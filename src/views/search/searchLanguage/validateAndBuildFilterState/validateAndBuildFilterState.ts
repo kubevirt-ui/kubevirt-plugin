@@ -1,4 +1,3 @@
-/* eslint-disable */
 import {
   type KubevirtFilter,
   type KubevirtFilterState,

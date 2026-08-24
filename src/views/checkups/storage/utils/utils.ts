@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { type TFunction } from 'i18next';
 
 import { ConfigMapModel, JobModel } from '@kubevirt-ui-ext/kubevirt-api/console';

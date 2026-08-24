@@ -9,12 +9,12 @@ import { FROM_PREFIX, TO_PREFIX } from '@search/utils/dateCreatedValues';
 import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
 import {
-  CPU_NUMERIC_REGEX,
   DATE_CREATED_FILTER_KEYS,
   FILTER_TYPE_TO_SEARCH_KEY,
-  MEMORY_UNIT_REGEX,
   NUMERIC_FILTER_KEYS,
   OPERATOR_TO_SIGN,
+  parseCpuNumeric,
+  parseMemoryUnit,
 } from './constants';
 import { toSearchString } from './utils';
 
@@ -41,9 +41,9 @@ const serializeNumericValue = (filterType: string, value: string): null | string
     return `${searchKey}${sign}${num}${unit}`;
   }
 
-  const parsed = parseCpuNumeric(value);
-  if (!parsed) return null;
-  const [operatorEnum, num] = parsed;
+  const cpuParsed = parseCpuNumeric(value);
+  if (!cpuParsed) return null;
+  const [operatorEnum, num] = cpuParsed;
   const sign = OPERATOR_TO_SIGN[operatorEnum];
   if (!sign) return null;
   return `${searchKey}${sign}${num}`;

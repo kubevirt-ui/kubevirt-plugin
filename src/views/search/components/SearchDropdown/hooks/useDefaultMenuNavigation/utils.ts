@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { KeyTypes } from '@patternfly/react-core';
 
 type SectionFocusIndices = {

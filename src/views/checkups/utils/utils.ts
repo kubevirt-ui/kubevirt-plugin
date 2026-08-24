@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { type TFunction } from 'i18next';
 
 import { JobModel, modelToGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';

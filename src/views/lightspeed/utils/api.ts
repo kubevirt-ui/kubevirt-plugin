@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { DEFAULT_LIGHTSPEED_API_BASE_URL, OLS_API_BASE_URL } from '@lightspeed/utils/constants';
 
 export const getAPIURL = (path: string): string => {

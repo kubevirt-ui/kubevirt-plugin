@@ -1,4 +1,3 @@
-/* eslint-disable */
 import produce from 'immer';
 
 import { DataImportCronModel, DataSourceModel } from '@kubevirt-ui-ext/kubevirt-api/console';

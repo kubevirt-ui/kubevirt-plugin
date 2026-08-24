@@ -1,4 +1,3 @@
-/* eslint-disable */
 import DropdownEnum from '@kubevirt-utils/utils/dropdownEnum';
 
 type TopConsumerScopeData = {

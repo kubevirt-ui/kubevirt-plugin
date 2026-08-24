@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 
 import { METRICS } from './constants';

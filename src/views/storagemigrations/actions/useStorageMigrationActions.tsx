@@ -1,4 +1,3 @@
-/* eslint-disable */
 import React, { type ReactNode, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router';
 
@@ -38,7 +37,7 @@ const useStorageMigrationActions: ExtensionHook<
         isOpen={isOpen}
         obj={migPlan}
         onClose={onClose}
-        onDeleteSubmit={() =>
+        onDeleteSubmit={(): Promise<unknown> =>
           k8sDelete({
             model: planModel,
             resource: migPlan,

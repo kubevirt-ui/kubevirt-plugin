@@ -1,4 +1,3 @@
-/* eslint-disable */
 import type {
   K8sResourceKind,
   K8sResourceKindReference,

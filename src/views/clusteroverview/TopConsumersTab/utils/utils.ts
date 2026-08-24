@@ -50,8 +50,11 @@ export const humanizeTopConsumerMetric = (
   return { unit: humanizedValue.unit, value: humanizedValue.value };
 };
 
-export const getHumanizedValue = (value: string, metric: TopConsumerMetric): HumanizeResult => {
-  const rawValue = getValue(value);
+export const getHumanizedValue = (
+  value: number | string,
+  metric: TopConsumerMetric,
+): HumanizeResult => {
+  const rawValue = typeof value === 'number' ? value : getValue(value);
   return humanizeTopConsumerMetric(rawValue, metric);
 };
 

@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { NumberOperator, numberOperatorInfo } from '@kubevirt-utils/utils/constants';
 import { SEARCH_KEY_BADGES } from '@search/components/SearchDropdown/constants';
 import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
@@ -41,5 +40,21 @@ export const NUMERIC_OPERATOR_REGEX = /^([a-zA-Z]+):?(>=|<=|>|<|=)(.*)$/;
 
 export const MEMORY_VALUE_REGEX = /^(\d+(?:\.\d+)?)\s*([A-Za-z]+)$/;
 
-export const MEMORY_UNIT_REGEX = /^(\S+)\s+(\d+(?:\.\d+)?)\s+(\w+?)$/;
-export const CPU_NUMERIC_REGEX = /^(\S+)\s+(.+)$/;
+export const parseMemoryUnit = (input: string): [string, string, string] | null => {
+  const parts = input.trim().split(/\s+/);
+  if (parts.length !== 3) return null;
+  const [key, numStr, unit] = parts;
+  if (!/^\d+(?:\.\d+)?$/.test(numStr)) return null;
+  if (!/^[A-Za-z]+$/.test(unit)) return null;
+  return [key, numStr, unit];
+};
+
+export const parseCpuNumeric = (input: string): [string, string] | null => {
+  const trimmed = input.trim();
+  const idx = trimmed.search(/\s/);
+  if (idx < 1) return null;
+  const key = trimmed.slice(0, idx);
+  const rest = trimmed.slice(idx).trim();
+  if (!rest) return null;
+  return [key, rest];
+};

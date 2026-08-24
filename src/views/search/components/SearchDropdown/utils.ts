@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { type KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { universalComparator } from '@kubevirt-utils/utils/utils';
 import { getFilterDefinition } from '@search/searchLanguage/utils';
