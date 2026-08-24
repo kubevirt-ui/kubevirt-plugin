@@ -1,15 +1,16 @@
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { TableColumnWithOptionalIndex } from '@virtualmachines/wizard/steps/InstanceTypesSteps/BootSourceStep/types';
+import { type TableColumnWithOptionalIndex } from '@virtualmachines/wizard/steps/InstanceTypesSteps/BootSourceStep/types';
 
 import useKubevirtUserSettings from './useKubevirtUserSettings';
 import { USER_SETTINGS_KEYS } from './utils/const';
+import { type UserSettingsState } from './utils/userSettingsInitialState';
 
 type UseKubevirtUserSettingsTableColumnsType = <T>(input: {
   columnManagementID: string;
   columns: TableColumnWithOptionalIndex<T>[];
 }) => [
   activeColumns: TableColumnWithOptionalIndex<T>[],
-  setActiveColumns: (val: any) => void,
+  setActiveColumns: (columnIds: string[]) => Promise<UserSettingsState['columns']> | undefined,
   loaded: boolean,
   error: Error,
 ];
@@ -22,8 +23,10 @@ const useKubevirtUserSettingsTableColumns: UseKubevirtUserSettingsTableColumnsTy
     USER_SETTINGS_KEYS.columns,
   );
 
-  const setActiveColumns = (columnIds: string[]) => {
-    setUserColumns?.({
+  const setActiveColumns = (
+    columnIds: string[],
+  ): Promise<UserSettingsState['columns']> | undefined => {
+    return setUserColumns?.({
       ...userColumns,
       [columnManagementID]: columnIds,
     });

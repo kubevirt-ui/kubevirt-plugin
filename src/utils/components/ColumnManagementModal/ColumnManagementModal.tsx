@@ -64,12 +64,12 @@ export const ColumnManagementModal: FC<ColumnManagementModalProps> = ({
     setCheckedColumns(updatedCheckedColumns);
   };
 
-  const submit: MouseEventHandler<HTMLButtonElement> = (event) => {
+  const submit: MouseEventHandler<HTMLButtonElement> = async (event) => {
     event.preventDefault();
     const orderedCheckedColumns = new Set<string>();
     for (const ids of checkedColumns) orderedCheckedColumns.add(ids);
 
-    setActiveColumns([...orderedCheckedColumns]);
+    await setActiveColumns([...orderedCheckedColumns]);
     onClose();
   };
 
