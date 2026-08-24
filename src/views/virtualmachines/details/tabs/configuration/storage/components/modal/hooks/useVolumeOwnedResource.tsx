@@ -1,7 +1,11 @@
 import { type V1VirtualMachine, type V1Volume } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { type VolumeTypes } from '@kubevirt-utils/components/DiskModal/utils/types';
 import { modelToGroupVersionKind } from '@kubevirt-utils/models';
-import { buildOwnerReference, compareOwnerReferences } from '@kubevirt-utils/resources/shared';
+import {
+  buildOwnerReference,
+  compareOwnerReferences,
+  getNamespace,
+} from '@kubevirt-utils/resources/shared';
 import { getCluster } from '@multicluster/helpers/selectors';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 import { type K8sModel } from '@openshift-console/dynamic-plugin-sdk';
@@ -38,7 +42,7 @@ const useVolumeOwnedResource: UseVolumeOwnedResource = (vm, volume) => {
           groupVersionKind: volumeGroupVersionKind,
           isList: false,
           name: volumeResourceName,
-          namespace: vm.metadata.namespace,
+          namespace: getNamespace(vm),
         }
       : null;
   const [resource, loaded, error] = useK8sWatchData<K8sResourceCommon>(watchVolumeResource);

@@ -1,10 +1,7 @@
 /* eslint-disable max-lines */
 import React, { type FC, useMemo, useState } from 'react';
 
-import {
-  type V1VirtualMachine,
-  type V1VirtualMachineInstance,
-} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import DiskModal from '@kubevirt-utils/components/DiskModal/DiskModal';
 import {
   isDeclarativeHotplugVolumesEnabled,
@@ -17,8 +14,7 @@ import useKubevirtHyperconvergeConfiguration from '@kubevirt-utils/hooks/useKube
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { getDataVolumeTemplates, getDisks, getVolumes } from '@kubevirt-utils/resources/vm';
-import { type DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/constants';
-import { isCDROMDisk } from '@kubevirt-utils/resources/vm/utils/disk/selectors';
+import { getDataVolumeName, isCDROMDisk } from '@kubevirt-utils/resources/vm/utils/disk/selectors';
 import { getContentScrollableElement } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import {
@@ -37,16 +33,9 @@ import DetachModal from '../../modal/DetachModal';
 import EjectCDROMModal from '../../modal/EjectCDROMModal';
 import MakePersistentModal from '../../modal/MakePersistentModal';
 import MountCDROMModal from '../../modal/MountCDROMModal';
+import { type DiskRowActionsProps } from './types';
 import { getDiskVolumeState } from './utils/getDiskVolumeState';
 import { isHotplugVolume, isPVCSource } from './utils/helpers';
-
-type DiskRowActionsProps = {
-  customize?: boolean;
-  obj: DiskRowDataLayout;
-  onDiskUpdate?: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine>;
-  vm: V1VirtualMachine;
-  vmi?: V1VirtualMachineInstance;
-};
 
 const DiskRowActions: FC<DiskRowActionsProps> = ({
   customize = false,
@@ -90,15 +79,16 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({
     }
 
     const newVM = produceVMDisks(vm, (draftVM) => {
-      const volumeToDelete = getVolumes(vm).find((vol) => vol.name === diskName);
+      const volumeToDelete = getVolumes(draftVM)?.find((vol) => vol.name === diskName);
+      const volumeName = volumeToDelete?.name ?? diskName;
       draftVM.spec.template.spec.domain.devices.disks = getDisks(draftVM)?.filter(
-        (disk) => disk.name !== (volumeToDelete?.name ?? diskName),
+        (disk) => disk.name !== volumeName,
       );
       draftVM.spec.template.spec.volumes = getVolumes(draftVM)?.filter(
-        (vol) => vol.name !== (volumeToDelete?.name ?? diskName),
+        (vol) => vol.name !== volumeName,
       );
       draftVM.spec.dataVolumeTemplates = getDataVolumeTemplates(draftVM)?.filter(
-        (dataVolume) => getName(dataVolume) !== volumeToDelete?.dataVolume?.name,
+        (dataVolume) => getName(dataVolume) !== getDataVolumeName(volumeToDelete),
       );
     });
 
@@ -178,18 +168,22 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({
     await cancelUpload();
   };
 
+  const actionLabel = isCDROMMountedState ? t('Eject') : t('Mount');
+  const cdromDropdownItem = (
+    <DropdownItem
+      isDisabled={isUploadInProgress}
+      key="cdrom"
+      onClick={isUploadInProgress ? undefined : (): void => onModalOpen(createCDROMModal)}
+    >
+      {actionLabel}
+    </DropdownItem>
+  );
   const mountCdromItem = isUploadInProgress ? (
     <Tooltip content={mountIsoUploadInProgressTooltip}>
-      <span>
-        <DropdownItem isDisabled key="cdrom">
-          {isCDROMMountedState ? t('Eject') : t('Mount')}
-        </DropdownItem>
-      </span>
+      <span>{cdromDropdownItem}</span>
     </Tooltip>
   ) : (
-    <DropdownItem key="cdrom" onClick={() => onModalOpen(createCDROMModal)}>
-      {isCDROMMountedState ? t('Eject') : t('Mount')}
-    </DropdownItem>
+    cdromDropdownItem
   );
 
   return (
