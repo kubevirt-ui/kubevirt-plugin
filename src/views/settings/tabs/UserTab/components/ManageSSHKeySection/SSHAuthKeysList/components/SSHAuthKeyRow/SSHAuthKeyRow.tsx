@@ -1,11 +1,11 @@
-import React, { FC, useCallback } from 'react';
+import React, { type FC, useCallback } from 'react';
 
 import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
 import { isEqualObject } from '@kubevirt-utils/components/NodeSelectorModal/utils/helpers';
 import {
   SecretSelectionOption,
-  SSHSecretDetails,
+  type SSHSecretDetails,
 } from '@kubevirt-utils/components/SSHSecretModal/utils/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { createSSHSecret } from '@kubevirt-utils/resources/secret/utils';
@@ -14,7 +14,7 @@ import { Button, ButtonVariant, Grid, GridItem, Truncate } from '@patternfly/rea
 import { MinusCircleIcon } from '@patternfly/react-icons';
 import { useSettingsCluster } from '@settings/context/SettingsClusterContext';
 
-import { AuthKeyRow } from '../../utils/types';
+import { type AuthKeyRow } from '../../utils/types';
 import AddProjectAuthKeyButton from '../AddProjectAuthKeyButton/AddProjectAuthKeyButton';
 
 import './SSHAuthKeyRow.scss';
@@ -46,14 +46,14 @@ const SSHAuthKeyRow: FC<SSHAuthKeyRowProps> = ({
         return Promise.resolve();
       }
 
-      if (secretOption === SecretSelectionOption.none && !isEmpty(secretName)) {
+      if (secretOption === SecretSelectionOption.None && !isEmpty(secretName)) {
         const updatedRow = { ...row, secretName: '' };
         onAuthKeyChange(updatedRow);
         return Promise.resolve();
       }
 
       if (
-        secretOption === SecretSelectionOption.useExisting &&
+        secretOption === SecretSelectionOption.UseExisting &&
         secretName !== sshSecretName &&
         !isEmpty(sshSecretName)
       ) {
@@ -63,7 +63,7 @@ const SSHAuthKeyRow: FC<SSHAuthKeyRowProps> = ({
       }
 
       if (
-        secretOption === SecretSelectionOption.addNew &&
+        secretOption === SecretSelectionOption.AddNew &&
         !isEmpty(sshPubKey) &&
         !isEmpty(sshSecretName)
       ) {
@@ -80,18 +80,20 @@ const SSHAuthKeyRow: FC<SSHAuthKeyRowProps> = ({
       <GridItem className="ssh-auth-row__project-name" span={5}>
         {isEmpty(secretName) ? (
           <InlineFilterSelect
-            options={selectableProjects?.sort().map((opt) => ({
-              children: opt,
-              groupVersionKind: modelToGroupVersionKind(ProjectModel),
-              value: opt,
-            }))}
+            options={selectableProjects
+              ?.toSorted((a, b) => a.localeCompare(b))
+              .map((opt) => ({
+                children: opt,
+                groupVersionKind: modelToGroupVersionKind(ProjectModel),
+                value: opt,
+              }))}
+            placeholder={t('Select project')}
+            selected={projectName}
+            setSelected={(newProject) => onAuthKeyChange({ ...row, projectName: newProject })}
             toggleProps={{
               'data-test': 'select-project-toggle',
               isFullWidth: true,
             }}
-            placeholder={t('Select project')}
-            selected={projectName}
-            setSelected={(newProject) => onAuthKeyChange({ ...row, projectName: newProject })}
           />
         ) : (
           <Truncate content={projectName} />

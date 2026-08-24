@@ -1,17 +1,16 @@
-// eslint-disable-next-line
 import { Buffer } from 'buffer';
 
 import { SecretModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { IoK8sApiCoreV1Secret } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type IoK8sApiCoreV1Secret } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import {
   SecretSelectionOption,
-  SSHSecretDetails,
+  type SSHSecretDetails,
 } from '@kubevirt-utils/components/SSHSecretModal/utils/types';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sCreate, kubevirtK8sDelete } from '@multicluster/k8sRequests';
-import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+import { type K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
 import { getName } from '../shared';
 
@@ -21,9 +20,9 @@ import {
 } from './../../components/CloudinitModal/utils/cloudinit-utils';
 
 export const decodeSecret = (secret: IoK8sApiCoreV1Secret): string =>
-  Buffer.from(secret?.data?.key || Object.values(secret?.data)?.[0] || '', 'base64').toString();
+  Buffer.from(secret?.data?.key ?? Object.values(secret?.data)?.[0] ?? '', 'base64').toString();
 
-export const encodeSecretKey = (key: string) => Buffer.from(key).toString('base64');
+export const encodeSecretKey = (key: string): string => Buffer.from(key).toString('base64');
 
 export const encodeKeyForVirtctlCommand = (vm: V1VirtualMachine, decodedPubKey: string): string => {
   const sshKeys = `ssh_authorized_keys:
@@ -36,7 +35,16 @@ export const encodeKeyForVirtctlCommand = (vm: V1VirtualMachine, decodedPubKey: 
   return encodeSecretKey(cloudInitUserData);
 };
 
-export const generateSSHKeySecret = (name: string, namespace: string, sshKey: string) => ({
+export const generateSSHKeySecret = (
+  name: string,
+  namespace: string,
+  sshKey: string,
+): {
+  apiVersion: string;
+  data: { key: string };
+  kind: string;
+  metadata: { name: string; namespace: string };
+} => ({
   apiVersion: SecretModel.apiVersion,
   data: { key: encodeSecretKey(sshKey) },
   kind: SecretModel.kind,
@@ -58,7 +66,7 @@ export const getInitialSSHDetails = ({
     ? {
         appliedDefaultKey: false,
         applyKeyToProject,
-        secretOption: SecretSelectionOption.addNew,
+        secretOption: SecretSelectionOption.AddNew,
         sshPubKey: decodeSecret(secretToCreate),
         sshSecretName: getName(secretToCreate),
         sshSecretNamespace,
@@ -67,8 +75,8 @@ export const getInitialSSHDetails = ({
         appliedDefaultKey: true,
         applyKeyToProject,
         secretOption: !isEmpty(sshSecretName)
-          ? SecretSelectionOption.useExisting
-          : SecretSelectionOption.none,
+          ? SecretSelectionOption.UseExisting
+          : SecretSelectionOption.None,
         sshPubKey: '',
         sshSecretName: sshSecretName || '',
         sshSecretNamespace,
@@ -114,7 +122,7 @@ export const createSSHSecret = (
   secretNamespace: string,
   cluster?: string,
   dryRun = false,
-) =>
+): Promise<K8sResourceCommon & { data?: { [key: string]: string } }> =>
   kubevirtK8sCreate<K8sResourceCommon & { data?: { [key: string]: string } }>({
     cluster,
     data: {
@@ -130,7 +138,7 @@ export const createSSHSecret = (
     ...(dryRun && { queryParams: { dryRun: 'All' } }),
   });
 
-export const deleteSecret = (secret: IoK8sApiCoreV1Secret) =>
+export const deleteSecret = (secret: IoK8sApiCoreV1Secret): false | Promise<K8sResourceCommon> =>
   secret &&
   kubevirtK8sDelete({
     cluster: getCluster(secret),

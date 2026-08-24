@@ -9,18 +9,16 @@ import { getNetworkInterfaceType } from '@kubevirt-utils/resources/vm/utils/netw
 import { NetworkInterfaceState } from '@kubevirt-utils/resources/vm/utils/network/types';
 import { generatePrettyName } from '@kubevirt-utils/utils/utils';
 import { type K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
-import { Checkbox, ExpandableSection, FormGroup } from '@patternfly/react-core';
+import { Checkbox, FormGroup } from '@patternfly/react-core';
 import {
   getConfigInterfaceStateFromVM,
   isLinkStateEditable,
 } from '@virtualmachines/details/tabs/configuration/network/utils/utils';
 
 import NameFormField from './components/NameFormField';
-import NetworkInterfaceLinkState from './components/NetworkInterfaceLinkState/NetworkInterfaceLinkState';
-import NetworkInterfaceMACAddressInput from './components/NetworkInterfaceMacAddressInput';
+import NetworkInterfaceAdvancedSettings from './components/NetworkInterfaceAdvancedSettings';
 import NetworkInterfaceModelSelect from './components/NetworkInterfaceModelSelect';
 import NetworkInterfaceNetworkSelect from './components/NetworkInterfaceNetworkSelect/NetworkInterfaceNetworkSelect';
-import NetworkInterfacePasst from './components/NetworkInterfacePasstSelect/NetworkInterfacePasst';
 import { type NetworkInterfaceModalProps } from './types';
 import { interfaceModelType } from './utils/constants';
 import { getNetworkName } from './utils/helpers';
@@ -120,30 +118,20 @@ const NetworkInterfaceModal: FC<NetworkInterfaceModalProps> = ({
           onChange={(_event, checked) => setIsBootSource(checked)}
         />
       </FormGroup>
-      <ExpandableSection
-        className="NetworkInterfaceModal__advanced"
+      <NetworkInterfaceAdvancedSettings
+        interfaceLinkState={interfaceLinkState}
+        interfaceMACAddress={interfaceMACAddress}
+        interfaceType={interfaceType}
         isExpanded={isExpanded}
-        onToggle={(_event, expand) => setIsExpanded(expand)}
-        toggleText={t('Advanced settings')}
-      >
-        <NetworkInterfacePasst
-          interfaceType={interfaceType}
-          namespace={getNamespace(vm)}
-          networkName={networkName}
-          setInterfaceType={setInterfaceType}
-        />
-        <NetworkInterfaceMACAddressInput
-          interfaceMACAddress={interfaceMACAddress}
-          isDisabled={!networkName}
-          setInterfaceMACAddress={setInterfaceMACAddress}
-          setIsError={setMacError}
-        />
-        <NetworkInterfaceLinkState
-          isDisabled={!isLinkStateEditable(interfaceLinkState) || passtEnabled}
-          linkState={interfaceLinkState}
-          setLinkState={setInterfaceLinkState}
-        />
-      </ExpandableSection>
+        networkName={networkName}
+        passtEnabled={passtEnabled}
+        setInterfaceLinkState={setInterfaceLinkState}
+        setInterfaceMACAddress={setInterfaceMACAddress}
+        setInterfaceType={setInterfaceType}
+        setIsExpanded={setIsExpanded}
+        setMacError={setMacError}
+        vm={vm}
+      />
     </TabModal>
   );
 };

@@ -1,4 +1,10 @@
-import React, { Dispatch, FC, FormEvent, SetStateAction, useState } from 'react';
+import React, {
+  type Dispatch,
+  type FC,
+  type FormEvent,
+  type SetStateAction,
+  useState,
+} from 'react';
 
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -23,7 +29,7 @@ const NetworkInterfaceMacAddressInput: FC<NetworkInterfaceMacAddressInputProps> 
 
   const [nameError, setNameError] = useState(undefined);
 
-  const handleNameChange = (value: string, event: FormEvent<HTMLInputElement>) => {
+  const handleNameChange = (value: string, event: FormEvent<HTMLInputElement>): void => {
     event.preventDefault();
     const error = validateMACAddress(t, value);
     setIsError(!!error);
@@ -41,7 +47,7 @@ const NetworkInterfaceMacAddressInput: FC<NetworkInterfaceMacAddressInputProps> 
         type="text"
         value={interfaceMACAddress}
       />
-      <FormGroupHelperText validated={validated}>{nameError && nameError}</FormGroupHelperText>
+      <FormGroupHelperText validated={validated}>{nameError}</FormGroupHelperText>
     </FormGroup>
   );
 };

@@ -1,6 +1,12 @@
-import React, { ComponentProps, forwardRef, HTMLProps, useState } from 'react';
+import React, { type ComponentProps, forwardRef, type HTMLProps, useState } from 'react';
 
-import { Button, ButtonVariant, Split, TextInput, TextInputProps } from '@patternfly/react-core';
+import {
+  Button,
+  ButtonVariant,
+  Split,
+  TextInput,
+  type TextInputProps,
+} from '@patternfly/react-core';
 import { EyeIcon, EyeSlashIcon } from '@patternfly/react-icons';
 
 // PatternFly changed the signature of the 'onChange' handler for input elements.
@@ -19,7 +25,7 @@ export const FormPasswordInput = forwardRef<HTMLInputElement, FormPasswordInputP
       <Split>
         <TextInput
           {...props}
-          onChange={(event, _value) => onChangeForward(event, _value)}
+          onChange={onChangeForward}
           ref={ref}
           type={passwordHidden ? 'password' : 'text'}
         />

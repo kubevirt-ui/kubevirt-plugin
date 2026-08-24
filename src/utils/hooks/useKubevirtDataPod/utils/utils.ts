@@ -19,12 +19,12 @@ export const getResourceVersion = (key: string): number | undefined => rsMapper[
 export const constructURL = (watchOptions: WatchK8sResource, query?: string): string => {
   const { groupVersionKind, name, namespace } = watchOptions || {};
   const baseUrl = `${PROXY_KUBEVIRT_URL}apis/${groupVersionKind?.group}/${groupVersionKind?.version}/`;
-  const namespaceUrl = namespace ? `namespaces/${namespace}/` : '';
-  const nameUrl = !name ? 's' : `/${name}`;
+  const namespacePart = namespace ? `namespaces/${namespace}/` : '';
+  const namePart = !name ? 's' : `/${name}`;
   const kindUrl = groupVersionKind?.kind.toLowerCase();
   const appendedQuery = !isEmpty(query) ? `?${query}` : '';
 
-  return `${baseUrl}${namespaceUrl}${kindUrl}${nameUrl}${appendedQuery}`;
+  return `${baseUrl}${namespacePart}${kindUrl}${namePart}${appendedQuery}`;
 };
 
 export const compareNameAndNamespace = (

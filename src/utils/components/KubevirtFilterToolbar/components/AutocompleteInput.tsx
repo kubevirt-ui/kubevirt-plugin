@@ -1,14 +1,14 @@
+import React, { type Dispatch, type FC, type SetStateAction, useMemo, useState } from 'react';
 import classNames from 'classnames';
-import React, { Dispatch, FC, SetStateAction, useMemo, useState } from 'react';
 
-import { FilterableObject } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
+import { type FilterableObject } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { labelParser } from '@kubevirt-utils/utils/labelUtils';
 import { fuzzyCaseInsensitive } from '@kubevirt-utils/utils/utils';
 import { Label, SelectList } from '@patternfly/react-core';
 
-import { useDocumentListener } from '../hooks/useDocumentListener';
-
 import { MAX_SUGGESTIONS, suggestionBoxKeyHandler } from '../constants';
+
+import { useDocumentListener } from '../hooks/useDocumentListener';
 import SearchFilter from './SearchFilter';
 
 type AutocompleteInputProps = {
@@ -32,16 +32,20 @@ const AutocompleteInput: FC<AutocompleteInputProps> = ({
 
   const processedData = useMemo(() => Array.from(labelParser(data)), [data]);
 
-  const onSelect = (value: string) => {
+  const onSelect = (value: string): void => {
     onSuggestionSelect(value);
     setVisible(false);
   };
 
-  const handleInput = (input: string) => {
+  const handleInput = (input: string): void => {
     setTextValue(input);
     setVisible(true);
-    // User input without whitespace
-    const processedText = input.trim().replace(/\s*=\s*/, '=');
+    const trimmed = input.trim();
+    const eqIdx = trimmed.indexOf('=');
+    const processedText =
+      eqIdx >= 0
+        ? trimmed.substring(0, eqIdx).trimEnd() + '=' + trimmed.substring(eqIdx + 1).trimStart()
+        : trimmed;
     const filtered = processedData
       .filter((item) => fuzzyCaseInsensitive(processedText, item))
       .slice(0, MAX_SUGGESTIONS);
@@ -51,7 +55,7 @@ const AutocompleteInput: FC<AutocompleteInputProps> = ({
   return (
     <div className="co-suggestion-box" ref={ref}>
       <SearchFilter
-        onChange={(_, input: string) => handleInput(input)}
+        onChange={(_event, input: string) => handleInput(input)}
         placeholder={placeholder}
         value={textValue}
       />

@@ -10,7 +10,7 @@ import {
   SELECTOR_OPERATOR_NOT_EQUALS_REGEX,
   SELECTOR_OPERATOR_NOT_IN_REGEX,
 } from './constants';
-import { Requirement } from './types';
+import { type Requirement } from './types';
 
 export const requirementFromString = (inputString: string): Requirement | undefined => {
   const string = inputString.trim();
@@ -56,7 +56,7 @@ export const requirementFromString = (inputString: string): Requirement | undefi
     const values = valuesString
       .slice(1, -1)
       .split(',')
-      .map((v) => v.trim());
+      .map((val) => val.trim());
 
     return {
       key,
@@ -70,7 +70,7 @@ export const requirementFromString = (inputString: string): Requirement | undefi
     const values = valuesString
       .slice(1, -1)
       .split(',')
-      .map((v) => v.trim());
+      .map((val) => val.trim());
 
     return {
       key,

@@ -1,9 +1,14 @@
 import { useMemo } from 'react';
 
-import { IoK8sApiCoreV1Node } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type IoK8sApiCoreV1Node } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 
 import { withOperatorPredicate } from '../utils/helpers';
-import { AffinityRowData } from '../utils/types';
+import { type AffinityRowData } from '../utils/types';
+
+const matchesAffinity = (node: IoK8sApiCoreV1Node, aff: AffinityRowData): boolean =>
+  !!node?.metadata?.labels &&
+  (aff?.expressions ?? []).every((exp) => withOperatorPredicate(node?.metadata?.labels, exp)) &&
+  (aff?.fields ?? []).every((field) => withOperatorPredicate(node, field));
 
 export const useAffinitiesQualifiedNodes = (
   nodes: IoK8sApiCoreV1Node[],
@@ -14,16 +19,8 @@ export const useAffinitiesQualifiedNodes = (
   return useMemo(() => {
     if (isNodesLoaded) {
       const suitableNodes = affinities.map((aff) =>
-        (nodes || []).filter(
-          (node) =>
-            node?.metadata?.labels &&
-            (aff?.expressions || []).every((exp) =>
-              withOperatorPredicate(node?.metadata?.labels, exp),
-            ) &&
-            (aff?.fields || []).every((field) => withOperatorPredicate(node, field)),
-        ),
+        (nodes ?? []).filter((node) => matchesAffinity(node, aff)),
       );
-      // OR/AND relation between nodes
       return filter(suitableNodes);
     }
     return [];

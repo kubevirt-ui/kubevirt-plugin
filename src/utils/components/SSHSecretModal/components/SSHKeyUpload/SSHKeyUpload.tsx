@@ -1,6 +1,6 @@
-import React, { Dispatch, FC, SetStateAction, useState } from 'react';
+import React, { type Dispatch, type FC, type SetStateAction, useState } from 'react';
 
-import { IoK8sApiCoreV1Secret } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type IoK8sApiCoreV1Secret } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -15,7 +15,7 @@ import {
   ValidatedOptions,
 } from '@patternfly/react-core';
 
-import { SecretSelectionOption, SSHSecretDetails } from '../../utils/types';
+import { SecretSelectionOption, type SSHSecretDetails } from '../../utils/types';
 import { getSecretNameErrorMessage } from '../../utils/utils';
 
 import './SSHKeyUpload.scss';
@@ -37,11 +37,11 @@ const SSHKeyUpload: FC<SSHKeyUploadProps> = ({ secrets, setSSHDetails, sshDetail
 
   const validated = !nameErrorMessage ? ValidatedOptions.default : ValidatedOptions.error;
 
-  const onChange = (_, sshPublicKey: string) => {
+  const onChange = (_event: unknown, sshPublicKey: string): void => {
     setIsValidKey(validateSSHPublicKey(sshPublicKey));
     setSSHDetails({
       ...sshDetails,
-      secretOption: SecretSelectionOption.addNew,
+      secretOption: SecretSelectionOption.AddNew,
       sshPubKey: sshPublicKey?.trim(),
       sshSecretNamespace: vmNamespaceTarget,
     });
@@ -50,29 +50,29 @@ const SSHKeyUpload: FC<SSHKeyUploadProps> = ({ secrets, setSSHDetails, sshDetail
   return (
     <Form isHorizontal>
       <FileUpload
-        onClearClick={() => {
-          setSSHDetails({
-            ...sshDetails,
-            secretOption: SecretSelectionOption.addNew,
-            sshPubKey: '',
-          });
-        }}
-        onFileInputChange={async (_, file: File) => {
-          const fileText = await file.text();
-          setIsValidKey(validateSSHPublicKey(fileText));
-          setSSHDetails({
-            ...sshDetails,
-            secretOption: SecretSelectionOption.addNew,
-            sshPubKey: fileText?.trim(),
-          });
-        }}
         allowEditingUploadedText
         browseButtonText={t('Upload')}
         className="ssh-key-upload__file-upload"
         id="ssh-key-upload"
         isLoading={isLoading}
         isReadOnly={false}
+        onClearClick={() => {
+          setSSHDetails({
+            ...sshDetails,
+            secretOption: SecretSelectionOption.AddNew,
+            sshPubKey: '',
+          });
+        }}
         onDataChange={onChange}
+        onFileInputChange={async (_event, file: File) => {
+          const fileText = await file.text();
+          setIsValidKey(validateSSHPublicKey(fileText));
+          setSSHDetails({
+            ...sshDetails,
+            secretOption: SecretSelectionOption.AddNew,
+            sshPubKey: fileText?.trim(),
+          });
+        }}
         onReadFinished={() => setIsLoading(false)}
         onReadStarted={() => setIsLoading(true)}
         onTextChange={onChange}
@@ -94,24 +94,22 @@ const SSHKeyUpload: FC<SSHKeyUploadProps> = ({ secrets, setSSHDetails, sshDetail
         label={t('Secret name')}
       >
         <TextInput
+          id="new-secret-name"
+          isRequired
+          name="new-secret-name"
           onChange={(_event, secretName: string) => {
             setNameErrorMessage(getSecretNameErrorMessage(secretName, vmNamespaceTarget, secrets));
             setSSHDetails({
               ...sshDetails,
-              secretOption: SecretSelectionOption.addNew,
+              secretOption: SecretSelectionOption.AddNew,
               // secret name must be under 51 chars, or machine will fail starting.
               sshSecretName: secretName.substring(0, 51),
             });
           }}
-          id="new-secret-name"
-          isRequired
-          name="new-secret-name"
           type="text"
           value={sshDetails?.sshSecretName}
         />
-        <FormGroupHelperText validated={validated}>
-          {nameErrorMessage && nameErrorMessage}
-        </FormGroupHelperText>
+        <FormGroupHelperText validated={validated}>{nameErrorMessage}</FormGroupHelperText>
       </FormGroup>
     </Form>
   );

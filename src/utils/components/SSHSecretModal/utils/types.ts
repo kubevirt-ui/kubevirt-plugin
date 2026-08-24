@@ -1,9 +1,11 @@
-import { IoK8sApiCoreV1Secret } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type Dispatch, type SetStateAction } from 'react';
+
+import { type IoK8sApiCoreV1Secret } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 
 export enum SecretSelectionOption {
-  addNew = 'addNew',
-  none = 'none',
-  useExisting = 'useExisting',
+  AddNew = 'addNew',
+  None = 'none',
+  UseExisting = 'useExisting',
 }
 
 export type SSHSecretDetails = {
@@ -19,6 +21,18 @@ export type SSHSecretDetails = {
   sshSecretName: string;
   // The namespace of secret
   sshSecretNamespace: string;
+};
+
+export type SSHOptionUseExistingProps = {
+  cluster?: string;
+  localNSProject: string;
+  namespace?: string;
+  projectsWithSecrets: { [namespace: string]: IoK8sApiCoreV1Secret[] };
+  secrets: IoK8sApiCoreV1Secret[];
+  secretsLoaded: boolean;
+  setLocalNSProject: Dispatch<SetStateAction<string>>;
+  setSSHDetails: Dispatch<SetStateAction<SSHSecretDetails>>;
+  sshDetails: SSHSecretDetails;
 };
 
 export type SecretsData = {

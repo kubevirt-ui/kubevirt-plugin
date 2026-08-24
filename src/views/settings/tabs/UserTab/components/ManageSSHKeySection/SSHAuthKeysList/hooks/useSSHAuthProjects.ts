@@ -67,7 +67,8 @@ const useSSHAuthProjects: UseSSHAuthProjects = (authKeyRows) => {
       }),
     );
 
-    void Promise.allSettled(promises)
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises -- allSettled never rejects
+    Promise.allSettled(promises)
       .then((settledResults) => {
         if (cancelled) return;
 

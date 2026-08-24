@@ -1,9 +1,10 @@
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { customizeWizardVMSignal } from '@kubevirt-utils/signals/customizeWizardVMSignal';
 
-import { getUploadClusterForVm } from '../keys/uploadKeys';
 import { useUploadProgressStore } from '../uploadProgressStore';
+
+import { getUploadClusterForVm } from '../keys/uploadKeys';
 
 export const cancelPendingVmUploads = (vm?: V1VirtualMachine): Promise<void> => {
   const target = vm ?? customizeWizardVMSignal.value;
@@ -20,5 +21,8 @@ export const cancelPendingVmUploads = (vm?: V1VirtualMachine): Promise<void> => 
 };
 
 export const cancelAllWizardPendingUploads = (): void => {
-  void useUploadProgressStore.getState().cancelAllPendingUploads();
+  useUploadProgressStore
+    .getState()
+    .cancelAllPendingUploads()
+    .catch(() => {});
 };

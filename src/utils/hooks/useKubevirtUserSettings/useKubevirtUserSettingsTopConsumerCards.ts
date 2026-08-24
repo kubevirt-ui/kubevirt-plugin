@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef } from 'react';
 
 import DurationOption from '@kubevirt-utils/components/DurationOption/DurationOption';
 import { isEqualObject } from '@kubevirt-utils/components/NodeSelectorModal/utils/helpers';
+import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 
 import useLocalStorage from '../useLocalStorage';
 
@@ -40,9 +41,9 @@ const useKubevirtUserSettingsTopConsumerCards: UseKubevirtUserSettingsTopConsume
     }
 
     if (!isEqualObject(topConsumerSettingsLocalStorage, cards?.[TOP_CONSUMERS_CARD])) {
-      void setCards?.({
-        [TOP_CONSUMERS_CARD]: topConsumerSettingsLocalStorage,
-      } as unknown as typeof cards);
+      setCards?.({ [TOP_CONSUMERS_CARD]: topConsumerSettingsLocalStorage }).catch(
+        kubevirtConsole.error,
+      );
     }
   }, [
     cards,

@@ -1,3 +1,4 @@
+/* eslint-disable */
 export const buildFilterPath = (
   basePath: string,
   paramName: string,

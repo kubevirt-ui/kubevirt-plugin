@@ -3,20 +3,94 @@ import {
   LOCALIZATION_LANGUAGE_LABEL,
   LOCALIZATION_NAME_LABEL,
 } from '@kubevirt-utils/hooks/useQuickStarts/utils/constants';
-import { QuickStart } from '@patternfly/quickstarts';
+import { type QuickStart } from '@patternfly/quickstarts';
 
-export const getQuickStartNameRef = (quickStart: QuickStart) =>
-  quickStart.metadata.labels?.[LOCALIZATION_NAME_LABEL] ||
-  quickStart.metadata.annotations?.[LOCALIZATION_NAME_LABEL] ||
+export const getQuickStartNameRef = (quickStart: QuickStart): string =>
+  quickStart.metadata.labels?.[LOCALIZATION_NAME_LABEL] ??
+  quickStart.metadata.annotations?.[LOCALIZATION_NAME_LABEL] ??
   quickStart.metadata.name;
 
-export const groupQuickStartsByName = (quickStarts: QuickStart[]) => {
+export const groupQuickStartsByName = (quickStarts: QuickStart[]): Record<string, QuickStart[]> => {
   return quickStarts.reduce<Record<string, QuickStart[]>>((grouped, quickStart) => {
     const name = getQuickStartNameRef(quickStart);
-    if (!grouped[name]) grouped[name] = [];
+    grouped[name] ??= [];
     grouped[name].push(quickStart);
     return grouped;
   }, {});
+};
+
+const extractLocale = (
+  quickStart: QuickStart,
+): { quickStartCountry: string; quickStartLanguage: string } => {
+  const quickStartLanguage = (
+    quickStart.metadata?.labels?.[LOCALIZATION_LANGUAGE_LABEL] ?? 'en'
+  ).toLowerCase();
+  const quickStartCountry = (
+    quickStart.metadata?.labels?.[LOCALIZATION_COUNTRY_LABEL] ?? ''
+  ).toUpperCase();
+  return { quickStartCountry, quickStartLanguage };
+};
+
+const findLanguageFallback = (
+  quickStart: QuickStart,
+  quickStartLanguage: string,
+  quickStartCountry: string,
+  preferredLanguage: string,
+  sameLanguageWithoutCountry: null | QuickStart,
+  sameLanguageWithAnyCountry: null | QuickStart,
+): {
+  sameLanguageWithAnyCountry: null | QuickStart;
+  sameLanguageWithoutCountry: null | QuickStart;
+} => {
+  let updatedWithoutCountry = sameLanguageWithoutCountry;
+  let updatedWithAnyCountry = sameLanguageWithAnyCountry;
+
+  if (quickStartLanguage === preferredLanguage) {
+    if (!quickStartCountry && !updatedWithoutCountry) {
+      updatedWithoutCountry = quickStart;
+    } else if (quickStartCountry && !updatedWithAnyCountry) {
+      updatedWithAnyCountry = quickStart;
+    }
+  }
+
+  return {
+    sameLanguageWithAnyCountry: updatedWithAnyCountry,
+    sameLanguageWithoutCountry: updatedWithoutCountry,
+  };
+};
+
+const findEnglishFallback = (
+  quickStart: QuickStart,
+  quickStartLanguage: string,
+  quickStartCountry: string,
+  preferredCountry: string,
+  fallbackLanguageSameCountry: null | QuickStart,
+  fallbackLanguageNoCountry: null | QuickStart,
+  fallbackLanguageAnyCountry: null | QuickStart,
+): {
+  fallbackLanguageAnyCountry: null | QuickStart;
+  fallbackLanguageNoCountry: null | QuickStart;
+  fallbackLanguageSameCountry: null | QuickStart;
+} => {
+  let updatedSameCountry = fallbackLanguageSameCountry;
+  let updatedNoCountry = fallbackLanguageNoCountry;
+  let updatedAnyCountry = fallbackLanguageAnyCountry;
+
+  if (quickStartLanguage === 'en') {
+    if (quickStartCountry === preferredCountry && !updatedSameCountry) {
+      updatedSameCountry = quickStart;
+    } else if (!quickStartCountry && !updatedNoCountry) {
+      updatedNoCountry = quickStart;
+    } else {
+      updatedAnyCountry ??= quickStart;
+    }
+  }
+
+  return {
+    fallbackLanguageAnyCountry: updatedAnyCountry,
+    fallbackLanguageNoCountry: updatedNoCountry,
+    fallbackLanguageSameCountry: updatedSameCountry,
+  };
 };
 
 /**
@@ -39,51 +113,54 @@ export const groupQuickStartsByName = (quickStarts: QuickStart[]) => {
  * @param language Language code
  */
 export const getBestMatch = (quickStarts: QuickStart[], language: string): null | QuickStart => {
-  if (!quickStarts || !quickStarts.length) {
+  if (!quickStarts?.length) {
     return null;
   }
-  const preferredLanguage = (language || 'en').split('-')[0].toLowerCase();
-  const preferredCountry = ((language || '').split('-')[1] || '').toUpperCase();
+  const preferredLanguage = (language ?? 'en').split('-')[0].toLowerCase();
+  const preferredCountry = ((language ?? '').split('-')[1] ?? '').toUpperCase();
 
-  let sameLanguageWithoutCountry: QuickStart = null;
-  let sameLanguageWithAnyCountry: QuickStart = null;
-  let fallbackLanguageSameCountry: QuickStart = null;
-  let fallbackLanguageNoCountry: QuickStart = null;
-  let fallbackLanguageAnyCountry: QuickStart = null;
+  let sameLanguageWithoutCountry: null | QuickStart = null;
+  let sameLanguageWithAnyCountry: null | QuickStart = null;
+  let fallbackLanguageSameCountry: null | QuickStart = null;
+  let fallbackLanguageNoCountry: null | QuickStart = null;
+  let fallbackLanguageAnyCountry: null | QuickStart = null;
 
   for (const quickStart of quickStarts) {
-    const quickStartLanguage = (
-      quickStart.metadata?.labels?.[LOCALIZATION_LANGUAGE_LABEL] || 'en'
-    ).toLowerCase();
-    const quickStartCountry = (
-      quickStart.metadata?.labels?.[LOCALIZATION_COUNTRY_LABEL] || ''
-    ).toUpperCase();
+    const { quickStartCountry, quickStartLanguage } = extractLocale(quickStart);
 
     if (quickStartLanguage === preferredLanguage && quickStartCountry === preferredCountry) {
       return quickStart;
     }
-    if (quickStartLanguage === preferredLanguage) {
-      if (!quickStartCountry && !sameLanguageWithoutCountry) {
-        sameLanguageWithoutCountry = quickStart;
-      } else if (quickStartCountry && !sameLanguageWithAnyCountry) {
-        sameLanguageWithAnyCountry = quickStart;
-      }
-    }
-    if (quickStartLanguage === 'en') {
-      if (quickStartCountry === preferredCountry && !fallbackLanguageSameCountry) {
-        fallbackLanguageSameCountry = quickStart;
-      } else if (!quickStartCountry && !fallbackLanguageNoCountry) {
-        fallbackLanguageNoCountry = quickStart;
-      } else if (!fallbackLanguageAnyCountry) {
-        fallbackLanguageAnyCountry = quickStart;
-      }
-    }
+
+    const langResult = findLanguageFallback(
+      quickStart,
+      quickStartLanguage,
+      quickStartCountry,
+      preferredLanguage,
+      sameLanguageWithoutCountry,
+      sameLanguageWithAnyCountry,
+    );
+    sameLanguageWithoutCountry = langResult.sameLanguageWithoutCountry;
+    sameLanguageWithAnyCountry = langResult.sameLanguageWithAnyCountry;
+
+    const enResult = findEnglishFallback(
+      quickStart,
+      quickStartLanguage,
+      quickStartCountry,
+      preferredCountry,
+      fallbackLanguageSameCountry,
+      fallbackLanguageNoCountry,
+      fallbackLanguageAnyCountry,
+    );
+    fallbackLanguageSameCountry = enResult.fallbackLanguageSameCountry;
+    fallbackLanguageNoCountry = enResult.fallbackLanguageNoCountry;
+    fallbackLanguageAnyCountry = enResult.fallbackLanguageAnyCountry;
   }
   return (
-    sameLanguageWithoutCountry ||
-    sameLanguageWithAnyCountry ||
-    fallbackLanguageSameCountry ||
-    fallbackLanguageNoCountry ||
+    sameLanguageWithoutCountry ??
+    sameLanguageWithAnyCountry ??
+    fallbackLanguageSameCountry ??
+    fallbackLanguageNoCountry ??
     fallbackLanguageAnyCountry
   );
 };

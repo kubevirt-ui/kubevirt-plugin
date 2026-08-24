@@ -1,4 +1,4 @@
-import { OnboardingPopoversHidden } from '@kubevirt-utils/components/OnboardingPopover/types';
+import { type OnboardingPopoversHidden } from '@kubevirt-utils/components/OnboardingPopover/types';
 
 export type UserSettingsState = {
   cards: CardsUserSettings;
@@ -10,7 +10,7 @@ export type UserSettingsState = {
   quickStart: QuickStartUserSettings;
   recentSearches: string[];
   savedSearches: {
-    [key: string]: any;
+    [key: string]: { description: string; isFavorited: boolean; query: string };
   };
   ssh: SSHUserSettings;
 };
@@ -33,7 +33,7 @@ export type QuickStartUserSettings = {
 };
 
 type CardsUserSettings = {
-  [cardPage: string]: { cardName: string; value: boolean };
+  [cardPage: string]: Record<string, unknown>;
 };
 
 type DefaultVMLabelsUserSettings = {

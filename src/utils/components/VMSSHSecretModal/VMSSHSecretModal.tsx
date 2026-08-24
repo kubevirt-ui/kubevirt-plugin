@@ -1,6 +1,6 @@
-import React, { FC, useCallback, useMemo } from 'react';
+import React, { type FC, useCallback, useMemo } from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { createSSHSecret, getInitialSSHDetails } from '@kubevirt-utils/resources/secret/utils';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { getVMSSHSecretName } from '@kubevirt-utils/resources/vm';
@@ -8,14 +8,14 @@ import { isEmpty } from '@kubevirt-utils/utils/utils';
 
 import { isEqualObject } from '../NodeSelectorModal/utils/helpers';
 import SSHSecretModal from '../SSHSecretModal/SSHSecretModal';
-import { SecretSelectionOption, SSHSecretDetails } from '../SSHSecretModal/utils/types';
+import { SecretSelectionOption, type SSHSecretDetails } from '../SSHSecretModal/utils/types';
 import { addSecretToVM, detachVMSecret } from '../SSHSecretModal/utils/utils';
 
 type VMSSHSecretModalProps = {
   authorizedSSHKeys: { [namespace: string]: string };
   isOpen: boolean;
   onClose: () => void;
-  updateAuthorizedSSHKeys: (val: any) => void;
+  updateAuthorizedSSHKeys: (val: { [namespace: string]: string }) => void;
   updateVM: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine | void>;
   vm: V1VirtualMachine;
 };
@@ -52,14 +52,14 @@ const VMSSHSecretModal: FC<VMSSHSecretModalProps> = ({
       }
 
       if (
-        secretOption === SecretSelectionOption.none &&
-        initialSSHDetails.secretOption !== SecretSelectionOption.none
+        secretOption === SecretSelectionOption.None &&
+        initialSSHDetails.secretOption !== SecretSelectionOption.None
       ) {
         return detachVMSecret(vm);
       }
 
       if (
-        secretOption === SecretSelectionOption.useExisting &&
+        secretOption === SecretSelectionOption.UseExisting &&
         initialSSHDetails.sshSecretName !== sshSecretName &&
         !isEmpty(sshSecretName)
       ) {
@@ -67,7 +67,7 @@ const VMSSHSecretModal: FC<VMSSHSecretModalProps> = ({
       }
 
       if (
-        secretOption === SecretSelectionOption.addNew &&
+        secretOption === SecretSelectionOption.AddNew &&
         !isEmpty(sshPubKey) &&
         !isEmpty(sshSecretName)
       ) {

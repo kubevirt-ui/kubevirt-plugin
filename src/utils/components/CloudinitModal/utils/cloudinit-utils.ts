@@ -13,16 +13,19 @@ import { safeYAMLToJS } from '@kubevirt-utils/utils/yaml';
 import { AutomaticSubscriptionTypeEnum } from '@settings/tabs/ClusterTab/components/GuestManagmentSection/AutomaticSubscriptionRHELGuests/components/AutomaticSubscriptionType/utils/utils';
 
 import { AUTO_UPDATE_OS_CMD, CLOUD_CONFIG_HEADER, DNF_AUTOMATIC_PACKAGE } from './constants';
+import { type CloudInitNetwork, type CloudInitNetworkData, type CloudInitUserData } from './types';
 
-export const deleteObjBlankValues = (obj: object = {}) =>
-  Object.fromEntries(Object.entries(obj)?.filter(([, v]) => !!v));
+export type { CloudInitNetworkData, CloudInitUserData } from './types';
+
+export const deleteObjBlankValues = (obj: object = {}): Record<string, unknown> =>
+  Object.fromEntries(Object.entries(obj)?.filter(([, val]) => !!val));
 
 export const getCloudInitVolume = (vm: V1VirtualMachine): V1Volume => {
   return getVolumes(vm)?.find((vol) => !!vol.cloudInitConfigDrive || !!vol.cloudInitNoCloud);
 };
 
 export const getCloudInitData = (cloudInitVolume: V1Volume): V1CloudInitNoCloudSource => {
-  return cloudInitVolume?.cloudInitConfigDrive || cloudInitVolume?.cloudInitNoCloud;
+  return cloudInitVolume?.cloudInitConfigDrive ?? cloudInitVolume?.cloudInitNoCloud;
 };
 
 export const convertYAMLUserDataObject = (
@@ -40,35 +43,29 @@ export const convertUserDataObjectToYAML = (
     const filteredUser = deleteObjBlankValues(userData);
     const result = dump(filteredUser);
     return addHeader ? `${CLOUD_CONFIG_HEADER}\n${result}` : result;
-  } catch (e) {
-    kubevirtConsole.error(e);
+  } catch (err) {
+    kubevirtConsole.error(err);
     return undefined;
   }
 };
 
-export const convertYAMLToNetworkDataObject = (networkData: string): CloudInitNetworkData => {
+export const convertYAMLToNetworkDataObject = (
+  networkData: string,
+): CloudInitNetworkData | undefined => {
   const networkObj = safeYAMLToJS<CloudInitNetwork | undefined>(networkData, undefined);
-  if (!networkObj) return undefined;
+  if (!networkObj?.ethernets) return undefined;
 
-  const name = networkObj?.ethernets && Object.keys(networkObj?.ethernets)?.[0];
+  const name = Object.keys(networkObj.ethernets)[0];
+  if (!name) return undefined;
 
-  const ips =
-    !isEmpty(networkObj?.ethernets?.[name]?.addresses) && networkObj?.ethernets?.[name]?.addresses;
-
-  const addresses = Array.isArray(ips) ? ips?.join(',') : ips;
-  const gateway4 = networkObj?.ethernets?.[name]?.gateway4;
-  const gateway6 = networkObj?.ethernets?.[name]?.gateway6;
+  const ethernet = networkObj.ethernets[name];
+  const rawAddresses = !isEmpty(ethernet?.addresses) ? ethernet.addresses : undefined;
+  const addresses = Array.isArray(rawAddresses) ? rawAddresses.join(',') : rawAddresses;
+  const gateway4 = ethernet?.gateway4;
+  const gateway6 = ethernet?.gateway6;
 
   const nonEmptyNetworkObj = !!addresses || !!name || !!gateway4 || !!gateway6;
-
-  return (
-    nonEmptyNetworkObj && {
-      addresses,
-      gateway4,
-      gateway6,
-      name,
-    }
-  );
+  return nonEmptyNetworkObj ? { addresses, gateway4, gateway6, name } : undefined;
 };
 
 export const convertNetworkDataObjectToYAML = (networkData: CloudInitNetworkData): string => {
@@ -88,18 +85,21 @@ export const convertNetworkDataObjectToYAML = (networkData: CloudInitNetworkData
           version: 2,
         } as CloudInitNetwork)
       : null;
-  } catch (e) {
-    kubevirtConsole.error(e);
+  } catch (err) {
+    kubevirtConsole.error(err);
     return undefined;
   }
 };
 
-export const createDefaultCloudInitYAML = () => ({
+export const createDefaultCloudInitYAML = (): { networkData: string; userData: string } => ({
   networkData: '',
   userData: '',
 });
 
-export const addDNFUpdateToRunCMD = (userData: CloudInitUserData, autoUpdateEnabled: boolean) => {
+export const addDNFUpdateToRunCMD = (
+  userData: CloudInitUserData,
+  autoUpdateEnabled: boolean,
+): void => {
   if (autoUpdateEnabled) {
     userData.packages ??= [];
     userData.packages.push(DNF_AUTOMATIC_PACKAGE);
@@ -112,7 +112,7 @@ export const addDNFUpdateToRunCMD = (userData: CloudInitUserData, autoUpdateEnab
 export const addSubscriptionManagerToRunCMD = (
   userData: CloudInitUserData,
   subscriptionData: RHELAutomaticSubscriptionData,
-) => {
+): void => {
   const subscriptionManagerCMD = [
     `subscription-manager register --org=${subscriptionData.organizationID} --activationkey=${subscriptionData.activationKey}`,
   ];
@@ -145,16 +145,21 @@ export const updateCloudInitRHELSubscription = (
     return vmVolumes;
   }
 
-  const [cloudInitVol, restVolumes]: [null | V1Volume, V1Volume[]] = vmVolumes.reduce(
+  const [cloudInitVol, restVolumes] = vmVolumes.reduce<[null | V1Volume, V1Volume[]]>(
     (result, vol) => {
-      !isEmpty(getCloudInitData(vol)) ? (result[0] = vol) : result[1].push(vol);
+      if (!isEmpty(getCloudInitData(vol))) {
+        result[0] = vol;
+      } else {
+        result[1].push(vol);
+      }
       return result;
     },
     [null, []],
   );
 
-  const cloudInitVolData = getCloudInitData(cloudInitVol);
+  if (!cloudInitVol) return vmVolumes;
 
+  const cloudInitVolData = getCloudInitData(cloudInitVol);
   const userDataObject = convertYAMLUserDataObject(cloudInitVolData?.userData);
 
   const updatedUserDataObject = produce(userDataObject, (draftUserDataObject) => {
@@ -171,31 +176,4 @@ export const updateCloudInitRHELSubscription = (
   });
 
   return [...restVolumes, updatedCloudInitVolume];
-};
-
-export type CloudInitUserData = {
-  chpasswd?: { expire?: boolean };
-  hostname?: string;
-  packages?: string[];
-  password: string;
-  runcmd?: Array<string | string[]>;
-  user: string;
-};
-
-export type CloudInitNetworkData = {
-  addresses: string;
-  gateway4?: string;
-  gateway6?: string;
-  name: string;
-};
-
-type CloudInitNetwork = {
-  ethernets: {
-    [name: string]: {
-      addresses: string[];
-      gateway4?: string;
-      gateway6?: string;
-    };
-  };
-  version: number;
 };

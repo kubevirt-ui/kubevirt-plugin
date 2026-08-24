@@ -1,4 +1,4 @@
-import React, { FC, useMemo, useState } from 'react';
+import React, { type FC, useMemo, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { createSSHSecret } from '@kubevirt-utils/resources/secret/utils';
@@ -7,10 +7,9 @@ import useClusterParam from '@multicluster/hooks/useClusterParam';
 
 import MutedTextSpan from '../MutedTextSpan/MutedTextSpan';
 import TabModal from '../TabModal/TabModal';
-
 import SSHSecretModalBody from './components/SSHSecretModalBody/SSHSecretModalBody';
 import useSecretsData from './hooks/useSecretsData';
-import { SecretSelectionOption, SSHSecretDetails } from './utils/types';
+import { SecretSelectionOption, type SSHSecretDetails } from './utils/types';
 import { validateSecretName, validateSecretNameUnique } from './utils/utils';
 
 type SSHSecretModalProps = {
@@ -21,7 +20,7 @@ type SSHSecretModalProps = {
   isUserTab?: boolean;
   namespace: string;
   onClose: () => void;
-  onSubmit: (sshDetails: SSHSecretDetails) => Promise<any | void>;
+  onSubmit: (sshDetails: SSHSecretDetails) => Promise<unknown | void>;
 };
 
 const SSHSecretModal: FC<SSHSecretModalProps> = ({
@@ -47,8 +46,8 @@ const SSHSecretModal: FC<SSHSecretModalProps> = ({
 
     return (
       !secretsLoaded ||
-      (secretOption === SecretSelectionOption.useExisting && isEmpty(sshSecretName)) ||
-      (secretOption === SecretSelectionOption.addNew &&
+      (secretOption === SecretSelectionOption.UseExisting && isEmpty(sshSecretName)) ||
+      (secretOption === SecretSelectionOption.AddNew &&
         (isEmpty(sshPubKey) ||
           isEmpty(sshSecretName) ||
           !validateSSHPublicKey(sshPubKey) ||
@@ -59,18 +58,18 @@ const SSHSecretModal: FC<SSHSecretModalProps> = ({
 
   return (
     <TabModal
+      headerText={t('Public SSH key')}
+      isDisabled={isDisabled}
+      isOpen={isOpen}
+      onClose={onClose}
       onSubmit={async () => {
         const { secretOption, sshPubKey, sshSecretName } = sshDetails;
-        if (secretOption === SecretSelectionOption.addNew) {
+        if (secretOption === SecretSelectionOption.AddNew) {
           await createSSHSecret(sshPubKey, sshSecretName, namespace, cluster, true);
         }
 
         return onSubmit(sshDetails);
       }}
-      headerText={t('Public SSH key')}
-      isDisabled={isDisabled}
-      isOpen={isOpen}
-      onClose={onClose}
     >
       <MutedTextSpan text={t('SSH key is saved in the project as a secret')} />
       <SSHSecretModalBody

@@ -43,7 +43,9 @@ const PodSelectorModal: FC<PodSelectorModalProps> = ({
   const [error, setError] = useState();
   const initialSelector = get(resource, path);
 
-  const [selector, setSelector] = useState(() => arrayify(initialSelector));
+  const [selector, setSelector] = useState(() =>
+    arrayify((initialSelector ?? {}) as Record<string, unknown>),
+  );
 
   const createPath = isEmpty(initialSelector);
 

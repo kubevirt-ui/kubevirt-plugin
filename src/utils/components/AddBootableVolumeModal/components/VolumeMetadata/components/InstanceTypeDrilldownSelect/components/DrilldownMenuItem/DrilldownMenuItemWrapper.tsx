@@ -1,14 +1,14 @@
-import React, { FC, useMemo } from 'react';
+import React, { type FC, type ReactNode, useMemo } from 'react';
 
 import HugepagesInfo from '@kubevirt-utils/components/HugepagesInfo/HugepagesInfo';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { type InstanceTypeSeries } from '@kubevirt-utils/resources/instancetype/types';
 import { Divider } from '@patternfly/react-core';
 
 import { instanceTypeSeriesNameMapper } from '../../utils/constants';
-import { RedHatInstanceTypeSeries } from '../../utils/types';
+import { type RedHatInstanceTypeSeries } from '../../utils/types';
 import { getSeriesLabel, seriesHasHugepagesVariant } from '../../utils/utils';
 import RedHatInstanceTypeSeriesSizesMenuItems from '../RedHatInstanceTypeSeriesMenu/RedHatInstanceTypeSeriesSizesMenuItems';
-
 import DrilldownMenuItem from './DrilldownMenuItem';
 
 type DrilldownMenuItemWrapperProps = {
@@ -26,11 +26,13 @@ const DrilldownMenuItemWrapper: FC<DrilldownMenuItemWrapperProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const { seriesName, sizes } = series;
-  const { disabled, Icon } = instanceTypeSeriesNameMapper[seriesName] || {};
+  const seriesConfig = instanceTypeSeriesNameMapper[seriesName as InstanceTypeSeries];
+  const disabled = seriesConfig?.disabled;
+  const Icon = seriesConfig?.Icon;
 
   const seriesLabel = useMemo(() => getSeriesLabel(seriesName, t), [seriesName, t]);
 
-  const getMenuItems = (isHugepages?: boolean) => (
+  const getMenuItems = (isHugepages?: boolean): ReactNode => (
     <RedHatInstanceTypeSeriesSizesMenuItems
       isHugepages={isHugepages}
       onSelect={onSelect}
@@ -42,7 +44,7 @@ const DrilldownMenuItemWrapper: FC<DrilldownMenuItemWrapperProps> = ({
   );
 
   return disabled ? null : (
-    <DrilldownMenuItem Icon={Icon && Icon} id={seriesName} key={seriesName} label={seriesLabel}>
+    <DrilldownMenuItem Icon={Icon} id={seriesName} key={seriesName} label={seriesLabel}>
       {seriesHasHugepagesVariant(seriesName) ? (
         <>
           <DrilldownMenuItem id={`${seriesName}-hugepages`} label={<HugepagesInfo />}>

@@ -13,27 +13,29 @@ import { signal } from '@preact/signals-react';
 export const operatorNamespaceSignal = signal<null | string>(null);
 
 const resolveOperatorNamespace = async (): Promise<string> => {
-  try {
-    const projectsResponse = await k8sList<K8sResourceCommon>({
-      model: ProjectModel,
-      queryParams: {},
-    });
+  const projectsResponse = await k8sList<K8sResourceCommon>({
+    model: ProjectModel,
+    queryParams: {},
+  });
 
-    const projects = Array.isArray(projectsResponse)
-      ? projectsResponse
-      : projectsResponse?.items || [];
+  const projects = Array.isArray(projectsResponse)
+    ? projectsResponse
+    : projectsResponse?.items || [];
 
-    if (projects.some((project) => getName(project) === OPENSHIFT_OS_IMAGES_NS))
-      return OPENSHIFT_CNV;
-    if (projects.some((project) => getName(project) === KUBEVIRT_OS_IMAGES_NS))
-      return KUBEVIRT_HYPERCONVERGED;
-  } catch {
-    // Fall through to default
+  if (projects.some((project) => getName(project) === OPENSHIFT_OS_IMAGES_NS)) {
+    return OPENSHIFT_CNV;
+  }
+  if (projects.some((project) => getName(project) === KUBEVIRT_OS_IMAGES_NS)) {
+    return KUBEVIRT_HYPERCONVERGED;
   }
 
   return DEFAULT_OPERATOR_NAMESPACE;
 };
 
-void resolveOperatorNamespace().then((ns) => {
-  operatorNamespaceSignal.value = ns;
-});
+resolveOperatorNamespace()
+  .then((ns) => {
+    operatorNamespaceSignal.value = ns;
+  })
+  .catch(() => {
+    operatorNamespaceSignal.value = DEFAULT_OPERATOR_NAMESPACE;
+  });

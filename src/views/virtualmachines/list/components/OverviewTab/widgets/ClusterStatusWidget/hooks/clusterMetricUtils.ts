@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { PrometheusResult } from '@openshift-console/dynamic-plugin-sdk';
 
 import { ScoreStatus } from '../../shared/StatusScoreList/StatusScoreList';

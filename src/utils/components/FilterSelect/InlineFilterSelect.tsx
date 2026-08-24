@@ -1,23 +1,29 @@
-import React, { FC, MouseEvent, ReactNode, SyntheticEvent, useMemo, useState } from 'react';
+import React, {
+  type FC,
+  type MouseEvent,
+  type ReactNode,
+  type SyntheticEvent,
+  useMemo,
+  useState,
+} from 'react';
 
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   Divider,
   MenuSearch,
   MenuSearchInput,
+  type PopperOptions,
   SearchInput,
   Select,
   SelectList,
-  SelectPopperProps,
-  SelectProps,
+  type SelectProps,
 } from '@patternfly/react-core';
 
-import SelectToggle, { MenuTogglePropsWithTestId } from '../toggles/SelectToggle';
-
+import SelectToggle, { type MenuTogglePropsWithTestId } from '../toggles/SelectToggle';
 import InlineFilterSelectOptionContent from './components/InlineFilterSelectOptionContent';
 import InlineFilterSelectOptions from './components/InlineFilterSelectOptions';
 import { NO_RESULTS } from './utils/constants';
-import { EnhancedSelectOptionProps } from './utils/types';
+import { type EnhancedSelectOptionProps } from './utils/types';
 import { getGroupedOptions } from './utils/utils';
 
 import './inline-filter-select.scss';
@@ -29,7 +35,7 @@ type InlineFilterSelectProps = {
   optionLabelText?: string;
   options: EnhancedSelectOptionProps[];
   placeholder?: string;
-  popperProps?: SelectPopperProps;
+  popperProps?: PopperOptions;
   searchPlaceholder?: string;
   selected: string;
   selectProps?: Omit<SelectProps, 'toggle'>;
@@ -56,9 +62,9 @@ const InlineFilterSelect: FC<InlineFilterSelectProps> = ({
   const [filterValue, setFilterValue] = useState<string>('');
   const [focusedItemIndex, setFocusedItemIndex] = useState<null | number>(null);
 
-  const onToggle = () => setIsOpen((prevIsOpen) => !prevIsOpen);
+  const onToggle = (): void => setIsOpen((prevIsOpen) => !prevIsOpen);
 
-  const onSelect = (_event: MouseEvent, value: string) => {
+  const onSelect = (_event: MouseEvent, value: string): void => {
     if (value && value !== NO_RESULTS) {
       setFilterValue('');
     }
@@ -112,15 +118,15 @@ const InlineFilterSelect: FC<InlineFilterSelectProps> = ({
           <MenuSearch>
             <MenuSearchInput>
               <SearchInput
-                onChange={(_, newFilterValue) => {
+                onChange={(_event, newFilterValue) => {
                   if (filterValue !== newFilterValue) {
                     setFilterValue(newFilterValue);
                   }
 
                   setFocusedItemIndex(null);
                 }}
-                onClear={(e: SyntheticEvent<HTMLButtonElement>) => {
-                  e.stopPropagation();
+                onClear={(event: SyntheticEvent<HTMLButtonElement>) => {
+                  event.stopPropagation();
                   setFilterValue('');
                 }}
                 placeholder={searchPlaceholder ?? placeholder}
@@ -140,7 +146,7 @@ const InlineFilterSelect: FC<InlineFilterSelectProps> = ({
           groupedOptions={groupedOptions}
         />
       </SelectList>
-      {menuFooter && menuFooter}
+      {menuFooter}
     </Select>
   );
 };

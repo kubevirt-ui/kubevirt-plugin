@@ -1,7 +1,6 @@
 /* eslint-disable perfectionist/sort-classes */
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import DropdownEnum from '@kubevirt-utils/utils/dropdownEnum';
-import { ObjectEnum } from '@kubevirt-utils/utils/ObjectEnum';
 export const ONE_SECOND = 1000;
 export const ONE_MINUTE = 60 * ONE_SECOND;
 export const FIVE_MIN = 5 * ONE_MINUTE;
@@ -75,7 +74,7 @@ class DurationOption extends DropdownEnum<string> {
   });
 
   private static readonly all = Object.freeze(
-    ObjectEnum.getAllClassEnumProperties<DurationOption>(DurationOption),
+    DurationOption.getAllClassEnumProperties<DurationOption>(),
   );
   private static readonly dropdownLabelMapper = DurationOption.all.reduce(
     (accumulator, durationOption: DurationOption) => ({

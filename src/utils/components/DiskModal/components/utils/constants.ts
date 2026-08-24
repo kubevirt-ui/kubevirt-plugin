@@ -42,4 +42,5 @@ export const REGISTRYURL_DATAVOLUME_FIELD = 'dataVolumeTemplate.spec.source.regi
 
 export const REGISTRY_CREDENTIALS_FIELD = 'registryCredentials';
 export const REGISTRY_USERNAME_FIELD = 'registryCredentials.username';
+// eslint-disable-next-line sonarjs/no-hardcoded-passwords
 export const REGISTRY_PASSWORD_FIELD = 'registryCredentials.password';

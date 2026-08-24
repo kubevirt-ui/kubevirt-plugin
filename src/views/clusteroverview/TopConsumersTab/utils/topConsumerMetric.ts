@@ -1,7 +1,6 @@
 /* eslint-disable perfectionist/sort-classes */
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import DropdownEnum from '@kubevirt-utils/utils/dropdownEnum';
-import { ObjectEnum } from '@kubevirt-utils/utils/ObjectEnum';
 type TopConsumerMetricData = {
   chartLabel: string;
   dropdownLabel: string;
@@ -63,7 +62,7 @@ export class TopConsumerMetric extends TopConsumerMetricObjectEnum<string> {
   });
 
   private static readonly all = Object.freeze(
-    ObjectEnum.getAllClassEnumProperties<TopConsumerMetric>(TopConsumerMetric),
+    TopConsumerMetric.getAllClassEnumProperties<TopConsumerMetric>(),
   );
 
   private static readonly dropdownLabelMapper = TopConsumerMetric.all.reduce(

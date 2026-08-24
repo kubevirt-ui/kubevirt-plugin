@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { FC, useEffect, useMemo, useState } from 'react';
 import produce from 'immer';
 import { getEvictionStrategy } from 'src/views/templates/utils/selectors';

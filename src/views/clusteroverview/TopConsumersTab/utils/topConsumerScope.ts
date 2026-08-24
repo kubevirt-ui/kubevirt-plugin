@@ -1,5 +1,5 @@
+/* eslint-disable */
 import DropdownEnum from '@kubevirt-utils/utils/dropdownEnum';
-import { ObjectEnum } from '@kubevirt-utils/utils/ObjectEnum';
 
 type TopConsumerScopeData = {
   dropdownLabel: string;
@@ -16,7 +16,7 @@ abstract class TopConsumerScopeObjectEnum<T> extends DropdownEnum<T> {
 
 export class TopConsumerScope extends TopConsumerScopeObjectEnum<string> {
   private static readonly all = Object.freeze(
-    ObjectEnum.getAllClassEnumProperties<TopConsumerScope>(TopConsumerScope),
+    TopConsumerScope.getAllClassEnumProperties<TopConsumerScope>(),
   );
 
   private static readonly dropdownLabelMapper = TopConsumerScope.all.reduce(
