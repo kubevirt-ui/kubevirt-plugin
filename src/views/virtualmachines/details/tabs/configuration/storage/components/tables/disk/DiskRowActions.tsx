@@ -132,7 +132,7 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({
   const createEditDiskModal = () =>
     createModal(({ isOpen, onClose }) => (
       <DiskModal
-        createdPVCName={isPVCSource(obj) ? obj?.source : null}
+        createdPVCName={isPVCSource(obj) && obj?.hasPVC ? obj?.source : null}
         editDiskName={diskName}
         isOpen={isOpen}
         onClose={onClose}
