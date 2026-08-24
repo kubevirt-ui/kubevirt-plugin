@@ -1,31 +1,28 @@
-/* eslint-disable */
-import { useRef } from 'react';
+import { useState } from 'react';
 
 /**
  * Tracks the running maximum of a chart's Y value across renders.
  * Only allows upward changes to prevent Y-axis jitter from fluctuating data.
  * Resets when resetKey changes (e.g. duration or VM identity change).
- * @param currentMax
- * @param resetKey
  */
 const useStableYMax = (currentMax: null | number, resetKey?: unknown): null | number => {
-  const stableMax = useRef<null | number>(null);
-  const prevResetKey = useRef(resetKey);
+  const [stableMax, setStableMax] = useState<null | number>(null);
+  const [prevResetKey, setPrevResetKey] = useState(resetKey);
 
-  if (prevResetKey.current !== resetKey) {
-    stableMax.current = null;
-    prevResetKey.current = resetKey;
+  if (prevResetKey !== resetKey) {
+    setStableMax(null);
+    setPrevResetKey(resetKey);
   }
 
   if (
     currentMax !== null &&
     Number.isFinite(currentMax) &&
-    (stableMax.current === null || currentMax > stableMax.current)
+    (stableMax === null || currentMax > stableMax)
   ) {
-    stableMax.current = currentMax;
+    setStableMax(currentMax);
   }
 
-  return stableMax.current;
+  return stableMax;
 };
 
 export default useStableYMax;

@@ -1,7 +1,6 @@
-/* eslint-disable */
-import React, { FC, memo } from 'react';
+import React, { type FC, memo } from 'react';
 
-import { V1Interface, V1Network } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1Interface, type V1Network } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
@@ -24,9 +23,9 @@ const NetworksReviewTable: FC<NetworksReviewTableProps> = memo(({ interfaces, ne
       <DescriptionItem
         descriptionData={
           <Stack>
-            {networkData.map((n, idx) => (
-              <StackItem key={n.iface?.name || n.network?.name || `network-row-${idx}`}>
-                {n.network?.name || n.iface?.name || NO_DATA_DASH}
+            {networkData.map((row) => (
+              <StackItem key={row.iface?.name ?? row.network?.name}>
+                {row.network?.name ?? row.iface?.name ?? NO_DATA_DASH}
               </StackItem>
             ))}
           </Stack>
@@ -36,9 +35,9 @@ const NetworksReviewTable: FC<NetworksReviewTableProps> = memo(({ interfaces, ne
       <DescriptionItem
         descriptionData={
           <Stack>
-            {networkData.map((n, idx) => (
-              <StackItem key={n.iface?.name || n.network?.name || `network-label-${idx}`}>
-                {getNetworkNameLabel(t, n) || NO_DATA_DASH}
+            {networkData.map((row) => (
+              <StackItem key={row.iface?.name ?? row.network?.name}>
+                {getNetworkNameLabel(t, row) ?? NO_DATA_DASH}
               </StackItem>
             ))}
           </Stack>
@@ -48,9 +47,9 @@ const NetworksReviewTable: FC<NetworksReviewTableProps> = memo(({ interfaces, ne
       <DescriptionItem
         descriptionData={
           <Stack>
-            {networkData.map((n, idx) => (
-              <StackItem key={n.iface?.name ?? n.network?.name ?? `network-type-${idx}`}>
-                {n.iface ? getPrintableNetworkInterfaceType(n.iface) : NO_DATA_DASH}
+            {networkData.map((row) => (
+              <StackItem key={row.iface?.name ?? row.network?.name}>
+                {row.iface ? getPrintableNetworkInterfaceType(row.iface) : NO_DATA_DASH}
               </StackItem>
             ))}
           </Stack>

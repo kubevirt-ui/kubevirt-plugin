@@ -1,26 +1,30 @@
-/* eslint-disable */
-import React, { FC, useCallback } from 'react';
+import React, { type FC, useCallback } from 'react';
 import { useWatch } from 'react-hook-form';
 
 import {
-  V1beta1VirtualMachineClusterPreference,
-  V1beta1VirtualMachinePreference,
+  type V1beta1VirtualMachineClusterPreference,
+  type V1beta1VirtualMachinePreference,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { BOOTABLE_VOLUME_SELECTED, logITFlowEvent } from '@kubevirt-utils/extensions/telemetry';
-import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
-import { getName, NamespacedResourceMap, ResourceMap } from '@kubevirt-utils/resources/shared';
+import { type BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
+import {
+  getName,
+  getUID,
+  type NamespacedResourceMap,
+  type ResourceMap,
+} from '@kubevirt-utils/resources/shared';
 import { Table, TableVariant, Tbody, Th, Thead, Tr } from '@patternfly/react-table';
-import { ThSortType } from '@patternfly/react-table/dist/esm/components/Table/base/types';
+import { type ThSortType } from '@patternfly/react-table/dist/esm/components/Table/base/types';
 import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
 import { CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
 import { getBootableVolumeRowData } from '@virtualmachines/wizard/steps/InstanceTypesSteps/BootSourceStep/components/BootableVolumeList/utils/getBootableVolumeRowData';
 import {
-  ApplySelectedBootableVolumeToForm,
-  UseBootableVolumesValues,
+  type ApplySelectedBootableVolumeToForm,
+  type UseBootableVolumesValues,
 } from '@virtualmachines/wizard/utils/types';
 import { applySelectedBootableVolumeToForm } from '@virtualmachines/wizard/utils/utils';
 
-import { TableColumnWithOptionalIndex } from '../../../../types';
+import { type TableColumnWithOptionalIndex } from '../../../../types';
 import BootableVolumeRow from '../BootableVolumeRow/BootableVolumeRow';
 
 type BootableVolumeTableProps = {
@@ -75,8 +79,12 @@ const BootableVolumeTable: FC<BootableVolumeTableProps> = ({
         </Tr>
       </Thead>
       <Tbody>
-        {sortedPaginatedData?.map?.((bootableVolume, index) => (
+        {sortedPaginatedData?.map?.((bootableVolume) => (
           <BootableVolumeRow
+            activeColumnIDs={activeColumns?.map((col) => col?.id)}
+            bootableVolume={bootableVolume}
+            key={getUID(bootableVolume)}
+            onSelectBootableVolume={onSelectBootableVolume}
             rowData={getBootableVolumeRowData({
               bootableVolume,
               bootableVolumesData,
@@ -84,10 +92,6 @@ const BootableVolumeTable: FC<BootableVolumeTableProps> = ({
               userPreferencesMap,
               volumeListNamespace,
             })}
-            activeColumnIDs={activeColumns?.map((col) => col?.id)}
-            bootableVolume={bootableVolume}
-            key={`${getName(bootableVolume)}-${index}`}
-            onSelectBootableVolume={onSelectBootableVolume}
             selectedBootableVolume={selectedBootableVolume}
           />
         ))}

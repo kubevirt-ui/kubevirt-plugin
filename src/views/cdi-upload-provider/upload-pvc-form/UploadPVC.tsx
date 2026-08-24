@@ -18,8 +18,8 @@ import {
   Title,
 } from '@patternfly/react-core';
 
+import { resourcePath } from '../utils/resourceUtils';
 import { getName } from '../utils/selectors';
-import { resourcePath } from '../utils/utils';
 import UploadPVCButtonBar from './UploadPVCButtonBar';
 import UploadPVCForm from './UploadPVCForm';
 import UploadPVCFormStatus from './UploadPVCFormStatus';

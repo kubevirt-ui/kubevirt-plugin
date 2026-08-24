@@ -59,6 +59,7 @@ const useInstanceTypeExpandSpec: UseInstanceTypeExpandSpec = (vm) => {
     } else {
       setInstanceTypeExpandedSpec(undefined);
       setErrorExpandedSpec(undefined);
+      setLoadingExpandedSpec(false);
     }
 
     return (): void => controller.abort();

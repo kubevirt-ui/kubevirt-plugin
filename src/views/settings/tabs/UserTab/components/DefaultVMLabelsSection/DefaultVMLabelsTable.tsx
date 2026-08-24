@@ -1,11 +1,10 @@
-/* eslint-disable */
-import React, { FC, useCallback, useEffect, useRef } from 'react';
+import React, { type FC, useCallback, useEffect, useState } from 'react';
 
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import useAutoAppliedLabels from '@kubevirt-utils/hooks/useAutoAppliedLabels/useAutoAppliedLabels';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
 import { USER_SETTINGS_KEYS } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/const';
-import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   Content,
@@ -27,28 +26,28 @@ const DefaultVMLabelsTable: FC = () => {
   );
 
   const loaded = adminLoaded && userLoaded;
-  const hasLoadedOnce = useRef(false);
+  const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
 
   useEffect(() => {
-    if (loaded) hasLoadedOnce.current = true;
+    if (loaded) setHasLoadedOnce(true);
   }, [loaded]);
 
   const onValueChange = useCallback(
     (key: string, value: string): void => {
-      void setUserValues({ ...(userValues || {}), [key]: value });
+      void setUserValues({ ...((userValues as Record<string, string>) ?? {}), [key]: value });
     },
     [setUserValues, userValues],
   );
 
-  if (!hasLoadedOnce.current) {
+  if (!hasLoadedOnce) {
     return <Skeleton />;
   }
 
   return (
     <Stack hasGutter>
-      {(adminError || userError) && (
+      {(adminError ?? userError) && (
         <StackItem>
-          <ErrorAlert error={adminError || userError} />
+          <ErrorAlert error={(adminError ?? userError) as Error} />
         </StackItem>
       )}
 
@@ -76,7 +75,7 @@ const DefaultVMLabelsTable: FC = () => {
               <DefaultVMLabelRow
                 label={label}
                 onValueChange={onValueChange}
-                userValue={userValues?.[label.key]}
+                userValue={(userValues as Record<string, string>)?.[label.key]}
               />
             </StackItem>
           ))}

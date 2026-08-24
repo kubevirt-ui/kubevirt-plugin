@@ -1,19 +1,9 @@
-/* eslint-disable */
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { type ReactElement } from 'react';
 import CheckupImageField from 'src/views/checkups/components/CheckupImageField';
 
-import { IoK8sApiStorageV1StorageClass } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import CheckboxSelect from '@kubevirt-utils/components/CheckboxSelect/CheckboxSelect';
 import ClusterProjectDropdown from '@kubevirt-utils/components/ClusterProjectDropdown/ClusterProjectDropdown';
-import { getDefaultStorageClass } from '@kubevirt-utils/components/DiskModal/components/StorageClassAndPreallocation/utils/helpers';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import useRelatedImage from '@kubevirt-utils/hooks/useRelatedImage';
-import useStorageProfileClaimPropertySets from '@kubevirt-utils/hooks/useStorageProfileClaimPropertySets';
-import { modelToGroupVersionKind, StorageClassModel } from '@kubevirt-utils/models';
-import { getName } from '@kubevirt-utils/resources/shared';
-import { generatePrettyName, isEmpty } from '@kubevirt-utils/utils/utils';
-import useClusterParam from '@multicluster/hooks/useClusterParam';
-import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 import {
   Alert,
   AlertVariant,
@@ -22,109 +12,49 @@ import {
   FormSection,
   Grid,
   GridItem,
-  SelectProps,
   Stack,
   TextInput,
 } from '@patternfly/react-core';
 
-import {
-  SELF_VALIDATION_NAME,
-  selfValidationCheckupImageSettings,
-  TEST_SUITE_OPTIONS,
-  TEST_SUITES,
-} from '../../utils';
-import { calculatePVCStorageSize } from '../../utils/selfValidationJob/resourceTemplates';
-import useIsOpenShiftPipelinesInstalled from '../hooks/useIsOpenShiftPipelinesInstalled';
-
+import { TEST_SUITE_OPTIONS } from '../../utils';
 import AdvancedSettings from './AdvancedSettings';
 import CheckupsSelfValidationFormActions from './CheckupsSelfValidationFormActions';
-import useStorageProfileCapabilitiesSync from './useStorageProfileCapabilitiesSync';
-import useWindowsValidationFormState from './useWindowsValidationFormState';
-import {
-  addStorageCapability,
-  addTestSuite,
-  getTestSuitesToggleTitle,
-  removeStorageCapability,
-  removeTestSuite,
-} from './utils';
+import useCheckupsSelfValidationFormState from './useCheckupsSelfValidationFormState';
 import WindowsValidationSettings from './WindowsValidationSettings';
 
 import './checkups-self-validation-form.scss';
 
-const CheckupsSelfValidationForm = () => {
+const CheckupsSelfValidationForm = (): ReactElement => {
   const { t } = useKubevirtTranslation();
-  const cluster = useClusterParam();
-  const [name, setName] = useState<string>(generatePrettyName(SELF_VALIDATION_NAME));
-  const [checkupImage, checkupImageLoaded, checkupImageLoadError, checkupImageIsFallback] =
-    useRelatedImage(selfValidationCheckupImageSettings);
-  const [selectedTestSuites, setSelectedTestSuites] = useState<string[]>(TEST_SUITES);
-  const [isDryRun, setIsDryRun] = useState<boolean>(false);
-  const [storageClass, setStorageClass] = useState<string>('');
-  const [testSkips, setTestSkips] = useState<string>('');
-  const [storageCapabilities, setStorageCapabilities] = useState<string[]>([]);
-
-  const windowsState = useWindowsValidationFormState(selectedTestSuites);
-  const [pipelinesInstalled, pipelinesLoaded] = useIsOpenShiftPipelinesInstalled();
-
-  const defaultPvcSize = useMemo(
-    () => calculatePVCStorageSize(selectedTestSuites),
-    [selectedTestSuites],
-  );
-  const [pvcSize, setPvcSize] = useState<string>(defaultPvcSize);
-
-  useEffect(() => {
-    setPvcSize(defaultPvcSize);
-  }, [defaultPvcSize]);
-
-  const [storageClasses, storageClassesLoaded] = useK8sWatchData<IoK8sApiStorageV1StorageClass[]>({
-    cluster,
-    groupVersionKind: modelToGroupVersionKind(StorageClassModel),
-    isList: true,
-  });
-
-  const defaultSC = useMemo(() => getDefaultStorageClass(storageClasses), [storageClasses]);
-  const effectiveStorageClass = storageClass || getName(defaultSC) || '';
-
   const {
+    checkupImage,
+    checkupImageIsFallback,
+    checkupImageLoaded,
+    checkupImageLoadError,
     claimPropertySets,
-    error: storageProfileError,
-    loaded: storageProfileLoaded,
-  } = useStorageProfileClaimPropertySets(effectiveStorageClass, cluster);
-
-  useStorageProfileCapabilitiesSync(
     effectiveStorageClass,
-    claimPropertySets,
+    handleStorageCapabilitySelect,
+    handleTestSuiteSelect,
+    isDryRun,
+    name,
+    pipelinesInstalled,
+    pipelinesLoaded,
+    pvcSize,
+    selectedTestSuites,
+    setIsDryRun,
+    setName,
+    setPvcSize,
+    setStorageClass,
+    setTestSkips,
+    storageCapabilities,
+    storageClasses,
+    storageClassesLoaded,
+    storageProfileError,
     storageProfileLoaded,
-    setStorageCapabilities,
-  );
-
-  useEffect(() => {
-    if (!storageClass && storageClassesLoaded && !isEmpty(defaultSC)) {
-      setStorageClass(getName(defaultSC));
-    }
-  }, [defaultSC, storageClass, storageClassesLoaded]);
-
-  const handleStorageCapabilitySelect: SelectProps['onSelect'] = useCallback(
-    (_event, value: string) => {
-      setStorageCapabilities((prev) =>
-        prev.includes(value)
-          ? removeStorageCapability(prev, value)
-          : addStorageCapability(prev, value),
-      );
-    },
-    [],
-  );
-
-  const handleTestSuiteSelect: SelectProps['onSelect'] = useCallback((_event, value: string) => {
-    setSelectedTestSuites((prev) =>
-      prev.includes(value) ? removeTestSuite(prev, value) : addTestSuite(prev, value),
-    );
-  }, []);
-
-  const testSuitesToggleTitle = useMemo(
-    () => getTestSuitesToggleTitle(selectedTestSuites, t),
-    [selectedTestSuites, t],
-  );
+    testSkips,
+    testSuitesToggleTitle,
+    windowsState,
+  } = useCheckupsSelfValidationFormState(t);
 
   return (
     <>
@@ -164,12 +94,12 @@ const CheckupsSelfValidationForm = () => {
 
               <FormGroup fieldId="test-suites" isRequired label={t('Test suites')}>
                 <CheckboxSelect
+                  onSelect={handleTestSuiteSelect}
                   options={TEST_SUITE_OPTIONS.map((option) => ({
                     children: option.label,
                     isSelected: selectedTestSuites.includes(option.value),
                     value: option.value,
                   }))}
-                  onSelect={handleTestSuiteSelect}
                   selectedValues={selectedTestSuites}
                   toggleTitle={testSuitesToggleTitle}
                 />
@@ -181,10 +111,10 @@ const CheckupsSelfValidationForm = () => {
                   pipelinesInstalled={pipelinesInstalled}
                   pipelinesLoaded={pipelinesLoaded}
                   setIsEulaConfirmed={windowsState.setIsEulaConfirmed}
-                  setWinImageDownloadUrl={windowsState.setWinImageDownloadUrl}
                   setWindowsServerTesting={windowsState.setWindowsServerTesting}
-                  winImageDownloadUrl={windowsState.winImageDownloadUrl}
+                  setWinImageDownloadUrl={windowsState.setWinImageDownloadUrl}
                   windowsServerTesting={windowsState.windowsServerTesting}
+                  winImageDownloadUrl={windowsState.winImageDownloadUrl}
                 />
               </Stack>
               <AdvancedSettings
@@ -199,7 +129,7 @@ const CheckupsSelfValidationForm = () => {
                 storageCapabilities={storageCapabilities}
                 storageClasses={storageClasses}
                 storageClassesLoaded={storageClassesLoaded}
-                storageProfileError={Boolean(storageProfileError)}
+                storageProfileError={storageProfileError}
                 storageProfileHasClaimPropertySets={Boolean(claimPropertySets?.length)}
                 storageProfileLoaded={storageProfileLoaded}
                 testSkips={testSkips}
@@ -215,8 +145,8 @@ const CheckupsSelfValidationForm = () => {
                 storageCapabilities={storageCapabilities}
                 storageClass={effectiveStorageClass}
                 testSkips={testSkips}
-                winImageDownloadUrl={windowsState.winImageDownloadUrl}
                 windowsServerTesting={windowsState.windowsServerTesting}
+                winImageDownloadUrl={windowsState.winImageDownloadUrl}
               />
             </FormSection>
           </Form>
