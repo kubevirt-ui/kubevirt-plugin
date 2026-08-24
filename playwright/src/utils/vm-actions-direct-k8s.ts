@@ -247,7 +247,6 @@ export async function navigateToVirtualMachinesWithEmptyProjectsInTree(
   defaultNamespace: string,
 ): Promise<void> {
   await vmTreePage.navigateToNamespaceVirtualMachinesViaUI(defaultNamespace);
-  await vmTreePage.toggleEmptyProjectsDisplay(true);
 }
 
 /** Opens the VM list tab for a project in the tree view. */

@@ -5,6 +5,7 @@ import type { KubernetesResource } from '@/data-models/kubernetes-types';
 import { expect, test } from '@/fixtures/vm-search-fixture';
 import { FOLDER_LABEL } from '@/utils/api-builders';
 import { TestTimeouts } from '@/utils/test-config';
+import { cleanupVmFixtures } from '@/utils/vm-search-test-helpers';
 
 const SUITE = 'VM Group Filter';
 
@@ -54,12 +55,7 @@ test.describe(SUITE, { tag: [T1_TAG, VM_SEARCH_TAG] }, () => {
   });
 
   test.afterAll(async ({ apiClient }) => {
-    for (const vmName of [vmAlpha1, vmAlpha2, vmBeta1, vmGamma1]) {
-      if (vmName) {
-        await apiClient.deleteVirtualMachine(testNamespace, vmName).catch(() => undefined);
-        await apiClient.waitForVmDeleted(vmName, testNamespace).catch(() => undefined);
-      }
-    }
+    await cleanupVmFixtures(apiClient, testNamespace, [vmAlpha1, vmAlpha2, vmBeta1, vmGamma1]);
   });
 
   test.beforeEach(async ({ vmListPage }) => {

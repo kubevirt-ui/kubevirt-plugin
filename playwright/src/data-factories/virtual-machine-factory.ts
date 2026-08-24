@@ -20,6 +20,7 @@ export interface VirtualMachineConfig extends BaseResourceConfig {
   cpuThreads?: number;
   description?: string;
   flavor?: 'large' | 'medium' | 'small' | 'tiny';
+  gpus?: Array<{ deviceName: string; name: string }>;
   hostname?: string;
   // Network configuration
   interfaceModel?: 'e1000' | 'e1000e' | 'rtl8139' | 'virtio';
@@ -115,6 +116,18 @@ export class VirtualMachineFactory extends BaseDataFactory {
 `
         : '';
 
+    const gpusSection =
+      vm.gpus && vm.gpus.length > 0
+        ? `          gpus:
+${vm.gpus
+  .map(
+    (gpu) => `            - deviceName: ${gpu.deviceName}
+              name: ${gpu.name}`,
+  )
+  .join('\n')}
+`
+        : '';
+
     const yaml = `apiVersion: kubevirt.io/v1
 kind: VirtualMachine
 metadata:
@@ -155,7 +168,7 @@ spec:
               name: ${vm.networkName}
           networkInterfaceMultiqueue: ${vm.networkInterfaceMultiqueue}
           rng: {}
-${featuresSection}${firmwareSection}        memory:
+${gpusSection}${featuresSection}${firmwareSection}        memory:
           guest: ${vm.memory}
       hostname: ${vm.hostname}
       networks:

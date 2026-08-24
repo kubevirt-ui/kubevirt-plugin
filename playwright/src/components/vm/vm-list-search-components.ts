@@ -464,6 +464,17 @@ export class VmListSearchComponent extends BaseComponent {
     await this._vmSearchInputByDataTest.press('Enter');
   }
 
+  async appendToVmSearch(searchText: string): Promise<void> {
+    await this._vmSearchInputByDataTest.waitFor({
+      state: 'visible',
+      timeout: TestTimeouts.ELEMENT_WAIT,
+    });
+    await this._vmSearchInputByDataTest.click();
+    await this._vmSearchInputByDataTest.press('End');
+    await this._vmSearchInputByDataTest.pressSequentially(` ${searchText}`, { delay: 250 });
+    await this._vmSearchInputByDataTest.press('Enter');
+  }
+
   async getAdvancedSearchIpValidationWarning(): Promise<string | null> {
     try {
       await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);

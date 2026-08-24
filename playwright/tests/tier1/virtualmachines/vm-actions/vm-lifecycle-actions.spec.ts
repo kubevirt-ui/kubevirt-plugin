@@ -4,7 +4,6 @@ import { expect, test } from '@/fixtures/vm-actions-fixture';
 test.describe('Tier1 VM Bulk Actions Tests', { tag: [T1_TAG, '@tier1-bulk-ops'] }, () => {
   test.beforeEach(async ({ vmListPage, testConfig }) => {
     await vmListPage.navigateToNamespaceVirtualMachinesViaUI(testConfig.testNamespace);
-    await vmListPage.toggleEmptyProjectsDisplay(true);
   });
 
   test(

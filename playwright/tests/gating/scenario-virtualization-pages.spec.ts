@@ -41,7 +41,6 @@ test.describe('Virtualization pages (gating)', { tag: [GATING_TAG] }, () => {
     await utils.withAllure({ suite: SUITE, feature: GATING, tags: [GATING_TAG] });
 
     await vmListPage.navigateToNamespaceVirtualMachinesViaUI(testConfig.testNamespace);
-    await vmListPage.toggleEmptyProjectsDisplay(true);
 
     await test.step('Virtual machines tab renders content', async () => {
       await vmListPage.clickVmListTab();

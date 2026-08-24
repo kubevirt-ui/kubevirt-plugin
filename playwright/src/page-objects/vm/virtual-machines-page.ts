@@ -434,6 +434,10 @@ export default class VirtualMachinesPage extends TreeContextMenuMixin(PageCommon
     return this.search.fillVmSearchInput(searchText);
   }
 
+  async appendToVmSearch(searchText: string): Promise<void> {
+    return this.search.appendToVmSearch(searchText);
+  }
+
   async filterByInstanceType(instanceType: string, check = true): Promise<void> {
     return this.listFilters.filterByInstanceType(instanceType, check);
   }
@@ -934,7 +938,9 @@ export default class VirtualMachinesPage extends TreeContextMenuMixin(PageCommon
   async navigateToNamespaceVirtualMachinesViaUI(namespace: string): Promise<void> {
     await this.clickNavVirtualMachines();
     await this.page.waitForLoadState('domcontentloaded');
-    await this.switchProject(namespace);
+    await this.toggleEmptyProjectsDisplay(true);
+    await this.searchTreeView(namespace);
+    await this.clickProjectNode(namespace);
   }
 
   async navigateToNamespaceVmListAndWait(namespace: string): Promise<void> {
