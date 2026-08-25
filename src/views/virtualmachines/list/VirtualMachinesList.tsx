@@ -57,6 +57,7 @@ import { vmsSignal } from '@virtualmachines/tree/utils/signals';
 import { OBJECTS_FETCHING_LIMIT, VirtualMachineRowFilterType } from '@virtualmachines/utils';
 import { getVMIFromMapper, getVMIMFromMapper } from '@virtualmachines/utils/mappers';
 
+import VirtIODriversAlert from './components/VirtIODriversAlert/VirtIODriversAlert';
 import VirtualMachineBulkActionButton from './components/VirtualMachineBulkActionButton';
 import VirtualMachineEmptyState from './components/VirtualMachineEmptyState/VirtualMachineEmptyState';
 import VirtualMachineSearchResultsHeader from './components/VirtualMachineSearchResultsHeader';
@@ -261,6 +262,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = forwardRef((props, ref
                 vms={vmsToShow}
                 vmsLoaded={vmsLoaded}
               />
+              <VirtIODriversAlert vms={vmsToShow} />
               <VirtualMachineFilterToolbar
                 onFilterChange={(...args) => {
                   deselectAllVMs();
