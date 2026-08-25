@@ -1,7 +1,7 @@
-import React, { FC, useState } from 'react';
-import { useLocation } from 'react-router';
+import React, { type FC, useState } from 'react';
+import { Link, useLocation } from 'react-router';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -11,7 +11,6 @@ import {
   Alert,
   AlertActionCloseButton,
   AlertVariant,
-  Button,
   Checkbox,
   Flex,
 } from '@patternfly/react-core';
@@ -19,6 +18,7 @@ import { DOWNLOADS_TAB_IDS } from '@settings/search/constants';
 import { createSettingsSearchURL } from '@settings/search/search';
 import { SETTINGS_TABS } from '@settings/tabs';
 import { getOSName } from '@virtualmachines/list/filters/getOSFilter';
+
 import { VIRTIO_DRIVERS_ALERT_DISMISSED_KEY } from './constants';
 
 type VirtIODriversAlertProps = {
@@ -47,7 +47,7 @@ const VirtIODriversAlert: FC<VirtIODriversAlertProps> = ({ vms }) => {
     location.pathname,
   );
 
-  const handleClose = () => {
+  const handleClose = (): void => {
     if (dontShowAgain) {
       setPermanentlyDismissed(true);
     }
@@ -70,9 +70,7 @@ const VirtIODriversAlert: FC<VirtIODriversAlertProps> = ({ vms }) => {
         )}
       </p>
       <Flex className="pf-v6-u-mt-sm">
-        <Button component="a" href={settingsURL} isInline variant="link">
-          {t('Go to Downloads')}
-        </Button>
+        <Link to={settingsURL}>{t('Go to Downloads')}</Link>
         <ExternalLink
           href={documentationURL.VIRTIO_WIN_DRIVERS}
           text={t('How to update Windows VMs')}
