@@ -5,9 +5,11 @@ import {
   SearchItemGetter,
   SearchItemWithTab,
 } from '@virtualmachines/details/tabs/configuration/utils/search';
+import { VIRTUALIZATION_PATHS } from '@virtualmachines/tree/utils/constants';
 
 import {
   CLUSTER_TAB_IDS,
+  DOWNLOADS_TAB_IDS,
   PREVIEW_FEATURES_TAB_IDS,
   SEARCH_ITEM_CHILDREN_TREE,
   USER_TAB_IDS,
@@ -39,8 +41,13 @@ export const getPreviewFeaturesTabIds: SearchItemGetter = () => [
   { id: PREVIEW_FEATURES_TAB_IDS.previewFeatures, title: t('Preview features') },
 ];
 
+const getDownloadsTabIds: SearchItemGetter = () => [
+  { id: DOWNLOADS_TAB_IDS.virtioDriversWindows, title: t('Windows drivers') },
+];
+
 const tabsIds: { [key: string]: SearchItem[] } = {
   cluster: getClusterTabIds(),
+  downloads: getDownloadsTabIds(),
   features: getPreviewFeaturesTabIds(),
   user: getUserTabIds(),
 };
@@ -55,9 +62,11 @@ export const createSettingsSearchURL = (
   elementId: string,
   pathname: string,
 ): string => {
-  const index = pathname?.lastIndexOf('settings');
-  const substr = pathname.slice(0, index);
-  return substr + `settings/${tab}#${elementId}`;
+  const settingsPath = VIRTUALIZATION_PATHS.SETTINGS;
+  const index = pathname.lastIndexOf(settingsPath);
+  const prefix =
+    index === -1 ? pathname.substring(0, pathname.lastIndexOf('/') + 1) : pathname.slice(0, index);
+  return `${prefix}${settingsPath}/${tab}#${elementId}`;
 };
 
 export const isSearchItemChildrenHighlighted = (itemId: string, hash: string): boolean => {
