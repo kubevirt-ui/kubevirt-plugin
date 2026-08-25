@@ -1,20 +1,19 @@
-import { ACMVirtualMachineAction } from '@kubevirt-extensions/acm.virtualmachine';
+import { type ACMVirtualMachineAction } from '@kubevirt-extensions/acm.virtualmachine';
 import {
-  FeatureFlagHookProvider,
-  HrefNavItem,
-  RoutePage,
-  Separator,
-  StandaloneRoutePage,
+  type FeatureFlagHookProvider,
+  type HrefNavItem,
+  type RoutePage,
+  type Separator,
+  type StandaloneRoutePage,
 } from '@openshift-console/dynamic-plugin-sdk';
 import type {
   ConsolePluginBuildMetadata,
   EncodedExtension,
 } from '@openshift-console/dynamic-plugin-sdk-webpack';
-import { ResourceRoute } from '@stolostron/multicluster-sdk';
+import { type ResourceRoute } from '@stolostron/multicluster-sdk';
 
 import { PERSPECTIVES } from '../utils/constants/constants';
 import { FLAG_KUBEVIRT_VIRTUALIZATION_NAV } from '../utils/flags/consts';
-
 import {
   CROSS_CLUSTER_MIGRATION_ACTION_ID,
   FLAG_DISALLOWED_KUBEVIRT_DYNAMIC_ACM,
@@ -258,11 +257,7 @@ export const extensions: EncodedExtension[] = [
       component: {
         $codeRef: 'VMWizard',
       },
-      path: [
-        `${FLEET_WIZARD_PATH}/all-clusters/all-namespaces`,
-        `${FLEET_WIZARD_PATH}/cluster/:cluster/ns/:ns`,
-        `${FLEET_WIZARD_PATH}/cluster/:cluster/all-namespaces`,
-      ],
+      path: [FLEET_WIZARD_PATH],
     },
     type: 'console.page/route',
   } as EncodedExtension<RoutePage>,

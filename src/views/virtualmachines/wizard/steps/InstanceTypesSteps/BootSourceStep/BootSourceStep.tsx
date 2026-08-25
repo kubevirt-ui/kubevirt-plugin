@@ -29,7 +29,10 @@ const BootSourceStep: FC = () => {
   const { t } = useKubevirtTranslation();
   const isAdmin = useIsAdmin();
   const { control } = useVMWizard();
-  const project = useWatch({ control, name: CREATE_VM_FORM_FIELDS_VM_DATA.PROJECT });
+  const [cluster, project] = useWatch({
+    control,
+    name: [CREATE_VM_FORM_FIELDS_VM_DATA.CLUSTER, CREATE_VM_FORM_FIELDS_VM_DATA.PROJECT],
+  });
   const volumeListNamespace = useWatch({
     control,
     name: CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.VOLUME_LIST_NAMESPACE,
@@ -42,11 +45,12 @@ const BootSourceStep: FC = () => {
   });
   const instanceTypesAndPreferencesData = useInstanceTypesAndPreferences(
     getValidNamespace(project),
+    cluster,
   );
 
   const effectiveNamespace = getEffectiveVolumeNamespace(volumeListNamespace, isAdmin);
 
-  const bootableVolumesData = useBootableVolumes(effectiveNamespace);
+  const bootableVolumesData = useBootableVolumes(effectiveNamespace, cluster);
 
   return (
     <Stack hasGutter>

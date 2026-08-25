@@ -2,21 +2,23 @@ import { useMemo } from 'react';
 
 import { parseNADConfig } from '@kubevirt-utils/components/NetworkInterfaceModal/utils/helpers';
 import { NetworkAttachmentDefinitionModelGroupVersionKind } from '@kubevirt-utils/models';
+import { type NetworkAttachmentDefinitionKind } from '@kubevirt-utils/resources/nad/types';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
-import { NetworkAttachmentDefinitionKind } from '@kubevirt-utils/resources/nad/types';
 
 import { NADRole, NADTopology, PrimaryTopologies } from '../../nad/constants';
 
 const useNamespaceUDN = (
   namespace: string,
+  clusterOverride?: string,
 ): [
   isNamespaceManagedByUDN: boolean,
   vmsNotSupported: boolean,
   nad?: NetworkAttachmentDefinitionKind,
 ] => {
-  const cluster = useClusterParam();
+  const clusterParam = useClusterParam();
+  const cluster = clusterOverride ?? clusterParam;
 
   const [nads] = useK8sWatchData<NetworkAttachmentDefinitionKind[]>({
     cluster,

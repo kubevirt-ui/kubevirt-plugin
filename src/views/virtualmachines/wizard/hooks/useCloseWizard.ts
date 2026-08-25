@@ -1,18 +1,21 @@
 import { useMemo } from 'react';
-import { useNavigate, useParams } from 'react-router';
+import { useFormContext, useWatch } from 'react-hook-form';
+import { useNavigate } from 'react-router';
 
-import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { getVMListURL } from '@multicluster/urls';
+import { CREATE_VM_FORM_FIELDS_VM_DATA } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
+import { type VMWizardFormValues } from '@virtualmachines/wizard/state/vm-wizard-form/types';
 
 type UseCloseWizard = () => () => void;
 
 const useCloseWizard: UseCloseWizard = () => {
   const navigate = useNavigate();
-  const clusterParam = useClusterParam();
-  const { ns } = useParams<{ ns: string }>();
-  const vmListURL = useMemo(() => getVMListURL(clusterParam, ns), [clusterParam, ns]);
+  const { control } = useFormContext<VMWizardFormValues>();
+  const cluster = useWatch({ control, name: CREATE_VM_FORM_FIELDS_VM_DATA.CLUSTER });
+  const namespace = useWatch({ control, name: CREATE_VM_FORM_FIELDS_VM_DATA.PROJECT });
+  const vmListURL = useMemo(() => getVMListURL(cluster ?? '', namespace), [cluster, namespace]);
 
-  const navigateToVMList = () => {
+  const navigateToVMList = (): void => {
     navigate(vmListURL);
   };
 

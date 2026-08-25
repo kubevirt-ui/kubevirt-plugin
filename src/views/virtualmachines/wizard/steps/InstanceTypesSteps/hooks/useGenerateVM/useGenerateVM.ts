@@ -44,7 +44,7 @@ const useGenerateVM = (): UseGenerateVMResult => {
   const { subscriptionData } = useRHELAutomaticSubscription();
 
   const validNamespace = getValidNamespace(project);
-  const [isUDNManagedNamespace] = useNamespaceUDN(validNamespace);
+  const [isUDNManagedNamespace] = useNamespaceUDN(validNamespace, cluster);
   const { loaded, vmCreationNad } = useProjectDefaultNad({
     cluster,
     namespaceName: validNamespace,

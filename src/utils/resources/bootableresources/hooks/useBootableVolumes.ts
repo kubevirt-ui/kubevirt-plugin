@@ -1,25 +1,25 @@
 import { useMemo } from 'react';
 
 import {
+  DataImportCronModel,
   DataSourceModelGroupVersionKind,
+  DataVolumeModel,
   modelToGroupVersionKind,
   PersistentVolumeClaimModel,
   VolumeSnapshotModel,
 } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { DataImportCronModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { DataVolumeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
-  V1beta1DataImportCron,
-  V1beta1DataSource,
-  V1beta1DataVolume,
+  type V1beta1DataImportCron,
+  type V1beta1DataSource,
+  type V1beta1DataVolume,
 } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
-import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
-import { VolumeSnapshotKind } from '@kubevirt-utils/components/SelectSnapshot/types';
+import { type IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type VolumeSnapshotKind } from '@kubevirt-utils/components/SelectSnapshot/types';
 import { DEFAULT_PREFERENCE_LABEL } from '@kubevirt-utils/constants/instancetypes-and-preferences';
 import { ALL_PROJECTS } from '@kubevirt-utils/hooks/constants';
 import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
 import useListMulticlusterFilters from '@kubevirt-utils/hooks/useListMulticlusterFilters';
-import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
+import { type BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import {
   convertResourceArrayToMapWithCluster,
   getName,
@@ -29,13 +29,17 @@ import {
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { Operator } from '@openshift-console/dynamic-plugin-sdk';
-import { UseBootableVolumesValues } from '@virtualmachines/wizard/utils/types';
+import { type UseBootableVolumesValues } from '@virtualmachines/wizard/utils/types';
 
-type UseBootableVolumes = (namespace?: string) => UseBootableVolumesValues;
+type UseBootableVolumes = (
+  namespace?: string,
+  clusterOverride?: string,
+) => UseBootableVolumesValues;
 
-const useBootableVolumes: UseBootableVolumes = (namespace) => {
+const useBootableVolumes: UseBootableVolumes = (namespace, clusterOverride) => {
   const projectsNamespace = namespace === ALL_PROJECTS ? null : namespace;
-  const cluster = useClusterParam();
+  const clusterParam = useClusterParam();
+  const cluster = clusterOverride ?? clusterParam;
 
   const multiclusterFilters = useListMulticlusterFilters();
 

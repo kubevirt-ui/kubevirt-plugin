@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useWatch } from 'react-hook-form';
 
+import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { logTemplateFlowEvent } from '@kubevirt-utils/extensions/telemetry/telemetry';
 import {
   CUSTOMIZE_VM_BUTTON_CLICKED,
@@ -46,9 +47,10 @@ const useCreateVMFromTemplate: UseCreateVMFromTemplate = () => {
       description,
       folder,
       name: vmName,
-      project: namespace,
+      project,
       selectedTemplate,
     } = getValues(CREATE_VM_FORM_FIELDS_VM_DATA.ROOT);
+    const namespace = project || DEFAULT_NAMESPACE;
     const lastProcessedTemplateKey = getValues(
       CREATE_VM_FORM_FIELDS_UI_STATE.LAST_PROCESSED_TEMPLATE_KEY,
     );

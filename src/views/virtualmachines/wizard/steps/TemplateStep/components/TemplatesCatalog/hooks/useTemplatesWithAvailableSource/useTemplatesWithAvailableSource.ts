@@ -1,14 +1,14 @@
 import { useMemo } from 'react';
 
-import { V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
+import { type V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import { getUID } from '@kubevirt-utils/resources/shared';
-import { Template } from '@kubevirt-utils/resources/template';
+import { type Template } from '@kubevirt-utils/resources/template';
 import { useSingleClusterAvailableSources } from '@kubevirt-utils/resources/template/hooks/useSingleClusterAvailableSources';
 import { getAvailableTemplates } from '@virtualmachines/wizard/steps/TemplateStep/components/TemplatesCatalog/utils/getAvailableTemplates';
 
 import useTemplates from './useTemplates';
 
-type UseTemplatesWithAvailableSource = (args: { namespace?: string }) => {
+type UseTemplatesWithAvailableSource = (args: { clusterOverride?: string; namespace?: string }) => {
   availableDataSources: Record<string, V1beta1DataSource>;
   availableTemplatesUID: Set<string>;
   bootSourcesLoaded: boolean;
@@ -17,8 +17,15 @@ type UseTemplatesWithAvailableSource = (args: { namespace?: string }) => {
   templates: Template[];
 };
 
-const useTemplatesWithAvailableSource: UseTemplatesWithAvailableSource = ({ namespace }) => {
-  const { allTemplates: templates, error: loadError, loaded } = useTemplates(namespace);
+const useTemplatesWithAvailableSource: UseTemplatesWithAvailableSource = ({
+  clusterOverride,
+  namespace,
+}) => {
+  const {
+    allTemplates: templates,
+    error: loadError,
+    loaded,
+  } = useTemplates(namespace, clusterOverride);
 
   const {
     availableDataSources,

@@ -1,28 +1,28 @@
 import { useState } from 'react';
 import { useWatch } from 'react-hook-form';
-import { useNavigate } from 'react-router';
+import { useLocation, useNavigate } from 'react-router';
 
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import useIsIPv6SingleStackCluster from '@kubevirt-utils/hooks/useIPStackType/useIsIPv6SingleStackCluster';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import useLocalStorage from '@kubevirt-utils/hooks/useLocalStorage';
 import { getName } from '@kubevirt-utils/resources/shared';
 import useNamespaceUDN from '@kubevirt-utils/resources/udn/hooks/useNamespaceUDN';
 import { customizeWizardVMSignal } from '@kubevirt-utils/signals/customizeWizardVMSignal';
 import { getErrorMessage, kubevirtConsole } from '@kubevirt-utils/utils/utils';
-import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { kubevirtK8sCreate } from '@multicluster/k8sRequests';
-import { getVMURL } from '@multicluster/urls';
+import { getVMURL, isACMPath } from '@multicluster/urls';
 import { useSignals } from '@preact/signals-react/runtime';
 
 import { useVMWizard } from '../state/vm-wizard-context/VMWizardContext';
 import { CREATE_VM_FORM_FIELDS_VM_DATA } from '../state/vm-wizard-form/consts';
-
 import {
   createHeadlessServiceSafely,
   logFailedVMCreation,
   logSuccessfulVMCreation,
   prepareVMToCreate,
 } from './utils/utils';
+import { SELECTED_CLUSTER } from '../utils/constants';
 
 type UseCreateCustomizedVM = () => {
   createCustomizedVM: () => Promise<void>;
@@ -34,14 +34,18 @@ const useCreateCustomizedVM: UseCreateCustomizedVM = () => {
   useSignals();
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
-  const cluster = useClusterParam();
+  const { pathname } = useLocation();
   const { control, getValues } = useVMWizard();
+  const cluster = useWatch({ control, name: CREATE_VM_FORM_FIELDS_VM_DATA.CLUSTER });
   const vmNamespaceTarget = useWatch({ control, name: CREATE_VM_FORM_FIELDS_VM_DATA.PROJECT });
   const isIPv6SingleStack = useIsIPv6SingleStackCluster(cluster);
-  const [isUDNManagedNamespace] = useNamespaceUDN(vmNamespaceTarget);
+  const [isUDNManagedNamespace] = useNamespaceUDN(vmNamespaceTarget, cluster);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<unknown>(null);
+  const [_clusterFromLocalStorage, setClusterInLocalStorage] = useLocalStorage(
+    SELECTED_CLUSTER.LOCAL_STORAGE_KEY,
+  );
 
   const createCustomizedVM = async () => {
     const {
@@ -71,6 +75,10 @@ const useCreateCustomizedVM: UseCreateCustomizedVM = () => {
       });
 
       logSuccessfulVMCreation(createdVM, creationMethod, selectedTemplate);
+
+      if (cluster && isACMPath(pathname)) {
+        setClusterInLocalStorage(cluster);
+      }
 
       if (!isUDNManagedNamespace) {
         await createHeadlessServiceSafely(createdVM, t);

@@ -11,7 +11,7 @@ import {
   ALL_NAMESPACES_SESSION_KEY,
 } from '@kubevirt-utils/hooks/constants';
 import { getResourceUrl } from '@kubevirt-utils/resources/shared';
-import { isAllNamespaces } from '@kubevirt-utils/utils/utils';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { ExtensionK8sModel, K8sModel } from '@openshift-console/dynamic-plugin-sdk';
 import { ResourceRouteHandler } from '@stolostron/multicluster-sdk';
 
@@ -68,19 +68,11 @@ export const isVMWizardURL = (path: string = ''): boolean =>
   path === FLEET_WIZARD_PATH ||
   path.startsWith(`${FLEET_WIZARD_PATH}/`);
 
-export const getVMWizardURL = (cluster: string, namespace?: string): string => {
-  if (!cluster) return `/vm-wizard`;
-
-  const namespacePath =
-    namespace && !isAllNamespaces(namespace) ? `ns/${namespace}` : ALL_NAMESPACES;
-
-  return cluster === ALL_CLUSTERS_KEY
-    ? `${FLEET_WIZARD_PATH}/${ALL_CLUSTERS_KEY}/${ALL_NAMESPACES}`
-    : `${FLEET_WIZARD_PATH}/cluster/${cluster}/${namespacePath}`;
-};
+export const getVMWizardURL = (isACM?: boolean): string =>
+  isACM ? FLEET_WIZARD_PATH : '/vm-wizard';
 
 type NavigateToVMWizardParams = {
-  cluster: string;
+  cluster?: string;
   namespace?: string;
   navigate: NavigateFunction;
 };
@@ -90,7 +82,7 @@ export const navigateToVMWizard = ({
   namespace,
   navigate,
 }: NavigateToVMWizardParams): void => {
-  navigate(getVMWizardURL(cluster, namespace), { state: { namespace } });
+  navigate(getVMWizardURL(!isEmpty(cluster)), { state: { cluster, namespace } });
 };
 
 export const getConsoleStandaloneURL = (

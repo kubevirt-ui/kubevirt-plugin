@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router';
+import { useLocation, useNavigate } from 'react-router';
 
-import { V1beta1VirtualMachineClone } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1beta1VirtualMachineClone } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import useCloneVMModal from '@kubevirt-utils/components/CloneVMModal/hooks/useCloneVMModal';
 import {
   cloneVM as createCloneRequest,
@@ -10,13 +10,16 @@ import {
 import { TELEMETRY_VM_CREATION_METHOD } from '@kubevirt-utils/extensions/telemetry/utils/property-constants';
 import { logVMCreationFailed } from '@kubevirt-utils/extensions/telemetry/vm-creation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import useLocalStorage from '@kubevirt-utils/hooks/useLocalStorage';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { RUNSTRATEGY_HALTED } from '@kubevirt-utils/resources/vm';
 import { customizeWizardVMSignal } from '@kubevirt-utils/signals/customizeWizardVMSignal';
 import { getCluster } from '@multicluster/helpers/selectors';
+import { isACMPath } from '@multicluster/urls';
 import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
 import { CREATE_VM_FORM_FIELDS_VM_DATA } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
 
+import { SELECTED_CLUSTER } from '../utils/constants';
 import { handleCloneRequestPhaseChange } from './utils/utils';
 
 type UseCloneVM = () => {
@@ -28,11 +31,15 @@ type UseCloneVM = () => {
 const useCloneVM: UseCloneVM = () => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
+  const { pathname } = useLocation();
   const { getValues } = useVMWizard();
 
   const [submittedCloneRequest, setSubmittedCloneRequest] = useState<V1beta1VirtualMachineClone>();
   const [error, setError] = useState<unknown>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [_clusterFromLocalStorage, setClusterInLocalStorage] = useLocalStorage(
+    SELECTED_CLUSTER.LOCAL_STORAGE_KEY,
+  );
 
   const cloneRequest = useCloneVMModal(
     getName(submittedCloneRequest),
@@ -47,11 +54,11 @@ const useCloneVM: UseCloneVM = () => {
       navigate,
       setError,
       setIsSubmitting,
-      submittedCloneRequest,
       setSubmittedCloneRequest,
+      submittedCloneRequest,
       t,
     });
-  }, [cloneRequest, getValues, navigate, submittedCloneRequest]);
+  }, [cloneRequest, getValues, navigate, submittedCloneRequest, t]);
 
   const cloneVM = async () => {
     if (isSubmitting || submittedCloneRequest) {
@@ -90,6 +97,10 @@ const useCloneVM: UseCloneVM = () => {
         shouldStartClonedVM,
         description,
       );
+
+      if (targetCluster && isACMPath(pathname)) {
+        setClusterInLocalStorage(targetCluster);
+      }
 
       setSubmittedCloneRequest(request);
     } catch (err) {

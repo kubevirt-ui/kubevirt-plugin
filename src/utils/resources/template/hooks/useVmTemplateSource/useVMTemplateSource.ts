@@ -1,30 +1,34 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import {
-  V1beta1DataVolumeSourcePVC,
-  V1beta1DataVolumeSourceRef,
-  V1beta1PersistentVolumeClaim,
+  type V1beta1DataVolumeSourcePVC,
+  type V1beta1DataVolumeSourceRef,
+  type V1beta1PersistentVolumeClaim,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { isEqualObject } from '@kubevirt-utils/components/NodeSelectorModal/utils/helpers';
-import { Template } from '@kubevirt-utils/resources/template';
+import { type Template } from '@kubevirt-utils/resources/template';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 
 import { BOOT_SOURCE } from '../../utils/constants';
-
-import { getDataSource, getPVC, getTemplateBootSourceType, TemplateBootSource } from './utils';
+import { getDataSource, getPVC, getTemplateBootSourceType, type TemplateBootSource } from './utils';
 
 /**
  * A Hook that returns the boot source status of a given template
  * @param {Template} template - template to check
+ * @param {string} [clusterOverride] - cluster override (e.g. from wizard form)
  * @returns the boot source and its status
  */
-export const useVMTemplateSource = (template: Template): UseVMTemplateSourceValue => {
+export const useVMTemplateSource = (
+  template: Template,
+  clusterOverride?: string,
+): UseVMTemplateSourceValue => {
   const [templateBootSource, setTemplateBootSource] = useState<TemplateBootSource>(undefined);
   const [isBootSourceAvailable, setIsBootSourceAvailable] = useState<boolean>(false);
   const [loaded, setLoaded] = useState<boolean>(false);
   const [error, setError] = useState<any>();
   const prevBootSourceRef = useRef<TemplateBootSource>();
-  const cluster = useClusterParam();
+  const clusterParam = useClusterParam();
+  const cluster = clusterOverride ?? clusterParam;
 
   const bootSource = useMemo(() => getTemplateBootSourceType(template), [template]);
 
@@ -63,6 +67,7 @@ export const useVMTemplateSource = (template: Template): UseVMTemplateSourceValu
         const pvc = await getPVC(
           dataSource?.spec?.source?.pvc?.name,
           dataSource?.spec?.source?.pvc?.namespace,
+          cluster,
         );
         setTemplateBootSource({
           source: {
@@ -155,7 +160,7 @@ export const useVMTemplateSource = (template: Template): UseVMTemplateSourceValu
 
     prevBootSourceRef.current = bootSource;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [bootSource]);
+  }, [bootSource, cluster]);
 
   return {
     error,
