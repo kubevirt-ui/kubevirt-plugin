@@ -1,6 +1,7 @@
 .vm-list-summary {
   &__expand-section {
     margin: var(--pf-t--global--spacer--lg);
+    margin-bottom: 0;
 
     &-toggle {
       color: var(--pf-t--global--text--color--regular);

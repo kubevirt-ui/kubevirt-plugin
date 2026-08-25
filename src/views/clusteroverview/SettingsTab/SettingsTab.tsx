@@ -6,6 +6,7 @@ import { Overview } from '@openshift-console/dynamic-plugin-sdk';
 import { Card, Tab, Tabs, TabTitleText } from '@patternfly/react-core';
 
 import ClusterTab from './ClusterTab/ClusterTab';
+import DownloadsTab from './DownloadsTab/DownloadsTab';
 import PreviewFeaturesTab from './PreviewFeaturesTab/PreviewFeaturesTab';
 import UserTab from './UserTab/UserTab';
 
@@ -41,6 +42,11 @@ const SettingsTab: FC = () => {
           <Tab eventKey={2} title={<TabTitleText>{t('Preview features')}</TabTitleText>}>
             <div className="settings-tab__content" data-test="preview-features">
               <PreviewFeaturesTab />
+            </div>
+          </Tab>
+          <Tab eventKey={3} title={<TabTitleText>{t('Downloads')}</TabTitleText>}>
+            <div className="settings-tab__content" data-test="downloads">
+              <DownloadsTab />
             </div>
           </Tab>
         </Tabs>

@@ -55,7 +55,7 @@ const useGeneratedVM = () => {
     ],
   );
 
-  const [driversImage] = useDriversImage();
+  const [driversImage] = useDriversImage(cluster);
   const isWindowsOSVolume = useIsWindowsBootableVolume();
 
   return useMemo(
