@@ -25,6 +25,9 @@ export default class OverviewSettingsComponent extends BaseComponent {
   private readonly _divIdAutoUpdateRhelVmsInputpfV6CSwitchInput = this.locator(
     'div[id="auto-update-rhel-vms"] input.pf-v6-c-switch__input',
   );
+  private readonly _downloadIsoButton = this.testId('virtio-drivers-section-download-iso');
+  private readonly _downloadsTab = this.testId('settings-tab-downloads');
+  private readonly _downloadsTabContent = this.testId('downloads');
   private readonly _generalSettingsButton = this.locator('button:has-text("General settings")');
   private readonly _guestManagementButton = this.locator('button:has-text("Guest management")');
   private readonly _guestSystemLog = this.testId('guest-system-log');
@@ -90,6 +93,10 @@ export default class OverviewSettingsComponent extends BaseComponent {
     } catch {
       return false;
     }
+  }
+
+  async clickDownloadsTab(): Promise<void> {
+    await this.navigateToTab(this._downloadsTab);
   }
 
   async clickSearchResultMenuItem(
@@ -602,6 +609,30 @@ export default class OverviewSettingsComponent extends BaseComponent {
   async isAdvancedCdromFeaturesEnabled(): Promise<boolean> {
     try {
       return await this._advancedCdromFeaturesToggle.isChecked().catch(() => false);
+    } catch {
+      return false;
+    }
+  }
+
+  async isDownloadIsoButtonVisible(): Promise<boolean> {
+    try {
+      await this._downloadIsoButton.waitFor({
+        state: 'visible',
+        timeout: TestTimeouts.ELEMENT_WAIT,
+      });
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  async isDownloadsTabContentVisible(): Promise<boolean> {
+    try {
+      await this._downloadsTabContent.waitFor({
+        state: 'visible',
+        timeout: TestTimeouts.ELEMENT_WAIT,
+      });
+      return true;
     } catch {
       return false;
     }

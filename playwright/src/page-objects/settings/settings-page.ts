@@ -38,6 +38,12 @@ export default class SettingsPage extends BasePage {
     return this._features.adjustMemoryRequestRatio(...args);
   }
 
+  clickDownloadsTab(
+    ...args: Parameters<OverviewSettingsPage['clickDownloadsTab']>
+  ): ReturnType<OverviewSettingsPage['clickDownloadsTab']> {
+    return this._settings.clickDownloadsTab(...args);
+  }
+
   disableAaq(
     ...args: Parameters<OverviewVirtualizationFeaturesPage['disableAaq']>
   ): ReturnType<OverviewVirtualizationFeaturesPage['disableAaq']> {
@@ -230,6 +236,18 @@ export default class SettingsPage extends BasePage {
     ...args: Parameters<OverviewSettingsPage['isAdvancedCdromFeaturesEnabled']>
   ): ReturnType<OverviewSettingsPage['isAdvancedCdromFeaturesEnabled']> {
     return this._settings.isAdvancedCdromFeaturesEnabled(...args);
+  }
+
+  isDownloadIsoButtonVisible(
+    ...args: Parameters<OverviewSettingsPage['isDownloadIsoButtonVisible']>
+  ): ReturnType<OverviewSettingsPage['isDownloadIsoButtonVisible']> {
+    return this._settings.isDownloadIsoButtonVisible(...args);
+  }
+
+  isDownloadsTabContentVisible(
+    ...args: Parameters<OverviewSettingsPage['isDownloadsTabContentVisible']>
+  ): ReturnType<OverviewSettingsPage['isDownloadsTabContentVisible']> {
+    return this._settings.isDownloadsTabContentVisible(...args);
   }
 
   isAutomaticGrantVirtualizationRolesChecked(

@@ -11,6 +11,7 @@ import {
   VmListTreeComponent,
 } from '@/components/vm/vm-list-state-migration-components';
 import VmListTemplateCreateComponent from '@/components/vm/vm-list-template-create-component';
+import VmListVirtioAlertComponent from '@/components/vm/vm-list-virtio-alert-component';
 import type { VmMetricEntry } from '@/data-factories/vm-metrics-mock-factory';
 import PageCommons from '@/page-objects/page-commons';
 import { TreeContextMenuMixin } from '@/page-objects/vm/tree-context-menu-mixin';
@@ -31,6 +32,7 @@ export default class VirtualMachinesPage extends TreeContextMenuMixin(PageCommon
   readonly templateCreate: VmListTemplateCreateComponent;
 
   readonly tree: VmListTreeComponent;
+  readonly virtioAlert: VmListVirtioAlertComponent;
 
   /**
    * Creates a new VirtualMachinesPage instance.
@@ -51,6 +53,7 @@ export default class VirtualMachinesPage extends TreeContextMenuMixin(PageCommon
     this.overviewWidgets = new VmListOverviewWidgetsComponent(page, {
       searchTreeView: (t) => this.tree.searchTreeView(t),
     });
+    this.virtioAlert = new VmListVirtioAlertComponent(page);
   }
 
   async areAllCheckboxesChecked(): Promise<boolean> {

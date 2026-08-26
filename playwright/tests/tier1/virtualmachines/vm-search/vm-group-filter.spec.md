@@ -4,7 +4,7 @@
 
 - **Project Name:** KubeVirt UI — Playwright E2E Tests
 - **Feature Area:** Tier1 — Virtual machines / Search
-- **Latest version:** CNV 5.00
+- **Latest version:** CNV 5.0.0
 - **Latest update:** 2026-08-18
 - **Document Status:** Approved
 
