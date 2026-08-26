@@ -1,55 +1,59 @@
-/* eslint-disable */
 import React, { useMemo } from 'react';
 
-import { MigrationPolicyModelRef } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { MigrationPolicyModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1alpha1MigrationPolicy } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import {
+  MigrationPolicyModel,
+  MigrationPolicyModelRef,
+} from '@kubevirt-ui-ext/kubevirt-api/console';
+import { type V1alpha1MigrationPolicy } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import DeleteModal from '@kubevirt-utils/components/DeleteModal/DeleteModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { asAccessReview } from '@kubevirt-utils/resources/shared';
 import { kubevirtK8sDelete } from '@multicluster/k8sRequests';
-import { Action, useK8sModel } from '@openshift-console/dynamic-plugin-sdk';
+import { type Action, useK8sModel } from '@openshift-console/dynamic-plugin-sdk';
 
 import MigrationPolicyEditModal from '../../components/MigrationPolicyEditModal/MigrationPolicyEditModal';
 
 type UseMigrationPoliciesActionsProviderValues = [Action[], boolean];
 
 type UseMigrationPoliciesActionsProvider = (
-  mp: V1alpha1MigrationPolicy,
+  migrationPolicy: V1alpha1MigrationPolicy,
 ) => UseMigrationPoliciesActionsProviderValues;
 
-const useMigrationPoliciesActionsProvider: UseMigrationPoliciesActionsProvider = (mp) => {
+const useMigrationPoliciesActionsProvider: UseMigrationPoliciesActionsProvider = (
+  migrationPolicy,
+) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
 
   const [, inFlight] = useK8sModel(MigrationPolicyModelRef);
 
   const actions: Action[] = useMemo(() => {
+    const onDeleteSubmit = (): Promise<unknown> =>
+      kubevirtK8sDelete({ model: MigrationPolicyModel, resource: migrationPolicy });
+
     return [
       {
-        accessReview: asAccessReview(MigrationPolicyModel, mp, 'patch'),
+        accessReview: asAccessReview(MigrationPolicyModel, migrationPolicy, 'patch'),
         cta: () =>
           createModal(({ isOpen, onClose }) => (
-            <MigrationPolicyEditModal isOpen={isOpen} mp={mp} onClose={onClose} />
+            <MigrationPolicyEditModal isOpen={isOpen} mp={migrationPolicy} onClose={onClose} />
           )),
         disabled: false,
         id: 'mp-action-edit',
         label: t('Edit'),
       },
       {
-        accessReview: asAccessReview(MigrationPolicyModel, mp, 'delete'),
+        accessReview: asAccessReview(MigrationPolicyModel, migrationPolicy, 'delete'),
         cta: () =>
           createModal(({ isOpen, onClose }) => {
             return (
               <DeleteModal
-                onDeleteSubmit={() =>
-                  kubevirtK8sDelete({ model: MigrationPolicyModel, resource: mp })
-                }
                 headerText={t('Delete MigrationPolicy?')}
                 isOpen={isOpen}
-                obj={mp}
+                obj={migrationPolicy}
                 onClose={onClose}
+                onDeleteSubmit={onDeleteSubmit}
               />
             );
           }),
@@ -58,7 +62,7 @@ const useMigrationPoliciesActionsProvider: UseMigrationPoliciesActionsProvider =
         label: t('Delete'),
       },
     ];
-  }, [createModal, mp, t]);
+  }, [createModal, migrationPolicy, t]);
 
   return useMemo(() => [actions, !inFlight], [actions, inFlight]);
 };

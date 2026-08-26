@@ -1,13 +1,13 @@
 import { useMemo } from 'react';
 
 import { HyperConvergedV1Beta1ModelGroupVersionKind as HyperConvergedModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1LabelSelector } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
-import { V1MigrationConfiguration } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { CalculationMethod } from '@kubevirt-utils/resources/quotas/types';
+import { type V1LabelSelector } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
+import { type V1MigrationConfiguration } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type CalculationMethod } from '@kubevirt-utils/resources/quotas/types';
 import { operatorNamespaceSignal } from '@kubevirt-utils/store/operatorNamespace';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
-import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+import { type K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
 import useDeepCompareMemoize from './useDeepCompareMemoize/useDeepCompareMemoize';
 
@@ -62,7 +62,7 @@ const getHyperConvergedObject = (hyperConverged): HyperConverged => {
 
 type UseHyperConvergeConfigurationType = (
   cluster?: string,
-) => [hyperConvergeConfig: HyperConverged, loaded: boolean, error: any];
+) => [hyperConvergeConfig: HyperConverged, loaded: boolean, error: Error | undefined];
 
 const useHyperConvergeConfiguration: UseHyperConvergeConfigurationType = (cluster) => {
   const operatorNamespace = operatorNamespaceSignal.value;

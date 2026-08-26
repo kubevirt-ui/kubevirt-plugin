@@ -1,4 +1,3 @@
-/* eslint-disable */
 import DropdownEnum from '@kubevirt-utils/utils/dropdownEnum';
 
 type TopConsumerScopeData = {
@@ -15,30 +14,6 @@ abstract class TopConsumerScopeObjectEnum<T> extends DropdownEnum<T> {
 }
 
 export class TopConsumerScope extends TopConsumerScopeObjectEnum<string> {
-  private static readonly all = Object.freeze(
-    TopConsumerScope.getAllClassEnumProperties<TopConsumerScope>(),
-  );
-
-  private static readonly dropdownLabelMapper = TopConsumerScope.all.reduce(
-    (accumulator, scope: TopConsumerScope) => ({
-      ...accumulator,
-      [scope.dropdownLabel]: scope,
-    }),
-    {},
-  );
-
-  static fromDropdownLabel = (dropdownLabel: string): TopConsumerScope =>
-    TopConsumerScope.dropdownLabelMapper[dropdownLabel];
-
-  static fromString = (source: string): TopConsumerScope => TopConsumerScope.stringMapper[source];
-
-  static getAll = (isAllNamespaces?: boolean) => {
-    if (isAllNamespaces || isAllNamespaces === undefined) {
-      return TopConsumerScope.all;
-    }
-    return [TopConsumerScope.VM, TopConsumerScope.NODE];
-  };
-
   static readonly NODE = new TopConsumerScope('NODE', {
     dropdownLabel: 'Node',
   });
@@ -47,15 +22,36 @@ export class TopConsumerScope extends TopConsumerScopeObjectEnum<string> {
     dropdownLabel: 'Project',
   });
 
-  private static readonly stringMapper = TopConsumerScope.all.reduce(
-    (accumulator, scope: TopConsumerScope) => ({
-      ...accumulator,
-      [scope.value]: scope,
-    }),
-    {},
-  );
-
-  static readonly VM = new TopConsumerScope('VM', {
+  static readonly vm = new TopConsumerScope('VM', {
     dropdownLabel: 'VM',
   });
+
+  static fromDropdownLabel(dropdownLabel: string): TopConsumerScope {
+    return scopeDropdownLabelMapper[dropdownLabel];
+  }
+
+  static fromString(source: string): TopConsumerScope {
+    return scopeStringMapper[source];
+  }
+
+  static getAll(isAllNamespaces?: boolean): readonly TopConsumerScope[] {
+    if (isAllNamespaces || isAllNamespaces === undefined) {
+      return allScopes;
+    }
+    return [TopConsumerScope.vm, TopConsumerScope.NODE];
+  }
 }
+
+const allScopes: readonly TopConsumerScope[] = Object.freeze([
+  TopConsumerScope.NODE,
+  TopConsumerScope.PROJECT,
+  TopConsumerScope.vm,
+]);
+
+const scopeDropdownLabelMapper: Record<string, TopConsumerScope> = Object.fromEntries(
+  allScopes.map((scope) => [scope.getDropdownLabel(), scope]),
+) as Record<string, TopConsumerScope>;
+
+const scopeStringMapper: Record<string, TopConsumerScope> = Object.fromEntries(
+  allScopes.map((scope) => [scope.getValue(), scope]),
+) as Record<string, TopConsumerScope>;

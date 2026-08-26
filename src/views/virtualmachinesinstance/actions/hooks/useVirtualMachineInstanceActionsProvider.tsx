@@ -1,21 +1,80 @@
-/* eslint-disable */
 import React, { useMemo } from 'react';
 
 import { VirtualMachineInstanceModelRef } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { VirtualMachineInstanceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import type { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { AnnotationsModal } from '@kubevirt-utils/components/AnnotationsModal/AnnotationsModal';
 import DeleteModal from '@kubevirt-utils/components/DeleteModal/DeleteModal';
 import { LabelsModal } from '@kubevirt-utils/components/LabelsModal/LabelsModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { asAccessReview } from '@kubevirt-utils/resources/shared';
-import { Action, k8sDelete, k8sPatch, useK8sModel } from '@openshift-console/dynamic-plugin-sdk';
+import {
+  type Action,
+  k8sDelete,
+  k8sPatch,
+  useK8sModel,
+} from '@openshift-console/dynamic-plugin-sdk';
 import { ExternalLinkAltIcon } from '@patternfly/react-icons';
+
+type ModalProps = { isOpen: boolean; onClose: () => void };
 
 type UseVirtualMachineInstanceActionsProvider = (
   vmi: V1VirtualMachineInstance,
-) => [Action[], boolean, any];
+) => [Action[], boolean, undefined];
+
+const renderLabelsModal =
+  (vmi: V1VirtualMachineInstance) =>
+  ({ isOpen, onClose }: ModalProps): React.ReactNode => (
+    <LabelsModal
+      isOpen={isOpen}
+      obj={vmi}
+      onClose={onClose}
+      onLabelsSubmit={(labels) =>
+        k8sPatch({
+          data: [{ op: 'replace', path: '/metadata/labels', value: labels }],
+          model: VirtualMachineInstanceModel,
+          resource: vmi,
+        })
+      }
+    />
+  );
+
+const renderAnnotationsModal =
+  (vmi: V1VirtualMachineInstance) =>
+  ({ isOpen, onClose }: ModalProps): React.ReactNode => (
+    <AnnotationsModal
+      isOpen={isOpen}
+      obj={vmi}
+      onClose={onClose}
+      onSubmit={(annotations) =>
+        k8sPatch({
+          data: [{ op: 'replace', path: '/metadata/annotations', value: annotations }],
+          model: VirtualMachineInstanceModel,
+          resource: vmi,
+        })
+      }
+    />
+  );
+
+const renderDeleteModal =
+  (vmi: V1VirtualMachineInstance, t: (key: string) => string) =>
+  ({ isOpen, onClose }: ModalProps): React.ReactNode => (
+    <DeleteModal
+      headerText={t('Delete VirtualMachineInstance?')}
+      isOpen={isOpen}
+      obj={vmi}
+      onClose={onClose}
+      onDeleteSubmit={() =>
+        k8sDelete({
+          json: undefined,
+          model: VirtualMachineInstanceModel,
+          requestInit: undefined,
+          resource: vmi,
+        })
+      }
+    />
+  );
 
 const useVirtualMachineInstanceActionsProvider: UseVirtualMachineInstanceActionsProvider = (
   vmi: V1VirtualMachineInstance,
@@ -26,84 +85,29 @@ const useVirtualMachineInstanceActionsProvider: UseVirtualMachineInstanceActions
   const actions = useMemo(
     () => [
       {
-        cta: () =>
+        cta: (): void => {
           window.open(
             `/k8s/ns/${vmi?.metadata?.namespace}/kubevirt.io~v1~VirtualMachine/${vmi?.metadata?.name}/console/standalone`,
-          ),
+          );
+        },
         disabled: inFlight,
         icon: <ExternalLinkAltIcon />,
         id: 'open-console',
         label: t('Open console'),
       },
       {
-        cta: () =>
-          createModal(({ isOpen, onClose }) => (
-            <LabelsModal
-              onLabelsSubmit={(labels) =>
-                k8sPatch({
-                  data: [
-                    {
-                      op: 'replace',
-                      path: '/metadata/labels',
-                      value: labels,
-                    },
-                  ],
-                  model: VirtualMachineInstanceModel,
-                  resource: vmi,
-                })
-              }
-              isOpen={isOpen}
-              obj={vmi}
-              onClose={onClose}
-            />
-          )),
+        cta: (): void => createModal(renderLabelsModal(vmi)),
         id: 'edit-labels',
         label: t('Edit labels'),
       },
       {
-        cta: () =>
-          createModal(({ isOpen, onClose }) => (
-            <AnnotationsModal
-              onSubmit={(annotations) =>
-                k8sPatch({
-                  data: [
-                    {
-                      op: 'replace',
-                      path: '/metadata/annotations',
-                      value: annotations,
-                    },
-                  ],
-                  model: VirtualMachineInstanceModel,
-                  resource: vmi,
-                })
-              }
-              isOpen={isOpen}
-              obj={vmi}
-              onClose={onClose}
-            />
-          )),
+        cta: (): void => createModal(renderAnnotationsModal(vmi)),
         id: 'edit-annotations',
         label: t('Edit annotations'),
       },
       {
         accessReview: asAccessReview(VirtualMachineInstanceModel, vmi, 'delete'),
-        cta: () =>
-          createModal(({ isOpen, onClose }) => (
-            <DeleteModal
-              onDeleteSubmit={() =>
-                k8sDelete({
-                  json: undefined,
-                  model: VirtualMachineInstanceModel,
-                  requestInit: undefined,
-                  resource: vmi,
-                })
-              }
-              headerText={t('Delete VirtualMachineInstance?')}
-              isOpen={isOpen}
-              obj={vmi}
-              onClose={onClose}
-            />
-          )),
+        cta: (): void => createModal(renderDeleteModal(vmi, t)),
         id: 'delete-virtual-machine-instance',
         label: t('Delete VirtualMachineInstance'),
       },

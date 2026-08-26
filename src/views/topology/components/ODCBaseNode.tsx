@@ -1,12 +1,14 @@
-/* eslint-disable */
-import { K8sResourceKind, K8sResourceKindReference } from '@openshift-console/dynamic-plugin-sdk';
-import { OdcNodeModel } from '@openshift-console/dynamic-plugin-sdk/lib/extensions/topology-types';
+import type {
+  K8sResourceKind,
+  K8sResourceKindReference,
+} from '@openshift-console/dynamic-plugin-sdk';
+import type { OdcNodeModel } from '@openshift-console/dynamic-plugin-sdk/lib/extensions/topology-types';
 import { BaseNode } from '@patternfly/react-topology';
 
 class OdcBaseNode extends BaseNode {
-  public resource?: K8sResourceKind | undefined = undefined;
+  public resource?: K8sResourceKind = undefined;
 
-  public resourceKind?: K8sResourceKindReference | undefined = undefined;
+  public resourceKind?: K8sResourceKindReference = undefined;
 
   constructor() {
     super();

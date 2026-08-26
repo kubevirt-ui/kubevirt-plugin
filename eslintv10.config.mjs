@@ -61,7 +61,7 @@ const baseConfig = {
     'id-length': [
       'error',
       {
-        exceptions: ['t', 'e', 'i', 'a', 'b', 'id', 'vm', 'vmi', 'ns'],
+        exceptions: ['t', 'e', 'i', 'a', 'b', 'id', 'ID', 'vm', 'VM', 'vmi', 'VMI', 'ns', 'NS'],
         min: 3,
         properties: 'never',
       },

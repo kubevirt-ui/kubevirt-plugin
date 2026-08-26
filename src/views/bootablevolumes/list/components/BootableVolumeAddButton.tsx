@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 import { useNavigate } from 'react-router';
 
 import AddBootableVolumeModal from '@kubevirt-utils/components/AddBootableVolumeModal/AddBootableVolumeModal';
@@ -33,20 +32,21 @@ const BootableVolumeAddButton: FC<BootableVolumeAddButtonProps> = ({ buttonText,
     yaml: t('With YAML'),
   };
 
-  const onCreate = (type: string) => {
-    return type === 'form'
-      ? createModal((props) => <AddBootableVolumeModal {...props} />)
-      : navigate(
-          isACMPage
-            ? `${getFleetBootableVolumesURL(selectedCluster, selectedNamespace)}/~new`
-            : `/k8s/ns/${selectedNamespace}/bootablevolumes/~new`,
-        );
+  const onCreate = (type: string): void => {
+    if (type === 'form') {
+      createModal((props) => <AddBootableVolumeModal {...props} />);
+      return;
+    }
+    const url = isACMPage
+      ? `${getFleetBootableVolumesURL(selectedCluster, selectedNamespace)}/~new`
+      : `/k8s/ns/${selectedNamespace}/bootablevolumes/~new`;
+    navigate(url);
   };
 
   if ((canCreateDS || canCreatePVC) && canListInstanceTypesPreference) {
     return (
       <ListPageCreateDropdown items={createItems} onClick={onCreate}>
-        {buttonText || t('Add volume')}
+        {buttonText ?? t('Add volume')}
       </ListPageCreateDropdown>
     );
   }

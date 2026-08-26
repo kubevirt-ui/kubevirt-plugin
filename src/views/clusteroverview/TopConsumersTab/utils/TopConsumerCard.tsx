@@ -1,12 +1,12 @@
-import React, { FC, useMemo } from 'react';
+import React, { type FC, useMemo } from 'react';
 
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
-  SetTopConsumerData,
-  TopConsumersData,
+  type SetTopConsumerData,
+  type TopConsumersData,
 } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/types';
 import { SelectOption } from '@patternfly/react-core';
 
@@ -15,6 +15,11 @@ import { TopConsumersChartList } from './TopConsumersChartList';
 import { TopConsumerScope } from './topConsumerScope';
 
 import './TopConsumerCard.scss';
+
+type CardSettings = {
+  metric?: { value?: string };
+  scope?: { value?: string };
+};
 
 type TopConsumersMetricCard = {
   cardID: string;
@@ -31,38 +36,34 @@ const TopConsumerCard: FC<TopConsumersMetricCard> = ({
   const activeNamespace = useActiveNamespace();
   const isAllNamespaces = activeNamespace === ALL_NAMESPACES_SESSION_KEY;
 
-  const metricKey = useMemo(
-    () => localStorageData?.[cardID]?.metric?.value,
-    [cardID, localStorageData],
-  );
+  const cardData = localStorageData?.[cardID] as CardSettings | undefined;
 
-  const scopeKey = useMemo(
-    () => localStorageData?.[cardID]?.scope?.value,
-    [cardID, localStorageData],
-  );
+  const metricKey = useMemo(() => cardData?.metric?.value, [cardData]);
+
+  const scopeKey = useMemo(() => cardData?.scope?.value, [cardData]);
 
   const currentScope = TopConsumerScope.fromString(scopeKey);
   const availableScopes = TopConsumerScope.getAll(isAllNamespaces);
 
   const defaultScope = useMemo(() => {
-    return availableScopes.includes(currentScope) ? currentScope : TopConsumerScope.VM;
+    return availableScopes.includes(currentScope) ? currentScope : TopConsumerScope.vm;
   }, [availableScopes, currentScope]);
 
-  const onMetricSelect = (value) => {
+  const onMetricSelect = (value: string): void => {
     setLocalStorageData(cardID, {
-      ...localStorageData?.[cardID],
+      ...cardData,
       metric: {
-        ...localStorageData?.[cardID]?.metric,
+        ...cardData?.metric,
         value: TopConsumerMetric.fromDropdownLabel(value).toString(),
       },
     });
   };
 
-  const onScopeSelect = (value) => {
+  const onScopeSelect = (value: string): void => {
     setLocalStorageData(cardID, {
-      ...localStorageData?.[cardID],
+      ...cardData,
       scope: {
-        ...localStorageData?.[cardID]?.scope,
+        ...cardData?.scope,
         value: TopConsumerScope.fromDropdownLabel(value).toString(),
       },
     });
@@ -73,7 +74,7 @@ const TopConsumerCard: FC<TopConsumersMetricCard> = ({
       <div className="kv-top-consumer-card__header">
         <div>
           <FormPFSelect
-            onSelect={(_e, value) => onMetricSelect(value)}
+            onSelect={(_event, value): void => onMetricSelect(value as string)}
             selected={t(TopConsumerMetric.fromString(metricKey)?.getDropdownLabel())}
             toggleProps={{ id: 'kv-top-consumers-card-metric-select' }}
           >
@@ -86,7 +87,7 @@ const TopConsumerCard: FC<TopConsumersMetricCard> = ({
         </div>
         <div className="kv-top-consumer-card__scope-select">
           <FormPFSelect
-            onSelect={(_e, value) => onScopeSelect(value)}
+            onSelect={(_event, value): void => onScopeSelect(value as string)}
             selected={t(defaultScope?.getDropdownLabel())}
             toggleProps={{ id: 'kv-top-consumers-card-scope-select' }}
           >

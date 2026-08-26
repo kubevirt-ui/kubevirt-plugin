@@ -15,7 +15,9 @@ const getNamespaceFilter = (namespace: string, clusterFilter: string): string =>
   return filters ? `{${filters}}` : '';
 };
 
-const topConsumerQueries = {
+type QueryBuilder = (numItemsToShow: number, duration: string, filter: string) => string;
+
+const topConsumerQueries: Record<string, Record<string, QueryBuilder>> = {
   [Scope.NODE.getValue()]: {
     [Metric.CPU.getValue()]: (numItemsToShow, duration, namespaceFilter) =>
       `sort_desc(topk(${numItemsToShow}, sum(rate(kubevirt_vmi_cpu_usage_seconds_total${namespaceFilter}[${duration}])) by (node))) > 0`,
@@ -52,7 +54,7 @@ const topConsumerQueries = {
     [Metric.VCPU_WAIT.getValue()]: (numItemsToShow, duration, clusterFilter) =>
       `sort_desc(topk(${numItemsToShow}, sum(rate(kubevirt_vmi_vcpu_wait_seconds_total${clusterFilter}[${duration}])) by (namespace))) > 0`,
   },
-  [Scope.VM.getValue()]: {
+  [Scope.vm.getValue()]: {
     [Metric.CPU.getValue()]: (numItemsToShow, duration, namespaceFilter) =>
       `sort_desc(topk(${numItemsToShow}, sum(rate(kubevirt_vmi_cpu_usage_seconds_total${namespaceFilter}[${duration}])) BY (name, namespace)))`,
     [Metric.MEMORY_SWAP_TRAFFIC.getValue()]: (numItemsToShow, duration, namespaceFilter) =>
@@ -88,7 +90,7 @@ export const getTopConsumerQuery = (
       ? `cluster="${escapePromLabelValue(trimmedCluster)}"`
       : '';
   const clusterFilterString = clusterFilter ? `{${clusterFilter}}` : '';
-  const namespaceFilter = getNamespaceFilter(namespace || '', clusterFilter);
+  const namespaceFilter = getNamespaceFilter(namespace ?? '', clusterFilter);
 
   // PROJECT scope aggregates by namespace, so it uses clusterFilter directly
   // NODE and VM scopes use namespaceFilter which includes both namespace and cluster

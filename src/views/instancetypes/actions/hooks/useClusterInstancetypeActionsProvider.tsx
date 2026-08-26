@@ -1,16 +1,17 @@
-/* eslint-disable */
 import React, { useMemo } from 'react';
 
-import { VirtualMachineClusterInstancetypeModelRef } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { VirtualMachineClusterInstancetypeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1beta1VirtualMachineClusterInstancetype } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import {
+  VirtualMachineClusterInstancetypeModel,
+  VirtualMachineClusterInstancetypeModelRef,
+} from '@kubevirt-ui-ext/kubevirt-api/console';
+import { type V1beta1VirtualMachineClusterInstancetype } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import CloneResourceModal from '@kubevirt-utils/components/CloneResourceModal/CloneResourceModal';
 import DeleteModal from '@kubevirt-utils/components/DeleteModal/DeleteModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { asAccessReview } from '@kubevirt-utils/resources/shared';
 import { kubevirtK8sDelete } from '@multicluster/k8sRequests';
-import { Action, useK8sModel } from '@openshift-console/dynamic-plugin-sdk';
+import { type Action, useK8sModel } from '@openshift-console/dynamic-plugin-sdk';
 
 type UseClusterInstancetypeActionsProviderValues = [Action[], boolean];
 
@@ -25,7 +26,15 @@ const useClusterInstancetypeActionsProvider: UseClusterInstancetypeActionsProvid
   const { createModal } = useModal();
 
   const [, inFlight] = useK8sModel(VirtualMachineClusterInstancetypeModelRef);
+
   const actions: Action[] = useMemo(() => {
+    const handleDelete = (): Promise<V1beta1VirtualMachineClusterInstancetype> =>
+      kubevirtK8sDelete({
+        cluster: instanceType?.cluster,
+        model: VirtualMachineClusterInstancetypeModel,
+        resource: instanceType,
+      });
+
     return [
       {
         accessReview: asAccessReview(
@@ -34,15 +43,13 @@ const useClusterInstancetypeActionsProvider: UseClusterInstancetypeActionsProvid
           'create',
         ),
         cta: () =>
-          createModal((modalProps) => {
-            return (
-              <CloneResourceModal
-                {...modalProps}
-                model={VirtualMachineClusterInstancetypeModel}
-                object={instanceType}
-              />
-            );
-          }),
+          createModal((modalProps) => (
+            <CloneResourceModal
+              {...modalProps}
+              model={VirtualMachineClusterInstancetypeModel}
+              object={instanceType}
+            />
+          )),
         disabled: false,
         id: 'instacetype-clone-action',
         label: t('Clone'),
@@ -54,23 +61,15 @@ const useClusterInstancetypeActionsProvider: UseClusterInstancetypeActionsProvid
           'delete',
         ),
         cta: () =>
-          createModal(({ isOpen, onClose }) => {
-            return (
-              <DeleteModal
-                onDeleteSubmit={() =>
-                  kubevirtK8sDelete({
-                    cluster: instanceType?.cluster,
-                    model: VirtualMachineClusterInstancetypeModel,
-                    resource: instanceType,
-                  })
-                }
-                headerText={t('Delete VirtualMachineClusterInstancetype?')}
-                isOpen={isOpen}
-                obj={instanceType}
-                onClose={onClose}
-              />
-            );
-          }),
+          createModal(({ isOpen, onClose }) => (
+            <DeleteModal
+              headerText={t('Delete VirtualMachineClusterInstancetype?')}
+              isOpen={isOpen}
+              obj={instanceType}
+              onClose={onClose}
+              onDeleteSubmit={handleDelete}
+            />
+          )),
         disabled: false,
         id: 'instacetype-delete-action',
         label: t('Delete'),

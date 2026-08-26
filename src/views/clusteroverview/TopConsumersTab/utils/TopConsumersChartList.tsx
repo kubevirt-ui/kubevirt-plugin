@@ -1,11 +1,11 @@
-import React, { FC, useMemo } from 'react';
+import React, { type FC, useMemo } from 'react';
 
 import LoadingEmptyState from '@kubevirt-utils/components/LoadingEmptyState/LoadingEmptyState';
 import { ALL_CLUSTERS_KEY } from '@kubevirt-utils/hooks/constants';
 import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
 import useCurrentTime from '@kubevirt-utils/hooks/useCurrentTime';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { TopConsumersData } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/types';
+import { type TopConsumersData } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/types';
 import useActiveClusterParam from '@multicluster/hooks/useActiveClusterParam';
 import { PrometheusEndpoint } from '@openshift-console/dynamic-plugin-sdk';
 import { CardBody } from '@patternfly/react-core';
@@ -19,7 +19,7 @@ import {
 import NoDataAvailableMessage from './NoDataAvailableMessage';
 import { getTopConsumerQuery } from './queries';
 import { TopConsumerMetric } from './topConsumerMetric';
-import { TopConsumerScope } from './topConsumerScope';
+import { type TopConsumerScope } from './topConsumerScope';
 import TopConsumersProgressChart from './TopConsumersProgressChart';
 import { getChartTitle, getHumanizedValue, getValue } from './utils';
 
@@ -41,11 +41,11 @@ export const TopConsumersChartList: FC<TopConsumersChartListProps> = ({
   const cluster = useActiveClusterParam();
   const [hubClusterName] = useHubClusterName();
   const duration = useMemo(
-    () => localStorageData?.[TOP_CONSUMERS_DURATION_KEY],
+    () => localStorageData?.[TOP_CONSUMERS_DURATION_KEY] as string | undefined,
     [localStorageData],
   );
   const numItemsLabel = useMemo(
-    () => localStorageData?.[TOP_CONSUMERS_NUM_ITEMS_KEY],
+    () => localStorageData?.[TOP_CONSUMERS_NUM_ITEMS_KEY] as string | undefined,
     [localStorageData],
   );
   const numItemsToShow = useMemo(
@@ -87,7 +87,7 @@ export const TopConsumersChartList: FC<TopConsumersChartListProps> = ({
         <TopConsumersProgressChart
           key={`chart-${metric?.getValue()}-${scope?.getValue()}-${i}`}
           labelUnit={humanizedValue.unit}
-          labelValue={humanizedValue.value}
+          labelValue={Number(humanizedValue.value)}
           maxValue={max}
           title={title}
           value={rawValue}
@@ -99,7 +99,7 @@ export const TopConsumersChartList: FC<TopConsumersChartListProps> = ({
 
   const showNoDataMessage = loaded && numQueryResults === 0;
 
-  const renderTopConsumersContent = () => {
+  const renderTopConsumersContent = (): React.JSX.Element | React.JSX.Element[] => {
     if (isLoading) {
       return <LoadingEmptyState />;
     }

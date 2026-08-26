@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC, useCallback } from 'react';
+import React, { type FC, useCallback } from 'react';
 import { useNavigate } from 'react-router';
 
 import { EditorType } from '@kubevirt-utils/components/SyncedEditor/utils/types';
@@ -27,12 +26,10 @@ const QuotasCreateButton: FC<QuotasCreateButtonProps> = ({ namespace }) => {
 
   const onCreate = useCallback(
     (type: string) => {
-      switch (type) {
-        case EditorType.Form:
-          return navigate(getQuotaCreateFormURL(namespace));
-        default:
-          return navigate(getQuotaCreateFormYAMLURL(namespace));
+      if (type === EditorType.Form) {
+        return navigate(getQuotaCreateFormURL(namespace));
       }
+      return navigate(getQuotaCreateFormYAMLURL(namespace));
     },
     [navigate, namespace],
   );

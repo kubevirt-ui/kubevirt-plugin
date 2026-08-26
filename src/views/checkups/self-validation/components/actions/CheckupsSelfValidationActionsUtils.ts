@@ -1,4 +1,4 @@
-import { IoK8sApiBatchV1Job } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type IoK8sApiBatchV1Job } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 
 import { extractConfigMapName } from '../../../utils/utils';
 
@@ -11,7 +11,7 @@ export type SelfValidationActionMode =
   (typeof SELF_VALIDATION_ACTION_MODE)[keyof typeof SELF_VALIDATION_ACTION_MODE];
 
 export type ActionState = {
-  configMapInfo: { cluster: string; name: string; namespace: string } | null;
+  configMapInfo: { cluster?: string; name: string; namespace: string } | null;
   isEnabled: boolean;
   showWarning: boolean;
 };

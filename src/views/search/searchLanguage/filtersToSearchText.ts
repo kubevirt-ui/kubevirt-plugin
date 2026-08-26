@@ -1,13 +1,13 @@
-import { KubevirtFilterState } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
+import { type KubevirtFilterState } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import {
   isExcludedValue,
   stripExclusionPrefix,
 } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/utils';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { SEARCH_KEYS } from '@search/components/SearchDropdown/constants';
 import { FROM_PREFIX, TO_PREFIX } from '@search/utils/dateCreatedValues';
 import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
-import { SEARCH_KEYS } from '@search/components/SearchDropdown/constants';
 import {
   CPU_NUMERIC_REGEX,
   DATE_CREATED_FILTER_KEYS,
@@ -18,22 +18,32 @@ import {
 } from './constants';
 import { toSearchString } from './utils';
 
+const parseMemoryUnit = (value: string): [string, string, string] | null => {
+  const match = MEMORY_UNIT_REGEX.exec(value);
+  return match?.[1] && match[2] && match[3] ? [match[1], match[2], match[3]] : null;
+};
+
+const parseCpuNumeric = (value: string): [string, string] | null => {
+  const match = CPU_NUMERIC_REGEX.exec(value);
+  return match?.[1] && match[2] ? [match[1], match[2]] : null;
+};
+
 const serializeNumericValue = (filterType: string, value: string): null | string => {
   const searchKey = FILTER_TYPE_TO_SEARCH_KEY.get(filterType);
   if (!searchKey) return null;
 
   if (filterType === VirtualMachineRowFilterType.Memory) {
-    const match = value.match(MEMORY_UNIT_REGEX);
-    if (!match) return null;
-    const [, operatorEnum, num, unit] = match;
+    const parsed = parseMemoryUnit(value);
+    if (!parsed) return null;
+    const [operatorEnum, num, unit] = parsed;
     const sign = OPERATOR_TO_SIGN[operatorEnum];
     if (!sign) return null;
     return `${searchKey}${sign}${num}${unit}`;
   }
 
-  const match = value.match(CPU_NUMERIC_REGEX);
-  if (!match) return null;
-  const [, operatorEnum, num] = match;
+  const parsed = parseCpuNumeric(value);
+  if (!parsed) return null;
+  const [operatorEnum, num] = parsed;
   const sign = OPERATOR_TO_SIGN[operatorEnum];
   if (!sign) return null;
   return `${searchKey}${sign}${num}`;
