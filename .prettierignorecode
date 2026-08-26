@@ -16,8 +16,10 @@ ci-scripts/hot-cluster/helm/**/templates/
 .playwright-mcp/
 test-results/
 
+# Ignore Claude Code local settings
+.claude/settings.local.json
+
 # Ignore anything that eslint will look at since eslint also applies prettier.
-#
 **/*.js
 **/*.jsx
 **/*.cjs
