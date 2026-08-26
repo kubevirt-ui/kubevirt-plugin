@@ -95,15 +95,14 @@ const VirtualMachineFilterToolbar: FC<VirtualMachineFilterToolbarProps> = ({
             filters,
             isToggleVisible:
               filtersShown.includes(filterDef.id as VirtualMachineRowFilterType) || showMoreFilters,
-            key: filterDef.id,
             onSetFilters: handleSetFilters,
             toggleSize: MenuToggleSize.sm,
           };
 
           return filterDef.optionGroups ? (
-            <GroupedCheckboxSelect {...sharedProps} data={vms ?? []} />
+            <GroupedCheckboxSelect key={filterDef.id} {...sharedProps} data={vms ?? []} />
           ) : (
-            <SelectFilterItem {...sharedProps} />
+            <SelectFilterItem key={filterDef.id} {...sharedProps} />
           );
         })}
         <ToolbarItem>
