@@ -1,10 +1,10 @@
-import { TFunction } from 'i18next';
+import { type TFunction } from 'i18next';
 
 // follow the backend validations
 // https://github.com/kubernetes/kubernetes/blob/8d7d7a5e0d4d7e75f5a860574346944b8cc0fc43/staging/src/k8s.io/apimachinery/pkg/util/validation/validation.go#L107-L124
 const dns1123LabelRegexp = /^[a-z0-9]([-a-z0-9]*[a-z0-9])?$/;
 
-const dns1123LabelErrMsg = (t: TFunction) =>
+const dns1123LabelErrMsg = (t: TFunction): string =>
   t(
     "a lowercase RFC 1123 label must consist of lower case alphanumeric characters or '-', and must start and end with an alphanumeric character",
   );
@@ -12,7 +12,7 @@ const dns1123LabelErrMsg = (t: TFunction) =>
 // DNS1123LabelMaxLength is a label's max length in DNS (RFC 1123)
 const DNS1123LabelMaxLength = 63;
 
-const maxNameLengthErrorMsg = (t: TFunction) =>
+const maxNameLengthErrorMsg = (t: TFunction): string =>
   t('Maximum name length is {{ maxNameLength }} characters', {
     maxNameLength: DNS1123LabelMaxLength,
   });
@@ -71,19 +71,23 @@ export const getNameValidationMessage = (t: TFunction, value: string): string | 
 export const isDigitsOnly = (value: string): boolean => /^\d+$/.test(value);
 
 // Standard 5-field cron (minute hour day-of-month month day-of-week)
-const CRON_FIELD_PATTERN =
-  /^(\*|([0-9]{1,2})(-([0-9]{1,2}))?)(\/[0-9]+)?(,(\*|([0-9]{1,2})(-([0-9]{1,2}))?)(\/[0-9]+)?)*$/;
+const CRON_ELEMENT_PATTERN = /^(?:\*|\d{1,2}(?:-\d{1,2})?)(?:\/\d+)?$/;
 
 const isValidCronField = (field: string, minValue: number, maxValue: number): boolean => {
-  if (!CRON_FIELD_PATTERN.test(field)) return false;
+  const elements = field.split(',');
+  if (!elements.every((element) => CRON_ELEMENT_PATTERN.test(element))) {
+    return false;
+  }
 
   const steps = field.match(/\/(\d+)/g);
-  if (steps?.some((s) => Number(s.slice(1)) === 0)) return false;
+  if (steps?.some((step) => Number(step.slice(1)) === 0)) {
+    return false;
+  }
 
   const numbers = field.match(/\d+/g);
   if (numbers) {
-    return numbers.every((n) => {
-      const value = Number(n);
+    return numbers.every((num) => {
+      const value = Number(num);
       return value >= minValue && value <= maxValue;
     });
   }
@@ -105,7 +109,9 @@ export const isValidCronExpression = (value: string): boolean => {
     return false;
   }
 
-  return parts.every((part, i) => isValidCronField(part, CRON_FIELD_MIN[i], CRON_FIELD_MAX[i]));
+  return parts.every((part, idx) =>
+    isValidCronField(part, CRON_FIELD_MIN[idx], CRON_FIELD_MAX[idx]),
+  );
 };
 
 export const getCronScheduleFormatError = (t: TFunction): string =>
@@ -139,7 +145,6 @@ const canParseUrl = (url: string): boolean => {
     return URL.canParse(url);
   }
   try {
-    // eslint-disable-next-line no-new
     new URL(url);
     return true;
   } catch {
@@ -151,11 +156,19 @@ export const isValidUrl = (url: string, options: UrlValidationOptions = {}): boo
   const { allowEmpty, allowRelative, maxLength } = options;
   const trimmed = url?.trim() ?? '';
 
-  if (!trimmed) return !!allowEmpty;
-  if (maxLength && trimmed.length > maxLength) return false;
-  if (allowRelative && /^\/[^/]/.test(trimmed)) return true;
+  if (!trimmed) {
+    return !!allowEmpty;
+  }
+  if (maxLength && trimmed.length > maxLength) {
+    return false;
+  }
+  if (allowRelative && /^\/[^/]/.test(trimmed)) {
+    return true;
+  }
 
-  if (!canParseUrl(trimmed)) return false;
+  if (!canParseUrl(trimmed)) {
+    return false;
+  }
 
   try {
     return ['http:', 'https:'].includes(new URL(trimmed).protocol);

@@ -1,6 +1,6 @@
-import React, { ComponentProps, forwardRef, HTMLProps } from 'react';
+import React, { type ComponentProps, forwardRef, type HTMLProps } from 'react';
 
-import { TextInput, TextInputProps } from '@patternfly/react-core';
+import { TextInput, type TextInputProps } from '@patternfly/react-core';
 
 // PatternFly changes the signature of the 'onChange' handler for input elements.
 // This causes issues with React Hook Form as it expects the default signature for an input element.
@@ -13,13 +13,7 @@ export const FormTextInput = forwardRef<HTMLInputElement, FormTextInputProps>(
   ({ onChange, ...props }, ref) => {
     const onChangeForward: TextInputProps['onChange'] = (event) => onChange?.(event);
 
-    return (
-      <TextInput
-        {...props}
-        onChange={(event, _value) => onChangeForward(event, _value)}
-        ref={ref}
-      />
-    );
+    return <TextInput {...props} onChange={onChangeForward} ref={ref} />;
   },
 );
 

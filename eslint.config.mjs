@@ -4,6 +4,7 @@ import promise from 'eslint-plugin-promise';
 import prettier from 'eslint-plugin-prettier/recommended';
 import reactHooks from 'eslint-plugin-react-hooks';
 import simpleImportSort from 'eslint-plugin-simple-import-sort';
+import sonarjs from 'eslint-plugin-sonarjs';
 import testingLibrary from 'eslint-plugin-testing-library';
 import unicorn from 'eslint-plugin-unicorn';
 import tseslint from 'typescript-eslint';
@@ -111,6 +112,27 @@ const reactConfig = {
   },
 };
 
+const sonarConfig = {
+  ...sonarjs.configs.recommended,
+  files: ['**/*.{js,jsx,ts,tsx}'],
+  rules: {
+    ...sonarjs.configs.recommended.rules,
+    'sonarjs/deprecation': 'off',
+    'sonarjs/fixme-tag': 'off',
+    'sonarjs/function-return-type': 'off',
+    'sonarjs/no-globals-shadowing': 'off',
+    'sonarjs/no-redundant-jump': 'off',
+    'sonarjs/no-unused-vars': 'off',
+    'sonarjs/super-linear-regex': 'off',
+    'sonarjs/todo-tag': 'off',
+    'sonarjs/unused-import': 'off',
+  },
+};
+
+const allSonarjsRulesOff = Object.fromEntries(
+  Object.keys(sonarjs.configs.recommended.rules).map((rule) => [rule, 'off']),
+);
+
 const prettierOverrides = {
   rules: {
     'prettier/prettier': ['error', { endOfLine: 'auto' }],
@@ -120,6 +142,7 @@ const prettierOverrides = {
 const githubScriptsOverrides = {
   files: ['.github/**/*.{ts,tsx,js,jsx}', 'ci-scripts/**/*.{ts,tsx,js,jsx}'],
   rules: {
+    ...allSonarjsRulesOff,
     'no-console': 'off',
   },
 };
@@ -132,6 +155,7 @@ const testingLibraryConfig = {
 const testFilesOverrides = {
   files: ['**/*.test.{ts,tsx}', '**/*.spec.{ts,tsx}', '**/__tests__/**/*.{ts,tsx}'],
   rules: {
+    ...allSonarjsRulesOff,
     'i18next/no-literal-string': 'off',
   },
 };
@@ -141,6 +165,7 @@ export default [
   baseConfig,
   ...tsConfigs,
   reactConfig,
+  sonarConfig,
   prettier,
   prettierOverrides,
   githubScriptsOverrides,

@@ -1,8 +1,8 @@
-import { TFunction } from 'i18next';
+import { type TFunction } from 'i18next';
 
 import { DataSourceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { appendBootableVolumeContext } from '@kubevirt-utils/resources/bootableresources/constants';
 import { getName, getResourceUrl, getUID } from '@kubevirt-utils/resources/shared';
 
@@ -17,8 +17,6 @@ type CompleteVmDiskUploadParams = {
   uploadKey: string;
   vm: V1VirtualMachine;
 };
-
-type CompleteVmCdromUploadParams = CompleteVmDiskUploadParams;
 
 type CompleteBootableVolumeUploadParams = {
   dataSource: V1beta1DataSource;
@@ -47,7 +45,7 @@ export const completeVmCdromUpload = ({
   t,
   uploadKey,
   vm,
-}: CompleteVmCdromUploadParams): void => {
+}: CompleteVmDiskUploadParams): void => {
   useUploadProgressStore.getState().completeUpload(uploadKey, {
     resourceName: diskName,
     successLinks: getUID(vm)

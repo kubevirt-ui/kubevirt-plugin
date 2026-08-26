@@ -6,7 +6,7 @@ const UPLOADING_MSG = 'Uploading image';
 const extractErrorDetails = (raw: string | undefined): string | undefined => {
   if (!raw) return undefined;
 
-  const jsonMatch = raw.match(/\{[^}]*"details"\s*:\s*"([^"]+)"[^}]*\}/);
+  const jsonMatch = /\{[^}]*"details"\s*:\s*"([^"]+)"[^}]*\}/.exec(raw);
   if (jsonMatch?.[1]) return jsonMatch[1];
 
   return raw;

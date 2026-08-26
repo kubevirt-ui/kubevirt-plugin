@@ -1,6 +1,6 @@
-import React, { Dispatch, FC, SetStateAction, useEffect, useState } from 'react';
+import React, { type Dispatch, type FC, type SetStateAction, useEffect, useState } from 'react';
 
-import { IoK8sApiCoreV1Secret } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type IoK8sApiCoreV1Secret } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
 import {
   addNewSecret,
@@ -12,7 +12,7 @@ import { decodeSecret } from '@kubevirt-utils/resources/secret/utils';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 
-import { SecretSelectionOption, SSHSecretDetails } from '../../utils/types';
+import { SecretSelectionOption, type SSHSecretDetails } from '../../utils/types';
 
 type SecretDropdownProps = {
   namespace: string;
@@ -41,7 +41,7 @@ const SecretDropdown: FC<SecretDropdownProps> = ({
     }
   }, [sshDetails?.sshPubKey, sshDetails?.sshSecretName]);
 
-  const onSelect = (newSecretName: string) => {
+  const onSelect = (newSecretName: string): void => {
     const selectedSecret = selectedProjectSecrets.find(
       (secret: IoK8sApiCoreV1Secret) => getName(secret) === newSecretName,
     );
@@ -51,7 +51,7 @@ const SecretDropdown: FC<SecretDropdownProps> = ({
 
     setSSHDetails((prev) => ({
       ...prev,
-      secretOption: addNew ? SecretSelectionOption.addNew : SecretSelectionOption.useExisting,
+      secretOption: addNew ? SecretSelectionOption.AddNew : SecretSelectionOption.UseExisting,
       sshPubKey,
       sshSecretName: addNew ? generatedSecretName : newSecretName,
       sshSecretNamespace: selectedSecret?.metadata?.namespace,

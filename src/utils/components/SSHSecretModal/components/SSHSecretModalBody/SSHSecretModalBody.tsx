@@ -1,12 +1,12 @@
-import React, { Dispatch, FC, SetStateAction, useState } from 'react';
+import React, { type Dispatch, type FC, type SetStateAction, useState } from 'react';
 
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import SecretSelectionRadioGroup from '@kubevirt-utils/components/SSHSecretModal/components/SecretSelectionRadioGroup';
 import SSHKeyUpload from '@kubevirt-utils/components/SSHSecretModal/components/SSHKeyUpload/SSHKeyUpload';
 import {
-  SecretsData,
+  type SecretsData,
   SecretSelectionOption,
-  SSHSecretDetails,
+  type SSHSecretDetails,
 } from '@kubevirt-utils/components/SSHSecretModal/utils/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -47,8 +47,8 @@ const SSHSecretModalBody: FC<SSHSecretModalBodyProps> = ({
   const { allSecrets, projectsWithSecrets, secretsLoaded, secretsLoadError } = secretsData;
 
   const showDefaultCheckbox =
-    (secretSelectionOption === SecretSelectionOption.addNew && !isTemplate) ||
-    (!isEmpty(projectsWithSecrets) && secretSelectionOption === SecretSelectionOption.useExisting);
+    (secretSelectionOption === SecretSelectionOption.AddNew && !isTemplate) ||
+    (!isEmpty(projectsWithSecrets) && secretSelectionOption === SecretSelectionOption.UseExisting);
 
   return (
     <Grid span={12}>
@@ -60,7 +60,7 @@ const SSHSecretModalBody: FC<SSHSecretModalBodyProps> = ({
         />
       </GridItem>
       <GridItem className="ssh-secret-section__body">
-        {secretSelectionOption === SecretSelectionOption.useExisting && (
+        {secretSelectionOption === SecretSelectionOption.UseExisting && (
           <SSHOptionUseExisting
             cluster={cluster}
             localNSProject={localNSProject}
@@ -73,7 +73,7 @@ const SSHSecretModalBody: FC<SSHSecretModalBodyProps> = ({
             sshDetails={sshDetails}
           />
         )}
-        {secretSelectionOption === SecretSelectionOption.addNew && (
+        {secretSelectionOption === SecretSelectionOption.AddNew && (
           <SSHKeyUpload
             secrets={allSecrets}
             setSSHDetails={setSSHDetails}
@@ -83,16 +83,16 @@ const SSHSecretModalBody: FC<SSHSecretModalBodyProps> = ({
       </GridItem>
       {showDefaultCheckbox && (
         <Checkbox
+          className="pf-v6-u-mt-md"
+          id="apply-key-to-project-per-user"
+          isChecked={sshDetails.applyKeyToProject || isUserTab}
+          isDisabled={isUserTab}
           label={t(
             'Automatically apply this key to any new VirtualMachine you create in this project.',
           )}
           onClick={() =>
             setSSHDetails((prev) => ({ ...prev, applyKeyToProject: !prev.applyKeyToProject }))
           }
-          className="pf-v6-u-mt-md"
-          id="apply-key-to-project-per-user"
-          isChecked={sshDetails.applyKeyToProject || isUserTab}
-          isDisabled={isUserTab}
         />
       )}
       {secretsLoadError && <ErrorAlert error={secretsLoadError} />}

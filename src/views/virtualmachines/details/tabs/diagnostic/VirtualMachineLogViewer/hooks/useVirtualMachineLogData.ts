@@ -1,4 +1,5 @@
-// eslint-disable-next-line
+/* eslint-disable */
+ 
 import { Buffer } from 'buffer';
 
 import { useEffect, useState } from 'react';

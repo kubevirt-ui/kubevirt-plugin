@@ -3,17 +3,16 @@ import { type TFunction } from 'i18next';
 
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { type SelectTypeaheadOptionProps } from '@kubevirt-utils/components/SelectTypeahead/SelectTypeahead';
-import { type ValidatedOptions } from '@patternfly/react-core';
-
 import { type NetworkAttachmentDefinitionKind } from '@kubevirt-utils/resources/nad/types';
+import { type ValidatedOptions } from '@patternfly/react-core';
 
 export type NetworkSelectTypeaheadOptionProps = SelectTypeaheadOptionProps & {
   type: string;
 };
 
 export type NetworkInterfaceNetworkSelectProps = {
-  editInitValueNetworkName?: string | undefined;
-  isEditing?: boolean | undefined;
+  editInitValueNetworkName?: string;
+  isEditing?: boolean;
   namespace?: string;
   networkName: string;
   setInterfaceType: Dispatch<SetStateAction<string>>;

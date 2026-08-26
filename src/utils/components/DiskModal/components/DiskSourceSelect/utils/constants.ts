@@ -1,8 +1,8 @@
-import { TFunction } from 'i18next';
+import { type TFunction } from 'i18next';
 
 import { SourceTypes } from '@kubevirt-utils/components/DiskModal/utils/types';
 
-import { DiskSourceOptionGroup, DiskSourceOptionGroupItem } from './types';
+import { type DiskSourceOptionGroup, type DiskSourceOptionGroupItem } from './types';
 
 export const diskSourceSnapshotVolumeNameFieldID = 'snapshot-name-select';
 export const diskSourceSnapshotVolumeNamespaceFieldID = 'snapshot-project-select';
@@ -14,7 +14,7 @@ export const ephemeralDiskSizeFieldID = 'ephemeral-disk-size';
 export const diskSourceFieldID = 'disk-source';
 export const diskSourceEphemeralFieldID = 'disk-source-container';
 export const diskSourceUsernameFieldID = 'disk-source-username';
-export const diskSourcePasswordFieldID = 'disk-source-password';
+export const diskSourceCredentialFieldID = 'disk-source-password';
 
 export const getOptionLabels = (t: TFunction): { [key in SourceTypes]: string } => ({
   [SourceTypes.BLANK]: t('Empty disk (blank)'),

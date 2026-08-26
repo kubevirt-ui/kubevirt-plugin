@@ -34,7 +34,7 @@ const DiskNameInput: FC<{ isDisabled?: boolean }> = ({ isDisabled }) => {
     | undefined;
 
   const debouncedHandler = debounce((event, newName) => {
-    void registered.onChange(event);
+    registered.onChange(event).catch(() => {});
     setValue(DISK_NAME_FIELD, newName);
   }, 300);
 

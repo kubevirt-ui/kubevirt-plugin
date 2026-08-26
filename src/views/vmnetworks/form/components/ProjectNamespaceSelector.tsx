@@ -68,7 +68,7 @@ const ProjectNamespaceSelector: FC = () => {
               >
                 {labelSelectorPairs.map(([key, value], index) => (
                   <LabelRow
-                    key={`label-row-${index}`}
+                    key={`${key}=${value}`}
                     label={{ id: index, key, value }}
                     onChange={handleLabelChange(labelSelectorPairs, index, onChange)}
                     onDelete={handleLabelDelete(labelSelectorPairs, index, onChange)}

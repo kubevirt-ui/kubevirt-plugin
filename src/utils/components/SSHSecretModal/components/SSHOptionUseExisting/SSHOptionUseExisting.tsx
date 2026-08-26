@@ -1,7 +1,6 @@
-import React, { Dispatch, FC, SetStateAction, useCallback, useEffect, useState } from 'react';
+import React, { type ReactNode, useCallback, useEffect, useState } from 'react';
 
 import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { IoK8sApiCoreV1Secret } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
@@ -15,7 +14,6 @@ import useProjects from '@kubevirt-utils/hooks/useProjects';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   Alert,
-  AlertVariant,
   Bullseye,
   FormGroup,
   Grid,
@@ -24,24 +22,12 @@ import {
   ValidatedOptions,
 } from '@patternfly/react-core';
 
-import { SecretSelectionOption, SSHSecretDetails } from '../../utils/types';
+import { SecretSelectionOption, type SSHOptionUseExistingProps } from '../../utils/types';
 import SecretDropdown from '../SecretDropdown/SecretDropdown';
 
 import './SSHOptionUseExisting.scss';
 
-type SSHOptionUseExistingProps = {
-  cluster?: string;
-  localNSProject: string;
-  namespace?: string;
-  projectsWithSecrets: { [namespace: string]: IoK8sApiCoreV1Secret[] };
-  secrets: IoK8sApiCoreV1Secret[];
-  secretsLoaded: boolean;
-  setLocalNSProject: Dispatch<SetStateAction<string>>;
-  setSSHDetails: Dispatch<SetStateAction<SSHSecretDetails>>;
-  sshDetails: SSHSecretDetails;
-};
-
-const SSHOptionUseExisting: FC<SSHOptionUseExistingProps> = ({
+const SSHOptionUseExisting = ({
   cluster,
   localNSProject,
   namespace,
@@ -51,19 +37,19 @@ const SSHOptionUseExisting: FC<SSHOptionUseExistingProps> = ({
   setLocalNSProject,
   setSSHDetails,
   sshDetails,
-}) => {
+}: SSHOptionUseExistingProps): ReactNode => {
   const { t } = useKubevirtTranslation();
   const activeNamespace = useNamespaceParam();
   const [nameErrorMessage, setNameErrorMessage] = useState<string>(null);
   const [selectedProject, setSelectedProject] = useState<string>(
-    localNSProject || namespace || sshDetails?.sshSecretNamespace,
+    localNSProject ?? namespace ?? sshDetails?.sshSecretNamespace,
   );
   const [userProjects] = useProjects(cluster, true);
 
   useEffect(() => {
     if (!selectedProject) {
       setSelectedProject(
-        localNSProject || namespace || sshDetails?.sshSecretNamespace || userProjects?.[0],
+        localNSProject ?? namespace ?? sshDetails?.sshSecretNamespace ?? userProjects?.[0],
       );
     }
   }, [namespace, localNSProject, userProjects, selectedProject, sshDetails?.sshSecretNamespace]);
@@ -75,7 +61,7 @@ const SSHOptionUseExisting: FC<SSHOptionUseExistingProps> = ({
       const addNew = addNewSecret(namespace, newProject, activeNamespace);
       setSSHDetails((prev) => ({
         ...prev,
-        secretOption: addNew ? SecretSelectionOption.addNew : SecretSelectionOption.useExisting,
+        secretOption: addNew ? SecretSelectionOption.AddNew : SecretSelectionOption.UseExisting,
         sshPubKey: '',
         sshSecretName: '',
         sshSecretNamespace: namespace,
@@ -84,11 +70,11 @@ const SSHOptionUseExisting: FC<SSHOptionUseExistingProps> = ({
     [setLocalNSProject, namespace, activeNamespace, setSSHDetails],
   );
 
-  const onSelectSecret = (generatedSecretName: string) => {
+  const onSelectSecret = (generatedSecretName: string): void => {
     setNameErrorMessage(getSecretNameErrorMessage(generatedSecretName, namespace, secrets));
   };
 
-  const onChangeSecretName = (newSecretName: string) => {
+  const onChangeSecretName = (newSecretName: string): void => {
     setNameErrorMessage(getSecretNameErrorMessage(newSecretName, namespace, secrets));
     setSSHDetails((prev) => ({
       ...prev,
@@ -100,27 +86,29 @@ const SSHOptionUseExisting: FC<SSHOptionUseExistingProps> = ({
     ? selectedProject !== namespace
     : selectedProject !== sshDetails?.sshSecretNamespace;
 
-  if (isEmpty(userProjects)) return <Bullseye>{t('No SSH keys found')}</Bullseye>;
+  if (isEmpty(userProjects)) {
+    return <Bullseye>{t('No SSH keys found')}</Bullseye>;
+  }
 
   return (
     <>
       <Alert
+        isInline
         title={t(
           'Select a secret from a different project to copy the secret to your current project.',
         )}
-        isInline
-        variant={AlertVariant.info}
+        variant="info"
       />
       <Grid className="ssh-use-existing__body">
         <GridItem span={6}>
           <FormGroup fieldId="project" label={t('Project')}>
             <InlineFilterSelect
+              className="ssh-use-existing__form-group--project"
               options={userProjects.map((project) => ({
                 children: project,
                 groupVersionKind: modelToGroupVersionKind(ProjectModel),
                 value: project,
               }))}
-              className="ssh-use-existing__form-group--project"
               placeholder={t('Select project')}
               selected={selectedProject}
               setSelected={onSelectProject}
@@ -158,9 +146,9 @@ const SSHOptionUseExisting: FC<SSHOptionUseExistingProps> = ({
             value={sshDetails.sshSecretName}
           />
           <FormGroupHelperText
-            validated={!nameErrorMessage ? ValidatedOptions.default : ValidatedOptions.error}
+            validated={nameErrorMessage ? ValidatedOptions.error : ValidatedOptions.default}
           >
-            {nameErrorMessage && nameErrorMessage}
+            {nameErrorMessage}
           </FormGroupHelperText>
         </FormGroup>
       )}

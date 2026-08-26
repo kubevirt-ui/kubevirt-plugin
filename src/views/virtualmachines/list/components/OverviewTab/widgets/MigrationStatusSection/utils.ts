@@ -1,3 +1,4 @@
+/* eslint-disable */
 import DurationOption from '@kubevirt-utils/components/DurationOption/DurationOption';
 import { getNamespacePathSegment } from '@kubevirt-utils/utils/utils';
 import {

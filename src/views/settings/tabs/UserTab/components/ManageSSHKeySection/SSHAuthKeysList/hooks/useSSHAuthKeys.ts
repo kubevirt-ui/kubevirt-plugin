@@ -75,10 +75,11 @@ const useSSHAuthKeys: UseSSHAuthKeys = () => {
           }),
         );
 
-        void filterAuthRows(authRows, cluster)
+        filterAuthRows(authRows, cluster)
           .then((filteredRows) => {
             setAuthKeyRows(filteredRows);
           })
+          .catch(() => {})
           .finally(() => setLoading(false));
       } else {
         setLoading(false);

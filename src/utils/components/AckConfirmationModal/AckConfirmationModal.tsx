@@ -1,4 +1,4 @@
-import React, { FC, ReactNode, useEffect, useState } from 'react';
+import React, { type FC, type ReactNode, useEffect, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
@@ -22,7 +22,7 @@ export type AckConfirmationModalProps = {
   className?: string;
   isOpen: boolean;
   onClose: () => void;
-  severityVariant?: 'danger' | 'warning' | undefined;
+  severityVariant?: 'danger' | 'warning';
   title: string;
 };
 
@@ -48,8 +48,10 @@ const AckConfirmationModal: FC<AckConfirmationModalProps> = ({
     }
   }, [checkToConfirmMessage, isOpen]);
 
-  const submitHandler = async () => {
-    if (isSubmitting) return;
+  const submitHandler = async (): Promise<void> => {
+    if (isSubmitting) {
+      return;
+    }
     setIsSubmitting(true);
     try {
       await action();
@@ -77,7 +79,7 @@ const AckConfirmationModal: FC<AckConfirmationModalProps> = ({
                 id={`ack-confirm-${actionType ?? 'action'}`}
                 isChecked={isChecked}
                 label={checkToConfirmMessage}
-                onChange={(_, checked) => setIsChecked(checked)}
+                onChange={(_event, checked) => setIsChecked(checked)}
               />
             </StackItem>
           )}

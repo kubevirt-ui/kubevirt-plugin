@@ -1,8 +1,8 @@
-import React, { FC, useMemo } from 'react';
+import React, { type FC, useMemo } from 'react';
 import produce from 'immer';
 
 import { SecretModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { IoK8sApiCoreV1Secret } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type IoK8sApiCoreV1Secret } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import LinuxLabel from '@kubevirt-utils/components/Labels/LinuxLabel';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
@@ -11,7 +11,7 @@ import SecretNameLabel from '@kubevirt-utils/components/SSHSecretModal/component
 import SSHSecretModal from '@kubevirt-utils/components/SSHSecretModal/SSHSecretModal';
 import {
   SecretSelectionOption,
-  SSHSecretDetails,
+  type SSHSecretDetails,
 } from '@kubevirt-utils/components/SSHSecretModal/utils/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { createSSHSecret, getInitialSSHDetails } from '@kubevirt-utils/resources/secret/utils';
@@ -20,7 +20,7 @@ import {
   getTemplateModel,
   getTemplateVirtualMachineObject,
   isOpenShiftTemplate,
-  Template,
+  type Template,
 } from '@kubevirt-utils/resources/template';
 import { getVMSSHSecretName } from '@kubevirt-utils/resources/vm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -39,7 +39,6 @@ import {
 import { PencilAltIcon } from '@patternfly/react-icons';
 
 import useEditTemplateAccessReview from '../../../../hooks/useIsTemplateEditable';
-
 import { removeAccessCredential, updateAccessCredential } from './sshkey-utils';
 
 type SSHKeyProps = {
@@ -54,10 +53,12 @@ const SSHKey: FC<SSHKeyProps> = ({ template }) => {
 
   const vmAttachedSecretName = useMemo(() => getVMSSHSecretName(vm), [vm]);
 
-  const secretToCreate: IoK8sApiCoreV1Secret = useMemo(
-    () =>
+  const secretToCreate = useMemo(
+    (): IoK8sApiCoreV1Secret | undefined =>
       isOpenShiftTemplate(template)
-        ? template?.objects?.find((obj) => obj.kind === SecretModel.kind)
+        ? (template?.objects?.find((obj: { kind: string }) => obj.kind === SecretModel.kind) as
+            | IoK8sApiCoreV1Secret
+            | undefined)
         : undefined,
     [template],
   );
@@ -67,28 +68,28 @@ const SSHKey: FC<SSHKeyProps> = ({ template }) => {
     [vmAttachedSecretName, secretToCreate],
   );
 
-  const onSubmit = async (sshDetails: SSHSecretDetails) => {
+  const onSubmit = async (sshDetails: SSHSecretDetails): Promise<Template | void> => {
     const { secretOption, sshPubKey, sshSecretName } = sshDetails;
 
     if (isEqualObject(sshDetails, initialSSHDetails)) {
       return Promise.resolve();
     }
 
-    if (secretOption === SecretSelectionOption.addNew) {
+    if (secretOption === SecretSelectionOption.AddNew) {
       await createSSHSecret(sshPubKey, sshSecretName, getNamespace(template), getCluster(template));
     }
 
     const newTemplate = produce(template, (draftTemplate) => {
       if (
-        secretOption === SecretSelectionOption.none &&
-        initialSSHDetails.secretOption !== SecretSelectionOption.none
+        secretOption === SecretSelectionOption.None &&
+        initialSSHDetails.secretOption !== SecretSelectionOption.None
       ) {
         removeAccessCredential(draftTemplate, initialSSHDetails.sshSecretName);
       }
 
       if (
-        (secretOption === SecretSelectionOption.useExisting ||
-          secretOption === SecretSelectionOption.addNew) &&
+        (secretOption === SecretSelectionOption.UseExisting ||
+          secretOption === SecretSelectionOption.AddNew) &&
         initialSSHDetails.sshSecretName !== sshSecretName &&
         !isEmpty(sshSecretName)
       ) {
@@ -124,6 +125,10 @@ const SSHKey: FC<SSHKeyProps> = ({ template }) => {
           </FlexItem>
           <FlexItem>
             <Button
+              icon={<PencilAltIcon />}
+              iconPosition="end"
+              isDisabled={!isTemplateEditable}
+              isInline
               onClick={() =>
                 createModal((modalProps) => (
                   <SSHSecretModal
@@ -135,10 +140,6 @@ const SSHKey: FC<SSHKeyProps> = ({ template }) => {
                   />
                 ))
               }
-              icon={<PencilAltIcon />}
-              iconPosition="end"
-              isDisabled={!isTemplateEditable}
-              isInline
               type="button"
               variant={ButtonVariant.link}
             >

@@ -237,10 +237,15 @@ const sonarConfig = {
     'sonarjs/no-globals-shadowing': 'off',
     'sonarjs/no-redundant-jump': 'off',
     'sonarjs/no-unused-vars': 'off',
+    'sonarjs/super-linear-regex': 'off',
     'sonarjs/todo-tag': 'off',
     'sonarjs/unused-import': 'off',
   },
 };
+
+const allSonarjsRulesOff = Object.fromEntries(
+  Object.keys(sonarjs.configs.recommended.rules).map((rule) => [rule, 'off']),
+);
 
 const reactConfig = {
   ...eslintReact.configs['recommended-typescript'],
@@ -277,6 +282,7 @@ const testingLibraryConfig = {
 const testFilesOverrides = {
   files: ['**/*.test.{ts,tsx}', '**/*.spec.{ts,tsx}', '**/__tests__/**/*.{ts,tsx}'],
   rules: {
+    ...allSonarjsRulesOff,
     '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/naming-convention': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
@@ -285,8 +291,6 @@ const testFilesOverrides = {
     'i18next/no-literal-string': 'off',
     'id-length': 'off',
     'max-lines': 'off',
-    'sonarjs/assertions-in-tests': 'off',
-    'sonarjs/use-type-alias': 'off',
   },
 };
 
@@ -299,17 +303,10 @@ const prettierOverrides = {
 const githubScriptsOverrides = {
   files: ['.github/**/*.{ts,tsx,js,jsx}', 'ci-scripts/**/*.{ts,tsx,js,jsx}'],
   rules: {
+    ...allSonarjsRulesOff,
     'i18next/no-literal-string': 'off',
     'no-console': 'off',
     'perfectionist/sort-classes': 'off',
-    'sonarjs/cognitive-complexity': 'off',
-    'sonarjs/no-alphabetical-sort': 'off',
-    'sonarjs/no-hardcoded-passwords': 'off',
-    'sonarjs/no-misleading-array-reverse': 'off',
-    'sonarjs/no-os-command-from-path': 'off',
-    'sonarjs/pseudo-random': 'off',
-    'sonarjs/publicly-writable-directories': 'off',
-    'sonarjs/super-linear-regex': 'off',
   },
 };
 

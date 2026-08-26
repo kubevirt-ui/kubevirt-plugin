@@ -76,7 +76,7 @@ const SidebarEditor = <Resource extends K8sResourceCommon>({
     setSuccess(false);
     setError(null);
     setLoading(true);
-    void onResourceUpdate(newResource)
+    onResourceUpdate(newResource)
       .then(() => setSuccess(true))
       .catch(setError)
       .finally(() => setLoading(false));

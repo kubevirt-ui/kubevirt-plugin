@@ -1,7 +1,7 @@
-import React, { FC } from 'react';
-import { FieldPath, useFormContext } from 'react-hook-form';
+import React, { type FC } from 'react';
+import { type FieldPath, useFormContext } from 'react-hook-form';
 
-import { V1DiskFormState } from '@kubevirt-utils/components/DiskModal/utils/types';
+import { type V1DiskFormState } from '@kubevirt-utils/components/DiskModal/utils/types';
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import { FormPasswordInput } from '@kubevirt-utils/components/FormPasswordInput/FormPasswordInput';
 import { FormTextInput } from '@kubevirt-utils/components/FormTextInput/FormTextInput';
@@ -12,11 +12,10 @@ import { FormGroup, ValidatedOptions } from '@patternfly/react-core';
 
 import { REGISTRY_PASSWORD_FIELD, REGISTRY_USERNAME_FIELD } from '../../../utils/constants';
 import {
+  diskSourceCredentialFieldID,
   diskSourceEphemeralFieldID,
-  diskSourcePasswordFieldID,
   diskSourceUsernameFieldID,
 } from '../../utils/constants';
-
 import { OS_REGISTERY_LINKS } from './utils/constants';
 
 type DiskSourceUrlInputProps = {
@@ -42,7 +41,7 @@ const DiskSourceContainer: FC<DiskSourceUrlInputProps> = ({
   const exampleURL =
     isRHELOS && isUpstream
       ? OS_REGISTERY_LINKS.fedora
-      : OS_REGISTERY_LINKS[os] || OS_REGISTERY_LINKS.fedora;
+      : (OS_REGISTERY_LINKS[os] ?? OS_REGISTERY_LINKS.fedora);
 
   const { error } = getFieldState(fieldName);
 
@@ -74,33 +73,33 @@ const DiskSourceContainer: FC<DiskSourceUrlInputProps> = ({
           >
             <FormTextInput
               {...register(REGISTRY_USERNAME_FIELD)}
+              aria-label={t('Username')}
+              data-test={diskSourceUsernameFieldID}
+              id={diskSourceUsernameFieldID}
+              type="text"
               validated={
                 errors?.[REGISTRY_USERNAME_FIELD]
                   ? ValidatedOptions.error
                   : ValidatedOptions.default
               }
-              aria-label={t('Username')}
-              data-test={diskSourceUsernameFieldID}
-              id={diskSourceUsernameFieldID}
-              type="text"
             />
           </FormGroup>
           <FormGroup
             className="disk-source-form-group"
-            fieldId={diskSourcePasswordFieldID}
+            fieldId={diskSourceCredentialFieldID}
             label={t('Password')}
           >
             <FormPasswordInput
               {...register(REGISTRY_PASSWORD_FIELD)}
+              aria-label={t('Password')}
+              data-test={diskSourceCredentialFieldID}
+              id={diskSourceCredentialFieldID}
+              type="text"
               validated={
                 errors?.[REGISTRY_PASSWORD_FIELD]
                   ? ValidatedOptions.error
                   : ValidatedOptions.default
               }
-              aria-label={t('Password')}
-              data-test={diskSourcePasswordFieldID}
-              id={diskSourcePasswordFieldID}
-              type="text"
             />
           </FormGroup>
         </>

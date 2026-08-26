@@ -1,10 +1,10 @@
-import React, { Dispatch, FC, SetStateAction, useCallback } from 'react';
+import React, { type Dispatch, type FC, type SetStateAction, useCallback } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Radio, Split, SplitItem } from '@patternfly/react-core';
 
 import { initialSSHCredentials } from '../utils/constants';
-import { SecretSelectionOption, SSHSecretDetails } from '../utils/types';
+import { SecretSelectionOption, type SSHSecretDetails } from '../utils/types';
 
 type SecretSelectionRadioGroupProps = {
   selectedOption: SecretSelectionOption;
@@ -37,32 +37,32 @@ const SecretSelectionRadioGroup: FC<SecretSelectionRadioGroupProps> = ({
     <Split className="ssh-secret-section__radio-group" hasGutter>
       <SplitItem>
         <Radio
-          onClick={() => {
-            onSelectSecretOption(SecretSelectionOption.none);
-            setSSHDetails(initialSSHCredentials);
-          }}
-          id={SecretSelectionOption.none}
-          isChecked={selectedOption === SecretSelectionOption.none}
+          id={SecretSelectionOption.None}
+          isChecked={selectedOption === SecretSelectionOption.None}
           label={t('None')}
           name="ssh-secret-selection"
+          onClick={() => {
+            onSelectSecretOption(SecretSelectionOption.None);
+            setSSHDetails(initialSSHCredentials);
+          }}
         />
       </SplitItem>
       <SplitItem>
         <Radio
-          id={SecretSelectionOption.useExisting}
-          isChecked={selectedOption === SecretSelectionOption.useExisting}
+          id={SecretSelectionOption.UseExisting}
+          isChecked={selectedOption === SecretSelectionOption.UseExisting}
           label={t('Use existing')}
           name="ssh-secret-selection"
-          onClick={() => onSelectSecretOption(SecretSelectionOption.useExisting)}
+          onClick={() => onSelectSecretOption(SecretSelectionOption.UseExisting)}
         />
       </SplitItem>
       <SplitItem>
         <Radio
-          id={SecretSelectionOption.addNew}
-          isChecked={selectedOption === SecretSelectionOption.addNew}
+          id={SecretSelectionOption.AddNew}
+          isChecked={selectedOption === SecretSelectionOption.AddNew}
           label={t('Add new')}
           name="ssh-secret-selection"
-          onClick={() => onSelectSecretOption(SecretSelectionOption.addNew)}
+          onClick={() => onSelectSecretOption(SecretSelectionOption.AddNew)}
         />
       </SplitItem>
     </Split>

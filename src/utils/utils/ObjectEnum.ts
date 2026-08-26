@@ -1,24 +1,6 @@
 import cloneDeepWith from 'lodash/cloneDeepWith';
 
 export abstract class ObjectEnum<T> {
-  static getAll = () => Object.freeze([]);
-
-  protected static getAllClassEnumProperties = <A extends ObjectEnum<any>>(Clazz: any) => {
-    const usedValues = new Set();
-    return Object.keys(Clazz)
-      .filter((value) => Clazz[value] instanceof Clazz)
-      .map((key) => {
-        const result = Clazz[key];
-        if (usedValues.has(result.getValue())) {
-          throw new Error(`${result}: value must be unique`);
-        }
-        usedValues.add(result.getValue());
-        return result;
-      }) as A[];
-  };
-
-  getValue = () => this.value;
-
   protected readonly value: T;
 
   protected constructor(value: T) {
@@ -28,8 +10,31 @@ export abstract class ObjectEnum<T> {
     this.value = value;
   }
 
-  toString() {
-    if (this.value === null || this.value === undefined) {
+  static getAll(): readonly ObjectEnum<unknown>[] {
+    return Object.freeze([]);
+  }
+
+  protected static getAllClassEnumProperties<A extends ObjectEnum<unknown>>(): A[] {
+    const entries = this as unknown as Record<string, unknown>;
+    const usedValues = new Set<unknown>();
+    return Object.keys(entries)
+      .filter((key) => entries[key] instanceof ObjectEnum)
+      .map((key) => {
+        const result = entries[key] as A;
+        if (usedValues.has(result.getValue())) {
+          throw new Error(`${String(result)}: value must be unique`);
+        }
+        usedValues.add(result.getValue());
+        return result;
+      });
+  }
+
+  getValue(): T {
+    return this.value;
+  }
+
+  toString(): string {
+    if (this.value == null) {
       return '';
     }
 
@@ -37,7 +42,7 @@ export abstract class ObjectEnum<T> {
   }
 }
 
-export const cloneDeepWithEnum = (object) => {
+export const cloneDeepWithEnum = <T>(object: T): T => {
   return cloneDeepWith(object, (value) => {
     if (value instanceof ObjectEnum) {
       return value;

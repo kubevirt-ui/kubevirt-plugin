@@ -1,4 +1,4 @@
-import React, { FC, ReactNode } from 'react';
+import React, { type FC, type ReactNode } from 'react';
 
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -79,18 +79,18 @@ const TabModalFooter: FC<TabModalFooterProps> = ({
             type="submit"
             variant={submitBtnVariant ?? ButtonVariant.primary}
           >
-            {submitBtnText || t('Save')}
+            {submitBtnText ?? t('Save')}
           </Button>
           <Button
+            data-test="cancel-button"
             onClick={() => {
-              void Promise.resolve()
+              Promise.resolve()
                 .then(() => (onCancel ?? onClose)())
                 .catch(kubevirtConsole.error);
             }}
-            data-test="cancel-button"
             variant={cancelBtnVariant ?? ButtonVariant.link}
           >
-            {cancelBtnText || t('Cancel')}
+            {cancelBtnText ?? t('Cancel')}
           </Button>
           {actionItemLink && (
             <div className="kv-tabmodal-footer__action-item-link">{actionItemLink}</div>

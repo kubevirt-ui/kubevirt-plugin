@@ -5,10 +5,11 @@ export const getSearchLabelHREF = (
   labelKey: string,
   labelValue: string,
   cluster?: string,
-) => {
+): string => {
   if (cluster) {
     return getACMTextSearchURL(`cluster:${cluster} kind:${kind} label:${labelKey}=${labelValue}`);
   }
 
-  return `/search?kind=${kind}&q=${encodeURIComponent(`${labelKey}=${labelValue}`)}`;
+  const labelParam = `${labelKey}=${labelValue}`;
+  return `/search?kind=${kind}&q=${encodeURIComponent(labelParam)}`;
 };

@@ -1,4 +1,4 @@
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { customizeWizardVMSignal } from '@kubevirt-utils/signals/customizeWizardVMSignal';
 
 import { useUploadProgressStore } from '../uploadProgressStore';
@@ -77,7 +77,7 @@ describe('cancelPendingVmUploads', () => {
 });
 
 describe('cancelAllWizardPendingUploads', () => {
-  const cancelAllPendingUploads = jest.fn();
+  const cancelAllPendingUploads = jest.fn().mockResolvedValue(undefined);
 
   beforeEach(() => {
     jest.clearAllMocks();

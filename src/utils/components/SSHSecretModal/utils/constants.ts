@@ -1,9 +1,9 @@
-import { SecretSelectionOption, SSHSecretDetails } from './types';
+import { SecretSelectionOption, type SSHSecretDetails } from './types';
 
 export const initialSSHCredentials: SSHSecretDetails = {
   appliedDefaultKey: false,
   applyKeyToProject: false,
-  secretOption: SecretSelectionOption.none,
+  secretOption: SecretSelectionOption.None,
   sshPubKey: '',
   sshSecretName: '',
   sshSecretNamespace: '',

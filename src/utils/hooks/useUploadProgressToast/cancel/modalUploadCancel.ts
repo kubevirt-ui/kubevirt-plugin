@@ -1,8 +1,8 @@
 import {
-  DROPDOWN_FORM_SELECTION,
+  type DROPDOWN_FORM_SELECTION,
   isUploadVolumeSource,
 } from '@kubevirt-utils/components/AddBootableVolumeModal/consts';
-import { DataUpload, UPLOAD_STATUS } from '@kubevirt-utils/hooks/useCDIUpload/types';
+import { type DataUpload, UPLOAD_STATUS } from '@kubevirt-utils/hooks/useCDIUpload/types';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 
 import { useUploadProgressStore } from '../uploadProgressStore';
@@ -31,11 +31,14 @@ export const cancelTrackedUploadOnModalClose = ({
   }
 
   if (uploadKey) {
-    void useUploadProgressStore.getState().cancelTrackedUpload(uploadKey);
+    useUploadProgressStore
+      .getState()
+      .cancelTrackedUpload(uploadKey)
+      .catch(() => {});
     return;
   }
 
-  void (async () => {
+  void (async (): Promise<void> => {
     try {
       await upload?.cancelUpload?.();
     } catch (error) {

@@ -1,4 +1,4 @@
-import React, { FC, JSX, useCallback, useMemo } from 'react';
+import React, { type FC, type JSX, useCallback, useMemo } from 'react';
 
 import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import ShowSystemNamespacesSwitch from '@kubevirt-utils/components/ClusterProjectDropdown/Dropdown/ShowSystemNamespacesSwitch';
@@ -10,7 +10,7 @@ import useConsoleShowSystemNamespaces from '@kubevirt-utils/hooks/useConsoleShow
 import { isSystemNamespace } from '@kubevirt-utils/resources/namespace/helper';
 import { getName } from '@kubevirt-utils/resources/shared';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
-import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+import { type K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
 type ProjectDropdownProps = {
   bookmarkCluster?: string;
@@ -82,7 +82,7 @@ const ProjectDropdown: FC<ProjectDropdownProps> = ({
 
   const onShowSystemNamespacesChange = useCallback(
     (showSystem: boolean) => {
-      void setShowSystemNamespaces(showSystem).catch(() => {
+      setShowSystemNamespaces(showSystem).catch(() => {
         // rejection handled; hook already rolls back optimistic state
       });
     },

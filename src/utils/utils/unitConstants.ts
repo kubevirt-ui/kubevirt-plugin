@@ -12,6 +12,7 @@ export enum DecimalUnit {
   B = 'B',
   E = 'E',
   G = 'G',
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   k = 'k',
   M = 'M',
   P = 'P',
@@ -58,10 +59,10 @@ multipliers.P = multipliers.T * 1000;
 multipliers.E = multipliers.P * 1000;
 
 /** Matches alphabetic characters at the end of the string */
-export const UNIT_REGEX = /[a-zA-Z]+$/;
+export const UNIT_REGEX = /(?<![a-z])[a-z]+$/i;
 
 /** Matches numeric characters (including decimal) at the start of the string */
-export const NUMBER_REGEX = /^[0-9]*\.?[0-9]+/;
+export const NUMBER_REGEX = /^(?:\d+(?:\.\d+)?|\.\d+)/;
 
 /** Matches exponential notation patterns */
-export const EXPONENTIAL_REGEX = /^[0-9]*\.?[0-9]+[eE][-+]?[0-9]+$/;
+export const EXPONENTIAL_REGEX = /^(?:\d+(?:\.\d+)?|\.\d+)[eE][-+]?\d+$/;
