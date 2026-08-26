@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useLocalStorage from '@kubevirt-utils/hooks/useLocalStorage';
@@ -21,6 +21,7 @@ const ShowOnlyVMProjectsSwitch: FC<ShowOnlyVMProjectsSwitchProps> = ({ hasVMs })
       aria-label={showOnlyVMProjectsLabel}
       checked={isShowOnlyVMProjectsChecked(hasVMs, showEmptyProjects)}
       className="vms-tree-view__toolbar-switch"
+      data-test="show-only-vm-projects-switch"
       isDisabled={!hasVMs}
       isReversed
       onChange={(_, checked) => setShowEmptyProjects(checked ? HIDE : SHOW)}

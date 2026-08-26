@@ -7,6 +7,7 @@ export default class VmTreePage extends TreeContextMenuMixin(PageCommons) {
   private readonly _idVmsTreeViewSearchInput = this.locator('[id="vms-tree-view-search-input"]');
   private readonly _overviewTab = this.locator('button[role="tab"]', { hasText: /^Overview$/ });
   private readonly _projectName = this.locator('#project-name');
+  private readonly _showOnlyVMProjectsSwitch = this.testId('show-only-vm-projects-switch');
   private readonly _treeNode = this.locator('.pf-v6-c-tree-view__node');
   private readonly _treeView = this.locator('.pf-v6-c-tree-view');
   private readonly _vmListTab = this.locator('button[role="tab"]', {
@@ -320,6 +321,18 @@ export default class VmTreePage extends TreeContextMenuMixin(PageCommons) {
     return await folderElement.isVisible();
   }
 
+  async isShowOnlyVMProjectsSwitchChecked(): Promise<boolean> {
+    const input = this._showOnlyVMProjectsSwitch;
+    await input.waitFor({ state: 'attached', timeout: TestTimeouts.ELEMENT_WAIT });
+    return input.isChecked();
+  }
+
+  async isShowOnlyVMProjectsSwitchEnabled(): Promise<boolean> {
+    const input = this._showOnlyVMProjectsSwitch;
+    await input.waitFor({ state: 'attached', timeout: TestTimeouts.ELEMENT_WAIT });
+    return input.isEnabled();
+  }
+
   async isTreeNodeVisible(nodeName: string): Promise<boolean> {
     try {
       const node = this._treeNode.filter({ hasText: nodeName });
@@ -442,7 +455,7 @@ export default class VmTreePage extends TreeContextMenuMixin(PageCommons) {
   }
 
   async toggleEmptyProjectsDisplay(show: boolean): Promise<void> {
-    const checkbox = this.locator('.vms-tree-view__toolbar-switch input[type="checkbox"]');
+    const checkbox = this._showOnlyVMProjectsSwitch;
 
     try {
       await checkbox.waitFor({ state: 'attached', timeout: TestTimeouts.ELEMENT_WAIT });
