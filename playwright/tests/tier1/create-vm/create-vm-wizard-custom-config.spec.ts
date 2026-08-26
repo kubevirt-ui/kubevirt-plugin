@@ -109,6 +109,17 @@ test.describe(
         const searchVisible = await vmWizardComputePage.verifyCustomizationSearchInputVisible();
         expect.soft(searchVisible, 'Find settings search input should be visible').toBe(true);
 
+        await test.step('Empty annotation rows cannot be saved', async () => {
+          await vmWizardComputePage.selectCustomizationTab('Labels and annotations');
+          await vmWizardComputePage.openAnnotationsModal();
+          await vmWizardComputePage.clickAddMoreInAnnotationsModal();
+
+          const saveDisabled = await vmWizardComputePage.isAnnotationsModalSaveDisabled();
+          expect(saveDisabled, 'Save should be disabled for empty annotation fields').toBe(true);
+
+          await vmWizardComputePage.closeAnnotationsModal();
+        });
+
         await vmWizardNavigationPage.clickNext();
       });
 

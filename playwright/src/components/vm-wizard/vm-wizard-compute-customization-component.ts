@@ -23,6 +23,7 @@ export default class VmWizardComputeCustomizationComponent extends BaseComponent
   private readonly _startThisVirtualMachineAfterCreation = this.locator(
     'text=Start this VirtualMachine after creation',
   );
+  private readonly _annotationsDialog = this.locator('[data-test="dialog-modal"]');
 
   constructor(page: Page) {
     super(page);
@@ -648,6 +649,95 @@ export default class VmWizardComputeCustomizationComponent extends BaseComponent
     } catch {
       return false;
     }
+  }
+
+  async clickAddMoreInAnnotationsModal(): Promise<void> {
+    const addMoreButton = this._annotationsDialog.locator('button:has-text("Add more")');
+    await addMoreButton.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+    await this.robustClick(addMoreButton);
+  }
+
+  async closeAnnotationsModal(): Promise<void> {
+    const cancelButton = this._annotationsDialog.getByTestId('cancel-button');
+    await this.robustClick(cancelButton);
+    await this._annotationsDialog.waitFor({
+      state: 'hidden',
+      timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+    });
+  }
+
+  async closeLabelsModal(): Promise<void> {
+    await this.closeAnnotationsModal();
+  }
+
+  async isAnnotationDeleteDisabledInModal(key: string): Promise<boolean> {
+    const deleteButton = this._annotationsDialog.getByTestId(`delete-annotation-row-${key}`);
+    await deleteButton.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+    return deleteButton.isDisabled();
+  }
+
+  async isAnnotationPresentInTable(key: string): Promise<boolean> {
+    const table = this._roleTabpanel.locator('[data-test="annotations-card-table"]');
+    return table
+      .locator('td')
+      .filter({ hasText: key })
+      .first()
+      .isVisible({ timeout: TestTimeouts.SHORT_WAIT })
+      .catch(() => false);
+  }
+
+  async isAnnotationTableDeleteDisabled(key: string): Promise<boolean> {
+    const deleteButton = this._roleTabpanel.getByTestId(`delete-annotations-${key}`);
+    await deleteButton.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+    return deleteButton.isDisabled();
+  }
+
+  async isAnnotationsModalSaveDisabled(): Promise<boolean> {
+    const saveButton = this._annotationsDialog.getByTestId('save-button');
+    await saveButton.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+    return saveButton.isDisabled();
+  }
+
+  async isLabelDeleteDisabledInModal(key: string): Promise<boolean> {
+    const deleteButton = this._annotationsDialog.getByTestId(`delete-label-row-${key}`);
+    await deleteButton.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+    return deleteButton.isDisabled();
+  }
+
+  async isLabelPresentInTable(key: string): Promise<boolean> {
+    const table = this._roleTabpanel.locator('[data-test="labels-card-table"]');
+    return table
+      .locator('td')
+      .filter({ hasText: key })
+      .first()
+      .isVisible({ timeout: TestTimeouts.SHORT_WAIT })
+      .catch(() => false);
+  }
+
+  async isLabelTableDeleteDisabled(key: string): Promise<boolean> {
+    const deleteButton = this._roleTabpanel.getByTestId(`delete-labels-${key}`);
+    await deleteButton.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+    return deleteButton.isDisabled();
+  }
+
+  async openAnnotationsModal(): Promise<void> {
+    const addButton = this._roleTabpanel.getByTestId('annotations-card-add-btn');
+    await addButton.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+    await this.robustClick(addButton);
+    await this._annotationsDialog.waitFor({
+      state: 'visible',
+      timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+    });
+  }
+
+  async openLabelsModal(): Promise<void> {
+    const addButton = this._roleTabpanel.getByTestId('labels-card-add-btn');
+    await addButton.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+    await this.robustClick(addButton);
+    await this._annotationsDialog.waitFor({
+      state: 'visible',
+      timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+    });
   }
 
   async verifyMetadataTabContent(): Promise<{
