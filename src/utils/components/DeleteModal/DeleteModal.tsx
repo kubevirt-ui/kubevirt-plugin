@@ -1,4 +1,4 @@
-import React, { FC, memo, ReactNode } from 'react';
+import React, { type FC, memo, type ReactNode } from 'react';
 import { useNavigate } from 'react-router';
 
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
@@ -7,9 +7,9 @@ import useNamespaceParam from '@kubevirt-utils/hooks/useNamespaceParam';
 import { getResourceUrl } from '@kubevirt-utils/resources/shared';
 import {
   getGroupVersionKindForResource,
-  K8sResourceCommon,
+  type K8sResourceCommon,
+  useK8sModel,
 } from '@openshift-console/dynamic-plugin-sdk';
-import { useK8sModel } from '@openshift-console/dynamic-plugin-sdk/lib/utils/k8s/hooks/useK8sModel';
 import { ButtonVariant } from '@patternfly/react-core';
 
 import ConfirmActionMessage from '../ConfirmActionMessage/ConfirmActionMessage';
@@ -41,18 +41,18 @@ const DeleteModal: FC<DeleteModalProps> = memo(
 
     const [model] = useK8sModel(getGroupVersionKindForResource(obj));
     const namespace = useNamespaceParam();
-    const url = redirectUrl || getResourceUrl({ activeNamespace: namespace, model });
+    const url = redirectUrl ?? getResourceUrl({ activeNamespace: namespace, model });
 
     return (
       <TabModal<K8sResourceCommon>
-        onSubmit={async () => {
-          await onDeleteSubmit();
-          shouldRedirect && navigate(url);
-        }}
-        headerText={headerText || t('Delete resource?')}
+        headerText={headerText ?? t('Delete resource?')}
         isOpen={isOpen}
         obj={obj}
         onClose={onClose}
+        onSubmit={async () => {
+          await onDeleteSubmit();
+          shouldRedirect && void navigate(url);
+        }}
         submitBtnText={t('Delete')}
         submitBtnVariant={ButtonVariant.danger}
         titleIconVariant="warning"
