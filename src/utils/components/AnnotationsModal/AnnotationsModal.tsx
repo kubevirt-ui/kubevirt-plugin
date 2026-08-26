@@ -1,22 +1,22 @@
-import React, { type FC, useEffect, useState } from 'react';
+import React, { type FC, useEffect, useMemo, useState } from 'react';
 
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getAnnotations } from '@kubevirt-utils/resources/shared';
+import { isSystemKey } from '@kubevirt-utils/utils/labelValidation/labelValidation';
 import { type K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { Button, ButtonVariant, Grid } from '@patternfly/react-core';
 import { PlusCircleIcon } from '@patternfly/react-icons';
 
 import { AnnotationsModalRow } from './AnnotationsModalRow';
+import {
+  type AnnotationEntry,
+  getAnnotationRowValidation,
+  getIdAnnotations,
+  toAnnotations,
+} from './utils';
 
 import './AnnotationsModal.scss';
-
-const uniqWith = <T,>(arr: T[], compareFn: (a: T, b: T) => boolean): T[] =>
-  arr.filter((element, index) => arr.findIndex((step) => compareFn(element, step)) === index);
-
-const getIdAnnotations = (annotations: {
-  [key: string]: string;
-}): { [k: string]: { key: string; value: string } } =>
-  Object.fromEntries(Object.entries(annotations).map(([key, value], i) => [i, { key, value }]));
 
 export const AnnotationsModal: FC<{
   isOpen: boolean;
@@ -26,9 +26,9 @@ export const AnnotationsModal: FC<{
 }> = ({ isOpen, obj, onClose, onSubmit }) => {
   const { t } = useKubevirtTranslation();
 
-  const [annotations, setAnnotations] = useState<{
-    [id: number]: { [key: string]: string };
-  }>({});
+  const [annotations, setAnnotations] = useState<Record<number, AnnotationEntry>>({});
+  const { hasDuplicates, hasEmptyKeys } = getAnnotationRowValidation(annotations);
+  const initialKeys = useMemo(() => new Set(Object.keys(getAnnotations(obj, {}))), [obj]);
 
   const onAnnotationAdd = (): void => {
     const keys = new Set(Object.keys(annotations));
@@ -47,31 +47,25 @@ export const AnnotationsModal: FC<{
   };
 
   const onAnnotationsSubmit = (): Promise<K8sResourceCommon | void> => {
-    if (
-      uniqWith(Object.values(annotations), (a, b) => a.key === b.key).length !==
-      Object.values(annotations).length
-    ) {
+    if (hasDuplicates) {
       return Promise.reject({ message: t('Duplicate keys found') });
     }
 
-    const updatedAnnotations: Record<string, string> = Object.fromEntries(
-      Object.entries(annotations).map(([, { key, value }]): [string, string] => [key, value]),
-    );
-
-    return onSubmit(updatedAnnotations);
+    return onSubmit(toAnnotations(annotations));
   };
 
-  // reset annotations when modal is closed
   useEffect(() => {
-    if (obj?.metadata?.annotations) {
-      setAnnotations(getIdAnnotations(obj.metadata.annotations));
-    }
+    const baseAnnotations = getAnnotations(obj, {});
+    const idAnnotations = getIdAnnotations(baseAnnotations);
+
+    setAnnotations(idAnnotations);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);
 
   return (
     <TabModal<K8sResourceCommon>
       headerText={t('Edit annotations')}
+      isDisabled={hasEmptyKeys || hasDuplicates}
       isOpen={isOpen}
       obj={obj}
       onClose={onClose}
@@ -81,6 +75,7 @@ export const AnnotationsModal: FC<{
         {Object.entries(annotations || {}).map(([id, { key, value }]) => (
           <AnnotationsModalRow
             annotation={{ key, value }}
+            isProtected={isSystemKey(key) && initialKeys.has(key)}
             key={id}
             onChange={(annotation) =>
               setAnnotations({

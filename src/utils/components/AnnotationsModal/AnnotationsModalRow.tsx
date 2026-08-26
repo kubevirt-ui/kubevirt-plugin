@@ -1,4 +1,4 @@
-import React, { FC, memo } from 'react';
+import React, { type FC, memo } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Button, ButtonVariant, GridItem, TextInput } from '@patternfly/react-core';
@@ -6,17 +6,19 @@ import { MinusCircleIcon } from '@patternfly/react-icons';
 
 export const AnnotationsModalRow: FC<{
   annotation: { key: string; value: string };
+  isProtected?: boolean;
   onChange: ({ key, value }: { key: string; value: string }) => void;
   onDelete: () => void;
-}> = memo(({ annotation, onChange, onDelete }) => {
+}> = memo(({ annotation, isProtected, onChange, onDelete }) => {
   const { t } = useKubevirtTranslation();
   return (
     <>
       <GridItem span={5}>
         <TextInput
           aria-label={t('annotation key')}
-          autoFocus
+          autoFocus={!isProtected}
           className="annotation-form-input"
+          isDisabled={isProtected}
           isRequired
           maxLength={255}
           onChange={(_event, newKey) => onChange({ ...annotation, key: newKey })}
@@ -30,6 +32,7 @@ export const AnnotationsModalRow: FC<{
         <TextInput
           aria-label={t('annotation value')}
           className="annotation-form-input"
+          isDisabled={isProtected}
           isRequired
           maxLength={255}
           onChange={(_event, newValue) => onChange({ ...annotation, value: newValue })}
@@ -40,7 +43,10 @@ export const AnnotationsModalRow: FC<{
       </GridItem>
       <GridItem span={2}>
         <Button
+          aria-label={t('Remove annotation')}
+          data-test={`delete-annotation-row-${annotation.key}`}
           icon={<MinusCircleIcon />}
+          isDisabled={isProtected}
           onClick={() => onDelete()}
           variant={ButtonVariant.plain}
         />

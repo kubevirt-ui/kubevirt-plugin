@@ -1,9 +1,10 @@
-import React, { FC, useMemo } from 'react';
+import React, { type FC, useMemo } from 'react';
 
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import useAutoAppliedLabels from '@kubevirt-utils/hooks/useAutoAppliedLabels/useAutoAppliedLabels';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+import { isSystemKey } from '@kubevirt-utils/utils/labelValidation/labelValidation';
+import { type K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { Button, ButtonVariant, Grid, GridItem, Stack, StackItem } from '@patternfly/react-core';
 import { PlusCircleIcon } from '@patternfly/react-icons';
 
@@ -68,7 +69,10 @@ const NewLabelsModal: FC<NewLabelsModalProps> = ({
               <LabelRow
                 existingKeys={existingKeys}
                 initialKeys={initialKeys}
-                isKeyProtected={protectedKeys.has(entry.key)}
+                isKeyProtected={
+                  protectedKeys.has(entry.key) ||
+                  (initialKeys.has(entry.key) && isSystemKey(entry.key))
+                }
                 isValueProtected={protectedKeys.get(entry.key) === true}
                 key={entry.id}
                 label={entry}
