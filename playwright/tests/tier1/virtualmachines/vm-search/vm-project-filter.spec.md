@@ -4,7 +4,7 @@
 
 - **Project Name:** KubeVirt UI — Playwright E2E Tests
 - **Feature Area:** Tier1 — Virtual machines / Search
-- **Latest version:** CNV 5.00
+- **Latest version:** CNV 5.0.0
 - **Latest update:** 2026-08-21
 - **Document Status:** Approved
 
@@ -47,7 +47,7 @@ the list URL from a namespaced path to all-namespaces.
 
 - **Objective:** Verify that clicking a project in the tree sets `project=` in the URL, shows a
   Project chip, and lists only that project's VMs.
-- **Target version:** CNV 5.00
+- **Target version:** CNV 5.0.0
 - **Jira References:** CNV-93586
 - **Pre-conditions:** Halted VMs exist in two test namespaces
 - **Tags:** `@adminOnly`
@@ -65,7 +65,7 @@ the list URL from a namespaced path to all-namespaces.
 
 - **Objective:** Verify that the Project toolbar filter is not disabled when a project is selected
   in the tree view.
-- **Target version:** CNV 5.00
+- **Target version:** CNV 5.0.0
 - **Jira References:** CNV-93586
 - **Pre-conditions:** Halted VMs exist in two test namespaces
 - **Tags:** `@adminOnly`
@@ -81,7 +81,7 @@ the list URL from a namespaced path to all-namespaces.
 
 - **Objective:** Verify that clicking Local cluster after a project selection removes `project=` from
   the URL and shows VMs from both test projects.
-- **Target version:** CNV 5.00
+- **Target version:** CNV 5.0.0
 - **Jira References:** CNV-93586
 - **Pre-conditions:** Halted VMs exist in two test namespaces
 - **Tags:** `@adminOnly`
@@ -99,7 +99,7 @@ the list URL from a namespaced path to all-namespaces.
 
 - **Objective:** Verify that selecting another project in the toolbar while the path is
   `/ns/<project-A>` broadens the path to `/all-namespaces` and keeps both project filters.
-- **Target version:** CNV 5.00
+- **Target version:** CNV 5.0.0
 - **Jira References:** CNV-93586
 - **Pre-conditions:** Halted VMs exist in two test namespaces
 - **Tags:** `@adminOnly`

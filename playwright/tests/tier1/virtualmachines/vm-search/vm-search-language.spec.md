@@ -4,7 +4,7 @@
 
 - **Project Name:** KubeVirt UI — Playwright E2E Tests
 - **Feature Area:** Tier1 — Virtual machines / Search
-- **Latest version:** CNV 5.00
+- **Latest version:** CNV 5.0.0
 - **Latest update:** 2026-08-18
 - **Document Status:** Approved
 
@@ -51,7 +51,7 @@ that submitted queries actually show and hide VirtualMachines in the list.
 
 - **Objective:** Verify that submitting a VM name as plain text creates a name chip and lists only that
   VM.
-- **Target version:** CNV 5.00
+- **Target version:** CNV 5.0.0
 - **Jira References:** CNV-74174
 - **Pre-conditions:** Fixture VMs exist in the test namespace
 - **Tags:** `@adminOnly`
@@ -68,7 +68,7 @@ that submitted queries actually show and hide VirtualMachines in the list.
 ### `002`: key:value search filters by status
 
 - **Objective:** Verify that `status:Running` produces a Running chip and hides Stopped fixture VMs.
-- **Target version:** CNV 5.00
+- **Target version:** CNV 5.0.0
 - **Jira References:** CNV-74174
 - **Pre-conditions:** Fixture VMs exist and are Stopped
 - **Tags:** `@adminOnly`
@@ -85,7 +85,7 @@ that submitted queries actually show and hide VirtualMachines in the list.
 
 - **Objective:** Verify that `status:Running,Stopped` produces both chips and lists the Stopped fixture
   VMs.
-- **Target version:** CNV 5.00
+- **Target version:** CNV 5.0.0
 - **Jira References:** CNV-74174
 - **Pre-conditions:** Fixture VMs exist and are Stopped
 - **Tags:** `@adminOnly`
@@ -102,7 +102,7 @@ that submitted queries actually show and hide VirtualMachines in the list.
 
 - **Objective:** Verify that `status:Stopped os:Fedora` produces both chips and lists only Stopped
   Fedora VMs.
-- **Target version:** CNV 5.00
+- **Target version:** CNV 5.0.0
 - **Jira References:** CNV-74174
 - **Pre-conditions:** Fixture VMs exist and are Stopped
 - **Tags:** `@adminOnly`
@@ -118,7 +118,7 @@ that submitted queries actually show and hide VirtualMachines in the list.
 ### `005`: Numeric filter with > operator for vCPU
 
 - **Objective:** Verify that `vcpu>4` produces a CPU chip and lists only VMs with more than 4 vCPUs.
-- **Target version:** CNV 5.00
+- **Target version:** CNV 5.0.0
 - **Jira References:** CNV-74174
 - **Pre-conditions:** Fixture VMs exist
 - **Tags:** `@adminOnly`
@@ -134,7 +134,7 @@ that submitted queries actually show and hide VirtualMachines in the list.
 ### `006`: Numeric filter with >= operator for memory
 
 - **Objective:** Verify that `memory>=8GiB` produces a memory chip and lists only the 8Gi VM.
-- **Target version:** CNV 5.00
+- **Target version:** CNV 5.0.0
 - **Jira References:** CNV-74174
 - **Pre-conditions:** Fixture VMs exist
 - **Tags:** `@adminOnly`
@@ -151,7 +151,7 @@ that submitted queries actually show and hide VirtualMachines in the list.
 
 - **Objective:** Verify that `-status:Error` produces an Exclude Error chip and does not hide Stopped
   fixture VMs.
-- **Target version:** CNV 5.00
+- **Target version:** CNV 5.0.0
 - **Jira References:** CNV-74174
 - **Pre-conditions:** Fixture VMs exist and are Stopped (none are Error)
 - **Tags:** `@adminOnly`
@@ -168,7 +168,7 @@ that submitted queries actually show and hide VirtualMachines in the list.
 
 - **Objective:** Verify that `-has:gpu` produces an Exclude gpu chip and hides the VM that has a GPU
   device.
-- **Target version:** CNV 5.00
+- **Target version:** CNV 5.0.0
 - **Jira References:** CNV-74174
 - **Pre-conditions:** Fixture VMs exist; the RHEL VM has a dummy GPU
 - **Tags:** `@adminOnly`
@@ -184,7 +184,7 @@ that submitted queries actually show and hide VirtualMachines in the list.
 ### `009`: Exclusion prefix -name: hides the named VM
 
 - **Objective:** Verify that `-name:<vm>` produces an Exclude name chip and hides only that VM.
-- **Target version:** CNV 5.00
+- **Target version:** CNV 5.0.0
 - **Jira References:** CNV-74174
 - **Pre-conditions:** Fixture VMs exist
 - **Tags:** `@adminOnly`
@@ -201,7 +201,7 @@ that submitted queries actually show and hide VirtualMachines in the list.
 
 - **Objective:** Verify that `description:database` produces a description chip and lists only the VM
   whose description contains that text.
-- **Target version:** CNV 5.00
+- **Target version:** CNV 5.0.0
 - **Jira References:** CNV-74174
 - **Pre-conditions:** Fixture VMs exist
 - **Tags:** `@adminOnly`
@@ -217,7 +217,7 @@ that submitted queries actually show and hide VirtualMachines in the list.
 ### `011`: Clear button empties the search input
 
 - **Objective:** Verify that the clear search control removes typed query text from the input.
-- **Target version:** CNV 5.00
+- **Target version:** CNV 5.0.0
 - **Jira References:** CNV-74174
 - **Pre-conditions:** None
 - **Tags:** `@adminOnly`
@@ -232,7 +232,7 @@ that submitted queries actually show and hide VirtualMachines in the list.
 ### `012`: Search dropdown shows key suggestions on focus
 
 - **Objective:** Verify that focusing the search input opens the dropdown with expected search keys.
-- **Target version:** CNV 5.00
+- **Target version:** CNV 5.0.0
 - **Jira References:** CNV-74174
 - **Pre-conditions:** None
 - **Tags:** `@adminOnly`
@@ -248,7 +248,7 @@ that submitted queries actually show and hide VirtualMachines in the list.
 ### `013`: Search dropdown shows value suggestions after typing key:
 
 - **Objective:** Verify that typing `status:` shows value autocomplete including Running and Stopped.
-- **Target version:** CNV 5.00
+- **Target version:** CNV 5.0.0
 - **Jira References:** CNV-74174
 - **Pre-conditions:** None
 - **Tags:** `@adminOnly`
@@ -265,7 +265,7 @@ that submitted queries actually show and hide VirtualMachines in the list.
 
 - **Objective:** Verify that `status:Stopped vcpu>4 -has:gpu` produces all three chips and lists only
   the Stopped high-CPU VM that does not have a GPU.
-- **Target version:** CNV 5.00
+- **Target version:** CNV 5.0.0
 - **Jira References:** CNV-74174
 - **Pre-conditions:** Fixture VMs exist and are Stopped
 - **Tags:** `@adminOnly`
@@ -281,7 +281,7 @@ that submitted queries actually show and hide VirtualMachines in the list.
 ### `015`: Search examples are shown in the dropdown
 
 - **Objective:** Verify that the search dropdown surfaces example query patterns.
-- **Target version:** CNV 5.00
+- **Target version:** CNV 5.0.0
 - **Jira References:** CNV-74174
 - **Pre-conditions:** None
 - **Tags:** `@adminOnly`
