@@ -141,8 +141,11 @@
     "htmlparser2": "8.0.2",
     "sanitize-html": "2.17.4",
     "shell-quote": "^1.8.4",
-    "ajv-keywords@5.1.0": {
-      "ajv": "^8.17.1"
+    "ajv": "^8.17.1",
+    "ajv-keywords": "^5.1.0",
+    "fork-ts-checker-webpack-plugin": {
+      "ajv": "6.15.0",
+      "ajv-keywords": "3.5.2"
     },
     "@openshift-console/plugin-shared": {
       "sanitize-html": "2.17.4"
