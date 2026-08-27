@@ -204,7 +204,7 @@ const _test = base.extend<TestFixtures, WorkerFixtures>({
         isMobile: false,
         deviceScaleFactor: 1,
         javaScriptEnabled: true,
-        acceptDownloads: false,
+        acceptDownloads: true,
       };
 
       if (recordVideoOnRetry || forceVideo) {
@@ -414,7 +414,7 @@ const _test = base.extend<TestFixtures, WorkerFixtures>({
         isMobile: false,
         deviceScaleFactor: 1,
         javaScriptEnabled: true,
-        acceptDownloads: false,
+        acceptDownloads: true,
       });
 
       await use(context);

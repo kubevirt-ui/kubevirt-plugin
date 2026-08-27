@@ -1,3 +1,4 @@
+import TableExportComponent from '@/components/shared/table-export-component';
 import VmListActionsComponent from '@/components/vm/vm-list-actions-component';
 import VmListComponent from '@/components/vm/vm-list-component';
 import VmListOverviewWidgetsComponent from '@/components/vm/vm-list-overview-widgets-component';
@@ -29,6 +30,7 @@ export default class VirtualMachinesPage extends TreeContextMenuMixin(PageCommon
   readonly listMigration: VmListMigrationComponent;
   readonly overviewWidgets: VmListOverviewWidgetsComponent;
   readonly search: VmListSearchComponent;
+  readonly tableExport: TableExportComponent;
   readonly templateCreate: VmListTemplateCreateComponent;
 
   readonly tree: VmListTreeComponent;
@@ -45,6 +47,7 @@ export default class VirtualMachinesPage extends TreeContextMenuMixin(PageCommon
     this.tree = new VmListTreeComponent(page);
     this.emptyState = new VmListEmptyStateComponent(page);
     this.search = new VmListSearchComponent(page);
+    this.tableExport = new TableExportComponent(page);
     this.listActions = new VmListActionsComponent(page);
     this.listFilters = new VmListFiltersComponent(page);
     this.listMigration = new VmListMigrationComponent(page, (vm) =>
@@ -331,6 +334,10 @@ export default class VirtualMachinesPage extends TreeContextMenuMixin(PageCommon
 
   async clickVmListTab(): Promise<void> {
     return this.overviewWidgets.clickVmListTab();
+  }
+
+  async downloadCsvExport(): Promise<{ content: string; filename: string }> {
+    return this.tableExport.downloadCsvExport();
   }
 
   async clickVmName(vmName: string, namespace: string): Promise<void> {
