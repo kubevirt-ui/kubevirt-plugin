@@ -737,6 +737,7 @@ export class VmStorageAddDiskComponent extends BaseComponent {
 
     const successAlert = this.page
       .locator('.pf-v6-c-alert.pf-m-success, .pf-c-alert.pf-m-success')
+      .filter({ hasNot: this.page.locator('[data-test^="upload-progress-"]') })
       .first();
     const closeButton = successAlert.locator(
       'button[aria-label="Close success alert"], button.pf-v6-c-button.pf-m-plain, button.pf-c-button.pf-m-plain',
