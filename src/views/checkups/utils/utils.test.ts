@@ -1,6 +1,14 @@
-import { IoK8sApiBatchV1Job } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type TFunction } from 'i18next';
 
-import { CheckupsStatus, getJobStatus, isJobFailedCondition, isJobRunning } from './utils';
+import { type IoK8sApiBatchV1Job } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+
+import {
+  CheckupsStatus,
+  getCSVExportStatusLabel,
+  getJobStatus,
+  isJobFailedCondition,
+  isJobRunning,
+} from './utils';
 
 const buildJob = (status: IoK8sApiBatchV1Job['status']): IoK8sApiBatchV1Job => ({
   apiVersion: 'batch/v1',
@@ -83,6 +91,14 @@ describe('getJobStatus', () => {
     const job = buildJob({ active: 1, uncountedTerminatedPods: { failed: ['pod-uid-1'] } });
 
     expect(getJobStatus(job)).toBe(CheckupsStatus.Running);
+  });
+});
+
+describe('getCSVExportStatusLabel', () => {
+  const t = ((key: string) => key) as TFunction;
+
+  it('should return Succeeded for Done', () => {
+    expect(getCSVExportStatusLabel(CheckupsStatus.Done, t)).toBe('Succeeded');
   });
 });
 

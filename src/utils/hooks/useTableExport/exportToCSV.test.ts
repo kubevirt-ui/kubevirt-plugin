@@ -1,7 +1,13 @@
-import { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
+import { saveAs } from 'file-saver';
+
+import { type ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { ACTIONS } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/const';
 
-import { buildCSVContent, getExportableColumns } from './exportToCSV';
+import { buildCSVContent, exportToCSV, getExportableColumns } from './exportToCSV';
+
+jest.mock('file-saver', () => ({
+  saveAs: jest.fn(),
+}));
 
 type Row = { name: string; status: string };
 
@@ -45,6 +51,59 @@ describe('getExportableColumns', () => {
     const result = getExportableColumns(columns, ['name']);
     expect(result.map((col) => col.key)).toEqual(['name']);
   });
+
+  it('excludes additional columns when activeColumnKeys is omitted', () => {
+    const result = getExportableColumns([
+      ...columns,
+      {
+        additional: true,
+        getValue: () => 'hidden',
+        key: 'created',
+        label: 'Created',
+        renderCell: () => null,
+      },
+    ]);
+    expect(result.map((col) => col.key)).toEqual(['name', 'status']);
+  });
+
+  it('includes additional columns when they are listed in activeColumnKeys', () => {
+    const result = getExportableColumns(
+      [
+        ...columns,
+        {
+          additional: true,
+          getValue: () => 'shown',
+          key: 'created',
+          label: 'Created',
+          renderCell: () => null,
+        },
+      ],
+      ['name', 'created'],
+    );
+    expect(result.map((col) => col.key)).toEqual(['name', 'created']);
+  });
+
+  it('excludes ACTIONS and selection even when listed in activeColumnKeys', () => {
+    const result = getExportableColumns(
+      [
+        {
+          getValue: () => 'menu',
+          key: ACTIONS,
+          label: 'Actions',
+          renderCell: () => null,
+        },
+        {
+          getValue: () => 'checked',
+          key: 'selection',
+          label: 'Select',
+          renderCell: () => null,
+        },
+        columns[0],
+      ],
+      [ACTIONS, 'selection', 'name'],
+    );
+    expect(result.map((col) => col.key)).toEqual(['name']);
+  });
 });
 
 describe('buildCSVContent', () => {
@@ -68,5 +127,41 @@ describe('buildCSVContent', () => {
 
     const csv = buildCSVContent(data, columns);
     expect(csv).toBe('Name,Status\n"say ""hello""","line1\nline2"');
+  });
+
+  it('passes callbacks to getValue', () => {
+    type Callbacks = { suffix: string };
+    const cols: ColumnConfig<Row, Callbacks>[] = [
+      {
+        getValue: (row, callbacks) => `${row.name}${callbacks?.suffix ?? ''}`,
+        key: 'name',
+        label: 'Name',
+        renderCell: () => null,
+      },
+    ];
+
+    const csv = buildCSVContent([{ name: 'vm-1', status: 'Running' }], cols, undefined, {
+      suffix: '-ns',
+    });
+    expect(csv).toBe('Name\nvm-1-ns');
+  });
+});
+
+describe('exportToCSV', () => {
+  beforeEach(() => {
+    jest.mocked(saveAs).mockClear();
+  });
+
+  it('calls saveAs with a Blob and a single .csv suffix', () => {
+    exportToCSV([{ name: 'vm-1', status: 'Running' }], columns, 'my-export.csv');
+
+    expect(saveAs).toHaveBeenCalledTimes(1);
+    expect(saveAs).toHaveBeenCalledWith(expect.any(Blob), 'my-export.csv');
+  });
+
+  it('does not call saveAs when there is no CSV content', () => {
+    exportToCSV([], [{ key: 'x', label: '', renderCell: () => null }], 'empty.csv');
+
+    expect(saveAs).not.toHaveBeenCalled();
   });
 });

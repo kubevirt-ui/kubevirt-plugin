@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo } from 'react';
 
-import { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
+import { type ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { exportToCSV } from '@kubevirt-utils/hooks/useTableExport';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -53,6 +53,7 @@ const ExportTableButton = <TData, TCallbacks = undefined>({
       <Button
         aria-label={t('Export table data to CSV')}
         className={asToolbarItem ? undefined : 'kubevirt-table-toolbar-action'}
+        data-test="export-table-csv"
         icon={<ExportIcon />}
         isAriaDisabled={disabled}
         onClick={handleExport}
