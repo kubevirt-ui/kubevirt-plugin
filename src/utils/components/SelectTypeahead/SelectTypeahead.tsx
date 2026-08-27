@@ -110,7 +110,7 @@ const SelectTypeahead: FC<SelectTypeaheadProps> = ({
     >
       <SelectList id={listboxId}>
         {selectOptions?.map(({ label, optionProps, value }, index) => {
-          const { children, ...otherOptionProps } = optionProps ?? {};
+          const { children, key: _key, ...otherOptionProps } = optionProps ?? {};
           return (
             <SelectOption
               key={value}
