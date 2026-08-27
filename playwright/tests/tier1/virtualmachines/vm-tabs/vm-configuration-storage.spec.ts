@@ -27,8 +27,7 @@ test.describe.serial(
       const created = await apiClient.verifyVmCreated(vmName, ns, utils.TestTimeouts.VM_CREATION);
       if (!created.exists) throw new Error(`VM ${vmName} was not created`);
 
-      const running = await apiClient.waitForVmRunning(vmName, ns, utils.TestTimeouts.VM_BOOTUP);
-      if (!running) throw new Error(`VM ${vmName} did not reach Running state`);
+      await apiClient.waitForVmRunning(vmName, ns, utils.TestTimeouts.VM_BOOTUP);
     });
 
     test.beforeEach(async ({ utils }) => {

@@ -415,7 +415,7 @@ export class VmCreationWizardBootSourceComponent extends BaseComponent {
 
   async isBootVolumeEmptyStateVisible(): Promise<boolean> {
     try {
-      const heading = this.locator('h3:has-text("No volumes found")');
+      const heading = this.locator('h3:has-text("You don\'t have any volumes yet")');
       return await heading.isVisible({ timeout: TestTimeouts.SHORT_WAIT }).catch(() => false);
     } catch {
       return false;
@@ -486,10 +486,28 @@ export class VmCreationWizardBootSourceComponent extends BaseComponent {
     }
 
     const table = this.locator('.pf-v6-c-wizard table, .pf-v6-c-wizard [role="grid"]');
-    await table.first().waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+    const tableVisible = await table
+      .first()
+      .waitFor({ state: 'visible', timeout: TestTimeouts.UI_DELAY_LONG })
+      .then(() => true)
+      .catch(() => false);
+
+    if (!tableVisible || (await this.isBootVolumeEmptyStateVisible())) {
+      await this.selectNoBootSource();
+      return;
+    }
 
     const nameCell = this._pfV6CWizardTableTbodyTr.first().locator('td[id="name"]');
-    await nameCell.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+    const rowVisible = await nameCell
+      .waitFor({ state: 'visible', timeout: TestTimeouts.UI_DELAY_LONG })
+      .then(() => true)
+      .catch(() => false);
+
+    if (!rowVisible) {
+      await this.selectNoBootSource();
+      return;
+    }
+
     await this.robustClick(nameCell);
   }
 

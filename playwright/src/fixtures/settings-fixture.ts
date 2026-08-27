@@ -7,7 +7,6 @@
  * All settings specs must use this fixture and be tagged @cnv-settings.
  */
 
-import { withSafeActions } from '@/page-objects/base-page';
 import QuotasPage from '@/page-objects/cluster/quotas-page';
 import PageCommons from '@/page-objects/page-commons';
 import SettingsPage from '@/page-objects/settings/settings-page';
@@ -22,13 +21,13 @@ interface SettingsFixtures {
 
 const test = baseTest.extend<SettingsFixtures>({
   settingsPage: async ({ page }, use) => {
-    await use(withSafeActions(new SettingsPage(page)));
+    await use(new SettingsPage(page));
   },
   pageCommons: async ({ page }, use) => {
-    await use(withSafeActions(new PageCommons(page)));
+    await use(new PageCommons(page));
   },
   quotasPage: async ({ page }, use) => {
-    await use(withSafeActions(new QuotasPage(page)));
+    await use(new QuotasPage(page));
   },
 });
 

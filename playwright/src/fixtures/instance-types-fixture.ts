@@ -7,7 +7,6 @@
  *   import { test, expect } from '@/fixtures/instance-types-fixture';
  */
 
-import { withSafeActions } from '@/page-objects/base-page';
 import InstanceTypesPage from '@/page-objects/create-vm/instance-types-page';
 import PageCommons from '@/page-objects/page-commons';
 
@@ -20,10 +19,10 @@ interface InstanceTypesFixtures {
 
 const test = baseTest.extend<InstanceTypesFixtures>({
   instanceTypesPage: async ({ page }, use) => {
-    await use(withSafeActions(new InstanceTypesPage(page)));
+    await use(new InstanceTypesPage(page));
   },
   pageCommons: async ({ page }, use) => {
-    await use(withSafeActions(new PageCommons(page)));
+    await use(new PageCommons(page));
   },
 });
 

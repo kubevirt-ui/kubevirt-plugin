@@ -219,30 +219,14 @@ export default class BootableVolumesListPage extends PageCommons {
     await this.clickNavBootableVolumes();
   }
 
-  async navigateToGeneralBootableVolumes() {
-    await this.goTo('/k8s/all-namespaces/bootablevolumes');
-  }
-
   async navigateToNamespaceBootableVolumesViaUI(namespace: string): Promise<void> {
     await this.switchToVirtualizationPerspective();
     await this.clickNavBootableVolumes();
     await this.page.waitForLoadState('domcontentloaded');
     if (!this.page.url().includes(`/ns/${namespace}/`)) {
-      const path = `/k8s/ns/${namespace}/bootablevolumes`;
-      await this.page.evaluate((p) => {
-        window.history.pushState({}, '', p);
-        window.dispatchEvent(new PopStateEvent('popstate'));
-      }, path);
-      await this.page.waitForFunction((p: string) => window.location.pathname === p, path, {
-        timeout: TestTimeouts.NAVIGATION,
-      });
-      await this.page.waitForLoadState('domcontentloaded');
+      await this.switchToNamespace(namespace);
     }
     await this.verifyPageLoaded([], true, TestTimeouts.UI_ELEMENT_VISIBILITY);
-  }
-
-  async navigateToProjectBootableVolumes(projectName: string) {
-    await this.goTo(`/k8s/ns/${projectName}/bootablevolumes`);
   }
 
   async openClusterFilter(): Promise<void> {

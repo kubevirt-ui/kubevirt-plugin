@@ -698,6 +698,14 @@ export default class PageCommons extends BasePage {
     }
   }
 
+  async dismissStartupOverlays(): Promise<void> {
+    await this._navComponent.dismissStartupOverlays();
+  }
+
+  async ensureInitialPerspective(): Promise<void> {
+    await this._navComponent.ensureInitialPerspective();
+  }
+
   async switchToPerspective(perspectiveName: string): Promise<void> {
     await this._navComponent.switchToPerspective(perspectiveName);
   }

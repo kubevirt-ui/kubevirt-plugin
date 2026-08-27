@@ -1,6 +1,7 @@
 import { setApiClient } from '@/clients/rcc-singleton';
 import RequestContextClient from '@/clients/request-context-client';
 import ScenarioContextManager from '@/context-managers/scenario-context-manager';
+import PageCommons from '@/page-objects/page-commons';
 import { detectAuthExpired, healBrowserAuth } from '@/utils/auth-healer';
 import { waitForClusterResources, waitForNamespaceReady } from '@/utils/cluster-resource-checker';
 import { EnvVariables } from '@/utils/env-variables';
@@ -149,105 +150,10 @@ const _test = base.extend<TestFixtures, WorkerFixtures>({
             }
           }
 
-          // Dismiss Core platform "Welcome to OpenShift" guided tour modal.
-          const tourSkipBtn = page.getByTestId('tour-step-footer-secondary');
-          const hasTour = await tourSkipBtn
-            .isVisible({ timeout: TestTimeouts.RETRY_DELAY })
-            .catch(() => false);
-          if (hasTour) {
-            await tourSkipBtn.click({ force: true }).catch(() => undefined);
-            await page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
-          }
-
-          // Dismiss onboarding popover ("We've maximized your workspace") if present.
-          const onboardingDismiss = page.locator('[data-test="onboarding-dismiss-btn"]');
-          if (
-            await onboardingDismiss
-              .isVisible({ timeout: TestTimeouts.RETRY_DELAY })
-              .catch(() => false)
-          ) {
-            await onboardingDismiss.click({ force: true }).catch(() => undefined);
-            await page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
-          }
-
-          // Dismiss Virtualization welcome modal.
-          const welcomeCheckbox = page.locator('#welcome-modal-checkbox');
-          const hasWelcome = await welcomeCheckbox
-            .isVisible({ timeout: TestTimeouts.RETRY_DELAY })
-            .catch(() => false);
-          if (hasWelcome) {
-            await welcomeCheckbox.check({ force: true }).catch(() => undefined);
-            const closeBtn = page.locator('.pf-v6-c-modal-box__close button');
-            await closeBtn.click({ force: true }).catch(() => undefined);
-            await page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
-          }
-
-          // Wait for any modal backdrop to clear before interacting with the page.
-          await page
-            .locator('.pf-v6-c-backdrop')
-            .waitFor({ state: 'hidden', timeout: TestTimeouts.UI_DELAY_LONG })
-            .catch(() => undefined);
-
+          const consolePage = new PageCommons(page);
+          await consolePage.dismissStartupOverlays();
           await page.waitForTimeout(consoleStabilizationMs);
-
-          const perspectiveToggle = page
-            .getByTestId('perspective-switcher-toggle')
-            .or(page.locator('[data-test-id="perspective-switcher-toggle"]'));
-          const virtNavSection = page.locator('[data-quickstart-id="qs-nav-sec-virtualization"]');
-
-          const navType = await Promise.race([
-            perspectiveToggle
-              .waitFor({ state: 'visible', timeout: TestTimeouts.DEFAULT })
-              .then(() => 'perspective' as const),
-            virtNavSection
-              .waitFor({ state: 'visible', timeout: TestTimeouts.DEFAULT })
-              .then(() => 'section' as const),
-          ]).catch(() => 'none' as const);
-
-          if (navType === 'perspective') {
-            const perspectiveUrlPattern = /virtualization/;
-            const inTargetPerspective = perspectiveUrlPattern.test(page.url());
-
-            if (!inTargetPerspective) {
-              const perspectiveOption = page
-                .getByTestId('perspective-switcher-menu-option')
-                .or(page.locator('[data-test-id="perspective-switcher-menu-option"]'))
-                .filter({
-                  has: page.locator('.pf-v6-c-menu__item-text', {
-                    hasText: /^Virtualization$/,
-                  }),
-                });
-
-              const selectionAttempts = 3;
-              for (let selAttempt = 1; selAttempt <= selectionAttempts; selAttempt++) {
-                try {
-                  const toggle = page
-                    .getByTestId('perspective-switcher-toggle')
-                    .or(page.locator('[data-test-id="perspective-switcher-toggle"]'));
-                  await toggle.waitFor({ state: 'visible', timeout: TestTimeouts.DEFAULT });
-                  await toggle.click();
-                  await perspectiveOption.waitFor({
-                    state: 'visible',
-                    timeout: TestTimeouts.UI_DELAY_LONG,
-                  });
-                  await perspectiveOption.scrollIntoViewIfNeeded();
-                  await page.waitForTimeout(TestTimeouts.UI_DELAY_MICRO);
-                  await perspectiveOption.click();
-
-                  await page.waitForURL(perspectiveUrlPattern, {
-                    timeout: TestTimeouts.UI_DELAY_LONG,
-                  });
-                  await page.waitForLoadState('load');
-                  break;
-                } catch {
-                  if (selAttempt === selectionAttempts)
-                    throw new Error('Perspective selection did not navigate to target URL');
-                  await page.keyboard.press('Escape').catch(() => undefined);
-                  await page.waitForTimeout(TestTimeouts.POLLING_INTERVAL);
-                }
-              }
-            }
-          }
+          await consolePage.ensureInitialPerspective();
 
           break;
         } catch (error) {

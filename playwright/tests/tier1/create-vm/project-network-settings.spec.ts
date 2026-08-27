@@ -1,11 +1,11 @@
 import type RequestContextClient from '@/clients/request-context-client';
 import {
   ADMIN_ONLY_TAG,
-  GATING,
-  GATING_TAG,
   NETWORKING_TAG_LABEL,
+  T1,
+  T1_TAG,
 } from '@/data-models/allure-constants';
-import { expect, test } from '@/fixtures/gating-fixture';
+import { expect, test } from '@/fixtures/create-vm-fixture';
 import type VmWizardBootSourcePage from '@/page-objects/vm-wizard/vm-wizard-boot-source-page';
 import type VmWizardComputeCustomizationPage from '@/page-objects/vm-wizard/vm-wizard-compute-customization-page';
 import type VmWizardNavigationPage from '@/page-objects/vm-wizard/vm-wizard-navigation-page';
@@ -134,12 +134,12 @@ async function assertAddNicModalHidesPodAndSelectsNad(
   await vmWizardComputePage.cancelNetworkInterfaceModal();
 }
 
-test.describe(SUITE, { tag: [GATING_TAG, '@catalog-wizard', ADMIN_ONLY_TAG] }, () => {
+test.describe(SUITE, { tag: [T1_TAG, '@catalog-wizard', ADMIN_ONLY_TAG] }, () => {
   test.beforeEach(async ({ utils }) => {
     await utils.withAllure({
       suite: SUITE,
-      feature: GATING,
-      tags: [GATING_TAG, NETWORKING_TAG_LABEL, ADMIN_ONLY_TAG],
+      feature: T1,
+      tags: [T1_TAG, NETWORKING_TAG_LABEL, ADMIN_ONLY_TAG],
     });
   });
 
