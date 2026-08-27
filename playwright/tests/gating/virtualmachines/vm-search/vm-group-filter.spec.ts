@@ -45,7 +45,10 @@ test.describe(SUITE, { tag: [GATING_TAG, VM_SEARCH_TAG] }, () => {
         },
       };
       await apiClient.createVirtualMachine(testNamespace, payload);
-      await apiClient.waitForVmExists(vmName, testNamespace);
+      const exists = await apiClient.waitForVmExists(vmName, testNamespace);
+      if (!exists) {
+        throw new Error(`VM ${vmName} was not created in ${testNamespace}`);
+      }
     };
 
     await createVmWithFolder(vmAlpha1, GROUP_ALPHA);
@@ -61,6 +64,7 @@ test.describe(SUITE, { tag: [GATING_TAG, VM_SEARCH_TAG] }, () => {
   test.beforeEach(async ({ vmListPage }) => {
     await vmListPage.navigateToNamespaceVirtualMachinesViaUI(testNamespace);
     await vmListPage.clickVmListTab();
+    await vmListPage.waitForVmRowVisible(vmAlpha1);
   });
 
   test.describe('Search language', () => {
@@ -175,6 +179,13 @@ test.describe(SUITE, { tag: [GATING_TAG, VM_SEARCH_TAG] }, () => {
 
       await test.step('Clear search', async () => {
         await vmListPage.clickClearSearchButton();
+        await expect
+          .poll(
+            async () =>
+              (await vmListPage.getFilterChipTexts()).some((chip) => chip.includes(GROUP_ALPHA)),
+            { timeout: TestTimeouts.UI_ELEMENT_VISIBILITY },
+          )
+          .toBe(false);
       });
 
       await test.step('All VMs are visible again', async () => {
@@ -291,6 +302,7 @@ test.describe(SUITE, { tag: [GATING_TAG, VM_SEARCH_TAG] }, () => {
       });
 
       await test.step('Only group-alpha VMs are listed', async () => {
+        await vmListPage.clickVmListTab();
         const alpha1Visible = await vmListPage.isVmVisibleByDataTest(vmAlpha1);
         const alpha2Visible = await vmListPage.isVmVisibleByDataTest(vmAlpha2);
         const beta1Hidden = await vmListPage.isVmNameHidden(vmBeta1, TestTimeouts.SHORT_WAIT);

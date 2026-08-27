@@ -24,7 +24,7 @@ test.describe.serial('Template creation flows', { tag: [T1_TAG, '@tier1-template
   test('Save existing VM as a template from the VM detail page', async ({
     apiClient,
     pageCommons,
-    vmTreePage,
+    vmListPage,
     vmDetailPage,
     templatesPage,
     utils,
@@ -54,7 +54,7 @@ test.describe.serial('Template creation flows', { tag: [T1_TAG, '@tier1-template
     const vmExists = await apiClient.waitForVmExists(vmName, sharedNs);
     expect.soft(vmExists, `VM ${vmName} should exist before saving as template`).toBe(true);
 
-    await vmTreePage.navigateToVmViaTreeView(sharedNs, vmName);
+    await vmListPage.navigateToVmViaTreeView(sharedNs, vmName);
     const isVmVisible = await vmDetailPage.isVmNameVisible(vmName);
     expect.soft(isVmVisible, `VM ${vmName} should be visible on detail page`).toBe(true);
 

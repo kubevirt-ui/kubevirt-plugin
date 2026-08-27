@@ -6,7 +6,7 @@ const SUITE = 'VM Disk Operations';
 test.describe('Tier1 VM Disk Operations — stopped RHEL9', { tag: [T1_TAG, '@nonpriv'] }, () => {
   test('Pod networking visible, add blank disk with storage class, detach disk', async ({
     apiClient,
-    vmTreePage,
+    vmListPage,
     vmDetailPage,
     utils,
   }) => {
@@ -31,7 +31,7 @@ test.describe('Tier1 VM Disk Operations — stopped RHEL9', { tag: [T1_TAG, '@no
     const result = await apiClient.verifyVmCreated(vmName, ns, utils.TestTimeouts.VM_BOOTUP);
     if (!result.exists) throw new Error(`VM ${vmName} was not created`);
 
-    await vmTreePage.navigateToVmViaTreeView(ns, vmName);
+    await vmListPage.navigateToVmViaTreeView(ns, vmName);
 
     await vmDetailPage.navigateToConfigurationNetwork();
     const podNetVisible = await vmDetailPage.verifyPodNetworking();

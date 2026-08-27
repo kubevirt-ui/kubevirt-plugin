@@ -226,13 +226,6 @@ export default class VmListActionsComponent extends BaseComponent {
     return vmName;
   }
 
-  async clickFolderSelector(folderName: string, namespace: string): Promise<void> {
-    const folderElement = this.locator(
-      `[id="folderSelector/#single-cluster#/${namespace}/${folderName}"] button svg`,
-    );
-    await folderElement.click();
-  }
-
   async clickKebabButton(): Promise<void> {
     await this._kebabButton.waitFor({
       state: 'visible',
@@ -608,13 +601,6 @@ export default class VmListActionsComponent extends BaseComponent {
     const checkbox = shareableCheck.locator('input[type="checkbox"]');
     await checkbox.waitFor({ state: 'attached', timeout: TestTimeouts.ELEMENT_WAIT });
     return await checkbox.isChecked();
-  }
-
-  async isFolderSelectorVisible(folderName: string, namespace: string): Promise<boolean> {
-    const folderElement = this.locator(
-      `[id="folderSelector/#single-cluster#/${namespace}/${folderName}"]`,
-    );
-    return await folderElement.isVisible();
   }
 
   async isKebabMenuActionEnabled(

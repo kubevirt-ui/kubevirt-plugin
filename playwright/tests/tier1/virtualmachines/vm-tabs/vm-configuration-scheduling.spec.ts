@@ -26,29 +26,29 @@ test.describe.serial(
       if (!verifyResult.exists) throw new Error(`VM ${vmName} was not created`);
     });
 
-    test.beforeEach(async ({ vmTreePage, utils, testConfig }) => {
+    test.beforeEach(async ({ vmListPage, utils, testConfig }) => {
       test.setTimeout(utils.TestTimeouts.TEST_VM_CREATION);
       await utils.withAllure({
         suite: 'VM Configuration Scheduling',
         feature: T1,
         tags: [T1_TAG, VM_TABS_TAG],
       });
-      await vmTreePage.navigateToNamespaceVirtualMachinesViaUI(testConfig.testNamespace);
+      await vmListPage.navigateToNamespaceVirtualMachinesViaUI(testConfig.testNamespace);
     });
 
     test('Configuration Scheduling: requirements and eviction strategy after patch', async ({
       apiClient,
-      vmTreePage,
+      vmListPage,
       vmDetailPage,
       testConfig,
     }) => {
-      await vmTreePage.searchTreeView(testConfig.testNamespace);
-      await vmTreePage.clickTreeNodeAndEnsureExpanded(
+      await vmListPage.searchTreeView(testConfig.testNamespace);
+      await vmListPage.clickTreeNodeAndEnsureExpanded(
         testConfig.testNamespace,
         vmName,
         testConfig.testNamespace,
       );
-      await vmTreePage.clickVmInTreeView(vmName, testConfig.testNamespace);
+      await vmListPage.clickVmInTreeView(vmName, testConfig.testNamespace);
 
       await vmDetailPage.navigateToConfigurationScheduling();
       const schedulingVisible = await vmDetailPage.verifySchedulingAndResourceRequirements();
@@ -77,17 +77,17 @@ test.describe.serial(
     });
 
     test('Edit run strategy via Configuration > Scheduling', async ({
-      vmTreePage,
+      vmListPage,
       vmDetailPage,
       testConfig,
     }) => {
-      await vmTreePage.searchTreeView(testConfig.testNamespace);
-      await vmTreePage.clickTreeNodeAndEnsureExpanded(
+      await vmListPage.searchTreeView(testConfig.testNamespace);
+      await vmListPage.clickTreeNodeAndEnsureExpanded(
         testConfig.testNamespace,
         vmName,
         testConfig.testNamespace,
       );
-      await vmTreePage.clickVmInTreeView(vmName, testConfig.testNamespace);
+      await vmListPage.clickVmInTreeView(vmName, testConfig.testNamespace);
 
       await test.step('Verify run strategy is visible in Configuration > Scheduling', async () => {
         await vmDetailPage.navigateToConfigurationScheduling();

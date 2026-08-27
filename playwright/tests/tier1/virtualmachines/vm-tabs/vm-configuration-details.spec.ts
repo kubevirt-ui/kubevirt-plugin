@@ -31,9 +31,9 @@ test.describe.serial('VM Configuration — stopped RHEL9 VM', { tag: [T1_TAG, '@
     await utils.withAllure({ suite: SUITE, feature: T1, tags: [T1_TAG, VM_TABS_TAG] });
   });
 
-  test('Stopped VM configuration CRUD', async ({ apiClient, vmTreePage, vmDetailPage, utils }) => {
+  test('Stopped VM configuration CRUD', async ({ apiClient, vmListPage, vmDetailPage, utils }) => {
     await test.step('Verify configuration search finds SSH', async () => {
-      await vmTreePage.navigateToVmViaTreeView(ns, stoppedVm);
+      await vmListPage.navigateToVmViaTreeView(ns, stoppedVm);
       await vmDetailPage.navigateToConfigurationDetails();
 
       const searchResult = await vmDetailPage.searchConfiguration('SSH', 'SSH');
@@ -41,7 +41,7 @@ test.describe.serial('VM Configuration — stopped RHEL9 VM', { tag: [T1_TAG, '@
     });
 
     await test.step('Verify scheduling, eviction, headless, and boot mode sub-tabs', async () => {
-      await vmTreePage.navigateToVmViaTreeView(ns, stoppedVm);
+      await vmListPage.navigateToVmViaTreeView(ns, stoppedVm);
       await vmDetailPage.navigateToConfigurationScheduling();
 
       await expect
@@ -86,7 +86,7 @@ test.describe.serial('VM Configuration — stopped RHEL9 VM', { tag: [T1_TAG, '@
     });
 
     await test.step('Edit description, boot mode, hostname, workload, and headless', async () => {
-      await vmTreePage.navigateToVmViaTreeView(ns, stoppedVm);
+      await vmListPage.navigateToVmViaTreeView(ns, stoppedVm);
       await vmDetailPage.navigateToConfigurationDetails();
 
       await vmDetailPage.editDetails(stoppedVm, {
@@ -143,7 +143,7 @@ test.describe.serial('VM Configuration — stopped RHEL9 VM', { tag: [T1_TAG, '@
     });
 
     await test.step('Verify hostname change via UI', async () => {
-      await vmTreePage.navigateToVmViaTreeView(ns, stoppedVm);
+      await vmListPage.navigateToVmViaTreeView(ns, stoppedVm);
       await vmDetailPage.navigateToConfigurationDetails();
 
       const hostnameVerified = await vmDetailPage.verifyHostname(
@@ -182,9 +182,9 @@ test.describe.serial('VM Configuration — running RHEL9 VM', { tag: [T1_TAG, '@
     await utils.withAllure({ suite: SUITE, feature: T1, tags: [T1_TAG, VM_TABS_TAG] });
   });
 
-  test('Running VM configuration CRUD', async ({ vmTreePage, vmDetailPage }) => {
+  test('Running VM configuration CRUD', async ({ vmListPage, vmDetailPage }) => {
     await test.step('Verify workload and machine type in configuration details', async () => {
-      await vmTreePage.navigateToVmViaTreeView(ns, runningVm);
+      await vmListPage.navigateToVmViaTreeView(ns, runningVm);
       await vmDetailPage.navigateToConfigurationDetails();
 
       const configDetailsValid = await vmDetailPage.verifyConfigurationDetails('Server');
@@ -202,7 +202,7 @@ test.describe.serial('VM Configuration — running RHEL9 VM', { tag: [T1_TAG, '@
     });
 
     await test.step('Edit description, boot mode, workload, and headless', async () => {
-      await vmTreePage.navigateToVmViaTreeView(ns, runningVm);
+      await vmListPage.navigateToVmViaTreeView(ns, runningVm);
       await vmDetailPage.navigateToConfigurationDetails();
 
       await vmDetailPage.editDetails(runningVm, { description: 'edit vm details' });
@@ -235,10 +235,10 @@ test.describe.serial('VM Configuration — running RHEL9 VM', { tag: [T1_TAG, '@
   });
 
   test('Add CD-ROM "Upload new ISO" has no separate Upload Mode selector', async ({
-    vmTreePage,
+    vmListPage,
     vmDetailPage,
   }) => {
-    await vmTreePage.navigateToVmViaTreeView(ns, runningVm);
+    await vmListPage.navigateToVmViaTreeView(ns, runningVm);
     await vmDetailPage.navigateToConfigurationStorage();
 
     await test.step('Verify Add CD-ROM modal has unified radio buttons', async () => {

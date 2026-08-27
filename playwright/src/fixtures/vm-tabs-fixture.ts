@@ -16,12 +16,10 @@ import PageCommons from '@/page-objects/page-commons';
 import VirtualMachineDetailPage from '@/page-objects/vm/virtual-machine-detail-page';
 import VirtualMachineSnapshotDetailPage from '@/page-objects/vm/virtual-machine-snapshot-detail-page';
 import VirtualMachinesPage from '@/page-objects/vm/virtual-machines-page';
-import VmTreePage from '@/page-objects/vm/vm-tree-page';
 
 import { baseTest, expect } from './scenario-test-fixture';
 
 interface VmTabsFixtures {
-  vmTreePage: VmTreePage;
   vmDetailPage: VirtualMachineDetailPage;
   vmListPage: VirtualMachinesPage;
   pageCommons: PageCommons;
@@ -34,9 +32,6 @@ interface VmTabsFixtures {
 }
 
 const test = baseTest.extend<VmTabsFixtures>({
-  vmTreePage: async ({ page }, use) => {
-    await use(new VmTreePage(page));
-  },
   vmDetailPage: async ({ page }, use) => {
     await use(new VirtualMachineDetailPage(page));
   },

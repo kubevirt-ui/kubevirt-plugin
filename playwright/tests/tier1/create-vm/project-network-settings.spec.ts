@@ -9,7 +9,7 @@ import { expect, test } from '@/fixtures/create-vm-fixture';
 import type VmWizardBootSourcePage from '@/page-objects/vm-wizard/vm-wizard-boot-source-page';
 import type VmWizardComputeCustomizationPage from '@/page-objects/vm-wizard/vm-wizard-compute-customization-page';
 import type VmWizardNavigationPage from '@/page-objects/vm-wizard/vm-wizard-navigation-page';
-import type VmTreePage from '@/page-objects/vm/vm-tree-page';
+import type VirtualMachinesPage from '@/page-objects/vm/virtual-machines-page';
 import { TestTimeouts } from '@/utils/test-config';
 import {
   createBridgeNetworkAttachmentDefinition,
@@ -47,14 +47,14 @@ async function setupProjectNetworkNamespace(
 }
 
 async function navigateWizardToCustomizationNetwork(args: {
-  vmTreePage: VmTreePage;
+  vmListPage: VirtualMachinesPage;
   vmWizardNavigationPage: VmWizardNavigationPage;
   vmWizardBootSourcePage: VmWizardBootSourcePage;
   vmWizardComputePage: VmWizardComputeCustomizationPage;
   namespace: string;
 }): Promise<void> {
   const {
-    vmTreePage,
+    vmListPage,
     vmWizardNavigationPage,
     vmWizardBootSourcePage,
     vmWizardComputePage,
@@ -62,8 +62,8 @@ async function navigateWizardToCustomizationNetwork(args: {
   } = args;
 
   // Namespace/NAD/annotations must already exist before this UI entry point.
-  await vmTreePage.switchToVirtualizationPerspective();
-  await vmTreePage.navigateToProjectVmListViaUI(namespace);
+  await vmListPage.switchToVirtualizationPerspective();
+  await vmListPage.navigateToProjectVmListViaUI(namespace);
   await vmWizardNavigationPage.openWizardFromCreateDropdown();
 
   await vmWizardNavigationPage.generateVmName();
@@ -145,7 +145,7 @@ test.describe(SUITE, { tag: [T1_TAG, '@catalog-wizard', ADMIN_ONLY_TAG] }, () =>
 
   test('uses Pod networking when project has no network annotations', async ({
     apiClient,
-    vmTreePage,
+    vmListPage,
     vmWizardNavigationPage,
     vmWizardBootSourcePage,
     vmWizardComputePage,
@@ -156,7 +156,7 @@ test.describe(SUITE, { tag: [T1_TAG, '@catalog-wizard', ADMIN_ONLY_TAG] }, () =>
     const namespace = await setupProjectNetworkNamespace(apiClient, 'proj-net-baseline');
 
     await navigateWizardToCustomizationNetwork({
-      vmTreePage,
+      vmListPage,
       vmWizardNavigationPage,
       vmWizardBootSourcePage,
       vmWizardComputePage,
@@ -176,7 +176,7 @@ test.describe(SUITE, { tag: [T1_TAG, '@catalog-wizard', ADMIN_ONLY_TAG] }, () =>
 
   test('uses project default-network for default NIC while Pod networking stays allowed', async ({
     apiClient,
-    vmTreePage,
+    vmListPage,
     vmWizardNavigationPage,
     vmWizardBootSourcePage,
     vmWizardComputePage,
@@ -191,7 +191,7 @@ test.describe(SUITE, { tag: [T1_TAG, '@catalog-wizard', ADMIN_ONLY_TAG] }, () =>
     });
 
     await navigateWizardToCustomizationNetwork({
-      vmTreePage,
+      vmListPage,
       vmWizardNavigationPage,
       vmWizardBootSourcePage,
       vmWizardComputePage,
@@ -218,7 +218,7 @@ test.describe(SUITE, { tag: [T1_TAG, '@catalog-wizard', ADMIN_ONLY_TAG] }, () =>
 
   test('hides Pod networking and selects available NAD when pod network is disallowed', async ({
     apiClient,
-    vmTreePage,
+    vmListPage,
     vmWizardNavigationPage,
     vmWizardBootSourcePage,
     vmWizardComputePage,
@@ -233,7 +233,7 @@ test.describe(SUITE, { tag: [T1_TAG, '@catalog-wizard', ADMIN_ONLY_TAG] }, () =>
     });
 
     await navigateWizardToCustomizationNetwork({
-      vmTreePage,
+      vmListPage,
       vmWizardNavigationPage,
       vmWizardBootSourcePage,
       vmWizardComputePage,
@@ -258,7 +258,7 @@ test.describe(SUITE, { tag: [T1_TAG, '@catalog-wizard', ADMIN_ONLY_TAG] }, () =>
 
   test('honors default-network and hides Pod networking when disallowed', async ({
     apiClient,
-    vmTreePage,
+    vmListPage,
     vmWizardNavigationPage,
     vmWizardBootSourcePage,
     vmWizardComputePage,
@@ -276,7 +276,7 @@ test.describe(SUITE, { tag: [T1_TAG, '@catalog-wizard', ADMIN_ONLY_TAG] }, () =>
     });
 
     await navigateWizardToCustomizationNetwork({
-      vmTreePage,
+      vmListPage,
       vmWizardNavigationPage,
       vmWizardBootSourcePage,
       vmWizardComputePage,

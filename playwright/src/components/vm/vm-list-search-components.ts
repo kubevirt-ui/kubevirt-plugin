@@ -328,9 +328,7 @@ export class VmListSearchComponent extends BaseComponent {
   }
 
   async clickClearSearchButton(): Promise<void> {
-    const clearBtn = this.locator(
-      'button[aria-label="Clear search"], button[aria-label="Reset"], button:has-text("Clear search")',
-    ).first();
+    const clearBtn = this.testId('vm-search-input').locator('button[aria-label="Clear search"]');
     const clearVisible = await clearBtn
       .waitFor({ state: 'visible', timeout: TestTimeouts.SHORT_WAIT })
       .then(() => true)
@@ -338,11 +336,8 @@ export class VmListSearchComponent extends BaseComponent {
     if (clearVisible) {
       await this.robustClick(clearBtn);
     } else {
-      const searchInput = this.testId('vm-adv-search-toolbar')
-        .locator('input')
-        .or(this.testId('vm-search-input').locator('input'))
-        .first();
-      await searchInput.clear();
+      await this._vmSearchInputByDataTest.clear();
+      await this._vmSearchInputByDataTest.press('Enter');
     }
     await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
   }

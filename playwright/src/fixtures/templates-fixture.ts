@@ -14,7 +14,6 @@ import OverviewPage from '@/page-objects/overview/overview-page';
 import PageCommons from '@/page-objects/page-commons';
 import VirtualMachineDetailPage from '@/page-objects/vm/virtual-machine-detail-page';
 import VirtualMachinesPage from '@/page-objects/vm/virtual-machines-page';
-import VmTreePage from '@/page-objects/vm/vm-tree-page';
 import VmWizardComputeCustomizationPage from '@/page-objects/vm-wizard/vm-wizard-compute-customization-page';
 import VmWizardNavigationPage from '@/page-objects/vm-wizard/vm-wizard-navigation-page';
 
@@ -25,7 +24,6 @@ interface TemplatesFixtures {
   overviewPage: OverviewPage;
   templatesPage: TemplatesPage;
   templateDetailPage: TemplateDetailPage;
-  vmTreePage: VmTreePage;
   vmDetailPage: VirtualMachineDetailPage;
   vmListPage: VirtualMachinesPage;
   pageCommons: PageCommons;
@@ -45,9 +43,6 @@ const test = baseTest.extend<TemplatesFixtures>({
   },
   templateDetailPage: async ({ page }, use) => {
     await use(new TemplateDetailPage(page));
-  },
-  vmTreePage: async ({ page }, use) => {
-    await use(new VmTreePage(page));
   },
   vmDetailPage: async ({ page }, use) => {
     await use(new VirtualMachineDetailPage(page));

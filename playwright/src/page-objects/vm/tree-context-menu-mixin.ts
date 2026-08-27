@@ -5,8 +5,7 @@ import { TestTimeouts } from '@/utils/test-config';
 type Constructor<T = BasePage> = new (...args: any[]) => T;
 
 /**
- * Mixin that adds tree-view right-click and context menu methods.
- * Applied to both VmTreePage and VirtualMachinesPage to eliminate duplication.
+ * Mixin that adds tree-view right-click and context menu methods to VirtualMachinesPage.
  */
 export function TreeContextMenuMixin<TBase extends Constructor>(Base: TBase) {
   return class extends Base {

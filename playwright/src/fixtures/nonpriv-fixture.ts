@@ -18,7 +18,6 @@ import OverviewPage from '@/page-objects/overview/overview-page';
 import VirtualMachineDetailPage from '@/page-objects/vm/virtual-machine-detail-page';
 import VirtualMachinesPage from '@/page-objects/vm/virtual-machines-page';
 import VmListPage from '@/page-objects/vm/vm-list-page';
-import VmTreePage from '@/page-objects/vm/vm-tree-page';
 import VmWizardBootSourcePage from '@/page-objects/vm-wizard/vm-wizard-boot-source-page';
 import VmWizardComputeCustomizationPage from '@/page-objects/vm-wizard/vm-wizard-compute-customization-page';
 import VmWizardNavigationPage from '@/page-objects/vm-wizard/vm-wizard-navigation-page';
@@ -26,7 +25,6 @@ import VmWizardNavigationPage from '@/page-objects/vm-wizard/vm-wizard-navigatio
 import { baseTest, expect } from './scenario-test-fixture';
 
 interface NonPrivFixtures {
-  vmTreePage: VmTreePage;
   vmListPage: VirtualMachinesPage;
   vmListTabPage: VmListPage;
   vmDetailPage: VirtualMachineDetailPage;
@@ -41,9 +39,6 @@ interface NonPrivFixtures {
 }
 
 const test = baseTest.extend<NonPrivFixtures>({
-  vmTreePage: async ({ page }, use) => {
-    await use(new VmTreePage(page));
-  },
   vmListPage: async ({ page }, use) => {
     await use(new VirtualMachinesPage(page));
   },

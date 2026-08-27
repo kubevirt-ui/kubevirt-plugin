@@ -5,7 +5,7 @@
 - **Project Name:** KubeVirt UI — Playwright E2E Tests
 - **Feature Area:** Gating — Virtual machines / Search
 - **Latest version:** CNV 5.0.0
-- **Latest update:** 2026-08-21
+- **Latest update:** 2026-08-27
 - **Document Status:** Approved
 
 ## 2. Introduction
@@ -86,12 +86,13 @@ the list URL from a namespaced path to all-namespaces.
 - **Pre-conditions:** Halted VMs exist in two test namespaces
 - **Tags:** `@adminOnly`
 
-| Step | Action                                                | Expected Result                 |
-| :--- | :---------------------------------------------------- | :------------------------------ |
-| 1    | Click Local cluster, then click project A in the tree | Project filter is applied       |
-| 2    | Click Local cluster                                   | Local cluster is selected       |
-| 3    | Observe the URL                                       | URL does not contain `project=` |
-| 4    | Observe the VM list                                   | VM A and VM B are visible       |
+| Step | Action                                                | Expected Result                                                                                    |
+| :--- | :---------------------------------------------------- | :------------------------------------------------------------------------------------------------- |
+| 1    | Click Local cluster, then click project A in the tree | Project filter is applied                                                                          |
+| 2    | Click Local cluster                                   | Local cluster is selected                                                                          |
+| 3    | Observe the URL                                       | URL does not contain `project=`                                                                    |
+| 4    | Observe the search input                              | Search box has no Project filter (no `project:` query and no project A chip)                       |
+| 5    | Search each fixture name (one at a time)              | VM A then VM B are listed (avoids all-namespaces pagination; name filter uses the first chip only) |
 
 ---
 

@@ -24,7 +24,6 @@ import SettingsPage from '@/page-objects/settings/settings-page';
 import VirtualMachineDetailPage from '@/page-objects/vm/virtual-machine-detail-page';
 import VirtualMachinesPage from '@/page-objects/vm/virtual-machines-page';
 import VmOverviewTabPage from '@/page-objects/vm/vm-overview-tab-page';
-import VmTreePage from '@/page-objects/vm/vm-tree-page';
 import VmCreationWizardPage from '@/page-objects/vm-wizard/vm-creation-wizard-page';
 import { EnvVariables } from '@/utils/env-variables';
 import { TestTimeouts } from '@/utils/test-config';
@@ -36,7 +35,6 @@ interface GatingFixtures {
   overviewPage: OverviewPage;
   pageCommons: PageCommons;
   settingsPage: SettingsPage;
-  vmTreePage: VmTreePage;
   vmDetailPage: VirtualMachineDetailPage;
   vmListPage: VirtualMachinesPage;
   vmOverviewTabPage: VmOverviewTabPage;
@@ -127,9 +125,6 @@ const test = baseTest.extend<GatingFixtures>({
   },
   settingsPage: async ({ page }, use) => {
     await use(new SettingsPage(page));
-  },
-  vmTreePage: async ({ page }, use) => {
-    await use(new VmTreePage(page));
   },
   vmDetailPage: async ({ page }, use) => {
     await use(new VirtualMachineDetailPage(page));

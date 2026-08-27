@@ -6,7 +6,6 @@ const SUITE = 'VM and VMI detail tabs';
 test.describe(SUITE, { tag: [T1_TAG] }, () => {
   test('VM and VMI detail tabs show expected content', async ({
     apiClient,
-    vmTreePage,
     vmListPage,
     vmDetailPage,
     utils,
@@ -34,11 +33,11 @@ test.describe(SUITE, { tag: [T1_TAG] }, () => {
     apiClient.trackResource('VirtualMachine', vmName, namespace);
     await apiClient.waitForVmRunning(vmName, namespace, utils.TestTimeouts.VM_RUNNING);
 
-    await vmTreePage.navigateToVirtualMachinesViaUI();
-    await vmTreePage.toggleEmptyProjectsDisplay(true);
-    await vmTreePage.searchTreeView(namespace);
-    await vmTreePage.clickProjectNode(namespace);
-    await vmTreePage.clickVmListTab();
+    await vmListPage.navigateToVirtualMachinesViaUI();
+    await vmListPage.toggleEmptyProjectsDisplay(true);
+    await vmListPage.searchTreeView(namespace);
+    await vmListPage.clickProjectNode(namespace);
+    await vmListPage.clickVmListTab();
 
     const pageLoaded = await vmListPage.verifyPageLoaded();
     expect.soft(pageLoaded, 'VM list page should load').toBe(true);
@@ -86,11 +85,11 @@ test.describe(SUITE, { tag: [T1_TAG] }, () => {
     const utilization = await vmDetailPage.verifyUtilization();
     expect.soft(utilization, 'Utilization visible in Metrics tab').toBe(true);
 
-    await vmTreePage.navigateToVirtualMachinesViaUI();
-    await vmTreePage.toggleEmptyProjectsDisplay(true);
-    await vmTreePage.searchTreeView(namespace);
-    await vmTreePage.clickProjectNode(namespace);
-    await vmTreePage.clickVmListTab();
+    await vmListPage.navigateToVirtualMachinesViaUI();
+    await vmListPage.toggleEmptyProjectsDisplay(true);
+    await vmListPage.searchTreeView(namespace);
+    await vmListPage.clickProjectNode(namespace);
+    await vmListPage.clickVmListTab();
     await vmListPage.clickVmByTestId(vmName);
     await vmDetailPage.navigateToOverview();
     await vmDetailPage.clickVmiByTestId(vmName);

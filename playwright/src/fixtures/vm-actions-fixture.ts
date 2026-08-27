@@ -16,14 +16,12 @@ import PageCommons from '@/page-objects/page-commons';
 import VirtualMachineDetailPage from '@/page-objects/vm/virtual-machine-detail-page';
 import VirtualMachinesPage from '@/page-objects/vm/virtual-machines-page';
 import VmOverviewTabPage from '@/page-objects/vm/vm-overview-tab-page';
-import VmTreePage from '@/page-objects/vm/vm-tree-page';
 import { EnvVariables } from '@/utils/env-variables';
 import { TestConfigManager } from '@/utils/test-config';
 
 import { baseTest, expect } from './scenario-test-fixture';
 
 interface VmActionsFixtures {
-  vmTreePage: VmTreePage;
   vmDetailPage: VirtualMachineDetailPage;
   vmListPage: VirtualMachinesPage;
   vmOverviewTabPage: VmOverviewTabPage;
@@ -36,9 +34,6 @@ interface VmActionsFixtures {
 }
 
 const test = baseTest.extend<VmActionsFixtures>({
-  vmTreePage: async ({ page }, use) => {
-    await use(new VmTreePage(page));
-  },
   vmDetailPage: async ({ page }, use) => {
     await use(new VirtualMachineDetailPage(page));
   },

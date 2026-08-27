@@ -128,13 +128,12 @@ test.describe('Virtualization pages (gating)', { tag: [GATING_TAG] }, () => {
   });
 
   test('Cluster overview displays status, health, and resource allocation sections', async ({
-    vmTreePage,
     vmListPage,
     utils,
   }) => {
     await utils.withAllure({ suite: SUITE, feature: GATING, tags: [GATING_TAG] });
 
-    await vmTreePage.navigateToVirtualMachinesViaUI();
+    await vmListPage.navigateToVirtualMachinesViaUI();
     await vmListPage.clickLocalClusterInTree();
 
     await test.step('Status section widgets are visible', async () => {

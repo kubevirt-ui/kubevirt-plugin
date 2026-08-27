@@ -10,7 +10,7 @@ test.describe(
   () => {
     test('From Template wizard selects RHEL9 template, creates VM, and reaches Running state', async ({
       apiClient,
-      vmTreePage,
+      vmListPage,
       vmWizardNavigationPage,
       vmWizardComputePage,
       utils,
@@ -24,8 +24,8 @@ test.describe(
 
       const wizardNs = await setupTestNamespace(apiClient, 'wizard-tpl');
 
-      await vmTreePage.switchToVirtualizationPerspective();
-      await vmTreePage.navigateToProjectVmListViaUI(wizardNs);
+      await vmListPage.switchToVirtualizationPerspective();
+      await vmListPage.navigateToProjectVmListViaUI(wizardNs);
       await vmWizardNavigationPage.openWizardFromCreateDropdown();
 
       const wizardVisible = await vmWizardNavigationPage.verifyWizardVisible();

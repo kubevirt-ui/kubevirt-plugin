@@ -9,7 +9,7 @@ test.describe(
     test(
       'Start, stop, and restart a VM from the detail page actions dropdown',
       { tag: ['@nonpriv'] },
-      async ({ vmDetailPage, vmTreePage, apiClient, utils }) => {
+      async ({ vmDetailPage, vmListPage, apiClient, utils }) => {
         const SUITE = 'VM Lifecycle';
         await utils.withAllure({ suite: SUITE, feature: T1, tags: [T1_TAG, '@tier1-vm-actions'] });
 
@@ -32,7 +32,7 @@ test.describe(
         expect(created.exists, 'VM should be created before lifecycle test').toBe(true);
 
         await test.step('Navigate to VM detail via tree view', async () => {
-          await vmTreePage.navigateToVmViaTreeView(ns, vmName);
+          await vmListPage.navigateToVmViaTreeView(ns, vmName);
           await vmDetailPage.navigateToOverview();
         });
 

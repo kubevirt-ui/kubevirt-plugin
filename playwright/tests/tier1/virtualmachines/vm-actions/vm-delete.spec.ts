@@ -6,7 +6,7 @@ test.describe('Tier1 VM Single Delete', { tag: [T1_TAG, '@tier1-vm-actions'] }, 
   test(
     'Delete a single VM via list kebab action removes it from the list and cluster',
     { tag: ['@nonpriv'] },
-    async ({ vmListPage, vmTreePage, apiClient, utils }) => {
+    async ({ vmListPage, apiClient, utils }) => {
       const SUITE = 'VM Single Delete';
       await utils.withAllure({ suite: SUITE, feature: T1, tags: [T1_TAG, '@tier1-vm-actions'] });
 
@@ -28,10 +28,10 @@ test.describe('Tier1 VM Single Delete', { tag: [T1_TAG, '@tier1-vm-actions'] }, 
       await apiClient.waitForVmExists(vmName, ns);
 
       await test.step('Navigate to VM list via UI and locate the VM', async () => {
-        await vmTreePage.navigateToVirtualMachinesViaUI();
-        await vmTreePage.toggleEmptyProjectsDisplay(true);
-        await vmTreePage.searchTreeView(ns);
-        await vmTreePage.clickProjectNode(ns);
+        await vmListPage.navigateToVirtualMachinesViaUI();
+        await vmListPage.toggleEmptyProjectsDisplay(true);
+        await vmListPage.searchTreeView(ns);
+        await vmListPage.clickProjectNode(ns);
         await vmListPage.clickVmListTab();
         await vmListPage.waitForVmRowVisible(vmName);
       });

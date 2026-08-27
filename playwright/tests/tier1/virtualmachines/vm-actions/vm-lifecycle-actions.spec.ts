@@ -9,7 +9,7 @@ test.describe('Tier1 VM Bulk Actions Tests', { tag: [T1_TAG, '@tier1-bulk-ops'] 
   test(
     'Bulk delete selected VMs removes them from the list',
     { tag: ['@nonpriv'] },
-    async ({ vmListPage, vmTreePage, apiClient, utils }) => {
+    async ({ vmListPage, apiClient, utils }) => {
       const SUITE = 'VM Bulk Actions';
       await utils.withAllure({ suite: SUITE, feature: T1, tags: [T1_TAG, '@tier1-bulk-ops'] });
 
@@ -31,8 +31,8 @@ test.describe('Tier1 VM Bulk Actions Tests', { tag: [T1_TAG, '@tier1-bulk-ops'] 
       const created = await apiClient.verifyVmCreated(vmName, ns, utils.TestTimeouts.VM_BOOTUP);
       expect(created.exists, 'VM should be created').toBe(true);
 
-      await vmTreePage.searchTreeView(ns);
-      await vmTreePage.clickProjectNode(ns);
+      await vmListPage.searchTreeView(ns);
+      await vmListPage.clickProjectNode(ns);
       await vmListPage.clickVmListTab();
       await vmListPage.waitForVmRowVisible(vmName);
 
