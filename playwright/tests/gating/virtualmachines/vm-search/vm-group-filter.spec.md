@@ -3,7 +3,7 @@
 ## 1. Project Overview
 
 - **Project Name:** KubeVirt UI — Playwright E2E Tests
-- **Feature Area:** Tier1 — Virtual machines / Search
+- **Feature Area:** Gating — Virtual machines / Search
 - **Latest version:** CNV 5.0.0
 - **Latest update:** 2026-08-18
 - **Document Status:** Approved
@@ -26,7 +26,7 @@ Group selection in the Advanced Search modal, and applying/clearing the filter f
 
 ## 3. Test Environment & Prerequisites
 
-- **Environment:** OpenShift with CNV operator installed; Playwright `Tier1` project.
+- **Environment:** OpenShift with CNV operator installed; Playwright `Gating` project.
 - **Configuration:** The UI preview feature "Enable groups in VirtualMachines tree view"
   (`treeViewFolders`) must be enabled. This is a plugin flag on the `kubevirt-ui-features`
   ConfigMap in the CNV namespace, not an HCO/KubeVirt feature gate. Playwright cluster setup
@@ -40,9 +40,9 @@ Group selection in the Advanced Search modal, and applying/clearing the filter f
 
 ## 4. Test Case Definitions
 
-**Spec file:** `tests/tier1/virtualmachines/vm-search/vm-group-filter.spec.ts`
-**Describe:** `VM Group Filter` — **Tags:** `@tier1`, `@vm-search`
-**Allure:** suite `VM Group Filter`, feature `Tier 1`
+**Spec file:** `tests/gating/virtualmachines/vm-search/vm-group-filter.spec.ts`
+**Describe:** `VM Group Filter` — **Tags:** `@gating`, `@vm-search`
+**Allure:** suite `VM Group Filter`, feature `Gating`
 
 ---
 

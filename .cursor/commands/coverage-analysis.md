@@ -41,13 +41,13 @@ Read-only coverage assessment of the virtualization module. Uses two complementa
 
 ## Test Infrastructure
 
-| Tier         | Directory                    | Purpose                                   | Status                       |
-| ------------ | ---------------------------- | ----------------------------------------- | ---------------------------- |
-| **Gating**   | `playwright/tests/gating/`   | Smoke: navigation, page loads, basic CRUD | Must always pass, no retries |
-| **Tier 1**   | `playwright/tests/tier1/`    | Single-resource CRUD lifecycle            | Active                       |
-| **Tier 2**   | `playwright/tests/tier2/`    | Cross-module integration                  | Active                       |
-| **Settings** | `playwright/tests/settings/` | Cluster-wide config (runs in isolation)   | Active                       |
-| **API**      | `playwright/tests/api/`      | API contract validation                   | Active                       |
+| Tier         | Directory                    | Purpose                                          | Status                       |
+| ------------ | ---------------------------- | ------------------------------------------------ | ---------------------------- |
+| **Gating**   | `playwright/tests/gating/`   | Smoke, resource creation, VM search/tree filters | Must always pass, no retries |
+| **Tier 1**   | `playwright/tests/tier1/`    | Single-resource CRUD lifecycle                   | Active                       |
+| **Tier 2**   | `playwright/tests/tier2/`    | Cross-module integration                         | Active                       |
+| **Settings** | `playwright/tests/settings/` | Cluster-wide config (runs in isolation)          | Active                       |
+| **API**      | `playwright/tests/api/`      | API contract validation                          | Active                       |
 
 Coverage analysis scans **all** directories. Proposals for new coverage target `tier1/` or `tier2/` based on complexity.
 

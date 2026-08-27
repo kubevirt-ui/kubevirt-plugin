@@ -1,6 +1,6 @@
 import { load as yamlLoad } from 'js-yaml';
 
-import { ADMIN_ONLY_TAG, T1, T1_TAG, VM_SEARCH_TAG } from '@/data-models/allure-constants';
+import { ADMIN_ONLY_TAG, GATING, GATING_TAG, VM_SEARCH_TAG } from '@/data-models/allure-constants';
 import type { KubernetesResource } from '@/data-models/kubernetes-types';
 import { expect, test } from '@/fixtures/vm-search-fixture';
 import { TestTimeouts } from '@/utils/test-config';
@@ -13,7 +13,7 @@ const projectParams = (url: string): string[] => new URL(url).searchParams.getAl
 const isAllNamespacesPath = (url: string): boolean =>
   new URL(url).pathname.includes('/all-namespaces/');
 
-test.describe(SUITE, { tag: [T1_TAG, VM_SEARCH_TAG] }, () => {
+test.describe(SUITE, { tag: [GATING_TAG, VM_SEARCH_TAG] }, () => {
   let projectA: string;
   let projectB: string;
   let vmA: string;
@@ -65,8 +65,8 @@ test.describe(SUITE, { tag: [T1_TAG, VM_SEARCH_TAG] }, () => {
   test('clicking a project node applies a Project filter', async ({ vmListPage, utils }) => {
     await utils.withAllure({
       suite: SUITE,
-      feature: T1,
-      tags: [T1_TAG, VM_SEARCH_TAG, ADMIN_ONLY_TAG],
+      feature: GATING,
+      tags: [GATING_TAG, VM_SEARCH_TAG, ADMIN_ONLY_TAG],
     });
 
     await test.step('Click Local cluster, then click project A in the tree', async () => {
@@ -105,8 +105,8 @@ test.describe(SUITE, { tag: [T1_TAG, VM_SEARCH_TAG] }, () => {
   }) => {
     await utils.withAllure({
       suite: SUITE,
-      feature: T1,
-      tags: [T1_TAG, VM_SEARCH_TAG, ADMIN_ONLY_TAG],
+      feature: GATING,
+      tags: [GATING_TAG, VM_SEARCH_TAG, ADMIN_ONLY_TAG],
     });
 
     await test.step('Click Local cluster, then click project A in the tree', async () => {
@@ -130,8 +130,8 @@ test.describe(SUITE, { tag: [T1_TAG, VM_SEARCH_TAG] }, () => {
   test('clicking Local cluster clears the Project filter', async ({ vmListPage, utils }) => {
     await utils.withAllure({
       suite: SUITE,
-      feature: T1,
-      tags: [T1_TAG, VM_SEARCH_TAG, ADMIN_ONLY_TAG],
+      feature: GATING,
+      tags: [GATING_TAG, VM_SEARCH_TAG, ADMIN_ONLY_TAG],
     });
 
     await test.step('Click Local cluster, then click project A in the tree', async () => {
@@ -181,8 +181,8 @@ test.describe(SUITE, { tag: [T1_TAG, VM_SEARCH_TAG] }, () => {
   }) => {
     await utils.withAllure({
       suite: SUITE,
-      feature: T1,
-      tags: [T1_TAG, VM_SEARCH_TAG, ADMIN_ONLY_TAG],
+      feature: GATING,
+      tags: [GATING_TAG, VM_SEARCH_TAG, ADMIN_ONLY_TAG],
     });
 
     await test.step('Open the namespaced VirtualMachines list for project A', async () => {

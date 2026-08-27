@@ -181,8 +181,8 @@ Remaining failures: <list with classification>
 
 | Tier     | Scope                                                                                                             | Where to add new tests   |
 | -------- | ----------------------------------------------------------------------------------------------------------------- | ------------------------ |
-| Gating   | Basic navigation + page load verification for each major route; resource creation (form + YAML) per module        | `tests/gating/`          |
-| Tier 1   | Single-resource CRUD lifecycle for each module; VM tab configuration; does NOT overlap gating                     | `tests/tier1/<feature>/` |
+| Gating   | Basic navigation + page load; resource creation (form + YAML); VM search/tree filters (no VM boot)                | `tests/gating/`          |
+| Tier 1   | Single-resource CRUD lifecycle for each remaining module; does NOT overlap gating                                 | `tests/tier1/<feature>/` |
 | Tier 2   | Cross-module integration (e.g. BV → VM wizard, snapshot → clone); VM live/storage migration; multi-step workflows | `tests/tier2/<feature>/` |
 | Settings | Cluster and user settings                                                                                         | `tests/settings/`        |
 | API      | API contract tests — CRUD lifecycle and endpoint validation via `RequestContextClient` (no browser UI)            | `tests/api/`             |
@@ -193,7 +193,10 @@ Remaining failures: <list with classification>
 tests/
 ├── gating/
 │   ├── scenario-virtualization-pages.spec.ts   # Page load + navigation verification
-│   └── scenario-resource-creation.spec.ts      # VM, template, BV creation (form + YAML)
+│   ├── scenario-resource-creation.spec.ts      # VM, template, BV creation (form + YAML)
+│   └── virtualmachines/
+│       ├── vm-search/                          # VM search language and filters (halted VMs)
+│       └── vm-tree/                            # Tree view empty-project filter
 ├── tier1/
 │   ├── bootable-volumes/                       # BV list, create, delete
 │   ├── checkups/                               # Network/storage checkup lifecycle
@@ -202,8 +205,9 @@ tests/
 │   ├── migrationpolicies/                      # Migration policy CRUD
 │   ├── templates/                              # Template creation, detail tabs, lifecycle
 │   └── virtualmachines/
-│       ├── vm-actions/                         # VM lifecycle actions, delete
-│       └── vm-tabs/                            # Configuration, diagnostics, disks, overview
+│       ├── vm-list/                            # VM list alerts
+│       ├── vm-actions/                         # Start/stop/restart, delete, bulk actions
+│       └── vm-tabs/                            # Configuration, diagnostics, disks, CD-ROM, overview
 ├── tier2/
 │   ├── bootable-volumes/                       # BV cross-module (API → UI list → cleanup)
 │   ├── create-vm/                              # Clone wizard (clone existing VM)

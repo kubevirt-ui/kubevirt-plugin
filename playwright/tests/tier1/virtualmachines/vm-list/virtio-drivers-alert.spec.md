@@ -39,7 +39,7 @@ localStorage across reload.
 
 ## 4. Test Case Definitions
 
-**Spec file:** `tests/tier1/virtualmachines/virtio-drivers-alert.spec.ts`
+**Spec file:** `tests/tier1/virtualmachines/vm-list/virtio-drivers-alert.spec.ts`
 **Describe:** `VirtIO drivers alert` — **Tags:** `@tier1`, `@nonpriv`
 **Allure:** suite `VirtIO drivers alert`, feature `Tier 1`
 

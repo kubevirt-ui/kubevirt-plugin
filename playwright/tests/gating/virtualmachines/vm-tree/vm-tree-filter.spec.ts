@@ -1,11 +1,11 @@
-import { ADMIN_ONLY_TAG, T1, T1_TAG, VM_LIST_TAG } from '@/data-models/allure-constants';
+import { ADMIN_ONLY_TAG, GATING, GATING_TAG, VM_LIST_TAG } from '@/data-models/allure-constants';
 import { expect, test } from '@/fixtures/vm-search-fixture';
 import { TestTimeouts } from '@/utils/test-config';
 import { setupTestNamespace } from '@/utils/test-setup-helpers';
 
 const SUITE = 'VM tree view filter';
 
-test.describe(SUITE, { tag: [T1_TAG] }, () => {
+test.describe(SUITE, { tag: [GATING_TAG] }, () => {
   let emptyNamespace: string;
 
   test.beforeAll(async ({ apiClient }) => {
@@ -18,8 +18,8 @@ test.describe(SUITE, { tag: [T1_TAG] }, () => {
   }) => {
     await utils.withAllure({
       suite: SUITE,
-      feature: T1,
-      tags: [T1_TAG, VM_LIST_TAG, ADMIN_ONLY_TAG, 'CNV-90652'],
+      feature: GATING,
+      tags: [GATING_TAG, VM_LIST_TAG, ADMIN_ONLY_TAG, 'CNV-90652'],
     });
 
     await test.step('Navigate to VirtualMachines and turn the filter on', async () => {

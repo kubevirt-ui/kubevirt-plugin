@@ -1,6 +1,6 @@
 import { load as yamlLoad } from 'js-yaml';
 
-import { ADMIN_ONLY_TAG, T1, T1_TAG, VM_SEARCH_TAG } from '@/data-models/allure-constants';
+import { ADMIN_ONLY_TAG, GATING, GATING_TAG, VM_SEARCH_TAG } from '@/data-models/allure-constants';
 import type { KubernetesResource } from '@/data-models/kubernetes-types';
 import { expect, test } from '@/fixtures/vm-search-fixture';
 import { FOLDER_LABEL } from '@/utils/api-builders';
@@ -13,7 +13,7 @@ const GROUP_ALPHA = 'group-alpha';
 const GROUP_BETA = 'group-beta';
 const GROUP_GAMMA = 'group-gamma';
 
-test.describe(SUITE, { tag: [T1_TAG, VM_SEARCH_TAG] }, () => {
+test.describe(SUITE, { tag: [GATING_TAG, VM_SEARCH_TAG] }, () => {
   let vmAlpha1: string;
   let vmAlpha2: string;
   let vmBeta1: string;
@@ -67,8 +67,8 @@ test.describe(SUITE, { tag: [T1_TAG, VM_SEARCH_TAG] }, () => {
     test('group key visible in search suggestions', async ({ vmListPage, utils }) => {
       await utils.withAllure({
         suite: SUITE,
-        feature: T1,
-        tags: [T1_TAG, VM_SEARCH_TAG, ADMIN_ONLY_TAG],
+        feature: GATING,
+        tags: [GATING_TAG, VM_SEARCH_TAG, ADMIN_ONLY_TAG],
       });
 
       await test.step('Focus search input to open dropdown', async () => {
@@ -92,8 +92,8 @@ test.describe(SUITE, { tag: [T1_TAG, VM_SEARCH_TAG] }, () => {
     test('group:folderName filters VMs by group', async ({ vmListPage, utils }) => {
       await utils.withAllure({
         suite: SUITE,
-        feature: T1,
-        tags: [T1_TAG, VM_SEARCH_TAG, ADMIN_ONLY_TAG],
+        feature: GATING,
+        tags: [GATING_TAG, VM_SEARCH_TAG, ADMIN_ONLY_TAG],
       });
 
       await test.step('Submit group:group-alpha search', async () => {
@@ -127,8 +127,8 @@ test.describe(SUITE, { tag: [T1_TAG, VM_SEARCH_TAG] }, () => {
     test('comma-separated groups apply OR logic', async ({ vmListPage, utils }) => {
       await utils.withAllure({
         suite: SUITE,
-        feature: T1,
-        tags: [T1_TAG, VM_SEARCH_TAG, ADMIN_ONLY_TAG],
+        feature: GATING,
+        tags: [GATING_TAG, VM_SEARCH_TAG, ADMIN_ONLY_TAG],
       });
 
       await test.step('Submit group:group-alpha,group-beta search', async () => {
@@ -165,8 +165,8 @@ test.describe(SUITE, { tag: [T1_TAG, VM_SEARCH_TAG] }, () => {
     test('clearing group filter restores all VMs', async ({ vmListPage, utils }) => {
       await utils.withAllure({
         suite: SUITE,
-        feature: T1,
-        tags: [T1_TAG, VM_SEARCH_TAG, ADMIN_ONLY_TAG],
+        feature: GATING,
+        tags: [GATING_TAG, VM_SEARCH_TAG, ADMIN_ONLY_TAG],
       });
 
       await test.step('Apply group filter', async () => {
@@ -193,8 +193,8 @@ test.describe(SUITE, { tag: [T1_TAG, VM_SEARCH_TAG] }, () => {
     test('selecting group in modal applies filter', async ({ vmListPage, utils }) => {
       await utils.withAllure({
         suite: SUITE,
-        feature: T1,
-        tags: [T1_TAG, VM_SEARCH_TAG, ADMIN_ONLY_TAG],
+        feature: GATING,
+        tags: [GATING_TAG, VM_SEARCH_TAG, ADMIN_ONLY_TAG],
       });
 
       await test.step('Open Advanced Search modal', async () => {
@@ -236,8 +236,8 @@ test.describe(SUITE, { tag: [T1_TAG, VM_SEARCH_TAG] }, () => {
     test('multi-group selection shows all matching VMs', async ({ vmListPage, utils }) => {
       await utils.withAllure({
         suite: SUITE,
-        feature: T1,
-        tags: [T1_TAG, VM_SEARCH_TAG, ADMIN_ONLY_TAG],
+        feature: GATING,
+        tags: [GATING_TAG, VM_SEARCH_TAG, ADMIN_ONLY_TAG],
       });
 
       await test.step('Open Advanced Search modal', async () => {
@@ -273,8 +273,8 @@ test.describe(SUITE, { tag: [T1_TAG, VM_SEARCH_TAG] }, () => {
     test('clicking folder node applies group filter', async ({ vmListPage, utils }) => {
       await utils.withAllure({
         suite: SUITE,
-        feature: T1,
-        tags: [T1_TAG, VM_SEARCH_TAG, ADMIN_ONLY_TAG],
+        feature: GATING,
+        tags: [GATING_TAG, VM_SEARCH_TAG, ADMIN_ONLY_TAG],
       });
 
       await test.step('Expand project in tree and click group-alpha folder', async () => {
@@ -304,8 +304,8 @@ test.describe(SUITE, { tag: [T1_TAG, VM_SEARCH_TAG] }, () => {
     test('clicking project node removes group filter', async ({ vmListPage, utils }) => {
       await utils.withAllure({
         suite: SUITE,
-        feature: T1,
-        tags: [T1_TAG, VM_SEARCH_TAG, ADMIN_ONLY_TAG],
+        feature: GATING,
+        tags: [GATING_TAG, VM_SEARCH_TAG, ADMIN_ONLY_TAG],
       });
 
       await test.step('Click folder node to apply group filter', async () => {

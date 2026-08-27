@@ -3,7 +3,7 @@
 ## 1. Project Overview
 
 - **Project Name:** KubeVirt UI — Playwright E2E Tests
-- **Feature Area:** Tier1 — Virtual machines / Search
+- **Feature Area:** Gating — Virtual machines / Search
 - **Latest version:** CNV 5.0.0
 - **Latest update:** 2026-08-21
 - **Document Status:** Approved
@@ -26,7 +26,7 @@ the list URL from a namespaced path to all-namespaces.
 
 ## 3. Test Environment & Prerequisites
 
-- **Environment:** OpenShift with CNV operator installed; Playwright `Tier1` project.
+- **Environment:** OpenShift with CNV operator installed; Playwright `Gating` project.
 - **Configuration:** No special feature gates required. Tests run on standalone virtualization
   (not ACM).
 - **Initial Setup:** `beforeAll` creates two namespaces, each with one Halted VM. `afterAll` deletes
@@ -37,9 +37,9 @@ the list URL from a namespaced path to all-namespaces.
 
 ## 4. Test Case Definitions
 
-**Spec file:** `tests/tier1/virtualmachines/vm-search/vm-project-filter.spec.ts`
-**Describe:** `VM Project Filter` — **Tags:** `@tier1`, `@vm-search`
-**Allure:** suite `VM Project Filter`, feature `Tier 1`
+**Spec file:** `tests/gating/virtualmachines/vm-search/vm-project-filter.spec.ts`
+**Describe:** `VM Project Filter` — **Tags:** `@gating`, `@vm-search`
+**Allure:** suite `VM Project Filter`, feature `Gating`
 
 ---
 
