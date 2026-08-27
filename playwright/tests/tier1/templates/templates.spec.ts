@@ -1,13 +1,18 @@
 import { T1, T1_TAG, VM_ACTIONS_TAG } from '@/data-models/allure-constants';
 import { expect, test } from '@/fixtures/templates-fixture';
-import { setupTestNamespace } from '@/utils/test-setup-helpers';
+import { isNativeVmTemplatesEnabled } from '@/utils/feature-flags';
 import {
   setupTemplateFromResource,
+  setupVmTemplateFromResource,
   verifyTemplateDeletedFromCluster,
 } from '@/utils/template-test-helpers';
+import { setupTestNamespace } from '@/utils/test-setup-helpers';
 
 const SUITE_TEST_VM_FROM_EXAMPLE_TEMPLATE = 'Test VM from example template';
 const SUITE_TEMPLATE_LIFECYCLE = 'Template lifecycle';
+const CPU = '4';
+const MEM = '8';
+const CPU_MEMORY = { cpu: CPU, mem: MEM };
 
 const lifecycleDedicatedTemplateFields = {
   displayName: 'Lifecycle Test Template',
@@ -152,7 +157,7 @@ test.describe.serial('Tier1 Template Tests', { tag: [T1_TAG, '@tier1-templates']
       .toBe(true);
   });
 
-  test('User template CPU and memory can be edited and saved via the details page', async ({
+  test('User Template CPU and memory can be edited and saved via the details page', async ({
     apiClient,
     pageCommons,
     templatesPage,
@@ -180,10 +185,44 @@ test.describe.serial('Tier1 Template Tests', { tag: [T1_TAG, '@tier1-templates']
     await templatesPage.filterTemplatesByName(templateName);
     await templatesPage.clickTemplateByTestId(templateName);
 
-    await templateDetailPage.editDetails({ cpu: '4', mem: '8' });
+    await templateDetailPage.editDetails(CPU_MEMORY);
 
-    const cpuMemVerified = await templateDetailPage.verifyCpuMemory('4', '8');
-    expect.soft(cpuMemVerified, 'Template should show updated CPU=4, Memory=8 GiB').toBe(true);
+    const cpuMemVerified = await templateDetailPage.verifyCpuMemory(CPU, MEM);
+    expect
+      .soft(cpuMemVerified, `Template should show updated CPU=${CPU}, Memory=${MEM} GiB`)
+      .toBe(true);
+  });
+
+  test('User VirtualMachineTemplate CPU and memory can be edited and saved via the details page', async ({
+    apiClient,
+    pageCommons,
+    templatesPage,
+    templateDetailPage,
+    utils,
+  }) => {
+    test.skip(!(await isNativeVmTemplatesEnabled(apiClient)), 'Native VM templates not enabled');
+
+    if (!utils.EnvVariables.onAcm) {
+      await pageCommons.switchProject(sharedNs);
+    }
+
+    const { templateName } = await setupVmTemplateFromResource(
+      apiClient,
+      'resource-edit-vm-template',
+      { targetNamespace: sharedNs },
+      utils,
+    );
+
+    await templatesPage.navigateToTemplatesViaUI();
+    await templatesPage.filterTemplatesByName(templateName);
+    await templatesPage.clickTemplateByTestId(templateName);
+
+    await templateDetailPage.editDetails(CPU_MEMORY);
+
+    const cpuMemVerified = await templateDetailPage.verifyCpuMemory(CPU, MEM);
+    expect
+      .soft(cpuMemVerified, `VM template should show updated CPU=${CPU}, Memory=${MEM} GiB`)
+      .toBe(true);
   });
 });
 

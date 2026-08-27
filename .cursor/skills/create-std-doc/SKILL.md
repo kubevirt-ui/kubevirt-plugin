@@ -37,7 +37,7 @@ Strictly follow `STD-TEMPLATE.md` for structure and section names.
 
 ## 3. Design Conventions & Traceability
 
-- **Versioning:** Use `Latest version` and `Target version` (formatted as `CNV <major>.<minor>`, derived from PR base branch or Jira `fixVersions`). Ensure they match. Default `Document Status` to `Draft`.
+- **Versioning:** Use `Latest version` and `Target version` (formatted as `CNV <major>.<minor>.<patch>`, derived from PR base branch or Jira `fixVersions`). Ensure they match. Default `Document Status` to `Draft`.
 - **Titles & Jira IDs:** Write precise scenario titles. **Do not put Jira IDs in scenario titles.** Place `CNV-[0-9]+` keys in the per-scenario `Jira References` field and the Traceability Matrix.
 - **Scope Definition:**
   - _In-Scope:_ Derived directly from the file's assertions.
@@ -54,4 +54,4 @@ Print and check off these items at the end of your response:
 - [ ] Preserved existing Test Case IDs, Approvals, and historical Traceability Matrix rows.
 - [ ] Placed Jira IDs in `Jira References` and the Matrix, NOT in scenario titles.
 - [ ] Redacted all credentials, secrets, and cluster IDs.
-- [ ] Formatted target versions correctly as `CNV <major>.<minor>`.
+- [ ] Formatted target versions correctly as `CNV <major>.<minor>.<patch>`.

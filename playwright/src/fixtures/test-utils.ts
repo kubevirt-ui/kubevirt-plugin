@@ -13,6 +13,7 @@ import { MigrationPolicyFactory } from '@/data-factories/migration-policy-factor
 import { SshKeyFactory } from '@/data-factories/ssh-key-factory';
 import { TemplateFactory } from '@/data-factories/template-factory';
 import { TestFileFactory } from '@/data-factories/test-file-factory';
+import { VmTemplateFactory } from '@/data-factories/vm-template-factory';
 import { VirtualMachineFactory } from '@/data-factories/virtual-machine-factory';
 import { createMinimalVirtualMachineSnapshotYaml } from '@/data-factories/virtual-machine-snapshot-factory';
 import { createVmMetricsSet } from '@/data-factories/vm-metrics-mock-factory';
@@ -448,6 +449,10 @@ export class TestUtils {
     return lazyLoad('TemplateFactory', () => TemplateFactory);
   }
 
+  get VmTemplateFactory() {
+    return lazyLoad('VmTemplateFactory', () => VmTemplateFactory);
+  }
+
   get TEST_ANNOTATIONS() {
     return lazyLoad('TEST_ANNOTATIONS', () => constants.TEST_ANNOTATIONS);
   }
@@ -664,6 +669,7 @@ export interface TestUtilsType {
   MigrationPolicyFactory: typeof MigrationPolicyFactory;
   createMinimalVirtualMachineSnapshotYaml: typeof createMinimalVirtualMachineSnapshotYaml;
   TemplateFactory: typeof TemplateFactory;
+  VmTemplateFactory: typeof VmTemplateFactory;
   VirtualMachineFactory: typeof VirtualMachineFactory;
   FileUtils: typeof FileUtils;
 }
