@@ -10,14 +10,22 @@ import { getLabelFilter } from './filters/getLabelFilter';
 import { getNameFilter } from './filters/getNameFilter';
 import useMigratedSearchParams from './hooks/useMigratedSearchParams';
 import useSyncedGroupFilter from './hooks/useSyncedGroupFilter';
-import { FilterableObject, KubevirtFilter, KubevirtFilterState, OnSetFilters } from './types';
+import {
+  type FilterableObject,
+  type KubevirtFilter,
+  type KubevirtFilterState,
+  type OnSetFilters,
+} from './types';
 import { matchesWithExclusion } from './utils';
 
 type UseKubevirtDataViewFiltersArgs<T extends FilterableObject> = {
   data: T[];
   filterDefinitions?: KubevirtFilter<T>[];
   hideLabelFilter?: boolean;
+  syncWithURL?: boolean;
 };
+
+const EMPTY_SEARCH_PARAMS = new URLSearchParams();
 
 type UseKubevirtDataViewFiltersResult<T extends FilterableObject> = {
   clearAllFilters: () => void;
@@ -30,9 +38,11 @@ const useKubevirtDataViewFilters = <T extends FilterableObject>({
   data,
   filterDefinitions: filterDefinitionsProp = EMPTY_FILTERS,
   hideLabelFilter,
+  syncWithURL = true,
 }: UseKubevirtDataViewFiltersArgs<T>): UseKubevirtDataViewFiltersResult<T> => {
   const { t } = useKubevirtTranslation();
   const [searchParams, setSearchParams] = useMigratedSearchParams();
+  const effectiveSearchParams = syncWithURL ? searchParams : undefined;
 
   const filterDefinitions = useMemo(
     () => [
@@ -54,14 +64,14 @@ const useKubevirtDataViewFilters = <T extends FilterableObject>({
 
   const { clearAllFilters, filters, onSetFilters } = useDataViewFilters<KubevirtFilterState>({
     initialFilters,
-    searchParams,
-    setSearchParams,
+    searchParams: effectiveSearchParams,
+    setSearchParams: syncWithURL ? setSearchParams : undefined,
   });
 
   const { syncedFilters, syncedOnSetFilters } = useSyncedGroupFilter(
     filters,
     onSetFilters,
-    searchParams,
+    effectiveSearchParams ?? EMPTY_SEARCH_PARAMS,
   );
 
   const filteredData = useMemo(

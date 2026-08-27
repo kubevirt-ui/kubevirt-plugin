@@ -1,8 +1,8 @@
-import { FieldPath } from 'react-hook-form';
+import { type FieldPath } from 'react-hook-form';
 
 import {
-  CreateInitialVMWizardFormValuesArgs,
-  VMWizardFormValues,
+  type CreateInitialVMWizardFormValuesArgs,
+  type VMWizardFormValues,
 } from '@virtualmachines/wizard/state/vm-wizard-form/types';
 import { OperatingSystemType } from '@virtualmachines/wizard/steps/InstanceTypesSteps/GuestOSStep/utils/constants';
 import { VMCreationMethod, VMWizardStep } from '@virtualmachines/wizard/utils/constants';
@@ -37,6 +37,7 @@ export const createInitialVMWizardFormValues = ({
   },
   vmData: {
     autoLabelsMerged: false,
+    bootSourceOverride: null,
     cluster,
     creationMethod: VMCreationMethod.INSTANCE_TYPE,
     description: '',
@@ -47,8 +48,9 @@ export const createInitialVMWizardFormValues = ({
   },
 });
 
-export const CREATE_VM_FORM_FIELDS_VM_DATA: Record<string, FieldPath<VMWizardFormValues>> = {
+export const CREATE_VM_FORM_FIELDS_VM_DATA = {
   AUTO_LABELS_MERGED: 'vmData.autoLabelsMerged',
+  BOOT_SOURCE_OVERRIDE: 'vmData.bootSourceOverride',
   CLUSTER: 'vmData.cluster',
   CREATION_METHOD: 'vmData.creationMethod',
   DESCRIPTION: 'vmData.description',
@@ -57,27 +59,21 @@ export const CREATE_VM_FORM_FIELDS_VM_DATA: Record<string, FieldPath<VMWizardFor
   PROJECT: 'vmData.project',
   ROOT: 'vmData',
   SELECTED_TEMPLATE: 'vmData.selectedTemplate',
-};
+} as const satisfies Record<string, FieldPath<VMWizardFormValues>>;
 
-export const CREATE_VM_FORM_FIELDS_UI_STATE: Record<string, FieldPath<VMWizardFormValues>> = {
+export const CREATE_VM_FORM_FIELDS_UI_STATE = {
   IS_TEMPLATES_DRAWER_OPEN: 'uiState.isTemplatesDrawerOpen',
   LAST_PROCESSED_TEMPLATE_KEY: 'uiState.lastProcessedTemplateKey',
   SHOULD_CHECK_VM_NAME_PROPERLY: 'uiState.shouldCheckVMNameProperly',
   TEMPLATE_PROCESS_ERROR: 'uiState.templateProcessError',
-};
+} as const satisfies Record<string, FieldPath<VMWizardFormValues>>;
 
-export const CREATE_VM_FORM_FIELDS_STEP_NAVIGATION: Record<
-  string,
-  FieldPath<VMWizardFormValues>
-> = {
+export const CREATE_VM_FORM_FIELDS_STEP_NAVIGATION = {
   CURRENT_STEP: 'stepNavigation.currentStep',
   VISITED_STEPS: 'stepNavigation.visitedSteps',
-};
+} as const satisfies Record<string, FieldPath<VMWizardFormValues>>;
 
-export const CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA: Record<
-  string,
-  FieldPath<VMWizardFormValues>
-> = {
+export const CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA = {
   CUSTOM_DISK_SIZE: 'instanceTypeData.customDiskSize',
   DV_SOURCE: 'instanceTypeData.dvSource',
   OPERATING_SYSTEM_TYPE: 'instanceTypeData.operatingSystemType',
@@ -90,4 +86,4 @@ export const CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA: Record<
   SELECTED_SIZE: 'instanceTypeData.selectedSize',
   USE_BOOT_SOURCE: 'instanceTypeData.useBootSource',
   VOLUME_LIST_NAMESPACE: 'instanceTypeData.volumeListNamespace',
-};
+} as const satisfies Record<string, FieldPath<VMWizardFormValues>>;

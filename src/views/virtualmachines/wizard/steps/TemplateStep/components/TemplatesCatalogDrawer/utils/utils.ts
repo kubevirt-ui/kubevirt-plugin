@@ -1,17 +1,20 @@
-import { TemplateParameter } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { type TFunction } from 'i18next';
+
+import { type TemplateParameter } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
-  V1beta1DataVolumeSpec,
-  V1ContainerDiskSource,
-  V1VirtualMachine,
+  type V1beta1DataVolumeSpec,
+  type V1ContainerDiskSource,
+  type V1VirtualMachine,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { V1beta1VirtualMachineTemplateSpecParameters } from '@kubevirt-ui-ext/kubevirt-api/virt-template';
+import { type V1beta1VirtualMachineTemplateSpecParameters } from '@kubevirt-ui-ext/kubevirt-api/virt-template';
 import {
   getParameters,
   isOpenShiftTemplate,
   isVirtualMachineTemplate,
-  Template,
+  type Template,
 } from '@kubevirt-utils/resources/template';
-import { getDisks, getVolumes } from '@kubevirt-utils/resources/vm';
+import { type BOOT_SOURCE } from '@kubevirt-utils/resources/template/utils/constants';
+import { getDisks, getVMBootSourceLabel, getVolumes } from '@kubevirt-utils/resources/vm';
 import { NAME_INPUT_FIELD } from '@virtualmachines/wizard/steps/TemplateStep/components/TemplatesCatalog/utils/consts';
 
 export const getTemplateParametersSplit = (
@@ -33,8 +36,8 @@ export const getDiskSource = (
 ): undefined | V1beta1DataVolumeSpec | V1ContainerDiskSource => {
   if (!diskName) return;
 
-  const disk = getDisks(vm)?.find((d) => d.name === diskName);
-  const volume = getVolumes(vm)?.find((v) => v.name === disk?.name);
+  const disk = getDisks(vm)?.find((diskItem) => diskItem.name === diskName);
+  const volume = getVolumes(vm)?.find((volumeItem) => volumeItem.name === disk?.name);
 
   if (!disk || !volume) return;
 
@@ -82,3 +85,19 @@ export const getFirstUnfulfilledRequiredParameter = (
 
 export const allRequiredParametersAreFulfilled = (template: Template): boolean =>
   !getFirstUnfulfilledRequiredParameter(template);
+
+export const getTemplateBootSourceLabel = (
+  bootSourceType: BOOT_SOURCE | undefined,
+  sourceRef: { name?: string; namespace?: string } | null | undefined,
+  t: TFunction,
+): string => {
+  if (!sourceRef?.name) {
+    return t(getVMBootSourceLabel(bootSourceType));
+  }
+
+  if (sourceRef.namespace) {
+    return t('{{name}} ({{namespace}})', { name: sourceRef.name, namespace: sourceRef.namespace });
+  }
+
+  return sourceRef.name;
+};

@@ -57,7 +57,7 @@ const VMCreationWizardContent: FC = () => {
       }
 
       if (currentStep?.id) {
-        setValue(CREATE_VM_FORM_FIELDS_STEP_NAVIGATION.CURRENT_STEP, currentStep.id);
+        setValue(CREATE_VM_FORM_FIELDS_STEP_NAVIGATION.CURRENT_STEP, String(currentStep.id));
         markStepVisited(String(currentStep.id), getValues, setValue);
       }
 

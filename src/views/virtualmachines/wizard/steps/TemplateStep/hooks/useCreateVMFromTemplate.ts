@@ -11,8 +11,16 @@ import { logVMCreationFailedFromTemplate } from '@kubevirt-utils/extensions/tele
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
 import { USER_SETTINGS_KEYS } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/const';
-import { getResourceKey } from '@kubevirt-utils/resources/shared';
-import { customizeWizardVMSignal } from '@kubevirt-utils/signals/customizeWizardVMSignal';
+import { getName, getResourceKey } from '@kubevirt-utils/resources/shared';
+import { type Template } from '@kubevirt-utils/resources/template';
+import {
+  getDataVolumeTemplates,
+  getRootDataVolumeTemplateSpec,
+} from '@kubevirt-utils/resources/vm';
+import {
+  customizeWizardVMSignal,
+  patchCustomizeWizardVMSignal,
+} from '@kubevirt-utils/signals/customizeWizardVMSignal';
 import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
 import {
   CREATE_VM_FORM_FIELDS_UI_STATE,
@@ -44,19 +52,13 @@ const useCreateVMFromTemplate: UseCreateVMFromTemplate = () => {
 
   const createVMFromTemplate = async (): Promise<boolean> => {
     const {
-      description,
-      folder,
-      name: vmName,
-      project,
-      selectedTemplate,
-    } = getValues(CREATE_VM_FORM_FIELDS_VM_DATA.ROOT);
-    const namespace = project || DEFAULT_NAMESPACE;
-    const lastProcessedTemplateKey = getValues(
-      CREATE_VM_FORM_FIELDS_UI_STATE.LAST_PROCESSED_TEMPLATE_KEY,
-    );
+      uiState: { lastProcessedTemplateKey },
+      vmData: { bootSourceOverride, description, folder, name: vmName, project, selectedTemplate },
+    } = getValues();
+    const namespace = project ?? DEFAULT_NAMESPACE;
     setValue(CREATE_VM_FORM_FIELDS_UI_STATE.TEMPLATE_PROCESS_ERROR, null);
 
-    const selectedKey = getResourceKey(selectedTemplate);
+    const selectedKey = getResourceKey(selectedTemplate as Template);
     if (selectedKey === lastProcessedTemplateKey) return true;
 
     const missingParam = getFirstUnfulfilledRequiredParameter(selectedTemplate);
@@ -80,6 +82,33 @@ const useCreateVMFromTemplate: UseCreateVMFromTemplate = () => {
         sshSecretName: authorizedSSHKeys?.[namespace],
         vm,
       });
+
+      if (bootSourceOverride) {
+        const rootDataVolumeTemplateSpec = getRootDataVolumeTemplateSpec(
+          customizeWizardVMSignal.value,
+        );
+
+        if (rootDataVolumeTemplateSpec) {
+          patchCustomizeWizardVMSignal([
+            {
+              data: getDataVolumeTemplates(customizeWizardVMSignal.value).map((dvTemplate) =>
+                getName(dvTemplate) === getName(rootDataVolumeTemplateSpec)
+                  ? {
+                      ...dvTemplate,
+                      spec: {
+                        ...dvTemplate.spec,
+                        source: undefined,
+                        sourceRef: bootSourceOverride,
+                      },
+                    }
+                  : dvTemplate,
+              ),
+              path: 'spec.dataVolumeTemplates',
+            },
+          ]);
+        }
+      }
+
       setValue(CREATE_VM_FORM_FIELDS_UI_STATE.LAST_PROCESSED_TEMPLATE_KEY, selectedKey);
       return true;
     } catch (error) {

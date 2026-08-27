@@ -1,9 +1,11 @@
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { type TableColumnWithOptionalIndex } from '@virtualmachines/wizard/steps/InstanceTypesSteps/BootSourceStep/types';
+import { type TableColumn } from '@openshift-console/dynamic-plugin-sdk';
 
 import useKubevirtUserSettings from './useKubevirtUserSettings';
 import { USER_SETTINGS_KEYS } from './utils/const';
 import { type UserSettingsState } from './utils/userSettingsInitialState';
+
+export type TableColumnWithOptionalIndex<T> = TableColumn<T> & { columnIndex?: number };
 
 type UseKubevirtUserSettingsTableColumnsType = <T>(input: {
   columnManagementID: string;

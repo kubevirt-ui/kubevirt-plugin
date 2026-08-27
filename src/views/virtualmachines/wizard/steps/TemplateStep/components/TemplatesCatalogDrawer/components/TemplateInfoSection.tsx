@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC, memo } from 'react';
+import React, { type FC, memo } from 'react';
 import { useWatch } from 'react-hook-form';
 
 import CPUDescription from '@kubevirt-utils/components/CPUDescription/CPUDescription';
@@ -29,6 +28,7 @@ import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMW
 import { CREATE_VM_FORM_FIELDS_VM_DATA } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
 import { useDrawerContext } from '@virtualmachines/wizard/steps/TemplateStep/components/TemplatesCatalogDrawer/hooks/useDrawerContext';
 
+import TemplateBootSourceItem from './TemplateBootSourceItem';
 import TemplateExpandableDescription from './TemplateExpandableDescription';
 
 const TemplateInfoSection: FC = memo(() => {
@@ -46,13 +46,13 @@ const TemplateInfoSection: FC = memo(() => {
   const networks = getTemplateNetworks(template);
   const interfaces = getTemplateInterfaces(template);
   const isDefaultTemplate = isDefaultVariantTemplate(template);
-
   const hasPodNetwork = networksHavePodNetwork(networks);
-
   const operatingSystem = getOperatingSystemName(template) || notAvailable;
+  const workloadLabel = WORKLOADS_LABELS[workload as keyof typeof WORKLOADS_LABELS] ?? t('Other');
+  const defaultSuffix = isDefaultTemplate ? t('(default)') : '';
   const categoryOrWorkload = isVMTemplate
     ? getTemplateCategoryDisplay(template, t)
-    : `${WORKLOADS_LABELS[workload] ?? t('Other')} ${isDefaultTemplate ? t('(default)') : ''}`;
+    : `${workloadLabel} ${defaultSuffix}`;
 
   return (
     <DescriptionList className="pf-v6-u-mt-lg">
@@ -76,9 +76,12 @@ const TemplateInfoSection: FC = memo(() => {
         olsObj={vm}
         promptType={OLSPromptType.CPU_MEMORY}
       />
+      <TemplateBootSourceItem />
       <DescriptionItem
         descriptionData={<NetworksReviewTable interfaces={interfaces} networks={networks} />}
-        descriptionHeader={t('Network interfaces ({{networks}})', { networks: networks?.length })}
+        descriptionHeader={t('Network interfaces ({{networks}})', {
+          networks: networks?.length,
+        })}
       />
       {isIPv6SingleStack && hasPodNetwork && (
         <Alert
