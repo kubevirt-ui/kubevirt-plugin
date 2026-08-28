@@ -1,11 +1,11 @@
-import { DataVolumeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { DataVolumeModel, modelToRef } from '@kubevirt-ui-ext/kubevirt-api/console';
 import type {
   V1beta1DataVolume,
   V1beta1StorageSpecAccessModesEnum,
   V1beta1StorageSpecVolumeModeEnum,
 } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
-import { getGroupVersionKindForModel, type K8sModel } from '@openshift-console/dynamic-plugin-sdk';
+import { type K8sModel } from '@openshift-console/dynamic-plugin-sdk';
 
 import { LABEL_CDROM_SOURCE } from './consts';
 import { getKubevirtModelAvailableAPIVersion } from './selectors';
@@ -30,7 +30,7 @@ export const resourcePathFromModel = (
   }
 
   if (crd) {
-    url += getGroupVersionKindForModel(model);
+    url += modelToRef(model);
   } else if (plural) {
     url += plural;
   }
