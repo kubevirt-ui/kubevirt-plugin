@@ -5,14 +5,6 @@ import { deadlineUnits } from '@virtualmachines/details/tabs/snapshots/utils/con
 
 import SnapshotDeadlineFormField from '../SnapshotDeadlineFormField';
 
-jest.mock('@kubevirt-utils/hooks/useKubevirtTranslation', () => {
-  const t = (key: string) => key;
-  return {
-    t,
-    useKubevirtTranslation: () => ({ t }),
-  };
-});
-
 const defaultProps = {
   deadline: '',
   deadlineUnit: deadlineUnits.Seconds,

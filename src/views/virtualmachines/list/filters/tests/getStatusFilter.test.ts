@@ -1,5 +1,6 @@
 import { type TFunction } from 'i18next';
 
+import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ERROR_STATUS } from '@kubevirt-utils/resources/vm';
 import {
   errorPrintableVMStatus,
@@ -9,12 +10,6 @@ import {
 import { getStatusFilter } from '../getStatusFilter';
 
 import { createMockVM } from './mockVM';
-
-const t = (str: string) => str;
-jest.mock('@kubevirt-utils/hooks/useKubevirtTranslation', () => ({
-  t: (str: string) => str,
-  useKubevirtTranslation: () => ({ t: (str: string) => str }),
-}));
 
 describe('VM Status Filter', () => {
   const statusFilter = getStatusFilter(t as TFunction);

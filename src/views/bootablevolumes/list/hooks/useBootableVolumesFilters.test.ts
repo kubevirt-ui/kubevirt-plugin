@@ -4,11 +4,6 @@ import { renderHook } from '@testing-library/react';
 import { BootableVolumesFilterID } from './constants';
 import useBootableVolumesFilters from './useBootableVolumesFilters';
 
-jest.mock('@kubevirt-utils/hooks/useKubevirtTranslation', () => ({
-  t: (str: string) => str,
-  useKubevirtTranslation: () => ({ t: (str: string) => str }),
-}));
-
 jest.mock('@multicluster/useIsACMPage', () => ({
   __esModule: true,
   default: () => false,

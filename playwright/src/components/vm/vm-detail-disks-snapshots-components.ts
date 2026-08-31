@@ -6,8 +6,9 @@ import BaseComponent from '@/components/shared/base-component';
 import VirtualMachineDetailCdromComponent from '@/components/vm/virtual-machine-detail-cdrom-component';
 import { VirtualMachineDetailConfigurationCdromComponent } from '@/components/vm/vm-detail-config-components';
 import { DISK_NAMES } from '@/data-models';
+import { MOCK_ENDPOINTS, MockResponses } from '@/utils/mock-responses';
 import { TestTimeouts } from '@/utils/test-config';
-import type { Page } from '@playwright/test';
+import type { Page, Response } from '@playwright/test';
 import { expect } from '@playwright/test';
 
 export class VmSnapshotsComponent extends BaseComponent {
@@ -957,6 +958,95 @@ export class VirtualMachineDetailDisksComponent extends BaseComponent {
     } catch {
       return false;
     }
+  }
+
+  async mockPvcPatchForbidden(): Promise<void> {
+    await this.page.route(MOCK_ENDPOINTS.PERSISTENT_VOLUME_CLAIMS, async (route) => {
+      if (route.request().method() === 'PATCH') {
+        await route.fulfill({
+          body: JSON.stringify(
+            MockResponses.createForbiddenStatus({
+              resource: 'persistentvolumeclaims',
+              verb: 'patch',
+            }),
+          ),
+          contentType: 'application/json',
+          status: 403,
+        });
+        return;
+      }
+      await route.continue();
+    });
+  }
+
+  async unroutePvcPatchForbidden(): Promise<void> {
+    await this.page.unroute(MOCK_ENDPOINTS.PERSISTENT_VOLUME_CLAIMS).catch(() => undefined);
+  }
+
+  waitForForbiddenPvcPatch(timeout: number): Promise<Response> {
+    return this.page.waitForResponse(
+      (response) =>
+        response.request().method() === 'PATCH' &&
+        response.url().includes('/persistentvolumeclaims/') &&
+        response.status() === 403,
+      { timeout },
+    );
+  }
+
+  async submitEditDiskResizeKeepingModalOpen(diskName: string, newSize: string): Promise<void> {
+    await this.navigateToConfigurationStorage();
+
+    const diskRow = this.getDiskRow(diskName);
+    await diskRow.waitFor({ state: 'visible', timeout: TestTimeouts.VM_CREATION });
+
+    const actionsBtn = diskRow.locator(this._diskRowActionsButton);
+    await actionsBtn.waitFor({
+      state: 'visible',
+      timeout: TestTimeouts.INSTANCE_TYPE_VERIFICATION,
+    });
+    await this.robustClick(actionsBtn);
+
+    await this.locator('[role="menu"] button', { hasText: 'Edit' }).waitFor({
+      state: 'visible',
+      timeout: TestTimeouts.INSTANCE_TYPE_VERIFICATION,
+    });
+    await this.robustClick(this.locator('[role="menu"] button', { hasText: 'Edit' }));
+
+    await this._h1HasTextEditDisk.waitFor({
+      state: 'visible',
+      timeout: TestTimeouts.INSTANCE_TYPE_VERIFICATION,
+    });
+
+    const editDiskModal = this._roleDialog.filter({ hasText: 'Edit Disk' });
+    await editDiskModal
+      .getByText('PersistentVolumeClaim size')
+      .waitFor({ state: 'visible', timeout: TestTimeouts.VM_CREATION });
+
+    const sizeInput = editDiskModal
+      .locator('input[aria-label="Input"], input[type="number"]')
+      .first();
+    await sizeInput.waitFor({
+      state: 'visible',
+      timeout: TestTimeouts.INSTANCE_TYPE_VERIFICATION,
+    });
+    await sizeInput.dblclick();
+    await sizeInput.fill(newSize);
+
+    await this.clickDialogSaveButton();
+  }
+
+  async waitForEditDiskModalHidden(): Promise<void> {
+    await this._h1HasTextEditDisk.waitFor({
+      state: 'hidden',
+      timeout: TestTimeouts.UI_ACTION_COMPLETE,
+    });
+  }
+
+  async waitForEditDiskModalVisible(): Promise<void> {
+    await this._h1HasTextEditDisk.waitFor({
+      state: 'visible',
+      timeout: TestTimeouts.INSTANCE_TYPE_VERIFICATION,
+    });
   }
 
   async setWindowsDriversOnDiskTab(mount: boolean): Promise<boolean> {

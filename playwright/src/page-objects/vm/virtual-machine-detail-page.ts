@@ -5,7 +5,7 @@
 import UploadProgressToastComponent from '@/components/shared/upload-progress-toast-component';
 import { DISK_NAMES } from '@/data-models';
 import { TestTimeouts } from '@/utils/test-config';
-import type { Page } from '@playwright/test';
+import type { Page, Response } from '@playwright/test';
 
 import PageCommons from '../page-commons';
 
@@ -718,6 +718,30 @@ export default class VirtualMachineDetailPage extends PageCommons {
 
   async resizeDisk(diskName: string, newSize: string): Promise<boolean> {
     return this.disks.resizeDisk(diskName, newSize);
+  }
+
+  async mockPvcPatchForbidden(): Promise<void> {
+    return this.disks.mockPvcPatchForbidden();
+  }
+
+  async submitEditDiskResizeKeepingModalOpen(diskName: string, newSize: string): Promise<void> {
+    return this.disks.submitEditDiskResizeKeepingModalOpen(diskName, newSize);
+  }
+
+  async unroutePvcPatchForbidden(): Promise<void> {
+    return this.disks.unroutePvcPatchForbidden();
+  }
+
+  waitForForbiddenPvcPatch(timeout: number): Promise<Response> {
+    return this.disks.waitForForbiddenPvcPatch(timeout);
+  }
+
+  async waitForEditDiskModalHidden(): Promise<void> {
+    return this.disks.waitForEditDiskModalHidden();
+  }
+
+  async waitForEditDiskModalVisible(): Promise<void> {
+    return this.disks.waitForEditDiskModalVisible();
   }
 
   async restartVmFromActionsDropdown() {

@@ -49,15 +49,19 @@ const TabModalFooter: FC<TabModalFooterProps> = ({
   const { t } = useKubevirtTranslation();
 
   const errorMessage = error ? formatK8sError(error, t) : '';
-  const rawHref = error ? getK8sErrorHref(error) : undefined;
-  const errorHref = rawHref && /^https?:\/\//i.test(rawHref) ? rawHref : undefined;
+  const errorHref = error ? getK8sErrorHref(error) : undefined;
 
   return (
     <ModalFooter>
       <Stack className="kv-tabmodal-footer" hasGutter>
         {error && (
           <StackItem>
-            <Alert isInline title={t('An error occurred')} variant={AlertVariant.danger}>
+            <Alert
+              data-test="modal-error-alert"
+              isInline
+              title={t('An error occurred')}
+              variant={AlertVariant.danger}
+            >
               <Stack hasGutter>
                 <StackItem>{errorMessage}</StackItem>
                 {errorHref && (

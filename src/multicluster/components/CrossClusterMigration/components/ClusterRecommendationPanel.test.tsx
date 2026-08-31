@@ -5,22 +5,6 @@ import { render, screen } from '@testing-library/react';
 import { type MigrationTargetResponse } from '../hooks/useClusterRecommendationTypes';
 import ClusterRecommendationPanel from './ClusterRecommendationPanel';
 
-jest.mock('@kubevirt-utils/hooks/useKubevirtTranslation', () => {
-  const t = (key: string, params?: Record<string, string>) => {
-    let result = key;
-    if (params) {
-      for (const [paramKey, value] of Object.entries(params)) {
-        result = result.replace(`{{${paramKey}}}`, String(value));
-      }
-    }
-    return result;
-  };
-  return {
-    t,
-    useKubevirtTranslation: () => ({ t }),
-  };
-});
-
 jest.mock('@kubevirt-utils/utils/humanize.js', () => ({
   humanizeBinaryBytes: (bytes: number) => ({
     string: `${(bytes / (1024 * 1024 * 1024)).toFixed(1)} GiB`,

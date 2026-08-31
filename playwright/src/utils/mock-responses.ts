@@ -9,6 +9,7 @@ export const MOCK_ENDPOINTS = {
   PROMETHEUS_RULES: '**/api/prometheus/api/v1/rules',
   NAMESPACE_SECRETS: (namespace = '**') =>
     `**/api/kubernetes/api/v1/namespaces/${namespace}/secrets*`,
+  PERSISTENT_VOLUME_CLAIMS: '**/persistentvolumeclaims/**',
 } as const;
 
 export const MockHelpers = {
@@ -27,6 +28,17 @@ export const MockHelpers = {
 };
 
 export const MockResponses = {
+  createForbiddenStatus({ resource, verb }: { resource: string; verb: string }): object {
+    return {
+      apiVersion: 'v1',
+      code: 403,
+      kind: 'Status',
+      message: `${resource} is forbidden: User cannot ${verb} resource`,
+      reason: 'Forbidden',
+      status: 'Failure',
+    };
+  },
+
   createMigMigrationResponse(vmName: string, namespace: string, diskNames?: string[]): object {
     const now = new Date();
     const startTime = new Date(now.getTime() - 4 * 60 * 1000); // 4 minutes ago

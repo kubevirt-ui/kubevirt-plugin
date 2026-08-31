@@ -118,6 +118,10 @@ export class CoreProxyHandler {
     return this.getConfigMap('kubevirt-user-settings', namespace);
   }
 
+  getPersistentVolumeClaim(namespace: string, name: string): Promise<KubernetesResource | null> {
+    return this.ctx.getResource('', 'v1', 'persistentvolumeclaims', name, namespace);
+  }
+
   listPersistentVolumeClaims(
     namespace: string,
     queryParams?: Record<string, string>,

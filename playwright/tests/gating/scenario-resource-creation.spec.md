@@ -4,9 +4,9 @@
 
 - **Project Name:** KubeVirt UI — Playwright E2E Tests
 - **Feature Area:** Gating — Resource creation
-- **Latest version:** CNV 5.0
+- **Latest version:** CNV 5.0.0
 - **Latest update:** 2026-08-21
-- **Document Status:** Draft
+- **Document Status:** Approved
 
 ## 2. Introduction
 
