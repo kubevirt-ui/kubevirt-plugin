@@ -1,11 +1,12 @@
-import React, { FC, useCallback, useMemo, useState } from 'react';
+import React, { type FC, useCallback, useMemo, useState } from 'react';
+import { Link } from 'react-router';
 
-import { AutoAppliedLabel } from '@kubevirt-utils/hooks/useAutoAppliedLabels/types';
+import { type AutoAppliedLabel } from '@kubevirt-utils/hooks/useAutoAppliedLabels/types';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
 import { USER_SETTINGS_KEYS } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/const';
-import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { patchCustomizeWizardVMSignal } from '@kubevirt-utils/signals/customizeWizardVMSignal';
-import { Button, ButtonVariant, Checkbox, Stack, StackItem } from '@patternfly/react-core';
+import { Checkbox, Stack, StackItem } from '@patternfly/react-core';
 import { USER_SETTINGS_URL } from '@settings/constants';
 import { USER_TAB_IDS } from '@settings/search/constants';
 import DefaultVMLabelRow from '@settings/tabs/UserTab/components/DefaultVMLabelsSection/components/DefaultVMLabelRow';
@@ -48,7 +49,7 @@ const RequiredVMLabelsDrawerBody: FC<RequiredVMLabelsDrawerBodyProps> = ({
           <DefaultVMLabelRow
             label={label}
             onValueChange={handleSave}
-            userValue={vmLabels[label.key] || ''}
+            userValue={vmLabels[label.key] ?? ''}
           />
         </StackItem>
       ))}
@@ -63,14 +64,12 @@ const RequiredVMLabelsDrawerBody: FC<RequiredVMLabelsDrawerBodyProps> = ({
       </StackItem>
 
       <StackItem>
-        <Button
-          component="a"
-          href={`${USER_SETTINGS_URL}#${USER_TAB_IDS.defaultVMLabels}`}
-          isInline
-          variant={ButtonVariant.link}
+        <Link
+          id="manage-in-user-settings-link"
+          to={`${USER_SETTINGS_URL}#${USER_TAB_IDS.defaultVMLabels}`}
         >
           {t('Manage in User settings')}
-        </Button>
+        </Link>
       </StackItem>
     </Stack>
   );
