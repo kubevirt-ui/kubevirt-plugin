@@ -439,6 +439,10 @@ export default class VmCreationWizardComponent extends BaseComponent {
     return this.location.openEditLocationPanel();
   }
 
+  async selectLocationProject(namespace: string): Promise<void> {
+    return this.location.selectLocationProject(namespace);
+  }
+
   async openWizardFromCreateDropdown(): Promise<void> {
     return this.deployment.openWizardFromCreateDropdown();
   }

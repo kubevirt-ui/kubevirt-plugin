@@ -1,6 +1,6 @@
-import classnames from 'classnames';
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 import { useWatch } from 'react-hook-form';
+import classnames from 'classnames';
 
 import { FLAG_LIGHTSPEED_PLUGIN } from '@kubevirt-utils/flags/consts';
 import useWizardFooterProps from '@kubevirt-utils/hooks/useWizardFooterProps';
@@ -15,7 +15,6 @@ import {
 } from '@patternfly/react-core';
 import VMNameConfirmationNextButton from '@virtualmachines/wizard/components/VMNameConfirmationNextButton';
 import useCloseWizard from '@virtualmachines/wizard/hooks/useCloseWizard';
-
 import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
 import { CREATE_VM_FORM_FIELDS_VM_DATA } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
 import { isCloneCreationMethod } from '@virtualmachines/wizard/utils/utils';
@@ -34,13 +33,13 @@ const DeploymentDetailsStepFooter: FC = () => {
       <ActionList>
         <ActionListGroup>
           <ActionListItem>
-            <Button isDisabled variant="secondary">
+            <Button data-test="wizard-back-button" isDisabled variant="secondary">
               {backButtonText}
             </Button>
           </ActionListItem>
           <ActionListItem>
             {isCloneMethod ? (
-              <Button onClick={goToNextStep} variant="primary">
+              <Button data-test="wizard-next-button" onClick={goToNextStep} variant="primary">
                 {nextButtonText}
               </Button>
             ) : (
@@ -54,6 +53,7 @@ const DeploymentDetailsStepFooter: FC = () => {
           <ActionListItem>
             <Button
               className={classnames({ 'pf-v6-u-mr-4xl': hasOLSConsole })}
+              data-test="wizard-cancel-button"
               onClick={closeWizard}
               variant="link"
             >
