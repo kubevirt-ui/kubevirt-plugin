@@ -283,6 +283,56 @@ export async function createBridgeNetworkAttachmentDefinition(
 }
 
 /**
+ * Appends a bridge Multus NIC to a VirtualMachine spec.
+ * Safe to call on a running VM (hot-plug add); the UI then lists the interface for NAD edit.
+ */
+export async function attachBridgeNetworkInterface(
+  client: RequestContextClient,
+  vmName: string,
+  namespace: string,
+  nicName: string,
+  nadName: string,
+): Promise<void> {
+  await client.patchVirtualMachine(namespace, vmName, [
+    {
+      op: 'add',
+      path: '/spec/template/spec/domain/devices/interfaces/-',
+      value: {
+        bridge: {},
+        model: 'virtio',
+        name: nicName,
+      },
+    },
+    {
+      op: 'add',
+      path: '/spec/template/spec/networks/-',
+      value: {
+        multus: { networkName: nadName },
+        name: nicName,
+      },
+    },
+  ]);
+}
+
+export function getVmMultusNetworkName(
+  vm: KubernetesResource | null,
+  nicName: string,
+): string | undefined {
+  const spec = vm?.spec as
+    | {
+        template?: {
+          spec?: {
+            networks?: Array<{ name?: string; multus?: { networkName?: string } }>;
+          };
+        };
+      }
+    | undefined;
+
+  return spec?.template?.spec?.networks?.find((network) => network.name === nicName)?.multus
+    ?.networkName;
+}
+
+/**
  * Sets project-level KubeVirt network annotations on a Namespace.
  * Always writes both annotation keys; omitted/undefined values are cleared via
  * JSON merge-patch nulls so configs can be replaced cleanly.

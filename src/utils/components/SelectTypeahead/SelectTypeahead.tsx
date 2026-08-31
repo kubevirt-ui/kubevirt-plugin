@@ -70,6 +70,7 @@ const SelectTypeahead: FC<SelectTypeaheadProps> = ({
       <TextInputGroup isPlain>
         <TextInputGroupMain
           autoComplete="off"
+          data-test={dataTestId ? `${dataTestId}-input` : undefined}
           icon={<SearchIcon />}
           innerRef={textInputRef}
           onChange={onTextInputChange}

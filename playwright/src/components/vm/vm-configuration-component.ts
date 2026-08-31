@@ -15,7 +15,7 @@ export default class VmConfigurationComponent extends PageCommons {
   private readonly _headlessCheckbox = this.locator('input[id="headless-mode"]');
 
   private readonly _isTextPendingChangesTextRestartRequired = this.locator(
-    ':is(:text("Pending changes"), :text("Restart required"))',
+    ':is(:text("Pending changes"), :text("Restart required"), :text("Migration required"))',
   );
 
   private readonly _restoreTemplateSettingsBtn = this.locator(

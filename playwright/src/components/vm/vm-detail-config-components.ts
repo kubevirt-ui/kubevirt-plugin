@@ -319,7 +319,7 @@ export class VirtualMachineDetailConfigurationComponent extends BaseComponent {
   private readonly _evictionStrategyElement = this.testId('eviction-strategy');
   private readonly _headlessCheckbox = this.locator('input[id="headless-mode"]');
   private readonly _isTextPendingChangesTextRestartRequired = this.locator(
-    ':is(:text("Pending changes"), :text("Restart required"))',
+    ':is(:text("Pending changes"), :text("Restart required"), :text("Migration required"))',
   );
   private readonly _restoreTemplateSettingsBtn = this.locator(
     'button:has-text("Restore template settings")',
