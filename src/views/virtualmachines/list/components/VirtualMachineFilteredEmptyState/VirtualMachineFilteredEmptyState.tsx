@@ -1,7 +1,7 @@
-import React, { FC, RefObject } from 'react';
+import React, { type FC, type RefObject } from 'react';
 import { Trans } from 'react-i18next';
 
-import { KubevirtFilterState } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
+import { type KubevirtFilterState } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   Button,
@@ -13,8 +13,7 @@ import {
   EmptyStateVariant,
 } from '@patternfly/react-core';
 import { SearchIcon } from '@patternfly/react-icons';
-
-import { buildFilterQueryString } from './utils';
+import { filtersToSearchText } from '@search/searchLanguage/filtersToSearchText';
 
 type VirtualMachineFilteredEmptyStateProps = {
   clearAllFilters: () => void;
@@ -29,7 +28,7 @@ const VirtualMachineFilteredEmptyState: FC<VirtualMachineFilteredEmptyStateProps
 }) => {
   const { t } = useKubevirtTranslation();
 
-  const queryString = buildFilterQueryString(filters);
+  const queryString = filtersToSearchText(filters, Object.keys(filters));
 
   if (!queryString) return null;
 

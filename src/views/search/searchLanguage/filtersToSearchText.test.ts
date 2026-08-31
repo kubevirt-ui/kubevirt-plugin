@@ -1,4 +1,4 @@
-import { KubevirtFilterState } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
+import { type KubevirtFilterState } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 
 import { filtersToSearchText } from './filtersToSearchText';
 
@@ -50,6 +50,12 @@ describe('filtersToSearchText', () => {
       expect(filtersToSearchText(f({ status: ['Running', '!Stopped'] }), ['status'])).toBe(
         'status:Running -status:Stopped',
       );
+    });
+
+    it('should keep mixed include and exclude as separate search-language tokens', () => {
+      expect(
+        filtersToSearchText(f({ os: ['RHEL', '!Fedora'], status: ['!Stopped'] }), ['status', 'os']),
+      ).toBe('-status:Stopped os:RHEL -os:Fedora');
     });
   });
 
