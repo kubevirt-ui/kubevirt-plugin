@@ -246,7 +246,7 @@ export const createVirtualMachineActionFactory = (t: TFunction) => ({
     confirmVMActions: boolean,
   ): ActionDropdownItemType => {
     return {
-      accessReview: asAccessReview(VirtualMachineSubresourcesModel, vm, 'update', 'pause'),
+      accessReview: asAccessReview(VirtualMachineInstanceSubresourcesModel, vm, 'update', 'pause'),
       cta: () =>
         confirmVMActions
           ? createModal(({ isOpen, onClose }) => (
@@ -270,12 +270,7 @@ export const createVirtualMachineActionFactory = (t: TFunction) => ({
     confirmVMActions: boolean,
   ): ActionDropdownItemType => {
     return {
-      accessReview: asAccessReview(
-        VirtualMachineInstanceSubresourcesModel,
-        vm,
-        'update',
-        'restart',
-      ),
+      accessReview: asAccessReview(VirtualMachineSubresourcesModel, vm, 'update', 'restart'),
       cta: () =>
         confirmVMActions
           ? createModal(({ isOpen, onClose }) => (
