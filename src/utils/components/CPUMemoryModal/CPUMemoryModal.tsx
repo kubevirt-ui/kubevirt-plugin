@@ -9,6 +9,7 @@ import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getLabel } from '@kubevirt-utils/resources/shared';
 import { getCPU, getMemory, VM_TEMPLATE_ANNOTATION } from '@kubevirt-utils/resources/vm';
+import { type QuantityUnit } from '@kubevirt-utils/utils/unitConstants';
 import { toQuantity } from '@kubevirt-utils/utils/units';
 import { ensurePath } from '@kubevirt-utils/utils/utils';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
@@ -53,9 +54,9 @@ const CPUMemoryModal: FC<CPUMemoryModalProps> = ({
 
   const memoryQuantity = toQuantity(getMemory(vm));
   const { unit, value } = memoryQuantity ?? {};
-  const [memory, setMemory] = useState<number>(value ?? undefined);
-  const [memoryUnit, setMemoryUnit] = useState<string>(unit ?? undefined);
-  const [cpu, setCPU] = useState<V1CPU>(() => getCPU(vm));
+  const [memory, setMemory] = useState<number | undefined>(value);
+  const [memoryUnit, setMemoryUnit] = useState<QuantityUnit | undefined>(unit);
+  const [cpu, setCPU] = useState<undefined | V1CPU>(() => getCPU(vm));
 
   const {
     data: templateDefaultsData,
@@ -75,16 +76,24 @@ const CPUMemoryModal: FC<CPUMemoryModalProps> = ({
 
   const handleSubmit = async (): Promise<void> => {
     setUpdateInProcess(true);
-    setUpdateError(null);
+    setUpdateError(undefined);
 
     const updatedVM = produce<V1VirtualMachine>(vm, (vmDraft: V1VirtualMachine) => {
-      ensurePath(vmDraft, [
-        'spec.template.spec.domain.cpu',
-        'spec.template.spec.domain.memory.guest',
-      ]);
+      if (cpu) {
+        ensurePath(vmDraft, 'spec.template.spec.domain.cpu');
+        const domain = vmDraft.spec?.template?.spec?.domain;
+        if (domain) {
+          domain.cpu = cpu;
+        }
+      }
 
-      vmDraft.spec.template.spec.domain.cpu = cpu;
-      vmDraft.spec.template.spec.domain.memory.guest = `${memory}${memoryUnit || ''}`;
+      if (memory && memoryUnit) {
+        ensurePath(vmDraft, 'spec.template.spec.domain.memory.guest');
+        const domainMemory = vmDraft.spec?.template?.spec?.domain?.memory;
+        if (domainMemory) {
+          domainMemory.guest = `${memory}${memoryUnit}`;
+        }
+      }
     });
 
     try {
@@ -94,7 +103,7 @@ const CPUMemoryModal: FC<CPUMemoryModalProps> = ({
       onClose();
     } catch (error) {
       setUpdateInProcess(false);
-      setUpdateError(error.message);
+      setUpdateError((error as Error)?.message ?? t('An error occurred while updating the VM'));
     }
   };
 
@@ -143,7 +152,7 @@ const CPUMemoryModal: FC<CPUMemoryModalProps> = ({
           isDisabled={
             !templateName || !defaultsLoaded || !defaultCpu || !defaultMemory || !!defaultLoadError
           }
-          isLoading={templateName && !defaultsLoaded}
+          isLoading={!!templateName && !defaultsLoaded}
           key="default"
           onClick={() => {
             setCPU(defaultCpu);

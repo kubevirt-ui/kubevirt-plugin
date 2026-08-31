@@ -3,25 +3,25 @@ import React, { type Dispatch, type FC, type SetStateAction, useState } from 're
 import { type V1CPU } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import VCPUInput from '@kubevirt-utils/components/CPUMemoryModal/components/CPUInput/components/vCPUInput/VCPUInput';
 import {
-  convertTopologyToVCPUs,
   CPUInputType,
-  formatVCPUsAsSockets,
   getInitialCPUInputType,
 } from '@kubevirt-utils/components/CPUMemoryModal/components/CPUInput/utils/utils';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Radio, Title, TitleSizes } from '@patternfly/react-core';
+import { Button, ButtonVariant, Flex, Radio, Title, TitleSizes } from '@patternfly/react-core';
+import { PlusCircleIcon } from '@patternfly/react-icons';
 
 import CPUTopologyInput from './components/CPUTopologyInput/CPUTopologyInput';
 import CPUHelperText from './components/vCPUInput/components/CPUHelperText/CPUHelperText';
+import { DEFAULT_CPU } from './constants';
 
 import './CPUInput.scss';
 
 type CPUInputProps = {
   cpuLimits: Record<string, number>;
-  currentCPU: V1CPU;
-  setUserEnteredCPU: Dispatch<SetStateAction<V1CPU>>;
-  userEnteredCPU: V1CPU;
+  currentCPU: undefined | V1CPU;
+  setUserEnteredCPU: Dispatch<SetStateAction<undefined | V1CPU>>;
+  userEnteredCPU: undefined | V1CPU;
 };
 
 const CPUInput: FC<CPUInputProps> = ({
@@ -51,48 +51,63 @@ const CPUInput: FC<CPUInputProps> = ({
           helpIconClassName="pf-v6-u-ml-sm"
         />
       </Title>
-      <Radio
-        body={
-          <VCPUInput
-            cpu={formatVCPUsAsSockets(userEnteredCPU)}
-            isDisabled={selectedRadioOption !== CPUInputType.editVCPU || isComplexTopology}
-            setCPU={setUserEnteredCPU}
-          />
-        }
-        id={CPUInputType.editVCPU}
-        isChecked={selectedRadioOption === CPUInputType.editVCPU}
-        isDisabled={isComplexTopology}
-        isLabelWrapped
-        name={radioInputName}
-        onClick={() => {
-          if (!isComplexTopology) {
-            setSelectedRadioOption(CPUInputType.editVCPU);
-          }
-        }}
-      />
-      <CPUHelperText
-        cpu={userEnteredCPU}
-        hide={userEnteredCPU?.sockets === convertTopologyToVCPUs(currentCPU)}
-      />
-      <Radio
-        body={
-          <CPUTopologyInput
+      {userEnteredCPU ? (
+        <>
+          <Flex alignItems={{ default: 'alignItemsCenter' }}>
+            <Radio
+              id={CPUInputType.editVCPU}
+              isChecked={selectedRadioOption === CPUInputType.editVCPU}
+              isDisabled={isComplexTopology}
+              isLabelWrapped
+              label={t('vCPU')}
+              name={radioInputName}
+              onClick={() => {
+                if (!isComplexTopology) {
+                  setSelectedRadioOption(CPUInputType.editVCPU);
+                }
+              }}
+            />
+            <VCPUInput
+              cpu={userEnteredCPU}
+              isDisabled={selectedRadioOption !== CPUInputType.editVCPU || isComplexTopology}
+              setCPU={setUserEnteredCPU}
+            />
+          </Flex>
+          <CPUHelperText
             cpu={userEnteredCPU}
-            cpuLimits={cpuLimits}
-            hide={selectedRadioOption !== CPUInputType.editTopologyManually}
-            isDisabled={selectedRadioOption !== CPUInputType.editTopologyManually}
-            setCPU={setUserEnteredCPU}
+            hide={userEnteredCPU.sockets === currentCPU?.sockets}
           />
-        }
-        className="cpu-input__edit-topology-manually"
-        id={CPUInputType.editTopologyManually}
-        isChecked={selectedRadioOption === CPUInputType.editTopologyManually}
-        label={<>{t('Set CPU topology manually')}</>}
-        name={radioInputName}
-        onClick={() => {
-          setSelectedRadioOption(CPUInputType.editTopologyManually);
-        }}
-      />
+          <Radio
+            body={
+              <CPUTopologyInput
+                cpu={userEnteredCPU}
+                cpuLimits={cpuLimits}
+                hide={selectedRadioOption !== CPUInputType.editTopologyManually}
+                isDisabled={selectedRadioOption !== CPUInputType.editTopologyManually}
+                setCPU={setUserEnteredCPU}
+              />
+            }
+            className="cpu-input__edit-topology-manually"
+            id={CPUInputType.editTopologyManually}
+            isChecked={selectedRadioOption === CPUInputType.editTopologyManually}
+            label={t('Set CPU topology manually')}
+            name={radioInputName}
+            onClick={() => {
+              setSelectedRadioOption(CPUInputType.editTopologyManually);
+            }}
+          />
+        </>
+      ) : (
+        <Button
+          icon={<PlusCircleIcon />}
+          onClick={() => {
+            setUserEnteredCPU(DEFAULT_CPU);
+          }}
+          variant={ButtonVariant.link}
+        >
+          {t('Add CPU')}
+        </Button>
+      )}
     </div>
   );
 };

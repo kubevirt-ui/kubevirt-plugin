@@ -1,4 +1,4 @@
-import React, { type FC, useEffect, useMemo, useState } from 'react';
+import React, { type FC, useState } from 'react';
 import produce from 'immer';
 
 import { type V1CPU } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -7,8 +7,7 @@ import { getCPULimitsFromTemplate } from '@kubevirt-utils/components/CPUMemoryMo
 import MemoryInput from '@kubevirt-utils/components/CPUMemoryModal/components/MemoryInput/MemoryInput';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getTemplateVirtualMachineObject, type Template } from '@kubevirt-utils/resources/template';
-import { getCPU, getMemory } from '@kubevirt-utils/resources/vm';
-import { toQuantity } from '@kubevirt-utils/utils/units';
+import { type QuantityUnit } from '@kubevirt-utils/utils/unitConstants';
 import { ensurePath } from '@kubevirt-utils/utils/utils';
 import {
   Alert,
@@ -36,31 +35,41 @@ type CPUMemoryModalProps = {
 
 const CPUMemoryModal: FC<CPUMemoryModalProps> = ({ isOpen, onClose, onSubmit, template }) => {
   const { t } = useKubevirtTranslation();
-  const vm = useMemo(() => getTemplateVirtualMachineObject(template), [template]);
 
   const { isTemplateEditable } = useEditTemplateAccessReview(template);
 
-  const [cpu, setCPU] = useState<V1CPU>(() => getCPU(vm));
-  const [memory, setMemory] = useState<number>();
-  const [memoryUnit, setMemoryUnit] = useState<string>();
+  const { defaultCPU, defaultMemory } = getDefaultCPUMemoryValues(template);
+  const { unit: defaultMemoryUnit, value: defaultMemorySize } = defaultMemory ?? {};
+
+  const [cpu, setCPU] = useState<undefined | V1CPU>(defaultCPU);
+  const [memory, setMemory] = useState<number | undefined>(defaultMemorySize);
+  const [memoryUnit, setMemoryUnit] = useState<QuantityUnit | undefined>(defaultMemoryUnit);
 
   const [updateInProcess, setUpdateInProcess] = useState<boolean>(false);
   const [updateError, setUpdateError] = useState<string>();
 
   const handleSubmit = async (): Promise<void> => {
     setUpdateInProcess(true);
-    setUpdateError(null);
+    setUpdateError(undefined);
 
     const updatedTemplate = produce<Template>(template, (templateDraft: Template) => {
       const draftVM = getTemplateVirtualMachineObject(templateDraft);
 
-      ensurePath(draftVM, [
-        'spec.template.spec.domain.cpu',
-        'spec.template.spec.domain.memory.guest',
-      ]);
+      if (cpu) {
+        ensurePath(draftVM, 'spec.template.spec.domain.cpu');
+        const domain = draftVM.spec?.template?.spec?.domain;
+        if (domain) {
+          domain.cpu = cpu;
+        }
+      }
 
-      draftVM.spec.template.spec.domain.cpu = cpu;
-      draftVM.spec.template.spec.domain.memory.guest = `${memory}${memoryUnit ?? ''}`;
+      if (memory && memoryUnit) {
+        ensurePath(draftVM, 'spec.template.spec.domain.memory.guest');
+        const domainMemory = draftVM.spec?.template?.spec?.domain?.memory;
+        if (domainMemory) {
+          domainMemory.guest = `${memory}${memoryUnit}`;
+        }
+      }
     });
 
     try {
@@ -70,24 +79,13 @@ const CPUMemoryModal: FC<CPUMemoryModalProps> = ({ isOpen, onClose, onSubmit, te
       onClose();
     } catch (error) {
       setUpdateInProcess(false);
-      setUpdateError(error.message);
+      setUpdateError(
+        (error as Error)?.message ?? t('An error occurred while updating the template'),
+      );
     }
   };
 
-  const { defaultCPU, defaultMemory } = getDefaultCPUMemoryValues(template);
-  const { defaultMemorySize, defaultMemoryUnit } = defaultMemory;
-
   const cpuLimits = getCPULimitsFromTemplate(template);
-
-  useEffect(() => {
-    if (vm?.metadata) {
-      const memoryQuantity = toQuantity(getMemory(vm));
-      const { unit: memUnit, value: memSize } = memoryQuantity ?? {};
-      setMemoryUnit(memUnit);
-      setMemory(memSize);
-      setCPU(getCPU(vm));
-    }
-  }, [vm]);
 
   return (
     <Modal
@@ -131,7 +129,7 @@ const CPUMemoryModal: FC<CPUMemoryModalProps> = ({ isOpen, onClose, onSubmit, te
         </Button>
         <Button
           data-test="restore-button"
-          isDisabled={isTemplateEditable}
+          isDisabled={!isTemplateEditable || updateInProcess}
           key="default"
           onClick={() => {
             setCPU(defaultCPU);

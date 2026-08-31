@@ -1,6 +1,6 @@
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
-import { V1CPU } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1CPU } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { PopoverPosition } from '@patternfly/react-core';
@@ -13,10 +13,9 @@ type CPUTopologyHelperTextProps = {
 
 const CPUTopologyHelperText: FC<CPUTopologyHelperTextProps> = ({ cpu }) => {
   const { t } = useKubevirtTranslation();
-  const { cores, sockets, threads } = cpu || {};
+  const { cores, sockets, threads } = cpu ?? {};
 
-  // VMs migrated from vSphere may not have spec.template.spec.domain.cpu.threads set
-  const totalCPU = cores * sockets * (threads || 1);
+  const totalCPU = (cores ?? 1) * (sockets ?? 1) * (threads ?? 1);
 
   return (
     <div className="cpu-topology-helper-text">

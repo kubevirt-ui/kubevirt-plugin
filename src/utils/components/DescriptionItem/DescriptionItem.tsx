@@ -1,10 +1,10 @@
-import React, { FC, ReactNode, useMemo } from 'react';
+import React, { type FC, type ReactNode, useMemo } from 'react';
 import classNames from 'classnames';
 
 import { DescriptionItemHeader } from '@kubevirt-utils/components/DescriptionItem/DescriptionItemHeader';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { OLSPromptType } from '@lightspeed/utils/prompts';
+import { type OLSPromptType } from '@lightspeed/utils/prompts';
 import {
   Button,
   ButtonVariant,
@@ -26,7 +26,7 @@ type DescriptionItemProps = {
   breadcrumb?: string;
   className?: string;
   'data-test'?: string;
-  descriptionData: any;
+  descriptionData: ReactNode;
   descriptionHeader?: ReactNode;
   isDisabled?: boolean;
   isEdit?: boolean;
@@ -100,10 +100,10 @@ const DescriptionItem: FC<DescriptionItemProps> = ({
     <DescriptionListGroup className={className}>
       <DescriptionListTermHelpText>
         <Flex
+          className={classNames({ 'pf-v6-u-w-100': isLabelEditor })}
           justifyContent={{
             default: isLabelEditor ? 'justifyContentSpaceBetween' : 'justifyContentFlexStart',
           }}
-          className={classNames({ 'pf-v6-u-w-100': isLabelEditor })}
         >
           {(bodyContent ||
             breadcrumb ||

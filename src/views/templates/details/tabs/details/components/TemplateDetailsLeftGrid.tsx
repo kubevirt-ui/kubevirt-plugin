@@ -17,9 +17,9 @@ import {
 } from '@kubevirt-utils/resources/template';
 import { getMachineType } from '@kubevirt-utils/resources/vm';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
-import { getOperatingSystemName } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { DescriptionList } from '@patternfly/react-core';
+import { getOSName } from '@virtualmachines/list/filters/getOSFilter';
 
 import { type TemplateDetailsGridProps } from '../TemplateDetailsPage';
 
@@ -49,7 +49,7 @@ const TemplateDetailsLeftGrid: FC<TemplateDetailsGridProps> = ({ template }) => 
       <DisplayName editable={isTemplateEditable} template={template} />
       <DescriptionItemDescription editable={isTemplateEditable} model={model} resource={template} />
       <DescriptionItem
-        descriptionData={getOperatingSystemName(template)}
+        descriptionData={getOSName(getTemplateVirtualMachineObject(template))}
         descriptionHeader={t('Operating system')}
       />
       <WorkloadProfile editable={isTemplateEditable} template={template} />

@@ -1,12 +1,12 @@
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
-import { V1CPU } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1CPU } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
 import { CpuMemHelperTextResources } from './utils/utils';
 
 type CPUDescriptionProps = {
-  cpu: V1CPU;
+  cpu?: V1CPU;
   helperTextResource?: string;
 };
 
@@ -15,7 +15,7 @@ const CPUDescription: FC<CPUDescriptionProps> = ({
   helperTextResource = CpuMemHelperTextResources.ActualVM,
 }) => {
   const { t } = useKubevirtTranslation();
-  const { cores, sockets, threads } = cpu || {};
+  const { cores, sockets, threads } = cpu ?? {};
 
   return (
     <>

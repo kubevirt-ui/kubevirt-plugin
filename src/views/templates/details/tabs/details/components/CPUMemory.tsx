@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 import { getVirtualMachineTemplatesCPUMemoryText } from 'src/views/templates/utils/utils';
 
 import CPUDescription from '@kubevirt-utils/components/CPUDescription/CPUDescription';
@@ -8,7 +8,7 @@ import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   getTemplateVirtualMachineCPU,
-  Template,
+  type Template,
   updateTemplate,
 } from '@kubevirt-utils/resources/template';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
@@ -25,8 +25,8 @@ const CPUMemory: FC<CPUMemoryProps> = ({ editable, template }) => {
   const CPUMemData = getVirtualMachineTemplatesCPUMemoryText(template, t);
   const { createModal } = useModal();
 
-  const onEditClick = () =>
-    createModal(({ isOpen, onClose }) => (
+  const onEditClick = (): void =>
+    createModal?.(({ isOpen, onClose }) => (
       <CPUMemoryModal
         isOpen={isOpen}
         onClose={onClose}
