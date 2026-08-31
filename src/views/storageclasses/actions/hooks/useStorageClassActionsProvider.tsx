@@ -1,20 +1,22 @@
-/* eslint-disable */
 import { useMemo } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { modelToGroupVersionKind, modelToRef, StorageClassModel } from '@kubevirt-utils/models';
 import { asAccessReview } from '@kubevirt-utils/resources/shared';
 import {
-  Action,
-  ExtensionHook,
+  type Action,
+  type ExtensionHook,
   k8sPatch,
-  K8sResourceCommon,
-  K8sResourceKind,
+  type K8sResourceCommon,
+  type K8sResourceKind,
   useK8sModel,
   useK8sWatchResource,
 } from '@openshift-console/dynamic-plugin-sdk';
 
 import { DEFAULT_VIRT_STORAGE_CLASS_ANNOTATION } from '../../constants';
+
+const hasDefaultVirtAnnotation = (resource: K8sResourceCommon): boolean =>
+  resource.metadata?.annotations?.[DEFAULT_VIRT_STORAGE_CLASS_ANNOTATION] === 'true';
 
 const useStorageClassActionsProvider: ExtensionHook<Action[], K8sResourceKind> = (storageClass) => {
   const { t } = useKubevirtTranslation();
@@ -24,9 +26,6 @@ const useStorageClassActionsProvider: ExtensionHook<Action[], K8sResourceKind> =
     groupVersionKind: modelToGroupVersionKind(StorageClassModel),
     isList: true,
   });
-
-  const hasDefaultVirtAnnotation = (sc: K8sResourceCommon) =>
-    sc.metadata?.annotations?.[DEFAULT_VIRT_STORAGE_CLASS_ANNOTATION] === 'true';
 
   const existingDefaultVirtStorageClass = useMemo(
     () => storageClasses.find(hasDefaultVirtAnnotation),
@@ -40,47 +39,46 @@ const useStorageClassActionsProvider: ExtensionHook<Action[], K8sResourceKind> =
       {
         accessReview: asAccessReview(StorageClassModel, storageClass, 'patch'),
         cta: async () => {
-          try {
+          await k8sPatch({
+            data: [
+              ...(!storageClass?.metadata?.annotations
+                ? [
+                    {
+                      op: 'add',
+                      path: '/metadata/annotations',
+                      value: {},
+                    },
+                  ]
+                : []),
+              {
+                op: 'replace',
+                path: `/metadata/annotations/${DEFAULT_VIRT_STORAGE_CLASS_ANNOTATION.replace(
+                  '/',
+                  '~1',
+                )}`,
+                value: 'true',
+              },
+            ],
+            model: StorageClassModel,
+            resource: storageClass,
+          });
+
+          if (existingDefaultVirtStorageClass) {
             await k8sPatch({
               data: [
-                ...(!storageClass?.metadata?.annotations
-                  ? [
-                      {
-                        op: 'add',
-                        path: '/metadata/annotations',
-                        value: {},
-                      },
-                    ]
-                  : []),
                 {
                   op: 'replace',
                   path: `/metadata/annotations/${DEFAULT_VIRT_STORAGE_CLASS_ANNOTATION.replace(
                     '/',
                     '~1',
                   )}`,
-                  value: 'true',
+                  value: 'false',
                 },
               ],
               model: StorageClassModel,
-              resource: storageClass,
+              resource: existingDefaultVirtStorageClass,
             });
-
-            if (existingDefaultVirtStorageClass)
-              await k8sPatch({
-                data: [
-                  {
-                    op: 'replace',
-                    path: `/metadata/annotations/${DEFAULT_VIRT_STORAGE_CLASS_ANNOTATION.replace(
-                      '/',
-                      '~1',
-                    )}`,
-                    value: 'false',
-                  },
-                ],
-                model: StorageClassModel,
-                resource: existingDefaultVirtStorageClass,
-              });
-          } catch (error) {}
+          }
         },
         disabled: isDefaultVirtStorageClass,
         disabledTooltip: isDefaultVirtStorageClass

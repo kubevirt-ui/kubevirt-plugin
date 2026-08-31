@@ -25,14 +25,14 @@ export const requirementFromString = (inputString: string): Requirement | undefi
 
   if (SELECTOR_OPERATOR_NEGATED_KEY_REGEX.test(string)) {
     return {
-      key: string.split(/!\s*/)[1],
+      key: string.split('!')[1].trim(),
       operator: Operator.DoesNotExist,
       values: [],
     };
   }
 
   if (SELECTOR_OPERATOR_EQUALS_REGEX.test(string)) {
-    const [key, value] = string.split(/\s*==?\s*/);
+    const [key, value] = string.split(/==?/).map((part) => part.trim());
 
     return {
       key,
@@ -42,7 +42,7 @@ export const requirementFromString = (inputString: string): Requirement | undefi
   }
 
   if (SELECTOR_OPERATOR_NOT_EQUALS_REGEX.test(string)) {
-    const [key, value] = string.split(/\s*!=\s*/);
+    const [key, value] = string.split('!=').map((part) => part.trim());
 
     return {
       key,
@@ -52,7 +52,10 @@ export const requirementFromString = (inputString: string): Requirement | undefi
   }
 
   if (SELECTOR_OPERATOR_IN_REGEX.test(string)) {
-    const [key, valuesString] = string.split(/\s+in\s+/);
+    const inKeyword = ' in ';
+    const inIndex = string.search(/ in /i);
+    const key = string.substring(0, inIndex).trim();
+    const valuesString = string.substring(inIndex + inKeyword.length).trim();
     const values = valuesString
       .slice(1, -1)
       .split(',')
@@ -66,7 +69,10 @@ export const requirementFromString = (inputString: string): Requirement | undefi
   }
 
   if (SELECTOR_OPERATOR_NOT_IN_REGEX.test(string)) {
-    const [key, valuesString] = string.split(/\s+notin\s+/);
+    const notinKeyword = ' notin ';
+    const notinIndex = string.search(/ notin /i);
+    const key = string.substring(0, notinIndex).trim();
+    const valuesString = string.substring(notinIndex + notinKeyword.length).trim();
     const values = valuesString
       .slice(1, -1)
       .split(',')
@@ -80,7 +86,7 @@ export const requirementFromString = (inputString: string): Requirement | undefi
   }
 
   if (SELECTOR_OPERATOR_GREATER_THAN_REGEX.test(string)) {
-    const [key, value] = string.split(/\s+>\s+/);
+    const [key, value] = string.split('>').map((part) => part.trim());
     return {
       key,
       operator: Operator.GreaterThan,
@@ -89,7 +95,7 @@ export const requirementFromString = (inputString: string): Requirement | undefi
   }
 
   if (SELECTOR_OPERATOR_LESS_THAN_REGEX.test(string)) {
-    const [key, value] = string.split(/\s+<\s+/);
+    const [key, value] = string.split('<').map((part) => part.trim());
     return {
       key,
       operator: Operator.LessThan,

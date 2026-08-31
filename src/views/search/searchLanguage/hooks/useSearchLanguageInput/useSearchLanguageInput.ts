@@ -1,5 +1,4 @@
-/* eslint-disable */
-import { FormEvent, KeyboardEvent, useCallback, useMemo, useState } from 'react';
+import { type FormEvent, type KeyboardEvent, useCallback, useMemo, useState } from 'react';
 
 import { logVMSearchLanguageUsed } from '@kubevirt-utils/extensions/telemetry/dashboard';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -11,13 +10,20 @@ import { validateAndBuildFilterState } from '@search/searchLanguage/validateAndB
 import { updateFilterState } from '../useOnCommitText/updateFilterState';
 import useSearchValidationToast from '../useSearchValidationToast/useSearchValidationToast';
 import useTokenOrder from '../useTokenOrder/useTokenOrder';
-
 import {
-  CommitTextOptions,
-  UseSearchLanguageInputProps,
-  UseSearchLanguageInputResult,
+  type CommitTextOptions,
+  type UseSearchLanguageInputProps,
+  type UseSearchLanguageInputResult,
 } from './types';
 import useDraftInput from './useDraftInput';
+
+const trimTrailingCommas = (text: string): string => {
+  let end = text.length;
+  while (end > 0 && text[end - 1] === ',') {
+    end--;
+  }
+  return end < text.length ? text.slice(0, end) : text;
+};
 
 export const useSearchLanguageInput = ({
   addRecentSearch,
@@ -50,11 +56,13 @@ export const useSearchLanguageInput = ({
 
   const onCommitText = useCallback(
     (text: string, options?: CommitTextOptions) => {
-      const trimmed = text.trim().replace(/,+$/, '');
+      const trimmed = trimTrailingCommas(text.trim());
 
       if (!trimmed) {
         onClear();
-        if (options?.closeDropdown) onCloseDropdown();
+        if (options?.closeDropdown) {
+          onCloseDropdown();
+        }
         return;
       }
 
@@ -109,7 +117,9 @@ export const useSearchLanguageInput = ({
   const onChange = useCallback(
     (_event: FormEvent<HTMLInputElement>, value: string) => {
       if (value.endsWith(KeyTypes.Space) && value.trim()) {
-        if (isIncompleteToken(getLastToken(value.trim()))) return;
+        if (isIncompleteToken(getLastToken(value.trim()))) {
+          return;
+        }
         onCommitText(value, { addTrailingSpace: true });
       } else {
         setDraftText(value);
@@ -128,7 +138,9 @@ export const useSearchLanguageInput = ({
 
       if (event.key === KeyTypes.Enter) {
         event.preventDefault();
-        if (isIncompleteToken(getLastToken(displayText))) return;
+        if (isIncompleteToken(getLastToken(displayText))) {
+          return;
+        }
         onCommitText(displayText, { closeDropdown: true });
       }
     },

@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type ComponentType, type FC } from 'react';
 
 import {
   modelToGroupVersionKind,
@@ -25,9 +24,9 @@ import { Progress, ProgressMeasureLocation, Tooltip } from '@patternfly/react-co
 
 import MigrationPolicyTooltip from './components/MigrationPolicyTooltip/MigrationPolicyTooltip';
 import useMigrationProgress from './hooks/useMigrationProgress';
-import { getStatusIcon } from './utils/statuses';
-import { MigrationTableDataLayout } from './utils/utils';
 import MigrationActionsDropdown from './MigrationActionsDropdown';
+import { getStatusIcon } from './utils/statuses';
+import { type MigrationTableDataLayout } from './utils/utils';
 
 type CellProps = {
   row: MigrationTableDataLayout;
@@ -79,17 +78,16 @@ export const NamespaceCell: FC<CellProps> = ({ row }) => {
 export const StatusCell: FC<CellProps> = ({ row }) => {
   const { vmim, vmiObj } = row;
   const migrationPhase = getMigrationPhase(vmim);
-  const StatusIcon = getStatusIcon(migrationPhase);
+  const StatusIcon = getStatusIcon(migrationPhase) as ComponentType;
   const showTooltip =
     migrationPhase === vmimStatuses.Failed || migrationPhase === vmimStatuses.Succeeded;
   const endTimestamp = vmiObj?.status?.migrationState?.endTimestamp;
+  const timestampSuffix = endTimestamp ? ` ${endTimestamp}` : '';
+  const tooltipContent = `${migrationPhase}${timestampSuffix}`;
 
   return (
     <span data-test={`migration-status-${getName(vmim)}`}>
-      <Tooltip
-        content={`${migrationPhase}${endTimestamp ? ` ${endTimestamp}` : ''}`}
-        hidden={!showTooltip}
-      >
+      <Tooltip content={tooltipContent} hidden={!showTooltip}>
         <span tabIndex={showTooltip ? 0 : undefined}>
           <GenericStatus Icon={StatusIcon} title={migrationPhase} />
         </span>
@@ -121,24 +119,24 @@ export const ProgressCell: FC<CellProps> = ({ row }) => {
 
 export const SourceNodeCell: FC<CellProps> = ({ row }) => {
   const { vmim, vmiObj } = row;
-  const cluster = getCluster(vmiObj) ?? getCluster(vmim) ?? '';
-  const sourceNode = getMigrationSourceNode(vmim);
-
   return (
     <span data-test={`migration-source-${getName(vmim)}`}>
-      <NodeLink cluster={cluster} nodeName={sourceNode} />
+      <NodeLink
+        cluster={getCluster(vmiObj) ?? getCluster(vmim) ?? ''}
+        nodeName={getMigrationSourceNode(vmim)}
+      />
     </span>
   );
 };
 
 export const TargetNodeCell: FC<CellProps> = ({ row }) => {
   const { vmim, vmiObj } = row;
-  const cluster = getCluster(vmiObj) ?? getCluster(vmim) ?? '';
-  const targetNode = getMigrationTargetNode(vmim);
-
   return (
     <span data-test={`migration-target-${getName(vmim)}`}>
-      <NodeLink cluster={cluster} nodeName={targetNode} />
+      <NodeLink
+        cluster={getCluster(vmiObj) ?? getCluster(vmim) ?? ''}
+        nodeName={getMigrationTargetNode(vmim)}
+      />
     </span>
   );
 };
@@ -149,28 +147,22 @@ export const MigrationPolicyCell: FC<CellProps> = ({ row }) => (
   </span>
 );
 
-export const VMIMNameCell: FC<CellProps> = ({ row }) => {
-  const { vmim, vmiObj } = row;
-  const cluster = getCluster(vmiObj) ?? getCluster(vmim);
-
-  return (
-    <span data-test={`migration-vmim-name-${getName(vmim)}`}>
-      <MulticlusterResourceLink
-        cluster={cluster}
-        groupVersionKind={VirtualMachineInstanceMigrationModelGroupVersionKind}
-        name={getName(vmim)}
-        namespace={getNamespace(vmim)}
-      />
-    </span>
-  );
-};
+export const VMIMNameCell: FC<CellProps> = ({ row }) => (
+  <span data-test={`migration-vmim-name-${getName(row.vmim)}`}>
+    <MulticlusterResourceLink
+      cluster={getCluster(row.vmiObj) ?? getCluster(row.vmim)}
+      groupVersionKind={VirtualMachineInstanceMigrationModelGroupVersionKind}
+      name={getName(row.vmim)}
+      namespace={getNamespace(row.vmim)}
+    />
+  </span>
+);
 
 export const CreatedCell: FC<CellProps> = ({ row }) => (
   <span data-test={`migration-created-${getName(row.vmim)}`}>
     <Timestamp timestamp={row.vmim?.metadata?.creationTimestamp} />
   </span>
 );
-
 export const ActionsCell: FC<CellProps> = ({ row }) => (
   <MigrationActionsDropdown isKebabToggle vmim={row.vmim} />
 );

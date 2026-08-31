@@ -6,7 +6,7 @@ import {
   SecretModel,
 } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { getName } from '@kubevirt-utils/resources/shared';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { isEmpty, kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 import { checkAccess, type K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { useSettingsCluster } from '@settings/context/SettingsClusterContext';
@@ -67,7 +67,6 @@ const useSSHAuthProjects: UseSSHAuthProjects = (authKeyRows) => {
       }),
     );
 
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises -- allSettled never rejects
     Promise.allSettled(promises)
       .then((settledResults) => {
         if (cancelled) return;
@@ -90,6 +89,7 @@ const useSSHAuthProjects: UseSSHAuthProjects = (authKeyRows) => {
 
         setSelectableProjects(projectsAllowedCreateSecret);
       })
+      .catch(kubevirtConsole.error)
       .finally(() => {
         if (!cancelled) setLoading(false);
       });

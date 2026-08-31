@@ -1,65 +1,29 @@
-/* eslint-disable */
-import { TFunction } from 'i18next';
+import { type TFunction } from 'i18next';
+
+import { ConfigMapModel, JobModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { type IoK8sApiBatchV1Job } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { kubevirtK8sCreate } from '@multicluster/k8sRequests';
+import { type SimpleSelectOption } from '@patternfly/react-templates';
 
 import {
-  ClusterRoleBindingModel,
-  ConfigMapModel,
-  JobModel,
-  RoleBindingModel,
-  RoleModel,
-  ServiceAccountModel,
-} from '@kubevirt-ui-ext/kubevirt-api/console';
-import {
-  IoK8sApiBatchV1Job,
-  IoK8sApiCoreV1ConfigMap,
-  IoK8sApiRbacV1ClusterRoleBinding,
-} from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
-import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
-import { isEmpty, kubevirtConsole } from '@kubevirt-utils/utils/utils';
-import { getCluster } from '@multicluster/helpers/selectors';
-import { kubevirtK8sCreate, kubevirtK8sDelete, kubevirtK8sPatch } from '@multicluster/k8sRequests';
-import { SimpleSelectOption } from '@patternfly/react-templates';
-import { checkAccess } from '@stolostron/multicluster-sdk/lib/internal/checkAccess';
+  storageCheckupConfigMap,
+  storageCheckupJob,
+  type StorageCheckupParams,
+} from './storageResources';
 
-import {
-  CONFIGMAP_NAME,
-  CONFIGMAP_NAMESPACE,
-  generateWithNumbers,
-  isJobRunning,
-  KUBEVIRT_VM_LATENCY_LABEL,
-  STATUS_COMPLETION_TIME_STAMP,
-  STATUS_FAILURE_REASON,
-  STATUS_START_TIME_STAMP,
-  STATUS_SUCCEEDED,
-} from '../../utils/utils';
+export {
+  deleteStorageCheckup,
+  deleteStorageJob,
+  rerunStorageCheckup,
+} from './storageCheckupOperations';
+export { installOrRemoveCheckupsStoragePermissions } from './storagePermissions';
+export type { SkipTeardownOption, StorageCheckupParams } from './storageResources';
 
-import {
-  KUBEVIRT_STORAGE_LABEL_VALUE,
-  STORAGE_CHECKUP_DEFAULT_STORAGE_CLASS,
-  STORAGE_CHECKUP_LIVE_MIGRATION,
-  STORAGE_CHECKUP_PARAM_NUM_OF_VMS,
-  STORAGE_CHECKUP_PARAM_SKIP_TEARDOWN,
-  STORAGE_CHECKUP_PARAM_STORAGE_CLASS,
-  STORAGE_CHECKUP_PARAM_VMI_TIMEOUT,
-  STORAGE_CHECKUP_ROLE,
-  STORAGE_CHECKUP_SA,
-  STORAGE_CHECKUP_TIMEOUT,
-  STORAGE_CHECKUPS_BOOT_GOLDEN_IMAGE,
-  STORAGE_CHECKUPS_GOLDEN_IMAGE_NOT_UP_TO_DATE,
-  STORAGE_CHECKUPS_MISSING_VOLUME_SNAP_SHOT,
-  STORAGE_CHECKUPS_STORAGE_WITH_RWX,
-  STORAGE_CHECKUPS_UNSET_EFS_STORAGE_CLASS,
-  STORAGE_CHECKUPS_VM_HOT_PLUG_VOLUME,
-  STORAGE_CHECKUPS_VM_VOLUME_CLONE,
-  STORAGE_CHECKUPS_WITH_CLAIM_PROPERTY_SETS,
-  STORAGE_CHECKUPS_WITH_NON_RBD_STORAGE_CLASS,
-  STORAGE_CLUSTER_ROLE_BINDING,
-} from './consts';
-
-export type SkipTeardownOption = 'always' | 'never' | 'onfailure';
-
-export const getSkipTeardownLabel = (t: TFunction, value: SkipTeardownOption): string => {
-  const labels: Record<SkipTeardownOption, string> = {
+export const getSkipTeardownLabel = (
+  t: TFunction,
+  value: 'always' | 'never' | 'onfailure',
+): string => {
+  const labels: Record<string, string> = {
     always: t('Always'),
     never: t('Never'),
     onfailure: t('On failure'),
@@ -67,7 +31,11 @@ export const getSkipTeardownLabel = (t: TFunction, value: SkipTeardownOption): s
   return labels[value] ?? value;
 };
 
-const SKIP_TEARDOWN_VALUES: SkipTeardownOption[] = ['never', 'onfailure', 'always'];
+const SKIP_TEARDOWN_VALUES: Array<'always' | 'never' | 'onfailure'> = [
+  'never',
+  'onfailure',
+  'always',
+];
 
 export const getSkipTeardownOptions = (t: TFunction): SimpleSelectOption[] =>
   SKIP_TEARDOWN_VALUES.map((value) => ({ content: getSkipTeardownLabel(t, value), value }));
@@ -76,152 +44,14 @@ export const NUM_OF_VMS_MIN = 1;
 export const NUM_OF_VMS_MAX = 100;
 
 export const isNumOfVMsInvalid = (value: string): boolean => {
-  if (!value) return false;
+  if (!value) {
+    return false;
+  }
   const num = Number(value);
   return !Number.isInteger(num) || num < NUM_OF_VMS_MIN || num > NUM_OF_VMS_MAX;
 };
 
 export const parseMinutesValue = (raw: string): number => Number(raw.trim().replace(/m$/i, ''));
-
-const storageClusterRoleBinding = (namespace: string) => ({
-  apiVersion: 'rbac.authorization.k8s.io/v1',
-  kind: 'ClusterRoleBinding',
-  metadata: { name: STORAGE_CLUSTER_ROLE_BINDING },
-  roleRef: { apiGroup: 'rbac.authorization.k8s.io', kind: 'ClusterRole', name: 'cluster-reader' },
-  subjects: [{ kind: 'ServiceAccount', name: STORAGE_CHECKUP_SA, namespace }],
-});
-
-const serviceAccountResource = (namespace: string) => ({
-  metadata: { name: STORAGE_CHECKUP_SA, namespace },
-});
-
-const storageCheckupRole = (namespace: string) => ({
-  apiVersion: 'rbac.authorization.k8s.io/v1',
-  kind: 'Role',
-  metadata: { name: STORAGE_CHECKUP_ROLE, namespace },
-  rules: [
-    { apiGroups: [''], resources: ['configmaps'], verbs: ['get', 'update'] },
-    { apiGroups: ['kubevirt.io'], resources: ['virtualmachines'], verbs: ['create', 'delete'] },
-    { apiGroups: ['kubevirt.io'], resources: ['virtualmachineinstances'], verbs: ['get'] },
-    {
-      apiGroups: ['subresources.kubevirt.io'],
-      resources: ['virtualmachineinstances/addvolume', 'virtualmachineinstances/removevolume'],
-      verbs: ['update'],
-    },
-    {
-      apiGroups: ['kubevirt.io'],
-      resources: ['virtualmachineinstancemigrations'],
-      verbs: ['create'],
-    },
-    { apiGroups: ['cdi.kubevirt.io'], resources: ['datavolumes'], verbs: ['create', 'delete'] },
-    { apiGroups: [''], resources: ['persistentvolumeclaims'], verbs: ['delete'] },
-  ],
-});
-
-const storageCheckupRoleBinding = (namespace: string) => ({
-  apiVersion: 'rbac.authorization.k8s.io/v1',
-  kind: 'RoleBinding',
-  metadata: { name: STORAGE_CHECKUP_ROLE, namespace },
-  roleRef: {
-    apiGroup: 'rbac.authorization.k8s.io',
-    kind: 'Role',
-    name: STORAGE_CHECKUP_ROLE,
-  },
-  subjects: [{ kind: 'ServiceAccount', name: STORAGE_CHECKUP_SA, namespace }],
-});
-
-export type StorageCheckupParams = {
-  name: string;
-  namespace: string;
-  numOfVMs?: string;
-  skipTeardown?: SkipTeardownOption;
-  storageClass?: string;
-  timeOut: string;
-  vmiTimeout?: string;
-};
-
-const normalizeMinutes = (raw: string): string | undefined => {
-  const trimmed = raw.trim().replace(/m$/i, '');
-  const num = Number(trimmed);
-  return Number.isFinite(num) && num > 0 ? `${trimmed}m` : undefined;
-};
-
-const storageCheckupConfigMap = (params: StorageCheckupParams): IoK8sApiCoreV1ConfigMap => {
-  const { name, namespace, numOfVMs, skipTeardown, storageClass, timeOut, vmiTimeout } = params;
-  const data: Record<string, string> = {
-    [STORAGE_CHECKUP_TIMEOUT]: `${timeOut}m`,
-  };
-
-  if (storageClass) {
-    data[STORAGE_CHECKUP_PARAM_STORAGE_CLASS] = storageClass;
-  }
-
-  if (vmiTimeout) {
-    const normalized = normalizeMinutes(vmiTimeout);
-    if (normalized) {
-      data[STORAGE_CHECKUP_PARAM_VMI_TIMEOUT] = normalized;
-    }
-  }
-
-  if (numOfVMs && Number(numOfVMs) > 0) {
-    data[STORAGE_CHECKUP_PARAM_NUM_OF_VMS] = numOfVMs;
-  }
-
-  if (skipTeardown && skipTeardown !== 'never') {
-    data[STORAGE_CHECKUP_PARAM_SKIP_TEARDOWN] = skipTeardown;
-  }
-
-  return {
-    apiVersion: 'v1',
-    data,
-    kind: ConfigMapModel.kind,
-    metadata: {
-      labels: {
-        [KUBEVIRT_VM_LATENCY_LABEL]: KUBEVIRT_STORAGE_LABEL_VALUE,
-      },
-      name,
-      namespace,
-    },
-  };
-};
-
-const storageCheckupJob = (
-  name: string,
-  namespace: string,
-  checkupImage: string,
-): IoK8sApiBatchV1Job => {
-  return {
-    apiVersion: 'batch/v1',
-    kind: 'Job',
-    metadata: {
-      labels: {
-        [KUBEVIRT_VM_LATENCY_LABEL]: KUBEVIRT_STORAGE_LABEL_VALUE,
-      },
-      name: generateWithNumbers(name),
-      namespace,
-    },
-    spec: {
-      backoffLimit: 0,
-      template: {
-        spec: {
-          containers: [
-            {
-              env: [
-                { name: CONFIGMAP_NAMESPACE, value: namespace },
-                { name: CONFIGMAP_NAME, value: name },
-              ],
-              image: checkupImage,
-              imagePullPolicy: 'Always',
-              name: generateWithNumbers(name),
-            },
-          ],
-          restartPolicy: 'Never',
-          serviceAccount: STORAGE_CHECKUP_SA,
-        },
-      },
-    },
-  };
-};
 
 export const createStorageCheckup = async (
   params: StorageCheckupParams & { checkupImage: string; cluster: string },
@@ -237,230 +67,6 @@ export const createStorageCheckup = async (
   return kubevirtK8sCreate({
     cluster,
     data: storageCheckupJob(name, namespace, checkupImage),
-    model: JobModel,
-  });
-};
-
-const installPermissions = async (
-  namespace: string,
-  cluster: string,
-  clusterRoleBinding: IoK8sApiRbacV1ClusterRoleBinding,
-): Promise<void> => {
-  await Promise.allSettled([
-    kubevirtK8sCreate({
-      cluster,
-      data: serviceAccountResource(namespace),
-      model: ServiceAccountModel,
-    }),
-    kubevirtK8sCreate({ cluster, data: storageCheckupRole(namespace), model: RoleModel }),
-  ]);
-  await kubevirtK8sCreate({
-    cluster,
-    data: storageCheckupRoleBinding(namespace),
-    model: RoleBindingModel,
-  });
-  try {
-    await kubevirtK8sCreate({
-      cluster,
-      data: storageClusterRoleBinding(namespace),
-      model: ClusterRoleBindingModel,
-    });
-  } catch (e) {
-    const subjectsExist = clusterRoleBinding?.subjects;
-    try {
-      await kubevirtK8sPatch({
-        cluster,
-        data: [
-          {
-            op: 'add',
-            path: `/subjects${subjectsExist ? '/-' : ''}`,
-            value: subjectsExist
-              ? { kind: 'ServiceAccount', name: STORAGE_CHECKUP_SA, namespace }
-              : [{ kind: 'ServiceAccount', name: STORAGE_CHECKUP_SA, namespace }],
-          },
-        ],
-        model: ClusterRoleBindingModel,
-        resource: storageClusterRoleBinding(namespace),
-      });
-    } catch (err) {
-      kubevirtConsole.log('Failed to patch ClusterRoleBinding: ', err?.message);
-    }
-  }
-};
-
-const removePermissions = async (
-  namespace: string,
-  cluster: string,
-  clusterRoleBinding: IoK8sApiRbacV1ClusterRoleBinding,
-): Promise<void> => {
-  try {
-    await Promise.allSettled([
-      kubevirtK8sDelete({
-        cluster,
-        model: ServiceAccountModel,
-        resource: serviceAccountResource(namespace),
-      }),
-      kubevirtK8sDelete({ cluster, model: RoleModel, resource: storageCheckupRole(namespace) }),
-    ]);
-    await kubevirtK8sDelete({
-      cluster,
-      model: RoleBindingModel,
-      resource: storageCheckupRoleBinding(namespace),
-    });
-
-    const remainingSubjects =
-      clusterRoleBinding?.subjects?.filter((subject) => subject?.namespace !== namespace) ?? [];
-
-    const canDeleteCRB =
-      remainingSubjects.length === 0 &&
-      (
-        await checkAccess(
-          ClusterRoleBindingModel.apiGroup,
-          ClusterRoleBindingModel.plural,
-          null,
-          'delete',
-          getName(clusterRoleBinding),
-          getNamespace(clusterRoleBinding),
-          cluster,
-        )
-      )?.status?.allowed;
-
-    if (canDeleteCRB) {
-      await kubevirtK8sDelete({
-        cluster,
-        model: ClusterRoleBindingModel,
-        resource: clusterRoleBinding,
-      });
-    } else {
-      await kubevirtK8sPatch({
-        cluster,
-        data: [
-          {
-            op: 'replace',
-            path: '/subjects',
-            value: remainingSubjects,
-          },
-        ],
-        model: ClusterRoleBindingModel,
-        resource: clusterRoleBinding,
-      });
-    }
-  } catch (err) {
-    kubevirtConsole.log('Failed to remove permissions: ', err?.message);
-  }
-};
-
-export const installOrRemoveCheckupsStoragePermissions = (
-  namespace: string,
-  cluster: string,
-  isPermitted: boolean,
-  clusterRoleBinding: IoK8sApiRbacV1ClusterRoleBinding,
-): Promise<void> => {
-  try {
-    return isPermitted
-      ? removePermissions(namespace, cluster, clusterRoleBinding)
-      : installPermissions(namespace, cluster, clusterRoleBinding);
-  } catch (error) {
-    return error;
-  }
-};
-
-export const deleteStorageCheckup = async (
-  resource: IoK8sApiCoreV1ConfigMap,
-  jobs: IoK8sApiBatchV1Job[],
-) => {
-  const errors: string[] = [];
-
-  try {
-    await kubevirtK8sDelete({ cluster: getCluster(resource), model: ConfigMapModel, resource });
-  } catch (e) {
-    kubevirtConsole.error('Failed to delete storage checkup ConfigMap:', e);
-    errors.push(getName(resource) || 'configmap');
-  }
-
-  for (const job of jobs) {
-    try {
-      await kubevirtK8sDelete({ cluster: getCluster(job), model: JobModel, resource: job });
-    } catch (e) {
-      kubevirtConsole.error(`Failed to delete job ${getName(job)}:`, e);
-      errors.push(getName(job) || 'job');
-    }
-  }
-
-  if (errors.length > 0) {
-    throw new Error(`Failed to delete resources: ${errors.join(', ')}`);
-  }
-};
-
-export const deleteStorageJob = async (job: IoK8sApiBatchV1Job): Promise<void> => {
-  await kubevirtK8sDelete({
-    cluster: getCluster(job),
-    model: JobModel,
-    resource: job,
-  });
-};
-
-export const rerunStorageCheckup = async (
-  resource: IoK8sApiCoreV1ConfigMap,
-  checkupImage: string,
-  jobs: IoK8sApiBatchV1Job[] = [],
-): Promise<IoK8sApiBatchV1Job> => {
-  const runningJobs = jobs.filter(isJobRunning);
-  const deletionErrors: string[] = [];
-
-  for (const job of runningJobs) {
-    try {
-      await deleteStorageJob(job);
-      kubevirtConsole.log('Deleted running job:', getName(job));
-    } catch (error) {
-      deletionErrors.push(getName(job) || 'job');
-      kubevirtConsole.error('Failed to delete running job:', error);
-    }
-  }
-
-  if (deletionErrors.length > 0) {
-    throw new Error(
-      `Failed to delete running jobs: ${deletionErrors.join(', ')}. Cannot proceed with rerun.`,
-    );
-  }
-
-  const isSucceeded = resource?.data?.[STATUS_SUCCEEDED] === 'true';
-  const patchOperations = [
-    STATUS_COMPLETION_TIME_STAMP,
-    STATUS_SUCCEEDED,
-    STATUS_FAILURE_REASON,
-    STATUS_START_TIME_STAMP,
-    ...(isSucceeded
-      ? [
-          STORAGE_CHECKUP_DEFAULT_STORAGE_CLASS,
-          STORAGE_CHECKUP_LIVE_MIGRATION,
-          STORAGE_CHECKUPS_UNSET_EFS_STORAGE_CLASS,
-          STORAGE_CHECKUPS_WITH_NON_RBD_STORAGE_CLASS,
-          STORAGE_CHECKUPS_VM_HOT_PLUG_VOLUME,
-          STORAGE_CHECKUPS_BOOT_GOLDEN_IMAGE,
-          STORAGE_CHECKUPS_STORAGE_WITH_RWX,
-          STORAGE_CHECKUPS_WITH_CLAIM_PROPERTY_SETS,
-          STORAGE_CHECKUPS_MISSING_VOLUME_SNAP_SHOT,
-          STORAGE_CHECKUPS_GOLDEN_IMAGE_NOT_UP_TO_DATE,
-          STORAGE_CHECKUPS_VM_VOLUME_CLONE,
-        ]
-      : []),
-  ]
-    .filter((key) => resource?.data?.[key])
-    .map((key) => ({ op: 'remove', path: `/data/${key}` }));
-
-  if (!isEmpty(patchOperations)) {
-    await kubevirtK8sPatch<IoK8sApiCoreV1ConfigMap>({
-      cluster: getCluster(resource),
-      data: patchOperations,
-      model: ConfigMapModel,
-      resource,
-    });
-  }
-
-  return kubevirtK8sCreate({
-    cluster: getCluster(resource),
-    data: storageCheckupJob(getName(resource), getNamespace(resource), checkupImage),
     model: JobModel,
   });
 };

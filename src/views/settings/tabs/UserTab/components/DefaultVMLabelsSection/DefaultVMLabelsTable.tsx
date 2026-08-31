@@ -29,7 +29,9 @@ const DefaultVMLabelsTable: FC = () => {
   const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
 
   useEffect(() => {
-    if (loaded) setHasLoadedOnce(true);
+    if (loaded) {
+      setHasLoadedOnce(true);
+    }
   }, [loaded]);
 
   const onValueChange = useCallback(
@@ -47,7 +49,7 @@ const DefaultVMLabelsTable: FC = () => {
     <Stack hasGutter>
       {(adminError ?? userError) && (
         <StackItem>
-          <ErrorAlert error={(adminError ?? userError) as Error} />
+          <ErrorAlert error={adminError ?? userError} />
         </StackItem>
       )}
 
@@ -75,7 +77,7 @@ const DefaultVMLabelsTable: FC = () => {
               <DefaultVMLabelRow
                 label={label}
                 onValueChange={onValueChange}
-                userValue={userValues?.[label.key]}
+                userValue={userValues?.[label.key] as string}
               />
             </StackItem>
           ))}

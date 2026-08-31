@@ -1,11 +1,10 @@
-/* eslint-disable */
-import { KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
+import { type KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { universalComparator } from '@kubevirt-utils/utils/utils';
 import { getFilterDefinition } from '@search/searchLanguage/utils';
 import { FROM_PREFIX, isFromValue, isToValue, TO_PREFIX } from '@search/utils/dateCreatedValues';
 import { STATUS_VALUE_GROUPS, VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
-import { SearchKeyBadge, ValueOption } from './types';
+import { type SearchKeyBadge, type ValueOption } from './types';
 
 export const toValueOptions = (
   filterDefinitions: KubevirtFilter[],
@@ -19,13 +18,42 @@ export const toValueOptions = (
   }));
 };
 
+const getStatusOrderedOptions = (filtered: ValueOption[]): ValueOption[] => {
+  const ordered: ValueOption[] = [];
+  for (const group of STATUS_VALUE_GROUPS) {
+    for (const val of group) {
+      const match = filtered.find((opt) => opt.value === val);
+      if (match) {
+        ordered.push(match);
+      }
+    }
+  }
+  return ordered;
+};
+
+const getDateCreatedOptions = (
+  selectedValues: string[],
+  options: ValueOption[],
+  filtered: ValueOption[],
+): ValueOption[] => {
+  const hasFrom = selectedValues.some((val) => isFromValue(val.toLowerCase()));
+  const hasTo = selectedValues.some((val) => isToValue(val.toLowerCase()));
+
+  if (hasFrom || hasTo) {
+    const complementValue = hasFrom ? TO_PREFIX : FROM_PREFIX;
+    return options.filter((opt) => opt.value === complementValue);
+  }
+
+  return filtered;
+};
+
 export const getFilteredOrderedOptions = (
   options: ValueOption[],
   activeSegment: string,
   selectedValues: string[],
   filterType: VirtualMachineRowFilterType,
 ): ValueOption[] => {
-  const selectedSet = new Set(selectedValues.map((v) => v.toLowerCase()));
+  const selectedSet = new Set(selectedValues.map((val) => val.toLowerCase()));
   const segment = activeSegment.toLowerCase();
 
   const filtered = options.filter(
@@ -36,26 +64,11 @@ export const getFilteredOrderedOptions = (
   );
 
   if (filterType === VirtualMachineRowFilterType.Status) {
-    const ordered: ValueOption[] = [];
-    for (const group of STATUS_VALUE_GROUPS) {
-      for (const val of group) {
-        const match = filtered.find((opt) => opt.value === val);
-        if (match) ordered.push(match);
-      }
-    }
-    return ordered;
+    return getStatusOrderedOptions(filtered);
   }
 
   if (filterType === VirtualMachineRowFilterType.DateCreated) {
-    const hasFrom = selectedValues.some((v) => isFromValue(v.toLowerCase()));
-    const hasTo = selectedValues.some((v) => isToValue(v.toLowerCase()));
-
-    if (hasFrom || hasTo) {
-      const complementValue = hasFrom ? TO_PREFIX : FROM_PREFIX;
-      return options.filter((opt) => opt.value === complementValue);
-    }
-
-    return filtered;
+    return getDateCreatedOptions(selectedValues, options, filtered);
   }
 
   return [...filtered].sort((a, b) => universalComparator(a.label, b.label));

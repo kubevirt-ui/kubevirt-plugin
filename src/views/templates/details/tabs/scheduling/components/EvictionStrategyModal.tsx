@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC, useEffect, useMemo, useState } from 'react';
+import React, { type FC, useEffect, useMemo, useState } from 'react';
 import produce from 'immer';
 import { getEvictionStrategy } from 'src/views/templates/utils/selectors';
 
@@ -11,7 +10,7 @@ import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import useHyperConvergeConfiguration from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getTemplateVirtualMachineObject, Template } from '@kubevirt-utils/resources/template';
+import { getTemplateVirtualMachineObject, type Template } from '@kubevirt-utils/resources/template';
 import { Checkbox, FormGroup } from '@patternfly/react-core';
 
 type EvictionStrategyModalProps = {
@@ -50,9 +49,11 @@ const EvictionStrategyModal: FC<EvictionStrategyModalProps> = ({
   const updatedTemplate = useMemo(() => {
     return produce<Template>(template, (templateDraft: Template) => {
       const draftVM = getTemplateVirtualMachineObject(templateDraft);
-      isChecked
-        ? (draftVM.spec.template.spec.evictionStrategy = EVICTION_STRATEGIES.LiveMigrate)
-        : (draftVM.spec.template.spec.evictionStrategy = EVICTION_STRATEGIES.None);
+      if (isChecked) {
+        draftVM.spec.template.spec.evictionStrategy = EVICTION_STRATEGIES.LiveMigrate;
+      } else {
+        draftVM.spec.template.spec.evictionStrategy = EVICTION_STRATEGIES.None;
+      }
     });
   }, [isChecked, template]);
 

@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 import { Link } from 'react-router';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -8,7 +8,7 @@ import { ExternalLinkAltIcon } from '@patternfly/react-icons';
 import './running-checkup-warning-description.scss';
 
 type RunningCheckupWarningDescriptionProps = {
-  configMapCluster: string;
+  configMapCluster?: string;
   configMapName: string;
   configMapNamespace: string;
   maxWidth?: string;
@@ -31,10 +31,10 @@ const RunningCheckupWarningDescription: FC<RunningCheckupWarningDescriptionProps
     <span className="running-checkup-warning">
       {showTitle && <span>{t('Self validation already running')}</span>}
       <Link
+        className="running-checkup-warning__link co-resource-item__resource-name"
         onClick={(e) => {
           !preventLink && e.stopPropagation();
         }}
-        className="running-checkup-warning__link co-resource-item__resource-name"
         to={preventLink ? null : linkTo}
       >
         <span className="running-checkup-warning__name" style={{ maxWidth: maxWidth }}>

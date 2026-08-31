@@ -1,10 +1,11 @@
-import { K8sIoApimachineryPkgApiResourceQuantity } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { Quantity } from '@kubevirt-utils/types/quantity.js';
+import { type K8sIoApimachineryPkgApiResourceQuantity } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type Quantity } from '@kubevirt-utils/types/quantity.js';
 
 import {
   convertToBaseValue,
   humanizeBinaryBytes,
   humanizeBinaryBytesWithoutB,
+  type HumanizeResult,
 } from './humanize.js';
 import {
   BinaryUnit,
@@ -15,7 +16,7 @@ import {
   EXPONENTIAL_REGEX,
   multipliers,
   NUMBER_REGEX,
-  QuantityUnit,
+  type QuantityUnit,
   UNIT_REGEX,
 } from './unitConstants';
 import { isEmpty } from './utils';
@@ -49,7 +50,7 @@ export const getHumanizedSize = (
   size: K8sIoApimachineryPkgApiResourceQuantity,
   bytesOption: 'withB' | 'withoutB' = 'withB',
   preferredUnit?: string,
-) => {
+): HumanizeResult => {
   const baseValue = convertToBaseValue(size?.toString());
 
   if (bytesOption === 'withoutB') {
@@ -59,10 +60,10 @@ export const getHumanizedSize = (
   return humanizeBinaryBytes(baseValue, null, preferredUnit);
 };
 
-export const extractUnitFromQuantityString = (quantityString?: string) =>
+export const extractUnitFromQuantityString = (quantityString?: string): string | undefined =>
   quantityString?.match(UNIT_REGEX)?.[0];
 
-export const extractNumberFromQuantityString = (quantityString?: string) => {
+export const extractNumberFromQuantityString = (quantityString?: string): null | number => {
   const match = quantityString?.match(NUMBER_REGEX);
   return match ? parseFloat(match[0]) : null;
 };
@@ -137,12 +138,12 @@ export const toQuantity = (quantityString?: string): Quantity | undefined => {
 
   // convert bytes or millibytes to a larger unit (if the corresponding value for that unit is >= 1)
   // value CAN BE a floating point number
-  const { unit, value } = getHumanizedSize(quantityString, 'withoutB');
+  const humanized = getHumanizedSize(quantityString, 'withoutB');
 
-  return { unit, value };
+  return { unit: humanized.unit as QuantityUnit, value: Number(humanized.value) };
 };
 
-export const quantityToString = ({ unit, value }: Quantity) =>
+export const quantityToString = ({ unit, value }: Quantity): string =>
   `${value}${unit === 'B' ? '' : unit}`;
 
 /**
@@ -151,20 +152,24 @@ export const quantityToString = ({ unit, value }: Quantity) =>
  * @param base - The base to convert to.
  * @returns The converted value and unit.
  */
-const convertBytes = (value: number, base: 'BINARY' | 'DECIMAL') => {
+const convertBytes = (
+  value: number,
+  base: 'BINARY' | 'DECIMAL',
+): { unitIndex: number; value: number } => {
   if (value === 0) {
     return { unitIndex: 0, value };
   }
 
   const divisor = base === 'BINARY' ? 1024 : 1000;
   let index = 0;
+  let result = value;
 
-  while (value % divisor === 0) {
-    value /= divisor;
+  while (result % divisor === 0) {
+    result /= divisor;
     index++;
   }
 
-  return { unitIndex: index, value };
+  return { unitIndex: index, value: result };
 };
 
 /**
@@ -175,7 +180,10 @@ const convertBytes = (value: number, base: 'BINARY' | 'DECIMAL') => {
  * @param convertBytesOnly if true, it will only format a string that is in bytes format (other strings with a unit will be untouched). Defaults to true.
  * @returns formatted quantity string
  */
-export const formatQuantityString = (quantityString: string, convertBytesOnly: boolean = true) => {
+export const formatQuantityString = (
+  quantityString: string,
+  convertBytesOnly: boolean = true,
+): null | string => {
   if (isEmpty(quantityString)) {
     return null;
   }
@@ -223,8 +231,8 @@ const toMultiplierKey = (unit: string): string => (unit === 'B' ? 'B' : unit.rep
  */
 export const convertBinaryUnit = (value: number, fromUnit: string, toUnit: string): number => {
   if (!fromUnit || !toUnit || fromUnit === toUnit) return value;
-  const from = multipliers[toMultiplierKey(fromUnit)];
-  const to = multipliers[toMultiplierKey(toUnit)];
-  if (from == null || to == null) return value;
-  return (value * from) / to;
+  const fromMultiplier = multipliers[toMultiplierKey(fromUnit)];
+  const targetMultiplier = multipliers[toMultiplierKey(toUnit)];
+  if (fromMultiplier == null || targetMultiplier == null) return value;
+  return (value * fromMultiplier) / targetMultiplier;
 };

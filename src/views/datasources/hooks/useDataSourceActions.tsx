@@ -1,30 +1,26 @@
-/* eslint-disable */
 import React, { useCallback, useMemo, useState } from 'react';
 
-import { DataImportCronModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { DataSourceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { DataImportCronModel, DataSourceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
-  V1beta1DataImportCron,
-  V1beta1DataSource,
+  type V1beta1DataImportCron,
+  type V1beta1DataSource,
 } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import { AnnotationsModal } from '@kubevirt-utils/components/AnnotationsModal/AnnotationsModal';
-import ExportModal from '@kubevirt-utils/components/ExportModal/ExportModal';
 import { LabelsModal } from '@kubevirt-utils/components/LabelsModal/LabelsModal';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
-import { VolumeSnapshotKind } from '@kubevirt-utils/components/SelectSnapshot/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { VolumeSnapshotModel } from '@kubevirt-utils/models';
 import { asAccessReview } from '@kubevirt-utils/resources/shared';
-import { isEmpty, kubevirtConsole } from '@kubevirt-utils/utils/utils';
-import { getCluster } from '@multicluster/helpers/selectors';
+import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { kubevirtK8sGet, kubevirtK8sPatch } from '@multicluster/k8sRequests';
-import { Action } from '@openshift-console/dynamic-plugin-sdk';
+import { type Action } from '@openshift-console/dynamic-plugin-sdk';
 import { Split, SplitItem } from '@patternfly/react-core';
+
+import { getDataSourceCronJob, isDataResourceOwnedBySSP } from '../utils';
 
 import DeleteDataSourceModal from '../actions/DeleteDataSourceModal/DeleteDataSourceModal';
 import { DataImportCronManageModal } from '../dataimportcron/details/DataImportCronManageModal/DataImportCronManageModal';
-import { getDataSourceCronJob, isDataResourceOwnedBySSP } from '../utils';
+import useUploadToRegistry from './useUploadToRegistry';
 
 type UseDataSourceActionsProvider = (
   dataSource: V1beta1DataSource,
@@ -37,12 +33,11 @@ export const useDataSourceActionsProvider: UseDataSourceActionsProvider = (
 ) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
-
   const [dataImportCron, setDataImportCron] = useState<V1beta1DataImportCron>();
   const [isLoading, setIsLoading] = useState<boolean>(false);
-
   const isOwnedBySSP = isDataResourceOwnedBySSP(dataSource);
   const dataImportCronName = getDataSourceCronJob(dataSource);
+  const handleUploadToRegistry = useUploadToRegistry(createModal, dataSource);
 
   const lazyLoadDataImportCron = useCallback(() => {
     if (dataImportCronName && !dataImportCron && !isOwnedBySSP) {
@@ -58,54 +53,46 @@ export const useDataSourceActionsProvider: UseDataSourceActionsProvider = (
     }
   }, [dataImportCron, dataImportCronName, dataSource?.metadata?.namespace, isOwnedBySSP]);
 
-  const actions = useMemo(
-    () => [
+  const actions = useMemo(() => {
+    const handleLabelsSubmit = (labels: { [key: string]: string }): Promise<unknown> =>
+      kubevirtK8sPatch({
+        data: [{ op: 'replace', path: '/metadata/labels', value: labels }],
+        model: DataSourceModel,
+        resource: dataSource,
+      });
+    const handleAnnotationsSubmit = (annotations: { [key: string]: string }): Promise<unknown> =>
+      kubevirtK8sPatch({
+        data: [{ op: 'replace', path: '/metadata/annotations', value: annotations }],
+        model: DataSourceModel,
+        resource: dataSource,
+      });
+    const handleManageClose = (modalClose: () => void): void => {
+      modalClose();
+      setDataImportCron(undefined);
+    };
+
+    return [
       {
-        cta: () =>
+        cta: (): void =>
           createModal(({ isOpen, onClose }) => (
             <LabelsModal
-              onLabelsSubmit={(labels) =>
-                kubevirtK8sPatch({
-                  data: [
-                    {
-                      op: 'replace',
-                      path: '/metadata/labels',
-                      value: labels,
-                    },
-                  ],
-                  model: DataSourceModel,
-                  resource: dataSource,
-                })
-              }
               isOpen={isOpen}
               obj={dataSource}
               onClose={onClose}
+              onLabelsSubmit={handleLabelsSubmit}
             />
           )),
-        disabled: false,
         id: 'datasource-action-edit-labels',
         label: t('Edit labels'),
       },
       {
-        cta: () =>
+        cta: (): void =>
           createModal(({ isOpen, onClose }) => (
             <AnnotationsModal
-              onSubmit={(updatedAnnotations) =>
-                kubevirtK8sPatch({
-                  data: [
-                    {
-                      op: 'replace',
-                      path: '/metadata/annotations',
-                      value: updatedAnnotations,
-                    },
-                  ],
-                  model: DataSourceModel,
-                  resource: dataSource,
-                })
-              }
               isOpen={isOpen}
               obj={dataSource}
               onClose={onClose}
+              onSubmit={handleAnnotationsSubmit}
             />
           )),
         disabled: false,
@@ -113,43 +100,13 @@ export const useDataSourceActionsProvider: UseDataSourceActionsProvider = (
         label: t('Edit annotations'),
       },
       {
-        cta: async () => {
-          if (isEmpty(dataSource?.spec?.source?.snapshot?.name)) {
-            createModal(({ isOpen, onClose }) => (
-              <ExportModal
-                cluster={getCluster(dataSource)}
-                isOpen={isOpen}
-                namespace={dataSource?.spec?.source?.pvc?.namespace}
-                onClose={onClose}
-                pvcName={dataSource?.spec?.source?.pvc?.name}
-              />
-            ));
-
-            return;
-          }
-
-          const volumeSnapshot = await kubevirtK8sGet<VolumeSnapshotKind>({
-            model: VolumeSnapshotModel,
-            name: dataSource?.spec?.source?.snapshot?.name,
-            ns: dataSource?.spec?.source?.snapshot?.namespace,
-          });
-
-          createModal(({ isOpen, onClose }) => (
-            <ExportModal
-              cluster={getCluster(dataSource)}
-              isOpen={isOpen}
-              namespace={dataSource?.spec?.source?.snapshot?.namespace}
-              onClose={onClose}
-              pvcName={volumeSnapshot?.spec?.source?.persistentVolumeClaimName}
-            />
-          ));
-        },
+        cta: handleUploadToRegistry,
         id: 'datasource-action-upload-to-registry',
         label: t('Upload to registry'),
       },
       {
         accessReview: asAccessReview(DataSourceModel, dataSource, 'delete'),
-        cta: () =>
+        cta: (): void =>
           createModal(({ isOpen, onClose }) => (
             <DeleteDataSourceModal
               dataImportCron={dataImportCron}
@@ -163,16 +120,13 @@ export const useDataSourceActionsProvider: UseDataSourceActionsProvider = (
         label: t('Delete'),
       },
       {
-        cta: () =>
+        cta: (): void =>
           createModal(({ isOpen, onClose }) => (
             <DataImportCronManageModal
-              onClose={() => {
-                onClose();
-                setDataImportCron(undefined);
-              }}
               dataImportCron={dataImportCron}
               dataSource={dataSource}
               isOpen={isOpen}
+              onClose={handleManageClose.bind(null, onClose)}
             />
           )),
         description: isOwnedBySSP && t('Red Hat DataSources cannot be edited'),
@@ -189,9 +143,17 @@ export const useDataSourceActionsProvider: UseDataSourceActionsProvider = (
           </Split>
         ),
       },
-    ],
-    [t, dataSource, isOwnedBySSP, dataImportCron, isLoading, isBootableVolume, createModal],
-  );
+    ];
+  }, [
+    t,
+    dataSource,
+    isOwnedBySSP,
+    dataImportCron,
+    isLoading,
+    isBootableVolume,
+    createModal,
+    handleUploadToRegistry,
+  ]);
 
   return [actions, lazyLoadDataImportCron];
 };

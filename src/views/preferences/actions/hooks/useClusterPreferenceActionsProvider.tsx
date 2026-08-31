@@ -1,17 +1,16 @@
-/* eslint-disable */
 import React, { useMemo } from 'react';
 
 import {
   VirtualMachineClusterPreferenceModel,
   VirtualMachineClusterPreferenceModelRef,
 } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import CloneResourceModal from '@kubevirt-utils/components/CloneResourceModal/CloneResourceModal';
 import DeleteModal from '@kubevirt-utils/components/DeleteModal/DeleteModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { asAccessReview } from '@kubevirt-utils/resources/shared';
-import { Action, k8sDelete, useK8sModel } from '@openshift-console/dynamic-plugin-sdk';
+import { type Action, k8sDelete, useK8sModel } from '@openshift-console/dynamic-plugin-sdk';
 
 type UseClusterPreferenceActionsProviderValues = [Action[], boolean];
 
@@ -25,6 +24,12 @@ const useClusterPreferenceActionsProvider: UseClusterPreferenceActionsProvider =
 
   const [, inFlight] = useK8sModel(VirtualMachineClusterPreferenceModelRef);
   const actions: Action[] = useMemo(() => {
+    const onDeleteSubmit = (): Promise<unknown> =>
+      k8sDelete({
+        model: VirtualMachineClusterPreferenceModel,
+        resource: preference,
+      });
+
     return [
       {
         accessReview: asAccessReview(VirtualMachineClusterPreferenceModel, preference, 'create'),
@@ -48,16 +53,11 @@ const useClusterPreferenceActionsProvider: UseClusterPreferenceActionsProvider =
           createModal(({ isOpen, onClose }) => {
             return (
               <DeleteModal
-                onDeleteSubmit={() =>
-                  k8sDelete({
-                    model: VirtualMachineClusterPreferenceModel,
-                    resource: preference,
-                  })
-                }
                 headerText={t('Delete VirtualMachineClusterPreference?')}
                 isOpen={isOpen}
                 obj={preference}
                 onClose={onClose}
+                onDeleteSubmit={onDeleteSubmit}
               />
             );
           }),

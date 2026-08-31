@@ -1,20 +1,19 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
 import NetworkInterfaceModal from '@kubevirt-utils/components/NetworkInterfaceModal/NetworkInterfaceModal';
+import { type NetworkInterfaceModalProps } from '@kubevirt-utils/components/NetworkInterfaceModal/types';
 import {
   createInterface,
   createNetwork,
 } from '@kubevirt-utils/components/NetworkInterfaceModal/utils/helpers';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getName } from '@kubevirt-utils/resources/shared';
-import { getNamespace } from '@kubevirt-utils/resources/shared';
+import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import {
   getTemplateModel,
   getTemplateVirtualMachineObject,
-  Template,
+  type Template,
 } from '@kubevirt-utils/resources/template';
-import { NetworkPresentation } from '@kubevirt-utils/resources/vm/utils/network/constants';
+import { type NetworkPresentation } from '@kubevirt-utils/resources/vm/utils/network/constants';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sUpdate } from '@multicluster/k8sRequests';
 
@@ -27,6 +26,28 @@ type TemplatesEditNetworkInterfaceModalProps = {
   template: Template;
 };
 
+const buildUpdatedTemplate = (
+  template: Template,
+  nicPresentation: NetworkPresentation,
+  resultInterface: ReturnType<typeof createInterface>,
+  resultNetwork: ReturnType<typeof createNetwork>,
+): ReturnType<typeof produceTemplateNetwork> =>
+  produceTemplateNetwork(template, (draftVM) => {
+    draftVM.spec.template.spec.domain.devices.interfaces = [
+      ...draftVM.spec.template.spec.domain.devices.interfaces.filter(
+        ({ name }) => name !== nicPresentation?.network?.name,
+      ),
+      resultInterface,
+    ];
+
+    draftVM.spec.template.spec.networks = [
+      ...draftVM.spec.template.spec.networks.filter(
+        ({ name }) => name !== nicPresentation?.network?.name,
+      ),
+      resultNetwork,
+    ];
+  });
+
 const TemplatesEditNetworkInterfaceModal: FC<TemplatesEditNetworkInterfaceModalProps> = ({
   isOpen,
   nicPresentation,
@@ -36,7 +57,7 @@ const TemplatesEditNetworkInterfaceModal: FC<TemplatesEditNetworkInterfaceModalP
   const { t } = useKubevirtTranslation();
   const vm = getTemplateVirtualMachineObject(template);
 
-  const onSubmit =
+  const onSubmit: NetworkInterfaceModalProps['onSubmit'] =
     ({
       interfaceLinkState,
       interfaceMACAddress,
@@ -57,21 +78,12 @@ const TemplatesEditNetworkInterfaceModal: FC<TemplatesEditNetworkInterfaceModalP
         nicName,
       });
 
-      const updatedTemplate = produceTemplateNetwork(template, (draftVM) => {
-        draftVM.spec.template.spec.domain.devices.interfaces = [
-          ...(draftVM.spec.template.spec.domain.devices.interfaces.filter(
-            ({ name }) => name !== nicPresentation?.network?.name,
-          ) || []),
-          resultInterface,
-        ];
-
-        draftVM.spec.template.spec.networks = [
-          ...(draftVM.spec.template.spec.networks.filter(
-            ({ name }) => name !== nicPresentation?.network?.name,
-          ) || []),
-          resultNetwork,
-        ];
-      });
+      const updatedTemplate = buildUpdatedTemplate(
+        template,
+        nicPresentation,
+        resultInterface,
+        resultNetwork,
+      );
 
       return kubevirtK8sUpdate({
         cluster: getCluster(template),

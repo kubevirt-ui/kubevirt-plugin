@@ -5,7 +5,7 @@ import { humanizeCpuCores } from '@kubevirt-utils/utils/humanize.js';
 import { getHumanizedSize } from '@kubevirt-utils/utils/units';
 import { ProgressVariant } from '@patternfly/react-core';
 
-export const getProgressVariant = (percentage: number) => {
+export const getProgressVariant = (percentage: number): ProgressVariant => {
   if (percentage >= DANGER_THRESHOLD) {
     return ProgressVariant.danger;
   }
@@ -20,7 +20,7 @@ export const getCountString = (count: number, type: ResourceKeyKind): string => 
     return `${humanizeCpuCores(count).string}`;
   }
   if (type === ResourceKeyKind.MEMORY) {
-    return getHumanizedSize(`${count}`, 'withB', 'GiB').value;
+    return String(getHumanizedSize(`${count}`, 'withB', 'GiB').value);
   }
   return `${count}`;
 };

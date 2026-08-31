@@ -1,15 +1,39 @@
-/* eslint-disable */
 import produce from 'immer';
 
-import { DataImportCronModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { DataSourceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { DataImportCronModel, DataSourceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
-  V1beta1DataImportCron,
-  V1beta1DataSource,
+  type V1beta1DataImportCron,
+  type V1beta1DataSource,
 } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import { DATA_SOURCE_CRONJOB_LABEL } from '@kubevirt-utils/resources/template';
-import { ensurePath } from '@kubevirt-utils/utils/utils';
+import { ensurePath, kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { kubevirtK8sCreate, kubevirtK8sDelete, kubevirtK8sPatch } from '@multicluster/k8sRequests';
+
+const updateDataSourceLabel = async (
+  dataSourceToUpdate: V1beta1DataSource,
+  dataImportCronName?: null | string,
+): Promise<void> => {
+  const existingLabels = dataSourceToUpdate.metadata?.labels ?? {};
+  const updatedLabels = produce(existingLabels, (labels) => {
+    if (dataImportCronName) {
+      labels[DATA_SOURCE_CRONJOB_LABEL] = dataImportCronName;
+    } else {
+      delete labels[DATA_SOURCE_CRONJOB_LABEL];
+    }
+  });
+  const hasLabels = !!dataSourceToUpdate.metadata?.labels;
+  await kubevirtK8sPatch({
+    data: [
+      {
+        op: hasLabels ? 'replace' : 'add',
+        path: '/metadata/labels',
+        value: updatedLabels,
+      },
+    ],
+    model: DataSourceModel,
+    resource: dataSourceToUpdate,
+  });
+};
 
 export const onDataImportCronManageSubmit = async ({
   data: { allowAutoUpdate, importsToKeep, schedule, url },
@@ -25,50 +49,22 @@ export const onDataImportCronManageSubmit = async ({
     dataImportCron: V1beta1DataImportCron;
     dataSource: V1beta1DataSource;
   };
-}) => {
-  const updateDataSourceLabel = async (
-    dataSourceToUpdate: V1beta1DataSource,
-    dataImportCronName: string,
-  ) => {
-    const updatedLabels = produce(dataSourceToUpdate.metadata.labels, (labels) => {
-      if (dataImportCronName) {
-        labels[DATA_SOURCE_CRONJOB_LABEL] = dataImportCronName;
-      } else {
-        delete labels[DATA_SOURCE_CRONJOB_LABEL];
-      }
-    });
-    await kubevirtK8sPatch({
-      data: [
-        {
-          op: 'replace',
-          path: '/metadata/labels',
-          value: updatedLabels,
-        },
-      ],
-      model: DataSourceModel,
-      resource: dataSourceToUpdate,
-    });
-  };
-
-  // remove DIC label from DS if allow automatic update is disabled
+}): Promise<V1beta1DataImportCron> => {
   try {
     if (!allowAutoUpdate && dataSource?.metadata?.labels?.[DATA_SOURCE_CRONJOB_LABEL]) {
       await updateDataSourceLabel(dataSource, null);
     }
 
-    // update DIC label on DS if allow automatic update is enabled and DIC is not already set
     if (allowAutoUpdate && !dataSource?.metadata?.labels?.[DATA_SOURCE_CRONJOB_LABEL]) {
       await updateDataSourceLabel(dataSource, dataImportCron?.metadata?.name);
     }
-  } catch (e) {
-    return Promise.reject(e);
+  } catch (err) {
+    return Promise.reject(err);
   }
 
-  // now we can update the DIC. it is immutable, so we have to delete it if it exists and create a new one
   const updatedDataImportCron = produce(dataImportCron, (dic) => {
     ensurePath(dic, 'spec.template.spec.source.registry.url');
 
-    // delete specific metadata fields from the DIC
     delete dic.metadata.resourceVersion;
     delete dic.metadata.creationTimestamp;
     delete dic.metadata.generation;
@@ -79,7 +75,6 @@ export const onDataImportCronManageSubmit = async ({
     dic.spec.schedule = schedule;
   });
 
-  // first we need to validate the changes with a dry run
   try {
     await kubevirtK8sCreate<V1beta1DataImportCron>({
       data: produce(updatedDataImportCron, (dic) => {
@@ -91,8 +86,8 @@ export const onDataImportCronManageSubmit = async ({
         fieldManager: 'kubectl-create',
       },
     });
-  } catch (e) {
-    return Promise.reject(e);
+  } catch (err) {
+    return Promise.reject(err);
   }
   try {
     await kubevirtK8sDelete({
@@ -101,15 +96,16 @@ export const onDataImportCronManageSubmit = async ({
       ns: dataImportCron?.metadata?.namespace,
       resource: dataImportCron,
     });
-    // we should not reject the promise if we failed to delete the DIC (it may not exist)
-  } catch (e) {}
+  } catch (error) {
+    kubevirtConsole.log('DIC deletion skipped:', error);
+  }
 
   try {
     return await kubevirtK8sCreate<V1beta1DataImportCron>({
       data: updatedDataImportCron,
       model: DataImportCronModel,
     });
-  } catch (e) {
-    return Promise.reject(e);
+  } catch (err) {
+    return Promise.reject(err);
   }
 };

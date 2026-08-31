@@ -73,7 +73,7 @@ export type HeavyLoadCheckupConfirmationModalProps = {
 };
 
 export type RunButtonWithTooltipProps = {
-  configMapInfo: { cluster: string; name: string; namespace: string } | null;
+  configMapInfo: { cluster?: string; name: string; namespace: string } | null;
   eulaPendingConfirmation: boolean;
   isSubmitDisabled: boolean;
   isSubmitting: boolean;

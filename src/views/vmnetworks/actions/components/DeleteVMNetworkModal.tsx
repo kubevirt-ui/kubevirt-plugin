@@ -1,12 +1,12 @@
-/* eslint-disable */
-import React, { FC, useState } from 'react';
+import React, { type FC, useState } from 'react';
 import { Trans } from 'react-i18next';
 import { useNavigate } from 'react-router';
 
+import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ClusterUserDefinedNetworkModel } from '@kubevirt-utils/models';
 import { getName } from '@kubevirt-utils/resources/shared';
-import { ClusterUserDefinedNetworkKind } from '@kubevirt-utils/resources/udn/types';
+import type { ClusterUserDefinedNetworkKind } from '@kubevirt-utils/resources/udn/types';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { k8sDelete } from '@openshift-console/dynamic-plugin-sdk';
 import {
@@ -35,12 +35,13 @@ const DeleteVMNetworkModal: FC<DeleteVMNetworkModalProps> = ({ closeModal, obj }
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
+  const [submitError, setSubmitError] = useState<Error>(null);
   const [connectedVMs] = useConnectedVMs(obj);
   const hasConnectedVMs = !isEmpty(connectedVMs);
 
   const name = getName(obj);
 
-  const onSubmit = async () => {
+  const onSubmit = async (): Promise<void> => {
     setIsSubmitting(true);
     try {
       await k8sDelete({
@@ -50,6 +51,7 @@ const DeleteVMNetworkModal: FC<DeleteVMNetworkModalProps> = ({ closeModal, obj }
       closeModal();
       navigate(VM_NETWORKS_PATH);
     } catch (error) {
+      setSubmitError(error as Error);
       setIsSubmitting(false);
     }
   };
@@ -66,6 +68,11 @@ const DeleteVMNetworkModal: FC<DeleteVMNetworkModalProps> = ({ closeModal, obj }
       <ModalHeader title={t('Delete network?')} titleIconVariant={'warning'} />
       <ModalBody>
         <Stack hasGutter>
+          {submitError && (
+            <StackItem>
+              <ErrorAlert error={submitError} />
+            </StackItem>
+          )}
           <StackItem>
             {t('Are you sure you want to delete')} <strong>{name}</strong>?{' '}
             {hasConnectedVMs &&
@@ -86,7 +93,7 @@ const DeleteVMNetworkModal: FC<DeleteVMNetworkModalProps> = ({ closeModal, obj }
               id="delete-vm-network-modal-acknowledge-checkbox"
               isChecked={isChecked}
               label={t('I acknowledge that this action is permanent and cannot be undone.')}
-              onChange={(_, checked) => setIsChecked(checked)}
+              onChange={(_event, checked) => setIsChecked(checked)}
             />
           </StackItem>
         </Stack>

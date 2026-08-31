@@ -1,18 +1,17 @@
-/* eslint-disable */
 import React, { useMemo } from 'react';
 
 import {
   VirtualMachineInstancetypeModel,
   VirtualMachineInstancetypeModelRef,
 } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1beta1VirtualMachineInstancetype } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1beta1VirtualMachineInstancetype } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import CloneResourceModal from '@kubevirt-utils/components/CloneResourceModal/CloneResourceModal';
 import DeleteModal from '@kubevirt-utils/components/DeleteModal/DeleteModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { asAccessReview } from '@kubevirt-utils/resources/shared';
 import { kubevirtK8sDelete } from '@multicluster/k8sRequests';
-import { Action, useK8sModel } from '@openshift-console/dynamic-plugin-sdk';
+import { type Action, useK8sModel } from '@openshift-console/dynamic-plugin-sdk';
 
 type UseUserInstancetypeActionsProviderValues = [Action[], boolean];
 
@@ -26,6 +25,13 @@ const useUserInstancetypeActionsProvider: UseUserInstancetypeActionsProvider = (
 
   const [, inFlight] = useK8sModel(VirtualMachineInstancetypeModelRef);
   const actions: Action[] = useMemo(() => {
+    const onDeleteSubmit = (): Promise<unknown> =>
+      kubevirtK8sDelete({
+        cluster: instanceType?.cluster,
+        model: VirtualMachineInstancetypeModel,
+        resource: instanceType,
+      });
+
     return [
       {
         accessReview: asAccessReview(VirtualMachineInstancetypeModel, instanceType, 'create'),
@@ -50,17 +56,11 @@ const useUserInstancetypeActionsProvider: UseUserInstancetypeActionsProvider = (
           createModal(({ isOpen, onClose }) => {
             return (
               <DeleteModal
-                onDeleteSubmit={() =>
-                  kubevirtK8sDelete({
-                    cluster: instanceType?.cluster,
-                    model: VirtualMachineInstancetypeModel,
-                    resource: instanceType,
-                  })
-                }
                 headerText={t('Delete VirtualMachineInstancetype?')}
                 isOpen={isOpen}
                 obj={instanceType}
                 onClose={onClose}
+                onDeleteSubmit={onDeleteSubmit}
               />
             );
           }),

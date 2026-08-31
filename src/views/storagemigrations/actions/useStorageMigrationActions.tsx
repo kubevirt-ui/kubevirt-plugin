@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { useMemo } from 'react';
+import React, { type ReactNode, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router';
 
 import DeleteModal from '@kubevirt-utils/components/DeleteModal/DeleteModal';
@@ -7,11 +6,11 @@ import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { modelToRef } from '@kubevirt-utils/models';
 import { getStorageMigrationPlanModelForKind } from '@kubevirt-utils/resources/migrations/backends';
-import { MultiNamespaceVirtualMachineStorageMigrationPlan } from '@kubevirt-utils/resources/migrations/constants';
+import { type MultiNamespaceVirtualMachineStorageMigrationPlan } from '@kubevirt-utils/resources/migrations/constants';
 import { asAccessReview, getResourceUrl } from '@kubevirt-utils/resources/shared';
 import {
-  Action,
-  ExtensionHook,
+  type Action,
+  type ExtensionHook,
   k8sDelete,
   useAnnotationsModal,
   useK8sModel,
@@ -30,6 +29,25 @@ const useStorageMigrationActions: ExtensionHook<
   const [, inFlight] = useK8sModel(modelToRef(planModel));
   const labelsModalLauncher = useLabelsModal(migPlan);
   const annotationsModalLauncher = useAnnotationsModal(migPlan);
+
+  const deleteModalRenderer = useCallback(
+    ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }): ReactNode => (
+      <DeleteModal
+        headerText={t('Delete migration plan?')}
+        isOpen={isOpen}
+        obj={migPlan}
+        onClose={onClose}
+        onDeleteSubmit={() =>
+          k8sDelete({
+            model: planModel,
+            resource: migPlan,
+          })
+        }
+      />
+    ),
+    [migPlan, planModel, t],
+  );
+
   const actions = useMemo(
     () => [
       {
@@ -46,13 +64,14 @@ const useStorageMigrationActions: ExtensionHook<
       },
       {
         accessReview: asAccessReview(planModel, migPlan, 'update'),
-        cta: () =>
+        cta: (): void => {
           navigate(
             `${getResourceUrl({
               model: planModel,
               resource: migPlan,
             })}/yaml`,
-          ),
+          );
+        },
         id: 'edit-migplan-resource',
         label: t('Edit {{kind}}', {
           kind: planModel.kind,
@@ -60,21 +79,7 @@ const useStorageMigrationActions: ExtensionHook<
       },
       {
         accessReview: asAccessReview(planModel, migPlan, 'delete'),
-        cta: () =>
-          createModal(({ isOpen, onClose }) => (
-            <DeleteModal
-              onDeleteSubmit={() =>
-                k8sDelete({
-                  model: planModel,
-                  resource: migPlan,
-                })
-              }
-              headerText={t('Delete migration plan?')}
-              isOpen={isOpen}
-              obj={migPlan}
-              onClose={onClose}
-            />
-          )),
+        cta: (): void => createModal(deleteModalRenderer),
         disabled: false,
         id: 'migplan-delete-action',
         label: t('Delete {{kind}}', {
@@ -85,12 +90,12 @@ const useStorageMigrationActions: ExtensionHook<
     [
       annotationsModalLauncher,
       createModal,
+      deleteModalRenderer,
       labelsModalLauncher,
       migPlan,
       navigate,
       planModel,
       t,
-      inFlight,
     ],
   );
 

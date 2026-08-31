@@ -1,4 +1,4 @@
-import { TFunction } from 'i18next';
+import { type TFunction } from 'i18next';
 
 import {
   humanizeBinaryBytes,
@@ -6,15 +6,18 @@ import {
   humanizeDecimalBytes,
   humanizeSeconds,
 } from '../../../../utils/utils/humanize';
-
+import { type HumanizeResult } from '../../../../utils/utils/humanize';
 import { STORAGE_IOPS_UNIT } from './constants';
 import { TopConsumerMetric } from './topConsumerMetric';
 import { TopConsumerScope } from './topConsumerScope';
 
-export const getValue = (value) => parseFloat(value);
+export const getValue = (value: string): number => parseFloat(value);
 
-export const humanizeTopConsumerMetric = (value: number, metric: TopConsumerMetric) => {
-  let humanizedValue;
+export const humanizeTopConsumerMetric = (
+  value: number,
+  metric: TopConsumerMetric,
+): HumanizeResult => {
+  let humanizedValue: HumanizeResult;
   switch (metric) {
     case TopConsumerMetric.CPU:
       humanizedValue = humanizeCpuCores(value);
@@ -47,15 +50,18 @@ export const humanizeTopConsumerMetric = (value: number, metric: TopConsumerMetr
   return { unit: humanizedValue.unit, value: humanizedValue.value };
 };
 
-export const getHumanizedValue = (value, metric) => {
-  const rawValue = getValue(value);
+export const getHumanizedValue = (
+  value: number | string,
+  metric: TopConsumerMetric,
+): HumanizeResult => {
+  const rawValue = typeof value === 'number' ? value : getValue(value);
   return humanizeTopConsumerMetric(rawValue, metric);
 };
 
-export const getTopConsumerCardID = (rowNumber, cardNumber) =>
+export const getTopConsumerCardID = (rowNumber: number, cardNumber: number): string =>
   `topConsumerCard-${rowNumber}-${cardNumber}`;
 
-export const getTopAmountSelectOptions = (t: TFunction) => [
+export const getTopAmountSelectOptions = (t: TFunction): { key: string; value: string }[] => [
   {
     key: 'top-5',
     value: t('Show top 5'),
@@ -71,41 +77,44 @@ export const initialTopConsumerCardSettings: {
 } = {
   'topConsumerCard-1-1': {
     metric: TopConsumerMetric.CPU,
-    scope: TopConsumerScope.VM,
+    scope: TopConsumerScope.vm,
   },
   'topConsumerCard-1-2': {
     metric: TopConsumerMetric.MEMORY,
-    scope: TopConsumerScope.VM,
+    scope: TopConsumerScope.vm,
   },
   'topConsumerCard-1-3': {
     metric: TopConsumerMetric.MEMORY_SWAP_TRAFFIC,
-    scope: TopConsumerScope.VM,
+    scope: TopConsumerScope.vm,
   },
   'topConsumerCard-2-1': {
     metric: TopConsumerMetric.VCPU_WAIT,
-    scope: TopConsumerScope.VM,
+    scope: TopConsumerScope.vm,
   },
   'topConsumerCard-2-2': {
     metric: TopConsumerMetric.STORAGE_THROUGHPUT,
-    scope: TopConsumerScope.VM,
+    scope: TopConsumerScope.vm,
   },
   'topConsumerCard-2-3': {
     metric: TopConsumerMetric.STORAGE_IOPS,
-    scope: TopConsumerScope.VM,
+    scope: TopConsumerScope.vm,
   },
   'topConsumerCard-3-1': {
     metric: TopConsumerMetric.STORAGE_READ_LATENCY,
-    scope: TopConsumerScope.VM,
+    scope: TopConsumerScope.vm,
   },
   'topConsumerCard-3-2': {
     metric: TopConsumerMetric.STORAGE_WRITE_LATENCY,
-    scope: TopConsumerScope.VM,
+    scope: TopConsumerScope.vm,
   },
 };
 
-export const getChartTitle = (scope, queryData) => {
+export const getChartTitle = (
+  scope: TopConsumerScope,
+  queryData: { metric?: Record<string, string> },
+): string => {
   let title = '';
-  const metricData = queryData?.metric;
+  const metricData: Record<string, string> | undefined = queryData?.metric;
   switch (scope) {
     case TopConsumerScope.NODE:
       title = metricData?.node;
@@ -113,10 +122,10 @@ export const getChartTitle = (scope, queryData) => {
     case TopConsumerScope.PROJECT:
       title = metricData?.namespace;
       break;
-    case TopConsumerScope.VM:
+    case TopConsumerScope.vm:
     default:
       title =
-        metricData?.name || metricData?.label_vm_kubevirt_io_name || `VMI (${metricData?.pod})`;
+        metricData?.name ?? metricData?.label_vm_kubevirt_io_name ?? `VMI (${metricData?.pod})`;
       break;
   }
 

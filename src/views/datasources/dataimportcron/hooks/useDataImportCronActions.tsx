@@ -1,12 +1,11 @@
-/* eslint-disable */
 import React, { useCallback, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
 
 import { DataImportCronModel, DataImportCronModelRef } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { DataSourceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
-  V1beta1DataImportCron,
-  V1beta1DataSource,
+  type V1beta1DataImportCron,
+  type V1beta1DataSource,
 } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import { AnnotationsModal } from '@kubevirt-utils/components/AnnotationsModal/AnnotationsModal';
 import DeleteModal from '@kubevirt-utils/components/DeleteModal/DeleteModal';
@@ -16,7 +15,7 @@ import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { asAccessReview } from '@kubevirt-utils/resources/shared';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
-import { Action, k8sDelete, k8sGet, k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
+import { type Action, k8sDelete, k8sGet, k8sPatch } from '@openshift-console/dynamic-plugin-sdk';
 import { Split, SplitItem } from '@patternfly/react-core';
 
 import { isDataResourceOwnedBySSP } from '../../utils';
@@ -45,25 +44,41 @@ export const useDataImportCronActionsProvider: UseDataImportCronActionsProvider 
         name: dataSourceName,
         ns: dataImportCron?.metadata?.namespace,
       })
-        .then((ds) => setDataSource(ds))
+        .then((dsc) => setDataSource(dsc))
         .catch(kubevirtConsole.error)
         .finally(() => setIsLoading(false));
     }
   }, [dataSource, dataSourceName, dataImportCron?.metadata?.namespace, isOwnedBySSP]);
 
-  const actions = useMemo(
-    () => [
+  const actions = useMemo(() => {
+    const handleLabelsSubmit = (labels: { [key: string]: string }): Promise<unknown> =>
+      k8sPatch({
+        data: [{ op: 'replace', path: '/metadata/labels', value: labels }],
+        model: DataImportCronModel,
+        resource: dataImportCron,
+      });
+    const handleAnnotationsSubmit = (annotations: { [key: string]: string }): Promise<unknown> =>
+      k8sPatch({
+        data: [{ op: 'replace', path: '/metadata/annotations', value: annotations }],
+        model: DataImportCronModel,
+        resource: dataImportCron,
+      });
+    const handleDeleteSubmit = (): Promise<unknown> =>
+      k8sDelete({ model: DataImportCronModel, resource: dataImportCron });
+    const handleManageClose = (modalClose: () => void): void => {
+      modalClose();
+      setDataSource(undefined);
+    };
+
+    return [
       {
-        cta: () =>
+        cta: (): void =>
           createModal(({ isOpen, onClose }) => (
             <DataImportCronManageModal
-              onClose={() => {
-                onClose();
-                setDataSource(undefined);
-              }}
               dataImportCron={dataImportCron}
               dataSource={dataSource}
               isOpen={isOpen}
+              onClose={handleManageClose.bind(null, onClose)}
             />
           )),
         disabled: !dataImportCron || isOwnedBySSP || isLoading,
@@ -80,25 +95,13 @@ export const useDataImportCronActionsProvider: UseDataImportCronActionsProvider 
         ),
       },
       {
-        cta: () =>
+        cta: (): void =>
           createModal(({ isOpen, onClose }) => (
             <LabelsModal
-              onLabelsSubmit={(labels) =>
-                k8sPatch({
-                  data: [
-                    {
-                      op: 'replace',
-                      path: '/metadata/labels',
-                      value: labels,
-                    },
-                  ],
-                  model: DataImportCronModel,
-                  resource: dataImportCron,
-                })
-              }
               isOpen={isOpen}
               obj={dataImportCron}
               onClose={onClose}
+              onLabelsSubmit={handleLabelsSubmit}
             />
           )),
         disabled: false,
@@ -106,25 +109,13 @@ export const useDataImportCronActionsProvider: UseDataImportCronActionsProvider 
         label: t('Edit labels'),
       },
       {
-        cta: () =>
+        cta: (): void =>
           createModal(({ isOpen, onClose }) => (
             <AnnotationsModal
-              onSubmit={(updatedAnnotations) =>
-                k8sPatch({
-                  data: [
-                    {
-                      op: 'replace',
-                      path: '/metadata/annotations',
-                      value: updatedAnnotations,
-                    },
-                  ],
-                  model: DataImportCronModel,
-                  resource: dataImportCron,
-                })
-              }
               isOpen={isOpen}
               obj={dataImportCron}
               onClose={onClose}
+              onSubmit={handleAnnotationsSubmit}
             />
           )),
         disabled: false,
@@ -132,37 +123,32 @@ export const useDataImportCronActionsProvider: UseDataImportCronActionsProvider 
         label: t('Edit annotations'),
       },
       {
-        cta: () =>
+        cta: (): void => {
           navigate(
             `/k8s/ns/${dataImportCron.metadata.namespace}/${DataImportCronModelRef}/${dataImportCron.metadata.name}/yaml`,
-          ),
+          );
+        },
         disabled: false,
         id: 'dataimportcron-action-edit-DataImportCron',
         label: t('Edit'),
       },
       {
         accessReview: asAccessReview(DataImportCronModel, dataImportCron, 'delete'),
-        cta: () =>
+        cta: (): void =>
           createModal(({ isOpen, onClose }) => (
             <DeleteModal
-              onDeleteSubmit={() =>
-                k8sDelete({
-                  model: DataImportCronModel,
-                  resource: dataImportCron,
-                })
-              }
               headerText={t('Delete DataImportCron?')}
               isOpen={isOpen}
               obj={dataImportCron}
               onClose={onClose}
+              onDeleteSubmit={handleDeleteSubmit}
             />
           )),
         id: 'dataimportcron-action-delete',
         label: t('Delete'),
       },
-    ],
-    [t, isLoading, dataImportCron, isOwnedBySSP, createModal, dataSource, navigate],
-  );
+    ];
+  }, [t, isLoading, dataImportCron, isOwnedBySSP, createModal, dataSource, navigate]);
 
   return [actions, lazyLoadDataSource];
 };
