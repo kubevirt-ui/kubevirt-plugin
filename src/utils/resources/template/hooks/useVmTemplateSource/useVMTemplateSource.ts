@@ -160,7 +160,6 @@ export const useVMTemplateSource = (
     }
 
     prevBootSourceRef.current = bootSource;
-     
   }, [bootSource, cluster]);
 
   return {

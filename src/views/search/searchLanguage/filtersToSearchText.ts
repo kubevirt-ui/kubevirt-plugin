@@ -41,9 +41,9 @@ const serializeNumericValue = (filterType: string, value: string): null | string
     return `${searchKey}${sign}${num}${unit}`;
   }
 
-  const parsed = parseCpuNumeric(value);
-  if (!parsed) return null;
-  const [operatorEnum, num] = parsed;
+  const cpuParsed = parseCpuNumeric(value);
+  if (!cpuParsed) return null;
+  const [operatorEnum, num] = cpuParsed;
   const sign = OPERATOR_TO_SIGN[operatorEnum];
   if (!sign) return null;
   return `${searchKey}${sign}${num}`;

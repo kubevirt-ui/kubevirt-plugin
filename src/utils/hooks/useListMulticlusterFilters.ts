@@ -1,8 +1,7 @@
-/* eslint-disable */
 import { useMemo } from 'react';
-import { isEmpty } from 'lodash';
+import isEmpty from 'lodash/isEmpty';
 
-import { AdvancedSearchFilter } from '@stolostron/multicluster-sdk';
+import { type AdvancedSearchFilter } from '@stolostron/multicluster-sdk';
 
 import useListClusters from './useListClusters';
 import useListNamespaces from './useListNamespaces';
@@ -17,7 +16,7 @@ const useListMulticlusterFilters = (
     () => [
       ...(isEmpty(clusters) ? [] : [{ property: 'cluster', values: clusters }]),
       ...(isEmpty(namespaces) ? [] : [{ property: 'namespace', values: namespaces }]),
-      ...(additionalFilters || []),
+      ...(additionalFilters ?? []),
     ],
     [clusters, namespaces, additionalFilters],
   );

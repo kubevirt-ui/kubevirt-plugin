@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { Dispatch, FC, SetStateAction } from 'react';
+import React, { type Dispatch, type FC, type SetStateAction } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FormGroup, GridItem, TextInput } from '@patternfly/react-core';
@@ -19,7 +18,7 @@ const NameFormField: FC<NameFormFieldProps> = ({ index, name, setName }) => {
         <FormGroup fieldId="name" label={!index && t('Name')}>
           <TextInput
             id="name"
-            onChange={(_, value: string) => setName(value)}
+            onChange={(_event, value: string) => setName(value)}
             type="text"
             value={name}
           />

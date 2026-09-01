@@ -1,12 +1,10 @@
-/* eslint-disable */
 import { useMemo } from 'react';
 
-import { IoK8sApiStorageV1StorageClass } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type IoK8sApiStorageV1StorageClass } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import useStorageClasses from '@kubevirt-utils/hooks/useStorageClasses/useStorageClasses';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 
 import { isEmpty } from '../../utils/utils';
-
 import { isDefaultStorageClass, isVirtDefaultStorageClass } from './utils';
 
 type UseDefaultStorageClass = (cluster?: string) => [
@@ -19,17 +17,17 @@ type UseDefaultStorageClass = (cluster?: string) => [
 
 const useDefaultStorageClass: UseDefaultStorageClass = (cluster) => {
   const clusterParam = useClusterParam();
-  const resolvedCluster = cluster || clusterParam;
+  const resolvedCluster = cluster ?? clusterParam;
   const [storageClasses, loaded] = useStorageClasses(resolvedCluster);
 
   const defaultStorageClass = useMemo(() => {
     const defaultSC = { clusterDefaultStorageClass: null, virtDefaultStorageClass: null };
     if (!loaded || isEmpty(storageClasses)) return defaultSC;
 
-    return storageClasses?.reduce((acc, sc) => {
-      if (isDefaultStorageClass(sc)) acc.clusterDefaultStorageClass = sc;
+    return storageClasses?.reduce((acc, storageClass) => {
+      if (isDefaultStorageClass(storageClass)) acc.clusterDefaultStorageClass = storageClass;
 
-      if (isVirtDefaultStorageClass(sc)) acc.virtDefaultStorageClass = sc;
+      if (isVirtDefaultStorageClass(storageClass)) acc.virtDefaultStorageClass = storageClass;
 
       return acc;
     }, defaultSC);

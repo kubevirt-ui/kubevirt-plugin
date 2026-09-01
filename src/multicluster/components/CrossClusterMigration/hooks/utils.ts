@@ -53,8 +53,7 @@ export const getSelectableOptions = (
   value: string;
 }> =>
   resources
-    .slice()
-    .sort((a, b) => a.localeCompare(b))
+    .toSorted((a, b) => a.localeCompare(b))
     .map((resource) => ({
       children: resource,
       groupVersionKind: groupVersionKind,

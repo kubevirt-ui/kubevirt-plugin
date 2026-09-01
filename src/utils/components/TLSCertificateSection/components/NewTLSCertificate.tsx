@@ -1,9 +1,8 @@
-/* eslint-disable */
-import React, { FC, useState } from 'react';
+import React, { type FC, useState } from 'react';
 
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { DropEvent, FileUpload } from '@patternfly/react-core';
+import { type DropEvent, FileUpload } from '@patternfly/react-core';
 
 type NewTLSCertificateProps = {
   onChange: (certificate: string) => void;
@@ -17,7 +16,15 @@ const NewTLSCertificate: FC<NewTLSCertificateProps> = ({ onChange, tlsCertificat
   return (
     <>
       <FileUpload
-        onFileInputChange={async (_, file: File) => {
+        allowEditingUploadedText
+        aria-label={t('TLS certificate')}
+        browseButtonText={t('Upload')}
+        filenamePlaceholder={t('Drag and drop a certificate file or paste PEM content')}
+        id="tls-certificate-upload"
+        isLoading={isCertLoading}
+        onClearClick={() => onChange('')}
+        onDataChange={(_event: DropEvent, data: string) => onChange(data)}
+        onFileInputChange={async (_event, file: File) => {
           setIsCertLoading(true);
           try {
             const text = await file.text();
@@ -28,17 +35,9 @@ const NewTLSCertificate: FC<NewTLSCertificateProps> = ({ onChange, tlsCertificat
             setIsCertLoading(false);
           }
         }}
-        allowEditingUploadedText
-        aria-label={t('TLS certificate')}
-        browseButtonText={t('Upload')}
-        filenamePlaceholder={t('Drag and drop a certificate file or paste PEM content')}
-        id="tls-certificate-upload"
-        isLoading={isCertLoading}
-        onClearClick={() => onChange('')}
-        onDataChange={(_event: DropEvent, data: string) => onChange(data)}
         onTextChange={(_event, value: string) => onChange(value)}
         type="text"
-        value={tlsCertificate || ''}
+        value={tlsCertificate ?? ''}
       />
       <FormGroupHelperText>
         {t('PEM-encoded CA certificate for HTTPS sources with a custom or self-signed CA.')}

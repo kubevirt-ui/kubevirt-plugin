@@ -1,7 +1,6 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
-import { IoK8sApiCoreV1Service } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type IoK8sApiCoreV1Service } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import {
   LOAD_BALANCER_ENABLED,
@@ -35,7 +34,7 @@ const SSHServiceSelect: FC<SSHServiceSelectProps> = ({
 
   const sshServiceType = sshService?.spec?.type ?? SERVICE_TYPES.NONE;
 
-  const handleChange = (_, newValue: string | undefined) => {
+  const handleChange = (_event, newValue: string | undefined): void => {
     if (newValue === sshServiceType) return;
     onSSHChange(newValue as SERVICE_TYPES);
   };

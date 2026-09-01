@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { Dispatch, FC, SetStateAction } from 'react';
+import React, { type Dispatch, type FC, type SetStateAction } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FormGroup, TextInput } from '@patternfly/react-core';
@@ -18,7 +17,7 @@ const NameFormField: FC<NameFormFieldProps> = ({ isDisabled, objName, setObjName
       <TextInput
         id="name"
         isDisabled={isDisabled}
-        onChange={(_, value: string) => setObjName(value)}
+        onChange={(_event, value: string) => setObjName(value)}
         type="text"
         value={objName}
       />

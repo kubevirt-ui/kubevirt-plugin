@@ -1,21 +1,20 @@
-/* eslint-disable */
-import React, { FC, ReactNode } from 'react';
+import React, { type FC, type ReactNode } from 'react';
 
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import {
-  FilterableObject,
-  KubevirtFilter,
-  KubevirtFilterState,
-  OnSetFilters,
+  type FilterableObject,
+  type KubevirtFilter,
+  type KubevirtFilterState,
+  type OnSetFilters,
 } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Badge, Icon, SelectGroup, SelectOption, ToolbarItem } from '@patternfly/react-core';
 import { FilterIcon } from '@patternfly/react-icons';
 
-import useItemCounts from '../hooks/useItemCounts';
-import { GroupedFilterOptionValue } from '../types';
+import { type GroupedFilterOptionValue } from '../types';
 import { getOnSelect } from '../utils';
 
+import useItemCounts from '../hooks/useItemCounts';
 import ToolbarFilterMultiChip from './ToolbarFilter/ToolbarFilterMultiChip';
 
 type GroupedFilterDropdownProps = {
@@ -39,10 +38,13 @@ const GroupedFilterDropdown: FC<GroupedFilterDropdownProps> = ({
 
   const itemCounts = useItemCounts(groupedFilters, data);
 
-  const onGroupedFilterSelect = (_event: unknown, selectedOption: GroupedFilterOptionValue) => {
+  const onGroupedFilterSelect = (
+    _event: unknown,
+    selectedOption: GroupedFilterOptionValue,
+  ): void => {
     const { filterId, value } = selectedOption;
-    const filterDef = groupedFilters.find((f) => f.id === filterId);
-    if (!filterDef) return;
+    const filterExists = groupedFilters.some((filter) => filter.id === filterId);
+    if (!filterExists) return;
 
     onSelect(filterId, value);
   };
@@ -51,6 +53,9 @@ const GroupedFilterDropdown: FC<GroupedFilterDropdownProps> = ({
     <>
       <ToolbarItem data-test="filter-dropdown-toggle">
         <FormPFSelect
+          closeOnSelect={false}
+          onSelect={customMenu ? undefined : onGroupedFilterSelect}
+          selectedLabel={t('Filter')}
           toggleProps={{
             icon: (
               <Icon className="span--icon__right-margin">
@@ -58,9 +63,6 @@ const GroupedFilterDropdown: FC<GroupedFilterDropdownProps> = ({
               </Icon>
             ),
           }}
-          closeOnSelect={false}
-          onSelect={customMenu ? undefined : onGroupedFilterSelect}
-          selectedLabel={t('Filter')}
         >
           {customMenu ??
             groupedFilters.map((filterDef) => (

@@ -1,13 +1,20 @@
-/* eslint-disable */
-import { InstanceTypeUnion } from './types';
+import { type InstanceTypeUnion } from './types';
 
-export const getInstanceTypeCPU = (resource: InstanceTypeUnion) => resource?.spec?.cpu?.guest;
+type VMWithRevisionRefs = {
+  status?: {
+    instancetypeRef?: { controllerRevisionRef?: { name?: string } };
+    preferenceRef?: { controllerRevisionRef?: { name?: string } };
+  };
+};
 
-export const getInstanceTypeMemory = (resource: InstanceTypeUnion) => resource?.spec?.memory?.guest;
+export const getInstanceTypeCPU = (resource: InstanceTypeUnion): number | undefined =>
+  resource?.spec?.cpu?.guest;
 
-//TODO: update kubvirt-api definion to include vm.status.instancetypeRef/preferenceRef
-export const getInstanceTypeRevisionName = (vm: any) =>
+export const getInstanceTypeMemory = (resource: InstanceTypeUnion): number | string | undefined =>
+  resource?.spec?.memory?.guest;
+
+export const getInstanceTypeRevisionName = (vm: VMWithRevisionRefs): string | undefined =>
   vm?.status?.instancetypeRef?.controllerRevisionRef?.name;
 
-export const getPreferenceRevisionName = (vm: any) =>
+export const getPreferenceRevisionName = (vm: VMWithRevisionRefs): string | undefined =>
   vm?.status?.preferenceRef?.controllerRevisionRef?.name;

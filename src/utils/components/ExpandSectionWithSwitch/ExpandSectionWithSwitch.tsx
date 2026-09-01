@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC, ReactNode } from 'react';
+import React, { type FC, type ReactNode } from 'react';
 
 import ExpandSectionWithCustomToggle from '@kubevirt-utils/components/ExpandSectionWithCustomToggle/ExpandSectionWithCustomToggle';
 import { Switch } from '@patternfly/react-core';
@@ -31,7 +30,7 @@ const ExpandSectionWithSwitch: FC<ExpandSectionWithSwitchProps> = ({
         <Switch
           isChecked={switchState}
           isDisabled={isDisabled}
-          onChange={(_, checked: boolean) => toggleSwitch(checked)}
+          onChange={(_event, checked: boolean) => toggleSwitch(checked)}
         />
       </div>
     }

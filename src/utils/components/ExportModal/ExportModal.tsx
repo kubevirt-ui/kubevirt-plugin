@@ -12,12 +12,8 @@ import { useUploadProgressStore } from '../../hooks/useUploadProgressToast/uploa
 import TabModal from '../TabModal/TabModal';
 import ExportModalForm from './components/ExportModalForm';
 import { persistExportPod, useExportUploadStore } from './exportUploadStore';
-import {
-  createServiceAccount,
-  createUploaderPod,
-  deleteExportResources,
-  isExportFormIncomplete,
-} from './utils';
+import { createServiceAccount, createUploaderPod } from './uploaderPod';
+import { deleteExportResources, isExportFormIncomplete } from './utils';
 
 type ExportModalProps = {
   cluster: string;

@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC, useCallback, useState } from 'react';
+import React, { type FC, useCallback, useState } from 'react';
 
 import NetworkInterfacePasstHelperPopover from '@kubevirt-utils/components/NetworkInterfaceModal/components/NetworkInterfacePasstSelect/NetworkInterfacePasstHelperPopover';
 import SelectToggle from '@kubevirt-utils/components/toggles/SelectToggle';
@@ -39,7 +38,7 @@ const NetworkInterfacePasst: FC<NetworkInterfacePasstProps> = ({
   }, []);
 
   const onSelect = useCallback(
-    (_, value: string) => {
+    (_event, value: string) => {
       setInterfaceType(value);
       onToggle();
     },
@@ -50,28 +49,28 @@ const NetworkInterfacePasst: FC<NetworkInterfacePasstProps> = ({
 
   return (
     <FormGroup
+      className="form-group-margin"
+      fieldId="passt-checkbox"
+      label={t('Binding')}
       labelHelp={
         passtFeatureFlag.featureEnabled && (
           <NetworkInterfacePasstHelperPopover namespace={namespace} />
         )
       }
-      className="form-group-margin"
-      fieldId="passt-checkbox"
-      label={t('Binding')}
     >
       <div data-test="passt-binding-select">
         <Select
+          isOpen={isOpen}
+          onOpenChange={setIsOpen}
+          onSelect={onSelect}
+          selected={selectedType}
           toggle={SelectToggle({
             'data-test': 'source-type-select',
             isExpanded: isOpen,
             isFullWidth: true,
             onClick: onToggle,
-            selected: selectedOption?.title || t('Select a binding'),
+            selected: selectedOption?.title ?? t('Select a binding'),
           })}
-          isOpen={isOpen}
-          onOpenChange={setIsOpen}
-          onSelect={onSelect}
-          selected={selectedType}
         >
           {options.map((option) => (
             <SelectOption description={option.description} key={option.id} value={option.id}>

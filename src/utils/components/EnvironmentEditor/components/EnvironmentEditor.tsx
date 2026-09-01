@@ -1,12 +1,11 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
-import { EnhancedSelectOptionProps } from '@kubevirt-utils/components/FilterSelect/utils/types';
+import { type EnhancedSelectOptionProps } from '@kubevirt-utils/components/FilterSelect/utils/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Button, ButtonVariant, Grid, GridItem, TextInput, Tooltip } from '@patternfly/react-core';
 import { MinusCircleIcon } from '@patternfly/react-icons';
 
-import { EnvironmentKind } from '../constants';
+import { type EnvironmentKind } from '../constants';
 
 import EnvironmentSelectResource from './EnvironmentSelectResource';
 
@@ -18,7 +17,7 @@ type EnvironmentEditorProps = {
   id: number;
   kind?: EnvironmentKind;
   loaded: boolean;
-  loadError: any;
+  loadError: unknown;
   onChange: (diskName: string, name: string, serial: string, kind: EnvironmentKind) => void;
   onRemove?: (diskName: string) => void;
   selectOptions: EnhancedSelectOptionProps[];
@@ -57,7 +56,7 @@ const EnvironmentEditor: FC<EnvironmentEditorProps> = ({
         <TextInput
           aria-labelledby="environment-serial-header"
           id={`${id}-serial`}
-          onChange={(_, value) => onChange(diskName, environmentName, value, kind)}
+          onChange={(_event, value) => onChange(diskName, environmentName, value, kind)}
           type="text"
           value={serial}
         />

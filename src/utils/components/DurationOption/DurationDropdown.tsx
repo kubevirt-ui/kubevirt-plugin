@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC, useState } from 'react';
+import React, { type FC, useState } from 'react';
 
 import DurationOption from '@kubevirt-utils/components/DurationOption/DurationOption';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -17,12 +16,12 @@ const DurationDropdown: FC<DurationDropdownProps> = ({ selectedDuration, selectH
 
   const [isOpen, setIsOpen] = useState(false);
 
-  const onSelect = (_, durationOption: string) => {
+  const onSelect = (_event: unknown, durationOption: string): void => {
     selectHandler(durationOption);
     setIsOpen(false);
   };
 
-  const onToggle = () => setIsOpen((prevIsOpen) => !prevIsOpen);
+  const onToggle = (): void => setIsOpen((prevIsOpen) => !prevIsOpen);
 
   const selected = t(DurationOption.fromString(selectedDuration)?.getDropdownLabel());
   return (
@@ -43,8 +42,8 @@ const DurationDropdown: FC<DurationDropdownProps> = ({ selectedDuration, selectH
               : 1,
           )
           .map((durationOption) => {
-            const dropdownLabel = durationOption?.getDropdownLabel() || '';
-            const durationValue = durationOption?.getValue() || '';
+            const dropdownLabel = durationOption?.getDropdownLabel() ?? '';
+            const durationValue = durationOption?.getValue() ?? '';
 
             return (
               <SelectOption data-test={durationValue} key={durationValue} value={dropdownLabel}>

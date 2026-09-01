@@ -1,17 +1,16 @@
-/* eslint-disable */
-import { ComponentType, ReactNode } from 'react';
+import { type ComponentType, type ReactNode } from 'react';
 
-import { Extension } from '@openshift-console/dynamic-plugin-sdk/lib/types';
-import { TooltipProps } from '@patternfly/react-core';
-import { ITransform } from '@patternfly/react-table';
+import { type Extension } from '@openshift-console/dynamic-plugin-sdk/lib/types';
+import { type TooltipProps } from '@patternfly/react-core';
+import { type ITransform } from '@patternfly/react-table';
 
-// TODO: all ACM extension declarations should be provided by '@stolostron/multicluster-sdk'
+// All ACM extension declarations should be provided by '@stolostron/multicluster-sdk'
 
 export type ACMVirtualMachineListColumn = Extension<
   'acm.virtualmachine/list/column',
   {
     /** component type */
-    cell: ComponentType<{ resource?: any }>;
+    cell: ComponentType<{ resource?: unknown }>;
     cellTransforms?: ITransform[];
     /** the header of the column */
     header: string;
@@ -33,7 +32,7 @@ export type ACMVirtualMachineAction = Extension<
       close: () => void;
       cluster?: string;
       isOpen: boolean;
-      resource?: any;
+      resource?: unknown;
     }>;
     /** Display a description for this action */
     description?: string;
@@ -42,7 +41,7 @@ export type ACMVirtualMachineAction = Extension<
     /** Display an action as being ariaDisabled */
     isAriaDisabled?: boolean;
     /** Display an action as being disabled */
-    isDisabled?: (resource: any) => boolean;
+    isDisabled?: (resource: unknown) => boolean;
     /** For application, default action type is OpenShift*/
     model?: {
       apiVersion: string;

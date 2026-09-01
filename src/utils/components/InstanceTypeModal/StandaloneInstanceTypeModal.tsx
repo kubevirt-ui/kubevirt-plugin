@@ -1,13 +1,11 @@
-/* eslint-disable */
-import React, { FC, useMemo } from 'react';
+import React, { type FC, useMemo } from 'react';
 
 import useInstanceTypesAndPreferences from '@kubevirt-utils/hooks/useInstanceTypesAndPreferences';
 
 import ErrorAlert from '../ErrorAlert/ErrorAlert';
 import Loading from '../Loading/Loading';
-
-import { InstanceTypeModalProps } from './utils/types';
 import InstanceTypeModal from './InstanceTypeModal';
+import { type InstanceTypeModalProps } from './utils/types';
 
 const StandaloneInstanceTypeModal: FC<
   Pick<InstanceTypeModalProps, 'isOpen' | 'onClose' | 'onSubmit' | 'vm'>
@@ -15,7 +13,7 @@ const StandaloneInstanceTypeModal: FC<
   const { allInstanceTypes, loaded, loadError } = useInstanceTypesAndPreferences();
   const instanceTypeName = vm?.spec?.instancetype?.name;
   const instanceType = useMemo(
-    () => allInstanceTypes.find((it) => it.metadata.name === instanceTypeName),
+    () => allInstanceTypes.find((iType) => iType.metadata.name === instanceTypeName),
     [instanceTypeName, allInstanceTypes],
   );
 

@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { useCallback, useMemo, useState } from 'react';
 
 import { ConfigMapModel } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -7,7 +6,7 @@ import useFeaturesConfigMap from '@kubevirt-utils/hooks/useFeatures/useFeaturesC
 import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
 import { useSettingsCluster } from '@settings/context/SettingsClusterContext';
 
-import { AutoAppliedLabel, UseAutoAppliedLabelsResult } from './types';
+import { type AutoAppliedLabel, type UseAutoAppliedLabelsResult } from './types';
 
 const isAutoAppliedLabel = (entry: unknown): entry is AutoAppliedLabel =>
   typeof entry === 'object' &&
@@ -22,7 +21,7 @@ const parseLabels = (raw: string | undefined): AutoAppliedLabel[] => {
   }
 
   try {
-    const parsed = JSON.parse(raw);
+    const parsed: unknown = JSON.parse(raw);
     return Array.isArray(parsed) ? parsed.filter(isAutoAppliedLabel) : [];
   } catch {
     return [];
@@ -32,10 +31,9 @@ const parseLabels = (raw: string | undefined): AutoAppliedLabel[] => {
 const useAutoAppliedLabels = (cluster?: string): UseAutoAppliedLabelsResult => {
   const settingsCluster = useSettingsCluster();
   const resolvedCluster = cluster ?? settingsCluster;
-  const {
-    featuresConfigMapData: [featureConfigMap, loaded, loadError],
-    isAdmin,
-  } = useFeaturesConfigMap(resolvedCluster);
+  const { featuresConfigMapData, isAdmin } = useFeaturesConfigMap(resolvedCluster);
+  const [featureConfigMap, loaded] = featuresConfigMapData;
+  const loadError: unknown = featuresConfigMapData[2];
   const [updateError, setUpdateError] = useState<Error | null>(null);
 
   const labels = useMemo(
@@ -51,12 +49,13 @@ const useAutoAppliedLabels = (cluster?: string): UseAutoAppliedLabelsResult => {
 
       setUpdateError(null);
       const path = `/data/${AUTO_APPLIED_LABELS}`;
-      const op = featureConfigMap.data?.[AUTO_APPLIED_LABELS] === undefined ? 'add' : 'replace';
+      const operation =
+        featureConfigMap.data?.[AUTO_APPLIED_LABELS] === undefined ? 'add' : 'replace';
 
       try {
         await kubevirtK8sPatch({
           cluster: resolvedCluster,
-          data: [{ op, path, value: JSON.stringify(nextLabels) }],
+          data: [{ op: operation, path, value: JSON.stringify(nextLabels) }],
           model: ConfigMapModel,
           resource: featureConfigMap,
         });
@@ -70,7 +69,7 @@ const useAutoAppliedLabels = (cluster?: string): UseAutoAppliedLabelsResult => {
   );
 
   return {
-    error: updateError || loadError || null,
+    error: updateError ?? (loadError instanceof Error ? loadError : null),
     isAdmin,
     labels,
     loaded: Boolean(loaded),

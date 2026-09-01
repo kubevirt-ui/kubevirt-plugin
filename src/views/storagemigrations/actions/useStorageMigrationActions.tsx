@@ -37,7 +37,7 @@ const useStorageMigrationActions: ExtensionHook<
         isOpen={isOpen}
         obj={migPlan}
         onClose={onClose}
-        onDeleteSubmit={() =>
+        onDeleteSubmit={(): Promise<unknown> =>
           k8sDelete({
             model: planModel,
             resource: migPlan,

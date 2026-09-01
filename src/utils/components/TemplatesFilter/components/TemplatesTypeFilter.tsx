@@ -1,14 +1,14 @@
-/* eslint-disable */
 import React, { type FC, useMemo } from 'react';
 
-import { KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
+import { type KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { type TemplateOrRequest } from '@kubevirt-utils/resources/template';
 import { Checkbox, Stack, StackItem } from '@patternfly/react-core';
 import { TEMPLATE_TYPE_ID } from '@templates/list/filters/constants';
 import { TemplateFilterType } from '@templates/list/filters/types';
 
-import { type UniversalFilter } from '../../../hooks/useUniversalFilter/useUniversalFilter';
 import { type TemplateTypeSelectionState } from '../utils';
+
+import { type UniversalFilter } from '../../../hooks/useUniversalFilter/useUniversalFilter';
 
 type TemplatesTypeFilterProps = {
   filterDefinition: KubevirtFilter<TemplateOrRequest>;
@@ -21,7 +21,7 @@ const TemplatesTypeFilter: FC<TemplatesTypeFilterProps> = ({
   typeSelection,
   universalFilter: { isSelected, setValue },
 }) => {
-  const { options, id, categoryLabel } = filterDefinition;
+  const { categoryLabel, id, options } = filterDefinition;
   const { isOpenShiftTypeSelected, isVirtualMachineTypeSelected, noTypeSelected } = typeSelection;
 
   const optionValues = useMemo(() => options?.map(({ value }) => value) ?? [], [options]);
@@ -43,14 +43,16 @@ const TemplatesTypeFilter: FC<TemplatesTypeFilterProps> = ({
       // Both appear selected; unchecking one leaves only the other.
       setValue(
         TemplateFilterType.Type,
-        optionValues.filter((v) => v !== typeId),
+        optionValues.filter((value) => value !== typeId),
       );
       return;
     }
 
-    const selectedValues = optionValues.filter((v) => isSelected(TemplateFilterType.Type, v));
+    const selectedValues = optionValues.filter((value) =>
+      isSelected(TemplateFilterType.Type, value),
+    );
     const nextSelectedValues = selectedValues.includes(typeId)
-      ? selectedValues.filter((v) => v !== typeId)
+      ? selectedValues.filter((value) => value !== typeId)
       : [...selectedValues, typeId];
 
     // Nothing or both selected → clear query (treat as all types).

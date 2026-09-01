@@ -1,9 +1,8 @@
-/* eslint-disable */
 import { DataSourceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
-  V1DataVolumeTemplateSpec,
-  V1VirtualMachine,
-  V1Volume,
+  type V1DataVolumeTemplateSpec,
+  type V1VirtualMachine,
+  type V1Volume,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { isExpandableSpecVM } from '@kubevirt-utils/resources/instancetype/helper';
 import { getName } from '@kubevirt-utils/resources/shared';
@@ -22,7 +21,7 @@ import { getCluster } from '@multicluster/helpers/selectors';
 
 import { DEFAULT_DISK_SIZE } from './constants';
 import { createDataVolumeName, doesSourceRequireDataVolume } from './helpers';
-import { DefaultFormValues, InterfaceTypes, SourceTypes, V1DiskFormState } from './types';
+import { type DefaultFormValues, InterfaceTypes, SourceTypes, type V1DiskFormState } from './types';
 
 const getDefaultDataVolumeTemplate = (name: string): V1DataVolumeTemplateSpec => ({
   metadata: { name },
@@ -59,12 +58,12 @@ export const getDefaultEditValues = (
   vm: V1VirtualMachine,
   editDiskName?: string,
   defaultValues?: DefaultFormValues,
-) => {
+): Partial<V1DiskFormState> => {
   const isBootSource = getBootDisk(vm)?.name === editDiskName;
   let diskToEdit = getDisks(vm)?.find((disk) => disk.name === editDiskName);
   const volumeToEdit = getVolumes(vm)?.find((volume) => volume.name === editDiskName);
   const dataVolumeTemplate = getDataVolumeTemplates(vm)?.find(
-    (dv) => getName(dv) === volumeToEdit?.dataVolume?.name,
+    (dataVolume) => getName(dataVolume) === volumeToEdit?.dataVolume?.name,
   );
 
   if (isEmpty(diskToEdit) && isExpandableSpecVM(vm)) diskToEdit = { name: editDiskName };
@@ -75,7 +74,7 @@ export const getDefaultEditValues = (
     disk: diskToEdit,
     isBootSource,
     volume: volumeToEdit,
-    ...(defaultValues ? defaultValues : {}),
+    ...(defaultValues ?? {}),
   };
 };
 
