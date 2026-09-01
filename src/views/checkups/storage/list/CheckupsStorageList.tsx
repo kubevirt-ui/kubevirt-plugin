@@ -1,18 +1,15 @@
-/* eslint-disable */
-import React, { useMemo } from 'react';
+import React, { type JSX, useMemo } from 'react';
 
-import { IoK8sApiBatchV1Job } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type IoK8sApiBatchV1Job } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import KubevirtFilterToolbar from '@kubevirt-utils/components/KubevirtFilterToolbar/KubevirtFilterToolbar';
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
+import { buildColumnLayout } from '@kubevirt-utils/components/KubevirtTable/utils';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
 import useKubevirtDataViewFilters from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/useKubevirtDataViewFilters';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtTableColumns';
-import {
-  ACTIONS,
-  COLUMN_MANAGEMENT_IDS,
-} from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/const';
+import { COLUMN_MANAGEMENT_IDS } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/const';
 import usePaginationWithFilters from '@kubevirt-utils/hooks/usePagination/usePaginationWithFilters';
 import { paginationDefaultValues } from '@kubevirt-utils/hooks/usePagination/utils/constants';
 import { EXPORT_TABLE_KEYS, KubevirtTableExport } from '@kubevirt-utils/hooks/useTableExport';
@@ -26,16 +23,15 @@ import { getCheckupsConfigMapRowId, getJobByName } from '../../utils/utils';
 import useCheckupsStorageData from '../components/hooks/useCheckupsStorageData';
 import { useCheckupsStoragePermissions } from '../components/hooks/useCheckupsStoragePermissions';
 import { getFilters } from '../utils/filters';
-
 import {
-  CheckupsStorageCallbacks,
+  type CheckupsStorageCallbacks,
   getCheckupsStorageColumns,
 } from './checkupsStorageListDefinition';
 import CheckupsStorageListEmptyState from './CheckupsStorageListEmptyState';
 
 import '@kubevirt-utils/styles/list-managment-group.scss';
 
-const CheckupsStorageList = () => {
+const CheckupsStorageList = (): JSX.Element => {
   const { t } = useKubevirtTranslation();
   const namespace = useActiveNamespace();
   const isACMPage = useIsACMPage();
@@ -57,10 +53,10 @@ const CheckupsStorageList = () => {
   });
 
   const {
+    handleFilterChange: handleSetFilters,
     handlePerPageSelect,
     handleSetPage,
     pagination,
-    handleFilterChange: handleSetFilters,
   } = usePaginationWithFilters(filteredData?.length ?? 0, onSetFilters);
 
   const columns = useMemo(
@@ -84,18 +80,13 @@ const CheckupsStorageList = () => {
   const isLoaded = loaded && !loadingPermissions && loadedColumns;
 
   const columnLayout = useMemo(
-    () => ({
-      columns: columns
-        .filter((col) => col.key !== ACTIONS)
-        .map(({ additional, key, label }) => ({
-          additional,
-          id: key,
-          title: label,
-        })),
-      id: COLUMN_MANAGEMENT_IDS.CHECKUPS_STORAGE,
-      selectedColumns: new Set(activeColumnKeys),
-      type: t('Checkups'),
-    }),
+    () =>
+      buildColumnLayout(
+        columns,
+        activeColumnKeys,
+        COLUMN_MANAGEMENT_IDS.CHECKUPS_STORAGE,
+        t('Checkups'),
+      ),
     [columns, activeColumnKeys, t],
   );
 

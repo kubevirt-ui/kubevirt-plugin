@@ -1,10 +1,9 @@
-/* eslint-disable */
-import React, { FC, useState } from 'react';
+import React, { type FC } from 'react';
 import { Trans } from 'react-i18next';
-import { Updater } from 'use-immer';
+import { type Updater } from 'use-immer';
 
-import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { VirtualMachineModelGroupVersionKind } from '@kubevirt-utils/models';
@@ -24,7 +23,6 @@ import {
   Form,
   FormGroup,
   Popover,
-  Radio,
   Stack,
   StackItem,
   TextInput,
@@ -33,11 +31,9 @@ import {
 } from '@patternfly/react-core';
 import { HelpIcon } from '@patternfly/react-icons';
 
-import { SelectedMigration } from '../utils/constants';
-import { getAllSelectedMigrations } from '../utils/utils';
-
+import { type SelectedMigration } from '../utils/constants';
+import MigrationVolumeSelection from './components/MigrationVolumeSelection';
 import SelectedStorageTooltip from './components/SelectedStorageTooltip';
-import SelectMigrationDisksTable from './components/SelectMigrationDisksTable';
 
 type VirtualMachineMigrationDetailsProps = {
   migrationPlanName: string;
@@ -57,15 +53,14 @@ const VirtualMachineMigrationDetails: FC<VirtualMachineMigrationDetailsProps> = 
   vms,
 }) => {
   const { t } = useKubevirtTranslation();
-  const [allPVCsSelected, setAllPVCsSelected] = useState(true);
-
   const isNameValid = isDNS1123Label(migrationPlanName);
 
   const totalAmount = humanizeBinaryBytes(
-    selectedPVCs?.reduce((acc, pvc) => {
-      acc += convertToBaseValue(pvc?.spec?.resources?.requests?.storage);
-      return acc;
-    }, 0),
+    selectedPVCs?.reduce(
+      (acc: number, pvc): number =>
+        acc + (convertToBaseValue(pvc?.spec?.resources?.requests?.storage) ?? 0),
+      0,
+    ),
   )?.string;
 
   const vmCount = vms?.length;
@@ -99,6 +94,9 @@ const VirtualMachineMigrationDetails: FC<VirtualMachineMigrationDetailsProps> = 
         </StackItem>
         <StackItem>
           <FormGroup
+            fieldId="migration-plan-name"
+            isRequired
+            label={t('VirtualMachine storage migration plan name')}
             labelHelp={
               <Popover
                 bodyContent={t(
@@ -108,14 +106,11 @@ const VirtualMachineMigrationDetails: FC<VirtualMachineMigrationDetailsProps> = 
                 <Button hasNoPadding icon={<HelpIcon />} variant={ButtonVariant.plain} />
               </Popover>
             }
-            fieldId="migration-plan-name"
-            isRequired
-            label={t('VirtualMachine storage migration plan name')}
           >
             <TextInput
               id="migration-plan-name"
               isRequired
-              onChange={(_, value) => setMigrationPlanName(value)}
+              onChange={(_event, value): void => setMigrationPlanName(value)}
               validated={isNameValid ? ValidatedOptions.default : ValidatedOptions.error}
               value={migrationPlanName}
             />
@@ -126,41 +121,12 @@ const VirtualMachineMigrationDetails: FC<VirtualMachineMigrationDetailsProps> = 
             )}
           </FormGroup>
         </StackItem>
-        <StackItem>
-          <Radio
-            onChange={() => {
-              setAllPVCsSelected(true);
-              setSelectedMigrations(getAllSelectedMigrations(vms, pvcs));
-            }}
-            id="all-volumes"
-            isChecked={allPVCsSelected}
-            isDisabled={isEmpty(pvcs)}
-            label={t('The entire VirtualMachine')}
-            name="volumes"
-          />
-          <Radio
-            onChange={() => {
-              setAllPVCsSelected(false);
-              setSelectedMigrations([]);
-            }}
-            id="selected-volumes"
-            isChecked={!allPVCsSelected}
-            isDisabled={isEmpty(pvcs)}
-            label={t('Selected volumes')}
-            name="volumes"
-          />
-        </StackItem>
-        {!allPVCsSelected && (
-          <StackItem>
-            <SelectMigrationDisksTable
-              pvcs={pvcs}
-              selectedPVCs={selectedPVCs}
-              setSelectedMigrations={setSelectedMigrations}
-              vms={vms}
-            />
-          </StackItem>
-        )}
-
+        <MigrationVolumeSelection
+          pvcs={pvcs}
+          selectedPVCs={selectedPVCs}
+          setSelectedMigrations={setSelectedMigrations}
+          vms={vms}
+        />
         {isEmpty(pvcs) ? (
           <Alert title={t('No migratable disks')} variant={AlertVariant.danger} />
         ) : (

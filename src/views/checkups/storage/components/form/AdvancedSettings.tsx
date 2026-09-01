@@ -1,45 +1,17 @@
-/* eslint-disable */
-import React, { Dispatch, FC, SetStateAction, useMemo } from 'react';
-import { Trans } from 'react-i18next';
+import React, { type Dispatch, type JSX, type SetStateAction } from 'react';
 
-import { IoK8sApiStorageV1StorageClass } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
-import {
-  getDefaultStorageClass,
-  getSCSelectOptions,
-} from '@kubevirt-utils/components/DiskModal/components/StorageClassAndPreallocation/utils/helpers';
-import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
+import { type IoK8sApiStorageV1StorageClass } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type getDefaultStorageClass } from '@kubevirt-utils/components/DiskModal/components/StorageClassAndPreallocation/utils/helpers';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
-import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { StorageClassModel } from '@kubevirt-utils/models';
-import {
-  Alert,
-  AlertVariant,
-  ExpandableSection,
-  FormGroup,
-  FormHelperText,
-  HelperText,
-  HelperTextItem,
-  PopoverPosition,
-  TextInput,
-  ValidatedOptions,
-} from '@patternfly/react-core';
-import { SimpleSelect } from '@patternfly/react-templates';
+import { ExpandableSection, FormGroup, PopoverPosition, TextInput } from '@patternfly/react-core';
 
-import {
-  getSkipTeardownOptions,
-  isNumOfVMsInvalid,
-  NUM_OF_VMS_MAX,
-  NUM_OF_VMS_MIN,
-  SkipTeardownOption,
-} from '../../utils/utils';
+import NumOfVMsField from './NumOfVMsField';
+import SkipTeardownField from './SkipTeardownField';
+import StorageClassField from './StorageClassField';
+import { type StorageCheckupAdvancedSettings } from './types';
 
-export type StorageCheckupAdvancedSettings = {
-  numOfVMs: string;
-  skipTeardown: SkipTeardownOption;
-  storageClass: string;
-  vmiTimeout: string;
-};
+export type { StorageCheckupAdvancedSettings } from './types';
 
 type AdvancedSettingsProps = {
   defaultSC: ReturnType<typeof getDefaultStorageClass>;
@@ -50,55 +22,38 @@ type AdvancedSettingsProps = {
   storageClassesLoaded: boolean;
 };
 
-const AdvancedSettings: FC<AdvancedSettingsProps> = ({
+const AdvancedSettings = ({
   defaultSC,
   setSettings,
   settings,
   storageClasses,
   storageClassesError,
   storageClassesLoaded,
-}) => {
+}: AdvancedSettingsProps): JSX.Element => {
   const { t } = useKubevirtTranslation();
 
   const updateSetting = <K extends keyof StorageCheckupAdvancedSettings>(
     key: K,
     value: StorageCheckupAdvancedSettings[K],
-  ) => {
+  ): void => {
     setSettings((prev) => ({ ...prev, [key]: value }));
   };
 
-  const skipTeardownOptions = useMemo(() => getSkipTeardownOptions(t), [t]);
-
   return (
     <ExpandableSection isIndented toggleText={t('Advanced settings')}>
-      <FormGroup className="form-group-spacing" fieldId="storage-class" label={t('Storage class')}>
-        {storageClassesLoaded ? (
-          <InlineFilterSelect
-            toggleProps={{
-              isFullWidth: true,
-            }}
-            options={getSCSelectOptions(storageClasses) ?? []}
-            placeholder={t('Select {{label}}', { label: StorageClassModel.label })}
-            popperProps={{ enableFlip: true }}
-            selected={settings.storageClass || defaultSC?.metadata?.name || ''}
-            setSelected={(value) => updateSetting('storageClass', value)}
-          />
-        ) : (
-          <Loading />
-        )}
-        {storageClassesError && (
-          <Alert
-            className="form-group-spacing"
-            isInline
-            title={t('Failed to load storage classes')}
-            variant={AlertVariant.danger}
-          >
-            {storageClassesError?.message}
-          </Alert>
-        )}
-      </FormGroup>
+      <StorageClassField
+        defaultSC={defaultSC}
+        onStorageClassChange={(value) => updateSetting('storageClass', value)}
+        selectedStorageClass={settings.storageClass}
+        storageClasses={storageClasses}
+        storageClassesError={storageClassesError}
+        storageClassesLoaded={storageClassesLoaded}
+      />
 
       <FormGroup
+        className="form-group-spacing"
+        fieldId="vmi-timeout"
+        label={t('VMI timeout (minutes)')}
         labelHelp={
           <HelpTextIcon
             bodyContent={t('Timeout for VMI operations (in minutes)')}
@@ -106,9 +61,6 @@ const AdvancedSettings: FC<AdvancedSettingsProps> = ({
             position={PopoverPosition.right}
           />
         }
-        className="form-group-spacing"
-        fieldId="vmi-timeout"
-        label={t('VMI timeout (minutes)')}
       >
         <TextInput
           className="CheckupsStorageForm--main__number-input"
@@ -122,81 +74,15 @@ const AdvancedSettings: FC<AdvancedSettingsProps> = ({
         />
       </FormGroup>
 
-      <FormGroup
-        labelHelp={
-          <HelpTextIcon
-            bodyContent={t('Number of concurrent VMs to boot for testing')}
-            buttonAriaLabel={t('Help for number of VMs')}
-            position={PopoverPosition.right}
-          />
-        }
-        className="form-group-spacing"
-        fieldId="num-of-vms"
-        label={t('Number of VMs')}
-      >
-        <TextInput
-          validated={
-            isNumOfVMsInvalid(settings.numOfVMs) ? ValidatedOptions.error : ValidatedOptions.default
-          }
-          className="CheckupsStorageForm--main__number-input"
-          id="num-of-vms"
-          max={NUM_OF_VMS_MAX}
-          min={NUM_OF_VMS_MIN}
-          name="num-of-vms"
-          onChange={(_event, value) => updateSetting('numOfVMs', value)}
-          placeholder={t('Default: 10')}
-          type="number"
-          value={settings.numOfVMs}
-        />
-        {isNumOfVMsInvalid(settings.numOfVMs) && (
-          <FormHelperText>
-            <HelperText>
-              <HelperTextItem variant="error">
-                {t('Number of VMs must be a number between {{min}} and {{max}}', {
-                  max: NUM_OF_VMS_MAX,
-                  min: NUM_OF_VMS_MIN,
-                })}
-              </HelperTextItem>
-            </HelperText>
-          </FormHelperText>
-        )}
-      </FormGroup>
+      <NumOfVMsField
+        onNumOfVMsChange={(value) => updateSetting('numOfVMs', value)}
+        value={settings.numOfVMs}
+      />
 
-      <FormGroup
-        labelHelp={
-          <HelpTextIcon
-            bodyContent={t(
-              'Controls whether the teardown steps should be skipped after checkup completion',
-            )}
-            buttonAriaLabel={t('Help for skip teardown')}
-            position={PopoverPosition.right}
-          />
-        }
-        className="form-group-spacing"
-        fieldId="skip-teardown"
-        label={t('Skip teardown')}
-      >
-        <SimpleSelect
-          id="skip-teardown"
-          initialOptions={skipTeardownOptions}
-          onSelect={(_, value: SkipTeardownOption) => updateSetting('skipTeardown', value)}
-          selected={settings.skipTeardown}
-        />
-      </FormGroup>
-
-      {settings.skipTeardown !== 'never' && (
-        <Alert
-          className="form-group-spacing"
-          isInline
-          title={t('Warning: Manual cleanup required')}
-          variant={AlertVariant.warning}
-        >
-          <Trans ns="plugin__kubevirt-plugin" t={t}>
-            When teardown is skipped, you will be responsible for manually cleaning up the
-            VirtualMachines, DataVolumes, and PersistentVolumeClaims created by the checkup job.
-          </Trans>
-        </Alert>
-      )}
+      <SkipTeardownField
+        onSkipTeardownChange={(value) => updateSetting('skipTeardown', value)}
+        skipTeardown={settings.skipTeardown}
+      />
     </ExpandableSection>
   );
 };

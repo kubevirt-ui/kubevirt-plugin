@@ -1,5 +1,6 @@
-/* eslint-disable */
-import { InstanceTypeSize } from '@kubevirt-utils/resources/instancetype/types';
+import { type ComponentClass } from 'react';
+
+import { type InstanceTypeSize } from '@kubevirt-utils/resources/instancetype/types';
 
 export enum InstanceTypeCategory {
   ComputeIntensive = 'ComputeIntensive',
@@ -16,7 +17,7 @@ export type InstanceTypeSizeDetails = {
 };
 
 export type CategoryDetails = {
-  Icon: any;
+  Icon: ComponentClass;
   instanceTypes: InstanceTypeSizeDetails[];
   prefix: string;
   prefixLabel: string;

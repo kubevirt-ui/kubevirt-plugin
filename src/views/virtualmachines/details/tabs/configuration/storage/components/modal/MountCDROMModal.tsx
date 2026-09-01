@@ -1,8 +1,7 @@
-/* eslint-disable */
-import React, { FC, useEffect, useState } from 'react';
+import React, { type FC, useEffect, useState } from 'react';
 import { FormProvider, useWatch } from 'react-hook-form';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import CDROMRestartRequiredAlert from '@kubevirt-utils/components/DiskModal/components/CDROMRestartRequiredAlert/CDROMRestartRequiredAlert';
 import CDROMSourceOptions from '@kubevirt-utils/components/DiskModal/components/CDROMSourceOptions/CDROMSourceOptions';
 import {
@@ -10,25 +9,13 @@ import {
   isExistingISOMode,
   isUploadMode,
 } from '@kubevirt-utils/components/DiskModal/utils/constants';
-import {
-  createEjectMountedDiskCancelCleanup,
-  isHotPluggableEnabled,
-  mountISOToCDROM,
-} from '@kubevirt-utils/components/DiskModal/utils/helpers';
-import {
-  logBackgroundUploadError,
-  runVmCdromBackgroundUpload,
-} from '@kubevirt-utils/components/DiskModal/utils/vmCdromBackgroundUpload';
+import { isHotPluggableEnabled } from '@kubevirt-utils/components/DiskModal/utils/helpers';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useCDIUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
 import useKubevirtHyperconvergeConfiguration from '@kubevirt-utils/hooks/useKubevirtHyperconvergeConfiguration';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getVmCdromUploadKeyFromVm } from '@kubevirt-utils/hooks/useUploadProgressToast/keys/uploadKeys';
-import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
-import {
-  getDataVolumeName,
-  getPVCClaimName,
-} from '@kubevirt-utils/resources/vm/utils/disk/selectors';
+import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { ButtonVariant, Stack } from '@patternfly/react-core';
@@ -36,7 +23,7 @@ import { isRunning } from '@virtualmachines/utils';
 
 import { useISOOptions } from './hooks/useISOOptions';
 import { useMountCDROMForm } from './hooks/useMountCDROMForm';
-import { buildDiskState, produceMountUploadVolumeState } from './utils';
+import { submitMountCDROM } from './utils/mountCDROMSubmit';
 
 type MountCDROMModalProps = {
   cdromName: string;
@@ -72,7 +59,7 @@ const MountCDROMModal: FC<MountCDROMModalProps> = ({
     uploadMode,
   } = useMountCDROMForm();
 
-  const { clearErrors, control, getValues } = methods;
+  const { clearErrors, control } = methods;
   const watchedUploadFile = useWatch({ control, name: FORM_FIELD_UPLOAD_FILE });
 
   const uploadEnabled = isUploadMode(uploadMode);
@@ -92,60 +79,25 @@ const MountCDROMModal: FC<MountCDROMModalProps> = ({
     }
   }, [uploadEnabled, clearErrors]);
 
-  const handleModalSubmit = async () => {
+  const handleModalSubmit = async (): Promise<V1VirtualMachine | void> => {
     setIsSubmitting(true);
     try {
-      const data = getValues();
-      const diskState = buildDiskState(
-        uploadMode,
-        selectedISO,
-        uploadFile?.file,
-        vm,
+      return await submitMountCDROM({
         cdromName,
+        cdromUploadKey,
+        checkUploadReady,
+        isHotPluggable,
+        isVMRunning,
+        onClose,
+        onSubmit,
+        selectedISO,
+        t,
+        uploadData,
+        uploadFile,
         uploadFilename,
-      );
-
-      if (!diskState) return;
-
-      if (data.uploadFile?.file) {
-        await checkUploadReady();
-
-        const diskStateForMount = produceMountUploadVolumeState(
-          diskState,
-          cdromName,
-          isHotPluggable,
-          isVMRunning,
-        );
-        const dvName =
-          getName(diskState.dataVolumeTemplate) ??
-          getDataVolumeName(diskState.volume) ??
-          getPVCClaimName(diskState.volume);
-
-        const vmWithMountedDv = await mountISOToCDROM(vm, diskStateForMount, isHotPluggable);
-        const submitResult = await onSubmit?.(vmWithMountedDv);
-        const vmAfterMount = submitResult ?? vmWithMountedDv;
-
-        void runVmCdromBackgroundUpload({
-          diskState,
-          dvName,
-          isHotPluggable,
-          onCancelCleanup: createEjectMountedDiskCancelCleanup(vmAfterMount, cdromName),
-          t,
-          uploadData,
-          uploadKey: cdromUploadKey,
-          vm: vmAfterMount,
-        }).catch(logBackgroundUploadError);
-
-        onClose();
-        return;
-      }
-
-      if (selectedISO) {
-        delete diskState.dataVolumeTemplate;
-      }
-
-      const updatedVM = await mountISOToCDROM(vm, diskState, isHotPluggable);
-      return onSubmit(updatedVM);
+        uploadMode,
+        vm,
+      });
     } finally {
       setIsSubmitting(false);
     }

@@ -1,21 +1,20 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { InstanceTypeUnion } from '@kubevirt-utils/resources/instancetype/types';
+import { type InstanceTypeUnion } from '@kubevirt-utils/resources/instancetype/types';
 import { getName } from '@kubevirt-utils/resources/shared';
 import {
   getGroupVersionKindForResource,
   ResourceLink,
 } from '@openshift-console/dynamic-plugin-sdk';
-import { FormGroup, Radio, SelectOption } from '@patternfly/react-core';
-import { RedhatIcon, UserIcon } from '@patternfly/react-icons';
+import { FormGroup, SelectOption } from '@patternfly/react-core';
 
 import FormPFSelect from '../FormPFSelect/FormPFSelect';
 import TabModal from '../TabModal/TabModal';
-
+import InstanceTypeProviderRadios from './components/InstanceTypeProviderRadios';
 import useEditInstanceType from './hooks/useEditInstanceType';
-import { InstanceTypeModalProps } from './utils/types';
+import { type InstanceTypeModalProps } from './utils/types';
 import { getInstanceTypeSizes } from './utils/util';
 
 const InstanceTypeModal: FC<InstanceTypeModalProps> = ({
@@ -42,7 +41,8 @@ const InstanceTypeModal: FC<InstanceTypeModalProps> = ({
     userInstanceTypes,
   } = useEditInstanceType({ allInstanceTypes, instanceType });
 
-  const handleSubmit = (newInstanceType: InstanceTypeUnion) => onSubmit(vm, newInstanceType);
+  const handleSubmit = (newInstanceType: InstanceTypeUnion): Promise<V1VirtualMachine> =>
+    onSubmit(vm, newInstanceType);
 
   return (
     <TabModal
@@ -54,37 +54,15 @@ const InstanceTypeModal: FC<InstanceTypeModalProps> = ({
       onSubmit={handleSubmit}
       shouldWrapInForm
     >
-      <FormGroup isStack role="radiogroup">
-        <Radio
-          label={
-            <span>
-              <RedhatIcon className="pf-v6-u-mr-sm" />
-              {t('Red Hat provided')}
-            </span>
-          }
-          id="red-hat-provided"
-          isChecked={redHatProvided}
-          name="instance-type-provider"
-          onChange={() => setRedHatProvided(true)}
-        />
-        <Radio
-          label={
-            <span>
-              <UserIcon className="pf-v6-u-mr-sm" />
-              {t('User provided')}
-            </span>
-          }
-          id="user-provided"
-          isChecked={!redHatProvided}
-          name="instance-type-provider"
-          onChange={() => setRedHatProvided(false)}
-        />
-      </FormGroup>
+      <InstanceTypeProviderRadios
+        redHatProvided={redHatProvided}
+        setRedHatProvided={setRedHatProvided}
+      />
       {redHatProvided && (
         <>
           <FormGroup isRequired label={t('Series')}>
             <FormPFSelect
-              onSelect={(_, value) => {
+              onSelect={(_event, value): void => {
                 if (value !== series) {
                   setSeries(value as string);
                   setSize(undefined);
@@ -107,7 +85,7 @@ const InstanceTypeModal: FC<InstanceTypeModalProps> = ({
           </FormGroup>
           <FormGroup isRequired label={t('Size')}>
             <FormPFSelect
-              onSelect={(_, value) => {
+              onSelect={(_event, value): void => {
                 setSize(value as string);
               }}
               placeholder={t('Select size')}
@@ -126,6 +104,9 @@ const InstanceTypeModal: FC<InstanceTypeModalProps> = ({
       {!redHatProvided && (
         <FormGroup isRequired label={t('InstanceType')}>
           <FormPFSelect
+            onSelect={(_event, value: string): void => setSelectedName(value)}
+            placeholder={t('Select InstanceType')}
+            selected={selectedName}
             selectedLabel={
               selectedName && selectedInstanceType ? (
                 <ResourceLink
@@ -135,19 +116,16 @@ const InstanceTypeModal: FC<InstanceTypeModalProps> = ({
                 />
               ) : undefined
             }
-            onSelect={(_, value: string) => setSelectedName(value)}
-            placeholder={t('Select InstanceType')}
-            selected={selectedName}
             toggleProps={{ isFullWidth: true }}
           >
-            {userInstanceTypes.map((it) => {
-              const itName = getName(it);
+            {userInstanceTypes.map((instanceTypeItem) => {
+              const instanceTypeName = getName(instanceTypeItem);
               return (
-                <SelectOption key={itName} value={itName}>
+                <SelectOption key={instanceTypeName} value={instanceTypeName}>
                   <ResourceLink
-                    groupVersionKind={getGroupVersionKindForResource(it)}
+                    groupVersionKind={getGroupVersionKindForResource(instanceTypeItem)}
                     linkTo={false}
-                    name={itName}
+                    name={instanceTypeName}
                   />
                 </SelectOption>
               );

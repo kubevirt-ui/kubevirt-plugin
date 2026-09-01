@@ -1,11 +1,10 @@
-/* eslint-disable */
-import { TFunction } from 'i18next';
+import { type TFunction } from 'i18next';
 
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import {
   getDefaultRunningStrategy,
-  RunStrategy,
+  type RunStrategy,
   RUNSTRATEGY_ALWAYS,
   RUNSTRATEGY_HALTED,
   RUNSTRATEGY_MANUAL,
@@ -19,23 +18,8 @@ import {
 import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
 
-export type WarningMessage = {
-  body?: string;
-  title: string;
-};
-
-export type RunStrategySelection = '' | RunStrategy;
-
-export type RunStrategyModalProps = {
-  hasMixedStrategies?: boolean;
-  hasStoppedVMs?: boolean;
-  initialRunStrategy?: RunStrategy;
-  isOpen: boolean;
-  isVMRunning: boolean;
-  onClose: () => void;
-  onSubmit: (runStrategy: RunStrategy) => Promise<K8sResourceCommon | K8sResourceCommon[] | void>;
-  vmCount?: number;
-};
+export type { RunStrategyModalProps, RunStrategySelection, WarningMessage } from './types';
+export { getRunStrategyWarningMessage } from './warnings';
 
 export const MIXED_HINT_ID = 'run-strategy-mixed-hint';
 
@@ -71,16 +55,18 @@ export const getToggledRunStrategy = (
   }
   return {
     newStrategy: RUNSTRATEGY_HALTED,
-    savedPrevious: currentRunStrategy || getDefaultRunningStrategy(),
+    savedPrevious: currentRunStrategy ?? getDefaultRunningStrategy(),
   };
 };
 
 export const getRunStrategyDisplayValue = (t: TFunction, vm: V1VirtualMachine): null | string => {
   const runStrategy = getEffectiveRunStrategy(vm);
-  if (!runStrategy) return null;
+  if (!runStrategy) {
+    return null;
+  }
 
   const labels = getRunStrategyLabels(t);
-  return labels[runStrategy] || runStrategy;
+  return labels[runStrategy] ?? runStrategy;
 };
 
 export const getStartAfterCreationLabel = (t: TFunction): string =>
@@ -110,14 +96,14 @@ export const getStartingRunStrategy = (sourceRunStrategy: RunStrategy | undefine
  * @param vmSpec the VM spec to migrate
  */
 export const migrateRunningFieldToRunStrategy = (vmSpec: V1VirtualMachine['spec']): void => {
-  if (vmSpec?.running === undefined) return;
+  if (vmSpec?.running === undefined) {
+    return;
+  }
 
   const wasRunning = vmSpec.running;
   delete vmSpec.running;
 
-  if (!vmSpec.runStrategy) {
-    vmSpec.runStrategy = wasRunning ? RUNSTRATEGY_ALWAYS : RUNSTRATEGY_HALTED;
-  }
+  vmSpec.runStrategy ??= wasRunning ? RUNSTRATEGY_ALWAYS : RUNSTRATEGY_HALTED;
 };
 
 /**
@@ -138,48 +124,7 @@ export const isRunStrategyManual = (runStrategy: RunStrategy | undefined): boole
   runStrategy === RUNSTRATEGY_MANUAL;
 
 export const isRunStrategyNotHalted = (runStrategy: RunStrategy | undefined): boolean =>
-  !!runStrategy && runStrategy !== RUNSTRATEGY_HALTED;
-
-export const getRunStrategyWarningMessage = (
-  t: TFunction,
-  runStrategy: RunStrategy,
-  initialRunStrategy: RunStrategy | undefined,
-  isVMCurrentlyRunning: boolean,
-  isMultiple: boolean,
-  hasStoppedVMs?: boolean,
-): null | WarningMessage => {
-  if (initialRunStrategy !== undefined && runStrategy === initialRunStrategy) return null;
-
-  const hasStopped = hasStoppedVMs ?? !isVMCurrentlyRunning;
-
-  if (isVMCurrentlyRunning && runStrategy === RUNSTRATEGY_HALTED) {
-    return {
-      title: isMultiple
-        ? t('This will stop the selected VMs.')
-        : t('This will stop the selected VM.'),
-    };
-  }
-  if (runStrategy === RUNSTRATEGY_MANUAL) {
-    return {
-      body: isMultiple
-        ? t(
-            'The cluster will no longer automatically restart the selected VMs if they crash. You will be responsible for all start, stop, and restart actions.',
-          )
-        : t(
-            'The cluster will no longer automatically restart this VM if it crashes. You will be responsible for all start, stop, and restart actions.',
-          ),
-      title: t('Manual run strategy'),
-    };
-  }
-  if (hasStopped && isRunStrategyStarting(runStrategy)) {
-    return {
-      title: isMultiple
-        ? t('Stopped VMs will start immediately.')
-        : t('The selected VM will start immediately.'),
-    };
-  }
-  return null;
-};
+  Boolean(runStrategy) && runStrategy !== RUNSTRATEGY_HALTED;
 
 const VALID_RUN_STRATEGIES = new Set<string>([
   RUNSTRATEGY_ALWAYS,
@@ -215,7 +160,10 @@ export const buildRunStrategyPatches = (
   return ops;
 };
 
-export const updateRunStrategy = (vm: V1VirtualMachine, runStrategy: RunStrategy) =>
+export const updateRunStrategy = (
+  vm: V1VirtualMachine,
+  runStrategy: RunStrategy,
+): Promise<V1VirtualMachine> =>
   kubevirtK8sPatch({
     cluster: getCluster(vm),
     data: buildRunStrategyPatches(vm, runStrategy),

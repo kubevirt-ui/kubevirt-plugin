@@ -1,10 +1,10 @@
-import type { TEST_STATUS } from '../../../../utils';
+import type { TestStatus } from '../../../../utils';
 
 export type TestSuiteProgress = {
   duration?: string;
   lastUpdated: string;
   progress: number;
-  status: TEST_STATUS;
+  status: TestStatus;
   suiteName: string;
   testsFailed?: number;
   testsPassed?: number;

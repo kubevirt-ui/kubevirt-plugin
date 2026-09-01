@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC, useState } from 'react';
+import React, { type FC, useState } from 'react';
 
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
@@ -10,7 +9,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { type NetworkPresentation } from '@kubevirt-utils/resources/vm/utils/network/constants';
 import { getNetworkInterface } from '@kubevirt-utils/resources/vm/utils/network/selectors';
 import { NetworkInterfaceState } from '@kubevirt-utils/resources/vm/utils/network/types';
-import { getContentScrollableElement } from '@kubevirt-utils/utils/utils';
+import { getContentScrollableElement, kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { Dropdown, DropdownItem, DropdownList, Tooltip } from '@patternfly/react-core';
 import { CopyIcon } from '@patternfly/react-icons';
 import {
@@ -86,7 +85,11 @@ const NetworkInterfaceActions: FC<NetworkInterfaceActionsProps> = ({
         {interfaceState === NetworkInterfaceState.DOWN && (
           <DropdownItem
             key="network-interface-state-up"
-            onClick={() => setNetworkInterfaceState(vm, nicName, NetworkInterfaceState.UP)}
+            onClick={(): void => {
+              setNetworkInterfaceState(vm, nicName, NetworkInterfaceState.UP)?.catch(
+                kubevirtConsole.error,
+              );
+            }}
           >
             {t('Set link up')}
           </DropdownItem>
@@ -94,7 +97,11 @@ const NetworkInterfaceActions: FC<NetworkInterfaceActionsProps> = ({
         {interfaceState === NetworkInterfaceState.UP && (
           <DropdownItem
             key="network-interface-state-down"
-            onClick={() => setNetworkInterfaceState(vm, nicName, NetworkInterfaceState.DOWN)}
+            onClick={(): void => {
+              setNetworkInterfaceState(vm, nicName, NetworkInterfaceState.DOWN)?.catch(
+                kubevirtConsole.error,
+              );
+            }}
           >
             {t('Set link down')}
           </DropdownItem>
@@ -103,7 +110,9 @@ const NetworkInterfaceActions: FC<NetworkInterfaceActionsProps> = ({
           <DropdownItem
             icon={<CopyIcon />}
             key="network-interface-copy-fqdn"
-            onClick={() => navigator.clipboard.writeText(fqdn)}
+            onClick={(): void => {
+              navigator.clipboard.writeText(fqdn).catch(kubevirtConsole.error);
+            }}
           >
             {t('Copy FQDN')}
           </DropdownItem>

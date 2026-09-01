@@ -1,32 +1,26 @@
-/* eslint-disable */
-import React, { FC, useMemo, useState } from 'react';
+import React, { type FC, useMemo, useState } from 'react';
 import { useWatch } from 'react-hook-form';
 
 import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
-import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
+import { type PaginationState } from '@kubevirt-utils/hooks/usePagination/utils/types';
+import { getName } from '@kubevirt-utils/resources/shared';
 import { isAllNamespaces, isEmpty } from '@kubevirt-utils/utils/utils';
-import {
-  getGroupVersionKindForResource,
-  ResourceLink,
-  Timestamp,
-} from '@openshift-console/dynamic-plugin-sdk';
 import { ActionList, ActionListItem, Pagination, SearchInput } from '@patternfly/react-core';
-import { Table, TableVariant, Tbody, Td, Th, Thead, Tr } from '@patternfly/react-table';
 import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
 import {
   CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA,
   CREATE_VM_FORM_FIELDS_VM_DATA,
 } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
-import { InstanceTypes } from '@virtualmachines/wizard/utils/types';
+import { type InstanceTypes } from '@virtualmachines/wizard/utils/types';
 
+import UserProvidedComputeResourcesEmptyState from './components/UserProvidedComputeResourcesEmptyState';
 import UserProvidedInstanceTypesEmptyState from './components/UserProvidedInstanceTypesEmptyState';
+import UserProvidedInstanceTypeTable from './components/UserProvidedInstanceTypeTable';
 import useInstanceTypeListColumns from './hooks/useInstanceTypeListColumn';
 import { paginationDefaultValues, paginationInitialState } from './utils/constants';
 
 import './UserProvidedInstanceTypeList.scss';
-import UserProvidedComputeResourcesEmptyState from './components/UserProvidedComputeResourcesEmptyState';
 
 type UserProvidedInstanceTypesListProps = {
   userProvidedInstanceTypes: InstanceTypes;
@@ -50,7 +44,7 @@ const UserProvidedInstanceTypesList: FC<UserProvidedInstanceTypesListProps> = ({
   const [searchInput, setSearchInput] = useState('');
   const [pagination, setPagination] = useState(paginationInitialState);
 
-  const onPaginationChange = ({ endIndex, page, perPage, startIndex }) => {
+  const onPaginationChange = ({ endIndex, page, perPage, startIndex }: PaginationState): void => {
     setPagination({
       endIndex,
       page,
@@ -59,13 +53,15 @@ const UserProvidedInstanceTypesList: FC<UserProvidedInstanceTypesListProps> = ({
     });
   };
 
-  const filteredItems = useMemo(() => {
-    return userProvidedInstanceTypes.filter(
-      (opt) =>
-        isEmpty(searchInput) ||
-        getName(opt).toLowerCase().includes(searchInput.toString().toLowerCase()),
-    );
-  }, [searchInput, userProvidedInstanceTypes]);
+  const filteredItems = useMemo(
+    (): InstanceTypes =>
+      userProvidedInstanceTypes.filter(
+        (opt) =>
+          isEmpty(searchInput) ||
+          getName(opt).toLowerCase().includes(searchInput.toString().toLowerCase()),
+      ),
+    [searchInput, userProvidedInstanceTypes],
+  );
 
   const { columns, getSortType, sortedData } = useInstanceTypeListColumns(
     filteredItems,
@@ -76,10 +72,10 @@ const UserProvidedInstanceTypesList: FC<UserProvidedInstanceTypesListProps> = ({
     return <UserProvidedComputeResourcesEmptyState namespace={namespace} />;
   }
 
-  const handleRowClick = (itName: string, itNamespace: string) => {
+  const handleRowClick = (instanceTypeName: string, instanceTypeNamespace: string): void => {
     setValue(CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.SELECTED_INSTANCE_TYPE, {
-      name: itName,
-      namespace: itNamespace,
+      name: instanceTypeName,
+      namespace: instanceTypeNamespace,
     });
   };
 
@@ -89,12 +85,12 @@ const UserProvidedInstanceTypesList: FC<UserProvidedInstanceTypesListProps> = ({
         <ActionList className="instance-type-list__action-list">
           <ActionListItem>
             <SearchInput
-              onChange={(_, value) => {
+              aria-label={t('Filter menu items')}
+              className="instance-type-list__search"
+              onChange={(_event, value): void => {
                 setSearchInput(value);
                 setPagination(paginationInitialState);
               }}
-              aria-label={t('Filter menu items')}
-              className="instance-type-list__search"
               placeholder={t('Search by name...')}
               type="search"
               value={searchInput}
@@ -102,15 +98,15 @@ const UserProvidedInstanceTypesList: FC<UserProvidedInstanceTypesListProps> = ({
           </ActionListItem>
           <ActionListItem>
             <Pagination
-              onPerPageSelect={(_e, perPage, page, startIndex, endIndex) =>
-                onPaginationChange({ endIndex, page, perPage, startIndex })
-              }
-              onSetPage={(_e, page, perPage, startIndex, endIndex) =>
-                onPaginationChange({ endIndex, page, perPage, startIndex })
-              }
               className="list-managment-group__pagination"
               isCompact
               itemCount={filteredItems?.length}
+              onPerPageSelect={(_event, perPage, page, startIndex, endIndex): void =>
+                onPaginationChange({ endIndex, page, perPage, startIndex })
+              }
+              onSetPage={(_event, page, perPage, startIndex, endIndex): void =>
+                onPaginationChange({ endIndex, page, perPage, startIndex })
+              }
               page={pagination?.page}
               perPage={pagination?.perPage}
               perPageOptions={paginationDefaultValues}
@@ -123,48 +119,13 @@ const UserProvidedInstanceTypesList: FC<UserProvidedInstanceTypesListProps> = ({
           isFilterEmpty={!isEmpty(userProvidedInstanceTypes) && isEmpty(filteredItems)}
         />
       ) : (
-        <Table variant={TableVariant.compact}>
-          <Thead>
-            <Tr>
-              {columns.map(({ id, title }, columnIndex) => (
-                <Th key={id} sort={getSortType(columnIndex)}>
-                  {title}
-                </Th>
-              ))}
-            </Tr>
-          </Thead>
-          <Tbody>
-            {sortedData.map((instanceType) => {
-              const itName = getName(instanceType);
-              const itNamespace = getNamespace(instanceType);
-              return (
-                <Tr
-                  isRowSelected={
-                    selectedInstanceType?.name === itName &&
-                    selectedInstanceType?.namespace === itNamespace
-                  }
-                  isClickable
-                  isSelectable
-                  key={`${itName}-${itNamespace}`}
-                  onRowClick={() => handleRowClick(itName, itNamespace)}
-                >
-                  <Td data-test={itName}>
-                    <ResourceLink
-                      groupVersionKind={getGroupVersionKindForResource(instanceType)}
-                      linkTo={false}
-                      name={itName}
-                      namespace={itNamespace}
-                    />
-                  </Td>
-                  <Td>
-                    <Timestamp timestamp={instanceType?.metadata?.creationTimestamp} />
-                  </Td>
-                  <Td>{instanceType?.metadata?.annotations?.description || NO_DATA_DASH}</Td>
-                </Tr>
-              );
-            })}
-          </Tbody>
-        </Table>
+        <UserProvidedInstanceTypeTable
+          columns={columns}
+          getSortType={getSortType}
+          onRowClick={handleRowClick}
+          selectedInstanceType={selectedInstanceType}
+          sortedData={sortedData}
+        />
       )}
     </>
   );

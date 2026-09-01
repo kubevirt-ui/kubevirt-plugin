@@ -28,8 +28,6 @@ import {
 import { CONNECTED_VMS_COLUMN_KEYS } from './constants';
 import useConnectedVMActions from './hooks/useConnectedVMActions';
 
-import '@kubevirt-utils/styles/list-managment-group.scss';
-
 type ConnectedVirtualMachinesProps = {
   obj: ClusterUserDefinedNetworkKind;
 };
