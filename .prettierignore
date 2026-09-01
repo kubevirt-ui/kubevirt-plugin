@@ -9,5 +9,9 @@ cypress/gui-test-screenshots
 cypress/cypress-a11y-report.json
 /locales
 
+# Playwright artifacts
+allure-results/
+playwright/.auth/
+
 # Helm templates contain Go template syntax that Prettier cannot parse
 ci-scripts/hot-cluster/helm/**/templates/

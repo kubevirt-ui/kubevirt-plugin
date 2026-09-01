@@ -1,7 +1,7 @@
-import { type TFunction } from 'i18next';
 import { type FC, type ReactNode } from 'react';
 import { type UseFormGetValues, type UseFormSetValue } from 'react-hook-form';
 import { type NavigateFunction } from 'react-router';
+import { type TFunction } from 'i18next';
 
 import {
   type V1beta1DataImportCron,
@@ -77,6 +77,10 @@ export type ApplySelectedBootableVolumeToForm = {
   setValue: UseFormSetValue<VMWizardFormValues>;
   volumeSnapshotSource: null | VolumeSnapshotKind;
 };
+
+export type OnSelectBootableVolume = (
+  args: Omit<ApplySelectedBootableVolumeToForm, 'getValues' | 'setValue'>,
+) => void;
 
 export type VMCreationMethodCardDetails = {
   description: string;

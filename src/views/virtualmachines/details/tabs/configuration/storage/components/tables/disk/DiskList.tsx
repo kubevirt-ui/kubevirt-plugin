@@ -1,11 +1,14 @@
-import React, { FC, useMemo } from 'react';
+import React, { type FC, type ReactNode, useMemo } from 'react';
 
 import { DataVolumeModel, VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import {
+  type V1VirtualMachine,
+  type V1VirtualMachineInstance,
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import DiskListTitle from '@kubevirt-utils/components/DiskListTitle/DiskListTitle';
 import DiskSourceSelect from '@kubevirt-utils/components/DiskModal/components/DiskSourceSelect/DiskSourceSelect';
 import DiskModal from '@kubevirt-utils/components/DiskModal/DiskModal';
-import { SourceTypes } from '@kubevirt-utils/components/DiskModal/utils/types';
+import { type SourceTypes } from '@kubevirt-utils/components/DiskModal/utils/types';
 import KubevirtFilterToolbar from '@kubevirt-utils/components/KubevirtFilterToolbar/KubevirtFilterToolbar';
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
@@ -17,37 +20,44 @@ import { VirtualMachineSubresourcesModel } from '@kubevirt-utils/models';
 import { asAccessReview, getNamespace } from '@kubevirt-utils/resources/shared';
 import useDisksTableData from '@kubevirt-utils/resources/vm/hooks/disk/useDisksTableData';
 import useProvisioningPercentage from '@kubevirt-utils/resources/vm/hooks/useProvisioningPercentage';
-import { K8sVerb, useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
+import { type DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/constants';
+import { type K8sVerb, useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
 import { Flex, FlexItem } from '@patternfly/react-core';
 import { useFleetAccessReview } from '@stolostron/multicluster-sdk';
 import { updateDisks } from '@virtualmachines/details/tabs/configuration/details/utils/utils';
 import { isRunning } from '@virtualmachines/utils';
 
 import useDisksFilters from '../../hooks/useDisksFilters';
-
-import { DiskListCallbacks, getDiskListColumns, getDiskRowId } from './diskListDefinition';
+import { type DiskListCallbacks, getDiskListColumns, getDiskRowId } from './diskListDefinition';
 
 import './disklist.scss';
 
 type DiskListProps = {
+  afterTitle?: ReactNode;
   customize?: boolean;
   onDiskUpdate?: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine>;
   vm: V1VirtualMachine;
   vmi?: V1VirtualMachineInstance;
 };
 
-const DiskList: FC<DiskListProps> = ({ customize = false, onDiskUpdate, vm, vmi }) => {
+const DiskList: FC<DiskListProps> = ({ afterTitle, customize = false, onDiskUpdate, vm, vmi }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const isWindowsSupported = useIsWindowsSupportedArchitecture();
   const columns = useMemo(() => getDiskListColumns(t), [t]);
-  const [disks, sourcesLoaded, loadError] = useDisksTableData(vm, vmi);
+  const [disks, sourcesLoaded, loadError] = useDisksTableData(vm, vmi) as [
+    DiskRowDataLayout[],
+    boolean,
+    unknown,
+    V1VirtualMachineInstance,
+  ];
   const filterDefinitions = useDisksFilters();
-  const { clearAllFilters, filteredData, filters, onSetFilters } = useKubevirtDataViewFilters({
-    data: disks ?? [],
-    filterDefinitions,
-    hideLabelFilter: true,
-  });
+  const { clearAllFilters, filteredData, filters, onSetFilters } =
+    useKubevirtDataViewFilters<DiskRowDataLayout>({
+      data: disks ?? [],
+      filterDefinitions,
+      hideLabelFilter: true,
+    });
 
   const addVolumeAccessReview = asAccessReview(
     VirtualMachineSubresourcesModel,
@@ -90,7 +100,10 @@ const DiskList: FC<DiskListProps> = ({ customize = false, onDiskUpdate, vm, vmi 
   return (
     <div className="kv-configuration-vm-disk-list">
       <DiskListTitle />
+      {afterTitle}
       <DiskSourceSelect
+        canCreateDataVolume={canCreateDataVolume}
+        canUpdate={canAddDisk}
         onSelect={(diskSource: SourceTypes) => {
           return createModal(({ isOpen, onClose }) => (
             <DiskModal
@@ -102,8 +115,6 @@ const DiskList: FC<DiskListProps> = ({ customize = false, onDiskUpdate, vm, vmi 
             />
           ));
         }}
-        canCreateDataVolume={canCreateDataVolume}
-        canUpdate={canAddDisk}
       />
       <Flex>
         <FlexItem>

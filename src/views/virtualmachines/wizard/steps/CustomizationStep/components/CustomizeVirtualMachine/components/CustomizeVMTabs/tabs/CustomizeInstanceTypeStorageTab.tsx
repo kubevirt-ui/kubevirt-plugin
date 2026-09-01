@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { type FC } from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import EnvironmentForm from '@kubevirt-utils/components/EnvironmentEditor/EnvironmentForm';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
+import VirtIORecommendationAlert from '@kubevirt-utils/components/VirtIORecommendationAlert/VirtIORecommendationAlert';
 import { getDataVolumeTemplates, getDisks, getVolumes } from '@kubevirt-utils/resources/vm';
 import {
   customizeWizardVMSignal,
@@ -13,7 +14,7 @@ import { Divider, Grid, GridItem, PageSection } from '@patternfly/react-core';
 import { useSignals } from '@preact/signals-react/runtime';
 import DiskList from '@virtualmachines/details/tabs/configuration/storage/components/tables/disk/DiskList';
 
-const CustomizeInstanceTypeStorageTab = () => {
+const CustomizeInstanceTypeStorageTab: FC = () => {
   useSignals();
   const vm = customizeWizardVMSignal.value;
 
@@ -26,6 +27,8 @@ const CustomizeInstanceTypeStorageTab = () => {
       <GridItem>
         <PageSection>
           <DiskList
+            afterTitle={<VirtIORecommendationAlert kind="disk" vm={vm} />}
+            customize
             onDiskUpdate={(updatedVM: V1VirtualMachine) => {
               const vmModified = patchCustomizeWizardVMSignal([
                 {
@@ -44,7 +47,6 @@ const CustomizeInstanceTypeStorageTab = () => {
 
               return Promise.resolve(vmModified ?? updatedVM);
             }}
-            customize
             vm={vm}
           />
         </PageSection>
