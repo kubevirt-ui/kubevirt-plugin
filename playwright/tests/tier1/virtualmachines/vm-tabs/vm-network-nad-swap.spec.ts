@@ -9,6 +9,7 @@ import { expect, test } from '@/fixtures/vm-tabs-fixture';
 import {
   attachBridgeNetworkInterface,
   createBridgeNetworkAttachmentDefinition,
+  createVmWithEmptyDisk,
   getVmMultusNetworkName,
   setupTestNamespace,
 } from '@/utils/test-setup-helpers';
@@ -42,23 +43,7 @@ test.describe(SUITE, { tag: [T1_TAG, ADMIN_ONLY_TAG] }, () => {
       await createBridgeNetworkAttachmentDefinition(apiClient, sourceNad, namespace);
       await createBridgeNetworkAttachmentDefinition(apiClient, targetNad, namespace);
 
-      await apiClient.createVmFromTemplate(
-        utils.TEMPLATE_METADATA_NAMES.RHEL9,
-        vmName,
-        namespace,
-        'openshift',
-        false,
-      );
-      apiClient.trackResource('VirtualMachine', vmName, namespace);
-
-      const created = await apiClient.verifyVmCreated(
-        vmName,
-        namespace,
-        utils.TestTimeouts.VM_BOOTUP,
-      );
-      expect(created.exists, 'VM should exist before start').toBe(true);
-
-      await apiClient.startVm(namespace, vmName);
+      await createVmWithEmptyDisk(apiClient, vmName, namespace);
       await utils.waitForVirtualMachineReady(
         apiClient,
         vmName,

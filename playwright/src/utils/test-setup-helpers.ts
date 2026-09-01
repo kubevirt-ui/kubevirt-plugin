@@ -283,6 +283,47 @@ export async function createBridgeNetworkAttachmentDefinition(
 }
 
 /**
+ * Creates a VM with a KubeVirt emptyDisk and no bootable volume.
+ * Skipping DataSource clones / container image pulls makes the VM much more
+ * likely to reach Running in CI.
+ */
+export async function createVmWithEmptyDisk(
+  client: RequestContextClient,
+  vmName: string,
+  namespace: string,
+  startVm = true,
+): Promise<void> {
+  await client.createVirtualMachine(namespace, {
+    apiVersion: 'kubevirt.io/v1',
+    kind: 'VirtualMachine',
+    metadata: { name: vmName, namespace },
+    spec: {
+      runStrategy: startVm ? 'Always' : 'Halted',
+      template: {
+        spec: {
+          domain: {
+            cpu: { cores: 1 },
+            devices: {
+              disks: [{ bootOrder: 1, disk: { bus: 'virtio' }, name: 'emptydisk' }],
+              interfaces: [{ masquerade: {}, name: 'default' }],
+            },
+            memory: { guest: '1Gi' },
+          },
+          networks: [{ name: 'default', pod: {} }],
+          terminationGracePeriodSeconds: 0,
+          volumes: [{ emptyDisk: { capacity: '1Gi' }, name: 'emptydisk' }],
+        },
+      },
+    },
+  });
+  client.trackResource('VirtualMachine', vmName, namespace);
+  const exists = await client.waitForVmExists(vmName, namespace);
+  if (!exists) {
+    throw new Error(`Empty-disk VM ${vmName} was not created in namespace ${namespace}`);
+  }
+}
+
+/**
  * Appends a bridge Multus NIC to a VirtualMachine spec.
  * Safe to call on a running VM (hot-plug add); the UI then lists the interface for NAD edit.
  */
