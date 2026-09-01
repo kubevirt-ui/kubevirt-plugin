@@ -34,9 +34,7 @@ const createVMTreeItem = (
   const vmNamespace = getNamespace(vm);
   const vmName = getName(vm);
   const vmCluster = getCluster(vm);
-  const VMStatusIcon = vm?.status?.printableStatus
-    ? statusIcon[vm.status.printableStatus]
-    : undefined;
+  const VMStatusIcon = statusIcon[vm?.status?.printableStatus ?? ''];
 
   return {
     defaultExpanded: currentPageVMName && currentPageVMName === vmName,
