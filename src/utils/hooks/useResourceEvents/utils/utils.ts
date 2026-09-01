@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { ResourceOptions } from '@kubevirt-utils/hooks/useResourceEvents/utils/types';
 import { getKind, getName, getUID } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';

@@ -53,9 +53,37 @@ const baseConfig = {
     unicorn,
   },
   rules: {
+    curly: ['error', 'all'],
+    eqeqeq: ['error', 'always', { null: 'ignore' }],
     'i18next/no-literal-string': 'error',
+    'id-length': [
+      'error',
+      {
+        exceptions: ['t', 'e', 'i', 'a', 'b', 'id', 'ID', 'vm', 'VM', 'vmi', 'VMI', 'ns', 'NS'],
+        min: 3,
+        properties: 'never',
+      },
+    ],
+    'max-lines': ['error', { max: 150, skipBlankLines: true, skipComments: true }],
     'no-console': 'error',
+    'no-else-return': ['error', { allowElseIf: false }],
     'no-nested-ternary': 'error',
+    'no-param-reassign': ['error', { props: false }],
+    'no-restricted-imports': [
+      'error',
+      {
+        paths: [
+          {
+            message:
+              'Import specific lodash modules (e.g., lodash/get) instead of the full bundle.',
+            name: 'lodash',
+          },
+        ],
+      },
+    ],
+    'no-var': 'error',
+    'no-warning-comments': ['warn', { location: 'start', terms: ['todo', 'fixme', 'hack', 'xxx'] }],
+    'prefer-const': 'error',
     'promise/always-return': ['warn', { ignoreLastCallback: true }],
     'promise/no-nesting': 'warn',
     'promise/no-return-wrap': 'error',
@@ -157,6 +185,8 @@ const testFilesOverrides = {
   rules: {
     ...allSonarjsRulesOff,
     'i18next/no-literal-string': 'off',
+    'id-length': 'off',
+    'max-lines': 'off',
   },
 };
 //part 2 will add the rules for the playwright tests.

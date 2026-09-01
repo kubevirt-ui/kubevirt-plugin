@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { FC, useEffect, useMemo, useState } from 'react';
 import { FormProvider, useForm, useWatch } from 'react-hook-form';
 

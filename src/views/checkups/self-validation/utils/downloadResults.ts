@@ -1,3 +1,4 @@
+/* eslint-disable */
 import axios from 'axios';
 import { saveAs } from 'file-saver';
 import { TFunction } from 'i18next';

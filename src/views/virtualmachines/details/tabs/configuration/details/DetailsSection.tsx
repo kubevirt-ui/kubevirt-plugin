@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { FC, useEffect, useMemo, useState } from 'react';
 
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';

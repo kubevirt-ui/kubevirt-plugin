@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { FC } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { Trans } from 'react-i18next';

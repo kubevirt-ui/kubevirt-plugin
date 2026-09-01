@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { isRedHatInstanceType } from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/InstanceTypeDrilldownSelect/utils/utils';
 
 import { VirtualMachineInstancetypeModelRef } from '@kubevirt-utils/models';

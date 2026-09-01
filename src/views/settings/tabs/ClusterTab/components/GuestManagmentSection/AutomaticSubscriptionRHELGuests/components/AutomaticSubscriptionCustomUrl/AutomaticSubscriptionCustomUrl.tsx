@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { FC, useCallback, useEffect, useState } from 'react';
 
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';

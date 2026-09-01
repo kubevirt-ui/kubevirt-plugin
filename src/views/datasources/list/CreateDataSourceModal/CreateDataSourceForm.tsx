@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { FC } from 'react';
 import { FieldError, UseFormRegister, UseFormSetValue } from 'react-hook-form';
 

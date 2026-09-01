@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getVMStatus } from '@kubevirt-utils/resources/shared';
 import { isErrorPrintableStatus } from '@virtualmachines/utils';

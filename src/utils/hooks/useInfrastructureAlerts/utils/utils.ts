@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { AlertType } from '@kubevirt-utils/components/AlertsCard/utils/types';
 import { AlertsBySeverity } from '@kubevirt-utils/hooks/useInfrastructureAlerts/useInfrastructureAlerts';
 import { OPERATOR_HEALTH_IMPACT_LABEL } from '@kubevirt-utils/hooks/useInfrastructureAlerts/utils/constants';

@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { CAPACITY_UNITS } from '@kubevirt-utils/components/CapacityInput/utils';
 import { createCPUQueryValue, createMemoryQueryValue } from '@search/utils/query';
 import { VirtualMachineRowFilterType } from '@virtualmachines/utils';

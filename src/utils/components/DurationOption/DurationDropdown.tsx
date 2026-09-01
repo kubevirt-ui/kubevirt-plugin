@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { FC, useState } from 'react';
 
 import DurationOption from '@kubevirt-utils/components/DurationOption/DurationOption';

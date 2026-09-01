@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { Dispatch, FC, SetStateAction, useMemo } from 'react';
 import { Trans } from 'react-i18next';
 

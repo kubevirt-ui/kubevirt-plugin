@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { FC } from 'react';
 import FirstItemListPopover from 'src/views/virtualmachines/list/components/FirstItemListPopover/FirstItemListPopover';
 

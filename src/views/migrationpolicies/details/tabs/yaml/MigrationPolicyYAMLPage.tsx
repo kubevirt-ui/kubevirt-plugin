@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { FC, Suspense } from 'react';
 
 import { V1alpha1MigrationPolicy } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';

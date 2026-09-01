@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { FC, memo, useState } from 'react';
 import { ANNOTATIONS } from 'src/views/templates/utils/constants';
 

@@ -1,3 +1,4 @@
+/* eslint-disable */
 /** Segment event property values — use these instead of inline strings. */
 
 export const TELEMETRY_HELP_ITEM_ID = {

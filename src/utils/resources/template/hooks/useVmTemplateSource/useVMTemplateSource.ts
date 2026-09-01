@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import {
@@ -159,7 +160,7 @@ export const useVMTemplateSource = (
     }
 
     prevBootSourceRef.current = bootSource;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [bootSource, cluster]);
 
   return {

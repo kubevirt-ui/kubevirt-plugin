@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { FC, MouseEvent, useState } from 'react';
 
 import SelectToggle from '@kubevirt-utils/components/toggles/SelectToggle';

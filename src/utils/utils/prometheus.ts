@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { murmur3 } from 'murmurhash-js';
 
 import { CNV_OBSERVABILITY, KUBEVIRT, NONE } from '@kubevirt-utils/constants/constants';

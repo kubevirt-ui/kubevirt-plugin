@@ -1,3 +1,4 @@
+/* eslint-disable */
 import threeScaleImg from './imgs/logos/3scale.svg';
 import aerogearImg from './imgs/logos/aerogear.svg';
 import amqImg from './imgs/logos/amq.svg';

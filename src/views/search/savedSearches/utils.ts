@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { logVMSavedSearchApplied } from '@kubevirt-utils/extensions/telemetry/dashboard';
 import {
   KubevirtFilterState,

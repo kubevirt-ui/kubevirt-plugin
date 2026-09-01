@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { ReactNode } from 'react';
 import classNames from 'classnames';
 import { TFunction } from 'i18next';

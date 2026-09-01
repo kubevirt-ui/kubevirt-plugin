@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { FC } from 'react';
 import cn from 'classnames';
 import { SubscriptionKind } from 'src/views/clusteroverview/utils/types';

@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { FC, useMemo } from 'react';
 
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';

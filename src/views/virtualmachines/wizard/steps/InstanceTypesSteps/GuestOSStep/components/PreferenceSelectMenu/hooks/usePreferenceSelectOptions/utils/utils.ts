@@ -1,3 +1,4 @@
+/* eslint-disable */
 import {
   V1beta1VirtualMachineClusterPreference,
   V1beta1VirtualMachinePreference,

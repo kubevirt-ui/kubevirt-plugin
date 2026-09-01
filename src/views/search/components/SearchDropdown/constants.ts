@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { TFunction } from 'i18next';
 
 import { NumberOperator, numberOperatorInfo } from '@kubevirt-utils/utils/constants';

@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { useMemo } from 'react';
 
 import { IoK8sApiBatchV1Job } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';

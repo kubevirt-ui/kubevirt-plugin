@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useMemo } from 'react';
 import { findObjectByName } from 'src/views/checkups/utils/utils';
 

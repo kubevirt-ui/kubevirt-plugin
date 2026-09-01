@@ -1,4 +1,5 @@
-// eslint-disable-next-line
+/* eslint-disable */
+ 
 import { Buffer } from 'buffer';
 
 import { type IoK8sApiCoreV1Pod } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';

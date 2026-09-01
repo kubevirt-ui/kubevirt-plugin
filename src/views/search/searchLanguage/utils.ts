@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 

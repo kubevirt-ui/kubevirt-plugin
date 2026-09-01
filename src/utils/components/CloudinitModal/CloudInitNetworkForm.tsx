@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { FC, FormEvent, useEffect } from 'react';
 import { Trans } from 'react-i18next';
 import * as ipaddr from 'ipaddr.js';

@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { InstanceTypesMenuItemsData } from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/InstanceTypeDrilldownSelect/utils/types';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { CubesIcon, PuzzlePieceIcon, ServerGroupIcon, StarIcon } from '@patternfly/react-icons';

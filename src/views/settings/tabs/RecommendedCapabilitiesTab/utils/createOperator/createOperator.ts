@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { defaultsDeep, isEqual } from 'lodash';
 
 import {

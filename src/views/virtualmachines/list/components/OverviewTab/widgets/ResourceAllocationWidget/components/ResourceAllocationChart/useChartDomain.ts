@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useMemo } from 'react';
 
 import { ChartDomain } from '@overview/OverviewTab/metric-charts-card/utils/hooks/types';

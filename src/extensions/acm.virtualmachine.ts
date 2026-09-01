@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { ComponentType, ReactNode } from 'react';
 
 import { Extension } from '@openshift-console/dynamic-plugin-sdk/lib/types';

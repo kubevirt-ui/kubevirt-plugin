@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1Condition } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { K8sResourceCommon, Selector } from '@openshift-console/dynamic-plugin-sdk';

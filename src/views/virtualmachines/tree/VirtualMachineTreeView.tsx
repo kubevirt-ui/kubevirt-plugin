@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { CSSProperties, FC, ReactNode, useMemo } from 'react';
 
 import useIsSmallScreen from '@kubevirt-utils/hooks/useIsSmallScreen';

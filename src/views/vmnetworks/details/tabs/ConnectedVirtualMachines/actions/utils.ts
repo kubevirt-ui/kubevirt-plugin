@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { V1Network, V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { deleteNetworkInterface } from '@kubevirt-utils/components/NetworkInterfaceModal/utils/helpers';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';

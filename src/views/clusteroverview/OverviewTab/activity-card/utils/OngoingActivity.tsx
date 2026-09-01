@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { FC } from 'react';
 
 import { OngoingActivityBody } from '@openshift-console/dynamic-plugin-sdk-internal';

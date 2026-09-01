@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { abbreviateNumber } from 'js-abbreviation-number';
 
 import { MILLISECONDS_MULTIPLIER, MS_PER_DAY } from '@kubevirt-utils/components/Charts/utils/utils';

@@ -4,9 +4,9 @@ import {
   humanizeBinaryBytes,
   humanizeCpuCores,
   humanizeDecimalBytes,
+  type HumanizeResult,
   humanizeSeconds,
 } from '../../../../utils/utils/humanize';
-import { type HumanizeResult } from '../../../../utils/utils/humanize';
 import { STORAGE_IOPS_UNIT } from './constants';
 import { TopConsumerMetric } from './topConsumerMetric';
 import { TopConsumerScope } from './topConsumerScope';
@@ -50,11 +50,8 @@ export const humanizeTopConsumerMetric = (
   return { unit: humanizedValue.unit, value: humanizedValue.value };
 };
 
-export const getHumanizedValue = (
-  value: number | string,
-  metric: TopConsumerMetric,
-): HumanizeResult => {
-  const rawValue = typeof value === 'number' ? value : getValue(value);
+export const getHumanizedValue = (value: string, metric: TopConsumerMetric): HumanizeResult => {
+  const rawValue = getValue(value);
   return humanizeTopConsumerMetric(rawValue, metric);
 };
 

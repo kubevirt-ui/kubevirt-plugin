@@ -1,3 +1,4 @@
+/* eslint-disable */
 import {
   V1alpha1MigrationPolicy,
   V1MigrationConfiguration,

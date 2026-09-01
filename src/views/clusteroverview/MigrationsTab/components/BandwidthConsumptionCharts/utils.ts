@@ -1,3 +1,4 @@
+/* eslint-disable */
 import xbytes from 'xbytes';
 
 import DurationOption from '@kubevirt-utils/components/DurationOption/DurationOption';

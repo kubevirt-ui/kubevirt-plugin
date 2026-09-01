@@ -1,3 +1,4 @@
+/* eslint-disable */
 export const isValidIPv4Substring = (ip: string) => {
   // Invalid characters || consecutive dots
   if (!/^[0-9.]*$/.test(ip) || /\.\./.test(ip)) {

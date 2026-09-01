@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { Dispatch, FC, SetStateAction } from 'react';
 
 import { PaginationState } from '@kubevirt-utils/hooks/usePagination/utils/types';

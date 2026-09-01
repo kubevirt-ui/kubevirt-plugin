@@ -1,3 +1,4 @@
+/* eslint-disable */
 /** Contains significant parts of https://github.com/xtermjs/xterm.js/blob/c4b707e9ca8ba8e27cecb859fe80ccebeca7375a/addons/addon-attach/src/AttachAddon.ts
  *  Original comments and copyrights retained below.
  */

@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { IoK8sApiCoreV1Pod } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';

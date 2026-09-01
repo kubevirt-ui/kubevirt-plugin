@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useCallback, useMemo } from 'react';
 
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';

@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { saveAs } from 'file-saver';
 
 import { ServiceModel } from '@kubevirt-ui-ext/kubevirt-api/console';

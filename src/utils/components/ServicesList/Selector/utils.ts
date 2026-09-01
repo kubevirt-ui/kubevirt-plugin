@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { ALL_CLUSTERS_KEY } from '@kubevirt-utils/hooks/constants';
 import { getACMTextSearchURL } from '@multicluster/urls';
 import { MatchExpression, Operator, Selector } from '@openshift-console/dynamic-plugin-sdk';

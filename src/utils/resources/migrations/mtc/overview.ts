@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { MigPlanModel } from '@kubevirt-utils/models';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 

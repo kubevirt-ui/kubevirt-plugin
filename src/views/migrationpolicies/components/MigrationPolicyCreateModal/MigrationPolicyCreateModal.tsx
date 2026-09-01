@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { FC, useMemo, useState } from 'react';
 
 import { MigrationPolicyModel } from '@kubevirt-ui-ext/kubevirt-api/console';

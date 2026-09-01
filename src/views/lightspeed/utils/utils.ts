@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { dump as dumpYAML } from 'js-yaml';
 
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';

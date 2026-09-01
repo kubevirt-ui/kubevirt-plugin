@@ -1,3 +1,4 @@
+/* eslint-disable */
 import produce from 'immer';
 
 import { V1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';

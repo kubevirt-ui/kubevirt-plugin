@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 
 import {

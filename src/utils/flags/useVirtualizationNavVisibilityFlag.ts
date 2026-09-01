@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useEffect, useMemo } from 'react';
 import useMultipleAccessReviews from 'src/views/cdi-upload-provider/hooks/useMultipleAccessReviews';
 

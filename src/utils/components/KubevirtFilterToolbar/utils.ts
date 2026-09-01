@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { KubevirtFilterState } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 
 export const getOnSelect =

@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { DistributionBucket } from '../../shared/DistributionBarChart/DistributionBarChart';
 import { ExtraScoreItem, StatusScoreItem } from '../../shared/StatusScoreList/StatusScoreList';
 

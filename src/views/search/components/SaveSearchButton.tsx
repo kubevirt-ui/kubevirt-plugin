@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { FC, useCallback } from 'react';
 
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';

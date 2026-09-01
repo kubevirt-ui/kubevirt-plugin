@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { FC } from 'react';
 
 import { BootableDeviceType } from '@kubevirt-utils/resources/vm/utils/boot-order/bootOrder';

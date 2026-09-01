@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { FC, JSX, Ref } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';

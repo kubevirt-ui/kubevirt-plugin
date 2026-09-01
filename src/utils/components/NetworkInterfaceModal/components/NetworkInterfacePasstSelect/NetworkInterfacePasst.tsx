@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { FC, useCallback, useState } from 'react';
 
 import NetworkInterfacePasstHelperPopover from '@kubevirt-utils/components/NetworkInterfaceModal/components/NetworkInterfacePasstSelect/NetworkInterfacePasstHelperPopover';

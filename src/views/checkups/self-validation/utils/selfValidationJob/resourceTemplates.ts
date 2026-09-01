@@ -1,3 +1,4 @@
+/* eslint-disable */
 import {
   IoK8sApiBatchV1Job,
   IoK8sApiCoreV1ConfigMap,

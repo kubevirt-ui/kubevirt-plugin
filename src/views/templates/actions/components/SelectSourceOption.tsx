@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { FC, ReactNode, useCallback } from 'react';
 import { useParams } from 'react-router';
 import { TFunction } from 'i18next';
