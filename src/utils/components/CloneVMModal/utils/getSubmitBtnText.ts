@@ -1,14 +1,6 @@
 import { type TFunction } from 'i18next';
 
-const getSubmitBtnText = (
-  isCloneSucceeded: boolean,
-  isCloneLoading: boolean,
-  isVMSource: boolean,
-  t: TFunction,
-): string => {
-  if (isCloneSucceeded) {
-    return t('Close');
-  }
+const getSubmitBtnText = (isCloneLoading: boolean, isVMSource: boolean, t: TFunction): string => {
   if (isCloneLoading) {
     return t('Cloning');
   }

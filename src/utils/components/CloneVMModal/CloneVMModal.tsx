@@ -12,6 +12,7 @@ import {
 } from '@kubevirt-utils/extensions/telemetry/utils/property-constants';
 import { logVMActionPerformed } from '@kubevirt-utils/extensions/telemetry/vm-actions';
 import { logVMCloned } from '@kubevirt-utils/extensions/telemetry/vm-storage';
+import useKubevirtToast from '@kubevirt-utils/hooks/useKubevirtToast';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useNameValidation } from '@kubevirt-utils/hooks/useNameValidation';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
@@ -40,6 +41,7 @@ type CloneVMModalProps = {
 
 const CloneVMModal: FC<CloneVMModalProps> = ({ headerText, isOpen, onClose, source }) => {
   const { t } = useKubevirtTranslation();
+  const { addSuccessToast } = useKubevirtToast();
   const namespace = getNamespace(source);
   const name = getName(source);
 
@@ -99,8 +101,14 @@ const CloneVMModal: FC<CloneVMModalProps> = ({ headerText, isOpen, onClose, sour
       if (isVM(source)) {
         logVMActionPerformed(TELEMETRY_VM_ACTION.CLONE, source);
       }
+      addSuccessToast({
+        title: t(
+          'Clone completed. The cloned virtual machine may take some time to appear in the list.',
+        ),
+      });
+      onClose();
     }
-  }, [isCloneSucceeded, source]);
+  }, [addSuccessToast, isCloneSucceeded, onClose, source, t]);
 
   return (
     <TabModal
@@ -114,21 +122,14 @@ const CloneVMModal: FC<CloneVMModalProps> = ({ headerText, isOpen, onClose, sour
       modalVariant={ModalVariant.medium}
       obj={source}
       onClose={onClose}
-      onSubmit={async () => {
-        if (isCloneSucceeded) {
-          onClose();
-          return;
-        }
-        return sendCloneRequest();
-      }}
+      onSubmit={sendCloneRequest}
       shouldWrapInForm
-      submitBtnText={getSubmitBtnText(isCloneSucceeded, isCloneInProgress, isVM(source), t)}
+      submitBtnText={getSubmitBtnText(isCloneInProgress, isVM(source), t)}
     >
       <CloneStatusAlerts
         cloneFailureMessage={cloneFailureMessage}
         isCloneFailed={isCloneFailed}
         isCloneInProgress={isCloneInProgress}
-        isCloneSucceeded={isCloneSucceeded}
       />
       <NameInput
         autoFocus
