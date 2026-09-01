@@ -302,7 +302,6 @@ test.describe(SUITE, { tag: [GATING_TAG, VM_SEARCH_TAG] }, () => {
       });
 
       await test.step('Only group-alpha VMs are listed', async () => {
-        await vmListPage.clickVmListTab();
         const alpha1Visible = await vmListPage.isVmVisibleByDataTest(vmAlpha1);
         const alpha2Visible = await vmListPage.isVmVisibleByDataTest(vmAlpha2);
         const beta1Hidden = await vmListPage.isVmNameHidden(vmBeta1, TestTimeouts.SHORT_WAIT);
@@ -336,7 +335,6 @@ test.describe(SUITE, { tag: [GATING_TAG, VM_SEARCH_TAG] }, () => {
       });
 
       await test.step('All VMs are visible again', async () => {
-        await vmListPage.clickVmListTab();
         const alpha1Visible = await vmListPage.isVmVisibleByDataTest(vmAlpha1);
         const beta1Visible = await vmListPage.isVmVisibleByDataTest(vmBeta1);
         const gamma1Visible = await vmListPage.isVmVisibleByDataTest(vmGamma1);

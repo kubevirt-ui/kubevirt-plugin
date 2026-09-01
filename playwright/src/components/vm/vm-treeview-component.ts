@@ -38,11 +38,10 @@ export default class VmTreeViewComponent extends BaseComponent {
 
   async clickFolderNode(folderName: string, namespace: string): Promise<void> {
     const nodeId = `folderSelector/#single-cluster#/${namespace}/${folderName}`;
-    // Direct child combinator so the click hits the folder label, not a nested VM
-    // inside the expanded folder LI (Playwright clicks the center of the bounding box).
-    const folderButton = this.locator(
-      `[id="${nodeId}"] > div button.pf-v6-c-tree-view__node-text`,
-    );
+    // Direct child of the folder LI so the click hits this node's button, not a nested VM.
+    const folderButton = this.locator(`[id="${nodeId}"] > div`).getByRole('button', {
+      name: folderName,
+    });
 
     try {
       await folderButton.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });

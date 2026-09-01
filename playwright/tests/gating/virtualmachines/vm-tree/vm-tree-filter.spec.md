@@ -5,7 +5,7 @@
 - **Project Name:** KubeVirt UI — Playwright E2E Tests
 - **Feature Area:** Gating — Virtual machines / Tree view
 - **Latest version:** CNV 5.1.0
-- **Latest update:** 2026-08-25
+- **Latest update:** 2026-09-01
 - **Document Status:** Approved
 
 ## 2. Introduction

@@ -88,24 +88,12 @@ export default class VirtualMachinesPage extends TreeContextMenuMixin(PageCommon
     return this.overviewWidgets.clearVmListMetricsMocks();
   }
 
-  async clearVmToolbarSearch(): Promise<void> {
-    return this.search.clearVmToolbarSearch();
-  }
-
   override async clickActionsDropdown() {
     return this.listActions.clickActionsDropdown();
   }
 
   async clickAdvancedSearchButton(): Promise<void> {
     return this.search.clickAdvancedSearchButton();
-  }
-
-  async clickAdvancedSearchClose(): Promise<void> {
-    return this.search.clickAdvancedSearchClose();
-  }
-
-  async clickAdvancedSearchReset(): Promise<void> {
-    return this.search.clickAdvancedSearchReset();
   }
 
   async clickBackToVirtualMachinesList(): Promise<void> {

@@ -39,7 +39,7 @@ Without `--local`, locator discovery relies on the live UI via Playwright MCP (`
 
 1. **Does it verify a page loads and shows expected content?** → **Gating** (add to existing `scenario-virtualization-pages.spec.ts`)
 2. **Does it create a resource via form or YAML?** → Check if gating already has it; if not, add to gating's `scenario-resource-creation.spec.ts`. If it's a full CRUD lifecycle, add to **Tier 1**.
-3. **Does it test VM search language or tree empty-project filter?** → **Gating** under `tests/gating/virtualmachines/`
+3. **Does it test VM search language, tree view or filters?** → **Gating** under `tests/gating/virtualmachines/`
 4. **Does it test VM tabs, lifecycle/delete, disks/CD-ROM, or list alerts?** → **Tier 1** under `tests/tier1/virtualmachines/`
 5. **Does it test a single resource's lifecycle (create → configure → verify → delete)?** → **Tier 1** under `tests/tier1/<feature>/`
 6. **Does it test cross-module integration, multi-resource workflows, or migration?** → **Tier 2** under `tests/tier2/<feature>/`
@@ -55,7 +55,7 @@ tests/
 │   ├── scenario-resource-creation.spec.ts      # VM, template, BV creation (form + YAML)
 │   └── virtualmachines/
 │       ├── vm-search/                          # VM search language and filters (halted VMs)
-│       └── vm-tree/                            # Tree view empty-project filter
+│       └── vm-tree/                            # Tree view
 ├── tier1/
 │   ├── bootable-volumes/                       # BV list, create, delete
 │   ├── checkups/                               # Network/storage checkup lifecycle

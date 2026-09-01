@@ -273,6 +273,9 @@ export class VmListSearchComponent extends BaseComponent {
   private readonly _backToVirtualMachinesListBtn = this.locator(
     'button:has-text("Back to VirtualMachines list")',
   );
+  private readonly _clearSearchButton = this.testId('vm-search-input').locator(
+    'button[aria-label="Clear search"]',
+  );
   private readonly _footerSaveButton = this.locator('footer').locator('[data-test="save-button"]');
   private readonly _h1H2H3H4H5H6 = this.locator('h1, h2, h3, h4, h5, h6');
   private readonly _savedSearches = this.testId('saved-searches');
@@ -290,33 +293,12 @@ export class VmListSearchComponent extends BaseComponent {
     super(page);
   }
 
-  async clearVmToolbarSearch(): Promise<void> {
-    await this._vmSearchInputByDataTest.waitFor({
-      state: 'visible',
-      timeout: TestTimeouts.ELEMENT_WAIT,
-    });
-    await this._vmSearchInputByDataTest.clear();
-    await this.clickSearchButton();
-  }
-
   async clickAdvancedSearchButton(): Promise<void> {
     await this._vmAdvancedSearchButton.waitFor({
       state: 'visible',
       timeout: TestTimeouts.ELEMENT_WAIT,
     });
     await this.robustClick(this._vmAdvancedSearchButton);
-  }
-
-  async clickAdvancedSearchClose(): Promise<void> {
-    const closeButton = this.locator('button[aria-label="Close"]');
-    await closeButton.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
-    await this.robustClick(closeButton);
-  }
-
-  async clickAdvancedSearchReset(): Promise<void> {
-    const resetButton = this.locator('button[aria-label="Clear search"]');
-    await resetButton.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
-    await this.robustClick(resetButton);
   }
 
   async clickBackToVirtualMachinesList(): Promise<void> {
@@ -328,13 +310,12 @@ export class VmListSearchComponent extends BaseComponent {
   }
 
   async clickClearSearchButton(): Promise<void> {
-    const clearBtn = this.testId('vm-search-input').locator('button[aria-label="Clear search"]');
-    const clearVisible = await clearBtn
+    const clearVisible = await this._clearSearchButton
       .waitFor({ state: 'visible', timeout: TestTimeouts.SHORT_WAIT })
       .then(() => true)
       .catch(() => false);
     if (clearVisible) {
-      await this.robustClick(clearBtn);
+      await this.robustClick(this._clearSearchButton);
     } else {
       await this._vmSearchInputByDataTest.clear();
       await this._vmSearchInputByDataTest.press('Enter');
