@@ -4,9 +4,11 @@
 
 - **Project Name:** KubeVirt UI — Playwright E2E Tests
 - **Feature Area:** [e.g., Gating — VM management, Tier1 — Bootable volumes]
-- **Latest version:** [Most recent CNV release this document was validated against, e.g., CNV 4.22.0]
+- **Latest version:** [Most recent CNV release this document was validated against, e.g., CNV 5.0.0]
 - **Latest update:** [YYYY-MM-DD of the most recent edit to this document]
 - **Document Status:** [Draft / In Review / Approved — if the tests described are included in the PR and have been verified locally, mark as Approved]
+
+CNV versions must be three-part `CNV <major>.<minor>.<patch>` (e.g. `CNV 5.0.0`). Do not use `CNV 5.0` or `CNV 5.00`. Apply the same format to every **Target version** below.
 
 ## 2. Introduction
 
@@ -38,7 +40,9 @@
 ### `001`: [Functional title — describes what the system does; no Jira ticket IDs in title]
 
 - **Objective:** [What behavior is verified in one sentence]
-- **Target version:** [CNV release this scenario was written for / first covers, e.g., CNV 4.22.0]
+  <<<<<<< HEAD
+- **Target version:** [CNV release this scenario was written for / first covers, e.g., CNV 5.0.0]
+  > > > > > > > c8ff20e69 (NV-76355: Add relevant tests)
 - **Jira References:** [CNV-XXXXX, CNV-YYYYY — tickets whose feature/bugfix this scenario covers; omit if none]
 - **Pre-conditions:** [Any test.skip() conditions or required cluster state]
 - **Tags:** [e.g., `@gating`, `@nonpriv`]
@@ -53,7 +57,7 @@
 ### `002`: [Functional title]
 
 - **Objective:** [What behavior is verified]
-- **Target version:** [CNV release this scenario was written for / first covers]
+- **Target version:** [CNV release this scenario was written for / first covers, e.g., CNV 5.0.0]
 - **Jira References:** [CNV-XXXXX — or omit if functional smoke with no specific ticket]
 - **Pre-conditions:** [e.g., VM must be in Running state]
 

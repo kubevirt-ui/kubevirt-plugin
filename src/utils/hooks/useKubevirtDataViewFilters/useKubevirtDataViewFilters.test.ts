@@ -8,10 +8,6 @@ let mockFiltersState: KubevirtFilterState = { labels: [], name: [] };
 const mockClearAllFilters = jest.fn();
 const mockOnSetFilters = jest.fn();
 
-jest.mock('@kubevirt-utils/hooks/useKubevirtTranslation', () => ({
-  useKubevirtTranslation: () => ({ t: (str: string) => str }),
-}));
-
 jest.mock('@patternfly/react-data-view', () => ({
   useDataViewFilters: jest.fn(() => ({
     clearAllFilters: mockClearAllFilters,

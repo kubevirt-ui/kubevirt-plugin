@@ -1,16 +1,11 @@
 import { type TFunction } from 'i18next';
 
+import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { OS_NAME_LABELS } from '@kubevirt-utils/resources/template';
 
 import { getOSFilter, getOSName } from '../getOSFilter';
 
 import { createMockVM } from './mockVM';
-
-const t = (str: string) => str;
-jest.mock('@kubevirt-utils/hooks/useKubevirtTranslation', () => ({
-  t: (str: string) => str,
-  useKubevirtTranslation: () => ({ t: (str: string) => str }),
-}));
 
 describe('VM OS Filter', () => {
   const osFilter = getOSFilter(t as TFunction);

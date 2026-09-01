@@ -1,10 +1,13 @@
 import { TestTimeouts } from '@/utils/test-config';
-import type { Page } from '@playwright/test';
+import { expect, type Page } from '@playwright/test';
 
 import BaseComponent from './base-component';
 
 export default class ModalComponent extends BaseComponent {
   private readonly _modalTitle = this.locator('.pf-v5-c-modal-box__title, .pf-c-modal-box__title');
+  private readonly _tabModal = this.locator('#tab-modal');
+  private readonly _tabModalErrorAlert = this._tabModal.getByTestId('modal-error-alert');
+  private readonly _tabModalSaveButton = this._tabModal.getByTestId('save-button');
   private readonly _welcomeModal = this.locator('#guided-tour-modal');
   private readonly _welcomeModalCloseButton = this.locator(
     '[id="guided-tour-modal"] button[aria-label="Close"]',
@@ -52,6 +55,39 @@ export default class ModalComponent extends BaseComponent {
 
   async clickConfirmInModal(): Promise<void> {
     await this.locator('button:has-text("Confirm")').click();
+  }
+
+  async isErrorAlertVisible(): Promise<boolean> {
+    return this._tabModalErrorAlert
+      .isVisible({ timeout: TestTimeouts.UI_ELEMENT_VISIBILITY })
+      .catch(() => false);
+  }
+
+  async isSaveButtonEnabled(): Promise<boolean> {
+    await this._tabModalSaveButton.waitFor({
+      state: 'visible',
+      timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+    });
+    return this._tabModalSaveButton.isEnabled();
+  }
+
+  async expectErrorAlertToContain(expected: string | RegExp): Promise<void> {
+    await expect(this._tabModalErrorAlert).toContainText(expected, {
+      timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+    });
+  }
+
+  async waitForErrorAlert(): Promise<void> {
+    await this._tabModalErrorAlert.waitFor({
+      state: 'visible',
+      timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+    });
+  }
+
+  async waitForSaveButtonEnabled(): Promise<void> {
+    await expect(this._tabModalSaveButton).toBeEnabled({
+      timeout: TestTimeouts.UI_ACTION_COMPLETE,
+    });
   }
 
   async clickOkInModal(): Promise<void> {

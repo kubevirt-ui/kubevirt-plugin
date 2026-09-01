@@ -446,6 +446,14 @@ export default class PageCommons extends BasePage {
     return this.pageContent.isElementVisible(selector);
   }
 
+  async isModalErrorAlertVisible(): Promise<boolean> {
+    return this.modal.isErrorAlertVisible();
+  }
+
+  async isModalSaveButtonEnabled(): Promise<boolean> {
+    return this.modal.isSaveButtonEnabled();
+  }
+
   async isModalVisible(): Promise<boolean> {
     return this.modal.isModalVisible();
   }
@@ -872,6 +880,18 @@ export default class PageCommons extends BasePage {
 
   async waitForLoadStateNetworkIdle(timeoutMs = 30_000): Promise<void> {
     await this.pageContent.waitForLoadStateNetworkIdle(timeoutMs);
+  }
+
+  async expectModalErrorAlertToContain(expected: string | RegExp): Promise<void> {
+    await this.modal.expectErrorAlertToContain(expected);
+  }
+
+  async waitForModalErrorAlert(): Promise<void> {
+    await this.modal.waitForErrorAlert();
+  }
+
+  async waitForModalSaveButtonEnabled(): Promise<void> {
+    await this.modal.waitForSaveButtonEnabled();
   }
 
   async waitForPageLoad() {

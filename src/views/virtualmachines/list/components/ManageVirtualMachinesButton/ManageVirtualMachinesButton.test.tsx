@@ -29,12 +29,6 @@ jest.mock('@kubevirt-utils/resources/vm', () => ({
   getVMListPath: (...args: unknown[]): string => mockGetVMListPath(...args),
 }));
 
-jest.mock('@kubevirt-utils/hooks/useKubevirtTranslation', () => ({
-  useKubevirtTranslation: (): { t: (str: string) => string } => ({
-    t: (str: string): string => str,
-  }),
-}));
-
 describe('ManageVirtualMachinesButton', () => {
   beforeEach(() => {
     jest.clearAllMocks();

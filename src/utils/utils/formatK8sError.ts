@@ -39,4 +39,7 @@ export const formatK8sError = (error: K8sLikeError | undefined, t: TFunction): s
   return message;
 };
 
-export const getK8sErrorHref = (error: K8sLikeError | undefined): string | undefined => error?.href;
+export const getK8sErrorHref = (error: K8sLikeError | undefined): string | undefined => {
+  const href = error?.href;
+  return href && /^https?:\/\//i.test(href) ? href : undefined;
+};

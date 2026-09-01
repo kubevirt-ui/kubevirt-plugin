@@ -18,6 +18,8 @@ const config: Config.InitialOptions = {
   },
   moduleFileExtensions: ['js', 'jsx', 'ts', 'tsx'],
   moduleNameMapper: {
+    '^@kubevirt-utils/hooks/useKubevirtTranslation$':
+      '<rootDir>/__mocks__/useKubevirtTranslation.ts',
     '@console/*': '<rootDir>/__mocks__/dummy.ts',
     '@stolostron/multicluster-sdk': '<rootDir>/__mocks__/multicluster-sdk.ts',
     '\\.(css|less|scss|svg)$': '<rootDir>/__mocks__/dummy.ts',

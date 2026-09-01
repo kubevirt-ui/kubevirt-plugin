@@ -23,10 +23,6 @@ jest.mock('@patternfly/react-charts/victory', () => {
   };
 });
 
-jest.mock('@kubevirt-utils/hooks/useKubevirtTranslation', () => ({
-  useKubevirtTranslation: () => ({ t: (value: string) => value }),
-}));
-
 jest.mock('../LiveMigrationSettingsPopover/LiveMigrationSettingsPopover', () => ({
   __esModule: true,
   default: () => null,

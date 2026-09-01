@@ -58,24 +58,6 @@ jest.mock('@overview/OverviewTab/vm-statuses-card/utils/utils', () => {
   };
 });
 
-jest.mock('@kubevirt-utils/hooks/useKubevirtTranslation', () => {
-  const t = (key: string, params?: Record<string, string>): string => {
-    let result = key;
-    if (params) {
-      for (const [objKey, value] of Object.entries(params)) {
-        result = result.replace(`{{${objKey}}}`, String(value));
-      }
-    }
-    return result;
-  };
-  return {
-    t,
-    useKubevirtTranslation: (): {
-      t: (key: string, params?: Record<string, string>) => string;
-    } => ({ t }),
-  };
-});
-
 jest.mock('@virtualmachines/search/hooks/useAccessibleResources', () => ({
   useAccessibleResources: (): ReturnType<typeof mockUseAccessibleResources> =>
     mockUseAccessibleResources(),
