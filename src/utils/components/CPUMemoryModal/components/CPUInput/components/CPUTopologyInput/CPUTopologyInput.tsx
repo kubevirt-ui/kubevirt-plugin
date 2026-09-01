@@ -1,6 +1,6 @@
-import React, { Dispatch, FC, SetStateAction } from 'react';
+import React, { type FC } from 'react';
 
-import { V1CPU } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1CPU } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import CPUTopologyHelperText from '@kubevirt-utils/components/CPUMemoryModal/components/CPUInput/components/CPUTopologyInput/components/TotalCPUHelperText/CPUTopologyHelperText';
 import { CPUComponent } from '@kubevirt-utils/components/CPUMemoryModal/components/CPUInput/utils/utils';
 import { Grid } from '@patternfly/react-core';
@@ -12,7 +12,7 @@ type CPUTopologyInputProps = {
   cpuLimits: Record<string, number>;
   hide: boolean;
   isDisabled: boolean;
-  setCPU: Dispatch<SetStateAction<V1CPU>>;
+  setCPU: (cpu: V1CPU) => void;
 };
 
 const CPUTopologyInput: FC<CPUTopologyInputProps> = ({

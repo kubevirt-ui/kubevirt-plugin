@@ -1,8 +1,8 @@
-import React, { FC, useState } from 'react';
+import React, { type FC, useState } from 'react';
 
 import {
-  V1beta1VirtualMachineSnapshot,
-  V1VirtualMachine,
+  type V1beta1VirtualMachineSnapshot,
+  type V1VirtualMachine,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
@@ -24,7 +24,6 @@ import {
 
 import { printableVMStatus } from '../../../../../utils';
 import IndicationLabelList from '../../../snapshots/components/IndicationLabel/IndicationLabelList';
-
 import SnapshotDeleteModal from './component/SnapshotDeleteModal';
 import { icon } from './utils/snapshotStatus';
 
@@ -45,7 +44,7 @@ const VirtualMachinesOverviewTabSnapshotsRow: FC<VirtualMachinesOverviewTabSnaps
     new Date(snapshot?.metadata?.creationTimestamp),
     new Date(Date.now()),
     false,
-  );
+  ) as string;
 
   const StatusIcon = icon[snapshot?.status?.phase];
 
@@ -108,10 +107,10 @@ const VirtualMachinesOverviewTabSnapshotsRow: FC<VirtualMachinesOverviewTabSnaps
             {t('Restore')}
           </DropdownItem>
           <DropdownItem
+            key="delete"
             onClick={() =>
               createModal((props) => <SnapshotDeleteModal snapshot={snapshot} {...props} />)
             }
-            key="delete"
           >
             {t('Delete')}
           </DropdownItem>

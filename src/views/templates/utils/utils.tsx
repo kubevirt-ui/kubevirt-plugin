@@ -1,19 +1,21 @@
-import { TFunction } from 'i18next';
+import React, { type ReactNode } from 'react';
+import { type TFunction } from 'i18next';
 
-import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { type V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
+import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import {
   getTemplateVirtualMachineObject,
   isVirtualMachineTemplateRequest,
-  Template,
+  type Template,
   TEMPLATE_TYPE_BASE,
   TEMPLATE_TYPE_LABEL,
-  TemplateOrRequest,
+  type TemplateOrRequest,
   vCPUCount,
 } from '@kubevirt-utils/resources/template';
 import {
+  getArchitecture as getVMArchitecture,
   getCPU,
   getMemoryCPU,
-  getArchitecture as getVMArchitecture,
   NO_DATA_DASH,
 } from '@kubevirt-utils/resources/vm';
 import { getArchitecture } from '@kubevirt-utils/utils/architecture';
@@ -23,17 +25,26 @@ export const isCommonVMTemplate = (template: V1Template): boolean =>
   template?.metadata?.labels?.[TEMPLATE_TYPE_LABEL] === TEMPLATE_TYPE_BASE;
 
 export const isDedicatedCPUPlacement = (template: Template): boolean =>
-  getCPU(getTemplateVirtualMachineObject(template))?.dedicatedCpuPlacement;
+  getCPU(getTemplateVirtualMachineObject(template))?.dedicatedCpuPlacement ?? false;
 
 export const getVirtualMachineTemplatesCPUMemoryText = (
   template: Template,
   t: TFunction,
-): string => {
+): ReactNode => {
   const { cpu, memory } = getMemoryCPU(getTemplateVirtualMachineObject(template));
 
-  return `${vCPUCount(cpu)} ${t('CPU')} | ${readableSizeUnit(memory) || NO_DATA_DASH} ${t(
-    'Memory',
-  )}`;
+  if (!cpu && !memory) {
+    return <MutedTextSpan text={t('None')} />;
+  }
+
+  const cpuText = cpu ? `${vCPUCount(cpu)}` : NO_DATA_DASH;
+  const memoryText = memory ? readableSizeUnit(memory) : NO_DATA_DASH;
+
+  return (
+    <>
+      {cpuText} {t('CPU')} | {memoryText} {t('Memory')}
+    </>
+  );
 };
 
 export const getTemplateArchitecture = (template: TemplateOrRequest): string | undefined => {

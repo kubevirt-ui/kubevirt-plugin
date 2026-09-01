@@ -29,8 +29,8 @@ import { isOpenShiftTemplate, isVirtualMachineTemplate, type Template } from './
  */
 export const getTemplateVirtualMachineObject = (template: Template): V1VirtualMachine => {
   const vm = isVirtualMachineTemplate(template)
-    ? template?.spec?.virtualMachine
-    : template?.objects?.find((obj) => obj.kind === VirtualMachineModel.kind);
+    ? (template?.spec?.virtualMachine as V1VirtualMachine)
+    : (template?.objects?.find((obj) => obj.kind === VirtualMachineModel.kind) as V1VirtualMachine);
 
   return { ...vm, cluster: getCluster(template) };
 };

@@ -1,6 +1,6 @@
-import { V1CPU, V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1CPU, type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getAnnotations } from '@kubevirt-utils/resources/shared';
-import { Template } from '@kubevirt-utils/resources/template';
+import { type Template } from '@kubevirt-utils/resources/template';
 import { parseJSONAnnotation } from '@kubevirt-utils/utils/utils';
 
 export enum CPUInputType {
@@ -19,12 +19,7 @@ export const getUpdatedCPU = (cpu: V1CPU, newValue: number, fieldChanged: CPUCom
 };
 
 export const convertTopologyToVCPUs = (cpu: V1CPU): number =>
-  // VMs migrated from vSphere may not have spec.template.spec.domain.cpu.threads set
-  cpu?.cores * cpu?.sockets * (cpu?.threads || 1);
-
-export const formatVCPUsAsSockets = (cpu: V1CPU): V1CPU => {
-  return { ...cpu };
-};
+  (cpu.cores ?? 1) * (cpu.sockets ?? 1) * (cpu.threads ?? 1);
 
 type VMValidationRule = {
   max?: number;
@@ -67,7 +62,11 @@ export const getCPULimitsFromTemplate = (template: Template): Record<string, num
   return parseValidationAnnotations(getAnnotations(template));
 };
 
-export const getInitialCPUInputType = (cpu: V1CPU): CPUInputType => {
-  const isSimpleCPU = (cpu?.cores || 1) === 1 && (cpu?.threads || 1) === 1;
+export const getInitialCPUInputType = (cpu: undefined | V1CPU): CPUInputType => {
+  if (!cpu) {
+    return CPUInputType.editVCPU;
+  }
+
+  const isSimpleCPU = cpu.cores === 1 && cpu.threads === 1;
   return isSimpleCPU ? CPUInputType.editVCPU : CPUInputType.editTopologyManually;
 };

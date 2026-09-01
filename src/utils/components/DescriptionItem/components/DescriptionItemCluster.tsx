@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -12,6 +12,10 @@ const DescriptionItemCluster: FC<DescriptionItemClusterProps> = ({ resource }) =
   const { t } = useKubevirtTranslation();
 
   const cluster = getCluster(resource);
+
+  if (!cluster) {
+    return null;
+  }
 
   return (
     <DescriptionItem descriptionData={cluster} descriptionHeader={t('Cluster')} isPopover={false} />

@@ -1,24 +1,24 @@
 /* eslint-disable */
 import {
-  V1AccessCredential,
-  V1Bootloader,
-  V1CPU,
-  V1DataVolumeTemplateSpec,
-  V1Devices,
-  V1Disk,
-  V1DomainSpec,
-  V1Features,
-  V1InstancetypeMatcher,
-  V1Interface,
-  V1PreferenceMatcher,
-  V1VirtualMachine,
-  V1VirtualMachineCondition,
-  V1VirtualMachineInstance,
-  V1Volume,
+  type V1AccessCredential,
+  type V1Bootloader,
+  type V1CPU,
+  type V1DataVolumeTemplateSpec,
+  type V1Devices,
+  type V1Disk,
+  type V1DomainSpec,
+  type V1Features,
+  type V1InstancetypeMatcher,
+  type V1Interface,
+  type V1PreferenceMatcher,
+  type V1VirtualMachine,
+  type V1VirtualMachineCondition,
+  type V1VirtualMachineInstance,
+  type V1Volume,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { DYNAMIC_CREDENTIALS_SUPPORT } from '@kubevirt-utils/components/DynamicSSHKeyInjection/constants/constants';
 import { ROOTDISK } from '@kubevirt-utils/constants/constants';
-import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
+import { type BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import {
   getAnnotation,
   getLabel,
@@ -26,17 +26,17 @@ import {
   getStatusConditions as getResourceStatusConditions,
   getStatusConditionsByType as getResourceStatusConditionsByType,
 } from '@kubevirt-utils/resources/shared';
-import { WORKLOADS } from '@kubevirt-utils/resources/template';
+import { type WORKLOADS } from '@kubevirt-utils/resources/template';
 import { isVM } from '@kubevirt-utils/utils/typeGuards';
 import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
 
 import { VM_WORKLOAD_ANNOTATION } from './annotations';
 import {
-  RunStrategy,
+  type RunStrategy,
   RUNSTRATEGY_ALWAYS,
   RUNSTRATEGY_HALTED,
-  UPDATE_STRATEGIES,
-  VirtualMachineStatusConditionTypes,
+  type UPDATE_STRATEGIES,
+  type VirtualMachineStatusConditionTypes,
 } from './constants';
 import { VM_STATUS } from './vmStatus';
 
@@ -294,13 +294,15 @@ export const getAutoAttachPodInterface = (vm: V1VirtualMachine): boolean =>
 export const getDomain = <T extends Record<string, any>>(obj: T): V1DomainSpec =>
   obj?.spec?.domain || obj?.spec?.template?.spec?.domain;
 
-export const getMemory = <T>(obj: T): string =>
+export const getMemory = <T>(obj: T): string | undefined =>
   getDomain(obj)?.memory?.guest?.toString() ||
   getDomain(obj)?.resources?.requests?.['memory']?.toString();
 
-export const getCPU = <T>(obj: T): V1CPU => getDomain(obj)?.cpu;
+export const getCPU = <T>(obj: T): undefined | V1CPU => getDomain(obj)?.cpu;
 
-export const getMemoryCPU = <T>(obj: T): { cpu: V1CPU; memory: string } => ({
+export const getMemoryCPU = <T>(
+  obj: T,
+): { cpu: undefined | V1CPU; memory: string | undefined } => ({
   cpu: getCPU(obj),
   memory: getMemory(obj),
 });

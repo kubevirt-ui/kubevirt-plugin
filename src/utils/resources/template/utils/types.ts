@@ -1,15 +1,15 @@
 import {
   TemplateModel,
-  V1Template,
+  type V1Template,
   VirtualMachineTemplateModel,
   VirtualMachineTemplateRequestModel,
 } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import {
-  V1alpha1VirtualMachineTemplateRequest,
-  V1beta1VirtualMachineTemplate,
+  type V1alpha1VirtualMachineTemplateRequest,
+  type V1beta1VirtualMachineTemplate,
 } from '@kubevirt-ui-ext/kubevirt-api/virt-template';
-import { ObjectMetadata } from '@openshift-console/dynamic-plugin-sdk';
+import { type ObjectMetadata } from '@openshift-console/dynamic-plugin-sdk';
 
 export type Template = V1beta1VirtualMachineTemplate | V1Template;
 

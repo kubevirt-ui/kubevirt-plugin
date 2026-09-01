@@ -1,19 +1,13 @@
 .cpu-memory-modal {
-  .pf-v6-c-modal-box__body {
-    display: table;
-  }
   .inputs {
     display: flex;
-    justify-content: space-between;
-    margin-top: var(--pf-t--global--spacer--xl);
-    margin-bottom: var(--pf-t--global--spacer--lg);
+    gap: var(--pf-t--global--spacer--xl);
+
     .input-memory {
-      &--dropdown {
-        margin-left: var(--pf-t--global--spacer--sm);
-      }
+      flex: 1;
     }
-    .input-cpu {
-      margin-right: var(--pf-t--global--spacer--xl);
+    .cpu-input {
+      flex: 1;
     }
   }
 }
