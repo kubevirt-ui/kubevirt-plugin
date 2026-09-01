@@ -20,6 +20,12 @@ Please read the following before submitting:
 
 > Add JIRA, Docs, and other PR/Issue links
 
+Jira:
+
 ## 🎥 Demo
 
 > Please add a video or an image of the behavior/changes
+
+Before:
+
+After:
