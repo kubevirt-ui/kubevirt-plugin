@@ -68,14 +68,7 @@ test.describe(SUITE, { tag: [T1_TAG, ADMIN_ONLY_TAG] }, () => {
       await vmDetailPage.changeConfigurationNetworkNicNad(NIC_NAME, targetNad);
     });
 
-    await test.step('Pending changes alert and new NAD are visible', async () => {
-      await expect
-        .poll(async () => vmDetailPage.getConfigurationNetworkNicName(NIC_NAME), {
-          message: `NIC ${NIC_NAME} should show target NAD ${targetNad} after swap`,
-          timeout: utils.TestTimeouts.ELEMENT_WAIT,
-        })
-        .toContain(targetNad);
-
+    await test.step('Pending changes alert and updated VM spec are visible', async () => {
       const pendingVisible = await vmDetailPage.waitForPendingChanges(
         utils.TestTimeouts.PENDING_CHANGES,
       );
@@ -83,6 +76,14 @@ test.describe(SUITE, { tag: [T1_TAG, ADMIN_ONLY_TAG] }, () => {
         pendingVisible,
         'Configuration Network should show a pending-changes or migration-required alert after NAD swap',
       ).toBe(true);
+
+      // Network column shows the runtime NAD until migration applies the spec change.
+      await expect
+        .poll(async () => vmDetailPage.getConfigurationNetworkNicName(NIC_NAME), {
+          message: `NIC ${NIC_NAME} should still show runtime NAD ${sourceNad} until migration`,
+          timeout: utils.TestTimeouts.ELEMENT_WAIT,
+        })
+        .toContain(sourceNad);
 
       await expect
         .poll(
