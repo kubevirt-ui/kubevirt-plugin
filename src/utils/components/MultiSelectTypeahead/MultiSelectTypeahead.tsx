@@ -1,9 +1,8 @@
-/* eslint-disable */
-import React, { FC, useMemo } from 'react';
+import React, { type FC, useMemo } from 'react';
 
 import { getSelectDataTestProps } from '@kubevirt-utils/utils/selectDataTest';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { MultiTypeaheadSelect, MultiTypeaheadSelectOption } from '@patternfly/react-templates';
+import { MultiTypeaheadSelect, type MultiTypeaheadSelectOption } from '@patternfly/react-templates';
 
 type MultiSelectTypeaheadProps = {
   allResourceNames: string[];
@@ -40,12 +39,12 @@ const MultiSelectTypeahead: FC<MultiSelectTypeaheadProps> = ({
 
   return (
     <MultiTypeaheadSelect
-      onSelectionChange={(_e, selectedProjects: string[]) => {
-        setSelectedResourceNames(selectedProjects);
-      }}
       initialInputValue={initialInputValue}
       initialOptions={resourceOptions}
       isScrollable
+      onSelectionChange={(_event, selectedProjects: string[]) => {
+        setSelectedResourceNames(selectedProjects);
+      }}
       placeholder={isEmpty(selectedResourceNames) ? emptyValuePlaceholder : selectPlaceholder}
       {...getSelectDataTestProps(dataTest)}
     />

@@ -1,11 +1,10 @@
-/* eslint-disable */
-import React, { FC, ReactNode } from 'react';
+import React, { type FC, type ReactNode } from 'react';
 import classNames from 'classnames';
 
 import NewBadge from '@kubevirt-utils/components/badges/NewBadge/NewBadge';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverContentWithLightspeedButton/PopoverContentWithLightspeedButton';
-import { OLSPromptType } from '@lightspeed/utils/prompts';
+import { type OLSPromptType } from '@lightspeed/utils/prompts';
 import { PopoverPosition, Split, SplitItem, Switch } from '@patternfly/react-core';
 
 import ExternalLink from '../ExternalLink/ExternalLink';
@@ -90,7 +89,7 @@ const SectionWithSwitch: FC<SectionWithSwitchProps> = ({
           data-test={dataTestID}
           isChecked={switchIsOn}
           isDisabled={isDisabled}
-          onChange={(_, checked: boolean) => turnOnSwitch(checked)}
+          onChange={(_event, checked: boolean) => turnOnSwitch(checked)}
         />
       </SplitItem>
     </Wrapper>

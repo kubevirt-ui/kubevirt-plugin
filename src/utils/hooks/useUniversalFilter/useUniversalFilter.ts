@@ -1,11 +1,10 @@
-/* eslint-disable */
 import { useCallback } from 'react';
 import { useSearchParams } from 'react-router';
 import { useDebounceCallback } from 'src/views/clusteroverview/utils/hooks/useDebounceCallback';
 
 import {
-  KubevirtFilterState,
-  OnSetFilters,
+  type KubevirtFilterState,
+  type OnSetFilters,
 } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 
@@ -42,7 +41,7 @@ const useUniversalFilter = ({
     (filterId: string, value: string) => {
       const current = filters[filterId] ?? [];
       const nextValues = current.includes(value)
-        ? current.filter((v) => v !== value)
+        ? current.filter((filterValue) => filterValue !== value)
         : [...current, value];
       onSetFilters({ [filterId]: nextValues });
     },

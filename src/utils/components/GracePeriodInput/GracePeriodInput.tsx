@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -17,12 +16,12 @@ import {
 
 import './grace-period-input.scss';
 
-interface GracePeriodInputProps {
+type GracePeriodInputProps = {
   gracePeriodSeconds: null | number;
   isChecked: boolean;
   onCheckboxChange: (checked: boolean) => void;
   setGracePeriodSeconds: (newGracePeriod: null | number) => void;
-}
+};
 
 export const GracePeriodInput: FC<GracePeriodInputProps> = ({
   gracePeriodSeconds,
@@ -44,7 +43,7 @@ export const GracePeriodInput: FC<GracePeriodInputProps> = ({
             id="grace-period-checkbox"
             isChecked={isChecked}
             label={t('With grace period')}
-            onChange={(_, checked) => onCheckboxChange(checked)}
+            onChange={(_event, checked) => onCheckboxChange(checked)}
           />
         </FlexItem>
         <FlexItem>
@@ -60,11 +59,11 @@ export const GracePeriodInput: FC<GracePeriodInputProps> = ({
             <InputGroup>
               <InputGroupItem isFill>
                 <TextInput
+                  aria-label={t('seconds')}
+                  min={0}
                   onChange={(_event, value) =>
                     setGracePeriodSeconds(isEmpty(value) ? null : parseInt(value))
                   }
-                  aria-label={t('seconds')}
-                  min={0}
                   type="number"
                   value={gracePeriodSeconds}
                 />

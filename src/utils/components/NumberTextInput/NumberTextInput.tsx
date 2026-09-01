@@ -1,8 +1,7 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
 import { isDigitsOnly } from '@kubevirt-utils/utils/validation';
-import { TextInput, TextInputProps } from '@patternfly/react-core';
+import { TextInput, type TextInputProps } from '@patternfly/react-core';
 
 type NumberTextInputProps = {
   setValue: (value: number) => void;
@@ -12,7 +11,7 @@ type NumberTextInputProps = {
 const NumberTextInput: FC<NumberTextInputProps> = ({ setValue, value, ...props }) => {
   return (
     <TextInput
-      onChange={(_, newValue) => {
+      onChange={(_event, newValue) => {
         if (newValue === '') {
           setValue(NaN);
           return;

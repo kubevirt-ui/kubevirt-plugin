@@ -1,22 +1,21 @@
-/* eslint-disable */
 import { useCallback, useEffect } from 'react';
 
 import usePagination from './usePagination';
-import { PaginationState } from './utils/types';
+import { type PaginationState } from './utils/types';
 
 type OnFilterChange = (...args: unknown[]) => void;
 
 type UsePaginationWithFiltersResult = {
   handleFilterChange?: (...args: Parameters<OnFilterChange>) => void;
   handlePerPageSelect: (
-    _e: unknown,
+    _event: unknown,
     perPage: number,
     page: number,
     startIndex: number,
     endIndex: number,
   ) => void;
   handleSetPage: (
-    _e: unknown,
+    _event: unknown,
     page: number,
     perPage: number,
     startIndex: number,
@@ -42,13 +41,13 @@ const usePaginationWithFilters = (
   );
 
   const handlePerPageSelect = useCallback(
-    (_e: unknown, perPage: number, page: number, startIndex: number, endIndex: number) =>
+    (_event: unknown, perPage: number, page: number, startIndex: number, endIndex: number) =>
       onPaginationChange({ endIndex, page, perPage, startIndex }),
     [onPaginationChange],
   );
 
   const handleSetPage = useCallback(
-    (_e: unknown, page: number, perPage: number, startIndex: number, endIndex: number) =>
+    (_event: unknown, page: number, perPage: number, startIndex: number, endIndex: number) =>
       onPaginationChange({ endIndex, page, perPage, startIndex }),
     [onPaginationChange],
   );

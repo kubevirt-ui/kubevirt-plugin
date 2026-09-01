@@ -1,15 +1,15 @@
-/* eslint-disable */
 import { AlertType } from '@kubevirt-utils/components/AlertsCard/utils/types';
-import { AlertsBySeverity } from '@kubevirt-utils/hooks/useInfrastructureAlerts/useInfrastructureAlerts';
+import { type AlertsBySeverity } from '@kubevirt-utils/hooks/useInfrastructureAlerts/useInfrastructureAlerts';
 import { OPERATOR_HEALTH_IMPACT_LABEL } from '@kubevirt-utils/hooks/useInfrastructureAlerts/utils/constants';
-import { Alert, AlertStates } from '@openshift-console/dynamic-plugin-sdk';
+import { type Alert, AlertStates } from '@openshift-console/dynamic-plugin-sdk';
 
 import { HealthImpactLevel } from '../../../../views/dashboard-extensions/KubevirtHealthPopup/utils/types';
 
 export const isFiringOrSilencedAlert = (alert: Alert): boolean =>
   alert?.state === AlertStates.Firing || alert?.state === AlertStates.Silenced;
 
-const getHealthImpact = (alert: Alert) => alert?.labels?.[OPERATOR_HEALTH_IMPACT_LABEL];
+const getHealthImpact = (alert: Alert): string | undefined =>
+  alert?.labels?.[OPERATOR_HEALTH_IMPACT_LABEL];
 
 export const isCriticalHealthImpactAlert = (alert: Alert): boolean =>
   getHealthImpact(alert) === HealthImpactLevel.critical;
@@ -25,7 +25,4 @@ export const sortAlertsBySeverity = (alerts: Alert[]): AlertsBySeverity =>
   ) ?? { [AlertType.critical]: [], [AlertType.info]: [], [AlertType.warning]: [] };
 
 export const getNumberOfAlerts = (alerts: AlertsBySeverity): number =>
-  Object.values(alerts)?.reduce((acc, alertsForLevel) => {
-    acc += alertsForLevel?.length || 0;
-    return acc;
-  }, 0);
+  Object.values(alerts)?.reduce((acc, alertsForLevel) => acc + (alertsForLevel?.length || 0), 0);

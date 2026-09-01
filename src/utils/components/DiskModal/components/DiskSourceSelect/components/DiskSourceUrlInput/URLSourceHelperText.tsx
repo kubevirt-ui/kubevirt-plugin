@@ -1,19 +1,20 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 import { Link } from 'react-router';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { OS_IMAGE_LINKS, OS_NAME_TYPES } from '@kubevirt-utils/resources/template';
 
 import { urlSourceHelperTextMapper } from './utils/constants';
-import { DiskSourceUrlInputProps } from './utils/types';
+import { type DiskSourceUrlInputProps } from './utils/types';
 
 const URLSourceHelperText: FC<DiskSourceUrlInputProps> = ({ os }) => {
   const { t } = useKubevirtTranslation();
   const { afterLabelText, beforeLabelText, label } =
-    urlSourceHelperTextMapper[os || OS_NAME_TYPES.fedora];
+    urlSourceHelperTextMapper[
+      (os || OS_NAME_TYPES.fedora) as keyof typeof urlSourceHelperTextMapper
+    ];
 
-  // TODO: Replace three-part concatenation with single interpolated translation key
+  // Replace three-part concatenation with single interpolated translation key
   // to avoid i18n concatenation issues (e.g., t('Example: For {{os}}, visit the {{link}} and copy...'))
   return (
     <>

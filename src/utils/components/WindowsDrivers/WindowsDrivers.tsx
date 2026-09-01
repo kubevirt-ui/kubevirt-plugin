@@ -1,14 +1,12 @@
-/* eslint-disable */
-import React, { FC, memo, useCallback, useEffect, useMemo, useState } from 'react';
+import React, { type FC, memo, useCallback, useEffect, useMemo, useState } from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { mountWinDriversToVM } from '@kubevirt-utils/resources/vm/utils/disk/drivers';
 import { Alert, AlertVariant, Checkbox, Flex, FlexItem } from '@patternfly/react-core';
 
 import { useDriversImage } from '../../resources/vm/utils/disk/useDriversImage';
-
 import { removeWindowsDrivers } from './utils';
 
 type WindowsDriversProps = {
@@ -34,12 +32,14 @@ const WindowsDrivers: FC<WindowsDriversProps> = memo(({ isWindows, updateVM, vm 
   );
 
   useEffect(() => {
-    const updateDisk = async () => {
+    const updateDisk = async (): Promise<void> => {
       setIsChecked(isWindows || !!windowsDriver);
       isWindows && !windowsDriver && (await updateVM(await mountWinDriversToVM(vm)));
     };
 
-    isChecked === null && !driversImageLoading && updateDisk();
+    if (isChecked == null && !driversImageLoading) {
+      void updateDisk();
+    }
   }, [isChecked, isWindows, updateVM, driversImageLoading, vm, windowsDriver]);
 
   const onChange = useCallback(
@@ -72,7 +72,7 @@ const WindowsDrivers: FC<WindowsDriversProps> = memo(({ isWindows, updateVM, vm 
           isChecked={isChecked}
           isDisabled={loading || driversImageLoading}
           label={t('Mount Windows drivers disk')}
-          onChange={(_, checked: boolean) => onChange(checked)}
+          onChange={(_event, checked: boolean) => onChange(checked)}
         />
       </FlexItem>
 

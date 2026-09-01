@@ -1,33 +1,30 @@
-/* eslint-disable */
 import { useCallback, useState } from 'react';
 import axios from 'axios';
 
-import { modelToGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { CDIConfigModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { CDIConfigModel, modelToGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 
 import { useKubevirtTranslation } from '../useKubevirtTranslation';
+
 import {
   registerCdiUpload,
   syncCdiUploadProgressAndFailures,
 } from '../useUploadProgressToast/cdi/cdiUploadTracking';
-
-import { CANCEL_ALLOCATION_MESSAGE, UploadCanceledError } from './errors';
+import { performUpload } from './performUpload';
 import {
-  CDIConfig,
-  DataUpload,
+  type CDIConfig,
+  type DataUpload,
   UPLOAD_STATUS,
-  UploadDataProps,
-  UploadError,
-  UseCDIUploadValues,
+  type UploadDataProps,
+  type UseCDIUploadValues,
 } from './types';
-import { cancelUploadPVC, createUploadPVC, getUploadProxyURL, getUploadURL } from './utils';
+import { cancelUploadPVC, getUploadProxyURL, getUploadURL } from './utils';
 
 export const useCDIUpload = (clusterInput?: string): UseCDIUploadValues => {
   const clusterParam = useClusterParam();
-  const cluster = clusterParam || clusterInput;
+  const cluster = clusterParam ?? clusterInput;
   const { t } = useKubevirtTranslation();
   const [cdiConfig, configLoaded, configError] = useK8sWatchData<CDIConfig>({
     cluster,
@@ -66,7 +63,7 @@ export const useCDIUpload = (clusterInput?: string): UseCDIUploadValues => {
     file,
     uploadKey,
     uploadTrackMetadata,
-  }: UploadDataProps) => {
+  }: UploadDataProps): Promise<void> => {
     const { CancelToken } = axios;
     const cancelSource = CancelToken.source();
     const noRouteFound = configError || !configLoaded || !uploadProxyURL;
@@ -77,11 +74,10 @@ export const useCDIUpload = (clusterInput?: string): UseCDIUploadValues => {
       status: UPLOAD_STATUS,
       progress?: number,
       uploadError?: DataUpload['uploadError'],
-    ) => {
+    ): void => {
       if (!uploadKey) {
         return;
       }
-
       syncCdiUploadProgressAndFailures({ progress, uploadError, uploadKey, uploadStatus: status });
     };
 
@@ -101,11 +97,9 @@ export const useCDIUpload = (clusterInput?: string): UseCDIUploadValues => {
         : undefined,
       uploadStatus: noRouteFound ? UPLOAD_STATUS.ERROR : UPLOAD_STATUS.ALLOCATING,
     };
-    // check for nullish values
+
     if (!file || !dataVolume) {
-      return Promise.reject({
-        message: t('Missing required fields'),
-      });
+      return Promise.reject({ message: t('Missing required fields') });
     }
 
     if (noRouteFound) {
@@ -123,77 +117,15 @@ export const useCDIUpload = (clusterInput?: string): UseCDIUploadValues => {
       });
     }
 
-    try {
-      // check if CORS is permitting
-      try {
-        await axios.get(getUploadURL(uploadProxyURL));
-      } catch (catchError) {
-        if (!catchError?.response) {
-          const certificateError = {
-            href: getUploadURL(uploadProxyURL),
-            message: t('Invalid certificate, please visit the following URL and approve it'),
-          };
-          setUpload((prev) => ({
-            ...prev,
-            uploadError: certificateError,
-            uploadStatus: UPLOAD_STATUS.ERROR,
-          }));
-          syncStore(UPLOAD_STATUS.ERROR, undefined, certificateError);
-          return Promise.reject(certificateError);
-        }
-      }
-
-      const { token } = await createUploadPVC(dataVolume);
-
-      // uploading
-      const form = new FormData();
-      form.append('file', file);
-
-      await axios({
-        cancelToken: cancelSource.token,
-        data: form,
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'multipart/form-data',
-        },
-        method: 'POST',
-        onUploadProgress: (e) => {
-          const progress = file.size > 0 ? Math.floor((e.loaded / file.size) * 100) : 0;
-          setUpload((prev) => ({
-            ...prev,
-            progress,
-            uploadStatus: UPLOAD_STATUS.UPLOADING,
-          }));
-          syncStore(UPLOAD_STATUS.UPLOADING, progress);
-        },
-        url: getUploadURL(uploadProxyURL),
-      });
-
-      // finished uploading
-      setUpload((prev) => ({
-        ...prev,
-        progress: 100,
-        uploadStatus: UPLOAD_STATUS.SUCCESS,
-      }));
-    } catch (e) {
-      // if cancelled, 'not found' is a case where the user clicked cancel while allocating
-      const isCanceled = axios.isCancel(e) || e?.message?.includes(CANCEL_ALLOCATION_MESSAGE);
-
-      const uploadError: undefined | UploadError = isCanceled
-        ? undefined
-        : { message: e?.message || t('Upload failed') };
-      setUpload((prev) => ({
-        ...prev,
-        uploadError,
-        uploadStatus: isCanceled ? UPLOAD_STATUS.CANCELED : UPLOAD_STATUS.ERROR,
-      }));
-      syncStore(isCanceled ? UPLOAD_STATUS.CANCELED : UPLOAD_STATUS.ERROR, undefined, uploadError);
-      if (isCanceled) {
-        return Promise.reject(new UploadCanceledError());
-      }
-
-      return Promise.reject(e);
-    }
+    return performUpload({
+      cancelSource,
+      dataVolume,
+      file,
+      setUpload,
+      syncStore,
+      t,
+      uploadProxyURL,
+    });
   };
 
   return {

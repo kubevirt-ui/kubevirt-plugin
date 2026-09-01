@@ -1,9 +1,8 @@
-/* eslint-disable */
-import { debounce } from 'lodash';
+import debounce from 'lodash/debounce';
 
 // utility from https://github.com/openshift/console/blob/b77f40a19e14735b257f80f00290ba49994308ca/frontend/packages/console-dynamic-plugin-sdk/src/utils/k8s/ws-factory.ts#L2
 export const createURL = (host: string, path: string): string => {
-  let url;
+  let url: string;
 
   if (host === 'auto') {
     if (window.location.protocol === 'https:') {
@@ -24,7 +23,7 @@ export const createURL = (host: string, path: string): string => {
 };
 
 export const addResizeObserver = (element: HTMLElement, callback: () => void): ResizeObserver => {
-  const debouncedCallback = debounce(callback, 100);
+  const debouncedCallback = debounce(callback, 100) as ResizeObserverCallback;
   const observer = new ResizeObserver(debouncedCallback);
   observer.observe(element);
   return observer;

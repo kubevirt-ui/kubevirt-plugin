@@ -1,10 +1,9 @@
-/* eslint-disable */
-import React, { FC, useMemo } from 'react';
+import React, { type FC, useMemo } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { NumberOperator, numberOperatorInfo } from '@kubevirt-utils/utils/constants';
 import { getSelectDataTestProps } from '@kubevirt-utils/utils/selectDataTest';
-import { SimpleSelect, SimpleSelectOption } from '@patternfly/react-templates';
+import { SimpleSelect, type SimpleSelectOption } from '@patternfly/react-templates';
 
 type NumberOperatorSelectProps = {
   'data-test'?: string;
@@ -32,7 +31,7 @@ const NumberOperatorSelect: FC<NumberOperatorSelectProps> = ({
     <SimpleSelect
       initialOptions={initialOptions}
       key={`number-operator-${selected}`}
-      onSelect={(_, selection: NumberOperator) => onSelect(selection)}
+      onSelect={(_event, selection: NumberOperator) => onSelect(selection)}
       {...getSelectDataTestProps(dataTest)}
     />
   );
