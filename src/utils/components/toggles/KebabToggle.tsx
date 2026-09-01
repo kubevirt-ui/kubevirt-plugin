@@ -4,7 +4,7 @@ import { MenuToggle, type MenuToggleElement, type MenuToggleProps } from '@patte
 import { EllipsisVIcon } from '@patternfly/react-icons';
 
 const KebabToggle =
-  (props: MenuToggleProps) =>
+  (props: MenuToggleProps & { 'data-test'?: string }) =>
   (toggleRef: Ref<MenuToggleElement>): ReactElement => (
     <MenuToggle data-test="kebab-button" {...props} ref={toggleRef} variant="plain">
       <EllipsisVIcon />

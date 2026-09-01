@@ -318,9 +318,10 @@ export class VirtualMachineDetailConfigurationComponent extends BaseComponent {
   private readonly _dataVolumeDetails = this.locator('text=DataVolume details');
   private readonly _evictionStrategyElement = this.testId('eviction-strategy');
   private readonly _headlessCheckbox = this.locator('input[id="headless-mode"]');
-  private readonly _isTextPendingChangesTextRestartRequired = this.locator(
-    ':is(:text("Pending changes"), :text("Restart required"), :text("Migration required"))',
-  );
+  private readonly _isTextPendingChangesTextRestartRequired = this.page
+    .getByText('Pending changes')
+    .or(this.page.getByText('Restart required'))
+    .or(this.page.getByText('Migration required'));
   private readonly _restoreTemplateSettingsBtn = this.locator(
     'button:has-text("Restore template settings")',
   );

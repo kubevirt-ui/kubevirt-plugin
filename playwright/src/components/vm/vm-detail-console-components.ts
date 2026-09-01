@@ -545,9 +545,10 @@ export class VirtualMachineDetailDiagnosticsComponent extends BaseComponent {
   private readonly _inputIdSimpleFileFilename = this.locator('input[id="simple-file-filename"]');
   private readonly _inputInput = this.locator('input[aria-label="Input"]');
   private readonly _inputSearchInput = this.locator('input[aria-label="Search input"]');
-  private readonly _isTextPendingChangesTextRestartRequired = this.locator(
-    ':is(:text("Pending changes"), :text("Restart required"), :text("Migration required"))',
-  );
+  private readonly _isTextPendingChangesTextRestartRequired = this.page
+    .getByText('Pending changes')
+    .or(this.page.getByText('Restart required'))
+    .or(this.page.getByText('Migration required'));
   private readonly _last5Minutes = this.locator('text=Last 5 minutes');
   private readonly _lunReservation = this.locator('#lun-reservation');
   private readonly _migrationMenu = this.testId('migration-menu');

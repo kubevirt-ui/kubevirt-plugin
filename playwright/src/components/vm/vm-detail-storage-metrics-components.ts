@@ -1961,9 +1961,10 @@ export class VmStorageComponent extends BaseComponent {
   }
 
   async waitForPendingChangesToDisappear(timeout = 60000): Promise<boolean> {
-    const pendingLocator = this.locator(
-      ':is(:text("Pending changes"), :text("Restart required"), :text("Migration required"))',
-    );
+    const pendingLocator = this.page
+      .getByText('Pending changes')
+      .or(this.page.getByText('Restart required'))
+      .or(this.page.getByText('Migration required'));
     try {
       await pendingLocator
         .first()
