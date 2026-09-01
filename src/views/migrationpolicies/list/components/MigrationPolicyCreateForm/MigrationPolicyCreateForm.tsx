@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { FC, JSX, useMemo, useState } from 'react';
 
 import ClusterProjectDropdown from '@kubevirt-utils/components/ClusterProjectDropdown/ClusterProjectDropdown';

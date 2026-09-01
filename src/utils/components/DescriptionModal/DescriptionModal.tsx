@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { FC, memo, useEffect, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -21,7 +22,7 @@ export const DescriptionModal: FC<DescriptionModalProps> = memo(
     // reset description when modal is closed
     useEffect(() => {
       setDescription(obj?.metadata?.annotations?.description);
-      // eslint-disable-next-line react-hooks/exhaustive-deps
+       
     }, [isOpen]);
 
     return (

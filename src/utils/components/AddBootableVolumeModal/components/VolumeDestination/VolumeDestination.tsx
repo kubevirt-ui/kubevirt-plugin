@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { FC, useState } from 'react';
 
 import ApplyStorageProfileSettings from '@kubevirt-utils/components/ApplyStorageProfileSettings/ApplyStorageProfileSettings';

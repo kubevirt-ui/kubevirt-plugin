@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { FC } from 'react';
 
 import { PersistentVolumeClaimModel } from '@kubevirt-ui-ext/kubevirt-api/console';

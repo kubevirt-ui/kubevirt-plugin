@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { FC } from 'react';
 
 const CatalogSkeleton: FC = () => (

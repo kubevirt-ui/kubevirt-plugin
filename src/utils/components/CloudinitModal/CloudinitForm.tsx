@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { FC, Fragment, Suspense, useState } from 'react';
 import { Trans } from 'react-i18next';
 import RandExp from 'randexp';

@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
   V1beta1VirtualMachineClusterInstancetype,

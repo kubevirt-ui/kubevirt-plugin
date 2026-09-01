@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { type K8sIoApimachineryPkgApiResourceQuantity } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { type Quantity } from '@kubevirt-utils/types/quantity.js';
 

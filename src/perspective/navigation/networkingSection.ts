@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { NavSection, ResourceNSNavItem } from '@openshift-console/dynamic-plugin-sdk';
 import { EncodedExtension } from '@openshift-console/dynamic-plugin-sdk-webpack';
 

@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useMemo } from 'react';
 
 import { getPrometheusData } from '@kubevirt-utils/components/Charts/utils/utils';

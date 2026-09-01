@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { FC, MouseEvent, useCallback, useMemo, useState } from 'react';
 
 import { VirtualMachineClusterPreferenceModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';

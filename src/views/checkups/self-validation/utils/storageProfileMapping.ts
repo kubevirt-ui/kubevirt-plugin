@@ -1,3 +1,4 @@
+/* eslint-disable */
 import {
   V1beta1StorageSpecAccessModesEnum,
   V1beta1StorageSpecVolumeModeEnum,

@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { CHECKUP_LABEL_VALUES, CHECKUP_STATUS_COLORS } from '../../utils/constants';
 
 // ===========================

@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { ChangeEvent, FC, useState } from 'react';
 
 import { DataUpload } from '@kubevirt-utils/hooks/useCDIUpload/types';

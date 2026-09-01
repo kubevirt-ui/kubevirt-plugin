@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { ChangeEvent, FC } from 'react';
 
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';

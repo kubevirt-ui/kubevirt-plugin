@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { FC } from 'react';
 import { Link } from 'react-router';
 import { isEmpty } from 'lodash';

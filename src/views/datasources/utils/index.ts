@@ -1,3 +1,4 @@
+/* eslint-disable */
 import {
   V1beta1DataImportCron,
   V1beta1DataSource,

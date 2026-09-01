@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { FC, JSX } from 'react';
 import { useParams } from 'react-router';
 

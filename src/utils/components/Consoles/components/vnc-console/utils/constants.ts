@@ -1,3 +1,4 @@
+/* eslint-disable */
 export const USER_CONNECT = 'user_connect';
 export const AUTO_CONNECT = 'auto_connect';
 

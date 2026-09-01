@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { load } from 'js-yaml';

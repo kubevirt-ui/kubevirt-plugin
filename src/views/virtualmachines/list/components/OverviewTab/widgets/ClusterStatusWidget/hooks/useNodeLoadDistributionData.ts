@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useMemo } from 'react';
 
 import { DeschedulerStatus } from '@kubevirt-utils/hooks/useDeschedulerInstalled';

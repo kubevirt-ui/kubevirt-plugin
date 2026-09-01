@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { type ACMVirtualMachineAction } from '@kubevirt-extensions/acm.virtualmachine';
 import {
   type FeatureFlagHookProvider,

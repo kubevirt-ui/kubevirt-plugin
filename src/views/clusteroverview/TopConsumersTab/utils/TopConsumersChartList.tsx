@@ -21,7 +21,7 @@ import { getTopConsumerQuery } from './queries';
 import { TopConsumerMetric } from './topConsumerMetric';
 import { type TopConsumerScope } from './topConsumerScope';
 import TopConsumersProgressChart from './TopConsumersProgressChart';
-import { getChartTitle, getHumanizedValue, getValue } from './utils';
+import { getChartTitle, getValue, humanizeTopConsumerMetric } from './utils';
 
 import './TopConsumersChartList.scss';
 
@@ -81,7 +81,7 @@ export const TopConsumersChartList: FC<TopConsumersChartListProps> = ({
       const queryData = query?.data?.result[i];
       const title = getChartTitle(scope, queryData);
       const rawValue = getValue(queryData?.value?.[1]);
-      const humanizedValue = getHumanizedValue(rawValue, metric);
+      const humanizedValue = humanizeTopConsumerMetric(rawValue, metric);
 
       charts.push(
         <TopConsumersProgressChart

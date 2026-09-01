@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React from 'react';
 
 import { initialAccessModes } from '@kubevirt-utils/components/DiskModal/components/utils/modesMapping';

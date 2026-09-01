@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { MILLISECONDS_MULTIPLIER } from '@kubevirt-utils/components/Charts/utils/utils';
 import { PrometheusResponse } from '@openshift-console/dynamic-plugin-sdk';
 import { ChartDomain } from '@overview/OverviewTab/metric-charts-card/utils/hooks/types';

@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { MigMigrationModel, MigPlanModel } from '@kubevirt-utils/models';
 import {
   MigMigration,

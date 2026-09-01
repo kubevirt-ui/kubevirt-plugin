@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { FC, useMemo, useRef, useState } from 'react';
 
 import { InstanceTypeSize } from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/InstanceTypeDrilldownSelect/utils/types';

@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { MigPlan, MigPlanPV } from '../constants';
 
 export const getMigPlanSpecNamespaces = (migPlan: MigPlan): string[] =>

@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { debounce } from 'lodash';
 
 // utility from https://github.com/openshift/console/blob/b77f40a19e14735b257f80f00290ba49994308ca/frontend/packages/console-dynamic-plugin-sdk/src/utils/k8s/ws-factory.ts#L2

@@ -1,7 +1,7 @@
-import React, { FC, useMemo } from 'react';
+import React, { type FC, useMemo } from 'react';
 import { Controller, useWatch } from 'react-hook-form';
 
-import { PreferenceOption } from '@kubevirt-utils/components/AddBootableVolumeModal/types';
+import { type PreferenceOption } from '@kubevirt-utils/components/AddBootableVolumeModal/types';
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -13,12 +13,13 @@ import {
   CREATE_VM_FORM_FIELDS_VM_DATA,
 } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
 import usePreferenceSelectOptions from '@virtualmachines/wizard/steps/InstanceTypesSteps/GuestOSStep/components/PreferenceSelectMenu/hooks/usePreferenceSelectOptions/usePreferenceSelectOptions';
+import { resetBootableVolumeFields } from '@virtualmachines/wizard/utils/utils';
 
 import './PreferenceSelectMenu.scss';
 
 const PreferenceSelectMenu: FC = () => {
   const { t } = useKubevirtTranslation();
-  const { control } = useVMWizard();
+  const { control, getValues, setValue } = useVMWizard();
   const [cluster, project, operatingSystemType] = useWatch({
     control,
     name: [
@@ -54,17 +55,20 @@ const PreferenceSelectMenu: FC = () => {
         <Loading />
       ) : (
         <Controller
+          control={control}
+          name={CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.PREFERENCE}
           render={({ field: { onChange, value } }) => {
             return (
               <FormPFSelect
-                onSelect={(_, selectedValue) => {
-                  onChange(selectedValue as PreferenceOption);
-                }}
                 className="pf-v6-u-mt-md"
                 isDisabled={noPreferences}
+                onSelect={(_event, selectedValue) => {
+                  onChange(selectedValue as PreferenceOption);
+                  resetBootableVolumeFields(getValues, setValue);
+                }}
                 placeholder={placeholderText}
-                selected={value?.name || ''}
-                selectedLabel={value?.name || placeholderText}
+                selected={(value?.name as string) || ''}
+                selectedLabel={(value?.name as string) || placeholderText}
                 toggleProps={{ isFullWidth: true }}
               >
                 {preferences?.map((pref) => (
@@ -75,8 +79,6 @@ const PreferenceSelectMenu: FC = () => {
               </FormPFSelect>
             );
           }}
-          control={control}
-          name={CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.PREFERENCE}
         />
       )}
     </FormGroup>

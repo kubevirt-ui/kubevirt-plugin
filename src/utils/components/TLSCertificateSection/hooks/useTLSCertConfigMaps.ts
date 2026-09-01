@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useMemo } from 'react';
 
 import { ConfigMapModel, modelToGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';

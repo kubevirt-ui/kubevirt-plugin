@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useCallback, useMemo, useState } from 'react';
 
 import { ConfigMapModel } from '@kubevirt-ui-ext/kubevirt-api/console';

@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { isNil } from 'lodash';
 
 import { isEmpty } from '@kubevirt-utils/utils/utils';

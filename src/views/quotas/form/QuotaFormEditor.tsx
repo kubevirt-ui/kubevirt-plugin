@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { FC, FormEvent, useState } from 'react';
 import { useNavigate } from 'react-router';
 

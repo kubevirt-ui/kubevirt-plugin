@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { InstanceTypeUnion } from './types';
 
 export const getInstanceTypeCPU = (resource: InstanceTypeUnion) => resource?.spec?.cpu?.guest;

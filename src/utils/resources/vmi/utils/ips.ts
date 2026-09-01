@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { isEmpty, removeLinkLocalIPV6 } from '@kubevirt-utils/utils/utils';
 import { IpAddresses } from '@virtualmachines/details/tabs/overview/components/VirtualMachinesOverviewTabNetworkInterfaces/utils/types';

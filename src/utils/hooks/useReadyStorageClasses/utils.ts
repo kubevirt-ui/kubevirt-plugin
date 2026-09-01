@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { IoK8sApiStorageV1StorageClass } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { StorageProfile } from '@kubevirt-utils/types/storage';

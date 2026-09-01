@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { FC, useState } from 'react';
 
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';

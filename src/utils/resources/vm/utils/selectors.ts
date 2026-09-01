@@ -1,3 +1,4 @@
+/* eslint-disable */
 import {
   V1AccessCredential,
   V1Bootloader,

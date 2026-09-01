@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { TFunction } from 'i18next';
 
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';

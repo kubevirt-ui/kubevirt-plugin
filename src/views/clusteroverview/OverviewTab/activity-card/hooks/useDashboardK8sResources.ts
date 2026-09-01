@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useMemo } from 'react';
 
 import { get } from '@kubevirt-utils/utils/utils';

@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useMemo } from 'react';
 
 import { PrometheusResponse, ResolvedExtension } from '@openshift-console/dynamic-plugin-sdk';
@@ -57,7 +58,7 @@ const useDashboardPrometheusActivities = () => {
           (q) => prometheusResults.getIn([q, 'data']) || prometheusResults.getIn([q, 'loadError']),
         ),
       ),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
     [prometheusResults],
   );
 

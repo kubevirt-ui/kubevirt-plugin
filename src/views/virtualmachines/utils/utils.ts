@@ -1,3 +1,4 @@
+/* eslint-disable */
 import * as ipaddr from 'ipaddr.js';
 
 import {

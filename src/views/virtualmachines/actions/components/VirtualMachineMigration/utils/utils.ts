@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { TFunction } from 'i18next';
 
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';

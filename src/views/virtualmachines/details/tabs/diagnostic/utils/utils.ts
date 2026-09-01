@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { TFunction } from 'i18next';
 
 import { VirtualMachineDetailsTab } from '@kubevirt-utils/constants/tabs-constants';

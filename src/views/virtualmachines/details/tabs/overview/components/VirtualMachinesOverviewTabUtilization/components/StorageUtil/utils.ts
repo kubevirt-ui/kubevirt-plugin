@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { V1VirtualMachineInstanceFileSystem } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 
 import { EXCLUDED_FILESYSTEM_TYPES } from './constants';

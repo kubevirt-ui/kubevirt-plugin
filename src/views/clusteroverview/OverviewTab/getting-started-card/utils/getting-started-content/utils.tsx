@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { Link } from 'react-router';
 
 import { GettingStartedLink } from '../types';

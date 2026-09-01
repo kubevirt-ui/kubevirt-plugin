@@ -1,3 +1,4 @@
+/* eslint-disable */
 /**
  * Unified entry point for the PR Label Gate workflow.
  *

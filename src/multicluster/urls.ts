@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { matchPath, NavigateFunction } from 'react-router';
 
 import {

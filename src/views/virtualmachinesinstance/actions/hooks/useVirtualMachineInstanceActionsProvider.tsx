@@ -1,7 +1,9 @@
 import React, { useMemo } from 'react';
 
-import { VirtualMachineInstanceModelRef } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { VirtualMachineInstanceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import {
+  VirtualMachineInstanceModel,
+  VirtualMachineInstanceModelRef,
+} from '@kubevirt-ui-ext/kubevirt-api/console';
 import type { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { AnnotationsModal } from '@kubevirt-utils/components/AnnotationsModal/AnnotationsModal';
 import DeleteModal from '@kubevirt-utils/components/DeleteModal/DeleteModal';

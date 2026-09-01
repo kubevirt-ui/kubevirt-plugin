@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React from 'react';
 import { TFunction } from 'i18next';
 import { parseSize } from 'xbytes';

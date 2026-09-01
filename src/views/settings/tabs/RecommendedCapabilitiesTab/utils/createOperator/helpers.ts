@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { NamespaceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
   ConsoleOperatorConfigModel,

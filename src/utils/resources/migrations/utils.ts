@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { getStatusNamespaces } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 

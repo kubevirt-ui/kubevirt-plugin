@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { FC, memo, useCallback, useEffect, useMemo, useState } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';

@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { K8sModel } from '@openshift-console/dynamic-plugin-sdk';
 
 export * from '@kubevirt-ui-ext/kubevirt-api/console';

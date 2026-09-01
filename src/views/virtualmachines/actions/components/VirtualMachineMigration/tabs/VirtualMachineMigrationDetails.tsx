@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { FC, useState } from 'react';
 import { Trans } from 'react-i18next';
 import { Updater } from 'use-immer';

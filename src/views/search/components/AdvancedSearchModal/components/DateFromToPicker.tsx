@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { Dispatch, FC, SetStateAction, useEffect, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';

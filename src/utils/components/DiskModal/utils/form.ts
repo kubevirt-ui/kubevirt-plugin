@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { DataSourceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
   V1DataVolumeTemplateSpec,

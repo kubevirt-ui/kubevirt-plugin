@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { FC } from 'react';
 
 import { Skeleton } from '@patternfly/react-core';

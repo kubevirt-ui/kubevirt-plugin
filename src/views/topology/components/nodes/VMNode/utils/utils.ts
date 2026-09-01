@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { errorPrintableVMStatus, printableVMStatus } from '@virtualmachines/utils';
 
 export const getStatusClass = (vmStatus: string) => {

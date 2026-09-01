@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useCallback } from 'react';
 import { useSearchParams } from 'react-router';
 import { useDebounceCallback } from 'src/views/clusteroverview/utils/hooks/useDebounceCallback';

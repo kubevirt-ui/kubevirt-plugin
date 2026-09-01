@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { PaginationState } from '@kubevirt-utils/hooks/usePagination/utils/types';

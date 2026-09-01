@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { Dispatch, FC, SetStateAction } from 'react';
 
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';

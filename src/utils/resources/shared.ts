@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { modelToGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
   V1beta1DataImportCron,

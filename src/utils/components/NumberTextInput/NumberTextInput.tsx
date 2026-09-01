@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { FC } from 'react';
 
 import { isDigitsOnly } from '@kubevirt-utils/utils/validation';

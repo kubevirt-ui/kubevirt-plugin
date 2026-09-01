@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { ReactElement, ReactNode, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router';
 

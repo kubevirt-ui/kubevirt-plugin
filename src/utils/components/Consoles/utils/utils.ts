@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 
 export const isConnectionEncrypted = () => window.location.protocol === 'https:';

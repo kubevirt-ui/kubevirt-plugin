@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 
 import {

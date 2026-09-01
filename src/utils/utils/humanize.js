@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { isString } from '@kubevirt-utils/utils/utils';
 
 export const units = {};

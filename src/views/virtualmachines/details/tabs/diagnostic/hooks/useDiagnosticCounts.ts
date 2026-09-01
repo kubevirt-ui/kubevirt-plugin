@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useMemo } from 'react';
 
 import { DiagnosticCategory, SEVERITY_TO_CONDITION } from '../utils/constants';

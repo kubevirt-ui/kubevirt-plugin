@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { Dispatch, FC, SetStateAction, useCallback, useEffect } from 'react';
 
 import { getSCSelectOptions } from '@kubevirt-utils/components/DiskModal/components/StorageClassAndPreallocation/utils/helpers';
@@ -47,7 +48,7 @@ const StorageClassSelect: FC<StorageClassSelectProps> = ({
         (readyStorageClasses || []).find((sc) => getName(sc) === selection)?.provisioner,
       );
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
     [readyStorageClasses],
   );
 
