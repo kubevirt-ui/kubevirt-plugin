@@ -8,14 +8,12 @@ type CloneStatusAlertsProps = {
   cloneFailureMessage: string | undefined;
   isCloneFailed: boolean;
   isCloneInProgress: boolean;
-  isCloneSucceeded: boolean;
 };
 
 const CloneStatusAlerts: FC<CloneStatusAlertsProps> = ({
   cloneFailureMessage,
   isCloneFailed,
   isCloneInProgress,
-  isCloneSucceeded,
 }) => {
   const { t } = useKubevirtTranslation();
 
@@ -34,15 +32,6 @@ const CloneStatusAlerts: FC<CloneStatusAlertsProps> = ({
               'The operation could not be completed. Please try again or contact your administrator.',
             )}
         </Alert>
-      )}
-      {isCloneSucceeded && (
-        <Alert
-          isInline
-          title={t(
-            'Clone completed. The cloned virtual machine may take some time to appear in the list.',
-          )}
-          variant={AlertVariant.success}
-        />
       )}
     </>
   );
