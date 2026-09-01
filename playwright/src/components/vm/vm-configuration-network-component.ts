@@ -10,7 +10,7 @@ export default class VmConfigurationNetworkComponent extends BaseComponent {
   private readonly _configurationNetworkSubTab = this.testId('vm-configuration-network');
   private readonly _configurationTab = this.testId('horizontal-link-Configuration');
   private readonly _editNicModal = this.testId('dialog-modal');
-  private readonly _nadSelectInput = this.testId('select-nad-input');
+  private readonly _nadSelectInput = this.testId('select-nad-input').locator('input');
   private readonly _nadSelectToggle = this.testId('select-nad');
   private readonly _pendingChangesAlert = this.testId('pending-changes-alert');
 
