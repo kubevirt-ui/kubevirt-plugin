@@ -11,14 +11,14 @@ type InlineFilterSelectOptionProps = {
 };
 const InlineFilterSelectOption: FC<InlineFilterSelectOptionProps> = ({ isFocused, option }) => {
   const optionValue = String(option.value);
-  const { key: _key, ...optionWithoutKey } = option;
+  const { key: _key, ...rest } = option;
   return (
     <SelectOption
       data-test={`select-option-${optionValue}`}
       id={`select-inline-filter-${optionValue.replace(' ', '-')}`}
       isFocused={isFocused}
       value={optionValue}
-      {...optionWithoutKey}
+      {...rest}
     >
       <InlineFilterSelectOptionContent option={option} />
     </SelectOption>
