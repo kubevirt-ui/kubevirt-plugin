@@ -28,6 +28,7 @@ import {
   PageSection,
   Title,
 } from '@patternfly/react-core';
+import { hasInvalidPasswordParameter } from '@virtualmachines/wizard/steps/TemplateStep/components/TemplatesCatalogDrawer/utils/utils';
 
 import useEditTemplateAccessReview from '../../hooks/useIsTemplateEditable';
 import ParameterEditor from './ParameterEditor';
@@ -66,7 +67,9 @@ const TemplateParametersPage: FC<TemplateParametersPageProps> = ({ obj: template
     });
   };
 
-  const isSaveDisabled = isEqualObject(getParameters(template), parameters);
+  const isSaveDisabled =
+    isEqualObject(getParameters(template), parameters) ||
+    hasInvalidPasswordParameter(parameters, t);
 
   const onSave: MouseEventHandler<HTMLButtonElement> = async (event) => {
     event.preventDefault();
