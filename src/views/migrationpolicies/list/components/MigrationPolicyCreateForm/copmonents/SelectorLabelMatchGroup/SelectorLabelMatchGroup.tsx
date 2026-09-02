@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { Dispatch, FC, SetStateAction } from 'react';
+import React, { type Dispatch, type FC, type SetStateAction } from 'react';
 import classNames from 'classnames';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -26,26 +25,31 @@ const SelectorLabelMatchGroup: FC<SelectorLabelMatchGroupProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
 
-  const onDeleteLabel = (key: string) => () =>
-    setLabels((prevLabels) => {
-      const updatedLabels = { ...prevLabels };
-      delete updatedLabels[key];
-      return updatedLabels;
-    });
-
-  const onEditLabel = (key: string) => (newText: string) => {
-    const [newKey, newValue] = extractKeyValueFromLabel(newText);
-    if (!!newKey && !!newValue) {
+  const onDeleteLabel =
+    (key: string): (() => void) =>
+    (): void => {
       setLabels((prevLabels) => {
         const updatedLabels = { ...prevLabels };
         delete updatedLabels[key];
-        updatedLabels[newKey] = newValue;
         return updatedLabels;
       });
-    }
-  };
+    };
 
-  const onAddLabel = (newText: string) => {
+  const onEditLabel =
+    (key: string): ((newText: string) => void) =>
+    (newText: string): void => {
+      const [newKey, newValue] = extractKeyValueFromLabel(newText);
+      if (!!newKey && !!newValue) {
+        setLabels((prevLabels) => {
+          const updatedLabels = { ...prevLabels };
+          delete updatedLabels[key];
+          updatedLabels[newKey] = newValue;
+          return updatedLabels;
+        });
+      }
+    };
+
+  const onAddLabel = (newText: string): void => {
     const [newKey, newValue] = extractKeyValueFromLabel(newText);
     if (!!newKey && !!newValue) {
       setLabels((prevLabels) => ({ ...prevLabels, [newKey]: newValue }));
@@ -63,7 +67,7 @@ const SelectorLabelMatchGroup: FC<SelectorLabelMatchGroupProps> = ({
               isEditable
               key={key}
               onClose={onDeleteLabel(key)}
-              onEditComplete={(_, val) => onEditLabel(key)(val)}
+              onEditComplete={(_event, val) => onEditLabel(key)(val)}
             >
               {transformKeyValueToLabel(key, labels[key])}
             </Label>
@@ -72,7 +76,7 @@ const SelectorLabelMatchGroup: FC<SelectorLabelMatchGroupProps> = ({
         <Label
           color="blue"
           isEditable
-          onEditComplete={(_, val) => onAddLabel(val)}
+          onEditComplete={(_event, val) => onAddLabel(val)}
           variant="outline"
         >
           {t('Enter key=value')}

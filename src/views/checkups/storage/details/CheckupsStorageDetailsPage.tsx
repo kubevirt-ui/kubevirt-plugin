@@ -1,25 +1,24 @@
-/* eslint-disable */
-import React, { useMemo } from 'react';
+import React, { type FC, useMemo } from 'react';
 import { useParams } from 'react-router';
 
 import StateHandler from '@kubevirt-utils/components/StateHandler/StateHandler';
 import useHideYamlTab, { removeYamlTabs } from '@kubevirt-utils/hooks/useHideYamlTab';
+import { getName } from '@kubevirt-utils/resources/shared';
 import { HorizontalNav } from '@openshift-console/dynamic-plugin-sdk';
 
 import CheckupsNotFound from '../../components/CheckupsNotFound';
 import { getJobByName } from '../../utils/utils';
 import useCheckupsStorageData from '../components/hooks/useCheckupsStorageData';
-
-import { useCheckupsStorageTabs } from './hooks/useCheckupsStorageTabs';
 import CheckupsStorageDetailsPageHeader from './CheckupsStorageDetailsPageHeader';
+import { useCheckupsStorageTabs } from './hooks/useCheckupsStorageTabs';
 
 import './checkups-storage-details-page.scss';
 
-const CheckupsStorageDetailsPage = () => {
+const CheckupsStorageDetailsPage: FC = () => {
   const { checkupName } = useParams<{ checkupName: string }>();
   const { configMaps, error, jobs, loaded } = useCheckupsStorageData();
 
-  const configMap = configMaps?.find((cm) => cm.metadata.name === checkupName);
+  const configMap = configMaps?.find((configMapItem) => getName(configMapItem) === checkupName);
   const jobMatches = getJobByName(jobs, configMap?.metadata?.name);
 
   const pages = useCheckupsStorageTabs();

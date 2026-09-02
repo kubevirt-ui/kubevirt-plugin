@@ -1,13 +1,12 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 import classNames from 'classnames';
 
 import { Flex, FlexItem, Grid, GridItem } from '@patternfly/react-core';
 
-import { K8sResourceKind } from '../../../../utils/types';
-import EmptyStateNoVMs from '../../../vms-per-resource-card/EmptyStateNoVMs';
 import { getVMStatusCounts } from '../utils';
 
+import { type K8sResourceKind } from '../../../../utils/types';
+import EmptyStateNoVMs from '../../../vms-per-resource-card/EmptyStateNoVMs';
 import VMStatusInventoryItem from './VMStatusInventoryItem';
 import VMStatusSectionSkeleton from './VMStatusSectionSkeleton';
 
@@ -41,23 +40,23 @@ const VMStatusSection: FC<VMStatusSectionProps> = ({ vms, vmsLoaded }) => {
 
   if (numStatuses === 0) {
     return <EmptyStateNoVMs />;
-  } else {
-    return (
-      <Grid className="kv-inventory-card__statuses-grid" hasGutter>
-        <GridItem
-          className={classNames({
-            'kv-inventory-card__statuses-grid--left-col': numStatuses >= 2,
-          })}
-          span={6}
-        >
-          <Flex direction={{ default: 'column' }}>{leftColumnStatusItems}</Flex>
-        </GridItem>
-        <GridItem span={6}>
-          <Flex direction={{ default: 'column' }}>{statusItems}</Flex>
-        </GridItem>
-      </Grid>
-    );
   }
+
+  return (
+    <Grid className="kv-inventory-card__statuses-grid" hasGutter>
+      <GridItem
+        className={classNames({
+          'kv-inventory-card__statuses-grid--left-col': numStatuses >= 2,
+        })}
+        span={6}
+      >
+        <Flex direction={{ default: 'column' }}>{leftColumnStatusItems}</Flex>
+      </GridItem>
+      <GridItem span={6}>
+        <Flex direction={{ default: 'column' }}>{statusItems}</Flex>
+      </GridItem>
+    </Grid>
+  );
 };
 
 export default VMStatusSection;

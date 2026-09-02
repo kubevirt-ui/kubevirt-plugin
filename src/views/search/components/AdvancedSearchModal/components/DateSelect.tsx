@@ -1,9 +1,8 @@
-/* eslint-disable */
-import React, { FC, useMemo } from 'react';
+import React, { type FC, useMemo } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getSelectDataTestProps } from '@kubevirt-utils/utils/selectDataTest';
-import { SimpleSelect, SimpleSelectOption } from '@patternfly/react-templates';
+import { SimpleSelect, type SimpleSelectOption } from '@patternfly/react-templates';
 
 import { DateSelectOption, dateSelectOptions, getDateSelectLabels } from '../constants/dateSelect';
 
@@ -40,7 +39,8 @@ const DateSelect: FC<DateSelectProps> = ({
 
   return (
     <SimpleSelect
-      onSelect={(_, selection: DateSelectOption) => {
+      initialOptions={initialOptions}
+      onSelect={(_event, selection: DateSelectOption) => {
         onSelect(selection);
 
         if (selection === DateSelectOption.Custom) {
@@ -54,7 +54,6 @@ const DateSelect: FC<DateSelectProps> = ({
         setDateFromString('');
         setDateToString('');
       }}
-      initialOptions={initialOptions}
       placeholder={t('Any time')}
       toggleWidth="100%"
       {...getSelectDataTestProps(dataTest)}

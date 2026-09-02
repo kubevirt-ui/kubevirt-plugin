@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { type K8sIoApimachineryPkgApiResourceQuantity } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { type Quantity } from '@kubevirt-utils/types/quantity.js';
 
@@ -200,7 +199,7 @@ export const formatQuantityString = (
 
   if (!isEmpty(unit) && !isValidQuantityUnit) {
     // ERROR: formatQuantityString helper called with quantityString argument which is not in Quantity format
-    // TODO: implement isQuantityString helper to check the format first
+    // implement isQuantityString helper to check the format first
     return '0';
   }
 

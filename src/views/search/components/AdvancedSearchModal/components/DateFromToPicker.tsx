@@ -1,8 +1,7 @@
-/* eslint-disable */
-import React, { Dispatch, FC, SetStateAction, useEffect, useState } from 'react';
+import React, { type Dispatch, type FC, type SetStateAction, useEffect, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { DatePicker, DatePickerProps, Split, SplitItem } from '@patternfly/react-core';
+import { DatePicker, type DatePickerProps, Split, SplitItem } from '@patternfly/react-core';
 
 import { useAdvancedSearchField } from '../store/useAdvancedSearchStore';
 
@@ -37,7 +36,7 @@ const DateFromToPicker: FC<DateFromToPickerProps> = ({
   const onDateChange: (
     setDateString: (dateString: string) => void,
     setDate: (date: Date) => void,
-  ) => DatePickerProps['onChange'] = (setDateString, setDate) => (_, dateString, date) => {
+  ) => DatePickerProps['onChange'] = (setDateString, setDate) => (_event, dateString, date) => {
     if (date) {
       setDateString(dateString);
       setDate(date);
@@ -61,7 +60,9 @@ const DateFromToPicker: FC<DateFromToPickerProps> = ({
         data-test={dataTest && `${dataTest}-to`}
         onChange={onDateChange(setDateToString, setDateTo)}
         placeholder={t('To')}
-        validators={[(date) => (date < dateFrom ? t('Date To cannot be before Date From') : '')]}
+        validators={[
+          (date): string => (date < dateFrom ? t('Date To cannot be before Date From') : ''),
+        ]}
         value={dateToString}
       />
     </Split>

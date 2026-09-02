@@ -1,10 +1,9 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 import classNames from 'classnames';
 
 import {
-  SetTopConsumerData,
-  TopConsumersData,
+  type SetTopConsumerData,
+  type TopConsumersData,
 } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/types';
 import { Grid, GridItem } from '@patternfly/react-core';
 
@@ -32,7 +31,7 @@ const TopConsumersGridRow: FC<TopConsumersGridRowProps> = ({
 
   return (
     <Grid className={classes}>
-      {Array.from({ length: 3 }, (_, i) => {
+      {Array.from({ length: 3 }, (_unused, i) => {
         const cardID = getTopConsumerCardID(rowNumber, i + 1);
         return (
           <GridItem className="kv-top-consumers-card__card-grid-item" key={cardID} span={4}>

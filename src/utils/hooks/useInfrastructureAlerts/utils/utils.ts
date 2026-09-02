@@ -18,7 +18,9 @@ export const sortAlertsBySeverity = (alerts: Alert[]): AlertsBySeverity =>
   alerts?.reduce(
     (acc, alert) => {
       const severity = alert?.labels?.severity as AlertType;
-      if (severity && acc[severity]) acc[severity].push(alert);
+      if (severity && acc[severity]) {
+        acc[severity].push(alert);
+      }
       return acc;
     },
     { [AlertType.critical]: [], [AlertType.info]: [], [AlertType.warning]: [] } as AlertsBySeverity,

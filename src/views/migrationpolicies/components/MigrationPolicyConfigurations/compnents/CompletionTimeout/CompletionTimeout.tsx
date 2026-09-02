@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { ChangeEvent, Dispatch, FC, SetStateAction } from 'react';
+import React, { type ChangeEvent, type Dispatch, type FC, type SetStateAction } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { NumberInput } from '@patternfly/react-core';
@@ -17,13 +16,13 @@ const CompletionTimeout: FC<CompletionTimeoutProps> = ({
 
   return (
     <NumberInput
-      onChange={(event: ChangeEvent<HTMLInputElement>) =>
-        +event?.target?.value >= 0 && setState(+event.target.value)
-      }
       id="migration-policy-completion-timeout-input"
       min={0}
       minusBtnAriaLabel={t('Decrement')}
-      onMinus={() => setState((prev) => --prev)}
+      onChange={(event: ChangeEvent<HTMLInputElement>) =>
+        +event?.target?.value >= 0 && setState(+event.target.value)
+      }
+      onMinus={() => setState((prev) => prev - 1)}
       onPlus={() => setState((prev) => (prev ? prev + 1 : 1))}
       plusBtnAriaLabel={t('Increment')}
       value={completionTimeoutInGib}

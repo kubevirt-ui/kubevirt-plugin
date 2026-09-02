@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -20,7 +19,7 @@ const IPField: FC = () => {
     <FormGroup label={t('IP address')}>
       <TextInput
         data-test="adv-search-vm-ip"
-        onChange={(_, newValue) => setValue(newValue)}
+        onChange={(_event, newValue) => setValue(newValue)}
         type="text"
         validated={validated}
         value={value}

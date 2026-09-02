@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
 import { OngoingActivityBody } from '@openshift-console/dynamic-plugin-sdk-internal';
 
@@ -15,10 +14,9 @@ const OngoingActivity: FC = () => {
     prometheusQueriesLoaded && (
       <OngoingActivityBody
         loaded={k8sResourcesLoaded && prometheusQueriesLoaded}
-        // TODO Fix typing
+        // Fix typing
         prometheusActivities={prometheusActivities}
-        // skipcq: JS-0349
-        resourceActivities={k8sResourceActivities as any}
+        resourceActivities={k8sResourceActivities as never}
       />
     )
   );

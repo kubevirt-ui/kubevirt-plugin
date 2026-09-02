@@ -1,10 +1,9 @@
-/* eslint-disable */
-import React, { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { type FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { load } from 'js-yaml';
 
 import { DataSourceModel, DataVolumeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
+import { type V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -14,26 +13,26 @@ import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { kubevirtK8sCreate, kubevirtK8sDelete } from '@multicluster/k8sRequests';
 import { getFleetBootableVolumesURL } from '@multicluster/urls';
 import useIsACMPage from '@multicluster/useIsACMPage';
-import { K8sResourceCommon, ResourceYAMLEditor } from '@openshift-console/dynamic-plugin-sdk';
+import { type K8sResourceCommon, ResourceYAMLEditor } from '@openshift-console/dynamic-plugin-sdk';
 
 import { defaultBootableVolumeYamlTemplate } from '../../../../templates/bootablevolume-yaml';
 
 const buildDataSourceForDataVolume = (
-  dv: K8sResourceCommon,
+  dataVolume: K8sResourceCommon,
   namespace: string,
 ): V1beta1DataSource => ({
   apiVersion: `${DataSourceModel.apiGroup}/${DataSourceModel.apiVersion}`,
   kind: DataSourceModel.kind,
   metadata: {
-    labels: getLabels(dv),
-    name: getName(dv),
-    namespace: getNamespace(dv) || namespace,
+    labels: getLabels(dataVolume),
+    name: getName(dataVolume),
+    namespace: getNamespace(dataVolume) ?? namespace,
   },
   spec: {
     source: {
       pvc: {
-        name: getName(dv),
-        namespace: getNamespace(dv) || namespace,
+        name: getName(dataVolume),
+        namespace: getNamespace(dataVolume) ?? namespace,
       },
     },
   },
@@ -55,14 +54,14 @@ const BootableVolumeYAMLPage: FC = () => {
     [],
   );
 
-  const selectedNamespace = namespace || DEFAULT_NAMESPACE;
+  const selectedNamespace = namespace ?? DEFAULT_NAMESPACE;
   const cluster = isACMPage ? selectedCluster : undefined;
 
   const bootableVolumesListURL = isACMPage
     ? getFleetBootableVolumesURL(selectedCluster, selectedNamespace)
     : `/k8s/ns/${selectedNamespace}/bootablevolumes`;
 
-  const onSave = async (yaml: string) => {
+  const onSave = async (yaml: string): Promise<void> => {
     setError(null);
     try {
       const dvData = load(yaml) as K8sResourceCommon;
@@ -113,9 +112,11 @@ const BootableVolumeYAMLPage: FC = () => {
   );
 
   useEffect(() => {
-    const el = wrapperRef.current;
-    el?.addEventListener('click', handleCancelClick, true);
-    return () => el?.removeEventListener('click', handleCancelClick, true);
+    const element = wrapperRef.current;
+    element?.addEventListener('click', handleCancelClick, true);
+    return (): void => {
+      element?.removeEventListener('click', handleCancelClick, true);
+    };
   }, [handleCancelClick]);
 
   return (

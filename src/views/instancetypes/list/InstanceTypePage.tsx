@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC, useMemo } from 'react';
+import React, { type FC, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 import classNames from 'classnames';
 
@@ -12,7 +11,7 @@ import useIsCRDPage from '@kubevirt-utils/hooks/useIsCRDPage';
 import useIsSearchPage from '@kubevirt-utils/hooks/useIsSearchPage';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useVirtualMachineInstanceTypes from '@kubevirt-utils/hooks/useVirtualMachineInstanceTypes';
-import { ListPageProps } from '@kubevirt-utils/utils/types';
+import { type ListPageProps } from '@kubevirt-utils/utils/types';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   DocumentTitle,
@@ -21,10 +20,10 @@ import {
 } from '@openshift-console/dynamic-plugin-sdk';
 import { Tab, Tabs, TabTitleText } from '@patternfly/react-core';
 
-import InstancetypeCreateButton from './components/InstancetypeCreateButton/InstancetypeCreateButton';
-import useTabsPaths from './hooks/useTabsPaths';
 import ClusterInstancetypeList from './ClusterInstancetypeList';
+import InstancetypeCreateButton from './components/InstancetypeCreateButton/InstancetypeCreateButton';
 import { CLUSTER_INSTANCETYPE_TAB_INDEX, USER_INSTANCETYPE_TAB_INDEX } from './constants';
+import useTabsPaths from './hooks/useTabsPaths';
 import UserInstancetypeList from './UserInstancetypeList';
 
 import '@kubevirt-utils/styles/list-managment-group.scss';
@@ -107,23 +106,23 @@ const InstanceTypePage: FC<ListPageProps> = (props) => {
         </ListPageHeader>
       </div>
       <Tabs
-        onSelect={(_, tabIndex: number | string) => {
-          navigate(tabsPaths[tabIndex]);
-        }}
         activeKey={activeTabKey}
         className="co-horizontal-nav"
+        onSelect={(_event, tabIndex: number | string) => {
+          navigate(tabsPaths[tabIndex]);
+        }}
         style={{ flexShrink: 0 }}
         usePageInsets
       >
         <Tab
-          title={<TabTitleText>{t('Cluster InstanceTypes')}</TabTitleText>}
           eventKey={CLUSTER_INSTANCETYPE_TAB_INDEX}
+          title={<TabTitleText>{t('Cluster InstanceTypes')}</TabTitleText>}
         >
           <ClusterInstancetypeList {...props} />
         </Tab>
         <Tab
-          title={<TabTitleText>{t('User InstanceTypes')}</TabTitleText>}
           eventKey={USER_INSTANCETYPE_TAB_INDEX}
+          title={<TabTitleText>{t('User InstanceTypes')}</TabTitleText>}
         >
           <UserInstancetypeList
             {...props}

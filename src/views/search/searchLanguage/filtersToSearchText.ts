@@ -18,32 +18,25 @@ import {
 } from './constants';
 import { toSearchString } from './utils';
 
-const parseMemoryUnit = (value: string): [string, string, string] | null => {
-  const match = MEMORY_UNIT_REGEX.exec(value);
-  return match?.[1] && match[2] && match[3] ? [match[1], match[2], match[3]] : null;
-};
-
-const parseCpuNumeric = (value: string): [string, string] | null => {
-  const match = CPU_NUMERIC_REGEX.exec(value);
-  return match?.[1] && match[2] ? [match[1], match[2]] : null;
-};
-
 const serializeNumericValue = (filterType: string, value: string): null | string => {
   const searchKey = FILTER_TYPE_TO_SEARCH_KEY.get(filterType);
   if (!searchKey) return null;
 
   if (filterType === VirtualMachineRowFilterType.Memory) {
-    const parsed = parseMemoryUnit(value);
-    if (!parsed) return null;
-    const [operatorEnum, num, unit] = parsed;
+    const match = MEMORY_UNIT_REGEX.exec(value);
+    if (!match) return null;
+    const operatorEnum = match[1] ?? '';
+    const num = match[2] ?? '';
+    const unit = match[3] ?? '';
     const sign = OPERATOR_TO_SIGN[operatorEnum];
     if (!sign) return null;
     return `${searchKey}${sign}${num}${unit}`;
   }
 
-  const cpuParsed = parseCpuNumeric(value);
-  if (!cpuParsed) return null;
-  const [operatorEnum, num] = cpuParsed;
+  const cpuMatch = CPU_NUMERIC_REGEX.exec(value);
+  if (!cpuMatch) return null;
+  const operatorEnum = cpuMatch[1] ?? '';
+  const num = cpuMatch[2] ?? '';
   const sign = OPERATOR_TO_SIGN[operatorEnum];
   if (!sign) return null;
   return `${searchKey}${sign}${num}`;

@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC, JSX, useMemo, useState } from 'react';
+import React, { type FC, type JSX, useMemo, useState } from 'react';
 
 import ClusterProjectDropdown from '@kubevirt-utils/components/ClusterProjectDropdown/ClusterProjectDropdown';
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
@@ -9,7 +8,6 @@ import { DocumentTitle } from '@openshift-console/dynamic-plugin-sdk';
 import { Form, FormGroup, TextInput } from '@patternfly/react-core';
 
 import MigrationPolicyConfigurations from '../../../components/MigrationPolicyConfigurations/MigrationPolicyConfigurations';
-
 import MigrationPolicyCreateFormHeader from './copmonents/MigrationPolicyCreateFormHeader/MigrationPolicyCreateFormHeader';
 import MigrationPolicyFormDescription from './copmonents/MigrationPolicyFormDescription/MigrationPolicyFormDescription';
 import MigrationPolicyFormFooter from './copmonents/MigrationPolicyFormFooter/MigrationPolicyFormFooter';
@@ -24,13 +22,17 @@ const MigrationPolicyCreateForm: FC = (): JSX.Element => {
   const isACMPage = useIsACMPage();
   const [state, setState] = useState(initialMigrationPolicyState);
 
-  const setStateField = (field: string) => (value: unknown) => {
-    const isValueFunction = typeof value === 'function';
-    setState((prevState) => ({
-      ...prevState,
-      [field]: isValueFunction ? (value as (prev: unknown) => unknown)(prevState?.[field]) : value,
-    }));
-  };
+  const setStateField =
+    (field: string): ((value: unknown) => void) =>
+    (value: unknown): void => {
+      const isValueFunction = typeof value === 'function';
+      setState((prevState) => ({
+        ...prevState,
+        [field]: isValueFunction
+          ? (value as (prev: unknown) => unknown)(prevState?.[field])
+          : value,
+      }));
+    };
   const migrationPolicy = useMemo(() => produceMigrationPolicy(state), [state]);
 
   return (
@@ -46,14 +48,14 @@ const MigrationPolicyCreateForm: FC = (): JSX.Element => {
         </FormGroup>
         <FormGroup fieldId="migration-policy-name" isRequired label={t('MigrationPolicy name')}>
           <TextInput
-            onChange={(_, value) => setStateField('migrationPolicyName')(value)}
+            onChange={(_event, value) => setStateField('migrationPolicyName')(value)}
             value={state?.migrationPolicyName}
           />
           <FormGroupHelperText>{t('Unique name of the MigrationPolicy')}</FormGroupHelperText>
         </FormGroup>
         <FormGroup fieldId="migration-policy-description" label={t('Description')}>
           <TextInput
-            onChange={(_, value) => setStateField('description')(value)}
+            onChange={(_event, value) => setStateField('description')(value)}
             value={state?.description}
           />
         </FormGroup>

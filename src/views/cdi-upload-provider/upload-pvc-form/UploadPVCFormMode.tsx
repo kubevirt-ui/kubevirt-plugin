@@ -1,13 +1,24 @@
-/* eslint-disable */
-import React from 'react';
+import React, { type Dispatch, type FC, type SetStateAction } from 'react';
 
+import { type IoK8sApiStorageV1StorageClass } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { initialAccessModes } from '@kubevirt-utils/components/DiskModal/components/utils/modesMapping';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getName } from '@kubevirt-utils/resources/shared';
 
 import UploadPVCFormAccessMode from './UploadPVCFormAccessMode';
 import UploadPVCFormModeVolumeMode from './UploadPVCFormVolumeMode';
 
-const UploadPVCFormMode = ({
+type UploadPVCFormModeProps = {
+  accessMode: string | undefined;
+  applySP: boolean;
+  setAccessMode: Dispatch<SetStateAction<string>>;
+  setVolumeMode: Dispatch<SetStateAction<string>>;
+  storageClasses: IoK8sApiStorageV1StorageClass[];
+  storageClassName: string;
+  volumeMode: string | undefined;
+};
+
+const UploadPVCFormMode: FC<UploadPVCFormModeProps> = ({
   accessMode,
   applySP,
   setAccessMode,
@@ -18,7 +29,8 @@ const UploadPVCFormMode = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const provisioner =
-    storageClasses?.find((sc) => sc.metadata.name === storageClassName)?.provisioner || '';
+    storageClasses?.find((storageClass) => getName(storageClass) === storageClassName)
+      ?.provisioner ?? '';
   return applySP ? (
     <div>
       {t('Access mode: {{accessMode}} / Volume mode: {{volumeMode}}', {

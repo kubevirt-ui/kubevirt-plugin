@@ -1,12 +1,11 @@
-/* eslint-disable */
-import React, { FC, useMemo } from 'react';
+import React, { type FC, useMemo } from 'react';
 
 import {
-  CAPACITY_UNITS,
+  type CAPACITY_UNITS,
   capacityUnitsOrdered,
 } from '@kubevirt-utils/components/CapacityInput/utils';
 import { getSelectDataTestProps } from '@kubevirt-utils/utils/selectDataTest';
-import { SimpleSelect, SimpleSelectOption } from '@patternfly/react-templates';
+import { SimpleSelect, type SimpleSelectOption } from '@patternfly/react-templates';
 
 type MemoryUnitSelectProps = {
   'data-test'?: string;
@@ -32,7 +31,7 @@ const MemoryUnitSelect: FC<MemoryUnitSelectProps> = ({
   return (
     <SimpleSelect
       initialOptions={initialOptions}
-      onSelect={(_, selection: CAPACITY_UNITS) => onSelect(selection)}
+      onSelect={(_event, selection: CAPACITY_UNITS) => onSelect(selection)}
       {...getSelectDataTestProps(dataTest)}
     />
   );

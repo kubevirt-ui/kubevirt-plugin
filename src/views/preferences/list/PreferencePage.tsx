@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC, useMemo } from 'react';
+import React, { type FC, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 import classNames from 'classnames';
 
@@ -14,13 +13,13 @@ import useIsCRDPage from '@kubevirt-utils/hooks/useIsCRDPage';
 import useIsSearchPage from '@kubevirt-utils/hooks/useIsSearchPage';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useUserPreferences from '@kubevirt-utils/hooks/useUserPreferences';
-import { ListPageProps } from '@kubevirt-utils/utils/types';
+import { type ListPageProps } from '@kubevirt-utils/utils/types';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { ListPageHeader } from '@openshift-console/dynamic-plugin-sdk';
 import { Tab, Tabs, TabTitleText } from '@patternfly/react-core';
 
-import PreferenceCreateButton from './components/PreferenceCreateButton';
 import ClusterPreferenceList from './ClusterPreferenceList';
+import PreferenceCreateButton from './components/PreferenceCreateButton';
 import UserPreferenceList from './UserPreferenceList';
 
 import '@kubevirt-utils/styles/list-managment-group.scss';
@@ -90,20 +89,20 @@ const PreferencePage: FC<ListPageProps> = (props) => {
         </ListPageHeader>
       </div>
       <Tabs
-        onSelect={(_, tabIndex: number | string) => {
+        activeKey={activeTabKey}
+        onSelect={(_event, tabIndex: number | string) => {
           navigate(
             tabIndex === 0
               ? `/k8s/cluster/${VirtualMachineClusterPreferenceModelRef}`
               : urlUserPreference,
           );
         }}
-        activeKey={activeTabKey}
         style={{ flexShrink: 0 }}
       >
-        <Tab title={<TabTitleText>{t('Cluster Preferences')}</TabTitleText>} eventKey={0}>
+        <Tab eventKey={0} title={<TabTitleText>{t('Cluster Preferences')}</TabTitleText>}>
           <ClusterPreferenceList {...props} />
         </Tab>
-        <Tab title={<TabTitleText>{t('User Preferences')}</TabTitleText>} eventKey={1}>
+        <Tab eventKey={1} title={<TabTitleText>{t('User Preferences')}</TabTitleText>}>
           <UserPreferenceList {...props} />
         </Tab>
       </Tabs>

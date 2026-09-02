@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FormGroup, TextInput } from '@patternfly/react-core';
@@ -15,7 +14,7 @@ const NameField: FC = () => {
     <FormGroup label={t('Name')}>
       <TextInput
         data-test="adv-search-vm-name"
-        onChange={(_, newValue) => setValue(newValue)}
+        onChange={(_event, newValue) => setValue(newValue)}
         type="text"
         value={value}
       />

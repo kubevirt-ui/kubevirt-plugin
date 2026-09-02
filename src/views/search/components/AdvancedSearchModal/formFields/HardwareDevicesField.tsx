@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Checkbox, FormGroup } from '@patternfly/react-core';
@@ -17,13 +16,13 @@ const HardwareDevicesField: FC = () => {
         id="adv-search-vm-hardware-gpu-devices"
         isChecked={value.gpu}
         label={t('GPU devices')}
-        onChange={(_, checked) => setValue({ ...value, gpu: checked })}
+        onChange={(_event, checked) => setValue({ ...value, gpu: checked })}
       />
       <Checkbox
         id="adv-search-vm-hardware-host-devices"
         isChecked={value.host}
         label={t('Host devices')}
-        onChange={(_, checked) => setValue({ ...value, host: checked })}
+        onChange={(_event, checked) => setValue({ ...value, host: checked })}
       />
     </FormGroup>
   );
