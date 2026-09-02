@@ -18,4 +18,6 @@ const interpolate = (key: string, options?: TOptions): string => {
 
 export const t = ((key: string, options?: TOptions) => interpolate(key, options)) as TFunction;
 
+// Name must match the real hook so Jest module mocks resolve.
+// eslint-disable-next-line @eslint-react/no-unnecessary-use-prefix
 export const useKubevirtTranslation = (): { t: TFunction } => ({ t });

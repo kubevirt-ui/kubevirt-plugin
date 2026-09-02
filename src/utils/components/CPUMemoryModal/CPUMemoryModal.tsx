@@ -16,15 +16,13 @@ import useClusterParam from '@multicluster/hooks/useClusterParam';
 import {
   Alert,
   AlertVariant,
-  Button,
-  ButtonVariant,
   Modal,
   ModalBody,
-  ModalFooter,
   ModalHeader,
   ModalVariant,
 } from '@patternfly/react-core';
 
+import CPUMemoryModalFooter from './components/CPUMemoryModalFooter';
 import useTemplateDefaultCpuMemory from './hooks/useTemplateDefaultCpuMemory';
 
 import './cpu-memory-modal.scss';
@@ -137,36 +135,20 @@ const CPUMemoryModal: FC<CPUMemoryModalProps> = ({
           </Alert>
         )}
       </ModalBody>
-      <ModalFooter>
-        <Button
-          data-test="save-button"
-          isDisabled={updateInProcess}
-          isLoading={updateInProcess}
-          key="confirm"
-          onClick={handleSubmit}
-          variant={ButtonVariant.primary}
-        >
-          {t('Save')}
-        </Button>
-        <Button
-          isDisabled={
-            !templateName || !defaultsLoaded || !defaultCpu || !defaultMemory || !!defaultLoadError
-          }
-          isLoading={!!templateName && !defaultsLoaded}
-          key="default"
-          onClick={() => {
-            setCPU(defaultCpu);
-            setMemory(defaultMemorySize);
-            setMemoryUnit(defaultMemoryUnit);
-          }}
-          variant={ButtonVariant.secondary}
-        >
-          {t('Restore template settings')}
-        </Button>
-        <Button key="cancel" onClick={onClose} variant={ButtonVariant.link}>
-          {t('Cancel')}
-        </Button>
-      </ModalFooter>
+      <CPUMemoryModalFooter
+        isRestoreDisabled={
+          !templateName || !defaultsLoaded || !defaultCpu || !defaultMemory || !!defaultLoadError
+        }
+        isRestoreLoading={!!templateName && !defaultsLoaded}
+        onClose={onClose}
+        onRestoreTemplateSettings={() => {
+          setCPU(defaultCpu);
+          setMemory(defaultMemorySize);
+          setMemoryUnit(defaultMemoryUnit);
+        }}
+        onSave={handleSubmit}
+        updateInProcess={updateInProcess}
+      />
     </Modal>
   );
 };
