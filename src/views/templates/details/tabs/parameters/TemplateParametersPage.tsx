@@ -1,3 +1,4 @@
+import { type TFunction } from 'i18next';
 import React, {
   type FC,
   Fragment,
@@ -28,15 +29,30 @@ import {
   PageSection,
   Title,
 } from '@patternfly/react-core';
+import { hasPasswordParameterValueError } from '@virtualmachines/wizard/steps/TemplateStep/components/TemplatesCatalogDrawer/utils/utils';
 
 import useEditTemplateAccessReview from '../../hooks/useIsTemplateEditable';
+import { PARAMETER_VALUE_TYPES } from './constants';
 import ParameterEditor from './ParameterEditor';
+import { getValueTypeFromParameter, isPasswordParameter } from './utils';
 
 import './template-parameters-page.scss';
 
 type TemplateParametersPageProps = {
   obj?: Template;
 };
+
+const hasInvalidPasswordParameter = (parameters: TemplateParameter[], t: TFunction): boolean =>
+  parameters.some((parameter) => {
+    if (
+      getValueTypeFromParameter(parameter) !== PARAMETER_VALUE_TYPES.VALUE ||
+      !isPasswordParameter(parameter.name)
+    ) {
+      return false;
+    }
+
+    return hasPasswordParameterValueError(t, parameter.value ?? '', parameter.from ?? '');
+  });
 
 const TemplateParametersPage: FC<TemplateParametersPageProps> = ({ obj: template }) => {
   const { t } = useKubevirtTranslation();
@@ -66,7 +82,9 @@ const TemplateParametersPage: FC<TemplateParametersPageProps> = ({ obj: template
     });
   };
 
-  const isSaveDisabled = isEqualObject(getParameters(template), parameters);
+  const isSaveDisabled =
+    isEqualObject(getParameters(template), parameters) ||
+    hasInvalidPasswordParameter(parameters, t);
 
   const onSave: MouseEventHandler<HTMLButtonElement> = async (event) => {
     event.preventDefault();
