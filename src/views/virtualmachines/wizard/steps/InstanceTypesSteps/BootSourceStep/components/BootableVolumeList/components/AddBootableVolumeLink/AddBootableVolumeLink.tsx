@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
 import AddBootableVolumeModal from '@kubevirt-utils/components/AddBootableVolumeModal/AddBootableVolumeModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
@@ -21,28 +21,29 @@ const AddBootableVolumeLink: FC<AddBootableVolumeLinkProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
-  const { canCreate, lockedPreference, onCreateVolume } = useAddBootableVolume();
+  const { canCreate, lockedPreference, onCreateVolume, onUploadStart } = useAddBootableVolume();
 
-  const openAddBootableVolumeModal = () => {
+  const openAddBootableVolumeModal = (): void => {
     createModal((props) => (
       <AddBootableVolumeModal
         {...props}
         lockedPreference={lockedPreference}
         onClose={props.onClose}
         onCreateVolume={onCreateVolume}
+        onUploadStart={onUploadStart}
       />
     ));
   };
 
   return (
     <Button
+      className="add-bootable-volume-link__inline-text"
+      isDisabled={!!loadError || !canCreate}
+      isInline
       onClick={() => {
         hidePopover?.();
         openAddBootableVolumeModal();
       }}
-      className="add-bootable-volume-link__inline-text"
-      isDisabled={!!loadError || !canCreate}
-      isInline
       variant={ButtonVariant.link}
     >
       {text || t('Add volume')}

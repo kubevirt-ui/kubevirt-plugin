@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
 import AddBootableVolumeModal from '@kubevirt-utils/components/AddBootableVolumeModal/AddBootableVolumeModal';
 import { runningTourSignal } from '@kubevirt-utils/components/GuidedTour/utils/guidedTourSignals';
@@ -18,17 +18,18 @@ const AddBootableVolumeButton: FC<AddBootableVolumeButtonProps> = ({ loadError }
   const { t } = useKubevirtTranslation();
   useSignals();
   const { createModal } = useModal();
-  const { canCreate, lockedPreference, onCreateVolume } = useAddBootableVolume();
+  const { canCreate, lockedPreference, onCreateVolume, onUploadStart } = useAddBootableVolume();
 
   const isEnabled = runningTourSignal.value || (isEmpty(loadError) && canCreate);
 
-  const openAddBootableVolumeModal = () => {
+  const openAddBootableVolumeModal = (): void => {
     createModal((props) => (
       <AddBootableVolumeModal
         {...props}
         lockedPreference={lockedPreference}
         onClose={props.onClose}
         onCreateVolume={onCreateVolume}
+        onUploadStart={onUploadStart}
       />
     ));
   };

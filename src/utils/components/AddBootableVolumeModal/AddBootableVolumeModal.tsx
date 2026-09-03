@@ -23,6 +23,7 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
   lockedPreference,
   onClose,
   onCreateVolume,
+  onUploadStart,
 }) => {
   const navigate = useNavigate();
   const { t } = useKubevirtTranslation();
@@ -54,6 +55,7 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
           dataSource,
           onClose,
           onCreateVolume,
+          onUploadStart,
           sourceType,
           t,
           uploadData,

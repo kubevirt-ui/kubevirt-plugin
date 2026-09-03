@@ -1,8 +1,9 @@
-import { ReactNode } from 'react';
+import { type ReactNode } from 'react';
 
-import { UPLOAD_STATUS, UploadError } from '@kubevirt-utils/hooks/useCDIUpload/types';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type UPLOAD_STATUS, type UploadError } from '@kubevirt-utils/hooks/useCDIUpload/types';
 
-import { UPLOAD_PROGRESS_STATUS } from './constants';
+import { type UPLOAD_PROGRESS_STATUS } from './constants';
 
 export type UploadProgressStatus =
   (typeof UPLOAD_PROGRESS_STATUS)[keyof typeof UPLOAD_PROGRESS_STATUS];
@@ -69,9 +70,12 @@ export type RegisterCdiUploadParams = {
 };
 
 export type UploadProgressStoreState = {
-  cancelAllPendingUploads: () => Promise<void>;
   cancelTrackedUpload: (uploadKey: string) => Promise<void>;
   cancelUploadsForVm: (cluster: string, namespace: string, vmName: string) => Promise<void>;
+  cancelWizardPendingUploads: (
+    wizardVm?: V1VirtualMachine,
+    wizardBootableVolumeKeys?: string[],
+  ) => Promise<void>;
   completeUpload: (uploadKey: string, options?: CompleteUploadOptions) => void;
   failUpload: (uploadKey: string, errorMessage: string) => void;
   getUpload: (uploadKey: string) => undefined | UploadEntry;
