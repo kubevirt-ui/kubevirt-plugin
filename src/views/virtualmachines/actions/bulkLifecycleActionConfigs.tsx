@@ -85,7 +85,7 @@ export const createUnpauseConfig =
     cta: (): void => {
       for (const vm of vms) void unpauseVM(vm);
     },
-    disabled: !vms.every((vm) => vm.status?.printableStatus === Paused),
+    disabled: isEmpty(vms) || !vms.every((vm) => vm.status?.printableStatus === Paused),
     id: BULK_ACTIONS_ID.UNPAUSE,
     label: t('Unpause'),
   });
