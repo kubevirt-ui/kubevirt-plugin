@@ -1,9 +1,8 @@
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
 import { SelectOption } from '@patternfly/react-core';
 
-import { EnhancedSelectOptionProps } from '../utils/types';
-
+import { type EnhancedSelectOptionProps } from '../utils/types';
 import InlineFilterSelectOptionContent from './InlineFilterSelectOptionContent';
 
 type InlineFilterSelectOptionProps = {
@@ -11,13 +10,15 @@ type InlineFilterSelectOptionProps = {
   option: EnhancedSelectOptionProps;
 };
 const InlineFilterSelectOption: FC<InlineFilterSelectOptionProps> = ({ isFocused, option }) => {
+  const optionValue = String(option.value);
+  const { key: _key, ...rest } = option;
   return (
     <SelectOption
-      data-test={`select-option-${option.value}`}
-      id={`select-inline-filter-${option.value?.replace(' ', '-')}`}
+      data-test={`select-option-${optionValue}`}
+      id={`select-inline-filter-${optionValue.replace(' ', '-')}`}
       isFocused={isFocused}
-      value={option.value}
-      {...option}
+      value={optionValue}
+      {...rest}
     >
       <InlineFilterSelectOptionContent option={option} />
     </SelectOption>

@@ -65,7 +65,7 @@ const CheckboxSelect: FC<CheckboxSelectProps> = ({
       toggle={toggle}
     >
       <SelectList>
-        {options?.map((option) => (
+        {options?.map(({ key: _key, ...option }) => (
           <SelectOption hasCheckbox key={String(option.value)} {...option} />
         ))}
         {isEmpty(options) && <SelectOption isDisabled>{t('No options found')}</SelectOption>}

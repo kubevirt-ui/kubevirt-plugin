@@ -1,9 +1,9 @@
 import React, { useCallback, useMemo } from 'react';
 
-import { EnhancedSelectOptionProps } from '@kubevirt-utils/components/FilterSelect/utils/types';
+import { type EnhancedSelectOptionProps } from '@kubevirt-utils/components/FilterSelect/utils/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
-import { EnvironmentKind, EnvironmentVariable, MapKindToAbbr } from '../constants';
+import { EnvironmentKind, type EnvironmentVariable, MapKindToAbbr } from '../constants';
 import { getEnvironmentOptionValue } from '../utils';
 
 import useEnvironmentsResources from './useEnvironmentsResources';
@@ -11,15 +11,11 @@ import useEnvironmentsResources from './useEnvironmentsResources';
 const useEnvironmentSelectOptions = (
   namespace: string,
   environments: EnvironmentVariable[],
-): { loaded: boolean; loadError: any; selectOptions: EnhancedSelectOptionProps[] } => {
+): { loaded: boolean; loadError: unknown; selectOptions: EnhancedSelectOptionProps[] } => {
   const { t } = useKubevirtTranslation();
-  const {
-    configMaps,
-    error: loadError,
-    loaded,
-    secrets,
-    serviceAccounts,
-  } = useEnvironmentsResources(namespace);
+  const environmentResources = useEnvironmentsResources(namespace);
+  const { configMaps, loaded, secrets, serviceAccounts } = environmentResources;
+  const loadError: unknown = environmentResources.error as unknown;
 
   const getEnhancedSelectOptionProps = useCallback(
     (optionName: string, optionKind: EnvironmentKind): EnhancedSelectOptionProps => ({
@@ -33,7 +29,6 @@ const useEnvironmentSelectOptions = (
         </>
       ),
       isDisabled: environments.some((env) => env.name === optionName),
-      key: optionName,
       value: getEnvironmentOptionValue(optionName, optionKind),
       valueForFilter: optionName,
     }),
@@ -41,7 +36,9 @@ const useEnvironmentSelectOptions = (
   );
 
   const selectOptions = useMemo(() => {
-    if (!loaded) return [];
+    if (!loaded) {
+      return [];
+    }
 
     return [
       ...secrets.map((secret) => ({

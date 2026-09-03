@@ -46,7 +46,6 @@ export const getEditingNetworkOptionIfMissing = ({
           </Label>
         </>
       ),
-      key: selectNetworkName,
     },
     type: interfaceTypesProxy.bridge,
     value: selectNetworkName,
@@ -82,7 +81,6 @@ export const buildNetworkSelectOptions = ({
             </Label>
           </span>
         ),
-        key: value,
       },
       type,
       value,
@@ -105,7 +103,6 @@ export const buildNetworkSelectOptions = ({
             </Label>
           </span>
         ),
-        key: POD_NETWORK,
       },
       type: podNetworkType,
       value: POD_NETWORK,
