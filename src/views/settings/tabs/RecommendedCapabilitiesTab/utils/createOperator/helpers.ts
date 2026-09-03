@@ -1,26 +1,16 @@
-/* eslint-disable */
 import { NamespaceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import {
-  ConsoleOperatorConfigModel,
-  OperatorGroupModel,
-  RoleBindingModel,
-  RoleModel,
-  SubscriptionModel,
-} from '@kubevirt-utils/models';
-import { getAPIVersionForModel } from '@kubevirt-utils/resources/shared';
+import { ConsoleOperatorConfigModel } from '@kubevirt-utils/models';
 import { parseJSONAnnotation } from '@kubevirt-utils/utils/utils';
-import { getGroupVersionKindForModel, ObjectMetadata } from '@openshift-console/dynamic-plugin-sdk';
 import {
-  InstallModeType,
-  InstallPlanApproval,
-  K8sResourceKind,
-  OperatorGroupKind,
-  PackageManifestKind,
-  SubscriptionKind,
-} from '@overview/utils/types';
+  getGroupVersionKindForModel,
+  type K8sGroupVersionKind,
+  type ObjectMetadata,
+} from '@openshift-console/dynamic-plugin-sdk';
+import { type K8sResourceKind } from '@overview/utils/types';
 
 import { CONSOLE_OPERATOR_CONFIG_NAME } from '../constants';
-import { isRedHatCatalogSource } from './constants';
+
+import { RED_HAT_CATALOG_SOURCE } from './constants';
 
 export enum OLMAnnotation {
   ActionText = 'marketplace.openshift.io/action-text',
@@ -59,56 +49,33 @@ export enum OLMAnnotation {
 }
 
 type AnnotationParserOptions = {
-  onError?: (e: any) => void;
+  onError?: (error: unknown) => void;
 };
 
 export type AnnotationParser<
-  Result = any,
+  Result = unknown,
   Options extends AnnotationParserOptions = AnnotationParserOptions,
 > = (annotations: ObjectMetadata['annotations'], options?: Options) => Result;
 
 export type ParseJSONAnnotationOptions = {
-  onError?: (error: any) => void;
-  validate?: (value: any) => boolean;
+  onError?: (error: unknown) => void;
+  validate?: (value: unknown) => boolean;
 };
 
-export const isArrayOfStrings = (value: any): value is string[] =>
+export const isArrayOfStrings = (value: unknown): value is string[] =>
   Array.isArray(value) && !value.some((element) => typeof element !== 'string');
 
-export const defaultChannelNameFor = (pkg: PackageManifestKind): string =>
-  pkg?.status?.defaultChannel || pkg?.status?.channels?.[0]?.name || '-';
-
-export const isK8sResource = (value: any): value is K8sResourceKind =>
-  Boolean(value?.metadata?.name);
+export const isK8sResource = (value: unknown): value is K8sResourceKind =>
+  Boolean((value as K8sResourceKind)?.metadata?.name);
 
 export const getSuggestedNamespaceTemplate: AnnotationParser<K8sResourceKind> = (
   annotations,
   options,
-) =>
+): K8sResourceKind =>
   parseJSONAnnotation<K8sResourceKind>(annotations, OLMAnnotation.SuggestedNamespaceTemplate, {
     validate: isK8sResource,
     ...options,
   });
-
-const getCurrentCSVName = (currentChannel, updateVersion) =>
-  currentChannel?.entries?.find((e) => e.version === updateVersion)?.name;
-
-export const installModesFor = (pkg: PackageManifestKind) => (channel: string) =>
-  pkg?.status?.channels?.find((ch) => ch.name === channel)?.currentCSVDesc?.installModes || [];
-export const supportedInstallModesFor = (pkg: PackageManifestKind, channel: string) =>
-  installModesFor(pkg)(channel).filter(({ supported }) => supported);
-
-export const getDefaultInstallMode = (
-  packageManifest: PackageManifestKind,
-  updateChannelName: string,
-): InstallModeType =>
-  supportedInstallModesFor(packageManifest, updateChannelName).reduce(
-    (preferredInstallMode, mode) =>
-      mode.type === InstallModeType.InstallModeTypeAllNamespaces
-        ? InstallModeType.InstallModeTypeAllNamespaces
-        : preferredInstallMode,
-    InstallModeType.InstallModeTypeOwnNamespace,
-  );
 
 export const getClusterServiceVersionPlugins: AnnotationParser<string[]> = (
   annotations,
@@ -120,100 +87,25 @@ export const getClusterServiceVersionPlugins: AnnotationParser<string[]> = (
   }) ?? [];
 
 export const isCatalogSourceTrusted = (catalogSource: string): boolean =>
-  isRedHatCatalogSource(catalogSource);
+  catalogSource === RED_HAT_CATALOG_SOURCE;
 
-export const getPrometheusRole = (namespace: string) => {
-  return {
-    apiVersion: `${RoleModel.apiGroup}/${RoleModel.apiVersion}`,
-    kind: RoleModel.kind,
-    metadata: {
-      name: `${namespace}-prometheus`,
-      namespace: namespace,
-    },
-    rules: [
-      {
-        apiGroups: [''],
-        resources: ['services', 'endpoints', 'pods'],
-        verbs: ['get', 'list', 'watch'],
-      },
-    ],
+type CreateOperatorWatchedResources = {
+  consoleOperatorConfig: {
+    cluster?: string;
+    groupVersionKind: K8sGroupVersionKind;
+    isList: false;
+    name: string;
+  };
+  namespaces: {
+    cluster?: string;
+    groupVersionKind: K8sGroupVersionKind;
+    isList: true;
   };
 };
 
-export const getPrometheusRoleBinding = (namespace: string) => ({
-  apiVersion: `${RoleBindingModel.apiGroup}/${RoleBindingModel.apiVersion}`,
-  kind: RoleBindingModel.kind,
-  metadata: {
-    name: `${namespace}-prometheus`,
-    namespace: namespace,
-  },
-  roleRef: {
-    apiGroup: RoleBindingModel.apiGroup,
-    kind: 'Role',
-    name: `${namespace}-prometheus`,
-  },
-  subjects: [
-    {
-      kind: 'ServiceAccount',
-      name: 'prometheus-k8s',
-      namespace: 'openshift-monitoring',
-    },
-  ],
-});
-
-export const getOperatorGroup = (
-  namespace: string,
-  installMode: InstallModeType,
-): OperatorGroupKind => ({
-  apiVersion: getAPIVersionForModel(OperatorGroupModel) as OperatorGroupKind['apiVersion'],
-  kind: 'OperatorGroup',
-  metadata: {
-    name: namespace,
-    namespace: namespace,
-  },
-  ...(installMode === InstallModeType.InstallModeTypeAllNamespaces
-    ? {}
-    : {
-        spec: {
-          targetNamespaces: [namespace],
-        },
-      }),
-});
-
-export const getSubscription = (
-  namespace: string,
-  packageManifest: PackageManifestKind,
-  updateChannelName: string,
-  updateVersion: string,
-  approval: InstallPlanApproval,
-): SubscriptionKind => {
-  const {
-    catalogSource,
-    catalogSourceNamespace,
-    channels = [],
-    packageName,
-  } = packageManifest?.status ?? {};
-  const currentChannel = channels?.find((ch) => ch.name === updateChannelName);
-
-  return {
-    apiVersion: getAPIVersionForModel(SubscriptionModel) as SubscriptionKind['apiVersion'],
-    kind: 'Subscription',
-    metadata: {
-      name: packageName,
-      namespace: namespace,
-    },
-    spec: {
-      channel: updateChannelName,
-      installPlanApproval: approval,
-      name: packageName,
-      source: catalogSource,
-      sourceNamespace: catalogSourceNamespace,
-      startingCSV: getCurrentCSVName(currentChannel, updateVersion),
-    },
-  };
-};
-
-export const getCreateOperatorWatchedResources = (cluster?: string) => ({
+export const getCreateOperatorWatchedResources = (
+  cluster?: string,
+): CreateOperatorWatchedResources => ({
   consoleOperatorConfig: {
     cluster,
     groupVersionKind: getGroupVersionKindForModel(ConsoleOperatorConfigModel),
@@ -226,3 +118,14 @@ export const getCreateOperatorWatchedResources = (cluster?: string) => ({
     isList: true,
   },
 });
+
+export {
+  defaultChannelNameFor,
+  getDefaultInstallMode,
+  getOperatorGroup,
+  getPrometheusRole,
+  getPrometheusRoleBinding,
+  getSubscription,
+  installModesFor,
+  supportedInstallModesFor,
+} from './operatorChannelHelpers';

@@ -1,5 +1,6 @@
 import React, { type FC, type ReactNode } from 'react';
 
+import { type IoK8sApiStorageV1StorageClass } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import CapacityInput from '@kubevirt-utils/components/CapacityInput/CapacityInput';
 import { getSCSelectOptions } from '@kubevirt-utils/components/DiskModal/components/StorageClassAndPreallocation/utils/helpers';
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
@@ -9,21 +10,17 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { StorageClassModel } from '@kubevirt-utils/models';
 import { FormGroup, PopoverPosition, Switch } from '@patternfly/react-core';
 
-import { type AdvancedSettingsProps } from './types';
-
-type StorageClassFieldsProps = Pick<
-  AdvancedSettingsProps,
-  | 'effectiveStorageClassName'
-  | 'isDryRun'
-  | 'pvcSize'
-  | 'setIsDryRun'
-  | 'setPvcSize'
-  | 'setStorageClass'
-  | 'storageClasses'
-  | 'storageClassesLoaded'
-> & {
+type StorageClassFieldsProps = {
   afterPvc?: ReactNode;
   afterStorageClass?: ReactNode;
+  effectiveStorageClassName: string;
+  isDryRun: boolean;
+  pvcSize: string;
+  setIsDryRun: (checked: boolean) => void;
+  setPvcSize: (size: string) => void;
+  setStorageClass: (sc: string) => void;
+  storageClasses: IoK8sApiStorageV1StorageClass[];
+  storageClassesLoaded: boolean;
 };
 
 const StorageClassFields: FC<StorageClassFieldsProps> = ({

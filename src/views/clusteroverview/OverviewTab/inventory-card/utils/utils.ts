@@ -13,7 +13,6 @@ import {
 } from '@openshift-console/dynamic-plugin-sdk';
 import { InProgressIcon, OffIcon, PausedIcon } from '@patternfly/react-icons';
 
-import { type K8sResourceKind } from '../../../utils/types';
 import { flattenTemplates } from './flattenTemplates';
 import { type VirtualMachineTemplateBundle } from './types';
 
@@ -29,10 +28,10 @@ export const getTemplates = (resources: {
   return flattenTemplates({ vms, vmTemplates }) || [];
 };
 
-export const getVMStatusCounts = (vms: K8sResourceKind[]): Record<string, number> => {
+export const getVMStatusCounts = (vms: V1VirtualMachine[]): Record<string, number> => {
   const statusCounts: Record<string, number> = {};
   for (const vm of vms) {
-    const status: string = getVMStatus(vm as V1VirtualMachine);
+    const status: string = getVMStatus(vm);
     const count: number = statusCounts[status] ?? 0;
     statusCounts[status] = count + 1;
   }

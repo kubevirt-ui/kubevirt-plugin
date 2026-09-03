@@ -1,59 +1,54 @@
-import React, { type ReactElement } from 'react';
-import CheckupImageField from 'src/views/checkups/components/CheckupImageField';
+import React, { type ReactNode, useState } from 'react';
 
-import CheckboxSelect from '@kubevirt-utils/components/CheckboxSelect/CheckboxSelect';
 import ClusterProjectDropdown from '@kubevirt-utils/components/ClusterProjectDropdown/ClusterProjectDropdown';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import {
-  Alert,
-  AlertVariant,
-  Form,
-  FormGroup,
-  FormSection,
-  Grid,
-  GridItem,
-  Stack,
-  TextInput,
-} from '@patternfly/react-core';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
+import { Form, FormSection, Grid, GridItem, Stack } from '@patternfly/react-core';
 
-import { TEST_SUITE_OPTIONS } from '../../utils';
 import AdvancedSettings from './AdvancedSettings';
 import CheckupsSelfValidationFormActions from './CheckupsSelfValidationFormActions';
+import CheckupsSelfValidationFormFields from './components/CheckupsSelfValidationFormFields';
+import { type SelfValidationStorageSubmit, type WindowsValidationSubmit } from './types';
 import useCheckupsSelfValidationFormState from './useCheckupsSelfValidationFormState';
 import WindowsValidationSettings from './WindowsValidationSettings';
 
 import './checkups-self-validation-form.scss';
 
-const CheckupsSelfValidationForm = (): ReactElement => {
+const defaultStorageSubmit: SelfValidationStorageSubmit = {
+  pvcSize: '',
+  storageCapabilities: [],
+  storageClass: '',
+};
+
+const defaultWindowsSubmit: WindowsValidationSubmit = {
+  isEulaConfirmed: false,
+  windowsServerTesting: false,
+  winImageDownloadUrl: '',
+};
+
+const CheckupsSelfValidationForm = (): ReactNode => {
   const { t } = useKubevirtTranslation();
+  const cluster = useClusterParam();
+  const [storageSubmit, setStorageSubmit] =
+    useState<SelfValidationStorageSubmit>(defaultStorageSubmit);
+  const [windowsSubmit, setWindowsSubmit] = useState<WindowsValidationSubmit>(defaultWindowsSubmit);
+
   const {
     checkupImage,
     checkupImageIsFallback,
     checkupImageLoaded,
     checkupImageLoadError,
-    claimPropertySets,
-    effectiveStorageClass,
-    handleStorageCapabilitySelect,
     handleTestSuiteSelect,
     isDryRun,
     name,
     pipelinesInstalled,
     pipelinesLoaded,
-    pvcSize,
     selectedTestSuites,
     setIsDryRun,
     setName,
-    setPvcSize,
-    setStorageClass,
     setTestSkips,
-    storageCapabilities,
-    storageClasses,
-    storageClassesLoaded,
-    storageProfileError,
-    storageProfileLoaded,
     testSkips,
     testSuitesToggleTitle,
-    windowsState,
   } = useCheckupsSelfValidationFormState(t);
 
   return (
@@ -63,90 +58,46 @@ const CheckupsSelfValidationForm = (): ReactElement => {
         <GridItem span={6}>
           <Form className={'CheckupsSelfValidationForm--main'}>
             <FormSection title={t('Run self validation checkup')} titleElement="h1">
-              <Alert
-                isInline
-                title={t('WARNING: This checkup may put the cluster under stress')}
-                variant={AlertVariant.warning}
-              >
-                {t(
-                  'This checkup can take up to 3 hours to complete. It should not be used in production environments as it may impact cluster performance.',
-                )}
-              </Alert>
-
-              <FormGroup fieldId="name" isRequired label={t('Name')}>
-                <TextInput
-                  id="name"
-                  isRequired
-                  name="name"
-                  onChange={(_event, value) => setName(value)}
-                  value={name}
-                />
-              </FormGroup>
-
-              {(checkupImageLoadError ?? checkupImageIsFallback) && (
-                <CheckupImageField
-                  checkupImage={checkupImage}
-                  checkupImageLoaded={checkupImageLoaded}
-                  checkupImageLoadError={checkupImageLoadError}
-                  isFallback={checkupImageIsFallback}
-                />
-              )}
-
-              <FormGroup fieldId="test-suites" isRequired label={t('Test suites')}>
-                <CheckboxSelect
-                  onSelect={handleTestSuiteSelect}
-                  options={TEST_SUITE_OPTIONS.map((option) => ({
-                    children: option.label,
-                    isSelected: selectedTestSuites.includes(option.value),
-                    value: option.value,
-                  }))}
-                  selectedValues={selectedTestSuites}
-                  toggleTitle={testSuitesToggleTitle}
-                />
-              </FormGroup>
+              <CheckupsSelfValidationFormFields
+                checkupImage={checkupImage ?? ''}
+                checkupImageIsFallback={checkupImageIsFallback}
+                checkupImageLoaded={checkupImageLoaded}
+                checkupImageLoadError={checkupImageLoadError}
+                handleTestSuiteSelect={handleTestSuiteSelect}
+                name={name}
+                selectedTestSuites={selectedTestSuites}
+                setName={setName}
+                testSuitesToggleTitle={testSuitesToggleTitle}
+              />
               <Stack hasGutter>
                 <WindowsValidationSettings
-                  isEulaConfirmed={windowsState.isEulaConfirmed}
-                  isTier2Selected={windowsState.isTier2Selected}
+                  onWindowsChange={setWindowsSubmit}
                   pipelinesInstalled={pipelinesInstalled}
                   pipelinesLoaded={pipelinesLoaded}
-                  setIsEulaConfirmed={windowsState.setIsEulaConfirmed}
-                  setWindowsServerTesting={windowsState.setWindowsServerTesting}
-                  setWinImageDownloadUrl={windowsState.setWinImageDownloadUrl}
-                  windowsServerTesting={windowsState.windowsServerTesting}
-                  winImageDownloadUrl={windowsState.winImageDownloadUrl}
+                  selectedTestSuites={selectedTestSuites}
                 />
               </Stack>
               <AdvancedSettings
-                effectiveStorageClassName={effectiveStorageClass}
-                handleStorageCapabilitySelect={handleStorageCapabilitySelect}
+                cluster={cluster}
                 isDryRun={isDryRun}
-                pvcSize={pvcSize}
+                onStorageChange={setStorageSubmit}
+                selectedTestSuites={selectedTestSuites}
                 setIsDryRun={setIsDryRun}
-                setPvcSize={setPvcSize}
-                setStorageClass={setStorageClass}
                 setTestSkips={setTestSkips}
-                storageCapabilities={storageCapabilities}
-                storageClasses={storageClasses}
-                storageClassesLoaded={storageClassesLoaded}
-                storageProfileError={storageProfileError}
-                storageProfileHasClaimPropertySets={Boolean(claimPropertySets?.length)}
-                storageProfileLoaded={storageProfileLoaded}
                 testSkips={testSkips}
               />
-
               <CheckupsSelfValidationFormActions
-                checkupImage={checkupImage}
+                checkupImage={checkupImage ?? ''}
                 isDryRun={isDryRun}
-                isEulaConfirmed={windowsState.isEulaConfirmed}
+                isEulaConfirmed={windowsSubmit.isEulaConfirmed}
                 name={name}
-                pvcSize={pvcSize}
+                pvcSize={storageSubmit.pvcSize}
                 selectedTestSuites={selectedTestSuites}
-                storageCapabilities={storageCapabilities}
-                storageClass={effectiveStorageClass}
+                storageCapabilities={storageSubmit.storageCapabilities}
+                storageClass={storageSubmit.storageClass}
                 testSkips={testSkips}
-                windowsServerTesting={windowsState.windowsServerTesting}
-                winImageDownloadUrl={windowsState.winImageDownloadUrl}
+                windowsServerTesting={windowsSubmit.windowsServerTesting}
+                winImageDownloadUrl={windowsSubmit.winImageDownloadUrl}
               />
             </FormSection>
           </Form>

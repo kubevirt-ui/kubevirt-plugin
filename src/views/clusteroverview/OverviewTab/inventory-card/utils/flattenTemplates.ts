@@ -11,7 +11,6 @@ import {
 import { findKeySuffixValue } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
 import { type WatchK8sResultsObject } from '@openshift-console/dynamic-plugin-sdk';
 
-import { type K8sResourceKind } from '../../../utils/types';
 import { TEMPLATE_CUSTOMIZED_ANNOTATION } from './constants';
 import {
   type Flatten,
@@ -20,10 +19,8 @@ import {
   type VMGenericLikeEntityKind,
 } from './types';
 
-export const getLoadedData = <T extends K8sResourceKind | K8sResourceKind[] = K8sResourceKind[]>(
-  result: WatchK8sResultsObject<T>,
-  defaultValue = null,
-): T => (result && result.loaded && !result.loadError ? result.data : defaultValue);
+export const getLoadedData = <T>(result: WatchK8sResultsObject<T>, defaultValue?: T): T =>
+  result && result.loaded && !result.loadError ? result.data : defaultValue;
 
 export const getWorkloadProfile = (vm: VMGenericLikeEntityKind): string =>
   findKeySuffixValue(getLabels(vm), TEMPLATE_WORKLOAD_LABEL);

@@ -1,12 +1,6 @@
-/* eslint-disable */
-import React, { FC, MouseEvent, useCallback, useMemo, useState } from 'react';
+import React, { type FC, useCallback, useMemo, useState } from 'react';
 
-import { VirtualMachineClusterPreferenceModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import PreferencePopoverContent from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/PreferenceSelect/PreferencePopoverContent';
-import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
-import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
-import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
+import { type V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import {
   DEFAULT_INSTANCETYPE_LABEL,
@@ -15,26 +9,18 @@ import {
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { convertResourceArrayToMap } from '@kubevirt-utils/resources/shared';
 import { ANNOTATIONS } from '@kubevirt-utils/resources/template';
-import { readableSizeUnit } from '@kubevirt-utils/utils/units';
-import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverContentWithLightspeedButton/PopoverContentWithLightspeedButton';
-import { OLSPromptType } from '@lightspeed/utils/prompts';
-import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+import { type K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import {
-  FormGroup,
-  Grid,
-  GridItem,
-  PopoverPosition,
-  SelectOption,
-  TextArea,
-} from '@patternfly/react-core';
-import {
-  CategoryDetails,
-  InstanceTypeCategory,
+  type CategoryDetails,
+  type InstanceTypeCategory,
 } from '@virtualmachines/wizard/steps/InstanceTypesSteps/ComputeResourcesStep/components/SelectInstanceTypeSection/utils/types';
 import { categoryDetailsMap } from '@virtualmachines/wizard/steps/InstanceTypesSteps/ComputeResourcesStep/components/SelectInstanceTypeSection/utils/utils';
 
-import { BootableResource, BootableVolumeMetadata } from '../../utils/types';
+import { type BootableResource, type BootableVolumeMetadata } from '../../utils/types';
 import { changeBootableVolumeMetadata } from '../../utils/utils';
+import EditBootableVolumeDescriptionField from './EditBootableVolumeDescriptionField';
+import EditBootableVolumeInstanceTypeFields from './EditBootableVolumeInstanceTypeFields';
+import EditBootableVolumePreferenceField from './EditBootableVolumePreferenceField';
 
 type EditBootableVolumesModalProps = {
   isOpen: boolean;
@@ -52,7 +38,8 @@ const EditBootableVolumesModal: FC<EditBootableVolumesModalProps> = ({
   const { t } = useKubevirtTranslation();
 
   const preferencesNames = useMemo(
-    () => Object.keys(convertResourceArrayToMap(preferences)).sort((a, b) => a.localeCompare(b)),
+    (): string[] =>
+      Object.keys(convertResourceArrayToMap(preferences)).sort((a, b) => a.localeCompare(b)),
     [preferences],
   );
 
@@ -71,39 +58,38 @@ const EditBootableVolumesModal: FC<EditBootableVolumesModalProps> = ({
   }, [source]);
 
   const [preference, setPreference] = useState<string>(initialParams.preference);
-  const [instanceType, setInstanceType] = useState<string>(initialParams.instanceType?.[0]);
-  const [size, setSize] = useState<string>(initialParams.size);
-  const [description, setDescription] = useState<string>(initialParams.description);
+  const [instanceType, setInstanceType] = useState<string>(initialParams.instanceType?.[0] ?? '');
+  const [size, setSize] = useState<string>(initialParams.size ?? '');
+  const [description, setDescription] = useState<string>(initialParams.description ?? '');
 
-  // update options for 'Size' dropdown according to chosen 'instanceType' in 'Default InstanceType' dropdown
-  const { instanceTypes }: CategoryDetails = useMemo(
-    () => (instanceType ? categoryDetailsMap[instanceType] : {}),
-    [instanceType],
-  );
+  const selectedCategory: CategoryDetails | undefined = instanceType
+    ? categoryDetailsMap[instanceType as InstanceTypeCategory]
+    : undefined;
+  const instanceTypes = selectedCategory?.instanceTypes;
 
-  const onInstanceTypeSelect = (_event: MouseEvent<HTMLSelectElement>, newInstanceType: string) => {
+  const onInstanceTypeSelect = (_event: unknown, newInstanceType: string): void => {
     setInstanceType(newInstanceType);
 
-    const newCategoryObject = categoryDetailsMap[newInstanceType];
+    const newCategoryObject = categoryDetailsMap[newInstanceType as InstanceTypeCategory];
     const newCategorySize = newCategoryObject.instanceTypes[0].label;
     setSize(newCategorySize);
   };
 
-  const onSizeSelect = (_event: MouseEvent<HTMLSelectElement>, newSize: string) => {
+  const onSizeSelect = (_event: unknown, newSize: string): void => {
     setSize(newSize);
   };
 
-  const onSubmitVolumeParams = useCallback(() => {
+  const onSubmitVolumeParams = useCallback((): ReturnType<typeof changeBootableVolumeMetadata> => {
     const preferenceLabel = preference && { [DEFAULT_PREFERENCE_LABEL]: preference };
 
-    const categoryObject = categoryDetailsMap[instanceType];
+    const categoryObject = categoryDetailsMap[instanceType as InstanceTypeCategory];
     const instanceLabel = instanceType && {
       [DEFAULT_INSTANCETYPE_LABEL]: `${categoryObject.prefix}.${size}`,
     };
 
     const descriptionAnnotation = description?.trim()
       ? { [ANNOTATIONS.description]: description.trim() }
-      : { [ANNOTATIONS.description]: undefined }; // we do want undefined here to get the annotation removed from the resource, if description not provided
+      : { [ANNOTATIONS.description]: undefined };
 
     const metadata: BootableVolumeMetadata = {
       annotations: {
@@ -129,94 +115,22 @@ const EditBootableVolumesModal: FC<EditBootableVolumesModalProps> = ({
       onSubmit={onSubmitVolumeParams()}
       shouldWrapInForm
     >
-      <FormGroup
-        labelHelp={
-          <HelpTextIcon
-            bodyContent={(hide) => (
-              <PopoverContentWithLightspeedButton
-                content={<PreferencePopoverContent />}
-                hide={hide}
-                promptType={OLSPromptType.PREFERENCE}
-              />
-            )}
-            position={PopoverPosition.right}
-          />
-        }
-        isRequired
-        label={t('Preference')}
-      >
-        <InlineFilterSelect
-          options={preferencesNames?.map((opt) => ({
-            children: opt,
-            groupVersionKind: VirtualMachineClusterPreferenceModelGroupVersionKind,
-            value: opt,
-          }))}
-          placeholder={t('Select preference')}
-          selected={preference}
-          setSelected={setPreference}
-        />
-      </FormGroup>
-      <Grid hasGutter>
-        <GridItem span={6}>
-          <FormGroup
-            labelHelp={
-              <HelpTextIcon
-                bodyContent={(hide) => (
-                  <PopoverContentWithLightspeedButton
-                    content={t('The default InstanceType for this volume.')}
-                    hide={hide}
-                    promptType={OLSPromptType.DEFAULT_INSTANCETYPE}
-                  />
-                )}
-                position={PopoverPosition.right}
-              />
-            }
-            label={t('Default InstanceType')}
-          >
-            <FormPFSelect onSelect={onInstanceTypeSelect} selected={instanceType}>
-              {Object.keys(InstanceTypeCategory)?.map((instanceTypeCategory) => {
-                const { seriesLabel, title }: CategoryDetails =
-                  categoryDetailsMap[instanceTypeCategory];
-                return (
-                  <SelectOption
-                    description={title}
-                    key={instanceTypeCategory}
-                    value={instanceTypeCategory}
-                  >
-                    {seriesLabel}
-                  </SelectOption>
-                );
-              })}
-            </FormPFSelect>
-          </FormGroup>
-        </GridItem>
-        <GridItem span={6}>
-          <FormGroup label={t('Size')}>
-            <FormPFSelect onSelect={onSizeSelect} selected={size}>
-              {instanceTypes?.map(({ cpus, label, memory }) => (
-                <SelectOption
-                  description={t('{{cpus}} CPUs, {{memory}} Memory', {
-                    cpus,
-                    memory: readableSizeUnit(memory),
-                  })}
-                  key={label}
-                  value={label}
-                >
-                  {label}
-                </SelectOption>
-              ))}
-            </FormPFSelect>
-          </FormGroup>
-        </GridItem>
-      </Grid>
-      <FormGroup label={t('Description')}>
-        <TextArea
-          aria-label={t('description text area')}
-          onChange={(_event, val) => setDescription(val)}
-          resizeOrientation="vertical"
-          value={description}
-        />
-      </FormGroup>
+      <EditBootableVolumePreferenceField
+        preference={preference}
+        preferencesNames={preferencesNames}
+        setPreference={setPreference}
+      />
+      <EditBootableVolumeInstanceTypeFields
+        instanceType={instanceType}
+        instanceTypes={instanceTypes}
+        onInstanceTypeSelect={onInstanceTypeSelect}
+        onSizeSelect={onSizeSelect}
+        size={size}
+      />
+      <EditBootableVolumeDescriptionField
+        description={description}
+        setDescription={setDescription}
+      />
     </TabModal>
   );
 };

@@ -1,6 +1,7 @@
 import React, { type FC } from 'react';
 
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getAllowedResourceData } from '@kubevirt-utils/resources/shared';
@@ -59,7 +60,10 @@ const InventoryCard: FC = () => {
             </div>
           </GridItem>
           <GridItem span={8}>
-            <VMStatusSection vms={vms?.data ?? []} vmsLoaded={vms?.loaded} />
+            <VMStatusSection
+              vms={(vms?.data ?? []) as V1VirtualMachine[]}
+              vmsLoaded={vms?.loaded}
+            />
           </GridItem>
         </Grid>
       </div>

@@ -1,115 +1,76 @@
-import React, { type FC } from 'react';
-import { Trans } from 'react-i18next';
+import React, { type FC, useCallback, useEffect } from 'react';
 
-import CheckboxSelect from '@kubevirt-utils/components/CheckboxSelect/CheckboxSelect';
-import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
-import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
-import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   ExpandableSection,
   FormGroup,
   HelperText,
   HelperTextItem,
-  PopoverPosition,
+  type SelectProps,
   TextInput,
 } from '@patternfly/react-core';
 
-import { STORAGE_CAPABILITY_OPTIONS } from '../../utils';
+import StorageCapabilityFields from './StorageCapabilityFields';
 import StorageClassFields from './StorageClassFields';
 import { type AdvancedSettingsProps } from './types';
+import useSelfValidationFormStorage from './useSelfValidationFormStorage';
+import { addStorageCapability, removeStorageCapability } from './utils';
 
 const AdvancedSettings: FC<AdvancedSettingsProps> = ({
-  effectiveStorageClassName,
-  handleStorageCapabilitySelect,
+  cluster,
   isDryRun,
-  pvcSize,
+  onStorageChange,
+  selectedTestSuites,
   setIsDryRun,
-  setPvcSize,
-  setStorageClass,
   setTestSkips,
-  storageCapabilities,
-  storageClasses,
-  storageClassesLoaded,
-  storageProfileError,
-  storageProfileHasClaimPropertySets,
-  storageProfileLoaded,
   testSkips,
 }) => {
   const { t } = useKubevirtTranslation();
+  const {
+    claimPropertySetsLength,
+    effectiveStorageClass,
+    pvcSize,
+    setPvcSize,
+    setStorageCapabilities,
+    setStorageClass,
+    storageCapabilities,
+    storageClasses,
+    storageClassesLoaded,
+    storageProfileError,
+    storageProfileLoaded,
+  } = useSelfValidationFormStorage(selectedTestSuites, cluster);
 
-  const showStorageProfilePrefilledHint =
-    storageProfileLoaded &&
-    !storageProfileError &&
-    storageProfileHasClaimPropertySets &&
-    Boolean(effectiveStorageClassName);
+  useEffect((): void => {
+    onStorageChange({
+      pvcSize,
+      storageCapabilities,
+      storageClass: effectiveStorageClass,
+    });
+  }, [effectiveStorageClass, onStorageChange, pvcSize, storageCapabilities]);
 
-  const showStorageProfileManualFallbackHint =
-    storageProfileLoaded &&
-    Boolean(effectiveStorageClassName) &&
-    (storageProfileError || !storageProfileHasClaimPropertySets);
+  const handleStorageCapabilitySelect: SelectProps['onSelect'] = useCallback(
+    (_event, value: string): void => {
+      setStorageCapabilities((prev) =>
+        prev.includes(value)
+          ? removeStorageCapability(prev, value)
+          : addStorageCapability(prev, value),
+      );
+    },
+    [setStorageCapabilities],
+  );
 
   return (
     <ExpandableSection isIndented toggleText={t('Advanced settings')}>
       <StorageClassFields
         afterPvc={
-          <FormGroup
-            className="form-group-spacing storage-capabilities"
-            fieldId="storage-capabilities"
-            label={t('Storage capabilities')}
-            labelHelp={
-              <HelpTextIcon
-                bodyContent={
-                  <Trans ns="plugin__kubevirt-plugin" t={t}>
-                    Select the storage capabilities your storage class supports. Check the{' '}
-                    <ExternalLink hideIcon href={documentationURL.STORAGE_PROFILES}>
-                      StorageProfile
-                    </ExternalLink>{' '}
-                    to see supported access and volume modes. Note: Storage Snapshot must be
-                    selected for snapshot tests to run.
-                  </Trans>
-                }
-                position={PopoverPosition.right}
-              />
-            }
-          >
-            <CheckboxSelect
-              onSelect={handleStorageCapabilitySelect}
-              options={STORAGE_CAPABILITY_OPTIONS.map((option) => ({
-                children: option.label,
-                isSelected: storageCapabilities.includes(option.value),
-                value: option.value,
-              }))}
-              selectedValues={storageCapabilities}
-              toggleTitle={t('Storage capabilities')}
-            />
-            {(showStorageProfilePrefilledHint || showStorageProfileManualFallbackHint) && (
-              <div aria-live="polite" className="pf-v6-u-pt-sm">
-                {showStorageProfilePrefilledHint && (
-                  <HelperText className="checkups-self-validation-form__helper-text">
-                    <HelperTextItem variant="default">
-                      <Trans ns="plugin__kubevirt-plugin" t={t}>
-                        Access and volume mode capabilities were pre-filled from the StorageProfile
-                        for storage class{' '}
-                        <strong>{{ storageClassName: effectiveStorageClassName }}</strong>.
-                        <br />
-                        You can override them if needed.
-                      </Trans>
-                    </HelperTextItem>
-                  </HelperText>
-                )}
-                {showStorageProfileManualFallbackHint && (
-                  <HelperText className="checkups-self-validation-form__helper-text">
-                    <HelperTextItem variant="warning">
-                      {t(
-                        'StorageProfile data is not available for this storage class. Select storage capabilities manually.',
-                      )}
-                    </HelperTextItem>
-                  </HelperText>
-                )}
-              </div>
-            )}
-          </FormGroup>
+          <StorageCapabilityFields
+            effectiveStorageClassName={effectiveStorageClass}
+            onSelect={handleStorageCapabilitySelect}
+            storageCapabilities={storageCapabilities}
+            storageProfileError={storageProfileError}
+            storageProfileHasClaimPropertySets={claimPropertySetsLength > 0}
+            storageProfileLoaded={storageProfileLoaded}
+          />
         }
         afterStorageClass={
           <FormGroup className="form-group-spacing" fieldId="test-skips" label={t('Test skips')}>
@@ -126,7 +87,7 @@ const AdvancedSettings: FC<AdvancedSettingsProps> = ({
             </HelperText>
           </FormGroup>
         }
-        effectiveStorageClassName={effectiveStorageClassName}
+        effectiveStorageClassName={effectiveStorageClass}
         isDryRun={isDryRun}
         pvcSize={pvcSize}
         setIsDryRun={setIsDryRun}
