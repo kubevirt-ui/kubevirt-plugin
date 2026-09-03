@@ -4,8 +4,8 @@
 
 - **Project Name:** KubeVirt UI — Playwright E2E Tests
 - **Feature Area:** Tier1 — VM tabs (CD-ROM)
-- **Latest version:** CNV 5.0.0
-- **Latest update:** 2026-08-17
+- **Latest version:** CNV 5.1.0
+- **Latest update:** 2026-09-03
 - **Document Status:** Approved
 
 ## 2. Introduction
@@ -13,12 +13,14 @@
 ### 2.1 Purpose
 
 Verify the "Add CD-ROM" flow with the "Upload new ISO" source on an existing, stopped RHEL9 VM,
-including the resulting background upload toast and the ability to abort an in-progress upload.
+including the resulting background upload toast, the ability to abort an in-progress upload, and
+that creating a new VM does not cancel an unrelated in-progress CD-ROM upload.
 
 ### 2.2 Scope
 
 - **In-Scope:** Add CD-ROM disk modal with "Upload new ISO" source, background upload progress toast,
-  abort/cancel upload action, DataVolume deletion after abort.
+  abort/cancel upload action, DataVolume deletion after abort, and that an in-progress CD-ROM upload
+  is not canceled when the VM creation wizard is opened and left.
 - **Out-of-Scope:** Adding a CD-ROM with upload during new VM creation (CNV-90313) — this file covers
   upload to an already-existing VM only.
 
@@ -82,15 +84,36 @@ including the resulting background upload toast and the ability to abort an in-p
 
 ---
 
+### `003`: Creating a new VM does not cancel an in-progress CD-ROM upload on another VM
+
+- **Objective:** Verify that opening and leaving the VM creation wizard does not cancel a background
+  CD-ROM ISO upload that was started on an existing VM (CNV-96397).
+- **Target version:** CNV 5.0.0
+- **Jira References:** CNV-96397
+- **Pre-conditions:** VM must exist and be reachable via the VM tree view (created stopped from the
+  RHEL9 template)
+- **Tags:** `@nonpriv`
+
+| Step | Action                                                              | Expected Result                                                       |
+| :--- | :------------------------------------------------------------------ | :-------------------------------------------------------------------- |
+| 1    | Add a CD-ROM disk using "Upload new ISO" with the sized ISO fixture | CD-ROM disk is added; uploading toast is visible                      |
+| 2    | Navigate to the VM list and open the VM creation wizard             | Wizard is visible                                                     |
+| 3    | Cancel / leave the wizard                                           | Wizard closes (unmount cleanup runs)                                  |
+| 4    | Observe the upload toast                                            | Uploading or success toast is shown; upload is not aborted/canceled   |
+| 5    | Check for the "Cancel upload" (abort) button                        | If still visible (upload in progress), the test aborts it to clean up |
+
+---
+
 ## 5. Requirements Traceability Matrix
 
-| Jira Ticket | Test Case ID | Coverage Type    | Status    |
-| ----------- | ------------ | ---------------- | --------- |
-| CNV-89946   | `001`        | Feature coverage | Automated |
-| CNV-89946   | `002`        | Feature coverage | Automated |
-| CNV-89800   | `001`        | Feature coverage | Automated |
-| CNV-89800   | `002`        | Feature coverage | Automated |
-| CNV-87382   | `001`        | Feature coverage | Automated |
+| Jira Ticket | Test Case ID | Coverage Type           | Status    |
+| ----------- | ------------ | ----------------------- | --------- |
+| CNV-89946   | `001`        | Feature coverage        | Automated |
+| CNV-89946   | `002`        | Feature coverage        | Automated |
+| CNV-89800   | `001`        | Feature coverage        | Automated |
+| CNV-89800   | `002`        | Feature coverage        | Automated |
+| CNV-87382   | `001`        | Feature coverage        | Automated |
+| CNV-96397   | `003`        | Bugfix regression guard | Automated |
 
 **Coverage Type values:**
 
