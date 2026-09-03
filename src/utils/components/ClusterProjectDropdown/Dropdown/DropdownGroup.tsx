@@ -1,9 +1,9 @@
-import React, { FC, JSX } from 'react';
+import React, { type FC, type JSX } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Divider, MenuGroup, MenuItem, MenuList, TooltipPosition } from '@patternfly/react-core';
 
-import { DropdownConfig, DropdownOption } from './types';
+import { type DropdownConfig, type DropdownOption } from './types';
 
 type DropdownGroupProps = {
   config: DropdownConfig;
@@ -11,6 +11,7 @@ type DropdownGroupProps = {
   isFavorites?: boolean;
   options: DropdownOption[];
   selectedKey: string;
+  showBottomDivider?: boolean;
 };
 
 const DropdownGroup: FC<DropdownGroupProps> = ({
@@ -19,6 +20,7 @@ const DropdownGroup: FC<DropdownGroupProps> = ({
   isFavorites,
   options,
   selectedKey,
+  showBottomDivider = false,
 }): JSX.Element | null => {
   const { t } = useKubevirtTranslation();
   const label = isFavorites ? t('Favorites') : config.itemsLabel;
@@ -27,7 +29,6 @@ const DropdownGroup: FC<DropdownGroupProps> = ({
 
   return (
     <>
-      <Divider />
       <MenuGroup label={label}>
         <MenuList>
           {options.map((option) => {
@@ -37,6 +38,12 @@ const DropdownGroup: FC<DropdownGroupProps> = ({
             const hasTooltip = !!option.tooltip;
             return (
               <MenuItem
+                isAriaDisabled={option.disabled && hasTooltip}
+                isDisabled={option.disabled && !hasTooltip}
+                isFavorited={isFavorite}
+                isSelected={selectedKey === option.key}
+                itemId={option.key}
+                key={option.key}
                 tooltipProps={
                   option.tooltip
                     ? {
@@ -45,12 +52,6 @@ const DropdownGroup: FC<DropdownGroupProps> = ({
                       }
                     : undefined
                 }
-                isAriaDisabled={option.disabled && hasTooltip}
-                isDisabled={option.disabled && !hasTooltip}
-                isFavorited={isFavorite}
-                isSelected={selectedKey === option.key}
-                itemId={option.key}
-                key={option.key}
               >
                 {option.title}
               </MenuItem>
@@ -58,6 +59,7 @@ const DropdownGroup: FC<DropdownGroupProps> = ({
           })}
         </MenuList>
       </MenuGroup>
+      {showBottomDivider && <Divider />}
     </>
   );
 };

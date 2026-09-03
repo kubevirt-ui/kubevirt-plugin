@@ -11,6 +11,7 @@ import { isSystemNamespace } from '@kubevirt-utils/resources/namespace/helper';
 import { getName } from '@kubevirt-utils/resources/shared';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 import { type K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+import { Divider } from '@patternfly/react-core';
 
 type ProjectDropdownProps = {
   bookmarkCluster?: string;
@@ -95,12 +96,14 @@ const ProjectDropdown: FC<ProjectDropdownProps> = ({
     }
 
     return (
-      <ShowSystemNamespacesSwitch
-        cssPrefix="co-namespace-dropdown"
-        hasSystemNamespaces={hasSystemNamespaces}
-        isChecked={showSystemNamespaces}
-        onChange={onShowSystemNamespacesChange}
-      />
+      <>
+        <ShowSystemNamespacesSwitch
+          hasSystemNamespaces={hasSystemNamespaces}
+          isChecked={showSystemNamespaces}
+          onChange={onShowSystemNamespacesChange}
+        />
+        <Divider />
+      </>
     );
   }, [hasSystemNamespaces, onShowSystemNamespacesChange, showSystemLoaded, showSystemNamespaces]);
 

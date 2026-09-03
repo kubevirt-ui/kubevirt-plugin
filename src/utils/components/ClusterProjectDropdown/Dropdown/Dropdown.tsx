@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react';
 
 import { useClickOutside } from '@kubevirt-utils/hooks/useClickOutside/useClickOutside';
-import { Menu, MenuContent, Popper, Tooltip } from '@patternfly/react-core';
+import { Divider, Menu, MenuContent, Popper, Tooltip } from '@patternfly/react-core';
 
 import DropdownGroup from './DropdownGroup';
 import DropdownMenuToggle from './DropdownMenuToggle';
@@ -9,10 +9,10 @@ import Filter from './Filter';
 import NoResults from './NoResults';
 import ShowSystemNamespacesSwitch from './ShowSystemNamespacesSwitch';
 import type { DropdownConfig, DropdownProps } from './types';
-export type { DropdownConfig };
 import { useDropdownCallbacks } from './useDropdownCallbacks';
 import { useDropdownOptions } from './useDropdownOptions';
 import { useFilteredOptions } from './useFilteredOptions';
+export type { DropdownConfig };
 
 import './Dropdown.scss';
 
@@ -108,15 +108,16 @@ const Dropdown = <T,>({
                 onFilterChange={setFilterText}
               />
             </div>
+            <Divider />
             {showSystemToggle && (
-              <div role="none">
+              <>
                 <ShowSystemNamespacesSwitch
-                  cssPrefix={config.cssPrefix}
                   hasSystemNamespaces={showSystemToggle.hasSystemItems}
                   isChecked={showSystemToggle.show}
                   onChange={showSystemToggle.onChange}
                 />
-              </div>
+                <Divider />
+              </>
             )}
             <MenuContent className={`${config.cssPrefix}__menu-content`} maxMenuHeight="60vh">
               {filteredOptions.length === 0 &&
@@ -130,6 +131,7 @@ const Dropdown = <T,>({
                   isFavorites
                   options={filteredFavorites}
                   selectedKey={selectedItem}
+                  showBottomDivider={filteredOptions.length > 0}
                 />
               )}
               <DropdownGroup

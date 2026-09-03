@@ -1,9 +1,8 @@
-import React, { FC, MouseEvent } from 'react';
+import React, { type FC, type MouseEvent } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   Button,
-  Divider,
   EmptyState,
   EmptyStateActions,
   EmptyStateBody,
@@ -19,19 +18,16 @@ type NoResultsProps = {
 const NoResults: FC<NoResultsProps> = ({ noItemsFoundTitle, onClear }) => {
   const { t } = useKubevirtTranslation();
   return (
-    <>
-      <Divider />
-      <EmptyState headingLevel="h4" icon={SearchIcon} titleText={noItemsFoundTitle}>
-        <EmptyStateBody>{t('No results match the filter criteria.')}</EmptyStateBody>
-        <EmptyStateFooter>
-          <EmptyStateActions>
-            <Button onClick={onClear} variant="link">
-              {t('Clear filters')}
-            </Button>
-          </EmptyStateActions>
-        </EmptyStateFooter>
-      </EmptyState>
-    </>
+    <EmptyState headingLevel="h4" icon={SearchIcon} titleText={noItemsFoundTitle}>
+      <EmptyStateBody>{t('No results match the filter criteria.')}</EmptyStateBody>
+      <EmptyStateFooter>
+        <EmptyStateActions>
+          <Button onClick={onClear} variant="link">
+            {t('Clear filters')}
+          </Button>
+        </EmptyStateActions>
+      </EmptyStateFooter>
+    </EmptyState>
   );
 };
 
