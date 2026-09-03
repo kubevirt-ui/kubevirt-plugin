@@ -1,5 +1,6 @@
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { SearchItemWithTab } from '@virtualmachines/details/tabs/configuration/utils/search';
+
+import { type SearchItemWithTab } from '../types';
 
 const MAX_RESULTS_TO_DISPLAY = 9;
 

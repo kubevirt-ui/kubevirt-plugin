@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC, useState } from 'react';
+import React, { type FC, useState } from 'react';
 import { Trans } from 'react-i18next';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -12,9 +11,8 @@ import {
   DEFAULT_VV_FILENAME,
   DEFAULT_VV_MIMETYPE,
 } from '../utils/constants';
-import { RemoteViewerProps } from '../utils/types';
+import { type RemoteViewerProps } from '../utils/types';
 import { downloadFile, generateDescriptorFile } from '../utils/utils';
-
 import MoreInformationDefault from './MoreInformationDefault';
 
 const RemoteViewer: FC<RemoteViewerProps> = ({
@@ -34,22 +32,26 @@ const RemoteViewer: FC<RemoteViewerProps> = ({
   const [isExpandedDefault, setIsExpandedDefault] = useState<boolean>(false);
   const [isExpandedRDP, setIsExpandedRDP] = useState<boolean>(false);
 
-  const console = spice || vnc;
+  const console = spice ?? vnc;
 
-  const onClickVV = () => {
+  const onClickVV = (): void => {
     const type = spice ? SPICE_CONSOLE_TYPE : VNC_CONSOLE_TYPE;
     if (console) {
-      const vv = onGenerate(console, type);
-      return onDownload(DEFAULT_VV_FILENAME, vv?.content, vv?.mimeType || DEFAULT_VV_MIMETYPE);
+      const vvFile = onGenerate(console, type);
+      return onDownload(
+        DEFAULT_VV_FILENAME,
+        vvFile?.content,
+        vvFile?.mimeType ?? DEFAULT_VV_MIMETYPE,
+      );
     }
   };
 
-  const onClickRDP = () => {
+  const onClickRDP = (): void => {
     const rdpFile = onGenerate(rdp, RDP_CONSOLE_TYPE);
     return onDownload(
       DEFAULT_RDP_FILENAME,
       rdpFile?.content,
-      rdpFile?.mimeType || DEFAULT_RDP_MIMETYPE,
+      rdpFile?.mimeType ?? DEFAULT_RDP_MIMETYPE,
     );
   };
 
@@ -57,17 +59,17 @@ const RemoteViewer: FC<RemoteViewerProps> = ({
     <Stack hasGutter>
       <Flex spaceItems={{ default: 'spaceItemsSm' }}>
         <Button isDisabled={!console} onClick={onClickVV}>
-          {textConnectWithRemoteViewer || t('Launch Remote Viewer')}
+          {textConnectWithRemoteViewer ?? t('Launch Remote Viewer')}
         </Button>
         {!!rdp && (
-          <Button onClick={onClickRDP}>{textConnectWithRDP || t('Launch Remote Desktop')}</Button>
+          <Button onClick={onClickRDP}>{textConnectWithRDP ?? t('Launch Remote Desktop')}</Button>
         )}
       </Flex>
       {!!console && (
         <ExpandableSection
           isExpanded={isExpandedDefault}
           onToggle={(_event, isExpanded) => setIsExpandedDefault(isExpanded)}
-          toggleText={textMoreInfo || t('Remote Viewer details')}
+          toggleText={textMoreInfo ?? t('Remote Viewer details')}
         >
           <MoreInformationDefault textMoreInfoContent={textMoreInfoContent} />
         </ExpandableSection>
@@ -76,7 +78,7 @@ const RemoteViewer: FC<RemoteViewerProps> = ({
         <ExpandableSection
           isExpanded={isExpandedRDP}
           onToggle={(_event, isExpanded) => setIsExpandedRDP(isExpanded)}
-          toggleText={textMoreRDPInfo || t('Remote Desktop details')}
+          toggleText={textMoreRDPInfo ?? t('Remote Desktop details')}
         >
           {textMoreRDPInfoContent ?? (
             <Content>

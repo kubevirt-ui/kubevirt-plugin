@@ -1,13 +1,12 @@
-/* eslint-disable */
 import { useCallback, useMemo } from 'react';
 import { useLocation } from 'react-router';
 
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
 import { USER_SETTINGS_KEYS } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/const';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { isEmpty, kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { getUrlSearchQuery } from '@search/utils/query';
 
-import { SavedSearchData, SavedSearchEntry } from '../savedSearches/types';
+import { type SavedSearchData, type SavedSearchEntry } from '../savedSearches/types';
 
 type SavedSearchDataResult = {
   deleteSearch: (name: string) => void;
@@ -42,9 +41,9 @@ export const useSavedSearchData = (): SavedSearchDataResult => {
 
   const deleteSearch = useCallback<SavedSearchDataResult['deleteSearch']>(
     (name) => {
-      const { [name]: _, ...restSearches } = savedSearches;
+      const { [name]: _removed, ...restSearches } = savedSearches;
 
-      setSavedSearches?.(restSearches);
+      setSavedSearches?.(restSearches)?.catch(kubevirtConsole.error);
     },
     [setSavedSearches, savedSearches],
   );
@@ -54,20 +53,20 @@ export const useSavedSearchData = (): SavedSearchDataResult => {
       setSavedSearches?.({
         ...savedSearches,
         [name]: data,
-      });
+      })?.catch(kubevirtConsole.error);
     },
     [setSavedSearches, savedSearches],
   );
 
   const toggleFavorite = useCallback<SavedSearchDataResult['toggleFavorite']>(
     (name) => {
-      const entry = savedSearches?.[name];
+      const entry = savedSearches?.[name] as SavedSearchData | undefined;
       if (!entry) return;
 
       setSavedSearches?.({
         ...savedSearches,
         [name]: { ...entry, isFavorited: !entry.isFavorited },
-      });
+      })?.catch(kubevirtConsole.error);
     },
     [setSavedSearches, savedSearches],
   );

@@ -1,9 +1,8 @@
-/* eslint-disable */
 import { getStatusNamespaces } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 
 import {
-  MultiNamespaceVirtualMachineStorageMigrationPlan,
+  type MultiNamespaceVirtualMachineStorageMigrationPlan,
   STATUS_READY,
   STORAGE_MIGRATION_PHASE,
 } from './constants';
@@ -12,9 +11,9 @@ import { getStorageMigrationPlanSpecNamespaces } from './selectors';
 const getMigrationConditionTimestamp = (
   migration: MultiNamespaceVirtualMachineStorageMigrationPlan,
   conditionType: string,
-) => {
-  for (const namespaceStatus of migration?.status?.namespaces || []) {
-    const condition = namespaceStatus?.conditions?.find((c) => c?.type === conditionType);
+): string | undefined => {
+  for (const namespaceStatus of migration?.status?.namespaces ?? []) {
+    const condition = namespaceStatus?.conditions?.find((cond) => cond?.type === conditionType);
     if (condition) {
       return condition.lastTransitionTime;
     }
@@ -24,11 +23,11 @@ const getMigrationConditionTimestamp = (
 
 export const getMigrationStartTimestamp = (
   migration: MultiNamespaceVirtualMachineStorageMigrationPlan,
-) => getMigrationConditionTimestamp(migration, STATUS_READY);
+): string | undefined => getMigrationConditionTimestamp(migration, STATUS_READY);
 
 export const getMigrationCompletedTimestamp = (
   migration: MultiNamespaceVirtualMachineStorageMigrationPlan,
-) => {
+): string | undefined => {
   if (!isMigrationCompleted(migration)) {
     return undefined;
   }
@@ -37,7 +36,7 @@ export const getMigrationCompletedTimestamp = (
 
 export const getVolumeCountFromMigPlan = (
   migrationPlan: MultiNamespaceVirtualMachineStorageMigrationPlan,
-) => {
+): number => {
   return getStorageMigrationPlanSpecNamespaces(migrationPlan).flatMap((namespaceMigration) =>
     (namespaceMigration?.virtualMachines ?? []).flatMap((vm) =>
       (vm?.targetMigrationPVCs ?? []).filter((pvc) => !isEmpty(pvc.destinationPVC)),
@@ -47,7 +46,7 @@ export const getVolumeCountFromMigPlan = (
 
 export const getCompletedVolumeCountFromMigPlan = (
   migrationPlan: MultiNamespaceVirtualMachineStorageMigrationPlan,
-) =>
+): number =>
   (migrationPlan?.status?.namespaces ?? []).flatMap((namespace) =>
     (namespace?.[STORAGE_MIGRATION_PHASE.COMPLETED] ?? []).flatMap(
       (migration) => migration?.sourcePVCs ?? [],
@@ -56,7 +55,7 @@ export const getCompletedVolumeCountFromMigPlan = (
 
 export const isMigrationCompleted = (
   migrationPlan: MultiNamespaceVirtualMachineStorageMigrationPlan,
-) => {
+): boolean => {
   const statusNamespaces = getStatusNamespaces(migrationPlan);
   const specNamespaces = getStorageMigrationPlanSpecNamespaces(migrationPlan);
 

@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC, FormEvent, MouseEvent, useCallback, useState } from 'react';
+import React, { type FC, type FormEvent, type MouseEvent, useCallback, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
@@ -18,8 +17,7 @@ import {
 } from '@patternfly/react-core';
 import { SearchIcon } from '@patternfly/react-icons';
 
-import { SearchItemWithTab } from '../../../views/virtualmachines/details/tabs/configuration/utils/search';
-
+import { type SearchItemWithTab } from './types';
 import { getOptions } from './utils/configurationSearch';
 
 import './configuration-search.scss';
@@ -46,7 +44,7 @@ const ConfigurationSearch: FC<ConfigurationSearchProps> = ({
   const onClear = useCallback(() => setValue(''), []);
 
   const onChange = useCallback(
-    (_e: FormEvent<HTMLInputElement>, newValue: string) => {
+    (_event: FormEvent<HTMLInputElement>, newValue: string) => {
       setIsPopperVisible(true);
       setValue(newValue);
       const options = getOptions(searchItems, newValue);
@@ -65,6 +63,7 @@ const ConfigurationSearch: FC<ConfigurationSearchProps> = ({
 
   return (
     <Popper
+      isVisible={isPopperVisible}
       popper={
         <Menu isScrollable onMouseDown={preventBlur} onSelect={onSelect}>
           <MenuContent>
@@ -104,7 +103,6 @@ const ConfigurationSearch: FC<ConfigurationSearchProps> = ({
           value={value}
         />
       }
-      isVisible={isPopperVisible}
     />
   );
 };

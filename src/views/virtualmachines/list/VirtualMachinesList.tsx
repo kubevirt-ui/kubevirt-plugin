@@ -9,9 +9,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import usePagination from '@kubevirt-utils/hooks/usePagination/usePagination';
 import useQuery from '@kubevirt-utils/hooks/useQuery';
 import { EXPORT_TABLE_KEYS, KubevirtTableExport } from '@kubevirt-utils/hooks/useTableExport';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { DocumentTitle } from '@openshift-console/dynamic-plugin-sdk';
-import { ListPageBody } from '@openshift-console/dynamic-plugin-sdk';
+import { DocumentTitle, ListPageBody } from '@openshift-console/dynamic-plugin-sdk';
 import { DataViewSortParams } from '@patternfly/react-data-view';
 import { useSignals } from '@preact/signals-react/runtime';
 import { vmsSignal } from '@virtualmachines/tree/utils/signals';
@@ -85,7 +83,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({
     /* eslint-disable-next-line react-hooks/exhaustive-deps */
     [vmsSignal.value, namespace, cluster],
   );
-  const hasNoVMs = useMemo(() => isEmpty(allVMsInNamespace), [allVMsInNamespace]);
+  const hasNoVMs = useMemo(() => allVMsInNamespace.length === 0, [allVMsInNamespace]);
 
   const exportButton = (
     <KubevirtTableExport<V1VirtualMachine, VMCallbacks>

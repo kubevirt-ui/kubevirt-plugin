@@ -1,13 +1,12 @@
-/* eslint-disable */
 import { logVMSavedSearchApplied } from '@kubevirt-utils/extensions/telemetry/dashboard';
 import {
-  KubevirtFilterState,
-  OnSetFilters,
+  type KubevirtFilterState,
+  type OnSetFilters,
 } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { updateFilterState } from '@search/searchLanguage/hooks/useOnCommitText/updateFilterState';
 import { convertQueryToFilterState } from '@search/utils/query';
 
-import { SavedSearchEntry } from './types';
+import { type SavedSearchEntry } from './types';
 
 export const applySearch = (
   name: string,
@@ -15,7 +14,7 @@ export const applySearch = (
   filters: KubevirtFilterState,
   onSetFilters: OnSetFilters,
 ): void => {
-  const entry = searches.find((s) => s.name === name);
+  const entry = searches.find((search) => search.name === name);
   const query = entry?.query;
 
   if (query) {

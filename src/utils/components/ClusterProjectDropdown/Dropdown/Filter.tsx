@@ -1,10 +1,9 @@
-/* eslint-disable */
-import React, { FC, JSX, Ref } from 'react';
+import React, { type FC, type JSX, type Ref } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { MenuSearch, MenuSearchInput, TextInput } from '@patternfly/react-core';
 
-import { DropdownConfig } from './types';
+import { type DropdownConfig } from './types';
 
 type FilterProps = {
   config: DropdownConfig;
@@ -27,7 +26,7 @@ const Filter: FC<FilterProps> = ({
           aria-label={t(config.selectPlaceholder)}
           autoFocus
           data-test="dropdown-text-filter"
-          onChange={(_, value: string) => onFilterChange(value)}
+          onChange={(_event, value: string) => onFilterChange(value)}
           placeholder={t(config.selectPlaceholder)}
           ref={filterRef}
           type="search"

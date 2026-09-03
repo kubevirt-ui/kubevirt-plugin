@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { Dispatch, FC, SetStateAction } from 'react';
+import React, { type Dispatch, type FC, type SetStateAction } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FormGroup, TextInput } from '@patternfly/react-core';
@@ -20,7 +19,7 @@ const DescriptionInput: FC<DescriptionInputProps> = ({
     <FormGroup fieldId="description" label={t('Description')}>
       <TextInput
         id="description"
-        onChange={(_, value: string) => setDescription(value)}
+        onChange={(_event, value: string) => setDescription(value)}
         placeholder={placeholder}
         type="text"
         value={description}

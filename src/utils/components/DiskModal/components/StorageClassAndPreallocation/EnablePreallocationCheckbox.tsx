@@ -1,10 +1,9 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { Trans } from 'react-i18next';
 import { Link } from 'react-router';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -12,7 +11,7 @@ import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverCo
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { Checkbox, Flex, FlexItem, FormGroup, PopoverPosition } from '@patternfly/react-core';
 
-import { V1DiskFormState } from '../../utils/types';
+import { type V1DiskFormState } from '../../utils/types';
 import { ENABLE_PREALLOCATION_FIELDID, ENALBE_PREACCLOCATION_FIELD } from '../utils/constants';
 
 type EnablePreallocationCheckboxProps = {
@@ -29,17 +28,17 @@ const EnablePreallocationCheckbox: FC<EnablePreallocationCheckboxProps> = ({ isD
       <Flex>
         <FlexItem>
           <Controller
+            control={control}
+            name={ENALBE_PREACCLOCATION_FIELD}
             render={({ field: { onChange, value } }) => (
               <Checkbox
                 id={ENABLE_PREALLOCATION_FIELDID}
                 isChecked={value}
                 isDisabled={isDisabled}
                 label={t('Enable preallocation')}
-                onChange={(_, checked) => onChange(checked)}
+                onChange={(_event, checked) => onChange(checked)}
               />
             )}
-            control={control}
-            name={ENALBE_PREACCLOCATION_FIELD}
           />
         </FlexItem>
         <FlexItem>
