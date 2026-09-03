@@ -1,16 +1,16 @@
-import { V1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
-import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
-import { PreferenceOption } from '@kubevirt-utils/components/AddBootableVolumeModal/types';
-import { VolumeSnapshotKind } from '@kubevirt-utils/components/SelectSnapshot/types';
-import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
-import { Template } from '@kubevirt-utils/resources/template';
-import { OperatingSystemType } from '@virtualmachines/wizard/steps/InstanceTypesSteps/GuestOSStep/utils/constants';
-import { VMCreationMethod } from '@virtualmachines/wizard/utils/constants';
+import { type V1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
+import { type IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type PreferenceOption } from '@kubevirt-utils/components/AddBootableVolumeModal/types';
+import { type VolumeSnapshotKind } from '@kubevirt-utils/components/SelectSnapshot/types';
+import { type BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
+import { type Template } from '@kubevirt-utils/resources/template';
+import { type OperatingSystemType } from '@virtualmachines/wizard/steps/InstanceTypesSteps/GuestOSStep/utils/constants';
+import { type VMCreationMethod } from '@virtualmachines/wizard/utils/constants';
 
 export type SelectedInstanceType = { name: string; namespace: null | string };
 
 /** VM identity, placement, and provisioning choices collected across wizard steps. */
-type VMWizardVirtualMachineData = {
+export type VMWizardVirtualMachineData = {
   autoLabelsMerged: boolean;
   cluster: string;
   creationMethod: VMCreationMethod;
@@ -58,7 +58,4 @@ export type VMWizardFormValues = {
   vmData: VMWizardVirtualMachineData;
 };
 
-export type CreateInitialVMWizardFormValuesArgs = {
-  cluster: string;
-  namespace: string;
-};
+export type CreateInitialVMWizardFormValuesArgs = Partial<VMWizardVirtualMachineData>;

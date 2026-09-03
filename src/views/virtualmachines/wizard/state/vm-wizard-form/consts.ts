@@ -1,15 +1,19 @@
-import { FieldPath } from 'react-hook-form';
+import { type FieldPath } from 'react-hook-form';
 
 import {
-  CreateInitialVMWizardFormValuesArgs,
-  VMWizardFormValues,
+  type CreateInitialVMWizardFormValuesArgs,
+  type VMWizardFormValues,
 } from '@virtualmachines/wizard/state/vm-wizard-form/types';
 import { OperatingSystemType } from '@virtualmachines/wizard/steps/InstanceTypesSteps/GuestOSStep/utils/constants';
 import { VMCreationMethod, VMWizardStep } from '@virtualmachines/wizard/utils/constants';
 
 export const createInitialVMWizardFormValues = ({
   cluster,
-  namespace,
+  creationMethod,
+  description,
+  folder,
+  name,
+  project,
 }: CreateInitialVMWizardFormValuesArgs): VMWizardFormValues => ({
   instanceTypeData: {
     customDiskSize: '',
@@ -37,12 +41,12 @@ export const createInitialVMWizardFormValues = ({
   },
   vmData: {
     autoLabelsMerged: false,
-    cluster,
-    creationMethod: VMCreationMethod.INSTANCE_TYPE,
-    description: '',
-    folder: '',
-    name: undefined,
-    project: namespace,
+    cluster: cluster ?? '',
+    creationMethod: creationMethod ?? VMCreationMethod.INSTANCE_TYPE,
+    description: description ?? '',
+    folder: folder ?? '',
+    name: name ?? undefined,
+    project: project ?? '',
     selectedTemplate: null,
   },
 });

@@ -16,7 +16,7 @@ export const VMWizardProvider: FC<VMWizardProviderProps> = ({ children }) => {
   const { cluster, hubClusterError, isLoadingHubCluster, namespace } = useWizardInitialValues();
 
   const methods = useForm<VMWizardFormValues>({
-    defaultValues: createInitialVMWizardFormValues({ cluster, namespace }),
+    defaultValues: createInitialVMWizardFormValues({ cluster, project: namespace }),
   });
 
   useEffect(() => (): void => clearVMPendingUploadsAndSignal(), []);
