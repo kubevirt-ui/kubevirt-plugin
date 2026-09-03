@@ -106,9 +106,10 @@ export function TreeContextMenuMixin<TBase extends Constructor>(Base: TBase) {
 
     async rightClickFolderInTreeView(folderName: string, namespace: string): Promise<void> {
       await this.waitForTreeStable();
+      // DOM: LI[id="folderSelector/..."] > DIV > DIV#label-selectable > SPAN.node-container > BUTTON.node-text
       const folderButton = this.locator(
-        `[id="folderSelector/#single-cluster#/${namespace}/${folderName}"]`,
-      ).getByTestId('vms-tree-folder-label');
+        `[id="folderSelector/#single-cluster#/${namespace}/${folderName}"] button.pf-v6-c-tree-view__node-text`,
+      );
       await folderButton.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
       await folderButton.scrollIntoViewIfNeeded();
       await folderButton.click({ button: 'right' });

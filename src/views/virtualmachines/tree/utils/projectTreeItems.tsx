@@ -5,7 +5,6 @@ import { getVMListNamespacesURL } from '@multicluster/urls';
 import { Tooltip } from '@patternfly/react-core';
 import { FolderIcon, FolderOpenIcon, ProjectDiagramIcon } from '@patternfly/react-icons';
 
-import { VMS_TREE_FOLDER_LABEL_TEST_ID } from './constants';
 import { type ProjectMapEntry } from './treeItemBuilders';
 import {
   buildTreeItemQuery,
@@ -61,7 +60,7 @@ const createFolderTreeItems = (
       })}`,
       icon: <FolderIcon />,
       id: folderTreeItemID,
-      name: <span data-test={VMS_TREE_FOLDER_LABEL_TEST_ID}>{folder}</span>,
+      name: folder,
     };
 
     treeViewDataMap[folderTreeItemID] ??= folderTreeItem;

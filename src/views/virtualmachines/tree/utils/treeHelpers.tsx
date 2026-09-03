@@ -12,19 +12,8 @@ import {
 } from './constants';
 import { HIDE, SHOW } from './constants';
 
-const isFolderItem = (item: TreeViewDataItem): boolean =>
-  item.id?.startsWith(FOLDER_SELECTOR_PREFIX);
-
-const getTreeItemName = (item: TreeViewDataItem): string => {
-  if (isFolderItem(item)) {
-    return item.id?.split('/').pop() ?? '';
-  }
-
-  return typeof item.name === 'string' ? item.name : '';
-};
-
 const nameMatchesSearch = (item: TreeViewDataItem, searchText: string): boolean =>
-  getTreeItemName(item).toLowerCase().includes(searchText.toLowerCase());
+  (item.name as string).toLowerCase().includes(searchText.toLowerCase());
 
 const isAllNamespacesItem = (item: TreeViewDataItem): boolean =>
   item.id === ALL_NAMESPACES_SESSION_KEY;
@@ -34,6 +23,9 @@ const isClusterItem = (item: TreeViewDataItem): boolean =>
 
 const isProjectItem = (item: TreeViewDataItem): boolean =>
   item.id?.startsWith(PROJECT_SELECTOR_PREFIX);
+
+const isFolderItem = (item: TreeViewDataItem): boolean =>
+  item.id?.startsWith(FOLDER_SELECTOR_PREFIX);
 
 const isVMItem = (item: TreeViewDataItem): boolean => !item.children;
 

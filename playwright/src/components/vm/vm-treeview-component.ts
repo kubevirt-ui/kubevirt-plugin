@@ -38,7 +38,8 @@ export default class VmTreeViewComponent extends BaseComponent {
 
   async clickFolderNode(folderName: string, namespace: string): Promise<void> {
     const nodeId = `folderSelector/#single-cluster#/${namespace}/${folderName}`;
-    const folderButton = this.locator(`[id="${nodeId}"]`).getByTestId('vms-tree-folder-label');
+    // Label button only — exclude the expand/collapse toggle (also a button with a similar name).
+    const folderButton = this.locator(`[id="${nodeId}"] button.pf-v6-c-tree-view__node-text`);
 
     try {
       await folderButton.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
