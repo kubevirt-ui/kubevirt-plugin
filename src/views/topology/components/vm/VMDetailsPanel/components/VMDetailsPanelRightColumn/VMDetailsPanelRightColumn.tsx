@@ -1,10 +1,12 @@
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
-import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import {
+  type V1VirtualMachine,
+  type V1VirtualMachineInstance,
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { useVMIAndPodsForVM } from '@kubevirt-utils/resources/vm';
 import { hasS390xArchitecture } from '@kubevirt-utils/resources/vm/utils/architecture';
-import { getVMIPod } from '@kubevirt-utils/resources/vmi';
 import { DescriptionList } from '@patternfly/react-core';
 import SSHTabAuthorizedSSHKey from '@virtualmachines/details/tabs/configuration/ssh/components/SSHTabAuthorizedSSHKey';
 
@@ -27,19 +29,18 @@ export type VMResourceListProps = {
 };
 
 const VMDetailsPanelRightColumn: FC<VMResourceListProps> = ({ instanceTypeVM, vm, vmi }) => {
-  const { pods } = useVMIAndPodsForVM(getName(vm), getNamespace(vm));
-  const launcherPod = getVMIPod(vmi, pods);
+  const { pod } = useVMIAndPodsForVM(getName(vm), getNamespace(vm));
   const vmHasS390xArchitecture = hasS390xArchitecture(vm);
 
   return (
     <DescriptionList className="pf-v6-c-description-list__group">
       <VMStatusDetailsItem vm={vm} vmi={vmi} />
-      <VMPodDetailsItem pods={pods} vmi={vmi} />
+      <VMPodDetailsItem pod={pod} />
       <VMBootOrderDetailsItem instanceTypeVM={instanceTypeVM} vm={vm} vmi={vmi} />
-      <VMIPAddressesDetailsItem launcherPod={launcherPod} vmi={vmi} />
+      <VMIPAddressesDetailsItem launcherPod={pod} vmi={vmi} />
       <VMHostnameDetailsItem vm={vm} vmi={vmi} />
       <VMTimezoneDetailsItem vmi={vmi} />
-      <VMNodeDetailsItem launcherPod={launcherPod} vm={vm} vmi={vmi} />
+      <VMNodeDetailsItem launcherPod={pod} vm={vm} vmi={vmi} />
       <VMWorkloadProfileDetailsItem vm={vm} />
       <VMUserCredentialsDetailsItem vm={vm} vmi={vmi} />
       <SSHTabAuthorizedSSHKey className="topology-vm-details-panel__item" vm={vm} />

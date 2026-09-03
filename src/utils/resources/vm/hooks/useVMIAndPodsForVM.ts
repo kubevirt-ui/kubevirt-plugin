@@ -1,13 +1,15 @@
 import { modelToGroupVersionKind, PodModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { type IoK8sApiCoreV1Pod } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { type V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import useVMI from '@kubevirt-utils/resources/vm/hooks/useVMI';
+import { getVMIPod } from '@kubevirt-utils/resources/vmi/utils/pod';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 
 type UseVMIAndPodsForVMValues = {
   error: Error | undefined;
   loaded: boolean;
-  pods: IoK8sApiCoreV1Pod[];
+  pod: IoK8sApiCoreV1Pod | null | undefined;
   vmi: V1VirtualMachineInstance;
 };
 
@@ -27,11 +29,13 @@ export const useVMIAndPodsForVM = (
 
   const loaded = vmiLoaded && podsLoaded;
   const error = vmiLoadError || podsLoadError;
+  const filteredVmi =
+    vmName === getName(vmi) && vmNamespace === getNamespace(vmi) ? vmi : undefined;
 
   return {
     error,
     loaded,
-    pods,
-    vmi: vmName === vmi?.metadata?.name && vmNamespace === vmi?.metadata?.namespace && vmi,
+    pod: getVMIPod(filteredVmi, pods),
+    vmi: filteredVmi,
   };
 };
