@@ -1,4 +1,10 @@
-import React, { Dispatch, FC, FormEvent, SetStateAction, useState } from 'react';
+import React, {
+  type Dispatch,
+  type FC,
+  type FormEvent,
+  type SetStateAction,
+  useState,
+} from 'react';
 
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -34,16 +40,17 @@ const SnapshotDeadlineFormField: FC<SnapshotDeadlineFormFieldProps> = ({
 
   const [deadlineError, setDeadlineError] = useState(undefined);
 
-  const handleDeadlineChange = (value: string, event: FormEvent<HTMLInputElement>) => {
-    event.preventDefault();
+  const handleDeadlineChange = (_event: FormEvent<HTMLInputElement>, value: string): void => {
     const error = validateSnapshotDeadline(t, value);
     setIsError(!!error);
     setDeadlineError(error);
     setDeadline(value);
   };
 
-  const handleDeadlineUnitChange = (value: deadlineUnits, event: FormEvent<HTMLSelectElement>) => {
-    event.preventDefault();
+  const handleDeadlineUnitChange = (
+    _event: FormEvent<HTMLSelectElement>,
+    value: deadlineUnits,
+  ): void => {
     setDeadlineUnit(value);
   };
 
@@ -55,17 +62,15 @@ const SnapshotDeadlineFormField: FC<SnapshotDeadlineFormFieldProps> = ({
         <GridItem span={8}>
           <TextInput
             id="deadline"
-            onChange={(event, value: string) => handleDeadlineChange(value, event)}
+            inputMode="numeric"
+            onChange={handleDeadlineChange}
             type="text"
+            validated={validated}
             value={deadline}
           />
         </GridItem>
         <GridItem span={4}>
-          <FormSelect
-            id="deadline-unit"
-            onChange={(event, value: deadlineUnits) => handleDeadlineUnitChange(value, event)}
-            value={deadlineUnit}
-          >
+          <FormSelect id="deadline-unit" onChange={handleDeadlineUnitChange} value={deadlineUnit}>
             {Object.entries(deadlineUnits).map(([key, value]) => (
               <FormSelectOption key={key} label={`${key} (${value})`} value={value} />
             ))}

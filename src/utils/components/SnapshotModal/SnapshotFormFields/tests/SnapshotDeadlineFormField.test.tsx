@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { deadlineUnits } from '@virtualmachines/details/tabs/snapshots/utils/consts';
 
 import SnapshotDeadlineFormField from '../SnapshotDeadlineFormField';
@@ -47,4 +47,17 @@ describe('SnapshotDeadlineFormField', () => {
       expect(optionLabels.some((l) => l.includes(labelPart) && l.includes(valuePart))).toBe(true);
     },
   );
+
+  it('should show validation error and disable submit for scientific notation (regression: CNV-96227)', () => {
+    const setIsError = jest.fn();
+
+    render(<SnapshotDeadlineFormField {...defaultProps} setIsError={setIsError} />);
+
+    fireEvent.change(screen.getByRole('textbox', { name: /deadline/i }), {
+      target: { value: '1e1' },
+    });
+
+    expect(screen.getByText('Deadline must be a number')).toBeInTheDocument();
+    expect(setIsError).toHaveBeenLastCalledWith(true);
+  });
 });

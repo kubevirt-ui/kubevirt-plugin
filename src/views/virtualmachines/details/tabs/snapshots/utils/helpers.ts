@@ -1,13 +1,13 @@
-import { TFunction } from 'i18next';
+import { type TFunction } from 'i18next';
 
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { VirtualMachineRestoreModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { VirtualMachineSnapshotModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
-  V1beta1VirtualMachineRestore,
-  V1beta1VirtualMachineSnapshot,
-  V1VirtualMachine,
-  V1VolumeSnapshotStatus,
+  type V1beta1VirtualMachineRestore,
+  type V1beta1VirtualMachineSnapshot,
+  type V1VirtualMachine,
+  type V1VolumeSnapshotStatus,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { VolumeRestorePolicy } from '@kubevirt-utils/components/SnapshotModal/utils/constants';
 import { getName } from '@kubevirt-utils/resources/shared';
@@ -16,7 +16,10 @@ import { isEmpty } from '@kubevirt-utils/utils/utils';
 
 export const getVolumeSnapshotStatusesPartition = (
   volumeSnapshotStatuses: V1VolumeSnapshotStatus[],
-) => {
+): {
+  supportedVolumes: V1VolumeSnapshotStatus[];
+  unsupportedVolumes: V1VolumeSnapshotStatus[];
+} => {
   const supportedVolumes = volumeSnapshotStatuses?.filter((status) => status?.enabled);
   const unsupportedVolumes = volumeSnapshotStatuses?.filter((status) => !status?.enabled);
   return {
@@ -25,7 +28,12 @@ export const getVolumeSnapshotStatusesPartition = (
   };
 };
 
-export const getVolumeSnapshotStatusesPartitionPerVM = (vms: V1VirtualMachine[]) =>
+export const getVolumeSnapshotStatusesPartitionPerVM = (
+  vms: V1VirtualMachine[],
+): {
+  supportedVolumes: Record<string, V1VolumeSnapshotStatus[]>;
+  unsupportedVolumes: Record<string, V1VolumeSnapshotStatus[]>;
+} =>
   vms.reduce<{
     supportedVolumes: Record<string, V1VolumeSnapshotStatus[]>;
     unsupportedVolumes: Record<string, V1VolumeSnapshotStatus[]>;
@@ -50,9 +58,11 @@ export const getVolumeSnapshotStatusesPartitionPerVM = (vms: V1VirtualMachine[])
     { supportedVolumes: {}, unsupportedVolumes: {} },
   );
 
+const POSITIVE_INTEGER_PATTERN = /^\d+$/;
+
 export const validateSnapshotDeadline = (t: TFunction, deadline: string): string => {
   if (deadline?.length > 0) {
-    if (!Number(deadline)) {
+    if (!POSITIVE_INTEGER_PATTERN.test(deadline)) {
       return t('Deadline must be a number');
     }
     if (Number(deadline) <= 0) {
@@ -91,7 +101,7 @@ export const getVMRestoreSnapshotResource = (
     metadata: {
       name: `restore-${snapshot.metadata.name}-${new Date().getTime()}`,
       namespace: snapshot.metadata.namespace,
-      ownerReferences: [...(snapshot.metadata.ownerReferences || [])],
+      ownerReferences: [...(snapshot.metadata.ownerReferences ?? [])],
     },
     spec: {
       target: {
