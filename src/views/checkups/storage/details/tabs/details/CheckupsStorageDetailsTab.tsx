@@ -1,7 +1,7 @@
-/* eslint-disable */
-import React, { FC, JSX } from 'react';
+import React, { type FC, type JSX } from 'react';
 import { useParams } from 'react-router';
 
+import { getName } from '@kubevirt-utils/resources/shared';
 import { Divider, PageSection } from '@patternfly/react-core';
 
 import CheckupsDetailsPageHistory from '../../../../CheckupsDetailsPageHistory';
@@ -13,7 +13,7 @@ const CheckupsStorageDetailsTab: FC = (): JSX.Element | null => {
   const { checkupName } = useParams<{ checkupName: string }>();
   const { configMaps, error, jobs, loaded } = useCheckupsStorageData();
 
-  const configMap = configMaps?.find((cm) => cm.metadata.name === checkupName);
+  const configMap = configMaps?.find((configMapItem) => getName(configMapItem) === checkupName);
 
   if (!configMap) {
     return null;

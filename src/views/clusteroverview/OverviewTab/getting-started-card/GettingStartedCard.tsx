@@ -1,7 +1,7 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getName } from '@kubevirt-utils/resources/shared';
 
 import FeatureHighlightsSection from './feature-highlights-section/FeatureHighlightsSection';
 import QuickStartsSection from './quick-starts-section/QuickStartsSection';
@@ -21,7 +21,9 @@ const GettingStartedCard: FC = () => {
             'Learn how to create, import, and run virtual machines on OpenShift with step-by-step instructions and tasks.',
           )}
           featured={['explore-pipelines', 'connect-ext-net-to-vm', 'create-rhel-vm']}
-          filter={(qs) => ['creating-virtual-machine-from-volume'].includes(qs.metadata.name)}
+          filter={(quickStart) =>
+            ['creating-virtual-machine-from-volume'].includes(getName(quickStart))
+          }
           title={t('Quick Starts')}
         />
         <FeatureHighlightsSection />

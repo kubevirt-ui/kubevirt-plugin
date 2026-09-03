@@ -1,17 +1,16 @@
 import React, { type FC, useState } from 'react';
-import produce from 'immer';
 
 import { type V1CPU, type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import CPUInput from '@kubevirt-utils/components/CPUMemoryModal/components/CPUInput/CPUInput';
 import { getCPULimitsFromVM } from '@kubevirt-utils/components/CPUMemoryModal/components/CPUInput/utils/utils';
 import MemoryInput from '@kubevirt-utils/components/CPUMemoryModal/components/MemoryInput/MemoryInput';
+import { applyCPUMemoryToVM } from '@kubevirt-utils/components/CPUMemoryModal/utils/CpuMemoryUtils';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getLabel } from '@kubevirt-utils/resources/shared';
 import { getCPU, getMemory, VM_TEMPLATE_ANNOTATION } from '@kubevirt-utils/resources/vm';
 import { type QuantityUnit } from '@kubevirt-utils/utils/unitConstants';
 import { toQuantity } from '@kubevirt-utils/utils/units';
-import { ensurePath } from '@kubevirt-utils/utils/utils';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import {
   Alert,
@@ -76,23 +75,7 @@ const CPUMemoryModal: FC<CPUMemoryModalProps> = ({
     setUpdateInProcess(true);
     setUpdateError(undefined);
 
-    const updatedVM = produce<V1VirtualMachine>(vm, (vmDraft: V1VirtualMachine) => {
-      if (cpu) {
-        ensurePath(vmDraft, 'spec.template.spec.domain.cpu');
-        const domain = vmDraft.spec?.template?.spec?.domain;
-        if (domain) {
-          domain.cpu = cpu;
-        }
-      }
-
-      if (memory && memoryUnit) {
-        ensurePath(vmDraft, 'spec.template.spec.domain.memory.guest');
-        const domainMemory = vmDraft.spec?.template?.spec?.domain?.memory;
-        if (domainMemory) {
-          domainMemory.guest = `${memory}${memoryUnit}`;
-        }
-      }
-    });
+    const updatedVM = applyCPUMemoryToVM(vm, cpu, memory, memoryUnit);
 
     try {
       await onSubmit(updatedVM);

@@ -1,8 +1,7 @@
-/* eslint-disable */
-import React, { FC, useMemo, useState } from 'react';
+import React, { type FC, useMemo, useState } from 'react';
 
 import { MigrationPolicyModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1alpha1MigrationPolicy } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1alpha1MigrationPolicy } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -13,7 +12,7 @@ import { FormGroup, TextInput, ValidatedOptions } from '@patternfly/react-core';
 
 import SelectorLabelMatchGroup from '../../list/components/MigrationPolicyCreateForm/copmonents/SelectorLabelMatchGroup/SelectorLabelMatchGroup';
 import {
-  InitialMigrationPolicyState,
+  type InitialMigrationPolicyState,
   initialMigrationPolicyState,
   produceMigrationPolicy,
 } from '../../list/components/MigrationPolicyCreateForm/utils/utils';
@@ -30,13 +29,17 @@ const MigrationPolicyCreateModal: FC<MigrationPolicyCreateModalProps> = ({ isOpe
   const [state, setState] = useState(initialMigrationPolicyState);
   const [isNameTouched, setIsNameTouched] = useState(false);
 
-  const setStateField = (field: keyof InitialMigrationPolicyState) => (value: unknown) => {
-    const isValueFunction = typeof value === 'function';
-    setState((prevState) => ({
-      ...prevState,
-      [field]: isValueFunction ? (value as (prev: unknown) => unknown)(prevState?.[field]) : value,
-    }));
-  };
+  const setStateField =
+    (field: keyof InitialMigrationPolicyState): ((value: unknown) => void) =>
+    (value: unknown): void => {
+      const isValueFunction = typeof value === 'function';
+      setState((prevState) => ({
+        ...prevState,
+        [field]: isValueFunction
+          ? (value as (prev: unknown) => unknown)(prevState?.[field])
+          : value,
+      }));
+    };
 
   const migrationPolicy: V1alpha1MigrationPolicy = useMemo(
     () => produceMigrationPolicy(state),
@@ -48,27 +51,27 @@ const MigrationPolicyCreateModal: FC<MigrationPolicyCreateModalProps> = ({ isOpe
 
   return (
     <TabModal<V1alpha1MigrationPolicy>
-      onSubmit={() =>
-        kubevirtK8sCreate({ cluster, data: migrationPolicy, model: MigrationPolicyModel })
-      }
       headerText={t('Create MigrationPolicy')}
       isDisabled={!isFormValid}
       isOpen={isOpen}
       obj={migrationPolicy}
       onClose={onClose}
+      onSubmit={() =>
+        kubevirtK8sCreate({ cluster, data: migrationPolicy, model: MigrationPolicyModel })
+      }
       shouldWrapInForm
       submitBtnText={t('Create')}
     >
       <FormGroup fieldId="migration-policy-name" isRequired label={t('MigrationPolicy name')}>
         <TextInput
+          id="migration-policy-name"
+          onBlur={() => setIsNameTouched(true)}
+          onChange={(_event, value) => setStateField('migrationPolicyName')(value)}
           validated={
             isNameTouched && migrationPolicyNameError
               ? ValidatedOptions.error
               : ValidatedOptions.default
           }
-          id="migration-policy-name"
-          onBlur={() => setIsNameTouched(true)}
-          onChange={(_, value) => setStateField('migrationPolicyName')(value)}
           value={state?.migrationPolicyName}
         />
         <FormGroupHelperText
@@ -82,7 +85,7 @@ const MigrationPolicyCreateModal: FC<MigrationPolicyCreateModalProps> = ({ isOpe
       <FormGroup fieldId="migration-policy-description" label={t('Description')}>
         <TextInput
           id="migration-policy-description"
-          onChange={(_, value) => setStateField('description')(value)}
+          onChange={(_event, value) => setStateField('description')(value)}
           value={state?.description}
         />
       </FormGroup>

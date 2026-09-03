@@ -1,11 +1,11 @@
-import React, { FC, useState } from 'react';
+import React, { type FC, useState } from 'react';
 import { Trans } from 'react-i18next';
 
 import { DataImportCronModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { DataSourceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
-  V1beta1DataImportCron,
-  V1beta1DataSource,
+  type V1beta1DataImportCron,
+  type V1beta1DataSource,
 } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import ConfirmActionMessage from '@kubevirt-utils/components/ConfirmActionMessage/ConfirmActionMessage';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
@@ -37,9 +37,9 @@ const DeleteDataSourceModal: FC<DeleteDataSourceModalProps> = ({
   const { t } = useKubevirtTranslation();
 
   const [deletePVC, setDeletePVC] = useState<boolean>(false);
-  const { dv, pvc, sourceExists } = useUnderlyingPVC(dataSource);
+  const { dataVolume, pvc, sourceExists } = useUnderlyingPVC(dataSource);
 
-  const onDelete = async () => {
+  const onDelete = async (): Promise<void> => {
     if (dataImportCron) {
       await kubevirtK8sDelete({
         model: DataImportCronModel,
@@ -53,7 +53,7 @@ const DeleteDataSourceModal: FC<DeleteDataSourceModalProps> = ({
     });
 
     if (deletePVC && sourceExists) {
-      await deleteDVAndRelatedResources(dv, dataSource, pvc);
+      await deleteDVAndRelatedResources(dataVolume, dataSource, pvc);
     }
   };
 
@@ -75,14 +75,14 @@ const DeleteDataSourceModal: FC<DeleteDataSourceModalProps> = ({
         {sourceExists && (
           <StackItem>
             <Checkbox
+              id="delete-pvc-checkbox"
+              isChecked={deletePVC}
               label={
                 <Trans t={t}>
                   Delete {{ kind: pvc?.kind }} source <b>{{ name: getName(pvc) }}</b> in namespace{' '}
                   <b>{{ namespace: getNamespace(pvc) }}</b>
                 </Trans>
               }
-              id="delete-pvc-checkbox"
-              isChecked={deletePVC}
               onChange={(_event, val) => setDeletePVC(val)}
             />
           </StackItem>

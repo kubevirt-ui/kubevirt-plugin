@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { useMemo } from 'react';
 import { findObjectByName } from 'src/views/checkups/utils/utils';
 
@@ -10,10 +9,10 @@ import {
   ServiceAccountModel,
 } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
-  IoK8sApiCoreV1ServiceAccount,
-  IoK8sApiRbacV1ClusterRoleBinding,
-  IoK8sApiRbacV1Role,
-  IoK8sApiRbacV1RoleBinding,
+  type IoK8sApiCoreV1ServiceAccount,
+  type IoK8sApiRbacV1ClusterRoleBinding,
+  type IoK8sApiRbacV1Role,
+  type IoK8sApiRbacV1RoleBinding,
 } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
@@ -27,7 +26,13 @@ import {
   SELF_VALIDATION_SA,
 } from '../../utils';
 
-const useCheckupsSelfValidationPermissions = () => {
+const useCheckupsSelfValidationPermissions = (): {
+  clusterRoleBinding: IoK8sApiRbacV1ClusterRoleBinding | undefined;
+  isPermitted: boolean;
+  isPermittedToInstall: boolean;
+  loadError: Error | null;
+  loading: boolean;
+} => {
   const namespace = useActiveNamespace();
   const cluster = useSelectedCluster();
   const isAllNamespace = namespace === ALL_NAMESPACES_SESSION_KEY;
@@ -101,16 +106,17 @@ const useCheckupsSelfValidationPermissions = () => {
 
   // Validate that the RoleBinding both targets the expected Role and includes the expected SA.
   const isRoleBinding = useMemo(() => {
-    const rb = findObjectByName(roleBindings, SELF_VALIDATION_ROLE);
+    const roleBinding = findObjectByName(roleBindings, SELF_VALIDATION_ROLE);
     const bindsExpectedRole =
-      rb?.roleRef?.kind === RoleModel.kind && rb?.roleRef?.name === SELF_VALIDATION_ROLE;
-    const bindsExpectedSA = rb?.subjects?.some(
+      roleBinding?.roleRef?.kind === RoleModel.kind &&
+      roleBinding?.roleRef?.name === SELF_VALIDATION_ROLE;
+    const bindsExpectedSA = roleBinding?.subjects?.some(
       (subject) =>
         subject?.kind === ServiceAccountModel.kind &&
         subject?.name === SELF_VALIDATION_SA &&
         subject?.namespace === namespace,
     );
-    return bindsExpectedRole && bindsExpectedSA ? rb : undefined;
+    return bindsExpectedRole && bindsExpectedSA ? roleBinding : undefined;
   }, [roleBindings, namespace]);
 
   return {

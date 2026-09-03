@@ -1,12 +1,12 @@
-/* eslint-disable */
 import {
-  V1alpha1MigrationPolicy,
-  V1MigrationConfiguration,
-  V1VirtualMachineInstance,
-  V1VirtualMachineInstanceMigration,
+  type V1alpha1MigrationPolicy,
+  type V1MigrationConfiguration,
+  type V1VirtualMachineInstance,
+  type V1VirtualMachineInstanceMigration,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import DurationOption from '@kubevirt-utils/components/DurationOption/DurationOption';
-import { PaginationState } from '@kubevirt-utils/hooks/usePagination/utils/types';
+import { type PaginationState } from '@kubevirt-utils/hooks/usePagination/utils/types';
+import { getName } from '@kubevirt-utils/resources/shared';
 import { vmimStatuses } from '@kubevirt-utils/resources/vmim/statuses';
 
 export type MigrationTableDataLayout = {
@@ -54,7 +54,9 @@ export const getMigrationsTableData = (
     (vmis || []).map((vmi) => [`${vmi?.metadata?.namespace}/${vmi?.metadata?.name}`, vmi]),
   );
 
-  const mpMap = new Map((mps || []).map((mp) => [mp?.metadata?.name, mp]));
+  const mpMap = new Map(
+    (mps || []).map((migrationPolicy) => [getName(migrationPolicy), migrationPolicy]),
+  );
 
   const migrationsData = (filteredVMIMS || []).map((vmim) => {
     const vmiKey = `${vmim?.metadata?.namespace}/${vmim?.spec?.vmiName}`;

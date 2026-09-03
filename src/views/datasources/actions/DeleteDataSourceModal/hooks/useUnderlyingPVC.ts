@@ -1,21 +1,20 @@
-/* eslint-disable */
 import {
   modelToGroupVersionKind,
   PersistentVolumeClaimModel,
 } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { DataVolumeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
-  V1beta1DataSource,
-  V1beta1DataVolume,
+  type V1beta1DataSource,
+  type V1beta1DataVolume,
 } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
-import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
 import { getDataSourcePVCSource } from '@kubevirt-utils/resources/bootableresources/selectors';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 
 type UseUnderlyingPVC = (dataSource: V1beta1DataSource) => {
-  dv: V1beta1DataVolume;
+  dataVolume: V1beta1DataVolume;
   pvc: IoK8sApiCoreV1PersistentVolumeClaim;
   sourceExists: boolean;
 };
@@ -33,7 +32,7 @@ const useUnderlyingPVC: UseUnderlyingPVC = (dataSource) => {
     },
   );
 
-  const [dv] = useKubevirtWatchResource<V1beta1DataVolume>(
+  const [dataVolume] = useKubevirtWatchResource<V1beta1DataVolume>(
     dataSourcePVC && {
       cluster: getCluster(dataSource),
       groupVersionKind: modelToGroupVersionKind(DataVolumeModel),
@@ -42,8 +41,8 @@ const useUnderlyingPVC: UseUnderlyingPVC = (dataSource) => {
     },
   );
 
-  const sourceExists = !isEmpty(pvc) || !isEmpty(dv);
-  return { dv, pvc, sourceExists };
+  const sourceExists = !isEmpty(pvc) || !isEmpty(dataVolume);
+  return { dataVolume, pvc, sourceExists };
 };
 
 export default useUnderlyingPVC;

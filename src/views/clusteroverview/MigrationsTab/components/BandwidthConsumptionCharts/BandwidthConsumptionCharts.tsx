@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 import xbytes from 'xbytes';
 
 import useResponsiveCharts from '@kubevirt-utils/components/Charts/hooks/useResponsiveCharts';
@@ -64,23 +63,23 @@ const BandwidthConsumptionCharts: FC<BandwidthConsumptionChartsProps> = ({ durat
         <MigrationsTimeAxis domainX={domainX} timespan={timespan} />
       )}
       <MigrationsUtilizationChart
+        chartData={bandwidthConsumed}
         domain={{
           x: domainX,
           y: getDomainY(maxBandwidthConsumed),
         }}
-        chartData={bandwidthConsumed}
         labels={getLabel(timespan, bandwidthConsumed, true)}
-        tickFormat={(y) => xbytes(y, { fixed: 0, iec: true, prefixIndex: 3 })}
+        tickFormat={(yValue) => xbytes(yValue, { fixed: 0, iec: true, prefixIndex: 3 })}
         tickValues={getTickValuesAxisY(maxBandwidthConsumed)}
         title={t('Bandwidth consumption')}
       />
       <Divider />
       <MigrationsUtilizationChart
+        chartData={migrationsCount}
         domain={{
           x: domainX,
           y: getDomainY(maxMigrationCount, 1),
         }}
-        chartData={migrationsCount}
         labels={getLabel(timespan, migrationsCount)}
         tickValues={getTickValuesAxisY(maxMigrationCount, 1)}
         title={t('Running migrations')}

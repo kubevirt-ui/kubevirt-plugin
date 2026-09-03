@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC, FormEvent, useState } from 'react';
+import React, { type FC, type FormEvent, useState } from 'react';
 import { useNavigate } from 'react-router';
 
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
@@ -7,7 +6,7 @@ import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/
 import ProjectDropdown from '@kubevirt-utils/components/ProjectDropdown/ProjectDropdown';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useNamespaceParam from '@kubevirt-utils/hooks/useNamespaceParam';
-import { ApplicationAwareResourceQuota } from '@kubevirt-utils/resources/quotas/types';
+import { type ApplicationAwareResourceQuota } from '@kubevirt-utils/resources/quotas/types';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
@@ -24,7 +23,6 @@ import AdvancedConfigAlert from '../components/AdvancedConfigAlert';
 import StandardResourceQuotaAlert from '../components/StandardResourceQuotaAlert';
 import { getQuotaListURL } from '../utils/url';
 import { getAdditionalResourceKeys } from '../utils/utils';
-
 import QuotaFormResourceLimitFields from './components/QuotaFormResourceLimitFields';
 import useOnQuotaSubmit from './hooks/useOnQuotaSubmit';
 import useOnQuotaUpdate from './hooks/useOnQuotaUpdate';
@@ -43,14 +41,14 @@ const QuotaFormEditor: FC<QuotaFormEditorProps> = ({ formData, isEdit = false, o
   const onQuotaSubmit = useOnQuotaSubmit(setError, isEdit);
   const { updateHardValue, updateMetadata } = useOnQuotaUpdate(formData, onChange);
 
-  const handleSubmit = async (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent): Promise<void> => {
     e.preventDefault();
 
     const quotaToSubmit: ApplicationAwareResourceQuota = {
       ...formData,
       metadata: {
         ...formData?.metadata,
-        namespace: getNamespace(formData) || namespace,
+        namespace: getNamespace(formData) ?? namespace,
       },
     };
 
@@ -58,7 +56,7 @@ const QuotaFormEditor: FC<QuotaFormEditorProps> = ({ formData, isEdit = false, o
   };
 
   const quotaName = getName(formData) ?? '';
-  const selectedNamespace = getNamespace(formData) || namespace;
+  const selectedNamespace = getNamespace(formData) ?? namespace;
   const hasAdditionalResources = !isEmpty(getAdditionalResourceKeys(formData, 'fromSpec'));
 
   const submitButton = (
@@ -81,7 +79,7 @@ const QuotaFormEditor: FC<QuotaFormEditorProps> = ({ formData, isEdit = false, o
             isDisabled={isEdit}
             isRequired
             name="quota-name"
-            onChange={(_, value) => updateMetadata('name', value)}
+            onChange={(_event, value) => updateMetadata('name', value)}
             type="text"
             value={quotaName}
           />

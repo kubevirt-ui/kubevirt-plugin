@@ -1,13 +1,13 @@
-/* eslint-disable */
 import { Link } from 'react-router';
 
-import { GettingStartedLink } from '../types';
+import { type GettingStartedLink } from '../types';
 
-export const getLinkComponent = (link: GettingStartedLink) => {
+export const getLinkComponent = (link: GettingStartedLink): 'a' | 'button' => {
   if (!link?.href) {
     return 'button';
-  } else if (link?.external) {
+  }
+  if (link?.external) {
     return 'a';
   }
-  return Link as any;
+  return Link as never;
 };

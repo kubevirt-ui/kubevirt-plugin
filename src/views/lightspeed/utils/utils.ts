@@ -1,17 +1,16 @@
-/* eslint-disable */
 import { dump as dumpYAML } from 'js-yaml';
 
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { DEFAULT_MAX_EVENTS, OLS_SUBMIT_BUTTON_ELEMENT_CLASS } from '@lightspeed/utils/constants';
-import { OLSAttachment, OLSAttachmentTypes } from '@lightspeed/utils/types';
-import { EventKind } from '@openshift-console/dynamic-plugin-sdk/lib/api/internal-types';
+import { type OLSAttachment, OLSAttachmentTypes } from '@lightspeed/utils/types';
+import { type EventKind } from '@openshift-console/dynamic-plugin-sdk/lib/api/internal-types';
 
 const getPromptSubmitButton = (): HTMLButtonElement =>
   document.getElementsByClassName(OLS_SUBMIT_BUTTON_ELEMENT_CLASS)[0] as HTMLButtonElement;
 
 // This function clicks the Lightspeed submit button in the Lightspeed drawer
-export const clickOLSPromptSubmitButton = () => {
+export const clickOLSPromptSubmitButton = (): Promise<HTMLButtonElement | null> => {
   return new Promise((resolve) => {
     const existingButton = getPromptSubmitButton();
     if (existingButton) {
@@ -34,7 +33,7 @@ export const clickOLSPromptSubmitButton = () => {
       return;
     }
 
-    const observer = new MutationObserver((_) => {
+    const observer = new MutationObserver((_unused) => {
       const button = getPromptSubmitButton();
       if (button) {
         button.click();
@@ -47,7 +46,7 @@ export const clickOLSPromptSubmitButton = () => {
   });
 };
 
-const asYAML = (input: any) => {
+const asYAML = (input: unknown): string | undefined => {
   try {
     return dumpYAML(input, { lineWidth: -1 }).trim();
   } catch (e) {

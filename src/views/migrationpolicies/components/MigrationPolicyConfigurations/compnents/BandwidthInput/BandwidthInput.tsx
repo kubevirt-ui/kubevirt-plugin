@@ -1,9 +1,14 @@
-/* eslint-disable */
-import React, { ChangeEvent, Dispatch, FC, SetStateAction, useCallback } from 'react';
+import React, {
+  type ChangeEvent,
+  type Dispatch,
+  type FC,
+  type SetStateAction,
+  useCallback,
+} from 'react';
 
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { QuantityUnit } from '@kubevirt-utils/utils/unitConstants';
+import { type QuantityUnit } from '@kubevirt-utils/utils/unitConstants';
 import { BinaryUnit } from '@kubevirt-utils/utils/unitConstants';
 import { addByteSuffix } from '@kubevirt-utils/utils/units';
 import { NumberInput, SelectOption, Split, SplitItem } from '@patternfly/react-core';
@@ -27,7 +32,7 @@ const BandwidthInput: FC<BandwidthInputProps> = ({ setState, state }) => {
   const { t } = useKubevirtTranslation();
 
   const onSelectUnit = useCallback(
-    (_, newUnit: QuantityUnit) => {
+    (_event, newUnit: QuantityUnit) => {
       setState((prev) => ({ ...prev, unit: newUnit }));
     },
     [setState],
@@ -37,12 +42,12 @@ const BandwidthInput: FC<BandwidthInputProps> = ({ setState, state }) => {
     <Split hasGutter>
       <SplitItem>
         <NumberInput
+          min={0}
+          minusBtnAriaLabel={t('Decrement')}
           onChange={(event: ChangeEvent<HTMLInputElement>) =>
             +event.target.value >= 0 &&
             setState((prev) => ({ ...prev, value: +event.target.value }))
           }
-          min={0}
-          minusBtnAriaLabel={t('Decrement')}
           onMinus={() => setState((prev) => ({ ...prev, value: --prev.value }))}
           onPlus={() => setState((prev) => ({ ...prev, value: prev?.value + 1 || 1 }))}
           plusBtnAriaLabel={t('Increment')}
