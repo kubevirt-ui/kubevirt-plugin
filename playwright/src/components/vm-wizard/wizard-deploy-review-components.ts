@@ -5,9 +5,9 @@ import type { Page } from '@playwright/test';
 export class VmCreationWizardReviewComponent extends BaseComponent {
   private readonly _inputTypeText = this.locator('input[type="text"]');
 
-  private readonly _pfV6CWizardButtonpfV6CButtonpfMPrimary = this.locator(
-    '.pf-v6-c-wizard button.pf-v6-c-button.pf-m-primary',
-  );
+  private readonly _wizardFooterCreateButton = this.page
+    .getByTestId('wizard-create-button')
+    .filter({ hasText: 'Create VirtualMachine' });
   private readonly _pfV6CWizardInputTypeText = this.locator('.pf-v6-c-wizard input[type="text"]');
   private readonly _startAfterCreateCheckbox = this.locator('#start-after-create-checkbox');
   private readonly _startThisVirtualMachineAfterCreation = this.locator(
@@ -25,13 +25,13 @@ export class VmCreationWizardReviewComponent extends BaseComponent {
 
   async clickCreateVm(): Promise<void> {
     await this.collapseSidebarIfExpanded();
-    const createBtn = this._pfV6CWizardButtonpfV6CButtonpfMPrimary;
-    await createBtn.first().waitFor({
+    const createBtn = this._wizardFooterCreateButton;
+    await createBtn.waitFor({
       state: 'visible',
       timeout: TestTimeouts.SHORT_WAIT,
     });
 
-    if (await createBtn.first().isDisabled()) {
+    if (await createBtn.isDisabled()) {
       const nameInput = this.locator('#vm-name');
       if ((await nameInput.count()) > 0) {
         await nameInput.press('Tab');
@@ -39,7 +39,7 @@ export class VmCreationWizardReviewComponent extends BaseComponent {
       }
     }
 
-    await this.robustClick(createBtn.first());
+    await this.robustClick(createBtn);
     await this.page.waitForTimeout(2000);
   }
 
@@ -58,9 +58,9 @@ export class VmCreationWizardReviewComponent extends BaseComponent {
 
   async getCreateButtonText(): Promise<string> {
     try {
-      const createBtn = this._pfV6CWizardButtonpfV6CButtonpfMPrimary;
+      const createBtn = this._wizardFooterCreateButton;
       return (
-        (await createBtn.first().textContent({ timeout: TestTimeouts.SHORT_WAIT }))?.trim() || ''
+        (await createBtn.textContent({ timeout: TestTimeouts.SHORT_WAIT }))?.trim() || ''
       );
     } catch {
       return '';
@@ -120,7 +120,7 @@ export class VmCreationWizardReviewComponent extends BaseComponent {
 
   async isCreateButtonDisabled(): Promise<boolean> {
     try {
-      const createBtn = this._pfV6CWizardButtonpfV6CButtonpfMPrimary.first();
+      const createBtn = this._wizardFooterCreateButton;
       await createBtn.waitFor({ state: 'visible', timeout: TestTimeouts.SHORT_WAIT });
       return createBtn.isDisabled();
     } catch {

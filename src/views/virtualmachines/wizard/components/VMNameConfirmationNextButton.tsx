@@ -1,4 +1,4 @@
-import React, { FC, ReactNode } from 'react';
+import React, { type FC, type ReactNode } from 'react';
 import { useWatch } from 'react-hook-form';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -13,12 +13,14 @@ import {
 
 type VMNameConfirmationNextButtonProps = {
   children: ReactNode;
+  dataTest?: string;
   isSubmitting?: boolean;
   onClick: () => void;
 };
 
 const VMNameConfirmationNextButton: FC<VMNameConfirmationNextButtonProps> = ({
   children,
+  dataTest = 'wizard-next-button',
   isSubmitting = false,
   onClick,
 }) => {
@@ -35,7 +37,7 @@ const VMNameConfirmationNextButton: FC<VMNameConfirmationNextButtonProps> = ({
   const isVMNameInvalid = shouldCheckVMNameProperly ? !isVMNameValid : !isVMNameAlmostValid;
   const isDisabled = isSubmitting || isVMNameInvalid;
 
-  const handleClick = () => {
+  const handleClick = (): void => {
     if (isVMNameValid) {
       onClick();
       return;
@@ -45,6 +47,7 @@ const VMNameConfirmationNextButton: FC<VMNameConfirmationNextButtonProps> = ({
 
   const nextButton = (
     <Button
+      data-test={dataTest}
       isAriaDisabled={isDisabled}
       isLoading={isSubmitting}
       onClick={isDisabled ? undefined : handleClick}

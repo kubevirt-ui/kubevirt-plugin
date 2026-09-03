@@ -4,7 +4,7 @@ import React, { FC, useMemo } from 'react';
 import { useWatch } from 'react-hook-form';
 
 import { instanceTypeSeriesNameMapper } from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/InstanceTypeDrilldownSelect/utils/constants';
-import { RedHatInstanceTypeSeries } from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/InstanceTypeDrilldownSelect/utils/types';
+import { type RedHatInstanceTypeSeries } from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/InstanceTypeDrilldownSelect/utils/types';
 import {
   getSeriesLabel,
   getSeriesSymbol,
@@ -12,6 +12,7 @@ import {
   seriesHasHugepagesVariant,
 } from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/InstanceTypeDrilldownSelect/utils/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { type InstanceTypeSeries } from '@kubevirt-utils/resources/instancetype/types';
 import { Card, CardBody, CardHeader, Flex, Tooltip } from '@patternfly/react-core';
 import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
 import { CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
@@ -30,11 +31,12 @@ const RedHatSeriesMenuCard: FC<RedHatSeriesMenuCardProps> = ({ rhSeriesItem }) =
   const selectedSeries = useWatch({
     control,
     name: CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.SELECTED_SERIES,
-  });
+  }) as string;
 
   const { classDisplayNameAnnotation, descriptionAnnotation, seriesName, sizes } = rhSeriesItem;
 
-  const { Icon, seriesLabel } = instanceTypeSeriesNameMapper[seriesName] || {};
+  const seriesConfig = instanceTypeSeriesNameMapper[seriesName as InstanceTypeSeries];
+  const Icon = seriesConfig?.Icon;
 
   const isSelectedSeries = useMemo(
     () => seriesName === selectedSeries,
@@ -43,39 +45,39 @@ const RedHatSeriesMenuCard: FC<RedHatSeriesMenuCardProps> = ({ rhSeriesItem }) =
 
   const defaultSeriesLabel = useMemo(() => getSeriesLabel(seriesName, t), [seriesName, t]);
 
-  const handleSeriesClick = () => {
+  const handleSeriesClick = (): void => {
     if (seriesName === selectedSeries) {
       return;
     }
 
     const standardSizes = seriesHasHugepagesVariant(seriesName)
-      ? sizes?.filter((s) => !is1GiInstanceType(s.sizeLabel))
+      ? sizes?.filter((size) => !is1GiInstanceType(size.sizeLabel))
       : sizes;
     const defaultSize = (standardSizes?.[0] ?? sizes?.[0])?.sizeLabel;
     setValue(CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.SELECTED_SERIES, seriesName);
     setValue(CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.SELECTED_SIZE, defaultSize);
     setValue(CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.SELECTED_INSTANCE_TYPE, {
-      name: seriesName,
+      name: defaultSize ? `${seriesName}.${defaultSize}` : seriesName,
       namespace: null,
     });
   };
 
   const card = (
     <Card
+      aria-pressed={isSelectedSeries}
       className={classNames(
         'instance-type-series-menu-card__toggle-card',
         isSelectedSeries && 'selected',
       )}
+      data-test={`instance-type-series-${seriesName}`}
+      isCompact
+      onClick={handleSeriesClick}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
           handleSeriesClick();
         }
       }}
-      aria-pressed={isSelectedSeries}
-      data-test={`instance-type-series-${seriesName}`}
-      isCompact
-      onClick={handleSeriesClick}
       role="button"
       tabIndex={0}
     >
@@ -87,9 +89,7 @@ const RedHatSeriesMenuCard: FC<RedHatSeriesMenuCardProps> = ({ rhSeriesItem }) =
           {classDisplayNameAnnotation}
         </CardHeader>
         <CardBody>
-          <div className="instance-type-series-menu-card__series-label">
-            {seriesLabel || defaultSeriesLabel}
-          </div>
+          <div className="instance-type-series-menu-card__series-label">{defaultSeriesLabel}</div>
         </CardBody>
       </Flex>
     </Card>

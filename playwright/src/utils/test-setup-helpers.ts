@@ -4,7 +4,8 @@
  */
 
 import type RequestContextClient from '@/clients/request-context-client';
-import type { JsonPatchOp } from '@/data-models/kubernetes-types';
+import type { JsonPatchOp, KubernetesResource } from '@/data-models/kubernetes-types';
+import { EnvVariables } from '@/utils/env-variables';
 import {
   generateRandomName,
   generateRandomString,
@@ -159,6 +160,90 @@ export async function setupTestNamespace(
   client.trackResource('Namespace', namespace);
   return namespace;
 }
+
+type DefaultSSHKeyArgs = {
+  client: RequestContextClient;
+  cnvNamespace?: string;
+  namespace: string;
+};
+
+type SetupDefaultSSHKeyArgs = DefaultSSHKeyArgs & {
+  secretName: string;
+};
+
+type UserSshSettings = { ssh?: Record<string, string> };
+
+async function resolveUserSettingsKey(client: RequestContextClient): Promise<string> {
+  const user = await client.getResource('user.openshift.io', 'v1', 'users', '~');
+  const settingsKey =
+    user?.metadata?.uid ?? user?.metadata?.name?.replace(/[^-._a-zA-Z0-9]+/g, '-');
+  if (!settingsKey) {
+    throw new Error('Could not resolve kubevirt user-settings key for the current user');
+  }
+  return settingsKey;
+}
+
+async function patchDefaultSshForNamespace({
+  client,
+  cnvNamespace = EnvVariables.cnvNamespace,
+  namespace,
+  secretName,
+}: DefaultSSHKeyArgs & { secretName: string | null }): Promise<void> {
+  const settingsKey = await resolveUserSettingsKey(client);
+  const userSettingsCm = await client.getKubeVirtUserSettings(cnvNamespace);
+  if (!userSettingsCm) {
+    throw new Error(`kubevirt-user-settings ConfigMap not found in ${cnvNamespace}`);
+  }
+  const cmData = (userSettingsCm?.data ?? {}) as Record<string, string>;
+  const parsed = JSON.parse(cmData[settingsKey] || '{}') as UserSshSettings;
+  const ssh = { ...parsed.ssh };
+  if (secretName) {
+    ssh[namespace] = secretName;
+  } else {
+    delete ssh[namespace];
+  }
+  parsed.ssh = ssh;
+
+  const op: JsonPatchOp = cmData[settingsKey]
+    ? { op: 'replace', path: `/data/${settingsKey}`, value: JSON.stringify(parsed) }
+    : { op: 'add', path: `/data/${settingsKey}`, value: JSON.stringify(parsed) };
+
+  await client.patchConfigMap('kubevirt-user-settings', cnvNamespace, [op]);
+}
+
+/**
+ * Creates an SSH public-key Secret and records it as the user's default key
+ * for the given namespace in kubevirt-user-settings.
+ */
+export async function setupDefaultSSHKey({
+  client,
+  cnvNamespace = EnvVariables.cnvNamespace,
+  namespace,
+  secretName,
+}: SetupDefaultSSHKeyArgs): Promise<void> {
+  await client.createSSHKeySecret(namespace, secretName);
+  client.trackResource('Secret', secretName, namespace);
+  await patchDefaultSshForNamespace({ client, cnvNamespace, namespace, secretName });
+}
+
+/**
+ * Removes the default SSH key mapping for a namespace from kubevirt-user-settings.
+ * Used when the test namespace is reused (HC E2E) so leftover defaults do not leak.
+ */
+export async function clearDefaultSSHKey({
+  client,
+  cnvNamespace = EnvVariables.cnvNamespace,
+  namespace,
+}: DefaultSSHKeyArgs): Promise<void> {
+  await patchDefaultSshForNamespace({ client, cnvNamespace, namespace, secretName: null });
+}
+
+export const getVmAccessCredentials = (vm: KubernetesResource | null): unknown[] | undefined => {
+  const spec = vm?.spec as {
+    template?: { spec?: { accessCredentials?: unknown[] } };
+  };
+  return spec?.template?.spec?.accessCredentials;
+};
 
 export type ProjectNetworkSettingsAnnotations = {
   /** Value for kubevirt.io/default-network (NAD name in the project). */

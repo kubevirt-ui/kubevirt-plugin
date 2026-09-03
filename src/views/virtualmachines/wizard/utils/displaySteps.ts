@@ -1,7 +1,7 @@
-import { createElement } from 'react';
-import { VMCreationMethod, VMWizardStep } from './constants';
+import { createElement, type ReactElement } from 'react';
+import { type TFunction } from 'i18next';
 
-import { TFunction } from 'i18next';
+import DefaultWizardFooter from '../components/DefaultWizardFooter';
 import CloneSourceStep from '../steps/CloneSourceStep/CloneSourceStep';
 import CustomizationStep from '../steps/CustomizationStep/CustomizationStep';
 import DeploymentDetailsStepFooter from '../steps/DeploymentDetailsStep/components/DeploymentDetailsStepFooter';
@@ -14,12 +14,16 @@ import ReviewAndCreateStepFooter from '../steps/ReviewAndCreateStep/components/R
 import ReviewAndCreateStep from '../steps/ReviewAndCreateStep/ReviewAndCreateStep';
 import TemplateStepFooter from '../steps/TemplateStep/components/TemplateStepFooter';
 import TemplateStep from '../steps/TemplateStep/TemplateStep';
+import { VMCreationMethod, VMWizardStep } from './constants';
 import { getVMGenerationNavItem } from './steps';
 import {
-  GetStepsToDisplayByCreationMethodArgs,
-  VMWizardStepDisplay,
-  WizardStepNavItemConfig,
+  type GetStepsToDisplayByCreationMethodArgs,
+  type VMWizardStepDisplay,
+  type WizardStepNavItemConfig,
 } from './types';
+
+const getDefaultFooter = (isNextDisabled: boolean): ReactElement =>
+  createElement(DefaultWizardFooter, { isNextDisabled });
 
 const getDeploymentDetailsStep = (t: TFunction): VMWizardStepDisplay => ({
   children: createElement(DeploymentDetailsStep),
@@ -37,7 +41,7 @@ const getCustomizationStep = (
 ): VMWizardStepDisplay => ({
   children: createElement(CustomizationStep),
   displayIndex: 6,
-  footer: { isNextDisabled: isNextDisabledForStep(VMWizardStep.CUSTOMIZATION) },
+  footer: getDefaultFooter(isNextDisabledForStep(VMWizardStep.CUSTOMIZATION)),
   id: VMWizardStep.CUSTOMIZATION,
   isDisabled: isStepDisabled(VMWizardStep.CUSTOMIZATION),
   name: t('Customization'),
@@ -79,9 +83,7 @@ export const getStepsToDisplayByCreationMethod = ({
       {
         children: createElement(CloneSourceStep),
         displayIndex: 7,
-        footer: {
-          isNextDisabled: isNextDisabledForStep(VMWizardStep.CLONE),
-        },
+        footer: getDefaultFooter(isNextDisabledForStep(VMWizardStep.CLONE)),
         id: VMWizardStep.CLONE,
         isDisabled: isStepDisabled(VMWizardStep.CLONE),
         name: t('Source'),
@@ -93,9 +95,7 @@ export const getStepsToDisplayByCreationMethod = ({
       {
         children: createElement(GuestOSStep),
         displayIndex: 2,
-        footer: {
-          isNextDisabled: isNextDisabledForStep(VMWizardStep.GUEST_OS),
-        },
+        footer: getDefaultFooter(isNextDisabledForStep(VMWizardStep.GUEST_OS)),
         id: VMWizardStep.GUEST_OS,
         isDisabled: isStepDisabled(VMWizardStep.GUEST_OS),
         name: t('Guest OS'),
@@ -103,9 +103,7 @@ export const getStepsToDisplayByCreationMethod = ({
       {
         children: createElement(BootSourceStep),
         displayIndex: 3,
-        footer: {
-          isNextDisabled: isNextDisabledForStep(VMWizardStep.BOOT_SOURCE),
-        },
+        footer: getDefaultFooter(isNextDisabledForStep(VMWizardStep.BOOT_SOURCE)),
         id: VMWizardStep.BOOT_SOURCE,
         isDisabled: isStepDisabled(VMWizardStep.BOOT_SOURCE),
         name: t('Boot source'),

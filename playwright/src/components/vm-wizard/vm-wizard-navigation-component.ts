@@ -22,9 +22,12 @@ export default class VmWizardNavigationComponent extends BaseComponent {
 
   private readonly _pfV6CMenuToggle = this.locator('.pf-v6-c-menu-toggle');
 
-  private readonly _pfV6CWizardButtonpfV6CButtonpfMPrimary = this.locator(
-    '.pf-v6-c-wizard button.pf-v6-c-button.pf-m-primary',
-  );
+  private readonly _wizardFooterCreateButton = this.page
+    .getByTestId('wizard-create-button')
+    .filter({ hasText: 'Create VirtualMachine' });
+  private readonly _wizardFooterNextButton = this.page
+    .getByTestId('wizard-next-button')
+    .filter({ hasText: 'Next' });
   private readonly _pfV6CWizardMain = this.locator('.pf-v6-c-wizard__main');
   private readonly _pfV6CWizardTemplatesCatalogTile = this.locator(
     '.pf-v6-c-wizard .templates-catalog-tile',
@@ -98,13 +101,13 @@ export default class VmWizardNavigationComponent extends BaseComponent {
 
   async clickCreateVm(): Promise<void> {
     await this.collapseSidebarIfExpanded();
-    const createBtn = this._pfV6CWizardButtonpfV6CButtonpfMPrimary;
-    await createBtn.first().waitFor({
+    const createBtn = this._wizardFooterCreateButton;
+    await createBtn.waitFor({
       state: 'visible',
       timeout: TestTimeouts.SHORT_WAIT,
     });
 
-    if (await createBtn.first().isDisabled()) {
+    if (await createBtn.isDisabled()) {
       const nameInput = this._vmNameInput.first();
       if ((await nameInput.count()) > 0) {
         await nameInput.press('Tab');
@@ -112,18 +115,18 @@ export default class VmWizardNavigationComponent extends BaseComponent {
       }
     }
 
-    await this.robustClick(createBtn.first());
+    await this.robustClick(createBtn);
     await this.page.waitForTimeout(2000);
   }
 
   async clickNext(): Promise<void> {
     await this.collapseSidebarIfExpanded();
-    const nextButton = this._pfV6CWizardButtonpfV6CButtonpfMPrimary;
-    await nextButton.first().waitFor({
+    const nextButton = this._wizardFooterNextButton;
+    await nextButton.waitFor({
       state: 'visible',
       timeout: TestTimeouts.SHORT_WAIT,
     });
-    await this.robustClick(nextButton.first());
+    await this.robustClick(nextButton);
     await this.page.waitForTimeout(1000);
   }
 
@@ -316,12 +319,12 @@ export default class VmWizardNavigationComponent extends BaseComponent {
   }
 
   async isNextButtonDisabled(): Promise<boolean> {
-    const nextButton = this._pfV6CWizardButtonpfV6CButtonpfMPrimary;
-    await nextButton.first().waitFor({
+    const nextButton = this._wizardFooterNextButton;
+    await nextButton.waitFor({
       state: 'visible',
       timeout: TestTimeouts.SHORT_WAIT,
     });
-    return await nextButton.first().isDisabled();
+    return await nextButton.isDisabled();
   }
 
   async navigateToStepByName(stepName: string): Promise<void> {
@@ -345,6 +348,33 @@ export default class VmWizardNavigationComponent extends BaseComponent {
     const editBtn = this._buttonEditVMCreationLocation;
     await this.robustClick(editBtn);
     await this.page.waitForTimeout(500);
+  }
+
+  async selectLocationProject(namespace: string): Promise<void> {
+    const current = await this.getLocationProject();
+    if (current.includes(namespace)) {
+      return;
+    }
+
+    await this.openEditLocationPanel();
+
+    const toggle = this.locator('.vm-creation-wizard').getByTestId('namespace-dropdown-menu-toggle');
+    await toggle.first().waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
+    await this.robustClick(toggle.first());
+
+    const filter = this.page.getByTestId('dropdown-text-filter');
+    await filter.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
+    await filter.clear();
+    await filter.fill(namespace);
+
+    const option = this.page.getByRole('menuitem', { name: namespace, exact: true });
+    await option.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
+    await this.robustClick(option);
+
+    await toggle
+      .filter({ hasText: namespace })
+      .first()
+      .waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
   }
 
   async openWizardFromCreateDropdown(): Promise<void> {
