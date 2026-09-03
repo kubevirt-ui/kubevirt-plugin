@@ -1,19 +1,20 @@
-/* eslint-disable */
-import React, { FC, useState } from 'react';
+import React, { type FC, useState } from 'react';
 import produce from 'immer';
 
-import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import {
+  type V1VirtualMachine,
+  type V1VirtualMachineInstance,
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import ModalPendingChangesAlert from '@kubevirt-utils/components/PendingChanges/ModalPendingChangesAlert/ModalPendingChangesAlert';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
-  BootableDeviceType,
+  type BootableDeviceType,
   DeviceType,
   getSortedBootableDevices,
 } from '@kubevirt-utils/resources/vm/utils/boot-order/bootOrder';
 import { ensurePath } from '@kubevirt-utils/utils/utils';
 
 import TabModal from '../TabModal/TabModal';
-
 import { BootOrderModalBody } from './BootOrderModalBody';
 
 import './boot-order.scss';
@@ -62,7 +63,7 @@ const BootOrderModal: FC<{
     >
       {vmi && <ModalPendingChangesAlert />}
       <BootOrderModalBody
-        changeEditMode={(v) => setIsEditMode(v)}
+        changeEditMode={(val) => setIsEditMode(val)}
         devices={devices}
         isEditMode={isEditMode}
         onChange={setDevices}

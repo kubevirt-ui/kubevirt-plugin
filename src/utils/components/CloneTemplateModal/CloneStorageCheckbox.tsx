@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -21,7 +20,7 @@ const CloneStorageCheckbox: FC<CloneStorageCheckboxProps> = ({ isChecked, onChan
             id="clone-storage"
             isChecked={isChecked}
             label={t("Copy template's boot source disk")}
-            onChange={(_, checked: boolean) => onChange(checked)}
+            onChange={(_event, checked: boolean) => onChange(checked)}
           />
         </FlexItem>
         <FlexItem>

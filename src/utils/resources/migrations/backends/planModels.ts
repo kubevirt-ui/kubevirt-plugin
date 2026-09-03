@@ -1,4 +1,3 @@
-/* eslint-disable */
 import {
   MigPlanModel,
   MultiNamespaceVirtualMachineStorageMigrationPlanModel,
@@ -13,7 +12,7 @@ const STORAGE_MIGRATION_PLAN_MODELS: K8sModel[] = [
 ];
 
 export const getStorageMigrationPlanModelForKind = (kind?: string): K8sModel => {
-  const found = STORAGE_MIGRATION_PLAN_MODELS.find((m) => m.kind === kind);
+  const found = STORAGE_MIGRATION_PLAN_MODELS.find((model) => model.kind === kind);
   if (found) {
     return found;
   }

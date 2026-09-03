@@ -1,15 +1,21 @@
-/* eslint-disable */
 import { useMemo } from 'react';
 
-import { V1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
-import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
+import { type IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useKubevirtWatchResources from '@multicluster/hooks/useKubevirtWatchResources';
 
 import { getPVCAndDVWatches } from './utils';
 
-const useDisksSources = (vm: V1VirtualMachine) => {
+const useDisksSources = (
+  vm: V1VirtualMachine,
+): {
+  dvs: V1beta1DataVolume[];
+  loaded: boolean;
+  loadingError: Error | undefined;
+  pvcs: IoK8sApiCoreV1PersistentVolumeClaim[];
+} => {
   const { dvWatches, pvcWatches } = useMemo(() => getPVCAndDVWatches(vm), [vm]);
 
   const pvcWatchesResult = useKubevirtWatchResources<{
@@ -24,7 +30,7 @@ const useDisksSources = (vm: V1VirtualMachine) => {
     () =>
       Object.values(dvWatchesResult || [])
         .map((watch) => watch.data)
-        .filter((dv) => !isEmpty(dv)),
+        .filter((dataVolume) => !isEmpty(dataVolume)),
     [dvWatchesResult],
   );
 
@@ -42,11 +48,11 @@ const useDisksSources = (vm: V1VirtualMachine) => {
     [pvcWatchesResult],
   );
 
-  const loadingError = useMemo(
+  const loadingError = useMemo<Error | undefined>(
     () =>
       Object.values(pvcWatchesResult).find((watch) => {
         return !isEmpty(watch.loadError) && watch.loadError?.code !== 404;
-      })?.loadError,
+      })?.loadError as Error | undefined,
     [pvcWatchesResult],
   );
 

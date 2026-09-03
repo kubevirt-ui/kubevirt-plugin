@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { Dispatch, FC, SetStateAction } from 'react';
+import React, { type Dispatch, type FC, type SetStateAction } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Checkbox, FormGroup } from '@patternfly/react-core';
@@ -23,7 +22,7 @@ const StartClonedVMCheckbox: FC<StartClonedVMCheckboxProps> = ({
         id="start-clone"
         isChecked={startCloneVM}
         label={t('Start VirtualMachine once created')}
-        onChange={(_, checked: boolean) => setStartCloneVM(checked)}
+        onChange={(_event, checked: boolean) => setStartCloneVM(checked)}
       />
     </FormGroup>
   );

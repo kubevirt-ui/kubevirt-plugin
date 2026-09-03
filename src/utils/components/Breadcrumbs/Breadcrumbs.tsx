@@ -1,6 +1,5 @@
-/* eslint-disable */
-import React, { FC } from 'react';
-import { isEmpty } from 'lodash';
+import React, { type FC } from 'react';
+import isEmpty from 'lodash/isEmpty';
 
 import { Breadcrumb, BreadcrumbItem } from '@patternfly/react-core';
 

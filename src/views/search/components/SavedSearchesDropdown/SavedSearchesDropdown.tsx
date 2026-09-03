@@ -1,9 +1,8 @@
-/* eslint-disable */
-import React, { FC, useMemo, useState } from 'react';
+import React, { type FC, useMemo, useState } from 'react';
 
 import {
-  KubevirtFilterState,
-  OnSetFilters,
+  type KubevirtFilterState,
+  type OnSetFilters,
 } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -18,13 +17,13 @@ import {
   SearchInput,
 } from '@patternfly/react-core';
 import { useSavedSearchData } from '@search/hooks/useSavedSearchData';
+import { type SavedSearchEntry } from '@search/savedSearches/types';
 import { applySearch } from '@search/savedSearches/utils';
 
 import SavedSearchesStateHandler from './components/SavedSearchesStateHandler';
 import SavedSearchItem from './components/SavedSearchItem';
 import useDeleteSavedSearch from './hooks/useDeleteSavedSearch';
 import { getSavedSearchesItemsToDisplay, getSortedSavedsearches } from './utils/utils';
-import { SavedSearchEntry } from '@search/savedSearches/types';
 
 type SavedSearchesDropdownProps = {
   filters: KubevirtFilterState;
@@ -51,14 +50,14 @@ const SavedSearchesDropdown: FC<SavedSearchesDropdownProps> = ({ filters, onSetF
   const savedSearchesItemsToDropdownItems = (savedSearchesItems: SavedSearchEntry[]) =>
     savedSearchesItems.map(({ description, isFavorited, name }) => (
       <SavedSearchItem
-        onApply={() => {
-          applySearch(name, searches, filters, onSetFilters);
-          setOpen(false);
-        }}
         description={description}
         isFavorited={isFavorited}
         key={name}
         name={name}
+        onApply={() => {
+          applySearch(name, searches, filters, onSetFilters);
+          setOpen(false);
+        }}
         onDelete={() => handleDelete(name, isFavorited)}
         onToggleFavorite={() => toggleFavorite(name)}
       />
@@ -89,7 +88,7 @@ const SavedSearchesDropdown: FC<SavedSearchesDropdownProps> = ({ filters, onSetF
         <MenuSearch>
           <MenuSearchInput>
             <SearchInput
-              onChange={(_, value) => setFilterText(value)}
+              onChange={(_event, value) => setFilterText(value)}
               placeholder={t('Find by name')}
               value={filterText}
             />

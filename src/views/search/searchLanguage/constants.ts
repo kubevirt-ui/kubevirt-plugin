@@ -39,6 +39,3 @@ export const DATE_CREATED_FILTER_KEYS = new Set<string>([
 export const NUMERIC_OPERATOR_REGEX = /^([a-zA-Z]+):?(>=|<=|>|<|=)(.*)$/;
 
 export const MEMORY_VALUE_REGEX = /^(\d+(?:\.\d+)?)\s*([A-Za-z]+)$/;
-
-export const MEMORY_UNIT_REGEX = /^(\S+)\s+(\d+(?:\.\d+)?)\s+(\w+?)$/;
-export const CPU_NUMERIC_REGEX = /^(\S+)\s+(.+)$/;

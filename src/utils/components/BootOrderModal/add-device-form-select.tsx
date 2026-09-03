@@ -1,7 +1,6 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
-import { BootableDeviceType } from '@kubevirt-utils/resources/vm/utils/boot-order/bootOrder';
+import { type BootableDeviceType } from '@kubevirt-utils/resources/vm/utils/boot-order/bootOrder';
 import { Button, ButtonVariant, FormSelect, FormSelectOption } from '@patternfly/react-core';
 import { MinusCircleIcon } from '@patternfly/react-icons';
 
@@ -16,7 +15,7 @@ export const AddDeviceFormSelect: FC<AddDeviceFormSelectProps> = ({
     <FormSelect
       className="kubevirt-boot-order__add-device-select"
       id={id}
-      onChange={(_, value: string) => onAdd(value)}
+      onChange={(_event, value: string) => onAdd(value)}
       value=""
     >
       <FormSelectOption label={label} value="" />

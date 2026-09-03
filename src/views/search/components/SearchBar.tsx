@@ -1,12 +1,13 @@
 import React, { type FC, type RefObject, useCallback, useMemo } from 'react';
 
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import {
   type KubevirtFilter,
   type KubevirtFilterState,
   type OnSetFilters,
 } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
-import { InputGroup, InputGroupItem } from '@patternfly/react-core';
+import { InputGroup, InputGroupItem, Stack, StackItem } from '@patternfly/react-core';
 import useShowAdvancedSearchModal from '@search/hooks/useShowAdvancedSearchModal';
 import { useSearchLanguageInput } from '@search/searchLanguage/hooks/useSearchLanguageInput/useSearchLanguageInput';
 import { convertFilterStateToModalInputs } from '@search/utils/query';
@@ -38,7 +39,7 @@ const SearchBar: FC<SearchBarProps> = ({
   const showSearchModal = useShowAdvancedSearchModal(onSetFilters, vms);
   const modalInputs = useMemo(() => convertFilterStateToModalInputs(filters), [filters]);
 
-  const { addRecentSearch, recentSearches } = useRecentSearches();
+  const { addRecentSearch, recentSearches, recentSearchesError } = useRecentSearches();
 
   const { onCommitText, ...searchInputProps } = useSearchLanguageInput({
     addRecentSearch,
@@ -56,26 +57,35 @@ const SearchBar: FC<SearchBarProps> = ({
   );
 
   return (
-    <InputGroup className="pf-v6-u-mb-md" data-test="vm-adv-search-toolbar">
-      <InputGroupItem isFill>
-        <SearchTextInput
-          filterDefinitions={filterDefinitions}
-          filters={filters}
-          inputRef={inputRef}
-          onOpenAdvancedSearch={() => showSearchModal(modalInputs)}
-          onSelectQueryText={onSelectQueryText}
-          onSetFilters={onSetFilters}
-          recentSearches={recentSearches}
-          {...searchInputProps}
-        />
-      </InputGroupItem>
-      <InputGroupItem>
-        <SearchTipsPopover onSelectTip={onSelectQueryText} />
-      </InputGroupItem>
-      <InputGroupItem>
-        <SavedSearchesDropdown filters={filters} onSetFilters={onSetFilters} />
-      </InputGroupItem>
-    </InputGroup>
+    <Stack>
+      {recentSearchesError && (
+        <StackItem>
+          <ErrorAlert error={recentSearchesError} />
+        </StackItem>
+      )}
+      <StackItem>
+        <InputGroup className="pf-v6-u-mb-md" data-test="vm-adv-search-toolbar">
+          <InputGroupItem isFill>
+            <SearchTextInput
+              filterDefinitions={filterDefinitions}
+              filters={filters}
+              inputRef={inputRef}
+              onOpenAdvancedSearch={() => showSearchModal(modalInputs)}
+              onSelectQueryText={onSelectQueryText}
+              onSetFilters={onSetFilters}
+              recentSearches={recentSearches}
+              {...searchInputProps}
+            />
+          </InputGroupItem>
+          <InputGroupItem>
+            <SearchTipsPopover onSelectTip={onSelectQueryText} />
+          </InputGroupItem>
+          <InputGroupItem>
+            <SavedSearchesDropdown filters={filters} onSetFilters={onSetFilters} />
+          </InputGroupItem>
+        </InputGroup>
+      </StackItem>
+    </Stack>
   );
 };
 

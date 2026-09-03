@@ -1,35 +1,29 @@
-import { Location } from 'react-router';
+import { type Location } from 'react-router';
 
+import { type SearchItemWithTab } from '@kubevirt-utils/components/ConfigurationSearch/types';
 import { COLON, HASH } from '@kubevirt-utils/constants/constants';
-import { SearchItemWithTab } from '@virtualmachines/details/tabs/configuration/utils/search';
 
-import { TabConfig } from './constants';
+import { type TabConfig } from './constants';
 
-export const getTargetTab = (location: Location<any>) => location.hash?.slice(1); // Remove '#'
+export const getTargetTab = (location: Location): string => location.hash?.slice(1); // Remove '#'
 
 export const getActiveTabFromLocation = (
-  location: Location<any>,
+  location: Location,
   searchItems: SearchItemWithTab[],
   tabs: TabConfig[],
 ): string | undefined => {
   const hash = getTargetTab(location);
-  if (!hash) return;
+  if (!hash) return undefined;
 
   const [tabFromHash, elementId] = hash.includes(COLON) ? hash.split(COLON) : [null, hash];
-  const targetTab = tabFromHash || searchItems.find((item) => item.element.id === elementId)?.tab;
+  const targetTab = tabFromHash ?? searchItems.find((item) => item.element.id === elementId)?.tab;
 
   if (!targetTab || !tabs.some((tab) => tab.name === targetTab)) {
-    return;
+    return undefined;
   }
 
   return targetTab;
 };
 
-// For wizard, we just use hash-based navigation without changing the path
-export const getWizardSearchUrlPath = (
-  tab: string,
-  elementId: string,
-  pathname: string,
-): string => {
-  return `${pathname}${HASH}${tab}${COLON}${elementId}`;
-};
+export const getWizardSearchUrlPath = (tab: string, elementId: string, pathname: string): string =>
+  `${pathname}${HASH}${tab}${COLON}${elementId}`;
