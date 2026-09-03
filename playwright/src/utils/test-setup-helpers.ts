@@ -283,6 +283,97 @@ export async function createBridgeNetworkAttachmentDefinition(
 }
 
 /**
+ * Creates a VM with a KubeVirt emptyDisk and no bootable volume.
+ * Skipping DataSource clones / container image pulls makes the VM much more
+ * likely to reach Running in CI.
+ */
+export async function createVmWithEmptyDisk(
+  client: RequestContextClient,
+  vmName: string,
+  namespace: string,
+  startVm = true,
+): Promise<void> {
+  await client.createVirtualMachine(namespace, {
+    apiVersion: 'kubevirt.io/v1',
+    kind: 'VirtualMachine',
+    metadata: { name: vmName, namespace },
+    spec: {
+      runStrategy: startVm ? 'Always' : 'Halted',
+      template: {
+        spec: {
+          domain: {
+            cpu: { cores: 1 },
+            devices: {
+              disks: [{ bootOrder: 1, disk: { bus: 'virtio' }, name: 'emptydisk' }],
+              interfaces: [{ masquerade: {}, name: 'default' }],
+            },
+            memory: { guest: '1Gi' },
+          },
+          networks: [{ name: 'default', pod: {} }],
+          terminationGracePeriodSeconds: 0,
+          volumes: [{ emptyDisk: { capacity: '1Gi' }, name: 'emptydisk' }],
+        },
+      },
+    },
+  });
+  client.trackResource('VirtualMachine', vmName, namespace);
+  const exists = await client.waitForVmExists(vmName, namespace);
+  if (!exists) {
+    throw new Error(`Empty-disk VM ${vmName} was not created in namespace ${namespace}`);
+  }
+}
+
+/**
+ * Appends a bridge Multus NIC to a VirtualMachine spec.
+ * Safe to call on a running VM (hot-plug add); the UI then lists the interface for NAD edit.
+ */
+export async function attachBridgeNetworkInterface(
+  client: RequestContextClient,
+  vmName: string,
+  namespace: string,
+  nicName: string,
+  nadName: string,
+): Promise<void> {
+  await client.patchVirtualMachine(namespace, vmName, [
+    {
+      op: 'add',
+      path: '/spec/template/spec/domain/devices/interfaces/-',
+      value: {
+        bridge: {},
+        model: 'virtio',
+        name: nicName,
+      },
+    },
+    {
+      op: 'add',
+      path: '/spec/template/spec/networks/-',
+      value: {
+        multus: { networkName: nadName },
+        name: nicName,
+      },
+    },
+  ]);
+}
+
+export function getVmMultusNetworkName(
+  vm: KubernetesResource | null,
+  nicName: string,
+): string | undefined {
+  const spec = vm?.spec as
+    | {
+        template?: {
+          spec?: {
+            networks?: Array<{ name?: string; multus?: { networkName?: string } }>;
+          };
+        };
+      }
+    | undefined;
+
+  return spec?.template?.spec?.networks?.find((network) => network.name === nicName)?.multus
+    ?.networkName;
+}
+
+/**
  * Sets project-level KubeVirt network annotations on a Namespace.
  * Always writes both annotation keys; omitted/undefined values are cleared via
  * JSON merge-patch nulls so configs can be replaced cleanly.

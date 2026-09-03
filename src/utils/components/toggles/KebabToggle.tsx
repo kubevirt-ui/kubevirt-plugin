@@ -1,12 +1,16 @@
-import React, { Ref } from 'react';
+import React, { type ReactElement, type Ref } from 'react';
 
-import { MenuToggle, MenuToggleElement, MenuToggleProps } from '@patternfly/react-core';
+import { MenuToggle, type MenuToggleElement, type MenuToggleProps } from '@patternfly/react-core';
 import { EllipsisVIcon } from '@patternfly/react-icons';
 
-const KebabToggle = (props: MenuToggleProps) => (toggleRef: Ref<MenuToggleElement>) => (
-  <MenuToggle {...props} data-test="kebab-button" ref={toggleRef} variant="plain">
-    <EllipsisVIcon />
-  </MenuToggle>
-);
+type KebabToggleProps = MenuToggleProps & { 'data-test'?: string };
+
+const KebabToggle =
+  (props: KebabToggleProps) =>
+  (toggleRef: Ref<MenuToggleElement>): ReactElement => (
+    <MenuToggle data-test="kebab-button" {...props} ref={toggleRef} variant="plain">
+      <EllipsisVIcon />
+    </MenuToggle>
+  );
 
 export default KebabToggle;

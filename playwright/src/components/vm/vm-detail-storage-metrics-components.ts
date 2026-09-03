@@ -4,6 +4,7 @@
 
 import BaseComponent from '@/components/shared/base-component';
 import { DISK_NAMES } from '@/data-models';
+import { getPendingStatusMessageLocator } from '@/utils/pending-changes-locator';
 import { TestTimeouts } from '@/utils/test-config';
 import type { Page } from '@playwright/test';
 import { expect } from '@playwright/test';
@@ -1961,7 +1962,7 @@ export class VmStorageComponent extends BaseComponent {
   }
 
   async waitForPendingChangesToDisappear(timeout = 60000): Promise<boolean> {
-    const pendingLocator = this.locator(':is(:text("Pending changes"), :text("Restart required"))');
+    const pendingLocator = getPendingStatusMessageLocator(this.page);
     try {
       await pendingLocator
         .first()

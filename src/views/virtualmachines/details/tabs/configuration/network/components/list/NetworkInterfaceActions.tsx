@@ -1,36 +1,25 @@
 /* eslint-disable */
 import React, { FC, useState } from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import ConfirmActionMessage from '@kubevirt-utils/components/ConfirmActionMessage/ConfirmActionMessage';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
-import { deleteNetworkInterface } from '@kubevirt-utils/components/NetworkInterfaceModal/utils/helpers';
-import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import KebabToggle from '@kubevirt-utils/components/toggles/KebabToggle';
 import useFQDN from '@kubevirt-utils/hooks/useFQDN/useFQDN';
 import useIsFQDNEnabled from '@kubevirt-utils/hooks/useFQDN/useIsFQDNEnabled';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { NetworkPresentation } from '@kubevirt-utils/resources/vm/utils/network/constants';
+import { type NetworkPresentation } from '@kubevirt-utils/resources/vm/utils/network/constants';
 import { getNetworkInterface } from '@kubevirt-utils/resources/vm/utils/network/selectors';
 import { NetworkInterfaceState } from '@kubevirt-utils/resources/vm/utils/network/types';
 import { getContentScrollableElement } from '@kubevirt-utils/utils/utils';
-import {
-  Alert,
-  AlertVariant,
-  ButtonVariant,
-  Dropdown,
-  DropdownItem,
-  DropdownList,
-  Tooltip,
-} from '@patternfly/react-core';
+import { Dropdown, DropdownItem, DropdownList, Tooltip } from '@patternfly/react-core';
 import { CopyIcon } from '@patternfly/react-icons';
 import {
   getConfigInterfaceStateFromVM,
   setNetworkInterfaceState,
 } from '@virtualmachines/details/tabs/configuration/network/utils/utils';
-import { isRunning } from '@virtualmachines/utils';
 
 import VirtualMachinesEditNetworkInterfaceModal from '../modal/VirtualMachinesEditNetworkInterfaceModal';
+import NetworkInterfaceDeleteModal from './NetworkInterfaceDeleteModal';
 
 type NetworkInterfaceActionsProps = {
   isAutoAttached?: boolean;
@@ -48,18 +37,12 @@ const NetworkInterfaceActions: FC<NetworkInterfaceActionsProps> = ({
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const deleteBtnText = t('Delete');
-
-  const isHotPlugNIC = Boolean(nicPresentation?.iface?.bridge);
-
   const interfaceState = getConfigInterfaceStateFromVM(vm, nicName);
-
   const isInterfaceMissing = !getNetworkInterface(vm, nicName);
-
   const fqdn = useFQDN(nicName, vm);
   const isFQDNEnabled = useIsFQDNEnabled();
 
-  const onEditModalOpen = () => {
+  const onEditModalOpen = (): void => {
     createModal(({ isOpen, onClose }) => (
       <VirtualMachinesEditNetworkInterfaceModal
         isOpen={isOpen}
@@ -71,51 +54,33 @@ const NetworkInterfaceActions: FC<NetworkInterfaceActionsProps> = ({
     setIsDropdownOpen(false);
   };
 
-  const onDeleteModalOpen = () => {
+  const onDeleteModalOpen = (): void => {
     createModal(({ isOpen, onClose }) => (
-      <TabModal<V1VirtualMachine>
-        headerText={t('Delete NIC?')}
+      <NetworkInterfaceDeleteModal
+        isHotPlugNIC={Boolean(nicPresentation?.iface?.bridge)}
         isOpen={isOpen}
+        nicName={nicName}
+        nicPresentation={nicPresentation}
         onClose={onClose}
-        onSubmit={() => deleteNetworkInterface(vm, nicName, nicPresentation)}
-        submitBtnText={deleteBtnText}
-        submitBtnVariant={ButtonVariant.danger}
-      >
-        <span>
-          {isRunning(vm) && isHotPlugNIC && (
-            <Alert
-              title={t(
-                'Deleting a network interface is supported only on VirtualMachines that were created in versions greater than 4.13.',
-              )}
-              component={'h6'}
-              isInline
-              variant={AlertVariant.warning}
-            />
-          )}
-          <br />
-          <ConfirmActionMessage
-            obj={{ metadata: { name: nicName, namespace: vm?.metadata?.namespace } }}
-          />
-        </span>
-      </TabModal>
+        vm={vm}
+      />
     ));
     setIsDropdownOpen(false);
   };
 
-  const onToggle = () => setIsDropdownOpen((prevIsOpen) => !prevIsOpen);
-
   const dropdown = (
     <Dropdown
-      toggle={KebabToggle({
-        id: `nic-actions-${nicName}`,
-        isDisabled: interfaceState === NetworkInterfaceState.ABSENT || isInterfaceMissing,
-        isExpanded: isDropdownOpen,
-        onClick: onToggle,
-      })}
       isOpen={isDropdownOpen}
       onOpenChange={setIsDropdownOpen}
       onSelect={() => setIsDropdownOpen(false)}
       popperProps={{ appendTo: getContentScrollableElement, position: 'right' }}
+      toggle={KebabToggle({
+        'data-test': `nic-actions-${nicName}`,
+        id: `nic-actions-${nicName}`,
+        isDisabled: interfaceState === NetworkInterfaceState.ABSENT || isInterfaceMissing,
+        isExpanded: isDropdownOpen,
+        onClick: () => setIsDropdownOpen((prevIsOpen) => !prevIsOpen),
+      })}
     >
       <DropdownList>
         {interfaceState === NetworkInterfaceState.DOWN && (
@@ -143,12 +108,10 @@ const NetworkInterfaceActions: FC<NetworkInterfaceActionsProps> = ({
             {t('Copy FQDN')}
           </DropdownItem>
         )}
-        <DropdownItem key="network-interface-edit" onClick={onEditModalOpen}>
+        <DropdownItem data-test="network-interface-edit" onClick={onEditModalOpen}>
           {t('Edit')}
         </DropdownItem>
-        <DropdownItem key="network-interface-delete" onClick={onDeleteModalOpen}>
-          {deleteBtnText}
-        </DropdownItem>
+        <DropdownItem onClick={onDeleteModalOpen}>{t('Delete')}</DropdownItem>
       </DropdownList>
     </Dropdown>
   );

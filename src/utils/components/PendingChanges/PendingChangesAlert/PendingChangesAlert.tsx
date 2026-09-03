@@ -1,4 +1,4 @@
-import React, { FC, ReactNode } from 'react';
+import React, { type FC, type ReactNode } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Alert, AlertVariant } from '@patternfly/react-core';
@@ -24,12 +24,13 @@ export const PendingChangesAlert: FC<PendingChangesAlertProps> = ({
   return (
     <Alert
       className="pending-changes-alert"
+      data-test="pending-changes-alert"
       isExpandable={isExpandable}
       isInline
-      title={title || t('Pending changes')}
+      title={title ?? t('Pending changes')}
       variant={isWarning ? AlertVariant.warning : AlertVariant.info}
     >
-      {warningMsg || children}
+      {warningMsg ?? children}
     </Alert>
   );
 };
