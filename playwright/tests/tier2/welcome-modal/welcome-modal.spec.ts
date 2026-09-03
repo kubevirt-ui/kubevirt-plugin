@@ -3,6 +3,7 @@ import { T2, T2_TAG } from '@/data-models/allure-constants';
 import { expect, test } from '@/fixtures/scenario-test-fixture';
 import { TestTimeouts } from '@/utils/test-config';
 import {
+  assertVirtualMachinesUsableDuringTour,
   checkIfModalIsVisibleAfterCheckboxClick,
   CLOSE_BUTTON_LOCATOR,
   enterVirtualMachinesPage,
@@ -38,6 +39,7 @@ test.describe('Welcome Modal', { tag: [T2_TAG, '@tier2-welcome-modal'] }, () => 
 
       await page.getByTestId('start-tour-btn').click();
 
+      await assertVirtualMachinesUsableDuringTour(page);
       await tourStepsTest(page);
 
       // Dismiss onboarding popover if it appeared after tour ended
