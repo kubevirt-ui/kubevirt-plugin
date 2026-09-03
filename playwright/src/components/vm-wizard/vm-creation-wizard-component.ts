@@ -13,6 +13,7 @@ import {
   VmCreationWizardComputeComponent,
   VmCreationWizardLocationComponent,
 } from '@/components/vm-wizard/wizard-step-components';
+import WizardLabelsComponent from '@/components/vm-wizard/wizard-labels-component';
 import { TestTimeouts } from '@/utils/test-config';
 import type { Page } from '@playwright/test';
 
@@ -33,6 +34,7 @@ export default class VmCreationWizardComponent extends BaseComponent {
   readonly compute: VmCreationWizardComputeComponent;
   readonly deployment: VmCreationWizardDeploymentComponent;
 
+  readonly labels: WizardLabelsComponent;
   readonly location: VmCreationWizardLocationComponent;
 
   readonly navigation: VmCreationWizardNavigationComponent;
@@ -45,6 +47,7 @@ export default class VmCreationWizardComponent extends BaseComponent {
     this.clone = new VmCreationWizardCloneComponent(page);
     this.compute = new VmCreationWizardComputeComponent(page);
     this.deployment = new VmCreationWizardDeploymentComponent(page);
+    this.labels = new WizardLabelsComponent(page);
     this.location = new VmCreationWizardLocationComponent(page);
     this.navigation = new VmCreationWizardNavigationComponent(page);
     this.review = new VmCreationWizardReviewComponent(page);
@@ -992,5 +995,35 @@ export default class VmCreationWizardComponent extends BaseComponent {
 
   async verifyWizardVisible(): Promise<boolean> {
     return this.deployment.verifyWizardVisible();
+  }
+
+  /** Waits for the Compute Resources step heading and instance type cards to be visible. */
+  async waitForComputeStepReady(): Promise<void> {
+    await this.page
+      .locator('.pf-v6-c-wizard__main')
+      .getByRole('heading', { name: 'Compute resources', level: 1 })
+      .waitFor({ state: 'visible', timeout: 30000 });
+    await this.page
+      .locator('.pf-v6-c-wizard__main .pf-v6-c-card')
+      .first()
+      .waitFor({ state: 'visible', timeout: 30000 });
+  }
+
+  /** Waits for the Next button to become enabled and clicks it. */
+  async clickNextWhenEnabled(): Promise<void> {
+    const nextBtn = this.page.locator('[data-test="wizard-next-button"]');
+    await nextBtn.waitFor({ state: 'visible', timeout: 30000 });
+    await this.page
+      .locator('[data-test="wizard-next-button"]:not([disabled])')
+      .waitFor({ state: 'attached', timeout: 30000 });
+    await nextBtn.click();
+  }
+
+  /** Waits until the specified wizard step becomes the active step in navigation. */
+  async waitForStepActive(stepName: string): Promise<void> {
+    await this.page
+      .locator('.pf-v6-c-wizard__nav-link[aria-current="step"]')
+      .filter({ hasText: stepName })
+      .waitFor({ state: 'visible', timeout: 30000 });
   }
 }

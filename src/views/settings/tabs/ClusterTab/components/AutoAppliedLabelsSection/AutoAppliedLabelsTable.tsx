@@ -121,6 +121,7 @@ const AutoAppliedLabelsTable: FC = () => {
       {!isAdding && (
         <StackItem>
           <Button
+            data-test="add-auto-label-key"
             icon={<PlusCircleIcon />}
             isDisabled={isDisabled}
             isInline
