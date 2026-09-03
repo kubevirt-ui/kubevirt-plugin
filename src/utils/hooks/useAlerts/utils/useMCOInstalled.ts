@@ -1,11 +1,15 @@
-import { TFunction } from 'i18next';
+import { type TFunction } from 'i18next';
 
-import { MultiClusterObservabilityModel } from '@kubevirt-utils/models';
+import { isObservabilityCMA } from '@kubevirt-utils/hooks/useVirtualizationObservabilityLink/utils';
+import {
+  ClusterManagementAddOnModel,
+  modelToGroupVersionKind,
+  MultiClusterObservabilityModel,
+} from '@kubevirt-utils/models';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 import useIsACMPage from '@multicluster/useIsACMPage';
-import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
-import { useHubClusterName } from '@stolostron/multicluster-sdk';
+import { type K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
 export const getMCONotInstalledTooltip = (t: TFunction): string =>
   t(
@@ -26,20 +30,26 @@ type UseMCOInstalledResult = {
  * MCO is required for fleet-wide Prometheus metrics polling.
  * When MCO is not installed, only the hub cluster should be shown and spoke clusters
  * should be disabled with a tooltip.
+ *
+ * Detection accepts either a MultiClusterObservability CR or a matching
+ * ClusterManagementAddOn (legacy observability-controller or MCOA).
  */
 export const useMCOInstalled = (): UseMCOInstalledResult => {
   const isACMPage = useIsACMPage();
-  const [hubClusterName] = useHubClusterName();
 
-  const [mcoResource, loaded, error] = useK8sWatchData<K8sResourceCommon[]>(
+  const [mcoResource, mcoLoaded, mcoError] = useK8sWatchData<K8sResourceCommon[]>(
     isACMPage
       ? {
-          cluster: hubClusterName,
-          groupVersionKind: {
-            group: MultiClusterObservabilityModel.apiGroup,
-            kind: MultiClusterObservabilityModel.kind,
-            version: MultiClusterObservabilityModel.apiVersion,
-          },
+          groupVersionKind: modelToGroupVersionKind(MultiClusterObservabilityModel),
+          isList: true,
+        }
+      : null,
+  );
+
+  const [observabilityAddOns, cmaLoaded, cmaError] = useK8sWatchData<K8sResourceCommon[]>(
+    isACMPage
+      ? {
+          groupVersionKind: modelToGroupVersionKind(ClusterManagementAddOnModel),
           isList: true,
         }
       : null,
@@ -52,11 +62,13 @@ export const useMCOInstalled = (): UseMCOInstalledResult => {
       mcoInstalled: true,
     };
   }
-  const mcoInstalled = !isEmpty(mcoResource);
+
+  const hasObservabilityCMA = observabilityAddOns?.some(isObservabilityCMA);
+  const mcoInstalled = !isEmpty(mcoResource) || Boolean(hasObservabilityCMA);
 
   return {
-    error,
-    loaded,
+    error: mcoError || cmaError,
+    loaded: mcoLoaded && cmaLoaded,
     mcoInstalled,
   };
 };
