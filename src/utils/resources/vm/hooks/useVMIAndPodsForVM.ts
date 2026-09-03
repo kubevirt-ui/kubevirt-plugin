@@ -1,11 +1,11 @@
 import { modelToGroupVersionKind, PodModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { IoK8sApiCoreV1Pod } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
-import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type IoK8sApiCoreV1Pod } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import useVMI from '@kubevirt-utils/resources/vm/hooks/useVMI';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 
 type UseVMIAndPodsForVMValues = {
-  error: any;
+  error: Error | undefined;
   loaded: boolean;
   pods: IoK8sApiCoreV1Pod[];
   vmi: V1VirtualMachineInstance;

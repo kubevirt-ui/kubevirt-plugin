@@ -1,14 +1,15 @@
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
 import { modelToGroupVersionKind, ServiceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { IoK8sApiCoreV1Service } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type IoK8sApiCoreV1Service } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import ServicesList from '@kubevirt-utils/components/ServicesList/ServicesList';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { useVMIAndPodsForVM } from '@kubevirt-utils/resources/vm';
 import { getServicesForVmi } from '@kubevirt-utils/resources/vmi';
 import { getVMIPod } from '@kubevirt-utils/resources/vmi/utils/pod';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 import { Card, CardBody, CardTitle, Divider } from '@patternfly/react-core';
@@ -26,6 +27,7 @@ const VirtualMachinesOverviewTabService: FC<VirtualMachinesOverviewTabServicePro
   });
 
   const {
+    error: vmiAndPodsLoadError,
     loaded: vmiAndPodsLoaded,
     pods,
     vmi,
@@ -33,6 +35,7 @@ const VirtualMachinesOverviewTabService: FC<VirtualMachinesOverviewTabServicePro
 
   const pod = getVMIPod(vmi, pods);
   const data = getServicesForVmi(services, pod, vm, vmi);
+  const vmiLoaded = vmiAndPodsLoaded || !isEmpty(vmiAndPodsLoadError);
 
   return (
     <Card>
@@ -41,7 +44,7 @@ const VirtualMachinesOverviewTabService: FC<VirtualMachinesOverviewTabServicePro
       </CardTitle>
       <Divider />
       <CardBody isFilled>
-        <ServicesList data={data} loaded={loaded && vmiAndPodsLoaded} loadError={loadError} />
+        <ServicesList data={data} loaded={loaded && vmiLoaded} loadError={loadError} />
       </CardBody>
     </Card>
   );
