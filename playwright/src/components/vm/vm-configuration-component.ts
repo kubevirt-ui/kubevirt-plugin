@@ -1,4 +1,5 @@
 import PageCommons from '@/page-objects/page-commons';
+import { getPendingStatusMessageLocator } from '@/utils/pending-changes-locator';
 import { TestTimeouts } from '@/utils/test-config';
 import type { Page } from '@playwright/test';
 
@@ -14,10 +15,7 @@ export default class VmConfigurationComponent extends PageCommons {
 
   private readonly _headlessCheckbox = this.locator('input[id="headless-mode"]');
 
-  private readonly _isTextPendingChangesTextRestartRequired = this.page
-    .getByText('Pending changes')
-    .or(this.page.getByText('Restart required'))
-    .or(this.page.getByText('Migration required'));
+  private readonly _pendingStatusMessage = getPendingStatusMessageLocator(this.page);
 
   private readonly _restoreTemplateSettingsBtn = this.locator(
     'button:has-text("Restore template settings")',
@@ -679,7 +677,7 @@ export default class VmConfigurationComponent extends PageCommons {
   }
 
   async waitForPendingChanges(timeout = 60000): Promise<boolean> {
-    const pendingLocator = this._isTextPendingChangesTextRestartRequired;
+    const pendingLocator = this._pendingStatusMessage;
     try {
       await pendingLocator
         .first()
@@ -695,7 +693,7 @@ export default class VmConfigurationComponent extends PageCommons {
   }
 
   async waitForPendingChangesToDisappear(timeout = 60000): Promise<boolean> {
-    const pendingLocator = this._isTextPendingChangesTextRestartRequired;
+    const pendingLocator = this._pendingStatusMessage;
     try {
       await pendingLocator
         .first()

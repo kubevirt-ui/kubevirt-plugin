@@ -18,7 +18,7 @@ const SUITE = 'VM NAD hot-swap';
 const NIC_NAME = 'nic-nad-swap';
 
 test.describe(SUITE, { tag: [T1_TAG, ADMIN_ONLY_TAG] }, () => {
-  test.beforeEach(async ({ utils }) => {
+  test.beforeEach(async ({ utils }): Promise<void> => {
     await utils.withAllure({
       suite: SUITE,
       feature: T1,

@@ -2,11 +2,12 @@ import React, { type FC } from 'react';
 
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import ConfirmActionMessage from '@kubevirt-utils/components/ConfirmActionMessage/ConfirmActionMessage';
+import DeleteModal from '@kubevirt-utils/components/DeleteModal/DeleteModal';
 import { deleteNetworkInterface } from '@kubevirt-utils/components/NetworkInterfaceModal/utils/helpers';
-import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { type NetworkPresentation } from '@kubevirt-utils/resources/vm/utils/network/constants';
-import { Alert, AlertVariant, ButtonVariant } from '@patternfly/react-core';
+import { Alert, AlertVariant } from '@patternfly/react-core';
 import { isRunning } from '@virtualmachines/utils';
 
 type NetworkInterfaceDeleteModalProps = {
@@ -27,34 +28,33 @@ const NetworkInterfaceDeleteModal: FC<NetworkInterfaceDeleteModalProps> = ({
   vm,
 }) => {
   const { t } = useKubevirtTranslation();
-  const deleteBtnText = t('Delete');
+  const namespace = getNamespace(vm);
 
   return (
-    <TabModal<V1VirtualMachine>
+    <DeleteModal
+      body={
+        <>
+          {isRunning(vm) && isHotPlugNIC && (
+            <Alert
+              className="pf-v6-u-mb-md"
+              component={'h6'}
+              isInline
+              title={t(
+                'Deleting a network interface is supported only on VirtualMachines that were created in versions greater than 4.13.',
+              )}
+              variant={AlertVariant.warning}
+            />
+          )}
+          <ConfirmActionMessage obj={{ metadata: { name: nicName, namespace } }} />
+        </>
+      }
       headerText={t('Delete NIC?')}
       isOpen={isOpen}
+      obj={vm}
       onClose={onClose}
-      onSubmit={() => deleteNetworkInterface(vm, nicName, nicPresentation)}
-      submitBtnText={deleteBtnText}
-      submitBtnVariant={ButtonVariant.danger}
-    >
-      <span>
-        {isRunning(vm) && isHotPlugNIC && (
-          <Alert
-            component={'h6'}
-            isInline
-            title={t(
-              'Deleting a network interface is supported only on VirtualMachines that were created in versions greater than 4.13.',
-            )}
-            variant={AlertVariant.warning}
-          />
-        )}
-        <br />
-        <ConfirmActionMessage
-          obj={{ metadata: { name: nicName, namespace: vm?.metadata?.namespace } }}
-        />
-      </span>
-    </TabModal>
+      onDeleteSubmit={() => deleteNetworkInterface(vm, nicName, nicPresentation)}
+      shouldRedirect={false}
+    />
   );
 };
 

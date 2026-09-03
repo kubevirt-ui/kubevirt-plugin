@@ -4,7 +4,7 @@
 
 import BaseComponent from '@/components/shared/base-component';
 import { TestTimeouts } from '@/utils/test-config';
-import type { Page } from '@playwright/test';
+import type { Locator, Page } from '@playwright/test';
 
 export default class VmConfigurationNetworkComponent extends BaseComponent {
   private readonly _configurationNetworkSubTab = this.testId('vm-configuration-network');
@@ -18,11 +18,11 @@ export default class VmConfigurationNetworkComponent extends BaseComponent {
     super(page);
   }
 
-  private nicActionsKebab(nicName: string) {
+  private nicActionsKebab(nicName: string): Locator {
     return this.testId(`nic-actions-${nicName}`);
   }
 
-  private nicNetworkCell(nicName: string) {
+  private nicNetworkCell(nicName: string): Locator {
     return this.testId(`nic-network-${nicName}`);
   }
 
@@ -82,8 +82,8 @@ export default class VmConfigurationNetworkComponent extends BaseComponent {
   async verifyNicDisplaysNad(nicName: string, expectedNadName: string): Promise<boolean> {
     try {
       await this.navigateToConfigurationNetwork();
-      const text = await this.getNicNetworkName(nicName);
-      return text.includes(expectedNadName);
+      const text = (await this.getNicNetworkName(nicName)).trim();
+      return text === expectedNadName.trim();
     } catch {
       return false;
     }

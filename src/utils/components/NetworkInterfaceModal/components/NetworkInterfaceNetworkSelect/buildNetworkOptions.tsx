@@ -75,7 +75,7 @@ export const buildNetworkSelectOptions = ({
       label: displayedValue,
       optionProps: {
         children: (
-          <span data-test={`network-option-${name}`}>
+          <span data-test={`network-option-${value}`}>
             {displayedValue}{' '}
             <Label isCompact>
               {getNadType(nad)} {t('Binding')}
