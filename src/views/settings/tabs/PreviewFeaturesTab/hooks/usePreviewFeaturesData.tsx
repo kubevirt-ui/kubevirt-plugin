@@ -10,8 +10,8 @@ import {
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import usePasstFeatureFlag from '@kubevirt-utils/hooks/usePasstFeatureFlag';
-import useIsHyperConvergedV1Available from '@kubevirt-utils/hooks/useVMTemplateFeatureFlag/useIsHyperConvergedV1Available';
 import useVMTemplateFeatureFlag from '@kubevirt-utils/hooks/useVMTemplateFeatureFlag/useVMTemplateFeatureFlag';
+import useIsHyperConvergedV1Available from '@kubevirt-utils/resources/hyperconverged/hooks/useIsHyperConvergedV1Available';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { PREVIEW_FEATURES_TAB_IDS } from '@settings/search/constants';
 

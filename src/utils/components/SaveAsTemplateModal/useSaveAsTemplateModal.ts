@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router';
 
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { logTemplateCreated } from '@kubevirt-utils/extensions/telemetry/templates';
+import useIsHyperConvergedV1Available from '@kubevirt-utils/resources/hyperconverged/hooks/useIsHyperConvergedV1Available';
 import { getName, getNamespace, getUID } from '@kubevirt-utils/resources/shared';
 import {
   getACMTemplateListURL,
@@ -11,10 +12,13 @@ import {
 import { createVMTemplateRequest } from '@kubevirt-utils/resources/template/utils/vmTemplateRequest';
 import { getOperatingSystem } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
 import { getWorkload } from '@kubevirt-utils/resources/vm/utils/selectors';
+import { getCluster } from '@multicluster/helpers/selectors';
 import useIsACMPage from '@multicluster/useIsACMPage';
 
 type UseSaveAsTemplateModal = {
   category: string;
+  categoryEnabledLoading: boolean;
+  isCategoryEnabled: boolean;
   onSubmit: () => Promise<void>;
   selectedProject: string;
   setCategory: Dispatch<SetStateAction<string>>;
@@ -27,6 +31,8 @@ const useSaveAsTemplateModal = (vm: V1VirtualMachine): UseSaveAsTemplateModal =>
   const navigate = useNavigate();
   const isACMPage = useIsACMPage();
 
+  const { isHCOV1, loading: isHCOV1Loading } = useIsHyperConvergedV1Available(getCluster(vm));
+
   const vmName = getName(vm);
   const vmNamespace = getNamespace(vm);
 
@@ -37,6 +43,7 @@ const useSaveAsTemplateModal = (vm: V1VirtualMachine): UseSaveAsTemplateModal =>
   const onSubmit = async (): Promise<void> => {
     await createVMTemplateRequest({
       category: category || undefined,
+      isHCOV1,
       templateName,
       templateNamespace: selectedProject,
       vm,
@@ -52,6 +59,8 @@ const useSaveAsTemplateModal = (vm: V1VirtualMachine): UseSaveAsTemplateModal =>
 
   return {
     category,
+    categoryEnabledLoading: isHCOV1Loading,
+    isCategoryEnabled: isHCOV1 && !isHCOV1Loading,
     onSubmit,
     selectedProject,
     setCategory,
