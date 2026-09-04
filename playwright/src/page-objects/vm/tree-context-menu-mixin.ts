@@ -5,8 +5,7 @@ import { TestTimeouts } from '@/utils/test-config';
 type Constructor<T = BasePage> = new (...args: any[]) => T;
 
 /**
- * Mixin that adds tree-view right-click and context menu methods.
- * Applied to both VmTreePage and VirtualMachinesPage to eliminate duplication.
+ * Mixin that adds tree-view right-click and context menu methods to VirtualMachinesPage.
  */
 export function TreeContextMenuMixin<TBase extends Constructor>(Base: TBase) {
   return class extends Base {
@@ -107,10 +106,10 @@ export function TreeContextMenuMixin<TBase extends Constructor>(Base: TBase) {
 
     async rightClickFolderInTreeView(folderName: string, namespace: string): Promise<void> {
       await this.waitForTreeStable();
-      // DOM: LI[id="folderSelector/..."] > DIV > DIV#label-selectable > SPAN.node-container > BUTTON.node-text
+      // Target only the folder row's label button (direct child div), not nested VM buttons.
       const folderButton = this.locator(
-        `[id="folderSelector/#single-cluster#/${namespace}/${folderName}"] button.pf-v6-c-tree-view__node-text`,
-      );
+        `[id="folderSelector/#single-cluster#/${namespace}/${folderName}"] > div`,
+      ).getByRole('button', { name: folderName, exact: true });
       await folderButton.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
       await folderButton.scrollIntoViewIfNeeded();
       await folderButton.click({ button: 'right' });

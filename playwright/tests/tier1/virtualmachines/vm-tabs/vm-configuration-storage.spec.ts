@@ -36,7 +36,7 @@ test.describe.serial(
 
     test('Disk driver/bus is reflected in UI for running VM', async ({
       apiClient,
-      vmTreePage,
+      vmListPage,
       vmDetailPage,
     }) => {
       const vmiBus = await apiClient.getVmiDiskBus(vmName, ns, 'rootdisk');
@@ -45,7 +45,7 @@ test.describe.serial(
         .soft(vmiBus?.toLowerCase(), 'VMI bus should be a known type (virtio/scsi/sata)')
         .toMatch(/virtio|scsi|sata/);
 
-      await vmTreePage.navigateToVmViaTreeView(ns, vmName);
+      await vmListPage.navigateToVmViaTreeView(ns, vmName);
       await vmDetailPage.navigateToConfigurationStorage();
 
       const driveValue = await vmDetailPage.getDiskDriveValue('rootdisk');
@@ -85,7 +85,7 @@ test.describe.serial(
 
     test('Disk size displayed on Configuration Storage and VMI Disks tabs, edit modal loads PVC size', async ({
       apiClient,
-      vmTreePage,
+      vmListPage,
       vmDetailPage,
       utils,
     }) => {
@@ -97,7 +97,7 @@ test.describe.serial(
       await apiClient.hotplugVolumeToVm(vmName, ns, dvDiskName, dvDiskName);
       await apiClient.waitForVmDiskPresent(vmName, ns, dvDiskName);
 
-      await vmTreePage.navigateToVmViaTreeView(ns, vmName);
+      await vmListPage.navigateToVmViaTreeView(ns, vmName);
       await vmDetailPage.navigateToConfigurationStorage();
 
       const rootdiskSize = await vmDetailPage.getDiskSizeValue('rootdisk');
@@ -132,7 +132,7 @@ test.describe.serial(
 
     test('Hotplug disk shows Make persistent action', async ({
       apiClient,
-      vmTreePage,
+      vmListPage,
       vmDetailPage,
       utils,
     }) => {
@@ -144,7 +144,7 @@ test.describe.serial(
       await apiClient.hotplugVolumeEphemeral(vmName, ns, diskName, diskName);
       await apiClient.waitForVmDiskPresent(vmName, ns, diskName);
 
-      await vmTreePage.navigateToVmViaTreeView(ns, vmName);
+      await vmListPage.navigateToVmViaTreeView(ns, vmName);
       await vmDetailPage.navigateToConfigurationStorage();
 
       const diskVisible = await vmDetailPage.verifyDiskExists(diskName);

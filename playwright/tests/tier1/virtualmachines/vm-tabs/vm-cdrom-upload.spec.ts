@@ -6,7 +6,7 @@ const SUITE = 'Tier1 VM CD-ROM upload';
 test.describe('Tier1 VM CD-ROM upload — stopped RHEL9', { tag: [T1_TAG, '@nonpriv'] }, () => {
   test('Add CD-ROM with upload starts a background upload with a toast', async ({
     apiClient,
-    vmTreePage,
+    vmListPage,
     vmDetailPage,
     utils,
   }) => {
@@ -31,7 +31,7 @@ test.describe('Tier1 VM CD-ROM upload — stopped RHEL9', { tag: [T1_TAG, '@nonp
     const result = await apiClient.verifyVmCreated(vmName, ns, utils.TestTimeouts.VM_BOOTUP);
     if (!result.exists) throw new Error(`VM ${vmName} was not created`);
 
-    await vmTreePage.navigateToVmViaTreeView(ns, vmName);
+    await vmListPage.navigateToVmViaTreeView(ns, vmName);
 
     const isoFileName = 'vm-cdrom-upload-test.iso';
     // Non-empty fixture so the upload stays abortable long enough for toast assertions.
@@ -73,7 +73,7 @@ test.describe('Tier1 VM CD-ROM upload — stopped RHEL9', { tag: [T1_TAG, '@nonp
 
   test('Aborting an in-progress CD-ROM upload from the toast cancels it', async ({
     apiClient,
-    vmTreePage,
+    vmListPage,
     vmDetailPage,
     utils,
   }) => {
@@ -98,7 +98,7 @@ test.describe('Tier1 VM CD-ROM upload — stopped RHEL9', { tag: [T1_TAG, '@nonp
     const result = await apiClient.verifyVmCreated(vmName, ns, utils.TestTimeouts.VM_BOOTUP);
     if (!result.exists) throw new Error(`VM ${vmName} was not created`);
 
-    await vmTreePage.navigateToVmViaTreeView(ns, vmName);
+    await vmListPage.navigateToVmViaTreeView(ns, vmName);
 
     const isoFileName = 'vm-cdrom-abort-test.iso';
     const isoPath = utils.TestFileFactory.createSizedIsoFile(isoFileName);

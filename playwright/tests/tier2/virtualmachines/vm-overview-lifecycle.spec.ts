@@ -40,13 +40,13 @@ test.describe.serial(
 
     test('VM snapshot lifecycle: take, restore, create VM from snapshot', async ({
       apiClient,
-      vmTreePage,
+      vmListPage,
       vmDetailPage,
       utils,
     }) => {
       test.setTimeout(utils.TestTimeouts.TEST_EXTENDED);
 
-      await vmTreePage.navigateToVmViaTreeView(ns, vmName);
+      await vmListPage.navigateToVmViaTreeView(ns, vmName);
       await vmDetailPage.navigateToSnapshots();
 
       let snapshotName: string;
@@ -79,13 +79,13 @@ test.describe.serial(
       });
     });
 
-    test('Restore VM from snapshot', async ({ apiClient, vmTreePage, vmDetailPage, utils }) => {
+    test('Restore VM from snapshot', async ({ apiClient, vmListPage, vmDetailPage, utils }) => {
       const snapshotName = utils.generateRandomSnapshotName('snapshot');
       await apiClient.createVmSnapshot(snapshotName, vmName, ns);
       apiClient.trackResource('VirtualMachineSnapshot', snapshotName, ns);
       await apiClient.waitForSnapshotReady(snapshotName, ns);
 
-      await vmTreePage.navigateToVmViaTreeView(ns, vmName);
+      await vmListPage.navigateToVmViaTreeView(ns, vmName);
       await vmDetailPage.navigateToSnapshots();
 
       const { success: restoreSuccess } = await vmDetailPage.restoreVmFromSnapshot(snapshotName);
@@ -94,7 +94,7 @@ test.describe.serial(
 
     test('Restore modal uses fixed InPlace policy without selector', async ({
       apiClient,
-      vmTreePage,
+      vmListPage,
       vmDetailPage,
       utils,
     }) => {
@@ -103,7 +103,7 @@ test.describe.serial(
       apiClient.trackResource('VirtualMachineSnapshot', snapshotName, ns);
       await apiClient.waitForSnapshotReady(snapshotName, ns);
 
-      await vmTreePage.navigateToVmViaTreeView(ns, vmName);
+      await vmListPage.navigateToVmViaTreeView(ns, vmName);
       await vmDetailPage.navigateToSnapshots();
 
       await vmDetailPage.openRestoreModalForSnapshot(snapshotName);
@@ -122,7 +122,6 @@ test.describe(
   () => {
     test('Clone a stopped VM with start-on-clone and verify the cloned VM runs', async ({
       apiClient,
-      vmTreePage,
       vmListPage,
       utils,
     }) => {
@@ -154,7 +153,7 @@ test.describe(
       );
       expect.soft(sourceCreated.exists, `Source VM ${sourceVm} should exist`).toBe(true);
 
-      await vmTreePage.navigateToProjectViaTreeView(ns);
+      await vmListPage.navigateToProjectViaTreeView(ns);
       await vmListPage.clickVmListTab();
 
       const clonedVm = utils.generateRandomVmName('clone-target');
@@ -195,7 +194,7 @@ test.describe('Running VM snapshot operations', { tag: [T2_TAG, '@tier2-snapshot
   test(
     'Take snapshot on running Fedora VM',
     { tag: ['@nonpriv'] },
-    async ({ apiClient, vmTreePage, vmDetailPage, utils, testConfig }) => {
+    async ({ apiClient, vmListPage, vmDetailPage, utils, testConfig }) => {
       await utils.withAllure({
         suite: 'VM snapshots tab',
         feature: T2,
@@ -227,7 +226,7 @@ test.describe('Running VM snapshot operations', { tag: [T2_TAG, '@tier2-snapshot
         utils.TestTimeouts.VM_BOOTUP,
       );
 
-      await vmTreePage.navigateToVmViaTreeView(namespace, fedoraVm);
+      await vmListPage.navigateToVmViaTreeView(namespace, fedoraVm);
       await vmDetailPage.navigateToSnapshots();
 
       await test.step('take snapshot and verify visible', async () => {

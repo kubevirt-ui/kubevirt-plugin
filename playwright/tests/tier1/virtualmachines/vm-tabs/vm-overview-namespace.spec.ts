@@ -4,7 +4,6 @@ import { expect, test } from '@/fixtures/vm-tabs-fixture';
 test.describe('VM Overview - namespace level', { tag: [T1_TAG, '@tier1-vm-overview'] }, () => {
   test('Namespace VM overview health and resource charts', async ({
     apiClient,
-    vmTreePage,
     vmListPage,
     utils,
   }) => {
@@ -43,7 +42,7 @@ test.describe('VM Overview - namespace level', { tag: [T1_TAG, '@tier1-vm-overvi
     await apiClient.verifyVmCreated(vmName2, namespace, utils.TestTimeouts.VM_BOOTUP);
     await apiClient.waitForVmRunning(vmName2, namespace, utils.TestTimeouts.VM_BOOTUP);
 
-    await vmTreePage.navigateToProjectViaTreeView(namespace);
+    await vmListPage.navigateToProjectViaTreeView(namespace);
 
     const result = await vmListPage.getHealthSectionWidgetsVisibility(utils.TestTimeouts.VM_BOOTUP);
     expect

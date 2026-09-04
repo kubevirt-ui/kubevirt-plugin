@@ -20,7 +20,6 @@ test.describe(
 
     test('Open storage migration modal, verify wizard steps, and close', async ({
       apiClient,
-      vmTreePage,
       vmListPage,
       utils,
     }) => {
@@ -39,7 +38,7 @@ test.describe(
       apiClient.trackResource('VirtualMachine', vmName, ns);
       await utils.waitForVirtualMachineReady(apiClient, vmName, ns, utils.TestTimeouts.VM_BOOTUP);
 
-      await vmTreePage.navigateToProjectViaTreeView(ns);
+      await vmListPage.navigateToProjectViaTreeView(ns);
       await vmListPage.clickVmListTab();
 
       await test.step('Verify Migrate Storage action is enabled for running VM', async () => {
@@ -68,7 +67,6 @@ test.describe(
 
     test('Perform full storage class migration and verify completion', async ({
       apiClient,
-      vmTreePage,
       vmListPage,
       utils,
     }) => {
@@ -95,7 +93,7 @@ test.describe(
       apiClient.trackResource('VirtualMachine', vmName, ns);
       await utils.waitForVirtualMachineReady(apiClient, vmName, ns, utils.TestTimeouts.VM_BOOTUP);
 
-      await vmTreePage.navigateToProjectViaTreeView(ns);
+      await vmListPage.navigateToProjectViaTreeView(ns);
       await vmListPage.clickVmListTab();
 
       await vmListPage.performStorageClassMigration(vmName, destinationSC);
@@ -103,7 +101,6 @@ test.describe(
 
     test('Start storage migration and cancel while in progress', async ({
       apiClient,
-      vmTreePage,
       vmListPage,
       utils,
     }) => {
@@ -122,7 +119,7 @@ test.describe(
       apiClient.trackResource('VirtualMachine', vmName, ns);
       await utils.waitForVirtualMachineReady(apiClient, vmName, ns, utils.TestTimeouts.VM_BOOTUP);
 
-      await vmTreePage.navigateToProjectViaTreeView(ns);
+      await vmListPage.navigateToProjectViaTreeView(ns);
       await vmListPage.clickVmListTab();
 
       await vmListPage.startStorageMigrationAndCancelWhileInProgress(vmName);

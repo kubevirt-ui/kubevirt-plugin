@@ -119,7 +119,7 @@ test.describe('VM Configuration — startInPause and CPU/memory lifecycle', { ta
   test(
     'Headless mode toggle and startInPause on Fedora VM',
     { tag: ['@nonpriv'] },
-    async ({ apiClient, vmTreePage, vmDetailPage, pageCommons, utils, testConfig }) => {
+    async ({ apiClient, vmListPage, vmDetailPage, pageCommons, utils, testConfig }) => {
       test.setTimeout(utils.TestTimeouts.TEST_EXTENDED);
       await utils.withAllure({
         suite: 'VM Configuration lifecycle',
@@ -153,7 +153,7 @@ test.describe('VM Configuration — startInPause and CPU/memory lifecycle', { ta
         utils.TestTimeouts.VM_BOOTUP,
       );
 
-      await vmTreePage.navigateToVmViaTreeView(namespace, vmName);
+      await vmListPage.navigateToVmViaTreeView(namespace, vmName);
       await vmDetailPage.navigateToConfigurationDetails();
 
       await vmDetailPage.editDetails(vmName, { headless: true });
@@ -170,9 +170,9 @@ test.describe('VM Configuration — startInPause and CPU/memory lifecycle', { ta
 
       await vmDetailPage.editDetails(vmName, { startInPause: true });
       await vmDetailPage.clickRestartButton();
-      await vmTreePage.searchTreeView(namespace);
-      await vmTreePage.clickTreeNodeAndEnsureExpanded(namespace, vmName, namespace);
-      await vmTreePage.clickVmInTreeView(vmName, namespace);
+      await vmListPage.searchTreeView(namespace);
+      await vmListPage.clickTreeNodeAndEnsureExpanded(namespace, vmName, namespace);
+      await vmListPage.clickVmInTreeView(vmName, namespace);
       await utils.waitForVirtualMachinePaused(
         apiClient,
         vmName,
@@ -190,7 +190,7 @@ test.describe('VM Configuration — startInPause and CPU/memory lifecycle', { ta
   test(
     'Increase CPU and memory, restart VM, and verify VMI reflects changes',
     { tag: ['@nonpriv'] },
-    async ({ apiClient, vmTreePage, vmDetailPage, utils, testConfig }) => {
+    async ({ apiClient, vmListPage, vmDetailPage, utils, testConfig }) => {
       test.setTimeout(utils.TestTimeouts.TEST_EXTENDED);
       await utils.withAllure({
         suite: 'VM Configuration lifecycle',
@@ -224,7 +224,7 @@ test.describe('VM Configuration — startInPause and CPU/memory lifecycle', { ta
         utils.TestTimeouts.VM_BOOTUP,
       );
 
-      await vmTreePage.navigateToVmViaTreeView(namespace, vmName);
+      await vmListPage.navigateToVmViaTreeView(namespace, vmName);
       await vmDetailPage.navigateToConfigurationDetails();
       await vmDetailPage.increaseCpuAndMemory();
 

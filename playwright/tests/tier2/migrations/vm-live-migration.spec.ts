@@ -10,7 +10,6 @@ test.describe(
   () => {
     test('Live migrate a running VM to another node via the VM list kebab action', async ({
       apiClient,
-      vmTreePage,
       vmListPage,
       utils,
     }) => {
@@ -36,7 +35,7 @@ test.describe(
 
       const originalNode = await apiClient.getVmNodeName(vmName, ns);
 
-      await vmTreePage.navigateToProjectViaTreeView(ns);
+      await vmListPage.navigateToProjectViaTreeView(ns);
       await vmListPage.clickVmListTab();
 
       await vmListPage.waitForVmStatus(vmName, 'Running');
@@ -65,7 +64,6 @@ test.describe(
 
     test('Migrate a running VM to a specific node', async ({
       apiClient,
-      vmTreePage,
       vmListPage,
       utils,
     }) => {
@@ -89,7 +87,7 @@ test.describe(
       apiClient.trackResource('VirtualMachine', vmName, ns);
       await utils.waitForVirtualMachineReady(apiClient, vmName, ns, utils.TestTimeouts.VM_BOOTUP);
 
-      await vmTreePage.navigateToProjectViaTreeView(ns);
+      await vmListPage.navigateToProjectViaTreeView(ns);
       await vmListPage.clickVmListTab();
 
       await vmListPage.waitForVmStatus(vmName, 'Running');

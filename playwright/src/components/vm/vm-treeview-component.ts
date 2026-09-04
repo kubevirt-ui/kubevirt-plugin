@@ -1,68 +1,25 @@
-import PageCommons from '@/page-objects/page-commons';
-import { TreeContextMenuMixin } from '@/page-objects/vm/tree-context-menu-mixin';
+/**
+ * VM list tree view: drawer, search, project/folder/VM nodes, and the empty-projects switch.
+ */
+
+import BaseComponent from '@/components/shared/base-component';
 import { TestTimeouts } from '@/utils/test-config';
 import type { Page } from '@playwright/test';
 
-export default class VmTreePage extends TreeContextMenuMixin(PageCommons) {
+export default class VmTreeViewComponent extends BaseComponent {
   private readonly _idVmsTreeViewSearchInput = this.locator('[id="vms-tree-view-search-input"]');
-  private readonly _overviewTab = this.locator('button[role="tab"]', { hasText: /^Overview$/ });
+  private readonly _localClusterNodeButton = this.locator('[id="#ALL_NS#"]').locator('button', {
+    hasText: 'Local cluster',
+  });
   private readonly _projectName = this.locator('#project-name');
   private readonly _showOnlyVMProjectsSwitch = this.testId('show-only-vm-projects-switch');
+  private readonly _somethingWrongHappened = this.locator('text=Something wrong happened');
   private readonly _treeNode = this.locator('.pf-v6-c-tree-view__node');
   private readonly _treeView = this.locator('.pf-v6-c-tree-view');
-  private readonly _vmListTab = this.locator('button[role="tab"]', {
-    hasText: /^Virtual machines$/,
-  });
   private readonly _vmsTreeview = this.testId('vms-treeview');
 
   constructor(page: Page) {
     super(page);
-  }
-
-  async captureAcmSearchRequestsForCluster(clusterName: string): Promise<{
-    totalSearchRequests: number;
-    clusterFilteredRequests: Array<{ kind: string; cluster: string }>;
-  }> {
-    const searchRequests: Array<{ body: string }> = [];
-
-    const handler = (request: {
-      method: () => string;
-      url: () => string;
-      postData: () => string | null;
-    }) => {
-      if (request.method() === 'POST' && request.url().includes('/proxy/search')) {
-        searchRequests.push({ body: request.postData() ?? '' });
-      }
-    };
-
-    this.page.on('request', handler);
-
-    await this.searchTreeView(clusterName);
-    await this.clickClusterNodeInTree(clusterName);
-    await this.page.waitForTimeout(5000);
-
-    this.page.removeListener('request', handler);
-
-    const clusterFilteredRequests: Array<{ kind: string; cluster: string }> = [];
-    for (const req of searchRequests) {
-      try {
-        const parsed = JSON.parse(req.body);
-        const filters = parsed?.variables?.input?.[0]?.filters ?? [];
-        const clusterFilter = filters.find(
-          (f: { property: string; values: string[] }) =>
-            f.property === 'cluster' && f.values?.includes(clusterName),
-        );
-        if (clusterFilter) {
-          const kindFilter = filters.find((f: { property: string }) => f.property === 'kind');
-          clusterFilteredRequests.push({
-            kind: kindFilter?.values?.[0] ?? 'unknown',
-            cluster: clusterName,
-          });
-        }
-      } catch {}
-    }
-
-    return { totalSearchRequests: searchRequests.length, clusterFilteredRequests };
   }
 
   async clearTreeViewSearch(): Promise<void> {
@@ -81,10 +38,24 @@ export default class VmTreePage extends TreeContextMenuMixin(PageCommons) {
 
   async clickFolderNode(folderName: string, namespace: string): Promise<void> {
     const nodeId = `folderSelector/#single-cluster#/${namespace}/${folderName}`;
-    const node = this.locator(`[id="${nodeId}"]`);
-    await node.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
-    await node.click();
-    await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
+    // Target only the folder row's label button (direct child div), not nested VM buttons.
+    const folderButton = this.locator(`[id="${nodeId}"] > div`).getByRole('button', {
+      name: folderName,
+      exact: true,
+    });
+
+    try {
+      await folderButton.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
+    } catch {
+      await this.searchTreeView(namespace);
+      await folderButton.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
+    }
+
+    await folderButton.scrollIntoViewIfNeeded();
+    await this.robustClick(folderButton);
+    await this.page.waitForURL((url) => url.toString().includes(`group=${folderName}`), {
+      timeout: TestTimeouts.ELEMENT_WAIT,
+    });
   }
 
   async clickFolderSelector(folderName: string, namespace: string): Promise<void> {
@@ -115,13 +86,12 @@ export default class VmTreePage extends TreeContextMenuMixin(PageCommons) {
     const labelButton = treeItem.locator('button', { hasText: 'Local cluster' });
     await labelButton.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
     await this.robustClick(labelButton);
+    await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
 
-    const tabOrError = this.page.locator('[role="tab"], :text("Something wrong happened")').first();
-    await tabOrError
-      .waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT })
-      .catch(() => undefined);
-
-    await this.recoverFromErrorBoundaryIfNeeded();
+    const hasError = await this._somethingWrongHappened.isVisible().catch(() => false);
+    if (hasError) {
+      await this.recoverFromErrorBoundaryIfNeeded();
+    }
   }
 
   async clickProjectNode(namespace: string): Promise<void> {
@@ -228,21 +198,12 @@ export default class VmTreePage extends TreeContextMenuMixin(PageCommons) {
     await this.robustClick(vmId);
   }
 
-  async clickVmListTab(): Promise<void> {
-    await this._vmListTab.waitFor({
+  async createProject(projectName: string): Promise<void> {
+    await this._localClusterNodeButton.waitFor({
       state: 'visible',
       timeout: TestTimeouts.ELEMENT_WAIT,
     });
-    await this.robustClick(this._vmListTab);
-    await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
-  }
-
-  async createProject(projectName: string): Promise<void> {
-    const localClusterNode = this.locator('[id="#ALL_NS#"]').locator('button', {
-      hasText: 'Local cluster',
-    });
-    await localClusterNode.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
-    await localClusterNode.click({ button: 'right' });
+    await this._localClusterNodeButton.click({ button: 'right' });
     await this.page.waitForTimeout(TestTimeouts.UI_ANIMATION_DELAY);
 
     const createProjectOption = this.locator('button:has-text("Create project")');
@@ -350,79 +311,12 @@ export default class VmTreePage extends TreeContextMenuMixin(PageCommons) {
     return await this._treeView.isVisible().catch(() => false);
   }
 
-  async navigateToAllNamespacesVirtualMachines() {
-    await this.goTo('/k8s/all-namespaces/kubevirt.io~v1~VirtualMachine');
-  }
-
   async navigateToAllProjects(): Promise<void> {
     return this.clickLocalClusterInTree();
   }
 
-  async navigateToFleetVirtualizationVmsForClusterNamespace(
-    clusterName: string,
-    namespace: string,
-  ): Promise<void> {
-    await this.goTo(
-      `/fleet-virtualization/kubevirt.io~v1~VirtualMachine/cluster/${clusterName}/ns/${namespace}`,
-    );
-  }
-
-  async navigateToFolderScopedVirtualMachines(
-    namespace: string,
-    folderName: string,
-  ): Promise<void> {
-    const label = encodeURIComponent(`vm.openshift.io/folder=${folderName}`);
-    await this.goTo(`/k8s/ns/${namespace}/kubevirt.io~v1~VirtualMachine?labels=${label}`);
-  }
-
-  async navigateToNamespaceVirtualMachines(namespace: string): Promise<void> {
-    await this.goTo(`/k8s/ns/${namespace}/kubevirt.io~v1~VirtualMachine`);
-  }
-
-  async navigateToNamespaceVirtualMachinesViaUI(
-    namespace: string,
-    options?: { closeWelcomeModal?: boolean },
-  ): Promise<void> {
-    await this.clickNavVirtualMachines();
-    await this.page.waitForLoadState('domcontentloaded');
-    if (options?.closeWelcomeModal) {
-      await this.tryCloseWelcomeModal();
-    }
-    await this.toggleEmptyProjectsDisplay(true);
-    await this.searchTreeView(namespace);
-    await this.clickProjectNode(namespace);
-  }
-
-  async navigateToProjectViaTreeView(namespace: string): Promise<void> {
-    await this.navigateToNamespaceVirtualMachinesViaUI(namespace, { closeWelcomeModal: true });
-  }
-
-  async navigateToProjectVirtualMachines(projectName: string): Promise<void> {
-    await this.goTo(`/k8s/ns/${projectName}/kubevirt.io~v1~VirtualMachine`);
-  }
-
-  async navigateToProjectVmListViaUI(namespace: string): Promise<void> {
-    await this.navigateToNamespaceVirtualMachinesViaUI(namespace);
-    await this.clickVmListTab();
-  }
-
-  async navigateToVirtualMachinesViaUI(): Promise<void> {
-    await this.clickNavVirtualMachines();
-  }
-
-  async navigateToVmViaTreeView(namespace: string, vmName: string): Promise<void> {
-    await this.clickNavVirtualMachines();
-    await this.page.waitForLoadState('domcontentloaded');
-    await this.tryCloseWelcomeModal();
-    await this.toggleEmptyProjectsDisplay(true);
-    await this.searchTreeView(namespace);
-    await this.clickTreeNodeAndEnsureExpanded(namespace, vmName, namespace);
-    await this.clickVmInTreeView(vmName, namespace);
-  }
-
   async recoverFromErrorBoundaryIfNeeded(timeout = TestTimeouts.ELEMENT_WAIT): Promise<boolean> {
-    const errorIndicator = this.page.locator('text=Something wrong happened');
-    const hasError = await errorIndicator
+    const hasError = await this._somethingWrongHappened
       .waitFor({ state: 'visible', timeout: 3000 })
       .then(() => true)
       .catch(() => false);

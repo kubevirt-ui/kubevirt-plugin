@@ -179,58 +179,7 @@ Remaining failures: <list with classification>
 
 ## Test Tier Definitions
 
-| Tier     | Scope                                                                                                             | Where to add new tests   |
-| -------- | ----------------------------------------------------------------------------------------------------------------- | ------------------------ |
-| Gating   | Basic navigation + page load verification for each major route; resource creation (form + YAML) per module        | `tests/gating/`          |
-| Tier 1   | Single-resource CRUD lifecycle for each module; VM tab configuration; does NOT overlap gating                     | `tests/tier1/<feature>/` |
-| Tier 2   | Cross-module integration (e.g. BV → VM wizard, snapshot → clone); VM live/storage migration; multi-step workflows | `tests/tier2/<feature>/` |
-| Settings | Cluster and user settings                                                                                         | `tests/settings/`        |
-| API      | API contract tests — CRUD lifecycle and endpoint validation via `RequestContextClient` (no browser UI)            | `tests/api/`             |
-
-### Current test file map
-
-```
-tests/
-├── gating/
-│   ├── scenario-virtualization-pages.spec.ts   # Page load + navigation verification
-│   └── scenario-resource-creation.spec.ts      # VM, template, BV creation (form + YAML)
-├── tier1/
-│   ├── bootable-volumes/                       # BV list, create, delete
-│   ├── checkups/                               # Network/storage checkup lifecycle
-│   ├── create-vm/                              # VM wizard (template, custom config)
-│   ├── instanceTypes/                          # Instance type CRUD
-│   ├── migrationpolicies/                      # Migration policy CRUD
-│   ├── templates/                              # Template creation, detail tabs, lifecycle
-│   └── virtualmachines/
-│       ├── vm-actions/                         # VM lifecycle actions, delete
-│       └── vm-tabs/                            # Configuration, diagnostics, disks, overview
-├── tier2/
-│   ├── bootable-volumes/                       # BV cross-module (API → UI list → cleanup)
-│   ├── create-vm/                              # Clone wizard (clone existing VM)
-│   ├── migrations/                             # Live migration, storage migration
-│   └── virtualmachines/                        # Snapshots (take/restore/clone), VM clone
-├── settings/
-│   ├── aaq-quotas.spec.ts                      # AAQ quota settings
-│   ├── cluster-settings.spec.ts                # Cluster-level settings
-│   └── user-settings.spec.ts                   # User preferences
-└── api/                                        # API contract tests (no browser UI)
-    ├── vm-vmi-lifecycle-api.spec.ts             # VM/VMI lifecycle (start/stop/restart/delete)
-    ├── vm-crud-api.spec.ts                      # VM CRUD operations
-    ├── vm-list-api.spec.ts                      # VM list endpoints
-    ├── vm-detail-api.spec.ts                    # VM detail page endpoints
-    ├── vm-migration-api.spec.ts                 # VMIM CRUD
-    ├── vm-snapshots-extended-api.spec.ts        # Snapshot/restore full lifecycle
-    ├── vm-save-as-template-api.spec.ts          # Save VM as template
-    ├── vm-folders-api.spec.ts                   # VM folder operations
-    ├── bootable-volumes-api.spec.ts             # BV read endpoints
-    ├── bootable-volumes-crud-api.spec.ts        # BV DataVolume/DataSource CRUD
-    ├── create-vm-api.spec.ts                    # VM creation page endpoints
-    ├── instance-types-crud-api.spec.ts          # Instance type CRUD
-    ├── migration-policies-crud-api.spec.ts      # Migration policy CRUD
-    ├── snapshots-crud-api.spec.ts               # Snapshot CRUD
-    ├── storage-migration-plan-crud-api.spec.ts  # Storage migration plan CRUD
-    └── templates-crud-api.spec.ts               # Template CRUD
-```
+Canonical tier table, placement rules, and test file map live in [create-test.md](./create-test.md#test-tiers-and-directories). Do not duplicate them here.
 
 ## Project Structure Reference
 

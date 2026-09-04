@@ -11,7 +11,7 @@ test.describe(
   () => {
     test('Clone wizard selects a source VM, creates a clone, and the clone reaches Running state', async ({
       apiClient,
-      vmTreePage,
+      vmListPage,
       vmWizardNavigationPage,
       vmWizardComputePage,
       utils,
@@ -43,10 +43,10 @@ test.describe(
         );
       });
 
-      await vmTreePage.switchToVirtualizationPerspective();
+      await vmListPage.switchToVirtualizationPerspective();
 
       await test.step('Step 1: Deployment details — select Clone existing VirtualMachine', async () => {
-        await vmTreePage.navigateToProjectVmListViaUI(cloneNs);
+        await vmListPage.navigateToProjectVmListViaUI(cloneNs);
         await vmWizardNavigationPage.openWizardFromCreateDropdown();
 
         const wizardVisible = await vmWizardNavigationPage.verifyWizardVisible();

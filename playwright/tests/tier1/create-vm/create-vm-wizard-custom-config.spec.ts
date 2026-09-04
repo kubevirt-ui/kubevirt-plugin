@@ -10,7 +10,7 @@ test.describe(
   () => {
     test('Custom configuration wizard creates a RHEL VM through all steps and reaches Running state', async ({
       apiClient,
-      vmTreePage,
+      vmListPage,
       vmWizardNavigationPage,
       vmWizardBootSourcePage,
       vmWizardComputePage,
@@ -25,8 +25,8 @@ test.describe(
 
       const wizardNs = await setupTestNamespace(apiClient, 'wizard-custom');
 
-      await vmTreePage.switchToVirtualizationPerspective();
-      await vmTreePage.navigateToProjectVmListViaUI(wizardNs);
+      await vmListPage.switchToVirtualizationPerspective();
+      await vmListPage.navigateToProjectVmListViaUI(wizardNs);
       await vmWizardNavigationPage.openWizardFromCreateDropdown();
 
       const wizardVisible = await vmWizardNavigationPage.verifyWizardVisible();

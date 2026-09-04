@@ -7,7 +7,7 @@ const SUITE = 'Resource creation (gating)';
 
 test.describe('Resource creation (gating)', { tag: [GATING_TAG, '@resource-creation'] }, () => {
   test('Create a VM via the creation wizard', async ({
-    vmTreePage,
+    vmListPage,
     vmCreationWizardPage,
     vmDetailPage,
     apiClient,
@@ -16,7 +16,7 @@ test.describe('Resource creation (gating)', { tag: [GATING_TAG, '@resource-creat
   }) => {
     await utils.withAllure({ suite: SUITE, feature: GATING, tags: [GATING_TAG, 'e2e-create'] });
 
-    await vmTreePage.navigateToVirtualMachinesViaUI();
+    await vmListPage.navigateToVirtualMachinesViaUI();
     await vmCreationWizardPage.openWizardFromCreateDropdown();
     await vmCreationWizardPage.selectCreationMethod('newVm');
     await vmCreationWizardPage.ensureVmNameFilled();
@@ -65,7 +65,6 @@ test.describe('Resource creation (gating)', { tag: [GATING_TAG, '@resource-creat
   });
 
   test('Create a VM via YAML import', async ({
-    vmTreePage,
     vmListPage,
     apiClient,
     testConfig,
@@ -80,7 +79,7 @@ test.describe('Resource creation (gating)', { tag: [GATING_TAG, '@resource-creat
       .join('\n');
     apiClient.trackResource('VirtualMachine', vmName, testConfig.testNamespace);
 
-    await vmTreePage.navigateToNamespaceVirtualMachinesViaUI(testConfig.testNamespace);
+    await vmListPage.navigateToNamespaceVirtualMachinesViaUI(testConfig.testNamespace);
 
     for (let attempt = 1; attempt <= 2; attempt++) {
       try {
@@ -91,7 +90,7 @@ test.describe('Resource creation (gating)', { tag: [GATING_TAG, '@resource-creat
         break;
       } catch {
         if (attempt === 2) throw new Error('YAML editor heading not visible after 2 attempts');
-        await vmTreePage.navigateToNamespaceVirtualMachinesViaUI(testConfig.testNamespace);
+        await vmListPage.navigateToNamespaceVirtualMachinesViaUI(testConfig.testNamespace);
       }
     }
 
@@ -178,7 +177,7 @@ test.describe('Resource creation (gating)', { tag: [GATING_TAG, '@resource-creat
   test('Create a template from a virtual machine', async ({
     apiClient,
     vmDetailPage,
-    vmTreePage,
+    vmListPage,
     templatesPage,
     testConfig,
     utils,
@@ -195,7 +194,7 @@ test.describe('Resource creation (gating)', { tag: [GATING_TAG, '@resource-creat
     const created = await apiClient.verifyVmCreated(vmName, ns, utils.TestTimeouts.VM_BOOTUP);
     expect(created.exists, `VM ${vmName} should be created`).toBe(true);
 
-    await vmTreePage.navigateToVmViaTreeView(ns, vmName);
+    await vmListPage.navigateToVmViaTreeView(ns, vmName);
     const nameVisible = await vmDetailPage.isVmNameVisible(
       vmName,
       utils.TestTimeouts.UI_ELEMENT_VISIBILITY,

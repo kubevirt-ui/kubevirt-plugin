@@ -27,22 +27,24 @@ Without `--local`, locator discovery relies on the live UI via Playwright MCP (`
 
 ### Test Tiers and Directories
 
-| Tier     | Directory                | Fixture source                | Project name | Tags            | Scope                                                                                                    |
-| -------- | ------------------------ | ----------------------------- | ------------ | --------------- | -------------------------------------------------------------------------------------------------------- |
-| Gating   | `tests/gating/`          | `@/fixtures/gating-fixture`   | `Gating`     | `@gating`       | Page load verification per major route; resource creation (form + YAML) per module                       |
-| Tier 1   | `tests/tier1/<feature>/` | Per-feature fixture           | `Tier1`      | `@tier1`        | Single-resource CRUD lifecycle per module; VM tab configuration; must NOT overlap gating                 |
-| Tier 2   | `tests/tier2/<feature>/` | Per-feature fixture           | `Tier2`      | `@tier2`        | Cross-module integration (BV→VM wizard, snapshot→clone); VM live/storage migration; multi-step workflows |
-| Settings | `tests/settings/`        | `@/fixtures/settings-fixture` | `Settings`   | `@cnv-settings` | Cluster and user settings pages                                                                          |
-| API      | `tests/api/`             | `@/fixtures/api-test-fixture` | `API`        | `@api`          | API contract tests — CRUD lifecycle and endpoint validation via `RequestContextClient` (no browser UI)   |
+| Tier     | Directory                | Fixture source                | Project name | Tags            | Scope                                                                                                                   |
+| -------- | ------------------------ | ----------------------------- | ------------ | --------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| Gating   | `tests/gating/`          | `@/fixtures/gating-fixture`   | `Gating`     | `@gating`       | Page load verification; resource creation (form + YAML); VM search and tree filters (no VM boot)                        |
+| Tier 1   | `tests/tier1/<feature>/` | Per-feature fixture           | `Tier1`      | `@tier1`        | Single-resource CRUD lifecycle per module (templates, BVs, instance types, migration policies); must NOT overlap gating |
+| Tier 2   | `tests/tier2/<feature>/` | Per-feature fixture           | `Tier2`      | `@tier2`        | Cross-module integration (BV→VM wizard, snapshot→clone); VM live/storage migration; multi-step workflows                |
+| Settings | `tests/settings/`        | `@/fixtures/settings-fixture` | `Settings`   | `@cnv-settings` | Cluster and user settings pages                                                                                         |
+| API      | `tests/api/`             | `@/fixtures/api-test-fixture` | `API`        | `@api`          | API contract tests — CRUD lifecycle and endpoint validation via `RequestContextClient` (no browser UI)                  |
 
 ### Where to place a new test
 
 1. **Does it verify a page loads and shows expected content?** → **Gating** (add to existing `scenario-virtualization-pages.spec.ts`)
 2. **Does it create a resource via form or YAML?** → Check if gating already has it; if not, add to gating's `scenario-resource-creation.spec.ts`. If it's a full CRUD lifecycle, add to **Tier 1**.
-3. **Does it test a single resource's lifecycle (create → configure → verify → delete)?** → **Tier 1** under `tests/tier1/<feature>/`
-4. **Does it test cross-module integration, multi-resource workflows, or migration?** → **Tier 2** under `tests/tier2/<feature>/`
-5. **Does it test cluster or user settings?** → **Settings** under `tests/settings/`
-6. **Does it validate API contracts (CRUD, list, subresources) without browser UI?** → **API** under `tests/api/`
+3. **Does it test VM search language, tree view or filters?** → **Gating** under `tests/gating/virtualmachines/`
+4. **Does it test VM tabs, lifecycle/delete, disks/CD-ROM, or list alerts?** → **Tier 1** under `tests/tier1/virtualmachines/`
+5. **Does it test a single resource's lifecycle (create → configure → verify → delete)?** → **Tier 1** under `tests/tier1/<feature>/`
+6. **Does it test cross-module integration, multi-resource workflows, or migration?** → **Tier 2** under `tests/tier2/<feature>/`
+7. **Does it test cluster or user settings?** → **Settings** under `tests/settings/`
+8. **Does it validate API contracts (CRUD, list, subresources) without browser UI?** → **API** under `tests/api/`
 
 ### Current test file map
 
@@ -50,7 +52,10 @@ Without `--local`, locator discovery relies on the live UI via Playwright MCP (`
 tests/
 ├── gating/
 │   ├── scenario-virtualization-pages.spec.ts   # Page load + navigation verification
-│   └── scenario-resource-creation.spec.ts      # VM, template, BV creation (form + YAML)
+│   ├── scenario-resource-creation.spec.ts      # VM, template, BV creation (form + YAML)
+│   └── virtualmachines/
+│       ├── vm-search/                          # VM search language and filters (halted VMs)
+│       └── vm-tree/                            # Tree view
 ├── tier1/
 │   ├── bootable-volumes/                       # BV list, create, delete
 │   ├── checkups/                               # Network/storage checkup lifecycle
@@ -59,8 +64,9 @@ tests/
 │   ├── migrationpolicies/                      # Migration policy CRUD
 │   ├── templates/                              # Template creation, detail tabs, lifecycle
 │   └── virtualmachines/
-│       ├── vm-actions/                         # VM lifecycle actions, delete
-│       └── vm-tabs/                            # Configuration, diagnostics, disks, overview
+│       ├── vm-list/                            # VM list alerts
+│       ├── vm-actions/                         # Start/stop/restart, delete, bulk actions
+│       └── vm-tabs/                            # Configuration, diagnostics, disks, CD-ROM, overview
 ├── tier2/
 │   ├── bootable-volumes/                       # BV cross-module (API → UI list → cleanup)
 │   ├── create-vm/                              # Clone wizard (clone existing VM)

@@ -100,7 +100,7 @@ Tests are organized into projects. Each project maps to a tier with its own scop
 
 | Project    | Directory                | Scope                                                         | Tags            |
 | ---------- | ------------------------ | ------------------------------------------------------------- | --------------- |
-| `Gating`   | `tests/gating/`          | Page loads, basic navigation, resource creation (form + YAML) | `@gating`       |
+| `Gating`   | `tests/gating/`          | Page loads, resource creation, VM search/tree filters         | `@gating`       |
 | `Tier1`    | `tests/tier1/<feature>/` | Single-resource CRUD lifecycle per module                     | `@tier1`        |
 | `Tier2`    | `tests/tier2/<feature>/` | Cross-module integration, migrations, multi-step workflows    | `@tier2`        |
 | `Settings` | `tests/settings/`        | Cluster and user settings (runs in isolation)                 | `@cnv-settings` |

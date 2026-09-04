@@ -3,9 +3,9 @@
 ## 1. Project Overview
 
 - **Project Name:** KubeVirt UI — Playwright E2E Tests
-- **Feature Area:** Tier1 — Virtual machines / Search
+- **Feature Area:** Gating — Virtual machines / Search
 - **Latest version:** CNV 5.0.0
-- **Latest update:** 2026-08-18
+- **Latest update:** 2026-09-01
 - **Document Status:** Approved
 
 ## 2. Introduction
@@ -27,7 +27,7 @@ that submitted queries actually show and hide VirtualMachines in the list.
 
 ## 3. Test Environment & Prerequisites
 
-- **Environment:** OpenShift with CNV operator installed; Playwright `Tier1` project.
+- **Environment:** OpenShift with CNV operator installed; Playwright `Gating` project.
 - **Configuration:** No special feature gates required.
 - **Initial Setup:** `beforeAll` creates three Halted VMs in the test namespace, then waits until each
   has `printableStatus: Stopped`:
@@ -41,9 +41,9 @@ that submitted queries actually show and hide VirtualMachines in the list.
 
 ## 4. Test Case Definitions
 
-**Spec file:** `tests/tier1/virtualmachines/vm-search/vm-search-language.spec.ts`
-**Describe:** `VM Search Language` — **Tags:** `@tier1`, `@vm-search`
-**Allure:** suite `VM Search Language`, feature `Tier 1`
+**Spec file:** `tests/gating/virtualmachines/vm-search/vm-search-language.spec.ts`
+**Describe:** `VM Search Language` — **Tags:** `@gating`, `@vm-search`
+**Allure:** suite `VM Search Language`, feature `Gating`
 
 ---
 

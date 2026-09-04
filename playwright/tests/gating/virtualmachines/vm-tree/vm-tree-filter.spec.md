@@ -3,9 +3,9 @@
 ## 1. Project Overview
 
 - **Project Name:** KubeVirt UI — Playwright E2E Tests
-- **Feature Area:** Tier1 — Virtual machines / Tree view
+- **Feature Area:** Gating — Virtual machines / Tree view
 - **Latest version:** CNV 5.1.0
-- **Latest update:** 2026-08-25
+- **Latest update:** 2026-09-01
 - **Document Status:** Approved
 
 ## 2. Introduction
@@ -26,7 +26,7 @@ enabled when the cluster has VirtualMachines, and that toggling it hides and sho
 
 ## 3. Test Environment & Prerequisites
 
-- **Environment:** OpenShift with CNV operator installed; Playwright `Tier1` project. The cluster
+- **Environment:** OpenShift with CNV operator installed; Playwright `Gating` project. The cluster
   already has at least one VirtualMachine from global setup.
 - **Configuration:** No special feature gates required. Tests run on standalone virtualization
   (not ACM).
@@ -37,9 +37,9 @@ enabled when the cluster has VirtualMachines, and that toggling it hides and sho
 
 ## 4. Test Case Definitions
 
-**Spec file:** `tests/tier1/virtualmachines/vm-tree/vm-tree-filter.spec.ts`
-**Describe:** `VM tree view filter` — **Tags:** `@tier1`
-**Allure:** suite `VM tree view filter`, feature `Tier 1`
+**Spec file:** `tests/gating/virtualmachines/vm-tree/vm-tree-filter.spec.ts`
+**Describe:** `VM tree view filter` — **Tags:** `@gating`
+**Allure:** suite `VM tree view filter`, feature `Gating`
 
 ---
 

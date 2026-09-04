@@ -1,6 +1,6 @@
 import { load as yamlLoad } from 'js-yaml';
 
-import { ADMIN_ONLY_TAG, T1, T1_TAG, VM_SEARCH_TAG } from '@/data-models/allure-constants';
+import { ADMIN_ONLY_TAG, GATING, GATING_TAG, VM_SEARCH_TAG } from '@/data-models/allure-constants';
 import type { KubernetesResource } from '@/data-models/kubernetes-types';
 import { expect, test } from '@/fixtures/vm-search-fixture';
 import { TestTimeouts } from '@/utils/test-config';
@@ -13,7 +13,7 @@ const projectParams = (url: string): string[] => new URL(url).searchParams.getAl
 const isAllNamespacesPath = (url: string): boolean =>
   new URL(url).pathname.includes('/all-namespaces/');
 
-test.describe(SUITE, { tag: [T1_TAG, VM_SEARCH_TAG] }, () => {
+test.describe(SUITE, { tag: [GATING_TAG, VM_SEARCH_TAG] }, () => {
   let projectA: string;
   let projectB: string;
   let vmA: string;
@@ -65,8 +65,8 @@ test.describe(SUITE, { tag: [T1_TAG, VM_SEARCH_TAG] }, () => {
   test('clicking a project node applies a Project filter', async ({ vmListPage, utils }) => {
     await utils.withAllure({
       suite: SUITE,
-      feature: T1,
-      tags: [T1_TAG, VM_SEARCH_TAG, ADMIN_ONLY_TAG],
+      feature: GATING,
+      tags: [GATING_TAG, VM_SEARCH_TAG, ADMIN_ONLY_TAG],
     });
 
     await test.step('Click Local cluster, then click project A in the tree', async () => {
@@ -105,8 +105,8 @@ test.describe(SUITE, { tag: [T1_TAG, VM_SEARCH_TAG] }, () => {
   }) => {
     await utils.withAllure({
       suite: SUITE,
-      feature: T1,
-      tags: [T1_TAG, VM_SEARCH_TAG, ADMIN_ONLY_TAG],
+      feature: GATING,
+      tags: [GATING_TAG, VM_SEARCH_TAG, ADMIN_ONLY_TAG],
     });
 
     await test.step('Click Local cluster, then click project A in the tree', async () => {
@@ -130,8 +130,8 @@ test.describe(SUITE, { tag: [T1_TAG, VM_SEARCH_TAG] }, () => {
   test('clicking Local cluster clears the Project filter', async ({ vmListPage, utils }) => {
     await utils.withAllure({
       suite: SUITE,
-      feature: T1,
-      tags: [T1_TAG, VM_SEARCH_TAG, ADMIN_ONLY_TAG],
+      feature: GATING,
+      tags: [GATING_TAG, VM_SEARCH_TAG, ADMIN_ONLY_TAG],
     });
 
     await test.step('Click Local cluster, then click project A in the tree', async () => {
@@ -162,15 +162,43 @@ test.describe(SUITE, { tag: [T1_TAG, VM_SEARCH_TAG] }, () => {
         .toBe(true);
     });
 
-    await test.step('VMs from both projects are visible', async () => {
-      const vmAVisible = await vmListPage.isVmVisibleByDataTest(vmA);
-      const vmBVisible = await vmListPage.isVmVisibleByDataTest(vmB);
+    await test.step('Search input does not contain the Project filter', async () => {
+      // fillVmSearchInput() clears the box first; asserting here so a leftover
+      // project query cannot be wiped and make the next step pass anyway.
+      const searchValue = await vmListPage.getSearchInputValue();
+      expect(
+        searchValue,
+        `Search input should not contain a project filter (got: "${searchValue}")`,
+      ).not.toMatch(/project:/i);
+      expect(
+        searchValue,
+        `Search input should not contain project A "${projectA}" (got: "${searchValue}")`,
+      ).not.toContain(projectA);
 
+      const chips = await vmListPage.getFilterChipTexts();
+      expect(
+        chips.some((chip) => chip.includes(projectA)),
+        `Project chip "${projectA}" should not be in the search box (got: ${chips.join(', ')})`,
+      ).toBe(false);
+    });
+
+    await test.step('VMs from both projects are visible', async () => {
+      // Paginated all-namespaces list; search each name (name filter uses selected[0] only).
+      await vmListPage.fillVmSearchInput(vmA);
       expect
-        .soft(vmAVisible, `VM ${vmA} should be visible after clearing the project filter`)
+        .soft(
+          await vmListPage.isVmVisibleByDataTest(vmA),
+          `VM ${vmA} should be visible after clearing the project filter`,
+        )
         .toBe(true);
+
+      await vmListPage.clickClearSearchButton();
+      await vmListPage.fillVmSearchInput(vmB);
       expect
-        .soft(vmBVisible, `VM ${vmB} should be visible after clearing the project filter`)
+        .soft(
+          await vmListPage.isVmVisibleByDataTest(vmB),
+          `VM ${vmB} should be visible after clearing the project filter`,
+        )
         .toBe(true);
     });
   });
@@ -181,8 +209,8 @@ test.describe(SUITE, { tag: [T1_TAG, VM_SEARCH_TAG] }, () => {
   }) => {
     await utils.withAllure({
       suite: SUITE,
-      feature: T1,
-      tags: [T1_TAG, VM_SEARCH_TAG, ADMIN_ONLY_TAG],
+      feature: GATING,
+      tags: [GATING_TAG, VM_SEARCH_TAG, ADMIN_ONLY_TAG],
     });
 
     await test.step('Open the namespaced VirtualMachines list for project A', async () => {

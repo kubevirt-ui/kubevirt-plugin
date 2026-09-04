@@ -9,7 +9,6 @@
 
 import CreateVmInstanceTypesPage from '@/page-objects/create-vm/create-vm-instance-types-page';
 import VirtualMachinesPage from '@/page-objects/vm/virtual-machines-page';
-import VmTreePage from '@/page-objects/vm/vm-tree-page';
 import VmWizardBootSourcePage from '@/page-objects/vm-wizard/vm-wizard-boot-source-page';
 import VmWizardComputeCustomizationPage from '@/page-objects/vm-wizard/vm-wizard-compute-customization-page';
 import VmWizardNavigationPage from '@/page-objects/vm-wizard/vm-wizard-navigation-page';
@@ -17,7 +16,6 @@ import VmWizardNavigationPage from '@/page-objects/vm-wizard/vm-wizard-navigatio
 import { baseTest, expect } from './scenario-test-fixture';
 
 interface CreateVmFixtures {
-  vmTreePage: VmTreePage;
   vmListPage: VirtualMachinesPage;
   vmWizardNavigationPage: VmWizardNavigationPage;
   vmWizardBootSourcePage: VmWizardBootSourcePage;
@@ -26,9 +24,6 @@ interface CreateVmFixtures {
 }
 
 const test = baseTest.extend<CreateVmFixtures>({
-  vmTreePage: async ({ page }, use) => {
-    await use(new VmTreePage(page));
-  },
   vmListPage: async ({ page }, use) => {
     await use(new VirtualMachinesPage(page));
   },
