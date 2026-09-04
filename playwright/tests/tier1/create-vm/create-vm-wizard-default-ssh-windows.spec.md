@@ -88,5 +88,5 @@ a planned coverage gap (status: Pending).
 ## 6. Approvals
 
 - **Prepared By:** Test automation / QE
-- **Reviewed By:** **\*\*\*\***\_\_**\*\*\*\***
-- **Approval Signature:** **\*\*\*\***\_\_**\*\*\*\***
+- **Reviewed By:** Batya Nahmias
+- **Approval Signature:** Batya Nahmias

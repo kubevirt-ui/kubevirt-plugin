@@ -14,6 +14,7 @@ const TOUR_STEP_COUNTER_LOCATOR = '[data-test="tour-step-counter"]';
 const TOUR_HEADER_LOCATOR = '[data-test="tour-popover-header"]';
 const TOUR_NEXT_BUTTON_LOCATOR = '[data-test="tour-next-btn"]';
 const TOUR_STEPS_COUNT = 8;
+const TOUR_GUIDE_VM_NAME = 'rhel9-tour-guide';
 
 export const verifyWelcomeModalVisibility = async (
   page: Page,
@@ -65,7 +66,9 @@ export const getTourTotalSteps = async (page: Page): Promise<number> => {
 export const enterVirtualMachinesPage = async (page: Page, nav: NavigationComponent) => {
   await nav.clickNavVirtualMachines();
   await page.waitForLoadState('load');
-  await verifyWelcomeModalVisibility(page, true, TestTimeouts.SHORT_WAIT);
+  await page.reload({ waitUntil: 'load' });
+  await page.waitForLoadState('load');
+  await verifyWelcomeModalVisibility(page, true, TestTimeouts.DEFAULT);
 };
 
 export const checkIfModalIsVisibleAfterCheckboxClick = async (page: Page) => {
@@ -87,6 +90,52 @@ export const checkIfModalIsVisibleAfterCheckboxClick = async (page: Page) => {
   ).not.toBeNull();
 
   await verifyWelcomeModalVisibility(page, true);
+};
+
+export const assertVirtualMachinesUsableDuringTour = async (page: Page) => {
+  await page
+    .locator('[data-test="tour-popover"]')
+    .waitFor({ state: 'visible', timeout: TestTimeouts.SHORT_WAIT });
+
+  const crashed = await page
+    .getByTestId('error-boundary')
+    .or(page.locator('text=Something wrong happened'))
+    .first()
+    .isVisible({ timeout: TestTimeouts.UI_STABILIZE })
+    .catch(() => false);
+  expect(
+    crashed,
+    'VirtualMachines should not show an error boundary while the tour is running',
+  ).toBe(false);
+
+  expect(
+    await page.locator('.pf-v6-c-tree-view').isVisible(),
+    'VM tree should be visible during the tour',
+  ).toBe(true);
+
+  await expect
+    .poll(
+      () =>
+        page
+          .locator('.pf-v6-c-tree-view__node')
+          .filter({ hasText: TOUR_GUIDE_VM_NAME })
+          .isVisible()
+          .catch(() => false),
+      {
+        message: `Tour guide VM ${TOUR_GUIDE_VM_NAME} should appear in the tree`,
+        timeout: TestTimeouts.ELEMENT_WAIT,
+      },
+    )
+    .toBe(true);
+
+  expect(
+    await page.getByTestId('overview-tab').isVisible(),
+    'Overview tab should be present during the tour',
+  ).toBe(true);
+  expect(
+    await page.getByTestId('vm-list-tab').isVisible(),
+    'Virtual machines tab should be present during the tour',
+  ).toBe(true);
 };
 
 export const tourStepsTest = async (page: Page) => {
