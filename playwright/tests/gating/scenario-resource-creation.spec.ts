@@ -174,7 +174,8 @@ test.describe('Resource creation (gating)', { tag: [GATING_TAG, '@resource-creat
       .toBe(true);
   });
 
-  test('Create a template from a virtual machine', async ({
+  // Re-enable after hot cluster is upgraded to CNV 4.22+ (requires template.kubevirt.io CRDs).
+  test.skip('Create a template from a virtual machine', async ({
     apiClient,
     vmDetailPage,
     vmListPage,
