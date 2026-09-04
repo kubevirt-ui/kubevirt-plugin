@@ -1,32 +1,28 @@
 /* eslint-disable */
-import { TemplateParameter } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { type TFunction } from 'i18next';
+
+import { type TemplateParameter } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
-  V1beta1DataVolumeSpec,
-  V1ContainerDiskSource,
-  V1VirtualMachine,
+  type V1beta1DataVolumeSpec,
+  type V1ContainerDiskSource,
+  type V1VirtualMachine,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { V1beta1VirtualMachineTemplateSpecParameters } from '@kubevirt-ui-ext/kubevirt-api/virt-template';
+import { type V1beta1VirtualMachineTemplateSpecParameters } from '@kubevirt-ui-ext/kubevirt-api/virt-template';
 import {
   getParameters,
   isOpenShiftTemplate,
   isVirtualMachineTemplate,
-  Template,
+  type Template,
 } from '@kubevirt-utils/resources/template';
 import { getDisks, getVolumes } from '@kubevirt-utils/resources/vm';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { NAME_INPUT_FIELD } from '@virtualmachines/wizard/steps/TemplateStep/components/TemplatesCatalog/utils/consts';
 
-export const getTemplateParametersSplit = (
-  parameters: TemplateParameter[],
-): [required: TemplateParameter[], optional: TemplateParameter[]] =>
-  (parameters ?? []).reduce(
-    (acc, currentParameter) => {
-      if (currentParameter.name === NAME_INPUT_FIELD) return acc;
-
-      acc[currentParameter.required ? 0 : 1].push(currentParameter);
-      return acc;
-    },
-    [[], []],
+export const getRequiredTemplateParameter = (parameters: TemplateParameter[]) => {
+  return (parameters ?? []).filter(
+    (parameter) => parameter.name !== NAME_INPUT_FIELD && parameter.required,
   );
+};
 
 export const getDiskSource = (
   vm: V1VirtualMachine,
@@ -83,3 +79,36 @@ export const getFirstUnfulfilledRequiredParameter = (
 
 export const allRequiredParametersAreFulfilled = (template: Template): boolean =>
   !getFirstUnfulfilledRequiredParameter(template);
+
+export const getPasswordParameterValueError = (
+  t: TFunction,
+  value: string,
+  parameterExpression: string,
+): string | undefined => {
+  if (isEmpty(parameterExpression) && isEmpty(value)) {
+    return t('Password must contain at least 1 character');
+  }
+
+  const parameterRegex = new RegExp(`^${parameterExpression}$`);
+  const isValid = parameterRegex.test(value);
+
+  if (isValid) {
+    return;
+  }
+
+  return t('Password must match the pattern: {{pattern}}', { pattern: parameterExpression });
+};
+
+export const hasPasswordParameterValueError = (
+  t: TFunction,
+  value: string,
+  parameterExpression: string,
+): boolean => Boolean(getPasswordParameterValueError(t, value, parameterExpression));
+
+export const isSomeParametersHavValidationError = (
+  parameters: TemplateParameter[],
+  t: TFunction,
+): boolean =>
+  parameters.some((parameter) =>
+    hasPasswordParameterValueError(t, parameter.value ?? '', parameter.from ?? ''),
+  );

@@ -1,12 +1,19 @@
-import React, { FC, MouseEvent } from 'react';
+import React, { type FC, type MouseEvent } from 'react';
 
-import { TemplateParameter } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { type TemplateParameter } from '@kubevirt-ui-ext/kubevirt-api/console';
+import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
+import { FormPasswordInput } from '@kubevirt-utils/components/FormPasswordInput/FormPasswordInput';
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { FormGroup, SelectOption, TextInput } from '@patternfly/react-core';
+import { FormGroup, SelectOption, TextInput, ValidatedOptions } from '@patternfly/react-core';
+import { getPasswordParameterValueError } from '@virtualmachines/wizard/steps/TemplateStep/components/TemplatesCatalogDrawer/utils/utils';
 
 import { PARAMETER_VALUE_TYPES } from './constants';
-import { getValueTypeFromParameter } from './utils';
+import {
+  getTemplateParameterByValueType,
+  getValueTypeFromParameter,
+  isPasswordParameter,
+} from './utils';
 
 type ParameterValueEditorProps = {
   isEditDisabled?: boolean;
@@ -22,26 +29,15 @@ const SelectParameterValueType: FC<ParameterValueEditorProps> = ({
   const { t } = useKubevirtTranslation();
 
   const valueType = getValueTypeFromParameter(parameter);
+  const isPassword = isPasswordParameter(parameter.name);
+  const passwordError = isPassword
+    ? getPasswordParameterValueError(t, parameter.value ?? '', parameter.from ?? '')
+    : undefined;
+  const validated = passwordError ? ValidatedOptions.error : ValidatedOptions.default;
 
-  const handleChange = (_event: MouseEvent<HTMLSelectElement>, value: string) => {
-    const newParameter = { ...parameter };
-    switch (value) {
-      case PARAMETER_VALUE_TYPES.GENERATED:
-        delete newParameter.value;
-        onChange({ ...newParameter, generate: 'expression' });
-        break;
-      case PARAMETER_VALUE_TYPES.VALUE:
-        delete newParameter.generate;
-        delete newParameter.from;
-        onChange({ ...newParameter, value: '' });
-        break;
-      case PARAMETER_VALUE_TYPES.NONE:
-        delete newParameter.generate;
-        delete newParameter.from;
-        delete newParameter.value;
-        onChange(newParameter);
-        break;
-    }
+  const handleChange = (_event: MouseEvent<HTMLSelectElement>, value: string): void => {
+    const newParameter = getTemplateParameterByValueType(parameter)[value as PARAMETER_VALUE_TYPES];
+    onChange(newParameter);
   };
 
   return (
@@ -75,12 +71,32 @@ const SelectParameterValueType: FC<ParameterValueEditorProps> = ({
           fieldId={`${parameter.name}-value`}
           label={t('Value')}
         >
-          <TextInput
-            id={`${parameter.name}-value`}
-            isDisabled={isEditDisabled}
-            onChange={(_event, value) => onChange({ ...parameter, value })}
-            value={parameter.value}
-          />
+          {isPassword ? (
+            <FormPasswordInput
+              data-test={`${parameter.name}-value`}
+              id={`${parameter.name}-value`}
+              isDisabled={isEditDisabled}
+              onChange={(event) =>
+                onChange({
+                  ...parameter,
+                  value: (event.target as HTMLInputElement).value,
+                })
+              }
+              validated={validated}
+              value={parameter.value ?? ''}
+            />
+          ) : (
+            <TextInput
+              data-test={`${parameter.name}-value`}
+              id={`${parameter.name}-value`}
+              isDisabled={isEditDisabled}
+              onChange={(_event, value) => onChange({ ...parameter, value })}
+              value={parameter.value}
+            />
+          )}
+          {passwordError && (
+            <FormGroupHelperText validated={validated}>{passwordError}</FormGroupHelperText>
+          )}
         </FormGroup>
       )}
       {valueType === PARAMETER_VALUE_TYPES.GENERATED && (
@@ -90,6 +106,7 @@ const SelectParameterValueType: FC<ParameterValueEditorProps> = ({
           label={t('From')}
         >
           <TextInput
+            data-test={`${parameter.name}-from`}
             id={`${parameter.name}-generated`}
             isDisabled={isEditDisabled}
             onChange={(_event, expression) => onChange({ ...parameter, from: expression })}
