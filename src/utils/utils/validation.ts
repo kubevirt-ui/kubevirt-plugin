@@ -33,7 +33,9 @@ export const getDNS1123LabelError = (value: string): ((t: TFunction) => string) 
 
 // Tolerates a trailing '-' since the user is likely still typing (e.g. "my-vm-").
 // A leading '-' is still rejected because it's never valid.
-export const getDNS1123LabelErrorLenient = (value: string): ((t: TFunction) => string) => {
+export const getDNS1123LabelErrorLenient = (
+  value: string,
+): ((t: TFunction) => string) | undefined => {
   const error = getDNS1123LabelError(value);
   if (
     error &&
@@ -55,18 +57,6 @@ export const validateDNS1123Label = (t: TFunction, value: string): string | unde
 };
 
 export const getFieldRequiredMessage = (t: TFunction): string => t('This field is required');
-
-/**
- * Validates a required DNS-1123 name field (trims whitespace before format validation).
- * @param t
- * @param value
- */
-export const getNameValidationMessage = (t: TFunction, value: string): string | undefined => {
-  if (!value?.trim()) {
-    return getFieldRequiredMessage(t);
-  }
-  return validateDNS1123Label(t, value);
-};
 
 export const isDigitsOnly = (value: string): boolean => /^\d+$/.test(value);
 
