@@ -6,7 +6,7 @@ import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import ServicesList from '@kubevirt-utils/components/ServicesList/ServicesList';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
-import { useVMIAndPodsForVM } from '@kubevirt-utils/resources/vm';
+import { useVMIAndPodForVM } from '@kubevirt-utils/resources/vm';
 import { getServicesForVmi } from '@kubevirt-utils/resources/vmi';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
@@ -30,10 +30,10 @@ const VirtualMachinesOverviewTabService: FC<VirtualMachinesOverviewTabServicePro
     loaded: vmiAndPodsLoaded,
     pod,
     vmi,
-  } = useVMIAndPodsForVM(getName(vm), getNamespace(vm), getCluster(vm));
+  } = useVMIAndPodForVM(getName(vm), getNamespace(vm), getCluster(vm));
 
   const data = getServicesForVmi(services, pod, vm, vmi);
-  const vmiLoaded = vmiAndPodsLoaded || !isEmpty(vmiAndPodsLoadError);
+  const vmiAndPodsResolved = vmiAndPodsLoaded || !isEmpty(vmiAndPodsLoadError);
 
   return (
     <Card>
@@ -42,7 +42,7 @@ const VirtualMachinesOverviewTabService: FC<VirtualMachinesOverviewTabServicePro
       </CardTitle>
       <Divider />
       <CardBody isFilled>
-        <ServicesList data={data} loaded={loaded && vmiLoaded} loadError={loadError} />
+        <ServicesList data={data} loaded={loaded && vmiAndPodsResolved} loadError={loadError} />
       </CardBody>
     </Card>
   );

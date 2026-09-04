@@ -7,7 +7,7 @@ import { DISABLED_GUEST_SYSTEM_LOGS_ACCESS } from '@kubevirt-utils/hooks/useFeat
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
-import { getDevices, useVMIAndPodsForVM } from '@kubevirt-utils/resources/vm';
+import { getDevices, useVMIAndPodForVM } from '@kubevirt-utils/resources/vm';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { Bullseye, spinnerSize } from '@patternfly/react-core';
 import { isRunning } from '@virtualmachines/utils';
@@ -26,7 +26,7 @@ const VirtualMachineLogViewer = ({
   vm,
 }: VirtualMachineLogViewerProps): React.JSX.Element => {
   const { t } = useKubevirtTranslation();
-  const { loaded, pod, vmi } = useVMIAndPodsForVM(getName(vm), getNamespace(vm), getCluster(vm));
+  const { loaded, pod, vmi } = useVMIAndPodForVM(getName(vm), getNamespace(vm), getCluster(vm));
   const { featureEnabled: isClusterDisabledGuestSystemLogs } = useFeatures(
     DISABLED_GUEST_SYSTEM_LOGS_ACCESS,
   );

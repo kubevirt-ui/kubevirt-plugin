@@ -5,7 +5,7 @@ import {
   type V1VirtualMachineInstance,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
-import { useVMIAndPodsForVM } from '@kubevirt-utils/resources/vm';
+import { useVMIAndPodForVM } from '@kubevirt-utils/resources/vm';
 import { hasS390xArchitecture } from '@kubevirt-utils/resources/vm/utils/architecture';
 import { DescriptionList } from '@patternfly/react-core';
 import SSHTabAuthorizedSSHKey from '@virtualmachines/details/tabs/configuration/ssh/components/SSHTabAuthorizedSSHKey';
@@ -29,7 +29,7 @@ export type VMResourceListProps = {
 };
 
 const VMDetailsPanelRightColumn: FC<VMResourceListProps> = ({ instanceTypeVM, vm, vmi }) => {
-  const { pod } = useVMIAndPodsForVM(getName(vm), getNamespace(vm));
+  const { pod } = useVMIAndPodForVM(getName(vm), getNamespace(vm));
   const vmHasS390xArchitecture = hasS390xArchitecture(vm);
 
   return (

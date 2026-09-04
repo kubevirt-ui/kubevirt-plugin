@@ -22,7 +22,7 @@ export const isPodReady = (pod): boolean =>
  * @returns {*}
  */
 export const getVMIPod = (
-  vmi: V1VirtualMachineInstance,
+  vmi: null | undefined | V1VirtualMachineInstance,
   pods: IoK8sApiCoreV1Pod[],
 ): IoK8sApiCoreV1Pod | null | undefined => {
   if (!pods || !vmi) {

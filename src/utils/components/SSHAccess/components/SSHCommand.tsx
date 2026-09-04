@@ -5,7 +5,7 @@ import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import StateHandler from '@kubevirt-utils/components/StateHandler/StateHandler';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
-import { useVMIAndPodsForVM } from '@kubevirt-utils/resources/vm';
+import { useVMIAndPodForVM } from '@kubevirt-utils/resources/vm';
 import { getVMILabelForServiceSelector } from '@kubevirt-utils/resources/vmi/utils/services';
 import { getCluster } from '@multicluster/helpers/selectors';
 import {
@@ -52,7 +52,7 @@ const SSHCommand: FC<SSHCommandProps> = ({
     loaded: vmiAndPodsLoaded,
     pod,
     vmi,
-  } = useVMIAndPodsForVM(getName(vm), getNamespace(vm), getCluster(vm));
+  } = useVMIAndPodForVM(getName(vm), getNamespace(vm), getCluster(vm));
   const loadError = sshServiceError ?? vmiAndPodsError;
 
   const onSSHChange = async (newServiceType: SERVICE_TYPES): Promise<void> => {

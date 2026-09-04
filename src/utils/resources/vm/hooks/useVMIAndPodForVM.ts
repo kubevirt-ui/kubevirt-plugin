@@ -6,18 +6,18 @@ import useVMI from '@kubevirt-utils/resources/vm/hooks/useVMI';
 import { getVMIPod } from '@kubevirt-utils/resources/vmi/utils/pod';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 
-type UseVMIAndPodsForVMValues = {
+type UseVMIAndPodForVMValues = {
   error: Error | undefined;
   loaded: boolean;
   pod: IoK8sApiCoreV1Pod | null | undefined;
-  vmi: V1VirtualMachineInstance;
+  vmi: undefined | V1VirtualMachineInstance;
 };
 
-export const useVMIAndPodsForVM = (
+export const useVMIAndPodForVM = (
   vmName: string,
   vmNamespace: string,
   vmCluster?: string,
-): UseVMIAndPodsForVMValues => {
+): UseVMIAndPodForVMValues => {
   const { vmi, vmiLoaded, vmiLoadError } = useVMI(vmName, vmNamespace, vmCluster);
 
   const [pods, podsLoaded, podsLoadError] = useK8sWatchData<K8sResourceCommon[]>({
