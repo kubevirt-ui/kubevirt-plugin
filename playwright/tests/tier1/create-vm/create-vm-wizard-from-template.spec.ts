@@ -72,6 +72,55 @@ test.describe(
         const hostname = await vmWizardComputePage.getCustomizationVmName();
         expect.soft(hostname.length, 'Hostname should be auto-generated').toBeGreaterThan(0);
 
+        await test.step('Template annotation vm.kubevirt.io/validations cannot be deleted', async () => {
+          const validationsKey = 'vm.kubevirt.io/validations';
+          await vmWizardComputePage.selectCustomizationTab('Labels and annotations');
+
+          const present = await vmWizardComputePage.isAnnotationPresentInTable(validationsKey);
+          expect(present, `${validationsKey} should appear in the annotations table`).toBe(true);
+
+          const tableDeleteDisabled =
+            await vmWizardComputePage.isAnnotationTableDeleteDisabled(validationsKey);
+          expect(
+            tableDeleteDisabled,
+            `${validationsKey} should not be deletable from the table`,
+          ).toBe(true);
+
+          await vmWizardComputePage.openAnnotationsModal();
+          const modalDeleteDisabled =
+            await vmWizardComputePage.isAnnotationDeleteDisabledInModal(validationsKey);
+          expect(
+            modalDeleteDisabled,
+            `${validationsKey} should not be deletable from the modal`,
+          ).toBe(true);
+
+          await vmWizardComputePage.closeAnnotationsModal();
+        });
+
+        await test.step('System labels cannot be deleted from the modal', async () => {
+          const templateLabelKey = 'vm.kubevirt.io/template';
+
+          const present = await vmWizardComputePage.isLabelPresentInTable(templateLabelKey);
+          expect(present, `${templateLabelKey} should appear in the labels table`).toBe(true);
+
+          const tableDeleteDisabled =
+            await vmWizardComputePage.isLabelTableDeleteDisabled(templateLabelKey);
+          expect(
+            tableDeleteDisabled,
+            `${templateLabelKey} should not be deletable from the table`,
+          ).toBe(true);
+
+          await vmWizardComputePage.openLabelsModal();
+          const modalDeleteDisabled =
+            await vmWizardComputePage.isLabelDeleteDisabledInModal(templateLabelKey);
+          expect(
+            modalDeleteDisabled,
+            `${templateLabelKey} should not be deletable from the modal`,
+          ).toBe(true);
+
+          await vmWizardComputePage.closeLabelsModal();
+        });
+
         await vmWizardNavigationPage.clickNext();
       });
 

@@ -1,4 +1,4 @@
-import React, { FC, useMemo } from 'react';
+import React, { type FC, useMemo } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { validateLabelEntry } from '@kubevirt-utils/utils/labelValidation/labelValidation';
@@ -67,6 +67,7 @@ const LabelRow: FC<LabelRowProps> = ({
       <GridItem span={2}>
         <Button
           aria-label={t('Remove label')}
+          data-test={`delete-label-row-${label.key}`}
           icon={<MinusCircleIcon />}
           isDisabled={isKeyProtected}
           onClick={onDelete}
