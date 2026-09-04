@@ -4,7 +4,6 @@ import { type TFunction } from 'i18next';
 import { getInstanceTypeFromVolume } from '@kubevirt-utils/components/AddBootableVolumeModal/utils';
 import { cancelAllWizardPendingUploads } from '@kubevirt-utils/hooks/useUploadProgressToast';
 import { getDiskSize } from '@kubevirt-utils/resources/bootableresources/selectors';
-import { setCustomizeWizardVMSignal } from '@kubevirt-utils/signals/customizeWizardVMSignal';
 import CloneIcon from '@virtualmachines/wizard/steps/DeploymentDetailsStep/components/CreationMethodTileGroup/components/CreationMethodTile/components/CloneIcon';
 import { InstanceTypeIcon } from '@virtualmachines/wizard/steps/DeploymentDetailsStep/components/CreationMethodTileGroup/components/CreationMethodTile/components/InstanceTypeIcon';
 import TemplateIcon from '@virtualmachines/wizard/steps/DeploymentDetailsStep/components/CreationMethodTileGroup/components/CreationMethodTile/components/TemplateIcon';
@@ -15,6 +14,7 @@ import {
   VMCreationMethod,
   type VMWizardStep,
 } from '@virtualmachines/wizard/utils/constants';
+import { discardGeneratedVMDraft } from '@virtualmachines/wizard/utils/generatedVMDraft';
 
 import {
   CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA,
@@ -134,5 +134,5 @@ export const markStepVisited = (
 
 export const clearVMPendingUploadsAndSignal = (): void => {
   cancelAllWizardPendingUploads();
-  setCustomizeWizardVMSignal(null);
+  discardGeneratedVMDraft();
 };

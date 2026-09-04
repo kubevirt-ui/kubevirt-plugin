@@ -25,7 +25,7 @@ const VMGenerationWizardNavItem: FC<VMGenerationWizardNavItemProps> = ({
     id={step.id}
     isCurrent={step.id === activeStep?.id}
     isDisabled={step.isDisabled || isGeneratingVM || !loaded}
-    onClick={() => handleNavItemClick(step, activeStep, goToStepByIndex)}
+    onClick={() => handleNavItemClick(step, goToStepByIndex)}
     stepIndex={step.index}
   />
 );

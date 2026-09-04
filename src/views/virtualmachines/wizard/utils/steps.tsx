@@ -6,14 +6,17 @@ import VMGenerationWizardNavItem from '@virtualmachines/wizard/components/VMGene
 import { type WizardStepNavItemConfig } from './types';
 
 export const getVMGenerationNavItem =
-  (navItemConfig: WizardStepNavItemConfig): CustomWizardNavItemFunction =>
+  (
+    navItemConfig: WizardStepNavItemConfig,
+    generatedVMReady: boolean,
+  ): CustomWizardNavItemFunction =>
   (step, activeStep, _steps, goToStepByIndex) => (
     <VMGenerationWizardNavItem
       activeStep={activeStep}
       goToStepByIndex={goToStepByIndex}
       handleNavItemClick={navItemConfig.handleNavItemClick}
       isGeneratingVM={navItemConfig.isGeneratingVM}
-      loaded={navItemConfig.loaded}
+      loaded={generatedVMReady}
       step={step}
     />
   );

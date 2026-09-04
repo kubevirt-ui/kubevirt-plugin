@@ -10,6 +10,7 @@ import { Wizard, WizardHeader, WizardStep, type WizardStepType } from '@patternf
 import useCloseWizard from '@virtualmachines/wizard/hooks/useCloseWizard';
 import { useSyncDeploymentDetails } from '@virtualmachines/wizard/hooks/useSyncDeploymentDetails';
 import useWizardStepValidation from '@virtualmachines/wizard/hooks/useWizardStepValidation';
+import useGenerateVM from '@virtualmachines/wizard/steps/InstanceTypesSteps/hooks/useGenerateVM/useGenerateVM';
 
 import RequiredLabelsDrawerWrapper from './components/RequiredLabelsDrawerWrapper';
 import TemplatesDrawerWrapper from './components/TemplatesDrawerWrapper';
@@ -34,20 +35,31 @@ const VMCreationWizardContent: FC = () => {
   const { isNextDisabledForStep, isStepDisabled } = useWizardStepValidation();
   const { control, getValues, setValue } = useVMWizard();
   const creationMethod = useWatch({ control, name: CREATE_VM_FORM_FIELDS_VM_DATA.CREATION_METHOD });
-  const navItemConfig = useVMGenerationNavClick(creationMethod);
+  const { ensureGeneratedVM, ready: generatedVMReady } = useGenerateVM();
+  const navItemConfig = useVMGenerationNavClick(creationMethod, ensureGeneratedVM);
   const syncDeploymentDetails = useSyncDeploymentDetails();
   const hasLoggedCreationStartedRef = useRef(false);
 
-  const stepsToDisplay: VMWizardStepDisplay[] = useMemo(
-    () =>
-      getStepsToDisplayByCreationMethod({
-        isNextDisabledForStep,
-        isStepDisabled,
-        navItemConfig,
-        t,
-      })[creationMethod as VMCreationMethod].toSorted((a, b) => a.displayIndex - b.displayIndex),
-    [navItemConfig, isStepDisabled, isNextDisabledForStep, creationMethod, t],
-  );
+  const stepsToDisplay: VMWizardStepDisplay[] = useMemo(() => {
+    const steps = getStepsToDisplayByCreationMethod({
+      ensureGeneratedVM,
+      generatedVMReady,
+      isNextDisabledForStep,
+      isStepDisabled,
+      navItemConfig,
+      t,
+    })[creationMethod as VMCreationMethod];
+
+    return steps.toSorted((a, b) => a.displayIndex - b.displayIndex);
+  }, [
+    creationMethod,
+    ensureGeneratedVM,
+    isNextDisabledForStep,
+    isStepDisabled,
+    generatedVMReady,
+    navItemConfig,
+    t,
+  ]);
 
   const onStepChange = useCallback(
     (currentStep: WizardStepType, prevStep: WizardStepType) => {

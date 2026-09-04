@@ -4,6 +4,7 @@ import { produce } from 'immer';
 import { type TemplateParameter } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Button, ButtonVariant, Form, Stack, StackItem } from '@patternfly/react-core';
+import useMarkGeneratedVMStale from '@virtualmachines/wizard/hooks/useMarkGeneratedVMStale';
 import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
 import {
   CREATE_VM_FORM_FIELDS_UI_STATE,
@@ -30,6 +31,7 @@ const ParametersSections: FC<ParametersSectionProps> = ({
   const { t } = useKubevirtTranslation();
   const { setTemplate, template } = useDrawerContext();
   const { setValue } = useVMWizard();
+  const markGeneratedVMStale = useMarkGeneratedVMStale();
   const [isEdit, setIsEdit] = useState<boolean>(showValidation);
   const [showPasswordValidationError, setShowPasswordValidationError] = useState<boolean>(false);
 
@@ -57,9 +59,9 @@ const ParametersSections: FC<ParametersSectionProps> = ({
         return;
       }
 
+      markGeneratedVMStale();
       setValue(CREATE_VM_FORM_FIELDS_VM_DATA.SELECTED_TEMPLATE, template);
       setValue(CREATE_VM_FORM_FIELDS_UI_STATE.TEMPLATE_PROCESS_ERROR, null);
-      setValue(CREATE_VM_FORM_FIELDS_UI_STATE.LAST_PROCESSED_TEMPLATE_KEY, '');
     }
 
     setIsEdit((prev) => !prev);

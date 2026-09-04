@@ -148,6 +148,67 @@ export default class VmWizardComputeCustomizationComponent extends BaseComponent
     await descInput.fill(text);
   }
 
+  async addEphemeralDisk({
+    containerImage,
+    diskName,
+    useAsBootSource,
+  }: {
+    containerImage: string;
+    diskName: string;
+    useAsBootSource: boolean;
+  }): Promise<void> {
+    await this.selectCustomizationTab('Storage');
+
+    const addDiskButton = this._roleTabpanel.getByRole('button', { exact: true, name: 'Add' });
+    await this.robustClick(addDiskButton);
+    await this.robustClick(
+      this.page.getByRole('option', { name: /Ephemeral disk \(Container image\)/ }),
+    );
+
+    const diskModal = this.testId('dialog-modal').filter({
+      has: this.page.getByRole('heading', { name: 'Add disk' }),
+    });
+    await diskModal.waitFor({
+      state: 'visible',
+      timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+    });
+    const diskNameInput = diskModal.getByRole('textbox', { name: 'Name' });
+    await diskNameInput.fill(diskName);
+    await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
+    await diskModal.getByTestId('disk-source-container').fill(containerImage);
+
+    if (useAsBootSource) {
+      await diskModal.getByRole('checkbox', { name: 'Use this disk as a boot source' }).check();
+    }
+
+    await this.robustClick(diskModal.getByTestId('save-button'));
+    await diskModal.waitFor({
+      state: 'hidden',
+      timeout: TestTimeouts.UI_ACTION_COMPLETE,
+    });
+  }
+
+  async editCustomizationDescription(description: string): Promise<void> {
+    await this.selectCustomizationTab('Details');
+    await this.robustClick(this._roleTabpanel.locator('[data-test$="-description"]'));
+
+    const descriptionModal = this.testId('dialog-modal').filter({
+      has: this.page.getByRole('heading', { exact: true, name: 'Description' }),
+    });
+    await descriptionModal.waitFor({
+      state: 'visible',
+      timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+    });
+    await descriptionModal
+      .getByRole('textbox', { name: 'description text area' })
+      .fill(description);
+    await this.robustClick(descriptionModal.getByTestId('save-button'));
+    await descriptionModal.waitFor({
+      state: 'hidden',
+      timeout: TestTimeouts.UI_ACTION_COMPLETE,
+    });
+  }
+
   async fillReviewVmName(name: string): Promise<void> {
     const nameInput = this._inputTypeText.first();
     await nameInput.clear();
@@ -264,6 +325,34 @@ export default class VmWizardComputeCustomizationComponent extends BaseComponent
 
   async submitHostnameModalWithEnter(): Promise<void> {
     await this._hostnameModalInput.press('Enter');
+  }
+
+  async getCustomizationBootOrder(): Promise<string> {
+    await this.selectCustomizationTab('Details');
+    const bootManagementToggle = this._roleTabpanel.getByRole('button', {
+      name: 'Boot management',
+    });
+
+    if ((await bootManagementToggle.getAttribute('aria-expanded')) !== 'true') {
+      await this.robustClick(bootManagementToggle);
+    }
+
+    const bootOrder = this._roleTabpanel.locator('[data-test$="-boot-order"]');
+    await bootOrder.waitFor({
+      state: 'visible',
+      timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+    });
+    return (await bootOrder.textContent())?.trim() ?? '';
+  }
+
+  async getCustomizationDescription(): Promise<string> {
+    await this.selectCustomizationTab('Details');
+    const description = this._roleTabpanel.locator('[data-test$="-description"]');
+    await description.waitFor({
+      state: 'visible',
+      timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+    });
+    return (await description.textContent())?.trim() ?? '';
   }
 
   async getReviewDescription(): Promise<string> {
@@ -480,6 +569,21 @@ export default class VmWizardComputeCustomizationComponent extends BaseComponent
     const tabText = tab === 'redhat' ? 'Red Hat provided' : 'User provided';
     const tabButton = this.locator(`button[role="tab"]:has-text("${tabText}")`);
     await this.robustClick(tabButton.first());
+  }
+
+  async isStorageDiskPresent(diskName: string): Promise<boolean> {
+    await this.selectCustomizationTab('Storage');
+    const diskList = this._roleTabpanel.getByTestId('vm-disk-list');
+    await diskList.waitFor({
+      state: 'visible',
+      timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+    });
+    await this.waitForLoadingComplete(TestTimeouts.UI_ACTION_COMPLETE);
+
+    return diskList
+      .getByText(diskName, { exact: true })
+      .isVisible({ timeout: TestTimeouts.UI_VISIBILITY_QUICK })
+      .catch(() => false);
   }
 
   async selectCustomizationTab(
