@@ -1,7 +1,7 @@
 import React from 'react';
 import { TFunction } from 'i18next';
 
-import { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
+import { type TableExportColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { ACTIONS } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/const';
 import { MultiNamespaceVirtualMachineStorageMigrationPlan } from '@kubevirt-utils/resources/migrations/constants';
 import {
@@ -26,7 +26,7 @@ import { getStorageClassesFromMigPlan } from './utils';
 
 export const getStorageMigrationColumns = (
   t: TFunction,
-): ColumnConfig<MultiNamespaceVirtualMachineStorageMigrationPlan>[] => [
+): TableExportColumnConfig<MultiNamespaceVirtualMachineStorageMigrationPlan>[] => [
   {
     getValue: (row) => getName(row) ?? '',
     key: STORAGE_MIGRATION_COLUMN_KEYS.NAME,

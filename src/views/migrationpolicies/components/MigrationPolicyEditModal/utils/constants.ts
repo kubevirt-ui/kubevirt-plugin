@@ -1,9 +1,10 @@
-import { QuantityUnit } from '@kubevirt-utils/utils/unitConstants';
-import { BinaryUnit } from '@kubevirt-utils/utils/unitConstants';
+import { type BinaryUnit, type QuantityUnit } from '@kubevirt-utils/utils/unitConstants';
 
-export type EditMigrationPolicyInitialState = {
-  allowAutoConverge?: boolean;
-  allowPostCopy?: boolean;
+import { type MigrationPolicyBooleanSpecKey } from '../../../utils/constants';
+
+export type EditMigrationPolicyInitialState = Partial<
+  Record<MigrationPolicyBooleanSpecKey, boolean>
+> & {
   bandwidthPerMigration?: { unit: QuantityUnit; value: number };
   completionTimeoutPerGiB?: number;
   migrationPolicyName: string;

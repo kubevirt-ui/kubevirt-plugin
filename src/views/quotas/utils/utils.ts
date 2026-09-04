@@ -10,7 +10,9 @@ import {
   ResourceInfo,
 } from '@kubevirt-utils/resources/quotas/types';
 import { ApplicationAwareQuota } from '@kubevirt-utils/resources/quotas/types';
+import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { convertToBaseValue } from '@kubevirt-utils/utils/humanize.js';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 
 import { ResourceKeyKind } from '../details/types';
 
@@ -129,6 +131,30 @@ export const getResourceLabel = (key: string, t: TFunction): string => {
   };
 
   return labels[key] ?? key;
+};
+
+export const getAdditionalQuotaDisplayValue = (
+  quota: ApplicationAwareQuota,
+  t: TFunction,
+): string => {
+  const additionalResourceKeys = getAdditionalResourceKeys(quota);
+  if (isEmpty(additionalResourceKeys)) {
+    return NO_DATA_DASH;
+  }
+
+  const quotaStatus = getStatus(quota);
+  const hard = quotaStatus?.hard;
+  const used = quotaStatus?.used;
+
+  return additionalResourceKeys
+    .map((resourceKey) =>
+      t('{{label}}: {{used}} / {{hard}}', {
+        hard: hard?.[resourceKey] ?? NO_DATA_DASH,
+        label: getResourceLabel(resourceKey, t),
+        used: used?.[resourceKey] ?? NO_DATA_DASH,
+      }),
+    )
+    .join(', ');
 };
 
 export const getQuotaNumbers = (

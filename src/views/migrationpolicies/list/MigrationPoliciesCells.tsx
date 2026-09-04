@@ -12,9 +12,9 @@ import MigrationPoliciesActions from '../actions/components/MigrationPoliciesAct
 import { MigrationPolicySelectorList } from '../components/MigrationPolicySelectorList/MigrationPolicySelectorList';
 import { migrationPolicySpecKeys } from '../utils/constants';
 import {
-  getBandwidthPerMigrationText,
   getBooleanText,
   getCompletionTimeoutText,
+  getMigrationPolicyBandwidthDisplayValue,
 } from '../utils/utils';
 
 type CellProps = {
@@ -46,15 +46,11 @@ export const ClusterCell: FC<CellProps> = ({ row }) => {
   );
 };
 
-export const BandwidthCell: FC<CellProps> = ({ row }) => {
-  const hasBandwidth = migrationPolicySpecKeys.BANDWIDTH_PER_MIGRATION in (row?.spec || {});
-
-  return (
-    <span data-test={`migration-policy-bandwidth-${getName(row)}`}>
-      {hasBandwidth ? getBandwidthPerMigrationText(row?.spec?.bandwidthPerMigration) : NO_DATA_DASH}
-    </span>
-  );
-};
+export const BandwidthCell: FC<CellProps> = ({ row }) => (
+  <span data-test={`migration-policy-bandwidth-${getName(row)}`}>
+    {getMigrationPolicyBandwidthDisplayValue(row)}
+  </span>
+);
 
 export const AutoConvergeCell: FC<CellProps> = ({ row }) => {
   const hasAutoConverge = migrationPolicySpecKeys.ALLOW_AUTO_CONVERGE in (row?.spec || {});

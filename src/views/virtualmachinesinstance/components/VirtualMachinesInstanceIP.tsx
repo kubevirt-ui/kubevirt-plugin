@@ -2,6 +2,7 @@ import React, { FC } from 'react';
 
 import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { getVMIIPAddresses } from '@kubevirt-utils/resources/vmi';
 import { Button, ButtonVariant, Popover, PopoverPosition } from '@patternfly/react-core';
 
@@ -15,7 +16,7 @@ const VirtualMachinesInstancesIP: FC<VirtualMachinesInstancesIPProps> = ({ vmi }
 
   return (
     <>
-      <div>{ips?.[0]}</div>
+      <div>{ips?.[0] ?? NO_DATA_DASH}</div>
       {ips?.length > 1 && (
         <Popover
           bodyContent={ips?.map((item) => (

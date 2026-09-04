@@ -129,6 +129,45 @@ describe('buildCSVContent', () => {
     expect(csv).toBe('Name,Status\n"say ""hello""","line1\nline2"');
   });
 
+  it('quotes two comma-containing fields in the same row', () => {
+    type MultiValueRow = { conditions: string; ips: string };
+    const cols: ColumnConfig<MultiValueRow>[] = [
+      {
+        getValue: (row) => row.ips,
+        key: 'ip',
+        label: 'IP address',
+        renderCell: () => null,
+      },
+      {
+        getValue: (row) => row.conditions,
+        key: 'conditions',
+        label: 'Conditions',
+        renderCell: () => null,
+      },
+    ];
+
+    const csv = buildCSVContent(
+      [
+        {
+          conditions: 'DataVolumesReady=True, LiveMigratable=True',
+          ips: '10.0.0.1, 10.0.0.2',
+        },
+      ],
+      cols,
+    );
+
+    expect(csv).toBe(
+      'IP address,Conditions\n"10.0.0.1, 10.0.0.2","DataVolumesReady=True, LiveMigratable=True"',
+    );
+  });
+
+  it('neutralizes spreadsheet formula prefixes', () => {
+    const data: Row[] = [{ name: '=HYPERLINK("http://evil")', status: '+cmd' }];
+
+    const csv = buildCSVContent(data, columns);
+    expect(csv).toBe('Name,Status\n"\'=HYPERLINK(""http://evil"")",\'+cmd');
+  });
+
   it('passes callbacks to getValue', () => {
     type Callbacks = { suffix: string };
     const cols: ColumnConfig<Row, Callbacks>[] = [

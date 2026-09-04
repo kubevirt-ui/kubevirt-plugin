@@ -3,7 +3,7 @@ import { type TFunction } from 'i18next';
 
 import ArchitectureLabel from '@kubevirt-utils/components/ArchitectureLabel/ArchitectureLabel';
 import { getK8sRowId } from '@kubevirt-utils/components/KubevirtTable/utils';
-import { type ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
+import { type TableExportColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { ACTIONS } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/const';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import {
@@ -16,7 +16,10 @@ import {
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm';
 import { ARCHITECTURE_ID } from '@kubevirt-utils/utils/architecture';
 import { getCluster } from '@multicluster/helpers/selectors';
-import { getTemplateArchitecture } from '@templates/utils/utils';
+import {
+  getTemplateArchitecture,
+  getVirtualMachineTemplatesCPUMemoryValue,
+} from '@templates/utils/utils';
 
 import { getWorkloadProfile } from '../utils/selectors';
 import TemplateActionsCell from './cells/TemplateActionsCell';
@@ -74,8 +77,8 @@ export const getTemplateColumns = (
   t: TFunction,
   namespace: string,
   isAllClustersPage: boolean,
-): ColumnConfig<TemplateOrRequest>[] => {
-  const columns: ColumnConfig<TemplateOrRequest>[] = [
+): TableExportColumnConfig<TemplateOrRequest>[] => {
+  const columns: TableExportColumnConfig<TemplateOrRequest>[] = [
     {
       getValue: (row) => getName(row) ?? '',
       key: TEMPLATE_COLUMN_KEYS.name,
@@ -133,6 +136,10 @@ export const getTemplateColumns = (
     },
     {
       additional: true,
+      getValue: (row) =>
+        isVirtualMachineTemplateRequest(row)
+          ? NO_DATA_DASH
+          : getVirtualMachineTemplatesCPUMemoryValue(row, t),
       key: TEMPLATE_COLUMN_KEYS.cpu,
       label: t('CPU | Memory'),
       renderCell: (row) => <TemplateCPUMemoryCell row={row} />,
