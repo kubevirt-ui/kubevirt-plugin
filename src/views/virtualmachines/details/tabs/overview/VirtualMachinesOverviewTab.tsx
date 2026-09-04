@@ -1,13 +1,13 @@
-import React, { FC, useRef } from 'react';
+import React, { type FC, useRef } from 'react';
 
 import AlertsCard from '@kubevirt-utils/components/AlertsCard/AlertsCard';
 import useContainerWidth from '@kubevirt-utils/hooks/useContainerWidth';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
-import { useVMIAndPodsForVM } from '@kubevirt-utils/resources/vm/hooks/useVMIAndPodsForVM';
+import { useVMIAndPodForVM } from '@kubevirt-utils/resources/vm/hooks/useVMIAndPodForVM';
 import { useGuestOS } from '@kubevirt-utils/resources/vmi';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { Grid, GridItem, PageSection } from '@patternfly/react-core';
-import { NavPageComponentProps } from '@virtualmachines/details/utils/types';
+import { type NavPageComponentProps } from '@virtualmachines/details/utils/types';
 
 import VirtualMachinesOverviewTabActiveUser from './components/VirtualMachinesOverviewTabActiveUser/VirtualMachinesOverviewTabActiveUser';
 import VirtualMachinesOverviewTabDetails from './components/VirtualMachinesOverviewTabDetails/VirtualMachinesOverviewTabDetails';
@@ -26,7 +26,7 @@ const VirtualMachinesOverviewTab: FC<NavPageComponentProps> = ({
   obj: vm,
 }) => {
   const vmAlerts = useVMAlerts(vm);
-  const { error, loaded, pods, vmi } = useVMIAndPodsForVM(
+  const { error, loaded, pod, vmi } = useVMIAndPodForVM(
     getName(vm),
     getNamespace(vm),
     getCluster(vm),
@@ -65,7 +65,7 @@ const VirtualMachinesOverviewTab: FC<NavPageComponentProps> = ({
                 <AlertsCard sortedAlerts={vmAlerts} />
               </GridItem>
               <GridItem>
-                <VirtualMachinesOverviewTabGeneral pods={pods} vm={vm} vmi={vmi} />
+                <VirtualMachinesOverviewTabGeneral pod={pod} vm={vm} vmi={vmi} />
               </GridItem>
               <GridItem>
                 <VirtualMachinesOverviewTabSnapshots vm={vm} />

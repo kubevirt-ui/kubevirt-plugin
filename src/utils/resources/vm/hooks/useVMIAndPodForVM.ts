@@ -1,21 +1,23 @@
 import { modelToGroupVersionKind, PodModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { IoK8sApiCoreV1Pod } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
-import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type IoK8sApiCoreV1Pod } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import useVMI from '@kubevirt-utils/resources/vm/hooks/useVMI';
+import { getVMIPod } from '@kubevirt-utils/resources/vmi/utils/pod';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 
-type UseVMIAndPodsForVMValues = {
-  error: any;
+type UseVMIAndPodForVMValues = {
+  error: Error | undefined;
   loaded: boolean;
-  pods: IoK8sApiCoreV1Pod[];
-  vmi: V1VirtualMachineInstance;
+  pod: IoK8sApiCoreV1Pod | null | undefined;
+  vmi: undefined | V1VirtualMachineInstance;
 };
 
-export const useVMIAndPodsForVM = (
+export const useVMIAndPodForVM = (
   vmName: string,
   vmNamespace: string,
   vmCluster?: string,
-): UseVMIAndPodsForVMValues => {
+): UseVMIAndPodForVMValues => {
   const { vmi, vmiLoaded, vmiLoadError } = useVMI(vmName, vmNamespace, vmCluster);
 
   const [pods, podsLoaded, podsLoadError] = useK8sWatchData<K8sResourceCommon[]>({
@@ -27,11 +29,13 @@ export const useVMIAndPodsForVM = (
 
   const loaded = vmiLoaded && podsLoaded;
   const error = vmiLoadError || podsLoadError;
+  const filteredVmi =
+    vmName === getName(vmi) && vmNamespace === getNamespace(vmi) ? vmi : undefined;
 
   return {
     error,
     loaded,
-    pods,
-    vmi: vmName === vmi?.metadata?.name && vmNamespace === vmi?.metadata?.namespace && vmi,
+    pod: getVMIPod(filteredVmi, pods),
+    vmi: filteredVmi,
   };
 };
