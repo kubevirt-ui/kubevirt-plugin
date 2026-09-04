@@ -3,7 +3,11 @@ export const migrationPolicySpecKeys = {
   ALLOW_POST_COPY: 'allowPostCopy',
   BANDWIDTH_PER_MIGRATION: 'bandwidthPerMigration',
   COMPLETION_TIMEOUT_PER_GIB: 'completionTimeoutPerGiB',
-};
+} as const;
+
+export type MigrationPolicyBooleanSpecKey =
+  | typeof migrationPolicySpecKeys.ALLOW_AUTO_CONVERGE
+  | typeof migrationPolicySpecKeys.ALLOW_POST_COPY;
 
 export const MIGRATION_POLICY_COLUMN_KEYS = {
   AUTO_CONVERGE: 'auto-converge',

@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo } from 'react';
 
-import { type ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
+import { type TableExportColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { exportToCSV } from '@kubevirt-utils/hooks/useTableExport';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -12,7 +12,7 @@ type ExportTableButtonProps<TData, TCallbacks = undefined> = {
   /** When true, renders as a PatternFly ToolbarItem (use inside TableToolbarActionsGroup). */
   asToolbarItem?: boolean;
   callbacks?: TCallbacks;
-  columns: ColumnConfig<TData, TCallbacks>[];
+  columns: TableExportColumnConfig<TData, TCallbacks>[];
   data: TData[];
   filename: string;
   isDisabled?: boolean;

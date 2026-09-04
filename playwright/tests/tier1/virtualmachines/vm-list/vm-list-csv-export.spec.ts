@@ -67,11 +67,23 @@ test.describe(SUITE, { tag: [T1_TAG, ADMIN_ONLY_TAG] }, () => {
       const headers = headerLine.split(',');
 
       expect(headers, 'CSV header should include Name').toContain('Name');
+      expect(headers, 'CSV header should include Conditions').toContain('Conditions');
+      expect(headers, 'CSV header should include IP address').toContain('IP address');
       expect(headers, 'CSV header should not include Actions').not.toContain('Actions');
-      expect(
-        dataLines.some((line) => line.includes(vmName)),
-        `CSV should contain a row for VM ${vmName}`,
-      ).toBe(true);
+
+      const nameIndex = headers.indexOf('Name');
+      const conditionsIndex = headers.indexOf('Conditions');
+      const ipIndex = headers.indexOf('IP address');
+      const vmRow = dataLines.find((line) => line.includes(vmName));
+      expect(vmRow, `CSV should contain a row for VM ${vmName}`).toBeDefined();
+      if (!vmRow) {
+        return;
+      }
+
+      const cells = vmRow.split(',');
+      expect(cells[nameIndex]).toBe(vmName);
+      expect(cells[conditionsIndex]).toBe('—');
+      expect(cells[ipIndex]).toBe('—');
     });
   });
 });

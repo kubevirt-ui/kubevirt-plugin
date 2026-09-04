@@ -1,3 +1,8 @@
+export type {
+  ExportableColumnConfig,
+  TableExportColumnConfig,
+} from '@kubevirt-utils/hooks/useDataViewTableSort/types';
+
 export type { ExportTableKey } from './constants';
 export { EXPORT_TABLE_KEYS, NON_EXPORTABLE_COLUMN_KEYS } from './constants';
 export { buildCSVContent, exportToCSV, getExportableColumns } from './exportToCSV';

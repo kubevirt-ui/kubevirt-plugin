@@ -9,12 +9,12 @@ import {
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getK8sRowId } from '@kubevirt-utils/components/KubevirtTable/utils';
 import Timestamp from '@kubevirt-utils/components/Timestamp/Timestamp';
-import { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
+import { type TableExportColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { ACTIONS } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/const';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getCPU, getMemory } from '@kubevirt-utils/resources/vm';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
-import { getVMIIPAddresses, getVMINodeName } from '@kubevirt-utils/resources/vmi';
+import { getIPAddressesDisplayValue, getVMINodeName } from '@kubevirt-utils/resources/vmi';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { getDeletionProtectionPrintableStatus } from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/utils/utils';
@@ -39,6 +39,12 @@ import MemoryPercentage from './components/VirtualMachineRow/components/MemoryPe
 import NetworkUsage from './components/VirtualMachineRow/components/NetworkUsage';
 import { filterConditions } from './components/VirtualMachineRow/utils/utils';
 import { VMStatusConditionLabelList } from './components/VMStatusConditionLabel';
+import { getConditionsDisplayValue } from './components/VMStatusConditionLabel/utils';
+import {
+  getCPUUsageDisplayValue,
+  getMemoryUsageDisplayValue,
+  getNetworkUsageDisplayValue,
+} from './usageDisplayValues';
 import {
   sortByCPUUsage,
   sortByMemoryUsage,
@@ -79,7 +85,7 @@ export const getVMColumns = (
   isAllClustersPage: boolean,
   canGetNode: boolean,
   hideActions = false,
-): ColumnConfig<V1VirtualMachine, VMCallbacks>[] => [
+): TableExportColumnConfig<V1VirtualMachine, VMCallbacks>[] => [
   ...(!hideActions
     ? [
         {
@@ -129,12 +135,7 @@ export const getVMColumns = (
     sortable: true,
   },
   {
-    getValue: (row: V1VirtualMachine): string => {
-      const types = filterConditions(row)
-        ?.map((condition) => condition?.type)
-        .filter(Boolean);
-      return !isEmpty(types) ? types.join(', ') : NO_DATA_DASH;
-    },
+    getValue: (row) => getConditionsDisplayValue(filterConditions(row)),
     key: VM_COLUMN_KEYS.conditions,
     label: t('Conditions'),
     renderCell: (row) => <VMStatusConditionLabelList conditions={filterConditions(row)} />,
@@ -165,14 +166,7 @@ export const getVMColumns = (
     sortable: true,
   },
   {
-    getValue: (row, callbacks): string => {
-      const vmi = callbacks?.getVmi(row);
-      if (!vmi) {
-        return NO_DATA_DASH;
-      }
-      const ips = getVMIIPAddresses(vmi);
-      return !isEmpty(ips) ? ips.join(', ') : NO_DATA_DASH;
-    },
+    getValue: (row, callbacks) => getIPAddressesDisplayValue(callbacks?.getVmi(row)),
     key: VM_COLUMN_KEYS.ipAddress,
     label: t('IP address'),
     renderCell: (row: V1VirtualMachine, callbacks: VMCallbacks) => (
@@ -181,6 +175,8 @@ export const getVMColumns = (
   },
   {
     additional: true,
+    getValue: (row, callbacks) =>
+      getMemoryUsageDisplayValue(row, getMemory(callbacks?.getVmi(row))),
     key: VM_COLUMN_KEYS.memoryUsage,
     label: t('Memory'),
     renderCell: (row: V1VirtualMachine, callbacks: VMCallbacks) => (
@@ -191,6 +187,7 @@ export const getVMColumns = (
   },
   {
     additional: true,
+    getValue: (row, callbacks) => getCPUUsageDisplayValue(row, getCPU(callbacks?.getVmi(row))),
     key: VM_COLUMN_KEYS.cpuUsage,
     label: t('CPU'),
     renderCell: (row: V1VirtualMachine, callbacks: VMCallbacks) => (
@@ -201,6 +198,7 @@ export const getVMColumns = (
   },
   {
     additional: true,
+    getValue: (row) => getNetworkUsageDisplayValue(row),
     key: VM_COLUMN_KEYS.networkUsage,
     label: t('Network'),
     renderCell: (row: V1VirtualMachine) => <NetworkUsage vm={row} />,

@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 
 import ExportTableButton from '@kubevirt-utils/components/ExportTableButton/ExportTableButton';
 import { getActiveColumns } from '@kubevirt-utils/components/KubevirtTable/utils/getActiveColumns';
-import { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
+import { type TableExportColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { useDataViewTableSort } from '@kubevirt-utils/hooks/useDataViewTableSort/useDataViewTableSort';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 
@@ -15,7 +15,7 @@ export type KubevirtTableExportProps<TData, TCallbacks = undefined> = {
   activeColumnKeys?: string[];
   asToolbarItem?: boolean;
   callbacks?: TCallbacks;
-  columns: ColumnConfig<TData, TCallbacks>[];
+  columns: TableExportColumnConfig<TData, TCallbacks>[];
   data: TData[];
   exportFilename?: string;
   exportKey?: ExportKey;
