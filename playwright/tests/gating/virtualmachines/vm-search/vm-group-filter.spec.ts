@@ -189,13 +189,24 @@ test.describe(SUITE, { tag: [GATING_TAG, VM_SEARCH_TAG] }, () => {
       });
 
       await test.step('All VMs are visible again', async () => {
-        const alpha1Visible = await vmListPage.isVmVisibleByDataTest(vmAlpha1);
-        const beta1Visible = await vmListPage.isVmVisibleByDataTest(vmBeta1);
-        const gamma1Visible = await vmListPage.isVmVisibleByDataTest(vmGamma1);
+        // Clearing a group filter can widen scope to all-namespaces; re-select the project.
+        await vmListPage.clickProjectNode(testNamespace);
 
-        expect.soft(alpha1Visible, `VM ${vmAlpha1} should be visible after clear`).toBe(true);
-        expect.soft(beta1Visible, `VM ${vmBeta1} should be visible after clear`).toBe(true);
-        expect.soft(gamma1Visible, `VM ${vmGamma1} should be visible after clear`).toBe(true);
+        await expect
+          .poll(async () => await vmListPage.isVmVisibleByDataTest(vmAlpha1), {
+            timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+          })
+          .toBe(true);
+        await expect
+          .poll(async () => await vmListPage.isVmVisibleByDataTest(vmBeta1), {
+            timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+          })
+          .toBe(true);
+        await expect
+          .poll(async () => await vmListPage.isVmVisibleByDataTest(vmGamma1), {
+            timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+          })
+          .toBe(true);
       });
     });
   });

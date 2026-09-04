@@ -113,7 +113,8 @@ export default class VirtualMachinesPage extends TreeContextMenuMixin(PageCommon
   }
 
   async clickClearSearchButton(): Promise<void> {
-    return this.search.clickClearSearchButton();
+    await this.search.clickClearSearchButton();
+    await this.clickVmListTab();
   }
 
   async clickClusterNodeInTree(clusterName: string): Promise<void> {
@@ -144,7 +145,8 @@ export default class VirtualMachinesPage extends TreeContextMenuMixin(PageCommon
   }
 
   async clickFolderNode(folderName: string, namespace: string): Promise<void> {
-    return this.tree.clickFolderNode(folderName, namespace);
+    await this.tree.clickFolderNode(folderName, namespace);
+    await this.clickVmListTab();
   }
 
   async clickFolderOption(folderName: string): Promise<void> {
@@ -194,7 +196,8 @@ export default class VirtualMachinesPage extends TreeContextMenuMixin(PageCommon
   }
 
   async clickProjectNode(namespace: string): Promise<void> {
-    return this.tree.clickProjectNode(namespace);
+    await this.tree.clickProjectNode(namespace);
+    await this.clickVmListTab();
   }
 
   async clickQuickCreateVmButton() {
