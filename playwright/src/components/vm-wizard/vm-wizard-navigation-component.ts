@@ -67,6 +67,10 @@ export default class VmWizardNavigationComponent extends BaseComponent {
     await this.robustClick(
       this.locator('.pf-v6-c-wizard button.pf-v6-c-button.pf-m-link:has-text("Cancel")').first(),
     );
+    await this._wizardContainer.first().waitFor({
+      state: 'hidden',
+      timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+    });
   }
 
   async clearCloneSourceFilters(): Promise<void> {
