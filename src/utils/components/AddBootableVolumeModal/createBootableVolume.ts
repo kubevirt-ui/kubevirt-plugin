@@ -19,6 +19,7 @@ const getBootableVolumePromise = ({
   arch,
   bootableVolume,
   dataSource,
+  onUploadStart,
   sourceType,
   t,
   uploadData,
@@ -26,6 +27,7 @@ const getBootableVolumePromise = ({
   arch?: string;
   bootableVolume: AddBootableVolumeState;
   dataSource: V1beta1DataSource;
+  onUploadStart?: (uploadKey: string) => void;
   sourceType: DROPDOWN_FORM_SELECTION;
   t: TFunction;
   uploadData: ({ dataVolume, file }: UploadDataProps) => Promise<void>;
@@ -47,6 +49,7 @@ const getBootableVolumePromise = ({
         draftDataSource,
         uploadData,
         t,
+        onUploadStart,
       ),
     [DROPDOWN_FORM_SELECTION.USE_EXISTING_PVC]: () =>
       createPVCBootableVolume(bootableVolume, bootableVolumeNamespace, draftDataSource),
@@ -62,13 +65,21 @@ const getBootableVolumePromise = ({
 };
 
 export const createBootableVolume: CreateBootableVolumeType =
-  ({ bootableVolume, onCreateVolume, sourceType, t, uploadData }) =>
+  ({ bootableVolume, onCreateVolume, onUploadStart, sourceType, t, uploadData }) =>
   async (dataSource: V1beta1DataSource) => {
     const architectures = bootableVolume?.architectures;
 
     if (!isEmpty(architectures)) {
       const dataSourcePromises = architectures?.map((arch) =>
-        getBootableVolumePromise({ arch, bootableVolume, dataSource, sourceType, t, uploadData }),
+        getBootableVolumePromise({
+          arch,
+          bootableVolume,
+          dataSource,
+          onUploadStart,
+          sourceType,
+          t,
+          uploadData,
+        }),
       );
 
       const newDataSources = await Promise.all(dataSourcePromises);
@@ -81,6 +92,7 @@ export const createBootableVolume: CreateBootableVolumeType =
     const dataSourceWithoutArch = await getBootableVolumePromise({
       bootableVolume,
       dataSource,
+      onUploadStart,
       sourceType,
       t,
       uploadData,

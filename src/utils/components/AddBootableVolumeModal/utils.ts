@@ -90,6 +90,7 @@ export const submitAddBootableVolume = async ({
   dataSource,
   onClose,
   onCreateVolume,
+  onUploadStart,
   sourceType,
   t,
   uploadData,
@@ -102,6 +103,7 @@ export const submitAddBootableVolume = async ({
   const createVolume = createBootableVolume({
     bootableVolume,
     onCreateVolume,
+    onUploadStart,
     sourceType,
     t,
     uploadData,

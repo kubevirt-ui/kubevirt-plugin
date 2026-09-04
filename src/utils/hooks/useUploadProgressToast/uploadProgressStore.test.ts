@@ -1,11 +1,12 @@
 import { cancelUploadPVC } from '@kubevirt-utils/hooks/useCDIUpload/utils';
 
+import { UPLOAD_PROGRESS_STATUS } from './constants';
 import {
   getBootableVolumeUploadKey,
+  getExportDiskUploadKey,
   getVmCdromUploadKey,
   getVmDiskUploadKey,
 } from './keys/uploadKeys';
-import { UPLOAD_PROGRESS_STATUS } from './constants';
 import { useUploadProgressStore } from './uploadProgressStore';
 
 jest.mock('@kubevirt-utils/hooks/useCDIUpload/utils', () => ({
@@ -372,133 +373,104 @@ describe('useUploadProgressStore', () => {
     });
   });
 
-  describe('cancelAllPendingUploads', () => {
-    it('should cancel and remove all in-progress uploads', async () => {
-      const diskUploadKey = getVmDiskUploadKey(CLUSTER, NAMESPACE, VM_NAME, VM_DISK_NAME);
+  describe('cancelWizardPendingUploads', () => {
+    it('should cancel draft-VM and bootable-volume uploads without canceling other VM uploads', async () => {
+      const wizardDiskUploadKey = getVmDiskUploadKey(CLUSTER, NAMESPACE, VM_NAME, VM_DISK_NAME);
+      const wizardCdromUploadKey = getVmCdromUploadKey(CLUSTER, NAMESPACE, VM_NAME, CDROM_NAME);
+      const otherVmCdromUploadKey = getVmCdromUploadKey(
+        CLUSTER,
+        NAMESPACE,
+        OTHER_VM_NAME,
+        CDROM_NAME,
+      );
       const bootableVolumeUploadKey = getBootableVolumeUploadKey(
         BOOTABLE_VOLUME_NAMESPACE,
         BOOTABLE_VOLUME_NAME,
       );
-      const completedUploadKey = 'completed-upload-key';
-      const diskCancelUpload = jest.fn(async () => undefined);
-      const bootableCancelUpload = jest.fn(async () => undefined);
+      const exportDiskUploadKey = getExportDiskUploadKey(CLUSTER, NAMESPACE, 'export-pvc');
+      const wizardDiskCancel = jest.fn(async () => undefined);
+      const wizardCdromCancel = jest.fn(async () => undefined);
+      const otherVmCdromCancel = jest.fn(async () => undefined);
+      const bootableCancel = jest.fn(async () => undefined);
+      const exportDiskCancel = jest.fn(async () => undefined);
 
-      useUploadProgressStore.getState().startUpload(diskUploadKey, {
-        cancelUpload: diskCancelUpload,
+      useUploadProgressStore.getState().startUpload(wizardDiskUploadKey, {
+        cancelUpload: wizardDiskCancel,
+        fileName: FILE_IMAGE_ISO,
+      });
+      useUploadProgressStore.getState().startUpload(wizardCdromUploadKey, {
+        cancelUpload: wizardCdromCancel,
+        fileName: FILE_IMAGE_ISO,
+      });
+      useUploadProgressStore.getState().startUpload(otherVmCdromUploadKey, {
+        cancelUpload: otherVmCdromCancel,
         fileName: FILE_IMAGE_ISO,
       });
       useUploadProgressStore.getState().startUpload(bootableVolumeUploadKey, {
-        cancelUpload: bootableCancelUpload,
+        cancelUpload: bootableCancel,
         fileName: FILE_IMAGE_ISO,
       });
-      useUploadProgressStore.getState().startUpload(completedUploadKey, {
+      useUploadProgressStore.getState().startUpload(exportDiskUploadKey, {
+        cancelUpload: exportDiskCancel,
         fileName: FILE_IMAGE_ISO,
       });
-      useUploadProgressStore.getState().completeUpload(completedUploadKey);
 
-      await useUploadProgressStore.getState().cancelAllPendingUploads();
+      await useUploadProgressStore.getState().cancelWizardPendingUploads(
+        {
+          cluster: CLUSTER,
+          metadata: { name: VM_NAME, namespace: NAMESPACE },
+          spec: { template: {} },
+        },
+        [bootableVolumeUploadKey],
+      );
 
-      expect(diskCancelUpload).toHaveBeenCalledTimes(1);
-      expect(bootableCancelUpload).toHaveBeenCalledTimes(1);
-      expect(useUploadProgressStore.getState().getUpload(diskUploadKey)).toBeUndefined();
+      expect(wizardDiskCancel).toHaveBeenCalledTimes(1);
+      expect(wizardCdromCancel).toHaveBeenCalledTimes(1);
+      expect(bootableCancel).toHaveBeenCalledTimes(1);
+      expect(otherVmCdromCancel).not.toHaveBeenCalled();
+      expect(exportDiskCancel).not.toHaveBeenCalled();
+      expect(useUploadProgressStore.getState().getUpload(wizardDiskUploadKey)).toBeUndefined();
+      expect(useUploadProgressStore.getState().getUpload(wizardCdromUploadKey)).toBeUndefined();
       expect(useUploadProgressStore.getState().getUpload(bootableVolumeUploadKey)).toBeUndefined();
-      expect(useUploadProgressStore.getState().getUpload(completedUploadKey)?.status).toBe(
-        UPLOAD_PROGRESS_STATUS.SUCCESS,
+      expect(useUploadProgressStore.getState().getUpload(otherVmCdromUploadKey)?.status).toBe(
+        UPLOAD_PROGRESS_STATUS.UPLOADING,
+      );
+      expect(useUploadProgressStore.getState().getUpload(exportDiskUploadKey)?.status).toBe(
+        UPLOAD_PROGRESS_STATUS.UPLOADING,
       );
     });
 
-    it('should retain uploads when cancelUpload fails without a PVC fallback', async () => {
-      const failingUploadKey = getVmDiskUploadKey(CLUSTER, NAMESPACE, VM_NAME, VM_DISK_NAME);
-      const succeedingUploadKey = getBootableVolumeUploadKey(
+    it('should cancel bootable-volume uploads when no draft VM is provided', async () => {
+      const bootableVolumeUploadKey = getBootableVolumeUploadKey(
         BOOTABLE_VOLUME_NAMESPACE,
         BOOTABLE_VOLUME_NAME,
       );
-      const failingCancelUpload = jest.fn(async () => {
-        throw new Error(ERROR_CANCEL_FAILED);
-      });
-      const succeedingCancelUpload = jest.fn(async () => undefined);
-
-      useUploadProgressStore.getState().startUpload(failingUploadKey, {
-        cancelUpload: failingCancelUpload,
-        fileName: FILE_IMAGE_ISO,
-      });
-      useUploadProgressStore.getState().startUpload(succeedingUploadKey, {
-        cancelUpload: succeedingCancelUpload,
-        fileName: FILE_IMAGE_ISO,
-      });
-
-      await useUploadProgressStore.getState().cancelAllPendingUploads();
-
-      expect(failingCancelUpload).toHaveBeenCalledTimes(1);
-      expect(succeedingCancelUpload).toHaveBeenCalledTimes(1);
-      expect(cancelUploadPVC).not.toHaveBeenCalled();
-      expect(useUploadProgressStore.getState().getUpload(failingUploadKey)?.status).toBe(
-        UPLOAD_PROGRESS_STATUS.UPLOADING,
+      const otherVmCdromUploadKey = getVmCdromUploadKey(
+        CLUSTER,
+        NAMESPACE,
+        OTHER_VM_NAME,
+        CDROM_NAME,
       );
-      expect(useUploadProgressStore.getState().getUpload(succeedingUploadKey)).toBeUndefined();
-    });
+      const bootableCancel = jest.fn(async () => undefined);
+      const otherVmCdromCancel = jest.fn(async () => undefined);
 
-    it('should fall back to cancelUploadPVC when cancelUpload fails during cancelAllPendingUploads', async () => {
-      const uploadKey = getVmDiskUploadKey(CLUSTER, NAMESPACE, VM_NAME, VM_DISK_NAME);
-      const cancelUpload = jest.fn(async () => {
-        throw new Error(ERROR_CANCEL_FAILED);
+      useUploadProgressStore.getState().startUpload(bootableVolumeUploadKey, {
+        cancelUpload: bootableCancel,
+        fileName: FILE_IMAGE_ISO,
       });
-
-      useUploadProgressStore.getState().startUpload(uploadKey, {
-        cancelUpload,
-        dvCluster: CLUSTER,
-        dvName: DV_NAME,
-        dvNamespace: NAMESPACE,
+      useUploadProgressStore.getState().startUpload(otherVmCdromUploadKey, {
+        cancelUpload: otherVmCdromCancel,
         fileName: FILE_IMAGE_ISO,
       });
 
-      await useUploadProgressStore.getState().cancelAllPendingUploads();
+      await useUploadProgressStore
+        .getState()
+        .cancelWizardPendingUploads(undefined, [bootableVolumeUploadKey]);
 
-      expect(cancelUpload).toHaveBeenCalledTimes(1);
-      expect(cancelUploadPVC).toHaveBeenCalledWith(DV_NAME, NAMESPACE, CLUSTER);
-      expect(useUploadProgressStore.getState().getUpload(uploadKey)).toBeUndefined();
-    });
-
-    it('should remove upload when cancelUploadPVC throws 404 during cancelAllPendingUploads', async () => {
-      const uploadKey = getVmDiskUploadKey(CLUSTER, NAMESPACE, VM_NAME, VM_DISK_NAME);
-      const cancelUpload = jest.fn(async () => {
-        throw new Error(ERROR_CANCEL_FAILED);
-      });
-      (cancelUploadPVC as jest.Mock).mockRejectedValueOnce({ code: 404 });
-
-      useUploadProgressStore.getState().startUpload(uploadKey, {
-        cancelUpload,
-        dvCluster: CLUSTER,
-        dvName: DV_NAME,
-        dvNamespace: NAMESPACE,
-        fileName: FILE_IMAGE_ISO,
-      });
-
-      await useUploadProgressStore.getState().cancelAllPendingUploads();
-
-      expect(cancelUploadPVC).toHaveBeenCalledWith(DV_NAME, NAMESPACE, CLUSTER);
-      expect(useUploadProgressStore.getState().getUpload(uploadKey)).toBeUndefined();
-    });
-
-    it('should retain upload when cancelUploadPVC throws non-404 error during cancelAllPendingUploads', async () => {
-      const uploadKey = getVmDiskUploadKey(CLUSTER, NAMESPACE, VM_NAME, VM_DISK_NAME);
-      const cancelUpload = jest.fn(async () => {
-        throw new Error(ERROR_CANCEL_FAILED);
-      });
-      (cancelUploadPVC as jest.Mock).mockRejectedValueOnce({ code: 403 });
-
-      useUploadProgressStore.getState().startUpload(uploadKey, {
-        cancelUpload,
-        dvCluster: CLUSTER,
-        dvName: DV_NAME,
-        dvNamespace: NAMESPACE,
-        fileName: FILE_IMAGE_ISO,
-      });
-
-      await useUploadProgressStore.getState().cancelAllPendingUploads();
-
-      expect(cancelUploadPVC).toHaveBeenCalledWith(DV_NAME, NAMESPACE, CLUSTER);
-      expect(useUploadProgressStore.getState().getUpload(uploadKey)?.status).toBe(
+      expect(bootableCancel).toHaveBeenCalledTimes(1);
+      expect(otherVmCdromCancel).not.toHaveBeenCalled();
+      expect(useUploadProgressStore.getState().getUpload(bootableVolumeUploadKey)).toBeUndefined();
+      expect(useUploadProgressStore.getState().getUpload(otherVmCdromUploadKey)?.status).toBe(
         UPLOAD_PROGRESS_STATUS.UPLOADING,
       );
     });

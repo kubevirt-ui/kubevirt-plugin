@@ -26,6 +26,7 @@ export type AddBootableVolumeModalProps = {
   lockedPreference?: PreferenceOption;
   onClose: () => void;
   onCreateVolume?: (createdVolume: BootableVolume) => void;
+  onUploadStart?: (uploadKey: string) => void;
 };
 
 export type AddBootableVolumeState = {
@@ -72,6 +73,7 @@ export type SubmitAddBootableVolumeParams = {
   dataSource: V1beta1DataSource;
   onClose: () => void;
   onCreateVolume?: (createdVolume: BootableVolume) => void;
+  onUploadStart?: (uploadKey: string) => void;
   sourceType: DROPDOWN_FORM_SELECTION;
   t: TFunction;
   uploadData: (props: UploadDataProps) => Promise<void>;
@@ -86,6 +88,7 @@ export type HandleAddBootableVolumeModalCloseParams = {
 export type CreateBootableVolumeType = (input: {
   bootableVolume: AddBootableVolumeState;
   onCreateVolume?: (createdVolume: BootableVolume) => void;
+  onUploadStart?: (uploadKey: string) => void;
   sourceType: DROPDOWN_FORM_SELECTION;
   t: TFunction;
   uploadData: ({ dataVolume, file }: UploadDataProps) => Promise<void>;

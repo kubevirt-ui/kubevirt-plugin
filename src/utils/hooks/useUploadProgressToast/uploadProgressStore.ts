@@ -1,18 +1,19 @@
 import { create } from 'zustand';
 
 import {
-  performCancelAllPendingUploads,
   performCancelTrackedUpload,
   performCancelUploadsForVm,
+  performCancelWizardPendingUploads,
 } from './cancel/cancelUpload';
 import { UPLOAD_PROGRESS_STATUS } from './constants';
-import { UploadProgressStoreState } from './types';
+import { type UploadProgressStoreState } from './types';
 
 export const useUploadProgressStore = create<UploadProgressStoreState>((set, get) => ({
-  cancelAllPendingUploads: () => performCancelAllPendingUploads(get),
   cancelTrackedUpload: (uploadKey) => performCancelTrackedUpload(get, uploadKey),
   cancelUploadsForVm: (cluster, namespace, vmName) =>
     performCancelUploadsForVm(get, cluster, namespace, vmName),
+  cancelWizardPendingUploads: (wizardVm, wizardBootableVolumeKeys) =>
+    performCancelWizardPendingUploads(get, wizardVm, wizardBootableVolumeKeys),
   completeUpload: (uploadKey, options) =>
     set((state) => {
       const current = state.uploads[uploadKey];
