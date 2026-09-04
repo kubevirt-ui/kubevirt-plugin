@@ -8,14 +8,14 @@ import {
 } from '@virtualmachines/wizard/components/constants';
 import useCloseWizard from '@virtualmachines/wizard/hooks/useCloseWizard';
 import useWizardStepValidation from '@virtualmachines/wizard/hooks/useWizardStepValidation';
+import { useTemplateVMGeneration } from '@virtualmachines/wizard/state/template-vm-generation-context/TemplateVMGenerationProvider';
 import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
 import { CREATE_VM_FORM_FIELDS_UI_STATE } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
-import useCreateVMFromTemplate from '@virtualmachines/wizard/steps/TemplateStep/hooks/useCreateVMFromTemplate';
 import { VMWizardStep } from '@virtualmachines/wizard/utils/constants';
 
 const TemplateStepFooter: FC = () => {
   const { activeStep, goToNextStep, goToPrevStep } = useWizardContext();
-  const { createVMFromTemplate, isProcessing } = useCreateVMFromTemplate();
+  const { createVMFromTemplate, isProcessing } = useTemplateVMGeneration();
   const closeWizard = useCloseWizard();
   const { setValue } = useVMWizard();
   const { isNextDisabledForStep } = useWizardStepValidation();

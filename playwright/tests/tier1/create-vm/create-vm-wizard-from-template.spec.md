@@ -5,27 +5,27 @@
 - **Project Name:** KubeVirt UI — Playwright E2E Tests
 - **Feature Area:** Tier1 — VM creation wizard
 - **Latest version:** CNV 5.1.0
-- **Latest update:** 2026-09-08
+- **Latest update:** 2026-09-14
 - **Document Status:** Approved
 
 ## 2. Introduction
 
 ### 2.1 Purpose
 
-Verify the Create from Template VM creation wizard happy path: selecting From Template, picking
-`rhel9-server-small`, validating and saving a custom hostname, protecting system annotations and
-labels, reviewing the configuration, and successfully creating the VM.
+Verify the Create from Template VM creation wizard: selecting `rhel9-server-small`, preventing
+duplicate template generation while processing, validating and saving a custom hostname, protecting
+system annotations and labels, reviewing the configuration, and successfully creating the VM.
 
 ### 2.2 Scope
 
 - **In-Scope:** Wizard steps 1–4 for Create from Template; generated hostname; required and RFC 1123
   hostname validation on submission with Enter; valid hostname persistence; Labels and annotations
   tab protection for `vm.kubevirt.io/validations` and `vm.kubevirt.io/template`; redirect to VM
-  details; VM resource existence.
-- **Out-of-Scope:** Custom configuration and clone existing VM flows (covered by
-  `create-vm-wizard-custom-config.spec.ts` and `create-vm-wizard-clone.spec.ts`); hostname validation
-  on blur without submission; maximum-length and trailing-hyphen hostname validation; editing the
-  hostname from an existing VM's details page.
+  details; VM resource existence; disabling normal duplicate-generation actions while a template
+  request is active; exactly one template-processing request for rapid Next interaction.
+- **Out-of-Scope:** Direct concurrent invocation of the template-generation callback, which is
+  covered by the focused Jest test; hostname validation on blur without submission; maximum-length
+  and trailing-hyphen hostname validation; editing the hostname from an existing VM's details page.
 
 ## 3. Test Environment & Prerequisites
 
@@ -33,15 +33,16 @@ labels, reviewing the configuration, and successfully creating the VM.
   or an equivalent cluster-admin session.
 - **Configuration:** RHEL9 template `rhel9-server-small` is available in the cluster template
   catalog; the console URL and authentication credentials are configured for Playwright.
-- **Initial Setup:** Each test creates an isolated namespace via `setupTestNamespace`; the created VM
-  is tracked via `apiClient.trackResource('VirtualMachine', ...)` for automatic cleanup.
+- **Initial Setup:** Each test creates an isolated namespace via `setupTestNamespace`; when a test
+  creates a VM, it is tracked via `apiClient.trackResource('VirtualMachine', ...)` for automatic
+  cleanup.
 
 ---
 
 ## 4. Test Case Definitions
 
 **Spec file:** `tests/tier1/create-vm/create-vm-wizard-from-template.spec.ts`
-**Describe:** `VM Creation Wizard — Create from Template happy path` — **Tags:** `@tier1`,
+**Describe:** `VM Creation Wizard — Create from Template` — **Tags:** `@tier1`,
 `@catalog-wizard`, `@adminOnly`
 **Allure:** suite `VM Creation Wizard`, feature `Tier1`
 
@@ -73,6 +74,29 @@ labels, reviewing the configuration, and successfully creating the VM.
 
 ---
 
+### `002`: Prevent duplicate template generation while processing
+
+- **Objective:** Verify that rapid repeated Next interaction cannot start another template
+  generation request while the original request is active.
+- **Target version:** CNV 5.1.0
+- **Jira References:** CNV-96281
+- **Pre-conditions:** `rhel9-server-small` is available in the catalog, and the user can create
+  namespaces.
+- **Tags:** `@tier1`, `@catalog-wizard`, `@adminOnly`
+
+| Step | Action                                                                    | Expected Result                                                                                      |
+| :--- | :------------------------------------------------------------------------ | :--------------------------------------------------------------------------------------------------- |
+| 1    | Create an isolated namespace and open the create VM wizard                | The creation wizard is visible                                                                       |
+| 2    | Select From Template, generate a VM name, and select `rhel9-server-small` | Template parameters finish loading and Next is enabled                                               |
+| 3    | Hold the template-processing request and rapidly activate Next twice      | The footer and Customization navigation are disabled while processing; only one request is initiated |
+| 4    | Release the original template-processing response                         | The wizard reaches Customization and no additional processing request is received                    |
+
+The E2E case covers normal browser interaction and the visible shared processing state. Direct
+concurrent callback invocation before React updates the DOM is covered deterministically by
+`useCreateVMFromTemplate.test.ts`.
+
+---
+
 ## 5. Requirements Traceability Matrix
 
 Maps Jira tickets to the test cases that provide coverage. Tickets without a specific test case
@@ -83,6 +107,7 @@ indicate a planned coverage gap (status: Pending).
 | —           | `001`        | Functional smoke        | Automated |
 | CNV-95902   | `001`        | Bugfix regression guard | Automated |
 | CNV-96404   | `001`        | Bugfix regression guard | Automated |
+| CNV-96281   | `002`        | Bugfix regression guard | Automated |
 
 **Coverage Type values:**
 

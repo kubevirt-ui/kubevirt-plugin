@@ -362,6 +362,35 @@ export default class VmWizardNavigationComponent extends BaseComponent {
     return await nextButton.isDisabled();
   }
 
+  async isWizardStepDisabled(stepName: string): Promise<boolean> {
+    const stepButton = this.locator(
+      `nav[aria-label="Wizard steps"] button:has-text("${stepName}")`,
+    ).first();
+    await stepButton.waitFor({ state: 'visible', timeout: TestTimeouts.SHORT_WAIT });
+    return await stepButton.isDisabled();
+  }
+
+  async attemptRapidNextClicks(): Promise<void> {
+    await this.collapseSidebarIfExpanded();
+    await this.page.keyboard.press('Escape');
+    await this.page
+      .locator('.pf-v6-c-tooltip, [role="tooltip"]')
+      .first()
+      .waitFor({ state: 'hidden', timeout: TestTimeouts.SHORT_WAIT })
+      .catch(() => undefined);
+
+    const nextButton = this._wizardFooterNextButton;
+    await nextButton.waitFor({ state: 'visible', timeout: TestTimeouts.SHORT_WAIT });
+
+    try {
+      await nextButton.dblclick();
+    } catch (error) {
+      if (!(await nextButton.isDisabled())) {
+        throw error;
+      }
+    }
+  }
+
   async navigateToStepByName(stepName: string): Promise<void> {
     const toggle = this.locator('button:has-text("Wizard toggle")');
     await this.robustClick(toggle.first());
@@ -552,6 +581,16 @@ export default class VmWizardNavigationComponent extends BaseComponent {
           }, 3000);
         }),
     );
+  }
+
+  async waitForTemplateDetailsLoaded(): Promise<void> {
+    const templateDrawer = this.locator('.template-catalog-drawer');
+    await templateDrawer
+      .getByRole('progressbar')
+      .waitFor({ state: 'hidden', timeout: TestTimeouts.ELEMENT_WAIT });
+    await templateDrawer
+      .getByRole('tab', { name: 'Details' })
+      .waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
   }
 
   async selectTemplateCatalogProject(projectName: string): Promise<void> {
