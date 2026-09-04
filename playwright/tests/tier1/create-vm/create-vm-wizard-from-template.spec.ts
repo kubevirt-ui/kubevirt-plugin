@@ -5,7 +5,7 @@ import { setupTestNamespace } from '@/utils/test-setup-helpers';
 const SUITE = 'VM Creation Wizard';
 
 test.describe(
-  'VM Creation Wizard — Create from Template happy path',
+  'VM Creation Wizard — Create from Template',
   { tag: [T1_TAG, '@catalog-wizard', ADMIN_ONLY_TAG] },
   () => {
     test('From Template wizard selects RHEL9 template, creates VM, and reaches Running state', async ({
@@ -206,6 +206,102 @@ test.describe(
         const result = await apiClient.verifyVmCreated(vmName, wizardNs);
         expect.soft(result.exists, `VM '${vmName}' should exist`).toBe(true);
       });
+    });
+
+    test('Template generation prevents duplicate requests while processing', async ({
+      apiClient,
+      page,
+      vmListPage,
+      vmWizardComputePage,
+      vmWizardNavigationPage,
+      utils,
+    }) => {
+      test.setTimeout(utils.TestTimeouts.TEST_VM_CREATION);
+      await utils.withAllure({
+        suite: SUITE,
+        feature: T1,
+        tags: [T1_TAG],
+      });
+
+      const wizardNamespace = await setupTestNamespace(apiClient, 'wizard-tpl-single');
+
+      await vmListPage.switchToVirtualizationPerspective();
+      await vmListPage.navigateToProjectVmListViaUI(wizardNamespace);
+      await vmWizardNavigationPage.openWizardFromCreateDropdown();
+
+      await test.step('Select a template and wait for its parameters to load', async () => {
+        await vmWizardNavigationPage.selectCreationMethod('fromTemplate');
+        await vmWizardNavigationPage.generateVmName();
+        await vmWizardNavigationPage.clickNext();
+        await vmWizardNavigationPage.selectTemplateByTestId('rhel9-server-small');
+        await vmWizardNavigationPage.waitForTemplateDetailsLoaded();
+        await vmWizardNavigationPage.closeTemplateDrawer();
+
+        expect(await vmWizardNavigationPage.isNextButtonDisabled()).toBe(false);
+      });
+
+      const processedTemplatesUrl = `**/apis/template.openshift.io/v1/namespaces/${wizardNamespace}/processedtemplates**`;
+      let processedTemplateRequestCount = 0;
+      let markTemplateRequestStarted: () => void = () => undefined;
+      let releaseTemplateRequest: () => void = () => undefined;
+      const templateRequestStarted = new Promise<void>((resolve) => {
+        markTemplateRequestStarted = resolve;
+      });
+      const templateRequestCanFinish = new Promise<void>((resolve) => {
+        releaseTemplateRequest = resolve;
+      });
+
+      await page.route(processedTemplatesUrl, async (route) => {
+        if (route.request().method() !== 'POST') {
+          await route.continue();
+          return;
+        }
+
+        processedTemplateRequestCount += 1;
+        if (processedTemplateRequestCount === 1) {
+          markTemplateRequestStarted();
+          await templateRequestCanFinish;
+        }
+        await route.continue();
+      });
+
+      try {
+        await test.step('Prevent another generation attempt while the request is active', async () => {
+          await Promise.all([
+            vmWizardNavigationPage.attemptRapidNextClicks(),
+            templateRequestStarted,
+          ]);
+
+          await expect
+            .poll(() => vmWizardNavigationPage.isNextButtonDisabled(), {
+              message: 'Next should be disabled while template generation is active',
+              timeout: utils.TestTimeouts.UI_ACTION_COMPLETE,
+            })
+            .toBe(true);
+          await expect
+            .poll(() => vmWizardNavigationPage.isWizardStepDisabled('Customization'), {
+              message: 'Customization navigation should be disabled during template generation',
+              timeout: utils.TestTimeouts.UI_ACTION_COMPLETE,
+            })
+            .toBe(true);
+          expect(processedTemplateRequestCount).toBe(1);
+        });
+
+        await test.step('Finish the original request and continue to Customization', async () => {
+          releaseTemplateRequest();
+
+          await expect
+            .poll(() => vmWizardComputePage.verifyCustomizationStepVisible(), {
+              message: 'The original template request should complete and open Customization',
+              timeout: utils.TestTimeouts.UI_ACTION_COMPLETE,
+            })
+            .toBe(true);
+          expect(processedTemplateRequestCount).toBe(1);
+        });
+      } finally {
+        releaseTemplateRequest();
+        await page.unroute(processedTemplatesUrl);
+      }
     });
   },
 );

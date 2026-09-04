@@ -1,5 +1,6 @@
 import React, { type FC, useCallback } from 'react';
 import { useWatch } from 'react-hook-form';
+import isEqual from 'lodash/isEqual';
 
 import TemplatesFilter from '@kubevirt-utils/components/TemplatesFilter/TemplatesFilter';
 import { TemplatesFilterVariant } from '@kubevirt-utils/components/TemplatesFilter/types';
@@ -7,6 +8,7 @@ import { logTemplateFlowEvent, TEMPLATE_SELECTED } from '@kubevirt-utils/extensi
 import { type Template } from '@kubevirt-utils/resources/template';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Card, Split, SplitItem } from '@patternfly/react-core';
+import useMarkGeneratedVMStale from '@virtualmachines/wizard/hooks/useMarkGeneratedVMStale';
 import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
 import {
   CREATE_VM_FORM_FIELDS_UI_STATE,
@@ -41,6 +43,7 @@ const TemplatesCatalog: FC = () => {
   } = useTemplatesCatalog();
 
   const { control, setValue } = useVMWizard();
+  const markGeneratedVMStale = useMarkGeneratedVMStale();
   const selectedTemplate = useWatch({
     control,
     name: CREATE_VM_FORM_FIELDS_VM_DATA.SELECTED_TEMPLATE,
@@ -48,13 +51,15 @@ const TemplatesCatalog: FC = () => {
 
   const handleTemplateSelect = useCallback(
     (template: Template) => {
+      if (!Boolean(isEqual(selectedTemplate, template))) {
+        markGeneratedVMStale();
+      }
       setValue(CREATE_VM_FORM_FIELDS_VM_DATA.SELECTED_TEMPLATE, template);
       setValue(CREATE_VM_FORM_FIELDS_UI_STATE.TEMPLATE_PROCESS_ERROR, null);
-      setValue(CREATE_VM_FORM_FIELDS_UI_STATE.LAST_PROCESSED_TEMPLATE_KEY, '');
       logTemplateFlowEvent(TEMPLATE_SELECTED, template);
       setValue(CREATE_VM_FORM_FIELDS_UI_STATE.IS_TEMPLATES_DRAWER_OPEN, true);
     },
-    [setValue],
+    [markGeneratedVMStale, selectedTemplate, setValue],
   );
 
   if (!loaded) {

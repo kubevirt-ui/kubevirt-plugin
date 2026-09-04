@@ -9,10 +9,10 @@ import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { TREE_VIEW_FOLDERS } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { setCustomizeWizardVMSignal } from '@kubevirt-utils/signals/customizeWizardVMSignal';
 import useIsACMPage from '@multicluster/useIsACMPage';
 import { Form, FormGroup } from '@patternfly/react-core';
 import { useHubClusterName } from '@stolostron/multicluster-sdk';
+import useInvalidateGeneratedVM from '@virtualmachines/wizard/hooks/useInvalidateGeneratedVM';
 import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
 import { CREATE_VM_FORM_FIELDS_VM_DATA } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
 
@@ -27,6 +27,7 @@ const VMCreationLocationForm: FC = () => {
     useFeatures(TREE_VIEW_FOLDERS);
 
   const { control, setValue } = useVMWizard();
+  const invalidateGeneratedVM = useInvalidateGeneratedVM();
   const [cluster, folder, project] = useWatch({
     control,
     name: [
@@ -49,11 +50,13 @@ const VMCreationLocationForm: FC = () => {
                 bookmarkCluster={hubClusterName}
                 includeAllClusters={false}
                 onChange={(selectedCluster) => {
-                  field.onChange(selectedCluster);
-                  setValue(CREATE_VM_FORM_FIELDS_VM_DATA.FOLDER, '');
-                  if (selectedCluster !== cluster)
+                  if (selectedCluster !== cluster) {
+                    field.onChange(selectedCluster);
+
+                    setValue(CREATE_VM_FORM_FIELDS_VM_DATA.FOLDER, '');
                     setValue(CREATE_VM_FORM_FIELDS_VM_DATA.PROJECT, '');
-                  setCustomizeWizardVMSignal(null);
+                    invalidateGeneratedVM();
+                  }
                 }}
                 selectedCluster={value as string}
               />
@@ -72,9 +75,12 @@ const VMCreationLocationForm: FC = () => {
               cluster={cluster}
               includeAllProjects={false}
               onChange={(selectedProject) => {
-                field.onChange(selectedProject);
-                setValue(CREATE_VM_FORM_FIELDS_VM_DATA.FOLDER, '');
-                setCustomizeWizardVMSignal(null);
+                if (selectedProject !== project) {
+                  field.onChange(selectedProject);
+
+                  setValue(CREATE_VM_FORM_FIELDS_VM_DATA.FOLDER, '');
+                  invalidateGeneratedVM();
+                }
               }}
               selectedProject={project || DEFAULT_NAMESPACE}
             />
