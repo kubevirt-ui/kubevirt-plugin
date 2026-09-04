@@ -1,9 +1,8 @@
-/* eslint-disable */
-import React, { FC, useMemo, useState } from 'react';
+import React, { type FC, useMemo, useState } from 'react';
 
 import {
-  KubevirtFilterState,
-  OnSetFilters,
+  type KubevirtFilterState,
+  type OnSetFilters,
 } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -49,19 +48,19 @@ const SavedSearchesDropdown: FC<SavedSearchesDropdownProps> = ({ filters, onSetF
 
   return (
     <Dropdown
+      isOpen={open}
       onOpenChange={(isOpen: boolean) => {
         setOpen(isOpen);
         if (!isOpen) {
           setFilterText('');
         }
       }}
+      popperProps={{ position: 'end' }}
       toggle={(toggleRef) => (
         <MenuToggle isExpanded={open} onClick={() => setOpen(!open)} ref={toggleRef}>
           {t('Saved searches')}
         </MenuToggle>
       )}
-      isOpen={open}
-      popperProps={{ position: 'end' }}
     >
       <SavedSearchesStateHandler
         loaded={searchesInitiallyLoaded}
@@ -71,7 +70,7 @@ const SavedSearchesDropdown: FC<SavedSearchesDropdownProps> = ({ filters, onSetF
         <MenuSearch>
           <MenuSearchInput>
             <SearchInput
-              onChange={(_, value) => setFilterText(value)}
+              onChange={(_event, value) => setFilterText(value)}
               placeholder={t('Find by name')}
               value={filterText}
             />
@@ -86,14 +85,14 @@ const SavedSearchesDropdown: FC<SavedSearchesDropdownProps> = ({ filters, onSetF
           ) : (
             filteredSearches.map(({ description, isFavorited, name }) => (
               <SavedSearchItem
-                onApply={() => {
-                  applySearch(name, searches, filters, onSetFilters);
-                  setOpen(false);
-                }}
                 description={description}
                 isFavorited={isFavorited}
                 key={name}
                 name={name}
+                onApply={() => {
+                  applySearch(name, searches, filters, onSetFilters);
+                  setOpen(false);
+                }}
                 onDelete={() => handleDelete(name, isFavorited)}
                 onToggleFavorite={() => toggleFavorite(name)}
               />

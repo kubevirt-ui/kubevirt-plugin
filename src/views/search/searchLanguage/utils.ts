@@ -1,10 +1,9 @@
-/* eslint-disable */
-import { KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
+import { type KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 
 import { EXCLUSION_PREFIX } from './constants';
 import { parseSearchToken } from './parser';
-import { TokenParts } from './types';
+import { type TokenParts } from './types';
 
 export const isExcludedToken = (input: string): boolean => input.startsWith(EXCLUSION_PREFIX);
 
@@ -83,4 +82,4 @@ export const isIncompleteToken = (tokenText: string): boolean => {
 export const getFilterDefinition = (
   filterType: string,
   filterDefinitions: KubevirtFilter[],
-): KubevirtFilter | undefined => filterDefinitions.find((d) => d.id === filterType);
+): KubevirtFilter | undefined => filterDefinitions.find((def) => def.id === filterType);

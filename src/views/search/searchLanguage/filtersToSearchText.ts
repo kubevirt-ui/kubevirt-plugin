@@ -9,10 +9,8 @@ import { FROM_PREFIX, TO_PREFIX } from '@search/utils/dateCreatedValues';
 import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
 import {
-  CPU_NUMERIC_REGEX,
   DATE_CREATED_FILTER_KEYS,
   FILTER_TYPE_TO_SEARCH_KEY,
-  MEMORY_UNIT_REGEX,
   NUMERIC_FILTER_KEYS,
   OPERATOR_TO_SIGN,
 } from './constants';
@@ -22,24 +20,20 @@ const serializeNumericValue = (filterType: string, value: string): null | string
   const searchKey = FILTER_TYPE_TO_SEARCH_KEY.get(filterType);
   if (!searchKey) return null;
 
+  const parts: string[] = value.trim().split(/\s+/);
+  const operatorKey: string = parts[0] ?? '';
+
   if (filterType === VirtualMachineRowFilterType.Memory) {
-    const match = MEMORY_UNIT_REGEX.exec(value);
-    if (!match) return null;
-    const operatorEnum = match[1] ?? '';
-    const num = match[2] ?? '';
-    const unit = match[3] ?? '';
-    const sign = OPERATOR_TO_SIGN[operatorEnum];
+    if (parts.length !== 3) return null;
+    const sign: string | undefined = OPERATOR_TO_SIGN[operatorKey];
     if (!sign) return null;
-    return `${searchKey}${sign}${num}${unit}`;
+    return `${searchKey}${sign}${parts[1]}${parts[2]}`;
   }
 
-  const cpuMatch = CPU_NUMERIC_REGEX.exec(value);
-  if (!cpuMatch) return null;
-  const operatorEnum = cpuMatch[1] ?? '';
-  const num = cpuMatch[2] ?? '';
-  const sign = OPERATOR_TO_SIGN[operatorEnum];
+  if (parts.length !== 2) return null;
+  const sign: string | undefined = OPERATOR_TO_SIGN[operatorKey];
   if (!sign) return null;
-  return `${searchKey}${sign}${num}`;
+  return `${searchKey}${sign}${parts[1]}`;
 };
 
 const serializeFilterValues = (filterType: string, values: string[]): string[] => {

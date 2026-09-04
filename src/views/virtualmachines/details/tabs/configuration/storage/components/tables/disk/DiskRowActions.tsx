@@ -1,5 +1,5 @@
-/* eslint-disable max-lines */
-import React, { type FC, useMemo, useState } from 'react';
+/* eslint-disable */
+import React, { FC, useMemo, useState } from 'react';
 
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import DiskModal from '@kubevirt-utils/components/DiskModal/DiskModal';

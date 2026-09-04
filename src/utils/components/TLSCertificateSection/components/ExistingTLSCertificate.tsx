@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
@@ -27,8 +26,8 @@ const ExistingTLSCertificate: FC<ExistingTLSCertificateProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
 
-  const certProject = selectedProject || namespace;
-  const selectedConfigMap = selectedConfigMapName || '';
+  const certProject = selectedProject ?? namespace;
+  const selectedConfigMap = selectedConfigMapName ?? '';
 
   const [projectNames, projectsLoaded] = useProjects(cluster);
   const [tlsCertConfigMaps, certMapsLoaded, certMapsError] = useTLSCertConfigMaps(
@@ -46,14 +45,14 @@ const ExistingTLSCertificate: FC<ExistingTLSCertificateProps> = ({
                 children: name,
                 value: name,
               }))}
+              placeholder={t('Select project...')}
+              selected={certProject || ''}
               setSelected={(name: string) => {
                 onChange(name, '');
               }}
               toggleProps={{
                 isFullWidth: true,
               }}
-              placeholder={t('Select project...')}
-              selected={certProject || ''}
             />
           ) : (
             <Loading />
@@ -67,18 +66,18 @@ const ExistingTLSCertificate: FC<ExistingTLSCertificateProps> = ({
           )}
           {!certMapsError && certMapsLoaded && (
             <InlineFilterSelect
-              options={tlsCertConfigMaps?.map((cm) => {
-                const name = getName(cm);
+              options={tlsCertConfigMaps?.map((configMap) => {
+                const name = getName(configMap);
                 return { children: name, value: name };
               })}
+              placeholder={t('Select TLS certificate')}
+              selected={selectedConfigMap || ''}
               setSelected={(name: string) => {
                 onChange(certProject, name);
               }}
               toggleProps={{
                 isFullWidth: true,
               }}
-              placeholder={t('Select TLS certificate')}
-              selected={selectedConfigMap || ''}
             />
           )}
           {!certMapsError && !certMapsLoaded && <Loading />}

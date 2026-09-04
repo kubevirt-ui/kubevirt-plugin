@@ -1,5 +1,4 @@
-/* eslint-disable */
-import { TFunction } from 'i18next';
+import { type TFunction } from 'i18next';
 
 import { yyyyMMddFormat } from '@patternfly/react-core';
 import {
@@ -49,10 +48,10 @@ export const resolveDateCreatedValue = (value: string): { from: string; to?: str
     return { from: getDaysBackDate(1), to: getDaysBackDate(0) };
   }
 
-  const match = lower.match(LAST_N_DAYS_REGEX);
+  const match = LAST_N_DAYS_REGEX.exec(lower);
   if (match) {
-    const n = parseInt(match[1], 10);
-    if (n > 0) return { from: getDaysBackDate(n) };
+    const days = parseInt(match[1], 10);
+    if (days > 0) return { from: getDaysBackDate(days) };
   }
 
   return null;
@@ -63,7 +62,7 @@ export const getDateCreatedChipLabel = (value: string, t: TFunction): string => 
   const label = labels[value as DateSelectOption];
   if (label && value !== DateSelectOption.Custom) return label;
 
-  const match = value.match(LAST_N_DAYS_REGEX);
+  const match = LAST_N_DAYS_REGEX.exec(value);
   if (match) {
     const count = parseInt(match[1], 10);
     return t('Last {{count}} days', { count });

@@ -1,17 +1,15 @@
-/* eslint-disable */
-import React, { FC, ReactNode, useState } from 'react';
-import { Controller, FieldPath, useFormContext } from 'react-hook-form';
+import React, { type FC, type ReactNode, useState } from 'react';
+import { Controller, type FieldPath, useFormContext } from 'react-hook-form';
 
-import { V1DiskFormState } from '@kubevirt-utils/components/DiskModal/utils/types';
+import { type V1DiskFormState } from '@kubevirt-utils/components/DiskModal/utils/types';
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
-import { DataUpload } from '@kubevirt-utils/hooks/useCDIUpload/types';
+import { type DataUpload } from '@kubevirt-utils/hooks/useCDIUpload/types';
 import { isUploadingDisk } from '@kubevirt-utils/hooks/useCDIUpload/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { DropEvent, FileUpload, FormGroup, ValidatedOptions } from '@patternfly/react-core';
+import { type DropEvent, FileUpload, FormGroup, ValidatedOptions } from '@patternfly/react-core';
 
 import { UPLOAD_FILE_FIELD, UPLOAD_FILENAME_FIELD } from '../../../utils/constants';
 import { diskSourceUploadFieldID } from '../../utils/constants';
-
 import { DiskSourceUploadPVCProgress } from './DiskSourceUploadPVCProgress';
 
 type DiskSourceUploadPVCProps = {
@@ -49,6 +47,8 @@ const DiskSourceUploadPVC: FC<DiskSourceUploadPVCProps> = ({
 
   return (
     <Controller
+      control={control}
+      name={UPLOAD_FILE_FIELD}
       render={({ field: { onChange, value } }) => (
         <>
           <FormGroup
@@ -57,6 +57,9 @@ const DiskSourceUploadPVC: FC<DiskSourceUploadPVCProps> = ({
             label={label ?? t('Upload data')}
           >
             <FileUpload
+              allowEditingUploadedText={false}
+              browseButtonText={t('Upload')}
+              data-test={diskSourceUploadFieldID}
               dropzoneProps={
                 acceptedFileTypes
                   ? {
@@ -66,27 +69,24 @@ const DiskSourceUploadPVC: FC<DiskSourceUploadPVCProps> = ({
                     }
                   : undefined
               }
+              filename={uploadFilename}
+              filenamePlaceholder={t('Drag and drop an image or upload one')}
+              id="simple-file"
+              isDisabled={isUploadingDisk(relevantUpload?.uploadStatus)}
+              isLoading={isLoading}
               onClearClick={() => {
                 onChange('');
                 setValue<FieldPath<V1DiskFormState>>(UPLOAD_FILENAME_FIELD, '');
                 setIsFileRejected(false);
                 handleClearUpload?.();
               }}
-              onFileInputChange={(_, file: File) => {
+              onDataChange={(_event: DropEvent, droppedFile: string) => onChange(droppedFile)}
+              onFileInputChange={(_event, file: File) => {
                 onChange(file);
                 setValue<FieldPath<V1DiskFormState>>(UPLOAD_FILENAME_FIELD, file.name);
                 setIsFileRejected(false);
                 handleUpload?.();
               }}
-              allowEditingUploadedText={false}
-              browseButtonText={t('Upload')}
-              data-test={diskSourceUploadFieldID}
-              filename={uploadFilename}
-              filenamePlaceholder={t('Drag and drop an image or upload one')}
-              id="simple-file"
-              isDisabled={isUploadingDisk(relevantUpload?.uploadStatus)}
-              isLoading={isLoading}
-              onDataChange={(_event: DropEvent, droppedFile: string) => onChange(droppedFile)}
               onReadFinished={() => setIsLoading(false)}
               onReadStarted={() => setIsLoading(true)}
               value={value}
@@ -98,7 +98,7 @@ const DiskSourceUploadPVC: FC<DiskSourceUploadPVCProps> = ({
             )}
             {error && !isFileRejected && (
               <FormGroupHelperText validated={ValidatedOptions.error}>
-                {error?.file?.message || error?.message}
+                {error?.file?.message ?? error?.message}
               </FormGroupHelperText>
             )}
           </FormGroup>
@@ -106,8 +106,6 @@ const DiskSourceUploadPVC: FC<DiskSourceUploadPVCProps> = ({
           {relevantUpload && <DiskSourceUploadPVCProgress upload={relevantUpload} />}
         </>
       )}
-      control={control}
-      name={UPLOAD_FILE_FIELD}
       rules={{ required: t('File is required.') }}
     />
   );
