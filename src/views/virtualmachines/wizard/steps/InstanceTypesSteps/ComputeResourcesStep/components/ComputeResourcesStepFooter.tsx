@@ -1,7 +1,12 @@
-import React, { type FC } from 'react';
+import React, { type FC, useEffect, useRef } from 'react';
 
-import { setCustomizeWizardVMSignal } from '@kubevirt-utils/signals/customizeWizardVMSignal';
+import {
+  customizeWizardVMSignal,
+  setCustomizeWizardVMSignal,
+} from '@kubevirt-utils/signals/customizeWizardVMSignal';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { type ButtonProps, useWizardContext, WizardFooter } from '@patternfly/react-core';
+import { useSignals } from '@preact/signals-react/runtime';
 import useCloseWizard from '@virtualmachines/wizard/hooks/useCloseWizard';
 import useWizardStepValidation from '@virtualmachines/wizard/hooks/useWizardStepValidation';
 import { VMWizardStep } from '@virtualmachines/wizard/utils/constants';
@@ -9,14 +14,28 @@ import { VMWizardStep } from '@virtualmachines/wizard/utils/constants';
 import useGenerateVM from '../../hooks/useGenerateVM/useGenerateVM';
 
 const ComputeResourcesStepFooter: FC = () => {
+  useSignals();
+  const vm = customizeWizardVMSignal.value;
   const { activeStep, goToNextStep, goToPrevStep } = useWizardContext();
   const { generatedVM, loaded } = useGenerateVM();
   const closeWizard = useCloseWizard();
   const { isNextDisabledForStep } = useWizardStepValidation();
+  const isAbleToGoToNextStepRef = useRef(false);
+
+  useEffect(() => {
+    if (!isAbleToGoToNextStepRef.current || isEmpty(vm)) {
+      return;
+    }
+    isAbleToGoToNextStepRef.current = false;
+    void goToNextStep();
+  }, [goToNextStep, vm]);
 
   const handleGoToNextStep = (): void => {
+    if (isEmpty(generatedVM)) {
+      return;
+    }
     setCustomizeWizardVMSignal(generatedVM);
-    void goToNextStep();
+    isAbleToGoToNextStepRef.current = true;
   };
 
   return (

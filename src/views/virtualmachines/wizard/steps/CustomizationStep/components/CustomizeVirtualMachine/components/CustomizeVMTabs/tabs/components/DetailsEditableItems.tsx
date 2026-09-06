@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { DescriptionModal } from '@kubevirt-utils/components/DescriptionModal/DescriptionModal';
@@ -15,6 +15,8 @@ import {
   patchCustomizeWizardVMSignal,
 } from '@kubevirt-utils/signals/customizeWizardVMSignal';
 import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
+import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
+import { CREATE_VM_FORM_FIELDS_VM_DATA } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
 
 type DetailsEditableItemsProps = {
   treeViewFoldersEnabled: boolean;
@@ -23,6 +25,7 @@ type DetailsEditableItemsProps = {
 const DetailsEditableItems: FC<DetailsEditableItemsProps> = ({ treeViewFoldersEnabled }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
+  const { setValue } = useVMWizard();
 
   const vm = customizeWizardVMSignal.value;
   const vmName = getName(vm);
@@ -30,57 +33,65 @@ const DetailsEditableItems: FC<DetailsEditableItemsProps> = ({ treeViewFoldersEn
   return (
     <>
       <DescriptionItem
+        data-test={`${vmName}-description`}
         descriptionData={
           getAnnotation(vm, DESCRIPTION_ANNOTATION) || <MutedTextSpan text={t('None')} />
         }
+        descriptionHeader={<SearchItem id="description">{t('Description')}</SearchItem>}
+        isEdit
         onEditClick={() =>
           createModal(({ isOpen, onClose }) => (
             <DescriptionModal
-              onSubmit={(description) =>
-                Promise.resolve(
-                  patchCustomizeWizardVMSignal([
-                    { data: description, path: `metadata.annotations.${DESCRIPTION_ANNOTATION}` },
-                  ]),
-                )
-              }
               isOpen={isOpen}
               obj={vm}
               onClose={onClose}
+              onSubmit={async (description) => {
+                setValue(CREATE_VM_FORM_FIELDS_VM_DATA.DESCRIPTION, description);
+                await Promise.resolve(
+                  patchCustomizeWizardVMSignal([
+                    { data: description, path: `metadata.annotations.${DESCRIPTION_ANNOTATION}` },
+                  ]),
+                );
+              }}
             />
           ))
         }
-        data-test={`${vmName}-description`}
-        descriptionHeader={<SearchItem id="description">{t('Description')}</SearchItem>}
-        isEdit
       />
       {treeViewFoldersEnabled && (
         <DescriptionItem
-          onEditClick={() =>
-            createModal(({ isOpen, onClose }) => (
-              <MoveVMToFolderModal
-                onSubmit={(folderName) =>
-                  Promise.resolve(
-                    patchCustomizeWizardVMSignal([
-                      { data: folderName, path: ['metadata', 'labels', VM_FOLDER_LABEL] },
-                    ]),
-                  )
-                }
-                isOpen={isOpen}
-                onClose={onClose}
-                vm={vm}
-              />
-            ))
-          }
           data-test={`${vmName}-folder`}
           descriptionData={getLabel(vm, VM_FOLDER_LABEL)}
           descriptionHeader={<SearchItem id="folder">{t('Group')}</SearchItem>}
           isEdit
+          onEditClick={() =>
+            createModal(({ isOpen, onClose }) => (
+              <MoveVMToFolderModal
+                isOpen={isOpen}
+                onClose={onClose}
+                onSubmit={async (folderName) => {
+                  setValue(CREATE_VM_FORM_FIELDS_VM_DATA.FOLDER, folderName);
+                  await Promise.resolve(
+                    patchCustomizeWizardVMSignal([
+                      { data: folderName, path: ['metadata', 'labels', VM_FOLDER_LABEL] },
+                    ]),
+                  );
+                }}
+                vm={vm}
+              />
+            ))
+          }
         />
       )}
       <DescriptionItem
+        data-test={`${vmName}-hostname`}
+        descriptionData={getHostname(vm) || vmName}
+        descriptionHeader={<SearchItem id="hostname">{t('Hostname')}</SearchItem>}
+        isEdit
         onEditClick={() =>
           createModal(({ isOpen, onClose }) => (
             <HostnameModal
+              isOpen={isOpen}
+              onClose={onClose}
               onSubmit={(updatedVM) =>
                 Promise.resolve(
                   patchCustomizeWizardVMSignal([
@@ -88,16 +99,10 @@ const DetailsEditableItems: FC<DetailsEditableItemsProps> = ({ treeViewFoldersEn
                   ]),
                 )
               }
-              isOpen={isOpen}
-              onClose={onClose}
               vm={vm}
             />
           ))
         }
-        data-test={`${vmName}-hostname`}
-        descriptionData={getHostname(vm) || vmName}
-        descriptionHeader={<SearchItem id="hostname">{t('Hostname')}</SearchItem>}
-        isEdit
       />
     </>
   );
