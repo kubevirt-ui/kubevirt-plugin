@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from 'react';
 import { useWatch } from 'react-hook-form';
 
-import { PreferenceOption } from '@kubevirt-utils/components/AddBootableVolumeModal/types';
+import { type PreferenceOption } from '@kubevirt-utils/components/AddBootableVolumeModal/types';
 import useClusterPreferences from '@kubevirt-utils/hooks/useClusterPreferences';
 import useHcoWorkloadArchitectures from '@kubevirt-utils/hooks/useHcoWorkloadArchitectures';
 import useUserPreferences from '@kubevirt-utils/hooks/useUserPreferences';
@@ -11,7 +11,7 @@ import {
   getDefaultPreference,
   getSortedPreferencesByOSType,
 } from '@virtualmachines/wizard/steps/InstanceTypesSteps/GuestOSStep/components/PreferenceSelectMenu/hooks/usePreferenceSelectOptions/utils/utils';
-import { OperatingSystemType } from '@virtualmachines/wizard/steps/InstanceTypesSteps/GuestOSStep/utils/constants';
+import { type OperatingSystemType } from '@virtualmachines/wizard/steps/InstanceTypesSteps/GuestOSStep/utils/constants';
 
 type UsePreferenceSelectOptions = (
   namespace: string,
@@ -53,7 +53,10 @@ const usePreferenceSelectOptions: UsePreferenceSelectOptions = (
     if (!isPreferencesLoaded) return;
 
     const defaultPref = getDefaultPreference(preferences, operatingSystemType, architectures);
-    if (!preference && defaultPref) {
+    const isCurrentPreferenceValid =
+      preference && preferences.some((pref) => pref.name === preference.name);
+
+    if (!isCurrentPreferenceValid && defaultPref) {
       setValue(CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.PREFERENCE, defaultPref);
     }
   }, [architectures, isPreferencesLoaded, operatingSystemType, preference, preferences, setValue]);

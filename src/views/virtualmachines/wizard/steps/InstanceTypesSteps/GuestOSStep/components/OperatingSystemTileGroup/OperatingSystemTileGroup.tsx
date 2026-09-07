@@ -32,7 +32,6 @@ const OperatingSystemTileGroup: FC = () => {
             isSelected={operatingSystemType === osType}
             onClick={() => {
               setValue(CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.OPERATING_SYSTEM_TYPE, osType);
-              setValue(CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.PREFERENCE, null);
               resetBootableVolumeFields(getValues, setValue);
             }}
             operatingSystem={osType}
