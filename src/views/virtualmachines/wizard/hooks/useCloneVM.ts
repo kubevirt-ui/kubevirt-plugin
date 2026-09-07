@@ -14,6 +14,7 @@ import useLocalStorage from '@kubevirt-utils/hooks/useLocalStorage';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { RUNSTRATEGY_HALTED } from '@kubevirt-utils/resources/vm';
 import { customizeWizardVMSignal } from '@kubevirt-utils/signals/customizeWizardVMSignal';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { isACMPath } from '@multicluster/urls';
 import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
@@ -82,10 +83,22 @@ const useCloneVM: UseCloneVM = () => {
     setError(null);
 
     try {
-      const targetCluster = getCluster(source) || cluster;
-      const vmSameName = await vmExists(name, targetNamespace, targetCluster);
+      const targetCluster = getCluster(source) ?? cluster;
+      const sourceName = getName(source) ?? '';
+      const vmToClonePromise = vmExists(sourceName, getNamespace(source) ?? '', targetCluster);
 
-      if (vmSameName) {
+      const targetVMAlreadyExistsPromise = vmExists(name, targetNamespace, targetCluster);
+
+      const [vmToClone, targetVMAlreadyExists] = await Promise.all([
+        vmToClonePromise,
+        targetVMAlreadyExistsPromise,
+      ]);
+
+      if (isEmpty(vmToClone)) {
+        throw new Error(t('{{name}} VirtualMachine no longer exists', { name: sourceName }));
+      }
+
+      if (targetVMAlreadyExists) {
         throw new Error(t('VirtualMachine with this name already exists'));
       }
 
