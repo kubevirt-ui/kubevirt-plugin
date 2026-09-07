@@ -1,1 +1,1 @@
-export * from './useVMIAndPodsForVM';
+export * from './useVMIAndPodForVM';

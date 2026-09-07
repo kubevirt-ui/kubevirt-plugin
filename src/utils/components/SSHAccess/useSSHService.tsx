@@ -2,9 +2,8 @@ import { modelToGroupVersionKind, ServiceModel } from '@kubevirt-ui-ext/kubevirt
 import { type IoK8sApiCoreV1Service } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
-import { useVMIAndPodsForVM } from '@kubevirt-utils/resources/vm';
+import { useVMIAndPodForVM } from '@kubevirt-utils/resources/vm';
 import { getServicesForVmi } from '@kubevirt-utils/resources/vmi';
-import { getVMIPod } from '@kubevirt-utils/resources/vmi/utils/pod';
 import { getCluster } from '@multicluster/helpers/selectors';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 
@@ -28,7 +27,7 @@ const useSSHService = (vm: V1VirtualMachine): UseSSHServiceReturnType => {
     vm && watchServiceResources,
   );
 
-  const { pods, vmi } = useVMIAndPodsForVM(
+  const { pod, vmi } = useVMIAndPodForVM(
     vm ? getName(vm) : '',
     vm ? getNamespace(vm) : '',
     vm ? getCluster(vm) : undefined,
@@ -36,7 +35,6 @@ const useSSHService = (vm: V1VirtualMachine): UseSSHServiceReturnType => {
 
   if (!vm) return [undefined, false, undefined];
 
-  const pod = getVMIPod(vmi, pods);
   const vmiServices = getServicesForVmi(services, pod, vm, vmi);
 
   const sshVMIService = vmiServices.find((service) =>

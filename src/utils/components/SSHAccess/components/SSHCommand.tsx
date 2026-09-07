@@ -1,12 +1,11 @@
-import React, { FC, useEffect, useState } from 'react';
+import React, { type FC, useEffect, useState } from 'react';
 
-import { IoK8sApiCoreV1Service } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type IoK8sApiCoreV1Service } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import StateHandler from '@kubevirt-utils/components/StateHandler/StateHandler';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
-import { useVMIAndPodsForVM } from '@kubevirt-utils/resources/vm';
-import { getVMIPod } from '@kubevirt-utils/resources/vmi/utils/pod';
+import { useVMIAndPodForVM } from '@kubevirt-utils/resources/vm';
 import { getVMILabelForServiceSelector } from '@kubevirt-utils/resources/vmi/utils/services';
 import { getCluster } from '@multicluster/helpers/selectors';
 import {
@@ -51,13 +50,12 @@ const SSHCommand: FC<SSHCommandProps> = ({
   const {
     error: vmiAndPodsError,
     loaded: vmiAndPodsLoaded,
-    pods,
+    pod,
     vmi,
-  } = useVMIAndPodsForVM(getName(vm), getNamespace(vm), getCluster(vm));
-  const loadError = sshServiceError || vmiAndPodsError;
-  const pod = getVMIPod(vmi, pods);
+  } = useVMIAndPodForVM(getName(vm), getNamespace(vm), getCluster(vm));
+  const loadError = sshServiceError ?? vmiAndPodsError;
 
-  const onSSHChange = async (newServiceType: SERVICE_TYPES) => {
+  const onSSHChange = async (newServiceType: SERVICE_TYPES): Promise<void> => {
     setLoading(true);
 
     try {

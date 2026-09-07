@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
 import {
   modelToGroupVersionKind,
@@ -7,39 +7,42 @@ import {
   VirtualMachineInstanceModelGroupVersionKind,
 } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type IoK8sApiCoreV1Pod } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import {
+  type V1VirtualMachine,
+  type V1VirtualMachineInstance,
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import DescriptionItemNamespace from '@kubevirt-utils/components/DescriptionItem/components/DescriptionItemNamespace';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import OwnerDetailsItem from '@kubevirt-utils/components/OwnerDetailsItem/OwnerDetailsItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
-import { getVMIPod } from '@kubevirt-utils/resources/vmi';
 import MulticlusterResourceLink from '@multicluster/components/MulticlusterResourceLink/MulticlusterResourceLink';
 import { ManagedClusterModel } from '@multicluster/constants';
 import { getCluster } from '@multicluster/helpers/selectors';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
-import { K8sResourceCommon, K8sVerb } from '@openshift-console/dynamic-plugin-sdk';
+import { type K8sVerb } from '@openshift-console/dynamic-plugin-sdk';
 import { Card, CardBody, CardTitle, DescriptionList, Divider } from '@patternfly/react-core';
 import { useFleetAccessReview } from '@stolostron/multicluster-sdk';
 
 import './virtual-machines-overview-tab-general.scss';
 
 type VirtualMachinesOverviewTabGeneralProps = {
-  pods: K8sResourceCommon[];
+  pod: IoK8sApiCoreV1Pod | null | undefined;
   vm: V1VirtualMachine;
   vmi: V1VirtualMachineInstance;
 };
 
 const VirtualMachinesOverviewTabGeneral: FC<VirtualMachinesOverviewTabGeneralProps> = ({
-  pods,
+  pod,
   vm,
   vmi,
 }) => {
   const { t } = useKubevirtTranslation();
 
   const clusterParam = useClusterParam();
-  const cluster = getCluster(vm) || clusterParam;
+  const cluster = getCluster(vm) ?? clusterParam;
 
   const [canGetNode] = useFleetAccessReview({
     cluster,
@@ -47,8 +50,6 @@ const VirtualMachinesOverviewTabGeneral: FC<VirtualMachinesOverviewTabGeneralPro
     resource: NodeModel.plural,
     verb: 'get' as K8sVerb,
   });
-  const pod = getVMIPod(vmi, pods);
-
   return (
     <div className="VirtualMachinesOverviewTabGeneral--main">
       <Card>
