@@ -1,4 +1,4 @@
-import React, { Dispatch, FC, SetStateAction } from 'react';
+import React, { type Dispatch, type FC, type SetStateAction } from 'react';
 
 import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
@@ -27,13 +27,7 @@ const DiskSourcePVCSelectNamespace: FC<DiskSourcePVCSelectNamespaceProps> = ({
   const fieldId = 'pvc-project-select';
 
   return (
-    <FormGroup
-      className="pvc-selection-formgroup"
-      fieldId={fieldId}
-      id={fieldId}
-      isRequired
-      label={t('Volume project')}
-    >
+    <FormGroup fieldId={fieldId} id={fieldId} isRequired label={t('Volume project')}>
       {projectsLoaded ? (
         <>
           <InlineFilterSelect
@@ -42,13 +36,13 @@ const DiskSourcePVCSelectNamespace: FC<DiskSourcePVCSelectNamespaceProps> = ({
               groupVersionKind: modelToGroupVersionKind(ProjectModel),
               value: name,
             }))}
+            placeholder={t('Select volume project')}
+            selected={selectedProject}
+            setSelected={onChange}
             toggleProps={{
               isDisabled,
               isFullWidth: true,
             }}
-            placeholder={t('Select volume project')}
-            selected={selectedProject}
-            setSelected={onChange}
           />
           <FormGroupHelperText>{t('Location of the existing volume')}</FormGroupHelperText>
         </>
