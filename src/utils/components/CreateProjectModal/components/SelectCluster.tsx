@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC, MouseEvent, useState } from 'react';
+import React, { type FC, type MouseEvent, useState } from 'react';
 
 import SelectToggle from '@kubevirt-utils/components/toggles/SelectToggle';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -20,10 +19,12 @@ const SelectCluster: FC<SelectClusterProps> = ({ selectedCluster, setSelectedClu
 
   const [allClusterNames, allClustersLoaded] = useFleetClusterNames();
 
-  const onToggle = () => setIsOpen((prevIsOpen) => !prevIsOpen);
+  const onToggle = (): void => setIsOpen((prevIsOpen) => !prevIsOpen);
 
-  const onSelect = (_?: MouseEvent, newValue?: string) => {
-    setSelectedCluster(newValue);
+  const onSelect = (_event?: MouseEvent, newValue?: string): void => {
+    if (newValue) {
+      setSelectedCluster(newValue);
+    }
     onToggle();
   };
 
@@ -31,6 +32,10 @@ const SelectCluster: FC<SelectClusterProps> = ({ selectedCluster, setSelectedClu
 
   return (
     <Select
+      isOpen={isOpen}
+      onOpenChange={setIsOpen}
+      onSelect={onSelect}
+      selected={selectedCluster}
       toggle={SelectToggle({
         'data-test': 'cluster-name-select',
         isExpanded: isOpen,
@@ -38,10 +43,6 @@ const SelectCluster: FC<SelectClusterProps> = ({ selectedCluster, setSelectedClu
         onClick: onToggle,
         selected: selectedCluster || t('Select cluster'),
       })}
-      isOpen={isOpen}
-      onOpenChange={setIsOpen}
-      onSelect={onSelect}
-      selected={selectedCluster}
     >
       {allClusterNames?.map((clusterName) => (
         <SelectOption key={clusterName} value={clusterName}>

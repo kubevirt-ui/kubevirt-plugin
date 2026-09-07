@@ -1,13 +1,12 @@
-/* eslint-disable */
 import produce from 'immer';
 
 import { VirtualMachineCloneModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { VirtualMachineSnapshotModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
-  V1beta1VirtualMachineClone,
-  V1beta1VirtualMachineSnapshot,
-  V1VirtualMachine,
+  type V1beta1VirtualMachineClone,
+  type V1beta1VirtualMachineSnapshot,
+  type V1VirtualMachine,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import {
   buildRunStrategyPatches,
@@ -46,7 +45,7 @@ export const cloneVM = (
   namespace: string,
   startVM?: boolean,
   description?: string,
-) => {
+): Promise<V1beta1VirtualMachineClone> => {
   const cloningRequest = produce(cloneVMToVM, (draftCloneData) => {
     draftCloneData.spec.source = {
       apiGroup: isVM(source) ? VirtualMachineModel.apiGroup : VirtualMachineSnapshotModel.apiGroup,
@@ -90,7 +89,7 @@ export const cloneVM = (
     }
 
     if (patches.length > 0) {
-      draftCloneData.spec.patches = patches.map((p) => JSON.stringify(p));
+      draftCloneData.spec.patches = patches.map((patch) => JSON.stringify(patch));
     }
   });
 
@@ -101,7 +100,11 @@ export const cloneVM = (
   });
 };
 
-export const vmExists = (vmName: string, vmNamespace: string, cluster?: string) =>
+export const vmExists = (
+  vmName: string,
+  vmNamespace: string,
+  cluster?: string,
+): Promise<null | V1VirtualMachine> =>
   kubevirtK8sGet<V1VirtualMachine>({
     cluster,
     model: VirtualMachineModel,

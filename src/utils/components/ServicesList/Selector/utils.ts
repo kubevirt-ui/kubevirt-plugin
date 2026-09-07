@@ -1,9 +1,12 @@
-/* eslint-disable */
 import { ALL_CLUSTERS_KEY } from '@kubevirt-utils/hooks/constants';
 import { getACMTextSearchURL } from '@multicluster/urls';
-import { MatchExpression, Operator, Selector } from '@openshift-console/dynamic-plugin-sdk';
+import {
+  type MatchExpression,
+  Operator,
+  type Selector,
+} from '@openshift-console/dynamic-plugin-sdk';
 
-const toArray = (value) => (Array.isArray(value) ? value : [value]);
+const toArray = (value: string | string[]): string[] => (Array.isArray(value) ? value : [value]);
 
 export const requirementToString = (requirement: MatchExpression): string => {
   const requirementStrings = {
@@ -26,17 +29,18 @@ export const createEquals = (key: string, value: string): MatchExpression => ({
   values: [value],
 });
 
-const isOldFormat = (selector: Selector) => !selector.matchLabels && !selector.matchExpressions;
+const isOldFormat = (selector: Selector): boolean =>
+  !selector.matchLabels && !selector.matchExpressions;
 
-export const toRequirements = (selector: Selector = {}) => {
+export const toRequirements = (selector: Selector = {}): MatchExpression[] => {
   const matchLabels = isOldFormat(selector) ? selector : selector.matchLabels;
   const { matchExpressions } = selector;
 
-  const requirements = Object.keys(matchLabels || {})
-    .sort()
+  const requirements = Object.keys(matchLabels ?? {})
+    .sort((a, b) => a.localeCompare(b))
     .map((match) => createEquals(match, matchLabels[match]));
 
-  requirements.push(...(matchExpressions || []));
+  requirements.push(...(matchExpressions ?? []));
 
   return requirements;
 };
@@ -57,9 +61,9 @@ export const getSelectorSearchURL = (
   if (cluster || isACMPage) {
     const labelFilters = requirementAsString
       .split(',')
-      .map((r) => `label:${r.trim()}`)
+      .map((req) => `label:${req.trim()}`)
       .join(' ');
-    const selectedCluster = cluster || hubClusterName;
+    const selectedCluster = cluster ?? hubClusterName;
     const clusterPart =
       selectedCluster && selectedCluster !== ALL_CLUSTERS_KEY ? `cluster:${selectedCluster} ` : '';
     const namespacePart = namespace ? ` namespace:${namespace}` : '';

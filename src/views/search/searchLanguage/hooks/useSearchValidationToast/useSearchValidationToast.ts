@@ -1,12 +1,14 @@
-/* eslint-disable */
 import { useCallback } from 'react';
 
 import useKubevirtToast from '@kubevirt-utils/hooks/useKubevirtToast';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { InvalidKeyError, InvalidValueError } from '@search/searchLanguage/types';
+import { type InvalidKeyError, type InvalidValueError } from '@search/searchLanguage/types';
 
-const useSearchValidationToast = () => {
+const useSearchValidationToast = (): ((
+  invalidKeyErrors: InvalidKeyError[],
+  invalidValueErrors: InvalidValueError[],
+) => void) => {
   const { t } = useKubevirtTranslation();
   const { addWarningToast } = useKubevirtToast();
 
@@ -20,7 +22,7 @@ const useSearchValidationToast = () => {
       const messages: string[] = [];
 
       for (const { invalidValues, searchKey, validValues } of invalidValueErrors) {
-        const badList = invalidValues.map((v) => `"${v}"`).join(', ');
+        const badList = invalidValues.map((val) => `"${val}"`).join(', ');
         if (isEmpty(validValues)) {
           messages.push(
             t('{{badList}} is not a valid {{searchKey}} value.', { badList, searchKey }),
@@ -45,7 +47,7 @@ const useSearchValidationToast = () => {
         );
       }
 
-      const getTitle = () => {
+      const getTitle = (): string => {
         if (hasInvalidKeys && hasInvalidValues) {
           return t("Some filters couldn't be applied");
         }

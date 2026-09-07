@@ -1,8 +1,7 @@
-/* eslint-disable */
 import { useMemo } from 'react';
 
 import { ConfigMapModel, modelToGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 
 import { TLS_CERT_CONFIGMAP_KEY } from '../constants';
@@ -22,7 +21,9 @@ export const useTLSCertConfigMaps = (
   const tlsCertConfigMaps = useMemo(() => {
     if (!namespace || !configMaps?.length) return [];
     return configMaps.filter(
-      (cm) => cm?.data && Object.prototype.hasOwnProperty.call(cm.data, TLS_CERT_CONFIGMAP_KEY),
+      (configMap) =>
+        configMap?.data &&
+        Object.prototype.hasOwnProperty.call(configMap.data, TLS_CERT_CONFIGMAP_KEY),
     );
   }, [namespace, configMaps]);
 

@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC, useCallback } from 'react';
+import React, { type FC, useCallback } from 'react';
 
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -30,18 +29,18 @@ const SaveSearchButton: FC<SaveSearchButtonProps> = ({ isDraft }) => {
   });
 
   const showSaveSearchModal = useCallback(() => {
-    const savedSearchNames = searches.map((s) => s.name);
+    const savedSearchNames = searches.map((search) => search.name);
     const initialDescription = urlQueryToSearchLanguage(urlSearchQuery);
 
     createModal(({ isOpen, onClose }) => (
       <SaveSearchModal
+        initialDescription={initialDescription}
+        isOpen={isOpen}
+        onClose={onClose}
         onSubmit={({ description, isFavorited, name }) => {
           saveSearch(name, { description, isFavorited, query: urlSearchQuery });
           onClose();
         }}
-        initialDescription={initialDescription}
-        isOpen={isOpen}
-        onClose={onClose}
         savedSearchNames={savedSearchNames}
       />
     ));

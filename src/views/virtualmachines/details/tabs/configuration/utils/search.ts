@@ -4,19 +4,14 @@ import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getInstanceTypeMatcher } from '@kubevirt-utils/resources/vm';
 import { hasS390xArchitecture } from '@kubevirt-utils/resources/vm/utils/architecture';
 
-export type SearchItem = {
-  description?: string;
-  id: string;
-  isDisabled?: boolean;
-  title: string;
-};
+import {
+  type SearchItem,
+  type SearchItemWithTab,
+} from '@kubevirt-utils/components/ConfigurationSearch/types';
+
+export type { SearchItem, SearchItemWithTab } from '@kubevirt-utils/components/ConfigurationSearch/types';
 
 export type SearchItemGetter = (vm?: V1VirtualMachine) => SearchItem[];
-
-export type SearchItemWithTab = {
-  element: SearchItem;
-  tab: string;
-};
 
 export const getDetailsTabBootIds: SearchItemGetter = () => [
   { description: t('Change boot mode'), id: 'boot-mode', title: t('Boot mode') },

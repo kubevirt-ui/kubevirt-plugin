@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 import { useFormContext } from 'react-hook-form';
 
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
@@ -9,8 +8,7 @@ import { diskTypes } from '@kubevirt-utils/resources/vm/utils/disk/constants';
 import { getDiskDrive } from '@kubevirt-utils/resources/vm/utils/disk/selectors';
 import { FormGroup, SelectOption } from '@patternfly/react-core';
 
-import { InterfaceTypes, V1DiskFormState } from '../../utils/types';
-
+import { InterfaceTypes, type V1DiskFormState } from '../../utils/types';
 import { diskInterfaceOptions } from './utils/constants';
 import { getInterfaceTypeHelperText } from './utils/util';
 
@@ -27,7 +25,7 @@ const DiskInterfaceSelect: FC<DiskInterfaceSelectProps> = ({ isVMRunning }) => {
 
   const diskType = getDiskDrive(disk);
 
-  const diskInterface = disk?.[diskType]?.bus || InterfaceTypes.VIRTIO;
+  const diskInterface = disk?.[diskType]?.bus ?? InterfaceTypes.VIRTIO;
 
   const selectedLabel = diskInterfaceOptions?.[diskInterface]?.label
     ? t(diskInterfaceOptions[diskInterface].label)
@@ -40,7 +38,7 @@ const DiskInterfaceSelect: FC<DiskInterfaceSelectProps> = ({ isVMRunning }) => {
       <div>
         <FormPFSelect
           className="disk-interface-select"
-          onSelect={(_, val) => setValue(`disk.${diskType}.bus`, val as string)}
+          onSelect={(_event, val) => setValue(`disk.${diskType}.bus`, val as string)}
           selected={diskInterface}
           selectedLabel={selectedLabel}
           toggleProps={{ isFullWidth: true }}

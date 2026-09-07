@@ -1,11 +1,10 @@
-/* eslint-disable */
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { MigPlanModel } from '@kubevirt-utils/models';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { getVolumes } from '@kubevirt-utils/resources/vm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 
-import { MigPlan, MultiNamespaceVirtualMachineStorageMigrationPlan } from '../constants';
+import { type MigPlan, type MultiNamespaceVirtualMachineStorageMigrationPlan } from '../constants';
 
 import {
   getMigPlanPVCName,
@@ -39,10 +38,10 @@ export const doesMTCPlanTargetVM = (migPlan: MigPlan, vm: V1VirtualMachine): boo
     }),
   );
 
-  return pvs.some((pv) => {
-    const pvcNs = getMigPlanPVCNamespace(pv) ?? vmNs;
+  return pvs.some((pvEntry) => {
+    const pvcNs = getMigPlanPVCNamespace(pvEntry) ?? vmNs;
     if (pvcNs !== vmNs) return false;
-    const pvcName = getMigPlanPVCName(pv) ?? pv.name;
+    const pvcName = getMigPlanPVCName(pvEntry) ?? pvEntry.name;
     return Boolean(pvcName && claimNames.has(pvcName));
   });
 };

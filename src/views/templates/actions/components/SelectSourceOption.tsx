@@ -1,7 +1,6 @@
-/* eslint-disable */
-import React, { FC, ReactNode, useCallback } from 'react';
+import React, { type FC, type JSX, type ReactNode, useCallback } from 'react';
 import { useParams } from 'react-router';
-import { TFunction } from 'i18next';
+import { type TFunction } from 'i18next';
 
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
@@ -9,9 +8,13 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { FormGroup, SelectOption } from '@patternfly/react-core';
 import { ExternalLinkAltIcon } from '@patternfly/react-icons';
 
-import { SOURCE_OPTIONS_IDS, SOURCE_TYPE_LABELS, SOURCE_TYPES } from '../../utils/constants';
+import { type SOURCE_OPTIONS_IDS, SOURCE_TYPE_LABELS, SOURCE_TYPES } from '../../utils/constants';
 
-const getSourceOption = (source: SOURCE_OPTIONS_IDS, ns: string, t: TFunction) => {
+const getSourceOption = (
+  source: SOURCE_OPTIONS_IDS,
+  ns: string,
+  t: TFunction,
+): JSX.Element | undefined => {
   switch (source) {
     case SOURCE_TYPES.defaultSource:
       return (
@@ -54,12 +57,12 @@ const getSourceOption = (source: SOURCE_OPTIONS_IDS, ns: string, t: TFunction) =
     case SOURCE_TYPES.uploadSource:
       return (
         <SelectOption
+          description={t('Upload new file using the "Upload data to PersistentVolumeClaim" page')}
           onClick={() =>
             window
               .open(`/k8s/ns/${ns || DEFAULT_NAMESPACE}/persistentvolumeclaims/~new/data`, '_blank')
               .focus()
           }
-          description={t('Upload new file using the "Upload data to PersistentVolumeClaim" page')}
           value={SOURCE_TYPES.uploadSource}
         >
           {t('Upload (Upload a new file to a PVC)')} <ExternalLinkAltIcon />
@@ -87,7 +90,7 @@ const SelectSourceOption: FC<SelectSourceOptionProps> = ({
   const { ns } = useParams<{ ns: string }>();
 
   const onSelect = useCallback(
-    (_, selection) => {
+    (_event, selection) => {
       if (selection !== SOURCE_TYPES.uploadSource) onSelectSource(selection);
     },
     [onSelectSource],

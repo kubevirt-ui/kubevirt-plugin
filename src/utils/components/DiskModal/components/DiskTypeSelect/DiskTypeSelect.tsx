@@ -1,12 +1,11 @@
-/* eslint-disable */
-import React, { FC, useRef } from 'react';
+import React, { type FC, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
-  DiskType,
+  type DiskType,
   diskTypes,
   diskTypesLabels,
 } from '@kubevirt-utils/resources/vm/utils/disk/constants';
@@ -14,7 +13,7 @@ import { getDiskDrive } from '@kubevirt-utils/resources/vm/utils/disk/selectors'
 import { FormGroup, SelectOption } from '@patternfly/react-core';
 
 import { getSourceFromVolume } from '../../utils/helpers';
-import { InterfaceTypes, SourceTypes, V1DiskFormState } from '../../utils/types';
+import { InterfaceTypes, SourceTypes, type V1DiskFormState } from '../../utils/types';
 import { getDiskTypeHelperText } from '../DiskInterfaceSelect/utils/util';
 import { DISKTYPE_SELECT_FIELDID } from '../utils/constants';
 
@@ -29,7 +28,7 @@ const DiskTypeSelect: FC<DiskTypeSelectProps> = ({ isVMRunning }) => {
   const diskState = watch();
 
   const diskType = getDiskDrive(diskState?.disk);
-  const initialDiskTypeRef = useRef<DiskType>(diskType);
+  const [initialDiskType] = useState<DiskType>(diskType);
 
   if (!diskState) return null;
 
@@ -39,15 +38,16 @@ const DiskTypeSelect: FC<DiskTypeSelectProps> = ({ isVMRunning }) => {
     return optionType === diskTypes.cdrom && isVMRunning && diskSource !== SourceTypes.CDROM;
   };
 
-  const diskInterface = diskState.disk?.[diskType]?.bus || InterfaceTypes.VIRTIO;
+  const diskInterface = diskState.disk?.[diskType]?.bus ?? InterfaceTypes.VIRTIO;
 
-  const userHelpText = getDiskTypeHelperText(initialDiskTypeRef.current, isVMRunning);
+  const userHelpText = getDiskTypeHelperText(initialDiskType, isVMRunning);
 
   return (
     <div data-test={DISKTYPE_SELECT_FIELDID}>
       <FormGroup fieldId={DISKTYPE_SELECT_FIELDID} label={t('Type')}>
         <FormPFSelect
-          onSelect={(_, val) => {
+          isDisabled={initialDiskType === diskTypes.cdrom}
+          onSelect={(_event, val) => {
             setValue('disk.cdrom', null);
             setValue('disk.lun', null);
             setValue('disk.disk', null);
@@ -61,7 +61,6 @@ const DiskTypeSelect: FC<DiskTypeSelectProps> = ({ isVMRunning }) => {
 
             setValue(`disk.${val as DiskType}`, { bus: newDiskInterface });
           }}
-          isDisabled={initialDiskTypeRef.current === diskTypes.cdrom}
           selected={diskType}
           selectedLabel={diskTypesLabels[diskType]}
           toggleProps={{ isFullWidth: true }}

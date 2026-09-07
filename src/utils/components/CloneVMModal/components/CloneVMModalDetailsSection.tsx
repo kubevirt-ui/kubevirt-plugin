@@ -1,7 +1,9 @@
-/* eslint-disable */
-import React, { FC, useState } from 'react';
+import React, { type FC, useState } from 'react';
 
-import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import {
+  type V1VirtualMachine,
+  type V1VirtualMachineInstance,
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import CPUMemory from '@kubevirt-utils/components/CPUMemory/CPUMemory';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
@@ -29,10 +31,11 @@ const CloneVMModalDetailsSection: FC<CloneVMModalDetailsSectionProps> = ({ vm, v
 
   const [guestAgentData] = useGuestOS(vmi);
   const osName =
-    guestAgentData?.os?.prettyName ||
-    guestAgentData?.os?.name ||
-    getOperatingSystemName(vm) ||
-    getOperatingSystem(vm);
+    guestAgentData?.os?.prettyName ??
+    guestAgentData?.os?.name ??
+    getOperatingSystemName(vm) ??
+    getOperatingSystem(vm) ??
+    '';
 
   const itMatcher = getInstanceTypeMatcher(vm);
   const sshSecretName = getVMSSHSecretName(vm);
@@ -42,12 +45,12 @@ const CloneVMModalDetailsSection: FC<CloneVMModalDetailsSectionProps> = ({ vm, v
     <ExpandableSection
       isExpanded={isExpanded}
       isIndented
-      onToggle={(_, expanded) => setIsExpanded(expanded)}
+      onToggle={(_event, expanded) => setIsExpanded(expanded)}
       toggleText={t('Details')}
     >
       <DescriptionList isHorizontal>
         <DescriptionItem
-          descriptionData={getNamespace(vm) || notAvailable}
+          descriptionData={getNamespace(vm) ?? notAvailable}
           descriptionHeader={t('Project')}
         />
         <DescriptionItem
