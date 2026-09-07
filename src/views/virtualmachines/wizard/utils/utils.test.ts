@@ -16,16 +16,16 @@ describe('clearVMPendingUploadsAndSignal', () => {
     jest.clearAllMocks();
   });
 
-  it('nulls the wizard VM signal before cancelling pending uploads', () => {
+  it('cancels wizard pending uploads before clearing the signal', () => {
     const callOrder: string[] = [];
-    (setCustomizeWizardVMSignal as jest.Mock).mockImplementation(() => callOrder.push('setSignal'));
     (cancelAllWizardPendingUploads as jest.Mock).mockImplementation(() =>
       callOrder.push('cancelUploads'),
     );
+    (setCustomizeWizardVMSignal as jest.Mock).mockImplementation(() => callOrder.push('setSignal'));
 
     clearVMPendingUploadsAndSignal();
 
-    expect(callOrder).toEqual(['setSignal', 'cancelUploads']);
+    expect(callOrder).toEqual(['cancelUploads', 'setSignal']);
   });
 
   it('clears the signal with null', () => {
@@ -34,9 +34,10 @@ describe('clearVMPendingUploadsAndSignal', () => {
     expect(setCustomizeWizardVMSignal).toHaveBeenCalledWith(null);
   });
 
-  it('cancels all pending wizard uploads', () => {
+  it('cancels pending wizard uploads', () => {
     clearVMPendingUploadsAndSignal();
 
     expect(cancelAllWizardPendingUploads).toHaveBeenCalledTimes(1);
+    expect(cancelAllWizardPendingUploads).toHaveBeenCalledWith();
   });
 });

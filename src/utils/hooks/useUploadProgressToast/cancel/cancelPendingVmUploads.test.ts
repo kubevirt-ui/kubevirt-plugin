@@ -23,14 +23,12 @@ const createVm = (): V1VirtualMachine => ({
 
 describe('cancelPendingVmUploads', () => {
   const cancelUploadsForVm = jest.fn().mockResolvedValue(undefined);
-  const cancelAllPendingUploads = jest.fn().mockResolvedValue(undefined);
 
   beforeEach(() => {
     jest.clearAllMocks();
     sessionStorage.clear();
     customizeWizardVMSignal.value = null;
     (useUploadProgressStore.getState as jest.Mock).mockReturnValue({
-      cancelAllPendingUploads,
       cancelUploadsForVm,
     });
   });
@@ -77,16 +75,27 @@ describe('cancelPendingVmUploads', () => {
 });
 
 describe('cancelAllWizardPendingUploads', () => {
-  const cancelAllPendingUploads = jest.fn().mockResolvedValue(undefined);
+  const cancelWizardPendingUploads = jest.fn().mockResolvedValue(undefined);
 
   beforeEach(() => {
     jest.clearAllMocks();
-    (useUploadProgressStore.getState as jest.Mock).mockReturnValue({ cancelAllPendingUploads });
+    customizeWizardVMSignal.value = null;
+    (useUploadProgressStore.getState as jest.Mock).mockReturnValue({ cancelWizardPendingUploads });
   });
 
-  it('should cancel all pending uploads in the store', () => {
+  it('should cancel wizard-scoped pending uploads for the current wizard VM', () => {
+    const vm = createVm();
+    customizeWizardVMSignal.value = vm;
+
     cancelAllWizardPendingUploads();
 
-    expect(cancelAllPendingUploads).toHaveBeenCalledTimes(1);
+    expect(cancelWizardPendingUploads).toHaveBeenCalledTimes(1);
+    expect(cancelWizardPendingUploads).toHaveBeenCalledWith(vm, []);
+  });
+
+  it('should pass undefined when wizard VM is null', () => {
+    cancelAllWizardPendingUploads();
+
+    expect(cancelWizardPendingUploads).toHaveBeenCalledWith(undefined, []);
   });
 });

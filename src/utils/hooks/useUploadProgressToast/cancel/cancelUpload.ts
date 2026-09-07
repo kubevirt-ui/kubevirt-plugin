@@ -1,10 +1,12 @@
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { cancelUploadPVC } from '@kubevirt-utils/hooks/useCDIUpload/utils';
 import { isK8sNotFoundError } from '@kubevirt-utils/resources/errorStatusChecks';
+import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 
 import { UPLOAD_PROGRESS_STATUS } from '../constants';
-import { collectVmScopedUploadKeys } from '../keys/uploadKeys';
-import { UploadEntry, UploadProgressStoreState } from '../types';
+import { collectVmScopedUploadKeys, getUploadClusterForVm } from '../keys/uploadKeys';
+import { type UploadEntry, type UploadProgressStoreState } from '../types';
 
 type StoreAccessor = () => UploadProgressStoreState;
 
@@ -108,12 +110,25 @@ export const performCancelUploadsForVm = async (
   await performCancelTrackedUploads(get, matchingKeys);
 };
 
-// Used when the VM creation wizard is closed. Cancels every in-progress upload, including
-// bootable-volume uploads that are not tied to a draft VM via vm-scoped keys.
-export const performCancelAllPendingUploads = async (get: StoreAccessor): Promise<void> => {
-  const pendingKeys = Object.entries(get().uploads)
-    .filter(([, upload]) => upload.status === UPLOAD_PROGRESS_STATUS.UPLOADING)
-    .map(([uploadKey]) => uploadKey);
+export const performCancelWizardPendingUploads = async (
+  get: StoreAccessor,
+  wizardVm?: V1VirtualMachine,
+  wizardBootableVolumeKeys?: string[],
+): Promise<void> => {
+  // Step 1: cancel VM-scoped uploads (vm-disk, vm-cdrom) tied to this wizard VM
+  if (wizardVm) {
+    const namespace = getNamespace(wizardVm);
+    const name = getName(wizardVm);
 
-  await performCancelTrackedUploads(get, pendingKeys);
+    if (namespace && name) {
+      await performCancelUploadsForVm(get, getUploadClusterForVm(wizardVm), namespace, name);
+    }
+  }
+
+  // Step 2: cancel bootable volume uploads registered during this wizard session
+  const pendingBootableKeys = (wizardBootableVolumeKeys ?? []).filter(
+    (key) => get().uploads[key]?.status === UPLOAD_PROGRESS_STATUS.UPLOADING,
+  );
+
+  await performCancelTrackedUploads(get, pendingBootableKeys);
 };

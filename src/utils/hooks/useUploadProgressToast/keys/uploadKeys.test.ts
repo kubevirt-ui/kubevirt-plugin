@@ -1,8 +1,10 @@
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 
 import {
+  collectBootableVolumeUploadKeys,
   collectVmScopedUploadKeys,
   getBootableVolumeUploadKey,
+  getExportDiskUploadKey,
   getUploadClusterForVm,
   getVmCdromUploadKey,
   getVmCdromUploadKeyFromVm,
@@ -137,6 +139,32 @@ describe('uploadKeys', () => {
       expect(collectVmScopedUploadKeys(uploads, '', NAMESPACE, VM_NAME)).toEqual([
         emptyClusterUploadKey,
       ]);
+    });
+  });
+
+  describe('collectBootableVolumeUploadKeys', () => {
+    it('should collect only bootable-volume keys', () => {
+      const bootableVolumeUploadKey = getBootableVolumeUploadKey(
+        BOOTABLE_VOLUME_NAMESPACE,
+        BOOTABLE_VOLUME_NAME,
+      );
+      const diskUploadKey = getVmDiskUploadKey(CLUSTER, NAMESPACE, VM_NAME, DISK_NAME);
+      const exportDiskUploadKey = getExportDiskUploadKey(CLUSTER, NAMESPACE, 'export-pvc');
+      const uploads = {
+        [bootableVolumeUploadKey]: {},
+        [diskUploadKey]: {},
+        [exportDiskUploadKey]: {},
+      };
+
+      expect(collectBootableVolumeUploadKeys(uploads)).toEqual([bootableVolumeUploadKey]);
+    });
+
+    it('should return an empty array when there are no bootable-volume keys', () => {
+      const uploads = {
+        [getVmCdromUploadKey(CLUSTER, NAMESPACE, VM_NAME, CDROM_NAME)]: {},
+      };
+
+      expect(collectBootableVolumeUploadKeys(uploads)).toEqual([]);
     });
   });
 });

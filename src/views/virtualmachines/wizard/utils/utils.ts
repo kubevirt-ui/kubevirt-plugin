@@ -133,6 +133,6 @@ export const markStepVisited = (
 };
 
 export const clearVMPendingUploadsAndSignal = (): void => {
-  setCustomizeWizardVMSignal(null);
   cancelAllWizardPendingUploads();
+  setCustomizeWizardVMSignal(null);
 };

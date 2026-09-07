@@ -88,6 +88,7 @@ export const createBootableVolumeFromUpload = async (
   draftDataSource: V1beta1DataSource,
   uploadData: ({ dataVolume, file }: UploadDataProps) => Promise<void>,
   t: TFunction,
+  onUploadStart?: (uploadKey: string) => void,
 ) => {
   const { isIso, uploadFile } = bootableVolume || {};
   const updatedNameBootableVolume = produce(bootableVolume, (draft) => {
@@ -115,6 +116,8 @@ export const createBootableVolumeFromUpload = async (
   const volumeName = getName(dataSourceToCreate);
   const volumeNamespace = getNamespace(dataSourceToCreate);
   const uploadKey = getBootableVolumeUploadKey(volumeNamespace, volumeName);
+
+  onUploadStart?.(uploadKey);
 
   await uploadData({
     dataVolume: bootableVolumeToCreate,

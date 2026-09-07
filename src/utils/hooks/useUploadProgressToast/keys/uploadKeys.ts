@@ -98,3 +98,6 @@ export const collectVmScopedUploadKeys = (
     ),
   );
 };
+
+export const collectBootableVolumeUploadKeys = (uploads: Record<string, unknown>): string[] =>
+  Object.keys(uploads).filter((key) => key.startsWith(`${UPLOAD_KEY_PREFIX.bootableVolume}/`));
