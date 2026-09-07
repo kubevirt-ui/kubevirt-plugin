@@ -1,7 +1,6 @@
-/* eslint-disable */
 import { errorPrintableVMStatus, printableVMStatus } from '@virtualmachines/utils';
 
-export const getStatusClass = (vmStatus: string) => {
+export const getStatusClass = (vmStatus: string): string => {
   switch (vmStatus) {
     case printableVMStatus.Provisioning:
       return 'kubevirt-m-pending';
@@ -13,7 +12,7 @@ export const getStatusClass = (vmStatus: string) => {
     case errorPrintableVMStatus.ErrorUnschedulable:
     case errorPrintableVMStatus.ImagePullBackOff:
       return 'kubevirt-m-error';
-    case printableVMStatus.Paused: // TODO Verify this is correct for this status
+    case printableVMStatus.Paused: // Verify this is correct for this status
     case printableVMStatus.WaitingForVolumeBinding:
     case printableVMStatus.Starting:
       return 'kubevirt-m-not-ready';
@@ -32,7 +31,11 @@ export const getStatusClass = (vmStatus: string) => {
   }
 };
 
-export const getImageProps = (height: number, width: number, iconRadius: number) => {
+export const getImageProps = (
+  height: number,
+  width: number,
+  iconRadius: number,
+): { height: number; width: number; x: number; y: number } => {
   return {
     height: iconRadius * 2,
     width: iconRadius * 2,

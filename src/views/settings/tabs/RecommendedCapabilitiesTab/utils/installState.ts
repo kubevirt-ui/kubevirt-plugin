@@ -1,5 +1,4 @@
-/* eslint-disable */
-import { isNil } from 'lodash';
+import isNil from 'lodash/isNil';
 
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
@@ -15,20 +14,18 @@ import {
   type RecommendedCapabilityDetailsMap,
 } from './types';
 
-const INSTALL_SUCCEEDED_STATUS = 'Succeeded';
-
 export const isInstalled = (installState: InstallState): boolean =>
   installState === InstallState.INSTALLED;
 
 export const computeInstallState = (
   csv: ClusterServiceVersionKind,
   subscription: SubscriptionKind,
-) => {
+): InstallState => {
   const installPhase = csv?.status?.phase;
   const installInProgress =
     !isNil(subscription) &&
     !isNil(csv?.status?.phase) &&
-    csv?.status?.phase !== INSTALL_SUCCEEDED_STATUS;
+    installPhase !== ClusterServiceVersionPhase.CSVPhaseSucceeded;
 
   if (installPhase === ClusterServiceVersionPhase.CSVPhaseSucceeded) return InstallState.INSTALLED;
   if (installPhase === ClusterServiceVersionPhase.CSVPhaseFailed) return InstallState.FAILED;

@@ -1,7 +1,9 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
-import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import {
+  type V1VirtualMachine,
+  type V1VirtualMachineInstance,
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
@@ -18,14 +20,14 @@ type VMOperatingSystemDetailsItemProps = {
 const VMOperatingSystemDetailsItem: FC<VMOperatingSystemDetailsItemProps> = ({ vm, vmi }) => {
   const { t } = useKubevirtTranslation();
 
-  const os = getOperatingSystemName(vm) || getOperatingSystem(vm);
+  const osName = getOperatingSystemName(vm) || getOperatingSystem(vm);
   const [guestAgentInfo] = useGuestOS(vmi);
   const operatingSystem = getOSNameFromGuestAgent(guestAgentInfo);
 
   return (
     <DescriptionItem
       className="topology-vm-details-panel__item"
-      descriptionData={operatingSystem || os}
+      descriptionData={operatingSystem || osName}
       descriptionHeader={<span id="operating-system">{t('Operating system')}</span>}
     />
   );

@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC, useState } from 'react';
+import React, { type FC, useState } from 'react';
 
 import ApplyStorageProfileSettings from '@kubevirt-utils/components/ApplyStorageProfileSettings/ApplyStorageProfileSettings';
 import CapacityInput from '@kubevirt-utils/components/CapacityInput/CapacityInput';
@@ -10,8 +9,7 @@ import { useRequiredFieldValidation } from '@kubevirt-utils/hooks/useRequiredFie
 import { getFieldRequiredMessage } from '@kubevirt-utils/utils/validation';
 import { ExpandableSection, FormGroup, Grid, GridItem, TextInput } from '@patternfly/react-core';
 
-import { AddBootableVolumeState, SetBootableVolumeFieldType } from '../../types';
-
+import { type AddBootableVolumeState, type SetBootableVolumeFieldType } from '../../types';
 import DefaultStorageClassAlert from './StorageClass/DefaultStorageClassAlert';
 import StorageClassSelect from './StorageClass/StorageClassSelect';
 
@@ -54,7 +52,7 @@ const VolumeDestination: FC<VolumeDestinationProps> = ({
           id="volume-name"
           isDisabled={isDisabled}
           onBlur={onVolumeNameBlur}
-          onChange={(_, value: string) => setBootableVolumeField('bootableVolumeName')(value)}
+          onChange={(_event, value: string) => setBootableVolumeField('bootableVolumeName')(value)}
           type="text"
           validated={volumeNameValidated}
           value={bootableVolumeName ?? ''}

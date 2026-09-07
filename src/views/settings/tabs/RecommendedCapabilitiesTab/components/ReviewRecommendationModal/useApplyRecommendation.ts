@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { useMemo } from 'react';
 import { dump } from 'js-yaml';
 
@@ -34,12 +33,12 @@ const useApplyRecommendation = (
     if (!managedCR) {
       return `# ${t('{{name}} CR absent – not yet configured', { name: registryEntry.crModel.kind })}`;
     }
-    const { managedFields: _, ...metadataWithoutManaged } = managedCR.metadata || {};
+    const { managedFields: _managedFields, ...metadataWithoutManaged } = managedCR.metadata ?? {};
     return dump({ ...managedCR, metadata: metadataWithoutManaged }, { skipInvalid: true });
   }, [managedCR, registryEntry.crModel.kind, t]);
 
-  const onSubmit = async () => {
-    const ensureAutopilotEnabled = async () => {
+  const onSubmit = async (): Promise<void> => {
+    const ensureAutopilotEnabled = async (): Promise<void> => {
       if (getAnnotation(hco, HCO_AUTOPILOT_ANNOTATION) === 'true' || !hco) return;
       await kubevirtK8sPatch({
         cluster,

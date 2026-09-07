@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { getName } from '@kubevirt-utils/resources/shared';
 import {
   type ClusterServiceVersionKind,
@@ -16,7 +15,7 @@ import {
   type VirtFeatureOperatorItem,
 } from './types';
 
-export const getPackageUID = (pkg: PackageManifestKind) =>
+export const getPackageUID = (pkg: PackageManifestKind): string =>
   `${pkg.metadata.name}-${pkg.status.catalogSource}-${pkg.status.catalogSourceNamespace}`;
 
 export const clusterServiceVersionFor = (
@@ -32,16 +31,20 @@ export const subscriptionFor = (
   allSubscriptions: SubscriptionKind[] = [],
   allGroups: OperatorGroupKind[] = [],
   pkg: PackageManifestKind,
-) =>
+): SubscriptionKind | undefined =>
   allSubscriptions
     .filter(
       (sub) =>
         sub.spec.name === pkg.status.packageName &&
         sub.spec.sourceNamespace === pkg.status.catalogSourceNamespace,
     )
-    .find((sub) => allGroups.some((og) => og.metadata.namespace === sub.metadata.namespace));
+    .find((sub) =>
+      allGroups.some(
+        (operatorGroup) => operatorGroup.metadata.namespace === sub.metadata.namespace,
+      ),
+    );
 
-export const getOperatorHubURL = (uid: string, namespace: string) =>
+export const getOperatorHubURL = (uid: string, namespace: string): string =>
   `/catalog/ns/${namespace || 'default'}?selectedId=${uid}`;
 
 const getNonInstalledManifests = (

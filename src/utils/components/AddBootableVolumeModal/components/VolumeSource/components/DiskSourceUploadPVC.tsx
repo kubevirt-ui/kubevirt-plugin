@@ -1,10 +1,9 @@
-/* eslint-disable */
-import React, { ChangeEvent, FC, useState } from 'react';
+import React, { type ChangeEvent, type FC, useState } from 'react';
 
-import { DataUpload } from '@kubevirt-utils/hooks/useCDIUpload/types';
+import { type DataUpload } from '@kubevirt-utils/hooks/useCDIUpload/types';
 import { isUploadingDisk } from '@kubevirt-utils/hooks/useCDIUpload/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { DropEvent, FileUpload, FormGroup } from '@patternfly/react-core';
+import { type DropEvent, FileUpload, FormGroup } from '@patternfly/react-core';
 
 import DiskSourceUploadISO from './DiskSourceUploadISO';
 import { DiskSourceUploadPVCProgress } from './DiskSourceUploadPVCProgress';
@@ -36,19 +35,8 @@ const DiskSourceUploadPVC: FC<DiskSourceUploadPVCProps> = ({
 
   return (
     <>
-      <FormGroup fieldId="disk-source-upload" isRequired label={label || t('Upload data')}>
+      <FormGroup fieldId="disk-source-upload" isRequired label={label ?? t('Upload data')}>
         <FileUpload
-          onClearClick={() => {
-            setUploadFile('');
-            setUploadFileName('');
-          }}
-          onFileInputChange={(_, file: File) => {
-            setUploadFileName(file.name);
-            setUploadFile(file);
-          }}
-          onTextChange={(_event: ChangeEvent<HTMLTextAreaElement>, value: string) =>
-            setUploadFile(value)
-          }
           allowEditingUploadedText={false}
           browseButtonText={t('Upload')}
           filename={uploadFileName}
@@ -56,9 +44,20 @@ const DiskSourceUploadPVC: FC<DiskSourceUploadPVCProps> = ({
           id="simple-file"
           isDisabled={isUploading || isLoading}
           isLoading={isLoading}
+          onClearClick={() => {
+            setUploadFile('');
+            setUploadFileName('');
+          }}
           onDataChange={(_event: DropEvent, droppedFile: string) => setUploadFile(droppedFile)}
+          onFileInputChange={(_event, file: File) => {
+            setUploadFileName(file.name);
+            setUploadFile(file);
+          }}
           onReadFinished={() => setIsLoading(false)}
           onReadStarted={() => setIsLoading(true)}
+          onTextChange={(_event: ChangeEvent<HTMLTextAreaElement>, value: string) =>
+            setUploadFile(value)
+          }
           value={uploadFile}
         />
       </FormGroup>

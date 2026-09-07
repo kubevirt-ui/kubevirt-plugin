@@ -1,11 +1,10 @@
-/* eslint-disable */
 import React, {
-  Dispatch,
-  FC,
-  KeyboardEvent,
-  MouseEvent,
-  ReactNode,
-  SetStateAction,
+  type Dispatch,
+  type FC,
+  type KeyboardEvent,
+  type MouseEvent,
+  type ReactNode,
+  type SetStateAction,
   useRef,
   useState,
 } from 'react';
@@ -17,7 +16,7 @@ import {
   MenuList,
   MenuToggle,
   Popper,
-  PopperProps,
+  type PopperProps,
 } from '@patternfly/react-core';
 
 type MenuHeightsType = {
@@ -56,11 +55,11 @@ const ComposableDrilldownSelect: FC<ComposableDrilldownMenuProps> = ({
   const [menuHeights, setMenuHeights] = useState<MenuHeightsType>({});
   const menuRef = useRef<HTMLDivElement>(null);
 
-  const onToggleClick = (ev?: MouseEvent) => {
+  const onToggleClick = (event?: MouseEvent): void => {
     if (isDisabled) {
       return;
     }
-    ev?.stopPropagation(); // Stop handleClickOutside from handling
+    event?.stopPropagation(); // Stop handleClickOutside from handling
     setIsOpen(!isOpen);
     setMenuDrilledIn([]);
     setDrilldownPath([]);
@@ -72,19 +71,19 @@ const ComposableDrilldownSelect: FC<ComposableDrilldownMenuProps> = ({
     fromMenuId: string,
     toMenuId: string,
     pathId: string,
-  ) => {
+  ): void => {
     setMenuDrilledIn([...menuDrilledIn, fromMenuId]);
     setDrilldownPath([...drilldownPath, pathId]);
     setActiveMenu(toMenuId);
   };
 
-  const drillOut = (_event: KeyboardEvent | MouseEvent, toMenuId: string) => {
+  const drillOut = (_event: KeyboardEvent | MouseEvent, toMenuId: string): void => {
     setMenuDrilledIn(menuDrilledIn.slice(0, menuDrilledIn.length - 1));
     setDrilldownPath(drilldownPath.slice(0, drilldownPath.length - 1));
     setActiveMenu(toMenuId);
   };
 
-  const setHeight = (menuId: string, height: number) => {
+  const setHeight = (menuId: string, height: number): void => {
     if (menuHeights[menuId] === undefined || (menuId !== id && menuHeights[menuId] !== height)) {
       setMenuHeights((prev) => ({
         ...prev,
@@ -97,6 +96,9 @@ const ComposableDrilldownSelect: FC<ComposableDrilldownMenuProps> = ({
 
   return (
     <Popper
+      appendTo={appendTo}
+      direction={direction}
+      isVisible={isOpen}
       popper={
         <Menu
           activeMenu={activeMenu}
@@ -127,9 +129,6 @@ const ComposableDrilldownSelect: FC<ComposableDrilldownMenuProps> = ({
           </MenuToggle>
         )
       }
-      appendTo={appendTo}
-      direction={direction}
-      isVisible={isOpen}
       triggerRef={triggerRef}
     />
   );

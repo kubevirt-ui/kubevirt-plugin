@@ -1,20 +1,18 @@
-/* eslint-disable */
 import { useCallback, useMemo } from 'react';
 import { type TFunction } from 'i18next';
 
 import { type DataViewTrTree } from '@patternfly/react-data-view';
 
+import { getEffectiveConfigStatus } from '../../utils/configStatus';
+import { countInstalledCapabilities } from '../../utils/installState';
 import {
   type AutopilotStatusMap,
   type CapabilityFeature,
-  CapabilityInstallState,
   type CapabilityFeatureOperator,
+  type CapabilityInstallState,
   type RecommendedCapabilityDetailsMap,
   type RecommendedCapabilityOperatorDetails,
 } from '../../utils/types';
-import { getEffectiveConfigStatus } from '../../utils/configStatus';
-import { countInstalledCapabilities } from '../../utils/installState';
-
 import { getAutopilotOperatorActions } from './autopilotOperatorActions';
 import { buildTreeRows } from './buildTreeRows';
 import { isCapabilitySelectable } from './utils';
@@ -111,7 +109,7 @@ const useCustomSelectionRows = ({
   const selectableRows = useMemo(
     () =>
       treeRows.filter((row) => {
-        const feature = features.find((f) => f.id === row.id);
+        const feature = features.find((feat) => feat.id === row.id);
         return (
           feature &&
           isCapabilitySelectable(feature, detailsMap, installingFeatures, getCapabilityInstallState)

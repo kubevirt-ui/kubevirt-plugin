@@ -1,8 +1,7 @@
-/* eslint-disable */
 import produce from 'immer';
 
 import { TemplateModel, VirtualMachineTemplateModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { produceVMDisks } from '@kubevirt-utils/components/DiskModal/utils/helpers';
 import {
   addSysprepConfig,
@@ -18,7 +17,7 @@ import {
   isOpenShiftTemplate,
   isVirtualMachineTemplate,
   replaceTemplateVM,
-  Template,
+  type Template,
 } from '@kubevirt-utils/resources/template';
 import { getVolumes } from '@kubevirt-utils/resources/vm';
 import { getCluster } from '@multicluster/helpers/selectors';
@@ -32,7 +31,7 @@ export const getTemplateSysprepObject = (
     ? template.objects.find((object) => object?.metadata?.name === sysprepName)
     : undefined;
 
-export const deleteTemplateSysprepObject = (template: Template, sysprepName: string) => {
+export const deleteTemplateSysprepObject = (template: Template, sysprepName: string): Template => {
   if (!isOpenShiftTemplate(template)) return template;
 
   return produce(template, (draftTemplate) => {
@@ -46,7 +45,7 @@ export const replaceTemplateSysprepObject = (
   template: Template,
   sysprepConfig: IoK8sApiCoreV1ConfigMap,
   oldSysprepName?: string,
-) => {
+): Template => {
   if (!isOpenShiftTemplate(template)) return template;
 
   return produce(template, (draftTemplate) => {
@@ -66,7 +65,7 @@ export const updateTemplateWithSysprep = async (
   template: Template,
   newSysprepName?: string,
   oldSysprepName?: string,
-) => {
+): Promise<void> => {
   if (newSysprepName === oldSysprepName) return;
 
   const vm = getTemplateVirtualMachineObject(template);
@@ -119,8 +118,8 @@ export const updateSysprepObject = (
 
       draftConfig.data[UNATTEND] = unattend;
     });
-  } else {
-    const data = { [AUTOUNATTEND]: autoUnattend, [UNATTEND]: unattend };
-    return generateNewSysprepConfig({ data });
   }
+
+  const data = { [AUTOUNATTEND]: autoUnattend, [UNATTEND]: unattend };
+  return generateNewSysprepConfig({ data });
 };

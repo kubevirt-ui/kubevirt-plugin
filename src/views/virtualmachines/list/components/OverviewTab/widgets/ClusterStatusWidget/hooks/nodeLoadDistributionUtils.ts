@@ -1,7 +1,8 @@
-/* eslint-disable */
-import { DistributionBucket } from '../../shared/DistributionBarChart/DistributionBarChart';
-import { ExtraScoreItem, StatusScoreItem } from '../../shared/StatusScoreList/StatusScoreList';
-
+import { type DistributionBucket } from '../../shared/DistributionBarChart/DistributionBarChart';
+import {
+  type ExtraScoreItem,
+  type StatusScoreItem,
+} from '../../shared/StatusScoreList/StatusScoreList';
 import { THRESHOLD_MEDIUM, TOP_N } from './clusterMetricConstants';
 import { formatPercent, getStatusAscending } from './clusterMetricUtils';
 
@@ -57,8 +58,8 @@ export const buildTopNodeItems = (
       const hottest = resources[0];
       const extras: ExtraScoreItem[] = resources
         .slice(1)
-        .filter((r) => r.pct >= THRESHOLD_MEDIUM)
-        .map((r) => ({ name: r.label, value: formatPercent(r.pct) }));
+        .filter((resource) => resource.pct >= THRESHOLD_MEDIUM)
+        .map((resource) => ({ name: resource.label, value: formatPercent(resource.pct) }));
 
       const item: StatusScoreItem = {
         name: node.name,

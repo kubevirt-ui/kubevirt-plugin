@@ -1,7 +1,6 @@
-/* eslint-disable */
 import { MILLISECONDS_MULTIPLIER } from '@kubevirt-utils/components/Charts/utils/utils';
-import { PrometheusResponse } from '@openshift-console/dynamic-plugin-sdk';
-import { ChartDomain } from '@overview/OverviewTab/metric-charts-card/utils/hooks/types';
+import { type PrometheusResponse } from '@openshift-console/dynamic-plugin-sdk';
+import { type ChartDomain } from '@overview/OverviewTab/metric-charts-card/utils/hooks/types';
 import { getHumanizedValue } from '@overview/OverviewTab/metric-charts-card/utils/hooks/utils';
 import { chart_color_black_500 } from '@patternfly/react-tokens';
 import chart_color_blue_300 from '@patternfly/react-tokens/dist/esm/chart_color_blue_300';
@@ -58,7 +57,13 @@ export const extractPerClusterData = (
 export const extractClusterNames = (response: PrometheusResponse): string[] => {
   const results = response?.data?.result;
   if (!results || results.length === 0) return [];
-  return results.map((r) => r.metric?.cluster).filter((name): name is string => Boolean(name));
+  return results.reduce<string[]>((names, result) => {
+    const name = result.metric?.cluster;
+    if (name) {
+      names.push(name);
+    }
+    return names;
+  }, []);
 };
 
 /** Format raw per-cluster data into chart series for the given top clusters. */
@@ -70,7 +75,7 @@ export const buildChartSeries = (
 ): ClusterChartSeries[] =>
   topClusterNames
     .map((name, idx) => {
-      const clusterData = rawClusters.find((c) => c.clusterName === name);
+      const clusterData = rawClusters.find((raw) => raw.clusterName === name);
       if (!clusterData) return null;
 
       const data = clusterData.values.map(([timestamp, value]) => {

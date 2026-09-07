@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import { SelectOption } from '@patternfly/react-core';
@@ -22,7 +21,7 @@ const AutomaticSubscriptionType: FC<AutomaticSubscriptionTypeProps> = ({
   return (
     <div className="AutomaticSubscriptionType--main">
       <FormPFSelect
-        onSelect={(_e, value: string) => {
+        onSelect={(_event, value: string) => {
           setSelected(getSubscriptionItem(value));
           updateSubscriptionType({ type: value });
         }}

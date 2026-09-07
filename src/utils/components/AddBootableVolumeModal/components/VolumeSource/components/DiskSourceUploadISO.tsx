@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Checkbox } from '@patternfly/react-core';
@@ -19,7 +18,7 @@ const DiskSourceUploadISO: FC<DiskSourceUploadISOProps> = ({ isDisabled, isIso, 
       isChecked={isIso}
       isDisabled={isDisabled}
       label={t('This is an ISO file')}
-      onChange={(_, value: boolean) => setIsIso(value)}
+      onChange={(_event, value: boolean) => setIsIso(value)}
     />
   );
 };

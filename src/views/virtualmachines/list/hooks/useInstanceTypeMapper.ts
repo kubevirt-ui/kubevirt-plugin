@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { useMemo } from 'react';
 
 import {
@@ -6,14 +5,17 @@ import {
   VirtualMachineInstancetypeModelGroupVersionKind,
 } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
-  V1beta1VirtualMachineClusterInstancetype,
-  V1beta1VirtualMachineInstancetype,
+  type V1beta1VirtualMachineClusterInstancetype,
+  type V1beta1VirtualMachineInstancetype,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getClusterKey, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { useAccessibleResources } from '@virtualmachines/search/hooks/useAccessibleResources';
-import { InstanceTypeMapper } from '@virtualmachines/utils/mappers';
+import { type InstanceTypeMapper } from '@virtualmachines/utils/mappers';
 
-export const useInstanceTypeMapper = () => {
+export const useInstanceTypeMapper = (): {
+  instanceTypeMapper: InstanceTypeMapper;
+  instanceTypesLoaded: boolean;
+} => {
   const { loaded: clusterITsLoaded, resources: clusterITs } =
     useAccessibleResources<V1beta1VirtualMachineClusterInstancetype>({
       groupVersionKind: VirtualMachineClusterInstancetypeModelGroupVersionKind,
@@ -27,21 +29,21 @@ export const useInstanceTypeMapper = () => {
   const instanceTypeMapper: InstanceTypeMapper = useMemo(() => {
     const clusterInstanceTypes = (clusterITs ?? []).reduce<
       InstanceTypeMapper['clusterInstanceTypes']
-    >((acc, it) => {
-      const cluster = getClusterKey(it);
-      if (!acc[cluster]) acc[cluster] = {};
-      acc[cluster][getName(it)] = it;
+    >((acc, instanceType) => {
+      const cluster = getClusterKey(instanceType);
+      acc[cluster] ??= {};
+      acc[cluster][getName(instanceType)] = instanceType;
       return acc;
     }, {});
 
     const namespacedInstanceTypes = (namespacedITs ?? []).reduce<
       InstanceTypeMapper['namespacedInstanceTypes']
-    >((acc, it) => {
-      const cluster = getClusterKey(it);
-      const ns = getNamespace(it);
-      if (!acc[cluster]) acc[cluster] = {};
-      if (!acc[cluster][ns]) acc[cluster][ns] = {};
-      acc[cluster][ns][getName(it)] = it;
+    >((acc, instanceType) => {
+      const cluster = getClusterKey(instanceType);
+      const ns = getNamespace(instanceType);
+      acc[cluster] ??= {};
+      acc[cluster][ns] ??= {};
+      acc[cluster][ns][getName(instanceType)] = instanceType;
       return acc;
     }, {});
 

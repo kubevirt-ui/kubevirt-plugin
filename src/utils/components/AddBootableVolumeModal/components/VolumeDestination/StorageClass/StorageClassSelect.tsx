@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { Dispatch, FC, SetStateAction, useCallback, useEffect } from 'react';
+import React, { type Dispatch, type FC, type SetStateAction, useCallback, useEffect } from 'react';
 
 import { getSCSelectOptions } from '@kubevirt-utils/components/DiskModal/components/StorageClassAndPreallocation/utils/helpers';
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
@@ -45,11 +44,11 @@ const StorageClassSelect: FC<StorageClassSelectProps> = ({
       setShowSCAlert(checkSC ? checkSC(selection) : false);
       setStorageClassName(selection);
       setStorageClassProvisioner?.(
-        (readyStorageClasses || []).find((sc) => getName(sc) === selection)?.provisioner,
+        (readyStorageClasses || []).find((scItem) => getName(scItem) === selection)?.provisioner,
       );
     },
-     
-    [readyStorageClasses],
+
+    [checkSC, readyStorageClasses, setShowSCAlert, setStorageClassName, setStorageClassProvisioner],
   );
 
   useEffect(() => {
@@ -64,15 +63,15 @@ const StorageClassSelect: FC<StorageClassSelectProps> = ({
       <div data-test="storage-class-select">
         {loaded ? (
           <InlineFilterSelect
-            toggleProps={{
-              isDisabled,
-              isFullWidth: true,
-            }}
             options={getSCSelectOptions(readyStorageClasses)}
             placeholder={t('Select {{label}}', { label: StorageClassModel.label })}
             popperProps={{ enableFlip: true }}
             selected={storageClass || getName(defaultSC)}
             setSelected={onSelect}
+            toggleProps={{
+              isDisabled,
+              isFullWidth: true,
+            }}
           />
         ) : (
           <Loading />

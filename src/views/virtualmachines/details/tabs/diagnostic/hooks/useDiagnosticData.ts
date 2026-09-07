@@ -1,25 +1,24 @@
-/* eslint-disable */
 import { useMemo } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
 import { DataVolumeModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
+import { type V1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import {
-  V1VirtualMachine,
-  V1VirtualMachineCondition,
-  V1VolumeSnapshotStatus,
+  type V1VirtualMachine,
+  type V1VirtualMachineCondition,
+  type V1VolumeSnapshotStatus,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { CLOUDINITDISK } from '@kubevirt-utils/constants/constants';
 import { getCluster } from '@multicluster/helpers/selectors';
 import useKubevirtWatchResources from '@multicluster/hooks/useKubevirtWatchResources';
-import { FleetWatchK8sResults } from '@stolostron/multicluster-sdk';
+import { type FleetWatchK8sResults } from '@stolostron/multicluster-sdk';
 
 import { DiagnosticCategory } from '../utils/constants';
 import {
-  DiagnosticData,
-  VirtualizationDataVolumeStatus,
-  VirtualizationStatusCondition,
-  VirtualizationVolumeSnapshotStatus,
+  type DiagnosticData,
+  type VirtualizationDataVolumeStatus,
+  type VirtualizationStatusCondition,
+  type VirtualizationVolumeSnapshotStatus,
 } from '../utils/types';
 import { getConditionSeverity, getDVSeverity, getSnapshotSeverity } from '../utils/utils';
 
@@ -57,7 +56,7 @@ const volumeSnapshotStatusesTransformer = (
       message,
       metadata: {
         condition: 'Other',
-        name: hasColon ? vss.reason.slice(0, index) : vss?.reason || vss?.name,
+        name: hasColon ? vss.reason.slice(0, index) : (vss?.reason ?? vss?.name),
         type: DiagnosticCategory.Storage,
       },
       reason,
@@ -75,7 +74,7 @@ const conditionsTransformer = (
     lastTransitionTime: condition?.['lastTransitionTime'],
     metadata: {
       condition: condition?.status === 'False' ? 'Error' : 'Other',
-      name: condition?.reason || condition?.type,
+      name: condition?.reason ?? condition?.type,
       type: DiagnosticCategory.VirtualMachines,
     },
     severity: getConditionSeverity(condition?.status, condition?.type),
@@ -85,9 +84,9 @@ const buildDVStatus = (
   data: FleetWatchK8sResults<{ [name: string]: V1beta1DataVolume }>,
 ): VirtualizationDataVolumeStatus[] =>
   Object.values(data)
-    .filter((dv) => dv.loaded && dv.data)
-    .map((dv) => {
-      const element = dv.data;
+    .filter((dataVolume) => dataVolume.loaded && dataVolume.data)
+    .map((dataVolume) => {
+      const element = dataVolume.data;
       const conditions = element?.status?.conditions;
       const message = conditions?.[conditions.length - 1]?.message;
       const phase = element?.status?.phase;

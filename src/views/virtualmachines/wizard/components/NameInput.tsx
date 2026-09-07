@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC, useCallback } from 'react';
+import React, { type FC, useCallback } from 'react';
 import { Controller, useWatch } from 'react-hook-form';
 
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
@@ -16,7 +15,6 @@ import {
   CREATE_VM_FORM_FIELDS_UI_STATE,
   CREATE_VM_FORM_FIELDS_VM_DATA,
 } from '../state/vm-wizard-form/consts';
-
 import GenerateVMNameButton from './GenerateVMNameButton';
 
 const NameInput: FC = () => {
@@ -43,18 +41,18 @@ const NameInput: FC = () => {
       <InputGroup>
         <InputGroupItem isFill>
           <Controller
-            render={({ field: { ref: __, ...field } }) => (
+            control={control}
+            name={CREATE_VM_FORM_FIELDS_VM_DATA.NAME}
+            render={({ field: { ref: _ref, ...field } }) => (
               <TextInput
                 id="vm-name"
                 {...field}
-                onChange={(_, value) => applyName(value)}
+                onChange={(_event, value) => applyName(value)}
                 placeholder={t('Enter a name or click the refresh icon to generate one')}
                 type="text"
                 validated={validated}
               />
             )}
-            control={control}
-            name={CREATE_VM_FORM_FIELDS_VM_DATA.NAME}
           />
         </InputGroupItem>
         <InputGroupItem>

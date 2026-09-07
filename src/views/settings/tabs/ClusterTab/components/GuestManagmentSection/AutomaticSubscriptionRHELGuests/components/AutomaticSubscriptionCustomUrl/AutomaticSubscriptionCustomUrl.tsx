@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC, useCallback, useEffect, useState } from 'react';
+import React, { type FC, useCallback, useEffect, useState } from 'react';
 
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
@@ -44,16 +43,16 @@ const AutomaticSubscriptionCustomUrl: FC<AutomaticSubscriptionCustomUrlProps> = 
     <div>
       <Flex alignItems={{ default: 'alignItemsCenter' }} gap={{ default: 'gapSm' }}>
         <Checkbox
+          id="auto-register-rhel"
+          isChecked={isChecked && !isDisabled}
+          isDisabled={isDisabled}
+          label={t('Use custom registration server url')}
           onChange={() =>
             setIsChecked((prevIsChecked) => {
               if (prevIsChecked) debounceUpdateCustomUrl('');
               return !prevIsChecked;
             })
           }
-          id="auto-register-rhel"
-          isChecked={isChecked && !isDisabled}
-          isDisabled={isDisabled}
-          label={t('Use custom registration server url')}
         />
         <HelpTextIcon
           bodyContent={t('Select this option if you use an on-premise subscription service')}
@@ -65,12 +64,12 @@ const AutomaticSubscriptionCustomUrl: FC<AutomaticSubscriptionCustomUrlProps> = 
           <Flex>
             <Content component="p">{t('URL')}</Content>
             <TextInput
-              onChange={(_, value: string) => {
+              className="AutomaticSubscriptionCustomUrl--input"
+              id="custom-url-input"
+              onChange={(_event, value: string) => {
                 setInputValue(value);
                 debounceUpdateCustomUrl(value);
               }}
-              className="AutomaticSubscriptionCustomUrl--input"
-              id="custom-url-input"
               value={inputValue}
             />
           </Flex>

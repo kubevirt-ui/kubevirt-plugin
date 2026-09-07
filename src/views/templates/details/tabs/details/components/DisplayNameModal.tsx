@@ -1,10 +1,9 @@
-/* eslint-disable */
-import React, { FC, memo, useState } from 'react';
+import React, { type FC, memo, useState } from 'react';
 import { ANNOTATIONS } from 'src/views/templates/utils/constants';
 
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk-internal/lib/extensions/console-types';
+import { type K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk-internal/lib/extensions/console-types';
 import { TextArea } from '@patternfly/react-core';
 
 type DisplayNameModalProps = {
@@ -31,7 +30,7 @@ const DisplayNameModal: FC<DisplayNameModalProps> = memo(({ isOpen, obj, onClose
       <TextArea
         aria-label={t('display name text area')}
         autoFocus
-        onChange={(_, value: string) => setDisplayName(value)}
+        onChange={(_event, value: string) => setDisplayName(value)}
         resizeOrientation="vertical"
         value={displayName}
       />

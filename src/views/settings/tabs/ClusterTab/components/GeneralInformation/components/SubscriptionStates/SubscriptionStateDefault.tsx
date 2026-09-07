@@ -1,7 +1,6 @@
-/* eslint-disable */
-import React, { FC } from 'react';
-import cn from 'classnames';
-import { SubscriptionKind } from 'src/views/clusteroverview/utils/types';
+import React, { type FC } from 'react';
+import classNames from 'classnames';
+import { type SubscriptionKind } from 'src/views/clusteroverview/utils/types';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -14,8 +13,10 @@ const SubscriptionStateDefault: FC<SubscriptionStateDefaultProps> = ({ subscript
   const { t } = useKubevirtTranslation();
 
   return (
-    <span className={cn({ 'pf-v6-u-text-color-subtle': isEmpty(subscription?.status?.state) })}>
-      {subscription?.status?.state || t('Unknown failure')}
+    <span
+      className={classNames({ 'pf-v6-u-text-color-subtle': isEmpty(subscription?.status?.state) })}
+    >
+      {subscription?.status?.state ?? t('Unknown failure')}
     </span>
   );
 };
