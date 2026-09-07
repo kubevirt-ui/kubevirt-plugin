@@ -23,6 +23,8 @@ import { applySearch } from '@search/savedSearches/utils';
 import SavedSearchesStateHandler from './components/SavedSearchesStateHandler';
 import SavedSearchItem from './components/SavedSearchItem';
 import useDeleteSavedSearch from './hooks/useDeleteSavedSearch';
+import { getSavedSearchesItemsToDisplay, getSortedSavedsearches } from './utils/utils';
+import { SavedSearchEntry } from '@search/savedSearches/types';
 
 type SavedSearchesDropdownProps = {
   filters: KubevirtFilterState;
@@ -40,28 +42,44 @@ const SavedSearchesDropdown: FC<SavedSearchesDropdownProps> = ({ filters, onSetF
 
   const handleDelete = useDeleteSavedSearch(deleteSearch, setOpen);
 
-  const filteredSearches = useMemo(() => {
-    const sorted = [...searches].sort((a, b) => Number(b.isFavorited) - Number(a.isFavorited));
-    if (!filterText) return sorted;
-    const lower = filterText.toLowerCase();
-    return sorted.filter(({ name }) => name.toLowerCase().includes(lower));
-  }, [searches, filterText]);
+  const { favoriteSavedSearchesItems, otherSavedSearchesItems, shouldDisplayDivider } =
+    useMemo(() => {
+      const sorted = getSortedSavedsearches(searches, filterText);
+      return getSavedSearchesItemsToDisplay(sorted);
+    }, [searches, filterText]);
+
+  const savedSearchesItemsToDropdownItems = (savedSearchesItems: SavedSearchEntry[]) =>
+    savedSearchesItems.map(({ description, isFavorited, name }) => (
+      <SavedSearchItem
+        onApply={() => {
+          applySearch(name, searches, filters, onSetFilters);
+          setOpen(false);
+        }}
+        description={description}
+        isFavorited={isFavorited}
+        key={name}
+        name={name}
+        onDelete={() => handleDelete(name, isFavorited)}
+        onToggleFavorite={() => toggleFavorite(name)}
+      />
+    ));
 
   return (
     <Dropdown
+      isOpen={open}
+      isScrollable
       onOpenChange={(isOpen: boolean) => {
         setOpen(isOpen);
         if (!isOpen) {
           setFilterText('');
         }
       }}
+      popperProps={{ position: 'end' }}
       toggle={(toggleRef) => (
         <MenuToggle isExpanded={open} onClick={() => setOpen(!open)} ref={toggleRef}>
           {t('Saved searches')}
         </MenuToggle>
       )}
-      isOpen={open}
-      popperProps={{ position: 'end' }}
     >
       <SavedSearchesStateHandler
         loaded={searchesInitiallyLoaded}
@@ -79,25 +97,16 @@ const SavedSearchesDropdown: FC<SavedSearchesDropdownProps> = ({ filters, onSetF
         </MenuSearch>
         <Divider />
         <DropdownList className="saved-searches-dropdown-menu" data-test="saved-searches">
-          {isEmpty(filteredSearches) ? (
+          {isEmpty(favoriteSavedSearchesItems) && isEmpty(otherSavedSearchesItems) ? (
             <DropdownItem isDisabled key="no-results">
               {t('No saved searches match "{{filterText}}".', { filterText })}
             </DropdownItem>
           ) : (
-            filteredSearches.map(({ description, isFavorited, name }) => (
-              <SavedSearchItem
-                onApply={() => {
-                  applySearch(name, searches, filters, onSetFilters);
-                  setOpen(false);
-                }}
-                description={description}
-                isFavorited={isFavorited}
-                key={name}
-                name={name}
-                onDelete={() => handleDelete(name, isFavorited)}
-                onToggleFavorite={() => toggleFavorite(name)}
-              />
-            ))
+            <>
+              {savedSearchesItemsToDropdownItems(favoriteSavedSearchesItems)}
+              {shouldDisplayDivider && <Divider component="li" />}
+              {savedSearchesItemsToDropdownItems(otherSavedSearchesItems)}
+            </>
           )}
         </DropdownList>
       </SavedSearchesStateHandler>
