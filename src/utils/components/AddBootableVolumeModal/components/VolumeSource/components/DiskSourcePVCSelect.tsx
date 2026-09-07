@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useMemo } from 'react';
+import React, { type FC, useCallback, useMemo } from 'react';
 
 import useProjects from '@kubevirt-utils/hooks/useProjects';
 import usePVCs from '@kubevirt-utils/hooks/usePVCs';
@@ -30,7 +30,7 @@ const DiskSourcePVCSelect: FC<DiskSourcePVCSelectProps> = ({
 
   const onSelectProject = useCallback(
     (newProject) => {
-      selectPVCNamespace && selectPVCNamespace(newProject);
+      selectPVCNamespace?.(newProject);
       selectPVCName(undefined);
     },
     [selectPVCNamespace, selectPVCName],
@@ -40,18 +40,22 @@ const DiskSourcePVCSelect: FC<DiskSourcePVCSelectProps> = ({
     (selection) => {
       selectPVCName(selection);
       const selectedPVC = pvcs?.find((pvc) => pvc?.metadata?.name === selection);
-      setDiskSize && setDiskSize(formatQuantityString(getPVCSize(selectedPVC)));
+      setDiskSize?.(formatQuantityString(getPVCSize(selectedPVC)));
     },
     [selectPVCName, pvcs, setDiskSize],
   );
 
   const pvcNames = useMemo(
-    () => pvcs?.map((pvc) => pvc?.metadata?.name)?.sort((a, b) => a?.localeCompare(b)),
+    () =>
+      pvcs
+        ?.map((pvc) => pvc?.metadata?.name)
+        ?.filter((name): name is string => Boolean(name))
+        ?.sort((a, b) => a.localeCompare(b)),
     [pvcs],
   );
 
   return (
-    <div>
+    <>
       <DiskSourcePVCSelectNamespace
         isDisabled={!selectPVCNamespace}
         onChange={onSelectProject}
@@ -66,7 +70,7 @@ const DiskSourcePVCSelect: FC<DiskSourcePVCSelectProps> = ({
         pvcNameSelected={pvcNameSelected}
         pvcsLoaded={pvcsLoaded}
       />
-    </div>
+    </>
   );
 };
 
