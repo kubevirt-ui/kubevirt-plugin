@@ -20,7 +20,7 @@ import {
 } from '@overview/utils/types';
 
 import { CONSOLE_OPERATOR_CONFIG_NAME } from '../constants';
-import { RED_HAT_CATALOG_SOURCE } from './constants';
+import { isRedHatCatalogSource } from './constants';
 
 export enum OLMAnnotation {
   ActionText = 'marketplace.openshift.io/action-text',
@@ -120,7 +120,7 @@ export const getClusterServiceVersionPlugins: AnnotationParser<string[]> = (
   }) ?? [];
 
 export const isCatalogSourceTrusted = (catalogSource: string): boolean =>
-  catalogSource === RED_HAT_CATALOG_SOURCE;
+  isRedHatCatalogSource(catalogSource);
 
 export const getPrometheusRole = (namespace: string) => {
   return {

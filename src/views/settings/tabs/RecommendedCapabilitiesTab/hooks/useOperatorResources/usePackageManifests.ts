@@ -7,7 +7,11 @@ import { type PackageManifestKind } from '@overview/utils/types';
 
 import { PACKAGE_MANIFESTS_WATCH_KEY } from './utils/constants';
 import { type UsePackageManifestsParams, type UsePackageManifestsReturn } from './utils/types';
-import { getPackageManifestWatchResources } from './utils/utils';
+import {
+  getPackageManifestWatchResources,
+  mapWatchResourceErrors,
+  selectPreferredPackageManifests,
+} from './utils/utils';
 
 const usePackageManifests = ({
   cluster,
@@ -24,18 +28,20 @@ const usePackageManifests = ({
     useKubevirtWatchResources<Record<string, PackageManifestKind[]>>(packageManifestResources);
 
   const packageManifestWatch = packageManifestData?.[PACKAGE_MANIFESTS_WATCH_KEY];
-  const allManifests = (packageManifestWatch?.data ?? []) as PackageManifestKind[];
   const loaded = packageManifestWatch?.loaded ?? false;
-  const loadError = packageManifestWatch?.loadError;
 
   const packageManifests = useMemo(() => {
     if (!loaded) return [];
 
+    const allManifests = packageManifestWatch?.data ?? [];
     const nameSet = new Set(memoizedPackageNames);
-    return allManifests.filter((pkg) => nameSet.has(getName(pkg)));
-  }, [allManifests, loaded, memoizedPackageNames]);
+    return selectPreferredPackageManifests(allManifests.filter((pkg) => nameSet.has(getName(pkg))));
+  }, [loaded, memoizedPackageNames, packageManifestWatch?.data]);
 
-  const loadErrors = useMemo(() => (loadError ? [loadError] : []), [loadError]);
+  const loadErrors = useMemo(
+    () => mapWatchResourceErrors([PACKAGE_MANIFESTS_WATCH_KEY], packageManifestData),
+    [packageManifestData],
+  );
 
   return useMemo(
     () => ({ loaded, loadErrors, packageManifests }),

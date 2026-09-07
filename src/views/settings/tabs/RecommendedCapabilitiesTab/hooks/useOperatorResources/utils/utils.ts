@@ -14,11 +14,35 @@ import {
 } from '@overview/utils/types';
 import { type FleetWatchK8sResource } from '@stolostron/multicluster-sdk';
 
-import { OPENSHIFT_MARKETPLACE_NAMESPACE } from '../../../utils/constants';
-import { RED_HAT_CATALOG_SOURCE } from '../../../utils/createOperator/constants';
+import { OPENSHIFT_MARKETPLACE_NAMESPACE, RED_HAT } from '../../../utils/constants';
+import {
+  isRedHatCatalogSource,
+  RED_HAT_CATALOG_SOURCE,
+} from '../../../utils/createOperator/constants';
 import { getSubscriptionInstalledCSV, subscriptionFor } from '../../../utils/operatorResolution';
 import { PACKAGE_MANIFESTS_WATCH_KEY } from './constants';
 import { type OperatorWatchResourceResult } from './types';
+
+const catalogSourceOf = (pkg: PackageManifestKind): string => pkg.status?.catalogSource ?? '';
+
+const pickPreferred = (candidates: PackageManifestKind[]): PackageManifestKind | undefined =>
+  candidates.find((pkg) => catalogSourceOf(pkg) === RED_HAT_CATALOG_SOURCE) ??
+  candidates.find((pkg) => isRedHatCatalogSource(catalogSourceOf(pkg))) ??
+  candidates.find((pkg) => pkg.status?.provider?.name?.includes(RED_HAT)) ??
+  candidates[0];
+
+/** One PackageManifest per package name, preferring redhat-operators then redhat-operators*. */
+export const selectPreferredPackageManifests = (
+  manifests: PackageManifestKind[],
+): PackageManifestKind[] => {
+  const names = [
+    ...new Set(manifests.map(getName).filter((name): name is string => Boolean(name))),
+  ];
+
+  return names
+    .map((name) => pickPreferred(manifests.filter((pkg) => getName(pkg) === name)))
+    .filter((pkg): pkg is PackageManifestKind => Boolean(pkg));
+};
 
 export const getCsvResourceKey = (packageName: string): string =>
   `clusterServiceVersion_${packageName}`;
@@ -77,7 +101,6 @@ export const getPackageManifestWatchResources = (
     groupVersionKind: getGroupVersionKindForModel(PackageManifestModel),
     isList: true,
     namespace: OPENSHIFT_MARKETPLACE_NAMESPACE,
-    selector: { matchLabels: { catalog: RED_HAT_CATALOG_SOURCE } },
   },
 });
 

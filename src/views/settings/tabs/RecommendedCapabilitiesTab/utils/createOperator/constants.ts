@@ -6,6 +6,9 @@ export const OPERATOR_MONITORING_DEFAULT_ANNOTATION_KEY =
 
 export const RED_HAT_CATALOG_SOURCE = 'redhat-operators';
 
+export const isRedHatCatalogSource = (catalogSource: string | undefined): boolean =>
+  Boolean(catalogSource?.startsWith(RED_HAT_CATALOG_SOURCE));
+
 export const OPENSHIFT_OPERATORS_NAMESPACE = 'openshift-operators';
 
 export const HTTP_CONFLICT_CODE = 409;
