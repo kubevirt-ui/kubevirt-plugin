@@ -1,4 +1,5 @@
-import React, { type FC, useMemo, useState } from 'react';
+import React, { type FC, useCallback } from 'react';
+import { Controller, useForm, useWatch } from 'react-hook-form';
 import produce from 'immer';
 
 import {
@@ -10,7 +11,11 @@ import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getHostname } from '@kubevirt-utils/resources/vm';
 import { ensurePath } from '@kubevirt-utils/utils/utils';
-import { getNameValidationMessage } from '@kubevirt-utils/utils/validation';
+import {
+  getDNS1123LabelError,
+  getDNS1123LabelErrorLenient,
+  getFieldRequiredMessage,
+} from '@kubevirt-utils/utils/validation';
 import { FormGroup, TextInput, ValidatedOptions } from '@patternfly/react-core';
 
 import FormGroupHelperText from '../FormGroupHelperText/FormGroupHelperText';
@@ -23,44 +28,78 @@ type HostnameModalProps = {
   vmi?: V1VirtualMachineInstance;
 };
 
+type HostnameFormValues = {
+  hostname: string;
+};
+
 const HostnameModal: FC<HostnameModalProps> = ({ isOpen, onClose, onSubmit, vm, vmi }) => {
   const { t } = useKubevirtTranslation();
-  const [newHostname, setNewHostname] = useState<string>(() => getHostname(vm));
-  const [isTouched, setIsTouched] = useState(false);
+  const {
+    control,
+    formState: { errors, isDirty, isSubmitted, touchedFields },
+    handleSubmit: submitForm,
+  } = useForm<HostnameFormValues>({
+    defaultValues: { hostname: getHostname(vm) ?? '' },
+    mode: 'onTouched',
+  });
 
-  const hostnameError = getNameValidationMessage(t, newHostname);
-  const isHostnameInvalid = isTouched && !!hostnameError;
+  const newHostname = useWatch({ control, name: 'hostname' });
 
-  const updatedVirtualMachine = useMemo(() => {
-    const updatedVM = produce<V1VirtualMachine>(vm, (vmDraft: V1VirtualMachine) => {
-      ensurePath(vmDraft, ['spec.template.spec']);
-      vmDraft.spec.template.spec.hostname = newHostname || undefined;
-    });
-    return updatedVM;
-  }, [vm, newHostname]);
+  const lenientHostnameError = isDirty ? getDNS1123LabelErrorLenient(newHostname)?.(t) : undefined;
+
+  // RHF always validates strictly - only the displayed error is lenient before blur or submit.
+  const hostnameError =
+    touchedFields.hostname || isSubmitted ? errors.hostname?.message : lenientHostnameError;
+
+  const handleSubmit = useCallback(
+    () =>
+      submitForm(async ({ hostname }) => {
+        const updatedVM = produce<V1VirtualMachine>(vm, (vmDraft: V1VirtualMachine) => {
+          ensurePath(vmDraft, ['spec.template.spec']);
+
+          vmDraft.spec.template.spec.hostname = hostname;
+        });
+
+        await onSubmit(updatedVM);
+        onClose();
+      })(),
+    [onClose, onSubmit, submitForm, vm],
+  );
+
   return (
     <TabModal
+      closeOnSubmit={false}
       headerText={t('Edit hostname')}
-      isDisabled={!!getNameValidationMessage(t, newHostname)}
+      isDisabled={!!hostnameError}
       isOpen={isOpen}
-      obj={updatedVirtualMachine}
       onClose={onClose}
-      onSubmit={onSubmit}
+      onSubmit={handleSubmit}
       shouldWrapInForm
     >
       {vmi && <ModalPendingChangesAlert />}
+
       <FormGroup fieldId="hostname" isRequired label={t('Hostname')}>
-        <TextInput
-          autoFocus
-          id="hostname"
-          onBlur={() => setIsTouched(true)}
-          onChange={(_event, val) => setNewHostname(val)}
-          type="text"
-          validated={isHostnameInvalid ? ValidatedOptions.error : ValidatedOptions.default}
-          value={newHostname}
+        <Controller
+          control={control}
+          name="hostname"
+          render={({ field }) => (
+            <TextInput
+              {...field}
+              autoFocus
+              id="hostname"
+              onChange={(_event, value) => field.onChange(value)}
+              type="text"
+              validated={hostnameError ? ValidatedOptions.error : ValidatedOptions.default}
+            />
+          )}
+          rules={{
+            required: getFieldRequiredMessage(t),
+            validate: (value) => getDNS1123LabelError(value)?.(t),
+          }}
         />
-        <FormGroupHelperText validated={isHostnameInvalid ? ValidatedOptions.error : undefined}>
-          {isHostnameInvalid ? hostnameError : t('Please provide hostname.')}
+
+        <FormGroupHelperText validated={hostnameError ? ValidatedOptions.error : undefined}>
+          {hostnameError ?? t('Please provide hostname.')}
         </FormGroupHelperText>
       </FormGroup>
     </TabModal>

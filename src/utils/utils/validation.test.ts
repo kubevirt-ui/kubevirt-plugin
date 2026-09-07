@@ -5,7 +5,6 @@ import {
   getDNS1123LabelError,
   getDNS1123LabelErrorLenient,
   getFieldRequiredMessage,
-  getNameValidationMessage,
   isDigitsOnly,
   isDNS1123Label,
   isDNS1123LabelLenient,
@@ -103,21 +102,6 @@ describe('validateDNS1123Label', () => {
 describe('getFieldRequiredMessage', () => {
   it('should return the required field message', () => {
     expect(getFieldRequiredMessage(t)).toBe('This field is required');
-  });
-});
-
-describe('getNameValidationMessage', () => {
-  it('should return the required message for an empty value', () => {
-    expect(getNameValidationMessage(t, '')).toBe('This field is required');
-    expect(getNameValidationMessage(t, '   ')).toBe('This field is required');
-  });
-
-  it('should return the format error for an invalid non-empty value', () => {
-    expect(getNameValidationMessage(t, 'My_VM')).toContain('lowercase RFC 1123 label');
-  });
-
-  it('should return undefined for a valid value', () => {
-    expect(getNameValidationMessage(t, 'my-vm')).toBeUndefined();
   });
 });
 
