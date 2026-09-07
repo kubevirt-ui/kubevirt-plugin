@@ -1,6 +1,7 @@
 import React, { type FC } from 'react';
 
 import { type V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
+import { type V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import ArchitectureLabel from '@kubevirt-utils/components/ArchitectureLabel/ArchitectureLabel';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getAnnotation, getName, getUID } from '@kubevirt-utils/resources/shared';
@@ -27,6 +28,7 @@ type TemplatesTableRowProps = {
   activeColumnIDs: string[];
   availableDatasources: Record<string, V1beta1DataSource>;
   availableTemplatesUID: Set<string>;
+  clusterPreference: null | V1beta1VirtualMachineClusterPreference;
   onSelectTemplate: (template: Template) => void;
   selectedTemplate?: Template;
   template: Template;
@@ -36,6 +38,7 @@ const TemplatesTableRow: FC<TemplatesTableRowProps> = ({
   activeColumnIDs,
   availableDatasources,
   availableTemplatesUID,
+  clusterPreference,
   onSelectTemplate,
   selectedTemplate,
   template,
@@ -68,7 +71,11 @@ const TemplatesTableRow: FC<TemplatesTableRowProps> = ({
     >
       <TemplatesTableRowCell activeColumnIDs={activeColumnIDs} id="name" width={35}>
         <Flex alignItems={{ default: 'alignItemsCenter' }} columnGap={{ default: 'columnGapXs' }}>
-          <img alt="os-icon" className="vm-catalog-row-icon" src={getTemplateOSIcon(template)} />
+          <img
+            alt="os-icon"
+            className="vm-catalog-row-icon"
+            src={getTemplateOSIcon(template, clusterPreference)}
+          />
           <FlexItem>
             <Content component={ContentVariants.small}>{getTemplateName(template)}</Content>
           </FlexItem>

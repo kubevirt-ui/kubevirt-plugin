@@ -357,7 +357,7 @@ export const getHostname = (vm: V1VirtualMachine): string => vm?.spec?.template?
 export const getInstanceTypeMatcher = (vm: V1VirtualMachine): V1InstancetypeMatcher =>
   vm?.spec?.instancetype;
 
-export const getPreferenceMatcher = (vm: V1VirtualMachine): V1PreferenceMatcher =>
+export const getPreferenceMatcher = (vm: V1VirtualMachine): V1PreferenceMatcher | undefined =>
   vm?.spec?.preference;
 
 /**

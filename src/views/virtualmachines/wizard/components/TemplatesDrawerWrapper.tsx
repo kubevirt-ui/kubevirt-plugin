@@ -1,4 +1,4 @@
-import React, { FC, ReactNode } from 'react';
+import React, { type FC, type ReactNode } from 'react';
 import { useWatch } from 'react-hook-form';
 
 import { Drawer, DrawerContent, DrawerContentBody } from '@patternfly/react-core';
@@ -20,7 +20,7 @@ const TemplatesDrawerWrapper: FC<{ children?: ReactNode }> = ({ children }) => {
     ],
   });
 
-  const handleDrawerClose = () => {
+  const handleDrawerClose = (): void => {
     setValue(CREATE_VM_FORM_FIELDS_UI_STATE.IS_TEMPLATES_DRAWER_OPEN, false);
   };
 

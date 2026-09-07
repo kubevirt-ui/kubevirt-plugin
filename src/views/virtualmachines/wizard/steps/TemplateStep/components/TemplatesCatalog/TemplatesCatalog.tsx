@@ -1,12 +1,12 @@
-import React, { FC, useCallback } from 'react';
+import React, { type FC, useCallback } from 'react';
 import { useWatch } from 'react-hook-form';
 
 import TemplatesFilter from '@kubevirt-utils/components/TemplatesFilter/TemplatesFilter';
 import { TemplatesFilterVariant } from '@kubevirt-utils/components/TemplatesFilter/types';
 import { logTemplateFlowEvent, TEMPLATE_SELECTED } from '@kubevirt-utils/extensions/telemetry';
+import { type Template } from '@kubevirt-utils/resources/template';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Card, Split, SplitItem } from '@patternfly/react-core';
-import { Template } from '@kubevirt-utils/resources/template';
 import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
 import {
   CREATE_VM_FORM_FIELDS_UI_STATE,
@@ -27,6 +27,7 @@ const TemplatesCatalog: FC = () => {
     availableTemplatesUID,
     bootSourcesLoaded,
     clearAll,
+    clusterPreferencesByName,
     filterDefinitions,
     filteredTemplates,
     filters,
@@ -34,6 +35,7 @@ const TemplatesCatalog: FC = () => {
     loaded,
     namespace,
     onSetFilters,
+    osDisplayNames,
     setIsList,
     setNamespace,
   } = useTemplatesCatalog();
@@ -84,9 +86,11 @@ const TemplatesCatalog: FC = () => {
               availableDatasources={availableDataSources}
               availableTemplatesUID={availableTemplatesUID}
               bootSourcesLoaded={bootSourcesLoaded}
+              clusterPreferencesByName={clusterPreferencesByName}
               isList={isList}
               loaded={loaded}
               onTemplateClick={handleTemplateSelect}
+              osDisplayNames={osDisplayNames}
               selectedTemplate={selectedTemplate}
               templates={filteredTemplates}
             />

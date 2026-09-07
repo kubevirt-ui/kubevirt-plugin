@@ -21,12 +21,12 @@ import {
 import { isVirtualMachineTemplate } from '@kubevirt-utils/resources/template/utils/types';
 import { getCPU } from '@kubevirt-utils/resources/vm';
 import { networksHavePodNetwork } from '@kubevirt-utils/resources/vm/utils/network/utils';
-import { getOperatingSystemName } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { Alert, DescriptionList } from '@patternfly/react-core';
 import useWizardDisksTableData from '@virtualmachines/wizard/components/DisksReviewTable/hooks/useWizardDisksTableData/useWizardDisksTableData';
 import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
 import { CREATE_VM_FORM_FIELDS_VM_DATA } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
+import { getTemplateOSName } from '@virtualmachines/wizard/steps/TemplateStep/utils/getTemplateOSName';
 import { useDrawerContext } from '@virtualmachines/wizard/steps/TemplateStep/components/TemplatesCatalogDrawer/hooks/useDrawerContext';
 
 import TemplateExpandableDescription from './TemplateExpandableDescription';
@@ -36,7 +36,7 @@ const TemplateInfoSection: FC = memo(() => {
   const { control } = useVMWizard();
   const cluster = useWatch({ control, name: CREATE_VM_FORM_FIELDS_VM_DATA.CLUSTER });
   const isIPv6SingleStack = useIsIPv6SingleStackCluster(cluster);
-  const { template, vm } = useDrawerContext();
+  const { clusterPreference, osDisplayNames, template, vm } = useDrawerContext();
   const [disks] = useWizardDisksTableData(vm);
 
   const notAvailable = t('N/A');
@@ -49,7 +49,8 @@ const TemplateInfoSection: FC = memo(() => {
 
   const hasPodNetwork = networksHavePodNetwork(networks);
 
-  const operatingSystem = getOperatingSystemName(template) || notAvailable;
+  const operatingSystem =
+    getTemplateOSName(template, clusterPreference, osDisplayNames) ?? notAvailable;
   const categoryOrWorkload = isVMTemplate
     ? getTemplateCategoryDisplay(template, t)
     : `${WORKLOADS_LABELS[workload] ?? t('Other')} ${isDefaultTemplate ? t('(default)') : ''}`;

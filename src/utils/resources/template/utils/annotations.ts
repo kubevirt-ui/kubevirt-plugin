@@ -4,6 +4,7 @@ export const ANNOTATIONS = Object.freeze({
   description: 'description',
   displayName: 'openshift.io/display-name',
   documentationURL: 'openshift.io/documentation-url',
+  iconClass: 'iconClass',
   importURLs: 'template.kubevirt.io/images',
   os: 'vm.kubevirt.io/os',
   osTemplate: 'vm.kubevirt.io/template',
