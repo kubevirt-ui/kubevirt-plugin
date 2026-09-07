@@ -1011,11 +1011,13 @@ export default class VmCreationWizardComponent extends BaseComponent {
 
   /** Waits for the Next button to become enabled and clicks it. */
   async clickNextWhenEnabled(): Promise<void> {
+    await this.page.keyboard.press('Escape');
     const nextBtn = this.page.locator('[data-test="wizard-next-button"]');
     await nextBtn.waitFor({ state: 'visible', timeout: 30000 });
     await this.page
       .locator('[data-test="wizard-next-button"]:not([disabled])')
       .waitFor({ state: 'attached', timeout: 30000 });
+    await nextBtn.hover().catch(() => undefined);
     await nextBtn.click();
   }
 

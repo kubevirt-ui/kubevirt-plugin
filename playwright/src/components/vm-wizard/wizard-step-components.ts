@@ -195,6 +195,8 @@ export class VmCreationWizardComputeComponent extends BaseComponent {
 
     const sizeOption = this.page.getByRole('menuitem').filter({ hasText: sizeName });
     await this.robustClick(sizeOption.first());
+    await this.page.keyboard.press('Escape');
+    await this.page.getByTestId('wizard-next-button').hover().catch(() => undefined);
   }
 
   async selectComputeTab(tab: 'redhat' | 'user'): Promise<void> {
@@ -204,19 +206,11 @@ export class VmCreationWizardComputeComponent extends BaseComponent {
   }
 
   async selectInstanceTypeSeries(series: 'cx' | 'd' | 'u' | 'm' | 'n' | 'o' | 'rt'): Promise<void> {
-    const seriesMap: Record<string, string> = {
-      cx: 'Compute Exclusive',
-      d: 'Dedicated vCPU',
-      u: 'General Purpose',
-      m: 'Memory Intensive',
-      n: 'Network',
-      o: 'Overcommitted',
-      rt: 'Realtime',
-    };
-    const card = this.locator(
-      `.instance-type-series-menu-card__toggle-card:has-text("${seriesMap[series]}")`,
-    );
-    await this.robustClick(card.first());
+    const card = this.testId(`instance-type-series-${series}1`);
+    await card.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+    await this.robustClick(card);
+    await this.page.keyboard.press('Escape');
+    await this.page.getByTestId('wizard-next-button').hover().catch(() => undefined);
   }
 
   /**

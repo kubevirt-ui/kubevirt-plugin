@@ -88,8 +88,11 @@ test.describe(
         const seriesVisible = await vmWizardComputePage.verifyInstanceTypeSeriesVisible();
         expect.soft(seriesVisible, 'Instance type series cards should be visible').toBe(true);
 
+        await vmWizardComputePage.selectInstanceTypeSeries('u');
+        await vmWizardComputePage.selectComputeSize('medium');
+
         const sizeText = await vmWizardComputePage.getComputeSizeDropdownText();
-        expect.soft(sizeText, 'A compute size should be pre-selected').toContain('CPUs');
+        expect.soft(sizeText, 'A medium compute size should be selected').toContain('CPUs');
 
         await vmWizardNavigationPage.clickNext();
       });
@@ -108,6 +111,17 @@ test.describe(
 
         const searchVisible = await vmWizardComputePage.verifyCustomizationSearchInputVisible();
         expect.soft(searchVisible, 'Find settings search input should be visible').toBe(true);
+
+        await test.step('Empty annotation rows cannot be saved', async () => {
+          await vmWizardComputePage.selectCustomizationTab('Labels and annotations');
+          await vmWizardComputePage.openAnnotationsModal();
+          await vmWizardComputePage.clickAddMoreInAnnotationsModal();
+
+          const saveDisabled = await vmWizardComputePage.isAnnotationsModalSaveDisabled();
+          expect(saveDisabled, 'Save should be disabled for empty annotation fields').toBe(true);
+
+          await vmWizardComputePage.closeAnnotationsModal();
+        });
 
         await vmWizardNavigationPage.clickNext();
       });

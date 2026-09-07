@@ -21,11 +21,18 @@ export class VmCreationWizardNavigationComponent extends BaseComponent {
 
   async clickNext(): Promise<void> {
     await this.collapseSidebarIfExpanded();
+    await this.page.keyboard.press('Escape');
+    await this.page
+      .locator('.pf-v6-c-tooltip, [role="tooltip"]')
+      .first()
+      .waitFor({ state: 'hidden', timeout: TestTimeouts.SHORT_WAIT })
+      .catch(() => undefined);
     const nextButton = this.page.getByTestId('wizard-next-button').filter({ hasText: 'Next' });
     await nextButton.waitFor({
       state: 'visible',
       timeout: TestTimeouts.SHORT_WAIT,
     });
+    await nextButton.hover().catch(() => undefined);
     await this.robustClick(nextButton);
     await this.page.waitForTimeout(1000);
   }
