@@ -35,12 +35,11 @@ const pickPreferred = (candidates: PackageManifestKind[]): PackageManifestKind |
 export const selectPreferredPackageManifests = (
   manifests: PackageManifestKind[],
 ): PackageManifestKind[] => {
-  const names = [
-    ...new Set(manifests.map(getName).filter((name): name is string => Boolean(name))),
-  ];
+  const named = manifests.filter((pkg) => getName(pkg));
+  const names = [...new Set(named.map(getName).filter((name): name is string => Boolean(name)))];
 
   return names
-    .map((name) => pickPreferred(manifests.filter((pkg) => getName(pkg) === name)))
+    .map((name) => pickPreferred(named.filter((pkg) => getName(pkg) === name)))
     .filter((pkg): pkg is PackageManifestKind => Boolean(pkg));
 };
 

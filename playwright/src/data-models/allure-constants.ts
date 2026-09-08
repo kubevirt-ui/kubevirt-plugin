@@ -93,3 +93,6 @@ export const AUTO_LABELS_TAG = '@auto-labels';
 
 /** Allure feature label for auto-applied labels tests. */
 export const AUTO_LABELS_FEATURE = 'Auto-Applied Labels';
+
+/** Playwright/Allure tag for Recommended capabilities tab tests. */
+export const RECOMMENDED_CAPABILITIES_TAG = '@tier2-recommended-capabilities';

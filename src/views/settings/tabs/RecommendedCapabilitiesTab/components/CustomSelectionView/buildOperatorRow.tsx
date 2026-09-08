@@ -1,5 +1,4 @@
 import React from 'react';
-
 import { type TFunction } from 'i18next';
 
 import ActionsDropdown from '@kubevirt-utils/components/ActionsDropdown/ActionsDropdown';
@@ -11,7 +10,7 @@ import { type DataViewTrTree } from '@patternfly/react-data-view';
 import { getOperatorInstallStatusLabel } from '../../utils/constants';
 import {
   type CapabilityFeatureOperator,
-  ConfigurationStatus,
+  type ConfigurationStatus,
   type RecommendedCapabilityOperatorDetails,
 } from '../../utils/types';
 import ConfigurationStatusCell from '../ConfigurationStatusCell/ConfigurationStatusCell';
@@ -50,11 +49,16 @@ export const buildOperatorRow = ({
     row: [
       {
         cell: operatorHubURL ? (
-          <Button isInline onClick={() => navigate(operatorHubURL)} variant="link">
+          <Button
+            data-test={`operator-${operator.packageName}`}
+            isInline
+            onClick={() => navigate(operatorHubURL)}
+            variant="link"
+          >
             {operator.displayName}
           </Button>
         ) : (
-          operator.displayName
+          <span data-test={`operator-${operator.packageName}`}>{operator.displayName}</span>
         ),
       },
       {

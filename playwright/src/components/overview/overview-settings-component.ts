@@ -809,6 +809,11 @@ export default class OverviewSettingsComponent extends BaseComponent {
     }
   }
 
+  async navigateToRecommendedCapabilities(): Promise<void> {
+    await this.navigateToSettingsViaSidebar();
+    await this.navigateToTab(this.testId('settings-tab-recommended'));
+  }
+
   async navigateToSettings() {
     await this.navigateToSettingsViaSidebar();
   }

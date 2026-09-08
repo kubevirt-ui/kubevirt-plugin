@@ -1,8 +1,8 @@
 /**
  * Settings test fixture.
  *
- * Provides SettingsPage — the standalone page object covering all three
- * Virtualization Settings tabs (Cluster, User, Preview features).
+ * Provides SettingsPage — the standalone page object covering Virtualization
+ * Settings tabs (Cluster, User, Recommended capabilities, Preview features).
  *
  * All settings specs must use this fixture and be tagged @cnv-settings.
  */

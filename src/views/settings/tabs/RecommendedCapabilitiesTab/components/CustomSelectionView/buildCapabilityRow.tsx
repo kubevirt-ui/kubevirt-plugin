@@ -1,5 +1,4 @@
 import React from 'react';
-
 import { type TFunction } from 'i18next';
 
 import ActionsDropdown from '@kubevirt-utils/components/ActionsDropdown/ActionsDropdown';
@@ -7,12 +6,13 @@ import { type ActionDropdownItemType } from '@kubevirt-utils/components/ActionsD
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Label, Spinner } from '@patternfly/react-core';
+import { type DataViewTrTree } from '@patternfly/react-data-view';
 
 import { CAPABILITY_INSTALL_STATE_CONFIG } from '../../utils/constants';
 import {
   type CapabilityFeature,
   CapabilityInstallState,
-  ConfigurationStatus,
+  type ConfigurationStatus,
 } from '../../utils/types';
 import ConfigurationStatusCell from '../ConfigurationStatusCell/ConfigurationStatusCell';
 
@@ -34,14 +34,16 @@ export const buildCapabilityRow = ({
   installState,
   isInstalling,
   t,
-}: BuildCapabilityRowParams) => {
+}: BuildCapabilityRowParams): DataViewTrTree['row'] => {
   const { color, getLabel } = CAPABILITY_INSTALL_STATE_CONFIG[installState];
 
   return [
     {
       cell: (
         <>
-          <span className="pf-v6-u-mr-xs">{feature.title}</span>
+          <span className="pf-v6-u-mr-xs" data-test={`capability-${feature.id}`}>
+            {feature.title}
+          </span>
           <HelpTextIcon bodyContent={feature.description} />
         </>
       ),

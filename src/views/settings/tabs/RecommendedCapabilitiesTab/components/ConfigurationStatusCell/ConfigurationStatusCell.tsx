@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Button, Icon, Label } from '@patternfly/react-core';
@@ -19,7 +19,7 @@ const ConfigurationStatusCell: FC<ConfigurationStatusCellProps> = ({
 
   if (configStatus === ConfigurationStatus.Recommended) {
     return (
-      <Label color="green" isCompact>
+      <Label color="green" data-test="configuration-status" isCompact>
         {t('Recommended')}
       </Label>
     );
@@ -31,11 +31,16 @@ const ConfigurationStatusCell: FC<ConfigurationStatusCellProps> = ({
         <Icon status="warning">
           <ExclamationTriangleIcon />
         </Icon>{' '}
-        {t('Manual')}
+        <span data-test="configuration-status">{t('Manual')}</span>
         {onReviewClick && (
           <>
             {' '}
-            <Button isInline onClick={onReviewClick} variant="link">
+            <Button
+              data-test="review-recommendation"
+              isInline
+              onClick={onReviewClick}
+              variant="link"
+            >
               {t('Review recommendation')}
             </Button>
           </>
@@ -44,7 +49,7 @@ const ConfigurationStatusCell: FC<ConfigurationStatusCellProps> = ({
     );
   }
 
-  return <>-</>;
+  return <span data-test="configuration-status">-</span>;
 };
 
 export default ConfigurationStatusCell;
