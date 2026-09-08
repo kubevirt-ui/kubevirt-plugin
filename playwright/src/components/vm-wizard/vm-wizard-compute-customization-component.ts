@@ -19,6 +19,13 @@ export default class VmWizardComputeCustomizationComponent extends BaseComponent
   );
   private readonly _pfV6CWizardInputTypeText = this.locator('.pf-v6-c-wizard input[type="text"]');
   private readonly _roleTabpanel = this.locator('[role="tabpanel"]');
+  private readonly _hostnameModal = this.testId('dialog-modal').filter({
+    has: this.page.getByRole('heading', { name: 'Edit hostname' }),
+  });
+  private readonly _hostnameModalInput = this._hostnameModal.getByRole('textbox', {
+    name: 'Hostname',
+  });
+  private readonly _hostnameModalSaveButton = this._hostnameModal.getByTestId('save-button');
   private readonly _startAfterCreateCheckbox = this.locator('#start-after-create-checkbox');
   private readonly _startThisVirtualMachineAfterCreation = this.locator(
     'text=Start this VirtualMachine after creation',
@@ -220,6 +227,43 @@ export default class VmWizardComputeCustomizationComponent extends BaseComponent
     } catch {
       return '';
     }
+  }
+
+  async fillHostnameModal(value: string): Promise<void> {
+    await this._hostnameModalInput.fill(value);
+  }
+
+  async isHostnameModalOpen(): Promise<boolean> {
+    return this._hostnameModal.isVisible();
+  }
+
+  async isHostnameModalSaveEnabled(): Promise<boolean> {
+    return this._hostnameModalSaveButton.isEnabled();
+  }
+
+  async isHostnameModalValidationErrorVisible(expected: RegExp | string): Promise<boolean> {
+    return this._hostnameModal.getByText(expected).isVisible();
+  }
+
+  async openHostnameModal(hostname: string): Promise<void> {
+    const hostnameValue = this._roleTabpanel.getByRole('button', { exact: true, name: hostname });
+    await this.robustClick(hostnameValue);
+    await this._hostnameModal.waitFor({
+      state: 'visible',
+      timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+    });
+  }
+
+  async saveHostnameModal(): Promise<void> {
+    await this.robustClick(this._hostnameModalSaveButton);
+    await this._hostnameModal.waitFor({
+      state: 'hidden',
+      timeout: TestTimeouts.UI_ACTION_COMPLETE,
+    });
+  }
+
+  async submitHostnameModalWithEnter(): Promise<void> {
+    await this._hostnameModalInput.press('Enter');
   }
 
   async getReviewDescription(): Promise<string> {

@@ -62,15 +62,77 @@ test.describe(
         await vmWizardNavigationPage.clickNext();
       });
 
-      await test.step('Step 3: Customization — verify tabs and auto-generated hostname', async () => {
+      await test.step('Step 3: Customization — validate and edit hostname', async () => {
         const custVisible = await vmWizardComputePage.verifyCustomizationStepVisible();
         expect(custVisible, 'Customization step should be visible').toBe(true);
 
         const tabsVisible = await vmWizardComputePage.verifyCustomizationTabsVisible();
         expect.soft(tabsVisible, 'Customization tabs should be visible').toBe(true);
 
-        const hostname = await vmWizardComputePage.getCustomizationVmName();
-        expect.soft(hostname.length, 'Hostname should be auto-generated').toBeGreaterThan(0);
+        const generatedHostname = await vmWizardComputePage.getCustomizationVmName();
+        expect(generatedHostname.length, 'Hostname should be auto-generated').toBeGreaterThan(0);
+
+        await vmWizardComputePage.openHostnameModal(generatedHostname);
+
+        await vmWizardComputePage.fillHostnameModal('');
+        await vmWizardComputePage.submitHostnameModalWithEnter();
+
+        await expect
+          .poll(
+            () =>
+              vmWizardComputePage.isHostnameModalValidationErrorVisible('This field is required'),
+            {
+              message: 'Empty hostname should show the required validation error',
+              timeout: utils.TestTimeouts.UI_VISIBILITY_QUICK,
+            },
+          )
+          .toBe(true);
+        expect(
+          await vmWizardComputePage.isHostnameModalOpen(),
+          'Hostname modal should remain open',
+        ).toBe(true);
+        expect(
+          await vmWizardComputePage.getCustomizationVmName(),
+          'Empty hostname should not be saved',
+        ).toBe(generatedHostname);
+
+        await vmWizardComputePage.fillHostnameModal('--');
+        await vmWizardComputePage.submitHostnameModalWithEnter();
+
+        await expect
+          .poll(
+            () =>
+              vmWizardComputePage.isHostnameModalValidationErrorVisible('lowercase RFC 1123 label'),
+            {
+              message: 'Invalid hostname should show the RFC 1123 validation error',
+              timeout: utils.TestTimeouts.UI_VISIBILITY_QUICK,
+            },
+          )
+          .toBe(true);
+        expect(
+          await vmWizardComputePage.isHostnameModalOpen(),
+          'Hostname modal should remain open',
+        ).toBe(true);
+        expect(
+          await vmWizardComputePage.getCustomizationVmName(),
+          'Invalid hostname should not be saved',
+        ).toBe(generatedHostname);
+
+        await vmWizardComputePage.fillHostnameModal('hostname');
+        await expect
+          .poll(() => vmWizardComputePage.isHostnameModalSaveEnabled(), {
+            message: 'Save should be enabled for a valid hostname',
+            timeout: utils.TestTimeouts.UI_VISIBILITY_QUICK,
+          })
+          .toBe(true);
+        await vmWizardComputePage.saveHostnameModal();
+
+        await expect
+          .poll(() => vmWizardComputePage.getCustomizationVmName(), {
+            message: 'Updated hostname should be displayed',
+            timeout: utils.TestTimeouts.UI_ACTION_COMPLETE,
+          })
+          .toBe('hostname');
 
         await test.step('Template annotation vm.kubevirt.io/validations cannot be deleted', async () => {
           const validationsKey = 'vm.kubevirt.io/validations';
