@@ -335,6 +335,23 @@ export default class VmWizardNavigationComponent extends BaseComponent {
     return await nextButton.isDisabled();
   }
 
+  async clickWizardNavStep(stepName: string): Promise<void> {
+    const navLink = this._wizardContainer
+      .locator('.pf-v6-c-wizard__nav-link')
+      .filter({ hasText: stepName });
+    await navLink.first().waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
+    await navLink.first().click({ force: true });
+    await this.page.waitForTimeout(TestTimeouts.UI_DELAY_MEDIUM);
+  }
+
+  async isWizardNavStepDisabled(stepName: string): Promise<boolean> {
+    const navLink = this._wizardContainer
+      .locator('.pf-v6-c-wizard__nav-link')
+      .filter({ hasText: stepName });
+    await navLink.first().waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
+    return await navLink.first().isDisabled();
+  }
+
   async navigateToStepByName(stepName: string): Promise<void> {
     const toggle = this.locator('button:has-text("Wizard toggle")');
     await this.robustClick(toggle.first());
@@ -366,7 +383,9 @@ export default class VmWizardNavigationComponent extends BaseComponent {
 
     await this.openEditLocationPanel();
 
-    const toggle = this.locator('.vm-creation-wizard').getByTestId('namespace-dropdown-menu-toggle');
+    const toggle = this.locator('.vm-creation-wizard').getByTestId(
+      'namespace-dropdown-menu-toggle',
+    );
     await toggle.first().waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
     await this.robustClick(toggle.first());
 

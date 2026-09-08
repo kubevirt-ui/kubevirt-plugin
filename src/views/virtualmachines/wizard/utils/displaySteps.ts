@@ -1,5 +1,8 @@
-import { createElement, type ReactElement } from 'react';
 import { type TFunction } from 'i18next';
+import { createElement, type ReactElement } from 'react';
+
+import { customizeWizardVMSignal } from '@kubevirt-utils/signals/customizeWizardVMSignal';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 
 import DefaultWizardFooter from '../components/DefaultWizardFooter';
 import CloneSourceStep from '../steps/CloneSourceStep/CloneSourceStep';
@@ -43,7 +46,7 @@ const getCustomizationStep = (
   displayIndex: 6,
   footer: getDefaultFooter(isNextDisabledForStep(VMWizardStep.CUSTOMIZATION)),
   id: VMWizardStep.CUSTOMIZATION,
-  isDisabled: isStepDisabled(VMWizardStep.CUSTOMIZATION),
+  isDisabled: isStepDisabled(VMWizardStep.CUSTOMIZATION) || isEmpty(customizeWizardVMSignal.value),
   name: t('Customization'),
   navItem: getVMGenerationNavItem(navItemConfig),
 });
