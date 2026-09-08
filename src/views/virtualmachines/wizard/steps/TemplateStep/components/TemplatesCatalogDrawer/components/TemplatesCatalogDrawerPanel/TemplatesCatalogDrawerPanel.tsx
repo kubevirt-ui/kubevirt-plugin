@@ -13,7 +13,7 @@ import { TemplatesDrawerTabKey } from '@virtualmachines/wizard/steps/TemplateSte
 import { useDrawerContext } from '@virtualmachines/wizard/steps/TemplateStep/components/TemplatesCatalogDrawer/hooks/useDrawerContext';
 import {
   allRequiredParametersAreFulfilled,
-  getTemplateParametersSplit,
+  getRequiredTemplateParameter,
 } from '@virtualmachines/wizard/steps/TemplateStep/components/TemplatesCatalogDrawer/utils/utils';
 
 import ParametersSections from '../ParametersSections';
@@ -32,7 +32,7 @@ const TemplatesCatalogDrawerPanel: FC = memo(() => {
   const { template, templateDataLoaded, templateLoadingError } = useDrawerContext();
   const templateKey = getResourceKey(template);
 
-  const [requiredParameters] = getTemplateParametersSplit(getParameters(template) ?? []);
+  const requiredParameters = getRequiredTemplateParameter(getParameters(template) ?? []);
   const hasRequiredParameters = !isEmpty(requiredParameters);
 
   useEffect(() => {
