@@ -9,8 +9,8 @@
 import type RequestContextClient from '@/clients/request-context-client';
 import type { TestUtilsType } from '@/fixtures/test-utils';
 import type SettingsPage from '@/page-objects/settings/settings-page';
+import type VirtualMachinesPage from '@/page-objects/vm/virtual-machines-page';
 import type VmCreationWizardPage from '@/page-objects/vm-wizard/vm-creation-wizard-page';
-import type VmTreePage from '@/page-objects/vm/vm-tree-page';
 
 export const FEATURES_CONFIG_MAP = 'kubevirt-ui-features';
 export const USER_SETTINGS_CONFIG_MAP = 'kubevirt-user-settings';
@@ -94,12 +94,12 @@ export async function navigateToUserLabelsSection(settingsPage: SettingsPage): P
 
 /** Navigates through the VM creation wizard to the Customization step. Returns the VM name. */
 export async function navigateToWizardCustomizationStep(
-  vmTreePage: VmTreePage,
+  vmListPage: VirtualMachinesPage,
   vmWizardPage: VmCreationWizardPage,
   namespace: string,
 ): Promise<string> {
-  await vmTreePage.switchToVirtualizationPerspective();
-  await vmTreePage.navigateToProjectVmListViaUI(namespace);
+  await vmListPage.switchToVirtualizationPerspective();
+  await vmListPage.navigateToProjectVmListViaUI(namespace);
   await vmWizardPage.openWizardFromCreateDropdown();
   await vmWizardPage.ensureVmNameFilled();
   const vmName = await vmWizardPage.page.locator('.vm-creation-wizard #vm-name').inputValue();

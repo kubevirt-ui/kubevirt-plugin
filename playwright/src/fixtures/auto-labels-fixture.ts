@@ -10,7 +10,6 @@ import SettingsPage from '@/page-objects/settings/settings-page';
 import VirtualMachineDetailPage from '@/page-objects/vm/virtual-machine-detail-page';
 import VirtualMachinesPage from '@/page-objects/vm/virtual-machines-page';
 import VmCreationWizardPage from '@/page-objects/vm-wizard/vm-creation-wizard-page';
-import VmTreePage from '@/page-objects/vm/vm-tree-page';
 
 import { baseTest, expect } from './scenario-test-fixture';
 
@@ -19,7 +18,6 @@ interface AutoLabelsFixtures {
   settingsPage: SettingsPage;
   vmDetailPage: VirtualMachineDetailPage;
   vmListPage: VirtualMachinesPage;
-  vmTreePage: VmTreePage;
   vmWizardPage: VmCreationWizardPage;
 }
 
@@ -35,9 +33,6 @@ const test = baseTest.extend<AutoLabelsFixtures>({
   },
   vmListPage: async ({ page }, use) => {
     await use(new VirtualMachinesPage(page));
-  },
-  vmTreePage: async ({ page }, use) => {
-    await use(new VmTreePage(page));
   },
   vmWizardPage: async ({ page }, use) => {
     await use(new VmCreationWizardPage(page));

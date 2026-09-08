@@ -15,6 +15,7 @@ import { MinusCircleIcon } from '@patternfly/react-icons';
 import LabelKeyInput from './LabelKeyInput';
 
 type LabelRowProps = {
+  autoAppliedKeys?: Set<string>;
   existingKeys: string[];
   initialKeys?: Set<string>;
   isKeyProtected?: boolean;
@@ -25,6 +26,7 @@ type LabelRowProps = {
 };
 
 const LabelRow: FC<LabelRowProps> = ({
+  autoAppliedKeys,
   existingKeys,
   initialKeys,
   isKeyProtected,
@@ -36,15 +38,20 @@ const LabelRow: FC<LabelRowProps> = ({
   const { t } = useKubevirtTranslation();
 
   const error = useMemo(
-    () => validateLabelEntry(label.key, label.value, t, initialKeys, existingKeys),
-    [label.key, label.value, t, initialKeys, existingKeys],
+    () => validateLabelEntry(label.key, label.value, t, initialKeys, existingKeys, autoAppliedKeys),
+    [label.key, label.value, t, initialKeys, existingKeys, autoAppliedKeys],
   );
 
   return (
     <>
       <GridItem span={5}>
         {isKeyProtected ? (
-          <TextInput aria-label={t('Label key')} isDisabled value={label.key} />
+          <TextInput
+            aria-label={t('Label key')}
+            data-test="label-key-input-protected"
+            isDisabled
+            value={label.key}
+          />
         ) : (
           <LabelKeyInput
             existingKeys={existingKeys}
@@ -76,7 +83,7 @@ const LabelRow: FC<LabelRowProps> = ({
       </GridItem>
       {error && (
         <GridItem span={12}>
-          <HelperText>
+          <HelperText data-test="label-row-error">
             <HelperTextItem variant="error">{error}</HelperTextItem>
           </HelperText>
         </GridItem>

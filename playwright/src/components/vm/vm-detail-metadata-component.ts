@@ -3,6 +3,7 @@
  */
 
 import BaseComponent from '@/components/shared/base-component';
+import LabelsModalComponent from '@/components/shared/labels-modal-component';
 import { TestTimeouts } from '@/utils/test-config';
 import type { Page } from '@playwright/test';
 
@@ -12,9 +13,11 @@ export default class VmDetailMetadataComponent extends BaseComponent {
   private readonly _advancedViewToggle = this.testId('advanced-view-toggle');
   private readonly _labelsCard = this.testId('labels-card');
   private readonly _labelsTable = this.locator('[data-test="labels-card-table"]');
+  readonly labelsModal: LabelsModalComponent;
 
   constructor(page: Page) {
     super(page);
+    this.labelsModal = new LabelsModalComponent(page);
   }
 
   async clickDeleteLabel(key: string): Promise<void> {
@@ -86,5 +89,11 @@ export default class VmDetailMetadataComponent extends BaseComponent {
   async toggleAdvancedView(): Promise<void> {
     await this.robustClick(this._advancedViewToggle);
     await this.page.waitForTimeout(TestTimeouts.UI_DELAY_MEDIUM);
+  }
+
+  async openAddLabelsModal(): Promise<void> {
+    const addButton = this._labelsCard.getByTestId('labels-card-add-btn');
+    await this.robustClick(addButton);
+    await this.labelsModal.waitForOpen();
   }
 }

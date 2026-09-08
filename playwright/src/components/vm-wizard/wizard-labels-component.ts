@@ -4,6 +4,7 @@
  */
 
 import BaseComponent from '@/components/shared/base-component';
+import LabelsModalComponent from '@/components/shared/labels-modal-component';
 import { TestTimeouts } from '@/utils/test-config';
 import type { Page } from '@playwright/test';
 
@@ -15,9 +16,11 @@ export default class WizardLabelsComponent extends BaseComponent {
   private readonly _labelsTable = this.locator('[data-test="labels-card-table"]');
   private readonly _saveAsDefaultsCheckbox = this.locator('#save-as-defaults');
   private readonly _tabPanel = this.locator('[role="tabpanel"]');
+  readonly labelsModal: LabelsModalComponent;
 
   constructor(page: Page) {
     super(page);
+    this.labelsModal = new LabelsModalComponent(page);
   }
 
   async closeRequiredLabelsDrawer(): Promise<void> {
@@ -115,5 +118,11 @@ export default class WizardLabelsComponent extends BaseComponent {
     if (isChecked !== checked) {
       await this._saveAsDefaultsCheckbox.click();
     }
+  }
+
+  async openAddLabelsModal(): Promise<void> {
+    const addButton = this._tabPanel.getByTestId('labels-card-add-btn');
+    await this.robustClick(addButton);
+    await this.labelsModal.waitForOpen();
   }
 }

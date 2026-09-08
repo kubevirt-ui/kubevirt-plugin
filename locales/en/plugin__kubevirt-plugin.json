@@ -2306,6 +2306,7 @@
   "This is a network interface (NIC)": "This is a network interface (NIC)",
   "This is a vm created from snapshot {{name}}": "This is a vm created from snapshot {{name}}",
   "This is an ISO file": "This is an ISO file",
+  "This key is reserved for an auto-applied label": "This key is reserved for an auto-applied label",
   "This list only shows network definitions that are compatible with virtual machines. To view the complete list of all available networks, refer to the full NetworkAttachmentDefinition list.": "This list only shows network definitions that are compatible with virtual machines. To view the complete list of all available networks, refer to the full NetworkAttachmentDefinition list.",
   "This network is currently connected to {{count}} virtual machine._one": "This network is currently connected to {{count}} virtual machine.",
   "This network is currently connected to {{count}} virtual machine._other": "This network is currently connected to {{count}} virtual machine.",

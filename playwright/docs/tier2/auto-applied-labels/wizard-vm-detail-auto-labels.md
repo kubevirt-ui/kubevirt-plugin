@@ -23,16 +23,19 @@ Consolidated tests for wizard drawer behavior, label protection, VM creation lab
 ### Test 1 — Wizard drawer and label protection
 
 Single wizard session covering:
+
 - Next button disabled when required labels have no value
 - Required labels drawer opens automatically on Customization step
 - Filling required label values and closing drawer enables Next
 - Auto-applied keys cannot be deleted from Labels tab
 - Admin-set values cannot be edited
 - Admin-empty values can be edited
+- New label key stays editable when it matches an auto-applied key; Save stays disabled until the key is corrected
 
 ### Test 2 — VM creation applies correct labels
 
 Single VM creation covering:
+
 - Required label with user-filled value appears on VM
 - Admin-set label appears on VM
 - Optional label without value is excluded from VM
@@ -40,10 +43,12 @@ Single VM creation covering:
 ### Test 3 — VM detail metadata tab enforces label restrictions
 
 Single API-created VM with all label types covering:
+
 - Auto-applied labels show correct values
 - Auto-applied keys cannot be deleted
 - Admin-empty value labels are editable
 - User-added labels remain deletable
+- New label key stays editable when it matches an auto-applied key; Save stays disabled until the key is corrected
 
 ## Requirements Traceability Matrix
 
@@ -62,3 +67,5 @@ Single API-created VM with all label types covering:
 | 011  | CNV-94368 | "Auto-applied keys cannot be deleted (detail)"   | Active |
 | 012  | CNV-94368 | "Admin-empty value labels are editable (detail)" | Active |
 | 013  | CNV-94368 | "User-added labels remain deletable"             | Active |
+| 014  | CNV-96233 | "New label key stays editable (wizard)"          | Active |
+| 015  | CNV-96233 | "New label key stays editable (detail)"          | Active |
