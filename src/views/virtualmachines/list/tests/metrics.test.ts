@@ -209,6 +209,26 @@ describe('VM Metrics', () => {
       expect(getCPUUsagePercentage(vm, { cores: 4 })).toBeUndefined();
     });
 
+    it('should return 0 when CPU usage is zero', () => {
+      setMetricFromResponse(
+        createMockPrometheusResponse([{ name: 'idle-cpu-vm', namespace: 'idle-cpu-ns', value: 0 }]),
+        Metric.CpuUsage,
+      );
+
+      const vm = createMockVM({ name: 'idle-cpu-vm', namespace: 'idle-cpu-ns' });
+      expect(getCPUUsagePercentage(vm, { cores: 2 })).toBe(0);
+    });
+
+    it('should return undefined when VMI CPU is missing', () => {
+      setMetricFromResponse(
+        createMockPrometheusResponse([{ name: 'no-vmi-cpu-vm', namespace: 'cpu-ns', value: 2 }]),
+        Metric.CpuUsage,
+      );
+
+      const vm = createMockVM({ name: 'no-vmi-cpu-vm', namespace: 'cpu-ns' });
+      expect(getCPUUsagePercentage(vm, undefined)).toBeUndefined();
+    });
+
     it('should handle multi-socket/core/thread CPU configuration', () => {
       setMetricFromResponse(
         createMockPrometheusResponse([{ name: 'complex-vm', namespace: 'complex-ns', value: 4 }]),
@@ -294,6 +314,17 @@ describe('VM Metrics', () => {
       expect(
         getNetworkUsagePercentage(createMockVM({ name: 'no-net-vm', namespace: 'no-net-ns' })),
       ).toBeUndefined();
+    });
+
+    it('should return 0 when network usage is zero', () => {
+      setMetricFromResponse(
+        createMockPrometheusResponse([{ name: 'idle-net-vm', namespace: 'net-ns', value: 0 }]),
+        Metric.NetworkUsage,
+      );
+
+      expect(
+        getNetworkUsagePercentage(createMockVM({ name: 'idle-net-vm', namespace: 'net-ns' })),
+      ).toBe(0);
     });
   });
 });

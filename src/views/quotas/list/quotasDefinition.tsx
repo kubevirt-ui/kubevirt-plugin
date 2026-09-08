@@ -2,12 +2,18 @@ import React from 'react';
 import { TFunction } from 'i18next';
 
 import { getK8sRowId } from '@kubevirt-utils/components/KubevirtTable/utils';
-import { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
+import { type TableExportColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { ACTIONS } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/const';
 import { ApplicationAwareQuota, CalculationMethod } from '@kubevirt-utils/resources/quotas/types';
 import { getCreationTimestamp, getName, getNamespace } from '@kubevirt-utils/resources/shared';
+import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 
-import { getMainResourceKeys, getQuotaNumbers, getStatus } from '../utils/utils';
+import {
+  getAdditionalQuotaDisplayValue,
+  getMainResourceKeys,
+  getQuotaNumbers,
+  getStatus,
+} from '../utils/utils';
 
 import QuotaActionsCell from './cells/QuotaActionsCell';
 import QuotaAdditionalCell from './cells/QuotaAdditionalCell';
@@ -22,9 +28,12 @@ import { QuotaColumn, QuotaScope } from './constants';
 
 const getUsagePercentageValue = (row: ApplicationAwareQuota, resourceKey: string): string => {
   const status = getStatus(row);
-  return String(
-    getQuotaNumbers(status?.used?.[resourceKey], status?.hard?.[resourceKey])?.percentage ?? 0,
-  );
+  const hardValue = status?.hard?.[resourceKey];
+  if (!hardValue) {
+    return NO_DATA_DASH;
+  }
+
+  return String(getQuotaNumbers(status?.used?.[resourceKey], hardValue)?.percentage ?? 0);
 };
 
 export const getQuotaColumns = (
@@ -32,13 +41,13 @@ export const getQuotaColumns = (
   namespace: string,
   scope: QuotaScope,
   calculationMethod: CalculationMethod,
-): ColumnConfig<ApplicationAwareQuota, QuotaCallbacks>[] => {
+): TableExportColumnConfig<ApplicationAwareQuota, QuotaCallbacks>[] => {
   const hasPodOverhead = calculationMethod === CalculationMethod.VmiPodUsage;
   const { cpu, memory, vmiCount } = getMainResourceKeys(
     calculationMethod === CalculationMethod.DedicatedVirtualResources,
   );
 
-  const columns: ColumnConfig<ApplicationAwareQuota, QuotaCallbacks>[] = [
+  const columns: TableExportColumnConfig<ApplicationAwareQuota, QuotaCallbacks>[] = [
     {
       getValue: (row) => getName(row) ?? '',
       key: QuotaColumn.NAME,
@@ -92,7 +101,7 @@ export const getQuotaColumns = (
       sortable: true,
     },
     {
-      getValue: () => '',
+      getValue: (row) => getAdditionalQuotaDisplayValue(row, t),
       key: QuotaColumn.ADDITIONAL,
       label: t('Additional quota'),
       renderCell: (row) => <QuotaAdditionalCell row={row} />,

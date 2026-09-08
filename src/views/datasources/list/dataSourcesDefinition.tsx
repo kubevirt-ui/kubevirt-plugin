@@ -3,7 +3,7 @@ import { TFunction } from 'i18next';
 
 import { V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import { getK8sRowId } from '@kubevirt-utils/components/KubevirtTable/utils';
-import { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
+import { type TableExportColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { ACTIONS } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/const';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 
@@ -27,8 +27,8 @@ export const DATASOURCE_COLUMN_KEYS = {
 export const getDataSourceColumns = (
   t: TFunction,
   namespace: string,
-): ColumnConfig<V1beta1DataSource>[] => {
-  const columns: ColumnConfig<V1beta1DataSource>[] = [
+): TableExportColumnConfig<V1beta1DataSource>[] => {
+  const columns: TableExportColumnConfig<V1beta1DataSource>[] = [
     {
       getValue: (row) => getName(row) ?? '',
       key: DATASOURCE_COLUMN_KEYS.name,

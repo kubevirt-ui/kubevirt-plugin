@@ -63,14 +63,8 @@ const BootableVolumesList: FC = () => {
   } = usePaginationWithFilters(filteredData?.length ?? 0, onSetFilters);
 
   const columns = useMemo(
-    () =>
-      getBootableVolumeColumns(
-        t,
-        isAllClustersPage,
-        isAllNamespaces(activeNamespace),
-        preferences ?? [],
-      ),
-    [t, isAllClustersPage, activeNamespace, preferences],
+    () => getBootableVolumeColumns(t, isAllClustersPage, isAllNamespaces(activeNamespace)),
+    [t, isAllClustersPage, activeNamespace],
   );
 
   const { activeColumnKeys, loaded: loadedColumns } = useKubevirtTableColumns({

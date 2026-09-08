@@ -1,20 +1,16 @@
 import React, { FC } from 'react';
 
 import { BootableResource } from '../../utils/types';
-import { getPreferenceReadableOS } from '../../utils/utils';
+import { getBootableVolumeOSDisplayValue } from '../utils/helpers';
 import { BootableVolumeCallbacks } from '../bootableVolumesDefinition';
-import { getClusterPreferences, getEffectiveCluster } from '../utils/helpers';
 
 type BootableVolumeOSCellProps = {
   callbacks: BootableVolumeCallbacks;
   row: BootableResource;
 };
 
-const BootableVolumeOSCell: FC<BootableVolumeOSCellProps> = ({ callbacks, row }) => {
-  const cluster = getEffectiveCluster(row, callbacks);
-  const clusterPreferences = getClusterPreferences(cluster, callbacks.preferences);
-
-  return <>{getPreferenceReadableOS(row, clusterPreferences, cluster)}</>;
-};
+const BootableVolumeOSCell: FC<BootableVolumeOSCellProps> = ({ callbacks, row }) => (
+  <>{getBootableVolumeOSDisplayValue(row, callbacks)}</>
+);
 
 export default BootableVolumeOSCell;

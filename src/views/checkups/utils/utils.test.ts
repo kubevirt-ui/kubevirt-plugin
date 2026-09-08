@@ -4,6 +4,7 @@ import { type IoK8sApiBatchV1Job } from '@kubevirt-ui-ext/kubevirt-api/kubernete
 
 import {
   CheckupsStatus,
+  getConfigMapStatus,
   getCSVExportStatusLabel,
   getJobStatus,
   isJobFailedCondition,
@@ -99,6 +100,18 @@ describe('getCSVExportStatusLabel', () => {
 
   it('should return Succeeded for Done', () => {
     expect(getCSVExportStatusLabel(CheckupsStatus.Done, t)).toBe('Succeeded');
+  });
+});
+
+describe('getConfigMapStatus', () => {
+  it('returns Failed when the job is Done but status.succeeded is unset', () => {
+    expect(getConfigMapStatus({ data: {} }, CheckupsStatus.Done)).toBe(CheckupsStatus.Failed);
+  });
+
+  it('returns Done when status.succeeded is true', () => {
+    expect(getConfigMapStatus({ data: { 'status.succeeded': 'true' } }, CheckupsStatus.Done)).toBe(
+      CheckupsStatus.Done,
+    );
   });
 });
 

@@ -5,7 +5,7 @@ import {
   IoK8sApiBatchV1Job,
   IoK8sApiCoreV1ConfigMap,
 } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
-import { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
+import { type TableExportColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { ACTIONS } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/const';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getCluster } from '@multicluster/helpers/selectors';
@@ -42,7 +42,7 @@ export const getCheckupsStorageColumns = (
   isACMPage: boolean,
   showNamespace: boolean,
   hubClusterName?: string,
-): ColumnConfig<IoK8sApiCoreV1ConfigMap, CheckupsStorageCallbacks>[] => [
+): TableExportColumnConfig<IoK8sApiCoreV1ConfigMap, CheckupsStorageCallbacks>[] => [
   {
     getValue: (row) => getName(row) ?? '',
     key: 'name',

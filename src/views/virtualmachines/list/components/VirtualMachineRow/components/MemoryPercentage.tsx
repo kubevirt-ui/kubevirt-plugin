@@ -1,22 +1,15 @@
 import React, { FC } from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { getMemoryUsagePercentage } from '@virtualmachines/list/metrics';
-import { isRunning } from '@virtualmachines/utils';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { getMemoryUsageDisplayValue } from '@virtualmachines/list/usageDisplayValues';
 
 type MemoryPercentageProps = {
   vm: V1VirtualMachine;
-  vmiMemory: string;
+  vmiMemory: string | undefined;
 };
 
-const MemoryPercentage: FC<MemoryPercentageProps> = ({ vm, vmiMemory }) => {
-  const memoryUsagePercentage = getMemoryUsagePercentage(vm, vmiMemory);
-
-  if (isEmpty(memoryUsagePercentage) || !isRunning(vm)) return <span>{NO_DATA_DASH}</span>;
-
-  return <span>{memoryUsagePercentage.toFixed(2)}%</span>;
-};
+const MemoryPercentage: FC<MemoryPercentageProps> = ({ vm, vmiMemory }) => (
+  <span>{getMemoryUsageDisplayValue(vm, vmiMemory)}</span>
+);
 
 export default MemoryPercentage;

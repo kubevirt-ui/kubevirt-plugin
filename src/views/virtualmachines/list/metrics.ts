@@ -68,20 +68,33 @@ export const setMetricFromResponse = (response: PrometheusResponse, metric: Metr
   }
 };
 
-export const getCPUUsagePercentage = (vm: V1VirtualMachine, vmiCPU: V1CPU): number => {
+const hasNumericMetric = (value: number | undefined): value is number =>
+  typeof value === 'number' && Number.isFinite(value);
+
+export const resetVMMetrics = (): void => {
+  vmsMetrics.value = {};
+};
+
+export const getCPUUsagePercentage = (
+  vm: V1VirtualMachine,
+  vmiCPU: undefined | V1CPU,
+): number | undefined => {
   const { cpuUsage } = getVMMetrics(vm);
 
-  if (isEmpty(cpuUsage)) return;
+  if (!hasNumericMetric(cpuUsage) || isEmpty(vmiCPU)) return;
 
   const cpuRequested = getVCPUCount(vmiCPU);
 
   return (cpuUsage * 100) / cpuRequested;
 };
 
-export const getMemoryUsagePercentage = (vm: V1VirtualMachine, vmiMemory: string): number => {
+export const getMemoryUsagePercentage = (
+  vm: V1VirtualMachine,
+  vmiMemory: string | undefined,
+): number | undefined => {
   const { memoryUsage } = getVMMetrics(vm);
 
-  if (isEmpty(memoryUsage) || isEmpty(vmiMemory)) return;
+  if (!hasNumericMetric(memoryUsage) || isEmpty(vmiMemory)) return;
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const memoryAvailableBytes = convertToBaseValue(vmiMemory);
@@ -91,10 +104,10 @@ export const getMemoryUsagePercentage = (vm: V1VirtualMachine, vmiMemory: string
   return (memoryUsage * 100) / memoryAvailableBytes;
 };
 
-export const getNetworkUsagePercentage = (vm: V1VirtualMachine): number => {
+export const getNetworkUsagePercentage = (vm: V1VirtualMachine): number | undefined => {
   const { networkUsage } = getVMMetrics(vm);
 
-  if (isEmpty(networkUsage)) return;
+  if (!hasNumericMetric(networkUsage)) return;
 
   return networkUsage;
 };

@@ -3,7 +3,7 @@ import { TFunction } from 'i18next';
 
 import { JobModel, modelToGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { IoK8sApiBatchV1Job } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
-import { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
+import { type TableExportColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { ACTIONS } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/const';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import MulticlusterResourceLink from '@multicluster/components/MulticlusterResourceLink/MulticlusterResourceLink';
@@ -55,7 +55,7 @@ const ActionsCell: FC<{ callbacks: CheckupsHistoryCallbacks; row: IoK8sApiBatchV
 
 export const getCheckupsHistoryColumns = (
   t: TFunction,
-): ColumnConfig<IoK8sApiBatchV1Job, CheckupsHistoryCallbacks>[] => [
+): TableExportColumnConfig<IoK8sApiBatchV1Job, CheckupsHistoryCallbacks>[] => [
   {
     getValue: (row) => getName(row) ?? '',
     key: 'job',
