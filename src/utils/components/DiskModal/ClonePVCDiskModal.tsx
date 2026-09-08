@@ -1,12 +1,12 @@
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
+import useCanClonePVCFromNamespace from '@kubevirt-utils/hooks/useCanClonePVCFromNamespace';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { isRunning } from '@virtualmachines/utils';
 
 import TabModal from '../TabModal/TabModal';
-
 import AdvancedSettings from './components/AdvancedSettings/AdvancedSettings';
 import BootSourceCheckbox from './components/BootSourceCheckbox/BootSourceCheckbox';
 import DiskInterfaceSelect from './components/DiskInterfaceSelect/DiskInterfaceSelect';
@@ -16,10 +16,11 @@ import DiskSourceClonePVCSelect from './components/DiskSourceSelect/components/D
 import DiskTypeSelect from './components/DiskTypeSelect/DiskTypeSelect';
 import PendingChanges from './components/PendingChanges';
 import StorageClassAndPreallocation from './components/StorageClassAndPreallocation/StorageClassAndPreallocation';
+import { DATAVOLUME_PVC_NAMESPACE, VM_CLUSTER_FIELD } from './components/utils/constants';
 import { getDefaultCreateValues, getDefaultEditValues } from './utils/form';
 import { diskModalTitle } from './utils/helpers';
 import { submit } from './utils/submit';
-import { SourceTypes, V1DiskFormState, V1SubDiskModalProps } from './utils/types';
+import { SourceTypes, type V1DiskFormState, type V1SubDiskModalProps } from './utils/types';
 
 const ClonePVCDiskModal: FC<V1SubDiskModalProps> = ({
   editDiskName,
@@ -45,7 +46,18 @@ const ClonePVCDiskModal: FC<V1SubDiskModalProps> = ({
   const {
     formState: { isSubmitting, isValid },
     handleSubmit,
+    watch,
   } = methods;
+
+  const sourceNamespace = watch(DATAVOLUME_PVC_NAMESPACE);
+  const vmCluster = watch(VM_CLUSTER_FIELD);
+  const { canClone, isChecking, requiresClonePermission } = useCanClonePVCFromNamespace(
+    sourceNamespace,
+    namespace,
+    vmCluster,
+  );
+  const hasClonePermission =
+    !requiresClonePermission || isChecking || canClone || isCreated || isEditDisk;
 
   return (
     <FormProvider {...methods}>
@@ -55,7 +67,7 @@ const ClonePVCDiskModal: FC<V1SubDiskModalProps> = ({
         }
         closeOnSubmit={isValid}
         headerText={diskModalTitle(isEditDisk, isVMRunning)}
-        isDisabled={!isValid}
+        isDisabled={!isValid || !hasClonePermission}
         isLoading={isSubmitting}
         isOpen={isOpen}
         onClose={onClose}
@@ -64,7 +76,7 @@ const ClonePVCDiskModal: FC<V1SubDiskModalProps> = ({
         <PendingChanges isVMRunning={isVMRunning} />
         <BootSourceCheckbox editDiskName={editDiskName} isDisabled={isVMRunning} vm={vm} />
         <DiskNameInput />
-        {!isCreated && <DiskSourceClonePVCSelect />}
+        {!isCreated && <DiskSourceClonePVCSelect destinationNamespace={namespace} />}
         <DiskSizeInput isCreated={isCreated} namespace={namespace} pvc={pvc} />
         <DiskTypeSelect isVMRunning={isVMRunning} />
         <DiskInterfaceSelect isVMRunning={isVMRunning} />
