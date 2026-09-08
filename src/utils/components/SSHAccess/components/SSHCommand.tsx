@@ -20,6 +20,7 @@ import {
   Stack,
   StackItem,
 } from '@patternfly/react-core';
+import { isRunning } from '@virtualmachines/utils';
 
 import { SERVICE_TYPES } from '../constants';
 import useSSHCommand, { isLoadBalancerBonded } from '../useSSHCommand';
@@ -52,7 +53,7 @@ const SSHCommand: FC<SSHCommandProps> = ({
     loaded: vmiAndPodsLoaded,
     pod,
     vmi,
-  } = useVMIAndPodForVM(getName(vm), getNamespace(vm), getCluster(vm));
+  } = useVMIAndPodForVM(getName(vm), getNamespace(vm), getCluster(vm), isRunning(vm));
   const loadError = sshServiceError ?? vmiAndPodsError;
 
   const onSSHChange = async (newServiceType: SERVICE_TYPES): Promise<void> => {

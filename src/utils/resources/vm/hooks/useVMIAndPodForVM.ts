@@ -17,8 +17,9 @@ export const useVMIAndPodForVM = (
   vmName: string,
   vmNamespace: string,
   vmCluster?: string,
+  fetchVMI = true,
 ): UseVMIAndPodForVMValues => {
-  const { vmi, vmiLoaded, vmiLoadError } = useVMI(vmName, vmNamespace, vmCluster);
+  const { vmi, vmiLoaded, vmiLoadError } = useVMI(vmName, vmNamespace, vmCluster, fetchVMI);
 
   const [pods, podsLoaded, podsLoadError] = useK8sWatchData<K8sResourceCommon[]>({
     cluster: vmCluster,
