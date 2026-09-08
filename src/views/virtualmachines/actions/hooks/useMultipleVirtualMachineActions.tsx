@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { ActionDropdownItemType } from '@kubevirt-utils/components/ActionsDropdown/constants';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type ActionDropdownItemType } from '@kubevirt-utils/components/ActionsDropdown/constants';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { CONFIRM_VM_ACTIONS, TREE_VIEW_FOLDERS } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
@@ -13,12 +13,12 @@ import { getCluster } from '@multicluster/helpers/selectors';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { useHubClusterName } from '@stolostron/multicluster-sdk';
 import { isPaused, isRunning, isStopped } from '@virtualmachines/utils';
-import { getVMIMFromMapper, VMIMMapper } from '@virtualmachines/utils/mappers';
+import { getVMIMFromMapper, type VMIMMapper } from '@virtualmachines/utils/mappers';
 
 import { createBulkVirtualMachineActionFactory } from '../BulkVirtualMachineActionFactory';
 
-import useClusterStorageMigrationAPI from './storageMigrationApi/useClusterStorageMigrationAPI';
 import { BULK_ACTIONS_ID } from './constants';
+import useClusterStorageMigrationAPI from './storageMigrationApi/useClusterStorageMigrationAPI';
 import useIsMTVInstalled from './useIsMTVInstalled';
 import useVirtualMachineActionsProvider from './useVirtualMachineActionsProvider';
 import { someVMIsMigrating } from './utils';
@@ -43,7 +43,9 @@ const useMultipleVirtualMachineActions: UseMultipleVirtualMachineActions = (
   const clusterParam = useClusterParam();
   const effectiveCluster = getCluster(vms?.[0]) ?? clusterParam ?? undefined;
 
-  const [provider, providerLoaded] = useProviderByClusterName(effectiveCluster ?? hubClusterName);
+  const [provider, providerLoaded, providerError] = useProviderByClusterName(
+    effectiveCluster ?? hubClusterName,
+  );
 
   const storageMigAPI = useClusterStorageMigrationAPI(effectiveCluster);
 
@@ -86,7 +88,7 @@ const useMultipleVirtualMachineActions: UseMultipleVirtualMachineActions = (
         BulkVirtualMachineActionFactory.crossClusterMigration(
           vms,
           createModal,
-          providerLoaded && isEmpty(provider),
+          !providerLoaded || !isEmpty(providerError) || isEmpty(provider),
         ),
       );
     }
@@ -132,6 +134,7 @@ const useMultipleVirtualMachineActions: UseMultipleVirtualMachineActions = (
     isTreeViewMenu,
     mtvInstalled,
     provider,
+    providerError,
     providerLoaded,
     storageMigAPI,
     t,

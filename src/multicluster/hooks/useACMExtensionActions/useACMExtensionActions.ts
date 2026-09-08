@@ -2,10 +2,10 @@ import { useMemo } from 'react';
 import produce from 'immer';
 
 import {
-  ACMVirtualMachineAction,
+  type ACMVirtualMachineAction,
   isACMVirtualMachineAction,
 } from '@kubevirt-extensions/acm.virtualmachine';
-import { ActionDropdownItemType } from '@kubevirt-utils/components/ActionsDropdown/constants';
+import { type ActionDropdownItemType } from '@kubevirt-utils/components/ActionsDropdown/constants';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -24,7 +24,9 @@ const useACMExtensionActions = (vm): ActionDropdownItemType[] => {
   const { t } = useKubevirtTranslation();
   const isACMPage = useIsACMPage();
   const [hubClusterName] = useHubClusterName();
-  const [provider, providerLoaded] = useProviderByClusterName(getCluster(vm) ?? hubClusterName);
+  const [provider, providerLoaded, providerError] = useProviderByClusterName(
+    getCluster(vm) ?? hubClusterName,
+  );
 
   const [virtualMachineActionExtensions, virtualMachineActionExtensionsResolved] =
     useResolvedExtensions<ACMVirtualMachineAction>(isACMVirtualMachineAction);
@@ -36,7 +38,7 @@ const useACMExtensionActions = (vm): ActionDropdownItemType[] => {
       const crossClusterMigration = draft.find(
         (action) => action.properties.id === CROSS_CLUSTER_MIGRATION_ACTION_ID,
       );
-      if (providerLoaded && isEmpty(provider)) {
+      if (!providerLoaded || !isEmpty(providerError) || isEmpty(provider)) {
         crossClusterMigration.properties.isDisabled = true;
         crossClusterMigration.properties.description = t(
           'Cross-cluster migration is not supported on this cluster.',
@@ -58,6 +60,7 @@ const useACMExtensionActions = (vm): ActionDropdownItemType[] => {
     hubClusterName,
     providerLoaded,
     provider,
+    providerError,
     t,
   ]);
 };

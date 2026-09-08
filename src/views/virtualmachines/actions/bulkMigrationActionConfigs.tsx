@@ -1,6 +1,7 @@
 import React from 'react';
 import { type TFunction } from 'i18next';
 
+import { PlanModel } from '@forklift-ui/types';
 import { VirtualMachineInstanceMigrationModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { type ActionDropdownItemType } from '@kubevirt-utils/components/ActionsDropdown/constants';
@@ -13,6 +14,7 @@ import {
 } from '@kubevirt-utils/resources/migrations/constants';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { getNoPermissionTooltipContent, isEmpty } from '@kubevirt-utils/utils/utils';
+import { MTV_MIGRATION_NAMESPACE } from '@multicluster/components/CrossClusterMigration/constants';
 import CrossClusterMigration from '@multicluster/components/CrossClusterMigration/CrossClusterMigration';
 import { CROSS_CLUSTER_MIGRATION_ACTION_ID } from '@multicluster/constants';
 import { getCluster } from '@multicluster/helpers/selectors';
@@ -29,19 +31,34 @@ export const createCrossClusterMigrationConfig =
   (
     vms: V1VirtualMachine[],
     createModal: (modal: ModalComponent) => void,
-    isDisabled: boolean,
+    isClusterUnsupported: boolean,
   ): ActionDropdownItemType => {
     const allRunning = vms?.every(isRunning);
 
+    const getDisabledTooltip = (): string | undefined => {
+      if (!allRunning) {
+        return t('All VirtualMachines must be running');
+      }
+      if (isClusterUnsupported) {
+        return t('Cross-cluster migration is not supported on this cluster.');
+      }
+      return undefined;
+    };
+
     return {
+      accessReview: {
+        cluster: getCluster(vms?.[0]),
+        group: PlanModel.apiGroup,
+        namespace: MTV_MIGRATION_NAMESPACE,
+        resource: PlanModel.plural,
+        verb: 'create',
+      },
       cta: () =>
         createModal(({ isOpen, onClose }) => (
           <CrossClusterMigration close={onClose} isOpen={isOpen} resources={vms} />
         )),
-      disabled: isEmpty(vms) || isDisabled || !allRunning,
-      disabledTooltip: !allRunning
-        ? t('All VirtualMachines must be running')
-        : t('Cross-cluster migration is not supported on this cluster.'),
+      disabled: isEmpty(vms) || isClusterUnsupported || !allRunning,
+      disabledTooltip: getDisabledTooltip(),
       id: CROSS_CLUSTER_MIGRATION_ACTION_ID,
       label: t('Cross-cluster migration'),
     };
