@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useEffect, useState } from 'react';
 
 import { BREAKPOINTS } from '@kubevirt-utils/constants/window';

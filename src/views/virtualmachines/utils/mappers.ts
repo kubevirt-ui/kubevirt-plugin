@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import {
   V1VirtualMachine,

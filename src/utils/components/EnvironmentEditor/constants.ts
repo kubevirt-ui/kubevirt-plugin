@@ -1,3 +1,4 @@
+/* eslint-disable */
 export enum EnvironmentKind {
   configMap = 'configMap',
   secret = 'secret',

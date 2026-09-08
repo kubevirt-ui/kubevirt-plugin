@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { V1beta1PersistentVolumeClaim, V1Disk } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 
 export type DiskPresentation = {

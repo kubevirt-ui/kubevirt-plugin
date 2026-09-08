@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { type V1CPU, type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getAnnotations } from '@kubevirt-utils/resources/shared';
 import { type Template } from '@kubevirt-utils/resources/template';

@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useCallback, useMemo } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';

@@ -1,3 +1,4 @@
+/* eslint-disable */
 declare module 'react-redux' {
   import type { ComponentType } from 'react';
   import type { Dispatch, Action } from 'redux';

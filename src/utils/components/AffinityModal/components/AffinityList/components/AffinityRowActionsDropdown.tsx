@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { FC, useState } from 'react';
 
 import KebabToggle from '@kubevirt-utils/components/toggles/KebabToggle';

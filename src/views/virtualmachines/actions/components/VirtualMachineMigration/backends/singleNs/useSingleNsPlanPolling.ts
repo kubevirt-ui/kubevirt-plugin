@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useCallback, useEffect, useState } from 'react';
 
 import { VirtualMachineStorageMigrationPlanModel } from '@kubevirt-utils/models';

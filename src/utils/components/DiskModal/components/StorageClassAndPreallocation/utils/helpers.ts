@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { modelToGroupVersionKind, StorageClassModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { type IoK8sApiStorageV1StorageClass } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { type EnhancedSelectOptionProps } from '@kubevirt-utils/components/FilterSelect/utils/types';

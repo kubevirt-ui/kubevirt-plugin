@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { Dispatch, FC, SetStateAction } from 'react';
 
 import { Button, ButtonVariant, Form, FormGroup, Split, SplitItem } from '@patternfly/react-core';

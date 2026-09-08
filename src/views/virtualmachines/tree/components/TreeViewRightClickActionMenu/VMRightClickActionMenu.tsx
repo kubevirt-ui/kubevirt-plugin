@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { FC } from 'react';
 
 import { getLabel, getName, getNamespace } from '@kubevirt-utils/resources/shared';

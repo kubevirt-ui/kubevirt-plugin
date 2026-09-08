@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { ROOTDISK } from '@kubevirt-utils/constants/constants';
 

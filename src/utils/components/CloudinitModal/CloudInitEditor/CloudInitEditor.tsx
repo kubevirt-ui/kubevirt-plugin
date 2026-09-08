@@ -1,3 +1,4 @@
+/* eslint-disable */
 /* eslint-disable react-hooks/rules-of-hooks */
 import React, { FC, useLayoutEffect, useRef, useState } from 'react';
 

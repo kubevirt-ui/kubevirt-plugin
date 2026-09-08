@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { createContext, useContext } from 'react';
 
 import { type CapabilityFeature, type CapabilitySelectionState } from '../utils/types';

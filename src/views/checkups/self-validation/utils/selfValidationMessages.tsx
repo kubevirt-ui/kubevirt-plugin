@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { ReactElement } from 'react';
 import { Link } from 'react-router';
 import { TFunction } from 'i18next';

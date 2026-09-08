@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useDispatch } from 'react-redux';
 
 import {

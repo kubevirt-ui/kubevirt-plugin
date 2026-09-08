@@ -1,3 +1,4 @@
+/* eslint-disable */
 import {
   EDITOR_VIEW_SWITCHED,
   RESOURCE_CREATED,

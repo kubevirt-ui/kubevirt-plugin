@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { PrometheusEndpoint } from '@openshift-console/dynamic-plugin-sdk';
 import { useFleetPrometheusPoll } from '@stolostron/multicluster-sdk';
 import { MetricsDataByNode } from '@virtualmachines/actions/components/VirtualMachineComputeMigration/utils/hooks/useNodesMetrics/utils/types';

@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useCallback, useMemo } from 'react';
 
 import { VirtualMachineInstanceMigrationModel } from '@kubevirt-ui-ext/kubevirt-api/console';

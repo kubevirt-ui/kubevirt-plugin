@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { JobModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { IoK8sApiBatchV1Job } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';

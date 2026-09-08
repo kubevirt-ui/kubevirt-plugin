@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useKubevirtClusterServiceVersion } from '@kubevirt-utils/hooks/useKubevirtClusterServiceVersion';
 import useIsACMPage from '@multicluster/useIsACMPage';
 

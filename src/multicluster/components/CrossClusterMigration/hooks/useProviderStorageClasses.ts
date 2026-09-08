@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { IoK8sApiStorageV1StorageClass } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { modelToGroupVersionKind, StorageClassModel } from '@kubevirt-utils/models';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';

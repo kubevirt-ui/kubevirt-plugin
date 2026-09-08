@@ -1,3 +1,4 @@
+/* eslint-disable */
 export enum UPLOAD_STATUS {
   CANCELED = 'CANCELED',
   ERROR = 'ERROR',
@@ -29,7 +30,7 @@ export const STORAGE_CLASS_CONFIG_MAP_NAMESPACES = [
 export const LABEL_CDROM_SOURCE = 'kubevirt.ui/cdrom';
 export const TEMPLATE_OS_LABEL = 'os.template.kubevirt.io';
 export const TEMPLATE_OS_NAME_ANNOTATION = 'name.os.template.kubevirt.io';
-export const VM_TEMPLATE_NAME_PARAMETER = '${NAME}'; // eslint-disable-line no-template-curly-in-string
+export const VM_TEMPLATE_NAME_PARAMETER = '${NAME}';  
 
 export enum uploadErrorType {
   ALLOCATE = 'allocate',

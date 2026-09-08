@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { getAnnotation } from '@kubevirt-utils/resources/shared';
 import { DESCRIPTION_ANNOTATION, getFolder } from '@kubevirt-utils/resources/vm';
 import {

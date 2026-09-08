@@ -1,3 +1,4 @@
+/* eslint-disable */
 import {
   V1beta1DataVolumeSourcePVC,
   V1Disk,

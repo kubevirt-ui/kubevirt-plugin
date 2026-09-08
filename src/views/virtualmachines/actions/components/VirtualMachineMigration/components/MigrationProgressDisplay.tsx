@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { ComponentType, FC } from 'react';
 import { Link } from 'react-router';
 

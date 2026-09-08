@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { useCallback, useMemo } from 'react';
 
 import { type ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';

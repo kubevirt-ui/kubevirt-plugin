@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { isCommonTemplate, Template } from '@kubevirt-utils/resources/template';
 import { VMCreationMethod, VMWizardStep } from '@virtualmachines/wizard/utils/constants';
 

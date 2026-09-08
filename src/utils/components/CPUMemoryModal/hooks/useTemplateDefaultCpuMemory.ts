@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { TemplateModel, V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1CPU } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';

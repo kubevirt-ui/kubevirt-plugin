@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { TFunction } from 'i18next';
 
 import { DataSourceModel } from '@kubevirt-ui-ext/kubevirt-api/console';

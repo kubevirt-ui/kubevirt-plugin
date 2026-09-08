@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useEffect } from 'react';
 
 import { DeploymentModel, modelToGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';

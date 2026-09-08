@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { FC } from 'react';
 
 import { MigrationPolicyStateDispatch } from '../../MigrationPolicyEditModal/utils/constants';

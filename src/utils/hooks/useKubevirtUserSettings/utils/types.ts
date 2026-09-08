@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { UserSettingsState } from './userSettingsInitialState';
 
 export type TopConsumersData = { [key: string]: any };

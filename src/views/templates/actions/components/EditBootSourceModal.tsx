@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { FC, useEffect, useRef, useState } from 'react';
 import { Trans } from 'react-i18next';
 

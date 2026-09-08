@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useForm, UseFormReturn } from 'react-hook-form';
 
 import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';

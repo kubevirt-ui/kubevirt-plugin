@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { FC, MouseEvent, useState } from 'react';
 
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';

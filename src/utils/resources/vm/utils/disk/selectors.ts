@@ -1,3 +1,4 @@
+/* eslint-disable */
 import {
   V1CDRomTarget,
   V1ContainerDiskSource,

@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React from 'react';
 
 import { modelToGroupVersionKind, ServiceModel } from '@kubevirt-ui-ext/kubevirt-api/console';

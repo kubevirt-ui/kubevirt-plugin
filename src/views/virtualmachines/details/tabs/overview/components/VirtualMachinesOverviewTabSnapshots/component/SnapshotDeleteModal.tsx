@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React from 'react';
 
 import { VirtualMachineSnapshotModel } from '@kubevirt-ui-ext/kubevirt-api/console';

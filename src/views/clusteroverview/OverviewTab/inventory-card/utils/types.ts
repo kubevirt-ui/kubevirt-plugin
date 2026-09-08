@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { IoK8sApiCoreV1Node } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';

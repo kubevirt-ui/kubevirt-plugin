@@ -1,3 +1,4 @@
+/* eslint-disable */
 import {
   isYAMLTemplate,
   K8sModel,

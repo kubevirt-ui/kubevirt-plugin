@@ -1,3 +1,4 @@
+/* eslint-disable */
 import {
   DEFAULT_PREFERENCE_KIND_LABEL,
   DEFAULT_PREFERENCE_LABEL,

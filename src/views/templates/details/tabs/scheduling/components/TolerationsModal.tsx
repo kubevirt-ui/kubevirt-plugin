@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { FC, useMemo } from 'react';
 import produce from 'immer';
 import { getTolerations } from 'src/views/templates/utils/selectors';

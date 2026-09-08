@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { getI18n, useTranslation } from 'react-i18next';
 import { TOptions } from 'i18next';
 

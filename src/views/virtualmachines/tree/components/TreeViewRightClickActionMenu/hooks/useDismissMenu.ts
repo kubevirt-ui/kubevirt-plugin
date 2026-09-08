@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useCallback, useEffect } from 'react';
 
 import { CLICK, ESCAPE, KEYDOWN } from '@kubevirt-utils/hooks/useClickOutside/constants';

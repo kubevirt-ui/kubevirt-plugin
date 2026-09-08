@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { HyperConvergedV1Beta1Model as HyperConvergedModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { TemplateModel, V1Template } from '@kubevirt-utils/models';

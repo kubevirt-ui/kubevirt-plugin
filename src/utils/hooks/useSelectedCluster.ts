@@ -1,3 +1,4 @@
+/* eslint-disable */
 import useIsACMPage from '@multicluster/useIsACMPage';
 import { useHubClusterName } from '@stolostron/multicluster-sdk';
 

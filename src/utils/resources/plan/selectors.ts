@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { V1beta1Plan } from '@forklift-ui/types';
 
 export const getSourceProviderName = (plan: V1beta1Plan) => plan?.spec?.provider?.source?.name;

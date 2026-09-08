@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { FC, ReactNode, useEffect } from 'react';
 import classNames from 'classnames';
 

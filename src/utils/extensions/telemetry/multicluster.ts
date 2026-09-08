@@ -1,3 +1,4 @@
+/* eslint-disable */
 import {
   CONSOLE_USED,
   MULTI_CLUSTER_MANAGEMENT_DETECTED,

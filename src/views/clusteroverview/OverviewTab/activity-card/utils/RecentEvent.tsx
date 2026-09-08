@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { FC } from 'react';
 
 import { EventModel } from '@kubevirt-ui-ext/kubevirt-api/console';

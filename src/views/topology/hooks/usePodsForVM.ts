@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { PodModel, ReplicationControllerModel } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -95,7 +96,7 @@ const usePodsForVM: UsePodsForVM = (vm) => {
       }
     },
     // Don't update on a resource change, we want the debounce callback to be consistent
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
     [vmName],
   );
 

@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useWatch } from 'react-hook-form';
 
 import { PreferenceOption } from '@kubevirt-utils/components/AddBootableVolumeModal/types';

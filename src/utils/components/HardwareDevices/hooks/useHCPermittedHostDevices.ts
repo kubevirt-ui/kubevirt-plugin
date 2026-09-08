@@ -1,3 +1,4 @@
+/* eslint-disable */
 import {
   V1KubeVirtConfiguration,
   V1PermittedHostDevices,

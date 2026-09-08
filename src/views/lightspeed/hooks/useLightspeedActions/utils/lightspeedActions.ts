@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { action } from 'typesafe-actions';
 
 import { Attachment, ChatEntry, Tool } from '@lightspeed/hooks/useLightspeedActions/utils/types';

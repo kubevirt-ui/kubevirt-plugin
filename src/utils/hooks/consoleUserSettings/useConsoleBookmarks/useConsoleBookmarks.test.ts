@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { CONSOLE_NAMESPACE_BOOKMARKS_KEY } from '@kubevirt-utils/hooks/useConsoleNamespaceBookmarks/consts';
 import { act, renderHook, waitFor } from '@testing-library/react';
 

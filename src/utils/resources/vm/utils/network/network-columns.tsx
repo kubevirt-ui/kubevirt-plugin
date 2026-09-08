@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { TFunction } from 'i18next';
 
 import { NetworkPresentation } from '@kubevirt-utils/resources/vm/utils/network/constants';

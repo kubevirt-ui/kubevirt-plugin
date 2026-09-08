@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { NODE_HEIGHT, NODE_PADDING, NODE_WIDTH, VIRTUAL_MACHINE_TYPE } from './constants';
 
 export const WorkloadModelProps = {

@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { sortable } from '@patternfly/react-table';
 

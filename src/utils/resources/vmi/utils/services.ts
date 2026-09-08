@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { IoK8sApiCoreV1Pod, IoK8sApiCoreV1Service } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getName } from '@kubevirt-utils/resources/shared';

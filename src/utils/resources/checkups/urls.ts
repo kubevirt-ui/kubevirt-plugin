@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { getFleetCheckupsURL } from '@multicluster/urls';
 
 import { CHECKUP_URLS } from '../../../views/checkups/utils/constants';

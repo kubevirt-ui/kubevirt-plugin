@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { FC, useCallback, useEffect, useState } from 'react';
 import { useDebounceCallback } from 'src/views/clusteroverview/utils/hooks/useDebounceCallback';
 

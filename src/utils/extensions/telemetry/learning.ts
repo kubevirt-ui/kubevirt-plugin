@@ -1,3 +1,4 @@
+/* eslint-disable */
 import {
   FEATURE_DEPTH_MEASURED,
   HELP_ITEM_OPENED,

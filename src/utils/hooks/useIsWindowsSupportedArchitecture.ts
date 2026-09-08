@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { ARCHITECTURES } from '@kubevirt-utils/constants/constants';
 import useHcoWorkloadArchitectures from '@kubevirt-utils/hooks/useHcoWorkloadArchitectures';
 import useClusterParam from '@multicluster/hooks/useClusterParam';

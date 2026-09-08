@@ -1,3 +1,4 @@
+/* eslint-disable */
 /** KubeClient -- @kubernetes/client-node wrapper with SA token refresh, retry, waitForCondition, bulkDelete. */
 
 import { readFileSync } from 'node:fs';

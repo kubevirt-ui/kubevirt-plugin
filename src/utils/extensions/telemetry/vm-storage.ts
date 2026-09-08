@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { V1VirtualMachine, V1Volume } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getVolumes } from '@kubevirt-utils/resources/vm';
 

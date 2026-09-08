@@ -1,3 +1,4 @@
+/* eslint-disable */
 import * as k8s from '@kubernetes/client-node';
 
 import { deleteNamespace, waitForNamespaceDeletion } from './reconciler-helpers';

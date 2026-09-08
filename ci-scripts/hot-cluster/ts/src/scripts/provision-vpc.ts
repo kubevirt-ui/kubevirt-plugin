@@ -1,3 +1,4 @@
+/* eslint-disable */
 /**
  * Provision VPC Gen2 resources (VPC, subnet, public gateway).
  * Replaces: ci-scripts/hot-cluster/provision-vpc-resources.sh

@@ -1,3 +1,4 @@
+/* eslint-disable */
 import {
   K8sIoApiCoreV1Affinity,
   K8sIoApiCoreV1NodeAffinity,

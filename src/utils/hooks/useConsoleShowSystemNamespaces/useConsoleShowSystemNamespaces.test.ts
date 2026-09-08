@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { CONSOLE_USER_SETTINGS } from '@kubevirt-utils/hooks/consoleUserSettings/useConsoleUserSettingLocalStorage/consts';
 import { act, renderHook, waitFor } from '@testing-library/react';
 

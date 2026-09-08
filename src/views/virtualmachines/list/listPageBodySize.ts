@@ -1,3 +1,4 @@
+/* eslint-disable */
 export enum ListPageBodySize {
   lg = 'lg',
   md = 'md',

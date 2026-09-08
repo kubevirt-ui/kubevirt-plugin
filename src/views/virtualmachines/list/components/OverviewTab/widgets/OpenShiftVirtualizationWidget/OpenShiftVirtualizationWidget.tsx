@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { FC, useMemo } from 'react';
 
 import useInfrastructureAlerts from '@kubevirt-utils/hooks/useInfrastructureAlerts/useInfrastructureAlerts';

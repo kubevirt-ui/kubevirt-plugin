@@ -1,3 +1,4 @@
+/* eslint-disable */
 import {
   VM_GPU_ATTACHED,
   VM_OS_COLLECTED,

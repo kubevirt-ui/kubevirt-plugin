@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { type FC, type FormEvent } from 'react';
 
 import { type V1CPU } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';

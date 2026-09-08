@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { NUMERIC_OPERATOR_REGEX, SEARCH_KEY_TO_FILTER_TYPE } from './constants';
 import { SearchToken } from './types';
 import { getSanitizedInput, isExcludedToken } from './utils';

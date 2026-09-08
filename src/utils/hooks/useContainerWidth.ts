@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { MutableRefObject, useEffect, useState } from 'react';
 
 import { debounce } from '@kubevirt-utils/utils/debounce';

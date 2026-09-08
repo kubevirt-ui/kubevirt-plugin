@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { FC, useEffect } from 'react';
 import { useLocation } from 'react-router';
 

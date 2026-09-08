@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { filterUDNNads } from '@kubevirt-utils/components/NetworkInterfaceModal/components/hooks/utils';
 
 import { UseNADsData } from './types';

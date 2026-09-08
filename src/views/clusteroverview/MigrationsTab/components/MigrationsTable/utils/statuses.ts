@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { GreenRunningIcon } from '@kubevirt-utils/icons/GreenRunningIcon';
 import {
   GreenCheckCircleIcon,

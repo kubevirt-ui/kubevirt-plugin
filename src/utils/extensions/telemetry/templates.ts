@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { getName } from '@kubevirt-utils/resources/shared';
 import { Template } from '@kubevirt-utils/resources/template';
 

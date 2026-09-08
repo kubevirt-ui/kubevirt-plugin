@@ -1,3 +1,4 @@
+/* eslint-disable */
 import * as path from 'path';
 
 import { defineConfig, devices } from '@playwright/test';

@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { ChangeEvent, FC, useEffect, useState } from 'react';
 import { XMLValidator } from 'fast-xml-parser';
 

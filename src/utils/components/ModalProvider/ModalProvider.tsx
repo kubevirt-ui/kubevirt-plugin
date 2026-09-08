@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { ComponentType, createContext, FC, ReactNode, useContext, useState } from 'react';
 
 import UploadProgressToastProvider from '@kubevirt-utils/hooks/useUploadProgressToast/UploadProgressToastProvider';

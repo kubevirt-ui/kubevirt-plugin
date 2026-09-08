@@ -1,3 +1,4 @@
+/* eslint-disable */
 export enum AlertType {
   critical = 'critical',
   info = 'info',

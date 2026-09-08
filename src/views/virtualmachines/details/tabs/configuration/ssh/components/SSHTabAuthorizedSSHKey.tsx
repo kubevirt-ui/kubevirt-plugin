@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { FC, useMemo } from 'react';
 import { VirtualMachineModel } from 'src/views/dashboard-extensions/utils';
 

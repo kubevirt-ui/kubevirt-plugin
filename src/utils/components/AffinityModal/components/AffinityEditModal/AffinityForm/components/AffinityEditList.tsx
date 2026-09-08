@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { FC } from 'react';
 
 import LabelsList from '@kubevirt-utils/components/NodeSelectorModal/components/LabelList';

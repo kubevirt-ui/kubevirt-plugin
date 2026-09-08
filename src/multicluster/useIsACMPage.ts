@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useEffect, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 

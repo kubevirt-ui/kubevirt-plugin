@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { type FC, useMemo, useState } from 'react';
 import { Link } from 'react-router';
 

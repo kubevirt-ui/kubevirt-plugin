@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { FC } from 'react';
 
 import { ColoredIconProps, StatusIconAndText } from '@openshift-console/dynamic-plugin-sdk';

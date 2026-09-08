@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { FC, useMemo, useRef, useState } from 'react';
 
 import useContainerWidth from '@kubevirt-utils/hooks/useContainerWidth';

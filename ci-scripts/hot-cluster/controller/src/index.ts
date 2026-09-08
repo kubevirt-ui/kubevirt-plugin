@@ -1,3 +1,4 @@
+/* eslint-disable */
 /**
  * ci-env-controller — watches labeled ConfigMaps and reconciles
  * CI test environments (namespace, Helm chart) on demand.

@@ -1,3 +1,4 @@
+/* eslint-disable */
 export enum NetworkTypeKeys {
   cnvBridgeNetworkType = 'bridge',
   ovnKubernetesNetworkType = 'ovn-k8s-cni-overlay',

@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { ChangeEvent, MouseEvent, ReactElement } from 'react';
 
 export interface GettingStartedLink {

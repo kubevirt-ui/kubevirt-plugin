@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { MigrationPolicyModelRef } from '@kubevirt-utils/models';
 import { CLUSTER_LIST_FILTER_PARAM } from '@kubevirt-utils/utils/constants';
 import { FLEET_MIGRATION_POLICIES_PATH } from '@multicluster/constants';

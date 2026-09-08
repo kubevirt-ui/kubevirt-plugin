@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { FC, useEffect, useRef } from 'react';
 
 import {

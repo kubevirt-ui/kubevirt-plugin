@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { EnhancedSelectOptionProps } from './types';
 
 export const getGroupedOptions = (

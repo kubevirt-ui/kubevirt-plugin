@@ -1,3 +1,4 @@
+/* eslint-disable */
 import 'i18next';
 
 declare module 'i18next' {

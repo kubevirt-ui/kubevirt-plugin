@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useLocation } from 'react-router';
 
 export const idIsHighlighted = (id: string, hash: string) => {

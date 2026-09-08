@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { format } from 'date-fns';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';

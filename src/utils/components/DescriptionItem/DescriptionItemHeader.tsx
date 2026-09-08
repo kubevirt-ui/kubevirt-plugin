@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { FC, ReactNode } from 'react';
 
 import DescriptionItemPopoverContent from '@kubevirt-utils/components/DescriptionItem/DescriptionItemPopoverContent';

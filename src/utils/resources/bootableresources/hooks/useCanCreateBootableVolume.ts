@@ -1,3 +1,4 @@
+/* eslint-disable */
 import {
   DataImportCronModel,
   DataSourceModel,

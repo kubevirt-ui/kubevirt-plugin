@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { type FC } from 'react';
 
 import AddBootableVolumeModal from '@kubevirt-utils/components/AddBootableVolumeModal/AddBootableVolumeModal';

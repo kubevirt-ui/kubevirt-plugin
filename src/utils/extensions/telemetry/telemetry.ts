@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { createVMFlowTypes } from '@kubevirt-utils/extensions/telemetry/utils/constants';
 import { TELEMETRY_UNKNOWN_ERROR_MESSAGE } from '@kubevirt-utils/extensions/telemetry/utils/property-constants';

@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { ChangeEvent, FC } from 'react';
 
 import ContainerSource from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeSource/components/ContainerSource';

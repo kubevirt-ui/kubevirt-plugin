@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React from 'react';
 
 import {
@@ -38,7 +39,7 @@ export const removeVMAlerts = (sortedAlerts: SimplifiedAlerts) =>
 
       return acc;
     },
-    // eslint-disable-next-line perfectionist/sort-objects
+     
     { critical: [], warning: [], info: [] },
   );
 

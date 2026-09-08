@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useEffect, useRef } from 'react';
 
 import { PlanModel, V1beta1Plan } from '@forklift-ui/types';

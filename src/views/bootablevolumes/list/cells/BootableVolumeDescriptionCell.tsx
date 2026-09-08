@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { FC } from 'react';
 
 import { ANNOTATIONS } from '@kubevirt-utils/resources/template';

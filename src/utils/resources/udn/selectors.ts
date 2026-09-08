@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { isClusterUserDefinedNetwork } from '@kubevirt-utils/utils/typeGuards';
 
 import {

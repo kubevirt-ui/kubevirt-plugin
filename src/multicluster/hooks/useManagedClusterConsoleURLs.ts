@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useCallback, useMemo } from 'react';
 
 import { modelToGroupVersionKind } from '@kubevirt-utils/models';

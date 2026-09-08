@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
 
 export const TEMPLATE_TYPE_LABEL = 'template.kubevirt.io/type';

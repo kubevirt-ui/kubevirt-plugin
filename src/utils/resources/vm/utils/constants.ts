@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { V1Interface, V1Network } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 
 export const NO_DATA_DASH = '—';

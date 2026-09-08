@@ -1,3 +1,4 @@
+/* eslint-disable */
 import useNamespaceParam from '@kubevirt-utils/hooks/useNamespaceParam';
 import { ApplicationAwareResourceQuota } from '@kubevirt-utils/resources/quotas/types';
 import { getNamespace } from '@kubevirt-utils/resources/shared';

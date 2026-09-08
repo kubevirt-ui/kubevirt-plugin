@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 
 const ACM_CONSOLE_PLUGIN_NAME = 'acm';

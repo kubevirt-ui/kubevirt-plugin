@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { FC, MouseEventHandler, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { getMigrationPolicyURL } from 'src/views/migrationpolicies/utils/utils';

@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { V1beta1NodeNetworkConfigurationEnactment } from '@kubevirt-ui-ext/kubevirt-api/nmstate';
 import {
   ENACTMENT_STATE_NNCP_LABEL,

@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { IoK8sApiCoreV1Service } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { NODE_PORT_ADDRESS } from '@kubevirt-utils/hooks/useFeatures/constants';

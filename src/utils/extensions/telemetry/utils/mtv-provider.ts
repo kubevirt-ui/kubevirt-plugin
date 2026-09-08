@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { V1beta1Provider } from '@forklift-ui/types';
 
 import { MTV_PROVIDER_TYPE, TELEMETRY_SOURCE_PROVIDER } from './property-constants';

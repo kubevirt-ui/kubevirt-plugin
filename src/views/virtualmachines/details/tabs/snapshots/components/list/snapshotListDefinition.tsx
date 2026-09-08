@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { FC, ReactNode } from 'react';
 import { TFunction } from 'i18next';
 

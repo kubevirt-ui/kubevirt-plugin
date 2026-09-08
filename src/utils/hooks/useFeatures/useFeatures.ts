@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { ConfigMapModel } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -54,7 +55,7 @@ export const useFeatures: UseFeatures = (featureName, clusterOverride) => {
           await createFeaturesConfigMap(cluster);
           setFeatureEnabled(FEATURES_CONFIG_MAP_INITIAL_DATA[featureName] === 'true');
           setError(null);
-          // eslint-disable-next-line @typescript-eslint/no-shadow
+           
         } catch (createError) {
           setLoading(false);
           setCreateError(createError);

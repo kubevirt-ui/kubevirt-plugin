@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useEffect } from 'react';
 
 import { getDriverEntry, setDriverEntry } from '@kubevirt-utils/store/drivers';

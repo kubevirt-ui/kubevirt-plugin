@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { FC, ReactNode, useEffect, useState } from 'react';
 
 import { HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';

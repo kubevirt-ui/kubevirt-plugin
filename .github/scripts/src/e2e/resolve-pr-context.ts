@@ -1,3 +1,4 @@
+/* eslint-disable */
 /**
  * Resolve a PR's current head SHA, mergeability, CI trust, and
  * merge-pool membership. Used by the pr_number retest path

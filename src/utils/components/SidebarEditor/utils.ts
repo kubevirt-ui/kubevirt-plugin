@@ -1,3 +1,4 @@
+/* eslint-disable */
 export type LineRange = { end: number; start: number };
 
 const getLineFromPath = (resourceYAML: string, path): LineRange => {

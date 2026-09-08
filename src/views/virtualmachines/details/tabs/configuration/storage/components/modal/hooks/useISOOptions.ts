@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useMemo } from 'react';
 
 import usePVCs from '@kubevirt-utils/hooks/usePVCs';

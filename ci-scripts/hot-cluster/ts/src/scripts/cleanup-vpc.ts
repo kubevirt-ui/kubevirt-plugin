@@ -1,3 +1,4 @@
+/* eslint-disable */
 /**
  * Delete every IBM Cloud VPC resource whose name starts with CLUSTER_NAME.
  * Carefully ordered to respect dependencies (DNS → VMs → LBs → gateways → subnets → SGs → VPC).

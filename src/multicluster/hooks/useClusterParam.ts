@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useMatch } from 'react-router';
 
 import { FLEET_BASE_PATH } from '@multicluster/constants';

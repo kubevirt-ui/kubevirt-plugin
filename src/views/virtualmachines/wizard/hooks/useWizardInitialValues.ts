@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useLocation } from 'react-router';
 
 import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';

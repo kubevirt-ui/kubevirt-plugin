@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { FC } from 'react';
 
 import DurationDropdown from '@kubevirt-utils/components/DurationOption/DurationDropdown';

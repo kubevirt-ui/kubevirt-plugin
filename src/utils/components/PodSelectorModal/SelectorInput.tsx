@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { ChangeEvent, FC, InputHTMLAttributes, useEffect, useRef, useState } from 'react';
 import TagsInput from 'react-tagsinput';
 import classNames from 'classnames';

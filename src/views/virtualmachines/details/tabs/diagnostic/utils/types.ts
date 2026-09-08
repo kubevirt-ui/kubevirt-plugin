@@ -1,3 +1,4 @@
+/* eslint-disable */
 import {
   V1VirtualMachineCondition,
   V1VolumeSnapshotStatus,

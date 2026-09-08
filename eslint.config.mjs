@@ -24,6 +24,9 @@ const ignoresConfig = {
     'cypress/cypress-a11y-report.json',
     'locales/**',
     'playwright/**',
+    'jest-setup.ts',
+    'jest.config.ts',
+    'playwright.config.ts',
   ],
 };
 
@@ -123,7 +126,92 @@ const baseConfig = {
   },
 };
 
-const tsConfigs = [{ ...tseslint.configs.base, files: ['**/*.{ts,tsx}'] }];
+const tsConfigs = tseslint.configs.recommended.map((config) => ({
+  ...config,
+  files: ['**/*.{ts,tsx}'],
+  languageOptions: {
+    ...config.languageOptions,
+    parserOptions: {
+      project: './tsconfig.eslint.json',
+      tsconfigRootDir: import.meta.dirname,
+    },
+  },
+  rules: {
+    ...config.rules,
+    '@typescript-eslint/await-thenable': 'error',
+    '@typescript-eslint/ban-ts-comment': 'error',
+    '@typescript-eslint/consistent-type-definitions': ['error', 'type'],
+    '@typescript-eslint/consistent-type-exports': 'off',
+    '@typescript-eslint/consistent-type-imports': 'off',
+    '@typescript-eslint/explicit-function-return-type': 'error',
+    '@typescript-eslint/naming-convention': [
+      'error',
+      { format: ['camelCase'], leadingUnderscore: 'allow', selector: 'default' },
+      {
+        format: ['camelCase', 'PascalCase', 'UPPER_CASE'],
+        leadingUnderscore: 'allow',
+        selector: 'variable',
+      },
+      { format: ['camelCase', 'PascalCase'], selector: 'function' },
+      { format: ['PascalCase'], selector: 'typeLike' },
+      { format: ['PascalCase', 'UPPER_CASE'], selector: 'enum' },
+      { format: ['PascalCase', 'UPPER_CASE'], selector: 'enumMember' },
+      { format: null, selector: 'property' },
+      { format: ['camelCase'], leadingUnderscore: 'allow', selector: 'parameter' },
+      { format: null, selector: 'import' },
+    ],
+    '@typescript-eslint/no-deprecated': 'error',
+    '@typescript-eslint/no-explicit-any': 'error',
+
+    '@typescript-eslint/no-floating-promises': [
+      'error',
+      {
+        allowForKnownSafeCalls: [
+          {
+            from: 'package',
+            name: 'NavigateFunction',
+            package: 'react-router',
+          },
+        ],
+        ignoreVoid: true,
+      },
+    ],
+    '@typescript-eslint/no-misused-promises': ['error', { checksVoidReturn: false }],
+    '@typescript-eslint/no-non-null-assertion': 'error',
+    '@typescript-eslint/no-require-imports': 'error',
+    '@typescript-eslint/no-shadow': 'error',
+    '@typescript-eslint/no-unsafe-assignment': 'error',
+    '@typescript-eslint/no-unused-expressions': [
+      'error',
+      {
+        allowShortCircuit: true,
+        allowTaggedTemplates: true,
+        allowTernary: true,
+      },
+    ],
+    '@typescript-eslint/no-unused-vars': [
+      'error',
+      {
+        argsIgnorePattern: '^_',
+        caughtErrorsIgnorePattern: '^_',
+        varsIgnorePattern: '^_',
+      },
+    ],
+    '@typescript-eslint/prefer-nullish-coalescing': [
+      'error',
+      {
+        ignorePrimitives: {
+          boolean: true,
+        },
+      },
+    ],
+    '@typescript-eslint/prefer-optional-chain': 'error',
+    '@typescript-eslint/restrict-template-expressions': [
+      'error',
+      { allowBoolean: true, allowNumber: true },
+    ],
+  },
+}));
 
 const reactConfig = {
   ...eslintReact.configs['recommended-typescript'],
@@ -184,6 +272,11 @@ const testFilesOverrides = {
   files: ['**/*.test.{ts,tsx}', '**/*.spec.{ts,tsx}', '**/__tests__/**/*.{ts,tsx}'],
   rules: {
     ...allSonarjsRulesOff,
+    '@typescript-eslint/explicit-function-return-type': 'off',
+    '@typescript-eslint/naming-convention': 'off',
+    '@typescript-eslint/no-explicit-any': 'off',
+    '@typescript-eslint/no-floating-promises': 'off',
+    '@typescript-eslint/no-unsafe-assignment': 'off',
     'i18next/no-literal-string': 'off',
     'id-length': 'off',
     'max-lines': 'off',

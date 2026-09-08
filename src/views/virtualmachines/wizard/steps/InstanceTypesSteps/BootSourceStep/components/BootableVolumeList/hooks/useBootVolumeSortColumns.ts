@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useMemo, useState } from 'react';
 
 import { V1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';

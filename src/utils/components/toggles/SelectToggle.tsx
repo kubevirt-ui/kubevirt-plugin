@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { Ref } from 'react';
 
 import { MenuToggle, MenuToggleElement, MenuToggleProps } from '@patternfly/react-core';

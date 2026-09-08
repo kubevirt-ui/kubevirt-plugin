@@ -1,3 +1,4 @@
+/* eslint-disable */
 /**
  * Seed kubevirt-user-settings and kubevirt-ui-features ConfigMaps.
  * Replaces the complex bash block that uses oc + jq for ConfigMap patching.

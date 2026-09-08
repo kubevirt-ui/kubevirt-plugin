@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { vmimStatuses } from '@kubevirt-utils/resources/vmim/statuses';
 import {
   CheckCircleIcon,

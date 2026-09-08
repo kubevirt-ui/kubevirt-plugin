@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { MigrationPolicyModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1alpha1MigrationPolicy } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { isEmpty } from '@kubevirt-utils/utils/utils';

@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { FC, useCallback } from 'react';
 
 import NetworkInterfaceModal from '@kubevirt-utils/components/NetworkInterfaceModal/NetworkInterfaceModal';

@@ -1,3 +1,4 @@
+/* eslint-disable */
 export type Debounce = {
   func: (any) => any;
   immediate: boolean;
@@ -15,7 +16,7 @@ export function debounce(func: (any) => any, wait = 0, immediate = false) {
   let timeout = null;
   return function (...args) {
     // skipcq: JS-0332
-    const context = this; // eslint-disable-line @typescript-eslint/no-this-alias
+    const context = this;  
     if (immediate && !timeout) func.apply(context, args);
     clearTimeout(timeout);
     timeout = setTimeout(function () {

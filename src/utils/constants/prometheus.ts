@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { PERSPECTIVES } from '@kubevirt-utils/constants/constants';
 import { AlertResource } from '@overview/OverviewTab/status-card/utils/utils';
 

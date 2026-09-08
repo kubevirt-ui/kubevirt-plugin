@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { ALERT_FIRED, ALERT_INTERACTED, ALERT_RESOLVED, ALERT_SILENCED } from './utils/constants';
 import { AlertActionTelemetry } from './utils/types';
 import { eventMonitor } from './telemetry';

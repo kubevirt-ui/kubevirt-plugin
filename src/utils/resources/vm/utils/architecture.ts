@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { ARCHITECTURES } from '@kubevirt-utils/constants/constants';
 

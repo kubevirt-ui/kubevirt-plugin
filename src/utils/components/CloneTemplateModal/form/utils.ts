@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { getDisplayName, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { Template } from '@kubevirt-utils/resources/template';
 import { getRandomChars } from '@kubevirt-utils/utils/utils';

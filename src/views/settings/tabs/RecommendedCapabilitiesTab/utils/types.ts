@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { type K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import {

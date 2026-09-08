@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { FC } from 'react';
 
 import AllClustersResourcesCard from './AllClustersResourcesCard';

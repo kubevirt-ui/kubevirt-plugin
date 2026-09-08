@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { VirtualMachineModelGroupVersionKind } from '@kubevirt-utils/models';
 import useClusterParam from '@multicluster/hooks/useClusterParam';

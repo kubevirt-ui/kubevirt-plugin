@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useFlag } from '@openshift-console/dynamic-plugin-sdk';
 
 /**

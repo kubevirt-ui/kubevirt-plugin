@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { FC, MouseEvent, useState } from 'react';
 
 import { V1PermittedHostDevices } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';

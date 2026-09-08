@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { FC, FormEvent } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';

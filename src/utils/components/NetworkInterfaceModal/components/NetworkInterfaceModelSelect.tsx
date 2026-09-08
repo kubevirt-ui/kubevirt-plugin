@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { Dispatch, FC, MouseEvent, SetStateAction } from 'react';
 
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';

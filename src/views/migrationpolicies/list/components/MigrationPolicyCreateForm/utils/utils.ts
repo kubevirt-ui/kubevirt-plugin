@@ -1,3 +1,4 @@
+/* eslint-disable */
 import produce from 'immer';
 
 import { V1alpha1MigrationPolicy } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';

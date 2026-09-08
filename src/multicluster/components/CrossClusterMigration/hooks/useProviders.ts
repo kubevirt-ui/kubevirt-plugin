@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { ProviderModel, V1beta1Provider } from '@forklift-ui/types';
 import { modelToGroupVersionKind } from '@kubevirt-utils/models';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';

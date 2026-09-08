@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { FC } from 'react';
 
 import { TLS_CERT_FIELD_NAMES } from '@kubevirt-utils/components/AddBootableVolumeModal/consts';

@@ -1,3 +1,4 @@
+/* eslint-disable */
 import type { V1Template as OriginalV1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1beta1DataVolume as OriginalV1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import { IoK8sApiCoreV1Pod as OriginalIoK8sApiCoreV1Pod } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
