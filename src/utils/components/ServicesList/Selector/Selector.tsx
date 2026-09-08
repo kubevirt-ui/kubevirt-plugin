@@ -1,11 +1,10 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 import { Link } from 'react-router';
-import { isEmpty } from 'lodash';
+import isEmpty from 'lodash/isEmpty';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useIsACMPage from '@multicluster/useIsACMPage';
-import { Selector as SelectorKind } from '@openshift-console/dynamic-plugin-sdk';
+import { type Selector as SelectorKind } from '@openshift-console/dynamic-plugin-sdk';
 import { SearchIcon } from '@patternfly/react-icons';
 import { useHubClusterName } from '@stolostron/multicluster-sdk';
 
@@ -31,7 +30,7 @@ const Requirement: FC<RequirementProps> = ({ cluster, kind, namespace = '', requ
   // Strip off any trailing '=' characters for valueless selectors
   const requirementAsString = selectorToString(requirements).replace(/=,/g, ',').replace(/=$/g, '');
 
-  const to = getSelectorSearchURL(
+  const selectorUrl = getSelectorSearchURL(
     requirementAsString,
     kind,
     namespace,
@@ -42,7 +41,7 @@ const Requirement: FC<RequirementProps> = ({ cluster, kind, namespace = '', requ
 
   return (
     <div className="co-m-requirement">
-      <Link className={`co-m-requirement__link co-text-${kind.toLowerCase()}`} to={to}>
+      <Link className={`co-m-requirement__link co-text-${kind.toLowerCase()}`} to={selectorUrl}>
         <SearchIcon className="co-m-requirement__icon co-icon-flex-child" />
         <span className="co-m-requirement__label">{requirementAsString.replace(/,/g, ', ')}</span>
       </Link>

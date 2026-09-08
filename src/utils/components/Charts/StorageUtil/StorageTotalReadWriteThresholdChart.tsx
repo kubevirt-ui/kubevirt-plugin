@@ -1,9 +1,8 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 import { Link } from 'react-router';
 import xbytes from 'xbytes';
 
-import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { tickLabels } from '@kubevirt-utils/components/Charts/ChartLabels/styleOverrides';
 import useVMQuery from '@kubevirt-utils/hooks/useVMQuery';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
@@ -63,16 +62,16 @@ const StorageTotalReadWriteThresholdChart: FC<StorageTotalReadWriteThresholdChar
   const isLoading = !loaded;
   const storageWriteData = data?.data?.result?.[0]?.values;
 
-  const chartData = storageWriteData?.map(([x, y]) => {
-    return { x: new Date(x * MILLISECONDS_MULTIPLIER), y: Number(y) };
+  const chartData = storageWriteData?.map(([timestamp, value]) => {
+    return { x: new Date(timestamp * MILLISECONDS_MULTIPLIER), y: Number(value) };
   });
   const yMax = useStableYMax(findMaxYValue(chartData), `${vmi?.metadata?.uid}_${duration}`);
   const yRange = getChartYRange(yMax);
 
   const thresholdData =
     yMax != null
-      ? storageWriteData?.map(([x]) => ({
-          x: new Date(x * MILLISECONDS_MULTIPLIER),
+      ? storageWriteData?.map(([timestamp]) => ({
+          x: new Date(timestamp * MILLISECONDS_MULTIPLIER),
           y: yMax,
         }))
       : undefined;
@@ -102,6 +101,7 @@ const StorageTotalReadWriteThresholdChart: FC<StorageTotalReadWriteThresholdChar
             width={width}
           >
             <ChartAxis
+              dependentAxis
               style={{
                 grid: {
                   stroke: chart_color_black_200.value,
@@ -111,37 +111,36 @@ const StorageTotalReadWriteThresholdChart: FC<StorageTotalReadWriteThresholdChar
               tickFormat={(tick: number) =>
                 xbytes(tick, { fixed: getNumberOfDigitsAfterDecimalPoint(yMax ?? 0), iec: true })
               }
-              dependentAxis
               {...(yRange && { tickValues: yRange })}
             />
             <ChartAxis
+              axisComponent={<></>}
               style={{
                 tickLabels: { padding: 2, ...tickLabels },
                 ticks: { stroke: 'transparent' },
               }}
-              axisComponent={<></>}
               tickCount={TICKS_COUNT}
               tickFormat={tickFormat(duration, currentTime)}
             />
             <ChartGroup>
               <ChartArea
+                data={chartData}
                 style={{
                   data: {
                     stroke: chart_color_blue_300.value,
                   },
                 }}
-                data={chartData}
               />
             </ChartGroup>
             {thresholdData && (
               <ChartThreshold
+                data={thresholdData}
                 style={{
                   data: {
                     stroke: chart_color_orange_300.value,
                     strokeDasharray: 10,
                   },
                 }}
-                data={thresholdData}
               />
             )}
           </Chart>

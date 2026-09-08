@@ -1,4 +1,3 @@
-/* eslint-disable */
 import React, { type FC, type ReactNode, useMemo, useState } from 'react';
 
 import { EMPTY_FILTERS } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/constants';
@@ -58,18 +57,18 @@ const KubevirtFilterToolbar: FC<KubevirtFilterToolbarProps> = ({
   const groupedFilters = useMemo(
     () =>
       filterDefinitions.filter(
-        (f) =>
-          f.filterLayout !== KubevirtFilterLayout.HIDDEN &&
-          f.filterLayout !== KubevirtFilterLayout.SELECT,
+        (filter) =>
+          filter.filterLayout !== KubevirtFilterLayout.HIDDEN &&
+          filter.filterLayout !== KubevirtFilterLayout.SELECT,
       ),
     [filterDefinitions],
   );
   const selectFilters = useMemo(
-    () => filterDefinitions.filter((f) => f.filterLayout === KubevirtFilterLayout.SELECT),
+    () => filterDefinitions.filter((filter) => filter.filterLayout === KubevirtFilterLayout.SELECT),
     [filterDefinitions],
   );
   const hiddenFilters = useMemo(
-    () => filterDefinitions.filter((f) => f.filterLayout === KubevirtFilterLayout.HIDDEN),
+    () => filterDefinitions.filter((filter) => filter.filterLayout === KubevirtFilterLayout.HIDDEN),
     [filterDefinitions],
   );
   const [searchInputText, setSearchInputText] = useState(filters.name[0] ?? '');

@@ -1,7 +1,6 @@
-/* eslint-disable */
-import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { isEmpty, removeLinkLocalIPV6 } from '@kubevirt-utils/utils/utils';
-import { IpAddresses } from '@virtualmachines/details/tabs/overview/components/VirtualMachinesOverviewTabNetworkInterfaces/utils/types';
+import { type IpAddresses } from '@virtualmachines/details/tabs/overview/components/VirtualMachinesOverviewTabNetworkInterfaces/utils/types';
 
 /**
  * Get VMI IPs
@@ -10,19 +9,19 @@ import { IpAddresses } from '@virtualmachines/details/tabs/overview/components/V
  * @returns {string[]}
  */
 export const getVMIIPAddresses = (vmi: V1VirtualMachineInstance): string[] => [
-  ...new Set(getVMIIPAddressesWithName(vmi).map(({ ip }) => ip)),
+  ...new Set(getVMIIPAddressesWithName(vmi).map(({ ip: ipAddress }) => ipAddress)),
 ];
 
 export const getVMIIPAddressesWithName = (vmi: V1VirtualMachineInstance): IpAddresses => {
-  const namedInterfaces = vmi?.status?.interfaces?.filter((iface) => !!iface.name) || [];
+  const namedInterfaces = vmi?.status?.interfaces?.filter((iface) => !!iface.name) ?? [];
   return removeLinkLocalIPV6(
     namedInterfaces?.reduce((acc, iface) => {
-      const ips = [...new Set([iface?.ipAddress, ...(iface?.ipAddresses || [])])].filter(
-        (ip) => !isEmpty(ip?.trim()),
+      const ips = [...new Set([iface?.ipAddress, ...(iface?.ipAddresses ?? [])])].filter(
+        (addr) => !isEmpty(addr?.trim()),
       );
       if (!isEmpty(ips)) {
-        for (const ip of ips) {
-          acc.push({ interfaceName: iface?.interfaceName, ip });
+        for (const addr of ips) {
+          acc.push({ interfaceName: iface?.interfaceName, ip: addr });
         }
       }
       return acc;

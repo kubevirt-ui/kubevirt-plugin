@@ -1,9 +1,8 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 import { Link } from 'react-router';
 import xbytes from 'xbytes';
 
-import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import useVMQuery from '@kubevirt-utils/hooks/useVMQuery';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { getMemory } from '@kubevirt-utils/resources/vm';
@@ -62,11 +61,15 @@ const MemoryThresholdChart: FC<MemoryThresholdChartProps> = ({ vmi }) => {
   const prometheusMemoryData = data?.data?.result?.[0]?.values;
   const memoryAvailableBytes = convertToBaseValue(getMemory(vmi));
 
-  const chartData = prometheusMemoryData?.map(([x, y]) => {
-    return { name: 'Memory used', x: new Date(x * MILLISECONDS_MULTIPLIER), y: Number(y) };
+  const chartData = prometheusMemoryData?.map(([timestamp, value]) => {
+    return {
+      name: 'Memory used',
+      x: new Date(timestamp * MILLISECONDS_MULTIPLIER),
+      y: Number(value),
+    };
   });
 
-  const thresholdLine = new Array(chartData?.length || 0).fill(0).map((_, index) => ({
+  const thresholdLine = new Array(chartData?.length ?? 0).fill(0).map((_unused, index) => ({
     name: 'Memory available',
     x: chartData?.[index]?.x,
     y: memoryAvailableBytes,
@@ -95,15 +98,16 @@ const MemoryThresholdChart: FC<MemoryThresholdChartProps> = ({ vmi }) => {
             width={width}
           >
             <ChartAxis
+              axisComponent={<></>}
               style={{
                 tickLabels: { padding: 2, ...tickLabels },
                 ticks: { stroke: 'transparent' },
               }}
-              axisComponent={<></>}
               tickCount={TICKS_COUNT}
               tickFormat={tickFormat(duration, currentTime)}
             />
             <ChartAxis
+              dependentAxis
               style={{
                 grid: {
                   stroke: chart_color_black_200.value,
@@ -113,27 +117,26 @@ const MemoryThresholdChart: FC<MemoryThresholdChartProps> = ({ vmi }) => {
               tickFormat={(tick: number) =>
                 xbytes(tick, { fixed: getNumberOfDigitsAfterDecimalPoint(yMax), iec: true })
               }
-              dependentAxis
               tickValues={[0, yMax]}
             />
             <ChartGroup>
               <ChartArea
+                data={chartData}
                 style={{
                   data: {
                     stroke: chart_color_blue_300.value,
                   },
                 }}
-                data={chartData}
               />
             </ChartGroup>
             <ChartThreshold
+              data={thresholdLine}
               style={{
                 data: {
                   stroke: chart_color_orange_300.value,
                   strokeDasharray: 10,
                 },
               }}
-              data={thresholdLine}
             />
           </Chart>
         </Link>

@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC, useMemo } from 'react';
+import React, { type FC, useMemo } from 'react';
 import { useNavigate } from 'react-router';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -35,13 +34,14 @@ const DefaultRightClickActionMenu: FC<DefaultRightClickActionMenuProps> = ({
 
   const navigate = useNavigate();
 
+  const clusterForAction = isACMPage ? cluster : '';
   const createVMAction = useMemo(() => {
     return prefix === PROJECT_SELECTOR_PREFIX
-      ? getCreateVMAction(t, navigate, namespace, isACMPage ? cluster : '')
+      ? getCreateVMAction(t, navigate, namespace, clusterForAction)
       : undefined;
-  }, [cluster, isACMPage, namespace, navigate, prefix, t]);
+  }, [clusterForAction, namespace, navigate, prefix, t]);
 
-  const getNestedLevel = () => {
+  const getNestedLevel = (): number => {
     if (prefix === FOLDER_SELECTOR_PREFIX) {
       return cluster ? 3 : 2;
     }

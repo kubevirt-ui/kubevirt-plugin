@@ -1,8 +1,7 @@
-/* eslint-disable */
-import React, { FC, useState } from 'react';
+import React, { type FC, useState } from 'react';
 
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
-import { ModalComponentProps } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+import { type ModalComponentProps } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
@@ -46,21 +45,21 @@ const SaveSearchModal: FC<SaveSearchModalProps> = ({
 
   return (
     <TabModal
-      onSubmit={async () => {
-        onSubmit({ description, isFavorited, name: trimmedName });
-      }}
       headerText={t('Save search')}
       isDisabled={isNameEmpty || invalidName}
       isOpen={isOpen}
       obj={{ metadata: { name } }}
       onClose={onClose}
+      onSubmit={async () => {
+        onSubmit({ description, isFavorited, name: trimmedName });
+      }}
       shouldWrapInForm
     >
       <FormGroup fieldId="save-search-name" isRequired label={t('Name')}>
         <TextInput
           data-test="save-search-name"
           id="save-search-name"
-          onChange={(_, value) => setName(value)}
+          onChange={(_event, value) => setName(value)}
           type="text"
           value={name}
         />
@@ -74,12 +73,14 @@ const SaveSearchModal: FC<SaveSearchModalProps> = ({
         <TextArea
           data-test="save-search-description"
           id="save-search-description"
-          onChange={(_, value) => setDescription(value)}
+          onChange={(_event, value) => setDescription(value)}
           resizeOrientation="vertical"
           value={description}
         />
       </FormGroup>
       <Checkbox
+        id="save-search-favorite"
+        isChecked={isFavorited}
         label={
           <Flex alignItems={{ default: 'alignItemsCenter' }} gap={{ default: 'gapSm' }}>
             <span>{t('Add to favorites')}</span>
@@ -90,9 +91,7 @@ const SaveSearchModal: FC<SaveSearchModalProps> = ({
             )}
           </Flex>
         }
-        id="save-search-favorite"
-        isChecked={isFavorited}
-        onChange={(_, checked) => setIsFavorited(checked)}
+        onChange={(_event, checked) => setIsFavorited(checked)}
       />
     </TabModal>
   );

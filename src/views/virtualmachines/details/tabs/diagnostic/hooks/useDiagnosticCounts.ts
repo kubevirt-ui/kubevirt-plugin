@@ -1,12 +1,11 @@
-/* eslint-disable */
 import { useMemo } from 'react';
 
 import { DiagnosticCategory, SEVERITY_TO_CONDITION } from '../utils/constants';
 import {
-  DiagnosticData,
-  DiagnosticFilterCounts,
-  DiagnosticSeverity,
-  DiagnosticSeverityCounts,
+  type DiagnosticData,
+  type DiagnosticFilterCounts,
+  type DiagnosticSeverity,
+  type DiagnosticSeverityCounts,
 } from '../utils/types';
 
 type DiagnosticCounts = {
@@ -25,9 +24,9 @@ const useDiagnosticCounts = ({
     let healthy = 0;
 
     const allItems: DiagnosticSeverity[] = [
-      ...conditions.map((c) => c.severity),
-      ...volumeSnapshotStatuses.map((v) => v.severity),
-      ...dataVolumesStatuses.map((d) => d.severity),
+      ...conditions.map((condition) => condition.severity),
+      ...volumeSnapshotStatuses.map((snapshot) => snapshot.severity),
+      ...dataVolumesStatuses.map((dataVolume) => dataVolume.severity),
     ];
 
     for (const severity of allItems) {

@@ -1,13 +1,12 @@
-/* eslint-disable */
-import { ReactNode, useMemo } from 'react';
-import { TFunction } from 'i18next';
+import { type ReactNode, useMemo } from 'react';
+import { type TFunction } from 'i18next';
 import { RESOURCE_KEYS } from 'src/views/quotas/utils/constants';
 
 import {
   ApplicationAwareResourceQuotaModel,
   modelToGroupVersionKind,
 } from '@kubevirt-utils/models';
-import { ApplicationAwareResourceQuota } from '@kubevirt-utils/resources/quotas/types';
+import { type ApplicationAwareResourceQuota } from '@kubevirt-utils/resources/quotas/types';
 import { convertToBaseValue, humanizeBinaryBytes } from '@kubevirt-utils/utils/humanize.js';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 
@@ -43,32 +42,32 @@ export const getUnitLabel = (unit: string, t: TFunction): string => {
 };
 
 const parseQuantity = (value: string | undefined): number =>
-  value != null ? ((convertToBaseValue(value) as number) ?? 0) : 0;
+  value !== undefined ? ((convertToBaseValue(value) as number) ?? 0) : 0;
 
-const toGiB = (bytes: number): number =>
-  humanizeBinaryBytes(bytes, null, UNIT_GIB)?.value ?? 0;
+const toGiB = (bytes: number): number => humanizeBinaryBytes(bytes, null, UNIT_GIB)?.value ?? 0;
 
 type QuotaStatusMaps = {
   hard: Record<string, string | undefined>;
   used: Record<string, string | undefined>;
 };
 
+const mergeStatusEntries = (
+  target: Record<string, string | undefined>,
+  source: Record<string, string> | undefined,
+): void => {
+  if (!source) return;
+  for (const [key, value] of Object.entries(source) as [string, string][]) {
+    if (!(key in target) && value) target[key] = value;
+  }
+};
+
 const aggregateQuotaStatus = (quotas: ApplicationAwareResourceQuota[]): QuotaStatusMaps => {
   const hard: Record<string, string | undefined> = {};
   const used: Record<string, string | undefined> = {};
 
-  for (const q of quotas) {
-    const status = q.status;
-    if (status?.hard) {
-      for (const [key, value] of Object.entries(status.hard) as [string, string][]) {
-        if (!(key in hard) && value) hard[key] = value;
-      }
-    }
-    if (status?.used) {
-      for (const [key, value] of Object.entries(status.used) as [string, string][]) {
-        if (!(key in used) && value) used[key] = value;
-      }
-    }
+  for (const quota of quotas) {
+    mergeStatusEntries(hard, quota.status?.hard);
+    mergeStatusEntries(used, quota.status?.used);
   }
 
   return { hard, used };
@@ -90,7 +89,7 @@ const useProjectResourceQuota = (namespace?: string): UseProjectResourceQuotaRes
           optional: true,
         }
       : null,
-  );
+  ) as [ApplicationAwareResourceQuota[], boolean, unknown];
 
   const projectQuota = useMemo<ProjectResourceQuota | undefined>(() => {
     if (!namespace || !loaded || loadError || !quotas?.length) return undefined;

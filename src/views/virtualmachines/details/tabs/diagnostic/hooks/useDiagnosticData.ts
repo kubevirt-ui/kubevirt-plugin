@@ -70,7 +70,7 @@ const conditionsTransformer = (
 ): VirtualizationStatusCondition[] =>
   conditions.map((condition) => ({
     ...condition,
-    id: uuidv4(),
+    id: uuidv4() as string,
     lastTransitionTime: condition?.['lastTransitionTime'],
     metadata: {
       condition: condition?.status === 'False' ? 'Error' : 'Other',

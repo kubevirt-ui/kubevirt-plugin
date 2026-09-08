@@ -1,5 +1,4 @@
-/* eslint-disable */
-import { TFunction } from 'i18next';
+import { type TFunction } from 'i18next';
 import { parseSize } from 'xbytes';
 
 import {
@@ -12,17 +11,20 @@ import {
   getInstanceTypeMemory,
 } from '@kubevirt-utils/resources/instancetype/selectors';
 import {
-  InstanceTypeSeries,
-  InstanceTypeSize,
-  InstanceTypeUnion,
+  type InstanceTypeSeries,
+  type InstanceTypeSize,
+  type InstanceTypeUnion,
 } from '@kubevirt-utils/resources/instancetype/types';
 import { getAnnotation, getName } from '@kubevirt-utils/resources/shared';
 
-import { InstanceTypeRecord, MappedInstanceTypes } from './types';
+import { type InstanceTypeRecord, type MappedInstanceTypes } from './types';
 
-export const getInstanceTypeSizePrettyDisplay = (t: TFunction, it: InstanceTypeUnion): string => {
-  const name = getName(it)?.split('.').pop() ?? getName(it) ?? '';
-  return `${name}: ${getInstanceTypeCPU(it)} ${t('CPUs')}, ${getInstanceTypeMemory(it)} ${t(
+export const getInstanceTypeSizePrettyDisplay = (
+  t: TFunction,
+  instanceType: InstanceTypeUnion,
+): string => {
+  const name = getName(instanceType)?.split('.').pop() ?? getName(instanceType) ?? '';
+  return `${name}: ${getInstanceTypeCPU(instanceType)} ${t('CPUs')}, ${getInstanceTypeMemory(instanceType)} ${t(
     'Memory',
   )}`;
 };
@@ -48,23 +50,23 @@ export const mappedInstanceTypesToSelectOptions = (
   t: TFunction,
   instanceTypes: InstanceTypeUnion[],
 ): MappedInstanceTypes =>
-  instanceTypes.reduce((acc, it) => {
-    if (isRedHatInstanceType(it)) {
-      const { series, size } = getInstanceTypeSeriesAndSize(it);
+  instanceTypes.reduce((acc, instanceType) => {
+    if (isRedHatInstanceType(instanceType)) {
+      const { series, size } = getInstanceTypeSeriesAndSize(instanceType);
       if (!series || !size) {
         return acc;
       }
       acc[series] = {
         ...(acc[series] || {}),
-        descriptionSeries: getInstanceTypeDescriptionAnnotation(it),
-        displayNameSeries: getInstanceTypeClassDisplayAnnotation(it),
+        descriptionSeries: getInstanceTypeDescriptionAnnotation(instanceType),
+        displayNameSeries: getInstanceTypeClassDisplayAnnotation(instanceType),
         sizes: {
           ...(acc?.[series]?.sizes || {}),
           [size]: {
-            instanceType: it,
-            prettyDisplaySize: getInstanceTypeSizePrettyDisplay(t, it),
+            instanceType,
+            prettyDisplaySize: getInstanceTypeSizePrettyDisplay(t, instanceType),
             series,
-            seriesDisplayName: getInstanceTypeClassDisplayAnnotation(it),
+            seriesDisplayName: getInstanceTypeClassDisplayAnnotation(instanceType),
             size,
           },
         },
@@ -73,7 +75,7 @@ export const mappedInstanceTypesToSelectOptions = (
     return acc;
   }, {} as MappedInstanceTypes);
 
-const sortInstanceTypeSizes = (a: InstanceTypeRecord, b: InstanceTypeRecord) => {
+const sortInstanceTypeSizes = (a: InstanceTypeRecord, b: InstanceTypeRecord): number => {
   const aCPU = getInstanceTypeCPU(a.instanceType);
   const bCPU = getInstanceTypeCPU(b.instanceType);
 
@@ -92,16 +94,19 @@ export const getInstanceTypesPrettyDisplaySize = (
   mappedInstanceTypes: MappedInstanceTypes,
   instanceTypeSeries?: InstanceTypeSeries,
   instanceTypeSize?: InstanceTypeSize,
-) => {
+): string | undefined => {
   if (!instanceTypeSeries || !instanceTypeSize) {
     return undefined;
   }
   return mappedInstanceTypes?.[instanceTypeSeries]?.sizes[instanceTypeSize]?.prettyDisplaySize;
 };
 
-export const getInstanceTypeSizes = (mappedInstanceTypes: MappedInstanceTypes, series?: string) => {
+export const getInstanceTypeSizes = (
+  mappedInstanceTypes: MappedInstanceTypes,
+  series?: string,
+): InstanceTypeRecord[] => {
   const matchedSeries = Object.values(mappedInstanceTypes).find(
-    (it) => it.displayNameSeries === series,
+    (entry) => entry.displayNameSeries === series,
   );
   return Object.values(matchedSeries?.sizes ?? {}).sort(sortInstanceTypeSizes);
 };
@@ -109,7 +114,7 @@ export const getInstanceTypeSizes = (mappedInstanceTypes: MappedInstanceTypes, s
 export const getInstanceTypeSeriesDisplayName = (
   mappedInstanceTypes: MappedInstanceTypes,
   instanceTypeSeries?: InstanceTypeSeries,
-) => {
+): string | undefined => {
   if (!instanceTypeSeries) {
     return undefined;
   }
@@ -121,9 +126,11 @@ export const getInstanceTypeFromSeriesAndSize = (
   instanceTypeSeries?: string,
   instanceTypeSize?: string,
 ): InstanceTypeUnion | undefined => {
-  const itSeries = Object.values(mappedInstanceTypes);
+  const allSeries = Object.values(mappedInstanceTypes);
 
-  const matchedSeries = itSeries.find((series) => series?.displayNameSeries === instanceTypeSeries);
+  const matchedSeries = allSeries.find(
+    (series) => series?.displayNameSeries === instanceTypeSeries,
+  );
 
   if (!matchedSeries) {
     return undefined;

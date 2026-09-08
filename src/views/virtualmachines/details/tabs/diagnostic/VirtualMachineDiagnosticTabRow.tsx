@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { type Dispatch, type SetStateAction } from 'react';
 import classNames from 'classnames';
 
 import { NAME_COLUMN_ID } from '@kubevirt-utils/components/ColumnManagementModal/constants';
@@ -26,7 +26,7 @@ type DiagnosticTabRowProps = {
     metadata?: { name?: string; namespace?: string };
     status?: string;
   };
-  setExpend: React.Dispatch<React.SetStateAction<{ expended: Set<string>; ids: Set<string> }>>;
+  setExpend: Dispatch<SetStateAction<{ expended: Set<string>; ids: Set<string> }>>;
 };
 
 const VirtualMachineDiagnosticTabRow = ({

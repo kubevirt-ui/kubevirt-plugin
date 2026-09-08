@@ -1,4 +1,3 @@
-/* eslint-disable */
 import DurationOption from '@kubevirt-utils/components/DurationOption/DurationOption';
 import { getNamespacePathSegment } from '@kubevirt-utils/utils/utils';
 import {
@@ -42,8 +41,5 @@ export const getMigrationsTabPath = (
   activeNamespace: string,
   clusterVersion?: string,
   clusterVersionLoaded = false,
-): string | undefined => {
-  if (!clusterVersionLoaded) return undefined;
-  const nsPath = getNamespacePathSegment(activeNamespace);
-  return `/k8s/${nsPath}/${getMigrationsPagePathSegment(clusterVersion)}`;
-};
+): string | undefined =>
+  buildMigrationsSpokePath(activeNamespace, clusterVersion, clusterVersionLoaded);

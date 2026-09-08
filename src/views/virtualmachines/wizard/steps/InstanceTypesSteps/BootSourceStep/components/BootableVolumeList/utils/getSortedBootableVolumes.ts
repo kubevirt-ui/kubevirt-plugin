@@ -1,4 +1,6 @@
-/* eslint-disable */
+import { type V1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
+import { type IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type VolumeSnapshotKind } from '@kubevirt-utils/components/SelectSnapshot/types';
 import {
   getBootableVolumePVCSource,
   getDataVolumeForPVC,
@@ -8,36 +10,40 @@ import {
   getPVCStorageClassName,
   getVolumeSnapshotStorageClass,
 } from '@kubevirt-utils/resources/bootableresources/selectors';
-import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
+import { type BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { getAnnotation, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { ANNOTATIONS } from '@kubevirt-utils/resources/template';
 import { getArchitecture } from '@kubevirt-utils/utils/architecture';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getOSFromDefaultPreference } from '@virtualmachines/wizard/steps/InstanceTypesSteps/BootSourceStep/components/BootableVolumeList/utils/utils';
 
-import { BootableVolumeResolvedSources, BootableVolumeSortContext } from '../../../types';
+import { type BootableVolumeResolvedSources, type BootableVolumeSortContext } from '../../../types';
+
+type BootableVolumeSourcesContext = Pick<
+  BootableVolumeSortContext,
+  'dvSources' | 'pvcSources' | 'volumeSnapshotSources'
+>;
 
 const getBootableVolumeResolvedSources = (
   bootableVolume: BootableVolume,
-  {
-    dvSources,
-    pvcSources,
-    volumeSnapshotSources,
-  }: Pick<BootableVolumeSortContext, 'dvSources' | 'pvcSources' | 'volumeSnapshotSources'>,
+  { dvSources, pvcSources, volumeSnapshotSources }: BootableVolumeSourcesContext,
 ): BootableVolumeResolvedSources => {
-  const pvcSource = getBootableVolumePVCSource(bootableVolume, pvcSources);
-  const dvSource = getDataVolumeForPVC(pvcSource, dvSources);
+  const pvcSource: IoK8sApiCoreV1PersistentVolumeClaim | null = getBootableVolumePVCSource(
+    bootableVolume,
+    pvcSources,
+  );
+  const dvSource = getDataVolumeForPVC(pvcSource, dvSources) as null | V1beta1DataVolume;
 
   return {
     dvSource,
     pvcSource,
-    volumeSnapshotSource: volumeSnapshotSources?.[getName(bootableVolume)],
+    volumeSnapshotSource: volumeSnapshotSources?.[getName(bootableVolume)] as VolumeSnapshotKind,
   };
 };
 
 export const getBootableVolumeSortDiskSize = (
   bootableVolume: BootableVolume,
-  context: Pick<BootableVolumeSortContext, 'dvSources' | 'pvcSources' | 'volumeSnapshotSources'>,
+  context: BootableVolumeSourcesContext,
 ): string => {
   const { dvSource, pvcSource, volumeSnapshotSource } = getBootableVolumeResolvedSources(
     bootableVolume,
@@ -49,14 +55,14 @@ export const getBootableVolumeSortDiskSize = (
 
 export const getBootableVolumeSortStorageClass = (
   bootableVolume: BootableVolume,
-  context: Pick<BootableVolumeSortContext, 'dvSources' | 'pvcSources' | 'volumeSnapshotSources'>,
+  context: BootableVolumeSourcesContext,
 ): string => {
   const { pvcSource, volumeSnapshotSource } = getBootableVolumeResolvedSources(
     bootableVolume,
     context,
   );
 
-  return getPVCStorageClassName(pvcSource) || getVolumeSnapshotStorageClass(volumeSnapshotSource);
+  return getPVCStorageClassName(pvcSource) ?? getVolumeSnapshotStorageClass(volumeSnapshotSource);
 };
 
 export type BootableVolumeSortValueGetter = (bootableVolume: BootableVolume) => string;

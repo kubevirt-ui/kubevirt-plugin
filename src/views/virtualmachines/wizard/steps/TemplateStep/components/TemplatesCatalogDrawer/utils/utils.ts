@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { type TFunction } from 'i18next';
 
 import { type TemplateParameter } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -22,7 +21,9 @@ import {
 } from '@templates/details/tabs/parameters/utils';
 import { NAME_INPUT_FIELD } from '@virtualmachines/wizard/steps/TemplateStep/components/TemplatesCatalog/utils/consts';
 
-export const getRequiredTemplateParameter = (parameters: TemplateParameter[]) => {
+export const getRequiredTemplateParameter = (
+  parameters: TemplateParameter[],
+): TemplateParameter[] => {
   return (parameters ?? []).filter(
     (parameter) => parameter.name !== NAME_INPUT_FIELD && parameter.required,
   );

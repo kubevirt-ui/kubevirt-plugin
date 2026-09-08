@@ -6,25 +6,13 @@ import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpa
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getNoDataAvailableMessage } from '@kubevirt-utils/utils/utils';
 import getYAxisTicks from '@overview/OverviewTab/metric-charts-card/utils/hooks/getYAxisTicks';
-import { type MetricChartData } from '@overview/OverviewTab/metric-charts-card/utils/hooks/useMetricChartData';
 import { getLabelUnit } from '@overview/OverviewTab/metric-charts-card/utils/utils';
 import { Bullseye, Skeleton } from '@patternfly/react-core';
 
-import { type ClusterChartSeries } from '../../hooks/useTopClustersChartData';
+import { type ResourceAllocationChartProps } from '../../utils/types';
 import ResourceAllocationChartContent from './ResourceAllocationChartContent';
 import useChartDomain from './useChartDomain';
 import { useChartTooltips } from './useChartTooltips';
-
-type ResourceAllocationChartProps = {
-  chartSeries?: ClusterChartSeries[];
-  effectiveData: MetricChartData;
-  isMultiCluster: boolean;
-  metric: string;
-  /** Flat horizontal quota limit line (gray dashed). Only rendered in single-cluster mode. */
-  quotaValue?: number;
-  /** Flat horizontal requested line (orange dashed). Only rendered in single-cluster mode. */
-  requestedValue?: number;
-};
 
 const ResourceAllocationChart: FC<ResourceAllocationChartProps> = ({
   chartSeries,

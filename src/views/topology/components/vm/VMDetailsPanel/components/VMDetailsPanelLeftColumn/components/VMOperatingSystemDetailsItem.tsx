@@ -20,7 +20,7 @@ type VMOperatingSystemDetailsItemProps = {
 const VMOperatingSystemDetailsItem: FC<VMOperatingSystemDetailsItemProps> = ({ vm, vmi }) => {
   const { t } = useKubevirtTranslation();
 
-  const osName = getOperatingSystemName(vm) || getOperatingSystem(vm);
+  const osName = getOperatingSystemName(vm) ?? getOperatingSystem(vm);
   const [guestAgentInfo] = useGuestOS(vmi);
   const operatingSystem = getOSNameFromGuestAgent(guestAgentInfo);
 
