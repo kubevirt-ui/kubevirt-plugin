@@ -292,7 +292,6 @@ export const createDataSourceWithImportCron: CreateDataSourceWithImportCronType 
 ) => {
   const {
     bootableVolumeCluster,
-    bootableVolumeName,
     cronExpression,
     registryCredentials,
     registryURL,
@@ -301,11 +300,12 @@ export const createDataSourceWithImportCron: CreateDataSourceWithImportCronType 
     storageClassName,
   } = bootableVolume;
 
+  const dataSourceName = getName(initialDataSource);
   const targetNamespace = getNamespace(initialDataSource);
   const { password, username } = registryCredentials || {};
   const addRegistrySecret = !!(username && password);
   const imageSecretName = addRegistrySecret
-    ? truncateToK8sName(bootableVolumeName, `registry-secret-${getRandomChars()}`)
+    ? truncateToK8sName(dataSourceName, `registry-secret-${getRandomChars()}`)
     : null;
 
   if (addRegistrySecret) {
@@ -325,7 +325,7 @@ export const createDataSourceWithImportCron: CreateDataSourceWithImportCronType 
   }
 
   const dataImportCronName = truncateToK8sName(
-    bootableVolumeName,
+    dataSourceName,
     `import-cron-${getRandomChars()}`,
   );
 
@@ -335,7 +335,7 @@ export const createDataSourceWithImportCron: CreateDataSourceWithImportCronType 
     draft.spec = {
       garbageCollect: 'Outdated',
       importsToKeep: retainRevisions,
-      managedDataSource: bootableVolumeName,
+      managedDataSource: dataSourceName,
       schedule: cronExpression,
       template: {
         spec: {
