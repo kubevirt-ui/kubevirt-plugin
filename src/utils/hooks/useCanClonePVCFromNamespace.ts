@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 
 import { DataVolumeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { checkAccessForFleet } from '@kubevirt-utils/components/LazyActionMenu/overrides';
+import { ensurePVCCloneRoleBinding } from '@kubevirt-utils/resources/cdi/ensurePVCCloneRoleBinding';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import useIsACMPage from '@multicluster/useIsACMPage';
 import {
@@ -45,46 +46,77 @@ const useCanClonePVCFromNamespace = (
     };
   }, [cluster, requiresClonePermission, sourceNamespace]);
 
-  const podsAccessReview = useMemo((): AccessReviewResourceAttributes | null => {
-    if (!requiresClonePermission || !sourceNamespace) {
-      return null;
-    }
-
-    return {
-      ...(cluster ? { cluster } : {}),
-      namespace: sourceNamespace,
-      resource: 'pods',
-      verb: 'create',
-    };
-  }, [cluster, requiresClonePermission, sourceNamespace]);
-
   const [isChecking, setIsChecking] = useState(false);
   const [canClone, setCanClone] = useState(true);
 
   useEffect(() => {
-    if (!requiresClonePermission || !dataVolumeSourceAccessReview || !podsAccessReview) {
-      setCanClone(true);
-      setIsChecking(false);
-      return;
-    }
+    let cancelled = false;
 
-    const checkAccessDelegate = cluster && isACMPage ? checkAccessForFleet : checkAccess;
-
-    setIsChecking(true);
-
-    Promise.all([
-      checkAccessDelegate(dataVolumeSourceAccessReview),
-      checkAccessDelegate(podsAccessReview),
-    ])
-      .then(([dataVolumeSourceResult, podsResult]) => {
-        setCanClone(isAccessAllowed(dataVolumeSourceResult) || isAccessAllowed(podsResult));
-      })
-      .catch((error) => {
-        kubevirtConsole.warn('PVC clone access review failed', error);
+    const checkClonePermission = async (): Promise<void> => {
+      if (!requiresClonePermission || !dataVolumeSourceAccessReview || !sourceNamespace) {
         setCanClone(true);
-      })
-      .finally(() => setIsChecking(false));
-  }, [cluster, dataVolumeSourceAccessReview, isACMPage, podsAccessReview, requiresClonePermission]);
+        setIsChecking(false);
+        return;
+      }
+
+      const checkAccessDelegate = cluster && isACMPage ? checkAccessForFleet : checkAccess;
+
+      setIsChecking(true);
+
+      try {
+        const initialResult = (await checkAccessDelegate(
+          dataVolumeSourceAccessReview,
+        )) as SelfSubjectAccessReviewKind;
+
+        if (cancelled) {
+          return;
+        }
+
+        if (isAccessAllowed(initialResult)) {
+          setCanClone(true);
+          return;
+        }
+
+        const roleBindingEnsured = await ensurePVCCloneRoleBinding(
+          sourceNamespace,
+          cluster,
+          isACMPage,
+        );
+
+        if (cancelled) {
+          return;
+        }
+
+        if (!roleBindingEnsured) {
+          setCanClone(false);
+          return;
+        }
+
+        const recheckResult = (await checkAccessDelegate(
+          dataVolumeSourceAccessReview,
+        )) as SelfSubjectAccessReviewKind;
+
+        if (!cancelled) {
+          setCanClone(isAccessAllowed(recheckResult));
+        }
+      } catch (error) {
+        kubevirtConsole.warn('PVC clone access review failed', error);
+        if (!cancelled) {
+          setCanClone(true);
+        }
+      } finally {
+        if (!cancelled) {
+          setIsChecking(false);
+        }
+      }
+    };
+
+    void checkClonePermission();
+
+    return (): void => {
+      cancelled = true;
+    };
+  }, [cluster, dataVolumeSourceAccessReview, isACMPage, requiresClonePermission, sourceNamespace]);
 
   return { canClone, isChecking, requiresClonePermission };
 };
