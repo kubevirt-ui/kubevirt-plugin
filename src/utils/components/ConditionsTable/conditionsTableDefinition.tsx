@@ -1,10 +1,9 @@
-/* eslint-disable */
-import React, { ReactNode } from 'react';
-import { TFunction } from 'i18next';
+import React, { type ReactNode } from 'react';
+import { type TFunction } from 'i18next';
 
-import { V1Condition } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1Condition } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import Timestamp from '@kubevirt-utils/components/Timestamp/Timestamp';
-import { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
+import { type ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 
 const renderTimestamp = (condition: V1Condition): ReactNode => (
@@ -13,37 +12,37 @@ const renderTimestamp = (condition: V1Condition): ReactNode => (
 
 export const getConditionsColumns = (t: TFunction): ColumnConfig<V1Condition, undefined>[] => [
   {
-    getValue: (r) => r.type ?? '',
+    getValue: (row) => row.type ?? '',
     key: 'type',
     label: t('Type'),
-    renderCell: (r) => r.type,
+    renderCell: (row) => row.type,
     sortable: true,
   },
   {
-    getValue: (r) => r.status ?? '',
+    getValue: (row) => row.status ?? '',
     key: 'status',
     label: t('Status'),
-    renderCell: (r) => r.status,
+    renderCell: (row) => row.status,
     sortable: true,
   },
   {
-    getValue: (r) => r.lastTransitionTime ?? '',
+    getValue: (row) => row.lastTransitionTime ?? '',
     key: 'lastTransitionTime',
     label: t('Updated'),
     renderCell: renderTimestamp,
     sortable: true,
   },
   {
-    getValue: (r) => r.reason ?? '',
+    getValue: (row) => row.reason ?? '',
     key: 'reason',
     label: t('Reason'),
-    renderCell: (r) => r.reason ?? NO_DATA_DASH,
+    renderCell: (row) => row.reason ?? NO_DATA_DASH,
     sortable: true,
   },
   {
     key: 'message',
     label: t('Message'),
-    renderCell: (r) => r.message ?? NO_DATA_DASH,
+    renderCell: (row) => row.message ?? NO_DATA_DASH,
   },
 ];
 

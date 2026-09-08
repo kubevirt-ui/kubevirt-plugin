@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 
 import {
@@ -6,14 +5,15 @@ import {
   CONDITION_TYPE_SUCCEEDED,
   K8S_CONDITION_STATUS_TRUE,
   MIG_MIGRATION_PHASE,
-  MigMigration,
-  MigPlan,
-  MigrationStatus,
+  type MigMigration,
+  type MigPlan,
+  type MigrationStatus,
   MTC_PLAN_VM_PLACEHOLDER,
-  MultiNamespaceVirtualMachineStorageMigrationPlan,
+  type MultiNamespaceVirtualMachineStorageMigrationPlan,
   STATUS_COMPLETED,
   STATUS_READY,
   STORAGE_MIGRATION_PHASE,
+  type StorageMigrationPlanNamespaceStatus,
 } from '../constants';
 import { getStorageMigrationPlanSpecNamespaces } from '../selectors';
 
@@ -27,26 +27,28 @@ import { migPlanHasFailedCondition } from './migPlanEval';
  * phases, conditions). This file maps MTC outcomes into that shape so MTC reuses the same helpers
  * as the native storage migration APIs.
  */
-const mtcConditionTimestamp = (m: MigMigration): string | undefined =>
-  m?.status?.conditions
-    ?.filter((c) => c.status === K8S_CONDITION_STATUS_TRUE && c.lastTransitionTime)
+const mtcConditionTimestamp = (migration: MigMigration): string | undefined =>
+  migration?.status?.conditions
+    ?.filter(
+      (condition) => condition.status === K8S_CONDITION_STATUS_TRUE && condition.lastTransitionTime,
+    )
     .sort(
       (a, b) => new Date(b.lastTransitionTime).getTime() - new Date(a.lastTransitionTime).getTime(),
     )[0]?.lastTransitionTime;
 
-const normalizeMigMigrationPhase = (m: MigMigration | undefined): string =>
-  (m?.status?.phase ?? '').trim().toLowerCase();
+const normalizeMigMigrationPhase = (migration: MigMigration | undefined): string =>
+  (migration?.status?.phase ?? '').trim().toLowerCase();
 
-export const isMigMigrationSucceeded = (m: MigMigration | undefined): boolean => {
-  if (!m) return false;
-  const phase = normalizeMigMigrationPhase(m);
+export const isMigMigrationSucceeded = (migration: MigMigration | undefined): boolean => {
+  if (!migration) return false;
+  const phase = normalizeMigMigrationPhase(migration);
   if (phase === MIG_MIGRATION_PHASE.COMPLETED || phase === MIG_MIGRATION_PHASE.SUCCESSFUL)
     return true;
   return (
-    m.status?.conditions?.some(
-      (c) =>
-        (c.type === CONDITION_TYPE_SUCCEEDED || c.type === STATUS_COMPLETED) &&
-        c.status === K8S_CONDITION_STATUS_TRUE,
+    migration.status?.conditions?.some(
+      (condition) =>
+        (condition.type === CONDITION_TYPE_SUCCEEDED || condition.type === STATUS_COMPLETED) &&
+        condition.status === K8S_CONDITION_STATUS_TRUE,
     ) ?? false
   );
 };
@@ -57,25 +59,26 @@ export const isMigMigrationSucceeded = (m: MigMigration | undefined): boolean =>
  * during early phases like Requested are not treated as terminal.
  * @param m MigMigration to evaluate (undefined treated as not failed).
  */
-export const isMigMigrationFailed = (m: MigMigration | undefined): boolean => {
-  if (!m) return false;
-  const phase = normalizeMigMigrationPhase(m);
+export const isMigMigrationFailed = (migration: MigMigration | undefined): boolean => {
+  if (!migration) return false;
+  const phase = normalizeMigMigrationPhase(migration);
   if (phase === MIG_MIGRATION_PHASE.FAILED) return true;
   if (phase) return false;
   return (
-    m.status?.conditions?.some(
-      (c) => c.type === CONDITION_TYPE_FAILED && c.status === K8S_CONDITION_STATUS_TRUE,
+    migration.status?.conditions?.some(
+      (condition) =>
+        condition.type === CONDITION_TYPE_FAILED && condition.status === K8S_CONDITION_STATUS_TRUE,
     ) ?? false
   );
 };
 
 const buildFailedNamespaceStatuses = (
   spec: MultiNamespaceVirtualMachineStorageMigrationPlan['spec'],
-): MultiNamespaceVirtualMachineStorageMigrationPlan['status']['namespaces'] =>
+): StorageMigrationPlanNamespaceStatus[] =>
   getStorageMigrationPlanSpecNamespaces({ spec }).map((ns) => {
     const failed: MigrationStatus[] = (ns.virtualMachines ?? []).map((vm) => ({
       name: vm.name,
-      sourcePVCs: (vm.targetMigrationPVCs ?? []).map((t) => ({ name: t.volumeName })),
+      sourcePVCs: (vm.targetMigrationPVCs ?? []).map((pvc) => ({ name: pvc.volumeName })),
     }));
 
     return {
@@ -93,18 +96,10 @@ export const mergeMTCMigMigrationStatusIntoPlan = (
   rawMigPlan?: MigPlan,
 ): MultiNamespaceVirtualMachineStorageMigrationPlan => {
   const spec = plan.spec;
-  const ts = mtcConditionTimestamp(migMigration) ?? plan.metadata?.creationTimestamp;
+  const conditionTimestamp =
+    mtcConditionTimestamp(migMigration) ?? plan.metadata?.creationTimestamp;
 
-  if (rawMigPlan && migPlanHasFailedCondition(rawMigPlan)) {
-    return {
-      ...plan,
-      status: {
-        namespaces: buildFailedNamespaceStatuses(spec),
-      },
-    };
-  }
-
-  if (isMigMigrationFailed(migMigration)) {
+  if ((rawMigPlan && migPlanHasFailedCondition(rawMigPlan)) || isMigMigrationFailed(migMigration)) {
     return {
       ...plan,
       status: {
@@ -120,13 +115,17 @@ export const mergeMTCMigMigrationStatusIntoPlan = (
         namespaces: getStorageMigrationPlanSpecNamespaces(plan).map((ns) => {
           const completed: MigrationStatus[] = (ns.virtualMachines ?? []).map((vm) => ({
             name: vm.name,
-            sourcePVCs: (vm.targetMigrationPVCs ?? []).map((t) => ({ name: t.volumeName })),
+            sourcePVCs: (vm.targetMigrationPVCs ?? []).map((pvc) => ({ name: pvc.volumeName })),
           }));
           return {
             ...emptyNamespaceStatus(),
             completedOutOf: ns.virtualMachines?.length ?? 0,
             conditions: [
-              { lastTransitionTime: ts, status: K8S_CONDITION_STATUS_TRUE, type: STATUS_READY },
+              {
+                lastTransitionTime: conditionTimestamp,
+                status: K8S_CONDITION_STATUS_TRUE,
+                type: STATUS_READY,
+              },
             ],
             [STORAGE_MIGRATION_PHASE.COMPLETED]: completed,
           };
@@ -146,7 +145,7 @@ export const mergeMTCMigMigrationStatusIntoPlan = (
           ? {
               conditions: [
                 {
-                  lastTransitionTime: ts,
+                  lastTransitionTime: conditionTimestamp,
                   message: phase,
                   status: K8S_CONDITION_STATUS_TRUE,
                   type: MTC_WIZARD_PROGRESS_PHASE_TYPE,
@@ -167,7 +166,7 @@ export const pickLatestMigMigrationForPlan = (
   planName: string,
 ): MigMigration | undefined =>
   (migrations ?? [])
-    .filter((m) => m.spec?.migPlanRef?.name === planName)
+    .filter((migration) => migration.spec?.migPlanRef?.name === planName)
     .sort(
       (a, b) =>
         new Date(b.metadata?.creationTimestamp ?? 0).getTime() -

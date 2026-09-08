@@ -1,17 +1,16 @@
-/* eslint-disable */
-import React, { FC, FormEvent, useEffect } from 'react';
+import React, { type FC, type FormEvent, useEffect } from 'react';
 import { Trans } from 'react-i18next';
 import * as ipaddr from 'ipaddr.js';
 
-import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverContentWithLightspeedButton/PopoverContentWithLightspeedButton';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
-import { Checkbox, Divider, FormGroup, TextInput, ValidatedOptions } from '@patternfly/react-core';
+import { Checkbox, Divider, FormGroup, TextInput } from '@patternfly/react-core';
 import { isValidIPv4Substring, isValidIPv6Substring } from '@search/utils/validation';
 
-import { CloudInitNetworkData } from './utils/cloudinit-utils';
+import GatewayFormGroup from './components/GatewayFormGroup';
+import { type CloudInitNetworkData } from './utils/cloudinit-utils';
 
 type CloudinitNetworkFormProps = {
   enableNetworkData: boolean;
@@ -48,7 +47,14 @@ export const CloudinitNetworkForm: FC<CloudinitNetworkFormProps> = ({
       gateway6 && (!isGateway6SubstringValid || !ipaddr.IPv6.isIPv6(gateway6));
 
     setSubmitDisabled(gateway4Invalid || gateway6Invalid);
-  }, [enableNetworkData, gateway4, gateway6, setSubmitDisabled]);
+  }, [
+    enableNetworkData,
+    gateway4,
+    gateway6,
+    isGateway4SubstringValid,
+    isGateway6SubstringValid,
+    setSubmitDisabled,
+  ]);
 
   return (
     <>
@@ -58,13 +64,13 @@ export const CloudinitNetworkForm: FC<CloudinitNetworkFormProps> = ({
 
       <FormGroup fieldId="custom-network-checkbox">
         <Checkbox
-          onChange={(_event: FormEvent<HTMLInputElement>, checked: boolean) =>
-            setEnableNetworkData(checked)
-          }
           description={t('check this option to add network data section to the cloud-init script.')}
           id="custom-network-checkbox"
           isChecked={enableNetworkData}
           label={t('Add network data')}
+          onChange={(_event: FormEvent<HTMLInputElement>, checked: boolean) =>
+            setEnableNetworkData(checked)
+          }
         />
       </FormGroup>
       {enableNetworkData && (
@@ -76,12 +82,15 @@ export const CloudinitNetworkForm: FC<CloudinitNetworkFormProps> = ({
           >
             <TextInput
               id={'ethernet-name'}
-              onChange={(_event, v) => updateNetworkField('name', v)}
+              onChange={(_event, inputValue) => updateNetworkField('name', inputValue)}
               type="text"
-              value={networkData?.name || ''}
+              value={networkData?.name ?? ''}
             />
           </FormGroup>
           <FormGroup
+            className="kv-cloudint-advanced-tab--validation-text"
+            fieldId={'address'}
+            label={t('IP addresses')}
             labelHelp={
               <HelpTextIcon
                 bodyContent={(hide) => (
@@ -101,57 +110,30 @@ export const CloudinitNetworkForm: FC<CloudinitNetworkFormProps> = ({
                 )}
               />
             }
-            className="kv-cloudint-advanced-tab--validation-text"
-            fieldId={'address'}
-            label={t('IP addresses')}
           >
             <TextInput
               id={'address'}
-              onChange={(_event, v) => updateNetworkField('addresses', v)}
+              onChange={(_event, inputValue) => updateNetworkField('addresses', inputValue)}
               type="text"
-              value={networkData?.addresses || ''}
+              value={networkData?.addresses ?? ''}
             />
           </FormGroup>
-          <FormGroup
-            className="kv-cloudint-advanced-tab--validation-text"
-            fieldId={'gateway4'}
+          <GatewayFormGroup
+            errorMessage={t('Invalid IPv4 address')}
+            fieldId="gateway4"
+            isValid={isGateway4SubstringValid}
             label={t('IPv4 Gateway address')}
-          >
-            <TextInput
-              validated={
-                isGateway4SubstringValid ? ValidatedOptions.default : ValidatedOptions.warning
-              }
-              id={'gateway4'}
-              onChange={(_event, v) => updateNetworkField('gateway4', v)}
-              type="text"
-              value={gateway4 || ''}
-            />
-            {!isGateway4SubstringValid && (
-              <FormGroupHelperText validated={ValidatedOptions.warning}>
-                {t('Invalid IPv4 address')}
-              </FormGroupHelperText>
-            )}
-          </FormGroup>
-          <FormGroup
-            className="kv-cloudint-advanced-tab--validation-text"
-            fieldId={'gateway6'}
+            onChange={(value) => updateNetworkField('gateway4', value)}
+            value={gateway4}
+          />
+          <GatewayFormGroup
+            errorMessage={t('Invalid IPv6 address')}
+            fieldId="gateway6"
+            isValid={isGateway6SubstringValid}
             label={t('IPv6 Gateway address')}
-          >
-            <TextInput
-              validated={
-                isGateway6SubstringValid ? ValidatedOptions.default : ValidatedOptions.warning
-              }
-              id={'gateway6'}
-              onChange={(_event, v) => updateNetworkField('gateway6', v)}
-              type="text"
-              value={gateway6 || ''}
-            />
-            {!isGateway6SubstringValid && (
-              <FormGroupHelperText validated={ValidatedOptions.warning}>
-                {t('Invalid IPv6 address')}
-              </FormGroupHelperText>
-            )}
-          </FormGroup>
+            onChange={(value) => updateNetworkField('gateway6', value)}
+            value={gateway6}
+          />
         </>
       )}
     </>

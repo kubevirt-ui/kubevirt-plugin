@@ -1,7 +1,6 @@
-/* eslint-disable */
-import React, { FC, useMemo, useRef, useState } from 'react';
+import React, { type FC, useMemo, useRef, useState } from 'react';
 
-import { InstanceTypeSize } from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/InstanceTypeDrilldownSelect/utils/types';
+import { type InstanceTypeSize } from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/InstanceTypeDrilldownSelect/utils/types';
 import { is1GiInstanceType } from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/InstanceTypeDrilldownSelect/utils/utils';
 import { seriesHasHugepagesVariant } from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/InstanceTypeDrilldownSelect/utils/utils';
 import HugepagesInfo from '@kubevirt-utils/components/HugepagesInfo/HugepagesInfo';
@@ -48,12 +47,12 @@ const InstanceTypeSizeDropdown: FC<InstanceTypeSizeDropdownProps> = ({
       return { hugepagesSizes: [], standardSizes: sizes };
     }
     return {
-      hugepagesSizes: sizes.filter((s) => is1GiInstanceType(s.sizeLabel)),
-      standardSizes: sizes.filter((s) => !is1GiInstanceType(s.sizeLabel)),
+      hugepagesSizes: sizes.filter((size) => is1GiInstanceType(size.sizeLabel)),
+      standardSizes: sizes.filter((size) => !is1GiInstanceType(size.sizeLabel)),
     };
   }, [seriesName, sizes]);
 
-  const getSizeLabel = (size: InstanceTypeSize) => {
+  const getSizeLabel = (size: InstanceTypeSize): string => {
     return t('{{sizeLabel}}: {{cpus}} CPUs, {{memory}} Memory', {
       cpus: size.cpus,
       memory: readableSizeUnit(size.memory),
@@ -61,19 +60,19 @@ const InstanceTypeSizeDropdown: FC<InstanceTypeSizeDropdownProps> = ({
     });
   };
 
-  const selectedSizeObj = sizes.find((s) => s.sizeLabel === selectedSize);
+  const selectedSizeObj = sizes.find((size) => size.sizeLabel === selectedSize);
   const selectedLabel = selectedSizeObj ? getSizeLabel(selectedSizeObj) : t('Select size');
 
-  const handleSelect = (sizeLabel: string) => {
+  const handleSelect = (sizeLabel: string): void => {
     onSizeSelect(sizeLabel);
     setIsOpen(false);
   };
 
-  const onToggle = () => {
+  const onToggle = (): void => {
     setIsOpen((prevIsOpen) => !prevIsOpen);
   };
 
-  const renderHugepagesMenu = () => (
+  const renderHugepagesMenu = (): React.JSX.Element => (
     <Menu>
       <MenuContent>
         <MenuList>
@@ -103,6 +102,7 @@ const InstanceTypeSizeDropdown: FC<InstanceTypeSizeDropdownProps> = ({
         {selectedLabel}
       </MenuToggle>
       <Popper
+        isVisible={isOpen}
         popper={
           <Menu className="instance-type-size-dropdown__menu" containsFlyout ref={menuRef}>
             <MenuContent>
@@ -129,7 +129,6 @@ const InstanceTypeSizeDropdown: FC<InstanceTypeSizeDropdownProps> = ({
             </MenuContent>
           </Menu>
         }
-        isVisible={isOpen}
         triggerRef={toggleRef}
       />
     </>

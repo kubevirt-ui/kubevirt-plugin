@@ -1,8 +1,13 @@
-/* eslint-disable */
-import { useMemo } from 'react';
+// @ai-rules:
+// 1. [Pattern]: Activities come as resolved extensions — `loader` is accessed via `in` operator since it's not on the resolved type.
+// 2. [Gotcha]: prometheusResults is an ImmutableMap; access values with .getIn().
+import { type ComponentType, useMemo } from 'react';
 
-import { PrometheusResponse, ResolvedExtension } from '@openshift-console/dynamic-plugin-sdk';
-import { DashboardsOverviewPrometheusActivity as DynamicDashboardsOverviewPrometheusActivity } from '@openshift-console/dynamic-plugin-sdk/lib/extensions/dashboards';
+import {
+  type PrometheusResponse,
+  type ResolvedExtension,
+} from '@openshift-console/dynamic-plugin-sdk';
+import { type DashboardsOverviewPrometheusActivity as DynamicDashboardsOverviewPrometheusActivity } from '@openshift-console/dynamic-plugin-sdk/lib/extensions/dashboards';
 import { useDashboardResources } from '@openshift-console/dynamic-plugin-sdk-internal';
 
 import useDashboardActivities from './useDashboardActivities';
@@ -13,7 +18,19 @@ export type WatchPrometheusQueryProps = {
   timespan?: number;
 };
 
-const useDashboardPrometheusActivities = () => {
+type PrometheusActivity = {
+  component: ComponentType | undefined;
+  loader: unknown;
+  results: PrometheusResponse[];
+};
+
+type UseDashboardPrometheusActivitiesResult = {
+  prometheusActivities: PrometheusActivity[] | undefined;
+  prometheusQueriesLoaded: boolean;
+  prometheusResults: ReturnType<typeof useDashboardResources>['prometheusResults'];
+};
+
+const useDashboardPrometheusActivities = (): UseDashboardPrometheusActivitiesResult => {
   const { prometheusActivities } = useDashboardActivities();
 
   const queries: WatchPrometheusQueryProps[] = prometheusActivities?.reduce(
@@ -28,23 +45,20 @@ const useDashboardPrometheusActivities = () => {
   const allPrometheusActivities = useMemo(
     () =>
       prometheusActivities
-        ?.filter((a) => {
-          const queryResults = a.properties.queries.map(
-            (q) => prometheusResults.getIn([q, 'data']) as PrometheusResponse,
+        ?.filter((activity) => {
+          const queryResults = activity.properties.queries.map(
+            (query) => prometheusResults.getIn([query, 'data']) as PrometheusResponse,
           );
-          return a.properties.isActivity(queryResults);
+          return activity.properties.isActivity(queryResults);
         })
-        ?.map((a) => {
-          const queryResults = a.properties.queries.map(
-            (q) => prometheusResults.getIn([q, 'data']) as PrometheusResponse,
+        ?.map((activity) => {
+          const queryResults = activity.properties.queries.map(
+            (query) => prometheusResults.getIn([query, 'data']) as PrometheusResponse,
           );
           return {
-            // TODO Fix typing
-            // loader: (a as DashboardsOverviewPrometheusActivity)?.properties.loader,
-            component: (a as ResolvedExtension<DynamicDashboardsOverviewPrometheusActivity>)
+            component: (activity as ResolvedExtension<DynamicDashboardsOverviewPrometheusActivity>)
               ?.properties.component,
-            // skipcq: JS-0349
-            loader: (a as any)?.properties.loader,
+            loader: 'loader' in activity.properties ? activity.properties.loader : undefined,
             results: queryResults,
           };
         }),
@@ -53,13 +67,14 @@ const useDashboardPrometheusActivities = () => {
 
   const prometheusQueriesLoaded = useMemo(
     () =>
-      prometheusActivities.every((a) =>
-        a.properties.queries.every(
-          (q) => prometheusResults.getIn([q, 'data']) || prometheusResults.getIn([q, 'loadError']),
+      prometheusActivities.every((activity) =>
+        activity.properties.queries.every(
+          (query) =>
+            prometheusResults.getIn([query, 'data']) ||
+            prometheusResults.getIn([query, 'loadError']),
         ),
       ),
-     
-    [prometheusResults],
+    [prometheusActivities, prometheusResults],
   );
 
   return {

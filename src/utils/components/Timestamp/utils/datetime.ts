@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 
 import {
@@ -42,9 +41,11 @@ export const utcDateTimeFormatter = new Intl.DateTimeFormat(undefined, utcDateTi
 
 const relativeTimeFormatter = Intl.RelativeTimeFormat ? new Intl.RelativeTimeFormat() : null;
 
-const getDuration = (ms: number) => {
-  let miliseconds = ms;
-  if (!ms || ms < 0) {
+const getDuration = (
+  rawMs: number,
+): { days: number; hours: number; minutes: number; seconds: number } => {
+  let miliseconds = rawMs;
+  if (!rawMs || rawMs < 0) {
     miliseconds = 0;
   }
   const seconds = Math.floor(miliseconds / 1000);
@@ -61,30 +62,26 @@ export const fromNow = (
   dateTime: Date | string,
   now?: Date,
   options?: Partial<{ omitSuffix: boolean }>,
-) => {
+): { time: string; value: number } | string => {
   // Check for null. If dateTime is null, it returns incorrect date Jan 1 1970.
   if (!dateTime) {
     return '-';
   }
 
-  if (!now) {
-    now = new Date();
-  }
+  const currentTime = now ?? new Date();
 
   const date = new Date(dateTime);
-  const ms = now.getTime() - date.getTime();
+  const timeDiffMs = currentTime.getTime() - date.getTime();
 
-  // If the event occurred less than one minute in the future, assume it's clock drift and show "Just now."
-  if (!options?.omitSuffix && ms < MINUTE_IN_MS && ms > MAX_CLOCK_SKEW_MS) {
+  if (!options?.omitSuffix && timeDiffMs < MINUTE_IN_MS && timeDiffMs > MAX_CLOCK_SKEW_MS) {
     return JUST_NOW;
   }
 
-  // Do not attempt to handle other dates in the future.
-  if (ms < 0) {
+  if (timeDiffMs < 0) {
     return '-';
   }
 
-  const { days, hours, minutes } = getDuration(ms);
+  const { days, hours, minutes } = getDuration(timeDiffMs);
 
   if (options?.omitSuffix) {
     if (days) {
@@ -118,7 +115,11 @@ export const fromNow = (
   return relativeTimeFormatter.format(-minutes, MINTUE);
 };
 
-export const timestampFor = (mdate: Date, now: Date, omitSuffix: boolean) => {
+export const timestampFor = (
+  mdate: Date,
+  now: Date,
+  omitSuffix: boolean,
+): { time: string; value: number } | string => {
   if (!isValid(mdate)) {
     return NO_DATA_DASH;
   }

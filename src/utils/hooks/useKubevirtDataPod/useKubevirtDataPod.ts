@@ -30,7 +30,7 @@ const nullResponse: [undefined, false, null] = [undefined, false, null];
 const useKubevirtDataPod = <T extends K8sResourceCommon | K8sResourceCommon[]>(
   watchOptions: NullableWatchK8sResource,
   filterOptions?: KubevirtDataPodFilters,
-): [T | undefined, boolean, Error | null] => {
+): [T | undefined, boolean, Error] => {
   const [data, setData] = useState<T>((<unknown>[]) as T);
   const [loaded, setLoaded] = useState<boolean>(false);
   const [error, setError] = useState<Error | null>(null);
@@ -60,35 +60,31 @@ const useKubevirtDataPod = <T extends K8sResourceCommon | K8sResourceCommon[]>(
   useEffect(() => {
     const controller = new AbortController();
     const fetchData = async (): Promise<void> => {
-      if (!watchOptionsMemoized?.groupVersionKind?.kind) {
-        return;
-      }
+      if (!watchOptionsMemoized?.groupVersionKind?.kind) return;
 
       setLoaded(false);
       try {
         const response = await consoleFetch(url, { signal: controller.signal });
         const jsonData = (await response.json()) as FetchResponseData;
-        if (jsonData?.metadata?.resourceVersion) {
-          registerResourceVersion(
-            watchOptionsMemoized.groupVersionKind.kind,
-            jsonData.metadata.resourceVersion,
-          );
-          setResourceVersion(getResourceVersion(watchOptionsMemoized.groupVersionKind.kind));
-        }
+        registerResourceVersion(
+          watchOptionsMemoized.groupVersionKind.kind,
+          jsonData?.metadata?.resourceVersion,
+        );
+        setResourceVersion(getResourceVersion(watchOptionsMemoized.groupVersionKind.kind));
         setData(jsonData?.items ? (jsonData.items as T) : (jsonData as unknown as T));
         setShouldConnect(true);
         setLoaded(true);
       } catch (e) {
         if (!controller.signal.aborted) {
-          setError(new Error((e as Error).message));
+          setError(new Error(e.msg));
           setLoaded(true);
         }
       }
     };
-    !isEmpty(watchOptionsMemoized) && void fetchData();
-    return (): void => {
-      controller.abort();
-    };
+    if (!isEmpty(watchOptionsMemoized)) {
+      fetchData().catch(() => {});
+    }
+    return (): void => controller.abort();
   }, [watchOptionsMemoized, url, query]);
 
   useEffect(() => {

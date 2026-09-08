@@ -1,15 +1,14 @@
-/* eslint-disable */
 import { abbreviateNumber } from 'js-abbreviation-number';
 
 import { MILLISECONDS_MULTIPLIER, MS_PER_DAY } from '@kubevirt-utils/components/Charts/utils/utils';
 import { dateFormatterNoYear } from '@kubevirt-utils/components/Timestamp/utils/datetime';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { PrometheusValue } from '@openshift-console/dynamic-plugin-sdk';
+import { type PrometheusValue } from '@openshift-console/dynamic-plugin-sdk';
 
-import { humanizeBinaryBytes } from '../../../../../../utils/utils/humanize';
 import { getLabelUnit, hasUnit, labeledTickIndexes } from '../utils';
 
-import { ChartData, ChartPoint } from './types';
+import { humanizeBinaryBytes } from '../../../../../../utils/utils/humanize';
+import { type ChartData, type ChartPoint } from './types';
 
 // Returns a unique date key like "2024-12-15" for grouping data points by calendar day
 export const getDateKey = (point: ChartPoint): string => {
@@ -20,11 +19,10 @@ export const getDateKey = (point: ChartPoint): string => {
 
 export const getValue = (point: PrometheusValue): string => point?.[1];
 
-export const getLargestValue = (data: PrometheusValue[]) => {
+export const getLargestValue = (data: PrometheusValue[]): number => {
   return data?.reduce((acc, point) => {
     const currValue = Number(getValue(point));
-    acc = currValue > acc ? currValue : acc;
-    return acc;
+    return currValue > acc ? currValue : acc;
   }, -1);
 };
 
@@ -37,10 +35,14 @@ export const getHumanizedValue = (metric: string, value: number, unit: string): 
 export const formatLargestValue = (metric: string, largestValue: number, unit: string): number =>
   hasUnit(metric) ? getHumanizedValue(metric, largestValue, unit) : largestValue;
 
-export const getFormattedData = (rawData: PrometheusValue[], metric: string, unit: string) =>
-  rawData?.map(([x, y]) => {
-    const humanizedValue = getHumanizedValue(metric, Number(y), unit);
-    return { x: new Date(x * MILLISECONDS_MULTIPLIER), y: humanizedValue };
+export const getFormattedData = (
+  rawData: PrometheusValue[],
+  metric: string,
+  unit: string,
+): { x: Date; y: number }[] =>
+  rawData?.map(([timestamp, metricValue]) => {
+    const humanizedValue = getHumanizedValue(metric, Number(metricValue), unit);
+    return { x: new Date(timestamp * MILLISECONDS_MULTIPLIER), y: humanizedValue };
   });
 
 // Calculate actual day span between two dates (inclusive)
@@ -117,9 +119,11 @@ export const xTickFormat = (tick: Date, index: number, allTicks: Date[]): string
   return dateFormatterNoYear.format(tick);
 };
 
-export const yTickFormat = (metric: string, unit: string) => (tick, index, allTicks) => {
-  if (tick === 0 || index === allTicks?.length - 1) {
-    return `${abbreviateNumber(tick, 1)} ${getLabelUnit(metric, unit)}`;
-  }
-  return null;
-};
+export const yTickFormat =
+  (metric: string, unit: string) =>
+  (tick: number, index: number, allTicks: number[]): null | string => {
+    if (tick === 0 || index === allTicks?.length - 1) {
+      return `${abbreviateNumber(tick, 1)} ${getLabelUnit(metric, unit)}`;
+    }
+    return null;
+  };

@@ -1,8 +1,7 @@
-/* eslint-disable */
 import { useMemo } from 'react';
 
-import { ChartDomain } from '@overview/OverviewTab/metric-charts-card/utils/hooks/types';
-import { MetricChartData } from '@overview/OverviewTab/metric-charts-card/utils/hooks/useMetricChartData';
+import { type ChartDomain } from '@overview/OverviewTab/metric-charts-card/utils/hooks/types';
+import { type MetricChartData } from '@overview/OverviewTab/metric-charts-card/utils/hooks/useMetricChartData';
 import t_chart_theme_colorscales_gray_colorscale_100 from '@patternfly/react-tokens/dist/esm/t_chart_theme_colorscales_gray_colorscale_100';
 import t_chart_theme_colorscales_orange_colorscale_400 from '@patternfly/react-tokens/dist/esm/t_chart_theme_colorscales_orange_colorscale_400';
 
@@ -47,11 +46,11 @@ const useChartDomain = ({
 
   const xAxisTicks = useMemo(() => {
     const today = new Date();
-    return Array.from({ length: CHART_DAYS_WINDOW }, (_, i) => {
-      const d = new Date(today);
-      d.setDate(d.getDate() - (CHART_DAYS_WINDOW - 1 - i));
-      d.setHours(12, 0, 0, 0);
-      return d;
+    return Array.from({ length: CHART_DAYS_WINDOW }, (_unused, idx) => {
+      const day = new Date(today);
+      day.setDate(day.getDate() - (CHART_DAYS_WINDOW - 1 - idx));
+      day.setHours(12, 0, 0, 0);
+      return day;
     });
   }, []);
 
@@ -69,17 +68,20 @@ const useChartDomain = ({
   const hasQuotaLines = !isMultiCluster && (quotaValue != null || requestedValue != null);
 
   const flatLineXValues = useMemo(
-    () => (effectiveData.chartData?.length ? effectiveData.chartData.map((p) => p.x) : xAxisTicks),
+    () =>
+      effectiveData.chartData?.length
+        ? effectiveData.chartData.map((point) => point.x)
+        : xAxisTicks,
     [effectiveData.chartData, xAxisTicks],
   );
 
   const quotaLineData = useMemo(
     () =>
       quotaValue != null && effectiveDomain.x[0]
-        ? flatLineXValues.map((x) => ({
+        ? flatLineXValues.map((xVal) => ({
             _color: t_chart_theme_colorscales_gray_colorscale_100.value,
             _dashed: true,
-            x,
+            x: xVal,
             y: quotaValue,
           }))
         : null,
@@ -89,10 +91,10 @@ const useChartDomain = ({
   const requestedLineData = useMemo(
     () =>
       requestedValue != null && effectiveDomain.x[0]
-        ? flatLineXValues.map((x) => ({
+        ? flatLineXValues.map((xVal) => ({
             _color: t_chart_theme_colorscales_orange_colorscale_400.value,
             _dashed: true,
-            x,
+            x: xVal,
             y: requestedValue,
           }))
         : null,

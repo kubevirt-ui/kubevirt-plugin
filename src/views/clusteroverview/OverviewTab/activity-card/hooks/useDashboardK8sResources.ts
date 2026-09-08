@@ -1,27 +1,44 @@
-/* eslint-disable */
-import { useMemo } from 'react';
+// @ai-rules:
+// 1. [Pattern]: Activities come as a union of LoadedExtension | ResolvedExtension — `loader` is accessed via `in` operator since it's not on the resolved type.
+// 2. [Type]: LegacyFirehoseResource mirrors the deprecated FirehoseResource shape for structural compatibility with utils.ts helpers.
+import { type ComponentType, useMemo } from 'react';
 
 import { get } from '@kubevirt-utils/utils/utils';
 import {
-  DashboardsOverviewResourceActivity as DynamicDashboardsOverviewResourceActivity,
-  FirehoseResource,
-  FirehoseResult,
-  ResolvedExtension,
+  type DashboardsOverviewResourceActivity as DynamicDashboardsOverviewResourceActivity,
+  type K8sResourceCommon,
+  type ResolvedExtension,
   useK8sWatchResources,
-  WatchK8sResource,
+  type WatchK8sResource,
 } from '@openshift-console/dynamic-plugin-sdk';
 
 import { asUniqueResource, asWatchK8sResource } from '../utils/utils';
-
 import useDashboardActivities from './useDashboardActivities';
 
-const useDashboardK8sResources = () => {
+type LegacyFirehoseResource = {
+  isList?: boolean;
+  kind: string;
+  prop: string;
+};
+
+type K8sResourceActivity = {
+  component: ComponentType | undefined;
+  loader: unknown;
+  resource: K8sResourceCommon;
+  timestamp: Date | null;
+};
+
+type UseDashboardK8sResourcesResult = {
+  k8sResourceActivities: K8sResourceActivity[] | undefined;
+  k8sResources: ReturnType<typeof useK8sWatchResources>;
+  k8sResourcesLoaded: boolean | undefined;
+};
+
+const useDashboardK8sResources = (): UseDashboardK8sResourcesResult => {
   const { resourceActivities } = useDashboardActivities();
 
   const resourcesMap = resourceActivities?.reduce((acc, activity, idx) => {
-    // TODO Fix typing
-    const firehoseResource: FirehoseResource = activity?.properties
-      ?.k8sResource as unknown as FirehoseResource;
+    const firehoseResource = activity?.properties?.k8sResource as unknown as LegacyFirehoseResource;
     const resource: WatchK8sResource = asWatchK8sResource(firehoseResource);
     return {
       ...acc,
@@ -35,29 +52,27 @@ const useDashboardK8sResources = () => {
     () =>
       resourceActivities
         ?.map((activity, index) => {
-          // TODO Fix typing
-          const firehoseResource: FirehoseResource = activity?.properties
-            ?.k8sResource as unknown as FirehoseResource;
+          const firehoseResource = activity?.properties
+            ?.k8sResource as unknown as LegacyFirehoseResource;
           const k8sResources = get(
             resources,
             [asUniqueResource(firehoseResource, index).prop, 'data'],
             [],
-          ) as FirehoseResult['data'];
+          ) as K8sResourceCommon[];
           return k8sResources
-            ?.filter((r) =>
-              activity.properties.isActivity ? activity.properties.isActivity(r) : true,
+            ?.filter((resource) =>
+              activity.properties.isActivity
+                ? Boolean(activity.properties.isActivity(resource))
+                : true,
             )
-            .map((r) => ({
-              // loader: (a as DashboardsOverviewResourceActivity)?.properties?.loader,
+            .map((resource) => ({
               component: (activity as ResolvedExtension<DynamicDashboardsOverviewResourceActivity>)
                 ?.properties?.component,
-              // skipcq: JS-0349
-              loader: (activity as any)?.properties?.loader,
-              // TODO Fix typing
-              resource: r,
-              timestamp: activity.properties.getTimestamp
-                ? activity.properties.getTimestamp(r)
-                : null,
+              loader: 'loader' in activity.properties ? activity.properties.loader : undefined,
+              resource,
+              timestamp: (activity.properties.getTimestamp
+                ? activity.properties.getTimestamp(resource)
+                : null) as Date | null,
             }));
         })
         ?.reduce((a, b) => a.concat(b), []),
@@ -67,9 +82,8 @@ const useDashboardK8sResources = () => {
   const resourcesLoaded = useMemo(
     () =>
       resourceActivities?.every((activity, index) => {
-        // TODO Fix typing
-        const firehoseResource: FirehoseResource = activity?.properties
-          ?.k8sResource as unknown as FirehoseResource;
+        const firehoseResource = activity?.properties
+          ?.k8sResource as unknown as LegacyFirehoseResource;
         const uniqueProp = asUniqueResource(firehoseResource, index).prop;
         return resources[uniqueProp]?.loaded || resources[uniqueProp]?.loadError;
       }),

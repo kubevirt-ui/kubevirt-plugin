@@ -1,5 +1,4 @@
-/* eslint-disable */
-import { V1beta1Plan } from '@forklift-ui/types';
+import { type V1beta1Plan } from '@forklift-ui/types';
 
 import { buildFilterPath } from '../../shared/urlUtils';
 
@@ -30,11 +29,14 @@ const CONDITION_TYPE = {
 const CONDITION_CATEGORY_CRITICAL = 'Critical';
 
 const getTrueConditionTypes = (plan: V1beta1Plan): string[] =>
-  (plan?.status?.conditions ?? []).filter((c) => c.status === CONDITION_TRUE).map((c) => c.type);
+  (plan?.status?.conditions ?? [])
+    .filter((condition) => condition.status === CONDITION_TRUE)
+    .map((condition) => condition.type);
 
 const hasCriticalCondition = (plan: V1beta1Plan): boolean =>
   (plan?.status?.conditions ?? []).some(
-    (c) => c.category === CONDITION_CATEGORY_CRITICAL && c.status === CONDITION_TRUE,
+    (condition) =>
+      condition.category === CONDITION_CATEGORY_CRITICAL && condition.status === CONDITION_TRUE,
   );
 
 const hasVMErrors = (plan: V1beta1Plan): boolean =>

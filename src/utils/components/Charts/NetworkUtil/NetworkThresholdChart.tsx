@@ -1,8 +1,7 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 import { Link } from 'react-router';
 
-import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import useVMQueries from '@kubevirt-utils/hooks/useVMQueries';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -65,21 +64,29 @@ const NetworkThresholdChart: FC<NetworkThresholdChartProps> = ({ vmi }) => {
 
   const isLoading = !networkInLoaded || !networkOutLoaded;
 
-  const error = networkInError || networkOutError;
+  const error = networkInError ?? networkOutError;
 
   const networkInData = networkIn?.data?.result?.[0]?.values;
   const networkOutData = networkOut?.data?.result?.[0]?.values;
-  const chartDataIn = networkInData?.map(([x, y]) => {
-    return { name: 'Network In', x: new Date(x * MILLISECONDS_MULTIPLIER), y: Number(y) };
+  const chartDataIn = networkInData?.map(([timestamp, value]) => {
+    return {
+      name: 'Network In',
+      x: new Date(timestamp * MILLISECONDS_MULTIPLIER),
+      y: Number(value),
+    };
   });
 
-  const chartDataOut = networkOutData?.map(([x, y]) => {
-    return { name: 'Network Out', x: new Date(x * MILLISECONDS_MULTIPLIER), y: Number(y) };
+  const chartDataOut = networkOutData?.map(([timestamp, value]) => {
+    return {
+      name: 'Network Out',
+      x: new Date(timestamp * MILLISECONDS_MULTIPLIER),
+      y: Number(value),
+    };
   });
 
   const isReady = !isEmpty(chartDataOut) || !isEmpty(chartDataIn);
   const yMax = useStableYMax(
-    findMaxYValue([...(chartDataIn || []), ...(chartDataOut || [])]),
+    findMaxYValue([...(chartDataIn ?? []), ...(chartDataOut ?? [])]),
     `${vmi?.metadata?.uid}_${duration}`,
   );
   const yRange = getChartYRange(yMax);
@@ -105,30 +112,30 @@ const NetworkThresholdChart: FC<NetworkThresholdChartProps> = ({ vmi }) => {
             width={width}
           >
             <ChartAxis
+              axisComponent={<></>}
               style={{
                 tickLabels: { padding: 2, ...tickLabels },
                 ticks: { stroke: 'transparent' },
               }}
-              axisComponent={<></>}
               tickCount={TICKS_COUNT}
               tickFormat={tickFormat(duration, currentTime)}
             />
             <ChartGroup>
               <ChartArea
+                data={chartDataOut}
                 style={{
                   data: {
                     stroke: chart_color_blue_300.value,
                   },
                 }}
-                data={chartDataOut}
               />
               <ChartArea
+                data={chartDataIn}
                 style={{
                   data: {
                     stroke: chart_color_blue_400.value,
                   },
                 }}
-                data={chartDataIn}
               />
             </ChartGroup>
           </Chart>

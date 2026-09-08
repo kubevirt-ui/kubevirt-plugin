@@ -1,12 +1,10 @@
-/* eslint-disable */
-import React, { ReactNode } from 'react';
-import { TFunction } from 'i18next';
+import React, { type ReactNode } from 'react';
+import { type TFunction } from 'i18next';
 
-import { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
+import { type ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 
-import { AffinityRowData } from '../../utils/types';
-
+import { type AffinityRowData } from '../../utils/types';
 import AffinityRowActionsDropdown from './components/AffinityRowActionsDropdown';
 import { AFFINITY_CONDITION_LABELS, AFFINITY_TYPE_LABLES } from './utils/constants';
 
@@ -17,8 +15,8 @@ export type AffinityCallbacks = {
 };
 
 const renderAffinityTerms = (affinity: AffinityRowData, { t }: AffinityCallbacks): ReactNode => {
-  const expressionsCount = affinity.expressions?.length || 0;
-  const fieldsCount = affinity.fields?.length || 0;
+  const expressionsCount = affinity.expressions?.length ?? 0;
+  const fieldsCount = affinity.fields?.length ?? 0;
 
   if (expressionsCount === 0 && fieldsCount === 0) {
     return NO_DATA_DASH;
@@ -46,24 +44,24 @@ export const getAffinityColumns = (
   t: TFunction,
 ): ColumnConfig<AffinityRowData, AffinityCallbacks>[] => [
   {
-    getValue: (r) => AFFINITY_TYPE_LABLES[r.type] ?? '',
+    getValue: (row) => AFFINITY_TYPE_LABLES[row.type] ?? '',
     key: 'type',
     label: t('Type'),
-    renderCell: (r) => AFFINITY_TYPE_LABLES[r.type],
+    renderCell: (row) => AFFINITY_TYPE_LABLES[row.type],
     sortable: true,
   },
   {
-    getValue: (r) => AFFINITY_CONDITION_LABELS[r.condition] ?? '',
+    getValue: (row) => AFFINITY_CONDITION_LABELS[row.condition] ?? '',
     key: 'condition',
     label: t('Condition'),
-    renderCell: (r) => AFFINITY_CONDITION_LABELS[r.condition],
+    renderCell: (row) => AFFINITY_CONDITION_LABELS[row.condition],
     sortable: true,
   },
   {
-    getValue: (r) => r.weight ?? 0,
+    getValue: (row) => row.weight ?? 0,
     key: 'weight',
     label: t('Weight'),
-    renderCell: (r) => r.weight ?? NO_DATA_DASH,
+    renderCell: (row) => row.weight ?? NO_DATA_DASH,
     sortable: true,
   },
   {

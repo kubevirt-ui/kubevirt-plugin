@@ -30,23 +30,14 @@ import {
   TICKS_COUNT,
 } from '../utils/utils';
 
-type NetworkChartDataPoint = {
-  name: string;
-  x: Date;
-  y: number;
-};
-
 type NetworkThresholdSingleSourceChartProps = {
   data: PrometheusResult[];
   link: string;
 };
 
-const CursorVoronoiContainer = createContainer('voronoi', 'cursor');
+type ChartDatum = { name: string; x: Date; y: number };
 
-const formatTooltipTitle = (datum: Record<string, unknown>): string => {
-  const date = datum?.x as Date | undefined;
-  return (date?.getHours() ?? '') + ':' + String(date?.getMinutes() ?? '')?.padStart(2, '0');
-};
+const CursorVoronoiContainer = createContainer('voronoi', 'cursor');
 
 const NetworkThresholdSingleSourceChart: FC<NetworkThresholdSingleSourceChartProps> = ({
   data,
@@ -55,28 +46,24 @@ const NetworkThresholdSingleSourceChart: FC<NetworkThresholdSingleSourceChartPro
   const { currentTime, duration, timespan } = useDuration();
   const { height, ref, width } = useResponsiveCharts();
 
-  const chartData: NetworkChartDataPoint[][] = !isEmpty(data)
-    ? (data?.map((obj) =>
-        (obj?.values ?? [])?.map(
-          ([timestamp, val]: [number, string]): NetworkChartDataPoint => ({
-            name: obj?.metric?.interface,
-            x: new Date(timestamp * MILLISECONDS_MULTIPLIER),
-            y: Number(val),
-          }),
-        ),
-      ) ?? [])
-    : [];
+  const chartData: ChartDatum[][] = isEmpty(data)
+    ? []
+    : data.map((obj) =>
+        (obj?.values ?? []).map(([timestamp, value]) => ({
+          name: obj?.metric?.interface,
+          x: new Date(timestamp * MILLISECONDS_MULTIPLIER),
+          y: Number(value),
+        })),
+      );
 
   const isReady = !isEmpty(chartData);
   const yMaxValue = useStableYMax(findNetworkMaxYValue(chartData), duration);
   const yRange = getChartYRange(yMaxValue);
 
-  const legendData: { childName: string; name: string }[] = !isEmpty(chartData)
-    ? (chartData?.map((series) => ({
-        childName: series?.[0]?.name,
-        name: series?.[0]?.name,
-      })) ?? [])
-    : [];
+  const legendData = chartData.map((series) => ({
+    childName: series?.[0]?.name,
+    name: series?.[0]?.name,
+  }));
 
   return (
     <ComponentReady isReady={isReady} linkToMetrics={link}>
@@ -87,7 +74,14 @@ const NetworkThresholdSingleSourceChart: FC<NetworkThresholdSingleSourceChartPro
               <CursorVoronoiContainer
                 cursorDimension="x"
                 labelComponent={
-                  <ChartLegendTooltip legendData={legendData} title={formatTooltipTitle} />
+                  <ChartLegendTooltip
+                    legendData={legendData}
+                    title={(datum: never): string =>
+                      (datum as ChartDatum)?.x?.getHours() +
+                      ':' +
+                      String((datum as ChartDatum)?.x?.getMinutes())?.padStart(2, '0')
+                    }
+                  />
                 }
                 labels={addTimestampToTooltip(formatNetworkThresholdSingleSourceTooltipData)}
                 mouseFollowTooltips

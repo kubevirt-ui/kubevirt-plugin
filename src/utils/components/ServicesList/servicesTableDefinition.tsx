@@ -1,17 +1,15 @@
-/* eslint-disable */
-import React, { ReactNode } from 'react';
+import React, { type ReactNode } from 'react';
 import classNames from 'classnames';
-import { TFunction } from 'i18next';
+import { type TFunction } from 'i18next';
 
-import { IoK8sApiCoreV1Service } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
-import { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
+import { type IoK8sApiCoreV1Service } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { modelToGroupVersionKind, NamespaceModel, ServiceModel } from '@kubevirt-utils/models';
 import { getLabels, getName, getNamespace, getUID } from '@kubevirt-utils/resources/shared';
 import MulticlusterResourceLink from '@multicluster/components/MulticlusterResourceLink/MulticlusterResourceLink';
 import { getCluster } from '@multicluster/helpers/selectors';
 
 import { LabelList } from '../Labels/LabelList';
-
 import { Selector } from './Selector/Selector';
 import ServiceActions from './ServiceActions';
 import ServiceLocation from './ServiceLocation';
@@ -82,7 +80,7 @@ export const getServicesColumns = (
   t: TFunction,
 ): ColumnConfig<IoK8sApiCoreV1Service, undefined>[] => [
   {
-    getValue: (r) => getName(r) ?? '',
+    getValue: (row) => getName(row) ?? '',
     key: 'name',
     label: t('Name'),
     props: { className: TABLE_COLUMN_CLASSES[0] },
@@ -90,7 +88,7 @@ export const getServicesColumns = (
     sortable: true,
   },
   {
-    getValue: (r) => getNamespace(r) ?? '',
+    getValue: (row) => getNamespace(row) ?? '',
     key: 'namespace',
     label: t('Namespace'),
     props: { className: classNames(TABLE_COLUMN_CLASSES[1], 'co-break-word') },
@@ -98,7 +96,7 @@ export const getServicesColumns = (
     sortable: true,
   },
   {
-    getValue: (r) => JSON.stringify(getLabels(r) ?? {}),
+    getValue: (row) => JSON.stringify(getLabels(row) ?? {}),
     key: 'labels',
     label: t('Labels'),
     props: { className: TABLE_COLUMN_CLASSES[2] },
@@ -106,7 +104,7 @@ export const getServicesColumns = (
     sortable: true,
   },
   {
-    getValue: (r) => JSON.stringify(r.spec?.selector ?? {}),
+    getValue: (row) => JSON.stringify(row.spec?.selector ?? {}),
     key: 'selector',
     label: t('Pod selector'),
     props: { className: TABLE_COLUMN_CLASSES[3] },
@@ -114,7 +112,7 @@ export const getServicesColumns = (
     sortable: true,
   },
   {
-    getValue: (r) => r.spec?.clusterIP ?? '',
+    getValue: (row) => row.spec?.clusterIP ?? '',
     key: 'location',
     label: t('Location'),
     props: { className: TABLE_COLUMN_CLASSES[4] },

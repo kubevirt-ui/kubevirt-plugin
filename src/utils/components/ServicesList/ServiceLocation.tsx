@@ -1,14 +1,13 @@
-import React, { type FC } from 'react';
+import React from 'react';
 
 import { type IoK8sApiCoreV1Service } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 
 type ServiceLocationProps = {
   service: IoK8sApiCoreV1Service;
 };
 
-const ServiceLocation: FC<ServiceLocationProps> = ({ service }) => {
+const ServiceLocation = ({ service }: ServiceLocationProps): React.ReactNode => {
   const { t } = useKubevirtTranslation();
 
   if (!service) {
@@ -20,15 +19,17 @@ const ServiceLocation: FC<ServiceLocationProps> = ({ service }) => {
       const clusterIP = service.spec.clusterIP ? `${service.spec.clusterIP}:` : '';
       return (
         <>
-          {service.spec.ports?.map((portObj) => (
-            <div
-              className="co-truncate co-select-to-copy"
-              key={`${portObj.port}-${portObj.protocol}`}
-            >
-              {clusterIP}
-              {portObj.nodePort}
-            </div>
-          ))}
+          {service.spec.ports?.map((portObj) => {
+            return (
+              <div
+                className="co-truncate co-select-to-copy"
+                key={`${portObj.port}-${portObj.nodePort}`}
+              >
+                {clusterIP}
+                {portObj.nodePort}
+              </div>
+            );
+          })}
         </>
       );
     }
@@ -39,11 +40,13 @@ const ServiceLocation: FC<ServiceLocationProps> = ({ service }) => {
       }
       return (
         <>
-          {service.status.loadBalancer.ingress.map((ingress) => (
-            <div className="co-truncate co-select-to-copy" key={ingress.hostname ?? ingress.ip}>
-              {ingress.hostname ?? ingress.ip ?? NO_DATA_DASH}
-            </div>
-          ))}
+          {service.status.loadBalancer.ingress.map((ingress) => {
+            return (
+              <div className="co-truncate co-select-to-copy" key={ingress.hostname ?? ingress.ip}>
+                {ingress.hostname ?? ingress.ip ?? '-'}
+              </div>
+            );
+          })}
         </>
       );
     }

@@ -9,21 +9,22 @@ import { isEqualObject } from '@kubevirt-utils/components/NodeSelectorModal/util
 import { ROOTDISK } from '@kubevirt-utils/constants/constants';
 import { getDiskSource } from '@virtualmachines/wizard/steps/TemplateStep/components/TemplatesCatalogDrawer/utils/utils';
 
-type DefaultVMSourceResult = {
+type UseDefaultVMSourceResult = {
   currentDiskSource: undefined | V1beta1DataVolumeSpec | V1ContainerDiskSource;
   isDefaultDiskSource: boolean;
   updateDefaultDiskSource: (generatedVM: V1VirtualMachine) => void;
 };
 
-const useDefaultVMSource = (virtualMachine: V1VirtualMachine): DefaultVMSourceResult => {
+const useDefaultVMSource = (vm: V1VirtualMachine): UseDefaultVMSourceResult => {
   const [defaultDiskSource, setDefaultDiskSource] = useState<
     V1beta1DataVolumeSpec | V1ContainerDiskSource
   >();
 
-  const currentDiskSource = getDiskSource(virtualMachine, ROOTDISK);
+  const currentDiskSource = getDiskSource(vm, ROOTDISK);
 
   const updateDefaultDiskSource = useCallback((generatedVM: V1VirtualMachine): void => {
     const source = getDiskSource(generatedVM, ROOTDISK);
+
     setDefaultDiskSource(source);
   }, []);
 
