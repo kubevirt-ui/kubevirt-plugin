@@ -1,7 +1,6 @@
-/* eslint-disable */
-import classNames from 'classnames';
-import React, { FC, useMemo } from 'react';
+import React, { type FC, useMemo } from 'react';
 import { useWatch } from 'react-hook-form';
+import classNames from 'classnames';
 
 import { instanceTypeSeriesNameMapper } from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/InstanceTypeDrilldownSelect/utils/constants';
 import { type RedHatInstanceTypeSeries } from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/InstanceTypeDrilldownSelect/utils/types';

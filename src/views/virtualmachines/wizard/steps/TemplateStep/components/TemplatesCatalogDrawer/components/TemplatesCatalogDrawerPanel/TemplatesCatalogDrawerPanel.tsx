@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC, memo, useCallback, useEffect, useState } from 'react';
+import React, { type FC, memo, useCallback, useEffect, useState } from 'react';
 import { useWatch } from 'react-hook-form';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -45,7 +44,7 @@ const TemplatesCatalogDrawerPanel: FC = memo(() => {
     }
   }, [templateProcessError, hasRequiredParameters]);
 
-  const handleTabKey = useCallback((_: unknown, tabKey: TemplatesDrawerTabKey): void => {
+  const handleTabKey = useCallback((_event: unknown, tabKey: TemplatesDrawerTabKey): void => {
     setActiveTabKey(tabKey);
   }, []);
 

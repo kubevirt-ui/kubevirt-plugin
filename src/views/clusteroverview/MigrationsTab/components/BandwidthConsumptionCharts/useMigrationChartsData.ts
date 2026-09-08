@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { useMemo } from 'react';
 
 import { getPrometheusData } from '@kubevirt-utils/components/Charts/utils/utils';
@@ -9,7 +8,7 @@ import useActiveClusterParam from '@multicluster/hooks/useActiveClusterParam';
 import { PrometheusEndpoint } from '@openshift-console/dynamic-plugin-sdk';
 import { useFleetPrometheusPoll, useHubClusterName } from '@stolostron/multicluster-sdk';
 
-import { ChartDataObject } from './constants';
+import { type ChartDataObject } from './constants';
 import { getBaseQuery, mapPrometheusValues } from './utils';
 
 type UseMigrationChartsData = (
@@ -78,8 +77,8 @@ export const useMigrationChartsData: UseMigrationChartsData = (duration, current
     countLoaded,
     errorBandwidth,
     errorCount,
-    maxBandwidthConsumed: Math.max(...(bandwidthConsumed || []).map((o) => o.y), 0),
-    maxMigrationCount: Math.max(...(migrationsCount || []).map((o) => o.y), 0),
+    maxBandwidthConsumed: Math.max(...(bandwidthConsumed || []).map((item) => item.y), 0),
+    maxMigrationCount: Math.max(...(migrationsCount || []).map((item) => item.y), 0),
     migrationsCount,
   };
 };

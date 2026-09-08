@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { useMemo } from 'react';
 
 import {
@@ -10,14 +9,14 @@ import {
 import { DataVolumeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { VirtualMachineSnapshotModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
-  V1beta1CDIConfig,
-  V1beta1DataVolume,
+  type V1beta1CDIConfig,
+  type V1beta1DataVolume,
 } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
-import { IoK8sApiCoreV1Secret } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
-import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type IoK8sApiCoreV1Secret } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import {
-  V1beta1VirtualMachineSnapshot,
-  V1VirtualMachine,
+  type V1beta1VirtualMachineSnapshot,
+  type V1VirtualMachine,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getRootDiskSecretRef, getVolumes } from '@kubevirt-utils/resources/vm';
@@ -27,7 +26,7 @@ import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 import { findPVCOwner } from '../utils/helpers';
 
 type UseDeleteVMResourcesResult = {
-  error: any;
+  error: Error;
   loaded: boolean;
   secrets: IoK8sApiCoreV1Secret[];
   snapshots: V1beta1VirtualMachineSnapshot[];
@@ -40,7 +39,7 @@ const useDeleteVMResources = (vm: V1VirtualMachine): UseDeleteVMResourcesResult 
   const vmName = getName(vm);
   const dvSecretRef = getRootDiskSecretRef(vm);
 
-  const vmVolumes = useMemo(() => getVolumes(vm) || [], [vm]);
+  const vmVolumes = useMemo(() => getVolumes(vm) ?? [], [vm]);
 
   const dvVolumeNames = useMemo(
     () => vmVolumes.filter((volume) => volume?.dataVolume).map((volume) => volume.dataVolume.name),
@@ -100,7 +99,7 @@ const useDeleteVMResources = (vm: V1VirtualMachine): UseDeleteVMResourcesResult 
   });
 
   const dataVolumes = useMemo(
-    () => allDataVolumes?.filter((dv) => dvVolumeNames.includes(getName(dv))) ?? [],
+    () => allDataVolumes?.filter((dataVolume) => dvVolumeNames.includes(getName(dataVolume))) ?? [],
     [allDataVolumes, dvVolumeNames],
   );
 

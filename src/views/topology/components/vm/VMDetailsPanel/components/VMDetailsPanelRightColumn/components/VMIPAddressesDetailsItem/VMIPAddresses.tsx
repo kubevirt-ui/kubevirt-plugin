@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Button, ButtonVariant, Popover, PopoverPosition } from '@patternfly/react-core';
@@ -21,7 +20,8 @@ const VMIPAddresses: FC<VMIPAddressesProps> = ({ ipAddresses }) => {
       {multipleIPsExist && (
         <Popover
           bodyContent={
-            Array.isArray(ipAddresses) && ipAddresses?.map((ip) => <div key={ip}>{ip}</div>)
+            Array.isArray(ipAddresses) &&
+            ipAddresses?.map((ipAddr) => <div key={ipAddr}>{ipAddr}</div>)
           }
           hasAutoWidth
           headerContent={<div>{t('IP Addresses ({{ips}})', { ips: numIPs })}</div>}

@@ -1,13 +1,12 @@
-/* eslint-disable */
 import { MigPlanModel } from '@kubevirt-utils/models';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 
 import {
   K8S_CONDITION_STATUS_TRUE,
-  MigPlan,
-  MigrationStatus,
+  type MigPlan,
+  type MigrationStatus,
   MTC_PLAN_VM_PLACEHOLDER,
-  MultiNamespaceVirtualMachineStorageMigrationPlan,
+  type MultiNamespaceVirtualMachineStorageMigrationPlan,
   STATUS_READY,
   STORAGE_MIGRATION_PHASE,
 } from '../constants';
@@ -30,22 +29,22 @@ export const normalizeMTCPlanForOverview = (
   migPlan: MigPlan,
 ): MultiNamespaceVirtualMachineStorageMigrationPlan => {
   const nsNames = getMigPlanSpecNamespaces(migPlan);
-  const pvs = getMigPlanSpecPersistentVolumes(migPlan);
+  const persistentVolumes = getMigPlanSpecPersistentVolumes(migPlan);
 
   const spec: MultiNamespaceVirtualMachineStorageMigrationPlan['spec'] = {
     namespaces: nsNames.map((nsName) => {
-      const nsPvs = pvs.filter((pv) => getMigPlanPVCNamespace(pv) === nsName);
+      const nsPvs = persistentVolumes.filter((volume) => getMigPlanPVCNamespace(volume) === nsName);
       return {
         name: nsName,
         virtualMachines: !isEmpty(nsPvs)
           ? [
               {
                 name: MTC_PLAN_VM_PLACEHOLDER,
-                targetMigrationPVCs: nsPvs.map((pv) => ({
+                targetMigrationPVCs: nsPvs.map((volume) => ({
                   destinationPVC: {
-                    storageClassName: pv.selection?.storageClass,
+                    storageClassName: volume.selection?.storageClass,
                   },
-                  volumeName: getMigPlanPVCName(pv) ?? pv.name ?? '',
+                  volumeName: getMigPlanPVCName(volume) ?? volume.name ?? '',
                 })),
               },
             ]

@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC, useEffect, useMemo, useState } from 'react';
+import React, { type FC, useEffect, useMemo, useState } from 'react';
 import { useLocation } from 'react-router';
 
 import ConfigurationSearch from '@kubevirt-utils/components/ConfigurationSearch/ConfigurationSearch';
@@ -35,7 +34,7 @@ const CustomizeVMTabs: FC = () => {
     setActiveTabKey(targetTab);
   }, [location, searchItems, tabs]);
 
-  // TODO: check why we return loading when vm is empty
+  // Check why we return loading when vm is empty
   if (!vm) {
     return <Loading />;
   }
@@ -45,16 +44,16 @@ const CustomizeVMTabs: FC = () => {
       <ConfigurationSearch createSearchURL={getWizardSearchUrlPath} searchItems={searchItems} />
       <div className="configuration-tab--body">
         <Tabs activeKey={activeTabKey}>
-          {tabs.map(({ Component, name, title }) => (
+          {tabs.map((tab) => (
             <Tab
               className="pf-v6-u-mt-lg"
-              data-test={`vm-configuration-${name}`}
-              eventKey={name}
-              key={name}
-              onClick={() => setActiveTabKey(name)}
-              title={<TabTitleText>{title}</TabTitleText>}
+              data-test={`vm-configuration-${tab.name}`}
+              eventKey={tab.name}
+              key={tab.name}
+              onClick={() => setActiveTabKey(tab.name)}
+              title={<TabTitleText>{tab.title}</TabTitleText>}
             >
-              {activeTabKey === name && <Component />}
+              {activeTabKey === tab.name && <tab.Component />}
             </Tab>
           ))}
         </Tabs>

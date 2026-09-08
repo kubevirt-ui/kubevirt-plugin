@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC, useEffect, useMemo, useState } from 'react';
+import React, { type FC, useEffect, useMemo, useState } from 'react';
 import { useWatch } from 'react-hook-form';
 
 import { getInstanceTypeMenuItems } from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/InstanceTypeDrilldownSelect/utils/utils';
@@ -41,7 +40,7 @@ const SelectInstanceTypeSection: FC = () => {
 
   if (!loaded) return <Loading />;
 
-  const handleTabClick = (_, tabIndex: TabKey) => {
+  const handleTabClick = (_event, tabIndex: TabKey): void => {
     setActiveTabKey(tabIndex);
   };
 

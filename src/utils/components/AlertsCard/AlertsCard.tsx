@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC, useMemo } from 'react';
+import React, { type FC, useMemo } from 'react';
 import { Link } from 'react-router';
 import classNames from 'classnames';
 
@@ -10,7 +9,7 @@ import {
   ALL_VIRT_ALERTS_URL_PARAMS,
   VIRTUALIZATION_ONLY_ALERTS,
 } from '@kubevirt-utils/components/AlertsCard/utils/constants';
-import { SimplifiedAlerts } from '@kubevirt-utils/components/AlertsCard/utils/types';
+import { type SimplifiedAlerts } from '@kubevirt-utils/components/AlertsCard/utils/types';
 import {
   alertScopeOptions,
   removeVMAlerts,
@@ -69,7 +68,7 @@ const AlertsCard: FC<AlertsCardProps> = ({ className, isOverviewPage = false, so
                 )}
                 {isAdmin ? (
                   <FormPFSelect
-                    onSelect={(_e, value) => setAlertScope(value)}
+                    onSelect={(_event, value) => setAlertScope(value)}
                     popperProps={{ position: 'right' }}
                     selected={alertScope}
                     toggleProps={{ id: 'overview-alerts-card' }}
@@ -86,10 +85,10 @@ const AlertsCard: FC<AlertsCardProps> = ({ className, isOverviewPage = false, so
                   </FormPFSelect>
                 ) : (
                   <Popover
+                    aria-label="Only VM-related alerts notification"
                     bodyContent={
                       <div>{t('Only VM-related alerts in your project will be shown')}</div>
                     }
-                    aria-label="Only VM-related alerts notification"
                     className="alerts-card__nonadmin-popover"
                     enableFlip={false}
                     hasAutoWidth
@@ -97,7 +96,7 @@ const AlertsCard: FC<AlertsCardProps> = ({ className, isOverviewPage = false, so
                     position={PopoverPosition.top}
                   >
                     <FormPFSelect
-                      onSelect={(_e, value) => setAlertScope(value)}
+                      onSelect={(_event, value) => setAlertScope(value)}
                       selected={alertScope}
                       toggleProps={{ id: 'overview-alerts-card' }}
                     >

@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 import { useWatch } from 'react-hook-form';
 
 import { useRunStrategyToggle } from '@kubevirt-utils/components/RunStrategyModal/useRunStrategyToggle';
@@ -49,13 +48,13 @@ const ReviewAndCreateStep: FC = () => {
       <StackItem isFilled />
       <StackItem>
         <Checkbox
-          onChange={(_, checked: boolean) => {
-            const { newStrategy } = onToggle(checked);
-            patchCustomizeWizardVMSignal([{ data: newStrategy, path: 'spec.runStrategy' }]);
-          }}
           id={START_AFTER_CREATION_CHECKBOX_ID}
           isChecked={isStartChecked}
           label={getStartAfterCreationLabel(t)}
+          onChange={(_event, checked: boolean) => {
+            const { newStrategy } = onToggle(checked);
+            patchCustomizeWizardVMSignal([{ data: newStrategy, path: 'spec.runStrategy' }]);
+          }}
         />
       </StackItem>
     </Stack>

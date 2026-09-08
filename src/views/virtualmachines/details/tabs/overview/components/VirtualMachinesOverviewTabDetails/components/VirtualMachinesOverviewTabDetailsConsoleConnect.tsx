@@ -1,6 +1,5 @@
-/* eslint-disable */
-import React, { FC } from 'react';
-import cn from 'classnames';
+import React, { type FC } from 'react';
+import classNames from 'classnames';
 
 import LoadingEmptyState from '@kubevirt-utils/components/LoadingEmptyState/LoadingEmptyState';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -24,7 +23,7 @@ const VirtualMachinesOverviewTabDetailsConsoleConnect: FC<
     <div className="vnc-no-connection-placeholder">
       {isConnecting && <LoadingEmptyState bodyContents={t('Connecting')} />}
       {!isConnecting && (
-        <div className={cn('vnc-grey-background', isDisabled && 'disabled')}>
+        <div className={classNames('vnc-grey-background', isDisabled && 'disabled')}>
           {!isDisabled && (
             <Icon onClick={connect} size="md">
               {isSessionAlreadyInUse ? (

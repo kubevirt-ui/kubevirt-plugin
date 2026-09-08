@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { Dispatch, FC, SetStateAction } from 'react';
+import React, { type Dispatch, type FC, type SetStateAction } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FormGroup, TextInput } from '@patternfly/react-core';
@@ -16,7 +15,7 @@ const NameFormField: FC<NameFormFieldProps> = ({ objName, setObjName }) => {
     <FormGroup fieldId="name" isRequired label={t('Name')}>
       <TextInput
         id="name"
-        onChange={(_, name: string) => setObjName(name)}
+        onChange={(_event, name: string) => setObjName(name)}
         type="text"
         value={objName}
       />

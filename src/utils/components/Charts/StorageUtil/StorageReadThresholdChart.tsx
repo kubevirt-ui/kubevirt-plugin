@@ -1,7 +1,6 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
-import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import useVMQueries from '@kubevirt-utils/hooks/useVMQueries';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -52,8 +51,8 @@ const StorageReadThresholdChart: FC<StorageThresholdChartProps> = ({ vmi }) => {
   const isLoading = !loaded;
   const storageWriteData = data?.data?.result?.[0]?.values;
 
-  const chartData = storageWriteData?.map(([x, y]) => {
-    return { x: new Date(x * MILLISECONDS_MULTIPLIER), y: Number(y) / GIB_IN_BYTES };
+  const chartData = storageWriteData?.map(([timestamp, value]) => {
+    return { x: new Date(timestamp * MILLISECONDS_MULTIPLIER), y: Number(value) / GIB_IN_BYTES };
   });
 
   return (
@@ -75,21 +74,21 @@ const StorageReadThresholdChart: FC<StorageThresholdChartProps> = ({ vmi }) => {
           width={width}
         >
           <ChartAxis
+            axisComponent={<></>}
             style={{
               ticks: { stroke: 'transparent' },
             }}
-            axisComponent={<></>}
             tickCount={TICKS_COUNT}
             tickFormat={tickFormat(duration, currentTime)}
           />
           <ChartGroup>
             <ChartArea
+              data={chartData}
               style={{
                 data: {
                   stroke: chart_color_blue_300.value,
                 },
               }}
-              data={chartData}
             />
           </ChartGroup>
         </Chart>

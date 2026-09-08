@@ -1,11 +1,10 @@
-/* eslint-disable */
 import { PersistentVolumeClaimModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { DataSourceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
+import { type V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import {
-  V1beta1DataVolumeSourcePVC,
-  V1beta1DataVolumeSourceRef,
-  V1VirtualMachine,
+  type V1beta1DataVolumeSourcePVC,
+  type V1beta1DataVolumeSourceRef,
+  type V1VirtualMachine,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { ROOTDISK } from '@kubevirt-utils/constants/constants';
 import { getName } from '@kubevirt-utils/resources/shared';
@@ -14,7 +13,7 @@ import {
   BOOT_SOURCE_LABELS,
   DATA_SOURCE_CRONJOB_LABEL,
 } from '@kubevirt-utils/resources/template';
-import { TemplateBootSource } from '@kubevirt-utils/resources/template/hooks/useVmTemplateSource/utils';
+import { type TemplateBootSource } from '@kubevirt-utils/resources/template/hooks/useVmTemplateSource/utils';
 import {
   getDataVolumeTemplates,
   getRootDataVolumeTemplateSpec,
@@ -35,7 +34,7 @@ export const getPVCSourceOrSourceRef = (
     (vol) => vol.name === bootDisk?.name || vol.name === ROOTDISK,
   );
   const dataVolumeTemplate = getDataVolumeTemplates(vm)?.find(
-    (dv) => getName(dv) === volume?.dataVolume?.name,
+    (dvTemplate) => getName(dvTemplate) === volume?.dataVolume?.name,
   );
   const sourceRef = dataVolumeTemplate?.spec?.sourceRef;
   const pvc = dataVolumeTemplate?.spec?.source?.pvc;
@@ -64,7 +63,7 @@ export const getVMBootSourceType = (vm: V1VirtualMachine): TemplateBootSource =>
   const bootDisk = getBootDisk(vm);
   const volume = getVolumes(vm)?.find((vol) => vol.name === bootDisk?.name);
   const dataVolumeTemplate = vm?.spec?.dataVolumeTemplates?.find(
-    (dv) => dv.metadata?.name === volume?.dataVolume?.name,
+    (dvTemplate) => dvTemplate.metadata?.name === volume?.dataVolume?.name,
   );
 
   if (dataVolumeTemplate?.spec?.sourceRef) {
@@ -141,17 +140,17 @@ export const getVMBootSourceLabel = (
   if (BOOT_SOURCE.DATA_SOURCE && dataSource?.metadata?.labels?.[DATA_SOURCE_CRONJOB_LABEL])
     return BOOT_SOURCE_LABELS[BOOT_SOURCE.DATA_SOURCE_AUTO_IMPORT] || 'N/A';
 
-  return BOOT_SOURCE_LABELS[bootSourceType] || 'N/A';
+  return BOOT_SOURCE_LABELS[bootSourceType] ?? 'N/A';
 };
 
-export const vmBootDiskSourceIsRegistry = (vm: V1VirtualMachine) => {
+export const vmBootDiskSourceIsRegistry = (vm: V1VirtualMachine): boolean => {
   const rootDataVolumeTemplateSpec = getRootDataVolumeTemplateSpec(vm);
   return Boolean(rootDataVolumeTemplateSpec?.spec?.source?.registry);
 };
 
-export const getVMPVCNames = (vm: V1VirtualMachine) =>
+export const getVMPVCNames = (vm: V1VirtualMachine): string[] | undefined =>
   getVolumes(vm)?.reduce((acc, volume) => {
-    const pvcName = volume.persistentVolumeClaim?.claimName || volume.dataVolume?.name;
+    const pvcName = volume.persistentVolumeClaim?.claimName ?? volume.dataVolume?.name;
     if (pvcName) {
       acc.push(pvcName);
     }

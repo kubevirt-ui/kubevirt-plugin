@@ -1,4 +1,3 @@
-/* eslint-disable */
 /** Contains significant parts of https://github.com/xtermjs/xterm.js/blob/c4b707e9ca8ba8e27cecb859fe80ccebeca7375a/addons/addon-attach/src/AttachAddon.ts
  *  Original comments and copyrights retained below.
  */
@@ -13,9 +12,9 @@
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import type { IDisposable, ITerminalAddon, Terminal } from '@xterm/xterm';
 
-interface IAttachOptions {
+type IAttachOptions = {
   bidirectional?: boolean;
-}
+};
 
 /**
  * Contrary to the @xterm/addon-attach use binaryType = 'blob' when sending/receiving to/from the server.
@@ -33,7 +32,7 @@ export class BlobOnlyAttachAddon implements ITerminalAddon {
     this._socket = socket;
     // enforce blob
     this._socket.binaryType = 'blob';
-    this._bidirectional = !(options && options.bidirectional === false);
+    this._bidirectional = options?.bidirectional !== false;
   }
 
   private _checkOpenSocket(): boolean {
@@ -61,10 +60,10 @@ export class BlobOnlyAttachAddon implements ITerminalAddon {
 
   public activate(terminal: Terminal): void {
     this._disposables.push(
-      addSocketListener(this._socket, 'message', (ev) => {
-        const data: Blob = ev.data;
+      addSocketListener(this._socket, 'message', (event) => {
+        const data = event.data as Blob;
         const reader = new FileReader();
-        reader.onload = () => {
+        reader.onload = (): void => {
           if (typeof reader.result === 'string') {
             terminal.write(reader.result);
           }
@@ -82,8 +81,8 @@ export class BlobOnlyAttachAddon implements ITerminalAddon {
   }
 
   public dispose(): void {
-    for (const d of this._disposables) {
-      d.dispose();
+    for (const disposable of this._disposables) {
+      disposable.dispose();
     }
   }
 }
@@ -98,11 +97,11 @@ export class BlobOnlyAttachAddon implements ITerminalAddon {
 export function addSocketListener<K extends keyof WebSocketEventMap>(
   socket: WebSocket,
   type: K,
-  handler: (this: WebSocket, ev: WebSocketEventMap[K]) => any,
+  handler: (this: WebSocket, event: WebSocketEventMap[K]) => void,
 ): IDisposable {
   socket.addEventListener(type, handler);
   return {
-    dispose: () => {
+    dispose: (): void => {
       if (!handler) {
         // Already disposed
         return;

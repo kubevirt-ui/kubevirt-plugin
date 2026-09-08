@@ -1,6 +1,5 @@
-/* eslint-disable */
 import React from 'react';
-import cn from 'classnames';
+import classNames from 'classnames';
 
 import { NAME_COLUMN_ID } from '@kubevirt-utils/components/ColumnManagementModal/constants';
 import useNamespaceParam from '@kubevirt-utils/hooks/useNamespaceParam';
@@ -14,6 +13,22 @@ import {
 } from '@openshift-console/dynamic-plugin-sdk';
 import { ExpandableRowContent, Tbody, Td, Tr } from '@patternfly/react-table';
 
+type DiagnosticTabRowProps = {
+  activeColumns: { id: string }[];
+  dataVolumeResourceLink?: boolean;
+  expend: { expended: Set<string>; ids: Set<string> };
+  index: number;
+  obj: {
+    [key: string]: unknown;
+    cluster?: string;
+    id?: string;
+    message?: string;
+    metadata?: { name?: string; namespace?: string };
+    status?: string;
+  };
+  setExpend: React.Dispatch<React.SetStateAction<{ expended: Set<string>; ids: Set<string> }>>;
+};
+
 const VirtualMachineDiagnosticTabRow = ({
   activeColumns,
   dataVolumeResourceLink = false,
@@ -21,21 +36,21 @@ const VirtualMachineDiagnosticTabRow = ({
   index,
   obj,
   setExpend,
-}) => {
+}: DiagnosticTabRowProps): React.JSX.Element => {
   const namespace = useNamespaceParam();
 
-  const isExpanded = expend?.expended.has(obj?.id) && obj?.message;
+  const isExpanded = expend?.expended.has(obj?.id) && !!obj?.message;
   const activeColumnsObj = new Set<string>(activeColumns.map(({ id }) => id));
 
   return (
     <Tbody isExpanded={isExpanded}>
-      <Tr className={cn({ 'VirtualMachineDiagnosticTabRow--row': isExpanded })}>
+      <Tr className={classNames({ 'VirtualMachineDiagnosticTabRow--row': isExpanded })}>
         <Td
           expand={
             obj?.message && {
               expandId: `message-${index}`,
               isExpanded,
-              onToggle: () =>
+              onToggle: (): void =>
                 setExpend((expendObj) => {
                   isExpanded ? expendObj.expended.delete(obj?.id) : expendObj.expended.add(obj?.id);
                   return { expended: new Set(expendObj.expended), ids: new Set(expendObj.ids) };
@@ -54,7 +69,7 @@ const VirtualMachineDiagnosticTabRow = ({
                 namespace={namespace}
               />
             ) : (
-              obj?.[column]?.toString() || NO_DATA_DASH
+              (obj?.[column]?.toString() ?? NO_DATA_DASH)
             )}
           </Td>
         ))}

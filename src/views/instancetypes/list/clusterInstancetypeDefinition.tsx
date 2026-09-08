@@ -1,14 +1,13 @@
-/* eslint-disable */
-import React from 'react';
-import { TFunction } from 'i18next';
+import React, { type JSX } from 'react';
+import { type TFunction } from 'i18next';
 import { parseSize } from 'xbytes';
 
 import { VirtualMachineClusterInstancetypeModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1beta1VirtualMachineClusterInstancetype } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1beta1VirtualMachineClusterInstancetype } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getK8sRowId } from '@kubevirt-utils/components/KubevirtTable/utils';
 import RedHatLabel from '@kubevirt-utils/components/RedHatLabel/RedHatLabel';
 import { VENDOR_LABEL } from '@kubevirt-utils/constants/constants';
-import { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
+import { type ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { getLabel, getName } from '@kubevirt-utils/resources/shared';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { getHumanizedSize } from '@kubevirt-utils/utils/units';
@@ -17,7 +16,7 @@ import { getCluster } from '@multicluster/helpers/selectors';
 
 import ClusterInstancetypeActions from '../actions/ClusterInstancetypeActions';
 
-const NameCell = ({ row }: { row: V1beta1VirtualMachineClusterInstancetype }) => (
+const NameCell = ({ row }: { row: V1beta1VirtualMachineClusterInstancetype }): JSX.Element => (
   <span data-test={getName(row)}>
     <MulticlusterResourceLink
       cluster={getCluster(row)}
@@ -29,30 +28,30 @@ const NameCell = ({ row }: { row: V1beta1VirtualMachineClusterInstancetype }) =>
   </span>
 );
 
-const ClusterCell = ({ row }: { row: V1beta1VirtualMachineClusterInstancetype }) => (
+const ClusterCell = ({ row }: { row: V1beta1VirtualMachineClusterInstancetype }): JSX.Element => (
   <>{getCluster(row) ?? NO_DATA_DASH}</>
 );
 
-const CPUCell = ({ row }: { row: V1beta1VirtualMachineClusterInstancetype }) => (
+const CPUCell = ({ row }: { row: V1beta1VirtualMachineClusterInstancetype }): React.JSX.Element => (
   <>{row?.spec?.cpu?.guest ?? NO_DATA_DASH}</>
 );
 
-const MemoryCell = ({ row }: { row: V1beta1VirtualMachineClusterInstancetype }) => {
+const MemoryCell = ({ row }: { row: V1beta1VirtualMachineClusterInstancetype }): JSX.Element => {
   const memory = row?.spec?.memory?.guest;
   if (!memory) return <>{NO_DATA_DASH}</>;
   return <>{getHumanizedSize(String(memory))?.string ?? NO_DATA_DASH}</>;
 };
 
-const VendorCell = ({ row }: { row: V1beta1VirtualMachineClusterInstancetype }) => (
+const VendorCell = ({ row }: { row: V1beta1VirtualMachineClusterInstancetype }): JSX.Element => (
   <>{getLabel(row, VENDOR_LABEL, NO_DATA_DASH)}</>
 );
 
-const ActionsCell = ({ row }: { row: V1beta1VirtualMachineClusterInstancetype }) => (
+const ActionsCell = ({ row }: { row: V1beta1VirtualMachineClusterInstancetype }): JSX.Element => (
   <ClusterInstancetypeActions instanceType={row} isKebabToggle />
 );
 
-const getMemoryValue = (it: V1beta1VirtualMachineClusterInstancetype): number => {
-  const memory = it?.spec?.memory?.guest;
+const getMemoryValue = (instanceType: V1beta1VirtualMachineClusterInstancetype): number => {
+  const memory = instanceType?.spec?.memory?.guest;
   if (!memory) return 0;
   try {
     return parseSize(`${memory}B`);
@@ -112,6 +111,6 @@ export const getClusterInstancetypeColumns = (
 ];
 
 export const getClusterInstancetypeRowId = (
-  it: V1beta1VirtualMachineClusterInstancetype,
+  instanceType: V1beta1VirtualMachineClusterInstancetype,
   index: number,
-): string => getK8sRowId(it, index, 'cluster-instancetype');
+): string => getK8sRowId(instanceType, index, 'cluster-instancetype');

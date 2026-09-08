@@ -1,9 +1,8 @@
-/* eslint-disable */
-import React, { FC, Fragment, Suspense, useState } from 'react';
+import React, { type FC, Fragment, Suspense, useState } from 'react';
 import { Trans } from 'react-i18next';
 import RandExp from 'randexp';
 
-import { V1Volume } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1Volume } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Loading } from '@patternfly/quickstarts';
@@ -20,10 +19,9 @@ import {
 import { EyeIcon, EyeSlashIcon } from '@patternfly/react-icons';
 
 import FormGroupHelperText from '../FormGroupHelperText/FormGroupHelperText';
-
-import { CloudInitNetworkData, CloudInitUserData } from './utils/cloudinit-utils';
 import CloudInitEditor from './CloudInitEditor';
 import { CloudinitNetworkForm } from './CloudInitNetworkForm';
+import { type CloudInitNetworkData, type CloudInitUserData } from './utils/cloudinit-utils';
 
 type CloudinitFormProps = {
   cloudInitVolume: V1Volume;
@@ -74,11 +72,11 @@ const CloudinitForm: FC<CloudinitFormProps> = ({
             required
           >
             <TextInput
-              onChange={(_event, v) => {
-                setSubmitDisabled(isEmpty(v));
-                updateUserField('user', v);
-              }}
               id={'cloudinit-user'}
+              onChange={(_event, val) => {
+                setSubmitDisabled(isEmpty(val));
+                updateUserField('user', val);
+              }}
               type="text"
               value={userData?.user || ''}
             />
@@ -92,7 +90,7 @@ const CloudinitForm: FC<CloudinitFormProps> = ({
               <InputGroupItem isFill>
                 <TextInput
                   id="cloudinit-password"
-                  onChange={(_event, v) => updateUserField('password', v)}
+                  onChange={(_event, val) => updateUserField('password', val)}
                   type={passwordHidden ? 'password' : 'text'}
                   value={userData?.password || ''}
                 />
@@ -110,13 +108,13 @@ const CloudinitForm: FC<CloudinitFormProps> = ({
               <Trans ns="plugin__kubevirt-plugin" t={t}>
                 Password for this username -{' '}
                 <Button
+                  isInline
                   onClick={() =>
                     updateUserField(
                       'password',
                       new RandExp(/[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}/).gen(),
                     )
                   }
-                  isInline
                   variant={ButtonVariant.link}
                 >
                   generate password

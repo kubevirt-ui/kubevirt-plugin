@@ -1,11 +1,10 @@
-/* eslint-disable */
-import { TFunction } from 'i18next';
+import { type TFunction } from 'i18next';
 
 import { VirtualMachineDetailsTab } from '@kubevirt-utils/constants/tabs-constants';
-import { LabelProps } from '@patternfly/react-core';
+import { type LabelProps } from '@patternfly/react-core';
 
 import { INVERTED_CONDITION_TYPES, SEVERITY_TO_CONDITION } from './constants';
-import { DiagnosticFilters, DiagnosticSeverity } from './types';
+import { type DiagnosticFilters, type DiagnosticSeverity } from './types';
 
 export const isActiveFilter = (filters: DiagnosticFilters, searchText: string): boolean =>
   filters.categories.size > 0 || filters.conditions.size > 0 || searchText.trim().length > 0;
@@ -29,7 +28,7 @@ export const filterBySearchText = (
   const trimmed = searchText?.trim();
   if (!trimmed) return true;
   const lower = trimmed.toLowerCase();
-  return fields.some((f) => f?.toLowerCase().includes(lower));
+  return fields.some((field) => field?.toLowerCase().includes(lower));
 };
 
 const DV_FAILED_PHASES = new Set(['Failed', 'Unknown']);

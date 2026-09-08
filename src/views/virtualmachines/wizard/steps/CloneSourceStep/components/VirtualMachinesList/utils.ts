@@ -1,27 +1,26 @@
-/* eslint-disable */
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
-import { PaginationState } from '@kubevirt-utils/hooks/usePagination/utils/types';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
+import { type PaginationState } from '@kubevirt-utils/hooks/usePagination/utils/types';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { isVM } from '@kubevirt-utils/utils/typeGuards';
 import { isEmpty, truncateToK8sName } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
-import { TableColumn } from '@openshift-console/dynamic-plugin-sdk';
-import { VMCallbacks } from '@virtualmachines/list/virtualMachinesDefinition';
+import { type TableColumn } from '@openshift-console/dynamic-plugin-sdk';
+import { type VMCallbacks } from '@virtualmachines/list/virtualMachinesDefinition';
 import {
   getVMIFromMapper,
   getVMIMFromMapper,
-  PVCMapper,
-  VMIMapper,
-  VMIMMapper,
+  type PVCMapper,
+  type VMIMapper,
+  type VMIMMapper,
 } from '@virtualmachines/utils/mappers';
 
-// TODO: Refactor these functions. This is an initial implementation copied from the Virtual Machines list component.
+// Refactor these functions. This is an initial implementation copied from the Virtual Machines list component.
 
 const getActiveColumnsManagedKeys = <TCallbacks>(
   activeColumns: TableColumn<V1VirtualMachine>[] | undefined,
   manageableColumns: ColumnConfig<V1VirtualMachine, TCallbacks>[],
-) => {
+): string[] => {
   if (isEmpty(activeColumns)) {
     const managedKeys = manageableColumns.reduce<string[]>((keys, col) => {
       if (!col.additional) {

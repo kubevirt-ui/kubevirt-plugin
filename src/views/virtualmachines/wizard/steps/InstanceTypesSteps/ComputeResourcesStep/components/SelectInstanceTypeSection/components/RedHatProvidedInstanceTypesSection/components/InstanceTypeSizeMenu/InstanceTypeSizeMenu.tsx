@@ -1,8 +1,7 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 import { Controller, useWatch } from 'react-hook-form';
 
-import { InstanceTypeSize } from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/InstanceTypeDrilldownSelect/utils/types';
+import { type InstanceTypeSize } from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/InstanceTypeDrilldownSelect/utils/types';
 import { logITFlowEvent } from '@kubevirt-utils/extensions/telemetry/telemetry';
 import { INSTANCETYPE_SELECTED } from '@kubevirt-utils/extensions/telemetry/utils/constants';
 import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
@@ -18,14 +17,16 @@ const InstanceTypeSizeMenu: FC<InstanceTypeSizeMenuProps> = ({ instanceTypeSizes
   const selectedSeries = useWatch({
     control,
     name: CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.SELECTED_SERIES,
-  });
+  }) as string | undefined;
 
   if (!instanceTypeSizes) return null;
 
   return (
     <div className="instance-type-series-menu-card__size-dropdown">
       <Controller
-        render={({ field: { onChange, ref: _, value } }) => (
+        control={control}
+        name={CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.SELECTED_SIZE}
+        render={({ field: { onChange, ref: _ref, value } }) => (
           <InstanceTypeSizeDropdown
             onSizeSelect={(size: string) => {
               onChange(size);
@@ -37,13 +38,11 @@ const InstanceTypeSizeMenu: FC<InstanceTypeSizeMenuProps> = ({ instanceTypeSizes
                 namespace: null,
               });
             }}
-            selectedSize={value}
+            selectedSize={value as string}
             seriesName={selectedSeries}
             sizes={instanceTypeSizes}
           />
         )}
-        control={control}
-        name={CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.SELECTED_SIZE}
       />
     </div>
   );

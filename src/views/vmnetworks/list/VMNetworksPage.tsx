@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
@@ -11,8 +10,8 @@ import { ListPageCreateButton, ListPageHeader } from '@openshift-console/dynamic
 import { Button, PopoverPosition, Stack, Tab, Tabs, TabTitleText } from '@patternfly/react-core';
 
 import { VM_NETWORKS_PATH } from '../constants';
-import useCanCreateVMNetwork from '../hooks/useCanCreateVMNetwork';
 
+import useCanCreateVMNetwork from '../hooks/useCanCreateVMNetwork';
 import { NADS_LIST_PATH, PATH_BY_TAB_INDEX, TAB_INDEX_BY_PATH, TAB_INDEXES } from './constants';
 import VMNetworkList from './VMNetworkList';
 import VMNetworkOtherTypesList from './VMNetworkOtherTypesList';
@@ -23,9 +22,9 @@ const VMNetworksPage: FC = () => {
   const location = useLocation();
   const { canCreate } = useCanCreateVMNetwork();
 
-  const locationTabKey = TAB_INDEX_BY_PATH[location?.pathname];
+  const locationTabKey = TAB_INDEX_BY_PATH[location?.pathname] as number | undefined;
 
-  const onCreate = () => {
+  const onCreate = (): void => {
     navigate(`${VM_NETWORKS_PATH}/~new`);
   };
 
@@ -38,7 +37,9 @@ const VMNetworksPage: FC = () => {
       </ListPageHeader>
       <Tabs
         activeKey={locationTabKey}
-        onSelect={(_, tabIndex: number | string) => navigate(PATH_BY_TAB_INDEX[tabIndex])}
+        onSelect={(_event, tabIndex: number | string) =>
+          navigate(PATH_BY_TAB_INDEX[tabIndex] as string)
+        }
         unmountOnExit
         usePageInsets
       >
@@ -49,6 +50,7 @@ const VMNetworksPage: FC = () => {
           <VMNetworkList onCreate={onCreate} />
         </Tab>
         <Tab
+          eventKey={TAB_INDEXES.OTHER_VM_NETWORK_TYPES}
           title={
             <>
               <TabTitleText className="pf-v6-u-mr-sm">{t('Other VM network types')}</TabTitleText>
@@ -63,11 +65,11 @@ const VMNetworksPage: FC = () => {
                           )}
                         </p>
                         <Button
+                          isInline
                           onClick={(e) => {
                             e.stopPropagation();
                             navigate(NADS_LIST_PATH);
                           }}
-                          isInline
                           variant="link"
                         >
                           {NetworkAttachmentDefinitionModel.kind}
@@ -83,7 +85,6 @@ const VMNetworksPage: FC = () => {
               />
             </>
           }
-          eventKey={TAB_INDEXES.OTHER_VM_NETWORK_TYPES}
         >
           <VMNetworkOtherTypesList />
         </Tab>

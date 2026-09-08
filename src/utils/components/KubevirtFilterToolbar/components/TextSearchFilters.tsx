@@ -1,22 +1,14 @@
-/* eslint-disable */
-import React, { Dispatch, FC, SetStateAction, useMemo, useState } from 'react';
+import React, { type Dispatch, type FC, type SetStateAction, useMemo, useState } from 'react';
 
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
-import {
-  STATIC_SEARCH_FILTERS,
-  STATIC_SEARCH_FILTERS_DROPDOWN_VALUES,
-  STATIC_SEARCH_FILTERS_LABELS,
-  STATIC_SEARCH_FILTERS_PLACEHOLDERS,
-  TextSearchFilterType,
-} from '../constants';
-
 import { getLabelFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/filters/getLabelFilter';
 import {
-  FilterableObject,
-  KubevirtFilterState,
-  OnSetFilters,
+  type FilterableObject,
+  type KubevirtFilterState,
+  type OnSetFilters,
 } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { useDebounceCallback } from '@overview/utils/hooks/useDebounceCallback';
 import {
   InputGroup,
   InputGroupItem,
@@ -24,10 +16,17 @@ import {
   ToolbarFilter,
   ToolbarItem,
 } from '@patternfly/react-core';
+
+import {
+  STATIC_SEARCH_FILTERS,
+  STATIC_SEARCH_FILTERS_DROPDOWN_VALUES,
+  STATIC_SEARCH_FILTERS_LABELS,
+  STATIC_SEARCH_FILTERS_PLACEHOLDERS,
+  type TextSearchFilterType,
+} from '../constants';
+
 import AutocompleteInput from './AutocompleteInput';
 import SearchFilter from './SearchFilter';
-
-import { useDebounceCallback } from '@overview/utils/hooks/useDebounceCallback';
 import ToolbarFilterMultiChip from './ToolbarFilter/ToolbarFilterMultiChip';
 
 type TextSearchFiltersProps = {
@@ -64,18 +63,18 @@ const TextSearchFilters: FC<TextSearchFiltersProps> = ({
   return (
     <ToolbarItem className="co-filter-search--full-width">
       <ToolbarFilter
+        categoryName={t(STATIC_SEARCH_FILTERS_LABELS.name)}
         deleteLabel={() => {
           onSetFilters({ name: [] });
           searchType === STATIC_SEARCH_FILTERS.name && setSearchInputText('');
         }}
-        categoryName={t(STATIC_SEARCH_FILTERS_LABELS.name)}
         labels={filters.name}
       >
         <InputGroup className="co-filter-group">
           {!hideLabelFilter && (
             <InputGroupItem isFill>
               <FormPFSelect
-                onSelect={(_e, value: TextSearchFilterType) => setSearchType(value)}
+                onSelect={(_event, value: TextSearchFilterType) => setSearchType(value)}
                 selected={searchType}
                 selectedLabel={searchSelectOptions[searchType]}
               >
@@ -89,23 +88,23 @@ const TextSearchFilters: FC<TextSearchFiltersProps> = ({
           )}
           {searchType === STATIC_SEARCH_FILTERS.labels ? (
             <AutocompleteInput
+              data={data}
               onSuggestionSelect={(selected) => {
                 onSetFilters({ labels: [...(filters.labels ?? []), selected] });
                 setSearchInputText('');
               }}
-              data={data}
               placeholder={t(STATIC_SEARCH_FILTERS_PLACEHOLDERS.labels)}
               setTextValue={setSearchInputText}
               textValue={searchInputText}
             />
           ) : (
             <SearchFilter
-              onChange={(_, newSearchInput: string) => {
+              data-test="name-filter-input"
+              onChange={(_event, newSearchInput: string) => {
                 setSearchInputText(newSearchInput);
                 const trimmedName = newSearchInput.trim();
                 debouncedOnSetFilters({ name: trimmedName ? [trimmedName] : [] });
               }}
-              data-test="name-filter-input"
               placeholder={t(STATIC_SEARCH_FILTERS_PLACEHOLDERS.name)}
               value={searchInputText}
             />

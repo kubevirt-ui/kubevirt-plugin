@@ -1,9 +1,8 @@
-/* eslint-disable */
-import React, { FC, ReactNode, useMemo } from 'react';
+import React, { type FC, type ReactNode, useMemo } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { convertBinaryUnit } from '@kubevirt-utils/utils/units';
-import { MetricChartData } from '@overview/OverviewTab/metric-charts-card/utils/hooks/useMetricChartData';
+import { type MetricChartData } from '@overview/OverviewTab/metric-charts-card/utils/hooks/useMetricChartData';
 import { getCurrentValue } from '@overview/OverviewTab/metric-charts-card/utils/utils';
 import { Card, CardBody, CardHeader, CardTitle, Content, Skeleton } from '@patternfly/react-core';
 
@@ -11,11 +10,11 @@ import QuotaFooter from './components/QuotaFooter';
 import ResourceAllocationChart from './components/ResourceAllocationChart/ResourceAllocationChart';
 import {
   getUnitLabel,
-  MetricQuotaData,
+  type MetricQuotaData,
   UNIT_GIB,
   UNIT_VCPU,
 } from './hooks/useProjectResourceQuota';
-import { TopClustersMetricData } from './hooks/useTopClustersChartData';
+import { type TopClustersMetricData } from './hooks/useTopClustersChartData';
 import { EMPTY_METRIC_DATA, formatBinaryValue, toMetricChartData } from './utils/utils';
 
 import './ResourceAllocationWidget.scss';
@@ -57,9 +56,9 @@ const ResourceAllocationWidget: FC<ResourceAllocationWidgetProps> = ({
 
     return {
       ...rawData,
-      chartData: rawData.chartData?.map((p) => ({
-        ...p,
-        y: Math.round(p.y * factor * 100) / 100,
+      chartData: rawData.chartData?.map((point) => ({
+        ...point,
+        y: Math.round(point.y * factor * 100) / 100,
       })),
       domain: {
         ...rawData.domain,
@@ -114,16 +113,16 @@ const ResourceAllocationWidget: FC<ResourceAllocationWidgetProps> = ({
         <div className="resource-allocation-widget__graph">
           <div className="resource-allocation-widget__graph-title">{graphTitle}</div>
           <ResourceAllocationChart
-            requestedValue={
-              !isMultiCluster && quotaData?.requestedValue != null
-                ? quotaData.requestedValue
-                : undefined
-            }
             chartSeries={clusterData?.chartSeries}
             effectiveData={effectiveData}
             isMultiCluster={isMultiCluster}
             metric={metric}
             quotaValue={!isMultiCluster ? quotaData?.quotaValue : undefined}
+            requestedValue={
+              !isMultiCluster && quotaData?.requestedValue != null
+                ? quotaData.requestedValue
+                : undefined
+            }
           />
         </div>
         {quotaData && <QuotaFooter display={footerDisplay} icon={quotaData.icon} />}
