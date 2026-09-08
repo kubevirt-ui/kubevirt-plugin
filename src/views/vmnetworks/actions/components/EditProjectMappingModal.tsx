@@ -65,6 +65,7 @@ const EditProjectMappingModal: FC<EditProjectMappingModalProps> = ({ closeModal,
       closeModal();
     } catch (error) {
       setApiError(error as Error);
+      setApiError(error);
     }
   };
 

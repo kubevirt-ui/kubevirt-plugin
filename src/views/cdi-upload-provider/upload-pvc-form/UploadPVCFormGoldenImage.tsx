@@ -1,8 +1,7 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
 import { PersistentVolumeClaimModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1beta1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1beta1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
 import {
@@ -15,8 +14,7 @@ import {
 } from '@patternfly/react-core';
 
 import { getName, getNamespace } from '../utils/selectors';
-import { OperatingSystemRecord } from '../utils/types';
-
+import { type OperatingSystemRecord } from '../utils/types';
 import UploadPVCFormPVCNamespace from './UploadPVCFormPVCNamespace';
 
 type UploadPVCFormGoldenImageProps = {
@@ -54,7 +52,7 @@ const UploadPVCFormGoldenImage: FC<UploadPVCFormGoldenImageProps> = ({
           id="golden-os-select"
           isDisabled={isLoading}
           isRequired
-          onChange={(_, val) => handleOs(val)}
+          onChange={(_event, val) => handleOs(val)}
           value={os?.id || ''}
         >
           <FormSelectOption
@@ -71,16 +69,16 @@ const UploadPVCFormGoldenImage: FC<UploadPVCFormGoldenImageProps> = ({
             const labelGoldenPVC =
               goldenPVC &&
               t('{{nameOrId}} - Default data image already exists', {
-                nameOrId: name || id,
+                nameOrId: name ?? id,
               });
 
             const labelMissingBaseImageName =
               !baseImageName &&
               t('{{nameOrId}} - Template missing data image definition', {
-                nameOrId: name || id,
+                nameOrId: name ?? id,
               });
 
-            const label = labelGoldenPVC || labelMissingBaseImageName || name || id;
+            const label = labelGoldenPVC ?? labelMissingBaseImageName ?? name ?? id;
 
             return <FormSelectOption key={id} label={label} value={id} />;
           })}
@@ -93,7 +91,7 @@ const UploadPVCFormGoldenImage: FC<UploadPVCFormGoldenImageProps> = ({
               id="golden-os-checkbox-pvc-size-template"
               isChecked={pvcSizeFromTemplate}
               label={t('Use template size PVC')}
-              onChange={(_, checked: boolean) => handlePvcSizeTemplate(checked)}
+              onChange={(_event, checked: boolean) => handlePvcSizeTemplate(checked)}
             />
             <Checkbox
               className="kv--create-upload__golden-switch"
@@ -101,7 +99,7 @@ const UploadPVCFormGoldenImage: FC<UploadPVCFormGoldenImageProps> = ({
               id="golden-os-checkbox-cdrom-boot-source-template"
               isChecked={!!mountAsCDROM}
               label={t('This is a CD-ROM boot source')}
-              onChange={(_, checked: boolean) => handleCDROMChange(checked)}
+              onChange={(_event, checked: boolean) => handleCDROMChange(checked)}
             />
           </>
         )}
@@ -118,9 +116,13 @@ const UploadPVCFormGoldenImage: FC<UploadPVCFormGoldenImageProps> = ({
               { osName: os?.name },
             )}{' '}
             <ResourceLink
+              groupVersionKind={{
+                group: PersistentVolumeClaimModel.apiGroup,
+                kind: PersistentVolumeClaimModel.kind,
+                version: PersistentVolumeClaimModel.apiVersion,
+              }}
               hideIcon
               inline
-              kind={PersistentVolumeClaimModel.kind}
               name={os?.baseImageName}
               namespace={os?.baseImageNamespace}
             />

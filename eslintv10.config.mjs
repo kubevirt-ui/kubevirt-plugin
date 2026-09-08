@@ -279,6 +279,34 @@ const reactConfig = {
   },
 };
 
+const perfectionistOverrides = {
+  files: ['**/*.{js,jsx,ts,tsx}'],
+  rules: {
+    'perfectionist/sort-classes': [
+      'error',
+      {
+        groups: [
+          'static-property',
+          'private-property',
+          'property',
+          'constructor',
+          'static-method',
+          'private-method',
+          'method',
+        ],
+        order: 'asc',
+        type: 'natural',
+      },
+    ],
+    'perfectionist/sort-imports': 'off',
+    'perfectionist/sort-intersection-types': 'off',
+    'perfectionist/sort-modules': 'off',
+    'perfectionist/sort-named-imports': 'off',
+    'perfectionist/sort-sets': 'off',
+    'perfectionist/sort-switch-case': 'off',
+  },
+};
+
 const testingLibraryConfig = {
   ...testingLibrary.configs['flat/react'],
   files: ['**/*.test.{ts,tsx}', '**/*.spec.{ts,tsx}', '**/__tests__/**/*.{ts,tsx}'],

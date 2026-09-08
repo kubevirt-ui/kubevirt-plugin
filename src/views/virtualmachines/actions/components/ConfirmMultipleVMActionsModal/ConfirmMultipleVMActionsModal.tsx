@@ -1,9 +1,8 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import AckConfirmationModal from '@kubevirt-utils/components/AckConfirmationModal/AckConfirmationModal';
-import { VMActionTelemetry } from '@kubevirt-utils/extensions/telemetry';
+import { type VMActionTelemetry } from '@kubevirt-utils/extensions/telemetry';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Stack, StackItem } from '@patternfly/react-core';
@@ -26,7 +25,7 @@ type ConfirmMultipleVMActionsModalProps = {
   isOpen: boolean;
   onClose: () => void;
   projectName?: string;
-  severityVariant?: 'danger' | 'warning' | undefined;
+  severityVariant?: 'danger' | 'warning';
   vms: V1VirtualMachine[];
 };
 
@@ -49,9 +48,10 @@ const ConfirmMultipleVMActionsModal: FC<ConfirmMultipleVMActionsModalProps> = ({
   const hasExcludedVMs = !isEmpty(excludedVMs);
   const excludedVMsByNamespace = getVMNamesByNamespace(excludedVMs);
   const numExcludedVMs = excludedVMs?.length;
-  const totalSelectedVMs = numVMs + (numExcludedVMs || 0);
+  const totalSelectedVMs = numVMs + (numExcludedVMs ?? 0);
 
-  const actionOnVms = () => runActionOnVMs(vms, action, actionType as VMActionTelemetry);
+  const actionOnVms = (): Promise<void> =>
+    runActionOnVMs(vms, action, actionType as VMActionTelemetry);
 
   const defaultBody = (
     <>

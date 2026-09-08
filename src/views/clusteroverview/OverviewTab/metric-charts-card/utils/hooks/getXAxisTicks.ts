@@ -9,7 +9,7 @@ const getXAxisTicks: UseXAxisTicks = (chartData) => {
 
   const tickValues: Date[] = isSingleDayData(chartData)
     ? [chartData?.[Math.floor((chartData.length - 1) / 2)]?.x]
-    : getDayMidpoints(chartData).sort((a, b) => Number(a) - Number(b));
+    : getDayMidpoints(chartData).sort((first, second) => Number(first) - Number(second));
 
   return [tickValues, xTickFormat];
 };

@@ -1,9 +1,11 @@
-/* eslint-disable */
-import React, { FC, useCallback, useMemo } from 'react';
+import React, { type FC, useCallback, useMemo } from 'react';
 import produce from 'immer';
 
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import {
+  type V1VirtualMachine,
+  type V1VirtualMachineInstance,
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import DedicatedResourcesModal from '@kubevirt-utils/components/DedicatedResourcesModal/DedicatedResourcesModal';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import EvictionStrategyModal from '@kubevirt-utils/components/EvictionStrategy/EvictionStrategyModal';
@@ -22,6 +24,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { isExpandableSpecVM } from '@kubevirt-utils/resources/instancetype/helper';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getEvictionStrategy } from '@kubevirt-utils/resources/vm';
+import { type RunStrategy } from '@kubevirt-utils/resources/vm/utils/constants';
 import {
   getEffectiveRunStrategy,
   isVMNotStopped,
@@ -75,7 +78,7 @@ const SchedulingSectionRightGrid: FC<SchedulingSectionRightGridProps> = ({
         vmi={vmi}
       />
     ));
-  }, [createModal, onSubmit, vm, vmi]);
+  }, [createModal, onSubmit, t, vm, vmi]);
 
   const evictionStrategy = useMemo(
     () => (
@@ -84,13 +87,25 @@ const SchedulingSectionRightGrid: FC<SchedulingSectionRightGridProps> = ({
     [vm],
   );
 
+  const onSubmitRunStrategy = useCallback(
+    (runStrategy: RunStrategy) =>
+      onUpdateVM
+        ? onUpdateVM(produce(vm, (draft) => applyRunStrategyToSpec(draft.spec, runStrategy)))
+        : updateRunStrategy(vm, runStrategy),
+    [onUpdateVM, vm],
+  );
+
   return (
     <GridItem span={5}>
       <DescriptionList>
         <DescriptionItem
+          data-test="dedicated-resources"
+          descriptionData={<DedicatedResources vm={isExpandableSpecVM(vm) ? instanceTypeVM : vm} />}
           descriptionHeader={
             <SearchItem id="dedicated-resources">{t('Dedicated resources')}</SearchItem>
           }
+          isDisabled={isExpandableSpecVM(vm)}
+          isEdit={canUpdateVM}
           messageOnDisabled={t(
             'Can not configure dedicated resources if the VirtualMachine is created from an instance type',
           )}
@@ -106,46 +121,36 @@ const SchedulingSectionRightGrid: FC<SchedulingSectionRightGridProps> = ({
               />
             ))
           }
-          data-test="dedicated-resources"
-          descriptionData={<DedicatedResources vm={isExpandableSpecVM(vm) ? instanceTypeVM : vm} />}
-          isDisabled={isExpandableSpecVM(vm)}
-          isEdit={canUpdateVM}
         />
         <DescriptionItem
+          data-test="eviction-strategy"
+          descriptionData={evictionStrategy}
           descriptionHeader={
             <SearchItem id="eviction-strategy">{t('Eviction strategy')}</SearchItem>
           }
-          data-test="eviction-strategy"
-          descriptionData={evictionStrategy}
           isEdit={canUpdateVM}
           onEditClick={onEditEvictionStrategy}
         />
         <DescriptionItem
+          bodyContent={getRunStrategyHelpText(t)}
+          data-test="run-strategy"
           descriptionData={
-            getRunStrategyDisplayValue(t, vm) || <MutedTextSpan text={t('Not available')} />
+            getRunStrategyDisplayValue(t, vm) ?? <MutedTextSpan text={t('Not available')} />
           }
+          descriptionHeader={<SearchItem id="run-strategy">{t('Run strategy')}</SearchItem>}
+          isEdit={canUpdateVM}
+          isPopover
           onEditClick={() =>
             createModal(({ isOpen, onClose }) => (
               <RunStrategyModal
-                onSubmit={(runStrategy) =>
-                  onUpdateVM
-                    ? onUpdateVM(
-                        produce(vm, (draft) => applyRunStrategyToSpec(draft.spec, runStrategy)),
-                      )
-                    : updateRunStrategy(vm, runStrategy)
-                }
                 initialRunStrategy={getEffectiveRunStrategy(vm)}
                 isOpen={isOpen}
                 isVMRunning={isVMNotStopped(vm)}
                 onClose={onClose}
+                onSubmit={onSubmitRunStrategy}
               />
             ))
           }
-          bodyContent={getRunStrategyHelpText(t)}
-          data-test="run-strategy"
-          descriptionHeader={<SearchItem id="run-strategy">{t('Run strategy')}</SearchItem>}
-          isEdit={canUpdateVM}
-          isPopover
         />
       </DescriptionList>
     </GridItem>

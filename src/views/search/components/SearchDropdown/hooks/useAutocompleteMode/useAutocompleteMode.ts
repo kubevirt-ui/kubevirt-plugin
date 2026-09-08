@@ -1,15 +1,14 @@
-/* eslint-disable */
 import { useMemo } from 'react';
 
-import { KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
+import { type KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { EXCLUSION_PREFIX, NUMERIC_FILTER_KEYS } from '@search/searchLanguage/constants';
 import { getSanitizedInput } from '@search/searchLanguage/utils';
 import { isFromValue, isToValue } from '@search/utils/dateCreatedValues';
 import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
-import { AutocompleteMode, DropdownType } from '../../types';
 import useSearchKeyBadges from '../useSearchKeyBadges';
 
+import { type AutocompleteMode, DropdownType } from '../../types';
 import { getSearchBadge, getValuesPart, hasOperatorSign, hasOptions } from './utils';
 
 export const useAutocompleteMode = (
@@ -57,10 +56,10 @@ export const useAutocompleteMode = (
         return { type: DropdownType.HIDDEN };
       }
 
-      const hasFrom = selectedValues.some((v) => isFromValue(v.toLowerCase()));
-      const hasTo = selectedValues.some((v) => isToValue(v.toLowerCase()));
+      const hasFrom = selectedValues.some((val) => isFromValue(val.toLowerCase()));
+      const hasTo = selectedValues.some((val) => isToValue(val.toLowerCase()));
       const hasQuickValue = selectedValues.some(
-        (v) => !isFromValue(v.toLowerCase()) && !isToValue(v.toLowerCase()),
+        (val) => !isFromValue(val.toLowerCase()) && !isToValue(val.toLowerCase()),
       );
 
       if (hasQuickValue || (hasFrom && hasTo)) {

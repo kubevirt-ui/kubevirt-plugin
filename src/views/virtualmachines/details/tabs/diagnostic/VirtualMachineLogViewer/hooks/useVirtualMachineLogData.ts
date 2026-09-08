@@ -1,5 +1,3 @@
-/* eslint-disable */
- 
 import { Buffer } from 'buffer';
 
 import { useEffect, useState } from 'react';
@@ -20,10 +18,9 @@ const useVirtualMachineLogData: UseVirtualMachineLogData = ({ connect = true, po
   const [baseK8sPath, k8sAPIPathLoaded] = useK8sBaseAPIPath(getCluster(pod));
   const url = `${baseK8sPath}/api/v1/namespaces/${getNamespace(pod)}/pods/${getName(pod)}/log`;
 
+  const wsProtocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
   const socket = useWebSocket<{ object: K8sResourceCommon; type: string }>(
-    k8sAPIPathLoaded
-      ? `${window.location.protocol === 'https:' ? 'wss' : 'ws'}://${window.location.host}${url}`
-      : null,
+    k8sAPIPathLoaded ? `${wsProtocol}://${window.location.host}${url}` : null,
     {
       onClose: () => kubevirtConsole.log('websocket closed kubevirt: ', url),
       onError: (err) => kubevirtConsole.log('Websocket error kubevirt:', err),

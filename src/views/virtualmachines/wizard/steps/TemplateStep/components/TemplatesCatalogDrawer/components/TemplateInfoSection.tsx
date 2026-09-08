@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC, memo } from 'react';
+import React, { type FC, memo } from 'react';
 import { useWatch } from 'react-hook-form';
 
 import CPUDescription from '@kubevirt-utils/components/CPUDescription/CPUDescription';
@@ -26,8 +25,8 @@ import { Alert, DescriptionList } from '@patternfly/react-core';
 import useWizardDisksTableData from '@virtualmachines/wizard/components/DisksReviewTable/hooks/useWizardDisksTableData/useWizardDisksTableData';
 import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
 import { CREATE_VM_FORM_FIELDS_VM_DATA } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
-import { getTemplateOSName } from '@virtualmachines/wizard/steps/TemplateStep/utils/getTemplateOSName';
 import { useDrawerContext } from '@virtualmachines/wizard/steps/TemplateStep/components/TemplatesCatalogDrawer/hooks/useDrawerContext';
+import { getTemplateOSName } from '@virtualmachines/wizard/steps/TemplateStep/utils/getTemplateOSName';
 
 import TemplateExpandableDescription from './TemplateExpandableDescription';
 
@@ -51,9 +50,10 @@ const TemplateInfoSection: FC = memo(() => {
 
   const operatingSystem =
     getTemplateOSName(template, clusterPreference, osDisplayNames) ?? notAvailable;
+  const defaultSuffix = isDefaultTemplate ? t('(default)') : '';
   const categoryOrWorkload = isVMTemplate
     ? getTemplateCategoryDisplay(template, t)
-    : `${WORKLOADS_LABELS[workload] ?? t('Other')} ${isDefaultTemplate ? t('(default)') : ''}`;
+    : `${WORKLOADS_LABELS[workload] ?? t('Other')} ${defaultSuffix}`;
 
   return (
     <DescriptionList className="pf-v6-u-mt-lg">
