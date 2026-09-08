@@ -1,18 +1,17 @@
-import React, { type FC, memo, useMemo } from 'react';
+import React, { type FC, memo } from 'react';
 
+import { type V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import DeprecatedBadge from '@kubevirt-utils/components/badges/DeprecatedBadge/DeprecatedBadge';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getAnnotations, getName, getNamespace, getUID } from '@kubevirt-utils/resources/shared';
+import { getName, getNamespace, getUID } from '@kubevirt-utils/resources/shared';
 import {
   getTemplateCategoryDisplay,
   getTemplateFlavorData,
-  getTemplateOSLabelName,
   isDeprecatedTemplate,
   isVirtualMachineTemplate,
   type Template,
 } from '@kubevirt-utils/resources/template';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm';
-import { getOperatingSystemName } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
 import { readableSizeUnit } from '@kubevirt-utils/utils/units';
 import {
   Badge,
@@ -25,18 +24,21 @@ import {
   StackItem,
 } from '@patternfly/react-core';
 import { getTemplateArchitecture } from '@templates/utils/utils';
+import { getTemplateOSName } from '@virtualmachines/wizard/steps/TemplateStep/utils/getTemplateOSName';
 import { getTemplateOSIcon } from '@virtualmachines/wizard/utils/os-icons/os-icons';
 
 import './TemplatesCatalogTile.scss';
 
 export type TemplatesCatalogTileProps = {
+  clusterPreference: null | V1beta1VirtualMachineClusterPreference;
   isSelected?: boolean;
   onClick: (template: Template) => void;
+  osDisplayNames: Record<string, string>;
   template: Template;
 };
 
 const TemplatesCatalogTile: FC<TemplatesCatalogTileProps> = memo(
-  ({ isSelected, onClick, template }) => {
+  ({ clusterPreference, isSelected, onClick, osDisplayNames, template }) => {
     const { t } = useKubevirtTranslation();
 
     const isDeprecated = isDeprecatedTemplate(template);
@@ -44,13 +46,8 @@ const TemplatesCatalogTile: FC<TemplatesCatalogTileProps> = memo(
     const templateName = getName(template);
     const { cpuCount, memory } = getTemplateFlavorData(template);
     const architecture = getTemplateArchitecture(template);
-    const osName =
-      getOperatingSystemName(template) || getTemplateOSLabelName(template) || NO_DATA_DASH;
-
-    const icon = useMemo(() => {
-      return getTemplateOSIcon(template);
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [getAnnotations(template)?.iconClass]);
+    const osName = getTemplateOSName(template, clusterPreference, osDisplayNames) ?? NO_DATA_DASH;
+    const icon = getTemplateOSIcon(template, clusterPreference);
 
     return (
       <Card

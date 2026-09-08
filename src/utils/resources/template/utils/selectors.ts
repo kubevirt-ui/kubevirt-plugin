@@ -1,5 +1,10 @@
-import { type V1Template, VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
+  type TemplateParameter,
+  type V1Template,
+  VirtualMachineModel,
+} from '@kubevirt-ui-ext/kubevirt-api/console';
+import {
+  type V1CPU,
   type V1Disk,
   type V1Interface,
   type V1Network,
@@ -43,18 +48,21 @@ export const isDefaultVariantTemplate = (template: Template): boolean =>
   getLabels(template)?.[TEMPLATE_DEFAULT_VARIANT_LABEL] === 'true';
 
 /**
- * A selector that returns the os label name of a given template
+ * A selector that returns the os annotation of a VM template of a given template
  * @param {Template} template - template
  */
-export const getTemplateOSLabelName = (template: Template): string =>
-  getAnnotation(getTemplateVirtualMachineObject(template)?.spec?.template, ANNOTATIONS.os);
+export const getTemplateOSAnnotation = (template: Template): string | undefined =>
+  getAnnotation(
+    getTemplateVirtualMachineObject(template)?.spec?.template as K8sResourceCommon,
+    ANNOTATIONS.os,
+  );
 
 /**
  * A selector that returns the os label of a given template
  * @param {Template} template - template
  */
 export const getTemplateOS = (template: Template): OS_NAME_TYPES => {
-  const templateOS = getTemplateOSLabelName(template);
+  const templateOS = getTemplateOSAnnotation(template);
   return (
     Object.values(OS_NAME_TYPES).find((osName) => templateOS?.includes(osName)) ??
     OS_NAME_TYPES.other
@@ -96,7 +104,7 @@ export const getTemplateImportURLs = (template: V1Template): string[] | undefine
  * @param {Template} template - template
  */
 export const getTemplateFlavor = (template: Template): string => {
-  const isFlavorExist = (flavor: string) =>
+  const isFlavorExist = (flavor: string): boolean =>
     getLabel(template, `${TEMPLATE_FLAVOR_LABEL}/${flavor}`) === 'true';
 
   return Object.values(FLAVORS).find((flavor) => isFlavorExist(flavor)) ?? 'unknown';
@@ -107,7 +115,7 @@ export const getTemplateFlavor = (template: Template): string => {
  * @param {Template} template - template
  */
 export const getTemplateWorkload = (template: Template): string => {
-  const isWorkloadExist = (workload: string) =>
+  const isWorkloadExist = (workload: string): boolean =>
     getLabel(template, `${TEMPLATE_WORKLOAD_LABEL}/${workload}`) === 'true';
 
   return Object.values(WORKLOADS).find((flavor) => isWorkloadExist(flavor)) ?? 'unknown';
@@ -159,7 +167,7 @@ export const getTemplateDisks = (template: Template): V1Disk[] => {
  * A selector that returns the parameters of a given template
  * @param {Template} template - template
  */
-export const getParameters = (template: Template) =>
+export const getParameters = (template: Template): TemplateParameter[] | undefined =>
   isOpenShiftTemplate(template) ? template?.parameters : template?.spec?.parameters;
 
 /**
@@ -204,5 +212,5 @@ export const getTemplateDescription = (template: Template): string =>
  * A selector that returns the CPU of a given template
  * @param {V1Template} template - template
  */
-export const getTemplateVirtualMachineCPU = (template: Template) =>
+export const getTemplateVirtualMachineCPU = (template: Template): undefined | V1CPU =>
   getCPU(getTemplateVirtualMachineObject(template));

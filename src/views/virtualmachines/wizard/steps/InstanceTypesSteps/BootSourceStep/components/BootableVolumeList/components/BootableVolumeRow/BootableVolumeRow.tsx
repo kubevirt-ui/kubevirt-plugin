@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
 import ArchitectureLabel from '@kubevirt-utils/components/ArchitectureLabel/ArchitectureLabel';
 import { PREFERENCE_DISPLAY_NAME_KEY } from '@kubevirt-utils/constants/instancetypes-and-preferences';
@@ -8,21 +8,17 @@ import {
   getPVCStorageClassName,
   getVolumeSnapshotStorageClass,
 } from '@kubevirt-utils/resources/bootableresources/selectors';
-import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
+import { type BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { getAnnotation, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { ANNOTATIONS } from '@kubevirt-utils/resources/template';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { ARCHITECTURE_ID, getArchitecture } from '@kubevirt-utils/utils/architecture';
 import { getHumanizedSize } from '@kubevirt-utils/utils/units';
 import { TableText, Tr, WrapModifier } from '@patternfly/react-table';
-import {
-  getTemplateOSIcon,
-  getVolumeNameOSIcon,
-} from '@virtualmachines/wizard/utils/os-icons/os-icons';
-import { ApplySelectedBootableVolumeToForm } from '@virtualmachines/wizard/utils/types';
+import { getBootableVolumeOSIcon } from '@virtualmachines/wizard/utils/os-icons/os-icons';
+import { type ApplySelectedBootableVolumeToForm } from '@virtualmachines/wizard/utils/types';
 
-import { BootableVolumeRowData } from '../../../../types';
-
+import { type BootableVolumeRowData } from '../../../../types';
 import BootableVolumeRowNameCell from './components/BootableVolumeRowNameCell';
 import TableData from './TableData';
 
@@ -60,7 +56,7 @@ const BootableVolumeRow: FC<BootableVolumeRowProps> = ({
     getName(selectedBootableVolume) === bootVolumeName &&
     getNamespace(selectedBootableVolume) === bootVolumeNamespace;
 
-  const handleClick = () => {
+  const handleClick = (): void => {
     onSelectBootableVolume({
       dvSource,
       pvcSource,
@@ -70,7 +66,7 @@ const BootableVolumeRow: FC<BootableVolumeRowProps> = ({
   };
 
   const sizeData = getHumanizedSize(getDiskSize(dvSource, pvcSource, volumeSnapshotSource)).string;
-  const icon = getVolumeNameOSIcon(bootVolumeName) || getTemplateOSIcon(preference);
+  const icon = getBootableVolumeOSIcon(preference, bootVolumeName);
 
   return (
     <Tr isClickable isRowSelected={isSelected} isSelectable onClick={handleClick}>
@@ -93,8 +89,8 @@ const BootableVolumeRow: FC<BootableVolumeRowProps> = ({
         {getAnnotation(preference, PREFERENCE_DISPLAY_NAME_KEY, NO_DATA_DASH)}
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id="storage-class" width={15}>
-        {getVolumeSnapshotStorageClass(volumeSnapshotSource) ||
-          getPVCStorageClassName(pvcSource) ||
+        {getVolumeSnapshotStorageClass(volumeSnapshotSource) ??
+          getPVCStorageClassName(pvcSource) ??
           NO_DATA_DASH}
       </TableData>
       <TableData activeColumnIDs={activeColumnIDs} id="size" width={10}>

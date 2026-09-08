@@ -63,7 +63,7 @@ export const getLabels = (
 export const getAnnotations = (
   entity: K8sResourceCommon,
   defaultValue?: { [key: string]: string },
-): { [key: string]: string } => entity?.metadata?.annotations || defaultValue;
+): { [key: string]: string } | undefined => entity?.metadata?.annotations || defaultValue;
 
 /**
  * function for getting an entity's annotation
@@ -76,7 +76,7 @@ export const getAnnotation = (
   entity: K8sResourceCommon,
   annotationName: string,
   defaultValue?: string,
-): string => entity?.metadata?.annotations?.[annotationName] ?? defaultValue;
+): string | undefined => entity?.metadata?.annotations?.[annotationName] ?? defaultValue;
 
 /**
  * function for getting an entity's display name
@@ -85,6 +85,9 @@ export const getAnnotation = (
  */
 export const getDisplayName = (entity: K8sResourceCommon): string | undefined =>
   getAnnotation(entity, ANNOTATIONS.displayName);
+
+export const getIconClass = (entity: K8sResourceCommon): string | undefined =>
+  getAnnotation(entity, ANNOTATIONS.iconClass);
 
 /**
  * function for getting an entity's label
@@ -433,16 +436,18 @@ export const getKind = <A extends K8sResourceCommon = K8sResourceCommon>(resourc
 export const getUID = <A extends K8sResourceCommon = K8sResourceCommon>(resource: A): string =>
   resource?.metadata?.uid;
 
+type K8sResource = { metadata?: { name?: string; namespace?: string } };
+
 export type ResourceMap<A> = { [name: string]: A };
 export type NamespacedResourceMap<A> = { [namespace: string]: ResourceMap<A> };
 
 // Function overloads
-export function convertResourceArrayToMap<A extends K8sResourceCommon = K8sResourceCommon>(
+export function convertResourceArrayToMap<A extends K8sResource>(
   resources: A[],
   isNamespaced: true,
 ): NamespacedResourceMap<A>;
 
-export function convertResourceArrayToMap<A extends K8sResourceCommon = K8sResourceCommon>(
+export function convertResourceArrayToMap<A extends K8sResource>(
   resources: A[],
   isNamespaced?: false,
 ): ResourceMap<A>;
@@ -459,7 +464,7 @@ export function convertResourceArrayToMap<A extends K8sResourceCommon = K8sResou
  * @param {boolean} isNamespaced - (optional) - a flag to indicate if the resource is namespace-scoped
  * @param isMultiCluster - (optional) - a flag to indicate if the resource is fetched multi-cluster
  */
-export function convertResourceArrayToMap<A extends K8sResourceCommon = K8sResourceCommon>(
+export function convertResourceArrayToMap<A extends K8sResource>(
   resources: A[],
   isNamespaced?: boolean,
 ): NamespacedResourceMap<A> | ResourceMap<A> {

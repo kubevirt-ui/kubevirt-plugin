@@ -4,7 +4,7 @@ import {
   OS_TEMPLATE_LABEL,
   VM_OS_ANNOTATION,
 } from '@kubevirt-utils/resources/vm';
-import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+import { type K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
 /**
  * @date 3/16/2022 - 10:08:55 AM
@@ -22,8 +22,11 @@ type LabelsOrAnnotationsMap = {
  * @param {string} keyPrefix - prefix to search
  * @returns {*}
  */
-const getPrefixedKey = (obj: LabelsOrAnnotationsMap, keyPrefix: string) =>
-  obj ? Object.keys(obj).find((key) => key.startsWith(keyPrefix)) : null;
+const getPrefixedKey = (
+  obj: LabelsOrAnnotationsMap | undefined,
+  keyPrefix: string,
+): string | undefined =>
+  obj ? Object.keys(obj).find((key) => key.startsWith(keyPrefix)) : undefined;
 
 /**
  * @date 3/16/2022 - 10:08:55 AM
@@ -31,31 +34,38 @@ const getPrefixedKey = (obj: LabelsOrAnnotationsMap, keyPrefix: string) =>
  * @param {string} key - key to search
  * @returns {*}
  */
-const getSuffixValue = (key: string) => {
-  const index = key ? key.lastIndexOf('/') : -1;
-  return index > 0 ? key.substring(index + 1) : null;
+const getSuffixValue = (key: string | undefined): string | undefined => {
+  if (!key) return undefined;
+  const index = key.lastIndexOf('/');
+  return index > 0 ? key.substring(index + 1) : undefined;
 };
 
 /**
  * @date 3/16/2022 - 10:08:55 AM
- * Find in a {LabelsOrAnnotationsMap} object a key that start with {keyPrefix} prefix after '/' in label
+ * Find in a {LabelsOrAnnotationsMap} object a key that start with {keyPrefix} prefix and return the value after '/' in the key
  * @param {LabelsOrAnnotationsMap} obj - object to search
  * @param {string} keyPrefix - prefix to search
  * @returns {*}
  */
-export const findKeySuffixValue = (obj: LabelsOrAnnotationsMap, keyPrefix: string) =>
-  getSuffixValue(getPrefixedKey(obj, keyPrefix));
+export const findKeySuffixValue = (
+  obj: LabelsOrAnnotationsMap | undefined,
+  keyPrefix: string,
+): string | undefined => getSuffixValue(getPrefixedKey(obj, keyPrefix));
 
 /**
  * @date 3/16/2022 - 10:08:55 AM
- * Find in a {LabelsOrAnnotationsMap} object a label that start with {keyPrefix}
+ * Find in a {LabelsOrAnnotationsMap} object a label that start with {keyPrefix}, return its value
  * @param {LabelsOrAnnotationsMap} obj - object to search
  * @param {string} keyPrefix - prefix to search
  * @returns {string}
  */
-export const getValueByPrefix = (obj: LabelsOrAnnotationsMap, keyPrefix: string): string => {
-  const objectKey = Object.keys(obj || {}).find((key) => key.startsWith(keyPrefix));
-  return objectKey ? obj[objectKey] : null;
+const getValueByPrefix = (
+  obj: LabelsOrAnnotationsMap | undefined,
+  keyPrefix: string,
+): string | undefined => {
+  if (!obj) return undefined;
+  const objectKey = getPrefixedKey(obj, keyPrefix);
+  return objectKey ? obj[objectKey] : undefined;
 };
 
 /**
@@ -64,8 +74,8 @@ export const getValueByPrefix = (obj: LabelsOrAnnotationsMap, keyPrefix: string)
  * @param {K8sResourceCommon} obj - object to search
  * @returns {string}
  */
-export const getOperatingSystem = (obj: K8sResourceCommon): string =>
-  findKeySuffixValue(obj?.metadata?.labels, OS_TEMPLATE_LABEL) ||
+export const getOperatingSystem = (obj: K8sResourceCommon): string | undefined =>
+  findKeySuffixValue(obj?.metadata?.labels, OS_TEMPLATE_LABEL) ??
   obj?.metadata?.annotations?.[VM_OS_ANNOTATION];
 
 /**
@@ -74,7 +84,7 @@ export const getOperatingSystem = (obj: K8sResourceCommon): string =>
  * @param {K8sResourceCommon} obj - object to search
  * @returns {string}
  */
-export const getOperatingSystemName = (obj: K8sResourceCommon): string =>
+export const getOperatingSystemName = (obj: K8sResourceCommon): string | undefined =>
   getValueByPrefix(
     obj?.metadata?.annotations,
     `${NAME_OS_TEMPLATE_ANNOTATION}/${getOperatingSystem(obj)}`,
@@ -97,7 +107,7 @@ export const OS_WINDOWS_PREFIX = 'win';
  */
 
 export const isWindows = (obj: K8sResourceCommon): boolean =>
-  (getOperatingSystem(obj) || '')?.startsWith(OS_WINDOWS_PREFIX);
+  (getOperatingSystem(obj) ?? '').startsWith(OS_WINDOWS_PREFIX);
 
 /**
  * Match one or more raw OS terms (annotation value, label, preference name)

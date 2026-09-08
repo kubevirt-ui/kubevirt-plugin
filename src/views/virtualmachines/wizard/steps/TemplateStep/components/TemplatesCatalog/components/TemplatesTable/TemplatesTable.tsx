@@ -2,14 +2,16 @@ import React, { type FC, useMemo } from 'react';
 import { useWatch } from 'react-hook-form';
 
 import { type V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
+import { type V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getUID } from '@kubevirt-utils/resources/shared';
+import { getUID, type ResourceMap } from '@kubevirt-utils/resources/shared';
 import { getTemplateName, type Template } from '@kubevirt-utils/resources/template';
 import { ARCHITECTURE_ID, ARCHITECTURE_TITLE } from '@kubevirt-utils/utils/architecture';
 import { Table, TableVariant, Tbody, Th, Thead, Tr } from '@patternfly/react-table';
 import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
 import { CREATE_VM_FORM_FIELDS_VM_DATA } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
 
+import { getTemplateClusterPreference } from '../../../../utils/getTemplateClusterPreference';
 import TemplatesTableRow from './TemplatesTableRow';
 
 import './TemplatesTable.scss';
@@ -18,6 +20,7 @@ type TemplatesTableProps = {
   availableDatasources: Record<string, V1beta1DataSource>;
   availableTemplatesUID: Set<string>;
   bootSourcesLoaded: boolean;
+  clusterPreferencesByName: ResourceMap<V1beta1VirtualMachineClusterPreference>;
   loaded: boolean;
   onTemplateClick: (template: Template) => void;
   templates: Template[];
@@ -27,6 +30,7 @@ const TemplatesTable: FC<TemplatesTableProps> = ({
   availableDatasources,
   availableTemplatesUID,
   bootSourcesLoaded,
+  clusterPreferencesByName,
   loaded,
   onTemplateClick,
   templates,
@@ -81,6 +85,7 @@ const TemplatesTable: FC<TemplatesTableProps> = ({
             activeColumnIDs={activeColumnIDs}
             availableDatasources={availableDatasources}
             availableTemplatesUID={availableTemplatesUID}
+            clusterPreference={getTemplateClusterPreference(template, clusterPreferencesByName)}
             key={getUID(template) ?? getTemplateName(template)}
             onSelectTemplate={onTemplateClick}
             selectedTemplate={selectedTemplate}
