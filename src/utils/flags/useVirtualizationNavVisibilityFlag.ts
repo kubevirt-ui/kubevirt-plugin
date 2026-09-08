@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { useEffect, useMemo } from 'react';
 import useMultipleAccessReviews from 'src/views/cdi-upload-provider/hooks/useMultipleAccessReviews';
 
@@ -12,16 +11,17 @@ import { getHyperconvergedRoleAggregationStrategy } from '@kubevirt-utils/resour
 import { getName } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
-  K8sResourceCommon,
-  K8sVerb,
-  SetFeatureFlag,
+  type K8sResourceCommon,
+  type K8sVerb,
+  type SetFeatureFlag,
   useK8sWatchResource,
 } from '@openshift-console/dynamic-plugin-sdk';
 
 import { FLAG_KUBEVIRT_VIRTUALIZATION_NAV, HCO_MANUAL_ROLE_AGGREGATION_STRATEGY } from './consts';
 
-const useVirtualizationNavVisibilityFlag = (setFeatureFlag: SetFeatureFlag) => {
-  const { hcConfig, hcError, hcLoaded } = useKubevirtHyperconvergeConfiguration();
+const useVirtualizationNavVisibilityFlag = (setFeatureFlag: SetFeatureFlag): void => {
+  const hcConfiguration = useKubevirtHyperconvergeConfiguration();
+  const { hcConfig, hcLoaded } = hcConfiguration;
 
   const [projects, projectsLoaded] = useK8sWatchResource<K8sResourceCommon[]>({
     groupVersionKind: modelToGroupVersionKind(ProjectModel),
@@ -41,8 +41,8 @@ const useVirtualizationNavVisibilityFlag = (setFeatureFlag: SetFeatureFlag) => {
   const projectNames = useMemo(
     () =>
       (projects ?? [])
-        .map((p) => getName(p))
-        .filter((n) => !isEmpty(n))
+        .map((project) => getName(project))
+        .filter((projectName): projectName is string => !isEmpty(projectName))
         .sort((a, b) => a.localeCompare(b)),
     [projects],
   );
@@ -65,7 +65,7 @@ const useVirtualizationNavVisibilityFlag = (setFeatureFlag: SetFeatureFlag) => {
   const isAllowed = useMemo(() => allowed.some((accessReview) => accessReview.allowed), [allowed]);
 
   useEffect(() => {
-    if (hcError) {
+    if (hcConfiguration.hcError) {
       setFeatureFlag(FLAG_KUBEVIRT_VIRTUALIZATION_NAV, true);
       return;
     }
@@ -88,7 +88,14 @@ const useVirtualizationNavVisibilityFlag = (setFeatureFlag: SetFeatureFlag) => {
     }
 
     setFeatureFlag(FLAG_KUBEVIRT_VIRTUALIZATION_NAV, false);
-  }, [setFeatureFlag, isAllowed, isManualRoleAggregation, hcLoaded, hcError, accessReviewsLoading]);
+  }, [
+    setFeatureFlag,
+    isAllowed,
+    isManualRoleAggregation,
+    hcLoaded,
+    hcConfiguration.hcError,
+    accessReviewsLoading,
+  ]);
 };
 
 export default useVirtualizationNavVisibilityFlag;

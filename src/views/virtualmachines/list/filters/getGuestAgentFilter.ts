@@ -1,9 +1,8 @@
-/* eslint-disable */
-import { TFunction } from 'i18next';
+import { type TFunction } from 'i18next';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import {
-  KubevirtFilter,
+  type KubevirtFilter,
   KubevirtFilterLayout,
 } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { getVMStatus } from '@kubevirt-utils/resources/shared';
@@ -31,7 +30,7 @@ export const getGuestAgentFilter = (t: TFunction): KubevirtFilter<V1VirtualMachi
   categoryLabel: t('Guest agent'),
   filterLayout: KubevirtFilterLayout.SELECT,
   id: VirtualMachineRowFilterType.GuestAgent,
-  match: (obj, selected) => selected.some((s) => matchesGuestAgentStatus(obj, s)),
+  match: (obj, selected) => selected.some((status) => matchesGuestAgentStatus(obj, status)),
   options: [
     { label: t('Not reporting'), value: GuestAgentStatus.NOT_REPORTING },
     { label: t('Reporting'), value: GuestAgentStatus.REPORTING },

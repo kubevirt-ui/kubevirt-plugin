@@ -1,8 +1,7 @@
-/* eslint-disable */
-import React, { FC, useMemo, useState } from 'react';
+import React, { type FC, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 
-import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Grid, GridItem, SelectOption, Title } from '@patternfly/react-core';
@@ -10,7 +9,6 @@ import { Grid, GridItem, SelectOption, Title } from '@patternfly/react-core';
 import useQuery from '../../../../../../utils/hooks/useQuery';
 import NoDataMetricsCard from '../components/NoDataMetricsCard';
 import { ALL_NETWORKS } from '../utils/constants';
-
 import NetworkChartsByNIC from './NetworkChartsByNIC';
 
 import '../virtual-machine-metrics-tab.scss';
@@ -33,7 +31,7 @@ const NetworkCharts: FC<NetworkChartsProps> = ({ prometheusUnavailable, vmi }) =
 
   const query = useQuery();
   const [selectedNetwork, setSelectedNetwork] = useState<string>(
-    query?.get('network') || ALL_NETWORKS,
+    query?.get('network') ?? ALL_NETWORKS,
   );
 
   if (prometheusUnavailable) {
@@ -58,16 +56,16 @@ const NetworkCharts: FC<NetworkChartsProps> = ({ prometheusUnavailable, vmi }) =
         {t('Network interface:')}
       </Title>{' '}
       <FormPFSelect
-        onSelect={(_, network: string) => setSelectedNetwork(network)}
+        onSelect={(_event, network: string) => setSelectedNetwork(network)}
         selected={selectedNetwork}
         toggleProps={{ className: 'network ul.pf-v6-c-dropdown__menu' }}
       >
         {interfacesNames?.map((nic) => (
           <SelectOption
+            key={nic}
             onClick={() => {
               navigate({ pathname, search: `?network=${nic}` }, { replace: true });
             }}
-            key={nic}
             value={nic}
           >
             {nic}

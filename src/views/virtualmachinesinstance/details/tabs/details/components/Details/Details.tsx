@@ -1,9 +1,11 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
 import { VirtualMachineInstanceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { VirtualMachineModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import {
+  type V1VirtualMachine,
+  type V1VirtualMachineInstance,
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import DescriptionItemAnnotations from '@kubevirt-utils/components/DescriptionItem/components/DescriptionItemAnnotations';
 import DescriptionItemCreatedAt from '@kubevirt-utils/components/DescriptionItem/components/DescriptionItemCreatedAt';
 import DescriptionItemDescription from '@kubevirt-utils/components/DescriptionItem/components/DescriptionItemDescription';
@@ -27,12 +29,11 @@ import { LinkIcon } from '@patternfly/react-icons';
 
 import VirtualMachinesInstancesStatus from '../../../../../components/VirtualMachinesInstancesStatus';
 import useGuestOS from '../../../../hooks/useGuestOS';
-
 import BootOrder from './BootOrder/BootOrder';
 import CPUMemory from './CPUMemory/CPUMemory';
 import HardwareDevices from './HadwareDevices/HardwareDevices';
 import Hostname from './Hostname/Hostname';
-import IP from './IP/IP';
+import IPAddress from './IP/IP';
 import Node from './Node/Node';
 import OperatingSystem from './OperatingSystem/OperatingSystem';
 import Pods from './Pods/Pods';
@@ -109,7 +110,7 @@ const Details: FC<DetailsProps> = ({ pathname, vmi }) => {
               descriptionHeader={t('Boot order')}
             />
             <DescriptionItem
-              descriptionData={<IP vmi={vmi} />}
+              descriptionData={<IPAddress vmi={vmi} />}
               descriptionHeader={t('IP address')}
             />
             <DescriptionItem

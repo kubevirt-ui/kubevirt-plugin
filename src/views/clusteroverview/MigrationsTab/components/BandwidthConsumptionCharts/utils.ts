@@ -1,4 +1,3 @@
-/* eslint-disable */
 import xbytes from 'xbytes';
 
 import DurationOption from '@kubevirt-utils/components/DurationOption/DurationOption';
@@ -10,20 +9,20 @@ import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { SECONDS_TO_MILLISECONDS_MULTIPLIER } from '@kubevirt-utils/resources/vm/utils/constants';
 import { escapePromLabelValue } from '@kubevirt-utils/utils/prometheus';
 import { multipliers } from '@kubevirt-utils/utils/unitConstants';
-import { PrometheusValue } from '@openshift-console/dynamic-plugin-sdk';
+import { type PrometheusValue } from '@openshift-console/dynamic-plugin-sdk';
 
-import { ChartDataObject, GRID_LINES } from './constants';
+import { type ChartDataObject, GRID_LINES } from './constants';
 
 export const mapPrometheusValues = (
   prometheusValues: PrometheusValue[],
   name: string,
 ): ChartDataObject[] =>
-  (prometheusValues || []).map(([x, y], idx) => {
+  (prometheusValues || []).map(([timestamp, value], idx) => {
     return {
       idx,
       name,
-      x: new Date(x * SECONDS_TO_MILLISECONDS_MULTIPLIER),
-      y: Number(y),
+      x: new Date(timestamp * SECONDS_TO_MILLISECONDS_MULTIPLIER),
+      y: Number(value),
     };
   });
 

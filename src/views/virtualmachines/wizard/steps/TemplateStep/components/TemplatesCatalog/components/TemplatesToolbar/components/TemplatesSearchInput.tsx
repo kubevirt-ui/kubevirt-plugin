@@ -1,9 +1,8 @@
-/* eslint-disable */
-import React, { FC, useState } from 'react';
+import React, { type FC, useState } from 'react';
 
 import {
-  KubevirtFilterState,
-  OnSetFilters,
+  type KubevirtFilterState,
+  type OnSetFilters,
 } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useUniversalFilter from '@kubevirt-utils/hooks/useUniversalFilter/useUniversalFilter';
@@ -29,7 +28,7 @@ const TemplatesSearchInput: FC<TemplatesSearchInputProps> = ({ filters, onSetFil
 
   const filterByKeywordMsg = t('Filter by keyword...');
 
-  const updateName = (val: string) => {
+  const updateName = (val: string): void => {
     setName(val);
     setValueWithDebounce('name', val);
   };
@@ -40,7 +39,7 @@ const TemplatesSearchInput: FC<TemplatesSearchInputProps> = ({ filters, onSetFil
       className="co-catalog-page__input"
       data-test="search-catalog"
       id="filter-text-input"
-      onChange={(_, val) => updateName(val)}
+      onChange={(_event, val) => updateName(val)}
       onClear={() => updateName('')}
       placeholder={filterByKeywordMsg}
       type="text"

@@ -1,13 +1,12 @@
-/* eslint-disable */
 import { VirtualMachineModel } from 'src/views/dashboard-extensions/utils';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { SINGLE_CLUSTER_KEY } from '@kubevirt-utils/resources/constants';
 import { getLabel, getLabels, getNamespace } from '@kubevirt-utils/resources/shared';
-import { escapeJsonPointerToken, isEmpty } from '@kubevirt-utils/utils/utils';
+import { escapeJsonPointerToken, isEmpty, kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
-import { TreeViewDataItem } from '@patternfly/react-core';
+import { type TreeViewDataItem } from '@patternfly/react-core';
 import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
 
 import {
@@ -22,7 +21,7 @@ import { getVMFromElementID, isVMAloneInFolder } from './utils';
 let draggingVM: null | V1VirtualMachine = null;
 let isDraggingVMAloneInFolder = false;
 
-export const changeVMFolder = (newFolder: string) =>
+export const changeVMFolder = (newFolder: string): Promise<V1VirtualMachine> =>
   kubevirtK8sPatch({
     cluster: getCluster(draggingVM),
     data: [
@@ -45,11 +44,12 @@ export const changeVMFolder = (newFolder: string) =>
     resource: draggingVM,
   });
 
-const dragStartHandler = (event) => {
-  const elementId = event.target.id as string;
+const dragStartHandler = (event: DragEvent): void => {
+  const target = event.target as HTMLElement;
+  const elementId = target.id;
   event.dataTransfer.effectAllowed = 'all';
 
-  event.target.style.backgroundColor = REMOVE_DRAG_BACKGROUND_COLOR;
+  target.style.backgroundColor = REMOVE_DRAG_BACKGROUND_COLOR;
 
   draggingVM = getVMFromElementID(elementId);
   isDraggingVMAloneInFolder = isVMAloneInFolder(draggingVM);
@@ -75,11 +75,11 @@ export const addDropEventListeners = (
 ): RemoveListenerFunction => {
   const dropHTMLElement = document.getElementById(treeViewItem.id);
 
-  const [_, dropCluster, dropNamespace, folderName] = treeViewItem.id.split('/');
+  const [_prefix, dropCluster, dropNamespace, folderName] = treeViewItem.id.split('/');
 
   if (!dropHTMLElement) return null;
 
-  const dropHandler = (event) => {
+  const dropHandler = (event: DragEvent): void => {
     event.stopPropagation();
     event.preventDefault();
 
@@ -87,12 +87,14 @@ export const addDropEventListeners = (
       const sourceFolder = getLabel(draggingVM, VM_FOLDER_LABEL);
       removeGroupValue(sourceFolder);
     }
-    changeVMFolder(folderName);
+    changeVMFolder(folderName).catch((err) =>
+      kubevirtConsole.error('Failed to change VM folder', err),
+    );
 
     dropHTMLElement.style.backgroundColor = REMOVE_DRAG_BACKGROUND_COLOR;
   };
 
-  const dragOverHandler = (event) => {
+  const dragOverHandler = (event: DragEvent): void => {
     const dragClusterAllowed =
       dropCluster === SINGLE_CLUSTER_KEY || getCluster(draggingVM) === dropCluster;
     const dragAllowed = getNamespace(draggingVM) === dropNamespace && dragClusterAllowed;
@@ -105,7 +107,7 @@ export const addDropEventListeners = (
       : NOT_ALLOWED_DRAG_TARGET_BACKGROUND_COLOR;
   };
 
-  const dragLeaveHandler = (event) => {
+  const dragLeaveHandler = (event: DragEvent): void => {
     event.preventDefault();
     event.stopPropagation();
     dropHTMLElement.style.backgroundColor = REMOVE_DRAG_BACKGROUND_COLOR;

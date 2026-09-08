@@ -82,7 +82,7 @@ export const buildChartSeries = (
         const parsed = Number(value);
         return {
           x: new Date(timestamp * MILLISECONDS_MULTIPLIER),
-          y: getHumanizedValue(metric, Number.isFinite(parsed) ? parsed : 0, unit),
+          y: getHumanizedValue(metric, Number.isFinite(parsed) ? parsed : 0, unit) as number,
         };
       });
 

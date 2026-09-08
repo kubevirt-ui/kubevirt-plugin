@@ -34,8 +34,8 @@ export const getDiskSource = (
 ): undefined | V1beta1DataVolumeSpec | V1ContainerDiskSource => {
   if (!diskName) return;
 
-  const disk = getDisks(vm)?.find((d) => d.name === diskName);
-  const volume = getVolumes(vm)?.find((v) => v.name === disk?.name);
+  const disk = getDisks(vm)?.find((diskItem) => diskItem.name === diskName);
+  const volume = getVolumes(vm)?.find((vol) => vol.name === disk?.name);
 
   if (!disk || !volume) return;
 

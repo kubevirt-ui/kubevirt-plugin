@@ -1,13 +1,12 @@
-/* eslint-disable */
 import React from 'react';
 import format from 'date-fns/format';
-import { TFunction } from 'i18next';
+import { type TFunction } from 'i18next';
 import { VMStatusConditionLabelList } from 'src/views/virtualmachines/list/components/VMStatusConditionLabel';
 
 import { NodeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getK8sRowId } from '@kubevirt-utils/components/KubevirtTable/utils';
-import { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
+import { type ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { ACTIONS } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/const';
 import {
   getCreationTimestamp,
@@ -21,7 +20,6 @@ import { GlobeAmericasIcon } from '@patternfly/react-icons';
 
 import VirtualMachinesInstancesIP from '../components/VirtualMachinesInstanceIP';
 import VirtualMachinesInstancesStatus from '../components/VirtualMachinesInstancesStatus';
-
 import VMIActionsCell from './cells/VMIActionsCell';
 import VMINameCell from './cells/VMINameCell';
 
@@ -54,7 +52,12 @@ export const getVMIColumns = (
       getValue: (row) => getNamespace(row) ?? '',
       key: VMI_COLUMN_KEYS.namespace,
       label: t('Namespace'),
-      renderCell: (row) => <ResourceLink kind="Namespace" name={getNamespace(row)} />,
+      renderCell: (row) => (
+        <ResourceLink
+          groupVersionKind={{ group: '', kind: 'Namespace', version: 'v1' }}
+          name={getNamespace(row)}
+        />
+      ),
       sortable: true,
     });
   }
@@ -73,7 +76,7 @@ export const getVMIColumns = (
       label: t('Conditions'),
       renderCell: (row) => (
         <VMStatusConditionLabelList
-          conditions={getVMIStatusConditions(row).filter((c) => c.reason)}
+          conditions={getVMIStatusConditions(row).filter((cond) => cond.reason)}
         />
       ),
     },
@@ -99,7 +102,12 @@ export const getVMIColumns = (
       renderCell: (row) => {
         const nodeName = getVMINodeName(row);
         if (!nodeName) return null;
-        return <ResourceLink kind={NodeModel.kind} name={nodeName} />;
+        return (
+          <ResourceLink
+            groupVersionKind={{ group: '', kind: NodeModel.kind, version: 'v1' }}
+            name={nodeName}
+          />
+        );
       },
       sortable: true,
     },

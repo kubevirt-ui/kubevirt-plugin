@@ -1,19 +1,18 @@
-/* eslint-disable */
 import { VirtualMachineInstanceMigrationModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { VirtualMachineInstanceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
-  V1AddVolumeOptions,
-  V1RemoveVolumeOptions,
-  V1StopOptions,
-  V1VirtualMachine,
-  V1VirtualMachineInstanceMigration,
+  type V1AddVolumeOptions,
+  type V1RemoveVolumeOptions,
+  type V1StopOptions,
+  type V1VirtualMachine,
+  type V1VirtualMachineInstanceMigration,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { TELEMETRY_VM_ACTION, VMActionTelemetry } from '@kubevirt-utils/extensions/telemetry';
+import { TELEMETRY_VM_ACTION, type VMActionTelemetry } from '@kubevirt-utils/extensions/telemetry';
 import { logVMActionPerformed } from '@kubevirt-utils/extensions/telemetry/vm-actions';
 import { cancelPendingVmUploads } from '@kubevirt-utils/hooks/useUploadProgressToast/cancel/cancelPendingVmUploads';
 import { getStorageMigrationPlanModelForKind } from '@kubevirt-utils/resources/migrations/backends';
-import { MultiNamespaceVirtualMachineStorageMigrationPlan } from '@kubevirt-utils/resources/migrations/constants';
+import { type MultiNamespaceVirtualMachineStorageMigrationPlan } from '@kubevirt-utils/resources/migrations/constants';
 import { getRandomChars, kubevirtConsole, truncateToK8sName } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import {
@@ -21,7 +20,7 @@ import {
   kubevirtK8sCreate,
   kubevirtK8sDelete,
 } from '@multicluster/k8sRequests';
-import { consoleFetch, K8sModel } from '@openshift-console/dynamic-plugin-sdk';
+import { consoleFetch, type K8sModel } from '@openshift-console/dynamic-plugin-sdk';
 
 export enum VMActionType {
   AddVolume = 'addvolume',
@@ -34,7 +33,7 @@ export enum VMActionType {
   Unpause = 'unpause',
 }
 
-const logDirectVMAction = (vm: V1VirtualMachine, action: VMActionTelemetry) => {
+const logDirectVMAction = (vm: V1VirtualMachine, action: VMActionTelemetry): void => {
   logVMActionPerformed(action, vm);
 };
 
@@ -52,14 +51,14 @@ export const VMActionRequest = async (
   action: VMActionType,
   model: K8sModel,
   body?: V1AddVolumeOptions | V1RemoveVolumeOptions | V1StopOptions,
-) => {
+): Promise<string | undefined> => {
   const {
     metadata: { name, namespace },
   } = vm;
 
   try {
     const k8sAPIPath = await getKubevirtBaseAPIPath(getCluster(vm));
-    // TODO: when this bz resolves https://bugzilla.redhat.com/show_bug.cgi?id=2056656
+    // When this bz resolves https://bugzilla.redhat.com/show_bug.cgi?id=2056656
     // we can do the call to k8sUpdate instead of consoleFetch
 
     // const promise = await k8sUpdate({
@@ -89,24 +88,33 @@ export const VMActionRequest = async (
   }
 };
 
-export const startVM = async (vm: V1VirtualMachine) =>
+export const startVM = async (vm: V1VirtualMachine): Promise<string | undefined> =>
   VMActionRequest(vm, VMActionType.Start, VirtualMachineModel);
-export const stopVM = async (vm: V1VirtualMachine, body?: V1StopOptions) =>
-  VMActionRequest(vm, VMActionType.Stop, VirtualMachineModel, body);
-export const restartVM = async (vm: V1VirtualMachine) =>
+export const stopVM = async (
+  vm: V1VirtualMachine,
+  body?: V1StopOptions,
+): Promise<string | undefined> => VMActionRequest(vm, VMActionType.Stop, VirtualMachineModel, body);
+export const restartVM = async (vm: V1VirtualMachine): Promise<string | undefined> =>
   VMActionRequest(vm, VMActionType.Restart, VirtualMachineModel);
-export const resetVM = async (vm: V1VirtualMachine) =>
+export const resetVM = async (vm: V1VirtualMachine): Promise<string | undefined> =>
   VMActionRequest(vm, VMActionType.Reset, VirtualMachineInstanceModel);
-export const pauseVM = async (vm: V1VirtualMachine) =>
+export const pauseVM = async (vm: V1VirtualMachine): Promise<string | undefined> =>
   VMActionRequest(vm, VMActionType.Pause, VirtualMachineInstanceModel);
-export const unpauseVM = async (vm: V1VirtualMachine) =>
+export const unpauseVM = async (vm: V1VirtualMachine): Promise<string | undefined> =>
   VMActionRequest(vm, VMActionType.Unpause, VirtualMachineInstanceModel);
-export const addPersistentVolume = async (vm: V1VirtualMachine, body: V1AddVolumeOptions) =>
+export const addPersistentVolume = async (
+  vm: V1VirtualMachine,
+  body: V1AddVolumeOptions,
+): Promise<string | undefined> =>
   VMActionRequest(vm, VMActionType.AddVolume, VirtualMachineModel, body);
-export const removeVolume = async (vm: V1VirtualMachine, body: V1RemoveVolumeOptions) =>
+export const removeVolume = async (
+  vm: V1VirtualMachine,
+  body: V1RemoveVolumeOptions,
+): Promise<string | undefined> =>
   VMActionRequest(vm, VMActionType.RemoveVolume, VirtualMachineModel, body);
-export const migrateVM = async (vm: V1VirtualMachine, node?: string) => {
-  const { name, namespace } = vm?.metadata;
+export const migrateVM = async (vm: V1VirtualMachine, node?: string): Promise<void> => {
+  const name = vm?.metadata?.name;
+  const namespace = vm?.metadata?.namespace;
 
   const migrationData: V1VirtualMachineInstanceMigration = {
     apiVersion: 'kubevirt.io/v1',
@@ -129,7 +137,7 @@ export const migrateVM = async (vm: V1VirtualMachine, node?: string) => {
   });
 };
 
-export const cancelMigration = async (vmim: V1VirtualMachineInstanceMigration) => {
+export const cancelMigration = async (vmim: V1VirtualMachineInstanceMigration): Promise<void> => {
   await kubevirtK8sDelete({
     cluster: vmim?.cluster,
     model: VirtualMachineInstanceMigrationModel,
@@ -140,7 +148,7 @@ export const cancelMigration = async (vmim: V1VirtualMachineInstanceMigration) =
 export const cancelStorageMigrationPlan = async (
   vm: V1VirtualMachine,
   plan: MultiNamespaceVirtualMachineStorageMigrationPlan,
-) => {
+): Promise<void> => {
   const model = getStorageMigrationPlanModelForKind(plan?.kind);
 
   await kubevirtK8sDelete({
@@ -150,7 +158,7 @@ export const cancelStorageMigrationPlan = async (
   });
 };
 
-export const deleteVM = async (vm: V1VirtualMachine) => {
+export const deleteVM = async (vm: V1VirtualMachine): Promise<void> => {
   try {
     await cancelPendingVmUploads(vm);
   } catch (error) {

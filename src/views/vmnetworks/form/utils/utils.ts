@@ -1,13 +1,12 @@
-/* eslint-disable */
-import { TFunction } from 'i18next';
+import { type TFunction } from 'i18next';
 
 import {
   InterfaceType,
-  NodeNetworkConfigurationInterface,
-  OVNBridgeMapping,
-  V1beta1NodeNetworkState,
-  V1NodeNetworkConfigurationPolicy,
-  V1NodeNetworkConfigurationPolicySpec,
+  type NodeNetworkConfigurationInterface,
+  type OVNBridgeMapping,
+  type V1beta1NodeNetworkState,
+  type V1NodeNetworkConfigurationPolicy,
+  type V1NodeNetworkConfigurationPolicySpec,
 } from '@kubevirt-ui-ext/kubevirt-api/nmstate';
 import { MAX_MTU } from '@kubevirt-utils/constants/constants';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -15,7 +14,7 @@ import { ValidatedOptions } from '@patternfly/react-core';
 
 import { MAX_VLAN_ID, MIN_VLAN_ID, OVN_BRIDGE_MAPPINGS, PREFIX_PHYSNET } from '../constants';
 
-const getBridgePorts = (bridgeInterfaces: NodeNetworkConfigurationInterface[]) =>
+const getBridgePorts = (bridgeInterfaces: NodeNetworkConfigurationInterface[]): string[] =>
   bridgeInterfaces.flatMap((iface) => {
     const ports = iface.bridge?.port;
 
@@ -25,14 +24,14 @@ const getBridgePorts = (bridgeInterfaces: NodeNetworkConfigurationInterface[]) =
 
     const port = ports[0];
 
-    return port['link-aggregation']?.port?.map((p) => p.name) ?? port.name;
+    return port['link-aggregation']?.port?.map((portItem) => portItem.name) ?? port.name;
   });
 
 export const getBridgeMTU = (
   bridgeName: string,
   nncpSpec: V1NodeNetworkConfigurationPolicySpec,
   nodeNetworkState: V1beta1NodeNetworkState,
-) => {
+): number => {
   if (bridgeName === 'br-ex') {
     return (
       (nodeNetworkState?.status?.currentState?.interfaces?.find(
@@ -42,7 +41,8 @@ export const getBridgeMTU = (
     );
   }
 
-  const interfaces: NodeNetworkConfigurationInterface[] = nncpSpec.desiredState?.interfaces;
+  const interfaces = (nncpSpec.desiredState?.interfaces ??
+    []) as NodeNetworkConfigurationInterface[];
   const bridgeInterfaces = interfaces?.filter(
     (iface) => iface.name === bridgeName && iface.type === InterfaceType.OVS_BRIDGE,
   );
@@ -81,9 +81,7 @@ export const getNNCPSpecListForLocalnetObject = (
         const localnet = mapping.localnet;
 
         if (!localnet.startsWith(PREFIX_PHYSNET)) {
-          if (!acc[localnet]) {
-            acc[localnet] = [];
-          }
+          acc[localnet] ??= [];
           if (!acc[localnet].includes(policy.spec)) {
             acc[localnet].push(policy.spec);
           }
@@ -95,7 +93,11 @@ export const getNNCPSpecListForLocalnetObject = (
     {} as Record<string, V1NodeNetworkConfigurationPolicySpec[]>,
   ) ?? {};
 
-export const getMTUValidatedInfo = (mtu: number, maxMTUFromLocalnet: number, t: TFunction) => {
+export const getMTUValidatedInfo = (
+  mtu: number,
+  maxMTUFromLocalnet: number,
+  t: TFunction,
+): { message: string | undefined; validated: ValidatedOptions } => {
   if (mtu > MAX_MTU) {
     return {
       message: t('MTU is higher than {{MAX_MTU}} bytes, which is a maximum possible MTU.', {
@@ -123,7 +125,7 @@ export const getMTUValidatedInfo = (mtu: number, maxMTUFromLocalnet: number, t: 
   };
 };
 
-export const getVLANIDValidatedOption = (value: number) =>
+export const getVLANIDValidatedOption = (value: number): ValidatedOptions =>
   isNaN(value) || (value >= MIN_VLAN_ID && value <= MAX_VLAN_ID)
     ? ValidatedOptions.default
     : ValidatedOptions.error;

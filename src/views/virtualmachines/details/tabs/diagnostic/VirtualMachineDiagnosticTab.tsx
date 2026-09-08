@@ -1,12 +1,11 @@
-/* eslint-disable */
-import React, { FC, useCallback, useEffect, useState } from 'react';
+import React, { type FC, useCallback, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 
 import { VirtualMachineDetailsTab } from '@kubevirt-utils/constants/tabs-constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { PageSection, Tab, Tabs, TabTitleText } from '@patternfly/react-core';
-import { NavPageComponentProps } from '@virtualmachines/details/utils/types';
+import { type NavPageComponentProps } from '@virtualmachines/details/utils/types';
 
 import DiagnosticsEmptyFilterState from './components/DiagnosticsEmptyFilterState/DiagnosticsEmptyFilterState';
 import DiagnosticsIssuesToolbar from './components/DiagnosticsIssuesToolbar/DiagnosticsIssuesToolbar';
@@ -20,9 +19,10 @@ import VirtualMachineDiagnosticTabVolumeStatus from './tables/VirtualMachineDiag
 import {
   CONDITION_TO_SEVERITY,
   createEmptyFilters,
+  type DiagnosticCondition,
   SEVERITY_TO_CONDITION,
 } from './utils/constants';
-import { DiagnosticSeverity } from './utils/types';
+import { type DiagnosticSeverity } from './utils/types';
 import { createURLDiagnostic, isActiveFilter } from './utils/utils';
 import VirtualMachineLogViewer from './VirtualMachineLogViewer/VirtualMachineLogViewer';
 
@@ -64,7 +64,7 @@ const VirtualMachineDiagnosticTab: FC<NavPageComponentProps> = ({ obj: vm }) => 
 
   const activeSeverity: DiagnosticSeverity | null =
     filters.conditions.size === 1 && filters.categories.size === 0
-      ? (CONDITION_TO_SEVERITY[[...filters.conditions][0]] ?? null)
+      ? (CONDITION_TO_SEVERITY[[...filters.conditions][0] as DiagnosticCondition] ?? null)
       : null;
 
   const handleCardClick = useCallback(
@@ -86,13 +86,13 @@ const VirtualMachineDiagnosticTab: FC<NavPageComponentProps> = ({ obj: vm }) => 
     <PageSection className="VirtualMachineDiagnosticTab" hasBodyWrapper={false}>
       <div className="VirtualMachineDiagnosticTab__body">
         <Tabs
-          onSelect={(_, key: string) => {
-            navigate(createURLDiagnostic(location.pathname, key));
-            setActiveTabKey(key);
-          }}
           activeKey={activeTabKey}
           className="VirtualMachineDiagnosticTab__tabs"
           isVertical
+          onSelect={(_event, key: string) => {
+            navigate(createURLDiagnostic(location.pathname, key));
+            setActiveTabKey(key);
+          }}
         >
           <Tab
             className="VirtualMachineDiagnosticTab__content"

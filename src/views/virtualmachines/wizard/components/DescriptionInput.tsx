@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 import { Controller } from 'react-hook-form';
 
 import { Button, InputGroup, InputGroupItem, TextInput } from '@patternfly/react-core';
@@ -15,11 +14,11 @@ const DescriptionInput: FC = () => {
     <InputGroup>
       <InputGroupItem isFill>
         <Controller
-          render={({ field: { ref: _, ...field } }) => (
-            <TextInput id="vm-description" type="text" {...field} />
-          )}
           control={control}
           name={CREATE_VM_FORM_FIELDS_VM_DATA.DESCRIPTION}
+          render={({ field: { ref: _ref, ...field } }) => (
+            <TextInput id="vm-description" type="text" {...field} />
+          )}
         />
       </InputGroupItem>
       <InputGroupItem style={{ visibility: 'hidden' }}>

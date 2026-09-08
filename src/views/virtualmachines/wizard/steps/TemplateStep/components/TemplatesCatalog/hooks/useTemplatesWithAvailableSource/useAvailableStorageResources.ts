@@ -1,16 +1,15 @@
-/* eslint-disable */
 import { useMemo } from 'react';
 
 import { PersistentVolumeClaimModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { DataSourceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
-import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
+import { type IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import {
   convertResourceArrayToMapWithCluster,
   getName,
   getNamespace,
 } from '@kubevirt-utils/resources/shared';
-import { BOOT_SOURCE, Template } from '@kubevirt-utils/resources/template';
+import { BOOT_SOURCE, type Template } from '@kubevirt-utils/resources/template';
 import {
   getTemplateBootSourceType,
   isDataSourceCloning,
@@ -19,7 +18,7 @@ import {
 import {
   getGroupVersionKindForModel,
   useK8sWatchResources,
-  WatchK8sResource,
+  type WatchK8sResource,
 } from '@openshift-console/dynamic-plugin-sdk';
 
 type UniqueSourceType = {
@@ -32,7 +31,15 @@ type UniqueSourceType = {
  * @param templatesLoaded - whether the templates are loaded
  * @returns availablePVCs and availableDatasources, both Sets of strings representing the available sources. `{namespace-name}`
  */
-export const useAvailableStorageResources = (templates: Template[], templatesLoaded: boolean) => {
+export const useAvailableStorageResources = (
+  templates: Template[],
+  templatesLoaded: boolean,
+): {
+  availableDataSources: Record<string, V1beta1DataSource>;
+  availablePVCs: Record<string, IoK8sApiCoreV1PersistentVolumeClaim>;
+  cloneInProgressDataSources: Record<string, V1beta1DataSource>;
+  loaded: boolean;
+} => {
   const { uniqueDataSources, uniquePVCs } = useMemo(() => {
     if (!templatesLoaded)
       return {
@@ -48,12 +55,12 @@ export const useAvailableStorageResources = (templates: Template[], templatesLoa
         const bootSource = getTemplateBootSourceType(template);
 
         if (bootSource.type === BOOT_SOURCE.DATA_SOURCE) {
-          const ds = bootSource?.source?.sourceRef;
-          acc.uniqueDataSources[`${ds?.namespace}/${ds?.name}`] = {
+          const dataSourceRef = bootSource?.source?.sourceRef;
+          acc.uniqueDataSources[`${dataSourceRef?.namespace}/${dataSourceRef?.name}`] = {
             groupVersionKind: getGroupVersionKindForModel(DataSourceModel),
             isList: false,
-            name: ds?.name,
-            namespace: ds?.namespace,
+            name: dataSourceRef?.name,
+            namespace: dataSourceRef?.namespace,
           };
         }
 

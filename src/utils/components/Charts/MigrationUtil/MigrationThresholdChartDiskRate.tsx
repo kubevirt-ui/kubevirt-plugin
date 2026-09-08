@@ -1,8 +1,7 @@
-/* eslint-disable */
-import React, { FC, useMemo } from 'react';
+import React, { type FC, useMemo } from 'react';
 import { Link } from 'react-router';
 
-import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useVMQuery from '@kubevirt-utils/hooks/useVMQuery';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
@@ -60,8 +59,12 @@ const MigrationThresholdChartDiskRate: FC<MigrationThresholdChartDiskRateProps> 
 
   const dataProcessed = useMemo(() => getPrometheusData(diskRate), [diskRate]);
 
-  const chartDataProcessed = dataProcessed?.map(([x, y]) => {
-    return { name: t('Data processed'), x: new Date(x * MILLISECONDS_MULTIPLIER), y: Number(y) };
+  const chartDataProcessed = dataProcessed?.map(([timestamp, value]) => {
+    return {
+      name: t('Data processed'),
+      x: new Date(timestamp * MILLISECONDS_MULTIPLIER),
+      y: Number(value),
+    };
   });
 
   const isReady = !isEmpty(chartDataProcessed);
@@ -92,35 +95,35 @@ const MigrationThresholdChartDiskRate: FC<MigrationThresholdChartDiskRateProps> 
             width={width}
           >
             <ChartAxis
+              dependentAxis
               style={{
                 grid: {
                   stroke: chart_color_black_200.value,
                 },
                 tickLabels,
               }}
-              dependentAxis
               {...(yMax != null && {
                 tickFormat: formatMemoryYTick(yMax, 2),
                 tickValues: yRange,
               })}
             />
             <ChartAxis
+              axisComponent={<></>}
               style={{
                 tickLabels: { padding: 2, ...tickLabels },
                 ticks: { stroke: 'transparent' },
               }}
-              axisComponent={<></>}
               tickCount={TICKS_COUNT}
               tickFormat={tickFormat(duration, currentTime)}
             />
             <ChartGroup>
               <ChartArea
+                data={chartDataProcessed}
                 style={{
                   data: {
                     stroke: chart_color_blue_300.value,
                   },
                 }}
-                data={chartDataProcessed}
               />
             </ChartGroup>
           </Chart>

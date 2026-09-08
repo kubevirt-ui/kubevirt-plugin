@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC, ReactNode, useState } from 'react';
+import React, { type FC, type ReactNode, useState } from 'react';
 import classNames from 'classnames';
 
 import { ExpandableSection, Title } from '@patternfly/react-core';
@@ -26,6 +25,10 @@ const OverviewSection: FC<OverviewSectionProps> = ({
   return (
     <div className="overview-section" data-test={dataTestId}>
       <ExpandableSection
+        className={classNames('overview-section__expandable', { 'pf-v6-u-mb-md': isExpanded })}
+        id={dataTestId}
+        isExpanded={isExpanded}
+        onToggle={(_event, expanded) => setIsExpanded(expanded)}
         toggleContent={
           <div className="overview-section__toggle-header">
             <Title className="overview-section__toggle-title" headingLevel="h3">
@@ -34,10 +37,6 @@ const OverviewSection: FC<OverviewSectionProps> = ({
             {subHeader && <span className="overview-section__sub-header">{subHeader}</span>}
           </div>
         }
-        className={classNames('overview-section__expandable', { 'pf-v6-u-mb-md': isExpanded })}
-        id={dataTestId}
-        isExpanded={isExpanded}
-        onToggle={(_, expanded) => setIsExpanded(expanded)}
       >
         <div className="overview-section__content">{children}</div>
       </ExpandableSection>

@@ -1,7 +1,6 @@
-/* eslint-disable */
 import { useMemo, useState } from 'react';
 
-import { ThProps } from '@patternfly/react-table';
+import { type ThProps } from '@patternfly/react-table';
 
 type GetSorting = (column: string, columnIndex: number) => ThProps['sort'];
 
@@ -19,9 +18,9 @@ const useDiagnosticSort: UseDiagnosticSort = () => {
   const [activeSortDirection, setActiveSortDirection] = useState<'asc' | 'desc'>('asc');
   const [activeSortColumn, setActiveSortColumn] = useState<string>('reason');
 
-  const getSorting: GetSorting = (column, columnIndex) => ({
+  const getSorting: GetSorting = (column, columnIndex): ThProps['sort'] => ({
     columnIndex,
-    onSort: (_, index, direction) => {
+    onSort: (_event, index, direction): void => {
       setActiveSortIndex(index);
       setActiveSortColumn(column);
       setActiveSortDirection(direction);

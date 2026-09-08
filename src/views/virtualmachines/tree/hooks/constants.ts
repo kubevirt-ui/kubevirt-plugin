@@ -13,7 +13,7 @@ export const NOT_ALLOWED_DRAG_TARGET_BACKGROUND_COLOR = '#F2F2F2';
 export const DROP_EFFECTS = {
   MOVE: 'move',
   NONE: 'none',
-};
+} as const;
 
 export const REMOVE_DRAG_BACKGROUND_COLOR = 'unset';
 

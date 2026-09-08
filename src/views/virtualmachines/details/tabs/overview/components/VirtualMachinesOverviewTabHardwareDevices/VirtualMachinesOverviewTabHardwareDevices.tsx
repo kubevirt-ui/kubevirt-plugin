@@ -1,7 +1,6 @@
-/* eslint-disable */
-import React, { FC, MouseEvent, useState } from 'react';
+import React, { type FC, type MouseEvent, useState } from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import HardwareDevicesList from '@kubevirt-utils/components/HardwareDevices/list/HardwareDevicesList';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getGPUDevices, getHostDevices } from '@kubevirt-utils/resources/vm';
@@ -32,7 +31,7 @@ const VirtualMachinesOverviewTabHardwareDevices: FC<
   const gpusCount = gpus?.length ?? 0;
   const vmHasS390xArchitecture = hasS390xArchitecture(vm);
 
-  const handleTabClick = (_: MouseEvent<HTMLElement>, tabIndex: number | string) => {
+  const handleTabClick = (_event: MouseEvent<HTMLElement>, tabIndex: number | string): void => {
     setActiveTabKey(tabIndex);
   };
 
@@ -58,12 +57,12 @@ const VirtualMachinesOverviewTabHardwareDevices: FC<
             </Tab>
           )}
           <Tab
+            eventKey={vmHasS390xArchitecture ? 0 : 1}
             title={
               <TabTitleText>
                 {t('Host devices ({{hostDevicesCount}})', { hostDevicesCount })}
               </TabTitleText>
             }
-            eventKey={vmHasS390xArchitecture ? 0 : 1}
           >
             <HardwareDevicesList
               className="kubevirt-table--tabs-content kubevirt-table--in-card"

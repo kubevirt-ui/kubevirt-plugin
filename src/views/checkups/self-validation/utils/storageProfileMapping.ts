@@ -1,9 +1,8 @@
-/* eslint-disable */
 import {
   V1beta1StorageSpecAccessModesEnum,
   V1beta1StorageSpecVolumeModeEnum,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { ClaimPropertySets } from '@kubevirt-utils/types/storage';
+import { type ClaimPropertySets } from '@kubevirt-utils/types/storage';
 
 import {
   STORAGE_CAPABILITY_STORAGE_RWO_BLOCK,
@@ -86,10 +85,10 @@ export const mergeProfileDerivedCapabilities = (
   previousCapabilities: string[],
   derivedFromProfile: string[],
 ): string[] => {
-  const manual = previousCapabilities.filter((c) => !STORAGE_CAPABILITIES_FROM_PROFILE.has(c));
+  const manual = previousCapabilities.filter((cap) => !STORAGE_CAPABILITIES_FROM_PROFILE.has(cap));
   return Array.from(new Set([...derivedFromProfile, ...manual]));
 };
 
 /** Remove only profile-derived flags; keep manual selections (snapshot, CSI, etc.). */
 export const stripProfileDerivedCapabilities = (capabilities: string[]): string[] =>
-  capabilities.filter((c) => !STORAGE_CAPABILITIES_FROM_PROFILE.has(c));
+  capabilities.filter((cap) => !STORAGE_CAPABILITIES_FROM_PROFILE.has(cap));

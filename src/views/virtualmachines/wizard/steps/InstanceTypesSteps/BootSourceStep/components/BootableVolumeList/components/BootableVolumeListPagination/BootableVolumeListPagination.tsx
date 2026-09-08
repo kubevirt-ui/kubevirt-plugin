@@ -1,8 +1,7 @@
-/* eslint-disable */
-import React, { Dispatch, FC, SetStateAction } from 'react';
+import React, { type Dispatch, type FC, type SetStateAction } from 'react';
 
-import { PaginationState } from '@kubevirt-utils/hooks/usePagination/utils/types';
-import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
+import { type PaginationState } from '@kubevirt-utils/hooks/usePagination/utils/types';
+import { type BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { Pagination } from '@patternfly/react-core';
 
 import { paginationDefaultValuesForm } from '../../utils/constants';
@@ -18,7 +17,7 @@ const BootableVolumeListPagination: FC<BootableVolumeListPaginationProps> = ({
   pagination,
   setPagination,
 }) => {
-  const onPageChange = ({ endIndex, page, perPage, startIndex }: PaginationState) => {
+  const onPageChange = ({ endIndex, page, perPage, startIndex }: PaginationState): void => {
     setPagination(() => ({
       endIndex,
       page,
@@ -28,14 +27,14 @@ const BootableVolumeListPagination: FC<BootableVolumeListPaginationProps> = ({
   };
   return (
     <Pagination
-      onPerPageSelect={(_e, perPage, page, startIndex, endIndex) =>
-        onPageChange({ endIndex, page, perPage, startIndex })
-      }
-      onSetPage={(_e, page, perPage, startIndex, endIndex) =>
-        onPageChange({ endIndex, page, perPage, startIndex })
-      }
       isLastFullPageShown
       itemCount={data?.length}
+      onPerPageSelect={(_event, perPage, page, startIndex, endIndex) =>
+        onPageChange({ endIndex, page, perPage, startIndex })
+      }
+      onSetPage={(_event, page, perPage, startIndex, endIndex) =>
+        onPageChange({ endIndex, page, perPage, startIndex })
+      }
       page={pagination?.page}
       perPage={pagination?.perPage}
       perPageOptions={paginationDefaultValuesForm}

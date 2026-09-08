@@ -1,11 +1,10 @@
-/* eslint-disable */
 import { DataVolumeModel, VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
-import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
-import { IoK8sApiCoreV1Secret } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type V1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
+import { type IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type IoK8sApiCoreV1Secret } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import {
-  V1beta1VirtualMachineSnapshot,
-  V1VirtualMachine,
+  type V1beta1VirtualMachineSnapshot,
+  type V1VirtualMachine,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { cancelPendingVmUploads } from '@kubevirt-utils/hooks/useUploadProgressToast/cancel/cancelPendingVmUploads';
 import { buildOwnerReference } from '@kubevirt-utils/resources/shared';
@@ -34,7 +33,7 @@ export const deleteVMWithResources = async ({
   snapshotsToSave,
   vm,
   volumesToSave,
-}: DeleteVMParams) => {
+}: DeleteVMParams): Promise<void> => {
   try {
     await cancelPendingVmUploads(vm);
   } catch (error) {
@@ -43,13 +42,13 @@ export const deleteVMWithResources = async ({
 
   const vmOwnerRef = buildOwnerReference(vm);
   const dvToSave = volumesToSave.filter(
-    (v) => v.kind === DataVolumeModel.kind,
+    (vol) => vol.kind === DataVolumeModel.kind,
   ) as V1beta1DataVolume[];
 
   await detachDataVolumeTemplates(vm, dvToSave);
   await Promise.allSettled(updateVolumeResources(volumesToSave, vmOwnerRef));
   await Promise.allSettled(updateSnapshotResources(snapshotsToSave, vmOwnerRef));
-  await Promise.allSettled(deleteSecrets(secrets));
+  await Promise.allSettled(deleteSecrets(secrets).map((result) => Promise.resolve(result)));
 
   await kubevirtK8sDelete({
     cluster: getCluster(vm),

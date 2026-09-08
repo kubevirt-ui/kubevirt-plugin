@@ -1,4 +1,3 @@
-/* eslint-disable */
 import React, { type FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -25,7 +24,7 @@ const ShowOnlyVMProjectsSwitch: FC<ShowOnlyVMProjectsSwitchProps> = ({ hasVMs })
       data-test="show-only-vm-projects-switch"
       isDisabled={!hasVMs}
       isReversed
-      onChange={(_, checked) => setShowEmptyProjects(checked ? HIDE : SHOW)}
+      onChange={(_event, checked) => setShowEmptyProjects(checked ? HIDE : SHOW)}
     />
   );
 

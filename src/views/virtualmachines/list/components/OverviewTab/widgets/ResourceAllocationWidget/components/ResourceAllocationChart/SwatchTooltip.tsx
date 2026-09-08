@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React from 'react';
+import React, { type JSX } from 'react';
 
 import { ChartTooltip } from '@patternfly/react-charts/victory';
 import chart_color_blue_300 from '@patternfly/react-tokens/dist/esm/chart_color_blue_300';
@@ -14,7 +13,10 @@ const FLIP_THRESHOLD = 0.35;
 
 const LINES_PER_DATUM = 3;
 
-const buildStyles = (text: string | string[], defaultColor: string) => {
+const buildStyles = (
+  text: string | string[],
+  defaultColor: string,
+): Record<string, number | string>[] => {
   const lineCount = Array.isArray(text)
     ? text.reduce((sum, t) => sum + (t?.split?.('\n')?.length ?? 0), 0)
     : (text?.split?.('\n')?.length ?? LINES_PER_DATUM);
@@ -31,11 +33,11 @@ const buildStyles = (text: string | string[], defaultColor: string) => {
   return styles;
 };
 
-const SwatchTooltip = (props: Record<string, unknown>) => {
+const SwatchTooltip = (props: Record<string, unknown>): JSX.Element => {
   const color = (props.datum as { _color?: string })?._color ?? chart_color_blue_300.var;
-  const y = props.y as number;
+  const yPos = props.y as number;
   const chartHeight = props.height as number;
-  const nearTop = chartHeight > 0 && y < chartHeight * FLIP_THRESHOLD;
+  const nearTop = chartHeight > 0 && yPos < chartHeight * FLIP_THRESHOLD;
   const styles = buildStyles(props.text as string | string[], color);
 
   return (

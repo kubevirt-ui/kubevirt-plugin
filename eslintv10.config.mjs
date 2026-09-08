@@ -49,6 +49,7 @@ const baseConfig = {
   plugins: {
     i18next,
     'import-x': importX,
+    perfectionist,
     promise,
     'react-hooks': reactHooks,
     'simple-import-sort': simpleImportSort,
@@ -91,6 +92,22 @@ const baseConfig = {
     'promise/no-nesting': 'warn',
     'promise/no-return-wrap': 'error',
     'promise/param-names': 'error',
+    'perfectionist/sort-classes': [
+      'error',
+      {
+        groups: [
+          'static-property',
+          'private-property',
+          'property',
+          'constructor',
+          'static-method',
+          'private-method',
+          'method',
+        ],
+        order: 'asc',
+        type: 'natural',
+      },
+    ],
     'react-hooks/exhaustive-deps': 'error',
     'react-hooks/immutability': 'error',
     'react-hooks/incompatible-library': 'warn',
@@ -262,18 +279,6 @@ const reactConfig = {
   },
 };
 
-const perfectionistOverrides = {
-  files: ['**/*.{js,jsx,ts,tsx}'],
-  rules: {
-    'perfectionist/sort-imports': 'off',
-    'perfectionist/sort-intersection-types': 'off',
-    'perfectionist/sort-modules': 'off',
-    'perfectionist/sort-named-imports': 'off',
-    'perfectionist/sort-sets': 'off',
-    'perfectionist/sort-switch-case': 'off',
-  },
-};
-
 const testingLibraryConfig = {
   ...testingLibrary.configs['flat/react'],
   files: ['**/*.test.{ts,tsx}', '**/*.spec.{ts,tsx}', '**/__tests__/**/*.{ts,tsx}'],
@@ -306,7 +311,6 @@ const githubScriptsOverrides = {
     ...allSonarjsRulesOff,
     'i18next/no-literal-string': 'off',
     'no-console': 'off',
-    'perfectionist/sort-classes': 'off',
   },
 };
 
@@ -316,8 +320,6 @@ export default [
   ...tsConfigs,
   reactConfig,
   sonarConfig,
-  perfectionist.configs['recommended-alphabetical'],
-  perfectionistOverrides,
   testingLibraryConfig,
   testFilesOverrides,
   prettier,

@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { Dispatch, FC, SetStateAction } from 'react';
+import React, { type Dispatch, type FC, type SetStateAction } from 'react';
 
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -87,10 +86,10 @@ const VirtualMachineMigrationDestinationTab: FC<VirtualMachineMigrationDestinati
             ),
             value: storageClass,
           }))}
+          placeholder={t('Select StorageClass')}
           popperProps={{
             appendTo: () => document.getElementById(POPPER_CONTAINER_ID),
           }}
-          placeholder={t('Select StorageClass')}
           selected={destinationStorageClass}
           setSelected={setSelectedStorageClass}
           toggleProps={{ isFullWidth: true }}
@@ -99,16 +98,18 @@ const VirtualMachineMigrationDestinationTab: FC<VirtualMachineMigrationDestinati
       {isSameStorageClass && (
         <StackItem>
           <Alert
+            isInline
             title={t(
               'The selected target StorageClass is the same as the source. Select a different StorageClass to proceed with the migration.',
             )}
-            isInline
             variant={AlertVariant.warning}
           />
         </StackItem>
       )}
       <StackItem>
         <Checkbox
+          id="keep-original-volumes"
+          isChecked={keepOriginalVolumes}
           label={
             <>
               {t('Keep original volumes at source after successful migration')}{' '}
@@ -121,18 +122,16 @@ const VirtualMachineMigrationDestinationTab: FC<VirtualMachineMigrationDestinati
               </Popover>
             </>
           }
-          id="keep-original-volumes"
-          isChecked={keepOriginalVolumes}
-          onChange={(_, checked) => setKeepOriginalVolumes(checked)}
+          onChange={(_event, checked) => setKeepOriginalVolumes(checked)}
         />
       </StackItem>
       <StackItem>
         {keepOriginalVolumes && (
           <Alert
+            isInline
             title={t(
               "If you keep these volumes, you'll need to manually decommission the disks after you've verified the migration",
             )}
-            isInline
             variant={AlertVariant.info}
           />
         )}

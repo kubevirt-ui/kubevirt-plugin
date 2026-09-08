@@ -1,9 +1,8 @@
-/* eslint-disable */
 import {
-  V1beta1VirtualMachineClusterPreference,
-  V1beta1VirtualMachinePreference,
+  type V1beta1VirtualMachineClusterPreference,
+  type V1beta1VirtualMachinePreference,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { PreferenceOption } from '@kubevirt-utils/components/AddBootableVolumeModal/types';
+import { type PreferenceOption } from '@kubevirt-utils/components/AddBootableVolumeModal/types';
 import { getClusterOnlyArchitecture } from '@kubevirt-utils/components/FirmwareBootloaderModal/utils/utils';
 import { ARCHITECTURES } from '@kubevirt-utils/constants/constants';
 import { getName } from '@kubevirt-utils/resources/shared';
@@ -42,7 +41,7 @@ export const getOperatingSystemTileTypes = (isWindowsSupported: boolean): Operat
 
 // Handles Windows naming: "2k22" → 2022, "2k25" → 2025
 const parseWindowsVersionToNumbersOnly = (segment: string): number => {
-  const match = segment?.match(/^2k(\d+)$/i);
+  const match = /^2k(\d+)$/i.exec(segment);
   return match ? 2000 + Number(match[1]) : Number(segment) || 0;
 };
 
@@ -77,7 +76,7 @@ const getPreferenceForSingleWorkloadArchitecture = (
 const getOtherLinuxDefaultPreference = (
   otherLinuxPreferences: PreferenceOption[],
   architectures?: string[],
-) => {
+): PreferenceOption | undefined => {
   const fedoraPreferences = otherLinuxPreferences
     .filter((entry) => entry.name.toLowerCase().includes(OS_NAME_TYPES.fedora))
     .sort(sortByVersionDescending);
@@ -113,13 +112,16 @@ export const getDefaultPreference = (
 const getFilteredPreferencesByOsType = (
   preferences: (V1beta1VirtualMachineClusterPreference | V1beta1VirtualMachinePreference)[],
   osType: OperatingSystemType,
-) =>
+): PreferenceOption[] =>
   preferences.reduce<PreferenceOption[]>((filteredPreferences, preference) => {
-    const os = preference?.spec?.annotations?.[VM_OS_ANNOTATION];
+    const osAnnotation = preference?.spec?.annotations?.[VM_OS_ANNOTATION];
     const preferenceName = getName(preference);
     const name = preferenceName?.toLowerCase() ?? '';
 
-    if (isEmpty(preferenceName) || !operatingSystemPreferenceFilters[osType]({ name, os })) {
+    if (
+      isEmpty(preferenceName) ||
+      !operatingSystemPreferenceFilters[osType]({ name, os: osAnnotation })
+    ) {
       return filteredPreferences;
     }
 

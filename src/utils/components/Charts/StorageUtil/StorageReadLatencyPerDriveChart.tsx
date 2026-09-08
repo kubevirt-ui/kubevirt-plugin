@@ -1,8 +1,7 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 import { Link } from 'react-router';
 
-import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { tickLabels } from '@kubevirt-utils/components/Charts/ChartLabels/styleOverrides';
 import useVMQuery from '@kubevirt-utils/hooks/useVMQuery';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
@@ -65,17 +64,17 @@ const StorageReadLatencyPerDriveChart: FC<StorageReadLatencyPerDriveChartProps> 
     timespan,
   });
 
-  const results = data?.data?.result || [];
+  const results = data?.data?.result ?? [];
 
   const isLoading = !loaded;
 
   const chartDataSeries = results.map((result, index) => {
     const driveName = getDriveName(result.metric?.drive, index);
-    const values = result.values || [];
+    const values = result.values ?? [];
 
-    const chartData = values.map(([x, y]) => ({
-      x: new Date(x * MILLISECONDS_MULTIPLIER),
-      y: Number(y),
+    const chartData = values.map(([timestamp, value]) => ({
+      x: new Date(timestamp * MILLISECONDS_MULTIPLIER),
+      y: Number(value),
     }));
 
     return {
@@ -122,36 +121,36 @@ const StorageReadLatencyPerDriveChart: FC<StorageReadLatencyPerDriveChartProps> 
             width={width}
           >
             <ChartAxis
+              dependentAxis
               style={{
                 grid: {
                   stroke: chart_color_black_200.value,
                 },
               }}
-              dependentAxis
               tickFormat={(tick: number) => `${tick === 0 ? tick : (tick * 1000)?.toFixed(2)} ms`}
               {...(yRange && { tickValues: yRange })}
             />
             <ChartAxis
+              axisComponent={<></>}
               style={{
                 tickLabels: { padding: 2, ...tickLabels },
                 ticks: { stroke: 'transparent' },
               }}
-              axisComponent={<></>}
               tickCount={TICKS_COUNT}
               tickFormat={tickFormat(duration, currentTime)}
             />
             <ChartGroup>
               {chartDataSeries.map((series) => (
                 <ChartLine
+                  data={series.data}
+                  key={series.name}
+                  name={series.name}
                   style={{
                     data: {
                       stroke: series.color,
                       strokeWidth: 2,
                     },
                   }}
-                  data={series.data}
-                  key={series.name}
-                  name={series.name}
                 />
               ))}
             </ChartGroup>

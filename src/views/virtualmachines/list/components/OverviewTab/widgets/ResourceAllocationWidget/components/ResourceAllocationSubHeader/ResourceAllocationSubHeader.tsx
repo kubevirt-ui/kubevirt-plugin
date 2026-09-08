@@ -1,12 +1,11 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { SelectOption } from '@patternfly/react-core';
 
 import { TOP_N } from '../../../ClusterStatusWidget/hooks/clusterMetricConstants';
-import { WidgetConfig } from '../ResourceAllocationSection/resourceAllocationSectionConfig';
+import { type WidgetConfig } from '../ResourceAllocationSection/resourceAllocationSectionConfig';
 
 import './ResourceAllocationSubHeader.scss';
 
@@ -31,7 +30,8 @@ const ResourceAllocationSubHeader: FC<ResourceAllocationSubHeaderProps> = ({
   widgetConfigs,
 }) => {
   const { t } = useKubevirtTranslation();
-  const selectedLabel = widgetConfigs.find((w) => w.metric === selectedMetric)?.title ?? '';
+  const selectedLabel =
+    widgetConfigs.find((config) => config.metric === selectedMetric)?.title ?? '';
   const showCount = topClusterCount >= TOP_N;
 
   return (

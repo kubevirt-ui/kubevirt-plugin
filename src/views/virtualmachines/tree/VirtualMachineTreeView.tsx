@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { CSSProperties, FC, ReactNode, useMemo } from 'react';
+import React, { type CSSProperties, type FC, type ReactNode, useMemo } from 'react';
 
 import useIsSmallScreen from '@kubevirt-utils/hooks/useIsSmallScreen';
 import useLocalStorage from '@kubevirt-utils/hooks/useLocalStorage';
@@ -12,10 +11,9 @@ import {
 } from '@patternfly/react-core';
 
 import { useHideNamespaceBar } from '../hooks/useHideNamespaceBar';
-
 import TreeViewContent from './components/TreeViewContent';
 import useAutoSelectTreeViewItem from './hooks/useAutoSelectTreeViewItem/useAutoSelectTreeViewItem';
-import { UseTreeViewData } from './hooks/useTreeViewData';
+import { type UseTreeViewData } from './hooks/useTreeViewData';
 import {
   CLOSED_DRAWER_SIZE,
   HIDE,
@@ -55,7 +53,7 @@ const VirtualMachineTreeView: FC<VirtualMachineTreeViewProps> = ({
 
   if (loadError) return <>{children}</>;
 
-  const toggleDrawer = () => {
+  const toggleDrawer = (): void => {
     const toggleOpen = !isOpen;
     setDrawerOpen(toggleOpen ? SHOW : HIDE);
 
@@ -71,11 +69,11 @@ const VirtualMachineTreeView: FC<VirtualMachineTreeViewProps> = ({
     height: getContentScrollableElement().offsetHeight - footerSpace || 0,
   };
 
-  const widthStyles: any = {
+  const widthStyles: Record<string, string> = {
     [PANEL_WIDTH_PROPERTY]: drawerWidth,
   };
 
-  const styles = { ...widthStyles, ...heightStyles } as CSSProperties;
+  const styles: CSSProperties = { ...widthStyles, ...heightStyles } as CSSProperties;
 
   const treeView = (
     <TreeViewContent
@@ -99,7 +97,7 @@ const VirtualMachineTreeView: FC<VirtualMachineTreeViewProps> = ({
               className="vms-tree-view"
               id={TREE_VIEW_PANEL_ID}
               isResizable={isOpen}
-              onResize={(_, width: number) => setDrawerWidth(`${String(width)}px`)}
+              onResize={(_event, width: number) => setDrawerWidth(`${String(width)}px`)}
               style={styles}
             >
               {treeView}

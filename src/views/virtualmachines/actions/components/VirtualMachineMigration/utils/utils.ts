@@ -1,15 +1,14 @@
-/* eslint-disable */
-import { TFunction } from 'i18next';
+import { type TFunction } from 'i18next';
 
-import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import {
-  V1VirtualMachine,
-  V1VirtualMachineInstanceMigration,
-  V1Volume,
+  type V1VirtualMachine,
+  type V1VirtualMachineInstanceMigration,
+  type V1Volume,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import {
-  MigrationStatus,
-  MultiNamespaceVirtualMachineStorageMigrationPlan,
+  type MigrationStatus,
+  type MultiNamespaceVirtualMachineStorageMigrationPlan,
   STORAGE_MIGRATION_PHASE,
 } from '@kubevirt-utils/resources/migrations/constants';
 import { getLabel, getName, getNamespace } from '@kubevirt-utils/resources/shared';
@@ -19,7 +18,7 @@ import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { EmptyStateStatus } from '@patternfly/react-core';
 import { CheckCircleIcon, CogIcon, ExclamationCircleIcon } from '@patternfly/react-icons';
 
-import { ALREADY_MIGRATED_PVC_LALBEL, SelectedMigration } from './constants';
+import { ALREADY_MIGRATED_PVC_LALBEL, type SelectedMigration } from './constants';
 import { createSelectedMigration, getTableDiskData } from './diskData';
 
 export const getVolumeFromPVC = (
@@ -35,12 +34,17 @@ export const getVolumeFromPVC = (
   );
 };
 
-export const getMigrationSuccessTimestamp = (vmim: V1VirtualMachineInstanceMigration): string =>
+export const getMigrationSuccessTimestamp = (
+  vmim: V1VirtualMachineInstanceMigration,
+): string | undefined =>
   vmim?.status?.phaseTransitionTimestamps?.find(
     (phaseTransition) => phaseTransition.phase === vmimStatuses.Succeeded,
   )?.phaseTransitionTimestamp;
 
-export const getVolumePVC = (volume: V1Volume, pvcs: IoK8sApiCoreV1PersistentVolumeClaim[]) =>
+export const getVolumePVC = (
+  volume: V1Volume,
+  pvcs: IoK8sApiCoreV1PersistentVolumeClaim[],
+): IoK8sApiCoreV1PersistentVolumeClaim | undefined =>
   pvcs?.find(
     (pvc) =>
       getName(pvc) === volume.dataVolume?.name ||
@@ -65,11 +69,8 @@ export const getMigratableVMPVCs = (
   }, []);
 };
 
-export const getAllVolumesCount = (vms: V1VirtualMachine[]) =>
-  vms.reduce((acc, vm) => {
-    acc = acc + getVolumes(vm).length;
-    return acc;
-  }, 0);
+export const getAllVolumesCount = (vms: V1VirtualMachine[]): number =>
+  vms.reduce((acc, vm) => acc + getVolumes(vm).length, 0);
 
 export const getAllSelectedMigrations = (
   vms: V1VirtualMachine[],

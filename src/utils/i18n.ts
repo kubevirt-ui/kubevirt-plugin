@@ -1,8 +1,7 @@
-/* eslint-disable */
 // IMPORTANT: This file adds comments recognized by the react-i18next-parser so that
 // labels declared in console extensions are added to the message catalog.
 
-// TODO: We should make the custom i18next JSON lexer available to plugins so
+// We should make the custom i18next JSON lexer available to plugins so
 // that they dont need this file.
 
 // t('plugin__kubevirt-plugin~Cluster')
@@ -85,7 +84,7 @@
 // t('Show uncategorized VirtualMachines')
 
 // URL source helper text - used in DiskSourceUrlInput/URLSourceHelperText.tsx via t(osEntry.field)
-// TODO: Replace three-part concatenation with single interpolated translation key
+// Replace three-part concatenation with single interpolated translation key
 // t('Example: For CentOS, visit the ')
 // t('CentOS cloud image list ')
 // t('and copy the download link URL for the cloud base image')

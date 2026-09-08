@@ -1,8 +1,7 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 import { Link } from 'react-router';
 
-import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import useVMQuery from '@kubevirt-utils/hooks/useVMQuery';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -56,8 +55,8 @@ const StorageIOPSTotalThresholdChart: FC<StorageIOPSTotalThresholdChartProps> = 
   const isLoading = !loaded;
   const storageWriteData = data?.data?.result?.[0]?.values;
 
-  const chartData = storageWriteData?.map(([x, y]) => {
-    return { x: new Date(x * MILLISECONDS_MULTIPLIER), y: Number(y) };
+  const chartData = storageWriteData?.map(([timestamp, value]) => {
+    return { x: new Date(timestamp * MILLISECONDS_MULTIPLIER), y: Number(value) };
   });
   const yMax = useStableYMax(findMaxYValue(chartData), `${vmi?.metadata?.uid}_${duration}`);
   const yRange = getChartYRange(yMax);
@@ -88,32 +87,32 @@ const StorageIOPSTotalThresholdChart: FC<StorageIOPSTotalThresholdChartProps> = 
             width={width}
           >
             <ChartAxis
+              dependentAxis
               style={{
                 grid: {
                   stroke: chart_color_black_200.value,
                 },
               }}
-              dependentAxis
               tickFormat={(tick: number) => `${tick === 0 ? tick : tick?.toFixed(2)} IOPS`}
               {...(yRange && { tickValues: yRange })}
             />
             <ChartAxis
+              axisComponent={<></>}
               style={{
                 tickLabels: { padding: 2 },
                 ticks: { stroke: 'transparent' },
               }}
-              axisComponent={<></>}
               tickCount={TICKS_COUNT}
               tickFormat={tickFormat(duration, currentTime)}
             />
             <ChartGroup>
               <ChartArea
+                data={chartData}
                 style={{
                   data: {
                     stroke: chart_color_blue_300.value,
                   },
                 }}
-                data={chartData}
               />
             </ChartGroup>
           </Chart>
