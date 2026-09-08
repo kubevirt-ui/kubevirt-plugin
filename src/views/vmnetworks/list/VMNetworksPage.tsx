@@ -6,12 +6,10 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { NetworkAttachmentDefinitionModel } from '@kubevirt-utils/models';
 import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverContentWithLightspeedButton/PopoverContentWithLightspeedButton';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
-import { ListPageCreateButton, ListPageHeader } from '@openshift-console/dynamic-plugin-sdk';
+import { ListPageHeader } from '@openshift-console/dynamic-plugin-sdk';
 import { Button, PopoverPosition, Stack, Tab, Tabs, TabTitleText } from '@patternfly/react-core';
 
-import { VM_NETWORKS_PATH } from '../constants';
-
-import useCanCreateVMNetwork from '../hooks/useCanCreateVMNetwork';
+import CreateNetworkButton from './components/CreateNetworkButton';
 import { NADS_LIST_PATH, PATH_BY_TAB_INDEX, TAB_INDEX_BY_PATH, TAB_INDEXES } from './constants';
 import VMNetworkList from './VMNetworkList';
 import VMNetworkOtherTypesList from './VMNetworkOtherTypesList';
@@ -20,20 +18,13 @@ const VMNetworksPage: FC = () => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
   const location = useLocation();
-  const { canCreate } = useCanCreateVMNetwork();
 
   const locationTabKey = TAB_INDEX_BY_PATH[location?.pathname] as number | undefined;
-
-  const onCreate = (): void => {
-    navigate(`${VM_NETWORKS_PATH}/~new`);
-  };
 
   return (
     <>
       <ListPageHeader title={t('Virtual machine networks')}>
-        <ListPageCreateButton isDisabled={!canCreate} onClick={onCreate}>
-          {t('Create network')}
-        </ListPageCreateButton>
+        <CreateNetworkButton />
       </ListPageHeader>
       <Tabs
         activeKey={locationTabKey}
@@ -47,7 +38,7 @@ const VMNetworksPage: FC = () => {
           eventKey={TAB_INDEXES.OVN_LOCALNET}
           title={<TabTitleText>{t('OVN localnet')}</TabTitleText>}
         >
-          <VMNetworkList onCreate={onCreate} />
+          <VMNetworkList />
         </Tab>
         <Tab
           eventKey={TAB_INDEXES.OTHER_VM_NETWORK_TYPES}

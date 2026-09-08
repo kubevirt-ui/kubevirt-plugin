@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router';
 
 import AddBootableVolumeModal from '@kubevirt-utils/components/AddBootableVolumeModal/AddBootableVolumeModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+import NoPermissionButton from '@kubevirt-utils/components/NoPermissionButton/NoPermissionButton';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useSelectedCluster from '@kubevirt-utils/hooks/useSelectedCluster';
@@ -12,11 +13,10 @@ import useIsACMPage from '@multicluster/useIsACMPage';
 import { ListPageCreateDropdown } from '@openshift-console/dynamic-plugin-sdk';
 
 type BootableVolumeAddButtonProps = {
-  buttonText?: string;
   namespace: string;
 };
 
-const BootableVolumeAddButton: FC<BootableVolumeAddButtonProps> = ({ buttonText, namespace }) => {
+const BootableVolumeAddButton: FC<BootableVolumeAddButtonProps> = ({ namespace }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const navigate = useNavigate();
@@ -34,7 +34,7 @@ const BootableVolumeAddButton: FC<BootableVolumeAddButtonProps> = ({ buttonText,
 
   const onCreate = (type: string): void => {
     if (type === 'form') {
-      createModal((props) => <AddBootableVolumeModal {...props} />);
+      createModal?.((props) => <AddBootableVolumeModal {...props} />);
       return;
     }
     const url = isACMPage
@@ -43,15 +43,17 @@ const BootableVolumeAddButton: FC<BootableVolumeAddButtonProps> = ({ buttonText,
     navigate(url);
   };
 
+  const createButtonText = t('Add volume');
+
   if ((canCreateDS || canCreatePVC) && canListInstanceTypesPreference) {
     return (
       <ListPageCreateDropdown items={createItems} onClick={onCreate}>
-        {buttonText ?? t('Add volume')}
+        {createButtonText}
       </ListPageCreateDropdown>
     );
   }
 
-  return <></>;
+  return <NoPermissionButton>{createButtonText}</NoPermissionButton>;
 };
 
 export default BootableVolumeAddButton;

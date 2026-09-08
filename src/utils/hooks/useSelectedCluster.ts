@@ -6,13 +6,13 @@ import useListClusters from './useListClusters';
 
 /**
  * Returns a cluster name that a user has selected or the hub cluster if none have been selected yet.
- * @returns a cluster name if the page is an ACM page, otherwise null
+ * @returns a cluster name if the page is an ACM page, otherwise undefined
  */
-const useSelectedCluster = () => {
+const useSelectedCluster = (): string | undefined => {
   const isACMPage = useIsACMPage();
   const clusters = useListClusters();
   const [hubClusterName] = useHubClusterName();
-  return isACMPage ? clusters?.[0] || hubClusterName : null;
+  return isACMPage ? (clusters?.[0] ?? hubClusterName) : undefined;
 };
 
 export default useSelectedCluster;

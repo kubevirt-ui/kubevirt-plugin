@@ -1,12 +1,11 @@
 import React, { type FC, useCallback } from 'react';
 import { useNavigate } from 'react-router';
 
+import NoPermissionButton from '@kubevirt-utils/components/NoPermissionButton/NoPermissionButton';
 import { EditorType } from '@kubevirt-utils/components/SyncedEditor/utils/types';
+import useCanCreateResource from '@kubevirt-utils/hooks/useCanCreateResource';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import {
-  ApplicationAwareResourceQuotaModel,
-  modelToGroupVersionKind,
-} from '@kubevirt-utils/models';
+import { ApplicationAwareResourceQuotaModel } from '@kubevirt-utils/models';
 import { ListPageCreateDropdown } from '@openshift-console/dynamic-plugin-sdk';
 
 import { getQuotaCreateFormURL, getQuotaCreateFormYAMLURL } from '../../utils/url';
@@ -34,16 +33,20 @@ const QuotasCreateButton: FC<QuotasCreateButtonProps> = ({ namespace }) => {
     [navigate, namespace],
   );
 
+  const canCreateQuota = useCanCreateResource({
+    model: ApplicationAwareResourceQuotaModel,
+    namespace,
+  });
+
+  const createButtonText = t('Create quota');
+
+  if (!canCreateQuota) {
+    return <NoPermissionButton>{createButtonText}</NoPermissionButton>;
+  }
+
   return (
-    <ListPageCreateDropdown
-      createAccessReview={{
-        groupVersionKind: modelToGroupVersionKind(ApplicationAwareResourceQuotaModel),
-        namespace,
-      }}
-      items={createItems}
-      onClick={onCreate}
-    >
-      {t('Create quota')}
+    <ListPageCreateDropdown items={createItems} onClick={onCreate}>
+      {createButtonText}
     </ListPageCreateDropdown>
   );
 };

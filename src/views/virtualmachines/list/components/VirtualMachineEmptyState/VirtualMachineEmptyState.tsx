@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 import { Trans } from 'react-i18next';
 
 import { ProjectRequestModel, VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -76,7 +76,7 @@ const VirtualMachineEmptyState: FC<VirtualMachineEmptyStateProps> = ({ namespace
             </>
           )}
         </EmptyStateBody>
-        {!loading && canCreateVM && (
+        {!loading && (
           <EmptyStateFooter>
             <EmptyStateActions>
               <VirtualMachinesCreateButton

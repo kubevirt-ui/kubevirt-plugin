@@ -1,11 +1,12 @@
-/* eslint-disable */
-import React, { FC, MouseEvent, Ref, useCallback, useState } from 'react';
+import React, { type FC, type MouseEvent, type Ref, useCallback, useState } from 'react';
 import { useNavigate } from 'react-router';
 
 import { TemplateModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import CloneTemplateModal from '@kubevirt-utils/components/CloneTemplateModal/CloneTemplateModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+import NoPermissionButton from '@kubevirt-utils/components/NoPermissionButton/NoPermissionButton';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
+import useCanCreateResource from '@kubevirt-utils/hooks/useCanCreateResource';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useListNamespaces from '@kubevirt-utils/hooks/useListNamespaces';
 import useSelectedCluster from '@kubevirt-utils/hooks/useSelectedCluster';
@@ -18,13 +19,12 @@ import {
   DropdownItem,
   DropdownList,
   MenuToggle,
-  MenuToggleElement,
+  type MenuToggleElement,
 } from '@patternfly/react-core';
-import { useFleetAccessReview } from '@stolostron/multicluster-sdk';
 import { VM_LIST_TAB_PARAM, VM_LIST_TAB_VMS } from '@virtualmachines/navigator/constants';
 
-import useAddCreateFromVMToast from './hooks/useAddCreateFromVMToast';
 import { CreateTemplateItems } from './constants';
+import useAddCreateFromVMToast from './hooks/useAddCreateFromVMToast';
 
 const VirtualMachineTemplatesCreateButton: FC = () => {
   const { t } = useKubevirtTranslation();
@@ -37,14 +37,12 @@ const VirtualMachineTemplatesCreateButton: FC = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   const currentNamespace = selectedNamespaces?.[0];
-  const namespace = currentNamespace || DEFAULT_NAMESPACE;
+  const namespace = currentNamespace ?? DEFAULT_NAMESPACE;
 
-  const [canCreateTemplate] = useFleetAccessReview({
+  const canCreateTemplate = useCanCreateResource({
     cluster,
-    group: TemplateModel.apiGroup,
+    model: TemplateModel,
     namespace,
-    resource: TemplateModel.plural,
-    verb: 'create',
   });
 
   const onSelect = useCallback(
@@ -52,7 +50,7 @@ const VirtualMachineTemplatesCreateButton: FC = () => {
       setIsOpen(false);
       if (value === CreateTemplateItems.yaml) {
         return navigate(
-          isACMPage
+          isACMPage && cluster
             ? `${getFleetTemplatesURL(cluster, namespace)}/~new`
             : `${getTemplateListURL(namespace)}/~new`,
         );
@@ -66,7 +64,7 @@ const VirtualMachineTemplatesCreateButton: FC = () => {
       }
 
       if (value === CreateTemplateItems.fromTemplate) {
-        return createModal(({ isOpen: isModalOpen, onClose }) => (
+        return createModal?.(({ isOpen: isModalOpen, onClose }) => (
           <CloneTemplateModal isOpen={isModalOpen} onClose={onClose} />
         ));
       }
@@ -74,9 +72,23 @@ const VirtualMachineTemplatesCreateButton: FC = () => {
     [cluster, isACMPage, namespace, navigate, createModal, currentNamespace, addCreateFromVMToast],
   );
 
+  const createButtonText = t('Create template');
+
+  if (!canCreateTemplate) {
+    return (
+      <span id="tour-step-create-template">
+        <NoPermissionButton>{createButtonText}</NoPermissionButton>
+      </span>
+    );
+  }
+
   return (
     <span id="tour-step-create-template">
       <Dropdown
+        isOpen={isOpen}
+        onOpenChange={setIsOpen}
+        onSelect={onSelect}
+        popperProps={{ position: 'end' }}
         toggle={(toggleRef: Ref<MenuToggleElement>) => (
           <MenuToggle
             data-test="item-create"
@@ -85,18 +97,13 @@ const VirtualMachineTemplatesCreateButton: FC = () => {
             ref={toggleRef}
             variant="primary"
           >
-            {t('Create template')}
+            {createButtonText}
           </MenuToggle>
         )}
-        isOpen={isOpen}
-        onOpenChange={setIsOpen}
-        onSelect={onSelect}
-        popperProps={{ position: 'end' }}
       >
         <DropdownList>
           <DropdownItem
             description={t('Clone and customize a template.')}
-            isDisabled={!canCreateTemplate}
             key={CreateTemplateItems.fromTemplate}
             value={CreateTemplateItems.fromTemplate}
           >
@@ -110,11 +117,7 @@ const VirtualMachineTemplatesCreateButton: FC = () => {
           >
             {t('From a virtual machine')}
           </DropdownItem>
-          <DropdownItem
-            isDisabled={!canCreateTemplate}
-            key={CreateTemplateItems.yaml}
-            value={CreateTemplateItems.yaml}
-          >
+          <DropdownItem key={CreateTemplateItems.yaml} value={CreateTemplateItems.yaml}>
             {t('With YAML')}
           </DropdownItem>
         </DropdownList>

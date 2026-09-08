@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
 import ListEmptyState from '@kubevirt-utils/components/ListEmptyState/ListEmptyState';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -18,10 +18,8 @@ const BootableVolumesEmptyState: FC<BootableVolumesEmptyStateProps> = ({ namespa
       <ListPageHeader title={t('Bootable volumes')} />
       <ListPageBody>
         <ListEmptyState
-          buttonAction={
-            <BootableVolumeAddButton buttonText={t('Add volume')} namespace={namespace} />
-          }
           bodyContent={t('To get started, add a bootable volume.')}
+          buttonAction={<BootableVolumeAddButton namespace={namespace} />}
           titleText={t("You don't have any bootable volumes yet")}
         />
       </ListPageBody>
