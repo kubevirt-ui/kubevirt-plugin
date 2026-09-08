@@ -1,3 +1,5 @@
+import { isSystemKey } from '@kubevirt-utils/utils/labelValidation/labelValidation';
+
 import { type LabelEntry } from './constants';
 
 type ProcessLabelChangeResult =
@@ -60,3 +62,25 @@ export const labelsToEntries = (labels: Record<string, string>): LabelEntry[] =>
 
 export const entriesToLabels = (entries: LabelEntry[]): Record<string, string> =>
   Object.fromEntries(entries.map(({ key, value }) => [key, value]));
+
+export const getProtectedEntryIds = (
+  entries: LabelEntry[],
+  protectedKeys: Map<string, boolean>,
+): { keyProtectedIds: Set<number>; valueProtectedIds: Set<number> } => {
+  const keyProtectedIds = new Set<number>();
+  const valueProtectedIds = new Set<number>();
+
+  for (const { id, key } of entries) {
+    if (!key) continue;
+
+    if (protectedKeys.has(key) || isSystemKey(key)) {
+      keyProtectedIds.add(id);
+    }
+
+    if (protectedKeys.get(key) === true) {
+      valueProtectedIds.add(id);
+    }
+  }
+
+  return { keyProtectedIds, valueProtectedIds };
+};

@@ -10,6 +10,7 @@
  * test.step() provides granular reporting within each test.
  */
 
+import type LabelsModalComponent from '@/components/shared/labels-modal-component';
 import {
   ADMIN_ONLY_TAG,
   AUTO_LABELS_FEATURE,
@@ -36,6 +37,35 @@ const TEST_LABELS = [
 
 const USER_ADDED_LABEL_KEY = 'user-custom-label';
 
+const assertNewLabelKeyStaysEditable = async (
+  labelsModal: LabelsModalComponent,
+): Promise<void> => {
+  await labelsModal.addLabelRow();
+  await labelsModal.fillNewLabelKey('team');
+  expect
+    .soft(
+      await labelsModal.isNewLabelKeyEnabled(),
+      'Key input should stay enabled for a reserved key',
+    )
+    .toBe(true);
+  await labelsModal.waitForValidationError();
+  expect
+    .soft(await labelsModal.isSaveDisabled(), 'Save should be disabled for a reserved key')
+    .toBe(true);
+  await labelsModal.fillNewLabelKey('team-custom');
+  expect
+    .soft(
+      await labelsModal.isNewLabelKeyEnabled(),
+      'Key input should stay enabled after correcting the key',
+    )
+    .toBe(true);
+  await labelsModal.waitForValidationErrorHidden();
+  expect
+    .soft(await labelsModal.isSaveDisabled(), 'Save should be enabled after correcting the key')
+    .toBe(false);
+  await labelsModal.close();
+};
+
 test.describe(
   'Auto-applied labels — wizard & VM detail',
   { tag: [T2_TAG, ADMIN_ONLY_TAG, AUTO_LABELS_TAG] },
@@ -61,13 +91,13 @@ test.describe(
     // Single wizard session: drawer behavior + label protection assertions
     test('Wizard drawer and label protection', async ({
       apiClient,
-      vmTreePage,
+      vmListPage,
       vmWizardPage,
       utils,
     }) => {
       test.setTimeout(utils.TestTimeouts.TEST_EXTENDED);
       const ns = await setupTestNamespace(apiClient, 'al-wizard');
-      await navigateToWizardCustomizationStep(vmTreePage, vmWizardPage, ns);
+      await navigateToWizardCustomizationStep(vmListPage, vmWizardPage, ns);
 
       // Wait for useApplyAutoLabels hook to process — drawer signals labels are merged
       await vmWizardPage.labels.waitForDrawerVisible();
@@ -117,19 +147,24 @@ test.describe(
           .toBe(true);
       });
 
+      await test.step('New label key stays editable when it matches an auto-applied key', async () => {
+        await vmWizardPage.labels.openAddLabelsModal();
+        await assertNewLabelKeyStaysEditable(vmWizardPage.labels.labelsModal);
+      });
+
       await vmWizardPage.cancelWizard().catch(() => {});
     });
 
     // Single VM creation: verifies required + admin-set labels are applied, optional excluded
     test('VM creation applies correct labels', async ({
       apiClient,
-      vmTreePage,
+      vmListPage,
       vmWizardPage,
       utils,
     }) => {
       test.setTimeout(utils.TestTimeouts.TEST_EXTENDED);
       const ns = await setupTestNamespace(apiClient, 'al-create');
-      const vmName = await navigateToWizardCustomizationStep(vmTreePage, vmWizardPage, ns);
+      const vmName = await navigateToWizardCustomizationStep(vmListPage, vmWizardPage, ns);
       await vmWizardPage.labels.waitForDrawerVisible();
       await vmWizardPage.labels.fillDrawerLabelValue('env', 'test');
       await vmWizardPage.labels.fillDrawerLabelValue('department', 'engineering');
@@ -158,7 +193,7 @@ test.describe(
       metadataComponent,
       utils,
       vmDetailPage,
-      vmTreePage,
+      vmListPage,
     }) => {
       const ns = await setupTestNamespace(apiClient, 'al-detail');
       const vmName = utils.generateRandomVmName('al-detail');
@@ -188,7 +223,7 @@ test.describe(
         ns,
       );
 
-      await vmTreePage.switchToVirtualizationPerspective();
+      await vmListPage.switchToVirtualizationPerspective();
       await vmDetailPage.navigateToVirtualMachineDetail(vmName, ns);
       await vmDetailPage.navigateToConfigurationMetadata();
 
@@ -215,6 +250,11 @@ test.describe(
             'User label deletable',
           )
           .toBe(true);
+      });
+
+      await test.step('New label key stays editable when it matches an auto-applied key', async () => {
+        await metadataComponent.openAddLabelsModal();
+        await assertNewLabelKeyStaysEditable(metadataComponent.labelsModal);
       });
     });
   },

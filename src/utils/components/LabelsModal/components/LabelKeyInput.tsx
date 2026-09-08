@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useMemo, useRef, useState } from 'react';
+import React, { type FC, useCallback, useMemo, useRef, useState } from 'react';
 
 import { useClickOutside } from '@kubevirt-utils/hooks/useClickOutside/useClickOutside';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -92,7 +92,7 @@ const LabelKeyInput: FC<LabelKeyInputProps> = ({ existingKeys, onChange, value }
         isVisible={isOpen && filteredSuggestions.length > 0}
         popper={menu}
         trigger={
-          <TextInputGroup>
+          <TextInputGroup data-test="label-key-input">
             <TextInputGroupMain
               aria-label={t('Label key')}
               onChange={onInputChange}

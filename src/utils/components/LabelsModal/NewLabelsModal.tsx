@@ -1,9 +1,8 @@
-import React, { type FC, useMemo } from 'react';
+import React, { type FC } from 'react';
 
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import useAutoAppliedLabels from '@kubevirt-utils/hooks/useAutoAppliedLabels/useAutoAppliedLabels';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { isSystemKey } from '@kubevirt-utils/utils/labelValidation/labelValidation';
 import { type K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { Button, ButtonVariant, Grid, GridItem, Stack, StackItem } from '@patternfly/react-core';
 import { PlusCircleIcon } from '@patternfly/react-icons';
@@ -29,22 +28,20 @@ const NewLabelsModal: FC<NewLabelsModalProps> = ({
   const { t } = useKubevirtTranslation();
   const { labels: autoAppliedLabels } = useAutoAppliedLabels();
 
-  const protectedKeys = useMemo(
-    () => new Map(autoAppliedLabels.map((label) => [label.key, Boolean(label.value)])),
-    [autoAppliedLabels],
-  );
-
   const {
+    autoAppliedKeys,
     existingKeys,
     handleSubmit,
     hasEmptyKeys,
     hasValidationErrors,
     initialKeys,
+    keyProtectedIds,
     labels,
     onLabelAdd,
     onLabelChange,
     onLabelDelete,
-  } = useLabelsModalState({ initialLabels, obj, onLabelsSubmit });
+    valueProtectedIds,
+  } = useLabelsModalState({ autoAppliedLabels, initialLabels, obj, onLabelsSubmit });
 
   return (
     <TabModal
@@ -67,13 +64,11 @@ const NewLabelsModal: FC<NewLabelsModalProps> = ({
             <GridItem span={2} />
             {labels.map((entry) => (
               <LabelRow
+                autoAppliedKeys={autoAppliedKeys}
                 existingKeys={existingKeys}
                 initialKeys={initialKeys}
-                isKeyProtected={
-                  protectedKeys.has(entry.key) ||
-                  (initialKeys.has(entry.key) && isSystemKey(entry.key))
-                }
-                isValueProtected={protectedKeys.get(entry.key) === true}
+                isKeyProtected={keyProtectedIds.has(entry.id)}
+                isValueProtected={valueProtectedIds.has(entry.id)}
                 key={entry.id}
                 label={entry}
                 onChange={(updated) => onLabelChange(entry.id, updated)}

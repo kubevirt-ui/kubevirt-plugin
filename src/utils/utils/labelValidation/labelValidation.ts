@@ -1,4 +1,4 @@
-import { TFunction } from 'i18next';
+import { type TFunction } from 'i18next';
 
 import {
   K8S_LABEL_NAME_REGEX,
@@ -19,6 +19,7 @@ export const validateLabelEntry = (
   t: TFunction,
   initialKeys?: Set<string>,
   allKeys?: string[],
+  autoAppliedKeys?: Set<string>,
 ): string | undefined => {
   if (!key.trim()) return undefined;
 
@@ -30,6 +31,9 @@ export const validateLabelEntry = (
   if (isInitialKey && isSystemKey(key)) return undefined;
 
   if (!isInitialKey && isSystemKey(key)) return t('Cannot use system-managed key prefix');
+
+  if (!isInitialKey && autoAppliedKeys?.has(key))
+    return t('This key is reserved for an auto-applied label');
 
   const keyError = validateK8sLabelKey(key, t);
   if (keyError) return keyError;
