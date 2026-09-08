@@ -1,10 +1,13 @@
-/* eslint-disable */
 import { murmur3 } from 'murmurhash-js';
 
 import { CNV_OBSERVABILITY, KUBEVIRT, NONE } from '@kubevirt-utils/constants/constants';
 import { MONITORING_SALT, OPERATOR_LABEL_KEY } from '@kubevirt-utils/constants/prometheus';
-import { Group } from '@kubevirt-utils/types/prometheus';
-import { Alert, PrometheusLabels, PrometheusRule } from '@openshift-console/dynamic-plugin-sdk';
+import { type Group } from '@kubevirt-utils/types/prometheus';
+import {
+  type Alert,
+  type PrometheusLabels,
+  type PrometheusRule,
+} from '@openshift-console/dynamic-plugin-sdk';
 
 /**
  * Escapes special characters in PromQL label values for use in exact match filters.
@@ -13,8 +16,8 @@ import { Alert, PrometheusLabels, PrometheusRule } from '@openshift-console/dyna
  * @param v - The label value to escape
  * @returns The escaped label value safe for use in PromQL queries like `label="${escapedValue}"`
  */
-export const escapePromLabelValue = (v: string): string =>
-  v.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+export const escapePromLabelValue = (value: string): string =>
+  value.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
 
 /**
  * Regex pattern matching all special regex characters that need to be escaped in PromQL regex patterns.
@@ -29,8 +32,8 @@ const PROMQL_REGEX_SPECIAL_CHARS_PATTERN = /[.*+?^${}()|[\]\\]/g;
  * @param v - The label value to escape
  * @returns The escaped label value safe for use in PromQL regex queries like `label=~"${escapedValue}"`
  */
-export const escapePromRegexValue = (v: string): string =>
-  v.replace(PROMQL_REGEX_SPECIAL_CHARS_PATTERN, '\\$&');
+export const escapePromRegexValue = (value: string): string =>
+  value.replace(PROMQL_REGEX_SPECIAL_CHARS_PATTERN, '\\$&');
 
 export const generateAlertId = (group: Group, rule: PrometheusRule): string => {
   const key = [
@@ -39,14 +42,17 @@ export const generateAlertId = (group: Group, rule: PrometheusRule): string => {
     rule?.name,
     rule?.duration,
     rule?.query,
-    ...Object?.entries(rule?.labels).map(([k, v]) => `${v}=${k}`),
+    ...Object?.entries(rule?.labels).map(([labelKey, value]) => `${value}=${labelKey}`),
   ].join(',');
   return String(murmur3(key, MONITORING_SALT));
 };
 
 export const labelsToParams = (labels: PrometheusLabels): string => {
   return Object.entries(labels)
-    .map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`)
+    .map(
+      ([labelKey, labelValue]) =>
+        `${encodeURIComponent(labelKey)}=${encodeURIComponent(labelValue)}`,
+    )
     .join('&');
 };
 

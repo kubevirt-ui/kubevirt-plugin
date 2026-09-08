@@ -23,9 +23,9 @@ const NetworksReviewTable: FC<NetworksReviewTableProps> = memo(({ interfaces, ne
       <DescriptionItem
         descriptionData={
           <Stack>
-            {networkData.map((row) => (
-              <StackItem key={row.iface?.name ?? row.network?.name}>
-                {row.network?.name ?? row.iface?.name ?? NO_DATA_DASH}
+            {networkData.map((net) => (
+              <StackItem key={`row-${net.iface?.name ?? net.network?.name ?? ''}`}>
+                {net.network?.name || net.iface?.name || NO_DATA_DASH}
               </StackItem>
             ))}
           </Stack>
@@ -35,9 +35,9 @@ const NetworksReviewTable: FC<NetworksReviewTableProps> = memo(({ interfaces, ne
       <DescriptionItem
         descriptionData={
           <Stack>
-            {networkData.map((row) => (
-              <StackItem key={row.iface?.name ?? row.network?.name}>
-                {getNetworkNameLabel(t, row) ?? NO_DATA_DASH}
+            {networkData.map((net) => (
+              <StackItem key={`label-${net.iface?.name ?? net.network?.name ?? ''}`}>
+                {getNetworkNameLabel(t, net) ?? NO_DATA_DASH}
               </StackItem>
             ))}
           </Stack>
@@ -47,9 +47,9 @@ const NetworksReviewTable: FC<NetworksReviewTableProps> = memo(({ interfaces, ne
       <DescriptionItem
         descriptionData={
           <Stack>
-            {networkData.map((row) => (
-              <StackItem key={row.iface?.name ?? row.network?.name}>
-                {row.iface ? getPrintableNetworkInterfaceType(row.iface) : NO_DATA_DASH}
+            {networkData.map((net) => (
+              <StackItem key={`type-${net.iface?.name ?? net.network?.name ?? ''}`}>
+                {net.iface ? getPrintableNetworkInterfaceType(net.iface) : NO_DATA_DASH}
               </StackItem>
             ))}
           </Stack>

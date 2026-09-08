@@ -9,25 +9,25 @@ import { GridItem, HelperText, HelperTextItem } from '@patternfly/react-core';
 
 import { type ChartDataObject } from '../constants';
 
-const CursorVoronoiContainer = createContainer('voronoi', 'cursor');
-
 type MigrationsUtilizationChartProps = {
   chartData: ChartDataObject[];
   domain?: {
     x: [number, number];
     y: [number, number];
-  } | null;
-  labels: (datum: Record<string, unknown>) => string;
-  tickFormat?: ((tick: number, index: number, ticks: number[]) => number | string) | number[];
-  tickValues?: null | number[];
+  };
+  labels: (prop: { datum: { idx: number; x: Date | number } }) => string;
+  tickFormat?: (tick: number, index: number, ticks: number[]) => number | string;
+  tickValues?: number[];
   title: string;
 };
+
+const CursorVoronoiContainer = createContainer('voronoi', 'cursor');
 
 const MigrationsUtilizationChart: FC<MigrationsUtilizationChartProps> = ({
   chartData,
   domain = null,
   labels,
-  tickFormat = (val: number): number => val,
+  tickFormat = (yValue: number): number => yValue,
   tickValues = null,
   title,
 }) => {

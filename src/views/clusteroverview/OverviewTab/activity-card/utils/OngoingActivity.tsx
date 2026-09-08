@@ -14,8 +14,7 @@ const OngoingActivity: FC = () => {
     prometheusQueriesLoaded && (
       <OngoingActivityBody
         loaded={k8sResourcesLoaded && prometheusQueriesLoaded}
-        // Fix typing
-        prometheusActivities={prometheusActivities}
+        prometheusActivities={prometheusActivities as never}
         resourceActivities={k8sResourceActivities as never}
       />
     )

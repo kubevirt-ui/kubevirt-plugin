@@ -1,15 +1,14 @@
-/* eslint-disable */
 import {
   modelToGroupVersionKind,
   VirtualMachineStorageMigrationPlanModel,
 } from '@kubevirt-utils/models';
 import { getStorageMigrationBackend } from '@kubevirt-utils/resources/migrations/backends';
 import {
-  type StorageMigrationAPI,
-  MigPlan,
-  MultiNamespaceVirtualMachineStorageMigrationPlan,
+  type MigPlan,
+  type MultiNamespaceVirtualMachineStorageMigrationPlan,
   STORAGE_MIGRATION_API,
-  VirtualMachineStorageMigrationPlan,
+  type StorageMigrationAPI,
+  type VirtualMachineStorageMigrationPlan,
 } from '@kubevirt-utils/resources/migrations/constants';
 import { normalizeSingleNsPlan } from '@kubevirt-utils/resources/migrations/singleNs/overview';
 import useK8sListData from '@multicluster/hooks/useK8sListData';
@@ -77,7 +76,7 @@ const useStorageMigrationOverviewData: UseStorageMigrationOverviewData = (cluste
             model: backend.planModel,
           }
         : null,
-    );
+    ) as [VirtualMachineStorageMigrationPlan[], boolean, Error | undefined];
 
   const [mtcPlans, mtcLoaded, mtcError] = useK8sListData<MigPlan>(
     storageMigAPI === STORAGE_MIGRATION_API.MTC && backend
@@ -87,7 +86,7 @@ const useStorageMigrationOverviewData: UseStorageMigrationOverviewData = (cluste
           namespace: backend.fixedPlanNamespace,
         }
       : null,
-  );
+  ) as [MigPlan[], boolean, Error | undefined];
 
   if (storageMigAPI === STORAGE_MIGRATION_API.LOADING) {
     return {
@@ -116,7 +115,7 @@ const useStorageMigrationOverviewData: UseStorageMigrationOverviewData = (cluste
       loadError: mtcError,
       storageMigAPI: STORAGE_MIGRATION_API.MTC,
       storageMigPlans: (mtcPlans ?? [])
-        .map((p) => backend.normalizePlanForOverview(p))
+        .map((plan) => backend.normalizePlanForOverview(plan))
         .filter(Boolean),
     };
   }
@@ -128,7 +127,7 @@ const useStorageMigrationOverviewData: UseStorageMigrationOverviewData = (cluste
       loadError: singleNsOnlyError,
       storageMigAPI: STORAGE_MIGRATION_API.SINGLE_NS,
       storageMigPlans: (singleNsOnlyPlans ?? [])
-        .map((p) => backend.normalizePlanForOverview(p))
+        .map((plan) => backend.normalizePlanForOverview(plan))
         .filter(Boolean),
     };
   }
@@ -139,8 +138,10 @@ const useStorageMigrationOverviewData: UseStorageMigrationOverviewData = (cluste
     loadError: multiNsError ?? singleNsError,
     storageMigAPI: STORAGE_MIGRATION_API.MULTI_NS,
     storageMigPlans: [
-      ...(multiNsPlans ?? []).map((p) => backend?.normalizePlanForOverview(p)).filter(Boolean),
-      ...(singleNsPlans ?? []).map((p) => normalizeSingleNsPlan(p)).filter(Boolean),
+      ...(multiNsPlans ?? [])
+        .map((plan) => backend?.normalizePlanForOverview(plan))
+        .filter(Boolean),
+      ...(singleNsPlans ?? []).map((plan) => normalizeSingleNsPlan(plan)).filter(Boolean),
     ],
   };
 };

@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC, useMemo, useState } from 'react';
+import React, { type FC, useMemo, useState } from 'react';
 
 import { VirtualMachineInstancetypeModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { VirtualMachineClusterInstancetypeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -10,7 +9,7 @@ import { getName } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { ResourceIcon } from '@openshift-console/dynamic-plugin-sdk';
 import { MenuItem, MenuSearch, MenuSearchInput, SearchInput } from '@patternfly/react-core';
-import { InstanceTypes } from '@virtualmachines/wizard/utils/types';
+import { type InstanceTypes } from '@virtualmachines/wizard/utils/types';
 
 type UserInstanceTypeMenuProps = {
   allInstanceTypes: InstanceTypes;
@@ -29,14 +28,16 @@ const UserInstanceTypeMenu: FC<UserInstanceTypeMenuProps> = ({
 
   const [searchInput, setSearchInput] = useState('');
 
-  const userCreatedInstanceTypes = allInstanceTypes.filter((it) => !isRedHatInstanceType(it));
+  const userCreatedInstanceTypes = allInstanceTypes.filter(
+    (instanceType) => !isRedHatInstanceType(instanceType),
+  );
 
   const filteredItems = useMemo(
     () =>
       userCreatedInstanceTypes.filter(
-        (it) =>
+        (instanceType) =>
           isEmpty(searchInput) ||
-          getName(it).toLowerCase().includes(searchInput.toString().toLowerCase()),
+          getName(instanceType).toLowerCase().includes(searchInput.toString().toLowerCase()),
       ),
     [userCreatedInstanceTypes, searchInput],
   );
@@ -50,16 +51,16 @@ const UserInstanceTypeMenu: FC<UserInstanceTypeMenuProps> = ({
           <MenuSearchInput>
             <SearchInput
               aria-label="Filter menu items"
-              onChange={(_, value) => setSearchInput(value)}
+              onChange={(_event, value) => setSearchInput(value)}
               type="search"
               value={searchInput}
             />
           </MenuSearchInput>
         </MenuSearch>
       )}
-      {filteredItems.map((it) => {
-        const itName = getName(it);
-        const itKind = it?.kind;
+      {filteredItems.map((instanceType) => {
+        const itName = getName(instanceType);
+        const itKind = instanceType?.kind;
         return (
           <MenuItem
             icon={

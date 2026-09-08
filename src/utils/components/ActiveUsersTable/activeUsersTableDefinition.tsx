@@ -1,11 +1,10 @@
-/* eslint-disable */
-import React, { ReactNode } from 'react';
-import { TFunction } from 'i18next';
+import React, { type ReactNode } from 'react';
+import { type TFunction } from 'i18next';
 
-import { V1VirtualMachineInstanceGuestOSUser } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachineInstanceGuestOSUser } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import Timestamp from '@kubevirt-utils/components/Timestamp/Timestamp';
 import { fromNow } from '@kubevirt-utils/components/Timestamp/utils/datetime';
-import { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
+import { type ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 
@@ -25,28 +24,28 @@ export const getActiveUserColumns = (
   t: TFunction,
 ): ColumnConfig<V1VirtualMachineInstanceGuestOSUser, undefined>[] => [
   {
-    getValue: (r) => r.userName ?? '',
+    getValue: (row) => row.userName ?? '',
     key: 'userName',
     label: t('User Name'),
-    renderCell: (r) => r.userName ?? NO_DATA_DASH,
+    renderCell: (row) => row.userName ?? NO_DATA_DASH,
     sortable: true,
   },
   {
-    getValue: (r) => r.domain ?? '',
+    getValue: (row) => row.domain ?? '',
     key: 'domain',
     label: t('Domain'),
-    renderCell: (r) => r.domain ?? NO_DATA_DASH,
+    renderCell: (row) => row.domain ?? NO_DATA_DASH,
     sortable: true,
   },
   {
-    getValue: (r) => r.loginTime ?? 0,
+    getValue: (row) => row.loginTime ?? 0,
     key: 'loginTime',
     label: t('Time of login'),
     renderCell: renderLoginTime,
     sortable: true,
   },
   {
-    getValue: (r) => r.loginTime ?? 0,
+    getValue: (row) => row.loginTime ?? 0,
     key: 'elapsedTime',
     label: t('Elapsed time since login'),
     renderCell: renderElapsedTime,

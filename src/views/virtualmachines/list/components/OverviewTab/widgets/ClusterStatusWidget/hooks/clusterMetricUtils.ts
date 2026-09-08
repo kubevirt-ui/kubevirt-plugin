@@ -1,8 +1,6 @@
-/* eslint-disable */
-import { PrometheusResult } from '@openshift-console/dynamic-plugin-sdk';
+import { type PrometheusResult } from '@openshift-console/dynamic-plugin-sdk';
 
-import { ScoreStatus } from '../../shared/StatusScoreList/StatusScoreList';
-
+import { type ScoreStatus } from '../../shared/StatusScoreList/StatusScoreList';
 import {
   INSTANCE_TO_NODE,
   SEVERITY_HIGH,
@@ -10,16 +8,18 @@ import {
   SEVERITY_MEDIUM,
   SEVERITY_ORDER,
   SEVERITY_STATUS_MAP,
-  SeverityCount,
-  SeverityLevel,
+  type SeverityCount,
+  type SeverityLevel,
   THRESHOLD_HIGH,
   THRESHOLD_MEDIUM,
 } from './clusterMetricConstants';
 
 /**
- * Returns the severity level for a value where higher = worse (e.g. utilization).
+ * Classifies a numeric value into a severity level based on fixed thresholds.
+ * Both ascending (higher = worse) and descending (higher = better) metrics
+ * currently share the same threshold boundaries.
  */
-const getLevelAscending = (value: number): SeverityLevel => {
+const getLevel = (value: number): SeverityLevel => {
   if (value >= THRESHOLD_HIGH) return SEVERITY_HIGH;
   if (value >= THRESHOLD_MEDIUM) return SEVERITY_MEDIUM;
   return SEVERITY_LOW;
@@ -30,16 +30,12 @@ const getLevelAscending = (value: number): SeverityLevel => {
  * Derives status from the severity level via SEVERITY_STATUS_MAP.
  */
 export const getStatusAscending = (value: number): ScoreStatus =>
-  SEVERITY_STATUS_MAP[getLevelAscending(value)];
+  SEVERITY_STATUS_MAP[getLevel(value)];
 
 /**
  * Returns the severity level for a value where higher = better (e.g. balance score).
  */
-export const getLevelDescending = (value: number): SeverityLevel => {
-  if (value >= THRESHOLD_HIGH) return SEVERITY_HIGH;
-  if (value >= THRESHOLD_MEDIUM) return SEVERITY_MEDIUM;
-  return SEVERITY_LOW;
-};
+export const getLevelDescending = getLevel;
 
 /**
  * Returns the status color for a value where higher = better (e.g. balance score).
@@ -57,15 +53,15 @@ export const buildSeverityCounts = (
   values: number[],
   direction: 'ascending' | 'descending',
 ): SeverityCount[] => {
-  const getLevelFn = direction === 'ascending' ? getLevelAscending : getLevelDescending;
+  const getLevelFn = direction === 'ascending' ? getLevel : getLevelDescending;
   const counts: Record<SeverityLevel, number> = {
     [SEVERITY_HIGH]: 0,
     [SEVERITY_LOW]: 0,
     [SEVERITY_MEDIUM]: 0,
   };
 
-  for (const v of values) {
-    counts[getLevelFn(v)]++;
+  for (const val of values) {
+    counts[getLevelFn(val)]++;
   }
 
   return SEVERITY_ORDER.map((level) => ({
@@ -91,9 +87,9 @@ export const buildLabelMap = (
   labelKey = 'node',
 ): Record<string, number> => {
   const map: Record<string, number> = {};
-  for (const r of results) {
-    const key = r.metric?.[labelKey];
-    if (key) map[key] = toFiniteNumber(r.value?.[1]);
+  for (const result of results) {
+    const key = result.metric?.[labelKey];
+    if (key) map[key] = toFiniteNumber(result.value?.[1]);
   }
   return map;
 };
@@ -103,7 +99,7 @@ export const computeDistributionScore = (values: number[]): number => {
   if (values.length === 0) return 100;
   const mean = values.reduce((a, b) => a + b, 0) / values.length;
   if (mean === 0) return 100;
-  const variance = values.reduce((sum, v) => sum + (v - mean) ** 2, 0) / values.length;
+  const variance = values.reduce((sum, val) => sum + (val - mean) ** 2, 0) / values.length;
   const coefficientOfVariation = Math.sqrt(variance) / mean;
   return Math.max(0, Math.round(100 - coefficientOfVariation * 100));
 };
@@ -112,7 +108,8 @@ export const pct = (used: number, total: number): number => (total > 0 ? (used /
 
 export const formatPercent = (value: number): string => `${Math.round(value)}%`;
 
-const escapeLabelValue = (v: string): string => v.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+const escapeLabelValue = (value: string): string =>
+  value.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
 
 /**
  * Injects a `cluster="name"` label filter into every metric selector in a PromQL expression.
@@ -131,7 +128,7 @@ export const injectClusterFilter = (expr: string, cluster: string): string => {
 
 /** Collects the union of keys from one or more maps. */
 export const getAllKeysFromMaps = (...maps: Record<string, unknown>[]): Set<string> =>
-  new Set(maps.flatMap((m) => Object.keys(m)));
+  new Set(maps.flatMap((mapObj) => Object.keys(mapObj)));
 
 type ResourceMaps = {
   cpu: Record<string, number>;
@@ -163,12 +160,12 @@ export const buildNestedLabelMap = (
   innerLabel: string,
 ): Record<string, Record<string, number>> => {
   const map: Record<string, Record<string, number>> = {};
-  for (const r of results) {
-    const outer = r.metric?.[outerLabel];
-    const inner = r.metric?.[innerLabel];
+  for (const result of results) {
+    const outer = result.metric?.[outerLabel];
+    const inner = result.metric?.[innerLabel];
     if (outer && inner) {
       map[outer] ??= {};
-      map[outer][inner] = toFiniteNumber(r.value?.[1]);
+      map[outer][inner] = toFiniteNumber(result.value?.[1]);
     }
   }
   return map;

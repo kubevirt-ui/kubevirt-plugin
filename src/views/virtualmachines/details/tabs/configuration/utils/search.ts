@@ -1,15 +1,16 @@
-/* eslint-disable */
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getInstanceTypeMatcher } from '@kubevirt-utils/resources/vm';
-import { hasS390xArchitecture } from '@kubevirt-utils/resources/vm/utils/architecture';
-
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import {
   type SearchItem,
   type SearchItemWithTab,
 } from '@kubevirt-utils/components/ConfigurationSearch/types';
+import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getInstanceTypeMatcher } from '@kubevirt-utils/resources/vm';
+import { hasS390xArchitecture } from '@kubevirt-utils/resources/vm/utils/architecture';
 
-export type { SearchItem, SearchItemWithTab } from '@kubevirt-utils/components/ConfigurationSearch/types';
+export type {
+  SearchItem,
+  SearchItemWithTab,
+} from '@kubevirt-utils/components/ConfigurationSearch/types';
 
 export type SearchItemGetter = (vm?: V1VirtualMachine) => SearchItem[];
 
@@ -83,16 +84,16 @@ export const getInitialRunTabIds: SearchItemGetter = () => [
 
 const getTabsIds = (vm: V1VirtualMachine): { [key: string]: SearchItem[] } => ({
   details: [
-    ...getDetailsTabBootIds(vm),
+    ...getDetailsTabBootIds(),
     ...getDetailsTabHardwareIds(vm),
     ...getDetailsTabMainIds(vm),
   ],
-  initial: getInitialRunTabIds(vm),
-  metadata: getMetadataTabIds(vm),
-  network: getNetworkTabIds(vm),
-  scheduling: getSchedulingTabIds(vm),
-  ssh: getSSHTabIds(vm),
-  storage: getStorageTabIds(vm),
+  initial: getInitialRunTabIds(),
+  metadata: getMetadataTabIds(),
+  network: getNetworkTabIds(),
+  scheduling: getSchedulingTabIds(),
+  ssh: getSSHTabIds(),
+  storage: getStorageTabIds(),
 });
 
 export const getSearchItems = (vm: V1VirtualMachine): SearchItemWithTab[] =>

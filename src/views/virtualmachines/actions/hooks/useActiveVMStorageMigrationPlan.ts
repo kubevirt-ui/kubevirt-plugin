@@ -1,12 +1,11 @@
-/* eslint-disable */
 import { useMemo } from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { modelToGroupVersionKind } from '@kubevirt-utils/models';
 import { getStorageMigrationBackend } from '@kubevirt-utils/resources/migrations/backends';
 import {
-  MigPlan,
-  MultiNamespaceVirtualMachineStorageMigrationPlan,
+  type MigPlan,
+  type MultiNamespaceVirtualMachineStorageMigrationPlan,
   STORAGE_MIGRATION_API,
 } from '@kubevirt-utils/resources/migrations/constants';
 import { doesMTCPlanTargetVM } from '@kubevirt-utils/resources/migrations/mtc';
@@ -18,6 +17,57 @@ import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 
 import useClusterStorageMigrationAPI from './storageMigrationApi/useClusterStorageMigrationAPI';
 import useCurrentStorageMigration from './useStorageMigrations';
+
+const resolveActiveMTCPlan = (
+  mtcPlans: MigPlan[],
+  vm: V1VirtualMachine,
+  namespace: string,
+  cluster: null | string,
+  backend: ReturnType<typeof getStorageMigrationBackend>,
+): MultiNamespaceVirtualMachineStorageMigrationPlan | null => {
+  const candidates = (mtcPlans ?? [])
+    .filter((migPlan) => {
+      if (migPlan.metadata?.deletionTimestamp) return false;
+      if (!(migPlan.spec?.namespaces ?? []).includes(namespace)) return false;
+      return doesMTCPlanTargetVM(migPlan, vm);
+    })
+    .sort(
+      (a, b) =>
+        new Date(b.metadata?.creationTimestamp ?? 0).getTime() -
+        new Date(a.metadata?.creationTimestamp ?? 0).getTime(),
+    );
+
+  for (const raw of candidates) {
+    const normalized = backend?.normalizePlanForOverview(raw);
+    if (normalized && !isMigrationCompleted(normalized)) {
+      return cluster
+        ? ({ ...normalized, cluster } as MultiNamespaceVirtualMachineStorageMigrationPlan)
+        : normalized;
+    }
+  }
+  return null;
+};
+
+const resolveActiveMultiNsPlan = (
+  storageMigPlans: MultiNamespaceVirtualMachineStorageMigrationPlan[],
+  namespace: string,
+  vmName: string,
+): MultiNamespaceVirtualMachineStorageMigrationPlan | null =>
+  [...(storageMigPlans ?? [])]
+    .sort(
+      (a, b) =>
+        new Date(b.metadata?.creationTimestamp ?? 0).getTime() -
+        new Date(a.metadata?.creationTimestamp ?? 0).getTime(),
+    )
+    .find((plan) => {
+      if (plan?.metadata?.deletionTimestamp) return false;
+      if (isMigrationCompleted(plan)) return false;
+
+      return plan?.spec?.namespaces?.some(
+        (ns) =>
+          ns?.name === namespace && ns?.virtualMachines?.some((vmSpec) => vmSpec?.name === vmName),
+      );
+    }) ?? null;
 
 const useActiveVMStorageMigrationPlan = (
   vm: V1VirtualMachine,
@@ -66,46 +116,10 @@ const useActiveVMStorageMigrationPlan = (
     if (storageMigAPI === STORAGE_MIGRATION_API.NONE) return null;
 
     if (storageMigAPI === STORAGE_MIGRATION_API.MTC && backend) {
-      const candidates = (mtcPlans ?? [])
-        .filter((mp) => {
-          if (mp.metadata?.deletionTimestamp) return false;
-          if (!(mp.spec?.namespaces ?? []).includes(namespace)) return false;
-          return doesMTCPlanTargetVM(mp, vm);
-        })
-        .sort(
-          (a, b) =>
-            new Date(b.metadata?.creationTimestamp ?? 0).getTime() -
-            new Date(a.metadata?.creationTimestamp ?? 0).getTime(),
-        );
-
-      for (const raw of candidates) {
-        const normalized = backend.normalizePlanForOverview(raw);
-        if (normalized && !isMigrationCompleted(normalized)) {
-          return cluster
-            ? ({ ...normalized, cluster } as MultiNamespaceVirtualMachineStorageMigrationPlan)
-            : normalized;
-        }
-      }
-      return null;
+      return resolveActiveMTCPlan(mtcPlans, vm, namespace, cluster, backend);
     }
 
-    const activePlan = [...(storageMigPlans ?? [])]
-      .sort(
-        (a, b) =>
-          new Date(b.metadata?.creationTimestamp ?? 0).getTime() -
-          new Date(a.metadata?.creationTimestamp ?? 0).getTime(),
-      )
-      .find((plan) => {
-        if (plan?.metadata?.deletionTimestamp) return false;
-        if (isMigrationCompleted(plan)) return false;
-
-        return plan?.spec?.namespaces?.some(
-          (ns) =>
-            ns?.name === namespace &&
-            ns?.virtualMachines?.some((vmSpec) => vmSpec?.name === vmName),
-        );
-      });
-
+    const activePlan = resolveActiveMultiNsPlan(storageMigPlans, namespace, vmName);
     if (activePlan) return activePlan;
 
     if (storageMigAPI === STORAGE_MIGRATION_API.MULTI_NS) return null;

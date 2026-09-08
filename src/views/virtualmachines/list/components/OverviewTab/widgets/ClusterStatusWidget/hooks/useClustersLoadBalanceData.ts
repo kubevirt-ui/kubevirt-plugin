@@ -1,11 +1,9 @@
-/* eslint-disable */
 import { useMemo } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
-import { StatusScoreItem } from '../../shared/StatusScoreList/StatusScoreList';
-
-import { getSeverityLabel, SeverityCount, TOP_N } from './clusterMetricConstants';
+import { type StatusScoreItem } from '../../shared/StatusScoreList/StatusScoreList';
+import { getSeverityLabel, type SeverityCount, TOP_N } from './clusterMetricConstants';
 import {
   buildNestedLabelMap,
   buildSeverityCounts,
@@ -59,7 +57,7 @@ const computeClusterScores = (
 
     const workerNames = workerNodesByCluster.get(cluster);
     const nodeNames = workerNames?.size
-      ? new Set([...allNodeNames].filter((n) => workerNames.has(n)))
+      ? new Set([...allNodeNames].filter((nodeName) => workerNames.has(nodeName)))
       : allNodeNames;
 
     const usedMaps = {
@@ -118,17 +116,17 @@ const useClustersLoadBalanceData = (): ClustersLoadBalanceData => {
       workerNodesByCluster,
     );
 
-    const computedItems: StatusScoreItem[] = clusterScores.slice(0, TOP_N).map((c) => ({
-      name: c.name,
+    const computedItems: StatusScoreItem[] = clusterScores.slice(0, TOP_N).map((clusterScore) => ({
+      name: clusterScore.name,
       score: {
-        description: getSeverityLabel(getLevelDescending(c.score), t),
-        status: getStatusDescending(c.score),
-        value: t('Load balance score: {{score}}%', { score: Math.round(c.score) }),
+        description: getSeverityLabel(getLevelDescending(clusterScore.score), t),
+        status: getStatusDescending(clusterScore.score),
+        value: t('Load balance score: {{score}}%', { score: Math.round(clusterScore.score) }),
       },
     }));
 
     const computedSeverity = buildSeverityCounts(
-      clusterScores.map((c) => c.score),
+      clusterScores.map((clusterScore) => clusterScore.score),
       'descending',
     );
 

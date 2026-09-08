@@ -1,4 +1,4 @@
-import React, { type FC, useEffect, useRef, useState } from 'react';
+import React, { type FC, useCallback, useEffect, useRef, useState } from 'react';
 import { FormProvider, useForm, useWatch } from 'react-hook-form';
 import { useNavigate } from 'react-router';
 
@@ -86,23 +86,30 @@ const VMNetworkNewForm: FC = () => {
 
   const isProjectMappingInvalid = !isValidProjectMapping(projectMappingOption, namespaceSelector);
 
-  const onSubmit = async (data: VMNetworkForm): Promise<void> => {
-    try {
-      await k8sCreate({
-        data: data.network,
-        model: ClusterUserDefinedNetworkModel,
-      });
+  const onSubmit = useCallback(
+    async (data: VMNetworkForm): Promise<void> => {
+      try {
+        await k8sCreate({
+          data: data.network,
+          model: ClusterUserDefinedNetworkModel,
+        });
 
-      completedRef.current = true;
-      logVMNetworkCreated(data.network, data.projectMappingOption);
+        completedRef.current = true;
+        logVMNetworkCreated(data.network, data.projectMappingOption);
 
-      navigate(`${VM_NETWORKS_PATH}/${name}`);
-    } catch (error) {
-      completedRef.current = true;
-      logCreationFailed(VM_NETWORK_CREATION_FAILED, error);
-      setApiError(error as Error);
-    }
-  };
+        navigate(`${VM_NETWORKS_PATH}/${data.network.metadata.name}`);
+      } catch (error) {
+        completedRef.current = true;
+        logCreationFailed(VM_NETWORK_CREATION_FAILED, error);
+        setApiError(error as Error);
+      }
+    },
+    [navigate],
+  );
+
+  const onSave = useCallback(async (): Promise<void> => {
+    await handleSubmit(onSubmit)();
+  }, [handleSubmit, onSubmit]);
 
   const onClose = (): void => {
     navigate(VM_NETWORKS_PATH);
@@ -112,8 +119,8 @@ const VMNetworkNewForm: FC = () => {
     <FormProvider {...methods}>
       <Wizard
         header={<VMNetworkWizardHeader />}
-        onSave={(evt) => handleSubmit(onSubmit)(evt)}
-        onStepChange={(_evt, currentStep) => {
+        onSave={onSave}
+        onStepChange={(_event, currentStep) => {
           currentStepIdRef.current = currentStep.id;
         }}
       >

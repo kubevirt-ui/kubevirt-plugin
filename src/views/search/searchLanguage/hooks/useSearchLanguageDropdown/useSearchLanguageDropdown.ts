@@ -1,9 +1,8 @@
-/* eslint-disable */
 import { useCallback, useMemo } from 'react';
 
 import {
-  KubevirtFilterState,
-  OnSetFilters,
+  type KubevirtFilterState,
+  type OnSetFilters,
 } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import {
   formatFilterValue,
@@ -11,12 +10,12 @@ import {
 } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/utils';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
-  AutocompleteMode,
+  type AutocompleteMode,
   DropdownType,
-  SearchKeyBadge,
+  type SearchKeyBadge,
 } from '@search/components/SearchDropdown/types';
 import { type SetDraftTextWithCursor } from '@search/hooks/useCursorTracking';
-import { TokenParts } from '@search/searchLanguage/types';
+import { type TokenParts } from '@search/searchLanguage/types';
 import { getExclusionPrefix } from '@search/searchLanguage/utils';
 import { isFromValue, isToValue } from '@search/utils/dateCreatedValues';
 import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
@@ -90,17 +89,19 @@ export const useSearchLanguageDropdown = ({
       }
 
       const lowerValue = value.toLowerCase();
-      const isAlreadySelected = selectedValues.some((v) => v.toLowerCase() === lowerValue);
+      const isAlreadySelected = selectedValues.some(
+        (selectedVal) => selectedVal.toLowerCase() === lowerValue,
+      );
 
       const newSelectedValues = isAlreadySelected
-        ? selectedValues.filter((v) => v.toLowerCase() !== lowerValue)
+        ? selectedValues.filter((selectedVal) => selectedVal.toLowerCase() !== lowerValue)
         : [...selectedValues, value];
 
       const isExcluded = !!exclusionPrefix;
-      const newFilterValues = newSelectedValues.map((v) => formatFilterValue(v, isExcluded));
+      const newFilterValues = newSelectedValues.map((val) => formatFilterValue(val, isExcluded));
 
       const currentValues = filters[filterType] ?? [];
-      const oppositePolarity = currentValues.filter((v) => isExcludedValue(v) !== isExcluded);
+      const oppositePolarity = currentValues.filter((val) => isExcludedValue(val) !== isExcluded);
 
       onSetFilters({ [filterType]: [...oppositePolarity, ...newFilterValues] });
       trackKey(filterType);

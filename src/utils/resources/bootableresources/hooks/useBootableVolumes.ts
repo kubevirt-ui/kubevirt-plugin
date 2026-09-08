@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { useMemo } from 'react';
 
 import {
@@ -20,14 +19,12 @@ import { DEFAULT_PREFERENCE_LABEL } from '@kubevirt-utils/constants/instancetype
 import { ALL_PROJECTS } from '@kubevirt-utils/hooks/constants';
 import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
 import useListMulticlusterFilters from '@kubevirt-utils/hooks/useListMulticlusterFilters';
+import { getProvisioningDataSources } from '@kubevirt-utils/resources/bootableresources/hooks/getProvisioningDataSources';
 import { type BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import {
   convertResourceArrayToMapWithCluster,
-  getName,
-  getNamespace,
   getReadyOrCloningOrUploadingDataSources,
 } from '@kubevirt-utils/resources/shared';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { Operator } from '@openshift-console/dynamic-plugin-sdk';
 import { type UseBootableVolumesValues } from '@virtualmachines/wizard/utils/types';
@@ -127,21 +124,9 @@ const useBootableVolumes: UseBootableVolumes = (namespace, clusterOverride) => {
   const pvcSources = useMemo(() => convertResourceArrayToMapWithCluster(pvcs, true), [pvcs]);
   const dvSources = useMemo(() => convertResourceArrayToMapWithCluster(dvs, true), [dvs]);
 
-  // DataSources being provisioned by a DataVolume that don't yet match the
-  // ready/cloning/uploading filters (e.g. freshly created DS before CDI
-  // updates its status conditions).
   const provisioningDataSources = useMemo(() => {
-    if (!loaded || isEmpty(dataSources) || isEmpty(dvs)) return [];
-
-    const readyOrCloningKeys = new Set(
-      readyOrCloningDataSources.map((ds) => `${getNamespace(ds)}/${getName(ds)}`),
-    );
-
-    return dataSources.filter((ds) => {
-      if (readyOrCloningKeys.has(`${getNamespace(ds)}/${getName(ds)}`)) return false;
-
-      return dvs.some((dv) => getName(dv) === getName(ds) && getNamespace(dv) === getNamespace(ds));
-    });
+    if (!loaded) return [];
+    return getProvisioningDataSources(dataSources, dvs, readyOrCloningDataSources);
   }, [loaded, dataSources, dvs, readyOrCloningDataSources]);
 
   const bootableVolumes: BootableVolume[] = useMemo(() => {
@@ -152,12 +137,12 @@ const useBootableVolumes: UseBootableVolumes = (namespace, clusterOverride) => {
 
   const volumeSnapshotSources = useMemo(
     () =>
-      dataSources.reduce((acc, ds) => {
-        if (ds?.spec?.source?.snapshot?.name) {
+      dataSources.reduce((acc, dataSource) => {
+        if (dataSource?.spec?.source?.snapshot?.name) {
           const matchedVolumeSnapshot = volumeSnapshots.find(
-            (volume) => volume.metadata.name === ds?.spec?.source?.snapshot?.name,
+            (volume) => volume.metadata.name === dataSource?.spec?.source?.snapshot?.name,
           );
-          acc[ds.metadata.name] = matchedVolumeSnapshot;
+          acc[dataSource.metadata.name] = matchedVolumeSnapshot;
         }
 
         return acc;

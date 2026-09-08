@@ -12,9 +12,9 @@ import { getUnitLabel, UNIT_GIB } from '../hooks/useProjectResourceQuota';
 import { type TopClustersMetricData } from '../hooks/useTopClustersChartData';
 import { CHART_DAYS_WINDOW, MIB_PER_GIB } from './constants';
 
-export const formatTimestamp = (dateValue: Date | undefined): string => {
-  if (!(dateValue instanceof Date)) return '';
-  return timestampFor(dateValue, new Date(), false) as string;
+export const formatTimestamp = (date: Date | undefined): string => {
+  if (!(date instanceof Date)) return '';
+  return timestampFor(date, new Date(), false) as string;
 };
 
 /**

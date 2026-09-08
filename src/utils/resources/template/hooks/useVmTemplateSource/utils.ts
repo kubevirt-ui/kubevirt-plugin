@@ -1,29 +1,29 @@
-/* eslint-disable */
 import produce from 'immer';
 
-import { PersistentVolumeClaimModel, V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { PersistentVolumeClaimModel, type V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { DataSourceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { DataVolumeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
-  V1beta1DataSource,
-  V1beta1DataVolume,
+  type V1beta1DataSource,
+  type V1beta1DataVolume,
 } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
-import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import {
-  V1beta1DataVolumeSourceHTTP,
-  V1beta1DataVolumeSourcePVC,
-  V1beta1DataVolumeSourceRef,
-  V1beta1DataVolumeSourceRegistry,
-  V1beta1DataVolumeSourceSnapshot,
-  V1beta1PersistentVolumeClaim,
-  V1ContainerDiskSource,
+  type V1beta1DataVolumeSourceHTTP,
+  type V1beta1DataVolumeSourcePVC,
+  type V1beta1DataVolumeSourceRef,
+  type V1beta1DataVolumeSourceRegistry,
+  type V1beta1DataVolumeSourceSnapshot,
+  type V1beta1PersistentVolumeClaim,
+  type V1ContainerDiskSource,
+  type V1DataVolumeTemplateSpec,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getBootDisk, getVolumes } from '@kubevirt-utils/resources/vm';
 import { getVMBootSourceType } from '@kubevirt-utils/resources/vm/utils/source';
 import { kubevirtK8sGet } from '@multicluster/k8sRequests';
 
-import { isOpenShiftTemplate, poorManProcess, Template } from '../../utils';
-import { BOOT_SOURCE } from '../../utils/constants';
+import { isOpenShiftTemplate, poorManProcess, type Template } from '../../utils';
+import { type BOOT_SOURCE } from '../../utils/constants';
 import { getTemplateVirtualMachineObject } from '../../utils/selectors';
 
 export type TemplateBootSource = {
@@ -66,7 +66,11 @@ export const getTemplateBootSourceType = (template: Template): TemplateBootSourc
  * @param cluster
  * @returns a promise that resolves into the PVC
  */
-export const getPVC = (name: string, ns: string, cluster?: string) =>
+export const getPVC = (
+  name: string,
+  ns: string,
+  cluster?: string,
+): Promise<IoK8sApiCoreV1PersistentVolumeClaim> =>
   kubevirtK8sGet<IoK8sApiCoreV1PersistentVolumeClaim>({
     cluster,
     model: PersistentVolumeClaimModel,
@@ -81,7 +85,11 @@ export const getPVC = (name: string, ns: string, cluster?: string) =>
  * @param cluster
  * @returns a promise that resolves into the DataVolume
  */
-export const getDataVolume = (name: string, ns: string, cluster?: string) =>
+export const getDataVolume = (
+  name: string,
+  ns: string,
+  cluster?: string,
+): Promise<V1beta1DataVolume> =>
   kubevirtK8sGet<V1beta1DataVolume>({
     cluster,
     model: DataVolumeModel,
@@ -96,7 +104,11 @@ export const getDataVolume = (name: string, ns: string, cluster?: string) =>
  * @param cluster
  * @returns a promise that resolves into the DataSource
  */
-export const getDataSource = (name: string, ns: string, cluster?: string) =>
+export const getDataSource = (
+  name: string,
+  ns: string,
+  cluster?: string,
+): Promise<V1beta1DataSource> =>
   kubevirtK8sGet<V1beta1DataSource>({
     cluster,
     model: DataSourceModel,
@@ -111,7 +123,11 @@ export const getDataSource = (name: string, ns: string, cluster?: string) =>
  * @param cluster
  * @returns a promise that resolves into the DataSource
  */
-export const getDataSourcePVC = (name: string, ns: string, cluster?: string) =>
+export const getDataSourcePVC = (
+  name: string,
+  ns: string,
+  cluster?: string,
+): Promise<IoK8sApiCoreV1PersistentVolumeClaim> =>
   getDataSource(name, ns, cluster)
     .then((data) => data?.spec?.source?.pvc)
     .then((pvc) => getPVC(pvc.name, pvc.namespace, cluster));
@@ -122,7 +138,9 @@ export const getDataSourcePVC = (name: string, ns: string, cluster?: string) =>
  * @returns true if the data source is ready, false otherwise
  */
 export const isDataSourceReady = (dataSource: V1beta1DataSource): boolean =>
-  dataSource?.status?.conditions?.some((c) => c.type === 'Ready' && c.status === 'True');
+  dataSource?.status?.conditions?.some(
+    (condition) => condition.type === 'Ready' && condition.status === 'True',
+  );
 
 /**
  * a function that returns true if the data source is cloning in progress
@@ -131,9 +149,9 @@ export const isDataSourceReady = (dataSource: V1beta1DataSource): boolean =>
  */
 export const isDataSourceCloning = (dataSource: V1beta1DataSource): boolean =>
   dataSource?.status?.conditions?.some(
-    (c) =>
-      c.type === 'Ready' &&
-      c.status === 'False' &&
+    (condition) =>
+      condition.type === 'Ready' &&
+      condition.status === 'False' &&
       [
         'CloneInProgress',
         'CloneScheduled',
@@ -143,12 +161,15 @@ export const isDataSourceCloning = (dataSource: V1beta1DataSource): boolean =>
         'Pending',
         'PVCBound',
         'SnapshotForSmartCloneInProgress',
-      ].includes(c?.reason),
+      ].includes(condition?.reason),
   );
 
 export const isDataSourceUploading = (dataSource: V1beta1DataSource): boolean =>
   dataSource?.status?.conditions?.some(
-    (c) => c.type === 'Ready' && c.status === 'False' && c?.reason === 'UploadScheduled',
+    (condition) =>
+      condition.type === 'Ready' &&
+      condition.status === 'False' &&
+      condition?.reason === 'UploadScheduled',
   );
 
 /**
@@ -160,20 +181,26 @@ export const isDataSourceUploading = (dataSource: V1beta1DataSource): boolean =>
 export const produceTemplateBootSourceStorageClass = (
   template: V1Template,
   storageClassName: string,
-) =>
+): V1Template =>
   produce(template, (templateDraft) => {
     if (storageClassName) {
       const vm = getTemplateVirtualMachineObject(templateDraft);
       const bootDisk = getBootDisk(vm);
       const volume = getVolumes(vm)?.find((vol) => vol.name === bootDisk?.name);
+      const dvTemplates: V1DataVolumeTemplateSpec[] = vm?.spec?.dataVolumeTemplates ?? [];
 
-      const otherDataVolumeTemplates = vm?.spec?.dataVolumeTemplates?.filter(
-        (dv) => dv.metadata?.name !== volume?.dataVolume?.name,
+      const otherDataVolumeTemplates = dvTemplates.filter(
+        (dvTemplate) => dvTemplate.metadata?.name !== volume?.dataVolume?.name,
       );
-      const dataVolumeTemplate = vm?.spec?.dataVolumeTemplates?.find(
-        (dv) => dv.metadata?.name === volume?.dataVolume?.name,
+      const dataVolumeTemplate = dvTemplates.find(
+        (dvTemplate) => dvTemplate.metadata?.name === volume?.dataVolume?.name,
       );
-      dataVolumeTemplate.spec.storage.storageClassName = storageClassName;
-      vm.spec.dataVolumeTemplates = [...otherDataVolumeTemplates, dataVolumeTemplate];
+      if (dataVolumeTemplate?.spec?.storage) {
+        dataVolumeTemplate.spec.storage.storageClassName = storageClassName;
+      }
+      vm.spec.dataVolumeTemplates = [
+        ...otherDataVolumeTemplates,
+        ...(dataVolumeTemplate ? [dataVolumeTemplate] : []),
+      ];
     }
   });

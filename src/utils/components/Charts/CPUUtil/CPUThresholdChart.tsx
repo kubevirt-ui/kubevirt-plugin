@@ -1,8 +1,7 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 import { Link } from 'react-router';
 
-import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import useVMQuery from '@kubevirt-utils/hooks/useVMQuery';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { getCPU, getVCPUCount } from '@kubevirt-utils/resources/vm';
@@ -64,14 +63,14 @@ const CPUThresholdChart: FC<CPUThresholdChartProps> = ({ vmi }) => {
   const cpu = getCPU(vmi);
   const cpuRequested = getVCPUCount(cpu);
 
-  const showValuesInMillicores = cpuUsage?.some(([_, y]) => Number(y) < 1);
+  const showValuesInMillicores = cpuUsage?.some(([_timestamp, cpuValue]) => Number(cpuValue) < 1);
 
-  const chartData = cpuUsage?.map(([x, y]) => {
-    const value = Number(y);
+  const chartData = cpuUsage?.map(([timestamp, cpuValue]) => {
+    const value = Number(cpuValue);
 
     return {
       name: showValuesInMillicores ? 'CPU usage (m)' : 'CPU usage',
-      x: new Date(x * MILLISECONDS_MULTIPLIER),
+      x: new Date(timestamp * MILLISECONDS_MULTIPLIER),
       y: showValuesInMillicores ? value * 1000 : value,
     };
   });
@@ -106,43 +105,43 @@ const CPUThresholdChart: FC<CPUThresholdChartProps> = ({ vmi }) => {
             width={width}
           >
             <ChartAxis
+              dependentAxis
               style={{
                 grid: {
                   stroke: chart_color_black_200.value,
                 },
                 tickLabels,
               }}
-              dependentAxis
               tickFormat={(tick: number) => tick?.toFixed(2)}
               tickValues={[0, showValuesInMillicores ? cpuRequested * 1000 : cpuRequested]}
             />
             <ChartAxis
+              axisComponent={<></>}
               style={{
                 tickLabels: { padding: 2, ...tickLabels },
                 ticks: { stroke: 'transparent' },
               }}
-              axisComponent={<></>}
               tickCount={TICKS_COUNT}
               tickFormat={tickFormat(duration, currentTime)}
             />
             <ChartGroup>
               <ChartArea
+                data={chartData}
                 style={{
                   data: {
                     stroke: chart_color_blue_300.value,
                   },
                 }}
-                data={chartData}
               />
             </ChartGroup>
             <ChartThreshold
+              data={thresholdData}
               style={{
                 data: {
                   stroke: chart_color_orange_300.value,
                   strokeDasharray: 10,
                 },
               }}
-              data={thresholdData}
             />
           </Chart>
         </Link>

@@ -14,18 +14,18 @@ import UnsupportedCharModal from './UnsupportedCharModal';
 import {
   ALT_L,
   CONTROL_L,
-  F1,
-  F2,
-  F3,
-  F4,
-  F5,
-  F6,
-  F7,
-  F8,
-  F9,
   F10,
   F11,
   F12,
+  KEY_F1,
+  KEY_F2,
+  KEY_F3,
+  KEY_F4,
+  KEY_F5,
+  KEY_F6,
+  KEY_F7,
+  KEY_F8,
+  KEY_F9,
   ONE,
   TWO,
 } from './utils/constants';
@@ -129,15 +129,15 @@ function createSendKeyFunction(keysym: number, scanCode: ScanCodeName): () => vo
   };
 }
 
-export const sendF1 = createSendKeyFunction(KeyTable.XK_F1, F1);
-export const sendF2 = createSendKeyFunction(KeyTable.XK_F2, F2);
-export const sendF3 = createSendKeyFunction(KeyTable.XK_F3, F3);
-export const sendF4 = createSendKeyFunction(KeyTable.XK_F4, F4);
-export const sendF5 = createSendKeyFunction(KeyTable.XK_F5, F5);
-export const sendF6 = createSendKeyFunction(KeyTable.XK_F6, F6);
-export const sendF7 = createSendKeyFunction(KeyTable.XK_F7, F7);
-export const sendF8 = createSendKeyFunction(KeyTable.XK_F8, F8);
-export const sendF9 = createSendKeyFunction(KeyTable.XK_F9, F9);
+export const sendF1 = createSendKeyFunction(KeyTable.XK_F1, KEY_F1);
+export const sendF2 = createSendKeyFunction(KeyTable.XK_F2, KEY_F2);
+export const sendF3 = createSendKeyFunction(KeyTable.XK_F3, KEY_F3);
+export const sendF4 = createSendKeyFunction(KeyTable.XK_F4, KEY_F4);
+export const sendF5 = createSendKeyFunction(KeyTable.XK_F5, KEY_F5);
+export const sendF6 = createSendKeyFunction(KeyTable.XK_F6, KEY_F6);
+export const sendF7 = createSendKeyFunction(KeyTable.XK_F7, KEY_F7);
+export const sendF8 = createSendKeyFunction(KeyTable.XK_F8, KEY_F8);
+export const sendF9 = createSendKeyFunction(KeyTable.XK_F9, KEY_F9);
 export const sendF10 = createSendKeyFunction(KeyTable.XK_F10, F10);
 export const sendF11 = createSendKeyFunction(KeyTable.XK_F11, F11);
 export const sendF12 = createSendKeyFunction(KeyTable.XK_F12, F12);
