@@ -24,7 +24,6 @@ import useAutoHideNavigation from '../hooks/useAutoHideNavigation/useAutoHideNav
 import OverviewTab from '../list/components/OverviewTab/OverviewTab';
 import { OVERVIEW_TAB_INDEX, VM_LIST_TAB_INDEX } from './constants';
 import useNavigatorTabs from './useNavigatorTabs';
-import VirtualMachineYAMLCreatePage from './VirtualMachineYAMLCreatePage';
 
 import './VirtualMachineNavigator.scss';
 
@@ -55,10 +54,6 @@ const VirtualMachineNavigator: FC = () => {
   const isNavCollapsed = useAutoHideNavigation();
 
   const treeProps = useTreeViewData();
-
-  if (location.pathname.endsWith(`${VirtualMachineModelRef}/~new`)) {
-    return <VirtualMachineYAMLCreatePage />;
-  }
 
   return (
     <>

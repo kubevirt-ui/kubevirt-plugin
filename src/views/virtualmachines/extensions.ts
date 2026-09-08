@@ -15,6 +15,8 @@ export const exposedModules: ConsolePluginBuildMetadata['exposedModules'] = {
   NodeInventoryItem: './views/virtualmachines/node/inventoryitem/NodeInventoryItem.tsx',
   NodeVirtualMachineList: './views/virtualmachines/node/list/NodeVirtualMachinesList.tsx',
   useServiceActionsProvider: './utils/components/ServicesList/useServiceActionsProvider.ts',
+  VirtualMachineYAMLCreatePage:
+    './views/virtualmachines/navigator/VirtualMachineYAMLCreatePage.tsx',
 };
 
 export const extensions: EncodedExtension[] = [
@@ -43,6 +45,14 @@ export const extensions: EncodedExtension[] = [
     },
     type: 'console.action/resource-provider',
   } as EncodedExtension<ResourceActionProvider>,
+
+  {
+    properties: {
+      component: { $codeRef: 'VirtualMachineYAMLCreatePage' },
+      path: ['/k8s/ns/:ns/kubevirt.io~v1~VirtualMachine/~new'],
+    },
+    type: 'console.page/route',
+  } as EncodedExtension<RoutePage>,
 
   {
     properties: {
