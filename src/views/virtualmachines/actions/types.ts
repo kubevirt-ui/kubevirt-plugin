@@ -1,6 +1,6 @@
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { ActionDropdownItemType } from '@kubevirt-utils/components/ActionsDropdown/constants';
-import { ModalComponent } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type ActionDropdownItemType } from '@kubevirt-utils/components/ActionsDropdown/constants';
+import { type ModalComponent } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import type { StorageMigrationAPI } from '@kubevirt-utils/resources/migrations/constants';
 
 export type BulkVirtualMachineActionFactory = {
@@ -8,7 +8,7 @@ export type BulkVirtualMachineActionFactory = {
   crossClusterMigration: (
     vms: V1VirtualMachine[],
     createModal: (modal: ModalComponent) => void,
-    isDisabled: boolean,
+    isClusterUnsupported: boolean,
   ) => ActionDropdownItemType;
   delete: (
     vms: V1VirtualMachine[],
