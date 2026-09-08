@@ -11,6 +11,7 @@ import { getName } from '@kubevirt-utils/resources/shared';
 import { Content, FormGroup } from '@patternfly/react-core';
 
 import { initialBootableVolumeState } from '../AddBootableVolumeModal/consts';
+import ErrorAlert from '../ErrorAlert/ErrorAlert';
 import InlineFilterSelect from '../FilterSelect/InlineFilterSelect';
 import Loading from '../Loading/Loading';
 
@@ -36,10 +37,8 @@ const SelectSnapshot: FC<SelectSnapshotProps> = ({
   snapshotNamespaceSelected,
 }) => {
   const { t } = useKubevirtTranslation();
-  const { projectsLoaded, projectsWithSnapshots, snapshots, snapshotsLoaded } = useSnapshots(
-    snapshotNamespaceSelected,
-    cluster,
-  );
+  const { error, projectsLoaded, projectsWithSnapshots, snapshots, snapshotsLoaded } =
+    useSnapshots(snapshotNamespaceSelected, cluster);
 
   const onSelectProject = useCallback(
     (newProject) => {
@@ -66,6 +65,14 @@ const SelectSnapshot: FC<SelectSnapshotProps> = ({
     () => snapshots?.map((snapshot) => getName(snapshot))?.sort((a, b) => a?.localeCompare(b)),
     [snapshots],
   );
+
+  if (error) {
+    return (
+      <div>
+        <ErrorAlert error={error} />
+      </div>
+    );
+  }
 
   return (
     <div>

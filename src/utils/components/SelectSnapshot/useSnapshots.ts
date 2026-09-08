@@ -16,7 +16,7 @@ type ProjectSnapshotCount = {
 };
 
 type UseSnapshotsReturnType = {
-  error: Error;
+  error?: Error;
   projectsLoaded: boolean;
   projectsWithSnapshots: ProjectSnapshotCount[];
   snapshots: VolumeSnapshotKind[];
@@ -59,12 +59,14 @@ const useSnapshots = (projectSelected: string, cluster?: string): UseSnapshotsRe
     [allSnapshots, projectSelected],
   );
 
+  const loaded = allSnapshotsLoaded || !!allSnapshotsErrors;
+
   return {
     error: allSnapshotsErrors,
-    projectsLoaded: allSnapshotsLoaded,
+    projectsLoaded: loaded,
     projectsWithSnapshots,
     snapshots,
-    snapshotsLoaded: allSnapshotsLoaded,
+    snapshotsLoaded: loaded,
   };
 };
 

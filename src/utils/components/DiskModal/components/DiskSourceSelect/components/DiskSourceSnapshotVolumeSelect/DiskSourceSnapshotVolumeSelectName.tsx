@@ -1,11 +1,12 @@
-import React, { FC, useMemo } from 'react';
+import React, { type FC, useMemo } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
 import {
   modelToGroupVersionKind,
   VolumeSnapshotModel,
 } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1DiskFormState } from '@kubevirt-utils/components/DiskModal/utils/types';
+import { type V1DiskFormState } from '@kubevirt-utils/components/DiskModal/utils/types';
+import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
@@ -37,9 +38,11 @@ const DiskSourceSnapshotVolumeSelectName: FC = () => {
   const vmCluster = watch(VM_CLUSTER_FIELD);
   const namespace = watch(DATAVOLUME_SNAPSHOT_NAMESPACE);
 
-  const { snapshots, snapshotsLoaded } = useSnapshots(namespace, vmCluster);
+  const { error: loadError, snapshots, snapshotsLoaded } = useSnapshots(namespace, vmCluster);
 
   const snapshotNames = useMemo(() => snapshots?.map(getName), [snapshots]);
+
+  if (loadError) return <ErrorAlert error={loadError} />;
 
   if (!snapshotsLoaded) return <Loading />;
 
