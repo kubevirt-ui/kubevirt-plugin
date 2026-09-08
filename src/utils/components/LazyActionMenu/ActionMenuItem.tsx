@@ -1,15 +1,17 @@
-import React, { FC, useCallback } from 'react';
+import React, { type FC, useCallback } from 'react';
 import { connect } from 'react-redux';
 import { useNavigate } from 'react-router';
 import isObject from 'lodash/isObject';
 
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isCallable } from '@kubevirt-utils/utils/typeGuards';
-import { Action } from '@openshift-console/dynamic-plugin-sdk';
+import { getNoPermissionTooltipContent } from '@kubevirt-utils/utils/utils';
+import { type Action } from '@openshift-console/dynamic-plugin-sdk';
 import { impersonateStateToProps } from '@openshift-console/dynamic-plugin-sdk/lib/app/core/reducers/coreSelectors';
-import { ImpersonateKind } from '@openshift-console/dynamic-plugin-sdk/lib/app/redux-types';
+import { type ImpersonateKind } from '@openshift-console/dynamic-plugin-sdk/lib/app/redux-types';
 import { MenuItem, Tooltip } from '@patternfly/react-core';
 
-import { CheckAccess } from './LazyActionMenu';
+import { type CheckAccess } from './LazyActionMenu';
 import { useCheckAccess } from './overrides';
 
 export type ActionMenuItemProps = {
@@ -18,16 +20,17 @@ export type ActionMenuItemProps = {
   onClick?: () => void;
 };
 
-const ActionItem: FC<ActionMenuItemProps & { isAllowed: boolean }> = ({
-  action,
-  autoFocus,
-  isAllowed,
-  onClick,
-}) => {
+const ActionItem: FC<
+  ActionMenuItemProps & { isAllowed: boolean; isPermissionDenied?: boolean }
+> = ({ action, autoFocus, isAllowed, isPermissionDenied = false, onClick }) => {
+  const { t } = useKubevirtTranslation();
   const { cta, description, disabled, icon, label } = action;
   const { external, href } = cta as { external?: boolean; href: string };
   const isDisabled = !isAllowed || disabled;
   const navigate = useNavigate();
+  const tooltipContent = isPermissionDenied
+    ? getNoPermissionTooltipContent(t)
+    : action.disabledTooltip;
 
   const handleClick = useCallback(
     (event: MouseEvent) => {
@@ -56,9 +59,9 @@ const ActionItem: FC<ActionMenuItemProps & { isAllowed: boolean }> = ({
 
   const menuItem = <MenuItem {...props}>{label}</MenuItem>;
 
-  if (isDisabled && action.disabledTooltip && !action.tooltip) {
+  if (isDisabled && tooltipContent && (isPermissionDenied || !action.tooltip)) {
     return (
-      <Tooltip content={action.disabledTooltip} position="left">
+      <Tooltip content={tooltipContent} position="left">
         <div>{menuItem}</div>
       </Tooltip>
     );
@@ -71,8 +74,10 @@ const AccessReviewActionItem = connect(impersonateStateToProps)((
   props: ActionMenuItemProps & { checkAccess: CheckAccess; impersonate: ImpersonateKind },
 ) => {
   const { action, checkAccess, impersonate } = props;
-  const [isAllowed] = useCheckAccess(action.accessReview, impersonate, checkAccess);
-  return <ActionItem {...props} isAllowed={isAllowed} />;
+  const [isAllowed, loading] = useCheckAccess(action.accessReview, impersonate, checkAccess);
+  return (
+    <ActionItem {...props} isAllowed={isAllowed} isPermissionDenied={!loading && !isAllowed} />
+  );
 });
 
 const ActionMenuItem: FC<ActionMenuItemProps & { checkAccess: CheckAccess }> = (props) => {

@@ -1,5 +1,7 @@
-import React, { Dispatch, FC, SetStateAction } from 'react';
+import React, { type Dispatch, type FC, type SetStateAction } from 'react';
 
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getNoPermissionTooltipContent } from '@kubevirt-utils/utils/utils';
 import {
   Menu,
   MenuContent,
@@ -10,7 +12,7 @@ import {
 } from '@patternfly/react-core';
 import { useFleetAccessReview } from '@stolostron/multicluster-sdk';
 
-import { ActionDropdownItemType } from '../ActionsDropdown/constants';
+import { type ActionDropdownItemType } from '../ActionsDropdown/constants';
 
 import './ActionDropdownItem.scss';
 
@@ -27,13 +29,18 @@ const ActionDropdownItem: FC<ActionDropdownItemProps> = ({
   tooltipPosition,
   tooltipZIndex,
 }) => {
-  const [accessReview] = useFleetAccessReview(action?.accessReview || {});
+  const { t } = useKubevirtTranslation();
+  const [accessReview, loading] = useFleetAccessReview(action?.accessReview ?? {});
 
   const actionAllowed = accessReview || action?.accessReview === undefined;
   const isDisabled = !actionAllowed || action?.disabled;
-  const showTooltip = isDisabled && action?.disabledTooltip;
+  const isPermissionDenied = action?.accessReview != null && !loading && !accessReview;
+  const tooltipContent = isPermissionDenied
+    ? getNoPermissionTooltipContent(t)
+    : action?.disabledTooltip;
+  const showTooltip = isDisabled && tooltipContent;
 
-  const handleClick = () => {
+  const handleClick = (): void => {
     if (typeof action?.cta === 'function') {
       action?.cta();
       setIsOpen(false);
@@ -42,6 +49,8 @@ const ActionDropdownItem: FC<ActionDropdownItemProps> = ({
 
   const menuItem = (
     <MenuItem
+      data-test={`${action?.id}`}
+      description={action?.description}
       flyoutMenu={
         action?.options && (
           <Menu className="kv-actions-dropdown-submenu" containsFlyout id={`menu-${action.id}`}>
@@ -61,8 +70,6 @@ const ActionDropdownItem: FC<ActionDropdownItemProps> = ({
           </Menu>
         )
       }
-      data-test={`${action?.id}`}
-      description={action?.description}
       isAriaDisabled={isDisabled}
       key={action?.id}
       onClick={handleClick}
@@ -80,7 +87,7 @@ const ActionDropdownItem: FC<ActionDropdownItemProps> = ({
   if (showTooltip) {
     return (
       <Tooltip
-        content={action.disabledTooltip}
+        content={tooltipContent}
         position={tooltipPosition ?? TooltipPosition.left}
         {...(tooltipZIndex && { zIndex: tooltipZIndex })}
       >
