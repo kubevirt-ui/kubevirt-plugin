@@ -1,3 +1,4 @@
+/* eslint-disable */
 import unionBy from 'lodash/unionBy';
 
 import { V1Disk, V1Interface, V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';

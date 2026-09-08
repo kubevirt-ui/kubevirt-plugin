@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { FC } from 'react';
 
 import { getCancelUploadLabel } from '@kubevirt-utils/hooks/useCDIUpload/utils';

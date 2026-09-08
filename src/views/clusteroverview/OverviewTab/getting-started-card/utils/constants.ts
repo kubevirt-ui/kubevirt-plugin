@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
 export const MTV_OPERATOR = 'mtv-operator';

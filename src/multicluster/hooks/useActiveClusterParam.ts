@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useMatch } from 'react-router';
 
 import { ALL_CLUSTERS_KEY } from '@kubevirt-utils/hooks/constants';

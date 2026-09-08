@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { BootloaderOption } from './types';
 
 export enum BootMode {

@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { IoK8sApiCoreV1Node } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 

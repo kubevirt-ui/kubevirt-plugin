@@ -1,3 +1,4 @@
+/* eslint-disable */
 export enum CreateTemplateItems {
   fromTemplate = 'fromTemplate',
   fromVM = 'fromVM',

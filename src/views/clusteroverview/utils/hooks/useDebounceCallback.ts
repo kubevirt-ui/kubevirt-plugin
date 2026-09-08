@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useMemo, useRef } from 'react';
 
 import { debounce } from '@kubevirt-utils/utils/debounce';

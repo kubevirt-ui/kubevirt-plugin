@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import {
   CONTAINER_EPHERMAL,

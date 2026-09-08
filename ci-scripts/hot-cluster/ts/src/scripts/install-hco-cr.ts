@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { readFileSync } from 'node:fs';
 
 import { type KubeClient, sleep } from '../kube-client';

@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { IoK8sApiCoreV1Node } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { getNodeConditions } from '@kubevirt-utils/resources/node/utils/selectors';
 

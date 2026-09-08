@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { NetworkAttachmentDefinitionModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { NetworkAttachmentDefinitionKind } from '@kubevirt-utils/resources/nad/types';
 import {

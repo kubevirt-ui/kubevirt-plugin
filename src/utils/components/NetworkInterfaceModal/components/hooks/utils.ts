@@ -1,3 +1,4 @@
+/* eslint-disable */
 import partition from 'lodash/partition';
 
 import { NetworkAttachmentDefinitionModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';

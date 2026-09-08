@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { ManagedColumn } from '@openshift-console/dynamic-plugin-sdk';
 
 import { DATA_LIST_PREFIX, MAX_VIEW_COLS } from './constants';

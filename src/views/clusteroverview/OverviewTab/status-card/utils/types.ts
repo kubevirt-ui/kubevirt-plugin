@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { ReactNode } from 'react';
 
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';

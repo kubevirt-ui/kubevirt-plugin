@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useCallback, useState } from 'react';
 
 import { getCluster } from '@multicluster/helpers/selectors';

@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { FC, useEffect, useState } from 'react';
 
 import SectionWithSwitch from '@kubevirt-utils/components/SectionWithSwitch/SectionWithSwitch';

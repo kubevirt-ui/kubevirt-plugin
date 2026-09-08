@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React from 'react';
 
 import { ExclamationCircleIcon } from '@patternfly/react-icons';

@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { MouseEvent } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 

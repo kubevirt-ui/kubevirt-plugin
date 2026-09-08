@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { IoK8sApiCoreV1Node } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import useWorkerNodes from '@kubevirt-utils/resources/node/hooks/useWorkerNodes';

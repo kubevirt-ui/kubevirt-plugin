@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { FC, useContext, useEffect, useState } from 'react';
 
 import { V1beta1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';

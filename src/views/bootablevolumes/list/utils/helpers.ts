@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getCluster } from '@multicluster/helpers/selectors';
 

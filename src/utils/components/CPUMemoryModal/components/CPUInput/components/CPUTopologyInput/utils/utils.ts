@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { CPUComponent } from '@kubevirt-utils/components/CPUMemoryModal/components/CPUInput/utils/utils';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 

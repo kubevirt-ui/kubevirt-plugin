@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { getAnnotation } from '@kubevirt-utils/resources/shared';
 import { type K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 

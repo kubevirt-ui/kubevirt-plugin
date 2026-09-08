@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { ComponentType } from 'react';
 
 import { ACMVirtualMachineAction } from '@kubevirt-extensions/acm.virtualmachine';

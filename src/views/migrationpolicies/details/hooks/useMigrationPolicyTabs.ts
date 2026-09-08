@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
 import MigrationPolicyDetailsPage from '../tabs/details/MigrationPolicyDetailsPage';

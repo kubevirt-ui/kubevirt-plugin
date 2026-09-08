@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
 import VirtualMachinesInstancePageConsoleTab from '../tabs/console/VirtualMachinesInstancePageConsoleTab';

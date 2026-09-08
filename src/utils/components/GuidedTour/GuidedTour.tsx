@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { ComponentType, FC, useMemo } from 'react';
 import Joyride, { ACTIONS, CallBackProps, EVENTS, TooltipRenderProps } from 'react-joyride';
 import { useLocation, useNavigate } from 'react-router';

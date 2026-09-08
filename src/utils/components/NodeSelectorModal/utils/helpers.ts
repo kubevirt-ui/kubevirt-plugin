@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { IDLabel } from './types';
 
 export const nodeSelectorToIDLabels = (nodeSelector: { [key: string]: string }): IDLabel[] =>

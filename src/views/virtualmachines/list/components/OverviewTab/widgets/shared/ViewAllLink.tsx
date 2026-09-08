@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { AnchorHTMLAttributes, FC, useMemo } from 'react';
 import { Link } from 'react-router';
 

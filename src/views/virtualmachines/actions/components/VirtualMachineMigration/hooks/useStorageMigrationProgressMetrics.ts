@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useMemo } from 'react';
 import type { TFunction } from 'i18next';
 

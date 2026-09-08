@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getCPU, getMemory } from '@kubevirt-utils/resources/vm';
 import { getVMINodeName } from '@kubevirt-utils/resources/vmi';

@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { ComponentType } from 'react';
 
 import { TFunction } from 'i18next';

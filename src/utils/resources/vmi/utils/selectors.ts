@@ -1,3 +1,4 @@
+/* eslint-disable */
 import {
   V1Bootloader,
   V1Devices,

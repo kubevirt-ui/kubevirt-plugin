@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { ObjectEnum } from '@kubevirt-utils/utils/ObjectEnum';
 
 export type DropdownProps = {

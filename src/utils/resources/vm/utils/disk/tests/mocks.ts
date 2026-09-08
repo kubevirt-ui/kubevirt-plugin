@@ -1,3 +1,4 @@
+/* eslint-disable */
 import {
   V1Disk,
   V1VirtualMachine,

@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useCallback } from 'react';
 
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';

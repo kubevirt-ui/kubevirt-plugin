@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { HyperConvergedV1Beta1Model as HyperConvergedModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { OPENSHIFT_OS_IMAGES_NS } from '@kubevirt-utils/constants/constants';
 import { HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';

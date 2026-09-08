@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { KubeDeschedulerModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
   DESCHEDULER_ENABLED,

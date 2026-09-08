@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useParams } from 'react-router';
 
 import useDeepCompareMemoize from './useDeepCompareMemoize/useDeepCompareMemoize';

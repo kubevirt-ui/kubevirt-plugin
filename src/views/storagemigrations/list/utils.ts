@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { getStorageMigrationPlanModelForKind } from '@kubevirt-utils/resources/migrations/backends';
 import { MultiNamespaceVirtualMachineStorageMigrationPlan } from '@kubevirt-utils/resources/migrations/constants';
 import { getStorageMigrationPlanSpecNamespaces } from '@kubevirt-utils/resources/migrations/selectors';

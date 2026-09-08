@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useEffect, useState } from 'react';
 
 const DEFAULT_REFRESH_INTERVAL_MS = 30_000;

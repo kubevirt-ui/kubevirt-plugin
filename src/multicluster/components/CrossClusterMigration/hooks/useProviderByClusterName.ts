@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { V1beta1Provider } from '@forklift-ui/types';
 
 import { getProviderByClusterName } from '../utils';

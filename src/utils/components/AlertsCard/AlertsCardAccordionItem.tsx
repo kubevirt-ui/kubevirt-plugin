@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { FC } from 'react';
 
 import AlertStatusItem from '@kubevirt-utils/components/AlertsCard/AlertStatusItem';

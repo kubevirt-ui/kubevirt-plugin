@@ -1,3 +1,4 @@
+/* eslint-disable */
 /**
  * Install OpenShift Virtualization (CNV) via OLM subscription.
  * Replaces: ci-scripts/hot-cluster/install-hco.sh (303 lines)

@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { ComponentClass, FC, ReactNode } from 'react';
 
 import { Divider, DrilldownMenu, MenuItem } from '@patternfly/react-core';

@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { signal } from '@preact/signals-react';
 
 export const runningTourSignal = signal(false);

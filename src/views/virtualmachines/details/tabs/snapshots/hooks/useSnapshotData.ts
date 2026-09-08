@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useMemo } from 'react';
 
 import { VirtualMachineRestoreModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';

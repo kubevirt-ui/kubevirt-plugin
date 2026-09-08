@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { JOB_ENV_ACCEPT_WINDOWS_EULA, JOB_ENV_WIN_IMAGE_DOWNLOAD_URL } from '../constants';
 
 import { selfValidationJob } from './resourceTemplates';

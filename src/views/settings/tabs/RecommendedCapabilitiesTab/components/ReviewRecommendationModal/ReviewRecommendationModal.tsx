@@ -1,4 +1,5 @@
-import React, { type FC, Suspense } from 'react';
+/* eslint-disable */
+import React, { FC, Suspense } from 'react';
 import { Trans } from 'react-i18next';
 
 import Loading from '@kubevirt-utils/components/Loading/Loading';

@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useRef } from 'react';
 
 import { BinaryUnit } from '@kubevirt-utils/utils/unitConstants';

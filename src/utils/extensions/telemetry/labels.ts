@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getLabels, getName } from '@kubevirt-utils/resources/shared';

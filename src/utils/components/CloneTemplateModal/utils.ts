@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { DataVolumeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {

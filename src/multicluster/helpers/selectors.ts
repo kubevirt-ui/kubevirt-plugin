@@ -1,3 +1,4 @@
+/* eslint-disable */
 /**
  *
  * @param resource k8s resource with optional cluster

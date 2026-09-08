@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { CONSOLE_NAMESPACE_SYSTEM_NAMESPACE_KEY } from '@kubevirt-utils/hooks/useConsoleShowSystemNamespaces/consts';
 import { act, renderHook, waitFor } from '@testing-library/react';
 

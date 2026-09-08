@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { SelectTypeaheadOptionProps } from '@kubevirt-utils/components/SelectTypeahead/SelectTypeahead';
 import { SelectOptionProps } from '@patternfly/react-core';
 

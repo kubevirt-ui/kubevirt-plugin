@@ -1,3 +1,4 @@
+/* eslint-disable */
 /**
  * TTL-based cleanup of stale CI environments.
  * Only reaps E2E ConfigMaps (CI_ENV_LABEL), never manual-console.

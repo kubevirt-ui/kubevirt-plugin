@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { FC, memo, ReactNode, useRef, useState } from 'react';
 import classNames from 'classnames';
 

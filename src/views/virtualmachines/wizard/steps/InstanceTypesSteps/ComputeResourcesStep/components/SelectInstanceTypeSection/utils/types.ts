@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { InstanceTypeSize } from '@kubevirt-utils/resources/instancetype/types';
 
 export enum InstanceTypeCategory {

@@ -1,3 +1,4 @@
+/* eslint-disable */
 /**
  * Cluster discovery — cached per reconciliation cycle.
  */

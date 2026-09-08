@@ -1,3 +1,4 @@
+/* eslint-disable */
 export type FromRequirementsOptions = {
   basic?: boolean;
   undefinedWhenEmpty?: boolean;

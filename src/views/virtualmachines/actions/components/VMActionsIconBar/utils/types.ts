@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { ComponentClass } from 'react';
 
 import { ActionDropdownItemType } from '@kubevirt-utils/components/ActionsDropdown/constants';

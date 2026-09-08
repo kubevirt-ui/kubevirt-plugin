@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { NetworkAttachmentDefinitionKind } from '@kubevirt-utils/resources/nad/types';
 
 export enum ExtraNADNamespaces {

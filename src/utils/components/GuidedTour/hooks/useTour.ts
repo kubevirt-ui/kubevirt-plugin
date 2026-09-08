@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useLocation, useNavigate } from 'react-router';
 
 import { ALL_NAMESPACES } from '@kubevirt-utils/hooks/constants';

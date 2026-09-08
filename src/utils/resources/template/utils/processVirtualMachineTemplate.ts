@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { V1beta1VirtualMachineTemplate } from '@kubevirt-ui-ext/kubevirt-api/virt-template';
 import { VirtualMachineTemplateModel } from '@kubevirt-utils/models';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';

@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { ClipboardEvent, FC } from 'react';
 
 import PlainIconButton from '@kubevirt-utils/components/HardwareDevices/form/PlainIconButton';

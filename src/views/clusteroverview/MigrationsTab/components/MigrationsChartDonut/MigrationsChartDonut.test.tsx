@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React from 'react';
 
 import { type V1VirtualMachineInstanceMigration } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';

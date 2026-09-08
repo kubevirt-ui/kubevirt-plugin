@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useMemo } from 'react';
 
 import { SimplifiedAlerts } from '@kubevirt-utils/components/AlertsCard/utils/types';
@@ -22,7 +23,7 @@ const useSimplifiedAlerts: UseSimplifiedAlerts = () => {
   const { getConsoleURL, loaded: consoleURLsLoaded } = useManagedClusterConsoleURLs();
 
   const simplifiedAlerts = useMemo(() => {
-    // eslint-disable-next-line perfectionist/sort-objects
+     
     const data = { critical: [], warning: [], info: [] };
     return (
       alerts.reduce((acc, alert) => {

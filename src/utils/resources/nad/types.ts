@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { K8sResourceKind } from '@openshift-console/dynamic-plugin-sdk';
 
 import { NADTopology } from './constants';

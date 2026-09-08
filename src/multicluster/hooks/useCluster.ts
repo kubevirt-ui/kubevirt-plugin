@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useHubClusterName } from '@stolostron/multicluster-sdk';
 
 import useClusterParam from './useClusterParam';

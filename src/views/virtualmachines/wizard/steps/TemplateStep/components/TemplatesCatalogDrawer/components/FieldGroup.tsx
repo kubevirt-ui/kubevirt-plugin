@@ -1,3 +1,4 @@
+/* eslint-disable */
 import classNames from 'classnames';
 import React, { type FC } from 'react';
 

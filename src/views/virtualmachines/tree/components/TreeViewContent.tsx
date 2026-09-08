@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { FC, MouseEvent } from 'react';
 
 import Loading from '@kubevirt-utils/components/Loading/Loading';

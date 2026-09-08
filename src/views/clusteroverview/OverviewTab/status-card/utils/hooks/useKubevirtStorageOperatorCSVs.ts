@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { modelToGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { ClusterServiceVersionModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { SubscriptionModel } from '@kubevirt-ui-ext/kubevirt-api/console';

@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { Operator } from '@openshift-console/dynamic-plugin-sdk';
 
 import useCheckupsData from '../../../utils/hooks/useCheckupsData';

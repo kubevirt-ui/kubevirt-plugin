@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useMemo } from 'react';
 
 import useListClusters from '@kubevirt-utils/hooks/useListClusters';

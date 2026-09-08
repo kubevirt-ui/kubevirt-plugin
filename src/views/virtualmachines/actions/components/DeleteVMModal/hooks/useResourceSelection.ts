@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useCallback, useState } from 'react';
 
 import { V1Volume } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';

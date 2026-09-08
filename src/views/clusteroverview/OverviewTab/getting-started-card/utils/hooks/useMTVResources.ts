@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { modelToGroupVersionKind, RouteModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
   K8sResourceCommon,

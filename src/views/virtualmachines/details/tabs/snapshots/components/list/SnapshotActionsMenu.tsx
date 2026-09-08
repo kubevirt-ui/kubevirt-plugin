@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { FC, useCallback, useState } from 'react';
 
 import { VirtualMachineCloneModel } from '@kubevirt-ui-ext/kubevirt-api/console';

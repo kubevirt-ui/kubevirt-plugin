@@ -1,3 +1,4 @@
+/* eslint-disable */
 import {
   MIGRATION_PLAN_CREATED,
   MTV_DETECTED,

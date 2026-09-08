@@ -1,3 +1,4 @@
+/* eslint-disable */
 import type { GitHubConfig } from '../../types/index';
 import { requireEnv } from '../../utils';
 

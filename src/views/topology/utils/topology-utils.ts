@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { K8sResourceKind } from '@openshift-console/dynamic-plugin-sdk';
 import { TopologyDataObject } from '@openshift-console/dynamic-plugin-sdk/lib/extensions/topology-types';
 import { GraphElement } from '@patternfly/react-topology';

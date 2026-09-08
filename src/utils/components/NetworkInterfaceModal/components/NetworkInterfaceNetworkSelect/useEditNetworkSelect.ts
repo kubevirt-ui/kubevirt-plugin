@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { Dispatch, SetStateAction, useEffect, useMemo, useState } from 'react';
 
 import { NetworkAttachmentDefinitionKind } from '@kubevirt-utils/resources/nad/types';

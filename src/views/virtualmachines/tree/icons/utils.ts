@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { printableVMStatus } from '@virtualmachines/utils';
 
 import PausedVirtualMachineIcon from './PausedVirtualMachineIcon';

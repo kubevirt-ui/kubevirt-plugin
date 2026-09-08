@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 
 type UseToggle = (

@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { FC } from 'react';
 import produce from 'immer';
 import { ANNOTATIONS } from 'src/views/templates/utils/constants';

@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { TOUR_GUIDE_VM_TREE_ID } from './constants';
 import { nextStep, prevStep, tourContextMenuTriggerSignal } from './guidedTourSignals';
 

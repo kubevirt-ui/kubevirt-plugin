@@ -29,6 +29,9 @@ const ignoresConfig = {
     '__mocks__/**',
     'webpack.config.ts', // will be removed when errors are fixed, in the meantime it is linted by default eslint.config.js
     'i18next-parser.config.js', // will be removed when errors are fixed, in the meantime it is linted by default eslint.config.js
+    'jest-setup.ts',
+    'jest.config.ts',
+    'playwright.config.ts',
   ],
 };
 

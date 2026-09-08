@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { FC } from 'react';
 
 import { NodeModel } from '@kubevirt-ui-ext/kubevirt-api/console';

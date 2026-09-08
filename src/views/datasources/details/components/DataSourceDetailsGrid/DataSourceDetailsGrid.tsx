@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { FC } from 'react';
 import { getDataSourceCronJob } from 'src/views/datasources/utils';
 

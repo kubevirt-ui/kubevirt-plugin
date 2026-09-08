@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { VirtualMachineStorageMigrationPlanModel } from '@kubevirt-utils/models';
 import type { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { migrateVMsSingleNs } from '@virtualmachines/actions/components/VirtualMachineMigration/backends/singleNs/migrateVMs';

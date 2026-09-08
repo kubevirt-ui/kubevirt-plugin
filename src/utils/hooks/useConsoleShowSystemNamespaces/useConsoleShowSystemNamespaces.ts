@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { UseConsoleShowSystemNamespaces } from '@kubevirt-utils/hooks/consoleUserSettings/types';

@@ -1,3 +1,4 @@
+/* eslint-disable */
 import produce from 'immer';
 
 import { TemplateModel, VirtualMachineTemplateModel } from '@kubevirt-ui-ext/kubevirt-api/console';

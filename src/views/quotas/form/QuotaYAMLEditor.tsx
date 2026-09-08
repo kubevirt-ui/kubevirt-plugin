@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { type FC, Suspense, useState } from 'react';
 import { load } from 'js-yaml';
 

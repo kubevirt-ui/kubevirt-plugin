@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { modelToGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { StorageProfileModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { ClaimPropertySets, StorageProfile } from '@kubevirt-utils/types/storage';

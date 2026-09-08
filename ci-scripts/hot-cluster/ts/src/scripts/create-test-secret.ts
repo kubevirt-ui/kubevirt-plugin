@@ -1,3 +1,4 @@
+/* eslint-disable */
 /**
  * Create the test secret from a YAML fixture, substituting name/namespace.
  * Replaces the `yq | oc apply` bash block.

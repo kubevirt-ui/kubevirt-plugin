@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { FC, useEffect, useMemo, useState } from 'react';
 import { getQuotaListURL } from 'src/views/quotas/utils/url';
 

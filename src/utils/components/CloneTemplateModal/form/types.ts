@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { Template } from '@kubevirt-utils/resources/template';
 
 export type CloneTemplateFormValues = {

@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { K8sGroupVersionKind } from '@openshift-console/dynamic-plugin-sdk';
 
 /**

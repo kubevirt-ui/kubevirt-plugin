@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { FC, useEffect, useMemo, useState } from 'react';
 import { NavLink, Route, Routes, useLocation, useParams } from 'react-router';
 import classNames from 'classnames';

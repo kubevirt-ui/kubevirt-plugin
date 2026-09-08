@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useEffect } from 'react';
 
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';

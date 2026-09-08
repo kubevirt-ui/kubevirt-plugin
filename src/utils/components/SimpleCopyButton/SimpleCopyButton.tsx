@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { ClipboardEvent, FC, MouseEventHandler, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';

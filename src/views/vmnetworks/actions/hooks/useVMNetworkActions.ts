@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useMemo } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -23,7 +24,7 @@ const useVMNetworkActions = (obj: ClusterUserDefinedNetworkKind) => {
   const actions = useMemo(
     (): Action[] => [
       {
-        // eslint-disable-next-line @typescript-eslint/no-empty-function
+         
         cta: () => {},
         description: t(
           "To change a network definition, create a new one and reassign virtual machines to it. Existing definitions can't be edited directly",

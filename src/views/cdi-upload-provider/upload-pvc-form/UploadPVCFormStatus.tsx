@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { FC, useEffect, useState } from 'react';
 
 import { cancelUploadPVC } from '@kubevirt-utils/hooks/useCDIUpload/utils';

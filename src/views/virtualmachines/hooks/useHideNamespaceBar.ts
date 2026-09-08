@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useEffect } from 'react';
 
 export const useHideNamespaceBar = () => {

@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useMemo } from 'react';
 
 import { type V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';

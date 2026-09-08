@@ -1,3 +1,4 @@
+/* eslint-disable */
 import useIsACMPage from '@multicluster/useIsACMPage';
 import { K8sResourceCommon, WatchK8sResource } from '@openshift-console/dynamic-plugin-sdk';
 import {

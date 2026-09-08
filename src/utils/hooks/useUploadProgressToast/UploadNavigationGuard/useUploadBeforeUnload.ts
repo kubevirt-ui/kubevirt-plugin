@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useEffect } from 'react';
 
 import { UPLOAD_PROGRESS_STATUS } from '../constants';

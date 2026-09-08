@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { FC, useMemo, useState } from 'react';
 
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';

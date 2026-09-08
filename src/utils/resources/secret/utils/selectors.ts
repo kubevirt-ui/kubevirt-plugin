@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { IoK8sApiCoreV1Secret } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 
 /**

@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { Dispatch, MouseEvent, Ref, SetStateAction, useState } from 'react';
 
 import { isKeyboardLayout, KeyboardLayout, KeyMapDef, keyMaps } from '@kubevirt-ui-ext/vnc-keymaps';

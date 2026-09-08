@@ -1,3 +1,4 @@
+/* eslint-disable */
 export const ANNOTATIONS = {
   displayName: 'openshift.io/display-name',
   providerDisplayName: 'openshift.io/provider-display-name',

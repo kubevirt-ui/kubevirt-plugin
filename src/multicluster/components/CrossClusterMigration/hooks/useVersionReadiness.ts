@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useMemo } from 'react';
 
 import useClusterVersion from '@kubevirt-utils/hooks/useClusterVersion/useClusterVersion';

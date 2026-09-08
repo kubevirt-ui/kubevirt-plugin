@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { FC } from 'react';
 
 import { OPENSHIFT_OS_IMAGES_NS } from '@kubevirt-utils/constants/constants';

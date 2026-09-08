@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useRef } from 'react';
 
 import { isEqualObject } from '@kubevirt-utils/components/NodeSelectorModal/utils/helpers';

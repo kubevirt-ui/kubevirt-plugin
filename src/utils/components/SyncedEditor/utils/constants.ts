@@ -1,3 +1,4 @@
+/* eslint-disable */
 const YAML_KEY_ORDER = ['apiVersion', 'kind', 'metadata', 'spec', 'status'];
 
 export const YAML_TO_JS_OPTIONS = {

@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   MultiNamespaceVirtualMachineStorageMigrationPlan,

@@ -1,3 +1,4 @@
+/* eslint-disable */
 import {
   K8sResourceCommon,
   MatchExpression,

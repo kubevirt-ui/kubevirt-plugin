@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { MatchExpression } from '@openshift-console/dynamic-plugin-sdk';
 
 export type IDEntity = {

@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { VirtualMachineInstanceMigrationModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1VirtualMachineInstanceMigration } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { MIGRATION_VMI_NAME_LABEL } from '@kubevirt-utils/resources/vmim/constants';

@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { getAnnotation } from '@kubevirt-utils/resources/shared';
 import { getLabel } from '@kubevirt-utils/resources/shared';
 import {

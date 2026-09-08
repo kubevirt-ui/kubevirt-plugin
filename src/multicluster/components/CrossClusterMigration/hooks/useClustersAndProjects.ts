@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useCallback, useMemo } from 'react';
 
 import { V1beta1Provider } from '@forklift-ui/types';

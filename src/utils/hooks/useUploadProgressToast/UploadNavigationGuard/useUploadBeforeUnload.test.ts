@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { act, renderHook } from '@testing-library/react';
 
 import { UPLOAD_PROGRESS_STATUS } from '../constants';

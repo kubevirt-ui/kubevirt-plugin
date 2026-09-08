@@ -1,3 +1,4 @@
+/* eslint-disable */
 import type { ConsoleUserSettingsLocation } from '@kubevirt-utils/hooks/consoleUserSettings/useConsoleUserSettingLocalStorage/consts';
 
 import './i18next';

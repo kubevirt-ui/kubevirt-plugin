@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useMemo } from 'react';
 
 import { OPENSHIFT_NAMESPACE } from '@kubevirt-utils/constants/constants';

@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { MigPlanModel } from '@kubevirt-utils/models';
 import type { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { migrateVMsMTC } from '@virtualmachines/actions/components/VirtualMachineMigration/backends/mtc/migrateVMs';

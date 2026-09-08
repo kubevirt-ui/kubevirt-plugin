@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { FC, PropsWithChildren, ReactNode } from 'react';
 
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';

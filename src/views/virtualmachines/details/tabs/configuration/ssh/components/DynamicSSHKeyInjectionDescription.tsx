@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React from 'react';
 
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';

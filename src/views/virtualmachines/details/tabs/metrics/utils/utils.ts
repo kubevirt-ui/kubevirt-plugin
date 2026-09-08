@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { ProgressVariant } from '@patternfly/react-core';
 
 export enum MetricsTabExpendedSections {

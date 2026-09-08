@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { ConfigMapModel, RoleBindingModel, RoleModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
   IoK8sApiCoreV1ConfigMap,

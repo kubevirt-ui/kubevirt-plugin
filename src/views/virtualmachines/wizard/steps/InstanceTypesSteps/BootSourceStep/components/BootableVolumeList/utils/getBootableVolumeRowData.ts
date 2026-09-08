@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import {
   V1beta1VirtualMachineClusterPreference,

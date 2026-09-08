@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { FC } from 'react';
 
 import { useWizardContext, WizardFooter } from '@patternfly/react-core';

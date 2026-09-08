@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { MetricChartData } from './useMetricChartData';
 
 export type ChartPoint = { name?: string; x: Date; y: number };

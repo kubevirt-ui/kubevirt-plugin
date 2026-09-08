@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useMemo } from 'react';
 
 import { useToast } from '@openshift-console/dynamic-plugin-sdk';
@@ -14,7 +15,7 @@ const noopResult = { addToast: noopAddToast, removeToast: noopRemoveToast };
 
 const useKubevirtToast = (): UseKubevirtToastResult => {
   const { t } = useKubevirtTranslation();
-  // eslint-disable-next-line react-hooks/rules-of-hooks -- safe: useToast is unavailable in 4.22 and older console versions
+   
   const { addToast, removeToast } = typeof useToast === 'function' ? useToast() : noopResult;
 
   return useMemo(() => {

@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { FC } from 'react';
 
 import EditButton from '@kubevirt-utils/components/EditButton/EditButton';

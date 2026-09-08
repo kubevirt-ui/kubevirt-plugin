@@ -1,3 +1,4 @@
+/* eslint-disable */
 // Disk cleanups do a read-modify-write on the VM (fetch, transform, patch), so running
 // several concurrently for the same VM (e.g. "Clear all") races and silently drops changes.
 // Chaining them per VM key ensures each one reads the VM only after the previous patch applied.

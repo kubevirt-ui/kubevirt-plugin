@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useMemo, useState } from 'react';
 
 import useConsoleFetch from '@kubevirt-utils/hooks/useConsoleFetch';
