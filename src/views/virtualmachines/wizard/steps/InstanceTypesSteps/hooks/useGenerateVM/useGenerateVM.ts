@@ -17,7 +17,6 @@ import { useDriversImage } from '@kubevirt-utils/resources/vm/utils/disk/useDriv
 import { generatePrettyName, getValidNamespace } from '@kubevirt-utils/utils/utils';
 import { AUTOMATIC_UPDATE_FEATURE_NAME } from '@settings/tabs/ClusterTab/components/GuestManagmentSection/AutomaticSubscriptionRHELGuests/utils/constants';
 import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
-import { type VMWizardFormValues } from '@virtualmachines/wizard/state/vm-wizard-form/types';
 import {
   createPopulatedCloudInitYAML,
   generateVM,
@@ -35,7 +34,7 @@ const useGenerateVM = (): UseGenerateVMResult => {
   const [vmData, instanceTypeData] = useWatch({
     control,
     name: ['vmData', 'instanceTypeData'],
-  }) as [VMWizardFormValues['vmData'], VMWizardFormValues['instanceTypeData']];
+  });
 
   const { cluster, name, project } = vmData;
   const { preference, selectedBootableVolume } = instanceTypeData;
@@ -55,7 +54,7 @@ const useGenerateVM = (): UseGenerateVMResult => {
     hyperConverge?.spec?.featureGates?.enableMultiArchBootImageImport;
 
   const selectedPreference = getSelectedPreferenceName(selectedBootableVolume, preference);
-  const osLabel = getLabel(selectedBootableVolume, KUBEVIRT_OS) || preference?.name;
+  const osLabel = getLabel(selectedBootableVolume, KUBEVIRT_OS) ?? preference?.name;
   const populatedCloudInitYAML = useMemo(
     () =>
       createPopulatedCloudInitYAML(

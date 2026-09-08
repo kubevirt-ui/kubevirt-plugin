@@ -1,19 +1,17 @@
-/* eslint-disable */
 import { type TFunction } from 'i18next';
 
 import { type ActionDropdownItemType } from '@kubevirt-utils/components/ActionsDropdown/constants';
 import { type DataViewTrTree } from '@patternfly/react-data-view';
 
+import { computeCapabilityConfigStatus, getEffectiveConfigStatus } from '../../utils/configStatus';
 import {
   type AutopilotStatusMap,
   type CapabilityFeature,
   type CapabilityFeatureOperator,
-  CapabilityInstallState,
+  type CapabilityInstallState,
   type RecommendedCapabilityDetailsMap,
   type RecommendedCapabilityOperatorDetails,
 } from '../../utils/types';
-import { computeCapabilityConfigStatus, getEffectiveConfigStatus } from '../../utils/configStatus';
-
 import { getCapabilityRowActions } from './actions';
 import { buildCapabilityRow } from './buildCapabilityRow';
 import { buildOperatorRow } from './buildOperatorRow';
@@ -65,10 +63,10 @@ export const buildTreeRows = ({
       : undefined;
 
     return {
-      children: feature.operators.map((op) => {
-        const opDetails = detailsMap[op.packageName];
-        const opActions = getOperatorActions?.(op, opDetails, navigate, t);
-        const opAutopilotStatus = autopilotStatusMap[op.packageName];
+      children: feature.operators.map((operator) => {
+        const opDetails = detailsMap[operator.packageName];
+        const opActions = getOperatorActions?.(operator, opDetails, navigate, t);
+        const opAutopilotStatus = autopilotStatusMap[operator.packageName];
         const effectiveConfigStatus = getEffectiveConfigStatus(
           opAutopilotStatus?.configStatus,
           opDetails,
@@ -78,9 +76,11 @@ export const buildTreeRows = ({
           configStatus: effectiveConfigStatus,
           includeConfigCell,
           navigate,
-          onReviewClick: onOpenReviewModal ? () => onOpenReviewModal(op.packageName) : undefined,
+          onReviewClick: onOpenReviewModal
+            ? (): void => onOpenReviewModal(operator.packageName)
+            : undefined,
           opDetails,
-          operator: op,
+          operator,
           t,
         });
       }),

@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { ChangeEvent, FC } from 'react';
+import React, { type ChangeEvent, type FC } from 'react';
 
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
@@ -16,7 +15,7 @@ import {
   ValidatedOptions,
 } from '@patternfly/react-core';
 
-import { AddBootableVolumeState, SetBootableVolumeFieldType } from '../types';
+import { type AddBootableVolumeState, type SetBootableVolumeFieldType } from '../types';
 import { getCronHelperText } from '../utils';
 
 type SchedulingSettingsProps = {
@@ -52,13 +51,13 @@ const SchedulingSettings: FC<SchedulingSettingsProps> = ({
         label={t('Retain revisions')}
       >
         <NumberInput
-          onChange={(event: ChangeEvent<HTMLInputElement>) =>
-            setBootableVolumeField('retainRevisions')(event.currentTarget.valueAsNumber)
-          }
           id="volume-registry-retain-revisions"
           isDisabled={isDisabled}
           min={0}
           minusBtnAriaLabel={t('Decrement')}
+          onChange={(event: ChangeEvent<HTMLInputElement>) =>
+            setBootableVolumeField('retainRevisions')(event.currentTarget.valueAsNumber)
+          }
           onMinus={() => setBootableVolumeField('retainRevisions')(retainRevisions - 1)}
           onPlus={() => setBootableVolumeField('retainRevisions')(retainRevisions + 1)}
           plusBtnAriaLabel={t('Increment')}
@@ -89,7 +88,7 @@ const SchedulingSettings: FC<SchedulingSettingsProps> = ({
           id="volume-registry-retain-cron-expression"
           isDisabled={isDisabled}
           onBlur={onCronBlur}
-          onChange={(_, value: string) => setBootableVolumeField('cronExpression')(value)}
+          onChange={(_event, value: string) => setBootableVolumeField('cronExpression')(value)}
           type="text"
           validated={cronValidated}
           value={cronExpression ?? ''}

@@ -1,15 +1,13 @@
-/* eslint-disable */
 import { useMemo } from 'react';
 
-import { DeschedulerStatus } from '@kubevirt-utils/hooks/useDeschedulerInstalled';
+import { type DeschedulerStatus } from '@kubevirt-utils/hooks/useDeschedulerInstalled';
 import { useDeschedulerStatus } from '@kubevirt-utils/hooks/useDeschedulerStatus/useDeschedulerStatus';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useWorkerNodes from '@kubevirt-utils/resources/node/hooks/useWorkerNodes';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 
-import { DistributionBucket } from '../../shared/DistributionBarChart/DistributionBarChart';
-import { StatusScoreItem } from '../../shared/StatusScoreList/StatusScoreList';
-
+import { type DistributionBucket } from '../../shared/DistributionBarChart/DistributionBarChart';
+import { type StatusScoreItem } from '../../shared/StatusScoreList/StatusScoreList';
 import {
   buildLabelMap,
   computeDistributionScore,
@@ -18,8 +16,8 @@ import {
 import {
   buildTopNodeItems,
   computeBuckets,
-  NodeUtilization,
-  ResourceLabels,
+  type NodeUtilization,
+  type ResourceLabels,
 } from './nodeLoadDistributionUtils';
 import useResourceUtilizationPolls from './useResourceUtilizationPolls';
 
@@ -51,7 +49,7 @@ export const useNodeLoadDistributionData = (clusterOverride?: string): NodeLoadD
   } = useResourceUtilizationPolls({ cluster, groupBy: 'node' });
 
   const workerNodeNames = useMemo(
-    () => new Set((workerNodes ?? []).map((n) => n.metadata?.name).filter(Boolean)),
+    () => new Set((workerNodes ?? []).map((node) => node.metadata?.name).filter(Boolean)),
     [workerNodes],
   );
 
@@ -85,7 +83,7 @@ export const useNodeLoadDistributionData = (clusterOverride?: string): NodeLoadD
 
     return {
       buckets: computeBuckets(nodes, bucketLabels),
-      distributionScore: computeDistributionScore(nodes.map((n) => n.overall)),
+      distributionScore: computeDistributionScore(nodes.map((node) => node.overall)),
       items: buildTopNodeItems(nodes, resourceLabels),
       totalNodeCount: nodes.length,
     };

@@ -1,9 +1,7 @@
-/* eslint-disable */
 import { useMemo } from 'react';
 
-import { StatusScoreItem } from '../../shared/StatusScoreList/StatusScoreList';
-
-import { SeverityCount, TOP_N } from './clusterMetricConstants';
+import { type StatusScoreItem } from '../../shared/StatusScoreList/StatusScoreList';
+import { type SeverityCount, TOP_N } from './clusterMetricConstants';
 import {
   buildLabelMap,
   buildSeverityCounts,
@@ -54,16 +52,16 @@ const useClustersUtilizationData = (): ClustersUtilizationData => {
 
     clusterUtils.sort((a, b) => b.overall - a.overall);
 
-    const computedItems: StatusScoreItem[] = clusterUtils.slice(0, TOP_N).map((c) => ({
-      name: c.name,
+    const computedItems: StatusScoreItem[] = clusterUtils.slice(0, TOP_N).map((clusterUtil) => ({
+      name: clusterUtil.name,
       score: {
-        status: getStatusAscending(c.overall),
-        value: formatPercent(c.overall),
+        status: getStatusAscending(clusterUtil.overall),
+        value: formatPercent(clusterUtil.overall),
       },
     }));
 
     const computedSeverity = buildSeverityCounts(
-      clusterUtils.map((c) => c.overall),
+      clusterUtils.map((clusterUtil) => clusterUtil.overall),
       'ascending',
     );
 

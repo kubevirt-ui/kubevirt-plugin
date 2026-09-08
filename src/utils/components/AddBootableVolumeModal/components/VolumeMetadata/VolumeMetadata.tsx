@@ -1,12 +1,10 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ANNOTATIONS } from '@kubevirt-utils/resources/template';
 import { FormGroup, TextInput } from '@patternfly/react-core';
 
-import { AddBootableVolumeState, SetBootableVolumeFieldType } from '../../types';
-
+import { type AddBootableVolumeState, type SetBootableVolumeFieldType } from '../../types';
 import ArchitectureSelect from './components/ArchitectureSelect/ArchitectureSelect';
 import { InstanceTypeDrilldownSelect } from './components/InstanceTypeDrilldownSelect/InstanceTypeDrilldownSelect';
 import PreferenceSelect from './components/PreferenceSelect/PreferenceSelect';
@@ -49,11 +47,11 @@ const VolumeMetadata: FC<VolumeMetadataProps> = ({
       />
       <FormGroup label={t('Description')}>
         <TextInput
-          onChange={(_, value: string) =>
-            setBootableVolumeField('annotations', ANNOTATIONS.description)(value)
-          }
           id="description"
           isDisabled={isDisabled}
+          onChange={(_event, value: string) =>
+            setBootableVolumeField('annotations', ANNOTATIONS.description)(value)
+          }
           value={annotations?.description}
         />
       </FormGroup>

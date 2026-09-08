@@ -31,7 +31,7 @@ export const getLargestValue = (data: PrometheusValue[]) => {
 export const findUnit = (metric: string, largestValue: number): null | string =>
   hasUnit(metric) ? humanizeBinaryBytes(largestValue)?.unit : null;
 
-export const getHumanizedValue = (metric: string, value: number, unit: string): any | number =>
+export const getHumanizedValue = (metric: string, value: number, unit: string): number =>
   hasUnit(metric) ? humanizeBinaryBytes(value, null, unit)?.value : value;
 
 export const formatLargestValue = (metric: string, largestValue: number, unit: string): number =>

@@ -1,11 +1,10 @@
-/* eslint-disable */
-import { TFunction } from 'i18next';
+import { type TFunction } from 'i18next';
 import { parseSize } from 'xbytes';
 
-import { V1beta1VirtualMachineClusterInstancetype } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1beta1VirtualMachineClusterInstancetype } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { isEqualObject } from '@kubevirt-utils/components/NodeSelectorModal/utils/helpers';
 import { VENDOR_LABEL } from '@kubevirt-utils/constants/constants';
-import { InstanceTypeUnion } from '@kubevirt-utils/resources/instancetype/types';
+import { type InstanceTypeUnion } from '@kubevirt-utils/resources/instancetype/types';
 import { getAnnotation, getLabel, getName } from '@kubevirt-utils/resources/shared';
 import { readableSizeUnit } from '@kubevirt-utils/utils/units';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -18,7 +17,11 @@ import {
   KUBEVIRT_IO,
   REDHAT_COM,
 } from './constants';
-import { InstanceTypeSize, InstanceTypesMenuItemsData, RedHatInstanceTypeSeries } from './types';
+import {
+  type InstanceTypeSize,
+  type InstanceTypesMenuItemsData,
+  type RedHatInstanceTypeSeries,
+} from './types';
 
 const getRedHatInstanceTypeSeriesAndSize = (
   instanceType: V1beta1VirtualMachineClusterInstancetype,
@@ -58,13 +61,14 @@ export const getInstanceTypeMenuItems = (
 ): InstanceTypesMenuItemsData => {
   if (isEmpty(instanceTypes)) return initialMenuItems;
 
-  const itemsData = instanceTypes.reduce<InstanceTypesMenuItemsData>((acc, it) => {
-    if (!isRedHatInstanceType(it)) {
-      !acc.userProvided.items.includes(getName(it)) && acc.userProvided.items.push(getName(it));
+  const itemsData = instanceTypes.reduce<InstanceTypesMenuItemsData>((acc, instanceType) => {
+    if (!isRedHatInstanceType(instanceType)) {
+      !acc.userProvided.items.includes(getName(instanceType)) &&
+        acc.userProvided.items.push(getName(instanceType));
       return acc;
     }
 
-    const { redHatITSeries, size } = getRedHatInstanceTypeSeriesAndSize(it);
+    const { redHatITSeries, size } = getRedHatInstanceTypeSeriesAndSize(instanceType);
     if (isEmpty(acc?.redHatProvided.items)) {
       acc.redHatProvided.items = [redHatITSeries];
       return acc;
@@ -89,7 +93,7 @@ export const getInstanceTypeMenuItems = (
 
   itemsData.redHatProvided.items = itemsData.redHatProvided.items.map((series) => ({
     ...series,
-    sizes: series.sizes.sort((a, b) => parseSize(a?.memory) - parseSize(b?.memory)),
+    sizes: [...series.sizes].sort((a, b) => parseSize(a?.memory) - parseSize(b?.memory)),
   }));
 
   return itemsData;
@@ -99,7 +103,7 @@ export const isExistingInstanceType = (
   allInstanceTypes: InstanceTypeUnion[],
   selectedInstanceType: string,
   selectedInstanceTypeKind: string,
-) =>
+): boolean =>
   allInstanceTypes.some(
     (instanceType) =>
       getName(instanceType) === selectedInstanceType &&
@@ -113,7 +117,7 @@ export const is1GiInstanceType = (sizeLabel: string): boolean => sizeLabel.endsW
 
 // Converts series name to symbol (e.g. cx1 -> CX, d1 -> D, etc.)
 export const getSeriesSymbol = (seriesName: string): string => {
-  const match = seriesName?.match(/^[a-zA-Z]+/);
+  const match = /^[a-zA-Z]+/.exec(seriesName);
   return match ? match[0].toUpperCase() : '';
 };
 

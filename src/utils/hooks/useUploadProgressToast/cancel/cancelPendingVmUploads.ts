@@ -5,12 +5,13 @@ import {
   getCustomizeWizardVM,
 } from '@kubevirt-utils/signals/customizeWizardVMSignal';
 import {
-  getWizardBootableVolumeUploadKeys,
   clearWizardBootableVolumeUploadKeys,
+  getWizardBootableVolumeUploadKeys,
 } from '@kubevirt-utils/signals/wizardBootableVolumeKeysSignal';
 
-import { getUploadClusterForVm } from '../keys/uploadKeys';
 import { useUploadProgressStore } from '../uploadProgressStore';
+
+import { getUploadClusterForVm } from '../keys/uploadKeys';
 
 export const cancelPendingVmUploads = (vm?: V1VirtualMachine): Promise<void> => {
   const target = vm ?? customizeWizardVMSignal.value;

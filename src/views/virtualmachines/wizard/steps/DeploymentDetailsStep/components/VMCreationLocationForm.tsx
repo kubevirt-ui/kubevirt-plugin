@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 import { Controller, useWatch } from 'react-hook-form';
 
 import ClusterDropdown from '@kubevirt-utils/components/ClusterProjectDropdown/ClusterDropdown';
@@ -42,9 +41,13 @@ const VMCreationLocationForm: FC = () => {
       {isACMPage && (
         <FormGroup isRequired label={t('Cluster')}>
           <Controller
-            render={({ field: { ref: _, ...field } }) => (
+            control={control}
+            name={CREATE_VM_FORM_FIELDS_VM_DATA.CLUSTER}
+            render={({ field: { ref: _ref, value, ...field } }) => (
               <ClusterDropdown
                 {...field}
+                bookmarkCluster={hubClusterName}
+                includeAllClusters={false}
                 onChange={(selectedCluster) => {
                   field.onChange(selectedCluster);
                   setValue(CREATE_VM_FORM_FIELDS_VM_DATA.FOLDER, '');
@@ -52,37 +55,34 @@ const VMCreationLocationForm: FC = () => {
                     setValue(CREATE_VM_FORM_FIELDS_VM_DATA.PROJECT, '');
                   setCustomizeWizardVMSignal(null);
                 }}
-                bookmarkCluster={hubClusterName}
-                includeAllClusters={false}
-                selectedCluster={field.value}
+                selectedCluster={value as string}
               />
             )}
-            control={control}
-            name={CREATE_VM_FORM_FIELDS_VM_DATA.CLUSTER}
           />
         </FormGroup>
       )}
       <FormGroup isRequired label={t('Project')}>
         <Controller
-          render={({ field: { ref: _, ...field } }) => (
+          control={control}
+          name={CREATE_VM_FORM_FIELDS_VM_DATA.PROJECT}
+          render={({ field: { ref: _ref, ...field } }) => (
             <NamespaceDropdown
               {...field}
+              bookmarkCluster={hubClusterName}
+              cluster={cluster}
+              includeAllProjects={false}
               onChange={(selectedProject) => {
                 field.onChange(selectedProject);
                 setValue(CREATE_VM_FORM_FIELDS_VM_DATA.FOLDER, '');
                 setCustomizeWizardVMSignal(null);
               }}
-              bookmarkCluster={hubClusterName}
-              cluster={cluster}
-              includeAllProjects={false}
               selectedProject={project || DEFAULT_NAMESPACE}
             />
           )}
-          control={control}
-          name={CREATE_VM_FORM_FIELDS_VM_DATA.PROJECT}
         />
       </FormGroup>
       <FormGroup
+        label={t('Group (optional)')}
         labelHelp={
           !treeViewFoldersLoading && !treeViewFoldersEnabled ? (
             <HelpTextIcon
@@ -92,16 +92,15 @@ const VMCreationLocationForm: FC = () => {
             />
           ) : undefined
         }
-        label={t('Group (optional)')}
       >
         <FolderSelect
-          setSelectedFolder={(newFolder) =>
-            setValue(CREATE_VM_FORM_FIELDS_VM_DATA.FOLDER, newFolder)
-          }
           cluster={cluster}
           isDisabled={treeViewFoldersLoading || !treeViewFoldersEnabled}
           namespace={project}
           selectedFolder={folder}
+          setSelectedFolder={(newFolder) =>
+            setValue(CREATE_VM_FORM_FIELDS_VM_DATA.FOLDER, newFolder)
+          }
         />
       </FormGroup>
     </Form>

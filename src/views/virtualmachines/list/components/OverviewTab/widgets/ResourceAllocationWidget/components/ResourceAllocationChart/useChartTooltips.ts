@@ -1,6 +1,5 @@
-/* eslint-disable */
 import { useCallback, useMemo } from 'react';
-import { TFunction } from 'i18next';
+import { type TFunction } from 'i18next';
 
 import {
   CHART_NAME_QUOTA,
@@ -37,11 +36,11 @@ const useChartTooltips = ({
       if (datum.y == null) return '';
       const swatch = datum._dashed ? DASHED_SWATCH : SOLID_SWATCH;
       const value = formatBinaryValue(datum.y, displayUnit, t);
-      const ts = formatTimestamp(datum.x);
+      const timestamp = formatTimestamp(datum.x);
       let label = t('Used');
       if (datum.childName === CHART_NAME_REQUESTED) label = t('Requested');
       else if (datum.childName === CHART_NAME_QUOTA) label = t('Quota');
-      return `${swatch}\n${label}: ${value}\n${ts}`;
+      return `${swatch}\n${label}: ${value}\n${timestamp}`;
     },
     [displayUnit, t],
   );
@@ -66,9 +65,9 @@ const useChartTooltips = ({
       if (datum.y == null) return '';
       const swatch = datum._dashed ? DASHED_SWATCH : SOLID_SWATCH;
       const value = formatBinaryValue(datum.y, displayUnit, t);
-      const ts = formatTimestamp(datum.x);
+      const timestamp = formatTimestamp(datum.x);
       const label = datum._clusterName ? `${datum._clusterName}: ${value}` : value;
-      return `${swatch}\n${label}\n${ts}`;
+      return `${swatch}\n${label}\n${timestamp}`;
     },
     [displayUnit, t],
   );

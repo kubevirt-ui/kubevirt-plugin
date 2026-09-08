@@ -1,11 +1,9 @@
-/* eslint-disable */
-import React, { FC, useState } from 'react';
+import React, { type FC, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Alert, Flex, FlexItem, Spinner, Stack, StackItem, Title } from '@patternfly/react-core';
 
-import { MigrationTargetResponse } from '../hooks/useClusterRecommendationTypes';
-
+import { type MigrationTargetResponse } from '../hooks/useClusterRecommendationTypes';
 import CandidateRow from './CandidateRow';
 
 type ClusterRecommendationPanelProps = {
@@ -61,7 +59,7 @@ const ClusterRecommendationPanel: FC<ClusterRecommendationPanelProps> = ({
 
   const recommendedCluster = data.recommendation?.cluster;
 
-  const handleSelect = (clusterName: string) => {
+  const handleSelect = (clusterName: string): void => {
     setSelectedCluster(clusterName);
     onSelectCluster?.(clusterName);
   };
@@ -91,16 +89,16 @@ const ClusterRecommendationPanel: FC<ClusterRecommendationPanelProps> = ({
       {data.excludedClusters?.length > 0 && (
         <StackItem>
           <Alert
+            isInline
+            isPlain
             title={t('{{clusterCount}} clusters excluded', {
               clusterCount: data.excludedClusters.length,
             })}
-            isInline
-            isPlain
             variant="info"
           >
-            {data.excludedClusters.map((ec) => (
-              <div key={ec.cluster}>
-                <strong>{ec.cluster}</strong>: {ec.reasons?.join(', ')}
+            {data.excludedClusters.map((excludedCluster) => (
+              <div key={excludedCluster.cluster}>
+                <strong>{excludedCluster.cluster}</strong>: {excludedCluster.reasons?.join(', ')}
               </div>
             ))}
           </Alert>

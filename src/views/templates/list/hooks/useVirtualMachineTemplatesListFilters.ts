@@ -1,15 +1,14 @@
-/* eslint-disable */
 import { useCallback, useMemo } from 'react';
 
 import {
-  KubevirtFilter,
-  KubevirtFilterState,
-  OnSetFilters,
+  type KubevirtFilter,
+  type KubevirtFilterState,
+  type OnSetFilters,
 } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import useKubevirtDataViewFilters from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/useKubevirtDataViewFilters';
 import { type Template, type TemplateOrRequest } from '@kubevirt-utils/resources/template/utils';
-
 import { isEmpty } from '@kubevirt-utils/utils/utils';
+
 import { TemplateFilterType } from '../filters/types';
 import useVirtualMachineTemplatesFilters from '../filters/useVirtualMachineTemplatesFilters';
 
@@ -46,7 +45,7 @@ const useVirtualMachineTemplatesListFilters = (
 
   // Type is controlled by TemplatesTypeToggle; keep it out of toolbar chips.
   const toolbarFilterDefinitions = useMemo(
-    () => filterDefinitions.filter((f) => f.id !== TemplateFilterType.Type),
+    () => filterDefinitions.filter((filterDef) => filterDef.id !== TemplateFilterType.Type),
     [filterDefinitions],
   );
 

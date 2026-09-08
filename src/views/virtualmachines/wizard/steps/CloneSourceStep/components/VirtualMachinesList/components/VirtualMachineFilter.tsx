@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
 import type { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import KubevirtFilterToolbar from '@kubevirt-utils/components/KubevirtFilterToolbar/KubevirtFilterToolbar';

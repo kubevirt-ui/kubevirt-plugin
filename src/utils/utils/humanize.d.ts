@@ -4,6 +4,8 @@ export type HumanizeResult = {
   value: number | string;
 };
 
+export type NumericHumanizeResult = Omit<HumanizeResult, 'value'> & { value: number };
+
 export declare const units: Record<string, unknown>;
 export declare const validate: Record<string, unknown>;
 
@@ -13,53 +15,53 @@ export declare const humanizeBinaryBytesWithoutB: (
   value: number,
   initialUnit?: string,
   preferredUnit?: string,
-) => HumanizeResult;
+) => NumericHumanizeResult;
 
 export declare const humanizeBinaryBytes: (
   value: number,
   initialUnit?: string,
   preferredUnit?: string,
-) => HumanizeResult;
+) => NumericHumanizeResult;
 
 export declare const humanizeDecimalBytes: (
   value: number,
   initialUnit?: string,
   preferredUnit?: string,
-) => HumanizeResult;
+) => NumericHumanizeResult;
 
 export declare const humanizeDecimalBytesPerSec: (
   value: number,
   initialUnit?: string,
   preferredUnit?: string,
-) => HumanizeResult;
+) => NumericHumanizeResult;
 
 export declare const humanizePacketsPerSec: (
   value: number,
   initialUnit?: string,
   preferredUnit?: string,
-) => HumanizeResult;
+) => NumericHumanizeResult;
 
 export declare const humanizeNumber: (
   value: number,
   initialUnit?: string,
   preferredUnit?: string,
-) => HumanizeResult;
+) => NumericHumanizeResult;
 
 export declare const humanizeNumberSI: (
   value: number,
   initialUnit?: string,
   preferredUnit?: string,
-) => HumanizeResult;
+) => NumericHumanizeResult;
 
 export declare const humanizeSeconds: (
   value: number,
   initialUnit?: string,
   preferredUnit?: string,
-) => HumanizeResult;
+) => NumericHumanizeResult;
 
-export declare const humanizeCpuCores: (value: number) => HumanizeResult;
+export declare const humanizeCpuCores: (value: number) => NumericHumanizeResult;
 
-export declare const humanizePercentage: (value: number) => HumanizeResult;
+export declare const humanizePercentage: (value: number) => NumericHumanizeResult;
 
 export declare const convertToBaseValue: (value: string) => null | number;
 

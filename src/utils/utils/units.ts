@@ -5,7 +5,7 @@ import {
   convertToBaseValue,
   humanizeBinaryBytes,
   humanizeBinaryBytesWithoutB,
-  type HumanizeResult,
+  type NumericHumanizeResult,
 } from './humanize.js';
 import {
   BinaryUnit,
@@ -50,7 +50,7 @@ export const getHumanizedSize = (
   size: K8sIoApimachineryPkgApiResourceQuantity,
   bytesOption: 'withB' | 'withoutB' = 'withB',
   preferredUnit?: string,
-): HumanizeResult => {
+): NumericHumanizeResult => {
   const baseValue = convertToBaseValue(size?.toString());
 
   if (bytesOption === 'withoutB') {
@@ -140,7 +140,7 @@ export const toQuantity = (quantityString?: string): Quantity | undefined => {
   // value CAN BE a floating point number
   const humanized = getHumanizedSize(quantityString, 'withoutB');
 
-  return { unit: humanized.unit as QuantityUnit, value: Number(humanized.value) };
+  return { unit: humanized.unit as QuantityUnit, value: humanized.value };
 };
 
 export const quantityToString = ({ unit, value }: Quantity): string =>

@@ -1,12 +1,11 @@
-/* eslint-disable */
 import { MigMigrationModel, MigPlanModel } from '@kubevirt-utils/models';
 import {
-  MigMigration,
-  MigPlan,
+  type MigMigration,
+  type MigPlan,
   MTC_MIGRATION_NAMESPACE,
   MTC_PV_ACTION_COPY,
   MTC_PV_COPY_METHOD_FILESYSTEM,
-  MultiNamespaceVirtualMachineStorageMigrationPlan,
+  type MultiNamespaceVirtualMachineStorageMigrationPlan,
   STORAGE_MIGRATION_PLAN_RETENTION_POLICY,
 } from '@kubevirt-utils/resources/migrations/constants';
 import {
@@ -17,8 +16,9 @@ import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getRandomChars, kubevirtConsole, truncateToK8sName } from '@kubevirt-utils/utils/utils';
 import { kubevirtK8sCreate, kubevirtK8sDelete } from '@multicluster/k8sRequests';
 
-import { MIGPLAN_PREFIX, MIGRATION_PREFIX } from '../../utils/constants';
 import type { MigrateVMsParams } from '../types';
+
+import { MIGPLAN_PREFIX, MIGRATION_PREFIX } from '../../utils/constants';
 
 const MTC_HOST_CLUSTER_REF = { name: 'host', namespace: MTC_MIGRATION_NAMESPACE };
 
@@ -49,23 +49,25 @@ export const migrateVMsMTC = async ({
     retentionPolicy,
   );
 
-  const namespaceSet = new Set(selectedMigrations.map((m) => m.vmNamespace ?? getNamespace(m.pvc)));
+  const namespaceSet = new Set(
+    selectedMigrations.map((migration) => migration.vmNamespace ?? getNamespace(migration.pvc)),
+  );
 
   const migPlan: MigPlan = {
     apiVersion: `${MigPlanModel.apiGroup}/${MigPlanModel.apiVersion}`,
     kind: MigPlanModel.kind,
     metadata: {
-      name: migrationPlanName || `${MIGPLAN_PREFIX}-${getRandomChars()}`,
+      name: migrationPlanName ?? `${MIGPLAN_PREFIX}-${getRandomChars()}`,
       namespace: MTC_MIGRATION_NAMESPACE,
     },
     spec: {
       destMigClusterRef: MTC_HOST_CLUSTER_REF,
       liveMigrate: true,
       namespaces: [...namespaceSet],
-      persistentVolumes: selectedMigrations.map((m) => ({
+      persistentVolumes: selectedMigrations.map((migration) => ({
         pvc: {
-          name: getName(m.pvc),
-          namespace: getNamespace(m.pvc),
+          name: getName(migration.pvc),
+          namespace: getNamespace(migration.pvc),
         },
         selection: {
           action: MTC_PV_ACTION_COPY,
@@ -92,7 +94,7 @@ export const migrateVMsMTC = async ({
     apiVersion: `${MigMigrationModel.apiGroup}/${MigMigrationModel.apiVersion}`,
     kind: MigMigrationModel.kind,
     metadata: {
-      name: truncateToK8sName(`${MIGRATION_PREFIX}-${planName || getRandomChars()}`, ''),
+      name: truncateToK8sName(`${MIGRATION_PREFIX}-${planName ?? getRandomChars()}`, ''),
       namespace: MTC_MIGRATION_NAMESPACE,
     },
     spec: {
