@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useMemo } from 'react';
+import React, { type FC, useCallback, useMemo } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -17,13 +17,13 @@ import {
 } from '@patternfly/react-core';
 import { DataViewCheckboxFilter, type DataViewTrTree } from '@patternfly/react-data-view';
 
-import InstallSelectedButton from '../InstallSelectedButton/InstallSelectedButton';
 import { STATUS_COUNT_TEMPLATES } from '../../utils/constants';
 import {
   type CapabilityFilterValues,
   CapabilityInstallState,
   type CapabilitySelectionState,
 } from '../../utils/types';
+import InstallSelectedButton from '../InstallSelectedButton/InstallSelectedButton';
 
 type CustomSelectionToolbarProps = {
   clearAllFilters: () => void;
@@ -106,13 +106,14 @@ const CustomSelectionToolbar: FC<CustomSelectionToolbarProps> = ({
         </ToolbarItem>
         <ToolbarItem>
           <SearchInput
+            data-test="search-capabilities"
             onChange={(_event, value) => onSetFilters({ name: value })}
             onClear={() => onSetFilters({ name: '' })}
             placeholder={t('Search capabilities')}
             value={filters.name}
           />
         </ToolbarItem>
-        <ToolbarItem>
+        <ToolbarItem data-test="capability-status-filter">
           <DataViewCheckboxFilter
             filterId="status"
             onChange={(_event, values) => onSetFilters({ status: values })}
@@ -127,7 +128,9 @@ const CustomSelectionToolbar: FC<CustomSelectionToolbarProps> = ({
         </ToolbarItem>
         <ToolbarItem className="pf-v6-u-ml-auto">
           {resourcesLoaded ? (
-            <Content component={ContentVariants.small}>{countText}</Content>
+            <Content component={ContentVariants.small} data-test="capabilities-count">
+              {countText}
+            </Content>
           ) : (
             <Skeleton width="160px" />
           )}

@@ -1,9 +1,10 @@
 /**
  * SettingsPage — standalone page object for the Virtualization Settings area.
  *
- * Covers all three tabs reachable from Virtualization → Settings:
+ * Covers Settings tabs reachable from Virtualization → Settings:
  *   /k8s/all-namespaces/virtualization-settings/cluster
  *   /k8s/all-namespaces/virtualization-settings/user
+ *   /k8s/all-namespaces/virtualization-settings/recommended
  *   /k8s/all-namespaces/virtualization-settings/features
  *
  * Composes the existing sub-page-objects without going through OverviewPage.
@@ -342,6 +343,12 @@ export default class SettingsPage extends BasePage {
     ...args: Parameters<OverviewSettingsPage['navigateToPreviewFeatures']>
   ): ReturnType<OverviewSettingsPage['navigateToPreviewFeatures']> {
     return this._settings.navigateToPreviewFeatures(...args);
+  }
+
+  navigateToRecommendedCapabilities(
+    ...args: Parameters<OverviewSettingsPage['navigateToRecommendedCapabilities']>
+  ): ReturnType<OverviewSettingsPage['navigateToRecommendedCapabilities']> {
+    return this._settings.navigateToRecommendedCapabilities(...args);
   }
 
   // ── Cluster tab — Resource management section ────────────────────────────────

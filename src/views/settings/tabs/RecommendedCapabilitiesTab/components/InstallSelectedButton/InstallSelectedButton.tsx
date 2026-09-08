@@ -61,6 +61,7 @@ const InstallSelectedButton: FC = () => {
 
   const button = (
     <Button
+      data-test="install-selected-capabilities"
       isAriaDisabled={isDisabled}
       isLoading={isAnyInstalling}
       onClick={handleInstall}

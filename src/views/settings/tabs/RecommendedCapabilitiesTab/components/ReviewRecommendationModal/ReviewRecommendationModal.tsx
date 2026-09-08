@@ -1,14 +1,13 @@
-import React, { FC, Suspense } from 'react';
+import React, { type FC, Suspense } from 'react';
 import { Trans } from 'react-i18next';
 
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { type K8sResourceCommon, YAMLEditor } from '@openshift-console/dynamic-plugin-sdk';
+import { CodeEditor, type K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { Content, ContentVariants, Grid, GridItem, ModalVariant } from '@patternfly/react-core';
 
 import { type AutopilotRegistryEntry } from '../../utils/autopilotRegistry';
-
 import useApplyRecommendation from './useApplyRecommendation';
 
 import './review-recommendation-modal.scss';
@@ -53,12 +52,17 @@ const ReviewRecommendationModal: FC<ReviewRecommendationModalProps> = ({
       submitBtnText={t('Apply')}
     >
       <hr className="review-recommendation-modal__separator" />
-      <Grid hasGutter>
+      <Grid data-test="review-recommendation-modal" hasGutter>
         <GridItem span={6}>
           <Content component={ContentVariants.h4}>{t('Current configuration')}</Content>
           <div className="review-recommendation-modal__editor">
             <Suspense fallback={<Loading />}>
-              <YAMLEditor minHeight="350px" options={EDITOR_OPTIONS} value={currentYAML} />
+              <CodeEditor
+                language="yaml"
+                minHeight="350px"
+                options={EDITOR_OPTIONS}
+                value={currentYAML}
+              />
             </Suspense>
           </div>
         </GridItem>
@@ -66,7 +70,12 @@ const ReviewRecommendationModal: FC<ReviewRecommendationModalProps> = ({
           <Content component={ContentVariants.h4}>{t('Recommended configuration')}</Content>
           <div className="review-recommendation-modal__editor">
             <Suspense fallback={<Loading />}>
-              <YAMLEditor minHeight="350px" options={EDITOR_OPTIONS} value={recommendedYAML} />
+              <CodeEditor
+                language="yaml"
+                minHeight="350px"
+                options={EDITOR_OPTIONS}
+                value={recommendedYAML}
+              />
             </Suspense>
           </div>
         </GridItem>

@@ -10,14 +10,14 @@ test.describe('Cluster Settings', { tag: [CNV_SETTINGS_TAG, '@adminOnly'] }, () 
 
   // ── Page-level ────────────────────────────────────────────────────────────────
 
-  test('Settings page shows Cluster, User, and Preview features tabs', async ({
+  test('Settings page shows Cluster, User, Recommended capabilities, and Preview features tabs', async ({
     settingsPage,
     utils,
   }) => {
     utils.withAllure({ suite: SUITE, feature: CNV_SETTINGS_FEATURE, tags: [CNV_SETTINGS_TAG] });
 
     const tabs = await settingsPage.getSettingsTabNames();
-    for (const expected of ['Cluster', 'User', 'Preview features']) {
+    for (const expected of ['Cluster', 'User', 'Recommended capabilities', 'Preview features']) {
       expect
         .soft(
           tabs.some((t) => t.includes(expected)),
