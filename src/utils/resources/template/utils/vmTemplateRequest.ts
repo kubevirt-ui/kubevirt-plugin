@@ -1,6 +1,6 @@
 import {
   VirtualMachineTemplateRequestModel,
-  VirtualMachineTemplateV1Alpha1Model,
+  VirtualMachineTemplateRequestV1Alpha1Model,
 } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { type V1beta1VirtualMachineTemplateRequest } from '@kubevirt-ui-ext/kubevirt-api/virt-template';
@@ -28,13 +28,13 @@ export const createVMTemplateRequest = async ({
 }: CreateVMTemplateRequestOptions): Promise<V1beta1VirtualMachineTemplateRequest> => {
   const cluster = getCluster(vm);
 
-  const templateModel = isHCOV1
+  const templateRequestModel = isHCOV1
     ? VirtualMachineTemplateRequestModel
-    : VirtualMachineTemplateV1Alpha1Model;
+    : VirtualMachineTemplateRequestV1Alpha1Model;
 
   const vmTemplateRequest: V1beta1VirtualMachineTemplateRequest = {
-    apiVersion: `${templateModel.apiGroup}/${templateModel.apiVersion}`,
-    kind: templateModel.kind,
+    apiVersion: `${templateRequestModel.apiGroup}/${templateRequestModel.apiVersion}`,
+    kind: templateRequestModel.kind,
     metadata: {
       name: templateName,
       namespace: templateNamespace,
@@ -54,6 +54,6 @@ export const createVMTemplateRequest = async ({
   return kubevirtK8sCreate({
     cluster,
     data: vmTemplateRequest,
-    model: templateModel,
+    model: templateRequestModel,
   });
 };
