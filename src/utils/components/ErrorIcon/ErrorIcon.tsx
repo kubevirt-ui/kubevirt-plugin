@@ -1,8 +1,7 @@
-/* eslint-disable */
-import React from 'react';
+import React, { type ReactElement } from 'react';
 
 import { ExclamationCircleIcon } from '@patternfly/react-icons';
 
-export const ErrorIcon = () => (
+export const ErrorIcon = (): ReactElement => (
   <ExclamationCircleIcon color="var(--pf-t--global--icon--color--status--danger--default)" />
 );

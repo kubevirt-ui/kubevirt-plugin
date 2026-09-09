@@ -1,7 +1,6 @@
-/* eslint-disable */
-import React, { FC, MouseEvent, useState } from 'react';
+import React, { type FC, type MouseEvent, useState } from 'react';
 
-import { V1PermittedHostDevices } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1PermittedHostDevices } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import SelectToggle from '@kubevirt-utils/components/toggles/SelectToggle';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -24,8 +23,8 @@ const DeviceNameSelect: FC<DeviceNameSelectProps> = ({
   const { t } = useKubevirtTranslation();
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
-  const onToggle = () => setIsOpen((prevIsOpen) => !prevIsOpen);
-  const onSelect = (_event: MouseEvent<HTMLSelectElement>, value: string) => {
+  const onToggle = (): void => setIsOpen((prevIsOpen) => !prevIsOpen);
+  const onSelect = (_event: MouseEvent<HTMLSelectElement>, value: string): void => {
     setDeviceName(value);
     setIsOpen(false);
   };

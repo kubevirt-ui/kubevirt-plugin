@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC, ReactElement, ReactNode } from 'react';
+import React, { type FC, type ReactElement, type ReactNode } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getNoPermissionTooltipContent } from '@kubevirt-utils/utils/utils';
@@ -22,7 +21,7 @@ const WithPermissionTooltip: FC<WithPermissionTooltipProps> = ({
 
   return (
     <HidableTooltip
-      content={title || getNoPermissionTooltipContent(t)}
+      content={title ?? getNoPermissionTooltipContent(t)}
       hidden={allowed}
       position={TooltipPosition.right}
     >

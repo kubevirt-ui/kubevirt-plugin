@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC, ReactNode } from 'react';
+import React, { type FC, type ReactNode } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
@@ -14,16 +13,33 @@ import {
 
 import AccessDenied from '../AccessDenied/AccessDenied';
 import Loading from '../Loading/Loading';
-
 import ListSkeleton from './ListSkeleton';
+
+type StateHandlerError = Error & { response?: { status?: number } };
 
 type StateHandlerProps = {
   children?: ReactNode;
-  error?: any;
+  error?: unknown;
   hasData: boolean;
   loaded: boolean;
   showSkeletonLoading?: boolean;
   withBullseye?: boolean;
+};
+
+const toStateHandlerError = (error: unknown): StateHandlerError | undefined => {
+  if (!error) {
+    return undefined;
+  }
+
+  if (error instanceof Error) {
+    return error;
+  }
+
+  if (typeof error === 'object' && 'message' in error) {
+    return error as StateHandlerError;
+  }
+
+  return new Error(String(error));
 };
 
 const StateHandler: FC<StateHandlerProps> = ({
@@ -35,12 +51,13 @@ const StateHandler: FC<StateHandlerProps> = ({
   withBullseye = false,
 }) => {
   const { t } = useKubevirtTranslation();
+  const stateHandlerError = toStateHandlerError(error);
 
-  if (error) {
-    const status = error?.response?.status;
+  if (stateHandlerError) {
+    const status = stateHandlerError.response?.status;
 
     if (status === 403) {
-      return <AccessDenied message={error.message} />;
+      return <AccessDenied message={stateHandlerError.message} />;
     }
 
     if (status === 404) {
@@ -58,7 +75,7 @@ const StateHandler: FC<StateHandlerProps> = ({
     }
     return (
       <Alert isInline title={t('Error')} variant={AlertVariant.danger}>
-        {error?.message}
+        {stateHandlerError.message}
       </Alert>
     );
   }

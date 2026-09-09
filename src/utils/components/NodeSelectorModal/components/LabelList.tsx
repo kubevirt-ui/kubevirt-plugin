@@ -1,9 +1,8 @@
-/* eslint-disable */
-import React, { FC, ReactNode } from 'react';
+import React, { type FC, type ReactNode } from 'react';
 
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { K8sModel } from '@openshift-console/dynamic-plugin-sdk';
+import { type K8sModel } from '@openshift-console/dynamic-plugin-sdk';
 import { Button, ButtonVariant, Flex, Grid, GridItem, Stack } from '@patternfly/react-core';
 import { PlusCircleIcon } from '@patternfly/react-icons';
 
@@ -27,8 +26,8 @@ const LabelsList: FC<LabelsListProps> = ({
   withKeyValueTitle,
 }) => {
   const { t } = useKubevirtTranslation();
-  const addRowTxt = addRowText || t('Add label');
-  const emptyStateAddRowTxt = emptyStateAddRowText || t('Add label to specify qualifying nodes');
+  const addRowTxt = addRowText ?? t('Add label');
+  const emptyStateAddRowTxt = emptyStateAddRowText ?? t('Add label to specify qualifying nodes');
 
   return (
     <Stack hasGutter={!isEmpty}>

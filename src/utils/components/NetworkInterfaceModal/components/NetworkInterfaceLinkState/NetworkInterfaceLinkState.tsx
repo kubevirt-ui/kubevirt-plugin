@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { Dispatch, FC, MouseEvent, SetStateAction } from 'react';
+import React, { type Dispatch, type FC, type MouseEvent, type SetStateAction } from 'react';
 
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import { describeNetworkState } from '@kubevirt-utils/components/NetworkIcons/utils';
@@ -20,7 +19,7 @@ const NetworkInterfaceLinkState: FC<NetworkInterfaceLinkStateProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
 
-  const handleChange = (event: MouseEvent<HTMLSelectElement>, value: string) => {
+  const handleChange = (event: MouseEvent<HTMLSelectElement>, value: string): void => {
     event.preventDefault();
     setLinkState(value);
   };

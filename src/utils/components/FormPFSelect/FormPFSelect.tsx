@@ -1,18 +1,18 @@
-/* eslint-disable */
-import React, { FC, ReactNode, useState } from 'react';
+import React, { type FC, type ReactNode, useState } from 'react';
 
-import { Select, SelectList, SelectProps } from '@patternfly/react-core';
+import { Select, SelectList, type SelectProps } from '@patternfly/react-core';
 
-import SelectToggle, { MenuTogglePropsWithTestId } from '../toggles/SelectToggle';
+import SelectToggle, { type MenuTogglePropsWithTestId } from '../toggles/SelectToggle';
 
 import './FormPFSelect.scss';
 
-type FormPFSelectProps = Omit<SelectProps, 'isOpen' | 'toggle'> & {
+type FormPFSelectProps = Omit<SelectProps, 'isOpen' | 'toggle' | 'selected'> & {
   children?: ReactNode;
   closeOnSelect?: boolean;
   isDisabled?: boolean;
   placeholder?: string;
-  selectedLabel?: any;
+  selected?: string | number | (string | number)[];
+  selectedLabel?: ReactNode;
   toggleProps?: MenuTogglePropsWithTestId;
 };
 
@@ -43,19 +43,21 @@ const FormPFSelect: FC<FormPFSelectProps> = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
 
-  const onToggle = () => setIsOpen((prevIsOpen) => !prevIsOpen);
+  const onToggle = (): void => setIsOpen((prevIsOpen) => !prevIsOpen);
 
   return (
     <Select
       onSelect={(event, value) => {
-        onSelect && onSelect(event, value);
-        closeOnSelect && setIsOpen(false);
+        onSelect?.(event, value);
+        if (closeOnSelect) {
+          setIsOpen(false);
+        }
       }}
       toggle={SelectToggle({
         isDisabled,
         isExpanded: isOpen,
         onClick: onToggle,
-        selected: selectedLabel || selected || placeholder,
+        selected: selectedLabel ?? selected ?? placeholder,
         ...toggleProps,
       })}
       className={className}

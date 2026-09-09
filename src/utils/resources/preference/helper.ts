@@ -13,17 +13,17 @@ export const getPreferredBootmode = (preference: V1beta1VirtualMachinePreference
     preference?.spec?.firmware?.preferredUseSecureBoot ||
     preference?.spec?.firmware?.preferredEfi?.secureBoot
   )
-    return BootMode.uefiSecure;
+    return BootMode.UefiSecure;
   if (
     preference?.spec?.firmware?.preferredUseEfi ||
     preference?.spec?.firmware?.preferredEfi?.secureBoot === false
   )
-    return BootMode.uefi;
+    return BootMode.Uefi;
   if (
     preference?.spec?.firmware?.preferredUseBios ||
     preference?.spec?.firmware?.preferredUseBiosSerial
   )
-    return BootMode.bios;
+    return BootMode.Bios;
 };
 
 export const getPreferenceModelFromMatcher = (preferenceMatcher: V1PreferenceMatcher): K8sModel =>

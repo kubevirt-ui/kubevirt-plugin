@@ -1,11 +1,11 @@
-/* eslint-disable */
 import { useCallback } from 'react';
 
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
-
+import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { useSignals } from '@preact/signals-react/runtime';
+
 import { dismissedPopoverKeysSignal } from '../onboardingSignals';
-import { OnboardingPopoverKey } from '../types';
+import { type OnboardingPopoverKey } from '../types';
 import { getTourStepsSeen, isCoveredByTourSteps, isPopoverVisible } from '../utils';
 
 type UseOnboardingPopoverArgs = {
@@ -39,11 +39,13 @@ const useOnboardingPopover = ({
     userSettingsLoaded,
   });
 
-  const dismiss = useCallback(() => {
+  const dismiss = useCallback((): void => {
     dismissedPopoverKeysSignal.value = new Set([...dismissedPopoverKeysSignal.value, popoverKey]);
     setUserSettings({
       ...userSettings,
       onboardingPopoversHidden: { ...onboardingPopoversHidden, [popoverKey]: true },
+    }).catch((saveError) => {
+      kubevirtConsole.error('Failed to persist onboarding popover dismiss state', saveError);
     });
   }, [onboardingPopoversHidden, popoverKey, setUserSettings, userSettings]);
 

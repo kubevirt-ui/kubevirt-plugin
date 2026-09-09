@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { Dispatch, FC, MouseEvent, SetStateAction } from 'react';
+import React, { type Dispatch, type FC, type MouseEvent, type SetStateAction } from 'react';
 
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -35,10 +34,17 @@ const NetworkInterfaceModelSelect: FC<NetworkInterfaceModelSelectProps> = ({
     },
   };
 
-  const handleChange = (event: MouseEvent<HTMLSelectElement>, value: string) => {
+  const handleChange = (event: MouseEvent<HTMLSelectElement>, value: string): void => {
     event.preventDefault();
     setInterfaceModel(value);
   };
+
+  const isKnownInterfaceModel = (model: string): model is keyof typeof interfaceModelOptions =>
+    model in interfaceModelOptions;
+
+  const selectedLabel = isKnownInterfaceModel(interfaceModel)
+    ? interfaceModelOptions[interfaceModel].name
+    : interfaceModel;
 
   return (
     <FormGroup fieldId="model" label={t('Model')}>
@@ -46,7 +52,7 @@ const NetworkInterfaceModelSelect: FC<NetworkInterfaceModelSelectProps> = ({
         <FormPFSelect
           onSelect={handleChange}
           selected={interfaceModel}
-          selectedLabel={interfaceModelOptions[interfaceModel].name}
+          selectedLabel={selectedLabel}
           toggleProps={{ isFullWidth: true }}
         >
           {Object.values(interfaceModelOptions)?.map(({ description, id, name }) => (

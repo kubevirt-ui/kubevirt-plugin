@@ -1,8 +1,7 @@
-/* eslint-disable */
-import { TFunction } from 'i18next';
+import { type TFunction } from 'i18next';
 import { produce } from 'immer';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { ARCHITECTURES } from '@kubevirt-utils/constants/constants';
 import {
   getArchitecture,
@@ -17,7 +16,7 @@ import {
   defaultBootloaderOptions,
   s390xBootloaderOptions,
 } from './constants';
-import { BootloaderOption, BootloaderOptionValue } from './types';
+import { type BootloaderOption, type BootloaderOptionValue } from './types';
 
 export const isObjectEmpty = (obj: object): boolean => obj && isEmpty(obj);
 
@@ -29,24 +28,24 @@ export const getClusterOnlyArchitecture = (
 
 export const getBootloaderFromVM = (
   vm: V1VirtualMachine,
-  defaultBootmode = BootMode.bios,
+  defaultBootmode = BootMode.Bios,
   clusterOnlyArchitecture?: string,
 ): BootloaderOptionValue => {
   const architecture = getArchitecture(vm) || clusterOnlyArchitecture;
   if (architecture === ARCHITECTURES.S390X) {
-    return BootMode.ipl;
+    return BootMode.Ipl;
   }
 
   const uefiBoot = getBootloader(vm)?.efi;
 
   if (uefiBoot?.secureBoot === true || isObjectEmpty(uefiBoot)) {
-    return BootMode.uefiSecure;
+    return BootMode.UefiSecure;
   }
   if (uefiBoot?.secureBoot === false) {
-    return BootMode.uefi;
+    return BootMode.Uefi;
   }
 
-  if (getBootloader(vm)?.bios) return BootMode.bios;
+  if (getBootloader(vm)?.bios) return BootMode.Bios;
 
   return defaultBootmode;
 };
@@ -85,10 +84,10 @@ export const updatedVMBootMode = (
   vm: V1VirtualMachine,
   firmwareBootloader: BootloaderOptionValue,
   clusterOnlyArchitecture?: string,
-) =>
+): V1VirtualMachine =>
   produce<V1VirtualMachine>(vm as V1VirtualMachine, (vmDraft: V1VirtualMachine) => {
     const architecture = getArchitecture(vm) || clusterOnlyArchitecture;
-    if (architecture === ARCHITECTURES.S390X && firmwareBootloader === BootMode.ipl) {
+    if (architecture === ARCHITECTURES.S390X && firmwareBootloader === BootMode.Ipl) {
       if (getBootloader(vmDraft)) {
         delete vmDraft.spec.template.spec.domain.firmware.bootloader;
       }
@@ -104,12 +103,12 @@ export const updatedVMBootMode = (
     vmDraft.spec.template.spec.domain.features.smm = { enabled: true };
 
     switch (firmwareBootloader) {
-      case BootMode.uefi:
+      case BootMode.Uefi:
         vmDraft.spec.template.spec.domain.firmware.bootloader = {
           efi: { secureBoot: false },
         };
         break;
-      case BootMode.uefiSecure:
+      case BootMode.UefiSecure:
         vmDraft.spec.template.spec.domain.firmware.bootloader = {
           efi: { secureBoot: true },
         };

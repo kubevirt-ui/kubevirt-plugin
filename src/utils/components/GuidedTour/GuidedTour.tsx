@@ -1,6 +1,10 @@
-/* eslint-disable */
-import React, { ComponentType, FC, useMemo } from 'react';
-import Joyride, { ACTIONS, CallBackProps, EVENTS, TooltipRenderProps } from 'react-joyride';
+import React, { type ComponentType, type FC, useMemo } from 'react';
+import Joyride, {
+  ACTIONS,
+  type CallBackProps,
+  EVENTS,
+  type TooltipRenderProps,
+} from 'react-joyride';
 import { useLocation, useNavigate } from 'react-router';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -13,7 +17,7 @@ import TourPopover from './components/TourPopover/TourPopover';
 import useTour from './hooks/useTour';
 import { getTourSteps } from './utils/constants';
 import { runningTourSignal, stepIndexSignal, tourStepsSeenSignal } from './utils/guidedTourSignals';
-import { handleClose, handleNext, handlePrev } from './utils/utils';
+import { getTourStepRoute, handleClose, handleNext, handlePrev } from './utils/utils';
 
 const GuidedTour: FC = () => {
   useSignals();
@@ -29,24 +33,24 @@ const GuidedTour: FC = () => {
 
   return (
     <Joyride
-      callback={(callbackProps: CallBackProps) => {
+      callback={async (callbackProps: CallBackProps) => {
         const { action, index, size, step, type } = callbackProps;
-        const route = step?.data?.route;
+        const route = getTourStepRoute(step?.data);
 
         if (typeof step?.target === 'string') {
           document.querySelector(step.target)?.scrollIntoView({ block: 'nearest' });
         }
 
-        const markStepSeen = (stepIndex: number) => {
+        const markStepSeen = async (stepIndex: number): Promise<void> => {
           const mergedSeen = Array.from(
             new Set([
-              ...(quickStarts?.tourStepsSeen || []),
+              ...(quickStarts?.tourStepsSeen ?? []),
               ...tourStepsSeenSignal.value,
               stepIndex,
             ]),
           );
-          if (mergedSeen.length !== (quickStarts?.tourStepsSeen || []).length) {
-            setQuickStarts?.({ ...quickStarts, tourStepsSeen: mergedSeen });
+          if (mergedSeen.length !== (quickStarts?.tourStepsSeen ?? []).length) {
+            await setQuickStarts?.({ ...quickStarts, tourStepsSeen: mergedSeen });
           }
           if (mergedSeen.length !== tourStepsSeenSignal.value.length) {
             tourStepsSeenSignal.value = mergedSeen;
@@ -54,7 +58,7 @@ const GuidedTour: FC = () => {
         };
 
         if (action === ACTIONS.CLOSE) {
-          markStepSeen(index);
+          await markStepSeen(index);
           handleClose(resetTour);
           return;
         }
@@ -64,7 +68,7 @@ const GuidedTour: FC = () => {
         }
 
         if (type === EVENTS.STEP_AFTER) {
-          markStepSeen(index);
+          await markStepSeen(index);
 
           if (index !== stepIndexSignal.value) return;
 

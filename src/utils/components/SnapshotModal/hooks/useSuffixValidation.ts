@@ -1,7 +1,6 @@
-/* eslint-disable */
 import { useMemo } from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import {
   getMaxSuffixLength,
   getMaxVMNameLength,
@@ -9,7 +8,16 @@ import {
 import { getLongestNameLength } from '@kubevirt-utils/resources/shared';
 import { isDNS1123Label } from '@kubevirt-utils/utils/validation';
 
-export const useSuffixValidation = (vms: V1VirtualMachine[], snapshotSuffix: string) => {
+export const useSuffixValidation = (
+  vms: V1VirtualMachine[],
+  snapshotSuffix: string,
+): {
+  isSuffixValid: boolean;
+  isSuffixValidDNS1123Label: boolean;
+  isSuffixValidLength: boolean;
+  maxSuffixLength: number;
+  maxVMNameLength: number;
+} => {
   const maxSuffixLength = useMemo(() => getMaxSuffixLength(getLongestNameLength(vms)), [vms]);
   const maxVMNameLength = getMaxVMNameLength(snapshotSuffix.length);
 

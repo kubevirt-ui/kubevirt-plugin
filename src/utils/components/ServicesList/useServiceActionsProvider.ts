@@ -1,22 +1,21 @@
-/* eslint-disable */
-import { useMemo } from 'react';
+import { createElement, useMemo } from 'react';
 import { useNavigate } from 'react-router';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { modelToRef, ServiceModel } from '@kubevirt-utils/models';
 import { asAccessReview, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import {
-  Action,
-  ExtensionHook,
-  K8sResourceKind,
+  type Action,
+  type ExtensionHook,
+  type K8sResourceKind,
   useAnnotationsModal,
   useDeleteModal,
   useK8sModel,
   useLabelsModal,
-  useModal,
 } from '@openshift-console/dynamic-plugin-sdk';
 
-import PodSelectorModal, { PodSelectorModalProps } from '../PodSelectorModal/PodSelectorModal';
+import { useModal } from '../ModalProvider/ModalProvider';
+import PodSelectorModal from '../PodSelectorModal/PodSelectorModal';
 
 const useServiceActionsProvider: ExtensionHook<Action[], K8sResourceKind> = (obj) => {
   const { t } = useKubevirtTranslation();
@@ -30,17 +29,20 @@ const useServiceActionsProvider: ExtensionHook<Action[], K8sResourceKind> = (obj
 
   const objNamespace = getNamespace(obj);
   const objName = getName(obj);
-  const createModal = useModal();
+  const { createModal } = useModal();
 
   const actions = useMemo(
     () => [
       {
         accessReview: asAccessReview(ServiceModel, obj, 'update'),
-        cta: () =>
-          createModal<PodSelectorModalProps>(PodSelectorModal, {
-            model: ServiceModel,
-            resource: obj,
-          }),
+        cta: (): void =>
+          createModal?.(({ onClose }) =>
+            createElement(PodSelectorModal, {
+              closeModal: onClose,
+              model: ServiceModel,
+              resource: obj,
+            }),
+          ),
         id: 'edit-pod-selectors-services',
         label: t('Edit Pod selector'),
       },
@@ -58,7 +60,9 @@ const useServiceActionsProvider: ExtensionHook<Action[], K8sResourceKind> = (obj
       },
       {
         accessReview: asAccessReview(ServiceModel, obj, 'update'),
-        cta: () => navigate(`/k8s/ns/${objNamespace}/${serviceModelRef}/${objName}/yaml`),
+        cta: (): void => {
+          navigate(`/k8s/ns/${objNamespace}/${serviceModelRef}/${objName}/yaml`);
+        },
         id: 'edit-services',
         label: t('Edit Service'),
       },

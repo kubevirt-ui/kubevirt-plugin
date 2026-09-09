@@ -1,13 +1,12 @@
-/* eslint-disable */
-import React, { Ref } from 'react';
+import React, { type ReactElement, type Ref } from 'react';
 
-import { MenuToggle, MenuToggleElement } from '@patternfly/react-core';
+import { MenuToggle, type MenuToggleElement } from '@patternfly/react-core';
 
-import { MenuTogglePropsWithTestId } from './SelectToggle';
+import { type MenuTogglePropsWithTestId } from './SelectToggle';
 
 const DropdownToggle =
   ({ children, 'data-test': dataTestId, ...props }: MenuTogglePropsWithTestId) =>
-  (toggleRef: Ref<MenuToggleElement>) => (
+  (toggleRef: Ref<MenuToggleElement>): ReactElement => (
     <MenuToggle data-test={dataTestId} ref={toggleRef} {...props}>
       {children}
     </MenuToggle>

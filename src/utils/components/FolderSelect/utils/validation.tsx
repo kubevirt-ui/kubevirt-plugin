@@ -1,17 +1,16 @@
-/* eslint-disable */
-import React from 'react';
+import React, { type ReactNode } from 'react';
 
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { MenuToggleProps } from '@patternfly/react-core';
+import { type MenuToggleProps } from '@patternfly/react-core';
 
 const isValidFolderNameRegex = /^(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])?$/;
 const startsCorrectlyRegex = /(^$)|(^[A-Za-z0-9])/;
 
-const findInvalidCharacter = (input: string) => {
+const findInvalidCharacter = (input: string): string | undefined => {
   return input.split('').find((char) => /[^-A-Za-z0-9_.]/.test(char));
 };
 
-export const getCreationNotAllowedMessage = (filterValue: string) => {
+export const getCreationNotAllowedMessage = (filterValue: string): ReactNode => {
   const invalidCharacter = findInvalidCharacter(filterValue);
 
   if (invalidCharacter) {

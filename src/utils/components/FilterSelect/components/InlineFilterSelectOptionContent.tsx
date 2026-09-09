@@ -1,10 +1,9 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
 
-import { EnhancedSelectOptionProps } from '../utils/types';
+import { type EnhancedSelectOptionProps } from '../utils/types';
 
 type InlineFilterSelectOptionContentProps = {
   option: EnhancedSelectOptionProps;
@@ -15,7 +14,7 @@ const InlineFilterSelectOptionContent: FC<InlineFilterSelectOptionContentProps> 
     <ResourceLink
       groupVersionKind={option.groupVersionKind}
       linkTo={false}
-      name={option?.label || option.value}
+      name={option?.label ?? String(option.value)}
     />
   ) : (
     <>{option?.children}</>

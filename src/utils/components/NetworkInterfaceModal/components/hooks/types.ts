@@ -1,8 +1,7 @@
-/* eslint-disable */
-import { NetworkAttachmentDefinitionKind } from '@kubevirt-utils/resources/nad/types';
+import { type NetworkAttachmentDefinitionKind } from '@kubevirt-utils/resources/nad/types';
 
 export enum ExtraNADNamespaces {
-  default = 'default',
+  Default = 'default',
   OPENSHIFT_MULTUS_NS = 'OPENSHIFT_MULTUS_NS',
   OPENSHIFT_SRIOV_NETWORK_OPERATOR_NS = 'OPENSHIFT_SRIOV_NETWORK_OPERATOR_NS',
 }
@@ -14,7 +13,7 @@ export type UseNADsData = (
   cluster?: string,
 ) => {
   loaded: boolean;
-  loadError: string;
+  loadError: unknown;
   nads: NetworkAttachmentDefinitionKind[];
   primaryNADs: NetworkAttachmentDefinitionKind[];
 };

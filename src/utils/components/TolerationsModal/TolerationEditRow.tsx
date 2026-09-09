@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
 import { K8sIoApiCoreV1TolerationEffectEnum } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -13,12 +12,12 @@ import {
 } from '@patternfly/react-core';
 import { MinusCircleIcon } from '@patternfly/react-icons';
 
-import { TolerationLabel } from './utils/constants';
+import { type TolerationLabel } from './utils/constants';
 
 type TolerationEditRowProps = {
   label: TolerationLabel;
   onChange: (label: TolerationLabel) => void;
-  onDelete: (id: any) => void;
+  onDelete: (id: number) => void;
 };
 
 const TolerationEditRow: FC<TolerationEditRowProps> = ({ label, onChange, onDelete }) => {

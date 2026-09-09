@@ -1,7 +1,9 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
-import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import {
+  type V1VirtualMachine,
+  type V1VirtualMachineInstance,
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getGPUDevices, getHostDevices } from '@kubevirt-utils/resources/vm';
 import { hasS390xArchitecture } from '@kubevirt-utils/resources/vm/utils/architecture';
@@ -12,12 +14,11 @@ import {
 } from '@patternfly/react-core';
 
 import { useModal } from '../ModalProvider/ModalProvider';
-
-import HardwareDevicesModal from './modal/HardwareDevicesModal';
-import { HARDWARE_DEVICE_TYPE } from './utils/constants';
 import HardwareDevicesHeadlessMode from './HardwareDevicesHeadlessMode';
 import HardwareDevicesTable from './HardwareDevicesTable';
 import HardwareDeviceTitle from './HardwareDeviceTitle';
+import HardwareDevicesModal from './modal/HardwareDevicesModal';
+import { HARDWARE_DEVICE_TYPE } from './utils/constants';
 
 type HardwareDevicesProps = {
   canEdit?: boolean;
@@ -41,8 +42,8 @@ const HardwareDevices: FC<HardwareDevicesProps> = ({
   const gpus = getGPUDevices(vm);
   const vmHasS390xArchitecture = hasS390xArchitecture(vm);
 
-  const onEditGPU = () => {
-    createModal(({ isOpen, onClose }) => (
+  const onEditGPU = (): void => {
+    createModal?.(({ isOpen, onClose }) => (
       <HardwareDevicesModal
         btnText={t('Add GPU device')}
         headerText={t('GPU devices')}
@@ -57,8 +58,8 @@ const HardwareDevices: FC<HardwareDevicesProps> = ({
     ));
   };
 
-  const onEditHostDevices = () => {
-    createModal(({ isOpen, onClose }) => (
+  const onEditHostDevices = (): void => {
+    createModal?.(({ isOpen, onClose }) => (
       <HardwareDevicesModal
         btnText={t('Add host device')}
         headerText={t('Host devices')}

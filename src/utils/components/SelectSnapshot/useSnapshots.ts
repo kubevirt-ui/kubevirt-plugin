@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { useMemo } from 'react';
 
 import {
@@ -8,7 +7,7 @@ import {
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 
-import { VolumeSnapshotKind } from './types';
+import { type VolumeSnapshotKind } from './types';
 
 type ProjectSnapshotCount = {
   count: number;
@@ -35,11 +34,11 @@ const useSnapshots = (projectSelected: string, cluster?: string): UseSnapshotsRe
   });
 
   const projectsWithSnapshots = useMemo(() => {
-    const countByNamespace = (allSnapshots || []).reduce<Record<string, number>>(
+    const countByNamespace = (allSnapshots ?? []).reduce<Record<string, number>>(
       (acc, snapshot) => {
         const ns = getNamespace(snapshot);
         if (ns) {
-          acc[ns] = (acc[ns] || 0) + 1;
+          acc[ns] = (acc[ns] ?? 0) + 1;
         }
         return acc;
       },
@@ -53,9 +52,9 @@ const useSnapshots = (projectSelected: string, cluster?: string): UseSnapshotsRe
 
   const snapshots = useMemo(
     () =>
-      (allSnapshots || [])
+      (allSnapshots ?? [])
         .filter((snapshot) => getNamespace(snapshot) === projectSelected)
-        .sort((a, b) => getName(a)?.localeCompare(getName(b))),
+        .sort((a, b) => (getName(a) ?? '').localeCompare(getName(b) ?? '')),
     [allSnapshots, projectSelected],
   );
 

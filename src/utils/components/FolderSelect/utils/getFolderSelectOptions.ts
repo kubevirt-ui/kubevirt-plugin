@@ -1,6 +1,5 @@
-/* eslint-disable */
-import { SelectTypeaheadOptionProps } from '@kubevirt-utils/components/SelectTypeahead/SelectTypeahead';
-import { SelectOptionProps } from '@patternfly/react-core';
+import { type SelectTypeaheadOptionProps } from '@kubevirt-utils/components/SelectTypeahead/SelectTypeahead';
+import { type SelectOptionProps } from '@patternfly/react-core';
 
 import { createNewFolderOption } from './options';
 
@@ -16,7 +15,10 @@ export const getFolderSelectOptions = (
   selectedFolder: string,
 ): SelectTypeaheadOptionProps[] => {
   const mappedOptions =
-    folderOptions?.map((option) => ({ optionProps: option, value: option.value })) ?? [];
+    folderOptions?.map((option) => ({
+      optionProps: option,
+      value: String(option.value ?? ''),
+    })) ?? [];
 
   if (selectedFolder && !mappedOptions.some((option) => option.value === selectedFolder)) {
     return [

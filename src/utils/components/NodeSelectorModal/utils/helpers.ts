@@ -1,10 +1,9 @@
-/* eslint-disable */
-import { IDLabel } from './types';
+import { type IDLabel } from './types';
 
 export const nodeSelectorToIDLabels = (nodeSelector: { [key: string]: string }): IDLabel[] =>
-  Object.entries(nodeSelector || {}).map(([key, value], id) => ({ id, key, value }));
+  Object.entries(nodeSelector ?? {}).map(([key, value], id) => ({ id, key, value }));
 
-export const isEqualObject = (object, otherObject) => {
+export const isEqualObject = (object: unknown, otherObject: unknown): boolean => {
   if (object === otherObject) {
     return true;
   }

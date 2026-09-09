@@ -1,11 +1,10 @@
-/* eslint-disable */
-import { TFunction } from 'i18next';
+import { type TFunction } from 'i18next';
 
 import { MAX_K8S_NAME_LENGTH } from '@kubevirt-utils/utils/constants';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { ValidatedOptions } from '@patternfly/react-core';
 
-export const vmNameLengthExceedsMaxLength = (vmName: string) =>
+export const vmNameLengthExceedsMaxLength = (vmName: string): boolean =>
   vmName?.length > MAX_K8S_NAME_LENGTH;
 
 export const isValidVMName = (vmName: string): boolean => {

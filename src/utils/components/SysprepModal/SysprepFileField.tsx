@@ -1,12 +1,10 @@
-/* eslint-disable */
-import React, { ChangeEvent, FC, useEffect, useState } from 'react';
-import { XMLValidator } from 'fast-xml-parser';
+import React, { type ChangeEvent, type FC, useEffect, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   Content,
   ContentVariants,
-  DropEvent,
+  type DropEvent,
   FileUpload,
   ValidatedOptions,
 } from '@patternfly/react-core';
@@ -24,6 +22,12 @@ type SysprepFileFieldProps = {
   value?: string;
 };
 
+const isValidXML = (xmlString: string): boolean => {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(xmlString, 'application/xml');
+  return doc.querySelector('parsererror') === null;
+};
+
 const SysprepFileField: FC<SysprepFileFieldProps> = ({ id, onChange, value }) => {
   const { t } = useKubevirtTranslation();
   const [data, setData] = useState<SysprepFile>({
@@ -33,13 +37,10 @@ const SysprepFileField: FC<SysprepFileFieldProps> = ({ id, onChange, value }) =>
     value,
   });
 
-  const onFieldChange = (newValue: string) => {
+  const onFieldChange = (newValue: string): void => {
     setData((currentSysprepFile) => ({
       ...currentSysprepFile,
-      validated:
-        XMLValidator.validate(newValue) === true
-          ? ValidatedOptions.default
-          : ValidatedOptions.error,
+      validated: isValidXML(newValue) ? ValidatedOptions.default : ValidatedOptions.error,
       value: newValue,
     }));
   };

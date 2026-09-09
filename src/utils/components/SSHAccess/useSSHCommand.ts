@@ -1,44 +1,42 @@
-/* eslint-disable */
-import { IoK8sApiCoreV1Service } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type IoK8sApiCoreV1Service } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { NODE_PORT_ADDRESS } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { getCloudInitCredentials } from '@kubevirt-utils/resources/vmi';
 import { getSSHNodePort } from '@kubevirt-utils/utils/utils';
 
 import { useFeatures } from '../../hooks/useFeatures/useFeatures';
-
 import { SERVICE_TYPES } from './constants';
 
-export type useSSHCommandResult = {
+export type UseSSHCommandResult = {
   command: string;
   sshServiceRunning: boolean;
   user: string;
 };
 
-export const isLoadBalancerBonded = (sshService: IoK8sApiCoreV1Service) =>
+export const isLoadBalancerBonded = (sshService: IoK8sApiCoreV1Service): boolean =>
   Boolean(sshService?.status?.loadBalancer?.ingress?.[0]?.ip);
 
 // SSH over NodePort
 const useSSHCommand = (
   vm: V1VirtualMachine,
   sshService: IoK8sApiCoreV1Service,
-): useSSHCommandResult => {
+): UseSSHCommandResult => {
   const { featureEnabled: nodePortAddress } = useFeatures(NODE_PORT_ADDRESS);
 
-  const consoleHostname = () => {
+  const consoleHostname = (): string => {
     if (sshService?.spec?.type === SERVICE_TYPES.LOAD_BALANCER) {
-      return sshService?.status?.loadBalancer?.ingress?.[0]?.ip;
+      return sshService?.status?.loadBalancer?.ingress?.[0]?.ip ?? '';
     }
 
     if (sshService?.spec?.type === SERVICE_TYPES.NODE_PORT) {
-      return nodePortAddress;
+      return typeof nodePortAddress === 'string' ? nodePortAddress : window.location.hostname;
     }
 
     return window.location.hostname; // fallback to console hostname
   };
 
   const { users } = getCloudInitCredentials(vm);
-  const user = users?.[0]?.name;
+  const user = users?.[0]?.name ?? '';
   const sshServicePort =
     sshService?.spec?.type === SERVICE_TYPES.LOAD_BALANCER
       ? sshService?.spec?.ports?.[0]?.port

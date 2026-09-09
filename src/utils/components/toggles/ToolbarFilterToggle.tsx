@@ -1,13 +1,12 @@
-/* eslint-disable */
-import React, { ReactNode, Ref } from 'react';
+import React, { type ReactElement, type ReactNode, type Ref } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   Badge,
   MenuToggle,
-  MenuToggleElement,
-  MenuToggleProps,
+  type MenuToggleElement,
+  type MenuToggleProps,
   Tooltip,
 } from '@patternfly/react-core';
 
@@ -39,12 +38,14 @@ const ToolbarFilterToggle = ({
   const { t } = useKubevirtTranslation();
   const hasSelectedValues = !isEmpty(selectedValues);
 
-  return (toggleRef: Ref<MenuToggleElement>) => {
+  return (toggleRef: Ref<MenuToggleElement>): ReactElement => {
     const menuToggle = (
       <MenuToggle
         badge={
           badgeNumber || hasSelectedValues || showAllBadge ? (
-            <Badge isRead>{badgeNumber || selectedValues.length || t('All')}</Badge>
+            <Badge isRead>
+              {badgeNumber ?? (selectedValues.length > 0 ? selectedValues.length : t('All'))}
+            </Badge>
           ) : null
         }
         data-test={dataTestId}

@@ -1,15 +1,17 @@
-/* eslint-disable */
 import {
-  GroupedMenuOption,
-  MenuOption,
+  type GroupedMenuOption,
+  type MenuOption,
   MenuOptionType,
 } from '@openshift-console/dynamic-plugin-sdk';
 
-export const getMenuOptionType = (option: MenuOption) => {
+const isGroupedMenuOption = (option: MenuOption): option is GroupedMenuOption =>
+  'children' in option && Array.isArray(option.children);
+
+export const getMenuOptionType = (option: MenuOption): MenuOptionType => {
   // a grouped menu has children
-  const isGroupMenu = Array.isArray((option as GroupedMenuOption).children);
+  const isGroupMenu = isGroupedMenuOption(option);
   // a submenu menu has children and submenu property true
-  const isSubMenu = isGroupMenu && (option as GroupedMenuOption).submenu;
+  const isSubMenu = isGroupMenu && option.submenu;
 
   if (isSubMenu) {
     return MenuOptionType.SUB_MENU;

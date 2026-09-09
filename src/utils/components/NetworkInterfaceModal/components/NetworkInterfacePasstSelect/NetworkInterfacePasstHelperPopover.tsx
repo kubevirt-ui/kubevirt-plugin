@@ -1,14 +1,13 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 import { Link } from 'react-router';
 
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { VIRTUALIZATION_PATHS } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
-interface NetworkInterfacePasstHelperPopoverProps {
+type NetworkInterfacePasstHelperPopoverProps = {
   namespace?: string;
-}
+};
 
 const NetworkInterfacePasstHelperPopover: FC<NetworkInterfacePasstHelperPopoverProps> = ({
   namespace,

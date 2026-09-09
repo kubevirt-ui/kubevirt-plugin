@@ -1,4 +1,3 @@
-/* eslint-disable */
 import {
   dismissOnboardingPopoverByWelcomeModalSignal,
   runningTourSignal,
@@ -8,7 +7,7 @@ import type { UserSettingsState } from '@kubevirt-utils/hooks/useKubevirtUserSet
 
 import { ONBOARDING_POPOVER_CHAIN } from './constants';
 import { dismissedPopoverKeysSignal } from './onboardingSignals';
-import { OnboardingPopoverKey, OnboardingPopoversHidden } from './types';
+import { type OnboardingPopoverKey, type OnboardingPopoversHidden } from './types';
 
 export const arePredecessorPopoversDismissed = (
   popoverKey: OnboardingPopoverKey,
@@ -33,7 +32,7 @@ export const isCoveredByTourSteps = (
 
 export const getTourStepsSeen = (
   quickStart: { tourStepsSeen?: number[] } | undefined,
-): number[] => [...(quickStart?.tourStepsSeen || []), ...tourStepsSeenSignal.value];
+): number[] => [...(quickStart?.tourStepsSeen ?? []), ...tourStepsSeenSignal.value];
 
 type IsPopoverVisibleArgs = {
   isCoveredByTour: boolean;

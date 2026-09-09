@@ -1,11 +1,16 @@
-/* eslint-disable */
 import produce from 'immer';
 
 import { ServiceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { VirtualMachineInstanceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { IoK8sApiCoreV1Pod, IoK8sApiCoreV1Service } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
-import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import {
+  type IoK8sApiCoreV1Pod,
+  type IoK8sApiCoreV1Service,
+} from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import {
+  type V1VirtualMachine,
+  type V1VirtualMachineInstance,
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getCloudInitCredentials } from '@kubevirt-utils/resources/vmi';
 import { getVMILabelForServiceSelector } from '@kubevirt-utils/resources/vmi/utils/services';
 import {
@@ -16,16 +21,16 @@ import {
 } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sCreate, kubevirtK8sDelete, kubevirtK8sUpdate } from '@multicluster/k8sRequests';
-import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+import { type K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
 import { buildOwnerReference, getName, getNamespace } from './../../resources/shared';
-import { PORT, SERVICE_TYPES, SSH_PORT } from './constants';
+import { PORT, type SERVICE_TYPES, SSH_PORT } from './constants';
 
 const buildSSHServiceFromVM = (
   vm: V1VirtualMachine,
   type: SERVICE_TYPES,
   pod?: IoK8sApiCoreV1Pod,
-) => {
+): IoK8sApiCoreV1Service => {
   const labelSelector = getVMILabelForServiceSelector(pod, vm);
 
   return {
@@ -43,7 +48,7 @@ const buildSSHServiceFromVM = (
       ports: [
         {
           port: PORT,
-          targetPort: SSH_PORT,
+          targetPort: String(SSH_PORT),
         },
       ],
       selector: {
@@ -54,7 +59,9 @@ const buildSSHServiceFromVM = (
   };
 };
 
-export const deleteSSHService = (sshService: IoK8sApiCoreV1Service) =>
+export const deleteSSHService = (
+  sshService: IoK8sApiCoreV1Service,
+): Promise<IoK8sApiCoreV1Service> =>
   kubevirtK8sDelete<IoK8sApiCoreV1Service>({
     model: ServiceModel,
     name: sshService?.metadata?.name,
@@ -66,7 +73,7 @@ export const addSSHSelectorLabelToVM = async (
   vm: V1VirtualMachine,
   vmi: V1VirtualMachineInstance,
   labelSelector: { labelKey: string; labelValue: string },
-) => {
+): Promise<V1VirtualMachine> => {
   const { labelKey, labelValue } = labelSelector;
 
   const vmWithLabel = produce(vm, (draftVM) => {
@@ -115,7 +122,7 @@ export const createSSHService = async (
   });
 };
 
-export const getConsoleVirtctlCommand = (vm: V1VirtualMachine, identityFlag?: string) => {
+export const getConsoleVirtctlCommand = (vm: V1VirtualMachine, identityFlag?: string): string => {
   const [vmName, vmNamespace, userName] = [
     getName(vm),
     getNamespace(vm),

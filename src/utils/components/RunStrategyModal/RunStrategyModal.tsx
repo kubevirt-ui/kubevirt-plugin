@@ -1,9 +1,8 @@
-/* eslint-disable */
-import React, { FC, MouseEvent, useEffect, useMemo, useState } from 'react';
+import React, { type FC, type MouseEvent, useEffect, useMemo, useState } from 'react';
 
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { RunStrategy } from '@kubevirt-utils/resources/vm/utils/constants';
+import { type RunStrategy } from '@kubevirt-utils/resources/vm/utils/constants';
 import {
   Content,
   ContentVariants,
@@ -14,7 +13,6 @@ import {
 } from '@patternfly/react-core';
 
 import FormPFSelect from '../FormPFSelect/FormPFSelect';
-
 import RunStrategyWarningAlert from './RunStrategyWarningAlert';
 import {
   getRunStrategyDescriptions,
@@ -22,8 +20,8 @@ import {
   getRunStrategyWarningMessage,
   isValidRunStrategy,
   MIXED_HINT_ID,
-  RunStrategyModalProps,
-  RunStrategySelection,
+  type RunStrategyModalProps,
+  type RunStrategySelection,
 } from './utils';
 
 import './RunStrategyModal.scss';
@@ -49,7 +47,7 @@ const RunStrategyModal: FC<RunStrategyModalProps> = ({
     }
   }, [isOpen, initialRunStrategy]);
 
-  const handleChange = (_event: MouseEvent<Element>, value: string) => {
+  const handleChange = (_event: MouseEvent<Element>, value: string): void => {
     if (isValidRunStrategy(value)) {
       setRunStrategy(value);
     }
@@ -96,11 +94,13 @@ const RunStrategyModal: FC<RunStrategyModalProps> = ({
               selected={runStrategy || undefined}
               selectedLabel={runStrategy ? labels[runStrategy] || runStrategy : undefined}
             >
-              {Object.entries(labels).map(([key, label]) => (
-                <SelectOption description={descriptions[key]} key={key} value={key}>
-                  {label}
-                </SelectOption>
-              ))}
+              {Object.entries(labels).map(([key, label]) =>
+                isValidRunStrategy(key) ? (
+                  <SelectOption description={descriptions[key]} key={key} value={key}>
+                    {label}
+                  </SelectOption>
+                ) : null,
+              )}
             </FormPFSelect>
             {showMixedStrategiesHint && (
               <Content
