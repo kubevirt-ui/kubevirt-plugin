@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { Dispatch, FC, MouseEvent, SetStateAction } from 'react';
+import React, { type Dispatch, type FC, type MouseEvent, type SetStateAction } from 'react';
 
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
@@ -58,7 +57,7 @@ const NetworkInterfaceTypeSelect: FC<NetworkInterfaceTypeSelectProps> = ({
     },
   };
 
-  const handleChange = (event: MouseEvent<HTMLSelectElement>, value: string) => {
+  const handleChange = (event: MouseEvent<HTMLSelectElement>, value: string): void => {
     event.preventDefault();
     setInterfaceType(value);
   };

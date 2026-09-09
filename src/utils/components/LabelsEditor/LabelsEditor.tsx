@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC, useState } from 'react';
+import React, { type FC, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
@@ -36,11 +35,11 @@ export const LabelsEditor: FC<LabelsEditorProps> = ({
   const { t } = useKubevirtTranslation();
   const [inputValue, setInputValue] = useState('');
 
-  const onClose = (value: string) => {
+  const onClose = (value: string): void => {
     onSelect(null, value);
   };
 
-  const onAdd = () => {
+  const onAdd = (): void => {
     onSelect(null, inputValue);
     setInputValue('');
   };

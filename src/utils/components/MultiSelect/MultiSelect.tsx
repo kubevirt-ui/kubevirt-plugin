@@ -1,11 +1,17 @@
-/* eslint-disable */
-import React, { FC, MouseEvent as ReactMouseEvent, ReactNode, Ref, useState } from 'react';
+import React, {
+  type FC,
+  type MouseEvent as ReactMouseEvent,
+  type ReactElement,
+  type ReactNode,
+  type Ref,
+  useState,
+} from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   Label,
   MenuToggle,
-  MenuToggleElement,
+  type MenuToggleElement,
   Select,
   SelectList,
   SelectOption,
@@ -19,7 +25,7 @@ type MultiSelectProps = {
   dataTestId?: string;
   items: MultiSelectOption[];
   selectedItems: string[];
-  setSelectedItems: (items: any[]) => void;
+  setSelectedItems: (items: string[]) => void;
   toggleText?: string;
 };
 
@@ -33,11 +39,14 @@ const MultiSelect: FC<MultiSelectProps> = ({
   const { t } = useKubevirtTranslation();
   const [isOpen, setIsOpen] = useState(false);
 
-  const onToggleClick = () => {
+  const onToggleClick = (): void => {
     setIsOpen(!isOpen);
   };
 
-  const onSelect = (_event: ReactMouseEvent<Element, MouseEvent> | undefined, value: string) => {
+  const onSelect = (
+    _event: ReactMouseEvent<Element, MouseEvent> | undefined,
+    value: string,
+  ): void => {
     if (selectedItems.includes(value)) {
       setSelectedItems(selectedItems.filter((id) => id !== value));
     } else {
@@ -45,7 +54,7 @@ const MultiSelect: FC<MultiSelectProps> = ({
     }
   };
 
-  const toggle = (toggleRef: Ref<MenuToggleElement>) => (
+  const toggle = (toggleRef: Ref<MenuToggleElement>): ReactElement => (
     <MenuToggle
       className="multi-select-toggle"
       data-test={dataTestId}
@@ -53,7 +62,7 @@ const MultiSelect: FC<MultiSelectProps> = ({
       onClick={onToggleClick}
       ref={toggleRef}
     >
-      {toggleText || t('Select items')}
+      {toggleText ?? t('Select items')}
       {selectedItems.length > 0 && (
         <Label className="pf-v6-u-ml-sm">
           {selectedItems?.length === items?.length ? t('All') : selectedItems.length}

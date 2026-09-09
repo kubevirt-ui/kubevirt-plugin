@@ -1,14 +1,13 @@
-/* eslint-disable */
 import { useEffect, useRef } from 'react';
 
-import { UniversalFilter } from '@kubevirt-utils/hooks/useUniversalFilter/useUniversalFilter';
+import { type UniversalFilter } from '@kubevirt-utils/hooks/useUniversalFilter/useUniversalFilter';
 import { TemplateFilterType } from '@templates/list/filters/types';
 import { TEMPLATE_SCOPE_ID } from '@templates/list/filters/useScopeFilter';
 
 const useFilterDefaultTemplates = (
   shouldApplyFilter: boolean,
   universalFilter: UniversalFilter,
-) => {
+): void => {
   const defaultAppliedRef = useRef(false);
   const { hasQueryKey, setValue } = universalFilter;
 

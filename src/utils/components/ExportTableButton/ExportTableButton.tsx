@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { useCallback, useMemo } from 'react';
+import React, { type JSX, useCallback, useMemo } from 'react';
 
 import { type ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -29,7 +28,7 @@ const ExportTableButton = <TData, TCallbacks = undefined>({
   filename,
   isDisabled,
   loaded = true,
-}: ExportTableButtonProps<TData, TCallbacks>) => {
+}: ExportTableButtonProps<TData, TCallbacks>): JSX.Element => {
   const { t } = useKubevirtTranslation();
 
   const disabled = isDisabled ?? (!loaded || isEmpty(data));

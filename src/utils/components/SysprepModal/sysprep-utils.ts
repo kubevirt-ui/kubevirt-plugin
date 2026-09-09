@@ -1,12 +1,14 @@
-/* eslint-disable */
 import { ConfigMapModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
-import { V1Disk, V1VirtualMachine, V1Volume } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import {
+  type V1Disk,
+  type V1VirtualMachine,
+  type V1Volume,
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getDisks, getVolumes } from '@kubevirt-utils/resources/vm';
 import { generatePrettyName } from '@kubevirt-utils/utils/utils';
 
 import { InterfaceTypes } from '../DiskModal/utils/types';
-
 import { SYSPREP } from './consts';
 
 export const AUTOUNATTEND = 'autounattend.xml';
@@ -24,17 +26,17 @@ export const sysprepVolume = (sysprepName: string): V1Volume => ({
   },
 });
 
-export const addSysprepConfig = (vm: V1VirtualMachine, newSysprepName: string) => {
+export const addSysprepConfig = (vm: V1VirtualMachine, newSysprepName: string): void => {
   getVolumes(vm).push({
     name: SYSPREP,
     sysprep: {
       configMap: { name: newSysprepName },
     },
   });
-  (getDisks(vm) || []).push(sysprepDisk());
+  (getDisks(vm) ?? []).push(sysprepDisk());
 };
 
-export const removeSysprepConfig = (vm: V1VirtualMachine, sysprepVolumeName: string) => {
+export const removeSysprepConfig = (vm: V1VirtualMachine, sysprepVolumeName: string): void => {
   vm.spec.template.spec.volumes = getVolumes(vm).filter(
     (volume) => sysprepVolumeName !== volume.name,
   );
@@ -43,7 +45,7 @@ export const removeSysprepConfig = (vm: V1VirtualMachine, sysprepVolumeName: str
   );
 };
 
-export const generateSysprepConfigMapName = () => generatePrettyName('sysprep-config');
+export const generateSysprepConfigMapName = (): string => generatePrettyName('sysprep-config');
 
 type GenerateNewSysprepConfig = {
   data: IoK8sApiCoreV1ConfigMap['data'];
@@ -58,8 +60,9 @@ export const generateNewSysprepConfig = ({
   data,
   kind: ConfigMapModel.kind,
   metadata: {
-    name: sysprepName || generateSysprepConfigMapName(),
+    name: sysprepName ?? generateSysprepConfigMapName(),
   },
 });
 
-export const getSysprepConfigMapName = (volume: V1Volume) => volume?.sysprep?.configMap?.name;
+export const getSysprepConfigMapName = (volume: V1Volume): string | undefined =>
+  volume?.sysprep?.configMap?.name;

@@ -1,22 +1,37 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC, type JSX } from 'react';
 
-import { V1PciHostDevice } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1PciHostDevice } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { HorizontalNav } from '@openshift-console/dynamic-plugin-sdk';
+import {
+  HorizontalNav,
+  type HorizontalNavProps,
+  type NavPage,
+} from '@openshift-console/dynamic-plugin-sdk';
 import { Bullseye, Flex, PageSection, PopoverPosition, Title } from '@patternfly/react-core';
 
-import useHCPermittedHostDevices from './hooks/useHCPermittedHostDevices';
 import HardwareDevicesPageTable from './HardwareDevicesPageTable';
+import useHCPermittedHostDevices from './hooks/useHCPermittedHostDevices';
+import { type HardwareDevicePageRow } from './utils/constants';
 
-const HardwareDevicesPage: FC<any> = (props) => {
+type HardwareDevicesPageTableProps = {
+  devices: HardwareDevicePageRow[];
+  error?: Error;
+  loaded: boolean;
+};
+
+type HardwareDevicesNavPage = Omit<NavPage, 'component'> & {
+  component: (pageProps: HardwareDevicesPageTableProps) => JSX.Element;
+  pageData: HardwareDevicesPageTableProps;
+};
+
+const HardwareDevicesPage: FC<HorizontalNavProps> = (props) => {
   const { t } = useKubevirtTranslation();
   const { hcError, hcLoaded, permittedHostDevices } = useHCPermittedHostDevices();
 
-  const pages = [
+  const pages: HardwareDevicesNavPage[] = [
     {
-      component: (pageProps) => (
+      component: (pageProps: HardwareDevicesPageTableProps) => (
         <PageSection hasBodyWrapper={false}>
           <Bullseye>
             <HardwareDevicesPageTable {...pageProps} />
@@ -29,7 +44,7 @@ const HardwareDevicesPage: FC<any> = (props) => {
         devices: permittedHostDevices?.pciHostDevices?.map(
           (device: V1PciHostDevice & { pciDeviceSelector: string }) => ({
             ...device,
-            selector: device?.pciVendorSelector || device?.pciDeviceSelector,
+            selector: device?.pciVendorSelector ?? device?.pciDeviceSelector,
           }),
         ),
         error: hcError,
@@ -37,7 +52,7 @@ const HardwareDevicesPage: FC<any> = (props) => {
       },
     },
     {
-      component: (pageProps) => (
+      component: (pageProps: HardwareDevicesPageTableProps) => (
         <PageSection hasBodyWrapper={false}>
           <Bullseye>
             <HardwareDevicesPageTable {...pageProps} />
@@ -71,7 +86,7 @@ const HardwareDevicesPage: FC<any> = (props) => {
           />
         </Flex>
       </PageSection>
-      <HorizontalNav {...props} match={props.match} pages={pages} />
+      <HorizontalNav {...props} pages={pages} />
     </div>
   );
 };

@@ -1,8 +1,7 @@
-/* eslint-disable */
-import React, { forwardRef, useEffect, useMemo, useRef } from 'react';
+import React, { forwardRef, useEffect, useRef } from 'react';
 import classNames from 'classnames';
 
-import { TextInput, TextInputProps } from '@patternfly/react-core';
+import { TextInput, type TextInputProps } from '@patternfly/react-core';
 
 type SearchFilterProps = {
   className?: string;
@@ -12,26 +11,26 @@ type SearchFilterProps = {
 const SearchFilter = forwardRef<HTMLInputElement, SearchFilterProps>((props, ref) => {
   const { className, placeholder, ...otherInputProps } = props;
 
-  const defaultRef = useRef<HTMLInputElement>();
+  const defaultRef = useRef<HTMLInputElement>(null);
 
-  const inputRef = useMemo(() => ref ?? defaultRef, [ref]);
+  const inputRef = ref ?? defaultRef;
 
   useEffect(() => {
-    if (!inputRef || !('current' in inputRef) || !inputRef.current) return;
+    const inputElement = typeof inputRef === 'function' ? null : inputRef.current;
 
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === '/' && inputRef.current !== document.activeElement) {
-        inputRef.current.focus();
+    if (!inputElement) return;
+
+    const onKeyDown = (event: KeyboardEvent): void => {
+      if (event.key === '/' && !inputElement.matches(':focus')) {
+        inputElement.focus();
         event.preventDefault();
       }
     };
 
-    inputRef.current.addEventListener('keydown', onKeyDown);
+    inputElement.addEventListener('keydown', onKeyDown);
 
-    return () => {
-      if (!inputRef || !('current' in inputRef) || !inputRef.current) return;
-
-      inputRef.current.removeEventListener('keydown', onKeyDown);
+    return (): void => {
+      inputElement.removeEventListener('keydown', onKeyDown);
     };
   }, [inputRef]);
 

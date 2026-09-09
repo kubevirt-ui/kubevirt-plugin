@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC, FormEvent } from 'react';
+import React, { type FC, type FormEvent } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Flex, Radio } from '@patternfly/react-core';
@@ -16,7 +15,7 @@ type EditorToggleProps = {
 export const EditorToggle: FC<EditorToggleProps> = ({ onChange, value }) => {
   const { t } = useKubevirtTranslation();
 
-  const handleChange = (event: FormEvent<HTMLInputElement>) => {
+  const handleChange = (event: FormEvent<HTMLInputElement>): void => {
     onChange(event?.currentTarget?.value as EditorType);
   };
 

@@ -1,6 +1,10 @@
-/* eslint-disable */
-import React, { ComponentType, FC, useMemo } from 'react';
-import Joyride, { ACTIONS, CallBackProps, EVENTS, TooltipRenderProps } from 'react-joyride';
+import React, { type ComponentType, type FC, useMemo } from 'react';
+import Joyride, {
+  ACTIONS,
+  type CallBackProps,
+  EVENTS,
+  type TooltipRenderProps,
+} from 'react-joyride';
 import { useLocation, useNavigate } from 'react-router';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -14,6 +18,10 @@ import useTour from './hooks/useTour';
 import { getTourSteps } from './utils/constants';
 import { runningTourSignal, stepIndexSignal, tourStepsSeenSignal } from './utils/guidedTourSignals';
 import { handleClose, handleNext, handlePrev } from './utils/utils';
+
+type TourStepData = {
+  route?: string;
+};
 
 const GuidedTour: FC = () => {
   useSignals();
@@ -31,22 +39,22 @@ const GuidedTour: FC = () => {
     <Joyride
       callback={(callbackProps: CallBackProps) => {
         const { action, index, size, step, type } = callbackProps;
-        const route = step?.data?.route;
+        const route = (step?.data as TourStepData | undefined)?.route;
 
         if (typeof step?.target === 'string') {
           document.querySelector(step.target)?.scrollIntoView({ block: 'nearest' });
         }
 
-        const markStepSeen = (stepIndex: number) => {
+        const markStepSeen = (stepIndex: number): void => {
           const mergedSeen = Array.from(
             new Set([
-              ...(quickStarts?.tourStepsSeen || []),
+              ...(quickStarts?.tourStepsSeen ?? []),
               ...tourStepsSeenSignal.value,
               stepIndex,
             ]),
           );
-          if (mergedSeen.length !== (quickStarts?.tourStepsSeen || []).length) {
-            setQuickStarts?.({ ...quickStarts, tourStepsSeen: mergedSeen });
+          if (mergedSeen.length !== (quickStarts?.tourStepsSeen ?? []).length) {
+            void setQuickStarts?.({ ...quickStarts, tourStepsSeen: mergedSeen });
           }
           if (mergedSeen.length !== tourStepsSeenSignal.value.length) {
             tourStepsSeenSignal.value = mergedSeen;

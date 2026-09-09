@@ -1,7 +1,6 @@
-/* eslint-disable */
 import { useMemo } from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import {
   getMaxSuffixLength,
   getMaxVMNameLength,
@@ -9,13 +8,24 @@ import {
 import { getLongestNameLength } from '@kubevirt-utils/resources/shared';
 import { isDNS1123Label } from '@kubevirt-utils/utils/validation';
 
-export const useSuffixValidation = (vms: V1VirtualMachine[], snapshotSuffix: string) => {
+type UseSuffixValidationResult = {
+  isSuffixValid: boolean;
+  isSuffixValidDNS1123Label: boolean;
+  isSuffixValidLength: boolean;
+  maxSuffixLength: number;
+  maxVMNameLength: number;
+};
+
+export const useSuffixValidation = (
+  vms: V1VirtualMachine[],
+  snapshotSuffix: string,
+): UseSuffixValidationResult => {
   const maxSuffixLength = useMemo(() => getMaxSuffixLength(getLongestNameLength(vms)), [vms]);
   const maxVMNameLength = getMaxVMNameLength(snapshotSuffix.length);
 
   const isSuffixValidLength = snapshotSuffix.length <= maxSuffixLength;
   const isSuffixValidDNS1123Label = useMemo(() => isDNS1123Label(snapshotSuffix), [snapshotSuffix]);
-  const isSuffixValid = snapshotSuffix && isSuffixValidLength && isSuffixValidDNS1123Label;
+  const isSuffixValid = Boolean(snapshotSuffix && isSuffixValidLength && isSuffixValidDNS1123Label);
 
   return {
     isSuffixValid,

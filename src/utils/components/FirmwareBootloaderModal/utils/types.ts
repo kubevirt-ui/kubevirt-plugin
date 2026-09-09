@@ -1,9 +1,9 @@
-import { BootMode } from './constants';
+import { type BootMode } from './constants';
 
 export type BootloaderOption = { description: string; title: string; value: string };
 
 export type BootloaderOptionValue =
-  | BootMode.bios
-  | BootMode.ipl
-  | BootMode.uefi
-  | BootMode.uefiSecure;
+  | BootMode.BIOS
+  | BootMode.IPL
+  | BootMode.UEFI
+  | BootMode.UefiSecure;

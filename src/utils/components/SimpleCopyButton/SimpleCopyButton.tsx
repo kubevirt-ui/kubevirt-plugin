@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { ClipboardEvent, FC, MouseEventHandler, useState } from 'react';
+import React, { type ClipboardEvent, type FC, type MouseEventHandler, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Button, clipboardCopyFunc, Tooltip } from '@patternfly/react-core';
@@ -15,7 +14,7 @@ const SimpleCopyButton: FC<SimpleCopyButtonProps> = ({ textToCopy }) => {
   const { t } = useKubevirtTranslation();
   const [copiedState, setCopiedState] = useState<boolean>(false);
 
-  const handleClick = (event: ClipboardEvent<HTMLInputElement>) => {
+  const handleClick = (event: ClipboardEvent<HTMLInputElement>): void => {
     clipboardCopyFunc(event, textToCopy);
     setCopiedState(true);
   };

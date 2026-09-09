@@ -1,11 +1,10 @@
-/* eslint-disable */
 import { useMemo } from 'react';
 
 import useHyperConvergeConfiguration from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 
 import { EVICTION_STRATEGY_DEFAULT } from './constants';
 
-const useHCOEvictionStrategy = (cluster?: string) => {
+const useHCOEvictionStrategy = (cluster?: string): string | undefined => {
   const [hyperConverge, hyperLoaded, hyperLoadingError] = useHyperConvergeConfiguration(cluster);
 
   return useMemo(() => {

@@ -1,7 +1,6 @@
-/* eslint-disable */
-import { Dispatch, SetStateAction, useEffect, useMemo, useState } from 'react';
+import { type Dispatch, type SetStateAction, useEffect, useMemo, useState } from 'react';
 
-import { NetworkAttachmentDefinitionKind } from '@kubevirt-utils/resources/nad/types';
+import { type NetworkAttachmentDefinitionKind } from '@kubevirt-utils/resources/nad/types';
 
 import {
   filterNADsForSelect,
@@ -20,6 +19,14 @@ type UseEditNetworkSelectArgs = {
   vmiNamespace: string;
 };
 
+type UseEditNetworkSelectReturn = {
+  filteredNADs: NetworkAttachmentDefinitionKind[];
+  selectedFirstOnLoad: boolean;
+  selectNetworkName: string;
+  selectTypeaheadKey: string;
+  setSelectedFirstOnLoad: Dispatch<SetStateAction<boolean>>;
+};
+
 const useEditNetworkSelect = ({
   currentlyUsedNADFullNames,
   editInitValueNetworkName,
@@ -29,7 +36,7 @@ const useEditNetworkSelect = ({
   networkName,
   setSubmitDisabled,
   vmiNamespace,
-}: UseEditNetworkSelectArgs) => {
+}: UseEditNetworkSelectArgs): UseEditNetworkSelectReturn => {
   const [selectedFirstOnLoad, setSelectedFirstOnLoad] = useState(Boolean(isEditing));
 
   const filteredNADs = useMemo(

@@ -1,12 +1,11 @@
-/* eslint-disable */
-import React from 'react';
+import React, { type JSX } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Label } from '@patternfly/react-core';
 
 import './new-badge.scss';
 
-const NewBadge = () => {
+const NewBadge = (): JSX.Element => {
   const { t } = useKubevirtTranslation();
   return (
     <Label className={'NewBadge--main'} color="blue" isCompact>

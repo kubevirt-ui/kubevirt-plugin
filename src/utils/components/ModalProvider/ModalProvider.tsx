@@ -1,5 +1,11 @@
-/* eslint-disable */
-import React, { ComponentType, createContext, FC, ReactNode, useContext, useState } from 'react';
+import React, {
+  type ComponentType,
+  createContext,
+  type FC,
+  type ReactNode,
+  useContext,
+  useState,
+} from 'react';
 
 import UploadProgressToastProvider from '@kubevirt-utils/hooks/useUploadProgressToast/UploadProgressToastProvider';
 
@@ -42,18 +48,18 @@ export const ModalContext = createContext<ModalContextType>({});
  *  <ExampleModal isOpen={isOpen} onClose={onClose} appendTo={appendTo} />
  * ))
  */
-export const useModal = () => useContext(ModalContext);
+export const useModal = (): ModalContextType => useContext(ModalContext);
 
 export const useModalValue = (): ModalContextType => {
   const [modal, setModal] = useState<ModalComponent>();
   const [isOpen, setIsOpen] = useState(false);
 
-  const createModal = (newModal: ModalComponent) => {
+  const createModal = (newModal: ModalComponent): void => {
     setIsOpen(true);
     setModal(() => newModal);
   };
 
-  const onClose = () => {
+  const onClose = (): void => {
     setIsOpen(false);
     setModal(undefined);
   };

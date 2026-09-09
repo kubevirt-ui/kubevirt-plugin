@@ -1,5 +1,4 @@
-/* eslint-disable */
-import { TFunction } from 'i18next';
+import { type TFunction } from 'i18next';
 
 import { NetworkInterfaceState } from '@kubevirt-utils/resources/vm/utils/network/types';
 
@@ -22,7 +21,7 @@ export const getNetworkInterfaceStateIcon = (
 ): (typeof interfaceStateIcons)[keyof typeof interfaceStateIcons] =>
   interfaceStateIcons[interfaceState] ?? LinkStateNoDataIcon;
 
-export const describeNetworkState = (t: TFunction, state: NetworkInterfaceState) => {
+export const describeNetworkState = (t: TFunction, state: NetworkInterfaceState): string => {
   switch (state) {
     case NetworkInterfaceState.ABSENT:
       return t('Hot-unplugged');
