@@ -1,16 +1,14 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC, type ReactElement } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isGuestAgentConnected } from '@kubevirt-utils/resources/vmi/utils/guest-agent';
 import { Alert, AlertVariant } from '@patternfly/react-core';
 
 import { DEFAULT_RDP_PORT } from '../utils/constants';
-import { MultusNetworkProps } from '../utils/types';
-
+import { type MultusNetworkProps } from '../utils/types';
 import RDP from './RDP';
 
-const MultusNetwork: FC<MultusNetworkProps> = ({ selectedNetwork, vmi }) => {
+const MultusNetwork: FC<MultusNetworkProps> = ({ selectedNetwork, vmi }): ReactElement => {
   const { t } = useKubevirtTranslation();
   const guestAgent = isGuestAgentConnected(vmi);
 
@@ -22,11 +20,11 @@ const MultusNetwork: FC<MultusNetworkProps> = ({ selectedNetwork, vmi }) => {
     );
   }
 
-  if (!selectedNetwork || !selectedNetwork?.ip) {
+  if (!selectedNetwork?.ip) {
     return (
       <Alert isInline title={t('Networks misconfigured')} variant={AlertVariant.warning}>{`${t(
         'No IP address is reported for network interface',
-      )} ${selectedNetwork?.name || ''}`}</Alert>
+      )} ${selectedNetwork?.name ?? ''}`}</Alert>
     );
   }
 

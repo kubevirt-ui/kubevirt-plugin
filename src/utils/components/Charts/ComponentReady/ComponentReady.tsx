@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC, PropsWithChildren } from 'react';
+import React, { type FC, type PropsWithChildren, type ReactElement } from 'react';
 import { Link } from 'react-router';
 
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
@@ -23,10 +22,10 @@ const ComponentReady: FC<ComponentReadyProps> = ({
   isReady,
   linkToMetrics,
   text,
-}) => {
+}): ReactElement => {
   const { t } = useKubevirtTranslation();
 
-  const renderText = text || getNoDataAvailableMessage(t);
+  const renderText: string = text ?? getNoDataAvailableMessage(t);
 
   return (
     <StateHandler error={error} hasData={isReady} loaded={!isLoading} withBullseye>

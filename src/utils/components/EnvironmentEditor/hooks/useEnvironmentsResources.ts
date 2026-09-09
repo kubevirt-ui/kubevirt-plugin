@@ -1,4 +1,3 @@
-/* eslint-disable */
 import {
   ConfigMapModel,
   modelToGroupVersionKind,
@@ -6,16 +5,16 @@ import {
   ServiceAccountModel,
 } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
-  IoK8sApiCoreV1ConfigMap,
-  IoK8sApiCoreV1Secret,
-  IoK8sApiCoreV1ServiceAccount,
+  type IoK8sApiCoreV1ConfigMap,
+  type IoK8sApiCoreV1Secret,
+  type IoK8sApiCoreV1ServiceAccount,
 } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 
 type UseEnvironmentsResourcesType = {
   configMaps: IoK8sApiCoreV1ConfigMap[];
-  error: any;
+  error: Error | undefined;
   loaded: boolean;
   secrets: IoK8sApiCoreV1Secret[];
   serviceAccounts: IoK8sApiCoreV1ServiceAccount[];

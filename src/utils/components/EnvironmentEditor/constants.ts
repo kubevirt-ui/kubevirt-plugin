@@ -1,8 +1,7 @@
-/* eslint-disable */
 export enum EnvironmentKind {
-  configMap = 'configMap',
-  secret = 'secret',
-  serviceAccount = 'serviceAccount',
+  ConfigMap = 'configMap',
+  Secret = 'secret',
+  ServiceAccount = 'serviceAccount',
 }
 
 export type EnvironmentVariable = {
@@ -12,8 +11,8 @@ export type EnvironmentVariable = {
   serial: string;
 };
 
-export const MapKindToAbbr = {
-  [EnvironmentKind.configMap]: 'CM',
-  [EnvironmentKind.secret]: 'S',
-  [EnvironmentKind.serviceAccount]: 'SA',
+export const MapKindToAbbr: Record<EnvironmentKind, string> = {
+  [EnvironmentKind.ConfigMap]: 'CM',
+  [EnvironmentKind.Secret]: 'S',
+  [EnvironmentKind.ServiceAccount]: 'SA',
 };

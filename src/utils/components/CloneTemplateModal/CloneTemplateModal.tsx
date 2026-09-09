@@ -1,15 +1,15 @@
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 import { FormProvider } from 'react-hook-form';
 
-import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { type V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+import { type K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { ButtonVariant } from '@patternfly/react-core';
 
+import CloneTemplateModalBody from './CloneTemplateModalBody';
 import { CloneTemplateField } from './form/types';
 import useCloneTemplate from './hooks/useCloneTemplate';
-import CloneTemplateModalBody from './CloneTemplateModalBody';
 
 import './clone-template-modal.scss';
 
@@ -28,7 +28,7 @@ const CloneTemplateModal: FC<CloneTemplateModalProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const { form, onSubmit, onTemplateSelected } = useCloneTemplate(obj, onTemplateCloned);
-  const template = form.watch(CloneTemplateField.template);
+  const template = form.watch(CloneTemplateField.Template);
 
   return (
     <FormProvider {...form}>

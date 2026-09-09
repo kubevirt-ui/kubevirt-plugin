@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { modelToGroupVersionKind, StorageClassModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { type IoK8sApiStorageV1StorageClass } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { type EnhancedSelectOptionProps } from '@kubevirt-utils/components/FilterSelect/utils/types';
@@ -22,7 +21,7 @@ export const getSCSelectOptions = (
     const scName = getName(storageClass);
     const defaultSC = isDefaultStorageClass(storageClass) ? t('(default) | ') : '';
     const descriptionAnnotation =
-      getAnnotation(storageClass, DESCRIPTION_ANNOTATION)?.concat(' | ') || '';
+      getAnnotation(storageClass, DESCRIPTION_ANNOTATION)?.concat(' | ') ?? '';
     const scType = storageClass?.parameters?.type
       ? ' | '.concat(storageClass?.parameters?.type)
       : '';

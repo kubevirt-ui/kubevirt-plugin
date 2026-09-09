@@ -88,38 +88,38 @@ export const getAffinityFromRowsData = (
   const affinity = {} as K8sIoApiCoreV1Affinity;
 
   const nodeSelectorTermsRequired = pickRows(
-    AffinityType.node,
-    AffinityCondition.required,
+    AffinityType.Node,
+    AffinityCondition.Required,
     getRequiredNodeTermFromRowData,
   );
 
   const nodeSelectorTermsPreferred = pickRows(
-    AffinityType.node,
-    AffinityCondition.preferred,
+    AffinityType.Node,
+    AffinityCondition.Preferred,
     getPreferredNodeTermFromRowData,
   );
 
   const podAffinityTermsRequired = pickRows(
-    AffinityType.pod,
-    AffinityCondition.required,
+    AffinityType.Pod,
+    AffinityCondition.Required,
     getRequiredPodTermFromRowData,
   );
 
   const podAffinityTermsPreferred = pickRows(
-    AffinityType.pod,
-    AffinityCondition.preferred,
+    AffinityType.Pod,
+    AffinityCondition.Preferred,
     getPreferredPodTermFromRowData,
   );
 
   const antiPodAffinityTermsRequired = pickRows(
-    AffinityType.podAnti,
-    AffinityCondition.required,
+    AffinityType.PodAnti,
+    AffinityCondition.Required,
     getRequiredPodTermFromRowData,
   );
 
   const antiPodAffinityTermsPreferred = pickRows(
-    AffinityType.podAnti,
-    AffinityCondition.preferred,
+    AffinityType.PodAnti,
+    AffinityCondition.Preferred,
     getPreferredPodTermFromRowData,
   );
 

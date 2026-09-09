@@ -1,8 +1,7 @@
-/* eslint-disable */
-import React, { FC, ReactNode } from 'react';
+import React, { type FC, type ReactElement, type ReactNode } from 'react';
 
 import DescriptionItemPopoverContent from '@kubevirt-utils/components/DescriptionItem/DescriptionItemPopoverContent';
-import { OLSPromptType } from '@lightspeed/utils/prompts';
+import { type OLSPromptType } from '@lightspeed/utils/prompts';
 import {
   DescriptionListTerm,
   DescriptionListTermHelpTextButton,
@@ -37,7 +36,7 @@ export const DescriptionItemHeader: FC<DescriptionItemHeaderProps> = ({
   moreInfoURL,
   olsObj,
   promptType,
-}) => {
+}): ReactElement => {
   const requiredIndicator = isRequired && (
     <span aria-hidden="true" className="DescriptionItemHeader--required">
       {ASTERISK}
@@ -59,7 +58,7 @@ export const DescriptionItemHeader: FC<DescriptionItemHeaderProps> = ({
         )}
         hasAutoWidth
         headerContent={descriptionHeader}
-        maxWidth={maxWidth || '30rem'}
+        maxWidth={maxWidth ?? '30rem'}
       >
         <DescriptionListTermHelpTextButton>
           {descriptionHeader}

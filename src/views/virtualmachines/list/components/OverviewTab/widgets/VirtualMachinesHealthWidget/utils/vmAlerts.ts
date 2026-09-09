@@ -12,9 +12,9 @@ export type SeverityUrls = Partial<Record<AlertType, string>>;
 export const getSeverityUrls = (baseUrl?: string): SeverityUrls => {
   if (!baseUrl) return {};
   return {
-    [AlertType.critical]: appendSeverityFilter(baseUrl, AlertType.critical),
-    [AlertType.info]: appendSeverityFilter(baseUrl, AlertType.info),
-    [AlertType.warning]: appendSeverityFilter(baseUrl, AlertType.warning),
+    [AlertType.Critical]: appendSeverityFilter(baseUrl, AlertType.Critical),
+    [AlertType.Info]: appendSeverityFilter(baseUrl, AlertType.Info),
+    [AlertType.Warning]: appendSeverityFilter(baseUrl, AlertType.Warning),
   };
 };
 

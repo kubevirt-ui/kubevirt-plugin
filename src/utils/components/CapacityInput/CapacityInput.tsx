@@ -1,15 +1,13 @@
-/* eslint-disable */
-import React, { ChangeEvent, FC } from 'react';
+import React, { type ChangeEvent, type FC, type ReactElement } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { BinaryUnit } from '@kubevirt-utils/utils/unitConstants';
+import { type BinaryUnit } from '@kubevirt-utils/utils/unitConstants';
 import { addByteSuffix, quantityToString, toQuantity } from '@kubevirt-utils/utils/units';
 import { FormGroup, NumberInput, Split, SplitItem, ValidatedOptions } from '@patternfly/react-core';
 import { SelectOption } from '@patternfly/react-core';
 
 import FormGroupHelperText from '../FormGroupHelperText/FormGroupHelperText';
 import FormPFSelect from '../FormPFSelect/FormPFSelect';
-
 import useUnitOptions from './useUnitOptions';
 import { getErrorValue } from './utils';
 
@@ -34,27 +32,27 @@ const CapacityInput: FC<CapacityInputProps> = ({
   minValue,
   onChange,
   size,
-}) => {
+}): ReactElement => {
   const { t } = useKubevirtTranslation();
 
   const { unit, value } = toQuantity(size) ?? {};
 
-  const onValueChange = (newValue: number) => {
+  const onValueChange = (newValue: number): void => {
     if (!unit) return;
     onChange(quantityToString({ unit, value: newValue }));
   };
 
-  const onUnitChange = (_event: unknown, newUnit: BinaryUnit) => {
+  const onUnitChange = (_event: unknown, newUnit: BinaryUnit): void => {
     if (value === undefined) return;
     onChange(quantityToString({ unit: newUnit, value }));
   };
 
-  const onMinus = () => {
+  const onMinus = (): void => {
     if (value === undefined) return;
     onValueChange(Number.isInteger(value) ? value - 1 : Math.floor(value));
   };
 
-  const onPlus = () => {
+  const onPlus = (): void => {
     if (value === undefined || value >= Number.MAX_SAFE_INTEGER) return;
     onValueChange(Number.isInteger(value) ? value + 1 : Math.ceil(value));
   };

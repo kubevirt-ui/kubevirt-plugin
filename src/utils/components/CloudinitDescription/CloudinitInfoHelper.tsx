@@ -1,12 +1,11 @@
-/* eslint-disable */
-import React from 'react';
+import React, { type ReactElement } from 'react';
 
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Stack, StackItem } from '@patternfly/react-core';
 
-const CloudInitInfoHelper = () => {
+const CloudInitInfoHelper = (): ReactElement => {
   const { t } = useKubevirtTranslation();
   return (
     <Stack className="kv-cloudinit-info-helper--main">

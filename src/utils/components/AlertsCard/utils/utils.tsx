@@ -1,54 +1,58 @@
-/* eslint-disable */
-import React from 'react';
+import React, { type ReactElement } from 'react';
 
 import {
   ALL_ALERTS,
   VIRTUALIZATION_ONLY_ALERTS,
 } from '@kubevirt-utils/components/AlertsCard/utils/constants';
-import { AlertType, SimplifiedAlerts } from '@kubevirt-utils/components/AlertsCard/utils/types';
+import {
+  AlertType,
+  type SimplifiedAlert,
+  type SimplifiedAlerts,
+} from '@kubevirt-utils/components/AlertsCard/utils/types';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { PrometheusLabels } from '@openshift-console/dynamic-plugin-sdk';
+import { type PrometheusLabels } from '@openshift-console/dynamic-plugin-sdk';
 import {
   BlueInfoCircleIcon,
   RedExclamationCircleIcon,
   YellowExclamationTriangleIcon,
 } from '@openshift-console/dynamic-plugin-sdk/lib/app/components/status/icons';
 
-export const labelStatus = {
-  [AlertType.critical]: 'danger',
-  [AlertType.info]: 'info',
-  [AlertType.warning]: 'warning',
+type LabelStatus = 'custom' | 'danger' | 'info' | 'success' | 'warning';
+
+export const labelStatus: Record<string, LabelStatus> = {
+  [AlertType.Critical]: 'danger',
+  [AlertType.Info]: 'info',
+  [AlertType.Warning]: 'warning',
 };
 
-export const labelText = {
-  [AlertType.critical]: t('Critical'),
-  [AlertType.info]: t('Info'),
-  [AlertType.warning]: t('Warning'),
+export const labelText: Record<string, string> = {
+  [AlertType.Critical]: t('Critical'),
+  [AlertType.Info]: t('Info'),
+  [AlertType.Warning]: t('Warning'),
 };
 
-export const alertIcon = {
-  [AlertType.critical]: () => <RedExclamationCircleIcon title="Critical" />,
-  [AlertType.info]: () => <BlueInfoCircleIcon title="Information" />,
-  [AlertType.warning]: () => <YellowExclamationTriangleIcon title="Warning" />,
+export const alertIcon: Record<string, () => ReactElement> = {
+  [AlertType.Critical]: (): ReactElement => <RedExclamationCircleIcon title="Critical" />,
+  [AlertType.Info]: (): ReactElement => <BlueInfoCircleIcon title="Information" />,
+  [AlertType.Warning]: (): ReactElement => <YellowExclamationTriangleIcon title="Warning" />,
 };
 
-export const removeVMAlerts = (sortedAlerts: SimplifiedAlerts) =>
-  Object.entries(sortedAlerts).reduce(
+export const removeVMAlerts = (sortedAlerts: SimplifiedAlerts): SimplifiedAlerts =>
+  (Object.entries(sortedAlerts) as [AlertType, SimplifiedAlert[]][]).reduce<SimplifiedAlerts>(
     (acc, [key, value]) => {
       acc[key] = value?.filter((alert) => !alert?.isVMAlert);
 
       return acc;
     },
-     
-    { critical: [], warning: [], info: [] },
+    { critical: [], info: [], warning: [] } as SimplifiedAlerts,
   );
 
-export const createAlertKey = (activeAt: string, labels: PrometheusLabels) =>
+export const createAlertKey = (activeAt: string, labels: PrometheusLabels): string =>
   [activeAt, labels?.name, labels?.vmName, labels?.pod, labels?.uid, labels?.instance]
     .filter(Boolean)
     .join('-');
 
-export const alertScopeOptions = () => [
+export const alertScopeOptions = (): { description: string; key: string; value: string }[] => [
   {
     description: t('See only virtualization health alerts'),
     key: VIRTUALIZATION_ONLY_ALERTS,

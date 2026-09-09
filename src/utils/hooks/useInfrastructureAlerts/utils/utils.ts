@@ -23,8 +23,8 @@ export const sortAlertsBySeverity = (alerts: Alert[]): AlertsBySeverity =>
       }
       return acc;
     },
-    { [AlertType.critical]: [], [AlertType.info]: [], [AlertType.warning]: [] } as AlertsBySeverity,
-  ) ?? { [AlertType.critical]: [], [AlertType.info]: [], [AlertType.warning]: [] };
+    { [AlertType.Critical]: [], [AlertType.Info]: [], [AlertType.Warning]: [] } as AlertsBySeverity,
+  ) ?? { [AlertType.Critical]: [], [AlertType.Info]: [], [AlertType.Warning]: [] };
 
 export const getNumberOfAlerts = (alerts: AlertsBySeverity): number =>
   Object.values(alerts)?.reduce((acc, alertsForLevel) => acc + (alertsForLevel?.length || 0), 0);

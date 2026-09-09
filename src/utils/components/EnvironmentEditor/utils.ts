@@ -5,13 +5,13 @@ import { EnvironmentKind, type EnvironmentVariable } from './constants';
 
 const getKindFromEnvVolume = (volume: V1Volume): EnvironmentKind | null => {
   if (volume.configMap) {
-    return EnvironmentKind.configMap;
+    return EnvironmentKind.ConfigMap;
   }
   if (volume.secret) {
-    return EnvironmentKind.secret;
+    return EnvironmentKind.Secret;
   }
   if (volume.serviceAccount) {
-    return EnvironmentKind.serviceAccount;
+    return EnvironmentKind.ServiceAccount;
   }
 
   return null;
@@ -69,9 +69,9 @@ const getServiceAccountVolume = (diskName: string, serviceAccountName: string): 
 });
 
 const MapGettersForKind = {
-  [EnvironmentKind.configMap]: getConfigMapVolume,
-  [EnvironmentKind.secret]: getSecretVolume,
-  [EnvironmentKind.serviceAccount]: getServiceAccountVolume,
+  [EnvironmentKind.ConfigMap]: getConfigMapVolume,
+  [EnvironmentKind.Secret]: getSecretVolume,
+  [EnvironmentKind.ServiceAccount]: getServiceAccountVolume,
 };
 
 export const updateVolumeForKind = (

@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC, ReactNode } from 'react';
+import React, { type FC, type ReactElement, type ReactNode } from 'react';
 
 import { AnnotationsModal } from '@kubevirt-utils/components/AnnotationsModal/AnnotationsModal';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
@@ -10,7 +9,7 @@ import { getAnnotations } from '@kubevirt-utils/resources/shared';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
-import { K8sModel } from '@openshift-console/dynamic-plugin-sdk';
+import { type K8sModel } from '@openshift-console/dynamic-plugin-sdk';
 
 type DescriptionItemAnnotationsProps = {
   className?: string;
@@ -18,7 +17,9 @@ type DescriptionItemAnnotationsProps = {
   editable?: boolean;
   label?: string;
   model: K8sModel;
-  onAnnotationsSubmit?: (annotations: { [key: string]: string }) => Promise<any>;
+  onAnnotationsSubmit?: (annotations: {
+    [key: string]: string;
+  }) => Promise<K8sResourceCommon | void>;
   resource: K8sResourceCommon;
 };
 
@@ -30,7 +31,7 @@ const DescriptionItemAnnotations: FC<DescriptionItemAnnotationsProps> = ({
   model,
   onAnnotationsSubmit,
   resource,
-}) => {
+}): ReactElement => {
   const { createModal } = useModal();
   const { t } = useKubevirtTranslation();
   const annotationsCount = Object.keys(getAnnotations(resource, {})).length;
@@ -38,7 +39,9 @@ const DescriptionItemAnnotations: FC<DescriptionItemAnnotationsProps> = ({
     annotationsCount,
   });
 
-  const onAnnotationsSubmitInternal = (updatedAnnotations: { [key: string]: string }) =>
+  const onAnnotationsSubmitInternal = (updatedAnnotations: {
+    [key: string]: string;
+  }): Promise<K8sResourceCommon> =>
     kubevirtK8sPatch({
       cluster: getCluster(resource),
       data: [
@@ -52,7 +55,7 @@ const DescriptionItemAnnotations: FC<DescriptionItemAnnotationsProps> = ({
       resource,
     });
 
-  const onEditClick = () =>
+  const onEditClick = (): void =>
     createModal(({ isOpen, onClose }) => (
       <AnnotationsModal
         isOpen={isOpen}

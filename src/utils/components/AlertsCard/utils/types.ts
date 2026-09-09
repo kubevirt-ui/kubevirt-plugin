@@ -1,8 +1,7 @@
-/* eslint-disable */
 export enum AlertType {
-  critical = 'critical',
-  info = 'info',
-  warning = 'warning',
+  Critical = 'critical',
+  Info = 'info',
+  Warning = 'warning',
 }
 
 export type SimplifiedAlert = {

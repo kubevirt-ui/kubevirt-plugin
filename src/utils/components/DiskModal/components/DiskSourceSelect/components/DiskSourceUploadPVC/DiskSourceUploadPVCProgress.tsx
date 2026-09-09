@@ -1,7 +1,6 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC, type ReactElement } from 'react';
 
-import { DataUpload } from '@kubevirt-utils/hooks/useCDIUpload/types';
+import { type DataUpload } from '@kubevirt-utils/hooks/useCDIUpload/types';
 import {
   getCancelUploadLabel,
   UPLOAD_STATUS,
@@ -19,7 +18,9 @@ import {
   StackItem,
 } from '@patternfly/react-core';
 
-export const DiskSourceUploadPVCProgress: FC<{ upload: DataUpload }> = ({ upload }) => {
+export const DiskSourceUploadPVCProgress: FC<{ upload: DataUpload }> = ({
+  upload,
+}): ReactElement => {
   const { t } = useKubevirtTranslation();
   return (
     <FormGroup fieldId="upload-progress">
@@ -27,9 +28,13 @@ export const DiskSourceUploadPVCProgress: FC<{ upload: DataUpload }> = ({ upload
         <StackItem>
           <Progress
             measureLocation={ProgressMeasureLocation.inside}
-            title={UPLOAD_STATUS_LABELS[upload?.uploadStatus]}
+            title={upload?.uploadStatus ? UPLOAD_STATUS_LABELS[upload.uploadStatus] : ''}
             value={upload?.progress}
-            variant={uploadStatusToProgressVariant[upload?.uploadStatus]}
+            variant={
+              uploadStatusToProgressVariant[
+                upload?.uploadStatus as keyof typeof uploadStatusToProgressVariant
+              ]
+            }
           />
         </StackItem>
         <StackItem>

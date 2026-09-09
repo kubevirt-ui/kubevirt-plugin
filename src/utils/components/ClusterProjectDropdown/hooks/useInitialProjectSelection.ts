@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { useEffect } from 'react';
 
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
@@ -32,7 +31,7 @@ export const useInitialProjectSelection = ({
 
     if (cluster && isEmpty(namespace) && projectLoaded && showProjectDropdown) {
       const defaultProject = projects?.find((project) => project === DEFAULT_NAMESPACE);
-      const selectedProject = defaultProject || projects?.[0] || ALL_PROJECTS;
+      const selectedProject = defaultProject ?? projects?.[0] ?? ALL_PROJECTS;
       onProjectChange(selectedProject);
     }
   }, [

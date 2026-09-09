@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC, type ReactElement } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
 import { getNamespace } from '@kubevirt-utils/resources/shared';
@@ -7,7 +6,6 @@ import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { isRunning } from '@virtualmachines/utils';
 
 import TabModal from '../TabModal/TabModal';
-
 import AdvancedSettings from './components/AdvancedSettings/AdvancedSettings';
 import BootSourceCheckbox from './components/BootSourceCheckbox/BootSourceCheckbox';
 import DiskInterfaceSelect from './components/DiskInterfaceSelect/DiskInterfaceSelect';
@@ -19,7 +17,7 @@ import StorageClassAndPreallocation from './components/StorageClassAndPreallocat
 import { getDefaultCreateValues, getDefaultEditValues } from './utils/form';
 import { diskModalTitle } from './utils/helpers';
 import { submit } from './utils/submit';
-import { SourceTypes, V1DiskFormState, V1SubDiskModalProps } from './utils/types';
+import { SourceTypes, type V1DiskFormState, type V1SubDiskModalProps } from './utils/types';
 
 const BlankDiskModal: FC<V1SubDiskModalProps> = ({
   createDiskSource,
@@ -30,7 +28,7 @@ const BlankDiskModal: FC<V1SubDiskModalProps> = ({
   onSubmit,
   pvc,
   vm,
-}) => {
+}): ReactElement => {
   const isVMRunning = isRunning(vm);
 
   const isEditDisk = !isEmpty(editDiskName);
@@ -39,7 +37,7 @@ const BlankDiskModal: FC<V1SubDiskModalProps> = ({
   const methods = useForm<V1DiskFormState>({
     defaultValues: isEditDisk
       ? getDefaultEditValues(vm, editDiskName)
-      : getDefaultCreateValues(vm, createDiskSource || SourceTypes.BLANK),
+      : getDefaultCreateValues(vm, createDiskSource ?? SourceTypes.BLANK),
     mode: 'all',
   });
 

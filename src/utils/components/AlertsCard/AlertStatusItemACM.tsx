@@ -1,13 +1,11 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC, type ReactElement } from 'react';
 
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Button } from '@patternfly/react-core';
 
 import ExternalLink from '../ExternalLink/ExternalLink';
-
-import { AlertType, SimplifiedAlert } from './utils/types';
+import { AlertType, type SimplifiedAlert } from './utils/types';
 import { alertIcon } from './utils/utils';
 
 import './AlertStatusItem.scss';
@@ -17,15 +15,18 @@ type AlertStatusItemACMProps = {
   alertType: AlertType;
 };
 
-const AlertStatusItemACM: FC<AlertStatusItemACMProps> = ({ alertDetails, alertType }) => {
+const AlertStatusItemACM: FC<AlertStatusItemACMProps> = ({
+  alertDetails,
+  alertType,
+}): ReactElement => {
   const { t } = useKubevirtTranslation();
   const { alertName, externalLink, isVMAlert, link, namespace, vmName } = alertDetails;
   const Icon = alertIcon[alertType];
 
-  const linkText =
-    alertType === AlertType.critical ? t('View alert') : t('View {{alertType}}', { alertType });
+  const linkText: string =
+    alertType === AlertType.Critical ? t('View alert') : t('View {{alertType}}', { alertType });
 
-  const renderAlertLink = () => {
+  const renderAlertLink = (): ReactElement => {
     // For spoke cluster alerts, open external link in new tab
     if (externalLink) {
       return <ExternalLink href={externalLink} text={linkText} />;

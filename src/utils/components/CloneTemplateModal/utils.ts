@@ -1,22 +1,26 @@
-/* eslint-disable */
-import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { type V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { DataVolumeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
-  V1beta1DataVolume,
-  V1beta1DataVolumeSpec,
+  type V1beta1DataVolume,
+  type V1beta1DataVolumeSpec,
 } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
-import { V1beta1DataVolumeSourcePVC } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import {
+  type V1beta1DataVolumeSourcePVC,
+  type V1DataVolumeTemplateSpec,
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import {
   getTemplateVirtualMachineObject,
   isOpenShiftTemplate,
-  Template,
+  type Template,
 } from '@kubevirt-utils/resources/template';
 import { getBootDisk, getDataVolumeTemplates, getVolumes } from '@kubevirt-utils/resources/vm';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sCreate } from '@multicluster/k8sRequests';
 
-const getBootSourceDataVolumeTemplate = (template: V1Template) => {
+const getBootSourceDataVolumeTemplate = (
+  template: V1Template,
+): V1DataVolumeTemplateSpec | undefined => {
   const vm = getTemplateVirtualMachineObject(template);
   const bootDisk = getBootDisk(vm);
   const rootVolume = getVolumes(vm)?.find((volume) => volume.name === bootDisk?.name);
@@ -55,7 +59,11 @@ const produceDataVolume = (
   spec: dataVolumeSpec,
 });
 
-export const cloneStorage = async (template: V1Template, pvcName: string, namespace: string) => {
+export const cloneStorage = async (
+  template: V1Template,
+  pvcName: string,
+  namespace: string,
+): Promise<void> => {
   const rootDiskDataVolumeTemplate = getBootSourceDataVolumeTemplate(template);
   const dataVolume = produceDataVolume(
     pvcName,

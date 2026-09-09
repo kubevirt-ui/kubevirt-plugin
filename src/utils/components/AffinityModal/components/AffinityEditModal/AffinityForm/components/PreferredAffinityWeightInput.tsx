@@ -1,12 +1,18 @@
-/* eslint-disable */
-import React, { Dispatch, FC, SetStateAction, useEffect, useState } from 'react';
+import React, {
+  type Dispatch,
+  type FC,
+  type ReactElement,
+  type SetStateAction,
+  useEffect,
+  useState,
+} from 'react';
 
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import NumberTextInput from '@kubevirt-utils/components/NumberTextInput/NumberTextInput';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FormGroup, ValidatedOptions } from '@patternfly/react-core';
 
-import { AffinityRowData } from '../../../../utils/types';
+import { type AffinityRowData } from '../../../../utils/types';
 
 type PreferredAffinityWeightInputProps = {
   focusedAffinity: AffinityRowData;
@@ -18,14 +24,14 @@ const PreferredAffinityWeightInput: FC<PreferredAffinityWeightInputProps> = ({
   focusedAffinity,
   setFocusedAffinity,
   setSubmitDisabled,
-}) => {
+}): ReactElement => {
   const { t } = useKubevirtTranslation();
   const [isTouched, setIsTouched] = useState(false);
-  const { weight } = focusedAffinity || {};
+  const { weight } = focusedAffinity ?? {};
 
   const isValid = weight >= 1 && weight <= 100;
 
-  const onChange = (value: number) => {
+  const onChange = (value: number): void => {
     setIsTouched(true);
     setFocusedAffinity({ ...focusedAffinity, weight: value });
   };

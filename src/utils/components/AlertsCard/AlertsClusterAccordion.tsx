@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC, useMemo, useState } from 'react';
+import React, { type FC, type ReactElement, useMemo, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
@@ -11,8 +10,8 @@ import {
   Label,
 } from '@patternfly/react-core';
 
-import { AlertType, SimplifiedAlert } from './utils/types';
 import AlertStatusItemACM from './AlertStatusItemACM';
+import { type AlertType, type SimplifiedAlert } from './utils/types';
 
 import './AlertsCard.scss';
 
@@ -24,10 +23,8 @@ type AlertsClusterAccordionProps = {
 // Group alerts by cluster name
 const groupAlertsByCluster = (alerts: SimplifiedAlert[]): Record<string, SimplifiedAlert[]> => {
   return alerts?.reduce<Record<string, SimplifiedAlert[]>>((acc, alert) => {
-    const clusterKey = alert?.cluster || '';
-    if (!acc[clusterKey]) {
-      acc[clusterKey] = [];
-    }
+    const clusterKey: string = alert?.cluster ?? '';
+    acc[clusterKey] ??= [];
     acc[clusterKey].push(alert);
     return acc;
   }, {});
@@ -40,14 +37,20 @@ const groupAlertsByCluster = (alerts: SimplifiedAlert[]): Record<string, Simplif
  * @param root0.alerts
  * @param root0.alertType
  */
-const AlertsClusterAccordion: FC<AlertsClusterAccordionProps> = ({ alerts, alertType }) => {
+const AlertsClusterAccordion: FC<AlertsClusterAccordionProps> = ({
+  alerts,
+  alertType,
+}): ReactElement => {
   const { t } = useKubevirtTranslation();
   const [expandedClusters, setExpandedClusters] = useState<Record<string, boolean>>({});
 
   const alertsByCluster = useMemo(() => groupAlertsByCluster(alerts), [alerts]);
-  const clusterNames = useMemo(() => Object.keys(alertsByCluster).sort(), [alertsByCluster]);
+  const clusterNames = useMemo(
+    () => Object.keys(alertsByCluster).sort((a, b) => a.localeCompare(b)),
+    [alertsByCluster],
+  );
 
-  const toggleClusterAccordion = (clusterName: string) => {
+  const toggleClusterAccordion = (clusterName: string): void => {
     setExpandedClusters((prev) => ({
       ...prev,
       [clusterName]: !prev[clusterName],
@@ -71,7 +74,7 @@ const AlertsClusterAccordion: FC<AlertsClusterAccordionProps> = ({ alerts, alert
                 {t('Cluster: {{clusterName}}', { clusterName })}
               </span>
               <Label className="alerts-card__cluster-toggle--label" isCompact>
-                {clusterAlerts?.length || 0}
+                {clusterAlerts?.length ?? 0}
               </Label>
             </AccordionToggle>
             <Divider />

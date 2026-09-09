@@ -1,4 +1,3 @@
-/* eslint-disable */
 import {
   cpuManagerLabelKey,
   cpuManagerLabelValue,
@@ -6,5 +5,5 @@ import {
 import { getSearchLabelHREF } from '@kubevirt-utils/components/Labels/utils';
 import { NodeModel } from '@kubevirt-utils/models';
 
-export const getDedicatedResourcesSearchHREF = (cluster?: string) =>
+export const getDedicatedResourcesSearchHREF = (cluster?: string): string =>
   getSearchLabelHREF(NodeModel.kind, cpuManagerLabelKey, cpuManagerLabelValue, cluster);
