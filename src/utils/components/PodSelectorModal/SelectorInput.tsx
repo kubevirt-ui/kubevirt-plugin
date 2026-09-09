@@ -1,5 +1,12 @@
-/* eslint-disable */
-import React, { ChangeEvent, FC, InputHTMLAttributes, useEffect, useRef, useState } from 'react';
+import React, {
+  type ChangeEvent,
+  type FC,
+  type InputHTMLAttributes,
+  type ReactNode,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import TagsInput from 'react-tagsinput';
 import classNames from 'classnames';
 
@@ -7,6 +14,13 @@ import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Label as PfLabel } from '@patternfly/react-core';
 
 import { cleanSelectorStr, cleanTags, isTagValid } from './selectorUtils';
+
+type RenderTagProps = {
+  getTagDisplayValue: (tagValue: string) => string;
+  key: number;
+  onRemove: (tagKey: number) => void;
+  tag: string;
+};
 
 type SelectorInputProps = {
   autoFocus?: boolean;
@@ -38,12 +52,12 @@ const SelectorInput: FC<SelectorInputProps> = ({
     }
   }, [initialTags, tags]);
 
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>): void => {
     const value = e.target.value;
     setInputValue(value);
   };
 
-  const handleChange = (newTagsInput: string[], changed: string[]) => {
+  const handleChange = (newTagsInput: string[], changed: string[]): void => {
     const newTag = changed?.[0];
 
     if (!isTagValid(newTag, isBasic)) {
@@ -68,7 +82,7 @@ const SelectorInput: FC<SelectorInputProps> = ({
     'data-test': 'tags-input',
     id: 'tags-input',
     onChange: handleInputChange,
-    placeholder: isEmpty(tags) ? placeholder || 'app=frontend' : '',
+    placeholder: isEmpty(tags) ? (placeholder ?? 'app=frontend') : '',
     spellCheck: 'false',
     value: inputValue,
     ...inputProps,
@@ -78,7 +92,7 @@ const SelectorInput: FC<SelectorInputProps> = ({
     <div className="pf-v6-c-form-control">
       <tags-input>
         <TagsInput
-          renderTag={({ getTagDisplayValue, key, onRemove, tag }: any) => (
+          renderTag={({ getTagDisplayValue, key, onRemove, tag }: RenderTagProps): ReactNode => (
             <PfLabel
               className={classNames('co-label tag-item-content', labelClassName)}
               data-test={`label=${key}`}

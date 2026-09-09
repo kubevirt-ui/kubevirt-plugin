@@ -1,23 +1,22 @@
-/* eslint-disable */
 import { TOUR_GUIDE_VM_TREE_ID } from './constants';
 import { nextStep, prevStep, tourContextMenuTriggerSignal } from './guidedTourSignals';
 
 export const CONTEXT_MENU_STEP_INDEX = 1;
 
-export const openContextMenu = () => {
+export const openContextMenu = (): void => {
   tourContextMenuTriggerSignal.value = document.getElementById(TOUR_GUIDE_VM_TREE_ID);
 };
 
-export const closeContextMenu = () => {
+export const closeContextMenu = (): void => {
   tourContextMenuTriggerSignal.value = null;
 };
 
-export const handleClose = (resetTour: () => void) => {
+export const handleClose = (resetTour: () => void): void => {
   closeContextMenu();
   resetTour();
 };
 
-export const handlePrev = (currentIndex: number) => {
+export const handlePrev = (currentIndex: number): void => {
   if (currentIndex === CONTEXT_MENU_STEP_INDEX) {
     closeContextMenu();
     prevStep();
@@ -31,7 +30,7 @@ export const handlePrev = (currentIndex: number) => {
   prevStep();
 };
 
-export const handleNext = (currentIndex: number, size: number, resetTour: () => void) => {
+export const handleNext = (currentIndex: number, size: number, resetTour: () => void): void => {
   if (currentIndex === CONTEXT_MENU_STEP_INDEX - 1) {
     openContextMenu();
     nextStep();

@@ -1,27 +1,25 @@
-/* eslint-disable */
-import React, { FC, useEffect, useMemo, useState } from 'react';
+import React, { type FC, useEffect, useMemo, useState } from 'react';
 import { NavLink, Route, Routes, useLocation, useParams } from 'react-router';
 import classNames from 'classnames';
 import { VirtualMachineModel } from 'src/views/dashboard-extensions/utils';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { logVMDetailTabViewed } from '@kubevirt-utils/extensions/telemetry/dashboard';
-import { VMDetailTabTelemetry } from '@kubevirt-utils/extensions/telemetry/utils/types';
+import { type VMDetailTabTelemetry } from '@kubevirt-utils/extensions/telemetry/utils/types';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { isVMWizardURL } from '@multicluster/urls';
 import { Badge } from '@patternfly/react-core';
 
 import StateHandler from '../StateHandler/StateHandler';
-
 import useDynamicPages from './utils/useDynamicPages';
-import { NavPageKubevirt, trimLastHistoryPath } from './utils/utils';
+import { type NavPageKubevirt, trimLastHistoryPath } from './utils/utils';
 
 import './HorizontalNavbar.scss';
 
 type HorizontalNavbarProps = {
   basePath?: string;
-  error?: any;
+  error?: unknown;
   instanceTypeExpandedSpec?: V1VirtualMachine;
   loaded: boolean;
   pages: NavPageKubevirt[];
@@ -49,6 +47,8 @@ const HorizontalNavbar: FC<HorizontalNavbarProps> = ({
 
   const paths = useMemo(() => allPages.map((page) => page.href), [allPages]);
 
+  const [activeItem, setActiveItem] = useState<number | string>();
+
   useEffect(() => {
     const defaultPage = allPages.find(({ href }) => isEmpty(href));
 
@@ -56,12 +56,10 @@ const HorizontalNavbar: FC<HorizontalNavbarProps> = ({
       allPages.find(
         ({ href }) =>
           !isEmpty(href) && location?.pathname?.replace(basePath, '').includes('/' + href),
-      ) || defaultPage;
+      ) ?? defaultPage;
 
     setActiveItem(initialActiveTab?.name?.toLowerCase());
   }, [allPages, location?.pathname, basePath]);
-
-  const [activeItem, setActiveItem] = useState<number | string>();
 
   const RoutesComponents = allPages.map((page) => {
     const Component = page.component;

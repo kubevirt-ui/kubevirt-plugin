@@ -1,7 +1,17 @@
-/* eslint-disable */
 export type LineRange = { end: number; start: number };
 
-const getLineFromPath = (resourceYAML: string, path): LineRange => {
+type EditorSelection = {
+  endColumn: number;
+  endLineNumber: number;
+  positionColumn: number;
+  positionLineNumber: number;
+  selectionStartColumn: number;
+  selectionStartLineNumber: number;
+  startColumn: number;
+  startLineNumber: number;
+};
+
+const getLineFromPath = (resourceYAML: string, path: string): LineRange | undefined => {
   const yamlLines = resourceYAML.split('\n');
   const range = { end: yamlLines.length - 1, start: 0 };
 
@@ -11,7 +21,7 @@ const getLineFromPath = (resourceYAML: string, path): LineRange => {
     const property = properties[propertyDepth];
 
     // at every iteration, go one level deeper, remove initial indentation for that range.
-    const replaceIndentationRegex = new RegExp(`^[ ]{${2 * parseInt(propertyDepth)}}`);
+    const replaceIndentationRegex = new RegExp(`^[ ]{${2 * parseInt(propertyDepth, 10)}}`);
 
     const rangeLines = yamlLines
       .slice(range.start + 1, range.end)
@@ -47,9 +57,9 @@ export const getLinesToHighlight = (
 ): LineRange[] =>
   pathsToHighlight
     .map((path) => getLineFromPath(resourceYAML, path))
-    .filter((highlightLine) => !!highlightLine);
+    .filter((highlightLine): highlightLine is LineRange => highlightLine !== undefined);
 
-export const createSelection = (range: LineRange) => ({
+export const createSelection = (range: LineRange): EditorSelection => ({
   endColumn: 0,
   endLineNumber: range.end + 1,
   positionColumn: 0,

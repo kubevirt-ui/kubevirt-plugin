@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC, MouseEvent, useState } from 'react';
+import React, { type FC, type MouseEvent, useState } from 'react';
 
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -8,7 +7,7 @@ import {
   WORKLOADS_DESCRIPTIONS,
   WORKLOADS_LABELS,
 } from '@kubevirt-utils/resources/template';
-import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+import { type K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { FormGroup } from '@patternfly/react-core';
 import { SelectOption } from '@patternfly/react-core';
 
@@ -30,7 +29,7 @@ const WorkloadProfileModal: FC<WorkloadProfileModalProps> = ({
   const { t } = useKubevirtTranslation();
   const [workload, setWorkload] = useState<WORKLOADS>(initialWorkload || WORKLOADS.desktop);
 
-  const handleChange = (event: MouseEvent<HTMLSelectElement>, value: WORKLOADS) => {
+  const handleChange = (event: MouseEvent<HTMLSelectElement>, value: WORKLOADS): void => {
     event.preventDefault();
     setWorkload(value);
   };

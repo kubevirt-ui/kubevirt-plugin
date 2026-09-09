@@ -1,10 +1,9 @@
-/* eslint-disable */
-import { IDLabel } from './types';
+import { type IDLabel } from './types';
 
 export const nodeSelectorToIDLabels = (nodeSelector: { [key: string]: string }): IDLabel[] =>
   Object.entries(nodeSelector || {}).map(([key, value], id) => ({ id, key, value }));
 
-export const isEqualObject = (object, otherObject) => {
+export const isEqualObject = (object: unknown, otherObject: unknown): boolean => {
   if (object === otherObject) {
     return true;
   }
@@ -13,23 +12,29 @@ export const isEqualObject = (object, otherObject) => {
     return false;
   }
 
-  if (object?.constructor !== otherObject?.constructor) {
+  if (typeof object !== 'object' || typeof otherObject !== 'object') {
     return false;
   }
 
-  if (typeof object !== 'object') {
+  if (object.constructor !== otherObject.constructor) {
     return false;
   }
 
-  const objectKeys = Object.keys(object);
-  const otherObjectKeys = Object.keys(otherObject);
+  const objectRecord = object as Record<string, unknown>;
+  const otherObjectRecord = otherObject as Record<string, unknown>;
+
+  const objectKeys = Object.keys(objectRecord);
+  const otherObjectKeys = Object.keys(otherObjectRecord);
 
   if (objectKeys.length !== otherObjectKeys.length) {
     return false;
   }
 
   for (const key of objectKeys) {
-    if (!otherObjectKeys.includes(key) || !isEqualObject(object[key], otherObject[key])) {
+    if (
+      !otherObjectKeys.includes(key) ||
+      !isEqualObject(objectRecord[key], otherObjectRecord[key])
+    ) {
       return false;
     }
   }

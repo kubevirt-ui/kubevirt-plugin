@@ -1,31 +1,44 @@
-/* eslint-disable */
-import { useEffect, useRef, useState } from 'react';
+import {
+  type Dispatch,
+  type RefObject,
+  type SetStateAction,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 
-import { KeyEventMap, KeyEventModes, textInputKeyHandler } from '../constants';
+import { type KeyEventMap, KeyEventModes, textInputKeyHandler } from '../constants';
 
 /**
  * Use this hook for components that require visibility only
  * when the user is actively interacting with the document.
  */
 
+type UseDocumentListenerReturn<T extends HTMLElement> = {
+  ref: RefObject<T | null>;
+  setVisible: Dispatch<SetStateAction<boolean>>;
+  visible: boolean;
+};
+
 export const useDocumentListener = <T extends HTMLElement>(
   keyEventMap: KeyEventMap = textInputKeyHandler,
-) => {
+): UseDocumentListenerReturn<T> => {
   const [visible, setVisible] = useState(true);
   const ref = useRef<T>(null);
 
-  const handleEvent = (e) => {
-    if (!ref?.current?.contains(e.target)) {
+  const handleEvent = (e: MouseEvent): void => {
+    if (!ref?.current?.contains(e.target as Node)) {
       setVisible(false);
     }
   };
 
-  const handleKeyEvents = (e) => {
-    const { nodeName } = e.target;
+  const handleKeyEvents = (e: KeyboardEvent): void => {
+    const target = e.target;
+    const nodeName = target instanceof Element ? target.nodeName : '';
     switch (keyEventMap[e.key]) {
       case KeyEventModes.HIDE:
         setVisible(false);
-        ref.current.blur();
+        ref.current?.blur();
         break;
       case KeyEventModes.FOCUS:
         if (
@@ -34,7 +47,7 @@ export const useDocumentListener = <T extends HTMLElement>(
           nodeName !== 'INPUT' &&
           nodeName !== 'TEXTAREA'
         ) {
-          ref.current.focus();
+          ref.current?.focus();
           e.preventDefault();
         }
         break;
@@ -46,7 +59,7 @@ export const useDocumentListener = <T extends HTMLElement>(
   useEffect(() => {
     document.addEventListener('click', handleEvent, true);
     document.addEventListener('keydown', handleKeyEvents, true);
-    return () => {
+    return (): void => {
       document.removeEventListener('click', handleEvent, true);
       document.removeEventListener('keydown', handleKeyEvents, true);
     };

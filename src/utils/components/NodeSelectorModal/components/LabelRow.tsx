@@ -1,17 +1,16 @@
-/* eslint-disable */
-import React, { ClipboardEvent, FC } from 'react';
+import React, { type ClipboardEvent, type FC } from 'react';
 
 import PlainIconButton from '@kubevirt-utils/components/HardwareDevices/form/PlainIconButton';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FormGroup, GridItem, TextInput } from '@patternfly/react-core';
 import { MinusCircleIcon } from '@patternfly/react-icons';
 
-import { IDLabel } from '../utils/types';
+import { type IDLabel } from '../utils/types';
 
 type LabelRowProps = {
   label: IDLabel;
   onChange: (label: IDLabel) => void;
-  onDelete: (id: any) => void;
+  onDelete: (id: number) => void;
   withKeyValueTitle?: boolean;
 };
 

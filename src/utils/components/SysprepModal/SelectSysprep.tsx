@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
 import { ConfigMapModel, modelToGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -8,7 +7,6 @@ import { Alert, AlertVariant, Button, ButtonVariant } from '@patternfly/react-co
 
 import InlineFilterSelect from '../FilterSelect/InlineFilterSelect';
 import Loading from '../Loading/Loading';
-
 import useSysprepConfigMaps from './hooks/useConfigMaps';
 
 type SelectSysprepProps = {

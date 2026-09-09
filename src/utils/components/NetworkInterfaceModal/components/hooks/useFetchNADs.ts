@@ -10,10 +10,8 @@ import { resources, watchResourceIfAllowed } from './utils';
 
 export const useFetchNADs = (
   namespace: string,
-  cluster: string,
-  // K8s watch errors are untyped from the Console SDK.
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- propagated to useNADsData consumers
-): [data: NetworkAttachmentDefinitionKind[], loaded: boolean, error: any] => {
+  cluster?: string,
+): [data: NetworkAttachmentDefinitionKind[], loaded: boolean, error: Error | undefined] => {
   const allowMap = useNADListPermissions(cluster);
   const [namespaceData, namespaceLoaded, namespaceLoadError] = useK8sWatchData<
     NetworkAttachmentDefinitionKind[]

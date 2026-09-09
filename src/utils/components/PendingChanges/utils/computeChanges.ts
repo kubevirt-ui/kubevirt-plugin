@@ -1,4 +1,3 @@
-/* eslint-disable */
 import {
   type V1VirtualMachine,
   type V1VirtualMachineInstance,
@@ -35,7 +34,7 @@ export const checkCPUMemoryChanged = (
   const vmMemory = getMemory(vm);
   const vmCPUSockets = getCPUSockets(vm);
 
-  const vmiMemory = getMemory(vmi) || '';
+  const vmiMemory = getMemory(vmi) ?? '';
   const vmiCPUSockets = getCPUSockets(vmi);
 
   return vmMemory !== vmiMemory || vmCPUSockets !== vmiCPUSockets;

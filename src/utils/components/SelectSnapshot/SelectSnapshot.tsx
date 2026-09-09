@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC, useCallback, useEffect, useMemo } from 'react';
+import React, { type FC, useCallback, useEffect, useMemo } from 'react';
 
 import {
   modelToGroupVersionKind,
@@ -14,7 +13,6 @@ import { initialBootableVolumeState } from '../AddBootableVolumeModal/consts';
 import ErrorAlert from '../ErrorAlert/ErrorAlert';
 import InlineFilterSelect from '../FilterSelect/InlineFilterSelect';
 import Loading from '../Loading/Loading';
-
 import useSnapshots from './useSnapshots';
 
 import './select-snapshot.scss';
@@ -37,12 +35,14 @@ const SelectSnapshot: FC<SelectSnapshotProps> = ({
   snapshotNamespaceSelected,
 }) => {
   const { t } = useKubevirtTranslation();
-  const { error, projectsLoaded, projectsWithSnapshots, snapshots, snapshotsLoaded } =
-    useSnapshots(snapshotNamespaceSelected, cluster);
+  const { error, projectsLoaded, projectsWithSnapshots, snapshots, snapshotsLoaded } = useSnapshots(
+    snapshotNamespaceSelected,
+    cluster,
+  );
 
   const onSelectProject = useCallback(
     (newProject) => {
-      selectSnapshotNamespace && selectSnapshotNamespace(newProject);
+      selectSnapshotNamespace?.(newProject);
       selectSnapshotName(undefined);
       setDiskSize?.(initialBootableVolumeState.size);
     },
@@ -62,7 +62,10 @@ const SelectSnapshot: FC<SelectSnapshotProps> = ({
   }, [snapshotNameSelected, snapshotsLoaded, getSnapshotSize, setDiskSize]);
 
   const snapshotNames = useMemo(
-    () => snapshots?.map((snapshot) => getName(snapshot))?.sort((a, b) => a?.localeCompare(b)),
+    () =>
+      snapshots
+        ?.map((snapshot) => getName(snapshot))
+        ?.sort((a, b) => (a ?? '').localeCompare(b ?? '')),
     [snapshots],
   );
 

@@ -1,15 +1,14 @@
-/* eslint-disable */
-import React, { FC, useMemo } from 'react';
+import React, { type FC, useMemo } from 'react';
 import produce from 'immer';
 
 import { NodeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { IoK8sApiCoreV1Node } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type IoK8sApiCoreV1Node } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import {
-  K8sIoApiCoreV1Toleration,
+  type K8sIoApiCoreV1Toleration,
   K8sIoApiCoreV1TolerationEffectEnum,
   K8sIoApiCoreV1TolerationOperatorEnum,
-  V1VirtualMachine,
-  V1VirtualMachineInstance,
+  type V1VirtualMachine,
+  type V1VirtualMachineInstance,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import LabelsList from '@kubevirt-utils/components/NodeSelectorModal/components/LabelList';
 import NodeCheckerAlert from '@kubevirt-utils/components/NodeSelectorModal/components/NodeCheckerAlert';
@@ -21,11 +20,11 @@ import { getTolerations } from '@kubevirt-utils/resources/vm';
 import { ensurePath, isEmpty } from '@kubevirt-utils/utils/utils';
 import { ModalVariant, Stack, StackItem } from '@patternfly/react-core';
 
-import { TolerationLabel } from './utils/constants';
-import { getNodeTaintQualifier } from './utils/helpers';
 import TolerationEditRow from './TolerationEditRow';
 import TolerationListHeaders from './TolerationListHeaders';
 import TolerationModalDescriptionText from './TolerationModalDescriptionText';
+import { type TolerationLabel } from './utils/constants';
+import { getNodeTaintQualifier } from './utils/helpers';
 
 type TolerationsModalProps = {
   isOpen: boolean;
@@ -53,14 +52,14 @@ const TolerationsModal: FC<TolerationsModalProps> = ({
     onEntityChange: onTolerationChange,
     onEntityDelete: onTolerationDelete,
   } = useIDEntities<TolerationLabel>(
-    (getTolerations(vm) || []).map((toleration, id) => ({ ...toleration, id })),
+    (getTolerations(vm) ?? []).map((toleration, id) => ({ ...toleration, id })),
   );
 
   const tolerationLabelsEmpty = tolerationsLabels?.length === 0;
 
   const qualifiedNodes = getNodeTaintQualifier(nodes, nodesLoaded, tolerationsLabels);
 
-  const onSelectorLabelAdd = () =>
+  const onSelectorLabelAdd = (): void =>
     onTolerationAdd({
       effect: K8sIoApiCoreV1TolerationEffectEnum.NoSchedule,
       id: null,

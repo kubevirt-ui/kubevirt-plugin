@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -7,8 +6,8 @@ import MulticlusterResourceLink from '@multicluster/components/MulticlusterResou
 import { getCluster } from '@multicluster/helpers/selectors';
 import {
   getGroupVersionKindForResource,
-  K8sResourceCommon,
-  OwnerReference,
+  type K8sResourceCommon,
+  type OwnerReference,
 } from '@openshift-console/dynamic-plugin-sdk';
 
 type OwnerReferencesProps = {
@@ -17,7 +16,7 @@ type OwnerReferencesProps = {
 
 const OwnerReferences: FC<OwnerReferencesProps> = ({ obj }) => {
   const { t } = useKubevirtTranslation();
-  const ownerReferences = (obj?.metadata?.ownerReferences || [])?.map(
+  const ownerReferences = (obj?.metadata?.ownerReferences ?? [])?.map(
     (ownerRef: OwnerReference) => (
       <MulticlusterResourceLink
         cluster={getCluster(obj)}

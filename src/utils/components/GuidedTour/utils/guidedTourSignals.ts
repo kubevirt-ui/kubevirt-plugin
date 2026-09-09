@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { signal } from '@preact/signals-react';
 
 export const runningTourSignal = signal(false);
@@ -8,11 +7,11 @@ export const tourContextMenuTriggerSignal = signal<HTMLElement | null>(null);
 export const dismissOnboardingPopoverByWelcomeModalSignal = signal(false);
 export const tourStepsSeenSignal = signal<number[]>([]);
 
-export const nextStep = () => {
+export const nextStep = (): void => {
   stepIndexSignal.value++;
 };
 
-export const prevStep = () => {
+export const prevStep = (): void => {
   if (stepIndexSignal.value > 0) {
     --stepIndexSignal.value;
   }

@@ -1,10 +1,9 @@
-/* eslint-disable */
-import React, { FC, useMemo } from 'react';
+import React, { type FC, useMemo } from 'react';
 import produce from 'immer';
 
 import { NodeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { IoK8sApiCoreV1Node } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type IoK8sApiCoreV1Node } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getNodeSelector } from '@kubevirt-utils/resources/vm';
@@ -16,7 +15,7 @@ import NodeCheckerAlert from './components/NodeCheckerAlert';
 import { useIDEntities } from './hooks/useIDEntities';
 import { useNodeLabelQualifier } from './hooks/useNodeLabelQualifier';
 import { isEqualObject, nodeSelectorToIDLabels } from './utils/helpers';
-import { IDLabel } from './utils/types';
+import { type IDLabel } from './utils/types';
 
 type NodeSelectorModalProps = {
   isOpen: boolean;
@@ -45,14 +44,12 @@ const NodeSelectorModal: FC<NodeSelectorModalProps> = ({
 
   const qualifiedNodes = useNodeLabelQualifier(nodes, nodesLoaded, selectorLabels);
 
-  const onSelectorLabelAdd = () => onLabelAdd({ id: null, key: '', value: '' });
+  const onSelectorLabelAdd = (): void => onLabelAdd({ id: null, key: '', value: '' });
 
   const updatedVirtualMachine = useMemo(() => {
     const updatedVM = produce<V1VirtualMachine>(vm, (vmDraft: V1VirtualMachine) => {
       ensurePath(vmDraft, ['spec.template.spec.nodeSelector']);
-      if (!vmDraft.spec.template.spec.nodeSelector) {
-        vmDraft.spec.template.spec.nodeSelector = {};
-      }
+      vmDraft.spec.template.spec.nodeSelector ??= {};
 
       const k8sSelector: { [key: string]: string } = selectorLabels.reduce(
         (acc, { key, value }) => {

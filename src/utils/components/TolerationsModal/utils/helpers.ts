@@ -1,18 +1,17 @@
-/* eslint-disable */
-import { IoK8sApiCoreV1Node } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type IoK8sApiCoreV1Node } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 
-import { TolerationLabel } from '../utils/constants';
+import { type TolerationLabel } from '../utils/constants';
 
 export const getNodeTaintQualifier = <T extends TolerationLabel = TolerationLabel>(
   nodes: IoK8sApiCoreV1Node[],
   isNodesLoaded: boolean,
   constraints: T[],
-): IoK8sApiCoreV1Node[] => {
+): IoK8sApiCoreV1Node[] | undefined => {
   const filteredConstraints = constraints.filter(Boolean);
   if (!isEmpty(filteredConstraints) && isNodesLoaded) {
-    const suitableNodes = (nodes || [])?.filter((node) => {
-      const nodeTaints = node?.spec?.taints || [];
+    const suitableNodes = (nodes ?? [])?.filter((node) => {
+      const nodeTaints = node?.spec?.taints ?? [];
       // we check for every constraint if the node has the required taint
       const isConstraintsExistInNodeTaints = filteredConstraints.every(({ effect, key, value }) =>
         nodeTaints.some((taint) => {
