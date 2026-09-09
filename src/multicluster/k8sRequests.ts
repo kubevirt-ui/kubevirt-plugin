@@ -1,4 +1,3 @@
-/* eslint-disable */
 import {
   k8sCreate,
   k8sDelete,
@@ -8,36 +7,38 @@ import {
   k8sUpdate,
 } from '@openshift-console/dynamic-plugin-sdk';
 import {
-  Fleet,
+  type Fleet,
   fleetK8sCreate,
-  FleetK8sCreateUpdateOptions,
+  type FleetK8sCreateUpdateOptions,
   fleetK8sDelete,
-  FleetK8sDeleteOptions,
+  type FleetK8sDeleteOptions,
   fleetK8sGet,
-  FleetK8sGetOptions,
+  type FleetK8sGetOptions,
   fleetK8sListItems,
-  FleetK8sListOptions,
+  type FleetK8sListOptions,
   fleetK8sPatch,
-  FleetK8sPatchOptions,
+  type FleetK8sPatchOptions,
   fleetK8sUpdate,
   getFleetK8sAPIPath,
 } from '@stolostron/multicluster-sdk';
 
 import { BASE_K8S_API_PATH } from './constants';
+import { getCluster } from './helpers/selectors';
 
-export const getKubevirtBaseAPIPath = async (cluster?: string) => {
+export const getKubevirtBaseAPIPath = async (cluster?: string): Promise<string> => {
   if (!cluster) return BASE_K8S_API_PATH;
 
-  return await getFleetK8sAPIPath(cluster);
+  return getFleetK8sAPIPath(cluster);
 };
 
 export const kubevirtK8sPatch = async <R extends K8sResourceCommon>(
   options: FleetK8sPatchOptions<R>,
 ): Promise<R> => {
-  if (options?.cluster || options?.resource?.cluster) {
+  const cluster = options?.cluster ?? getCluster(options?.resource);
+  if (cluster) {
     const object = await fleetK8sPatch<R>(options);
 
-    if (object) object.cluster = options?.cluster || options?.resource?.cluster;
+    if (object) object.cluster = cluster;
     return object;
   }
 
@@ -47,10 +48,11 @@ export const kubevirtK8sPatch = async <R extends K8sResourceCommon>(
 export const kubevirtK8sUpdate = async <R extends K8sResourceCommon>(
   options: FleetK8sCreateUpdateOptions<R>,
 ): Promise<R> => {
-  if (options?.cluster || options?.data?.cluster) {
+  const cluster = options?.cluster ?? getCluster(options?.data);
+  if (cluster) {
     const object = await fleetK8sUpdate<R>(options);
 
-    if (object) object.cluster = options?.cluster || options?.data?.cluster;
+    if (object) object.cluster = cluster;
     return object;
   }
 
@@ -64,7 +66,7 @@ export const kubevirtK8sGet = async <R extends K8sResourceCommon>(
     const object = await fleetK8sGet<R>(options);
 
     if (object) {
-      object.cluster = options?.cluster;
+      object.cluster = options.cluster;
     }
     return object;
   }
@@ -75,10 +77,11 @@ export const kubevirtK8sGet = async <R extends K8sResourceCommon>(
 export const kubevirtK8sDelete = async <R extends K8sResourceCommon>(
   options: FleetK8sDeleteOptions<R>,
 ): Promise<R> => {
-  if (options?.cluster || options?.resource?.cluster) {
+  const cluster = options?.cluster ?? getCluster(options?.resource);
+  if (cluster) {
     const object = await fleetK8sDelete<R>(options);
 
-    if (object) object.cluster = options?.cluster || options?.resource?.cluster;
+    if (object) object.cluster = cluster;
     return object;
   }
 
@@ -88,10 +91,11 @@ export const kubevirtK8sDelete = async <R extends K8sResourceCommon>(
 export const kubevirtK8sCreate = async <R extends K8sResourceCommon>(
   options: FleetK8sCreateUpdateOptions<R>,
 ): Promise<R> => {
-  if (options?.cluster || options?.data?.cluster) {
+  const cluster = options?.cluster ?? getCluster(options?.data);
+  if (cluster) {
     const object = await fleetK8sCreate<R>(options);
 
-    if (object) object.cluster = options?.cluster || options?.data?.cluster;
+    if (object) object.cluster = cluster;
     return object;
   }
 

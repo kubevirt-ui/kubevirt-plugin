@@ -1,4 +1,3 @@
-/* eslint-disable */
 import React, { type ComponentType } from 'react';
 
 import { PlanModel } from '@forklift-ui/types';
@@ -59,7 +58,6 @@ export function buildACMVirtualMachineActionsFromExtensions(
       description: action.properties.description,
       disabled: resolveActionDisabled(action.properties.isDisabled, virtualMachine),
       id: action.properties.id,
-
       label: action.properties.title as ACMVirtualMachineAction['properties']['title'],
     };
   });

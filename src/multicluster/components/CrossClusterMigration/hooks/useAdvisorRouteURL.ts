@@ -1,5 +1,21 @@
-/* eslint-disable */
-import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
+import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
+import { type K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+
+type ConsolePluginResource = K8sResourceCommon & {
+  spec?: {
+    backend?: {
+      service?: {
+        namespace?: string;
+      };
+    };
+  };
+};
+
+type RouteResource = K8sResourceCommon & {
+  spec?: {
+    host?: string;
+  };
+};
 
 const ACM_CONSOLE_PLUGIN_NAME = 'acm';
 const MTV_ADVISOR_ROUTE_NAME = 'mtv-advisor-route';
@@ -18,15 +34,15 @@ const RouteGroupVersionKind = {
   version: 'v1',
 };
 
-const useAdvisorRouteURL = (): [null | string, boolean, Error] => {
-  const [acmPlugin, acmLoaded, acmError] = useK8sWatchResource({
+const useAdvisorRouteURL = (): [null | string, boolean, Error | undefined] => {
+  const [acmPlugin, acmLoaded, acmError] = useK8sWatchData<ConsolePluginResource>({
     groupVersionKind: ConsolePluginGroupVersionKind,
     name: ACM_CONSOLE_PLUGIN_NAME,
   });
 
-  const acmNamespace = (acmPlugin as any)?.spec?.backend?.service?.namespace;
+  const acmNamespace = acmPlugin?.spec?.backend?.service?.namespace;
 
-  const [route, routeLoaded, routeError] = useK8sWatchResource(
+  const [route, routeLoaded, routeError] = useK8sWatchData<RouteResource>(
     acmNamespace
       ? {
           groupVersionKind: RouteGroupVersionKind,
@@ -37,8 +53,8 @@ const useAdvisorRouteURL = (): [null | string, boolean, Error] => {
   );
 
   const loaded = acmLoaded && routeLoaded;
-  const error = acmError || routeError;
-  const isAvailable = loaded && !error && !!(route as any)?.spec?.host;
+  const error = acmError ?? routeError;
+  const isAvailable = loaded && !error && !!route?.spec?.host;
 
   return [isAvailable ? PROXY_KUBEVIRT_MTV_ADVISOR : null, loaded, error];
 };

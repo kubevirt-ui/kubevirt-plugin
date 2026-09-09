@@ -1,15 +1,15 @@
-/* eslint-disable */
 import { useMemo } from 'react';
 
 import { modelToGroupVersionKind, NamespaceModel } from '@kubevirt-utils/models';
 import { getCluster } from '@multicluster/helpers/selectors';
 import useIsACMPage from '@multicluster/useIsACMPage';
+import { type K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
 import useKubevirtSearchPoll from './useKubevirtSearchPoll';
 
 export type UseMulticlusterNamespacesReturn = {
   allNamespaces: K8sResourceCommon[];
-  error: any;
+  error: Error | undefined;
   loaded: boolean;
   namespacesByCluster: Record<string, K8sResourceCommon[]>;
 };
@@ -33,18 +33,17 @@ const useMulticlusterNamespaces = (
 
   const namespacesByCluster = useMemo(
     () =>
-      namespaces?.reduce(
-        (acc, project) => {
-          const cluster = getCluster(project);
+      namespaces?.reduce<Record<string, K8sResourceCommon[]>>((acc, project) => {
+        const cluster = getCluster(project);
 
-          if (!(cluster in acc)) acc[cluster] = [];
+        if (!cluster) return acc;
 
-          acc[cluster].push(project);
+        if (!(cluster in acc)) acc[cluster] = [];
 
-          return acc;
-        },
-        {} as Record<string, K8sResourceCommon[]>,
-      ),
+        acc[cluster].push(project);
+
+        return acc;
+      }, {}),
     [namespaces],
   );
 

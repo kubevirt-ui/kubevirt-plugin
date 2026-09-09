@@ -1,5 +1,10 @@
-/* eslint-disable */
-import React, { Dispatch, FC, SetStateAction, useCallback } from 'react';
+import React, {
+  type Dispatch,
+  type FC,
+  type ReactElement,
+  type SetStateAction,
+  useCallback,
+} from 'react';
 
 import {
   DROPDOWN_FORM_SELECTION,
@@ -7,15 +12,15 @@ import {
   SOURCE_DETAILS_SECTION_ID,
 } from '@kubevirt-utils/components/AddBootableVolumeModal/consts';
 import {
-  AddBootableVolumeState,
-  SetBootableVolumeFieldType,
+  type AddBootableVolumeState,
+  type SetBootableVolumeFieldType,
 } from '@kubevirt-utils/components/AddBootableVolumeModal/types';
 import {
   deleteBootableVolumeLabel,
   updateBootableVolumeField,
 } from '@kubevirt-utils/components/AddBootableVolumeModal/utils';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
-import { DataUpload } from '@kubevirt-utils/hooks/useCDIUpload/types';
+import { type DataUpload } from '@kubevirt-utils/hooks/useCDIUpload/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getValidNamespace } from '@kubevirt-utils/utils/utils';
 import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverContentWithLightspeedButton/PopoverContentWithLightspeedButton';
@@ -24,12 +29,12 @@ import useIsACMPage from '@multicluster/useIsACMPage';
 import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
 import { Form, PopoverPosition, Title } from '@patternfly/react-core';
 
+import SchedulingSettings from './SchedulingSettings';
 import SourceTypeSelection from './SourceTypeSelection/SourceTypeSelection';
 import VolumeDestination from './VolumeDestination/VolumeDestination';
 import ClusterSelect from './VolumeMetadata/components/ClusterSelect';
 import VolumeMetadata from './VolumeMetadata/VolumeMetadata';
 import VolumeSource from './VolumeSource/VolumeSource';
-import SchedulingSettings from './SchedulingSettings';
 
 type AddBootableVolumeBodyProps = {
   bootableVolume: AddBootableVolumeState;
@@ -47,7 +52,7 @@ const AddBootableVolumeBody: FC<AddBootableVolumeBodyProps> = ({
   setSourceType,
   sourceType,
   upload,
-}) => {
+}): ReactElement => {
   const { t } = useKubevirtTranslation();
   const isACMPage = useIsACMPage();
   const [activeNamespace] = useActiveNamespace();
@@ -60,11 +65,12 @@ const AddBootableVolumeBody: FC<AddBootableVolumeBodyProps> = ({
   );
 
   const deleteLabel = useCallback(
-    (labelKey: string) => setBootableVolume((prev) => deleteBootableVolumeLabel(prev, labelKey)),
+    (labelKey: string): void =>
+      setBootableVolume((prev) => deleteBootableVolumeLabel(prev, labelKey)),
     [setBootableVolume],
   );
 
-  const resetDiskSize = () => setBootableVolumeField('size')(initialBootableVolumeState.size);
+  const resetDiskSize = (): void => setBootableVolumeField('size')(initialBootableVolumeState.size);
 
   return (
     <Form className="pf-v6-u-mt-md">

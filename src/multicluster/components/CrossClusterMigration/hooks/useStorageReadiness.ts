@@ -1,10 +1,12 @@
-/* eslint-disable */
 import { useCallback, useEffect } from 'react';
-import { Updater } from 'use-immer';
+import { type Updater } from 'use-immer';
 
-import { IoK8sApiCoreV1PersistentVolumeClaim, V1beta1StorageMap } from '@forklift-ui/types';
-import { IoK8sApiStorageV1StorageClass } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import {
+  type IoK8sApiCoreV1PersistentVolumeClaim,
+  type V1beta1StorageMap,
+} from '@forklift-ui/types';
+import { type IoK8sApiStorageV1StorageClass } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { modelToGroupVersionKind, PersistentVolumeClaimModel } from '@kubevirt-utils/models';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -17,7 +19,7 @@ import useProviderStorageClasses from './useProviderStorageClasses';
 
 export type UseStorageReadinessReturnType = {
   changeStorageMap: (storageClassName: string, destinationStorageClassName: string) => void;
-  error: any;
+  error: Error | undefined;
   isReady: boolean;
   loaded: boolean;
   storageMap: V1beta1StorageMap;
@@ -27,9 +29,9 @@ export type UseStorageReadinessReturnType = {
 const useStorageReadiness = (
   vms: V1VirtualMachine[],
   targetCluster: string,
-  storageMap: V1beta1StorageMap,
-  setStorageMap: Updater<V1beta1StorageMap>,
-) => {
+  storageMap: V1beta1StorageMap | null,
+  setStorageMap: Updater<V1beta1StorageMap | null>,
+): UseStorageReadinessReturnType => {
   const sourceCluster = getCluster(vms?.[0]);
   const sourceNamespace = getNamespace(vms?.[0]);
 
@@ -61,9 +63,9 @@ const useStorageReadiness = (
   ]);
 
   const changeStorageMap = useCallback(
-    (storageClassName: string, destinationStorageClassName: string) => {
+    (storageClassName: string, destinationStorageClassName: string): void => {
       setStorageMap((draft) => {
-        const storageMapItem = draft.spec.map.find((map) => map.source.name === storageClassName);
+        const storageMapItem = draft.spec?.map?.find((map) => map.source.name === storageClassName);
         if (storageMapItem) {
           storageMapItem.destination.storageClass = destinationStorageClassName;
         }
@@ -72,13 +74,13 @@ const useStorageReadiness = (
     [setStorageMap],
   );
 
-  const error = targetStorageClassesError || pvcsError;
+  const error = targetStorageClassesError ?? pvcsError;
   const loaded = (pvcsLoaded && targetStorageClassesLoaded) || !isEmpty(error);
 
   return {
     changeStorageMap,
     error,
-    isReady: storageMap?.spec?.map?.every((map) => map.destination.storageClass),
+    isReady: !!storageMap?.spec?.map?.every((map) => map.destination.storageClass),
     loaded,
     storageMap,
     targetStorageClasses,

@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { useMemo } from 'react';
 
 import useListClusters from '@kubevirt-utils/hooks/useListClusters';
@@ -6,7 +5,7 @@ import useListNamespaces from '@kubevirt-utils/hooks/useListNamespaces';
 import { useHubClusterName } from '@stolostron/multicluster-sdk';
 import { getVMListQueries } from '@virtualmachines/list/hooks/utils';
 
-const useVMListQueries = () => {
+const useVMListQueries = (): ReturnType<typeof getVMListQueries> => {
   const clusters = useListClusters();
   const namespaces = useListNamespaces();
 

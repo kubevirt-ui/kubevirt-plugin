@@ -1,15 +1,17 @@
-/* eslint-disable */
 import { NetworkAttachmentDefinitionModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { NetworkAttachmentDefinitionKind } from '@kubevirt-utils/resources/nad/types';
 import {
   DEFAULT_NAMESPACE,
   OPENSHIFT_MULTUS_NS,
   OPENSHIFT_SRIOV_NETWORK_OPERATOR_NS,
 } from '@kubevirt-utils/constants/constants';
 import { modelToGroupVersionKind } from '@kubevirt-utils/models';
+import { type NetworkAttachmentDefinitionKind } from '@kubevirt-utils/resources/nad/types';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 
-const useProviderNADs = (targetCluster: string, namespace: string) => {
+const useProviderNADs = (
+  targetCluster: string,
+  namespace: string,
+): { data: NetworkAttachmentDefinitionKind[]; error: Error; loaded: boolean } => {
   const [namespaceNADs, namespaceNADsLoaded, namespaceNADsError] = useK8sWatchData<
     NetworkAttachmentDefinitionKind[]
   >({

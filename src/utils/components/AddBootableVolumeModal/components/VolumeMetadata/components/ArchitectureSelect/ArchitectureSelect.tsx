@@ -1,9 +1,8 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC, type ReactElement } from 'react';
 
 import {
-  AddBootableVolumeState,
-  SetBootableVolumeFieldType,
+  type AddBootableVolumeState,
+  type SetBootableVolumeFieldType,
 } from '@kubevirt-utils/components/AddBootableVolumeModal/types';
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
@@ -25,7 +24,7 @@ const ArchitectureSelect: FC<ArchitectureSelectProps> = ({
   bootableVolumeState,
   isDisabled,
   setBootableVolumeField,
-}) => {
+}): ReactElement | null => {
   const { t } = useKubevirtTranslation();
   const [workloadArchitectures] = useHcoWorkloadArchitectures(
     bootableVolumeState?.bootableVolumeCluster,
@@ -69,7 +68,7 @@ const ArchitectureSelect: FC<ArchitectureSelectProps> = ({
                 setBootableVolumeField('architectures')(
                   architectures?.includes(arch)
                     ? architectures.filter((a) => a !== arch)
-                    : [...(architectures || []), arch],
+                    : [...(architectures ?? []), arch],
                 )
               }
               hasCheckbox

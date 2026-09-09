@@ -1,10 +1,9 @@
-/* eslint-disable */
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useIsACMPage from '@multicluster/useIsACMPage';
 
 import useClusterParam from './useClusterParam';
 
-const useIsAllClustersPage = () => {
+const useIsAllClustersPage = (): boolean => {
   const cluster = useClusterParam();
   const isACMPage = useIsACMPage();
 

@@ -1,9 +1,8 @@
-/* eslint-disable */
 import { useMemo, useState } from 'react';
 
 import useConsoleFetch from '@kubevirt-utils/hooks/useConsoleFetch';
 
-import { MigrationTargetResponse } from './useClusterRecommendationTypes';
+import { type MigrationTargetResponse } from './useClusterRecommendationTypes';
 
 type VMQueryParams = {
   cluster: string;
@@ -41,7 +40,7 @@ const useClusterRecommendation = (
 
   const { data, error, loaded } = useConsoleFetch<MigrationTargetResponse>(triggered ? url : null);
 
-  const fetchRecommendation = () => setTriggered(true);
+  const fetchRecommendation = (): void => setTriggered(true);
 
   return { data: data ?? null, error, fetchRecommendation, loaded, loading: triggered && !loaded };
 };
