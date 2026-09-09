@@ -1,5 +1,8 @@
-import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { VMQueries } from '@kubevirt-utils/components/Charts/utils/queries';
+import {
+  type V1VirtualMachine,
+  type V1VirtualMachineInstance,
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type VMQueries } from '@kubevirt-utils/components/Charts/utils/queries';
 import { queriesToLink } from '@kubevirt-utils/components/Charts/utils/utils';
 import useIsACMPage from '@multicluster/useIsACMPage';
 
@@ -9,15 +12,15 @@ const useVMQuery = (
   vm: V1VirtualMachine | V1VirtualMachineInstance,
   queryKey: VMQueries,
 ): {
-  query: string;
-  queryLink: string;
+  query?: string;
+  queryLink: null | string;
 } => {
   const isACMPage = useIsACMPage();
 
   const availableQueries = useVMQueries(vm);
   const query = availableQueries[queryKey];
 
-  const queryLink = queriesToLink(query);
+  const queryLink = query ? queriesToLink(query) : '';
 
   return { query, queryLink: isACMPage ? null : queryLink };
 };
