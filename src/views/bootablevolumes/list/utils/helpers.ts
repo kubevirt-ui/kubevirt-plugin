@@ -1,14 +1,14 @@
-/* eslint-disable */
-import { V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getCluster } from '@multicluster/helpers/selectors';
 
-import { BootableResource } from '../../utils/types';
-import { BootableVolumeCallbacks } from '../bootableVolumesDefinition';
+import { type BootableVolumeCallbacks } from '../bootableVolumesDefinition';
+
+import { type BootableResource } from '../../utils/types';
 
 export const getEffectiveCluster = (
   row: BootableResource,
   callbacks: BootableVolumeCallbacks,
-): string => getCluster(row) || callbacks.clusterParam;
+): string => getCluster(row) ?? callbacks.clusterParam;
 
 export const getClusterPreferences = (
   cluster: string,

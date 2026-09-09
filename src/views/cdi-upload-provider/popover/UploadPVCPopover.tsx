@@ -1,12 +1,10 @@
-/* eslint-disable */
-import React, { FC, useContext, useEffect, useState } from 'react';
+import React, { type FC, useContext, useEffect, useState } from 'react';
 
-import { V1beta1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1beta1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { cancelUploadPVC } from '@kubevirt-utils/hooks/useCDIUpload/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
 import { CDIUploadContext } from '../utils/context';
-
 import UploadPVCPopoverProgressStatus from './UploadPVCPopoverProgressStatus';
 import UploadPVCPopoverUploadStatus from './UploadPVCPopoverUploadStatus';
 
@@ -21,15 +19,19 @@ const UploadPVCPopover: FC<PVCUploadStatusProps> = ({ pvc, title }) => {
   const upload = uploads?.find(
     (upl) => upl?.pvcName === pvc?.metadata?.name && upl?.namespace === pvc?.metadata?.namespace,
   );
-  const [error, setError] = useState(upload?.uploadError);
+  const [error, setError] = useState<{ message: string } | undefined>(upload?.uploadError);
 
-  const onCancelClick = () => {
+  const onCancelClick = (): void => {
     upload?.cancelUpload?.();
-    cancelUploadPVC(pvc?.metadata?.name, pvc?.metadata?.namespace).catch(setError);
+    cancelUploadPVC(pvc?.metadata?.name, pvc?.metadata?.namespace).catch((err: unknown) => {
+      setError({ message: err instanceof Error ? err.message : String(err) });
+    });
   };
 
-  const onErrorDeleteSource = () => {
-    cancelUploadPVC(pvc?.metadata?.name, pvc?.metadata?.namespace).catch(setError);
+  const onErrorDeleteSource = (): void => {
+    cancelUploadPVC(pvc?.metadata?.name, pvc?.metadata?.namespace).catch((err: unknown) => {
+      setError({ message: err instanceof Error ? err.message : String(err) });
+    });
   };
 
   useEffect(() => {
@@ -44,7 +46,7 @@ const UploadPVCPopover: FC<PVCUploadStatusProps> = ({ pvc, title }) => {
       upload={upload}
     />
   ) : (
-    <UploadPVCPopoverProgressStatus onCancelClick={onCancelClick} title={title || t('Uploading')} />
+    <UploadPVCPopoverProgressStatus onCancelClick={onCancelClick} title={title ?? t('Uploading')} />
   );
 };
 

@@ -15,7 +15,7 @@ import { TemplateFilterType } from './types';
 
 const getRowOS = (obj: TemplateOrRequest): string => {
   if (isVirtualMachineTemplateRequest(obj)) {
-    return OS_NAME_TYPES.other;
+    return OS_NAME_TYPES.Other;
   }
 
   return getTemplateOS(obj);
@@ -30,9 +30,12 @@ const useOSFilter = (): KubevirtFilter<TemplateOrRequest> => {
       categoryLabel: t('Operating system'),
       id: TemplateFilterType.OSName,
       match: (obj, selected) => selected.includes(getRowOS(obj)),
-      options: OS_NAMES.filter(({ id }) => isWindowsSupported || id !== OS_NAME_TYPES.windows).map(
-        ({ id, title }) => ({ label: title, value: id }),
-      ),
+      options: OS_NAMES.reduce<Array<{ label: string; value: string }>>((acc, { id, title }) => {
+        if (isWindowsSupported || id !== OS_NAME_TYPES.Windows) {
+          acc.push({ label: title, value: id });
+        }
+        return acc;
+      }, []),
     }),
     [isWindowsSupported, t],
   );

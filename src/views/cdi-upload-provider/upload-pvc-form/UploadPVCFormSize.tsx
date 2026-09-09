@@ -1,5 +1,10 @@
-/* eslint-disable */
-import React, { MouseEvent, ReactEventHandler } from 'react';
+import React, {
+  type Dispatch,
+  type FC,
+  type MouseEvent,
+  type ReactEventHandler,
+  type SetStateAction,
+} from 'react';
 
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -14,7 +19,14 @@ import {
 
 import { dropdownUnits } from '../utils/consts';
 
-const UploadPVCFormSize = ({
+type UploadPVCFormSizeProps = {
+  requestSizeUnit: string;
+  requestSizeValue: string;
+  setRequestSizeUnit: Dispatch<SetStateAction<string>>;
+  setRequestSizeValue: Dispatch<SetStateAction<string>>;
+};
+
+const UploadPVCFormSize: FC<UploadPVCFormSizeProps> = ({
   requestSizeUnit,
   requestSizeValue,
   setRequestSizeUnit,
@@ -22,30 +34,33 @@ const UploadPVCFormSize = ({
 }) => {
   const { t } = useKubevirtTranslation();
 
-  const handleRequestSizeInputChange = (obj: { unit: string; value: number }) => {
-    setRequestSizeValue(obj?.value);
+  const handleRequestSizeInputChange = (obj: { unit: string; value: number }): void => {
+    setRequestSizeValue(String(obj?.value));
     setRequestSizeUnit(obj?.unit);
   };
 
-  const onValueChange: ReactEventHandler<HTMLInputElement> = (event) => {
+  const onValueChange: ReactEventHandler<HTMLInputElement> = (event): void => {
     handleRequestSizeInputChange({
       unit: requestSizeUnit,
       value: Number(event?.currentTarget?.value),
     });
   };
 
-  const changeValueBy = (changeBy: number) => {
+  const changeValueBy = (changeBy: number): void => {
     // When default defaultRequestSizeValue is not set, value becomes NaN and increment decrement buttons of NumberSpinner don't work.
-    const newValue = Number.isFinite(requestSizeValue) ? requestSizeValue + changeBy : 0 + changeBy;
+    const numericValue = Number(requestSizeValue);
+    const newValue = Number.isFinite(numericValue) ? numericValue + changeBy : 0 + changeBy;
     handleRequestSizeInputChange({ unit: requestSizeUnit, value: newValue });
   };
 
-  const onUnitChange = (_event: MouseEvent<HTMLInputElement>, value: string) => {
+  const onUnitChange = (_event: MouseEvent<HTMLInputElement>, value: string): void => {
     handleRequestSizeInputChange({
       unit: value,
-      value: requestSizeValue,
+      value: Number(requestSizeValue),
     });
   };
+
+  const unitLabel = dropdownUnits[requestSizeUnit as keyof typeof dropdownUnits];
 
   return (
     <FormGroup fieldId="request-size-input" isRequired label={t('Size')}>
@@ -61,13 +76,9 @@ const UploadPVCFormSize = ({
           onPlus={() => changeValueBy(1)}
           plusBtnAriaLabel={t('Increment')}
           required
-          value={requestSizeValue}
+          value={Number(requestSizeValue)}
         />
-        <FormPFSelect
-          onSelect={onUnitChange}
-          selected={requestSizeUnit}
-          selectedLabel={dropdownUnits[requestSizeUnit]}
-        >
+        <FormPFSelect onSelect={onUnitChange} selected={requestSizeUnit} selectedLabel={unitLabel}>
           {Object.entries(dropdownUnits)?.map(([value, label]) => (
             <SelectOption key={value} value={value}>
               {label}

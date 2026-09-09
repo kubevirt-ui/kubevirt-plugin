@@ -11,7 +11,7 @@ const URLSourceHelperText: FC<DiskSourceUrlInputProps> = ({ os }) => {
   const { t } = useKubevirtTranslation();
   const { afterLabelText, beforeLabelText, label } =
     urlSourceHelperTextMapper[
-      (os || OS_NAME_TYPES.fedora) as keyof typeof urlSourceHelperTextMapper
+      (os || OS_NAME_TYPES.Fedora) as keyof typeof urlSourceHelperTextMapper
     ];
 
   // Replace three-part concatenation with single interpolated translation key
@@ -20,7 +20,7 @@ const URLSourceHelperText: FC<DiskSourceUrlInputProps> = ({ os }) => {
     <>
       {t(beforeLabelText)}
       <strong>
-        <Link rel="noreferrer" target="_blank" to={OS_IMAGE_LINKS[os || OS_NAME_TYPES.fedora]}>
+        <Link rel="noreferrer" target="_blank" to={OS_IMAGE_LINKS[os || OS_NAME_TYPES.Fedora]}>
           {t(label)}
         </Link>
       </strong>

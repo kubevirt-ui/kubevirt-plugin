@@ -1,24 +1,21 @@
-/* eslint-disable */
-import {
-  modelToGroupVersionKind,
-  PersistentVolumeClaimModel,
-} from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
   DataSourceModel,
   DataSourceModelGroupVersionKind,
+  modelToGroupVersionKind,
+  PersistentVolumeClaimModel,
 } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { DataVolumeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { VirtualMachineInstancetypeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { VirtualMachinePreferenceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
-  V1beta1DataImportCron,
-  V1beta1DataSource,
-  V1beta1DataVolume,
+  type V1beta1DataImportCron,
+  type V1beta1DataSource,
+  type V1beta1DataVolume,
 } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
-import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import {
-  V1beta1VirtualMachineClusterPreference,
-  V1beta1VirtualMachinePreference,
+  type V1beta1VirtualMachineClusterPreference,
+  type V1beta1VirtualMachinePreference,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import {
   DEFAULT_INSTANCETYPE_KIND_LABEL,
@@ -32,27 +29,30 @@ import {
 import { isEmpty, kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sDelete } from '@multicluster/k8sRequests';
+import { type K8sGroupVersionKind } from '@openshift-console/dynamic-plugin-sdk';
 
-import { VirtualMachinePreference } from '../preference/types';
 import {
-  ClusterNamespacedResourceMap,
+  type ClusterNamespacedResourceMap,
   getClusterKey,
   getLabel,
   getName,
   getNamespace,
-  NamespacedResourceMap,
-  ResourceMap,
+  type NamespacedResourceMap,
+  type ResourceMap,
 } from '../shared';
 
+import { type VirtualMachinePreference } from '../preference/types';
 import { deprecatedOSNames, KUBEVIRT_ISO_LABEL } from './constants';
-import { BootableVolume } from './types';
+import { type BootableVolume } from './types';
 
 export const isBootableVolumePVCKind = (
   bootableVolume: BootableVolume,
 ): bootableVolume is IoK8sApiCoreV1PersistentVolumeClaim =>
   bootableVolume?.kind === PersistentVolumeClaimModel.kind;
 
-export const getBootableVolumeGroupVersionKind = (bootableVolume: BootableVolume) =>
+export const getBootableVolumeGroupVersionKind = (
+  bootableVolume: BootableVolume,
+): K8sGroupVersionKind =>
   isBootableVolumePVCKind(bootableVolume)
     ? modelToGroupVersionKind(PersistentVolumeClaimModel)
     : DataSourceModelGroupVersionKind;
@@ -73,7 +73,8 @@ export const getBootableVolumePVCSource = (
 export const getDataVolumeForPVC = (
   pvc: IoK8sApiCoreV1PersistentVolumeClaim,
   dvSources: ClusterNamespacedResourceMap<V1beta1DataVolume>,
-) => (pvc ? dvSources?.[getClusterKey(pvc)]?.[getNamespace(pvc)]?.[getName(pvc)] : null);
+): V1beta1DataVolume | null | undefined =>
+  pvc ? dvSources?.[getClusterKey(pvc)]?.[getNamespace(pvc)]?.[getName(pvc)] : null;
 
 export const getInstanceTypePrefix = (instanceTypeNamePrefix: string): string => {
   if (instanceTypeNamePrefix?.includes('.')) {
@@ -105,12 +106,13 @@ export const deleteDVAndRelatedResources = async (
 export const isBootableVolumeISO = (bootableVolume: BootableVolume): boolean =>
   getLabel(bootableVolume, KUBEVIRT_ISO_LABEL) === 'true';
 
-export const isDeprecated = (bootVolumeName: string) => deprecatedOSNames.includes(bootVolumeName);
+export const isDeprecated = (bootVolumeName: string): boolean =>
+  deprecatedOSNames.includes(bootVolumeName);
 
 export const getDataImportCronFromDataSource = (
   dataImportCrons: V1beta1DataImportCron[],
   dataSource: V1beta1DataSource,
-): V1beta1DataImportCron =>
+): V1beta1DataImportCron | undefined =>
   dataImportCrons?.find(
     (cron) =>
       cron?.spec?.managedDataSource === getName(dataSource) &&
@@ -118,10 +120,10 @@ export const getDataImportCronFromDataSource = (
       getCluster(dataSource) === getCluster(cron),
   );
 
-export const hasUserPreference = (bootableVolume: BootableVolume) =>
+export const hasUserPreference = (bootableVolume: BootableVolume): boolean =>
   getLabel(bootableVolume, DEFAULT_PREFERENCE_KIND_LABEL) === VirtualMachinePreferenceModel.kind;
 
-export const hasUserInstanceType = (bootableVolume: BootableVolume) =>
+export const hasUserInstanceType = (bootableVolume: BootableVolume): boolean =>
   getLabel(bootableVolume, DEFAULT_INSTANCETYPE_KIND_LABEL) ===
   VirtualMachineInstancetypeModel.kind;
 

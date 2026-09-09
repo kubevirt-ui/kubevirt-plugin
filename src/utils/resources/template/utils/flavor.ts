@@ -1,7 +1,6 @@
-/* eslint-disable */
-import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1CPU, V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { Template } from '@kubevirt-utils/resources/template';
+import { type V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { type V1CPU, type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type Template } from '@kubevirt-utils/resources/template';
 import { getCPU, getMemory } from '@kubevirt-utils/resources/vm';
 
 import {
@@ -16,9 +15,9 @@ import {
  */
 export const parseCPU = (cpu: V1CPU): V1CPU => {
   return {
-    cores: cpu?.cores || 1,
-    sockets: cpu?.sockets || 1,
-    threads: cpu?.threads || 1,
+    cores: cpu?.cores ?? 1,
+    sockets: cpu?.sockets ?? 1,
+    threads: cpu?.threads ?? 1,
   };
 };
 
@@ -30,7 +29,7 @@ export const vCPUCount = (cpu: V1CPU): number => {
   const parsedCpu = parseCPU(cpu);
 
   // VMs migrated from vSphere may not have spec.template.spec.domain.cpu.threads set
-  return parsedCpu.sockets * parsedCpu.cores * (parsedCpu.threads || 1);
+  return parsedCpu.sockets * parsedCpu.cores * (parsedCpu.threads ?? 1);
 };
 
 /**

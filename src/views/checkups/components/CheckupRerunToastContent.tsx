@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Button, ButtonVariant } from '@patternfly/react-core';
@@ -19,7 +18,7 @@ const CheckupRerunToastContent: FC<CheckupRerunToastContentProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
 
-  const handleClick = () => {
+  const handleClick = (): void => {
     navigate(url);
     onDismiss?.();
   };

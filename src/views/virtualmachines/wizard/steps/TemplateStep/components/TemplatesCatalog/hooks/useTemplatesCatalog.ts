@@ -62,7 +62,7 @@ const useTemplatesCatalog = (): UseTemplatesCatalogReturn => {
     () =>
       isWindowsSupported
         ? templates
-        : templates.filter((t) => getTemplateOS(t) !== OS_NAME_TYPES.windows),
+        : templates.filter((t) => getTemplateOS(t) !== OS_NAME_TYPES.Windows),
     [templates, isWindowsSupported],
   );
 

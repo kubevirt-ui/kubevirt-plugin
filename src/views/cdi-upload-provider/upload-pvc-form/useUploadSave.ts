@@ -4,7 +4,7 @@ import axios from 'axios';
 import { type V1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import { createUploadPVC } from '@kubevirt-utils/hooks/useCDIUpload/utils';
 
-import { CDI_UPLOAD_URL_BUILDER, uploadErrorType } from '../utils/consts';
+import { CDI_UPLOAD_URL_BUILDER, UploadErrorType } from '../utils/consts';
 import { getName } from '../utils/selectors';
 
 type UploadSaveParams = {
@@ -36,7 +36,7 @@ export const useUploadSave = ({
     (e: FormEvent<EventTarget>): void => {
       e.preventDefault();
       if (!fileName) {
-        setError(uploadErrorType.MISSING);
+        setError(UploadErrorType.MISSING);
         return;
       }
       setIsCheckingCertificate(true);
@@ -45,7 +45,7 @@ export const useUploadSave = ({
         .catch((catchError) => {
           setIsCheckingCertificate(false);
           if (catchError?.response?.data === undefined) {
-            throw new Error(uploadErrorType.CERT);
+            throw new Error(UploadErrorType.CERT);
           }
         })
         .then(() => {
@@ -61,7 +61,7 @@ export const useUploadSave = ({
         })
         .catch((err) => {
           setIsAllocating(false);
-          setError(err?.message ?? uploadErrorType.ALLOCATE);
+          setError(err?.message ?? UploadErrorType.ALLOCATE);
         });
     },
     [

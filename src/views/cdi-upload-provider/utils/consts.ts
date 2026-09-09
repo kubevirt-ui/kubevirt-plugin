@@ -1,4 +1,3 @@
-/* eslint-disable */
 export enum UPLOAD_STATUS {
   CANCELED = 'CANCELED',
   ERROR = 'ERROR',
@@ -6,7 +5,7 @@ export enum UPLOAD_STATUS {
   SUCCESS = 'SUCCESS',
   UPLOADING = 'UPLOADING',
 }
-export const CDI_UPLOAD_URL_BUILDER = (uploadProxyURL) =>
+export const CDI_UPLOAD_URL_BUILDER = (uploadProxyURL: string): string =>
   `https://${uploadProxyURL}/v1beta1/upload-form-async`;
 export const CDI_UPLOAD_POD_ANNOTATION = 'cdi.kubevirt.io/storage.pod.phase';
 export const CDI_UPLOAD_POD_NAME_ANNOTATION = 'cdi.kubevirt.io/storage.uploadPodName';
@@ -30,9 +29,9 @@ export const STORAGE_CLASS_CONFIG_MAP_NAMESPACES = [
 export const LABEL_CDROM_SOURCE = 'kubevirt.ui/cdrom';
 export const TEMPLATE_OS_LABEL = 'os.template.kubevirt.io';
 export const TEMPLATE_OS_NAME_ANNOTATION = 'name.os.template.kubevirt.io';
-export const VM_TEMPLATE_NAME_PARAMETER = '${NAME}';  
+export const VM_TEMPLATE_NAME_PARAMETER = '${NAME}';
 
-export enum uploadErrorType {
+export enum UploadErrorType {
   ALLOCATE = 'allocate',
   CDI_INIT = 'cdi_init',
   CERT = 'cert',

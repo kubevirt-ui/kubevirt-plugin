@@ -1,6 +1,11 @@
-/* eslint-disable */
-import { IoK8sApiCoreV1Pod, IoK8sApiCoreV1Service } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
-import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import {
+  type IoK8sApiCoreV1Pod,
+  type IoK8sApiCoreV1Service,
+} from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import {
+  type V1VirtualMachine,
+  type V1VirtualMachineInstance,
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getName } from '@kubevirt-utils/resources/shared';
 
 export const VMI_ID_LABEL = 'vmi.kubevirt.io/id';
@@ -12,7 +17,7 @@ export const getVMILabelForServiceSelector = (
   pod: IoK8sApiCoreV1Pod | undefined,
   vm: V1VirtualMachine,
 ): { labelKey: string; labelValue: string } => {
-  const podLabels = pod?.metadata?.labels || {};
+  const podLabels = pod?.metadata?.labels ?? {};
   const vmName = getName(vm);
 
   if (podLabels[VMI_ID_LABEL]) {
@@ -66,7 +71,7 @@ export const getServicesForVmi = (
   const vmiName = vmi?.metadata?.name;
 
   return services.filter((service) => {
-    const selectors = service?.spec?.selector || {};
+    const selectors = service?.spec?.selector ?? {};
     if (Object.keys(selectors).length === 0) return false;
 
     return Object.keys(selectors).every((key) => {

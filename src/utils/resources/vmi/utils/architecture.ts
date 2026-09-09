@@ -1,8 +1,7 @@
-/* eslint-disable */
-import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { ARCHITECTURES } from '@kubevirt-utils/constants/constants';
 
 import { getVMIArchitecture } from './selectors';
 
-export const hasS390xArchitecture = (vmi: V1VirtualMachineInstance) =>
+export const hasS390xArchitecture = (vmi: V1VirtualMachineInstance): boolean =>
   getVMIArchitecture(vmi) === ARCHITECTURES.S390X;

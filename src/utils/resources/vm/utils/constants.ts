@@ -1,5 +1,4 @@
-/* eslint-disable */
-import { V1Interface, V1Network } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1Interface, type V1Network } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 
 export const NO_DATA_DASH = '—';
 
@@ -28,7 +27,7 @@ export const PATHS_TO_HIGHLIGHT = {
   SCRIPTS_TAB: ['spec.template.spec.volumes', 'spec.template.spec.accessCredentials'],
 };
 
-export const MIGRATION__PROMETHEUS_DELAY = 15 * SECONDS_TO_MILLISECONDS_MULTIPLIER;
+export const MIGRATION_PROMETHEUS_DELAY = 15 * SECONDS_TO_MILLISECONDS_MULTIPLIER;
 
 export const DEFAULT_NETWORK_INTERFACE: V1Interface = { masquerade: {}, name: 'default' };
 

@@ -1,20 +1,19 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 import { Trans } from 'react-i18next';
 
 import {
   modelToGroupVersionKind,
   TemplateModel,
-  V1Template,
+  type V1Template,
 } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1beta1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1beta1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   TEMPLATE_TYPE_BASE,
   TEMPLATE_TYPE_LABEL,
   TEMPLATE_VM_COMMON_NAMESPACE,
 } from '@kubevirt-utils/resources/template';
-import { useK8sWatchResource, WatchK8sResource } from '@openshift-console/dynamic-plugin-sdk';
+import { useK8sWatchResource, type WatchK8sResource } from '@openshift-console/dynamic-plugin-sdk';
 import { Alert, AlertVariant } from '@patternfly/react-core';
 
 import useBaseImages from './hooks/useBaseImages';
@@ -30,10 +29,11 @@ const templatesResource: WatchK8sResource = {
 };
 
 const PVCDeleteAlertExtension: FC<{ pvc: V1beta1PersistentVolumeClaim }> = ({ pvc }) => {
-  const [commonTemplates, loadedTemplates, errorTemplates] =
-    useK8sWatchResource<V1Template[]>(templatesResource);
+  const [commonTemplates, loadedTemplates, errorTemplates] = useK8sWatchResource<V1Template[]>(
+    templatesResource,
+  ) as [V1Template[] | undefined, boolean, Error | undefined];
   const { t } = useKubevirtTranslation();
-  const [goldenPvcs, loadedPvcs, errorPvcs] = useBaseImages(commonTemplates);
+  const [goldenPvcs, loadedPvcs, errorPvcs] = useBaseImages(commonTemplates ?? []);
 
   const isGolden = goldenPvcs?.find(
     (goldenPvc) => goldenPvc?.metadata?.name === pvc?.metadata?.name,
@@ -48,7 +48,7 @@ const PVCDeleteAlertExtension: FC<{ pvc: V1beta1PersistentVolumeClaim }> = ({ pv
         </p>
       </Trans>
       {!loadedPvcs && !loadedTemplates && <p>{t('Checking for usages of this PVC...')}</p>}
-      {(errorPvcs || errorTemplates) && <p>{t('Error checking for usages of this PVC.')}</p>}
+      {(errorPvcs ?? errorTemplates) && <p>{t('Error checking for usages of this PVC.')}</p>}
       {isGolden && (
         <Trans ns="plugin__kubevirt-plugin" t={t}>
           <p>

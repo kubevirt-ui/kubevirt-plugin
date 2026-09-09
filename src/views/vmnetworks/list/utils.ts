@@ -50,20 +50,20 @@ const getVMNetworkTypeFromNAD = (nad: NetworkAttachmentDefinitionKind): VMNetwor
 
   const { role, topology, type } = config;
 
-  if (type === NetworkTypeKeys.cnvBridgeNetworkType) {
+  if (type === NetworkTypeKeys.CnvBridgeNetworkType) {
     return VMNetworkType.LINUX_BRIDGE;
   }
 
-  if (type === NetworkTypeKeys.sriovNetworkType) {
+  if (type === NetworkTypeKeys.SriovNetworkType) {
     return VMNetworkType.SRIOV;
   }
 
-  if (type === NetworkTypeKeys.ovnKubernetesNetworkType) {
-    if (topology === NADTopology.localnet) {
+  if (type === NetworkTypeKeys.OvnKubernetesNetworkType) {
+    if (topology === NADTopology.Localnet) {
       return VMNetworkType.LOCALNET;
     }
 
-    if (role !== NADRole.primary && topology === NADTopology.layer2) {
+    if (role !== NADRole.Primary && topology === NADTopology.Layer2) {
       return VMNetworkType.SECONDARY_LAYER2_OVERLAY;
     }
   }

@@ -32,7 +32,7 @@ const useNamespaceUDN = (
       nads?.find((nad) => {
         const config = parseNADConfig(nad);
 
-        return PrimaryTopologies.includes(config?.topology) && config?.role === NADRole.primary;
+        return PrimaryTopologies.includes(config?.topology) && config?.role === NADRole.Primary;
       }),
     [nads],
   );
@@ -41,7 +41,7 @@ const useNamespaceUDN = (
 
   const vmsNotSupported = useMemo(() => {
     const config = parseNADConfig(udnNAD);
-    return config?.topology === NADTopology.layer3;
+    return config?.topology === NADTopology.Layer3;
   }, [udnNAD]);
 
   return [isNamespaceManagedByUDN, vmsNotSupported, udnNAD];

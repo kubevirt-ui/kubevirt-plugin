@@ -1,15 +1,16 @@
-/* eslint-disable */
 import { MigPlanModel } from '@kubevirt-utils/models';
-import type { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { migrateVMsMTC } from '@virtualmachines/actions/components/VirtualMachineMigration/backends/mtc/migrateVMs';
 
-import type { MigPlan } from '../constants';
+import { type MigPlan } from '../constants';
 import { MTC_MIGRATION_NAMESPACE, STORAGE_MIGRATION_API } from '../constants';
 import { normalizeMTCPlanForOverview } from '../mtc';
 
-import type { StorageMigrationBackendDescriptor } from './types';
+import type {
+  StorageMigrationBackendDescriptor,
+  StorageMigrationPlanOverviewNormalizer,
+} from './types';
 
-const normalizePlanForOverview = (plan: K8sResourceCommon) =>
+const normalizePlanForOverview: StorageMigrationPlanOverviewNormalizer = (plan) =>
   normalizeMTCPlanForOverview(plan as MigPlan);
 
 export const mtcBackend: StorageMigrationBackendDescriptor = {

@@ -1,5 +1,4 @@
-/* eslint-disable */
-import { V1beta1VirtualMachineTemplate } from '@kubevirt-ui-ext/kubevirt-api/virt-template';
+import { type V1beta1VirtualMachineTemplate } from '@kubevirt-ui-ext/kubevirt-api/virt-template';
 import { VirtualMachineTemplateModel } from '@kubevirt-utils/models';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getKubevirtBaseAPIPath } from '@multicluster/k8sRequests';
@@ -8,7 +7,7 @@ import { consoleFetch } from '@openshift-console/dynamic-plugin-sdk';
 import { NAME_PARAMETER } from './constants';
 import { generateVMName } from './helpers';
 import { getParameters } from './selectors';
-import { ProcessedVirtualMachineTemplate, ProcessOptions } from './types';
+import { type ProcessedVirtualMachineTemplate, type ProcessOptions } from './types';
 
 const API_GROUP_VERSION = 'subresources.template.kubevirt.io/v1beta1';
 
@@ -20,7 +19,7 @@ const buildParameterOverrides = (
 
   for (const param of getParameters(template) ?? []) {
     if (param.name === NAME_PARAMETER) {
-      overrides.NAME = vmName || generateVMName(template);
+      overrides.NAME = vmName ?? generateVMName(template);
     } else if (param.value) {
       overrides[param.name] = param.value;
     }
@@ -51,7 +50,9 @@ export const processVirtualMachineTemplate = async (
     method: 'POST',
   });
 
-  const processedTemplate = await response.json();
+  const processedTemplate = (await response.json()) as ProcessedVirtualMachineTemplate & {
+    cluster?: string;
+  };
 
   if (cluster) processedTemplate.cluster = cluster;
 

@@ -1,7 +1,13 @@
-/* eslint-disable */
 import { type MenuToggleProps } from '@patternfly/react-core';
 
-export const getSelectDataTestProps = (dataTest?: string) => {
+type SelectDataTestProps =
+  | Record<string, never>
+  | {
+      'data-test': string;
+      toggleProps: MenuToggleProps;
+    };
+
+export const getSelectDataTestProps = (dataTest?: string): SelectDataTestProps => {
   if (!dataTest) {
     return {};
   }

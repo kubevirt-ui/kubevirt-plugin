@@ -30,8 +30,8 @@ const BootableVolumeOSIcons: FC<BootableVolumeOSIconsProps> = ({ osName }) => {
 
   const osIcons = [
     getIconByOSName(LINUX),
-    getIconByOSName(OS_NAME_TYPES.rhel),
-    ...(isWindowsSupported ? [getIconByOSName(OS_NAME_TYPES.windows)] : []),
+    getIconByOSName(OS_NAME_TYPES.Rhel),
+    ...(isWindowsSupported ? [getIconByOSName(OS_NAME_TYPES.Windows)] : []),
   ];
 
   return (

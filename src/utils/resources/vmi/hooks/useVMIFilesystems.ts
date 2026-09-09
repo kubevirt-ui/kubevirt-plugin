@@ -1,21 +1,24 @@
-/* eslint-disable */
 import { useEffect, useState } from 'react';
 
 import {
-  V1VirtualMachineInstance,
-  V1VirtualMachineInstanceFileSystem,
+  type V1VirtualMachineInstance,
+  type V1VirtualMachineInstanceFileSystem,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import useVMISubresourceURL from '@multicluster/hooks/useVMISubresourceURL';
 import { consoleFetch } from '@openshift-console/dynamic-plugin-sdk';
 
+type FilesystemListResponse = {
+  items?: V1VirtualMachineInstanceFileSystem[];
+};
+
 type UseVMIFilesystems = (
   vmi?: V1VirtualMachineInstance,
-) => [V1VirtualMachineInstanceFileSystem[], boolean, Error];
+) => [V1VirtualMachineInstanceFileSystem[], boolean, Error | null];
 
 export const useVMIFilesystems: UseVMIFilesystems = (vmi) => {
   const [loaded, setLoaded] = useState(false);
   const [filesystems, setFilesystems] = useState<V1VirtualMachineInstanceFileSystem[]>([]);
-  const [error, setError] = useState<Error>(null);
+  const [error, setError] = useState<Error | null>(null);
   const [url, urlLoaded] = useVMISubresourceURL(vmi, 'filesystemlist');
 
   useEffect(() => {
@@ -25,12 +28,12 @@ export const useVMIFilesystems: UseVMIFilesystems = (vmi) => {
 
     setError(null);
     if (guestOS) {
-      (async () => {
+      (async (): Promise<void> => {
         const response = await consoleFetch(url);
-        const jsonData = await response.json();
+        const jsonData = (await response.json()) as FilesystemListResponse;
         setFilesystems(jsonData?.items ?? []);
         setLoaded(true);
-      })().catch((err) => {
+      })().catch((err: Error) => {
         setError(err);
         setLoaded(true);
       });

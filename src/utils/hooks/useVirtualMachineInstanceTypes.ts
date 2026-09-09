@@ -1,11 +1,10 @@
-/* eslint-disable */
 import { VirtualMachineInstancetypeModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1beta1VirtualMachineInstancetype } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1beta1VirtualMachineInstancetype } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
 import useListMulticlusterFilters from '@kubevirt-utils/hooks/useListMulticlusterFilters';
 import { isAllNamespaces } from '@kubevirt-utils/utils/utils';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
-import { Selector } from '@openshift-console/dynamic-plugin-sdk';
+import { type Selector } from '@openshift-console/dynamic-plugin-sdk';
 
 type UseVirtualMachineInstanceTypes = (params?: {
   cluster?: string;
@@ -19,7 +18,7 @@ const useVirtualMachineInstanceTypes: UseVirtualMachineInstanceTypes = ({
   fieldSelector,
   namespace,
   selector,
-}) => {
+} = {}) => {
   const clusterParam = useClusterParam();
   const multiclusterFilters = useListMulticlusterFilters();
   const isAllNamespace = isAllNamespaces(namespace);
@@ -28,6 +27,7 @@ const useVirtualMachineInstanceTypes: UseVirtualMachineInstanceTypes = ({
     V1beta1VirtualMachineInstancetype[]
   >(
     {
+      // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- cluster can be empty string from wizard form
       cluster: cluster || clusterParam,
       fieldSelector,
       groupVersionKind: VirtualMachineInstancetypeModelGroupVersionKind,
@@ -39,7 +39,7 @@ const useVirtualMachineInstanceTypes: UseVirtualMachineInstanceTypes = ({
     multiclusterFilters,
   );
 
-  return [instanceTypes || [], loaded || !!loadError, loadError];
+  return [instanceTypes ?? [], loaded || !!loadError, loadError];
 };
 
 export default useVirtualMachineInstanceTypes;

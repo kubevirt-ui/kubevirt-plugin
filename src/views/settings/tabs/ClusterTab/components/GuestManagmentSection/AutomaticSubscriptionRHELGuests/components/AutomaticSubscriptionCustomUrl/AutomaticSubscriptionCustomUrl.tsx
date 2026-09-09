@@ -1,4 +1,4 @@
-import React, { type FC, useCallback, useEffect, useState } from 'react';
+import React, { type FC, useEffect, useMemo, useState } from 'react';
 
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
@@ -34,8 +34,11 @@ const AutomaticSubscriptionCustomUrl: FC<AutomaticSubscriptionCustomUrlProps> = 
     setInputValue(customUrl);
   }, [customUrl]);
 
-  const debounceUpdateCustomUrl = useCallback(
-    (url: string) => debounce(patchCustomUrl, 1000)(url),
+  const debounceUpdateCustomUrl = useMemo(
+    () =>
+      debounce((url: string): void => {
+        void patchCustomUrl(url);
+      }, 1000),
     [patchCustomUrl],
   );
 

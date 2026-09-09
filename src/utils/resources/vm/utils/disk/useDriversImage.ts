@@ -1,15 +1,15 @@
-/* eslint-disable */
 import { useEffect } from 'react';
 
 import { getDriverEntry, setDriverEntry } from '@kubevirt-utils/store/drivers';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { useSignals } from '@preact/signals-react/runtime';
 
-import { DEFAULT_INFO, getDriversInfo, VirtioWinDriversInfo } from './drivers';
+import { DEFAULT_INFO, getDriversInfo, type VirtioWinDriversInfo } from './drivers';
 
 export const useVirtioWinDriversInfo = (clusterParam?: string): [VirtioWinDriversInfo, boolean] => {
   useSignals();
   const clusterParamFromURL = useClusterParam();
+  // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- clusterParam can be empty string from wizard form
   const cluster = clusterParam || clusterParamFromURL;
 
   const entry = getDriverEntry(cluster);

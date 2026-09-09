@@ -1,4 +1,3 @@
-/* eslint-disable */
 import {
   DataImportCronModel,
   DataSourceModel,
@@ -8,7 +7,7 @@ import {
 } from '@kubevirt-ui-ext/kubevirt-api/console';
 import useListNamespaces from '@kubevirt-utils/hooks/useListNamespaces';
 import useSelectedCluster from '@kubevirt-utils/hooks/useSelectedCluster';
-import { K8sVerb } from '@openshift-console/dynamic-plugin-sdk';
+import { type K8sVerb } from '@openshift-console/dynamic-plugin-sdk';
 import { useFleetAccessReview } from '@stolostron/multicluster-sdk';
 
 type UseCanCreateBootableVolume = (namespace: string) => {
@@ -23,7 +22,7 @@ const useCanCreateBootableVolume: UseCanCreateBootableVolume = (namespace) => {
   const selectedNamespaces = useListNamespaces();
 
   const clusterToVerifyAccess = useSelectedCluster();
-  const namespaceToVerifyAccess = selectedNamespaces?.[0] || namespace;
+  const namespaceToVerifyAccess = selectedNamespaces?.[0] ?? namespace;
 
   const [canCreatePVC, loadingPVC] = useFleetAccessReview({
     cluster: clusterToVerifyAccess,

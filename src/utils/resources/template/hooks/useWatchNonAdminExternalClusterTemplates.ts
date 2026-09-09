@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { useMemo } from 'react';
 
 import { OPENSHIFT_NAMESPACE } from '@kubevirt-utils/constants/constants';
@@ -11,7 +10,21 @@ import { useHubClusterName } from '@stolostron/multicluster-sdk';
 
 import { TemplateModelGroupVersionKind } from './constants';
 
-const useWatchNonAdminExternalClusterTemplates = () => {
+const toTemplateWatchError = (error: unknown): Error | string | undefined => {
+  if (isEmpty(error)) {
+    return undefined;
+  }
+  if (error instanceof Error) {
+    return error;
+  }
+  return String(error);
+};
+
+const useWatchNonAdminExternalClusterTemplates = (): {
+  externalClusterTemplates: V1Template[];
+  externalClusterTemplatesError: Error | string | undefined;
+  externalClusterTemplatesLoaded: boolean;
+} => {
   const cluster = useClusterParam();
   const namespace = useNamespaceParam();
 
@@ -65,7 +78,9 @@ const useWatchNonAdminExternalClusterTemplates = () => {
   );
 
   const externalClusterTemplatesError = useMemo(
-    () => externalClusterOpenshiftTemplatesError || externalClusterNamespaceTemplatesError,
+    () =>
+      toTemplateWatchError(externalClusterOpenshiftTemplatesError) ??
+      toTemplateWatchError(externalClusterNamespaceTemplatesError),
     [externalClusterOpenshiftTemplatesError, externalClusterNamespaceTemplatesError],
   );
 

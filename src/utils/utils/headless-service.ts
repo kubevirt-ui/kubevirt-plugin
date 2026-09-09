@@ -1,6 +1,5 @@
-/* eslint-disable */
 import { ServiceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sCreate } from '@multicluster/k8sRequests';
@@ -11,7 +10,7 @@ export const HEADLESS_SERVICE_LABEL = 'network.kubevirt.io/headlessService';
 export const HEADLESS_SERVICE_NAME = 'headless';
 export const HEADLESS_SERVICE_PORT = 5434;
 
-export const createHeadlessService = async (createdVM: V1VirtualMachine) => {
+export const createHeadlessService = async (createdVM: V1VirtualMachine): Promise<void> => {
   try {
     await kubevirtK8sCreate({
       cluster: getCluster(createdVM),

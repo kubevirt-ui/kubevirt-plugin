@@ -1,9 +1,8 @@
-/* eslint-disable */
 import {
-  K8sResourceCommon,
-  MatchExpression,
+  type K8sResourceCommon,
+  type MatchExpression,
   Operator,
-  Selector,
+  type Selector,
 } from '@openshift-console/dynamic-plugin-sdk';
 
 import { isEmpty } from './utils';
@@ -40,14 +39,15 @@ export const matchExpressionSatisfied = (
   }
 };
 
-export const matchSelector = (resource: K8sResourceCommon, selector: Selector) => {
-  const { matchExpressions, matchLabels } = selector || {};
+export const matchSelector = (resource: K8sResourceCommon, selector: Selector): boolean => {
+  const { matchExpressions, matchLabels } = selector ?? {};
+  const labels = matchLabels ?? {};
 
-  const requirements = Object.keys(matchLabels || {})
-    .sort()
-    .map((matchLabel) => createEquals(matchLabel, matchLabels[matchLabel]));
+  const requirements = Object.keys(labels)
+    .sort((a, b) => a.localeCompare(b))
+    .map((matchLabel) => createEquals(matchLabel, labels[matchLabel]));
 
-  const allExpressions = [...requirements, ...(matchExpressions || [])];
+  const allExpressions = [...requirements, ...(matchExpressions ?? [])];
 
   return allExpressions.every((expression) =>
     matchExpressionSatisfied(expression, resource?.metadata?.labels),

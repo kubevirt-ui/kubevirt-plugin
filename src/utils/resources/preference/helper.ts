@@ -1,14 +1,15 @@
-/* eslint-disable */
 import { VirtualMachineClusterPreferenceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { VirtualMachinePreferenceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
-  V1beta1VirtualMachinePreference,
-  V1PreferenceMatcher,
+  type V1beta1VirtualMachinePreference,
+  type V1PreferenceMatcher,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { BootMode } from '@kubevirt-utils/components/FirmwareBootloaderModal/utils/constants';
-import { K8sModel } from '@openshift-console/dynamic-plugin-sdk';
+import { type K8sModel } from '@openshift-console/dynamic-plugin-sdk';
 
-export const getPreferredBootmode = (preference: V1beta1VirtualMachinePreference) => {
+export const getPreferredBootmode = (
+  preference: V1beta1VirtualMachinePreference,
+): BootMode | undefined => {
   if (
     preference?.spec?.firmware?.preferredUseSecureBoot ||
     preference?.spec?.firmware?.preferredEfi?.secureBoot

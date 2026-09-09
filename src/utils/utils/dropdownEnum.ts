@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { ObjectEnum } from '@kubevirt-utils/utils/ObjectEnum';
 
 export type DropdownProps = {
@@ -10,7 +9,7 @@ abstract class DropdownEnum<T> extends ObjectEnum<T> {
 
   getDropdownLabel = (): string => this.dropdownLabel;
 
-  protected constructor(value: T, { dropdownLabel }) {
+  protected constructor(value: T, { dropdownLabel }: DropdownProps) {
     super(value);
     this.dropdownLabel = dropdownLabel;
   }

@@ -26,10 +26,8 @@ const toLoadError = (value: unknown): Error => {
   if (value instanceof Error) {
     return value;
   }
-  if (value) {
-    return new Error(String(value));
-  }
-  return new Error('');
+
+  return new Error(isEmpty(value) ? '' : String(value));
 };
 
 const useRHELAutomaticSubscription: UseRHELAutomaticSubscription = (clusterOverride) => {
@@ -37,20 +35,22 @@ const useRHELAutomaticSubscription: UseRHELAutomaticSubscription = (clusterOverr
   const cluster = clusterOverride ?? clusterParam;
   const { featuresConfigMapData, isAdmin } = useFeaturesConfigMap(cluster);
   const featureConfigMap = featuresConfigMapData[0];
-  const loaded = featuresConfigMapData[1];
+  const loaded = Boolean(featuresConfigMapData[1]);
   const loadError = toLoadError(featuresConfigMapData[2]);
 
   const [loading, setLoading] = useState(false);
 
-  const updateSubscription = ({
+  const updateSubscription = async ({
     activationKey,
     customUrl,
     organizationID,
     type,
-  }: Partial<RHELAutomaticSubscriptionData>): void => {
+  }: Partial<RHELAutomaticSubscriptionData>): Promise<void> => {
     setLoading(true);
     const updatedConfigMap = produce(featureConfigMap, (draftCM) => {
-      if (isEmpty(draftCM?.data)) draftCM.data = {};
+      if (isEmpty(draftCM?.data)) {
+        draftCM.data = {};
+      }
       draftCM.data[AUTOMATIC_SUBSCRIPTION_ACTIVATION_KEY] =
         activationKey ?? draftCM.data[AUTOMATIC_SUBSCRIPTION_ACTIVATION_KEY];
 

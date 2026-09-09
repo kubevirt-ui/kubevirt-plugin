@@ -65,7 +65,7 @@ export const getTemplateOS = (template: Template): OS_NAME_TYPES => {
   const templateOS = getTemplateOSAnnotation(template);
   return (
     Object.values(OS_NAME_TYPES).find((osName) => templateOS?.includes(osName)) ??
-    OS_NAME_TYPES.other
+    OS_NAME_TYPES.Other
   );
 };
 

@@ -1,10 +1,13 @@
-/* eslint-disable */
 import {
-  V1Bootloader,
-  V1Devices,
-  V1VirtualMachineCondition,
-  V1VirtualMachineInstance,
-  V1VirtualMachineInstanceNetworkInterface,
+  type V1Bootloader,
+  type V1Devices,
+  type V1Disk,
+  type V1Interface,
+  type V1Network,
+  type V1VirtualMachineCondition,
+  type V1VirtualMachineInstance,
+  type V1VirtualMachineInstanceNetworkInterface,
+  type V1Volume,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import {
   getStatusConditions as getResourceStatusConditions,
@@ -16,21 +19,23 @@ import {
  * @param {V1VirtualMachineInstance} vmi the virtual machine instance
  * @returns the virtual machine instance volumes
  */
-export const getVMIVolumes = (vmi: V1VirtualMachineInstance) => vmi?.spec?.volumes;
+export const getVMIVolumes = (vmi: V1VirtualMachineInstance): V1Volume[] | undefined =>
+  vmi?.spec?.volumes;
 
 /**
  * A selector for the virtual machine instance's networks
  * @param {V1VirtualMachineInstance} vmi the virtual machine instance
  * @returns the virtual machine instance networks
  */
-export const getVMINetworks = (vmi: V1VirtualMachineInstance) => vmi?.spec?.networks;
+export const getVMINetworks = (vmi: V1VirtualMachineInstance): V1Network[] | undefined =>
+  vmi?.spec?.networks;
 
 /**
  * A selector for the virtual machine instance's interfaces
  * @param {V1VirtualMachineInstance} vmi the virtual machine instance
  * @returns the virtual machine instance interfaces
  */
-export const getVMIInterfaces = (vmi: V1VirtualMachineInstance) =>
+export const getVMIInterfaces = (vmi: V1VirtualMachineInstance): V1Interface[] | undefined =>
   vmi?.spec?.domain?.devices?.interfaces;
 
 /**
@@ -78,7 +83,8 @@ export const getNetworkInterfaceState = (
 export const getVMIArchitecture = (vmi: V1VirtualMachineInstance): string =>
   vmi?.spec?.architecture;
 
-export const getVMIDisks = (vmi: V1VirtualMachineInstance) => vmi?.spec?.domain?.devices?.disks;
+export const getVMIDisks = (vmi: V1VirtualMachineInstance): V1Disk[] | undefined =>
+  vmi?.spec?.domain?.devices?.disks;
 
 /**
  * A selector that returns the VMI's status conditions
@@ -101,8 +107,8 @@ export const getVMIStatusConditionByType = (
 ): undefined | V1VirtualMachineCondition =>
   getResourceStatusConditionsByType<V1VirtualMachineCondition>(vmi, conditionType);
 
-export const getMigrationSourceNode = (vmi: V1VirtualMachineInstance) =>
+export const getMigrationSourceNode = (vmi: V1VirtualMachineInstance): string | undefined =>
   vmi?.status?.migrationState?.sourceNode;
 
-export const getMigrationTargetNode = (vmi: V1VirtualMachineInstance) =>
+export const getMigrationTargetNode = (vmi: V1VirtualMachineInstance): string | undefined =>
   vmi?.status?.migrationState?.targetNode;

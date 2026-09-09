@@ -1,6 +1,3 @@
-/* eslint-disable */
-import { ComponentClass, FC } from 'react';
-
 import { GreenRunningIcon } from '@kubevirt-utils/icons/GreenRunningIcon';
 import {
   ExclamationCircleIcon,
@@ -25,15 +22,7 @@ export const vmiStatuses = {
 
 export const osNames = ['centos', 'fedora', 'windows', 'rhel', 'other'];
 
-const iconHandler = {
-  get: (mapper: typeof iconMapper, prop: string) => {
-    const icon = mapper[prop?.toLowerCase()];
-    if (icon) return icon;
-    return InProgressIcon;
-  },
-};
-
-const iconMapper: { [key: string]: ComponentClass<any, any> | FC } = {
+const iconMapper = {
   error: ExclamationCircleIcon,
   failed: ExclamationCircleIcon,
   paused: PausedIcon,
@@ -42,4 +31,13 @@ const iconMapper: { [key: string]: ComponentClass<any, any> | FC } = {
   unknown: UnknownIcon,
 };
 
-export const icon = new Proxy<typeof iconMapper>(iconMapper, iconHandler);
+type IconComponent = (typeof iconMapper)[keyof typeof iconMapper];
+
+const iconHandler = {
+  get: (mapper: typeof iconMapper, prop: string): IconComponent => {
+    const icon = mapper[prop?.toLowerCase() as keyof typeof iconMapper];
+    return icon ?? InProgressIcon;
+  },
+};
+
+export const icon = new Proxy(iconMapper, iconHandler);

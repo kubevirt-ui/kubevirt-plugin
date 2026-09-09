@@ -1,3 +1,5 @@
+import partition from 'lodash/partition';
+
 import { NetworkAttachmentDefinitionModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
   DEFAULT_NAMESPACE,
@@ -36,21 +38,17 @@ type FilterUDNNadsResult = {
   regular: NetworkAttachmentDefinitionKind[];
 };
 
-const isRegularNad = (nad: NetworkAttachmentDefinitionKind): boolean => {
-  const role = getNADRole(nad);
-  return (
-    role !== NADRole.primary &&
-    (getLabel(nad, UDN_LABEL) === undefined || role === NADRole.secondary)
-  );
-};
-
 export const filterUDNNads = (nads: NetworkAttachmentDefinitionKind[]): FilterUDNNadsResult => {
   const vmAvailableNADs = (nads ?? []).filter(
     (nad) => getName(nad) !== PRIMARY_UDN_KUBEVIRT_BINDING,
   );
 
-  const regular = vmAvailableNADs.filter(isRegularNad);
-  const primary = vmAvailableNADs.filter((nad) => !isRegularNad(nad));
+  const [regular, primary] = partition(
+    vmAvailableNADs,
+    (nad) =>
+      getNADRole(nad) !== NADRole.Primary &&
+      (getLabel(nad, UDN_LABEL) === undefined || getNADRole(nad) === NADRole.Secondary),
+  ) as [NetworkAttachmentDefinitionKind[], NetworkAttachmentDefinitionKind[]];
   return { primary, regular };
 };
 

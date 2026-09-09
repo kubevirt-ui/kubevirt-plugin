@@ -1,5 +1,4 @@
-/* eslint-disable */
-import { IoK8sApiCoreV1Node } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type IoK8sApiCoreV1Node } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { getNodeConditions } from '@kubevirt-utils/resources/node/utils/selectors';
 
 import { NodeStatus } from './types';
@@ -12,7 +11,8 @@ export const isNodeReady = (node: IoK8sApiCoreV1Node): boolean => {
   );
 };
 
-export const nodeStatus = (node: IoK8sApiCoreV1Node) => (isNodeReady(node) ? 'Ready' : 'Not Ready');
+export const nodeStatus = (node: IoK8sApiCoreV1Node): string =>
+  isNodeReady(node) ? 'Ready' : 'Not Ready';
 
 export const isNodeSchedulable = (node: IoK8sApiCoreV1Node): boolean => {
   return !node?.spec?.unschedulable;

@@ -1,21 +1,20 @@
-/* eslint-disable */
 import { useEffect, useState } from 'react';
 
 import {
-  V1VirtualMachineInstance,
-  V1VirtualMachineInstanceGuestAgentInfo,
+  type V1VirtualMachineInstance,
+  type V1VirtualMachineInstanceGuestAgentInfo,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import useGuestAgentURL from '@multicluster/hooks/useGuestAgentURL';
 import { consoleFetch } from '@openshift-console/dynamic-plugin-sdk';
 
 type UseGuestOS = (
   vmi?: V1VirtualMachineInstance,
-) => [V1VirtualMachineInstanceGuestAgentInfo, boolean, Error];
+) => [V1VirtualMachineInstanceGuestAgentInfo, boolean, Error | null];
 
 export const useGuestOS: UseGuestOS = (vmi) => {
   const [loaded, setLoaded] = useState(false);
   const [data, setData] = useState<V1VirtualMachineInstanceGuestAgentInfo>({});
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<Error | null>(null);
   const [guestURL, guestURLLoaded] = useGuestAgentURL(vmi);
 
   useEffect(() => {
@@ -25,12 +24,12 @@ export const useGuestOS: UseGuestOS = (vmi) => {
 
     setError(null);
     if (guestOS) {
-      (async () => {
+      (async (): Promise<void> => {
         const response = await consoleFetch(guestURL);
-        const jsonData = await response.json();
+        const jsonData = (await response.json()) as V1VirtualMachineInstanceGuestAgentInfo;
         setData(jsonData);
         setLoaded(true);
-      })().catch((err) => {
+      })().catch((err: Error) => {
         setError(err);
         setLoaded(true);
       });

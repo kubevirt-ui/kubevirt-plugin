@@ -5,5 +5,5 @@ export type UseFeaturesValues = {
   error: Error;
   featureEnabled: boolean;
   loading: boolean;
-  toggleFeature: (val: boolean) => Promise<IoK8sApiCoreV1ConfigMap>;
+  toggleFeature: (val: boolean | string) => Promise<IoK8sApiCoreV1ConfigMap>;
 };

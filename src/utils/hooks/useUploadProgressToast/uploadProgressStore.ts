@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { create } from 'zustand';
 
 import {
@@ -7,15 +6,15 @@ import {
   performCancelWizardPendingUploads,
 } from './cancel/cancelUpload';
 import { UPLOAD_PROGRESS_STATUS } from './constants';
-import { type UploadProgressStoreState } from './types';
+import { type UploadEntry, type UploadProgressStoreState } from './types';
 
 export const useUploadProgressStore = create<UploadProgressStoreState>((set, get) => ({
-  cancelTrackedUpload: (uploadKey) => performCancelTrackedUpload(get, uploadKey),
-  cancelUploadsForVm: (cluster, namespace, vmName) =>
+  cancelTrackedUpload: (uploadKey): Promise<void> => performCancelTrackedUpload(get, uploadKey),
+  cancelUploadsForVm: (cluster, namespace, vmName): Promise<void> =>
     performCancelUploadsForVm(get, cluster, namespace, vmName),
-  cancelWizardPendingUploads: (wizardVm, wizardBootableVolumeKeys) =>
+  cancelWizardPendingUploads: (wizardVm, wizardBootableVolumeKeys): Promise<void> =>
     performCancelWizardPendingUploads(get, wizardVm, wizardBootableVolumeKeys),
-  completeUpload: (uploadKey, options) =>
+  completeUpload: (uploadKey, options): void =>
     set((state) => {
       const current = state.uploads[uploadKey];
       if (!current) {
@@ -39,7 +38,7 @@ export const useUploadProgressStore = create<UploadProgressStoreState>((set, get
         },
       };
     }),
-  failUpload: (uploadKey, errorMessage) =>
+  failUpload: (uploadKey, errorMessage): void =>
     set((state) => {
       const current = state.uploads[uploadKey];
       if (!current) {
@@ -57,8 +56,8 @@ export const useUploadProgressStore = create<UploadProgressStoreState>((set, get
         },
       };
     }),
-  getUpload: (uploadKey) => get().uploads[uploadKey],
-  markUploadCanceled: (uploadKey) =>
+  getUpload: (uploadKey): UploadEntry | undefined => get().uploads[uploadKey],
+  markUploadCanceled: (uploadKey): void =>
     set((state) => {
       const current = state.uploads[uploadKey];
       if (!current) {
@@ -75,13 +74,13 @@ export const useUploadProgressStore = create<UploadProgressStoreState>((set, get
         },
       };
     }),
-  removeUpload: (uploadKey) =>
+  removeUpload: (uploadKey): void =>
     set((state) => {
       const nextUploads = { ...state.uploads };
       delete nextUploads[uploadKey];
       return { uploads: nextUploads };
     }),
-  startUpload: (uploadKey, entry) =>
+  startUpload: (uploadKey, entry): void =>
     set((state) => ({
       uploads: {
         ...state.uploads,
@@ -94,7 +93,7 @@ export const useUploadProgressStore = create<UploadProgressStoreState>((set, get
         },
       },
     })),
-  tryMarkTerminalToastShown: (uploadKey) => {
+  tryMarkTerminalToastShown: (uploadKey): boolean => {
     const current = get().uploads[uploadKey];
     if (!current || current.terminalToastShown) {
       return false;
@@ -114,7 +113,7 @@ export const useUploadProgressStore = create<UploadProgressStoreState>((set, get
     });
     return true;
   },
-  trySetToastId: (uploadKey, toastId) => {
+  trySetToastId: (uploadKey, toastId): boolean => {
     const current = get().uploads[uploadKey];
     if (!current || current.toastId) {
       return false;
@@ -134,10 +133,10 @@ export const useUploadProgressStore = create<UploadProgressStoreState>((set, get
     });
     return true;
   },
-  updateProgress: (uploadKey, progress) =>
+  updateProgress: (uploadKey, progress): void =>
     set((state) => {
       const current = state.uploads[uploadKey];
-      if (!current || current.status !== UPLOAD_PROGRESS_STATUS.UPLOADING) {
+      if (current?.status !== UPLOAD_PROGRESS_STATUS.UPLOADING) {
         return state;
       }
 

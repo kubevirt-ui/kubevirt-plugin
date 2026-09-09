@@ -117,7 +117,7 @@ export const useFeatures: UseFeatures = (featureName, clusterOverride) => {
   ]);
 
   const toggleFeature = useCallback(
-    async (value: boolean) => {
+    async (value: boolean | string) => {
       if (!operatorNamespace) return;
       setLoading(true);
 

@@ -1,11 +1,13 @@
-/* eslint-disable */
 import { VirtualMachineInstanceMigrationModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1VirtualMachineInstanceMigration } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachineInstanceMigration } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
 import { useAccessibleResources } from '@virtualmachines/search/hooks/useAccessibleResources';
 import { OBJECTS_FETCHING_LIMIT } from '@virtualmachines/utils';
 
-const useVirtualMachineInstanceMigrations = (cluster?: string, namespace?: string) => {
+const useVirtualMachineInstanceMigrations = (
+  cluster?: string,
+  namespace?: string,
+): readonly [V1VirtualMachineInstanceMigration[], boolean, unknown] => {
   const [namespacedVMIMs, namespacedVMIMsLoaded, namespacedVMIMsLoadError] =
     useKubevirtWatchResource<V1VirtualMachineInstanceMigration[]>(
       namespace

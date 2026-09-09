@@ -1,14 +1,13 @@
-/* eslint-disable */
 import { VirtualMachineClusterInstancetypeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { VirtualMachineInstancetypeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
-  V1InstancetypeMatcher,
-  V1VirtualMachine,
-  V1VirtualMachineInstance,
+  type V1InstancetypeMatcher,
+  type V1VirtualMachine,
+  type V1VirtualMachineInstance,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { isVM } from '@kubevirt-utils/utils/typeGuards';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { K8sModel } from '@openshift-console/dynamic-plugin-sdk';
+import { type K8sModel } from '@openshift-console/dynamic-plugin-sdk';
 
 import { getAnnotation } from '../shared';
 
@@ -39,10 +38,12 @@ export const isInstanceTypeVM = (vm: V1VirtualMachine | V1VirtualMachineInstance
 
 export const getInstanceTypeNameFromAnnotation = (
   vm: V1VirtualMachine | V1VirtualMachineInstance,
-) =>
+): string | undefined =>
   getAnnotation(vm, NAMESPACED_INSTANCE_TYPE_NAME_ANNOTATION) ??
   getAnnotation(vm, CLUSTER_INSTANCE_TYPE_NAME_ANNOTATION);
 
-export const getPreferenceNameFromAnnotation = (vm: V1VirtualMachine | V1VirtualMachineInstance) =>
+export const getPreferenceNameFromAnnotation = (
+  vm: V1VirtualMachine | V1VirtualMachineInstance,
+): string | undefined =>
   getAnnotation(vm, NAMESPACED_PREFERENCE_NAME_ANNOTATION) ??
   getAnnotation(vm, CLUSTER_PREFERENCE_NAME_ANNOTATION);

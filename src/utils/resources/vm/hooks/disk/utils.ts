@@ -1,10 +1,9 @@
-/* eslint-disable */
 import {
-  V1beta1DataVolumeSourcePVC,
-  V1Disk,
-  V1VirtualMachine,
-  V1VirtualMachineInstance,
-  V1Volume,
+  type V1beta1DataVolumeSourcePVC,
+  type V1Disk,
+  type V1VirtualMachine,
+  type V1VirtualMachineInstance,
+  type V1Volume,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import {
   DataVolumeModelGroupVersionKind,
@@ -12,17 +11,23 @@ import {
   PersistentVolumeClaimModel,
 } from '@kubevirt-utils/models';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
-import { DiskRawData } from '@kubevirt-utils/resources/vm/utils/disk/constants';
+import { type DiskRawData } from '@kubevirt-utils/resources/vm/utils/disk/constants';
 import { getDiskDrive } from '@kubevirt-utils/resources/vm/utils/disk/selectors';
 import { getVMIDisks } from '@kubevirt-utils/resources/vmi/utils/selectors';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
+import { type WatchK8sResource } from '@openshift-console/dynamic-plugin-sdk';
 
 import { getDataVolumeTemplates, getVolumes } from '../../utils';
 
 const PersistentVolumeClaimGroupVersionKind = modelToGroupVersionKind(PersistentVolumeClaimModel);
 
-export const getPVCAndDVWatches = (vm: V1VirtualMachine) => {
+type PVCAndDVWatches = {
+  dvWatches: Record<string, WatchK8sResource>;
+  pvcWatches: Record<string, WatchK8sResource>;
+};
+
+export const getPVCAndDVWatches = (vm: V1VirtualMachine): PVCAndDVWatches => {
   const cluster = getCluster(vm);
 
   const pvcSources = getDataVolumeTemplates(vm)?.map((dataVolume) => ({
@@ -31,8 +36,8 @@ export const getPVCAndDVWatches = (vm: V1VirtualMachine) => {
   }));
 
   pvcSources.push(
-    ...(getVolumes(vm) || [])
-      .map((volume) => volume?.persistentVolumeClaim?.claimName || volume?.dataVolume?.name)
+    ...(getVolumes(vm) ?? [])
+      .map((volume) => volume?.persistentVolumeClaim?.claimName ?? volume?.dataVolume?.name)
       .filter((claimName) => Boolean(claimName))
       .map(
         (claimName) =>
@@ -69,9 +74,12 @@ export const getPVCAndDVWatches = (vm: V1VirtualMachine) => {
   return { dvWatches, pvcWatches };
 };
 
-export const getEjectedCDROMDrives = (diskDevices: DiskRawData[], vmDisks: V1Disk[]) => {
+export const getEjectedCDROMDrives = (
+  diskDevices: DiskRawData[],
+  vmDisks: V1Disk[],
+): { disk: V1Disk; volume: V1Disk }[] => {
   const diskDevicesSet = new Set(diskDevices.map((obj) => obj.disk?.name).filter(Boolean));
-  const ejectedCDROMDrives = (vmDisks || []).filter((obj) => !diskDevicesSet.has(obj.name));
+  const ejectedCDROMDrives = (vmDisks ?? []).filter((obj) => !diskDevicesSet.has(obj.name));
   const mappedEjectedCDROMDrives = ejectedCDROMDrives.map((disk) => ({
     disk,
     volume: disk,
@@ -79,13 +87,13 @@ export const getEjectedCDROMDrives = (diskDevices: DiskRawData[], vmDisks: V1Dis
   return mappedEjectedCDROMDrives;
 };
 
-export const isStorageVolume = (volume: V1Volume) => {
+export const isStorageVolume = (volume: V1Volume): boolean => {
   return Boolean(
-    volume.dataVolume ||
-    volume.persistentVolumeClaim ||
-    volume.containerDisk ||
-    volume.emptyDisk ||
-    volume.cloudInitNoCloud ||
+    volume.dataVolume ??
+    volume.persistentVolumeClaim ??
+    volume.containerDisk ??
+    volume.emptyDisk ??
+    volume.cloudInitNoCloud ??
     volume.cloudInitConfigDrive,
   );
 };
@@ -101,7 +109,7 @@ export const enrichDisksWithVMIBusInfo = (
   vmDiskList: V1Disk[],
   vmi?: null | V1VirtualMachineInstance,
 ): V1Disk[] => {
-  const vmiDisks = getVMIDisks(vmi) || [];
+  const vmiDisks = getVMIDisks(vmi) ?? [];
 
   return vmDiskList.map((vmDisk) => {
     const driveType = getDiskDrive(vmDisk);

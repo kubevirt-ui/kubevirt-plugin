@@ -1,23 +1,22 @@
-/* eslint-disable */
 export enum NetworkTypeKeys {
-  cnvBridgeNetworkType = 'bridge',
-  ovnKubernetesNetworkType = 'ovn-k8s-cni-overlay',
-  ovnKubernetesSecondaryLocalnet = 'ovn-k8s-cni-overlay-localnet',
-  sriovNetworkType = 'sriov',
+  CnvBridgeNetworkType = 'bridge',
+  OvnKubernetesNetworkType = 'ovn-k8s-cni-overlay',
+  OvnKubernetesSecondaryLocalnet = 'ovn-k8s-cni-overlay-localnet',
+  SriovNetworkType = 'sriov',
 }
 
 export enum NADTopology {
-  layer2 = 'layer2',
-  layer3 = 'layer3',
-  localnet = 'localnet',
+  Layer2 = 'layer2',
+  Layer3 = 'layer3',
+  Localnet = 'localnet',
 }
 
 export enum NADRole {
-  primary = 'primary',
-  secondary = 'secondary',
+  Primary = 'primary',
+  Secondary = 'secondary',
 }
 
 export const PRIMARY_UDN_KUBEVIRT_BINDING = 'primary-udn-kubevirt-binding';
 
-export const PrimaryTopologies = [NADTopology.layer2, NADTopology.layer3];
-export const SecondaryTopologies = [NADTopology.localnet];
+export const PrimaryTopologies = [NADTopology.Layer2, NADTopology.Layer3];
+export const SecondaryTopologies = [NADTopology.Localnet];

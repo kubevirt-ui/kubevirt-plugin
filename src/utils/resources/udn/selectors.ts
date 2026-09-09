@@ -1,11 +1,10 @@
-/* eslint-disable */
 import { isClusterUserDefinedNetwork } from '@kubevirt-utils/utils/typeGuards';
 
 import {
-  ClusterUserDefinedNetworkKind,
-  UserDefinedNetworkKind,
-  UserDefinedNetworkLocalnet,
-  UserDefinedNetworkSpec,
+  type ClusterUserDefinedNetworkKind,
+  type UserDefinedNetworkKind,
+  type UserDefinedNetworkLocalnet,
+  type UserDefinedNetworkSpec,
 } from './types';
 
 export const getNetwork = (
@@ -21,13 +20,13 @@ export const getNetwork = (
 export const getMTU = (udn: ClusterUserDefinedNetworkKind | UserDefinedNetworkKind): number => {
   if (isClusterUserDefinedNetwork(udn)) {
     return (
-      udn?.spec?.network?.layer2?.mtu ||
-      udn?.spec?.network?.layer3?.mtu ||
+      udn?.spec?.network?.layer2?.mtu ??
+      udn?.spec?.network?.layer3?.mtu ??
       udn?.spec?.network?.localnet?.mtu
     );
   }
 
-  return udn?.spec?.layer2?.mtu || udn?.spec?.layer3?.mtu;
+  return udn?.spec?.layer2?.mtu ?? udn?.spec?.layer3?.mtu;
 };
 
 export const getLocalnet = (cudn: ClusterUserDefinedNetworkKind): UserDefinedNetworkLocalnet =>
