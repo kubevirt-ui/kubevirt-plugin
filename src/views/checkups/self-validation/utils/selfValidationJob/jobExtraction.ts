@@ -1,10 +1,8 @@
-/* eslint-disable */
 import { JobModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { IoK8sApiBatchV1Job } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type IoK8sApiBatchV1Job } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { k8sList } from '@openshift-console/dynamic-plugin-sdk';
 
-import { getJobContainers, isJobRunning, KUBEVIRT_VM_LATENCY_LABEL } from '../../../utils/utils';
 import {
   JOB_ENV_ACCEPT_WINDOWS_EULA,
   JOB_ENV_DRY_RUN,
@@ -17,6 +15,8 @@ import {
   JOB_VOLUME_RESULTS,
   SELF_VALIDATION_LABEL_VALUE,
 } from '../constants';
+
+import { getJobContainers, isJobRunning, KUBEVIRT_VM_LATENCY_LABEL } from '../../../utils/utils';
 
 // ===========================
 // Job Information Extraction
@@ -62,7 +62,7 @@ export const getStorageCapabilitiesFromJob = (job: IoK8sApiBatchV1Job): string[]
 };
 
 export const getCheckupImageFromJob = (job: IoK8sApiBatchV1Job): string =>
-  getJobContainers(job)?.[0]?.image || '';
+  getJobContainers(job)?.[0]?.image ?? '';
 
 export { isJobRunning } from '../../../utils/utils';
 
@@ -83,7 +83,7 @@ export const getAllRunningSelfValidationJobs = async (): Promise<IoK8sApiBatchV1
       },
     });
 
-    const jobs = Array.isArray(response) ? response : response?.items || [];
+    const jobs = Array.isArray(response) ? response : (response?.items ?? []);
     return jobs.filter(isJobRunning);
   } catch (error) {
     kubevirtConsole.error('Failed to fetch running self-validation jobs:', error);

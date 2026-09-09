@@ -63,7 +63,7 @@ const SSHConfiguration: FC<SSHConfigurationProps> = ({ newBadge }) => {
     [cluster, featureConfigMap],
   );
 
-  const onTextChange = useDebounceCallback((val: string, field) => {
+  const onTextChange = useDebounceCallback((val: string, field: string) => {
     onChange(val, field);
   }, 700);
 

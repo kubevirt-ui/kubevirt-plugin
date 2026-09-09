@@ -108,13 +108,21 @@ export const NodeInventoryItem: FC<{ obj: NodeKind }> = ({ obj }) => {
               <FlexItem>
                 <NodeInventoryStatusItem
                   count={primaryStatuses.Error}
-                  icon={<vmStatusIcon.Error size="xl" />}
+                  icon={
+                    <Icon size="xl">
+                      <vmStatusIcon.Error />
+                    </Icon>
+                  }
                 />
               </FlexItem>
               <FlexItem>
                 <NodeInventoryStatusItem
                   count={primaryStatuses.Running}
-                  icon={<vmStatusIcon.Running size="xl" />}
+                  icon={
+                    <Icon size="xl">
+                      <vmStatusIcon.Running />
+                    </Icon>
+                  }
                 />
               </FlexItem>
               <FlexItem>

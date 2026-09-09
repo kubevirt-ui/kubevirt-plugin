@@ -1,20 +1,18 @@
-/* eslint-disable */
 import React from 'react';
-import { TFunction } from 'i18next';
+import { type TFunction } from 'i18next';
 
 import {
-  IoK8sApiBatchV1Job,
-  IoK8sApiCoreV1ConfigMap,
+  type IoK8sApiBatchV1Job,
+  type IoK8sApiCoreV1ConfigMap,
 } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
-import { ActionDropdownItemType } from '@kubevirt-utils/components/ActionsDropdown/constants';
+import { type ActionDropdownItemType } from '@kubevirt-utils/components/ActionsDropdown/constants';
 import DeleteModal from '@kubevirt-utils/components/DeleteModal/DeleteModal';
 import { trimLastHistoryPath } from '@kubevirt-utils/components/HorizontalNavbar/utils/utils';
-import { ModalComponent } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
-import { ToastActions } from '@kubevirt-utils/hooks/useKubevirtToast';
+import { type ModalComponent } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+import { type ToastActions } from '@kubevirt-utils/hooks/useKubevirtToast';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 
 import { deleteSelfValidationCheckup } from '../../utils';
-
 import { getConfigMapInfo } from './CheckupsSelfValidationActionsUtils';
 import {
   createGoToRunningCheckupAction,
@@ -73,7 +71,7 @@ export const createCheckupsSelfValidationActionFactory = (
     };
 
     return {
-      cta: () => {
+      cta: (): void => {
         createModal((props) => (
           <DeleteModal
             {...props}

@@ -1,18 +1,22 @@
-/* eslint-disable */
 import { useEffect, useMemo } from 'react';
 
 import { ConfigMapModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
-  IoK8sApiBatchV1Job,
-  IoK8sApiCoreV1ConfigMap,
+  type IoK8sApiBatchV1Job,
+  type IoK8sApiCoreV1ConfigMap,
 } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import useK8sGetData from '@multicluster/hooks/useK8sGetData';
 
-import { CONFIGMAP_NAME, getJobContainers } from '../../../utils/utils';
-import { JobResults, parseResults } from '../../utils';
+import {
+  CONFIGMAP_NAME,
+  getJobContainers,
+  STATUS_COMPLETION_TIME_STAMP,
+  STATUS_START_TIME_STAMP,
+} from '../../../utils/utils';
+import { type JobResults, parseResults } from '../../utils';
 
 type UseJobResultsProps = {
   cluster: string;
@@ -85,7 +89,10 @@ export const useJobResults = ({
     if (!configMapLoaded || configMapError || !configMap)
       return { parseError: false, results: null };
 
-    if (getName(configMap) !== configMapName || getNamespace(configMap) !== namespace) {
+    if (
+      configMapName != null &&
+      (getName(configMap) !== configMapName || getNamespace(configMap) !== namespace)
+    ) {
       return { parseError: false, results: null };
     }
 
@@ -98,8 +105,8 @@ export const useJobResults = ({
       results: {
         tests: parsedResults,
         timestamps: {
-          completionTimestamp: configMap.data?.['status.completionTimestamp'],
-          startTimestamp: configMap.data?.['status.startTimestamp'],
+          completionTimestamp: configMap.data?.[STATUS_COMPLETION_TIME_STAMP],
+          startTimestamp: configMap.data?.[STATUS_START_TIME_STAMP],
         },
       },
     };
@@ -134,7 +141,9 @@ export const useJobResults = ({
   }, [nameResolutionError, jobSucceeded, namespace, configMapName, configMapError, parseError, t]);
 
   const configMapIsStale =
-    !!configMap && (getName(configMap) !== configMapName || getNamespace(configMap) !== namespace);
+    !!configMap &&
+    configMapName != null &&
+    (getName(configMap) !== configMapName || getNamespace(configMap) !== namespace);
 
   const isLoading =
     !nameResolutionError &&

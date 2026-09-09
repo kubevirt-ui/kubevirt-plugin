@@ -1,5 +1,5 @@
-/* eslint-disable */
-import React, { FC, ReactNode, useMemo, useState } from 'react';
+import type { FC, ReactNode } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
 
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
@@ -19,10 +19,9 @@ import {
 } from '../actions/CheckupsSelfValidationActionsUtils';
 import { useAllRunningSelfValidationJobs } from '../hooks/useAllRunningSelfValidationJobs';
 import useCheckupsSelfValidationPermissions from '../hooks/useCheckupsSelfValidationPermissions';
-
 import HeavyLoadCheckupConfirmationModal from './HeavyLoadCheckupConfirmationModal';
 import RunButtonWithTooltip from './RunButtonWithTooltip';
-import { CheckupsSelfValidationFormActionsProps } from './types';
+import { type CheckupsSelfValidationFormActionsProps } from './types';
 import { isValidWinImageDownloadUrl } from './utils';
 
 const CheckupsSelfValidationFormActions: FC<CheckupsSelfValidationFormActionsProps> = ({
@@ -58,7 +57,7 @@ const CheckupsSelfValidationFormActions: FC<CheckupsSelfValidationFormActionsPro
         hasOtherRunningJobs: false,
         isCreateSelfValidationPermitted,
         otherRunningJobs: [],
-        runningSelfValidationJobs: runningSelfValidationJobs || [],
+        runningSelfValidationJobs: runningSelfValidationJobs ?? [],
       }),
     [isCreateSelfValidationPermitted, runningSelfValidationJobs],
   );
@@ -85,7 +84,7 @@ const CheckupsSelfValidationFormActions: FC<CheckupsSelfValidationFormActionsPro
 
   const showTooltip = eulaPendingConfirmation || showRunningCheckupTooltip;
 
-  const executeRun = async () => {
+  const executeRun = async (): Promise<void> => {
     if (
       windowsServerTesting &&
       trimmedWinImageDownloadUrl &&
@@ -128,12 +127,12 @@ const CheckupsSelfValidationFormActions: FC<CheckupsSelfValidationFormActionsPro
     }
   };
 
-  const handleOpenConfirmation = () => {
+  const handleOpenConfirmation = (): void => {
     createModal(({ isOpen, onClose }) => (
       <HeavyLoadCheckupConfirmationModal
         onConfirm={() => {
           onClose();
-          executeRun();
+          void executeRun();
         }}
         isOpen={isOpen}
         onClose={onClose}

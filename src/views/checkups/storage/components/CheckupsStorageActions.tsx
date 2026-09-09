@@ -1,10 +1,10 @@
-/* eslint-disable */
+import type { FC } from 'react';
 import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
 
 import {
-  IoK8sApiBatchV1Job,
-  IoK8sApiCoreV1ConfigMap,
+  type IoK8sApiBatchV1Job,
+  type IoK8sApiCoreV1ConfigMap,
 } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import DeleteModal from '@kubevirt-utils/components/DeleteModal/DeleteModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
@@ -21,14 +21,16 @@ import { createCheckupRerunHandler } from '../../utils/createCheckupRerunHandler
 import { getCheckupImageFromNewestJob } from '../../utils/utils';
 import { deleteStorageCheckup, rerunStorageCheckup } from '../utils/utils';
 
-const CheckupsStorageActions = ({
-  configMap,
-  isKebab = false,
-  jobs,
-}: {
+type CheckupsStorageActionsProps = {
   configMap: IoK8sApiCoreV1ConfigMap;
   isKebab?: boolean;
   jobs: IoK8sApiBatchV1Job[];
+};
+
+const CheckupsStorageActions: FC<CheckupsStorageActionsProps> = ({
+  configMap,
+  isKebab = false,
+  jobs,
 }) => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
@@ -39,7 +41,7 @@ const CheckupsStorageActions = ({
   const toast = useKubevirtToast();
   const [isActionsOpen, setIsActionsOpen] = useState<boolean>(false);
 
-  const onToggle = () => setIsActionsOpen((prevIsOpen) => !prevIsOpen);
+  const onToggle = (): void => setIsActionsOpen((prevIsOpen) => !prevIsOpen);
 
   const Toggle = isKebab
     ? KebabToggle({ isExpanded: isActionsOpen, onClick: onToggle })

@@ -1,9 +1,8 @@
-/* eslint-disable */
-import { TFunction } from 'i18next';
 import React from 'react';
+import { type TFunction } from 'i18next';
 
-import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
-import { ToastActions } from '@kubevirt-utils/hooks/useKubevirtToast';
+import { type IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type ToastActions } from '@kubevirt-utils/hooks/useKubevirtToast';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getCluster } from '@multicluster/helpers/selectors';
 
@@ -17,7 +16,13 @@ type ShowRerunToastParams = {
   toast: ToastActions;
 };
 
-export const showRerunToast = ({ configMap, getUrl, navigate, t, toast }: ShowRerunToastParams) => {
+export const showRerunToast = ({
+  configMap,
+  getUrl,
+  navigate,
+  t,
+  toast,
+}: ShowRerunToastParams): void => {
   const name = getName(configMap);
   const url = getUrl(name, getNamespace(configMap), getCluster(configMap));
 

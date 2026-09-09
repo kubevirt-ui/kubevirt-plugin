@@ -1,5 +1,5 @@
-/* eslint-disable */
-import React, { FC, useEffect, useMemo, useState } from 'react';
+import type { FC, ReactNode } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -21,7 +21,6 @@ import {
 import { InProgressIcon } from '@patternfly/react-icons';
 
 import TestStatistics from '../../../components/shared/TestStatistics';
-
 import { getTestSuiteLabel, getTotalSkippedTests } from './utils/progressTracker';
 import type { OverallProgress } from './utils/types';
 
@@ -56,7 +55,7 @@ const OverallProgressCard: FC<OverallProgressCardProps> = ({ progress: overallPr
       setElapsedSeconds(getElapsedTimeInSeconds(overallProgress?.startTime));
     }, 1000);
 
-    return () => clearInterval(intervalId);
+    return (): void => clearInterval(intervalId);
   }, [isJobActive, overallProgress?.startTime]);
 
   const elapsedTime = elapsedSeconds > 0 ? formatElapsedTime(t, elapsedSeconds) : null;
@@ -66,7 +65,7 @@ const OverallProgressCard: FC<OverallProgressCardProps> = ({ progress: overallPr
     [overallProgress?.suites],
   );
 
-  const getOverallStatusIcon = () => {
+  const getOverallStatusIcon = (): ReactNode => {
     if (!overallProgress) return null;
     if (overallProgress.failedSuites > 0) {
       return <RedExclamationCircleIcon />;

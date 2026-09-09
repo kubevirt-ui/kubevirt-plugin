@@ -1,16 +1,17 @@
-/* eslint-disable */
 import React from 'react';
-import { TFunction } from 'i18next';
+import { type TFunction } from 'i18next';
 
 import {
-  IoK8sApiBatchV1Job,
-  IoK8sApiCoreV1ConfigMap,
+  type IoK8sApiBatchV1Job,
+  type IoK8sApiCoreV1ConfigMap,
 } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
-import { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
+import { type ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { ACTIONS } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/const';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { SortByDirection } from '@patternfly/react-table';
+
+import { groupJobsByConfigMapName } from '../utils';
 
 import { CHECKUPS_COLUMN_KEYS } from '../../utils/constants';
 import {
@@ -21,8 +22,6 @@ import {
   getJobStatus,
   STATUS_START_TIME_STAMP,
 } from '../../utils/utils';
-import { groupJobsByConfigMapName } from '../utils';
-
 import {
   ActionsCell,
   ClusterCell,
@@ -55,7 +54,8 @@ export const getCheckupsSelfValidationColumns = (
     ...(isACMPage
       ? [
           {
-            getValue: (row: IoK8sApiCoreV1ConfigMap) => getCluster(row) || hubClusterName || '',
+            getValue: (row: IoK8sApiCoreV1ConfigMap): string =>
+              getCluster(row) ?? hubClusterName ?? '',
             key: 'cluster',
             label: t('Cluster'),
             renderCell: (row: IoK8sApiCoreV1ConfigMap) => <ClusterCell row={row} />,
@@ -71,14 +71,14 @@ export const getCheckupsSelfValidationColumns = (
       sortable: true,
     },
     {
-      getValue: (row, callbacks) => {
+      getValue: (row, callbacks): string => {
         const latestJob = callbacks?.getJobByName(getName(row), false)?.[0];
         return getCSVExportStatusLabel(getConfigMapStatus(row, getJobStatus(latestJob)), t);
       },
       key: 'status',
       label: t('Status'),
       renderCell: (row, callbacks) => <StatusCell callbacks={callbacks} row={row} />,
-      sort: (data, sortDirection) => {
+      sort: (data, sortDirection): IoK8sApiCoreV1ConfigMap[] => {
         const statusOrder = {
           [CheckupsStatus.Deleting]: 5,
           [CheckupsStatus.Done]: 2,
@@ -93,8 +93,8 @@ export const getCheckupsSelfValidationColumns = (
           const statusA = getConfigMapStatus(a, getJobStatus(jobA));
           const statusB = getConfigMapStatus(b, getJobStatus(jobB));
 
-          const orderA = statusOrder[statusA] || 999;
-          const orderB = statusOrder[statusB] || 999;
+          const orderA = statusOrder[statusA] ?? 999;
+          const orderB = statusOrder[statusB] ?? 999;
 
           return sortDirection === SortByDirection.asc ? orderA - orderB : orderB - orderA;
         });
@@ -102,9 +102,9 @@ export const getCheckupsSelfValidationColumns = (
       sortable: true,
     },
     {
-      getValue: (row, callbacks) => {
+      getValue: (row, callbacks): string => {
         const latestJob = callbacks?.getJobByName(row?.metadata?.name, false)?.[0];
-        return latestJob?.status?.startTime || row?.data?.[STATUS_START_TIME_STAMP] || '';
+        return latestJob?.status?.startTime ?? row?.data?.[STATUS_START_TIME_STAMP] ?? '';
       },
       key: CHECKUPS_COLUMN_KEYS.START_TIME_CAMEL,
       label: t('Start time'),
@@ -113,16 +113,16 @@ export const getCheckupsSelfValidationColumns = (
       sortable: true,
     },
     {
-      getValue: (row, callbacks) => {
+      getValue: (row, callbacks): string => {
         const latestJob = callbacks?.getJobByName(row?.metadata?.name, false)?.[0];
-        return latestJob?.status?.completionTime || '';
+        return latestJob?.status?.completionTime ?? '';
       },
       key: 'completionTime',
       label: t('Completion time'),
       renderCell: (row, callbacks) => (
         <TimeCell callbacks={callbacks} row={row} type="completion" />
       ),
-      sort: (data, sortDirection) => {
+      sort: (data, sortDirection): IoK8sApiCoreV1ConfigMap[] => {
         return data.toSorted((a, b) => {
           const jobA = jobsByConfigMapName.get(a?.metadata?.name)?.[0];
           const jobB = jobsByConfigMapName.get(b?.metadata?.name)?.[0];

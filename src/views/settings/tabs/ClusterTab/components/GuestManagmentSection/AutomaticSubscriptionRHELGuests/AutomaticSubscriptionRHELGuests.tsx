@@ -100,7 +100,9 @@ const AutomaticSubscriptionRHELGuests: FC<AutomaticSubscriptionRHELGuestsProps> 
                 {selected?.value ===
                   AutomaticSubscriptionTypeEnum.MONITOR_AND_MANAGE_SUBSCRIPTIONS && (
                   <AutomaticSubscriptionCustomUrl
+                    canEdit={formProps.canEdit}
                     customUrl={formProps.subscriptionData?.customUrl}
+                    updateSubscription={formProps.updateSubscription}
                   />
                 )}
               </>

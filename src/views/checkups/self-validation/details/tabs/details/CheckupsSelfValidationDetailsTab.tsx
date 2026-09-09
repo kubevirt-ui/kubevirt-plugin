@@ -1,7 +1,6 @@
-/* eslint-disable */
-import React, { FC, useCallback } from 'react';
+import React, { type FC, useCallback } from 'react';
 
-import { IoK8sApiBatchV1Job } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type IoK8sApiBatchV1Job } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { Divider, PageSection } from '@patternfly/react-core';
@@ -14,7 +13,6 @@ import useJobResults from '../../../components/hooks/useJobResults';
 import useProgressTracking from '../../components/progress/hooks/useProgressTracking';
 import TestProgressOverview from '../../components/progress/TestProgressOverview';
 import useWatchCheckupData from '../../hooks/useWatchCheckupData';
-
 import CheckupsSelfValidationDetailsPageSection from './CheckupsSelfValidationDetailsPageSection';
 
 const CheckupsSelfValidationDetailsTab: FC = () => {
@@ -28,7 +26,7 @@ const CheckupsSelfValidationDetailsTab: FC = () => {
   } = useJobResults({
     cluster: getCluster(configMap),
     job: currentJob,
-    namespace: getNamespace(configMap) || '',
+    namespace: getNamespace(configMap) ?? '',
   });
 
   const isJobCompleted = getIsJobCompleted(currentJob);
@@ -42,7 +40,7 @@ const CheckupsSelfValidationDetailsTab: FC = () => {
     cluster: getCluster(configMap),
     enabled: isJobRunning,
     job: currentJob,
-    namespace: getNamespace(configMap) || '',
+    namespace: getNamespace(configMap) ?? '',
   });
 
   const renderCustomActions = useCallback(

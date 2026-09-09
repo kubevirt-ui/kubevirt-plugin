@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { useDispatch } from 'react-redux';
 
 import {
@@ -13,7 +12,13 @@ import {
   updateChatHistoryByID,
   updateChatHistoryTool,
 } from '@lightspeed/hooks/useLightspeedActions/utils/lightspeedActions';
-import { Attachment, ChatEntry, Tool } from '@lightspeed/hooks/useLightspeedActions/utils/types';
+import {
+  type Attachment,
+  type ChatEntry,
+  type Tool,
+} from '@lightspeed/hooks/useLightspeedActions/utils/types';
+
+type OLSDispatch = (action: { payload?: unknown; type: string }) => void;
 
 type UseLightspeedActions = () => {
   clearAttachments: () => void;
@@ -29,7 +34,7 @@ type UseLightspeedActions = () => {
 };
 
 const useLightspeedActions: UseLightspeedActions = () => {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch() as OLSDispatch;
 
   return {
     clearAttachments: () => dispatch(attachmentsClear()),

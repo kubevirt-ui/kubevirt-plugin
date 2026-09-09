@@ -1,10 +1,9 @@
-/* eslint-disable */
-import React, { ReactElement } from 'react';
+import React, { type ReactElement } from 'react';
 import { Link } from 'react-router';
-import { TFunction } from 'i18next';
+import { type TFunction } from 'i18next';
 import { extractConfigMapName } from 'src/views/checkups/utils/utils';
 
-import { IoK8sApiBatchV1Job } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type IoK8sApiBatchV1Job } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { getSelfValidationCheckupURL } from '@kubevirt-utils/resources/checkups/urls';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getCluster } from '@multicluster/helpers/selectors';
@@ -17,7 +16,7 @@ export const getRunningCheckupErrorMessage = (
   const jobLinks = runningJobs.flatMap((job, index) => {
     const configMapInfo = extractConfigMapName(job);
 
-    const jobName = getName(job) || t('Unknown');
+    const jobName = getName(job) ?? t('Unknown');
     const key = getName(job) ?? `job-${index}`;
     const cluster = getCluster(job);
     const url = getSelfValidationCheckupURL(getName(job), getNamespace(job), cluster);

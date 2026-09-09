@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC, useMemo } from 'react';
+import React, { type FC, useMemo } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
@@ -41,12 +40,12 @@ type TestSuiteCardProps = {
 const TestSuiteCard: FC<TestSuiteCardProps> = ({ isExpanded, onToggle, suiteData, suiteName }) => {
   const { t } = useKubevirtTranslation();
 
-  const totalTests = suiteData.tests_run || 0;
-  const testsFailed = suiteData.tests_failures || 0;
-  const testsPassed = suiteData.tests_passed || 0;
-  const testsSkipped = suiteData.tests_skipped || 0;
+  const totalTests = suiteData.tests_run ?? 0;
+  const testsFailed = suiteData.tests_failures ?? 0;
+  const testsPassed = suiteData.tests_passed ?? 0;
+  const testsSkipped = suiteData.tests_skipped ?? 0;
 
-  const failedTests = useMemo(() => suiteData.failed_tests || [], [suiteData.failed_tests]);
+  const failedTests = useMemo(() => suiteData.failed_tests ?? [], [suiteData.failed_tests]);
   const testDuration = useMemo(
     () => formatGoDuration(suiteData.tests_duration),
     [suiteData.tests_duration],

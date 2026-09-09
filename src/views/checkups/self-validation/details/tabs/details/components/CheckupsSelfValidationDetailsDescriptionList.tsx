@@ -1,11 +1,10 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 import CheckupsStatusIcon from 'src/views/checkups/CheckupsStatusIcon';
 
 import { modelToGroupVersionKind, NamespaceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
-  IoK8sApiBatchV1Job,
-  IoK8sApiCoreV1ConfigMap,
+  type IoK8sApiBatchV1Job,
+  type IoK8sApiCoreV1ConfigMap,
 } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -15,9 +14,10 @@ import { getCluster } from '@multicluster/helpers/selectors';
 import { Timestamp } from '@openshift-console/dynamic-plugin-sdk';
 import { DescriptionList, Grid, GridItem } from '@patternfly/react-core';
 
-import { STATUS_COMPLETION_TIME_STAMP, STATUS_START_TIME_STAMP } from '../../../../../utils/utils';
-import { JobResults } from '../../../../utils';
 import ResultsStatus from '../ResultsStatus';
+
+import { STATUS_COMPLETION_TIME_STAMP, STATUS_START_TIME_STAMP } from '../../../../../utils/utils';
+import { type JobResults } from '../../../../utils';
 
 type CheckupsSelfValidationDetailsDescriptionListProps = {
   configMap: IoK8sApiCoreV1ConfigMap;
@@ -50,7 +50,7 @@ const CheckupsSelfValidationDetailsDescriptionList: FC<
             descriptionData={
               <Timestamp
                 timestamp={
-                  results?.timestamps?.startTimestamp || configMap?.data?.[STATUS_START_TIME_STAMP]
+                  results?.timestamps?.startTimestamp ?? configMap?.data?.[STATUS_START_TIME_STAMP]
                 }
               />
             }
@@ -88,7 +88,7 @@ const CheckupsSelfValidationDetailsDescriptionList: FC<
             descriptionData={
               <Timestamp
                 timestamp={
-                  results?.timestamps?.completionTimestamp ||
+                  results?.timestamps?.completionTimestamp ??
                   configMap?.data?.[STATUS_COMPLETION_TIME_STAMP]
                 }
               />

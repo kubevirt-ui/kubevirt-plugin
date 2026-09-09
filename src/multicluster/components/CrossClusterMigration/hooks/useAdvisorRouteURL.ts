@@ -1,3 +1,4 @@
+import { type RouteResource } from '@kubevirt-utils/resources/route/types';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 import { type K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
@@ -8,12 +9,6 @@ type ConsolePluginResource = K8sResourceCommon & {
         namespace?: string;
       };
     };
-  };
-};
-
-type RouteResource = K8sResourceCommon & {
-  spec?: {
-    host?: string;
   };
 };
 

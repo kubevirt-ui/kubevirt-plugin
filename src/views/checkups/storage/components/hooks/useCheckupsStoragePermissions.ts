@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { useMemo } from 'react';
 import { findObjectByName } from 'src/views/checkups/utils/utils';
 
@@ -10,10 +9,10 @@ import {
   ServiceAccountModel,
 } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
-  IoK8sApiCoreV1ServiceAccount,
-  IoK8sApiRbacV1ClusterRoleBinding,
-  IoK8sApiRbacV1Role,
-  IoK8sApiRbacV1RoleBinding,
+  type IoK8sApiCoreV1ServiceAccount,
+  type IoK8sApiRbacV1ClusterRoleBinding,
+  type IoK8sApiRbacV1Role,
+  type IoK8sApiRbacV1RoleBinding,
 } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
@@ -27,7 +26,14 @@ import {
   STORAGE_CLUSTER_ROLE_BINDING,
 } from '../../utils/consts';
 
-export const useCheckupsStoragePermissions = () => {
+type UseCheckupsStoragePermissionsResult = {
+  clusterRoleBinding: IoK8sApiRbacV1ClusterRoleBinding | undefined;
+  isPermitted: boolean;
+  isPermittedToInstall: boolean;
+  loading: boolean;
+};
+
+export const useCheckupsStoragePermissions = (): UseCheckupsStoragePermissionsResult => {
   const namespace = useActiveNamespace();
   const cluster = useSelectedCluster();
   const isAllNamespace = namespace === ALL_NAMESPACES_SESSION_KEY;

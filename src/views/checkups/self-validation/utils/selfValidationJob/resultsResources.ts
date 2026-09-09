@@ -1,6 +1,6 @@
-/* eslint-disable */
 import { JobModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { IoK8sApiBatchV1Job } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type IoK8sApiBatchV1Job } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { isConflictError } from '@kubevirt-utils/errors/errorTypes';
 import { kubevirtK8sCreate, kubevirtK8sGet } from '@multicluster/k8sRequests';
 
 import { type ValidatedJobParameters } from '../constants';
@@ -61,9 +61,8 @@ export const createResultsResourcesJob = async (
       model: JobModel,
     });
     return job;
-  } catch (error: any) {
-    // If job already exists (409), fetch and return the existing job
-    if (error?.response?.status === 409 || error?.code === 409) {
+  } catch (error: unknown) {
+    if (isConflictError(error)) {
       const existingJob = await kubevirtK8sGet<IoK8sApiBatchV1Job>({
         cluster,
         model: JobModel,

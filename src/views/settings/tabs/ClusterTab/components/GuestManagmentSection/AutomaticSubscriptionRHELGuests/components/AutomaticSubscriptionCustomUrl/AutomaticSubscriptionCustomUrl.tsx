@@ -1,31 +1,25 @@
 import React, { type FC, useEffect, useMemo, useState } from 'react';
 
-import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
-import { AUTOMATIC_SUBSCRIPTION_CUSTOM_URL } from '@kubevirt-utils/hooks/useFeatures/constants';
-import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { type RHELAutomaticSubscriptionData } from '@kubevirt-utils/hooks/useRHELAutomaticSubscription/utils/types';
 import { debounce } from '@kubevirt-utils/utils/debounce';
 import { Checkbox, Content, Flex, PopoverPosition, TextInput } from '@patternfly/react-core';
-import { useSettingsCluster } from '@settings/context/SettingsClusterContext';
 
 import './automatic-subscription-custom-url.scss';
 
 type AutomaticSubscriptionCustomUrlProps = {
+  canEdit: boolean;
   customUrl: string;
-  isDisabled?: boolean;
+  updateSubscription: (data: Partial<RHELAutomaticSubscriptionData>) => void;
 };
 
 const AutomaticSubscriptionCustomUrl: FC<AutomaticSubscriptionCustomUrlProps> = ({
+  canEdit,
   customUrl,
-  isDisabled,
+  updateSubscription,
 }) => {
   const { t } = useKubevirtTranslation();
-  const cluster = useSettingsCluster();
-  const { error, toggleFeature: patchCustomUrl } = useFeatures(
-    AUTOMATIC_SUBSCRIPTION_CUSTOM_URL,
-    cluster,
-  );
   const [isChecked, setIsChecked] = useState<boolean>(!!customUrl);
   const [inputValue, setInputValue] = useState<string>(customUrl);
 
@@ -37,9 +31,9 @@ const AutomaticSubscriptionCustomUrl: FC<AutomaticSubscriptionCustomUrlProps> = 
   const debounceUpdateCustomUrl = useMemo(
     () =>
       debounce((url: string): void => {
-        void patchCustomUrl(url);
+        updateSubscription({ customUrl: url });
       }, 1000),
-    [patchCustomUrl],
+    [updateSubscription],
   );
 
   return (
@@ -47,12 +41,14 @@ const AutomaticSubscriptionCustomUrl: FC<AutomaticSubscriptionCustomUrlProps> = 
       <Flex alignItems={{ default: 'alignItemsCenter' }} gap={{ default: 'gapSm' }}>
         <Checkbox
           id="auto-register-rhel"
-          isChecked={isChecked && !isDisabled}
-          isDisabled={isDisabled}
+          isChecked={isChecked}
+          isDisabled={!canEdit}
           label={t('Use custom registration server url')}
           onChange={() =>
             setIsChecked((prevIsChecked) => {
-              if (prevIsChecked) debounceUpdateCustomUrl('');
+              if (prevIsChecked) {
+                debounceUpdateCustomUrl('');
+              }
               return !prevIsChecked;
             })
           }
@@ -62,22 +58,20 @@ const AutomaticSubscriptionCustomUrl: FC<AutomaticSubscriptionCustomUrlProps> = 
           position={PopoverPosition.right}
         />
       </Flex>
-      {isChecked && !isDisabled && (
-        <>
-          <Flex>
-            <Content component="p">{t('URL')}</Content>
-            <TextInput
-              className="AutomaticSubscriptionCustomUrl--input"
-              id="custom-url-input"
-              onChange={(_event, value: string) => {
-                setInputValue(value);
-                debounceUpdateCustomUrl(value);
-              }}
-              value={inputValue}
-            />
-          </Flex>
-          <ErrorAlert error={error} />
-        </>
+      {isChecked && (
+        <Flex>
+          <Content component="p">{t('URL')}</Content>
+          <TextInput
+            className="AutomaticSubscriptionCustomUrl--input"
+            id="custom-url-input"
+            isDisabled={!canEdit}
+            onChange={(_event, value: string) => {
+              setInputValue(value);
+              debounceUpdateCustomUrl(value);
+            }}
+            value={inputValue}
+          />
+        </Flex>
       )}
     </div>
   );

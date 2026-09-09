@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 import { Link } from 'react-router';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -10,7 +9,7 @@ type DataSourceAnnotationsProps = {
 
 const DataSourceAnnotations: FC<DataSourceAnnotationsProps> = ({ annotations }) => {
   const { t } = useKubevirtTranslation();
-  const keys = Object.keys(annotations || {});
+  const keys = Object.keys(annotations ?? {});
   return <Link to="#">{t('{{annotations}} Annotations', { annotations: keys?.length })}</Link>;
 };
 

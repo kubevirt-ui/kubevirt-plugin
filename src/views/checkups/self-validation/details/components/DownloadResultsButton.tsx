@@ -1,9 +1,8 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
 import {
-  IoK8sApiBatchV1Job,
-  IoK8sApiCoreV1ConfigMap,
+  type IoK8sApiBatchV1Job,
+  type IoK8sApiCoreV1ConfigMap,
 } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import useKubevirtToast from '@kubevirt-utils/hooks/useKubevirtToast';
@@ -30,13 +29,13 @@ const DownloadResultsButton: FC<DownloadResultsButtonProps> = ({ configMap, job 
 
   const jobStatus = job ? getJobStatus(job) : null;
   const isCompleted = jobStatus === CheckupsStatus.Done;
-  const namespace = configMap?.metadata?.namespace || null;
+  const namespace = configMap?.metadata?.namespace ?? null;
 
   if (!configMap || !job) {
     return null;
   }
 
-  const handleDownloadResults = async () => {
+  const handleDownloadResults = async (): Promise<void> => {
     if (!isCompleted) {
       kubevirtConsole.log('Checkup not completed yet. Status:', jobStatus);
       return;

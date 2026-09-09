@@ -1,6 +1,5 @@
-/* eslint-disable */
 export enum HealthImpactLevel {
-  critical = 'critical',
-  none = 'none',
-  warning = 'warning',
+  Critical = 'critical',
+  None = 'none',
+  Warning = 'warning',
 }
