@@ -1,18 +1,20 @@
 // Re-export all utilities from the consolidated files
 
 // Constants
-export * from './constants';
 export type {
   JobResults,
   JobResultsTimestamps,
-  TEST_STATUS,
+  TestStatus,
   ValidatedJobParameters,
 } from './constants';
+export * from './constants';
 export { downloadResults, getDefaultErrorMessage, validateDownloadInputs } from './downloadResults';
 
 // Download results utilities
 export type { DownloadInputValidationResult, DownloadResultsReturn } from './downloadResults';
 
+// Results parsing and status
+export { getCheckupsSelfValidationListFilters } from './filters';
 // Job lifecycle and helpers
 export {
   addOwnerReference,
@@ -42,11 +44,8 @@ export {
   installPermissions as installSelfValidationPermissions,
   uninstallPermissions as removeSelfValidationPermissions,
 } from './selfValidationPermissions';
-
 // RBAC permissions
 export type { PermissionOperationResult } from './selfValidationPermissions';
-// Results parsing and status
-export { getCheckupsSelfValidationListFilters } from './filters';
 export {
   formatGoDuration,
   formatStatusTimestamp,

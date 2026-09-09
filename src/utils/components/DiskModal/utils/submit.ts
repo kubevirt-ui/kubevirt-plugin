@@ -1,28 +1,18 @@
-/* eslint-disable */
-import produce from 'immer';
-
-import { V1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { TELEMETRY_HOTPLUG_OPERATION } from '@kubevirt-utils/extensions/telemetry/utils/property-constants';
 import {
   logVMDiskAttached,
   logVMDiskHotplug,
 } from '@kubevirt-utils/extensions/telemetry/vm-storage';
 import { PersistentVolumeClaimModel } from '@kubevirt-utils/models';
-import { getName } from '@kubevirt-utils/resources/shared';
-import {
-  getBootDisk,
-  getDataVolumeTemplates,
-  getDisks,
-  getVolumes,
-} from '@kubevirt-utils/resources/vm';
+import { getBootDisk } from '@kubevirt-utils/resources/vm';
 import { ensurePath, generateUploadDiskName, isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
 import { isRunning } from '@virtualmachines/utils';
 
 import { getDataVolumeTemplateSize } from '../components/utils/selectors';
-
 import { reorderBootDisk } from './bootDiskUtils';
 import { DEFAULT_CDROM_DISK_SIZE, DEFAULT_DISK_SIZE, UPLOAD_SUFFIX } from './constants';
 import {
@@ -30,9 +20,11 @@ import {
   createDataVolumeName,
   getEmptyVMDataVolumeResource,
   hotplugPromise,
-  produceVMDisks,
 } from './helpers';
-import { SubmitInput, UploadDataVolumeParams, V1DiskFormState } from './types';
+import { addDisk, editDisk, resizeVMDataVolumeTemplate } from './submitDiskMutations';
+import { type SubmitInput, type UploadDataVolumeParams } from './types';
+
+export { addDisk, editDisk, resizeVMDataVolumeTemplate } from './submitDiskMutations';
 
 export const uploadDataVolume = async ({
   data,
@@ -47,12 +39,12 @@ export const uploadDataVolume = async ({
   const dataVolume = getEmptyVMDataVolumeResource(vm);
   const file = data?.uploadFile?.file;
 
-  dataVolume.metadata.name = dvName || generateUploadDiskName(data.disk.name, UPLOAD_SUFFIX);
+  dataVolume.metadata.name = dvName ?? generateUploadDiskName(data.disk.name, UPLOAD_SUFFIX);
   dataVolume.spec.source = { upload: {} };
   const isCDROM = Boolean(data.disk?.cdrom);
   const defaultSize = isCDROM ? DEFAULT_CDROM_DISK_SIZE : DEFAULT_DISK_SIZE;
   dataVolume.spec.storage.resources.requests.storage =
-    getDataVolumeTemplateSize(data) || defaultSize;
+    getDataVolumeTemplateSize(data) ?? defaultSize;
 
   await uploadData({
     dataVolume,
@@ -78,44 +70,6 @@ export const uploadDataVolume = async ({
   return dataVolume;
 };
 
-export const editDisk = (data: V1DiskFormState, diskName: string, vm: V1VirtualMachine) => {
-  const volumes = getVolumes(vm);
-  const diskIndex = getDisks(vm)?.findIndex((disk) => disk.name === diskName);
-  const volumeIndex = volumes?.findIndex((volume) => volume.name === diskName);
-  const dataVolumeTemplateIndex = getDataVolumeTemplates(vm)?.findIndex(
-    (dv) => getName(dv) === volumes[volumeIndex]?.dataVolume?.name,
-  );
-
-  return produceVMDisks(vm, (draftVM: V1VirtualMachine) => {
-    draftVM.spec.template.spec.domain.devices.disks.splice(diskIndex, 1, data.disk);
-    if (volumeIndex >= 0) {
-      draftVM.spec.template.spec.volumes.splice(volumeIndex, 1, data.volume);
-    }
-    if (dataVolumeTemplateIndex >= 0)
-      draftVM.spec.dataVolumeTemplates.splice(dataVolumeTemplateIndex, 1, data.dataVolumeTemplate);
-  });
-};
-
-export const addDisk = (data: V1DiskFormState, vm: V1VirtualMachine) => {
-  return produceVMDisks(vm, (draftVM: V1VirtualMachine) => {
-    draftVM.spec.template.spec.domain.devices.disks.push(data.disk);
-    if (data.volume) draftVM.spec.template.spec.volumes.push(data.volume);
-    if (data.dataVolumeTemplate) draftVM.spec.dataVolumeTemplates.push(data.dataVolumeTemplate);
-  });
-};
-
-export const resizeVMDataVolumeTemplate = (data: V1DiskFormState, vm: V1VirtualMachine) => {
-  return produce(vm, (draftVM) => {
-    if (!draftVM?.spec?.dataVolumeTemplates) return;
-
-    const vmDataVolumeTemplate = draftVM.spec.dataVolumeTemplates.find(
-      (dv) => getName(dv) === getName(data.dataVolumeTemplate),
-    );
-    ensurePath(vmDataVolumeTemplate, ['spec.storage.resources.requests.storage']);
-    vmDataVolumeTemplate.spec.storage.resources.requests.storage = data.expandPVCSize;
-  });
-};
-
 export const submit = async ({
   data,
   editDiskName,
@@ -123,7 +77,7 @@ export const submit = async ({
   onSubmit,
   pvc,
   vm,
-}: SubmitInput) => {
+}: SubmitInput): Promise<string | V1VirtualMachine | void> => {
   const isVMRunning = isRunning(vm);
   const isEditDisk = !isEmpty(editDiskName);
   const isCreatingDisk = isEmpty(editDiskName);
@@ -146,7 +100,9 @@ export const submit = async ({
 
   const newVM = reorderBootDisk(vmWithDisk, data.disk.name, data.isBootSource, isInitialBootDisk);
 
-  const updateDisk = async (vmToSubmit: V1VirtualMachine) => {
+  const updateDisk = async (
+    vmToSubmit: V1VirtualMachine,
+  ): Promise<string | V1VirtualMachine | void> => {
     if (shouldHotplug) {
       try {
         const result = await hotplugPromise(vmToSubmit, data);

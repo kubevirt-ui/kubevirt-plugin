@@ -59,10 +59,6 @@ const CloneVMModal: FC<CloneVMModalProps> = ({ headerText, isOpen, onClose, sour
   const [startCloneVM, setStartCloneVM] = useState(false);
   const [initialCloneRequest, setInitialCloneRequest] = useState<V1beta1VirtualMachineClone>();
 
-  const onNameChange = (value: string): void => {
-    setCloneName(value);
-  };
-
   const sendCloneRequest = async (): Promise<void> => {
     const vmSameName = await vmExists(cloneName, namespace, getCluster(source));
 
@@ -135,7 +131,7 @@ const CloneVMModal: FC<CloneVMModalProps> = ({ headerText, isOpen, onClose, sour
         autoFocus
         errorText={errorText}
         name={cloneName}
-        setName={onNameChange}
+        setName={setCloneName}
         validated={validated}
       />
       <DescriptionInput

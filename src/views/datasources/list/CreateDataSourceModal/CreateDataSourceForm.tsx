@@ -1,6 +1,5 @@
-/* eslint-disable */
-import React, { FC } from 'react';
-import { FieldError, UseFormRegister, UseFormSetValue } from 'react-hook-form';
+import React, { type FC } from 'react';
+import { type FieldError, type UseFormRegister, type UseFormSetValue } from 'react-hook-form';
 
 import CapacityInput from '@kubevirt-utils/components/CapacityInput/CapacityInput';
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
@@ -20,7 +19,8 @@ import {
   ValidatedOptions,
 } from '@patternfly/react-core';
 
-import { CreateDataSourceModalFormType } from './CreateDataSourceModal';
+import CreateDataSourceFormIdentityFields from './CreateDataSourceFormIdentityFields';
+import { type CreateDataSourceModalFormType } from './CreateDataSourceModal';
 
 type CreateDataSourceFormProps = {
   errors: {
@@ -42,50 +42,16 @@ export const CreateDataSourceForm: FC<CreateDataSourceFormProps> = ({
   const { t } = useKubevirtTranslation();
   return (
     <Form>
-      <FormGroup fieldId="datasource-create-name" isRequired label={t('Name')}>
-        <FormTextInput
-          {...register('name', { required: true })}
-          aria-label={t('Name')}
-          id="datasource-create-name"
-          type="text"
-          validated={errors?.['name'] ? ValidatedOptions.error : ValidatedOptions.default}
-        />
-        <FormGroupHelperText
-          validated={errors?.['name'] ? ValidatedOptions.error : ValidatedOptions.default}
-        >
-          {errors?.['name'] && getFieldRequiredMessage(t)}
-        </FormGroupHelperText>
-      </FormGroup>
-      <FormGroup
-        aria-label={t('Registry URL')}
-        fieldId="datasource-create-source-url"
-        isRequired
-        label={t('Registry URL')}
-      >
-        <FormTextInput
-          {...register('url', { required: true })}
-          aria-label={t('Registry URL')}
-          data-test={'datasource-create-source-url'}
-          id={'datasource-create-source-url'}
-          type="text"
-          validated={errors?.['url'] ? ValidatedOptions.error : ValidatedOptions.default}
-        />
-        <FormGroupHelperText
-          validated={errors?.['url'] ? ValidatedOptions.error : ValidatedOptions.default}
-        >
-          {errors?.['url']
-            ? getFieldRequiredMessage(t)
-            : t('Example: {{exampleURL}}', {
-                exampleURL: 'quay.io/containerdisks/centos:7-2009',
-              })}
-        </FormGroupHelperText>
-      </FormGroup>
+      <CreateDataSourceFormIdentityFields errors={errors} register={register} />
       <CapacityInput
         label={t('Disk size')}
         onChange={(value) => setValue('size', value)}
         size={size}
       />
       <FormGroup
+        fieldId="retain-revision-info"
+        isRequired
+        label={t('Retain revisions')}
         labelHelp={
           <HelpTextIcon
             bodyContent={t(
@@ -94,16 +60,13 @@ export const CreateDataSourceForm: FC<CreateDataSourceFormProps> = ({
             buttonAriaLabel={t('More info for retain revisions field')}
           />
         }
-        fieldId="retain-revision-info"
-        isRequired
-        label={t('Retain revisions')}
       >
         <NumberInput
           id={'datasource-create-imports-to-keep'}
           max={10}
           min={0}
-          onMinus={() => setValue('importsToKeep', importsToKeep - 1)}
-          onPlus={() => setValue('importsToKeep', importsToKeep + 1)}
+          onMinus={(): void => setValue('importsToKeep', importsToKeep - 1)}
+          onPlus={(): void => setValue('importsToKeep', importsToKeep + 1)}
           value={importsToKeep}
         />
         <FormGroupHelperText>

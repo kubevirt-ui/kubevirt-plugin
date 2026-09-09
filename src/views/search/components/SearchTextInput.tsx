@@ -1,20 +1,5 @@
-/* eslint-disable */
-import React, {
-  FC,
-  FormEvent,
-  KeyboardEvent,
-  RefObject,
-  useCallback,
-  useRef,
-  useState,
-} from 'react';
+import React, { type FC, useRef } from 'react';
 
-import { useClickOutside } from '@kubevirt-utils/hooks/useClickOutside/useClickOutside';
-import {
-  KubevirtFilter,
-  KubevirtFilterState,
-  OnSetFilters,
-} from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   Button,
@@ -28,36 +13,14 @@ import {
   Tooltip,
 } from '@patternfly/react-core';
 import { SearchIcon, TimesIcon } from '@patternfly/react-icons';
-import useCursorTracking from '@search/hooks/useCursorTracking';
-import { useSearchLanguageDropdown } from '@search/searchLanguage/hooks/useSearchLanguageDropdown/useSearchLanguageDropdown';
 import { VM_SEARCH_INPUT_ID } from '@search/utils/constants';
 
-import { useAutocompleteMode } from './SearchDropdown/hooks/useAutocompleteMode/useAutocompleteMode';
-import { useDropdownNavigation } from './SearchDropdown/hooks/useDropdownNavigation/useDropdownNavigation';
-import SearchDropdown from './SearchDropdown/SearchDropdown';
-import { DropdownType } from './SearchDropdown/types';
 import AdvancedSearchIcon from './AdvancedSearchIcon';
+import { useSearchDropdownHandlers } from './hooks/useSearchDropdownHandlers';
+import { useSearchTextInputHandlers } from './hooks/useSearchTextInputHandlers';
 import SaveSearchButton from './SaveSearchButton';
-
-type SearchTextInputProps = {
-  displayText: string;
-  filterDefinitions: KubevirtFilter[];
-  filters: KubevirtFilterState;
-  inputRef: RefObject<HTMLInputElement>;
-  isDraft: boolean;
-  isDropdownOpen: boolean;
-  onChange: (event: FormEvent<HTMLInputElement>, value: string) => void;
-  onClear: () => void;
-  onCloseDropdown: () => void;
-  onInputKeyDown: (event: KeyboardEvent<HTMLInputElement>) => void;
-  onOpenAdvancedSearch: () => void;
-  onOpenDropdown: () => void;
-  onSelectQueryText: (query: string) => void;
-  onSetFilters: OnSetFilters;
-  recentSearches: string[];
-  setDraftText: (value: string) => void;
-  trackKey: (key: string) => void;
-};
+import SearchDropdown from './SearchDropdown/SearchDropdown';
+import { type SearchTextInputProps } from './types';
 
 const SearchTextInput: FC<SearchTextInputProps> = ({
   displayText,
@@ -80,48 +43,51 @@ const SearchTextInput: FC<SearchTextInputProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
 
-  const toggleRef = useRef<HTMLDivElement>(null);
-  const menuRef = useRef<HTMLDivElement>(null);
-
-  const [showAllExamples, setShowAllExamples] = useState(false);
-  const onToggleShowAllExamples = useCallback(() => setShowAllExamples((prev) => !prev), []);
-
-  const { handleCursorChange, setDraftTextWithCursor, tokenParts, updateCursorPosition } =
-    useCursorTracking({ displayText, inputRef, setDraftText });
-
-  const autocompleteMode = useAutocompleteMode(tokenParts.token, filterDefinitions);
-
-  const { onSelectKey, onSelectOperator, onSelectValue } = useSearchLanguageDropdown({
+  const {
     autocompleteMode,
+    menuRef,
+    onSelectKey,
+    onSelectOperator,
+    onSelectValue,
+    onToggleShowAllExamples,
+    showAllExamples,
+    updateCursorPosition,
+  } = useSearchDropdownHandlers({
+    displayText,
+    filterDefinitions,
     filters,
+    inputRef,
     onSetFilters,
-    setDraftTextWithCursor,
-    tokenParts,
+    setDraftText,
     trackKey,
   });
 
-  const { focusedItemIndex, handleKeyDown, resetFocusedItem } = useDropdownNavigation({
+  const toggleRef = useRef<HTMLDivElement>(null);
+
+  const {
+    focusedItemIndex,
+    handleAdvancedSearchClick,
+    handleChange,
+    handleKeyDown,
+    shouldShowDropdown,
+  } = useSearchTextInputHandlers({
     autocompleteMode,
+    displayText,
     filterDefinitions,
+    inputRef,
+    onChange,
+    onCloseDropdown,
     onInputKeyDown,
+    onOpenAdvancedSearch,
     onSelectKey,
     onSelectOperator,
     onSelectQueryText,
     onSelectValue,
     recentSearches,
+    setDraftText,
     showAllExamples,
+    toggleRef,
   });
-
-  const handleChange = useCallback(
-    (event: FormEvent<HTMLInputElement>, value: string) => {
-      handleCursorChange(event);
-      resetFocusedItem();
-      onChange(event, value);
-    },
-    [handleCursorChange, resetFocusedItem, onChange],
-  );
-
-  useClickOutside([toggleRef, menuRef], onCloseDropdown);
 
   const searchInput = (
     <div className="pf-v6-u-w-100" ref={toggleRef}>
@@ -151,13 +117,10 @@ const SearchTextInput: FC<SearchTextInputProps> = ({
             <SaveSearchButton isDraft={isDraft} />
             <Tooltip content={t('Advanced search')}>
               <Button
-                onClick={() => {
-                  onCloseDropdown();
-                  onOpenAdvancedSearch();
-                }}
                 aria-label={t('Advanced search')}
                 data-test="vm-advanced-search-button"
                 icon={<AdvancedSearchIcon isLarge />}
+                onClick={handleAdvancedSearchClick}
                 variant={ButtonVariant.plain}
               />
             </Tooltip>
@@ -184,9 +147,13 @@ const SearchTextInput: FC<SearchTextInputProps> = ({
     </div>
   );
 
-  const shouldShowDropdown = isDropdownOpen && autocompleteMode.type !== DropdownType.HIDDEN;
-
-  return <Popper isVisible={shouldShowDropdown} popper={dropdown} trigger={searchInput} />;
+  return (
+    <Popper
+      isVisible={shouldShowDropdown(isDropdownOpen)}
+      popper={dropdown}
+      trigger={searchInput}
+    />
+  );
 };
 
 export default SearchTextInput;

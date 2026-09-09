@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import {
@@ -8,9 +7,11 @@ import {
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { isEqualObject } from '@kubevirt-utils/components/NodeSelectorModal/utils/helpers';
 import { type Template } from '@kubevirt-utils/resources/template';
+import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 
 import { BOOT_SOURCE } from '../../utils/constants';
+import { type UseVMTemplateSourceValue } from './types';
 import { getDataSource, getPVC, getTemplateBootSourceType, type TemplateBootSource } from './utils';
 
 /**
@@ -26,66 +27,65 @@ export const useVMTemplateSource = (
   const [templateBootSource, setTemplateBootSource] = useState<TemplateBootSource>(undefined);
   const [isBootSourceAvailable, setIsBootSourceAvailable] = useState<boolean>(false);
   const [loaded, setLoaded] = useState<boolean>(false);
-  const [error, setError] = useState<any>();
+  const [error, setError] = useState<unknown>();
   const prevBootSourceRef = useRef<TemplateBootSource>();
   const clusterParam = useClusterParam();
   const cluster = clusterOverride ?? clusterParam;
 
   const bootSource = useMemo(() => getTemplateBootSourceType(template), [template]);
 
-  const getPVCSource = async ({ name, namespace }: V1beta1DataVolumeSourcePVC) => {
-    setLoaded(false);
-    try {
-      const pvc = (await getPVC(name, namespace, cluster)) as V1beta1PersistentVolumeClaim;
-      if (pvc) {
-        setIsBootSourceAvailable(true);
-        setTemplateBootSource({
-          source: {
-            pvc: {
-              name,
-              namespace,
-            },
-          },
-          sourceValue: { pvc },
-          storageClassName: pvc?.spec?.storageClassName,
-          type: BOOT_SOURCE.PVC,
-        });
-      }
-    } catch (e) {
-      setError(e);
-    }
-    setLoaded(true);
-  };
-
-  const getDataSourceCondition = async ({ name, namespace }: V1beta1DataVolumeSourceRef) => {
-    setLoaded(false);
-    try {
-      const dataSource = await getDataSource(name, namespace, cluster);
-      if (
-        dataSource?.status?.conditions?.find((c) => c?.type === 'Ready' && c?.status === 'True')
-      ) {
-        setIsBootSourceAvailable(true);
-        const pvc = await getPVC(
-          dataSource?.spec?.source?.pvc?.name,
-          dataSource?.spec?.source?.pvc?.namespace,
-          cluster,
-        );
-        setTemplateBootSource({
-          source: {
-            pvc: dataSource?.spec?.source?.pvc,
-          },
-          storageClassName: pvc?.spec?.storageClassName,
-          type: BOOT_SOURCE.DATA_SOURCE,
-        });
-      }
-    } catch (e) {
-      setError(e);
-    }
-    setLoaded(true);
-  };
-
   useEffect(() => {
-    if (isEqualObject(prevBootSourceRef?.current, bootSource)) return;
+    if (isEqualObject(prevBootSourceRef?.current, bootSource)) {
+      return;
+    }
+
+    const getPVCSource = async ({ name, namespace }: V1beta1DataVolumeSourcePVC): Promise<void> => {
+      setLoaded(false);
+      try {
+        const pvc = (await getPVC(name, namespace, cluster)) as V1beta1PersistentVolumeClaim;
+        if (pvc) {
+          setIsBootSourceAvailable(true);
+          setTemplateBootSource({
+            source: { pvc: { name, namespace } },
+            sourceValue: { pvc },
+            storageClassName: pvc?.spec?.storageClassName,
+            type: BOOT_SOURCE.PVC,
+          });
+        }
+      } catch (e) {
+        setError(e);
+      }
+      setLoaded(true);
+    };
+
+    const getDataSourceCondition = async ({
+      name,
+      namespace,
+    }: V1beta1DataVolumeSourceRef): Promise<void> => {
+      setLoaded(false);
+      try {
+        const dataSource = await getDataSource(name, namespace, cluster);
+        if (
+          dataSource?.status?.conditions?.some(
+            (condition) => condition?.type === 'Ready' && condition?.status === 'True',
+          )
+        ) {
+          setIsBootSourceAvailable(true);
+          const pvc = await getPVC(
+            dataSource?.spec?.source?.pvc?.name,
+            dataSource?.spec?.source?.pvc?.namespace,
+          );
+          setTemplateBootSource({
+            source: { pvc: dataSource?.spec?.source?.pvc },
+            storageClassName: pvc?.spec?.storageClassName,
+            type: BOOT_SOURCE.DATA_SOURCE,
+          });
+        }
+      } catch (e) {
+        setError(e);
+      }
+      setLoaded(true);
+    };
 
     setError(undefined);
     setTemplateBootSource(undefined);
@@ -93,65 +93,46 @@ export const useVMTemplateSource = (
 
     switch (bootSource?.type) {
       case BOOT_SOURCE.PVC:
-        getPVCSource(bootSource?.source?.pvc);
+        getPVCSource(bootSource?.source?.pvc).catch(kubevirtConsole.error);
         break;
-
       case BOOT_SOURCE.DATA_SOURCE:
-        getDataSourceCondition(bootSource?.source?.sourceRef);
+        getDataSourceCondition(bootSource?.source?.sourceRef).catch(kubevirtConsole.error);
         break;
-
       case BOOT_SOURCE.URL:
-        {
-          setTemplateBootSource({
-            source: bootSource.source,
-            sourceValue: {
-              http: bootSource?.source?.http,
-            },
-            type: bootSource.type,
-          });
-          setIsBootSourceAvailable(true);
-          setLoaded(true);
-        }
+        setTemplateBootSource({
+          source: bootSource.source,
+          sourceValue: { http: bootSource?.source?.http },
+          type: bootSource.type,
+        });
+        setIsBootSourceAvailable(true);
+        setLoaded(true);
         break;
-
       case BOOT_SOURCE.REGISTRY:
-        {
-          setTemplateBootSource({
-            source: bootSource.source,
-            sourceValue: {
-              registry: bootSource?.source?.registry,
-            },
-            type: bootSource.type,
-          });
-          setIsBootSourceAvailable(true);
-          setLoaded(true);
-        }
+        setTemplateBootSource({
+          source: bootSource.source,
+          sourceValue: { registry: bootSource?.source?.registry },
+          type: bootSource.type,
+        });
+        setIsBootSourceAvailable(true);
+        setLoaded(true);
         break;
       case BOOT_SOURCE.CONTAINER_DISK:
-        {
-          setTemplateBootSource({
-            source: bootSource.source,
-            sourceValue: {
-              containerDisk: bootSource?.source?.containerDisk,
-            },
-            type: bootSource.type,
-          });
-          setIsBootSourceAvailable(true);
-          setLoaded(true);
-        }
+        setTemplateBootSource({
+          source: bootSource.source,
+          sourceValue: { containerDisk: bootSource?.source?.containerDisk },
+          type: bootSource.type,
+        });
+        setIsBootSourceAvailable(true);
+        setLoaded(true);
         break;
       case BOOT_SOURCE.SNAPSHOT:
-        {
-          setTemplateBootSource({
-            source: bootSource.source,
-            sourceValue: {
-              snapshot: bootSource?.source?.snapshot,
-            },
-            type: bootSource.type,
-          });
-          setIsBootSourceAvailable(true);
-          setLoaded(true);
-        }
+        setTemplateBootSource({
+          source: bootSource.source,
+          sourceValue: { snapshot: bootSource?.source?.snapshot },
+          type: bootSource.type,
+        });
+        setIsBootSourceAvailable(true);
+        setLoaded(true);
         break;
       default:
         setIsBootSourceAvailable(false);
@@ -168,11 +149,4 @@ export const useVMTemplateSource = (
     loaded,
     templateBootSource,
   };
-};
-
-type UseVMTemplateSourceValue = {
-  error: any;
-  isBootSourceAvailable: boolean;
-  loaded: boolean;
-  templateBootSource: TemplateBootSource;
 };

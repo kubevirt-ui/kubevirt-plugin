@@ -1,3 +1,4 @@
+import { type TFunction } from 'i18next';
 import produce from 'immer';
 
 import { VirtualMachineCloneModel } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -16,6 +17,7 @@ import { getEffectiveRunStrategy } from '@kubevirt-utils/resources/vm/utils/sele
 import { isVM } from '@kubevirt-utils/utils/typeGuards';
 import { getRandomChars, truncateToK8sName } from '@kubevirt-utils/utils/utils';
 import { kubevirtK8sCreate, kubevirtK8sGet } from '@multicluster/k8sRequests';
+import { type Patch } from '@openshift-console/dynamic-plugin-sdk';
 
 import { VolumeNamePolicy } from './constants';
 
@@ -61,7 +63,7 @@ export const cloneVM = (
 
     draftCloneData.spec.volumeNamePolicy = VolumeNamePolicy.PrefixTargetName;
 
-    const patches = [];
+    const patches: Patch[] = [];
 
     if (startVM) {
       const sourceVM = source as V1VirtualMachine;
@@ -117,3 +119,18 @@ export const vmExists = (
 
     return null;
   });
+
+export const getSubmitBtnText = (
+  isCloneSucceeded: boolean,
+  isCloneInProgress: boolean,
+  isVMSource: boolean,
+  t: TFunction,
+): string => {
+  if (isCloneSucceeded) {
+    return t('Close');
+  }
+  if (isCloneInProgress) {
+    return t('Cloning');
+  }
+  return isVMSource ? t('Clone') : t('Create');
+};

@@ -1,15 +1,15 @@
-import { modelToGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { VirtualMachineCloneModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1beta1VirtualMachineClone } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import {
+  modelToGroupVersionKind,
+  VirtualMachineCloneModel,
+} from '@kubevirt-ui-ext/kubevirt-api/console';
+import { type V1beta1VirtualMachineClone } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 
-type UseCloneVMModal = (
+const useCloneVMModal = (
   cloneRequestName: string,
   cloneRequestNamespace: string,
   cluster?: string,
-) => V1beta1VirtualMachineClone;
-
-const useCloneVMModal: UseCloneVMModal = (cloneRequestName, cloneRequestNamespace, cluster) => {
+): V1beta1VirtualMachineClone => {
   const [freshVMCloneRequest] = useK8sWatchData<V1beta1VirtualMachineClone>(
     cloneRequestName &&
       cloneRequestNamespace && {

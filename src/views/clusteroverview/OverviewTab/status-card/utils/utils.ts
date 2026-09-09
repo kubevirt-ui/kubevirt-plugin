@@ -1,29 +1,23 @@
-/* eslint-disable */
-import React, { ReactNode } from 'react';
-
 import {
   modelToGroupVersionKind,
   NetworkAddonsConfigModel,
 } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import BlueSyncIcon from '@kubevirt-utils/icons/BlueSyncIcon';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
-  Alert,
-  GreenCheckCircleIcon,
+  type Alert,
   HealthState,
-  PrometheusLabels,
-  RedExclamationCircleIcon,
-  WatchK8sResource,
-  YellowExclamationTriangleIcon,
+  type K8sResourceCommon,
+  type PrometheusLabels,
+  type WatchK8sResource,
 } from '@openshift-console/dynamic-plugin-sdk';
-import { InProgressIcon } from '@patternfly/react-icons';
 
-import BlueArrowCircleUpIcon from '../../../utils/Components/BlueArrowCircleUpIcon';
 import { ClusterServiceVersionPhase } from '../../../utils/types';
-
-import GrayUnknownIcon from './health-state-icons/GrayUnknownIcon';
 import { CLUSTER } from './constants';
+import { type ClusterServiceVersionKind } from './types';
+
+export type { HealthStateMappingValues } from './health-state-icons/healthStateMapping';
+export { getHealthStateIcon, healthStateMapping } from './health-state-icons/healthStateMapping';
 
 export const NetworkAddonsConfigResource: WatchK8sResource = {
   groupVersionKind: modelToGroupVersionKind(NetworkAddonsConfigModel),
@@ -31,7 +25,14 @@ export const NetworkAddonsConfigResource: WatchK8sResource = {
   namespaced: false,
 };
 
-export const getClusterNAC = (nacList) => nacList?.find((nac) => nac?.metadata?.name === CLUSTER);
+export const getClusterNAC = (
+  nacList: K8sResourceCommon[] | undefined,
+): K8sResourceCommon | undefined => nacList?.find((nac) => nac?.metadata?.name === CLUSTER);
+
+export type StorageHealthState = {
+  message?: string;
+  state: HealthState;
+};
 
 export const getHealthStatusFromCSV = (
   csvPhase: ClusterServiceVersionPhase | undefined,
@@ -55,7 +56,11 @@ export const getHealthStatusFromCSV = (
   }
 };
 
-export const getStorageOperatorHealthStatus = (operatorCSV, loaded, loadErrors) => {
+export const getStorageOperatorHealthStatus = (
+  operatorCSV: ClusterServiceVersionKind | null | undefined,
+  loaded: boolean,
+  loadErrors: unknown,
+): StorageHealthState => {
   if (!loaded) {
     return { state: HealthState.LOADING };
   }
@@ -65,7 +70,12 @@ export const getStorageOperatorHealthStatus = (operatorCSV, loaded, loadErrors) 
   return getHealthStatusFromCSV(operatorCSV?.status?.phase);
 };
 
-export const getOverallStorageStatus = (lsoState, odfState, loaded, loadErrors) => {
+export const getOverallStorageStatus = (
+  lsoState: StorageHealthState,
+  odfState: StorageHealthState,
+  loaded: boolean,
+  loadErrors: unknown,
+): { state: HealthState } => {
   const lsoAvailable = lsoState.state === HealthState.OK;
   const odfAvailable = odfState.state === HealthState.OK;
 
@@ -79,60 +89,6 @@ export const getOverallStorageStatus = (lsoState, odfState, loaded, loadErrors) 
     return { state: HealthState.OK };
   }
   return { state: HealthState.NOT_AVAILABLE };
-};
-
-export const healthStateMapping: { [key in HealthState]: HealthStateMappingValues } = {
-  [HealthState.ERROR]: {
-    health: HealthState.ERROR,
-    icon: <RedExclamationCircleIcon title="Error" />,
-    priority: 6,
-  },
-  [HealthState.LOADING]: {
-    health: HealthState.LOADING,
-    icon: <div className="skeleton-health" />,
-    priority: 7,
-  },
-  [HealthState.NOT_AVAILABLE]: {
-    health: HealthState.NOT_AVAILABLE,
-    icon: <GrayUnknownIcon title="Not available" />,
-    priority: 8,
-  },
-  [HealthState.OK]: {
-    health: HealthState.OK,
-    icon: <GreenCheckCircleIcon title="Healthy" />,
-    priority: 0,
-  },
-  [HealthState.PROGRESS]: {
-    health: HealthState.PROGRESS,
-    icon: <InProgressIcon title="In progress" />,
-    priority: 2,
-  },
-  [HealthState.UNKNOWN]: {
-    health: HealthState.UNKNOWN,
-    icon: <GrayUnknownIcon title="Unknown" />,
-    priority: 1,
-  },
-  [HealthState.UPDATING]: {
-    health: HealthState.UPDATING,
-    icon: <BlueSyncIcon title="Updating" />,
-    priority: 3,
-  },
-  [HealthState.UPGRADABLE]: {
-    health: HealthState.UPGRADABLE,
-    icon: <BlueArrowCircleUpIcon title="Upgrade available" />,
-    priority: 4,
-  },
-  [HealthState.WARNING]: {
-    health: HealthState.WARNING,
-    icon: <YellowExclamationTriangleIcon title="Warning" />,
-    priority: 5,
-  },
-};
-
-export type HealthStateMappingValues = {
-  health: HealthState;
-  icon: ReactNode;
-  priority: number;
 };
 
 export type MonitoringResource = {
@@ -180,15 +136,15 @@ export const getExternalAlertURL = (
   return `${baseURL}${alertPath}`;
 };
 
-export const labelsToParams = (labels: PrometheusLabels) =>
+export const labelsToParams = (labels: PrometheusLabels): string =>
   Object.entries(labels)
-    .map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`)
+    .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
     .join('&');
 
-export const getAlertURL = (alert: Alert, ruleID: string) =>
+export const getAlertURL = (alert: Alert, ruleID: string): string =>
   `${AlertResource.plural}/${ruleID}?${labelsToParams(alert.labels)}`;
 
-export const asArray = (value) => {
+export const asArray = <Value>(value: null | undefined | Value | Value[]): Value[] => {
   if (!value) {
     return [];
   }

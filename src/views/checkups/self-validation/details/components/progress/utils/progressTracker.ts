@@ -6,12 +6,12 @@ import {
   getOverallProgressFromJob,
   getTestSuitesFromJob,
   TEST_PROGRESS_ANNOTATION_PREFIX,
-  type TEST_STATUS,
   TEST_STATUS_COMPLETED,
   TEST_STATUS_FAILED,
   TEST_STATUS_PENDING,
   TEST_STATUS_RUNNING,
   type TestProgressAnnotations,
+  type TestStatus,
 } from '../../../../utils';
 import type {
   JobData,
@@ -103,7 +103,7 @@ const parseSuiteProgressFromJobData = (
 ): TestSuiteProgress => {
   // Use provided lastUpdated or current timestamp as ISO string
   const lastUpdatedString = lastUpdated ?? new Date().toISOString();
-  let status: TEST_STATUS;
+  let status: TestStatus;
 
   if (jobProgress.finished) {
     // Check if there are any failed tests - if so, mark as FAILED, otherwise COMPLETED
