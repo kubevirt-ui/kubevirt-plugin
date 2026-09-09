@@ -35,7 +35,7 @@ import {
 } from '../utils/utils';
 
 type NetworkThresholdChartProps = {
-  vmi: V1VirtualMachineInstance;
+  vmi?: V1VirtualMachineInstance;
 };
 
 const NetworkThresholdChart: FC<NetworkThresholdChartProps> = ({ vmi }) => {
@@ -62,7 +62,7 @@ const NetworkThresholdChart: FC<NetworkThresholdChartProps> = ({ vmi }) => {
     query: queries?.NETWORK_OUT_USAGE,
   });
 
-  const isLoading = !networkInLoaded || !networkOutLoaded;
+  const isLoading = !vmi || !networkInLoaded || !networkOutLoaded;
 
   const error = networkInError ?? networkOutError;
 

@@ -42,15 +42,21 @@ import './virtual-machines-overview-tab-utilization.scss';
 
 type VirtualMachinesOverviewTabUtilizationProps = {
   vm: V1VirtualMachine;
-  vmi: V1VirtualMachineInstance;
+  vmi?: V1VirtualMachineInstance;
+  vmiLoaded?: boolean;
+  vmiLoadError?: Error;
 };
 
 const VirtualMachinesOverviewTabUtilization: FC<VirtualMachinesOverviewTabUtilizationProps> = ({
   vm,
   vmi,
+  vmiLoaded,
+  vmiLoadError,
 }) => {
   const { t } = useKubevirtTranslation();
   const { mcoError, prometheusUnavailable } = usePrometheusAvailability(vm);
+  const vmIsRunning = isRunning(vm);
+  const isVmiLoading = vmIsRunning && (!vmiLoaded || !vmi);
 
   return (
     <Card className="VirtualMachinesOverviewTabUtilization--main">
@@ -80,7 +86,12 @@ const VirtualMachinesOverviewTabUtilization: FC<VirtualMachinesOverviewTabUtiliz
       </CardTitle>
       <Divider />
       <CardBody isFilled>
-        <ComponentReady isReady={isRunning(vm)} text={t('VirtualMachine is not running')}>
+        <ComponentReady
+          error={vmIsRunning ? vmiLoadError : undefined}
+          isLoading={isVmiLoading}
+          isReady={vmIsRunning && Boolean(vmi)}
+          text={t('VirtualMachine is not running')}
+        >
           {prometheusUnavailable && (
             <Alert
               className="pf-v6-u-mb-md"

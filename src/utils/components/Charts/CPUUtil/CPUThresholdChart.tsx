@@ -35,7 +35,7 @@ import {
 } from '../utils/utils';
 
 type CPUThresholdChartProps = {
-  vmi: V1VirtualMachineInstance;
+  vmi?: V1VirtualMachineInstance;
 };
 
 const CPUThresholdChart: FC<CPUThresholdChartProps> = ({ vmi }) => {
@@ -58,7 +58,7 @@ const CPUThresholdChart: FC<CPUThresholdChartProps> = ({ vmi }) => {
     query,
   });
 
-  const isLoading = !loaded;
+  const isLoading = !vmi || !loaded;
   const cpuUsage = dataCPUUsage?.data?.result?.[0]?.values;
   const cpu = getCPU(vmi);
   const cpuRequested = getVCPUCount(cpu);

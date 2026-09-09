@@ -31,15 +31,27 @@ type UtilizationQueriesArgs = {
   duration?: string;
   hubClusterName?: string;
   nic?: string;
-  obj: K8sResourceCommon;
+  obj?: K8sResourceCommon;
 };
 
-type GetUtilizationQueries = ({ duration, hubClusterName, nic, obj }: UtilizationQueriesArgs) => {
-  [key in VMQueries]: string;
+type UtilizationQueries = {
+  [key in VMQueries]: string | undefined;
 };
+
+type GetUtilizationQueries = (args: UtilizationQueriesArgs) => UtilizationQueries;
+
+const emptyUtilizationQueries = (): UtilizationQueries =>
+  Object.values(VMQueries).reduce(
+    (queries, queryKey) => ({ ...queries, [queryKey]: undefined }),
+    {} as UtilizationQueries,
+  );
 
 export const getUtilizationQueries: GetUtilizationQueries = ({ duration, hubClusterName, obj }) => {
   const { name, namespace } = obj?.metadata ?? {};
+
+  if (!name || !namespace) {
+    return emptyUtilizationQueries();
+  }
 
   const isManagedCluster: boolean = !isEmpty(obj?.cluster) && obj?.cluster !== hubClusterName;
   const clusterFilter: string = isManagedCluster ? `,cluster='${obj.cluster}'` : '';
