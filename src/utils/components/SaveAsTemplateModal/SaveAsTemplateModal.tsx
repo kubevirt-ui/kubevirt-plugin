@@ -13,6 +13,7 @@ import {
   ButtonVariant,
   FormGroup,
   ModalVariant,
+  Skeleton,
   TextInput,
 } from '@patternfly/react-core';
 import { isRunning } from '@virtualmachines/utils';
@@ -30,6 +31,8 @@ const SaveAsTemplateModal: FC<SaveAsTemplateModalProps> = ({ isOpen, onClose, vm
 
   const {
     category,
+    categoryEnabledLoading,
+    isCategoryEnabled,
     onSubmit,
     selectedProject,
     setCategory,
@@ -41,7 +44,7 @@ const SaveAsTemplateModal: FC<SaveAsTemplateModalProps> = ({ isOpen, onClose, vm
   return (
     <TabModal<K8sResourceCommon>
       headerText={t('Save as template')}
-      isDisabled={!templateName.trim() || !selectedProject}
+      isDisabled={!templateName.trim() || !selectedProject || categoryEnabledLoading}
       isOpen={isOpen}
       modalVariant={ModalVariant.medium}
       onClose={onClose}
@@ -77,9 +80,13 @@ const SaveAsTemplateModal: FC<SaveAsTemplateModalProps> = ({ isOpen, onClose, vm
         />
       </FormGroup>
 
-      <FormGroup fieldId="template-category-select" label={t('Category')}>
-        <CategorySelect selectedCategory={category} setSelectedCategory={setCategory} />
-      </FormGroup>
+      {isCategoryEnabled && (
+        <FormGroup fieldId="template-category-select" label={t('Category')}>
+          <CategorySelect selectedCategory={category} setSelectedCategory={setCategory} />
+        </FormGroup>
+      )}
+
+      {categoryEnabledLoading && <Skeleton />}
     </TabModal>
   );
 };
