@@ -1,13 +1,12 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC, type ReactElement } from 'react';
 
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
-import { EnhancedSelectOptionProps } from '@kubevirt-utils/components/FilterSelect/utils/types';
+import { type EnhancedSelectOptionProps } from '@kubevirt-utils/components/FilterSelect/utils/types';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Alert, AlertVariant } from '@patternfly/react-core';
 
-import { EnvironmentKind, MapKindToAbbr } from '../constants';
+import { type EnvironmentKind, MapKindToAbbr } from '../constants';
 import {
   getEnvironmentOptionKind,
   getEnvironmentOptionName,
@@ -19,7 +18,7 @@ type EnvironmentSelectResourceProps = {
   environmentName?: string;
   kind?: EnvironmentKind;
   loaded: boolean;
-  loadError: any;
+  loadError: unknown;
   onChange: (diskName: string, name: string, serial: string, kind: EnvironmentKind) => void;
   selectOptions: EnhancedSelectOptionProps[];
   serial: string;
@@ -34,7 +33,7 @@ const EnvironmentSelectResource: FC<EnvironmentSelectResourceProps> = ({
   onChange,
   selectOptions,
   serial,
-}) => {
+}): ReactElement => {
   const { t } = useKubevirtTranslation();
 
   if (!loaded) return <Loading />;
@@ -47,11 +46,11 @@ const EnvironmentSelectResource: FC<EnvironmentSelectResourceProps> = ({
         title={t('An error occurred')}
         variant={AlertVariant.danger}
       >
-        <div className="co-pre-line">{loadError?.message}</div>
+        <div className="co-pre-line">{(loadError as Error)?.message}</div>
       </Alert>
     );
 
-  const onSelect = (value: string) => {
+  const onSelect = (value: string): void => {
     onChange(diskName, getEnvironmentOptionName(value), serial, getEnvironmentOptionKind(value));
   };
 

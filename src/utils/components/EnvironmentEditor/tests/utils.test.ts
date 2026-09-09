@@ -1,4 +1,4 @@
-import { EnvironmentKind, EnvironmentVariable } from '../constants';
+import { EnvironmentKind, type EnvironmentVariable } from '../constants';
 import { areEnvironmentsChanged } from '../utils';
 
 const env1Name = 'test-1';
@@ -13,23 +13,23 @@ describe('utils tests', () => {
   describe('areEnvironmentsChanged tests', () => {
     it('shuffle Envs', () => {
       const initialEnvironments: EnvironmentVariable[] = [
-        { diskName: env1Disk, kind: EnvironmentKind.secret, name: env1Name, serial: env1Serial },
-        { diskName: env2Disk, kind: EnvironmentKind.secret, name: env2Name, serial: env2Serial },
+        { diskName: env1Disk, kind: EnvironmentKind.Secret, name: env1Name, serial: env1Serial },
+        { diskName: env2Disk, kind: EnvironmentKind.Secret, name: env2Name, serial: env2Serial },
       ];
       const newEnvironment: EnvironmentVariable[] = [
-        { diskName: env1Disk, kind: EnvironmentKind.secret, name: env2Name, serial: env2Serial },
-        { diskName: env1Disk, kind: EnvironmentKind.secret, name: env1Name, serial: env1Serial },
+        { diskName: env1Disk, kind: EnvironmentKind.Secret, name: env2Name, serial: env2Serial },
+        { diskName: env1Disk, kind: EnvironmentKind.Secret, name: env1Name, serial: env1Serial },
       ];
       expect(areEnvironmentsChanged(newEnvironment, initialEnvironments)).toBeFalsy();
     });
 
     it('added Env', () => {
       const initialEnvironments: EnvironmentVariable[] = [
-        { diskName: env2Disk, kind: EnvironmentKind.secret, name: env2Name, serial: env2Serial },
+        { diskName: env2Disk, kind: EnvironmentKind.Secret, name: env2Name, serial: env2Serial },
       ];
       const newEnvironment: EnvironmentVariable[] = [
-        { diskName: env2Disk, kind: EnvironmentKind.secret, name: env2Name, serial: env2Serial },
-        { diskName: env1Disk, kind: EnvironmentKind.secret, name: env1Name, serial: env1Serial },
+        { diskName: env2Disk, kind: EnvironmentKind.Secret, name: env2Name, serial: env2Serial },
+        { diskName: env1Disk, kind: EnvironmentKind.Secret, name: env1Name, serial: env1Serial },
       ];
 
       expect(areEnvironmentsChanged(newEnvironment, initialEnvironments)).toBeTruthy();
@@ -37,11 +37,11 @@ describe('utils tests', () => {
 
     it('Removed Env', () => {
       const newEnvironment: EnvironmentVariable[] = [
-        { diskName: env2Disk, kind: EnvironmentKind.secret, name: env2Name, serial: env2Serial },
+        { diskName: env2Disk, kind: EnvironmentKind.Secret, name: env2Name, serial: env2Serial },
       ];
       const initialEnvironments: EnvironmentVariable[] = [
-        { diskName: env2Disk, kind: EnvironmentKind.secret, name: env2Name, serial: env2Serial },
-        { diskName: env1Disk, kind: EnvironmentKind.secret, name: env1Name, serial: env1Serial },
+        { diskName: env2Disk, kind: EnvironmentKind.Secret, name: env2Name, serial: env2Serial },
+        { diskName: env1Disk, kind: EnvironmentKind.Secret, name: env1Name, serial: env1Serial },
       ];
 
       expect(areEnvironmentsChanged(newEnvironment, initialEnvironments)).toBeTruthy();

@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { type FC, type FormEvent } from 'react';
+import React, { type FC, type FormEvent, type ReactElement } from 'react';
 
 import { type V1CPU } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getCPUComponentTitle } from '@kubevirt-utils/components/CPUMemoryModal/components/CPUInput/components/CPUTopologyInput/utils/utils';
@@ -23,9 +22,9 @@ const CPUComponentInput: FC<CPUComponentInputProps> = ({
   cpuLimits,
   isDisabled,
   setCPU,
-}) => {
+}): ReactElement => {
   // Get minimum value from validation rules
-  const minValue = cpuLimits?.[cpuComponent] || 1;
+  const minValue: number = cpuLimits?.[cpuComponent] ?? 1;
 
   const updateCPU = (newValue: number): void => {
     if (newValue >= minValue) {

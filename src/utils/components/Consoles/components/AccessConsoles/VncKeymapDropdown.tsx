@@ -1,7 +1,18 @@
-/* eslint-disable */
-import React, { Dispatch, MouseEvent, Ref, SetStateAction, useState } from 'react';
+import React, {
+  type Dispatch,
+  type MouseEvent,
+  type ReactElement,
+  type Ref,
+  type SetStateAction,
+  useState,
+} from 'react';
 
-import { isKeyboardLayout, KeyboardLayout, KeyMapDef, keyMaps } from '@kubevirt-ui-ext/vnc-keymaps';
+import {
+  isKeyboardLayout,
+  type KeyboardLayout,
+  type KeyMapDef,
+  keyMaps,
+} from '@kubevirt-ui-ext/vnc-keymaps';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
@@ -13,11 +24,11 @@ import {
   DropdownList,
   MenuToggle,
   MenuToggleAction,
-  MenuToggleElement,
+  type MenuToggleElement,
 } from '@patternfly/react-core';
 import { PasteIcon } from '@patternfly/react-icons';
 
-import { AccessConsolesActions, EN_US } from './utils/accessConsoles';
+import { type AccessConsolesActions, EN_US } from './utils/accessConsoles';
 
 export const VncKeymapDropdown = ({
   actions,
@@ -31,13 +42,13 @@ export const VncKeymapDropdown = ({
   selectedKeyboard: KeyboardLayout;
   setSelectedKeyboard: Dispatch<SetStateAction<KeyboardLayout>>;
   updateFavorite: (keymap: KeyboardLayout) => void;
-}) => {
+}): ReactElement => {
   const { t } = useKubevirtTranslation();
   const [isKeyboardSelectOpen, setIsKeyboardSelectOpen] = useState<boolean>(false);
   const { createModal } = useModal();
   const typeInLabel = t('Paste to console');
 
-  const getRegularLayouts = () =>
+  const getRegularLayouts = (): [string, KeyMapDef][] =>
     Object.entries(keyMaps)
       // en_us has special treatment
       .filter(([value]) => value !== EN_US)
@@ -49,7 +60,7 @@ export const VncKeymapDropdown = ({
         event.stopPropagation();
         isKeyboardLayout(value) && updateFavorite(value);
       }}
-      onSelect={(_event, value?: number | string) => {
+      onSelect={(_event, value?: number | string): void => {
         isKeyboardLayout(value) && setSelectedKeyboard(value);
         setIsKeyboardSelectOpen(false);
       }}
@@ -59,7 +70,7 @@ export const VncKeymapDropdown = ({
             <MenuToggleAction
               onClick={
                 actions.sendPaste
-                  ? (e: MouseEvent<HTMLButtonElement>) => {
+                  ? (e: MouseEvent<HTMLButtonElement>): void => {
                       e?.currentTarget?.blur();
                       actions
                         .sendPaste({
@@ -67,7 +78,7 @@ export const VncKeymapDropdown = ({
                           selectedKeyboard,
                           shouldFocusOnConsole: true,
                         })
-                        .catch((err) =>
+                        .catch((err: unknown) =>
                           kubevirtConsole.error('Failed to paste into VNC console', err),
                         );
                     }
@@ -91,7 +102,7 @@ export const VncKeymapDropdown = ({
       )}
       isOpen={isKeyboardSelectOpen}
       isScrollable
-      onOpenChange={(isOpen) => setIsKeyboardSelectOpen(isOpen)}
+      onOpenChange={(isOpen: boolean) => setIsKeyboardSelectOpen(isOpen)}
       selected={selectedKeyboard}
       shouldFocusToggleOnSelect
     >

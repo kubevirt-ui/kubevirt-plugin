@@ -1,10 +1,9 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC, type ReactElement } from 'react';
 
 import { TLS_CERT_FIELD_NAMES } from '@kubevirt-utils/components/AddBootableVolumeModal/consts';
 import {
-  AddBootableVolumeState,
-  SetBootableVolumeFieldType,
+  type AddBootableVolumeState,
+  type SetBootableVolumeFieldType,
 } from '@kubevirt-utils/components/AddBootableVolumeModal/types';
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import { FormTextInput } from '@kubevirt-utils/components/FormTextInput/FormTextInput';
@@ -19,7 +18,10 @@ type HTTPSourceProps = {
   setBootableVolumeField: SetBootableVolumeFieldType;
 };
 
-const HTTPSource: FC<HTTPSourceProps> = ({ bootableVolume, setBootableVolumeField }) => {
+const HTTPSource: FC<HTTPSourceProps> = ({
+  bootableVolume,
+  setBootableVolumeField,
+}): ReactElement => {
   const { t } = useKubevirtTranslation();
 
   const httpSourceHelperURL =
@@ -45,7 +47,7 @@ const HTTPSource: FC<HTTPSourceProps> = ({ bootableVolume, setBootableVolumeFiel
           onChange={(event) => setBootableVolumeField('url')(event.currentTarget.value)}
           type="text"
           validated={urlValidated}
-          value={bootableVolume?.url || ''}
+          value={bootableVolume?.url ?? ''}
         />
         <FormGroupHelperText validated={urlValidated}>
           {isUrlInvalid ? (

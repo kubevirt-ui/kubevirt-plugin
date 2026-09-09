@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 import { Link } from 'react-router';
 
 import { AlertType } from '@kubevirt-utils/components/AlertsCard/utils/types';
@@ -29,8 +29,8 @@ const KubevirtHealthPopup: FC = () => {
     'You can host and manage virtualized workloads on the same platform as container-based workloads.',
   );
 
-  const numCriticalAlerts = alerts?.[AlertType.critical]?.length;
-  const numWarningAlerts = alerts?.[AlertType.warning]?.length;
+  const numCriticalAlerts = alerts?.[AlertType.Critical]?.length;
+  const numWarningAlerts = alerts?.[AlertType.Warning]?.length;
   const healthAlertsURLBasePath = getAlertsPath(perspective, null, HEALTH_ALERTS_URL_PARAMS);
 
   return (
@@ -48,7 +48,7 @@ const KubevirtHealthPopup: FC = () => {
               <StackItem>
                 <div className="kv-health-popup__alerts-count">
                   <RedExclamationCircleIcon className="kv-health-popup__alerts-count--icon" />
-                  <Link to={`${healthAlertsURLBasePath}${AlertType.critical}`}>
+                  <Link to={`${healthAlertsURLBasePath}${AlertType.Critical}`}>
                     {numCriticalAlerts} {t('Critical')}
                   </Link>
                 </div>
@@ -58,7 +58,7 @@ const KubevirtHealthPopup: FC = () => {
               <StackItem>
                 <div className="kv-health-popup__alerts-count">
                   <YellowExclamationTriangleIcon className="kv-health-popup__alerts-count--icon" />{' '}
-                  <Link to={`${healthAlertsURLBasePath}${AlertType.warning}`}>
+                  <Link to={`${healthAlertsURLBasePath}${AlertType.Warning}`}>
                     {numWarningAlerts} {t('Warning')}
                   </Link>
                 </div>

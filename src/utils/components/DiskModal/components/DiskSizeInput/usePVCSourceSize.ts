@@ -1,9 +1,8 @@
-/* eslint-disable */
 import {
-  V1beta1DataSource,
-  V1beta1DataVolumeSourceRef,
+  type V1beta1DataSource,
+  type V1beta1DataVolumeSourceRef,
 } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
-import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import {
   DataSourceModelGroupVersionKind,
   modelToGroupVersionKind,
@@ -18,7 +17,7 @@ const usePVCSourceSize = (
   pvcClaimName: string,
   pvcClaimNamespace: string,
   clusterFromResource?: string,
-): [pvcSize: string, loaded: boolean, error: any] => {
+): [pvcSize: string, loaded: boolean, error: Error | undefined] => {
   const clusterFromUrl = useClusterParam();
   const cluster = clusterFromResource ?? clusterFromUrl;
   const [dataSource, dsLoaded, dsError] = useK8sWatchData<V1beta1DataSource>(
@@ -50,10 +49,10 @@ const usePVCSourceSize = (
     : null;
 
   const [pvc, loaded, error] = useK8sWatchData<IoK8sApiCoreV1PersistentVolumeClaim>(
-    pvcWatchResource || dataSourcePVCWatchRequest,
+    pvcWatchResource ?? dataSourcePVCWatchRequest,
   );
 
-  return [getPVCSize(pvc), loaded && dsLoaded, error || dsError];
+  return [getPVCSize(pvc), loaded && dsLoaded, error ?? dsError];
 };
 
 export default usePVCSourceSize;

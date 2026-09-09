@@ -1,11 +1,17 @@
-/* eslint-disable */
-import React, { Dispatch, FC, SetStateAction, useEffect, useState } from 'react';
+import React, {
+  type Dispatch,
+  type FC,
+  type ReactElement,
+  type SetStateAction,
+  useEffect,
+  useState,
+} from 'react';
 
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FormGroup, TextInput, ValidatedOptions } from '@patternfly/react-core';
 
-import { AffinityRowData } from '../../../../utils/types';
+import { type AffinityRowData } from '../../../../utils/types';
 
 type TopologyKeyInputProps = {
   focusedAffinity: AffinityRowData;
@@ -17,12 +23,12 @@ const TopologyKeyInput: FC<TopologyKeyInputProps> = ({
   focusedAffinity,
   setFocusedAffinity,
   setSubmitDisabled,
-}) => {
+}): ReactElement => {
   const { t } = useKubevirtTranslation();
   const [validated, setValidated] = useState<ValidatedOptions>(ValidatedOptions.default);
-  const { topologyKey } = focusedAffinity || {};
+  const { topologyKey } = focusedAffinity ?? {};
 
-  const onChange = (value: string) => {
+  const onChange = (value: string): void => {
     setFocusedAffinity({ ...focusedAffinity, topologyKey: value });
   };
 

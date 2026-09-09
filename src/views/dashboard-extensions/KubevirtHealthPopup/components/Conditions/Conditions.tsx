@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 import { Link } from 'react-router';
 
 import { HyperConvergedV1Beta1Model as HyperConvergedModel } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -25,9 +25,9 @@ const Conditions: FC = () => {
     );
 
   const getConditionValue = (): number => {
-    if (alerts?.[AlertType.critical]?.length)
-      return SEVERITY_TO_CONDITION_VALUE[AlertType.critical];
-    if (alerts?.[AlertType.warning]?.length) return SEVERITY_TO_CONDITION_VALUE[AlertType.warning];
+    if (alerts?.[AlertType.Critical]?.length)
+      return SEVERITY_TO_CONDITION_VALUE[AlertType.Critical];
+    if (alerts?.[AlertType.Warning]?.length) return SEVERITY_TO_CONDITION_VALUE[AlertType.Warning];
     return SEVERITY_TO_CONDITION_VALUE.none;
   };
 

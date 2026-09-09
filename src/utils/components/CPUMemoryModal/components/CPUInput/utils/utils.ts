@@ -1,18 +1,17 @@
-/* eslint-disable */
 import { type V1CPU, type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getAnnotations } from '@kubevirt-utils/resources/shared';
 import { type Template } from '@kubevirt-utils/resources/template';
 import { parseJSONAnnotation } from '@kubevirt-utils/utils/utils';
 
 export enum CPUInputType {
-  editTopologyManually = 'editTopologyManually',
-  editVCPU = 'editVCPU',
+  EditTopologyManually = 'editTopologyManually',
+  EditVCPU = 'editVCPU',
 }
 
 export enum CPUComponent {
-  cores = 'cores',
-  sockets = 'sockets',
-  threads = 'threads',
+  Cores = 'cores',
+  Sockets = 'sockets',
+  Threads = 'threads',
 }
 
 export const getUpdatedCPU = (cpu: V1CPU, newValue: number, fieldChanged: CPUComponent): V1CPU => {
@@ -49,9 +48,9 @@ const parseValidationAnnotations = (
   const threadsValidation = validations.find((value) => value.path?.includes('cpu.threads'));
 
   return {
-    cores: coresValidation?.min || 1,
-    sockets: socketsValidation?.min || 1,
-    threads: threadsValidation?.min || 1,
+    cores: coresValidation?.min ?? 1,
+    sockets: socketsValidation?.min ?? 1,
+    threads: threadsValidation?.min ?? 1,
   };
 };
 
@@ -65,9 +64,9 @@ export const getCPULimitsFromTemplate = (template: Template): Record<string, num
 
 export const getInitialCPUInputType = (cpu: undefined | V1CPU): CPUInputType => {
   if (!cpu) {
-    return CPUInputType.editVCPU;
+    return CPUInputType.EditVCPU;
   }
 
   const isSimpleCPU = cpu.cores === 1 && cpu.threads === 1;
-  return isSimpleCPU ? CPUInputType.editVCPU : CPUInputType.editTopologyManually;
+  return isSimpleCPU ? CPUInputType.EditVCPU : CPUInputType.EditTopologyManually;
 };

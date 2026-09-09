@@ -1,10 +1,9 @@
-/* eslint-disable */
-import React, { FC, useEffect, useMemo } from 'react';
+import React, { type FC, type ReactElement, useEffect, useMemo } from 'react';
 
 import usePreferenceSelectOptions from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/PreferenceSelect/hooks/usePreferenceSelectOptions';
 import {
-  AddBootableVolumeState,
-  SetBootableVolumeFieldType,
+  type AddBootableVolumeState,
+  type SetBootableVolumeFieldType,
 } from '@kubevirt-utils/components/AddBootableVolumeModal/types';
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
@@ -18,8 +17,8 @@ import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverCo
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { FormGroup, HelperText, PopoverPosition } from '@patternfly/react-core';
 
-import { getSelectedKeyByLabel } from './utils/utils';
 import PreferencePopoverContent from './PreferencePopoverContent';
+import { getSelectedKeyByLabel } from './utils/utils';
 
 type PreferenceSelectProps = {
   bootableVolume: AddBootableVolumeState;
@@ -33,7 +32,7 @@ const PreferenceSelect: FC<PreferenceSelectProps> = ({
   deleteLabel,
   isDisabled,
   setBootableVolumeField,
-}) => {
+}): ReactElement => {
   const { t } = useKubevirtTranslation();
 
   const { bootableVolumeCluster, bootableVolumeNamespace, labels } = bootableVolume;
@@ -43,7 +42,7 @@ const PreferenceSelect: FC<PreferenceSelectProps> = ({
     bootableVolumeCluster,
   );
 
-  const handleSelect = (value: string) => {
+  const handleSelect = (value: string): void => {
     const selectedOption = preferenceSelectOptions.find((option) => option.value === value);
     if (!selectedOption) return;
     setBootableVolumeField('labels', DEFAULT_PREFERENCE_LABEL)(selectedOption.label);

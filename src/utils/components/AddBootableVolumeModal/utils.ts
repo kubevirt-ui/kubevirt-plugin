@@ -1,14 +1,13 @@
-/* eslint-disable */
-import { TFunction } from 'i18next';
+import { type TFunction } from 'i18next';
 
 import { DataSourceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
-import { TabModalResult } from '@kubevirt-utils/components/TabModal/TabModal';
+import { type V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
+import { type TabModalResult } from '@kubevirt-utils/components/TabModal/TabModal';
 import { DEFAULT_INSTANCETYPE_LABEL } from '@kubevirt-utils/constants/instancetypes-and-preferences';
 import { isUploadCanceledError } from '@kubevirt-utils/hooks/useCDIUpload/errors';
 import { cancelTrackedUploadOnModalClose } from '@kubevirt-utils/hooks/useUploadProgressToast/cancel/modalUploadCancel';
 import { appendBootableVolumeContext } from '@kubevirt-utils/resources/bootableresources/constants';
-import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
+import { type BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { getLabel, getResourceUrl } from '@kubevirt-utils/resources/shared';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { getFieldRequiredMessage } from '@kubevirt-utils/utils/validation';
@@ -16,12 +15,12 @@ import { getFieldRequiredMessage } from '@kubevirt-utils/utils/validation';
 import { isUploadVolumeSource, SOURCE_DETAILS_SECTION_ID } from './consts';
 import { createBootableVolume } from './createBootableVolume';
 import {
-  AddBootableVolumeState,
-  HandleAddBootableVolumeModalCloseParams,
-  SubmitAddBootableVolumeParams,
+  type AddBootableVolumeState,
+  type HandleAddBootableVolumeModalCloseParams,
+  type SubmitAddBootableVolumeParams,
 } from './types';
 
-export const formatRegistryURL = (registryURL: string) =>
+export const formatRegistryURL = (registryURL: string): string =>
   registryURL?.replace(/^(https?:\/\/)/i, '');
 
 export const extractCreatedDataSources = (result: unknown): V1beta1DataSource[] => {
@@ -111,7 +110,7 @@ export const submitAddBootableVolume = async ({
   });
 
   if (isUploadVolumeSource(sourceType)) {
-    void (async () => {
+    void (async (): Promise<void> => {
       try {
         await createVolume(dataSource);
       } catch (error) {

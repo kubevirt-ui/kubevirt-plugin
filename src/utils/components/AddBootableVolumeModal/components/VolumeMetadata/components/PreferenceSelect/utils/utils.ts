@@ -1,13 +1,15 @@
-/* eslint-disable */
 import {
   VirtualMachineClusterPreferenceModelGroupVersionKind,
   VirtualMachinePreferenceModelGroupVersionKind,
 } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { VirtualMachineClusterPreferenceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { EnhancedSelectOptionProps } from '@kubevirt-utils/components/FilterSelect/utils/types';
+import { type EnhancedSelectOptionProps } from '@kubevirt-utils/components/FilterSelect/utils/types';
 import { DEFAULT_PREFERENCE_KIND_LABEL } from '@kubevirt-utils/constants/instancetypes-and-preferences';
 import { getName } from '@kubevirt-utils/resources/shared';
-import { K8sGroupVersionKind, K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+import {
+  type K8sGroupVersionKind,
+  type K8sResourceCommon,
+} from '@openshift-console/dynamic-plugin-sdk';
 
 type ResourceDropdownOptionParams = {
   group?: string;
@@ -25,7 +27,7 @@ export const getResourceDropdownOptions = ({
   resources,
 }: ResourceDropdownOptionParams): EnhancedSelectOptionProps[] =>
   resources
-    ?.map(getName)
+    ?.map((resource) => getName(resource) as string)
     ?.sort((a, b) => a.localeCompare(b))
     ?.map((opt) => ({
       children: opt,
@@ -40,7 +42,7 @@ export const getSelectedKeyByLabel = (
   label: string,
   options: EnhancedSelectOptionProps[],
   volumeLabels: { [key: string]: string },
-) => {
+): string | undefined => {
   // Name could be duplicated between cluster and user Preferences
   const matchingOptions = options.filter((option) => option.label === label);
 

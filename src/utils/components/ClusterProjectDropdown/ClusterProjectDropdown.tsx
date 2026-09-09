@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC, JSX, memo, useCallback } from 'react';
+import React, { type FC, memo, type ReactElement, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 
 import ClusterDropdown from '@kubevirt-utils/components/ClusterProjectDropdown/ClusterDropdown';
@@ -40,7 +39,7 @@ const ClusterProjectDropdown: FC<ClusterProjectDropdownProps> = memo(
     onlyCNVClusters = false,
     showClusterDropdown = true,
     showProjectDropdown = true,
-  }): JSX.Element | null => {
+  }): ReactElement | null => {
     const { t } = useKubevirtTranslation();
     const isACMPage = useIsACMPage();
     const cluster = useActiveClusterParam();
@@ -49,12 +48,12 @@ const ClusterProjectDropdown: FC<ClusterProjectDropdownProps> = memo(
     const navigate = useNavigate();
     const location = useLocation();
     const [hubClusterName, hubClusterNameLoaded] = useHubClusterName();
-    const [projects, projectLoaded] = useProjects(cluster || hubClusterName);
+    const [projects, projectLoaded] = useProjects(cluster ?? hubClusterName);
     const { cnvNotInstalledClusters, loaded: cnvLoaded } = useClusterCNVInstalled();
     const [clusterNames, clustersLoaded] = useFleetClusterNames();
 
     const onClusterChange = useCallback(
-      (newCluster: string) => {
+      (newCluster: string): void => {
         const clusterReplaceKey =
           newCluster === ALL_CLUSTERS_KEY ? '/all-clusters/' : `/cluster/${newCluster}/`;
         let newPathname = location.pathname
@@ -75,7 +74,7 @@ const ClusterProjectDropdown: FC<ClusterProjectDropdownProps> = memo(
     );
 
     const onProjectChange = useCallback(
-      (newProject: string) => {
+      (newProject: string): void => {
         const projectReplaceKey =
           newProject === ALL_PROJECTS ? '/all-namespaces/' : `/ns/${newProject}/`;
         const newPathname = location.pathname
@@ -137,7 +136,7 @@ const ClusterProjectDropdown: FC<ClusterProjectDropdownProps> = memo(
               includeAllClusters={includeAllClusters}
               omittedClusters={onlyCNVClusters && cnvLoaded ? cnvNotInstalledClusters : undefined}
               onChange={onClusterChange}
-              selectedCluster={cluster || ALL_CLUSTERS_KEY}
+              selectedCluster={cluster ?? ALL_CLUSTERS_KEY}
             />
           </div>
         )}
@@ -151,7 +150,7 @@ const ClusterProjectDropdown: FC<ClusterProjectDropdownProps> = memo(
               disabledTooltip={t('Project can be selected only at a cluster level')}
               includeAllProjects={includeAllProjects}
               onChange={onProjectChange}
-              selectedProject={namespace || ALL_PROJECTS}
+              selectedProject={namespace ?? ALL_PROJECTS}
             />
           </div>
         )}

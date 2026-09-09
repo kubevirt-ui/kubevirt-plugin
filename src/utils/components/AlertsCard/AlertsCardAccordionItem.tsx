@@ -1,8 +1,7 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC, type ReactElement } from 'react';
 
 import AlertStatusItem from '@kubevirt-utils/components/AlertsCard/AlertStatusItem';
-import { AlertType, SimplifiedAlert } from '@kubevirt-utils/components/AlertsCard/utils/types';
+import { AlertType, type SimplifiedAlert } from '@kubevirt-utils/components/AlertsCard/utils/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useIsAllClustersPage from '@multicluster/hooks/useIsAllClustersPage';
 import useIsACMPage from '@multicluster/useIsACMPage';
@@ -31,18 +30,18 @@ const AlertsCardAccordionItem: FC<AlertsCardAccordionItemProps> = ({
   alerts,
   alertType,
   handleDrawerToggleClick,
-}) => {
+}): ReactElement => {
   const { t } = useKubevirtTranslation();
-  const isACMPage = useIsACMPage();
-  const isAllClustersPage = useIsAllClustersPage();
+  const isACMPage = useIsACMPage() as boolean;
+  const isAllClustersPage = useIsAllClustersPage() as boolean;
 
-  const alertTitle = {
-    [AlertType.critical]: t('Critical'),
-    [AlertType.info]: t('Info'),
-    [AlertType.warning]: t('Warnings'),
+  const alertTitle: Record<string, string> = {
+    [AlertType.Critical]: t('Critical'),
+    [AlertType.Info]: t('Info'),
+    [AlertType.Warning]: t('Warnings'),
   };
 
-  const renderAlerts = () => {
+  const renderAlerts = (): ReactElement | ReactElement[] => {
     if (isAllClustersPage) {
       return <AlertsClusterAccordion alerts={alerts} alertType={alertType} />;
     }
@@ -58,7 +57,7 @@ const AlertsCardAccordionItem: FC<AlertsCardAccordionItemProps> = ({
     ));
   };
 
-  const isExpanded = alertOpen === alertType;
+  const isExpanded: boolean = alertOpen === alertType;
 
   return (
     <AccordionItem isExpanded={isExpanded}>
@@ -72,7 +71,7 @@ const AlertsCardAccordionItem: FC<AlertsCardAccordionItemProps> = ({
         <div className="subtitle">
           <span className="subtitle-name">{alertTitle?.[alertType]}</span>
           <Label className="subtitle-label" isCompact>
-            {alerts?.length || 0}
+            {alerts?.length ?? 0}
           </Label>
         </div>
       </AccordionToggle>

@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC, type ReactElement } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ClipboardCopy } from '@patternfly/react-core';
@@ -15,11 +14,11 @@ type InlineCodeClipboardCopyProps = {
 const InlineCodeClipboardCopy: FC<InlineCodeClipboardCopyProps> = ({
   clipboardText,
   isCredentialsVisible = false,
-}) => {
+}): ReactElement => {
   const { t } = useKubevirtTranslation();
 
-  const handleCopy = () => {
-    writeToClipboard(clipboardText.concat(String.fromCharCode(LINE_FEED)));
+  const handleCopy = async (): Promise<void> => {
+    await writeToClipboard(clipboardText.concat(String.fromCharCode(LINE_FEED)));
   };
 
   return (

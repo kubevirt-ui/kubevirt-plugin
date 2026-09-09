@@ -1,17 +1,16 @@
-import React, { FC, useEffect } from 'react';
+import React, { type FC, useEffect } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
-import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { type V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Template } from '@kubevirt-utils/resources/template';
+import { type Template } from '@kubevirt-utils/resources/template';
 import { FormGroup } from '@patternfly/react-core';
 
 import FormGroupHelperText from '../FormGroupHelperText/FormGroupHelperText';
-
-import FormGroupTextInput from './components/FormGroupTextInput';
-import { CloneTemplateField, CloneTemplateFormValues } from './form/types';
 import CloneStorageCheckbox from './CloneStorageCheckbox';
+import FormGroupTextInput from './components/FormGroupTextInput';
 import { SOURCE_TEMPLATE_TOGGLE_TEST_ID } from './constants';
+import { CloneTemplateField, type CloneTemplateFormValues } from './form/types';
 import SelectProject from './SelectProject';
 import SelectTemplate from './SelectTemplate';
 import { getTemplateBootSourcePVC } from './utils';
@@ -27,14 +26,14 @@ const CloneTemplateModalBody: FC<CloneTemplateModalBodyProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const { control, setValue, watch } = useFormContext<CloneTemplateFormValues>();
-  const sourceProject = watch(CloneTemplateField.sourceProject);
-  const isCloneStorageEnabled = watch(CloneTemplateField.isCloneStorageEnabled);
-  const template = watch(CloneTemplateField.template);
+  const sourceProject = watch(CloneTemplateField.SourceProject);
+  const isCloneStorageEnabled = watch(CloneTemplateField.IsCloneStorageEnabled);
+  const template = watch(CloneTemplateField.Template);
   const hasClonableStorage = !!getTemplateBootSourcePVC(template);
 
   useEffect(() => {
     if (!hasClonableStorage && isCloneStorageEnabled) {
-      setValue(CloneTemplateField.isCloneStorageEnabled, false);
+      setValue(CloneTemplateField.IsCloneStorageEnabled, false);
     }
   }, [hasClonableStorage, isCloneStorageEnabled, setValue]);
 
@@ -47,7 +46,7 @@ const CloneTemplateModalBody: FC<CloneTemplateModalBodyProps> = ({
               <SelectProject selectedProject={value} setSelectedProject={onChange} />
             )}
             control={control}
-            name={CloneTemplateField.sourceProject}
+            name={CloneTemplateField.SourceProject}
           />
         </FormGroup>
       )}
@@ -61,7 +60,7 @@ const CloneTemplateModalBody: FC<CloneTemplateModalBodyProps> = ({
         />
       </FormGroup>
       <FormGroupTextInput
-        fieldId={CloneTemplateField.templateName}
+        fieldId={CloneTemplateField.TemplateName}
         isRequired
         label={t('New template name')}
       />
@@ -71,16 +70,16 @@ const CloneTemplateModalBody: FC<CloneTemplateModalBodyProps> = ({
             <SelectProject selectedProject={value} setSelectedProject={onChange} />
           )}
           control={control}
-          name={CloneTemplateField.targetProject}
+          name={CloneTemplateField.TargetProject}
         />
         <FormGroupHelperText>{t('Project name to clone the template to')}</FormGroupHelperText>
       </FormGroup>
       <FormGroupTextInput
-        fieldId={CloneTemplateField.templateDisplayName}
+        fieldId={CloneTemplateField.TemplateDisplayName}
         label={t('Template display name')}
       />
       <FormGroupTextInput
-        fieldId={CloneTemplateField.templateProvider}
+        fieldId={CloneTemplateField.TemplateProvider}
         label={t('Template provider')}
       >
         <FormGroupHelperText>{t('Example: your company name')}</FormGroupHelperText>
@@ -91,13 +90,13 @@ const CloneTemplateModalBody: FC<CloneTemplateModalBodyProps> = ({
             <CloneStorageCheckbox isChecked={value} onChange={onChange} />
           )}
           control={control}
-          name={CloneTemplateField.isCloneStorageEnabled}
+          name={CloneTemplateField.IsCloneStorageEnabled}
         />
       )}
       {hasClonableStorage && isCloneStorageEnabled && (
         <FormGroupTextInput
           className="pvc-name-form-group"
-          fieldId={CloneTemplateField.pvcName}
+          fieldId={CloneTemplateField.PvcName}
           isRequired
           label={t("Name of the new template's disk")}
         />

@@ -1,8 +1,7 @@
-/* eslint-disable */
-import { TFunction } from 'i18next';
+import { type TFunction } from 'i18next';
 
-import { V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
-import { UploadDataProps } from '@kubevirt-utils/hooks/useCDIUpload/types';
+import { type V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
+import { type UploadDataProps } from '@kubevirt-utils/hooks/useCDIUpload/types';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 
 import {
@@ -14,7 +13,7 @@ import {
   setDataSourceMetadata,
 } from './bootableVolumeSources';
 import { DROPDOWN_FORM_SELECTION } from './consts';
-import { AddBootableVolumeState, CreateBootableVolumeType } from './types';
+import { type AddBootableVolumeState, type CreateBootableVolumeType } from './types';
 
 const getBootableVolumePromise = ({
   arch,
@@ -32,7 +31,7 @@ const getBootableVolumePromise = ({
   sourceType: DROPDOWN_FORM_SELECTION;
   t: TFunction;
   uploadData: ({ dataVolume, file }: UploadDataProps) => Promise<void>;
-}) => {
+}): Promise<V1beta1DataSource> => {
   const { bootableVolumeNamespace } = bootableVolume;
 
   const draftDataSource = setDataSourceMetadata(
@@ -67,7 +66,7 @@ const getBootableVolumePromise = ({
 
 export const createBootableVolume: CreateBootableVolumeType =
   ({ bootableVolume, onCreateVolume, onUploadStart, sourceType, t, uploadData }) =>
-  async (dataSource: V1beta1DataSource) => {
+  async (dataSource: V1beta1DataSource): Promise<V1beta1DataSource[]> => {
     const architectures = bootableVolume?.architectures;
 
     if (!isEmpty(architectures)) {

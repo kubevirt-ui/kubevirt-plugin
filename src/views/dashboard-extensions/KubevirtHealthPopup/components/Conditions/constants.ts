@@ -1,9 +1,9 @@
 import { AlertType } from '@kubevirt-utils/components/AlertsCard/utils/types';
 
 export const SEVERITY_TO_CONDITION_VALUE: Record<'none' | AlertType, number> = {
-  [AlertType.critical]: 2,
-  [AlertType.info]: 0,
-  [AlertType.warning]: 1,
+  [AlertType.Critical]: 2,
+  [AlertType.Info]: 0,
+  [AlertType.Warning]: 1,
   none: 0,
 };
 

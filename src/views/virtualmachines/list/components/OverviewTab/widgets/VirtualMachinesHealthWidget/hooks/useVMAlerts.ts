@@ -24,16 +24,16 @@ const isVMRelatedAlert = (alert: Alert, namespace?: string): boolean => {
 
 const countBySeverity = (alerts: Alert[]): Record<AlertType, number> => {
   const counts: Record<AlertType, number> = {
-    [AlertType.critical]: 0,
-    [AlertType.info]: 0,
-    [AlertType.warning]: 0,
+    [AlertType.Critical]: 0,
+    [AlertType.Info]: 0,
+    [AlertType.Warning]: 0,
   };
   if (alerts)
     for (const alert of alerts) {
       const severity = alert.labels?.severity;
-      if (severity === AlertSeverity.Critical) counts[AlertType.critical]++;
-      else if (severity === AlertSeverity.Warning) counts[AlertType.warning]++;
-      else if (severity === AlertSeverity.Info) counts[AlertType.info]++;
+      if (severity === AlertSeverity.Critical) counts[AlertType.Critical]++;
+      else if (severity === AlertSeverity.Warning) counts[AlertType.Warning]++;
+      else if (severity === AlertSeverity.Info) counts[AlertType.Info]++;
     }
   return counts;
 };

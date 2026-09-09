@@ -1,7 +1,6 @@
-/* eslint-disable */
 import produce from 'immer';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getVmCdromUploadKeyFromVm } from '@kubevirt-utils/hooks/useUploadProgressToast/keys/uploadKeys';
 import { getCustomizeWizardVM } from '@kubevirt-utils/signals/customizeWizardVMSignal';
 import { generateUploadDiskName } from '@kubevirt-utils/utils/utils';
@@ -17,7 +16,7 @@ import {
   mountISOToCDROM,
 } from './helpers';
 import { addDisk } from './submit';
-import { SubmitCDROMInput, V1DiskFormState } from './types';
+import { type SubmitCDROMInput, type V1DiskFormState } from './types';
 import { logBackgroundUploadError, runVmCdromBackgroundUpload } from './vmCdromBackgroundUpload';
 
 export const submitCDROM = async (
@@ -37,7 +36,7 @@ export const submitCDROM = async (
   const uploadISO = uploadEnabled && data?.uploadFile?.file;
   const vmIsRunning = isRunning(vm);
 
-  const finalize = (producedData: V1DiskFormState) => {
+  const finalize = (producedData: V1DiskFormState): Promise<V1VirtualMachine | void> => {
     const vmWithDisk = addDisk(producedData, vm);
     const updatedVM = reorderBootDisk(
       vmWithDisk,
@@ -77,8 +76,8 @@ export const submitCDROM = async (
         false,
       );
 
-      const submitResult = await onSubmit(updatedVMWithEmpty);
-      const vmAfterEmptyAdd = submitResult || updatedVMWithEmpty;
+      const submitResult = (await onSubmit(updatedVMWithEmpty)) as V1VirtualMachine | undefined;
+      const vmAfterEmptyAdd = submitResult ?? updatedVMWithEmpty;
 
       const runningVmUploadPromise = runVmCdromBackgroundUpload({
         afterUpload: async () => {
@@ -125,9 +124,7 @@ export const submitCDROM = async (
     onUploadStarted?.(stoppedVmUploadPromise, diskName);
 
     const dataWithVolume = produce(data, (draft) => {
-      if (!draft.volume) {
-        draft.volume = { name: diskName };
-      }
+      draft.volume ??= { name: diskName };
       draft.volume.name = diskName;
       draft.volume.persistentVolumeClaim = { claimName: dvName };
       delete draft.volume.dataVolume;

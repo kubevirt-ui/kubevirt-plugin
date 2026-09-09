@@ -1,16 +1,20 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC, type ReactElement, type ReactNode } from 'react';
 import { Link } from 'react-router';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Alert, AlertVariant, Stack, StackItem } from '@patternfly/react-core';
 
-type ErrorAlertProps = {
-  error: any | Error;
+type ErrorAlertError = {
+  href?: string;
+  message?: ReactNode;
 };
 
-const ErrorAlert: FC<ErrorAlertProps> = ({ error }) => {
+type ErrorAlertProps = {
+  error: ErrorAlertError;
+};
+
+const ErrorAlert: FC<ErrorAlertProps> = ({ error }): ReactElement | null => {
   const { t } = useKubevirtTranslation();
   if (isEmpty(error)) return null;
 

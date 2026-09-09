@@ -55,21 +55,21 @@ const CPUInput: FC<CPUInputProps> = ({
         <>
           <Flex alignItems={{ default: 'alignItemsCenter' }}>
             <Radio
-              id={CPUInputType.editVCPU}
-              isChecked={selectedRadioOption === CPUInputType.editVCPU}
+              id={CPUInputType.EditVCPU}
+              isChecked={selectedRadioOption === CPUInputType.EditVCPU}
               isDisabled={isComplexTopology}
               isLabelWrapped
               label={t('vCPU')}
               name={radioInputName}
               onClick={() => {
                 if (!isComplexTopology) {
-                  setSelectedRadioOption(CPUInputType.editVCPU);
+                  setSelectedRadioOption(CPUInputType.EditVCPU);
                 }
               }}
             />
             <VCPUInput
               cpu={userEnteredCPU}
-              isDisabled={selectedRadioOption !== CPUInputType.editVCPU || isComplexTopology}
+              isDisabled={selectedRadioOption !== CPUInputType.EditVCPU || isComplexTopology}
               setCPU={setUserEnteredCPU}
             />
           </Flex>
@@ -82,18 +82,18 @@ const CPUInput: FC<CPUInputProps> = ({
               <CPUTopologyInput
                 cpu={userEnteredCPU}
                 cpuLimits={cpuLimits}
-                hide={selectedRadioOption !== CPUInputType.editTopologyManually}
-                isDisabled={selectedRadioOption !== CPUInputType.editTopologyManually}
+                hide={selectedRadioOption !== CPUInputType.EditTopologyManually}
+                isDisabled={selectedRadioOption !== CPUInputType.EditTopologyManually}
                 setCPU={setUserEnteredCPU}
               />
             }
             className="cpu-input__edit-topology-manually"
-            id={CPUInputType.editTopologyManually}
-            isChecked={selectedRadioOption === CPUInputType.editTopologyManually}
+            id={CPUInputType.EditTopologyManually}
+            isChecked={selectedRadioOption === CPUInputType.EditTopologyManually}
             label={t('Set CPU topology manually')}
             name={radioInputName}
             onClick={() => {
-              setSelectedRadioOption(CPUInputType.editTopologyManually);
+              setSelectedRadioOption(CPUInputType.EditTopologyManually);
             }}
           />
         </>

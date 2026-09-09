@@ -43,17 +43,17 @@ const useEnvironmentSelectOptions = (
     return [
       ...secrets.map((secret) => ({
         group: t('Secrets'),
-        ...getEnhancedSelectOptionProps(secret.metadata.name, EnvironmentKind.secret),
+        ...getEnhancedSelectOptionProps(secret.metadata.name, EnvironmentKind.Secret),
       })),
       ...configMaps.map((configMap) => ({
         group: t('ConfigMaps'),
-        ...getEnhancedSelectOptionProps(configMap.metadata.name, EnvironmentKind.configMap),
+        ...getEnhancedSelectOptionProps(configMap.metadata.name, EnvironmentKind.ConfigMap),
       })),
       ...serviceAccounts.map((serviceAccount) => ({
         group: t('ServiceAccounts'),
         ...getEnhancedSelectOptionProps(
           serviceAccount.metadata.name,
-          EnvironmentKind.serviceAccount,
+          EnvironmentKind.ServiceAccount,
         ),
       })),
     ];

@@ -1,11 +1,10 @@
-/* eslint-disable */
-import React, { FC, useState } from 'react';
+import React, { type FC, type ReactElement, useState } from 'react';
 
 import KebabToggle from '@kubevirt-utils/components/toggles/KebabToggle';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Dropdown, DropdownItem, DropdownList } from '@patternfly/react-core';
 
-import { AffinityRowData } from '../../../utils/types';
+import { type AffinityRowData } from '../../../utils/types';
 
 type AffinityRowActionsDropdownProps = {
   affinity: AffinityRowData;
@@ -17,12 +16,12 @@ const AffinityRowActionsDropdown: FC<AffinityRowActionsDropdownProps> = ({
   affinity,
   onDelete,
   onEdit,
-}) => {
+}): ReactElement => {
   const { t } = useKubevirtTranslation();
   const [isOpen, setIsOpen] = useState(false);
 
-  const onToggle = () => setIsOpen((prevIsOpen) => !prevIsOpen);
-  const handleDelete = () => {
+  const onToggle = (): void => setIsOpen((prevIsOpen) => !prevIsOpen);
+  const handleDelete = (): void => {
     onDelete(affinity);
     setIsOpen(false);
   };

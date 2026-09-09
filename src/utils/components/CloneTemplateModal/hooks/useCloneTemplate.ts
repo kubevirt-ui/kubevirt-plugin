@@ -1,15 +1,15 @@
-/* eslint-disable */
-import { useForm, UseFormReturn } from 'react-hook-form';
+import { useForm, type UseFormReturn } from 'react-hook-form';
 
-import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { type V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { OPENSHIFT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import useNamespaceParam from '@kubevirt-utils/hooks/useNamespaceParam';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
-import { Template } from '@kubevirt-utils/resources/template';
+import { type Template } from '@kubevirt-utils/resources/template';
 
-import { CloneTemplateFormValues } from '../form/types';
-import { getInitialFormValues } from '../form/utils';
 import { cloneTemplateSubmit } from '../onSubmit';
+
+import { type CloneTemplateFormValues } from '../form/types';
+import { getInitialFormValues } from '../form/utils';
 
 type UseCloneTemplateReturn = {
   form: UseFormReturn<CloneTemplateFormValues>;
@@ -21,17 +21,17 @@ const useCloneTemplate = (
   initialTemplate?: Template,
   onTemplateCloned?: (clonedTemplate: V1Template) => void,
 ): UseCloneTemplateReturn => {
-  const namespace = useNamespaceParam();
+  const namespace = useNamespaceParam() as string | undefined;
 
   const form = useForm<CloneTemplateFormValues>({
-    defaultValues: getInitialFormValues(initialTemplate, namespace || OPENSHIFT_NAMESPACE),
+    defaultValues: getInitialFormValues(initialTemplate, namespace ?? OPENSHIFT_NAMESPACE),
     mode: 'onChange',
   });
 
-  const onTemplateSelected = (newTemplate: Template) =>
+  const onTemplateSelected = (newTemplate: Template): void =>
     form.reset(getInitialFormValues(newTemplate, getNamespace(newTemplate)));
 
-  const onSubmit = async () =>
+  const onSubmit = async (): Promise<void> =>
     cloneTemplateSubmit({
       formValues: form.getValues(),
       onTemplateCloned,

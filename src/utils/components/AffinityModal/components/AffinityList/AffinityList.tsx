@@ -1,16 +1,20 @@
-import React, { FC, useMemo } from 'react';
+import React, { type FC, useMemo } from 'react';
 
-import { IoK8sApiCoreV1Node } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type IoK8sApiCoreV1Node } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
 import NodeCheckerAlert from '@kubevirt-utils/components/NodeSelectorModal/components/NodeCheckerAlert';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Stack, StackItem } from '@patternfly/react-core';
 
-import { AffinityRowData, AffinityType } from '../../utils/types';
 import AddAffinityRuleButton from '../AddAffinityRuleButton';
 import AffinityDescriptionText from '../AffinityDescriptionText';
 
-import { AffinityCallbacks, getAffinityColumns, getAffinityRowId } from './affinityTableDefinition';
+import { type AffinityRowData, AffinityType } from '../../utils/types';
+import {
+  type AffinityCallbacks,
+  getAffinityColumns,
+  getAffinityRowId,
+} from './affinityTableDefinition';
 
 type AffinityListProps = {
   affinities: AffinityRowData[];
@@ -60,7 +64,7 @@ const AffinityList: FC<AffinityListProps> = ({
         <AddAffinityRuleButton isLinkButton onAffinityClickAdd={onAffinityClickAdd} />
       </StackItem>
       <StackItem>
-        {affinities?.some((affinity) => affinity?.type === AffinityType.node) && nodesLoaded && (
+        {affinities?.some((affinity) => affinity?.type === AffinityType.Node) && nodesLoaded && (
           <NodeCheckerAlert
             nodesLoaded={nodesLoaded}
             preferredQualifiedNodes={preferredQualifiedNodes}

@@ -44,7 +44,7 @@ const DrilldownMenuItemWrapper: FC<DrilldownMenuItemWrapperProps> = ({
   );
 
   return disabled ? null : (
-    <DrilldownMenuItem Icon={Icon} id={seriesName} key={seriesName} label={seriesLabel}>
+    <DrilldownMenuItem icon={Icon} id={seriesName} key={seriesName} label={seriesLabel}>
       {seriesHasHugepagesVariant(seriesName) ? (
         <>
           <DrilldownMenuItem id={`${seriesName}-hugepages`} label={<HugepagesInfo />}>

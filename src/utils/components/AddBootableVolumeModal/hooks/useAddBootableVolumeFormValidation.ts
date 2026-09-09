@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { useMemo } from 'react';
 
 import { TLS_CERT_SOURCE_EXISTING } from '@kubevirt-utils/components/TLSCertificateSection';
@@ -7,17 +6,17 @@ import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { isValidCronExpression } from '@kubevirt-utils/utils/validation';
 
 import { DROPDOWN_FORM_SELECTION } from '../consts';
-import { UseAddBootableVolumeFormValidationParams } from '../types';
+import { type UseAddBootableVolumeFormValidationParams } from '../types';
 
 export const useAddBootableVolumeFormValidation = ({
   bootableVolume,
   sourceType,
 }: UseAddBootableVolumeFormValidationParams): boolean => {
-  const isRegistryFormValid = useMemo(() => {
+  const isRegistryFormValid = useMemo((): boolean => {
     if (sourceType !== DROPDOWN_FORM_SELECTION.USE_REGISTRY) return true;
 
     const { cronExpression, registryCredentials, registryURL } = bootableVolume;
-    const { password, username } = registryCredentials || {};
+    const { password, username } = registryCredentials ?? {};
 
     const areCredentialsEmpty = isEmpty(username) && isEmpty(password);
     const areCredentialsFilled = !isEmpty(username) && !isEmpty(password);
@@ -31,7 +30,7 @@ export const useAddBootableVolumeFormValidation = ({
     );
   }, [sourceType, bootableVolume]);
 
-  const isTlsCertValid = useMemo(() => {
+  const isTlsCertValid = useMemo((): boolean => {
     if (sourceType !== DROPDOWN_FORM_SELECTION.USE_HTTP) return true;
     if (!bootableVolume?.tlsCertificateRequired) return true;
 
@@ -42,7 +41,7 @@ export const useAddBootableVolumeFormValidation = ({
     return !!bootableVolume?.tlsCertificate?.trim();
   }, [sourceType, bootableVolume]);
 
-  const isSourceValid = useMemo(() => {
+  const isSourceValid = useMemo((): boolean => {
     switch (sourceType) {
       case DROPDOWN_FORM_SELECTION.UPLOAD_VOLUME:
         return !!bootableVolume?.uploadFile;
@@ -61,7 +60,7 @@ export const useAddBootableVolumeFormValidation = ({
     }
   }, [sourceType, bootableVolume]);
 
-  const isFormValid = useMemo(() => {
+  const isFormValid = useMemo((): boolean => {
     const hasRequiredPreference = !!bootableVolume?.labels?.[DEFAULT_PREFERENCE_LABEL];
     const hasVolumeName = !!bootableVolume?.bootableVolumeName?.trim();
     return (

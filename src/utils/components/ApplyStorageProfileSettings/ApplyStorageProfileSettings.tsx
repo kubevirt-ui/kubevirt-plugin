@@ -1,9 +1,8 @@
-/* eslint-disable */
-import React, { FC, useEffect, useRef } from 'react';
+import React, { type FC, type ReactElement, useEffect, useRef } from 'react';
 
 import {
-  V1beta1StorageSpecAccessModesEnum,
-  V1beta1StorageSpecVolumeModeEnum,
+  type V1beta1StorageSpecAccessModesEnum,
+  type V1beta1StorageSpecVolumeModeEnum,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -33,21 +32,21 @@ const ApplyStorageProfileSettings: FC<ApplyStorageProfileSettingsProps> = ({
   storageClassName,
   vmCluster,
   volumeMode,
-}) => {
+}): ReactElement => {
   const { t } = useKubevirtTranslation();
-  const { claimPropertySets, error, loaded } = useStorageProfileClaimPropertySets(
-    storageClassName,
-    vmCluster,
-  );
-  const storageRef = useRef<string>(undefined);
+  const storageProfileResult = useStorageProfileClaimPropertySets(storageClassName, vmCluster);
+  const claimPropertySets = storageProfileResult.claimPropertySets;
+  const error = storageProfileResult.error as Error | undefined;
+  const loaded = storageProfileResult.loaded;
+  const storageRef = useRef<string>();
 
   useEffect(() => {
     if (storageRef.current === storageClassName) {
       return;
     }
     storageRef.current = storageClassName;
-    setAccessMode(undefined);
-    setVolumeMode(undefined);
+    setAccessMode();
+    setVolumeMode();
   });
 
   if (!loaded) {

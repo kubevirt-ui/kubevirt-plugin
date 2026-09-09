@@ -1,7 +1,9 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC, type ReactElement } from 'react';
 
-import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import {
+  type V1VirtualMachine,
+  type V1VirtualMachineInstance,
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { vCPUCount } from '@kubevirt-utils/resources/template/utils';
 import { getCPU, getMemory } from '@kubevirt-utils/resources/vm';
@@ -17,15 +19,15 @@ type CPUMemoryProps = {
   vmi?: V1VirtualMachineInstance;
 };
 
-const CPUMemory: FC<CPUMemoryProps> = ({ vm, vmi }) => {
+const CPUMemory: FC<CPUMemoryProps> = ({ vm, vmi }): ReactElement => {
   const { t } = useKubevirtTranslation();
   const isVMRunning = isRunning(vm);
 
   if ((isVMRunning && !vmi) || !vm) return <Skeleton className="pf-m-width-sm" />;
 
-  const cpu = vCPUCount(getCPU(vmi) || getCPU(vm));
+  const cpu = vCPUCount(getCPU(vmi) ?? getCPU(vm));
 
-  const memory = readableSizeUnit(getMemory(vmi) || getMemory(vm));
+  const memory = readableSizeUnit(getMemory(vmi) ?? getMemory(vm));
 
   return (
     <span data-test="cpu-memory-value" id="virtual-machine-overview-details-cpu-memory">

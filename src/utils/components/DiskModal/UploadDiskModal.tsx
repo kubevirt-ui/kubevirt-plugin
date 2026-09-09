@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC, type ReactElement } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
 import { isUploadCanceledError } from '@kubevirt-utils/hooks/useCDIUpload/errors';
@@ -16,7 +15,6 @@ import { getCluster } from '@multicluster/helpers/selectors';
 import { isRunning } from '@virtualmachines/utils';
 
 import TabModal from '../TabModal/TabModal';
-
 import AdvancedSettings from './components/AdvancedSettings/AdvancedSettings';
 import BootSourceCheckbox from './components/BootSourceCheckbox/BootSourceCheckbox';
 import DiskInterfaceSelect from './components/DiskInterfaceSelect/DiskInterfaceSelect';
@@ -30,7 +28,7 @@ import { reorderBootDisk } from './utils/bootDiskUtils';
 import { getDefaultCreateValues } from './utils/form';
 import { diskModalTitle, hotplugPromise } from './utils/helpers';
 import { addDisk, uploadDataVolume } from './utils/submit';
-import { SourceTypes, V1DiskFormState, V1SubDiskModalProps } from './utils/types';
+import { SourceTypes, type V1DiskFormState, type V1SubDiskModalProps } from './utils/types';
 
 const UploadDiskModal: FC<V1SubDiskModalProps> = ({
   isOpen,
@@ -38,7 +36,7 @@ const UploadDiskModal: FC<V1SubDiskModalProps> = ({
   onSubmit,
   onUploadedDataVolume,
   vm,
-}) => {
+}): ReactElement => {
   const { t } = useKubevirtTranslation();
   const { upload, uploadData } = useCDIUpload(getCluster(vm));
   const isVMRunning = isRunning(vm);
@@ -104,14 +102,14 @@ const UploadDiskModal: FC<V1SubDiskModalProps> = ({
 
             data.dataVolumeTemplate.spec.source.pvc = {
               name: getName(uploadedDataVolume),
-              namespace: getNamespace(uploadedDataVolume) || vmNamespace,
+              namespace: getNamespace(uploadedDataVolume) ?? vmNamespace,
             };
 
             const vmWithDisk = addDisk(data, vm);
 
             const newVM = reorderBootDisk(vmWithDisk, data.disk.name, data.isBootSource, false);
 
-            return !isVMRunning ? onSubmit(newVM) : (hotplugPromise(newVM, data) as Promise<any>);
+            return !isVMRunning ? onSubmit(newVM) : hotplugPromise(newVM, data);
           })()
         }
         closeOnSubmit={isValid}
