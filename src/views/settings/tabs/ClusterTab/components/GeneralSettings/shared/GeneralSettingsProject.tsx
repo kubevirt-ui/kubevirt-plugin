@@ -1,13 +1,13 @@
-/* eslint-disable */
-import React, { FC, ReactNode, useEffect, useState } from 'react';
+import React, { type FC, type ReactNode, useEffect, useState } from 'react';
 
-import { HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
+import { type HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+import { type K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { Content, ContentVariants } from '@patternfly/react-core';
 import { useSettingsCluster } from '@settings/context/SettingsClusterContext';
 import ExpandSection from '@settings/ExpandSection/ExpandSection';
 
+import { type HyperConvergeConfigurationWatch } from '../consts/consts';
 import GeneralSettingsError from '../shared/GeneralSettingsError';
 import GeneralSettingsProjectSelector from '../shared/GeneralSettingsProjectSelector';
 
@@ -16,16 +16,16 @@ import '../shared/general-settings.scss';
 type GeneralSettingsProjectProps = {
   description: ReactNode;
   hcoResourceNamespace: string;
-  hyperConvergeConfiguration: [hyperConvergeConfig: HyperConverged, loaded: boolean, error: any];
+  hyperConvergeConfiguration: HyperConvergeConfigurationWatch;
   namespace: string;
   onChange: (
     hyperConverged: HyperConverged,
     newNamespace: null | number | string,
-    handelError: (value: string) => void,
+    handleError: (value: string) => void,
     handleLoading: (value: boolean) => void,
     cluster?: string,
   ) => void;
-  projectsData: [projects: K8sResourceCommon[], loaded: boolean, error: any];
+  projectsData: [projects: K8sResourceCommon[], loaded: boolean, error: unknown];
   searchItemId?: string;
   toggleText: string;
 };
@@ -55,8 +55,8 @@ const GeneralSettingsProject: FC<GeneralSettingsProjectProps> = ({
     }
   }, [hcoResourceNamespace, hyperConverge, namespace]);
 
-  const onSelect = (value: string) => {
-    setError(null);
+  const onSelect = (value: string): void => {
+    setError(undefined);
     setSelectedProject(value);
     onChange(hyperConverge, value, setError, setLoading, cluster);
   };

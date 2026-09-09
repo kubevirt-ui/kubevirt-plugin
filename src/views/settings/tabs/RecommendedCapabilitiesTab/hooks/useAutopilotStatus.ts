@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { useMemo } from 'react';
 
 import useHyperConvergeConfiguration from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
@@ -37,7 +36,7 @@ const useAutopilotStatus = (): UseAutopilotStatusResult => {
         statusMap[entry.operatorPackageName] = {
           configStatus:
             result?.loaded && !result?.loadError ? deriveConfigStatus(resource) : undefined,
-          managedCR: resource || undefined,
+          managedCR: resource ?? undefined,
           recommendedYAML: entry.recommendedYAML,
         };
 

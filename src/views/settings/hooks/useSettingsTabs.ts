@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 
@@ -6,9 +5,13 @@ import { VIRTUALIZATION_PATHS } from '@kubevirt-utils/constants/constants';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
-import { getTabs } from '../tabs';
+import { getTabs, type SettingsTabConfig } from '../tabs';
 
-export const useSettingsTabs = () => {
+export const useSettingsTabs = (): {
+  activeTab: string;
+  redirectTab: (name: string, replace?: boolean) => void;
+  tabs: SettingsTabConfig[];
+} => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
   const location = useLocation();
@@ -37,7 +40,7 @@ export const useSettingsTabs = () => {
 
   const [activeTab, setActiveTab] = useState<string>(() => {
     const tabFromURL = getActiveTabFromURL();
-    return tabFromURL || tabs[0]?.name || '';
+    return tabFromURL ?? tabs[0]?.name ?? '';
   });
 
   const redirectTab = useCallback(

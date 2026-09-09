@@ -1,15 +1,13 @@
-/* eslint-disable */
 import { useMemo } from 'react';
 
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { useDataViewFilters } from '@patternfly/react-data-view';
 
 import {
   type CapabilityFeature,
   type CapabilityFilterValues,
-  CapabilityInstallState,
+  type CapabilityInstallState,
 } from '../../utils/types';
-
-import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { matchesName, matchesStatus } from './utils';
 
 const INITIAL_FILTERS: CapabilityFilterValues = {
@@ -20,7 +18,12 @@ const INITIAL_FILTERS: CapabilityFilterValues = {
 export const useCapabilityFilters = (
   features: CapabilityFeature[],
   getCapabilityInstallState: (feature: CapabilityFeature) => CapabilityInstallState,
-) => {
+): {
+  clearAllFilters: () => void;
+  filteredData: CapabilityFeature[];
+  filters: CapabilityFilterValues;
+  onSetFilters: ReturnType<typeof useDataViewFilters<CapabilityFilterValues>>['onSetFilters'];
+} => {
   const { clearAllFilters, filters, onSetFilters } = useDataViewFilters<CapabilityFilterValues>({
     initialFilters: INITIAL_FILTERS,
   });

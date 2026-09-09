@@ -1,8 +1,8 @@
-/* eslint-disable */
 import { useCallback, useMemo } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useDataViewSort } from '@patternfly/react-data-view';
+import { type DataViewTh } from '@patternfly/react-data-view/dist/esm/DataViewTable';
 import { type ThProps } from '@patternfly/react-table';
 
 export const COLUMN_KEYS = {
@@ -14,7 +14,13 @@ export const COLUMN_KEYS = {
 
 const SORTABLE_KEYS = [COLUMN_KEYS.name, COLUMN_KEYS.status];
 
-export const useCustomSelectionColumns = () => {
+type UseCustomSelectionColumnsResult = {
+  columns: DataViewTh[];
+  direction: 'asc' | 'desc' | undefined;
+  sortBy: string | undefined;
+};
+
+export const useCustomSelectionColumns = (): UseCustomSelectionColumnsResult => {
   const { t } = useKubevirtTranslation();
 
   const { direction, onSort, sortBy } = useDataViewSort({

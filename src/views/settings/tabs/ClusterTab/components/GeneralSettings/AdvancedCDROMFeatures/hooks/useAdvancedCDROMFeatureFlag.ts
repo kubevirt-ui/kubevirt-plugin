@@ -1,21 +1,27 @@
-/* eslint-disable */
 import { useState } from 'react';
 
 import { HyperConvergedV1Beta1Model as HyperConvergedModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { K8S_OPS } from '@kubevirt-utils/constants/constants';
 import useHyperConvergeConfiguration, {
-  HyperConverged,
+  type HyperConverged,
 } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
 
 import { DECLARATIVE_HOTPLUG_VOLUMES_FEATURE_GATE } from './constants';
 
+type AdvancedCDROMFeatureFlag = {
+  canEdit: boolean;
+  featureEnabled: boolean;
+  loading: boolean;
+  toggleFeature: (val: boolean) => Promise<HyperConverged | undefined>;
+};
+
 const updateDeclarativeHotplugVolumesFeatureGate = (
   hcoCR: HyperConverged,
   switchState: boolean,
   cluster?: string,
-) => {
+): Promise<HyperConverged> => {
   const featureGates = hcoCR.spec?.featureGates;
   const hasGate = featureGates?.hasOwnProperty(DECLARATIVE_HOTPLUG_VOLUMES_FEATURE_GATE);
 
@@ -34,7 +40,7 @@ const updateDeclarativeHotplugVolumesFeatureGate = (
   });
 };
 
-const useAdvancedCDROMFeatureFlag = (cluster?: string) => {
+const useAdvancedCDROMFeatureFlag = (cluster?: string): AdvancedCDROMFeatureFlag => {
   const [loading, setLoading] = useState(false);
   const [hyperConvergeConfiguration, hcoLoaded] = useHyperConvergeConfiguration(cluster);
   const isAdmin = useIsAdmin();

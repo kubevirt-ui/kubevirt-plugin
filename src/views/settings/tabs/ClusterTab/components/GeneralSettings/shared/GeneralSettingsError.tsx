@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Alert, AlertVariant } from '@patternfly/react-core';
@@ -9,12 +8,13 @@ type GeneralSettingsErrorProps = {
   loadingError?: unknown;
 };
 
+const hasMessage = (value: object): value is { message: unknown } => 'message' in value;
+
 const toMessage = (value: unknown): string => {
   if (!value) return '';
   if (typeof value === 'string') return value;
   if (value instanceof Error) return value.message;
-  if (typeof value === 'object' && value !== null && 'message' in value)
-    return String((value as { message: unknown }).message);
+  if (typeof value === 'object' && hasMessage(value)) return String(value.message);
   return String(value);
 };
 

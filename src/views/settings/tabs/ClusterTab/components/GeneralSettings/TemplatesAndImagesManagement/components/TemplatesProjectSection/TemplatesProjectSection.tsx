@@ -1,14 +1,12 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 import { Trans } from 'react-i18next';
 
-import { HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+import { type K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { CLUSTER_TAB_IDS } from '@settings/search/constants';
 
+import { type HyperConvergeConfigurationWatch } from '../../../consts/consts';
 import GeneralSettingsProject from '../../../shared/GeneralSettingsProject';
-
 import {
   getCurrentTemplatesNamespaceFromHCO,
   OPENSHIFT,
@@ -18,8 +16,8 @@ import {
 import '../../../shared/general-settings.scss';
 
 type TemplatesProjectSectionProps = {
-  hyperConvergeConfiguration: [hyperConvergeConfig: HyperConverged, loaded: boolean, error: any];
-  projectsData: [projects: K8sResourceCommon[], loaded: boolean, error: any];
+  hyperConvergeConfiguration: HyperConvergeConfigurationWatch;
+  projectsData: [projects: K8sResourceCommon[], loaded: boolean, error: unknown];
 };
 
 const TemplatesProjectSection: FC<TemplatesProjectSectionProps> = ({

@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 import { useNavigate } from 'react-router';
 
 import LazyActionMenu from '@kubevirt-utils/components/LazyActionMenu/LazyActionMenu';
@@ -10,7 +9,7 @@ import {
   NamespaceModel,
   StorageClassModel,
 } from '@kubevirt-utils/models';
-import { MultiNamespaceVirtualMachineStorageMigrationPlan } from '@kubevirt-utils/resources/migrations/constants';
+import { type MultiNamespaceVirtualMachineStorageMigrationPlan } from '@kubevirt-utils/resources/migrations/constants';
 import { getStorageMigrationPlanSpecNamespaces } from '@kubevirt-utils/resources/migrations/selectors';
 import {
   getMigrationStartTimestamp,
@@ -36,7 +35,7 @@ type CellProps = {
 export const NameCell: FC<CellProps> = ({ row }) => {
   const navigate = useNavigate();
   const clusterParam = useClusterParam();
-  const cluster = getCluster(row) || clusterParam;
+  const cluster = getCluster(row) ?? clusterParam;
   const migPlanName = getName(row);
   const planModel = getStorageMigrationRowModel(row);
 
@@ -63,7 +62,7 @@ export const NameCell: FC<CellProps> = ({ row }) => {
 export const NamespacesCell: FC<CellProps> = ({ row }) => {
   const clusterParam = useClusterParam();
   const isACMPage = useIsACMPage();
-  const cluster = getCluster(row) || clusterParam;
+  const cluster = getCluster(row) ?? clusterParam;
   const namespaces = getStorageMigrationPlanSpecNamespaces(row);
 
   if (isEmpty(namespaces)) {
@@ -98,7 +97,7 @@ export const StorageMigrationCell: FC<CellProps> = ({ row }) => {
 export const TargetStorageClassCell: FC<CellProps> = ({ row }) => {
   const navigate = useNavigate();
   const clusterParam = useClusterParam();
-  const cluster = getCluster(row) || clusterParam;
+  const cluster = getCluster(row) ?? clusterParam;
   const targetStorageClasses = getStorageClassesFromMigPlan(row);
 
   if (isEmpty(targetStorageClasses)) {

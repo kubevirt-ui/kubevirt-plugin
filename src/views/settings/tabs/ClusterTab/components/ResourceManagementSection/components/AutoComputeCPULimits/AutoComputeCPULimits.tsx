@@ -1,8 +1,7 @@
-/* eslint-disable */
-import React, { FC, useEffect, useState } from 'react';
+import React, { type FC, useEffect, useState } from 'react';
 
 import SectionWithSwitch from '@kubevirt-utils/components/SectionWithSwitch/SectionWithSwitch';
-import { HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
+import { type HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Alert, AlertVariant } from '@patternfly/react-core';
 import { useSettingsCluster } from '@settings/context/SettingsClusterContext';
@@ -36,7 +35,7 @@ const AutoComputeCPULimits: FC<AutoComputeCPULimitsProps> = ({
     );
   }, [cluster, featureGates, hcoLoaded]);
 
-  const onFeatureChange = (switchOn: boolean) => {
+  const onFeatureChange = (switchOn: boolean): void => {
     setError(undefined);
     setIsLoading(true);
     updateAutoResourceLimitsFeatureGate(hco, switchOn, cluster)

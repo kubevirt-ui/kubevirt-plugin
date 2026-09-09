@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC, useCallback, useState } from 'react';
+import React, { type FC, useCallback, useState } from 'react';
 import { Link } from 'react-router';
 
 import ClusterDropdown from '@kubevirt-utils/components/ClusterProjectDropdown/ClusterDropdown';
@@ -41,7 +40,7 @@ const SettingsPage: FC = () => {
   const [selectedCluster, setSelectedCluster] = useState<string>();
 
   const showClusterDropdown = clusterNames?.length > 1;
-  const activeCluster = selectedCluster || hubClusterName;
+  const activeCluster = selectedCluster ?? hubClusterName;
 
   const contextCluster =
     activeCluster && activeCluster !== hubClusterName ? activeCluster : undefined;

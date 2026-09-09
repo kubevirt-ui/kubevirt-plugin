@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC, useCallback, useEffect, useState } from 'react';
+import React, { type FC, useCallback, useEffect, useState } from 'react';
 import { useDebounceCallback } from 'src/views/clusteroverview/utils/hooks/useDebounceCallback';
 
 import { ConfigMapModel } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -47,7 +46,7 @@ const SSHConfiguration: FC<SSHConfigurationProps> = ({ newBadge }) => {
       const setIsLoading =
         field === LOAD_BALANCER_ENABLED ? setLoadBalancerIsLoading : setNodePortIsLoading;
       setIsLoading(true);
-      kubevirtK8sPatch({
+      void kubevirtK8sPatch({
         cluster,
         data: [
           {
@@ -63,7 +62,7 @@ const SSHConfiguration: FC<SSHConfigurationProps> = ({ newBadge }) => {
     [cluster, featureConfigMap],
   );
 
-  const onTextChange = useDebounceCallback((val: string, field) => {
+  const onTextChange = useDebounceCallback((val: string, field: string) => {
     onChange(val, field);
   }, 700);
 

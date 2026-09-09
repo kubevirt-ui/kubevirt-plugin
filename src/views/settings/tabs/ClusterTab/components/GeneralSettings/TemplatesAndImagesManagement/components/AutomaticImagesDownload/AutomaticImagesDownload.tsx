@@ -1,9 +1,7 @@
-/* eslint-disable */
-import React, { FC, useCallback, useState } from 'react';
+import React, { type FC, useCallback, useState } from 'react';
 
 import { HyperConvergedV1Beta1Model as HyperConvergedModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import SectionWithSwitch from '@kubevirt-utils/components/SectionWithSwitch/SectionWithSwitch';
-import { HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName } from '@kubevirt-utils/resources/shared';
@@ -14,10 +12,11 @@ import { useSettingsCluster } from '@settings/context/SettingsClusterContext';
 import ExpandSection from '@settings/ExpandSection/ExpandSection';
 import { CLUSTER_TAB_IDS } from '@settings/search/constants';
 
+import { type HyperConvergeConfigurationWatch } from '../../../consts/consts';
 import { AUTOMATIC_IMAGE_DOWNLOAD_ANNOTATION } from './utils/consts';
 
 type AutomaticImagesDownloadProps = {
-  hyperConvergeConfiguration: [hyperConvergeConfig: HyperConverged, loaded: boolean, error: any];
+  hyperConvergeConfiguration: HyperConvergeConfigurationWatch;
   newBadge: boolean;
 };
 
@@ -33,9 +32,7 @@ const AutomaticImagesDownload: FC<AutomaticImagesDownloadProps> = ({
 
   const [hyperConverged, loaded] = hyperConvergeConfiguration;
   const isEnabledAutomaticImagesDownload =
-    hyperConverged?.spec?.enableCommonBootImageImport !== undefined
-      ? hyperConverged?.spec?.enableCommonBootImageImport
-      : true;
+    hyperConverged?.spec?.enableCommonBootImageImport ?? true;
 
   const bootSources =
     hyperConverged?.spec?.dataImportCronTemplates ||
@@ -44,7 +41,7 @@ const AutomaticImagesDownload: FC<AutomaticImagesDownloadProps> = ({
   const onChangeAutomaticImagesDownload = useCallback(
     (val: boolean) => {
       setIsLoading(true);
-      kubevirtK8sPatch({
+      void kubevirtK8sPatch({
         cluster,
         data: [
           {
@@ -77,7 +74,7 @@ const AutomaticImagesDownload: FC<AutomaticImagesDownloadProps> = ({
             }
           : source,
       );
-      kubevirtK8sPatch({
+      void kubevirtK8sPatch({
         cluster,
         data: [
           {

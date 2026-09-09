@@ -1,8 +1,7 @@
-/* eslint-disable */
 import produce from 'immer';
 
-import { V1alpha1MigrationPolicy } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { BinaryUnit } from '@kubevirt-utils/utils/unitConstants';
+import { type V1alpha1MigrationPolicy } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type BinaryUnit } from '@kubevirt-utils/utils/unitConstants';
 import { generatePrettyName, isEmpty } from '@kubevirt-utils/utils/utils';
 
 import { getEmptyMigrationPolicy } from '../../../../utils/utils';
@@ -24,7 +23,9 @@ export const initialMigrationPolicyState: InitialMigrationPolicyState = {
   vmiSelectorMatchLabel: {},
 };
 
-export const produceMigrationPolicy = (state: InitialMigrationPolicyState) =>
+export const produceMigrationPolicy = (
+  state: InitialMigrationPolicyState,
+): V1alpha1MigrationPolicy =>
   produce<V1alpha1MigrationPolicy>(
     getEmptyMigrationPolicy(),
     (mpDraft: V1alpha1MigrationPolicy) => {
@@ -37,11 +38,11 @@ export const produceMigrationPolicy = (state: InitialMigrationPolicyState) =>
         migrationPolicyName,
         namespaceSelectorMatchLabel,
         vmiSelectorMatchLabel,
-      } = state || {};
+      } = state;
 
       mpDraft.metadata.name = migrationPolicyName;
 
-      mpDraft.metadata.annotations['description'] = description ? description : null;
+      mpDraft.metadata.annotations['description'] = description ?? null;
 
       mpDraft.spec.allowAutoConverge = allowAutoConverge;
 

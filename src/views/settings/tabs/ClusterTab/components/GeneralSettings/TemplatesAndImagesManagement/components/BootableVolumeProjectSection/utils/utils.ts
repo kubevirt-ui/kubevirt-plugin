@@ -1,19 +1,19 @@
-/* eslint-disable */
 import { HyperConvergedV1Beta1Model as HyperConvergedModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { OPENSHIFT_OS_IMAGES_NS } from '@kubevirt-utils/constants/constants';
-import { HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
+import { type HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
+import { getErrorMessage } from '@kubevirt-utils/utils/utils';
 import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
 
 export const getCurrentBootableVolumesNamespaceFromHCO = (hyperConverged: HyperConverged): string =>
-  hyperConverged?.spec?.commonBootImageNamespace || OPENSHIFT_OS_IMAGES_NS;
+  hyperConverged?.spec?.commonBootImageNamespace ?? OPENSHIFT_OS_IMAGES_NS;
 
 export const updateHCOBootableVolumesNamespace = async (
   hyperConverged: HyperConverged,
   newNamespace: null | number | string,
-  handelError: (value: string) => void,
+  handleError: (value: string) => void,
   handleLoading: (value: boolean) => void,
   cluster?: string,
-) => {
+): Promise<void> => {
   const currentTemplatesNamespace = getCurrentBootableVolumesNamespaceFromHCO(hyperConverged);
   if (newNamespace !== currentTemplatesNamespace) {
     handleLoading(true);
@@ -30,8 +30,8 @@ export const updateHCOBootableVolumesNamespace = async (
         model: HyperConvergedModel,
         resource: hyperConverged,
       });
-    } catch (error) {
-      handelError(error?.message || error);
+    } catch (error: unknown) {
+      handleError(getErrorMessage(error));
     } finally {
       handleLoading(false);
     }

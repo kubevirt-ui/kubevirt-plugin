@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC, ReactNode, useEffect } from 'react';
+import React, { type FC, type ReactNode, useEffect } from 'react';
 import classNames from 'classnames';
 
 import { ExpandableSection } from '@patternfly/react-core';
@@ -37,7 +36,11 @@ const ExpandSection: FC<ExpandSectionProps> = ({
     if (isDisabled) setIsExpanded(false);
   }, [isDisabled, setIsExpanded]);
 
-  const handleToggle = (expanded: boolean) => (isDisabled ? null : setIsExpanded(expanded));
+  const handleToggle = (expanded: boolean): void => {
+    if (!isDisabled) {
+      setIsExpanded(expanded);
+    }
+  };
 
   return (
     <ExpandableSection

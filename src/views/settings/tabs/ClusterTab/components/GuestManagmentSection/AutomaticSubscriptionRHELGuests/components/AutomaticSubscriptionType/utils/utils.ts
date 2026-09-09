@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
 export enum AutomaticSubscriptionTypeEnum {
@@ -7,7 +6,12 @@ export enum AutomaticSubscriptionTypeEnum {
   NO_SUBSCRIPTION = 'noSubscription',
 }
 
-export const selectItems = [
+export type SubscriptionItem = {
+  title: string;
+  value: AutomaticSubscriptionTypeEnum;
+};
+
+export const selectItems: SubscriptionItem[] = [
   {
     title: t('No subscription'),
     value: AutomaticSubscriptionTypeEnum.NO_SUBSCRIPTION,
@@ -22,5 +26,5 @@ export const selectItems = [
   },
 ];
 
-export const getSubscriptionItem = (value: string) =>
+export const getSubscriptionItem = (value: string): SubscriptionItem | undefined =>
   selectItems.find((item) => item.value === value);

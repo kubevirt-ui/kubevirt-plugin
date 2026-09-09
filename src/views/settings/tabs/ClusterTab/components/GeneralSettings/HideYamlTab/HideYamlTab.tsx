@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
 import SectionWithSwitch from '@kubevirt-utils/components/SectionWithSwitch/SectionWithSwitch';
 import { HIDE_YAML_TAB } from '@kubevirt-utils/hooks/useFeatures/constants';
@@ -23,7 +22,7 @@ const HideYamlTab: FC<HideYamlTabProps> = ({ newBadge = false }) => {
     cluster,
   );
 
-  const onChange = async (checked: boolean) => {
+  const onChange = async (checked: boolean): Promise<void> => {
     await toggleFeature(checked);
   };
 

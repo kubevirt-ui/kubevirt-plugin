@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { useEffect, useState } from 'react';
+import React, { type FC, useEffect, useState } from 'react';
 
 import {
   logVMMigrationClusterLimitConfigured,
@@ -7,6 +6,7 @@ import {
   logVMMigrationNodeLimitConfigured,
   logVMMigrationNodeLimitReached,
 } from '@kubevirt-utils/extensions/telemetry/vm-migration';
+import { type HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { useDebounceCallback } from '@overview/utils/hooks/useDebounceCallback';
@@ -19,12 +19,15 @@ import {
   MIGRATION_PER_NODE,
   updateLiveMigrationConfig,
 } from '../utils/utils';
-
 import MigrationNumberInput from './MigrationNumberInput';
 
 const MIN_MIGRATION_LIMIT = 0;
 
-const Limits = ({ hyperConverge }) => {
+type LimitsProps = {
+  hyperConverge: HyperConverged;
+};
+
+const Limits: FC<LimitsProps> = ({ hyperConverge }) => {
   const { t } = useKubevirtTranslation();
   const cluster = useSettingsCluster();
 
@@ -36,19 +39,19 @@ const Limits = ({ hyperConverge }) => {
   const updateConfigWithDebounceNode: typeof updateLiveMigrationConfig =
     useDebounceCallback(updateLiveMigrationConfig);
 
-  const updateValueCluster = (value: number) => {
+  const updateValueCluster = (value: number): void => {
     if (value < MIN_MIGRATION_LIMIT) return;
 
     logVMMigrationClusterLimitConfigured(value);
-    logVMMigrationClusterLimitReached(value, migrationPerCluster || 0);
-    updateConfigWithDebounceCluster(hyperConverge, value, MIGRATION_PER_CLUSTER, cluster);
+    logVMMigrationClusterLimitReached(value, migrationPerCluster ?? 0);
+    void updateConfigWithDebounceCluster(hyperConverge, value, MIGRATION_PER_CLUSTER, cluster);
   };
-  const updateValueNode = (value: number) => {
+  const updateValueNode = (value: number): void => {
     if (value < MIN_MIGRATION_LIMIT) return;
 
     logVMMigrationNodeLimitConfigured(value);
-    logVMMigrationNodeLimitReached(value, migrationPerNode || 0);
-    updateConfigWithDebounceNode(hyperConverge, value, MIGRATION_PER_NODE, cluster);
+    logVMMigrationNodeLimitReached(value, migrationPerNode ?? 0);
+    void updateConfigWithDebounceNode(hyperConverge, value, MIGRATION_PER_NODE, cluster);
   };
 
   useEffect(() => {

@@ -1,5 +1,4 @@
-/* eslint-disable */
-import { TFunction } from 'i18next';
+import { type TFunction } from 'i18next';
 import {
   getQuotaNumbers,
   getResourceKeyKind,
@@ -9,7 +8,7 @@ import {
 import { humanizeCpuCores } from '@kubevirt-utils/utils/humanize.js';
 import { getHumanizedSize } from '@kubevirt-utils/utils/units';
 
-import { ResourceKeyKind } from './types';
+import { ResourceKeyKind, type StatusChartInfo } from './types';
 
 export const getCountText = (
   count: number,
@@ -30,7 +29,7 @@ export const getStatusChartInfo = (
   usedValue: string,
   maxValue: string,
   t: TFunction,
-) => {
+): StatusChartInfo => {
   const resourceLabel = getResourceLabel(resourceKey, t);
   const resourceKeyKind = getResourceKeyKind(resourceKey);
 

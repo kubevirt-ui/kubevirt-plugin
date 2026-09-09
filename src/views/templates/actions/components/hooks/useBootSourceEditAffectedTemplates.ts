@@ -1,10 +1,9 @@
-/* eslint-disable */
 import { useMemo } from 'react';
 
 import {
   modelToGroupVersionKind,
   TemplateModel,
-  V1Template,
+  type V1Template,
 } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
   getTemplateParameterValue,
@@ -13,7 +12,7 @@ import {
 } from '@kubevirt-utils/resources/template';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 
-const useBootSourceEditAffectedTemplates = (obj: V1Template) => {
+const useBootSourceEditAffectedTemplates = (obj: V1Template): V1Template[] => {
   const [allTemplates] = useK8sWatchResource<V1Template[]>({
     groupVersionKind: modelToGroupVersionKind(TemplateModel),
     isList: true,

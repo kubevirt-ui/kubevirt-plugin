@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { createContext, useContext } from 'react';
 
 import { type CapabilityFeature, type CapabilitySelectionState } from '../utils/types';
@@ -25,6 +24,7 @@ const defaultActionsValue: CapabilitiesActionsValue = {
 
 const CapabilitiesActionsContext = createContext<CapabilitiesActionsValue>(defaultActionsValue);
 
-export const useCapabilitiesActions = () => useContext(CapabilitiesActionsContext);
+export const useCapabilitiesActions = (): CapabilitiesActionsValue =>
+  useContext(CapabilitiesActionsContext);
 
 export { CapabilitiesActionsContext };

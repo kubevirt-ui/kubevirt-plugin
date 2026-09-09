@@ -1,15 +1,14 @@
-/* eslint-disable */
-import React, { FC, ReactNode } from 'react';
+/* eslint-disable max-lines */
+import React, { type FC, type ReactNode } from 'react';
 
-import { V1beta1DataVolumeSpec } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
+import { type V1beta1DataVolumeSpec } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import CapacityInput from '@kubevirt-utils/components/CapacityInput/CapacityInput';
 import { DEFAULT_DISK_SIZE } from '@kubevirt-utils/components/DiskModal/utils/constants';
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FormGroup, TextInput, ValidatedOptions } from '@patternfly/react-core';
 
-import { SOURCE_OPTIONS_IDS, SOURCE_TYPES } from '../../utils/constants';
-
+import { type SOURCE_OPTIONS_IDS, SOURCE_TYPES } from '../../utils/constants';
 import { PersistentVolumeClaimSelect } from './PersistentVolumeClaimSelect/PersistentVolumeClaimSelect';
 import SelectSourceOption from './SelectSourceOption';
 import {
@@ -43,54 +42,62 @@ export const SelectSource: FC<SelectSourceProps> = ({
   const pvcNamespaceSelected = source?.source?.pvc?.namespace;
   const httpURL = source?.source?.http?.url;
   const containerImage = source?.source?.registry?.url;
-  const volumeQuantity = source?.storage?.resources?.requests?.storage || initialVolumeQuantity;
+  const volumeQuantity = source?.storage?.resources?.requests?.storage ?? initialVolumeQuantity;
 
-  const onSourceSelected = (newSourceType: SOURCE_OPTIONS_IDS, newVolumeQuantity?: string) => {
-    const selectedVolumeQuantity = newVolumeQuantity || volumeQuantity;
+  const onSourceSelected = (
+    newSourceType: SOURCE_OPTIONS_IDS,
+    newVolumeQuantity?: string,
+  ): void => {
+    const selectedVolumeQuantity = newVolumeQuantity ?? volumeQuantity;
 
     switch (newSourceType) {
       case SOURCE_TYPES.httpSource:
-        return onSourceChange(
+        onSourceChange(
           getGenericSourceCustomization(
             newSourceType,
             httpURL,
             withSize ? selectedVolumeQuantity : null,
           ),
         );
+        return;
       case SOURCE_TYPES.pvcSource:
-        return onSourceChange(
+        onSourceChange(
           getPVCSource(
             pvcNameSelected,
             pvcNamespaceSelected,
             withSize ? selectedVolumeQuantity : null,
           ),
         );
+        return;
       case SOURCE_TYPES.registrySource:
-        return onSourceChange(
+        onSourceChange(
           getGenericSourceCustomization(
             newSourceType,
-            containerImage || '',
+            containerImage ?? '',
             withSize ? selectedVolumeQuantity : null,
           ),
         );
+        return;
       default:
         return;
     }
   };
 
-  const onContainerChange = (newContainerURL) =>
+  const onContainerChange = (newContainerURL: string): void => {
     onSourceChange(
       getGenericSourceCustomization(
         selectedSourceType,
-        newContainerURL || '',
+        newContainerURL ?? '',
         withSize ? volumeQuantity : null,
       ),
     );
+  };
 
-  const onURLChange = (newUrl) =>
+  const onURLChange = (newUrl: string): void => {
     onSourceChange(
       getGenericSourceCustomization(selectedSourceType, newUrl, withSize ? volumeQuantity : null),
     );
+  };
 
   return (
     <>

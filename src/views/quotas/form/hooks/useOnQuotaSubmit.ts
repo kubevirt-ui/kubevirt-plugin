@@ -1,15 +1,14 @@
-/* eslint-disable */
 import { useCallback } from 'react';
 import { useNavigate } from 'react-router';
 
-import { ApplicationAwareQuota } from '@kubevirt-utils/resources/quotas/types';
+import { type ApplicationAwareQuota } from '@kubevirt-utils/resources/quotas/types';
 import { kubevirtK8sCreate, kubevirtK8sUpdate } from '@multicluster/k8sRequests';
 
 import { getQuotaDetailsURL } from '../../utils/url';
 import { getQuotaModel } from '../../utils/utils';
 
 type UseOnQuotaSubmit = (
-  onError: (error: any) => void,
+  onError: (error: unknown) => void,
   isEdit: boolean,
 ) => (quota: ApplicationAwareQuota) => Promise<void>;
 

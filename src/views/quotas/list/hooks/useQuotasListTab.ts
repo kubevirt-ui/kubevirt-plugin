@@ -1,12 +1,12 @@
-/* eslint-disable */
-import { MouseEvent } from 'react';
+import { type MouseEvent } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
 
-import { CLUSTER_QUOTA_LIST_URL, getQuotaListURL } from '../../utils/url';
 import { QuotaScope } from '../constants';
+
+import { CLUSTER_QUOTA_LIST_URL, getQuotaListURL } from '../../utils/url';
 
 export type UseQuotasListTab = () => {
   activeTab: QuotaScope;
@@ -22,8 +22,11 @@ const useQuotasListTab: UseQuotasListTab = () => {
   const isClusterScoped = location.pathname.includes(CLUSTER_QUOTA_LIST_URL);
   const activeTab = isClusterScoped ? QuotaScope.CLUSTER : QuotaScope.PROJECT;
 
-  const handleTabSelect = (_event: MouseEvent, tabKey: QuotaScope) =>
-    navigate(tabKey === QuotaScope.CLUSTER ? CLUSTER_QUOTA_LIST_URL : getQuotaListURL(namespace));
+  const handleTabSelect = (_event: MouseEvent, tabKey: QuotaScope): void => {
+    void navigate(
+      tabKey === QuotaScope.CLUSTER ? CLUSTER_QUOTA_LIST_URL : getQuotaListURL(namespace),
+    );
+  };
 
   return { activeTab, handleTabSelect };
 };

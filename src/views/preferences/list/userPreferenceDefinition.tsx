@@ -1,13 +1,12 @@
-/* eslint-disable */
-import React from 'react';
-import { TFunction } from 'i18next';
+import React, { type FC } from 'react';
+import { type TFunction } from 'i18next';
 
 import { VirtualMachinePreferenceModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1beta1VirtualMachinePreference } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1beta1VirtualMachinePreference } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getK8sRowId } from '@kubevirt-utils/components/KubevirtTable/utils';
 import RedHatLabel from '@kubevirt-utils/components/RedHatLabel/RedHatLabel';
 import { VENDOR_LABEL } from '@kubevirt-utils/constants/constants';
-import { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
+import { type ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { getLabel, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import MulticlusterResourceLink from '@multicluster/components/MulticlusterResourceLink/MulticlusterResourceLink';
@@ -15,7 +14,11 @@ import { getCluster } from '@multicluster/helpers/selectors';
 
 import UserPreferenceActions from '../actions/UserPreferenceActions';
 
-const NameCell = ({ row }: { row: V1beta1VirtualMachinePreference }) => (
+type UserPreferenceCellProps = {
+  row: V1beta1VirtualMachinePreference;
+};
+
+const NameCell: FC<UserPreferenceCellProps> = ({ row }) => (
   <>
     <MulticlusterResourceLink
       cluster={getCluster(row)}
@@ -28,15 +31,15 @@ const NameCell = ({ row }: { row: V1beta1VirtualMachinePreference }) => (
   </>
 );
 
-const NamespaceCell = ({ row }: { row: V1beta1VirtualMachinePreference }) => (
+const NamespaceCell: FC<UserPreferenceCellProps> = ({ row }) => (
   <>{getNamespace(row) ?? NO_DATA_DASH}</>
 );
 
-const VendorCell = ({ row }: { row: V1beta1VirtualMachinePreference }) => (
+const VendorCell: FC<UserPreferenceCellProps> = ({ row }) => (
   <>{getLabel(row, VENDOR_LABEL, NO_DATA_DASH)}</>
 );
 
-const ActionsCell = ({ row }: { row: V1beta1VirtualMachinePreference }) => (
+const ActionsCell: FC<UserPreferenceCellProps> = ({ row }) => (
   <UserPreferenceActions isKebabToggle preference={row} />
 );
 

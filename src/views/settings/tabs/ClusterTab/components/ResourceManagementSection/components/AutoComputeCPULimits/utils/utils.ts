@@ -1,7 +1,6 @@
-/* eslint-disable */
 import { HyperConvergedV1Beta1Model as HyperConvergedModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { K8S_OPS } from '@kubevirt-utils/constants/constants';
-import { HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
+import { type HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
 
 import { AUTO_RESOURCE_LIMITS_FEATURE_GATE } from './constants';
@@ -10,7 +9,7 @@ export const updateAutoResourceLimitsFeatureGate = (
   hcoCR: HyperConverged,
   switchState: boolean,
   cluster?: string,
-) =>
+): Promise<HyperConverged> =>
   kubevirtK8sPatch<HyperConverged>({
     cluster,
     data: [

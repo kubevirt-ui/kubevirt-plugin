@@ -1,8 +1,7 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
 import { VirtualMachineTemplateRequestModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1alpha1VirtualMachineTemplateRequest } from '@kubevirt-ui-ext/kubevirt-api/virt-template';
+import { type V1alpha1VirtualMachineTemplateRequest } from '@kubevirt-ui-ext/kubevirt-api/virt-template';
 import ActionsDropdown from '@kubevirt-utils/components/ActionsDropdown/ActionsDropdown';
 import DeleteModal from '@kubevirt-utils/components/DeleteModal/DeleteModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
@@ -26,7 +25,7 @@ const VirtualMachineTemplateRequestActions: FC<VirtualMachineTemplateRequestActi
   const actions = [
     {
       accessReview: asAccessReview(VirtualMachineTemplateRequestModel, request, 'delete'),
-      cta: () =>
+      cta: (): void =>
         createModal(({ isOpen, onClose }) => (
           <DeleteModal
             onDeleteSubmit={() =>

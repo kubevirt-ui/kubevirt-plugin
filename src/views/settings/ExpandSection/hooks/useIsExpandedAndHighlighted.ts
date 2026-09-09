@@ -1,11 +1,16 @@
-/* eslint-disable */
-import { useEffect, useMemo, useState } from 'react';
+import { type Dispatch, type SetStateAction, useEffect, useMemo, useState } from 'react';
 import { useLocation } from 'react-router';
 
 import { idIsHighlighted } from '@kubevirt-utils/components/SearchItem/useIsHighlighted';
 import { isSearchItemChildrenHighlighted } from '@settings/search/search';
 
-const useIsExpandedAndHighlighted = (searchItemId?: string) => {
+type UseIsExpandedAndHighlightedReturn = {
+  isExpanded: boolean;
+  isHighlighted: boolean;
+  setIsExpanded: Dispatch<SetStateAction<boolean>>;
+};
+
+const useIsExpandedAndHighlighted = (searchItemId?: string): UseIsExpandedAndHighlightedReturn => {
   const location = useLocation();
 
   const isHighlighted = useMemo(

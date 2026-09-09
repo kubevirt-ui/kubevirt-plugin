@@ -1,9 +1,9 @@
-/* eslint-disable */
 import { HyperConvergedV1Beta1Model as HyperConvergedModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
-import { TemplateModel, V1Template } from '@kubevirt-utils/models';
+import { type HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
+import { TemplateModel, type V1Template } from '@kubevirt-utils/models';
+import { getErrorMessage } from '@kubevirt-utils/utils/utils';
 import { kubevirtK8sDelete, kubevirtK8sGet, kubevirtK8sPatch } from '@multicluster/k8sRequests';
-import { TemplateList } from '@overview/utils/types';
+import { type TemplateList } from '@overview/utils/types';
 
 const TYPE_LABEL = 'template.kubevirt.io/type';
 const BASE = 'base';
@@ -11,15 +11,15 @@ const BASE = 'base';
 export const OPENSHIFT = 'openshift';
 
 export const getCurrentTemplatesNamespaceFromHCO = (hyperConverged: HyperConverged): string =>
-  hyperConverged?.spec?.commonTemplatesNamespace || OPENSHIFT;
+  hyperConverged?.spec?.commonTemplatesNamespace ?? OPENSHIFT;
 
 export const updateHCOCommonTemplatesNamespace = async (
   hyperConverged: HyperConverged,
   newNamespace: null | number | string,
-  handelError: (value: string) => void,
+  handleError: (value: string) => void,
   handleLoading: (value: boolean) => void,
   cluster?: string,
-) => {
+): Promise<void> => {
   const currentTemplatesNamespace = getCurrentTemplatesNamespaceFromHCO(hyperConverged);
   if (newNamespace !== currentTemplatesNamespace) {
     handleLoading(true);
@@ -56,8 +56,8 @@ export const updateHCOCommonTemplatesNamespace = async (
       );
 
       await Promise.all<Promise<V1Template>[]>(templatesDeletePromisesArray);
-    } catch (error) {
-      handelError(error?.message || error);
+    } catch (error: unknown) {
+      handleError(getErrorMessage(error));
     } finally {
       handleLoading(false);
     }

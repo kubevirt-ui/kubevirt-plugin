@@ -1,5 +1,4 @@
-/* eslint-disable */
-import { useMemo } from 'react';
+import { type FC, useMemo } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
@@ -11,7 +10,11 @@ import TemplateSchedulingTab from '../tabs/scheduling/TemplateSchedulingTab';
 import TemplateScriptsPage from '../tabs/scripts/TemplateScriptsPage';
 import TemplateYAMLPage from '../tabs/yaml/TemplateYAMLPage';
 
-export const useTemplateTabs = () => {
+export const useTemplateTabs = (): {
+  component: FC;
+  href: string;
+  name: string;
+}[] => {
   const { t } = useKubevirtTranslation();
 
   const tabs = useMemo(

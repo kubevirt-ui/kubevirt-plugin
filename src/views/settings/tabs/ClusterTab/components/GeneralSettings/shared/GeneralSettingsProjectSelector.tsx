@@ -1,11 +1,10 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-utils/models';
 import { getName } from '@kubevirt-utils/resources/shared';
-import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+import { type K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { Spinner } from '@patternfly/react-core';
 
 type GeneralSettingsProjectSelectorProps = {
@@ -24,14 +23,13 @@ const GeneralSettingsProjectSelector: FC<GeneralSettingsProjectSelectorProps> = 
 
   return (
     <InlineFilterSelect
-      options={[
-        ...projects
-          ?.map((proj) => ({
-            groupVersionKind: modelToGroupVersionKind(ProjectModel),
-            value: getName(proj),
-          }))
-          .sort((a, b) => a.value.localeCompare(b.value)),
-      ]}
+      options={projects
+        .flatMap((proj) => {
+          const name = getName(proj);
+          if (!name) return [];
+          return [{ groupVersionKind: modelToGroupVersionKind(ProjectModel), value: name }];
+        })
+        .sort((a, b) => a.value.localeCompare(b.value))}
       toggleProps={{
         icon: !loaded && <Spinner size="sm" />,
         isDisabled: !loaded,

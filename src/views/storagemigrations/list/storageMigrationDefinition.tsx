@@ -1,10 +1,9 @@
-/* eslint-disable */
 import React from 'react';
-import { TFunction } from 'i18next';
+import { type TFunction } from 'i18next';
 
-import { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
+import { type ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { ACTIONS } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/const';
-import { MultiNamespaceVirtualMachineStorageMigrationPlan } from '@kubevirt-utils/resources/migrations/constants';
+import { type MultiNamespaceVirtualMachineStorageMigrationPlan } from '@kubevirt-utils/resources/migrations/constants';
 import {
   getMigrationStartTimestamp,
   getVolumeCountFromMigPlan,
@@ -92,7 +91,7 @@ export const getStorageMigrationRowId = (
   const uid = getUID(row);
   if (uid) return uid;
 
-  const cluster = getCluster(row) || 'local';
+  const cluster = getCluster(row) ?? 'local';
   const name = getName(row);
 
   if (name) {
