@@ -1,16 +1,16 @@
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useNamespaceParam from '@kubevirt-utils/hooks/useNamespaceParam';
 import { VM_STATUS } from '@kubevirt-utils/resources/vm/utils/vmStatus';
-import useVMStatusesPath from '@overview/OverviewTab/vm-statuses-card/hooks/useVMStatusesPath';
-import { ERROR, OTHER } from '@overview/OverviewTab/vm-statuses-card/utils/constants';
+import useVMStatusesPath from '@kubevirt-utils/resources/vm/vmStatuses/hooks/useVMStatusesPath';
+import { ERROR, OTHER } from '@kubevirt-utils/resources/vm/vmStatuses/utils/constants';
 import {
   getOtherStatuses,
   getVMStatuses,
   vmStatusIcon,
-} from '@overview/OverviewTab/vm-statuses-card/utils/utils';
+} from '@kubevirt-utils/resources/vm/vmStatuses/utils/utils';
 import { Card, CardBody, CardHeader, CardTitle, Grid } from '@patternfly/react-core';
 
 import StatusCountItem from '../../shared/StatusCountItem';

@@ -1,11 +1,11 @@
 import isNil from 'lodash/isNil';
 
-import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   type ClusterServiceVersionKind,
   ClusterServiceVersionPhase,
   type SubscriptionKind,
-} from '@overview/utils/types';
+} from '@kubevirt-utils/types/olm';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 
 import {
   type CapabilityFeature,

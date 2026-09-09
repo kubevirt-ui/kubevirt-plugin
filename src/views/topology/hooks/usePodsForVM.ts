@@ -16,7 +16,7 @@ import {
   PodRCData,
   useK8sWatchResources,
 } from '@openshift-console/dynamic-plugin-sdk';
-import { useDebounceCallback } from '@overview/utils/hooks/useDebounceCallback';
+import { useDebounceCallback } from '@kubevirt-utils/hooks/useDebounceCallback';
 
 import { getReplicationControllersForResource } from '../utils/resource-utils';
 
@@ -96,7 +96,7 @@ const usePodsForVM: UsePodsForVM = (vm) => {
       }
     },
     // Don't update on a resource change, we want the debounce callback to be consistent
-     
+
     [vmName],
   );
 

@@ -5,7 +5,7 @@ import {
   type OperatorGroupKind,
   type PackageManifestKind,
   type SubscriptionKind,
-} from '@overview/utils/types';
+} from '@kubevirt-utils/types/olm';
 
 export type VirtualizationFeatureOperators =
   | 'cluster-kube-descheduler-operator'

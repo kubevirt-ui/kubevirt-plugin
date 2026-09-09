@@ -1,13 +1,13 @@
 import { useMemo } from 'react';
 
 import { type V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type ChartPoint } from '@kubevirt-utils/components/Charts/MetricChartUtils/hooks/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useVMQueries from '@kubevirt-utils/hooks/useVMQueries';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { PrometheusEndpoint, type PrometheusValue } from '@openshift-console/dynamic-plugin-sdk';
-import { type ChartPoint } from '@overview/OverviewTab/metric-charts-card/utils/hooks/types';
 import { useFleetPrometheusPoll } from '@stolostron/multicluster-sdk';
 import useDuration from '@virtualmachines/details/tabs/metrics/hooks/useDuration';
 

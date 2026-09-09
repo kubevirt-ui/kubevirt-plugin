@@ -1,4 +1,4 @@
-import type { Perspective } from '@openshift-console/dynamic-plugin-sdk';
+import type { Perspective, RoutePage } from '@openshift-console/dynamic-plugin-sdk';
 import type {
   ConsolePluginBuildMetadata,
   EncodedExtension,
@@ -6,7 +6,6 @@ import type {
 
 import { PERSPECTIVES } from '../utils/constants/constants';
 import { FLAG_KUBEVIRT_VIRTUALIZATION_NAV } from '../utils/flags/consts';
-
 import { clusterSection } from './navigation/clusterSection';
 import { computeSection } from './navigation/computeSection';
 import { migrationSection } from './navigation/migrationSection';
@@ -15,6 +14,7 @@ import { storageSection } from './navigation/storageSection';
 import { virtualizationSection } from './navigation/virtualizationSection';
 
 export const exposedModules: ConsolePluginBuildMetadata['exposedModules'] = {
+  VirtualizationLandingPage: './perspective/VirtualizationLandingPage.tsx',
   perspective: './perspective/perspective.ts',
 };
 
@@ -33,6 +33,15 @@ export const extensions: EncodedExtension[] = [
     },
     type: 'console.perspective',
   } as EncodedExtension<Perspective>,
+  {
+    properties: {
+      component: {
+        $codeRef: 'VirtualizationLandingPage',
+      },
+      path: ['/k8s/virtualization-landing'],
+    },
+    type: 'console.page/route',
+  } as EncodedExtension<RoutePage>,
   ...virtualizationSection,
   ...clusterSection,
   ...migrationSection,

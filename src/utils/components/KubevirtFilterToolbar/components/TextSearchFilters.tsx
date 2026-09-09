@@ -1,6 +1,7 @@
 import React, { type Dispatch, type FC, type SetStateAction, useMemo, useState } from 'react';
 
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
+import { useDebounceCallback } from '@kubevirt-utils/hooks/useDebounceCallback';
 import { getLabelFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/filters/getLabelFilter';
 import {
   type FilterableObject,
@@ -8,7 +9,6 @@ import {
   type OnSetFilters,
 } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { useDebounceCallback } from '@overview/utils/hooks/useDebounceCallback';
 import {
   InputGroup,
   InputGroupItem,

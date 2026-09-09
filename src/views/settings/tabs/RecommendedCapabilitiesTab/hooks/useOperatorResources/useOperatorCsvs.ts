@@ -1,9 +1,9 @@
 import { useMemo } from 'react';
 
 import useDeepCompareMemoize from '@kubevirt-utils/hooks/useDeepCompareMemoize/useDeepCompareMemoize';
+import { type ClusterServiceVersionKind } from '@kubevirt-utils/types/olm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useKubevirtWatchResources from '@multicluster/hooks/useKubevirtWatchResources';
-import { type ClusterServiceVersionKind } from '@overview/utils/types';
 
 import { type UseOperatorCsvsParams, type UseOperatorCsvsReturn } from './utils/types';
 import { getCsvWatchResources, mapWatchResourceData, mapWatchResourceErrors } from './utils/utils';

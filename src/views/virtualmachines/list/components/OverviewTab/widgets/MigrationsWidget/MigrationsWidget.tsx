@@ -2,12 +2,12 @@ import React, { type FC, type ReactNode, useMemo } from 'react';
 
 import { type V1VirtualMachineInstanceMigration } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { vmStatusIcon } from '@kubevirt-utils/resources/vm/vmStatuses/utils/utils';
 import {
   getMigrationStatusCounts,
   type MigrationStatusCounts,
 } from '@kubevirt-utils/resources/vmim/utils';
 import { GreenCheckCircleIcon } from '@openshift-console/dynamic-plugin-sdk';
-import { vmStatusIcon } from '@overview/OverviewTab/vm-statuses-card/utils/utils';
 import {
   Card,
   CardBody,

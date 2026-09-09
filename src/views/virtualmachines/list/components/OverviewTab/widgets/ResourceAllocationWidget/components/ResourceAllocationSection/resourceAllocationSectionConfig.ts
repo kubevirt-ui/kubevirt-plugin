@@ -1,12 +1,12 @@
-import { TFunction } from 'i18next';
+import { type TFunction } from 'i18next';
 
+import { METRICS } from '@kubevirt-utils/components/Charts/MetricChartUtils/constants';
+import { type MetricChartData } from '@kubevirt-utils/components/Charts/MetricChartUtils/hooks/useMetricChartData';
+import { getCurrentValue } from '@kubevirt-utils/components/Charts/MetricChartUtils/utils';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
-import { METRICS } from '@overview/OverviewTab/metric-charts-card/utils/constants';
-import { MetricChartData } from '@overview/OverviewTab/metric-charts-card/utils/hooks/useMetricChartData';
-import { getCurrentValue } from '@overview/OverviewTab/metric-charts-card/utils/utils';
 
-import { MetricQuotaData } from '../../hooks/useProjectResourceQuota';
-import { TopClustersMetricData } from '../../hooks/useTopClustersChartData';
+import { type MetricQuotaData } from '../../hooks/useProjectResourceQuota';
+import { type TopClustersMetricData } from '../../hooks/useTopClustersChartData';
 import { getMetricSubtitle } from '../../utils/utils';
 
 export type WidgetConfig = {

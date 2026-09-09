@@ -9,11 +9,11 @@ import {
 import type { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName } from '@kubevirt-utils/resources/shared';
+import { getVMStatuses, vmStatusIcon } from '@kubevirt-utils/resources/vm/vmStatuses/utils/utils';
 import { getVMINodeName } from '@kubevirt-utils/resources/vmi';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import type { NodeKind } from '@openshift-console/dynamic-plugin-sdk';
-import { getVMStatuses, vmStatusIcon } from '@overview/OverviewTab/vm-statuses-card/utils/utils';
 import { Flex, FlexItem, Icon, StackItem } from '@patternfly/react-core';
 import { ExclamationCircleIcon } from '@patternfly/react-icons';
 import { useVirtualMachineInstanceMapper } from '@virtualmachines/list/hooks/useVirtualMachineInstanceMapper';

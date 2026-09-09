@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 import { useSearchParams } from 'react-router';
-import { useDebounceCallback } from 'src/views/clusteroverview/utils/hooks/useDebounceCallback';
 
+import { useDebounceCallback } from '@kubevirt-utils/hooks/useDebounceCallback';
 import {
   type KubevirtFilterState,
   type OnSetFilters,

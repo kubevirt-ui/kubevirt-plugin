@@ -1,12 +1,12 @@
 import React, { type FC } from 'react';
 
 import useResponsiveCharts from '@kubevirt-utils/components/Charts/hooks/useResponsiveCharts';
+import getYAxisTicks from '@kubevirt-utils/components/Charts/MetricChartUtils/hooks/getYAxisTicks';
+import { getLabelUnit } from '@kubevirt-utils/components/Charts/MetricChartUtils/utils';
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getNoDataAvailableMessage } from '@kubevirt-utils/utils/utils';
-import getYAxisTicks from '@overview/OverviewTab/metric-charts-card/utils/hooks/getYAxisTicks';
-import { getLabelUnit } from '@overview/OverviewTab/metric-charts-card/utils/utils';
 import { Bullseye, Skeleton } from '@patternfly/react-core';
 
 import { type ResourceAllocationChartProps } from '../../utils/types';

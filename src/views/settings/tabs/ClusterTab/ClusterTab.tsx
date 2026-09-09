@@ -1,11 +1,10 @@
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import useHyperConvergeConfiguration from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
-import { useKubevirtCSVDetails } from '@overview/utils/hooks/useKubevirtCSVDetails';
-import { isNewBadgeNeeded } from '@overview/utils/utils';
 import { Card, Divider } from '@patternfly/react-core';
 import { useSettingsCluster } from '@settings/context/SettingsClusterContext';
+import { useKubevirtCSVDetails } from '@settings/tabs/ClusterTab/hooks/useKubevirtCSVDetails';
 
 import AutoAppliedLabelsSection from './components/AutoAppliedLabelsSection/AutoAppliedLabelsSection';
 import GeneralInformation from './components/GeneralInformation/GeneralInformation';
@@ -13,6 +12,7 @@ import GeneralSettings from './components/GeneralSettings/GeneralSettings';
 import GuestManagementSection from './components/GuestManagmentSection/GuestManagementSection';
 import PersistentReservationSection from './components/PersistentReservationSection/PersistentReservationSection';
 import ResourceManagementSection from './components/ResourceManagementSection/ResourceManagementSection';
+import { isNewBadgeNeeded } from './utils';
 
 const ClusterTab: FC = () => {
   const cluster = useSettingsCluster();

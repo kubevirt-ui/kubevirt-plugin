@@ -4,8 +4,8 @@ import { SubscriptionModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api
 import { KUBEVIRT_HYPERCONVERGED } from '@kubevirt-utils/constants/constants';
 import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
 import { operatorNamespaceSignal } from '@kubevirt-utils/store/operatorNamespace';
+import { type SubscriptionKind } from '@kubevirt-utils/types/olm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { type SubscriptionKind } from '@overview/utils/types';
 import { useFleetClusterNames } from '@stolostron/multicluster-sdk';
 
 export const useClusterCNVInstalled = (): {

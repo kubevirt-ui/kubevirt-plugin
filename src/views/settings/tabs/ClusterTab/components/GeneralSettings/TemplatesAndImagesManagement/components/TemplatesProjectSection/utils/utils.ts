@@ -3,7 +3,7 @@ import { HyperConvergedV1Beta1Model as HyperConvergedModel } from '@kubevirt-ui-
 import { HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { TemplateModel, V1Template } from '@kubevirt-utils/models';
 import { kubevirtK8sDelete, kubevirtK8sGet, kubevirtK8sPatch } from '@multicluster/k8sRequests';
-import { TemplateList } from '@overview/utils/types';
+import { type TemplateList } from '@kubevirt-utils/resources/template/utils/types';
 
 const TYPE_LABEL = 'template.kubevirt.io/type';
 const BASE = 'base';

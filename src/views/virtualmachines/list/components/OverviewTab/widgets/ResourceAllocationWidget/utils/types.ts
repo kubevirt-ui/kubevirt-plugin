@@ -1,4 +1,4 @@
-import { type MetricChartData } from '@overview/OverviewTab/metric-charts-card/utils/hooks/useMetricChartData';
+import { type MetricChartData } from '@kubevirt-utils/components/Charts/MetricChartUtils/hooks/useMetricChartData';
 
 import { type ClusterChartSeries } from '../hooks/useTopClustersChartData';
 

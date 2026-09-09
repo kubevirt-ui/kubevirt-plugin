@@ -3,7 +3,7 @@ import React, { FC, useMemo } from 'react';
 
 import { V1beta1Plan } from '@forklift-ui/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { vmStatusIcon } from '@overview/OverviewTab/vm-statuses-card/utils/utils';
+import { vmStatusIcon } from '@kubevirt-utils/resources/vm/vmStatuses/utils/utils';
 import { Card, CardBody, CardHeader, CardTitle, Grid } from '@patternfly/react-core';
 
 import StatusCountItem from '../../shared/StatusCountItem';

@@ -6,14 +6,14 @@ import {
   SubscriptionModel,
 } from '@kubevirt-utils/models';
 import { getLabels, getName, getNamespace } from '@kubevirt-utils/resources/shared';
-import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
-import { kubevirtK8sCreate, kubevirtK8sPatch } from '@multicluster/k8sRequests';
 import {
   InstallPlanApproval,
   type K8sResourceKind,
   type OperatorGroupKind,
   type SubscriptionKind,
-} from '@overview/utils/types';
+} from '@kubevirt-utils/types/olm';
+import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
+import { kubevirtK8sCreate, kubevirtK8sPatch } from '@multicluster/k8sRequests';
 
 import { RED_HAT } from '../constants';
 import { type VirtFeatureOperatorItem } from '../types';
