@@ -84,15 +84,25 @@ export const getVMObjectFromTemplate = ({
   vmName?: string;
 }) => {
   const generatedVM = produce(vm, (draftVM) => {
-    ensurePath(draftVM, 'metadata.labels');
-    ensurePath(draftVM, 'metadata.annotations');
+    ensurePath(draftVM, ['metadata.labels', 'metadata.annotations']);
 
     if (!isEmpty(description)) {
       draftVM.metadata.annotations.description = description;
     }
 
-    draftVM.metadata.labels[LABEL_USED_TEMPLATE_NAME] = selectedTemplate?.metadata?.name;
-    draftVM.metadata.labels[LABEL_USED_TEMPLATE_NAMESPACE] = selectedTemplate?.metadata?.namespace;
+    const selectedTemplateName = selectedTemplate?.metadata?.name;
+    if (selectedTemplateName) {
+      draftVM.metadata.labels[LABEL_USED_TEMPLATE_NAME] = selectedTemplateName;
+    } else {
+      delete draftVM.metadata.labels[LABEL_USED_TEMPLATE_NAME];
+    }
+
+    const selectedTemplateNamespace = selectedTemplate?.metadata?.namespace;
+    if (selectedTemplateNamespace) {
+      draftVM.metadata.labels[LABEL_USED_TEMPLATE_NAMESPACE] = selectedTemplateNamespace;
+    } else {
+      delete draftVM.metadata.labels[LABEL_USED_TEMPLATE_NAMESPACE];
+    }
 
     if (folder) {
       draftVM.metadata.labels[VM_FOLDER_LABEL] = folder;

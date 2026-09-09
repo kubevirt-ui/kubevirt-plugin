@@ -30,6 +30,7 @@ const WorkloadProfile: FC<TemplateDetailsGridProps> = ({ editable, template }) =
       ensurePath(draftVM, ['spec.template.metadata.annotations']);
       draftVM.spec.template.metadata.annotations[VM_WORKLOAD_ANNOTATION] = updatedWorkload;
 
+      ensurePath(draftTemplate, 'metadata.labels');
       const currentWorkload = getTemplateWorkload(template);
       if (currentWorkload) {
         delete draftTemplate.metadata.labels[`${TEMPLATE_WORKLOAD_LABEL}/${currentWorkload}`];

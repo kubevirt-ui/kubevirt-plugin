@@ -34,7 +34,11 @@ const StartPauseModal: FC<StartPauseModalProps> = ({
   const updatedVirtualMachine = useMemo(() => {
     const updatedVM = produce<V1VirtualMachine>(vm, (vmDraft: V1VirtualMachine) => {
       ensurePath(vmDraft, ['spec.template.spec']);
-      vmDraft.spec.template.spec.startStrategy = checked ? printableVMStatus.Paused : null;
+      if (checked) {
+        vmDraft.spec.template.spec.startStrategy = printableVMStatus.Paused;
+      } else {
+        delete vmDraft.spec.template.spec.startStrategy;
+      }
     });
     return updatedVM;
   }, [vm, checked]);
