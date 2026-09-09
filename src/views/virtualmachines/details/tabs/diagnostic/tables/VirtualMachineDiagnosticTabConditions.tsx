@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC, useMemo } from 'react';
+import React, { type FC, useMemo } from 'react';
 
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import Timestamp from '@kubevirt-utils/components/Timestamp/Timestamp';
@@ -12,9 +11,8 @@ import { Bullseye, Label } from '@patternfly/react-core';
 import { Table, Tbody, Td, Th, Thead, Tr } from '@patternfly/react-table';
 
 import useDiagnosticConditionsTableColumns from '../hooks/useDiagnosticConditionsTableColumns';
-import { VirtualizationStatusCondition } from '../utils/types';
+import { type VirtualizationStatusCondition } from '../utils/types';
 import { getConditionLabel } from '../utils/utils';
-
 import VirtualMachineDiagnosticTabTableTitle from './components/VirtualMachineDiagnosticTabTableTitle';
 
 type VirtualMachineDiagnosticTabConditionsProps = {
@@ -25,7 +23,7 @@ const VirtualMachineDiagnosticTabConditions: FC<VirtualMachineDiagnosticTabCondi
   conditions,
 }) => {
   const { t } = useKubevirtTranslation();
-  const { activeColumns, loaded, sorting } = useDiagnosticConditionsTableColumns();
+  const { activeColumns, getSorting, loaded, sorting } = useDiagnosticConditionsTableColumns();
 
   const sortedData = useMemo(
     () => columnSorting(conditions, sorting?.direction, undefined, sorting?.column),
@@ -57,8 +55,8 @@ const VirtualMachineDiagnosticTabConditions: FC<VirtualMachineDiagnosticTabCondi
       <Table aria-label={t('Status conditions')}>
         <Thead>
           <Tr>
-            {activeColumns?.map(({ cell: { sort }, title }, index) => (
-              <Th key={title} modifier="nowrap" sort={sort(index)}>
+            {activeColumns?.map(({ id, title }, index) => (
+              <Th key={title} modifier="nowrap" sort={getSorting(id, index)}>
                 {title}
               </Th>
             ))}

@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC, useMemo, useState } from 'react';
+import React, { type FC, useMemo, useState } from 'react';
 
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -10,7 +9,11 @@ import useMetricChartData from '@overview/OverviewTab/metric-charts-card/utils/h
 import { Bullseye, Card, CardBody } from '@patternfly/react-core';
 
 import { determineOverviewLevel } from '../../../../config';
-import { GRID_FOUR_EQUAL, OVERVIEW_LEVEL_PROJECT, OverviewSectionData } from '../../../../types';
+import {
+  GRID_FOUR_EQUAL,
+  OVERVIEW_LEVEL_PROJECT,
+  type OverviewSectionData,
+} from '../../../../types';
 import OverviewSection from '../../../OverviewSection/OverviewSection';
 import OverviewSectionRow from '../../../OverviewSection/OverviewSectionRow';
 import useProjectResourceQuota from '../../hooks/useProjectResourceQuota';
@@ -18,8 +21,7 @@ import { useTopClusterNames, useTopClustersChartData } from '../../hooks/useTopC
 import ResourceAllocationWidget from '../../ResourceAllocationWidget';
 import ClusterLegend from '../ResourceAllocationChart/ClusterLegend';
 import ResourceAllocationSubHeader from '../ResourceAllocationSubHeader/ResourceAllocationSubHeader';
-
-import { getWidgetConfigs, WidgetDataMap } from './resourceAllocationSectionConfig';
+import { getWidgetConfigs, type WidgetDataMap } from './resourceAllocationSectionConfig';
 
 const ResourceAllocationSection: FC<OverviewSectionData> = ({
   metricsUnavailable,
@@ -128,7 +130,11 @@ const ResourceAllocationSection: FC<OverviewSectionData> = ({
         gridColumns={GRID_FOUR_EQUAL}
       >
         {widgetConfigs.map(({ graphTitle, metric, subtitle, title: widgetTitle }) => {
-          const { clusterData, metricChartData, quotaData } = dataMap[metric];
+          const widgetData = dataMap[metric];
+          if (!widgetData) {
+            return null;
+          }
+          const { clusterData, metricChartData, quotaData } = widgetData;
           return (
             <ResourceAllocationWidget
               clusterData={isAllClusters ? clusterData : undefined}

@@ -1,14 +1,13 @@
-/* eslint-disable */
-import { TFunction } from 'i18next';
+import { type TFunction } from 'i18next';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import {
-  KubevirtFilter,
+  type KubevirtFilter,
   KubevirtFilterLayout,
 } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { getVMIIPAddresses } from '@kubevirt-utils/resources/vmi';
 import { compareCIDR, VirtualMachineRowFilterType } from '@virtualmachines/utils';
-import { getVMIFromMapper, VMIMapper } from '@virtualmachines/utils/mappers';
+import { getVMIFromMapper, type VMIMapper } from '@virtualmachines/utils/mappers';
 
 export const getIPFilter = (
   t: TFunction,
@@ -17,7 +16,7 @@ export const getIPFilter = (
   categoryLabel: t('IP Address'),
   filterLayout: KubevirtFilterLayout.HIDDEN,
   id: VirtualMachineRowFilterType.IP,
-  match: (obj, selected) => {
+  match: (obj, selected): boolean => {
     const search = selected[0];
     if (!search) return true;
 

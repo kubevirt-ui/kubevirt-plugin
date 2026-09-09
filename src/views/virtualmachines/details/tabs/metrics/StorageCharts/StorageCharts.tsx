@@ -1,7 +1,6 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
-import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import StorageIOPSTotalThresholdChart from '@kubevirt-utils/components/Charts/StorageUtil/StorageIOPSTotalThresholdChart';
 import StorageReadLatencyAvgMaxChart from '@kubevirt-utils/components/Charts/StorageUtil/StorageReadLatencyAvgMaxChart';
 import StorageReadLatencyPerDriveChart from '@kubevirt-utils/components/Charts/StorageUtil/StorageReadLatencyPerDriveChart';
@@ -32,17 +31,17 @@ const StorageCharts: FC<StorageChartsProps> = ({ prometheusUnavailable, vmi }) =
 
   return (
     <Grid hasGutter>
-      {STORAGE_CHART_COMPONENTS.map(({ Chart, titleKey }) => {
-        const title = t(titleKey);
+      {STORAGE_CHART_COMPONENTS.map((chartConfig) => {
+        const title = t(chartConfig.titleKey);
         return (
-          <GridItem key={titleKey} span={6}>
+          <GridItem key={chartConfig.titleKey} span={6}>
             {prometheusUnavailable ? (
               <NoDataMetricsCard title={title} />
             ) : (
               <Card>
                 <CardTitle>{title}</CardTitle>
                 <CardBody>
-                  <Chart vmi={vmi} />
+                  <chartConfig.Chart vmi={vmi} />
                 </CardBody>
               </Card>
             )}

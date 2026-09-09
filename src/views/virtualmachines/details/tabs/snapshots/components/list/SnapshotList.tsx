@@ -1,18 +1,16 @@
-/* eslint-disable */
-import React, { FC, useMemo } from 'react';
+import React, { type FC, useMemo } from 'react';
 
 import KubevirtFilterToolbar from '@kubevirt-utils/components/KubevirtFilterToolbar/KubevirtFilterToolbar';
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
 import useKubevirtDataViewFilters from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/useKubevirtDataViewFilters';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
-import { UseSnapshotData } from '../../hooks/useSnapshotData';
+import { type UseSnapshotData } from '../../hooks/useSnapshotData';
 import { getSnapshotFilters } from '../../utils/filters';
-
 import {
   getSnapshotListColumns,
   getSnapshotRowId,
-  SnapshotListCallbacks,
+  type SnapshotListCallbacks,
 } from './snapshotListDefinition';
 
 type SnapshotsListProps = UseSnapshotData & { isVMRunning?: boolean };

@@ -1,5 +1,4 @@
-/* eslint-disable */
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getCPU, getMemory } from '@kubevirt-utils/resources/vm';
 import { getVMINodeName } from '@kubevirt-utils/resources/vmi';
 import { SortByDirection } from '@patternfly/react-table';
@@ -10,7 +9,7 @@ import {
   getMemoryUsagePercentage,
   getNetworkUsagePercentage,
 } from './metrics';
-import { VMCallbacks } from './virtualMachinesDefinition';
+import { type VMCallbacks } from './virtualMachinesDefinition';
 
 const EMPTY_STRING_VALUE = '';
 const EMPTY_NUMBER_VALUE = 0;
@@ -33,7 +32,11 @@ const createVMSort = (
 const createNullSafeSort = (
   extractor: (vm: V1VirtualMachine, callbacks?: VMCallbacks) => number | string | undefined,
   isString = false,
-) => {
+): ((
+  data: V1VirtualMachine[],
+  direction: SortByDirection,
+  callbacks?: VMCallbacks,
+) => V1VirtualMachine[]) => {
   return createVMSort((a, b, callbacks) => {
     const firstValue = extractor(a, callbacks);
     const secondValue = extractor(b, callbacks);

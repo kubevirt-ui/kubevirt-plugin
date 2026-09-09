@@ -1,12 +1,11 @@
-/* eslint-disable */
 export enum ListPageBodySize {
-  lg = 'lg',
-  md = 'md',
-  sm = 'sm',
+  Lg = 'lg',
+  Md = 'md',
+  Sm = 'sm',
 }
 
-export const getListPageBodySize = (width: number) => {
-  if (width < 660) return ListPageBodySize.sm;
-  if (width < 1100) return ListPageBodySize.md;
-  return ListPageBodySize.lg;
+export const getListPageBodySize = (width: number): ListPageBodySize => {
+  if (width < 660) return ListPageBodySize.Sm;
+  if (width < 1100) return ListPageBodySize.Md;
+  return ListPageBodySize.Lg;
 };

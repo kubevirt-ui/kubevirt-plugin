@@ -1,9 +1,8 @@
-/* eslint-disable */
-import React, { FC, useCallback, useState } from 'react';
+import React, { type FC, useCallback, useState } from 'react';
 
 import { VirtualMachineCloneModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { VirtualMachineSnapshotModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1beta1VirtualMachineSnapshot } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1beta1VirtualMachineSnapshot } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import CloneVMModal from '@kubevirt-utils/components/CloneVMModal/CloneVMModal';
 import ConfirmActionMessage from '@kubevirt-utils/components/ConfirmActionMessage/ConfirmActionMessage';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
@@ -84,7 +83,7 @@ const SnapshotActionsMenu: FC<SnapshotActionsMenuProps> = ({
     setIsDropdownOpen(false);
   }, [createModal, deleteLabel, snapshot, t]);
 
-  const onToggle = () => setIsDropdownOpen((prevIsOpen) => !prevIsOpen);
+  const onToggle = (): void => setIsDropdownOpen((prevIsOpen) => !prevIsOpen);
 
   return (
     <Dropdown

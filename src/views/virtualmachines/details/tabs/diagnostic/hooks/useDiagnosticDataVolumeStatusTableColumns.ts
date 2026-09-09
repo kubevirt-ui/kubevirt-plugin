@@ -4,12 +4,12 @@ import useKubevirtUserSettingsTableColumns from '@kubevirt-utils/hooks/useKubevi
 import type { TableColumn } from '@openshift-console/dynamic-plugin-sdk';
 
 import type { DiagnosticColumn, DiagnosticSort } from '../utils/types';
-
-import useDiagnosticSort from './useDiagnosticSort';
+import useDiagnosticSort, { type GetSorting } from './useDiagnosticSort';
 
 type UseDiagnosticDataVolumeStatusTableColumnsResult = {
   activeColumns: TableColumn<DiagnosticColumn>[];
   columns: TableColumn<DiagnosticColumn>[];
+  getSorting: GetSorting;
   sorting: DiagnosticSort;
 };
 
@@ -46,7 +46,7 @@ const useDiagnosticDataVolumeStatusTableColumns =
       columns,
     });
 
-    return { activeColumns, columns, sorting: sort };
+    return { activeColumns, columns, getSorting, sorting: sort };
   };
 
 export default useDiagnosticDataVolumeStatusTableColumns;

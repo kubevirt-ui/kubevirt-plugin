@@ -1,10 +1,9 @@
-/* eslint-disable */
-import React, { FC, useState } from 'react';
+import React, { type FC, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { load } from 'js-yaml';
 
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import {
   TELEMETRY_RESOURCE_CREATION_METHOD,
@@ -34,7 +33,7 @@ const VirtualMachineYAMLCreatePage: FC = () => {
   const isIPv6SingleStack = useIsIPv6SingleStackCluster(cluster);
   const [error, setError] = useState<Error | null>(null);
 
-  const onSave = async (yaml: string) => {
+  const onSave = async (yaml: string): Promise<void> => {
     setError(null);
     try {
       const vm = load(yaml) as V1VirtualMachine;
@@ -48,7 +47,7 @@ const VirtualMachineYAMLCreatePage: FC = () => {
       logResourceCreated(TELEMETRY_RESOURCE_TYPE.VM, TELEMETRY_RESOURCE_CREATION_METHOD.YAML);
       logVMCreated(TELEMETRY_VM_CREATION_METHOD.SCRATCH);
 
-      const vmCluster = getCluster(createdVM) || cluster;
+      const vmCluster = getCluster(createdVM) ?? cluster;
       navigate(
         vmCluster
           ? getVMURL(vmCluster, namespace, getName(createdVM))

@@ -1,7 +1,6 @@
-/* eslint-disable */
 import { useMemo } from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import useQuery from '@kubevirt-utils/hooks/useQuery';
 import { getLabel, getName } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -22,7 +21,7 @@ const useFolderFilter = (vms: undefined | V1VirtualMachine[]): UseFolderFilterRe
   );
 
   const filteredVMs = useMemo(() => {
-    if (isEmpty(folderNames) || !vms) return vms || [];
+    if (isEmpty(folderNames) || !vms) return vms ?? [];
     return vms.filter((vm) => folderNames.includes(getLabel(vm, VM_FOLDER_LABEL)));
   }, [vms, folderNames]);
 

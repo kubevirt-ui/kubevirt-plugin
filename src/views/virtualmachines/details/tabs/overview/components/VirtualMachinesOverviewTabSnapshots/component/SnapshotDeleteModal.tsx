@@ -1,15 +1,20 @@
-/* eslint-disable */
-import React from 'react';
+import React, { type FC } from 'react';
 
 import { VirtualMachineSnapshotModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1beta1VirtualMachineSnapshot } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1beta1VirtualMachineSnapshot } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import ConfirmActionMessage from '@kubevirt-utils/components/ConfirmActionMessage/ConfirmActionMessage';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { kubevirtK8sDelete } from '@multicluster/k8sRequests';
 import { ButtonVariant } from '@patternfly/react-core';
 
-const SnapshotDeleteModal = ({ isOpen, onClose, snapshot }) => {
+type SnapshotDeleteModalProps = {
+  isOpen: boolean;
+  onClose: () => void;
+  snapshot: V1beta1VirtualMachineSnapshot;
+};
+
+const SnapshotDeleteModal: FC<SnapshotDeleteModalProps> = ({ isOpen, onClose, snapshot }) => {
   const { t } = useKubevirtTranslation();
   return (
     <TabModal<V1beta1VirtualMachineSnapshot>

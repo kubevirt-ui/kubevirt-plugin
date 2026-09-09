@@ -1,22 +1,21 @@
-/* eslint-disable */
 import { VirtualMachineInstanceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { IoK8sApiCoreV1Pod } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type IoK8sApiCoreV1Pod } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+import { type K8sResourceCommon, type OwnerReference } from '@openshift-console/dynamic-plugin-sdk';
 
 import { VMListQueries } from './constants';
 
-const getVMIOwner = (resource: K8sResourceCommon) =>
+const getVMIOwner = (resource: K8sResourceCommon): OwnerReference | undefined =>
   resource?.metadata?.ownerReferences?.find(
     (owner) => owner.kind === VirtualMachineInstanceModel.kind,
   );
 
-export const getVMNamesFromPodsNames = (pods: IoK8sApiCoreV1Pod[]) => {
-  return pods?.reduce((acc, pod) => {
+export const getVMNamesFromPodsNames = (pods: IoK8sApiCoreV1Pod[]): Record<string, string> => {
+  return pods?.reduce<Record<string, string>>((acc, pod) => {
     const vmiOwner = getVMIOwner(pod);
 
-    if (!vmiOwner) return acc;
+    if (!vmiOwner?.name) return acc;
 
     acc[`${getNamespace(pod)}-${getName(pod)}`] = vmiOwner.name;
 
@@ -24,7 +23,10 @@ export const getVMNamesFromPodsNames = (pods: IoK8sApiCoreV1Pod[]) => {
   }, {});
 };
 
-export const getVMListQueries = (namespaces: string[], clusters?: string[]) => {
+export const getVMListQueries = (
+  namespaces: string[],
+  clusters?: string[],
+): Record<string, string> => {
   const namespacesFilter = isEmpty(namespaces) ? '' : `namespace=~'${namespaces.join('|')}'`;
 
   const clustersFilter = isEmpty(clusters) ? '' : `cluster=~'${clusters.join('|')}'`;

@@ -1,13 +1,12 @@
-/* eslint-disable */
-import React, { FC, useMemo } from 'react';
+import React, { type FC, useMemo } from 'react';
 
-import { V1beta1Plan } from '@forklift-ui/types';
+import { type V1beta1Plan } from '@forklift-ui/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { vmStatusIcon } from '@overview/OverviewTab/vm-statuses-card/utils/utils';
 import { Card, CardBody, CardHeader, CardTitle, Grid } from '@patternfly/react-core';
 
 import StatusCountItem from '../../shared/StatusCountItem';
 import ViewAllLink from '../../shared/ViewAllLink';
+import { getCrossClusterStatusItems } from '../utils/crossClusterStatusItems';
 import {
   buildPhaseFilterPath,
   CROSS_CLUSTER_FAILED_STATUSES,
@@ -42,6 +41,8 @@ const CrossClusterMigrationPlansWidget: FC<CrossClusterMigrationPlansWidgetProps
     [plansListPath],
   );
 
+  const statusItems = useMemo(() => getCrossClusterStatusItems(statusCounts, t), [statusCounts, t]);
+
   return (
     <Card className="cross-cluster-migration-plans-widget" isCompact>
       <CardHeader
@@ -54,26 +55,7 @@ const CrossClusterMigrationPlansWidget: FC<CrossClusterMigrationPlansWidgetProps
       </CardHeader>
       <CardBody>
         <Grid className="status-count-grid" hasGutter>
-          {[
-            {
-              count: statusCounts.failed,
-              icon: <vmStatusIcon.Error />,
-              key: 'failed',
-              label: t('Failed'),
-            },
-            {
-              count: statusCounts.running,
-              icon: <vmStatusIcon.Running />,
-              key: 'running',
-              label: t('Running'),
-            },
-            {
-              count: statusCounts.other,
-              icon: <vmStatusIcon.Other />,
-              key: 'other',
-              label: t('Other'),
-            },
-          ].map(({ count, icon, key, label }) => (
+          {statusItems.map(({ count, icon, key, label }) => (
             <StatusCountItem
               count={count}
               href={statusLinks[key]}

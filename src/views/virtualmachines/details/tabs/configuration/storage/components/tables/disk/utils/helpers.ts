@@ -1,11 +1,15 @@
-/* eslint-disable */
-import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type TFunction } from 'i18next';
+
+import {
+  type V1VirtualMachine,
+  type V1VirtualMachineInstance,
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import {
   CONTAINER_EPHERMAL,
   OTHER,
 } from '@kubevirt-utils/components/DiskModal/components/utils/constants';
 import { getVolumes } from '@kubevirt-utils/resources/vm';
-import { DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/constants';
+import { type DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/constants';
 
 export const isHotplugVolume = (
   vm: V1VirtualMachine,
@@ -15,10 +19,16 @@ export const isHotplugVolume = (
   const volumeStatus = vmi?.status?.volumeStatus?.find((volStatus) => volStatus.name === diskName);
   const vmVolume = getVolumes(vm)?.find((vol) => vol?.name === diskName);
   const hotplugStatus =
-    volumeStatus?.hotplugVolume ||
-    vmVolume?.dataVolume?.hotpluggable ||
-    vmVolume?.persistentVolumeClaim?.hotpluggable;
+    volumeStatus?.hotplugVolume != null ||
+    vmVolume?.dataVolume?.hotpluggable === true ||
+    vmVolume?.persistentVolumeClaim?.hotpluggable === true;
   return !!hotplugStatus;
+};
+
+export const getTranslatedSource = (source: string, t: TFunction): string => {
+  if (source === OTHER) return t(OTHER);
+  if (source === CONTAINER_EPHERMAL) return t(CONTAINER_EPHERMAL);
+  return source;
 };
 
 export const isPVCSource = (obj: DiskRowDataLayout): boolean =>

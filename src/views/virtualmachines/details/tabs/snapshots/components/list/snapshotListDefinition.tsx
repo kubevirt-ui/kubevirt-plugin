@@ -1,14 +1,13 @@
-/* eslint-disable */
-import React, { FC, ReactNode } from 'react';
-import { TFunction } from 'i18next';
+import React, { type FC, type ReactNode } from 'react';
+import { type TFunction } from 'i18next';
 
 import { VirtualMachineSnapshotModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
-  V1beta1VirtualMachineRestore,
-  V1beta1VirtualMachineSnapshot,
+  type V1beta1VirtualMachineRestore,
+  type V1beta1VirtualMachineSnapshot,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import Timestamp from '@kubevirt-utils/components/Timestamp/Timestamp';
-import { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
+import { type ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { getName, getNamespace, getUID } from '@kubevirt-utils/resources/shared';
 import MulticlusterResourceLink from '@multicluster/components/MulticlusterResourceLink/MulticlusterResourceLink';
 import { getCluster } from '@multicluster/helpers/selectors';
@@ -16,7 +15,6 @@ import { getCluster } from '@multicluster/helpers/selectors';
 import { snapshotStatuses } from '../../utils/consts';
 import IndicationLabelList from '../IndicationLabel/IndicationLabelList';
 import SnapshotStatusIcon from '../SnapshotStatusIcon/SnapshotStatusIcon';
-
 import SnapshotActionsMenu from './SnapshotActionsMenu';
 
 export type SnapshotListCallbacks = {
@@ -57,8 +55,10 @@ const StatusCell: FC<SnapshotCellProps> = ({ row }) => (
 );
 
 const LastRestoredCell: FC<SnapshotCellProps> = ({ callbacks, row }) => {
-  const relevantRestore = callbacks?.restores?.[getName(row)];
-  return <Timestamp timestamp={relevantRestore?.status?.restoreTime} />;
+  const snapshotName = getName(row);
+  const relevantRestore = snapshotName ? callbacks?.restores?.[snapshotName] : undefined;
+  const restoreTime = relevantRestore?.status?.restoreTime;
+  return <Timestamp timestamp={restoreTime} />;
 };
 
 const renderActionsCell = (

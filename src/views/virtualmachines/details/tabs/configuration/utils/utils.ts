@@ -1,8 +1,8 @@
-/* eslint-disable */
-import { TFunction } from 'i18next';
+import { type ComponentType } from 'react';
+import { type TFunction } from 'i18next';
 
 import { VirtualMachineDetailsTab } from '@kubevirt-utils/constants/tabs-constants';
-import { getTabNameAndTitle } from '@virtualmachines/details/utils/utils';
+import { getTabNameAndTitle, type TabNameAndTitle } from '@virtualmachines/details/utils/utils';
 
 import DetailsTab from '../details/DetailsTab';
 import InitialRunTab from '../initialrun/InitialRunTab';
@@ -12,7 +12,11 @@ import VirtualMachineSchedulingPage from '../scheduling/SchedulingTab';
 import SSHTab from '../ssh/SSHTab';
 import StorageTab from '../storage/StorageTab';
 
-export const getTabs = (t: TFunction) => [
+type TabConfig = TabNameAndTitle & {
+  Component: ComponentType<Record<string, unknown>>;
+};
+
+export const getTabs = (t: TFunction): TabConfig[] => [
   {
     Component: DetailsTab,
     ...getTabNameAndTitle(VirtualMachineDetailsTab.Details, t),
@@ -49,7 +53,7 @@ const getInnerTabs = (t: TFunction): { [key: string]: string } =>
     return acc;
   }, {});
 
-export const getInnerTabFromPath = (path: string, t: TFunction) =>
+export const getInnerTabFromPath = (path: string, t: TFunction): string | undefined =>
   getInnerTabs(t)[path.slice(path.lastIndexOf('/') + 1)];
 
 export const includesConfigurationPath = (path: string, append: string): string => {

@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 import { Link } from 'react-router';
 
 import DurationDropdown from '@kubevirt-utils/components/DurationOption/DurationDropdown';
@@ -25,8 +24,9 @@ const TimeRange: FC = () => {
   const virtualizationObservabilityLink = useVirtualizationObservabilityLink();
 
   const { duration, setDuration } = useDuration();
-  const onDurationSelect = (value: string) =>
+  const onDurationSelect = (value: string): void => {
     setDuration(DurationOption.fromDropdownLabel(value).toString());
+  };
 
   return (
     <div className="timerange--main">

@@ -1,7 +1,6 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getDisks } from '@kubevirt-utils/resources/vm';
 import { isCDROMDisk } from '@kubevirt-utils/resources/vm/utils/disk/selectors';
@@ -15,7 +14,7 @@ type ISOBadgeProps = {
 const ISOBadge: FC<ISOBadgeProps> = ({ diskName, vm }) => {
   const { t } = useKubevirtTranslation();
 
-  const disks = getDisks(vm) || [];
+  const disks = getDisks(vm) ?? [];
   const disk = disks.find((vmDisk) => vmDisk.name === diskName);
 
   if (!disk || !isCDROMDisk(disk)) {

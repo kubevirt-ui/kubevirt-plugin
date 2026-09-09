@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC, useMemo } from 'react';
+import React, { type FC, useMemo } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
@@ -10,9 +9,8 @@ import { Label } from '@patternfly/react-core';
 import { Table, Tbody, Td, Th, Thead, Tr } from '@patternfly/react-table';
 
 import useDiagnosticVolumeStatusTableColumns from '../hooks/useDiagnosticVolumeStatusTableColumns';
-import { VirtualizationVolumeSnapshotStatus } from '../utils/types';
+import { type VirtualizationVolumeSnapshotStatus } from '../utils/types';
 import { getEnabledLabel } from '../utils/utils';
-
 import VirtualMachineDiagnosticTabTableTitle from './components/VirtualMachineDiagnosticTabTableTitle';
 
 type VirtualMachineDiagnosticTabVolumeStatusProps = {
@@ -23,7 +21,7 @@ const VirtualMachineDiagnosticTabVolumeStatus: FC<VirtualMachineDiagnosticTabVol
   volumeSnapshotStatuses,
 }) => {
   const { t } = useKubevirtTranslation();
-  const { activeColumns, sorting } = useDiagnosticVolumeStatusTableColumns();
+  const { activeColumns, getSorting, sorting } = useDiagnosticVolumeStatusTableColumns();
 
   const sortedData = useMemo(
     () => columnSorting(volumeSnapshotStatuses, sorting?.direction, undefined, sorting?.column),
@@ -47,8 +45,8 @@ const VirtualMachineDiagnosticTabVolumeStatus: FC<VirtualMachineDiagnosticTabVol
       <Table aria-label={t('Volume snapshot status')}>
         <Thead>
           <Tr>
-            {activeColumns?.map(({ cell: { sort }, title }, index) => (
-              <Th key={title} sort={sort(index)}>
+            {activeColumns?.map(({ id, title }, index) => (
+              <Th key={title} sort={getSorting(id, index)}>
                 {title}
               </Th>
             ))}

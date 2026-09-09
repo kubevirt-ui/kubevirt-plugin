@@ -1,16 +1,16 @@
-/* eslint-disable */
+import { type TFunction } from 'i18next';
+
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { getCluster } from '@multicluster/helpers/selectors';
-import { FleetAccessReviewResourceAttributes } from '@stolostron/multicluster-sdk';
-import { TFunction } from 'i18next';
+import { type FleetAccessReviewResourceAttributes } from '@stolostron/multicluster-sdk';
 
 export const filterVMsByClusterAndNamespace = (
   vms: V1VirtualMachine[],
   namespace: string,
   cluster?: string,
-) =>
+): V1VirtualMachine[] =>
   (vms ?? []).filter((vm) => {
     if (!vm) return false;
     const vmNamespace = getNamespace(vm);
@@ -37,7 +37,7 @@ export const getNamespacesWithVMsCount = (
   return new Set(vms.map((vm) => getNamespace(vm))).size;
 };
 
-export const getDisabledCreateVMTooltip = (t: TFunction, isInAllNamespaces: boolean) => {
+export const getDisabledCreateVMTooltip = (t: TFunction, isInAllNamespaces: boolean): string => {
   if (isInAllNamespaces) {
     return t(
       'To create a VM, select a project where you have create permissions, or create a new project',

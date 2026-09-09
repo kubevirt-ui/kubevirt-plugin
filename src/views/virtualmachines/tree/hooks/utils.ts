@@ -1,5 +1,4 @@
-/* eslint-disable */
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { SINGLE_CLUSTER_KEY } from '@kubevirt-utils/resources/constants';
 import { getLabel, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getCluster } from '@multicluster/helpers/selectors';
@@ -18,7 +17,7 @@ export const getVMFromElementID = (elementID: string): V1VirtualMachine => {
   );
 };
 
-export const isVMAloneInFolder = (draggingVM: V1VirtualMachine) => {
+export const isVMAloneInFolder = (draggingVM: V1VirtualMachine): boolean => {
   const draggingVMFolder = getLabel(draggingVM, VM_FOLDER_LABEL);
 
   return (

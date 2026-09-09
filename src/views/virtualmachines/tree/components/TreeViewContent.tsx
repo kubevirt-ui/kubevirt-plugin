@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC, MouseEvent } from 'react';
+import React, { type FC, type MouseEvent } from 'react';
 
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import CreateProjectOnboardingPopover from '@kubevirt-utils/components/OnboardingPopover/components/CreateProjectOnboardingPopover';
@@ -12,7 +11,7 @@ import {
   Stack,
   Title,
   TreeView,
-  TreeViewDataItem,
+  type TreeViewDataItem,
 } from '@patternfly/react-core';
 
 import useFilteredTreeView from '../hooks/useFilteredTreeView';
@@ -23,9 +22,8 @@ import {
   getMatchedProjectItems,
   highlightMatchedTreeItems,
 } from '../utils/utils';
-
-import TreeViewRightClickActionMenu from './TreeViewRightClickActionMenu/TreeViewRightClickActionMenu';
 import PanelToggleButton from './PanelToggleButton';
+import TreeViewRightClickActionMenu from './TreeViewRightClickActionMenu/TreeViewRightClickActionMenu';
 import TreeViewToolbar from './TreeViewToolbar';
 
 type TreeViewContentProps = {
@@ -69,7 +67,7 @@ const TreeViewContent: FC<TreeViewContentProps> = ({
   const filteredProjectsCount = getMatchedProjectItems(filteredTreeData, searchText).length;
   const filteredClustersCount = getMatchedClusterItems(filteredTreeData, searchText).length;
 
-  const getSearchResultInfo = () => {
+  const getSearchResultInfo = (): string | undefined => {
     if (filteredClustersCount && filteredProjectsCount) {
       return t('{{clustersCount}} clusters, {{projectsCount}} projects found', {
         clustersCount: filteredClustersCount,

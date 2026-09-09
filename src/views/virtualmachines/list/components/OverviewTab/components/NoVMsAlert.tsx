@@ -1,4 +1,3 @@
-/* eslint-disable */
 import React, { type FC, useMemo, useState } from 'react';
 import { Link } from 'react-router';
 
@@ -18,7 +17,7 @@ const NoVMsAlert: FC<NoVMsAlertProps> = ({ cluster, namespace }) => {
   const { t } = useKubevirtTranslation();
   const [dismissed, setDismissed] = useState(false);
   const isACMPage = useIsACMPage();
-  const selectedNamespace = namespace || DEFAULT_NAMESPACE;
+  const selectedNamespace = namespace ?? DEFAULT_NAMESPACE;
 
   const [canCreateVM, loading] = useAccessReview({
     group: VirtualMachineModel.apiGroup,

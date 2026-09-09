@@ -90,7 +90,7 @@ const VirtualMachinesList: FC = () => {
         filterDefinitions={filterDefinitions}
         filteredVMsCount={filteredVMs?.length}
         filters={filters}
-        isCompact={listPageBodySize !== ListPageBodySize.lg}
+        isCompact={listPageBodySize !== ListPageBodySize.Lg}
         onPageChange={onPageChange}
         pagination={pagination}
       />

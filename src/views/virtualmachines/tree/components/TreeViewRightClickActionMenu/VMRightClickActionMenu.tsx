@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
 import { getLabel, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getCluster } from '@multicluster/helpers/selectors';
@@ -8,7 +7,6 @@ import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
 import { getVMIMFromMapper } from '@virtualmachines/utils/mappers';
 
 import { vmimMapperSignal, vmsSignal } from '../../utils/signals';
-
 import RightClickActionMenu from './RightClickActionMenu';
 import { getVMComponentsFromID } from './utils';
 
@@ -32,7 +30,7 @@ const VMRightClickActionMenu: FC<VMRightClickActionMenuProps> = ({ hideMenu, tri
 
   const vmHasFolder = !!getLabel(vm, VM_FOLDER_LABEL);
 
-  const getNestedLevel = () => {
+  const getNestedLevel = (): number => {
     if (vmHasFolder) {
       return vmCluster ? 4 : 3;
     }

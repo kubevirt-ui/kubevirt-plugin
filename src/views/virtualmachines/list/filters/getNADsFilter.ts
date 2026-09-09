@@ -1,9 +1,8 @@
-/* eslint-disable */
-import { TFunction } from 'i18next';
+import { type TFunction } from 'i18next';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import {
-  KubevirtFilter,
+  type KubevirtFilter,
   KubevirtFilterLayout,
 } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
@@ -14,7 +13,7 @@ export const getNADsFilter = (t: TFunction): KubevirtFilter<V1VirtualMachine> =>
   categoryLabel: t('NADs'),
   filterLayout: KubevirtFilterLayout.HIDDEN,
   id: VirtualMachineRowFilterType.NAD,
-  match: (obj, selected) => {
+  match: (obj, selected): boolean => {
     const networkNames = getNetworks(obj)
       ?.map((network) => network.multus?.networkName)
       .filter(Boolean)

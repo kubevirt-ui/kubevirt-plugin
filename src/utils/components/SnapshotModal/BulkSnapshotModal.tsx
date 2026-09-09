@@ -15,7 +15,7 @@ import { addRandomSuffix } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sCreate } from '@multicluster/k8sRequests';
 import { FormGroup, List, ListItem, Stack, StackItem, TextArea } from '@patternfly/react-core';
-import { deadlineUnits } from '@virtualmachines/details/tabs/snapshots/utils/consts';
+import { DeadlineUnits } from '@virtualmachines/details/tabs/snapshots/utils/consts';
 import { getVolumeSnapshotStatusesPartitionPerVM } from '@virtualmachines/details/tabs/snapshots/utils/helpers';
 
 import TabModal from '../TabModal/TabModal';
@@ -47,7 +47,7 @@ const BulkSnapshotModal: FC<BulkSnapshotModalProps> = ({ isOpen, onClose, vms })
 
   const [description, setDescription] = useState<string>(undefined);
   const [deadline, setDeadline] = useState<string>(undefined);
-  const [deadlineUnit, setDeadlineUnit] = useState<deadlineUnits>(deadlineUnits.Seconds);
+  const [deadlineUnit, setDeadlineUnit] = useState<DeadlineUnits>(DeadlineUnits.Seconds);
 
   const [isSubmitDisabled, setIsSubmitDisabled] = useState<boolean>(false);
 

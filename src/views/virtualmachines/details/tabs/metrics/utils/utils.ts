@@ -1,11 +1,10 @@
-/* eslint-disable */
 import { ProgressVariant } from '@patternfly/react-core';
 
 export enum MetricsTabExpendedSections {
-  'migration' = 'migration',
-  'network' = 'network',
-  'storage' = 'storage',
-  'utilization' = 'utilization',
+  Migration = 'migration',
+  Network = 'network',
+  Storage = 'storage',
+  Utilization = 'utilization',
 }
 
 export const getMigrationProgressVariant = (

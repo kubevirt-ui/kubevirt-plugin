@@ -1,14 +1,13 @@
-/* eslint-disable */
-import React, { FC, memo } from 'react';
+import React, { type FC, memo } from 'react';
 
-import { V1VirtualMachineCondition } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachineCondition } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { Label, LabelGroup, Popover, PopoverPosition } from '@patternfly/react-core';
 
 export const VMStatusConditionLabel: FC<V1VirtualMachineCondition> = memo((condition) => {
   const bodyContentMessage = condition?.message ?? condition?.reason;
 
   const InnerLabel = (
-    <Label color="grey" onClick={bodyContentMessage ? (e) => e.preventDefault() : undefined}>
+    <Label color="grey" onClick={bodyContentMessage ? (e): void => e.preventDefault() : undefined}>
       {condition?.type}={condition?.status}
     </Label>
   );

@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import SnapshotModal from '@kubevirt-utils/components/SnapshotModal/SnapshotModal';
@@ -9,10 +8,9 @@ import {
   ListPageCreateButton,
   ListPageHeader,
 } from '@openshift-console/dynamic-plugin-sdk';
-import { NavPageComponentProps } from '@virtualmachines/details/utils/types';
+import { type NavPageComponentProps } from '@virtualmachines/details/utils/types';
 
 import { printableVMStatus } from '../../../utils';
-
 import SnapshotList from './components/list/SnapshotList';
 import useSnapshotData from './hooks/useSnapshotData';
 

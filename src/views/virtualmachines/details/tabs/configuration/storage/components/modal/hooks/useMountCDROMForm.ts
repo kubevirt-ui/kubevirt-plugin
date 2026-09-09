@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { useCallback, useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 
@@ -108,7 +107,7 @@ export const useMountCDROMForm = (options?: UseMountCDROMFormOptions): UseMountC
     clearUploadFilenameFields();
   }, [handleClearUpload, clearUploadFilenameFields]);
 
-  const isFormValid = Boolean(selectedISO || uploadFile?.filename);
+  const isFormValid = selectedISO !== '' || Boolean(uploadFile?.filename);
 
   return {
     handleClearUpload,

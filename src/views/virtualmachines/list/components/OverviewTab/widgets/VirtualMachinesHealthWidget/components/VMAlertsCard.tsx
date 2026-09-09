@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC, PropsWithChildren, ReactNode } from 'react';
+import React, { type FC, type PropsWithChildren, type ReactNode } from 'react';
 
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -7,7 +6,7 @@ import { getNoDataAvailableMessage } from '@kubevirt-utils/utils/utils';
 import { Bullseye, Card, CardBody, CardHeader, CardTitle } from '@patternfly/react-core';
 
 import ViewAllLink from '../../shared/ViewAllLink';
-import { VMAlertsProps } from '../utils/vmAlerts';
+import { type VMAlertsProps } from '../utils/vmAlerts';
 
 import './health-card.scss';
 import './VMAlerts.scss';
@@ -25,13 +24,13 @@ const VMAlertsCard: FC<VMAlertsCardProps> = ({
   titleExtra,
 }) => {
   const { t } = useKubevirtTranslation();
-  const baseUrl = alertsBasePath || alertsBaseHref;
+  const baseUrl = alertsBasePath ?? alertsBaseHref;
 
   return (
     <Card className="vm-alerts health-card" data-test="vm-alerts-widget" isCompact>
       <CardHeader
         actions={
-          baseUrl
+          baseUrl != null
             ? {
                 actions: <ViewAllLink href={alertsBaseHref} linkPath={alertsBasePath} />,
                 hasNoOffset: false,

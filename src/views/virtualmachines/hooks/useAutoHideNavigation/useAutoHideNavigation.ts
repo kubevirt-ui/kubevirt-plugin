@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { useEffect, useRef, useState } from 'react';
 
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
@@ -29,7 +28,7 @@ const useAutoHideNavigation = (): boolean => {
       userExpandedNavSignal.value = false;
     }
 
-    return () => {
+    return (): void => {
       userExpandedNavSignal.value = false;
       expandSidebar();
     };
@@ -43,13 +42,15 @@ const useAutoHideNavigation = (): boolean => {
       if (didCollapse) setWasCollapsed(true);
     });
 
-    return () => cancelAnimationFrame(frameId);
+    return (): void => {
+      cancelAnimationFrame(frameId);
+    };
   }, [settingEnabled, userOverrode]);
 
   useEffect(() => {
     if (!settingEnabled) return;
 
-    const handleNavToggleClick = () => {
+    const handleNavToggleClick = (): void => {
       requestAnimationFrame(() => {
         if (isSidebarOpen()) {
           userExpandedNavSignal.value = true;
@@ -60,7 +61,7 @@ const useAutoHideNavigation = (): boolean => {
     const navButton = getNavToggleButton();
     navButton?.addEventListener('click', handleNavToggleClick);
 
-    return () => {
+    return (): void => {
       navButton?.removeEventListener('click', handleNavToggleClick);
     };
   }, [settingEnabled]);
