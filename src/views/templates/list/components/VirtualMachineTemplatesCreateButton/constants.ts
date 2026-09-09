@@ -1,6 +1,5 @@
-/* eslint-disable */
 export enum CreateTemplateItems {
-  fromTemplate = 'fromTemplate',
-  fromVM = 'fromVM',
-  yaml = 'yaml',
+  FromTemplate = 'fromTemplate',
+  FromVM = 'fromVM',
+  Yaml = 'yaml',
 }

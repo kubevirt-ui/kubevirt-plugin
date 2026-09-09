@@ -48,7 +48,7 @@ const VirtualMachineTemplatesCreateButton: FC = () => {
   const onSelect = useCallback(
     (_event: MouseEvent, value: string) => {
       setIsOpen(false);
-      if (value === CreateTemplateItems.yaml) {
+      if (value === CreateTemplateItems.Yaml) {
         return navigate(
           isACMPage && cluster
             ? `${getFleetTemplatesURL(cluster, namespace)}/~new`
@@ -56,14 +56,14 @@ const VirtualMachineTemplatesCreateButton: FC = () => {
         );
       }
 
-      if (value === CreateTemplateItems.fromVM) {
+      if (value === CreateTemplateItems.FromVM) {
         navigate(
           getVMListPath(currentNamespace, cluster, `${VM_LIST_TAB_PARAM}=${VM_LIST_TAB_VMS}`),
         );
         return addCreateFromVMToast();
       }
 
-      if (value === CreateTemplateItems.fromTemplate) {
+      if (value === CreateTemplateItems.FromTemplate) {
         return createModal?.(({ isOpen: isModalOpen, onClose }) => (
           <CloneTemplateModal isOpen={isModalOpen} onClose={onClose} />
         ));
@@ -104,20 +104,20 @@ const VirtualMachineTemplatesCreateButton: FC = () => {
         <DropdownList>
           <DropdownItem
             description={t('Clone and customize a template.')}
-            key={CreateTemplateItems.fromTemplate}
-            value={CreateTemplateItems.fromTemplate}
+            key={CreateTemplateItems.FromTemplate}
+            value={CreateTemplateItems.FromTemplate}
           >
             {t('From an existing template')}
           </DropdownItem>
           <DropdownItem
             description={t('Save an existing VM as a template.')}
             isExternalLink
-            key={CreateTemplateItems.fromVM}
-            value={CreateTemplateItems.fromVM}
+            key={CreateTemplateItems.FromVM}
+            value={CreateTemplateItems.FromVM}
           >
             {t('From a virtual machine')}
           </DropdownItem>
-          <DropdownItem key={CreateTemplateItems.yaml} value={CreateTemplateItems.yaml}>
+          <DropdownItem key={CreateTemplateItems.Yaml} value={CreateTemplateItems.Yaml}>
             {t('With YAML')}
           </DropdownItem>
         </DropdownList>

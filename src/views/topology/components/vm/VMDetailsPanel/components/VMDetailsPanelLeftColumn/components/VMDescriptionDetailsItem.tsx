@@ -1,7 +1,6 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { DescriptionModal } from '@kubevirt-utils/components/DescriptionModal/DescriptionModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
@@ -25,7 +24,7 @@ const VMDescriptionDetailsItem: FC<VMDescriptionDetailsItemProps> = ({ vm }) => 
   return (
     <DescriptionItem
       descriptionData={
-        getAnnotation(vm, DESCRIPTION_ANNOTATION) || <MutedTextSpan text={t('None')} />
+        getAnnotation(vm, DESCRIPTION_ANNOTATION) ?? <MutedTextSpan text={t('None')} />
       }
       onEditClick={() =>
         createModal(({ isOpen, onClose }) => (

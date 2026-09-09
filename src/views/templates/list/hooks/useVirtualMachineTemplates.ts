@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { useMemo } from 'react';
 
 import { VirtualMachineTemplateModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -14,7 +13,7 @@ type UseVirtualMachineTemplates = (
   enabled?: boolean,
   clusterOverride?: string,
 ) => {
-  error: any;
+  error: unknown;
   loaded: boolean;
   vmTemplates: V1beta1VirtualMachineTemplate[];
 };

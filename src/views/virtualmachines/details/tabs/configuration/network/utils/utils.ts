@@ -1,12 +1,11 @@
-/* eslint-disable */
 import produce from 'immer';
 
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
-  V1Network,
-  V1VirtualMachine,
-  V1VirtualMachineInstance,
-  V1VirtualMachineInstanceNetworkInterface,
+  type V1Network,
+  type V1VirtualMachine,
+  type V1VirtualMachineInstance,
+  type V1VirtualMachineInstanceNetworkInterface,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getInterface, getInterfaces } from '@kubevirt-utils/resources/vm';
 import { DEFAULT_NETWORK_INTERFACE } from '@kubevirt-utils/resources/vm/utils/constants';
@@ -30,12 +29,12 @@ export const isActiveOnGuest = (
   vmi: V1VirtualMachineInstance,
   nicName: string,
   isVMRunning?: boolean,
-) =>
+): boolean =>
   (isVMRunning ? getVMIStatusInterfaces(vmi) : getVMIInterfaces(vmi))?.some(
     (iface) => iface?.name === nicName,
   );
 
-export const isAbsent = (vm: V1VirtualMachine, nicName: string) =>
+export const isAbsent = (vm: V1VirtualMachine, nicName: string): boolean =>
   getInterfaces(vm)?.find((iface) => iface?.name === nicName)?.state === ABSENT;
 
 export const isPendingNICAdd = (
@@ -53,14 +52,14 @@ export const isPendingNICAdd = (
   );
 };
 
-export const interfaceNotFound = (vm: V1VirtualMachine, nicName: string) =>
+export const interfaceNotFound = (vm: V1VirtualMachine, nicName: string): boolean =>
   !Boolean(getInterfaces(vm)?.find((iface) => iface?.name === nicName));
 
 //special case - when u add ephemeral nic from vm console terminal
 export const isInterfaceEphemeral = (
   network: V1Network,
   ifaceVMIStatus: V1VirtualMachineInstanceNetworkInterface,
-) => {
+): boolean => {
   const ifaceVMI = !network && ifaceVMIStatus && ifaceVMIStatus?.infoSource === 'guest-agent';
 
   return ifaceVMI;
@@ -89,7 +88,7 @@ export const isPendingNICRemoval = (
 
 export { getConfigInterfaceState, getConfigInterfaceStateFromVM, isSRIOVNetworkByVM };
 
-export const isSRIOVInterface = <T extends { sriov?: object }>(iface: T) => !!iface?.sriov;
+export const isSRIOVInterface = <T extends { sriov?: object }>(iface: T): boolean => !!iface?.sriov;
 
 export const getRuntimeInterfaceState = (simpleIfaceState: string): NetworkInterfaceState => {
   return isNetworkInterfaceState(simpleIfaceState) ? simpleIfaceState : NetworkInterfaceState.NONE;
@@ -115,5 +114,5 @@ export const setNetworkInterfaceState = (
   }).catch((error) => kubevirtConsole.error(error));
 };
 
-export const isLinkStateEditable = (state: NetworkInterfaceState) =>
+export const isLinkStateEditable = (state: NetworkInterfaceState): boolean =>
   state === NetworkInterfaceState.DOWN || state === NetworkInterfaceState.UP;

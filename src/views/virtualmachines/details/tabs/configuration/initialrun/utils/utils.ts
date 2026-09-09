@@ -1,7 +1,6 @@
-/* eslint-disable */
 import { ConfigMapModel, VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { SYSPREP } from '@kubevirt-utils/components/SysprepModal/consts';
 import {
   AUTOUNATTEND,
@@ -12,7 +11,7 @@ import {
 } from '@kubevirt-utils/components/SysprepModal/sysprep-utils';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { getDisks, getVolumes } from '@kubevirt-utils/resources/vm';
-import { PatchCustomizeWizardVMSignal } from '@kubevirt-utils/signals/customizeWizardVMSignal';
+import { type PatchCustomizeWizardVMSignal } from '@kubevirt-utils/signals/customizeWizardVMSignal';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sCreate, kubevirtK8sPatch } from '@multicluster/k8sRequests';
@@ -29,14 +28,14 @@ export const patchVMWithExistingSysprepConfigMap = async (
     ? onSubmit([
         {
           data: [
-            ...(vmDisks || []).filter((disk) => disk?.name !== SYSPREP),
+            ...(vmDisks ?? []).filter((disk) => disk?.name !== SYSPREP),
             ...(!isEmpty(name) ? [sysprepDisk()] : []),
           ],
           path: `spec.template.spec.domain.devices.disks`,
         },
         {
           data: [
-            ...(vmVolumes || []).filter((vol) => vol?.name !== SYSPREP),
+            ...(vmVolumes ?? []).filter((vol) => vol?.name !== SYSPREP),
             ...(!isEmpty(name) ? [sysprepVolume(name)] : []),
           ],
           path: `spec.template.spec.volumes`,
@@ -125,12 +124,12 @@ export const createSysprepConfigMap = async (
           {
             op: 'replace',
             path: `/spec/template/spec/domain/devices/disks`,
-            value: [...(vmDisks || []), sysprepDisk()],
+            value: [...(vmDisks ?? []), sysprepDisk()],
           },
           {
             op: 'replace',
             path: `/spec/template/spec/volumes`,
-            value: [...(vmVolumes || []), sysprepVolume(configMap.metadata.name)],
+            value: [...(vmVolumes ?? []), sysprepVolume(configMap.metadata.name)],
           },
         ],
         model: VirtualMachineModel,

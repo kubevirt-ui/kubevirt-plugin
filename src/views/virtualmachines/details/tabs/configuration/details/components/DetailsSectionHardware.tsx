@@ -1,8 +1,10 @@
-/* eslint-disable */
-import React, { FC, useEffect } from 'react';
+import React, { type FC, useEffect } from 'react';
 import { useLocation } from 'react-router';
 
-import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import {
+  type V1VirtualMachine,
+  type V1VirtualMachineInstance,
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getClusterOnlyArchitecture } from '@kubevirt-utils/components/FirmwareBootloaderModal/utils/utils';
 import HardwareDevicesTable from '@kubevirt-utils/components/HardwareDevices/HardwareDevicesTable';
 import HardwareDeviceTitle from '@kubevirt-utils/components/HardwareDevices/HardwareDeviceTitle';
@@ -42,7 +44,7 @@ const DetailsSectionHardware: FC<DetailsSectionHardwareProps> = ({
   const [clusterWorkloadArchitectures] = useHcoWorkloadArchitectures(getCluster(vm));
   const clusterOnlyArchitecture = getClusterOnlyArchitecture(clusterWorkloadArchitectures);
   const [isExpanded, setIsExpanded] = useToggle('hardware-devices');
-  const onSubmit = onSubmitProp || updateHardwareDevices;
+  const onSubmit = onSubmitProp ?? updateHardwareDevices;
   const hostDevices = getHostDevices(vm);
   const gpus = getGPUDevices(vm);
   const vmHasS390xArchitecture = hasS390xArchitecture(vm);
@@ -52,7 +54,7 @@ const DetailsSectionHardware: FC<DetailsSectionHardwareProps> = ({
     expandURLHash(getSearchItemsIds(getDetailsTabHardwareIds(vm)), location?.hash, setIsExpanded);
   }, [location?.hash, vm, setIsExpanded]);
 
-  const onEditHostDevices = () => {
+  const onEditHostDevices = (): void => {
     createModal(({ isOpen, onClose }) => (
       <HardwareDevicesModal
         btnText={t('Add host device')}
@@ -68,7 +70,7 @@ const DetailsSectionHardware: FC<DetailsSectionHardwareProps> = ({
     ));
   };
 
-  const onEditGPU = () => {
+  const onEditGPU = (): void => {
     createModal(({ isOpen, onClose }) => (
       <HardwareDevicesModal
         onSubmit={async (updatedVM) => {

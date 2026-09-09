@@ -1,5 +1,4 @@
-/* eslint-disable */
-import { ComponentType } from 'react';
+import { type ComponentType } from 'react';
 
 import {
   contextMenuActions,
@@ -9,8 +8,8 @@ import {
   withEditReviewAccess,
 } from '@openshift-console/dynamic-plugin-sdk-internal';
 import {
-  GraphElement,
-  NodeComponentProps,
+  type GraphElement,
+  type NodeComponentProps,
   nodeDragSourceSpec,
   nodeDropTargetSpec,
   withDndDrop,
@@ -20,7 +19,6 @@ import {
 
 import CreateConnector from '../components/CreateConnector';
 import VMNode from '../components/nodes/VMNode/VMNode';
-
 import { VIRTUAL_MACHINE_TYPE } from './constants';
 
 export const getKubevirtComponentFactory = (
@@ -33,8 +31,8 @@ export const getKubevirtComponentFactory = (
         CreateConnector,
       )(
         withDndDrop<
-          any,
-          any,
+          unknown,
+          unknown,
           { canDrop?: boolean; droppable?: boolean; hover?: boolean },
           NodeComponentProps
         >(nodeDropTargetSpec())(

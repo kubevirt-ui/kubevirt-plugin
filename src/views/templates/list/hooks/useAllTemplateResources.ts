@@ -1,17 +1,15 @@
-/* eslint-disable */
 import { useMemo } from 'react';
 
 import useIsVMTemplateFeatureEnabled from '@kubevirt-utils/hooks/useVMTemplateFeatureFlag/useIsVMTemplateFeatureEnabled';
 import {
   sortTemplates,
-  Template,
-  TemplateOrRequest,
+  type Template,
+  type TemplateOrRequest,
 } from '@kubevirt-utils/resources/template/utils';
-import { Selector } from '@openshift-console/dynamic-plugin-sdk';
+import { type Selector } from '@openshift-console/dynamic-plugin-sdk';
 
 import { VMTemplateRequestStatus } from '../../components/VirtualMachineTemplateRequest/constants';
 import { getVMTemplateRequestStatus } from '../../components/VirtualMachineTemplateRequest/utils';
-
 import { useOpenShiftTemplates } from './useOpenShiftTemplates';
 import useVirtualMachineTemplateRequests from './useVirtualMachineTemplateRequests';
 import useVirtualMachineTemplates from './useVirtualMachineTemplates';
@@ -23,7 +21,7 @@ type UseAllTemplateResources = (props: {
 }) => {
   allTemplates: Template[];
   allTemplatesWithRequests: TemplateOrRequest[];
-  error: any;
+  error: unknown;
   loaded: boolean;
 };
 
@@ -74,7 +72,7 @@ const useAllTemplateResources: UseAllTemplateResources = ({
   return {
     allTemplates,
     allTemplatesWithRequests,
-    error: vmTemplatesEnabled ? templatesError || vmtError || vmtrError : templatesError,
+    error: vmTemplatesEnabled ? (templatesError ?? vmtError ?? vmtrError) : templatesError,
     loaded:
       !vmTemplatesFeatureLoading &&
       (vmTemplatesEnabled ? templatesLoaded && vmtLoaded && vmtrLoaded : templatesLoaded),

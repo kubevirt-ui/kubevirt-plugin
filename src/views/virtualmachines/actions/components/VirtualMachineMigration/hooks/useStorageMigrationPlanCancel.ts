@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { useCallback, useState } from 'react';
 
 import { getCluster } from '@multicluster/helpers/selectors';
@@ -20,7 +19,10 @@ const useStorageMigrationPlanCancel = ({
   onClose,
   planModel,
   storageMigrationPlan,
-}: UseStorageMigrationPlanCancelArgs) => {
+}: UseStorageMigrationPlanCancelArgs): {
+  cancelError: Error | null;
+  onCancelMigration: () => Promise<void>;
+} => {
   const [cancelError, setCancelError] = useState<Error | null>(null);
 
   const onCancelMigration = useCallback(async () => {

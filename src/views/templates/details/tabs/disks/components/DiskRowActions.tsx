@@ -1,7 +1,6 @@
-/* eslint-disable */
-import React, { FC, useCallback, useState } from 'react';
+import React, { type FC, useCallback, useState } from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import ConfirmActionMessage from '@kubevirt-utils/components/ConfirmActionMessage/ConfirmActionMessage';
 import { CONFIRM_ACTIONS } from '@kubevirt-utils/components/ConfirmActionMessage/constants';
 import DiskModal from '@kubevirt-utils/components/DiskModal/DiskModal';
@@ -48,7 +47,7 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({ diskName, isDisabled, onUpdat
     return onUpdate(vmWithDeletedDisk);
   }, [diskName, onUpdate, vm]);
 
-  const onDeleteModalToggle = () => {
+  const onDeleteModalToggle = (): void => {
     createModal(({ isOpen, onClose }) => (
       <TabModal<V1VirtualMachine>
         headerText={t('Detach disk?')}
@@ -67,7 +66,7 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({ diskName, isDisabled, onUpdat
     ));
   };
 
-  const onEditModalToggle = () => {
+  const onEditModalToggle = (): void => {
     createModal(({ isOpen, onClose }) => (
       <DiskModal
         editDiskName={diskName}
@@ -79,7 +78,7 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({ diskName, isDisabled, onUpdat
     ));
   };
 
-  const onToggle = () => setIsDropdownOpen((prevIsOpen) => !prevIsOpen);
+  const onToggle = (): void => setIsDropdownOpen((prevIsOpen) => !prevIsOpen);
 
   return (
     <Dropdown

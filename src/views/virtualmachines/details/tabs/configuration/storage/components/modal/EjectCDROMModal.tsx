@@ -1,8 +1,7 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 import { Trans } from 'react-i18next';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { ejectISOFromCDROM } from '@kubevirt-utils/components/DiskModal/utils/helpers';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -30,7 +29,7 @@ const EjectCDROMModal: FC<EjectCDROMModalProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
 
-  const handleEject = () => {
+  const handleEject = async (): Promise<V1VirtualMachine> => {
     const currentVM = getCustomizeWizardVM() ?? vm;
     const updatedVM = ejectISOFromCDROM(currentVM, cdromName);
 

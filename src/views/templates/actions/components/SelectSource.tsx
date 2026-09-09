@@ -8,7 +8,7 @@ import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FormGroup, TextInput, ValidatedOptions } from '@patternfly/react-core';
 
-import { type SOURCE_OPTIONS_IDS, SOURCE_TYPES } from '../../utils/constants';
+import { SOURCE_TYPES, type SourceOptionsIds } from '../../utils/constants';
 import { PersistentVolumeClaimSelect } from './PersistentVolumeClaimSelect/PersistentVolumeClaimSelect';
 import SelectSourceOption from './SelectSourceOption';
 import {
@@ -23,7 +23,7 @@ type SelectSourceProps = {
   onSourceChange: (customSource: V1beta1DataVolumeSpec) => void;
   source: V1beta1DataVolumeSpec;
   sourceLabel: ReactNode;
-  sourceOptions: SOURCE_OPTIONS_IDS[];
+  sourceOptions: SourceOptionsIds[];
   withSize?: boolean;
 };
 
@@ -44,10 +44,7 @@ export const SelectSource: FC<SelectSourceProps> = ({
   const containerImage = source?.source?.registry?.url;
   const volumeQuantity = source?.storage?.resources?.requests?.storage ?? initialVolumeQuantity;
 
-  const onSourceSelected = (
-    newSourceType: SOURCE_OPTIONS_IDS,
-    newVolumeQuantity?: string,
-  ): void => {
+  const onSourceSelected = (newSourceType: SourceOptionsIds, newVolumeQuantity?: string): void => {
     const selectedVolumeQuantity = newVolumeQuantity ?? volumeQuantity;
 
     switch (newSourceType) {
@@ -95,7 +92,11 @@ export const SelectSource: FC<SelectSourceProps> = ({
 
   const onURLChange = (newUrl: string): void => {
     onSourceChange(
-      getGenericSourceCustomization(selectedSourceType, newUrl, withSize ? volumeQuantity : null),
+      getGenericSourceCustomization(
+        selectedSourceType,
+        newUrl,
+        withSize ? volumeQuantity : undefined,
+      ),
     );
   };
 
@@ -112,7 +113,7 @@ export const SelectSource: FC<SelectSourceProps> = ({
         <PersistentVolumeClaimSelect
           selectPVC={(newPVCNamespace, newPVCName) =>
             onSourceChange(
-              getPVCSource(newPVCName, newPVCNamespace, withSize ? volumeQuantity : null),
+              getPVCSource(newPVCName, newPVCNamespace, withSize ? volumeQuantity : undefined),
             )
           }
           projectSelected={pvcNamespaceSelected}

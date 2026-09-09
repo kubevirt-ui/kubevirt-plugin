@@ -1,6 +1,5 @@
-/* eslint-disable */
 import { VirtualMachineTemplateRequestModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1alpha1VirtualMachineTemplateRequest } from '@kubevirt-ui-ext/kubevirt-api/virt-template';
+import { type V1alpha1VirtualMachineTemplateRequest } from '@kubevirt-ui-ext/kubevirt-api/virt-template';
 import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
 import useListClusters from '@kubevirt-utils/hooks/useListClusters';
 import isResourceNotFoundError from '@kubevirt-utils/utils/isResourceNotFoundError';
@@ -10,7 +9,7 @@ type UseVirtualMachineTemplateRequests = (
   namespace?: string,
   enabled?: boolean,
 ) => {
-  error: any;
+  error: unknown;
   loaded: boolean;
   vmTemplateRequests: V1alpha1VirtualMachineTemplateRequest[];
 };

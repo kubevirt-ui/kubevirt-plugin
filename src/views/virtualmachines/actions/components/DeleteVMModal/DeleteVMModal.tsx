@@ -1,8 +1,7 @@
-/* eslint-disable */
-import React, { FC, useMemo, useState } from 'react';
+import React, { type FC, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import ConfirmActionMessage from '@kubevirt-utils/components/ConfirmActionMessage/ConfirmActionMessage';
 import { GracePeriodInput } from '@kubevirt-utils/components/GracePeriodInput/GracePeriodInput';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
@@ -18,10 +17,10 @@ import { useHubClusterName } from '@stolostron/multicluster-sdk';
 import { deselectVM, isVMSelected } from '@virtualmachines/list/selectedVMs';
 
 import DeleteOwnedResourcesMessage from './components/DeleteOwnedResourcesMessage';
+import { DEFAULT_GRACE_PERIOD } from './constants';
 import useDeleteVMResources from './hooks/useDeleteVMResources';
 import useResourceSelection from './hooks/useResourceSelection';
 import { deleteVMWithResources } from './utils/deleteVM';
-import { DEFAULT_GRACE_PERIOD } from './constants';
 
 type DeleteVMModalProps = {
   isOpen: boolean;
@@ -44,7 +43,7 @@ const DeleteVMModal: FC<DeleteVMModalProps> = ({ isOpen, onClose, vm }) => {
   const shareableVolumes = useMemo(() => getShareableVolumes(vm), [vm]);
   const { shouldSaveResource, toggleResource } = useResourceSelection(shareableVolumes);
 
-  const onDelete = async (updatedVM: V1VirtualMachine) => {
+  const onDelete = async (updatedVM: V1VirtualMachine): Promise<void> => {
     await deleteVMWithResources({
       gracePeriodOptions: gracePeriodCheckbox
         ? { apiVersion: 'v1', gracePeriodSeconds, kind: 'DeleteOptions' }

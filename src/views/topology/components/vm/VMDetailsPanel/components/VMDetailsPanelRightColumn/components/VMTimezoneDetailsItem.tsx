@@ -1,7 +1,6 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
-import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
@@ -20,7 +19,7 @@ const VMTimezoneDetailsItem: FC<VMTimezoneDetailsItemProps> = ({ vmi }) => {
   return (
     <DescriptionItem
       className="topology-vm-details-panel__item"
-      descriptionData={guestAgentData?.timezone?.split(',')[0] || NO_DATA_DASH}
+      descriptionData={guestAgentData?.timezone?.split(',')[0] ?? NO_DATA_DASH}
       descriptionHeader={t('Time zone')}
     />
   );

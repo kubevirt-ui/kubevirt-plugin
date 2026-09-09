@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC, useCallback, useState } from 'react';
+import React, { type FC, useCallback, useState } from 'react';
 import produce from 'immer';
 
 import ConfirmActionMessage from '@kubevirt-utils/components/ConfirmActionMessage/ConfirmActionMessage';
@@ -9,10 +8,10 @@ import KebabToggle from '@kubevirt-utils/components/toggles/KebabToggle';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   getTemplateVirtualMachineObject,
-  Template,
+  type Template,
   updateTemplate,
 } from '@kubevirt-utils/resources/template';
-import { NetworkPresentation } from '@kubevirt-utils/resources/vm/utils/network/constants';
+import { type NetworkPresentation } from '@kubevirt-utils/resources/vm/utils/network/constants';
 import { NetworkInterfaceState } from '@kubevirt-utils/resources/vm/utils/network/types';
 import { getContentScrollableElement } from '@kubevirt-utils/utils/utils';
 import { ButtonVariant, Dropdown, DropdownItem, DropdownList } from '@patternfly/react-core';
@@ -45,7 +44,7 @@ const NetworkInterfaceActions: FC<NetworkInterfaceActionsProps> = ({
   const editBtnText = t('Edit');
   const submitBtnText = t('Delete');
 
-  const onEditModalOpen = () => {
+  const onEditModalOpen = (): void => {
     createModal(({ isOpen, onClose }) => (
       <TemplatesEditNetworkInterfaceModal
         isOpen={isOpen}
@@ -69,7 +68,7 @@ const NetworkInterfaceActions: FC<NetworkInterfaceActionsProps> = ({
     return updateTemplate(updatedTemplate);
   }, [nicName, template]);
 
-  const onDeleteModalToggle = () => {
+  const onDeleteModalToggle = (): void => {
     createModal(({ isOpen, onClose }) => (
       <TabModal<Template>
         headerText={label}
@@ -87,7 +86,7 @@ const NetworkInterfaceActions: FC<NetworkInterfaceActionsProps> = ({
     ));
   };
 
-  const onToggle = () => setIsDropdownOpen((prevIsOpen) => !prevIsOpen);
+  const onToggle = (): void => setIsDropdownOpen((prevIsOpen) => !prevIsOpen);
 
   return (
     <Dropdown

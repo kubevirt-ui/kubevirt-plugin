@@ -8,10 +8,10 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { FormGroup, SelectOption } from '@patternfly/react-core';
 import { ExternalLinkAltIcon } from '@patternfly/react-icons';
 
-import { type SOURCE_OPTIONS_IDS, SOURCE_TYPE_LABELS, SOURCE_TYPES } from '../../utils/constants';
+import { SOURCE_TYPE_LABELS, SOURCE_TYPES, type SourceOptionsIds } from '../../utils/constants';
 
 const getSourceOption = (
-  source: SOURCE_OPTIONS_IDS,
+  source: SourceOptionsIds,
   ns: string,
   t: TFunction,
 ): JSX.Element | undefined => {
@@ -75,9 +75,9 @@ const getSourceOption = (
 
 type SelectSourceOptionProps = {
   label: ReactNode;
-  onSelectSource: (selection: SOURCE_OPTIONS_IDS) => void;
-  options: SOURCE_OPTIONS_IDS[];
-  selectedSource: SOURCE_OPTIONS_IDS;
+  onSelectSource: (selection: SourceOptionsIds) => void;
+  options: SourceOptionsIds[];
+  selectedSource: SourceOptionsIds;
 };
 
 const SelectSourceOption: FC<SelectSourceOptionProps> = ({

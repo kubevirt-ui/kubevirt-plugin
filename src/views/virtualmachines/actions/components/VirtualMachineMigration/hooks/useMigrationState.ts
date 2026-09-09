@@ -1,15 +1,14 @@
-/* eslint-disable */
 import { useCallback, useMemo, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getStorageMigrationBackend } from '@kubevirt-utils/resources/migrations/backends';
 import {
+  type MultiNamespaceVirtualMachineStorageMigrationPlan,
   type StorageMigrationAPI,
-  MultiNamespaceVirtualMachineStorageMigrationPlan,
 } from '@kubevirt-utils/resources/migrations/constants';
 import { getCluster } from '@multicluster/helpers/selectors';
 
-import { SelectedMigration } from '../utils/constants';
+import { type SelectedMigration } from '../utils/constants';
 
 type UseMigrationState = (
   selectedMigrations: SelectedMigration[],
@@ -45,7 +44,7 @@ const useMigrationState: UseMigrationState = (
   const migrate = useMemo(
     () =>
       backend?.migrateVMs ??
-      (async () => {
+      (async (): Promise<never> => {
         throw new Error(t('Storage migration is not available on this cluster.'));
       }),
     [backend, t],

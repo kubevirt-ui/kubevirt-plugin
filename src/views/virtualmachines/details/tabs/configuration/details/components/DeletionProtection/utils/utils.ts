@@ -1,15 +1,14 @@
-/* eslint-disable */
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getLabel, getLabels } from '@kubevirt-utils/resources/shared';
 import { updateLabels } from '@virtualmachines/details/tabs/configuration/details/utils/utils';
 
 import { VM_DELETION_PROTECTION_LABEL } from './constants';
 
-export const isDeletionProtectionEnabled = (vm: V1VirtualMachine) =>
+export const isDeletionProtectionEnabled = (vm: V1VirtualMachine): boolean =>
   getLabel(vm, VM_DELETION_PROTECTION_LABEL, 'false') === 'true';
 
-export const getDeletionProtectionPrintableStatus = (vm: V1VirtualMachine) => {
+export const getDeletionProtectionPrintableStatus = (vm: V1VirtualMachine): string => {
   const deletionProtectionEnabled = isDeletionProtectionEnabled(vm);
   return deletionProtectionEnabled ? t('Enabled') : t('Disabled');
 };
@@ -17,7 +16,7 @@ export const getDeletionProtectionPrintableStatus = (vm: V1VirtualMachine) => {
 export const setDeletionProtectionForVM = (
   vm: V1VirtualMachine,
   enableDeletionProtection: boolean,
-) => {
+): Promise<V1VirtualMachine> => {
   const vmLabels = getLabels(vm, {});
   vmLabels[VM_DELETION_PROTECTION_LABEL] = enableDeletionProtection.toString();
   return updateLabels(vm, vmLabels);

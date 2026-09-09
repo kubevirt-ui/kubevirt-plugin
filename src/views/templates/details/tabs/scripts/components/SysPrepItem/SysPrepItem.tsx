@@ -1,9 +1,8 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 import { useParams } from 'react-router';
 
 import { ConfigMapModel, modelToGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import WindowsLabel from '@kubevirt-utils/components/Labels/WindowsLabel';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
@@ -12,7 +11,7 @@ import { SysprepDescription } from '@kubevirt-utils/components/SysprepModal/Sysp
 import { SysprepModal } from '@kubevirt-utils/components/SysprepModal/SysprepModal';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getTemplateVirtualMachineObject, Template } from '@kubevirt-utils/resources/template';
+import { getTemplateVirtualMachineObject, type Template } from '@kubevirt-utils/resources/template';
 import { getVolumes } from '@kubevirt-utils/resources/vm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
@@ -21,7 +20,6 @@ import { Button, ButtonVariant, Flex, FlexItem, Title } from '@patternfly/react-
 import { PencilAltIcon } from '@patternfly/react-icons';
 
 import useEditTemplateAccessReview from '../../../../hooks/useIsTemplateEditable';
-
 import {
   deleteTemplateSysprepObject,
   getTemplateSysprepObject,
@@ -61,20 +59,23 @@ const SysPrepItem: FC<SysPrepItemProps> = ({ template }) => {
     );
 
   const { [AUTOUNATTEND]: autoUnattend, [UNATTEND]: unattend } =
-    externalSysprepConfig?.data || sysPrepObject?.data || {};
+    externalSysprepConfig?.data ?? sysPrepObject?.data ?? {};
 
-  const onSysprepSelected = async (newSysprepName: string) => {
+  const onSysprepSelected = async (newSysprepName: string): Promise<void> => {
     const templateNoSysprepObj = deleteTemplateSysprepObject(template, currentVMSysprepName);
     return updateTemplateWithSysprep(templateNoSysprepObj, newSysprepName, currentVMSysprepName);
   };
 
-  const onSysprepCreation = (newUnattended: string, newAutoUnattend: string) => {
+  const onSysprepCreation = async (
+    newUnattended: string,
+    newAutoUnattend: string,
+  ): Promise<void> => {
     const newSysPrepObject = updateSysprepObject(sysPrepObject, newUnattended, newAutoUnattend);
     const templateWithSysPrep = newSysPrepObject
       ? replaceTemplateSysprepObject(template, newSysPrepObject, currentVMSysprepName)
       : deleteTemplateSysprepObject(template, currentVMSysprepName);
 
-    return updateTemplateWithSysprep(
+    await updateTemplateWithSysprep(
       templateWithSysPrep,
       newSysPrepObject?.metadata?.name,
       externalSysprepSelected,
@@ -97,7 +98,7 @@ const SysPrepItem: FC<SysPrepItemProps> = ({ template }) => {
                   <SysprepModal
                     {...modalProps}
                     autoUnattend={autoUnattend}
-                    namespace={vm?.metadata?.namespace || DEFAULT_NAMESPACE}
+                    namespace={vm?.metadata?.namespace ?? DEFAULT_NAMESPACE}
                     onSysprepCreation={onSysprepCreation}
                     onSysprepSelected={onSysprepSelected}
                     sysprepSelected={externalSysprepSelected}

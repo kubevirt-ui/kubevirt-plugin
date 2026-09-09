@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 import produce from 'immer';
 import { getWorkloadProfile } from 'src/views/templates/utils/selectors';
 
@@ -10,21 +9,22 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import {
   getTemplateVirtualMachineObject,
   getTemplateWorkload,
+  type Template,
   TEMPLATE_WORKLOAD_LABEL,
   updateTemplate,
-  WORKLOADS,
+  type WORKLOADS,
 } from '@kubevirt-utils/resources/template';
 import { VM_WORKLOAD_ANNOTATION } from '@kubevirt-utils/resources/vm/utils';
 import { ensurePath } from '@kubevirt-utils/utils/utils';
 
-import { TemplateDetailsGridProps } from '../TemplateDetailsPage';
+import { type TemplateDetailsGridProps } from '../TemplateDetailsPage';
 
 const WorkloadProfile: FC<TemplateDetailsGridProps> = ({ editable, template }) => {
   const { createModal } = useModal();
   const { t } = useKubevirtTranslation();
   const workload = getWorkloadProfile(template);
 
-  const updateWorkload = (updatedWorkload: WORKLOADS) => {
+  const updateWorkload = (updatedWorkload: WORKLOADS): Promise<Template> => {
     const updatedTemplate = produce(template, (draftTemplate) => {
       const draftVM = getTemplateVirtualMachineObject(draftTemplate);
       ensurePath(draftVM, ['spec.template.metadata.annotations']);
@@ -40,7 +40,7 @@ const WorkloadProfile: FC<TemplateDetailsGridProps> = ({ editable, template }) =
     return updateTemplate(updatedTemplate);
   };
 
-  const onEditClick = () =>
+  const onEditClick = (): void =>
     createModal(({ isOpen, onClose }) => (
       <WorkloadProfileModal
         initialWorkload={getTemplateWorkload(template) as WORKLOADS}

@@ -1,7 +1,6 @@
-/* eslint-disable */
-import React, { FC, useState } from 'react';
+import React, { type FC, useState } from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { TELEMETRY_VM_ACTION } from '@kubevirt-utils/extensions/telemetry/utils/property-constants';
 import { logVMActionPerformed } from '@kubevirt-utils/extensions/telemetry/vm-actions';
@@ -30,7 +29,7 @@ const ComputeMigrationModal: FC<ComputeMigrationModalProps> = ({ isOpen, onClose
 
   const [selectedNode, setSelectedNode] = useState<string>('');
 
-  const handleNodeSelection = (changedNode: string) => {
+  const handleNodeSelection = (changedNode: string): void => {
     setSelectedNode(changedNode);
   };
 
