@@ -1,16 +1,18 @@
 import { useMemo } from 'react';
 
 import { VirtualMachineModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { TREE_VIEW_FOLDERS } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
+import useIsWindowsSupportedArchitecture from '@kubevirt-utils/hooks/useIsWindowsSupportedArchitecture';
 import useClusterFilter from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/filters/useClusterFilter';
 import useProjectFilter from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/filters/useProjectFilter';
-import { KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
+import { type KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useIsACMPage from '@multicluster/useIsACMPage';
+import useProjectsWithVMs from '@search/components/AdvancedSearchModal/hooks/useProjectsWithVMs';
 import { useAccessibleResources } from '@virtualmachines/search/hooks/useAccessibleResources';
-import { PVCMapper, VMIMapper } from '@virtualmachines/utils/mappers';
+import { type PVCMapper, type VMIMapper } from '@virtualmachines/utils/mappers';
 
 import { getCPUFilter } from '../filters/getCPUFilter';
 import { getDateCreatedFilter, getDateFromFilter, getDateToFilter } from '../filters/getDateFilter';
@@ -27,8 +29,6 @@ import { getStatusFilter } from '../filters/getStatusFilter';
 import useArchitectureFilter from '../filters/useArchitectureFilter';
 import useNodeFilter from '../filters/useNodeFilter';
 import useStorageClassFilter from '../filters/useStorageClassFilter';
-
-import useProjectsWithVMs from '@search/components/AdvancedSearchModal/hooks/useProjectsWithVMs';
 import { useInstanceTypeMapper } from './useInstanceTypeMapper';
 
 const useVMListFilters = (
@@ -37,6 +37,7 @@ const useVMListFilters = (
 ): KubevirtFilter<V1VirtualMachine>[] => {
   const { t } = useKubevirtTranslation();
   const isACMPage = useIsACMPage();
+  const isWindowsSupported = useIsWindowsSupportedArchitecture();
   const { featureEnabled: treeViewFoldersEnabled } = useFeatures(TREE_VIEW_FOLDERS);
 
   const { resources: vms } = useAccessibleResources<V1VirtualMachine>({
@@ -72,7 +73,7 @@ const useVMListFilters = (
         showAllBadge: true,
       },
       getStatusFilter(t),
-      getOSFilter(t),
+      getOSFilter(t, isWindowsSupported),
       storageClassFilter,
       getHWDevicesFilter(t),
       getSchedulingFilter(t),
@@ -93,6 +94,7 @@ const useVMListFilters = (
   }, [
     t,
     isACMPage,
+    isWindowsSupported,
     treeViewFoldersEnabled,
     clusterFilter,
     projectFilter,

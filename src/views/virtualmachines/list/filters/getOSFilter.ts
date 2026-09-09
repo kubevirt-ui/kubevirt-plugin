@@ -24,15 +24,20 @@ export const getOSName = (obj: V1VirtualMachine) => {
   return matchOSName(osAnnotation, osLabel, osPreference);
 };
 
-export const getOSFilter = (t: TFunction): KubevirtFilter<V1VirtualMachine> => ({
+export const getOSFilter = (
+  t: TFunction,
+  isWindowsSupported = true,
+): KubevirtFilter<V1VirtualMachine> => ({
   categoryLabel: t('Operating system'),
   categoryLabelShort: t('OS'),
   filterLayout: KubevirtFilterLayout.SELECT,
   id: VirtualMachineRowFilterType.OS,
   match: (obj, selected) => selected.includes(getOSName(obj)),
-  options: Object.values(OS_NAME_LABELS).map((osName) => ({
-    label: osName,
-    value: osName,
-  })),
+  options: Object.values(OS_NAME_LABELS)
+    .filter((osName) => isWindowsSupported || osName !== OS_NAME_LABELS.windows)
+    .map((osName) => ({
+      label: osName,
+      value: osName,
+    })),
   showAllBadge: true,
 });

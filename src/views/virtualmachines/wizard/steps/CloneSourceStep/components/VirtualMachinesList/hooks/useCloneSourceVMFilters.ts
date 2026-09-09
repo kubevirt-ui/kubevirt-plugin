@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 
 import type { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import useIsWindowsSupportedArchitecture from '@kubevirt-utils/hooks/useIsWindowsSupportedArchitecture';
 import { type KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { toGrouped } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -20,6 +21,7 @@ export const useCloneSourceVMFilters = (
   pvcMapper: PVCMapper,
 ): KubevirtFilter<V1VirtualMachine>[] => {
   const { t } = useKubevirtTranslation();
+  const isWindowsSupported = useIsWindowsSupportedArchitecture();
 
   const storageClassFilter = useStorageClassFilter(vms, pvcMapper);
   const nodeFilter = useNodeFilter(vmiMapper);
@@ -29,7 +31,7 @@ export const useCloneSourceVMFilters = (
     () =>
       [
         getStatusFilter(t),
-        getOSFilter(t),
+        getOSFilter(t, isWindowsSupported),
         storageClassFilter,
         getHWDevicesFilter(t),
         getSchedulingFilter(t),
@@ -37,6 +39,6 @@ export const useCloneSourceVMFilters = (
         getGuestAgentFilter(t),
         architectureFilter,
       ].map(toGrouped),
-    [t, storageClassFilter, nodeFilter, architectureFilter],
+    [t, isWindowsSupported, storageClassFilter, nodeFilter, architectureFilter],
   );
 };

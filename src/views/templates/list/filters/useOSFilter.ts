@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 
-import { KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
+import useIsWindowsSupportedArchitecture from '@kubevirt-utils/hooks/useIsWindowsSupportedArchitecture';
+import { type KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   getTemplateOS,
@@ -22,15 +23,18 @@ const getRowOS = (obj: TemplateOrRequest): string => {
 
 const useOSFilter = (): KubevirtFilter<TemplateOrRequest> => {
   const { t } = useKubevirtTranslation();
+  const isWindowsSupported = useIsWindowsSupportedArchitecture();
 
   return useMemo(
     () => ({
       categoryLabel: t('Operating system'),
       id: TemplateFilterType.OSName,
       match: (obj, selected) => selected.includes(getRowOS(obj)),
-      options: OS_NAMES.map(({ id, title }) => ({ label: title, value: id })),
+      options: OS_NAMES.filter(({ id }) => isWindowsSupported || id !== OS_NAME_TYPES.windows).map(
+        ({ id, title }) => ({ label: title, value: id }),
+      ),
     }),
-    [t],
+    [isWindowsSupported, t],
   );
 };
 
