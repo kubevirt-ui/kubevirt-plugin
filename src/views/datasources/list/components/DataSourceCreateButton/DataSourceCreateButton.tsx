@@ -1,45 +1,47 @@
 import React, { type FC } from 'react';
 import { useNavigate } from 'react-router';
-import { getMigrationPolicyURL } from 'src/views/migrationpolicies/utils/utils';
 
-import { MigrationPolicyModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { DataSourceModel, DataSourceModelRef } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import NoPermissionButton from '@kubevirt-utils/components/NoPermissionButton/NoPermissionButton';
+import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import useCanCreateResource from '@kubevirt-utils/hooks/useCanCreateResource';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import useSelectedCluster from '@kubevirt-utils/hooks/useSelectedCluster';
 import { ListPageCreateDropdown } from '@openshift-console/dynamic-plugin-sdk';
 
-import MigrationPolicyCreateModal from '../../../components/MigrationPolicyCreateModal/MigrationPolicyCreateModal';
+import { CreateDataSourceModal } from '../../CreateDataSourceModal/CreateDataSourceModal';
 
-const MigrationPoliciesCreateButton: FC = () => {
+type DataSourceCreateButtonProps = {
+  namespace: string;
+};
+
+const DataSourceCreateButton: FC<DataSourceCreateButtonProps> = ({ namespace }) => {
   const { t } = useKubevirtTranslation();
-  const selectedCluster = useSelectedCluster();
-  const navigate = useNavigate();
   const { createModal } = useModal();
+  const navigate = useNavigate();
+
+  const canCreateDataSource = useCanCreateResource({
+    model: DataSourceModel,
+    namespace,
+  });
 
   const createItems = {
     form: t('With form'),
     yaml: t('With YAML'),
   };
 
-  const canCreateMigrationPolicy = useCanCreateResource({
-    cluster: selectedCluster,
-    model: MigrationPolicyModel,
-  });
-
   const onCreate = (type: string): void => {
     if (type === 'form') {
-      return createModal?.(({ isOpen, onClose }) => (
-        <MigrationPolicyCreateModal isOpen={isOpen} onClose={onClose} />
-      ));
+      createModal?.((props) => <CreateDataSourceModal namespace={namespace} {...props} />);
+      return;
     }
-    navigate(getMigrationPolicyURL('~new', selectedCluster));
+
+    navigate(`/k8s/ns/${namespace || DEFAULT_NAMESPACE}/${DataSourceModelRef}/~new`);
   };
 
-  const createButtonText = t('Create MigrationPolicy');
+  const createButtonText = t('Create DataSource');
 
-  if (!canCreateMigrationPolicy) {
+  if (!canCreateDataSource) {
     return <NoPermissionButton>{createButtonText}</NoPermissionButton>;
   }
 
@@ -50,4 +52,4 @@ const MigrationPoliciesCreateButton: FC = () => {
   );
 };
 
-export default MigrationPoliciesCreateButton;
+export default DataSourceCreateButton;
