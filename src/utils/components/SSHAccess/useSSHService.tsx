@@ -6,6 +6,7 @@ import { useVMIAndPodForVM } from '@kubevirt-utils/resources/vm';
 import { getServicesForVmi } from '@kubevirt-utils/resources/vmi';
 import { getCluster } from '@multicluster/helpers/selectors';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
+import { isRunning } from '@virtualmachines/utils';
 
 import { SSH_PORT } from './constants';
 
@@ -28,9 +29,10 @@ const useSSHService = (vm: V1VirtualMachine): UseSSHServiceReturnType => {
   );
 
   const { pod, vmi } = useVMIAndPodForVM(
-    vm ? getName(vm) : '',
-    vm ? getNamespace(vm) : '',
-    vm ? getCluster(vm) : undefined,
+    getName(vm),
+    getNamespace(vm),
+    getCluster(vm),
+    isRunning(vm),
   );
 
   if (!vm) return [undefined, false, undefined];
