@@ -1,6 +1,5 @@
+# RHEL 10 enables post-quantum algorithms in the DEFAULT policy; copy them into nginx.
 FROM registry.access.redhat.com/ubi10/ubi:latest AS policy
-
-RUN update-crypto-policies --set DEFAULT:PQ
 # NOTE: Since the `:latest` tag can have npm version changes, we are using
 #       a specific version tag. Container build errors have come up when
 #       the `:latest` is updated.
