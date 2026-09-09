@@ -1,12 +1,11 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC, type ReactElement } from 'react';
 
 import { modelToGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { VirtualMachineSnapshotContentModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
-  V1beta1VirtualMachineSnapshot,
-  V1beta1VirtualMachineSnapshotContent,
-  V1VirtualMachine,
+  type V1beta1VirtualMachineSnapshot,
+  type V1beta1VirtualMachineSnapshotContent,
+  type V1VirtualMachine,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
@@ -24,7 +23,7 @@ type SnapshotContentConfigurationSummaryProps = {
 
 const SnapshotContentConfigurationSummary: FC<SnapshotContentConfigurationSummaryProps> = ({
   snapshot,
-}) => {
+}): ReactElement => {
   const { t } = useKubevirtTranslation();
 
   const [snapshotContent, loaded, error] = useK8sWatchData<V1beta1VirtualMachineSnapshotContent>(
@@ -32,7 +31,7 @@ const SnapshotContentConfigurationSummary: FC<SnapshotContentConfigurationSummar
       cluster: getCluster(snapshot),
       groupVersionKind: modelToGroupVersionKind(VirtualMachineSnapshotContentModel),
       name: snapshot.status.virtualMachineSnapshotContentName,
-      namespace: getNamespace(snapshot) || DEFAULT_NAMESPACE,
+      namespace: getNamespace(snapshot) ?? DEFAULT_NAMESPACE,
     },
   );
 

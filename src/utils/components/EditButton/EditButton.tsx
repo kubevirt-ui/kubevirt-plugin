@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC, ReactNode } from 'react';
+import React, { type FC, type ReactElement, type ReactNode } from 'react';
 
 import { Button, ButtonVariant } from '@patternfly/react-core';
 import { PencilAltIcon } from '@patternfly/react-icons';
@@ -24,13 +23,13 @@ const EditButton: FC<EditButtonProps> = ({
   onClick,
   testId,
   variant = ButtonVariant.link,
-}) => (
+}): ReactElement => (
   <Button
     onClick={(e) => {
       e.stopPropagation();
       onClick?.();
     }}
-    aria-label={ariaLabel || undefined}
+    aria-label={ariaLabel ?? undefined}
     className={className}
     data-test={testId}
     icon={<PencilAltIcon />}

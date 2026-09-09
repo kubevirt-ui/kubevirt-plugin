@@ -1,9 +1,8 @@
-/* eslint-disable */
-import { TemplateModel, V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1CPU } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { TemplateModel, type V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { type V1CPU } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
 import { getCPU, getMemory } from '@kubevirt-utils/resources/vm';
-import { Quantity } from '@kubevirt-utils/types/quantity';
+import { type Quantity } from '@kubevirt-utils/types/quantity';
 import { toQuantity } from '@kubevirt-utils/utils/units';
 import useK8sGetData from '@multicluster/hooks/useK8sGetData';
 
@@ -25,12 +24,15 @@ const useTemplateDefaultCpuMemory: UseTemplateDefaultCpuMemory = (
   templateNamespace,
   templateCluster,
 ) => {
-  const [template, loaded, error] = useK8sGetData<V1Template>({
+  const hookResult = useK8sGetData<V1Template>({
     cluster: templateCluster,
     model: TemplateModel,
     name: templateName,
     ns: templateNamespace,
   });
+  const template = hookResult[0];
+  const loaded = hookResult[1];
+  const error = hookResult[2] as Error | undefined;
 
   const vmObject = getTemplateVirtualMachineObject(template);
   const defaultMemory = toQuantity(getMemory(vmObject));

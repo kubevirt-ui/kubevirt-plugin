@@ -1,19 +1,19 @@
-import React, { FC, ReactNode } from 'react';
+import React, { type FC, type ReactNode } from 'react';
 
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Operator } from '@openshift-console/dynamic-plugin-sdk';
 import { FormGroup } from '@patternfly/react-core';
 
-import { isTermsInvalid } from '../../../../utils/helpers';
-import { useIDEntitiesValue } from '../AffinityForm';
+import { type UseIDEntitiesValue } from '../AffinityForm';
 
+import { isTermsInvalid } from '../../../../utils/helpers';
 import AffinityEditList from './AffinityEditList';
 import ErrorHelperText from './ErrorHelperText';
 
 type ExpressionEditListProps = {
   errorHelperText: ReactNode;
-  expressions: useIDEntitiesValue;
+  expressions: UseIDEntitiesValue;
   helperText: ReactNode;
   label: string;
 };

@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { getResizeObserver } from '@patternfly/react-core';
@@ -9,25 +8,25 @@ type UseResponsiveCharts = () => {
   width: number;
 };
 const useResponsiveCharts: UseResponsiveCharts = () => {
-  const containerRef = useRef(null);
+  const containerRef = useRef<Element | null>(null);
   const [width, setWidth] = useState<number>();
   const [height, setHeight] = useState<number>(200);
-  const [listener, setListener] = useState(null);
+  const [listener, setListener] = useState<(() => void) | null>(null);
   const ref = useCallback((node: Element) => {
     if (node) {
-      const sizeSetter = () => {
+      const sizeSetter = (): void => {
         setWidth(node.getBoundingClientRect().width);
         setHeight(node.getBoundingClientRect().height);
       };
       sizeSetter();
-      setListener(getResizeObserver(containerRef?.current, sizeSetter));
+      setListener(getResizeObserver(containerRef.current ?? node, sizeSetter));
       containerRef.current = node;
     }
   }, []);
 
   useEffect(() => {
-    return () => {
-      listener && listener();
+    return (): void => {
+      listener?.();
     };
   }, [listener]);
 

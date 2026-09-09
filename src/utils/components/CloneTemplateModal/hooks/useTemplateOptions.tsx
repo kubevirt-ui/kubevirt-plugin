@@ -1,4 +1,3 @@
-/* eslint-disable */
 import React, { useMemo } from 'react';
 
 import {
@@ -6,10 +5,10 @@ import {
   ERROR_OPTION_KEY,
   LOADING_OPTION_KEY,
 } from '@kubevirt-utils/components/FilterSelect/utils/constants';
-import { EnhancedSelectOptionProps } from '@kubevirt-utils/components/FilterSelect/utils/types';
+import { type EnhancedSelectOptionProps } from '@kubevirt-utils/components/FilterSelect/utils/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName } from '@kubevirt-utils/resources/shared';
-import { sortTemplates, Template } from '@kubevirt-utils/resources/template';
+import { sortTemplates, type Template } from '@kubevirt-utils/resources/template';
 import { TemplateModelGroupVersionKind } from '@kubevirt-utils/resources/template/hooks/constants';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { HelperText, HelperTextItem } from '@patternfly/react-core';
@@ -25,7 +24,10 @@ type UseTemplateOptions = (namespace?: string) => {
 
 const useTemplateOptions: UseTemplateOptions = (namespace) => {
   const { t } = useKubevirtTranslation();
-  const { error, loaded, templates } = useOpenShiftTemplates({ namespace });
+  const openShiftTemplatesResult = useOpenShiftTemplates({ namespace });
+  const error = openShiftTemplatesResult.error as Error | undefined;
+  const loaded = openShiftTemplatesResult.loaded;
+  const templates = openShiftTemplatesResult.templates as Template[] | undefined;
 
   const sortedTemplates = useMemo(() => sortTemplates(templates ?? []), [templates]);
 
@@ -71,7 +73,7 @@ const useTemplateOptions: UseTemplateOptions = (namespace) => {
     }));
   }, [loaded, error, sortedTemplates, t]);
 
-  const hasOptions = !error && loaded && !isEmpty(sortedTemplates);
+  const hasOptions: boolean = !error && loaded && !isEmpty(sortedTemplates);
 
   const templateMap = useMemo(
     () => new Map(sortedTemplates.map((tmpl) => [getTemplateOptionKey(tmpl), tmpl])),

@@ -1,5 +1,4 @@
-/* eslint-disable */
-import { Template } from '@kubevirt-utils/resources/template';
+import { type Template } from '@kubevirt-utils/resources/template';
 
 export type CloneTemplateFormValues = {
   isCloneStorageEnabled: boolean;
@@ -13,12 +12,12 @@ export type CloneTemplateFormValues = {
 };
 
 export enum CloneTemplateField {
-  isCloneStorageEnabled = 'isCloneStorageEnabled',
-  pvcName = 'pvcName',
-  sourceProject = 'sourceProject',
-  targetProject = 'targetProject',
-  template = 'template',
-  templateDisplayName = 'templateDisplayName',
-  templateName = 'templateName',
-  templateProvider = 'templateProvider',
+  IsCloneStorageEnabled = 'isCloneStorageEnabled',
+  PvcName = 'pvcName',
+  SourceProject = 'sourceProject',
+  TargetProject = 'targetProject',
+  Template = 'template',
+  TemplateDisplayName = 'templateDisplayName',
+  TemplateName = 'templateName',
+  TemplateProvider = 'templateProvider',
 }

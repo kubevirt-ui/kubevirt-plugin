@@ -1,8 +1,10 @@
-/* eslint-disable */
-import React, { FC, useCallback, useEffect, useState } from 'react';
+import React, { type FC, type ReactElement, useCallback, useEffect, useState } from 'react';
 
 import AlertsCardAccordionItem from '@kubevirt-utils/components/AlertsCard/AlertsCardAccordionItem';
-import { AlertType, SimplifiedAlerts } from '@kubevirt-utils/components/AlertsCard/utils/types';
+import {
+  AlertType,
+  type SimplifiedAlerts,
+} from '@kubevirt-utils/components/AlertsCard/utils/types';
 import { labelStatus, labelText } from '@kubevirt-utils/components/AlertsCard/utils/utils';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
@@ -20,7 +22,7 @@ type AlertsDrawerProps = {
   sortedAlerts: SimplifiedAlerts;
 };
 
-const AlertsDrawer: FC<AlertsDrawerProps> = ({ sortedAlerts }) => {
+const AlertsDrawer: FC<AlertsDrawerProps> = ({ sortedAlerts }): ReactElement => {
   const [alertTypeOpen, setAlertTypeOpen] = useState<AlertType>(null);
 
   const [titleOpen, setTitleOpen] = useState<boolean>(false);
@@ -29,14 +31,14 @@ const AlertsDrawer: FC<AlertsDrawerProps> = ({ sortedAlerts }) => {
   const handleDrawerToggleClick = useCallback((alertType: AlertType): void => {
     setAlertTypeOpen((alert) => (alert === alertType ? null : alertType));
   }, []);
-  const alertsQuantity =
-    Object.values(sortedAlerts)?.reduce((acc, category) => acc + category?.length, 0) || 0;
+  const alertsQuantity: number =
+    Object.values(sortedAlerts)?.reduce((acc, category) => acc + category?.length, 0) ?? 0;
 
   useEffect(() => {
     //open critical alerts by default, if exists, only for the first time loading
     if (!defaultOpenCritical && !isEmpty(sortedAlerts?.critical)) {
       setTitleOpen(true);
-      setAlertTypeOpen(AlertType.critical);
+      setAlertTypeOpen(AlertType.Critical);
       setDefaultOpenCritical(true);
     }
   }, [sortedAlerts, defaultOpenCritical]);
@@ -58,7 +60,7 @@ const AlertsDrawer: FC<AlertsDrawerProps> = ({ sortedAlerts }) => {
             >
               <Flex>
                 {Object.keys(sortedAlerts)?.map((alertType) => {
-                  const numAlerts = sortedAlerts?.[alertType]?.length;
+                  const numAlerts = sortedAlerts?.[alertType as AlertType]?.length;
                   // // Don't show alerts in the drawer header if there are no alerts of the type
                   if (numAlerts === 0) {
                     return null;
@@ -85,7 +87,7 @@ const AlertsDrawer: FC<AlertsDrawerProps> = ({ sortedAlerts }) => {
                         key={alertType}
                         status={labelStatus[alertType]}
                       >
-                        {numAlerts || 0}
+                        {numAlerts ?? 0}
                       </Label>
                       <span className="alerts-label--text">{labelText[alertType]}</span>
                     </Button>
@@ -100,7 +102,7 @@ const AlertsDrawer: FC<AlertsDrawerProps> = ({ sortedAlerts }) => {
                     <AlertsCardAccordionItem
                       alertOpen={alertTypeOpen}
                       alerts={alerts}
-                      alertType={AlertType[alertType]}
+                      alertType={alertType as AlertType}
                       handleDrawerToggleClick={handleDrawerToggleClick}
                       key={alertType}
                     />

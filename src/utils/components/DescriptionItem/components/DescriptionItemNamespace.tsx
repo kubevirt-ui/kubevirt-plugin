@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC, type ReactElement } from 'react';
 
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
@@ -10,7 +9,7 @@ import { OLSPromptType } from '@lightspeed/utils/prompts';
 import MulticlusterResourceLink from '@multicluster/components/MulticlusterResourceLink/MulticlusterResourceLink';
 import { getCluster } from '@multicluster/helpers/selectors';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
-import { getGroupVersionKindForModel, K8sModel } from '@openshift-console/dynamic-plugin-sdk';
+import { getGroupVersionKindForModel, type K8sModel } from '@openshift-console/dynamic-plugin-sdk';
 
 type DescriptionItemNamespaceProps = {
   label?: string;
@@ -22,11 +21,11 @@ const DescriptionItemNamespace: FC<DescriptionItemNamespaceProps> = ({
   label,
   model,
   resource,
-}) => {
+}): ReactElement => {
   const { t } = useKubevirtTranslation();
 
   const clusterParam = useClusterParam();
-  const cluster = getCluster(resource) || clusterParam;
+  const cluster = getCluster(resource) ?? clusterParam;
   const namespace = getNamespace(resource);
 
   return (

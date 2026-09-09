@@ -1,10 +1,9 @@
 import { useCallback, useMemo } from 'react';
 
-import { IoK8sApiCoreV1Node } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type IoK8sApiCoreV1Node } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 
 import { intersectionWith, unionWith } from '../utils/helpers';
-import { AffinityCondition, AffinityRowData, AffinityType } from '../utils/types';
-
+import { AffinityCondition, type AffinityRowData, AffinityType } from '../utils/types';
 import { useAffinitiesQualifiedNodes } from './useAffinitiesQualifiedNodes';
 
 type UseRequiredAndPreferredQualifiedNodes = (
@@ -21,10 +20,10 @@ export const useRequiredAndPreferredQualifiedNodes: UseRequiredAndPreferredQuali
   const [requiredNodeAffinities, preferredNodeAffinities] = useMemo(
     () => [
       affinities?.filter(
-        (aff) => aff?.type === AffinityType.node && aff?.condition === AffinityCondition.required,
+        (aff) => aff?.type === AffinityType.Node && aff?.condition === AffinityCondition.Required,
       ),
       affinities?.filter(
-        (aff) => aff?.type === AffinityType.node && aff?.condition === AffinityCondition.preferred,
+        (aff) => aff?.type === AffinityType.Node && aff?.condition === AffinityCondition.Preferred,
       ),
     ],
     [affinities],

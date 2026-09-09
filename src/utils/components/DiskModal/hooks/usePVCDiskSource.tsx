@@ -1,10 +1,13 @@
-/* eslint-disable */
-import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { modelToGroupVersionKind, PersistentVolumeClaimModel } from '@kubevirt-utils/models';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 
-const usePVCDiskSource = (pvcName: string, pvcNamespace: string, clusterFromResource?: string) => {
+const usePVCDiskSource = (
+  pvcName: string,
+  pvcNamespace: string,
+  clusterFromResource?: string,
+): [IoK8sApiCoreV1PersistentVolumeClaim, boolean, Error] => {
   const clusterFromUrl = useClusterParam();
   const cluster = clusterFromResource ?? clusterFromUrl;
 

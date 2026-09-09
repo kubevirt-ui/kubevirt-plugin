@@ -1,9 +1,8 @@
-/* eslint-disable */
-import React, { FC, FormEvent } from 'react';
+import React, { type FC, type FormEvent, type ReactElement } from 'react';
 
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { FormGroup, TextInput, ValidatedOptions } from '@patternfly/react-core';
+import { FormGroup, TextInput, type ValidatedOptions } from '@patternfly/react-core';
 
 type NameInputProps = {
   autoFocus?: boolean;
@@ -13,10 +12,16 @@ type NameInputProps = {
   validated: ValidatedOptions;
 };
 
-const NameInput: FC<NameInputProps> = ({ autoFocus, errorText, name, setName, validated }) => {
+const NameInput: FC<NameInputProps> = ({
+  autoFocus,
+  errorText,
+  name,
+  setName,
+  validated,
+}): ReactElement => {
   const { t } = useKubevirtTranslation();
 
-  const handleChange = (_event: FormEvent<HTMLInputElement>, value: string) => {
+  const handleChange = (_event: FormEvent<HTMLInputElement>, value: string): void => {
     setName(value);
   };
 

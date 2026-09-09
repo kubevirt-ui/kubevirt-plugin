@@ -1,7 +1,9 @@
-/* eslint-disable */
-import { HTMLProps, ReactNode } from 'react';
+import { type HTMLProps, type ReactNode } from 'react';
 
-import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import {
+  type V1VirtualMachine,
+  type V1VirtualMachineInstance,
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 
 export type ConsoleDetailPropType = {
   address: string;
@@ -9,12 +11,12 @@ export type ConsoleDetailPropType = {
   tlsPort?: number | string;
 };
 
-export type onGenerateFunctionType = (
+export type OnGenerateFunctionType = (
   console: ConsoleDetailPropType,
   type: string,
 ) => { content: string; mimeType: string };
 
-export type onDownloadFunctionType = (fileName: string, content: string, mimeType: string) => void;
+export type OnDownloadFunctionType = (fileName: string, content: string, mimeType: string) => void;
 
 export type ConnectWithRemoteViewerProps = HTMLProps<HTMLDivElement> & {
   /** Custom content of more-info section  */
@@ -30,7 +32,7 @@ export type ConnectWithRemoteViewerProps = HTMLProps<HTMLDivElement> & {
    *
    * Parameters: (fileName, content, mimeType) => {}
    */
-  onDownload?: onDownloadFunctionType;
+  onDownload?: OnDownloadFunctionType;
   /** Callback function. Generate content of .vv file.
    * Parameters: ({ _console, type }) => ({
    *     content,  // required string value
@@ -38,7 +40,7 @@ export type ConnectWithRemoteViewerProps = HTMLProps<HTMLDivElement> & {
    *     fileName  // optional, default: console.vv
    *   })
    */
-  onGenerate?: onGenerateFunctionType;
+  onGenerate?: OnGenerateFunctionType;
   /** Connection details for RDP */
   rdp?: ConsoleDetailPropType;
 
@@ -126,7 +128,7 @@ export type RemoteViewerProps = HTMLProps<HTMLDivElement> & {
    *
    * Parameters: (fileName, content, mimeType) => {}
    */
-  onDownload?: onDownloadFunctionType;
+  onDownload?: OnDownloadFunctionType;
   /** Callback function. Generate content of .vv file.
    * Parameters: ({ _console, type }) => ({
    *     content,  // required string value
@@ -134,7 +136,7 @@ export type RemoteViewerProps = HTMLProps<HTMLDivElement> & {
    *     fileName  // optional, default: console.vv
    *   })
    */
-  onGenerate?: onGenerateFunctionType;
+  onGenerate?: OnGenerateFunctionType;
   /** Connection details for RDP */
   rdp?: ConsoleDetailPropType;
 

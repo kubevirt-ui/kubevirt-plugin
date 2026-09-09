@@ -1,7 +1,12 @@
-/* eslint-disable */
-import React, { Dispatch, FC, SetStateAction, useEffect } from 'react';
+import React, {
+  type Dispatch,
+  type FC,
+  type ReactElement,
+  type SetStateAction,
+  useEffect,
+} from 'react';
 
-import { IoK8sApiCoreV1Node } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type IoK8sApiCoreV1Node } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import NodeCheckerAlert from '@kubevirt-utils/components/NodeSelectorModal/components/NodeCheckerAlert';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Content, ContentVariants, Divider, Form } from '@patternfly/react-core';
@@ -9,11 +14,10 @@ import { Content, ContentVariants, Divider, Form } from '@patternfly/react-core'
 import { isTermsInvalid } from '../../../utils/helpers';
 import {
   AffinityCondition,
-  AffinityLabel,
-  AffinityRowData,
+  type AffinityLabel,
+  type AffinityRowData,
   AffinityType,
 } from '../../../utils/types';
-
 import AffinityConditionSelect from './components/AffinityConditionSelect';
 import AffinityTypeSelect from './components/AffinityTypeSelect';
 import ExpressionEditList from './components/ExpressionEditList';
@@ -24,7 +28,7 @@ import PreferredAffinityWeightInput from './components/PreferredAffinityWeightIn
 import TopologyKeyInput from './components/TopologyKeyInput';
 import WorkloadExpressionDescriptionText from './components/WorkloadExpressionDescriptionText';
 
-export type useIDEntitiesValue = {
+export type UseIDEntitiesValue = {
   entities: AffinityLabel[];
   initialEntitiesChanged: boolean;
   onEntityAdd: (newEntity: AffinityLabel) => void;
@@ -34,8 +38,8 @@ export type useIDEntitiesValue = {
 };
 
 type AffinityFormProps = {
-  expressions: useIDEntitiesValue;
-  fields: useIDEntitiesValue;
+  expressions: UseIDEntitiesValue;
+  fields: UseIDEntitiesValue;
   focusedAffinity: AffinityRowData;
   isSubmitDisabled: boolean;
   nodesLoaded: boolean;
@@ -53,10 +57,10 @@ const AffinityForm: FC<AffinityFormProps> = ({
   qualifiedNodes,
   setFocusedAffinity,
   setSubmitDisabled,
-}) => {
+}): ReactElement => {
   const { t } = useKubevirtTranslation();
 
-  const isNodeAffinity = focusedAffinity?.type === AffinityType.node;
+  const isNodeAffinity = focusedAffinity?.type === AffinityType.Node;
 
   useEffect(() => {
     setSubmitDisabled(
@@ -81,7 +85,7 @@ const AffinityForm: FC<AffinityFormProps> = ({
         focusedAffinity={focusedAffinity}
         setFocusedAffinity={setFocusedAffinity}
       />
-      {focusedAffinity?.condition === AffinityCondition.preferred && (
+      {focusedAffinity?.condition === AffinityCondition.Preferred && (
         <PreferredAffinityWeightInput
           focusedAffinity={focusedAffinity}
           setFocusedAffinity={setFocusedAffinity}

@@ -1,11 +1,10 @@
-/* eslint-disable */
 import { getDisplayName, getName, getNamespace } from '@kubevirt-utils/resources/shared';
-import { Template } from '@kubevirt-utils/resources/template';
+import { type Template } from '@kubevirt-utils/resources/template';
 import { getRandomChars } from '@kubevirt-utils/utils/utils';
 
 import { getTemplateBootSourcePVC } from '../utils';
 
-import { CloneTemplateFormValues } from './types';
+import { type CloneTemplateFormValues } from './types';
 
 const getInitialPVCName = (template: Template): string => {
   const pvc = getTemplateBootSourcePVC(template);
@@ -26,7 +25,7 @@ export const getInitialFormValues = (
     sourceProject,
     targetProject: getNamespace(template),
     template,
-    templateDisplayName: getDisplayName(template) || '',
+    templateDisplayName: getDisplayName(template) ?? '',
     templateName: generateTemplateName(template),
     templateProvider: '',
   };

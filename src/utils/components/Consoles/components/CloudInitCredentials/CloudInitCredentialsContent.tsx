@@ -1,7 +1,6 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC, type ReactElement } from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getCloudInitCredentials } from '@kubevirt-utils/resources/vmi';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -13,7 +12,9 @@ type CloudInitCredentialsContentProps = {
   vm: V1VirtualMachine;
 };
 
-const CloudInitCredentialsContent: FC<CloudInitCredentialsContentProps> = ({ vm }) => {
+const CloudInitCredentialsContent: FC<CloudInitCredentialsContentProps> = ({
+  vm,
+}): ReactElement => {
   const { t } = useKubevirtTranslation();
   const { users } = getCloudInitCredentials(vm);
 
@@ -30,13 +31,13 @@ const CloudInitCredentialsContent: FC<CloudInitCredentialsContentProps> = ({ vm 
       {users.map((user) => (
         <Flex className="cloud-init-credentials-user-pass" key={user.name}>
           <CloudInitCredentialsItem
-            credentials={user?.name || ''}
+            credentials={user?.name ?? ''}
             credentialTitle={t('User name')}
             hideCredentialText={t('Hide username')}
             showCredentialText={t('Show username')}
           />
           <CloudInitCredentialsItem
-            credentials={user?.password || ''}
+            credentials={user?.password ?? ''}
             credentialTitle={t('Password')}
             hideCredentialText={t('Hide password')}
             showCredentialText={t('Show password')}

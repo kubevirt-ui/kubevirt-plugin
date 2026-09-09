@@ -1,4 +1,3 @@
-/* eslint-disable */
 import {
   type V1DataVolumeTemplateSpec,
   type V1Disk,
@@ -33,10 +32,9 @@ export const getRunningVMMissingDisksFromVMI = (
   vmi: V1VirtualMachineInstance,
 ): V1Disk[] => {
   const vmDiskNames = vmDisks?.map((disk) => disk?.name);
-  const missingDisksFromVMI = (vmi?.spec?.domain?.devices?.disks ?? [])?.filter(
-    (disk) => !vmDiskNames?.includes(disk?.name),
-  );
-  return missingDisksFromVMI || [];
+  const vmiDisks = (vmi?.spec?.domain?.devices?.disks ?? []) as V1Disk[];
+  const missingDisksFromVMI = vmiDisks?.filter((disk) => !vmDiskNames?.includes(disk?.name));
+  return missingDisksFromVMI ?? [];
 };
 
 export const getRunningVMMissingVolumesFromVMI = (
@@ -47,7 +45,7 @@ export const getRunningVMMissingVolumesFromVMI = (
   const missingVolumesFromVMI = (vmi?.spec?.volumes ?? [])?.filter(
     (vol) => !vmVolumeNames?.includes(vol?.name),
   );
-  return missingVolumesFromVMI || [];
+  return missingVolumesFromVMI ?? [];
 };
 
 export const doesSourceRequireDataVolume = (diskSource: SourceTypes): boolean => {
@@ -98,7 +96,7 @@ export const doesDataVolumeTemplateHaveDisk = (vm: V1VirtualMachine, diskName: s
 };
 
 export const getOS = (vm: V1VirtualMachine): string =>
-  getAnnotation(vm?.spec?.template, ANNOTATIONS.os) || getOperatingSystem(vm);
+  getAnnotation(vm?.spec?.template, ANNOTATIONS.os) ?? getOperatingSystem(vm);
 
 export const getOSNameWithoutVersionNumber = (osName: string): string => {
   const name = osName?.match(/[a-zA-Z]+/g);

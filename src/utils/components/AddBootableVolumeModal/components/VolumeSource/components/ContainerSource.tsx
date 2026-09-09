@@ -1,5 +1,11 @@
-/* eslint-disable */
-import React, { Dispatch, FC, FormEventHandler, SetStateAction } from 'react';
+import React, {
+  type Dispatch,
+  type FC,
+  type FormEvent,
+  type FormEventHandler,
+  type ReactElement,
+  type SetStateAction,
+} from 'react';
 import { useFormContext } from 'react-hook-form';
 
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
@@ -27,18 +33,21 @@ const ContainerSource: FC<ContainerSourceProps> = ({
   selectedSourceType,
   setRegistryCredentials,
   testId,
-}) => {
+}): ReactElement => {
   const { t } = useKubevirtTranslation();
   const form = useFormContext();
-  const errors = form?.formState?.errors || {};
+  const errors = form?.formState?.errors ?? {};
   const register = form?.register;
 
   const validated = errors?.[`${testId}-containerImage`]
     ? ValidatedOptions.error
     : ValidatedOptions.default;
 
-  const handleCredentialsChange = (e, field: 'password' | 'username') => {
-    setRegistryCredentials({ ...registryCredentials, [field]: e.target.value });
+  const handleCredentialsChange = (
+    e: FormEvent<HTMLInputElement>,
+    field: 'password' | 'username',
+  ): void => {
+    setRegistryCredentials({ ...registryCredentials, [field]: e.currentTarget.value });
   };
 
   return (

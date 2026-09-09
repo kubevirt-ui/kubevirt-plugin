@@ -26,13 +26,13 @@ const VCPUInput: FC<VCPUInputProps> = ({ cpu, isDisabled, setCPU }) => {
       min={1}
       onChange={(e: FormEvent<HTMLInputElement>) => {
         const newNumber = +e.currentTarget.value;
-        setCPU(getUpdatedCPU(cpu, newNumber, CPUComponent.sockets));
+        setCPU(getUpdatedCPU(cpu, newNumber, CPUComponent.Sockets));
       }}
       onMinus={() =>
-        handleButtonInput(getUpdatedCPU(cpu, (cpu.sockets ?? 1) - 1, CPUComponent.sockets))
+        handleButtonInput(getUpdatedCPU(cpu, (cpu.sockets ?? 1) - 1, CPUComponent.Sockets))
       }
       onPlus={() =>
-        handleButtonInput(getUpdatedCPU(cpu, (cpu.sockets ?? 1) + 1, CPUComponent.sockets))
+        handleButtonInput(getUpdatedCPU(cpu, (cpu.sockets ?? 1) + 1, CPUComponent.Sockets))
       }
       value={convertTopologyToVCPUs(cpu)}
       widthChars={1}

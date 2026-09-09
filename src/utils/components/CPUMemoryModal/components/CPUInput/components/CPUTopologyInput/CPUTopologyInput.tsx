@@ -28,21 +28,21 @@ const CPUTopologyInput: FC<CPUTopologyInputProps> = ({
     <Grid hasGutter>
       <CPUComponentInput
         cpu={cpu}
-        cpuComponent={CPUComponent.cores}
+        cpuComponent={CPUComponent.Cores}
         cpuLimits={cpuLimits}
         isDisabled={isDisabled}
         setCPU={setCPU}
       />
       <CPUComponentInput
         cpu={cpu}
-        cpuComponent={CPUComponent.sockets}
+        cpuComponent={CPUComponent.Sockets}
         cpuLimits={cpuLimits}
         isDisabled={isDisabled}
         setCPU={setCPU}
       />
       <CPUComponentInput
         cpu={cpu}
-        cpuComponent={CPUComponent.threads}
+        cpuComponent={CPUComponent.Threads}
         cpuLimits={cpuLimits}
         isDisabled={isDisabled}
         setCPU={setCPU}

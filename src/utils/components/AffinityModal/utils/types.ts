@@ -1,19 +1,18 @@
-/* eslint-disable */
-import { MatchExpression } from '@openshift-console/dynamic-plugin-sdk';
+import { type MatchExpression } from '@openshift-console/dynamic-plugin-sdk';
 
 export type IDEntity = {
   id: number;
 };
 
 export enum AffinityType {
-  node = 'nodeAffinity',
-  pod = 'podAffinity',
-  podAnti = 'podAntiAffinity',
+  Node = 'nodeAffinity',
+  Pod = 'podAffinity',
+  PodAnti = 'podAntiAffinity',
 }
 
 export enum AffinityCondition {
-  preferred = 'preferredDuringSchedulingIgnoredDuringExecution',
-  required = 'requiredDuringSchedulingIgnoredDuringExecution',
+  Preferred = 'preferredDuringSchedulingIgnoredDuringExecution',
+  Required = 'requiredDuringSchedulingIgnoredDuringExecution',
 }
 
 export type AffinityLabel = IDEntity & {

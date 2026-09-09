@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC, useCallback } from 'react';
+import React, { type FC, type ReactElement, useCallback } from 'react';
 import produce from 'immer';
 
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
@@ -10,7 +9,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { getAnnotations, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sUpdate } from '@multicluster/k8sRequests';
-import { K8sModel } from '@openshift-console/dynamic-plugin-sdk';
+import { type K8sModel } from '@openshift-console/dynamic-plugin-sdk';
 
 type DescriptionItemDescriptionProps = {
   editable?: boolean;
@@ -22,17 +21,17 @@ const DescriptionItemDescription: FC<DescriptionItemDescriptionProps> = ({
   editable = true,
   model,
   resource,
-}) => {
+}): ReactElement => {
   const { createModal } = useModal();
   const { t } = useKubevirtTranslation();
-  const description = getAnnotations(resource)?.description || <MutedTextSpan text={t('None')} />;
+  const description = getAnnotations(resource)?.description ?? <MutedTextSpan text={t('None')} />;
 
   const updateDescription = useCallback(
-    (updatedDescription: string) => {
+    (updatedDescription: string): Promise<K8sResourceCommon> => {
       const updatedResource = produce<K8sResourceCommon>(
         resource,
         (resourceDraft: K8sResourceCommon) => {
-          if (!resourceDraft.metadata.annotations) resourceDraft.metadata.annotations = {};
+          resourceDraft.metadata.annotations ??= {};
 
           if (updatedDescription) {
             resourceDraft.metadata.annotations.description = updatedDescription;
@@ -55,7 +54,7 @@ const DescriptionItemDescription: FC<DescriptionItemDescriptionProps> = ({
   );
 
   const onEditClick = useCallback(
-    () =>
+    (): void =>
       createModal(({ isOpen, onClose }) => (
         <DescriptionModal
           isOpen={isOpen}

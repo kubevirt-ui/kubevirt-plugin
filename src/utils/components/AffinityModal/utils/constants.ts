@@ -1,13 +1,13 @@
 // import { Operator } from '@openshift-console/dynamic-plugin-sdk';
 
-import { AffinityCondition, AffinityRowData, AffinityType } from './types';
+import { AffinityCondition, type AffinityRowData, AffinityType } from './types';
 
 export const TOPOLOGY_KEY_DEFAULT = 'kubernetes.io/hostname';
 
 export const defaultNewAffinity = {
-  condition: AffinityCondition.required,
+  condition: AffinityCondition.Required,
   expressions: [],
   fields: [],
   topologyKey: TOPOLOGY_KEY_DEFAULT,
-  type: AffinityType.node,
+  type: AffinityType.Node,
 } as AffinityRowData;

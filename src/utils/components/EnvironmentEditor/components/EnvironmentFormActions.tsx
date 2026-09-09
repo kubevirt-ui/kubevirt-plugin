@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC, useState } from 'react';
+import React, { type FC, type ReactElement, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
@@ -17,10 +16,10 @@ import './EnvironmentFormActions.scss';
 
 type EnvironmentFormActionsProps = {
   closeError: () => void;
-  error?: any;
+  error?: Error | undefined;
   isSaveDisabled?: boolean;
   onReload: () => void;
-  onSave: () => void;
+  onSave: () => Promise<unknown>;
 };
 
 const EnvironmentFormActions: FC<EnvironmentFormActionsProps> = ({
@@ -29,26 +28,26 @@ const EnvironmentFormActions: FC<EnvironmentFormActionsProps> = ({
   isSaveDisabled,
   onReload,
   onSave,
-}) => {
+}): ReactElement => {
   const { t } = useKubevirtTranslation();
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [apiError, setApiError] = useState<any>();
+  const [apiError, setApiError] = useState<Error | undefined>();
 
-  const onSubmit = async () => {
+  const onSubmit = async (): Promise<void> => {
     setLoading(true);
     try {
       await onSave();
       setSuccess(true);
       setApiError(undefined);
     } catch (onSaveError) {
-      setApiError(onSaveError);
+      setApiError(onSaveError instanceof Error ? onSaveError : new Error(String(onSaveError)));
     } finally {
       setLoading(false);
     }
   };
 
-  const closeAlert = () => {
+  const closeAlert = (): void => {
     if (apiError) {
       setApiError(undefined);
     } else {
@@ -59,7 +58,7 @@ const EnvironmentFormActions: FC<EnvironmentFormActionsProps> = ({
   return (
     <Stack className="environment-form__buttons">
       <StackItem>
-        {(error || apiError) && (
+        {(error ?? apiError) && (
           <Alert
             actionClose={<AlertActionCloseButton onClose={closeAlert} />}
             className="co-alert--scrollable"
@@ -67,7 +66,7 @@ const EnvironmentFormActions: FC<EnvironmentFormActionsProps> = ({
             title={t('An error occurred')}
             variant={AlertVariant.danger}
           >
-            <div className="co-pre-line">{error?.message || apiError?.message}</div>
+            <div className="co-pre-line">{error?.message ?? apiError?.message}</div>
           </Alert>
         )}
         {success && (

@@ -1,12 +1,17 @@
-/* eslint-disable */
-import React, { Dispatch, FC, MouseEvent, SetStateAction, useState } from 'react';
+import React, {
+  type Dispatch,
+  type FC,
+  type ReactElement,
+  type SetStateAction,
+  useState,
+} from 'react';
 
 import SelectToggle from '@kubevirt-utils/components/toggles/SelectToggle';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FormGroup, SelectList } from '@patternfly/react-core';
 import { Select, SelectOption } from '@patternfly/react-core';
 
-import { AffinityRowData, AffinityType } from '../../../../utils/types';
+import { type AffinityRowData, type AffinityType } from '../../../../utils/types';
 import { AFFINITY_TYPE_LABLES } from '../../../AffinityList/utils/constants';
 
 type AffinityTypeSelectProps = {
@@ -17,17 +22,17 @@ type AffinityTypeSelectProps = {
 const AffinityTypeSelect: FC<AffinityTypeSelectProps> = ({
   focusedAffinity,
   setFocusedAffinity,
-}) => {
+}): ReactElement => {
   const { t } = useKubevirtTranslation();
   const [isOpen, setIsOpen] = useState(false);
 
-  const handleChange = (event: MouseEvent<HTMLSelectElement>, value: AffinityType) => {
+  const handleChange = (event, value: AffinityType): void => {
     event.preventDefault();
     setFocusedAffinity({ ...focusedAffinity, type: value });
     setIsOpen(false);
   };
 
-  const onToggle = () => setIsOpen((prevIsOpen) => !prevIsOpen);
+  const onToggle = (): void => setIsOpen((prevIsOpen) => !prevIsOpen);
   return (
     <FormGroup fieldId="type" isRequired label={t('Type')}>
       <Select

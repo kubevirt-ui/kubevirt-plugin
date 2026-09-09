@@ -1,12 +1,10 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC, type ReactElement } from 'react';
 
 import LabelsList from '@kubevirt-utils/components/NodeSelectorModal/components/LabelList';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Content, ContentVariants, GridItem } from '@patternfly/react-core';
 
-import { AffinityLabel } from '../../../../utils/types';
-
+import { type AffinityLabel } from '../../../../utils/types';
 import AffinityEditRow from './AffinityEditRow';
 
 type AffinityExpressionListProps = {
@@ -14,7 +12,7 @@ type AffinityExpressionListProps = {
   expressions: AffinityLabel[];
   onAdd: () => void;
   onChange: (aff: AffinityLabel) => void;
-  onDelete: (id: any) => void;
+  onDelete: (id: number) => void;
   rowID: string;
 };
 
@@ -25,7 +23,7 @@ const AffinityEditList: FC<AffinityExpressionListProps> = ({
   onChange,
   onDelete,
   rowID,
-}) => {
+}): ReactElement => {
   const { t } = useKubevirtTranslation();
 
   return (

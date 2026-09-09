@@ -1,8 +1,6 @@
-/* eslint-disable */
-/* eslint-disable react-hooks/rules-of-hooks */
-import React, { FC, useLayoutEffect, useRef, useState } from 'react';
+import React, { type FC, type ReactElement, useLayoutEffect, useRef, useState } from 'react';
 
-import { V1Volume } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1Volume } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ResourceYAMLEditor } from '@openshift-console/dynamic-plugin-sdk';
 import { Alert, AlertActionCloseButton, AlertVariant, Divider } from '@patternfly/react-core';
@@ -18,7 +16,10 @@ type CloudInitEditorProps = {
 
 const EDITOR_TOOLS_SPACES = 75;
 
-export const _CloudInitEditor: FC<CloudInitEditorProps> = ({ cloudInitVolume, onSave }) => {
+export const CloudInitEditor: FC<CloudInitEditorProps> = ({
+  cloudInitVolume,
+  onSave,
+}): ReactElement => {
   const { t } = useKubevirtTranslation();
   const cloudInitData = getCloudInitData(cloudInitVolume);
 
@@ -26,7 +27,7 @@ export const _CloudInitEditor: FC<CloudInitEditorProps> = ({ cloudInitVolume, on
   const [saved, setSaved] = useState<boolean>(false);
   const yamlEditorRef = useRef<HTMLDivElement>();
 
-  const onSaveClick = (yaml: string) => {
+  const onSaveClick = (yaml: string): void => {
     onSave(yaml);
     setSaved(true);
   };

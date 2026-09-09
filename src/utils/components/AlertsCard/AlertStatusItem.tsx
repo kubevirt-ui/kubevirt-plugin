@@ -1,8 +1,8 @@
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 import { Link } from 'react-router';
 
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { AlertType, SimplifiedAlert } from '@kubevirt-utils/components/AlertsCard/utils/types';
+import { AlertType, type SimplifiedAlert } from '@kubevirt-utils/components/AlertsCard/utils/types';
 import { alertIcon } from '@kubevirt-utils/components/AlertsCard/utils/utils';
 import Timestamp from '@kubevirt-utils/components/Timestamp/Timestamp';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -20,7 +20,7 @@ const AlertStatusItem: FC<AlertStatusItemProps> = ({ alertDetails, alertType }) 
   const Icon = alertIcon[alertType];
 
   const linkText =
-    alertType === AlertType.critical ? t('View alert') : t('View {{alertType}}', { alertType });
+    alertType === AlertType.Critical ? t('View alert') : t('View {{alertType}}', { alertType });
 
   return (
     <div className="alert-item">

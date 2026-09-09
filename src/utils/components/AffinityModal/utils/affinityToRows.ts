@@ -16,19 +16,19 @@ const getNodeAffinityRows = (nodeAffinity: K8sIoApiCoreV1NodeAffinity): Affinity
   const preferredTerms = nodeAffinity?.preferredDuringSchedulingIgnoredDuringExecution ?? [];
 
   const required = requiredTerms.map(({ matchExpressions, matchFields }, i) => ({
-    condition: AffinityCondition.required,
+    condition: AffinityCondition.Required,
     expressions: setIDsToEntity(matchExpressions),
     fields: setIDsToEntity(matchFields),
     id: `node-required-${i}`,
-    type: AffinityType.node,
+    type: AffinityType.Node,
   }));
 
   const preferred = preferredTerms.map(({ preference, weight }, i) => ({
-    condition: AffinityCondition.preferred,
+    condition: AffinityCondition.Preferred,
     expressions: setIDsToEntity(preference.matchExpressions),
     fields: setIDsToEntity(preference.matchFields),
     id: `node-preferred-${i}`,
-    type: AffinityType.node,
+    type: AffinityType.Node,
     weight,
   }));
 
@@ -43,21 +43,21 @@ const getPodLikeAffinityRows = (
   const preferredTerms = podLikeAffinity?.preferredDuringSchedulingIgnoredDuringExecution ?? [];
 
   const required = requiredTerms?.map((podAffinityTerm, i) => ({
-    condition: AffinityCondition.required,
+    condition: AffinityCondition.Required,
     expressions: setIDsToEntity(podAffinityTerm?.labelSelector?.matchExpressions),
     id: isAnti ? `pod-anti-required-${i}` : `pod-required-${i}`,
     namespaces: podAffinityTerm?.namespaces,
     topologyKey: podAffinityTerm?.topologyKey,
-    type: isAnti ? AffinityType.podAnti : AffinityType.pod,
+    type: isAnti ? AffinityType.PodAnti : AffinityType.Pod,
   }));
 
   const preferred = preferredTerms?.map(({ podAffinityTerm, weight }, i) => ({
-    condition: AffinityCondition.preferred,
+    condition: AffinityCondition.Preferred,
     expressions: setIDsToEntity(podAffinityTerm?.labelSelector?.matchExpressions),
     id: isAnti ? `pod-anti-preferred-${i}` : `pod-preferred-${i}`,
     namespaces: podAffinityTerm?.namespaces,
     topologyKey: podAffinityTerm?.topologyKey,
-    type: isAnti ? AffinityType.podAnti : AffinityType.pod,
+    type: isAnti ? AffinityType.PodAnti : AffinityType.Pod,
     weight,
   }));
 

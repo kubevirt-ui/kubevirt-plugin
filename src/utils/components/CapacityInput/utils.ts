@@ -1,11 +1,10 @@
-/* eslint-disable */
-import { TFunction } from 'i18next';
+import { type TFunction } from 'i18next';
 
 import {
   BinaryUnit,
   binaryUnitsOrdered,
   decimalUnitsOrdered,
-  QuantityUnit,
+  type QuantityUnit,
 } from '@kubevirt-utils/utils/unitConstants';
 import {
   extractNumberFromQuantityString,
@@ -21,10 +20,10 @@ export enum CAPACITY_UNITS {
 
 export const capacityUnitsOrdered = [CAPACITY_UNITS.MiB, CAPACITY_UNITS.GiB, CAPACITY_UNITS.TiB];
 
-export const getUnitOptions = (unit: QuantityUnit) => {
-  const defaultMinIndex = binaryUnitsOrdered.indexOf(BinaryUnit.Mi);
-  const defaultMaxIndex = binaryUnitsOrdered.indexOf(BinaryUnit.Ti);
-  const unitIndex = isBinaryUnit(unit)
+export const getUnitOptions = (unit: QuantityUnit): QuantityUnit[] => {
+  const defaultMinIndex: number = binaryUnitsOrdered.indexOf(BinaryUnit.Mi);
+  const defaultMaxIndex: number = binaryUnitsOrdered.indexOf(BinaryUnit.Ti);
+  const unitIndex: number = isBinaryUnit(unit)
     ? binaryUnitsOrdered.indexOf(unit)
     : decimalUnitsOrdered.indexOf(unit);
 
@@ -41,7 +40,7 @@ export const getUnitOptions = (unit: QuantityUnit) => {
   return options;
 };
 
-export const getErrorValue = (t: TFunction, value: number) => {
+export const getErrorValue = (t: TFunction, value: number): string => {
   if (value > 0) {
     return t('less than');
   }

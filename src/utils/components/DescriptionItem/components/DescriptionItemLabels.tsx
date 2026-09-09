@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC, ReactNode } from 'react';
+import React, { type FC, type ReactElement, type ReactNode } from 'react';
 
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { LabelsModal } from '@kubevirt-utils/components/LabelsModal/LabelsModal';
@@ -11,7 +10,7 @@ import { getLabels, getName } from '@kubevirt-utils/resources/shared';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
-import { K8sModel } from '@openshift-console/dynamic-plugin-sdk';
+import { type K8sModel } from '@openshift-console/dynamic-plugin-sdk';
 
 type DescriptionItemLabelsProps = {
   className?: string;
@@ -19,7 +18,7 @@ type DescriptionItemLabelsProps = {
   editable?: boolean;
   label?: string;
   model: K8sModel;
-  onLabelsSubmit?: (labels: { [key: string]: string }) => Promise<any>;
+  onLabelsSubmit?: (labels: { [key: string]: string }) => Promise<K8sResourceCommon | void>;
   resource: K8sResourceCommon;
 };
 
@@ -31,11 +30,11 @@ const DescriptionItemLabels: FC<DescriptionItemLabelsProps> = ({
   model,
   onLabelsSubmit,
   resource,
-}) => {
+}): ReactElement => {
   const { createModal } = useModal();
   const { t } = useKubevirtTranslation();
 
-  const onLabelsSubmitInternal = (labels: { [key: string]: string }) =>
+  const onLabelsSubmitInternal = (labels: { [key: string]: string }): Promise<K8sResourceCommon> =>
     kubevirtK8sPatch({
       cluster: getCluster(resource),
       data: [
@@ -49,7 +48,7 @@ const DescriptionItemLabels: FC<DescriptionItemLabelsProps> = ({
       resource,
     });
 
-  const onEditClick = () =>
+  const onEditClick = (): void =>
     createModal(({ isOpen, onClose }) => (
       <LabelsModal
         isOpen={isOpen}

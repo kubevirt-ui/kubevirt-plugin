@@ -1,8 +1,7 @@
-/* eslint-disable */
-import React, { FC, JSX, useMemo } from 'react';
+import React, { type FC, type ReactElement, useMemo } from 'react';
 
 import Dropdown, {
-  DropdownConfig,
+  type DropdownConfig,
 } from '@kubevirt-utils/components/ClusterProjectDropdown/Dropdown/Dropdown';
 import { ALL_CLUSTERS, ALL_CLUSTERS_KEY } from '@kubevirt-utils/hooks/constants';
 import useConsoleClusterBookmarks from '@kubevirt-utils/hooks/useConsoleClusterBookmarks/useConsoleClusterBookmarks';
@@ -31,17 +30,17 @@ const ClusterDropdown: FC<ClusterDropdownProps> = ({
   omittedClusters,
   onChange,
   selectedCluster,
-}): JSX.Element => {
+}): ReactElement => {
   const { t } = useKubevirtTranslation();
   const [clusterNames, clustersLoaded] = useFleetClusterNames();
   const [bookmarks, updateBookmarks, bookmarksLoaded] = useConsoleClusterBookmarks(bookmarkCluster);
 
-  const isItemDisabled = useMemo(() => {
+  const isItemDisabled = useMemo((): ((key: string) => boolean) | undefined => {
     if (!disabledClusters || disabledClusters.length === 0) {
       return undefined;
     }
     const disabledSet = new Set(disabledClusters);
-    return (key: string) => disabledSet.has(key);
+    return (key: string): boolean => disabledSet.has(key);
   }, [disabledClusters]);
 
   const config: DropdownConfig = useMemo(
@@ -57,7 +56,7 @@ const ClusterDropdown: FC<ClusterDropdownProps> = ({
     [t],
   );
 
-  const effectiveOmittedClusters = useMemo(() => {
+  const effectiveOmittedClusters = useMemo((): string[] | undefined => {
     if (includeAllClusters) {
       return omittedClusters;
     }
@@ -69,7 +68,7 @@ const ClusterDropdown: FC<ClusterDropdownProps> = ({
 
   const bookmarksProp = useMemo(
     () => ({
-      bookmarks: bookmarks || {},
+      bookmarks: bookmarks ?? {},
       bookmarksLoaded,
       updateBookmarks: updateBookmarks ?? null,
     }),
@@ -86,7 +85,7 @@ const ClusterDropdown: FC<ClusterDropdownProps> = ({
       extractTitle={identity}
       includeAllItems={includeAllClusters}
       isItemDisabled={isItemDisabled}
-      items={clusterNames || null}
+      items={clusterNames ?? null}
       itemsLoaded={clustersLoaded}
       omittedItems={effectiveOmittedClusters}
       onChange={onChange}

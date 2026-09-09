@@ -1,5 +1,4 @@
-/* eslint-disable */
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 
 import {
   convertYAMLUserDataObject,
@@ -7,10 +6,10 @@ import {
 } from '../CloudinitModal/utils/cloudinit-utils';
 import { cmdIsSSHInjection } from '../SSHSecretModal/utils/utils';
 
-export const hasDynamicSSHInjectionCommand = (vm: V1VirtualMachine) => {
+export const hasDynamicSSHInjectionCommand = (vm: V1VirtualMachine): boolean => {
   const cloudInitVolume = getCloudInitVolume(vm);
   const userData = convertYAMLUserDataObject(
-    cloudInitVolume?.cloudInitNoCloud?.userData || cloudInitVolume?.cloudInitConfigDrive?.userData,
+    cloudInitVolume?.cloudInitNoCloud?.userData ?? cloudInitVolume?.cloudInitConfigDrive?.userData,
   );
 
   return !!userData.runcmd?.find(cmdIsSSHInjection);

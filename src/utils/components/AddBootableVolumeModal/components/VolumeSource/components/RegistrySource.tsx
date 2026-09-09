@@ -1,28 +1,30 @@
-/* eslint-disable */
-import React, { ChangeEvent, FC } from 'react';
+import React, { type ChangeEvent, type FC, type ReactElement } from 'react';
 
 import ContainerSource from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeSource/components/ContainerSource';
 import { formatRegistryURL } from '@kubevirt-utils/components/AddBootableVolumeModal/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { removeAllWhitespace } from '@kubevirt-utils/utils/utils';
 
-import { AddBootableVolumeState, SetBootableVolumeFieldType } from '../../../types';
+import { type AddBootableVolumeState, type SetBootableVolumeFieldType } from '../../../types';
 
 type RegistrySourceProps = {
   bootableVolume: AddBootableVolumeState;
   setBootableVolumeField: SetBootableVolumeFieldType;
 };
 
-const RegistrySource: FC<RegistrySourceProps> = ({ bootableVolume, setBootableVolumeField }) => {
+const RegistrySource: FC<RegistrySourceProps> = ({
+  bootableVolume,
+  setBootableVolumeField,
+}): ReactElement => {
   const { t } = useKubevirtTranslation();
   const { registryCredentials = { password: '', username: '' }, registryURL = '' } = bootableVolume;
 
-  const handleInputValueChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleInputValueChange = (e: ChangeEvent<HTMLInputElement>): void => {
     const trimmedValue = removeAllWhitespace(e.target.value);
     setBootableVolumeField('registryURL')(formatRegistryURL(trimmedValue));
   };
 
-  const handleCredentialsChange = (updatedCreds: { password: string; username: string }) => {
+  const handleCredentialsChange = (updatedCreds: { password: string; username: string }): void => {
     setBootableVolumeField('registryCredentials')(updatedCreds);
   };
 
