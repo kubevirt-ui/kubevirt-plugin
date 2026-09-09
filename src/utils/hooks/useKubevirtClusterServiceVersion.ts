@@ -4,9 +4,9 @@ import { SubscriptionModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api
 import { KUBEVIRT_HYPERCONVERGED } from '@kubevirt-utils/constants/constants';
 import { ClusterServiceVersionModelGroupVersionKind } from '@kubevirt-utils/models';
 import { operatorNamespaceSignal } from '@kubevirt-utils/store/operatorNamespace';
+import { type ClusterServiceVersionKind, type SubscriptionKind } from '@kubevirt-utils/types/olm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
-import { ClusterServiceVersionKind, SubscriptionKind } from '@overview/utils/types';
 
 type UseKubevirtClusterServiceVersion = (cluster?: string) => {
   installedCSV: ClusterServiceVersionKind;

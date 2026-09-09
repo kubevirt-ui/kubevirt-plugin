@@ -4,7 +4,7 @@ import React, { FC } from 'react';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { SubscriptionKind } from '@overview/utils/types';
+import { SubscriptionKind } from '@kubevirt-utils/types/olm';
 import {
   Alert,
   AlertVariant,

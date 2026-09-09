@@ -17,7 +17,7 @@ import {
   OperatorGroupKind,
   PackageManifestKind,
   SubscriptionKind,
-} from '@overview/utils/types';
+} from '@kubevirt-utils/types/olm';
 
 import { CONSOLE_OPERATOR_CONFIG_NAME } from '../constants';
 import { isRedHatCatalogSource } from './constants';

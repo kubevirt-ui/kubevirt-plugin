@@ -9,7 +9,7 @@ import {
   type V1alpha1VirtualMachineTemplateRequest,
   type V1beta1VirtualMachineTemplate,
 } from '@kubevirt-ui-ext/kubevirt-api/virt-template';
-import { type ObjectMetadata } from '@openshift-console/dynamic-plugin-sdk';
+import { type K8sResourceCommon, type ObjectMetadata } from '@openshift-console/dynamic-plugin-sdk';
 
 export type Template = V1beta1VirtualMachineTemplate | V1Template;
 
@@ -42,3 +42,7 @@ export const isVirtualMachineTemplateRequest = (
 
 export const isOpenShiftTemplate = (obj: TemplateOrRequest): obj is V1Template =>
   obj?.kind === TemplateModel.kind;
+
+export type TemplateList = K8sResourceCommon & {
+  items: V1Template[];
+};

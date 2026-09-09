@@ -1,0 +1,254 @@
+/* eslint-disable */
+import { type V1Condition } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type K8sResourceCommon, type Selector } from '@openshift-console/dynamic-plugin-sdk';
+
+type Descriptor<T = any> = {
+  description: string;
+  displayName: string;
+  path: string;
+  value?: any;
+  'x-descriptors'?: T[];
+};
+
+export type CRDDescription = {
+  description?: string;
+  displayName: string;
+  kind: string;
+  name: string;
+  resources?: {
+    kind: string;
+    name?: string;
+    version: string;
+  }[];
+  specDescriptors?: Descriptor[];
+  statusDescriptors?: Descriptor[];
+  version: string;
+};
+
+export type APIServiceDefinition = {
+  containerPort: number;
+  deploymentName: string;
+  description?: string;
+  displayName: string;
+  group: string;
+  kind: string;
+  name: string;
+  resources?: {
+    kind: string;
+    name?: string;
+    version: string;
+  }[];
+  specDescriptors?: Descriptor[];
+  statusDescriptors?: Descriptor[];
+  version: string;
+};
+
+export enum InstallModeType {
+  InstallModeTypeAllNamespaces = 'AllNamespaces',
+  InstallModeTypeMultiNamespace = 'MultiNamespace',
+  InstallModeTypeOwnNamespace = 'OwnNamespace',
+  InstallModeTypeSingleNamespace = 'SingleNamespace',
+}
+
+export type ClusterServiceVersionIcon = { base64data: string; mediatype: string };
+
+export enum ClusterServiceVersionPhase {
+  CSVPhaseDeleting = 'Deleting',
+  CSVPhaseFailed = 'Failed',
+  CSVPhaseInstalling = 'Installing',
+  CSVPhaseInstallReady = 'InstallReady',
+  CSVPhaseNone = '',
+  CSVPhasePending = 'Pending',
+  CSVPhaseReplacing = 'Replacing',
+  CSVPhaseSucceeded = 'Succeeded',
+  CSVPhaseUnknown = 'Unknown',
+}
+
+export enum CSVConditionReason {
+  CSVReasonBeingReplaced = 'BeingReplaced',
+  CSVReasonComponentFailed = 'InstallComponentFailed',
+  CSVReasonComponentUnhealthy = 'ComponentUnhealthy',
+  CSVReasonCopied = 'Copied',
+  CSVReasonInstallCheckFailed = 'InstallCheckFailed',
+  CSVReasonInstallSuccessful = 'InstallSucceeded',
+  CSVReasonInvalidStrategy = 'InvalidInstallStrategy',
+  CSVReasonOwnerConflict = 'OwnerConflict',
+  CSVReasonReplaced = 'Replaced',
+  CSVReasonRequirementsMet = 'AllRequirementsMet',
+  CSVReasonRequirementsNotMet = 'RequirementsNotMet',
+  CSVReasonRequirementsUnknown = 'RequirementsUnknown',
+  CSVReasonWaiting = 'InstallWaiting',
+}
+
+export type RequirementStatus = {
+  group: string;
+  kind: string;
+  name: string;
+  status: string;
+  uuid?: string;
+  version: string;
+};
+
+export type K8sResourceKind = K8sResourceCommon & {
+  data?: { [key: string]: any };
+  spec?: {
+    [key: string]: any;
+  };
+  status?: { [key: string]: any };
+};
+
+export type ClusterServiceVersionKind = {
+  apiVersion: 'operators.coreos.com/v1alpha1';
+  kind: 'ClusterServiceVersion';
+  spec: {
+    apiservicedefinitions?: { owned?: APIServiceDefinition[]; required?: APIServiceDefinition[] };
+    customresourcedefinitions?: { owned?: CRDDescription[]; required?: CRDDescription[] };
+    description?: string;
+    displayName?: string;
+    icon?: ClusterServiceVersionIcon[];
+    install: {
+      spec: {
+        deployments: { name: string; spec: any }[];
+        permissions: {
+          rules: { apiGroups: string[]; resources: string[]; verbs: string[] }[];
+          serviceAccountName: string;
+        }[];
+      };
+      strategy: 'Deployment';
+    };
+    installModes: { supported: boolean; type: InstallModeType }[];
+    provider?: { name: string };
+    relatedImages: { image: string; name: string }[];
+    replaces?: string;
+    version?: string;
+  };
+  status?: {
+    phase: ClusterServiceVersionPhase;
+    reason: CSVConditionReason;
+    requirementStatus?: RequirementStatus[];
+  };
+} & K8sResourceKind;
+
+export enum InstallPlanApproval {
+  Automatic = 'Automatic',
+  Manual = 'Manual',
+}
+
+type ObjectReference = {
+  apiVersion?: string;
+  fieldPath?: string;
+  kind?: string;
+  name?: string;
+  namespace?: string;
+  resourceVersion?: string;
+  uid?: string;
+};
+
+export enum SubscriptionState {
+  SubscriptionStateAtLatest = 'AtLatestKnown',
+  SubscriptionStateFailed = 'UpgradeFailed',
+  SubscriptionStateNone = '',
+  SubscriptionStateUpgradeAvailable = 'UpgradeAvailable',
+  SubscriptionStateUpgradePending = 'UpgradePending',
+}
+
+export type SubscriptionKind = {
+  apiVersion: 'operators.coreos.com/v1alpha1';
+  kind: 'Subscription';
+  spec: {
+    channel?: string;
+    installPlanApproval?: InstallPlanApproval;
+    name: string;
+    source: string;
+    sourceNamespace?: string;
+    startingCSV?: string;
+  };
+  status?: {
+    catalogHealth?: {
+      catalogSourceRef?: ObjectReference;
+      healthy?: boolean;
+      lastUpdated?: string;
+    }[];
+    conditions?: V1Condition[];
+    currentCSV?: string;
+    installedCSV?: string;
+    installPlanRef?: ObjectReference;
+    lastUpdated?: string;
+    state?: SubscriptionState;
+  };
+} & K8sResourceCommon;
+
+export type CatalogSourceKind = {
+  apiVersion: 'operators.coreos.com/v1alpha1';
+  kind: 'CatalogSource';
+  spec: {
+    configMap?: string;
+    description?: string;
+    displayName?: string;
+    icon?: { data: string; mediatype: string };
+    name: string;
+    publisher?: string;
+    secrets?: string[];
+    sourceType: 'configMap' | 'grpc' | 'internal';
+    updateStrategy?: { registryPoll: { interval: string } };
+  };
+} & K8sResourceKind;
+
+export type PackageManifestKind = {
+  apiVersion: 'packages.operators.coreos.com/v1';
+  kind: 'PackageManifest';
+  spec: any;
+  status: {
+    catalogSource: string;
+    catalogSourceDisplayName: string;
+    catalogSourceNamespace: string;
+    catalogSourcePublisher: string;
+    channels: {
+      currentCSV: string;
+      currentCSVDesc: {
+        annotations?: any;
+        apiservicedefinitions?: {
+          owned?: APIServiceDefinition[];
+          required?: APIServiceDefinition[];
+        };
+        customresourcedefinitions?: { owned?: CRDDescription[]; required?: CRDDescription[] };
+        description?: string;
+        displayName: string;
+        icon: { base64data: string; mediatype: string }[];
+        installModes: { supported: boolean; type: InstallModeType }[];
+        keywords?: string[];
+        provider: {
+          name: string;
+        };
+        version: string;
+      };
+      deprecation?: { message: string };
+      entries?: {
+        deprecation?: { message: string };
+        name: string;
+        version: string;
+      }[];
+      name: string;
+    }[];
+    defaultChannel: string;
+    deprecation?: { message: string };
+    packageName: string;
+    provider: {
+      name: string;
+    };
+  };
+} & K8sResourceKind;
+
+export type OperatorGroupKind = {
+  apiVersion: 'operators.coreos.com/v1';
+  kind: 'OperatorGroup';
+  spec?: {
+    selector?: Selector;
+    serviceAccount?: K8sResourceKind;
+    targetNamespaces?: string[];
+  };
+  status?: {
+    lastUpdated: string;
+    namespaces?: string[];
+  };
+} & K8sResourceKind;

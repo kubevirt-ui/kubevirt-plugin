@@ -1,8 +1,8 @@
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import useResourcesQuantities from '@overview/OverviewTab/resources-inventory-card/hooks/useResourcesQuantities';
 
+import useResourcesQuantities from '../../hooks/useResourcesQuantities';
 import ResourceTile from './ResourceTile';
 
 import './ClusterResourcesCard.scss';

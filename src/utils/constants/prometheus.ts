@@ -1,6 +1,6 @@
 /* eslint-disable */
 import { PERSPECTIVES } from '@kubevirt-utils/constants/constants';
-import { AlertResource } from '@overview/OverviewTab/status-card/utils/utils';
+import { AlertResource } from '@kubevirt-utils/components/HealthState/utils';
 
 export const MONITORING_SALT = 'monitoring-salt';
 export const OPERATOR_LABEL_KEY = 'kubernetes_operator_part_of';

@@ -4,7 +4,7 @@ import React, { FC, useMemo } from 'react';
 import useInfrastructureAlerts from '@kubevirt-utils/hooks/useInfrastructureAlerts/useInfrastructureAlerts';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { HealthState } from '@openshift-console/dynamic-plugin-sdk';
-import { healthStateMapping } from '@overview/OverviewTab/status-card/utils/utils';
+import { healthStateMapping } from '@kubevirt-utils/components/HealthState/utils';
 import { Card, CardBody, CardHeader, CardTitle, Skeleton } from '@patternfly/react-core';
 
 import { useKubeVirtOverviewClusterCsv } from '../../context/KubeVirtOverviewClusterCsvContext';

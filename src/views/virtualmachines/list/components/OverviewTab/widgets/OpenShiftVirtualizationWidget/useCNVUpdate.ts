@@ -2,9 +2,9 @@ import { useMemo } from 'react';
 
 import { ClusterServiceVersionModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { useKubevirtClusterServiceVersion } from '@kubevirt-utils/hooks/useKubevirtClusterServiceVersion';
+import { buildUrlForCSVSubscription } from '@kubevirt-utils/utils/url';
 import { FLEET_BASE_PATH } from '@multicluster/constants';
 import useManagedClusterConsoleURLs from '@multicluster/hooks/useManagedClusterConsoleURLs';
-import { buildUrlForCSVSubscription } from '@overview/utils/utils';
 import { useHubClusterName } from '@stolostron/multicluster-sdk';
 
 import { isUpdateAvailable } from './utils';
@@ -47,13 +47,7 @@ export const useCNVUpdate = (cluster?: string, isAllClustersPage = false): UseCN
       operatorLink: link,
       operatorLinkExternal: spokeConsoleURL ? `${spokeConsoleURL}${path}` : undefined,
     };
-  }, [
-    cluster,
-    hubClusterName,
-    getConsoleURL,
-    installedCSV?.metadata?.name,
-    subscription?.metadata?.namespace,
-  ]);
+  }, [cluster, hubClusterName, getConsoleURL, installedCSV, subscription]);
 
   return { isSpokeCluster, operatorLink, operatorLinkExternal, updateAvailable };
 };

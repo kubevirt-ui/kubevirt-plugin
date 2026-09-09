@@ -1,12 +1,12 @@
 import xbytes from 'xbytes';
 
+import { type ChartPoint } from '@kubevirt-utils/components/Charts/MetricChartUtils/hooks/types';
 import DurationOption from '@kubevirt-utils/components/DurationOption/DurationOption';
 import {
   dateFormatterNoYear,
   timeFormatter,
 } from '@kubevirt-utils/components/Timestamp/utils/datetime';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { type ChartPoint } from '@overview/OverviewTab/metric-charts-card/utils/hooks/types';
 
 export const SINGLE_VM_DURATION = 'SINGLE_VM_DURATION';
 export const TICKS_COUNT = 100;

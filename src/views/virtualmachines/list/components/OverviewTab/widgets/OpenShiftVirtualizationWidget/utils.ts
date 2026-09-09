@@ -1,8 +1,8 @@
 import { type TFunction } from 'i18next';
 
 import { HCOHealthStatus } from '@kubevirt-utils/extensions/dashboard/types';
+import { type SubscriptionKind, SubscriptionState } from '@kubevirt-utils/types/olm';
 import { HealthState, type PrometheusResult } from '@openshift-console/dynamic-plugin-sdk';
-import { type SubscriptionKind, SubscriptionState } from '@overview/utils/types';
 
 const hcoValueToHealthState: Record<number, HealthState> = {
   [HCOHealthStatus.critical]: HealthState.ERROR,

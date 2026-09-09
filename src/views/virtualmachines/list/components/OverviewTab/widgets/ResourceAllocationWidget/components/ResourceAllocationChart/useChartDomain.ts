@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 
-import { type ChartDomain } from '@overview/OverviewTab/metric-charts-card/utils/hooks/types';
-import { type MetricChartData } from '@overview/OverviewTab/metric-charts-card/utils/hooks/useMetricChartData';
+import { type ChartDomain } from '@kubevirt-utils/components/Charts/MetricChartUtils/hooks/types';
+import { type MetricChartData } from '@kubevirt-utils/components/Charts/MetricChartUtils/hooks/useMetricChartData';
 import t_chart_theme_colorscales_gray_colorscale_100 from '@patternfly/react-tokens/dist/esm/t_chart_theme_colorscales_gray_colorscale_100';
 import t_chart_theme_colorscales_orange_colorscale_400 from '@patternfly/react-tokens/dist/esm/t_chart_theme_colorscales_orange_colorscale_400';
 

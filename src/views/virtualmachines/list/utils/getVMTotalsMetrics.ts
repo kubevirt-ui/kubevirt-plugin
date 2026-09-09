@@ -2,7 +2,7 @@ import {
   type V1VirtualMachine,
   type V1VirtualMachineInstance,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { METRICS } from '@overview/OverviewTab/metric-charts-card/utils/constants';
+import { METRICS } from '@kubevirt-utils/components/Charts/MetricChartUtils/constants';
 
 import { getVMMetrics, Metric } from '../metrics';
 

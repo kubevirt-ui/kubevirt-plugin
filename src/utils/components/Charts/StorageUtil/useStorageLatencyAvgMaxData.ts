@@ -1,8 +1,8 @@
 import { type V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type ChartPoint } from '@kubevirt-utils/components/Charts/MetricChartUtils/hooks/types';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { PrometheusEndpoint, type PrometheusValue } from '@openshift-console/dynamic-plugin-sdk';
-import { type ChartPoint } from '@overview/OverviewTab/metric-charts-card/utils/hooks/types';
 import { chart_color_orange_300 } from '@patternfly/react-tokens';
 import chart_color_blue_300 from '@patternfly/react-tokens/dist/esm/chart_color_blue_300';
 import { useFleetPrometheusPoll } from '@stolostron/multicluster-sdk';

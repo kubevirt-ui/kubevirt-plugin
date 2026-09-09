@@ -9,11 +9,11 @@ import { FLAG_KUBEVIRT_VIRTUALIZATION_NAV } from './src/utils/flags/consts';
 import { extensions as BootableVolumesExtensions } from './src/views/bootablevolumes/extensions';
 import { extensions as CDIUploadProviderExtensions } from './src/views/cdi-upload-provider/extensions';
 import { extensions as CheckupsExtensions } from './src/views/checkups/extensions';
-import { extensions as ClusterOverviewExtensions } from './src/views/clusteroverview/extensions';
 import { extensions as dashboardExtensionsExtensions } from './src/views/dashboard-extensions/extensions';
 import { extensions as DataSourcesExtensions } from './src/views/datasources/extensions';
 import { extensions as InstanceTypesExtensions } from './src/views/instancetypes/extensions';
 import { extensions as MigrationPoliciesExtensions } from './src/views/migrationpolicies/extensions';
+import { extensions as MigrationsExtensions } from './src/views/migrations/extensions';
 import { extensions as VirtualizationSectionExtensions } from './src/views/navigation/virtualizationSection';
 import { extensions as PreferencesExtensions } from './src/views/preferences/extensions';
 import { extensions as QuotasExtensions } from './src/views/quotas/extensions';
@@ -23,8 +23,8 @@ import { extensions as StorageMigrationExtensions } from './src/views/storagemig
 import { extensions as TemplatesExtensions } from './src/views/templates/extensions';
 import { extensions as TopologyExtensions } from './src/views/topology/extensions';
 import { extensions as VirtualMachineInstanceMigrationsExtensions } from './src/views/virtualmachineinstancemigrations/extensions';
-import { extensions as VMWizardExtensions } from './src/views/virtualmachines/wizard/extensions';
 import { extensions as VirtualMachinesExtensions } from './src/views/virtualmachines/extensions';
+import { extensions as VMWizardExtensions } from './src/views/virtualmachines/wizard/extensions';
 import { extensions as VirtualMachinesInstanceExtensions } from './src/views/virtualmachinesinstance/extensions';
 import { extensions as VMNetworksExtensions } from './src/views/vmnetworks/extensions';
 
@@ -39,7 +39,7 @@ const extensions: EncodedExtension[] = [
   ...VirtualMachineInstanceMigrationsExtensions,
   ...StorageClassExtensions,
   ...StorageMigrationExtensions,
-  ...ClusterOverviewExtensions,
+  ...MigrationsExtensions,
   ...VirtualMachinesExtensions,
   ...TemplatesExtensions,
   ...BootableVolumesExtensions,

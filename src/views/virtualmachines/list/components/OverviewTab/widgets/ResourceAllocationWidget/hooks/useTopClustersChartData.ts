@@ -1,18 +1,18 @@
 import { useMemo, useState } from 'react';
 
-import DurationOption from '@kubevirt-utils/components/DurationOption/DurationOption';
-import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { PrometheusEndpoint } from '@openshift-console/dynamic-plugin-sdk';
-import { type ChartDomain } from '@overview/OverviewTab/metric-charts-card/utils/hooks/types';
+import { type ChartDomain } from '@kubevirt-utils/components/Charts/MetricChartUtils/hooks/types';
 import {
   findUnit,
   formatLargestValue,
   getLargestValue,
-} from '@overview/OverviewTab/metric-charts-card/utils/hooks/utils';
+} from '@kubevirt-utils/components/Charts/MetricChartUtils/hooks/utils';
 import {
   getFilteredPerClusterQuery,
   getTopClusterRankingQuery,
-} from '@overview/OverviewTab/metric-charts-card/utils/metricQueries';
+} from '@kubevirt-utils/components/Charts/MetricChartUtils/metricQueries';
+import DurationOption from '@kubevirt-utils/components/DurationOption/DurationOption';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { PrometheusEndpoint } from '@openshift-console/dynamic-plugin-sdk';
 import { useFleetPrometheusPoll } from '@stolostron/multicluster-sdk';
 
 import { TOP_N } from '../../ClusterStatusWidget/hooks/clusterMetricConstants';

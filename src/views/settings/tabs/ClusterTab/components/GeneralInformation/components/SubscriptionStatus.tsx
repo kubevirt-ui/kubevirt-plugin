@@ -1,7 +1,7 @@
 /* eslint-disable */
 import React, { FC } from 'react';
 
-import { SubscriptionKind, SubscriptionState } from '@overview/utils/types';
+import { SubscriptionKind, SubscriptionState } from '@kubevirt-utils/types/olm';
 
 import SubscriptionStateAtLatest from './SubscriptionStates/SubscriptionStateAtLatest';
 import SubscriptionStateDefault from './SubscriptionStates/SubscriptionStateDefault';

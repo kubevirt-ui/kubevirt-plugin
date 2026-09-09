@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { getVMStatuses } from '@overview/OverviewTab/vm-statuses-card/utils/utils';
+import { getVMStatuses } from '@kubevirt-utils/resources/vm/vmStatuses/utils/utils';
 import { render, screen } from '@testing-library/react';
 import {
   createNode,
@@ -39,7 +39,7 @@ jest.mock('@kubevirt-utils/resources/vmi', () => ({
     vmi?.status?.nodeName,
 }));
 
-jest.mock('@overview/OverviewTab/vm-statuses-card/utils/utils', () => {
+jest.mock('@kubevirt-utils/resources/vm/vmStatuses/utils/utils', () => {
   const mockErrorIcon = (): React.ReactElement => <span data-test-id="error-icon" />;
   const mockRunningIcon = (): React.ReactElement => <span data-test-id="running-icon" />;
   const mockStoppedIcon = (): React.ReactElement => <span data-test-id="stopped-icon" />;
