@@ -1,6 +1,6 @@
 import BaseComponent from '@/components/shared/base-component';
 import { TestTimeouts } from '@/utils/test-config';
-import type { Page } from '@playwright/test';
+import type { Locator, Page } from '@playwright/test';
 
 export default class VmWizardNavigationComponent extends BaseComponent {
   private readonly _buttonEditVMCreationLocation = this.locator(
@@ -25,6 +25,9 @@ export default class VmWizardNavigationComponent extends BaseComponent {
   private readonly _wizardFooterCreateButton = this.page
     .getByTestId('wizard-create-button')
     .filter({ hasText: 'Create VirtualMachine' });
+  private readonly _wizardFooterCloneButton = this.page
+    .getByTestId('wizard-create-button')
+    .filter({ hasText: 'Clone VirtualMachine' });
   private readonly _wizardFooterNextButton = this.page
     .getByTestId('wizard-next-button')
     .filter({ hasText: 'Next' });
@@ -102,6 +105,10 @@ export default class VmWizardNavigationComponent extends BaseComponent {
   async clickCreateVm(): Promise<void> {
     await this.collapseSidebarIfExpanded();
     const createBtn = this._wizardFooterCreateButton;
+    await this.clickCreateVMButton(createBtn);
+  }
+
+  async clickCreateVMButton(createBtn: Locator): Promise<void> {
     await createBtn.waitFor({
       state: 'visible',
       timeout: TestTimeouts.SHORT_WAIT,
@@ -117,6 +124,22 @@ export default class VmWizardNavigationComponent extends BaseComponent {
 
     await this.robustClick(createBtn);
     await this.page.waitForTimeout(2000);
+  }
+
+  async clickCloneVm(): Promise<void> {
+    await this.collapseSidebarIfExpanded();
+    const cloneBtn = this._wizardFooterCloneButton;
+    await this.clickCreateVMButton(cloneBtn);
+  }
+
+  async getWizardErrorAlertMessage(): Promise<string> {
+    try {
+      const alert = this._wizardContainer.locator('.pf-v6-c-alert.pf-m-danger');
+      await alert.waitFor({ state: 'visible', timeout: TestTimeouts.SHORT_WAIT });
+      return (await alert.textContent())?.trim() || '';
+    } catch {
+      return '';
+    }
   }
 
   async clickNext(): Promise<void> {
@@ -366,7 +389,9 @@ export default class VmWizardNavigationComponent extends BaseComponent {
 
     await this.openEditLocationPanel();
 
-    const toggle = this.locator('.vm-creation-wizard').getByTestId('namespace-dropdown-menu-toggle');
+    const toggle = this.locator('.vm-creation-wizard').getByTestId(
+      'namespace-dropdown-menu-toggle',
+    );
     await toggle.first().waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
     await this.robustClick(toggle.first());
 
