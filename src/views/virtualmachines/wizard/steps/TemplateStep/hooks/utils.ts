@@ -4,7 +4,7 @@ import { produce } from 'immer';
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { DYNAMIC_CREDENTIALS_SUPPORT } from '@kubevirt-utils/components/DynamicSSHKeyInjection/constants/constants';
 import { addSecretToVM } from '@kubevirt-utils/components/SSHSecretModal/utils/utils';
-import { getLabel, getName } from '@kubevirt-utils/resources/shared';
+import { getLabel, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import {
   getTemplateVirtualMachineObject,
   isVirtualMachineTemplate,
@@ -90,14 +90,16 @@ export const getVMObjectFromTemplate = ({
       draftVM.metadata.annotations.description = description;
     }
 
-    const selectedTemplateName = selectedTemplate?.metadata?.name;
+    const selectedTemplateName = getName(selectedTemplate);
+
     if (selectedTemplateName) {
       draftVM.metadata.labels[LABEL_USED_TEMPLATE_NAME] = selectedTemplateName;
     } else {
       delete draftVM.metadata.labels[LABEL_USED_TEMPLATE_NAME];
     }
 
-    const selectedTemplateNamespace = selectedTemplate?.metadata?.namespace;
+    const selectedTemplateNamespace = getNamespace(selectedTemplate);
+    
     if (selectedTemplateNamespace) {
       draftVM.metadata.labels[LABEL_USED_TEMPLATE_NAMESPACE] = selectedTemplateNamespace;
     } else {
