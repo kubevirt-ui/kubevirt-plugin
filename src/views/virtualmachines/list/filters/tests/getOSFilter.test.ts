@@ -281,6 +281,14 @@ describe('VM OS Filter', () => {
         expect(optionValues).toContain(os);
       }
     });
+
+    it('should exclude Windows when Windows is not supported', () => {
+      const optionValues = getOSFilter(t as TFunction, false).options?.map(
+        (option) => option.value,
+      );
+
+      expect(optionValues).not.toContain(OS_NAME_LABELS.windows);
+    });
   });
 
   describe('priority of OS detection methods', () => {
