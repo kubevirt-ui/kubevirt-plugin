@@ -1,7 +1,7 @@
 /* eslint-disable */
 import React, { FC } from 'react';
 
-import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import SubTitleChartLabel from '@kubevirt-utils/components/Charts/ChartLabels/SubTitleChartLabel';
 import TitleChartLabel from '@kubevirt-utils/components/Charts/ChartLabels/TitleChartLabel';
 import ComponentReady from '@kubevirt-utils/components/Charts/ComponentReady/ComponentReady';
@@ -19,7 +19,7 @@ import useDuration from '@virtualmachines/details/tabs/metrics/hooks/useDuration
 import { UtilizationBlock } from '../UtilizationBlock';
 
 type CPUUtilProps = {
-  vmi: V1VirtualMachineInstance;
+  vmi?: V1VirtualMachineInstance;
 };
 
 const CPUUtil: FC<CPUUtilProps> = ({ vmi }) => {
@@ -40,11 +40,11 @@ const CPUUtil: FC<CPUUtilProps> = ({ vmi }) => {
     query: queries?.CPU_USAGE,
   });
 
-  const isLoading = !loaded;
+  const isLoading = !vmi || !loaded;
   const vmCPU = getCPU(vmi);
   const hasData = dataCPUUsage?.data?.result?.length > 0;
 
-  const cpuUsage = +(dataCPUUsage?.data?.result?.[0]?.value?.[1] || 0);
+  const cpuUsage = +(dataCPUUsage?.data?.result?.[0]?.value?.[1] ?? 0);
   const cpuUsageHumanized = humanizeCpuCores(cpuUsage);
 
   const cpuRequested = getVCPUCount(vmCPU);
@@ -57,6 +57,9 @@ const CPUUtil: FC<CPUUtilProps> = ({ vmi }) => {
 
   return (
     <UtilizationBlock
+      dataTestId="util-summary-cpu"
+      title={t('CPU')}
+      usageValue={isReady ? cpuUsageHumanized?.string : ''}
       usedOfTotalText={
         isReady
           ? t('Requested of {{cpuRequested}}', {
@@ -64,18 +67,15 @@ const CPUUtil: FC<CPUUtilProps> = ({ vmi }) => {
             })
           : ''
       }
-      dataTestId="util-summary-cpu"
-      title={t('CPU')}
-      usageValue={isReady ? cpuUsageHumanized?.string : ''}
     >
       <ComponentReady error={error} isLoading={isLoading} isReady={isReady}>
         <ChartDonutUtilization
+          animate
+          constrainToVisibleArea
           data={{
             x: t('CPU used'),
             y: (averageCPUUsage > 100 ? 100 : averageCPUUsage) || 0,
           }}
-          animate
-          constrainToVisibleArea
           labels={({ datum }) => (datum.x ? `${datum.x}: ${cpuUsageHumanized?.string}` : null)}
           style={{ labels: { fontSize: 20 } }}
           subTitle={t('Used')}

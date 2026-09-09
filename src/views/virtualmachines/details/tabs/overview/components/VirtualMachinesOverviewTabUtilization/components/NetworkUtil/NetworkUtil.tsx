@@ -1,7 +1,7 @@
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 import xbytes from 'xbytes';
 
-import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import ComponentReady from '@kubevirt-utils/components/Charts/ComponentReady/ComponentReady';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useVMQueries from '@kubevirt-utils/hooks/useVMQueries';
@@ -19,7 +19,7 @@ import NetworkBreakdownPopover from './NetworkBreakdownPopover';
 import NetworkMetricsRow from './NetworkMetricsRow';
 
 type NetworkUtilProps = {
-  vmi: V1VirtualMachineInstance;
+  vmi?: V1VirtualMachineInstance;
 };
 
 const NetworkUtil: FC<NetworkUtilProps> = ({ vmi }) => {
@@ -51,7 +51,7 @@ const NetworkUtil: FC<NetworkUtilProps> = ({ vmi }) => {
   });
 
   const loaded = networkInLoaded && networkOutLoaded;
-  const isLoading = !loaded;
+  const isLoading = !vmi || !loaded;
   const error = networkInError || networkOutError;
 
   const hasNetworkInData = !isEmpty(networkIn?.data?.result);
