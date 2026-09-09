@@ -1,7 +1,7 @@
-/* eslint-disable */
-import { V1VirtualMachine, V1Volume } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine, type V1Volume } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getVolumes } from '@kubevirt-utils/resources/vm';
 
+import { eventMonitor, getTelemetryErrorMessage } from './telemetry';
 import {
   VM_CLONED,
   VM_DISK_ATTACHED,
@@ -17,8 +17,7 @@ import {
   TELEMETRY_HOTPLUG_OPERATION,
   TELEMETRY_VM_STATE,
 } from './utils/property-constants';
-import { HotplugOperationTelemetry, SnapshotStatusTelemetry } from './utils/types';
-import { eventMonitor, getTelemetryErrorMessage } from './telemetry';
+import { type HotplugOperationTelemetry, type SnapshotStatusTelemetry } from './utils/types';
 
 const getDiskTypes = (volumes: V1Volume[]): string[] =>
   volumes
@@ -35,11 +34,14 @@ export const logVMDiskAttached = (properties?: {
   provisioner?: string;
   requestedSizeGi?: number;
   storageClass?: string;
-}) => {
+}): void => {
   eventMonitor(VM_DISK_ATTACHED, properties ?? {});
 };
 
-export const logVMDiskHotplug = (operation: HotplugOperationTelemetry, error?: Error | string) => {
+export const logVMDiskHotplug = (
+  operation: HotplugOperationTelemetry,
+  error?: Error | string,
+): void => {
   if (error) {
     eventMonitor(VM_DISK_HOTPLUG_FAILED, {
       errorMessage: getTelemetryErrorMessage(error),
@@ -60,7 +62,7 @@ export const logVMSnapshotCreated = (
     errorMessage?: string;
     snapshotSizeMB?: number;
   },
-) => {
+): void => {
   eventMonitor(VM_SNAPSHOT_CREATED, { status, ...properties });
 };
 
@@ -69,7 +71,7 @@ export const logVMSnapshotRestored = (
   properties?: {
     errorMessage?: string;
   },
-) => {
+): void => {
   eventMonitor(VM_SNAPSHOT_RESTORED, { status, ...properties });
 };
 
@@ -78,11 +80,11 @@ export const logVMCloned = (properties: {
   sourceStorageClass?: string;
   status: SnapshotStatusTelemetry;
   targetStorageClass?: string;
-}) => {
+}): void => {
   eventMonitor(VM_CLONED, properties);
 };
 
-export const logVMDiskSummary = (vm: V1VirtualMachine) => {
+export const logVMDiskSummary = (vm: V1VirtualMachine): void => {
   const volumes = getVolumes(vm);
   eventMonitor(VM_DISK_SUMMARY, {
     diskCount: volumes.length,

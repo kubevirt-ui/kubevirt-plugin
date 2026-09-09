@@ -1,7 +1,6 @@
-/* eslint-disable */
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { UseConsoleShowSystemNamespaces } from '@kubevirt-utils/hooks/consoleUserSettings/types';
+import { type UseConsoleShowSystemNamespaces } from '@kubevirt-utils/hooks/consoleUserSettings/types';
 import useConsoleUserSettingLocalStorage from '@kubevirt-utils/hooks/consoleUserSettings/useConsoleUserSettingLocalStorage/useConsoleUserSettingLocalStorage';
 import {
   parseBooleanUserPreference,
@@ -44,9 +43,6 @@ const useConsoleShowSystemNamespaces: UseConsoleShowSystemNamespaces = (cluster)
     userName,
   } = useConsoleUserSettingsConfigMap(settingsCluster);
 
-  const contextRef = useRef({ configMapName, userConfigMap, userName });
-  contextRef.current = { configMapName, userConfigMap, userName };
-
   const valueFromConfigMap = useMemo(
     () =>
       getConfigMapValue(
@@ -86,14 +82,13 @@ const useConsoleShowSystemNamespaces: UseConsoleShowSystemNamespaces = (cluster)
 
       try {
         await queuedWrite(showSystem, async (valueToWrite) => {
-          const ctx = contextRef.current;
           await upsertConsoleUserSetting({
             cluster: settingsCluster,
-            configMapName: ctx.configMapName,
+            configMapName,
             key: CONSOLE_NAMESPACE_SYSTEM_NAMESPACE_KEY,
             serializedValue: serializeBooleanUserPreference(valueToWrite),
-            userConfigMap: ctx.userConfigMap,
-            userName: ctx.userName,
+            userConfigMap,
+            userName,
           });
         });
 
@@ -108,7 +103,7 @@ const useConsoleShowSystemNamespaces: UseConsoleShowSystemNamespaces = (cluster)
         setLoading(false);
       }
     },
-    [queuedWrite, settingsCluster],
+    [configMapName, queuedWrite, settingsCluster, userConfigMap, userName],
   );
 
   const updateLocalStorageValueWithOptimism = useCallback(
@@ -141,7 +136,7 @@ const useConsoleShowSystemNamespaces: UseConsoleShowSystemNamespaces = (cluster)
     showSystemNamespaces,
     updateConfigMapValue,
     settingsLoaded,
-    error || errorUser || configMapError,
+    error ?? errorUser ?? configMapError,
   ];
 };
 

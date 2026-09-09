@@ -1,8 +1,7 @@
-/* eslint-disable */
 import { useMemo } from 'react';
 import { useLocation } from 'react-router';
 
-const useIsSearchPage = () => {
+const useIsSearchPage = (): boolean => {
   const location = useLocation();
 
   return useMemo(() => location?.pathname?.includes('/search'), [location]);

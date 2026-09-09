@@ -1,12 +1,11 @@
-/* eslint-disable */
 import { useMemo } from 'react';
 
-import { V1KubeVirtConfiguration } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1KubeVirtConfiguration } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getHyperconvergedConfiguration } from '@kubevirt-utils/resources/hyperconverged/selectors';
 import { operatorNamespaceSignal } from '@kubevirt-utils/store/operatorNamespace';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
-import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+import { type K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
 import { KUBEVIRT_HC_GROUP_VERSION_KIND, KUBEVIRT_HC_NAME } from './constants';
 
@@ -22,7 +21,7 @@ const useKubevirtHyperconvergeConfiguration = (
   disabledFeatureGates: string[];
   featureGates: string[];
   hcConfig: KubevirtHyperconverged;
-  hcError: any;
+  hcError: Error | undefined;
   hcLoaded: boolean;
 } => {
   const operatorNamespace = operatorNamespaceSignal.value;

@@ -1,10 +1,9 @@
-/* eslint-disable */
 import { ALL_NAMESPACES_SESSION_KEY } from './constants';
 import useNamespaceParam from './useNamespaceParam';
 
-const useActiveNamespace = () => {
+const useActiveNamespace = (): string => {
   const namespaceParam = useNamespaceParam();
-  return namespaceParam || ALL_NAMESPACES_SESSION_KEY;
+  return namespaceParam ?? ALL_NAMESPACES_SESSION_KEY;
 };
 
 export default useActiveNamespace;

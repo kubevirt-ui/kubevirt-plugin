@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { useMemo } from 'react';
 
 import { useToast } from '@openshift-console/dynamic-plugin-sdk';
@@ -7,16 +6,21 @@ import { AlertVariant } from '@patternfly/react-core';
 import { useKubevirtTranslation } from '../useKubevirtTranslation';
 
 import { getToastVariantDefaults } from './constants';
-import { ToastHelper, UseKubevirtToastResult } from './types';
+import {
+  type AddToast,
+  type RemoveToast,
+  type ToastHelper,
+  type UseKubevirtToastResult,
+} from './types';
 
-const noopAddToast = () => 'noop';
-const noopRemoveToast = () => undefined;
-const noopResult = { addToast: noopAddToast, removeToast: noopRemoveToast };
+const noopAddToast: AddToast = () => 'noop';
+const noopRemoveToast: RemoveToast = () => undefined;
 
 const useKubevirtToast = (): UseKubevirtToastResult => {
   const { t } = useKubevirtTranslation();
-   
-  const { addToast, removeToast } = typeof useToast === 'function' ? useToast() : noopResult;
+  const toast = useToast();
+  const addToast = toast?.addToast ?? noopAddToast;
+  const removeToast = toast?.removeToast ?? noopRemoveToast;
 
   return useMemo(() => {
     const variantDefaults = getToastVariantDefaults(t);

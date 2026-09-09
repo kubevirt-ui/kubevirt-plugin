@@ -1,16 +1,14 @@
-/* eslint-disable */
+import { type ClusterUserDefinedNetworkKind } from '@kubevirt-utils/resources/udn/types';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
 import { DEFAULT_MTU, ProjectMappingOption } from '../../../views/vmnetworks/form/constants';
-
+import { logEventWithName } from './telemetry';
 import {
   VM_NETWORK_CREATED,
   VM_NETWORK_MTU_CHANGED,
   VM_NETWORK_VLAN_ENABLED,
 } from './utils/constants';
 import { TELEMETRY_PROJECT_MAPPING_METHOD } from './utils/property-constants';
-import { logEventWithName } from './telemetry';
 
 const projectMappingMethodMap: Record<ProjectMappingOption, string> = {
   [ProjectMappingOption.AllProjects]: TELEMETRY_PROJECT_MAPPING_METHOD.ALL_PROJECTS,
@@ -19,9 +17,9 @@ const projectMappingMethodMap: Record<ProjectMappingOption, string> = {
 };
 
 export const logVMNetworkCreated = (
-  resource: { spec?: any } & K8sResourceCommon,
+  resource: ClusterUserDefinedNetworkKind,
   projectMappingOption: ProjectMappingOption,
-) => {
+): void => {
   logEventWithName(VM_NETWORK_CREATED, {
     projectMappingMethod: projectMappingMethodMap[projectMappingOption],
   });

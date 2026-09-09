@@ -1,8 +1,6 @@
-/* eslint-disable */
 import { useEffect, useMemo, useState } from 'react';
 
-import { ColumnConfig } from '../useDataViewTableSort/types';
-
+import { type ColumnConfig } from '../useDataViewTableSort/types';
 import { BREAKPOINT_XXL, isColumnVisible } from './constants';
 
 export const useResponsiveColumns = <TData, TCallbacks = undefined>(
@@ -16,13 +14,13 @@ export const useResponsiveColumns = <TData, TCallbacks = undefined>(
     if (typeof window === 'undefined') return;
 
     let timeoutId: ReturnType<typeof setTimeout>;
-    const handleResize = () => {
+    const handleResize = (): void => {
       clearTimeout(timeoutId);
       timeoutId = setTimeout(() => setWindowWidth(window.innerWidth), 100);
     };
 
     window.addEventListener('resize', handleResize);
-    return () => {
+    return (): void => {
       window.removeEventListener('resize', handleResize);
       clearTimeout(timeoutId);
     };

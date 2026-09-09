@@ -1,16 +1,15 @@
-/* eslint-disable */
 import { useMemo } from 'react';
 
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   isNavSection,
-  SetFeatureFlag,
+  type SetFeatureFlag,
   useResolvedExtensions,
 } from '@openshift-console/dynamic-plugin-sdk';
 
 import { FLAG_SHOW_MIGRATION_SECTION, KUBEVIRT_PLUGIN_NAME, MIGRATION_SECTION_ID } from './consts';
 
-const useShowMigrationSectionFlag = (setFeatureFlag: SetFeatureFlag) => {
+const useShowMigrationSectionFlag = (setFeatureFlag: SetFeatureFlag): void => {
   const [navSectionExtensions, navSectionResolved] = useResolvedExtensions(isNavSection);
 
   const noMigrationSectionExtension = useMemo(

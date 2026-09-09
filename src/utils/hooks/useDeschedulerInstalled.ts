@@ -1,8 +1,7 @@
-/* eslint-disable */
 import { KubeDeschedulerModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
   DESCHEDULER_ENABLED,
-  DESCHEDULER_NOT_ENABLED,
+  type DESCHEDULER_NOT_ENABLED,
   DESCHEDULER_NOT_INSTALLED,
   DESCHEDULER_UNKNOWN,
 } from '@kubevirt-utils/hooks/constants';
@@ -10,7 +9,7 @@ import {
   KUBE_DESCHEDULER_NAME,
   KUBE_DESCHEDULER_NAMESPACE,
 } from '@kubevirt-utils/resources/descheduler/constants';
-import { KubeDescheduler } from '@kubevirt-utils/resources/descheduler/types';
+import { type KubeDescheduler } from '@kubevirt-utils/resources/descheduler/types';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
@@ -40,7 +39,7 @@ const getDeschedulerStatus = (installed: boolean, loaded: boolean): DeschedulerS
 export const useDeschedulerInstalled = (cluster?: string): UseDeschedulerInstalledResult => {
   const clusterParam = useClusterParam();
   const [resource, loaded] = useK8sWatchData<KubeDescheduler>({
-    cluster: cluster || clusterParam,
+    cluster: cluster ?? clusterParam,
     groupVersionKind: KubeDeschedulerModelGroupVersionKind,
     isList: false,
     name: KUBE_DESCHEDULER_NAME,

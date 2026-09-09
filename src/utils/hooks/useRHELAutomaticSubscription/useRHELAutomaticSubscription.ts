@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { useState } from 'react';
 import produce from 'immer';
 
@@ -14,44 +13,58 @@ import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { kubevirtK8sUpdate } from '@multicluster/k8sRequests';
 
-import { RHELAutomaticSubscriptionFormProps } from './utils/types';
+import {
+  type RHELAutomaticSubscriptionData,
+  type RHELAutomaticSubscriptionFormProps,
+} from './utils/types';
 
 type UseRHELAutomaticSubscription = (
   clusterOverride?: string,
 ) => RHELAutomaticSubscriptionFormProps;
 
+const toLoadError = (value: unknown): Error => {
+  if (value instanceof Error) {
+    return value;
+  }
+  if (value) {
+    return new Error(String(value));
+  }
+  return new Error('');
+};
+
 const useRHELAutomaticSubscription: UseRHELAutomaticSubscription = (clusterOverride) => {
   const clusterParam = useClusterParam();
   const cluster = clusterOverride ?? clusterParam;
-  const {
-    featuresConfigMapData: [featureConfigMap, loaded, loadError],
-    isAdmin,
-  } = useFeaturesConfigMap(cluster);
+  const { featuresConfigMapData, isAdmin } = useFeaturesConfigMap(cluster);
+  const featureConfigMap = featuresConfigMapData[0];
+  const loaded = featuresConfigMapData[1];
+  const loadError = toLoadError(featuresConfigMapData[2]);
 
   const [loading, setLoading] = useState(false);
 
-  const updateSubscription = async ({ activationKey, customUrl, organizationID, type }) => {
+  const updateSubscription = ({
+    activationKey,
+    customUrl,
+    organizationID,
+    type,
+  }: Partial<RHELAutomaticSubscriptionData>): void => {
     setLoading(true);
     const updatedConfigMap = produce(featureConfigMap, (draftCM) => {
       if (isEmpty(draftCM?.data)) draftCM.data = {};
       draftCM.data[AUTOMATIC_SUBSCRIPTION_ACTIVATION_KEY] =
-        activationKey !== undefined
-          ? activationKey
-          : draftCM.data[AUTOMATIC_SUBSCRIPTION_ACTIVATION_KEY];
+        activationKey ?? draftCM.data[AUTOMATIC_SUBSCRIPTION_ACTIVATION_KEY];
 
       draftCM.data[AUTOMATIC_SUBSCRIPTION_ORGANIZATION_ID] =
-        organizationID !== undefined
-          ? organizationID
-          : draftCM.data[AUTOMATIC_SUBSCRIPTION_ORGANIZATION_ID];
+        organizationID ?? draftCM.data[AUTOMATIC_SUBSCRIPTION_ORGANIZATION_ID];
 
       draftCM.data[AUTOMATIC_SUBSCRIPTION_CUSTOM_URL] =
-        customUrl !== undefined ? customUrl : draftCM.data[AUTOMATIC_SUBSCRIPTION_CUSTOM_URL];
+        customUrl ?? draftCM.data[AUTOMATIC_SUBSCRIPTION_CUSTOM_URL];
 
       draftCM.data[AUTOMATIC_SUBSCRIPTION_TYPE_KEY] =
-        type !== undefined ? type : draftCM.data[AUTOMATIC_SUBSCRIPTION_TYPE_KEY];
+        type ?? draftCM.data[AUTOMATIC_SUBSCRIPTION_TYPE_KEY];
     });
 
-    kubevirtK8sUpdate({
+    void kubevirtK8sUpdate({
       cluster,
       data: updatedConfigMap,
       model: ConfigMapModel,
@@ -64,10 +77,10 @@ const useRHELAutomaticSubscription: UseRHELAutomaticSubscription = (clusterOverr
     loadError,
     loading,
     subscriptionData: {
-      activationKey: featureConfigMap?.data?.[AUTOMATIC_SUBSCRIPTION_ACTIVATION_KEY],
-      customUrl: featureConfigMap?.data?.[AUTOMATIC_SUBSCRIPTION_CUSTOM_URL],
-      organizationID: featureConfigMap?.data?.[AUTOMATIC_SUBSCRIPTION_ORGANIZATION_ID],
-      type: featureConfigMap?.data?.[AUTOMATIC_SUBSCRIPTION_TYPE_KEY],
+      activationKey: featureConfigMap?.data?.[AUTOMATIC_SUBSCRIPTION_ACTIVATION_KEY] ?? '',
+      customUrl: featureConfigMap?.data?.[AUTOMATIC_SUBSCRIPTION_CUSTOM_URL] ?? '',
+      organizationID: featureConfigMap?.data?.[AUTOMATIC_SUBSCRIPTION_ORGANIZATION_ID] ?? '',
+      type: featureConfigMap?.data?.[AUTOMATIC_SUBSCRIPTION_TYPE_KEY] ?? '',
     },
     updateSubscription,
   };

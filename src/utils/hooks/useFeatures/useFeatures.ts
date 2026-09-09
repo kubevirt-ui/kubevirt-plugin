@@ -1,20 +1,23 @@
-/* eslint-disable */
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { ConfigMapModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { type IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { operatorNamespaceSignal } from '@kubevirt-utils/store/operatorNamespace';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
+import { type WatchK8sResult } from '@openshift-console/dynamic-plugin-sdk';
 
 import { FEATURES_CONFIG_MAP_INITIAL_DATA, FEATURES_CONFIG_MAP_NAME } from './constants';
 import { applyMissingFeatures, createFeaturesConfigMap } from './createFeaturesConfigMap';
-import { UseFeaturesValues } from './types';
+import { type UseFeaturesValues } from './types';
 import useFeaturesConfigMap from './useFeaturesConfigMap';
+
+type ConfigMapLoadError = Error & { code?: number };
 
 type UseFeatures = (featureName: string, clusterOverride?: string) => UseFeaturesValues;
 
 export const useFeatures: UseFeatures = (featureName, clusterOverride) => {
-  const [createError, setCreateError] = useState(null);
+  const [createError, setCreateError] = useState<Error | null>(null);
   const [createInProgress, setCreateInProgress] = useState(false);
 
   const clusterParam = useClusterParam();
@@ -24,8 +27,11 @@ export const useFeatures: UseFeatures = (featureName, clusterOverride) => {
 
   const { featuresConfigMapData, isAdmin } = useFeaturesConfigMap(configMapCluster, !createError);
 
-  const [featureConfigMap, loaded, loadError] = featuresConfigMapData;
-  const [featureEnabled, setFeatureEnabled] = useState(null);
+  const configMapWatchResult = featuresConfigMapData as WatchK8sResult<IoK8sApiCoreV1ConfigMap>;
+  const featureConfigMap = configMapWatchResult[0];
+  const loaded = configMapWatchResult[1];
+  const loadError = configMapWatchResult[2] as ConfigMapLoadError | undefined;
+  const [featureEnabled, setFeatureEnabled] = useState<boolean | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error>(null);
 
@@ -50,15 +56,14 @@ export const useFeatures: UseFeatures = (featureName, clusterOverride) => {
       setError(loadError);
 
       setCreateInProgress(true);
-      (async () => {
+      void (async (): Promise<void> => {
         try {
           await createFeaturesConfigMap(cluster);
           setFeatureEnabled(FEATURES_CONFIG_MAP_INITIAL_DATA[featureName] === 'true');
           setError(null);
-           
-        } catch (createError) {
+        } catch (configMapCreateError) {
           setLoading(false);
-          setCreateError(createError);
+          setCreateError(configMapCreateError);
         }
         setCreateInProgress(false);
       })();
@@ -83,7 +88,7 @@ export const useFeatures: UseFeatures = (featureName, clusterOverride) => {
         // In case of features config-map exists but there is a new feature to enter that is missing
         case undefined:
         case null: {
-          (async () => {
+          void (async (): Promise<void> => {
             try {
               await applyMissingFeatures(featureName, featureConfigMap, cluster);
               setFeatureEnabled(FEATURES_CONFIG_MAP_INITIAL_DATA[featureName] === 'true');
@@ -94,7 +99,7 @@ export const useFeatures: UseFeatures = (featureName, clusterOverride) => {
           break;
         }
         default:
-          setFeatureEnabled(featureConfigMap?.data?.[featureName]);
+          setFeatureEnabled(String(featureConfigMap?.data?.[featureName]) === 'true');
       }
       setLoading(false);
       return;

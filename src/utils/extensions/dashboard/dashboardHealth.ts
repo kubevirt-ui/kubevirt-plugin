@@ -1,5 +1,5 @@
 import { HCOHealthStatus } from '@kubevirt-utils/extensions/dashboard/types';
-import { HealthState, PrometheusHealthHandler } from '@openshift-console/dynamic-plugin-sdk';
+import { HealthState, type PrometheusHealthHandler } from '@openshift-console/dynamic-plugin-sdk';
 
 export const getKubevirtHealthState: PrometheusHealthHandler = (responses) => {
   const { error, response } = responses?.[0];
@@ -15,11 +15,11 @@ export const getKubevirtHealthState: PrometheusHealthHandler = (responses) => {
   const hcoHealthStatus = parseInt(response?.data?.result?.[0]?.value?.[1]);
 
   switch (hcoHealthStatus) {
-    case HCOHealthStatus.none:
+    case HCOHealthStatus.None:
       return { state: HealthState.OK };
-    case HCOHealthStatus.warning:
+    case HCOHealthStatus.Warning:
       return { state: HealthState.WARNING };
-    case HCOHealthStatus.critical:
+    case HCOHealthStatus.Critical:
     default:
       return { state: HealthState.ERROR };
   }

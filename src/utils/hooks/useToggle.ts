@@ -1,5 +1,4 @@
-/* eslint-disable */
-import { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import { type Dispatch, type SetStateAction, useEffect, useState } from 'react';
 
 type UseToggle = (
   key: string,
@@ -10,8 +9,11 @@ export const useToggle: UseToggle = (key = '', defaultValue) => {
   const [isToggled, setIsToggled] = useState<boolean>(() => {
     // Retrieve initial value from localStorage (if available)
     const storedValue = localStorage.getItem(key);
-    const parsedValue = storedValue && JSON.parse(storedValue);
-    return parsedValue !== null ? parsedValue : (defaultValue ?? false);
+    if (storedValue === null) {
+      return defaultValue ?? false;
+    }
+    const parsedValue = JSON.parse(storedValue) as boolean;
+    return typeof parsedValue === 'boolean' ? parsedValue : (defaultValue ?? false);
   });
 
   // Update localStorage on toggle change

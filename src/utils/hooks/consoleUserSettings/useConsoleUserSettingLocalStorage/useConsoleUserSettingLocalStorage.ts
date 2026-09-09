@@ -1,11 +1,10 @@
-/* eslint-disable */
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { isConsoleUserSettingsLocalStorage } from '@kubevirt-utils/hooks/consoleUserSettings/utils';
 
-import { ConsoleUserSettingHookResult } from '../types';
-import useQueuedUserSettingWrite from '../useQueuedUserSettingWrite/useQueuedUserSettingWrite';
+import { type ConsoleUserSettingHookResult } from '../types';
 
+import useQueuedUserSettingWrite from '../useQueuedUserSettingWrite/useQueuedUserSettingWrite';
 import { CONSOLE_USER_SETTINGS } from './consts';
 import {
   parseStoredUserSettingValue,
@@ -47,7 +46,7 @@ const useConsoleUserSettingLocalStorage: UseConsoleUserSettingLocalStorage = <T>
     setValue(readValue());
     setLoaded(true);
 
-    const onStorage = (event: StorageEvent) => {
+    const onStorage = (event: StorageEvent): void => {
       if (
         event.storageArea !== localStorage ||
         event.key !== CONSOLE_USER_SETTINGS.LOCAL_STORAGE_KEY
@@ -59,7 +58,7 @@ const useConsoleUserSettingLocalStorage: UseConsoleUserSettingLocalStorage = <T>
     };
 
     window.addEventListener('storage', onStorage);
-    return () => window.removeEventListener('storage', onStorage);
+    return (): void => window.removeEventListener('storage', onStorage);
   }, [readValue]);
 
   const updateValue = useCallback(

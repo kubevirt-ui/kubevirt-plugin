@@ -1,9 +1,8 @@
-/* eslint-disable */
 import { useMemo } from 'react';
 
 import useHyperConvergeConfiguration from '../useHyperConvergeConfiguration';
 
-const useIsFQDNEnabled = () => {
+const useIsFQDNEnabled = (): boolean => {
   const [hyperConverge, hyperLoaded, hyperError] = useHyperConvergeConfiguration();
 
   return useMemo(

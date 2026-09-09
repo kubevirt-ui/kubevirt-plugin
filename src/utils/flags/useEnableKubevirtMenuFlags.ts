@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { VirtualMachineClusterInstancetypeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { VirtualMachineClusterPreferenceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { VirtualMachineInstancetypeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -6,8 +5,8 @@ import { VirtualMachinePreferenceModel } from '@kubevirt-ui-ext/kubevirt-api/con
 import useHyperConvergeConfiguration from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { isAAQEnabled } from '@kubevirt-utils/resources/hyperconverged/utils';
 import {
-  K8sVerb,
-  SetFeatureFlag,
+  type K8sVerb,
+  type SetFeatureFlag,
   useAccessReview,
   useActiveNamespace,
 } from '@openshift-console/dynamic-plugin-sdk';
@@ -18,7 +17,7 @@ import {
   FLAG_KUBEVIRT_QUOTAS,
 } from './consts';
 
-const useEnableKubevirtMenuFlags = (setFeatureFlag: SetFeatureFlag) => {
+const useEnableKubevirtMenuFlags = (setFeatureFlag: SetFeatureFlag): void => {
   const [namespace] = useActiveNamespace();
 
   const [canShowClusterInstancetypes] = useAccessReview({

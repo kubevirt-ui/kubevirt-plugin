@@ -1,8 +1,9 @@
-/* eslint-disable */
 import { useMemo } from 'react';
 
 import { HyperConvergedV1Beta1Model as HyperConvergedModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import useHyperConvergeConfiguration from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
+import useHyperConvergeConfiguration, {
+  type HyperConverged,
+} from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import useKubevirtHyperconvergeConfiguration from '@kubevirt-utils/hooks/useKubevirtHyperconvergeConfiguration';
 import { getHyperconvergedConfiguration } from '@kubevirt-utils/resources/hyperconverged/selectors';
@@ -15,11 +16,19 @@ import {
 import { escapeJsonPointerToken, isEmpty } from '@kubevirt-utils/utils/utils';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
-import { Patch } from '@openshift-console/dynamic-plugin-sdk';
+import { type Patch } from '@openshift-console/dynamic-plugin-sdk';
 
-const usePasstFeatureFlag = (clusterOverride?: string) => {
+type UsePasstFeatureFlag = (clusterOverride?: string) => {
+  canEdit: boolean;
+  featureEnabled: boolean;
+  isLegacyPasst: boolean;
+  loading: boolean;
+  toggleFeature: (val: boolean) => Promise<HyperConverged>;
+};
+
+const usePasstFeatureFlag: UsePasstFeatureFlag = (clusterOverride) => {
   const clusterParam = useClusterParam();
-  const cluster = clusterOverride || clusterParam;
+  const cluster = clusterOverride ?? clusterParam;
   const { featureGates, hcConfig, hcLoaded } = useKubevirtHyperconvergeConfiguration(cluster);
   const [hyperConvergeConfiguration] = useHyperConvergeConfiguration(cluster);
   const isAdmin = useIsAdmin();
@@ -39,7 +48,7 @@ const usePasstFeatureFlag = (clusterOverride?: string) => {
     featureEnabled,
     isLegacyPasst,
     loading: !hcLoaded,
-    toggleFeature: (val: boolean) => {
+    toggleFeature: (val: boolean): Promise<HyperConverged> => {
       const patch: Patch[] = [
         ...(isEmpty(getAnnotations(hyperConvergeConfiguration))
           ? [{ op: 'add', path: '/metadata/annotations', value: {} }]

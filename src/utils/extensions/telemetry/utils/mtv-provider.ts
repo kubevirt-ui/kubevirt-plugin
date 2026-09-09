@@ -1,8 +1,7 @@
-/* eslint-disable */
-import { V1beta1Provider } from '@forklift-ui/types';
+import { type V1beta1Provider } from '@forklift-ui/types';
 
 import { MTV_PROVIDER_TYPE, TELEMETRY_SOURCE_PROVIDER } from './property-constants';
-import { SourceProviderTelemetry } from './types';
+import { type SourceProviderTelemetry } from './types';
 
 const MTV_PROVIDER_TYPE_TO_TELEMETRY: {
   keywords: readonly string[];
@@ -35,7 +34,9 @@ export const mapMtvProviderTypeToTelemetry = (type?: string): SourceProviderTele
   return match?.provider ?? TELEMETRY_SOURCE_PROVIDER.OTHER;
 };
 
-export const getMtvSourceTelemetry = (provider?: V1beta1Provider) => {
+export const getMtvSourceTelemetry = (
+  provider?: V1beta1Provider,
+): { sourceProvider: SourceProviderTelemetry; sourceVersion?: string } => {
   const sourceVersion =
     provider?.spec?.settings?.version ??
     provider?.spec?.settings?.productVersion ??

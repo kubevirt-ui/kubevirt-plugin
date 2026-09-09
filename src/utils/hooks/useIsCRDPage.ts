@@ -1,10 +1,9 @@
-/* eslint-disable */
 import { useMemo } from 'react';
 import { useLocation } from 'react-router';
 
 import { CustomResourceDefinitionModel } from '@kubevirt-utils/models';
 
-const useIsCRDPage = () => {
+const useIsCRDPage = (): boolean => {
   const location = useLocation();
 
   return useMemo(

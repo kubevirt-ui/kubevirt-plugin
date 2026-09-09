@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { ARCHITECTURES } from '@kubevirt-utils/constants/constants';
 import useHcoWorkloadArchitectures from '@kubevirt-utils/hooks/useHcoWorkloadArchitectures';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
@@ -7,7 +6,7 @@ const WINDOWS_SUPPORTED_ARCHITECTURES: string[] = [ARCHITECTURES.AMD64, ARCHITEC
 
 const useIsWindowsSupportedArchitecture = (cluster?: string): boolean => {
   const clusterParam = useClusterParam();
-  const resolvedCluster = cluster || clusterParam;
+  const resolvedCluster = cluster ?? clusterParam;
   const [architectures] = useHcoWorkloadArchitectures(resolvedCluster);
 
   if (!architectures?.length) return true;

@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { CONSOLE_NAMESPACE_SYSTEM_NAMESPACE_KEY } from '@kubevirt-utils/hooks/useConsoleShowSystemNamespaces/consts';
 import { act, renderHook, waitFor } from '@testing-library/react';
 
@@ -57,7 +56,7 @@ describe('useConsoleUserSettingLocalStorage', () => {
 
     expect(result.current[0]).toBe(true);
     expect(
-      JSON.parse(localStorage.getItem(CONSOLE_USER_SETTINGS.LOCAL_STORAGE_KEY) || '{}'),
+      JSON.parse(localStorage.getItem(CONSOLE_USER_SETTINGS.LOCAL_STORAGE_KEY) ?? '{}'),
     ).toEqual({
       [CONSOLE_NAMESPACE_SYSTEM_NAMESPACE_KEY]: true,
     });
@@ -84,7 +83,7 @@ describe('useConsoleUserSettingLocalStorage', () => {
 
     expect(result.current[0]).toBe(false);
     expect(
-      JSON.parse(localStorage.getItem(CONSOLE_USER_SETTINGS.LOCAL_STORAGE_KEY) || '{}'),
+      JSON.parse(localStorage.getItem(CONSOLE_USER_SETTINGS.LOCAL_STORAGE_KEY) ?? '{}'),
     ).toEqual({
       [CONSOLE_NAMESPACE_SYSTEM_NAMESPACE_KEY]: false,
     });
@@ -122,7 +121,7 @@ describe('useConsoleUserSettingLocalStorage', () => {
     jest.restoreAllMocks();
 
     expect(
-      JSON.parse(localStorage.getItem(CONSOLE_USER_SETTINGS.LOCAL_STORAGE_KEY) || '{}'),
+      JSON.parse(localStorage.getItem(CONSOLE_USER_SETTINGS.LOCAL_STORAGE_KEY) ?? '{}'),
     ).toEqual({
       [CONSOLE_NAMESPACE_SYSTEM_NAMESPACE_KEY]: true,
     });

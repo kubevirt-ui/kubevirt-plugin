@@ -1,28 +1,23 @@
-/* eslint-disable */
 import { CONSOLE_NAMESPACE_BOOKMARKS_KEY } from '@kubevirt-utils/hooks/useConsoleNamespaceBookmarks/consts';
 import { act, renderHook, waitFor } from '@testing-library/react';
 
-import { TEST_FAVORITE_BOOKMARKS } from '../tests/constants';
+import { TEST_FAVORITE_BOOKMARKS, USER_SETTINGS_CONFIG_MAP_NAME } from '../tests/constants';
 import { CONSOLE_USER_SETTINGS } from '../useConsoleUserSettingLocalStorage/consts';
-
 import useConsoleBookmarks from './useConsoleBookmarks';
 
 jest.mock(
   '@kubevirt-utils/hooks/useConsoleUserSettingsConfigMap/useConsoleUserSettingsConfigMap',
   () => ({
     __esModule: true,
-    default: () => {
-      const { USER_SETTINGS_CONFIG_MAP_NAME: configMapName } = require('../tests/constants');
-      return {
-        configMapError: undefined,
-        configMapName,
-        errorUser: undefined,
-        loadedConfigMap: true,
-        loadedUser: true,
-        userConfigMap: undefined,
-        userName: configMapName,
-      };
-    },
+    default: () => ({
+      configMapError: undefined,
+      configMapName: USER_SETTINGS_CONFIG_MAP_NAME,
+      errorUser: undefined,
+      loadedConfigMap: true,
+      loadedUser: true,
+      userConfigMap: undefined,
+      userName: USER_SETTINGS_CONFIG_MAP_NAME,
+    }),
   }),
 );
 
@@ -87,7 +82,7 @@ describe('useConsoleBookmarks', () => {
 
     expect(result.current[0]).toEqual({ second: true });
     expect(
-      JSON.parse(localStorage.getItem(CONSOLE_USER_SETTINGS.LOCAL_STORAGE_KEY) || '{}'),
+      JSON.parse(localStorage.getItem(CONSOLE_USER_SETTINGS.LOCAL_STORAGE_KEY) ?? '{}'),
     ).toEqual({
       [CONSOLE_NAMESPACE_BOOKMARKS_KEY]: { second: true },
     });

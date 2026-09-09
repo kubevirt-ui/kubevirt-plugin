@@ -1,6 +1,5 @@
-/* eslint-disable */
 import { modelToGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { IoK8sApiStorageV1StorageClass } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type IoK8sApiStorageV1StorageClass } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { StorageClassModel } from '@kubevirt-utils/models';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
@@ -11,7 +10,7 @@ const useStorageClasses: UseStorageClasses = (cluster) => {
   const clusterParam = useClusterParam();
 
   const [storageClasses, loaded] = useK8sWatchData<IoK8sApiStorageV1StorageClass[]>({
-    cluster: cluster || clusterParam,
+    cluster: cluster ?? clusterParam,
     groupVersionKind: modelToGroupVersionKind(StorageClassModel),
     isList: true,
   });

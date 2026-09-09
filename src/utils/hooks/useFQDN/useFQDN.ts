@@ -1,15 +1,20 @@
-/* eslint-disable */
 import { useMemo } from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { DNSConfigModel, modelToGroupVersionKind } from '@kubevirt-utils/models';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getCluster } from '@multicluster/helpers/selectors';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
-import { K8sResourceKind } from '@openshift-console/dynamic-plugin-sdk';
+import { type K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+
+type DNSConfig = K8sResourceCommon & {
+  spec?: {
+    baseDomain?: string;
+  };
+};
 
 const useFQDN = (nicName: string, vm: V1VirtualMachine): string | undefined => {
-  const [dns] = useK8sWatchData<K8sResourceKind>({
+  const [dns] = useK8sWatchData<DNSConfig>({
     cluster: getCluster(vm),
     groupVersionKind: modelToGroupVersionKind(DNSConfigModel),
     name: 'cluster',

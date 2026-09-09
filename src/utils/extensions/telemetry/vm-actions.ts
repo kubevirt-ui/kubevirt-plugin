@@ -1,19 +1,18 @@
-/* eslint-disable */
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getName } from '@kubevirt-utils/resources/shared';
 
-import { VM_ACTION_PERFORMED, VM_BULK_ACTION_PERFORMED } from './utils/constants';
-import { VMActionTelemetry } from './utils/types';
 import { eventMonitor } from './telemetry';
+import { VM_ACTION_PERFORMED, VM_BULK_ACTION_PERFORMED } from './utils/constants';
+import { type VMActionTelemetry } from './utils/types';
 
-export const logVMActionPerformed = (action: VMActionTelemetry, vm: V1VirtualMachine) => {
+export const logVMActionPerformed = (action: VMActionTelemetry, vm: V1VirtualMachine): void => {
   eventMonitor(VM_ACTION_PERFORMED, {
     action,
     vmName: getName(vm),
   });
 };
 
-export const logVMBulkActionPerformed = (action: VMActionTelemetry, vmCount: number) => {
+export const logVMBulkActionPerformed = (action: VMActionTelemetry, vmCount: number): void => {
   eventMonitor(VM_BULK_ACTION_PERFORMED, {
     action,
     vmCount,

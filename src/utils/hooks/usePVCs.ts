@@ -1,17 +1,16 @@
-/* eslint-disable */
 import { useMemo } from 'react';
 
 import {
   modelToGroupVersionKind,
   PersistentVolumeClaimModel,
 } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 
 type UsePVCs = (
   namespace: string,
   cluster?: string,
-) => [IoK8sApiCoreV1PersistentVolumeClaim[], boolean, any];
+) => [IoK8sApiCoreV1PersistentVolumeClaim[], boolean, Error];
 
 const usePVCs: UsePVCs = (namespace, cluster) => {
   const pvcWathcResource = namespace
@@ -28,7 +27,10 @@ const usePVCs: UsePVCs = (namespace, cluster) => {
     useK8sWatchData<IoK8sApiCoreV1PersistentVolumeClaim[]>(pvcWathcResource);
 
   const pvcs = useMemo(
-    () => (pvcsUnsorted || [])?.sort((a, b) => a?.metadata?.name?.localeCompare(b?.metadata?.name)),
+    () =>
+      (pvcsUnsorted ?? []).toSorted((a, b) =>
+        (a.metadata?.name ?? '').localeCompare(b.metadata?.name ?? ''),
+      ),
     [pvcsUnsorted],
   );
 
