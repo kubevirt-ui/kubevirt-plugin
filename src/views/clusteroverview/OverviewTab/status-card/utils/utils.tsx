@@ -1,10 +1,14 @@
 import React, { ReactNode } from 'react';
 
-import { modelToGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { NetworkAddonsConfigModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import {
+  modelToGroupVersionKind,
+  NetworkAddonsConfigModel,
+} from '@kubevirt-ui-ext/kubevirt-api/console';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import BlueSyncIcon from '@kubevirt-utils/icons/BlueSyncIcon';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
+  Alert,
   GreenCheckCircleIcon,
   HealthState,
   PrometheusLabels,
@@ -12,13 +16,11 @@ import {
   WatchK8sResource,
   YellowExclamationTriangleIcon,
 } from '@openshift-console/dynamic-plugin-sdk';
-import { Alert } from '@openshift-console/dynamic-plugin-sdk';
 import { InProgressIcon } from '@patternfly/react-icons';
 
 import BlueArrowCircleUpIcon from '../../../utils/Components/BlueArrowCircleUpIcon';
 import { ClusterServiceVersionPhase } from '../../../utils/types';
 
-import BlueSyncIcon from './health-state-icons/BlueSyncIcon';
 import GrayUnknownIcon from './health-state-icons/GrayUnknownIcon';
 import { CLUSTER } from './constants';
 
