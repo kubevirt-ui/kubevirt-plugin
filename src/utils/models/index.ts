@@ -62,7 +62,7 @@ export const ClusterManagementAddOnModel: K8sModel = {
   kind: 'ClusterManagementAddOn',
   label: 'ClusterManagementAddOn',
   labelPlural: 'ClusterManagementAddOns',
-  namespaced: true,
+  namespaced: false,
   plural: 'clustermanagementaddons',
 };
 
