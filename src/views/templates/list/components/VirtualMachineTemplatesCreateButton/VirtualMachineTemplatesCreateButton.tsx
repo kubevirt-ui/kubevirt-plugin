@@ -1,17 +1,16 @@
-import React, { type FC, type MouseEvent, type Ref, useCallback, useState } from 'react';
+import React, { type FC, type JSX, type MouseEvent, type Ref, useCallback, useState } from 'react';
 import { useNavigate } from 'react-router';
 
 import { TemplateModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import CloneTemplateModal from '@kubevirt-utils/components/CloneTemplateModal/CloneTemplateModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
-import NoPermissionButton from '@kubevirt-utils/components/NoPermissionButton/NoPermissionButton';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
-import useCanCreateResource from '@kubevirt-utils/hooks/useCanCreateResource';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useListNamespaces from '@kubevirt-utils/hooks/useListNamespaces';
 import useSelectedCluster from '@kubevirt-utils/hooks/useSelectedCluster';
 import { getTemplateListURL } from '@kubevirt-utils/resources/template';
 import { getVMListPath } from '@kubevirt-utils/resources/vm';
+import { getNoPermissionTooltipContent } from '@kubevirt-utils/utils/utils';
 import { getFleetTemplatesURL } from '@multicluster/urls';
 import useIsACMPage from '@multicluster/useIsACMPage';
 import {
@@ -20,13 +19,15 @@ import {
   DropdownList,
   MenuToggle,
   type MenuToggleElement,
+  TooltipPosition,
 } from '@patternfly/react-core';
+import { useFleetAccessReview } from '@stolostron/multicluster-sdk';
 import { VM_LIST_TAB_PARAM, VM_LIST_TAB_VMS } from '@virtualmachines/navigator/constants';
 
 import { CreateTemplateItems } from './constants';
 import useAddCreateFromVMToast from './hooks/useAddCreateFromVMToast';
 
-const VirtualMachineTemplatesCreateButton: FC = () => {
+const VirtualMachineTemplatesCreateButton: FC = (): JSX.Element => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const addCreateFromVMToast = useAddCreateFromVMToast();
@@ -39,32 +40,41 @@ const VirtualMachineTemplatesCreateButton: FC = () => {
   const currentNamespace = selectedNamespaces?.[0];
   const namespace = currentNamespace ?? DEFAULT_NAMESPACE;
 
-  const canCreateTemplate = useCanCreateResource({
+  const [canCreateTemplate, loading] = useFleetAccessReview({
     cluster,
-    model: TemplateModel,
+    group: TemplateModel.apiGroup,
     namespace,
+    resource: TemplateModel.plural,
+    verb: 'create',
   });
 
+  const isPermissionDenied = !loading && !canCreateTemplate;
+  const permissionTooltipProps = isPermissionDenied
+    ? { content: getNoPermissionTooltipContent(t), position: TooltipPosition.left }
+    : undefined;
+
   const onSelect = useCallback(
-    (_event: MouseEvent, value: string) => {
+    (_event: MouseEvent, value: string): void => {
       setIsOpen(false);
       if (value === CreateTemplateItems.yaml) {
-        return navigate(
+        navigate(
           isACMPage && cluster
             ? `${getFleetTemplatesURL(cluster, namespace)}/~new`
             : `${getTemplateListURL(namespace)}/~new`,
         );
+        return;
       }
 
       if (value === CreateTemplateItems.fromVM) {
         navigate(
           getVMListPath(currentNamespace, cluster, `${VM_LIST_TAB_PARAM}=${VM_LIST_TAB_VMS}`),
         );
-        return addCreateFromVMToast();
+        addCreateFromVMToast();
+        return;
       }
 
       if (value === CreateTemplateItems.fromTemplate) {
-        return createModal?.(({ isOpen: isModalOpen, onClose }) => (
+        createModal(({ isOpen: isModalOpen, onClose }) => (
           <CloneTemplateModal isOpen={isModalOpen} onClose={onClose} />
         ));
       }
@@ -73,14 +83,6 @@ const VirtualMachineTemplatesCreateButton: FC = () => {
   );
 
   const createButtonText = t('Create template');
-
-  if (!canCreateTemplate) {
-    return (
-      <span id="tour-step-create-template">
-        <NoPermissionButton>{createButtonText}</NoPermissionButton>
-      </span>
-    );
-  }
 
   return (
     <span id="tour-step-create-template">
@@ -104,7 +106,10 @@ const VirtualMachineTemplatesCreateButton: FC = () => {
         <DropdownList>
           <DropdownItem
             description={t('Clone and customize a template.')}
+            isAriaDisabled={isPermissionDenied}
+            isDisabled={!canCreateTemplate && !isPermissionDenied}
             key={CreateTemplateItems.fromTemplate}
+            tooltipProps={permissionTooltipProps}
             value={CreateTemplateItems.fromTemplate}
           >
             {t('From an existing template')}
@@ -117,7 +122,13 @@ const VirtualMachineTemplatesCreateButton: FC = () => {
           >
             {t('From a virtual machine')}
           </DropdownItem>
-          <DropdownItem key={CreateTemplateItems.yaml} value={CreateTemplateItems.yaml}>
+          <DropdownItem
+            isAriaDisabled={isPermissionDenied}
+            isDisabled={!canCreateTemplate && !isPermissionDenied}
+            key={CreateTemplateItems.yaml}
+            tooltipProps={permissionTooltipProps}
+            value={CreateTemplateItems.yaml}
+          >
             {t('With YAML')}
           </DropdownItem>
         </DropdownList>
