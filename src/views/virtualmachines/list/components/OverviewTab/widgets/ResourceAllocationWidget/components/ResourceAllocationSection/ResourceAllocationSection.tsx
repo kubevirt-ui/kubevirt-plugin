@@ -1,11 +1,11 @@
 import React, { type FC, useMemo, useState } from 'react';
 
+import { METRICS } from '@kubevirt-utils/components/Charts/MetricChartUtils/constants';
+import useMetricChartData from '@kubevirt-utils/components/Charts/MetricChartUtils/hooks/useMetricChartData';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getNoDataAvailableMessage } from '@kubevirt-utils/utils/utils';
 import useIsAllClustersPage from '@multicluster/hooks/useIsAllClustersPage';
-import { METRICS } from '@overview/OverviewTab/metric-charts-card/utils/constants';
-import useMetricChartData from '@overview/OverviewTab/metric-charts-card/utils/hooks/useMetricChartData';
 import { Bullseye, Card, CardBody } from '@patternfly/react-core';
 
 import { determineOverviewLevel } from '../../../../config';

@@ -1,8 +1,8 @@
 import React, { type FC } from 'react';
 import classNames from 'classnames';
-import { type SubscriptionKind } from 'src/views/clusteroverview/utils/types';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { type SubscriptionKind } from '@kubevirt-utils/types/olm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 
 type SubscriptionStateDefaultProps = {

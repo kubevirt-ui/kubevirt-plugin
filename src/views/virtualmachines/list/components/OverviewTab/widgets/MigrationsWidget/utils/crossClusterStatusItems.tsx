@@ -1,7 +1,7 @@
 import React, { type ReactNode } from 'react';
 import { type TFunction } from 'i18next';
 
-import { vmStatusIcon } from '@overview/OverviewTab/vm-statuses-card/utils/utils';
+import { vmStatusIcon } from '@kubevirt-utils/resources/vm/vmStatuses/utils/utils';
 
 import { type CrossClusterMigrationCounts } from './mtvPlanStatus';
 

@@ -15,7 +15,7 @@ import {
   type OperatorGroupKind,
   type PackageManifestKind,
   type SubscriptionKind,
-} from '@overview/utils/types';
+} from '@kubevirt-utils/types/olm';
 
 type PackageChannel = PackageManifestKind['status']['channels'][number];
 type InstallMode = PackageChannel['currentCSVDesc']['installModes'][number];

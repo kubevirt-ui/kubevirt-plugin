@@ -1,12 +1,12 @@
 import { NamespaceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { ConsoleOperatorConfigModel } from '@kubevirt-utils/models';
+import { type K8sResourceKind } from '@kubevirt-utils/types/olm';
 import { parseJSONAnnotation } from '@kubevirt-utils/utils/utils';
 import {
   getGroupVersionKindForModel,
   type K8sGroupVersionKind,
   type ObjectMetadata,
 } from '@openshift-console/dynamic-plugin-sdk';
-import { type K8sResourceKind } from '@overview/utils/types';
 
 import { CONSOLE_OPERATOR_CONFIG_NAME } from '../constants';
 

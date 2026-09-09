@@ -1,12 +1,12 @@
 import { type TFunction } from 'i18next';
 
-import { timestampFor } from '@kubevirt-utils/components/Timestamp/utils/datetime';
-import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
-import { type MetricChartData } from '@overview/OverviewTab/metric-charts-card/utils/hooks/useMetricChartData';
+import { type MetricChartData } from '@kubevirt-utils/components/Charts/MetricChartUtils/hooks/useMetricChartData';
 import {
   getCurrentValue,
   getLabelUnit,
-} from '@overview/OverviewTab/metric-charts-card/utils/utils';
+} from '@kubevirt-utils/components/Charts/MetricChartUtils/utils';
+import { timestampFor } from '@kubevirt-utils/components/Timestamp/utils/datetime';
+import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 
 import { getUnitLabel, UNIT_GIB } from '../hooks/useProjectResourceQuota';
 import { type TopClustersMetricData } from '../hooks/useTopClustersChartData';

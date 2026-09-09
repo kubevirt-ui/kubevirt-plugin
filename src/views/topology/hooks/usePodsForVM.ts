@@ -7,6 +7,7 @@ import {
   type V1VirtualMachine,
   type V1VirtualMachineInstance,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { useDebounceCallback } from '@kubevirt-utils/hooks/useDebounceCallback';
 import useDeepCompareMemoize from '@kubevirt-utils/hooks/useDeepCompareMemoize/useDeepCompareMemoize';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getVMIPod } from '@kubevirt-utils/resources/vmi';
@@ -18,7 +19,6 @@ import {
   type PodRCData,
   useK8sWatchResources,
 } from '@openshift-console/dynamic-plugin-sdk';
-import { useDebounceCallback } from '@overview/utils/hooks/useDebounceCallback';
 
 import { getReplicationControllersForResource } from '../utils/resource-utils';
 

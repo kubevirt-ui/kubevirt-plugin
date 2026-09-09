@@ -1,4 +1,4 @@
-import { type SubscriptionKind, SubscriptionState } from '@overview/utils/types';
+import { type SubscriptionKind, SubscriptionState } from '@kubevirt-utils/types/olm';
 
 const REQUIRES_APPROVAL = 'RequiresApproval';
 

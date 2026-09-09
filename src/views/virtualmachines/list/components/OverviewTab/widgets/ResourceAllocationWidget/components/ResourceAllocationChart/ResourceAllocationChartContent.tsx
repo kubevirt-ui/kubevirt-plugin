@@ -2,9 +2,9 @@ import React, { type FC } from 'react';
 import { abbreviateNumber } from 'js-abbreviation-number';
 
 import { tickLabels } from '@kubevirt-utils/components/Charts/ChartLabels/styleOverrides';
-import { type ChartDomain } from '@overview/OverviewTab/metric-charts-card/utils/hooks/types';
-import { type MetricChartData } from '@overview/OverviewTab/metric-charts-card/utils/hooks/useMetricChartData';
-import { xTickFormat } from '@overview/OverviewTab/metric-charts-card/utils/hooks/utils';
+import { type ChartDomain } from '@kubevirt-utils/components/Charts/MetricChartUtils/hooks/types';
+import { type MetricChartData } from '@kubevirt-utils/components/Charts/MetricChartUtils/hooks/useMetricChartData';
+import { xTickFormat } from '@kubevirt-utils/components/Charts/MetricChartUtils/hooks/utils';
 import {
   Chart,
   ChartAxis,

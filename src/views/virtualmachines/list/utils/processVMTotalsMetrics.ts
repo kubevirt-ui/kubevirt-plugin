@@ -1,12 +1,12 @@
 import { type V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { getCPU, getMemory, getVCPUCount } from '@kubevirt-utils/resources/vm';
-import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
-import { convertToBaseValue, humanizeCpuCores } from '@kubevirt-utils/utils/humanize.js';
-import { METRICS } from '@overview/OverviewTab/metric-charts-card/utils/constants';
+import { METRICS } from '@kubevirt-utils/components/Charts/MetricChartUtils/constants';
 import {
   findUnit,
   getHumanizedValue,
-} from '@overview/OverviewTab/metric-charts-card/utils/hooks/utils';
+} from '@kubevirt-utils/components/Charts/MetricChartUtils/hooks/utils';
+import { getCPU, getMemory, getVCPUCount } from '@kubevirt-utils/resources/vm';
+import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
+import { convertToBaseValue, humanizeCpuCores } from '@kubevirt-utils/utils/humanize.js';
 
 export const getValueWithUnitText = (bytes: number, metric: string): string => {
   const unit = findUnit(metric, bytes);

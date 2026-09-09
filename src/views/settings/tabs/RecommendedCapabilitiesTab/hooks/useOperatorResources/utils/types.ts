@@ -1,9 +1,9 @@
-import type {
-  ClusterServiceVersionKind,
-  OperatorGroupKind,
-  PackageManifestKind,
-  SubscriptionKind,
-} from '@overview/utils/types';
+import {
+  type ClusterServiceVersionKind,
+  type OperatorGroupKind,
+  type PackageManifestKind,
+  type SubscriptionKind,
+} from '@kubevirt-utils/types/olm';
 
 export type BaseOperatorWatchResources = {
   operatorGroups: OperatorGroupKind[];

@@ -10,10 +10,10 @@ import {
   DESCHEDULER_OPERATOR_NAME,
   KUBE_DESCHEDULER_NAMESPACE,
 } from '@kubevirt-utils/resources/descheduler/constants';
+import { type SubscriptionKind } from '@kubevirt-utils/types/olm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
-import { type SubscriptionKind } from '@overview/utils/types';
 
 type UseDeschedulerStatusResult = {
   loaded: boolean;
