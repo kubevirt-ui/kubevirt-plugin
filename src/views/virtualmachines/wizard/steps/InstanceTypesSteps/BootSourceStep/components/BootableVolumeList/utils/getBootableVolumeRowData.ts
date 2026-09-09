@@ -1,20 +1,24 @@
-/* eslint-disable */
-import { V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
+import { type V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import {
-  V1beta1VirtualMachineClusterPreference,
-  V1beta1VirtualMachinePreference,
+  type V1beta1VirtualMachineClusterPreference,
+  type V1beta1VirtualMachinePreference,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type VolumeSnapshotKind } from '@kubevirt-utils/components/SelectSnapshot/types';
 import {
   getBootableVolumePVCSource,
   getDataImportCronFromDataSource,
   getDataVolumeForPVC,
   getPreference,
 } from '@kubevirt-utils/resources/bootableresources/helpers';
-import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
-import { getName, NamespacedResourceMap, ResourceMap } from '@kubevirt-utils/resources/shared';
-import { UseBootableVolumesValues } from '@virtualmachines/wizard/utils/types';
+import { type BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
+import {
+  getName,
+  type NamespacedResourceMap,
+  type ResourceMap,
+} from '@kubevirt-utils/resources/shared';
+import { type UseBootableVolumesValues } from '@virtualmachines/wizard/utils/types';
 
-import { BootableVolumeRowData } from '../../../types';
+import { type BootableVolumeRowData } from '../../../types';
 
 type GetBootableVolumeRowDataArgs = {
   bootableVolume: BootableVolume;
@@ -34,6 +38,9 @@ export const getBootableVolumeRowData = ({
   const bootSourceName = getName(bootableVolume);
   const { dataImportCrons, dvSources, pvcSources, volumeSnapshotSources } = bootableVolumesData;
   const pvcSource = getBootableVolumePVCSource(bootableVolume, pvcSources);
+  const volumeSnapshotSource: VolumeSnapshotKind | undefined = bootSourceName
+    ? volumeSnapshotSources[bootSourceName]
+    : undefined;
 
   return {
     dataImportCron: getDataImportCronFromDataSource(
@@ -44,6 +51,6 @@ export const getBootableVolumeRowData = ({
     preference: getPreference(bootableVolume, preferencesMap, userPreferencesMap),
     pvcSource,
     volumeListNamespace,
-    volumeSnapshotSource: volumeSnapshotSources?.[bootSourceName],
+    volumeSnapshotSource,
   };
 };

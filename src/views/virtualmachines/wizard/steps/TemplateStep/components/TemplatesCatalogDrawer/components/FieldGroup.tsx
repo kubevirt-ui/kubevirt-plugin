@@ -1,6 +1,5 @@
-/* eslint-disable */
-import classNames from 'classnames';
 import React, { type FC } from 'react';
+import classNames from 'classnames';
 
 import { type TemplateParameter } from '@kubevirt-ui-ext/kubevirt-api/console';
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
@@ -50,7 +49,7 @@ const FieldGroup: FC<FieldGroupProps> = ({
       className={classNames('field-group', className)}
       fieldId={fieldId}
       isRequired={required}
-      label={displayName || name}
+      label={displayName ?? name}
     >
       {isPasswordParameterField ? (
         <FormPasswordInput

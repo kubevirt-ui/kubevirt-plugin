@@ -1,9 +1,8 @@
-/* eslint-disable */
 import React, { type FC, type ReactNode, useEffect } from 'react';
-import { FormProvider, useForm, useFormContext } from 'react-hook-form';
+import { FormProvider, useForm, useFormContext, type UseFormReturn } from 'react-hook-form';
 
 import Loading from '@kubevirt-utils/components/Loading/Loading';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { getErrorMessage, isEmpty } from '@kubevirt-utils/utils/utils';
 import useWizardInitialValues from '@virtualmachines/wizard/hooks/useWizardInitialValues';
 import { createInitialVMWizardFormValues } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
 import { type VMWizardFormValues } from '@virtualmachines/wizard/state/vm-wizard-form/types';
@@ -27,13 +26,13 @@ export const VMWizardProvider: FC<VMWizardProviderProps> = ({ children }) => {
   }
 
   if (!isEmpty(hubClusterError)) {
-    throw new Error(hubClusterError?.message ?? hubClusterError?.toString());
+    throw new Error(getErrorMessage(hubClusterError));
   }
 
   return <FormProvider {...methods}>{children}</FormProvider>;
 };
 
-export const useVMWizard = () => {
+export const useVMWizard = (): UseFormReturn<VMWizardFormValues> => {
   const context = useFormContext<VMWizardFormValues>();
 
   if (!context?.control) {

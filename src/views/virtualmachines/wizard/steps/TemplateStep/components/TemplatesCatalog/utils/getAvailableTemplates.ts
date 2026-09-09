@@ -1,17 +1,17 @@
-/* eslint-disable */
-import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
+import { type IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import {
-  ClusterNamespacedResourceMap,
+  type ClusterNamespacedResourceMap,
   getResourceFromClusterMap,
 } from '@kubevirt-utils/resources/shared';
-import { BOOT_SOURCE, Template } from '@kubevirt-utils/resources/template';
+import { BOOT_SOURCE, type Template } from '@kubevirt-utils/resources/template';
 import { getTemplateBootSourceType } from '@kubevirt-utils/resources/template/hooks/useVmTemplateSource/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 
 const addTemplateIfHasAvailableDataSource = (
   acc: Template[],
   template: Template,
-  availableDataSources: object,
+  availableDataSources: Record<string, V1beta1DataSource>,
 ): void => {
   const dataSource = getTemplateBootSourceType(template)?.source?.sourceRef;
   const hasMatchingDataSource =
@@ -49,7 +49,7 @@ const addTemplateIfHasOtherBootSource = (acc: Template[], template: Template): v
 };
 
 export const getAvailableTemplates = (
-  availableDataSources: object,
+  availableDataSources: Record<string, V1beta1DataSource>,
   availablePVCs: ClusterNamespacedResourceMap<IoK8sApiCoreV1PersistentVolumeClaim>,
   templates: Template[],
   templatesLoaded: boolean,

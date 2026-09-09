@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { TREE_VIEW_FOLDERS } from '@kubevirt-utils/hooks/useFeatures/constants';
@@ -37,19 +36,19 @@ const ReviewGridLeftColumn: FC = () => {
             <CloneDescriptionInput />
           </>
         ) : (
-          <DescriptionItem descriptionData={name || NO_DATA_DASH} descriptionHeader={t('Name')} />
+          <DescriptionItem descriptionData={name ?? NO_DATA_DASH} descriptionHeader={t('Name')} />
         )}
         <DescriptionItem
-          descriptionData={getCluster(vm) || NO_DATA_DASH}
+          descriptionData={getCluster(vm) ?? NO_DATA_DASH}
           descriptionHeader={t('Cluster')}
         />
         <DescriptionItem
-          descriptionData={project || NO_DATA_DASH}
+          descriptionData={project ?? NO_DATA_DASH}
           descriptionHeader={t('Project')}
         />
         {!treeViewFoldersLoading && treeViewFoldersEnabled && (
           <DescriptionItem
-            descriptionData={getFolder(vm) || NO_DATA_DASH}
+            descriptionData={getFolder(vm) ?? NO_DATA_DASH}
             descriptionHeader={t('Group')}
           />
         )}

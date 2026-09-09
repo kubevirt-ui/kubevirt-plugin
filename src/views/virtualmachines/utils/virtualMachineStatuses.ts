@@ -1,7 +1,6 @@
-/* eslint-disable */
-import { ComponentClass, FC } from 'react';
+import { type ComponentClass, type FC } from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { ErrorIcon } from '@kubevirt-utils/components/ErrorIcon/ErrorIcon';
 import { GreenRunningIcon } from '@kubevirt-utils/icons/GreenRunningIcon';
 import {
@@ -9,7 +8,7 @@ import {
   getVMSnapshottingStatus,
   getVMStatus,
 } from '@kubevirt-utils/resources/shared';
-import { ERROR_STATUS, VM_ERROR_STATUSES, VM_STATUS } from '@kubevirt-utils/resources/vm';
+import { ERROR_STATUS, VM_ERROR_STATUSES } from '@kubevirt-utils/resources/vm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   HourglassHalfIcon,
@@ -66,8 +65,10 @@ export const STATUS_VALUE_GROUPS: string[][] = [
   [printableVMStatus.Stopping, printableVMStatus.Deleting, printableVMStatus.Terminating],
 ];
 
-export const isErrorPrintableStatus = (printableStatus: string) =>
-  Object.values(VM_ERROR_STATUSES).includes(printableStatus as VM_STATUS);
+const errorPrintableStatuses: string[] = [...VM_ERROR_STATUSES];
+
+export const isErrorPrintableStatus = (printableStatus: string): boolean =>
+  errorPrintableStatuses.includes(printableStatus);
 
 export const getVMStatusIcon = (status: string): ComponentClass | FC => {
   switch (status) {

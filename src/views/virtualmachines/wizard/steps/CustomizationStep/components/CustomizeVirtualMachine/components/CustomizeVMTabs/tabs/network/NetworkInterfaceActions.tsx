@@ -1,7 +1,6 @@
-/* eslint-disable */
-import React, { FC, useCallback, useState } from 'react';
+import React, { type FC, useCallback, useState } from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import ConfirmActionMessage from '@kubevirt-utils/components/ConfirmActionMessage/ConfirmActionMessage';
 import { produceVMNetworks } from '@kubevirt-utils/components/DiskModal/utils/helpers';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
@@ -9,7 +8,7 @@ import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import KebabToggle from '@kubevirt-utils/components/toggles/KebabToggle';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getInterfaces, getNetworks } from '@kubevirt-utils/resources/vm';
-import { NetworkPresentation } from '@kubevirt-utils/resources/vm/utils/network/constants';
+import { type NetworkPresentation } from '@kubevirt-utils/resources/vm/utils/network/constants';
 import {
   getConfigInterfaceStateFromVM,
   isSRIOVNetworkByVM,
@@ -39,7 +38,7 @@ const NetworkInterfaceActions: FC<NetworkInterfaceActionsProps> = ({
   const interfaceState = getConfigInterfaceStateFromVM(vm, nicName);
   const isSRIOVIface = isSRIOVNetworkByVM(vm, nicName);
 
-  const onEditModalOpen = () => {
+  const onEditModalOpen = (): void => {
     createModal(({ isOpen, onClose }) => (
       <WizardEditNetworkInterfaceModal
         isOpen={isOpen}
@@ -64,7 +63,7 @@ const NetworkInterfaceActions: FC<NetworkInterfaceActionsProps> = ({
     return onUpdateVM(updatedVM);
   }, [nicName, onUpdateVM, vm]);
 
-  const onDeleteModalToggle = () => {
+  const onDeleteModalToggle = (): void => {
     createModal(({ isOpen, onClose }) => (
       <TabModal<V1VirtualMachine>
         headerText={t('Delete NIC?')}
@@ -83,7 +82,7 @@ const NetworkInterfaceActions: FC<NetworkInterfaceActionsProps> = ({
     setIsDropdownOpen(false);
   };
 
-  const onToggle = () => setIsDropdownOpen((prev) => !prev);
+  const onToggle = (): void => setIsDropdownOpen((prev) => !prev);
 
   return (
     <Dropdown

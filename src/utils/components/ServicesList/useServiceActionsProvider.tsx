@@ -1,6 +1,7 @@
-import { createElement, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router';
 
+import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { modelToRef, ServiceModel } from '@kubevirt-utils/models';
 import { asAccessReview, getName, getNamespace } from '@kubevirt-utils/resources/shared';
@@ -8,25 +9,17 @@ import {
   type Action,
   type ExtensionHook,
   type K8sResourceKind,
-  type OverlayComponent,
   useAnnotationsModal,
   useDeleteModal,
   useK8sModel,
   useLabelsModal,
-  useOverlay,
 } from '@openshift-console/dynamic-plugin-sdk';
 
-import PodSelectorModal, { type PodSelectorModalProps } from '../PodSelectorModal/PodSelectorModal';
-
-type PodSelectorOverlayProps = Omit<PodSelectorModalProps, 'closeModal'>;
-
-const PodSelectorOverlay: OverlayComponent<PodSelectorOverlayProps> = ({
-  closeOverlay,
-  ...props
-}) => createElement(PodSelectorModal, { ...props, closeModal: closeOverlay });
+import PodSelectorModal from '../PodSelectorModal/PodSelectorModal';
 
 const useServiceActionsProvider: ExtensionHook<Action[], K8sResourceKind> = (obj) => {
   const { t } = useKubevirtTranslation();
+  const { createModal } = useModal();
   const serviceModelRef = modelToRef({ apiGroup: 'core', ...ServiceModel });
   const [, inFlight] = useK8sModel(serviceModelRef);
 
@@ -37,17 +30,15 @@ const useServiceActionsProvider: ExtensionHook<Action[], K8sResourceKind> = (obj
 
   const objNamespace = getNamespace(obj);
   const objName = getName(obj);
-  const launchOverlay = useOverlay();
 
   const actions = useMemo(
     () => [
       {
         accessReview: asAccessReview(ServiceModel, obj, 'update'),
         cta: (): void =>
-          launchOverlay(PodSelectorOverlay, {
-            model: ServiceModel,
-            resource: obj,
-          }),
+          createModal(({ onClose }) => (
+            <PodSelectorModal closeModal={onClose} model={ServiceModel} resource={obj} />
+          )),
         id: 'edit-pod-selectors-services',
         label: t('Edit Pod selector'),
       },
@@ -79,7 +70,7 @@ const useServiceActionsProvider: ExtensionHook<Action[], K8sResourceKind> = (obj
       },
     ],
     [
-      launchOverlay,
+      createModal,
       launchAnnotationsModal,
       launchDeleteModal,
       launchLabelsModal,

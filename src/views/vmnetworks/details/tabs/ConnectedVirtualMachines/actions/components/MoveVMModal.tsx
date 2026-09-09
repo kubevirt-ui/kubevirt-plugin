@@ -1,7 +1,6 @@
-/* eslint-disable */
-import React, { FC, useState } from 'react';
+import React, { type FC, useState } from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName } from '@kubevirt-utils/resources/shared';
@@ -18,7 +17,7 @@ import {
   ModalVariant,
 } from '@patternfly/react-core';
 
-import { VMNetworkWithProjects } from '../types';
+import { type VMNetworkWithProjects } from '../types';
 import { moveVMsToNewNetwork } from '../utils';
 
 import VMNetworkSelect from './VMNetworkSelect';
@@ -39,12 +38,12 @@ const MoveVMModal: FC<MoveVMModalProps> = ({ closeModal, currentNetwork, vms }) 
   const vmsCount = vms.length;
   const isSingleVM = vmsCount === 1;
 
-  const onSelect = ({ projectNames, vmNetworkName }: VMNetworkWithProjects) => {
+  const onSelect = ({ projectNames, vmNetworkName }: VMNetworkWithProjects): void => {
     setNewNetwork(vmNetworkName);
     setNewNetworkProjects(projectNames);
   };
 
-  const onSubmit = async () => {
+  const onSubmit = async (): Promise<void> => {
     setIsSubmitting(true);
     try {
       await moveVMsToNewNetwork(vms, currentNetwork, newNetwork, newNetworkProjects);

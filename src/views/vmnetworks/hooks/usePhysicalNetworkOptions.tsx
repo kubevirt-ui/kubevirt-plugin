@@ -1,16 +1,17 @@
-/* eslint-disable */
 import { useMemo } from 'react';
 
 import {
-  V1NodeNetworkConfigurationPolicy,
-  V1NodeNetworkConfigurationPolicySpec,
+  type V1NodeNetworkConfigurationPolicy,
+  type V1NodeNetworkConfigurationPolicySpec,
 } from '@kubevirt-ui-ext/kubevirt-api/nmstate';
-import { SelectTypeaheadOptionProps } from '@kubevirt-utils/components/SelectTypeahead/SelectTypeahead';
+import { type SelectTypeaheadOptionProps } from '@kubevirt-utils/components/SelectTypeahead/SelectTypeahead';
 import {
   modelToGroupVersionKind,
   NodeNetworkConfigurationPolicyModel,
 } from '@kubevirt-utils/models';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
+
+import { toWatchError } from '../utils';
 
 import { getNNCPSpecListForLocalnetObject } from '../form/utils/utils';
 
@@ -18,15 +19,16 @@ const usePhysicalNetworkOptions = (): [
   SelectTypeaheadOptionProps[],
   Record<string, V1NodeNetworkConfigurationPolicySpec[]>,
   boolean,
-  Error,
+  Error | undefined,
 ] => {
-  const [policies, policiesLoaded, policiesLoadError] = useK8sWatchResource<
-    V1NodeNetworkConfigurationPolicy[]
-  >({
+  const watchResult = useK8sWatchResource<V1NodeNetworkConfigurationPolicy[]>({
     groupVersionKind: modelToGroupVersionKind(NodeNetworkConfigurationPolicyModel),
     isList: true,
     namespaced: false,
   });
+  const policies = watchResult[0];
+  const policiesLoaded = watchResult[1];
+  const policiesLoadError = toWatchError(watchResult[2]);
 
   const nncpSpecListForLocalnet = useMemo(
     () => getNNCPSpecListForLocalnetObject(policies),

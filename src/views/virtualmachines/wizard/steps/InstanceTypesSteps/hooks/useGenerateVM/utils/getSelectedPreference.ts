@@ -1,4 +1,3 @@
-/* eslint-disable */
 import {
   DEFAULT_PREFERENCE_KIND_LABEL,
   DEFAULT_PREFERENCE_LABEL,
@@ -13,7 +12,7 @@ export const getSelectedPreferenceName = (
   selectedBootableVolume: BootableVolume | null,
   preference?: PreferenceFormValue,
 ): string | undefined =>
-  getLabel(selectedBootableVolume, DEFAULT_PREFERENCE_LABEL) || preference?.name;
+  getLabel(selectedBootableVolume, DEFAULT_PREFERENCE_LABEL) ?? preference?.name;
 
 export const getSelectedPreferenceMatcher = (
   selectedBootableVolume: BootableVolume | null,

@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React from 'react';
+import React, { type FC } from 'react';
 
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import {
@@ -9,7 +8,7 @@ import {
 import { PageSection } from '@patternfly/react-core';
 import SchedulingSection from '@virtualmachines/details/tabs/configuration/scheduling/components/SchedulingSection';
 
-const CustomizeInstanceTypeSchedulingTab = () => {
+const CustomizeInstanceTypeSchedulingTab: FC = () => {
   const vm = customizeWizardVMSignal.value;
 
   if (!vm) {

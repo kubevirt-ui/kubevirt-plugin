@@ -1,12 +1,11 @@
-/* eslint-disable */
-import { TFunction } from 'i18next';
+import { type TFunction } from 'i18next';
 
-import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import {
-  V1DataVolumeTemplateSpec,
-  V1Disk,
-  V1VirtualMachine,
-  V1Volume,
+  type V1DataVolumeTemplateSpec,
+  type V1Disk,
+  type V1VirtualMachine,
+  type V1Volume,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import {
   getPVCSize,
@@ -28,7 +27,7 @@ import {
   getDataVolumeStorageClassName,
   getDataVolumeStorageRequest,
 } from '@kubevirt-utils/resources/vm/utils/dataVolumeTemplate/selectors';
-import { DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/constants';
+import { type DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/constants';
 import {
   getCDRom,
   getContainerDisk,
@@ -39,7 +38,8 @@ import {
   getPVCClaimName,
 } from '@kubevirt-utils/resources/vm/utils/disk/selectors';
 import { getHumanizedSize } from '@kubevirt-utils/utils/units';
-import { DiskDevice, SourceNameByPriority } from './types';
+
+import { type DiskDevice, type SourceNameByPriority } from './types';
 
 const findVolumeForDisk = (disk: V1Disk, volumes: V1Volume[]): undefined | V1Volume =>
   volumes?.find(({ name }) => name === disk?.name);
@@ -48,7 +48,7 @@ const findPVCForVolume = (
   volume: V1Volume,
   pvcs: IoK8sApiCoreV1PersistentVolumeClaim[],
 ): IoK8sApiCoreV1PersistentVolumeClaim | undefined => {
-  const claimName = volume?.persistentVolumeClaim?.claimName || volume?.dataVolume?.name;
+  const claimName = volume?.persistentVolumeClaim?.claimName ?? volume?.dataVolume?.name;
   return pvcs?.find(({ metadata }) => metadata?.name === claimName);
 };
 
@@ -66,7 +66,7 @@ export const resolveDiskDevices = (
   const volumes = getVolumes(vm);
   const dataVolumeTemplates = getDataVolumeTemplates(vm);
 
-  return (disks || []).map((disk) => {
+  return (disks ?? []).map((disk) => {
     const volume = findVolumeForDisk(disk, volumes);
     const pvc = findPVCForVolume(volume, pvcs);
     const dataVolumeTemplate = findDataVolumeTemplateForVolume(volume, dataVolumeTemplates);
@@ -77,17 +77,17 @@ export const resolveDiskDevices = (
 
 const getDiskSize = (device: DiskDevice): string => {
   const size =
-    getDataVolumeStorageRequest(device?.dataVolumeTemplate) ||
-    getDataVolumePVCStorageRequest(device?.dataVolumeTemplate) ||
+    getDataVolumeStorageRequest(device?.dataVolumeTemplate) ??
+    getDataVolumePVCStorageRequest(device?.dataVolumeTemplate) ??
     getPVCSize(device?.pvc);
 
   return size ? getHumanizedSize(size).string : NO_DATA_DASH;
 };
 
 const getDiskStorageClass = (device: DiskDevice): string =>
-  getDataVolumeStorageClassName(device?.dataVolumeTemplate) ||
-  getDataVolumePVCStorageClassName(device?.dataVolumeTemplate) ||
-  getPVCStorageClassName(device?.pvc) ||
+  getDataVolumeStorageClassName(device?.dataVolumeTemplate) ??
+  getDataVolumePVCStorageClassName(device?.dataVolumeTemplate) ??
+  getPVCStorageClassName(device?.pvc) ??
   NO_DATA_DASH;
 
 const isEnvironmentDisk = (volume: V1Volume): boolean =>
@@ -138,7 +138,7 @@ export const getSource = (device: DiskDevice, t: TFunction): string => {
     return sourceName;
   }
 
-  return getName(device?.pvc) || t('Other');
+  return getName(device?.pvc) ?? t('Other');
 };
 
 export const mapDiskDevicesToRows = (

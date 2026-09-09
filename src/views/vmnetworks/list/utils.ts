@@ -1,5 +1,4 @@
-/* eslint-disable */
-import { TFunction } from 'i18next';
+import { type TFunction } from 'i18next';
 
 import { parseNADConfig } from '@kubevirt-utils/components/NetworkInterfaceModal/utils/helpers';
 import {
@@ -8,16 +7,16 @@ import {
   UserDefinedNetworkModel,
 } from '@kubevirt-utils/models';
 import { NADRole, NADTopology, NetworkTypeKeys } from '@kubevirt-utils/resources/nad/constants';
+import { type NetworkAttachmentDefinitionKind } from '@kubevirt-utils/resources/nad/types';
 import { IPAM_MODE_DISABLED, UDNRole, UDNTopology } from '@kubevirt-utils/resources/udn/constants';
 import { getNetwork } from '@kubevirt-utils/resources/udn/selectors';
 import {
-  ClusterUserDefinedNetworkKind,
-  UserDefinedNetworkKind,
+  type ClusterUserDefinedNetworkKind,
+  type UserDefinedNetworkKind,
 } from '@kubevirt-utils/resources/udn/types';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm';
-import { NetworkAttachmentDefinitionKind } from '@kubevirt-utils/resources/nad/types';
 
-import { OtherVMNetwork, VMNetworkType } from './types';
+import { type OtherVMNetwork, VMNetworkType } from './types';
 
 const getVMNetworkTypeFromUDN = (
   udn: ClusterUserDefinedNetworkKind | UserDefinedNetworkKind,
@@ -82,7 +81,7 @@ export const getVMNetworkType = (network: OtherVMNetwork): VMNetworkType => {
   return getVMNetworkTypeFromUDN(network);
 };
 
-export const getVMNetworkTypeLabel = (networkType: VMNetworkType, t: TFunction) =>
+export const getVMNetworkTypeLabel = (networkType: VMNetworkType, t: TFunction): string =>
   ({
     [VMNetworkType.INVALID]: NO_DATA_DASH,
     [VMNetworkType.LINUX_BRIDGE]: t('Linux bridge'),

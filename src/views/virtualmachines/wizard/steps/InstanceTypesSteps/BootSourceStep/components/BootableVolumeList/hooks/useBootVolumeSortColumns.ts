@@ -1,23 +1,22 @@
-/* eslint-disable */
 import { useMemo, useState } from 'react';
 
-import { V1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
-import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type V1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
+import { type IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import {
-  V1beta1VirtualMachineClusterPreference,
-  V1beta1VirtualMachinePreference,
+  type V1beta1VirtualMachineClusterPreference,
+  type V1beta1VirtualMachinePreference,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { VolumeSnapshotKind } from '@kubevirt-utils/components/SelectSnapshot/types';
-import { PaginationState } from '@kubevirt-utils/hooks/usePagination/utils/types';
-import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
+import { type VolumeSnapshotKind } from '@kubevirt-utils/components/SelectSnapshot/types';
+import { type PaginationState } from '@kubevirt-utils/hooks/usePagination/utils/types';
+import { type BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import {
-  ClusterNamespacedResourceMap,
-  NamespacedResourceMap,
-  ResourceMap,
+  type ClusterNamespacedResourceMap,
+  type NamespacedResourceMap,
+  type ResourceMap,
 } from '@kubevirt-utils/resources/shared';
-import { ThSortType } from '@patternfly/react-table/dist/esm/components/Table/base/types';
+import { type ThSortType } from '@patternfly/react-table/dist/esm/components/Table/base/types';
 import {
-  BootableVolumeSortCriterion,
+  type BootableVolumeSortCriterion,
   sortBootableVolumesWithColumnGetters,
 } from '@virtualmachines/wizard/steps/InstanceTypesSteps/BootSourceStep/components/BootableVolumeList/utils/getSortedBootableVolumes';
 
@@ -79,7 +78,7 @@ const useBootVolumeSortColumns: UseBootVolumeSortColumns = (
 
   const getSortType = (columnIndex: number): ThSortType => ({
     columnIndex,
-    onSort: (_event, index, direction) => {
+    onSort: (_event, index, direction): void => {
       setSortCriteria({ columnIndex: index, direction });
     },
     sortBy: {

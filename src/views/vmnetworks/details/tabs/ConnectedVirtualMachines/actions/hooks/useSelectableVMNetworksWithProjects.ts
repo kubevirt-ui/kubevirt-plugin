@@ -55,7 +55,7 @@ const useSelectableVMNetworksWithProjects: UseSelectableVMNetworksWithProjects =
   return [
     vmNetworksWithProjects,
     vmNetworksLoaded && projectsLoaded,
-    vmNetworksError || projectsError,
+    vmNetworksError ?? projectsError,
   ];
 };
 

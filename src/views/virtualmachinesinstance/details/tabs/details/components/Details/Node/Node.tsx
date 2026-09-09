@@ -1,7 +1,6 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
-import { NodeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { modelToGroupVersionKind, NodeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
 
@@ -12,7 +11,7 @@ type NodeProps = {
 const Node: FC<NodeProps> = ({ nodeName }) => {
   const { t } = useKubevirtTranslation();
   return nodeName ? (
-    <ResourceLink kind={NodeModel.kind} name={nodeName} />
+    <ResourceLink groupVersionKind={modelToGroupVersionKind(NodeModel)} name={nodeName} />
   ) : (
     <div className="pf-v6-u-text-color-subtle">{t('Not available')} </div>
   );

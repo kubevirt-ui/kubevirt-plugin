@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { DescriptionModal } from '@kubevirt-utils/components/DescriptionModal/DescriptionModal';
@@ -32,7 +31,7 @@ const DetailsEditableItems: FC<DetailsEditableItemsProps> = ({ treeViewFoldersEn
     <>
       <DescriptionItem
         descriptionData={
-          getAnnotation(vm, DESCRIPTION_ANNOTATION) || <MutedTextSpan text={t('None')} />
+          getAnnotation(vm, DESCRIPTION_ANNOTATION) ?? <MutedTextSpan text={t('None')} />
         }
         onEditClick={() =>
           createModal(({ isOpen, onClose }) => (

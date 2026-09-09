@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { useMemo } from 'react';
 
 import {
@@ -6,32 +5,43 @@ import {
   NetworkAttachmentDefinitionModelGroupVersionKind,
   UserDefinedNetworkModelGroupVersionKind,
 } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { type NetworkAttachmentDefinitionKind } from '@kubevirt-utils/resources/nad/types';
 import {
-  ClusterUserDefinedNetworkKind,
-  UserDefinedNetworkKind,
+  type ClusterUserDefinedNetworkKind,
+  type UserDefinedNetworkKind,
 } from '@kubevirt-utils/resources/udn/types';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
-import { NetworkAttachmentDefinitionKind } from '@kubevirt-utils/resources/nad/types';
 
 import { VALID_OTHER_VM_NETWORK_TYPES } from '../constants';
-import { OtherVMNetwork, OtherVMNetworkWithType } from '../types';
+import { type OtherVMNetwork, type OtherVMNetworkWithType } from '../types';
 import { getVMNetworkType, hasUDNOwner } from '../utils';
 
-const useOtherVMNetworks = (): [OtherVMNetworkWithType[], boolean, Error] => {
-  const [cudns, cudnsLoaded, cudnsError] = useK8sWatchResource<ClusterUserDefinedNetworkKind[]>({
+import { toWatchError } from '../../utils';
+
+const useOtherVMNetworks = (): [OtherVMNetworkWithType[], boolean, Error | undefined] => {
+  const cudnsWatchResult = useK8sWatchResource<ClusterUserDefinedNetworkKind[]>({
     groupVersionKind: ClusterUserDefinedNetworkModelGroupVersionKind,
     isList: true,
   });
+  const cudns = cudnsWatchResult[0];
+  const cudnsLoaded = cudnsWatchResult[1];
+  const cudnsError = toWatchError(cudnsWatchResult[2]);
 
-  const [udns, udnsLoaded, udnsError] = useK8sWatchResource<UserDefinedNetworkKind[]>({
+  const udnsWatchResult = useK8sWatchResource<UserDefinedNetworkKind[]>({
     groupVersionKind: UserDefinedNetworkModelGroupVersionKind,
     isList: true,
   });
+  const udns = udnsWatchResult[0];
+  const udnsLoaded = udnsWatchResult[1];
+  const udnsError = toWatchError(udnsWatchResult[2]);
 
-  const [nads, nadsLoaded, nadsError] = useK8sWatchResource<NetworkAttachmentDefinitionKind[]>({
+  const nadsWatchResult = useK8sWatchResource<NetworkAttachmentDefinitionKind[]>({
     groupVersionKind: NetworkAttachmentDefinitionModelGroupVersionKind,
     isList: true,
   });
+  const nads = nadsWatchResult[0];
+  const nadsLoaded = nadsWatchResult[1];
+  const nadsError = toWatchError(nadsWatchResult[2]);
 
   const otherVMNetworksWithType: OtherVMNetworkWithType[] = useMemo(() => {
     const nadsWithoutUDN = nads?.filter((nad) => !hasUDNOwner(nad));
@@ -53,7 +63,7 @@ const useOtherVMNetworks = (): [OtherVMNetworkWithType[], boolean, Error] => {
   return [
     otherVMNetworksWithType,
     nadsLoaded && cudnsLoaded && udnsLoaded,
-    nadsError || cudnsError || udnsError,
+    nadsError ?? cudnsError ?? udnsError,
   ];
 };
 

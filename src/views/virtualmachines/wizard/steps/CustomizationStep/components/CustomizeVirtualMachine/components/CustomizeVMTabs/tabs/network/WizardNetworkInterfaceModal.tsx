@@ -1,9 +1,9 @@
-/* eslint-disable */
-import React, { FC, useCallback } from 'react';
+import React, { type FC, useCallback } from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { produceVMNetworks } from '@kubevirt-utils/components/DiskModal/utils/helpers';
 import NetworkInterfaceModal from '@kubevirt-utils/components/NetworkInterfaceModal/NetworkInterfaceModal';
+import { type NetworkInterfaceModalOnSubmit } from '@kubevirt-utils/components/NetworkInterfaceModal/types';
 import {
   createInterface,
   createNetwork,
@@ -35,8 +35,8 @@ const WizardNetworkInterfaceModal: FC<WizardNetworkInterfaceModalProps> = ({
       isLegacyPasst,
       networkName,
       nicName,
-    }) =>
-      (currentVM: V1VirtualMachine) => {
+    }: NetworkInterfaceModalOnSubmit) =>
+      (currentVM: V1VirtualMachine): Promise<void> => {
         const resultNetwork = createNetwork(nicName, networkName);
         const resultInterface = createInterface({
           interfaceLinkState,

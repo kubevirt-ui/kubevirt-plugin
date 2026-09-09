@@ -1,11 +1,10 @@
-/* eslint-disable */
-import React from 'react';
+import React, { type FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Stack, StackItem, Title, TitleSizes } from '@patternfly/react-core';
 import TemplatesCatalog from '@virtualmachines/wizard/steps/TemplateStep/components/TemplatesCatalog/TemplatesCatalog';
 
-const TemplateStep = () => {
+const TemplateStep: FC = () => {
   const { t } = useKubevirtTranslation();
 
   return (

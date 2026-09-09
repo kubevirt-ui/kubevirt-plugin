@@ -1,18 +1,17 @@
-/* eslint-disable */
-import React, { FC, ReactNode } from 'react';
+import React, { type FC, type ReactNode } from 'react';
 import { Link } from 'react-router';
-import { TFunction } from 'i18next';
+import { type TFunction } from 'i18next';
 
-import { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
+import { type ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName, getUID } from '@kubevirt-utils/resources/shared';
 import { getLocalnet, getMTU, getVLANID } from '@kubevirt-utils/resources/udn/selectors';
-import { ClusterUserDefinedNetworkKind } from '@kubevirt-utils/resources/udn/types';
+import { type ClusterUserDefinedNetworkKind } from '@kubevirt-utils/resources/udn/types';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 
-import VMNetworkActions from '../actions/VMNetworkActions';
 import { VM_NETWORKS_PATH } from '../constants';
 
+import VMNetworkActions from '../actions/VMNetworkActions';
 import MatchedProjects from './components/MatchedProjects';
 
 type MTUCellProps = {
@@ -45,7 +44,7 @@ export const getVMNetworkListColumns = (
     getValue: (row) => getName(row) ?? '',
     key: 'name',
     label: t('Name'),
-    renderCell: (row) => {
+    renderCell: (row): ReactNode => {
       const name = getName(row);
       return (
         <span data-test={`vmnetwork-name-${name}`}>

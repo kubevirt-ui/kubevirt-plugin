@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { useEffect, useRef } from 'react';
 import { useWatch } from 'react-hook-form';
 
@@ -42,7 +41,7 @@ const useApplyAutoLabels = (): void => {
     const existingLabels = getLabels(vm, {});
     const labelsToMerge = labels.reduce<Record<string, string>>((acc, { key, value }) => {
       if (!existingLabels[key]) {
-        acc[key] = String(value || userDefaults?.[key] || '');
+        acc[key] = String(value ?? userDefaults?.[key] ?? '');
       }
       return acc;
     }, {});

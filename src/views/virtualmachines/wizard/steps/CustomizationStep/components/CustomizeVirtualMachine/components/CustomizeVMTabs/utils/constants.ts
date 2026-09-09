@@ -1,8 +1,8 @@
-/* eslint-disable */
-import { TFunction } from 'i18next';
-import { FC } from 'react';
+import { type FC } from 'react';
+import { type TFunction } from 'i18next';
 
 import { VirtualMachineDetailsTab } from '@kubevirt-utils/constants/tabs-constants';
+import { getTabNameAndTitle } from '@virtualmachines/details/utils/utils';
 import CustomizeInstanceTypeDetailsTab from '@virtualmachines/wizard/steps/CustomizationStep/components/CustomizeVirtualMachine/components/CustomizeVMTabs/tabs/CustomizeInstanceTypeDetailsTab';
 import CustomizeInstanceTypeInitialRunTab from '@virtualmachines/wizard/steps/CustomizationStep/components/CustomizeVirtualMachine/components/CustomizeVMTabs/tabs/CustomizeInstanceTypeInitialRunTab';
 import CustomizeInstanceTypeMetadataTab from '@virtualmachines/wizard/steps/CustomizationStep/components/CustomizeVirtualMachine/components/CustomizeVMTabs/tabs/CustomizeInstanceTypeMetadataTab';
@@ -10,7 +10,6 @@ import CustomizeInstanceTypeNetworkTab from '@virtualmachines/wizard/steps/Custo
 import CustomizeInstanceTypeSchedulingTab from '@virtualmachines/wizard/steps/CustomizationStep/components/CustomizeVirtualMachine/components/CustomizeVMTabs/tabs/CustomizeInstanceTypeSchedulingTab';
 import CustomizeInstanceTypeSSHTab from '@virtualmachines/wizard/steps/CustomizationStep/components/CustomizeVirtualMachine/components/CustomizeVMTabs/tabs/CustomizeInstanceTypeSSHTab';
 import CustomizeInstanceTypeStorageTab from '@virtualmachines/wizard/steps/CustomizationStep/components/CustomizeVirtualMachine/components/CustomizeVMTabs/tabs/CustomizeInstanceTypeStorageTab';
-import { getTabNameAndTitle } from '@virtualmachines/details/utils/utils';
 
 export type TabConfig = {
   Component: FC;
@@ -18,7 +17,7 @@ export type TabConfig = {
   title: string;
 };
 
-export const getTabs = (t: TFunction) => [
+export const getTabs = (t: TFunction): TabConfig[] => [
   {
     Component: CustomizeInstanceTypeDetailsTab,
     ...getTabNameAndTitle(VirtualMachineDetailsTab.Details, t),

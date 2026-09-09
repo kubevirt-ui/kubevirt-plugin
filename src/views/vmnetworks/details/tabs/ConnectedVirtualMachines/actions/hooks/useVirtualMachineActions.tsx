@@ -1,15 +1,15 @@
-/* eslint-disable */
-import { useMemo } from 'react';
+import React, { useMemo } from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { VirtualMachineModel } from '@kubevirt-utils/models';
 import { asAccessReview, getName } from '@kubevirt-utils/resources/shared';
-import { ClusterUserDefinedNetworkKind } from '@kubevirt-utils/resources/udn/types';
-import { Action, useModal } from '@openshift-console/dynamic-plugin-sdk';
+import { type ClusterUserDefinedNetworkKind } from '@kubevirt-utils/resources/udn/types';
+import { type Action } from '@openshift-console/dynamic-plugin-sdk';
 
-import DisconnectVMModal, { DisconnectVMModalProps } from '../components/DisconnectVMModal';
-import MoveVMModal, { MoveVMModalProps } from '../components/MoveVMModal';
+import DisconnectVMModal from '../components/DisconnectVMModal';
+import MoveVMModal from '../components/MoveVMModal';
 
 type UseVirtualMachineActions = (
   vms: V1VirtualMachine[],
@@ -18,7 +18,7 @@ type UseVirtualMachineActions = (
 
 const useVirtualMachineActions: UseVirtualMachineActions = (vms, vmNetwork) => {
   const { t } = useKubevirtTranslation();
-  const createModal = useModal();
+  const { createModal } = useModal();
 
   const isSingleVM = vms.length === 1;
   const vm = vms[0];
@@ -29,21 +29,19 @@ const useVirtualMachineActions: UseVirtualMachineActions = (vms, vmNetwork) => {
     (): Action[] => [
       {
         accessReview: isSingleVM ? asAccessReview(VirtualMachineModel, vm, 'patch') : undefined,
-        cta: () =>
-          createModal<DisconnectVMModalProps>(DisconnectVMModal, {
-            currentNetwork: vmNetworkName,
-            vms,
-          }),
+        cta: (): void =>
+          createModal(({ onClose }) => (
+            <DisconnectVMModal closeModal={onClose} currentNetwork={vmNetworkName} vms={vms} />
+          )),
         id: 'disconnect-vm',
         label: t('Disconnect virtual machine from network'),
       },
       {
         accessReview: isSingleVM ? asAccessReview(VirtualMachineModel, vm, 'patch') : undefined,
-        cta: () =>
-          createModal<MoveVMModalProps>(MoveVMModal, {
-            currentNetwork: vmNetworkName,
-            vms,
-          }),
+        cta: (): void =>
+          createModal(({ onClose }) => (
+            <MoveVMModal closeModal={onClose} currentNetwork={vmNetworkName} vms={vms} />
+          )),
         id: 'move-vm',
         label: t('Move virtual machine to another network'),
       },

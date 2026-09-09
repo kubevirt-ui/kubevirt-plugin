@@ -1,7 +1,6 @@
-/* eslint-disable */
-import React, { FC, useMemo } from 'react';
+import React, { type FC, useMemo } from 'react';
 
-import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import DiskListTitle from '@kubevirt-utils/components/DiskListTitle/DiskListTitle';
 import KubevirtFilterToolbar from '@kubevirt-utils/components/KubevirtFilterToolbar/KubevirtFilterToolbar';
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
@@ -11,7 +10,6 @@ import { ListPageBody } from '@openshift-console/dynamic-plugin-sdk';
 
 import useDisksTableDisks from '../../hooks/useDisksTableDisks';
 import { getVMIDiskFilters } from '../../utils/filters';
-
 import { getVMIDiskRowId, getVMIDisksTableColumns } from './disksTableDefinition';
 
 type DisksTableProps = {

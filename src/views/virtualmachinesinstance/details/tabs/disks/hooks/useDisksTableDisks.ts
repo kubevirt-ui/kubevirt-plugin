@@ -1,20 +1,21 @@
-/* eslint-disable */
 import { useMemo } from 'react';
 
 import { PersistentVolumeClaimModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { getCluster } from '@multicluster/helpers/selectors';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
-import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+import { type K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
 import {
-  DiskPresentation,
-  DiskRaw,
+  type DiskPresentation,
+  type DiskRaw,
   diskStructureCreator,
 } from './../utils/virtualMachinesInstancePageDisksTabUtils';
 
-type UseDisksTableDisks = (vmi: V1VirtualMachineInstance) => [DiskPresentation[], boolean, any];
+type UseDisksTableDisks = (
+  vmi: V1VirtualMachineInstance,
+) => [DiskPresentation[], boolean, Error | undefined];
 
 const useDisksTableDisks: UseDisksTableDisks = (vmi) => {
   const vmiDisks = vmi?.spec?.domain?.devices?.disks;
@@ -42,6 +43,6 @@ const useDisksTableDisks: UseDisksTableDisks = (vmi) => {
     return diskStructureCreator(diskDevices);
   }, [pvcs, vmiDisks, vmiVolumes]);
 
-  return [disks || [], loaded, loadingError];
+  return [disks ?? [], loaded, loadingError];
 };
 export default useDisksTableDisks;

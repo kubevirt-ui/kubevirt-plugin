@@ -1,13 +1,11 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
-import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import FileSystemList from '@kubevirt-utils/components/FileSystemList/FileSystemList';
-import { FileSystemData } from '@kubevirt-utils/components/FileSystemList/fileSystemListDefinition';
+import { type FileSystemData } from '@kubevirt-utils/components/FileSystemList/fileSystemListDefinition';
 import { ListPageBody } from '@openshift-console/dynamic-plugin-sdk';
 
 import useGuestOS from '../../../../hooks/useGuestOS';
-
 import FileSystemTableTitle from './FileSystemTableTitle';
 
 type FileSystemTableProps = {

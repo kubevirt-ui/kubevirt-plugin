@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { useLocation } from 'react-router';
 
 import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
@@ -18,7 +17,7 @@ type WizardLocationState = {
 
 type WizardInitialValues = {
   cluster: string;
-  hubClusterError: any;
+  hubClusterError: unknown;
   isLoadingHubCluster: boolean;
   namespace: string;
 };
@@ -28,7 +27,11 @@ const useWizardInitialValues = (): WizardInitialValues => {
   const { state } = location as { state: null | WizardLocationState };
   const activeNamespaceFromUtil = useActiveNamespace();
   const [activeNamespaceFromSDK] = useActiveNamespaceSDK();
-  const [hubClusterName, hubClusterLoaded, hubClusterError] = useHubClusterName();
+  const [hubClusterName, hubClusterLoaded, hubClusterError] = useHubClusterName() as [
+    string | undefined,
+    boolean,
+    unknown,
+  ];
 
   const isACM = useIsACMPage();
 
