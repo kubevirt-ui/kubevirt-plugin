@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { useMemo } from 'react';
 
 import useClusterVersion from '@kubevirt-utils/hooks/useClusterVersion/useClusterVersion';
@@ -10,13 +9,13 @@ type UseVersionReadinessReturnType = (
   sourceCluster: string,
   targetCluster: string,
 ) => {
-  error: any;
+  error: Error | undefined;
   isReady: boolean;
   loaded: boolean;
-  sourceClusterVersion: string;
-  sourceKubevirtVersion: string;
-  targetClusterVersion: string;
-  targetKubevirtVersion: string;
+  sourceClusterVersion: string | null;
+  sourceKubevirtVersion: string | null;
+  targetClusterVersion: string | null;
+  targetKubevirtVersion: string | null;
 };
 
 const useVersionReadiness: UseVersionReadinessReturnType = (sourceCluster, targetCluster) => {
@@ -37,13 +36,13 @@ const useVersionReadiness: UseVersionReadinessReturnType = (sourceCluster, targe
   const [sourceClusterVersion, sourceClusterVersionLoaded, sourceClusterVersionError] =
     useClusterVersion(sourceCluster);
 
-  const targetClusterMajorMinorVersion = getClusterMajorMinorVersion(targetClusterVersion);
-  const sourceClusterMajorMinorVersion = getClusterMajorMinorVersion(sourceClusterVersion);
+  const targetClusterMajorMinorVersion = getClusterMajorMinorVersion(targetClusterVersion ?? '');
+  const sourceClusterMajorMinorVersion = getClusterMajorMinorVersion(sourceClusterVersion ?? '');
   const targetInstalledCSVMajorMinorVersion = getClusterMajorMinorVersion(
-    targetInstalledCSV?.spec?.version,
+    targetInstalledCSV?.spec?.version ?? '',
   );
   const sourceInstalledCSVMajorMinorVersion = getClusterMajorMinorVersion(
-    sourceInstalledCSV?.spec?.version,
+    sourceInstalledCSV?.spec?.version ?? '',
   );
 
   const isReady = useMemo(() => {
@@ -60,9 +59,9 @@ const useVersionReadiness: UseVersionReadinessReturnType = (sourceCluster, targe
 
   return {
     error:
-      targetClusterVersionError ||
-      sourceClusterVersionError ||
-      sourceLoadErrors ||
+      targetClusterVersionError ??
+      sourceClusterVersionError ??
+      sourceLoadErrors ??
       targetLoadErrors,
     isReady,
     loaded:

@@ -1,8 +1,6 @@
-/* eslint-disable */
-import { ComponentType, FC } from 'react';
-import React from 'react';
+import React, { type ComponentType, type FC, type ReactElement } from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import useACMExtensionColumns from '@multicluster/hooks/useACMExtensionColumns/useACMExtensionColumns';
 import { TableData } from '@openshift-console/dynamic-plugin-sdk';
 
@@ -11,15 +9,16 @@ type ACMExtentionsTableDataProps = {
   vm: V1VirtualMachine;
 };
 
-const ACMExtentionsTableData: FC<ACMExtentionsTableDataProps> = ({ activeColumnIDs, vm }) => {
+const ACMExtentionsTableData: FC<ACMExtentionsTableDataProps> = ({
+  activeColumnIDs,
+  vm,
+}): ReactElement => {
   const columnProperties = useACMExtensionColumns();
 
   return (
     <>
       {columnProperties.map((column) => {
-        const CellColumn = column.cell as ComponentType<{
-          resource?: any;
-        }>;
+        const CellColumn = column.cell as ComponentType<{ resource?: unknown }>;
 
         return (
           <TableData

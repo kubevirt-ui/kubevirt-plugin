@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { useMatch } from 'react-router';
 
 import { ALL_CLUSTERS_KEY } from '@kubevirt-utils/hooks/constants';
@@ -11,10 +10,9 @@ const useActiveClusterParam = (): null | string => {
   const pathMatch = useMatch(`${FLEET_BASE_PATH}/:page/cluster/:cluster/*`);
 
   if (!isACMPage) return null;
-
   if (allClustersMatch) return ALL_CLUSTERS_KEY;
 
-  return pathMatch?.params?.cluster || null;
+  return pathMatch?.params?.cluster ?? null;
 };
 
 export default useActiveClusterParam;

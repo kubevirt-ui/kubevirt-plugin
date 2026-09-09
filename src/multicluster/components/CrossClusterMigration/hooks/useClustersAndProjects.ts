@@ -1,8 +1,7 @@
-/* eslint-disable */
 import { useCallback, useMemo } from 'react';
 
-import { V1beta1Provider } from '@forklift-ui/types';
-import { EnhancedSelectOptionProps } from '@kubevirt-utils/components/FilterSelect/utils/types';
+import { type V1beta1Provider } from '@forklift-ui/types';
+import { type EnhancedSelectOptionProps } from '@kubevirt-utils/components/FilterSelect/utils/types';
 import useProjects from '@kubevirt-utils/hooks/useProjects';
 import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-utils/models';
 import { getName } from '@kubevirt-utils/resources/shared';
@@ -18,27 +17,37 @@ type UseClustersAndProjects = (
   sourceCluster: string,
   selectedClusterTarget: string,
 ) => {
-  clustersError: any;
+  clustersError: Error | undefined;
   clustersLoaded: boolean;
   clustersOptions: EnhancedSelectOptionProps[];
-  getProviderFromClusterName: (clusterName: string) => V1beta1Provider;
+  getProviderFromClusterName: (clusterName: string) => V1beta1Provider | undefined;
   projectOptions: EnhancedSelectOptionProps[];
-  projectsError: any;
+  projectsError: Error | undefined;
   projectsLoaded: boolean;
   providers: V1beta1Provider[];
 };
 
 const useClustersAndProjects: UseClustersAndProjects = (sourceCluster, selectedClusterTarget) => {
-  const [clusterNames, clustersLoaded, clustersError] = useFleetClusterNames();
+  const [clusterNames, clustersLoaded, clustersError] = useFleetClusterNames() as [
+    string[],
+    boolean,
+    Error | undefined,
+  ];
   const [providers, providersLoaded, providersError] = useProviders();
 
-  const selectableClusters = useMemo(() => {
-    return clusterNames?.filter((clusterName) => clusterName !== sourceCluster);
-  }, [clusterNames, sourceCluster]);
+  const selectableClusters = useMemo(
+    () => clusterNames?.filter((clusterName) => clusterName !== sourceCluster),
+    [clusterNames, sourceCluster],
+  );
 
-  const enabledClusters = useMemo(() => {
-    return providers?.map((provider) => getClusterFromProvider(getName(provider)));
-  }, [providers]);
+  const enabledClusters = useMemo(
+    () =>
+      providers
+        ?.map((provider) => getName(provider))
+        .filter((name): name is string => !!name)
+        .map((name) => getClusterFromProvider(name)),
+    [providers],
+  );
 
   const clustersOptions = getSelectableOptions(
     selectableClusters,
@@ -50,14 +59,13 @@ const useClustersAndProjects: UseClustersAndProjects = (sourceCluster, selectedC
   const projectOptions = getSelectableOptions(projects, modelToGroupVersionKind(ProjectModel));
 
   const getProviderFromClusterName = useCallback(
-    (clusterName: string) => {
-      return getProviderByClusterName(clusterName, providers);
-    },
+    (clusterName: string): V1beta1Provider | undefined =>
+      getProviderByClusterName(clusterName, providers),
     [providers],
   );
 
   return {
-    clustersError: clustersError || providersError,
+    clustersError: (clustersError ?? providersError) as Error | undefined,
     clustersLoaded: clustersLoaded && providersLoaded,
     clustersOptions,
     getProviderFromClusterName,

@@ -1,7 +1,6 @@
-/* eslint-disable */
-import { TFunction } from 'i18next';
+import { type TFunction } from 'i18next';
 
-import { LabelProps } from '@patternfly/react-core';
+import { type LabelProps } from '@patternfly/react-core';
 
 export const getScoreColor = (score: number): LabelProps['color'] => {
   if (score >= 70) return 'green';
@@ -9,8 +8,12 @@ export const getScoreColor = (score: number): LabelProps['color'] => {
   return 'red';
 };
 
-export const getSubtitleChecks = (t: TFunction, checks: boolean[], checksLoaded: boolean[]) => {
-  const subtitle = [];
+export const getSubtitleChecks = (
+  t: TFunction,
+  checks: boolean[],
+  checksLoaded: boolean[],
+): string => {
+  const subtitle: string[] = [];
 
   const errorChecksCount = checks.filter((check, index) => !check && checksLoaded[index]).length;
   const successChecksCount = checks.filter((check, index) => check && checksLoaded[index]).length;

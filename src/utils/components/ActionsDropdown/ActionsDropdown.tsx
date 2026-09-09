@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC, memo, ReactNode, useRef, useState } from 'react';
+import React, { type FC, memo, type ReactElement, type ReactNode, useRef, useState } from 'react';
 import classNames from 'classnames';
 
 import DropdownToggle from '@kubevirt-utils/components/toggles/DropdownToggle';
@@ -9,8 +8,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { Menu, MenuContent, MenuList, Popper, Tooltip } from '@patternfly/react-core';
 
 import ActionDropdownItem from '../ActionDropdownItem/ActionDropdownItem';
-
-import { ActionDropdownItemType } from './constants';
+import { type ActionDropdownItemType } from './constants';
 
 type ActionsDropdownProps = {
   actions: ActionDropdownItemType[];
@@ -31,7 +29,7 @@ const ActionsDropdown: FC<ActionsDropdownProps> = ({
   isKebabToggle,
   onLazyClick,
   variant,
-}) => {
+}): ReactElement => {
   const { t } = useKubevirtTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -40,7 +38,7 @@ const ActionsDropdown: FC<ActionsDropdownProps> = ({
 
   useClickOutside([menuRef, toggleRef], () => setIsOpen(false));
 
-  const onToggle = () => {
+  const onToggle = (): void => {
     setIsOpen((prevIsOpen) => {
       if (onLazyClick && !prevIsOpen) onLazyClick();
 

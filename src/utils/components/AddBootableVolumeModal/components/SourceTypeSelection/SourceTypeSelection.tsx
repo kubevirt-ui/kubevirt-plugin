@@ -1,13 +1,11 @@
-/* eslint-disable */
-import React, { FC, useCallback, useEffect, useState } from 'react';
+import React, { type FC, type ReactElement, useCallback, useEffect, useState } from 'react';
 
 import SelectToggle from '@kubevirt-utils/components/toggles/SelectToggle';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import usePermissions from '@kubevirt-utils/hooks/usePermissions/usePermissions';
 import useCanCreateBootableVolume from '@kubevirt-utils/resources/bootableresources/hooks/useCanCreateBootableVolume';
 import { getNoPermissionTooltipContent } from '@kubevirt-utils/utils/utils';
-import { Divider, FormGroup, SelectGroup } from '@patternfly/react-core';
-import { Select, SelectOption } from '@patternfly/react-core';
+import { Divider, FormGroup, Select, SelectGroup, SelectOption } from '@patternfly/react-core';
 
 import { DROPDOWN_FORM_SELECTION, optionsValueLabelMapper } from '../../consts';
 
@@ -25,7 +23,7 @@ const SourceTypeSelection: FC<SourceTypeSelectionProps> = ({
   namespace,
   resetDiskSize,
   setFormSelection,
-}) => {
+}): ReactElement => {
   const { t } = useKubevirtTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const { canCreateDS, canCreatePVC, canCreateSnapshots, loading } =
@@ -34,9 +32,9 @@ const SourceTypeSelection: FC<SourceTypeSelectionProps> = ({
   const canUploadImage = capabilitiesData.uploadImage.allowed && canCreatePVC;
 
   const onSelect = useCallback(
-    (event, value) => {
-      event.preventDefault();
-      setFormSelection(value);
+    (_event, value): void => {
+      _event?.preventDefault();
+      setFormSelection(value as DROPDOWN_FORM_SELECTION);
       setIsOpen(false);
 
       if (
@@ -59,7 +57,7 @@ const SourceTypeSelection: FC<SourceTypeSelectionProps> = ({
     }
   }, [canUploadImage, permissionsLoading, loading, setFormSelection]);
 
-  const onToggle = () => setIsOpen((prevIsOpen) => !prevIsOpen);
+  const onToggle = (): void => setIsOpen((prevIsOpen) => !prevIsOpen);
 
   return (
     <FormGroup fieldId="source-type" label={t('Source type')}>

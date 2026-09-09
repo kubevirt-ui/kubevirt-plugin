@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { type V1beta1Provider } from '@forklift-ui/types';
 
 import { getProviderByClusterName } from '../utils';
@@ -10,7 +9,11 @@ const useProviderByClusterName = (
 ): [undefined | V1beta1Provider, boolean, Error | undefined] => {
   const [providers, providersLoaded, providersError] = useProviders();
 
-  return [getProviderByClusterName(cluster, providers), providersLoaded, providersError];
+  return [
+    cluster ? getProviderByClusterName(cluster, providers) : undefined,
+    providersLoaded,
+    providersError,
+  ];
 };
 
 export default useProviderByClusterName;

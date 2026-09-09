@@ -1,21 +1,22 @@
-/* eslint-disable */
-import React from 'react';
+import React, { type FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Divider, Split, SplitItem, Title } from '@patternfly/react-core';
 
 import './VersionCompatibility.scss';
 
-const VersionCompatibility = ({
-  sourceClusterVersion,
-  sourceKubevirtVersion,
-  targetClusterVersion,
-  targetKubevirtVersion,
-}: {
+type VersionCompatibilityProps = {
   sourceClusterVersion: string;
   sourceKubevirtVersion: string;
   targetClusterVersion: string;
   targetKubevirtVersion: string;
+};
+
+const VersionCompatibility: FC<VersionCompatibilityProps> = ({
+  sourceClusterVersion,
+  sourceKubevirtVersion,
+  targetClusterVersion,
+  targetKubevirtVersion,
 }) => {
   const { t } = useKubevirtTranslation();
   return (

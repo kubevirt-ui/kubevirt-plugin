@@ -1,10 +1,9 @@
-/* eslint-disable */
 import { useMemo } from 'react';
 import { isDataSourceReady } from 'src/views/datasources/utils';
 
 import { DataSourceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
-import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
+import { type IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import useListMulticlusterFilters from '@kubevirt-utils/hooks/useListMulticlusterFilters';
 import { modelToGroupVersionKind, PersistentVolumeClaimModel } from '@kubevirt-utils/models';
 import { convertResourceArrayToMapWithCluster } from '@kubevirt-utils/resources/shared';
@@ -12,7 +11,15 @@ import { isDataSourceCloning } from '@kubevirt-utils/resources/template/hooks/us
 import useIsACMPage from '@multicluster/useIsACMPage';
 import { useFleetSearchPoll } from '@stolostron/multicluster-sdk';
 
-const useMulticlusterAvailableSources = () => {
+type UseMulticlusterAvailableSourcesReturn = {
+  availableDataSources: ReturnType<typeof convertResourceArrayToMapWithCluster>;
+  availablePVCs: ReturnType<typeof convertResourceArrayToMapWithCluster>;
+  cloneInProgressDataSources: ReturnType<typeof convertResourceArrayToMapWithCluster>;
+  error: Error | undefined;
+  loaded: boolean;
+};
+
+const useMulticlusterAvailableSources = (): UseMulticlusterAvailableSourcesReturn => {
   const multiclusterSearch = useListMulticlusterFilters();
   const isACMPage = useIsACMPage();
 
@@ -55,7 +62,7 @@ const useMulticlusterAvailableSources = () => {
       availableDataSources,
       availablePVCs: pvcsMap,
       cloneInProgressDataSources,
-      error: dataSourcesError || pvcsError,
+      error: (dataSourcesError ?? pvcsError) as Error | undefined,
       loaded: pvcsLoaded && dataSourcesLoaded,
     }),
     [

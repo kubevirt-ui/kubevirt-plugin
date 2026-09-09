@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC, useState } from 'react';
+import React, { type FC, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { load } from 'js-yaml';
 
@@ -24,7 +23,7 @@ import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { kubevirtK8sCreate } from '@multicluster/k8sRequests';
 import { getFleetResourceRoute, getMulticlusterSearchURL } from '@multicluster/urls';
 import useIsACMPage from '@multicluster/useIsACMPage';
-import { ResourceYAMLEditor } from '@openshift-console/dynamic-plugin-sdk';
+import { type K8sResourceCommon, ResourceYAMLEditor } from '@openshift-console/dynamic-plugin-sdk';
 
 import useModelFromParam from './hooks/useModelFromParam';
 import useYAMLTemplateExtension from './hooks/useYAMLTemplateExtension';
@@ -38,18 +37,18 @@ const MulticlusterYAMLCreation: FC = () => {
 
   const cluster = useClusterParam();
   const namespace = useNamespaceParam();
-  const [error, setError] = useState<Error>(null);
+  const [error, setError] = useState<Error | null>(null);
   const isVirtualMachineModel = model?.kind === VirtualMachineModel.kind;
   const isTemplateModel = model?.kind === TemplateModel.kind;
 
-  const onSave = async (yaml: string) => {
+  const onSave = async (yaml: string): Promise<void> => {
     setError(null);
 
     if (!model) return;
     try {
       const createdResource = await kubevirtK8sCreate({
         cluster,
-        data: load(yaml),
+        data: load(yaml) as K8sResourceCommon,
         model,
         ns: namespace,
       });
@@ -72,14 +71,14 @@ const MulticlusterYAMLCreation: FC = () => {
       });
 
       navigate(
-        kubevirtURL ||
+        kubevirtURL ??
           getMulticlusterSearchURL(model, getName(createdResource), namespace, cluster),
       );
     } catch (apiError) {
       if (isVirtualMachineModel) {
         logVMCreationFailed(TELEMETRY_VM_CREATION_METHOD.SCRATCH, apiError);
       }
-      setError(apiError);
+      setError(apiError instanceof Error ? apiError : new Error(String(apiError)));
     }
   };
 

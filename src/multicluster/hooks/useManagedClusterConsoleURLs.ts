@@ -1,11 +1,12 @@
-/* eslint-disable */
 import { useCallback, useMemo } from 'react';
 
 import { modelToGroupVersionKind } from '@kubevirt-utils/models';
-import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
-import { useFleetK8sWatchResource, useHubClusterName } from '@stolostron/multicluster-sdk';
+import { type K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+import { useHubClusterName } from '@stolostron/multicluster-sdk';
 
 import { CONSOLE_URL_CLAIM, ManagedClusterModel } from '../constants';
+
+import useK8sWatchData from './useK8sWatchData';
 
 type ManagedCluster = K8sResourceCommon & {
   status?: {
@@ -18,7 +19,7 @@ type ManagedCluster = K8sResourceCommon & {
 
 type UseManagedClusterConsoleURLs = (cluster?: string) => {
   consoleURLs: Record<string, string>;
-  error: unknown;
+  error: Error | undefined;
   getConsoleURL: (clusterName: string) => string | undefined;
   isSpokeCluster: boolean;
   loaded: boolean;
@@ -35,7 +36,7 @@ type UseManagedClusterConsoleURLs = (cluster?: string) => {
 const useManagedClusterConsoleURLs: UseManagedClusterConsoleURLs = (cluster) => {
   const [hubClusterName] = useHubClusterName();
 
-  const [managedClusters, loaded, error] = useFleetK8sWatchResource<ManagedCluster[]>({
+  const [managedClusters, loaded, error] = useK8sWatchData<ManagedCluster[]>({
     groupVersionKind: modelToGroupVersionKind(ManagedClusterModel),
     isList: true,
   });
@@ -61,7 +62,6 @@ const useManagedClusterConsoleURLs: UseManagedClusterConsoleURLs = (cluster) => 
 
   const getConsoleURL = useCallback(
     (clusterName: string): string | undefined => {
-      // Hub cluster doesn't need external URL - use current console
       if (!clusterName || clusterName === hubClusterName) {
         return undefined;
       }

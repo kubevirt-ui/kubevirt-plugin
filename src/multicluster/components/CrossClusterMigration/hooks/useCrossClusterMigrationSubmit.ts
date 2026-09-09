@@ -1,15 +1,14 @@
-/* eslint-disable */
 import { useCallback, useRef, useState } from 'react';
-import { Updater } from 'use-immer';
+import { type Updater } from 'use-immer';
 
 import {
   MigrationModel,
   NetworkMapModel,
   PlanModel,
   StorageMapModel,
-  V1beta1NetworkMap,
-  V1beta1Plan,
-  V1beta1StorageMap,
+  type V1beta1NetworkMap,
+  type V1beta1Plan,
+  type V1beta1StorageMap,
 } from '@forklift-ui/types';
 import { logMigrationPlanCreated } from '@kubevirt-utils/extensions/telemetry/mtv';
 import { getMtvSourceTelemetry } from '@kubevirt-utils/extensions/telemetry/utils/mtv-provider';
@@ -28,7 +27,12 @@ const useCrossClusterMigrationSubmit = (
   setMigrationPlan: Updater<V1beta1Plan>,
   storageMap: V1beta1StorageMap,
   networkMap: V1beta1NetworkMap,
-) => {
+): {
+  error: Error | null;
+  isSubmitting: boolean;
+  onSubmit: () => Promise<void>;
+  success: boolean;
+} => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<Error | null>(null);
@@ -38,7 +42,7 @@ const useCrossClusterMigrationSubmit = (
   const isSubmittingRef = useRef(false);
   const [providers] = useProviders();
 
-  const onSubmit = useCallback(async () => {
+  const onSubmit = useCallback(async (): Promise<void> => {
     if (isSubmittingRef.current) return;
     isSubmittingRef.current = true;
 
@@ -136,9 +140,9 @@ const useCrossClusterMigrationSubmit = (
         vmCount: migrationPlan?.spec?.vms?.length,
       });
       setSuccess(true);
-    } catch (apiError) {
+    } catch (apiError: unknown) {
       cleanupPartialResources({ createdMigrationPlan, createdNetworkMap, createdStorageMap });
-      setError(apiError);
+      setError(apiError instanceof Error ? apiError : new Error(String(apiError)));
     } finally {
       setIsSubmitting(false);
       isSubmittingRef.current = false;

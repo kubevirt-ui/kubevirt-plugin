@@ -1,11 +1,12 @@
-/* eslint-disable */
 import { useCallback, useEffect, useMemo } from 'react';
-import { Updater } from 'use-immer';
+import { type Updater } from 'use-immer';
 
-import { V1beta1NetworkMap, V1beta1NetworkMapSpecMapDestination } from '@forklift-ui/types';
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { NetworkAttachmentDefinitionKind } from '@kubevirt-utils/resources/nad/types';
-import { getNamespace } from '@kubevirt-utils/resources/shared';
+import {
+  type V1beta1NetworkMap,
+  type V1beta1NetworkMapSpecMapDestination,
+} from '@forklift-ui/types';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type NetworkAttachmentDefinitionKind } from '@kubevirt-utils/resources/nad/types';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 
 import { POD_NETWORK_TYPE } from '../constants';
@@ -18,7 +19,7 @@ export type UseNetworkReadinessReturnType = {
     vmNetworkName: string,
     destinationNetwork: V1beta1NetworkMapSpecMapDestination,
   ) => void;
-  error: any;
+  error: Error | undefined;
   isReady: boolean;
   loaded: boolean;
   networkMap: V1beta1NetworkMap;
@@ -28,10 +29,11 @@ export type UseNetworkReadinessReturnType = {
 const useNetworkReadiness = (
   vms: V1VirtualMachine[],
   targetCluster: string,
-  networkMap: V1beta1NetworkMap,
-  setNetworkMap: Updater<V1beta1NetworkMap>,
+  networkMap: V1beta1NetworkMap | null,
+  setNetworkMap: Updater<V1beta1NetworkMap | null>,
 ): UseNetworkReadinessReturnType => {
-  const { data, error, loaded } = useProviderNADs(targetCluster, getNamespace(vms?.[0]));
+  const namespace = vms?.[0]?.metadata?.namespace ?? '';
+  const { data, error, loaded } = useProviderNADs(targetCluster, namespace);
 
   useEffect(() => {
     if (loaded && networkMap === null) {
@@ -45,16 +47,20 @@ const useNetworkReadiness = (
         (map) =>
           map.source.type === POD_NETWORK_TYPE ||
           (!isEmpty(map?.destination?.namespace) && !isEmpty(map?.destination?.name)),
-      ),
+      ) ?? false,
     [networkMap?.spec?.map],
   );
 
   const changeNetworkMap = useCallback(
-    (vmNetworkName: string, destinationNetwork: V1beta1NetworkMapSpecMapDestination) => {
+    (vmNetworkName: string, destinationNetwork: V1beta1NetworkMapSpecMapDestination): void => {
       setNetworkMap((draftNetworkMap) => {
-        const mappedNAD = draftNetworkMap.spec.map.find((map) => map.source.name === vmNetworkName);
+        const mappedNAD = draftNetworkMap.spec?.map?.find(
+          (map) => map.source.name === vmNetworkName,
+        );
 
-        mappedNAD.destination = destinationNetwork;
+        if (mappedNAD) {
+          mappedNAD.destination = destinationNetwork;
+        }
       });
     },
     [setNetworkMap],

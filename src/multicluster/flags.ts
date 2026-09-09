@@ -1,15 +1,18 @@
-/* eslint-disable */
 import { useEffect, useRef } from 'react';
 
 import { logMultiClusterManagementDetected } from '@kubevirt-utils/extensions/telemetry/multicluster';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { SetFeatureFlag } from '@openshift-console/dynamic-plugin-sdk';
+import { type SetFeatureFlag } from '@openshift-console/dynamic-plugin-sdk';
 import { useFleetClusterNames, useHubClusterName } from '@stolostron/multicluster-sdk';
 
 import { FLAG_DISALLOWED_KUBEVIRT_DYNAMIC_ACM, FLAG_KUBEVIRT_DYNAMIC_ACM } from './constants';
 
-export const useKubevirtDynamicACMFlag = (setFeatureFlag: SetFeatureFlag) => {
-  const [hubClusterName, hubClusterNameLoaded, hubClusterError] = useHubClusterName();
+export const useKubevirtDynamicACMFlag = (setFeatureFlag: SetFeatureFlag): void => {
+  const [hubClusterName, hubClusterNameLoaded, hubClusterError] = useHubClusterName() as [
+    string | undefined,
+    boolean,
+    Error | undefined,
+  ];
   const [clusterNames, clustersLoaded] = useFleetClusterNames();
   const hasLoggedMultiClusterRef = useRef(false);
 

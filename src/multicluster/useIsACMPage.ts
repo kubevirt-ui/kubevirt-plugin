@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { useEffect, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 
@@ -13,7 +12,7 @@ type UseIsACMPageOptions = {
   activePerspectiveSync?: boolean;
 };
 
-const useIsACMPage = ({ activePerspectiveSync = true }: UseIsACMPageOptions = {}) => {
+const useIsACMPage = ({ activePerspectiveSync = true }: UseIsACMPageOptions = {}): boolean => {
   const { pathname, search } = useLocation();
   const navigate = useNavigate();
   const [activePerspective] = useActivePerspective();
