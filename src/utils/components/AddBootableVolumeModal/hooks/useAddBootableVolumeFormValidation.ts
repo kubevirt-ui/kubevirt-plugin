@@ -1,18 +1,36 @@
 /* eslint-disable */
 import { useMemo } from 'react';
 
+import { DROPDOWN_FORM_SELECTION } from '@kubevirt-utils/components/AddBootableVolumeModal/consts';
 import { TLS_CERT_SOURCE_EXISTING } from '@kubevirt-utils/components/TLSCertificateSection';
 import { DEFAULT_PREFERENCE_LABEL } from '@kubevirt-utils/constants/instancetypes-and-preferences';
+import useCanClonePVCFromNamespace from '@kubevirt-utils/hooks/useCanClonePVCFromNamespace';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { isValidCronExpression } from '@kubevirt-utils/utils/validation';
 
-import { DROPDOWN_FORM_SELECTION } from '../consts';
 import { UseAddBootableVolumeFormValidationParams } from '../types';
 
 export const useAddBootableVolumeFormValidation = ({
   bootableVolume,
   sourceType,
 }: UseAddBootableVolumeFormValidationParams): boolean => {
+  const { canClone, isChecking, requiresClonePermission } = useCanClonePVCFromNamespace(
+    bootableVolume?.pvcNamespace,
+    bootableVolume?.bootableVolumeNamespace,
+    bootableVolume?.bootableVolumeCluster,
+  );
+
+  const hasClonePermission = useMemo(() => {
+    if (sourceType !== DROPDOWN_FORM_SELECTION.USE_EXISTING_PVC) {
+      return true;
+    }
+
+    if (!requiresClonePermission || isChecking) {
+      return true;
+    }
+
+    return canClone;
+  }, [canClone, isChecking, requiresClonePermission, sourceType]);
   const isRegistryFormValid = useMemo(() => {
     if (sourceType !== DROPDOWN_FORM_SELECTION.USE_REGISTRY) return true;
 
@@ -69,11 +87,13 @@ export const useAddBootableVolumeFormValidation = ({
       hasVolumeName &&
       isRegistryFormValid &&
       isTlsCertValid &&
-      isSourceValid
+      isSourceValid &&
+      hasClonePermission
     );
   }, [
     bootableVolume?.labels,
     bootableVolume?.bootableVolumeName,
+    hasClonePermission,
     isRegistryFormValid,
     isTlsCertValid,
     isSourceValid,
