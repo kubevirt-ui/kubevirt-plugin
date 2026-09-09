@@ -1,7 +1,5 @@
-/* eslint-disable */
-import React, { FC, useMemo } from 'react';
+import React, { type FC, useMemo } from 'react';
 
-import KubevirtFilterToolbar from '@kubevirt-utils/components/KubevirtFilterToolbar/KubevirtFilterToolbar';
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
 import { buildColumnLayout } from '@kubevirt-utils/components/KubevirtTable/utils';
 import useKubevirtDataViewFilters from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/useKubevirtDataViewFilters';
@@ -9,33 +7,28 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import useKubevirtTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtTableColumns';
 import useNamespaceParam from '@kubevirt-utils/hooks/useNamespaceParam';
 import usePaginationWithFilters from '@kubevirt-utils/hooks/usePagination/usePaginationWithFilters';
-import { paginationDefaultValues } from '@kubevirt-utils/hooks/usePagination/utils/constants';
-import { EXPORT_TABLE_KEYS, KubevirtTableExport } from '@kubevirt-utils/hooks/useTableExport';
 import {
   ApplicationAwareClusterResourceQuotaModel,
   ApplicationAwareResourceQuotaModel,
   modelToGroupVersionKind,
   modelToRef,
 } from '@kubevirt-utils/models';
-import { ApplicationAwareQuota } from '@kubevirt-utils/resources/quotas/types';
+import { type ApplicationAwareQuota } from '@kubevirt-utils/resources/quotas/types';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
-  K8sResourceKind,
+  type K8sResourceKind,
   ListPageBody,
-  ListPageHeader,
   useK8sWatchResource,
 } from '@openshift-console/dynamic-plugin-sdk';
-import { Pagination, Tab, Tabs, TabTitleText } from '@patternfly/react-core';
 
 import useAAQCalculationMethod from '../hooks/useAAQCalculationMethod';
-
-import QuotasCreateButton from './components/QuotasCreateButton';
 import QuotasEmptyState from './components/QuotasEmptyState';
-import QuotasLearnMoreLink from './components/QuotasLearnMoreLink';
-import useQuotasListTab from './hooks/useQuotasListTab';
-import { QuotaCallbacks } from './utils/helpers';
+import QuotasListHeader from './components/QuotasListHeader';
+import QuotasListToolbar from './components/QuotasListToolbar';
 import { QuotaScope } from './constants';
+import useQuotasListTab from './hooks/useQuotasListTab';
 import { getQuotaColumns, getQuotaRowId } from './quotasDefinition';
+import { type QuotaCallbacks } from './utils/helpers';
 
 import '@kubevirt-utils/styles/list-managment-group.scss';
 
@@ -51,20 +44,20 @@ const QuotasList: FC = () => {
     groupVersionKind: modelToGroupVersionKind(ApplicationAwareResourceQuotaModel),
     isList: true,
     namespace,
-  });
+  }) as [K8sResourceKind[], boolean, unknown];
 
   const [clusterQuotas, clusterQuotasLoaded, clusterQuotasLoadError] = useK8sWatchResource<
     K8sResourceKind[]
   >({
     groupVersionKind: modelToGroupVersionKind(ApplicationAwareClusterResourceQuotaModel),
     isList: true,
-  });
+  }) as [K8sResourceKind[], boolean, unknown];
 
   const hasClusterQuotas = clusterQuotasLoaded && !isEmpty(clusterQuotas);
   const showTabs = hasClusterQuotas || activeTab === QuotaScope.CLUSTER;
 
   const quotas = useMemo(
-    () =>
+    (): ApplicationAwareQuota[] =>
       (activeTab === QuotaScope.CLUSTER
         ? clusterQuotas
         : namespaceQuotas) as ApplicationAwareQuota[],
@@ -81,10 +74,10 @@ const QuotasList: FC = () => {
   });
 
   const {
+    handleFilterChange: handleSetFilters,
     handlePerPageSelect,
     handleSetPage,
     pagination,
-    handleFilterChange: handleSetFilters,
   } = usePaginationWithFilters(filteredData?.length ?? 0, onSetFilters);
 
   const columns = useMemo(
@@ -119,72 +112,33 @@ const QuotasList: FC = () => {
 
   return (
     <>
-      <ListPageHeader
-        helpText={
-          <>
-            <div className="pf-v6-u-text-color-subtle pf-v6-u-my-sm">
-              {t(
-                'Define and monitor quotas for virtual machines and pods using Application Aware Quota. AAQ provides more accurate quota enforcement for virtualized workloads and is designed to fully replace Kubernetes ResourceQuota.',
-              )}
-            </div>
-            <div>
-              <QuotasLearnMoreLink />
-            </div>
-          </>
-        }
-        title={t('Application-aware quotas')}
-      >
-        {!showEmptyState && <QuotasCreateButton namespace={namespace} />}
-      </ListPageHeader>
-      {showTabs && (
-        <Tabs activeKey={activeTab} onSelect={handleTabSelect} usePageInsets>
-          <Tab
-            eventKey={QuotaScope.PROJECT}
-            title={<TabTitleText>{t('Project-scoped')}</TabTitleText>}
-          />
-          <Tab
-            eventKey={QuotaScope.CLUSTER}
-            title={<TabTitleText>{t('Cluster-scoped')}</TabTitleText>}
-          />
-        </Tabs>
-      )}
+      <QuotasListHeader
+        activeTab={activeTab}
+        handleTabSelect={handleTabSelect}
+        namespace={namespace}
+        showEmptyState={showEmptyState}
+        showTabs={showTabs}
+      />
       <ListPageBody>
         {showEmptyState ? (
           <QuotasEmptyState namespace={namespace} />
         ) : (
           <>
-            <div className="list-managment-group">
-              <KubevirtFilterToolbar
-                clearAllFilters={clearAllFilters}
-                columnLayout={columnLayout}
-                data={quotas}
-                filters={filters}
-                loaded={isLoaded}
-                onSetFilters={handleSetFilters}
-                toolbarEndContent={
-                  <KubevirtTableExport<ApplicationAwareQuota, QuotaCallbacks>
-                    activeColumnKeys={activeColumnKeys}
-                    callbacks={callbacks}
-                    columns={columns}
-                    data={filteredData ?? []}
-                    exportKey={EXPORT_TABLE_KEYS.APPLICATION_AWARE_QUOTAS}
-                    loaded={isLoaded}
-                  />
-                }
-              />
-              {!isEmpty(filteredData) && isLoaded && (
-                <Pagination
-                  className="list-managment-group__pagination"
-                  isLastFullPageShown
-                  itemCount={filteredData?.length}
-                  onPerPageSelect={handlePerPageSelect}
-                  onSetPage={handleSetPage}
-                  page={pagination?.page}
-                  perPage={pagination?.perPage}
-                  perPageOptions={paginationDefaultValues}
-                />
-              )}
-            </div>
+            <QuotasListToolbar
+              activeColumnKeys={activeColumnKeys}
+              callbacks={callbacks}
+              clearAllFilters={clearAllFilters}
+              columnLayout={columnLayout}
+              columns={columns}
+              filteredData={filteredData ?? []}
+              filters={filters}
+              handlePerPageSelect={handlePerPageSelect}
+              handleSetFilters={handleSetFilters}
+              handleSetPage={handleSetPage}
+              isLoaded={isLoaded}
+              pagination={pagination}
+              quotas={quotas}
+            />
             <KubevirtTable<ApplicationAwareQuota, QuotaCallbacks>
               activeColumnKeys={activeColumnKeys}
               ariaLabel={t('Application-aware quotas table')}

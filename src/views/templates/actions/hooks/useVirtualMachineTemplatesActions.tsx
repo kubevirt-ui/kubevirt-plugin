@@ -1,15 +1,12 @@
-/* eslint-disable */
-import React, { useCallback, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router';
 
-import { TemplateModel, V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { DataVolumeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
-import { AnnotationsModal } from '@kubevirt-utils/components/AnnotationsModal/AnnotationsModal';
-import CloneTemplateModal from '@kubevirt-utils/components/CloneTemplateModal/CloneTemplateModal';
-import DeleteModal from '@kubevirt-utils/components/DeleteModal/DeleteModal';
-import { LabelsModal } from '@kubevirt-utils/components/LabelsModal/LabelsModal';
-import Loading from '@kubevirt-utils/components/Loading/Loading';
+import {
+  DataVolumeModel,
+  TemplateModel,
+  type V1Template,
+} from '@kubevirt-ui-ext/kubevirt-api/console';
+import { type V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useNamespaceParam from '@kubevirt-utils/hooks/useNamespaceParam';
@@ -19,26 +16,17 @@ import {
   getTemplateListURL,
   getTemplateURL,
 } from '@kubevirt-utils/resources/template/utils';
+import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
-import { kubevirtK8sDelete, kubevirtK8sPatch } from '@multicluster/k8sRequests';
+import { kubevirtK8sDelete } from '@multicluster/k8sRequests';
 import useIsACMPage from '@multicluster/useIsACMPage';
-import { Action } from '@openshift-console/dynamic-plugin-sdk';
-import { useFleetAccessReview } from '@stolostron/multicluster-sdk';
-import { useHubClusterName } from '@stolostron/multicluster-sdk';
+import { type Action } from '@openshift-console/dynamic-plugin-sdk';
+import { useFleetAccessReview, useHubClusterName } from '@stolostron/multicluster-sdk';
+
+import { createDataVolume, getBootDataSource, hasEditableBootSource } from '../editBootSource';
 
 import useEditTemplateAccessReview from '../../details/hooks/useIsTemplateEditable';
-import {
-  NO_DELETE_TEMPLATE_PERMISSIONS,
-  NO_EDIT_TEMPLATE_PERMISSIONS,
-} from '../../utils/constants';
-import EditBootSourceModal from '../components/EditBootSourceModal';
-import { EDIT_TEMPLATE_ID } from '../constants';
-import {
-  createDataVolume,
-  getBootDataSource,
-  getEditBootSourceRefDescription,
-  hasEditableBootSource,
-} from '../editBootSource';
+import { getTemplateActions } from './getTemplateActions';
 
 type UseVirtualMachineTemplatesActions = (
   template: V1Template,
@@ -56,7 +44,7 @@ const useVirtualMachineTemplatesActions: UseVirtualMachineTemplatesActions = (
   const editableBootSource = hasEditableBootSource(bootDataSource);
   const namespace = useNamespaceParam();
   const [hubClusterName] = useHubClusterName();
-  const cluster = getCluster(template) || hubClusterName;
+  const cluster = getCluster(template) ?? hubClusterName;
   const isACMPage = useIsACMPage();
   const baseTemplatePage = getTemplateURL(
     getName(template),
@@ -84,171 +72,54 @@ const useVirtualMachineTemplatesActions: UseVirtualMachineTemplatesActions = (
     ),
   );
 
-  const goToTemplatePage = useCallback(
-    (currentTemplate: V1Template) => {
-      navigate(
-        getTemplateURL(
-          getName(currentTemplate),
-          getNamespace(currentTemplate),
-          isACMPage ? cluster : undefined,
-        ),
-      );
-    },
-    [navigate, isACMPage, cluster],
-  );
+  const goToTemplatePage = (currentTemplate: V1Template): void => {
+    navigate(
+      getTemplateURL(
+        getName(currentTemplate),
+        getNamespace(currentTemplate),
+        isACMPage ? cluster : undefined,
+      ),
+    );
+  };
 
-  const onLazyActions = useCallback(async () => {
-    if (!bootDataSource) {
-      const dataSource = await getBootDataSource(template);
-      setBootDataSource(dataSource);
-    }
-    setLoadingBootSource(false);
+  const onLazyActions = useCallback((): void => {
+    const loadBootSource = async (): Promise<void> => {
+      if (!bootDataSource) {
+        const dataSource = await getBootDataSource(template);
+        setBootDataSource(dataSource);
+      }
+      setLoadingBootSource(false);
+    };
+    loadBootSource().catch(kubevirtConsole.error);
   }, [bootDataSource, template]);
 
-  const onDelete = async () => {
+  const onDelete = async (): Promise<void> => {
     await kubevirtK8sDelete({
       cluster,
       model: TemplateModel,
       resource: template,
-    }).then(() => navigate(isACMPage ? getACMTemplateListURL() : getTemplateListURL(namespace)));
+    }).then((): void => {
+      navigate(isACMPage ? getACMTemplateListURL() : getTemplateListURL(namespace));
+    });
   };
 
-  const actions = [
-    {
-      accessReview: asAccessReview(TemplateModel, template, 'patch'),
-      cta: () => goToTemplatePage(template),
-      id: EDIT_TEMPLATE_ID,
-      label: t('Edit'),
-    },
-    {
-      accessReview: asAccessReview(TemplateModel, template, 'create'),
-      cta: () =>
-        createModal(({ isOpen, onClose }) => (
-          <CloneTemplateModal
-            isOpen={isOpen}
-            obj={template}
-            onClose={onClose}
-            onTemplateCloned={goToTemplatePage}
-          />
-        )),
-      id: 'clone-template',
-      label: t('Clone'),
-    },
-    {
-      accessReview: asAccessReview(TemplateModel, template, 'patch'),
-      cta: () => navigate(`${baseTemplatePage}/disks`),
-      description:
-        (isCommonTemplate && t('Red Hat template cannot be edited')) ||
-        (!hasEditPermission && t(NO_EDIT_TEMPLATE_PERMISSIONS)),
-      disabled: isCommonTemplate || !hasEditPermission,
-      id: 'edit-boot-source',
-      label: t('Edit boot source'),
-    },
-    {
-      accessReview: asAccessReview(TemplateModel, template, 'patch'),
-      cta: () =>
-        createModal(({ isOpen, onClose }) => (
-          <EditBootSourceModal
-            dataSource={bootDataSource}
-            isOpen={isOpen}
-            obj={template}
-            onClose={onClose}
-          />
-        )),
-      description:
-        (!loadingBootSource || !canWriteToDataSourceNs) &&
-        getEditBootSourceRefDescription(bootDataSource, canWriteToDataSourceNs),
-      disabled: !editableBootSource || !canWriteToDataSourceNs,
-      id: 'edit-boot-source-ref',
-      label: (
-        <>
-          {t('Edit boot source reference')} {loadingBootSource && <Loading />}
-        </>
-      ),
-    },
-    {
-      accessReview: asAccessReview(TemplateModel, template, 'patch'),
-      cta: () =>
-        createModal(({ isOpen, onClose }) => (
-          <LabelsModal
-            onLabelsSubmit={(labels) =>
-              kubevirtK8sPatch({
-                cluster,
-                data: [
-                  {
-                    op: 'replace',
-                    path: '/metadata/labels',
-                    value: labels,
-                  },
-                ],
-                model: TemplateModel,
-                resource: template,
-              })
-            }
-            isOpen={isOpen}
-            obj={template}
-            onClose={onClose}
-          />
-        )),
-      description:
-        (isCommonTemplate && t('Labels cannot be edited for Red Hat templates')) ||
-        (!hasEditPermission && t(NO_EDIT_TEMPLATE_PERMISSIONS)),
-      disabled: isCommonTemplate || !hasEditPermission,
-      id: 'edit-labels',
-      label: t('Edit labels'),
-    },
-    {
-      accessReview: asAccessReview(TemplateModel, template, 'patch'),
-      cta: () =>
-        createModal(({ isOpen, onClose }) => (
-          <AnnotationsModal
-            onSubmit={(updatedAnnotations) =>
-              kubevirtK8sPatch({
-                cluster,
-                data: [
-                  {
-                    op: 'replace',
-                    path: '/metadata/annotations',
-                    value: updatedAnnotations,
-                  },
-                ],
-                model: TemplateModel,
-                resource: template,
-              })
-            }
-            isOpen={isOpen}
-            obj={template}
-            onClose={onClose}
-          />
-        )),
-      description:
-        (isCommonTemplate && t('Annotations cannot be edited for Red Hat templates')) ||
-        (!hasEditPermission && t(NO_EDIT_TEMPLATE_PERMISSIONS)),
-      disabled: isCommonTemplate || !hasEditPermission,
-      id: 'edit-annotations',
-      label: t('Edit annotations'),
-    },
-    {
-      accessReview: asAccessReview(TemplateModel, template, 'delete'),
-      cta: () =>
-        createModal(({ isOpen, onClose }) => (
-          <DeleteModal
-            headerText={t('Delete VirtualMachine template?')}
-            isOpen={isOpen}
-            obj={template}
-            onClose={onClose}
-            onDeleteSubmit={onDelete}
-            shouldRedirect={false}
-          />
-        )),
-      description:
-        (isCommonTemplate && t('Red Hat template cannot be deleted')) ||
-        (!canDeleteTemplate && t(NO_DELETE_TEMPLATE_PERMISSIONS)),
-      disabled: isCommonTemplate || !canDeleteTemplate,
-      id: 'delete-template',
-      label: t('Delete'),
-    },
-  ];
+  const actions = getTemplateActions({
+    baseTemplatePage,
+    bootDataSource,
+    canDeleteTemplate,
+    canWriteToDataSourceNs,
+    cluster,
+    createModal,
+    editableBootSource,
+    goToTemplatePage,
+    hasEditPermission,
+    isCommonTemplate,
+    loadingBootSource,
+    navigate,
+    onDelete,
+    t,
+    template,
+  });
 
   return [actions, onLazyActions];
 };

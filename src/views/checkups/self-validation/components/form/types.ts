@@ -2,53 +2,25 @@ import { type IoK8sApiStorageV1StorageClass } from '@kubevirt-ui-ext/kubevirt-ap
 import { type ClaimPropertySets } from '@kubevirt-utils/types/storage';
 import { type SelectProps } from '@patternfly/react-core';
 
-import type useWindowsValidationFormState from './useWindowsValidationFormState';
-
-export type CheckupFormState = {
-  checkupImage: string;
-  checkupImageIsFallback: boolean;
-  checkupImageLoaded: boolean;
-  checkupImageLoadError: Error | undefined;
-  claimPropertySets: ClaimPropertySets | null | undefined;
-  effectiveStorageClass: string;
-  handleStorageCapabilitySelect: SelectProps['onSelect'];
-  handleTestSuiteSelect: SelectProps['onSelect'];
-  isDryRun: boolean;
-  name: string;
-  pipelinesInstalled: boolean;
-  pipelinesLoaded: boolean;
+export type SelfValidationStorageSubmit = {
   pvcSize: string;
-  selectedTestSuites: string[];
-  setIsDryRun: (checked: boolean) => void;
-  setName: (name: string) => void;
-  setPvcSize: (size: string) => void;
-  setStorageClass: (storageClass: string) => void;
-  setTestSkips: (testSkips: string) => void;
   storageCapabilities: string[];
-  storageClasses: IoK8sApiStorageV1StorageClass[];
-  storageClassesLoaded: boolean;
-  storageProfileError: boolean;
-  storageProfileLoaded: boolean;
-  testSkips: string;
-  testSuitesToggleTitle: string;
-  windowsState: ReturnType<typeof useWindowsValidationFormState>;
+  storageClass: string;
+};
+
+export type WindowsValidationSubmit = {
+  isEulaConfirmed: boolean;
+  windowsServerTesting: boolean;
+  winImageDownloadUrl: string;
 };
 
 export type AdvancedSettingsProps = {
-  effectiveStorageClassName: string;
-  handleStorageCapabilitySelect: SelectProps['onSelect'];
+  cluster: string | undefined;
   isDryRun: boolean;
-  pvcSize: string;
+  onStorageChange: (storage: SelfValidationStorageSubmit) => void;
+  selectedTestSuites: string[];
   setIsDryRun: (checked: boolean) => void;
-  setPvcSize: (size: string) => void;
-  setStorageClass: (storageClass: string) => void;
   setTestSkips: (testSkips: string) => void;
-  storageCapabilities: string[];
-  storageClasses: IoK8sApiStorageV1StorageClass[];
-  storageClassesLoaded: boolean;
-  storageProfileError: boolean;
-  storageProfileHasClaimPropertySets: boolean;
-  storageProfileLoaded: boolean;
   testSkips: string;
 };
 
@@ -59,11 +31,11 @@ export type CheckupsSelfValidationFormActionsProps = {
   name: string;
   pvcSize: string;
   selectedTestSuites: string[];
-  storageCapabilities: string[];
-  storageClass: string;
-  testSkips: string;
+  storageCapabilities?: string[];
+  storageClass?: string;
+  testSkips?: string;
   windowsServerTesting: boolean;
-  winImageDownloadUrl: string;
+  winImageDownloadUrl?: string;
 };
 
 export type HeavyLoadCheckupConfirmationModalProps = {
@@ -83,13 +55,46 @@ export type RunButtonWithTooltipProps = {
 };
 
 export type WindowsValidationSettingsProps = {
-  isEulaConfirmed: boolean;
-  isTier2Selected: boolean;
+  onWindowsChange: (state: WindowsValidationSubmit) => void;
   pipelinesInstalled: boolean;
   pipelinesLoaded: boolean;
-  setIsEulaConfirmed: (checked: boolean) => void;
-  setWindowsServerTesting: (checked: boolean) => void;
-  setWinImageDownloadUrl: (url: string) => void;
-  windowsServerTesting: boolean;
-  winImageDownloadUrl: string;
+  selectedTestSuites: string[];
+};
+
+export type CheckupFormState = {
+  checkupImage: string | undefined;
+  checkupImageIsFallback: boolean;
+  checkupImageLoaded: boolean;
+  checkupImageLoadError: Error;
+  claimPropertySets: ClaimPropertySets;
+  effectiveStorageClass: string;
+  handleStorageCapabilitySelect: SelectProps['onSelect'];
+  handleTestSuiteSelect: SelectProps['onSelect'];
+  isDryRun: boolean;
+  name: string;
+  pipelinesInstalled: boolean;
+  pipelinesLoaded: boolean;
+  pvcSize: string;
+  selectedTestSuites: string[];
+  setIsDryRun: React.Dispatch<React.SetStateAction<boolean>>;
+  setName: React.Dispatch<React.SetStateAction<string>>;
+  setPvcSize: React.Dispatch<React.SetStateAction<string>>;
+  setStorageClass: React.Dispatch<React.SetStateAction<string>>;
+  setTestSkips: React.Dispatch<React.SetStateAction<string>>;
+  storageCapabilities: string[];
+  storageClasses: IoK8sApiStorageV1StorageClass[];
+  storageClassesLoaded: boolean;
+  storageProfileError: boolean;
+  storageProfileLoaded: boolean;
+  testSkips: string;
+  testSuitesToggleTitle: string;
+  windowsState: {
+    isEulaConfirmed: boolean;
+    isTier2Selected: boolean;
+    setIsEulaConfirmed: (checked: boolean) => void;
+    setWindowsServerTesting: (checked: boolean) => void;
+    setWinImageDownloadUrl: (url: string) => void;
+    windowsServerTesting: boolean;
+    winImageDownloadUrl: string;
+  };
 };

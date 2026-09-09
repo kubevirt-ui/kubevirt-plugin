@@ -1,11 +1,11 @@
 import React, { type FC } from 'react';
 import classNames from 'classnames';
 
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { Flex, FlexItem, Grid, GridItem } from '@patternfly/react-core';
 
 import { getVMStatusCounts } from '../utils';
 
-import { type K8sResourceKind } from '../../../../utils/types';
 import EmptyStateNoVMs from '../../../vms-per-resource-card/EmptyStateNoVMs';
 import VMStatusInventoryItem from './VMStatusInventoryItem';
 import VMStatusSectionSkeleton from './VMStatusSectionSkeleton';
@@ -13,7 +13,7 @@ import VMStatusSectionSkeleton from './VMStatusSectionSkeleton';
 import './VMStatusSection.scss';
 
 export type VMStatusSectionProps = {
-  vms: K8sResourceKind[];
+  vms: V1VirtualMachine[];
   vmsLoaded: boolean;
 };
 

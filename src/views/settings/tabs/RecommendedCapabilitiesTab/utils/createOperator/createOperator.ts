@@ -38,11 +38,6 @@ import {
   isCatalogSourceTrusted,
 } from './helpers';
 
-const getConsolePlugins = (value: unknown): string[] =>
-  Array.isArray(value)
-    ? value.filter((plugin): plugin is string => typeof plugin === 'string')
-    : [];
-
 export const createOperator = async (
   operatorItem: VirtFeatureOperatorItem,
   consoleOperatorConfig: K8sResourceKind,
@@ -126,7 +121,11 @@ export const createOperator = async (
       );
     }
 
-    const previousPlugins = getConsolePlugins(consoleOperatorConfig?.spec?.plugins);
+    const previousPlugins: string[] = Array.isArray(consoleOperatorConfig?.spec?.plugins)
+      ? (consoleOperatorConfig.spec.plugins as unknown[]).filter(
+          (plugin): plugin is string => typeof plugin === 'string',
+        )
+      : [];
     const updatedPlugins: string[] = [
       ...previousPlugins.filter((plugin: string) => !csvPlugins.includes(plugin)),
       ...enabledPlugins,
