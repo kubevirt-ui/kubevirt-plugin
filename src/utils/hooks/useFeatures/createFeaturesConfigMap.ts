@@ -1,9 +1,8 @@
-/* eslint-disable */
 import { ConfigMapModel, RoleBindingModel, RoleModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
-  IoK8sApiCoreV1ConfigMap,
-  IoK8sApiRbacV1Role,
-  IoK8sApiRbacV1RoleBinding,
+  type IoK8sApiCoreV1ConfigMap,
+  type IoK8sApiRbacV1Role,
+  type IoK8sApiRbacV1RoleBinding,
 } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { operatorNamespaceSignal } from '@kubevirt-utils/store/operatorNamespace';
 import { DEFAULT_OPERATOR_NAMESPACE } from '@kubevirt-utils/utils/utils';
@@ -16,7 +15,7 @@ import {
   getFeaturesRoleBinding,
 } from './constants';
 
-export const createFeaturesConfigMap = async (cluster?: string) => {
+export const createFeaturesConfigMap = async (cluster?: string): Promise<void> => {
   const namespace = operatorNamespaceSignal.value ?? DEFAULT_OPERATOR_NAMESPACE;
 
   await kubevirtK8sCreate<IoK8sApiCoreV1ConfigMap>({
@@ -42,7 +41,7 @@ export const applyMissingFeatures = async (
   featureName: string,
   featureConfigMap: IoK8sApiCoreV1ConfigMap,
   cluster?: string,
-) => {
+): Promise<void> => {
   await kubevirtK8sPatch({
     cluster,
     data: [

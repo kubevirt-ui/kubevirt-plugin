@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { act, renderHook } from '@testing-library/react';
 
 import { UPLOAD_PROGRESS_STATUS } from '../constants';
@@ -82,13 +81,11 @@ describe('useUploadBeforeUnload', () => {
 
     const event = {
       preventDefault: jest.fn(),
-      returnValue: 'initial',
     } as unknown as BeforeUnloadEvent;
 
     handler(event);
 
     expect(event.preventDefault).toHaveBeenCalled();
-    expect(event.returnValue).toBe('');
   });
 
   it('should not register listener for terminal upload statuses', () => {

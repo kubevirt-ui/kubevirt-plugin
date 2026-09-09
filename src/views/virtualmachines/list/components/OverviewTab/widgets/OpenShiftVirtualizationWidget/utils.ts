@@ -5,9 +5,9 @@ import { HealthState, type PrometheusResult } from '@openshift-console/dynamic-p
 import { type SubscriptionKind, SubscriptionState } from '@overview/utils/types';
 
 const hcoValueToHealthState: Record<number, HealthState> = {
-  [HCOHealthStatus.critical]: HealthState.ERROR,
-  [HCOHealthStatus.none]: HealthState.OK,
-  [HCOHealthStatus.warning]: HealthState.WARNING,
+  [HCOHealthStatus.Critical]: HealthState.ERROR,
+  [HCOHealthStatus.None]: HealthState.OK,
+  [HCOHealthStatus.Warning]: HealthState.WARNING,
 };
 
 export const HCO_HEALTH_QUERY = 'kubevirt_hyperconverged_operator_health_status';
@@ -33,9 +33,9 @@ export const processHealthResults = (
     if (Number.isNaN(value)) continue;
 
     if (resultCluster) {
-      if (value === HCOHealthStatus.critical) {
+      if (value === HCOHealthStatus.Critical) {
         criticalClusters.push(resultCluster);
-      } else if (value === HCOHealthStatus.warning) {
+      } else if (value === HCOHealthStatus.Warning) {
         degradedClusters.push(resultCluster);
       }
     }

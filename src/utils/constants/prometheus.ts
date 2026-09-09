@@ -1,11 +1,10 @@
-/* eslint-disable */
 import { PERSPECTIVES } from '@kubevirt-utils/constants/constants';
 import { AlertResource } from '@overview/OverviewTab/status-card/utils/utils';
 
 export const MONITORING_SALT = 'monitoring-salt';
 export const OPERATOR_LABEL_KEY = 'kubernetes_operator_part_of';
 
-export const getAlertsBasePath = (perspective: string, namespace?: string) => {
+export const getAlertsBasePath = (perspective: string, namespace?: string): string => {
   switch (perspective) {
     case PERSPECTIVES.ACM:
       return `/multicloud${AlertResource.plural}`;
@@ -19,5 +18,5 @@ export const getAlertsBasePath = (perspective: string, namespace?: string) => {
   }
 };
 
-export const getAlertsPath = (perspective: string, namespace?: string, suffix?: string) =>
+export const getAlertsPath = (perspective: string, namespace?: string, suffix?: string): string =>
   `${getAlertsBasePath(perspective, namespace)}${suffix}`;

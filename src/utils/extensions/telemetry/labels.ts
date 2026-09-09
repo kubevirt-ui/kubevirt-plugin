@@ -1,13 +1,12 @@
-/* eslint-disable */
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getLabels, getName } from '@kubevirt-utils/resources/shared';
-import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+import { type K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
-import { VM_LABELS_COLLECTED } from './utils/constants';
 import { eventMonitor } from './telemetry';
+import { VM_LABELS_COLLECTED } from './utils/constants';
 
-export const logVMLabelsCollected = (vm: V1VirtualMachine) => {
+export const logVMLabelsCollected = (vm: V1VirtualMachine): void => {
   const labels = getLabels(vm) ?? {};
   eventMonitor(VM_LABELS_COLLECTED, {
     labelCount: Object.keys(labels).length,
@@ -18,7 +17,7 @@ export const logVMLabelsCollected = (vm: V1VirtualMachine) => {
 export const logVMLabelsCollectedIfVirtualMachine = (
   obj: K8sResourceCommon,
   updatedLabels: Record<string, string>,
-) => {
+): void => {
   if (obj?.kind !== VirtualMachineModel.kind) {
     return;
   }

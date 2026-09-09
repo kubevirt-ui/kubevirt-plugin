@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 
@@ -14,7 +13,7 @@ import useProjects from './useProjects';
 export const useForceProjectSelection = (
   pathConditions: string[] = [VIRTUALIZATION_PATHS.BASE],
   enabled: boolean = true,
-) => {
+): void => {
   const location = useLocation();
   const navigate = useNavigate();
   const isAdmin = useIsAdmin();

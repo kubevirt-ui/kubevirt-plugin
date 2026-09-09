@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { useMemo } from 'react';
 
 import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -6,7 +5,7 @@ import { isSystemNamespace } from '@kubevirt-utils/resources/namespace/helper';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { universalComparator } from '@kubevirt-utils/utils/utils';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
-import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+import { type K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
 type UseProjectResources = (
   cluster?: string,
@@ -26,9 +25,10 @@ const useProjectResources: UseProjectResources = (cluster, onlyUserProjects = fa
       : projects;
   }, [projects, onlyUserProjects]);
 
-  const sortedProjects = useMemo(() => {
-    return filteredProjects?.sort((a, b) => universalComparator(getName(a), getName(b)));
-  }, [filteredProjects]);
+  const sortedProjects = useMemo(
+    () => filteredProjects?.toSorted((a, b) => universalComparator(getName(a), getName(b))),
+    [filteredProjects],
+  );
 
   return [sortedProjects, loaded, error];
 };

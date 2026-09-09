@@ -1,5 +1,4 @@
-/* eslint-disable */
-import { isCommonTemplate, Template } from '@kubevirt-utils/resources/template';
+import { isCommonTemplate, type Template } from '@kubevirt-utils/resources/template';
 import { VMCreationMethod, VMWizardStep } from '@virtualmachines/wizard/utils/constants';
 
 import { logTaskErrorLogged, logTaskProficiencyMeasured } from './learning';
@@ -11,7 +10,7 @@ import {
   TELEMETRY_TEMPLATE_TYPE,
   TELEMETRY_VM_CREATION_METHOD,
 } from './utils/property-constants';
-import { TemplateTypeTelemetry, VMCreationMethodTelemetry } from './utils/types';
+import { type TemplateTypeTelemetry, type VMCreationMethodTelemetry } from './utils/types';
 
 export const mapCreationMethodToTelemetry = (
   method: VMCreationMethod,
@@ -47,14 +46,14 @@ export const getTemplateTypeTelemetry = (template: Template): TemplateTypeTeleme
     ? TELEMETRY_TEMPLATE_TYPE.PREDEFINED
     : TELEMETRY_TEMPLATE_TYPE.USER_DEFINED;
 
-export const logVMCreationStarted = (creationMethod: VMCreationMethodTelemetry) => {
+export const logVMCreationStarted = (creationMethod: VMCreationMethodTelemetry): void => {
   eventMonitor(VM_CREATION_STARTED, { creationMethod });
 };
 
 export const logVMCreated = (
   creationMethod: VMCreationMethodTelemetry,
   options?: { templateType?: TemplateTypeTelemetry },
-) => {
+): void => {
   eventMonitor(VM_CREATED, {
     creationMethod,
     ...(options?.templateType && { templateType: options.templateType }),
@@ -70,7 +69,7 @@ export const logVMCreationFailed = (
   creationMethod: VMCreationMethodTelemetry,
   error: unknown,
   options?: { templateType?: TemplateTypeTelemetry },
-) => {
+): void => {
   const errorMessage = getTelemetryErrorMessage(error);
   const errorCode = (error as { code?: string })?.code;
 
@@ -87,13 +86,13 @@ export const logVMCreationFailed = (
   });
 };
 
-export const logVMCreatedFromTemplate = (template: Template) => {
+export const logVMCreatedFromTemplate = (template: Template): void => {
   logVMCreated(TELEMETRY_VM_CREATION_METHOD.TEMPLATE, {
     templateType: getTemplateTypeTelemetry(template),
   });
 };
 
-export const logVMCreationFailedFromTemplate = (template: Template, error: unknown) => {
+export const logVMCreationFailedFromTemplate = (template: Template, error: unknown): void => {
   logVMCreationFailed(TELEMETRY_VM_CREATION_METHOD.TEMPLATE, error, {
     templateType: getTemplateTypeTelemetry(template),
   });

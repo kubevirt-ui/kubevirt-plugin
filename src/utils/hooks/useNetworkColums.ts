@@ -1,8 +1,7 @@
-/* eslint-disable */
 import { useMemo } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { NetworkPresentation } from '@kubevirt-utils/resources/vm/utils/network/constants';
+import { type NetworkPresentation } from '@kubevirt-utils/resources/vm/utils/network/constants';
 import {
   Actions,
   MacAddress,
@@ -12,9 +11,9 @@ import {
   State,
   Type,
 } from '@kubevirt-utils/resources/vm/utils/network/network-columns';
-import { TableColumn } from '@openshift-console/dynamic-plugin-sdk';
+import { type TableColumn } from '@openshift-console/dynamic-plugin-sdk';
 
-const useNetworkColumns = () => {
+const useNetworkColumns = (): TableColumn<NetworkPresentation>[] => {
   const { t } = useKubevirtTranslation();
 
   const columns: TableColumn<NetworkPresentation>[] = useMemo(() => {

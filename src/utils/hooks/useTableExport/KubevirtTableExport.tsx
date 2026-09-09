@@ -1,13 +1,12 @@
-/* eslint-disable */
-import React, { useMemo } from 'react';
+import React, { type ReactElement, useMemo } from 'react';
 
 import ExportTableButton from '@kubevirt-utils/components/ExportTableButton/ExportTableButton';
 import { getActiveColumns } from '@kubevirt-utils/components/KubevirtTable/utils/getActiveColumns';
-import { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
+import { type ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { useDataViewTableSort } from '@kubevirt-utils/hooks/useDataViewTableSort/useDataViewTableSort';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 
-import { buildExportFilename, DEFAULT_EXPORT_FILENAME, ExportTableKey } from './constants';
+import { buildExportFilename, DEFAULT_EXPORT_FILENAME, type ExportTableKey } from './constants';
 import useExportParams from './useExportParams';
 
 type ExportKey = `${string}-${ExportTableKey}` | ExportTableKey;
@@ -38,7 +37,7 @@ const KubevirtTableExport = <TData, TCallbacks = undefined>({
   initialSortDirection,
   initialSortKey,
   loaded = true,
-}: KubevirtTableExportProps<TData, TCallbacks>) => {
+}: KubevirtTableExportProps<TData, TCallbacks>): ReactElement => {
   const { cluster, namespace } = useExportParams();
 
   const resolvedFilename = useMemo(() => {

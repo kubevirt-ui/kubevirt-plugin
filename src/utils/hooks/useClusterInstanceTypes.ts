@@ -1,10 +1,9 @@
-/* eslint-disable */
 import { VirtualMachineClusterInstancetypeModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1beta1VirtualMachineClusterInstancetype } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1beta1VirtualMachineClusterInstancetype } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
 import useListMulticlusterFilters from '@kubevirt-utils/hooks/useListMulticlusterFilters';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
-import { Selector } from '@openshift-console/dynamic-plugin-sdk';
+import { type Selector } from '@openshift-console/dynamic-plugin-sdk';
 
 type UseClusterInstanceTypes = (
   fieldSelector?: string,
@@ -20,7 +19,7 @@ const useClusterInstanceTypes: UseClusterInstanceTypes = (fieldSelector, selecto
     V1beta1VirtualMachineClusterInstancetype[]
   >(
     {
-      cluster: cluster || clusterParam,
+      cluster: cluster ?? clusterParam,
       fieldSelector,
       groupVersionKind: VirtualMachineClusterInstancetypeModelGroupVersionKind,
       isList: true,
@@ -30,7 +29,7 @@ const useClusterInstanceTypes: UseClusterInstanceTypes = (fieldSelector, selecto
     multiclusterFilters,
   );
 
-  return [instanceTypes || [], loaded || !!loadError, loadError];
+  return [instanceTypes ?? [], loaded || !!loadError, loadError];
 };
 
 export default useClusterInstanceTypes;

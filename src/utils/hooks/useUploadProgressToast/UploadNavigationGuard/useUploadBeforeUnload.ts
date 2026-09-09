@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { useEffect } from 'react';
 
 import { UPLOAD_PROGRESS_STATUS } from '../constants';
@@ -17,13 +16,12 @@ const useUploadBeforeUnload = (): void => {
       return;
     }
 
-    const handler = (event: BeforeUnloadEvent) => {
+    const handler = (event: BeforeUnloadEvent): void => {
       event.preventDefault();
-      event.returnValue = '';
     };
 
     window.addEventListener('beforeunload', handler);
-    return () => window.removeEventListener('beforeunload', handler);
+    return (): void => window.removeEventListener('beforeunload', handler);
   }, [hasActiveUploads]);
 };
 

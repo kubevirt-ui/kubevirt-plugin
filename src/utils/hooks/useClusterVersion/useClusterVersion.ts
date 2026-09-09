@@ -1,12 +1,11 @@
-/* eslint-disable */
 import { useMemo } from 'react';
 
 import { ClusterVersionModel, modelToGroupVersionKind } from '@kubevirt-utils/models';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 
-import { ClusterVersion } from './constants';
+import { type ClusterVersion } from './constants';
 
-const useClusterVersion = (cluster?: string): [string | undefined, boolean, any] => {
+const useClusterVersion = (cluster?: string): [string | undefined, boolean, Error | undefined] => {
   const [clusterVersionResource, clusterVersionLoaded, clusterVersionError] = useK8sWatchData<
     ClusterVersion[]
   >({

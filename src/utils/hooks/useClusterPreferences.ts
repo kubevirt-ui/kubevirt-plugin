@@ -1,10 +1,9 @@
-/* eslint-disable */
 import { VirtualMachineClusterPreferenceModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
 import useListMulticlusterFilters from '@kubevirt-utils/hooks/useListMulticlusterFilters';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
-import { Selector } from '@openshift-console/dynamic-plugin-sdk';
+import { type Selector } from '@openshift-console/dynamic-plugin-sdk';
 
 type UseClusterPreferences = (
   fieldSelector?: string,
@@ -20,7 +19,7 @@ const useClusterPreferences: UseClusterPreferences = (fieldSelector, selector, c
     V1beta1VirtualMachineClusterPreference[]
   >(
     {
-      cluster: cluster || clusterParam,
+      cluster: cluster ?? clusterParam,
       fieldSelector,
       groupVersionKind: VirtualMachineClusterPreferenceModelGroupVersionKind,
       isList: true,
@@ -30,7 +29,7 @@ const useClusterPreferences: UseClusterPreferences = (fieldSelector, selector, c
     multiclusterFilters,
   );
 
-  return [preferences || [], loaded || !!loadError, loadError];
+  return [preferences ?? [], loaded || !!loadError, loadError];
 };
 
 export default useClusterPreferences;

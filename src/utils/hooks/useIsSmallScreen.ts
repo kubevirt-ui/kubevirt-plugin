@@ -1,18 +1,17 @@
-/* eslint-disable */
 import { useEffect, useState } from 'react';
 
 import { BREAKPOINTS } from '@kubevirt-utils/constants/window';
 
-const useIsSmallScreen = () => {
+const useIsSmallScreen = (): boolean => {
   const [isSmallScreen, setIsSmallScreen] = useState(window.innerWidth < BREAKPOINTS.md);
 
   useEffect(() => {
-    const handleResize = () => {
+    const handleResize = (): void => {
       setIsSmallScreen(window.innerWidth < BREAKPOINTS.md);
     };
 
     window.addEventListener('resize', handleResize);
-    return () => {
+    return (): void => {
       window.removeEventListener('resize', handleResize);
     };
   }, []);

@@ -1,7 +1,7 @@
-/* eslint-disable */
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getName } from '@kubevirt-utils/resources/shared';
 
+import { eventMonitor, getTelemetryErrorMessage } from './telemetry';
 import {
   VM_MIGRATION_CLUSTER_LIMIT_CONFIGURED,
   VM_MIGRATION_CLUSTER_LIMIT_REACHED,
@@ -11,8 +11,7 @@ import {
   VM_MIGRATION_NODE_LIMIT_REACHED,
   VM_MIGRATION_STARTED,
 } from './utils/constants';
-import { MigrationStatusTelemetry } from './utils/types';
-import { eventMonitor, getTelemetryErrorMessage } from './telemetry';
+import { type MigrationStatusTelemetry } from './utils/types';
 
 type MigrationProperties = {
   clusterLimit?: number;
@@ -28,7 +27,7 @@ export const logVMMigrationStarted = (
     targetNode?: string;
     targetNodeSpecified?: boolean;
   },
-) => {
+): void => {
   eventMonitor(VM_MIGRATION_STARTED, {
     vmName: getName(vm),
     ...properties,
@@ -40,18 +39,19 @@ export const logVMMigrationCompleted = (
   status: MigrationStatusTelemetry,
   properties: MigrationProperties = {},
 ): void => {
-  const cleanProperties = Object.fromEntries(
-    Object.entries(properties).filter(([, value]) => value !== undefined),
-  );
+  const { clusterLimit, currentParallelCount, vmDiskGB, vmMemoryMB } = properties;
 
   eventMonitor(VM_MIGRATION_COMPLETED, {
     status,
     vmName: getName(vm),
-    ...cleanProperties,
+    ...(clusterLimit !== undefined && { clusterLimit }),
+    ...(currentParallelCount !== undefined && { currentParallelCount }),
+    ...(vmDiskGB !== undefined && { vmDiskGB }),
+    ...(vmMemoryMB !== undefined && { vmMemoryMB }),
   });
 };
 
-export const logVMMigrationFailed = (vm: V1VirtualMachine, error: unknown) => {
+export const logVMMigrationFailed = (vm: V1VirtualMachine, error: unknown): void => {
   const vmName = getName(vm);
   const errorMessage = getTelemetryErrorMessage(error);
   const errorCode = (error as { code?: string })?.code;
@@ -63,21 +63,24 @@ export const logVMMigrationFailed = (vm: V1VirtualMachine, error: unknown) => {
   });
 };
 
-export const logVMMigrationClusterLimitConfigured = (clusterLimit: number) => {
+export const logVMMigrationClusterLimitConfigured = (clusterLimit: number): void => {
   eventMonitor(VM_MIGRATION_CLUSTER_LIMIT_CONFIGURED, { clusterLimit });
 };
 
 export const logVMMigrationClusterLimitReached = (
   clusterLimit: number,
   currentParallelCount: number,
-) => {
+): void => {
   eventMonitor(VM_MIGRATION_CLUSTER_LIMIT_REACHED, { clusterLimit, currentParallelCount });
 };
 
-export const logVMMigrationNodeLimitConfigured = (nodeLimit: number) => {
+export const logVMMigrationNodeLimitConfigured = (nodeLimit: number): void => {
   eventMonitor(VM_MIGRATION_NODE_LIMIT_CONFIGURED, { nodeLimit });
 };
 
-export const logVMMigrationNodeLimitReached = (nodeLimit: number, currentParallelCount: number) => {
+export const logVMMigrationNodeLimitReached = (
+  nodeLimit: number,
+  currentParallelCount: number,
+): void => {
   eventMonitor(VM_MIGRATION_NODE_LIMIT_REACHED, { currentParallelCount, nodeLimit });
 };

@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
 export const PageTitles = {
@@ -10,5 +9,5 @@ export const PageTitles = {
   VirtualMachines: t('VirtualMachines'),
 };
 
-export const getResourceDetailsTitle = (name: string, resourceKind: string) =>
+export const getResourceDetailsTitle = (name: string, resourceKind: string): string =>
   t('{{name}} · {{resourceKind}} · Details', { name, resourceKind });

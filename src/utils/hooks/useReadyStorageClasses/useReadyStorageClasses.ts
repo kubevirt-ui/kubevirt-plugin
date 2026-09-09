@@ -1,15 +1,14 @@
-/* eslint-disable */
 import { useMemo } from 'react';
 
 import {
   modelToGroupVersionKind,
   StorageProfileModel,
 } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { IoK8sApiStorageV1StorageClass } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type IoK8sApiStorageV1StorageClass } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import useStorageClasses from '@kubevirt-utils/hooks/useStorageClasses/useStorageClasses';
 import { getName } from '@kubevirt-utils/resources/shared';
-import { StorageProfile } from '@kubevirt-utils/types/storage';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { type StorageProfile } from '@kubevirt-utils/types/storage';
+import { isEmpty, universalComparator } from '@kubevirt-utils/utils/utils';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 
@@ -25,7 +24,7 @@ type UseReadyStorageClasses = (cluster?: string) => [
 
 const useReadyStorageClasses: UseReadyStorageClasses = (cluster) => {
   const clusterParam = useClusterParam();
-  const resolvedCluster = cluster || clusterParam;
+  const resolvedCluster = cluster ?? clusterParam;
 
   const [storageClasses, scLoaded] = useStorageClasses(resolvedCluster);
 
@@ -44,7 +43,7 @@ const useReadyStorageClasses: UseReadyStorageClasses = (cluster) => {
   }, [storageClasses, storageProfiles, scLoaded, spLoaded]);
 
   const sortedStorageClasses = useMemo(
-    () => readyStorageClasses?.map(getName)?.sort(),
+    () => readyStorageClasses?.map(getName)?.toSorted((a, b) => universalComparator(a, b)),
     [readyStorageClasses],
   );
 

@@ -1,4 +1,4 @@
-/* eslint-disable */
+import { USER_SETTINGS_CONFIG_MAP_NAME } from '@kubevirt-utils/hooks/consoleUserSettings/tests/constants';
 import { CONSOLE_USER_SETTINGS } from '@kubevirt-utils/hooks/consoleUserSettings/useConsoleUserSettingLocalStorage/consts';
 import { act, renderHook, waitFor } from '@testing-library/react';
 
@@ -9,20 +9,15 @@ jest.mock(
   '@kubevirt-utils/hooks/useConsoleUserSettingsConfigMap/useConsoleUserSettingsConfigMap',
   () => ({
     __esModule: true,
-    default: () => {
-      const {
-        USER_SETTINGS_CONFIG_MAP_NAME: configMapName,
-      } = require('@kubevirt-utils/hooks/consoleUserSettings/tests/constants');
-      return {
-        configMapError: undefined,
-        configMapName,
-        errorUser: undefined,
-        loadedConfigMap: true,
-        loadedUser: true,
-        userConfigMap: undefined,
-        userName: configMapName,
-      };
-    },
+    default: () => ({
+      configMapError: undefined,
+      configMapName: USER_SETTINGS_CONFIG_MAP_NAME,
+      errorUser: undefined,
+      loadedConfigMap: true,
+      loadedUser: true,
+      userConfigMap: undefined,
+      userName: USER_SETTINGS_CONFIG_MAP_NAME,
+    }),
   }),
 );
 
@@ -94,7 +89,7 @@ describe('useConsoleShowSystemNamespaces', () => {
     });
 
     expect(
-      JSON.parse(localStorage.getItem(CONSOLE_USER_SETTINGS.LOCAL_STORAGE_KEY) || '{}'),
+      JSON.parse(localStorage.getItem(CONSOLE_USER_SETTINGS.LOCAL_STORAGE_KEY) ?? '{}'),
     ).toEqual({
       [CONSOLE_NAMESPACE_SYSTEM_NAMESPACE_KEY]: true,
     });

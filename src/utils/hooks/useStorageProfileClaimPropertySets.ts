@@ -1,12 +1,11 @@
-/* eslint-disable */
 import { modelToGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { StorageProfileModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { ClaimPropertySets, StorageProfile } from '@kubevirt-utils/types/storage';
+import { type ClaimPropertySets, type StorageProfile } from '@kubevirt-utils/types/storage';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 
 export type UseStorageProfileClaimPropertySetsValue = {
   claimPropertySets: ClaimPropertySets;
-  error: any;
+  error: Error;
   loaded: boolean;
 };
 

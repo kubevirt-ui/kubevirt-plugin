@@ -1,15 +1,13 @@
-/* eslint-disable */
 import { useEffect } from 'react';
 
 import { DeploymentModel, modelToGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { IoK8sApiAppsV1Deployment } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type IoK8sApiAppsV1Deployment } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 
 import { LOAD_BALANCER_ENABLED } from '../useFeatures/constants';
 import { useFeatures } from '../useFeatures/useFeatures';
-
 import { METAL_LB_DEPLOYMENT_NAME, METAL_LB_DEPLOYMENT_NAMESPACE } from './constants';
 
 export const useMetalLBOperatorInstalled = (clusterOverride?: string): boolean => {
@@ -28,7 +26,7 @@ export const useMetalLBOperatorInstalled = (clusterOverride?: string): boolean =
 
   useEffect(() => {
     if (!featureEnabled && !loading && metalLBOperatorInstalled) {
-      toggleFeature(true);
+      void toggleFeature(true);
     }
   }, [featureEnabled, loading, metalLBOperatorInstalled, toggleFeature]);
 

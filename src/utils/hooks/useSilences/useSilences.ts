@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { useMemo } from 'react';
 
 import {
@@ -6,20 +5,22 @@ import {
   SILENCES_URL,
   URL_POLL_DEFAULT_DELAY,
 } from '@kubevirt-utils/hooks/useSilences/utils/constants';
-import { Silence } from '@openshift-console/dynamic-plugin-sdk';
+import { type Silence } from '@openshift-console/dynamic-plugin-sdk';
 import { useURLPoll } from '@openshift-console/dynamic-plugin-sdk-internal';
+
+type SilenceWithName = Silence & { name: string };
 
 type UseSilences = () => {
   loaded: boolean;
-  loadError: any;
-  silences: Silence[];
+  loadError: Error | undefined;
+  silences: SilenceWithName[] | undefined;
 };
 
 const useSilences: UseSilences = () => {
-  const [response, loadError, loading] = useURLPoll<Silence[]>(
-    SILENCES_URL,
-    URL_POLL_DEFAULT_DELAY,
-  );
+  const pollResult = useURLPoll<Silence[]>(SILENCES_URL, URL_POLL_DEFAULT_DELAY);
+  const response = pollResult[0];
+  const loading = pollResult[2];
+  const loadError = pollResult[1] instanceof Error ? pollResult[1] : undefined;
 
   const silencesWithAlertName = useMemo(() => {
     return response?.map((silence: Silence) => {
@@ -30,7 +31,7 @@ const useSilences: UseSilences = () => {
       return {
         ...silence,
         name:
-          alertName ||
+          alertName ??
           silence?.matchers
             .map((matcher) => `${matcher?.name}${matcher?.isRegex ? '=~' : '='}${matcher?.value}`)
             .join(', '),

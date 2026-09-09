@@ -1,14 +1,13 @@
-/* eslint-disable */
 import produce from 'immer';
 
 import { TemplateModel, VirtualMachineTemplateModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import {
   getTemplateVirtualMachineObject,
   isVirtualMachineTemplate,
-  Template,
+  type Template,
 } from '@kubevirt-utils/resources/template';
 import {
   DESCHEDULER_EVICT_ANNOTATION,
@@ -26,7 +25,7 @@ export const isDeschedulerEnabled = (annotations: { [key: string]: string }): bo
   return !deschedulerDisabled;
 };
 
-const updateVMDeschedulerSetting = (vm: V1VirtualMachine, settingChecked: boolean) => {
+const updateVMDeschedulerSetting = (vm: V1VirtualMachine, settingChecked: boolean): void => {
   ensurePath(vm, 'spec.template.metadata.annotations');
 
   if (settingChecked) {

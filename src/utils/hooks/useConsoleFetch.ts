@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { useEffect, useState } from 'react';
 
 import { consoleFetch } from '@openshift-console/dynamic-plugin-sdk';
@@ -22,19 +21,19 @@ const useConsoleFetch = <R>(
     if (!url) return;
     if (loaded) return;
 
-    const fetchData = async () => {
+    const fetchData = async (): Promise<void> => {
       try {
         const response = await consoleFetch(url, initialValue, timeout);
         setData(await response.json());
       } catch (e) {
-        setError(e);
+        setError(e instanceof Error ? e : new Error(String(e)));
       } finally {
         setLoaded(true);
       }
     };
 
-    fetchData();
-  }, [loaded, url]);
+    void fetchData();
+  }, [initialValue, loaded, timeout, url]);
 
   return { data, error, loaded };
 };
