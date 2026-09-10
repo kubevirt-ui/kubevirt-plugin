@@ -1,4 +1,4 @@
-import React, { type FC, type ReactNode, useMemo } from 'react';
+import React, { type FC, type ReactNode } from 'react';
 import classNames from 'classnames';
 
 import { DescriptionItemHeader } from '@kubevirt-utils/components/DescriptionItem/DescriptionItemHeader';
@@ -66,35 +66,24 @@ const DescriptionItem: FC<DescriptionItemProps> = ({
   subTitle,
 }) => {
   const { t } = useKubevirtTranslation();
-  const NotAvailable = <MutedTextSpan text={t('Not available')} />;
+  const notAvailableText = t('Not available');
 
-  const description = useMemo(
-    () =>
-      isEdit && !showEditOnTitle ? (
-        <>
-          <EditButtonWithTooltip
-            isEditable={!isDisabled}
-            onEditClick={onEditClick}
-            testId={testId}
-            tooltipContent={messageOnDisabled}
-          >
-            {descriptionData ?? NotAvailable}
-          </EditButtonWithTooltip>
-          {additionalContent}
-        </>
-      ) : (
-        descriptionData
-      ),
-    [
-      descriptionData,
-      isDisabled,
-      onEditClick,
-      messageOnDisabled,
-      testId,
-      additionalContent,
-      showEditOnTitle,
-    ],
-  );
+  const description =
+    isEdit && !showEditOnTitle ? (
+      <>
+        <EditButtonWithTooltip
+          isEditable={!isDisabled}
+          onEditClick={onEditClick}
+          testId={testId}
+          tooltipContent={messageOnDisabled}
+        >
+          {descriptionData ?? <MutedTextSpan text={notAvailableText} />}
+        </EditButtonWithTooltip>
+        {additionalContent}
+      </>
+    ) : (
+      descriptionData
+    );
 
   return (
     <DescriptionListGroup className={className}>

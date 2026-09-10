@@ -37,7 +37,7 @@ const useDeleteSavedSearch: UseDeleteSavedSearch = (deleteSearch, setOpen) => {
         deleteSearch(name);
       }
     },
-    [createModal, deleteSearch, t],
+    [createModal, deleteSearch, setOpen, t],
   );
 
   return handleDelete;

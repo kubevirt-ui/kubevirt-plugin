@@ -1,5 +1,5 @@
 import React, { type FC, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { isDataImportCronAutoUpdated } from 'src/views/datasources/utils';
 
 import {
@@ -49,17 +49,17 @@ export const DataImportCronManageModal: FC<DataImportCronManageModalProps> = ({
     isDataImportCronAutoUpdated(dataSource, dataImportCron),
   );
   const {
+    control,
     formState: { errors },
     handleSubmit,
     register,
     setValue,
-    watch,
   } = useForm<DataImportCronManageFormType>({
     defaultValues: {
       importsToKeep: dataImportCron?.spec?.importsToKeep ?? 3,
     },
   });
-  const importsToKeep = watch('importsToKeep');
+  const importsToKeep = useWatch({ control, name: 'importsToKeep' });
 
   const onSubmit = handleSubmit(
     (data) =>

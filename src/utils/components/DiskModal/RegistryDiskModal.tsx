@@ -1,5 +1,5 @@
 import React, { type FC } from 'react';
-import { FormProvider, useForm } from 'react-hook-form';
+import { FormProvider, useForm, useWatch } from 'react-hook-form';
 
 import AdvancedSettings from '@kubevirt-utils/components/DiskModal/components/AdvancedSettings/AdvancedSettings';
 import BootSourceCheckbox from '@kubevirt-utils/components/DiskModal/components/BootSourceCheckbox/BootSourceCheckbox';
@@ -39,12 +39,12 @@ const RegistryDiskModal: FC<V1SubDiskModalProps> = (props) => {
   });
 
   const {
+    control,
     formState: { isSubmitting, isValid },
     handleSubmit,
-    watch,
   } = methods;
 
-  const formRegistryCredentials = watch(REGISTRY_CREDENTIALS_FIELD);
+  const formRegistryCredentials = useWatch({ control, name: REGISTRY_CREDENTIALS_FIELD });
   const { password, username } = formRegistryCredentials ?? { password: '', username: '' };
   const credentialsValid = (username && password) || (!username && !password);
 

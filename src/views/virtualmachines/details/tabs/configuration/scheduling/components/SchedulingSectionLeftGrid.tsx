@@ -56,7 +56,7 @@ const SchedulingSectionLeftGrid: FC<SchedulingSectionLeftGridProps> = ({
             name: updatedVM?.metadata?.name,
             ns: updatedVM?.metadata?.namespace,
           }),
-    [onUpdateVM],
+    [onUpdateVM, vm],
   );
 
   return (
