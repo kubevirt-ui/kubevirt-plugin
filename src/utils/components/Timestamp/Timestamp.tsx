@@ -2,6 +2,7 @@ import type { FC } from 'react';
 import React from 'react';
 import classnames from 'classnames';
 
+import useCurrentTime from '@kubevirt-utils/hooks/useCurrentTime';
 import { pluralize, Tooltip } from '@patternfly/react-core';
 import { GlobeAmericasIcon } from '@patternfly/react-icons';
 
@@ -15,6 +16,8 @@ export type TimestampProps = {
 };
 
 const Timestamp: FC<TimestampProps> = ({ className, hideIcon = false, omitSuffix, timestamp }) => {
+  const now = useCurrentTime();
+
   // Check for null. If props.timestamp is null, it returns incorrect date and time of Wed Dec 31 1969 19:00:00 GMT-0500 (Eastern Standard Time)
   if (!timestamp || !isValid(new Date(timestamp))) {
     return <div className="co-timestamp">-</div>;
@@ -22,7 +25,7 @@ const Timestamp: FC<TimestampProps> = ({ className, hideIcon = false, omitSuffix
 
   const mdate = new Date(timestamp);
 
-  const newTimestamp = timestampFor(mdate, new Date(Date.now()), omitSuffix);
+  const newTimestamp = timestampFor(mdate, new Date(now), omitSuffix);
 
   const timeStamp = omitSuffix
     ? pluralize(newTimestamp['value'], newTimestamp['time'])

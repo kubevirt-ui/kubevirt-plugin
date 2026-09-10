@@ -70,11 +70,6 @@ const useOperatorResources = (
       operatorGroupsWatch?.loadError,
       packageManifestLoadErrors,
       subscriptionsWatch?.loadError,
-
-      csvLoadErrors,
-      operatorGroupsWatch?.loadError,
-      packageManifestLoadErrors,
-      subscriptionsWatch?.loadError,
     ],
   );
 

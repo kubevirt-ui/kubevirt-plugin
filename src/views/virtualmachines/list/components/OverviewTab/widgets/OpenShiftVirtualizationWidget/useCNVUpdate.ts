@@ -47,13 +47,7 @@ export const useCNVUpdate = (cluster?: string, isAllClustersPage = false): UseCN
       operatorLink: link,
       operatorLinkExternal: spokeConsoleURL ? `${spokeConsoleURL}${path}` : undefined,
     };
-  }, [
-    cluster,
-    hubClusterName,
-    getConsoleURL,
-    installedCSV?.metadata?.name,
-    subscription?.metadata?.namespace,
-  ]);
+  }, [cluster, hubClusterName, getConsoleURL, installedCSV, subscription]);
 
   return { isSpokeCluster, operatorLink, operatorLinkExternal, updateAvailable };
 };

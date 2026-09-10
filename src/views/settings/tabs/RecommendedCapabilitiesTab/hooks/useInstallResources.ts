@@ -9,6 +9,7 @@ import {
   useAccessReview,
 } from '@openshift-console/dynamic-plugin-sdk';
 import { useSettingsCluster } from '@settings/context/SettingsClusterContext';
+
 import { CONSOLE_OPERATOR_CONFIG_NAME } from '../utils/constants';
 
 type UseInstallResourcesReturn = {
@@ -44,8 +45,10 @@ const useInstallResources = (): UseInstallResourcesReturn => {
   }>(watchedResources);
 
   const consoleOperatorConfig = watchData?.consoleOperatorConfig?.data as K8sResourceKind;
-  const namespaces = (watchData?.namespaces?.data as K8sResourceKind[]) ?? [];
-  const namespaceNames = useMemo(() => namespaces.map(getName), [namespaces]);
+  const namespaceNames = useMemo(
+    () => ((watchData?.namespaces?.data as K8sResourceKind[]) ?? []).map(getName),
+    [watchData?.namespaces?.data],
+  );
 
   const installResourcesLoaded =
     watchData?.consoleOperatorConfig?.loaded && watchData?.namespaces?.loaded;

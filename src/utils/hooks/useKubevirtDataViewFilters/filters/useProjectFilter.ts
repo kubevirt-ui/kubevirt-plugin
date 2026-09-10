@@ -50,7 +50,7 @@ const useProjectFilter = (options?: UseProjectFilterOptions): KubevirtFilter => 
       return multiclusterNamespacesNames;
     }
     return projects ?? [];
-  }, [options?.allowedProjects, isACMPage, multiclusterNamespacesNames, projects]);
+  }, [options, isACMPage, multiclusterNamespacesNames, projects]);
 
   return useMemo(
     () => ({

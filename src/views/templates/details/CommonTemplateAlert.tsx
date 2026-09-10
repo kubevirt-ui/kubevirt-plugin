@@ -36,7 +36,7 @@ const CommonTemplateAlert: FC<CommonTemplateAlertProps> = ({ template }) => {
         ),
       );
     },
-    [navigate],
+    [isACMPage, navigate],
   );
 
   return (

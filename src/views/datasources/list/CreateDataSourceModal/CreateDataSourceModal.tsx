@@ -1,6 +1,6 @@
 import type { FC } from 'react';
 import React from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { useNavigate } from 'react-router';
 
 import { DataSourceModelRef } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -38,11 +38,11 @@ export const CreateDataSourceModal: FC<CreateDataSourceModalProps> = ({
   const navigate = useNavigate();
 
   const {
+    control,
     formState: { errors },
     handleSubmit,
     register,
     setValue,
-    watch,
   } = useForm<CreateDataSourceModalFormType>({
     defaultValues: {
       importsToKeep: 3,
@@ -50,9 +50,9 @@ export const CreateDataSourceModal: FC<CreateDataSourceModalProps> = ({
       size: DEFAULT_DISK_SIZE,
     },
   });
-  const importsToKeep = watch('importsToKeep');
-  const size = watch('size');
-  const name = watch('name');
+  const importsToKeep = useWatch({ control, name: 'importsToKeep' });
+  const size = useWatch({ control, name: 'size' });
+  const name = useWatch({ control, name: 'name' });
 
   const onSubmit = handleSubmit(
     (data) =>

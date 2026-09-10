@@ -10,10 +10,9 @@ import {
   TEST_STATUS_PENDING,
   TEST_STATUS_RUNNING,
 } from '../../../utils';
-
-import type { OverallProgress } from './utils/types';
 import OverallProgressCard from './OverallProgressCard';
 import TestSuiteProgressCard from './TestSuiteProgressCard';
+import type { OverallProgress } from './utils/types';
 
 import './progress-components.scss';
 
@@ -41,7 +40,7 @@ const TestProgressOverview: FC<TestProgressOverviewProps> = ({ error, loading, p
       const orderB = statusOrder[b.status] || 4;
       return orderA - orderB;
     });
-  }, [progress?.suites]);
+  }, [progress]);
 
   if (loading && !progress) {
     return (
