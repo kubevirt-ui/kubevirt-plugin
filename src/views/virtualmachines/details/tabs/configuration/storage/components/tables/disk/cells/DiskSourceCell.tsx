@@ -29,10 +29,10 @@ const DiskSourceCell: FC<DiskSourceCellProps> = ({ row, sourcesLoaded, vm }) => 
     return (
       <span data-test={dataTestId}>
         <MulticlusterResourceLink
+          cluster={getCluster(vm)}
           groupVersionKind={modelToGroupVersionKind(
             hasDataVolume ? DataVolumeModel : PersistentVolumeClaimModel,
           )}
-          cluster={getCluster(vm)}
           name={source}
           namespace={namespace ?? getNamespace(vm)}
         />

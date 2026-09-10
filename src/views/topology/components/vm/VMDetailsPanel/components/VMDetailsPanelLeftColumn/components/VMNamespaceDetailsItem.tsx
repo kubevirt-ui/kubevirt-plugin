@@ -22,6 +22,7 @@ const VMNamespaceDetailsItem: FC<VMNamespaceDetailsItemProps> = ({ vm }) => {
 
   return (
     <DescriptionItem
+      className="topology-vm-details-panel__item"
       descriptionData={
         <ResourceLink
           groupVersionKind={getGroupVersionKindForModel(NamespaceModel)}
@@ -30,7 +31,6 @@ const VMNamespaceDetailsItem: FC<VMNamespaceDetailsItemProps> = ({ vm }) => {
           title={getUID(vm)}
         />
       }
-      className="topology-vm-details-panel__item"
       descriptionHeader={<span>{t('Namespace')}</span>}
     />
   );

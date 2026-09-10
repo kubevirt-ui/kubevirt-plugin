@@ -30,6 +30,7 @@ const VirtualMachinesOverviewTabNetworkFQDN: FC<VirtualMachinesOverviewTabNetwor
       <Divider />
       <DescriptionList isHorizontal>
         <DescriptionItem
+          className="VirtualMachinesOverviewTabNetworkFQDN--main"
           descriptionData={
             <ClipboardCopy
               clickTip={t('Copied')}
@@ -39,7 +40,6 @@ const VirtualMachinesOverviewTabNetworkFQDN: FC<VirtualMachinesOverviewTabNetwor
               {getInternalFQDNURL(vm)}
             </ClipboardCopy>
           }
-          className="VirtualMachinesOverviewTabNetworkFQDN--main"
           descriptionHeader={t('Internal FQDN')}
           isPopover
         />

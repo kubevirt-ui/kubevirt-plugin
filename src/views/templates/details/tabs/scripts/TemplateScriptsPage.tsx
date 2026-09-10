@@ -28,7 +28,6 @@ import {
 import { PencilAltIcon } from '@patternfly/react-icons';
 
 import useEditTemplateAccessReview from '../../hooks/useIsTemplateEditable';
-
 import SSHKey from './components/SSHKey/SSHKey';
 import SysPrepItem from './components/SysPrepItem/SysPrepItem';
 
@@ -58,6 +57,7 @@ const TemplateScriptsPage: FC<TemplateScriptsPageProps> = ({ obj: template }) =>
       <SidebarEditor<Template> onResourceUpdate={updateTemplate} resource={template}>
         <DescriptionList className="template-scripts-tab__description-list">
           <DescriptionItem
+            descriptionData={<CloudInitDescription vm={vm} />}
             descriptionHeader={
               <Flex className="vm-description-item__title">
                 <FlexItem>
@@ -65,6 +65,10 @@ const TemplateScriptsPage: FC<TemplateScriptsPageProps> = ({ obj: template }) =>
                 </FlexItem>
                 <FlexItem>
                   <Button
+                    icon={<PencilAltIcon />}
+                    iconPosition="end"
+                    isDisabled={!isTemplateEditable}
+                    isInline
                     onClick={() =>
                       createModal(({ isOpen, onClose }) => (
                         <CloudinitModal
@@ -76,10 +80,6 @@ const TemplateScriptsPage: FC<TemplateScriptsPageProps> = ({ obj: template }) =>
                         />
                       ))
                     }
-                    icon={<PencilAltIcon />}
-                    iconPosition="end"
-                    isDisabled={!isTemplateEditable}
-                    isInline
                     type="button"
                     variant={ButtonVariant.link}
                   >
@@ -88,7 +88,6 @@ const TemplateScriptsPage: FC<TemplateScriptsPageProps> = ({ obj: template }) =>
                 </FlexItem>
               </Flex>
             }
-            descriptionData={<CloudInitDescription vm={vm} />}
           />
           <Divider />
           <SSHKey template={template} />

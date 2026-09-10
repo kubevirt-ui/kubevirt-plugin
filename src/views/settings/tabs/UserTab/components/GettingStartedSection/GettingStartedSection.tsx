@@ -29,14 +29,14 @@ const GettingStartedSection: FC = () => {
     >
       <Stack hasGutter>
         <SectionWithSwitch
+          dataTestID="welcome-information"
+          switchIsOn={!quickStarts?.dontShowWelcomeModal}
           title={
             <SearchItem id={USER_TAB_IDS.welcomeInformation}>{t('Welcome information')}</SearchItem>
           }
           turnOnSwitch={(checked) =>
             setQuickStarts({ ...quickStarts, dontShowWelcomeModal: !checked })
           }
-          dataTestID="welcome-information"
-          switchIsOn={!quickStarts?.dontShowWelcomeModal}
         />
         <SectionWithSwitch
           dataTestID="guided-tour"

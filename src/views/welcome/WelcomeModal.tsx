@@ -1,6 +1,6 @@
-import openCulture from 'images/openCulture.svg';
 import type { FC } from 'react';
 import React from 'react';
+import openCulture from 'images/openCulture.svg';
 
 import useIsWindowsSupportedArchitecture from '@kubevirt-utils/hooks/useIsWindowsSupportedArchitecture';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -25,7 +25,7 @@ import './WelcomeModal.scss';
 const WelcomeModal: FC = () => {
   const { t } = useKubevirtTranslation();
   const isWindowsSupported = useIsWindowsSupportedArchitecture();
-  const { isOpen, onClose, quickStarts, onDontShowAgainCheckboxChange } = useWelcomeModal();
+  const { isOpen, onClose, onDontShowAgainCheckboxChange, quickStarts } = useWelcomeModal();
 
   return (
     <Modal
@@ -64,11 +64,11 @@ const WelcomeModal: FC = () => {
               <WelcomeButtons onClose={onClose} />
 
               <Checkbox
-                onChange={onDontShowAgainCheckboxChange}
                 className="WelcomeModal__checkbox"
                 id="welcome-modal-checkbox"
                 isChecked={quickStarts?.dontShowWelcomeModal}
                 label={t('Do not show this again')}
+                onChange={onDontShowAgainCheckboxChange}
               />
             </Stack>
           </GridItem>

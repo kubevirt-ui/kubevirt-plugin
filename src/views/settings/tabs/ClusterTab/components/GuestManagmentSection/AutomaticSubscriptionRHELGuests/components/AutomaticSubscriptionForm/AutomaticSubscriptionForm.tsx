@@ -37,7 +37,6 @@ const AutomaticSubscriptionForm: FC<RHELAutomaticSubscriptionFormProps> = ({
       setActivationKey(subscriptionData?.activationKey ?? '');
       setOrganizationID(subscriptionData?.organizationID ?? '');
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [subscriptionData?.activationKey, subscriptionData?.organizationID, loaded]);
 
   const update = useMemo(
@@ -61,12 +60,12 @@ const AutomaticSubscriptionForm: FC<RHELAutomaticSubscriptionFormProps> = ({
           <Grid hasGutter>
             <GridItem span={7}>
               <TextInput
+                id="activation-key-input"
+                isDisabled={!canEdit}
                 onChange={(_event, val) => {
                   setActivationKey(val);
                   update({ activationKey: val });
                 }}
-                id="activation-key-input"
-                isDisabled={!canEdit}
                 value={activationKey}
               />
             </GridItem>
@@ -91,12 +90,12 @@ const AutomaticSubscriptionForm: FC<RHELAutomaticSubscriptionFormProps> = ({
           <Grid hasGutter>
             <GridItem span={7}>
               <TextInput
+                id="organization-id-input"
+                isDisabled={!canEdit}
                 onChange={(_event, val) => {
                   setOrganizationID(val);
                   update({ organizationID: val });
                 }}
-                id="organization-id-input"
-                isDisabled={!canEdit}
                 value={organizationID}
               />
             </GridItem>

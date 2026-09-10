@@ -28,6 +28,10 @@ const CheckupsStorageListEmptyState: FC<CheckupsStorageListEmptyStateProps> = ({
 
   return (
     <CheckupsEmptyState
+      checkupType={CHECKUP_URLS.STORAGE}
+      isLoading={isLoading || loadingPermissions}
+      isPermitted={isPermitted}
+      namespace={namespace}
       permissionsButtonProps={{
         isDisabled: !isPermittedToInstall,
         onClick: async () => {
@@ -44,10 +48,6 @@ const CheckupsStorageListEmptyState: FC<CheckupsStorageListEmptyStateProps> = ({
           }
         },
       }}
-      checkupType={CHECKUP_URLS.STORAGE}
-      isLoading={isLoading || loadingPermissions}
-      isPermitted={isPermitted}
-      namespace={namespace}
     />
   );
 };

@@ -18,15 +18,15 @@ const VirtualMachineTemplatesEmptyState: FC = () => {
       <ListPageHeader title={t('Templates')} />
       <ListPageBody>
         <ListEmptyState
+          bodyContent={t('To get started, create a template.')}
+          buttonAction={<VirtualMachineTemplatesCreateButton />}
+          icon={PficonTemplateIcon}
           learnMoreLink={
             <ExternalLink
               href={documentationURL.CREATING_VMS_FROM_TEMPLATES}
               text={t('Learn more about templates')}
             />
           }
-          bodyContent={t('To get started, create a template.')}
-          buttonAction={<VirtualMachineTemplatesCreateButton />}
-          icon={PficonTemplateIcon}
           titleText={t("You don't have any templates yet")}
         />
       </ListPageBody>

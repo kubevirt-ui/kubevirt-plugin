@@ -42,6 +42,8 @@ const DetailsToggleItems: FC<DetailsToggleItemsProps> = ({
         bodyContent={t(
           'Whether to attach the default graphics device or not. VNC will not be available if checked.',
         )}
+        breadcrumb="VirtualMachine.spec.template.devices.autoattachGraphicsDevice"
+        data-test={`${vmName}-headless`}
         descriptionData={
           <HeadlessMode
             updateHeadlessMode={(checked) =>
@@ -57,8 +59,6 @@ const DetailsToggleItems: FC<DetailsToggleItemsProps> = ({
             vm={vm}
           />
         }
-        breadcrumb="VirtualMachine.spec.template.devices.autoattachGraphicsDevice"
-        data-test={`${vmName}-headless`}
         descriptionHeader={<SearchItem id="headless-mode">{t('Headless mode')}</SearchItem>}
         isPopover
         olsObj={vm}
@@ -70,15 +70,15 @@ const DetailsToggleItems: FC<DetailsToggleItemsProps> = ({
         )}
         descriptionData={
           <Switch
+            id="guest-system-log-access"
+            isChecked={isCheckedGuestSystemAccessLog}
+            isDisabled={isGuestSystemLogsDisabled}
             onChange={(_event, checked) => {
               setIsCheckedGuestSystemAccessLog(checked);
               patchCustomizeWizardVMSignal([
                 { data: checked, path: `spec.template.spec.domain.devices.logSerialConsole` },
               ]);
             }}
-            id="guest-system-log-access"
-            isChecked={isCheckedGuestSystemAccessLog}
-            isDisabled={isGuestSystemLogsDisabled}
           />
         }
         descriptionHeader={
@@ -94,6 +94,8 @@ const DetailsToggleItems: FC<DetailsToggleItemsProps> = ({
         )}
         descriptionData={
           <Switch
+            id="deletion-protection"
+            isChecked={deletionProtectionEnabled}
             onChange={(_event, checked) =>
               createModal(({ isOpen, onClose }) => (
                 <DeletionProtectionModal
@@ -102,6 +104,8 @@ const DetailsToggleItems: FC<DetailsToggleItemsProps> = ({
                       ? VMDeletionProtectionOptions.ENABLE
                       : VMDeletionProtectionOptions.DISABLE
                   }
+                  isOpen={isOpen}
+                  onCancel={onClose}
                   onConfirm={(enableDeletionProtection) => {
                     patchCustomizeWizardVMSignal([
                       {
@@ -111,14 +115,10 @@ const DetailsToggleItems: FC<DetailsToggleItemsProps> = ({
                     ]);
                     onClose();
                   }}
-                  isOpen={isOpen}
-                  onCancel={onClose}
                   vm={vm}
                 />
               ))
             }
-            id="deletion-protection"
-            isChecked={deletionProtectionEnabled}
           />
         }
         descriptionHeader={

@@ -30,6 +30,7 @@ const OwnerDetailsItem: FC<OwnerDetailsItemProps> = ({ className, obj }) => {
         <Popover
           bodyContent={(hide) => (
             <PopoverContentWithLightspeedButton
+              breadcrumb={`${obj?.kind}.metadata.ownerReferences`}
               content={
                 <Trans ns="plugin__kubevirt-plugin">
                   <div>
@@ -40,7 +41,6 @@ const OwnerDetailsItem: FC<OwnerDetailsItemProps> = ({ className, obj }) => {
                   </div>
                 </Trans>
               }
-              breadcrumb={`${obj?.kind}.metadata.ownerReferences`}
               hide={hide}
               obj={obj}
               promptType={OLSPromptType.OWNER}

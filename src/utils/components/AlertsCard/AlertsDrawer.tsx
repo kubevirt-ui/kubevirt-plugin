@@ -49,14 +49,14 @@ const AlertsDrawer: FC<AlertsDrawerProps> = ({ sortedAlerts }): ReactElement => 
         <Accordion asDefinitionList isBordered>
           <AccordionItem isExpanded={titleOpen}>
             <AccordionToggle
+              className="alerts-card__toggle--main"
+              id="toggle-main"
               onClick={() => {
                 setTitleOpen((title) => {
                   title && setAlertTypeOpen(null);
                   return !title;
                 });
               }}
-              className="alerts-card__toggle--main"
-              id="toggle-main"
             >
               <Flex>
                 {Object.keys(sortedAlerts)?.map((alertType) => {
@@ -67,6 +67,8 @@ const AlertsDrawer: FC<AlertsDrawerProps> = ({ sortedAlerts }): ReactElement => 
                   }
                   return (
                     <Button
+                      className="pf-m-link--align-left"
+                      key={alertType}
                       onClick={(e) => {
                         setAlertTypeOpen((prevAlertOpen) =>
                           titleOpen && prevAlertOpen === alertType
@@ -78,8 +80,6 @@ const AlertsDrawer: FC<AlertsDrawerProps> = ({ sortedAlerts }): ReactElement => 
                         );
                         e?.stopPropagation();
                       }}
-                      className="pf-m-link--align-left"
-                      key={alertType}
                       variant={ButtonVariant.plain}
                     >
                       <Label

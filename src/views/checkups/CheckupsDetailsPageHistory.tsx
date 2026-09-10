@@ -42,15 +42,15 @@ const CheckupsDetailsPageHistory: FC<CheckupsDetailsPageHistoryProps> = ({
 
   const exportButton = (
     <KubevirtTableExport
+      asToolbarItem={false}
+      callbacks={callbacks}
+      columns={columns}
+      data={jobs}
       exportKey={
         checkupName
           ? `${checkupName}-${EXPORT_TABLE_KEYS.CHECKUPS_HISTORY}`
           : EXPORT_TABLE_KEYS.CHECKUPS_HISTORY
       }
-      asToolbarItem={false}
-      callbacks={callbacks}
-      columns={columns}
-      data={jobs}
       initialSortDirection={initialSortDirection}
       initialSortKey={initialSortKey}
       loaded={loaded}

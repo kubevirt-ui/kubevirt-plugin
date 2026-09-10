@@ -14,7 +14,7 @@ const DiskListTitle: FC<DiskListTitleProps> = ({ className }) => {
   const { t } = useKubevirtTranslation();
 
   return (
-    <Title headingLevel="h2" className={className}>
+    <Title className={className} headingLevel="h2">
       <SearchItem id="disks">{t('Disks')}</SearchItem>
     </Title>
   );

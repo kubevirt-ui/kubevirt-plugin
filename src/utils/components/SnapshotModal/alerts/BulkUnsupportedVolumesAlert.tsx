@@ -45,11 +45,11 @@ const BulkUnsupportedVolumesAlert: FC<BulkUnsupportedVolumesAlertProps> = ({
             </StackItem>
           </Stack>
         }
+        isExpandable
+        isInline
         title={t('The following {{count}} disks will not be included in the snapshot', {
           count: volumesCount,
         })}
-        isExpandable
-        isInline
         variant={AlertVariant.warning}
       >
         <Stack className="vm-disks-list" hasGutter>

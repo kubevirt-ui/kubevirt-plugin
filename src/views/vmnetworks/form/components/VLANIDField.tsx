@@ -11,6 +11,7 @@ import { FormGroup, TextInput } from '@patternfly/react-core';
 
 import type { VMNetworkForm } from '../constants';
 import { MAX_VLAN_ID, MIN_VLAN_ID } from '../constants';
+
 import { getVLANIDValidatedOption } from '../utils/utils';
 
 const VLANIDField: FC = () => {
@@ -19,6 +20,8 @@ const VLANIDField: FC = () => {
 
   return (
     <FormGroup
+      fieldId="vlanID"
+      label={t('VLAN ID')}
       labelHelp={
         <HelpTextIcon
           bodyContent={(hide) => (
@@ -33,10 +36,10 @@ const VLANIDField: FC = () => {
           headerContent={t('VLAN ID')}
         />
       }
-      fieldId="vlanID"
-      label={t('VLAN ID')}
     >
       <Controller
+        control={control}
+        name="network.spec.network.localnet.vlan.access.id"
         render={({ field: { onChange, value } }) => {
           const numberValue = (value as unknown) === '' ? NaN : value;
           const validated = getVLANIDValidatedOption(numberValue);
@@ -60,8 +63,6 @@ const VLANIDField: FC = () => {
             </>
           );
         }}
-        control={control}
-        name="network.spec.network.localnet.vlan.access.id"
       />
     </FormGroup>
   );

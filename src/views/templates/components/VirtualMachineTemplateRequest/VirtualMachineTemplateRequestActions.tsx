@@ -28,6 +28,10 @@ const VirtualMachineTemplateRequestActions: FC<VirtualMachineTemplateRequestActi
       cta: (): void =>
         createModal(({ isOpen, onClose }) => (
           <DeleteModal
+            headerText={t('Delete request for VirtualMachine template?')}
+            isOpen={isOpen}
+            obj={request}
+            onClose={onClose}
             onDeleteSubmit={() =>
               kubevirtK8sDelete({
                 cluster: getCluster(request),
@@ -35,10 +39,6 @@ const VirtualMachineTemplateRequestActions: FC<VirtualMachineTemplateRequestActi
                 resource: request,
               })
             }
-            headerText={t('Delete request for VirtualMachine template?')}
-            isOpen={isOpen}
-            obj={request}
-            onClose={onClose}
             shouldRedirect={false}
           />
         )),

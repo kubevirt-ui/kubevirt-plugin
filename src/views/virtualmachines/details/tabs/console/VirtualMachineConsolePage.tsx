@@ -57,15 +57,15 @@ const VirtualMachineConsolePage: FC<NavPageComponentProps> = ({ obj: vm }) => {
     return (
       <PageSection className="virtual-machine-console-page-section" hasBodyWrapper={false}>
         <Consoles
+          consoleContainerClass="virtual-machine-console-page"
+          isHeadlessMode={isHeadlessMode(vmi)}
+          isVmRunning={true}
+          isWindowsVM={isWindows(vmi)}
           path={getConsoleBasePath({
             apiPath,
             name,
             namespace,
           })}
-          consoleContainerClass="virtual-machine-console-page"
-          isHeadlessMode={isHeadlessMode(vmi)}
-          isVmRunning={true}
-          isWindowsVM={isWindows(vmi)}
           vmCluster={cluster}
           vmName={name}
           vmNamespace={namespace}

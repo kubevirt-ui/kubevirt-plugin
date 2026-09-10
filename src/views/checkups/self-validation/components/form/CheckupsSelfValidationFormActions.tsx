@@ -34,8 +34,8 @@ const CheckupsSelfValidationFormActions: FC<CheckupsSelfValidationFormActionsPro
   storageCapabilities,
   storageClass,
   testSkips,
-  winImageDownloadUrl,
   windowsServerTesting,
+  winImageDownloadUrl,
 }) => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
@@ -130,12 +130,12 @@ const CheckupsSelfValidationFormActions: FC<CheckupsSelfValidationFormActionsPro
   const handleOpenConfirmation = (): void => {
     createModal(({ isOpen, onClose }) => (
       <HeavyLoadCheckupConfirmationModal
+        isOpen={isOpen}
+        onClose={onClose}
         onConfirm={() => {
           onClose();
           void executeRun();
         }}
-        isOpen={isOpen}
-        onClose={onClose}
       />
     ));
   };

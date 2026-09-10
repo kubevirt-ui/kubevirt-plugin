@@ -63,6 +63,8 @@ const MigrationPolicyConfigurations: FC<MigrationPolicyConfigurationsProps> = ({
                   </SplitItem>
                   <SplitItem>
                     <Button
+                      icon={<MinusCircleIcon />}
+                      isInline
                       onClick={() =>
                         setState((prev) => {
                           const newState = { ...prev };
@@ -70,8 +72,6 @@ const MigrationPolicyConfigurations: FC<MigrationPolicyConfigurationsProps> = ({
                           return newState;
                         })
                       }
-                      icon={<MinusCircleIcon />}
-                      isInline
                       variant={ButtonVariant.plain}
                     />
                   </SplitItem>

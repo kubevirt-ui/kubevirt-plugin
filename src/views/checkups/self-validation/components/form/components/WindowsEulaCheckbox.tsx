@@ -22,6 +22,8 @@ const WindowsEulaCheckbox: FC<WindowsEulaCheckboxProps> = ({
   return (
     <StackItem className="pf-v6-u-pl-lg">
       <Checkbox
+        id="windows-eula-checkbox"
+        isChecked={isEulaConfirmed}
         label={
           <Trans ns="plugin__kubevirt-plugin" t={t}>
             By setting this parameter, you are agreeing to the applicable{' '}
@@ -31,8 +33,6 @@ const WindowsEulaCheckbox: FC<WindowsEulaCheckboxProps> = ({
             for each deployment or installation for the Microsoft product(s).
           </Trans>
         }
-        id="windows-eula-checkbox"
-        isChecked={isEulaConfirmed}
         onChange={(_event, checked) => setIsEulaConfirmed(checked)}
       />
     </StackItem>

@@ -24,6 +24,7 @@ const AdvancedConfigAlert: FC<AdvancedConfigAlertProps> = ({ isEdit, quota }) =>
 
   return (
     <Alert
+      actionClose={<AlertActionCloseButton onClose={() => setIsAlertOpen(false)} />}
       actionLinks={
         <Link
           to={
@@ -35,7 +36,6 @@ const AdvancedConfigAlert: FC<AdvancedConfigAlertProps> = ({ isEdit, quota }) =>
           {t('View YAML')}
         </Link>
       }
-      actionClose={<AlertActionCloseButton onClose={() => setIsAlertOpen(false)} />}
       isInline
       title={t('Advanced quota configuration detected')}
       variant="warning"

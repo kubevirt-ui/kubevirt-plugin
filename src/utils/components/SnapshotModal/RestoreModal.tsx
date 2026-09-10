@@ -36,6 +36,10 @@ const RestoreModal: FC<RestoreModalProps> = ({ isOpen, onClose, snapshot }) => {
 
   return (
     <TabModal<V1beta1VirtualMachineRestore>
+      headerText={t('Restore snapshot')}
+      isOpen={isOpen}
+      obj={resultRestore}
+      onClose={onClose}
       onSubmit={async (obj) => {
         try {
           const result = await kubevirtK8sCreate({
@@ -52,10 +56,6 @@ const RestoreModal: FC<RestoreModalProps> = ({ isOpen, onClose, snapshot }) => {
           throw error;
         }
       }}
-      headerText={t('Restore snapshot')}
-      isOpen={isOpen}
-      obj={resultRestore}
-      onClose={onClose}
       shouldWrapInForm
       submitBtnText={t('Restore')}
     >

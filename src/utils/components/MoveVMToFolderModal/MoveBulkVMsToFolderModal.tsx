@@ -9,8 +9,8 @@ import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { Popover, PopoverPosition, Stack, StackItem } from '@patternfly/react-core';
 
-import useRemoveFolderQuery from './hooks/useRemoveFolderQuery';
 import BulkVMsPopover from './BulkVMsPopover';
+import useRemoveFolderQuery from './hooks/useRemoveFolderQuery';
 import SelectedFolderIndicator from './SelectedFolderIndicator';
 
 type MoveBulkVMToFolderModalProps = {
@@ -35,13 +35,13 @@ const MoveBulkVMToFolderModal: FC<MoveBulkVMToFolderModalProps> = ({
 
   return (
     <TabModal<V1VirtualMachine>
+      headerText={t('Move to group')}
+      isOpen={isOpen}
+      onClose={onClose}
       onSubmit={() => {
         removeFolderQuery?.(folderName);
         return onSubmit(folderName);
       }}
-      headerText={t('Move to group')}
-      isOpen={isOpen}
-      onClose={onClose}
     >
       <Stack hasGutter>
         <StackItem>

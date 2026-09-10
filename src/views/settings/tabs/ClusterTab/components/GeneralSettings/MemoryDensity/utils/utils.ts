@@ -20,17 +20,17 @@ export type RatioLevelConfig = {
 };
 
 export const getRatioLevelConfig = (t: TFunction): Record<RatioLevel, RatioLevelConfig> => ({
-  recommended: {
-    color: 'var(--pf-t--global--color--status--success--default)',
-    description: t("Requests most of each VM's configured memory on the cluster."),
-    label: t('Recommended'),
-    title: t('Recommended (75% and above)'),
-  },
   caution: {
     color: 'var(--pf-t--global--color--status--warning--default)',
     description: t('Moderate overcommit. Monitor cluster memory pressure.'),
     label: t('Use with caution'),
     title: t('Use with caution (50% to 74.9%)'),
+  },
+  recommended: {
+    color: 'var(--pf-t--global--color--status--success--default)',
+    description: t("Requests most of each VM's configured memory on the cluster."),
+    label: t('Recommended'),
+    title: t('Recommended (75% and above)'),
   },
   risk: {
     color: 'var(--pf-t--global--color--status--danger--default)',

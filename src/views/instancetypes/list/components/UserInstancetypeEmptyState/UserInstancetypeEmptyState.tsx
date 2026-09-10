@@ -15,13 +15,13 @@ const UserInstancetypeEmptyState: FC<UserInstancetypeEmptyStateProps> = ({ names
 
   return (
     <ListEmptyState
+      bodyContent={t('To get started, create a VirtualMachineInstanceType.')}
       buttonAction={
         <InstancetypeCreateButton
           buttonText={t('Create VirtualMachineInstanceType')}
           namespace={namespace}
         />
       }
-      bodyContent={t('To get started, create a VirtualMachineInstanceType.')}
       titleText={t("You don't have any VirtualMachineInstanceTypes yet")}
     />
   );

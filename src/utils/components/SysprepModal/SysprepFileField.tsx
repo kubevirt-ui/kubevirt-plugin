@@ -54,6 +54,13 @@ const SysprepFileField: FC<SysprepFileFieldProps> = ({ id, onChange, value }) =>
   return (
     <>
       <FileUpload
+        allowEditingUploadedText
+        data-test={`sysprep-${id.toLowerCase().replace('.', '-')}-input`}
+        filename={data.fileName}
+        id={`sysprep-${id}-input`}
+        isLoading={data.isLoading}
+        isReadOnly={false}
+        onDataChange={(_event: DropEvent, text: string) => onFieldChange(text)}
         onFileInputChange={(_event: DropEvent, file: File) => {
           setData((currentData: SysprepFile) => ({ ...currentData, fileName: file.name }));
         }}
@@ -66,19 +73,12 @@ const SysprepFileField: FC<SysprepFileFieldProps> = ({ id, onChange, value }) =>
         onTextChange={(_event: ChangeEvent<HTMLTextAreaElement>, text: string) =>
           onFieldChange(text)
         }
+        type="text"
         validated={
           data.validated !== ValidatedOptions.error
             ? ValidatedOptions.default
             : ValidatedOptions.error
         }
-        allowEditingUploadedText
-        data-test={`sysprep-${id.toLowerCase().replace('.', '-')}-input`}
-        filename={data.fileName}
-        id={`sysprep-${id}-input`}
-        isLoading={data.isLoading}
-        isReadOnly={false}
-        onDataChange={(_event: DropEvent, text: string) => onFieldChange(text)}
-        type="text"
         value={data.value}
       />
       {data.validated === ValidatedOptions.error && (

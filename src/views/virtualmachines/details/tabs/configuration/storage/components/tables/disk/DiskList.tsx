@@ -29,7 +29,6 @@ import { updateDisks } from '@virtualmachines/details/tabs/configuration/details
 import { isRunning } from '@virtualmachines/utils';
 
 import useDisksFilters from '../../hooks/useDisksFilters';
-
 import type { DiskListCallbacks } from './diskListDefinition';
 import { getDiskListColumns, getDiskRowId } from './diskListDefinition';
 
@@ -97,6 +96,8 @@ const DiskList: FC<DiskListProps> = ({ customize = false, onDiskUpdate, vm, vmi 
     <div className="kv-configuration-vm-disk-list">
       <DiskListTitle />
       <DiskSourceSelect
+        canCreateDataVolume={canCreateDataVolume}
+        canUpdate={canAddDisk}
         onSelect={(diskSource: SourceTypes) => {
           return createModal(({ isOpen, onClose }) => (
             <DiskModal
@@ -108,8 +109,6 @@ const DiskList: FC<DiskListProps> = ({ customize = false, onDiskUpdate, vm, vmi 
             />
           ));
         }}
-        canCreateDataVolume={canCreateDataVolume}
-        canUpdate={canAddDisk}
       />
       <Flex>
         <FlexItem>

@@ -7,10 +7,11 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { Alert, AlertVariant, EmptyStateActions } from '@patternfly/react-core';
 
+import { installSelfValidationPermissions, removeSelfValidationPermissions } from '../utils';
+
 import CheckupsEmptyState from '../../components/CheckupsEmptyState/CheckupsEmptyState';
 import { CHECKUP_URLS } from '../../utils/constants';
 import { useAllRunningSelfValidationJobs } from '../components/hooks/useAllRunningSelfValidationJobs';
-import { installSelfValidationPermissions, removeSelfValidationPermissions } from '../utils';
 import { getRunningCheckupErrorMessage } from '../utils/selfValidationMessages';
 
 import './CheckupsSelfValidationListEmptyState.scss';
@@ -42,6 +43,10 @@ const CheckupsSelfValidationListEmptyState: FC<CheckupsSelfValidationListEmptySt
 
   return (
     <CheckupsEmptyState
+      checkupType={CHECKUP_URLS.SELF_VALIDATION}
+      isLoading={isLoading || loadingPermissions}
+      isPermitted={isPermitted}
+      namespace={namespace}
       permissionsButtonProps={{
         isDisabled: !isPermittedToInstall,
         onClick: async () => {
@@ -78,10 +83,6 @@ const CheckupsSelfValidationListEmptyState: FC<CheckupsSelfValidationListEmptySt
           )}
         </>
       }
-      checkupType={CHECKUP_URLS.SELF_VALIDATION}
-      isLoading={isLoading || loadingPermissions}
-      isPermitted={isPermitted}
-      namespace={namespace}
     />
   );
 };

@@ -28,30 +28,30 @@ const SavedSearchItem: FC<SavedSearchItemProps> = ({
     <DropdownItem
       actions={
         <MenuItemAction
+          aria-label={t('Delete saved search')}
+          data-test={`delete-search-item-${name}`}
+          icon={<TrashIcon />}
           onClick={(e) => {
             e.stopPropagation();
             onDelete();
           }}
-          aria-label={t('Delete saved search')}
-          data-test={`delete-search-item-${name}`}
-          icon={<TrashIcon />}
-        />
-      }
-      icon={
-        <Button
-          onClick={(e) => {
-            e.stopPropagation();
-            onToggleFavorite();
-          }}
-          aria-label={isFavorited ? t('Remove from favorites') : t('Add to favorites')}
-          data-test={`toggle-favorite-${name}`}
-          isFavorite
-          isFavorited={isFavorited}
-          variant="plain"
         />
       }
       className="pf-v6-u-py-0"
       data-test={`saved-search-item-${name}`}
+      icon={
+        <Button
+          aria-label={isFavorited ? t('Remove from favorites') : t('Add to favorites')}
+          data-test={`toggle-favorite-${name}`}
+          isFavorite
+          isFavorited={isFavorited}
+          onClick={(e) => {
+            e.stopPropagation();
+            onToggleFavorite();
+          }}
+          variant="plain"
+        />
+      }
       onClick={onApply}
     >
       {name}

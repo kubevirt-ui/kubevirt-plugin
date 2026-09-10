@@ -90,16 +90,17 @@ const CheckupsStorageActions: FC<CheckupsStorageActionsProps> = ({
     <Dropdown isOpen={isActionsOpen} onOpenChange={setIsActionsOpen} toggle={Toggle}>
       <DropdownList>
         <DropdownItem
+          isDisabled={!checkupImage}
+          key="rerun"
           onClick={() => {
             setIsActionsOpen(false);
             handleRerunAction();
           }}
-          isDisabled={!checkupImage}
-          key="rerun"
         >
           {t('Rerun')}
         </DropdownItem>
         <DropdownItem
+          key="delete"
           onClick={() =>
             createModal((props) => (
               <DeleteModal
@@ -111,7 +112,6 @@ const CheckupsStorageActions: FC<CheckupsStorageActionsProps> = ({
               />
             ))
           }
-          key="delete"
         >
           {t('Delete')}
         </DropdownItem>

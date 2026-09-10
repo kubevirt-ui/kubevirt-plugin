@@ -47,13 +47,13 @@ const StandardResourceQuotaAlert: FC<StandardResourceQuotaAlertProps> = ({
 
   return (
     <Alert
+      actionClose={<AlertActionCloseButton onClose={() => setIsAlertOpen(false)} />}
       actionLinks={
         <ExternalLink
           href={getStandardResourceQuotaListURL(namespace)}
           text={t('View ResourceQuotas for this project')}
         />
       }
-      actionClose={<AlertActionCloseButton onClose={() => setIsAlertOpen(false)} />}
       className={className}
       isInline
       title={t('Standard ResourceQuota detected on project')}

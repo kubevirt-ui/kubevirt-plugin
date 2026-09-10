@@ -9,14 +9,14 @@ import { TEMPLATE_CATEGORY_FILTER_ALL } from '@templates/list/filters/useCategor
 import { type UniversalFilter } from '../../../hooks/useUniversalFilter/useUniversalFilter';
 
 type TemplatesCategoryFilterProps = {
-  isMenu?: boolean;
   filterDefinition: KubevirtFilter<TemplateOrRequest>;
+  isMenu?: boolean;
   universalFilter: UniversalFilter;
 };
 
 const TemplatesCategoryFilter: FC<TemplatesCategoryFilterProps> = ({
-  isMenu,
   filterDefinition,
+  isMenu,
   universalFilter,
 }) => {
   const { t } = useKubevirtTranslation();

@@ -95,22 +95,6 @@ const baseConfig = {
     'promise/no-nesting': 'warn',
     'promise/no-return-wrap': 'error',
     'promise/param-names': 'error',
-    'perfectionist/sort-classes': [
-      'error',
-      {
-        groups: [
-          'static-property',
-          'private-property',
-          'property',
-          'constructor',
-          'static-method',
-          'private-method',
-          'method',
-        ],
-        order: 'asc',
-        type: 'natural',
-      },
-    ],
     'react-hooks/exhaustive-deps': 'error',
     'react-hooks/immutability': 'error',
     'react-hooks/incompatible-library': 'warn',
@@ -282,7 +266,7 @@ const reactConfig = {
   },
 };
 
-const perfectionistOverrides = {
+export const perfectionistConfig = {
   files: ['**/*.{js,jsx,ts,tsx}'],
   rules: {
     'perfectionist/sort-classes': [
@@ -302,11 +286,10 @@ const perfectionistOverrides = {
       },
     ],
     'perfectionist/sort-imports': 'off',
-    'perfectionist/sort-intersection-types': 'off',
-    'perfectionist/sort-modules': 'off',
+    'perfectionist/sort-jsx-props': 'error',
     'perfectionist/sort-named-imports': 'off',
-    'perfectionist/sort-sets': 'off',
-    'perfectionist/sort-switch-case': 'off',
+    'perfectionist/sort-object-types': 'error',
+    'perfectionist/sort-objects': 'error',
   },
 };
 
@@ -348,6 +331,7 @@ const githubScriptsOverrides = {
 export default [
   ignoresConfig,
   baseConfig,
+  perfectionistConfig,
   ...tsConfigs,
   reactConfig,
   sonarConfig,

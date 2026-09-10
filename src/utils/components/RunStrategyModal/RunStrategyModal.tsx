@@ -84,15 +84,15 @@ const RunStrategyModal: FC<RunStrategyModalProps> = ({
         <StackItem>
           <FormGroup fieldId="run-strategy-select" label={t('Run strategy')}>
             <FormPFSelect
+              onSelect={handleChange}
+              placeholder={t('Select a run strategy')}
+              selected={runStrategy || undefined}
+              selectedLabel={runStrategy ? labels[runStrategy] || runStrategy : undefined}
               toggleProps={{
                 'aria-describedby': showMixedStrategiesHint ? MIXED_HINT_ID : undefined,
                 id: 'run-strategy-select',
                 isFullWidth: true,
               }}
-              onSelect={handleChange}
-              placeholder={t('Select a run strategy')}
-              selected={runStrategy || undefined}
-              selectedLabel={runStrategy ? labels[runStrategy] || runStrategy : undefined}
             >
               {Object.entries(labels).map(([key, label]) => (
                 <SelectOption

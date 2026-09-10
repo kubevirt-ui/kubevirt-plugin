@@ -50,6 +50,9 @@ const MigrationNumberInput: FC<MigrationNumberInputProps> = ({
         <Skeleton height="33px" width="140px" />
       ) : (
         <NumberInput
+          data-test={`${inputName}-input`}
+          inputName={inputName}
+          min={minValue}
           onChange={(event: ChangeEvent<HTMLInputElement>) => {
             const newValue = Number(event.target.value);
             newValue >= minValue &&
@@ -75,9 +78,6 @@ const MigrationNumberInput: FC<MigrationNumberInputProps> = ({
               return newValue;
             })
           }
-          data-test={`${inputName}-input`}
-          inputName={inputName}
-          min={minValue}
           value={value}
         />
       )}

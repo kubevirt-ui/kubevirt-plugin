@@ -38,13 +38,13 @@ const DiskSourcePVCSelectName: FC<DiskSourcePVCSelectNameProps> = ({
             groupVersionKind: modelToGroupVersionKind(PersistentVolumeClaimModel),
             value: name,
           }))}
+          placeholder={t('Select volume name')}
+          selected={pvcNameSelected}
+          setSelected={onChange}
           toggleProps={{
             isDisabled,
             isFullWidth: true,
           }}
-          placeholder={t('Select volume name')}
-          selected={pvcNameSelected}
-          setSelected={onChange}
         />
       ) : (
         <Loading />

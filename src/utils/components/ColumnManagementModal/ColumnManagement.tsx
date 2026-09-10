@@ -32,13 +32,13 @@ const ColumnManagement: FC<ColumnManagementProps> = ({
   const button = (
     <Tooltip content={t('Manage columns')} trigger="mouseenter focus">
       <Button
-        onClick={() =>
-          createModal((props) => <ColumnManagementModal {...props} columnLayout={columnLayout} />)
-        }
         aria-label={t('Column management')}
         className={asToolbarItem ? undefined : 'kubevirt-table-toolbar-action'}
         data-test="manage-columns"
         icon={<ColumnsIcon />}
+        onClick={() =>
+          createModal((props) => <ColumnManagementModal {...props} columnLayout={columnLayout} />)
+        }
         variant={ButtonVariant.plain}
       />
     </Tooltip>

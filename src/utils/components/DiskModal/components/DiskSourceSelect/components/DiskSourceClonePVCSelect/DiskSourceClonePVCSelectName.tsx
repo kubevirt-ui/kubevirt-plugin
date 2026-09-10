@@ -50,6 +50,8 @@ const DiskSourceClonePVCSelectName: FC = () => {
 
   return (
     <Controller
+      control={control}
+      name={DATAVOLUME_PVC_NAME}
       render={({ field: { onChange, value } }) => (
         <FormGroup
           fieldId={diskSourcePVCNameFieldID}
@@ -63,6 +65,8 @@ const DiskSourceClonePVCSelectName: FC = () => {
               groupVersionKind: modelToGroupVersionKind(PersistentVolumeClaimModel),
               value: name,
             }))}
+            placeholder={t('Select PersistentVolumeClaim')}
+            selected={value}
             setSelected={(pvcName) => {
               onChange(pvcName);
               const selectedPVC = pvcMapper[pvcName];
@@ -72,8 +76,6 @@ const DiskSourceClonePVCSelectName: FC = () => {
               isDisabled: isEmpty(namespace),
               isFullWidth: true,
             }}
-            placeholder={t('Select PersistentVolumeClaim')}
-            selected={value}
           />
           {error && (
             <FormGroupHelperText validated={ValidatedOptions.error}>
@@ -85,8 +87,6 @@ const DiskSourceClonePVCSelectName: FC = () => {
       rules={{
         required: t('PersistentVolumeClaim is required.'),
       }}
-      control={control}
-      name={DATAVOLUME_PVC_NAME}
     />
   );
 };

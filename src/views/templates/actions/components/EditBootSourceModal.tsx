@@ -107,14 +107,14 @@ const EditBootSourceModal: FC<EditBootSourceModalProps> = ({
             <SelectSourceSkeleton />
           ) : (
             <SelectSource
+              onSourceChange={setBootSource}
+              source={bootSource}
+              sourceLabel={t('Boot source type')}
               sourceOptions={[
                 SOURCE_TYPES.pvcSource,
                 SOURCE_TYPES.registrySource,
                 SOURCE_TYPES.httpSource,
               ]}
-              onSourceChange={setBootSource}
-              source={bootSource}
-              sourceLabel={t('Boot source type')}
               withSize
             />
           )}

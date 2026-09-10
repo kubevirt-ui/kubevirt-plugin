@@ -22,6 +22,8 @@ const RightClickMenuWrapper: FC<RightClickMenuWrapperProps> = ({
   triggerRef,
 }) => (
   <Popper
+    distance={MENU_DISTANCE}
+    isVisible
     popper={
       <Menu
         className="right-click-action-menu"
@@ -31,8 +33,6 @@ const RightClickMenuWrapper: FC<RightClickMenuWrapperProps> = ({
         <MenuContent>{children}</MenuContent>
       </Menu>
     }
-    distance={MENU_DISTANCE}
-    isVisible
     triggerRef={triggerRef}
     zIndex={RIGHT_CLICK_MENU_Z_INDEX}
   />

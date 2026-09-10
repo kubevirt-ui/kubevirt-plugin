@@ -18,6 +18,7 @@ const DrilldownMenuItem: FC<DrilldownMenuItemProps> = ({
   const Icon = icon;
   return (
     <MenuItem
+      direction="down"
       drilldownMenu={
         <DrilldownMenu id={id}>
           <MenuItem direction="up" itemId={`${id}_breadcrumb`}>
@@ -27,7 +28,6 @@ const DrilldownMenuItem: FC<DrilldownMenuItemProps> = ({
           {children}
         </DrilldownMenu>
       }
-      direction="down"
       icon={Icon && <Icon />}
       itemId={id}
     >

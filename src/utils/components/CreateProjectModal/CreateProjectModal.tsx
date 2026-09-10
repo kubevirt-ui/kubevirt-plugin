@@ -14,7 +14,6 @@ import { Content, Form, FormGroup, TextInput } from '@patternfly/react-core';
 
 import ExternalLink from '../ExternalLink/ExternalLink';
 import TabModal from '../TabModal/TabModal';
-
 import SelectCluster from './components/SelectCluster';
 
 type CreateProjectModalProps = {
@@ -40,6 +39,11 @@ const CreateProjectModal: FC<CreateProjectModalProps> = ({
 
   return (
     <TabModal<K8sResourceCommon & { description: string; displayName: string }>
+      headerText={t('Create project')}
+      isDisabled={isEmpty(name)}
+      isOpen={isOpen}
+      obj={{ description, displayName, metadata: { name } }}
+      onClose={onClose}
       onSubmit={(data) =>
         kubevirtK8sCreate({
           cluster,
@@ -47,11 +51,6 @@ const CreateProjectModal: FC<CreateProjectModalProps> = ({
           model: ProjectRequestModel,
         }).then((value) => createdProject?.(value))
       }
-      headerText={t('Create project')}
-      isDisabled={isEmpty(name)}
-      isOpen={isOpen}
-      obj={{ description, displayName, metadata: { name } }}
-      onClose={onClose}
       submitBtnText={t('Create')}
     >
       <Content component="p">
@@ -65,6 +64,9 @@ const CreateProjectModal: FC<CreateProjectModalProps> = ({
       <br />
       <Form>
         <FormGroup
+          fieldId="project-name"
+          isRequired
+          label={t('Name')}
           labelHelp={
             <HelpTextIcon
               bodyContent={
@@ -78,9 +80,6 @@ const CreateProjectModal: FC<CreateProjectModalProps> = ({
               }
             />
           }
-          fieldId="project-name"
-          isRequired
-          label={t('Name')}
         >
           <TextInput
             id="project-name"

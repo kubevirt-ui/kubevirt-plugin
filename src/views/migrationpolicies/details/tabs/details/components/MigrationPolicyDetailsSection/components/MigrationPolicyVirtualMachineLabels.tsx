@@ -36,9 +36,15 @@ const MigrationPolicyVirtualMachineLabels: FC<MigrationPolicyVirtualMachineLabel
       <DescriptionListTermHelpText className="migration-policy-description-item-header">
         {t('VirtualMachineInstance labels')}
         <Button
+          className="migration-policy-description-item-header--action-button"
+          isInline
           onClick={() =>
             createModal(({ isOpen, onClose }) => (
               <LabelsModal
+                initialLabels={mpVirtualMachineSelector}
+                isOpen={isOpen}
+                obj={mp}
+                onClose={onClose}
                 onLabelsSubmit={(labels) =>
                   kubevirtK8sUpdate({
                     data: ensureMigrationPolicyMatchLabels(
@@ -49,15 +55,9 @@ const MigrationPolicyVirtualMachineLabels: FC<MigrationPolicyVirtualMachineLabel
                     model: MigrationPolicyModel,
                   })
                 }
-                initialLabels={mpVirtualMachineSelector}
-                isOpen={isOpen}
-                obj={mp}
-                onClose={onClose}
               />
             ))
           }
-          className="migration-policy-description-item-header--action-button"
-          isInline
           variant={ButtonVariant.link}
         >
           {t('Edit')}

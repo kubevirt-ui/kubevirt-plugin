@@ -14,7 +14,6 @@ import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { FormGroup, Radio } from '@patternfly/react-core';
 
 import HelpTextIcon from '../HelpTextIcon/HelpTextIcon';
-
 import RecommendationLabel from './RecommendationLabel';
 import { ACCESS_MODE_RADIO_OPTIONS, getAccessModesForVolume } from './utils';
 
@@ -41,6 +40,8 @@ export const AccessMode: FC<AccessModeProps> = ({
 
   return (
     <FormGroup
+      isStack
+      label={t('Access mode')}
       labelHelp={
         <HelpTextIcon
           bodyContent={(hide) => (
@@ -60,27 +61,25 @@ export const AccessMode: FC<AccessModeProps> = ({
           )}
         />
       }
-      isStack
-      label={t('Access mode')}
     >
       {ACCESS_MODE_RADIO_OPTIONS.map(({ label, value }) => (
         <Radio
+          id={value}
+          isChecked={value === accessMode}
+          isDisabled={isDisabled}
+          key={value}
           label={
             <div className="ApplyStorageProfileSettings--labelWithGap">
               {label}
               {accessModeForVolume === value && <RecommendationLabel />}
             </div>
           }
+          name="accessMode"
           onChange={(_event, checked) => {
             if (checked) {
               setAccessMode(value);
             }
           }}
-          id={value}
-          isChecked={value === accessMode}
-          isDisabled={isDisabled}
-          key={value}
-          name="accessMode"
         />
       ))}
     </FormGroup>

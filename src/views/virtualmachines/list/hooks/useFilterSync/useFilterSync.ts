@@ -10,6 +10,7 @@ import {
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { getACMVMListURL, getVMListURL } from '@multicluster/urls';
 import useIsACMPage from '@multicluster/useIsACMPage';
+
 import { hasMismatch } from './utils';
 
 /**
@@ -46,8 +47,8 @@ const useFilterSync = (onSetFilters: OnSetFilters): void => {
 
     if (pathChanged) {
       onSetFilters({
-        [PROJECT_LIST_FILTER_TYPE]: namespace ? [namespace] : [],
         [CLUSTER_LIST_FILTER_TYPE]: cluster ? [cluster] : [],
+        [PROJECT_LIST_FILTER_TYPE]: namespace ? [namespace] : [],
       });
       return;
     }

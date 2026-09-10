@@ -10,7 +10,6 @@ import { ActionGroup, Alert, AlertVariant, Button, ButtonVariant } from '@patter
 
 import { CHECKUP_URLS } from '../../../utils/constants';
 import { createStorageCheckup, isNumOfVMsInvalid } from '../../utils/utils';
-
 import type { StorageCheckupAdvancedSettings } from './AdvancedSettings';
 
 type CheckupsStorageFormActionsProps = {
@@ -44,6 +43,7 @@ const CheckupsStorageFormActions: FC<CheckupsStorageFormActionsProps> = ({
             isSubmitting ||
             isNumOfVMsInvalid(advancedSettings.numOfVMs)
           }
+          isLoading={isSubmitting}
           onClick={async () => {
             setError(null);
             setIsSubmitting(true);
@@ -64,7 +64,6 @@ const CheckupsStorageFormActions: FC<CheckupsStorageFormActionsProps> = ({
               setIsSubmitting(false);
             }
           }}
-          isLoading={isSubmitting}
           variant={ButtonVariant.primary}
         >
           {t('Run')}

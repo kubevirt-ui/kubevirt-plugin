@@ -14,7 +14,6 @@ import ViewAllLink from '../../../shared/ViewAllLink';
 import { TOP_N } from '../../hooks/clusterMetricConstants';
 import { useNodeLoadDistributionData } from '../../hooks/useNodeLoadDistributionData';
 import TwoColumnCard from '../TwoColumnCard/TwoColumnCard';
-
 import useDeschedulerDisplay from './useDeschedulerDisplay';
 
 type NodeLoadDistributionCardProps = {
@@ -66,26 +65,26 @@ const NodeLoadDistributionCard: FC<NodeLoadDistributionCardProps> = ({
           )}
         </div>
       }
+      gridColumns="1fr 1fr"
+      headerActions={<ViewAllLink href={nodesHref} linkPath={nodesLinkPath} />}
+      isLoading={!loaded}
+      items={items}
       leftContent={
         <DistributionBarChart
+          buckets={buckets}
           helpContent={t(
             'Measures how evenly the workload is spread across nodes. 100% means perfectly balanced, 0% means all load is concentrated on a few nodes.',
           )}
-          buckets={buckets}
           title={t('Distribution score {{score}}%', { score: distributionScore })}
         />
       }
+      nameHeader={t('Node name')}
+      noDataMessage={metricsUnavailable ? getNoDataAvailableMessage(t) : undefined}
       rightTitle={
         totalNodeCount > TOP_N
           ? t('Top {{topNodesCount}} nodes by load', { topNodesCount: TOP_N })
           : t('Top nodes by load')
       }
-      gridColumns="1fr 1fr"
-      headerActions={<ViewAllLink href={nodesHref} linkPath={nodesLinkPath} />}
-      isLoading={!loaded}
-      items={items}
-      nameHeader={t('Node name')}
-      noDataMessage={metricsUnavailable ? getNoDataAvailableMessage(t) : undefined}
       scoreHeader={t('Load')}
       title={t('Node load distribution')}
     />

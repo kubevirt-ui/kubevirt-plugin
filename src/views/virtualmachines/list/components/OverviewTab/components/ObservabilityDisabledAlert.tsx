@@ -38,10 +38,10 @@ const ObservabilityDisabledAlert: FC<ObservabilityDisabledAlertProps> = ({ disab
 
   return (
     <Alert
+      actionClose={<AlertActionCloseButton onClose={() => setAlertDismissed(true)} />}
       className={classNames('observability-disabled-alert', {
         'observability-disabled-alert--multiple': disabledClusters.length > 1,
       })}
-      actionClose={<AlertActionCloseButton onClose={() => setAlertDismissed(true)} />}
       isInline
       title={null}
       variant={AlertVariant.warning}

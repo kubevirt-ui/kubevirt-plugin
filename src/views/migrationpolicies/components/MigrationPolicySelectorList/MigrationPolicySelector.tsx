@@ -25,10 +25,10 @@ export const MigrationPolicySelector: FC<MigrationPolicySelectorProps> = memo(
         position={PopoverPosition.top}
       >
         <Label
+          color={isVMILabel ? 'grey' : 'blue'}
           onClick={(e) => {
             e.preventDefault();
           }}
-          color={isVMILabel ? 'grey' : 'blue'}
         >
           <div className={classNames({ 'kv-migration-policy__label-vm': isVMILabel })}>
             {labelBodyContent}

@@ -41,11 +41,11 @@ const CommonTemplateAlert: FC<CommonTemplateAlertProps> = ({ template }) => {
 
   return (
     <Alert
+      data-test="common-template-alert"
+      isInline
       title={t('Templates provided by {{providerName}} are not editable.', {
         providerName,
       })}
-      data-test="common-template-alert"
-      isInline
       variant={AlertVariant.info}
     >
       {t(
@@ -59,6 +59,7 @@ const CommonTemplateAlert: FC<CommonTemplateAlertProps> = ({ template }) => {
       })}
       <div className="pf-v6-u-mt-md">
         <Button
+          isInline
           onClick={() =>
             createModal(({ isOpen, onClose }) => (
               <CloneTemplateModal
@@ -69,7 +70,6 @@ const CommonTemplateAlert: FC<CommonTemplateAlertProps> = ({ template }) => {
               />
             ))
           }
-          isInline
           variant={ButtonVariant.link}
         >
           {t('Create a new custom Template')}

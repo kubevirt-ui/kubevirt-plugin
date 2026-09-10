@@ -22,11 +22,11 @@ const DiskSourcePVCSelectNamespace: FC<DiskSourcePVCSelectNamespaceProps> = ({ v
       label={t('PersistentVolumeClaim project')}
     >
       <FormPFSelect
+        placeholder={vmNamespace}
         toggleProps={{
           isDisabled: true,
           isFullWidth: true,
         }}
-        placeholder={vmNamespace}
       />
       <FormGroupHelperText>{t('Location of the existing PVC')}</FormGroupHelperText>
     </FormGroup>

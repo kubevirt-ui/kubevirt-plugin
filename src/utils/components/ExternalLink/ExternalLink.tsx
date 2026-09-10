@@ -28,12 +28,6 @@ const ExternalLink: FC<ExternalLinkProps> = ({
   text,
 }) => (
   <Button
-    onClick={(e) => {
-      if (stopPropagation) {
-        e.stopPropagation();
-      }
-      onClick?.();
-    }}
     aria-label={ariaLabel}
     className={className}
     component="a"
@@ -42,6 +36,12 @@ const ExternalLink: FC<ExternalLinkProps> = ({
     icon={hideIcon ? undefined : <ExternalLinkAltIcon />}
     iconPosition="end"
     isInline
+    onClick={(e) => {
+      if (stopPropagation) {
+        e.stopPropagation();
+      }
+      onClick?.();
+    }}
     rel="noopener noreferrer"
     target="_blank"
     variant="link"

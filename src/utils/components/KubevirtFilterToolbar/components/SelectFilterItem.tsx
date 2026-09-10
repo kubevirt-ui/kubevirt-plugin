@@ -37,14 +37,14 @@ const SelectFilterItem: FC<SelectFilterItemProps> = ({
     <ToolbarFilterMultiChip filterDef={filterDef} filters={filters} onSetFilters={onSetFilters}>
       {isToggleVisible && (
         <CheckboxSelect
+          badgeNumber={filterDef.toggleBadgeNumber}
+          isToggleDisabled={filterDef.disabled}
+          onSelect={(_event, value: string) => onSelect(filterDef.id, value)}
           options={filterDef.options?.map(({ label, value }) => ({
             children: label,
             isSelected: selected.includes(value),
             value,
           }))}
-          badgeNumber={filterDef.toggleBadgeNumber}
-          isToggleDisabled={filterDef.disabled}
-          onSelect={(_event, value: string) => onSelect(filterDef.id, value)}
           selectedValues={selected}
           showAllBadge={filterDef.showAllBadge}
           toggleSize={toggleSize}

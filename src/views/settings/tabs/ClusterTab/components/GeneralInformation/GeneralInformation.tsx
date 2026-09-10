@@ -72,6 +72,7 @@ const GeneralInformation: FC<GeneralInformationProps> = ({
       <SplitItem>
         <DescriptionList>
           <DescriptionItem
+            bodyContent={t('The channel to track and receive the updates from.')}
             descriptionData={
               loaded ? (
                 <SettingsLink showExternalIcon to={operatorLink}>
@@ -81,7 +82,6 @@ const GeneralInformation: FC<GeneralInformationProps> = ({
                 <Skeleton />
               )
             }
-            bodyContent={t('The channel to track and receive the updates from.')}
             descriptionHeader={t('Channel')}
             isPopover
           />

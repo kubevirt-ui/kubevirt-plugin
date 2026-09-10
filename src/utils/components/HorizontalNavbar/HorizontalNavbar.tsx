@@ -95,6 +95,9 @@ const HorizontalNavbar: FC<HorizontalNavbarProps> = ({
                 key={item.name}
               >
                 <NavLink
+                  className="pf-v6-c-tabs__link"
+                  data-test={`horizontal-link-${item.name}`}
+                  id={`horizontal-pageHeader-${item.name}`}
                   onClick={() => {
                     setActiveItem(item.name.toLowerCase());
                     logVMDetailTabViewed(
@@ -107,9 +110,6 @@ const HorizontalNavbar: FC<HorizontalNavbarProps> = ({
                     trimLastHistoryPath(location.pathname.replace(basePath, ''), paths) +
                     item.href
                   }
-                  className="pf-v6-c-tabs__link"
-                  data-test={`horizontal-link-${item.name}`}
-                  id={`horizontal-pageHeader-${item.name}`}
                 >
                   {item.name}
                   {item.badges?.map(

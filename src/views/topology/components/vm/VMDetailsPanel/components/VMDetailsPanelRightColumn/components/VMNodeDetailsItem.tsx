@@ -39,6 +39,7 @@ const VMNodeDetailsItem: FC<VMNodeDetailsItemProps> = ({ launcherPod, vm, vmi })
 
   return (
     <DescriptionItem
+      className="topology-vm-details-panel__item"
       descriptionData={
         nodeName ? (
           <ResourceLink groupVersionKind={modelToGroupVersionKind(NodeModel)} name={nodeName} />
@@ -46,7 +47,6 @@ const VMNodeDetailsItem: FC<VMNodeDetailsItemProps> = ({ launcherPod, vm, vmi })
           NO_DATA_DASH
         )
       }
-      className="topology-vm-details-panel__item"
       descriptionHeader={t('Node')}
     />
   );

@@ -23,7 +23,7 @@ const GeneralSettings: FC<GeneralSettingsProps> = ({ hyperConvergeConfiguration,
     >
       <Stack hasGutter>
         {getGeneralSettingsSections(t).map(({ Component: sectionComponent, label }) => (
-          <StackItem key={label} isFilled>
+          <StackItem isFilled key={label}>
             {createElement(sectionComponent, { hyperConvergeConfiguration, newBadge })}
           </StackItem>
         ))}

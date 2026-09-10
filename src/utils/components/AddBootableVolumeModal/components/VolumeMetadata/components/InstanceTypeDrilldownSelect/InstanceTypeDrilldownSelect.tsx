@@ -77,6 +77,7 @@ export const InstanceTypeDrilldownSelect: FC<InstanceTypeMenuItemsProps> = ({
 
   return (
     <FormGroup
+      label={t('Default InstanceType')}
       labelHelp={
         <HelpTextIcon
           bodyContent={(hide) => (
@@ -89,15 +90,8 @@ export const InstanceTypeDrilldownSelect: FC<InstanceTypeMenuItemsProps> = ({
           position={PopoverPosition.right}
         />
       }
-      label={t('Default InstanceType')}
     >
       <ComposableDrilldownSelect
-        toggleLabel={
-          <SelectInstanceTypeToggle
-            selected={selectedInstanceType}
-            selectedKind={selectedInstanceTypeKind}
-          />
-        }
         appendTo={document.getElementById('tab-modal')}
         direction="up"
         id={MENUS.root}
@@ -105,6 +99,12 @@ export const InstanceTypeDrilldownSelect: FC<InstanceTypeMenuItemsProps> = ({
         isOpen={isOpen}
         scrollableMenuIDs={[MENUS.userProvided]}
         setIsOpen={setIsOpen}
+        toggleLabel={
+          <SelectInstanceTypeToggle
+            selected={selectedInstanceType}
+            selectedKind={selectedInstanceTypeKind}
+          />
+        }
       >
         <DrilldownMenuItem {...menuItems.redHatProvided} label={t(menuItems.redHatProvided.label)}>
           <RedHatInstanceTypeSeriesMenu

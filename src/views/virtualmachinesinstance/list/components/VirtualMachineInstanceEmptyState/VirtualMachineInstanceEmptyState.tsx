@@ -21,6 +21,7 @@ const VirtualMachineInstanceEmptyState: FC<VirtualMachineInstanceEmptyStateProps
 
   return (
     <ListEmptyState
+      bodyContent={t('To get started, create a VirtualMachine.')}
       buttonAction={
         <Button
           onClick={() => navigateToVMWizard({ cluster, namespace, navigate })}
@@ -29,6 +30,7 @@ const VirtualMachineInstanceEmptyState: FC<VirtualMachineInstanceEmptyStateProps
           {t('Create VirtualMachine')}
         </Button>
       }
+      icon={VirtualMachineIcon}
       learnMoreLink={
         <Button
           icon={<RocketIcon />}
@@ -38,8 +40,6 @@ const VirtualMachineInstanceEmptyState: FC<VirtualMachineInstanceEmptyStateProps
           {t('Learn how to use VirtualMachines')}
         </Button>
       }
-      bodyContent={t('To get started, create a VirtualMachine.')}
-      icon={VirtualMachineIcon}
       titleText={t("You don't have any VirtualMachineInstances yet")}
     />
   );

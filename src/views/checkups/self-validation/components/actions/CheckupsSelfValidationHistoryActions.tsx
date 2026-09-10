@@ -36,6 +36,7 @@ const CheckupsSelfValidationHistoryActions: FC<CheckupsSelfValidationHistoryActi
     createModal((props) => (
       <DeleteModal
         {...props}
+        headerText={t('Delete job')}
         obj={{
           metadata: { name: getName(job), namespace: getNamespace(job) },
         }}
@@ -50,7 +51,6 @@ const CheckupsSelfValidationHistoryActions: FC<CheckupsSelfValidationHistoryActi
             setIsDeleting(false);
           }
         }}
-        headerText={t('Delete job')}
         shouldRedirect={false}
       />
     ));

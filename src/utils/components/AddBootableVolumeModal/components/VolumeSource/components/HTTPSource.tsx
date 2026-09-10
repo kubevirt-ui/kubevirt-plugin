@@ -64,6 +64,8 @@ const HTTPSource: FC<HTTPSourceProps> = ({
       </FormGroup>
 
       <TLSCertificateSection
+        cluster={bootableVolume?.bootableVolumeCluster}
+        namespace={bootableVolume?.bootableVolumeNamespace}
         onExistingCertificateChange={(certNamespace, configMapName) => {
           setBootableVolumeField(TLS_CERT_FIELD_NAMES.tlsCertProject)(certNamespace);
           setBootableVolumeField(TLS_CERT_FIELD_NAMES.tlsCertConfigMapName)(configMapName);
@@ -80,8 +82,6 @@ const HTTPSource: FC<HTTPSourceProps> = ({
         onSourceChange={(source) =>
           setBootableVolumeField(TLS_CERT_FIELD_NAMES.tlsCertSource)(source)
         }
-        cluster={bootableVolume?.bootableVolumeCluster}
-        namespace={bootableVolume?.bootableVolumeNamespace}
         tlsCertConfigMapName={bootableVolume?.tlsCertConfigMapName}
         tlsCertificate={bootableVolume?.tlsCertificate}
         tlsCertificateRequired={bootableVolume?.tlsCertificateRequired}

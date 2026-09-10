@@ -28,6 +28,10 @@ const RerunCheckupModal: FC<RerunCheckupModalProps> = ({
 
   return (
     <TabModal
+      headerText={title}
+      isOpen={isOpen}
+      obj={{}}
+      onClose={onClose}
       onSubmit={async () => {
         if (isWarning) {
           await onConfirm?.();
@@ -35,10 +39,6 @@ const RerunCheckupModal: FC<RerunCheckupModalProps> = ({
           onClose();
         }
       }}
-      headerText={title}
-      isOpen={isOpen}
-      obj={{}}
-      onClose={onClose}
       submitBtnText={isWarning ? t('Rerun') : t('Close')}
       titleIconVariant={isWarning ? 'warning' : 'danger'}
     >

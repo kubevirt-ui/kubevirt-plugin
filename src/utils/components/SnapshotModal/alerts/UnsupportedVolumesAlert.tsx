@@ -20,10 +20,10 @@ const UnsupportedVolumesAlert: FC<UnsupportedVolumesAlertProps> = ({ unsupported
   return (
     <FormGroup fieldId="snapshot-unsupported-volumes-alert">
       <Alert
+        isInline
         title={t('The following disk will not be included in the snapshot', {
           count: unsupportedVolumes?.length,
         })}
-        isInline
         variant={AlertVariant.warning}
       >
         <Stack hasGutter>

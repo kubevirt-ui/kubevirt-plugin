@@ -15,12 +15,12 @@ const HeavyLoadCheckupConfirmationModal: FC<HeavyLoadCheckupConfirmationModalPro
 
   return (
     <AckConfirmationModal
-      checkToConfirmMessage={t(
-        'I confirm this is a non-production environment safe for heavy load testing.',
-      )}
       action={onConfirm}
       actionLabel={t('Run checkup')}
       actionType="heavy-load-checkup"
+      checkToConfirmMessage={t(
+        'I confirm this is a non-production environment safe for heavy load testing.',
+      )}
       isOpen={isOpen}
       onClose={onClose}
       severityVariant="warning"

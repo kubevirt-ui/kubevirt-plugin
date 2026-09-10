@@ -71,6 +71,8 @@ const GettingStartedSectionContents: FC<GettingStartedSectionContentsProps> = ({
               ) : (
                 <span key={link.id}>
                   <SimpleListItem
+                    component={getLinkComponent(link)}
+                    componentClassName={link.external ? 'co-external-link' : 'co-goto-arrow'}
                     componentProps={
                       link.external
                         ? {
@@ -84,8 +86,6 @@ const GettingStartedSectionContents: FC<GettingStartedSectionContentsProps> = ({
                             to: link.href,
                           }
                     }
-                    component={getLinkComponent(link)}
-                    componentClassName={link.external ? 'co-external-link' : 'co-goto-arrow'}
                     href={link.href}
                     onClick={handleClick}
                   >

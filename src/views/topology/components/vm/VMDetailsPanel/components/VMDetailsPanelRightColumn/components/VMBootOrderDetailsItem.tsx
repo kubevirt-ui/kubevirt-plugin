@@ -27,6 +27,11 @@ const VMBootOrderDetailsItem: FC<VMBootOrderDetailsItemProps> = ({ instanceTypeV
 
   return (
     <DescriptionItem
+      className="topology-vm-details-panel__item"
+      data-test={`${getName(vm)}-boot-order`}
+      descriptionData={<BootOrderSummary instanceTypeVM={instanceTypeVM} vm={vm} />}
+      descriptionHeader={t('Boot order')}
+      isEdit
       onEditClick={() =>
         createModal((props) => (
           <BootOrderModal
@@ -38,11 +43,6 @@ const VMBootOrderDetailsItem: FC<VMBootOrderDetailsItemProps> = ({ instanceTypeV
           />
         ))
       }
-      className="topology-vm-details-panel__item"
-      data-test={`${getName(vm)}-boot-order`}
-      descriptionData={<BootOrderSummary instanceTypeVM={instanceTypeVM} vm={vm} />}
-      descriptionHeader={t('Boot order')}
-      isEdit
     />
   );
 };

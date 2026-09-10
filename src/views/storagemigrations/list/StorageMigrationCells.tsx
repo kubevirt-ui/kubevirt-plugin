@@ -42,6 +42,10 @@ export const NameCell: FC<CellProps> = ({ row }) => {
   return (
     <span data-test={`storage-migration-name-${migPlanName}`}>
       <MulticlusterResourceLink
+        cluster={cluster}
+        groupVersionKind={modelToGroupVersionKind(planModel)}
+        name={migPlanName}
+        namespace={getNamespace(row)}
         onClick={() =>
           navigate(
             getResourceUrl({
@@ -50,10 +54,6 @@ export const NameCell: FC<CellProps> = ({ row }) => {
             }),
           )
         }
-        cluster={cluster}
-        groupVersionKind={modelToGroupVersionKind(planModel)}
-        name={migPlanName}
-        namespace={getNamespace(row)}
       />
     </span>
   );

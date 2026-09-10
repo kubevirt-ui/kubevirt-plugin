@@ -59,13 +59,13 @@ const HelpTextIcon: FC<HelpTextIconProps> = ({
       position={position}
     >
       <Button
+        aria-label={buttonAriaLabel ?? t('Help')}
+        hasNoPadding
         icon={
           <Icon className={helpIconClassName} onClick={handleHelpClick} size={size}>
             <HelpIcon className="help-icon" />
           </Icon>
         }
-        aria-label={buttonAriaLabel ?? t('Help')}
-        hasNoPadding
         isInline
         variant="plain"
       />

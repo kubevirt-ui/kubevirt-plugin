@@ -59,6 +59,7 @@ const RelatedOperatorsSection: FC = () => {
 
   return (
     <GettingStartedSectionContents
+      description={t('Ease operational complexity with virtualization by using Operators.')}
       icon={
         <i
           aria-hidden="true"
@@ -66,7 +67,6 @@ const RelatedOperatorsSection: FC = () => {
           id="kv-getting-started--related-operators-icon"
         />
       }
-      description={t('Ease operational complexity with virtualization by using Operators.')}
       id="related-operators"
       links={links}
       moreLink={moreLink}

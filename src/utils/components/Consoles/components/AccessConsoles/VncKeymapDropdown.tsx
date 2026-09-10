@@ -56,18 +56,29 @@ export const VncKeymapDropdown = ({
 
   return (
     <Dropdown
+      isOpen={isKeyboardSelectOpen}
+      isScrollable
       onActionClick={(event, value) => {
         event.stopPropagation();
         isKeyboardLayout(value) && updateFavorite(value);
       }}
+      onOpenChange={(isOpen: boolean) => setIsKeyboardSelectOpen(isOpen)}
       onSelect={(_event, value?: number | string): void => {
         isKeyboardLayout(value) && setSelectedKeyboard(value);
         setIsKeyboardSelectOpen(false);
       }}
+      selected={selectedKeyboard}
+      shouldFocusToggleOnSelect
       toggle={(toggleRef: Ref<MenuToggleElement>) => (
         <MenuToggle
+          className="vnc-paste-button"
+          isExpanded={isKeyboardSelectOpen}
+          onClick={() => setIsKeyboardSelectOpen(!isKeyboardSelectOpen)}
+          ref={toggleRef}
           splitButtonItems={[
             <MenuToggleAction
+              aria-label={typeInLabel}
+              key={typeInLabel}
               onClick={
                 actions.sendPaste
                   ? (e: MouseEvent<HTMLButtonElement>): void => {
@@ -84,27 +95,16 @@ export const VncKeymapDropdown = ({
                     }
                   : undefined
               }
-              aria-label={typeInLabel}
-              key={typeInLabel}
             >
               <PasteIcon />
               <span className="pf-v6-u-ml-sm">{typeInLabel}</span>
             </MenuToggleAction>,
           ]}
-          className="vnc-paste-button"
-          isExpanded={isKeyboardSelectOpen}
-          onClick={() => setIsKeyboardSelectOpen(!isKeyboardSelectOpen)}
-          ref={toggleRef}
           variant="secondary"
         >
           {selectedKeyboard}
         </MenuToggle>
       )}
-      isOpen={isKeyboardSelectOpen}
-      isScrollable
-      onOpenChange={(isOpen: boolean) => setIsKeyboardSelectOpen(isOpen)}
-      selected={selectedKeyboard}
-      shouldFocusToggleOnSelect
     >
       <DropdownList>
         {favoriteKeymaps.length > 0 && (

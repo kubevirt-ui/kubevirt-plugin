@@ -110,13 +110,13 @@ export const SelectSource: FC<SelectSourceProps> = ({
 
       {selectedSourceType === SOURCE_TYPES.pvcSource && (
         <PersistentVolumeClaimSelect
+          projectSelected={pvcNamespaceSelected}
+          pvcNameSelected={pvcNameSelected}
           selectPVC={(newPVCNamespace, newPVCName) =>
             onSourceChange(
               getPVCSource(newPVCName, newPVCNamespace, withSize ? volumeQuantity : null),
             )
           }
-          projectSelected={pvcNamespaceSelected}
-          pvcNameSelected={pvcNameSelected}
         />
       )}
 

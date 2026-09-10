@@ -62,6 +62,10 @@ const SourceTypeSelection: FC<SourceTypeSelectionProps> = ({
   return (
     <FormGroup fieldId="source-type" label={t('Source type')}>
       <Select
+        isOpen={isOpen}
+        onOpenChange={setIsOpen}
+        onSelect={onSelect}
+        selected={formSelection}
         toggle={SelectToggle({
           'data-test': 'source-type-select',
           isDisabled,
@@ -70,10 +74,6 @@ const SourceTypeSelection: FC<SourceTypeSelectionProps> = ({
           onClick: isDisabled ? undefined : onToggle,
           selected: t(optionsValueLabelMapper[formSelection]),
         })}
-        isOpen={isOpen}
-        onOpenChange={setIsOpen}
-        onSelect={onSelect}
-        selected={formSelection}
       >
         <SelectGroup label={t('Upload new')}>
           <SelectOption

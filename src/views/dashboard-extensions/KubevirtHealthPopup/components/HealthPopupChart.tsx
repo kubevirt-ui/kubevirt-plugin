@@ -50,16 +50,16 @@ const HealthPopupChart: FC<HealthPopupChartProps> = ({ alerts, numberOfAlerts })
   return (
     <div className="kv-health-popup__chart">
       <ChartDonut
-        style={{
-          data: {
-            fill: ({ datum }) => datum?.fill,
-          },
-        }}
         ariaDesc={t('Virtualization alerts')}
         ariaTitle={t('Virtualization alerts donut chart')}
         data={chartData}
         height={150}
         labels={({ datum }) => `${datum?.x}: ${datum?.y}%`}
+        style={{
+          data: {
+            fill: ({ datum }) => datum?.fill,
+          },
+        }}
         subTitle={t('Alerts')}
         subTitleComponent={<SubTitleChartLabel />}
         title={totalNumberAlerts?.toString()}

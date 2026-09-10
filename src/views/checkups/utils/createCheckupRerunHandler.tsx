@@ -60,11 +60,11 @@ export const createCheckupRerunHandler = ({
       createModal((props) => (
         <RerunCheckupModal
           {...props}
+          message={runningJobWarningMessage}
           onConfirm={() => {
             props.onClose();
             void executeRerun();
           }}
-          message={runningJobWarningMessage}
           variant="warning"
         />
       ));

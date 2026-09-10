@@ -56,6 +56,11 @@ const UploadDiskModal: FC<V1SubDiskModalProps> = ({
   return (
     <FormProvider {...methods}>
       <TabModal
+        closeOnSubmit={isValid}
+        headerText={diskModalTitle(false, isVMRunning)}
+        isDisabled={!isValid}
+        isLoading={isSubmitting}
+        isOpen={isOpen}
         onClose={() => {
           const diskName = getValues('disk.name');
           const uploadKey = diskName
@@ -112,11 +117,6 @@ const UploadDiskModal: FC<V1SubDiskModalProps> = ({
             return !isVMRunning ? onSubmit(newVM) : hotplugPromise(newVM, data);
           })()
         }
-        closeOnSubmit={isValid}
-        headerText={diskModalTitle(false, isVMRunning)}
-        isDisabled={!isValid}
-        isLoading={isSubmitting}
-        isOpen={isOpen}
         shouldWrapInForm
       >
         <PendingChanges isVMRunning={isVMRunning} />

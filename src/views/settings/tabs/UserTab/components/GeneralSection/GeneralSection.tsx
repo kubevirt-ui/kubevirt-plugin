@@ -23,15 +23,15 @@ const GeneralSection: FC = () => {
       toggleText={t('General')}
     >
       <SectionWithSwitch
+        dataTestID="auto-hide-nav"
         helpTextIconContent={t(
           'Automatically collapse the side navigation when managing your virtual machines to maximize your workspace',
         )}
+        id={USER_TAB_IDS.autoHideNav}
+        switchIsOn={isChecked}
         title={
           <SearchItem id={USER_TAB_IDS.autoHideNav}>{t('Auto-hide navigation menu')}</SearchItem>
         }
-        dataTestID="auto-hide-nav"
-        id={USER_TAB_IDS.autoHideNav}
-        switchIsOn={isChecked}
         turnOnSwitch={(checked) => setNavigation({ ...navigation, autoHideNav: checked })}
       />
     </ExpandSection>

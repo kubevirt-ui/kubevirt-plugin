@@ -5,7 +5,6 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import type { Template } from '@kubevirt-utils/resources/template';
 
 import InlineFilterSelect from '../FilterSelect/InlineFilterSelect';
-
 import useTemplateOptions from './hooks/useTemplateOptions';
 import { getTemplateOptionKey } from './utils';
 
@@ -29,13 +28,13 @@ const SelectTemplate: FC<SelectTemplateProps> = ({
 
   return (
     <InlineFilterSelect
-      setSelected={(key: string) => {
-        onTemplateSelect(templateMap.get(key));
-      }}
       options={options}
       placeholder={t('Select a template')}
       searchPlaceholder={t('Search templates')}
       selected={getTemplateOptionKey(selectedTemplate)}
+      setSelected={(key: string) => {
+        onTemplateSelect(templateMap.get(key));
+      }}
       showSearch={hasOptions}
       toggleProps={{ 'data-test': dataTestId, isDisabled, isFullWidth: true }}
     />

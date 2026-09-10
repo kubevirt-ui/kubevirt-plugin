@@ -37,6 +37,7 @@ const AddNetworkInterfaceButton: FC<AddNetworkInterfaceButtonProps> = ({
 
   return (
     <ListPageCreateButton
+      className={classNames('add-network-interface-button pf-v6-u-mb-md')}
       onClick={() =>
         createModal(({ isOpen, onClose }) => (
           <VirtualMachinesNetworkInterfaceModal
@@ -49,7 +50,6 @@ const AddNetworkInterfaceButton: FC<AddNetworkInterfaceButtonProps> = ({
           />
         ))
       }
-      className={classNames('add-network-interface-button pf-v6-u-mb-md')}
     >
       {actionText}
     </ListPageCreateButton>

@@ -88,17 +88,17 @@ const GuidedTour: FC = () => {
           }
         }
       }}
-      styles={{
-        options: {
-          zIndex: 10000,
-        },
-      }}
       continuous
       disableScrollParentFix
       floaterProps={{ disableAnimation: true }}
       run={runningTourSignal.value}
       stepIndex={stepIndexSignal.value}
       steps={steps}
+      styles={{
+        options: {
+          zIndex: 10000,
+        },
+      }}
       tooltipComponent={TourPopover as ComponentType<TooltipRenderProps>}
     />
   );

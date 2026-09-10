@@ -28,6 +28,8 @@ const DeleteResourceCheckbox: FC<DeleteResourceCheckboxProps> = ({
   return (
     <StackItem>
       <Checkbox
+        id={`${resource.kind}-${resourceName}`}
+        isChecked={willDelete}
         label={
           <Flex
             alignItems={{ default: 'alignItemsFlexStart' }}
@@ -55,8 +57,6 @@ const DeleteResourceCheckbox: FC<DeleteResourceCheckboxProps> = ({
             )}
           </Flex>
         }
-        id={`${resource.kind}-${resourceName}`}
-        isChecked={willDelete}
         onChange={onToggle}
       />
     </StackItem>

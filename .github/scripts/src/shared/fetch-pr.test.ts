@@ -1,5 +1,5 @@
-import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
+import { describe, it } from 'node:test';
 
 import { fetchPr } from './fetch-pr';
 
@@ -14,7 +14,7 @@ describe('fetchPr', () => {
   it('returns normalized PR details', async () => {
     const octokit = makeMockOctokit({
       base: { ref: 'main' },
-      head: { sha: 'abc123', repo: { full_name: 'owner/repo' } },
+      head: { repo: { full_name: 'owner/repo' }, sha: 'abc123' },
       labels: [{ name: 'lgtm' }],
       merge_commit_sha: 'def456',
       node_id: 'node1',
@@ -36,7 +36,7 @@ describe('fetchPr', () => {
   it('handles missing merge_commit_sha', async () => {
     const octokit = makeMockOctokit({
       base: { ref: 'release-4.21' },
-      head: { sha: 'abc123', repo: null },
+      head: { repo: null, sha: 'abc123' },
       labels: [],
       merge_commit_sha: null,
       node_id: '',
@@ -52,7 +52,7 @@ describe('fetchPr', () => {
   it('handles missing user', async () => {
     const octokit = makeMockOctokit({
       base: { ref: 'main' },
-      head: { sha: 'sha1', repo: null },
+      head: { repo: null, sha: 'sha1' },
       labels: [],
       merge_commit_sha: 'sha2',
       node_id: '',

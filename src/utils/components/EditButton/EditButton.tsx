@@ -25,10 +25,6 @@ const EditButton: FC<EditButtonProps> = ({
   variant = ButtonVariant.link,
 }): ReactElement => (
   <Button
-    onClick={(e) => {
-      e.stopPropagation();
-      onClick?.();
-    }}
     aria-label={ariaLabel ?? undefined}
     className={className}
     data-test={testId}
@@ -36,6 +32,10 @@ const EditButton: FC<EditButtonProps> = ({
     iconPosition="end"
     isDisabled={isDisabled}
     isInline={isInline}
+    onClick={(e) => {
+      e.stopPropagation();
+      onClick?.();
+    }}
     variant={variant}
   >
     {children}

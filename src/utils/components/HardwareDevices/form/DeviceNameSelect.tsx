@@ -32,12 +32,6 @@ const DeviceNameSelect: FC<DeviceNameSelectProps> = ({
     <GridItem span={5}>
       <FormGroup fieldId="deviceName" isRequired label={!index && t('Device name')}>
         <Select
-          toggle={SelectToggle({
-            isExpanded: isOpen,
-            isFullWidth: true,
-            onClick: onToggle,
-            selected: deviceName,
-          })}
           id="deviceName"
           isOpen={isOpen}
           isScrollable
@@ -45,6 +39,12 @@ const DeviceNameSelect: FC<DeviceNameSelectProps> = ({
           onSelect={onSelect}
           popperProps={{ appendTo: () => document.getElementById('tab-modal') }}
           selected={deviceName}
+          toggle={SelectToggle({
+            isExpanded: isOpen,
+            isFullWidth: true,
+            onClick: onToggle,
+            selected: deviceName,
+          })}
         >
           {!isEmpty(permittedHostDevices?.mediatedDevices) && (
             <SelectGroup key="mediated" label={t('Mediated devices')}>

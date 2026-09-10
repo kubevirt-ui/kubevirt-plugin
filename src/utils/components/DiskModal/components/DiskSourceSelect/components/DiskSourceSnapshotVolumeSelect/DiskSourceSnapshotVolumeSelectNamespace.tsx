@@ -38,6 +38,8 @@ const DiskSourceSnapshotVolumeSelectNamespace: FC = () => {
 
   return (
     <Controller
+      control={control}
+      name={DATAVOLUME_SNAPSHOT_NAMESPACE}
       render={({ field: { onChange, value } }) => (
         <FormGroup
           fieldId={diskSourceSnapshotVolumeNamespaceFieldID}
@@ -51,6 +53,8 @@ const DiskSourceSnapshotVolumeSelectNamespace: FC = () => {
               groupVersionKind: modelToGroupVersionKind(ProjectModel),
               value: name,
             }))}
+            placeholder={t('Select Project')}
+            selected={value}
             setSelected={(val) => {
               onChange(val);
               setValue<FieldPath<V1DiskFormState>>(DATAVOLUME_SNAPSHOT_NAME, null, {
@@ -60,8 +64,6 @@ const DiskSourceSnapshotVolumeSelectNamespace: FC = () => {
             toggleProps={{
               isFullWidth: true,
             }}
-            placeholder={t('Select Project')}
-            selected={value}
           />
           <FormGroupHelperText
             validated={error ? ValidatedOptions.error : ValidatedOptions.default}
@@ -70,8 +72,6 @@ const DiskSourceSnapshotVolumeSelectNamespace: FC = () => {
           </FormGroupHelperText>
         </FormGroup>
       )}
-      control={control}
-      name={DATAVOLUME_SNAPSHOT_NAMESPACE}
       rules={{ required: t('Project is required.') }}
     />
   );

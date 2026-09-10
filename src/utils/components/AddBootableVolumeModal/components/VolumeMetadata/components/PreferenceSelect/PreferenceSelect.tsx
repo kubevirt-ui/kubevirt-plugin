@@ -72,6 +72,8 @@ const PreferenceSelect: FC<PreferenceSelectProps> = ({
 
   return (
     <FormGroup
+      isRequired
+      label={t('Preference')}
       labelHelp={
         <HelpTextIcon
           bodyContent={(hide) => (
@@ -84,18 +86,16 @@ const PreferenceSelect: FC<PreferenceSelectProps> = ({
           position={PopoverPosition.right}
         />
       }
-      isRequired
-      label={t('Preference')}
     >
       <InlineFilterSelect
-        toggleProps={{
-          isDisabled: isDisabled || !!bootableVolume.lockedPreference,
-          isFullWidth: true,
-        }}
         options={preferenceSelectOptions}
         placeholder={t('Select preference')}
         selected={selectedPreferenceKey}
         setSelected={handleSelect}
+        toggleProps={{
+          isDisabled: isDisabled || !!bootableVolume.lockedPreference,
+          isFullWidth: true,
+        }}
       />
       {bootableVolume.lockedPreference && (
         <HelperText>{t('Automatically set by the VM Guest OS selection.')}</HelperText>

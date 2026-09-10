@@ -19,6 +19,7 @@ const SSHTabSSHAccess: FC<SSHTabSSHAccessProps> = ({ isCustomizeInstanceType, vm
 
   return (
     <DescriptionItem
+      data-test="ssh-access"
       descriptionData={
         <SSHAccess
           isCustomizeInstanceType={isCustomizeInstanceType}
@@ -28,7 +29,6 @@ const SSHTabSSHAccess: FC<SSHTabSSHAccessProps> = ({ isCustomizeInstanceType, vm
           vm={vm}
         />
       }
-      data-test="ssh-access"
       descriptionHeader={<SearchItem id="ssh-access">{t('SSH access')}</SearchItem>}
     />
   );
