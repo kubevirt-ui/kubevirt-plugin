@@ -6,9 +6,15 @@ import { type V1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containeri
 import {
   type V1VirtualMachine,
   type V1VirtualMachineCondition,
+  type V1Volume,
   type V1VolumeSnapshotStatus,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { CLOUDINITDISK } from '@kubevirt-utils/constants/constants';
+import {
+  getStatusConditions,
+  getVolumes,
+  getVolumeSnapshotStatuses,
+} from '@kubevirt-utils/resources/vm';
 import { getCluster } from '@multicluster/helpers/selectors';
 import useKubevirtWatchResources from '@multicluster/hooks/useKubevirtWatchResources';
 import { type FleetWatchK8sResults } from '@stolostron/multicluster-sdk';
@@ -20,7 +26,12 @@ import {
   type VirtualizationStatusCondition,
   type VirtualizationVolumeSnapshotStatus,
 } from '../utils/types';
-import { getConditionSeverity, getDVSeverity, getSnapshotSeverity } from '../utils/utils';
+import {
+  getConditionSeverity,
+  getDVSeverity,
+  getSnapshotSeverity,
+  isContainerDiskVolume,
+} from '../utils/utils';
 
 const getDataVolumesNames = (vm: V1VirtualMachine): string[] =>
   vm?.spec?.template?.spec?.volumes
@@ -42,21 +53,23 @@ const buildDataVolumeResources = (vm: V1VirtualMachine): Record<string, unknown>
 
 const volumeSnapshotStatusesTransformer = (
   volumeSnapshotStatuses: V1VolumeSnapshotStatus[] = [],
+  volumes: V1Volume[] = [],
 ): VirtualizationVolumeSnapshotStatus[] =>
   volumeSnapshotStatuses.map((vss) => {
     const index = vss?.reason?.indexOf(':') ?? -1;
     const hasColon = index !== -1;
 
-    const reason = hasColon ? vss.reason.slice(0, index) : vss?.name;
-    const message = hasColon ? vss.reason.slice(index + 1) : vss?.reason;
+    const reason = hasColon && vss.reason ? vss.reason.slice(0, index) : vss?.name;
+    const message = hasColon && vss.reason ? vss.reason.slice(index + 1) : vss?.reason;
 
     return {
       ...vss,
+      excludeFromWarningCount: vss?.enabled === false && isContainerDiskVolume(vss?.name, volumes),
       id: uuidv4(),
       message,
       metadata: {
         condition: 'Other',
-        name: hasColon ? vss.reason.slice(0, index) : (vss?.reason ?? vss?.name),
+        name: hasColon && vss.reason ? vss.reason.slice(0, index) : (vss?.reason ?? vss?.name),
         type: DiagnosticCategory.Storage,
       },
       reason,
@@ -106,16 +119,20 @@ const useDiagnosticData = (vm: V1VirtualMachine): DiagnosticData => {
   const dataVolumesData = useKubevirtWatchResources<{ [name: string]: V1beta1DataVolume }>(
     dvResources,
   );
+  const vmVolumes = getVolumes(vm);
+  const vmVolumeSnapshotStatuses = getVolumeSnapshotStatuses(vm);
+  const vmConditions = getStatusConditions(vm);
 
   return useMemo(() => {
     const volumeSnapshotStatuses = volumeSnapshotStatusesTransformer(
-      vm?.status?.volumeSnapshotStatuses,
+      vmVolumeSnapshotStatuses,
+      vmVolumes,
     );
-    const conditions = conditionsTransformer(vm?.status?.conditions);
+    const conditions = conditionsTransformer(vmConditions);
     const dataVolumesStatuses = buildDVStatus(dataVolumesData);
 
     return { conditions, dataVolumesStatuses, volumeSnapshotStatuses };
-  }, [dataVolumesData, vm?.status?.conditions, vm?.status?.volumeSnapshotStatuses]);
+  }, [dataVolumesData, vmVolumes, vmConditions, vmVolumeSnapshotStatuses]);
 };
 
 export default useDiagnosticData;
