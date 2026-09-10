@@ -5,7 +5,7 @@ FROM registry.access.redhat.com/ubi10/ubi:latest AS policy
 #       the `:latest` is updated.
 #
 # Image info: https://catalog.redhat.com/en/software/containers/ubi10/nodejs-22/677d3d3e5fdd0fab2f7ad136
-FROM registry.access.redhat.com/ubi10/nodejs-22:10.2-1788329676 AS builder
+FROM registry.access.redhat.com/ubi10/nodejs-22:1788937512 AS builder
 USER root
 
 COPY . /opt/app-root/src
