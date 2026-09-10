@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { getAnnotation } from '@kubevirt-utils/resources/shared';
 import { type K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
@@ -15,7 +14,7 @@ export type ProjectNetworkSettings = {
 
 const getProjectDefaultNadName = (namespace?: K8sResourceCommon): string | undefined => {
   const value = getAnnotation(namespace, PROJECT_DEFAULT_NETWORK_ANNOTATION);
-  return value || undefined;
+  return value ?? undefined;
 };
 
 const isPodNetworkAllowed = (namespace?: K8sResourceCommon): boolean => {

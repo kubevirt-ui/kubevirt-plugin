@@ -27,7 +27,7 @@ const WorkloadProfileModal: FC<WorkloadProfileModalProps> = ({
   onSubmit,
 }) => {
   const { t } = useKubevirtTranslation();
-  const [workload, setWorkload] = useState<WORKLOADS>(initialWorkload || WORKLOADS.desktop);
+  const [workload, setWorkload] = useState<WORKLOADS>(initialWorkload || WORKLOADS.Desktop);
 
   const handleChange = (event: MouseEvent<HTMLSelectElement>, value: WORKLOADS): void => {
     event.preventDefault();

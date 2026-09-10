@@ -8,7 +8,7 @@ import { isVirtualMachineTemplate, isVirtualMachineTemplateRequest } from './typ
 const getSortPriority = (item: TemplateOrRequest): number => {
   if (isVirtualMachineTemplateRequest(item)) return 0;
   if (isVirtualMachineTemplate(item)) return 1;
-  if (getTemplateOS(item as Template) === OS_NAME_TYPES.rhel) return 2;
+  if (getTemplateOS(item as Template) === OS_NAME_TYPES.Rhel) return 2;
   return 3;
 };
 

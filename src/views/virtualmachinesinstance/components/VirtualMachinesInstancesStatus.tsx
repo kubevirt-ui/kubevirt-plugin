@@ -8,7 +8,7 @@ type VirtualMachinesInstancesStatusProps = {
 };
 
 const VirtualMachinesInstancesStatus: FC<VirtualMachinesInstancesStatusProps> = ({ status }) => {
-  const IconComponent = icon?.[status];
+  const IconComponent = icon[status as keyof typeof icon] ?? icon['unknown'];
   return (
     <>
       <IconComponent /> {status}

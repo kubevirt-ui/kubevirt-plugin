@@ -1,9 +1,8 @@
-/* eslint-disable */
-import { Canceler } from 'axios';
+import { type Canceler } from 'axios';
 
-import { V1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
+import { type V1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 
-import { UPLOAD_STATUS } from './consts';
+import { type UPLOAD_STATUS } from './consts';
 
 export type UploadingStatusProps = {
   dataVolume?: V1beta1DataVolume;
@@ -25,14 +24,14 @@ export type DataUpload = {
   namespace: string;
   progress?: number;
   pvcName: string;
-  uploadError?: any;
+  uploadError?: { message: string };
   uploadStatus?: UPLOAD_STATUS;
 };
 
 export type OperatingSystemRecord = {
   baseImageName?: string;
   baseImageNamespace?: string;
-  baseImageRecomendedSize?: any;
+  baseImageRecomendedSize?: [string, string | undefined];
   id: string;
   isSourceRef?: boolean;
   name: string;

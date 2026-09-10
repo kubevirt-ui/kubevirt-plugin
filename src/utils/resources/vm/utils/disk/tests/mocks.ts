@@ -1,9 +1,8 @@
-/* eslint-disable */
 import {
-  V1Disk,
-  V1VirtualMachine,
-  V1VirtualMachineInstance,
-  V1Volume,
+  type V1Disk,
+  type V1VirtualMachine,
+  type V1VirtualMachineInstance,
+  type V1Volume,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 
 type DeepPartial<T> = {
@@ -27,7 +26,7 @@ const deepMerge = <T extends object>(base: T, overrides: DeepPartial<T>): T => {
         result[key] = undefined as T[Extract<keyof T, string>];
       } else if (
         typeof overrideValue === 'object' &&
-        overrideValue !== null &&
+        overrideValue != null &&
         !Array.isArray(overrideValue) &&
         Object.keys(overrideValue).length > 0 &&
         typeof result[key] === 'object' &&

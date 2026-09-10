@@ -1,8 +1,8 @@
-/* eslint-disable */
 import produce from 'immer';
 
 import { ConfigMapModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { InterfaceTypes } from '@kubevirt-utils/components/DiskModal/utils/types';
 import { ensurePath, kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
@@ -17,11 +17,13 @@ import {
   WINDOWS_DRIVERS_DISK,
 } from './constants';
 
-const getVirtioWinConfigMap = async (cluster?: string): Promise<any> => {
-  let lastException = undefined;
+const getVirtioWinConfigMap = async (
+  cluster?: string,
+): Promise<IoK8sApiCoreV1ConfigMap | undefined> => {
+  let lastException: unknown = undefined;
   for (const namespace of VIRTIO_WIN_CONFIG_MAP_NAMESPACES) {
     try {
-      const configMap = await kubevirtK8sGet({
+      const configMap: IoK8sApiCoreV1ConfigMap | undefined = await kubevirtK8sGet({
         cluster,
         model: ConfigMapModel,
         name: VIRTIO_WIN_CONFIG_MAP_NAME,
@@ -55,8 +57,8 @@ export const getDriversInfo = async (cluster?: string): Promise<VirtioWinDrivers
     const configMap = await getVirtioWinConfigMap(cluster);
 
     return {
-      downloadURL: configMap?.data?.[VIRTIO_WIN_IMAGE_DOWNLOAD_URL] || undefined,
-      image: configMap?.data?.[VIRTIO_WIN_IMAGE] || DEFAULT_INFO.image,
+      downloadURL: configMap?.data?.[VIRTIO_WIN_IMAGE_DOWNLOAD_URL] ?? undefined,
+      image: configMap?.data?.[VIRTIO_WIN_IMAGE] ?? DEFAULT_INFO.image,
     };
   } catch (error) {
     kubevirtConsole.error(error);
@@ -74,10 +76,9 @@ export const addWinDriverVolume = (vm: V1VirtualMachine, driverImage: string): V
   return produce(vm, (draftVM) => {
     ensurePath(draftVM, ['spec.template.spec.domain.devices']);
 
-    if (!draftVM.spec.template.spec.domain.devices.disks)
-      draftVM.spec.template.spec.domain.devices.disks = [];
+    draftVM.spec.template.spec.domain.devices.disks ??= [];
 
-    if (!draftVM.spec.template.spec.volumes) draftVM.spec.template.spec.volumes = [];
+    draftVM.spec.template.spec.volumes ??= [];
 
     draftVM.spec.template.spec.domain.devices.disks.push({
       cdrom: {

@@ -1,4 +1,3 @@
-/* eslint-disable */
 import produce from 'immer';
 
 import { KubeDeschedulerModel } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -14,7 +13,7 @@ import {
   DeschedulerMode,
   DeschedulerProfile,
   DeviationThreshold,
-  KubeDescheduler,
+  type KubeDescheduler,
 } from './types';
 
 export const defaultDescheduler: KubeDescheduler = {
@@ -37,11 +36,11 @@ export const defaultDescheduler: KubeDescheduler = {
   },
 };
 
-export const updateDeviationThreshold = (
+export const updateDeviationThreshold = async (
   descheduler: KubeDescheduler,
   newThreshold: DeviationThreshold,
   cluster?: string,
-) => {
+): Promise<KubeDescheduler> => {
   const updatedDescheduler = produce(descheduler, (tempDescheduler) => {
     tempDescheduler.spec.profileCustomizations = {
       ...tempDescheduler.spec.profileCustomizations,

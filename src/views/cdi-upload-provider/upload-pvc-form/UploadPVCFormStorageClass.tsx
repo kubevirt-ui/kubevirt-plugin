@@ -1,13 +1,21 @@
-/* eslint-disable */
-import React from 'react';
+import React, { type Dispatch, type FC, type SetStateAction } from 'react';
 
 import { StorageClassModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { type IoK8sApiStorageV1StorageClass } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { getSCSelectOptions } from '@kubevirt-utils/components/DiskModal/components/StorageClassAndPreallocation/utils/helpers';
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Checkbox, FormGroup, Stack, StackItem } from '@patternfly/react-core';
 
-const UploadPVCFormStorageClass = ({
+type UploadPVCFormStorageClassProps = {
+  applySP: boolean;
+  setApplySP: Dispatch<SetStateAction<boolean>>;
+  setStorageClassName: Dispatch<SetStateAction<string>>;
+  storageClasses: IoK8sApiStorageV1StorageClass[];
+  storageClassName: string;
+};
+
+const UploadPVCFormStorageClass: FC<UploadPVCFormStorageClassProps> = ({
   applySP,
   setApplySP,
   setStorageClassName,

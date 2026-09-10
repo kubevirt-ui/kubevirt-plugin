@@ -169,7 +169,7 @@ export const parseNADConfig = (
   if (!nad?.spec?.config) return null;
 
   try {
-    return JSON.parse(nad.spec.config);
+    return JSON.parse(nad.spec.config) as NetworkAttachmentDefinitionConfig;
   } catch (e) {
     kubevirtConsole.log('Cannot parse NAD config: ', e);
     return null;

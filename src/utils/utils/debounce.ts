@@ -1,27 +1,19 @@
-/* eslint-disable */
-export type Debounce = {
-  func: (any) => any;
-  immediate: boolean;
-  wait: number;
-};
-
-/**
- * @param func Function to debounce
- * @param wait Number of milliseconds to wait before invoking the function again
- * @param immediate If set to true, func is invoked immediately and will be invoked
- *    on the leading edge of the timeout. If set to false, func will be invoked on
- *    the trailing edge of the timeout.
- */
-export function debounce(func: (any) => any, wait = 0, immediate = false) {
-  let timeout = null;
-  return function (...args) {
-    // skipcq: JS-0332
-    const context = this;  
-    if (immediate && !timeout) func.apply(context, args);
+export function debounce<Args extends unknown[]>(
+  func: (...args: Args) => void,
+  wait = 0,
+  immediate = false,
+): (...args: Args) => void {
+  let timeout: NodeJS.Timeout | null = null;
+  return (...args: Args): void => {
+    if (immediate && !timeout) {
+      func(...args);
+    }
     clearTimeout(timeout);
-    timeout = setTimeout(function () {
+    timeout = setTimeout((): void => {
       timeout = null;
-      if (!immediate) func.apply(context, args);
+      if (!immediate) {
+        func(...args);
+      }
     }, wait);
   };
 }

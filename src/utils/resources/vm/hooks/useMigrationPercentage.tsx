@@ -9,7 +9,7 @@ import { vmimStatuses } from '@kubevirt-utils/resources/vmim/statuses';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { PrometheusEndpoint, usePrometheusPoll } from '@openshift-console/dynamic-plugin-sdk';
 
-import { MIGRATION__PROMETHEUS_DELAY } from '../utils/constants';
+import { MIGRATION_PROMETHEUS_DELAY } from '../utils/constants';
 
 type UseMigrationPercentage = (vm: V1VirtualMachine | V1VirtualMachineInstance) => {
   endTimestamp: string;
@@ -25,7 +25,7 @@ const useMigrationPercentage: UseMigrationPercentage = (vm) => {
 
   const prometheusProps = {
     cluster: getCluster(vm),
-    delay: MIGRATION__PROMETHEUS_DELAY,
+    delay: MIGRATION_PROMETHEUS_DELAY,
     endpoint: PrometheusEndpoint?.QUERY,
     namespace,
   };

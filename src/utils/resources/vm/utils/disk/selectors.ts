@@ -1,12 +1,11 @@
-/* eslint-disable */
 import {
-  V1CDRomTarget,
-  V1ContainerDiskSource,
-  V1Disk,
-  V1EmptyDiskSource,
-  V1VirtualMachine,
-  V1VirtualMachineInstance,
-  V1Volume,
+  type V1CDRomTarget,
+  type V1ContainerDiskSource,
+  type V1Disk,
+  type V1EmptyDiskSource,
+  type V1VirtualMachine,
+  type V1VirtualMachineInstance,
+  type V1Volume,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { InterfaceTypes } from '@kubevirt-utils/components/DiskModal/utils/types';
 import { getDisks, getVolumes } from '@kubevirt-utils/resources/vm';
@@ -15,7 +14,7 @@ import { isRunning } from '@virtualmachines/utils';
 
 import { NO_DATA_DASH } from '../constants';
 
-import { DiskType, diskTypes, diskTypesLabels } from './constants';
+import { type DiskType, diskTypes, diskTypesLabels } from './constants';
 
 /**
  * returns a drive type from a disk
@@ -63,9 +62,9 @@ export const isCDROMDisk = (disk: V1Disk): boolean => {
 
 export const getCDROMSourceName = (volume: V1Volume): string => {
   return (
-    volume?.dataVolume?.name ||
-    volume?.persistentVolumeClaim?.claimName ||
-    volume?.containerDisk?.image ||
+    volume?.dataVolume?.name ??
+    volume?.persistentVolumeClaim?.claimName ??
+    volume?.containerDisk?.image ??
     ''
   );
 };
@@ -74,9 +73,23 @@ export const isCDROMMounted = (volume: V1Volume): boolean => {
   return !isEmpty(getCDROMSourceName(volume));
 };
 
-export const getCDROMStatus = (vm: V1VirtualMachine, vmi?: V1VirtualMachineInstance) => {
+export type CDROMDiskStatus = {
+  canDelete: boolean;
+  canEject: boolean;
+  canMount: boolean;
+  disk: V1Disk;
+  isMounted: boolean;
+  name: string;
+  sourceName: null | string;
+  volume: V1Volume | undefined;
+};
+
+export const getCDROMStatus = (
+  vm: V1VirtualMachine,
+  vmi?: V1VirtualMachineInstance,
+): CDROMDiskStatus[] => {
   const isVMRunning = isRunning(vm);
-  const disks = (isVMRunning ? vmi?.spec?.domain?.devices?.disks : getDisks(vm)) || [];
+  const disks = (isVMRunning ? vmi?.spec?.domain?.devices?.disks : getDisks(vm)) ?? [];
   const cdroms = disks.filter(isCDROMDisk);
   const volumes = isVMRunning ? vmi?.spec?.volumes : getVolumes(vm);
 
@@ -110,10 +123,11 @@ export const hasContainerDisk = (volume: V1Volume): boolean => {
 };
 
 export const getContainerDiskImage = (volume: V1Volume): null | string => {
-  return volume?.containerDisk?.image?.toLowerCase() || null;
+  return volume?.containerDisk?.image?.toLowerCase() ?? null;
 };
 
-export const getPVCClaimName = (volume: V1Volume) => volume?.persistentVolumeClaim?.claimName;
+export const getPVCClaimName = (volume: V1Volume): string | undefined =>
+  volume?.persistentVolumeClaim?.claimName;
 
 export const getContainerDisk = (volume: V1Volume): V1ContainerDiskSource => volume?.containerDisk;
 

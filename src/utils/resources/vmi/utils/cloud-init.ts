@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import {
   getCloudInitData,
@@ -27,7 +26,7 @@ export const getCloudInitCredentials = (
     return {
       users: [
         {
-          name: userDataObject?.user || CLOUD_INIT_MISSING_USERNAME,
+          name: userDataObject?.user ?? CLOUD_INIT_MISSING_USERNAME,
           password: userDataObject?.password?.toString(),
         },
       ],

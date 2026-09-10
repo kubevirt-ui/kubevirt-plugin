@@ -6,15 +6,18 @@ import { type V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containeri
 import { type IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import useListMulticlusterFilters from '@kubevirt-utils/hooks/useListMulticlusterFilters';
 import { modelToGroupVersionKind, PersistentVolumeClaimModel } from '@kubevirt-utils/models';
-import { convertResourceArrayToMapWithCluster } from '@kubevirt-utils/resources/shared';
+import {
+  type ClusterNamespacedResourceMap,
+  convertResourceArrayToMapWithCluster,
+} from '@kubevirt-utils/resources/shared';
 import { isDataSourceCloning } from '@kubevirt-utils/resources/template/hooks/useVmTemplateSource/utils';
 import useIsACMPage from '@multicluster/useIsACMPage';
 import { useFleetSearchPoll } from '@stolostron/multicluster-sdk';
 
 type UseMulticlusterAvailableSourcesReturn = {
-  availableDataSources: ReturnType<typeof convertResourceArrayToMapWithCluster>;
-  availablePVCs: ReturnType<typeof convertResourceArrayToMapWithCluster>;
-  cloneInProgressDataSources: ReturnType<typeof convertResourceArrayToMapWithCluster>;
+  availableDataSources: ClusterNamespacedResourceMap<V1beta1DataSource>;
+  availablePVCs: ClusterNamespacedResourceMap<IoK8sApiCoreV1PersistentVolumeClaim>;
+  cloneInProgressDataSources: ClusterNamespacedResourceMap<V1beta1DataSource>;
   error: Error | undefined;
   loaded: boolean;
 };

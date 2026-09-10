@@ -1,10 +1,11 @@
-/* eslint-disable */
 import { VirtualMachineInstanceMigrationModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1VirtualMachineInstanceMigration } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachineInstanceMigration } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { MIGRATION_VMI_NAME_LABEL } from '@kubevirt-utils/resources/vmim/constants';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 
-const useVirtualMachineInstanceMigration = (resource: K8sResourceCommon) => {
+const useVirtualMachineInstanceMigration = (
+  resource: K8sResourceCommon,
+): V1VirtualMachineInstanceMigration | null | undefined => {
   const [vmims] = useK8sWatchData<V1VirtualMachineInstanceMigration[]>(
     resource && {
       cluster: resource?.cluster,

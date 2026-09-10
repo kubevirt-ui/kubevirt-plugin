@@ -1,12 +1,19 @@
-/* eslint-disable */
 import { useMemo } from 'react';
 
-import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { getUtilizationQueries } from '@kubevirt-utils/components/Charts/utils/queries';
+import {
+  type V1VirtualMachine,
+  type V1VirtualMachineInstance,
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import {
+  getUtilizationQueries,
+  type VMQueries,
+} from '@kubevirt-utils/components/Charts/utils/queries';
 import { useHubClusterName } from '@stolostron/multicluster-sdk';
 import useDuration from '@virtualmachines/details/tabs/metrics/hooks/useDuration';
 
-const useVMQueries = (vm: V1VirtualMachine | V1VirtualMachineInstance) => {
+const useVMQueries = (
+  vm: V1VirtualMachine | V1VirtualMachineInstance,
+): { [key in VMQueries]: string } => {
   const { duration } = useDuration();
 
   const [hubClusterName] = useHubClusterName();

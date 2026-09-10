@@ -1,7 +1,10 @@
-/* eslint-disable */
 import { VirtualMachineModel } from 'src/views/dashboard-extensions/utils';
 
-import { V1Interface, V1Network, V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import {
+  type V1Interface,
+  type V1Network,
+  type V1VirtualMachine,
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
 
@@ -40,25 +43,12 @@ export const appendWithIndex = <T>({
   value: T;
 }): PatchItem<T>[] => [
   ...(index === 0
-    ? [
-        // index based add will fail if array does not exist
-        {
-          op: 'test',
-          path,
-          value: null,
-        } as PatchItem<T>,
-        {
-          op: 'add',
-          path,
-          value: [],
-        } as PatchItem<T>,
-      ]
+    ? ([
+        { op: 'test', path, value: null },
+        { op: 'add', path, value: [] },
+      ] as PatchItem<T>[])
     : []),
-  {
-    op: 'add',
-    path: `${path}/-`,
-    value,
-  },
+  { op: 'add', path: `${path}/-`, value },
 ];
 
 export const updateNetwork = ({
@@ -71,21 +61,11 @@ export const updateNetwork = ({
   nextValue: V1Network;
 }): PatchItem<V1Network>[] => {
   const replaceValue: V1Network = { ...currentValue, ...nextValue };
-
   if (!nextValue.pod) delete replaceValue.pod;
   if (!nextValue.multus) delete replaceValue.multus;
-
   return [
-    {
-      op: 'test',
-      path: `${NETWORK_PATH}/${index}`,
-      value: currentValue,
-    },
-    {
-      op: 'replace',
-      path: `${NETWORK_PATH}/${index}`,
-      value: replaceValue,
-    },
+    { op: 'test', path: `${NETWORK_PATH}/${index}`, value: currentValue },
+    { op: 'replace', path: `${NETWORK_PATH}/${index}`, value: replaceValue },
   ];
 };
 
@@ -99,24 +79,14 @@ export const updateInterface = ({
   nextValue: V1Interface;
 }): PatchItem<V1Interface>[] => {
   const replaceValue: V1Interface = { ...currentValue, ...nextValue };
-
   if (!nextValue.bridge) delete replaceValue.bridge;
   if (!nextValue.masquerade) delete replaceValue.masquerade;
   if (!nextValue.sriov) delete replaceValue.sriov;
   if (!nextValue.binding) delete replaceValue.binding;
   if (!nextValue.passtBinding) delete replaceValue.passtBinding;
-
   return [
-    {
-      op: 'test',
-      path: `${INTERFACE_PATH}/${index}`,
-      value: currentValue,
-    },
-    {
-      op: 'replace',
-      path: `${INTERFACE_PATH}/${index}`,
-      value: replaceValue,
-    },
+    { op: 'test', path: `${INTERFACE_PATH}/${index}`, value: currentValue },
+    { op: 'replace', path: `${INTERFACE_PATH}/${index}`, value: replaceValue },
   ];
 };
 
@@ -145,19 +115,14 @@ export const removeAtIndex = <T>({
   path: string;
   value: T;
 }): PatchItem<T>[] => [
-  {
-    op: 'test',
-    path: `${path}/${index}`,
-    value,
-  },
-  {
-    op: 'remove',
-    path: `${path}/${index}`,
-    value: undefined,
-  },
+  { op: 'test', path: `${path}/${index}`, value },
+  { op: 'remove', path: `${path}/${index}`, value: undefined },
 ];
 
-export const patchVM = (vm: V1VirtualMachine, items: PatchItem<unknown>[]) =>
+export const patchVM = (
+  vm: V1VirtualMachine,
+  items: PatchItem<unknown>[],
+): Promise<V1VirtualMachine> =>
   kubevirtK8sPatch({
     cluster: getCluster(vm),
     data: items,

@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC, type ReactNode } from 'react';
 
 import { getCancelUploadLabel } from '@kubevirt-utils/hooks/useCDIUpload/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -17,7 +16,7 @@ import { BanIcon, ErrorCircleOIcon, InProgressIcon } from '@patternfly/react-ico
 import dangerColor from '@patternfly/react-tokens/dist/js/t_global_icon_color_status_danger_default';
 
 import { UPLOAD_STATUS } from '../utils/consts';
-import { DataUpload } from '../utils/types';
+import { type DataUpload } from '../utils/types';
 import { getProgressVariant } from '../utils/utils';
 
 type UploadPVCPopoverUploadStatusProps = {
@@ -35,7 +34,9 @@ const UploadPVCPopoverUploadStatus: FC<UploadPVCPopoverUploadStatusProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
 
-  const getPopoverBody = (status: string) => {
+  const getPopoverBody = (
+    status: string,
+  ): { body?: string; icon: ReactNode; title: string } | null => {
     switch (status) {
       case UPLOAD_STATUS.ERROR:
         return {

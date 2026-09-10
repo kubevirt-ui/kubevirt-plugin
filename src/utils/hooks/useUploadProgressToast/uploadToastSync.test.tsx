@@ -1,9 +1,8 @@
-/* eslint-disable */
 import React from 'react';
-import { TFunction } from 'i18next';
+import { type TFunction } from 'i18next';
 
 import { UPLOAD_PROGRESS_STATUS } from './constants';
-import { UploadEntry } from './types';
+import { type UploadEntry } from './types';
 import { useUploadProgressStore } from './uploadProgressStore';
 import {
   replaceWithTerminalUploadToast,
@@ -236,7 +235,10 @@ describe('replaceWithTerminalUploadToast', () => {
     // Start the first upload through the store so it gets generation = 1.
     useUploadProgressStore.getState().startUpload(UPLOAD_KEY, { fileName: 'image.iso' });
     useUploadProgressStore.getState().markUploadCanceled(UPLOAD_KEY);
-    const canceledUpload = useUploadProgressStore.getState().getUpload(UPLOAD_KEY)!;
+    const canceledUpload = useUploadProgressStore.getState().getUpload(UPLOAD_KEY);
+    if (!canceledUpload) {
+      throw new Error('Expected canceled upload entry in store');
+    }
 
     replaceWithTerminalUploadToast(UPLOAD_KEY, canceledUpload, context);
 

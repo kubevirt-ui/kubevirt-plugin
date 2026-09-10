@@ -1,10 +1,9 @@
-/* eslint-disable */
-import React, { FC, ReactNode } from 'react';
-import { TFunction } from 'i18next';
+import React, { type FC, type ReactNode } from 'react';
+import { type TFunction } from 'i18next';
 
 import { JobModel, modelToGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { IoK8sApiBatchV1Job } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
-import { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
+import { type IoK8sApiBatchV1Job } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { ACTIONS } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/const';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import MulticlusterResourceLink from '@multicluster/components/MulticlusterResourceLink/MulticlusterResourceLink';
@@ -14,9 +13,9 @@ import { Timestamp } from '@openshift-console/dynamic-plugin-sdk';
 import { SortByDirection } from '@patternfly/react-table';
 import { useHubClusterName } from '@stolostron/multicluster-sdk';
 
+import CheckupsStatusIcon from './CheckupsStatusIcon';
 import { CHECKUPS_COLUMN_KEYS } from './utils/constants';
 import { getCSVExportStatusLabel, getJobStatus, getJobStatusRank } from './utils/utils';
-import CheckupsStatusIcon from './CheckupsStatusIcon';
 
 export type CheckupsHistoryCallbacks = {
   customActions?: (job: IoK8sApiBatchV1Job) => ReactNode;
@@ -25,7 +24,7 @@ export type CheckupsHistoryCallbacks = {
 const JobCell: FC<{ row: IoK8sApiBatchV1Job }> = ({ row }) => {
   const [hubClusterName] = useHubClusterName();
   const isACMPage = useIsACMPage();
-  const cluster = getCluster(row) || hubClusterName;
+  const cluster = getCluster(row) ?? hubClusterName;
 
   return (
     <MulticlusterResourceLink
@@ -104,7 +103,7 @@ export const getCheckupsHistoryRowId = (job: IoK8sApiBatchV1Job, index: number):
   if (job?.metadata?.uid) {
     return job.metadata.uid;
   }
-  const cluster = getCluster(job) || 'local';
+  const cluster = getCluster(job) ?? 'local';
   const namespace = job?.metadata?.namespace;
   const name = job?.metadata?.name;
   if (namespace && name) {

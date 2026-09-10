@@ -1,7 +1,6 @@
-/* eslint-disable */
-import { K8sResourceKind } from '@openshift-console/dynamic-plugin-sdk';
+import { type K8sResourceKind } from '@openshift-console/dynamic-plugin-sdk';
 
-import { NADTopology } from './constants';
+import { type NADTopology } from './constants';
 
 // The config is a JSON object with the NetworkAttachmentDefinitionConfig type stored as a string
 export type NetworkAttachmentDefinitionSpec = {
@@ -19,7 +18,8 @@ type IPAMConfig = {
 };
 
 type NetworkAttachmentDefinitionPlugin = {
-  [key: string]: any;
+  type?: string;
+  [key: string]: unknown;
 };
 
 export type NetworkAttachmentDefinitionConfig = {

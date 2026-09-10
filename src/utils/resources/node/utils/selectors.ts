@@ -1,6 +1,5 @@
-/* eslint-disable */
-import { IoK8sApiCoreV1NodeCondition } from '@forklift-ui/types';
-import { IoK8sApiCoreV1Node } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type IoK8sApiCoreV1NodeCondition } from '@forklift-ui/types';
+import { type IoK8sApiCoreV1Node } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { ARCHITECTURES } from '@kubevirt-utils/constants/constants';
 
 /**
@@ -27,4 +26,4 @@ export const getDefaultArchitecture = (): ARCHITECTURES => ARCHITECTURES.AMD64;
  * @returns {string} the node's architecture
  */
 export const getNodeArchitecture = (node: IoK8sApiCoreV1Node): string =>
-  node?.status?.nodeInfo?.architecture || getDefaultArchitecture();
+  node?.status?.nodeInfo?.architecture ?? getDefaultArchitecture();

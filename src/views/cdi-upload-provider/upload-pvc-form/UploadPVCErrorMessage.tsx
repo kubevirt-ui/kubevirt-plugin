@@ -5,7 +5,7 @@ import { Trans } from 'react-i18next';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Alert, AlertVariant } from '@patternfly/react-core';
 
-import { uploadErrorType } from '../utils/consts';
+import { UploadErrorType } from '../utils/consts';
 
 type UploadErrorMessageProps = {
   message: string;
@@ -16,8 +16,8 @@ const UploadPVCErrorMessage: FC<UploadErrorMessageProps> = ({ message, uploadPro
   const { t } = useKubevirtTranslation();
 
   const Error = {
-    [uploadErrorType.ALLOCATE]: t('Could not create persistent volume claim'),
-    [uploadErrorType.CERT]: (
+    [UploadErrorType.ALLOCATE]: t('Could not create persistent volume claim'),
+    [UploadErrorType.CERT]: (
       <>
         {t('It seems that your browser does not trust the certificate of the upload proxy.')}
         {uploadProxyURL && (
@@ -31,7 +31,7 @@ const UploadPVCErrorMessage: FC<UploadErrorMessageProps> = ({ message, uploadPro
         )}
       </>
     ),
-    [uploadErrorType.MISSING]: t('File input is missing'),
+    [UploadErrorType.MISSING]: t('File input is missing'),
   };
   return (
     <Alert

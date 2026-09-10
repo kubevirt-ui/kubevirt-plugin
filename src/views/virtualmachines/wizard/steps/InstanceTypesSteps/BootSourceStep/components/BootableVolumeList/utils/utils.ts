@@ -27,7 +27,7 @@ export const filterBootableVolumesByPreference = (
   if (isLinuxGenericPreference(preference)) {
     return bootableVolumes.filter((vol) => {
       const osCategory = getBootVolumeOS(vol);
-      return osCategory !== OS_NAME_TYPES.rhel && osCategory !== OS_NAME_TYPES.windows;
+      return osCategory !== OS_NAME_TYPES.Rhel && osCategory !== OS_NAME_TYPES.Windows;
     });
   }
 
@@ -46,7 +46,7 @@ export const getBootVolumeOS = (bootVolume: BootableVolume): OS_NAME_TYPES => {
   const bootVolumePreference = getLabel(bootVolume, DEFAULT_PREFERENCE_LABEL);
   return (
     Object.values(OS_NAME_TYPES).find((osName) => bootVolumePreference?.includes(osName)) ??
-    OS_NAME_TYPES.other
+    OS_NAME_TYPES.Other
   );
 };
 
@@ -76,8 +76,8 @@ export const getOsNameFromPreference = (preferenceName?: string): string | undef
   }
 
   const base = preferenceName.split('.')[0].split('-')[0];
-  const isRhelPreference = base === OS_NAME_TYPES.rhel;
-  const isWindowsPreference = base === OS_NAME_TYPES.windows;
+  const isRhelPreference = base === OS_NAME_TYPES.Rhel;
+  const isWindowsPreference = base === OS_NAME_TYPES.Windows;
   const isRhelOrWindowsPreference = isRhelPreference || isWindowsPreference;
 
   return isRhelOrWindowsPreference ? base : LINUX;

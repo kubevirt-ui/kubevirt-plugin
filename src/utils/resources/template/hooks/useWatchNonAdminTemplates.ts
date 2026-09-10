@@ -100,7 +100,9 @@ const useWatchNonAdminTemplates = (): {
   return useMemo(
     () => ({
       allowedTemplates: isLocalCluster ? allowedTemplates : externalClusterTemplates,
-      allowedTemplatesError: isLocalCluster ? allowedTemplatesError : externalClusterTemplatesError,
+      allowedTemplatesError: isLocalCluster
+        ? allowedTemplatesError
+        : (externalClusterTemplatesError ?? ''),
       allowedTemplatesLoaded: isLocalCluster
         ? allowedTemplatesLoaded
         : externalClusterTemplatesLoaded,

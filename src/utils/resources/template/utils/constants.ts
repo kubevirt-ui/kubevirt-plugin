@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
 
 export const TEMPLATE_TYPE_LABEL = 'template.kubevirt.io/type';
@@ -37,23 +36,23 @@ export const RHEL = 'rhel';
 export const WINDOWS = 'windows';
 
 export enum OS_NAME_TYPES_NOT_SUPPORTED {
-  debian = 'debian',
-  ubuntu = 'ubuntu',
+  Debian = 'debian',
+  Ubuntu = 'ubuntu',
 }
 
 export enum OS_NAME_TYPES {
-  centos = 'centos',
-  fedora = 'fedora',
-  other = 'other',
-  rhel = 'rhel',
-  windows = 'windows',
+  Centos = 'centos',
+  Fedora = 'fedora',
+  Other = 'other',
+  Rhel = 'rhel',
+  Windows = 'windows',
 }
 
 export enum FLAVORS {
-  large = 'large',
-  medium = 'medium',
-  small = 'small',
-  tiny = 'tiny',
+  Large = 'large',
+  Medium = 'medium',
+  Small = 'small',
+  Tiny = 'tiny',
 }
 
 export enum SUPPORT_TYPES {
@@ -62,58 +61,58 @@ export enum SUPPORT_TYPES {
 }
 
 export enum WORKLOADS {
-  desktop = 'desktop',
-  highperformance = 'highperformance',
-  server = 'server',
+  Desktop = 'desktop',
+  HighPerformance = 'highperformance',
+  Server = 'server',
 }
 
 export const WORKLOADS_LABELS = {
-  [WORKLOADS.desktop]: 'Desktop',
-  [WORKLOADS.highperformance]: 'High performance',
-  [WORKLOADS.server]: 'Server',
+  [WORKLOADS.Desktop]: 'Desktop',
+  [WORKLOADS.HighPerformance]: 'High performance',
+  [WORKLOADS.Server]: 'Server',
 };
 
 export const WORKLOADS_DESCRIPTIONS = {
-  [WORKLOADS.desktop]: 'Small scale consumption, recommended for using the graphical console',
-  [WORKLOADS.highperformance]: 'Optimized for high resource consumption workloads',
-  [WORKLOADS.server]: 'Balances performance, compatible with a broad range of workloads',
+  [WORKLOADS.Desktop]: 'Small scale consumption, recommended for using the graphical console',
+  [WORKLOADS.HighPerformance]: 'Optimized for high resource consumption workloads',
+  [WORKLOADS.Server]: 'Balances performance, compatible with a broad range of workloads',
 };
 
 export const OS_NAME_LABELS = {
-  [OS_NAME_TYPES.centos]: 'CentOS',
-  [OS_NAME_TYPES.fedora]: 'Fedora',
-  [OS_NAME_TYPES.other]: 'Other',
-  [OS_NAME_TYPES.rhel]: 'RHEL',
-  [OS_NAME_TYPES.windows]: 'Windows',
+  [OS_NAME_TYPES.Centos]: 'CentOS',
+  [OS_NAME_TYPES.Fedora]: 'Fedora',
+  [OS_NAME_TYPES.Other]: 'Other',
+  [OS_NAME_TYPES.Rhel]: 'RHEL',
+  [OS_NAME_TYPES.Windows]: 'Windows',
 };
 
 export const OS_NAMES = [
   {
-    id: OS_NAME_TYPES.rhel,
+    id: OS_NAME_TYPES.Rhel,
     title: OS_NAME_LABELS.rhel,
   },
   {
-    id: OS_NAME_TYPES.fedora,
+    id: OS_NAME_TYPES.Fedora,
     title: OS_NAME_LABELS.fedora,
   },
   {
-    id: OS_NAME_TYPES.centos,
+    id: OS_NAME_TYPES.Centos,
     title: OS_NAME_LABELS.centos,
   },
   {
-    id: OS_NAME_TYPES.windows,
+    id: OS_NAME_TYPES.Windows,
     title: OS_NAME_LABELS.windows,
   },
   {
-    id: OS_NAME_TYPES.other,
+    id: OS_NAME_TYPES.Other,
     title: OS_NAME_LABELS.other,
   },
 ];
 
 export const WORKLOAD_ITEMS = [
-  { id: WORKLOADS.desktop, title: WORKLOADS_LABELS.desktop },
-  { id: WORKLOADS.highperformance, title: WORKLOADS_LABELS.highperformance },
-  { id: WORKLOADS.server, title: WORKLOADS_LABELS.server },
+  { id: WORKLOADS.Desktop, title: WORKLOADS_LABELS.desktop },
+  { id: WORKLOADS.HighPerformance, title: WORKLOADS_LABELS.highperformance },
+  { id: WORKLOADS.Server, title: WORKLOADS_LABELS.server },
 ];
 
 export enum BOOT_SOURCE {
@@ -139,11 +138,11 @@ export const BOOT_SOURCE_LABELS = {
 };
 
 export const OS_IMAGE_LINKS = {
-  [OS_NAME_TYPES.centos]: documentationURL.OS_IMAGE_CENTOS,
-  [OS_NAME_TYPES.fedora]: documentationURL.OS_IMAGE_FEDORA,
-  [OS_NAME_TYPES.other]: documentationURL.OS_IMAGE_OTHER,
-  [OS_NAME_TYPES.rhel]: documentationURL.OS_IMAGE_RHEL,
-  [OS_NAME_TYPES.windows]: documentationURL.OS_IMAGE_WINDOWS,
+  [OS_NAME_TYPES.Centos]: documentationURL.OS_IMAGE_CENTOS,
+  [OS_NAME_TYPES.Fedora]: documentationURL.OS_IMAGE_FEDORA,
+  [OS_NAME_TYPES.Other]: documentationURL.OS_IMAGE_OTHER,
+  [OS_NAME_TYPES.Rhel]: documentationURL.OS_IMAGE_RHEL,
+  [OS_NAME_TYPES.Windows]: documentationURL.OS_IMAGE_WINDOWS,
 };
 
 export const GENERATE_VM_PRETTY_NAME_ANNOTATION =

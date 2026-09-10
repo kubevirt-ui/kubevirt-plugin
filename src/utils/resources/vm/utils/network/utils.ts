@@ -1,8 +1,7 @@
-/* eslint-disable */
 import {
-  V1Network,
-  V1VirtualMachine,
-  V1VirtualMachineInstance,
+  type V1Network,
+  type V1VirtualMachine,
+  type V1VirtualMachineInstance,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import {
   DEFAULT_NETWORK_INTERFACE,
@@ -15,14 +14,17 @@ import {
   getVMIStatusInterfaces,
 } from '@kubevirt-utils/resources/vmi/utils/selectors';
 import { sortByDirection, universalComparator } from '@kubevirt-utils/utils/utils';
-import { SortByDirection } from '@patternfly/react-table';
+import { type SortByDirection } from '@patternfly/react-table';
 
-import { NetworkPresentation } from './constants';
+import { type NetworkPresentation } from './constants';
 import { getPrintableNetworkInterfaceType, isPodNetwork } from './selectors';
-import { NICState } from './types';
+import { type NICState } from './types';
 
-export const sortNICs = (nics: NetworkPresentation[], direction: SortByDirection) =>
-  nics.sort((a: NetworkPresentation, b: NetworkPresentation) =>
+export const sortNICs = (
+  nics: NetworkPresentation[],
+  direction: SortByDirection,
+): NetworkPresentation[] =>
+  nics.toSorted((a: NetworkPresentation, b: NetworkPresentation) =>
     sortByDirection(universalComparator, direction)(
       getPrintableNetworkInterfaceType(a.iface),
       getPrintableNetworkInterfaceType(b.iface),

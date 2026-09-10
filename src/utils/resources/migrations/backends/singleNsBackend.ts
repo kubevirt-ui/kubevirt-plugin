@@ -1,14 +1,15 @@
-/* eslint-disable */
 import { VirtualMachineStorageMigrationPlanModel } from '@kubevirt-utils/models';
-import type { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { migrateVMsSingleNs } from '@virtualmachines/actions/components/VirtualMachineMigration/backends/singleNs/migrateVMs';
 
-import { type VirtualMachineStorageMigrationPlan, STORAGE_MIGRATION_API } from '../constants';
+import { STORAGE_MIGRATION_API, type VirtualMachineStorageMigrationPlan } from '../constants';
+
 import { normalizeSingleNsPlan } from '../singleNs/overview';
+import type {
+  StorageMigrationBackendDescriptor,
+  StorageMigrationPlanOverviewNormalizer,
+} from './types';
 
-import type { StorageMigrationBackendDescriptor } from './types';
-
-const normalizePlanForOverview = (plan: K8sResourceCommon) =>
+const normalizePlanForOverview: StorageMigrationPlanOverviewNormalizer = (plan) =>
   normalizeSingleNsPlan(plan as VirtualMachineStorageMigrationPlan);
 
 export const singleNsBackend: StorageMigrationBackendDescriptor = {

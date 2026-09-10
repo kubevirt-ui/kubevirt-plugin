@@ -36,7 +36,7 @@ const DiskSourceContainer: FC<DiskSourceUrlInputProps> = ({
     register,
   } = useFormContext<V1DiskFormState>();
 
-  const isRHELOS = os?.includes(OS_NAME_TYPES.rhel);
+  const isRHELOS = os?.includes(OS_NAME_TYPES.Rhel);
   // we show fedora on upstream and rhel on downstream, and default as fedora if not exists.
   const exampleURL =
     isRHELOS && isUpstream

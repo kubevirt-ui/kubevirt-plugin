@@ -78,7 +78,7 @@ const getOtherLinuxDefaultPreference = (
   architectures?: string[],
 ): PreferenceOption | undefined => {
   const fedoraPreferences = otherLinuxPreferences
-    .filter((entry) => entry.name.toLowerCase().includes(OS_NAME_TYPES.fedora))
+    .filter((entry) => entry.name.toLowerCase().includes(OS_NAME_TYPES.Fedora))
     .sort(sortByVersionDescending);
 
   const fedoraPreferenceForSingleWorkloadArchitecture = getPreferenceForSingleWorkloadArchitecture(
