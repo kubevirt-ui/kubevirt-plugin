@@ -4,7 +4,6 @@ import React, { useMemo } from 'react';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
 import SelectTypeahead from '../SelectTypeahead/SelectTypeahead';
-
 import useFolderOptions from './hooks/useFolderOptions';
 import { getFolderSelectOptions } from './utils/getFolderSelectOptions';
 import { createNewFolderOption, getCreateNewFolderOption } from './utils/options';

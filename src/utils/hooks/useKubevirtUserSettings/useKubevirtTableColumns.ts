@@ -2,8 +2,8 @@ import { useMemo } from 'react';
 
 import type { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 
-import { ACTIONS, USER_SETTINGS_KEYS } from './utils/const';
 import useKubevirtUserSettings from './useKubevirtUserSettings';
+import { ACTIONS, USER_SETTINGS_KEYS } from './utils/const';
 
 type UseKubevirtTableColumnsType = <TData, TCallbacks = undefined>(input: {
   columnManagementID: string;

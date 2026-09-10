@@ -23,9 +23,13 @@ const VMDescriptionDetailsItem: FC<VMDescriptionDetailsItemProps> = ({ vm }) => 
 
   return (
     <DescriptionItem
+      className="topology-vm-details-panel__item"
+      data-test={`${getName(vm)}-description`}
       descriptionData={
         getAnnotation(vm, DESCRIPTION_ANNOTATION) ?? <MutedTextSpan text={t('None')} />
       }
+      descriptionHeader={<SearchItem id="description">{t('Description')}</SearchItem>}
+      isEdit
       onEditClick={() =>
         createModal(({ isOpen, onClose }) => (
           <DescriptionModal
@@ -36,10 +40,6 @@ const VMDescriptionDetailsItem: FC<VMDescriptionDetailsItemProps> = ({ vm }) => 
           />
         ))
       }
-      className="topology-vm-details-panel__item"
-      data-test={`${getName(vm)}-description`}
-      descriptionHeader={<SearchItem id="description">{t('Description')}</SearchItem>}
-      isEdit
     />
   );
 };

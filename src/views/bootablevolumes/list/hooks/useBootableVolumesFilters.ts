@@ -17,7 +17,6 @@ import { getArchitecture } from '@kubevirt-utils/utils/architecture';
 import useIsACMPage from '@multicluster/useIsACMPage';
 
 import { getPreferenceOSType } from '../../utils/utils';
-
 import { BootableVolumesFilterID, NODATA_ID, NODATA_TITLE } from './constants';
 
 const useBootableVolumesFilters = (bootableVolumes: BootableVolume[]): KubevirtFilter[] => {

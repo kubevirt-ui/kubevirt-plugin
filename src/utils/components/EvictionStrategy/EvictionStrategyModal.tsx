@@ -15,7 +15,6 @@ import { ensurePath } from '@kubevirt-utils/utils/utils';
 import { Checkbox, FormGroup } from '@patternfly/react-core';
 
 import FormGroupHelperText from '../FormGroupHelperText/FormGroupHelperText';
-
 import { EVICTION_STRATEGIES } from './constants';
 
 type EvictionStrategyModalProps = {

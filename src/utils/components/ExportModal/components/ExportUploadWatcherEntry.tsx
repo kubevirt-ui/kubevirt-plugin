@@ -9,12 +9,13 @@ import { getResourceUrl } from '@kubevirt-utils/resources/shared';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { kubevirtK8sDelete } from '@multicluster/k8sRequests';
 
-import { useUploadProgressStore } from '../../../hooks/useUploadProgressToast/uploadProgressStore';
-import { getExportDiskUploadKey } from '../../../hooks/useUploadProgressToast/keys/uploadKeys';
 import { type ExportUploadState, useExportUploadStore } from '../exportUploadStore';
+import { exportFailed, exportSucceeded, getExportErrorMessage } from '../utils';
+
+import { getExportDiskUploadKey } from '../../../hooks/useUploadProgressToast/keys/uploadKeys';
+import { useUploadProgressStore } from '../../../hooks/useUploadProgressToast/uploadProgressStore';
 import { UploaderPhase } from '../hooks/types';
 import useUploaderProgress from '../hooks/useUploaderProgress';
-import { exportFailed, exportSucceeded, getExportErrorMessage } from '../utils';
 
 type ExportUploadWatcherEntryProps = {
   upload: ExportUploadState;

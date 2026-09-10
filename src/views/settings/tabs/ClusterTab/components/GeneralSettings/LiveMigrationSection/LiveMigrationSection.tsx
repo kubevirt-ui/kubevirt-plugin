@@ -7,7 +7,6 @@ import ExpandSection from '@settings/ExpandSection/ExpandSection';
 import { CLUSTER_TAB_IDS } from '@settings/search/constants';
 
 import { getGeneralSettingsLabels } from '../consts/consts';
-
 import Limits from './Limits/Limits';
 import Network from './Network/Network';
 

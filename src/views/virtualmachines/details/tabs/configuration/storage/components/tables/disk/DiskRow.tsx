@@ -120,10 +120,10 @@ const DiskRow: FC<
       <TableData activeColumnIDs={activeColumnIDs} id="source">
         {sourcesLoaded && (hasPVC || hasDataVolume) && (
           <MulticlusterResourceLink
+            cluster={getCluster(vm)}
             groupVersionKind={modelToGroupVersionKind(
               hasDataVolume ? DataVolumeModel : PersistentVolumeClaimModel,
             )}
-            cluster={getCluster(vm)}
             name={source}
             namespace={namespace ?? getNamespace(vm)}
           />

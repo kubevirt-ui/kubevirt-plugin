@@ -11,8 +11,6 @@ import {
 } from '@kubevirt-utils/resources/vmim/selectors';
 import { getCluster } from '@multicluster/helpers/selectors';
 
-import { MIGRATION_COLUMN_KEYS } from './utils/constants';
-import type { MigrationTableDataLayout } from './utils/utils';
 import {
   ActionsCell,
   CreatedCell,
@@ -25,6 +23,8 @@ import {
   VMIMNameCell,
   VMNameCell,
 } from './MigrationsCells';
+import { MIGRATION_COLUMN_KEYS } from './utils/constants';
+import type { MigrationTableDataLayout } from './utils/utils';
 
 export const getMigrationsTableColumns = (
   t: TFunction,

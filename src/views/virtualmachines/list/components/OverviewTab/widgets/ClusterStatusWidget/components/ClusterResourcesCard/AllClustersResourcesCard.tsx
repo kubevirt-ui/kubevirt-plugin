@@ -4,7 +4,6 @@ import React from 'react';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
 import useAllClustersWorkerNodes from '../../hooks/useAllClustersWorkerNodes';
-
 import ResourceTile from './ResourceTile';
 
 import './ClusterResourcesCard.scss';

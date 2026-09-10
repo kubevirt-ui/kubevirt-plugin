@@ -10,7 +10,6 @@ import { getCluster } from '@multicluster/helpers/selectors';
 import { Tooltip } from '@patternfly/react-core';
 
 import type { MigrationTableDataLayout } from '../../utils/utils';
-
 import { migrationsConfigTooltipFields } from './utils';
 
 type TooltipFieldObject = { label: string; value: string };

@@ -1,7 +1,6 @@
 import { renderHook } from '@testing-library/react';
 
 import { HUB_CLUSTER_NAME, MANAGED_CLUSTER_NAME } from '../tests/constants';
-
 import useConsoleUserSettingsCluster from './useConsoleUserSettingsCluster';
 
 const mockUseIsACMPage = jest.fn();

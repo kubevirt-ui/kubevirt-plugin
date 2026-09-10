@@ -13,9 +13,9 @@ import type { ApplicationAwareQuota } from '@kubevirt-utils/resources/quotas/typ
 import { HorizontalNav, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import { Bullseye } from '@patternfly/react-core';
 
+import QuotaPageTitle from './QuotaPageTitle';
 import QuotaDetailsTab from './tabs/QuotaDetailsTab/QuotaDetailsTab';
 import QuotaYAMLTab from './tabs/QuotaYAMLTab';
-import QuotaPageTitle from './QuotaPageTitle';
 
 const QuotaDetailsPage: FC = () => {
   const { t } = useKubevirtTranslation();

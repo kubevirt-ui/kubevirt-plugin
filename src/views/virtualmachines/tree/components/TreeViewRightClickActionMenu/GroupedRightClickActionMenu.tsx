@@ -6,8 +6,8 @@ import type { ActionDropdownItemType } from '@kubevirt-utils/components/ActionsD
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Divider, MenuGroup, MenuList, TooltipPosition } from '@patternfly/react-core';
 
-import useGroupedActions from './hooks/useGroupedActions';
 import { RIGHT_CLICK_MENU_Z_INDEX } from './constants';
+import useGroupedActions from './hooks/useGroupedActions';
 import type { RightClickActionMenuProps } from './RightClickActionMenu';
 import RightClickMenuWrapper from './RightClickMenuWrapper';
 

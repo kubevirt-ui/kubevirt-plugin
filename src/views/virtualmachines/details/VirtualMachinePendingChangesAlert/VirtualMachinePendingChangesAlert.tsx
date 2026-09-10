@@ -15,9 +15,9 @@ import { VirtualMachineStatusConditionTypes } from '@kubevirt-utils/resources/vm
 import PendingChanges from '@virtualmachines/details/VirtualMachinePendingChangesAlert/PendingChanges';
 import { isRunning } from '@virtualmachines/utils';
 
-import { getPendingChangesAlertTitle } from './utils/utils';
 import MigrationPendingChanges from './MigrationPendingChanges';
 import RestartPendingChanges from './RestartPendingChanges';
+import { getPendingChangesAlertTitle } from './utils/utils';
 
 type VirtualMachinePendingChangesAlertProps = {
   instanceTypeExpandedSpec: V1VirtualMachine;

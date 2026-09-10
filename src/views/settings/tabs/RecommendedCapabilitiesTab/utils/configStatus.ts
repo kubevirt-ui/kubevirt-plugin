@@ -1,3 +1,4 @@
+import { isInstalled } from './installState';
 import {
   type AutopilotStatusMap,
   type CapabilityFeature,
@@ -5,8 +6,6 @@ import {
   type RecommendedCapabilityDetailsMap,
   type RecommendedCapabilityOperatorDetails,
 } from './types';
-
-import { isInstalled } from './installState';
 
 export const getEffectiveConfigStatus = (
   autopilotConfigStatus: ConfigurationStatus | undefined,

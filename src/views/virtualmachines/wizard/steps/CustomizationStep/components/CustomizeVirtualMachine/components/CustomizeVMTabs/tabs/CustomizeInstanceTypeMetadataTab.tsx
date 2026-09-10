@@ -7,7 +7,6 @@ import {
   patchCustomizeWizardVMSignal,
 } from '@kubevirt-utils/signals/customizeWizardVMSignal';
 import { PageSection } from '@patternfly/react-core';
-
 import MetadataTabContent from '@virtualmachines/details/tabs/configuration/metadata/components/MetadataTabContent';
 
 import '@virtualmachines/details/tabs/configuration/metadata/metadata-tab.scss';

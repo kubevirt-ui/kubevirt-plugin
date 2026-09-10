@@ -22,7 +22,6 @@ import {
 
 import { MEMORY_REQUEST_RATIO_MAX, MEMORY_REQUEST_RATIO_MIN } from '../utils/const';
 import { getRatioLevel, getRatioLevelConfig, isValidRatio } from '../utils/utils';
-
 import RequestRatioHelpContent from './RequestRatioHelpContent';
 
 type MemoryRequestRatioInputProps = {

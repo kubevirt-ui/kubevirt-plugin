@@ -1,7 +1,7 @@
+import { HCO_MANUAL_ROLE_AGGREGATION_STRATEGY } from '@kubevirt-utils/flags/consts';
 import type { HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
 
-import { HCO_MANUAL_ROLE_AGGREGATION_STRATEGY } from '@kubevirt-utils/flags/consts';
 import {
   HCO_AGGREGATE_TO_DEFAULT_ROLE_AGGREGATION_STRATEGY,
   HCO_ROLE_AGGREGATION_STRATEGY_PATH,

@@ -2,6 +2,7 @@ import { type TFunction } from 'i18next';
 
 import { DESCHEDULER_OPERATOR_NAME } from '@kubevirt-utils/resources/descheduler/constants';
 
+import { getOperatorDefinitions } from './operatorDefinitions';
 import {
   CLUSTER_LOGGING_OPERATOR_NAME,
   CLUSTER_OBSERVABILITY_OPERATOR_NAME,
@@ -19,7 +20,6 @@ import {
   OADP_OPERATOR_NAME,
   SANDBOXED_CONTAINERS_OPERATOR_NAME,
 } from './operatorNames';
-import { getOperatorDefinitions } from './operatorDefinitions';
 import { type CapabilityFeature } from './types';
 
 export const getRecommendedCapabilityFeatures = (t: TFunction): CapabilityFeature[] => {

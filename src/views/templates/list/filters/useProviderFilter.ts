@@ -13,7 +13,6 @@ import {
 import { OTHER } from '@kubevirt-utils/utils/constants';
 
 import { getTemplateProviderName } from '../../utils/selectors';
-
 import { TemplateFilterType } from './types';
 
 const PROVIDER_ID = {

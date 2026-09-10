@@ -1,7 +1,7 @@
-import classNames from 'classnames';
 import type { FC } from 'react';
 import React from 'react';
 import { useWatch } from 'react-hook-form';
+import classNames from 'classnames';
 
 import EditButton from '@kubevirt-utils/components/EditButton/EditButton';
 import { TREE_VIEW_FOLDERS } from '@kubevirt-utils/hooks/useFeatures/constants';
@@ -10,7 +10,6 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm';
 import useIsACMPage from '@multicluster/useIsACMPage';
 import { ButtonVariant } from '@patternfly/react-core';
-
 import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
 import { CREATE_VM_FORM_FIELDS_VM_DATA } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
 

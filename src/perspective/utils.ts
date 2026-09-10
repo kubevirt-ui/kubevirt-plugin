@@ -2,7 +2,6 @@ import type { EncodedExtension } from '@openshift-console/dynamic-plugin-sdk-web
 
 import { PERSPECTIVES } from '../utils/constants/constants';
 import { VIRT_SECTION_ID } from '../views/navigation/constants';
-
 import { VIRT_PERSPECTIVE_SUFFIX } from './constants';
 
 export const suffixId = (id: string): string => `${id}${VIRT_PERSPECTIVE_SUFFIX}`;

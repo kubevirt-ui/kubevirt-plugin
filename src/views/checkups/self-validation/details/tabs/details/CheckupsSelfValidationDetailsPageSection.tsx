@@ -25,7 +25,6 @@ import {
   TOTAL_TESTS_RUN_KEY,
   TOTAL_TESTS_SKIPPED_KEY,
 } from '../../../utils';
-
 import CheckupsSelfValidationDetailsDescriptionList from './components/CheckupsSelfValidationDetailsDescriptionList';
 import { useExpandedSections } from './hooks/useExpandedSections';
 import { useFilteredTestSuites } from './hooks/useFilteredTestSuites';

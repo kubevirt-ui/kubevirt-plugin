@@ -18,7 +18,6 @@ import {
 import { CheckCircleIcon } from '@patternfly/react-icons';
 
 import type { CandidateCluster } from '../hooks/useClusterRecommendationTypes';
-
 import ScoreBadge from './ScoreBadge';
 
 import './CandidateRow.scss';

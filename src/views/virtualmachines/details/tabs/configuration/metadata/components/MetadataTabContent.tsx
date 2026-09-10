@@ -5,7 +5,6 @@ import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import type { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
 import useMetadataTabState from '../hooks/useMetadataTabState';
-
 import AdvancedView from './AdvancedView';
 import AnnotationsTable from './AnnotationsTable';
 import LabelsAnnotationsHeader from './LabelsAnnotationsHeader';

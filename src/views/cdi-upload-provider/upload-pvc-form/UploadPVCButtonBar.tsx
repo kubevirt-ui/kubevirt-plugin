@@ -5,7 +5,6 @@ import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { Alert, AlertGroup, AlertVariant } from '@patternfly/react-core';
 
 import { injectDisabled } from '../utils/utils';
-
 import UploadErrorMessage from './UploadPVCErrorMessage';
 
 type UploadPVCButtonBarProps = {

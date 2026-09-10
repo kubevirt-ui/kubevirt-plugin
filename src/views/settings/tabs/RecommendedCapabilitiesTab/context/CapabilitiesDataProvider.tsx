@@ -4,20 +4,20 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { getValidNamespace } from '@kubevirt-utils/utils/utils';
 import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
 import { useDataViewSelection } from '@patternfly/react-data-view';
-import useOperatorResources from '../hooks/useOperatorResources/useOperatorResources';
 
 import useAutopilotStatus from '../hooks/useAutopilotStatus';
 import useInstallFeature from '../hooks/useInstallFeature';
+import useOperatorResources from '../hooks/useOperatorResources/useOperatorResources';
 import { getAutopilotCapabilities, getManualCapabilities } from '../utils/autopilotUtils';
 import { getRecommendedCapabilityFeatures } from '../utils/capabilityFeatures';
 import { buildRecommendedDetailsMap } from '../utils/detailsMap';
+import { computeCapabilityInstallState } from '../utils/installState';
 import { RECOMMENDED_OPERATOR_PACKAGE_NAMES } from '../utils/operatorNames';
 import {
   type AlternativeStateMap,
   type CapabilityFeature,
   type RecommendedCapabilityDetailsMap,
 } from '../utils/types';
-import { computeCapabilityInstallState } from '../utils/installState';
 import {
   CapabilitiesActionsContext,
   type CapabilitiesActionsValue,

@@ -18,7 +18,6 @@ import type {
 import { observer, RectAnchor, useAnchor } from '@patternfly/react-topology';
 
 import type { VMNodeData } from '../../../utils/types/types';
-
 import { getImageProps, getStatusClass } from './utils/utils';
 
 import './VMNode.scss';

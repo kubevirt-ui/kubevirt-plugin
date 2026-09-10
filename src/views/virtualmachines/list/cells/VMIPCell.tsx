@@ -6,7 +6,6 @@ import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { getVMIIPAddressesWithName } from '@kubevirt-utils/resources/vmi';
 
 import FirstItemListPopover from '../components/FirstItemListPopover/FirstItemListPopover';
-
 import type { VMCellWithCallbacksProps } from './types';
 
 const VMIPCell: FC<VMCellWithCallbacksProps> = ({ callbacks, row }) => {

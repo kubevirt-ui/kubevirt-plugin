@@ -2,8 +2,8 @@ import type { TFunction } from 'i18next';
 
 import type { V1beta1VirtualMachineSnapshot } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import type { KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
-
 import { getStatusPhase } from '@kubevirt-utils/resources/shared';
+
 import { snapshotStatuses } from './consts';
 
 const STATUS_PHASE_FILTER_ID = 'status-phase';

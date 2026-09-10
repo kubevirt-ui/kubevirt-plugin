@@ -1,5 +1,5 @@
-import type { TFunction } from 'i18next';
 import type { FC } from 'react';
+import type { TFunction } from 'i18next';
 
 import ClusterTab from './tabs/ClusterTab/ClusterTab';
 import DownloadsTab from './tabs/DownloadsTab/DownloadsTab';

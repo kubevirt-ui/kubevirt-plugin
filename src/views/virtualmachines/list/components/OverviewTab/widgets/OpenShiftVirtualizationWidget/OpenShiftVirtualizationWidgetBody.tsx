@@ -8,7 +8,6 @@ import { getNoDataAvailableMessage } from '@kubevirt-utils/utils/utils';
 import { Bullseye, Grid } from '@patternfly/react-core';
 
 import StatusCountItem from '../shared/StatusCountItem';
-
 import MultiClusterHealthStatus from './MultiClusterHealthStatus';
 
 type OpenShiftVirtualizationWidgetBodyProps = {

@@ -29,14 +29,14 @@ const VMHostDevicesDetailsItem: FC<VMHostDevicesDetailsItemProps> = ({ vm, vmi }
   const onEditHostDevices = (): void => {
     createModal(({ isOpen, onClose }) => (
       <HardwareDevicesModal
-        onSubmit={(updatedVM) =>
-          updateHardwareDevices(HARDWARE_DEVICE_TYPE.HOST_DEVICES, updatedVM)
-        }
         btnText={t('Add host device')}
         headerText={t('Host devices')}
         initialDevices={hostDevices}
         isOpen={isOpen}
         onClose={onClose}
+        onSubmit={(updatedVM) =>
+          updateHardwareDevices(HARDWARE_DEVICE_TYPE.HOST_DEVICES, updatedVM)
+        }
         type={HARDWARE_DEVICE_TYPE.HOST_DEVICES}
         vm={vm}
         vmi={vmi}
@@ -46,6 +46,7 @@ const VMHostDevicesDetailsItem: FC<VMHostDevicesDetailsItemProps> = ({ vm, vmi }
 
   return (
     <DescriptionItem
+      className="topology-vm-details-panel__item"
       descriptionData={
         <span>
           {t('{{hostDevicesCount}} host devices', {
@@ -53,7 +54,6 @@ const VMHostDevicesDetailsItem: FC<VMHostDevicesDetailsItemProps> = ({ vm, vmi }
           })}
         </span>
       }
-      className="topology-vm-details-panel__item"
       descriptionHeader={<span id="host-devices">{t('Host devices')}</span>}
       isEdit
       onEditClick={onEditHostDevices}

@@ -106,23 +106,6 @@ const baseConfig = {
     'react-hooks/set-state-in-effect': 'off',
     'react-hooks/set-state-in-render': 'error',
     'react-hooks/unsupported-syntax': 'error',
-    'simple-import-sort/exports': 'error',
-    'simple-import-sort/imports': [
-      'error',
-      {
-        groups: [
-          [
-            '^(assert|buffer|child_process|cluster|console|constants|crypto|dgram|dns|domain|events|fs|http|https|module|net|os|path|punycode|querystring|readline|repl|stream|string_decoder|sys|timers|tls|tty|url|util|vm|zlib|freelist|v8|process|async_hooks|http2|perf_hooks)(/.*|$)',
-          ],
-          ['^react', '^\\w'],
-          ['^(@|config/)(/*|$)'],
-          ['^\\u0000'],
-          ['^\\.\\.(?!/?$)', '^\\.\\/?$'],
-          ['^\\.\\./(?=.*/)(?!/?$)', '^\\.(?!/?$)', '^\\./?$'],
-          ['^.+\\.s?css$'],
-        ],
-      },
-    ],
     'unicorn/no-for-each': 'error',
 
     'unicorn/no-lonely-if': 'error',
@@ -328,6 +311,32 @@ const githubScriptsOverrides = {
   },
 };
 
+export const simpleImportSortConfig = {
+  files: ['**/*.{js,jsx,ts,tsx}'],
+  plugins: {
+    'import-x': importX,
+  },
+  rules: {
+    'simple-import-sort/exports': 'error',
+    'simple-import-sort/imports': [
+      'error',
+      {
+        groups: [
+          [
+            '^(assert|buffer|child_process|cluster|console|constants|crypto|dgram|dns|domain|events|fs|http|https|module|net|os|path|punycode|querystring|readline|repl|stream|string_decoder|sys|timers|tls|tty|url|util|vm|zlib|freelist|v8|process|async_hooks|http2|perf_hooks)(/.*|$)',
+          ],
+          ['^react', '^\\w'],
+          ['^(@|config/)(/*|$)'],
+          ['^\\u0000'],
+          ['^\\.\\.(?!/?$)', '^\\.\\/?$'],
+          ['^\\.\\./(?=.*/)(?!/?$)', '^\\.(?!/?$)', '^\\./?$'],
+          ['^.+\\.s?css$'],
+        ],
+      },
+    ],
+  },
+};
+
 export default [
   ignoresConfig,
   baseConfig,
@@ -335,6 +344,7 @@ export default [
   ...tsConfigs,
   reactConfig,
   sonarConfig,
+  simpleImportSortConfig,
   testingLibraryConfig,
   testFilesOverrides,
   prettier,

@@ -6,9 +6,8 @@ import { PATHS_TO_HIGHLIGHT } from '@kubevirt-utils/resources/vm/utils/constants
 import { PageSection } from '@patternfly/react-core';
 
 import type { ConfigurationInnerTabProps } from '../utils/types';
-
-import { onSubmitYAML } from './utils/utils';
 import DetailsSection from './DetailsSection';
+import { onSubmitYAML } from './utils/utils';
 
 const DetailsTab: FC<ConfigurationInnerTabProps> = ({
   allInstanceTypes,

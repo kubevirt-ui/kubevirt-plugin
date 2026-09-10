@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
-import { type AutopilotStatusMap, type CapabilityFeature } from '../../utils/types';
 import { getRegistryEntryByPackageName } from '../../utils/autopilotUtils';
+import { type AutopilotStatusMap, type CapabilityFeature } from '../../utils/types';
 
 type UseReviewRecommendationModalReturn = {
   onCloseReviewModal: () => void;

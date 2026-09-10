@@ -9,7 +9,6 @@ import { Bullseye, Flex, PageSection, Stack } from '@patternfly/react-core';
 
 import { getSortedResourceKeys, getStatus } from '../../../utils/utils';
 import StatusChart from '../../components/StatusChart';
-
 import QuotaConsumptionTable from './QuotaConsumptionTable/QuotaConsumptionTable';
 import QuotaDetailsGrid from './QuotaDetailsGrid';
 

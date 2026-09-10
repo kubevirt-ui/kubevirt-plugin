@@ -1,9 +1,10 @@
 import type { FC } from 'react';
 import React from 'react';
 
+import type { BootableVolumeCallbacks } from '../bootableVolumesDefinition';
+
 import type { BootableResource } from '../../utils/types';
 import { getPreferenceReadableOS } from '../../utils/utils';
-import type { BootableVolumeCallbacks } from '../bootableVolumesDefinition';
 import { getClusterPreferences, getEffectiveCluster } from '../utils/helpers';
 
 type BootableVolumeOSCellProps = {

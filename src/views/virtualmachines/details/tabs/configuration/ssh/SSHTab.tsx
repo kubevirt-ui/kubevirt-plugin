@@ -10,7 +10,6 @@ import { DescriptionList, Grid, GridItem, PageSection, Stack, Title } from '@pat
 
 import { onSubmitYAML } from '../details/utils/utils';
 import type { ConfigurationInnerTabProps } from '../utils/types';
-
 import SSHTabAuthorizedSSHKey from './components/SSHTabAuthorizedSSHKey';
 import SSHTabSSHAccess from './components/SSHTabSSHAccess';
 

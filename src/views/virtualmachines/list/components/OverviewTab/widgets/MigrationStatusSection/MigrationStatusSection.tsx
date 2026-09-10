@@ -22,7 +22,6 @@ import MigrationsWidget from '../MigrationsWidget/MigrationsWidget';
 import OverviewSection from '../OverviewSection/OverviewSection';
 import OverviewSectionRow from '../OverviewSection/OverviewSectionRow';
 import StorageMigrationPlansWidget from '../StorageMigrationPlansWidget/StorageMigrationPlansWidget';
-
 import MultiClusterMigrationStatusSection from './MultiClusterMigrationStatusSection';
 import { buildMigrationsSpokePath, getMigrationsTabPath, MIGRATIONS_DURATION } from './utils';
 

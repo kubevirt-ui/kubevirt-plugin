@@ -17,7 +17,6 @@ import { replaceTemplateVM, updateTemplate } from '@kubevirt-utils/resources/tem
 import { PageSection, Stack, StackItem } from '@patternfly/react-core';
 
 import useEditTemplateAccessReview from '../../hooks/useIsTemplateEditable';
-
 import useDisksFilters from './hooks/useDisksFilters';
 import useTemplateDisksTableData from './hooks/useTemplateDisksTableData';
 import type { TemplateDiskCallbacks } from './templateDisksTableDefinition';

@@ -1,7 +1,7 @@
-import produce from 'immer';
 import type { FC } from 'react';
 import React, { useEffect } from 'react';
 import { useWatch } from 'react-hook-form';
+import produce from 'immer';
 
 import useIsIPv6SingleStackCluster from '@kubevirt-utils/hooks/useIPStackType/useIsIPv6SingleStackCluster';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';

@@ -8,6 +8,7 @@ import {
   stripToPrefix,
 } from '@search/utils/dateCreatedValues';
 import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
+
 import { setFilter } from './utils';
 
 const tryValidateDate = (

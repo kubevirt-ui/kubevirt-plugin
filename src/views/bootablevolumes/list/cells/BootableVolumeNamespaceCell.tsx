@@ -5,8 +5,9 @@ import { modelToGroupVersionKind, NamespaceModel } from '@kubevirt-ui-ext/kubevi
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import MulticlusterResourceLink from '@multicluster/components/MulticlusterResourceLink/MulticlusterResourceLink';
 
-import type { BootableResource } from '../../utils/types';
 import type { BootableVolumeCallbacks } from '../bootableVolumesDefinition';
+
+import type { BootableResource } from '../../utils/types';
 import { getEffectiveCluster } from '../utils/helpers';
 
 type BootableVolumeNamespaceCellProps = {

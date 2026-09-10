@@ -4,7 +4,6 @@ import React from 'react';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
 import { getItemLabel, getSeverityLabel } from '../../hooks/clusterMetricConstants';
-
 import type { SeverityCountListProps } from './types';
 
 import './TwoColumnCard.scss';

@@ -43,6 +43,7 @@ const VMGPUDevicesDetailsItem: FC<VMGPUDevicesDetailsItemProps> = ({ vm, vmi }) 
 
   return (
     <DescriptionItem
+      className="topology-vm-details-panel__item"
       descriptionData={
         <span>
           {t('{{gpusCount}} GPU devices', {
@@ -50,7 +51,6 @@ const VMGPUDevicesDetailsItem: FC<VMGPUDevicesDetailsItemProps> = ({ vm, vmi }) 
           })}
         </span>
       }
-      className="topology-vm-details-panel__item"
       descriptionHeader={<span id="gpu-devices">{t('GPU devices')}</span>}
       isEdit
       onEditClick={onEditGPU}

@@ -5,7 +5,6 @@ import type { TFunction } from 'i18next';
 import type { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 
 import type { ProjectWithVMCount } from '../../types';
-
 import ProjectNameCell from './cells/ProjectNameCell';
 import ProjectVMCountCell from './cells/ProjectVMCountCell';
 

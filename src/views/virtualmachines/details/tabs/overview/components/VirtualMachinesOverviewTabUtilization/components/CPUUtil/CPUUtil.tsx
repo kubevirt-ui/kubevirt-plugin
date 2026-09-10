@@ -56,6 +56,9 @@ const CPUUtil: FC<CPUUtilProps> = ({ vmi }) => {
 
   return (
     <UtilizationBlock
+      dataTestId="util-summary-cpu"
+      title={t('CPU')}
+      usageValue={isReady ? cpuUsageHumanized?.string : ''}
       usedOfTotalText={
         isReady
           ? t('Requested of {{cpuRequested}}', {
@@ -63,18 +66,15 @@ const CPUUtil: FC<CPUUtilProps> = ({ vmi }) => {
             })
           : ''
       }
-      dataTestId="util-summary-cpu"
-      title={t('CPU')}
-      usageValue={isReady ? cpuUsageHumanized?.string : ''}
     >
       <ComponentReady error={error} isLoading={isLoading} isReady={isReady}>
         <ChartDonutUtilization
+          animate
+          constrainToVisibleArea
           data={{
             x: t('CPU used'),
             y: (averageCPUUsage > 100 ? 100 : averageCPUUsage) || 0,
           }}
-          animate
-          constrainToVisibleArea
           labels={({ datum }) => (datum.x ? `${datum.x}: ${cpuUsageHumanized?.string}` : null)}
           style={{ labels: { fontSize: 20 } }}
           subTitle={t('Used')}

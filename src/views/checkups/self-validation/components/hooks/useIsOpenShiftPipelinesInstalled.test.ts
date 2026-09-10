@@ -1,6 +1,5 @@
-import { renderHook } from '@testing-library/react';
-
 import { useK8sModel } from '@openshift-console/dynamic-plugin-sdk';
+import { renderHook } from '@testing-library/react';
 
 import useIsOpenShiftPipelinesInstalled from './useIsOpenShiftPipelinesInstalled';
 

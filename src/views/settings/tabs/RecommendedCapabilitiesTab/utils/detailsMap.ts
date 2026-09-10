@@ -3,19 +3,19 @@ import { type OperatorGroupKind, type SubscriptionKind } from '@overview/utils/t
 
 import { type UseOperatorResourcesReturn } from '../hooks/useOperatorResources/utils/types';
 import { RED_HAT } from './constants';
+import { computeInstallState } from './installState';
 import { RECOMMENDED_OPERATOR_PACKAGE_NAMES } from './operatorNames';
-import {
-  InstallState,
-  type RecommendedCapabilityDetailsMap,
-  type RecommendedCapabilityOperatorDetails,
-} from './types';
 import {
   clusterServiceVersionFor,
   getOperatorHubURL,
   getPackageUID,
   getSubscriptionInstalledCSV,
 } from './operatorResolution';
-import { computeInstallState } from './installState';
+import {
+  InstallState,
+  type RecommendedCapabilityDetailsMap,
+  type RecommendedCapabilityOperatorDetails,
+} from './types';
 
 const findSubscriptionByPackageName = (
   allSubscriptions: SubscriptionKind[],

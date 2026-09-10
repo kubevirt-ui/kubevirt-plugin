@@ -11,11 +11,10 @@ import { DataView, DataViewTable, type DataViewTrTree } from '@patternfly/react-
 import { useCapabilitiesActions } from '../../context/useCapabilitiesActions';
 import { useCapabilitiesData } from '../../context/useCapabilitiesData';
 import ReviewRecommendationModal from '../ReviewRecommendationModal/ReviewRecommendationModal';
-
 import CustomSelectionToolbar from './CustomSelectionToolbar';
 import { useCapabilityFilters } from './useCapabilityFilters';
-import useCustomSelectionRows from './useCustomSelectionRows';
 import { useCustomSelectionColumns } from './useCustomSelectionColumns';
+import useCustomSelectionRows from './useCustomSelectionRows';
 import useReviewRecommendationModal from './useReviewRecommendationModal';
 import { sortFeatures } from './utils';
 

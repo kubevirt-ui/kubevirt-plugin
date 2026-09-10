@@ -37,6 +37,13 @@ const ComputeMigrationModal: FC<ComputeMigrationModalProps> = ({ isOpen, onClose
 
   return (
     <TabModal
+      headerDescription={t('Select the target Node to migrate your VirtualMachine to.')}
+      headerText={t('Migrate VirtualMachine to a different Node')}
+      isDisabled={isMigrateDisabled}
+      isOpen={isOpen}
+      modalVariant={ModalVariant.large}
+      obj={vm}
+      onClose={onClose}
       onSubmit={async () => {
         const targetNode = migrationOption === MigrationOptions.MANUAL ? selectedNode : undefined;
         logVMMigrationStarted(vm, {
@@ -46,13 +53,6 @@ const ComputeMigrationModal: FC<ComputeMigrationModalProps> = ({ isOpen, onClose
         logVMActionPerformed(TELEMETRY_VM_ACTION.MIGRATE, vm);
         await migrateVM(vm, targetNode);
       }}
-      headerDescription={t('Select the target Node to migrate your VirtualMachine to.')}
-      headerText={t('Migrate VirtualMachine to a different Node')}
-      isDisabled={isMigrateDisabled}
-      isOpen={isOpen}
-      modalVariant={ModalVariant.large}
-      obj={vm}
-      onClose={onClose}
       positionTop={false}
       submitBtnText={t('Migrate VirtualMachine')}
     >

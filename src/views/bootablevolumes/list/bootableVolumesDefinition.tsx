@@ -17,7 +17,6 @@ import { getCluster } from '@multicluster/helpers/selectors';
 
 import type { BootableResource } from '../utils/types';
 import { getPreferenceReadableOS, getSourcePreferenceLabelValue } from '../utils/utils';
-
 import BootableVolumeActionsCell from './cells/BootableVolumeActionsCell';
 import BootableVolumeArchitectureCell from './cells/BootableVolumeArchitectureCell';
 import BootableVolumeClusterCell from './cells/BootableVolumeClusterCell';

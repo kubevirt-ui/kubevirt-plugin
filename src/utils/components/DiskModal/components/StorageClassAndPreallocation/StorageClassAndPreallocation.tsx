@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 import type { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 
 import { checkDifferentStorageClassFromBootPVC } from '../../utils/helpers';
-
 import DefaultStorageClassAlert from './DefaultStorageClassAlert';
 import EnablePreallocationCheckbox from './EnablePreallocationCheckbox';
 import StorageClassSelect from './StorageClassSelect';

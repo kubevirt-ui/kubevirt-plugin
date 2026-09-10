@@ -14,7 +14,6 @@ import { getClusterKey, getName } from '@kubevirt-utils/resources/shared';
 
 import { isJobRunning } from '../../utils';
 import { useAllRunningSelfValidationJobs } from '../hooks/useAllRunningSelfValidationJobs';
-
 import { createCheckupsSelfValidationActionFactory } from './CheckupsSelfValidationActionFactory';
 
 type CheckupsSelfValidationActionsProps = {

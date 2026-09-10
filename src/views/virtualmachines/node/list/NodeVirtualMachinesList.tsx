@@ -1,13 +1,11 @@
 import React, { type FC, useCallback, useMemo, useState } from 'react';
 import { useParams } from 'react-router';
 
-import { getCluster } from '@multicluster/helpers/selectors';
 import {
   VirtualMachineModelGroupVersionKind,
   VirtualMachineModelRef,
 } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
 import ColumnManagement from '@kubevirt-utils/components/ColumnManagementModal/ColumnManagement';
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
 import { PageTitles } from '@kubevirt-utils/constants/page-constants';
@@ -20,6 +18,8 @@ import {
 } from '@kubevirt-utils/hooks/usePagination/utils/constants';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { getVMINodeName } from '@kubevirt-utils/resources/vmi';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { getCluster } from '@multicluster/helpers/selectors';
 import { DocumentTitle, ListPageBody, type NodeKind } from '@openshift-console/dynamic-plugin-sdk';
 import { Flex, FlexItem, Pagination } from '@patternfly/react-core';
 

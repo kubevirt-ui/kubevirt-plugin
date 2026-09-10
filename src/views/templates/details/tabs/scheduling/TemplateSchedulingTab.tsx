@@ -8,7 +8,6 @@ import { updateTemplate } from '@kubevirt-utils/resources/template/utils';
 import { Grid, GridItem, PageSection, Title } from '@patternfly/react-core';
 
 import useEditTemplateAccessReview from '../../hooks/useIsTemplateEditable';
-
 import TemplateSchedulingLeftGrid from './components/TemplateSchedulingLeftGrid';
 import TemplateSchedulingRightGrid from './components/TemplateSchedulingRightGrid';
 

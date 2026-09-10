@@ -5,8 +5,9 @@ import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 
 import { UPLOAD_PROGRESS_STATUS } from '../constants';
-import { collectVmScopedUploadKeys, getUploadClusterForVm } from '../keys/uploadKeys';
 import { type UploadEntry, type UploadProgressStoreState } from '../types';
+
+import { collectVmScopedUploadKeys, getUploadClusterForVm } from '../keys/uploadKeys';
 
 type StoreAccessor = () => UploadProgressStoreState;
 

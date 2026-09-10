@@ -6,7 +6,6 @@ import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpa
 import { Bullseye } from '@patternfly/react-core';
 
 import StatusScoreList from '../../../shared/StatusScoreList/StatusScoreList';
-
 import LoadingSkeleton from './LoadingSkeleton';
 import SeverityCountList from './SeverityCountList';
 import type { TwoColumnCardBodyProps } from './types';

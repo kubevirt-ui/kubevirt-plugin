@@ -29,7 +29,6 @@ import {
   TEST_STATUS_PENDING,
   TEST_STATUS_RUNNING,
 } from '../../../utils';
-
 import { getTestSuiteLabel } from './utils/progressTracker';
 import type { TestSuiteProgress } from './utils/types';
 

@@ -28,6 +28,8 @@ const VMWorkloadProfileDetailsItem: FC<VMWorkloadProfileDetailsItemProps> = ({ v
   return (
     !getInstanceTypeMatcher(vm) && (
       <DescriptionItem
+        className="topology-vm-details-panel__item"
+        data-test={`${vmName}-workload-profile`}
         descriptionData={
           vmWorkload ? (
             ((): string => {
@@ -38,6 +40,8 @@ const VMWorkloadProfileDetailsItem: FC<VMWorkloadProfileDetailsItemProps> = ({ v
             <MutedTextSpan text={t('Not available')} />
           )
         }
+        descriptionHeader={<SearchItem id="workload-profile">{t('Workload profile')}</SearchItem>}
+        isEdit
         onEditClick={() =>
           createModal(({ isOpen, onClose }) => (
             <WorkloadProfileModal
@@ -48,10 +52,6 @@ const VMWorkloadProfileDetailsItem: FC<VMWorkloadProfileDetailsItemProps> = ({ v
             />
           ))
         }
-        className="topology-vm-details-panel__item"
-        data-test={`${vmName}-workload-profile`}
-        descriptionHeader={<SearchItem id="workload-profile">{t('Workload profile')}</SearchItem>}
-        isEdit
       />
     )
   );

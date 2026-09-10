@@ -1,5 +1,5 @@
-import { produce } from 'immer';
 import React, { type FC, useEffect, useState } from 'react';
+import { produce } from 'immer';
 
 import { type TemplateParameter } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';

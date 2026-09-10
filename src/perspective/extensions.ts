@@ -6,7 +6,6 @@ import type {
 
 import { PERSPECTIVES } from '../utils/constants/constants';
 import { FLAG_KUBEVIRT_VIRTUALIZATION_NAV } from '../utils/flags/consts';
-
 import { clusterSection } from './navigation/clusterSection';
 import { computeSection } from './navigation/computeSection';
 import { migrationSection } from './navigation/migrationSection';

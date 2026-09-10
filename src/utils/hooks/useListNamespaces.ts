@@ -1,7 +1,6 @@
 import { useMemo } from 'react';
 
 import { isEmpty } from '../utils/utils';
-
 import useNamespaceParam from './useNamespaceParam';
 import useSelectedRowFilterProjects from './useSelectedRowFilterProjects';
 

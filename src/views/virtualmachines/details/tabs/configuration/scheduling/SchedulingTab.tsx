@@ -7,7 +7,6 @@ import { PageSection } from '@patternfly/react-core';
 
 import { onSubmitYAML } from '../details/utils/utils';
 import type { ConfigurationInnerTabProps } from '../utils/types';
-
 import SchedulingSection from './components/SchedulingSection';
 
 const SchedulingTab: FC<ConfigurationInnerTabProps> = ({ instanceTypeVM, vm, vmi }) => (
