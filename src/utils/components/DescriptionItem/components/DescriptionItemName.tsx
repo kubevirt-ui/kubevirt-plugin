@@ -1,10 +1,11 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName } from '@kubevirt-utils/resources/shared';
-import { K8sModel } from '@openshift-console/dynamic-plugin-sdk/lib/api/common-types';
+import type { K8sModel } from '@openshift-console/dynamic-plugin-sdk/lib/api/common-types';
 
 type DescriptionItemNameProps = {
   label?: string;

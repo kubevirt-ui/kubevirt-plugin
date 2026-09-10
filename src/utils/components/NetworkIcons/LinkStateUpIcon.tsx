@@ -1,9 +1,10 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
 import PlugCircleCheckIcon from '@kubevirt-utils/components/NetworkIcons/PlugCircleCheckIcon';
 import { Tooltip, TooltipPosition } from '@patternfly/react-core';
 
-import { NetworkIconProps } from './NetworkIcon';
+import type { NetworkIconProps } from './NetworkIcon';
 import StateText from './StateText';
 
 import './LinkStateIcon.scss';

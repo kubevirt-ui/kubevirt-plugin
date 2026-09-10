@@ -1,7 +1,8 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
 import ActionsDropdown from '@kubevirt-utils/components/ActionsDropdown/ActionsDropdown';
-import { ClusterUserDefinedNetworkKind } from '@kubevirt-utils/resources/udn/types';
+import type { ClusterUserDefinedNetworkKind } from '@kubevirt-utils/resources/udn/types';
 
 import useVMNetworkActions from './hooks/useVMNetworkActions';
 

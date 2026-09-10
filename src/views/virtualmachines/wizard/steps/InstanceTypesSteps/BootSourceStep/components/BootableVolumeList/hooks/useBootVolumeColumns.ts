@@ -1,11 +1,11 @@
 import { ALL_PROJECTS } from '@kubevirt-utils/hooks/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettingsTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettingsTableColumns';
-import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
+import type { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { ARCHITECTURE_ID, ARCHITECTURE_TITLE } from '@kubevirt-utils/utils/architecture';
-import { ColumnLayout } from '@openshift-console/dynamic-plugin-sdk-internal/lib/extensions/console-types';
+import type { ColumnLayout } from '@openshift-console/dynamic-plugin-sdk-internal/lib/extensions/console-types';
 
-import { TableColumnWithOptionalIndex } from '../../../types';
+import type { TableColumnWithOptionalIndex } from '../../../types';
 import {
   DESCRIPTION_COLUMN_ID,
   NAME_COLUMN_ID,

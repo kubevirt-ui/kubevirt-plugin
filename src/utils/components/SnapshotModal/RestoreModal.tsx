@@ -1,8 +1,9 @@
-import React, { FC, useMemo } from 'react';
+import type { FC } from 'react';
+import React, { useMemo } from 'react';
 import { Trans } from 'react-i18next';
 
 import { VirtualMachineRestoreModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import {
+import type {
   V1beta1VirtualMachineRestore,
   V1beta1VirtualMachineSnapshot,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';

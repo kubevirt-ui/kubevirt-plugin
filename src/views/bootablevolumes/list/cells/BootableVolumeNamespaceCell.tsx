@@ -1,11 +1,12 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
 import { modelToGroupVersionKind, NamespaceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import MulticlusterResourceLink from '@multicluster/components/MulticlusterResourceLink/MulticlusterResourceLink';
 
-import { BootableResource } from '../../utils/types';
-import { BootableVolumeCallbacks } from '../bootableVolumesDefinition';
+import type { BootableResource } from '../../utils/types';
+import type { BootableVolumeCallbacks } from '../bootableVolumesDefinition';
 import { getEffectiveCluster } from '../utils/helpers';
 
 type BootableVolumeNamespaceCellProps = {

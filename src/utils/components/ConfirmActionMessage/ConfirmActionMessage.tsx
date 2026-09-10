@@ -1,15 +1,11 @@
-import { FC } from 'react';
+import type { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
-import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+import type { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
-import {
-  CONFIRM_ACTIONS,
-  ConfirmAction,
-  getActionMessages,
-  getActionMessagesWithNamespace,
-} from './constants';
+import type { ConfirmAction } from './constants';
+import { CONFIRM_ACTIONS, getActionMessages, getActionMessagesWithNamespace } from './constants';
 
 type ConfirmActionMessageProps = {
   action?: ConfirmAction;

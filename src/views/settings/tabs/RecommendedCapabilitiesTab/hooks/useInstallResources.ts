@@ -3,9 +3,9 @@ import { useMemo } from 'react';
 import { ConsoleOperatorConfigModel, NamespaceModel } from '@kubevirt-utils/models';
 import { getName } from '@kubevirt-utils/resources/shared';
 import useKubevirtWatchResources from '@multicluster/hooks/useKubevirtWatchResources';
+import type { K8sResourceKind } from '@openshift-console/dynamic-plugin-sdk';
 import {
   getGroupVersionKindForModel,
-  K8sResourceKind,
   useAccessReview,
 } from '@openshift-console/dynamic-plugin-sdk';
 import { useSettingsCluster } from '@settings/context/SettingsClusterContext';

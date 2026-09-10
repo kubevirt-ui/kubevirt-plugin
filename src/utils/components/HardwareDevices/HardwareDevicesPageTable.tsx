@@ -1,9 +1,10 @@
-import React, { FC, useMemo } from 'react';
+import type { FC } from 'react';
+import React, { useMemo } from 'react';
 
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
-import { HardwareDevicePageRow } from './utils/constants';
+import type { HardwareDevicePageRow } from './utils/constants';
 import {
   getHardwareDevicePageRowId,
   getHardwareDevicesPageColumns,

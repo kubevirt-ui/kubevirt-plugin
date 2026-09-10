@@ -1,4 +1,4 @@
-import { WizardFooterProps } from '@patternfly/react-core';
+import type { WizardFooterProps } from '@patternfly/react-core';
 
 import { useKubevirtTranslation } from './useKubevirtTranslation';
 

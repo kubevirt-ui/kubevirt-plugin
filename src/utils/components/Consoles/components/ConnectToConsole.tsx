@@ -1,9 +1,10 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
 import LoadingEmptyState from '@kubevirt-utils/components/LoadingEmptyState/LoadingEmptyState';
 import { Button, EmptyState, EmptyStateBody, EmptyStateFooter } from '@patternfly/react-core';
 
-import { CustomConnectComponentProps } from './vnc-console/utils/VncConsoleTypes';
+import type { CustomConnectComponentProps } from './vnc-console/utils/VncConsoleTypes';
 
 const ConnectToConsole: FC<
   CustomConnectComponentProps & { connectingMsg: string; connectMsg: string; message: string }

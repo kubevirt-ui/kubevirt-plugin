@@ -6,7 +6,7 @@ import {
   MultiNamespaceVirtualMachineStorageMigrationPlanModel,
   VirtualMachineStorageMigrationPlanModel,
 } from '@kubevirt-utils/models';
-import {
+import type {
   MultiNamespaceVirtualMachineStorageMigrationPlan,
   VirtualMachineStorageMigrationPlan,
 } from '@kubevirt-utils/resources/migrations/constants';

@@ -10,7 +10,7 @@ import { getLabelFilter } from './filters/getLabelFilter';
 import { getNameFilter } from './filters/getNameFilter';
 import useMigratedSearchParams from './hooks/useMigratedSearchParams';
 import useSyncedGroupFilter from './hooks/useSyncedGroupFilter';
-import { FilterableObject, KubevirtFilter, KubevirtFilterState, OnSetFilters } from './types';
+import type { FilterableObject, KubevirtFilter, KubevirtFilterState, OnSetFilters } from './types';
 import { matchesWithExclusion } from './utils';
 
 type UseKubevirtDataViewFiltersArgs<T extends FilterableObject> = {

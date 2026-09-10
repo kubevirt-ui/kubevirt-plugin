@@ -1,4 +1,4 @@
-import { EncodedExtension } from '@openshift-console/dynamic-plugin-sdk-webpack';
+import type { EncodedExtension } from '@openshift-console/dynamic-plugin-sdk-webpack';
 
 import { PERSPECTIVES } from '../utils/constants/constants';
 import { VIRT_SECTION_ID } from '../views/navigation/constants';

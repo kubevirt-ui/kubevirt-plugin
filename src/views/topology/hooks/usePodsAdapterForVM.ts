@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { PodsAdapterDataType } from '@openshift-console/dynamic-plugin-sdk';
+import type { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import type { PodsAdapterDataType } from '@openshift-console/dynamic-plugin-sdk';
 
 import usePodsForVM from './usePodsForVM';
 

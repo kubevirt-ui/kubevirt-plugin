@@ -1,11 +1,12 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Button, ButtonVariant, Tooltip } from '@patternfly/react-core';
 
 import RunningCheckupWarningDescription from '../actions/RunningCheckupWarningDescription';
 
-import { RunButtonWithTooltipProps } from './types';
+import type { RunButtonWithTooltipProps } from './types';
 
 const RunButtonWithTooltip: FC<RunButtonWithTooltipProps> = ({
   configMapInfo,

@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { SavedSearchEntry } from '@search/savedSearches/types';
+import type { SavedSearchEntry } from '@search/savedSearches/types';
 import { areQueriesEqual } from '@search/utils/query';
 
 type UseSaveSearchButtonTooltipArgs = {

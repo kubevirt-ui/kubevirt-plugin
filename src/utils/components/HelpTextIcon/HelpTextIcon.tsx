@@ -1,16 +1,11 @@
-import React, { FC, MouseEventHandler, ReactNode } from 'react';
+import type { FC, MouseEventHandler, ReactNode } from 'react';
+import React from 'react';
 
 import { logHelpItemOpened } from '@kubevirt-utils/extensions/telemetry/learning';
 import { TELEMETRY_HELP_ITEM_ID } from '@kubevirt-utils/extensions/telemetry/utils/property-constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import {
-  Button,
-  Icon,
-  IconSize,
-  Popover,
-  PopoverPosition,
-  PopoverProps,
-} from '@patternfly/react-core';
+import type { IconSize, PopoverProps } from '@patternfly/react-core';
+import { Button, Icon, Popover, PopoverPosition } from '@patternfly/react-core';
 import { HelpIcon } from '@patternfly/react-icons';
 
 import './HelpTextIcon.scss';

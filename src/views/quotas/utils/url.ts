@@ -1,7 +1,7 @@
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { ALL_NAMESPACES } from '@kubevirt-utils/hooks/constants';
 import { ResourceQuotaModel } from '@kubevirt-utils/models';
-import { ApplicationAwareQuota } from '@kubevirt-utils/resources/quotas/types';
+import type { ApplicationAwareQuota } from '@kubevirt-utils/resources/quotas/types';
 import { getName, getNamespace, getResourceUrl } from '@kubevirt-utils/resources/shared';
 
 import { isNamespacedQuota } from './utils';

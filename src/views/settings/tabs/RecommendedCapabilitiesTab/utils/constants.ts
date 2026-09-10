@@ -2,7 +2,8 @@ import { type TFunction } from 'i18next';
 
 import { type LabelProps } from '@patternfly/react-core';
 
-import { CapabilityInstallState, InstallState } from './types';
+import type { InstallState } from './types';
+import { CapabilityInstallState } from './types';
 import { isInstalled } from './installState';
 
 export const RED_HAT = 'Red Hat';

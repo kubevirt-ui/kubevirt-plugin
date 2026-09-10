@@ -1,8 +1,9 @@
-import React, { FC, JSX, memo, RefObject } from 'react';
+import type { FC, JSX, RefObject } from 'react';
+import React, { memo } from 'react';
 
 import { MenuToggle } from '@patternfly/react-core';
 
-import { DropdownConfig } from './types';
+import type { DropdownConfig } from './types';
 
 type DropdownMenuToggleProps = {
   config: DropdownConfig;

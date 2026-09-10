@@ -1,4 +1,4 @@
-import { ComponentClass } from 'react';
+import type { ComponentClass } from 'react';
 
 export type InstanceTypeSize = {
   cpus: number;

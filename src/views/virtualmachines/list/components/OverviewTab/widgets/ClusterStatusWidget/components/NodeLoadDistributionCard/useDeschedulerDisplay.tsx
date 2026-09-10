@@ -1,4 +1,5 @@
-import React, { ReactNode, useMemo } from 'react';
+import type { ReactNode } from 'react';
+import React, { useMemo } from 'react';
 
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
@@ -7,7 +8,7 @@ import {
   DESCHEDULER_NOT_ENABLED,
   DESCHEDULER_NOT_INSTALLED,
 } from '@kubevirt-utils/hooks/constants';
-import { DeschedulerStatus } from '@kubevirt-utils/hooks/useDeschedulerInstalled';
+import type { DeschedulerStatus } from '@kubevirt-utils/hooks/useDeschedulerInstalled';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import useManagedClusterConsoleURLs from '@multicluster/hooks/useManagedClusterConsoleURLs';

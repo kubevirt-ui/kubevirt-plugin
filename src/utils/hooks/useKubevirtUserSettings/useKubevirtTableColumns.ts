@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-import { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
+import type { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 
 import { ACTIONS, USER_SETTINGS_KEYS } from './utils/const';
 import useKubevirtUserSettings from './useKubevirtUserSettings';

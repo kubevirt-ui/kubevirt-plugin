@@ -1,8 +1,5 @@
-import {
-  ApplicationAwareQuota,
-  CalculationMethod,
-  QuotaStatus,
-} from '@kubevirt-utils/resources/quotas/types';
+import type { ApplicationAwareQuota, QuotaStatus } from '@kubevirt-utils/resources/quotas/types';
+import { CalculationMethod } from '@kubevirt-utils/resources/quotas/types';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { SortByDirection } from '@patternfly/react-table';
 

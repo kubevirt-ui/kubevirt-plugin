@@ -1,4 +1,4 @@
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import type { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getCustomizeWizardVM } from '@kubevirt-utils/signals/customizeWizardVMSignal';
 import { isRunning } from '@virtualmachines/utils';
 
@@ -8,7 +8,7 @@ import {
   mountISOToCDROM,
 } from './helpers';
 import { submitCDROM } from './submitCDROM';
-import { V1DiskFormState } from './types';
+import type { V1DiskFormState } from './types';
 import { runVmCdromBackgroundUpload } from './vmCdromBackgroundUpload';
 
 jest.mock('@virtualmachines/utils', () => ({

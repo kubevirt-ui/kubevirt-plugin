@@ -1,9 +1,10 @@
-import React, { FC, useMemo } from 'react';
+import type { FC } from 'react';
+import React, { useMemo } from 'react';
 import { Link } from 'react-router';
-import { TFunction } from 'i18next';
+import type { TFunction } from 'i18next';
 
 import { DataSourceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
+import type { V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import DeprecatedBadge from '@kubevirt-utils/components/badges/DeprecatedBadge/DeprecatedBadge';
 import {
   getBootableVolumeGroupVersionKind,
@@ -26,8 +27,8 @@ import { ResourceIcon } from '@openshift-console/dynamic-plugin-sdk';
 import { Label } from '@patternfly/react-core';
 
 import { appendBootableVolumeContext } from '../../../datasources/hooks/useIsBootableVolumeContext';
-import { BootableResource } from '../../utils/types';
-import { BootableVolumeCallbacks } from '../bootableVolumesDefinition';
+import type { BootableResource } from '../../utils/types';
+import type { BootableVolumeCallbacks } from '../bootableVolumesDefinition';
 import { getEffectiveCluster } from '../utils/helpers';
 
 import './BootableVolumeNameCell.scss';

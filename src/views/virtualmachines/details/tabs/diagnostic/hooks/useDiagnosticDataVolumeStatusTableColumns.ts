@@ -1,9 +1,9 @@
 import { NAME_COLUMN_ID } from '@kubevirt-utils/components/ColumnManagementModal/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettingsTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettingsTableColumns';
-import { TableColumn } from '@openshift-console/dynamic-plugin-sdk';
+import type { TableColumn } from '@openshift-console/dynamic-plugin-sdk';
 
-import { DiagnosticColumn, DiagnosticSort } from '../utils/types';
+import type { DiagnosticColumn, DiagnosticSort } from '../utils/types';
 
 import useDiagnosticSort from './useDiagnosticSort';
 

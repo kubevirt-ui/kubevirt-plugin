@@ -1,6 +1,7 @@
-import { TFunction } from 'i18next';
+import type { TFunction } from 'i18next';
 
-import { formatK8sError, getK8sErrorHref, K8sLikeError } from './formatK8sError';
+import type { K8sLikeError } from './formatK8sError';
+import { formatK8sError, getK8sErrorHref } from './formatK8sError';
 
 const t = ((key: string) => key) as TFunction;
 

@@ -1,6 +1,6 @@
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import type { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { VirtualMachineStorageMigrationPlanModel } from '@kubevirt-utils/models';
-import { VirtualMachineStorageMigrationPlan } from '@kubevirt-utils/resources/migrations/constants';
+import type { VirtualMachineStorageMigrationPlan } from '@kubevirt-utils/resources/migrations/constants';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { getCluster } from '@multicluster/helpers/selectors';
 import useK8sListData from '@multicluster/hooks/useK8sListData';

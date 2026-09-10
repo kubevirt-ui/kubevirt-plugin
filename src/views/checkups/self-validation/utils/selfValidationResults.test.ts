@@ -1,4 +1,4 @@
-import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import type { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 
 import { SELF_VALIDATION_RESULTS_KEY } from './constants';
 import { parseFailedTest, parseResults } from './selfValidationResults';

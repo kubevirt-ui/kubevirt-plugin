@@ -1,5 +1,6 @@
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { K8sGroupVersionKind, useK8sModel } from '@openshift-console/dynamic-plugin-sdk';
+import type { K8sGroupVersionKind } from '@openshift-console/dynamic-plugin-sdk';
+import { useK8sModel } from '@openshift-console/dynamic-plugin-sdk';
 
 const PIPELINE_GROUP_VERSION_KIND: K8sGroupVersionKind = {
   group: 'tekton.dev',

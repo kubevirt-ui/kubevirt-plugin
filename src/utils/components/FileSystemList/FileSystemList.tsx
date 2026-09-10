@@ -1,13 +1,11 @@
-import React, { FC, useMemo } from 'react';
+import type { FC } from 'react';
+import React, { useMemo } from 'react';
 
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
-import {
-  FileSystemData,
-  getFileSystemColumns,
-  getFileSystemRowId,
-} from './fileSystemListDefinition';
+import type { FileSystemData } from './fileSystemListDefinition';
+import { getFileSystemColumns, getFileSystemRowId } from './fileSystemListDefinition';
 
 type FileSystemListProps = {
   data: FileSystemData[];

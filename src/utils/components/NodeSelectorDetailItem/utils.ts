@@ -1,4 +1,4 @@
-import { V1VirtualMachineInstanceSpec } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import type { V1VirtualMachineInstanceSpec } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 
 /**

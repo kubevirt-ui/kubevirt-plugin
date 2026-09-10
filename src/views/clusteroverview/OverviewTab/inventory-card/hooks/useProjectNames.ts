@@ -1,6 +1,7 @@
 import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { K8sResourceCommon, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
+import type { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 
 export const useProjectNames = (): string[] => {
   const [projects] = useK8sWatchResource<K8sResourceCommon[]>({

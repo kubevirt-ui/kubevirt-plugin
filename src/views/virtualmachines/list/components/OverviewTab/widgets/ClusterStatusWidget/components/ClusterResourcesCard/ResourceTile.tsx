@@ -1,4 +1,5 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
 import { Card, CardBody, Skeleton, Split, SplitItem } from '@patternfly/react-core';
 

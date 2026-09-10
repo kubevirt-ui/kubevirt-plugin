@@ -1,9 +1,10 @@
-import React, { FC } from 'react';
-import { TFunction } from 'i18next';
+import type { FC } from 'react';
+import React from 'react';
+import type { TFunction } from 'i18next';
 
-import { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
+import type { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
-import { DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/constants';
+import type { DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/constants';
 import { readableSizeUnit } from '@kubevirt-utils/utils/units';
 
 const NameCell: FC<{ row: DiskRowDataLayout }> = ({ row }) => (

@@ -1,4 +1,4 @@
-import { K8sResourceKind, Selector } from '@openshift-console/dynamic-plugin-sdk';
+import type { K8sResourceKind, Selector } from '@openshift-console/dynamic-plugin-sdk';
 
 export enum CalculationMethod {
   DedicatedVirtualResources = 'DedicatedVirtualResources',

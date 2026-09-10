@@ -6,7 +6,7 @@ import {
   type RecommendedCapabilityDetailsMap,
 } from '../../utils/types';
 import { COLUMN_KEYS } from './useCustomSelectionColumns';
-import { SortByDirection } from '@patternfly/react-table';
+import type { SortByDirection } from '@patternfly/react-table';
 import { compareWithDirection } from '@kubevirt-utils/utils/utils';
 
 export const matchesName = (feature: CapabilityFeature, query: string): boolean => {

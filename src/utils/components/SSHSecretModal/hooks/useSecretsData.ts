@@ -1,11 +1,11 @@
 import { useMemo } from 'react';
 
 import { modelToGroupVersionKind, SecretModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { IoK8sApiCoreV1Secret } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import type { IoK8sApiCoreV1Secret } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { getMappedProjectsWithKeys } from '@kubevirt-utils/components/SSHSecretModal/utils/utils';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 
-import { SecretsData } from '../utils/types';
+import type { SecretsData } from '../utils/types';
 
 type UseSecretsData = (
   secretsNamespace: string,

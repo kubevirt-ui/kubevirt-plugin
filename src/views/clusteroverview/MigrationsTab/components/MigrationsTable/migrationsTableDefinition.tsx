@@ -1,7 +1,7 @@
 import React from 'react';
-import { TFunction } from 'i18next';
+import type { TFunction } from 'i18next';
 
-import { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
+import type { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { ACTIONS } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/const';
 import { getName, getNamespace, getUID } from '@kubevirt-utils/resources/shared';
 import {
@@ -12,7 +12,7 @@ import {
 import { getCluster } from '@multicluster/helpers/selectors';
 
 import { MIGRATION_COLUMN_KEYS } from './utils/constants';
-import { MigrationTableDataLayout } from './utils/utils';
+import type { MigrationTableDataLayout } from './utils/utils';
 import {
   ActionsCell,
   CreatedCell,

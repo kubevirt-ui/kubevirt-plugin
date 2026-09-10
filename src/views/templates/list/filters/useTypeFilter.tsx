@@ -1,9 +1,10 @@
 import React, { useMemo } from 'react';
 
-import { KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
+import type { KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useIsVMTemplateFeatureEnabled from '@kubevirt-utils/hooks/useVMTemplateFeatureFlag/useIsVMTemplateFeatureEnabled';
-import { isOpenShiftTemplate, TemplateOrRequest } from '@kubevirt-utils/resources/template';
+import type { TemplateOrRequest } from '@kubevirt-utils/resources/template';
+import { isOpenShiftTemplate } from '@kubevirt-utils/resources/template';
 import {
   TemplateModelGroupVersionKind,
   VirtualMachineTemplateGroupVersionKind,

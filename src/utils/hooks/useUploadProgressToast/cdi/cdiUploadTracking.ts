@@ -1,11 +1,8 @@
-import {
-  getUploadErrorMessage,
-  UPLOAD_STATUS,
-  UploadError,
-} from '@kubevirt-utils/hooks/useCDIUpload/types';
+import type { UploadError } from '@kubevirt-utils/hooks/useCDIUpload/types';
+import { getUploadErrorMessage, UPLOAD_STATUS } from '@kubevirt-utils/hooks/useCDIUpload/types';
 
 import { isTerminalUploadStatus } from '../toast/uploadTitles';
-import { RegisterCdiUploadParams, SyncCdiUploadParams } from '../types';
+import type { RegisterCdiUploadParams, SyncCdiUploadParams } from '../types';
 import { useUploadProgressStore } from '../uploadProgressStore';
 
 const applyCdiStatusToStore = (

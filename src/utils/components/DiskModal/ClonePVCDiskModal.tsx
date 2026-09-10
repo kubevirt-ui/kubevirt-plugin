@@ -1,4 +1,5 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
 import { getNamespace } from '@kubevirt-utils/resources/shared';
@@ -19,7 +20,8 @@ import StorageClassAndPreallocation from './components/StorageClassAndPreallocat
 import { getDefaultCreateValues, getDefaultEditValues } from './utils/form';
 import { diskModalTitle } from './utils/helpers';
 import { submit } from './utils/submit';
-import { SourceTypes, V1DiskFormState, V1SubDiskModalProps } from './utils/types';
+import type { V1DiskFormState, V1SubDiskModalProps } from './utils/types';
+import { SourceTypes } from './utils/types';
 
 const ClonePVCDiskModal: FC<V1SubDiskModalProps> = ({
   editDiskName,

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 
-import { KubevirtFilterState } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
+import type { KubevirtFilterState } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 
 type UseTokenOrderResult = {

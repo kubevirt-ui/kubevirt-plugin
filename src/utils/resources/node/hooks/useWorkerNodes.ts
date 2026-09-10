@@ -1,7 +1,7 @@
 import { modelToGroupVersionKind, NodeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { IoK8sApiCoreV1Node } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import type { IoK8sApiCoreV1Node } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
-import { WatchK8sResult } from '@openshift-console/dynamic-plugin-sdk';
+import type { WatchK8sResult } from '@openshift-console/dynamic-plugin-sdk';
 
 export const WORKER_NODE_LABEL = 'node-role.kubernetes.io/worker';
 

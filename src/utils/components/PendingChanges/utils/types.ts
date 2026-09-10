@@ -1,4 +1,4 @@
-import { VirtualMachineDetailsTab } from '@kubevirt-utils/constants/tabs-constants';
+import type { VirtualMachineDetailsTab } from '@kubevirt-utils/constants/tabs-constants';
 
 export type PendingChange = {
   handleAction: () => void;

@@ -1,7 +1,8 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import type { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getBootDisk } from '@kubevirt-utils/resources/vm';
@@ -17,7 +18,7 @@ import {
   Stack,
 } from '@patternfly/react-core';
 
-import { V1DiskFormState } from '../../utils/types';
+import type { V1DiskFormState } from '../../utils/types';
 import { IS_BOOT_SOURCE_FIELD } from '../utils/constants';
 
 import './BootSourceCheckbox.scss';

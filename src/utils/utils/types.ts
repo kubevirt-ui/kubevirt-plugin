@@ -1,4 +1,4 @@
-import { Selector } from '@openshift-console/dynamic-plugin-sdk';
+import type { Selector } from '@openshift-console/dynamic-plugin-sdk';
 
 export type ListPageProps = {
   fieldSelector?: string;

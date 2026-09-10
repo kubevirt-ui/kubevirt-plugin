@@ -1,8 +1,8 @@
-import { TFunction } from 'i18next';
+import type { TFunction } from 'i18next';
 
 import { CalculationMethod } from '@kubevirt-utils/resources/quotas/types';
 
-import { CalculationMethodContentMapper } from './types';
+import type { CalculationMethodContentMapper } from './types';
 
 export const getCalculationMethodContentMapper = (
   t: TFunction,

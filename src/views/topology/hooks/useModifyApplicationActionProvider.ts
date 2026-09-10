@@ -1,9 +1,9 @@
 import { useMemo } from 'react';
 
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { Action, K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+import type { Action, K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { useGetModifyApplicationAction } from '@openshift-console/dynamic-plugin-sdk-internal';
-import { GraphElement } from '@patternfly/react-topology';
+import type { GraphElement } from '@patternfly/react-topology';
 import { isVMType } from '@topology/utils/utils';
 
 type UseModifyApplicationActionProvider = (element: GraphElement) => [Action[], boolean, undefined];

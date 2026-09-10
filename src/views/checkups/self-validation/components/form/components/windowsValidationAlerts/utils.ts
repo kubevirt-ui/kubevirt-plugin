@@ -1,4 +1,4 @@
-import { TFunction } from 'i18next';
+import type { TFunction } from 'i18next';
 
 export const getPipelinesPrerequisiteTitle = (t: TFunction): string =>
   t('Prerequisite: OpenShift Pipelines must be installed on the cluster.');

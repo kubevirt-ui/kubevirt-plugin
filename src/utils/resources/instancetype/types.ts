@@ -1,4 +1,4 @@
-import {
+import type {
   V1beta1VirtualMachineClusterInstancetype,
   V1beta1VirtualMachineInstancetype,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';

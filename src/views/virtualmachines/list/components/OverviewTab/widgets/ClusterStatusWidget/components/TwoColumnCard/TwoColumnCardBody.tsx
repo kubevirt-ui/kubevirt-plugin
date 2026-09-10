@@ -1,4 +1,5 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 import classNames from 'classnames';
 
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
@@ -8,7 +9,7 @@ import StatusScoreList from '../../../shared/StatusScoreList/StatusScoreList';
 
 import LoadingSkeleton from './LoadingSkeleton';
 import SeverityCountList from './SeverityCountList';
-import { TwoColumnCardBodyProps } from './types';
+import type { TwoColumnCardBodyProps } from './types';
 
 const TwoColumnCardBody: FC<TwoColumnCardBodyProps> = ({
   bottomLeftContent,

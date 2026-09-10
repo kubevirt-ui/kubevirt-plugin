@@ -1,5 +1,5 @@
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import {
+import type { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import type {
   InstanceTypeSeries,
   InstanceTypeSize,
   InstanceTypeUnion,

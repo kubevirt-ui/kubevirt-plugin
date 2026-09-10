@@ -1,6 +1,7 @@
-import React, { createContext, FC, ReactNode, useState } from 'react';
+import type { FC, ReactNode } from 'react';
+import React, { createContext, useState } from 'react';
 
-import { ResourceTypeTelemetry } from '@kubevirt-utils/extensions/telemetry/utils/types';
+import type { ResourceTypeTelemetry } from '@kubevirt-utils/extensions/telemetry/utils/types';
 
 export type SidebarEditorContextType = {
   isEditable?: boolean;

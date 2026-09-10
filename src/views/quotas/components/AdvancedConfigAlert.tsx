@@ -1,8 +1,9 @@
-import React, { FC, useState } from 'react';
+import type { FC } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { ApplicationAwareResourceQuota } from '@kubevirt-utils/resources/quotas/types';
+import type { ApplicationAwareResourceQuota } from '@kubevirt-utils/resources/quotas/types';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { Alert, AlertActionCloseButton } from '@patternfly/react-core';
 

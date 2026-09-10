@@ -1,7 +1,8 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { NetworkInterfaceState } from '@kubevirt-utils/resources/vm/utils/network/types';
+import type { NetworkInterfaceState } from '@kubevirt-utils/resources/vm/utils/network/types';
 import { List, ListItem } from '@patternfly/react-core';
 
 import { describeNetworkState } from './utils';

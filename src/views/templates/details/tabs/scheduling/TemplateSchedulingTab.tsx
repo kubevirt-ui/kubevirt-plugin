@@ -1,8 +1,9 @@
-import React, { FC, memo } from 'react';
+import type { FC } from 'react';
+import React, { memo } from 'react';
 
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Template } from '@kubevirt-utils/resources/template';
+import type { Template } from '@kubevirt-utils/resources/template';
 import { updateTemplate } from '@kubevirt-utils/resources/template/utils';
 import { Grid, GridItem, PageSection, Title } from '@patternfly/react-core';
 

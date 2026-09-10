@@ -1,5 +1,5 @@
-import { V1VolumeSnapshotStatus } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+import type { V1VolumeSnapshotStatus } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import type { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
 export type VolumeSnapshotKind = K8sResourceCommon & {
   spec: {

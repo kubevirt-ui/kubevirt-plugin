@@ -1,8 +1,9 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { ColumnLayout } from '@openshift-console/dynamic-plugin-sdk';
+import type { ColumnLayout } from '@openshift-console/dynamic-plugin-sdk';
 import { Button, ButtonVariant, ToolbarItem, Tooltip } from '@patternfly/react-core';
 import { ColumnsIcon } from '@patternfly/react-icons';
 

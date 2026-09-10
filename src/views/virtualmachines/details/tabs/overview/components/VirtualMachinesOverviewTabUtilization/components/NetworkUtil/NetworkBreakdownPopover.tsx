@@ -1,11 +1,12 @@
-import React, { FC, useMemo } from 'react';
+import type { FC } from 'react';
+import React, { useMemo } from 'react';
 import { Link } from 'react-router';
 
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import type { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getResourceUrl } from '@kubevirt-utils/resources/shared';
-import { PrometheusResponse } from '@openshift-console/dynamic-plugin-sdk';
+import type { PrometheusResponse } from '@openshift-console/dynamic-plugin-sdk';
 import { Button, ButtonVariant, Content, ContentVariants, Popover } from '@patternfly/react-core';
 
 import { getInterfaceNetworkRate } from './utils';

@@ -1,7 +1,8 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
 import StatusScoreItem from './StatusScoreItem';
-import { StatusScoreItem as StatusScoreItemType } from './types';
+import type { StatusScoreItem as StatusScoreItemType } from './types';
 
 import './StatusScoreList.scss';
 

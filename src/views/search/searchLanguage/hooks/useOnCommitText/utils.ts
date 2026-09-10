@@ -1,4 +1,4 @@
-import { KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
+import type { KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import {
   formatFilterValue,
   isExcludedValue,
@@ -6,7 +6,7 @@ import {
 } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/utils';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 
-import { OptionsLookup } from '../../types';
+import type { OptionsLookup } from '../../types';
 
 export const buildOptionsLookup = (filterDefinitions: KubevirtFilter[]): OptionsLookup => {
   const lookup: OptionsLookup = new Map();

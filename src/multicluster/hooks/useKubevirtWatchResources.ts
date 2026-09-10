@@ -1,16 +1,12 @@
-import {
-  useK8sWatchResources,
-  WatchK8sResource,
-  WatchK8sResources,
-} from '@openshift-console/dynamic-plugin-sdk';
-import {
+import type { WatchK8sResource, WatchK8sResources } from '@openshift-console/dynamic-plugin-sdk';
+import { useK8sWatchResources } from '@openshift-console/dynamic-plugin-sdk';
+import type {
   FleetResourcesObject,
   FleetWatchK8sResource,
   FleetWatchK8sResources,
   FleetWatchK8sResults,
-  useFleetK8sWatchResources,
-  useHubClusterName,
 } from '@stolostron/multicluster-sdk';
+import { useFleetK8sWatchResources, useHubClusterName } from '@stolostron/multicluster-sdk';
 
 const useKubevirtWatchResources = <R extends FleetResourcesObject>(
   resources: FleetWatchK8sResources<R>,

@@ -1,4 +1,5 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
 const TemplateIcon: FC = () => (
   <svg fill="none" height="45" viewBox="0 0 16 16" width="45" xmlns="http://www.w3.org/2000/svg">

@@ -1,9 +1,9 @@
-import { CSSProperties, ReactNode } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 
-import { OLSPromptType } from '@lightspeed/utils/prompts';
+import type { OLSPromptType } from '@lightspeed/utils/prompts';
 
-import { StatusScoreItem } from '../../../shared/StatusScoreList/StatusScoreList';
-import { SeverityCount } from '../../hooks/clusterMetricConstants';
+import type { StatusScoreItem } from '../../../shared/StatusScoreList/StatusScoreList';
+import type { SeverityCount } from '../../hooks/clusterMetricConstants';
 
 export type SeverityCountListProps = {
   itemLabel?: string;

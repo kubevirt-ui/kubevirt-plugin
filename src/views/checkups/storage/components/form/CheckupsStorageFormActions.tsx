@@ -1,4 +1,5 @@
-import React, { FC, useState } from 'react';
+import type { FC } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router';
 
 import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
@@ -10,7 +11,7 @@ import { ActionGroup, Alert, AlertVariant, Button, ButtonVariant } from '@patter
 import { CHECKUP_URLS } from '../../../utils/constants';
 import { createStorageCheckup, isNumOfVMsInvalid } from '../../utils/utils';
 
-import { StorageCheckupAdvancedSettings } from './AdvancedSettings';
+import type { StorageCheckupAdvancedSettings } from './AdvancedSettings';
 
 type CheckupsStorageFormActionsProps = {
   advancedSettings: StorageCheckupAdvancedSettings;

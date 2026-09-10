@@ -1,4 +1,4 @@
-import { TFunction } from 'i18next';
+import type { TFunction } from 'i18next';
 
 export const getElapsedTimeInSeconds = (startTime: string | undefined): number => {
   if (!startTime) return 0;

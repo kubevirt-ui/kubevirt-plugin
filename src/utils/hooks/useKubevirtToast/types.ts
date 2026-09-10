@@ -1,4 +1,4 @@
-import { useToast } from '@openshift-console/dynamic-plugin-sdk';
+import type { useToast } from '@openshift-console/dynamic-plugin-sdk';
 
 export type ToastOptions = Parameters<ReturnType<typeof useToast>['addToast']>[0];
 export type HelperOptions = Omit<ToastOptions, 'content' | 'variant'> & {

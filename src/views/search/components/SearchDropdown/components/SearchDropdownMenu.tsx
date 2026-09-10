@@ -1,6 +1,8 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
-import { Menu, MenuContent, MenuProps } from '@patternfly/react-core';
+import type { MenuProps } from '@patternfly/react-core';
+import { Menu, MenuContent } from '@patternfly/react-core';
 
 import SearchDropdownFooter from './SearchDropdownFooter';
 

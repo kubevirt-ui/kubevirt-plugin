@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react';
 
 import { paginationInitialState } from './utils/constants';
-import { PaginationState, UsePagination } from './utils/types';
+import type { PaginationState, UsePagination } from './utils/types';
 
 const usePagination: UsePagination = () => {
   const [pagination, setPagination] = useState<PaginationState>(paginationInitialState);

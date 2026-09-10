@@ -1,4 +1,4 @@
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import type { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { ensurePath, isIPV6LinkLocal } from '@kubevirt-utils/utils/utils';
 
 describe('Test ensurePath', () => {

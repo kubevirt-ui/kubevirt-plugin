@@ -1,6 +1,6 @@
 import { signal } from '@preact/signals-react';
 
-import { OnboardingPopoverKey } from './types';
+import type { OnboardingPopoverKey } from './types';
 
 // Tracks dismissed popover keys synchronously within the session so the chain
 // can advance immediately without waiting for ConfigMap propagation.

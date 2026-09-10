@@ -1,6 +1,7 @@
 import { useRef } from 'react';
 
-import { createQueuedUserSettingWrite, QueuedUserSettingWrite } from './queuedUserSettingWrite';
+import type { QueuedUserSettingWrite } from './queuedUserSettingWrite';
+import { createQueuedUserSettingWrite } from './queuedUserSettingWrite';
 
 const useQueuedUserSettingWrite = (): QueuedUserSettingWrite => {
   const writerRef = useRef(createQueuedUserSettingWrite());

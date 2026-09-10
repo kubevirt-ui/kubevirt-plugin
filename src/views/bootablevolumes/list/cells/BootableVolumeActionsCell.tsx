@@ -1,12 +1,13 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
-import { V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
+import type { V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import { isBootableVolumePVCKind } from '@kubevirt-utils/resources/bootableresources/helpers';
 
 import DataSourceActions from '../../../datasources/actions/DataSourceActions';
 import BootableVolumesActions from '../../actions/BootableVolumesActions';
-import { BootableResource } from '../../utils/types';
-import { BootableVolumeCallbacks } from '../bootableVolumesDefinition';
+import type { BootableResource } from '../../utils/types';
+import type { BootableVolumeCallbacks } from '../bootableVolumesDefinition';
 import { getClusterPreferences, getEffectiveCluster } from '../utils/helpers';
 
 type BootableVolumeActionsCellProps = {

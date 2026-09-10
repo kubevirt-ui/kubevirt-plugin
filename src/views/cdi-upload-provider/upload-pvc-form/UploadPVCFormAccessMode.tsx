@@ -1,4 +1,5 @@
-import React, { FC, useCallback, useEffect, useState } from 'react';
+import type { FC } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
 import { ACCESS_MODE_RADIO_OPTIONS } from '@kubevirt-utils/components/ApplyStorageProfileSettings/utils';
 import { getAccessModeForProvisioner } from '@kubevirt-utils/components/DiskModal/components/utils/modesMapping';

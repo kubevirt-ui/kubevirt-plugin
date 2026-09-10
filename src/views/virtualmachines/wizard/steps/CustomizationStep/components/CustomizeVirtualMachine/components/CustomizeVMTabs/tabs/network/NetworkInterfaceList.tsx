@@ -1,6 +1,7 @@
-import React, { FC, useMemo } from 'react';
+import type { FC } from 'react';
+import React, { useMemo } from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import type { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import KubevirtFilterToolbar from '@kubevirt-utils/components/KubevirtFilterToolbar/KubevirtFilterToolbar';
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
 import useKubevirtDataViewFilters from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/useKubevirtDataViewFilters';
@@ -11,11 +12,8 @@ import { hasAutoAttachedPodNetwork } from '@kubevirt-utils/resources/vm/utils/ne
 import AutoAttachedNetworkEmptyState from '@virtualmachines/details/tabs/configuration/network/components/list/AutoAttachedNetworkEmptyState';
 
 import useNetworkFilters from './useNetworkFilters';
-import {
-  getWizardNetworkColumns,
-  getWizardNetworkRowId,
-  WizardNetworkCallbacks,
-} from './wizardNetworkInterfaceDefinition';
+import type { WizardNetworkCallbacks } from './wizardNetworkInterfaceDefinition';
+import { getWizardNetworkColumns, getWizardNetworkRowId } from './wizardNetworkInterfaceDefinition';
 
 type NetworkInterfaceListProps = {
   onUpdateVM?: (updateVM: V1VirtualMachine) => Promise<void>;

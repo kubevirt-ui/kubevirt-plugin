@@ -1,9 +1,10 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 import classNames from 'classnames';
 
 import { ToolbarGroup } from '@patternfly/react-core';
 
-import { TableToolbarActionsProps } from './types';
+import type { TableToolbarActionsProps } from './types';
 
 import './TableToolbarActions.scss';
 

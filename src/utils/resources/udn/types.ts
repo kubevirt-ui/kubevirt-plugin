@@ -1,6 +1,6 @@
-import { K8sResourceKind, Selector } from '@openshift-console/dynamic-plugin-sdk';
+import type { K8sResourceKind, Selector } from '@openshift-console/dynamic-plugin-sdk';
 
-import { IPAM_MODE_DISABLED, UDNRole, VLAN_MODE_ACCESS } from './constants';
+import type { IPAM_MODE_DISABLED, UDNRole, VLAN_MODE_ACCESS } from './constants';
 
 export type UserDefinedNetworkAnnotations = {
   description?: string;

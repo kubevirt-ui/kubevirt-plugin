@@ -1,10 +1,10 @@
-import { TFunction } from 'i18next';
+import type { TFunction } from 'i18next';
 
 import CheckupsSelfValidationList from '../self-validation/list/CheckupsSelfValidationList';
 import CheckupsStorageList from '../storage/list/CheckupsStorageList';
 
 import { CHECKUP_URLS } from './constants';
-import { TabConfig } from './types';
+import type { TabConfig } from './types';
 
 export const getCheckUpTabs = (t: TFunction): TabConfig[] => [
   {

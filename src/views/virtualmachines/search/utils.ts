@@ -1,6 +1,6 @@
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { resolveDateCreatedValue } from '@search/utils/dateCreatedValues';
-import { AdvancedSearchFilter } from '@stolostron/multicluster-sdk';
+import type { AdvancedSearchFilter } from '@stolostron/multicluster-sdk';
 
 type DateCreatedSearchParams = {
   createdFrom: string | null;

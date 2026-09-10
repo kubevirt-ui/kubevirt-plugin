@@ -1,4 +1,4 @@
-import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
+import type { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { renderHook } from '@testing-library/react';
 
 import { BootableVolumesFilterID } from './constants';

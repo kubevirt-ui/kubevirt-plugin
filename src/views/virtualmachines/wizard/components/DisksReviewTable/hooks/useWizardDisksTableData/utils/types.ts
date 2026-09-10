@@ -1,5 +1,9 @@
-import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
-import { V1DataVolumeTemplateSpec, V1Disk, V1Volume } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import type { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import type {
+  V1DataVolumeTemplateSpec,
+  V1Disk,
+  V1Volume,
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 
 export type DiskDevice = {
   dataVolumeTemplate: V1DataVolumeTemplateSpec;

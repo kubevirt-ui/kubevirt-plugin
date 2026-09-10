@@ -1,7 +1,8 @@
-import React, { FC, useMemo } from 'react';
+import type { FC } from 'react';
+import React, { useMemo } from 'react';
 
 import { VirtualMachineModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import type { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import LoadingEmptyState from '@kubevirt-utils/components/LoadingEmptyState/LoadingEmptyState';
 import { ALL_CLUSTERS_KEY, ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
@@ -17,7 +18,7 @@ import {
   getVMStatuses,
 } from '@overview/OverviewTab/vm-statuses-card/utils/utils';
 import { Card, CardBody, CardHeader, CardTitle, Divider, Grid } from '@patternfly/react-core';
-import { AdvancedSearchFilter } from '@stolostron/multicluster-sdk';
+import type { AdvancedSearchFilter } from '@stolostron/multicluster-sdk';
 
 import VMAdditionalStatuses from './VMAdditionalStatuses';
 import VMStatusItem from './VMStatusItem';

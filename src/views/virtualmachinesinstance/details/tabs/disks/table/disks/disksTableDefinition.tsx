@@ -1,16 +1,17 @@
-import React, { ReactNode } from 'react';
-import { TFunction } from 'i18next';
+import type { ReactNode } from 'react';
+import React from 'react';
+import type { TFunction } from 'i18next';
 
 import {
   modelToGroupVersionKind,
   PersistentVolumeClaimModel,
 } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
+import type { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { getHumanizedSize } from '@kubevirt-utils/utils/units';
 import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
 
-import { DiskPresentation } from '../../utils/virtualMachinesInstancePageDisksTabUtils';
+import type { DiskPresentation } from '../../utils/virtualMachinesInstancePageDisksTabUtils';
 
 const renderSourceCell = (disk: DiskPresentation): ReactNode => {
   if (disk.namespace) {

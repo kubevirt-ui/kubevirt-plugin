@@ -1,6 +1,10 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
-import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import type {
+  V1VirtualMachine,
+  V1VirtualMachineInstance,
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import BootOrderSummary from '@kubevirt-utils/components/BootOrder/BootOrderSummary';
 import BootOrderModal from '@kubevirt-utils/components/BootOrderModal/BootOrderModal';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';

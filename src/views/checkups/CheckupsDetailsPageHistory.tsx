@@ -1,14 +1,15 @@
-import React, { FC, ReactNode, useMemo } from 'react';
+import type { FC, ReactNode } from 'react';
+import React, { useMemo } from 'react';
 
-import { IoK8sApiBatchV1Job } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import type { IoK8sApiBatchV1Job } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
 import { TableToolbarActionsFlex } from '@kubevirt-utils/components/TableToolbarActions/TableToolbarActionsFlex';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { EXPORT_TABLE_KEYS, KubevirtTableExport } from '@kubevirt-utils/hooks/useTableExport';
 import { Title } from '@patternfly/react-core';
 
+import type { CheckupsHistoryCallbacks } from './checkupsDetailsPageHistoryDefinition';
 import {
-  CheckupsHistoryCallbacks,
   getCheckupsHistoryColumns,
   getCheckupsHistoryRowId,
 } from './checkupsDetailsPageHistoryDefinition';

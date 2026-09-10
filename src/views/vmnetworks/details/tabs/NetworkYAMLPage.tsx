@@ -1,7 +1,8 @@
-import React, { FC, Suspense } from 'react';
+import type { FC } from 'react';
+import React, { Suspense } from 'react';
 
 import Loading from '@kubevirt-utils/components/Loading/Loading';
-import { ClusterUserDefinedNetworkKind } from '@kubevirt-utils/resources/udn/types';
+import type { ClusterUserDefinedNetworkKind } from '@kubevirt-utils/resources/udn/types';
 import { ResourceYAMLEditor } from '@openshift-console/dynamic-plugin-sdk';
 
 type NetworkYAMLPageProps = {

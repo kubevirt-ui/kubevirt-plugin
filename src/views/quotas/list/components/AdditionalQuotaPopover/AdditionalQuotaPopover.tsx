@@ -1,8 +1,9 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { QuotaStatus } from '@kubevirt-utils/resources/quotas/types';
+import type { QuotaStatus } from '@kubevirt-utils/resources/quotas/types';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Button, DescriptionList, Popover } from '@patternfly/react-core';

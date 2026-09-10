@@ -1,4 +1,4 @@
-import { K8sResourceKind } from '@openshift-console/dynamic-plugin-sdk';
+import type { K8sResourceKind } from '@openshift-console/dynamic-plugin-sdk';
 
 export enum EditorType {
   Form = 'form',

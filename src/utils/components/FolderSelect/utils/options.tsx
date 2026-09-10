@@ -1,8 +1,9 @@
 import React from 'react';
-import { TFunction } from 'i18next';
+import type { TFunction } from 'i18next';
 
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { HelperText, HelperTextItem, SelectOptionProps } from '@patternfly/react-core';
+import type { SelectOptionProps } from '@patternfly/react-core';
+import { HelperText, HelperTextItem } from '@patternfly/react-core';
 import { FolderIcon, InfoIcon } from '@patternfly/react-icons';
 
 import { getCreationNotAllowedMessage } from './validation';

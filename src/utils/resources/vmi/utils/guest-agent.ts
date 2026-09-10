@@ -1,4 +1,4 @@
-import {
+import type {
   V1VirtualMachine,
   V1VirtualMachineInstance,
   V1VirtualMachineInstanceGuestAgentInfo,

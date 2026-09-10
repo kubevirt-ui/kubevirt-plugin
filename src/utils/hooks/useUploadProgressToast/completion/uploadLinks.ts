@@ -1,13 +1,13 @@
-import { TFunction } from 'i18next';
+import type { TFunction } from 'i18next';
 
 import { DataVolumeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import type { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { VirtualMachineDetailsTab } from '@kubevirt-utils/constants/tabs-constants';
 import { getName, getNamespace, getResourceUrl } from '@kubevirt-utils/resources/shared';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { getVMURL } from '@multicluster/urls';
 
-import { UploadSuccessLink } from '../types';
+import type { UploadSuccessLink } from '../types';
 
 export const getVmStorageUrl = (vm: V1VirtualMachine): string => {
   const cluster = getCluster(vm);

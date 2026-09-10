@@ -1,20 +1,20 @@
-import { Dispatch, SetStateAction } from 'react';
-import { TFunction } from 'i18next';
+import type { Dispatch, SetStateAction } from 'react';
+import type { TFunction } from 'i18next';
 
-import { V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
-import {
+import type { V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
+import type {
   V1beta1StorageSpecAccessModesEnum,
   V1beta1StorageSpecVolumeModeEnum,
 } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
-import {
+import type {
   TLS_CERT_SOURCE_EXISTING,
   TLS_CERT_SOURCE_NEW,
 } from '@kubevirt-utils/components/TLSCertificateSection';
-import { DataUpload, UploadDataProps } from '@kubevirt-utils/hooks/useCDIUpload/types';
-import { ToastActions } from '@kubevirt-utils/hooks/useKubevirtToast';
-import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
+import type { DataUpload, UploadDataProps } from '@kubevirt-utils/hooks/useCDIUpload/types';
+import type { ToastActions } from '@kubevirt-utils/hooks/useKubevirtToast';
+import type { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 
-import { DROPDOWN_FORM_SELECTION } from './consts';
+import type { DROPDOWN_FORM_SELECTION } from './consts';
 
 export type PreferenceOption = {
   kind?: string;

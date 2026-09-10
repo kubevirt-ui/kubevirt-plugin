@@ -1,11 +1,12 @@
-import React, { FC, ReactNode, useMemo } from 'react';
+import type { FC, ReactNode } from 'react';
+import React, { useMemo } from 'react';
 
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import type { ButtonProps } from '@patternfly/react-core';
 import {
   Button,
-  ButtonProps,
   ButtonVariant,
   EmptyState,
   EmptyStateActions,
@@ -19,7 +20,7 @@ import {
 } from '@patternfly/react-core';
 import { SearchIcon } from '@patternfly/react-icons';
 
-import { CheckupType } from '../../utils/types';
+import type { CheckupType } from '../../utils/types';
 
 import { getBodyText, getDocumentationURL, getLearnMoreText, getTitleText } from './utils';
 

@@ -1,7 +1,8 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
 import RequiredBadge from '@kubevirt-utils/components/badges/RequiredBadge/RequiredBadge';
-import { AutoAppliedLabel } from '@kubevirt-utils/hooks/useAutoAppliedLabels/types';
+import type { AutoAppliedLabel } from '@kubevirt-utils/hooks/useAutoAppliedLabels/types';
 import { Grid, GridItem, Split, SplitItem } from '@patternfly/react-core';
 
 import DefaultVMLabelValueCell from './DefaultVMLabelValueCell';

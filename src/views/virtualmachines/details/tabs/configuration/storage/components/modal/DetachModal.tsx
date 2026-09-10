@@ -1,8 +1,10 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
 import ConfirmActionMessage from '@kubevirt-utils/components/ConfirmActionMessage/ConfirmActionMessage';
 import { CONFIRM_ACTIONS } from '@kubevirt-utils/components/ConfirmActionMessage/constants';
-import TabModal, { TabModalProps } from '@kubevirt-utils/components/TabModal/TabModal';
+import type { TabModalProps } from '@kubevirt-utils/components/TabModal/TabModal';
+import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
 type DetachModalProps = Omit<TabModalProps, 'children'> & { diskName: string };

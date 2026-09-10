@@ -1,4 +1,5 @@
-import React, { FC, FormEvent, ReactNode } from 'react';
+import type { FC, FormEvent, ReactNode } from 'react';
+import React from 'react';
 
 import { Form, ModalBody } from '@patternfly/react-core';
 

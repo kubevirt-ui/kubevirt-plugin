@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 
 import { ConfigMapModel, modelToGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
-import {
+import type {
   IoK8sApiBatchV1Job,
   IoK8sApiCoreV1ConfigMap,
 } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
@@ -9,9 +9,9 @@ import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
 import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
-import { Operator } from '@openshift-console/dynamic-plugin-sdk';
+import type { Operator } from '@openshift-console/dynamic-plugin-sdk';
 
-import { CheckupLabelValue } from '../constants';
+import type { CheckupLabelValue } from '../constants';
 import { createJobWatchConfig, KUBEVIRT_VM_LATENCY_LABEL } from '../utils';
 
 type UseCheckupsDataOptions = {

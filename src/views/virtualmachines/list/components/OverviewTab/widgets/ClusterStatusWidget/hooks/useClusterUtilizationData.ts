@@ -1,5 +1,5 @@
 import useClusterParam from '@multicluster/hooks/useClusterParam';
-import { PrometheusResponse } from '@openshift-console/dynamic-plugin-sdk';
+import type { PrometheusResponse } from '@openshift-console/dynamic-plugin-sdk';
 
 import { pct } from './clusterMetricUtils';
 import useResourceUtilizationPolls from './useResourceUtilizationPolls';

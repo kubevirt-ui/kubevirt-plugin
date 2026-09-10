@@ -1,9 +1,10 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
 import Breadcrumbs from '@kubevirt-utils/components/Breadcrumbs/Breadcrumbs';
 import { FLAG_LIGHTSPEED_PLUGIN } from '@kubevirt-utils/flags/consts';
 import LightspeedHelpButton from '@lightspeed/components/LightspeedHelpButton/LightspeedHelpButton';
-import { OLSPromptType } from '@lightspeed/utils/prompts';
+import type { OLSPromptType } from '@lightspeed/utils/prompts';
 import { useFlag } from '@openshift-console/dynamic-plugin-sdk';
 import { Split, SplitItem, StackItem } from '@patternfly/react-core';
 

@@ -9,7 +9,7 @@ export * from './telemetry';
 export * from './templates';
 export * from './utils/constants';
 export * from './utils/property-constants';
-export * from './utils/types';
+export type * from './utils/types';
 export * from './vm-actions';
 export * from './vm-creation';
 export * from './vm-migration';

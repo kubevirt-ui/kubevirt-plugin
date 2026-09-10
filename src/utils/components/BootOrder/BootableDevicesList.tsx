@@ -1,9 +1,11 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
 import TemplateValue from '@kubevirt-utils/components/TemplateValue/TemplateValue';
 import { List, ListComponent, ListItem, OrderType } from '@patternfly/react-core';
 
-import { BootableDeviceType, DeviceType } from '../../resources/vm/utils/boot-order/bootOrder';
+import type { BootableDeviceType } from '../../resources/vm/utils/boot-order/bootOrder';
+import { DeviceType } from '../../resources/vm/utils/boot-order/bootOrder';
 
 type BootableDevicesListProps = {
   devices: BootableDeviceType[];

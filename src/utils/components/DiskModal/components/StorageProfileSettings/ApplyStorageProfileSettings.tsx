@@ -1,9 +1,10 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 import { useFormContext } from 'react-hook-form';
 
 import ApplyStorageProfileSettings from '@kubevirt-utils/components/ApplyStorageProfileSettings/ApplyStorageProfileSettings';
 
-import { V1DiskFormState } from '../../utils/types';
+import type { V1DiskFormState } from '../../utils/types';
 import {
   ACCESS_MODE_FIELD,
   DATAVOLUME_TEMPLATE_STORAGE,

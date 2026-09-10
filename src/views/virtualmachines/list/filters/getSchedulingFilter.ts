@@ -1,10 +1,8 @@
-import { TFunction } from 'i18next';
+import type { TFunction } from 'i18next';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import {
-  KubevirtFilter,
-  KubevirtFilterLayout,
-} from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
+import type { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import type { KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
+import { KubevirtFilterLayout } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { getAffinity, getNodeSelector } from '@kubevirt-utils/resources/vm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { SchedulingKind } from '@search/utils/constants';

@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { PersistentVolumeClaimModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import type { V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import DeleteModal from '@kubevirt-utils/components/DeleteModal/DeleteModal';
 import ExportModal from '@kubevirt-utils/components/ExportModal/ExportModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
@@ -9,9 +9,10 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { deleteDVAndRelatedResources } from '@kubevirt-utils/resources/bootableresources/helpers';
 import { asAccessReview, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getCluster } from '@multicluster/helpers/selectors';
-import { Action, K8sVerb, useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
+import type { Action, K8sVerb } from '@openshift-console/dynamic-plugin-sdk';
+import { useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
 
-import { BootableResource } from '../../utils/types';
+import type { BootableResource } from '../../utils/types';
 import EditBootableVolumesModal from '../components/EditBootableVolumesModal';
 import RemoveBootableVolumesModal from '../components/RemoveBootableVolumesModal';
 

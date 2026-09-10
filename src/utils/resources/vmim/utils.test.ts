@@ -1,4 +1,4 @@
-import { V1VirtualMachineInstanceMigration } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import type { V1VirtualMachineInstanceMigration } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 
 import { vmimStatuses } from './statuses';
 import { getMigrationStatusCounts } from './utils';

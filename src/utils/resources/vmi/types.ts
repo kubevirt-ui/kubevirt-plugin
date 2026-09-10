@@ -1,4 +1,4 @@
-import {
+import type {
   V1Interface,
   V1Network,
   V1VirtualMachineInstanceNetworkInterface,

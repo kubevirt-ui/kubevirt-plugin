@@ -1,6 +1,7 @@
-import React, { Dispatch, FC, SetStateAction, useState } from 'react';
+import type { Dispatch, FC, SetStateAction } from 'react';
+import React, { useState } from 'react';
 
-import { IoK8sApiCoreV1Node } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import type { IoK8sApiCoreV1Node } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { useIDEntities } from '@kubevirt-utils/components/NodeSelectorModal/hooks/useIDEntities';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
@@ -14,7 +15,7 @@ import {
 } from '@patternfly/react-core';
 
 import { getIntersectedQualifiedNodes } from '../../utils/helpers';
-import { AffinityLabel, AffinityRowData } from '../../utils/types';
+import type { AffinityLabel, AffinityRowData } from '../../utils/types';
 
 import AffinityForm from './AffinityForm/AffinityForm';
 import { useNodeFieldQualifier } from './hooks/useNodeFieldQualifier';

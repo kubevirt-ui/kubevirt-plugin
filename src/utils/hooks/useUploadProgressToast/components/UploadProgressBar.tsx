@@ -1,14 +1,9 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import {
-  Flex,
-  FlexItem,
-  Progress,
-  ProgressMeasureLocation,
-  ProgressVariant,
-  Spinner,
-} from '@patternfly/react-core';
+import type { ProgressVariant } from '@patternfly/react-core';
+import { Flex, FlexItem, Progress, ProgressMeasureLocation, Spinner } from '@patternfly/react-core';
 
 type UploadProgressBarProps = {
   fileName: string;

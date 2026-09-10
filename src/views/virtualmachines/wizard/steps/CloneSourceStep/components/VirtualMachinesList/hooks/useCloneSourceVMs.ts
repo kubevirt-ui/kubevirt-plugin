@@ -1,10 +1,10 @@
 import { useWatch } from 'react-hook-form';
 
 import { VirtualMachineModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import type { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { KUBEVIRT_APISERVER_PROXY } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
-import { KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
+import type { KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
 import { usePVCMapper } from '@kubevirt-utils/hooks/usePVCMapper';
 import useVirtualMachineInstanceMigrationMapper from '@kubevirt-utils/resources/vmim/hooks/useVirtualMachineInstanceMigrationMapper';
@@ -18,7 +18,7 @@ import { VM_FILTER_OPTIONS } from '@virtualmachines/list/utils/constants';
 import { useAccessibleResources } from '@virtualmachines/search/hooks/useAccessibleResources';
 import useVMSearchQueries from '@virtualmachines/search/hooks/useVMSearchQueries';
 import { OBJECTS_FETCHING_LIMIT } from '@virtualmachines/utils';
-import { PVCMapper, VMIMapper, VMIMMapper } from '@virtualmachines/utils/mappers';
+import type { PVCMapper, VMIMapper, VMIMMapper } from '@virtualmachines/utils/mappers';
 
 import { resolveVMListSource } from '../utils/utils';
 

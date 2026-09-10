@@ -1,4 +1,4 @@
-import { IoK8sApiStorageV1StorageClass } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import type { IoK8sApiStorageV1StorageClass } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 
 import {
   DEFAULT_STORAGE_CLASS_ANNOTATION,

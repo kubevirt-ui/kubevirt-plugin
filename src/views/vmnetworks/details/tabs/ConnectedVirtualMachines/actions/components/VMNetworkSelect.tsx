@@ -1,13 +1,14 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import type { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Alert, AlertVariant, SelectOption, Skeleton } from '@patternfly/react-core';
 
 import useSelectableVMNetworksWithProjects from '../hooks/useSelectableVMNetworksWithProjects';
-import { VMNetworkWithProjects } from '../types';
+import type { VMNetworkWithProjects } from '../types';
 
 export type VMNetworkSelectProps = {
   currentNetwork: string;

@@ -1,4 +1,4 @@
-import { UseConsoleNamespaceBookmarks } from '@kubevirt-utils/hooks/consoleUserSettings/types';
+import type { UseConsoleNamespaceBookmarks } from '@kubevirt-utils/hooks/consoleUserSettings/types';
 import useConsoleBookmarks from '@kubevirt-utils/hooks/consoleUserSettings/useConsoleBookmarks/useConsoleBookmarks';
 
 import { CONSOLE_NAMESPACE_BOOKMARKS_KEY } from './consts';

@@ -5,7 +5,7 @@ import { WORKER_NODE_LABEL } from '@kubevirt-utils/resources/node/hooks/useWorke
 import { getName } from '@kubevirt-utils/resources/shared';
 import { getCluster } from '@multicluster/helpers/selectors';
 import useKubevirtSearchPoll from '@multicluster/hooks/useKubevirtSearchPoll';
-import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+import type { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
 const allClustersWorkerNodesWatchOptions = {
   groupVersionKind: modelToGroupVersionKind(NodeModel),

@@ -1,5 +1,5 @@
-import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
+import type { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
+import type { V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 
 export type TemplatesCatalogCallbacks = {
   availableDatasources: Record<string, V1beta1DataSource>;

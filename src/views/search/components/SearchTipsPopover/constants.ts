@@ -1,6 +1,6 @@
-import { TFunction } from 'i18next';
+import type { TFunction } from 'i18next';
 
-import { SearchTipsSection } from './types';
+import type { SearchTipsSection } from './types';
 
 export const getSearchTipsSections = (t: TFunction, isACMPage: boolean): SearchTipsSection[] => [
   {

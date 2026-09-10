@@ -1,8 +1,8 @@
-import { FieldError, FieldErrorsImpl } from 'react-hook-form';
+import type { FieldError, FieldErrorsImpl } from 'react-hook-form';
 
-import { V1beta1DataVolumeSourceRef, V1Disk } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import type { V1beta1DataVolumeSourceRef, V1Disk } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 
-import { V1DiskFormState } from '../../utils/types';
+import type { V1DiskFormState } from '../../utils/types';
 
 export const getSourceRef = (diskState: V1DiskFormState): V1beta1DataVolumeSourceRef =>
   diskState.dataVolumeTemplate?.spec?.sourceRef;

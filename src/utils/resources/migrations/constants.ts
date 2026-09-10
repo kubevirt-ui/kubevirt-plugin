@@ -1,9 +1,12 @@
-import {
+import type {
   V1beta1StorageSpecAccessModesEnum,
   V1beta1StorageSpecVolumeModeEnum,
   V1Condition,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { K8sResourceCommon, K8sResourceCondition } from '@openshift-console/dynamic-plugin-sdk';
+import type {
+  K8sResourceCommon,
+  K8sResourceCondition,
+} from '@openshift-console/dynamic-plugin-sdk';
 
 export type MigrationStatus = {
   name: string;
@@ -75,9 +78,7 @@ export type VirtualMachineStorageMigrationPlan = K8sResourceCommon & {
 
 export type MultiNamespaceVirtualMachineStorageMigration = K8sResourceCommon & {
   spec: {
-    multiNamespaceVirtualMachineStorageMigrationPlanRef: {
-      name: string;
-    };
+    multiNamespaceVirtualMachineStorageMigrationPlanRef: { name: string };
   };
 };
 
@@ -93,7 +94,6 @@ export const STATUS_COMPLETED = 'Completed';
 
 export const STATUS_IN_PROGRESS = 'In Progress';
 export const STATUS_READY = 'Ready';
-
 export const K8S_CONDITION_STATUS_TRUE = 'True';
 
 export const CONDITION_TYPE_FAILED = 'Failed';

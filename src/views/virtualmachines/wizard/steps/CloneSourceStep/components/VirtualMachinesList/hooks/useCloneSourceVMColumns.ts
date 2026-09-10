@@ -1,20 +1,17 @@
 import { useMemo } from 'react';
 
 import { NodeModel, VirtualMachineModelRef } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import type { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { buildColumnLayout } from '@kubevirt-utils/components/KubevirtTable/utils';
 import { getActiveColumns } from '@kubevirt-utils/components/KubevirtTable/utils/getActiveColumns';
-import { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
+import type { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettingsTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettingsTableColumns';
 import useIsAllClustersPage from '@multicluster/hooks/useIsAllClustersPage';
-import { ColumnLayout, K8sVerb } from '@openshift-console/dynamic-plugin-sdk';
+import type { ColumnLayout, K8sVerb } from '@openshift-console/dynamic-plugin-sdk';
 import { useFleetAccessReview } from '@stolostron/multicluster-sdk';
-import {
-  getVMColumns,
-  VM_COLUMN_KEYS,
-  VMCallbacks,
-} from '@virtualmachines/list/virtualMachinesDefinition';
+import type { VMCallbacks } from '@virtualmachines/list/virtualMachinesDefinition';
+import { getVMColumns, VM_COLUMN_KEYS } from '@virtualmachines/list/virtualMachinesDefinition';
 
 import { getActiveColumnKeys } from '../utils/utils';
 

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 
-import { HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
+import type { HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 
 import { MEMORY_REQUEST_RATIO_DEFAULT } from '../utils/const';
 import { updateMemoryOvercommit } from '../utils/utils';

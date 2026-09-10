@@ -1,11 +1,12 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 import { Trans } from 'react-i18next';
 
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Button, ButtonVariant } from '@patternfly/react-core';
 
-import { RDPServiceNotConfiguredProps } from '../utils/types';
+import type { RDPServiceNotConfiguredProps } from '../utils/types';
 
 import RDPServiceModal from './RDPServiceModal';
 

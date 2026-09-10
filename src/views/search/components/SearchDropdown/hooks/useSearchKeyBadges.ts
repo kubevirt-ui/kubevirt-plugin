@@ -5,7 +5,7 @@ import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import useIsACMPage from '@multicluster/useIsACMPage';
 
 import { getSearchKeyBadges } from '../constants';
-import { SearchKeyBadge } from '../types';
+import type { SearchKeyBadge } from '../types';
 
 const useSearchKeyBadges = (): SearchKeyBadge[] => {
   const isACMPage = useIsACMPage();

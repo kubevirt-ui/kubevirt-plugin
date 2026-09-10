@@ -1,5 +1,5 @@
 import { CAPACITY_UNITS } from '@kubevirt-utils/components/CapacityInput/utils';
-import { KubevirtFilterState } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
+import type { KubevirtFilterState } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { NumberOperator } from '@kubevirt-utils/utils/constants';
 import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 

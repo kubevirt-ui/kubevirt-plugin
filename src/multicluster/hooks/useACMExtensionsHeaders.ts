@@ -1,4 +1,4 @@
-import { TableColumn } from '@openshift-console/dynamic-plugin-sdk';
+import type { TableColumn } from '@openshift-console/dynamic-plugin-sdk';
 
 import useACMExtensionColumns from './useACMExtensionColumns/useACMExtensionColumns';
 

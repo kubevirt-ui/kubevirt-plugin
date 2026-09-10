@@ -1,7 +1,8 @@
 /* Copyright Contributors to the Open Cluster Management project */
-import React, { FC, useMemo } from 'react';
+import type { FC } from 'react';
+import React, { useMemo } from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import type { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { Modal, ModalBody } from '@patternfly/react-core';
 
 import CrossClusterMigrationWizard from './CrossClusterMigrationWizard';

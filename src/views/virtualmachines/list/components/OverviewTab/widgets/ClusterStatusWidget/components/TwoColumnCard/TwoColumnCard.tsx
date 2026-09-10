@@ -1,11 +1,12 @@
-import React, { CSSProperties, FC } from 'react';
+import type { CSSProperties, FC } from 'react';
+import React from 'react';
 
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverContentWithLightspeedButton/PopoverContentWithLightspeedButton';
 import { Card, CardBody, CardHeader, CardTitle } from '@patternfly/react-core';
 
 import TwoColumnCardBody from './TwoColumnCardBody';
-import { TwoColumnCardProps } from './types';
+import type { TwoColumnCardProps } from './types';
 
 import './TwoColumnCard.scss';
 

@@ -1,9 +1,10 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Content, ContentVariants, Title } from '@patternfly/react-core';
 
-import { DiagnosticSeverity, DiagnosticSeverityCounts } from '../../utils/types';
+import type { DiagnosticSeverity, DiagnosticSeverityCounts } from '../../utils/types';
 import DiagnosticsOverviewCards from '../DiagnosticsOverviewCards/DiagnosticsOverviewCards';
 
 type DiagnosticsOverviewProps = {

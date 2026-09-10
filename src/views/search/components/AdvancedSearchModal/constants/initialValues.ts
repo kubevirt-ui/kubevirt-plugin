@@ -1,6 +1,6 @@
 import { CAPACITY_UNITS } from '@kubevirt-utils/components/CapacityInput/utils';
 import { NumberOperator } from '@kubevirt-utils/utils/constants';
-import {
+import type {
   CPUValue,
   GuestAgentValue,
   HWDevicesValue,

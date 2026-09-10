@@ -1,6 +1,7 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
-import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
+import type { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import ActionsDropdown from '@kubevirt-utils/components/ActionsDropdown/ActionsDropdown';
 
 import useVirtualMachineTemplatesActions from './hooks/useVirtualMachineTemplatesActions';

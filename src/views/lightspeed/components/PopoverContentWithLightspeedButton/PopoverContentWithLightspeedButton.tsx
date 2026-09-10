@@ -1,7 +1,8 @@
-import React, { FC, ReactNode } from 'react';
+import type { FC, ReactNode } from 'react';
+import React from 'react';
 
 import LightspeedPopoverContentFooter from '@lightspeed/components/LightspeedPopoverContentFooter';
-import { OLSPromptType } from '@lightspeed/utils/prompts';
+import type { OLSPromptType } from '@lightspeed/utils/prompts';
 import { Stack, StackItem } from '@patternfly/react-core';
 
 import './PopoverContentWithLightspeedButton.scss';

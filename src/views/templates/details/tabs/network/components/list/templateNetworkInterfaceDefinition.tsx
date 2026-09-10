@@ -1,14 +1,13 @@
-import React, { ReactNode } from 'react';
-import { TFunction } from 'i18next';
+import type { ReactNode } from 'react';
+import React from 'react';
+import type { TFunction } from 'i18next';
 
 import TemplateValue from '@kubevirt-utils/components/TemplateValue/TemplateValue';
-import { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
-import { Template } from '@kubevirt-utils/resources/template';
+import type { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
+import type { Template } from '@kubevirt-utils/resources/template';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
-import {
-  NetworkPresentation,
-  POD_NETWORK_SORT_KEY,
-} from '@kubevirt-utils/resources/vm/utils/network/constants';
+import type { NetworkPresentation } from '@kubevirt-utils/resources/vm/utils/network/constants';
+import { POD_NETWORK_SORT_KEY } from '@kubevirt-utils/resources/vm/utils/network/constants';
 import {
   getPrintableNetworkInterfaceType,
   isPodNetwork,

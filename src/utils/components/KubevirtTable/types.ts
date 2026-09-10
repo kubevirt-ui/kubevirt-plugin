@@ -1,7 +1,7 @@
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 
-import { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
-import { PaginationState } from '@kubevirt-utils/hooks/usePagination/utils/types';
+import type { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
+import type { PaginationState } from '@kubevirt-utils/hooks/usePagination/utils/types';
 
 // Column layout types (for KubevirtFilterToolbar integration)
 export type ColumnLayoutColumn = {

@@ -1,7 +1,7 @@
 import { useLocation, useParams } from 'react-router';
 
 import useNamespaceParam from '@kubevirt-utils/hooks/useNamespaceParam';
-import { Template } from '@kubevirt-utils/resources/template';
+import type { Template } from '@kubevirt-utils/resources/template';
 import {
   TemplateModelGroupVersionKind,
   VirtualMachineTemplateGroupVersionKind,

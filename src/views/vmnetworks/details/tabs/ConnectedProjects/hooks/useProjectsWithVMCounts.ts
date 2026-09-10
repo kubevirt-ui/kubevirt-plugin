@@ -1,10 +1,10 @@
 import useVMNetworkMatchedProjects from 'src/views/vmnetworks/hooks/useVMNetworkMatchedProjects';
 
 import { getName } from '@kubevirt-utils/resources/shared';
-import { ClusterUserDefinedNetworkKind } from '@kubevirt-utils/resources/udn/types';
+import type { ClusterUserDefinedNetworkKind } from '@kubevirt-utils/resources/udn/types';
 
 import useConnectedVMsWithNamespace from '../../../hooks/useConnectedVMsWithNamespace';
-import { ProjectWithVMCount } from '../../../types';
+import type { ProjectWithVMCount } from '../../../types';
 
 type UseProjectsWithVMCounts = (
   obj: ClusterUserDefinedNetworkKind,

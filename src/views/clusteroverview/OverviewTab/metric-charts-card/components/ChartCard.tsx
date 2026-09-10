@@ -1,4 +1,5 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import LoadingEmptyState from '@kubevirt-utils/components/LoadingEmptyState/LoadingEmptyState';
@@ -8,7 +9,7 @@ import { getNoDataAvailableMessage, isEmpty } from '@kubevirt-utils/utils/utils'
 import { Bullseye, Card, CardBody, Grid, GridItem } from '@patternfly/react-core';
 
 import useMetricChartData from '../utils/hooks/useMetricChartData';
-import { ChartCardProps } from '../utils/types';
+import type { ChartCardProps } from '../utils/types';
 import { getCurrentValue } from '../utils/utils';
 
 import MetricChart from './MetricChart';

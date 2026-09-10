@@ -1,8 +1,9 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import BlueArrowCircleUpIcon from '@overview/utils/Components/BlueArrowCircleUpIcon';
-import { SubscriptionKind } from '@overview/utils/types';
+import type { SubscriptionKind } from '@overview/utils/types';
 import { InProgressIcon } from '@patternfly/react-icons';
 import SettingsLink from '@settings/context/SettingsLink';
 

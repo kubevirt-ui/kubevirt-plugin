@@ -1,6 +1,6 @@
-import { TFunction } from 'i18next';
+import type { TFunction } from 'i18next';
 
-import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
+import type { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
 export type SearchKeyBadge = {
   filterType: VirtualMachineRowFilterType;

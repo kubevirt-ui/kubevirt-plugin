@@ -1,5 +1,5 @@
-import { HorizontalNavTab } from '@openshift-console/dynamic-plugin-sdk';
-import { CodeRef, Extension } from '@openshift-console/dynamic-plugin-sdk/lib/types';
+import type { HorizontalNavTab } from '@openshift-console/dynamic-plugin-sdk';
+import type { CodeRef, Extension } from '@openshift-console/dynamic-plugin-sdk/lib/types';
 
 /**
  * Expands Console `console.tab/horizontalNav` to allow controlling tab visibility.

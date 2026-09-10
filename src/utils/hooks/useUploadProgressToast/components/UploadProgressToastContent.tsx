@@ -1,4 +1,5 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
 import { UPLOAD_PROGRESS_STATUS } from '../constants';
 import { useUploadProgressStore } from '../uploadProgressStore';
@@ -8,7 +9,7 @@ import UploadProgressErrorToast from './UploadProgressErrorToast';
 import UploadProgressSuccessToast from './UploadProgressSuccessToast';
 import UploadProgressUploadingToast from './UploadProgressUploadingToast';
 
-import { UploadEntry } from '../types';
+import type { UploadEntry } from '../types';
 
 type UploadProgressToastContentProps = {
   navigate: (path: string) => void;

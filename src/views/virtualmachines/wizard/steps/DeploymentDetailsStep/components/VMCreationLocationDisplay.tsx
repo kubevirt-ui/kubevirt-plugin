@@ -1,5 +1,6 @@
 import classNames from 'classnames';
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 import { useWatch } from 'react-hook-form';
 
 import EditButton from '@kubevirt-utils/components/EditButton/EditButton';

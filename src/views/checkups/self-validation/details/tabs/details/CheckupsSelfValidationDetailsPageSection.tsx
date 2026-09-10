@@ -1,6 +1,7 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
-import {
+import type {
   IoK8sApiBatchV1Job,
   IoK8sApiCoreV1ConfigMap,
 } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
@@ -17,8 +18,8 @@ import {
 
 import { CheckupsStatus, getJobStatus } from '../../../../utils/utils';
 import TestStatistics from '../../../components/shared/TestStatistics';
+import type { JobResults } from '../../../utils';
 import {
-  JobResults,
   TOTAL_TESTS_FAILED_KEY,
   TOTAL_TESTS_PASSED_KEY,
   TOTAL_TESTS_RUN_KEY,

@@ -1,13 +1,14 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
 import ActionDropdownItem from '@kubevirt-utils/components/ActionDropdownItem/ActionDropdownItem';
-import { ActionDropdownItemType } from '@kubevirt-utils/components/ActionsDropdown/constants';
+import type { ActionDropdownItemType } from '@kubevirt-utils/components/ActionsDropdown/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Divider, MenuGroup, MenuList, TooltipPosition } from '@patternfly/react-core';
 
 import useGroupedActions from './hooks/useGroupedActions';
 import { RIGHT_CLICK_MENU_Z_INDEX } from './constants';
-import { RightClickActionMenuProps } from './RightClickActionMenu';
+import type { RightClickActionMenuProps } from './RightClickActionMenu';
 import RightClickMenuWrapper from './RightClickMenuWrapper';
 
 type GroupedRightClickActionMenuProps = RightClickActionMenuProps & {

@@ -1,4 +1,4 @@
-import { KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
+import type { KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { type TemplateOrRequest } from '@kubevirt-utils/resources/template';
 import { TEMPLATE_TYPE_ID } from '@templates/list/filters/constants';
 import { TemplateFilterType } from '@templates/list/filters/types';

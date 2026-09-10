@@ -1,6 +1,6 @@
 import { CAPACITY_UNITS } from '@kubevirt-utils/components/CapacityInput/utils';
 import { ApplicationAwareResourceQuotaModel } from '@kubevirt-utils/models';
-import { ApplicationAwareResourceQuota } from '@kubevirt-utils/resources/quotas/types';
+import type { ApplicationAwareResourceQuota } from '@kubevirt-utils/resources/quotas/types';
 
 export const initialQuotaYaml: ApplicationAwareResourceQuota = {
   apiVersion: `${ApplicationAwareResourceQuotaModel.apiGroup}/${ApplicationAwareResourceQuotaModel.apiVersion}`,

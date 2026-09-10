@@ -1,7 +1,7 @@
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { PROJECT_NAME_LABEL_KEY } from '@kubevirt-utils/constants/constants';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { Selector } from '@openshift-console/dynamic-plugin-sdk';
+import type { Selector } from '@openshift-console/dynamic-plugin-sdk';
 
 import { ProjectMappingOption } from '../../form/constants';
 

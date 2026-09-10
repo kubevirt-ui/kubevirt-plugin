@@ -1,4 +1,4 @@
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import type { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 
 export const createMockVM = (overrides: Partial<V1VirtualMachine> = {}): V1VirtualMachine => ({
   apiVersion: 'kubevirt.io/v1',

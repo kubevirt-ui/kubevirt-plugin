@@ -1,11 +1,12 @@
-import React, { FC, useMemo } from 'react';
+import type { FC } from 'react';
+import React, { useMemo } from 'react';
 
 import { VirtualMachineClusterInstancetypeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { readableSizeUnit } from '@kubevirt-utils/utils/units';
 import { MenuItem } from '@patternfly/react-core';
 
-import { InstanceTypeSize } from '../../utils/types';
+import type { InstanceTypeSize } from '../../utils/types';
 import { is1GiInstanceType, seriesHasHugepagesVariant } from '../../utils/utils';
 
 type RedHatInstanceTypeSeriesSizesMenuItemProps = {

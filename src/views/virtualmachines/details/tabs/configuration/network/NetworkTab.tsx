@@ -1,4 +1,5 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
@@ -7,7 +8,7 @@ import { PATHS_TO_HIGHLIGHT } from '@kubevirt-utils/resources/vm/utils/constants
 import { PageSection, Title } from '@patternfly/react-core';
 
 import { onSubmitYAML } from '../details/utils/utils';
-import { ConfigurationInnerTabProps } from '../utils/types';
+import type { ConfigurationInnerTabProps } from '../utils/types';
 
 import AddNetworkInterfaceButton from './components/AddNetworkInterfaceButton';
 import NetworkInterfaceList from './components/list/NetworkInterfaceList';

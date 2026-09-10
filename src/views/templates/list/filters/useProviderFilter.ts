@@ -1,14 +1,14 @@
 import { useMemo } from 'react';
 
-import { KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
+import type { KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getLabel } from '@kubevirt-utils/resources/shared';
+import type { TemplateOrRequest } from '@kubevirt-utils/resources/template';
 import {
   isOpenShiftTemplate,
   isVirtualMachineTemplateRequest,
   TEMPLATE_TYPE_BASE,
   TEMPLATE_TYPE_LABEL,
-  TemplateOrRequest,
 } from '@kubevirt-utils/resources/template';
 import { OTHER } from '@kubevirt-utils/utils/constants';
 

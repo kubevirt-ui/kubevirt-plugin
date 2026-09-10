@@ -1,20 +1,18 @@
 import { DataImportCronModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { DataSourceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { DataVolumeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import {
+import type {
   V1beta1DataImportCron,
   V1beta1DataSource,
   V1beta1DataVolume,
 } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import { DEFAULT_DISK_SIZE } from '@kubevirt-utils/components/DiskModal/utils/constants';
-import {
-  TLS_CERT_SOURCE_EXISTING,
-  TLSCertSourceType,
-} from '@kubevirt-utils/components/TLSCertificateSection';
+import type { TLSCertSourceType } from '@kubevirt-utils/components/TLSCertificateSection';
+import { TLS_CERT_SOURCE_EXISTING } from '@kubevirt-utils/components/TLSCertificateSection';
 import { OPENSHIFT_OS_IMAGES_NS } from '@kubevirt-utils/constants/constants';
 import { CDI_BIND_REQUESTED_ANNOTATION } from '@kubevirt-utils/hooks/useCDIUpload/consts';
 
-import { AddBootableVolumeState } from './types';
+import type { AddBootableVolumeState } from './types';
 
 export const SOURCE_DETAILS_SECTION_ID = 'source-details-section';
 

@@ -1,8 +1,9 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import type { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import NetworkIcon from '@kubevirt-utils/components/NetworkIcons/NetworkIcon';
-import { NetworkPresentation } from '@kubevirt-utils/resources/vm/utils/network/constants';
+import type { NetworkPresentation } from '@kubevirt-utils/resources/vm/utils/network/constants';
 import { getConfigInterfaceStateFromVM } from '@kubevirt-utils/resources/vm/utils/network/selectors';
 
 type StateCellProps = {

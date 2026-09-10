@@ -1,4 +1,8 @@
-import { V1Interface, V1Network, V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import type {
+  V1Interface,
+  V1Network,
+  V1VirtualMachine,
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 
 export type InterfacesData = {
   iface: V1Interface;

@@ -1,6 +1,6 @@
-import { V1Interface, V1Network } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import type { V1Interface, V1Network } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 
-import { NetworkPresentation } from './constants';
+import type { NetworkPresentation } from './constants';
 
 /**
  * function to get network interfaces row data from networks and interfaces

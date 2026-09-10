@@ -1,5 +1,5 @@
-import { V1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
-import {
+import type { V1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
+import type {
   V1beta1DataVolumeSourceHTTP,
   V1beta1DataVolumeSourceRef,
   V1DataVolumeTemplateSpec,

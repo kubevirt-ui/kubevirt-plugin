@@ -1,10 +1,11 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 import { getVMTemplateBaseName } from 'src/views/templates/utils/selectors';
 
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { modelToGroupVersionKind, TemplateModel } from '@kubevirt-utils/models';
-import { Template } from '@kubevirt-utils/resources/template';
+import type { Template } from '@kubevirt-utils/resources/template';
 import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
 import { Content } from '@patternfly/react-core';
 

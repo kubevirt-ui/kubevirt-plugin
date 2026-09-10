@@ -1,4 +1,5 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 import { useFormContext } from 'react-hook-form';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -17,7 +18,7 @@ import {
 } from '@patternfly/react-core';
 
 import { getVMNetworkProjects } from '../../utils';
-import { VMNetworkForm } from '../constants';
+import type { VMNetworkForm } from '../constants';
 
 const SelectedProjects: FC = () => {
   const { t } = useKubevirtTranslation();

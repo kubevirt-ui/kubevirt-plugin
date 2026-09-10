@@ -1,9 +1,9 @@
-import {
+import type {
   NavSection,
   ResourceClusterNavItem,
   ResourceNSNavItem,
 } from '@openshift-console/dynamic-plugin-sdk';
-import { EncodedExtension } from '@openshift-console/dynamic-plugin-sdk-webpack';
+import type { EncodedExtension } from '@openshift-console/dynamic-plugin-sdk-webpack';
 
 import { PERSPECTIVES } from '../../utils/constants/constants';
 

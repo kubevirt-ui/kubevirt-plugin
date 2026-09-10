@@ -1,4 +1,4 @@
-import {
+import type {
   V1beta1VirtualMachineClusterPreference,
   V1beta1VirtualMachinePreference,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -7,15 +7,11 @@ import {
   PREFERENCE_DISPLAY_NAME_KEY,
 } from '@kubevirt-utils/constants/instancetypes-and-preferences';
 import { ALL_PROJECTS } from '@kubevirt-utils/hooks/constants';
-import { PaginationState } from '@kubevirt-utils/hooks/usePagination/utils/types';
+import type { PaginationState } from '@kubevirt-utils/hooks/usePagination/utils/types';
 import { getPreference } from '@kubevirt-utils/resources/bootableresources/helpers';
-import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
-import {
-  getAnnotation,
-  getLabel,
-  NamespacedResourceMap,
-  ResourceMap,
-} from '@kubevirt-utils/resources/shared';
+import type { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
+import type { NamespacedResourceMap, ResourceMap } from '@kubevirt-utils/resources/shared';
+import { getAnnotation, getLabel } from '@kubevirt-utils/resources/shared';
 import { LINUX, OS_NAME_TYPES } from '@kubevirt-utils/resources/template';
 import { OS_IMAGES_NS } from '@kubevirt-utils/utils/utils';
 

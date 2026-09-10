@@ -1,7 +1,5 @@
-import {
-  MultiNamespaceVirtualMachineStorageMigrationPlan,
-  STORAGE_MIGRATION_PHASE,
-} from '@kubevirt-utils/resources/migrations/constants';
+import type { MultiNamespaceVirtualMachineStorageMigrationPlan } from '@kubevirt-utils/resources/migrations/constants';
+import { STORAGE_MIGRATION_PHASE } from '@kubevirt-utils/resources/migrations/constants';
 import { isMigrationCompleted } from '@kubevirt-utils/resources/migrations/utils';
 import { getStatusNamespaces } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';

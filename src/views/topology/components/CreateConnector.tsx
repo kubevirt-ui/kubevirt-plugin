@@ -1,7 +1,9 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { DefaultCreateConnector, Point } from '@patternfly/react-topology';
+import type { Point } from '@patternfly/react-topology';
+import { DefaultCreateConnector } from '@patternfly/react-topology';
 
 type CreateConnectorProps = {
   dragging?: boolean;

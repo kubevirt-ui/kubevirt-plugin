@@ -1,11 +1,12 @@
-import React, { FC, useMemo } from 'react';
+import type { FC } from 'react';
+import React, { useMemo } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Label, MenuList } from '@patternfly/react-core';
 
 import useSearchKeyBadges from '../hooks/useSearchKeyBadges';
-import { SearchKeyBadge } from '../types';
+import type { SearchKeyBadge } from '../types';
 import { getFilteredKeyBadges } from '../utils';
 
 import SearchMenuItem from './SearchMenuItem';

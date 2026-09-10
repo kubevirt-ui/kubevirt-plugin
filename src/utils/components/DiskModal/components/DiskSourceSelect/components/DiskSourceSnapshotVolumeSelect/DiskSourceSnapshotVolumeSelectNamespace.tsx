@@ -1,8 +1,10 @@
-import React, { FC } from 'react';
-import { Controller, FieldPath, useFormContext } from 'react-hook-form';
+import type { FC } from 'react';
+import React from 'react';
+import type { FieldPath } from 'react-hook-form';
+import { Controller, useFormContext } from 'react-hook-form';
 
 import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1DiskFormState } from '@kubevirt-utils/components/DiskModal/utils/types';
+import type { V1DiskFormState } from '@kubevirt-utils/components/DiskModal/utils/types';
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import Loading from '@kubevirt-utils/components/Loading/Loading';

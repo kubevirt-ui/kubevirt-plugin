@@ -1,10 +1,11 @@
-import React, { FC, Suspense } from 'react';
+import type { FC } from 'react';
+import React, { Suspense } from 'react';
 
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { getUID } from '@kubevirt-utils/resources/shared';
 import { ResourceYAMLEditor } from '@openshift-console/dynamic-plugin-sdk';
 import { Bullseye } from '@patternfly/react-core';
-import { NavPageComponentProps } from '@virtualmachines/details/utils/types';
+import type { NavPageComponentProps } from '@virtualmachines/details/utils/types';
 
 import './virtual-machine-yaml-page.scss';
 

@@ -4,7 +4,7 @@ import {
   DROPDOWN_FORM_SELECTION,
   initialBootableVolumeState,
 } from '@kubevirt-utils/components/AddBootableVolumeModal/consts';
-import {
+import type {
   AddBootableVolumeState,
   UseAddBootableVolumeModalData,
 } from '@kubevirt-utils/components/AddBootableVolumeModal/types';

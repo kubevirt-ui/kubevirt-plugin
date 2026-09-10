@@ -1,6 +1,6 @@
 import xbytes from 'xbytes';
 
-import { PrometheusResponse } from '@openshift-console/dynamic-plugin-sdk';
+import type { PrometheusResponse } from '@openshift-console/dynamic-plugin-sdk';
 
 export const getInterfaceNetworkRate = (
   networkTotal: PrometheusResponse,

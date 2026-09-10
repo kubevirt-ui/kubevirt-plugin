@@ -1,6 +1,6 @@
-import { VMINetworkPresentation } from '@kubevirt-utils/resources/vmi/types';
+import type { VMINetworkPresentation } from '@kubevirt-utils/resources/vmi/types';
 
-import { NetworkPresentation } from './constants';
+import type { NetworkPresentation } from './constants';
 
 export enum NetworkInterfaceState {
   'ABSENT' = 'absent',

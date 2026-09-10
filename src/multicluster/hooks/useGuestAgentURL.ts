@@ -1,4 +1,4 @@
-import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import type { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 
 import useVMISubresourceURL from './useVMISubresourceURL';
 

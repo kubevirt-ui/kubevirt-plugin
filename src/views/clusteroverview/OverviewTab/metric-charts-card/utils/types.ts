@@ -1,4 +1,4 @@
-import { MetricChartData } from './hooks/useMetricChartData';
+import type { MetricChartData } from './hooks/useMetricChartData';
 
 export type ChartCardProps = {
   metric: string;

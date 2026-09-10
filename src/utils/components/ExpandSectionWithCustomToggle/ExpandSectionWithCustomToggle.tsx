@@ -1,12 +1,12 @@
-import { FC, ReactNode } from 'react';
+import type { FC, ReactNode } from 'react';
 import React from 'react';
 import classNames from 'classnames';
 
+import type { PopoverProps } from '@patternfly/react-core';
 import {
   ExpandableSection,
   ExpandableSectionToggle,
   PopoverPosition,
-  PopoverProps,
   Split,
   SplitItem,
   Stack,

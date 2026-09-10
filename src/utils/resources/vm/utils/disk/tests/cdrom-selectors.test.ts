@@ -1,4 +1,4 @@
-import { V1Disk, V1Volume } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import type { V1Disk, V1Volume } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getDisks, getVolumes } from '@kubevirt-utils/resources/vm';
 import { isRunning } from '@virtualmachines/utils';
 

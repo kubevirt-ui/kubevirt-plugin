@@ -1,4 +1,5 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router';
 
 import AddBootableVolumeBody from '@kubevirt-utils/components/AddBootableVolumeModal/components/AddBootableVolumeBody';
@@ -6,7 +7,7 @@ import { handleAddBootableVolumeSuccess } from '@kubevirt-utils/components/AddBo
 import { emptyDataSource } from '@kubevirt-utils/components/AddBootableVolumeModal/consts';
 import { useAddBootableVolumeFormValidation } from '@kubevirt-utils/components/AddBootableVolumeModal/hooks/useAddBootableVolumeFormValidation';
 import useAddBootableVolumeModalData from '@kubevirt-utils/components/AddBootableVolumeModal/hooks/useAddBootableVolumeModalData';
-import { AddBootableVolumeModalProps } from '@kubevirt-utils/components/AddBootableVolumeModal/types';
+import type { AddBootableVolumeModalProps } from '@kubevirt-utils/components/AddBootableVolumeModal/types';
 import {
   getAddBootableVolumeSubmitBtnText,
   handleAddBootableVolumeModalClose,

@@ -1,9 +1,10 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
 import DescriptionItemAnnotations from '@kubevirt-utils/components/DescriptionItem/components/DescriptionItemAnnotations';
 import DescriptionItemLabels from '@kubevirt-utils/components/DescriptionItem/components/DescriptionItemLabels';
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
-import { K8sModel, K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+import type { K8sModel, K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { DescriptionList, Grid } from '@patternfly/react-core';
 
 type AdvancedViewProps = {

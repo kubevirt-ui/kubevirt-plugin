@@ -1,12 +1,13 @@
-import React, { FC, ReactNode } from 'react';
+import type { FC, ReactNode } from 'react';
+import React from 'react';
 
-import {
+import type {
   V1VirtualMachine,
   V1VirtualMachineInstance,
   V1VirtualMachineInstanceGuestAgentInfo,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import FileSystemList from '@kubevirt-utils/components/FileSystemList/FileSystemList';
-import { FileSystemData } from '@kubevirt-utils/components/FileSystemList/fileSystemListDefinition';
+import type { FileSystemData } from '@kubevirt-utils/components/FileSystemList/fileSystemListDefinition';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isGuestAgentConnected } from '@kubevirt-utils/resources/vmi';

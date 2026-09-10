@@ -1,7 +1,7 @@
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 
 import { DEBUG, INFO } from './utils/constants';
-import { VncLogLevel } from './utils/VncConsoleTypes';
+import type { VncLogLevel } from './utils/VncConsoleTypes';
 
 export type VncLoggerType = {
   log: (logLevel: VncLogLevel, ...args: unknown[]) => void;

@@ -1,4 +1,5 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -7,7 +8,7 @@ import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { List, ListItem, Stack } from '@patternfly/react-core';
 
 import { calculationMethods } from '../constants';
-import { CalculationMethodContentMapper } from '../types';
+import type { CalculationMethodContentMapper } from '../types';
 
 type QuotaCalculationMethodTermProps = {
   calculationMethodContentMapper: CalculationMethodContentMapper;

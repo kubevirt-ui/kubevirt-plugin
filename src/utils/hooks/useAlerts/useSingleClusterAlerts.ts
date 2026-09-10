@@ -3,13 +3,9 @@ import { useMemo } from 'react';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
-import { PrometheusRulesResponse } from '@kubevirt-utils/types/prometheus';
-import {
-  Alert,
-  PrometheusEndpoint,
-  PrometheusResponse,
-  usePrometheusPoll,
-} from '@openshift-console/dynamic-plugin-sdk';
+import type { PrometheusRulesResponse } from '@kubevirt-utils/types/prometheus';
+import type { Alert, PrometheusResponse } from '@openshift-console/dynamic-plugin-sdk';
+import { PrometheusEndpoint, usePrometheusPoll } from '@openshift-console/dynamic-plugin-sdk';
 
 import useSilences from '../useSilences/useSilences';
 

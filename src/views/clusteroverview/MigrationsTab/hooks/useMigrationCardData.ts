@@ -4,14 +4,14 @@ import {
   VirtualMachineInstanceMigrationModelGroupVersionKind,
   VirtualMachineInstanceModelGroupVersionKind,
 } from '@kubevirt-ui-ext/kubevirt-api/console';
-import {
+import type {
   V1VirtualMachineInstance,
   V1VirtualMachineInstanceMigration,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { ALL_CLUSTERS_KEY, ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
 import { useClusterObservabilityDisabled } from '@kubevirt-utils/hooks/useAlerts/utils/useClusterObservabilityDisabled';
-import {
+import type {
   KubevirtFilter,
   KubevirtFilterState,
   OnSetFilters,
@@ -21,7 +21,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
 import useMigrationPolicies from '@kubevirt-utils/hooks/useMigrationPolicies';
 import useActiveClusterParam from '@multicluster/hooks/useActiveClusterParam';
-import { AdvancedSearchFilter } from '@stolostron/multicluster-sdk';
+import type { AdvancedSearchFilter } from '@stolostron/multicluster-sdk';
 
 import useHyperConvergedMigrations from '../components/LiveMigrationSettingsPopover/hooks/useHyperConvergedMigrations';
 import {
@@ -29,10 +29,8 @@ import {
   getStatusFilter,
   getTargetNodeFilter,
 } from '../components/MigrationsTable/utils/filters';
-import {
-  getMigrationsTableData,
-  MigrationTableDataLayout,
-} from '../components/MigrationsTable/utils/utils';
+import type { MigrationTableDataLayout } from '../components/MigrationsTable/utils/utils';
+import { getMigrationsTableData } from '../components/MigrationsTable/utils/utils';
 
 export type UseMigrationCardDataAndFiltersValues = {
   clearAllFilters: () => void;

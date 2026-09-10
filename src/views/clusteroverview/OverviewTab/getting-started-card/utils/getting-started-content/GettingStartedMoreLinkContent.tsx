@@ -1,9 +1,10 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 import { Link } from 'react-router';
 
 import { Button, ButtonVariant } from '@patternfly/react-core';
 
-import { GettingStartedLink } from '../types';
+import type { GettingStartedLink } from '../types';
 
 export type GettingStartedMoreLinkContentProps = {
   moreLink: GettingStartedLink;

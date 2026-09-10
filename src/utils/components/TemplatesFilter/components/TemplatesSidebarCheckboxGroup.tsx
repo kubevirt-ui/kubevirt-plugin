@@ -1,6 +1,6 @@
 import React, { type FC } from 'react';
 
-import { KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
+import type { KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { type TemplateOrRequest } from '@kubevirt-utils/resources/template';
 import { Checkbox, Stack, StackItem } from '@patternfly/react-core';
 

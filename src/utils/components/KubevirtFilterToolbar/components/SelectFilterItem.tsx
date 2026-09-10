@@ -1,12 +1,13 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
 import CheckboxSelect from '@kubevirt-utils/components/CheckboxSelect/CheckboxSelect';
-import {
+import type {
   KubevirtFilter,
   KubevirtFilterState,
   OnSetFilters,
 } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
-import { MenuToggleProps } from '@patternfly/react-core';
+import type { MenuToggleProps } from '@patternfly/react-core';
 
 import { getOnSelect } from '../utils';
 

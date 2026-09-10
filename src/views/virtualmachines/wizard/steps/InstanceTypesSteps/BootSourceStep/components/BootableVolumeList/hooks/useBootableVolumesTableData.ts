@@ -1,24 +1,24 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useWatch } from 'react-hook-form';
 
-import {
+import type {
   V1beta1VirtualMachineClusterPreference,
   V1beta1VirtualMachinePreference,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { ALL_PROJECTS } from '@kubevirt-utils/hooks/constants';
 import useKubevirtDataViewFilters from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/useKubevirtDataViewFilters';
-import {
+import type {
   KubevirtFilter,
   KubevirtFilterState,
   OnSetFilters,
 } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { PaginationState } from '@kubevirt-utils/hooks/usePagination/utils/types';
-import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
-import { NamespacedResourceMap, ResourceMap } from '@kubevirt-utils/resources/shared';
+import type { PaginationState } from '@kubevirt-utils/hooks/usePagination/utils/types';
+import type { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
+import type { NamespacedResourceMap, ResourceMap } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { ColumnLayout } from '@openshift-console/dynamic-plugin-sdk';
-import { ThSortType } from '@patternfly/react-table/dist/esm/components/Table/base/types';
+import type { ColumnLayout } from '@openshift-console/dynamic-plugin-sdk';
+import type { ThSortType } from '@patternfly/react-table/dist/esm/components/Table/base/types';
 import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
 import { CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
 import useBootVolumeColumns from '@virtualmachines/wizard/steps/InstanceTypesSteps/BootSourceStep/components/BootableVolumeList/hooks/useBootVolumeColumns';
@@ -26,9 +26,9 @@ import useBootVolumeSortColumns from '@virtualmachines/wizard/steps/InstanceType
 import { paginationInitialStateForm } from '@virtualmachines/wizard/steps/InstanceTypesSteps/BootSourceStep/components/BootableVolumeList/utils/constants';
 import { getBootVolumeTableFilters } from '@virtualmachines/wizard/steps/InstanceTypesSteps/BootSourceStep/components/BootableVolumeList/utils/getBootVolumeFilters';
 import { filterBootableVolumesByPreference } from '@virtualmachines/wizard/steps/InstanceTypesSteps/BootSourceStep/components/BootableVolumeList/utils/utils';
-import { UseBootableVolumesValues } from '@virtualmachines/wizard/utils/types';
+import type { UseBootableVolumesValues } from '@virtualmachines/wizard/utils/types';
 
-import { TableColumnWithOptionalIndex } from '../../../types';
+import type { TableColumnWithOptionalIndex } from '../../../types';
 
 type BootableVolumesTableData = {
   activeColumns: TableColumnWithOptionalIndex<BootableVolume>[];

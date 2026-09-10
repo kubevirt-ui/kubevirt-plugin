@@ -1,4 +1,5 @@
-import React, { FC, useMemo } from 'react';
+import type { FC } from 'react';
+import React, { useMemo } from 'react';
 
 import { MigrationPolicyModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
@@ -8,7 +9,7 @@ import MulticlusterResourceLink from '@multicluster/components/MulticlusterResou
 import { getCluster } from '@multicluster/helpers/selectors';
 import { Tooltip } from '@patternfly/react-core';
 
-import { MigrationTableDataLayout } from '../../utils/utils';
+import type { MigrationTableDataLayout } from '../../utils/utils';
 
 import { migrationsConfigTooltipFields } from './utils';
 

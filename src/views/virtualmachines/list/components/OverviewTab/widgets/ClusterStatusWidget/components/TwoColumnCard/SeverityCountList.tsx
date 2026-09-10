@@ -1,10 +1,11 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
 import { getItemLabel, getSeverityLabel } from '../../hooks/clusterMetricConstants';
 
-import { SeverityCountListProps } from './types';
+import type { SeverityCountListProps } from './types';
 
 import './TwoColumnCard.scss';
 

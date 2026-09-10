@@ -1,5 +1,5 @@
-import { QueryParams } from '@openshift-console/dynamic-plugin-sdk';
-import { EventKind } from '@openshift-console/dynamic-plugin-sdk/lib/api/internal-types';
+import type { QueryParams } from '@openshift-console/dynamic-plugin-sdk';
+import type { EventKind } from '@openshift-console/dynamic-plugin-sdk/lib/api/internal-types';
 
 export enum EventType {
   Added = 'ADDED',

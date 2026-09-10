@@ -1,4 +1,5 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 import { getCountText } from 'src/views/quotas/details/utils';
 import {
   getQuotaNumbers,
@@ -7,7 +8,7 @@ import {
 } from 'src/views/quotas/utils/utils';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { QuotaStatus } from '@kubevirt-utils/resources/quotas/types';
+import type { QuotaStatus } from '@kubevirt-utils/resources/quotas/types';
 import { Td, Tr } from '@patternfly/react-table';
 
 import { QuotaCapacityIcon } from './QuotaCapacityIcon';

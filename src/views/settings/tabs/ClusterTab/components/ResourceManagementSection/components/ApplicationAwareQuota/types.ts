@@ -1,4 +1,4 @@
-import { CalculationMethod } from '@kubevirt-utils/resources/quotas/types';
+import type { CalculationMethod } from '@kubevirt-utils/resources/quotas/types';
 
 export type CalculationMethodContent = {
   description: string;

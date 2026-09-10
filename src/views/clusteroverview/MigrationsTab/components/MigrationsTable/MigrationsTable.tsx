@@ -1,4 +1,5 @@
-import React, { FC, useMemo } from 'react';
+import type { FC } from 'react';
+import React, { useMemo } from 'react';
 
 import { NodeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import KubevirtFilterToolbar from '@kubevirt-utils/components/KubevirtFilterToolbar/KubevirtFilterToolbar';
@@ -10,10 +11,11 @@ import useKubevirtTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettin
 import usePaginationWithFilters from '@kubevirt-utils/hooks/usePagination/usePaginationWithFilters';
 import { paginationDefaultValues } from '@kubevirt-utils/hooks/usePagination/utils/constants';
 import { isAllNamespaces, isEmpty } from '@kubevirt-utils/utils/utils';
-import { K8sVerb, ListPageBody, useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
+import type { K8sVerb } from '@openshift-console/dynamic-plugin-sdk';
+import { ListPageBody, useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
 import { Pagination } from '@patternfly/react-core';
 
-import { UseMigrationCardDataAndFiltersValues } from '../../hooks/useMigrationCardData';
+import type { UseMigrationCardDataAndFiltersValues } from '../../hooks/useMigrationCardData';
 
 import { getMigrationsTableColumns, getMigrationsTableRowId } from './migrationsTableDefinition';
 import { COLUMN_MANAGEMENT_ID_MIGRATIONS, MIGRATION_COLUMN_KEYS } from './utils/constants';
