@@ -1,18 +1,15 @@
-/* eslint-disable */
-import React, { FC, useState } from 'react';
+import React, { type FC, useState } from 'react';
 
-import ExpandSectionWithCustomToggle from '@kubevirt-utils/components/ExpandSectionWithCustomToggle/ExpandSectionWithCustomToggle';
 import NewBadge from '@kubevirt-utils/components/badges/NewBadge/NewBadge';
-import { HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
+import ExpandSectionWithCustomToggle from '@kubevirt-utils/components/ExpandSectionWithCustomToggle/ExpandSectionWithCustomToggle';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Skeleton, Stack, StackItem } from '@patternfly/react-core';
 import { useSettingsCluster } from '@settings/context/SettingsClusterContext';
 import { CLUSTER_TAB_IDS } from '@settings/search/constants';
 
-import { getGeneralSettingsLabels } from '../consts/consts';
+import { getGeneralSettingsLabels, type HyperConvergeConfigurationWatch } from '../consts/consts';
 import GeneralSettingsError from '../shared/GeneralSettingsError';
-
 import ActiveRatio from './components/ActiveRatio';
 import MemoryRequestRatioHelpContent from './components/MemoryRequestRatioHelpContent';
 import MemoryRequestRatioInput from './components/MemoryRequestRatioInput';
@@ -21,7 +18,7 @@ import { useMemoryRequestRatio } from './hooks/useMemoryRequestRatio';
 import { getCurrentOvercommit } from './utils/utils';
 
 type MemoryDensityProps = {
-  hyperConvergeConfiguration: [hyperConvergeConfig: HyperConverged, loaded: boolean, error: any];
+  hyperConvergeConfiguration: HyperConvergeConfigurationWatch;
 };
 
 const MemoryDensity: FC<MemoryDensityProps> = ({ hyperConvergeConfiguration }) => {
@@ -29,7 +26,7 @@ const MemoryDensity: FC<MemoryDensityProps> = ({ hyperConvergeConfiguration }) =
   const cluster = useSettingsCluster();
   const isAdmin = useIsAdmin();
   const [hyperConverge, hyperLoaded] = hyperConvergeConfiguration;
-  const [error, setError] = useState<any>(null);
+  const [error, setError] = useState<unknown>(null);
 
   const currentOvercommit = getCurrentOvercommit(hyperConverge);
 
@@ -37,7 +34,7 @@ const MemoryDensity: FC<MemoryDensityProps> = ({ hyperConvergeConfiguration }) =
   const { hasChanged, inputValue, isLoading, onChange, onRestoreDefault, onSave } =
     useMemoryRequestRatio({ cluster, currentOvercommit, hyperConverge });
 
-  const handleSave = async () => {
+  const handleSave = async (): Promise<void> => {
     setError(null);
     try {
       await onSave();

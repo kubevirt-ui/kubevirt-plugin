@@ -1,13 +1,13 @@
-/* eslint-disable */
-import React, { MouseEvent, useEffect, useState } from 'react';
+import React, { type FC, type MouseEvent, useEffect, useState } from 'react';
 
 import { NetworkAttachmentDefinitionModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
+import { type HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { type NetworkAttachmentDefinitionKind } from '@kubevirt-utils/resources/nad/types';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
-import { NetworkAttachmentDefinitionKind } from '@kubevirt-utils/resources/nad/types';
 import {
   Alert,
   AlertVariant,
@@ -27,7 +27,11 @@ import {
   updateLiveMigrationConfig,
 } from '../utils/utils';
 
-const Network = ({ hyperConverge }) => {
+type NetworkProps = {
+  hyperConverge: HyperConverged;
+};
+
+const Network: FC<NetworkProps> = ({ hyperConverge }) => {
   const { t } = useKubevirtTranslation();
   const cluster = useSettingsCluster();
   const [selectedNetwork, setSelectedNetwork] = useState<string>('');
@@ -44,8 +48,8 @@ const Network = ({ hyperConverge }) => {
     }
   }, [hyperConverge]);
 
-  const onSelect = (_event: MouseEvent<Element>, selectedValue: string) => {
-    updateLiveMigrationConfig(
+  const onSelect = (_event: MouseEvent<Element>, selectedValue: string): void => {
+    void updateLiveMigrationConfig(
       hyperConverge,
       selectedValue !== PRIMARY_NETWORK ? selectedValue : null,
       'network',

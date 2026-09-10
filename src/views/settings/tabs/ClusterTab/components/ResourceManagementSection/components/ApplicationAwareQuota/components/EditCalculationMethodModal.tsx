@@ -1,17 +1,16 @@
-/* eslint-disable */
-import React, { FC, useState } from 'react';
+import React, { type FC, useState } from 'react';
 
 import { HyperConvergedV1Beta1Model as HyperConvergedModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
-import { HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
+import { type HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { CalculationMethod } from '@kubevirt-utils/resources/quotas/types';
+import { type CalculationMethod } from '@kubevirt-utils/resources/quotas/types';
 import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
 import { FormGroup, Radio } from '@patternfly/react-core';
 import { useSettingsCluster } from '@settings/context/SettingsClusterContext';
 
 import { calculationMethods } from '../constants';
-import { CalculationMethodContentMapper } from '../types';
+import { type CalculationMethodContentMapper } from '../types';
 
 type EditCalculationMethodModalProps = {
   calculationMethodContentMapper: CalculationMethodContentMapper;
@@ -33,7 +32,7 @@ const EditCalculationMethodModal: FC<EditCalculationMethodModalProps> = ({
 
   const [checkedMethod, setCheckedMethod] = useState<CalculationMethod>(initiallySelectedMethod);
 
-  const onSubmit = async () => {
+  const onSubmit = async (): Promise<void> => {
     if (checkedMethod === initiallySelectedMethod) {
       return;
     }

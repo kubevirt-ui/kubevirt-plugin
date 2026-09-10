@@ -1,8 +1,7 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
 import { MenuList } from '@patternfly/react-core';
-import { SearchKeyBadge } from '@search/components/SearchDropdown/types';
+import { type SearchKeyBadge } from '@search/components/SearchDropdown/types';
 
 import SearchKeyItem from './SearchKeyItem';
 
@@ -22,7 +21,7 @@ const SearchKeysList: FC<SearchKeysListProps> = ({
   startIndex = 0,
 }) => {
   const getCategoryLabel = (badge: SearchKeyBadge): string =>
-    labelLookup.get(badge.filterType) || badge.searchKey;
+    labelLookup.get(badge.filterType) ?? badge.searchKey;
 
   return (
     <MenuList>

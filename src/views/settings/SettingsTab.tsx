@@ -1,5 +1,5 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { createElement, type FC } from 'react';
+import classNames from 'classnames';
 
 import { Card, Tab, Tabs, TabTitleText } from '@patternfly/react-core';
 
@@ -7,7 +7,6 @@ import { useSettingsTabs } from './hooks/useSettingsTabs';
 
 import './settings-tab.scss';
 import '@kubevirt-utils/styles/cursor.scss';
-import classNames from 'classnames';
 
 const SettingsTab: FC = () => {
   const { activeTab, redirectTab, tabs } = useSettingsTabs();
@@ -29,7 +28,7 @@ const SettingsTab: FC = () => {
       </div>
       <div className="settings-tab__scrollable">
         <Card className="settings-tab__card">
-          {tabs.map(({ Component, dataTest, isFullWidth, name }) =>
+          {tabs.map(({ Component: tabComponent, dataTest, isFullWidth, name }) =>
             activeTab === name ? (
               <div
                 className={classNames('settings-tab__content', {
@@ -38,7 +37,7 @@ const SettingsTab: FC = () => {
                 data-test={dataTest}
                 key={name}
               >
-                <Component />
+                {createElement(tabComponent)}
               </div>
             ) : null,
           )}

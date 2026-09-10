@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React from 'react';
+import React, { type FC } from 'react';
 import classNames from 'classnames';
 
 import { createIcon } from '@patternfly/react-icons/dist/esm/createIcon';
@@ -23,7 +22,7 @@ type AdvancedSearchIconProps = {
   isLarge?: boolean;
 };
 
-const AdvancedSearchIcon = ({ isLarge = false }: AdvancedSearchIconProps) => {
+const AdvancedSearchIcon: FC<AdvancedSearchIconProps> = ({ isLarge = false }) => {
   return (
     <AdvancedSearchIconComponent className={classNames('advanced-search-icon', { isLarge })} />
   );

@@ -1,11 +1,9 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
-import { HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-utils/models';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
-import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+import { type K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { Stack, StackItem } from '@patternfly/react-core';
 import { useSettingsCluster } from '@settings/context/SettingsClusterContext';
 import ExpandSection from '@settings/ExpandSection/ExpandSection';
@@ -14,10 +12,10 @@ import AutomaticImagesDownload from '@settings/tabs/ClusterTab/components/Genera
 import BootableVolumeProjectSection from '@settings/tabs/ClusterTab/components/GeneralSettings/TemplatesAndImagesManagement/components/BootableVolumeProjectSection/BootableVolumeProjectSection';
 import TemplatesProjectSection from '@settings/tabs/ClusterTab/components/GeneralSettings/TemplatesAndImagesManagement/components/TemplatesProjectSection/TemplatesProjectSection';
 
-import { getGeneralSettingsLabels } from '../consts/consts';
+import { getGeneralSettingsLabels, type HyperConvergeConfigurationWatch } from '../consts/consts';
 
 type TemplatesAndImagesManagementProps = {
-  hyperConvergeConfiguration: [hyperConvergeConfig: HyperConverged, loaded: boolean, error: any];
+  hyperConvergeConfiguration: HyperConvergeConfigurationWatch;
   newBadge?: boolean;
 };
 

@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC, useState } from 'react';
+import React, { type FC, useState } from 'react';
 
 import { HyperConvergedV1Beta1Model as HyperConvergedModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import SectionWithSwitch from '@kubevirt-utils/components/SectionWithSwitch/SectionWithSwitch';
@@ -8,7 +7,7 @@ import {
   FEATURE_PERSISTENT_RESERVATION,
 } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
-import { HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
+import { type HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
@@ -35,7 +34,7 @@ const PersistentReservationSection: FC<PersistentReservationSectionProps> = ({
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const { toggleFeature } = useFeatures(FEATURE_HCO_PERSISTENT_RESERVATION, cluster);
 
-  const onChange = async (checked: boolean) => {
+  const onChange = async (checked: boolean): Promise<void> => {
     if (!hyperConverge) return;
     setError(null);
     setIsLoading(true);
@@ -57,8 +56,9 @@ const PersistentReservationSection: FC<PersistentReservationSectionProps> = ({
       });
 
       await toggleFeature(checked);
-    } catch (err) {
-      setError(err.message);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      setError(message);
     } finally {
       setIsLoading(false);
     }

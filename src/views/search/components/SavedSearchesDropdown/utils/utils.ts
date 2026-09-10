@@ -1,8 +1,10 @@
-/* eslint-disable */
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { type SavedSearchEntry } from '@search/savedSearches/types';
 
-export const getSortedSavedsearches = (searches: SavedSearchEntry[], filterText: string) => {
+export const getSortedSavedsearches = (
+  searches: SavedSearchEntry[],
+  filterText: string,
+): SavedSearchEntry[] => {
   const sorted = [...searches].sort((a, b) => Number(b.isFavorited) - Number(a.isFavorited));
   if (!filterText) return sorted;
   const lower = filterText.toLowerCase();

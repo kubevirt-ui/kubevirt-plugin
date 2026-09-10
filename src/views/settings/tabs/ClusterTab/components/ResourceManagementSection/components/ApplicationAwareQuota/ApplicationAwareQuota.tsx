@@ -1,10 +1,9 @@
-/* eslint-disable */
-import React, { FC, useEffect, useMemo, useState } from 'react';
+import React, { type FC, useEffect, useMemo, useState } from 'react';
 import { getQuotaListURL } from 'src/views/quotas/utils/url';
 
 import { HyperConvergedV1Beta1Model as HyperConvergedModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import SectionWithSwitch from '@kubevirt-utils/components/SectionWithSwitch/SectionWithSwitch';
-import { HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
+import { type HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getAAQCalculationMethod } from '@kubevirt-utils/resources/hyperconverged/selectors';
 import { isAAQEnabled } from '@kubevirt-utils/resources/hyperconverged/utils';
@@ -44,7 +43,7 @@ const ApplicationAwareQuota: FC<ApplicationAwareQuotaProps> = ({
     setIsEnabled(hyperLoaded ? aaqEnabled : false);
   }, [aaqEnabled, cluster, hyperLoaded]);
 
-  const onFeatureChange = (checked: boolean) => {
+  const onFeatureChange = (checked: boolean): void => {
     setIsLoading(true);
     kubevirtK8sPatch<HyperConverged>({
       cluster,

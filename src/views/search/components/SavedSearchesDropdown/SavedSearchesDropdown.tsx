@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { type FC, useMemo, useState } from 'react';
+import React, { type FC, type JSX, useMemo, useState } from 'react';
 
 import {
   type KubevirtFilterState,
@@ -48,7 +47,9 @@ const SavedSearchesDropdown: FC<SavedSearchesDropdownProps> = ({ filters, onSetF
       return getSavedSearchesItemsToDisplay(sorted);
     }, [searches, filterText]);
 
-  const savedSearchesItemsToDropdownItems = (savedSearchesItems: SavedSearchEntry[]) =>
+  const savedSearchesItemsToDropdownItems = (
+    savedSearchesItems: SavedSearchEntry[],
+  ): JSX.Element[] =>
     savedSearchesItems.map(({ description, isFavorited, name }) => (
       <SavedSearchItem
         description={description}

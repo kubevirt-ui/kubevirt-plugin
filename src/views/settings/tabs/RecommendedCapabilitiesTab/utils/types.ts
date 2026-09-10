@@ -1,5 +1,4 @@
-/* eslint-disable */
-import { OLSPromptType } from '@lightspeed/utils/prompts';
+import { type OLSPromptType } from '@lightspeed/utils/prompts';
 import { type K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import {
   type OperatorGroupKind,
@@ -24,7 +23,6 @@ export enum InstallState {
 }
 
 export type VirtFeatureOperatorItem = {
-  [key: string]: any;
   catalogSource?: string;
   catalogSourceNamespace?: string;
   createdAt?: string;

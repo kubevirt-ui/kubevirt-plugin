@@ -1,13 +1,12 @@
-/* eslint-disable */
-import React from 'react';
-import { TFunction } from 'i18next';
+import React, { type FC } from 'react';
+import { type TFunction } from 'i18next';
 
 import { VirtualMachineClusterPreferenceModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getK8sRowId } from '@kubevirt-utils/components/KubevirtTable/utils';
 import RedHatLabel from '@kubevirt-utils/components/RedHatLabel/RedHatLabel';
 import { VENDOR_LABEL } from '@kubevirt-utils/constants/constants';
-import { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
+import { type ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { getLabel, getName } from '@kubevirt-utils/resources/shared';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import MulticlusterResourceLink from '@multicluster/components/MulticlusterResourceLink/MulticlusterResourceLink';
@@ -15,7 +14,11 @@ import { getCluster } from '@multicluster/helpers/selectors';
 
 import ClusterPreferenceActions from '../actions/ClusterPreferenceActions';
 
-const NameCell = ({ row }: { row: V1beta1VirtualMachineClusterPreference }) => (
+type ClusterPreferenceCellProps = {
+  row: V1beta1VirtualMachineClusterPreference;
+};
+
+const NameCell: FC<ClusterPreferenceCellProps> = ({ row }) => (
   <>
     <MulticlusterResourceLink
       cluster={getCluster(row)}
@@ -27,11 +30,11 @@ const NameCell = ({ row }: { row: V1beta1VirtualMachineClusterPreference }) => (
   </>
 );
 
-const VendorCell = ({ row }: { row: V1beta1VirtualMachineClusterPreference }) => (
+const VendorCell: FC<ClusterPreferenceCellProps> = ({ row }) => (
   <>{getLabel(row, VENDOR_LABEL, NO_DATA_DASH)}</>
 );
 
-const ActionsCell = ({ row }: { row: V1beta1VirtualMachineClusterPreference }) => (
+const ActionsCell: FC<ClusterPreferenceCellProps> = ({ row }) => (
   <ClusterPreferenceActions isKebabToggle preference={row} />
 );
 

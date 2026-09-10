@@ -1,6 +1,5 @@
-/* eslint-disable */
 import useNamespaceParam from '@kubevirt-utils/hooks/useNamespaceParam';
-import { ApplicationAwareResourceQuota } from '@kubevirt-utils/resources/quotas/types';
+import { type ApplicationAwareResourceQuota } from '@kubevirt-utils/resources/quotas/types';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 
 type UseOnQuotaUpdate = (
@@ -14,17 +13,17 @@ type UseOnQuotaUpdate = (
 const useOnQuotaUpdate: UseOnQuotaUpdate = (formData, onChange) => {
   const namespace = useNamespaceParam();
 
-  const updateFormData = (updated: ApplicationAwareResourceQuota) => {
+  const updateFormData = (updated: ApplicationAwareResourceQuota): void => {
     onChange?.({
       ...updated,
       metadata: {
         ...updated?.metadata,
-        namespace: getNamespace(updated) || namespace,
+        namespace: getNamespace(updated) ?? namespace,
       },
     });
   };
 
-  const updateMetadata = (key: string, value: string) => {
+  const updateMetadata = (key: string, value: string): void => {
     updateFormData({
       ...formData,
       metadata: {
@@ -34,7 +33,7 @@ const useOnQuotaUpdate: UseOnQuotaUpdate = (formData, onChange) => {
     });
   };
 
-  const updateHardValue = (key: string, value: number, unit = '') => {
+  const updateHardValue = (key: string, value: number, unit = ''): void => {
     updateFormData({
       ...formData,
       spec: {

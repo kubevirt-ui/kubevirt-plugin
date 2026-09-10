@@ -1,23 +1,23 @@
-/* eslint-disable */
-import { TFunction } from 'i18next';
+import { type TFunction } from 'i18next';
 
 import {
   ApplicationAwareClusterResourceQuotaModel,
   ApplicationAwareResourceQuotaModel,
 } from '@kubevirt-utils/models';
 import {
-  ApplicationAwareResourceQuota,
-  QuotaStatus,
-  ResourceInfo,
+  type ApplicationAwareResourceQuota,
+  type QuotaStatus,
+  type ResourceInfo,
 } from '@kubevirt-utils/resources/quotas/types';
-import { ApplicationAwareQuota } from '@kubevirt-utils/resources/quotas/types';
+import { type ApplicationAwareQuota } from '@kubevirt-utils/resources/quotas/types';
 import { convertToBaseValue } from '@kubevirt-utils/utils/humanize.js';
 
 import { ResourceKeyKind } from '../details/types';
-
 import { RESOURCE_KEYS } from './constants';
 
-export const getQuotaModel = (quota: ApplicationAwareQuota) => {
+export const getQuotaModel = (
+  quota: ApplicationAwareQuota,
+): typeof ApplicationAwareResourceQuotaModel | typeof ApplicationAwareClusterResourceQuotaModel => {
   return isNamespacedQuota(quota)
     ? ApplicationAwareResourceQuotaModel
     : ApplicationAwareClusterResourceQuotaModel;
@@ -35,7 +35,9 @@ export const getStatus = (quota: ApplicationAwareQuota): QuotaStatus =>
 export const getSpecLimits = (quota: ApplicationAwareQuota): ResourceInfo =>
   isNamespacedQuota(quota) ? quota?.spec?.hard : quota?.spec?.quota?.hard;
 
-export const getMainResourceKeys = (isDedicatedVirtualResources: boolean) => {
+export const getMainResourceKeys = (
+  isDedicatedVirtualResources: boolean,
+): { cpu: string; memory: string; vmiCount: string } => {
   return {
     cpu: isDedicatedVirtualResources ? RESOURCE_KEYS.cpuRequestsVMI : RESOURCE_KEYS.cpuRequests,
     memory: isDedicatedVirtualResources

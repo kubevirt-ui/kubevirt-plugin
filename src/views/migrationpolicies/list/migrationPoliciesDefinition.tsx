@@ -1,15 +1,13 @@
-/* eslint-disable */
 import React from 'react';
-import { TFunction } from 'i18next';
+import { type TFunction } from 'i18next';
 
-import { V1alpha1MigrationPolicy } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
+import { type V1alpha1MigrationPolicy } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { ACTIONS } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/const';
 import { getName, getUID } from '@kubevirt-utils/resources/shared';
 import { getCluster } from '@multicluster/helpers/selectors';
 
 import { MIGRATION_POLICY_COLUMN_KEYS } from '../utils/constants';
-
 import {
   ActionsCell,
   AutoConvergeCell,
@@ -111,7 +109,7 @@ export const getMigrationPoliciesRowId = (row: V1alpha1MigrationPolicy, index: n
   const uid = getUID(row);
   if (uid) return uid;
 
-  const cluster = getCluster(row) || 'local';
+  const cluster = getCluster(row) ?? 'local';
   const name = getName(row);
 
   if (name) {

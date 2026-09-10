@@ -1,7 +1,6 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
-import { V1alpha1VirtualMachineTemplateRequest } from '@kubevirt-ui-ext/kubevirt-api/virt-template';
+import { type V1alpha1VirtualMachineTemplateRequest } from '@kubevirt-ui-ext/kubevirt-api/virt-template';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { RedExclamationCircleIcon } from '@openshift-console/dynamic-plugin-sdk';
 import { Tooltip } from '@patternfly/react-core';
@@ -27,7 +26,7 @@ const VirtualMachineTemplateRequestStatusIcon: FC<VirtualMachineTemplateRequestS
 
   if (status === VMTemplateRequestStatus.Failed) {
     return (
-      <Tooltip content={message || t('Unknown error')}>
+      <Tooltip content={message ?? t('Unknown error')}>
         <span>
           <RedExclamationCircleIcon />
           <span className="pf-v6-u-ml-sm">{t('Failed')}</span>

@@ -1,10 +1,9 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC, type ReactNode } from 'react';
 
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { SubscriptionKind } from '@overview/utils/types';
+import { type SubscriptionKind } from '@overview/utils/types';
 import {
   Alert,
   AlertVariant,
@@ -42,7 +41,7 @@ const GeneralInformation: FC<GeneralInformationProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
 
-  const getUpdateStatusContent = () => {
+  const getUpdateStatusContent = (): ReactNode => {
     if (!loaded) return <Skeleton />;
     if (catalogSourceMissing) return <SourceMissingStatus />;
     return <SubscriptionStatus operatorLink={operatorLink} subscription={kubevirtSubscription} />;

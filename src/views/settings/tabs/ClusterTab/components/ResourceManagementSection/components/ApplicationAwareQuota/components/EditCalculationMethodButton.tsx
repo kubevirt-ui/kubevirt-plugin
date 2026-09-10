@@ -1,12 +1,11 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
 import EditButton from '@kubevirt-utils/components/EditButton/EditButton';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
-import { HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
-import { CalculationMethod } from '@kubevirt-utils/resources/quotas/types';
+import { type HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
+import { type CalculationMethod } from '@kubevirt-utils/resources/quotas/types';
 
-import { CalculationMethodContentMapper } from '../types';
+import { type CalculationMethodContentMapper } from '../types';
 
 import EditCalculationMethodModal from './EditCalculationMethodModal';
 
@@ -25,7 +24,7 @@ const EditCalculationMethodButton: FC<EditCalculationMethodButtonProps> = ({
 
   const selectedLabel = calculationMethodContentMapper[selectedCalculationMethod]?.label;
 
-  const onClick = () => {
+  const onClick = (): void => {
     createModal(({ isOpen, onClose }) => (
       <EditCalculationMethodModal
         calculationMethodContentMapper={calculationMethodContentMapper}

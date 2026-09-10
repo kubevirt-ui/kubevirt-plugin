@@ -1,9 +1,8 @@
-/* eslint-disable */
-import React, { FC, useEffect, useState } from 'react';
+import React, { type FC, useEffect, useState } from 'react';
 
 import { HyperConvergedV1Beta1Model as HyperConvergedModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import SectionWithSwitch from '@kubevirt-utils/components/SectionWithSwitch/SectionWithSwitch';
-import { HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
+import { type HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
@@ -42,7 +41,7 @@ const KernelSamepageMerging: FC<KernelSamepageMergingProps> = ({
     }
   }, [ksmConfiguration, hyperLoaded]);
 
-  const onKSMchange = (value: boolean) => {
+  const onKSMchange = (value: boolean): void => {
     setError(null);
     setIsLoading(true);
     kubevirtK8sPatch<HyperConverged>({

@@ -1,6 +1,5 @@
-/* eslint-disable */
 import { NUMERIC_OPERATOR_REGEX, SEARCH_KEY_TO_FILTER_TYPE } from './constants';
-import { SearchToken } from './types';
+import { type SearchToken } from './types';
 import { getSanitizedInput, isExcludedToken } from './utils';
 
 export const parseSearchToken = (input: string): SearchToken => {
@@ -9,7 +8,7 @@ export const parseSearchToken = (input: string): SearchToken => {
   const text = getSanitizedInput(trimmedInput);
   const exclude = isExcludedToken(trimmedInput);
 
-  const numericMatch = text.match(NUMERIC_OPERATOR_REGEX);
+  const numericMatch = NUMERIC_OPERATOR_REGEX.exec(text);
   if (numericMatch) {
     const [, rawKey, operator, value] = numericMatch;
     const searchKey = rawKey.toLowerCase();

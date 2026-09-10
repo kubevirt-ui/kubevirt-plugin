@@ -1,11 +1,11 @@
-/* eslint-disable */
 import { getStorageMigrationPlanModelForKind } from '@kubevirt-utils/resources/migrations/backends';
-import { MultiNamespaceVirtualMachineStorageMigrationPlan } from '@kubevirt-utils/resources/migrations/constants';
+import { type MultiNamespaceVirtualMachineStorageMigrationPlan } from '@kubevirt-utils/resources/migrations/constants';
 import { getStorageMigrationPlanSpecNamespaces } from '@kubevirt-utils/resources/migrations/selectors';
 import {
   getMigrationStartTimestamp,
   getVolumeCountFromMigPlan,
 } from '@kubevirt-utils/resources/migrations/utils';
+import { type K8sModel } from '@openshift-console/dynamic-plugin-sdk';
 
 import { getMigrationPercentage } from './components/utils';
 
@@ -26,12 +26,12 @@ export const getStorageClassesFromMigPlan = (
 
 export const getStorageMigrationRowModel = (
   row: MultiNamespaceVirtualMachineStorageMigrationPlan,
-) => getStorageMigrationPlanModelForKind(row?.kind);
+): K8sModel => getStorageMigrationPlanModelForKind(row?.kind);
 
 export const compareMigrationVolumes = (
   a: MultiNamespaceVirtualMachineStorageMigrationPlan,
   b: MultiNamespaceVirtualMachineStorageMigrationPlan,
-) => {
+): number => {
   const aVolumes = getVolumeCountFromMigPlan(a);
   const bVolumes = getVolumeCountFromMigPlan(b);
 
@@ -41,7 +41,7 @@ export const compareMigrationVolumes = (
 export const compareMigrationNamespaces = (
   a: MultiNamespaceVirtualMachineStorageMigrationPlan,
   b: MultiNamespaceVirtualMachineStorageMigrationPlan,
-) => {
+): number => {
   return (
     getStorageMigrationPlanSpecNamespaces(a).length -
     getStorageMigrationPlanSpecNamespaces(b).length
@@ -51,7 +51,7 @@ export const compareMigrationNamespaces = (
 export const compareMigrationStorageClasses = (
   a: MultiNamespaceVirtualMachineStorageMigrationPlan,
   b: MultiNamespaceVirtualMachineStorageMigrationPlan,
-) => {
+): number => {
   const aStorageClasses = getStorageClassesFromMigPlan(a)?.[0] ?? '';
   const bStorageClasses = getStorageClassesFromMigPlan(b)?.[0] ?? '';
 
@@ -61,7 +61,7 @@ export const compareMigrationStorageClasses = (
 export const compareMigrationStarted = (
   a: MultiNamespaceVirtualMachineStorageMigrationPlan,
   b: MultiNamespaceVirtualMachineStorageMigrationPlan,
-) => {
+): number => {
   const aStarted = getMigrationStartTimestamp(a) ?? '';
   const bStarted = getMigrationStartTimestamp(b) ?? '';
   return aStarted.localeCompare(bStarted);
@@ -70,7 +70,7 @@ export const compareMigrationStarted = (
 export const compareMigrationStatus = (
   a: MultiNamespaceVirtualMachineStorageMigrationPlan,
   b: MultiNamespaceVirtualMachineStorageMigrationPlan,
-) => {
+): number => {
   const aPercentage = getMigrationPercentage(a);
   const bPercentage = getMigrationPercentage(b);
   return aPercentage - bPercentage;

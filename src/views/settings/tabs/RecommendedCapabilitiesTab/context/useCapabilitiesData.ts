@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { createContext, useContext } from 'react';
 
 import {
@@ -37,6 +36,6 @@ const defaultDataValue: CapabilitiesDataValue = {
 
 const CapabilitiesDataContext = createContext<CapabilitiesDataValue>(defaultDataValue);
 
-export const useCapabilitiesData = () => useContext(CapabilitiesDataContext);
+export const useCapabilitiesData = (): CapabilitiesDataValue => useContext(CapabilitiesDataContext);
 
 export { CapabilitiesDataContext };

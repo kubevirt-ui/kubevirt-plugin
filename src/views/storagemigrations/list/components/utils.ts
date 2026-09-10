@@ -1,7 +1,6 @@
-/* eslint-disable */
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
-  MultiNamespaceVirtualMachineStorageMigrationPlan,
+  type MultiNamespaceVirtualMachineStorageMigrationPlan,
   STORAGE_MIGRATION_PHASE,
 } from '@kubevirt-utils/resources/migrations/constants';
 import {
@@ -37,7 +36,7 @@ export const getStatusMigration = (
 
 export const getMigrationPercentage = (
   storageMigrationPlan: MultiNamespaceVirtualMachineStorageMigrationPlan,
-) => {
+): number => {
   if (isMigrationCompleted(storageMigrationPlan)) return 100;
 
   const totalVolumeCount = getVolumeCountFromMigPlan(storageMigrationPlan);

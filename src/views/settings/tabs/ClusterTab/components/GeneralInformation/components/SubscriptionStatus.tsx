@@ -1,7 +1,6 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
-import { SubscriptionKind, SubscriptionState } from '@overview/utils/types';
+import { type SubscriptionKind, SubscriptionState } from '@overview/utils/types';
 
 import SubscriptionStateAtLatest from './SubscriptionStates/SubscriptionStateAtLatest';
 import SubscriptionStateDefault from './SubscriptionStates/SubscriptionStateDefault';
@@ -25,7 +24,7 @@ const SubscriptionStatus: FC<SubscriptionStatusType> = ({ operatorLink, subscrip
     ),
   };
 
-  return Component[subscription?.status?.state || 'default'];
+  return Component[subscription?.status?.state ?? 'default'];
 };
 
 export default SubscriptionStatus;

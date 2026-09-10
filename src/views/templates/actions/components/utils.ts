@@ -1,12 +1,12 @@
-/* eslint-disable */
 import {
-  V1beta1DataSource,
-  V1beta1DataVolumeSpec,
+  type V1beta1DataSource,
+  type V1beta1DataVolumeSpec,
 } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import { DEFAULT_DISK_SIZE } from '@kubevirt-utils/components/DiskModal/utils/constants';
 
-import { SOURCE_OPTIONS_IDS, SOURCE_TYPES } from '../../utils/constants';
 import { getDataSourceDataVolume } from '../editBootSource';
+
+import { type SOURCE_OPTIONS_IDS, SOURCE_TYPES } from '../../utils/constants';
 
 export const getDataVolumeSpec = async (
   dataSource: V1beta1DataSource,
@@ -16,10 +16,12 @@ export const getDataVolumeSpec = async (
 
   const dataVolume = await getDataSourceDataVolume(dataSourcePVCName, dataSourcePVCNamespace);
 
-  return dataVolume?.spec as Promise<V1beta1DataVolumeSpec>;
+  return dataVolume?.spec;
 };
 
-export const getSourceTypeFromDataVolumeSpec = (dataVolumeSpec: V1beta1DataVolumeSpec) => {
+export const getSourceTypeFromDataVolumeSpec = (
+  dataVolumeSpec: V1beta1DataVolumeSpec,
+): SOURCE_OPTIONS_IDS | undefined => {
   if (dataVolumeSpec?.source?.pvc) return SOURCE_TYPES.pvcSource;
 
   if (dataVolumeSpec?.source?.http) return SOURCE_TYPES.httpSource;
@@ -78,6 +80,6 @@ export const getPVCSource = (
 
 const DOCKER_PREFIX = 'docker://';
 
-export const appendDockerPrefix = (image: string) => {
+export const appendDockerPrefix = (image: string): string => {
   return image?.startsWith(DOCKER_PREFIX) ? image : DOCKER_PREFIX.concat(image);
 };

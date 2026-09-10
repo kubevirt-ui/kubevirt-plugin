@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
 import SectionWithSwitch from '@kubevirt-utils/components/SectionWithSwitch/SectionWithSwitch';
 import { HIDE_CREDENTIALS_NON_PRIVILEGED } from '@kubevirt-utils/hooks/useFeatures/constants';
@@ -21,7 +20,7 @@ const HideCredentials: FC<HideCredentialsProps> = ({ newBadge = false }) => {
     cluster,
   );
 
-  const onChange = async (checked: boolean) => {
+  const onChange = async (checked: boolean): Promise<void> => {
     await toggleFeature(checked);
   };
 

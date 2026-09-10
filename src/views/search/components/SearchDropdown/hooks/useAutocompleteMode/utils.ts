@@ -1,9 +1,8 @@
-/* eslint-disable */
-import { KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
+import { type KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getFilterDefinition } from '@search/searchLanguage/utils';
 
-import { SearchKeyBadge } from '../../types';
+import { type SearchKeyBadge } from '../../types';
 
 export const getSearchBadge = (
   key: string,
@@ -27,7 +26,7 @@ export const getValuesPart = (
 
   const valuesPart = input.slice(colonIndex + 1);
   const segments = valuesPart.split(',');
-  const activeSegment = segments[segments.length - 1] || '';
+  const activeSegment = segments[segments.length - 1] ?? '';
   const selectedValues = segments.slice(0, -1).filter(Boolean);
 
   return { activeSegment, selectedValues };

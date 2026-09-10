@@ -1,4 +1,3 @@
-/* eslint-disable */
 import React, { type FC, Suspense, useState } from 'react';
 import { load } from 'js-yaml';
 
@@ -15,7 +14,7 @@ const QuotaYAMLEditor: FC<YAMLEditorProps> = ({ initialYAML = '', isEdit = false
   const [error, setError] = useState<Error | null>(null);
   const onQuotaSubmit = useOnQuotaSubmit(setError, isEdit);
 
-  const onSave = async (yaml: string) => {
+  const onSave = async (yaml: string): Promise<void> => {
     const quota = load(yaml) as ApplicationAwareQuota;
     await onQuotaSubmit(quota);
   };

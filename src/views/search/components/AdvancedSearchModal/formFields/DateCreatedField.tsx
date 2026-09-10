@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FormGroup } from '@patternfly/react-core';
@@ -23,7 +22,7 @@ const DateCreatedField: FC = () => {
   );
   const { setValue: setDateOption, value: dateOption } = useAdvancedSearchField('dateOption');
 
-  const effectiveDateOption = dateOption || (dateCreated as DateSelectOption);
+  const effectiveDateOption = dateOption ?? (dateCreated as DateSelectOption);
 
   return (
     <FormGroup label={t('Date created')}>

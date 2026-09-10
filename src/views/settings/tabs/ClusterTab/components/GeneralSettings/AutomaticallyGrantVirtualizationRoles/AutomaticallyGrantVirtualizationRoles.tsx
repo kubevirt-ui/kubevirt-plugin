@@ -1,10 +1,9 @@
-/* eslint-disable */
-import React, { FC, useMemo, useState } from 'react';
+import React, { type FC, useMemo, useState } from 'react';
 
 import SectionWithSwitch from '@kubevirt-utils/components/SectionWithSwitch/SectionWithSwitch';
 import { CONTROL_DEFAULT_VIRTUALIZATION_PERMISSIONS } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
-import { HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
+import { type HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getErrorMessage } from '@kubevirt-utils/utils/utils';
@@ -14,7 +13,6 @@ import ExpandSection from '@settings/ExpandSection/ExpandSection';
 import { CLUSTER_TAB_IDS } from '@settings/search/constants';
 
 import { getGeneralSettingsLabels } from '../consts/consts';
-
 import { isAutomaticRoleGrantEnabled, setRoleAggregationStrategy } from './utils/utils';
 
 type AutomaticallyGrantVirtualizationRolesProps = {
@@ -39,14 +37,14 @@ const AutomaticallyGrantVirtualizationRoles: FC<AutomaticallyGrantVirtualization
   );
 
   const switchIsOn = useMemo(() => isAutomaticRoleGrantEnabled(hyperConverge), [hyperConverge]);
-  const displayError = useMemo(() => error || hyperError?.message, [error, hyperError]);
+  const displayError = useMemo(() => error ?? hyperError?.message, [error, hyperError]);
 
   const isDisabled = useMemo(
     () => !isAdmin || !hyperLoaded || isLoading || Boolean(hyperError) || !previewFeatureEnabled,
     [isAdmin, hyperLoaded, isLoading, hyperError, previewFeatureEnabled],
   );
 
-  const onChange = async (checked: boolean) => {
+  const onChange = async (checked: boolean): Promise<void> => {
     if (!hyperConverge || !isAdmin) {
       return;
     }
@@ -56,8 +54,8 @@ const AutomaticallyGrantVirtualizationRoles: FC<AutomaticallyGrantVirtualization
 
     try {
       await setRoleAggregationStrategy(hyperConverge, checked, cluster);
-    } catch (error) {
-      setError(getErrorMessage(error));
+    } catch (updateError) {
+      setError(getErrorMessage(updateError));
     } finally {
       setIsLoading(false);
     }
