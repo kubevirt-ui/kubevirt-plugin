@@ -1,8 +1,7 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 import { Link } from 'react-router';
 
-import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { getStorageCheckupURL } from '@kubevirt-utils/resources/checkups/urls';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
@@ -19,20 +18,19 @@ import {
   STATUS_START_TIME_STAMP,
 } from '../../utils/utils';
 import CheckupsStorageActions from '../components/CheckupsStorageActions';
-
-import { CheckupsStorageCallbacks } from './checkupsStorageListDefinition';
+import { type CheckupsStorageCallbacks } from './checkupsStorageListDefinition';
 
 export { ClusterCell, NamespaceCell };
 
 export const NameCell: FC<{ row: IoK8sApiCoreV1ConfigMap }> = ({ row }) => {
   const [hubClusterName] = useHubClusterName();
   const isACMPage = useIsACMPage();
-  const cluster = getCluster(row) || hubClusterName;
+  const cluster = getCluster(row) ?? hubClusterName;
   const name = getName(row);
   const namespace = getNamespace(row);
 
   if (!name || !namespace) {
-    return <>{name || NO_DATA_DASH}</>;
+    return <>{name ?? NO_DATA_DASH}</>;
   }
 
   return (
@@ -56,8 +54,8 @@ export const StatusCell: FC<{
 };
 
 export const FailureCell: FC<{ row: IoK8sApiCoreV1ConfigMap }> = ({ row }) => (
-  <span data-test={`checkup-failure-${getName(row) || row?.metadata?.uid || 'unknown'}`}>
-    {row?.data?.[STATUS_FAILURE_REASON] || NO_DATA_DASH}
+  <span data-test={`checkup-failure-${getName(row) ?? row?.metadata?.uid ?? 'unknown'}`}>
+    {row?.data?.[STATUS_FAILURE_REASON] ?? NO_DATA_DASH}
   </span>
 );
 

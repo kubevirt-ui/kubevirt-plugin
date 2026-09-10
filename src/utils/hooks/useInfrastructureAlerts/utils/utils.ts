@@ -12,7 +12,7 @@ const getHealthImpact = (alert: Alert): string | undefined =>
   alert?.labels?.[OPERATOR_HEALTH_IMPACT_LABEL];
 
 export const isCriticalHealthImpactAlert = (alert: Alert): boolean =>
-  getHealthImpact(alert) === HealthImpactLevel.critical;
+  getHealthImpact(alert) === HealthImpactLevel.Critical;
 
 export const sortAlertsBySeverity = (alerts: Alert[]): AlertsBySeverity =>
   alerts?.reduce(

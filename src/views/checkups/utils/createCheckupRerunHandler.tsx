@@ -1,17 +1,15 @@
-/* eslint-disable */
 import React from 'react';
-import { TFunction } from 'i18next';
+import { type TFunction } from 'i18next';
 
 import {
-  IoK8sApiBatchV1Job,
-  IoK8sApiCoreV1ConfigMap,
+  type IoK8sApiBatchV1Job,
+  type IoK8sApiCoreV1ConfigMap,
 } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
-import { ModalComponent } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
-import { ToastActions } from '@kubevirt-utils/hooks/useKubevirtToast';
+import { type ModalComponent } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+import { type ToastActions } from '@kubevirt-utils/hooks/useKubevirtToast';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 
 import RerunCheckupModal from '../components/RerunCheckupModal';
-
 import { showRerunToast } from './showRerunToast';
 import { isJobRunning } from './utils';
 
@@ -40,7 +38,7 @@ export const createCheckupRerunHandler = ({
   t,
   toast,
 }: CreateCheckupRerunHandlerParams): (() => void) => {
-  const executeRerun = async () => {
+  const executeRerun = async (): Promise<void> => {
     try {
       await rerun();
       if (isKebab) {
@@ -64,14 +62,14 @@ export const createCheckupRerunHandler = ({
           {...props}
           onConfirm={() => {
             props.onClose();
-            executeRerun();
+            void executeRerun();
           }}
           message={runningJobWarningMessage}
           variant="warning"
         />
       ));
     } else {
-      executeRerun();
+      void executeRerun();
     }
   };
 };

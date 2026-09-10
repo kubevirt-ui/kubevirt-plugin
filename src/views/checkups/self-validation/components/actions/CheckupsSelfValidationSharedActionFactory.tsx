@@ -1,21 +1,19 @@
-/* eslint-disable */
-import React, { ReactNode } from 'react';
-import { TFunction } from 'i18next';
+import React, { type ReactNode } from 'react';
+import { type TFunction } from 'i18next';
 
 import {
-  IoK8sApiBatchV1Job,
-  IoK8sApiCoreV1ConfigMap,
+  type IoK8sApiBatchV1Job,
+  type IoK8sApiCoreV1ConfigMap,
 } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
-import { ActionDropdownItemType } from '@kubevirt-utils/components/ActionsDropdown/constants';
-import { ModalComponent } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
-import { ToastActions } from '@kubevirt-utils/hooks/useKubevirtToast';
+import { type ActionDropdownItemType } from '@kubevirt-utils/components/ActionsDropdown/constants';
+import { type ModalComponent } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+import { type ToastActions } from '@kubevirt-utils/hooks/useKubevirtToast';
 import { getSelfValidationCheckupURL } from '@kubevirt-utils/resources/checkups/urls';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 
 import { createCheckupRerunHandler } from '../../../utils/createCheckupRerunHandler';
 import { rerunSelfValidationCheckup } from '../../utils';
-
-import { ActionState, getRerunModeState } from './CheckupsSelfValidationActionsUtils';
+import { type ActionState, getRerunModeState } from './CheckupsSelfValidationActionsUtils';
 import RunningCheckupWarningDescription from './RunningCheckupWarningDescription';
 
 type RerunActionParams = {
@@ -100,7 +98,7 @@ export const createGoToRunningCheckupAction = ({
     return null;
   }
 
-  const handleGoToRunningCheckup = () => {
+  const handleGoToRunningCheckup = (): void => {
     const path = getSelfValidationCheckupURL(
       configMapInfo.name,
       configMapInfo.namespace,

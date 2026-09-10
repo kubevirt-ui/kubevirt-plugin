@@ -1,11 +1,10 @@
-/* eslint-disable */
 import produce from 'immer';
 
 import { DataImportCronModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { DataSourceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
-  V1beta1DataImportCron,
-  V1beta1DataSource,
+  type V1beta1DataImportCron,
+  type V1beta1DataSource,
 } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import { CDI_BIND_REQUESTED_ANNOTATION } from '@kubevirt-utils/hooks/useCDIUpload/consts';
 import { buildOwnerReference } from '@kubevirt-utils/resources/shared';
@@ -60,7 +59,7 @@ export const createDataSourceWithImportCron = async ({
   schedule: string;
   size: string;
   url: string;
-}) => {
+}): Promise<void> => {
   const dataImportCronName = `${dataSourceName}-import-cron`;
   const dataImportCron = produce(initialDataImportCron, (draft) => {
     draft.metadata.name = dataImportCronName;

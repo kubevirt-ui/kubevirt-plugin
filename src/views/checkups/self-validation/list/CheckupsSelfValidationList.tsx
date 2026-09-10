@@ -1,7 +1,6 @@
-/* eslint-disable */
-import React, { FC, useMemo } from 'react';
+import React, { type FC, useMemo } from 'react';
 
-import { IoK8sApiBatchV1Job } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type IoK8sApiBatchV1Job } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import KubevirtFilterToolbar from '@kubevirt-utils/components/KubevirtFilterToolbar/KubevirtFilterToolbar';
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
 import useKubevirtDataViewFilters from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/useKubevirtDataViewFilters';
@@ -20,14 +19,14 @@ import { ListPageBody } from '@openshift-console/dynamic-plugin-sdk';
 import { Pagination } from '@patternfly/react-core';
 import { useHubClusterName } from '@stolostron/multicluster-sdk';
 
+import { getCheckupsSelfValidationListFilters } from '../utils';
+
 import { CHECKUPS_COLUMN_KEYS } from '../../utils/constants';
 import { getCheckupsConfigMapRowId, getJobByName } from '../../utils/utils';
 import useCheckupsSelfValidationData from '../components/hooks/useCheckupsSelfValidationData';
 import useCheckupsSelfValidationPermissions from '../components/hooks/useCheckupsSelfValidationPermissions';
-import { getCheckupsSelfValidationListFilters } from '../utils';
-
 import {
-  CheckupsSelfValidationCallbacks,
+  type CheckupsSelfValidationCallbacks,
   getCheckupsSelfValidationColumns,
 } from './checkupsSelfValidationListDefinition';
 import CheckupsSelfValidationListEmptyState from './CheckupsSelfValidationListEmptyState';
@@ -47,7 +46,7 @@ const CheckupsSelfValidationList: FC = () => {
     loading: loadingPermissions,
   } = useCheckupsSelfValidationPermissions();
   const { configMaps, error: dataError, jobs, loaded } = useCheckupsSelfValidationData();
-  const error = dataError || permissionsError;
+  const error = dataError ?? permissionsError;
 
   const filterDefinitions = useMemo(() => getCheckupsSelfValidationListFilters(t), [t]);
   const { clearAllFilters, filteredData, filters, onSetFilters } = useKubevirtDataViewFilters({

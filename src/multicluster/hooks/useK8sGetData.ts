@@ -2,12 +2,14 @@ import { useEffect, useState } from 'react';
 
 import useDeepCompareMemoize from '@kubevirt-utils/hooks/useDeepCompareMemoize/useDeepCompareMemoize';
 import { kubevirtK8sGet } from '@multicluster/k8sRequests';
-import { type K8sResourceCommon, type WatchK8sResult } from '@openshift-console/dynamic-plugin-sdk';
+import { type K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { type FleetK8sGetOptions } from '@stolostron/multicluster-sdk';
+
+type K8sGetResult<T> = [T | undefined, boolean, Error | undefined];
 
 const useK8sGetData = <T extends K8sResourceCommon>(
   options: false | FleetK8sGetOptions | null,
-): WatchK8sResult<T> => {
+): K8sGetResult<T> => {
   const [data, setData] = useState<T>();
   const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState<Error>();

@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useResourceEvents from '@kubevirt-utils/hooks/useResourceEvents/useResourceEvents';
@@ -8,7 +7,7 @@ import { isEmpty } from '@kubevirt-utils/utils/utils';
 import AIExperienceIcon from '@lightspeed/components/AIExperienceIcon';
 import useLightspeedActions from '@lightspeed/hooks/useLightspeedActions/useLightspeedActions';
 import { DEFAULT_MAX_EVENTS, RESOURCE_EVENTS_TIMEOUT_MS } from '@lightspeed/utils/constants';
-import { getOLSPrompt, OLSPromptType } from '@lightspeed/utils/prompts';
+import { getOLSPrompt, type OLSPromptType } from '@lightspeed/utils/prompts';
 import {
   asOLSEventsAttachment,
   asOLSYAMLAttachment,
@@ -47,7 +46,7 @@ const LightspeedHelpButton: FC<LightspeedHelpButtonProps> = ({
   const yamlAttachment = obj ? asOLSYAMLAttachment(obj) : null;
   const prompt = getOLSPrompt(promptType, isVM(obj) && { vm: obj });
 
-  const handleClick = async () => {
+  const handleClick = async (): Promise<void> => {
     onClick?.();
     clearAttachments();
     clearContextEvents();

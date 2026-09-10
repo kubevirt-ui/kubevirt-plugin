@@ -1,12 +1,11 @@
-/* eslint-disable */
 import React from 'react';
-import { TFunction } from 'i18next';
+import { type TFunction } from 'i18next';
 
 import {
-  IoK8sApiBatchV1Job,
-  IoK8sApiCoreV1ConfigMap,
+  type IoK8sApiBatchV1Job,
+  type IoK8sApiCoreV1ConfigMap,
 } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
-import { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
+import { type ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { ACTIONS } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/const';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getCluster } from '@multicluster/helpers/selectors';
@@ -22,7 +21,6 @@ import {
   STATUS_START_TIME_STAMP,
   STATUS_SUCCEEDED,
 } from '../../utils/utils';
-
 import {
   ActionsCell,
   ClusterCell,
@@ -54,7 +52,8 @@ export const getCheckupsStorageColumns = (
   ...(isACMPage
     ? [
         {
-          getValue: (row: IoK8sApiCoreV1ConfigMap) => getCluster(row) || hubClusterName || '',
+          getValue: (row: IoK8sApiCoreV1ConfigMap): string =>
+            getCluster(row) ?? hubClusterName ?? '',
           key: 'cluster',
           label: t('Cluster'),
           renderCell: (row: IoK8sApiCoreV1ConfigMap) => <ClusterCell row={row} />,
@@ -74,7 +73,7 @@ export const getCheckupsStorageColumns = (
       ]
     : []),
   {
-    getValue: (row, callbacks) => {
+    getValue: (row, callbacks): string => {
       const latestJob = callbacks?.getJobByName(getName(row))?.[0];
       return getCSVExportStatusLabel(getConfigMapStatus(row, getJobStatus(latestJob)), t);
     },
@@ -85,7 +84,7 @@ export const getCheckupsStorageColumns = (
     sortable: true,
   },
   {
-    getValue: (row) => row?.data?.[STATUS_FAILURE_REASON] || '',
+    getValue: (row): string => row?.data?.[STATUS_FAILURE_REASON] ?? '',
     key: 'failure',
     label: t('Failure reason'),
     renderCell: (row) => <FailureCell row={row} />,
@@ -93,7 +92,7 @@ export const getCheckupsStorageColumns = (
     sortable: true,
   },
   {
-    getValue: (row) => row?.data?.[STATUS_START_TIME_STAMP] || '',
+    getValue: (row): string => row?.data?.[STATUS_START_TIME_STAMP] ?? '',
     key: CHECKUPS_COLUMN_KEYS.START_TIME,
     label: t('Start time'),
     renderCell: (row) => <StartTimeCell row={row} />,
@@ -101,7 +100,7 @@ export const getCheckupsStorageColumns = (
     sortable: true,
   },
   {
-    getValue: (row) => row?.data?.[STATUS_COMPLETION_TIME_STAMP] || '',
+    getValue: (row): string => row?.data?.[STATUS_COMPLETION_TIME_STAMP] ?? '',
     key: CHECKUPS_COLUMN_KEYS.COMPLETE_TIME,
     label: t('Completion time'),
     renderCell: (row) => <CompleteTimeCell row={row} />,

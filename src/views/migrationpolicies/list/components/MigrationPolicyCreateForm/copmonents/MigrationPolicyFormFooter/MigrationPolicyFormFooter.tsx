@@ -1,11 +1,11 @@
-/* eslint-disable */
-import React, { FC, MouseEventHandler, useState } from 'react';
+import React, { type FC, type MouseEventHandler, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { getMigrationPolicyURL } from 'src/views/migrationpolicies/utils/utils';
 
 import { MigrationPolicyModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1alpha1MigrationPolicy } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1alpha1MigrationPolicy } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { type K8sLikeError } from '@kubevirt-utils/utils/formatK8sError';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { kubevirtK8sCreate } from '@multicluster/k8sRequests';
 import {
@@ -29,7 +29,7 @@ const MigrationPolicyFormFooter: FC<MigrationPolicyFormFooterProps> = ({ migrati
   const cluster = useClusterParam();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState(undefined);
+  const [error, setError] = useState<K8sLikeError | undefined>();
   const migrationPolicyName = migrationPolicy?.metadata?.name;
 
   const handleSubmit: MouseEventHandler<HTMLButtonElement> = (e) => {
@@ -43,7 +43,7 @@ const MigrationPolicyFormFooter: FC<MigrationPolicyFormFooterProps> = ({ migrati
       .finally(() => setIsSubmitting(false));
   };
 
-  const closeModal = () => {
+  const closeModal = (): void => {
     setError(undefined);
     setIsSubmitting(false);
     navigate(-1);

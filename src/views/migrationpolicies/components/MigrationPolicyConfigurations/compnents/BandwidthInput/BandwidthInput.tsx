@@ -8,7 +8,6 @@ import React, {
 
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { type QuantityUnit } from '@kubevirt-utils/utils/unitConstants';
 import { BinaryUnit } from '@kubevirt-utils/utils/unitConstants';
 import { addByteSuffix } from '@kubevirt-utils/utils/units';
 import { NumberInput, SelectOption, Split, SplitItem } from '@patternfly/react-core';
@@ -16,12 +15,12 @@ import { NumberInput, SelectOption, Split, SplitItem } from '@patternfly/react-c
 type BandwidthInputProps = {
   setState: Dispatch<
     SetStateAction<{
-      unit: QuantityUnit;
+      unit: BinaryUnit;
       value: number;
     }>
   >;
   state: {
-    unit: QuantityUnit;
+    unit: BinaryUnit;
     value: number;
   };
 };
@@ -32,7 +31,7 @@ const BandwidthInput: FC<BandwidthInputProps> = ({ setState, state }) => {
   const { t } = useKubevirtTranslation();
 
   const onSelectUnit = useCallback(
-    (_event, newUnit: QuantityUnit) => {
+    (_event, newUnit: BinaryUnit) => {
       setState((prev) => ({ ...prev, unit: newUnit }));
     },
     [setState],

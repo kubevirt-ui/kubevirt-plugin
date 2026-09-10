@@ -1,10 +1,8 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 import { getDataSourceCronJob } from 'src/views/datasources/utils';
 
-import { PersistentVolumeClaimModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { DataSourceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
+import { type V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import PreferencePopoverContent from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/PreferenceSelect/PreferencePopoverContent';
 import DescriptionItemAnnotations from '@kubevirt-utils/components/DescriptionItem/components/DescriptionItemAnnotations';
 import DescriptionItemCreatedAt from '@kubevirt-utils/components/DescriptionItem/components/DescriptionItemCreatedAt';
@@ -14,12 +12,12 @@ import DescriptionItemNamespace from '@kubevirt-utils/components/DescriptionItem
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import OwnerDetailsItem from '@kubevirt-utils/components/OwnerDetailsItem/OwnerDetailsItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { modelToGroupVersionKind, PersistentVolumeClaimModel } from '@kubevirt-utils/models';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
 import { DescriptionList, Grid, GridItem } from '@patternfly/react-core';
 
 import DataSourceImportCronDescription from '../DataSourceImportCronDescription/DataSourceImportCronDescription';
-
 import DataSourceInstanceTypeLink from './DataSourceInstanceTypeLink';
 import DataSourcePreferenceLink from './DataSourcePreferenceLink';
 
@@ -31,7 +29,7 @@ export const DataSourceDetailsGrid: FC<DataSourceDetailsGridProps> = ({ dataSour
   const { t } = useKubevirtTranslation();
   const dataImportCron = getDataSourceCronJob(dataSource);
   const { name: pvcSourceName, namespace: pvcSourceNamespace } =
-    dataSource?.spec?.source?.pvc || {};
+    dataSource?.spec?.source?.pvc ?? {};
 
   return (
     <Grid hasGutter>
@@ -58,7 +56,7 @@ export const DataSourceDetailsGrid: FC<DataSourceDetailsGridProps> = ({ dataSour
             <DescriptionItem
               descriptionData={
                 <ResourceLink
-                  kind={PersistentVolumeClaimModel.kind}
+                  groupVersionKind={modelToGroupVersionKind(PersistentVolumeClaimModel)}
                   name={pvcSourceName}
                   namespace={pvcSourceNamespace}
                 />

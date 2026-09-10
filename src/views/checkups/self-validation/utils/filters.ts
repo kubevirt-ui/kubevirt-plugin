@@ -1,8 +1,7 @@
-/* eslint-disable */
-import { TFunction } from 'i18next';
+import { type TFunction } from 'i18next';
 
-import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
-import { KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
+import { type IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 
 import { SELF_VALIDATION_RESULTS_KEY } from './constants';
 
@@ -19,7 +18,7 @@ export const getCheckupsSelfValidationListFilters = (
   {
     categoryLabel: t('Status'),
     id: SELF_VALIDATION_STATUS_FILTER_ID,
-    match: (obj, selected) => {
+    match: (obj, selected): boolean => {
       const status = obj?.data?.[SELF_VALIDATION_RESULTS_KEY]
         ? SELF_VALIDATION_STATUS.completed
         : SELF_VALIDATION_STATUS.running;

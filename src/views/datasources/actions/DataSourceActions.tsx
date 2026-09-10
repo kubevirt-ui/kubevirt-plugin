@@ -1,12 +1,11 @@
-/* eslint-disable */
-import React, { FC, useState } from 'react';
+import React, { type FC, useState } from 'react';
 
-import { V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
+import { type V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import DropdownToggle from '@kubevirt-utils/components/toggles/DropdownToggle';
 import KebabToggle from '@kubevirt-utils/components/toggles/KebabToggle';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getContentScrollableElement } from '@kubevirt-utils/utils/utils';
-import { Action } from '@openshift-console/dynamic-plugin-sdk';
+import { type Action } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Divider,
   Dropdown,
@@ -37,7 +36,7 @@ const DataSourceActions: FC<DataSourceActionProps> = ({
   const dsActions = actions.filter((a) => a.id !== 'datasource-action-manage-source');
   const manageAction = actions.find((a) => a.id === 'datasource-action-manage-source');
 
-  const onToggle = () => {
+  const onToggle = (): void => {
     setIsOpen((prevIsOpen) => {
       if (!prevIsOpen) onLazyOpen();
 
@@ -49,7 +48,7 @@ const DataSourceActions: FC<DataSourceActionProps> = ({
     ? KebabToggle({ isExpanded: isOpen, onClick: onToggle })
     : DropdownToggle({ children: t('Actions'), isExpanded: isOpen, onClick: onToggle });
 
-  const handleClick = (action: Action) => {
+  const handleClick = (action: Action): void => {
     if (typeof action?.cta === 'function') {
       action.cta();
     }

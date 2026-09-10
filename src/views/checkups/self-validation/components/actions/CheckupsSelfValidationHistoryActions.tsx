@@ -1,9 +1,8 @@
-/* eslint-disable */
-import React, { FC, useCallback, useMemo, useState } from 'react';
+import React, { type FC, useCallback, useMemo, useState } from 'react';
 
-import { IoK8sApiBatchV1Job } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type IoK8sApiBatchV1Job } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import ActionsDropdown from '@kubevirt-utils/components/ActionsDropdown/ActionsDropdown';
-import { ActionDropdownItemType } from '@kubevirt-utils/components/ActionsDropdown/constants';
+import { type ActionDropdownItemType } from '@kubevirt-utils/components/ActionsDropdown/constants';
 import DeleteModal from '@kubevirt-utils/components/DeleteModal/DeleteModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import useKubevirtToast from '@kubevirt-utils/hooks/useKubevirtToast';
@@ -12,9 +11,10 @@ import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { Spinner } from '@patternfly/react-core';
 
+import DownloadResultsErrorModal from '../DownloadResultsErrorModal';
+
 import { deleteSelfValidationJob } from '../../utils';
 import { getDefaultErrorMessage } from '../../utils/downloadResults';
-import DownloadResultsErrorModal from '../DownloadResultsErrorModal';
 import { useDownloadResults } from '../hooks/useDownloadResults';
 
 type CheckupsSelfValidationHistoryActionsProps = {
@@ -30,7 +30,7 @@ const CheckupsSelfValidationHistoryActions: FC<CheckupsSelfValidationHistoryActi
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
   const { download, isDownloading } = useDownloadResults();
   const isJobCompleted = job?.status?.succeeded === 1 && job?.status?.terminating !== 1;
-  const namespace = getNamespace(job) || null;
+  const namespace = getNamespace(job) ?? null;
 
   const handleDeleteClick = useCallback(() => {
     createModal((props) => (

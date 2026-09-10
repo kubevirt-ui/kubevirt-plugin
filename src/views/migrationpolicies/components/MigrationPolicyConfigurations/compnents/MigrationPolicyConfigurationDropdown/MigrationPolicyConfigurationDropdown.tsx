@@ -1,16 +1,15 @@
-/* eslint-disable */
-import React, { Dispatch, FC, SetStateAction, useState } from 'react';
+import React, { type Dispatch, type FC, type SetStateAction, useState } from 'react';
 
 import DropdownToggle from '@kubevirt-utils/components/toggles/DropdownToggle';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Dropdown, DropdownItem, DropdownList } from '@patternfly/react-core';
 
-import { InitialMigrationPolicyState } from '../../../../list/components/MigrationPolicyCreateForm/utils/utils';
+import { type InitialMigrationPolicyState } from '../../../../list/components/MigrationPolicyCreateForm/utils/utils';
 import {
-  EditMigrationPolicyInitialState,
-  MigrationPolicyStateDispatch,
+  type EditMigrationPolicyInitialState,
+  type MigrationPolicyStateDispatch,
 } from '../../../MigrationPolicyEditModal/utils/constants';
-import { MigrationPolicyConfigurationOption } from '../../utils/constants';
+import { type MigrationPolicyConfigurationOption } from '../../utils/constants';
 
 type MigrationPolicyConfigurationDropdownProps = {
   isDisabled: boolean;
@@ -28,12 +27,12 @@ const MigrationPolicyConfigurationDropdown: FC<MigrationPolicyConfigurationDropd
   const { t } = useKubevirtTranslation();
   const [isOpen, setIsOpen] = useState(false);
 
-  const handleOptionClick = (key: string, defaultValue: MigrationPolicyStateDispatch) => {
+  const handleOptionClick = (key: string, defaultValue: MigrationPolicyStateDispatch): void => {
     setState((prev) => ({ ...prev, [key]: defaultValue }));
     setIsOpen(false);
   };
 
-  const onToggle = () => setIsOpen((prevIsOpen) => !prevIsOpen);
+  const onToggle = (): void => setIsOpen((prevIsOpen) => !prevIsOpen);
   return (
     <Dropdown
       toggle={DropdownToggle({

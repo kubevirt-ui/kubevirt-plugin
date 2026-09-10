@@ -1,9 +1,8 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
 import {
-  V1beta1DataImportCron,
-  V1beta1DataSource,
+  type V1beta1DataImportCron,
+  type V1beta1DataSource,
 } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
@@ -34,7 +33,7 @@ export const DataImportCronManageDetails: FC<DataImportCronManageDetailsProps> =
   const { t } = useKubevirtTranslation();
 
   const source = dataImportCron?.spec?.template.spec?.source?.registry?.url;
-  const importsToKeep = dataImportCron?.spec?.importsToKeep?.toString() || t('3 (default)');
+  const importsToKeep = dataImportCron?.spec?.importsToKeep?.toString() ?? t('3 (default)');
   const isAutoUpdated = isDataImportCronAutoUpdated(dataSource, dataImportCron);
   const isOwnedBySSP = isDataResourceOwnedBySSP(dataImportCron);
 

@@ -1,8 +1,9 @@
-/* eslint-disable */
+import { DataVolumeModel, modelToGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { TemplateModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { DataVolumeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { VirtualMachineInstanceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { type V1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
+import { type K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 export { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 
 export const diskImportKindMapping = {
@@ -82,19 +83,22 @@ export const printableStatusToLabel = {
   [printableVmStatus.WaitingForVolumeBinding]: VMStatusSimpleLabel.Starting,
 };
 
-export const getVmStatusLabelFromPrintable = (printableStatus: string) =>
-  printableStatusToLabel?.[printableStatus] || StatusSimpleLabel.Other;
+export const getVmStatusLabelFromPrintable = (
+  printableStatus: string,
+): StatusSimpleLabel | VMStatusSimpleLabel =>
+  printableStatusToLabel?.[printableStatus] ?? StatusSimpleLabel.Other;
 
 export const VIRTUALMACHINES_TEMPLATES_BASE_URL = 'virtualmachinetemplates';
 
-export const getTimestamp = (resource) => new Date(resource.metadata.creationTimestamp);
+export const getTimestamp = (resource: K8sResourceCommon): Date | undefined =>
+  resource.metadata?.creationTimestamp ? new Date(resource.metadata.creationTimestamp) : undefined;
 
-export const isDVActivity = (resource) =>
+export const isDVActivity = (resource: V1beta1DataVolume): boolean =>
   resource?.status?.phase === 'ImportInProgress' &&
-  Object.keys(diskImportKindMapping).includes(resource?.metadata?.ownerReferences?.[0]?.kind);
+  Object.keys(diskImportKindMapping).includes(resource?.metadata?.ownerReferences?.[0]?.kind ?? '');
 
 export const k8sDVResource = {
+  groupVersionKind: modelToGroupVersionKind(DataVolumeModel),
   isList: true,
-  kind: DataVolumeModel,
   prop: 'dvs',
 };
