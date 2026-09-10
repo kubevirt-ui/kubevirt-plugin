@@ -1,4 +1,5 @@
-import React, { FC, ReactNode, useState } from 'react';
+import type { FC, ReactNode } from 'react';
+import React, { useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Alert, ExpandableSection, FormGroup } from '@patternfly/react-core';

@@ -1,4 +1,5 @@
-import React, { FC, useMemo } from 'react';
+import type { FC } from 'react';
+import React, { useMemo } from 'react';
 import { useParams } from 'react-router';
 
 import Loading from '@kubevirt-utils/components/Loading/Loading';
@@ -8,7 +9,7 @@ import {
   ApplicationAwareResourceQuotaModel,
   modelToGroupVersionKind,
 } from '@kubevirt-utils/models';
-import { ApplicationAwareQuota } from '@kubevirt-utils/resources/quotas/types';
+import type { ApplicationAwareQuota } from '@kubevirt-utils/resources/quotas/types';
 import { HorizontalNav, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import { Bullseye } from '@patternfly/react-core';
 

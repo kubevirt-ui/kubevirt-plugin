@@ -1,4 +1,4 @@
-import { PrometheusRule } from '@openshift-console/dynamic-plugin-sdk';
+import type { PrometheusRule } from '@openshift-console/dynamic-plugin-sdk';
 
 export type Group = {
   file: string;

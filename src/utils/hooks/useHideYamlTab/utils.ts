@@ -1,4 +1,4 @@
-import { TabConfig } from '../../../views/checkups/utils/types';
+import type { TabConfig } from '../../../views/checkups/utils/types';
 
 const YAML_TAB_HREF = 'yaml';
 

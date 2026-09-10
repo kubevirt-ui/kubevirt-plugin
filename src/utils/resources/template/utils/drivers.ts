@@ -1,7 +1,7 @@
+import type { Template } from '@kubevirt-utils/resources/template';
 import {
   getTemplateVirtualMachineObject,
   replaceTemplateVM,
-  Template,
 } from '@kubevirt-utils/resources/template';
 import { mountWinDriversToVM } from '@kubevirt-utils/resources/vm/utils/disk/drivers';
 

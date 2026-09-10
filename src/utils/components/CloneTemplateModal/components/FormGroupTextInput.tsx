@@ -1,7 +1,9 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 import { useFormContext } from 'react-hook-form';
 
-import { FormGroup, FormGroupProps, TextInput } from '@patternfly/react-core';
+import type { FormGroupProps } from '@patternfly/react-core';
+import { FormGroup, TextInput } from '@patternfly/react-core';
 
 type FormGroupTextInputProps = Omit<FormGroupProps, 'fieldId'> & {
   fieldId: string;

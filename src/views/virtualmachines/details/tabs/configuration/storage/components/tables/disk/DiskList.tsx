@@ -1,11 +1,15 @@
-import React, { FC, useMemo } from 'react';
+import type { FC } from 'react';
+import React, { useMemo } from 'react';
 
 import { DataVolumeModel, VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import type {
+  V1VirtualMachine,
+  V1VirtualMachineInstance,
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import DiskListTitle from '@kubevirt-utils/components/DiskListTitle/DiskListTitle';
 import DiskSourceSelect from '@kubevirt-utils/components/DiskModal/components/DiskSourceSelect/DiskSourceSelect';
 import DiskModal from '@kubevirt-utils/components/DiskModal/DiskModal';
-import { SourceTypes } from '@kubevirt-utils/components/DiskModal/utils/types';
+import type { SourceTypes } from '@kubevirt-utils/components/DiskModal/utils/types';
 import KubevirtFilterToolbar from '@kubevirt-utils/components/KubevirtFilterToolbar/KubevirtFilterToolbar';
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
@@ -17,7 +21,8 @@ import { VirtualMachineSubresourcesModel } from '@kubevirt-utils/models';
 import { asAccessReview, getNamespace } from '@kubevirt-utils/resources/shared';
 import useDisksTableData from '@kubevirt-utils/resources/vm/hooks/disk/useDisksTableData';
 import useProvisioningPercentage from '@kubevirt-utils/resources/vm/hooks/useProvisioningPercentage';
-import { K8sVerb, useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
+import type { K8sVerb } from '@openshift-console/dynamic-plugin-sdk';
+import { useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
 import { Flex, FlexItem } from '@patternfly/react-core';
 import { useFleetAccessReview } from '@stolostron/multicluster-sdk';
 import { updateDisks } from '@virtualmachines/details/tabs/configuration/details/utils/utils';
@@ -25,7 +30,8 @@ import { isRunning } from '@virtualmachines/utils';
 
 import useDisksFilters from '../../hooks/useDisksFilters';
 
-import { DiskListCallbacks, getDiskListColumns, getDiskRowId } from './diskListDefinition';
+import type { DiskListCallbacks } from './diskListDefinition';
+import { getDiskListColumns, getDiskRowId } from './diskListDefinition';
 
 import './disklist.scss';
 

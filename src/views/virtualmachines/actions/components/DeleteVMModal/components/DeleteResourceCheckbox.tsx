@@ -1,8 +1,10 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName } from '@kubevirt-utils/resources/shared';
-import { K8sResourceCommon, ResourceIcon } from '@openshift-console/dynamic-plugin-sdk';
+import type { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+import { ResourceIcon } from '@openshift-console/dynamic-plugin-sdk';
 import { Checkbox, Flex, FlexItem, Label, StackItem, Tooltip } from '@patternfly/react-core';
 
 import { getResourceGroupVersionKind } from '../utils/helpers';

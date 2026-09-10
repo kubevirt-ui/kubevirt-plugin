@@ -1,9 +1,10 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getStorageMigrationPlanModelForKind } from '@kubevirt-utils/resources/migrations/backends/planModels';
 import type { ProgressComponentProps } from '@kubevirt-utils/resources/migrations/backends/types';
-import { MultiNamespaceVirtualMachineStorageMigrationPlan } from '@kubevirt-utils/resources/migrations/constants';
+import type { MultiNamespaceVirtualMachineStorageMigrationPlan } from '@kubevirt-utils/resources/migrations/constants';
 
 import useStorageMigrationPlanCancel from '../hooks/useStorageMigrationPlanCancel';
 import useStorageMigrationProgressMetrics from '../hooks/useStorageMigrationProgressMetrics';

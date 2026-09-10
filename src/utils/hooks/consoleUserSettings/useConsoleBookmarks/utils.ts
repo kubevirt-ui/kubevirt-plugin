@@ -1,4 +1,4 @@
-import { ConsoleBookmarks } from '../types';
+import type { ConsoleBookmarks } from '../types';
 
 export const parseBookmarks = (bookmarksData: string | undefined): ConsoleBookmarks => {
   if (!bookmarksData) {

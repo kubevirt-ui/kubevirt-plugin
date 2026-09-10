@@ -1,6 +1,7 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
-import { V1VirtualMachineInstanceGuestAgentInfo } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import type { V1VirtualMachineInstanceGuestAgentInfo } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
 type HostnameProps = {

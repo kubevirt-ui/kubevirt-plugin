@@ -1,6 +1,6 @@
 import useHyperConvergeConfiguration from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { getAAQCalculationMethod } from '@kubevirt-utils/resources/hyperconverged/selectors';
-import { CalculationMethod } from '@kubevirt-utils/resources/quotas/types';
+import type { CalculationMethod } from '@kubevirt-utils/resources/quotas/types';
 
 const useAAQCalculationMethod = (): CalculationMethod => {
   const [hyperConverge] = useHyperConvergeConfiguration();

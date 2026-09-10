@@ -1,6 +1,7 @@
-import React, { FC, useMemo } from 'react';
+import type { FC } from 'react';
+import React, { useMemo } from 'react';
 
-import { V1Disk, V1Interface } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import type { V1Disk, V1Interface } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import BootableDevicesList from '@kubevirt-utils/components/BootOrder/BootableDevicesList';
 import {
   sortBootOrder,

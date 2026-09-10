@@ -1,6 +1,6 @@
 import React, { type FC } from 'react';
 
-import {
+import type {
   KubevirtFilterState,
   OnSetFilters,
 } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';

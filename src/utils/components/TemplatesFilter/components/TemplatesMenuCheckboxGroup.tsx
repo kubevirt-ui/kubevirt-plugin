@@ -1,7 +1,8 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
-import { KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
-import { TemplateOrRequest } from '@kubevirt-utils/resources/template';
+import type { KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
+import type { TemplateOrRequest } from '@kubevirt-utils/resources/template';
 import { SelectGroup, SelectOption } from '@patternfly/react-core';
 
 import { type UniversalFilter } from '../../../hooks/useUniversalFilter/useUniversalFilter';

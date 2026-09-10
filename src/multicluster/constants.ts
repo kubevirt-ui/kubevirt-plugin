@@ -4,7 +4,7 @@ import {
   VirtualMachineInstancetypeModelRef,
   VirtualMachineModelRef,
 } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { K8sModel } from '@openshift-console/dynamic-plugin-sdk';
+import type { K8sModel } from '@openshift-console/dynamic-plugin-sdk';
 
 export const BASE_K8S_API_PATH = '/api/kubernetes';
 

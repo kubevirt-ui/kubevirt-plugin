@@ -1,5 +1,5 @@
-import { HrefNavItem, NavSection } from '@openshift-console/dynamic-plugin-sdk';
-import { EncodedExtension } from '@openshift-console/dynamic-plugin-sdk-webpack';
+import type { HrefNavItem, NavSection } from '@openshift-console/dynamic-plugin-sdk';
+import type { EncodedExtension } from '@openshift-console/dynamic-plugin-sdk-webpack';
 
 import { PERSPECTIVES } from '../../utils/constants/constants';
 import { NAV_ID } from '../../views/navigation/constants';

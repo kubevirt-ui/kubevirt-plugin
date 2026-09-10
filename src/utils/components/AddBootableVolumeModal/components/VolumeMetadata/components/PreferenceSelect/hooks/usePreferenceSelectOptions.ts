@@ -7,8 +7,8 @@ import {
 import { VirtualMachineClusterPreferenceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { VirtualMachinePreferenceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { getResourceDropdownOptions } from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/PreferenceSelect/utils/utils';
-import { SetBootableVolumeFieldType } from '@kubevirt-utils/components/AddBootableVolumeModal/types';
-import { EnhancedSelectOptionProps } from '@kubevirt-utils/components/FilterSelect/utils/types';
+import type { SetBootableVolumeFieldType } from '@kubevirt-utils/components/AddBootableVolumeModal/types';
+import type { EnhancedSelectOptionProps } from '@kubevirt-utils/components/FilterSelect/utils/types';
 import { DEFAULT_PREFERENCE_KIND_LABEL } from '@kubevirt-utils/constants/instancetypes-and-preferences';
 import useClusterPreferences from '@kubevirt-utils/hooks/useClusterPreferences';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';

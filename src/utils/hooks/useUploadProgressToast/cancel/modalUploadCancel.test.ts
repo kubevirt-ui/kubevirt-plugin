@@ -1,5 +1,6 @@
 import { DROPDOWN_FORM_SELECTION } from '@kubevirt-utils/components/AddBootableVolumeModal/consts';
-import { DataUpload, UPLOAD_STATUS } from '@kubevirt-utils/hooks/useCDIUpload/types';
+import type { DataUpload } from '@kubevirt-utils/hooks/useCDIUpload/types';
+import { UPLOAD_STATUS } from '@kubevirt-utils/hooks/useCDIUpload/types';
 
 import { useUploadProgressStore } from '../uploadProgressStore';
 

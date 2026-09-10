@@ -1,4 +1,5 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
 import { modelToGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import MulticlusterResourceLink from '@multicluster/components/MulticlusterResourceLink/MulticlusterResourceLink';
@@ -6,7 +7,7 @@ import { ManagedClusterModel } from '@multicluster/constants';
 import { getCluster } from '@multicluster/helpers/selectors';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 
-import { VMCellProps } from './types';
+import type { VMCellProps } from './types';
 
 const VMClusterCell: FC<VMCellProps> = ({ row }) => {
   const clusterParam = useClusterParam();

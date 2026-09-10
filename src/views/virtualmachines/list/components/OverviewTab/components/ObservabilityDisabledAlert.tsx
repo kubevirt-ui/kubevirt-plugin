@@ -1,4 +1,5 @@
-import React, { FC, useEffect, useMemo, useState } from 'react';
+import type { FC } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Trans } from 'react-i18next';
 import classNames from 'classnames';
 
@@ -13,7 +14,8 @@ import {
   Tooltip,
 } from '@patternfly/react-core';
 
-import { CLUSTER_SEPARATOR, ObservabilityDisabledAlertProps } from './utils';
+import type { ObservabilityDisabledAlertProps } from './utils';
+import { CLUSTER_SEPARATOR } from './utils';
 
 import './ObservabilityDisabledAlert.scss';
 

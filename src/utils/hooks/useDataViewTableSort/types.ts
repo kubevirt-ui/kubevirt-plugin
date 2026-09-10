@@ -1,6 +1,6 @@
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 
-import { SortByDirection } from '@patternfly/react-table';
+import type { SortByDirection } from '@patternfly/react-table';
 
 export type ColumnConfig<TData, TCallbacks = undefined> = {
   /** If true, column is hidden by default in column management (user must explicitly enable) */

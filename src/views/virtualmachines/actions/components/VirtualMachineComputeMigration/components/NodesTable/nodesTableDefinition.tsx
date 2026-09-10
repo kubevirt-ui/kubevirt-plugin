@@ -1,13 +1,14 @@
-import React, { FC, ReactNode } from 'react';
-import { TFunction } from 'i18next';
+import type { FC, ReactNode } from 'react';
+import React from 'react';
+import type { TFunction } from 'i18next';
 
-import { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
+import type { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { humanizeBinaryBytes } from '@kubevirt-utils/utils/humanize.js';
 import Status from '@openshift-console/dynamic-plugin-sdk/lib/app/components/status/Status';
 import { Radio } from '@patternfly/react-core';
 
-import { NodeData } from '../../utils/types';
+import type { NodeData } from '../../utils/types';
 
 export type NodesTableCallbacks = {
   handleNodeSelection: (node: string) => void;

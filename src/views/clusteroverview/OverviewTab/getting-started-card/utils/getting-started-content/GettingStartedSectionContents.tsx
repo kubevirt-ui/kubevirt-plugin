@@ -1,4 +1,5 @@
-import React, { FC, ReactElement } from 'react';
+import type { FC, ReactElement } from 'react';
+import React from 'react';
 
 import {
   Content,
@@ -12,7 +13,7 @@ import {
   TitleSizes,
 } from '@patternfly/react-core';
 
-import { GettingStartedLink } from '../types';
+import type { GettingStartedLink } from '../types';
 
 import GettingStartedLinkExtraContent from './GettingStartedLinkExtraContent';
 import GettingStartedMoreLinkContent from './GettingStartedMoreLinkContent';

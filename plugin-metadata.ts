@@ -1,4 +1,4 @@
-import { ConsolePluginBuildMetadata } from '@openshift-console/dynamic-plugin-sdk-webpack';
+import type { ConsolePluginBuildMetadata } from '@openshift-console/dynamic-plugin-sdk-webpack';
 
 import { exposedModules as MulticlusterExposedModules } from './src/multicluster/extensions';
 import { exposedModules as VirtualizationPerspectiveExposedModules } from './src/perspective/extensions';

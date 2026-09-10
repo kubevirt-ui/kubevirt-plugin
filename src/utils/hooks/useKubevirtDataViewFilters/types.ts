@@ -1,6 +1,6 @@
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 
-import { DataViewFilterOption } from '@patternfly/react-data-view';
+import type { DataViewFilterOption } from '@patternfly/react-data-view';
 
 export enum KubevirtFilterLayout {
   GROUPED = 'grouped',

@@ -1,11 +1,11 @@
 import { ConfigMapModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import type { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { CONSOLE_USER_SETTINGS_NAMESPACE } from '@kubevirt-utils/hooks/useConsoleUserSettingsConfigMap/useConsoleUserSettingsConfigMap';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { kubevirtK8sCreate, kubevirtK8sGet, kubevirtK8sPatch } from '@multicluster/k8sRequests';
 
 import { CONSOLE_USER_SETTINGS } from './useConsoleUserSettingLocalStorage/consts';
-import { UpsertConsoleUserSettingArgs } from './types';
+import type { UpsertConsoleUserSettingArgs } from './types';
 
 type PatchOperation = {
   op: 'add' | 'replace';

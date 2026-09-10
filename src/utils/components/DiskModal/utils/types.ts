@@ -1,14 +1,14 @@
-import { TFunction } from 'i18next';
+import type { TFunction } from 'i18next';
 
-import { V1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
-import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
-import {
+import type { V1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
+import type { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import type {
   V1DataVolumeTemplateSpec,
   V1Disk,
   V1VirtualMachine,
   V1Volume,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { UploadDataProps } from '@kubevirt-utils/hooks/useCDIUpload/types';
+import type { UploadDataProps } from '@kubevirt-utils/hooks/useCDIUpload/types';
 
 export type RegistryCredentials = { password: string; username: string };
 

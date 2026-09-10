@@ -1,7 +1,7 @@
 import classNames from 'classnames';
 import React, { type FC, useEffect } from 'react';
 
-import {
+import type {
   KubevirtFilter,
   KubevirtFilterState,
   OnSetFilters,

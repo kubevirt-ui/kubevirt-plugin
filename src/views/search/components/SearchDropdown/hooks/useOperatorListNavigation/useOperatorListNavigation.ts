@@ -1,8 +1,11 @@
-import { Dispatch, SetStateAction, useCallback } from 'react';
+import type { Dispatch, SetStateAction } from 'react';
+import { useCallback } from 'react';
 
 import { OPERATOR_OPTIONS } from '../../constants';
-import { AutocompleteMode, DropdownType, ValueOption } from '../../types';
-import { OptionalListNavigationResult, useListNavigation } from '../useListNavigation';
+import type { AutocompleteMode, ValueOption } from '../../types';
+import { DropdownType } from '../../types';
+import type { OptionalListNavigationResult } from '../useListNavigation';
+import { useListNavigation } from '../useListNavigation';
 
 type UseOperatorListNavigationProps = {
   autocompleteMode: AutocompleteMode;

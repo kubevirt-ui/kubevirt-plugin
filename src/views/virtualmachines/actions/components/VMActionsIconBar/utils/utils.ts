@@ -1,9 +1,9 @@
-import { TFunction } from 'i18next';
+import type { TFunction } from 'i18next';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { ModalComponent } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+import type { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import type { ModalComponent } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { EjectIcon, PauseIcon, PlayIcon, RedoIcon, SquareIcon } from '@patternfly/react-icons';
-import { VMActionIconDetails } from '@virtualmachines/actions/components/VMActionsIconBar/utils/types';
+import type { VMActionIconDetails } from '@virtualmachines/actions/components/VMActionsIconBar/utils/types';
 import { createVirtualMachineActionFactory } from '@virtualmachines/actions/VirtualMachineActionFactory';
 import { isPaused, isRestoring, isSnapshotting } from '@virtualmachines/utils';
 

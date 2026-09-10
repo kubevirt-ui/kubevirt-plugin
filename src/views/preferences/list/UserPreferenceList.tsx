@@ -1,4 +1,5 @@
-import React, { FC, useMemo } from 'react';
+import type { FC } from 'react';
+import React, { useMemo } from 'react';
 
 import { VirtualMachinePreferenceModelRef } from '@kubevirt-ui-ext/kubevirt-api/console';
 import KubevirtFilterToolbar from '@kubevirt-utils/components/KubevirtFilterToolbar/KubevirtFilterToolbar';
@@ -12,7 +13,7 @@ import useKubevirtTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettin
 import usePaginationWithFilters from '@kubevirt-utils/hooks/usePagination/usePaginationWithFilters';
 import { paginationDefaultValues } from '@kubevirt-utils/hooks/usePagination/utils/constants';
 import useUserPreferences from '@kubevirt-utils/hooks/useUserPreferences';
-import { ListPageProps } from '@kubevirt-utils/utils/types';
+import type { ListPageProps } from '@kubevirt-utils/utils/types';
 import { isAllNamespaces, isEmpty } from '@kubevirt-utils/utils/utils';
 import { ListPageBody } from '@openshift-console/dynamic-plugin-sdk';
 import { Pagination } from '@patternfly/react-core';

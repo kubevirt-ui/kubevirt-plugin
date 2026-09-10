@@ -1,6 +1,7 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
-import { KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
+import type { KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 
 import FilteredKeyList from './components/FilteredKeyList';
 import OperatorList from './components/OperatorList';
@@ -11,7 +12,8 @@ import SearchExamples from './components/SearchExamples';
 import SearchValueList from './components/SearchValueList';
 import { getSectionFocusIndices } from './hooks/useDefaultMenuNavigation/utils';
 import useSearchKeyBadges from './hooks/useSearchKeyBadges';
-import { AutocompleteMode, DropdownType, SearchKeyBadge } from './types';
+import type { AutocompleteMode, SearchKeyBadge } from './types';
+import { DropdownType } from './types';
 import { hasActiveKeyFilter, toValueOptions } from './utils';
 
 import './search-dropdown.scss';

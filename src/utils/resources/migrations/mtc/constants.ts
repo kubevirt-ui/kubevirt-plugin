@@ -1,4 +1,5 @@
-import { STORAGE_MIGRATION_PHASE, StorageMigrationPlanNamespaceStatus } from '../constants';
+import type { StorageMigrationPlanNamespaceStatus } from '../constants';
+import { STORAGE_MIGRATION_PHASE } from '../constants';
 
 export const emptyNamespaceStatus = (): StorageMigrationPlanNamespaceStatus => ({
   completedOutOf: 0,

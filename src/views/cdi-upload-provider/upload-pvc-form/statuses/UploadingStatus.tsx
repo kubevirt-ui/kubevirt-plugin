@@ -1,4 +1,5 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
 import { getCancelUploadLabel } from '@kubevirt-utils/hooks/useCDIUpload/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -17,7 +18,7 @@ import {
 import { InProgressIcon } from '@patternfly/react-icons';
 
 import { UPLOAD_STATUS } from '../../utils/consts';
-import { UploadingStatusProps } from '../../utils/types';
+import type { UploadingStatusProps } from '../../utils/types';
 import { getProgressVariant } from '../../utils/utils';
 
 const UploadingStatus: FC<UploadingStatusProps> = ({ onCancelClick, onSuccessClick, upload }) => {

@@ -1,4 +1,5 @@
-import React, { FC, useMemo } from 'react';
+import type { FC } from 'react';
+import React, { useMemo } from 'react';
 
 import { VirtualMachineInstancetypeModelRef } from '@kubevirt-ui-ext/kubevirt-api/console';
 import KubevirtFilterToolbar from '@kubevirt-utils/components/KubevirtFilterToolbar/KubevirtFilterToolbar';
@@ -23,7 +24,7 @@ import { Pagination } from '@patternfly/react-core';
 
 import UserInstancetypeEmptyState from './components/UserInstancetypeEmptyState/UserInstancetypeEmptyState';
 import { getUserInstancetypeColumns, getUserInstancetypeRowId } from './userInstancetypeDefinition';
-import { UserInstancetypeListProps } from './utils/types';
+import type { UserInstancetypeListProps } from './utils/types';
 
 import '@kubevirt-utils/styles/list-managment-group.scss';
 

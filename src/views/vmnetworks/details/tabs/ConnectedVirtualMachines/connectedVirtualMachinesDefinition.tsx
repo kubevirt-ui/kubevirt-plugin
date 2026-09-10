@@ -1,11 +1,12 @@
-import React, { ReactNode } from 'react';
-import { TFunction } from 'i18next';
+import type { ReactNode } from 'react';
+import React from 'react';
+import type { TFunction } from 'i18next';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
+import type { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import type { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { getName, getNamespace, getUID, getVMStatus } from '@kubevirt-utils/resources/shared';
-import { ClusterUserDefinedNetworkKind } from '@kubevirt-utils/resources/udn/types';
-import { Action } from '@openshift-console/dynamic-plugin-sdk/lib/extensions/actions';
+import type { ClusterUserDefinedNetworkKind } from '@kubevirt-utils/resources/udn/types';
+import type { Action } from '@openshift-console/dynamic-plugin-sdk/lib/extensions/actions';
 
 import VMActionsCell from './cells/VMActionsCell';
 import VMNameCell from './cells/VMNameCell';

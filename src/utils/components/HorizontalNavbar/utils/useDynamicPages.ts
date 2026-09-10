@@ -1,17 +1,11 @@
 import { useMemo } from 'react';
 
-import {
-  isKubevirtHorizontalNavTab,
-  KubevirtHorizontalNavTab,
-} from '@kubevirt-extensions/kubevirt.tab';
-import {
-  HorizontalNavTab,
-  isHorizontalNavTab,
-  K8sModel,
-  useResolvedExtensions,
-} from '@openshift-console/dynamic-plugin-sdk';
+import type { KubevirtHorizontalNavTab } from '@kubevirt-extensions/kubevirt.tab';
+import { isKubevirtHorizontalNavTab } from '@kubevirt-extensions/kubevirt.tab';
+import type { HorizontalNavTab, K8sModel } from '@openshift-console/dynamic-plugin-sdk';
+import { isHorizontalNavTab, useResolvedExtensions } from '@openshift-console/dynamic-plugin-sdk';
 
-import { NavPageKubevirt } from './utils';
+import type { NavPageKubevirt } from './utils';
 
 const useDynamicPages = (
   model: K8sModel,

@@ -1,7 +1,8 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
 import ActionDropdownItem from '@kubevirt-utils/components/ActionDropdownItem/ActionDropdownItem';
-import { ActionDropdownItemType } from '@kubevirt-utils/components/ActionsDropdown/constants';
+import type { ActionDropdownItemType } from '@kubevirt-utils/components/ActionsDropdown/constants';
 import { MenuList, TooltipPosition } from '@patternfly/react-core';
 
 import { RIGHT_CLICK_MENU_Z_INDEX } from './constants';

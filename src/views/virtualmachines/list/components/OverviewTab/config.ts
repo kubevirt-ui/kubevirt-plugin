@@ -1,12 +1,10 @@
-import { TFunction } from 'i18next';
+import type { TFunction } from 'i18next';
 
+import type { OverviewConfig, OverviewLevel, OverviewSectionConfig } from './types';
 import {
   OVERVIEW_LEVEL_CLUSTER,
   OVERVIEW_LEVEL_MULTICLUSTER,
   OVERVIEW_LEVEL_PROJECT,
-  OverviewConfig,
-  OverviewLevel,
-  OverviewSectionConfig,
   SECTION_ID_CLUSTER_STATUS,
   SECTION_ID_MIGRATION_STATUS,
   SECTION_ID_RESOURCE_ALLOCATION,

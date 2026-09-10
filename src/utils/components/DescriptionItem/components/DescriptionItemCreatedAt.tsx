@@ -1,11 +1,12 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import Timestamp from '@kubevirt-utils/components/Timestamp/Timestamp';
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getCreationTimestamp } from '@kubevirt-utils/resources/shared';
-import { K8sModel } from '@openshift-console/dynamic-plugin-sdk';
+import type { K8sModel } from '@openshift-console/dynamic-plugin-sdk';
 
 type DescriptionItemCreatedAtProps = {
   label?: string;

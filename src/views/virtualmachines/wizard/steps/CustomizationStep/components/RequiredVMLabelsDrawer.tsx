@@ -1,6 +1,7 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
-import { AutoAppliedLabel } from '@kubevirt-utils/hooks/useAutoAppliedLabels/types';
+import type { AutoAppliedLabel } from '@kubevirt-utils/hooks/useAutoAppliedLabels/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   DrawerActions,

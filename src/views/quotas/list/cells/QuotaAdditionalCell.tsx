@@ -1,6 +1,7 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
-import { ApplicationAwareQuota } from '@kubevirt-utils/resources/quotas/types';
+import type { ApplicationAwareQuota } from '@kubevirt-utils/resources/quotas/types';
 
 import { getAdditionalResourceKeys, getStatus } from '../../utils/utils';
 import AdditionalQuotaPopover from '../components/AdditionalQuotaPopover/AdditionalQuotaPopover';

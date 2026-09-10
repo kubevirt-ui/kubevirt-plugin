@@ -1,13 +1,14 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import type { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import ListSkeleton from '@kubevirt-utils/components/StateHandler/ListSkeleton';
-import { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
+import type { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Table, TableVariant, Tbody, Th, Thead, Tr } from '@patternfly/react-table';
-import { VMCallbacks } from '@virtualmachines/list/virtualMachinesDefinition';
+import type { VMCallbacks } from '@virtualmachines/list/virtualMachinesDefinition';
 
 import VirtualMachineRow from './VirtualMachineRow';
 

@@ -1,4 +1,5 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
@@ -6,7 +7,7 @@ import { getVMIIPAddressesWithName } from '@kubevirt-utils/resources/vmi';
 
 import FirstItemListPopover from '../components/FirstItemListPopover/FirstItemListPopover';
 
-import { VMCellWithCallbacksProps } from './types';
+import type { VMCellWithCallbacksProps } from './types';
 
 const VMIPCell: FC<VMCellWithCallbacksProps> = ({ callbacks, row }) => {
   const { t } = useKubevirtTranslation();

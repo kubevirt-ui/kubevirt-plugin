@@ -1,5 +1,6 @@
-import React, { FC, useMemo } from 'react';
-import { ReactNode } from 'react';
+import type { FC } from 'react';
+import React, { useMemo } from 'react';
+import type { ReactNode } from 'react';
 
 import SubTitleChartLabel from '@kubevirt-utils/components/Charts/ChartLabels/SubTitleChartLabel';
 import TitleChartLabel from '@kubevirt-utils/components/Charts/ChartLabels/TitleChartLabel';

@@ -1,8 +1,9 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 import { getSortedResourceKeys, getStatus } from 'src/views/quotas/utils/utils';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { ApplicationAwareResourceQuota } from '@kubevirt-utils/resources/quotas/types';
+import type { ApplicationAwareResourceQuota } from '@kubevirt-utils/resources/quotas/types';
 import { Card, CardBody, CardTitle } from '@patternfly/react-core';
 import { Table, Tbody, Th, Thead, Tr } from '@patternfly/react-table';
 

@@ -1,12 +1,12 @@
 import { useCallback, useState } from 'react';
 
-import { IoK8sApiBatchV1Job } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import type { IoK8sApiBatchV1Job } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 
+import type { DownloadResultsReturn } from '../../utils/downloadResults';
 import {
   downloadResults,
-  DownloadResultsReturn,
   getDefaultErrorMessage,
   validateDownloadInputs,
 } from '../../utils/downloadResults';

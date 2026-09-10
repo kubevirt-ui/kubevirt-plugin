@@ -1,11 +1,9 @@
 import { useMemo } from 'react';
 
-import { KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
+import type { KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import {
-  DiskRowDataLayout,
-  diskTypesLabels,
-} from '@kubevirt-utils/resources/vm/utils/disk/constants';
+import type { DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/constants';
+import { diskTypesLabels } from '@kubevirt-utils/resources/vm/utils/disk/constants';
 
 const DISK_TYPE_FILTER_ID = 'disk-type';
 

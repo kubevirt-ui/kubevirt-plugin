@@ -1,6 +1,7 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
-import { HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
+import type { HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Stack, StackItem } from '@patternfly/react-core';
 import ExpandSection from '@settings/ExpandSection/ExpandSection';

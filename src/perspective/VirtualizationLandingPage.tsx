@@ -1,4 +1,5 @@
-import React, { FC, useEffect } from 'react';
+import type { FC } from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router';
 
 import Loading from '@kubevirt-utils/components/Loading/Loading';

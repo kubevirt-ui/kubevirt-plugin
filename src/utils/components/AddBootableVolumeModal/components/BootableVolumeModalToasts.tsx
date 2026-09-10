@@ -1,12 +1,10 @@
 import React from 'react';
 
-import { V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
+import type { V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import BootableVolumeViewLink from '@kubevirt-utils/components/AddBootableVolumeModal/components/BootableVolumeViewLink';
-import {
-  DROPDOWN_FORM_SELECTION,
-  isBackgroundImportSource,
-} from '@kubevirt-utils/components/AddBootableVolumeModal/consts';
-import { BootableVolumeToastHandlers } from '@kubevirt-utils/components/AddBootableVolumeModal/types';
+import type { DROPDOWN_FORM_SELECTION } from '@kubevirt-utils/components/AddBootableVolumeModal/consts';
+import { isBackgroundImportSource } from '@kubevirt-utils/components/AddBootableVolumeModal/consts';
+import type { BootableVolumeToastHandlers } from '@kubevirt-utils/components/AddBootableVolumeModal/types';
 import {
   extractCreatedDataSources,
   getCreatedBootableVolumeUrl,

@@ -1,9 +1,11 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
 import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-utils/models';
-import { ResourceLink, RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
+import type { RowProps } from '@openshift-console/dynamic-plugin-sdk';
+import { ResourceLink, TableData } from '@openshift-console/dynamic-plugin-sdk';
 
-import { ProjectWithVMCount } from '../../types';
+import type { ProjectWithVMCount } from '../../types';
 
 type ConnectedProjectsRowProps = RowProps<ProjectWithVMCount>;
 

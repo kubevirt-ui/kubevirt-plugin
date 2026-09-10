@@ -1,6 +1,7 @@
-import { Dispatch, SetStateAction, useEffect, useMemo, useRef } from 'react';
+import type { Dispatch, SetStateAction } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 
-import { ClaimPropertySets } from '@kubevirt-utils/types/storage';
+import type { ClaimPropertySets } from '@kubevirt-utils/types/storage';
 
 import {
   claimPropertySetsToCapabilities,

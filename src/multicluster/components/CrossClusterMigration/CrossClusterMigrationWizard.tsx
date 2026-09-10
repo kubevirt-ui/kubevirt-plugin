@@ -1,10 +1,12 @@
 /* Copyright Contributors to the Open Cluster Management project */
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router';
 import { useImmer } from 'use-immer';
 
-import { PlanModel, V1beta1NetworkMap, V1beta1Plan, V1beta1StorageMap } from '@forklift-ui/types';
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import type { V1beta1NetworkMap, V1beta1Plan, V1beta1StorageMap } from '@forklift-ui/types';
+import { PlanModel } from '@forklift-ui/types';
+import type { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {

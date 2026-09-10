@@ -1,8 +1,9 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { BootMode } from '@kubevirt-utils/components/FirmwareBootloaderModal/utils/constants';
-import { HARDWARE_DEVICE_TYPE } from '@kubevirt-utils/components/HardwareDevices/utils/constants';
+import type { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import type { BootMode } from '@kubevirt-utils/components/FirmwareBootloaderModal/utils/constants';
+import type { HARDWARE_DEVICE_TYPE } from '@kubevirt-utils/components/HardwareDevices/utils/constants';
 import { getDevices } from '@kubevirt-utils/resources/vm';
 import {
   customizeWizardVMSignal,

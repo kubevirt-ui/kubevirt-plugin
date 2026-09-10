@@ -1,6 +1,7 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
-import { ColoredIconProps } from '@openshift-console/dynamic-plugin-sdk';
+import type { ColoredIconProps } from '@openshift-console/dynamic-plugin-sdk';
 import { UnknownIcon } from '@patternfly/react-icons';
 import disabledColor from '@patternfly/react-tokens/dist/js/t_global_icon_color_disabled';
 

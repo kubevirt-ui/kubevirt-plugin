@@ -1,6 +1,7 @@
-import React, { FC, useMemo, useState } from 'react';
+import type { FC } from 'react';
+import React, { useMemo, useState } from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import type { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ListPageBody } from '@openshift-console/dynamic-plugin-sdk';
@@ -8,7 +9,8 @@ import { HelperText, HelperTextItem, SearchInput, Stack, StackItem } from '@patt
 
 import useNodesData from '../../utils/hooks/useNodesData';
 
-import { getNodeRowId, getNodesTableColumns, NodesTableCallbacks } from './nodesTableDefinition';
+import type { NodesTableCallbacks } from './nodesTableDefinition';
+import { getNodeRowId, getNodesTableColumns } from './nodesTableDefinition';
 
 import './NodesTable.scss';
 

@@ -1,14 +1,19 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
 import { modelToGroupVersionKind, NodeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { IoK8sApiCoreV1Pod } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
-import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import type { IoK8sApiCoreV1Pod } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import type {
+  V1VirtualMachine,
+  V1VirtualMachineInstance,
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { getVMINodeName } from '@kubevirt-utils/resources/vmi';
-import { K8sVerb, ResourceLink, useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
+import type { K8sVerb } from '@openshift-console/dynamic-plugin-sdk';
+import { ResourceLink, useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
 import { getNodeName } from '@topology/utils/selectors/selectors';
 
 import '../../../TopologyVMDetailsPanel.scss';

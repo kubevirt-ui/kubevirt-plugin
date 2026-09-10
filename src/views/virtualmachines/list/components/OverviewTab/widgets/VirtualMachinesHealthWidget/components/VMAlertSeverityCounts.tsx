@@ -1,4 +1,5 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
@@ -9,7 +10,7 @@ import {
 import { Grid } from '@patternfly/react-core';
 
 import StatusCountItem, { getLinkProps } from '../../shared/StatusCountItem';
-import { SeverityUrls } from '../utils/vmAlerts';
+import type { SeverityUrls } from '../utils/vmAlerts';
 
 type VMAlertSeverityCountsProps = {
   critical: number;

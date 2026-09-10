@@ -1,7 +1,8 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
 import { DataSourceModel, modelToGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
+import type { V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
 

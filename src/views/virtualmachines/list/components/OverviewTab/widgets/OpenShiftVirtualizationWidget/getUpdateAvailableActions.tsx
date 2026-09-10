@@ -1,9 +1,10 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 import { Link } from 'react-router';
 
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { CardHeaderActionsObject } from '@patternfly/react-core';
+import type { CardHeaderActionsObject } from '@patternfly/react-core';
 
 type UpdateAvailableActionProps = {
   isSpokeCluster: boolean;

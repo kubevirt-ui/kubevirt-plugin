@@ -1,11 +1,11 @@
 import { NetworkAttachmentDefinitionModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { NADListPermissionsMap } from '@kubevirt-utils/components/NetworkInterfaceModal/components/hooks/types';
+import type { NADListPermissionsMap } from '@kubevirt-utils/components/NetworkInterfaceModal/components/hooks/types';
 import {
   DEFAULT_NAMESPACE,
   OPENSHIFT_MULTUS_NS,
   OPENSHIFT_SRIOV_NETWORK_OPERATOR_NS,
 } from '@kubevirt-utils/constants/constants';
-import { K8sVerb } from '@openshift-console/dynamic-plugin-sdk';
+import type { K8sVerb } from '@openshift-console/dynamic-plugin-sdk';
 import { useFleetAccessReview } from '@stolostron/multicluster-sdk';
 
 type UseNADListPermissions = (cluster?: string) => NADListPermissionsMap;

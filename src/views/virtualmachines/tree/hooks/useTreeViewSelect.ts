@@ -1,10 +1,11 @@
-import { MouseEvent, useCallback, useState } from 'react';
+import type { MouseEvent } from 'react';
+import { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router';
 
 import { logTreeViewAction } from '@kubevirt-utils/extensions/telemetry/multicluster';
 import { TELEMETRY_TREE_VIEW_ACTION } from '@kubevirt-utils/extensions/telemetry/utils/property-constants';
 
-import { TreeViewDataItemWithHref } from '../utils/utils';
+import type { TreeViewDataItemWithHref } from '../utils/utils';
 
 const useTreeViewSelect = (): [
   selected: TreeViewDataItemWithHref,

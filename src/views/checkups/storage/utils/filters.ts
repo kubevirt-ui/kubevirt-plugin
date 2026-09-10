@@ -1,10 +1,10 @@
-import { TFunction } from 'i18next';
+import type { TFunction } from 'i18next';
 
-import {
+import type {
   IoK8sApiBatchV1Job,
   IoK8sApiCoreV1ConfigMap,
 } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
-import { KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
+import type { KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 
 import { getName } from '@kubevirt-utils/resources/shared';
 import { CheckupsStatus, getConfigMapStatus, getJobByName, getJobStatus } from '../../utils/utils';

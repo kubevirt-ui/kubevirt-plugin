@@ -1,4 +1,4 @@
-import { NetworkPresentation } from '@kubevirt-utils/resources/vm/utils/network/constants';
+import type { NetworkPresentation } from '@kubevirt-utils/resources/vm/utils/network/constants';
 
 export type SimpleNICPresentation = {
   config?: NetworkPresentation;

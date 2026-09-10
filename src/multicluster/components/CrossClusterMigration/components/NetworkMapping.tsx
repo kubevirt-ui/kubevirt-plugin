@@ -1,16 +1,17 @@
-import React, { FC, useMemo } from 'react';
+import type { FC } from 'react';
+import React, { useMemo } from 'react';
 
-import { V1beta1NetworkMap } from '@forklift-ui/types';
+import type { V1beta1NetworkMap } from '@forklift-ui/types';
 import { NetworkAttachmentDefinitionModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
-import { NetworkAttachmentDefinitionKind } from '@kubevirt-utils/resources/nad/types';
+import type { NetworkAttachmentDefinitionKind } from '@kubevirt-utils/resources/nad/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { modelToGroupVersionKind } from '@kubevirt-utils/models';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { FormGroup, Split, SplitItem, TextInput, Title } from '@patternfly/react-core';
 
 import { POD_NETWORK_TYPE } from '../constants';
-import { UseNetworkReadinessReturnType } from '../hooks/useNetworkReadiness';
+import type { UseNetworkReadinessReturnType } from '../hooks/useNetworkReadiness';
 import { getNADNameAndNamespace } from '../utils';
 
 type NetworkMappingProps = {

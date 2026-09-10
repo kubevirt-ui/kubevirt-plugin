@@ -1,10 +1,11 @@
-import React, { ReactNode } from 'react';
+import type { ReactNode } from 'react';
+import React from 'react';
 
 import { Checkbox } from '@patternfly/react-core';
-import { DataViewTr } from '@patternfly/react-data-view';
+import type { DataViewTr } from '@patternfly/react-data-view';
 
 import { PF_TABLE_CHECK_CLASS } from './constants';
-import { ColumnConfig } from './types';
+import type { ColumnConfig } from './types';
 
 export type GenerateRowsParams<TData, TCallbacks = undefined> = {
   callbacks: TCallbacks;

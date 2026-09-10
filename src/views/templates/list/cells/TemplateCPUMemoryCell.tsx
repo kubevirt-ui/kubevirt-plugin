@@ -1,10 +1,9 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import {
-  isVirtualMachineTemplateRequest,
-  TemplateOrRequest,
-} from '@kubevirt-utils/resources/template';
+import type { TemplateOrRequest } from '@kubevirt-utils/resources/template';
+import { isVirtualMachineTemplateRequest } from '@kubevirt-utils/resources/template';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm';
 
 import { getVirtualMachineTemplatesCPUMemoryText } from '../../utils/utils';

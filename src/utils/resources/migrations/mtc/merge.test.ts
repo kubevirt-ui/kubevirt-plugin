@@ -1,13 +1,15 @@
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import type { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 
+import type {
+  MigMigration,
+  MigPlan,
+  MultiNamespaceVirtualMachineStorageMigrationPlan,
+} from '../constants';
 import {
   CONDITION_TYPE_FAILED,
   K8S_CONDITION_STATUS_TRUE,
-  MigMigration,
-  MigPlan,
   MTC_PLAN_VM_PLACEHOLDER,
-  MultiNamespaceVirtualMachineStorageMigrationPlan,
   STATUS_READY,
   STORAGE_MIGRATION_PHASE,
 } from '../constants';

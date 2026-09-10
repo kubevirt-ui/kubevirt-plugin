@@ -1,9 +1,10 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
 import TemplateValue from '@kubevirt-utils/components/TemplateValue/TemplateValue';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
-import { NetworkPresentation } from '@kubevirt-utils/resources/vm/utils/network/constants';
+import type { NetworkPresentation } from '@kubevirt-utils/resources/vm/utils/network/constants';
 import { isPodNetwork } from '@kubevirt-utils/resources/vm/utils/network/selectors';
 
 type TemplateNetworkCellProps = {

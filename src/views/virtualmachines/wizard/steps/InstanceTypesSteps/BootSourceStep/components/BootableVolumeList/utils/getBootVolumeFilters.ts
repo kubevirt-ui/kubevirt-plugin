@@ -1,7 +1,7 @@
-import { TFunction } from 'i18next';
+import type { TFunction } from 'i18next';
 
 import { DataSourceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
+import type { KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import {
   ISO,
   SHOW_DEPRECATED_BOOTABLE_VOLUMES,
@@ -10,7 +10,7 @@ import {
   isBootableVolumeISO,
   isDeprecated,
 } from '@kubevirt-utils/resources/bootableresources/helpers';
-import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
+import type { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { OS_NAMES } from '@kubevirt-utils/resources/template';
 import {

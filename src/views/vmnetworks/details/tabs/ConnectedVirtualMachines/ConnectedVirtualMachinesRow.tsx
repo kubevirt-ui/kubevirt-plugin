@@ -1,6 +1,7 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import type { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import ActionsDropdown from '@kubevirt-utils/components/ActionsDropdown/ActionsDropdown';
 import {
   modelToGroupVersionKind,
@@ -8,8 +9,9 @@ import {
   VirtualMachineModel,
 } from '@kubevirt-utils/models';
 import { getName, getNamespace, getVMStatus } from '@kubevirt-utils/resources/shared';
-import { ClusterUserDefinedNetworkKind } from '@kubevirt-utils/resources/udn/types';
-import { ResourceLink, RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
+import type { ClusterUserDefinedNetworkKind } from '@kubevirt-utils/resources/udn/types';
+import type { RowProps } from '@openshift-console/dynamic-plugin-sdk';
+import { ResourceLink, TableData } from '@openshift-console/dynamic-plugin-sdk';
 import { Checkbox, Flex } from '@patternfly/react-core';
 
 import useVirtualMachineActions from './actions/hooks/useVirtualMachineActions';

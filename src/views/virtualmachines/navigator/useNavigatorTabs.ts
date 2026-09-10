@@ -1,4 +1,5 @@
-import { MouseEvent, useCallback, useEffect, useState } from 'react';
+import type { MouseEvent } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 
 import { OVERVIEW_TAB_INDEX, TAB_INDEX_MAP, TAB_KEY_MAP, VM_LIST_TAB_PARAM } from './constants';

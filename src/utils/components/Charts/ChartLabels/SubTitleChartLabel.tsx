@@ -1,6 +1,8 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
-import { ChartLabel, ChartLabelProps } from '@patternfly/react-charts/victory';
+import type { ChartLabelProps } from '@patternfly/react-charts/victory';
+import { ChartLabel } from '@patternfly/react-charts/victory';
 
 const SubTitleChartLabel: FC<ChartLabelProps & { splitTitleText?: boolean }> = (props) => (
   <ChartLabel

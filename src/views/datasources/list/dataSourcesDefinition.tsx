@@ -1,9 +1,9 @@
 import React from 'react';
-import { TFunction } from 'i18next';
+import type { TFunction } from 'i18next';
 
-import { V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
+import type { V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import { getK8sRowId } from '@kubevirt-utils/components/KubevirtTable/utils';
-import { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
+import type { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { ACTIONS } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/const';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 

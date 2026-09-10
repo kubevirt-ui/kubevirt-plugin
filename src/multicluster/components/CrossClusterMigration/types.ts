@@ -1,8 +1,8 @@
-import {
+import type {
   IoK8sApiCoreV1PersistentVolumeClaim,
   IoK8sApiStorageV1StorageClass,
 } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import type { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 
 export type GetInitialStorageMapParams = {
   pvcs: IoK8sApiCoreV1PersistentVolumeClaim[];

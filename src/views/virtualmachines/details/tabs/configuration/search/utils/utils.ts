@@ -1,6 +1,6 @@
 import { VirtualMachineDetailsTab } from '@kubevirt-utils/constants/tabs-constants';
 
-import { SearchItem } from '../../utils/search';
+import type { SearchItem } from '../../utils/search';
 
 export const createConfigurationSearchURL = (
   tab: string,

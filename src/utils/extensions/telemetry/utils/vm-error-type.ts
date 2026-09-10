@@ -1,7 +1,7 @@
 import { VM_ERROR_STATUSES, VM_STATUS } from '@kubevirt-utils/resources/vm/utils/vmStatus';
 
 import { TELEMETRY_VM_ERROR_TYPE } from './property-constants';
-import { VMErrorTypeTelemetry } from './types';
+import type { VMErrorTypeTelemetry } from './types';
 
 export const getVMErrorTelemetryType = (printableStatus: string): null | VMErrorTypeTelemetry => {
   if (!VM_ERROR_STATUSES.includes(printableStatus as VM_STATUS)) {

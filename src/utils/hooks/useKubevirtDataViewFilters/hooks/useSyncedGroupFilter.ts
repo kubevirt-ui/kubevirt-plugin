@@ -2,7 +2,7 @@ import { useCallback, useMemo } from 'react';
 
 import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
-import { KubevirtFilterState, OnSetFilters } from '../types';
+import type { KubevirtFilterState, OnSetFilters } from '../types';
 
 type UseSyncedGroupFilter = (
   filters: KubevirtFilterState,

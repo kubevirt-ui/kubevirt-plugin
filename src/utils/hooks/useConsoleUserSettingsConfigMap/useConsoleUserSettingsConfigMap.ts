@@ -5,12 +5,12 @@ import {
   modelToGroupVersionKind,
   UserModel,
 } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import type { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { isConsoleUserSettingsLocalStorage } from '@kubevirt-utils/hooks/consoleUserSettings/utils';
 import { getName, getUID } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
-import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+import type { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
 import { hashUsernameForSettings } from './utils';
 

@@ -1,4 +1,4 @@
-import { LabelProps } from '@patternfly/react-core';
+import type { LabelProps } from '@patternfly/react-core';
 
 const ARCHITECUTRE_COLORS: Record<string, LabelProps['color']> = {
   amd64: 'blue',

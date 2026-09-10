@@ -1,10 +1,11 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router';
 import classNames from 'classnames';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { K8sGroupVersionKind } from '@openshift-console/dynamic-plugin-sdk';
+import type { K8sGroupVersionKind } from '@openshift-console/dynamic-plugin-sdk';
 import { Label as PfLabel, LabelGroup as PfLabelGroup } from '@patternfly/react-core';
 
 import { getSearchLabelHREF } from './utils';

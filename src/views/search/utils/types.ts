@@ -1,8 +1,8 @@
-import { CAPACITY_UNITS } from '@kubevirt-utils/components/CapacityInput/utils';
-import { NumberOperator } from '@kubevirt-utils/utils/constants';
-import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
+import type { CAPACITY_UNITS } from '@kubevirt-utils/components/CapacityInput/utils';
+import type { NumberOperator } from '@kubevirt-utils/utils/constants';
+import type { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
-import { GuestAgentStatus, HWDeviceKind, SchedulingKind } from './constants';
+import type { GuestAgentStatus, HWDeviceKind, SchedulingKind } from './constants';
 
 export type AdvancedSearchInputs = AdvancedSearchQueryInputs & {
   labelInputText?: string;

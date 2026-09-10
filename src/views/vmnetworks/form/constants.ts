@@ -2,7 +2,7 @@ import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { PROJECT_NAME_LABEL_KEY } from '@kubevirt-utils/constants/constants';
 import { ClusterUserDefinedNetworkModel } from '@kubevirt-utils/models';
 import { IPAM_MODE_DISABLED, UDNRole, UDNTopology } from '@kubevirt-utils/resources/udn/constants';
-import { ClusterUserDefinedNetworkKind } from '@kubevirt-utils/resources/udn/types';
+import type { ClusterUserDefinedNetworkKind } from '@kubevirt-utils/resources/udn/types';
 
 export const DEFAULT_MTU = 1500;
 export const NODE_NETWORK_MAPPING_PARAM_KEY = 'physicalNetworkName';

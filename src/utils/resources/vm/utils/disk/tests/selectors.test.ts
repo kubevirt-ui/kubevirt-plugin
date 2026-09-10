@@ -1,4 +1,4 @@
-import { V1Disk } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import type { V1Disk } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 
 import {

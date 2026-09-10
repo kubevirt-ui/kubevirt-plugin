@@ -1,8 +1,11 @@
-import { Dispatch, SetStateAction, useMemo } from 'react';
+import type { Dispatch, SetStateAction } from 'react';
+import { useMemo } from 'react';
 
-import { AutocompleteMode, DropdownType, SearchKeyBadge } from '../../types';
+import type { AutocompleteMode, SearchKeyBadge } from '../../types';
+import { DropdownType } from '../../types';
 import { getFilteredKeyBadges, hasActiveKeyFilter } from '../../utils';
-import { OptionalListNavigationResult, useListNavigation } from '../useListNavigation';
+import type { OptionalListNavigationResult } from '../useListNavigation';
+import { useListNavigation } from '../useListNavigation';
 import useSearchKeyBadges from '../useSearchKeyBadges';
 
 type UseKeyListNavigationProps = {

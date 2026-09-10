@@ -1,4 +1,5 @@
-import React, { FC, useMemo } from 'react';
+import type { FC } from 'react';
+import React, { useMemo } from 'react';
 
 import useIsAllClustersPage from '@multicluster/hooks/useIsAllClustersPage';
 import {
@@ -6,12 +7,8 @@ import {
   getNamespacesWithVMsCount,
 } from '@virtualmachines/list/utils/utils';
 
-import {
-  GRID_NARROW_WIDE,
-  GRID_THREE_EQUAL,
-  GRID_TWO_EQUAL,
-  OverviewSectionData,
-} from '../../types';
+import type { OverviewSectionData } from '../../types';
+import { GRID_NARROW_WIDE, GRID_THREE_EQUAL, GRID_TWO_EQUAL } from '../../types';
 import ClusterUtilizationWidget from '../ClusterUtilizationWidget/ClusterUtilizationWidget';
 import OpenShiftVirtualizationWidget from '../OpenShiftVirtualizationWidget/OpenShiftVirtualizationWidget';
 import OverviewSection from '../OverviewSection/OverviewSection';

@@ -11,7 +11,7 @@ import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { TEMPLATE_TYPE_LABEL } from '@kubevirt-utils/resources/template';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import useKubevirtWatchResources from '@multicluster/hooks/useKubevirtWatchResources';
-import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+import type { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
 
 type UseResourcesQuantities = () => {

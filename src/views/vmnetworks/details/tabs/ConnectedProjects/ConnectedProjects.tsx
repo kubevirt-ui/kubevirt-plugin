@@ -1,12 +1,13 @@
-import React, { FC, useMemo } from 'react';
+import type { FC } from 'react';
+import React, { useMemo } from 'react';
 
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
 import ListSkeleton from '@kubevirt-utils/components/StateHandler/ListSkeleton';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { ClusterUserDefinedNetworkKind } from '@kubevirt-utils/resources/udn/types';
+import type { ClusterUserDefinedNetworkKind } from '@kubevirt-utils/resources/udn/types';
 import { ListPageBody } from '@openshift-console/dynamic-plugin-sdk';
 
-import { ProjectWithVMCount } from '../../types';
+import type { ProjectWithVMCount } from '../../types';
 
 import useProjectsWithVMCounts from './hooks/useProjectsWithVMCounts';
 import {

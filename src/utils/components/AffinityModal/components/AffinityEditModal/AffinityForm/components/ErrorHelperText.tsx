@@ -1,4 +1,5 @@
-import React, { FC, ReactNode } from 'react';
+import type { FC, ReactNode } from 'react';
+import React from 'react';
 
 const ErrorHelperText: FC<{ children?: ReactNode }> = ({ children }) => {
   return <div className="pf-v6-c-form__helper-text pf-m-error">{children}</div>;

@@ -1,9 +1,10 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
 import DiskSourceUploadPVC from '@kubevirt-utils/components/DiskModal/components/DiskSourceSelect/components/DiskSourceUploadPVC/DiskSourceUploadPVC';
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
-import { EnhancedSelectOptionProps } from '@kubevirt-utils/components/FilterSelect/utils/types';
-import { DataUpload } from '@kubevirt-utils/hooks/useCDIUpload/types';
+import type { EnhancedSelectOptionProps } from '@kubevirt-utils/components/FilterSelect/utils/types';
+import type { DataUpload } from '@kubevirt-utils/hooks/useCDIUpload/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Content, ContentVariants, Radio, Stack, StackItem } from '@patternfly/react-core';
 

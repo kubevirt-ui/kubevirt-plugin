@@ -1,9 +1,10 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import type { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import ActionsDropdown from '@kubevirt-utils/components/ActionsDropdown/ActionsDropdown';
 import { getName, getNamespace, getUID } from '@kubevirt-utils/resources/shared';
-import { Action } from '@openshift-console/dynamic-plugin-sdk/lib/extensions/actions';
+import type { Action } from '@openshift-console/dynamic-plugin-sdk/lib/extensions/actions';
 
 type VMActionsCellProps = {
   getActions: (vms: V1VirtualMachine[]) => Action[];

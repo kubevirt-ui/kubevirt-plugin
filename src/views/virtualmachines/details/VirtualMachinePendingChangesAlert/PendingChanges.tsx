@@ -1,7 +1,8 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
 import PendingChangesBreadcrumb from '@kubevirt-utils/components/PendingChanges/PendingChangesBreadcrumb/PendingChangesBreadcrumb';
-import { PendingChange } from '@kubevirt-utils/components/PendingChanges/utils/types';
+import type { PendingChange } from '@kubevirt-utils/components/PendingChanges/utils/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { List } from '@patternfly/react-core';
 

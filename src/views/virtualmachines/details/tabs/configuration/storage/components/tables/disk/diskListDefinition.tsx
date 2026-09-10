@@ -1,11 +1,15 @@
-import React, { ReactNode } from 'react';
-import { TFunction } from 'i18next';
+import type { ReactNode } from 'react';
+import React from 'react';
+import type { TFunction } from 'i18next';
 
-import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
-import { NameWithPercentages } from '@kubevirt-utils/resources/vm/hooks/types';
+import type {
+  V1VirtualMachine,
+  V1VirtualMachineInstance,
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import type { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
+import type { NameWithPercentages } from '@kubevirt-utils/resources/vm/hooks/types';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
-import { DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/constants';
+import type { DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/constants';
 import { readableSizeUnit } from '@kubevirt-utils/utils/units';
 
 import DiskNameCell from './cells/DiskNameCell';

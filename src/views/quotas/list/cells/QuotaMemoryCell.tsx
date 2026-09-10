@@ -1,10 +1,12 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
-import { ApplicationAwareQuota } from '@kubevirt-utils/resources/quotas/types';
+import type { ApplicationAwareQuota } from '@kubevirt-utils/resources/quotas/types';
 
 import { QUOTA_UNITS } from '../../utils/constants';
 import QuotaLimitBar from '../components/QuotaLimitBar/QuotaLimitBar';
-import { getQuotaStatusData, getResourceKeysFromCallbacks, QuotaCallbacks } from '../utils/helpers';
+import type { QuotaCallbacks } from '../utils/helpers';
+import { getQuotaStatusData, getResourceKeysFromCallbacks } from '../utils/helpers';
 
 type QuotaMemoryCellProps = {
   callbacks: QuotaCallbacks;

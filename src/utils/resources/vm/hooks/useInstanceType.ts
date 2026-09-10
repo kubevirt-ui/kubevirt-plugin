@@ -1,5 +1,5 @@
 import { modelToGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
-import {
+import type {
   V1beta1VirtualMachineInstancetype,
   V1InstancetypeMatcher,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';

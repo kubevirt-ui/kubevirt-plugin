@@ -1,4 +1,4 @@
-import { DiagnosticFilters, DiagnosticSeverity } from './types';
+import type { DiagnosticFilters, DiagnosticSeverity } from './types';
 
 export const INVERTED_CONDITION_TYPES = new Set(['RestartRequired']);
 

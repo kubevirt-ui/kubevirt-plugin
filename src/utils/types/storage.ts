@@ -1,5 +1,5 @@
-import { V1beta1StorageSpecAccessModesEnum } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+import type { V1beta1StorageSpecAccessModesEnum } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import type { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
 export type ClaimPropertySet = {
   accessModes: V1beta1StorageSpecAccessModesEnum[];

@@ -1,4 +1,5 @@
-import React, { FC, ReactNode } from 'react';
+import type { FC, ReactNode } from 'react';
+import React from 'react';
 
 import { Drawer, DrawerContent, DrawerContentBody } from '@patternfly/react-core';
 import useRequiredVMLabelsDrawer from '@virtualmachines/wizard/hooks/useRequiredVMLabelsDrawer';

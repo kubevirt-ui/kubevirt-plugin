@@ -6,7 +6,8 @@ import { universalComparator } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { useFleetClusterNames, useHubClusterName } from '@stolostron/multicluster-sdk';
 
-import { KubevirtFilter, KubevirtFilterLayout } from '../types';
+import type { KubevirtFilter } from '../types';
+import { KubevirtFilterLayout } from '../types';
 
 const useClusterFilter = (): KubevirtFilter => {
   const { t } = useKubevirtTranslation();

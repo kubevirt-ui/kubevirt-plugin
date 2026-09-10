@@ -1,10 +1,10 @@
 import { useMemo } from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import type { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import type { TabBadge } from '@kubevirt-utils/components/HorizontalNavbar/utils/utils';
 import {
   TAB_BADGE_COLOR_RED,
   TAB_BADGE_COLOR_YELLOW,
-  TabBadge,
 } from '@kubevirt-utils/components/HorizontalNavbar/utils/utils';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 

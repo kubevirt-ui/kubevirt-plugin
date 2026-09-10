@@ -1,7 +1,8 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 import { useFormContext } from 'react-hook-form';
 
-import { V1DiskFormState } from '@kubevirt-utils/components/DiskModal/utils/types';
+import type { V1DiskFormState } from '@kubevirt-utils/components/DiskModal/utils/types';
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FormGroup, TextInput, ValidatedOptions } from '@patternfly/react-core';
@@ -10,7 +11,7 @@ import { DATAVOLUME_HTTPURL_FIELD } from '../../../utils/constants';
 import { diskSourceURLFieldID } from '../../utils/constants';
 
 import { HTTP_URL_PREFIX, HTTPS_URL_PREFIX } from './utils/constants';
-import { DiskSourceUrlInputProps } from './utils/types';
+import type { DiskSourceUrlInputProps } from './utils/types';
 import URLSourceHelperText from './URLSourceHelperText';
 
 const DiskSourceUrlInput: FC<DiskSourceUrlInputProps> = ({ os }) => {

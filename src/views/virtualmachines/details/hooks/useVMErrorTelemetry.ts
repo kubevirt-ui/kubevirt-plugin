@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import type { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { logVMErrorDetected } from '@kubevirt-utils/extensions/telemetry/errors';
 import { getVMErrorTelemetryType } from '@kubevirt-utils/extensions/telemetry/utils/vm-error-type';
 import { getName, getNamespace, getVMStatus } from '@kubevirt-utils/resources/shared';

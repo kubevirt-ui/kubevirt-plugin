@@ -1,4 +1,4 @@
-import { EncodedExtension } from '@openshift-console/dynamic-plugin-sdk-webpack';
+import type { EncodedExtension } from '@openshift-console/dynamic-plugin-sdk-webpack';
 
 import { extensions } from '../../views/navigation/virtualizationSection';
 import { adaptNavForPerspective } from '../utils';

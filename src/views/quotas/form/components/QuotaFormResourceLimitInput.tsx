@@ -1,9 +1,10 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverContentWithLightspeedButton/PopoverContentWithLightspeedButton';
-import { OLSPromptType } from '@lightspeed/utils/prompts';
+import type { OLSPromptType } from '@lightspeed/utils/prompts';
 import { Flex, FormGroup, Stack, StackItem } from '@patternfly/react-core';
 
 import NumberTextInput from '../../../../utils/components/NumberTextInput/NumberTextInput';

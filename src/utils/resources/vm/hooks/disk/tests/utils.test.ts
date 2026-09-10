@@ -1,4 +1,4 @@
-import { V1Disk } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import type { V1Disk } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { createDisk, createVMI } from '@kubevirt-utils/resources/vm/utils/disk/tests/mocks';
 
 import { enrichDisksWithVMIBusInfo } from '../utils';

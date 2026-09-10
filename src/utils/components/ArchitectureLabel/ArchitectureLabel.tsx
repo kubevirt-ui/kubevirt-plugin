@@ -1,8 +1,10 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { Label, LabelProps } from '@patternfly/react-core';
+import type { LabelProps } from '@patternfly/react-core';
+import { Label } from '@patternfly/react-core';
 
 import { getArchitectureLabelColor } from './constants';
 

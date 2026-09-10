@@ -1,28 +1,27 @@
-import React, { FC, useCallback, useMemo } from 'react';
+import type { FC } from 'react';
+import React, { useCallback, useMemo } from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import type { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import DiskListTitle from '@kubevirt-utils/components/DiskListTitle/DiskListTitle';
 import DiskSourceSelect from '@kubevirt-utils/components/DiskModal/components/DiskSourceSelect/DiskSourceSelect';
 import DiskModal from '@kubevirt-utils/components/DiskModal/DiskModal';
-import { SourceTypes } from '@kubevirt-utils/components/DiskModal/utils/types';
+import type { SourceTypes } from '@kubevirt-utils/components/DiskModal/utils/types';
 import KubevirtFilterToolbar from '@kubevirt-utils/components/KubevirtFilterToolbar/KubevirtFilterToolbar';
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
 import useKubevirtDataViewFilters from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/useKubevirtDataViewFilters';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { replaceTemplateVM, Template, updateTemplate } from '@kubevirt-utils/resources/template';
+import type { Template } from '@kubevirt-utils/resources/template';
+import { replaceTemplateVM, updateTemplate } from '@kubevirt-utils/resources/template';
 import { PageSection, Stack, StackItem } from '@patternfly/react-core';
 
 import useEditTemplateAccessReview from '../../hooks/useIsTemplateEditable';
 
 import useDisksFilters from './hooks/useDisksFilters';
 import useTemplateDisksTableData from './hooks/useTemplateDisksTableData';
-import {
-  getTemplateDiskColumns,
-  getTemplateDiskRowId,
-  TemplateDiskCallbacks,
-} from './templateDisksTableDefinition';
+import type { TemplateDiskCallbacks } from './templateDisksTableDefinition';
+import { getTemplateDiskColumns, getTemplateDiskRowId } from './templateDisksTableDefinition';
 import { getTemplateVMWithNamespace } from './utils';
 
 type TemplateDisksPageProps = {

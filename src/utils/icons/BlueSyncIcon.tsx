@@ -1,6 +1,7 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
-import { ColoredIconProps } from '@openshift-console/dynamic-plugin-sdk';
+import type { ColoredIconProps } from '@openshift-console/dynamic-plugin-sdk';
 import { SyncAltIcon } from '@patternfly/react-icons';
 import blueInfoColor from '@patternfly/react-tokens/dist/js/t_global_icon_color_brand_default';
 

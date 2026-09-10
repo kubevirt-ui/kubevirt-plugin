@@ -1,12 +1,13 @@
-import React, { ReactNode } from 'react';
-import { TFunction } from 'i18next';
+import type { ReactNode } from 'react';
+import React from 'react';
+import type { TFunction } from 'i18next';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import type { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import DiskNameCell from '@kubevirt-utils/components/DiskNameCell/DiskNameCell';
 import TemplateValue from '@kubevirt-utils/components/TemplateValue/TemplateValue';
-import { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
+import type { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
-import { DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/constants';
+import type { DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/constants';
 import { readableSizeUnit } from '@kubevirt-utils/utils/units';
 
 import DiskRowActions from './components/DiskRowActions';

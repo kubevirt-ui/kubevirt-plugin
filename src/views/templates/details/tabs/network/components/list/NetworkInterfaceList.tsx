@@ -1,19 +1,21 @@
-import React, { FC, useMemo } from 'react';
+import type { FC } from 'react';
+import React, { useMemo } from 'react';
 
 import KubevirtFilterToolbar from '@kubevirt-utils/components/KubevirtFilterToolbar/KubevirtFilterToolbar';
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
 import useKubevirtDataViewFilters from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/useKubevirtDataViewFilters';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getTemplateVirtualMachineObject, Template } from '@kubevirt-utils/resources/template';
+import type { Template } from '@kubevirt-utils/resources/template';
+import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
 import { getInterfaces, getNetworks } from '@kubevirt-utils/resources/vm';
 import { getNetworkInterfaceRowData } from '@kubevirt-utils/resources/vm/utils/network/rowData';
 
 import useNetworkRowFilters from '../../hooks/useNetworkRowFilters';
 
+import type { TemplateNetworkCallbacks } from './templateNetworkInterfaceDefinition';
 import {
   getTemplateNetworkColumns,
   getTemplateNetworkRowId,
-  TemplateNetworkCallbacks,
 } from './templateNetworkInterfaceDefinition';
 
 type NetworkInterfaceListProps = {

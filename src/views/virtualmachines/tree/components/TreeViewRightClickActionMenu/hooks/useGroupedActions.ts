@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-import { ActionDropdownItemType } from '@kubevirt-utils/components/ActionsDropdown/constants';
+import type { ActionDropdownItemType } from '@kubevirt-utils/components/ActionsDropdown/constants';
 import { ACTIONS_ID } from '@virtualmachines/actions/hooks/constants';
 
 const MANAGE_VMS_GROUP_IDS = new Set<string>([

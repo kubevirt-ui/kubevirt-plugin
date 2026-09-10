@@ -1,13 +1,14 @@
-import React, { FC, useMemo } from 'react';
+import type { FC } from 'react';
+import React, { useMemo } from 'react';
 
-import {
+import type {
   V1beta1DataImportCron,
   V1beta1DataSource,
 } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import DeprecatedBadge from '@kubevirt-utils/components/badges/DeprecatedBadge/DeprecatedBadge';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isDeprecated } from '@kubevirt-utils/resources/bootableresources/helpers';
-import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
+import type { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { isDataImportCronProgressing } from '@kubevirt-utils/resources/shared';
 import {
   isDataSourceCloning,

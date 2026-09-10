@@ -1,9 +1,6 @@
 import { getNamespace } from '@kubevirt-utils/resources/shared';
-import {
-  getTemplateModel,
-  isOpenShiftTemplate,
-  Template,
-} from '@kubevirt-utils/resources/template';
+import type { Template } from '@kubevirt-utils/resources/template';
+import { getTemplateModel, isOpenShiftTemplate } from '@kubevirt-utils/resources/template';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { useFleetAccessReview } from '@stolostron/multicluster-sdk';
 

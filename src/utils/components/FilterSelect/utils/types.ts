@@ -1,7 +1,7 @@
-import { MouseEvent } from 'react';
+import type { MouseEvent } from 'react';
 
-import { K8sGroupVersionKind } from '@openshift-console/dynamic-plugin-sdk';
-import { SelectOptionProps } from '@patternfly/react-core';
+import type { K8sGroupVersionKind } from '@openshift-console/dynamic-plugin-sdk';
+import type { SelectOptionProps } from '@patternfly/react-core';
 
 export type EnhancedSelectOptionProps = SelectOptionProps & {
   group?: string;

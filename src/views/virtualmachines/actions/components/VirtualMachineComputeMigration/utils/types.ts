@@ -1,4 +1,4 @@
-import { NodeStatus } from '@kubevirt-utils/resources/node/utils/types';
+import type { NodeStatus } from '@kubevirt-utils/resources/node/utils/types';
 
 export enum MigrationOptions {
   AUTOMATIC = 'automatic',

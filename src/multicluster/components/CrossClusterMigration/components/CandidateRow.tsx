@@ -1,4 +1,5 @@
-import React, { FC, useCallback } from 'react';
+import type { FC } from 'react';
+import React, { useCallback } from 'react';
 
 import { ENTER_KEY, SPACE_SYMBOL } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -16,7 +17,7 @@ import {
 } from '@patternfly/react-core';
 import { CheckCircleIcon } from '@patternfly/react-icons';
 
-import { CandidateCluster } from '../hooks/useClusterRecommendationTypes';
+import type { CandidateCluster } from '../hooks/useClusterRecommendationTypes';
 
 import ScoreBadge from './ScoreBadge';
 

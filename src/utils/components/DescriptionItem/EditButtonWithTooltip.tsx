@@ -1,4 +1,5 @@
-import React, { FC, memo, PropsWithChildren, ReactNode, useMemo } from 'react';
+import type { FC, PropsWithChildren, ReactNode } from 'react';
+import React, { memo, useMemo } from 'react';
 
 import { Tooltip } from '@patternfly/react-core';
 

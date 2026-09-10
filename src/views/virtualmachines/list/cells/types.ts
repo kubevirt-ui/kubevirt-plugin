@@ -1,6 +1,6 @@
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import type { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 
-import { VMCallbacks } from '../virtualMachinesDefinition';
+import type { VMCallbacks } from '../virtualMachinesDefinition';
 
 export type VMCellProps = {
   row: V1VirtualMachine;

@@ -1,10 +1,11 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Tooltip, TooltipPosition } from '@patternfly/react-core';
 import { HelpIcon } from '@patternfly/react-icons';
 
-import { NetworkIconProps } from './NetworkIcon';
+import type { NetworkIconProps } from './NetworkIcon';
 import StateText from './StateText';
 
 import './LinkStateIcon.scss';

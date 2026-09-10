@@ -1,4 +1,5 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
 import LinuxLabel from '@kubevirt-utils/components/Labels/LinuxLabel';
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
@@ -8,7 +9,7 @@ import { PATHS_TO_HIGHLIGHT } from '@kubevirt-utils/resources/vm/utils/constants
 import { DescriptionList, Grid, GridItem, PageSection, Stack, Title } from '@patternfly/react-core';
 
 import { onSubmitYAML } from '../details/utils/utils';
-import { ConfigurationInnerTabProps } from '../utils/types';
+import type { ConfigurationInnerTabProps } from '../utils/types';
 
 import SSHTabAuthorizedSSHKey from './components/SSHTabAuthorizedSSHKey';
 import SSHTabSSHAccess from './components/SSHTabSSHAccess';

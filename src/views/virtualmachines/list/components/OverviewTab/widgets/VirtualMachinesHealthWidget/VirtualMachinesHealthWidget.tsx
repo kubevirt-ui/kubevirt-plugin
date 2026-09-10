@@ -1,8 +1,10 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
 import useIsAllClustersPage from '@multicluster/hooks/useIsAllClustersPage';
 
-import { GRID_VM_HEALTH, OverviewSectionData } from '../../types';
+import type { OverviewSectionData } from '../../types';
+import { GRID_VM_HEALTH } from '../../types';
 import OverviewSection from '../OverviewSection/OverviewSection';
 import OverviewSectionRow from '../OverviewSection/OverviewSectionRow';
 

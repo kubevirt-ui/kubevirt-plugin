@@ -1,4 +1,5 @@
-import React, { createContext, FC, PropsWithChildren, useContext } from 'react';
+import type { FC, PropsWithChildren } from 'react';
+import React, { createContext, useContext } from 'react';
 
 type SettingsClusterContextType = {
   cluster: string | undefined;

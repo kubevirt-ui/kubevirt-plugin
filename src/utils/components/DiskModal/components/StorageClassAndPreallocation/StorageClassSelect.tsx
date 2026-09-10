@@ -1,4 +1,5 @@
-import React, { Dispatch, FC, SetStateAction, useCallback, useEffect, useMemo } from 'react';
+import type { Dispatch, FC, SetStateAction } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
@@ -12,7 +13,7 @@ import { convertResourceArrayToMap, getName } from '@kubevirt-utils/resources/sh
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { FormGroup } from '@patternfly/react-core';
 
-import { V1DiskFormState } from '../../utils/types';
+import type { V1DiskFormState } from '../../utils/types';
 import {
   STORAGE_CLASS_FIELD,
   STORAGE_CLASS_PROVIDER_FIELD,

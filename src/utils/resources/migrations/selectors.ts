@@ -1,4 +1,4 @@
-import { MultiNamespaceVirtualMachineStorageMigrationPlan } from './constants';
+import type { MultiNamespaceVirtualMachineStorageMigrationPlan } from './constants';
 
 export const getStorageMigrationPlanSpecNamespaces = (
   plan?: Pick<MultiNamespaceVirtualMachineStorageMigrationPlan, 'spec'>,

@@ -1,6 +1,6 @@
-import { ComponentClass } from 'react';
+import type { ComponentClass } from 'react';
 
-import { InstanceTypeSeries } from '@kubevirt-utils/resources/instancetype/types';
+import type { InstanceTypeSeries } from '@kubevirt-utils/resources/instancetype/types';
 import {
   MemoryIcon,
   MicrochipIcon,
@@ -13,7 +13,7 @@ import {
   UserIcon,
 } from '@patternfly/react-icons';
 
-import { InstanceTypesMenuItemsData } from './types';
+import type { InstanceTypesMenuItemsData } from './types';
 
 export const MENUS = {
   redHatProvided: 'redHatProvided',

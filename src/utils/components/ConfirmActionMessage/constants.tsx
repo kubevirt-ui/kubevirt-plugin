@@ -1,6 +1,7 @@
-import React, { ReactElement } from 'react';
+import type { ReactElement } from 'react';
+import React from 'react';
 import { Trans } from 'react-i18next';
-import { TFunction } from 'i18next';
+import type { TFunction } from 'i18next';
 
 export const CONFIRM_ACTIONS = {
   delete: 'delete',

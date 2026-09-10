@@ -1,11 +1,14 @@
-import { Dispatch, KeyboardEvent, SetStateAction, useCallback, useMemo } from 'react';
+import type { Dispatch, KeyboardEvent, SetStateAction } from 'react';
+import { useCallback, useMemo } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
 import { DEFAULT_VISIBLE_EXAMPLES, getSearchExamples } from '../../constants';
-import { AutocompleteMode, DropdownType, MainMenuItem, SearchKeyBadge } from '../../types';
+import type { AutocompleteMode, MainMenuItem, SearchKeyBadge } from '../../types';
+import { DropdownType } from '../../types';
 import { hasActiveKeyFilter } from '../../utils';
-import { OptionalListNavigationResult, useListNavigation } from '../useListNavigation';
+import type { OptionalListNavigationResult } from '../useListNavigation';
+import { useListNavigation } from '../useListNavigation';
 import useSearchKeyBadges from '../useSearchKeyBadges';
 
 import { getNextGridIndex } from './utils';

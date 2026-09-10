@@ -1,9 +1,10 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 import classnames from 'classnames';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Card, Split, SplitItem, Title, TitleSizes } from '@patternfly/react-core';
-import { OperatingSystemType } from '@virtualmachines/wizard/steps/InstanceTypesSteps/GuestOSStep/utils/constants';
+import type { OperatingSystemType } from '@virtualmachines/wizard/steps/InstanceTypesSteps/GuestOSStep/utils/constants';
 import { getOperatingSystemDetails } from '@virtualmachines/wizard/steps/InstanceTypesSteps/GuestOSStep/utils/utils';
 
 import './OperatingSystemTile.scss';

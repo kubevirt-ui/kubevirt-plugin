@@ -1,9 +1,9 @@
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import type { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
 import { isRunning } from '@virtualmachines/utils';
 
 import { submit } from './submit';
-import { V1DiskFormState } from './types';
+import type { V1DiskFormState } from './types';
 
 jest.mock('@multicluster/k8sRequests', () => ({
   kubevirtK8sPatch: jest.fn(),

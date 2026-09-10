@@ -1,4 +1,5 @@
-import React, { FC, useState } from 'react';
+import type { FC } from 'react';
+import React, { useState } from 'react';
 import { Trans } from 'react-i18next';
 
 import { ProjectRequestModel } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -8,7 +9,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { kubevirtK8sCreate } from '@multicluster/k8sRequests';
 import useIsACMPage from '@multicluster/useIsACMPage';
-import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+import type { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { Content, Form, FormGroup, TextInput } from '@patternfly/react-core';
 
 import ExternalLink from '../ExternalLink/ExternalLink';

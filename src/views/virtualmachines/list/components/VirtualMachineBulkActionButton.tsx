@@ -1,6 +1,7 @@
-import React, { FC, useMemo } from 'react';
+import type { FC } from 'react';
+import React, { useMemo } from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import type { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import LazyActionMenu from '@kubevirt-utils/components/LazyActionMenu/LazyActionMenu';
 import {
   checkAccessForFleet,
@@ -11,7 +12,7 @@ import { VirtualMachineModelRef } from '@kubevirt-utils/models';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { ActionMenuVariant } from '@openshift-console/dynamic-plugin-sdk/lib/api/internal-types';
 import useMultipleVirtualMachineActions from '@virtualmachines/actions/hooks/useMultipleVirtualMachineActions';
-import { VMIMMapper } from '@virtualmachines/utils/mappers';
+import type { VMIMMapper } from '@virtualmachines/utils/mappers';
 
 import useExistingSelectedVMs from '../hooks/useExistingSelectedVMs';
 

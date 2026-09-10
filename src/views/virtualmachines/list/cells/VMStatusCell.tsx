@@ -1,11 +1,12 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
 import { printableVMStatus } from '@virtualmachines/utils';
 
 import VirtualMachineMigrationPercentage from '../../details/tabs/overview/components/VirtualMachinesOverviewTabDetails/components/VirtualMachineMigrationPercentage';
 import StatusWithPopover from '../../details/tabs/overview/components/VirtualMachinesOverviewTabDetails/components/VirtualMachineStatusWithPopover/VirtualMachineStatusWithPopover';
 
-import { VMCellWithCallbacksProps } from './types';
+import type { VMCellWithCallbacksProps } from './types';
 
 const VMStatusCell: FC<VMCellWithCallbacksProps> = ({ callbacks, row }) => {
   const vmi = callbacks.getVmi(row);

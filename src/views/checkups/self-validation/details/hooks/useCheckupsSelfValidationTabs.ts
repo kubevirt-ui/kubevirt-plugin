@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
-import { TabConfig } from '../../../utils/types';
+import type { TabConfig } from '../../../utils/types';
 import CheckupsSelfValidationDetailsTab from '../tabs/details/CheckupsSelfValidationDetailsTab';
 import CheckupsSelfValidationYAMLTab from '../tabs/yaml/CheckupsSelfValidationYAMLTab';
 

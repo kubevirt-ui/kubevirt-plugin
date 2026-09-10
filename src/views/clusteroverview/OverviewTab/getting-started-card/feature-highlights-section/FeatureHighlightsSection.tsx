@@ -1,10 +1,11 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
 import { documentationURL, PLUGIN_VERSION } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
 import GettingStartedSectionContents from '../utils/getting-started-content/GettingStartedSectionContents';
-import { GettingStartedLink } from '../utils/types';
+import type { GettingStartedLink } from '../utils/types';
 
 import FeatureHighlightsTitle from './FeatureHighlightsTitle';
 

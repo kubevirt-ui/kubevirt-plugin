@@ -1,5 +1,5 @@
 import { VirtualMachinePreferenceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import {
+import type {
   V1beta1VirtualMachinePreference,
   V1VirtualMachine,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';

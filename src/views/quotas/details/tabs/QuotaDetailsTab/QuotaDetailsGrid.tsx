@@ -1,11 +1,12 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 import { getQuotaModel } from 'src/views/quotas/utils/utils';
 
 import DescriptionItemCreatedAt from '@kubevirt-utils/components/DescriptionItem/components/DescriptionItemCreatedAt';
 import DescriptionItemName from '@kubevirt-utils/components/DescriptionItem/components/DescriptionItemName';
 import DescriptionItemNamespace from '@kubevirt-utils/components/DescriptionItem/components/DescriptionItemNamespace';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { ApplicationAwareQuota } from '@kubevirt-utils/resources/quotas/types';
+import type { ApplicationAwareQuota } from '@kubevirt-utils/resources/quotas/types';
 import { Card, CardBody, CardTitle, DescriptionList } from '@patternfly/react-core';
 
 type QuotaDetailsGridProps = {

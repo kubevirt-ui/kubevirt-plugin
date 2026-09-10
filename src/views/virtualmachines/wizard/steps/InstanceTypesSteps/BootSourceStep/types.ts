@@ -1,20 +1,20 @@
-import {
+import type {
   V1beta1DataImportCron,
   V1beta1DataVolume,
 } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
-import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
-import {
+import type { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import type {
   V1beta1VirtualMachineClusterPreference,
   V1beta1VirtualMachinePreference,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { VolumeSnapshotKind } from '@kubevirt-utils/components/SelectSnapshot/types';
-import { VirtualMachinePreference } from '@kubevirt-utils/resources/preference/types';
-import {
+import type { VolumeSnapshotKind } from '@kubevirt-utils/components/SelectSnapshot/types';
+import type { VirtualMachinePreference } from '@kubevirt-utils/resources/preference/types';
+import type {
   ClusterNamespacedResourceMap,
   NamespacedResourceMap,
   ResourceMap,
 } from '@kubevirt-utils/resources/shared';
-import { TableColumn } from '@openshift-console/dynamic-plugin-sdk';
+import type { TableColumn } from '@openshift-console/dynamic-plugin-sdk';
 
 export type TableColumnWithOptionalIndex<T> = TableColumn<T> & { columnIndex?: number };
 

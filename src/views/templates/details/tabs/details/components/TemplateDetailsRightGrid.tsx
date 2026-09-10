@@ -1,10 +1,11 @@
-import React, { FC, useCallback } from 'react';
+import type { FC } from 'react';
+import React, { useCallback } from 'react';
 import BootOrderItem from 'src/views/templates/details/tabs/details/components/BootOrderItem';
 import BootSource from 'src/views/templates/details/tabs/details/components/BootSource';
-import { TemplateDetailsGridProps } from 'src/views/templates/details/tabs/details/TemplateDetailsPage';
+import type { TemplateDetailsGridProps } from 'src/views/templates/details/tabs/details/TemplateDetailsPage';
 import { getTemplateProviderName } from 'src/views/templates/utils/selectors';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import type { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import AdditionalResources from '@kubevirt-utils/components/AdditionalResources/AdditionalResources';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import HardwareDevices from '@kubevirt-utils/components/HardwareDevices/HardwareDevices';

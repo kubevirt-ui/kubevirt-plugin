@@ -1,10 +1,14 @@
-import React, { FC, useMemo } from 'react';
+import type { FC } from 'react';
+import React, { useMemo } from 'react';
 
-import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import type {
+  V1VirtualMachine,
+  V1VirtualMachineInstance,
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getDisks } from '@kubevirt-utils/resources/vm';
-import { NameWithPercentages } from '@kubevirt-utils/resources/vm/hooks/types';
-import { DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/constants';
+import type { NameWithPercentages } from '@kubevirt-utils/resources/vm/hooks/types';
+import type { DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/constants';
 import { isCDROMDisk } from '@kubevirt-utils/resources/vm/utils/disk/selectors';
 import {
   Button,

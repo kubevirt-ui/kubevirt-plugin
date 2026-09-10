@@ -2,12 +2,8 @@ import { universalComparator } from '@kubevirt-utils/utils/utils';
 
 import { OS_NAME_TYPES } from './constants';
 import { getTemplateName, getTemplateOS } from './selectors';
-import {
-  isVirtualMachineTemplate,
-  isVirtualMachineTemplateRequest,
-  Template,
-  TemplateOrRequest,
-} from './types';
+import type { Template, TemplateOrRequest } from './types';
+import { isVirtualMachineTemplate, isVirtualMachineTemplateRequest } from './types';
 
 const getSortPriority = (item: TemplateOrRequest): number => {
   if (isVirtualMachineTemplateRequest(item)) return 0;

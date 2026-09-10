@@ -1,9 +1,10 @@
 import { ConfigMapModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import type { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { getRandomChars } from '@kubevirt-utils/utils/utils';
 import { kubevirtK8sCreate, kubevirtK8sGet } from '@multicluster/k8sRequests';
 
-import { TLS_CERT_CONFIGMAP_KEY, TLS_CERT_SOURCE_EXISTING, TLSCertSourceType } from './constants';
+import type { TLSCertSourceType } from './constants';
+import { TLS_CERT_CONFIGMAP_KEY, TLS_CERT_SOURCE_EXISTING } from './constants';
 
 export type TLSCertConfig = {
   cluster?: string;

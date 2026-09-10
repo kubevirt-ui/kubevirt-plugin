@@ -1,6 +1,7 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
-import { ClusterChartSeries } from '../../hooks/useTopClustersChartData';
+import type { ClusterChartSeries } from '../../hooks/useTopClustersChartData';
 
 import './ClusterLegend.scss';
 

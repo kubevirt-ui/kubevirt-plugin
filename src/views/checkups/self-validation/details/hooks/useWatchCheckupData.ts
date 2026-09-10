@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { useParams } from 'react-router';
 
 import { ConfigMapModel, modelToGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
-import {
+import type {
   IoK8sApiBatchV1Job,
   IoK8sApiCoreV1ConfigMap,
 } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';

@@ -1,4 +1,4 @@
-import { KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
+import type { KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 
 import { validateAndBuildFilterState } from './validateAndBuildFilterState';
 

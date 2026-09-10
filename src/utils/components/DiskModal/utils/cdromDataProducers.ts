@@ -1,6 +1,6 @@
 import produce from 'immer';
 
-import { V1DiskFormState } from './types';
+import type { V1DiskFormState } from './types';
 
 export const produceExistingISOData = (
   data: V1DiskFormState,

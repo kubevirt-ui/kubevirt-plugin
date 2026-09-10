@@ -1,4 +1,5 @@
-import React, { ComponentType, FC, ReactNode } from 'react';
+import type { ComponentType, FC, ReactNode } from 'react';
+import React from 'react';
 
 import {
   EmptyState,

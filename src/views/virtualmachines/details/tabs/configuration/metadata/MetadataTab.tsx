@@ -1,11 +1,12 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
 import { PATHS_TO_HIGHLIGHT } from '@kubevirt-utils/resources/vm/utils/constants';
 import { PageSection } from '@patternfly/react-core';
 
 import { onSubmitYAML, updateAnnotation, updateLabels } from '../details/utils/utils';
-import { ConfigurationInnerTabProps } from '../utils/types';
+import type { ConfigurationInnerTabProps } from '../utils/types';
 
 import MetadataTabContent from './components/MetadataTabContent';
 

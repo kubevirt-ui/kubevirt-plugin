@@ -1,9 +1,10 @@
-import React, { FC } from 'react';
-import { TFunction } from 'i18next';
+import type { FC } from 'react';
+import React from 'react';
+import type { TFunction } from 'i18next';
 import FirstItemListPopover from 'src/views/virtualmachines/list/components/FirstItemListPopover/FirstItemListPopover';
 
 import InlineCodeClipboardCopy from '@kubevirt-utils/components/Consoles/components/CloudInitCredentials/InlineCodeClipboardCopy';
-import { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
+import type { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import useFQDN from '@kubevirt-utils/hooks/useFQDN/useFQDN';
 import useIsFQDNEnabled from '@kubevirt-utils/hooks/useFQDN/useIsFQDNEnabled';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -22,7 +23,7 @@ import {
   PopoverPosition,
 } from '@patternfly/react-core';
 
-import { InterfacesData } from './utils/types';
+import type { InterfacesData } from './utils/types';
 
 const NameCell: FC<{ row: InterfacesData }> = ({ row }) => {
   const { t } = useKubevirtTranslation();

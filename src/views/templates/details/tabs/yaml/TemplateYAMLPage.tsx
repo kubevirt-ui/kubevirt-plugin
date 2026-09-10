@@ -1,10 +1,12 @@
-import React, { FC, Suspense, useCallback, useState } from 'react';
+import type { FC } from 'react';
+import React, { Suspense, useCallback, useState } from 'react';
 import { load } from 'js-yaml';
 
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { getName } from '@kubevirt-utils/resources/shared';
-import { Template, updateTemplate } from '@kubevirt-utils/resources/template';
+import type { Template } from '@kubevirt-utils/resources/template';
+import { updateTemplate } from '@kubevirt-utils/resources/template';
 import { ResourceYAMLEditor } from '@openshift-console/dynamic-plugin-sdk';
 import { Alert, AlertVariant, Bullseye } from '@patternfly/react-core';
 

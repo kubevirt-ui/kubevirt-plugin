@@ -1,10 +1,11 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Label, Tooltip } from '@patternfly/react-core';
 
 import { TOOLTIP_DELAY_MS } from '../../../constants';
-import { SearchKeyBadge } from '../../../types';
+import type { SearchKeyBadge } from '../../../types';
 import SearchMenuItem from '../../SearchMenuItem';
 
 type SearchKeyItemProps = {

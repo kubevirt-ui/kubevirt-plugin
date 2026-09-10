@@ -1,5 +1,6 @@
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { DiskType, diskTypes } from '@kubevirt-utils/resources/vm/utils/disk/constants';
+import type { DiskType } from '@kubevirt-utils/resources/vm/utils/disk/constants';
+import { diskTypes } from '@kubevirt-utils/resources/vm/utils/disk/constants';
 
 export const getDiskTypeHelperText = (diskType: DiskType, isVMRunning: boolean): string => {
   if (diskType === diskTypes.cdrom)

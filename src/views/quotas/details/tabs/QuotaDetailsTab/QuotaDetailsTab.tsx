@@ -1,7 +1,8 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 import StandardResourceQuotaAlert from 'src/views/quotas/components/StandardResourceQuotaAlert';
 
-import { ApplicationAwareResourceQuota } from '@kubevirt-utils/resources/quotas/types';
+import type { ApplicationAwareResourceQuota } from '@kubevirt-utils/resources/quotas/types';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { Loading } from '@patternfly/quickstarts';
 import { Bullseye, Flex, PageSection, Stack } from '@patternfly/react-core';

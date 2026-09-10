@@ -1,24 +1,23 @@
-import React, { FC, ReactNode, Ref, useRef } from 'react';
+import type { FC, ReactNode, Ref } from 'react';
+import React, { useRef } from 'react';
 import classNames from 'classnames';
 
-import { TopologyDataObject } from '@openshift-console/dynamic-plugin-sdk/lib/extensions/topology-types';
+import type { TopologyDataObject } from '@openshift-console/dynamic-plugin-sdk/lib/extensions/topology-types';
 import { BaseNode } from '@openshift-console/dynamic-plugin-sdk-internal';
 import { Tooltip } from '@patternfly/react-core';
 import { VirtualMachineIcon } from '@patternfly/react-icons';
-import {
+import type {
   Node,
   NodeModel,
-  observer,
-  RectAnchor,
-  useAnchor,
   WithContextMenuProps,
   WithCreateConnectorProps,
   WithDndDropProps,
   WithDragNodeProps,
   WithSelectionProps,
 } from '@patternfly/react-topology';
+import { observer, RectAnchor, useAnchor } from '@patternfly/react-topology';
 
-import { VMNodeData } from '../../../utils/types/types';
+import type { VMNodeData } from '../../../utils/types/types';
 
 import { getImageProps, getStatusClass } from './utils/utils';
 

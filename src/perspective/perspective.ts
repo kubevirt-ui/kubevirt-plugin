@@ -1,7 +1,7 @@
 import { ALL_CLUSTERS_KEY, ALL_NAMESPACES } from '@kubevirt-utils/hooks/constants';
 import { VirtualMachineModelRef } from '@kubevirt-utils/models';
 import { FLEET_VIRTUAL_MACHINES_PATH } from '@multicluster/constants';
-import { Perspective, ResolvedExtension } from '@openshift-console/dynamic-plugin-sdk';
+import type { Perspective, ResolvedExtension } from '@openshift-console/dynamic-plugin-sdk';
 
 import virtualizationIcon from './virtualization-icon';
 

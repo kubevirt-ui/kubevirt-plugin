@@ -1,14 +1,14 @@
-import { TFunction } from 'i18next';
+import type { TFunction } from 'i18next';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import type { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { isUploadCanceledError } from '@kubevirt-utils/hooks/useCDIUpload/errors';
-import { UploadDataProps } from '@kubevirt-utils/hooks/useCDIUpload/types';
+import type { UploadDataProps } from '@kubevirt-utils/hooks/useCDIUpload/types';
 import { completeVmCdromUpload } from '@kubevirt-utils/hooks/useUploadProgressToast/completion/uploadCompletion';
 import { useUploadProgressStore } from '@kubevirt-utils/hooks/useUploadProgressToast/uploadProgressStore';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 
 import { uploadDataVolume } from './submit';
-import { V1DiskFormState } from './types';
+import type { V1DiskFormState } from './types';
 
 export const getVmCdromAbortTooltip = (isHotPluggable: boolean, t: TFunction): string =>
   isHotPluggable ? t('Eject CD-ROM') : t('Detach CD-ROM drive');

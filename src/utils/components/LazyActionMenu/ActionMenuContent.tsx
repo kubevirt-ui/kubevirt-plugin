@@ -1,15 +1,12 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
-import {
-  Action,
-  GroupedMenuOption,
-  MenuOption,
-  MenuOptionType,
-} from '@openshift-console/dynamic-plugin-sdk';
+import type { Action, GroupedMenuOption, MenuOption } from '@openshift-console/dynamic-plugin-sdk';
+import { MenuOptionType } from '@openshift-console/dynamic-plugin-sdk';
 import { Divider, Menu, MenuContent, MenuGroup, MenuItem, MenuList } from '@patternfly/react-core';
 
 import ActionMenuItem from './ActionMenuItem';
-import { CheckAccess } from './LazyActionMenu';
+import type { CheckAccess } from './LazyActionMenu';
 import { orderExtensionBasedOnInsertBeforeAndAfter } from './order-extensions';
 import { getMenuOptionType } from './utils';
 

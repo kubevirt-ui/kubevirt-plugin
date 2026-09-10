@@ -1,7 +1,8 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 import { createUseStyles } from 'react-jss';
 
-import { RDPProps } from '../utils/types';
+import type { RDPProps } from '../utils/types';
 
 import ManualConnection from './ManualConnection';
 import RemoteViewer from './RemoteViewer';

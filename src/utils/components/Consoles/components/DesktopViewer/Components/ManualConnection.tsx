@@ -1,9 +1,10 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Content, DescriptionList } from '@patternfly/react-core';
 
-import { ManualConnectionProps } from '../utils/types';
+import type { ManualConnectionProps } from '../utils/types';
 
 import Detail from './Detail';
 

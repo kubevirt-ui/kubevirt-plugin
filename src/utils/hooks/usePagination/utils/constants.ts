@@ -1,6 +1,6 @@
-import { PerPageOptions } from '@patternfly/react-core';
+import type { PerPageOptions } from '@patternfly/react-core';
 
-import { PaginationState } from './types';
+import type { PaginationState } from './types';
 
 export const paginationDefaultValues: PerPageOptions[] = [
   { title: '15', value: 15 },

@@ -1,9 +1,10 @@
-import React, { ReactNode } from 'react';
-import { TFunction } from 'i18next';
+import type { ReactNode } from 'react';
+import React from 'react';
+import type { TFunction } from 'i18next';
 
-import { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
+import type { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 
-import { ProjectWithVMCount } from '../../types';
+import type { ProjectWithVMCount } from '../../types';
 
 import ProjectNameCell from './cells/ProjectNameCell';
 import ProjectVMCountCell from './cells/ProjectVMCountCell';

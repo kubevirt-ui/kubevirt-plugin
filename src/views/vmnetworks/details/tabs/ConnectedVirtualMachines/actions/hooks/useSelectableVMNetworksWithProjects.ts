@@ -2,12 +2,12 @@ import { useMemo } from 'react';
 import useVMNetworks from 'src/views/vmnetworks/hooks/useVMNetworks';
 import { getVMNetworkProjects } from 'src/views/vmnetworks/utils';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import type { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import useProjectResources from '@kubevirt-utils/hooks/useProjectResources';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 
-import { VMNetworkWithProjects } from '../types';
+import type { VMNetworkWithProjects } from '../types';
 
 type UseSelectableVMNetworksWithProjects = (
   currentNetworkName: string,

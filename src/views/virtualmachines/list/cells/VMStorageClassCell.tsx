@@ -1,4 +1,5 @@
-import React, { FC, useMemo } from 'react';
+import type { FC } from 'react';
+import React, { useMemo } from 'react';
 
 import { modelToGroupVersionKind, StorageClassModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
@@ -8,7 +9,7 @@ import { getCluster } from '@multicluster/helpers/selectors';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { getVirtualMachineStorageClasses } from '@virtualmachines/utils/mappers';
 
-import { VMCellWithCallbacksProps } from './types';
+import type { VMCellWithCallbacksProps } from './types';
 
 const VMStorageClassCell: FC<VMCellWithCallbacksProps> = ({ callbacks, row }) => {
   const clusterParam = useClusterParam();

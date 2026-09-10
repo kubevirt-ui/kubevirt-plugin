@@ -1,8 +1,8 @@
-import { TFunction } from 'i18next';
+import type { TFunction } from 'i18next';
 
 import { AlertVariant } from '@patternfly/react-core';
 
-import { ToastOptions } from './types';
+import type { ToastOptions } from './types';
 
 export const getToastVariantDefaults = (t: TFunction): Record<string, Partial<ToastOptions>> => {
   const drawerGroup = t('Virtualization');

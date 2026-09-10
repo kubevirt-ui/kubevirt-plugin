@@ -12,7 +12,8 @@ import { universalComparator } from '@kubevirt-utils/utils/utils';
 import useMulticlusterNamespaces from '@multicluster/hooks/useMulticlusterNamespaces';
 import useIsACMPage from '@multicluster/useIsACMPage';
 
-import { KubevirtFilter, KubevirtFilterLayout } from '../types';
+import type { KubevirtFilter } from '../types';
+import { KubevirtFilterLayout } from '../types';
 
 type UseProjectFilterOptions = {
   /** When provided, overrides the default project list with these project names */

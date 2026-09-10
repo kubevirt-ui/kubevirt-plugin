@@ -1,11 +1,10 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import {
-  ApplicationAwareResourceQuota,
-  CalculationMethod,
-} from '@kubevirt-utils/resources/quotas/types';
+import type { ApplicationAwareResourceQuota } from '@kubevirt-utils/resources/quotas/types';
+import { CalculationMethod } from '@kubevirt-utils/resources/quotas/types';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { Flex, Stack } from '@patternfly/react-core';

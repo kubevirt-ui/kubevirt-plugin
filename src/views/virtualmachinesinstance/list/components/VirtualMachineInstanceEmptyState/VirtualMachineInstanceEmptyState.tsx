@@ -1,4 +1,5 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router';
 
 import ListEmptyState from '@kubevirt-utils/components/ListEmptyState/ListEmptyState';

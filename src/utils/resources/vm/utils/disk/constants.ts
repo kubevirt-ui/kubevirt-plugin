@@ -1,6 +1,10 @@
-import { V1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
-import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
-import { V1DataVolumeTemplateSpec, V1Disk, V1Volume } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import type { V1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
+import type { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import type {
+  V1DataVolumeTemplateSpec,
+  V1Disk,
+  V1Volume,
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 
 export type DiskRawData = {
   dataVolume?: V1beta1DataVolume;

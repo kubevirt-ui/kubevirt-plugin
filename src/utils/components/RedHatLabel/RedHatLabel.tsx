@@ -1,10 +1,11 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { COMMON_INSTANCETYPES } from '@kubevirt-utils/resources/bootableresources/constants';
 import { getLabel } from '@kubevirt-utils/resources/shared';
 import { APP_NAME_LABEL } from '@kubevirt-utils/resources/template';
-import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+import type { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { Label } from '@patternfly/react-core';
 
 type RedHatLabelProps<T extends K8sResourceCommon = K8sResourceCommon> = {

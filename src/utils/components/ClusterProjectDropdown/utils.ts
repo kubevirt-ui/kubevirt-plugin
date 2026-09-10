@@ -1,5 +1,5 @@
 import { getName } from '@kubevirt-utils/resources/shared';
-import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+import type { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
 export const extractName = (resource: K8sResourceCommon): string => getName(resource);
 

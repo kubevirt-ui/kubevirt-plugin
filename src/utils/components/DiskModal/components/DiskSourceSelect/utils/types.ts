@@ -1,6 +1,6 @@
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 
-import { SourceTypes } from '@kubevirt-utils/components/DiskModal/utils/types';
+import type { SourceTypes } from '@kubevirt-utils/components/DiskModal/utils/types';
 
 export type DiskSourceOptionGroupItem = {
   description?: string;

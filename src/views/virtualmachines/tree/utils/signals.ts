@@ -1,6 +1,6 @@
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import type { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { signal } from '@preact/signals-react';
-import { VMIMMapper } from '@virtualmachines/utils/mappers';
+import type { VMIMMapper } from '@virtualmachines/utils/mappers';
 
 export const vmsSignal = signal<V1VirtualMachine[]>([]);
 

@@ -1,7 +1,8 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 import classNames from 'classnames';
 
-import {
+import type {
   V1Disk,
   V1Interface,
   V1Network,

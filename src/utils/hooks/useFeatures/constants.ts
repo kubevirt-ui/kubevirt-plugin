@@ -1,10 +1,10 @@
 import { ConfigMapModel, GroupModel, RoleModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import {
+import type {
   IoK8sApiCoreV1ConfigMap,
   IoK8sApiRbacV1Role,
   IoK8sApiRbacV1RoleBinding,
 } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
-import { K8sVerb } from '@openshift-console/dynamic-plugin-sdk';
+import type { K8sVerb } from '@openshift-console/dynamic-plugin-sdk';
 
 export const AUTOMATIC_SUBSCRIPTION_ACTIVATION_KEY = 'automaticSubscriptionActivationKey';
 export const AUTOMATIC_SUBSCRIPTION_ORGANIZATION_ID = 'automaticSubscriptionOrganizationId';

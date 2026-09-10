@@ -1,9 +1,9 @@
-import React, { FC, JSX, useCallback, useMemo } from 'react';
+import type { FC, JSX } from 'react';
+import React, { useCallback, useMemo } from 'react';
 
 import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import Dropdown, {
-  DropdownConfig,
-} from '@kubevirt-utils/components/ClusterProjectDropdown/Dropdown/Dropdown';
+import type { DropdownConfig } from '@kubevirt-utils/components/ClusterProjectDropdown/Dropdown/Dropdown';
+import Dropdown from '@kubevirt-utils/components/ClusterProjectDropdown/Dropdown/Dropdown';
 import { ALL_PROJECTS } from '@kubevirt-utils/hooks/constants';
 import useConsoleNamespaceBookmarks from '@kubevirt-utils/hooks/useConsoleNamespaceBookmarks/useConsoleNamespaceBookmarks';
 import useConsoleShowSystemNamespaces from '@kubevirt-utils/hooks/useConsoleShowSystemNamespaces/useConsoleShowSystemNamespaces';
@@ -11,7 +11,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { isSystemNamespace } from '@kubevirt-utils/resources/namespace/helper';
 import { getName } from '@kubevirt-utils/resources/shared';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
-import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+import type { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
 import { extractName } from './utils';
 

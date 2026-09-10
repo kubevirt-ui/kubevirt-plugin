@@ -1,6 +1,6 @@
-import { TFunction } from 'i18next';
+import type { TFunction } from 'i18next';
 
-import { ClaimPropertySets } from '@kubevirt-utils/types/storage';
+import type { ClaimPropertySets } from '@kubevirt-utils/types/storage';
 import { isValidUrl } from '@kubevirt-utils/utils/validation';
 
 import { TEST_SUITES } from '../../utils/constants';

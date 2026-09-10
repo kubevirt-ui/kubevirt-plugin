@@ -1,10 +1,11 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
 import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-utils/models';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
 
-import { ProjectWithVMCount } from '../../../types';
+import type { ProjectWithVMCount } from '../../../types';
 
 type ProjectNameCellProps = {
   row: ProjectWithVMCount;

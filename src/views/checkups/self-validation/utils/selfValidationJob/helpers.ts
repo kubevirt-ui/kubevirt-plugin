@@ -1,6 +1,6 @@
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
-import { K8sModel } from '@openshift-console/dynamic-plugin-sdk';
+import type { K8sModel } from '@openshift-console/dynamic-plugin-sdk';
 
 /**
  * Generates a timestamp string in format YYYYMMDD-HHMMSS

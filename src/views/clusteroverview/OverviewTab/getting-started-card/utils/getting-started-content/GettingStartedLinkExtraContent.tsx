@@ -1,9 +1,10 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 import { Link } from 'react-router';
 
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 
-import { GettingStartedLink } from '../types';
+import type { GettingStartedLink } from '../types';
 
 import './GettingStartedLinkExtraContent.scss';
 

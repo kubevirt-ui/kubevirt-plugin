@@ -11,7 +11,7 @@ import { useFleetPrometheusPoll, useHubClusterName } from '@stolostron/multiclus
 
 import { getMetricQuery } from '../metricQueries';
 
-import { ChartData, ChartDomain } from './types';
+import type { ChartData, ChartDomain } from './types';
 import {
   findUnit,
   formatLargestValue,

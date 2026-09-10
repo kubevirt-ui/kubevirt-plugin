@@ -1,4 +1,4 @@
-import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
+import type { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { ProcessedTemplatesModel } from '@kubevirt-utils/models';
 import { NAME_PARAMETER } from '@kubevirt-utils/resources/template';
 import { kubevirtK8sCreate } from '@multicluster/k8sRequests';

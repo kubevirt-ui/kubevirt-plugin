@@ -1,6 +1,7 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
-import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import type { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { usePods } from '@kubevirt-utils/hooks/usePods';
 import { modelToGroupVersionKind, PodModel } from '@kubevirt-utils/models';
 import { getName, getNamespace, getUID } from '@kubevirt-utils/resources/shared';

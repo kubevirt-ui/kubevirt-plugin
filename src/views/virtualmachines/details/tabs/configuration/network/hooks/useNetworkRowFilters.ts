@@ -1,13 +1,13 @@
 import { useMemo } from 'react';
 
-import { KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
+import type { KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   interfaceLabelsProxy,
   interfaceTypesProxy,
 } from '@kubevirt-utils/resources/vm/utils/network/constants';
 
-import { SimpleNICPresentation } from '../utils/types';
+import type { SimpleNICPresentation } from '../utils/types';
 
 const INTERFACE_TYPE_FILTER_ID = 'interface-type';
 

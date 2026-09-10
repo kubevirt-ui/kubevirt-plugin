@@ -1,6 +1,7 @@
-import React, { FC, ReactNode } from 'react';
+import type { FC, ReactNode } from 'react';
+import React from 'react';
 
-import { ColumnLayout } from '@openshift-console/dynamic-plugin-sdk';
+import type { ColumnLayout } from '@openshift-console/dynamic-plugin-sdk';
 
 import ColumnManagement from '../../ColumnManagementModal/ColumnManagement';
 import { TableToolbarActionsGroup } from '../../TableToolbarActions/TableToolbarActionsGroup';

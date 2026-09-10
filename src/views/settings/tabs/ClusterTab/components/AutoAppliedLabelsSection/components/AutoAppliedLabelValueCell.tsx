@@ -1,6 +1,7 @@
-import React, { FC, useCallback, useState } from 'react';
+import type { FC } from 'react';
+import React, { useCallback, useState } from 'react';
 
-import { AutoAppliedLabel } from '@kubevirt-utils/hooks/useAutoAppliedLabels/types';
+import type { AutoAppliedLabel } from '@kubevirt-utils/hooks/useAutoAppliedLabels/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { validateK8sLabelValue } from '@kubevirt-utils/utils/labelValidation/labelValidation';
 import {

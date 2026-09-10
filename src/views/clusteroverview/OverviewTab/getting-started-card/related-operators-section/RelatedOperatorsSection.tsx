@@ -1,4 +1,5 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
@@ -8,7 +9,7 @@ import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
 
 import GettingStartedSectionContents from '../utils/getting-started-content/GettingStartedSectionContents';
 import useMTVResources from '../utils/hooks/useMTVResources';
-import { GettingStartedLink } from '../utils/types';
+import type { GettingStartedLink } from '../utils/types';
 
 import './RelatedOperatorsSection.scss';
 

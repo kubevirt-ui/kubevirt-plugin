@@ -1,4 +1,5 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
@@ -13,7 +14,8 @@ import {
 
 import ExistingTLSCertificate from './components/ExistingTLSCertificate';
 import NewTLSCertificate from './components/NewTLSCertificate';
-import { TLS_CERT_SOURCE_EXISTING, TLS_CERT_SOURCE_NEW, TLSCertSourceType } from './constants';
+import type { TLSCertSourceType } from './constants';
+import { TLS_CERT_SOURCE_EXISTING, TLS_CERT_SOURCE_NEW } from './constants';
 
 type TLSCertificateSectionProps = {
   cluster?: string;

@@ -1,8 +1,9 @@
-import { ChangeEvent, useCallback, useMemo, useState } from 'react';
+import type { ChangeEvent } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import useLocalStorage from '@kubevirt-utils/hooks/useLocalStorage';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { TreeViewDataItem } from '@patternfly/react-core';
+import type { TreeViewDataItem } from '@patternfly/react-core';
 import { useSignals } from '@preact/signals-react/runtime';
 
 import { HIDE, SHOW, SHOW_EMPTY_PROJECTS_KEY } from '../utils/constants';

@@ -1,7 +1,7 @@
-import { TFunction } from 'i18next';
+import type { TFunction } from 'i18next';
 
-import { V1beta1VirtualMachineSnapshot } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
+import type { V1beta1VirtualMachineSnapshot } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import type { KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 
 import { getStatusPhase } from '@kubevirt-utils/resources/shared';
 import { snapshotStatuses } from './consts';

@@ -1,11 +1,12 @@
-import React, { FC, ReactNode } from 'react';
+import type { FC, ReactNode } from 'react';
+import React from 'react';
 import { Trans } from 'react-i18next';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Flex, Icon, Spinner } from '@patternfly/react-core';
 import { ExclamationCircleIcon, SaveIcon } from '@patternfly/react-icons';
-import { SavedSearchEntry } from '@search/savedSearches/types';
+import type { SavedSearchEntry } from '@search/savedSearches/types';
 
 type SavedSearchesStateHandlerProps = {
   children: ReactNode;

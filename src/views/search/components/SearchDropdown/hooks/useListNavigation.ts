@@ -1,4 +1,5 @@
-import { Dispatch, KeyboardEvent, SetStateAction, useCallback } from 'react';
+import type { Dispatch, KeyboardEvent, SetStateAction } from 'react';
+import { useCallback } from 'react';
 
 import { KeyTypes } from '@patternfly/react-core';
 

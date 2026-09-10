@@ -1,9 +1,10 @@
-import React, { FC, useMemo } from 'react';
-import { Updater } from 'use-immer';
+import type { FC } from 'react';
+import React, { useMemo } from 'react';
+import type { Updater } from 'use-immer';
 
-import { V1beta1NetworkMap, V1beta1Plan, V1beta1StorageMap } from '@forklift-ui/types';
+import type { V1beta1NetworkMap, V1beta1Plan, V1beta1StorageMap } from '@forklift-ui/types';
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import type { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import StateHandler from '@kubevirt-utils/components/StateHandler/StateHandler';
 import { modelToGroupVersionKind } from '@kubevirt-utils/models';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';

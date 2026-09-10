@@ -1,4 +1,5 @@
-import React, { FC, useCallback } from 'react';
+import type { FC } from 'react';
+import React, { useCallback } from 'react';
 
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import {

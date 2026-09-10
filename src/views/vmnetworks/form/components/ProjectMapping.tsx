@@ -1,4 +1,5 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
 import { PROJECT_NAME_LABEL_KEY } from '@kubevirt-utils/constants/constants';
@@ -7,7 +8,8 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import useProjectResources from '@kubevirt-utils/hooks/useProjectResources';
 import { Radio, Stack, Title } from '@patternfly/react-core';
 
-import { ProjectMappingOption, VMNetworkForm } from '../constants';
+import type { VMNetworkForm } from '../constants';
+import { ProjectMappingOption } from '../constants';
 
 import ProjectList from './ProjectList';
 import ProjectNamespaceSelector from './ProjectNamespaceSelector';

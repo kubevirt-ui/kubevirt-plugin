@@ -1,10 +1,13 @@
-import { Dispatch, SetStateAction, useCallback, useMemo } from 'react';
+import type { Dispatch, SetStateAction } from 'react';
+import { useCallback, useMemo } from 'react';
 
-import { KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
+import type { KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 
-import { AutocompleteMode, DropdownType, ValueOption } from '../../types';
+import type { AutocompleteMode, ValueOption } from '../../types';
+import { DropdownType } from '../../types';
 import { getFilteredOrderedOptions, toValueOptions } from '../../utils';
-import { OptionalListNavigationResult, useListNavigation } from '../useListNavigation';
+import type { OptionalListNavigationResult } from '../useListNavigation';
+import { useListNavigation } from '../useListNavigation';
 
 type UseValueListNavigationProps = {
   autocompleteMode: AutocompleteMode;

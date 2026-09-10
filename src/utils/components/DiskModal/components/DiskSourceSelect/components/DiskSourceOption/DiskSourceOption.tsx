@@ -1,9 +1,10 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
-import { SourceTypes } from '@kubevirt-utils/components/DiskModal/utils/types';
+import type { SourceTypes } from '@kubevirt-utils/components/DiskModal/utils/types';
 import { SelectOption } from '@patternfly/react-core';
 
-import { DiskSourceOptionGroupItem } from '../../utils/types';
+import type { DiskSourceOptionGroupItem } from '../../utils/types';
 
 type DiskSourceOptionProps = {
   onSelect: (value: SourceTypes) => void;

@@ -1,6 +1,6 @@
-import { FormEvent, KeyboardEvent } from 'react';
+import type { FormEvent, KeyboardEvent } from 'react';
 
-import {
+import type {
   KubevirtFilter,
   KubevirtFilterState,
   OnSetFilters,

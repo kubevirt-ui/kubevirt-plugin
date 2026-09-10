@@ -1,11 +1,12 @@
-import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import type { Dispatch, SetStateAction } from 'react';
+import React, { useEffect, useState } from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import type { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { VirtualMachineModelGroupVersionKind } from '@kubevirt-utils/models';
 import { getLabel } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
-import { SelectOptionProps } from '@patternfly/react-core';
+import type { SelectOptionProps } from '@patternfly/react-core';
 import { FolderIcon } from '@patternfly/react-icons';
 import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
 

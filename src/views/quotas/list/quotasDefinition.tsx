@@ -1,10 +1,11 @@
 import React from 'react';
-import { TFunction } from 'i18next';
+import type { TFunction } from 'i18next';
 
 import { getK8sRowId } from '@kubevirt-utils/components/KubevirtTable/utils';
-import { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
+import type { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { ACTIONS } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/const';
-import { ApplicationAwareQuota, CalculationMethod } from '@kubevirt-utils/resources/quotas/types';
+import type { ApplicationAwareQuota } from '@kubevirt-utils/resources/quotas/types';
+import { CalculationMethod } from '@kubevirt-utils/resources/quotas/types';
 import { getCreationTimestamp, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 
 import { getMainResourceKeys, getQuotaNumbers, getStatus } from '../utils/utils';
@@ -17,7 +18,8 @@ import QuotaMemoryCell from './cells/QuotaMemoryCell';
 import QuotaNameCell from './cells/QuotaNameCell';
 import QuotaNamespaceCell from './cells/QuotaNamespaceCell';
 import QuotaVMICountCell from './cells/QuotaVMICountCell';
-import { createSortByPercentage, getNamespaceColumnValue, QuotaCallbacks } from './utils/helpers';
+import type { QuotaCallbacks } from './utils/helpers';
+import { createSortByPercentage, getNamespaceColumnValue } from './utils/helpers';
 import { QuotaColumn, QuotaScope } from './constants';
 
 const getUsagePercentageValue = (row: ApplicationAwareQuota, resourceKey: string): string => {

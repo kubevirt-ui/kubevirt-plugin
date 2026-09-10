@@ -1,4 +1,4 @@
-import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import type { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import {
   getPrometheusDataAllNics,
   getPrometheusDataByNic,
@@ -7,7 +7,8 @@ import {
 import useVMQueries from '@kubevirt-utils/hooks/useVMQueries';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { getCluster } from '@multicluster/helpers/selectors';
-import { PrometheusEndpoint, PrometheusResult } from '@openshift-console/dynamic-plugin-sdk';
+import type { PrometheusResult } from '@openshift-console/dynamic-plugin-sdk';
+import { PrometheusEndpoint } from '@openshift-console/dynamic-plugin-sdk';
 import { useFleetPrometheusPoll } from '@stolostron/multicluster-sdk';
 
 import useDuration from '../../hooks/useDuration';

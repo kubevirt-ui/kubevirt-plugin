@@ -1,4 +1,5 @@
-import React, { createContext, FC, ReactNode, useContext, useMemo } from 'react';
+import type { FC, ReactNode } from 'react';
+import React, { createContext, useContext, useMemo } from 'react';
 
 import { useKubevirtClusterServiceVersion } from '@kubevirt-utils/hooks/useKubevirtClusterServiceVersion';
 

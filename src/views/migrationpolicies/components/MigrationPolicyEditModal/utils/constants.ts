@@ -1,5 +1,5 @@
-import { QuantityUnit } from '@kubevirt-utils/utils/unitConstants';
-import { BinaryUnit } from '@kubevirt-utils/utils/unitConstants';
+import type { QuantityUnit } from '@kubevirt-utils/utils/unitConstants';
+import type { BinaryUnit } from '@kubevirt-utils/utils/unitConstants';
 
 export type EditMigrationPolicyInitialState = {
   allowAutoConverge?: boolean;

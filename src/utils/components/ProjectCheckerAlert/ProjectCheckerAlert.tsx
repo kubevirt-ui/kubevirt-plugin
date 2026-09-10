@@ -1,4 +1,5 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
 import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
@@ -6,7 +7,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { getName } from '@kubevirt-utils/resources/shared';
 import MulticlusterResourceLink from '@multicluster/components/MulticlusterResourceLink/MulticlusterResourceLink';
 import { getCluster } from '@multicluster/helpers/selectors';
-import { K8sResourceKind } from '@openshift-console/dynamic-plugin-sdk';
+import type { K8sResourceKind } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Alert,
   AlertVariant,

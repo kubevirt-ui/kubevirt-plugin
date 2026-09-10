@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 
-import { KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
-import { Template, TemplateOrRequest } from '@kubevirt-utils/resources/template';
+import type { KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
+import type { Template, TemplateOrRequest } from '@kubevirt-utils/resources/template';
 import { ARCHITECTURE_TITLE } from '@kubevirt-utils/utils/architecture';
 import { getTemplateArchitecture, getUniqueTemplateArchitectures } from '@templates/utils/utils';
 

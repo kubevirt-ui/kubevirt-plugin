@@ -1,6 +1,6 @@
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
-import { TabConfig } from '../../../utils/types';
+import type { TabConfig } from '../../../utils/types';
 import CheckupsStorageDetailsTab from '../tabs/details/CheckupsStorageDetailsTab';
 import CheckupsStorageYAMLTab from '../tabs/yaml/CheckupsStorageYAMLTab';
 

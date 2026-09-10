@@ -1,12 +1,13 @@
-import React, { FC, useMemo } from 'react';
+import type { FC } from 'react';
+import React, { useMemo } from 'react';
 
 import { NodeModel, TemplateModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { NetworkAttachmentDefinitionModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { getAllowedResourceData } from '@kubevirt-utils/resources/shared';
-import { K8sResourceCommon, WatchK8sResults } from '@openshift-console/dynamic-plugin-sdk';
+import type { K8sResourceCommon, WatchK8sResults } from '@openshift-console/dynamic-plugin-sdk';
 import { ResourceInventoryItem } from '@openshift-console/dynamic-plugin-sdk-internal';
-import { K8sModel } from '@openshift-console/dynamic-plugin-sdk-internal/lib/api/common-types';
+import type { K8sModel } from '@openshift-console/dynamic-plugin-sdk-internal/lib/api/common-types';
 import { Stack, StackItem } from '@patternfly/react-core';
 
 import './ResourcesSection.scss';

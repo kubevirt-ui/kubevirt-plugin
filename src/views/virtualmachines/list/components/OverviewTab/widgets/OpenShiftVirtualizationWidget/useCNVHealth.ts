@@ -1,10 +1,7 @@
 import { useMemo } from 'react';
 
-import {
-  HealthState,
-  PrometheusEndpoint,
-  PrometheusResponse,
-} from '@openshift-console/dynamic-plugin-sdk';
+import type { PrometheusResponse } from '@openshift-console/dynamic-plugin-sdk';
+import { HealthState, PrometheusEndpoint } from '@openshift-console/dynamic-plugin-sdk';
 import { useFleetPrometheusPoll } from '@stolostron/multicluster-sdk';
 
 import { HCO_HEALTH_QUERY, processHealthResults } from './utils';

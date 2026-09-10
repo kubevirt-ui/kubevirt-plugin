@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-import { AlertType } from '@kubevirt-utils/components/AlertsCard/utils/types';
+import type { AlertType } from '@kubevirt-utils/components/AlertsCard/utils/types';
 import useAlerts from '@kubevirt-utils/hooks/useAlerts/useAlerts';
 import {
   getNumberOfAlerts,
@@ -9,7 +9,7 @@ import {
   sortAlertsBySeverity,
 } from '@kubevirt-utils/hooks/useInfrastructureAlerts/utils/utils';
 import { isKubeVirtAlert } from '@kubevirt-utils/utils/prometheus';
-import { Alert } from '@openshift-console/dynamic-plugin-sdk';
+import type { Alert } from '@openshift-console/dynamic-plugin-sdk';
 
 export type AlertsBySeverity = { [key in AlertType]: Alert[] };
 

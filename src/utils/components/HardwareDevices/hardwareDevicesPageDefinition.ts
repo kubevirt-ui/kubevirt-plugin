@@ -1,9 +1,9 @@
-import { TFunction } from 'i18next';
+import type { TFunction } from 'i18next';
 
-import { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
+import type { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 
-import { HardwareDevicePageRow } from './utils/constants';
+import type { HardwareDevicePageRow } from './utils/constants';
 
 const TABLE_COLUMN_CLASSES = ['pf-m-width-20', 'pf-m-width-20'];
 

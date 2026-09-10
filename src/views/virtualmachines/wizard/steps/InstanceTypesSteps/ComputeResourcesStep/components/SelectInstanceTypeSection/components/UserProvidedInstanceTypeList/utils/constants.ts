@@ -1,4 +1,4 @@
-import { PaginationState } from '@kubevirt-utils/hooks/usePagination/utils/types';
+import type { PaginationState } from '@kubevirt-utils/hooks/usePagination/utils/types';
 
 export const paginationDefaultValues = [
   { title: '5', value: 5 },

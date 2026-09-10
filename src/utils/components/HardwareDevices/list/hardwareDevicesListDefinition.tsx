@@ -1,8 +1,9 @@
-import React, { ReactNode } from 'react';
-import { TFunction } from 'i18next';
+import type { ReactNode } from 'react';
+import React from 'react';
+import type { TFunction } from 'i18next';
 
-import { V1GPU, V1HostDevice } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
+import type { V1GPU, V1HostDevice } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import type { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { Button, ButtonVariant } from '@patternfly/react-core';
 import { MinusCircleIcon } from '@patternfly/react-icons';

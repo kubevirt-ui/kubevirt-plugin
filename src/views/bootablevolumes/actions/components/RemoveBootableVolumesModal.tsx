@@ -1,10 +1,11 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
 import DeleteModal from '@kubevirt-utils/components/DeleteModal/DeleteModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useLastNamespacePath } from '@kubevirt-utils/hooks/useLastNamespacePath';
 
-import { BootableResource } from '../../utils/types';
+import type { BootableResource } from '../../utils/types';
 import { deleteBootableVolumeMetadata } from '../../utils/utils';
 
 type RemoveBootableVolumesModalProps = {

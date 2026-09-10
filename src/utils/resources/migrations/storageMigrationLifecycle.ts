@@ -1,10 +1,8 @@
 import { getStatusNamespaces } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 
-import {
-  MultiNamespaceVirtualMachineStorageMigrationPlan,
-  STORAGE_MIGRATION_PHASE,
-} from './constants';
+import type { MultiNamespaceVirtualMachineStorageMigrationPlan } from './constants';
+import { STORAGE_MIGRATION_PHASE } from './constants';
 import { isMigrationCompleted } from './utils';
 
 export enum StorageMigrationStatusFilterValue {

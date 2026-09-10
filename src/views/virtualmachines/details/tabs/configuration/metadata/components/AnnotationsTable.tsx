@@ -1,11 +1,12 @@
-import React, { FC, useCallback, useMemo } from 'react';
+import type { FC } from 'react';
+import React, { useCallback, useMemo } from 'react';
 
 import { AnnotationsModal } from '@kubevirt-utils/components/AnnotationsModal/AnnotationsModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getAnnotations } from '@kubevirt-utils/resources/shared';
 import { isSystemKey } from '@kubevirt-utils/utils/labelValidation/labelValidation';
-import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+import type { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { Truncate } from '@patternfly/react-core';
 
 import LabelsAnnotationsTable from './LabelsAnnotationsTable';

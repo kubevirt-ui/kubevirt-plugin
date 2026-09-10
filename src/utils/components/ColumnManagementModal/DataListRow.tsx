@@ -1,6 +1,7 @@
-import React, { FC, FormEvent } from 'react';
+import type { FC, FormEvent } from 'react';
+import React from 'react';
 
-import { ManagedColumn } from '@openshift-console/dynamic-plugin-sdk';
+import type { ManagedColumn } from '@openshift-console/dynamic-plugin-sdk';
 import {
   DataListCell,
   DataListCheck,

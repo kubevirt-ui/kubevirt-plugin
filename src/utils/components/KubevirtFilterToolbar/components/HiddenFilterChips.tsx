@@ -1,6 +1,7 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
-import {
+import type {
   KubevirtFilter,
   KubevirtFilterState,
   OnSetFilters,

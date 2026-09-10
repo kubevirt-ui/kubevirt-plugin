@@ -1,6 +1,7 @@
 import produce from 'immer';
 
-import { TemplateModel, V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
+import type { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { TemplateModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { getAnnotations, getLabels, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import {
   ANNOTATIONS,
@@ -17,7 +18,7 @@ import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sCreate } from '@multicluster/k8sRequests';
 import { LABELS } from '@templates/utils/constants';
 
-import { CloneTemplateFormValues } from './form/types';
+import type { CloneTemplateFormValues } from './form/types';
 import { cloneStorage } from './utils';
 
 type CloneTemplateSubmitParams = {

@@ -1,5 +1,5 @@
 import { getCluster } from '@multicluster/helpers/selectors';
-import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+import type { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { useHubClusterName } from '@stolostron/multicluster-sdk';
 
 import useMCOInstalled from './useAlerts/utils/useMCOInstalled';

@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-import {
+import type {
   FilterableObject,
   KubevirtFilter,
 } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';

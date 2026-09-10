@@ -1,6 +1,7 @@
-import { Dispatch, SetStateAction, useCallback, useState } from 'react';
+import type { Dispatch, SetStateAction } from 'react';
+import { useCallback, useState } from 'react';
 
-import { IDEntity } from '../utils/types';
+import type { IDEntity } from '../utils/types';
 
 type UseIDEntitiesProps = <T extends IDEntity = IDEntity>(
   initialEntities: T[],

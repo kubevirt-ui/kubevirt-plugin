@@ -1,5 +1,5 @@
 import { TELEMETRY_VM_ACTION } from './property-constants';
-import { VMActionTelemetry } from './types';
+import type { VMActionTelemetry } from './types';
 
 export const mapVMActionTypeToTelemetry = (actionType: string): undefined | VMActionTelemetry => {
   const normalized = actionType.toLowerCase();

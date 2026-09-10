@@ -1,4 +1,5 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
@@ -11,7 +12,7 @@ import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverCo
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { Checkbox, ExpandableSection, Split, Stack, StackItem } from '@patternfly/react-core';
 
-import { V1DiskFormState } from '../../utils/types';
+import type { V1DiskFormState } from '../../utils/types';
 import ApplyStorageProfileSettings from '../StorageProfileSettings/ApplyStorageProfileSettings';
 import { LUN_RESERVATION_FIELD, SHARABLE_FIELD } from '../utils/constants';
 import { getDiskSharable, getLunReservation } from '../utils/selectors';

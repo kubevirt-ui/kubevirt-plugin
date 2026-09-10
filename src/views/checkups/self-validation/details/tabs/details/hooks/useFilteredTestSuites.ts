@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 
-import { JobResults } from '../../../../utils';
-import { TestSuiteData } from '../TestSuiteCard';
+import type { JobResults } from '../../../../utils';
+import type { TestSuiteData } from '../TestSuiteCard';
 
 /**
  * Hook to filter and format test suites from job results

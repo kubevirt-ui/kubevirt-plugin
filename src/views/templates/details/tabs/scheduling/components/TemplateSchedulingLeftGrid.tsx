@@ -1,10 +1,12 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 import AffinityRules from 'src/views/templates/details/tabs/scheduling/components/AffinityRules';
 import Descheduler from 'src/views/templates/details/tabs/scheduling/components/Descheduler';
 import NodeSelector from 'src/views/templates/details/tabs/scheduling/components/NodeSelector';
 import Tolerations from 'src/views/templates/details/tabs/scheduling/components/Tolerations';
 
-import { Template, updateTemplate } from '@kubevirt-utils/resources/template';
+import type { Template } from '@kubevirt-utils/resources/template';
+import { updateTemplate } from '@kubevirt-utils/resources/template';
 import { DescriptionList } from '@patternfly/react-core';
 
 export type TemplateSchedulingGridProps = {

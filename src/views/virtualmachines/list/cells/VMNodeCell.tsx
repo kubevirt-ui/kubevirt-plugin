@@ -1,4 +1,5 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
 import { modelToGroupVersionKind, NodeModel } from '@kubevirt-utils/models';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
@@ -6,7 +7,7 @@ import { getVMINodeName } from '@kubevirt-utils/resources/vmi';
 import MulticlusterResourceLink from '@multicluster/components/MulticlusterResourceLink/MulticlusterResourceLink';
 import { getCluster } from '@multicluster/helpers/selectors';
 
-import { VMCellWithCallbacksProps } from './types';
+import type { VMCellWithCallbacksProps } from './types';
 
 const VMNodeCell: FC<VMCellWithCallbacksProps> = ({ callbacks, row }) => {
   if (!row) return null;

@@ -1,6 +1,6 @@
-import { TFunction } from 'i18next';
+import type { TFunction } from 'i18next';
 
-import { ScoreStatus } from '../../shared/StatusScoreList/StatusScoreList';
+import type { ScoreStatus } from '../../shared/StatusScoreList/StatusScoreList';
 
 export const THRESHOLD_HIGH = 90;
 export const THRESHOLD_MEDIUM = 50;

@@ -1,4 +1,5 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
@@ -8,7 +9,8 @@ import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverCo
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { FormGroup, TextInput } from '@patternfly/react-core';
 
-import { MAX_VLAN_ID, MIN_VLAN_ID, VMNetworkForm } from '../constants';
+import type { VMNetworkForm } from '../constants';
+import { MAX_VLAN_ID, MIN_VLAN_ID } from '../constants';
 import { getVLANIDValidatedOption } from '../utils/utils';
 
 const VLANIDField: FC = () => {

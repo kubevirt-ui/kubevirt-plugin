@@ -1,4 +1,4 @@
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import type { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { RUNSTRATEGY_HALTED } from '@kubevirt-utils/resources/vm/utils/constants';
 
 export const exampleRunningVirtualMachine: V1VirtualMachine = {

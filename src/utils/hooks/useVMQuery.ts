@@ -1,5 +1,8 @@
-import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { VMQueries } from '@kubevirt-utils/components/Charts/utils/queries';
+import type {
+  V1VirtualMachine,
+  V1VirtualMachineInstance,
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import type { VMQueries } from '@kubevirt-utils/components/Charts/utils/queries';
 import { queriesToLink } from '@kubevirt-utils/components/Charts/utils/utils';
 import useIsACMPage from '@multicluster/useIsACMPage';
 

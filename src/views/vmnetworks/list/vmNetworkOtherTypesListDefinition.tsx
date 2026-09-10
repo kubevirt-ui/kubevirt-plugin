@@ -1,7 +1,8 @@
-import React, { FC, ReactNode } from 'react';
-import { TFunction } from 'i18next';
+import type { FC, ReactNode } from 'react';
+import React from 'react';
+import type { TFunction } from 'i18next';
 
-import { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
+import type { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { modelToGroupVersionKind, NamespaceModel } from '@kubevirt-utils/models';
 import { getName, getNamespace, getUID } from '@kubevirt-utils/resources/shared';
@@ -11,7 +12,7 @@ import {
   ResourceLink,
 } from '@openshift-console/dynamic-plugin-sdk';
 
-import { OtherVMNetworkWithType } from './types';
+import type { OtherVMNetworkWithType } from './types';
 import { getVMNetworkTypeLabel } from './utils';
 
 const renderNameCell = (row: OtherVMNetworkWithType): ReactNode => {

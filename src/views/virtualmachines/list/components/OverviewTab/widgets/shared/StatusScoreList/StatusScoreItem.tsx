@@ -1,9 +1,10 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Label, Tooltip, Truncate } from '@patternfly/react-core';
 
-import { StatusScoreItem as StatusScoreItemType } from './types';
+import type { StatusScoreItem as StatusScoreItemType } from './types';
 
 type StatusScoreItemProps = {
   item: StatusScoreItemType;

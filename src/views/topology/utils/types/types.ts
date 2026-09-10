@@ -1,9 +1,9 @@
-import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import {
+import type { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import type {
   OdcNodeModel,
   TopologyDataObject,
 } from '@openshift-console/dynamic-plugin-sdk/lib/extensions/topology-types';
-import { Node } from '@patternfly/react-topology';
+import type { Node } from '@patternfly/react-topology';
 
 export type VMNodeData = {
   kind: string;

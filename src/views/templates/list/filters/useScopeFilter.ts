@@ -1,12 +1,12 @@
 import { useMemo } from 'react';
 
-import { KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
+import type { KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import type { TemplateOrRequest } from '@kubevirt-utils/resources/template';
 import {
   isCommonTemplate,
   isDefaultVariantTemplate,
   isOpenShiftTemplate,
-  TemplateOrRequest,
 } from '@kubevirt-utils/resources/template';
 
 import { TemplateFilterType } from './types';

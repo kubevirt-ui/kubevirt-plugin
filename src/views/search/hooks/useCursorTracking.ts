@@ -1,14 +1,7 @@
-import {
-  FormEvent,
-  RefObject,
-  useCallback,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import type { FormEvent, RefObject } from 'react';
+import { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
-import { TokenParts } from '@search/searchLanguage/types';
+import type { TokenParts } from '@search/searchLanguage/types';
 import { splitAtCursorToken } from '@search/searchLanguage/utils';
 
 export type SetDraftTextWithCursor = (value: string, cursorPos?: number) => void;

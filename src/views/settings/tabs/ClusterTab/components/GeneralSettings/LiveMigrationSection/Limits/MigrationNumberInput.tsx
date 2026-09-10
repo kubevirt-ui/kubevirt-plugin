@@ -1,8 +1,9 @@
-import React, { ChangeEvent, Dispatch, FC, SetStateAction } from 'react';
+import type { ChangeEvent, Dispatch, FC, SetStateAction } from 'react';
+import React from 'react';
 
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverContentWithLightspeedButton/PopoverContentWithLightspeedButton';
-import { OLSPromptType } from '@lightspeed/utils/prompts';
+import type { OLSPromptType } from '@lightspeed/utils/prompts';
 import { NumberInput, PopoverPosition, Skeleton, Title } from '@patternfly/react-core';
 
 type MigrationNumberInputProps = {

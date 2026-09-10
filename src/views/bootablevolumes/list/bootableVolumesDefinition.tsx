@@ -1,24 +1,21 @@
 import React from 'react';
-import { TFunction } from 'i18next';
+import type { TFunction } from 'i18next';
 
-import {
+import type {
   V1beta1DataImportCron,
   V1beta1DataVolume,
 } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
-import { V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import type { V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getK8sRowId } from '@kubevirt-utils/components/KubevirtTable/utils';
-import { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
+import type { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { ACTIONS } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/const';
-import {
-  ClusterNamespacedResourceMap,
-  getName,
-  getNamespace,
-} from '@kubevirt-utils/resources/shared';
+import type { ClusterNamespacedResourceMap } from '@kubevirt-utils/resources/shared';
+import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { ANNOTATIONS } from '@kubevirt-utils/resources/template';
 import { ARCHITECTURE_ID, ARCHITECTURE_LABEL } from '@kubevirt-utils/utils/architecture';
 import { getCluster } from '@multicluster/helpers/selectors';
 
-import { BootableResource } from '../utils/types';
+import type { BootableResource } from '../utils/types';
 import { getPreferenceReadableOS, getSourcePreferenceLabelValue } from '../utils/utils';
 
 import BootableVolumeActionsCell from './cells/BootableVolumeActionsCell';

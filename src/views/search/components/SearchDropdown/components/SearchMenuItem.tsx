@@ -1,6 +1,8 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
-import { MenuItem, MenuItemProps } from '@patternfly/react-core';
+import type { MenuItemProps } from '@patternfly/react-core';
+import { MenuItem } from '@patternfly/react-core';
 
 const SearchMenuItem: FC<MenuItemProps> = ({ children, onClick, ...props }) => (
   <MenuItem

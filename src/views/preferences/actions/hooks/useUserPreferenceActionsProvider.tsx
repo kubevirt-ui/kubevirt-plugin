@@ -1,13 +1,14 @@
 import React from 'react';
 
 import { VirtualMachinePreferenceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1beta1VirtualMachinePreference } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import type { V1beta1VirtualMachinePreference } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import CloneResourceModal from '@kubevirt-utils/components/CloneResourceModal/CloneResourceModal';
 import DeleteModal from '@kubevirt-utils/components/DeleteModal/DeleteModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { asAccessReview } from '@kubevirt-utils/resources/shared';
-import { Action, k8sDelete } from '@openshift-console/dynamic-plugin-sdk';
+import type { Action } from '@openshift-console/dynamic-plugin-sdk';
+import { k8sDelete } from '@openshift-console/dynamic-plugin-sdk';
 
 type UseUserPreferenceActionsProvider = (preference: V1beta1VirtualMachinePreference) => Action[];
 

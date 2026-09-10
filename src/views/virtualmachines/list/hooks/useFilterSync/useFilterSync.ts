@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router';
 
-import { OnSetFilters } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
+import type { OnSetFilters } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import useNamespaceParam from '@kubevirt-utils/hooks/useNamespaceParam';
 import {
   CLUSTER_LIST_FILTER_TYPE,

@@ -1,11 +1,12 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 import DedicatedResources from 'src/views/templates/details/tabs/scheduling/components//DedicatedResources';
 import EvictionStrategy from 'src/views/templates/details/tabs/scheduling/components//EvictionStrategy';
 
 import { updateTemplate } from '@kubevirt-utils/resources/template';
 import { DescriptionList } from '@patternfly/react-core';
 
-import { TemplateSchedulingGridProps } from './TemplateSchedulingLeftGrid';
+import type { TemplateSchedulingGridProps } from './TemplateSchedulingLeftGrid';
 
 const TemplateSchedulingRightGrid: FC<TemplateSchedulingGridProps> = ({ editable, template }) => {
   return (

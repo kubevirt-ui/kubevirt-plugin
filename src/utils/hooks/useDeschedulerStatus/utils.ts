@@ -4,7 +4,7 @@ import {
   DESCHEDULER_NOT_INSTALLED,
   DESCHEDULER_UNKNOWN,
 } from '@kubevirt-utils/hooks/constants';
-import { DeschedulerStatus } from '@kubevirt-utils/hooks/useDeschedulerInstalled';
+import type { DeschedulerStatus } from '@kubevirt-utils/hooks/useDeschedulerInstalled';
 
 type GetDeschedulerStatusParams = {
   hasSubscription: boolean;

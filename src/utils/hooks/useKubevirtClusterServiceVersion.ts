@@ -6,7 +6,7 @@ import { ClusterServiceVersionModelGroupVersionKind } from '@kubevirt-utils/mode
 import { operatorNamespaceSignal } from '@kubevirt-utils/store/operatorNamespace';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
-import { ClusterServiceVersionKind, SubscriptionKind } from '@overview/utils/types';
+import type { ClusterServiceVersionKind, SubscriptionKind } from '@overview/utils/types';
 
 type UseKubevirtClusterServiceVersion = (cluster?: string) => {
   installedCSV: ClusterServiceVersionKind;

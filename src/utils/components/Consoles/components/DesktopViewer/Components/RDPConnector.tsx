@@ -1,8 +1,9 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 
 import ComponentReady from '@kubevirt-utils/components/Charts/ComponentReady/ComponentReady';
 
-import { RDPConnectorProps } from '../utils/types';
+import type { RDPConnectorProps } from '../utils/types';
 
 import RDP from './RDP';
 import RDPServiceNotConfigured from './RDPServiceNotConfigured';

@@ -1,4 +1,5 @@
-import { FC, useEffect, useRef } from 'react';
+import type { FC } from 'react';
+import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router';
 
 import useKubevirtToast from '@kubevirt-utils/hooks/useKubevirtToast';

@@ -1,4 +1,5 @@
-import React, { FC, ReactEventHandler } from 'react';
+import type { FC, ReactEventHandler } from 'react';
+import React from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FormGroup, FormHelperText, HelperText, TextInput } from '@patternfly/react-core';

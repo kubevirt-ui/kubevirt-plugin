@@ -1,13 +1,14 @@
-import React, { FC } from 'react';
+import type { FC } from 'react';
+import React from 'react';
 import { useWatch } from 'react-hook-form';
 
-import { OnSetFilters } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
+import type { OnSetFilters } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import { Card, Skeleton } from '@patternfly/react-core';
 import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
 import { CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
 import usePreferencesData from '@virtualmachines/wizard/steps/InstanceTypesSteps/BootSourceStep/components/BootableVolumeList/hooks/usePreferencesData';
-import {
+import type {
   UseBootableVolumesValues,
   UseInstanceTypeAndPreferencesValues,
 } from '@virtualmachines/wizard/utils/types';

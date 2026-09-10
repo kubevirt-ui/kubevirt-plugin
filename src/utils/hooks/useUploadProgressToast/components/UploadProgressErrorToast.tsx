@@ -4,7 +4,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { FlexItem } from '@patternfly/react-core';
 
-import { UploadEntry } from '../types';
+import type { UploadEntry } from '../types';
 
 import ToastLayout from './ToastLayout';
 import UploadProgressLinks from './UploadProgressLinks';

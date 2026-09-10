@@ -1,6 +1,10 @@
-import React, { FC, useMemo } from 'react';
+import type { FC } from 'react';
+import React, { useMemo } from 'react';
 
-import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import type {
+  V1VirtualMachine,
+  V1VirtualMachineInstance,
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import KubevirtFilterToolbar from '@kubevirt-utils/components/KubevirtFilterToolbar/KubevirtFilterToolbar';
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
 import useKubevirtDataViewFilters from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/useKubevirtDataViewFilters';
@@ -14,7 +18,7 @@ import { getInterfacesAndNetworks } from '@kubevirt-utils/resources/vm/utils/net
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 
 import useNetworkRowFilters from '../../hooks/useNetworkRowFilters';
-import { SimpleNICPresentation } from '../../utils/types';
+import type { SimpleNICPresentation } from '../../utils/types';
 import {
   isInterfaceEphemeral,
   isPendingNICAdd,
@@ -23,10 +27,10 @@ import {
 } from '../../utils/utils';
 
 import AutoAttachedNetworkEmptyState from './AutoAttachedNetworkEmptyState';
+import type { NetworkInterfaceListCallbacks } from './networkInterfaceListDefinition';
 import {
   getNetworkInterfaceListColumns,
   getNetworkInterfaceRowId,
-  NetworkInterfaceListCallbacks,
 } from './networkInterfaceListDefinition';
 
 type NetworkInterfaceTableProps = {

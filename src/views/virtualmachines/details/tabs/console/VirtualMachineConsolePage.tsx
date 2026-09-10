@@ -1,4 +1,5 @@
-import React, { FC, useEffect, useMemo, useRef } from 'react';
+import type { FC } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 
 import VmNotRunning from '@kubevirt-utils/components/Consoles/components/VmNotRunning';
 import { KUBEVIRT_UI_VNC_LOG_LEVEL_LABEL } from '@kubevirt-utils/components/Consoles/components/vnc-console/utils/constants';
@@ -14,7 +15,7 @@ import { isWindows } from '@kubevirt-utils/resources/vm/utils/operation-system/o
 import { getCluster } from '@multicluster/helpers/selectors';
 import useK8sBaseAPIPath from '@multicluster/hooks/useK8sBaseAPIPath';
 import { Bullseye, PageSection, Spinner } from '@patternfly/react-core';
-import { NavPageComponentProps } from '@virtualmachines/details/utils/types';
+import type { NavPageComponentProps } from '@virtualmachines/details/utils/types';
 
 import { isRunning, isStopped } from '../../../utils';
 

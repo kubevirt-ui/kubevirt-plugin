@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import type { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import type { RunStrategy } from '@kubevirt-utils/resources/vm/utils/constants';
 import {
   getDefaultRunningStrategy,
-  RunStrategy,
   RUNSTRATEGY_MANUAL,
 } from '@kubevirt-utils/resources/vm/utils/constants';
 import { getEffectiveRunStrategy } from '@kubevirt-utils/resources/vm/utils/selectors';
