@@ -129,7 +129,7 @@
   },
   "lint-staged": {
     "*.{js,ts,tsx,jsx}": [
-      "eslint --config eslintv10.config.mjs --no-warn-ignored --fix"
+      "eslint --config eslint.config.mjs --no-warn-ignored --fix"
     ],
     "*.scss": [
       "stylelint --fix"
