@@ -10,9 +10,10 @@ import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Breadcrumb, BreadcrumbItem, Label, Title } from '@patternfly/react-core';
 
+import { isDataSourceReady } from '../utils';
+
 import DataSourceActions from '../actions/DataSourceActions';
 import useIsBootableVolumeContext from '../hooks/useIsBootableVolumeContext';
-import { isDataSourceReady } from '../utils';
 
 type DataSourcePageTitleProps = {
   dataSource: V1beta1DataSource;

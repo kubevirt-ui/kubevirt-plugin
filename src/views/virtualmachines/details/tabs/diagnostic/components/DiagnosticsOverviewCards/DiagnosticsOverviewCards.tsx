@@ -87,11 +87,11 @@ const DiagnosticsOverviewCards: FC<DiagnosticsOverviewCardsProps> = ({
         return (
           <FlexItem flex={{ default: 'flex_1' }} key={card.label}>
             <Card
+              aria-label={t('{{label}}, {{count}}', { count: card.count, label: card.label })}
+              aria-pressed={isSelected}
               className={`diagnostics-overview-cards__card ${card.colorClass} ${
                 isSelected ? 'diagnostics-overview-cards__card--selected' : ''
               }`}
-              aria-label={t('{{label}}, {{count}}', { count: card.count, label: card.label })}
-              aria-pressed={isSelected}
               data-test={`diagnostics-card-${card.severity ?? 'all'}`}
               isClickable
               isCompact

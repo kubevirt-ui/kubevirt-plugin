@@ -4,11 +4,11 @@ import React, { useMemo } from 'react';
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
-import type { HardwareDevicePageRow } from './utils/constants';
 import {
   getHardwareDevicePageRowId,
   getHardwareDevicesPageColumns,
 } from './hardwareDevicesPageDefinition';
+import type { HardwareDevicePageRow } from './utils/constants';
 
 type HardwareDevicesPageTableProps = {
   devices: HardwareDevicePageRow[];

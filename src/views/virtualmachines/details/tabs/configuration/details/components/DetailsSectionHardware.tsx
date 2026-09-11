@@ -73,6 +73,11 @@ const DetailsSectionHardware: FC<DetailsSectionHardwareProps> = ({
   const onEditGPU = (): void => {
     createModal(({ isOpen, onClose }) => (
       <HardwareDevicesModal
+        btnText={t('Add GPU device')}
+        headerText={t('GPU devices')}
+        initialDevices={gpus}
+        isOpen={isOpen}
+        onClose={onClose}
         onSubmit={async (updatedVM) => {
           const result = await onSubmit(HARDWARE_DEVICE_TYPE.GPUS, updatedVM);
           const gpuDevices = getGPUDevices(updatedVM);
@@ -82,11 +87,6 @@ const DetailsSectionHardware: FC<DetailsSectionHardwareProps> = ({
           });
           return result;
         }}
-        btnText={t('Add GPU device')}
-        headerText={t('GPU devices')}
-        initialDevices={gpus}
-        isOpen={isOpen}
-        onClose={onClose}
         type={HARDWARE_DEVICE_TYPE.GPUS}
         vm={vm}
         vmi={vmi}
@@ -96,6 +96,9 @@ const DetailsSectionHardware: FC<DetailsSectionHardwareProps> = ({
 
   return (
     <ExpandableSection
+      isExpanded={isExpanded}
+      isIndented
+      onToggle={(_event, val) => setIsExpanded(val)}
       toggleContent={
         <SearchItem id="hardware-devices">
           {t('Hardware devices ({{devices}})', {
@@ -103,9 +106,6 @@ const DetailsSectionHardware: FC<DetailsSectionHardwareProps> = ({
           })}
         </SearchItem>
       }
-      isExpanded={isExpanded}
-      isIndented
-      onToggle={(_event, val) => setIsExpanded(val)}
     >
       <Grid>
         {!vmHasS390xArchitecture && !isClusterS390xArchitecture && (

@@ -22,7 +22,6 @@ import {
 
 import useSnapshotData from '../../../snapshots/hooks/useSnapshotData';
 import { createURL } from '../../utils/utils';
-
 import VirtualMachinesOverviewTabSnapshotsRow from './VirtualMachinesOverviewTabSnapshotsRow';
 
 type VirtualMachinesOverviewTabSnapshotsProps = {

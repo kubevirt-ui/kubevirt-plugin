@@ -5,7 +5,6 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { Button, ButtonVariant, Tooltip } from '@patternfly/react-core';
 
 import RunningCheckupWarningDescription from '../actions/RunningCheckupWarningDescription';
-
 import type { RunButtonWithTooltipProps } from './types';
 
 const RunButtonWithTooltip: FC<RunButtonWithTooltipProps> = ({

@@ -1,8 +1,8 @@
 import type { TFunction } from 'i18next';
 
 import type { KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
-
 import { diskTypesLabels } from '@kubevirt-utils/resources/vm/utils/disk/constants';
+
 import type { DiskPresentation } from './virtualMachinesInstancePageDisksTabUtils';
 
 const DISK_TYPE_FILTER_ID = 'disk-type';

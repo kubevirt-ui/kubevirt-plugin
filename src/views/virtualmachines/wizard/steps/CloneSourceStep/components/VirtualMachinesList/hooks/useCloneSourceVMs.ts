@@ -10,8 +10,6 @@ import { usePVCMapper } from '@kubevirt-utils/hooks/usePVCMapper';
 import useVirtualMachineInstanceMigrationMapper from '@kubevirt-utils/resources/vmim/hooks/useVirtualMachineInstanceMigrationMapper';
 import useVirtualMachineInstanceMigrations from '@kubevirt-utils/resources/vmim/hooks/useVirtualMachineInstanceMigrations';
 import { useSignals } from '@preact/signals-react/runtime';
-import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
-import { CREATE_VM_FORM_FIELDS_VM_DATA } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
 import { useVirtualMachineInstanceMapper } from '@virtualmachines/list/hooks/useVirtualMachineInstanceMapper';
 import useVMMetrics from '@virtualmachines/list/hooks/useVMMetrics';
 import { VM_FILTER_OPTIONS } from '@virtualmachines/list/utils/constants';
@@ -19,9 +17,10 @@ import { useAccessibleResources } from '@virtualmachines/search/hooks/useAccessi
 import useVMSearchQueries from '@virtualmachines/search/hooks/useVMSearchQueries';
 import { OBJECTS_FETCHING_LIMIT } from '@virtualmachines/utils';
 import type { PVCMapper, VMIMapper, VMIMMapper } from '@virtualmachines/utils/mappers';
+import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
+import { CREATE_VM_FORM_FIELDS_VM_DATA } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
 
 import { resolveVMListSource } from '../utils/utils';
-
 import { useCloneSourceVMFilters } from './useCloneSourceVMFilters';
 
 type UseCloneSourceVMsReturn = {

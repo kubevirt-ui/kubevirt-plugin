@@ -9,7 +9,6 @@ import ExpandSection from '@settings/ExpandSection/ExpandSection';
 import { CLUSTER_TAB_IDS } from '@settings/search/constants';
 
 import { getGeneralSettingsLabels } from '../consts/consts';
-
 import AdvancedCDROMPopoverContent from './AdvancedCDROMPopoverContent';
 import useAdvancedCDROMFeatureFlag from './hooks/useAdvancedCDROMFeatureFlag';
 

@@ -59,6 +59,7 @@ const SSHTabAuthorizedSSHKey: FC<SSHTabAuthorizedSSHKeyProps> = ({
 
   return (
     <DescriptionItem
+      className={className}
       descriptionData={
         <Stack hasGutter>
           <SecretNameLabel secretName={secretName} />
@@ -67,6 +68,8 @@ const SSHTabAuthorizedSSHKey: FC<SSHTabAuthorizedSSHKeyProps> = ({
           />
         </Stack>
       }
+      descriptionHeader={<SearchItem id="public-ssh-key">{t('Public SSH key')}</SearchItem>}
+      isEdit={isEditable}
       onEditClick={() =>
         createModal((modalProps) => (
           <VMSSHSecretModal
@@ -78,9 +81,6 @@ const SSHTabAuthorizedSSHKey: FC<SSHTabAuthorizedSSHKeyProps> = ({
           />
         ))
       }
-      className={className}
-      descriptionHeader={<SearchItem id="public-ssh-key">{t('Public SSH key')}</SearchItem>}
-      isEdit={isEditable}
       showEditOnTitle
     />
   );

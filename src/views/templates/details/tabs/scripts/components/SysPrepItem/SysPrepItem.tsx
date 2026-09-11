@@ -84,6 +84,7 @@ const SysPrepItem: FC<SysPrepItemProps> = ({ template }) => {
 
   return (
     <DescriptionItem
+      descriptionData={<SysprepDescription error={sysprepLoadError} loaded={sysprepLoaded} />}
       descriptionHeader={
         <Flex className="vm-description-item__title">
           <FlexItem>
@@ -93,6 +94,10 @@ const SysPrepItem: FC<SysPrepItemProps> = ({ template }) => {
           </FlexItem>
           <FlexItem>
             <Button
+              icon={<PencilAltIcon />}
+              iconPosition="end"
+              isDisabled={!isTemplateEditable}
+              isInline
               onClick={() =>
                 createModal((modalProps) => (
                   <SysprepModal
@@ -106,10 +111,6 @@ const SysPrepItem: FC<SysPrepItemProps> = ({ template }) => {
                   />
                 ))
               }
-              icon={<PencilAltIcon />}
-              iconPosition="end"
-              isDisabled={!isTemplateEditable}
-              isInline
               type="button"
               variant={ButtonVariant.link}
             >
@@ -118,7 +119,6 @@ const SysPrepItem: FC<SysPrepItemProps> = ({ template }) => {
           </FlexItem>
         </Flex>
       }
-      descriptionData={<SysprepDescription error={sysprepLoadError} loaded={sysprepLoaded} />}
     />
   );
 };

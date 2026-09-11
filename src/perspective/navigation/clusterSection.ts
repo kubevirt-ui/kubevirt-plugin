@@ -1,9 +1,10 @@
 import type { HrefNavItem, NavSection } from '@openshift-console/dynamic-plugin-sdk';
 import type { EncodedExtension } from '@openshift-console/dynamic-plugin-sdk-webpack';
 
+import { suffixId } from '../utils';
+
 import { PERSPECTIVES } from '../../utils/constants/constants';
 import { NAV_ID } from '../../views/navigation/constants';
-import { suffixId } from '../utils';
 
 export const clusterSection: EncodedExtension[] = [
   {

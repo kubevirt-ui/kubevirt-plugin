@@ -26,9 +26,10 @@ import MulticlusterResourceLink from '@multicluster/components/MulticlusterResou
 import { ResourceIcon } from '@openshift-console/dynamic-plugin-sdk';
 import { Label } from '@patternfly/react-core';
 
+import type { BootableVolumeCallbacks } from '../bootableVolumesDefinition';
+
 import { appendBootableVolumeContext } from '../../../datasources/hooks/useIsBootableVolumeContext';
 import type { BootableResource } from '../../utils/types';
-import type { BootableVolumeCallbacks } from '../bootableVolumesDefinition';
 import { getEffectiveCluster } from '../utils/helpers';
 
 import './BootableVolumeNameCell.scss';

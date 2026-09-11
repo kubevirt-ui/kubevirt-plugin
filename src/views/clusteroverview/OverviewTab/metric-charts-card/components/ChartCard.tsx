@@ -11,7 +11,6 @@ import { Bullseye, Card, CardBody, Grid, GridItem } from '@patternfly/react-core
 import useMetricChartData from '../utils/hooks/useMetricChartData';
 import type { ChartCardProps } from '../utils/types';
 import { getCurrentValue } from '../utils/utils';
-
 import MetricChart from './MetricChart';
 
 import './ChartCard.scss';

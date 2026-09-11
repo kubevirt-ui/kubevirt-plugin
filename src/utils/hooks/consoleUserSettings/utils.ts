@@ -4,8 +4,8 @@ import { CONSOLE_USER_SETTINGS_NAMESPACE } from '@kubevirt-utils/hooks/useConsol
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { kubevirtK8sCreate, kubevirtK8sGet, kubevirtK8sPatch } from '@multicluster/k8sRequests';
 
-import { CONSOLE_USER_SETTINGS } from './useConsoleUserSettingLocalStorage/consts';
 import type { UpsertConsoleUserSettingArgs } from './types';
+import { CONSOLE_USER_SETTINGS } from './useConsoleUserSettingLocalStorage/consts';
 
 type PatchOperation = {
   op: 'add' | 'replace';

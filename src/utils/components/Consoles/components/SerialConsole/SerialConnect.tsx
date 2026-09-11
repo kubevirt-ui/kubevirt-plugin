@@ -4,6 +4,7 @@ import React from 'react';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
 import ConnectToConsole from '../ConnectToConsole';
+
 import type { CustomConnectComponentProps } from '../vnc-console/utils/VncConsoleTypes';
 
 const SerialConnect: FC<CustomConnectComponentProps> = ({ connect, isConnecting }) => {

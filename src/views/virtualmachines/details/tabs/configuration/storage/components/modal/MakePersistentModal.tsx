@@ -52,10 +52,10 @@ const MakePersistentModal: FC<MakePersistentModalProps> = ({
       <Stack hasGutter>
         <StackItem>
           <ConfirmActionMessage
+            action={CONFIRM_ACTIONS.makePersistent}
             obj={{
               metadata: { name: volume?.name },
             }}
-            action={CONFIRM_ACTIONS.makePersistent}
           />
         </StackItem>
       </Stack>

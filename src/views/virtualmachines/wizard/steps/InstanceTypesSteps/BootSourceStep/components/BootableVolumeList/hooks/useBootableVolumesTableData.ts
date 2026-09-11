@@ -6,12 +6,12 @@ import type {
   V1beta1VirtualMachinePreference,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { ALL_PROJECTS } from '@kubevirt-utils/hooks/constants';
-import useKubevirtDataViewFilters from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/useKubevirtDataViewFilters';
 import type {
   KubevirtFilter,
   KubevirtFilterState,
   OnSetFilters,
 } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
+import useKubevirtDataViewFilters from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/useKubevirtDataViewFilters';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import type { PaginationState } from '@kubevirt-utils/hooks/usePagination/utils/types';
 import type { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';

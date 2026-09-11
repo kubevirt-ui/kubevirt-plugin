@@ -18,6 +18,10 @@ const SnapshotDeleteModal: FC<SnapshotDeleteModalProps> = ({ isOpen, onClose, sn
   const { t } = useKubevirtTranslation();
   return (
     <TabModal<V1beta1VirtualMachineSnapshot>
+      headerText={t('Delete VirtualMachineSnapshot?')}
+      isOpen={isOpen}
+      obj={snapshot}
+      onClose={onClose}
       onSubmit={(obj) =>
         kubevirtK8sDelete({
           json: undefined,
@@ -26,10 +30,6 @@ const SnapshotDeleteModal: FC<SnapshotDeleteModalProps> = ({ isOpen, onClose, sn
           resource: obj,
         })
       }
-      headerText={t('Delete VirtualMachineSnapshot?')}
-      isOpen={isOpen}
-      obj={snapshot}
-      onClose={onClose}
       submitBtnText={t('Delete')}
       submitBtnVariant={ButtonVariant.danger}
     >

@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useWatch } from 'react-hook-form';
 
-import useAutoAppliedLabels from '@kubevirt-utils/hooks/useAutoAppliedLabels/useAutoAppliedLabels';
 import type { AutoAppliedLabel } from '@kubevirt-utils/hooks/useAutoAppliedLabels/types';
+import useAutoAppliedLabels from '@kubevirt-utils/hooks/useAutoAppliedLabels/useAutoAppliedLabels';
 import { getLabels } from '@kubevirt-utils/resources/shared';
 import { customizeWizardVMSignal } from '@kubevirt-utils/signals/customizeWizardVMSignal';
 import { useSignals } from '@preact/signals-react/runtime';

@@ -22,6 +22,8 @@ const VMAlerts: FC<VMAlertsProps> = ({ alertsBaseHref, alertsBasePath, vmNames }
 
   return (
     <VMAlertsCard
+      alertsBaseHref={alertsBaseHref}
+      alertsBasePath={alertsBasePath}
       titleExtra={
         <TotalAlertCount
           alertsBaseHref={alertsBaseHref}
@@ -31,8 +33,6 @@ const VMAlerts: FC<VMAlertsProps> = ({ alertsBaseHref, alertsBasePath, vmNames }
           totalAlerts={totalAlerts}
         />
       }
-      alertsBaseHref={alertsBaseHref}
-      alertsBasePath={alertsBasePath}
     >
       {error ? (
         <Flex

@@ -1,7 +1,6 @@
 import { CONSOLE_NAMESPACE_BOOKMARKS_KEY } from '@kubevirt-utils/hooks/useConsoleNamespaceBookmarks/consts';
 
 import { TEST_FAVORITE_BOOKMARKS } from '../tests/constants';
-
 import { CONSOLE_USER_SETTINGS } from './consts';
 import {
   parseBooleanUserPreference,

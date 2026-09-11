@@ -5,7 +5,6 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { Content, DescriptionList } from '@patternfly/react-core';
 
 import type { ManualConnectionProps } from '../utils/types';
-
 import Detail from './Detail';
 
 const ManualConnection: FC<ManualConnectionProps> = ({

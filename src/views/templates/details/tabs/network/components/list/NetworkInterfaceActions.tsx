@@ -90,34 +90,34 @@ const NetworkInterfaceActions: FC<NetworkInterfaceActionsProps> = ({
 
   return (
     <Dropdown
+      isOpen={isDropdownOpen}
+      onOpenChange={setIsDropdownOpen}
+      onSelect={() => setIsDropdownOpen(false)}
+      popperProps={{ appendTo: getContentScrollableElement, position: 'right' }}
       toggle={KebabToggle({
         id: `nic-actions-${nicName}`,
         isDisabled: !isTemplateEditable,
         isExpanded: isDropdownOpen,
         onClick: onToggle,
       })}
-      isOpen={isDropdownOpen}
-      onOpenChange={setIsDropdownOpen}
-      onSelect={() => setIsDropdownOpen(false)}
-      popperProps={{ appendTo: getContentScrollableElement, position: 'right' }}
     >
       <DropdownList>
         {interfaceState === NetworkInterfaceState.DOWN && (
           <DropdownItem
+            key="network-interface-state-up"
             onClick={() =>
               setTemplateNetworkInterfaceState(template, nicName, NetworkInterfaceState.UP)
             }
-            key="network-interface-state-up"
           >
             {t('Set link up')}
           </DropdownItem>
         )}
         {interfaceState === NetworkInterfaceState.UP && (
           <DropdownItem
+            key="network-interface-state-down"
             onClick={() =>
               setTemplateNetworkInterfaceState(template, nicName, NetworkInterfaceState.DOWN)
             }
-            key="network-interface-state-down"
           >
             {t('Set link down')}
           </DropdownItem>

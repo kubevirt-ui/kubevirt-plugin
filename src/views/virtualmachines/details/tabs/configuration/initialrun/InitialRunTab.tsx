@@ -13,7 +13,6 @@ import { useFleetAccessReview } from '@stolostron/multicluster-sdk';
 
 import { onSubmitYAML } from '../details/utils/utils';
 import type { ConfigurationInnerTabProps } from '../utils/types';
-
 import InitialRunTabCloudinit from './components/InitialRunTabCloudinit';
 import InitialRunTabSysprep from './components/InitialRunTabSysprep';
 

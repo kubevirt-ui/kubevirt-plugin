@@ -7,7 +7,6 @@ import { PageSection } from '@patternfly/react-core';
 
 import { onSubmitYAML, updateAnnotation, updateLabels } from '../details/utils/utils';
 import type { ConfigurationInnerTabProps } from '../utils/types';
-
 import MetadataTabContent from './components/MetadataTabContent';
 
 import './metadata-tab.scss';

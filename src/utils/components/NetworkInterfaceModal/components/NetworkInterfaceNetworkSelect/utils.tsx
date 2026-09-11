@@ -2,6 +2,7 @@ import React, { type ReactNode } from 'react';
 import { type TFunction } from 'i18next';
 
 import { GLOBAL_NAD_NAMESPACES } from '@kubevirt-utils/constants/constants';
+import { type NetworkAttachmentDefinitionKind } from '@kubevirt-utils/resources/nad/types';
 import { NAD_TYPE_OVN_K8S_CNI_OVERLAY } from '@kubevirt-utils/resources/vm';
 import { interfaceTypesProxy } from '@kubevirt-utils/resources/vm/utils/network/constants';
 import { getDNS1123LabelError } from '@kubevirt-utils/utils/validation';
@@ -9,7 +10,6 @@ import { HelperText, HelperTextItem, Label, type SelectOptionProps } from '@patt
 import { InfoIcon } from '@patternfly/react-icons';
 
 import { getNadFullName, getNameAndNs, isNadFullName, isOvnOverlayNad } from '../../utils/helpers';
-import { type NetworkAttachmentDefinitionKind } from '@kubevirt-utils/resources/nad/types';
 import InvalidNADNamespace from './components/InvalidNADNamespace';
 import { type NetworkSelectTypeaheadOptionProps } from './types';
 
@@ -119,7 +119,6 @@ export const buildValidators = ({
   ];
 };
 
-// eslint-disable-next-line
 export const validateNADNamespace = (name: string, vmNamespace: string): false | ReactNode => {
   if (!isNadFullName(name)) {
     return false;

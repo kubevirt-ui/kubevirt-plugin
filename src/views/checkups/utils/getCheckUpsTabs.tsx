@@ -2,7 +2,6 @@ import type { TFunction } from 'i18next';
 
 import CheckupsSelfValidationList from '../self-validation/list/CheckupsSelfValidationList';
 import CheckupsStorageList from '../storage/list/CheckupsStorageList';
-
 import { CHECKUP_URLS } from './constants';
 import type { TabConfig } from './types';
 

@@ -48,6 +48,7 @@ const VMTemplateDetailsItem: FC<VMDetailsItemTemplateProps> = ({ vm }) => {
 
   return (
     <DescriptionItem
+      className="topology-vm-details-panel__item"
       descriptionData={
         notAvailable ? (
           <MutedTextSpan text={t('Not available')} />
@@ -55,7 +56,6 @@ const VMTemplateDetailsItem: FC<VMDetailsItemTemplateProps> = ({ vm }) => {
           <VMTemplateLink name={templateName} namespace={templateNamespace} />
         )
       }
-      className="topology-vm-details-panel__item"
       descriptionHeader={<span id="template">{t('Template')}</span>}
     />
   );

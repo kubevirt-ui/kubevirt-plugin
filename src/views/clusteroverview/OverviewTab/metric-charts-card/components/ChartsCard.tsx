@@ -4,7 +4,6 @@ import React from 'react';
 import { Grid, GridItem } from '@patternfly/react-core';
 
 import { METRICS } from '../utils/constants';
-
 import ChartCard from './ChartCard';
 
 import './ChartsCard.scss';

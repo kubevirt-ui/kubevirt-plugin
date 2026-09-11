@@ -8,7 +8,6 @@ import type { MultiNamespaceVirtualMachineStorageMigrationPlan } from '@kubevirt
 
 import useStorageMigrationPlanCancel from '../hooks/useStorageMigrationPlanCancel';
 import useStorageMigrationProgressMetrics from '../hooks/useStorageMigrationProgressMetrics';
-
 import MigrationProgressDisplay from './MigrationProgressDisplay';
 import MigrationStatusShell from './MigrationStatusShell';
 

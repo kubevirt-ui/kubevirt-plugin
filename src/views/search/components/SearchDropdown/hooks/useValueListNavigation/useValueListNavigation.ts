@@ -3,11 +3,12 @@ import { useCallback, useMemo } from 'react';
 
 import type { KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 
+import type { OptionalListNavigationResult } from '../useListNavigation';
+import { useListNavigation } from '../useListNavigation';
+
 import type { AutocompleteMode, ValueOption } from '../../types';
 import { DropdownType } from '../../types';
 import { getFilteredOrderedOptions, toValueOptions } from '../../utils';
-import type { OptionalListNavigationResult } from '../useListNavigation';
-import { useListNavigation } from '../useListNavigation';
 
 type UseValueListNavigationProps = {
   autocompleteMode: AutocompleteMode;

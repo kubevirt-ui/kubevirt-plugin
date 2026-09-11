@@ -3,14 +3,14 @@ import { useCallback, useMemo } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
-import { DEFAULT_VISIBLE_EXAMPLES, getSearchExamples } from '../../constants';
-import type { AutocompleteMode, MainMenuItem, SearchKeyBadge } from '../../types';
-import { DropdownType } from '../../types';
-import { hasActiveKeyFilter } from '../../utils';
 import type { OptionalListNavigationResult } from '../useListNavigation';
 import { useListNavigation } from '../useListNavigation';
 import useSearchKeyBadges from '../useSearchKeyBadges';
 
+import { DEFAULT_VISIBLE_EXAMPLES, getSearchExamples } from '../../constants';
+import type { AutocompleteMode, MainMenuItem, SearchKeyBadge } from '../../types';
+import { DropdownType } from '../../types';
+import { hasActiveKeyFilter } from '../../utils';
 import { getNextGridIndex } from './utils';
 
 type UseDefaultMenuNavigationProps = {

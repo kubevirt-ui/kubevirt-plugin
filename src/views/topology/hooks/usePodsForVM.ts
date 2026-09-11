@@ -24,8 +24,8 @@ import { getReplicationControllersForResource } from '../utils/resource-utils';
 
 type WatchedResourceResult<T extends K8sResourceCommon = K8sResourceCommon> = {
   data: T[];
-  loadError?: string;
   loaded: boolean;
+  loadError?: string;
 };
 
 type UsePodsForVMWatchedResources = {

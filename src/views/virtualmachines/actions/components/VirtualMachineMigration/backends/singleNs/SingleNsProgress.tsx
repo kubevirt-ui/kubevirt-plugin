@@ -6,7 +6,6 @@ import type { ProgressComponentProps } from '@kubevirt-utils/resources/migration
 import useStorageMigrationNavigation from '@virtualmachines/list/components/OverviewTab/widgets/StorageMigrationPlansWidget/useStorageMigrationNavigation';
 
 import StorageMigrationProgress from '../../components/StorageMigrationProgress';
-
 import useSingleNsPlanPolling from './useSingleNsPlanPolling';
 
 const SingleNsProgress: FC<ProgressComponentProps> = (props) => {

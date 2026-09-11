@@ -3,8 +3,8 @@ import {
   getCustomizeWizardVM,
   updateVMCustomizeIT,
 } from '@kubevirt-utils/signals/customizeWizardVMSignal';
-import { updateDisks } from '@virtualmachines/details/tabs/configuration/details/utils/utils';
 import { kubevirtK8sGet } from '@multicluster/k8sRequests';
+import { updateDisks } from '@virtualmachines/details/tabs/configuration/details/utils/utils';
 
 import {
   createDataVolumeName,

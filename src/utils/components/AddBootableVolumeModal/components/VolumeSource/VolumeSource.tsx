@@ -7,7 +7,6 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 
 import { DROPDOWN_FORM_SELECTION } from '../../consts';
 import type { AddBootableVolumeState, SetBootableVolumeFieldType } from '../../types';
-
 import DiskSourceUploadPVC from './components/DiskSourceUploadPVC';
 import PVCSource from './components/PVCSource';
 import RegistrySource from './components/RegistrySource';

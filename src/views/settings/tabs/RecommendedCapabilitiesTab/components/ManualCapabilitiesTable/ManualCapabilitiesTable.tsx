@@ -9,7 +9,6 @@ import { DataView, DataViewTable } from '@patternfly/react-data-view';
 
 import { useCapabilitiesData } from '../../context/useCapabilitiesData';
 import { buildTreeRows } from '../CustomSelectionView/buildTreeRows';
-
 import { getManualOperatorActions } from './manualOperatorActions';
 
 const ManualCapabilitiesTable: FC = () => {

@@ -8,7 +8,6 @@ import {
 } from '@openshift-console/dynamic-plugin-sdk';
 
 import StatusCountItem from '../shared/StatusCountItem';
-
 import ClusterNameTooltip from './ClusterNameTooltip';
 
 type MultiClusterHealthStatusProps = {

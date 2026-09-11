@@ -14,7 +14,6 @@ import { Flex, FlexItem, Title } from '@patternfly/react-core';
 import CheckupsDetailsPageBreadcrumb from '../../components/CheckupsDetailsPageBreadcrumb';
 import { CHECKUP_URLS } from '../../utils/constants';
 import CheckupsSelfValidationActions from '../components/actions/CheckupsSelfValidationActions';
-
 import DownloadResultsButton from './components/DownloadResultsButton';
 
 import './checkups-self-validation-details-page.scss';

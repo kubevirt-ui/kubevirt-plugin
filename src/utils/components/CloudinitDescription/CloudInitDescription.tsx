@@ -13,7 +13,6 @@ import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { DescriptionList, Stack, StackItem } from '@patternfly/react-core';
 
 import DescriptionItem from '../DescriptionItem/DescriptionItem';
-
 import CloudInitInfoHelper from './CloudinitInfoHelper';
 
 export const CloudInitDescription: FC<{ vm: V1VirtualMachine }> = ({ vm }) => {

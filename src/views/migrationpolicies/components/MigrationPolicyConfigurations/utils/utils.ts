@@ -4,7 +4,7 @@ import { BinaryUnit } from '@kubevirt-utils/utils/unitConstants';
 import BandwidthInput from '../compnents/BandwidthInput/BandwidthInput';
 import CompletionTimeout from '../compnents/CompletionTimeout/CompletionTimeout';
 import YesNoDropdown from '../compnents/YesNoDropdown/YesNoDropdown';
-import { type MigrationPolicyConfigurationOption } from './constants';
+import type { MigrationPolicyConfigurationOption } from './constants';
 
 export const getMigrationPolicyConfigurationOptions = (): MigrationPolicyConfigurationOption => {
   return {

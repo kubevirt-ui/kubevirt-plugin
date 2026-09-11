@@ -5,8 +5,9 @@ import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FormGroup, TextInput, ValidatedOptions } from '@patternfly/react-core';
 
-import { MAX_WIN_IMAGE_DOWNLOAD_URL_LENGTH } from '../../../utils/constants';
 import { isValidWinImageDownloadUrl } from '../utils';
+
+import { MAX_WIN_IMAGE_DOWNLOAD_URL_LENGTH } from '../../../utils/constants';
 
 type WindowsDownloadUrlFieldProps = {
   setWinImageDownloadUrl: (url: string) => void;

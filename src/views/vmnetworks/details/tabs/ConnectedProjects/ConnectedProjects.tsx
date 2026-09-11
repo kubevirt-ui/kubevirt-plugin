@@ -8,13 +8,12 @@ import type { ClusterUserDefinedNetworkKind } from '@kubevirt-utils/resources/ud
 import { ListPageBody } from '@openshift-console/dynamic-plugin-sdk';
 
 import type { ProjectWithVMCount } from '../../types';
-
-import useProjectsWithVMCounts from './hooks/useProjectsWithVMCounts';
 import {
   getConnectedProjectRowId,
   getConnectedProjectsColumns,
 } from './connectedProjectsDefinition';
 import { CONNECTED_PROJECTS_COLUMN_KEYS } from './constants';
+import useProjectsWithVMCounts from './hooks/useProjectsWithVMCounts';
 
 type ConnectedProjectsProps = {
   obj: ClusterUserDefinedNetworkKind;

@@ -58,6 +58,7 @@ const InitialRunTabSysprep: FC<InitialRunTabSysprepProps> = ({ canUpdateVM, onSu
 
   return (
     <DescriptionItem
+      data-test="sysprep-button"
       descriptionData={
         <SysprepDescription
           cluster={cluster}
@@ -66,6 +67,10 @@ const InitialRunTabSysprep: FC<InitialRunTabSysprepProps> = ({ canUpdateVM, onSu
           selectedSysprepName={currentVMSysprepName}
         />
       }
+      descriptionHeader={<SearchItem id="sysprep">{t('Sysprep')}</SearchItem>}
+      isDisabled={!canUpdateVM}
+      isEdit={canUpdateVM}
+      label={<WindowsLabel />}
       onEditClick={() =>
         createModal((modalProps) => (
           <SysprepModal
@@ -79,11 +84,6 @@ const InitialRunTabSysprep: FC<InitialRunTabSysprepProps> = ({ canUpdateVM, onSu
           />
         ))
       }
-      data-test="sysprep-button"
-      descriptionHeader={<SearchItem id="sysprep">{t('Sysprep')}</SearchItem>}
-      isDisabled={!canUpdateVM}
-      isEdit={canUpdateVM}
-      label={<WindowsLabel />}
       showEditOnTitle
     />
   );

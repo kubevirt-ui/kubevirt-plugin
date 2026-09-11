@@ -4,9 +4,8 @@
  * needs (title, base branch, head SHA, PR author), then delegates.
  */
 
-import type { CommandContext } from './dispatcher';
-
 import { main as runValidationCommands } from '../validation/commands/index';
+import type { CommandContext } from './dispatcher';
 
 export const executeValidationCommand = async (ctx: CommandContext): Promise<void> => {
   const { data: pullRequest } = await ctx.octokit.pulls.get({

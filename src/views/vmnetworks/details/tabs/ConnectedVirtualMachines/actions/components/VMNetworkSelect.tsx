@@ -7,8 +7,9 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Alert, AlertVariant, SelectOption, Skeleton } from '@patternfly/react-core';
 
-import useSelectableVMNetworksWithProjects from '../hooks/useSelectableVMNetworksWithProjects';
 import type { VMNetworkWithProjects } from '../types';
+
+import useSelectableVMNetworksWithProjects from '../hooks/useSelectableVMNetworksWithProjects';
 
 export type VMNetworkSelectProps = {
   currentNetwork: string;

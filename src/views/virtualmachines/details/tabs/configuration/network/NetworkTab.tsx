@@ -9,7 +9,6 @@ import { PageSection, Title } from '@patternfly/react-core';
 
 import { onSubmitYAML } from '../details/utils/utils';
 import type { ConfigurationInnerTabProps } from '../utils/types';
-
 import AddNetworkInterfaceButton from './components/AddNetworkInterfaceButton';
 import NetworkInterfaceList from './components/list/NetworkInterfaceList';
 

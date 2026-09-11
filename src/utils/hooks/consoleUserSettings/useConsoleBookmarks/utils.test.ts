@@ -1,5 +1,4 @@
 import { TEST_FAVORITE_BOOKMARKS } from '../tests/constants';
-
 import { areBookmarksEqual, parseBookmarks, parseStoredBookmarks } from './utils';
 
 describe('parseBookmarks', () => {

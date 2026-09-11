@@ -1,8 +1,8 @@
 import { type TFunction } from 'i18next';
 
 import { type ActionDropdownItemType } from '@kubevirt-utils/components/ActionsDropdown/constants';
-import { isInstalled } from '../../utils/installState';
 
+import { isInstalled } from '../../utils/installState';
 import { type RecommendedCapabilityOperatorDetails } from '../../utils/types';
 
 export const getManualOperatorActions = (

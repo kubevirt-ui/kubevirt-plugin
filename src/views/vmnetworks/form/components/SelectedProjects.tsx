@@ -17,8 +17,9 @@ import {
   Popover,
 } from '@patternfly/react-core';
 
-import { getVMNetworkProjects } from '../../utils';
 import type { VMNetworkForm } from '../constants';
+
+import { getVMNetworkProjects } from '../../utils';
 
 const SelectedProjects: FC = () => {
   const { t } = useKubevirtTranslation();

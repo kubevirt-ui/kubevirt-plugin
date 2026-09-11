@@ -4,10 +4,10 @@ import React from 'react';
 import MultiSelectTypeahead from '@kubevirt-utils/components/MultiSelectTypeahead/MultiSelectTypeahead';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FormGroup } from '@patternfly/react-core';
+import { getNodes } from '@virtualmachines/list/filters/utils';
 import { useVirtualMachineInstanceMapper } from '@virtualmachines/list/hooks/useVirtualMachineInstanceMapper';
 import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
-import { getNodes } from '@virtualmachines/list/filters/utils';
 import { useAdvancedSearchField } from '../store/useAdvancedSearchStore';
 
 const NodesField: FC = () => {

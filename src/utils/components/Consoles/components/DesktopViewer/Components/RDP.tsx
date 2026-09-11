@@ -3,7 +3,6 @@ import React from 'react';
 import { createUseStyles } from 'react-jss';
 
 import type { RDPProps } from '../utils/types';
-
 import ManualConnection from './ManualConnection';
 import RemoteViewer from './RemoteViewer';
 

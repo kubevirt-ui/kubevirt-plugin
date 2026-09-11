@@ -25,7 +25,6 @@ import {
   isPendingNICRemoval,
   isSRIOVInterface,
 } from '../../utils/utils';
-
 import AutoAttachedNetworkEmptyState from './AutoAttachedNetworkEmptyState';
 import type { NetworkInterfaceListCallbacks } from './networkInterfaceListDefinition';
 import {

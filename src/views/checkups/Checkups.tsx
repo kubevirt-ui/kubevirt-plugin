@@ -10,9 +10,9 @@ import {
   ListPageHeader,
 } from '@openshift-console/dynamic-plugin-sdk';
 
+import CheckupsRunButton from './CheckupsRunButton';
 import useCheckupsTabsNavigation from './hooks/useCheckupsTabsNavigation';
 import { getCheckUpTabs } from './utils/getCheckUpsTabs';
-import CheckupsRunButton from './CheckupsRunButton';
 
 import './checkups.scss';
 

@@ -7,7 +7,6 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { Divider, PageSection, Title } from '@patternfly/react-core';
 
 import useIsBootableVolumeContext from '../hooks/useIsBootableVolumeContext';
-
 import { DataSourceDetailsGrid } from './components/DataSourceDetailsGrid/DataSourceDetailsGrid';
 
 type DataSourceDetailsPageProps = {

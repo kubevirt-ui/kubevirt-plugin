@@ -2,8 +2,8 @@ import type { FC } from 'react';
 
 import type { ProgressComponentProps } from '@kubevirt-utils/resources/migrations/backends/types';
 import {
-  type StorageMigrationAPI,
   STORAGE_MIGRATION_API,
+  type StorageMigrationAPI,
 } from '@kubevirt-utils/resources/migrations/constants';
 
 import MtcProgress from './mtc/MtcProgress';

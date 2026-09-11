@@ -9,10 +9,9 @@ import { FormGroup, TextInput, ValidatedOptions } from '@patternfly/react-core';
 
 import { DATAVOLUME_HTTPURL_FIELD } from '../../../utils/constants';
 import { diskSourceURLFieldID } from '../../utils/constants';
-
+import URLSourceHelperText from './URLSourceHelperText';
 import { HTTP_URL_PREFIX, HTTPS_URL_PREFIX } from './utils/constants';
 import type { DiskSourceUrlInputProps } from './utils/types';
-import URLSourceHelperText from './URLSourceHelperText';
 
 const DiskSourceUrlInput: FC<DiskSourceUrlInputProps> = ({ os }) => {
   const { t } = useKubevirtTranslation();

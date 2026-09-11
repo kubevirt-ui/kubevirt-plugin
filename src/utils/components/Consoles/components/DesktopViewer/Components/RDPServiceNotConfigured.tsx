@@ -7,7 +7,6 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { Button, ButtonVariant } from '@patternfly/react-core';
 
 import type { RDPServiceNotConfiguredProps } from '../utils/types';
-
 import RDPServiceModal from './RDPServiceModal';
 
 import './rdp-service.scss';

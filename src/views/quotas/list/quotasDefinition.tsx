@@ -9,7 +9,6 @@ import { CalculationMethod } from '@kubevirt-utils/resources/quotas/types';
 import { getCreationTimestamp, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 
 import { getMainResourceKeys, getQuotaNumbers, getStatus } from '../utils/utils';
-
 import QuotaActionsCell from './cells/QuotaActionsCell';
 import QuotaAdditionalCell from './cells/QuotaAdditionalCell';
 import QuotaCPUCell from './cells/QuotaCPUCell';
@@ -18,9 +17,9 @@ import QuotaMemoryCell from './cells/QuotaMemoryCell';
 import QuotaNameCell from './cells/QuotaNameCell';
 import QuotaNamespaceCell from './cells/QuotaNamespaceCell';
 import QuotaVMICountCell from './cells/QuotaVMICountCell';
+import { QuotaColumn, QuotaScope } from './constants';
 import type { QuotaCallbacks } from './utils/helpers';
 import { createSortByPercentage, getNamespaceColumnValue } from './utils/helpers';
-import { QuotaColumn, QuotaScope } from './constants';
 
 const getUsagePercentageValue = (row: ApplicationAwareQuota, resourceKey: string): string => {
   const status = getStatus(row);

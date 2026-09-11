@@ -15,7 +15,6 @@ import type { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { Bullseye, StackItem } from '@patternfly/react-core';
 
 import { isResourceShared } from '../utils/helpers';
-
 import DeleteResourceCheckbox from './DeleteResourceCheckbox';
 
 type DeleteOwnedResourcesMessageProps = {

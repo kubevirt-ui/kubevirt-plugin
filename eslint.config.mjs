@@ -13,6 +13,8 @@ import eslintReact from '@eslint-react/eslint-plugin';
 
 import { perfectionistConfig } from './eslintv10.config.mjs';
 
+import { simpleImportSortConfig } from './eslintv10.config.mjs';
+
 const ignoresConfig = {
   ignores: [
     'dist/**',
@@ -289,4 +291,5 @@ export default [
   githubScriptsOverrides,
   testingLibraryConfig,
   testFilesOverrides,
+  simpleImportSortConfig,
 ];

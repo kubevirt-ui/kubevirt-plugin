@@ -5,7 +5,6 @@ import type { V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui-ext/ku
 import ActionsDropdown from '@kubevirt-utils/components/ActionsDropdown/ActionsDropdown';
 
 import type { BootableResource } from '../utils/types';
-
 import useBootableVolumesActions from './hooks/useBootableVolumesActions';
 
 type BootableVolumesActionsProps = {

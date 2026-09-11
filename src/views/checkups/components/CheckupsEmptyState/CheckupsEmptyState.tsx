@@ -21,7 +21,6 @@ import {
 import { SearchIcon } from '@patternfly/react-icons';
 
 import type { CheckupType } from '../../utils/types';
-
 import { getBodyText, getDocumentationURL, getLearnMoreText, getTitleText } from './utils';
 
 type CheckupsEmptyState = {

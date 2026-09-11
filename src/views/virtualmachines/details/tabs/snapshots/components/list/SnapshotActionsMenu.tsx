@@ -63,6 +63,10 @@ const SnapshotActionsMenu: FC<SnapshotActionsMenuProps> = ({
   const onDeleteModalToggle = useCallback(() => {
     createModal(({ isOpen, onClose }) => (
       <TabModal<V1beta1VirtualMachineSnapshot>
+        headerText={t('Delete VirtualMachineSnapshot?')}
+        isOpen={isOpen}
+        obj={snapshot}
+        onClose={onClose}
         onSubmit={(obj) =>
           kubevirtK8sDelete({
             cluster: getCluster(obj),
@@ -70,10 +74,6 @@ const SnapshotActionsMenu: FC<SnapshotActionsMenuProps> = ({
             resource: obj,
           })
         }
-        headerText={t('Delete VirtualMachineSnapshot?')}
-        isOpen={isOpen}
-        obj={snapshot}
-        onClose={onClose}
         submitBtnText={deleteLabel}
         submitBtnVariant={ButtonVariant.danger}
       >
@@ -87,15 +87,15 @@ const SnapshotActionsMenu: FC<SnapshotActionsMenuProps> = ({
 
   return (
     <Dropdown
+      isOpen={isDropdownOpen}
+      onOpenChange={setIsDropdownOpen}
+      onSelect={() => setIsDropdownOpen(false)}
+      popperProps={{ appendTo: getContentScrollableElement, position: 'right' }}
       toggle={KebabToggle({
         id: `snapshot-actions-${snapshot?.metadata?.name}`,
         isExpanded: isDropdownOpen,
         onClick: onToggle,
       })}
-      isOpen={isDropdownOpen}
-      onOpenChange={setIsDropdownOpen}
-      onSelect={() => setIsDropdownOpen(false)}
-      popperProps={{ appendTo: getContentScrollableElement, position: 'right' }}
     >
       <DropdownList>
         <DropdownItem

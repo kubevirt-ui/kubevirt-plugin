@@ -13,7 +13,6 @@ import useDisksTableData from '@kubevirt-utils/resources/vm/hooks/disk/useDisksT
 import { Card, CardBody, CardTitle, Divider } from '@patternfly/react-core';
 
 import { createURL } from '../../utils/utils';
-
 import { getOverviewDiskRowId, getOverviewDisksColumns } from './overviewDisksDefinition';
 
 import './virtual-machines-overview-tab-disks.scss';

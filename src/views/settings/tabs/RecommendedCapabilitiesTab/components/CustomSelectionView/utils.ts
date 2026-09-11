@@ -1,13 +1,13 @@
-import { InstallState } from '../../utils/types';
+import { compareWithDirection } from '@kubevirt-utils/utils/utils';
+import type { SortByDirection } from '@patternfly/react-table';
 
+import { InstallState } from '../../utils/types';
 import {
   type CapabilityFeature,
   CapabilityInstallState,
   type RecommendedCapabilityDetailsMap,
 } from '../../utils/types';
 import { COLUMN_KEYS } from './useCustomSelectionColumns';
-import type { SortByDirection } from '@patternfly/react-table';
-import { compareWithDirection } from '@kubevirt-utils/utils/utils';
 
 export const matchesName = (feature: CapabilityFeature, query: string): boolean => {
   const lowerQuery = query.toLowerCase();

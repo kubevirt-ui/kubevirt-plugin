@@ -13,7 +13,6 @@ import ClusterUtilizationWidget from '../ClusterUtilizationWidget/ClusterUtiliza
 import OpenShiftVirtualizationWidget from '../OpenShiftVirtualizationWidget/OpenShiftVirtualizationWidget';
 import OverviewSection from '../OverviewSection/OverviewSection';
 import OverviewSectionRow from '../OverviewSection/OverviewSectionRow';
-
 import ClusterResourcesCard from './components/ClusterResourcesCard/ClusterResourcesCard';
 import ClustersLoadBalanceCard from './components/ClustersLoadBalanceCard/ClustersLoadBalanceCard';
 import ClustersUtilizationCard from './components/ClustersUtilizationCard/ClustersUtilizationCard';

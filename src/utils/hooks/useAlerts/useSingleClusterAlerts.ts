@@ -8,7 +8,6 @@ import type { Alert, PrometheusResponse } from '@openshift-console/dynamic-plugi
 import { PrometheusEndpoint, usePrometheusPoll } from '@openshift-console/dynamic-plugin-sdk';
 
 import useSilences from '../useSilences/useSilences';
-
 import { convertMetricResultsToAlerts, convertRulesToAlerts } from './utils/metricToAlerts';
 import { silenceFiringAlerts } from './utils/utils';
 

@@ -8,7 +8,6 @@ import {
   mergeProfileDerivedCapabilities,
   stripProfileDerivedCapabilities,
 } from '../../utils';
-
 import { buildStorageProfileDerivedKey } from './utils';
 
 /**

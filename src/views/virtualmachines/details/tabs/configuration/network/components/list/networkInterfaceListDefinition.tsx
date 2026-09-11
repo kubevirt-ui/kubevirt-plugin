@@ -1,5 +1,5 @@
-import { type TFunction } from 'i18next';
 import React, { type FC, type ReactNode } from 'react';
+import { type TFunction } from 'i18next';
 
 import {
   type V1VirtualMachine,

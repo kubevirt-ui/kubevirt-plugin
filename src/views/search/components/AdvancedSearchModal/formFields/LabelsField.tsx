@@ -2,9 +2,9 @@ import type { FC } from 'react';
 import React, { useMemo } from 'react';
 
 import type { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { labelParser } from '@kubevirt-utils/utils/labelUtils';
 import MultiSelectTypeahead from '@kubevirt-utils/components/MultiSelectTypeahead/MultiSelectTypeahead';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { labelParser } from '@kubevirt-utils/utils/labelUtils';
 import { FormGroup } from '@patternfly/react-core';
 import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 

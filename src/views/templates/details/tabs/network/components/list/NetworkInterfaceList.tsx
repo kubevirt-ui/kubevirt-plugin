@@ -11,7 +11,6 @@ import { getInterfaces, getNetworks } from '@kubevirt-utils/resources/vm';
 import { getNetworkInterfaceRowData } from '@kubevirt-utils/resources/vm/utils/network/rowData';
 
 import useNetworkRowFilters from '../../hooks/useNetworkRowFilters';
-
 import type { TemplateNetworkCallbacks } from './templateNetworkInterfaceDefinition';
 import {
   getTemplateNetworkColumns,

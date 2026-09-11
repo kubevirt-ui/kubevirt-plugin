@@ -16,7 +16,6 @@ import { ListPageBody, useAccessReview } from '@openshift-console/dynamic-plugin
 import { Pagination } from '@patternfly/react-core';
 
 import type { UseMigrationCardDataAndFiltersValues } from '../../hooks/useMigrationCardData';
-
 import { getMigrationsTableColumns, getMigrationsTableRowId } from './migrationsTableDefinition';
 import { COLUMN_MANAGEMENT_ID_MIGRATIONS, MIGRATION_COLUMN_KEYS } from './utils/constants';
 

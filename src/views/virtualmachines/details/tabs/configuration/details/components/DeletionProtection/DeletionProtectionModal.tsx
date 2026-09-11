@@ -93,10 +93,10 @@ const DeletionProtectionModal: FC<DeletionProtectionModalProps> = ({
           {enableDeletionProtection ? t('Enable') : t('Disable')}
         </Button>
         <Button
+          key="cancel"
           onClick={() => {
             onCancel();
           }}
-          key="cancel"
           variant={ButtonVariant.link}
         >
           {t('Cancel')}

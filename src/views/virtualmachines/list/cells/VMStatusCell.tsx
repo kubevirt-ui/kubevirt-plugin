@@ -5,7 +5,6 @@ import { printableVMStatus } from '@virtualmachines/utils';
 
 import VirtualMachineMigrationPercentage from '../../details/tabs/overview/components/VirtualMachinesOverviewTabDetails/components/VirtualMachineMigrationPercentage';
 import StatusWithPopover from '../../details/tabs/overview/components/VirtualMachinesOverviewTabDetails/components/VirtualMachineStatusWithPopover/VirtualMachineStatusWithPopover';
-
 import type { VMCellWithCallbacksProps } from './types';
 
 const VMStatusCell: FC<VMCellWithCallbacksProps> = ({ callbacks, row }) => {

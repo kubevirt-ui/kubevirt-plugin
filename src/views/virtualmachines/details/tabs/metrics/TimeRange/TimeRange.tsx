@@ -39,13 +39,13 @@ const TimeRange: FC = () => {
 
       {isACMPage && virtualizationObservabilityLink && (
         <ExternalLink
+          href={virtualizationObservabilityLink}
           onClick={() =>
             logExternalMonitoringNavigation(
               TELEMETRY_EXTERNAL_MONITORING_TOOL.GRAFANA,
               TELEMETRY_VM_DETAIL_TAB.METRICS,
             )
           }
-          href={virtualizationObservabilityLink}
         >
           {t('Virtualization dashboard')}
         </ExternalLink>
