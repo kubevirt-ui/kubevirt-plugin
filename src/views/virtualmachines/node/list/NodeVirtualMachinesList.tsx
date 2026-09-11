@@ -1,4 +1,11 @@
-import React, { type FC, useCallback, useMemo, useState } from 'react';
+import {
+  type FC,
+  type KeyboardEvent as ReactKeyboardEvent,
+  type MouseEvent as ReactMouseEvent,
+  useCallback,
+  useMemo,
+  useState,
+} from 'react';
 import { useParams } from 'react-router';
 
 import {
@@ -78,7 +85,7 @@ const NodeVirtualMachinesList: FC<NodeVirtualMachinesListProps> = ({ obj }) => {
 
   const onSetPagination = useCallback(
     (
-      _event: React.MouseEvent | React.KeyboardEvent | MouseEvent,
+      _event: ReactMouseEvent | ReactKeyboardEvent | MouseEvent,
       perPage: number,
       page: number,
       startIndex?: number,

@@ -1,4 +1,4 @@
-import React from 'react';
+import { type JSX } from 'react';
 
 import { type V1Devices, type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
@@ -21,10 +21,7 @@ type VirtualMachineLogViewerProps = {
   vm: V1VirtualMachine;
 };
 
-const VirtualMachineLogViewer = ({
-  connect,
-  vm,
-}: VirtualMachineLogViewerProps): React.JSX.Element => {
+const VirtualMachineLogViewer = ({ connect, vm }: VirtualMachineLogViewerProps): JSX.Element => {
   const { t } = useKubevirtTranslation();
   const { loaded, pod, vmi } = useVMIAndPodForVM(getName(vm), getNamespace(vm), getCluster(vm));
   const { featureEnabled: isClusterDisabledGuestSystemLogs } = useFeatures(

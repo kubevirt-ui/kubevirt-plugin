@@ -1,4 +1,4 @@
-import React, { type FC } from 'react';
+import { type FC, type JSX } from 'react';
 
 import {
   type V1VirtualMachine,
@@ -56,7 +56,7 @@ const DetailsSectionBootOrder: FC<DetailsSectionBootOrderProps> = ({
 
   const onEditClick = (): void => {
     createModal(
-      (props: ModalComponentProps): React.JSX.Element => (
+      (props: ModalComponentProps): JSX.Element => (
         <BootOrderModal
           {...props}
           instanceTypeVM={instanceTypeVM}

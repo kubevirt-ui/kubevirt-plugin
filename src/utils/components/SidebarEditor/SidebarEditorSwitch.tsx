@@ -1,4 +1,4 @@
-import React, { type FC, memo, useContext } from 'react';
+import { type FC, type FormEvent, memo, useContext } from 'react';
 import { useLocation } from 'react-router';
 
 import { TELEMETRY_EDITOR_VIEW_SWITCH } from '@kubevirt-utils/extensions/telemetry/utils/property-constants';
@@ -16,10 +16,7 @@ const SidebarEditorSwitch: FC = memo(() => {
 
   if (!showSwitch) return null;
 
-  const handleSwitchChange = (
-    _event: React.FormEvent<HTMLInputElement>,
-    checked: boolean,
-  ): void => {
+  const handleSwitchChange = (_event: FormEvent<HTMLInputElement>, checked: boolean): void => {
     if (telemetryResourceType) {
       logEditorViewSwitched(
         telemetryResourceType,

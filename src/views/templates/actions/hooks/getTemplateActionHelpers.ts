@@ -1,7 +1,7 @@
 // Extracted from useVirtualMachineTemplatesActions.tsx
 // Root: src/views/templates/actions/hooks/useVirtualMachineTemplatesActions.tsx
 
-import type React from 'react';
+import { type JSX } from 'react';
 import { type NavigateFunction } from 'react-router';
 import { type TFunction } from 'i18next';
 
@@ -44,7 +44,7 @@ export type GetTemplateActionsParams = {
   canDeleteTemplate: boolean;
   canWriteToDataSourceNs: boolean;
   cluster: string;
-  createModal: (modal: (props: ModalComponentProps) => React.JSX.Element) => void;
+  createModal: (modal: (props: ModalComponentProps) => JSX.Element) => void;
   editableBootSource: boolean;
   goToTemplatePage: (currentTemplate: V1Template) => void;
   hasEditPermission: boolean;

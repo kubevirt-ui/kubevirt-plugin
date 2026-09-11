@@ -1,4 +1,4 @@
-import React from 'react';
+import { type ReactElement, type ReactNode } from 'react';
 
 import { getVMStatuses } from '@overview/OverviewTab/vm-statuses-card/utils/utils';
 import { render, screen } from '@testing-library/react';
@@ -40,9 +40,9 @@ jest.mock('@kubevirt-utils/resources/vmi', () => ({
 }));
 
 jest.mock('@overview/OverviewTab/vm-statuses-card/utils/utils', () => {
-  const mockErrorIcon = (): React.ReactElement => <span data-test-id="error-icon" />;
-  const mockRunningIcon = (): React.ReactElement => <span data-test-id="running-icon" />;
-  const mockStoppedIcon = (): React.ReactElement => <span data-test-id="stopped-icon" />;
+  const mockErrorIcon = (): ReactElement => <span data-test-id="error-icon" />;
+  const mockRunningIcon = (): ReactElement => <span data-test-id="running-icon" />;
+  const mockStoppedIcon = (): ReactElement => <span data-test-id="stopped-icon" />;
 
   return {
     getVMStatuses: jest.fn(() => ({
@@ -69,13 +69,9 @@ jest.mock('@virtualmachines/list/hooks/useVirtualMachineInstanceMapper', () => (
 }));
 
 jest.mock('react-router', () => {
-  const MockLink = ({
-    children,
-    to,
-  }: {
-    children: React.ReactNode;
-    to: string;
-  }): React.ReactElement => <a href={to}>{children}</a>;
+  const MockLink = ({ children, to }: { children: ReactNode; to: string }): ReactElement => (
+    <a href={to}>{children}</a>
+  );
 
   return {
     Link: MockLink,

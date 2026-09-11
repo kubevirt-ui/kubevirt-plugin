@@ -1,4 +1,4 @@
-import React, { type FC, useMemo, useRef, useState } from 'react';
+import { type FC, type JSX, useMemo, useRef, useState } from 'react';
 
 import { type InstanceTypeSize } from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/InstanceTypeDrilldownSelect/utils/types';
 import { is1GiInstanceType } from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/InstanceTypeDrilldownSelect/utils/utils';
@@ -72,7 +72,7 @@ const InstanceTypeSizeDropdown: FC<InstanceTypeSizeDropdownProps> = ({
     setIsOpen((prevIsOpen) => !prevIsOpen);
   };
 
-  const renderHugepagesMenu = (): React.JSX.Element => (
+  const renderHugepagesMenu = (): JSX.Element => (
     <Menu>
       <MenuContent>
         <MenuList>

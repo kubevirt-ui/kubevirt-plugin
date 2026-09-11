@@ -1,4 +1,4 @@
-import React, { type FC, useEffect, useState } from 'react';
+import { type FC, type JSX, useEffect, useState } from 'react';
 import { useLocation } from 'react-router';
 import classNames from 'classnames';
 
@@ -68,7 +68,7 @@ const DetailsSectionBoot: FC<DetailsSectionBootProps> = ({
 
   const onBootModeEdit = (): void => {
     createModal(
-      ({ isOpen, onClose }: ModalComponentProps): React.JSX.Element => (
+      ({ isOpen, onClose }: ModalComponentProps): JSX.Element => (
         <FirmwareBootloaderModal
           isOpen={isOpen}
           onClose={onClose}

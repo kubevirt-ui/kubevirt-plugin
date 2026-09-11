@@ -1,4 +1,4 @@
-import React, { type FC, useMemo } from 'react';
+import { type FC, type JSX, useMemo } from 'react';
 
 import LoadingEmptyState from '@kubevirt-utils/components/LoadingEmptyState/LoadingEmptyState';
 import { ALL_CLUSTERS_KEY } from '@kubevirt-utils/hooks/constants';
@@ -99,7 +99,7 @@ export const TopConsumersChartList: FC<TopConsumersChartListProps> = ({
 
   const showNoDataMessage = loaded && numQueryResults === 0;
 
-  const renderTopConsumersContent = (): React.JSX.Element | React.JSX.Element[] => {
+  const renderTopConsumersContent = (): JSX.Element | JSX.Element[] => {
     if (isLoading) {
       return <LoadingEmptyState />;
     }

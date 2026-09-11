@@ -1,4 +1,4 @@
-import React, { type JSX } from 'react';
+import { type JSX } from 'react';
 import { type TFunction } from 'i18next';
 import { parseSize } from 'xbytes';
 
@@ -47,7 +47,7 @@ const MemoryCell = ({ row }: { row: V1beta1VirtualMachineInstancetype }): JSX.El
   return <>{getHumanizedSize(String(memory))?.string ?? NO_DATA_DASH}</>;
 };
 
-const VendorCell = ({ row }: { row: V1beta1VirtualMachineInstancetype }): React.JSX.Element => (
+const VendorCell = ({ row }: { row: V1beta1VirtualMachineInstancetype }): JSX.Element => (
   <>{getLabel(row, VENDOR_LABEL, NO_DATA_DASH)}</>
 );
 
