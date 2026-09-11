@@ -1,14 +1,14 @@
 import { cancelAllWizardPendingUploads } from '@kubevirt-utils/hooks/useUploadProgressToast';
-import { setCustomizeWizardVMSignal } from '@kubevirt-utils/signals/customizeWizardVMSignal';
 
+import { discardGeneratedVMDraft } from './generatedVMDraft';
 import { clearVMPendingUploadsAndSignal } from './utils';
 
 jest.mock('@kubevirt-utils/hooks/useUploadProgressToast', () => ({
   cancelAllWizardPendingUploads: jest.fn(),
 }));
 
-jest.mock('@kubevirt-utils/signals/customizeWizardVMSignal', () => ({
-  setCustomizeWizardVMSignal: jest.fn(),
+jest.mock('./generatedVMDraft', () => ({
+  discardGeneratedVMDraft: jest.fn(),
 }));
 
 describe('clearVMPendingUploadsAndSignal', () => {
@@ -18,20 +18,20 @@ describe('clearVMPendingUploadsAndSignal', () => {
 
   it('cancels wizard pending uploads before clearing the signal', () => {
     const callOrder: string[] = [];
+    (discardGeneratedVMDraft as jest.Mock).mockImplementation(() => callOrder.push('setSignal'));
     (cancelAllWizardPendingUploads as jest.Mock).mockImplementation(() =>
       callOrder.push('cancelUploads'),
     );
-    (setCustomizeWizardVMSignal as jest.Mock).mockImplementation(() => callOrder.push('setSignal'));
 
     clearVMPendingUploadsAndSignal();
 
     expect(callOrder).toEqual(['cancelUploads', 'setSignal']);
   });
 
-  it('clears the signal with null', () => {
+  it('discards the generated VM draft', () => {
     clearVMPendingUploadsAndSignal();
 
-    expect(setCustomizeWizardVMSignal).toHaveBeenCalledWith(null);
+    expect(discardGeneratedVMDraft).toHaveBeenCalledTimes(1);
   });
 
   it('cancels pending wizard uploads', () => {

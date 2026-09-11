@@ -24,14 +24,14 @@ import { type VMWizardFormValues } from '../state/vm-wizard-form/types';
 
 export type VMGenerationNavItemClickHandler = (
   step: WizardStepType,
-  activeStep: WizardStepType,
   goToStepByIndex: (index: number) => void,
 ) => Promise<void> | void;
+
+export type EnsureGeneratedVM = () => boolean;
 
 export type WizardStepNavItemConfig = {
   handleNavItemClick: VMGenerationNavItemClickHandler;
   isGeneratingVM: boolean;
-  loaded: boolean;
 };
 
 export type VMWizardStepDisplay = WizardStepProps & {
@@ -40,6 +40,8 @@ export type VMWizardStepDisplay = WizardStepProps & {
 };
 
 export type GetStepsToDisplayByCreationMethodArgs = {
+  ensureGeneratedVM: EnsureGeneratedVM;
+  generatedVMReady: boolean;
   isNextDisabledForStep: (stepId: VMWizardStep) => boolean;
   isStepDisabled: (stepId: VMWizardStep) => boolean;
   navItemConfig: WizardStepNavItemConfig;

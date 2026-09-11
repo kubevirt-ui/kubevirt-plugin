@@ -36,6 +36,7 @@ const getDeploymentDetailsStep = (t: TFunction): VMWizardStepDisplay => ({
 const getCustomizationStep = (
   t: TFunction,
   navItemConfig: WizardStepNavItemConfig,
+  generatedVMReady: boolean,
   isStepDisabled: (stepId: VMWizardStep) => boolean,
   isNextDisabledForStep: (stepId: VMWizardStep) => boolean,
 ): VMWizardStepDisplay => ({
@@ -45,12 +46,13 @@ const getCustomizationStep = (
   id: VMWizardStep.CUSTOMIZATION,
   isDisabled: isStepDisabled(VMWizardStep.CUSTOMIZATION),
   name: t('Customization'),
-  navItem: getVMGenerationNavItem(navItemConfig),
+  navItem: getVMGenerationNavItem(navItemConfig, generatedVMReady),
 });
 
 const getReviewAndCreateStep = (
   t: TFunction,
   navItemConfig: WizardStepNavItemConfig,
+  generatedVMReady: boolean,
   isStepDisabled: (stepId: VMWizardStep) => boolean,
 ): VMWizardStepDisplay => ({
   children: createElement(ReviewAndCreateStep),
@@ -59,10 +61,12 @@ const getReviewAndCreateStep = (
   id: VMWizardStep.REVIEW_AND_CREATE,
   isDisabled: isStepDisabled(VMWizardStep.REVIEW_AND_CREATE),
   name: t('Review and create'),
-  navItem: getVMGenerationNavItem(navItemConfig),
+  navItem: getVMGenerationNavItem(navItemConfig, generatedVMReady),
 });
 
 export const getStepsToDisplayByCreationMethod = ({
+  ensureGeneratedVM,
+  generatedVMReady,
   isNextDisabledForStep,
   isStepDisabled,
   navItemConfig,
@@ -72,10 +76,16 @@ export const getStepsToDisplayByCreationMethod = ({
   const customizationStep = getCustomizationStep(
     t,
     navItemConfig,
+    generatedVMReady,
     isStepDisabled,
     isNextDisabledForStep,
   );
-  const reviewAndCreateStep = getReviewAndCreateStep(t, navItemConfig, isStepDisabled);
+  const reviewAndCreateStep = getReviewAndCreateStep(
+    t,
+    navItemConfig,
+    generatedVMReady,
+    isStepDisabled,
+  );
 
   return {
     [VMCreationMethod.CLONE]: [
@@ -111,7 +121,10 @@ export const getStepsToDisplayByCreationMethod = ({
       {
         children: createElement(ComputeResourcesStep),
         displayIndex: 4,
-        footer: createElement(ComputeResourcesStepFooter),
+        footer: createElement(ComputeResourcesStepFooter, {
+          ensureGeneratedVM,
+          ready: generatedVMReady,
+        }),
         id: VMWizardStep.COMPUTE_RESOURCES,
         isDisabled: isStepDisabled(VMWizardStep.COMPUTE_RESOURCES),
         name: t('Compute resources'),

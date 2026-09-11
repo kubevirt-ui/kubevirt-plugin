@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useWatch } from 'react-hook-form';
+import isEqual from 'lodash/isEqual';
 
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { logTemplateFlowEvent } from '@kubevirt-utils/extensions/telemetry/telemetry';
@@ -23,6 +24,12 @@ import {
   getVMObjectFromTemplate,
   resolveVMFromTemplate,
 } from '@virtualmachines/wizard/steps/TemplateStep/hooks/utils';
+import { VMCreationMethod } from '@virtualmachines/wizard/utils/constants';
+import {
+  beginGeneratedVMDraftRequest,
+  getGeneratedVMDraftRevision,
+  publishGeneratedVMDraft,
+} from '@virtualmachines/wizard/utils/generatedVMDraft';
 
 type UseCreateVMFromTemplate = () => {
   createVMFromTemplate: () => Promise<boolean>;
@@ -33,7 +40,10 @@ const useCreateVMFromTemplate: UseCreateVMFromTemplate = () => {
   const { t } = useKubevirtTranslation();
   const [isProcessing, setIsProcessing] = useState(false);
   const { control, getValues, setValue } = useVMWizard();
-  const cluster = useWatch({ control, name: CREATE_VM_FORM_FIELDS_VM_DATA.CLUSTER });
+  const cluster = useWatch({
+    control,
+    name: CREATE_VM_FORM_FIELDS_VM_DATA.CLUSTER,
+  });
   const [authorizedSSHKeys] = useKubevirtUserSettings(USER_SETTINGS_KEYS.ssh, cluster);
 
   const failWithProcessError = (message: string): false => {
@@ -43,13 +53,8 @@ const useCreateVMFromTemplate: UseCreateVMFromTemplate = () => {
   };
 
   const createVMFromTemplate = async (): Promise<boolean> => {
-    const {
-      description,
-      folder,
-      name: vmName,
-      project,
-      selectedTemplate,
-    } = getValues(CREATE_VM_FORM_FIELDS_VM_DATA.ROOT);
+    const vmData = getValues(CREATE_VM_FORM_FIELDS_VM_DATA.ROOT);
+    const { description, folder, name: vmName, project, selectedTemplate } = vmData;
     const namespace = project || DEFAULT_NAMESPACE;
     const lastProcessedTemplateKey = getValues(
       CREATE_VM_FORM_FIELDS_UI_STATE.LAST_PROCESSED_TEMPLATE_KEY,
@@ -57,7 +62,7 @@ const useCreateVMFromTemplate: UseCreateVMFromTemplate = () => {
     setValue(CREATE_VM_FORM_FIELDS_UI_STATE.TEMPLATE_PROCESS_ERROR, null);
 
     const selectedKey = getResourceKey(selectedTemplate);
-    if (selectedKey === lastProcessedTemplateKey) return true;
+    if (selectedKey === lastProcessedTemplateKey && customizeWizardVMSignal.value) return true;
 
     const missingParam = getFirstUnfulfilledRequiredParameter(selectedTemplate);
     if (missingParam) {
@@ -68,21 +73,47 @@ const useCreateVMFromTemplate: UseCreateVMFromTemplate = () => {
 
     logTemplateFlowEvent(CUSTOMIZE_VM_BUTTON_CLICKED, selectedTemplate);
 
+    const generationRequestRevision = beginGeneratedVMDraftRequest();
+    const generationRequestIsCurrent = (): boolean => {
+      const currentVMData = getValues(CREATE_VM_FORM_FIELDS_VM_DATA.ROOT);
+
+      return (
+        generationRequestRevision === getGeneratedVMDraftRevision() &&
+        currentVMData.creationMethod === VMCreationMethod.TEMPLATE &&
+        currentVMData.cluster === cluster &&
+        currentVMData.project === project &&
+        currentVMData.name === vmName &&
+        currentVMData.description === description &&
+        currentVMData.folder === folder &&
+        Boolean(isEqual(currentVMData.selectedTemplate, selectedTemplate))
+      );
+    };
+
     setIsProcessing(true);
     try {
       const vm = await resolveVMFromTemplate(selectedTemplate, namespace, cluster, vmName);
 
-      customizeWizardVMSignal.value = getVMObjectFromTemplate({
-        description,
-        folder,
-        namespace,
-        selectedTemplate,
-        sshSecretName: authorizedSSHKeys?.[namespace],
-        vm,
-      });
+      if (!generationRequestIsCurrent()) {
+        return false;
+      }
+
+      publishGeneratedVMDraft(
+        getVMObjectFromTemplate({
+          description,
+          folder,
+          namespace,
+          selectedTemplate,
+          sshSecretName: authorizedSSHKeys?.[namespace],
+          vm,
+        }),
+      );
       setValue(CREATE_VM_FORM_FIELDS_UI_STATE.LAST_PROCESSED_TEMPLATE_KEY, selectedKey);
       return true;
     } catch (error) {
+      if (!generationRequestIsCurrent()) {
+        return false;
+      }
+
       const message = (error as Error)?.message ?? String(error);
       logTemplateFlowEvent(CUSTOMIZE_VM_FAILED, selectedTemplate);
       logVMCreationFailedFromTemplate(selectedTemplate, error);

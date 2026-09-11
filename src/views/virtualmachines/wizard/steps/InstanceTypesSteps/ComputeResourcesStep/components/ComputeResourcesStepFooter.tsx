@@ -1,6 +1,5 @@
 import React, { type FC } from 'react';
 
-import { setCustomizeWizardVMSignal } from '@kubevirt-utils/signals/customizeWizardVMSignal';
 import { useWizardContext, WizardFooter } from '@patternfly/react-core';
 import {
   WIZARD_BACK_BUTTON_PROPS,
@@ -10,17 +9,26 @@ import {
 import useCloseWizard from '@virtualmachines/wizard/hooks/useCloseWizard';
 import useWizardStepValidation from '@virtualmachines/wizard/hooks/useWizardStepValidation';
 import { VMWizardStep } from '@virtualmachines/wizard/utils/constants';
+import { type EnsureGeneratedVM } from '@virtualmachines/wizard/utils/types';
 
-import useGenerateVM from '../../hooks/useGenerateVM/useGenerateVM';
+type ComputeResourcesStepFooterProps = {
+  ensureGeneratedVM: EnsureGeneratedVM;
+  ready: boolean;
+};
 
-const ComputeResourcesStepFooter: FC = () => {
+const ComputeResourcesStepFooter: FC<ComputeResourcesStepFooterProps> = ({
+  ensureGeneratedVM,
+  ready,
+}) => {
   const { activeStep, goToNextStep, goToPrevStep } = useWizardContext();
-  const { generatedVM, loaded } = useGenerateVM();
   const closeWizard = useCloseWizard();
   const { isNextDisabledForStep } = useWizardStepValidation();
 
   const handleGoToNextStep = (): void => {
-    setCustomizeWizardVMSignal(generatedVM);
+    if (!ensureGeneratedVM()) {
+      return;
+    }
+
     void goToNextStep();
   };
 
@@ -30,8 +38,8 @@ const ComputeResourcesStepFooter: FC = () => {
       backButtonProps={WIZARD_BACK_BUTTON_PROPS}
       cancelButtonProps={WIZARD_CANCEL_BUTTON_PROPS}
       isBackDisabled={activeStep.index === 1}
-      isNextDisabled={isNextDisabledForStep(VMWizardStep.COMPUTE_RESOURCES) || !loaded}
-      nextButtonProps={{ ...WIZARD_NEXT_BUTTON_PROPS, isLoading: !loaded }}
+      isNextDisabled={isNextDisabledForStep(VMWizardStep.COMPUTE_RESOURCES) || !ready}
+      nextButtonProps={{ ...WIZARD_NEXT_BUTTON_PROPS, isLoading: !ready }}
       onBack={goToPrevStep}
       onClose={closeWizard}
       onNext={handleGoToNextStep}

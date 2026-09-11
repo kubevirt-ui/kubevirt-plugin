@@ -37,9 +37,9 @@ export const CLONE_FLOW: VMWizardStep[] = [
   VMWizardStep.REVIEW_AND_CREATE,
 ];
 
-export const VM_GENERATION_STEPS = new Set<number | string>([
-  VMWizardStep.TEMPLATE,
-  VMWizardStep.COMPUTE_RESOURCES,
+export const VM_DRAFT_REQUIRED_STEPS = new Set<number | string>([
+  VMWizardStep.CUSTOMIZATION,
+  VMWizardStep.REVIEW_AND_CREATE,
 ]);
 
 export const SELECTED_CLUSTER = {

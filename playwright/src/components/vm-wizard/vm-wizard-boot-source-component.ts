@@ -224,6 +224,10 @@ export default class VmWizardBootSourceComponent extends BaseComponent {
     }
   }
 
+  async selectBootVolume(): Promise<void> {
+    await this.robustClick(this.page.getByRole('radio', { exact: true, name: 'Boot volume' }));
+  }
+
   async selectNoBootSource(): Promise<void> {
     const radio = this.locator('input[type="radio"][value="no-boot-source"]').or(
       this._noBootSource.locator('..').locator('input[type="radio"]'),
