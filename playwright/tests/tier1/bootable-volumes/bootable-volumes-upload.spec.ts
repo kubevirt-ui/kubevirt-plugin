@@ -164,4 +164,63 @@ test.describe('Tier1 Bootable Volumes - Upload experience', { tag: [T1_TAG] }, (
       });
     },
   );
+
+  test(
+    'Closing the VM creation wizard does not cancel an unrelated bootable volume upload',
+    { tag: ['@nonpriv'] },
+    async ({ bootableVolumesPage, vmWizardNavigationPage, apiClient, utils }) => {
+      await utils.withAllure({ suite: SUITE, feature: T1, tags: [T1_TAG] });
+
+      const ns = await setupTestNamespace(apiClient, 'bv-upload-wizard-isolation');
+      const volumeName = utils.generateRandomDataVolumeName('bv-wizard-iso');
+      const imagePath = await utils.TestFileFactory.downloadCirrosImage(UPLOAD_IMAGE_FILENAME);
+      apiClient.trackResource('DataVolume', volumeName, ns);
+
+      await bootableVolumesPage.navigateToNamespaceBootableVolumesViaUI(ns);
+
+      await test.step('Start a bootable volume upload from the Bootable Volumes page', async () => {
+        await bootableVolumesPage.clickCreateAndSelectOption('With form');
+        await bootableVolumesPage.fillCreateBootableVolumeFormAndSave(volumeName, imagePath);
+        await bootableVolumesPage.expectUploadingToastVisible(
+          UPLOAD_IMAGE_FILENAME,
+          utils.TestTimeouts.UI_ELEMENT_VISIBILITY,
+        );
+      });
+
+      await test.step('Open and cancel the VM creation wizard', async () => {
+        await vmWizardNavigationPage.openWizardFromCreateDropdown();
+
+        const wizardVisible = await vmWizardNavigationPage.verifyWizardVisible();
+        expect(wizardVisible, 'Wizard should open').toBe(true);
+
+        await vmWizardNavigationPage.cancelWizard();
+      });
+
+      await test.step('Bootable volume upload is still active after closing the wizard', async () => {
+        const state = await bootableVolumesPage.expectUploadingOrTerminalToastVisible(
+          UPLOAD_IMAGE_FILENAME,
+          utils.TestTimeouts.UI_ELEMENT_VISIBILITY,
+        );
+        expect(
+          state === 'uploading' || state === 'success',
+          `Expected uploading or success toast after closing wizard, got ${state}`,
+        ).toBe(true);
+      });
+
+      await test.step('Abort the upload to clean up when still in progress', async () => {
+        const abortVisible = await bootableVolumesPage.isAbortUploadButtonVisible(
+          utils.TestTimeouts.UI_DELAY_MEDIUM,
+          UPLOAD_IMAGE_FILENAME,
+        );
+        if (!abortVisible) {
+          return;
+        }
+        await bootableVolumesPage.clickAbortUpload(UPLOAD_IMAGE_FILENAME);
+        await bootableVolumesPage.expectAbortedUploadToastVisible(
+          UPLOAD_IMAGE_FILENAME,
+          utils.TestTimeouts.UI_ELEMENT_VISIBILITY,
+        );
+      });
+    },
+  );
 });

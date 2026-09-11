@@ -137,4 +137,85 @@ test.describe('Tier1 VM CD-ROM upload — stopped RHEL9', { tag: [T1_TAG, '@nonp
       expect(dvGone, 'DataVolume should be deleted after abort').toBe(true);
     });
   });
+
+  test('Creating a new VM does not cancel an in-progress CD-ROM upload on another VM', async ({
+    apiClient,
+    vmTreePage,
+    vmDetailPage,
+    vmWizardNavigationPage,
+    utils,
+  }) => {
+    await utils.withAllure({ suite: SUITE, feature: T1, tags: [T1_TAG, VM_TABS_TAG] });
+    test.setTimeout(utils.TestTimeouts.TEST_VM_CREATION);
+
+    const ns = utils.generateTestNamespace('vm-cdrom-create');
+    await apiClient.createNamespace(ns);
+    await apiClient.waitForNamespaceReady(ns);
+    apiClient.trackResource('Namespace', ns);
+
+    const vmName = utils.generateRandomVmName('vm-cdrom-create');
+    await apiClient.createVmFromTemplate(
+      utils.TEMPLATE_METADATA_NAMES.RHEL9,
+      vmName,
+      ns,
+      'openshift',
+      false,
+    );
+    apiClient.trackResource('VirtualMachine', vmName, ns);
+
+    const result = await apiClient.verifyVmCreated(vmName, ns, utils.TestTimeouts.VM_BOOTUP);
+    if (!result.exists) throw new Error(`VM ${vmName} was not created`);
+
+    await vmTreePage.navigateToVmViaTreeView(ns, vmName);
+
+    const isoFileName = 'vm-cdrom-create-test.iso';
+    const isoPath = utils.TestFileFactory.createSizedIsoFile(isoFileName);
+    const diskName = utils.generateRandomDiskName('cdrom-create');
+    apiClient.trackResource('DataVolume', diskName, ns);
+
+    await test.step('Start the CD-ROM upload', async () => {
+      const added = await vmDetailPage.addCDROMDisk(diskName, 'Upload new ISO', isoPath);
+      expect(added, `CD-ROM disk ${diskName} should be added from UI`).toBe(true);
+      await vmDetailPage.expectUploadingToastVisible(
+        isoFileName,
+        utils.TestTimeouts.UI_ELEMENT_VISIBILITY,
+      );
+    });
+
+    await test.step('Open and leave the VM creation wizard', async () => {
+      await vmTreePage.navigateToProjectVmListViaUI(ns);
+      await vmWizardNavigationPage.openWizardFromCreateDropdown();
+
+      const wizardVisible = await vmWizardNavigationPage.verifyWizardVisible();
+      expect(wizardVisible, 'Wizard should open').toBe(true);
+
+      await vmWizardNavigationPage.cancelWizard();
+    });
+
+    await test.step('Uploading toast is still visible after leaving the wizard', async () => {
+      const state = await vmDetailPage.expectUploadingOrTerminalToastVisible(
+        isoFileName,
+        utils.TestTimeouts.UI_ELEMENT_VISIBILITY,
+      );
+      expect(
+        state === 'uploading' || state === 'success',
+        `Expected uploading or success toast after creating a VM, got ${state}`,
+      ).toBe(true);
+    });
+
+    await test.step('Abort the upload to clean up when still in progress', async () => {
+      const abortVisible = await vmDetailPage.isAbortUploadButtonVisible(
+        utils.TestTimeouts.UI_DELAY_MEDIUM,
+        isoFileName,
+      );
+      if (!abortVisible) {
+        return;
+      }
+      await vmDetailPage.clickAbortUpload(isoFileName);
+      await vmDetailPage.expectAbortedUploadToastVisible(
+        isoFileName,
+        utils.TestTimeouts.UI_ELEMENT_VISIBILITY,
+      );
+    });
+  });
 });
