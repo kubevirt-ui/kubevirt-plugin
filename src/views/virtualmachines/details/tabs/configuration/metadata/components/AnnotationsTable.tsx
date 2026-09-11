@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import React, { useCallback, useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 
 import { AnnotationsModal } from '@kubevirt-utils/components/AnnotationsModal/AnnotationsModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';

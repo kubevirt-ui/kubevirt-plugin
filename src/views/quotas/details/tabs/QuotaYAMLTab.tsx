@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import React, { Suspense } from 'react';
+import { Suspense } from 'react';
 
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import type { ApplicationAwareQuota } from '@kubevirt-utils/resources/quotas/types';

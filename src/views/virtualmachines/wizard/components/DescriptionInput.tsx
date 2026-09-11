@@ -1,4 +1,4 @@
-import React, { type FC } from 'react';
+import { type FC } from 'react';
 import { Controller } from 'react-hook-form';
 
 import { Button, InputGroup, InputGroupItem, TextInput } from '@patternfly/react-core';

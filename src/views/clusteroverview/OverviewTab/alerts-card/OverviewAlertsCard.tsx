@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 
 import AlertsCard from '@kubevirt-utils/components/AlertsCard/AlertsCard';
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';

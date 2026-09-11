@@ -1,4 +1,4 @@
-import React, { type FC } from 'react';
+import { type FC } from 'react';
 
 import AllClustersResourcesCard from './AllClustersResourcesCard';
 import SingleClusterResourcesCard from './SingleClusterResourcesCard';

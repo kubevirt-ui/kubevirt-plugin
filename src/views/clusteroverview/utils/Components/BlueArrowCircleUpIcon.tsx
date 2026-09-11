@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 
 import type { ColoredIconProps } from '@openshift-console/dynamic-plugin-sdk';
 import { ArrowCircleUpIcon } from '@patternfly/react-icons';

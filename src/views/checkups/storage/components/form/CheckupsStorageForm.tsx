@@ -1,4 +1,4 @@
-import React, { type FC, useEffect, useMemo, useRef, useState } from 'react';
+import { type FC, useEffect, useMemo, useRef, useState } from 'react';
 import CheckupImageField from 'src/views/checkups/components/CheckupImageField';
 
 import { type IoK8sApiStorageV1StorageClass } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';

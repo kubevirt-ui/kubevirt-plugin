@@ -1,4 +1,4 @@
-import React, { type FC, type MouseEvent, useState } from 'react';
+import { type FC, type MouseEvent, useState } from 'react';
 
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';

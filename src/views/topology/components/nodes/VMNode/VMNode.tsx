@@ -1,5 +1,5 @@
 import type { FC, ReactNode, Ref } from 'react';
-import React, { useRef } from 'react';
+import { useRef } from 'react';
 import classNames from 'classnames';
 
 import type { TopologyDataObject } from '@openshift-console/dynamic-plugin-sdk/lib/extensions/topology-types';

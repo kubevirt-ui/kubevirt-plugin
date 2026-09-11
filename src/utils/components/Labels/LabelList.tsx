@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 import { useNavigate } from 'react-router';
 import classNames from 'classnames';
 

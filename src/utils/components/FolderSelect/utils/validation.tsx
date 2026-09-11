@@ -1,4 +1,4 @@
-import React, { type JSX } from 'react';
+import { type JSX } from 'react';
 
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { type MenuToggleProps } from '@patternfly/react-core';

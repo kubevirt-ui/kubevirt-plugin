@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 
 import Breadcrumbs from '@kubevirt-utils/components/Breadcrumbs/Breadcrumbs';
 import { FLAG_LIGHTSPEED_PLUGIN } from '@kubevirt-utils/flags/consts';

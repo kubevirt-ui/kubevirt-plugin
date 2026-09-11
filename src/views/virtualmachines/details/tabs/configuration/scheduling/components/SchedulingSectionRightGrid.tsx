@@ -1,4 +1,4 @@
-import React, { type FC, useCallback, useMemo } from 'react';
+import { type FC, useCallback, useMemo } from 'react';
 import produce from 'immer';
 
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';

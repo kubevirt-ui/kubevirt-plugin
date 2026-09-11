@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 import { getSortedResourceKeys, getStatus } from 'src/views/quotas/utils/utils';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';

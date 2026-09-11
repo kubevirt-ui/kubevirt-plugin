@@ -1,5 +1,5 @@
 /* eslint-disable */
-import React, { FC } from 'react';
+import { FC } from 'react';
 import { Link } from 'react-router';
 
 import DurationDropdown from '@kubevirt-utils/components/DurationOption/DurationDropdown';

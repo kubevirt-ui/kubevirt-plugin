@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 
 import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
 import useClusterVersion from '@kubevirt-utils/hooks/useClusterVersion/useClusterVersion';

@@ -1,4 +1,4 @@
-import React, { type FC, useCallback, useMemo, useRef } from 'react';
+import { type FC, useCallback, useMemo, useRef } from 'react';
 import { useWatch } from 'react-hook-form';
 
 import {

@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 import { getMCONotInstalledTooltip } from '@kubevirt-utils/hooks/useAlerts/utils/useMCOInstalled';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';

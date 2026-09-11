@@ -1,4 +1,4 @@
-import React, { createElement, type FC } from 'react';
+import { createElement, type FC } from 'react';
 import { useLocation, useParams } from 'react-router';
 
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';

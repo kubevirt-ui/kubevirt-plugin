@@ -1,5 +1,4 @@
 import type { Dispatch, FC, SetStateAction } from 'react';
-import React from 'react';
 
 import {
   modelToGroupVersionKind,

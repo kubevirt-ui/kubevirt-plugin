@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import React, { useCallback, useState } from 'react';
+import { useCallback, useState } from 'react';
 
 import type { AutoAppliedLabel } from '@kubevirt-utils/hooks/useAutoAppliedLabels/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';

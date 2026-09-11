@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';

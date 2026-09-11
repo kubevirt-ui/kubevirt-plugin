@@ -1,4 +1,4 @@
-import React, { type FC, type ReactElement, type ReactNode } from 'react';
+import { type FC, type ReactElement, type ReactNode } from 'react';
 import { Link } from 'react-router';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';

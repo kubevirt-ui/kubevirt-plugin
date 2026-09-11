@@ -1,4 +1,4 @@
-import React, { type JSX } from 'react';
+import { type JSX } from 'react';
 import { useLocation } from 'react-router';
 
 import { VirtualMachineModelRef } from '@kubevirt-ui-ext/kubevirt-api/console';

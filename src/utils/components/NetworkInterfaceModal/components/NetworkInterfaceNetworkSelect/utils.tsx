@@ -1,4 +1,4 @@
-import React, { type ReactNode } from 'react';
+import { type ReactNode } from 'react';
 import { type TFunction } from 'i18next';
 
 import { GLOBAL_NAD_NAMESPACES } from '@kubevirt-utils/constants/constants';

@@ -1,4 +1,4 @@
-import React, { type FC, useMemo, useState } from 'react';
+import { type FC, useMemo, useState } from 'react';
 
 import { MigrationPolicyModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { type V1alpha1MigrationPolicy } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';

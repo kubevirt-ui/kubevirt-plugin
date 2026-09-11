@@ -1,4 +1,4 @@
-import React, {
+import {
   type Dispatch,
   type MouseEvent,
   type ReactElement,

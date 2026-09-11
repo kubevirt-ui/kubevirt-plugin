@@ -1,11 +1,4 @@
-import React, {
-  type FC,
-  Fragment,
-  type MouseEventHandler,
-  useCallback,
-  useEffect,
-  useState,
-} from 'react';
+import { type FC, Fragment, type MouseEventHandler, useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { useImmer } from 'use-immer';
 

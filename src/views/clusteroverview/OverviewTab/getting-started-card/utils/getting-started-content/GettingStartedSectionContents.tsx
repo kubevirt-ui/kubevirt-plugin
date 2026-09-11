@@ -1,5 +1,4 @@
 import type { FC, ReactElement } from 'react';
-import React from 'react';
 
 import {
   Content,

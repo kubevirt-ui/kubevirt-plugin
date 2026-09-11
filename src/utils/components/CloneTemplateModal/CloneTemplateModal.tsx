@@ -1,4 +1,4 @@
-import React, { type FC } from 'react';
+import { type FC } from 'react';
 import { FormProvider } from 'react-hook-form';
 
 import { type V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';

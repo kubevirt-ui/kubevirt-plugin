@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Flex, FlexItem } from '@patternfly/react-core';

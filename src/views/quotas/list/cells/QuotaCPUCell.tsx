@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 
 import type { ApplicationAwareQuota } from '@kubevirt-utils/resources/quotas/types';
 import { CalculationMethod } from '@kubevirt-utils/resources/quotas/types';

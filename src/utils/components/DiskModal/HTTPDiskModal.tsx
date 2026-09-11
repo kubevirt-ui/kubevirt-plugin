@@ -1,4 +1,4 @@
-import React, { type FC } from 'react';
+import { type FC } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
 import { getNamespace } from '@kubevirt-utils/resources/shared';

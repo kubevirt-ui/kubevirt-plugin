@@ -1,5 +1,4 @@
 import type { FC, ReactNode } from 'react';
-import React from 'react';
 
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { Alert, AlertGroup, AlertVariant } from '@patternfly/react-core';

@@ -1,4 +1,4 @@
-import React, { type FC, useCallback, useEffect, useMemo } from 'react';
+import { type FC, useCallback, useEffect, useMemo } from 'react';
 
 import {
   modelToGroupVersionKind,

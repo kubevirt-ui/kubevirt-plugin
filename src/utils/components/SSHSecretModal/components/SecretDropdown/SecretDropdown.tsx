@@ -1,4 +1,4 @@
-import React, { type Dispatch, type FC, type SetStateAction, useEffect, useState } from 'react';
+import { type Dispatch, type FC, type SetStateAction, useEffect, useState } from 'react';
 
 import { type IoK8sApiCoreV1Secret } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';

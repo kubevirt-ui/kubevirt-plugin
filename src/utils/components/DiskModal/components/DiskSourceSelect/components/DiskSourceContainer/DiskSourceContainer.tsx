@@ -1,4 +1,4 @@
-import React, { type FC } from 'react';
+import { type FC } from 'react';
 import { type FieldPath, useFormContext } from 'react-hook-form';
 
 import { type V1DiskFormState } from '@kubevirt-utils/components/DiskModal/utils/types';

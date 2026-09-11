@@ -1,4 +1,4 @@
-import React, { type FC, type ReactElement, type ReactNode } from 'react';
+import { type FC, type ReactElement, type ReactNode } from 'react';
 
 import { Button, ButtonVariant } from '@patternfly/react-core';
 import { PencilAltIcon } from '@patternfly/react-icons';

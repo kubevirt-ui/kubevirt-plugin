@@ -1,4 +1,4 @@
-import React, { type FC } from 'react';
+import { type FC } from 'react';
 import classNames from 'classnames';
 
 import { Button, ButtonVariant, SplitItem, Tooltip } from '@patternfly/react-core';

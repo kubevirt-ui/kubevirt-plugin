@@ -1,4 +1,4 @@
-import React, { type FC, useCallback } from 'react';
+import { type FC, useCallback } from 'react';
 import { connect } from 'react-redux';
 import { useNavigate } from 'react-router';
 import isObject from 'lodash/isObject';

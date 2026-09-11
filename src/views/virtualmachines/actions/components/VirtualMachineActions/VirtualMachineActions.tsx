@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import React, { memo, useMemo } from 'react';
+import { memo, useMemo } from 'react';
 
 import type { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import type { ActionDropdownItemType } from '@kubevirt-utils/components/ActionsDropdown/constants';

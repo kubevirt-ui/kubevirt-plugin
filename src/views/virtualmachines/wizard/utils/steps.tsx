@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { type CustomWizardNavItemFunction } from '@patternfly/react-core';
 import VMGenerationWizardNavItem from '@virtualmachines/wizard/components/VMGenerationWizardNavItem/VMGenerationWizardNavItem';
 

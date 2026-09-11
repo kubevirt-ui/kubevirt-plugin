@@ -1,4 +1,4 @@
-import React, { type FC, useCallback, useState } from 'react';
+import { type FC, useCallback, useState } from 'react';
 
 import NetworkInterfacePasstHelperPopover from '@kubevirt-utils/components/NetworkInterfaceModal/components/NetworkInterfacePasstSelect/NetworkInterfacePasstHelperPopover';
 import SelectToggle from '@kubevirt-utils/components/toggles/SelectToggle';

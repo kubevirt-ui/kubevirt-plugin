@@ -1,4 +1,4 @@
-import React, { type FC, type FormEvent, type MouseEvent, useCallback, useState } from 'react';
+import { type FC, type FormEvent, type MouseEvent, useCallback, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';

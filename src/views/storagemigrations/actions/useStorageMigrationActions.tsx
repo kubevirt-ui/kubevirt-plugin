@@ -1,4 +1,4 @@
-import React, { type ReactNode, useCallback, useMemo } from 'react';
+import { type ReactNode, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router';
 
 import DeleteModal from '@kubevirt-utils/components/DeleteModal/DeleteModal';

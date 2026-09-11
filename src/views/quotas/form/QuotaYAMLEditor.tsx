@@ -1,4 +1,4 @@
-import React, { type FC, Suspense, useState } from 'react';
+import { type FC, Suspense, useState } from 'react';
 import { load } from 'js-yaml';
 
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';

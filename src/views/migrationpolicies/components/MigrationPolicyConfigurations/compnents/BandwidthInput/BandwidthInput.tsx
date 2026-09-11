@@ -1,10 +1,4 @@
-import React, {
-  type ChangeEvent,
-  type Dispatch,
-  type FC,
-  type SetStateAction,
-  useCallback,
-} from 'react';
+import { type ChangeEvent, type Dispatch, type FC, type SetStateAction, useCallback } from 'react';
 
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';

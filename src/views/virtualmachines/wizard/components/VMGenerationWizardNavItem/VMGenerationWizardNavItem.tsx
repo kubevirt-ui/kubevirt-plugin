@@ -1,4 +1,4 @@
-import React, { type FC } from 'react';
+import { type FC } from 'react';
 
 import { WizardNavItem, type WizardStepType } from '@patternfly/react-core';
 import { type VMGenerationNavItemClickHandler } from '@virtualmachines/wizard/utils/types';

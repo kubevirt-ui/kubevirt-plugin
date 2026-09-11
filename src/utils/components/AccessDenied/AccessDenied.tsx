@@ -1,5 +1,4 @@
 import type { FC, ReactNode } from 'react';
-import React from 'react';
 
 import restrictedSignImg from '@images/restricted-sign.svg';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';

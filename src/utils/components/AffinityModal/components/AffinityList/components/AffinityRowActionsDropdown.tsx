@@ -1,4 +1,4 @@
-import React, { type FC, type ReactElement, useState } from 'react';
+import { type FC, type ReactElement, useState } from 'react';
 
 import KebabToggle from '@kubevirt-utils/components/toggles/KebabToggle';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';

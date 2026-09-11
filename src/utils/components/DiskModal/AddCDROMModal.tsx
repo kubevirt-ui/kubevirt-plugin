@@ -1,4 +1,4 @@
-import React, { type FC } from 'react';
+import { type FC } from 'react';
 import { FormProvider } from 'react-hook-form';
 
 import { ButtonVariant, Stack, StackItem } from '@patternfly/react-core';

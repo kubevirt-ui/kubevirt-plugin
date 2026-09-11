@@ -1,4 +1,4 @@
-import React, { type FC } from 'react';
+import { type FC } from 'react';
 import produce from 'immer';
 import { getWorkloadProfile } from 'src/views/templates/utils/selectors';
 

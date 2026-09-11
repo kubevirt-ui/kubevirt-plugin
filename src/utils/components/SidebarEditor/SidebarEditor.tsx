@@ -1,4 +1,4 @@
-import React, { type JSX, type ReactNode, Suspense, useContext, useMemo, useState } from 'react';
+import { type JSX, type ReactNode, Suspense, useContext, useMemo, useState } from 'react';
 import { dump } from 'js-yaml';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';

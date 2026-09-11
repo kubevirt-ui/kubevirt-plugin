@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 
 import { ToggleGroup, ToggleGroupItem } from '@patternfly/react-core';
 import { ListIcon, ThIcon } from '@patternfly/react-icons';

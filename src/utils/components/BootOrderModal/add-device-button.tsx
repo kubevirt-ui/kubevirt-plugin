@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 
 import { Button, ButtonVariant, Content, ContentVariants } from '@patternfly/react-core';
 import { PlusCircleIcon } from '@patternfly/react-icons';

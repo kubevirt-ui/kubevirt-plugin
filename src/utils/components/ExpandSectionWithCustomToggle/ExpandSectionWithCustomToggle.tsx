@@ -1,5 +1,4 @@
 import type { FC, ReactNode } from 'react';
-import React from 'react';
 import classNames from 'classnames';
 
 import type { PopoverProps } from '@patternfly/react-core';

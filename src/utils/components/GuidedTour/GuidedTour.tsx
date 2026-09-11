@@ -1,4 +1,4 @@
-import React, { type ComponentType, type FC, useMemo } from 'react';
+import { type ComponentType, type FC, useMemo } from 'react';
 import Joyride, {
   ACTIONS,
   type CallBackProps,

@@ -1,4 +1,4 @@
-import React, { type ChangeEvent, type FC, useEffect, useState } from 'react';
+import { type ChangeEvent, type FC, useEffect, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {

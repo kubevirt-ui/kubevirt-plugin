@@ -1,4 +1,4 @@
-import React, { type FC, type ReactElement } from 'react';
+import { type FC, type ReactElement } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isGuestAgentConnected } from '@kubevirt-utils/resources/vmi/utils/guest-agent';

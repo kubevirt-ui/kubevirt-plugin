@@ -1,4 +1,4 @@
-import React, { type FC, type FormEvent } from 'react';
+import { type FC, type FormEvent } from 'react';
 
 import { MEMORY_UNITS } from '@kubevirt-utils/components/CPUMemoryModal/utils/CpuMemoryUtils';
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';

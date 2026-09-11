@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import type { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';

@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { DeviceType } from '@kubevirt-utils/resources/vm/utils/boot-order/bootOrder';

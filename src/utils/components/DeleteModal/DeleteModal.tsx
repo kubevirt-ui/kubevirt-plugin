@@ -1,4 +1,4 @@
-import React, { type FC, memo, type ReactNode } from 'react';
+import { type FC, memo, type ReactNode } from 'react';
 import { useNavigate } from 'react-router';
 
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';

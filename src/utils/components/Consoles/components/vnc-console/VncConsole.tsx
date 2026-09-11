@@ -1,4 +1,4 @@
-import React, { type FC, memo, useEffect, useRef } from 'react';
+import { type FC, memo, useEffect, useRef } from 'react';
 
 import RFBCreate from '@novnc/novnc/lib/rfb';
 import { getLogging, initLogging } from '@novnc/novnc/lib/util/logging';

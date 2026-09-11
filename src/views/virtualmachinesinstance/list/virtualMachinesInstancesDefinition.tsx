@@ -1,4 +1,3 @@
-import React from 'react';
 import format from 'date-fns/format';
 import { type TFunction } from 'i18next';
 import { VMStatusConditionLabelList } from 'src/views/virtualmachines/list/components/VMStatusConditionLabel';

@@ -1,5 +1,5 @@
 /* eslint-disable */
-import React, { FC, useCallback, useEffect, useMemo } from 'react';
+import { FC, useCallback, useEffect, useMemo } from 'react';
 import { Updater } from 'use-immer';
 
 import { V1beta1Plan } from '@forklift-ui/types';

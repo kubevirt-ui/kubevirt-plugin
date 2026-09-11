@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 import { getQuotaNumbers, getResourceKeyKind } from 'src/views/quotas/utils/utils';
 
 import type { ResourceInfo } from '@kubevirt-utils/resources/quotas/types';

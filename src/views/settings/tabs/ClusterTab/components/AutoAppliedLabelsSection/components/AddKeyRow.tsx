@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import React, { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import LabelKeyInput from '@kubevirt-utils/components/LabelsModal/components/LabelKeyInput';
 import type { AutoAppliedLabel } from '@kubevirt-utils/hooks/useAutoAppliedLabels/types';

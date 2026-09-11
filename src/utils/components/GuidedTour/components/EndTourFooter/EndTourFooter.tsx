@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 import { Trans } from 'react-i18next';
 import { Link } from 'react-router';
 

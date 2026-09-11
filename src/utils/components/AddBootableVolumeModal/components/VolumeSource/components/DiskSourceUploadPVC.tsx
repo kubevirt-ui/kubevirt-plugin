@@ -1,4 +1,4 @@
-import React, { type ChangeEvent, type FC, useState } from 'react';
+import { type ChangeEvent, type FC, useState } from 'react';
 
 import { type DataUpload } from '@kubevirt-utils/hooks/useCDIUpload/types';
 import { isUploadingDisk } from '@kubevirt-utils/hooks/useCDIUpload/utils';

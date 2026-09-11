@@ -1,4 +1,4 @@
-import React, { type ChangeEvent, type FC, type ReactElement } from 'react';
+import { type ChangeEvent, type FC, type ReactElement } from 'react';
 
 import ContainerSource from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeSource/components/ContainerSource';
 import { formatRegistryURL } from '@kubevirt-utils/components/AddBootableVolumeModal/utils';

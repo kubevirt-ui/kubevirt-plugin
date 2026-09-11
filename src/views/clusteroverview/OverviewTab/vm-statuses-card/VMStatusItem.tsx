@@ -1,5 +1,5 @@
 /* eslint-disable */
-import React, { FC } from 'react';
+import { FC } from 'react';
 import { Link } from 'react-router';
 
 import { VM_STATUS } from '@kubevirt-utils/resources/vm/utils/vmStatus';

@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 
 import RequiredBadge from '@kubevirt-utils/components/badges/RequiredBadge/RequiredBadge';
 import type { AutoAppliedLabel } from '@kubevirt-utils/hooks/useAutoAppliedLabels/types';

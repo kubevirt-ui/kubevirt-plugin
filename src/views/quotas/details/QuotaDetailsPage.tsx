@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import { useParams } from 'react-router';
 
 import Loading from '@kubevirt-utils/components/Loading/Loading';

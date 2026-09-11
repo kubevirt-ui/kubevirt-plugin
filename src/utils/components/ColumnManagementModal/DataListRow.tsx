@@ -1,5 +1,4 @@
 import type { FC, FormEvent } from 'react';
-import React from 'react';
 
 import type { ManagedColumn } from '@openshift-console/dynamic-plugin-sdk';
 import {

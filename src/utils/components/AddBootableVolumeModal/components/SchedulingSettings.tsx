@@ -1,4 +1,4 @@
-import React, { type ChangeEvent, type FC } from 'react';
+import { type ChangeEvent, type FC } from 'react';
 
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';

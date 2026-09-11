@@ -1,4 +1,4 @@
-import React, { type ComponentProps, type FC, type ReactNode } from 'react';
+import { type ComponentProps, type FC, type ReactNode } from 'react';
 
 import KubevirtFilterToolbar from '@kubevirt-utils/components/KubevirtFilterToolbar/KubevirtFilterToolbar';
 import {

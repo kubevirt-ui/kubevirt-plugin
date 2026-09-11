@@ -1,4 +1,4 @@
-import React, { type FC, useEffect } from 'react';
+import { type FC, useEffect } from 'react';
 import { Trans } from 'react-i18next';
 
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';

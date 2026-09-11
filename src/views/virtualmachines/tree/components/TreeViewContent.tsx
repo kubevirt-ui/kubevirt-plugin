@@ -1,4 +1,4 @@
-import React, { type FC, type MouseEvent } from 'react';
+import { type FC, type MouseEvent } from 'react';
 
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import CreateProjectOnboardingPopover from '@kubevirt-utils/components/OnboardingPopover/components/CreateProjectOnboardingPopover';

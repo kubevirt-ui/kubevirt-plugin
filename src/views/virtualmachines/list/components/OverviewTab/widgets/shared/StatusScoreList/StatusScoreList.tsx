@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 
 import StatusScoreItem from './StatusScoreItem';
 import type { StatusScoreItem as StatusScoreItemType } from './types';

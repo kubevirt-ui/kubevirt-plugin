@@ -1,4 +1,4 @@
-import React, { type FC, type JSX, type ReactNode, useCallback } from 'react';
+import { type FC, type JSX, type ReactNode, useCallback } from 'react';
 import { useParams } from 'react-router';
 import { type TFunction } from 'i18next';
 

@@ -1,4 +1,4 @@
-import React, { type ReactNode } from 'react';
+import { type ReactNode } from 'react';
 
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import BlueSyncIcon from '@kubevirt-utils/icons/BlueSyncIcon';

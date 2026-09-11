@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import React, { useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import produce from 'immer';
 import { printableVMStatus } from 'src/views/virtualmachines/utils';
 

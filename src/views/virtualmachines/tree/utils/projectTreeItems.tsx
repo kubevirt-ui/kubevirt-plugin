@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getVMListNamespacesURL } from '@multicluster/urls';
 import { Tooltip } from '@patternfly/react-core';

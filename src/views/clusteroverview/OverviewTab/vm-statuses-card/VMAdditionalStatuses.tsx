@@ -1,5 +1,5 @@
 /* eslint-disable */
-import React, { FC, useState } from 'react';
+import { FC, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { VM_STATUS } from '@kubevirt-utils/resources/vm/utils/vmStatus';

@@ -1,4 +1,4 @@
-import React, { type FC, type MouseEvent, useMemo, useState } from 'react';
+import { type FC, type MouseEvent, useMemo, useState } from 'react';
 
 import {
   type V1VirtualMachine,

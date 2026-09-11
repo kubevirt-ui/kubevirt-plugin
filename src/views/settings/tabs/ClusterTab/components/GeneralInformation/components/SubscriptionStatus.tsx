@@ -1,4 +1,4 @@
-import React, { type FC } from 'react';
+import { type FC } from 'react';
 
 import { type SubscriptionKind, SubscriptionState } from '@overview/utils/types';
 

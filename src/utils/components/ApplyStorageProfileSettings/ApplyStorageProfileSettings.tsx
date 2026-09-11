@@ -1,4 +1,4 @@
-import React, { type FC, type ReactElement, useEffect, useRef } from 'react';
+import { type FC, type ReactElement, useEffect, useRef } from 'react';
 
 import {
   type V1beta1StorageSpecAccessModesEnum,

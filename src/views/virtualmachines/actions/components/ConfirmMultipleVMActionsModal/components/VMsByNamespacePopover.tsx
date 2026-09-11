@@ -1,4 +1,4 @@
-import React, { type FC } from 'react';
+import { type FC } from 'react';
 
 import { universalComparator } from '@kubevirt-utils/utils/sortingUtils';
 import { Stack, StackItem } from '@patternfly/react-core';

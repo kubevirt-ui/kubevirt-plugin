@@ -1,4 +1,4 @@
-import React, { type FC } from 'react';
+import { type FC } from 'react';
 import { getDataSourceCronJob } from 'src/views/datasources/utils';
 
 import { DataSourceModel } from '@kubevirt-ui-ext/kubevirt-api/console';

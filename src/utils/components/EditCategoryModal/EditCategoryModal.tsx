@@ -1,4 +1,4 @@
-import React, { type FC, useState } from 'react';
+import { type FC, useState } from 'react';
 
 import CategorySelect from '@kubevirt-utils/components/CategorySelect/CategorySelect';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';

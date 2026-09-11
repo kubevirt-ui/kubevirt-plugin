@@ -1,4 +1,4 @@
-import React, { type Dispatch, type FC, type SetStateAction } from 'react';
+import { type Dispatch, type FC, type SetStateAction } from 'react';
 
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';

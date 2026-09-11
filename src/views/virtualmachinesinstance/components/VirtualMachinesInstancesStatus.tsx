@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 
 import { icon } from '@kubevirt-utils/resources/vmi';
 

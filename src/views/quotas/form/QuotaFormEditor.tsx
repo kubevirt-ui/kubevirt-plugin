@@ -1,4 +1,4 @@
-import React, { type FC, type FormEvent, useState } from 'react';
+import { type FC, type FormEvent, useState } from 'react';
 import { useNavigate } from 'react-router';
 
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';

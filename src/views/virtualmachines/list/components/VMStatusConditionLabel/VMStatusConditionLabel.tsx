@@ -1,4 +1,4 @@
-import React, { type FC, memo } from 'react';
+import { type FC, memo } from 'react';
 
 import { type V1VirtualMachineCondition } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { Label, LabelGroup, Popover, PopoverPosition } from '@patternfly/react-core';

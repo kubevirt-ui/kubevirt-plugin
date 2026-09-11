@@ -1,4 +1,4 @@
-import React, { type FC, useCallback, useMemo } from 'react';
+import { type FC, useCallback, useMemo } from 'react';
 
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { createSSHSecret, getInitialSSHDetails } from '@kubevirt-utils/resources/secret/utils';

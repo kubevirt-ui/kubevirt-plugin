@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
 import { PROJECT_NAME_LABEL_KEY } from '@kubevirt-utils/constants/constants';
