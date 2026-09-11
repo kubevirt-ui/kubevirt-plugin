@@ -1,6 +1,5 @@
-/* eslint-disable */
-import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
-import { V1VirtualMachine, V1Volume } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type V1VirtualMachine, type V1Volume } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getDisks, getVolumes } from '@kubevirt-utils/resources/vm';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
@@ -8,7 +7,7 @@ import { getPrintableDiskDrive } from '@kubevirt-utils/resources/vm/utils/disk/s
 import { convertToBaseValue, humanizeBinaryBytes } from '@kubevirt-utils/utils/humanize.js';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 
-import { SelectedMigration } from './constants';
+import { type SelectedMigration } from './constants';
 import { getVolumePVC } from './utils';
 
 export type MigrationDisksTableData = {
@@ -52,7 +51,7 @@ const getVMDiskdata = (
 export const getTableDiskData = (
   vms: V1VirtualMachine[],
   pvcs: IoK8sApiCoreV1PersistentVolumeClaim[],
-) => {
+): MigrationDisksTableData[] => {
   if (isEmpty(vms)) {
     return [];
   }

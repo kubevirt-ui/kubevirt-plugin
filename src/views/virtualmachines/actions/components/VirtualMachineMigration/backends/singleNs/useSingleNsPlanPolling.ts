@@ -1,11 +1,10 @@
-/* eslint-disable */
 import { useCallback, useEffect, useState } from 'react';
 
 import { VirtualMachineStorageMigrationPlanModel } from '@kubevirt-utils/models';
 import {
-  MultiNamespaceVirtualMachineStorageMigrationPlan,
+  type MultiNamespaceVirtualMachineStorageMigrationPlan,
   STORAGE_MIGRATION_PHASE,
-  VirtualMachineStorageMigrationPlan,
+  type VirtualMachineStorageMigrationPlan,
 } from '@kubevirt-utils/resources/migrations/constants';
 import { normalizeSingleNsPlan } from '@kubevirt-utils/resources/migrations/singleNs/overview';
 import { isMigrationCompleted } from '@kubevirt-utils/resources/migrations/utils';
@@ -74,7 +73,7 @@ const useSingleNsPlanPolling = (
     let timerId: ReturnType<typeof setTimeout>;
     let nextDelayMs = MIGRATION_PLAN_POLL_INTERVAL_MS;
 
-    const poll = async () => {
+    const poll = async (): Promise<void> => {
       const result = await fetchPlan(stopped);
       if (stopped) return;
 
@@ -97,9 +96,9 @@ const useSingleNsPlanPolling = (
       timerId = setTimeout(poll, nextDelayMs);
     };
 
-    poll();
+    void poll();
 
-    return () => {
+    return (): void => {
       stopped = true;
       clearTimeout(timerId);
     };

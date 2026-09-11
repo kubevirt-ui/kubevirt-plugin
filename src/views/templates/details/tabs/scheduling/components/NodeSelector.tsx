@@ -1,6 +1,5 @@
-/* eslint-disable */
-import React, { FC } from 'react';
-import { TemplateSchedulingGridProps } from 'src/views/templates/details/tabs/scheduling/components/TemplateSchedulingLeftGrid';
+import React, { type FC } from 'react';
+import { type TemplateSchedulingGridProps } from 'src/views/templates/details/tabs/scheduling/components/TemplateSchedulingLeftGrid';
 import { getNodeSelector } from 'src/views/templates/utils/selectors';
 
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
@@ -14,7 +13,7 @@ const NodeSelector: FC<TemplateSchedulingGridProps> = ({ editable, onSubmit, tem
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
 
-  const onEditClick = () =>
+  const onEditClick = (): void => {
     createModal(({ isOpen, onClose }) => (
       <NodeSelectorModal
         isOpen={isOpen}
@@ -23,6 +22,7 @@ const NodeSelector: FC<TemplateSchedulingGridProps> = ({ editable, onSubmit, tem
         template={template}
       />
     ));
+  };
 
   return (
     <DescriptionItem

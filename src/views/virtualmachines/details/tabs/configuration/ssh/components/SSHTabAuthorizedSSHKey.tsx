@@ -1,8 +1,7 @@
-/* eslint-disable */
-import React, { FC, useMemo } from 'react';
+import React, { type FC, useMemo } from 'react';
 import { VirtualMachineModel } from 'src/views/dashboard-extensions/utils';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
@@ -15,12 +14,11 @@ import { asAccessReview, getName, getNamespace } from '@kubevirt-utils/resources
 import { getVMSSHSecretName } from '@kubevirt-utils/resources/vm';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sUpdate } from '@multicluster/k8sRequests';
-import { K8sVerb } from '@openshift-console/dynamic-plugin-sdk';
+import { type K8sVerb } from '@openshift-console/dynamic-plugin-sdk';
 import { Stack } from '@patternfly/react-core';
 import { useFleetAccessReview } from '@stolostron/multicluster-sdk';
 
 import { useDynamicSSHInjection } from '../hooks/useDynamicSSHInjection';
-
 import DynamicSSHKeyInjectionDescription from './DynamicSSHKeyInjectionDescription';
 
 type SSHTabAuthorizedSSHKeyProps = {
@@ -48,7 +46,7 @@ const SSHTabAuthorizedSSHKey: FC<SSHTabAuthorizedSSHKeyProps> = ({
   const isEditable =
     ((canUpdateVM && isDynamicSSHInjectionEnabled) || isCustomizeInstanceType) && loaded;
 
-  const onSubmit = (updatedVM: V1VirtualMachine) =>
+  const onSubmit = (updatedVM: V1VirtualMachine): Promise<V1VirtualMachine> =>
     onUpdateVM
       ? onUpdateVM(updatedVM)
       : kubevirtK8sUpdate({

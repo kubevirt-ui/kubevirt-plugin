@@ -1,7 +1,6 @@
-/* eslint-disable */
 import { PrometheusEndpoint } from '@openshift-console/dynamic-plugin-sdk';
 import { useFleetPrometheusPoll } from '@stolostron/multicluster-sdk';
-import { MetricsDataByNode } from '@virtualmachines/actions/components/VirtualMachineComputeMigration/utils/hooks/useNodesMetrics/utils/types';
+import { type MetricsDataByNode } from '@virtualmachines/actions/components/VirtualMachineComputeMigration/utils/hooks/useNodesMetrics/utils/types';
 import { getDataByNode } from '@virtualmachines/actions/components/VirtualMachineComputeMigration/utils/hooks/useNodesMetrics/utils/utils';
 
 type UseNodesMetrics = (cluster?: string) => {
@@ -41,11 +40,11 @@ const useNodesMetrics: UseNodesMetrics = (cluster) => {
 
   const metricsLoaded = usedMemoryLoaded && totalMemoryLoaded && usedCPULoaded && totalCPULoaded;
 
-  const metricsData = getDataByNode({
-    totalCPU: totalCPUData || [],
-    totalMemory: totalMemoryData || [],
-    usedCPU: usedCPUData || [],
-    usedMemory: usedMemoryData || [],
+  const metricsData: MetricsDataByNode = getDataByNode({
+    totalCPU: totalCPUData ?? [],
+    totalMemory: totalMemoryData ?? [],
+    usedCPU: usedCPUData ?? [],
+    usedMemory: usedMemoryData ?? [],
   });
 
   return { metricsData, metricsLoaded };

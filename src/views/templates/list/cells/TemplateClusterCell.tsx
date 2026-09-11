@@ -1,8 +1,7 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
 import { modelToGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { TemplateOrRequest } from '@kubevirt-utils/resources/template';
+import { type TemplateOrRequest } from '@kubevirt-utils/resources/template';
 import { ManagedClusterModel } from '@multicluster/constants';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
@@ -14,7 +13,7 @@ type TemplateClusterCellProps = {
 
 const TemplateClusterCell: FC<TemplateClusterCellProps> = ({ row }) => {
   const [hubClusterName] = useHubClusterName();
-  const cluster = getCluster(row) || hubClusterName;
+  const cluster = getCluster(row) ?? hubClusterName;
 
   return (
     <ResourceLink groupVersionKind={modelToGroupVersionKind(ManagedClusterModel)} name={cluster} />

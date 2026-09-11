@@ -1,8 +1,7 @@
-/* eslint-disable */
-import React, { FC, useState } from 'react';
+import React, { type FC, useState } from 'react';
 import { Trans } from 'react-i18next';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { TELEMETRY_VM_ACTION } from '@kubevirt-utils/extensions/telemetry';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName } from '@kubevirt-utils/resources/shared';
@@ -51,14 +50,15 @@ const DeleteAllVMsConfirmationModal: FC<DeleteAllVMsConfirmationModalProps> = ({
   const numVMs = vms.length;
   const isConfirmed = confirmationValue === numVMs.toString();
 
-  const actionOnVms = () => runActionOnVMs(vms, deleteVM, TELEMETRY_VM_ACTION.DELETE);
+  const actionOnVms = (): Promise<void> =>
+    runActionOnVMs(vms, deleteVM, TELEMETRY_VM_ACTION.DELETE);
 
-  const handleSearchVirtualMachines = (value: string) => {
+  const handleSearchVirtualMachines = (value: string): void => {
     setSearchVirtualMachines(value);
     setShowAll(false);
   };
 
-  const handleClose = () => {
+  const handleClose = (): void => {
     setShowAll(false);
     setConfirmationValue('');
     setSearchVirtualMachines('');
@@ -66,7 +66,7 @@ const DeleteAllVMsConfirmationModal: FC<DeleteAllVMsConfirmationModalProps> = ({
     onClose();
   };
 
-  const submitHandler = async () => {
+  const submitHandler = async (): Promise<void> => {
     if (isSubmitting || !isConfirmed) return;
     setIsSubmitting(true);
     setError(undefined);

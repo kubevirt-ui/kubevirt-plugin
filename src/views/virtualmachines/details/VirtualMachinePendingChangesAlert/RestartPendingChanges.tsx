@@ -1,10 +1,9 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
-import { V1VirtualMachineCondition } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachineCondition } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import PendingChangesBreadcrumb from '@kubevirt-utils/components/PendingChanges/PendingChangesBreadcrumb/PendingChangesBreadcrumb';
 import { getPendingChangesByTab } from '@kubevirt-utils/components/PendingChanges/utils/helpers';
-import { PendingChange } from '@kubevirt-utils/components/PendingChanges/utils/types';
+import { type PendingChange } from '@kubevirt-utils/components/PendingChanges/utils/types';
 import { VirtualMachineDetailsTab } from '@kubevirt-utils/constants/tabs-constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { List } from '@patternfly/react-core';
@@ -35,7 +34,7 @@ const RestartPendingChanges: FC<RestartPendingChangesProps> = ({
   return (
     <span>
       <p>
-        {restartRequiredCondition?.message ||
+        {restartRequiredCondition?.message ??
           t('RestartRequired condition has been set on this VirtualMachine.')}
       </p>
       {hasPendingChanges && (

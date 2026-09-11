@@ -1,15 +1,14 @@
-/* eslint-disable */
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { addSecretToVM } from '@kubevirt-utils/components/SSHSecretModal/utils/utils';
 import {
   getTemplateVirtualMachineObject,
   isVirtualMachineTemplate,
-  Template,
+  type Template,
 } from '@kubevirt-utils/resources/template';
 import { getAccessCredentials } from '@kubevirt-utils/resources/vm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 
-export const updateAccessCredential = (template: Template, secretName: string) => {
+export const updateAccessCredential = (template: Template, secretName: string): void => {
   const vm = getTemplateVirtualMachineObject(template);
   const updatedVM = addSecretToVM(vm, secretName);
 
@@ -23,7 +22,7 @@ export const updateAccessCredential = (template: Template, secretName: string) =
   );
 };
 
-export const removeAccessCredential = (template: Template, secretName: string) => {
+export const removeAccessCredential = (template: Template, secretName: string): void => {
   const vm = getTemplateVirtualMachineObject(template);
   const accessCredentials = getAccessCredentials(vm);
 

@@ -1,5 +1,5 @@
-/* eslint-disable */
 import { useKubevirtClusterServiceVersion } from '@kubevirt-utils/hooks/useKubevirtClusterServiceVersion';
+import { type StorageMigrationAPI } from '@kubevirt-utils/resources/migrations/constants';
 import useIsACMPage from '@multicluster/useIsACMPage';
 
 import useClusterStorageMigrationApiProbe from './useClusterStorageMigrationApiProbe';
@@ -11,7 +11,7 @@ import useClusterStorageMigrationApiProbe from './useClusterStorageMigrationApiP
  * The overview widget calls `useClusterStorageMigrationApiProbe` with shared CSV context
  * to avoid duplicate Subscription/CSV watches next to OpenShift Virtualization.
  */
-const useClusterStorageMigrationAPI = (cluster?: string) => {
+const useClusterStorageMigrationAPI = (cluster?: string): StorageMigrationAPI => {
   const isACMPage = useIsACMPage();
   const csv = useKubevirtClusterServiceVersion(isACMPage ? cluster : undefined);
   return useClusterStorageMigrationApiProbe(cluster, csv);

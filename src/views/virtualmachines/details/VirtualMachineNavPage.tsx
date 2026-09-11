@@ -1,8 +1,7 @@
-/* eslint-disable */
-import React, { FC, useMemo } from 'react';
+import React, { type FC, useMemo } from 'react';
 import { useParams } from 'react-router';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { tourGuideVM } from '@kubevirt-utils/components/GuidedTour/utils/constants';
 import { runningTourSignal } from '@kubevirt-utils/components/GuidedTour/utils/guidedTourSignals';
 import HorizontalNavbar from '@kubevirt-utils/components/HorizontalNavbar/HorizontalNavbar';
@@ -61,7 +60,7 @@ const VirtualMachineNavPage: FC = () => {
       <SidebarEditorProvider telemetryResourceType={TELEMETRY_RESOURCE_TYPE.VM}>
         <div className="VirtualMachineNavPage">
           <DocumentTitle>
-            {getResourceDetailsTitle(getName(vmToShow) || name, 'VirtualMachine')}
+            {getResourceDetailsTitle(getName(vmToShow) ?? name, 'VirtualMachine')}
           </DocumentTitle>
 
           <VirtualMachineNavPageTitle

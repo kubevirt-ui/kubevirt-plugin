@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { NODE_HEIGHT, NODE_PADDING, NODE_WIDTH, VIRTUAL_MACHINE_TYPE } from './constants';
 
 export const WorkloadModelProps = {
@@ -11,4 +10,4 @@ export const WorkloadModelProps = {
   width: NODE_WIDTH,
 };
 
-export const isVMType = (type: string) => type === VIRTUAL_MACHINE_TYPE;
+export const isVMType = (type: string): boolean => type === VIRTUAL_MACHINE_TYPE;

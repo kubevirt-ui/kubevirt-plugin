@@ -1,12 +1,17 @@
-/* eslint-disable */
-import React from 'react';
+import React, { type FC } from 'react';
 
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { StackItem } from '@patternfly/react-core';
 
-const DynamicSSHKeyInjectionDescription = ({ isDynamicSSHInjectionEnabled }) => {
+type DynamicSSHKeyInjectionDescriptionProps = {
+  isDynamicSSHInjectionEnabled: boolean;
+};
+
+const DynamicSSHKeyInjectionDescription: FC<DynamicSSHKeyInjectionDescriptionProps> = ({
+  isDynamicSSHInjectionEnabled,
+}) => {
   const { t } = useKubevirtTranslation();
 
   if (isDynamicSSHInjectionEnabled) return <>{t('Store the key in a project secret.')}</>;

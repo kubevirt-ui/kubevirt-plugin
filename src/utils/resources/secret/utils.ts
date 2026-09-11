@@ -138,8 +138,7 @@ export const createSSHSecret = (
     ...(dryRun && { queryParams: { dryRun: 'All' } }),
   });
 
-export const deleteSecret = (secret: IoK8sApiCoreV1Secret): false | Promise<K8sResourceCommon> =>
-  secret &&
+export const deleteSecret = (secret: IoK8sApiCoreV1Secret): Promise<K8sResourceCommon> =>
   kubevirtK8sDelete({
     cluster: getCluster(secret),
     model: SecretModel,

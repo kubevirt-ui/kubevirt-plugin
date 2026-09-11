@@ -1,18 +1,17 @@
-/* eslint-disable */
 import produce from 'immer';
-import { Draft } from 'immer';
+import { type Draft } from 'immer';
 
 import { TemplateModel, VirtualMachineTemplateModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { produceVMNetworks } from '@kubevirt-utils/components/DiskModal/utils/helpers';
 import {
   getTemplateVirtualMachineObject,
   isVirtualMachineTemplate,
   replaceTemplateVM,
-  Template,
+  type Template,
 } from '@kubevirt-utils/resources/template';
 import { getInterface } from '@kubevirt-utils/resources/vm';
-import { NetworkInterfaceState } from '@kubevirt-utils/resources/vm/utils/network/types';
+import { type NetworkInterfaceState } from '@kubevirt-utils/resources/vm/utils/network/types';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sUpdate } from '@multicluster/k8sRequests';
@@ -20,7 +19,7 @@ import { kubevirtK8sUpdate } from '@multicluster/k8sRequests';
 export const produceTemplateNetwork = (
   template: Template,
   updateNetwork: (vmDraft: Draft<V1VirtualMachine>) => void,
-) => {
+): Template => {
   const vm = getTemplateVirtualMachineObject(template);
   const updatedVM = produceVMNetworks(vm, updateNetwork);
 

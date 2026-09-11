@@ -1,7 +1,7 @@
-/* eslint-disable */
 import { useMemo } from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type NavPageKubevirt } from '@kubevirt-utils/components/HorizontalNavbar/utils/utils';
 import { VirtualMachineDetailsTab } from '@kubevirt-utils/constants/tabs-constants';
 import useHideYamlTab, { filterYamlTabs } from '@kubevirt-utils/hooks/useHideYamlTab';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -17,7 +17,7 @@ import SnapshotListPage from '../tabs/snapshots/SnapshotListPage';
 import VirtualMachineYAMLPage from '../tabs/yaml/VirtualMachineYAMLPage';
 import { getTabHrefAndName } from '../utils/utils';
 
-export const useVirtualMachineTabs = (vm: V1VirtualMachine) => {
+export const useVirtualMachineTabs = (vm: V1VirtualMachine): NavPageKubevirt[] => {
   const { t } = useKubevirtTranslation();
   const { hideYamlTab } = useHideYamlTab();
 

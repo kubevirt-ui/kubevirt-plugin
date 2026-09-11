@@ -1,5 +1,4 @@
-/* eslint-disable */
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { UPLOAD_PROGRESS_STATUS } from '@kubevirt-utils/hooks/useUploadProgressToast/constants';
 import { getVmCdromUploadKeyFromVm } from '@kubevirt-utils/hooks/useUploadProgressToast/keys/uploadKeys';
 import { useUploadProgressStore } from '@kubevirt-utils/hooks/useUploadProgressToast/uploadProgressStore';
@@ -40,7 +39,7 @@ export const useMountIsoUploadForDisk = (
 
   const isUploadInProgress = upload?.status === UPLOAD_PROGRESS_STATUS.UPLOADING;
 
-  const cancelUpload = () => cancelMountIsoUpload(vm, diskName);
+  const cancelUpload = (): Promise<boolean> => cancelMountIsoUpload(vm, diskName);
 
   return { cancelUpload, isUploadInProgress };
 };

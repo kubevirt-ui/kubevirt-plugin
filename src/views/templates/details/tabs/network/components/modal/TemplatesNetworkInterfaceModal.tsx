@@ -1,7 +1,7 @@
-/* eslint-disable */
-import React, { FC, useCallback } from 'react';
+import React, { type FC, useCallback } from 'react';
 
 import NetworkInterfaceModal from '@kubevirt-utils/components/NetworkInterfaceModal/NetworkInterfaceModal';
+import { type NetworkInterfaceModalOnSubmit } from '@kubevirt-utils/components/NetworkInterfaceModal/types';
 import {
   createInterface,
   createNetwork,
@@ -11,7 +11,7 @@ import { getNamespace } from '@kubevirt-utils/resources/shared';
 import {
   getTemplateModel,
   getTemplateVirtualMachineObject,
-  Template,
+  type Template,
 } from '@kubevirt-utils/resources/template';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sUpdate } from '@multicluster/k8sRequests';
@@ -42,8 +42,8 @@ const TemplatesNetworkInterfaceModal: FC<TemplatesNetworkInterfaceModalProps> = 
       isLegacyPasst,
       networkName,
       nicName,
-    }) =>
-      () => {
+    }: NetworkInterfaceModalOnSubmit) =>
+      (): Promise<Template> => {
         const resultNetwork = createNetwork(nicName, networkName);
         const resultInterface = createInterface({
           interfaceLinkState,
@@ -65,7 +65,7 @@ const TemplatesNetworkInterfaceModal: FC<TemplatesNetworkInterfaceModalProps> = 
           model: getTemplateModel(template),
           name: getName(updatedTemplate),
           ns: getNamespace(updatedTemplate),
-        });
+        }).then(() => updatedTemplate);
       },
     [template],
   );

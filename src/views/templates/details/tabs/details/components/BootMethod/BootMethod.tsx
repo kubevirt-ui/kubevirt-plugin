@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { getBootloaderTitleFromVM } from '@kubevirt-utils/components/FirmwareBootloaderModal/utils/utils';
@@ -7,7 +6,7 @@ import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   getTemplateVirtualMachineObject,
-  Template,
+  type Template,
   updateTemplate,
 } from '@kubevirt-utils/resources/template';
 
@@ -26,7 +25,7 @@ const BootMethod: FC<BootMethodProps> = ({ editable, template }) => {
     getTemplateVirtualMachineObject(template),
     t,
   );
-  const onEditClick = () =>
+  const onEditClick = (): void =>
     createModal(({ isOpen, onClose }) => (
       <TemplateBootloaderModal
         isOpen={isOpen}

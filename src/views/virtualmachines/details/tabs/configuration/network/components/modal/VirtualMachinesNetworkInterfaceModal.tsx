@@ -1,16 +1,16 @@
-/* eslint-disable */
-import React, { FC, useCallback } from 'react';
+import React, { type FC, useCallback } from 'react';
 import produce from 'immer';
 import { VirtualMachineModel } from 'src/views/dashboard-extensions/utils';
 
 import {
-  V1Disk,
-  V1Interface,
-  V1Network,
-  V1VirtualMachine,
-  V1VirtualMachineInstance,
+  type V1Disk,
+  type V1Interface,
+  type V1Network,
+  type V1VirtualMachine,
+  type V1VirtualMachineInstance,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import NetworkInterfaceModal from '@kubevirt-utils/components/NetworkInterfaceModal/NetworkInterfaceModal';
+import { type NetworkInterfaceModalOnSubmit } from '@kubevirt-utils/components/NetworkInterfaceModal/types';
 import {
   createInterface,
   createNetwork,
@@ -22,6 +22,7 @@ import {
   addNetwork,
   patchVM,
 } from '@kubevirt-utils/resources/vm/utils/network/patch';
+import { ensurePath } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sUpdate } from '@multicluster/k8sRequests';
 
@@ -55,7 +56,9 @@ const VirtualMachinesNetworkInterfaceModal: FC<VirtualMachinesNetworkInterfaceMo
       isLegacyPasst,
       networkName,
       nicName,
-    }) =>
+    }: NetworkInterfaceModalOnSubmit): (() =>
+      | Promise<V1VirtualMachine | string | void>
+      | undefined) =>
       () => {
         const existingInterface = getInterface(vm, nicName);
         const existingNetwork = getNetworks(vm)?.find(({ name }) => name === nicName);
@@ -77,8 +80,8 @@ const VirtualMachinesNetworkInterfaceModal: FC<VirtualMachinesNetworkInterfaceMo
         if (isBootSource) resultInterface.bootOrder = nicBootOrder;
 
         if (onAddNetworkInterface) {
-          const updatedNetworks: V1Network[] = [...(getNetworks(vm) || []), resultNetwork];
-          const updatedInterfaces: V1Interface[] = [...(getInterfaces(vm) || []), resultInterface];
+          const updatedNetworks: V1Network[] = [...(getNetworks(vm) ?? []), resultNetwork];
+          const updatedInterfaces: V1Interface[] = [...(getInterfaces(vm) ?? []), resultInterface];
           return onAddNetworkInterface(
             updatedNetworks,
             updatedInterfaces,
@@ -88,9 +91,12 @@ const VirtualMachinesNetworkInterfaceModal: FC<VirtualMachinesNetworkInterfaceMo
 
         if (isBootSource && needsDiskUpdate) {
           const newVM = produce(vm, (draftVM) => {
-            draftVM.spec!.template!.spec!.domain!.devices!.disks = disksWithOrder;
-            getNetworks(draftVM)!.push(resultNetwork);
-            getInterfaces(draftVM)!.push(resultInterface);
+            ensurePath(draftVM, ['spec.template.spec.domain.devices.disks']);
+            draftVM.spec.template.spec.domain.devices.disks = disksWithOrder;
+            ensurePath(draftVM, ['spec.template.spec.networks']);
+            draftVM.spec.template.spec.networks.push(resultNetwork);
+            ensurePath(draftVM, ['spec.template.spec.domain.devices.interfaces']);
+            draftVM.spec.template.spec.domain.devices.interfaces.push(resultInterface);
           });
           return kubevirtK8sUpdate({
             cluster: getCluster(vm),

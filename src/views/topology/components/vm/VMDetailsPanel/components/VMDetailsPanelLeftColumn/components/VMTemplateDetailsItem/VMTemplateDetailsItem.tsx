@@ -1,8 +1,7 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
-import { TemplateModel, V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { TemplateModel, type V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -14,7 +13,6 @@ import {
 import {
   getGroupVersionKindForModel,
   useK8sWatchResource,
-  WatchK8sResource,
 } from '@openshift-console/dynamic-plugin-sdk';
 
 import VMTemplateLink from './VMTemplateLink';
@@ -31,17 +29,22 @@ const VMTemplateDetailsItem: FC<VMDetailsItemTemplateProps> = ({ vm }) => {
   const templateName = getLabel(vm, LABEL_USED_TEMPLATE_NAME);
   const templateNamespace = getLabel(vm, LABEL_USED_TEMPLATE_NAMESPACE);
 
-  const templatesResource: WatchK8sResource = {
-    groupVersionKind: getGroupVersionKindForModel(TemplateModel),
-    isList: false,
-    name: templateName,
-    namespace: templateNamespace,
-  };
-  const [template, loadedTemplates, errorTemplates] =
-    useK8sWatchResource<V1Template>(templatesResource);
+  const [template, loadedTemplates, errorTemplates] = useK8sWatchResource<V1Template>(
+    templateName && templateNamespace
+      ? {
+          groupVersionKind: getGroupVersionKindForModel(TemplateModel),
+          isList: false,
+          name: templateName,
+          namespace: templateNamespace,
+        }
+      : null,
+  ) as [V1Template | undefined, boolean, Error | undefined];
 
   const notAvailable =
-    !templateName || !templateNamespace || (loadedTemplates && !template) || errorTemplates;
+    !templateName ||
+    !templateNamespace ||
+    (loadedTemplates && !template) ||
+    Boolean(errorTemplates);
 
   return (
     <DescriptionItem

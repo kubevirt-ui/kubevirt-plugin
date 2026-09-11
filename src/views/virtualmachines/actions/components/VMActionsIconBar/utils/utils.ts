@@ -25,29 +25,29 @@ export const getVMActionIconsDetails = (
   return [
     {
       action: stopAction,
-      Icon: SquareIcon,
+      icon: SquareIcon,
       isDisabled: stopAction?.disabled,
     },
     {
       action: restartAction,
-      Icon: RedoIcon,
+      icon: RedoIcon,
       isDisabled: restartAction?.disabled,
     },
     {
       action: pauseAction,
-      Icon: PauseIcon,
+      icon: PauseIcon,
       isDisabled: pauseAction?.disabled,
       isHidden: isPaused(vm),
     },
     {
       action: VirtualMachineActionFactory.unpause(vm),
-      Icon: EjectIcon,
+      icon: EjectIcon,
       iconClassname: 'vm-actions-icon-bar__icon--unpause',
       isHidden: !isPaused(vm),
     },
     {
       action: startAction,
-      Icon: PlayIcon,
+      icon: PlayIcon,
       isDisabled: startAction?.disabled,
     },
   ];

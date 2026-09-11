@@ -1,6 +1,5 @@
-/* eslint-disable */
-import React, { FC } from 'react';
-import { TemplateSchedulingGridProps } from 'src/views/templates/details/tabs/scheduling/components/TemplateSchedulingLeftGrid';
+import React, { type FC } from 'react';
+import { type TemplateSchedulingGridProps } from 'src/views/templates/details/tabs/scheduling/components/TemplateSchedulingLeftGrid';
 import { isDedicatedCPUPlacement } from 'src/views/templates/utils/utils';
 
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
@@ -16,7 +15,7 @@ const DedicatedResources: FC<TemplateSchedulingGridProps> = ({ editable, onSubmi
     ? t('Workload scheduled with dedicated resources (guaranteed policy)')
     : t('No dedicated resources applied');
 
-  const onEditClick = () =>
+  const onEditClick = (): void => {
     createModal(({ isOpen, onClose }) => (
       <DedicatedResourcesModal
         isOpen={isOpen}
@@ -25,6 +24,7 @@ const DedicatedResources: FC<TemplateSchedulingGridProps> = ({ editable, onSubmi
         template={template}
       />
     ));
+  };
 
   return (
     <DescriptionItem

@@ -1,12 +1,11 @@
-/* eslint-disable */
 import { useCallback, useEffect, useState } from 'react';
 
 import { MigMigrationModel, MigPlanModel } from '@kubevirt-utils/models';
 import {
-  MigMigration,
-  MigPlan,
+  type MigMigration,
+  type MigPlan,
   MTC_MIGRATION_NAMESPACE,
-  MultiNamespaceVirtualMachineStorageMigrationPlan,
+  type MultiNamespaceVirtualMachineStorageMigrationPlan,
   STORAGE_MIGRATION_PHASE,
 } from '@kubevirt-utils/resources/migrations/constants';
 import {
@@ -32,7 +31,7 @@ const useMTCPlanPolling = (
   plan: MultiNamespaceVirtualMachineStorageMigrationPlan | null,
 ): [MultiNamespaceVirtualMachineStorageMigrationPlan | null, boolean, Error | undefined] => {
   const [data, setData] = useState<MultiNamespaceVirtualMachineStorageMigrationPlan | null>(() =>
-    plan ? mergeMTCMigMigrationStatusIntoPlan(plan, undefined, undefined) : null,
+    plan ? mergeMTCMigMigrationStatusIntoPlan(plan, undefined) : null,
   );
   const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState<Error | undefined>();
@@ -85,13 +84,13 @@ const useMTCPlanPolling = (
   useEffect(() => {
     if (!plan) return;
 
-    setData(mergeMTCMigMigrationStatusIntoPlan(plan, undefined, undefined));
+    setData(mergeMTCMigMigrationStatusIntoPlan(plan, undefined));
 
     let stopped = false;
     let timerId: ReturnType<typeof setTimeout>;
     let nextDelayMs = MIGRATION_PLAN_POLL_INTERVAL_MS;
 
-    const poll = async () => {
+    const poll = async (): Promise<void> => {
       const result = await fetchProgress(stopped);
       if (stopped) return;
 
@@ -114,9 +113,9 @@ const useMTCPlanPolling = (
       timerId = setTimeout(poll, nextDelayMs);
     };
 
-    poll();
+    void poll();
 
-    return () => {
+    return (): void => {
       stopped = true;
       clearTimeout(timerId);
     };

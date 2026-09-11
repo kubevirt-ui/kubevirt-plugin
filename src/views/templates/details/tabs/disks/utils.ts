@@ -1,8 +1,7 @@
-/* eslint-disable */
 import produce from 'immer';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { getTemplateVirtualMachineObject, Template } from '@kubevirt-utils/resources/template';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { getTemplateVirtualMachineObject, type Template } from '@kubevirt-utils/resources/template';
 
 export const getTemplateVMWithNamespace = (template: Template): undefined | V1VirtualMachine => {
   const vm = getTemplateVirtualMachineObject(template);
@@ -13,6 +12,6 @@ export const getTemplateVMWithNamespace = (template: Template): undefined | V1Vi
 
   return produce(vm, (draftVM) => {
     draftVM.metadata ??= {};
-    draftVM.metadata.namespace ??= template?.metadata?.namespace || 'default';
+    draftVM.metadata.namespace ??= template?.metadata?.namespace ?? 'default';
   });
 };

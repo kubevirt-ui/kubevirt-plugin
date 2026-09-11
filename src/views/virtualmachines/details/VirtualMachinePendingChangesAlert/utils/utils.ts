@@ -1,7 +1,6 @@
-/* eslint-disable */
-import { TFunction } from 'i18next';
+import { type TFunction } from 'i18next';
 
-import { V1VirtualMachineCondition } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachineCondition } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 
 export const getPendingChangesAlertTitle = (
   t: TFunction,
@@ -24,7 +23,7 @@ export const getMigrationRequiredConditionMessage = (
   condition?: V1VirtualMachineCondition,
 ): string => {
   const baseMessage =
-    condition?.message ||
+    condition?.message ??
     t(
       'Pending configuration changes require migrating or restarting the VirtualMachine to take effect.',
     );

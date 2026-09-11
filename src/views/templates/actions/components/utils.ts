@@ -6,7 +6,7 @@ import { DEFAULT_DISK_SIZE } from '@kubevirt-utils/components/DiskModal/utils/co
 
 import { getDataSourceDataVolume } from '../editBootSource';
 
-import { type SOURCE_OPTIONS_IDS, SOURCE_TYPES } from '../../utils/constants';
+import { SOURCE_TYPES, type SourceOptionsIds } from '../../utils/constants';
 
 export const getDataVolumeSpec = async (
   dataSource: V1beta1DataSource,
@@ -21,16 +21,18 @@ export const getDataVolumeSpec = async (
 
 export const getSourceTypeFromDataVolumeSpec = (
   dataVolumeSpec: V1beta1DataVolumeSpec,
-): SOURCE_OPTIONS_IDS | undefined => {
+): SourceOptionsIds | undefined => {
   if (dataVolumeSpec?.source?.pvc) return SOURCE_TYPES.pvcSource;
 
   if (dataVolumeSpec?.source?.http) return SOURCE_TYPES.httpSource;
 
   if (dataVolumeSpec?.source?.registry) return SOURCE_TYPES.registrySource;
+
+  return undefined;
 };
 
 export const getGenericSourceCustomization = (
-  diskSourceId: SOURCE_OPTIONS_IDS,
+  diskSourceId: SourceOptionsIds,
   url?: string,
   storage?: string,
 ): V1beta1DataVolumeSpec => {

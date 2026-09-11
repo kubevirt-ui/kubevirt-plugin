@@ -1,11 +1,10 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import useInstanceTypeExpandSpec from '@kubevirt-utils/resources/vm/hooks/useInstanceTypeExpandSpec';
 import { Grid, GridItem } from '@patternfly/react-core';
 import { observer } from '@patternfly/react-topology';
-import { VMNode } from '@topology/utils/types/types';
+import { type VMNode, type VMNodeData } from '@topology/utils/types/types';
 
 import VMDetailsPanelLeftColumn from './components/VMDetailsPanelLeftColumn/VMDetailsPanelLeftColumn';
 import VMDetailsPanelRightColumn from './components/VMDetailsPanelRightColumn/VMDetailsPanelRightColumn';
@@ -17,7 +16,7 @@ type TopologyVMDetailsPanelProps = {
 const TopologyVMDetailsPanel: FC<TopologyVMDetailsPanelProps> = observer(({ vmNode }) => {
   const vmData = vmNode.getData();
   const vm = vmData.resource as V1VirtualMachine;
-  const { vmi } = vmData?.data;
+  const vmi = (vmData.data as VMNodeData | undefined)?.vmi;
   const [instanceTypeExpandedSpec] = useInstanceTypeExpandSpec(vm);
   return (
     <div className="overview__sidebar-pane-body resource-overview__body">

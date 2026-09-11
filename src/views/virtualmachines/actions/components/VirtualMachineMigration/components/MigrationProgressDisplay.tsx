@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { ComponentType, FC } from 'react';
+import React, { type ComponentType, type FC } from 'react';
 import { Link } from 'react-router';
 
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
@@ -14,7 +13,7 @@ import {
   EmptyStateActions,
   EmptyStateBody,
   EmptyStateFooter,
-  EmptyStateStatus,
+  type EmptyStateStatus,
   EmptyStateVariant,
   Spinner,
 } from '@patternfly/react-core';
@@ -43,7 +42,7 @@ const MigrationProgressDisplay: FC<MigrationProgressDisplayProps> = ({
   isExternal,
   migrationCompleted,
   migrationHeading,
-  migrationIcon: MigrationIcon,
+  migrationIcon,
   migrationStatus,
   onCancelMigration,
   onClose,
@@ -53,7 +52,7 @@ const MigrationProgressDisplay: FC<MigrationProgressDisplayProps> = ({
   return (
     <EmptyState
       headingLevel="h3"
-      icon={MigrationIcon}
+      icon={migrationIcon}
       status={migrationStatus}
       titleText={migrationHeading}
       variant={EmptyStateVariant.lg}

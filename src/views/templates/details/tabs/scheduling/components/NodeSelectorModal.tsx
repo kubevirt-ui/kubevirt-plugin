@@ -1,10 +1,9 @@
-/* eslint-disable */
-import React, { FC, useMemo } from 'react';
+import React, { type FC, useMemo } from 'react';
 import produce from 'immer';
 import { getNodeSelector } from 'src/views/templates/utils/selectors';
 
 import { modelToGroupVersionKind, NodeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { IoK8sApiCoreV1Node } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type IoK8sApiCoreV1Node } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import LabelsList from '@kubevirt-utils/components/NodeSelectorModal/components/LabelList';
 import LabelRow from '@kubevirt-utils/components/NodeSelectorModal/components/LabelRow';
 import NodeCheckerAlert from '@kubevirt-utils/components/NodeSelectorModal/components/NodeCheckerAlert';
@@ -14,10 +13,10 @@ import {
   isEqualObject,
   nodeSelectorToIDLabels,
 } from '@kubevirt-utils/components/NodeSelectorModal/utils/helpers';
-import { IDLabel } from '@kubevirt-utils/components/NodeSelectorModal/utils/types';
+import { type IDLabel } from '@kubevirt-utils/components/NodeSelectorModal/utils/types';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getTemplateVirtualMachineObject, Template } from '@kubevirt-utils/resources/template';
+import { getTemplateVirtualMachineObject, type Template } from '@kubevirt-utils/resources/template';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
@@ -46,7 +45,9 @@ const NodeSelectorModal: FC<NodeSelectorModalProps> = ({ isOpen, onClose, onSubm
 
   const qualifiedNodes = useNodeLabelQualifier(nodes, nodesLoaded, selectorLabels);
 
-  const onSelectorLabelAdd = () => onLabelAdd({ id: null, key: '', value: '' });
+  const onSelectorLabelAdd = (): void => {
+    onLabelAdd({ id: null, key: '', value: '' });
+  };
 
   const updatedTemplate = useMemo(
     () =>

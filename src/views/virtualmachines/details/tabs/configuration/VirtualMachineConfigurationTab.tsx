@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
+import React, { createElement, type FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { useLocation } from 'react-router';
 
@@ -10,12 +9,11 @@ import { getName } from '@kubevirt-utils/resources/shared';
 import useVMI from '@kubevirt-utils/resources/vm/hooks/useVMI';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { PageSection, Tab, Tabs, TabTitleText } from '@patternfly/react-core';
-import { NavPageComponentProps } from '@virtualmachines/details/utils/types';
+import { type NavPageComponentProps } from '@virtualmachines/details/utils/types';
 import { isRunning } from '@virtualmachines/utils';
 
 import ConfigurationSearch from '../../../../../utils/components/ConfigurationSearch/ConfigurationSearch';
 import { getNamespace } from '../../../../cdi-upload-provider/utils/selectors';
-
 import { createConfigurationSearchURL } from './search/utils/utils';
 import { getSearchItems } from './utils/search';
 import { getInnerTabFromPath, getTabs, includesConfigurationPath } from './utils/utils';
@@ -64,7 +62,7 @@ const VirtualMachineConfigurationTab: FC<NavPageComponentProps> = ({
       />
       <div className="VirtualMachineConfigurationTab__body">
         <Tabs activeKey={activeTabKey} className="VirtualMachineConfigurationTab__tabs" isVertical>
-          {tabs.map(({ Component, name, title }) => (
+          {tabs.map(({ Component: tabComponent, name, title }) => (
             <Tab
               className="VirtualMachineConfigurationTab__content"
               data-test={`vm-configuration-${name}`}
@@ -73,14 +71,13 @@ const VirtualMachineConfigurationTab: FC<NavPageComponentProps> = ({
               onClick={() => redirectTab(name)}
               title={<TabTitleText>{title}</TabTitleText>}
             >
-              {activeTabKey === name && (
-                <Component
-                  allInstanceTypes={allInstanceTypes}
-                  instanceTypeVM={instanceTypeExpandedSpec}
-                  vm={vm}
-                  vmi={vmi}
-                />
-              )}
+              {activeTabKey === name &&
+                createElement(tabComponent, {
+                  allInstanceTypes,
+                  instanceTypeVM: instanceTypeExpandedSpec,
+                  vm,
+                  vmi,
+                })}
             </Tab>
           ))}
         </Tabs>

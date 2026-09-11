@@ -1,10 +1,9 @@
-/* eslint-disable */
-import React from 'react';
+import React, { type FC } from 'react';
 import { Trans } from 'react-i18next';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
-const DeschedulerPopover = () => {
+const DeschedulerPopover: FC = () => {
   const { t } = useKubevirtTranslation();
 
   return (

@@ -1,23 +1,23 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 import classNames from 'classnames';
 
 import { Button, ButtonVariant, SplitItem, Tooltip } from '@patternfly/react-core';
 import { useFleetAccessReview } from '@stolostron/multicluster-sdk';
-import { VMActionIconDetails } from '@virtualmachines/actions/components/VMActionsIconBar/utils/types';
+import { type VMActionIconDetails } from '@virtualmachines/actions/components/VMActionsIconBar/utils/types';
 
 import '../VMActionsIconBar.scss';
 
 const ActionIconButton: FC<VMActionIconDetails> = ({
   action,
-  Icon,
+  icon: iconComponent,
   iconClassname,
   isDisabled,
   isHidden,
 }) => {
   const [actionAllowed] = useFleetAccessReview(action?.accessReview);
+  const IconElement = iconComponent;
 
-  const handleClick = () => {
+  const handleClick = (): void => {
     if (typeof action?.cta === 'function') {
       action?.cta();
     }
@@ -34,7 +34,7 @@ const ActionIconButton: FC<VMActionIconDetails> = ({
             onClick={handleClick}
             variant={ButtonVariant.link}
           >
-            <Icon className={classNames(iconClassname, 'vm-actions-icon-bar__icon')} />
+            <IconElement className={classNames(iconClassname, 'vm-actions-icon-bar__icon')} />
           </Button>
         </Tooltip>
       </SplitItem>

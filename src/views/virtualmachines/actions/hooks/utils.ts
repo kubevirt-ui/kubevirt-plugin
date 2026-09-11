@@ -1,11 +1,10 @@
-/* eslint-disable */
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { VirtualMachineStorageMigrationPlan } from '@kubevirt-utils/resources/migrations/constants';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type VirtualMachineStorageMigrationPlan } from '@kubevirt-utils/resources/migrations/constants';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { vmimStatuses } from '@kubevirt-utils/resources/vmim/statuses';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { printableVMStatus } from '@virtualmachines/utils';
-import { getVMIMFromMapper, VMIMMapper } from '@virtualmachines/utils/mappers';
+import { getVMIMFromMapper, type VMIMMapper } from '@virtualmachines/utils/mappers';
 
 export const sortMigPlansByCreationTimestamp = (
   a: VirtualMachineStorageMigrationPlan,
@@ -23,7 +22,7 @@ export const getVMMigPlans = (
   return migPlans?.filter((migPlan) => isVMMigPlan(migPlan, getName(vm)));
 };
 
-export const someVMIsMigrating = (vms: V1VirtualMachine[], vmimMapper: VMIMMapper) =>
+export const someVMIsMigrating = (vms: V1VirtualMachine[], vmimMapper: VMIMMapper): boolean =>
   vms?.some((vm) => {
     if (vm?.status?.printableStatus === printableVMStatus.Migrating) {
       return true;

@@ -1,21 +1,20 @@
-/* eslint-disable */
 import { useEffect, useRef, useState } from 'react';
 
 import type { useKubevirtClusterServiceVersion } from '@kubevirt-utils/hooks/useKubevirtClusterServiceVersion';
 import {
-  type StorageMigrationAPI,
   STORAGE_MIGRATION_API,
+  type StorageMigrationAPI,
 } from '@kubevirt-utils/resources/migrations/constants';
 import useIsACMPage from '@multicluster/useIsACMPage';
 import { useHubClusterName } from '@stolostron/multicluster-sdk';
 
 import {
-  type StorageMigrationProbeFallbackPhase,
   csvLoadedIndicatesMultiNsStorageMigrationApi,
   csvVersionMeetsMultiNsAssumeThreshold,
   STORAGE_MIGRATION_CSV_WAIT_AFTER_MULTI_NS_404_MS,
   STORAGE_MIGRATION_PROBE_PHASE_IDLE,
   STORAGE_MIGRATION_PROBE_PHASE_WAITING_CSV_AFTER_MULTI_NS_404,
+  type StorageMigrationProbeFallbackPhase,
 } from './constants';
 import {
   onMultiNamespaceStorageMigration404,
@@ -45,7 +44,11 @@ const useClusterStorageMigrationApiProbe = (
   const phaseRef = useRef<StorageMigrationProbeFallbackPhase>(STORAGE_MIGRATION_PROBE_PHASE_IDLE);
   const resolvedRef = useRef<{ api: StorageMigrationAPI; cluster?: string } | null>(null);
 
-  const [, hubClusterLoaded, hubClusterError] = useHubClusterName();
+  const [, hubClusterLoaded, hubClusterError] = useHubClusterName() as [
+    string | undefined,
+    boolean,
+    Error | undefined,
+  ];
   const { installedCSV, loaded: csvLoaded } = csv;
   const csvVersion = installedCSV?.spec?.version;
 
@@ -89,14 +92,14 @@ const useClusterStorageMigrationApiProbe = (
     let canceled = false;
     let csvWaitTimer: ReturnType<typeof setTimeout> | undefined;
 
-    const clearCsvWaitTimer = () => {
+    const clearCsvWaitTimer = (): void => {
       if (csvWaitTimer !== undefined) {
         clearTimeout(csvWaitTimer);
         csvWaitTimer = undefined;
       }
     };
 
-    const finish = (api: StorageMigrationAPI) => {
+    const finish = (api: StorageMigrationAPI): void => {
       if (canceled) return;
       phaseRef.current = STORAGE_MIGRATION_PROBE_PHASE_IDLE;
       clearCsvWaitTimer();
@@ -104,7 +107,7 @@ const useClusterStorageMigrationApiProbe = (
       setResult(api);
     };
 
-    const canceledFn = () => canceled;
+    const canceledFn = (): boolean => canceled;
 
     if (
       phaseRef.current === STORAGE_MIGRATION_PROBE_PHASE_WAITING_CSV_AFTER_MULTI_NS_404 &&
@@ -117,7 +120,7 @@ const useClusterStorageMigrationApiProbe = (
       } else {
         probeMtcThenSingleNsOrNone(cluster, canceledFn, finish);
       }
-      return () => {
+      return (): void => {
         canceled = true;
         clearCsvWaitTimer();
       };
@@ -127,7 +130,7 @@ const useClusterStorageMigrationApiProbe = (
       phaseRef.current === STORAGE_MIGRATION_PROBE_PHASE_WAITING_CSV_AFTER_MULTI_NS_404 &&
       !csvLoaded
     ) {
-      return () => {
+      return (): void => {
         canceled = true;
         clearCsvWaitTimer();
       };
@@ -137,7 +140,7 @@ const useClusterStorageMigrationApiProbe = (
     // resolve immediately without a LIST probe when CSV is already loaded.
     if (csvLoadedIndicatesMultiNsStorageMigrationApi(csvLoaded, csvVersion)) {
       finish(STORAGE_MIGRATION_API.MULTI_NS);
-      return () => {
+      return (): void => {
         canceled = true;
       };
     }
@@ -159,7 +162,7 @@ const useClusterStorageMigrationApiProbe = (
       }),
     );
 
-    return () => {
+    return (): void => {
       canceled = true;
       clearCsvWaitTimer();
     };

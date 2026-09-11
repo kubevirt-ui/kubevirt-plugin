@@ -1,12 +1,11 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import {
   isDeprecatedTemplate,
   isVirtualMachineTemplateRequest,
-  TemplateOrRequest,
+  type TemplateOrRequest,
 } from '@kubevirt-utils/resources/template';
 import MulticlusterResourceLink from '@multicluster/components/MulticlusterResourceLink/MulticlusterResourceLink';
 import { getCluster } from '@multicluster/helpers/selectors';
@@ -26,7 +25,7 @@ const TemplateNameCell: FC<TemplateNameCellProps> = ({ row }) => {
 
   const name = getName(row);
   const namespace = getNamespace(row);
-  const cluster = getCluster(row) || clusterParam;
+  const cluster = getCluster(row) ?? clusterParam;
 
   const isVMTR = isVirtualMachineTemplateRequest(row);
 

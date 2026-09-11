@@ -1,12 +1,11 @@
-/* eslint-disable */
-import React, { FC, useMemo } from 'react';
+import React, { type FC, useMemo } from 'react';
 import produce from 'immer';
 import { getTolerations } from 'src/views/templates/utils/selectors';
 
 import { modelToGroupVersionKind, NodeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { IoK8sApiCoreV1Node } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type IoK8sApiCoreV1Node } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import {
-  K8sIoApiCoreV1Toleration,
+  type K8sIoApiCoreV1Toleration,
   K8sIoApiCoreV1TolerationEffectEnum,
   K8sIoApiCoreV1TolerationOperatorEnum,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -17,10 +16,10 @@ import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import TolerationEditRow from '@kubevirt-utils/components/TolerationsModal/TolerationEditRow';
 import TolerationListHeaders from '@kubevirt-utils/components/TolerationsModal/TolerationListHeaders';
 import TolerationModalDescriptionText from '@kubevirt-utils/components/TolerationsModal/TolerationModalDescriptionText';
-import { TolerationLabel } from '@kubevirt-utils/components/TolerationsModal/utils/constants';
+import { type TolerationLabel } from '@kubevirt-utils/components/TolerationsModal/utils/constants';
 import { getNodeTaintQualifier } from '@kubevirt-utils/components/TolerationsModal/utils/helpers';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getTemplateVirtualMachineObject, Template } from '@kubevirt-utils/resources/template';
+import { getTemplateVirtualMachineObject, type Template } from '@kubevirt-utils/resources/template';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
@@ -41,7 +40,7 @@ const TolerationsModal: FC<TolerationsModalProps> = ({ isOpen, onClose, onSubmit
     onEntityChange: onTolerationChange,
     onEntityDelete: onTolerationDelete,
   } = useIDEntities<TolerationLabel>(
-    (getTolerations(template) || []).map((toleration, id) => ({ ...toleration, id })),
+    (getTolerations(template) ?? []).map((toleration, id) => ({ ...toleration, id })),
   );
   const tolerationLabelsEmpty = tolerationsLabels?.length === 0;
   const [nodes, nodesLoaded] = useK8sWatchData<IoK8sApiCoreV1Node[]>({
@@ -51,7 +50,7 @@ const TolerationsModal: FC<TolerationsModalProps> = ({ isOpen, onClose, onSubmit
   });
   const qualifiedNodes = getNodeTaintQualifier(nodes, nodesLoaded, tolerationsLabels);
 
-  const onSelectorLabelAdd = () =>
+  const onSelectorLabelAdd = (): void =>
     onTolerationAdd({
       effect: K8sIoApiCoreV1TolerationEffectEnum.NoSchedule,
       id: null,

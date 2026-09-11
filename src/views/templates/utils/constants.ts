@@ -1,4 +1,3 @@
-/* eslint-disable */
 export const ANNOTATIONS = {
   displayName: 'openshift.io/display-name',
   providerDisplayName: 'openshift.io/provider-display-name',
@@ -26,7 +25,7 @@ export const SOURCE_TYPE_LABELS = {
   [SOURCE_TYPES.registrySource]: 'Registry (ContainerDisk)',
 };
 
-export type SOURCE_OPTIONS_IDS =
+export type SourceOptionsIds =
   | typeof SOURCE_TYPES.httpSource
   | typeof SOURCE_TYPES.pvcSource
   | typeof SOURCE_TYPES.registrySource

@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { useMemo } from 'react';
 
 import { type V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -20,7 +19,7 @@ type UseOpenShiftTemplates = (props: {
   namespace?: string;
   selector?: Selector;
 }) => {
-  error: any;
+  error: unknown;
   loaded: boolean;
   templates: V1Template[];
 };
@@ -68,9 +67,9 @@ export const useOpenShiftTemplates: UseOpenShiftTemplates = ({
     namespace,
     searchQueries: templateMulticlusterFilters,
     selector: {
-      ...(selector || {}),
+      ...(selector ?? {}),
       matchExpressions: [
-        ...(selector?.matchExpressions || []),
+        ...(selector?.matchExpressions ?? []),
         {
           key: TEMPLATE_TYPE_LABEL,
           operator: Operator.In,

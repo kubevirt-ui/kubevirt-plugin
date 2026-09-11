@@ -1,7 +1,6 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
@@ -31,7 +30,7 @@ const VMWorkloadProfileDetailsItem: FC<VMWorkloadProfileDetailsItemProps> = ({ v
       <DescriptionItem
         descriptionData={
           vmWorkload ? (
-            (() => {
+            ((): string => {
               const workloadKey = WORKLOADS_LABELS[vmWorkload];
               return workloadKey ? t(workloadKey) : vmWorkload;
             })()

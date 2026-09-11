@@ -1,8 +1,14 @@
-/* eslint-disable */
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { sortable } from '@patternfly/react-table';
 
-const useFilesystemTableColumns = () => {
+type FilesystemTableColumn = {
+  id: string;
+  sort: string;
+  title: string;
+  transforms: (typeof sortable)[];
+};
+
+const useFilesystemTableColumns = (): FilesystemTableColumn[] => {
   const { t } = useKubevirtTranslation();
 
   const columns = [

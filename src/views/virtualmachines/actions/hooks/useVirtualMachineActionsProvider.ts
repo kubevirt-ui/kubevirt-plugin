@@ -1,11 +1,10 @@
-/* eslint-disable */
 import { useMemo } from 'react';
 
 import {
-  V1VirtualMachine,
-  V1VirtualMachineInstanceMigration,
+  type V1VirtualMachine,
+  type V1VirtualMachineInstanceMigration,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { ActionDropdownItemType } from '@kubevirt-utils/components/ActionsDropdown/constants';
+import { type ActionDropdownItemType } from '@kubevirt-utils/components/ActionsDropdown/constants';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { getConsoleVirtctlCommand } from '@kubevirt-utils/components/SSHAccess/utils';
 import { CONFIRM_VM_ACTIONS, TREE_VIEW_FOLDERS } from '@kubevirt-utils/hooks/useFeatures/constants';
@@ -20,9 +19,9 @@ import useACMExtensionActions from '@multicluster/hooks/useACMExtensionActions/u
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { useK8sModel } from '@openshift-console/dynamic-plugin-sdk';
 
-import { printableVMStatus } from '../../utils';
 import { createVirtualMachineActionFactory } from '../VirtualMachineActionFactory';
 
+import { printableVMStatus } from '../../utils';
 import useClusterStorageMigrationAPI from './storageMigrationApi/useClusterStorageMigrationAPI';
 import useActiveVMStorageMigrationPlan from './useActiveVMStorageMigrationPlan';
 import useIsMTVInstalled from './useIsMTVInstalled';
@@ -30,7 +29,7 @@ import useIsMTVInstalled from './useIsMTVInstalled';
 type UseVirtualMachineActionsProvider = (
   vm: V1VirtualMachine,
   vmim?: V1VirtualMachineInstanceMigration,
-) => [ActionDropdownItemType[], boolean, any];
+) => [ActionDropdownItemType[], boolean];
 
 const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (vm, vmim) => {
   const { t } = useKubevirtTranslation();
@@ -78,15 +77,14 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (vm, 
     const isComputeMigration =
       !isStorageMigration && (printableStatus === Migrating || !!currentMigrationExist);
 
-    const startOrStop = ((printableStatusMachine) => {
-      const map = {
-        default: VirtualMachineActionFactory.stop(vm, createModal, confirmVMActionsEnabled),
-        Stopped: VirtualMachineActionFactory.start(vm),
-        Stopping: VirtualMachineActionFactory.forceStop(vm),
-        Terminating: VirtualMachineActionFactory.forceStop(vm),
-      };
-      return map[printableStatusMachine] || map.default;
-    })(printableStatus);
+    const startOrStopMap: Record<string, ActionDropdownItemType> = {
+      default: VirtualMachineActionFactory.stop(vm, createModal, confirmVMActionsEnabled),
+      Stopped: VirtualMachineActionFactory.start(vm),
+      Stopping: VirtualMachineActionFactory.forceStop(vm),
+      Terminating: VirtualMachineActionFactory.forceStop(vm),
+    };
+    const startOrStop: ActionDropdownItemType =
+      startOrStopMap[printableStatus ?? 'default'] ?? startOrStopMap.default;
 
     const migrateCompute = VirtualMachineActionFactory.migrateCompute(vm, createModal);
 
@@ -153,7 +151,7 @@ const useVirtualMachineActionsProvider: UseVirtualMachineActionsProvider = (vm, 
     VirtualMachineActionFactory,
   ]);
 
-  return useMemo(() => [actions, !inFlight, undefined], [actions, inFlight]);
+  return useMemo(() => [actions, !inFlight], [actions, inFlight]);
 };
 
 export default useVirtualMachineActionsProvider;
