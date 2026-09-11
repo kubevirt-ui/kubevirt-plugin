@@ -107,7 +107,7 @@
       "command": "/clone",
       "description": "Cherry-pick this PR to another release branch once merged.",
       "trust": "member-or-owner",
-      "workflow": ".github/workflows/jira_clone.yml"
+      "workflow": ".github/workflows/pr-commands.yml"
     },
     {
       "command": "/help",

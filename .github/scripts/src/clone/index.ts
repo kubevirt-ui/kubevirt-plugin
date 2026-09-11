@@ -1,17 +1,23 @@
 import { upsertComment } from '../github-comments';
 import { createOctokit } from '../github-repo';
 import { JiraClient } from '../jira-client';
-import { requireEnv } from '../utils';
+import { requireEnv, safeErrorMessage } from '../utils';
 
 import { failStep } from '../shared/output';
 import type { CherryPickResult, GitHubConfig } from '../types/index';
 import { JIRA_BASE_URL, JIRA_PROJECT_KEY } from '../types/index';
 import { openCherryPickPR, performCherryPick } from './cherry-pick';
+import { formatCloneFailureMessage } from './clone-errors';
 import { cloneAllTickets } from './clone-tickets';
 import { postCloneError, validateCloneCommand } from './clone-validation';
 
-/** Entrypoint: parse /clone command, clone Jira tickets, cherry-pick, and open a new PR. */
-const main = async (): Promise<void> => {
+const clonedTicketsFooter = (clonedKeys: string[]): string =>
+  clonedKeys.length > 0
+    ? `Cloned tickets: ${clonedKeys.map((key) => `[${key}](${JIRA_BASE_URL}/browse/${key})`).join(', ')}`
+    : '';
+
+/** Parse /clone command, clone Jira tickets, cherry-pick, and open a new PR. */
+export const runClone = async (): Promise<void> => {
   const ghConfig: GitHubConfig = {
     owner: requireEnv('REPO_OWNER'),
     repo: requireEnv('REPO_NAME'),
@@ -66,46 +72,57 @@ const main = async (): Promise<void> => {
     failStep(`Failed to clone any tickets: ${ticketIds.join(', ')}`);
   }
 
+  const clonedKeys = clonedTickets.map((ticket) => ticket.clonedKey);
+  const clonedFooter = clonedTicketsFooter(clonedKeys);
   const primaryClone = clonedTickets[0];
   const cherryPickBranch = `cherry-pick-${primaryClone.clonedKey.toLowerCase()}-to-${targetBranch}`;
   const commitSha = mergeCommitSha || headSha;
 
-  const result = await (async (): Promise<CherryPickResult> => {
-    try {
-      return performCherryPick(targetBranch, commitSha, cherryPickBranch, clonedTickets);
-    } catch (err) {
-      const keys = clonedTickets
-        .map((ticket) => `[${ticket.clonedKey}](${JIRA_BASE_URL}/browse/${ticket.clonedKey})`)
-        .join(', ');
-      await postCloneError(
-        octokit,
-        ghConfig,
-        prNumber,
-        `Cherry-pick failed.\n\nCloned tickets: ${keys}`,
-      );
-      failStep('Cherry-pick failed');
-      throw err;
-    }
-  })();
+  let result: CherryPickResult;
+  try {
+    result = performCherryPick(targetBranch, commitSha, cherryPickBranch, clonedTickets);
+  } catch (err) {
+    await postCloneError(
+      octokit,
+      ghConfig,
+      prNumber,
+      formatCloneFailureMessage('Cherry-pick failed', err, clonedFooter),
+    );
+    return failStep(`Cherry-pick failed: ${safeErrorMessage(err)}`);
+  }
 
   const originalSummary = prTitle.replace(/^(?:\[.*?\]\s*)?(?:CNV-\d+\s*)+:\s*/i, '').trim();
   const newPrTitle = `[${targetBranch}] ${clonedTickets
     .map((ticket) => ticket.clonedKey)
     .join(' ')}: ${originalSummary}`;
 
-  const newPr = await openCherryPickPR(octokit, ghConfig.owner, ghConfig.repo, {
-    cherryPickBranch: result.cherryPickBranch,
-    cherryPickClean: result.cherryPickClean,
-    clonedTickets,
-    conflictDetails: result.conflictDetails,
-    matchedVersion,
-    originalPrNumber: prNumber,
-    prTitle: newPrTitle,
-    targetBranch,
-  });
+  let newPr: { html_url: string; number: number };
+  try {
+    newPr = await openCherryPickPR(octokit, ghConfig.owner, ghConfig.repo, {
+      cherryPickBranch: result.cherryPickBranch,
+      cherryPickClean: result.cherryPickClean,
+      clonedTickets,
+      conflictDetails: result.conflictDetails,
+      matchedVersion,
+      originalPrNumber: prNumber,
+      prTitle: newPrTitle,
+      targetBranch,
+    });
+  } catch (err) {
+    await postCloneError(
+      octokit,
+      ghConfig,
+      prNumber,
+      formatCloneFailureMessage('Failed to open cherry-pick PR', err, clonedFooter),
+    );
+    return failStep(`Failed to open cherry-pick PR: ${safeErrorMessage(err)}`);
+  }
 
   const statusIcon = result.cherryPickClean ? ':white_check_mark:' : ':warning:';
   const draftNote = result.cherryPickClean ? '' : ' (opened as **draft**)';
+  const conflictNote = result.cherryPickClean
+    ? 'Clean'
+    : `Conflicts — see PR and resolve manually:\n\`\`\`\n${result.conflictDetails}\n\`\`\``;
   const rows = clonedTickets.map(
     (ticket) =>
       `| ${ticket.originalKey} → ${ticket.clonedKey} | [${ticket.clonedKey}](${JIRA_BASE_URL}/browse/${ticket.clonedKey}) |`,
@@ -122,7 +139,7 @@ const main = async (): Promise<void> => {
     '|---|---|',
     `| **Fix version** | ${matchedVersion.name} |`,
     `| **New PR** | #${newPr.number} |`,
-    `| **Cherry-pick** | ${result.cherryPickClean ? 'Clean' : 'Conflicts (see PR)'} |`,
+    `| **Cherry-pick** | ${conflictNote} |`,
   ].join('\n');
 
   await upsertComment(
@@ -135,7 +152,3 @@ const main = async (): Promise<void> => {
   );
   console.log(`Done. New PR: ${newPr.html_url}`);
 };
-
-void main().catch((err) => {
-  failStep(err instanceof Error ? err.message : 'Unexpected error');
-});
