@@ -104,12 +104,12 @@ const NetworkInterfaceActions: FC<NetworkInterfaceActionsProps> = ({
         )}
         {interfaceState === NetworkInterfaceState.UP && (
           <DropdownItem
-            onClick={() =>
-              onUpdateVM(setInterfaceLinkState(vm, nicName, NetworkInterfaceState.DOWN))
-            }
             description={isSRIOVIface && t('Not available for SR-IOV interfaces')}
             isDisabled={isSRIOVIface}
             key="network-interface-state-down"
+            onClick={() =>
+              onUpdateVM(setInterfaceLinkState(vm, nicName, NetworkInterfaceState.DOWN))
+            }
           >
             {t('Set link down')}
           </DropdownItem>

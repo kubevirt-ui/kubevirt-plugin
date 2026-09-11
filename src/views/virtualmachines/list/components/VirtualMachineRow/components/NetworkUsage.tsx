@@ -12,7 +12,6 @@ type NetworkUsageProps = {
 };
 
 const NetworkUsage: FC<NetworkUsageProps> = ({ vm }) => {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const totalTransferred: number | undefined = getNetworkUsagePercentage(vm);
 
   if (isEmpty(totalTransferred) || !isRunning(vm)) return <>{NO_DATA_DASH}</>;

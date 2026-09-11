@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-shadow */
 import type {
   V1VirtualMachine,
   V1VirtualMachineInstance,

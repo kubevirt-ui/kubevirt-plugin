@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 import { renderHook } from '@testing-library/react';
 

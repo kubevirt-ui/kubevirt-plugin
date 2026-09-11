@@ -1,4 +1,3 @@
-/* eslint-disable perfectionist/sort-enums */
 export enum METRICS {
   VM = 'VirtualMachines',
   RUNNING_VMS = 'Running VMs',

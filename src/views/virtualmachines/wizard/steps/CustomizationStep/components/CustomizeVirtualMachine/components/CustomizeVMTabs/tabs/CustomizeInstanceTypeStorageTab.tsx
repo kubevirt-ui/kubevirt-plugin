@@ -26,6 +26,7 @@ const CustomizeInstanceTypeStorageTab: FC = () => {
       <GridItem>
         <PageSection>
           <DiskList
+            customize
             onDiskUpdate={(updatedVM: V1VirtualMachine) => {
               const vmModified = patchCustomizeWizardVMSignal([
                 {
@@ -44,7 +45,6 @@ const CustomizeInstanceTypeStorageTab: FC = () => {
 
               return Promise.resolve(vmModified ?? updatedVM);
             }}
-            customize
             vm={vm}
           />
         </PageSection>

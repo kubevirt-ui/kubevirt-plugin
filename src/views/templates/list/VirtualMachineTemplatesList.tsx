@@ -44,7 +44,6 @@ const VirtualMachineTemplatesList: FC<ListPageProps> = ({
   const namespaceParam = useNamespaceParam();
   const isAllClustersPage = useIsAllClustersPage();
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- hook error typed as any
   const { allTemplates, allTemplatesWithRequests, error, loaded } = useAllTemplateResources({
     fieldSelector,
     namespace: namespaceParam,
@@ -126,7 +125,6 @@ const VirtualMachineTemplatesList: FC<ListPageProps> = ({
           getRowId={getTemplateRowId}
           initialSortKey="none"
           loaded={loaded && loadedColumns}
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- hook error typed as any
           loadError={error}
           noFilteredDataMsg={t('No templates found')}
           persistSortInUrl

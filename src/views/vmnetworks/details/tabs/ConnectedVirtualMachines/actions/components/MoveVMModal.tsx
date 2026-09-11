@@ -83,6 +83,8 @@ const MoveVMModal: FC<MoveVMModalProps> = ({ closeModal, currentNetwork, vms }) 
           </FormGroup>
           {newNetwork && (
             <Alert
+              isInline
+              isPlain
               title={
                 isSingleVM
                   ? t(
@@ -102,8 +104,6 @@ const MoveVMModal: FC<MoveVMModalProps> = ({ closeModal, currentNetwork, vms }) 
                       },
                     )
               }
-              isInline
-              isPlain
               variant="warning"
             />
           )}
