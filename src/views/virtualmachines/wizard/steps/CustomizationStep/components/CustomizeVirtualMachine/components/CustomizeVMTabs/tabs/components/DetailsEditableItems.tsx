@@ -30,12 +30,18 @@ const DetailsEditableItems: FC<DetailsEditableItemsProps> = ({ treeViewFoldersEn
   return (
     <>
       <DescriptionItem
+        data-test={`${vmName}-description`}
         descriptionData={
           getAnnotation(vm, DESCRIPTION_ANNOTATION) ?? <MutedTextSpan text={t('None')} />
         }
+        descriptionHeader={<SearchItem id="description">{t('Description')}</SearchItem>}
+        isEdit
         onEditClick={() =>
           createModal(({ isOpen, onClose }) => (
             <DescriptionModal
+              isOpen={isOpen}
+              obj={vm}
+              onClose={onClose}
               onSubmit={(description) =>
                 Promise.resolve(
                   patchCustomizeWizardVMSignal([
@@ -43,21 +49,21 @@ const DetailsEditableItems: FC<DetailsEditableItemsProps> = ({ treeViewFoldersEn
                   ]),
                 )
               }
-              isOpen={isOpen}
-              obj={vm}
-              onClose={onClose}
             />
           ))
         }
-        data-test={`${vmName}-description`}
-        descriptionHeader={<SearchItem id="description">{t('Description')}</SearchItem>}
-        isEdit
       />
       {treeViewFoldersEnabled && (
         <DescriptionItem
+          data-test={`${vmName}-folder`}
+          descriptionData={getLabel(vm, VM_FOLDER_LABEL)}
+          descriptionHeader={<SearchItem id="folder">{t('Group')}</SearchItem>}
+          isEdit
           onEditClick={() =>
             createModal(({ isOpen, onClose }) => (
               <MoveVMToFolderModal
+                isOpen={isOpen}
+                onClose={onClose}
                 onSubmit={(folderName) =>
                   Promise.resolve(
                     patchCustomizeWizardVMSignal([
@@ -65,22 +71,22 @@ const DetailsEditableItems: FC<DetailsEditableItemsProps> = ({ treeViewFoldersEn
                     ]),
                   )
                 }
-                isOpen={isOpen}
-                onClose={onClose}
                 vm={vm}
               />
             ))
           }
-          data-test={`${vmName}-folder`}
-          descriptionData={getLabel(vm, VM_FOLDER_LABEL)}
-          descriptionHeader={<SearchItem id="folder">{t('Group')}</SearchItem>}
-          isEdit
         />
       )}
       <DescriptionItem
+        data-test={`${vmName}-hostname`}
+        descriptionData={getHostname(vm) || vmName}
+        descriptionHeader={<SearchItem id="hostname">{t('Hostname')}</SearchItem>}
+        isEdit
         onEditClick={() =>
           createModal(({ isOpen, onClose }) => (
             <HostnameModal
+              isOpen={isOpen}
+              onClose={onClose}
               onSubmit={(updatedVM) =>
                 Promise.resolve(
                   patchCustomizeWizardVMSignal([
@@ -88,16 +94,10 @@ const DetailsEditableItems: FC<DetailsEditableItemsProps> = ({ treeViewFoldersEn
                   ]),
                 )
               }
-              isOpen={isOpen}
-              onClose={onClose}
               vm={vm}
             />
           ))
         }
-        data-test={`${vmName}-hostname`}
-        descriptionData={getHostname(vm) || vmName}
-        descriptionHeader={<SearchItem id="hostname">{t('Hostname')}</SearchItem>}
-        isEdit
       />
     </>
   );

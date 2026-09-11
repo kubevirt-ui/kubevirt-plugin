@@ -50,18 +50,18 @@ const ProjectList: FC<ProjectListProps> = ({ errorLoadingProjects, loadedProject
   return (
     <Stack className="pf-v6-u-pl-md" hasGutter>
       <Controller
+        control={control}
+        name="network.spec.namespaceSelector.matchExpressions"
         render={({ field: { onChange, value } }) => (
           <MultiSelectTypeahead
-            setSelectedResourceNames={(newSelection) => {
-              onChange(transformProjectsIntoMatchExpressions(newSelection));
-            }}
             allResourceNames={projects.map(getName)}
             hasCheckboxes
             selectedResourceNames={value?.map((expr) => expr.values).flat() ?? []}
+            setSelectedResourceNames={(newSelection) => {
+              onChange(transformProjectsIntoMatchExpressions(newSelection));
+            }}
           />
         )}
-        control={control}
-        name="network.spec.namespaceSelector.matchExpressions"
       />
       {matchExpressions?.length > 0 && <SelectedProjects />}
     </Stack>

@@ -83,7 +83,6 @@ export const getMemoryUsagePercentage = (vm: V1VirtualMachine, vmiMemory: string
 
   if (isEmpty(memoryUsage) || isEmpty(vmiMemory)) return;
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const memoryAvailableBytes = convertToBaseValue(vmiMemory);
 
   if (!memoryAvailableBytes) return;

@@ -75,7 +75,6 @@ export const useUploadPVCTemplates = (): UseUploadPVCTemplatesResult => {
     [commonTemplates, goldenAccessReviews],
   );
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const [goldenPvcs, loadedPvcs, errorPvcs] = useBaseImages(allowedTemplates);
 
   const osParam = new URLSearchParams(window.location.search).get(CDI_UPLOAD_OS_URL_PARAM);

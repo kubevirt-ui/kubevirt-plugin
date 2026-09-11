@@ -1,4 +1,5 @@
 import i18next from 'eslint-plugin-i18next';
+import importX from 'eslint-plugin-import-x';
 import perfectionist from 'eslint-plugin-perfectionist';
 import prettier from 'eslint-plugin-prettier/recommended';
 import promise from 'eslint-plugin-promise';
@@ -11,14 +12,11 @@ import tseslint from 'typescript-eslint';
 
 import eslintReact from '@eslint-react/eslint-plugin';
 
-import { perfectionistConfig } from './eslintv10.config.mjs';
-
-import { simpleImportSortConfig } from './eslintv10.config.mjs';
-
 const ignoresConfig = {
   ignores: [
     'dist/**',
     'node_modules/**',
+    'eslint.config.mjs',
     'eslintv10.config.mjs',
     'package-lock.json',
     'i18n-scripts/**',
@@ -28,6 +26,9 @@ const ignoresConfig = {
     'cypress/cypress-a11y-report.json',
     'locales/**',
     'playwright/**',
+    '__mocks__/**',
+    'webpack.config.ts', // will be removed when errors are fixed, in the meantime it is linted by default eslint.config.js
+    'i18next-parser.config.js', // will be removed when errors are fixed, in the meantime it is linted by default eslint.config.js
     'jest-setup.ts',
     'jest.config.ts',
     'playwright.config.ts',
@@ -48,11 +49,9 @@ const baseConfig = {
     },
     sourceType: 'module',
   },
-  linterOptions: {
-    reportUnusedDisableDirectives: 'off',
-  },
   plugins: {
     i18next,
+    'import-x': importX,
     perfectionist,
     promise,
     'react-hooks': reactHooks,
@@ -88,6 +87,7 @@ const baseConfig = {
         ],
       },
     ],
+
     'no-var': 'error',
     'no-warning-comments': ['warn', { location: 'start', terms: ['todo', 'fixme', 'hack', 'xxx'] }],
     'prefer-const': 'error',
@@ -101,17 +101,18 @@ const baseConfig = {
     'react-hooks/preserve-manual-memoization': 'error',
     'react-hooks/purity': 'error',
     'react-hooks/refs': 'error',
+
     'react-hooks/rules-of-hooks': 'error',
     'react-hooks/set-state-in-effect': 'off',
     'react-hooks/set-state-in-render': 'error',
     'react-hooks/unsupported-syntax': 'error',
-    'simple-import-sort/exports': 'off',
-    'simple-import-sort/imports': 'off',
     'unicorn/no-for-each': 'error',
+
     'unicorn/no-lonely-if': 'error',
     'unicorn/no-useless-spread': 'error',
     'unicorn/prefer-array-some': 'error',
     'unicorn/prefer-includes': 'error',
+
     'unicorn/throw-new-error': 'error',
   },
   settings: {
@@ -138,7 +139,10 @@ const tsConfigs = tseslint.configs.recommended.map((config) => ({
     '@typescript-eslint/ban-ts-comment': 'error',
     '@typescript-eslint/consistent-type-definitions': ['error', 'type'],
     '@typescript-eslint/consistent-type-exports': 'error',
-    '@typescript-eslint/consistent-type-imports': 'error',
+    '@typescript-eslint/consistent-type-imports': [
+      'error',
+      { fixStyle: 'inline-type-imports', prefer: 'type-imports' },
+    ],
     '@typescript-eslint/explicit-function-return-type': 'error',
     '@typescript-eslint/naming-convention': [
       'error',
@@ -209,21 +213,6 @@ const tsConfigs = tseslint.configs.recommended.map((config) => ({
   },
 }));
 
-const reactConfig = {
-  ...eslintReact.configs['recommended-typescript'],
-  files: ['**/*.{ts,tsx}'],
-  rules: {
-    ...eslintReact.configs['recommended-typescript'].rules,
-    '@eslint-react/exhaustive-deps': 'off',
-    '@eslint-react/purity': 'off',
-    '@eslint-react/rules-of-hooks': 'off',
-    // TODO: tackle set-state-in-effect in a later version — 82 files affected
-    '@eslint-react/set-state-in-effect': 'off',
-    '@eslint-react/set-state-in-render': 'off',
-    '@eslint-react/unsupported-syntax': 'off',
-  },
-};
-
 const sonarConfig = {
   ...sonarjs.configs.recommended,
   files: ['**/*.{js,jsx,ts,tsx}'],
@@ -245,23 +234,51 @@ const allSonarjsRulesOff = Object.fromEntries(
   Object.keys(sonarjs.configs.recommended.rules).map((rule) => [rule, 'off']),
 );
 
-const prettierOverrides = {
+const reactConfig = {
+  ...eslintReact.configs['recommended-typescript'],
+  files: ['**/*.{ts,tsx}'],
   rules: {
-    'prettier/prettier': ['error', { endOfLine: 'auto' }],
+    ...eslintReact.configs['recommended-typescript'].rules,
+    '@eslint-react/exhaustive-deps': 'off',
+    '@eslint-react/purity': 'off',
+    '@eslint-react/rules-of-hooks': 'off',
+    // TODO: tackle set-state-in-effect in a later version — 82 files affected
+    '@eslint-react/set-state-in-effect': 'off',
+    '@eslint-react/set-state-in-render': 'off',
+    '@eslint-react/unsupported-syntax': 'off',
   },
 };
 
-const githubScriptsOverrides = {
-  files: ['.github/**/*.{ts,tsx,js,jsx}', 'ci-scripts/**/*.{ts,tsx,js,jsx}'],
+export const perfectionistConfig = {
+  files: ['**/*.{js,jsx,ts,tsx}'],
   rules: {
-    ...allSonarjsRulesOff,
-    'no-console': 'off',
+    'perfectionist/sort-classes': [
+      'error',
+      {
+        groups: [
+          'static-property',
+          'private-property',
+          'property',
+          'constructor',
+          'static-method',
+          'private-method',
+          'method',
+        ],
+        order: 'asc',
+        type: 'natural',
+      },
+    ],
+    'perfectionist/sort-imports': 'off',
+    'perfectionist/sort-jsx-props': 'error',
+    'perfectionist/sort-named-imports': 'off',
+    'perfectionist/sort-object-types': 'error',
+    'perfectionist/sort-objects': 'error',
   },
 };
 
 const testingLibraryConfig = {
   ...testingLibrary.configs['flat/react'],
-  files: ['src/**/*.test.{ts,tsx}', 'src/**/*.spec.{ts,tsx}', 'src/**/__tests__/**/*.{ts,tsx}'],
+  files: ['**/*.test.{ts,tsx}', '**/*.spec.{ts,tsx}', '**/__tests__/**/*.{ts,tsx}'],
 };
 
 const testFilesOverrides = {
@@ -278,7 +295,48 @@ const testFilesOverrides = {
     'max-lines': 'off',
   },
 };
-//part 2 will add the rules for the playwright tests.
+
+const prettierOverrides = {
+  rules: {
+    'prettier/prettier': ['error', { endOfLine: 'auto' }],
+  },
+};
+
+const githubScriptsOverrides = {
+  files: ['.github/**/*.{ts,tsx,js,jsx}', 'ci-scripts/**/*.{ts,tsx,js,jsx}'],
+  rules: {
+    ...allSonarjsRulesOff,
+    'i18next/no-literal-string': 'off',
+    'no-console': 'off',
+  },
+};
+
+export const simpleImportSortConfig = {
+  files: ['**/*.{js,jsx,ts,tsx}'],
+  plugins: {
+    'import-x': importX,
+  },
+  rules: {
+    'simple-import-sort/exports': 'error',
+    'simple-import-sort/imports': [
+      'error',
+      {
+        groups: [
+          [
+            '^(assert|buffer|child_process|cluster|console|constants|crypto|dgram|dns|domain|events|fs|http|https|module|net|os|path|punycode|querystring|readline|repl|stream|string_decoder|sys|timers|tls|tty|url|util|vm|zlib|freelist|v8|process|async_hooks|http2|perf_hooks)(/.*|$)',
+          ],
+          ['^react', '^\\w'],
+          ['^(@|config/)(/*|$)'],
+          ['^\\u0000'],
+          ['^\\.\\.(?!/?$)', '^\\.\\/?$'],
+          ['^\\.\\./(?=.*/)(?!/?$)', '^\\.(?!/?$)', '^\\./?$'],
+          ['^.+\\.s?css$'],
+        ],
+      },
+    ],
+  },
+};
+
 export default [
   ignoresConfig,
   baseConfig,
@@ -286,10 +344,10 @@ export default [
   ...tsConfigs,
   reactConfig,
   sonarConfig,
+  simpleImportSortConfig,
+  testingLibraryConfig,
+  testFilesOverrides,
   prettier,
   prettierOverrides,
   githubScriptsOverrides,
-  testingLibraryConfig,
-  testFilesOverrides,
-  simpleImportSortConfig,
 ];

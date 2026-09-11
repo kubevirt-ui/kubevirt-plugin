@@ -81,10 +81,6 @@ const VirtualMachinesList: FC = () => {
           clearAllFilters();
           resetToFirstPage();
         }}
-        onSetFilters={(newFilters) => {
-          onSetFilters(newFilters);
-          resetToFirstPage();
-        }}
         columnLayout={columnLayout}
         data={vms}
         filterDefinitions={filterDefinitions}
@@ -92,6 +88,10 @@ const VirtualMachinesList: FC = () => {
         filters={filters}
         isCompact={listPageBodySize !== ListPageBodySize.Lg}
         onPageChange={onPageChange}
+        onSetFilters={(newFilters) => {
+          onSetFilters(newFilters);
+          resetToFirstPage();
+        }}
         pagination={pagination}
       />
       <VirtualMachineTable

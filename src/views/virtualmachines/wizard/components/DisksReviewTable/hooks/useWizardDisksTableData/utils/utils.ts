@@ -95,34 +95,34 @@ const isEnvironmentDisk = (volume: V1Volume): boolean =>
 
 const getSourceNameByPriority = (device: DiskDevice, t: TFunction): SourceNameByPriority[] => [
   {
-    sourceNamePriority: 1,
     isDeviceElementExists: Boolean(getDataVolumeSourceRef(device?.dataVolumeTemplate)),
     source: () => t('PVC (auto import)'),
+    sourceNamePriority: 1,
   },
   {
-    sourceNamePriority: 2,
     isDeviceElementExists: Boolean(getDataVolumeSourceURL(device?.dataVolumeTemplate)),
     source: () => t('URL'),
+    sourceNamePriority: 2,
   },
   {
-    sourceNamePriority: 3,
     isDeviceElementExists: Boolean(getContainerDisk(device?.volume)),
     source: () => t('Container (Ephemeral)'),
+    sourceNamePriority: 3,
   },
   {
-    sourceNamePriority: 4,
     isDeviceElementExists: Boolean(getPVCClaimName(device?.volume)),
     source: () => getPVCClaimName(device.volume),
+    sourceNamePriority: 4,
   },
   {
-    sourceNamePriority: 5,
     isDeviceElementExists: Boolean(getDataVolumeName(device?.volume)),
     source: () => getDataVolumeName(device.volume),
+    sourceNamePriority: 5,
   },
   {
-    sourceNamePriority: 6,
     isDeviceElementExists: Boolean(getEmptyDisk(device?.volume)) && Boolean(getCDRom(device?.disk)),
     source: () => t('Empty'),
+    sourceNamePriority: 6,
   },
 ];
 
