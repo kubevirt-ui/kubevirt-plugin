@@ -1,8 +1,8 @@
-/* eslint-disable */
-import React from 'react';
+import React, { type FC, type ReactNode } from 'react';
 
 import { modelToGroupVersionKind, ServiceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { IoK8sApiCoreV1Service } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type IoK8sApiCoreV1Service } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import ServicesList from '@kubevirt-utils/components/ServicesList/ServicesList';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { usePods } from '@kubevirt-utils/hooks/usePods';
@@ -14,7 +14,12 @@ import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 import { Icon, Title } from '@patternfly/react-core';
 import { LinkIcon } from '@patternfly/react-icons';
 
-const Services = ({ pathname, vmi }) => {
+type ServicesProps = {
+  pathname: string;
+  vmi: V1VirtualMachineInstance;
+};
+
+const Services: FC<ServicesProps> = ({ pathname, vmi }): ReactNode => {
   const { t } = useKubevirtTranslation();
 
   const [services, loaded, loadError] = useK8sWatchData<IoK8sApiCoreV1Service[]>({

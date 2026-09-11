@@ -1,7 +1,12 @@
 import React, { type FC } from 'react';
 
 import { setCustomizeWizardVMSignal } from '@kubevirt-utils/signals/customizeWizardVMSignal';
-import { type ButtonProps, useWizardContext, WizardFooter } from '@patternfly/react-core';
+import { useWizardContext, WizardFooter } from '@patternfly/react-core';
+import {
+  WIZARD_BACK_BUTTON_PROPS,
+  WIZARD_CANCEL_BUTTON_PROPS,
+  WIZARD_NEXT_BUTTON_PROPS,
+} from '@virtualmachines/wizard/components/constants';
 import useCloseWizard from '@virtualmachines/wizard/hooks/useCloseWizard';
 import useWizardStepValidation from '@virtualmachines/wizard/hooks/useWizardStepValidation';
 import { VMWizardStep } from '@virtualmachines/wizard/utils/constants';
@@ -22,13 +27,11 @@ const ComputeResourcesStepFooter: FC = () => {
   return (
     <WizardFooter
       activeStep={activeStep}
-      backButtonProps={{ 'data-test': 'wizard-back-button' } as Omit<ButtonProps, 'children'>}
-      cancelButtonProps={{ 'data-test': 'wizard-cancel-button' } as Omit<ButtonProps, 'children'>}
+      backButtonProps={WIZARD_BACK_BUTTON_PROPS}
+      cancelButtonProps={WIZARD_CANCEL_BUTTON_PROPS}
       isBackDisabled={activeStep.index === 1}
       isNextDisabled={isNextDisabledForStep(VMWizardStep.COMPUTE_RESOURCES) || !loaded}
-      nextButtonProps={
-        { 'data-test': 'wizard-next-button', isLoading: !loaded } as Omit<ButtonProps, 'children'>
-      }
+      nextButtonProps={{ ...WIZARD_NEXT_BUTTON_PROPS, isLoading: !loaded }}
       onBack={goToPrevStep}
       onClose={closeWizard}
       onNext={handleGoToNextStep}

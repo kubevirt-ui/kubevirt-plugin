@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { useMemo } from 'react';
 
 import { type V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
@@ -13,7 +12,7 @@ type UseTemplatesWithAvailableSource = (args: { clusterOverride?: string; namesp
   availableDataSources: Record<string, V1beta1DataSource>;
   availableTemplatesUID: Set<string>;
   bootSourcesLoaded: boolean;
-  error: any;
+  error: unknown;
   loaded: boolean;
   templates: Template[];
 };

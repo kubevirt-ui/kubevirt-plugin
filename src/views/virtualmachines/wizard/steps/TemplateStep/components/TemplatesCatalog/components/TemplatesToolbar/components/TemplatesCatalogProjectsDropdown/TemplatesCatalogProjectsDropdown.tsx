@@ -1,4 +1,3 @@
-/* eslint-disable */
 import React, { type FC, memo, useMemo } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
 
@@ -33,7 +32,7 @@ export const TemplatesCatalogProjectsDropdown: FC<TemplatesCatalogProjectsDropdo
       () => [
         { children: ALL_PROJECTS, value: ALL_PROJECTS },
         ...[...projects]
-          .sort((a, b) => getName(a).localeCompare(getName(b)))
+          .sort((a, b) => (getName(a) ?? '').localeCompare(getName(b) ?? ''))
           .map((proj) => {
             const name = getName(proj);
             return { children: name, value: name };
@@ -42,7 +41,7 @@ export const TemplatesCatalogProjectsDropdown: FC<TemplatesCatalogProjectsDropdo
       [projects],
     );
 
-    const onSelect = (value: string) => {
+    const onSelect = (value: string): void => {
       onChange(value === ALL_PROJECTS ? '' : value);
     };
 

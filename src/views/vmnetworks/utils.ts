@@ -1,12 +1,25 @@
-/* eslint-disable */
 import {
-  ClusterUserDefinedNetworkKind,
-  ClusterUserDefinedNetworkSpec,
+  type ClusterUserDefinedNetworkKind,
+  type ClusterUserDefinedNetworkSpec,
 } from '@kubevirt-utils/resources/udn/types';
 import { isEmpty, verifyMatchExpressions } from '@kubevirt-utils/utils/utils';
-import { MatchExpression, Operator } from '@openshift-console/dynamic-plugin-sdk';
+import {
+  type K8sResourceCommon,
+  type MatchExpression,
+  Operator,
+} from '@openshift-console/dynamic-plugin-sdk';
 
 import { ProjectMappingOption } from './form/constants';
+
+export const toWatchError = (value: unknown): Error | undefined => {
+  if (value instanceof Error) {
+    return value;
+  }
+  if (value) {
+    return new Error(String(value));
+  }
+  return undefined;
+};
 
 export const isValidProjectMapping = (
   projectMappingOption: ProjectMappingOption,
@@ -34,9 +47,9 @@ export const getVMNetworkProjects = (
   vmNetwork: ClusterUserDefinedNetworkKind,
   projects: K8sResourceCommon[],
 ): K8sResourceCommon[] => {
-  const namespaceSelector = vmNetwork?.spec?.namespaceSelector || {};
+  const namespaceSelector = vmNetwork?.spec?.namespaceSelector ?? {};
 
-  const matchLabelsToExpressions = Object.entries(namespaceSelector.matchLabels || {}).map(
+  const matchLabelsToExpressions = Object.entries(namespaceSelector.matchLabels ?? {}).map(
     ([key, value]): MatchExpression => ({
       key,
       operator: Operator.Equals,
@@ -44,7 +57,7 @@ export const getVMNetworkProjects = (
     }),
   );
 
-  const matchExpressions = namespaceSelector.matchExpressions || [];
+  const matchExpressions = namespaceSelector.matchExpressions ?? [];
 
   const combinedExpressions = [...matchLabelsToExpressions, ...matchExpressions];
 

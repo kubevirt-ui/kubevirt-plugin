@@ -1,13 +1,12 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { getDescription } from '@kubevirt-utils/resources/shared';
 import { customizeWizardVMSignal } from '@kubevirt-utils/signals/customizeWizardVMSignal';
 import { Radio } from '@patternfly/react-core';
 import { Td, Tr } from '@patternfly/react-table';
-import { VMCallbacks } from '@virtualmachines/list/virtualMachinesDefinition';
+import { type VMCallbacks } from '@virtualmachines/list/virtualMachinesDefinition';
 import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
 import { CREATE_VM_FORM_FIELDS_VM_DATA } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
 
@@ -24,7 +23,7 @@ const VirtualMachineRow: FC<VirtualMachineRowProps> = ({ callbacks, columns, vm 
 
   const { isRowSelected, rowId } = getVMConfiguration(vm);
 
-  const handleClick = () => {
+  const handleClick = (): void => {
     setValue(CREATE_VM_FORM_FIELDS_VM_DATA.NAME, getCloneSourceVMName(vm));
     setValue(CREATE_VM_FORM_FIELDS_VM_DATA.DESCRIPTION, getDescription(vm) ?? '');
     customizeWizardVMSignal.value = vm;

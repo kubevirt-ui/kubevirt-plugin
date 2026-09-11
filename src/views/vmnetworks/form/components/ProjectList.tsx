@@ -1,15 +1,17 @@
-/* eslint-disable */
-import React, { FC, useCallback } from 'react';
+import React, { type FC, useCallback } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
 import MultiSelectTypeahead from '@kubevirt-utils/components/MultiSelectTypeahead/MultiSelectTypeahead';
 import { PROJECT_NAME_LABEL_KEY } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName } from '@kubevirt-utils/resources/shared';
-import { K8sResourceCommon, MatchExpression } from '@openshift-console/dynamic-plugin-sdk';
+import {
+  type K8sResourceCommon,
+  type MatchExpression,
+} from '@openshift-console/dynamic-plugin-sdk';
 import { Alert, Skeleton, Stack } from '@patternfly/react-core';
 
-import { VMNetworkForm } from '../constants';
+import { type VMNetworkForm } from '../constants';
 
 import SelectedProjects from './SelectedProjects';
 
@@ -55,7 +57,7 @@ const ProjectList: FC<ProjectListProps> = ({ errorLoadingProjects, loadedProject
             }}
             allResourceNames={projects.map(getName)}
             hasCheckboxes
-            selectedResourceNames={value?.map((expr) => expr.values).flat() || []}
+            selectedResourceNames={value?.map((expr) => expr.values).flat() ?? []}
           />
         )}
         control={control}

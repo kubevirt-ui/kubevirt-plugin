@@ -1,8 +1,13 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
 import { useWizardContext, WizardFooter } from '@patternfly/react-core';
 import useCloseWizard from '@virtualmachines/wizard/hooks/useCloseWizard';
+
+import {
+  WIZARD_BACK_BUTTON_PROPS,
+  WIZARD_CANCEL_BUTTON_PROPS,
+  WIZARD_NEXT_BUTTON_PROPS,
+} from './constants';
 
 type DefaultWizardFooterProps = {
   isNextDisabled?: boolean;
@@ -15,11 +20,11 @@ const DefaultWizardFooter: FC<DefaultWizardFooterProps> = ({ isNextDisabled }) =
   return (
     <WizardFooter
       activeStep={activeStep}
-      backButtonProps={{ 'data-test': 'wizard-back-button' } as any}
-      cancelButtonProps={{ 'data-test': 'wizard-cancel-button' } as any}
+      backButtonProps={WIZARD_BACK_BUTTON_PROPS}
+      cancelButtonProps={WIZARD_CANCEL_BUTTON_PROPS}
       isBackDisabled={activeStep.index === 1}
       isNextDisabled={isNextDisabled}
-      nextButtonProps={{ 'data-test': 'wizard-next-button' } as any}
+      nextButtonProps={WIZARD_NEXT_BUTTON_PROPS}
       onBack={goToPrevStep}
       onClose={closeWizard}
       onNext={goToNextStep}

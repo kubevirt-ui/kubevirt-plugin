@@ -1,7 +1,6 @@
-/* eslint-disable */
 import { useMemo } from 'react';
 
-import { KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
+import { type KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   ClusterUserDefinedNetworkModel,
@@ -10,7 +9,7 @@ import {
 } from '@kubevirt-utils/models';
 
 import { VALID_OTHER_VM_NETWORK_TYPES } from '../constants';
-import { OtherVMNetworkWithType, VMNetworkType } from '../types';
+import { type OtherVMNetworkWithType, VMNetworkType } from '../types';
 import { getVMNetworkTypeLabel } from '../utils';
 
 enum KindFilterIDs {
@@ -34,7 +33,7 @@ const useOtherVMNetworkFilters = (): KubevirtFilter<OtherVMNetworkWithType>[] =>
       {
         categoryLabel: t('Kind'),
         id: 'vm-network-kind',
-        match: (obj, selected) => {
+        match: (obj, selected): boolean => {
           const id = getIDFromKind(obj.kind);
           return Boolean(id && selected.includes(id));
         },

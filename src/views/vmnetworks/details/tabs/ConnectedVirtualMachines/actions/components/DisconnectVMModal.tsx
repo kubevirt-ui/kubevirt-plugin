@@ -1,8 +1,7 @@
-/* eslint-disable */
-import React, { FC, useState } from 'react';
+import React, { type FC, useState } from 'react';
 import { Trans } from 'react-i18next';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { modelToGroupVersionKind, VirtualMachineModel } from '@kubevirt-utils/models';
@@ -36,7 +35,7 @@ const DisconnectVMModal: FC<DisconnectVMModalProps> = ({ closeModal, currentNetw
   const vmsCount = vms.length;
   const isSingleVM = vmsCount === 1;
 
-  const onSubmit = async () => {
+  const onSubmit = async (): Promise<void> => {
     setIsSubmitting(true);
     try {
       await disconnectVMsFromNetwork(vms, currentNetwork);

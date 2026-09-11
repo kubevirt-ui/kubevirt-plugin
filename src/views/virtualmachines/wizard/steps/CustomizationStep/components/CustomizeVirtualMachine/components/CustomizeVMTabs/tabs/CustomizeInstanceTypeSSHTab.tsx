@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React from 'react';
+import React, { type FC } from 'react';
 
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
@@ -12,7 +11,7 @@ import { Grid, GridItem, PageSection, Stack, Title } from '@patternfly/react-cor
 import SSHTabAuthorizedSSHKey from '@virtualmachines/details/tabs/configuration/ssh/components/SSHTabAuthorizedSSHKey';
 import SSHTabSSHAccess from '@virtualmachines/details/tabs/configuration/ssh/components/SSHTabSSHAccess';
 
-const CustomizeInstanceTypeSSHTab = () => {
+const CustomizeInstanceTypeSSHTab: FC = () => {
   const { t } = useKubevirtTranslation();
   const vm = customizeWizardVMSignal.value;
 

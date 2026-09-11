@@ -1,4 +1,3 @@
-/* eslint-disable */
 import React, { type FC } from 'react';
 
 import AddBootableVolumeModal from '@kubevirt-utils/components/AddBootableVolumeModal/AddBootableVolumeModal';
@@ -47,7 +46,7 @@ const AddBootableVolumeLink: FC<AddBootableVolumeLinkProps> = ({
       }}
       variant={ButtonVariant.link}
     >
-      {text || t('Add volume')}
+      {text ?? t('Add volume')}
     </Button>
   );
 };

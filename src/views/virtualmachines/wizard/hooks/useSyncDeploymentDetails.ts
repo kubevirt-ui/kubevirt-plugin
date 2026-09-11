@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { getAnnotation } from '@kubevirt-utils/resources/shared';
 import { DESCRIPTION_ANNOTATION, getFolder } from '@kubevirt-utils/resources/vm';
 import {
@@ -51,7 +50,7 @@ export const useSyncDeploymentDetails: UseSyncDeploymentDetails = () => {
       );
       setValue(
         CREATE_VM_FORM_FIELDS_VM_DATA.FOLDER,
-        getFolder(customizeWizardVMSignal.value) || '',
+        getFolder(customizeWizardVMSignal.value) ?? '',
       );
     }
   };

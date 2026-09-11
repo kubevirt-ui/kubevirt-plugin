@@ -1,10 +1,10 @@
-/* eslint-disable */
-import React, { FC, useMemo, useRef, useState } from 'react';
+import React, { type FC, useMemo, useRef, useState } from 'react';
 
 import useContainerWidth from '@kubevirt-utils/hooks/useContainerWidth';
 import useKubevirtDataViewFilters from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/useKubevirtDataViewFilters';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { paginationInitialState } from '@kubevirt-utils/hooks/usePagination/utils/constants';
+import { type PaginationState } from '@kubevirt-utils/hooks/usePagination/utils/types';
 import { Label } from '@patternfly/react-core';
 import { getListPageBodySize, ListPageBodySize } from '@virtualmachines/list/listPageBodySize';
 
@@ -53,7 +53,7 @@ const VirtualMachinesList: FC = () => {
     setPagination((prevPagination) => getPaginationFirstPageState(prevPagination));
   };
 
-  const onPageChange = ({ endIndex, page, perPage, startIndex }) => {
+  const onPageChange = ({ endIndex, page, perPage, startIndex }: PaginationState): void => {
     setPagination({ endIndex, page, perPage, startIndex });
   };
 

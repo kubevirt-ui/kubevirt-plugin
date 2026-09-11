@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React from 'react';
+import React, { type FC } from 'react';
 
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
@@ -13,7 +12,7 @@ import { DescriptionList, Divider, PageSection, Title } from '@patternfly/react-
 import InitialRunTabCloudinit from '@virtualmachines/details/tabs/configuration/initialrun/components/InitialRunTabCloudinit';
 import InitialRunTabSysprep from '@virtualmachines/details/tabs/configuration/initialrun/components/InitialRunTabSysprep';
 
-const CustomizeInstanceTypeInitialRunTab = () => {
+const CustomizeInstanceTypeInitialRunTab: FC = () => {
   const { t } = useKubevirtTranslation();
   const vm = customizeWizardVMSignal.value;
 

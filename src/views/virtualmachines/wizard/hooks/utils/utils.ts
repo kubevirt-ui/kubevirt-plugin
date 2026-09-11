@@ -1,4 +1,3 @@
-/* eslint-disable */
 import type { TFunction } from 'i18next';
 import produce from 'immer';
 
@@ -108,13 +107,13 @@ export const handleCloneRequestPhaseChange = ({
 
   if (clonePhase === CLONING_STATUSES.SUCCEEDED) {
     logVMCreated(TELEMETRY_VM_CREATION_METHOD.CLONE);
-    navigate(getVMURL(getCluster(cloneRequest) || cluster, targetNamespace, name));
+    navigate(getVMURL(getCluster(cloneRequest) ?? cluster, targetNamespace, name));
     return;
   }
 
   if (isClonePhaseFailed(clonePhase)) {
     const cloneError = new Error(
-      cloneRequest?.status?.conditions?.[0]?.message || t('Clone failed'),
+      cloneRequest?.status?.conditions?.[0]?.message ?? t('Clone failed'),
     );
     setError(cloneError);
     setIsSubmitting(false);

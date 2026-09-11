@@ -1,7 +1,6 @@
-/* eslint-disable */
 import {
-  V1beta1NodeNetworkState,
-  V1NodeNetworkConfigurationPolicySpec,
+  type V1beta1NodeNetworkState,
+  type V1NodeNetworkConfigurationPolicySpec,
 } from '@kubevirt-ui-ext/kubevirt-api/nmstate';
 import { modelToGroupVersionKind, NodeNetworkStateModel } from '@kubevirt-utils/models';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
@@ -11,7 +10,7 @@ import { getBridgeMTU, getBridgeNames } from '../utils/utils';
 const useMaxMTU = (
   localnet: string,
   nncpSpecListForLocalnet: Record<string, V1NodeNetworkConfigurationPolicySpec[]>,
-) => {
+): number => {
   const [nodeNetworkStates] = useK8sWatchResource<V1beta1NodeNetworkState[]>({
     groupVersionKind: modelToGroupVersionKind(NodeNetworkStateModel),
     isList: true,

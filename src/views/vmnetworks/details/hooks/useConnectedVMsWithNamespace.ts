@@ -1,11 +1,12 @@
-/* eslint-disable */
 import { useMemo } from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { VirtualMachineModelGroupVersionKind } from '@kubevirt-utils/models';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 
 import { getMatchingNetworkNamespace } from '../utils';
+
+import { toWatchError } from '../../utils';
 
 type UseConnectedVMsWithNamespace = (
   vmNetworkName: string,
@@ -21,11 +22,14 @@ type UseConnectedVMsWithNamespace = (
  * @returns Tuple of [filtered VMs with network namespace, loaded state, error]
  */
 const useConnectedVMsWithNamespace: UseConnectedVMsWithNamespace = (vmNetworkName) => {
-  const [vms, loaded, error] = useK8sWatchResource<V1VirtualMachine[]>({
+  const watchResult = useK8sWatchResource<V1VirtualMachine[]>({
     groupVersionKind: VirtualMachineModelGroupVersionKind,
     isList: true,
     namespaced: false,
   });
+  const vms = watchResult[0];
+  const loaded = watchResult[1];
+  const error = toWatchError(watchResult[2]);
 
   const vmsWithNamespace = useMemo(
     () =>

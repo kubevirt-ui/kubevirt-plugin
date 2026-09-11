@@ -1,10 +1,12 @@
-/* eslint-disable */
-import { V1beta1PersistentVolumeClaim, V1Disk } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import {
+  type V1beta1PersistentVolumeClaim,
+  type V1Disk,
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 
 export type DiskPresentation = {
   drive: string;
   interface: string;
-  metadata: { [key: string]: any };
+  metadata: { name?: string };
   name: string;
   namespace?: string;
   size?: string;
@@ -25,27 +27,38 @@ export type DiskRaw = V1Disk & { pvc?: V1beta1PersistentVolumeClaim };
 export const diskTypes = {
   cdrom: 'CD-ROM',
   disk: 'Disk',
-  LUN: 'LUN',
+  lun: 'LUN',
 };
 
-const findDrive = (obj: DiskRaw) => {
+const findDrive = (obj: DiskRaw): string => {
   const type = Object.keys(diskTypes).find((driveType: string) =>
     Object.keys(obj).includes(driveType),
   );
-  return type || 'disk';
+  return type ?? 'disk';
+};
+
+const getDriveBus = (device: DiskRaw): string | undefined => {
+  const drive = findDrive(device);
+  if (drive === 'cdrom') {
+    return device.cdrom?.bus;
+  }
+  if (drive === 'lun') {
+    return device.lun?.bus;
+  }
+  return device.disk?.bus;
 };
 
 export const diskStructureCreator = (disks: DiskRaw[]): DiskPresentation[] => {
   return disks?.map((device) => {
     return {
       drive: findDrive(device),
-      interface: device?.[findDrive(device)]?.bus,
+      interface: getDriveBus(device),
       metadata: { name: device?.name },
       name: device?.name,
       namespace: device?.pvc?.metadata?.namespace,
       size: device?.pvc?.spec?.resources?.requests?.storage?.toString(),
-      source: device?.pvc?.metadata?.name || 'Other',
-      storageClass: device?.pvc?.spec?.storageClassName || '-',
+      source: device?.pvc?.metadata?.name ?? 'Other',
+      storageClass: device?.pvc?.spec?.storageClassName ?? '-',
     };
   });
 };

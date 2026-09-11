@@ -1,21 +1,20 @@
-/* eslint-disable */
-import { useCallback } from 'react';
+import React, { useCallback } from 'react';
 
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { VirtualMachineModel } from '@kubevirt-utils/models';
 import { asAccessReview } from '@kubevirt-utils/resources/shared';
-import { useModal } from '@openshift-console/dynamic-plugin-sdk';
-import { type Action } from '@openshift-console/dynamic-plugin-sdk/lib/extensions/actions';
+import { type Action } from '@openshift-console/dynamic-plugin-sdk';
 
-import DisconnectVMModal, {
-  type DisconnectVMModalProps,
-} from '../actions/components/DisconnectVMModal';
-import MoveVMModal, { type MoveVMModalProps } from '../actions/components/MoveVMModal';
+import DisconnectVMModal from '../actions/components/DisconnectVMModal';
+import MoveVMModal from '../actions/components/MoveVMModal';
 
-const useConnectedVMActions = (vmNetworkName: string | undefined) => {
+const useConnectedVMActions = (
+  vmNetworkName: string | undefined,
+): ((vmList: V1VirtualMachine[]) => Action[]) => {
   const { t } = useKubevirtTranslation();
-  const createModal = useModal();
+  const { createModal } = useModal();
 
   const createActions = useCallback(
     (vmList: V1VirtualMachine[]): Action[] => {
@@ -25,21 +24,19 @@ const useConnectedVMActions = (vmNetworkName: string | undefined) => {
       return [
         {
           accessReview,
-          cta: () =>
-            createModal<DisconnectVMModalProps>(DisconnectVMModal, {
-              currentNetwork: vmNetworkName,
-              vms: vmList,
-            }),
+          cta: (): void =>
+            createModal(({ onClose }) => (
+              <DisconnectVMModal closeModal={onClose} currentNetwork={vmNetworkName} vms={vmList} />
+            )),
           id: 'disconnect-vm',
           label: t('Disconnect virtual machine from network'),
         },
         {
           accessReview,
-          cta: () =>
-            createModal<MoveVMModalProps>(MoveVMModal, {
-              currentNetwork: vmNetworkName,
-              vms: vmList,
-            }),
+          cta: (): void =>
+            createModal(({ onClose }) => (
+              <MoveVMModal closeModal={onClose} currentNetwork={vmNetworkName} vms={vmList} />
+            )),
           id: 'move-vm',
           label: t('Move virtual machine to another network'),
         },

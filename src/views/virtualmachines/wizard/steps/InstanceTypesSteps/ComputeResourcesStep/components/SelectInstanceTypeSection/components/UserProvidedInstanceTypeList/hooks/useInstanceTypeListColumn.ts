@@ -1,12 +1,11 @@
-/* eslint-disable */
 import { useCallback, useMemo, useState } from 'react';
 
-import { V1beta1VirtualMachineClusterInstancetype } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1beta1VirtualMachineClusterInstancetype } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { PaginationState } from '@kubevirt-utils/hooks/usePagination/utils/types';
+import { type PaginationState } from '@kubevirt-utils/hooks/usePagination/utils/types';
 import { columnSorting } from '@kubevirt-utils/utils/utils';
-import { TableColumn } from '@openshift-console/dynamic-plugin-sdk';
-import { ThSortType } from '@patternfly/react-table/dist/esm/components/Table/base/types';
+import { type TableColumn } from '@openshift-console/dynamic-plugin-sdk';
+import { type ThSortType } from '@patternfly/react-table/dist/esm/components/Table/base/types';
 
 type UseInstanceTypeListColumnsValues = {
   columns: TableColumn<V1beta1VirtualMachineClusterInstancetype>[];
@@ -49,7 +48,7 @@ const useInstanceTypeListColumns: UseInstanceTypeListColumns = (data, pagination
   const getSortType = useCallback(
     (columnIndex: number): ThSortType => ({
       columnIndex,
-      onSort: (_event, index, direction) => {
+      onSort: (_event, index, direction): void => {
         setActiveSortIndex(index);
         setActiveSortDirection(direction);
       },

@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 
@@ -62,7 +61,7 @@ const useCloneVM: UseCloneVM = () => {
     });
   }, [cloneRequest, getValues, navigate, submittedCloneRequest, t]);
 
-  const cloneVM = async () => {
+  const cloneVM = async (): Promise<void> => {
     if (isSubmitting || submittedCloneRequest) {
       return;
     }

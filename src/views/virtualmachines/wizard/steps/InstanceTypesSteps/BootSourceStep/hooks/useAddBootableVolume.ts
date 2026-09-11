@@ -1,9 +1,8 @@
-/* eslint-disable */
 import { useWatch } from 'react-hook-form';
 
-import { PreferenceOption } from '@kubevirt-utils/components/AddBootableVolumeModal/types';
+import { type PreferenceOption } from '@kubevirt-utils/components/AddBootableVolumeModal/types';
 import useCanCreateBootableVolume from '@kubevirt-utils/resources/bootableresources/hooks/useCanCreateBootableVolume';
-import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
+import { type BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { addWizardBootableVolumeUploadKey } from '@kubevirt-utils/signals/wizardBootableVolumeKeysSignal';
 import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
 import { CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
@@ -30,7 +29,7 @@ const useAddBootableVolume = (): AddBootableVolume => {
   const { canCreateDS, canCreatePVC } = useCanCreateBootableVolume(volumeListNamespace);
   const canCreate = canCreateDS || canCreatePVC;
 
-  const onCreateVolume = (volume: BootableVolume) =>
+  const onCreateVolume = (volume: BootableVolume): void => {
     applySelectedBootableVolumeToForm({
       dvSource: null,
       getValues,
@@ -39,8 +38,9 @@ const useAddBootableVolume = (): AddBootableVolume => {
       setValue,
       volumeSnapshotSource: null,
     });
+  };
 
-  const onUploadStart = (uploadKey: string) => addWizardBootableVolumeUploadKey(uploadKey);
+  const onUploadStart = (uploadKey: string): void => addWizardBootableVolumeUploadKey(uploadKey);
 
   return {
     canCreate,

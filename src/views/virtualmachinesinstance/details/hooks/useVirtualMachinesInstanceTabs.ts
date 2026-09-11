@@ -1,4 +1,5 @@
-/* eslint-disable */
+import { type ComponentType } from 'react';
+
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
 import VirtualMachinesInstancePageConsoleTab from '../tabs/console/VirtualMachinesInstancePageConsoleTab';
@@ -9,7 +10,13 @@ import VirtualMachinesInstancePageNetworkTab from '../tabs/network/VirtualMachin
 import VirtualMachinesInstancePageSchedulingTab from '../tabs/scheduling/VirtualMachinesInstancePageSchedulingTab';
 import VirtualMachinesInstancePageYAMLTab from '../tabs/yaml/VirtualMachinesInstancePageYAMLTab';
 
-const useVirtualMachinesInstanceTabs = () => {
+type VirtualMachineInstanceTab = {
+  component: ComponentType;
+  href: string;
+  name: string;
+};
+
+const useVirtualMachinesInstanceTabs = (): VirtualMachineInstanceTab[] => {
   const { t } = useKubevirtTranslation();
 
   const tabs = [

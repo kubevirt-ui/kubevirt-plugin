@@ -1,3 +1,5 @@
+import { type ComponentClass, type FC } from 'react';
+
 import { GreenRunningIcon } from '@kubevirt-utils/icons/GreenRunningIcon';
 import {
   ExclamationCircleIcon,
@@ -38,6 +40,11 @@ const iconHandler = {
     const icon = mapper[prop?.toLowerCase() as keyof typeof iconMapper];
     return icon ?? InProgressIcon;
   },
+};
+
+export const getVMIPhaseIcon = (phase: string | undefined): ComponentClass | FC => {
+  const iconComponent = iconMapper[phase?.toLowerCase() as keyof typeof iconMapper];
+  return iconComponent ?? InProgressIcon;
 };
 
 export const icon = new Proxy(iconMapper, iconHandler);

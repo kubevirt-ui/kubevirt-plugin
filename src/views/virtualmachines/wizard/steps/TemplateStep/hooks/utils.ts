@@ -1,7 +1,6 @@
-/* eslint-disable */
 import { produce } from 'immer';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { DYNAMIC_CREDENTIALS_SUPPORT } from '@kubevirt-utils/components/DynamicSSHKeyInjection/constants/constants';
 import { addSecretToVM } from '@kubevirt-utils/components/SSHSecretModal/utils/utils';
 import { getLabel, getName } from '@kubevirt-utils/resources/shared';
@@ -10,7 +9,7 @@ import {
   isVirtualMachineTemplate,
   LABEL_USED_TEMPLATE_NAME,
   LABEL_USED_TEMPLATE_NAMESPACE,
-  Template,
+  type Template,
 } from '@kubevirt-utils/resources/template';
 import { processOpenShiftTemplate } from '@kubevirt-utils/resources/template/utils/processOpenShiftTemplate';
 import { processVirtualMachineTemplate } from '@kubevirt-utils/resources/template/utils/processVirtualMachineTemplate';
@@ -54,7 +53,7 @@ export const resolveVMFromTemplate = async (
 export const applyCertConfigMapToCDRom = (
   vmObject: V1VirtualMachine,
   certConfigMapName: string | undefined,
-) => {
+): void => {
   if (!certConfigMapName) return;
 
   const cdromDVTemplate = vmObject.spec?.dataVolumeTemplates?.find(
@@ -82,7 +81,7 @@ export const getVMObjectFromTemplate = ({
   sshSecretName?: string;
   vm: V1VirtualMachine;
   vmName?: string;
-}) => {
+}): V1VirtualMachine => {
   const generatedVM = produce(vm, (draftVM) => {
     ensurePath(draftVM, 'metadata.labels');
     ensurePath(draftVM, 'metadata.annotations');
@@ -98,7 +97,7 @@ export const getVMObjectFromTemplate = ({
       draftVM.metadata.labels[VM_FOLDER_LABEL] = folder;
     }
 
-    draftVM.metadata.name = vmName || getName(draftVM) || draftVM.metadata.labels?.app;
+    draftVM.metadata.name = vmName ?? getName(draftVM) ?? draftVM.metadata.labels?.app;
     draftVM.metadata.namespace = namespace;
     draftVM.spec.runStrategy = getDefaultRunningStrategy();
   });

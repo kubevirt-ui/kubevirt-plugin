@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { useEffect, useState } from 'react';
 import { useWatch } from 'react-hook-form';
 
@@ -27,7 +26,7 @@ const useVMTemplateGeneratedParams = (
     name: [CREATE_VM_FORM_FIELDS_VM_DATA.CLUSTER, CREATE_VM_FORM_FIELDS_VM_DATA.PROJECT],
   });
   const [error, setError] = useState<Error>();
-  const namespace = namespaceOverride || project || DEFAULT_NAMESPACE;
+  const namespace = [namespaceOverride, project].find((ns) => ns) ?? DEFAULT_NAMESPACE;
   const [templateWithGeneratedValues, setTemplateWithGeneratedValues] = useState<Template>();
   const [loading, setLoading] = useState<boolean>(false);
 

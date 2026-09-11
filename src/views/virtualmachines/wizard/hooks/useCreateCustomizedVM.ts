@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { useState } from 'react';
 import { useWatch } from 'react-hook-form';
 import { useLocation, useNavigate } from 'react-router';
@@ -17,13 +16,13 @@ import { useSignals } from '@preact/signals-react/runtime';
 
 import { useVMWizard } from '../state/vm-wizard-context/VMWizardContext';
 import { CREATE_VM_FORM_FIELDS_VM_DATA } from '../state/vm-wizard-form/consts';
+import { SELECTED_CLUSTER } from '../utils/constants';
 import {
   createHeadlessServiceSafely,
   logFailedVMCreation,
   logSuccessfulVMCreation,
   prepareVMToCreate,
 } from './utils/utils';
-import { SELECTED_CLUSTER } from '../utils/constants';
 
 type UseCreateCustomizedVM = () => {
   createCustomizedVM: () => Promise<void>;
@@ -48,7 +47,7 @@ const useCreateCustomizedVM: UseCreateCustomizedVM = () => {
     SELECTED_CLUSTER.LOCAL_STORAGE_KEY,
   );
 
-  const createCustomizedVM = async () => {
+  const createCustomizedVM = async (): Promise<void> => {
     const {
       creationMethod,
       name: vmName,

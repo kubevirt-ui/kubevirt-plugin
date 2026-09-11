@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { useMemo } from 'react';
 
 import useIsVMTemplateFeatureEnabled from '@kubevirt-utils/hooks/useVMTemplateFeatureFlag/useIsVMTemplateFeatureEnabled';
@@ -11,7 +10,7 @@ type UseTemplates = (
   clusterOverride?: string,
 ) => {
   allTemplates: Template[];
-  error: any;
+  error: unknown;
   loaded: boolean;
 };
 
@@ -23,13 +22,21 @@ const useTemplates: UseTemplates = (namespace, clusterOverride) => {
     error: templatesError,
     loaded: templatesLoaded,
     templates,
-  } = useOpenShiftTemplates({ clusterOverride, namespace });
+  } = useOpenShiftTemplates({ clusterOverride, namespace }) as {
+    error: unknown;
+    loaded: boolean;
+    templates: Template[];
+  };
 
   const {
     error: vmtError,
     loaded: vmtLoaded,
     vmTemplates,
-  } = useVirtualMachineTemplates(namespace, vmTemplatesEnabled, clusterOverride);
+  } = useVirtualMachineTemplates(namespace, vmTemplatesEnabled, clusterOverride) as {
+    error: unknown;
+    loaded: boolean;
+    vmTemplates: Template[];
+  };
 
   const allTemplates = useMemo(
     () => (vmTemplatesEnabled ? [...vmTemplates, ...templates] : templates),
@@ -38,7 +45,7 @@ const useTemplates: UseTemplates = (namespace, clusterOverride) => {
 
   return {
     allTemplates,
-    error: vmTemplatesEnabled ? templatesError || vmtError : templatesError,
+    error: vmTemplatesEnabled ? (templatesError ?? vmtError) : templatesError,
     loaded:
       !vmTemplatesFeatureLoading &&
       (vmTemplatesEnabled ? templatesLoaded && vmtLoaded : templatesLoaded),

@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { useEffect, useState } from 'react';
+import React, { type FC, useEffect, useState } from 'react';
 
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
@@ -12,16 +11,15 @@ import { getPreferredBootmode } from '@kubevirt-utils/resources/preference/helpe
 import { asAccessReview } from '@kubevirt-utils/resources/shared';
 import { getDevices } from '@kubevirt-utils/resources/vm';
 import { customizeWizardVMSignal } from '@kubevirt-utils/signals/customizeWizardVMSignal';
-import { K8sVerb, useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
+import { type K8sVerb, useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
 import { Grid } from '@patternfly/react-core';
 import { isDeletionProtectionEnabled } from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/utils/utils';
 
 import usePreference from '../hooks/usePreference';
-
 import DetailsLeftColumn from './components/DetailsLeftColumn';
 import DetailsRightColumn from './components/DetailsRightColumn';
 
-const CustomizeInstanceTypeDetailsTab = () => {
+const CustomizeInstanceTypeDetailsTab: FC = () => {
   const vm = customizeWizardVMSignal.value;
 
   const [preference, preferenceLoading] = usePreference(vm);

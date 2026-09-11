@@ -1,5 +1,4 @@
-/* eslint-disable */
-import { useEffect, useRef, useState } from 'react';
+import { type ChangeEvent, useEffect, useRef, useState } from 'react';
 
 import {
   dismissOnboardingPopoverByWelcomeModalSignal,
@@ -7,7 +6,7 @@ import {
 } from '@kubevirt-utils/components/GuidedTour/utils/guidedTourSignals';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
 import { USER_SETTINGS_KEYS } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/const';
-import { QuickStartUserSettings } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/userSettingsInitialState';
+import { type QuickStartUserSettings } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/userSettingsInitialState';
 import { useSignals } from '@preact/signals-react/runtime';
 
 type UseWelcomeModalReturn = {
@@ -37,13 +36,13 @@ const useWelcomeModal = (): UseWelcomeModalReturn => {
     setIsOpen(shouldOpenModal);
   }, [loaded, quickStarts?.dontShowWelcomeModal]);
 
-  const onClose = () => {
+  const onClose = (): void => {
     setIsOpen(false);
     dismissOnboardingPopoverByWelcomeModalSignal.value = Boolean(quickStarts?.dontShowWelcomeModal);
   };
 
-  const onDontShowAgainCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setQuickStarts({
+  const onDontShowAgainCheckboxChange = (event: ChangeEvent<HTMLInputElement>): void => {
+    void setQuickStarts({
       ...quickStarts,
       dontShowWelcomeModal: event.target.checked,
     });

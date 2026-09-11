@@ -14,7 +14,7 @@ export const exposedModules: ConsolePluginBuildMetadata['exposedModules'] = {
   Navigator: './views/virtualmachines/navigator/VirtualMachineNavigator.tsx',
   NodeInventoryItem: './views/virtualmachines/node/inventoryitem/NodeInventoryItem.tsx',
   NodeVirtualMachineList: './views/virtualmachines/node/list/NodeVirtualMachinesList.tsx',
-  useServiceActionsProvider: './utils/components/ServicesList/useServiceActionsProvider.ts',
+  useServiceActionsProvider: './utils/components/ServicesList/useServiceActionsProvider.tsx',
 };
 
 export const extensions: EncodedExtension[] = [

@@ -1,7 +1,11 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
-import { type ButtonProps, useWizardContext, WizardFooter } from '@patternfly/react-core';
+import { useWizardContext, WizardFooter } from '@patternfly/react-core';
+import {
+  WIZARD_BACK_BUTTON_PROPS,
+  WIZARD_CANCEL_BUTTON_PROPS,
+  WIZARD_NEXT_BUTTON_PROPS,
+} from '@virtualmachines/wizard/components/constants';
 import useCloseWizard from '@virtualmachines/wizard/hooks/useCloseWizard';
 import useWizardStepValidation from '@virtualmachines/wizard/hooks/useWizardStepValidation';
 import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
@@ -21,27 +25,17 @@ const TemplateStepFooter: FC = () => {
     if (!success) return;
 
     setValue(CREATE_VM_FORM_FIELDS_UI_STATE.IS_TEMPLATES_DRAWER_OPEN, false);
-    goToNextStep();
+    void goToNextStep();
   };
 
   return (
     <WizardFooter
       activeStep={activeStep}
-      backButtonProps={{ 'data-test': 'wizard-back-button' } as Omit<ButtonProps, 'children'>}
-      cancelButtonProps={
-        {
-          'data-test': 'wizard-cancel-button',
-          isDisabled: isProcessing,
-        } as Omit<ButtonProps, 'children'>
-      }
+      backButtonProps={WIZARD_BACK_BUTTON_PROPS}
+      cancelButtonProps={{ ...WIZARD_CANCEL_BUTTON_PROPS, isDisabled: isProcessing }}
       isBackDisabled={activeStep.index === 1 || isProcessing}
       isNextDisabled={isNextDisabledForStep(VMWizardStep.TEMPLATE) || isProcessing}
-      nextButtonProps={
-        {
-          'data-test': 'wizard-next-button',
-          isLoading: isProcessing,
-        } as Omit<ButtonProps, 'children'>
-      }
+      nextButtonProps={{ ...WIZARD_NEXT_BUTTON_PROPS, isLoading: isProcessing }}
       onBack={goToPrevStep}
       onClose={closeWizard}
       onNext={handleGoToNextStep}
