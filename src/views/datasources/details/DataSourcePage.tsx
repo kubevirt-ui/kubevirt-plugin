@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 
 import type { V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import Loading from '@kubevirt-utils/components/Loading/Loading';

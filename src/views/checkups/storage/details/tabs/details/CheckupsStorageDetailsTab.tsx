@@ -1,4 +1,4 @@
-import React, { type FC, type JSX } from 'react';
+import { type FC, type JSX } from 'react';
 import { useParams } from 'react-router';
 
 import { getName } from '@kubevirt-utils/resources/shared';

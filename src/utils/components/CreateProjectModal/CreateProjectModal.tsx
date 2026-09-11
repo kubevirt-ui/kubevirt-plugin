@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Trans } from 'react-i18next';
 
 import { ProjectRequestModel } from '@kubevirt-ui-ext/kubevirt-api/console';

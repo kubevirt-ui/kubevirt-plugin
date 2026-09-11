@@ -1,4 +1,4 @@
-import React, { type FC, useMemo } from 'react';
+import { type FC, useMemo } from 'react';
 import { useNavigate } from 'react-router';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';

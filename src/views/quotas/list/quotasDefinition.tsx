@@ -1,4 +1,3 @@
-import React from 'react';
 import type { TFunction } from 'i18next';
 
 import { getK8sRowId } from '@kubevirt-utils/components/KubevirtTable/utils';

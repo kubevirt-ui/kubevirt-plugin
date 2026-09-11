@@ -1,5 +1,5 @@
 import type { FC, ReactNode } from 'react';
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 import { AngleDownIcon, AngleRightIcon } from '@patternfly/react-icons';
 

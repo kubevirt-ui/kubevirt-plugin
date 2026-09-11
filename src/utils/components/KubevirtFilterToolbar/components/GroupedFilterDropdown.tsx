@@ -1,4 +1,4 @@
-import React, { type FC, type ReactNode } from 'react';
+import { type FC, type ReactNode } from 'react';
 
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import {

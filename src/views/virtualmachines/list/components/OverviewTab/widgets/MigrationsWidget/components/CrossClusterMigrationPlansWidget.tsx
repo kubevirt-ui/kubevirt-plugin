@@ -1,4 +1,4 @@
-import React, { type FC, useMemo } from 'react';
+import { type FC, useMemo } from 'react';
 
 import { type V1beta1Plan } from '@forklift-ui/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';

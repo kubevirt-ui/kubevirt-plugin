@@ -1,4 +1,4 @@
-import React, { type FC, Suspense } from 'react';
+import { type FC, Suspense } from 'react';
 
 import { type V1alpha1MigrationPolicy } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import Loading from '@kubevirt-utils/components/Loading/Loading';

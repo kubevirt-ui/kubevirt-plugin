@@ -1,4 +1,4 @@
-import React, { type FC, useMemo } from 'react';
+import { type FC, useMemo } from 'react';
 import { VirtualMachineModel } from 'src/views/dashboard-extensions/utils';
 
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';

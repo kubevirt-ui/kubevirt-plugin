@@ -1,4 +1,4 @@
-import React, { createElement, type FC } from 'react';
+import { createElement, type FC } from 'react';
 import classNames from 'classnames';
 
 import { Card, Tab, Tabs, TabTitleText } from '@patternfly/react-core';

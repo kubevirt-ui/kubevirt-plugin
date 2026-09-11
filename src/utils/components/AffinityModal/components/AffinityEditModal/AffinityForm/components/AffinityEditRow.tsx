@@ -1,4 +1,4 @@
-import React, { type FC, type MouseEvent } from 'react';
+import { type FC, type MouseEvent } from 'react';
 
 import { LabelsEditor } from '@kubevirt-utils/components/LabelsEditor/LabelsEditor';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';

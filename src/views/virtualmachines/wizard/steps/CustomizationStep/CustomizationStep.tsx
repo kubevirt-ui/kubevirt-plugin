@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useWatch } from 'react-hook-form';
 import produce from 'immer';
 

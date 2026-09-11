@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useImmer } from 'use-immer';
 
 import type { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';

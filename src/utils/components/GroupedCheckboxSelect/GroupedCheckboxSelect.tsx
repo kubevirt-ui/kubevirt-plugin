@@ -1,4 +1,4 @@
-import React, { type FC, Fragment, type ReactNode, useMemo, useState } from 'react';
+import { type FC, Fragment, type ReactNode, useMemo, useState } from 'react';
 
 import ToolbarFilterMultiChip from '@kubevirt-utils/components/KubevirtFilterToolbar/components/ToolbarFilter/ToolbarFilterMultiChip';
 import useItemCounts from '@kubevirt-utils/components/KubevirtFilterToolbar/hooks/useItemCounts';

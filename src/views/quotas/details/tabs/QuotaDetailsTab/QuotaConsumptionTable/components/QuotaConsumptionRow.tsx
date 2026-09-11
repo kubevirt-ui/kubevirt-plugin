@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 import { getCountText } from 'src/views/quotas/details/utils';
 import {
   getQuotaNumbers,

@@ -1,4 +1,4 @@
-import React, { type FC } from 'react';
+import { type FC } from 'react';
 
 import { getName } from '@kubevirt-utils/resources/shared';
 import { getTemplateName } from '@kubevirt-utils/resources/template/utils/selectors';

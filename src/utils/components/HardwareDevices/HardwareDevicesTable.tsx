@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 
 import type { V1GPU, V1HostDevice } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';

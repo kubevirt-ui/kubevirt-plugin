@@ -1,5 +1,5 @@
 /* eslint-disable */
-import React, { FC } from 'react';
+import { FC } from 'react';
 
 import { EventModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';

@@ -1,4 +1,4 @@
-import React, { type FC, useMemo, useState } from 'react';
+import { type FC, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 
 import { MigrationPolicyModel } from '@kubevirt-ui-ext/kubevirt-api/console';

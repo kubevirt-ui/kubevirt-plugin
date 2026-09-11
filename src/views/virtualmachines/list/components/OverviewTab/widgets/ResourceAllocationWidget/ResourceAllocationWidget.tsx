@@ -1,4 +1,4 @@
-import React, { type FC, type ReactNode, useMemo } from 'react';
+import { type FC, type ReactNode, useMemo } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { convertBinaryUnit } from '@kubevirt-utils/utils/units';

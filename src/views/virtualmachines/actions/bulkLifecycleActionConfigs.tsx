@@ -1,4 +1,3 @@
-import React from 'react';
 import { type TFunction } from 'i18next';
 
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';

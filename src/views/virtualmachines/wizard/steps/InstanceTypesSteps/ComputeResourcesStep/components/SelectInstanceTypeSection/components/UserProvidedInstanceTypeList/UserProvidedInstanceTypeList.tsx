@@ -1,4 +1,4 @@
-import React, { type FC, useMemo, useState } from 'react';
+import { type FC, useMemo, useState } from 'react';
 import { useWatch } from 'react-hook-form';
 
 import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';

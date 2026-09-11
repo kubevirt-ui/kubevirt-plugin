@@ -1,4 +1,4 @@
-import React, { type FC } from 'react';
+import { type FC } from 'react';
 import { Link } from 'react-router';
 
 import { ALL_NAMESPACES } from '@kubevirt-utils/hooks/constants';

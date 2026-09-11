@@ -1,4 +1,4 @@
-import React, { type FC, type FormEvent } from 'react';
+import { type FC, type FormEvent } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Flex, Radio } from '@patternfly/react-core';

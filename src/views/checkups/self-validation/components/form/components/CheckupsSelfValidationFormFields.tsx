@@ -1,7 +1,7 @@
 // Extracted from CheckupsSelfValidationForm.tsx
 // Root: src/views/checkups/self-validation/components/form/CheckupsSelfValidationForm.tsx
 
-import React, { type FC } from 'react';
+import { type FC } from 'react';
 import CheckupImageField from 'src/views/checkups/components/CheckupImageField';
 
 import CheckboxSelect from '@kubevirt-utils/components/CheckboxSelect/CheckboxSelect';

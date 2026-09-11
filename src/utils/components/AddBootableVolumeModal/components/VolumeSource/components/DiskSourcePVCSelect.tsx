@@ -1,4 +1,4 @@
-import React, { type FC, useCallback, useMemo } from 'react';
+import { type FC, useCallback, useMemo } from 'react';
 
 import useProjects from '@kubevirt-utils/hooks/useProjects';
 import usePVCs from '@kubevirt-utils/hooks/usePVCs';

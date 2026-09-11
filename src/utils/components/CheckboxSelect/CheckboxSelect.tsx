@@ -1,4 +1,4 @@
-import React, { type FC, type ReactNode, useState } from 'react';
+import { type FC, type ReactNode, useState } from 'react';
 
 import ToolbarFilterToggle from '@kubevirt-utils/components/toggles/ToolbarFilterToggle';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';

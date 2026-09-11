@@ -1,4 +1,4 @@
-import React, { type ChangeEvent, type Dispatch, type FC, type SetStateAction } from 'react';
+import { type ChangeEvent, type Dispatch, type FC, type SetStateAction } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { NumberInput } from '@patternfly/react-core';

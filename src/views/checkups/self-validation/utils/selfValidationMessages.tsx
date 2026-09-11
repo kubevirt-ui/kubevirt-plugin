@@ -1,4 +1,4 @@
-import React, { type ReactElement } from 'react';
+import { type ReactElement } from 'react';
 import { Link } from 'react-router';
 import { type TFunction } from 'i18next';
 import { extractConfigMapName } from 'src/views/checkups/utils/utils';

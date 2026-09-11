@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import { useCallback } from 'react';
 import { type TFunction } from 'i18next';
 
 import { toTemplateCategoryLabelValue } from '@kubevirt-utils/resources/template/utils/getTemplateCategoryLabel';

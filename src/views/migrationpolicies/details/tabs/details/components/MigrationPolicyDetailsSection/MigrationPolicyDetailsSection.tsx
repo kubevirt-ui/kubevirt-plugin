@@ -1,4 +1,4 @@
-import React, { type JSX } from 'react';
+import { type JSX } from 'react';
 import { Trans } from 'react-i18next';
 
 import { MigrationPolicyModel } from '@kubevirt-ui-ext/kubevirt-api/console';

@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 import { useWatch } from 'react-hook-form';
 
 import type { RedHatInstanceTypeMetadata } from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/InstanceTypeDrilldownSelect/utils/types';

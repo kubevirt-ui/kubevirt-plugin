@@ -1,4 +1,4 @@
-import React, { type FC } from 'react';
+import { type FC } from 'react';
 
 import { VirtualMachineTemplateModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { type V1beta1VirtualMachineTemplate } from '@kubevirt-ui-ext/kubevirt-api/virt-template';

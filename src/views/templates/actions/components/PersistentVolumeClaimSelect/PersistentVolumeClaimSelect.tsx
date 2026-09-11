@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import React, { useCallback } from 'react';
+import { useCallback } from 'react';
 
 import useProjects from '@kubevirt-utils/hooks/useProjects';
 import usePVCs from '@kubevirt-utils/hooks/usePVCs';

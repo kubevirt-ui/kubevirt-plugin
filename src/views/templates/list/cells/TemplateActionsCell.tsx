@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 
 import type { TemplateOrRequest } from '@kubevirt-utils/resources/template';
 import {

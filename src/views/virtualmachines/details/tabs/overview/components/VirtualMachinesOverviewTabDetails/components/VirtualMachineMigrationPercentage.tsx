@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 
 import type { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import useMigrationPercentage from '@kubevirt-utils/resources/vm/hooks/useMigrationPercentage';

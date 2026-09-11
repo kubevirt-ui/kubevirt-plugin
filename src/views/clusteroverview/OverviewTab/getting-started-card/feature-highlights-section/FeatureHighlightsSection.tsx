@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 
 import { documentationURL, PLUGIN_VERSION } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';

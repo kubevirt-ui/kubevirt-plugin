@@ -1,4 +1,4 @@
-import React, { type FC, useState } from 'react';
+import { type FC, useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { isDataImportCronAutoUpdated } from 'src/views/datasources/utils';
 

@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 
 import type { KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 

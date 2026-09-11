@@ -1,4 +1,4 @@
-import React, { type FC, memo, useState } from 'react';
+import { type FC, memo, useState } from 'react';
 import { ANNOTATIONS } from 'src/views/templates/utils/constants';
 
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';

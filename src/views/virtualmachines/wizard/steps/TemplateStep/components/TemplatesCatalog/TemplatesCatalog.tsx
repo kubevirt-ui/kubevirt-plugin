@@ -1,4 +1,4 @@
-import React, { type FC, useCallback } from 'react';
+import { type FC, useCallback } from 'react';
 import { useWatch } from 'react-hook-form';
 
 import TemplatesFilter from '@kubevirt-utils/components/TemplatesFilter/TemplatesFilter';

@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 
 import type { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';

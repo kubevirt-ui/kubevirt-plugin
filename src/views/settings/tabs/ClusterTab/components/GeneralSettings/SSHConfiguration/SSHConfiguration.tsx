@@ -1,4 +1,4 @@
-import React, { type FC, useCallback, useEffect, useState } from 'react';
+import { type FC, useCallback, useEffect, useState } from 'react';
 import { useDebounceCallback } from 'src/views/clusteroverview/utils/hooks/useDebounceCallback';
 
 import { ConfigMapModel } from '@kubevirt-ui-ext/kubevirt-api/console';

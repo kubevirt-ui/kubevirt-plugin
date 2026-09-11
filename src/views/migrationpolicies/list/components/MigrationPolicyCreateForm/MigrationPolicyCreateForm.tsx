@@ -1,4 +1,4 @@
-import React, { type FC, type JSX, useMemo, useState } from 'react';
+import { type FC, type JSX, useMemo, useState } from 'react';
 
 import ClusterProjectDropdown from '@kubevirt-utils/components/ClusterProjectDropdown/ClusterProjectDropdown';
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';

@@ -1,4 +1,4 @@
-import React, { type FC, useCallback, useMemo, useState } from 'react';
+import { type FC, useCallback, useMemo, useState } from 'react';
 import { Link } from 'react-router';
 
 import { type AutoAppliedLabel } from '@kubevirt-utils/hooks/useAutoAppliedLabels/types';

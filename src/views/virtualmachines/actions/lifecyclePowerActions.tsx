@@ -1,7 +1,6 @@
 // Extracted from VirtualMachineActionFactory.tsx
 // Root: src/views/virtualmachines/actions/VirtualMachineActionFactory.tsx
 
-import React from 'react';
 import { type TFunction } from 'i18next';
 
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';

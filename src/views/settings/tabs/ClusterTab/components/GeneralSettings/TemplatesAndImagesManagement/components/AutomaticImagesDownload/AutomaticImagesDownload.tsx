@@ -1,4 +1,4 @@
-import React, { type FC, useCallback, useState } from 'react';
+import { type FC, useCallback, useState } from 'react';
 
 import { HyperConvergedV1Beta1Model as HyperConvergedModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import SectionWithSwitch from '@kubevirt-utils/components/SectionWithSwitch/SectionWithSwitch';

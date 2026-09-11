@@ -1,4 +1,4 @@
-import React, { type FC } from 'react';
+import { type FC } from 'react';
 import { Trans } from 'react-i18next';
 import { type Updater } from 'use-immer';
 

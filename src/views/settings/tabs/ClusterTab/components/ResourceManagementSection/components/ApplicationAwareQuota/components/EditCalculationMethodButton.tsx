@@ -1,4 +1,4 @@
-import React, { type FC } from 'react';
+import { type FC } from 'react';
 
 import EditButton from '@kubevirt-utils/components/EditButton/EditButton';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';

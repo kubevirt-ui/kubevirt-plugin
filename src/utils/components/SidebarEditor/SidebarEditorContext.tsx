@@ -1,5 +1,5 @@
 import type { FC, ReactNode } from 'react';
-import React, { createContext, useState } from 'react';
+import { createContext, useState } from 'react';
 
 import type { ResourceTypeTelemetry } from '@kubevirt-utils/extensions/telemetry/utils/types';
 

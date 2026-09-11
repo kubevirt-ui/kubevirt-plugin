@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import React, { Suspense } from 'react';
+import { Suspense } from 'react';
 
 import type { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import Loading from '@kubevirt-utils/components/Loading/Loading';

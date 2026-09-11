@@ -1,4 +1,4 @@
-import React, { type Dispatch, type FC, type SetStateAction, useCallback } from 'react';
+import { type Dispatch, type FC, type SetStateAction, useCallback } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Radio, Split, SplitItem } from '@patternfly/react-core';

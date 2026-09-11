@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 
 import { VirtualMachineModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';

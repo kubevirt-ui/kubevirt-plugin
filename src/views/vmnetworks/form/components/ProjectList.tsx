@@ -1,4 +1,4 @@
-import React, { type FC, useCallback } from 'react';
+import { type FC, useCallback } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
 import MultiSelectTypeahead from '@kubevirt-utils/components/MultiSelectTypeahead/MultiSelectTypeahead';

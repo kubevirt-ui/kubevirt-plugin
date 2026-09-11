@@ -1,4 +1,4 @@
-import React, {
+import {
   type ChangeEvent,
   type FC,
   type InputHTMLAttributes,

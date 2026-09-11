@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 
 import { DataSourceModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { DataImportCronModel } from '@kubevirt-ui-ext/kubevirt-api/console';

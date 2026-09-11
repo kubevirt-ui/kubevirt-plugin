@@ -1,4 +1,4 @@
-import React, { type JSX, type ReactNode, type Ref } from 'react';
+import { type JSX, type ReactNode, type Ref } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';

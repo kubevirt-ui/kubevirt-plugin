@@ -1,8 +1,6 @@
 // Extracted from VirtualMachineActionFactory.tsx
 // Root: src/views/virtualmachines/actions/VirtualMachineActionFactory.tsx
 
-import React from 'react';
-
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { LabelsModal } from '@kubevirt-utils/components/LabelsModal/LabelsModal';

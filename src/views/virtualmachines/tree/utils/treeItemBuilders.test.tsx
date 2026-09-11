@@ -1,5 +1,4 @@
-import type React from 'react';
-import { isValidElement } from 'react';
+import { isValidElement, type ReactElement } from 'react';
 
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 
@@ -22,7 +21,7 @@ const getItemIconType = (vm: V1VirtualMachine) => {
 
   expect(isValidElement(icon)).toBe(true);
 
-  return (icon as React.ReactElement).type;
+  return (icon as ReactElement).type;
 };
 
 describe('buildProjectMap', () => {

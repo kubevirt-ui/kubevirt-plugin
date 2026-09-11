@@ -1,5 +1,4 @@
 /* eslint-disable */
-import React from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { HealthItem } from '@openshift-console/dynamic-plugin-sdk-internal';

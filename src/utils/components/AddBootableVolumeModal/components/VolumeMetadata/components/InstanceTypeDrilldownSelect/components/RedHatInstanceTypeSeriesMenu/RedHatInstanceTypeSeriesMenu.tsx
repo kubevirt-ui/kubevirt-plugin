@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 
 import type { RedHatInstanceTypeSeries } from '../../utils/types';
 import DrilldownMenuItemWrapper from '../DrilldownMenuItem/DrilldownMenuItemWrapper';

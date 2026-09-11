@@ -1,4 +1,4 @@
-import React, { type ComponentProps, forwardRef, type HTMLProps, useState } from 'react';
+import { type ComponentProps, forwardRef, type HTMLProps, useState } from 'react';
 
 import {
   Button,

@@ -1,5 +1,5 @@
 import type { FC, JSX, RefObject } from 'react';
-import React, { memo } from 'react';
+import { memo } from 'react';
 
 import { MenuToggle } from '@patternfly/react-core';
 

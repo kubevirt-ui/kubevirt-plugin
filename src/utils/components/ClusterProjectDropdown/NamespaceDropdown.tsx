@@ -1,5 +1,5 @@
 import type { FC, JSX } from 'react';
-import React, { useCallback, useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 
 import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import type { DropdownConfig } from '@kubevirt-utils/components/ClusterProjectDropdown/Dropdown/Dropdown';

@@ -1,4 +1,4 @@
-import React, { type FC, useMemo, useState } from 'react';
+import { type FC, useMemo, useState } from 'react';
 
 import SectionWithSwitch from '@kubevirt-utils/components/SectionWithSwitch/SectionWithSwitch';
 import { CONTROL_DEFAULT_VIRTUALIZATION_PERMISSIONS } from '@kubevirt-utils/hooks/useFeatures/constants';

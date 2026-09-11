@@ -1,4 +1,4 @@
-import React, { type FC } from 'react';
+import { type FC } from 'react';
 
 import { MenuList } from '@patternfly/react-core';
 import { type SearchKeyBadge } from '@search/components/SearchDropdown/types';

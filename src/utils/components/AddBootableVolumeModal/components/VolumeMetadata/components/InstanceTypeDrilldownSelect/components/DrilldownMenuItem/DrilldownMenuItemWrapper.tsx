@@ -1,4 +1,4 @@
-import React, { type FC, type ReactNode, useMemo } from 'react';
+import { type FC, type ReactNode, useMemo } from 'react';
 
 import HugepagesInfo from '@kubevirt-utils/components/HugepagesInfo/HugepagesInfo';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';

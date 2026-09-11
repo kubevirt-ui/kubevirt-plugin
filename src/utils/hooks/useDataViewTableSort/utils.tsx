@@ -1,5 +1,4 @@
 import type { ReactNode } from 'react';
-import React from 'react';
 
 import { Checkbox } from '@patternfly/react-core';
 import type { DataViewTr } from '@patternfly/react-data-view';

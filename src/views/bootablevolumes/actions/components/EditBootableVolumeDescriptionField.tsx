@@ -1,7 +1,7 @@
 // Extracted from EditBootableVolumesModal.tsx
 // Root: src/views/bootablevolumes/actions/components/EditBootableVolumesModal.tsx
 
-import React, { type FC } from 'react';
+import { type FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FormGroup, TextArea } from '@patternfly/react-core';

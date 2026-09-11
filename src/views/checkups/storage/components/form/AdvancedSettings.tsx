@@ -1,4 +1,4 @@
-import React, { type Dispatch, type JSX, type SetStateAction } from 'react';
+import { type Dispatch, type JSX, type SetStateAction } from 'react';
 
 import { type IoK8sApiStorageV1StorageClass } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { type getDefaultStorageClass } from '@kubevirt-utils/components/DiskModal/components/StorageClassAndPreallocation/utils/helpers';

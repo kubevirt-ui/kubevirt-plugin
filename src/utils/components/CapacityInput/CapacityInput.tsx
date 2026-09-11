@@ -1,4 +1,4 @@
-import React, { type ChangeEvent, type FC, type ReactElement } from 'react';
+import { type ChangeEvent, type FC, type ReactElement } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { type BinaryUnit } from '@kubevirt-utils/utils/unitConstants';

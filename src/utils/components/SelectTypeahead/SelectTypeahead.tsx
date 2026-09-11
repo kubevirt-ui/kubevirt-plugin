@@ -1,4 +1,4 @@
-import React, { type FC, type Ref } from 'react';
+import { type FC, type ReactNode, type Ref } from 'react';
 
 import {
   Button,
@@ -55,7 +55,7 @@ const SelectTypeahead: FC<SelectTypeaheadProps> = ({
     setSelectedValue,
   });
 
-  const toggle = (toggleRef: Ref<MenuToggleElement>): React.ReactNode => (
+  const toggle = (toggleRef: Ref<MenuToggleElement>): ReactNode => (
     <MenuToggle
       aria-label="Typeahead menu toggle"
       data-test={dataTestId}

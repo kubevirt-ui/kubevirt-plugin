@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 
 import aiExperienceIcon from '@lightspeed/images/aiExperienceIcon.svg';
 

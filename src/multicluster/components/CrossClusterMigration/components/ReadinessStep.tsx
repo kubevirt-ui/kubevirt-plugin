@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import type { Updater } from 'use-immer';
 
 import type { V1beta1NetworkMap, V1beta1Plan, V1beta1StorageMap } from '@forklift-ui/types';

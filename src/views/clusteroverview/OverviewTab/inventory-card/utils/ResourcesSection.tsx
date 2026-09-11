@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 
 import { NodeModel, TemplateModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { NetworkAttachmentDefinitionModel } from '@kubevirt-ui-ext/kubevirt-api/console';

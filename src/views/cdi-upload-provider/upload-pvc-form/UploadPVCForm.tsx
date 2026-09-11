@@ -1,4 +1,4 @@
-import React, { type Dispatch, type FC, type SetStateAction } from 'react';
+import { type Dispatch, type FC, type SetStateAction } from 'react';
 
 import { type V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { type IoK8sApiStorageV1StorageClass } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';

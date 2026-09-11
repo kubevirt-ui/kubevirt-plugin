@@ -1,4 +1,4 @@
-import React, { type FC, type MouseEventHandler } from 'react';
+import { type FC, type MouseEventHandler } from 'react';
 import { type TooltipRenderProps } from 'react-joyride';
 import classNames from 'classnames';
 

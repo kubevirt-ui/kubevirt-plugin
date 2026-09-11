@@ -1,7 +1,7 @@
 // Extracted from DiskRowActions.tsx
 // Root: src/views/virtualmachines/details/tabs/configuration/storage/components/tables/disk/DiskRowActions.tsx
 
-import React, { type FC, type ReactNode } from 'react';
+import { type FC, type ReactNode } from 'react';
 
 import { type DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/constants';
 import { DropdownItem, DropdownList, Tooltip } from '@patternfly/react-core';

@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 
 import Timestamp from '@kubevirt-utils/components/Timestamp/Timestamp';
 import type { ApplicationAwareQuota } from '@kubevirt-utils/resources/quotas/types';

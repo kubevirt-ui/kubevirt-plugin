@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import ListEmptyState from '@kubevirt-utils/components/ListEmptyState/ListEmptyState';

@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { fireEvent, render, screen } from '@testing-library/react';
 import { VM_LIST_TAB_PARAM, VM_LIST_TAB_VMS } from '@virtualmachines/navigator/constants';
 

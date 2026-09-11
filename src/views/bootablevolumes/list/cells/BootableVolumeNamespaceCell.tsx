@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 
 import { modelToGroupVersionKind, NamespaceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { getNamespace } from '@kubevirt-utils/resources/shared';

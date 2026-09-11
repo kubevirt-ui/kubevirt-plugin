@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 import { useWatch } from 'react-hook-form';
 import classNames from 'classnames';
 

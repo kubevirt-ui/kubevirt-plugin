@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 
 import { Flex, Skeleton, Stack, StackItem } from '@patternfly/react-core';
 

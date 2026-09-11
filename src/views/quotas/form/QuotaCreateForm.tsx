@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 
 import { SyncedEditor } from '@kubevirt-utils/components/SyncedEditor/SyncedEditor';
 

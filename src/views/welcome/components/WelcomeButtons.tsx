@@ -1,4 +1,4 @@
-import React, { type FC } from 'react';
+import { type FC } from 'react';
 import { useNavigate } from 'react-router';
 
 import CreateProjectModal from '@kubevirt-utils/components/CreateProjectModal/CreateProjectModal';

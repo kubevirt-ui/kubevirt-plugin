@@ -1,4 +1,4 @@
-import React, { type JSX } from 'react';
+import { type JSX } from 'react';
 import { type TFunction } from 'i18next';
 import { parseSize } from 'xbytes';
 
@@ -32,7 +32,7 @@ const ClusterCell = ({ row }: { row: V1beta1VirtualMachineClusterInstancetype })
   <>{getCluster(row) ?? NO_DATA_DASH}</>
 );
 
-const CPUCell = ({ row }: { row: V1beta1VirtualMachineClusterInstancetype }): React.JSX.Element => (
+const CPUCell = ({ row }: { row: V1beta1VirtualMachineClusterInstancetype }): JSX.Element => (
   <>{row?.spec?.cpu?.guest ?? NO_DATA_DASH}</>
 );
 

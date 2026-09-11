@@ -1,4 +1,4 @@
-import React, { type FC } from 'react';
+import { type FC } from 'react';
 
 import { useWizardContext, WizardFooter } from '@patternfly/react-core';
 import {

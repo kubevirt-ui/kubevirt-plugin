@@ -1,4 +1,4 @@
-import React, { type FC, Fragment } from 'react';
+import { type FC, Fragment } from 'react';
 
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Breadcrumb, BreadcrumbHeading, BreadcrumbItem, ListItem } from '@patternfly/react-core';

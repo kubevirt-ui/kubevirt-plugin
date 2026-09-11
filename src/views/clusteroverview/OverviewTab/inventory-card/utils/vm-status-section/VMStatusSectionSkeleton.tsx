@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 
 import { Flex, Grid, GridItem, Skeleton } from '@patternfly/react-core';
 

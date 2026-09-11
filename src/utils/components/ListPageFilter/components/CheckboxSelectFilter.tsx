@@ -1,4 +1,4 @@
-import React, { type FC, type ReactNode, useMemo } from 'react';
+import { type FC, type ReactNode, useMemo } from 'react';
 
 import useQuery from '@kubevirt-utils/hooks/useQuery';
 import { type SelectProps, ToolbarFilter } from '@patternfly/react-core';

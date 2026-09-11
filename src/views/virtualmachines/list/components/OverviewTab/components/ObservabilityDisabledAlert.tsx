@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import React, { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Trans } from 'react-i18next';
 import classNames from 'classnames';
 

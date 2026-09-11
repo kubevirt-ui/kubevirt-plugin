@@ -1,4 +1,4 @@
-import React, { type ChangeEvent, type FC, memo, type ReactNode, useMemo, useState } from 'react';
+import { type ChangeEvent, type FC, memo, type ReactNode, useMemo, useState } from 'react';
 import TagsInput from 'react-tagsinput';
 
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';

@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import React, { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import produce from 'immer';
 
 import type {

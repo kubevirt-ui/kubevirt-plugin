@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';

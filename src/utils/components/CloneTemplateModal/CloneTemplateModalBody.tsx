@@ -1,4 +1,4 @@
-import React, { type FC, useEffect } from 'react';
+import { type FC, useEffect } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
 import { type V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';

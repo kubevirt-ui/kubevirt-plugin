@@ -1,4 +1,4 @@
-import React, { createElement, type FC } from 'react';
+import { createElement, type FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Stack, StackItem } from '@patternfly/react-core';

@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
 
 import { DataImportCronModel, DataImportCronModelRef } from '@kubevirt-ui-ext/kubevirt-api/console';

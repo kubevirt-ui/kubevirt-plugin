@@ -1,4 +1,4 @@
-import React, { type Dispatch, type FC, type MouseEvent, type SetStateAction } from 'react';
+import { type Dispatch, type FC, type MouseEvent, type SetStateAction } from 'react';
 
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import { describeNetworkState } from '@kubevirt-utils/components/NetworkIcons/utils';

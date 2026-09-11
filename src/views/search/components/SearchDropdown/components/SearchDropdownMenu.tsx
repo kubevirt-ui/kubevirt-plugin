@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 
 import type { MenuProps } from '@patternfly/react-core';
 import { Menu, MenuContent } from '@patternfly/react-core';

@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 import type { FieldPath } from 'react-hook-form';
 import { Controller, useFormContext } from 'react-hook-form';
 

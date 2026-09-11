@@ -1,4 +1,4 @@
-import React, { type FC, useMemo } from 'react';
+import { type FC, useMemo } from 'react';
 import produce from 'immer';
 
 import { SecretModel } from '@kubevirt-ui-ext/kubevirt-api/console';

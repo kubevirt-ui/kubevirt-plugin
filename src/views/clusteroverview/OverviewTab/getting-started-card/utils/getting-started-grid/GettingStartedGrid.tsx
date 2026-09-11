@@ -1,5 +1,5 @@
 /* eslint-disable */
-import React, { FC, ReactNode } from 'react';
+import { FC, ReactNode } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useToggle } from '@kubevirt-utils/hooks/useToggle';

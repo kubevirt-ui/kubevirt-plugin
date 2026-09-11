@@ -1,4 +1,4 @@
-import React, { type ClipboardEvent, type FC, type MouseEventHandler, useState } from 'react';
+import { type ClipboardEvent, type FC, type MouseEventHandler, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Button, clipboardCopyFunc, Tooltip } from '@patternfly/react-core';

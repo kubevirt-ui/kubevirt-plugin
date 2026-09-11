@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 
 import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-utils/models';
 import type { RowProps } from '@openshift-console/dynamic-plugin-sdk';

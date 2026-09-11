@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 
 import useTour from '@kubevirt-utils/components/GuidedTour/hooks/useTour';
 import { runningTourSignal } from '@kubevirt-utils/components/GuidedTour/utils/guidedTourSignals';

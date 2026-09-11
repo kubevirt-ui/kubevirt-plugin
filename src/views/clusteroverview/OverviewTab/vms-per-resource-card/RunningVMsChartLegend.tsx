@@ -1,4 +1,4 @@
-import React from 'react';
+import { type JSX } from 'react';
 
 import { Grid, GridItem } from '@patternfly/react-core';
 
@@ -8,7 +8,7 @@ import RunningVMsChartLegendLabel, {
 
 import './RunningVMsChartLegend.scss';
 
-const RunningVMsChartLegend = ({ legendItems }): React.JSX.Element => {
+const RunningVMsChartLegend = ({ legendItems }): JSX.Element => {
   const gridItems = [];
   for (const item of legendItems as RunningVMsChartLegendLabelItem[]) {
     const component = (

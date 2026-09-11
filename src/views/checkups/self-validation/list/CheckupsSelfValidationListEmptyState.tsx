@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import React, { useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import type { IoK8sApiRbacV1ClusterRoleBinding } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';

@@ -1,4 +1,4 @@
-import React, { type ReactElement, useMemo } from 'react';
+import { type ReactElement, useMemo } from 'react';
 
 import ExportTableButton from '@kubevirt-utils/components/ExportTableButton/ExportTableButton';
 import { getActiveColumns } from '@kubevirt-utils/components/KubevirtTable/utils/getActiveColumns';

@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';

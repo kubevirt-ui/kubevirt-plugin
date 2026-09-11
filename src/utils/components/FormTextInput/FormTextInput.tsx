@@ -1,4 +1,4 @@
-import React, { type ComponentProps, forwardRef, type HTMLProps } from 'react';
+import { type ComponentProps, forwardRef, type HTMLProps } from 'react';
 
 import { TextInput, type TextInputProps } from '@patternfly/react-core';
 

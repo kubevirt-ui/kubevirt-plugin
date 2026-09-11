@@ -1,7 +1,7 @@
 // Extracted from CheckupsStorageDetailsPageSection.tsx
 // Root: src/views/checkups/storage/details/CheckupsStorageDetailsPageSection.tsx
 
-import React, { type FC } from 'react';
+import { type FC } from 'react';
 
 import { modelToGroupVersionKind, StorageClassModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';

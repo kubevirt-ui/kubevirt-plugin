@@ -1,4 +1,4 @@
-import React, { type FC, useMemo, useState } from 'react';
+import { type FC, useMemo, useState } from 'react';
 
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';

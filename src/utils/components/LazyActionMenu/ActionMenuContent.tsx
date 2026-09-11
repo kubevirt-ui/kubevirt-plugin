@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 
 import type { Action, GroupedMenuOption, MenuOption } from '@openshift-console/dynamic-plugin-sdk';
 import { MenuOptionType } from '@openshift-console/dynamic-plugin-sdk';

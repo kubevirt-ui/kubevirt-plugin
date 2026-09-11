@@ -1,4 +1,4 @@
-import React, { type FC, memo } from 'react';
+import { type FC, memo } from 'react';
 
 import { type V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import DeprecatedBadge from '@kubevirt-utils/components/badges/DeprecatedBadge/DeprecatedBadge';

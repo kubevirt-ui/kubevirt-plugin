@@ -1,4 +1,4 @@
-import React, {
+import {
   createElement,
   type FC,
   type PropsWithChildren,

@@ -1,5 +1,4 @@
 import type { FC, ReactNode } from 'react';
-import React from 'react';
 
 import { Button, ButtonVariant, FormGroup, GridItem } from '@patternfly/react-core';
 

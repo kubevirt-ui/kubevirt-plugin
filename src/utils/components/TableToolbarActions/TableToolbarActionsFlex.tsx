@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 import classNames from 'classnames';
 
 import { Flex } from '@patternfly/react-core';

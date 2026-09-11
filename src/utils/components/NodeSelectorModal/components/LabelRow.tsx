@@ -1,4 +1,4 @@
-import React, { type ClipboardEvent, type FC } from 'react';
+import { type ClipboardEvent, type FC } from 'react';
 
 import PlainIconButton from '@kubevirt-utils/components/HardwareDevices/form/PlainIconButton';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';

@@ -1,4 +1,4 @@
-import React, { type FC } from 'react';
+import { type FC } from 'react';
 
 import { isDigitsOnly } from '@kubevirt-utils/utils/validation';
 import { TextInput, type TextInputProps } from '@patternfly/react-core';

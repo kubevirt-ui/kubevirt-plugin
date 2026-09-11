@@ -1,4 +1,4 @@
-import React, { type ReactNode } from 'react';
+import { type ReactNode } from 'react';
 import { type TFunction } from 'i18next';
 
 import { type V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';

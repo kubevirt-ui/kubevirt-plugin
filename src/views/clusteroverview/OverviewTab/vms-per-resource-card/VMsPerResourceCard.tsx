@@ -1,4 +1,4 @@
-import React, { type ChangeEvent, type FC, type MouseEvent, useState } from 'react';
+import { type ChangeEvent, type FC, type MouseEvent, useState } from 'react';
 
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';

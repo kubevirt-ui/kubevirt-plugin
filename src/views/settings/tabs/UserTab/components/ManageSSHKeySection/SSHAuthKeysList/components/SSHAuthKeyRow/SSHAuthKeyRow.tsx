@@ -1,4 +1,4 @@
-import React, { type FC, useCallback } from 'react';
+import { type FC, useCallback } from 'react';
 
 import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';

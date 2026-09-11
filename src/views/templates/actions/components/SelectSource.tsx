@@ -1,5 +1,5 @@
 /* eslint-disable max-lines */
-import React, { type FC, type ReactNode } from 'react';
+import { type FC, type ReactNode } from 'react';
 
 import { type V1beta1DataVolumeSpec } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import CapacityInput from '@kubevirt-utils/components/CapacityInput/CapacityInput';

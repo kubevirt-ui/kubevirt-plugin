@@ -1,4 +1,4 @@
-import React, { type FC, useCallback, useState } from 'react';
+import { type FC, useCallback, useState } from 'react';
 import produce from 'immer';
 
 import ConfirmActionMessage from '@kubevirt-utils/components/ConfirmActionMessage/ConfirmActionMessage';

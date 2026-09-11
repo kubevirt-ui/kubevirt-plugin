@@ -1,4 +1,4 @@
-import React, { type FC, type MouseEvent } from 'react';
+import { type FC, type MouseEvent } from 'react';
 
 import { type TemplateParameter } from '@kubevirt-ui-ext/kubevirt-api/console';
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';

@@ -1,4 +1,4 @@
-import React, { type FC } from 'react';
+import { type FC } from 'react';
 
 import { VirtualMachineSnapshotModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { type V1beta1VirtualMachineSnapshot } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';

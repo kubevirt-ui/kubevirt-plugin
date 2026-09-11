@@ -1,4 +1,4 @@
-import React, { type FC, memo } from 'react';
+import { type FC, memo } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Button, ButtonVariant, GridItem, TextInput } from '@patternfly/react-core';

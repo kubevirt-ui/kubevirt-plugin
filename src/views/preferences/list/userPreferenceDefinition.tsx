@@ -1,4 +1,4 @@
-import React, { type FC } from 'react';
+import { type FC } from 'react';
 import { type TFunction } from 'i18next';
 
 import { VirtualMachinePreferenceModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';

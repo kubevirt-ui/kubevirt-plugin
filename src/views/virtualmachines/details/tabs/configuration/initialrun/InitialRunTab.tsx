@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 import { VirtualMachineModel } from 'src/views/dashboard-extensions/utils';
 
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';

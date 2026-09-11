@@ -1,4 +1,4 @@
-import React, { type FC, type MouseEvent, type ReactElement, type Ref, useState } from 'react';
+import { type FC, type MouseEvent, type ReactElement, type Ref, useState } from 'react';
 import { type TFunction } from 'i18next';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';

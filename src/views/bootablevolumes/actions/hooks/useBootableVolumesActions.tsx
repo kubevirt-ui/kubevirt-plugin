@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { PersistentVolumeClaimModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import type { V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import DeleteModal from '@kubevirt-utils/components/DeleteModal/DeleteModal';

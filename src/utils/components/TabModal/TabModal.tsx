@@ -1,4 +1,4 @@
-import React, { type ComponentType, type FormEvent, memo, type ReactNode, useState } from 'react';
+import { type ComponentType, type FormEvent, memo, type ReactNode, useState } from 'react';
 
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';

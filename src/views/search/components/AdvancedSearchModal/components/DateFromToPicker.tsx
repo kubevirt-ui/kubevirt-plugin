@@ -1,4 +1,4 @@
-import React, { type Dispatch, type FC, type SetStateAction, useEffect, useState } from 'react';
+import { type Dispatch, type FC, type SetStateAction, useEffect, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { DatePicker, type DatePickerProps, Split, SplitItem } from '@patternfly/react-core';

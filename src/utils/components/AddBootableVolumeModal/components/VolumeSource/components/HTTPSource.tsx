@@ -1,4 +1,4 @@
-import React, { type FC, type ReactElement } from 'react';
+import { type FC, type ReactElement } from 'react';
 
 import { TLS_CERT_FIELD_NAMES } from '@kubevirt-utils/components/AddBootableVolumeModal/consts';
 import {

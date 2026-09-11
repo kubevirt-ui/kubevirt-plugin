@@ -1,4 +1,4 @@
-import React, { type JSX, useCallback, useMemo } from 'react';
+import { type JSX, useCallback, useMemo } from 'react';
 
 import { type ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';

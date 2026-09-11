@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { OS_NAME_LABELS } from '@kubevirt-utils/resources/template';

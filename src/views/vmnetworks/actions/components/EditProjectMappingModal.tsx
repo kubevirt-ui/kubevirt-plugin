@@ -1,4 +1,4 @@
-import React, { type FC, useState } from 'react';
+import { type FC, useState } from 'react';
 import { FormProvider, useForm, useWatch } from 'react-hook-form';
 
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';

@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect, useRef } from 'react';
+import { forwardRef, useEffect, useRef } from 'react';
 import classNames from 'classnames';
 
 import { TextInput, type TextInputProps } from '@patternfly/react-core';

@@ -1,4 +1,4 @@
-import React, { type FC, type MouseEvent, useState } from 'react';
+import { type FC, type MouseEvent, useState } from 'react';
 
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import HardwareDevicesList from '@kubevirt-utils/components/HardwareDevices/list/HardwareDevicesList';

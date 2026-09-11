@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 
 import { DataImportCronModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import type { V1beta1DataImportCron } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';

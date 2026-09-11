@@ -1,4 +1,4 @@
-import React, { type FC, type ReactElement } from 'react';
+import { type FC, type ReactElement } from 'react';
 
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { documentationURL } from '@kubevirt-utils/constants/documentation';

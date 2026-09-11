@@ -84,6 +84,12 @@ const baseConfig = {
               'Import specific lodash modules (e.g., lodash/get) instead of the full bundle.',
             name: 'lodash',
           },
+          {
+            importNames: ['default'],
+            message:
+              'Use named imports (e.g. { useState, type FC }); the JSX runtime is automatic.',
+            name: 'react',
+          },
         ],
       },
     ],

@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';

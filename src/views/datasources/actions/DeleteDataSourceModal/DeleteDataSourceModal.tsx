@@ -1,4 +1,4 @@
-import React, { type FC, useState } from 'react';
+import { type FC, useState } from 'react';
 import { Trans } from 'react-i18next';
 
 import { DataImportCronModel } from '@kubevirt-ui-ext/kubevirt-api/console';

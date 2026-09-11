@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 import { createUseStyles } from 'react-jss';
 
 import type { RDPProps } from '../utils/types';

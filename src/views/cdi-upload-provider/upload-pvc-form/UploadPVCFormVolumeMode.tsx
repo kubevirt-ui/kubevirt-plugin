@@ -1,4 +1,4 @@
-import React, { type FC, useMemo } from 'react';
+import { type FC, useMemo } from 'react';
 import { Trans } from 'react-i18next';
 
 import { type V1beta1StorageSpecAccessModesEnum } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';

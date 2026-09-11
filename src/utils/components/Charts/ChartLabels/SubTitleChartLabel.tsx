@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 
 import type { ChartLabelProps } from '@patternfly/react-charts/victory';
 import { ChartLabel } from '@patternfly/react-charts/victory';

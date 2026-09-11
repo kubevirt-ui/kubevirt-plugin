@@ -1,4 +1,4 @@
-import React, { type FC, memo, type ReactElement, useCallback } from 'react';
+import { type FC, memo, type ReactElement, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 
 import ClusterDropdown from '@kubevirt-utils/components/ClusterProjectDropdown/ClusterDropdown';

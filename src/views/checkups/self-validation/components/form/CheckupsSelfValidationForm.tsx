@@ -1,4 +1,4 @@
-import React, { type ReactNode, useState } from 'react';
+import { type ReactNode, useState } from 'react';
 
 import ClusterProjectDropdown from '@kubevirt-utils/components/ClusterProjectDropdown/ClusterProjectDropdown';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';

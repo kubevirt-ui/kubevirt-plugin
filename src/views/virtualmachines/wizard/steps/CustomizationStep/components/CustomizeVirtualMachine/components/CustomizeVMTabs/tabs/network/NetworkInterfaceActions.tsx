@@ -1,4 +1,4 @@
-import React, { type FC, useCallback, useState } from 'react';
+import { type FC, useCallback, useState } from 'react';
 
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import ConfirmActionMessage from '@kubevirt-utils/components/ConfirmActionMessage/ConfirmActionMessage';

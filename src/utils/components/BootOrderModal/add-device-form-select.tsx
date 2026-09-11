@@ -1,4 +1,4 @@
-import React, { type FC } from 'react';
+import { type FC } from 'react';
 
 import { type BootableDeviceType } from '@kubevirt-utils/resources/vm/utils/boot-order/bootOrder';
 import { Button, ButtonVariant, FormSelect, FormSelectOption } from '@patternfly/react-core';

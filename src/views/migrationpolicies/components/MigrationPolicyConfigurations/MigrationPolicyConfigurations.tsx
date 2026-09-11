@@ -1,4 +1,4 @@
-import React, { type ComponentType, type Dispatch, type FC, type SetStateAction } from 'react';
+import { type ComponentType, type Dispatch, type FC, type SetStateAction } from 'react';
 
 import { Button, ButtonVariant, Form, FormGroup, Split, SplitItem } from '@patternfly/react-core';
 import { MinusCircleIcon } from '@patternfly/react-icons';

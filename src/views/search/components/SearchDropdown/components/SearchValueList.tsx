@@ -1,4 +1,4 @@
-import React, { type FC, Fragment, type ReactElement, useMemo } from 'react';
+import { type FC, Fragment, type ReactElement, useMemo } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';

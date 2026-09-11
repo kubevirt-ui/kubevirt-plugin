@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Form, FormGroup } from '@patternfly/react-core';

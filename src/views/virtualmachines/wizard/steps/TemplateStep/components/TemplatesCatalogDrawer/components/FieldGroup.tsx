@@ -1,4 +1,4 @@
-import React, { type FC } from 'react';
+import { type FC } from 'react';
 import classNames from 'classnames';
 
 import { type TemplateParameter } from '@kubevirt-ui-ext/kubevirt-api/console';

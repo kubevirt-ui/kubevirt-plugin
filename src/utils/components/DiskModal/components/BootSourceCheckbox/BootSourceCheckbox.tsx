@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
 import type { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';

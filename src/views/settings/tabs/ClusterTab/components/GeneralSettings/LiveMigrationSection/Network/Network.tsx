@@ -1,4 +1,4 @@
-import React, { type FC, type MouseEvent, useEffect, useState } from 'react';
+import { type FC, type MouseEvent, useEffect, useState } from 'react';
 
 import { NetworkAttachmentDefinitionModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';

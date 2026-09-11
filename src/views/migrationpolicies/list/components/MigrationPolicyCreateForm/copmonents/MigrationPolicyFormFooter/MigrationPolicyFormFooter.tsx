@@ -1,4 +1,4 @@
-import React, { type FC, type MouseEventHandler, useState } from 'react';
+import { type FC, type MouseEventHandler, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { getMigrationPolicyURL } from 'src/views/migrationpolicies/utils/utils';
 
