@@ -21,7 +21,7 @@ const DisplayName: FC<TemplateDetailsGridProps> = ({ editable, template }) => {
 
   const updateDisplayName = (updatedDisplayName: string): Promise<Template> => {
     const updatedTemplate = produce<Template>(template, (templateDraft: Template) => {
-      if (!templateDraft.metadata.annotations) ensurePath(templateDraft, 'metadata.annotations');
+      ensurePath(templateDraft, 'metadata.annotations');
 
       delete templateDraft.metadata.annotations[ANNOTATIONS.displayName];
 

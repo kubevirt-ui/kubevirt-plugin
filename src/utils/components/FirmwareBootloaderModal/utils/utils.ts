@@ -98,8 +98,10 @@ export const updatedVMBootMode = (
       return;
     }
 
-    ensurePath(vmDraft, 'spec.template.spec.domain.firmware.bootloader');
-    ensurePath(vmDraft, 'spec.template.spec.domain.features.smm');
+    ensurePath(vmDraft, [
+      'spec.template.spec.domain.firmware.bootloader',
+      'spec.template.spec.domain.features.smm',
+    ]);
     vmDraft.spec.template.spec.domain.features.smm = { enabled: true };
 
     switch (firmwareBootloader) {
