@@ -41,6 +41,9 @@ const StorageUtil: FC<StorageUtilProps> = ({ vmi }) => {
 
   return (
     <UtilizationBlock
+      dataTestId="util-summary-storage"
+      title={t('Storage')}
+      usageValue={isReady ? xbytes(usedBytes || 0, { fixed: 2, iec: true }) : ''}
       usedOfTotalText={
         isReady
           ? t('Used of {{ total }}', {
@@ -48,12 +51,11 @@ const StorageUtil: FC<StorageUtilProps> = ({ vmi }) => {
             })
           : ''
       }
-      dataTestId="util-summary-storage"
-      title={t('Storage')}
-      usageValue={isReady ? xbytes(usedBytes || 0, { fixed: 2, iec: true }) : ''}
     >
       <ComponentReady isLoading={!loaded} isReady={isReady}>
         <ChartDonutUtilization
+          animate
+          constrainToVisibleArea
           data={{
             x: t('Storage used'),
             y: usedPercentage,
@@ -61,8 +63,6 @@ const StorageUtil: FC<StorageUtilProps> = ({ vmi }) => {
           labels={({ datum }) =>
             datum.x ? `${datum.x}: ${xbytes(usedBytes || 0, { fixed: 2, iec: true })}` : null
           }
-          animate
-          constrainToVisibleArea
           style={{ labels: { fontSize: 20 } }}
           subTitle={t('Used')}
           subTitleComponent={<SubTitleChartLabel y={135} />}

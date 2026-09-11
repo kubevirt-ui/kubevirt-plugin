@@ -27,10 +27,10 @@ const HideCredentials: FC<HideCredentialsProps> = ({ newBadge = false }) => {
   return (
     <>
       <SectionWithSwitch
+        dataTestID="hide-credentials"
         helpTextIconContent={t(
           'When enabled, non-privileged users cannot view VM credentials set via cloud-init',
         )}
-        dataTestID="hide-credentials"
         isDisabled={!canEdit}
         isLoading={loading}
         newBadge={newBadge}

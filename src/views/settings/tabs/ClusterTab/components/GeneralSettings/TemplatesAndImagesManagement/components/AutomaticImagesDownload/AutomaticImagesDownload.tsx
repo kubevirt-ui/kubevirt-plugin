@@ -116,15 +116,15 @@ const AutomaticImagesDownload: FC<AutomaticImagesDownloadProps> = ({
               const name = getName(bootSource);
               return (
                 <SectionWithSwitch
-                  switchIsOn={
-                    bootSource.metadata.annotations[AUTOMATIC_IMAGE_DOWNLOAD_ANNOTATION] !== 'false'
-                  }
                   dataTestID={`${name}-auto-image-download-switch`}
                   id={`${name}-auto-image-download-switch`}
                   inlineCheckbox
                   isLoading={index === imageLoadingIndex}
                   key={name}
                   newBadge={newBadge}
+                  switchIsOn={
+                    bootSource.metadata.annotations[AUTOMATIC_IMAGE_DOWNLOAD_ANNOTATION] !== 'false'
+                  }
                   title={name}
                   turnOnSwitch={(checked) => onChangeDataImportCronTemplate(checked, index)}
                 />

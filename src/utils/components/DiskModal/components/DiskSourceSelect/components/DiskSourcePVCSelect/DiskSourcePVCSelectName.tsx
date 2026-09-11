@@ -19,7 +19,6 @@ import { FormGroup, ValidatedOptions } from '@patternfly/react-core';
 
 import { PVC_CLAIMNAME_FIELD, VM_CLUSTER_FIELD } from '../../../utils/constants';
 import { diskSourcePVCNameFieldID } from '../../utils/constants';
-
 import PVCOwnerWarning from './PVCOwnerWarning';
 
 type DiskSourcePVCSelectNameProps = {
@@ -53,6 +52,8 @@ const DiskSourcePVCSelectName: FC<DiskSourcePVCSelectNameProps> = ({ vmNamespace
   return (
     <>
       <Controller
+        control={control}
+        name={PVC_CLAIMNAME_FIELD}
         render={({ field: { onChange, value } }) => (
           <FormGroup
             fieldId={diskSourcePVCNameFieldID}
@@ -66,13 +67,13 @@ const DiskSourcePVCSelectName: FC<DiskSourcePVCSelectNameProps> = ({ vmNamespace
                 groupVersionKind: modelToGroupVersionKind(PersistentVolumeClaimModel),
                 value: name,
               }))}
+              placeholder={t('Select PersistentVolumeClaim')}
+              selected={value as string}
+              setSelected={onChange}
               toggleProps={{
                 isDisabled: isEmpty(vmNamespace),
                 isFullWidth: true,
               }}
-              placeholder={t('Select PersistentVolumeClaim')}
-              selected={value as string}
-              setSelected={onChange}
             />
             {error && (
               <FormGroupHelperText validated={ValidatedOptions.error}>
@@ -81,8 +82,6 @@ const DiskSourcePVCSelectName: FC<DiskSourcePVCSelectNameProps> = ({ vmNamespace
             )}
           </FormGroup>
         )}
-        control={control}
-        name={PVC_CLAIMNAME_FIELD}
         rules={{ required: t('PersistentVolumeClaim is required.') }}
       />
       {vmNamespace && selectedPVC && (

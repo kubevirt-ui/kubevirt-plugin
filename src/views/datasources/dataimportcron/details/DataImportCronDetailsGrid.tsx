@@ -45,6 +45,8 @@ export const DataImportCronDetailsGrid: FC<DataImportCronDetailsGridProps> = ({
           <DescriptionItemCreatedAt model={DataImportCronModel} resource={dataImportCron} />
           <OwnerDetailsItem obj={dataImportCron} />
           <DataImportCronManageDetails
+            dataImportCron={dataImportCron}
+            dataSource={dataSource}
             onEditClick={() =>
               createModal(({ isOpen, onClose }) => (
                 <DataImportCronManageModal
@@ -55,8 +57,6 @@ export const DataImportCronDetailsGrid: FC<DataImportCronDetailsGridProps> = ({
                 />
               ))
             }
-            dataImportCron={dataImportCron}
-            dataSource={dataSource}
           />
         </DescriptionList>
       </GridItem>

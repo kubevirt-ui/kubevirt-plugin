@@ -47,10 +47,15 @@ const FormPFSelect: FC<FormPFSelectProps> = ({
 
   return (
     <Select
+      className={className}
+      isOpen={isOpen}
+      isScrollable
+      onOpenChange={(open: boolean) => setIsOpen(open)}
       onSelect={(event, value) => {
         onSelect?.(event, value);
         closeOnSelect && setIsOpen(false);
       }}
+      selected={selected}
       toggle={SelectToggle({
         isDisabled,
         isExpanded: isOpen,
@@ -58,11 +63,6 @@ const FormPFSelect: FC<FormPFSelectProps> = ({
         selected: selectedLabel ?? selected ?? placeholder,
         ...toggleProps,
       })}
-      className={className}
-      isOpen={isOpen}
-      isScrollable
-      onOpenChange={(open: boolean) => setIsOpen(open)}
-      selected={selected}
       {...props}
     >
       <SelectList className="FormPFSelect-list">{children}</SelectList>

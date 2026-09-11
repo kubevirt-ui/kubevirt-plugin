@@ -15,13 +15,13 @@ const UserPreferencesEmptyState: FC<UserPreferencesEmptyStateProps> = ({ namespa
 
   return (
     <ListEmptyState
+      bodyContent={t('To get started, create a VirtualMachinePreference.')}
       buttonAction={
         <PreferenceCreateButton
           buttonText={t('Create VirtualMachinePreference')}
           namespace={namespace}
         />
       }
-      bodyContent={t('To get started, create a VirtualMachinePreference.')}
       titleText={t("You don't have any VirtualMachinePreferences yet")}
     />
   );

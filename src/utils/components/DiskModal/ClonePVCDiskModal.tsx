@@ -7,7 +7,6 @@ import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { isRunning } from '@virtualmachines/utils';
 
 import TabModal from '../TabModal/TabModal';
-
 import AdvancedSettings from './components/AdvancedSettings/AdvancedSettings';
 import BootSourceCheckbox from './components/BootSourceCheckbox/BootSourceCheckbox';
 import DiskInterfaceSelect from './components/DiskInterfaceSelect/DiskInterfaceSelect';
@@ -52,15 +51,15 @@ const ClonePVCDiskModal: FC<V1SubDiskModalProps> = ({
   return (
     <FormProvider {...methods}>
       <TabModal
-        onSubmit={() =>
-          handleSubmit(async (data) => submit({ data, editDiskName, onSubmit, pvc, vm }))()
-        }
         closeOnSubmit={isValid}
         headerText={diskModalTitle(isEditDisk, isVMRunning)}
         isDisabled={!isValid}
         isLoading={isSubmitting}
         isOpen={isOpen}
         onClose={onClose}
+        onSubmit={() =>
+          handleSubmit(async (data) => submit({ data, editDiskName, onSubmit, pvc, vm }))()
+        }
         shouldWrapInForm
       >
         <PendingChanges isVMRunning={isVMRunning} />

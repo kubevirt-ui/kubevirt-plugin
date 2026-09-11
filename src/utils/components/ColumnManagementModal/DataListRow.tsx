@@ -34,12 +34,12 @@ const DataListRow: FC<DataListRowProps> = ({
   >
     <DataListItemRow>
       <DataListCheck
-        isDisabled={
-          (disableUncheckedRow && !checkedColumns.has(column.id)) || column.id === NAME_COLUMN_ID
-        }
         aria-labelledby={`table-column-management-item-${column.id}`}
         id={inputId}
         isChecked={checkedColumns.has(column.id)}
+        isDisabled={
+          (disableUncheckedRow && !checkedColumns.has(column.id)) || column.id === NAME_COLUMN_ID
+        }
         name={column.title}
         onChange={onChange}
       />

@@ -8,7 +8,6 @@ import { ListPageBody } from '@openshift-console/dynamic-plugin-sdk';
 import { HelperText, HelperTextItem, SearchInput, Stack, StackItem } from '@patternfly/react-core';
 
 import useNodesData from '../../utils/hooks/useNodesData';
-
 import type { NodesTableCallbacks } from './nodesTableDefinition';
 import { getNodeRowId, getNodesTableColumns } from './nodesTableDefinition';
 
@@ -62,11 +61,6 @@ const NodesTable: FC<NodesTableProps> = ({ handleNodeSelection, selectedNode, vm
       <StackItem>
         <ListPageBody>
           <KubevirtTable
-            noDataMsg={
-              vmArch
-                ? t('No nodes with {{arch}} architecture found', { arch: vmArch })
-                : t('No nodes found')
-            }
             ariaLabel={t('Nodes table')}
             callbacks={callbacks}
             columns={columns}
@@ -76,6 +70,11 @@ const NodesTable: FC<NodesTableProps> = ({ handleNodeSelection, selectedNode, vm
             getRowId={getNodeRowId}
             initialSortKey="name"
             loaded={nodesDataLoaded}
+            noDataMsg={
+              vmArch
+                ? t('No nodes with {{arch}} architecture found', { arch: vmArch })
+                : t('No nodes found')
+            }
             noFilteredDataMsg={t('No nodes match the search criteria')}
             unfilteredData={nodesData}
           />

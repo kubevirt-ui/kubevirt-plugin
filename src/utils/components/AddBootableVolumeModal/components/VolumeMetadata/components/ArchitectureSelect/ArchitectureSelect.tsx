@@ -37,6 +37,7 @@ const ArchitectureSelect: FC<ArchitectureSelectProps> = ({
   return (
     <>
       <FormGroup
+        label={t(ARCHITECTURE_TITLE)}
         labelHelp={
           <HelpTextIcon
             bodyContent={(hide) => (
@@ -51,19 +52,21 @@ const ArchitectureSelect: FC<ArchitectureSelectProps> = ({
             position={PopoverPosition.right}
           />
         }
-        label={t(ARCHITECTURE_TITLE)}
       >
         <FormPFSelect
-          selectedLabel={
-            architectures?.length ? architectures.join(', ') : t('Select architecture')
-          }
           closeOnSelect={true}
           isDisabled={isDisabled}
           selected={architectures}
+          selectedLabel={
+            architectures?.length ? architectures.join(', ') : t('Select architecture')
+          }
           toggleProps={{ isFullWidth: true }}
         >
           {workloadArchitectures.map((arch: string) => (
             <SelectOption
+              hasCheckbox
+              isSelected={architectures?.includes(arch)}
+              key={arch}
               onClick={() =>
                 setBootableVolumeField('architectures')(
                   architectures?.includes(arch)
@@ -71,9 +74,6 @@ const ArchitectureSelect: FC<ArchitectureSelectProps> = ({
                     : [...(architectures ?? []), arch],
                 )
               }
-              hasCheckbox
-              isSelected={architectures?.includes(arch)}
-              key={arch}
               value={arch}
             >
               {arch}

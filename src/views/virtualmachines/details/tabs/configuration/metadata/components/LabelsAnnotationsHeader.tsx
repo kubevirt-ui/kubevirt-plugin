@@ -29,11 +29,11 @@ const LabelsAnnotationsHeader: FC<LabelsAnnotationsHeaderProps> = ({
       >
         <FlexItem>
           <Switch
-            onChange={(_event, checked) => toggleAdvancedView(checked)}
             data-test="advanced-view-toggle"
             id="advanced-view-toggle"
             isChecked={isAdvancedView}
             label={t('Show advanced view')}
+            onChange={(_event, checked) => toggleAdvancedView(checked)}
           />
         </FlexItem>
         <FlexItem>

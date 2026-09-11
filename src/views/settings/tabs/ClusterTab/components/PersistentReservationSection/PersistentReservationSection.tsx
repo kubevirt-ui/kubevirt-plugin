@@ -71,10 +71,10 @@ const PersistentReservationSection: FC<PersistentReservationSectionProps> = ({
       toggleText={t('SCSI persistent reservation')}
     >
       <SectionWithSwitch
+        dataTestID="persistent-reservation"
         helpTextIconContent={t(
           'The SCSI reservation for disk makes the disk attached to the VirtualMachine as a SCSI LUN. This option should only be used for cluster-aware applications',
         )}
-        dataTestID="persistent-reservation"
         isDisabled={!hyperLoaded || !hyperConverge}
         isLoading={isLoading}
         olsObj={hyperConvergeConfiguration?.[0]}

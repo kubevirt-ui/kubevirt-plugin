@@ -28,6 +28,8 @@ const VMStatusDetailsItem: FC<VMStatusDetailsItemProps> = ({ vm, vmi }) => {
 
   return (
     <DescriptionItem
+      className="topology-vm-details-panel__item"
+      data-test="virtual-machine-overview-details-status"
       descriptionData={
         <Split hasGutter isWrappable>
           <SplitItem>
@@ -39,8 +41,6 @@ const VMStatusDetailsItem: FC<VMStatusDetailsItemProps> = ({ vm, vmi }) => {
           <VMNotMigratableLabel vm={vm} />
         </Split>
       }
-      className="topology-vm-details-panel__item"
-      data-test="virtual-machine-overview-details-status"
       descriptionHeader={t('Status')}
     />
   );

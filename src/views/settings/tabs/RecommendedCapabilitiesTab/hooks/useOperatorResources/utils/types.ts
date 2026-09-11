@@ -46,6 +46,6 @@ export type UseOperatorCsvsReturn = {
 
 export type OperatorWatchResourceResult<T> = {
   data?: T;
-  loadError?: unknown;
   loaded?: boolean;
+  loadError?: unknown;
 };

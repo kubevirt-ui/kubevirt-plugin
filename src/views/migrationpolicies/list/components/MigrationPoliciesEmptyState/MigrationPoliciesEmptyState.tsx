@@ -18,15 +18,15 @@ const MigrationPoliciesEmptyState: FC = () => {
       <ListPageHeader title={t('MigrationPolicies')} />
       <ListPageBody>
         <ListEmptyState
+          bodyContent={t('To get started, create a MigrationPolicy.')}
+          buttonAction={<MigrationPoliciesCreateButton />}
+          icon={MigrationIcon}
           learnMoreLink={
             <ExternalLink
               href={documentationURL.MIGRATION_POLICIES}
               text={t('Learn more about MigrationPolicies')}
             />
           }
-          bodyContent={t('To get started, create a MigrationPolicy.')}
-          buttonAction={<MigrationPoliciesCreateButton />}
-          icon={MigrationIcon}
           titleText={t("You don't have any MigrationPolicies yet")}
         />
       </ListPageBody>

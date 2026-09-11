@@ -43,10 +43,10 @@ const GuestAgentIssues: FC<GuestAgentIssuesProps> = ({ vms }) => {
       <CardBody>
         <Grid hasGutter>
           <StatusCountItem
+            count={vmsNotReporting}
             helpContent={t(
               'A VM will stop reporting if the guest agent is missing, the guest OS becomes unresponsive or the monitoring stack fails.',
             )}
-            count={vmsNotReporting}
             href={notReportingPath}
             label={t('VMs not reporting')}
             span={6}

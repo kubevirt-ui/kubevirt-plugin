@@ -55,6 +55,7 @@ const NodeCheckerAlert: FC<NodeCheckerAlertProps> = ({
 
   return (
     <Alert
+      isInline
       title={
         <>
           {!!qualifiedNodesSize || !!preferredQualifiedNodesSize ? (
@@ -81,7 +82,6 @@ const NodeCheckerAlert: FC<NodeCheckerAlertProps> = ({
           ? AlertVariant.success
           : AlertVariant.warning
       }
-      isInline
     >
       {qualifiedNodesSize || preferredQualifiedNodesSize ? (
         <Popover

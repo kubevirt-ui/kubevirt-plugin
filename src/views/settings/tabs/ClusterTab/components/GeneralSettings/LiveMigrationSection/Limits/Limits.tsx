@@ -72,10 +72,10 @@ const Limits: FC<LimitsProps> = ({ hyperConverge }) => {
       <div className="live-migration-tab__number--container">
         <div className="live-migration-tab__number--cluster">
           <MigrationNumberInput
+            inputName={MIGRATION_PER_CLUSTER}
             labelHelp={t(
               'Maximum number of migrations running in parallel in the cluster. The format is a number',
             )}
-            inputName={MIGRATION_PER_CLUSTER}
             minValue={MIN_MIGRATION_LIMIT}
             promptType={OLSPromptType.MAX_MIGRATIONS_PER_CLUSTER}
             setValue={setMigrationPerCluster}

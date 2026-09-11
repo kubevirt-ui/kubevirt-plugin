@@ -11,6 +11,8 @@ import tseslint from 'typescript-eslint';
 
 import eslintReact from '@eslint-react/eslint-plugin';
 
+import { perfectionistConfig } from './eslintv10.config.mjs';
+
 const ignoresConfig = {
   ignores: [
     'dist/**',
@@ -91,22 +93,6 @@ const baseConfig = {
     'promise/no-nesting': 'warn',
     'promise/no-return-wrap': 'error',
     'promise/param-names': 'error',
-    'perfectionist/sort-classes': [
-      'error',
-      {
-        groups: [
-          'static-property',
-          'private-property',
-          'property',
-          'constructor',
-          'static-method',
-          'private-method',
-          'method',
-        ],
-        order: 'asc',
-        type: 'natural',
-      },
-    ],
     'react-hooks/exhaustive-deps': 'error',
     'react-hooks/immutability': 'error',
     'react-hooks/incompatible-library': 'warn',
@@ -294,6 +280,7 @@ const testFilesOverrides = {
 export default [
   ignoresConfig,
   baseConfig,
+  perfectionistConfig,
   ...tsConfigs,
   reactConfig,
   sonarConfig,

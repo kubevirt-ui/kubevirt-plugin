@@ -30,13 +30,13 @@ const GeneralSettingsProjectSelector: FC<GeneralSettingsProjectSelectorProps> = 
           return [{ groupVersionKind: modelToGroupVersionKind(ProjectModel), value: name }];
         })
         .sort((a, b) => a.value.localeCompare(b.value))}
+      placeholder={t('Select project')}
+      selected={selectedProject}
+      setSelected={onSelect}
       toggleProps={{
         icon: !loaded && <Spinner size="sm" />,
         isDisabled: !loaded,
       }}
-      placeholder={t('Select project')}
-      selected={selectedProject}
-      setSelected={onSelect}
     />
   );
 };

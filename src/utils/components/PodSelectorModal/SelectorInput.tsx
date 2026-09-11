@@ -92,6 +92,13 @@ const SelectorInput: FC<SelectorInputProps> = ({
     <div className="pf-v6-c-form-control">
       <tags-input>
         <TagsInput
+          addKeys={[13]}
+          addOnBlur
+          className="tags"
+          inputProps={inputPropsWithDefaults}
+          onChange={handleChange}
+          ref={ref}
+          removeKeys={isEmpty(inputValue) ? [] : [8]}
           renderTag={({ getTagDisplayValue, key, onRemove, tag }: RenderTagProps): ReactNode => (
             <PfLabel
               className={classNames('co-label tag-item-content', labelClassName)}
@@ -102,13 +109,6 @@ const SelectorInput: FC<SelectorInputProps> = ({
               {getTagDisplayValue(tag)}
             </PfLabel>
           )}
-          addKeys={[13]}
-          addOnBlur
-          className="tags"
-          inputProps={inputPropsWithDefaults}
-          onChange={handleChange}
-          ref={ref}
-          removeKeys={isEmpty(inputValue) ? [] : [8]}
           value={tags}
         />{' '}
       </tags-input>

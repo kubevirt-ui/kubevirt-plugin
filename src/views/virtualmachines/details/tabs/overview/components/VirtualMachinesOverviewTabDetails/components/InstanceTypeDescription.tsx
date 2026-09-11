@@ -33,6 +33,7 @@ const InstanceTypeDescription: FC<InstanceTypeDescriptionProps> = ({ vm }) => {
         bodyContent={t(
           'A ControllerRevision resource is cloned from the InstanceType when creating the VirtualMachine',
         )}
+        data-test="virtual-machine-overview-details-instance-type"
         descriptionData={
           itMatcher ? (
             <MulticlusterResourceLink
@@ -46,7 +47,6 @@ const InstanceTypeDescription: FC<InstanceTypeDescriptionProps> = ({ vm }) => {
             None
           )
         }
-        data-test="virtual-machine-overview-details-instance-type"
         descriptionHeader={t('InstanceType')}
         isPopover
       />

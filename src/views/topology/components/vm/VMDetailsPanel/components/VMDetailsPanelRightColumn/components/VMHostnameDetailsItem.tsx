@@ -28,6 +28,11 @@ const VMHostnameDetailsItem: FC<VMHostnameDetailsItemProps> = ({ vm, vmi }) => {
 
   return (
     <DescriptionItem
+      className="topology-vm-details-panel__item"
+      data-test={`${vmName}-hostname`}
+      descriptionData={getHostname(vm) || vmName}
+      descriptionHeader={t('Hostname')}
+      isEdit
       onEditClick={() =>
         createModal(({ isOpen, onClose }) => (
           <HostnameModal
@@ -39,11 +44,6 @@ const VMHostnameDetailsItem: FC<VMHostnameDetailsItemProps> = ({ vm, vmi }) => {
           />
         ))
       }
-      className="topology-vm-details-panel__item"
-      data-test={`${vmName}-hostname`}
-      descriptionData={getHostname(vm) || vmName}
-      descriptionHeader={t('Hostname')}
-      isEdit
     />
   );
 };

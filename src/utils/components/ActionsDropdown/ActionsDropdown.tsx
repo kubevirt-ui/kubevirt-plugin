@@ -77,6 +77,8 @@ const ActionsDropdown: FC<ActionsDropdownProps> = ({
     >
       {Toggle(toggleRef)}
       <Popper
+        isVisible={isOpen}
+        placement="bottom-end"
         popper={
           <Menu containsFlyout ref={menuRef}>
             <MenuContent>
@@ -88,8 +90,6 @@ const ActionsDropdown: FC<ActionsDropdownProps> = ({
             </MenuContent>
           </Menu>
         }
-        isVisible={isOpen}
-        placement="bottom-end"
         triggerRef={toggleRef}
       />
     </div>

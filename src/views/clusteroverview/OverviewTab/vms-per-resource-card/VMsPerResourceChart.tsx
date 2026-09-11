@@ -1,6 +1,6 @@
 import type { FC } from 'react';
-import React, { useMemo } from 'react';
 import type { ReactNode } from 'react';
+import React, { useMemo } from 'react';
 
 import SubTitleChartLabel from '@kubevirt-utils/components/Charts/ChartLabels/SubTitleChartLabel';
 import TitleChartLabel from '@kubevirt-utils/components/Charts/ChartLabels/TitleChartLabel';
@@ -9,7 +9,9 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { ChartDonut } from '@patternfly/react-charts/victory';
 import { CardBody } from '@patternfly/react-core';
 
+import EmptyStateNoVMs from './EmptyStateNoVMs';
 import useVMsPerResource from './hooks/useVMsPerResource';
+import RunningVMsChartLegend from './RunningVMsChartLegend';
 import {
   getChartData,
   getInstanceTypeSeriesLabel,
@@ -17,8 +19,6 @@ import {
   getResourcesToVMCountMap,
   vmsPerResourceCount,
 } from './utils/utils';
-import EmptyStateNoVMs from './EmptyStateNoVMs';
-import RunningVMsChartLegend from './RunningVMsChartLegend';
 
 import './VMsPerResourceCard.scss';
 type VMsPerResourceChartProps = {
@@ -40,6 +40,11 @@ const VMsPerResourceChart: FC<VMsPerResourceChartProps> = ({ type }) => {
   const RunningVMsChart = (
     <div>
       <ChartDonut
+        ariaDesc={t('VirtualMachines per resource')}
+        ariaTitle={t('VirtualMachines per resource')}
+        data={chartData}
+        height={150}
+        labels={({ datum }) => `${getInstanceTypeSeriesLabel(datum.x)}: ${datum.y}%`}
         padding={{
           bottom: 20,
           left: 20,
@@ -51,11 +56,6 @@ const VMsPerResourceChart: FC<VMsPerResourceChartProps> = ({ type }) => {
             fontSize: 5,
           },
         }}
-        ariaDesc={t('VirtualMachines per resource')}
-        ariaTitle={t('VirtualMachines per resource')}
-        data={chartData}
-        height={150}
-        labels={({ datum }) => `${getInstanceTypeSeriesLabel(datum.x)}: ${datum.y}%`}
         subTitle={t('VMs')}
         subTitleComponent={<SubTitleChartLabel splitTitleText />}
         title={vmsPerResourcesCount?.toString()}

@@ -18,8 +18,8 @@ const useOperatorResources = (
   const memoizedPackageNames = useDeepCompareMemoize(packageNames);
 
   const {
-    loadErrors: packageManifestLoadErrors,
     loaded: packageManifestsLoaded,
+    loadErrors: packageManifestLoadErrors,
     packageManifests: filteredPackageManifests,
   } = usePackageManifests({ cluster, packageNames: memoizedPackageNames });
 
@@ -45,8 +45,8 @@ const useOperatorResources = (
 
   const {
     clusterServiceVersions,
-    loadErrors: csvLoadErrors,
     loaded: csvResourcesLoaded,
+    loadErrors: csvLoadErrors,
   } = useOperatorCsvs({
     cluster,
     enabled: baseResourcesLoaded,

@@ -9,6 +9,7 @@ import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ListPageCreateLink } from '@openshift-console/dynamic-plugin-sdk';
 import { SearchIcon } from '@patternfly/react-icons';
+
 import { getCreateComputeResourceURL } from '../utils/utils';
 
 type UserProvidedComputeResourcesEmptyStateProps = {
@@ -22,6 +23,11 @@ const UserProvidedComputeResourcesEmptyState: FC<UserProvidedComputeResourcesEmp
 
   return (
     <ListEmptyState
+      bodyContent={
+        <Trans ns="plugin__kubevirt-plugin" t={t}>
+          To get started, create a <b>compute resource</b>.
+        </Trans>
+      }
       buttonAction={
         <ListPageCreateLink
           createAccessReview={{ groupVersionKind: VirtualMachineInstancetypeModelRef, namespace }}
@@ -30,12 +36,6 @@ const UserProvidedComputeResourcesEmptyState: FC<UserProvidedComputeResourcesEmp
           {t('Create compute resource')}
         </ListPageCreateLink>
       }
-      bodyContent={
-        <Trans ns="plugin__kubevirt-plugin" t={t}>
-          To get started, create a <b>compute resource</b>.
-        </Trans>
-      }
-      titleText={t("You don't have any compute resources yet")}
       icon={SearchIcon}
       learnMoreLink={
         <ExternalLink
@@ -43,6 +43,7 @@ const UserProvidedComputeResourcesEmptyState: FC<UserProvidedComputeResourcesEmp
           text={t('Learn more about compute resources')}
         />
       }
+      titleText={t("You don't have any compute resources yet")}
     />
   );
 };

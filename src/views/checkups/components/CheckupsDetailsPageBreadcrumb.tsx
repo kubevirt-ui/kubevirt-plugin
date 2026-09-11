@@ -28,6 +28,7 @@ const CheckupsDetailsPageBreadcrumb: FC<CheckupsDetailsPageBreadcrumbProps> = ({
     <Breadcrumb>
       <BreadcrumbItem>
         <Button
+          isInline
           onClick={() =>
             navigate(
               cluster
@@ -35,7 +36,6 @@ const CheckupsDetailsPageBreadcrumb: FC<CheckupsDetailsPageBreadcrumbProps> = ({
                 : `/k8s/ns/${namespace}/checkups/${checkupType}`,
             )
           }
-          isInline
           variant={ButtonVariant.link}
         >
           {parentLabel}

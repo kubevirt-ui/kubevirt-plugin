@@ -38,6 +38,7 @@ const ProjectCheckerAlert: FC<ProjectCheckerAlertProps> = ({
 
   return (
     <Alert
+      isInline
       title={
         <>
           {numQualifiedProjects ? (
@@ -51,7 +52,6 @@ const ProjectCheckerAlert: FC<ProjectCheckerAlertProps> = ({
           )}
         </>
       }
-      isInline
       variant={numQualifiedProjects ? AlertVariant.success : AlertVariant.warning}
     >
       {numQualifiedProjects ? (

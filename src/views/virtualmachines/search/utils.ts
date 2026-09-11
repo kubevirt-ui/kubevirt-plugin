@@ -41,7 +41,7 @@ const appendCustomDateRange = (
 
 export const appendDateCreatedSearchQueries = (
   vmQueries: AdvancedSearchFilter,
-  { dateCreated, createdFrom, createdTo }: DateCreatedSearchParams,
+  { createdFrom, createdTo, dateCreated }: DateCreatedSearchParams,
 ): void => {
   if (dateCreated) {
     appendResolvedDateCreated(vmQueries, dateCreated);

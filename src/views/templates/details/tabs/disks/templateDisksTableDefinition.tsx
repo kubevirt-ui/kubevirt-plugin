@@ -43,10 +43,10 @@ export const getTemplateDiskColumns = (
     label: t('Name'),
     renderCell: (row) => (
       <DiskNameCell
+        row={row}
         wrapper={(children) => (
           <TemplateValue value={row?.name ?? NO_DATA_DASH}>{children}</TemplateValue>
         )}
-        row={row}
       />
     ),
     sortable: true,

@@ -41,6 +41,7 @@ const QuotaFormResourceLimitInput: FC<QuotaFormResourceLimitInputProps> = ({
 
   return (
     <FormGroup
+      label={resourceLimitLabel}
       labelHelp={
         <HelpTextIcon
           bodyContent={(hide) => {
@@ -61,7 +62,6 @@ const QuotaFormResourceLimitInput: FC<QuotaFormResourceLimitInputProps> = ({
           }}
         />
       }
-      label={resourceLimitLabel}
     >
       <Flex
         alignItems={{ default: 'alignItemsCenter' }}

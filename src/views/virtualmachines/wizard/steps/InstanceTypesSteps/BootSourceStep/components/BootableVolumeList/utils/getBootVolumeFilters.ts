@@ -37,8 +37,8 @@ const getArchitectureBootVolumeFilter = (
   t: TFunction,
 ): KubevirtFilter<BootableVolume> => {
   const architectureOptions = getUniqueArchitectures(bootableVolumes).map((arch) => ({
-    value: arch ?? OTHER,
     label: arch ?? t(OTHER),
+    value: arch ?? OTHER,
   }));
 
   return {

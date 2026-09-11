@@ -4,15 +4,16 @@ import React, { useMemo } from 'react';
 import type { V1beta1NetworkMap } from '@forklift-ui/types';
 import { NetworkAttachmentDefinitionModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
-import type { NetworkAttachmentDefinitionKind } from '@kubevirt-utils/resources/nad/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { modelToGroupVersionKind } from '@kubevirt-utils/models';
+import type { NetworkAttachmentDefinitionKind } from '@kubevirt-utils/resources/nad/types';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { FormGroup, Split, SplitItem, TextInput, Title } from '@patternfly/react-core';
 
 import { POD_NETWORK_TYPE } from '../constants';
-import type { UseNetworkReadinessReturnType } from '../hooks/useNetworkReadiness';
 import { getNADNameAndNamespace } from '../utils';
+
+import type { UseNetworkReadinessReturnType } from '../hooks/useNetworkReadiness';
 
 type NetworkMappingProps = {
   changeNetworkMap: UseNetworkReadinessReturnType['changeNetworkMap'];
@@ -65,6 +66,7 @@ const NetworkMapping: FC<NetworkMappingProps> = ({ changeNetworkMap, nads, netwo
                     ? `${map.source.namespace}/${map.source.name}`
                     : POD_NETWORK_TYPE
                 }
+                selectProps={{ id: `network-select-${map.source.name}` }}
                 setSelected={(newSelection) => {
                   if (newSelection === POD_NETWORK_TYPE) {
                     changeNetworkMap(map.source.name, {
@@ -81,7 +83,6 @@ const NetworkMapping: FC<NetworkMappingProps> = ({ changeNetworkMap, nads, netwo
                     type: 'multus',
                   });
                 }}
-                selectProps={{ id: `network-select-${map.source.name}` }}
                 toggleProps={{ isFullWidth: true }}
               />
             </FormGroup>

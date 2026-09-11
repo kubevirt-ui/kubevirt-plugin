@@ -47,11 +47,11 @@ const TolerationEditRow: FC<TolerationEditRowProps> = ({ label, onChange, onDele
       </GridItem>
       <GridItem span={3}>
         <FormSelect
+          id={`toleration-${id}-effect-select`}
+          isRequired
           onChange={(_event, newEffect) =>
             onChange({ ...label, effect: newEffect as K8sIoApiCoreV1TolerationEffectEnum })
           }
-          id={`toleration-${id}-effect-select`}
-          isRequired
           value={effect}
         >
           {Object.values(K8sIoApiCoreV1TolerationEffectEnum).map((effectOption) => (

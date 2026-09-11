@@ -44,6 +44,8 @@ const BootSourceCheckbox: FC<BootSourceCheckboxProps> = ({ editDiskName, isDisab
       <Stack hasGutter>
         <Split className="enable-bootsource-checkbox" hasGutter>
           <Controller
+            control={control}
+            name={IS_BOOT_SOURCE_FIELD}
             render={({ field: { onChange, value } }) => (
               <Checkbox
                 id="enable-bootsource"
@@ -53,8 +55,6 @@ const BootSourceCheckbox: FC<BootSourceCheckboxProps> = ({ editDiskName, isDisab
                 onChange={onChange}
               />
             )}
-            control={control}
-            name={IS_BOOT_SOURCE_FIELD}
           />
           <HelpTextIcon
             bodyContent={(hide) => (

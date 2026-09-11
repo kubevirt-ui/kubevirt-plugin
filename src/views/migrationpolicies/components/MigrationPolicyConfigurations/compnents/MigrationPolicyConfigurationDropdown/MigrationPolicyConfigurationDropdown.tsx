@@ -35,15 +35,15 @@ const MigrationPolicyConfigurationDropdown: FC<MigrationPolicyConfigurationDropd
   const onToggle = (): void => setIsOpen((prevIsOpen) => !prevIsOpen);
   return (
     <Dropdown
+      className="migration-policy__form-config-dropdown"
+      isOpen={isOpen}
+      onOpenChange={setIsOpen}
       toggle={DropdownToggle({
         children: t('Add configuration'),
         isDisabled,
         isExpanded: isOpen,
         onClick: onToggle,
       })}
-      className="migration-policy__form-config-dropdown"
-      isOpen={isOpen}
-      onOpenChange={setIsOpen}
     >
       <DropdownList>
         {Object.entries(options).map(([key, { defaultValue, description, label }]) => (

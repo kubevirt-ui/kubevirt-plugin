@@ -8,6 +8,7 @@ import { useVirtioWinDriversInfo } from '@kubevirt-utils/resources/vm/utils/disk
 import { Button, ButtonVariant, FlexItem, Spinner, Tooltip } from '@patternfly/react-core';
 import { DownloadIcon } from '@patternfly/react-icons';
 import { DOWNLOADS_TAB_IDS } from '@settings/search/constants';
+
 import { getVersionFromImage } from './utils';
 
 import './VirtIODriversSection.scss';
@@ -16,7 +17,7 @@ const VirtIODriversSection: FC = () => {
   const { t } = useKubevirtTranslation();
   const [driversInfo, loading] = useVirtioWinDriversInfo();
 
-  const { image, downloadURL } = driversInfo;
+  const { downloadURL, image } = driversInfo;
   const version = getVersionFromImage(image) ?? NO_DATA_DASH;
 
   const downloadButton = (
@@ -38,9 +39,6 @@ const VirtIODriversSection: FC = () => {
 
   return (
     <ExpandSectionWithCustomToggle
-      id="virtio-drivers-section"
-      searchItemId={DOWNLOADS_TAB_IDS.virtioDriversWindows}
-      toggleContent={t('Windows drivers')}
       customContent={
         downloadURL ? (
           downloadButton
@@ -48,6 +46,9 @@ const VirtIODriversSection: FC = () => {
           <Tooltip content={t('No ISO available')}>{downloadButton}</Tooltip>
         )
       }
+      id="virtio-drivers-section"
+      searchItemId={DOWNLOADS_TAB_IDS.virtioDriversWindows}
+      toggleContent={t('Windows drivers')}
     >
       {loading ? (
         <Spinner size="md" />

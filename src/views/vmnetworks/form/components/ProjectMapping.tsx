@@ -37,39 +37,39 @@ const ProjectMapping: FC<ProjectMappingProps> = ({ isEditModal = false }) => {
 
       {/* Make this network available for all projects = configure with default namespace selector */}
       <Controller
+        control={control}
+        name="projectMappingOption"
         render={({ field: { onChange } }) => (
           <Radio
+            id="project-all"
+            isChecked={projectMappingOption === ProjectMappingOption.AllProjects}
+            label={t('Make this network available for all projects')}
+            name="project-mapping"
             onChange={() => {
               setValue('network.spec.namespaceSelector', {
                 matchLabels: { [PROJECT_NAME_LABEL_KEY]: DEFAULT_NAMESPACE },
               });
               onChange(ProjectMappingOption.AllProjects);
             }}
-            id="project-all"
-            isChecked={projectMappingOption === ProjectMappingOption.AllProjects}
-            label={t('Make this network available for all projects')}
-            name="project-mapping"
           />
         )}
-        control={control}
-        name="projectMappingOption"
       />
 
       <Controller
+        control={control}
+        name="projectMappingOption"
         render={({ field: { onChange } }) => (
           <Radio
-            onChange={() => {
-              setValue('network.spec.namespaceSelector', { matchExpressions: [] });
-              onChange(ProjectMappingOption.SelectFromList);
-            }}
             id="project-list"
             isChecked={projectMappingOption === ProjectMappingOption.SelectFromList}
             label={t('Select projects from list')}
             name="project-mapping"
+            onChange={() => {
+              setValue('network.spec.namespaceSelector', { matchExpressions: [] });
+              onChange(ProjectMappingOption.SelectFromList);
+            }}
           />
         )}
-        control={control}
-        name="projectMappingOption"
       />
 
       {projectMappingOption === ProjectMappingOption.SelectFromList && (
@@ -81,21 +81,21 @@ const ProjectMapping: FC<ProjectMappingProps> = ({ isEditModal = false }) => {
       )}
 
       <Controller
+        control={control}
+        name="projectMappingOption"
         render={({ field: { onChange } }) => (
           <Radio
-            onChange={() => {
-              setValue('network.spec.namespaceSelector', { matchLabels: {} });
-              onChange(ProjectMappingOption.SelectByLabels);
-            }}
             description={t('Ensure the projects for this network have the labels you specified.')}
             id="project-labels"
             isChecked={projectMappingOption === ProjectMappingOption.SelectByLabels}
             label={t('Select labels to specify qualifying projects')}
             name="project-mapping"
+            onChange={() => {
+              setValue('network.spec.namespaceSelector', { matchLabels: {} });
+              onChange(ProjectMappingOption.SelectByLabels);
+            }}
           />
         )}
-        control={control}
-        name="projectMappingOption"
       />
 
       {projectMappingOption === ProjectMappingOption.SelectByLabels && <ProjectNamespaceSelector />}

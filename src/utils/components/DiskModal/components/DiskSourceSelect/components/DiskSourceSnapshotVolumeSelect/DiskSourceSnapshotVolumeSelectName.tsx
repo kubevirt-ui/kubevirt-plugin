@@ -51,6 +51,8 @@ const DiskSourceSnapshotVolumeSelectName: FC = () => {
 
   return (
     <Controller
+      control={control}
+      name={DATAVOLUME_SNAPSHOT_NAME}
       render={({ field: { onChange, value } }) => (
         <FormGroup
           fieldId={diskSourceSnapshotVolumeNameFieldID}
@@ -64,6 +66,8 @@ const DiskSourceSnapshotVolumeSelectName: FC = () => {
               groupVersionKind: modelToGroupVersionKind(VolumeSnapshotModel),
               value: name,
             }))}
+            placeholder={t('Select VolumeSnapshot')}
+            selected={value}
             setSelected={(snapshotName) => {
               onChange(snapshotName);
               const selectedSnapshot = snapshotsMapper[snapshotName];
@@ -74,8 +78,6 @@ const DiskSourceSnapshotVolumeSelectName: FC = () => {
               isDisabled: isEmpty(namespace),
               isFullWidth: true,
             }}
-            placeholder={t('Select VolumeSnapshot')}
-            selected={value}
           />
           {error && (
             <FormGroupHelperText validated={ValidatedOptions.error}>
@@ -87,8 +89,6 @@ const DiskSourceSnapshotVolumeSelectName: FC = () => {
       rules={{
         required: t('VolumeSnapshot is required.'),
       }}
-      control={control}
-      name={DATAVOLUME_SNAPSHOT_NAME}
     />
   );
 };

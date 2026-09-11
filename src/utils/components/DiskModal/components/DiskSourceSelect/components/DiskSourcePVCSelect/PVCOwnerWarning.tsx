@@ -21,13 +21,13 @@ const PVCOwnerWarning: FC<PVCOwnerWarningProps> = ({ cluster, namespace, pvc }) 
 
   return (
     <Alert
+      className="pf-v6-u-mt-sm"
+      isInline
+      isPlain
       title={t(
         'This disk is owned by VirtualMachine {{vmOwnerName}}. If that VirtualMachine is deleted, this disk will also be deleted.',
         { vmOwnerName },
       )}
-      className="pf-v6-u-mt-sm"
-      isInline
-      isPlain
       variant={AlertVariant.warning}
     />
   );

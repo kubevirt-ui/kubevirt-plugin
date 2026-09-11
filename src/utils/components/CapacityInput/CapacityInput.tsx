@@ -69,6 +69,11 @@ const CapacityInput: FC<CapacityInputProps> = ({
       <Split hasGutter>
         <SplitItem>
           <NumberInput
+            isDisabled={isDisabled || isEditingCreatedDisk}
+            max={Number.MAX_SAFE_INTEGER}
+            min={1}
+            minusBtnAriaLabel={t('Decrement')}
+            minusBtnProps={{ isDisabled: isDisabled || isMinusDisabled }}
             onChange={(event: ChangeEvent<HTMLInputElement>) => {
               const numberValue = Number(event.target.value);
               if (
@@ -79,11 +84,6 @@ const CapacityInput: FC<CapacityInputProps> = ({
                 onValueChange(numberValue);
               }
             }}
-            isDisabled={isDisabled || isEditingCreatedDisk}
-            max={Number.MAX_SAFE_INTEGER}
-            min={1}
-            minusBtnAriaLabel={t('Decrement')}
-            minusBtnProps={{ isDisabled: isDisabled || isMinusDisabled }}
             onMinus={onMinus}
             onPlus={onPlus}
             plusBtnAriaLabel={t('Increment')}

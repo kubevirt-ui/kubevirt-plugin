@@ -21,7 +21,6 @@ import {
   STORAGECLASS_SELECT_FIELDID,
   VM_CLUSTER_FIELD,
 } from '../utils/constants';
-
 import { getSCSelectOptions } from './utils/helpers';
 
 type StorageClassSelectProps = {
@@ -80,20 +79,20 @@ const StorageClassSelect: FC<StorageClassSelectProps> = ({ checkSC, setShowSCAle
     <FormGroup fieldId={STORAGECLASS_SELECT_FIELDID} label={t('StorageClass')}>
       <div data-test={STORAGECLASS_SELECT_FIELDID}>
         <Controller
+          control={control}
+          name={STORAGE_CLASS_FIELD}
           render={({ field: { value } }) => (
             <InlineFilterSelect
-              toggleProps={{
-                isFullWidth: true,
-              }}
               options={getSCSelectOptions(readyStorageClasses)}
               placeholder={t('Select {{label}}', { label: StorageClassModel.label })}
               popperProps={{ enableFlip: true }}
               selected={value}
               setSelected={onSelect}
+              toggleProps={{
+                isFullWidth: true,
+              }}
             />
           )}
-          control={control}
-          name={STORAGE_CLASS_FIELD}
         />
       </div>
     </FormGroup>

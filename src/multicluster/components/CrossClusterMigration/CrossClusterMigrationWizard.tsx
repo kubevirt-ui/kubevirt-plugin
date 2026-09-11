@@ -53,10 +53,10 @@ const CrossClusterMigrationWizard: FC<{
     <Wizard
       header={
         <WizardHeader
+          closeButtonAriaLabel={t('Close header')}
           description={t(
             'Choose the target location for your VirtualMachines, then adjust your migration plan if necessary',
           )}
-          closeButtonAriaLabel={t('Close header')}
           isCloseHidden={true}
           onClose={close}
           title={t('Migrate VirtualMachines')}

@@ -45,6 +45,8 @@ const AdvancedSettings: FC<AdvancedSettingsProps> = ({
         <StackItem>
           <Split hasGutter>
             <Controller
+              control={control}
+              name={SHARABLE_FIELD}
               render={({ field: { onChange, value } }) => (
                 <Checkbox
                   id="sharable-disk"
@@ -54,8 +56,6 @@ const AdvancedSettings: FC<AdvancedSettingsProps> = ({
                   onChange={(_event, checked) => onChange(checked)}
                 />
               )}
-              control={control}
-              name={SHARABLE_FIELD}
             />
             <HelpTextIcon
               bodyContent={(hide) => (

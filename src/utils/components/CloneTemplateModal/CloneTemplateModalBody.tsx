@@ -42,11 +42,11 @@ const CloneTemplateModalBody: FC<CloneTemplateModalBodyProps> = ({
       {!initialTemplate && (
         <FormGroup isRequired label={t('Source template project')}>
           <Controller
+            control={control}
+            name={CloneTemplateField.SourceProject}
             render={({ field: { onChange, value } }) => (
               <SelectProject selectedProject={value} setSelectedProject={onChange} />
             )}
-            control={control}
-            name={CloneTemplateField.SourceProject}
           />
         </FormGroup>
       )}
@@ -66,11 +66,11 @@ const CloneTemplateModalBody: FC<CloneTemplateModalBodyProps> = ({
       />
       <FormGroup isRequired label={t('Template project')}>
         <Controller
+          control={control}
+          name={CloneTemplateField.TargetProject}
           render={({ field: { onChange, value } }) => (
             <SelectProject selectedProject={value} setSelectedProject={onChange} />
           )}
-          control={control}
-          name={CloneTemplateField.TargetProject}
         />
         <FormGroupHelperText>{t('Project name to clone the template to')}</FormGroupHelperText>
       </FormGroup>
@@ -86,11 +86,11 @@ const CloneTemplateModalBody: FC<CloneTemplateModalBodyProps> = ({
       </FormGroupTextInput>
       {hasClonableStorage && (
         <Controller
+          control={control}
+          name={CloneTemplateField.IsCloneStorageEnabled}
           render={({ field: { onChange, value } }) => (
             <CloneStorageCheckbox isChecked={value} onChange={onChange} />
           )}
-          control={control}
-          name={CloneTemplateField.IsCloneStorageEnabled}
         />
       )}
       {hasClonableStorage && isCloneStorageEnabled && (

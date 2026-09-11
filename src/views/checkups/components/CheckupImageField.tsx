@@ -29,13 +29,13 @@ const CheckupImageField: FC<CheckupImageFieldProps> = ({
   const { t } = useKubevirtTranslation();
   return (
     <FormGroup
+      label={t('Checkup image')}
       labelHelp={
         <HelpTextIcon
           bodyContent={t('The image used by the checkup job.')}
           position={PopoverPosition.right}
         />
       }
-      label={t('Checkup image')}
     >
       {!checkupImageLoaded && <Skeleton screenreaderText={t('Loading checkup image')} />}
       {checkupImageLoaded && <Truncate content={checkupImage ?? ''} />}

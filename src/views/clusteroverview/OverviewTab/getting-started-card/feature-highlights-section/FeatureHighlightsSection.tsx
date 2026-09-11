@@ -6,7 +6,6 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 
 import GettingStartedSectionContents from '../utils/getting-started-content/GettingStartedSectionContents';
 import type { GettingStartedLink } from '../utils/types';
-
 import FeatureHighlightsTitle from './FeatureHighlightsTitle';
 
 import './FeatureHighlightsSection.scss';
@@ -39,10 +38,10 @@ const FeatureHighlightsSection: FC = () => {
       id: 'item2',
       title: (
         <FeatureHighlightsTitle
+          readTime={t('5 min')}
           title={t('OpenShift Virtualization {{version}} Highlights', {
             version: parseFloat(PLUGIN_VERSION).toFixed(2),
           })}
-          readTime={t('5 min')}
         />
       ),
     },

@@ -62,8 +62,8 @@ const DefaultVMLabelValueCell: FC<DefaultVMLabelValueCellProps> = ({ labelKey, o
       <Split className="settings-label-cell__row" hasGutter>
         <SplitItem>
           <TextInput
-            className="settings-label-cell__value-input"
             aria-label={t('Value for {{labelkey}}', { labelKey })}
+            className="settings-label-cell__value-input"
             onChange={(_event, val) => setEditValue(val)}
             placeholder={t('Enter a value')}
             validated={valueError ? 'error' : 'default'}

@@ -9,7 +9,6 @@ import { updateTemplate } from '@kubevirt-utils/resources/template';
 import { Button, PageSection, Stack, StackItem, Title } from '@patternfly/react-core';
 
 import useEditTemplateAccessReview from '../../hooks/useIsTemplateEditable';
-
 import NetworkInterfaceList from './components/list/NetworkInterfaceList';
 import TemplatesNetworkInterfaceModal from './components/modal/TemplatesNetworkInterfaceModal';
 
@@ -30,6 +29,8 @@ const TemplateNetwork: FC<TemplateNetworkProps> = ({ obj: template }) => {
           <Title headingLevel="h2">{t('Network interfaces')}</Title>
           <StackItem>
             <Button
+              className="template-network-tab__button"
+              isDisabled={!isTemplateEditable}
               onClick={() =>
                 createModal(({ isOpen, onClose }) => (
                   <TemplatesNetworkInterfaceModal
@@ -40,8 +41,6 @@ const TemplateNetwork: FC<TemplateNetworkProps> = ({ obj: template }) => {
                   />
                 ))
               }
-              className="template-network-tab__button"
-              isDisabled={!isTemplateEditable}
             >
               {actionText}
             </Button>

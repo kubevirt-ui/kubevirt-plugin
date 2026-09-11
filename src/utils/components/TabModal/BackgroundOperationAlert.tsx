@@ -20,10 +20,10 @@ const BackgroundOperationAlert: FC<BackgroundOperationAlertProps> = ({
 
   return (
     <Alert
+      isInline
       title={
         description ?? t('You can close this dialog — the process will continue in the background.')
       }
-      isInline
       variant={AlertVariant.info}
     />
   );

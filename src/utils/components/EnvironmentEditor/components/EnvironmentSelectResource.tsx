@@ -58,16 +58,16 @@ const EnvironmentSelectResource: FC<EnvironmentSelectResourceProps> = ({
 
   return (
     <InlineFilterSelect
+      options={selectOptions}
+      selected={selectedValue}
+      selectProps={{ 'aria-labelledby': 'environment-name-header' }}
+      setSelected={onSelect}
       toggleProps={{
         children: environmentName ?? t('Select a resource'),
         icon: kind ? (
           <span className={`co-m-resource-icon co-m-resource-${kind}`}>{MapKindToAbbr[kind]}</span>
         ) : null,
       }}
-      options={selectOptions}
-      selected={selectedValue}
-      selectProps={{ 'aria-labelledby': 'environment-name-header' }}
-      setSelected={onSelect}
     />
   );
 };

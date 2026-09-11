@@ -55,10 +55,10 @@ const CheckupsSelfValidationList: FC = () => {
   });
 
   const {
+    handleFilterChange: handleSetFilters,
     handlePerPageSelect,
     handleSetPage,
     pagination,
-    handleFilterChange: handleSetFilters,
   } = usePaginationWithFilters(filteredData?.length ?? 0, onSetFilters);
 
   const columns = useMemo(

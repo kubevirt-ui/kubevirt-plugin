@@ -49,6 +49,12 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
 
   return (
     <TabModal
+      closeOnSubmit
+      headerText={t('Add volume')}
+      isDisabled={!isFormValid}
+      isOpen={isOpen}
+      obj={emptyDataSource}
+      onClose={() => handleAddBootableVolumeModalClose({ onClose, sourceType, upload })}
       onSubmit={(dataSource) =>
         submitAddBootableVolume({
           bootableVolume,
@@ -62,12 +68,6 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
           uploadData,
         })
       }
-      closeOnSubmit
-      headerText={t('Add volume')}
-      isDisabled={!isFormValid}
-      isOpen={isOpen}
-      obj={emptyDataSource}
-      onClose={() => handleAddBootableVolumeModalClose({ onClose, sourceType, upload })}
       onSuccess={(result) => handleAddBootableVolumeSuccess(result, sourceType, toastHandlers)}
       submitBtnText={getAddBootableVolumeSubmitBtnText(t, isUploading)}
     >

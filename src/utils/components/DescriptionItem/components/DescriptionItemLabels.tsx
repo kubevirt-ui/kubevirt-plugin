@@ -67,12 +67,12 @@ const DescriptionItemLabels: FC<DescriptionItemLabelsProps> = ({
       bodyContent={t(
         'Map of string keys and values that can be used to organize and categorize (scope and select) objects. May match selectors of replication controllers and services.',
       )}
-      descriptionData={
-        <MetadataLabels cluster={getCluster(resource)} labels={getLabels(resource)} model={model} />
-      }
       breadcrumb={`${label ?? model.label}.metadata.labels`}
       className={className}
       data-test={`${getName(resource)}-labels`}
+      descriptionData={
+        <MetadataLabels cluster={getCluster(resource)} labels={getLabels(resource)} model={model} />
+      }
       descriptionHeader={descriptionHeader}
       isEdit={editable}
       isLabelEditor

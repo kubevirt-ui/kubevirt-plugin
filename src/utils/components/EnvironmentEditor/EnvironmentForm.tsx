@@ -104,14 +104,14 @@ const EnvironmentForm: FC<EnvironmentFormProps> = ({ onEditChange, updateVM, vm 
         </div>
 
         <EnvironmentFormActions
+          closeError={() => setFormError(null)}
+          error={formError}
+          isSaveDisabled={!edited || !environments.every((env) => env.name)}
           onReload={() =>
             setTemporaryVM((draftVM) => {
               draftVM.spec = vm.spec;
             })
           }
-          closeError={() => setFormError(null)}
-          error={formError}
-          isSaveDisabled={!edited || !environments.every((env) => env.name)}
           onSave={() => updateVM(temporaryVM)}
         />
       </Form>

@@ -14,8 +14,8 @@ import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { ListPageBody, ListPageHeader } from '@openshift-console/dynamic-plugin-sdk';
 import { Pagination } from '@patternfly/react-core';
 
-import useStorageMigrationResources from './hooks/useStorageMigrationResources';
 import { COLUMN_MANAGEMENT_ID_STORAGE_MIGRATIONS } from './constants';
+import useStorageMigrationResources from './hooks/useStorageMigrationResources';
 import { getStorageMigrationColumns, getStorageMigrationRowId } from './storageMigrationDefinition';
 import { getStorageMigrationStatusFilters } from './StorageMigrationListFilters';
 
@@ -40,10 +40,10 @@ const StorageMigrationList: FC = () => {
   });
 
   const {
+    handleFilterChange: handleSetFilters,
     handlePerPageSelect,
     handleSetPage,
     pagination,
-    handleFilterChange: handleSetFilters,
   } = usePaginationWithFilters(filteredData?.length ?? 0, onSetFilters);
 
   const columnLayout = useMemo(

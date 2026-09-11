@@ -79,13 +79,13 @@ const useBootableVolumesActions: BootableVolumesActionsProps = (source, preferen
       cta: () =>
         createModal(({ isOpen, onClose }) => (
           <DeleteModal
-            onDeleteSubmit={async () => {
-              await deleteDVAndRelatedResources(source, source, source);
-            }}
             headerText={t('Delete {{kind}}', { kind: source?.kind })}
             isOpen={isOpen}
             obj={source}
             onClose={onClose}
+            onDeleteSubmit={async () => {
+              await deleteDVAndRelatedResources(source, source, source);
+            }}
             shouldRedirect={false}
           />
         )),

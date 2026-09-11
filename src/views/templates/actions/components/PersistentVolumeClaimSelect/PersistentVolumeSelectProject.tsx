@@ -38,12 +38,12 @@ export const PersistentVolumeSelectProject: FC<PersistentVolumeSelectProjectProp
           groupVersionKind: modelToGroupVersionKind(ProjectModel),
           value: name,
         }))}
-        toggleProps={{
-          isFullHeight: true,
-        }}
         placeholder={t('Select PVC project')}
         selected={selectedProject}
         setSelected={onChange}
+        toggleProps={{
+          isFullHeight: true,
+        }}
       />
       <FormGroupHelperText validated={validated}>
         {validated === ValidatedOptions.default && t('Location of the existing PVC')}

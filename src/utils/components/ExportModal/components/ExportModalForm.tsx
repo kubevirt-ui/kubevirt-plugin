@@ -67,9 +67,9 @@ const ExportModalForm: FC<ExportModalFormProps> = ({
       <StackItem>
         <FormGroup fieldId="password" isRequired label={t('Password')}>
           <FormPasswordInput
-            onChange={(event) => setPassword((event.target as HTMLInputElement).value)}
             id="password"
             isDisabled={isDisabled}
+            onChange={(event) => setPassword((event.target as HTMLInputElement).value)}
             value={password}
           />
         </FormGroup>

@@ -47,13 +47,13 @@ export const PersistentVolumeSelectName: FC<PersistentVolumeSelectNameProps> = (
           children: name,
           value: name,
         }))}
+        placeholder={t('Select PVC name')}
+        selected={pvcNameSelected}
+        setSelected={onChange}
         toggleProps={{
           isDisabled,
           isFullHeight: true,
         }}
-        placeholder={t('Select PVC name')}
-        selected={pvcNameSelected}
-        setSelected={onChange}
       />
     </FormGroup>
   );

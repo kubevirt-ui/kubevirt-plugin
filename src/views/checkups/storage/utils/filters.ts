@@ -5,15 +5,15 @@ import type {
   IoK8sApiCoreV1ConfigMap,
 } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import type { KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
-
 import { getName } from '@kubevirt-utils/resources/shared';
+
 import { CheckupsStatus, getConfigMapStatus, getJobByName, getJobStatus } from '../../utils/utils';
 
 const STORAGE_STATUS_FILTER_ID = 'status';
 
 const STORAGE_STATUS = {
-  running: 'running',
   failed: 'failed',
+  running: 'running',
   succeeded: 'succeeded',
 } as const;
 

@@ -34,6 +34,7 @@ const DescriptionItemNamespace: FC<DescriptionItemNamespaceProps> = ({
       bodyContent={t(
         'Namespace defines the space within which each name must be unique. An empty namespace is equivalent to the "default" namespace, but "default" is the canonical representation. Not all objects are required to be scoped to a namespace - the value of this field for those objects will be empty. Must be a DNS_LABEL. Cannot be updated.',
       )}
+      breadcrumb={`${label ?? model.label}.metadata.namespace`}
       descriptionData={
         <MulticlusterResourceLink
           cluster={cluster}
@@ -41,7 +42,6 @@ const DescriptionItemNamespace: FC<DescriptionItemNamespaceProps> = ({
           name={namespace}
         />
       }
-      breadcrumb={`${label ?? model.label}.metadata.namespace`}
       descriptionHeader={t('Namespace')}
       isPopover
       moreInfoURL={documentationURL.NAMESPACE_DOC}

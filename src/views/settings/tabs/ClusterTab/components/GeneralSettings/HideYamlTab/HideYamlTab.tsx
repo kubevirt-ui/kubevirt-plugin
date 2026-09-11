@@ -33,10 +33,10 @@ const HideYamlTab: FC<HideYamlTabProps> = ({ newBadge = false }) => {
       toggleText={t('YAML tab visibility')}
     >
       <SectionWithSwitch
+        dataTestID="hide-yaml-tab"
         helpTextIconContent={t(
           'Controls whether non-admin users can access YAML configurations for virtualization objects in the UI (VirtualMachines, VirtualMachineInstances, Templates, DataSources, DataImportCrons, MigrationPolicies, Checkups, and VM Networks).',
         )}
-        dataTestID="hide-yaml-tab"
         isDisabled={!canEdit}
         isLoading={loading}
         newBadge={newBadge}

@@ -20,6 +20,11 @@ const WindowsTestingSwitch: FC<WindowsTestingSwitchProps> = ({
 
   const windowsSwitch = (
     <Switch
+      className="pf-v6-u-mb-sm"
+      id="windows-server-testing"
+      isChecked={windowsServerTesting}
+      isDisabled={!isTier2Selected}
+      isReversed={true}
       label={
         <>
           <span className="pf-v6-c-form__label-text">{t('Windows Server 2022 testing')}</span>
@@ -32,11 +37,6 @@ const WindowsTestingSwitch: FC<WindowsTestingSwitchProps> = ({
           />
         </>
       }
-      className="pf-v6-u-mb-sm"
-      id="windows-server-testing"
-      isChecked={windowsServerTesting}
-      isDisabled={!isTier2Selected}
-      isReversed={true}
       onChange={(_event, checked) => setWindowsServerTesting(checked)}
     />
   );

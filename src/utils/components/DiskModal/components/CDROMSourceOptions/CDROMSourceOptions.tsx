@@ -66,14 +66,14 @@ const CDROMSourceOptions: FC<CDROMSourceOptionsProps> = ({
             {existingISOSelected && (
               <div className="pf-v6-u-ml-lg pf-v6-u-mt-sm">
                 <InlineFilterSelect
-                  toggleProps={{
-                    isDisabled: isSubmitting,
-                    isFullWidth: true,
-                  }}
                   options={isoOptions}
                   placeholder={t('Select ISO file')}
                   selected={selectedISO}
                   setSelected={onISOSelect}
+                  toggleProps={{
+                    isDisabled: isSubmitting,
+                    isFullWidth: true,
+                  }}
                 />
               </div>
             )}

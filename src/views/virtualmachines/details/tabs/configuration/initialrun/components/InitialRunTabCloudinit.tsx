@@ -37,6 +37,9 @@ const InitialRunTabCloudinit: FC<InitialRunTabCloudInitProps> = ({
 
   return (
     <DescriptionItem
+      descriptionData={<CloudInitDescription vm={vm} />}
+      descriptionHeader={<SearchItem id="cloud-init">{t('Cloud-init')}</SearchItem>}
+      isEdit={canEdit}
       onEditClick={() =>
         createModal(({ isOpen, onClose }) => (
           <CloudinitModal
@@ -49,9 +52,6 @@ const InitialRunTabCloudinit: FC<InitialRunTabCloudInitProps> = ({
           />
         ))
       }
-      descriptionData={<CloudInitDescription vm={vm} />}
-      descriptionHeader={<SearchItem id="cloud-init">{t('Cloud-init')}</SearchItem>}
-      isEdit={canEdit}
       showEditOnTitle
     />
   );

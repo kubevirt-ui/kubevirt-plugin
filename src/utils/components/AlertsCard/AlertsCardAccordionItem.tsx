@@ -62,11 +62,11 @@ const AlertsCardAccordionItem: FC<AlertsCardAccordionItemProps> = ({
   return (
     <AccordionItem isExpanded={isExpanded}>
       <AccordionToggle
+        className="alerts-card__toggle--item"
+        id={alertType}
         onClick={() => {
           handleDrawerToggleClick(alertType);
         }}
-        className="alerts-card__toggle--item"
-        id={alertType}
       >
         <div className="subtitle">
           <span className="subtitle-name">{alertTitle?.[alertType]}</span>

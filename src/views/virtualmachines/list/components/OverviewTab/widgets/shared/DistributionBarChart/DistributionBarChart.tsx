@@ -67,21 +67,21 @@ const DistributionBarChart: FC<DistributionBarChartProps> = ({
                 }}
               />
               <ChartAxis
+                axisComponent={<></>}
+                dependentAxis
                 style={{
                   grid: { stroke: chart_color_black_200.value },
                   tickLabels: { fontSize: CHART_FONT_SIZE },
                 }}
-                axisComponent={<></>}
-                dependentAxis
                 tickCount={5}
               />
               <ChartBar
+                data={chartData}
+                labels={({ datum }) => datum.y}
                 style={{
                   data: { fill: ({ datum }) => datum.fill, width: 25 },
                   labels: { fontSize: CHART_FONT_SIZE, fontWeight: 'bold' },
                 }}
-                data={chartData}
-                labels={({ datum }) => datum.y}
               />
             </Chart>
           )

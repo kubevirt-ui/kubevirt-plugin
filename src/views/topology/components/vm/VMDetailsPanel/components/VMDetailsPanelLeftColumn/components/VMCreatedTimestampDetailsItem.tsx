@@ -27,6 +27,8 @@ const VMCreatedTimestampDetailsItem: FC<VMCreatedTimestampDetailsItemProps> = ({
 
   return (
     <DescriptionItem
+      className="topology-vm-details-panel__item"
+      data-test="virtual-machine-overview-details-created"
       descriptionData={
         timestamp !== NO_DATA_DASH ? (
           <>
@@ -37,8 +39,6 @@ const VMCreatedTimestampDetailsItem: FC<VMCreatedTimestampDetailsItemProps> = ({
           NO_DATA_DASH
         )
       }
-      className="topology-vm-details-panel__item"
-      data-test="virtual-machine-overview-details-created"
       descriptionHeader={t('Created')}
     />
   );

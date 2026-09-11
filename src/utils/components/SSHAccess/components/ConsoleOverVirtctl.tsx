@@ -45,6 +45,7 @@ const ConsoleOverVirtctl: FC<ConsoleOverVirtctlProps> = ({ vm }) => {
         <Content component="p">
           {t('SSH using virtctl')}
           <HelpTextIcon
+            aria-label="Help"
             bodyContent={(hide) => (
               <PopoverContentWithLightspeedButton
                 content={
@@ -77,7 +78,6 @@ const ConsoleOverVirtctl: FC<ConsoleOverVirtctlProps> = ({ vm }) => {
                 promptType={OLSPromptType.SSH_USING_VIRTCTL}
               />
             )}
-            aria-label="Help"
             className="virtctl-popover"
             helpIconClassName="pf-v6-u-ml-sm"
             position={PopoverPosition.right}

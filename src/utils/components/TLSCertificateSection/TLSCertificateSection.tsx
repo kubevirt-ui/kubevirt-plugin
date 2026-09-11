@@ -58,15 +58,15 @@ const TLSCertificateSection: FC<TLSCertificateSectionProps> = ({
       <Stack hasGutter>
         <StackItem>
           <Checkbox
+            id="tls-certificate-required"
+            isChecked={tlsRequired}
+            label={t('TLS certificate required')}
             onChange={(_event, checked) => {
               onRequiredChange(checked);
               if (checked) {
                 onSourceChange(TLS_CERT_SOURCE_EXISTING);
               }
             }}
-            id="tls-certificate-required"
-            isChecked={tlsRequired}
-            label={t('TLS certificate required')}
           />
         </StackItem>
         {tlsRequired && (
@@ -76,26 +76,26 @@ const TLSCertificateSection: FC<TLSCertificateSectionProps> = ({
                 <Flex direction={{ default: 'row' }} gap={{ default: 'gapLg' }}>
                   <FlexItem>
                     <Radio
-                      onChange={() => {
-                        onSourceChange(TLS_CERT_SOURCE_EXISTING);
-                        onNewCertificateChange('');
-                      }}
                       id="tls-use-existing"
                       isChecked={useExisting}
                       label={t('Use existing')}
                       name="tls-cert-source"
+                      onChange={() => {
+                        onSourceChange(TLS_CERT_SOURCE_EXISTING);
+                        onNewCertificateChange('');
+                      }}
                     />
                   </FlexItem>
                   <FlexItem>
                     <Radio
-                      onChange={() => {
-                        onSourceChange(TLS_CERT_SOURCE_NEW);
-                        onExistingCertificateChange('', '');
-                      }}
                       id="tls-add-new"
                       isChecked={!useExisting}
                       label={t('Add new')}
                       name="tls-cert-source"
+                      onChange={() => {
+                        onSourceChange(TLS_CERT_SOURCE_NEW);
+                        onExistingCertificateChange('', '');
+                      }}
                     />
                   </FlexItem>
                 </Flex>

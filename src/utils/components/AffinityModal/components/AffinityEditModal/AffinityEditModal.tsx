@@ -16,7 +16,6 @@ import {
 
 import { getIntersectedQualifiedNodes } from '../../utils/helpers';
 import type { AffinityLabel, AffinityRowData } from '../../utils/types';
-
 import AffinityForm from './AffinityForm/AffinityForm';
 import { useNodeFieldQualifier } from './hooks/useNodeFieldQualifier';
 import { useNodeLabelQualifier } from './hooks/useNodeLabelQualifier';
@@ -61,23 +60,24 @@ const AffinityEditModal: FC<AffinityEditModalProps> = ({
       <ModalHeader title={title} />
       <ModalBody>
         <AffinityForm
+          expressions={expressions}
+          fields={fields}
+          focusedAffinity={focusedAffinity}
+          isSubmitDisabled={isDisabled}
+          nodesLoaded={nodesLoaded}
           qualifiedNodes={getIntersectedQualifiedNodes({
             expressionNodes: qualifiedExpressionNodes,
             expressions: expressions?.entities,
             fieldNodes: qualifiedFieldNodes,
             fields: fields?.entities,
           })}
-          expressions={expressions}
-          fields={fields}
-          focusedAffinity={focusedAffinity}
-          isSubmitDisabled={isDisabled}
-          nodesLoaded={nodesLoaded}
           setFocusedAffinity={setFocusedAffinity}
           setSubmitDisabled={setIsDisabled}
         />
       </ModalBody>
       <ModalFooter>
         <Button
+          isDisabled={isDisabled}
           onClick={() =>
             onSubmit({
               ...focusedAffinity,
@@ -85,7 +85,6 @@ const AffinityEditModal: FC<AffinityEditModalProps> = ({
               fields: fields?.entities,
             })
           }
-          isDisabled={isDisabled}
         >
           {t('Save affinity rule')}
         </Button>

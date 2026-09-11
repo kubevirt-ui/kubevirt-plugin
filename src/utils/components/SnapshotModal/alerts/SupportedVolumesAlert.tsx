@@ -17,12 +17,12 @@ const SupportedVolumesAlert: FC<SupportedVolumesAlertProps> = ({ isVMRunning }) 
   return (
     <FormGroup fieldId="snapshot-info-alerts">
       <Alert
+        isInline
         title={
           <Stack hasGutter>
             <StackItem>{t('Taking snapshot of running VirtualMachine.')}</StackItem>
           </Stack>
         }
-        isInline
         variant={AlertVariant.info}
       />
     </FormGroup>

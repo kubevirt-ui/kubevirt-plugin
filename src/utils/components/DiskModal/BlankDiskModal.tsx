@@ -49,15 +49,15 @@ const BlankDiskModal: FC<V1SubDiskModalProps> = ({
   return (
     <FormProvider {...methods}>
       <TabModal
-        onSubmit={() =>
-          handleSubmit(async (data) => submit({ data, editDiskName, onSubmit, pvc, vm }))()
-        }
         closeOnSubmit={isValid}
         headerText={diskModalTitle(isEditDisk, isVMRunning)}
         isDisabled={!isValid}
         isLoading={isSubmitting}
         isOpen={isOpen}
         onClose={onClose}
+        onSubmit={() =>
+          handleSubmit(async (data) => submit({ data, editDiskName, onSubmit, pvc, vm }))()
+        }
         shouldWrapInForm
       >
         <PendingChanges isVMRunning={isVMRunning} />

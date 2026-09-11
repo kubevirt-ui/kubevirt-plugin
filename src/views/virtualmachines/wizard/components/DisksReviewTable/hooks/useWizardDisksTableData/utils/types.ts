@@ -13,7 +13,7 @@ export type DiskDevice = {
 };
 
 export type SourceNameByPriority = {
-  sourceNamePriority: number;
   isDeviceElementExists: boolean;
   source: () => string;
+  sourceNamePriority: number;
 };

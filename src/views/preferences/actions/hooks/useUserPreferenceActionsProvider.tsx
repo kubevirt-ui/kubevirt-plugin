@@ -40,16 +40,16 @@ const useUserPreferenceActionsProvider: UseUserPreferenceActionsProvider = (pref
         createModal(({ isOpen, onClose }) => {
           return (
             <DeleteModal
+              headerText={t('Delete VirtualMachinePreference?')}
+              isOpen={isOpen}
+              obj={preference}
+              onClose={onClose}
               onDeleteSubmit={() =>
                 k8sDelete({
                   model: VirtualMachinePreferenceModel,
                   resource: preference,
                 })
               }
-              headerText={t('Delete VirtualMachinePreference?')}
-              isOpen={isOpen}
-              obj={preference}
-              onClose={onClose}
             />
           );
         }),

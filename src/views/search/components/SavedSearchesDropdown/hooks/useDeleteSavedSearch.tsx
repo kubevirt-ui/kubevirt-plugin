@@ -23,13 +23,13 @@ const useDeleteSavedSearch: UseDeleteSavedSearch = (deleteSearch, setOpen) => {
             body={t('This will permanently delete "{{name}}" and remove it from your favorites.', {
               name,
             })}
-            onDeleteSubmit={async () => {
-              deleteSearch(name);
-            }}
             headerText={t('Delete favorite saved search?')}
             isOpen={isOpen}
             obj={{}}
             onClose={onClose}
+            onDeleteSubmit={async () => {
+              deleteSearch(name);
+            }}
             shouldRedirect={false}
           />
         ));

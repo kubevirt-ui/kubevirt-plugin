@@ -98,13 +98,13 @@ const SelectSnapshot: FC<SelectSnapshotProps> = ({
               value: name,
               valueForFilter: `${name} (${count})`,
             }))}
+            placeholder={t('Select VolumeSnapshot project')}
+            selected={snapshotNamespaceSelected}
+            setSelected={onSelectProject}
             toggleProps={{
               isDisabled: !selectSnapshotNamespace,
               isFullWidth: true,
             }}
-            placeholder={t('Select VolumeSnapshot project')}
-            selected={snapshotNamespaceSelected}
-            setSelected={onSelectProject}
           />
         </FormGroup>
       )}
@@ -117,13 +117,13 @@ const SelectSnapshot: FC<SelectSnapshotProps> = ({
               groupVersionKind: modelToGroupVersionKind(VolumeSnapshotModel),
               value: name,
             }))}
+            placeholder={t('Select VolumeSnapshot name')}
+            selected={snapshotNameSelected}
+            setSelected={selectSnapshotName}
             toggleProps={{
               isDisabled: !snapshotNamespaceSelected,
               isFullWidth: true,
             }}
-            placeholder={t('Select VolumeSnapshot name')}
-            selected={snapshotNameSelected}
-            setSelected={selectSnapshotName}
           />
         </FormGroup>
       ) : (

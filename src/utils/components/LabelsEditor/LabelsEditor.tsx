@@ -63,14 +63,14 @@ export const LabelsEditor: FC<LabelsEditorProps> = ({
       <InputGroup>
         <InputGroupItem isFill>
           <TextInput
+            aria-label={textInputPlaceholder}
+            onChange={(_event, value) => setInputValue(value)}
             onKeyDown={(event) => {
               if (event.key === KeyTypes.Enter && !addingIsDisabled) {
                 event.preventDefault();
                 onAdd();
               }
             }}
-            aria-label={textInputPlaceholder}
-            onChange={(_event, value) => setInputValue(value)}
             placeholder={textInputPlaceholder}
             type="text"
             value={inputValue}
