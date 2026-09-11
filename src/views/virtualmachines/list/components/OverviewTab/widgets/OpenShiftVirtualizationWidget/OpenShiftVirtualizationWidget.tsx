@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC, useMemo } from 'react';
+import React, { type FC, useMemo } from 'react';
 
 import useInfrastructureAlerts from '@kubevirt-utils/hooks/useInfrastructureAlerts/useInfrastructureAlerts';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -8,7 +7,6 @@ import { healthStateMapping } from '@overview/OverviewTab/status-card/utils/util
 import { Card, CardBody, CardHeader, CardTitle, Skeleton } from '@patternfly/react-core';
 
 import { useKubeVirtOverviewClusterCsv } from '../../context/KubeVirtOverviewClusterCsvContext';
-
 import { getUpdateAvailableActions } from './getUpdateAvailableActions';
 import OpenShiftVirtualizationWidgetBody from './OpenShiftVirtualizationWidgetBody';
 import { useCNVHealth } from './useCNVHealth';
@@ -48,7 +46,7 @@ const OpenShiftVirtualizationWidget: FC<OpenShiftVirtualizationWidgetProps> = ({
   const version = installedCSV?.spec?.version;
   const statusIcon = healthStateMapping[healthState]?.icon;
   const healthMessages = getHealthStateToMessage(t);
-  const statusMessage = healthMessages[healthState] || healthMessages[HealthState.NOT_AVAILABLE];
+  const statusMessage = healthMessages[healthState] ?? healthMessages[HealthState.NOT_AVAILABLE];
 
   const isLoading = isAllClustersPage
     ? !healthLoaded
@@ -61,7 +59,7 @@ const OpenShiftVirtualizationWidget: FC<OpenShiftVirtualizationWidgetProps> = ({
     if (!csvLoaded) {
       return <Skeleton width="50%" />;
     }
-    return t('Installed version {{version}}', { version: version || t('Unknown') });
+    return t('Installed version {{version}}', { version: version ?? t('Unknown') });
   }, [isAllClustersPage, csvLoaded, version, t]);
 
   return (

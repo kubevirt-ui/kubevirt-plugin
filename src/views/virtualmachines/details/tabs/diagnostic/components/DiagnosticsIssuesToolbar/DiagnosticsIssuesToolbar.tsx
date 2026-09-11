@@ -1,6 +1,5 @@
-/* eslint-disable */
-import React, { FC, Ref, useState } from 'react';
-import { TFunction } from 'i18next';
+import React, { type FC, type MouseEvent, type ReactElement, type Ref, useState } from 'react';
+import { type TFunction } from 'i18next';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
@@ -8,7 +7,7 @@ import {
   Flex,
   FlexItem,
   MenuToggle,
-  MenuToggleElement,
+  type MenuToggleElement,
   SearchInput,
   Select,
   SelectGroup,
@@ -21,7 +20,7 @@ import { DataViewToolbar } from '@patternfly/react-data-view';
 import { FilterIcon } from '@patternfly/react-icons';
 
 import { DIAGNOSTIC_CATEGORIES, DIAGNOSTIC_CONDITIONS } from '../../utils/constants';
-import { DiagnosticFilterCounts, DiagnosticFilters } from '../../utils/types';
+import { type DiagnosticFilterCounts, type DiagnosticFilters } from '../../utils/types';
 
 import './diagnostics-issues-toolbar.scss';
 
@@ -45,7 +44,7 @@ const renderFilterOptions = (
   selectedSet: Set<string>,
   counts: Record<string, number>,
   t: TFunction,
-) =>
+): ReactElement[] =>
   options.map((option) => (
     <SelectOption hasCheckbox isSelected={selectedSet.has(option)} key={option} value={option}>
       <Flex
@@ -72,7 +71,7 @@ const DiagnosticsIssuesToolbar: FC<DiagnosticsIssuesToolbarProps> = ({
 
   const activeFilterCount = filters.categories.size + filters.conditions.size;
 
-  const handleSelect = (_event: React.MouseEvent, value: string) => {
+  const handleSelect = (_event: MouseEvent, value: string): void => {
     if ((DIAGNOSTIC_CATEGORIES as string[]).includes(value)) {
       onFiltersChange({ ...filters, categories: toggleSetItem(filters.categories, value) });
     } else {
@@ -80,12 +79,12 @@ const DiagnosticsIssuesToolbar: FC<DiagnosticsIssuesToolbarProps> = ({
     }
   };
 
-  const clearAll = () => {
+  const clearAll = (): void => {
     onFiltersChange({ categories: new Set(), conditions: new Set() });
     onSearchChange('');
   };
 
-  const filterToggle = (toggleRef: Ref<MenuToggleElement>) => (
+  const filterToggle = (toggleRef: Ref<MenuToggleElement>): ReactElement => (
     <MenuToggle
       badge={activeFilterCount > 0 ? <Badge isRead>{activeFilterCount}</Badge> : undefined}
       icon={<FilterIcon />}

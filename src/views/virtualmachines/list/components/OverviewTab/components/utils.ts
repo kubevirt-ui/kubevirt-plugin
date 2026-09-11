@@ -1,5 +1,4 @@
-/* eslint-disable */
-import { TFunction } from 'i18next';
+import { type TFunction } from 'i18next';
 
 type SpokeClusterParams = {
   cluster?: string;
@@ -69,7 +68,7 @@ export const getShowObservabilityWarning = ({
   ((isAllClustersPage && disabledClusters.length > 0) ||
     (isSpokeCluster && disabledClusters.includes(cluster)));
 
-export const getAlertMessage = (canCreate: boolean, t: TFunction) =>
+export const getAlertMessage = (canCreate: boolean, t: TFunction): string =>
   canCreate
     ? t('Create your first virtual machine to begin monitoring health and performance metrics.')
     : t('Health and performance metrics will appear after virtual machines are available.');

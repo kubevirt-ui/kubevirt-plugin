@@ -1,9 +1,8 @@
-/* eslint-disable */
-import { TFunction } from 'i18next';
+import { type TFunction } from 'i18next';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import {
-  KubevirtFilter,
+  type KubevirtFilter,
   KubevirtFilterLayout,
 } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { getInstanceTypeCPU } from '@kubevirt-utils/resources/instancetype/selectors';
@@ -14,8 +13,8 @@ import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 import {
   getInstanceTypeFromMapper,
   getVMIFromMapper,
-  InstanceTypeMapper,
-  VMIMapper,
+  type InstanceTypeMapper,
+  type VMIMapper,
 } from '@virtualmachines/utils/mappers';
 
 import { getOperatorChipLabel } from './utils';
@@ -29,7 +28,7 @@ export const getCPUFilter = (
   filterLayout: KubevirtFilterLayout.HIDDEN,
   getChipLabel: getOperatorChipLabel,
   id: VirtualMachineRowFilterType.CPU,
-  match: (obj, selected) => {
+  match: (obj, selected): boolean => {
     const cpuInfo = selected[0];
     if (!cpuInfo) return true;
 
@@ -37,7 +36,7 @@ export const getCPUFilter = (
     const [operator, cpu] = cpuInfo.split(' ');
     const filterCPU = Number(cpu);
 
-    const cpuSpec = getCPU(obj) || getCPU(vmi);
+    const cpuSpec = getCPU(obj) ?? getCPU(vmi);
     const vmCPU = cpuSpec
       ? vCPUCount(cpuSpec)
       : getInstanceTypeCPU(getInstanceTypeFromMapper(instanceTypeMapper, obj));

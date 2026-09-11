@@ -1,13 +1,17 @@
-/* eslint-disable */
 import { useMemo } from 'react';
 
 import { VirtualMachineInstanceModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getClusterKey } from '@kubevirt-utils/resources/shared';
 import { useAccessibleResources } from '@virtualmachines/search/hooks/useAccessibleResources';
-import { VMIMapper } from '@virtualmachines/utils/mappers';
+import { type VMIMapper } from '@virtualmachines/utils/mappers';
 
-export const useVirtualMachineInstanceMapper = () => {
+type UseVirtualMachineInstanceMapperResult = {
+  vmiMapper: VMIMapper;
+  vmisLoaded: boolean;
+};
+
+export const useVirtualMachineInstanceMapper = (): UseVirtualMachineInstanceMapperResult => {
   const { loaded: vmisLoaded, resources: vmis } = useAccessibleResources<V1VirtualMachineInstance>({
     groupVersionKind: VirtualMachineInstanceModelGroupVersionKind,
   });

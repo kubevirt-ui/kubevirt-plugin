@@ -1,9 +1,8 @@
-/* eslint-disable */
-import { TFunction } from 'i18next';
+import { type TFunction } from 'i18next';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import {
-  KubevirtFilter,
+  type KubevirtFilter,
   KubevirtFilterLayout,
 } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { getVMStatus } from '@kubevirt-utils/resources/shared';
@@ -19,7 +18,7 @@ export const getStatusFilter = (t: TFunction): KubevirtFilter<V1VirtualMachine> 
   categoryLabel: t('Status'),
   filterLayout: KubevirtFilterLayout.SELECT,
   id: VirtualMachineRowFilterType.Status,
-  match: (obj, selected) => {
+  match: (obj, selected): boolean => {
     const status = getVMStatus(obj);
     const isError = selected.includes(ERROR_STATUS) && isErrorPrintableStatus(status);
     return selected.includes(status) || isError;

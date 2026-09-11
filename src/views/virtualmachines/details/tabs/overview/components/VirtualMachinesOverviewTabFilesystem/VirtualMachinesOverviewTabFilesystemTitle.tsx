@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React from 'react';
+import React, { type FC } from 'react';
 
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -7,7 +6,7 @@ import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverCo
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { CardTitle, PopoverPosition } from '@patternfly/react-core';
 
-const VirtualMachinesOverviewTabFilesystemTitle = () => {
+const VirtualMachinesOverviewTabFilesystemTitle: FC = () => {
   const { t } = useKubevirtTranslation();
 
   return (

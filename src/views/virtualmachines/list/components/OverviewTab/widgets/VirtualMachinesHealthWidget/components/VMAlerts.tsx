@@ -1,12 +1,10 @@
-/* eslint-disable */
-import React, { FC, useMemo } from 'react';
+import React, { type FC, useMemo } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Alert, Flex } from '@patternfly/react-core';
 
 import useVMAlerts from '../hooks/useVMAlerts';
-import { getSeverityUrls, VMAlertsProps } from '../utils/vmAlerts';
-
+import { getSeverityUrls, type VMAlertsProps } from '../utils/vmAlerts';
 import TotalAlertCount from './TotalAlertCount';
 import VMAlertsCard from './VMAlertsCard';
 import VMAlertSeverityCounts from './VMAlertSeverityCounts';
@@ -17,8 +15,8 @@ const VMAlerts: FC<VMAlertsProps> = ({ alertsBaseHref, alertsBasePath, vmNames }
   const totalAlerts = critical + warning + info;
   const isLoading = !loaded;
 
-  const isExternal = !alertsBasePath && !!alertsBaseHref;
-  const baseUrl = alertsBasePath || alertsBaseHref;
+  const isExternal = alertsBasePath == null && alertsBaseHref != null;
+  const baseUrl = alertsBasePath ?? alertsBaseHref;
 
   const severityUrls = useMemo(() => getSeverityUrls(baseUrl), [baseUrl]);
 

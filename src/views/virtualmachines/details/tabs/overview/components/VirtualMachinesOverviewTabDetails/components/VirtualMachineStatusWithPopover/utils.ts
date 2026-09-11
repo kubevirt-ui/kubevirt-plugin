@@ -1,4 +1,5 @@
-/* eslint-disable */
+import { type ComponentType } from 'react';
+
 import { vmimStatuses } from '@kubevirt-utils/resources/vmim/statuses';
 import {
   CheckCircleIcon,
@@ -10,7 +11,7 @@ import {
   UnknownIcon,
 } from '@patternfly/react-icons';
 
-export const getMigrationPhaseIcon = (phase: string) => {
+export const getMigrationPhaseIcon = (phase: string): ComponentType => {
   switch (phase) {
     case vmimStatuses.Running:
       return RunningIcon;

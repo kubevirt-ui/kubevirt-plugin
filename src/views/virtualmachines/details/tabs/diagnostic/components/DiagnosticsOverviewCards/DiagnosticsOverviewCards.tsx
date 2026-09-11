@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { ComponentType, FC } from 'react';
+import React, { type ComponentType, type FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
@@ -19,7 +18,7 @@ import {
   InfoCircleIcon,
 } from '@patternfly/react-icons';
 
-import { DiagnosticSeverity, DiagnosticSeverityCounts } from '../../utils/types';
+import { type DiagnosticSeverity, type DiagnosticSeverityCounts } from '../../utils/types';
 
 import './diagnostics-overview-cards.scss';
 
@@ -82,36 +81,36 @@ const DiagnosticsOverviewCards: FC<DiagnosticsOverviewCardsProps> = ({
 
   return (
     <Flex className="diagnostics-overview-cards">
-      {cards.map(({ colorClass, count, icon: CardIcon, label, severity, status }) => {
-        const isSelected = activeSeverity === severity;
+      {cards.map((card) => {
+        const isSelected = activeSeverity === card.severity;
 
         return (
-          <FlexItem flex={{ default: 'flex_1' }} key={label}>
+          <FlexItem flex={{ default: 'flex_1' }} key={card.label}>
             <Card
-              className={`diagnostics-overview-cards__card ${colorClass} ${
+              className={`diagnostics-overview-cards__card ${card.colorClass} ${
                 isSelected ? 'diagnostics-overview-cards__card--selected' : ''
               }`}
-              aria-label={t('{{label}}, {{count}}', { count, label })}
+              aria-label={t('{{label}}, {{count}}', { count: card.count, label: card.label })}
               aria-pressed={isSelected}
-              data-test={`diagnostics-card-${severity ?? 'all'}`}
+              data-test={`diagnostics-card-${card.severity ?? 'all'}`}
               isClickable
               isCompact
               isSelected={isSelected}
-              onClick={() => onSeverityChange(severity)}
+              onClick={() => onSeverityChange(card.severity)}
               role="button"
             >
               <CardTitle>
                 <Split hasGutter>
                   <SplitItem>
-                    <Icon status={status}>
-                      <CardIcon />
+                    <Icon status={card.status}>
+                      <card.icon />
                     </Icon>
                   </SplitItem>
-                  <SplitItem>{label}</SplitItem>
+                  <SplitItem>{card.label}</SplitItem>
                 </Split>
               </CardTitle>
               <CardBody>
-                <span className="diagnostics-overview-cards__count">{count}</span>
+                <span className="diagnostics-overview-cards__count">{card.count}</span>
               </CardBody>
             </Card>
           </FlexItem>

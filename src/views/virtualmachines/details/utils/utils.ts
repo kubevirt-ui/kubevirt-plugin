@@ -1,5 +1,4 @@
-/* eslint-disable */
-import { TFunction } from 'i18next';
+import { type TFunction } from 'i18next';
 
 import {
   getVirtualMachineDetailsTabLabel,
@@ -7,7 +6,15 @@ import {
   VirtualMachineDetailsTab,
 } from '@kubevirt-utils/constants/tabs-constants';
 
-export const getTabNameAndTitle = (tab: VirtualMachineDetailsTab, t: TFunction) => {
+export type TabNameAndTitle = {
+  name: VirtualMachineDetailsTab;
+  title: string | undefined;
+};
+
+export const getTabNameAndTitle = (
+  tab: VirtualMachineDetailsTab,
+  t: TFunction,
+): TabNameAndTitle => {
   const tabLabels = getVirtualMachineDetailsTabLabel(t);
   return {
     name: tab,
@@ -15,7 +22,10 @@ export const getTabNameAndTitle = (tab: VirtualMachineDetailsTab, t: TFunction) 
   };
 };
 
-export const getTabHrefAndName = (tab: VirtualMachineDetailsTab, t: TFunction) => {
+export const getTabHrefAndName = (
+  tab: VirtualMachineDetailsTab,
+  t: TFunction,
+): { href: string; name: string | undefined } => {
   const tabLabels = getVirtualMachineDetailsTabLabel(t);
 
   if (VirtualMachineConfigurationTabInner.has(tab)) {

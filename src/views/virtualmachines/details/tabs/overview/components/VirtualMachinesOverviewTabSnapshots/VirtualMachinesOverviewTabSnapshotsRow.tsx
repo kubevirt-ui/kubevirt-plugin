@@ -1,4 +1,3 @@
-/* eslint-disable */
 import React, { type FC, useState } from 'react';
 
 import {
@@ -10,6 +9,7 @@ import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider
 import RestoreModal from '@kubevirt-utils/components/SnapshotModal/RestoreModal';
 import { timestampFor } from '@kubevirt-utils/components/Timestamp/utils/datetime';
 import KebabToggle from '@kubevirt-utils/components/toggles/KebabToggle';
+import useCurrentTime from '@kubevirt-utils/hooks/useCurrentTime';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   DescriptionList,
@@ -40,16 +40,19 @@ const VirtualMachinesOverviewTabSnapshotsRow: FC<VirtualMachinesOverviewTabSnaps
   const { t } = useKubevirtTranslation();
   const [isKebabOpen, setIsKebabOpen] = useState(false);
   const { createModal } = useModal();
+  const currentTime = useCurrentTime();
 
-  const timestamp = timestampFor(
+  const timestampValue = timestampFor(
     new Date(snapshot?.metadata?.creationTimestamp),
-    new Date(Date.now()),
+    new Date(currentTime),
     false,
-  ) as string;
+  );
+  const timestamp = typeof timestampValue === 'string' ? timestampValue : timestampValue.time;
 
-  const StatusIcon = icon[snapshot?.status?.phase];
+  const phase = snapshot?.status?.phase ?? '';
+  const StatusIcon = icon[phase];
 
-  const onToggle = () => setIsKebabOpen((prevIsOpen) => !prevIsOpen);
+  const onToggle = (): void => setIsKebabOpen((prevIsOpen) => !prevIsOpen);
 
   return (
     <Flex flexWrap={{ default: 'nowrap' }}>
@@ -70,7 +73,7 @@ const VirtualMachinesOverviewTabSnapshotsRow: FC<VirtualMachinesOverviewTabSnaps
                   descriptionData={
                     <>
                       <StatusIcon />
-                      <span className="pf-v6-u-ml-xs">{snapshot?.status?.phase}</span>
+                      <span className="pf-v6-u-ml-xs">{phase}</span>
                     </>
                   }
                   descriptionHeader={t('Status')}

@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
 import AllClustersResourcesCard from './AllClustersResourcesCard';
 import SingleClusterResourcesCard from './SingleClusterResourcesCard';
@@ -22,7 +21,7 @@ const ClusterResourcesCard: FC<ClusterResourcesCardProps> = ({
   if (isAllClustersPage) {
     return (
       <AllClustersResourcesCard
-        clustersCount={clustersCount || 0}
+        clustersCount={clustersCount ?? 0}
         projectsCount={projectsCount}
         vmsCount={vmsCount}
       />

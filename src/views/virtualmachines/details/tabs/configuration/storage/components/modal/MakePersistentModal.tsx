@@ -1,10 +1,9 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
 import {
-  V1VirtualMachine,
-  V1VirtualMachineInstance,
-  V1Volume,
+  type V1VirtualMachine,
+  type V1VirtualMachineInstance,
+  type V1Volume,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import ConfirmActionMessage from '@kubevirt-utils/components/ConfirmActionMessage/ConfirmActionMessage';
 import { CONFIRM_ACTIONS } from '@kubevirt-utils/components/ConfirmActionMessage/constants';
@@ -14,7 +13,6 @@ import { getVMIVolumes } from '@kubevirt-utils/resources/vmi';
 import { Stack, StackItem } from '@patternfly/react-core';
 
 import { updateDisks } from '../../../details/utils/utils';
-
 import { persistVolume } from './utils';
 
 type MakePersistentModalProps = {
@@ -34,7 +32,7 @@ const MakePersistentModal: FC<MakePersistentModalProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
 
-  const makePersistent = async () => {
+  const makePersistent = async (): Promise<V1VirtualMachine> => {
     const volumeToPersist = getVMIVolumes(vmi)?.find(
       (vmiVolume) => vmiVolume.name === volume?.name,
     );

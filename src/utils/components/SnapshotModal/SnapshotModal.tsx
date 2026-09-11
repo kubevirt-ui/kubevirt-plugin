@@ -30,7 +30,7 @@ import {
   TextInput,
   ValidatedOptions,
 } from '@patternfly/react-core';
-import { deadlineUnits } from '@virtualmachines/details/tabs/snapshots/utils/consts';
+import { DeadlineUnits } from '@virtualmachines/details/tabs/snapshots/utils/consts';
 import { getVolumeSnapshotStatusesPartition } from '@virtualmachines/details/tabs/snapshots/utils/helpers';
 import { printableVMStatus } from '@virtualmachines/utils';
 
@@ -54,7 +54,7 @@ const SnapshotModal: FC<SnapshotModalProps> = ({ isOpen, onClose, vm }) => {
   const isSnapshotNameValid = isDNS1123Label(snapshotName);
   const [description, setDescription] = useState<string>(undefined);
   const [deadline, setDeadline] = useState<string>(undefined);
-  const [deadlineUnit, setDeadlineUnit] = useState<deadlineUnits>(deadlineUnits.Seconds);
+  const [deadlineUnit, setDeadlineUnit] = useState<DeadlineUnits>(DeadlineUnits.Seconds);
 
   const volumeSnapshotStatuses = getVolumeSnapshotStatuses(vm);
   const { supportedVolumes, unsupportedVolumes } =

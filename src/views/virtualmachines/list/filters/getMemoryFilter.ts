@@ -1,9 +1,8 @@
-/* eslint-disable */
-import { TFunction } from 'i18next';
+import { type TFunction } from 'i18next';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import {
-  KubevirtFilter,
+  type KubevirtFilter,
   KubevirtFilterLayout,
 } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { getInstanceTypeMemory } from '@kubevirt-utils/resources/instancetype/selectors';
@@ -14,8 +13,8 @@ import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 import {
   getInstanceTypeFromMapper,
   getVMIFromMapper,
-  InstanceTypeMapper,
-  VMIMapper,
+  type InstanceTypeMapper,
+  type VMIMapper,
 } from '@virtualmachines/utils/mappers';
 
 import { getOperatorChipLabel } from './utils';
@@ -29,7 +28,7 @@ export const getMemoryFilter = (
   filterLayout: KubevirtFilterLayout.HIDDEN,
   getChipLabel: getOperatorChipLabel,
   id: VirtualMachineRowFilterType.Memory,
-  match: (obj, selected) => {
+  match: (obj, selected): boolean => {
     const memoryInfo = selected[0];
     if (!memoryInfo) return true;
 
@@ -37,8 +36,8 @@ export const getMemoryFilter = (
     const [operator, memoryFilterValue, memoryFilterUnit] = memoryInfo.split(' ');
     const filterBytes = convertToBaseValue(`${memoryFilterValue} ${memoryFilterUnit.slice(0, -1)}`);
     const vmMemory =
-      getMemory(obj) ||
-      getMemory(vmi) ||
+      getMemory(obj) ??
+      getMemory(vmi) ??
       getInstanceTypeMemory(getInstanceTypeFromMapper(instanceTypeMapper, obj))?.toString();
     const vmBytes = convertToBaseValue(vmMemory);
     return numberOperatorInfo[operator].compareFunction(vmBytes, filterBytes);

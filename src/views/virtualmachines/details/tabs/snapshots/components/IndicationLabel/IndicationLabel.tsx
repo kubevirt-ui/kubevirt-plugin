@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
 import { Label, Tooltip } from '@patternfly/react-core';
 
@@ -13,7 +12,7 @@ type IndicationLabelProps = {
 
 const IndicationLabel: FC<IndicationLabelProps> = ({ indicationObject }) => (
   <Tooltip content={indicationObject.message}>
-    <Label status={INDICATOR_STATUSES[indicationObject.indication] || 'info'}>
+    <Label status={INDICATOR_STATUSES[indicationObject.indication] ?? 'info'}>
       {indicationObject.indication}
     </Label>
   </Tooltip>

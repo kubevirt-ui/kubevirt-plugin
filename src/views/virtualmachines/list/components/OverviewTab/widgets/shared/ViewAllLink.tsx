@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { AnchorHTMLAttributes, FC, useMemo } from 'react';
+import React, { type AnchorHTMLAttributes, type FC, type JSX, useMemo } from 'react';
 import { Link } from 'react-router';
 
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
@@ -31,7 +30,9 @@ const ViewAllLink: FC<ViewAllLinkProps> = ({
   const LinkComponent = useMemo(
     () =>
       linkPath
-        ? (props: AnchorHTMLAttributes<HTMLAnchorElement>) => <Link {...props} to={linkPath} />
+        ? (props: AnchorHTMLAttributes<HTMLAnchorElement>): JSX.Element => (
+            <Link {...props} to={linkPath} />
+          )
         : undefined,
     [linkPath],
   );

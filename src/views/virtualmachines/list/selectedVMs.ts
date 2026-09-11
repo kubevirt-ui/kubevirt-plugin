@@ -1,5 +1,4 @@
-/* eslint-disable */
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
@@ -7,14 +6,14 @@ import { signal } from '@preact/signals-core';
 
 export const selectedVMs = signal<{ cluster?: string; name: string; namespace: string }[]>([]);
 
-export const selectVM = (vm: V1VirtualMachine) => {
+export const selectVM = (vm: V1VirtualMachine): void => {
   const vmIdentifier = { cluster: getCluster(vm), name: getName(vm), namespace: getNamespace(vm) };
   if (isEmpty(findVM(vm))) {
     selectedVMs.value = [...selectedVMs.value, vmIdentifier];
   }
 };
 
-export const deselectVM = (vm: V1VirtualMachine) => {
+export const deselectVM = (vm: V1VirtualMachine): void => {
   const vmIdentifier = { cluster: getCluster(vm), name: getName(vm), namespace: getNamespace(vm) };
   selectedVMs.value = selectedVMs.value.filter(
     (selectedVM) =>
@@ -24,7 +23,7 @@ export const deselectVM = (vm: V1VirtualMachine) => {
   );
 };
 
-export const selectAllVMs = (vms: V1VirtualMachine[]) => {
+export const selectAllVMs = (vms: V1VirtualMachine[]): void => {
   const vmIdentifiers = vms.map((vm) => ({
     cluster: getCluster(vm),
     name: getName(vm),
@@ -33,11 +32,13 @@ export const selectAllVMs = (vms: V1VirtualMachine[]) => {
   selectedVMs.value = [...vmIdentifiers];
 };
 
-export const deselectAllVMs = () => {
+export const deselectAllVMs = (): void => {
   selectedVMs.value = [];
 };
 
-export const findVM = (vm: V1VirtualMachine) => {
+export const findVM = (
+  vm: V1VirtualMachine,
+): { cluster?: string; name: string; namespace: string } | undefined => {
   const vmIdentifier = { cluster: getCluster(vm), name: getName(vm), namespace: getNamespace(vm) };
   return selectedVMs.value.find(
     (selectedVM) =>

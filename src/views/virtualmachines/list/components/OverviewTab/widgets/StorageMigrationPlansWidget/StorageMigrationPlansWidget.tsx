@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC, useMemo } from 'react';
+import React, { type FC, type ReactNode, useMemo } from 'react';
 
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -19,7 +18,6 @@ import { PendingIcon } from '@patternfly/react-icons';
 
 import StatusCountItem, { getLinkProps } from '../shared/StatusCountItem';
 import ViewAllLink from '../shared/ViewAllLink';
-
 import useStorageMigrationNavigation from './useStorageMigrationNavigation';
 import useStorageMigrationOverviewData from './useStorageMigrationOverviewData';
 import { getStorageMigrationStatusCounts } from './utils';
@@ -45,7 +43,7 @@ const StorageMigrationPlansWidget: FC<StorageMigrationPlansWidgetProps> = ({ clu
     [storageMigPlans],
   );
 
-  const headerActions = (() => {
+  const headerActions = ((): ReactNode => {
     if (storageMigAPI === STORAGE_MIGRATION_API.NONE) {
       return null;
     }
@@ -64,7 +62,7 @@ const StorageMigrationPlansWidget: FC<StorageMigrationPlansWidgetProps> = ({ clu
     );
   })();
 
-  const cardBodyContent = (() => {
+  const cardBodyContent = ((): ReactNode => {
     if (loadError) {
       return <ErrorAlert error={loadError} />;
     }

@@ -1,17 +1,16 @@
-/* eslint-disable */
 import {
-  V1VirtualMachine,
-  V1VirtualMachineCondition,
+  type V1VirtualMachine,
+  type V1VirtualMachineCondition,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { isLiveMigratable } from '@virtualmachines/utils';
 
-const isLiveMigratableCondition = (condition: V1VirtualMachineCondition) =>
+const isLiveMigratableCondition = (condition: V1VirtualMachineCondition): boolean =>
   condition?.type === 'LiveMigratable' && condition?.status === 'True';
 
-const isNotLiveMigratableCondition = (condition: V1VirtualMachineCondition) =>
+const isNotLiveMigratableCondition = (condition: V1VirtualMachineCondition): boolean =>
   condition?.type === 'LiveMigratable' && condition?.status === 'False';
 
-const isLiveMigratableType = (condition: V1VirtualMachineCondition) =>
+const isLiveMigratableType = (condition: V1VirtualMachineCondition): boolean =>
   condition?.type === 'LiveMigratable';
 
 export const filterConditions = (vm: V1VirtualMachine): V1VirtualMachineCondition[] => {

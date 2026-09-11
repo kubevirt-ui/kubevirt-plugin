@@ -1,25 +1,24 @@
-/* eslint-disable */
-import React, { FC, useMemo } from 'react';
+import React, { type FC, useMemo } from 'react';
 
 import { VirtualMachineModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useClusterObservabilityDisabled } from '@kubevirt-utils/hooks/useAlerts/utils/useClusterObservabilityDisabled';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
 import useIsAllClustersPage from '@multicluster/hooks/useIsAllClustersPage';
 import useIsACMPage from '@multicluster/useIsACMPage';
-import { WatchK8sResource } from '@openshift-console/dynamic-plugin-sdk';
+import { type WatchK8sResource } from '@openshift-console/dynamic-plugin-sdk';
 import { Alert, Bullseye, PageSection, Spinner, Stack } from '@patternfly/react-core';
 import { useSignals } from '@preact/signals-react/runtime';
-import { AdvancedSearchFilter, useHubClusterName } from '@stolostron/multicluster-sdk';
+import { type AdvancedSearchFilter, useHubClusterName } from '@stolostron/multicluster-sdk';
 import { useAccessibleResources } from '@virtualmachines/search/hooks/useAccessibleResources';
 import { OBJECTS_FETCHING_LIMIT } from '@virtualmachines/utils';
 
 import OverviewAlerts from './components/OverviewAlerts';
+import { determineOverviewLevel, getOverviewConfig } from './config';
 import { KubeVirtOverviewClusterCsvProvider } from './context/KubeVirtOverviewClusterCsvContext';
 import useFolderFilter from './hooks/useFolderFilter';
-import { determineOverviewLevel, getOverviewConfig } from './config';
-import { OVERVIEW_LEVEL_PROJECT, OverviewTabProps } from './types';
+import { OVERVIEW_LEVEL_PROJECT, type OverviewTabProps } from './types';
 
 const OverviewTab: FC<OverviewTabProps> = ({ cluster, namespace }) => {
   useSignals();
@@ -68,7 +67,7 @@ const OverviewTab: FC<OverviewTabProps> = ({ cluster, namespace }) => {
     resources: accessibleVms,
   } = useAccessibleResources<V1VirtualMachine>({
     groupVersionKind: VirtualMachineModelGroupVersionKind,
-    namespace: namespace || undefined,
+    namespace: namespace ?? undefined,
   });
 
   const vms = namespace ? watchedVms : accessibleVms;
@@ -136,13 +135,23 @@ const OverviewTab: FC<OverviewTabProps> = ({ cluster, namespace }) => {
           observabilityLoaded={observabilityLoaded}
         />
         {overviewLevel === OVERVIEW_LEVEL_PROJECT ? (
-          config.sections.map(({ Component, id, subHeader, title }) => (
-            <Component key={id} {...sectionData} subHeader={subHeader} title={title} />
+          config.sections.map((section) => (
+            <section.Component
+              key={section.id}
+              {...sectionData}
+              subHeader={section.subHeader}
+              title={section.title}
+            />
           ))
         ) : (
           <KubeVirtOverviewClusterCsvProvider cluster={cluster}>
-            {config.sections.map(({ Component, id, subHeader, title }) => (
-              <Component key={id} {...sectionData} subHeader={subHeader} title={title} />
+            {config.sections.map((section) => (
+              <section.Component
+                key={section.id}
+                {...sectionData}
+                subHeader={section.subHeader}
+                title={section.title}
+              />
             ))}
           </KubeVirtOverviewClusterCsvProvider>
         )}

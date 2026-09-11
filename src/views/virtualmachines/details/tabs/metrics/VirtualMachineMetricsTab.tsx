@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC, useEffect, useState } from 'react';
+import React, { type FC, useEffect, useState } from 'react';
 import { useLocation } from 'react-router';
 
 import {
@@ -14,7 +13,7 @@ import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { Overview } from '@openshift-console/dynamic-plugin-sdk';
 import { Alert, AlertVariant, ExpandableSection, Title } from '@patternfly/react-core';
-import { NavPageComponentProps } from '@virtualmachines/details/utils/types';
+import { type NavPageComponentProps } from '@virtualmachines/details/utils/types';
 
 import MigrationCharts from './MigrationCharts/MigrationCharts';
 import NetworkCharts from './NetworkCharts/NetworkCharts';
@@ -32,14 +31,16 @@ const VirtualMachineMetricsTab: FC<NavPageComponentProps> = ({ obj: vm }) => {
   const { mcoError, prometheusUnavailable } = usePrometheusAvailability(vm);
 
   const [expended, setExpended] = useState<{ [key in MetricsTabExpendedSections]: boolean }>({
-    [MetricsTabExpendedSections.migration]: true,
-    [MetricsTabExpendedSections.network]: true,
-    [MetricsTabExpendedSections.storage]: true,
-    [MetricsTabExpendedSections.utilization]: true,
+    [MetricsTabExpendedSections.Migration]: true,
+    [MetricsTabExpendedSections.Network]: true,
+    [MetricsTabExpendedSections.Storage]: true,
+    [MetricsTabExpendedSections.Utilization]: true,
   });
 
-  const onToggle = (value: MetricsTabExpendedSections) => () =>
-    setExpended((currentOpen) => ({ ...currentOpen, [value]: !currentOpen?.[value] }));
+  const onToggle =
+    (value: MetricsTabExpendedSections): (() => void) =>
+    () =>
+      setExpended((currentOpen) => ({ ...currentOpen, [value]: !currentOpen?.[value] }));
 
   useEffect(() => {
     if (!isEmpty(location?.search) && vmiLoaded) {
@@ -74,34 +75,34 @@ const VirtualMachineMetricsTab: FC<NavPageComponentProps> = ({ obj: vm }) => {
       {!prometheusUnavailable && <TimeRange />}
       <Overview className="virtual-machine-metrics-tab__charts">
         <ExpandableSection
-          id={MetricsTabExpendedSections.utilization}
-          isExpanded={expended?.[MetricsTabExpendedSections.utilization]}
-          onToggle={onToggle(MetricsTabExpendedSections.utilization)}
+          id={MetricsTabExpendedSections.Utilization}
+          isExpanded={expended?.[MetricsTabExpendedSections.Utilization]}
+          onToggle={onToggle(MetricsTabExpendedSections.Utilization)}
           toggleText={t('Utilization')}
         >
           <UtilizationCharts prometheusUnavailable={prometheusUnavailable} vmi={vmi} />
         </ExpandableSection>
 
         <ExpandableSection
-          id={MetricsTabExpendedSections.storage}
-          isExpanded={expended?.[MetricsTabExpendedSections.storage]}
-          onToggle={onToggle(MetricsTabExpendedSections.storage)}
+          id={MetricsTabExpendedSections.Storage}
+          isExpanded={expended?.[MetricsTabExpendedSections.Storage]}
+          onToggle={onToggle(MetricsTabExpendedSections.Storage)}
           toggleText={t('Storage')}
         >
           <StorageCharts prometheusUnavailable={prometheusUnavailable} vmi={vmi} />
         </ExpandableSection>
         <ExpandableSection
-          id={MetricsTabExpendedSections.network}
-          isExpanded={expended?.[MetricsTabExpendedSections.network]}
-          onToggle={onToggle(MetricsTabExpendedSections.network)}
+          id={MetricsTabExpendedSections.Network}
+          isExpanded={expended?.[MetricsTabExpendedSections.Network]}
+          onToggle={onToggle(MetricsTabExpendedSections.Network)}
           toggleText={t('Network')}
         >
           <NetworkCharts prometheusUnavailable={prometheusUnavailable} vmi={vmi} />
         </ExpandableSection>
         <ExpandableSection
-          id={MetricsTabExpendedSections.migration}
-          isExpanded={expended?.[MetricsTabExpendedSections.migration]}
-          onToggle={onToggle(MetricsTabExpendedSections.migration)}
+          id={MetricsTabExpendedSections.Migration}
+          isExpanded={expended?.[MetricsTabExpendedSections.Migration]}
+          onToggle={onToggle(MetricsTabExpendedSections.Migration)}
           toggleText={t('Migration')}
         >
           <MigrationCharts prometheusUnavailable={prometheusUnavailable} vmi={vmi} />

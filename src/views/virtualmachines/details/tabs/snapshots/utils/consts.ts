@@ -1,5 +1,7 @@
-/* eslint-disable */
+import { type FC } from 'react';
+
 import {
+  type ColoredIconProps,
   GreenCheckCircleIcon,
   RedExclamationCircleIcon,
   YellowExclamationTriangleIcon,
@@ -11,7 +13,7 @@ export const snapshotStatuses = {
   Succeeded: 'Succeeded',
 };
 
-export const iconMapper = {
+export const iconMapper: Record<string, FC<ColoredIconProps>> = {
   default: GreenCheckCircleIcon,
   Error: RedExclamationCircleIcon,
   Failed: RedExclamationCircleIcon,
@@ -21,7 +23,7 @@ export const iconMapper = {
 };
 
 // https://kubevirt.io/user-guide/operations/snapshot_restore_api/#snapshot-a-virtualmachine
-export enum deadlineUnits {
+export enum DeadlineUnits {
   Hours = 'h',
   Minutes = 'm',
   Seconds = 's',

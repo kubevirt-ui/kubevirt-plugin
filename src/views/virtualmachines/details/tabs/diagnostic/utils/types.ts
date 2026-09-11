@@ -1,27 +1,26 @@
-/* eslint-disable */
 import {
-  V1VirtualMachineCondition,
-  V1VolumeSnapshotStatus,
+  type V1VirtualMachineCondition,
+  type V1VolumeSnapshotStatus,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { ThProps } from '@patternfly/react-table';
+import { type ThProps } from '@patternfly/react-table';
 
 export type DiagnosticSeverity = 'critical' | 'healthy' | 'warning';
 
-export interface VirtualizationVolumeSnapshotStatus extends V1VolumeSnapshotStatus {
+export type VirtualizationVolumeSnapshotStatus = {
   id?: string;
   message?: string;
   metadata: { [key: string]: string };
   severity?: DiagnosticSeverity;
   status?: boolean;
-}
+} & V1VolumeSnapshotStatus;
 
-export interface VirtualizationStatusCondition extends V1VirtualMachineCondition {
+export type VirtualizationStatusCondition = {
   id?: string;
   lastTransitionTime?: string;
   message?: string;
   metadata: { [key: string]: string };
   severity?: DiagnosticSeverity;
-}
+} & V1VirtualMachineCondition;
 
 export type DiagnosticSort = {
   column: string;

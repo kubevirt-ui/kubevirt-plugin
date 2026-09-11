@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 
 import { type ThProps } from '@patternfly/react-table';
 
-type GetSorting = (column: string, columnIndex: number) => ThProps['sort'];
+export type GetSorting = (column: string, columnIndex: number) => ThProps['sort'];
 
 type UseDiagnosticSort = () => {
   getSorting: GetSorting;

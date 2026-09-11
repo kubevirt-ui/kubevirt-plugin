@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { useMemo } from 'react';
 
 import usePVCs from '@kubevirt-utils/hooks/usePVCs';
@@ -10,7 +9,12 @@ type ISOOption = {
   value: string;
 };
 
-export const useISOOptions = (namespace: string) => {
+type UseISOOptionsReturn = {
+  isoOptions: ISOOption[];
+  pvcsLoaded: boolean;
+};
+
+export const useISOOptions = (namespace: string): UseISOOptionsReturn => {
   const [pvcs, pvcsLoaded] = usePVCs(namespace);
 
   const isoOptions: ISOOption[] = useMemo(() => {

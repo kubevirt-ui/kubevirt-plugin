@@ -1,15 +1,15 @@
-/* eslint-disable */
 import { useMemo } from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import {
-  KubevirtFilter,
+  type KubevirtFilter,
   KubevirtFilterLayout,
 } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getVMINodeName } from '@kubevirt-utils/resources/vmi';
 import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
-import { getVMIFromMapper, VMIMapper } from '@virtualmachines/utils/mappers';
+import { getVMIFromMapper, type VMIMapper } from '@virtualmachines/utils/mappers';
+
 import { getNodes } from './utils';
 
 const useNodeFilter = (vmiMapper: VMIMapper): KubevirtFilter<V1VirtualMachine> => {
@@ -25,7 +25,7 @@ const useNodeFilter = (vmiMapper: VMIMapper): KubevirtFilter<V1VirtualMachine> =
       categoryLabel: t('Node'),
       filterLayout: KubevirtFilterLayout.SELECT,
       id: VirtualMachineRowFilterType.Node,
-      match: (obj: V1VirtualMachine, selected: string[]) => {
+      match: (obj: V1VirtualMachine, selected: string[]): boolean => {
         const nodeName = getVMINodeName(getVMIFromMapper(vmiMapper, obj));
         return selected.includes(nodeName);
       },

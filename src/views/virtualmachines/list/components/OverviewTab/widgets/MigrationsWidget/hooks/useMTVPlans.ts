@@ -1,7 +1,6 @@
-/* eslint-disable */
 import { useEffect, useRef } from 'react';
 
-import { PlanModel, V1beta1Plan } from '@forklift-ui/types';
+import { PlanModel, type V1beta1Plan } from '@forklift-ui/types';
 import { logMTVDetected } from '@kubevirt-utils/extensions/telemetry/mtv';
 import { modelToGroupVersionKind } from '@kubevirt-utils/models';
 import { MTV_MIGRATION_NAMESPACE } from '@multicluster/components/CrossClusterMigration/constants';
@@ -14,6 +13,8 @@ type UseMTVPlansResult = {
   loadError: unknown;
   plans: V1beta1Plan[];
 };
+
+type WatchResult<T> = [T | undefined, boolean, unknown];
 
 const useMTVPlans = (): UseMTVPlansResult => {
   const [isMTVInstalled, isMTVInFlight] = useIsMTVInstalled();
@@ -34,7 +35,7 @@ const useMTVPlans = (): UseMTVPlansResult => {
           namespace: MTV_MIGRATION_NAMESPACE,
         }
       : null,
-  );
+  ) as WatchResult<V1beta1Plan[]>;
 
   return {
     isMTVInstalled,

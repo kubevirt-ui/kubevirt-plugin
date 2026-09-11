@@ -1,23 +1,21 @@
-/* eslint-disable */
-import React, { FC, useMemo } from 'react';
+import React, { type FC, useMemo } from 'react';
 
 import { DataVolumeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import {
-  CONTAINER_EPHERMAL,
-  OTHER,
-} from '@kubevirt-utils/components/DiskModal/components/utils/constants';
+  type V1VirtualMachine,
+  type V1VirtualMachineInstance,
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { modelToGroupVersionKind, PersistentVolumeClaimModel } from '@kubevirt-utils/models';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { getDisks } from '@kubevirt-utils/resources/vm';
-import { NameWithPercentages } from '@kubevirt-utils/resources/vm/hooks/types';
-import { DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/constants';
+import { type NameWithPercentages } from '@kubevirt-utils/resources/vm/hooks/types';
+import { type DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/constants';
 import { isCDROMDisk } from '@kubevirt-utils/resources/vm/utils/disk/selectors';
 import { readableSizeUnit } from '@kubevirt-utils/utils/units';
 import MulticlusterResourceLink from '@multicluster/components/MulticlusterResourceLink/MulticlusterResourceLink';
 import { getCluster } from '@multicluster/helpers/selectors';
-import { RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
+import { type RowProps, TableData } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Label,
   Popover,
@@ -30,15 +28,10 @@ import {
 import DiskRowActions from './DiskRowActions';
 import { HotplugLabel } from './HotplugLabel';
 import ISOBadge from './ISOBadge';
+import { getTranslatedSource } from './utils/helpers';
 
 import '../tables.scss';
 import './disklist.scss';
-
-const getTranslatedSource = (source: string, t: (key: string) => string): string => {
-  if (source === OTHER) return t(OTHER);
-  if (source === CONTAINER_EPHERMAL) return t(CONTAINER_EPHERMAL);
-  return source;
-};
 
 const DiskRow: FC<
   RowProps<
@@ -76,7 +69,7 @@ const DiskRow: FC<
   const provisioningPercentage = provisioningPercentages?.[source];
 
   const { displayName } = useMemo(() => {
-    const disks = getDisks(vm) || [];
+    const disks = getDisks(vm) ?? [];
     const foundDisk = disks.find((disk) => disk.name === name);
     const cdrom = foundDisk && isCDROMDisk(foundDisk);
     const cdromName = t('CD-ROM');
@@ -132,7 +125,7 @@ const DiskRow: FC<
             )}
             cluster={getCluster(vm)}
             name={source}
-            namespace={namespace || getNamespace(vm)}
+            namespace={namespace ?? getNamespace(vm)}
           />
         )}
 

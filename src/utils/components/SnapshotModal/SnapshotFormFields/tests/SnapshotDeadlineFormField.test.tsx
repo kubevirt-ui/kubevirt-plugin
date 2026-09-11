@@ -1,27 +1,27 @@
 import React from 'react';
 
 import { fireEvent, render, screen } from '@testing-library/react';
-import { deadlineUnits } from '@virtualmachines/details/tabs/snapshots/utils/consts';
+import { DeadlineUnits } from '@virtualmachines/details/tabs/snapshots/utils/consts';
 
 import SnapshotDeadlineFormField from '../SnapshotDeadlineFormField';
 
 const defaultProps = {
   deadline: '',
-  deadlineUnit: deadlineUnits.Seconds,
+  deadlineUnit: DeadlineUnits.Seconds,
   setDeadline: jest.fn(),
   setDeadlineUnit: jest.fn(),
   setIsError: jest.fn(),
 };
 
 describe('SnapshotDeadlineFormField', () => {
-  it('should render deadline unit options from deadlineUnits enum only', () => {
+  it('should render deadline unit options from DeadlineUnits enum only', () => {
     render(<SnapshotDeadlineFormField {...defaultProps} />);
 
     const select = screen.getByRole('combobox');
     expect(select).toBeInTheDocument();
 
     const options = screen.getAllByRole('option');
-    const expectedCount = Object.keys(deadlineUnits).length;
+    const expectedCount = Object.keys(DeadlineUnits).length;
     expect(options).toHaveLength(expectedCount);
     expect(expectedCount).toBe(3);
   });
@@ -36,7 +36,7 @@ describe('SnapshotDeadlineFormField', () => {
     expect(optionLabels.some((label) => label.includes('ms'))).toBe(false);
   });
 
-  it.each(Object.entries(deadlineUnits))(
+  it.each(Object.entries(DeadlineUnits))(
     'should expose %s (%s) as a deadline unit option',
     (labelPart, valuePart) => {
       render(<SnapshotDeadlineFormField {...defaultProps} />);

@@ -1,9 +1,8 @@
-/* eslint-disable */
-import { TFunction } from 'i18next';
+import { type TFunction } from 'i18next';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import {
-  KubevirtFilter,
+  type KubevirtFilter,
   KubevirtFilterLayout,
 } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { getCreationTimestamp } from '@kubevirt-utils/resources/shared';
@@ -14,9 +13,9 @@ import {
 } from '@search/components/AdvancedSearchModal/constants/dateSelect';
 import {
   FROM_PREFIX,
-  TO_PREFIX,
   getDateCreatedChipLabel,
   resolveDateCreatedValue,
+  TO_PREFIX,
 } from '@search/utils/dateCreatedValues';
 import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
@@ -26,7 +25,8 @@ enum DATE_VARIANT {
 }
 
 const getMatchDateFunction =
-  (variant: DATE_VARIANT) => (obj: V1VirtualMachine, selected: string[]) => {
+  (variant: DATE_VARIANT) =>
+  (obj: V1VirtualMachine, selected: string[]): boolean => {
     const dateString = selected[0];
     if (!dateString) return true;
     const dateCreatedString = getCreationTimestamp(obj);
@@ -46,7 +46,7 @@ export const getDateCreatedFilter = (t: TFunction): KubevirtFilter<V1VirtualMach
     filterLayout: KubevirtFilterLayout.HIDDEN,
     getChipLabel: (value) => getDateCreatedChipLabel(value, t),
     id: VirtualMachineRowFilterType.DateCreated,
-    match: (obj, selected) => {
+    match: (obj, selected): boolean => {
       const value = selected[0];
       if (!value) return true;
 

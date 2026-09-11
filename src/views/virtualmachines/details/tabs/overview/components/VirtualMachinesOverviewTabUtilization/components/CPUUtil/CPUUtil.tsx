@@ -1,7 +1,6 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
-import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import SubTitleChartLabel from '@kubevirt-utils/components/Charts/ChartLabels/SubTitleChartLabel';
 import TitleChartLabel from '@kubevirt-utils/components/Charts/ChartLabels/TitleChartLabel';
 import ComponentReady from '@kubevirt-utils/components/Charts/ComponentReady/ComponentReady';
@@ -44,7 +43,7 @@ const CPUUtil: FC<CPUUtilProps> = ({ vmi }) => {
   const vmCPU = getCPU(vmi);
   const hasData = dataCPUUsage?.data?.result?.length > 0;
 
-  const cpuUsage = +(dataCPUUsage?.data?.result?.[0]?.value?.[1] || 0);
+  const cpuUsage = +(dataCPUUsage?.data?.result?.[0]?.value?.[1] ?? 0);
   const cpuUsageHumanized = humanizeCpuCores(cpuUsage);
 
   const cpuRequested = getVCPUCount(vmCPU);

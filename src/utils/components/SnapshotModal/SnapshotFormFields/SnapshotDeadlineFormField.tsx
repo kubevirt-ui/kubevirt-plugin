@@ -18,14 +18,14 @@ import {
   ValidatedOptions,
 } from '@patternfly/react-core';
 
-import { deadlineUnits } from '../../../../views/virtualmachines/details/tabs/snapshots/utils/consts';
+import { DeadlineUnits } from '../../../../views/virtualmachines/details/tabs/snapshots/utils/consts';
 import { validateSnapshotDeadline } from '../../../../views/virtualmachines/details/tabs/snapshots/utils/helpers';
 
 type SnapshotDeadlineFormFieldProps = {
   deadline: string;
-  deadlineUnit: string;
+  deadlineUnit: DeadlineUnits;
   setDeadline: Dispatch<SetStateAction<string>>;
-  setDeadlineUnit: Dispatch<SetStateAction<string>>;
+  setDeadlineUnit: Dispatch<SetStateAction<DeadlineUnits>>;
   setIsError: Dispatch<SetStateAction<boolean>>;
 };
 
@@ -49,7 +49,7 @@ const SnapshotDeadlineFormField: FC<SnapshotDeadlineFormFieldProps> = ({
 
   const handleDeadlineUnitChange = (
     _event: FormEvent<HTMLSelectElement>,
-    value: deadlineUnits,
+    value: DeadlineUnits,
   ): void => {
     setDeadlineUnit(value);
   };
@@ -71,7 +71,7 @@ const SnapshotDeadlineFormField: FC<SnapshotDeadlineFormFieldProps> = ({
         </GridItem>
         <GridItem span={4}>
           <FormSelect id="deadline-unit" onChange={handleDeadlineUnitChange} value={deadlineUnit}>
-            {Object.entries(deadlineUnits).map(([key, value]) => (
+            {Object.entries(DeadlineUnits).map(([key, value]) => (
               <FormSelectOption key={key} label={`${key} (${value})`} value={value} />
             ))}
           </FormSelect>

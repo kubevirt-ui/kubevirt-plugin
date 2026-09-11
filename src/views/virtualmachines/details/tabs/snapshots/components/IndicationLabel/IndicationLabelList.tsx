@@ -1,12 +1,16 @@
-/* eslint-disable */
-import React from 'react';
+import React, { type FC } from 'react';
 
+import { type V1beta1VirtualMachineSnapshot } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { LabelGroup } from '@patternfly/react-core';
 
 import IndicationLabel from './IndicationLabel';
 
-const IndicationLabelList = ({ snapshot }) => {
-  const indications = snapshot?.status?.sourceIndications || [];
+type IndicationLabelListProps = {
+  snapshot: V1beta1VirtualMachineSnapshot;
+};
+
+const IndicationLabelList: FC<IndicationLabelListProps> = ({ snapshot }) => {
+  const indications = snapshot?.status?.sourceIndications ?? [];
 
   if (indications.length === 0) {
     return <>-</>;
