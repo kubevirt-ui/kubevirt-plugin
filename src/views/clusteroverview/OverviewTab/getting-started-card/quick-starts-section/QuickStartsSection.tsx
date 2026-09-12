@@ -1,25 +1,23 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useQuickStartContext } from '@openshift-console/dynamic-plugin-sdk';
 import { QuickStartsLoader } from '@openshift-console/dynamic-plugin-sdk-internal';
-import { AllQuickStartStates, QuickStart } from '@patternfly/quickstarts';
+import { type AllQuickStartStates, type QuickStart } from '@patternfly/quickstarts';
 import { RouteIcon } from '@patternfly/react-icons';
 
 import GettingStartedSectionContents from '../utils/getting-started-content/GettingStartedSectionContents';
-import { GettingStartedLink } from '../utils/types';
-
+import { type GettingStartedLink } from '../utils/types';
 import { orderQuickStarts } from './utils';
 
-interface QuickStartsSectionProps {
+type QuickStartsSectionProps = {
   allQuickStartStates?: AllQuickStartStates;
   description?: string;
   featured?: string[];
   filter?: (QuickStart) => boolean;
   setActiveQuickStart?: (quickStartId: string, totalTasks?: number) => void;
   title?: string;
-}
+};
 
 const QuickStartsSection: FC<QuickStartsSectionProps> = ({
   description,
@@ -44,7 +42,7 @@ const QuickStartsSection: FC<QuickStartsSectionProps> = ({
         const links: GettingStartedLink[] = loaded
           ? slicedQuickStarts.map((quickStart: QuickStart) => ({
               id: quickStart.metadata.name,
-              onClick: () => {
+              onClick: (): void => {
                 setActiveQuickStart(quickStart.metadata.name, quickStart.spec.tasks.length);
               },
               title: quickStart.spec.displayName,
@@ -63,7 +61,7 @@ const QuickStartsSection: FC<QuickStartsSectionProps> = ({
         return (
           <GettingStartedSectionContents
             description={
-              description ||
+              description ??
               t(
                 'Follow guided documentation to build applications and familiarize yourself with key features.',
               )
@@ -72,7 +70,7 @@ const QuickStartsSection: FC<QuickStartsSectionProps> = ({
             id="quick-start"
             links={links}
             moreLink={moreLink}
-            title={title || t('Build with guided documentation')}
+            title={title ?? t('Build with guided documentation')}
             titleColor={'var(--co-global--palette--purple-600)'}
           />
         );

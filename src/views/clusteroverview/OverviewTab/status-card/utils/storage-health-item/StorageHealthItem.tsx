@@ -1,15 +1,14 @@
-/* eslint-disable */
-import React from 'react';
+import React, { type FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { HealthItem } from '@openshift-console/dynamic-plugin-sdk-internal';
 
-import useKubevirtStorageOperatorCSVs from '../hooks/useKubevirtStorageOperatorCSVs';
 import { getOverallStorageStatus, getStorageOperatorHealthStatus } from '../utils';
 
+import useKubevirtStorageOperatorCSVs from '../hooks/useKubevirtStorageOperatorCSVs';
 import StatusCardStoragePopover from './StatusStorageCardPopover';
 
-const StorageHealthItem = () => {
+const StorageHealthItem: FC = () => {
   const { t } = useKubevirtTranslation();
   const { loaded, loadErrors, lsoCSV, odfCSV } = useKubevirtStorageOperatorCSVs();
 

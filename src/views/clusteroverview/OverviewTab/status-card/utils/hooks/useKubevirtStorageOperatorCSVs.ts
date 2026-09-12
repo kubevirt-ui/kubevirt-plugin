@@ -1,11 +1,16 @@
-/* eslint-disable */
 import { modelToGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { ClusterServiceVersionModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { SubscriptionModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { K8sResourceCommon, useK8sWatchResources } from '@openshift-console/dynamic-plugin-sdk';
+import { useK8sWatchResources } from '@openshift-console/dynamic-plugin-sdk';
+import { type SubscriptionKind } from '@overview/utils/types';
 
 import { LSO_NAME, ODF_OPERATOR_NAME } from '../constants';
-import { ClusterServiceVersionKind } from '../types';
+import { type ClusterServiceVersionKind } from '../types';
+
+type WatchedStorageResources = {
+  installedCSVs: ClusterServiceVersionKind[];
+  subscriptions: SubscriptionKind[];
+};
 
 const watchedResources = {
   installedCSVs: {
@@ -20,34 +25,38 @@ const watchedResources = {
   },
 };
 
-const getSubscriptionForOperator = (subscriptions, operatorName) => {
-  return subscriptions.find((sub) => sub?.spec?.name === operatorName);
-};
+const getSubscriptionForOperator = (
+  subscriptions: SubscriptionKind[],
+  operatorName: string,
+): SubscriptionKind | undefined => subscriptions.find((sub) => sub.spec?.name === operatorName);
 
 const getCSVForInstalledVersion = (
-  clusterServiceVersions,
-  installedCSV,
-): ClusterServiceVersionKind => {
-  return clusterServiceVersions.find((csv) => csv?.metadata?.name === installedCSV);
+  clusterServiceVersions: ClusterServiceVersionKind[],
+  installedCSV: string | undefined,
+): ClusterServiceVersionKind | undefined =>
+  clusterServiceVersions.find((csv) => csv.metadata?.name === installedCSV);
+
+type UseKubevirtStorageOperatorCSVsReturn = {
+  loaded: boolean;
+  loadErrors: string[];
+  lsoCSV: ClusterServiceVersionKind | null;
+  odfCSV: ClusterServiceVersionKind | null;
 };
 
-const useKubevirtStorageOperatorCSVs = () => {
-  const resources = useK8sWatchResources<{ [key: string]: K8sResourceCommon[] }>(watchedResources);
+const useKubevirtStorageOperatorCSVs = (): UseKubevirtStorageOperatorCSVsReturn => {
+  const resources = useK8sWatchResources<WatchedStorageResources>(watchedResources);
 
-  const loadErrors = Object.keys(resources).filter((key) => resources?.[key]?.loadError);
-  const loaded = Object.keys(resources).every((key) => resources?.[key]?.loaded);
+  const loadErrors = Object.keys(resources).filter((key) => resources[key]?.loadError);
+  const loaded = Object.keys(resources).every((key) => resources[key]?.loaded);
 
-  const subscriptions = resources?.subscriptions;
-  const installedCSVs = resources?.installedCSVs;
-
-  const lsoSub = getSubscriptionForOperator(subscriptions?.data, LSO_NAME);
+  const lsoSub = getSubscriptionForOperator(resources.subscriptions.data, LSO_NAME);
   const lsoCSV = lsoSub
-    ? getCSVForInstalledVersion(installedCSVs?.data, lsoSub?.status?.installedCSV)
+    ? (getCSVForInstalledVersion(resources.installedCSVs.data, lsoSub.status?.installedCSV) ?? null)
     : null;
 
-  const odfSub = getSubscriptionForOperator(subscriptions?.data, ODF_OPERATOR_NAME);
+  const odfSub = getSubscriptionForOperator(resources.subscriptions.data, ODF_OPERATOR_NAME);
   const odfCSV = odfSub
-    ? getCSVForInstalledVersion(installedCSVs?.data, odfSub?.status?.installedCSV)
+    ? (getCSVForInstalledVersion(resources.installedCSVs.data, odfSub.status?.installedCSV) ?? null)
     : null;
 
   return {

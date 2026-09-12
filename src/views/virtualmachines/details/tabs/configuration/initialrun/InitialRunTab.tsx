@@ -19,7 +19,7 @@ import InitialRunTabSysprep from './components/InitialRunTabSysprep';
 const InitialRunTab: FC<ConfigurationInnerTabProps> = ({ vm, vmi }) => {
   const { t } = useKubevirtTranslation();
   const accessReview = asAccessReview(VirtualMachineModel, vm, 'update' as K8sVerb);
-  const [canUpdateVM] = useFleetAccessReview(accessReview || {});
+  const [canUpdateVM] = useFleetAccessReview(accessReview ?? {});
 
   return (
     <SidebarEditor

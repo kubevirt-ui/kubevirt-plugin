@@ -1,21 +1,28 @@
-/* eslint-disable */
 import { useMemo } from 'react';
 
 import {
-  DashboardsOverviewPrometheusActivity,
-  DashboardsOverviewResourceActivity,
-  DashboardsOverviewResourceActivity as DynamicDashboardsOverviewResourceActivity,
+  type DashboardsOverviewPrometheusActivity,
+  type DashboardsOverviewResourceActivity,
+  type DashboardsOverviewResourceActivity as DynamicDashboardsOverviewResourceActivity,
   isDashboardsOverviewPrometheusActivity as isDynamicDashboardsOverviewPrometheusActivity,
   isDashboardsOverviewResourceActivity as isDynamicDashboardsOverviewResourceActivity,
   useK8sModels,
   useResolvedExtensions,
 } from '@openshift-console/dynamic-plugin-sdk';
 import {
-  LoadedExtension,
-  ResolvedExtension,
+  type LoadedExtension,
+  type ResolvedExtension,
 } from '@openshift-console/dynamic-plugin-sdk/lib/types';
 
-const useDashboardActivities = () => {
+type UseDashboardActivitiesReturn = {
+  prometheusActivities: ResolvedExtension<DashboardsOverviewPrometheusActivity>[];
+  resourceActivities: (
+    | LoadedExtension<DashboardsOverviewResourceActivity>
+    | ResolvedExtension<DynamicDashboardsOverviewResourceActivity>
+  )[];
+};
+
+const useDashboardActivities = (): UseDashboardActivitiesReturn => {
   const [models] = useK8sModels();
 
   const [dynamicResourceActivityExtensions] =
@@ -28,7 +35,10 @@ const useDashboardActivities = () => {
     | ResolvedExtension<DynamicDashboardsOverviewResourceActivity>
   )[] = useMemo(
     () =>
-      dynamicResourceActivityExtensions?.filter((e) => !!models?.[e.properties.k8sResource.kind]),
+      dynamicResourceActivityExtensions?.filter((e) => {
+        const modelKey = e.properties.k8sResource.groupVersionKind?.kind;
+        return !!modelKey && !!models?.[modelKey];
+      }),
     [dynamicResourceActivityExtensions, models],
   );
 

@@ -1,15 +1,14 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { StatusPopupItem, StatusPopupSection } from '@openshift-console/dynamic-plugin-sdk';
 import { Stack, StackItem } from '@patternfly/react-core';
 
-import { healthStateMapping } from '../utils';
+import { healthStateMapping, type StorageHealthState } from '../utils';
 
 type StatusCardStoragePopoverProps = {
-  lsoState: any;
-  odfState: any;
+  lsoState: StorageHealthState;
+  odfState: StorageHealthState;
 };
 
 const StatusCardStoragePopover: FC<StatusCardStoragePopoverProps> = ({ lsoState, odfState }) => {

@@ -1,4 +1,5 @@
-/* eslint-disable */
+import { type ComponentType } from 'react';
+
 import { GreenRunningIcon } from '@kubevirt-utils/icons/GreenRunningIcon';
 import {
   GreenCheckCircleIcon,
@@ -25,4 +26,14 @@ const iconMapper = {
   WaitingForSync: InProgressIcon,
 };
 
-export const getStatusIcon = (phase: string) => iconMapper[phase] || UnknownIcon;
+type StatusIconPhase = keyof typeof iconMapper;
+
+const isStatusIconPhase = (phase: string): phase is StatusIconPhase =>
+  Object.hasOwn(iconMapper, phase);
+
+export const getStatusIcon = (phase: string): ComponentType => {
+  if (isStatusIconPhase(phase)) {
+    return iconMapper[phase];
+  }
+  return UnknownIcon;
+};

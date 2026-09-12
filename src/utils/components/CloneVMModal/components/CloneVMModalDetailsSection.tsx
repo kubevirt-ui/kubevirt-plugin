@@ -54,7 +54,7 @@ const CloneVMModalDetailsSection: FC<CloneVMModalDetailsSectionProps> = ({ vm, v
           descriptionHeader={t('Project')}
         />
         <DescriptionItem
-          descriptionData={sshSecretName || <MutedTextSpan text={t('Not configured')} />}
+          descriptionData={sshSecretName ?? <MutedTextSpan text={t('Not configured')} />}
           descriptionHeader={t('Public SSH key')}
         />
         <DescriptionItem

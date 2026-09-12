@@ -40,7 +40,7 @@ const SSHTabAuthorizedSSHKey: FC<SSHTabAuthorizedSSHKeyProps> = ({
     getCluster(vm),
   );
   const accessReview = asAccessReview(VirtualMachineModel, vm, 'update' as K8sVerb);
-  const [canUpdateVM] = useFleetAccessReview(accessReview || {});
+  const [canUpdateVM] = useFleetAccessReview(accessReview ?? {});
   const secretName = useMemo(() => getVMSSHSecretName(vm), [vm]);
   const isDynamicSSHInjectionEnabled = useDynamicSSHInjection(vm);
   const isEditable =

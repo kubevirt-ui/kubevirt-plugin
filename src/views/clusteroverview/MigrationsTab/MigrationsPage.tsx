@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 import { Link } from 'react-router';
 
 import DurationDropdown from '@kubevirt-utils/components/DurationOption/DurationDropdown';
@@ -18,8 +17,8 @@ import {
   Title,
 } from '@patternfly/react-core';
 
-import { MIGRATIONS_DURATION_KEY } from './utils/constants';
 import MigrationsTab from './MigrationsTab';
+import { MIGRATIONS_DURATION_KEY } from './utils/constants';
 
 import './MigrationsPage.scss';
 
@@ -32,7 +31,7 @@ const MigrationsPage: FC = () => {
     DurationOption.FIVE_MIN.toString(),
   );
 
-  const onDurationSelect = (value: string) => {
+  const onDurationSelect = (value: string): void => {
     const parsed = DurationOption.fromDropdownLabel(value);
     if (parsed) setDuration(parsed.toString());
   };
