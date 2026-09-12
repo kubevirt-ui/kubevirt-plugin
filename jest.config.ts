@@ -1,5 +1,3 @@
-/* eslint-disable */
-/* eslint-disable @typescript-eslint/no-var-requires */
 import { pathsToModuleNameMapper, TsJestTransformerOptions } from 'ts-jest';
 
 import { Config } from '@jest/types';

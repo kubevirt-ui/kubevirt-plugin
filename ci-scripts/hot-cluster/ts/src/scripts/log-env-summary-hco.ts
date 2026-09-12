@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { KubeClient } from '../kube-client';
 
 const CNV_NS = 'openshift-cnv';

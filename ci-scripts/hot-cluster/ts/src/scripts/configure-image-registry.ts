@@ -1,4 +1,3 @@
-/* eslint-disable */
 /**
  * Ensure the internal image registry is available for in-cluster builds.
  * Replaces: ci-scripts/hot-cluster/configure-image-registry.sh

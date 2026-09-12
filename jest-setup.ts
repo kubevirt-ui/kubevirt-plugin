@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { TextDecoder, TextEncoder } from 'util';
 
 import { configure } from '@testing-library/dom';

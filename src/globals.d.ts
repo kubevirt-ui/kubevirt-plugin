@@ -1,8 +1,9 @@
-/* eslint-disable */
+/* eslint-disable @typescript-eslint/consistent-type-definitions -- module augmentation requires interface merging */
+import type * as mtvTypes from '@forklift-ui/types';
 import type { V1Template as OriginalV1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1beta1DataVolume as OriginalV1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
-import { IoK8sApiCoreV1Pod as OriginalIoK8sApiCoreV1Pod } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
-import * as kubevirtUITypes from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import type { V1beta1DataVolume as OriginalV1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
+import type { IoK8sApiCoreV1Pod as OriginalIoK8sApiCoreV1Pod } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import type * as kubevirtUITypes from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import type { K8sResourceCommon as OriginalK8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
 declare module '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer' {
