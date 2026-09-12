@@ -1,8 +1,11 @@
-/* eslint-disable */
 import { modelToRef } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { K8sModel } from '@openshift-console/dynamic-plugin-sdk';
+import { type K8sModel } from '@openshift-console/dynamic-plugin-sdk';
 
-export const buildUrlForCSVSubscription = (model: K8sModel, name?: string, namespace?: string) => {
+export const buildUrlForCSVSubscription = (
+  model: K8sModel,
+  name?: string,
+  namespace?: string,
+): string => {
   const url = ['/k8s'];
   url.push(namespace ? `/ns/${namespace}/` : '/all-namespaces/');
   url.push(modelToRef(model));

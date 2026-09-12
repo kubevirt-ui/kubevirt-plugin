@@ -6,5 +6,5 @@ export const createURL = (append: string, url: string): string =>
   url?.endsWith('/') ? `${url}${append}` : `${url}/${append}`;
 
 export const getInternalFQDNURL = (vm: V1VirtualMachine): string => {
-  return `${getHostname(vm) || getName(vm)}.headless.${getNamespace(vm)}.svc.cluster.local`;
+  return `${getHostname(vm) ?? getName(vm)}.headless.${getNamespace(vm)}.svc.cluster.local`;
 };

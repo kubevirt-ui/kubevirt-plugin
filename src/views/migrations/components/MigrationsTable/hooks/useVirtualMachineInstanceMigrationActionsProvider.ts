@@ -1,18 +1,17 @@
-/* eslint-disable */
 import { useCallback, useMemo } from 'react';
 
 import { VirtualMachineInstanceMigrationModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1VirtualMachineInstanceMigration } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachineInstanceMigration } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { VirtualMachineModelRef } from '@kubevirt-utils/models';
 import { asAccessReview } from '@kubevirt-utils/resources/shared';
 import { vmimStatuses } from '@kubevirt-utils/resources/vmim/statuses';
-import { Action, useK8sModel } from '@openshift-console/dynamic-plugin-sdk';
+import { type Action, useK8sModel } from '@openshift-console/dynamic-plugin-sdk';
 import { cancelMigration } from '@virtualmachines/actions/actions';
 
 type UseVirtualMachineInstanceMigrationActionsProvider = (
   vmim: V1VirtualMachineInstanceMigration,
-) => [Action[], boolean, any];
+) => [Action[], boolean, undefined];
 
 const useVirtualMachineInstanceMigrationActionsProvider: UseVirtualMachineInstanceMigrationActionsProvider =
   (vmim) => {
