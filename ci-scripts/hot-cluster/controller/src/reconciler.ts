@@ -1,4 +1,3 @@
-/* eslint-disable */
 /**
  * Core reconciliation logic — processes a single ConfigMap trigger.
  */

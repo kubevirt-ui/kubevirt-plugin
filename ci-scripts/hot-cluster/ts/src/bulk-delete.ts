@@ -1,4 +1,3 @@
-/* eslint-disable */
 import type * as k8s from '@kubernetes/client-node';
 
 type BulkDeleteParams = {

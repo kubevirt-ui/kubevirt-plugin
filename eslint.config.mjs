@@ -26,6 +26,8 @@ const ignoresConfig = {
     'cypress/cypress-a11y-report.json',
     'locales/**',
     'playwright/**',
+    '.github/**',
+    'ci-scripts/**',
     '__mocks__/**',
     'webpack.config.ts', // will be removed when errors are fixed, in the meantime it is linted by default eslint.config.js
     'i18next-parser.config.js', // will be removed when errors are fixed, in the meantime it is linted by default eslint.config.js

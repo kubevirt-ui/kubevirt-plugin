@@ -1,8 +1,8 @@
-/* eslint-disable */
 import 'i18next';
 
 declare module 'i18next' {
   /** @see https://www.i18next.com/overview/typescript#custom-type-options */
+  // eslint-disable-next-line @typescript-eslint/consistent-type-definitions -- i18next module augmentation requires interface
   interface CustomTypeOptions {
     /**
      * This fixes an issue with react-i18next `Trans` component's string interpolation when

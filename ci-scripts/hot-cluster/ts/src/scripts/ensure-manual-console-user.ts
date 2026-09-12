@@ -1,4 +1,3 @@
-/* eslint-disable */
 /**
  * Ensure an htpasswd identity provider exists on the cluster,
  * upsert a user + password, and grant cluster-admin.

@@ -1,4 +1,3 @@
-/* eslint-disable */
 /** Check hot cluster health: API, nodes, HCO, KubeVirt pods, ARC, storage, console. */
 
 import { KubeClient } from '../kube-client';

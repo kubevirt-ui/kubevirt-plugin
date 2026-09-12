@@ -1,15 +1,14 @@
-/* eslint-disable */
 declare module 'react-redux' {
   import type { ComponentType } from 'react';
-  import type { Dispatch, Action } from 'redux';
+  import type { Action, Dispatch } from 'redux';
 
   export function connect<
     TStateProps = Record<string, unknown>,
     TOwnProps = Record<string, unknown>,
   >(
-    mapStateToProps?: (state: any, ownProps?: TOwnProps) => TStateProps,
-    mapDispatchToProps?: any,
-  ): (component: ComponentType<any>) => ComponentType<TOwnProps>;
+    mapStateToProps?: (state: unknown, ownProps?: TOwnProps) => TStateProps,
+    mapDispatchToProps?: unknown,
+  ): (component: ComponentType<TOwnProps & TStateProps>) => ComponentType<TOwnProps>;
 
   export function useDispatch<TDispatch extends Dispatch<Action> = Dispatch<Action>>(): TDispatch;
 
