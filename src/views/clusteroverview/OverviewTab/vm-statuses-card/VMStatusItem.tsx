@@ -1,9 +1,8 @@
-/* eslint-disable */
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 import { Link } from 'react-router';
 
-import { VM_STATUS } from '@kubevirt-utils/resources/vm/utils/vmStatus';
-import { ERROR } from '@overview/OverviewTab/vm-statuses-card/utils/constants';
+import { type VM_STATUS } from '@kubevirt-utils/resources/vm/utils/vmStatus';
+import { type ERROR } from '@overview/OverviewTab/vm-statuses-card/utils/constants';
 import { GridItem } from '@patternfly/react-core';
 
 import useVMStatusesPath from './hooks/useVMStatusesPath';
@@ -30,7 +29,10 @@ const VMStatusItem: FC<VMStatusItemProps> = ({
   statusArray,
   statusLabel,
 }) => {
-  const Icon = vmStatusIcon[statusLabel];
+  const Icon =
+    statusLabel in vmStatusIcon
+      ? vmStatusIcon[statusLabel as keyof typeof vmStatusIcon]
+      : undefined;
   const path = useVMStatusesPath(namespace, statusArray, enabledClusters);
 
   return (
@@ -42,10 +44,10 @@ const VMStatusItem: FC<VMStatusItemProps> = ({
           </span>
           <span className="vm-statuses-card__status-item--value">
             <Link
+              id={`count-vm-status-${statusLabel}`}
               onClick={() => {
                 onFilterChange?.();
               }}
-              id={`count-vm-status-${statusLabel}`}
               to={path}
             >
               {count.toString()}

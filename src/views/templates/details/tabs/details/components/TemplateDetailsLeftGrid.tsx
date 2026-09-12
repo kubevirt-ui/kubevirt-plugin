@@ -33,7 +33,7 @@ import WorkloadProfile from './WorkloadProfile';
 
 const TemplateDetailsLeftGrid: FC<TemplateDetailsGridProps> = ({ template }) => {
   const { t } = useKubevirtTranslation();
-  const machineType = getMachineType(getTemplateVirtualMachineObject(template)) || NO_DATA_DASH;
+  const machineType = getMachineType(getTemplateVirtualMachineObject(template)) ?? NO_DATA_DASH;
   const { isTemplateEditable } = useEditTemplateAccessReview(template);
   const model = getTemplateModel(template);
   const isVMTemplate = isVirtualMachineTemplate(template);

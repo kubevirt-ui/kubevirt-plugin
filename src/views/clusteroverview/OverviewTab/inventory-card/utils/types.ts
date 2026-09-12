@@ -1,14 +1,15 @@
-/* eslint-disable */
-import { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { IoK8sApiCoreV1Node } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
-import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { type IoK8sApiCoreV1Node } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import {
-  K8sResourceCommon,
-  ResourcesObject,
-  WatchK8sResults,
+  type V1VirtualMachine,
+  type V1VirtualMachineInstance,
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type NetworkAttachmentDefinitionKind } from '@kubevirt-utils/resources/nad/types';
+import {
+  type K8sResourceCommon,
+  type ResourcesObject,
+  type WatchK8sResults,
 } from '@openshift-console/dynamic-plugin-sdk';
-
-import { NetworkAttachmentDefinitionKind } from '@kubevirt-utils/resources/nad/types';
 
 export type InventoryCardResources = {
   nads: NetworkAttachmentDefinitionKind[];
@@ -41,5 +42,5 @@ export type VirtualMachineTemplateBundle = {
 
 export type Flatten<
   F extends ResourcesObject = { [key: string]: K8sResourceCommon | K8sResourceCommon[] },
-  R = any,
+  R = unknown,
 > = (resources: WatchK8sResults<F>) => R;

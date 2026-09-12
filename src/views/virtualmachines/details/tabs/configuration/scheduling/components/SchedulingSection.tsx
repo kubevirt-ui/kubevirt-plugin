@@ -35,7 +35,7 @@ const SchedulingSection: FC<SchedulingSectionProps> = ({ instanceTypeVM, onSubmi
     isList: true,
   });
   const accessReview = asAccessReview(VirtualMachineModel, vm, 'update' as K8sVerb);
-  const [canUpdateVM] = useFleetAccessReview(accessReview || {});
+  const [canUpdateVM] = useFleetAccessReview(accessReview ?? {});
 
   return (
     <>

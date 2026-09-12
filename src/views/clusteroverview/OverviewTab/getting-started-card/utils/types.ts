@@ -1,7 +1,6 @@
-/* eslint-disable */
-import { ChangeEvent, MouseEvent, ReactElement } from 'react';
+import { type ChangeEvent, type MouseEvent, type ReactElement } from 'react';
 
-export interface GettingStartedLink {
+export type GettingStartedLink = {
   description?: string;
   external?: boolean;
   /** Default hyperlink location */
@@ -15,4 +14,4 @@ export interface GettingStartedLink {
   secondaryLinkText?: string;
   showSecondaryLink?: boolean;
   title?: ReactElement | string;
-}
+};

@@ -1,8 +1,7 @@
-/* eslint-disable */
-import React, { FC, useState } from 'react';
+import React, { type FC, type ReactNode, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { VM_STATUS } from '@kubevirt-utils/resources/vm/utils/vmStatus';
+import { type VM_STATUS } from '@kubevirt-utils/resources/vm/utils/vmStatus';
 import {
   Accordion,
   AccordionContent,
@@ -51,14 +50,14 @@ const VMAdditionalStatuses: FC<VMAdditionalStatusesProps> = ({
 
   const statusItems = getStatusItems();
 
-  const toggleAccordion = (accordionId: string) => {
+  const toggleAccordion = (accordionId: string): void => {
     setExpandedAccordions((prev) => ({
       ...prev,
       [accordionId]: !prev[accordionId],
     }));
   };
 
-  const renderStatusItems = (statuses: Record<string, number>) => {
+  const renderStatusItems = (statuses: Record<string, number>): ReactNode[] => {
     return Object.keys(statuses)?.map((state) => {
       const count = statuses?.[state];
       return (
