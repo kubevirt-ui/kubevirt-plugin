@@ -1,6 +1,3 @@
-// Extracted from VirtualMachineActionFactory.tsx
-// Root: src/views/virtualmachines/actions/VirtualMachineActionFactory.tsx
-
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { type ActionDropdownItemType } from '@kubevirt-utils/components/ActionsDropdown/constants';
 import { type ModalComponent } from '@kubevirt-utils/components/ModalProvider/ModalProvider';

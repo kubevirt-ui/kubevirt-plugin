@@ -1,6 +1,3 @@
-// Extracted from CheckupsSelfValidationForm.tsx
-// Root: src/views/checkups/self-validation/components/form/CheckupsSelfValidationForm.tsx
-
 import { type Dispatch, type SetStateAction, useEffect, useMemo, useState } from 'react';
 
 import { type IoK8sApiStorageV1StorageClass } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';

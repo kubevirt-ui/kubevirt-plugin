@@ -1,6 +1,3 @@
-// Extracted from CheckupsStorageDetailsPageSection.tsx
-// Root: src/views/checkups/storage/details/CheckupsStorageDetailsPageSection.tsx
-
 import React, { type FC } from 'react';
 
 import {

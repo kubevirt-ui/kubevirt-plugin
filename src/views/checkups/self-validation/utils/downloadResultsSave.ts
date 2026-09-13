@@ -1,6 +1,3 @@
-// Extracted from downloadResults.ts
-// Root: src/views/checkups/self-validation/utils/downloadResults.ts
-
 import axios from 'axios';
 import { saveAs } from 'file-saver';
 import { type TFunction } from 'i18next';

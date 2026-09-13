@@ -1,6 +1,3 @@
-// Extracted from resourceTemplates.ts
-// Root: src/views/checkups/self-validation/utils/selfValidationJob/resourceTemplates.ts
-
 export type SelfValidationJobOptions = {
   acceptWindowsEula?: boolean;
   checkupImage: string;

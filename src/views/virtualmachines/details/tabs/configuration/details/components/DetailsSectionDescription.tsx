@@ -1,6 +1,3 @@
-// Extracted from DetailsSection.tsx
-// Root: src/views/virtualmachines/details/tabs/configuration/details/DetailsSection.tsx
-
 import React, { type FC } from 'react';
 
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';

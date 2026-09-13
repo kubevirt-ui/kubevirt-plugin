@@ -1,6 +1,3 @@
-// Extracted from downloadResults.ts
-// Root: src/views/checkups/self-validation/utils/downloadResults.ts
-
 import axios, { isAxiosError } from 'axios';
 
 import { ConfigMapModel } from '@kubevirt-ui-ext/kubevirt-api/console';

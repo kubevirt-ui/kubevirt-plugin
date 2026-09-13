@@ -1,6 +1,3 @@
-// Extracted from resourceTemplates.ts
-// Root: src/views/checkups/self-validation/utils/selfValidationJob/resourceTemplates.ts
-
 import { type IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 
 import { SELF_VALIDATION_LABEL_VALUE, TEST_SUITE_TIER2 } from '../constants';

@@ -1,6 +1,3 @@
-// Extracted from VirtualMachineActionFactory.tsx
-// Root: src/views/virtualmachines/actions/VirtualMachineActionFactory.tsx
-
 import {
   type V1VirtualMachine,
   type V1VirtualMachineInstanceMigration,
