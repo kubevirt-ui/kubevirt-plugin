@@ -8,7 +8,7 @@
   },
   "eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact"],
   "eslint.options": {
-    "overrideConfigFile": "eslintv10.config.mjs"
+    "overrideConfigFile": "eslint.config.mjs"
   },
   "cSpell.words": ["hyperconverged", "kubevirt"],
   "yaml.validate": true,

@@ -17,7 +17,6 @@ const ignoresConfig = {
     'dist/**',
     'node_modules/**',
     'eslint.config.mjs',
-    'eslintv10.config.mjs',
     'package-lock.json',
     'i18n-scripts/**',
     'coverage/**',
@@ -249,7 +248,7 @@ const reactConfig = {
   },
 };
 
-export const perfectionistConfig = {
+const perfectionistConfig = {
   files: ['**/*.{js,jsx,ts,tsx}'],
   rules: {
     'perfectionist/sort-classes': [
@@ -311,7 +310,7 @@ const githubScriptsOverrides = {
   },
 };
 
-export const simpleImportSortConfig = {
+const simpleImportSortConfig = {
   files: ['**/*.{js,jsx,ts,tsx}'],
   plugins: {
     'import-x': importX,
