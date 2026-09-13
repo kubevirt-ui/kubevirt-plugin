@@ -1,7 +1,3 @@
-// Extracted from useVirtualMachineTemplatesActions.tsx
-// Root: src/views/templates/actions/hooks/useVirtualMachineTemplatesActions.tsx
-
-import { type JSX } from 'react';
 import { type NavigateFunction } from 'react-router';
 import { type TFunction } from 'i18next';
 

@@ -1,6 +1,3 @@
-// Extracted from downloadResults.ts
-// Root: src/views/checkups/self-validation/utils/downloadResults.ts
-
 import { type IoK8sApiBatchV1Job } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';

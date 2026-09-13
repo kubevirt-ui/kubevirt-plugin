@@ -1,6 +1,3 @@
-// Extracted from types.ts
-// Root: src/views/clusteroverview/utils/types.ts
-
 import { type K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
 import { type APIServiceDefinition, type CRDDescription } from './descriptorTypes';

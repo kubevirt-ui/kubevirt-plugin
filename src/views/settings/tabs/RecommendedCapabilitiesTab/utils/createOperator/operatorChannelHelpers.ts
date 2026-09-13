@@ -1,6 +1,3 @@
-// Extracted from helpers.ts
-// Root: src/views/settings/tabs/RecommendedCapabilitiesTab/utils/createOperator/helpers.ts
-
 import {
   OperatorGroupModel,
   RoleBindingModel,

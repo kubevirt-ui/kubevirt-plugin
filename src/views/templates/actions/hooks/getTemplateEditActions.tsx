@@ -1,7 +1,3 @@
-// Extracted from useVirtualMachineTemplatesActions.tsx
-// Root: src/views/templates/actions/hooks/useVirtualMachineTemplatesActions.tsx
-
-import { type JSX } from 'react';
 
 import { TemplateModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import CloneTemplateModal from '@kubevirt-utils/components/CloneTemplateModal/CloneTemplateModal';

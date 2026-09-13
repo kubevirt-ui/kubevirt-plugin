@@ -1,6 +1,3 @@
-// Extracted from utils.ts
-// Root: src/views/virtualmachines/details/tabs/configuration/details/utils/utils.ts
-
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
   type V1beta1VirtualMachineClusterInstancetype,

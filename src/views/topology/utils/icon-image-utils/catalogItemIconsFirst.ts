@@ -1,6 +1,3 @@
-// Extracted from catalog-item-icon.tsx
-// Root: src/views/topology/utils/icon-image-utils/catalog-item-icon.tsx
-
 import { toCatalogIconSrc } from './catalogItemIconSrc';
 import threeScaleImg from './imgs/logos/3scale.svg';
 import aerogearImg from './imgs/logos/aerogear.svg';

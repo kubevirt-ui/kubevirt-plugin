@@ -1,6 +1,3 @@
-// Extracted from jobLifecycle.ts
-// Root: src/views/checkups/self-validation/utils/selfValidationJob/jobLifecycle.ts
-
 import {
   ConfigMapModel,
   JobModel,

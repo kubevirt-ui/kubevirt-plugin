@@ -1,6 +1,3 @@
-// Extracted from catalog-item-icon.tsx
-// Root: src/views/topology/utils/icon-image-utils/catalog-item-icon.tsx
-
 import { toCatalogIconSrc } from './catalogItemIconSrc';
 import mariadbImg from './imgs/logos/mariadb.svg';
 import mediawikiImg from './imgs/logos/mediawiki.svg';

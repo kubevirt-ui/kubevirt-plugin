@@ -1,6 +1,3 @@
-// Extracted from EditBootableVolumesModal.tsx
-// Root: src/views/bootablevolumes/actions/components/EditBootableVolumesModal.tsx
-
 import { type FC, type ReactNode } from 'react';
 
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
