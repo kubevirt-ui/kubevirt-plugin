@@ -266,10 +266,10 @@ export const compareOwnerReferences = (obj: OwnerReference, otherObj: OwnerRefer
  */
 export const asAccessReview = (
   model: K8sModel,
-  obj: K8sResourceCommon,
+  obj: K8sResourceCommon | undefined,
   verb: K8sVerb,
   subresource?: string,
-): FleetAccessReviewResourceAttributes => {
+): FleetAccessReviewResourceAttributes | null => {
   if (!obj) {
     return null;
   }

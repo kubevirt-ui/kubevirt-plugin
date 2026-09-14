@@ -16,6 +16,7 @@ import {
 type EnvironmentSelectResourceProps = {
   diskName: string;
   environmentName?: string;
+  isDisabled?: boolean;
   kind?: EnvironmentKind;
   loaded: boolean;
   loadError: unknown;
@@ -27,6 +28,7 @@ type EnvironmentSelectResourceProps = {
 const EnvironmentSelectResource: FC<EnvironmentSelectResourceProps> = ({
   diskName,
   environmentName,
+  isDisabled,
   kind,
   loaded,
   loadError,
@@ -67,6 +69,7 @@ const EnvironmentSelectResource: FC<EnvironmentSelectResourceProps> = ({
         icon: kind ? (
           <span className={`co-m-resource-icon co-m-resource-${kind}`}>{MapKindToAbbr[kind]}</span>
         ) : null,
+        isDisabled,
       }}
     />
   );

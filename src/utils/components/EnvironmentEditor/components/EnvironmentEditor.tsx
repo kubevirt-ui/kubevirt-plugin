@@ -15,6 +15,7 @@ type EnvironmentEditorProps = {
   diskName: string;
   environmentName?: string;
   id: number;
+  isDisabled?: boolean;
   kind?: EnvironmentKind;
   loaded: boolean;
   loadError: unknown;
@@ -28,6 +29,7 @@ const EnvironmentEditor: FC<EnvironmentEditorProps> = ({
   diskName,
   environmentName,
   id,
+  isDisabled,
   kind,
   loaded,
   loadError,
@@ -44,6 +46,7 @@ const EnvironmentEditor: FC<EnvironmentEditorProps> = ({
         <EnvironmentSelectResource
           diskName={diskName}
           environmentName={environmentName}
+          isDisabled={isDisabled}
           kind={kind}
           loaded={loaded}
           loadError={loadError}
@@ -56,6 +59,7 @@ const EnvironmentEditor: FC<EnvironmentEditorProps> = ({
         <TextInput
           aria-labelledby="environment-serial-header"
           id={`${id}-serial`}
+          isDisabled={isDisabled}
           onChange={(_event, value) => onChange(diskName, environmentName, value, kind)}
           type="text"
           value={serial}
@@ -65,6 +69,7 @@ const EnvironmentEditor: FC<EnvironmentEditorProps> = ({
         <Tooltip content={t('Remove')}>
           <Button
             className="pairs-list__span-btns"
+            isDisabled={isDisabled}
             onClick={() => onRemove(diskName)}
             variant={ButtonVariant.plain}
           >

@@ -19,12 +19,18 @@ import useEnvironmentSelectOptions from './hooks/useEnvironmentSelectOptions';
 import './EnvironmentForm.scss';
 
 type EnvironmentFormProps = {
+  isEditable?: boolean;
   onEditChange?: (edited: boolean) => void;
   updateVM: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine | void>;
   vm: V1VirtualMachine;
 };
 
-const EnvironmentForm: FC<EnvironmentFormProps> = ({ onEditChange, updateVM, vm }) => {
+const EnvironmentForm: FC<EnvironmentFormProps> = ({
+  isEditable = true,
+  onEditChange,
+  updateVM,
+  vm,
+}) => {
   const [temporaryVM, setTemporaryVM] = useImmer(vm);
 
   const { t } = useKubevirtTranslation();
@@ -80,6 +86,7 @@ const EnvironmentForm: FC<EnvironmentFormProps> = ({ onEditChange, updateVM, vm 
             diskName={environment.diskName}
             environmentName={environment.name}
             id={index}
+            isDisabled={!isEditable}
             key={environment.name}
             kind={environment.kind}
             loaded={loaded}
@@ -93,8 +100,8 @@ const EnvironmentForm: FC<EnvironmentFormProps> = ({ onEditChange, updateVM, vm 
 
         <div>
           <Button
-            className="pf-m-link--align-left"
             icon={<PlusCircleIcon />}
+            isDisabled={!isEditable}
             onClick={onEnvironmentAdd}
             type="button"
             variant={ButtonVariant.link}

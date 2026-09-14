@@ -20,6 +20,7 @@ import { patchCustomizeWizardVMSignal } from '@kubevirt-utils/signals/customizeW
 import { updateBootOrder } from '../utils/utils';
 
 type DetailsSectionBootOrderProps = {
+  canUpdateVM?: boolean;
   instanceTypeVM?: V1VirtualMachine;
   isCustomizeInstanceType?: boolean;
   vm: V1VirtualMachine;
@@ -27,6 +28,7 @@ type DetailsSectionBootOrderProps = {
 };
 
 const DetailsSectionBootOrder: FC<DetailsSectionBootOrderProps> = ({
+  canUpdateVM = true,
   instanceTypeVM,
   isCustomizeInstanceType,
   vm,
@@ -74,7 +76,7 @@ const DetailsSectionBootOrder: FC<DetailsSectionBootOrderProps> = ({
       data-test={`${vmName}-boot-order`}
       descriptionData={<BootOrderSummary instanceTypeVM={instanceTypeVM} vm={vm} />}
       descriptionHeader={<SearchItem id="boot-order">{t('Boot order')}</SearchItem>}
-      isEdit
+      isEdit={canUpdateVM}
       onEditClick={onEditClick}
     />
   );

@@ -1,7 +1,7 @@
 import type { FC } from 'react';
 import React, { useMemo } from 'react';
 
-import { DataVolumeModel, VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { DataVolumeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import type {
   V1VirtualMachine,
   V1VirtualMachineInstance,
@@ -13,6 +13,7 @@ import type { SourceTypes } from '@kubevirt-utils/components/DiskModal/utils/typ
 import KubevirtFilterToolbar from '@kubevirt-utils/components/KubevirtFilterToolbar/KubevirtFilterToolbar';
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+import useIsVMEditable from '@kubevirt-utils/components/VMEditPermissionContext/useIsVMEditable';
 import WindowsDrivers from '@kubevirt-utils/components/WindowsDrivers/WindowsDrivers';
 import useIsWindowsSupportedArchitecture from '@kubevirt-utils/hooks/useIsWindowsSupportedArchitecture';
 import useKubevirtDataViewFilters from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/useKubevirtDataViewFilters';
@@ -62,12 +63,10 @@ const DiskList: FC<DiskListProps> = ({ customize = false, onDiskUpdate, vm, vmi 
   );
   const [canAddVolume] = useFleetAccessReview(addVolumeAccessReview ?? {});
   const vmIsRunning = isRunning(vm);
-
-  const accessReview = asAccessReview(VirtualMachineModel, vm, 'update' as K8sVerb);
-  const [canUpdate] = useFleetAccessReview(accessReview ?? {});
+  const isEditable = useIsVMEditable();
 
   const canHotplug = vmIsRunning && canAddVolume;
-  const canAddDisk = canUpdate || canHotplug;
+  const canAddDisk = isEditable || canHotplug;
 
   const [canCreateDataVolume] = useAccessReview({
     group: DataVolumeModel.apiGroup,
@@ -125,7 +124,7 @@ const DiskList: FC<DiskListProps> = ({ customize = false, onDiskUpdate, vm, vmi 
 
         {isWindowsSupported && (
           <FlexItem>
-            <WindowsDrivers updateVM={onSubmit} vm={vm} />
+            <WindowsDrivers isDisabled={!isEditable} updateVM={onSubmit} vm={vm} />
           </FlexItem>
         )}
       </Flex>

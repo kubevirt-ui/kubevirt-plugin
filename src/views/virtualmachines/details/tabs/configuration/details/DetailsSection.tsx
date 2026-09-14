@@ -1,7 +1,6 @@
 /* eslint-disable */
 import React, { FC, useEffect, useMemo, useState } from 'react';
 
-import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { INSTANCETYPE_CLASS_DISPLAY_NAME } from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/InstanceTypeDrilldownSelect/utils/constants';
 import NUMABadge from '@kubevirt-utils/components/badges/NUMABadge/NUMABadge';
@@ -25,7 +24,7 @@ import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isInstanceTypeVM } from '@kubevirt-utils/resources/instancetype/helper';
 import { InstanceTypeUnion } from '@kubevirt-utils/resources/instancetype/types';
-import { asAccessReview, getAnnotation, getName } from '@kubevirt-utils/resources/shared';
+import { getAnnotation, getName } from '@kubevirt-utils/resources/shared';
 import { WORKLOADS_LABELS } from '@kubevirt-utils/resources/template';
 import {
   DESCRIPTION_ANNOTATION,
@@ -35,11 +34,10 @@ import {
   getWorkload,
   hasNUMAConfiguration,
 } from '@kubevirt-utils/resources/vm';
+import useIsVMEditable from '@kubevirt-utils/components/VMEditPermissionContext/useIsVMEditable';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
-import { K8sVerb } from '@openshift-console/dynamic-plugin-sdk';
 import { DescriptionList, Grid, GridItem, Switch, Title } from '@patternfly/react-core';
-import { useFleetAccessReview } from '@stolostron/multicluster-sdk';
 import DeletionProtectionModal from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/DeletionProtectionModal';
 import { VMDeletionProtectionOptions } from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/utils/types';
 import {
@@ -71,8 +69,7 @@ type DetailsSectionProps = {
 const DetailsSection: FC<DetailsSectionProps> = ({ allInstanceTypes, instanceTypeVM, vm, vmi }) => {
   const { createModal } = useModal();
   const { t } = useKubevirtTranslation();
-  const accessReview = asAccessReview(VirtualMachineModel, vm, 'update' as K8sVerb);
-  const [canUpdateVM] = useFleetAccessReview(accessReview || {});
+  const isEditable = useIsVMEditable();
   const { featureEnabled: isGuestSystemLogsDisabled } = useFeatures(
     DISABLED_GUEST_SYSTEM_LOGS_ACCESS,
   );
@@ -127,7 +124,7 @@ const DetailsSection: FC<DetailsSectionProps> = ({ allInstanceTypes, instanceTyp
               }
               data-test={`${vmName}-description`}
               descriptionHeader={<SearchItem id="description">{t('Description')}</SearchItem>}
-              isEdit
+              isEdit={isEditable}
             />
             {!getInstanceTypeMatcher(vm) && (
               <DescriptionItem
@@ -161,7 +158,7 @@ const DetailsSection: FC<DetailsSectionProps> = ({ allInstanceTypes, instanceTyp
                   ))
                 }
                 data-test={`${vmName}-workload-profile`}
-                isEdit
+                isEdit={isEditable}
               />
             )}
             <DescriptionItem
@@ -198,7 +195,7 @@ const DetailsSection: FC<DetailsSectionProps> = ({ allInstanceTypes, instanceTyp
               bodyContent={isInstanceType ? null : <CPUDescription cpu={getCPU(vm)} />}
               data-test={`${vmName}-cpu-memory`}
               descriptionData={<CPUMemory vm={cpuMemoryVM || vm} vmi={vmi} />}
-              isEdit={canUpdateVM}
+              isEdit={isEditable}
               isPopover
               olsObj={vm}
               promptType={OLSPromptType.CPU_MEMORY}
@@ -226,7 +223,7 @@ const DetailsSection: FC<DetailsSectionProps> = ({ allInstanceTypes, instanceTyp
               data-test={`${vmName}-hostname`}
               descriptionData={vm?.spec?.template?.spec?.hostname || vmName}
               descriptionHeader={<SearchItem id="hostname">{t('Hostname')}</SearchItem>}
-              isEdit
+              isEdit={isEditable}
             />
             <DescriptionItem
               bodyContent={t(
@@ -234,6 +231,7 @@ const DetailsSection: FC<DetailsSectionProps> = ({ allInstanceTypes, instanceTyp
               )}
               descriptionData={
                 <HeadlessMode
+                  isDisabled={!isEditable}
                   updateHeadlessMode={(checked) => updateHeadlessMode(vm, checked)}
                   vm={vm}
                 />
@@ -257,7 +255,7 @@ const DetailsSection: FC<DetailsSectionProps> = ({ allInstanceTypes, instanceTyp
                   }}
                   id="guest-system-log-access"
                   isChecked={isCheckedGuestSystemAccessLog}
-                  isDisabled={isGuestSystemLogsDisabled}
+                  isDisabled={isGuestSystemLogsDisabled || !isEditable}
                 />
               }
               descriptionHeader={
@@ -293,6 +291,7 @@ const DetailsSection: FC<DetailsSectionProps> = ({ allInstanceTypes, instanceTyp
                   }
                   id="deletion-protection"
                   isChecked={deletionProtectionEnabled}
+                  isDisabled={!isEditable}
                 />
               }
               descriptionHeader={
@@ -306,9 +305,9 @@ const DetailsSection: FC<DetailsSectionProps> = ({ allInstanceTypes, instanceTyp
         </GridItem>
         <GridItem span={5}>
           <DescriptionList>
-            <DetailsSectionHardware vm={vm} vmi={vmi} />
+            <DetailsSectionHardware isEditable={isEditable} vm={vm} vmi={vmi} />
             <DetailsSectionBoot
-              canUpdateVM={canUpdateVM}
+              canUpdateVM={isEditable}
               instanceTypeVM={instanceTypeVM}
               vm={vm}
               vmi={vmi}

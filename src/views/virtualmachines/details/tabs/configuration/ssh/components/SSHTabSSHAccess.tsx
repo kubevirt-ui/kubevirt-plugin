@@ -6,6 +6,7 @@ import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/Descript
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import SSHAccess from '@kubevirt-utils/components/SSHAccess/SSHAccess';
 import useSSHService from '@kubevirt-utils/components/SSHAccess/useSSHService';
+import useIsVMEditable from '@kubevirt-utils/components/VMEditPermissionContext/useIsVMEditable';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
 type SSHTabSSHAccessProps = {
@@ -16,6 +17,7 @@ type SSHTabSSHAccessProps = {
 const SSHTabSSHAccess: FC<SSHTabSSHAccessProps> = ({ isCustomizeInstanceType, vm }) => {
   const { t } = useKubevirtTranslation();
   const [sshService, sshServiceLoaded, sshServiceError] = useSSHService(vm);
+  const isEditable = useIsVMEditable();
 
   return (
     <DescriptionItem
@@ -23,6 +25,7 @@ const SSHTabSSHAccess: FC<SSHTabSSHAccessProps> = ({ isCustomizeInstanceType, vm
       descriptionData={
         <SSHAccess
           isCustomizeInstanceType={isCustomizeInstanceType}
+          isDisabled={!isEditable}
           sshService={sshService}
           sshServiceError={sshServiceError}
           sshServiceLoaded={sshServiceLoaded}

@@ -6,17 +6,16 @@ import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/Descript
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import SecretNameLabel from '@kubevirt-utils/components/SSHSecretModal/components/SecretNameLabel';
+import useIsVMEditable from '@kubevirt-utils/components/VMEditPermissionContext/useIsVMEditable';
 import VMSSHSecretModal from '@kubevirt-utils/components/VMSSHSecretModal/VMSSHSecretModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
 import { USER_SETTINGS_KEYS } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/const';
-import { asAccessReview, getName, getNamespace } from '@kubevirt-utils/resources/shared';
+import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getVMSSHSecretName } from '@kubevirt-utils/resources/vm';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sUpdate } from '@multicluster/k8sRequests';
-import { type K8sVerb } from '@openshift-console/dynamic-plugin-sdk';
 import { Stack } from '@patternfly/react-core';
-import { useFleetAccessReview } from '@stolostron/multicluster-sdk';
 
 import { useDynamicSSHInjection } from '../hooks/useDynamicSSHInjection';
 import DynamicSSHKeyInjectionDescription from './DynamicSSHKeyInjectionDescription';
@@ -39,12 +38,11 @@ const SSHTabAuthorizedSSHKey: FC<SSHTabAuthorizedSSHKeyProps> = ({
     USER_SETTINGS_KEYS.ssh,
     getCluster(vm),
   );
-  const accessReview = asAccessReview(VirtualMachineModel, vm, 'update' as K8sVerb);
-  const [canUpdateVM] = useFleetAccessReview(accessReview || {});
+  const canEditVM = useIsVMEditable();
   const secretName = useMemo(() => getVMSSHSecretName(vm), [vm]);
   const isDynamicSSHInjectionEnabled = useDynamicSSHInjection(vm);
   const isEditable =
-    ((canUpdateVM && isDynamicSSHInjectionEnabled) || isCustomizeInstanceType) && loaded;
+    ((canEditVM && isDynamicSSHInjectionEnabled) || isCustomizeInstanceType) && loaded;
 
   const onSubmit = (updatedVM: V1VirtualMachine): Promise<V1VirtualMachine> =>
     onUpdateVM

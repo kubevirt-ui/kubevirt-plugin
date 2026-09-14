@@ -28,12 +28,14 @@ import { expandURLHash, getDetailsTabHardwareIds } from '../../utils/search';
 import { updateHardwareDevices } from '../utils/utils';
 
 type DetailsSectionHardwareProps = {
+  isEditable?: boolean;
   onSubmit?: (type: HARDWARE_DEVICE_TYPE, updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine>;
   vm: V1VirtualMachine;
   vmi?: V1VirtualMachineInstance;
 };
 
 const DetailsSectionHardware: FC<DetailsSectionHardwareProps> = ({
+  isEditable = true,
   onSubmit: onSubmitProp,
   vm,
   vmi,
@@ -111,7 +113,11 @@ const DetailsSectionHardware: FC<DetailsSectionHardwareProps> = ({
         {!vmHasS390xArchitecture && !isClusterS390xArchitecture && (
           <>
             <GridItem span={5}>
-              <HardwareDeviceTitle canEdit onClick={onEditGPU} title={t('GPU devices')} />
+              <HardwareDeviceTitle
+                canEdit={isEditable}
+                onClick={onEditGPU}
+                title={t('GPU devices')}
+              />
               <HardwareDevicesTable devices={gpus} />
             </GridItem>
 
@@ -126,7 +132,11 @@ const DetailsSectionHardware: FC<DetailsSectionHardwareProps> = ({
         )}
 
         <GridItem span={vmHasS390xArchitecture || isClusterS390xArchitecture ? 11 : 5}>
-          <HardwareDeviceTitle canEdit onClick={onEditHostDevices} title={t('Host devices')} />
+          <HardwareDeviceTitle
+            canEdit={isEditable}
+            onClick={onEditHostDevices}
+            title={t('Host devices')}
+          />
           <HardwareDevicesTable devices={hostDevices} />
         </GridItem>
       </Grid>

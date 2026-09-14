@@ -2,6 +2,7 @@ import type { FC } from 'react';
 import React from 'react';
 
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import useIsVMEditable from '@kubevirt-utils/components/VMEditPermissionContext/useIsVMEditable';
 import type { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
 import useMetadataTabState from '../hooks/useMetadataTabState';
@@ -22,6 +23,7 @@ const MetadataTabContent: FC<MetadataTabContentProps> = ({
   vm,
 }) => {
   const { isAdvancedView, setIsAdvancedView } = useMetadataTabState();
+  const isEditable = useIsVMEditable();
 
   return (
     <>
@@ -31,6 +33,7 @@ const MetadataTabContent: FC<MetadataTabContentProps> = ({
       />
       {isAdvancedView ? (
         <AdvancedView
+          isEditable={isEditable}
           model={VirtualMachineModel}
           onAnnotationsSubmit={onAnnotationsSubmit}
           onLabelsSubmit={onLabelsSubmit}
@@ -38,8 +41,12 @@ const MetadataTabContent: FC<MetadataTabContentProps> = ({
         />
       ) : (
         <>
-          <LabelsTable onLabelsSubmit={onLabelsSubmit} resource={vm} />
-          <AnnotationsTable onAnnotationsSubmit={onAnnotationsSubmit} resource={vm} />
+          <LabelsTable editable={isEditable} onLabelsSubmit={onLabelsSubmit} resource={vm} />
+          <AnnotationsTable
+            editable={isEditable}
+            onAnnotationsSubmit={onAnnotationsSubmit}
+            resource={vm}
+          />
         </>
       )}
     </>
