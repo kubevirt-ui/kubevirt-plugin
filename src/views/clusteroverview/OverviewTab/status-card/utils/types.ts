@@ -1,16 +1,15 @@
-/* eslint-disable */
-import { ReactNode } from 'react';
+import { type ReactNode } from 'react';
 
-import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+import { type K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
 import {
-  APIServiceDefinition,
-  ClusterServiceVersionIcon,
-  ClusterServiceVersionPhase,
-  CRDDescription,
-  CSVConditionReason,
-  InstallModeType,
-  RequirementStatus,
+  type APIServiceDefinition,
+  type ClusterServiceVersionIcon,
+  type ClusterServiceVersionPhase,
+  type CRDDescription,
+  type CSVConditionReason,
+  type InstallModeType,
+  type RequirementStatus,
 } from '../../../utils/types';
 
 export type ClusterServiceVersionKind = {
@@ -24,7 +23,7 @@ export type ClusterServiceVersionKind = {
     icon?: ClusterServiceVersionIcon[];
     install: {
       spec: {
-        deployments: { name: string; spec: any }[];
+        deployments: { name: string; spec: unknown }[];
         permissions: {
           rules: { apiGroups: string[]; resources: string[]; verbs: string[] }[];
           serviceAccountName: string;

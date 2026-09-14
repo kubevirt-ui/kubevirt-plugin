@@ -1,22 +1,21 @@
-/* eslint-disable */
-import { TFunction } from 'i18next';
+import { type TFunction } from 'i18next';
 
-import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
-import { vmimStatuses } from '@kubevirt-utils/resources/vmim/statuses';
-
+import { type V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import {
   getMigrationSourceNode,
   getMigrationTargetNode,
 } from '@kubevirt-utils/resources/vmi/utils/selectors';
 import { getMigrationPhase } from '@kubevirt-utils/resources/vmim/selectors';
+import { vmimStatuses } from '@kubevirt-utils/resources/vmim/statuses';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
+
 import {
   MIGRATION_SOURCE_FILTER_ID,
   MIGRATION_STATUS_FILTER_ID,
   MIGRATION_TARGET_FILTER_ID,
 } from './constants';
-import { MigrationTableDataLayout } from './utils';
+import { type MigrationTableDataLayout } from './utils';
 
 export const getStatusFilter = (t: TFunction): KubevirtFilter<MigrationTableDataLayout>[] => [
   {
@@ -44,7 +43,7 @@ export const getSourceNodeFilter = (
     {
       categoryLabel: t('Source Node'),
       id: MIGRATION_SOURCE_FILTER_ID,
-      match: (obj, selected) => {
+      match: (obj, selected): boolean => {
         const nodeName = getMigrationSourceNode(obj?.vmiObj);
         return selected.includes(`source-${nodeName}`);
       },
@@ -70,7 +69,7 @@ export const getTargetNodeFilter = (
     {
       categoryLabel: t('Target Node'),
       id: MIGRATION_TARGET_FILTER_ID,
-      match: (obj, selected) => {
+      match: (obj, selected): boolean => {
         const nodeName = getMigrationTargetNode(obj?.vmiObj);
         return selected.includes(`target-${nodeName}`);
       },

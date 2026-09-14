@@ -1,9 +1,8 @@
-/* eslint-disable */
-import { TFunction } from 'i18next';
+import { type TFunction } from 'i18next';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import {
-  KubevirtFilter,
+  type KubevirtFilter,
   KubevirtFilterLayout,
 } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { getAnnotation } from '@kubevirt-utils/resources/shared';
@@ -16,9 +15,9 @@ import {
 } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
 import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
-export const getOSName = (obj: V1VirtualMachine) => {
+export const getOSName = (obj: V1VirtualMachine): string | undefined => {
   const osAnnotation = getAnnotation(obj?.spec?.template, ANNOTATIONS.os);
-  const osLabel = getOperatingSystemName(obj) || getOperatingSystem(obj);
+  const osLabel = getOperatingSystemName(obj) ?? getOperatingSystem(obj);
   const osPreference = getPreferenceMatcher(obj)?.name;
 
   return matchOSName(osAnnotation, osLabel, osPreference);

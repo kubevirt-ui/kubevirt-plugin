@@ -1,4 +1,4 @@
-import React, { type ComponentType, type FC } from 'react';
+import React, { type FC } from 'react';
 
 import {
   modelToGroupVersionKind,
@@ -78,7 +78,7 @@ export const NamespaceCell: FC<CellProps> = ({ row }) => {
 export const StatusCell: FC<CellProps> = ({ row }) => {
   const { vmim, vmiObj } = row;
   const migrationPhase = getMigrationPhase(vmim);
-  const StatusIcon = getStatusIcon(migrationPhase) as ComponentType;
+  const StatusIcon = getStatusIcon(migrationPhase ?? '');
   const showTooltip =
     migrationPhase === vmimStatuses.Failed || migrationPhase === vmimStatuses.Succeeded;
   const endTimestamp = vmiObj?.status?.migrationState?.endTimestamp;

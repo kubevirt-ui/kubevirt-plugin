@@ -1,63 +1,28 @@
-/* eslint-disable */
-import React, { FC, useEffect, useMemo, useState } from 'react';
+import React, { type FC, useEffect, useMemo, useState } from 'react';
 
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { INSTANCETYPE_CLASS_DISPLAY_NAME } from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/InstanceTypeDrilldownSelect/utils/constants';
-import NUMABadge from '@kubevirt-utils/components/badges/NUMABadge/NUMABadge';
-import CPUDescription from '@kubevirt-utils/components/CPUDescription/CPUDescription';
-import CPUMemory from '@kubevirt-utils/components/CPUMemory/CPUMemory';
-import CPUMemoryModal from '@kubevirt-utils/components/CPUMemoryModal/CPUMemoryModal';
-import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
-import { DescriptionModal } from '@kubevirt-utils/components/DescriptionModal/DescriptionModal';
-import HeadlessMode from '@kubevirt-utils/components/HeadlessMode/HeadlessMode';
-import HostnameModal from '@kubevirt-utils/components/HostnameModal/HostnameModal';
-import InstanceTypeModal from '@kubevirt-utils/components/InstanceTypeModal/InstanceTypeModal';
+import {
+  type V1VirtualMachine,
+  type V1VirtualMachineInstance,
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
-import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
-import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
-import WorkloadProfileModal from '@kubevirt-utils/components/WorkloadProfileModal/WorkloadProfileModal';
-import { WorkloadTypeTelemetry } from '@kubevirt-utils/extensions/telemetry/utils/types';
-import { logVMWorkloadCollected } from '@kubevirt-utils/extensions/telemetry/workload';
 import { DISABLED_GUEST_SYSTEM_LOGS_ACCESS } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isInstanceTypeVM } from '@kubevirt-utils/resources/instancetype/helper';
-import { InstanceTypeUnion } from '@kubevirt-utils/resources/instancetype/types';
-import { asAccessReview, getAnnotation, getName } from '@kubevirt-utils/resources/shared';
-import { WORKLOADS_LABELS } from '@kubevirt-utils/resources/template';
-import {
-  DESCRIPTION_ANNOTATION,
-  getCPU,
-  getInstanceTypeMatcher,
-  getMachineType,
-  getWorkload,
-  hasNUMAConfiguration,
-} from '@kubevirt-utils/resources/vm';
-import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
-import { OLSPromptType } from '@lightspeed/utils/prompts';
-import { K8sVerb } from '@openshift-console/dynamic-plugin-sdk';
-import { DescriptionList, Grid, GridItem, Switch, Title } from '@patternfly/react-core';
+import { type InstanceTypeUnion } from '@kubevirt-utils/resources/instancetype/types';
+import { asAccessReview, getName } from '@kubevirt-utils/resources/shared';
+import { type K8sVerb } from '@openshift-console/dynamic-plugin-sdk';
+import { DescriptionList, Grid, GridItem, Title } from '@patternfly/react-core';
 import { useFleetAccessReview } from '@stolostron/multicluster-sdk';
-import DeletionProtectionModal from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/DeletionProtectionModal';
-import { VMDeletionProtectionOptions } from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/utils/types';
-import {
-  isDeletionProtectionEnabled,
-  setDeletionProtectionForVM,
-} from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/utils/utils';
+import { isDeletionProtectionEnabled } from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/utils/utils';
 
+import DetailsSectionAccessItems from './components/DetailsSectionAccessItems';
 import DetailsSectionBoot from './components/DetailsSectionBoot';
+import DetailsSectionComputeItems from './components/DetailsSectionComputeItems';
+import DetailsSectionDescription from './components/DetailsSectionDescription';
 import DetailsSectionHardware from './components/DetailsSectionHardware';
-import {
-  updateDescription,
-  updatedHostname,
-  updatedInstanceType,
-  updatedVirtualMachine,
-  updateGuestSystemAccessLog,
-  updateHeadlessMode,
-  updateWorkload,
-} from './utils/utils';
 
 import './details-section.scss';
 
@@ -69,10 +34,9 @@ type DetailsSectionProps = {
 };
 
 const DetailsSection: FC<DetailsSectionProps> = ({ allInstanceTypes, instanceTypeVM, vm, vmi }) => {
-  const { createModal } = useModal();
   const { t } = useKubevirtTranslation();
   const accessReview = asAccessReview(VirtualMachineModel, vm, 'update' as K8sVerb);
-  const [canUpdateVM] = useFleetAccessReview(accessReview || {});
+  const [canUpdateVM] = useFleetAccessReview(accessReview ?? {});
   const { featureEnabled: isGuestSystemLogsDisabled } = useFeatures(
     DISABLED_GUEST_SYSTEM_LOGS_ACCESS,
   );
@@ -80,22 +44,22 @@ const DetailsSection: FC<DetailsSectionProps> = ({ allInstanceTypes, instanceTyp
   const logSerialConsole = vm?.spec?.template?.spec?.domain?.devices?.logSerialConsole;
   const [isCheckedGuestSystemAccessLog, setIsCheckedGuestSystemAccessLog] = useState<boolean>();
   const instanceType = useMemo(
-    () => allInstanceTypes.find((it) => getName(it) === vm?.spec?.instancetype?.name),
+    () =>
+      allInstanceTypes.find(
+        (instanceTypeResource) => getName(instanceTypeResource) === vm?.spec?.instancetype?.name,
+      ),
     [allInstanceTypes, vm?.spec?.instancetype?.name],
   );
   useEffect(
     () =>
       setIsCheckedGuestSystemAccessLog(
-        logSerialConsole || (logSerialConsole === undefined && !isGuestSystemLogsDisabled),
+        logSerialConsole ?? (logSerialConsole === undefined && !isGuestSystemLogsDisabled),
       ),
     [isGuestSystemLogsDisabled, logSerialConsole],
   );
 
-  const vmWorkload = getWorkload(vm);
   const vmName = getName(vm);
-
   const cpuMemoryVM = instanceTypeVM?.metadata?.uid === vm?.metadata?.uid ? instanceTypeVM : vm;
-
   const isInstanceType = isInstanceTypeVM(vm);
   const deletionProtectionEnabled = isDeletionProtectionEnabled(vm);
 
@@ -111,196 +75,25 @@ const DetailsSection: FC<DetailsSectionProps> = ({ allInstanceTypes, instanceTyp
       <Grid>
         <GridItem span={5}>
           <DescriptionList>
-            <DescriptionItem
-              descriptionData={
-                getAnnotation(vm, DESCRIPTION_ANNOTATION) || <MutedTextSpan text={t('None')} />
-              }
-              onEditClick={() =>
-                createModal(({ isOpen, onClose }) => (
-                  <DescriptionModal
-                    isOpen={isOpen}
-                    obj={vm}
-                    onClose={onClose}
-                    onSubmit={(description) => updateDescription(vm, description)}
-                  />
-                ))
-              }
-              data-test={`${vmName}-description`}
-              descriptionHeader={<SearchItem id="description">{t('Description')}</SearchItem>}
-              isEdit
+            <DetailsSectionDescription vm={vm} />
+            <DetailsSectionComputeItems
+              allInstanceTypes={allInstanceTypes}
+              canUpdateVM={canUpdateVM}
+              cpuMemoryVM={cpuMemoryVM}
+              instanceType={instanceType}
+              isInstanceType={isInstanceType}
+              vm={vm}
+              vmi={vmi}
+              vmName={vmName}
             />
-            {!getInstanceTypeMatcher(vm) && (
-              <DescriptionItem
-                descriptionData={
-                  vmWorkload ? (
-                    (() => {
-                      const workloadKey = WORKLOADS_LABELS[vmWorkload];
-                      return workloadKey ? t(workloadKey) : vmWorkload;
-                    })()
-                  ) : (
-                    <MutedTextSpan text={t('Not available')} />
-                  )
-                }
-                descriptionHeader={
-                  <SearchItem id="workload-profile">{t('Workload profile')}</SearchItem>
-                }
-                onEditClick={() =>
-                  createModal(({ isOpen, onClose }) => (
-                    <WorkloadProfileModal
-                      onSubmit={async (workload) => {
-                        const result = await updateWorkload(vm, workload);
-                        logVMWorkloadCollected({
-                          workloadType: workload as WorkloadTypeTelemetry,
-                        });
-                        return result;
-                      }}
-                      initialWorkload={vmWorkload}
-                      isOpen={isOpen}
-                      onClose={onClose}
-                    />
-                  ))
-                }
-                data-test={`${vmName}-workload-profile`}
-                isEdit
-              />
-            )}
-            <DescriptionItem
-              descriptionHeader={
-                <SearchItem id="cpu-memory">
-                  {isInstanceType ? t('InstanceType') : t('CPU | Memory')}
-                </SearchItem>
-              }
-              onEditClick={() =>
-                createModal(({ isOpen, onClose }) => {
-                  return isInstanceType ? (
-                    <InstanceTypeModal
-                      allInstanceTypes={allInstanceTypes}
-                      instanceType={instanceType}
-                      isOpen={isOpen}
-                      onClose={onClose}
-                      onSubmit={updatedInstanceType}
-                      vm={vm}
-                    />
-                  ) : (
-                    <CPUMemoryModal
-                      isOpen={isOpen}
-                      onClose={onClose}
-                      onSubmit={updatedVirtualMachine}
-                      vm={vm}
-                    />
-                  );
-                })
-              }
-              subTitle={
-                instanceType && getAnnotation(instanceType, INSTANCETYPE_CLASS_DISPLAY_NAME)
-              }
-              additionalContent={hasNUMAConfiguration(cpuMemoryVM) && <NUMABadge />}
-              bodyContent={isInstanceType ? null : <CPUDescription cpu={getCPU(vm)} />}
-              data-test={`${vmName}-cpu-memory`}
-              descriptionData={<CPUMemory vm={cpuMemoryVM || vm} vmi={vmi} />}
-              isEdit={canUpdateVM}
-              isPopover
-              olsObj={vm}
-              promptType={OLSPromptType.CPU_MEMORY}
-            />
-            <DescriptionItem
-              bodyContent={t('The QEMU machine type.')}
-              descriptionData={getMachineType(vm) || NO_DATA_DASH}
-              descriptionHeader={t('Machine type')}
-              isPopover
-              olsObj={vm}
-              promptType={OLSPromptType.MACHINE_TYPE}
-            />
-            <DescriptionItem
-              onEditClick={() =>
-                createModal(({ isOpen, onClose }) => (
-                  <HostnameModal
-                    isOpen={isOpen}
-                    onClose={onClose}
-                    onSubmit={updatedHostname}
-                    vm={vm}
-                    vmi={vmi}
-                  />
-                ))
-              }
-              data-test={`${vmName}-hostname`}
-              descriptionData={vm?.spec?.template?.spec?.hostname || vmName}
-              descriptionHeader={<SearchItem id="hostname">{t('Hostname')}</SearchItem>}
-              isEdit
-            />
-            <DescriptionItem
-              bodyContent={t(
-                'Whether to attach the default graphics device or not. VNC will not be available if checked.',
-              )}
-              descriptionData={
-                <HeadlessMode
-                  updateHeadlessMode={(checked) => updateHeadlessMode(vm, checked)}
-                  vm={vm}
-                />
-              }
-              breadcrumb="VirtualMachine.spec.template.devices.autoattachGraphicsDevice"
-              data-test={`${vmName}-headless`}
-              descriptionHeader={<SearchItem id="headless-mode">{t('Headless mode')}</SearchItem>}
-              isPopover
-              olsObj={vm}
-              promptType={OLSPromptType.HEADLESS_MODE}
-            />
-            <DescriptionItem
-              bodyContent={t(
-                'Applying the start/pause mode to this virtual machine will cause it to partially reboot and pause.',
-              )}
-              descriptionData={
-                <Switch
-                  onChange={(_event, checked) => {
-                    setIsCheckedGuestSystemAccessLog(checked);
-                    updateGuestSystemAccessLog(vm, checked);
-                  }}
-                  id="guest-system-log-access"
-                  isChecked={isCheckedGuestSystemAccessLog}
-                  isDisabled={isGuestSystemLogsDisabled}
-                />
-              }
-              descriptionHeader={
-                <SearchItem id="guest-system-log-access">{t('Guest system log access')}</SearchItem>
-              }
-              isPopover
-              olsObj={vm}
-              promptType={OLSPromptType.GUEST_SYSTEM_LOG_ACCESS}
-            />
-            <DescriptionItem
-              bodyContent={t(
-                'Applying deletion protection to this VM will prevent deletion through the web console.',
-              )}
-              descriptionData={
-                <Switch
-                  onChange={(_event, checked) =>
-                    createModal(({ isOpen, onClose }) => (
-                      <DeletionProtectionModal
-                        deletionProtectionOption={
-                          checked
-                            ? VMDeletionProtectionOptions.ENABLE
-                            : VMDeletionProtectionOptions.DISABLE
-                        }
-                        onConfirm={(enableDeletionProtection) => {
-                          setDeletionProtectionForVM(vm, enableDeletionProtection);
-                          onClose();
-                        }}
-                        isOpen={isOpen}
-                        onCancel={onClose}
-                        vm={vm}
-                      />
-                    ))
-                  }
-                  id="deletion-protection"
-                  isChecked={deletionProtectionEnabled}
-                />
-              }
-              descriptionHeader={
-                <SearchItem id="deletion-protection">{t('Deletion protection')}</SearchItem>
-              }
-              isPopover
-              olsObj={vm}
-              promptType={OLSPromptType.DELETION_PROTECTION}
+            <DetailsSectionAccessItems
+              deletionProtectionEnabled={deletionProtectionEnabled}
+              isCheckedGuestSystemAccessLog={isCheckedGuestSystemAccessLog}
+              isGuestSystemLogsDisabled={isGuestSystemLogsDisabled}
+              setIsCheckedGuestSystemAccessLog={setIsCheckedGuestSystemAccessLog}
+              vm={vm}
+              vmi={vmi}
+              vmName={vmName}
             />
           </DescriptionList>
         </GridItem>

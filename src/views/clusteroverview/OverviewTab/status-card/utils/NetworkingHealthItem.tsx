@@ -1,13 +1,28 @@
-/* eslint-disable */
-import React from 'react';
+import React, { type FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { HealthState } from '@openshift-console/dynamic-plugin-sdk';
+import { HealthState, type K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { HealthItem } from '@openshift-console/dynamic-plugin-sdk-internal';
 
 import { AVAILABLE } from './constants';
 
-const NetworkingHealthItem = ({ nac }) => {
+type NetworkAddonsConfigCondition = {
+  message?: string;
+  status?: string;
+  type?: string;
+};
+
+type NetworkAddonsConfig = K8sResourceCommon & {
+  status?: {
+    conditions?: NetworkAddonsConfigCondition[];
+  };
+};
+
+type NetworkingHealthItemProps = {
+  nac: NetworkAddonsConfig;
+};
+
+const NetworkingHealthItem: FC<NetworkingHealthItemProps> = ({ nac }) => {
   const { t } = useKubevirtTranslation();
   const nacConditions = nac?.status?.conditions;
   const availableCondition = nacConditions?.find((condition) => condition?.type === AVAILABLE);

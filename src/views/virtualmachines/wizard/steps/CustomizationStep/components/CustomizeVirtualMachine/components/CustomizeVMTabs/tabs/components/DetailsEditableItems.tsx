@@ -79,7 +79,7 @@ const DetailsEditableItems: FC<DetailsEditableItemsProps> = ({ treeViewFoldersEn
       )}
       <DescriptionItem
         data-test={`${vmName}-hostname`}
-        descriptionData={getHostname(vm) || vmName}
+        descriptionData={getHostname(vm) ?? vmName}
         descriptionHeader={<SearchItem id="hostname">{t('Hostname')}</SearchItem>}
         isEdit
         onEditClick={() =>

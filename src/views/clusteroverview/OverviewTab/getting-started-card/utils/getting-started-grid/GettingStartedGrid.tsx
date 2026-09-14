@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { FC, ReactNode } from 'react';
+import React, { type FC, type ReactNode } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useToggle } from '@kubevirt-utils/hooks/useToggle';
@@ -29,7 +28,7 @@ export const GettingStartedGrid: FC<GettingStartedGridProps> = ({ children }) =>
     'Use our collection of resources to help you get started with virtualization.',
   );
 
-  const onExpand = () => setIsExpanded(!isExpanded);
+  const onExpand = (): void => setIsExpanded(!isExpanded);
 
   return (
     <Card

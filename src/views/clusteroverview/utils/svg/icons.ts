@@ -1,4 +1,3 @@
-/* eslint-disable */
- 
+import recommendedOperatorIconSrc from './operators_icon.svg';
 
-export const recommendedOperatorIcon = require('./operators_icon.svg') as string;
+export const recommendedOperatorIcon = recommendedOperatorIconSrc;

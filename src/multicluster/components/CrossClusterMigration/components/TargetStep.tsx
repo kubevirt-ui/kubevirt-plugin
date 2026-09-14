@@ -1,10 +1,8 @@
-/* eslint-disable */
-import React, { FC, useCallback, useEffect, useMemo } from 'react';
-import { Updater } from 'use-immer';
+import React, { type FC, useCallback, useEffect, useMemo } from 'react';
+import { type Updater } from 'use-immer';
 
-import { V1beta1Plan } from '@forklift-ui/types';
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
+import { type V1beta1Plan } from '@forklift-ui/types';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import StateHandler from '@kubevirt-utils/components/StateHandler/StateHandler';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
@@ -14,26 +12,15 @@ import {
 import { getName, getNamespace, getUID } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
-import {
-  Bullseye,
-  Button,
-  ButtonVariant,
-  Form,
-  FormGroup,
-  Spinner,
-  Split,
-  SplitItem,
-  Title,
-} from '@patternfly/react-core';
-import { ArrowRightIcon, WrenchIcon } from '@patternfly/react-icons';
+import { Title } from '@patternfly/react-core';
 import { useHubClusterName } from '@stolostron/multicluster-sdk';
+
+import { getClusterFromProvider } from '../utils';
 
 import useAdvisorRouteURL from '../hooks/useAdvisorRouteURL';
 import useClusterRecommendation from '../hooks/useClusterRecommendation';
 import useClustersAndProjects from '../hooks/useClustersAndProjects';
-import { getClusterFromProvider } from '../utils';
-
-import ClusterRecommendationPanel from './ClusterRecommendationPanel';
+import TargetStepForm from './TargetStepForm';
 
 import './TargetStep.scss';
 
@@ -136,89 +123,32 @@ const TargetStep: FC<TargetStepProps> = ({ migrationPlan, setMigrationPlan, vms 
 
   return (
     <StateHandler
-      error={clustersError || projectsError}
+      error={clustersError ?? projectsError}
       hasData={!isEmpty(providers)}
       loaded={clustersLoaded}
     >
       <Title className="cross-cluster-migration-title" headingLevel="h2" size="lg">
         {t('Target placement')}
       </Title>
-      <Form>
-        <Split hasGutter>
-          <SplitItem className="crossclustermigration-target-step__box" isFilled>
-            <Title headingLevel="h5">{t('Source')}</Title>
-
-            <FormGroup label={t('Cluster')}>
-              <InlineFilterSelect
-                options={clustersOptions}
-                selected={sourceCluster}
-                selectProps={{ id: 'source-cluster-select' }}
-                setSelected={undefined}
-                toggleProps={{ children: sourceCluster, isDisabled: true, isFullWidth: true }}
-              />
-            </FormGroup>
-
-            <FormGroup label={t('Project')}>
-              <InlineFilterSelect
-                options={[]}
-                selected={sourceNamespace}
-                selectProps={{ id: 'source-project-select' }}
-                setSelected={undefined}
-                toggleProps={{ children: sourceNamespace, isDisabled: true, isFullWidth: true }}
-              />
-            </FormGroup>
-          </SplitItem>
-          <SplitItem>
-            <Bullseye>
-              <ArrowRightIcon />
-            </Bullseye>
-          </SplitItem>
-          <SplitItem className="crossclustermigration-target-step__box" isFilled>
-            <Title headingLevel="h5">{t('Target')}</Title>
-
-            <FormGroup label={t('Cluster')}>
-              <InlineFilterSelect
-                options={clustersOptions}
-                selected={selectedClusterTarget}
-                selectProps={{ id: 'target-cluster-select' }}
-                setSelected={onClusterChange}
-                toggleProps={{ isFullWidth: true }}
-              />
-            </FormGroup>
-
-            {projectsLoaded ? (
-              <FormGroup label={t('Project')}>
-                <InlineFilterSelect
-                  options={projectOptions}
-                  selected={selectedProjectTarget}
-                  selectProps={{ id: 'target-project-select' }}
-                  setSelected={onProjectChange}
-                  toggleProps={{ isFullWidth: true }}
-                />
-              </FormGroup>
-            ) : (
-              <Spinner />
-            )}
-          </SplitItem>
-        </Split>
-        {advisorBaseURL && (
-          <Button
-            icon={<WrenchIcon />}
-            isDisabled={recLoading}
-            onClick={fetchRecommendation}
-            variant={ButtonVariant.secondary}
-          >
-            {t('Get cluster recommendation')}
-          </Button>
-        )}
-        <ClusterRecommendationPanel
-          data={recData}
-          error={recError}
-          loaded={recLoaded}
-          loading={recLoading}
-          onSelectCluster={onRecommendationSelect}
-        />
-      </Form>
+      <TargetStepForm
+        advisorBaseURL={advisorBaseURL}
+        clustersOptions={clustersOptions}
+        fetchRecommendation={fetchRecommendation}
+        onClusterChange={onClusterChange}
+        onProjectChange={onProjectChange}
+        onRecommendationSelect={onRecommendationSelect}
+        projectOptions={projectOptions}
+        projectsLoaded={projectsLoaded}
+        recData={recData}
+        recError={recError}
+        recLoaded={recLoaded}
+        recLoading={recLoading}
+        selectedClusterTarget={selectedClusterTarget}
+        selectedProjectTarget={selectedProjectTarget}
+        sourceCluster={sourceCluster}
+        sourceNamespace={sourceNamespace}
+        t={t}
+      />
     </StateHandler>
   );
 };

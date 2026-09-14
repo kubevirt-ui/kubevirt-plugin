@@ -1,44 +1,28 @@
-/* eslint-disable */
-import React, { ReactElement, ReactNode, useEffect, useMemo } from 'react';
+import React, { type ReactElement, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router';
 
-import { PF_TABLE_CHECK_CLASS } from '@kubevirt-utils/hooks/useDataViewTableSort/constants';
 import { useDataViewTableSort } from '@kubevirt-utils/hooks/useDataViewTableSort/useDataViewTableSort';
 import { generateRows } from '@kubevirt-utils/hooks/useDataViewTableSort/utils';
-import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { Checkbox, EmptyState, EmptyStateVariant } from '@patternfly/react-core';
-import { DataViewTable, DataViewTr } from '@patternfly/react-data-view';
+import { type DataViewTr } from '@patternfly/react-data-view';
 
-import MutedTextSpan from '../MutedTextSpan/MutedTextSpan';
 import StateHandler from '../StateHandler/StateHandler';
-
+import KubevirtTableBody from './components/KubevirtTableBody';
+import { useSelectionColumn } from './hooks/useSelectionColumn';
 import { useTableSelection } from './hooks/useTableSelection';
-import { KubevirtTableProps } from './types';
+import { type KubevirtTableProps } from './types';
 import { getActiveColumns } from './utils/getActiveColumns';
 
 import './KubevirtTable.scss';
 
 export type { KubevirtTableProps } from './types';
 
-const renderNoDataContent = (content: ReactNode): ReactNode => {
-  if (typeof content === 'string') {
-    return <EmptyState headingLevel="h4" titleText={content} variant={EmptyStateVariant.xs} />;
-  }
-  return content;
-};
-
-const renderNoFilteredDataContent = (content: ReactNode): ReactNode => {
-  if (typeof content === 'string') {
-    return <MutedTextSpan text={content} />;
-  }
-  return content;
-};
+const defaultGetRowId = (_row: unknown, index: number): string => String(index);
+const defaultOnSelect = (_items: unknown[]): void => {};
 
 const KubevirtTable = <TData, TCallbacks = undefined>(
   props: KubevirtTableProps<TData, TCallbacks>,
 ): ReactElement => {
-  const { t } = useKubevirtTranslation();
   const {
     activeColumnKeys,
     ariaLabel,
@@ -106,20 +90,19 @@ const KubevirtTable = <TData, TCallbacks = undefined>(
     isRowSelected,
     someSelected,
     validSelectedItems,
-  } = useTableSelection({
+  } = useTableSelection<TData>({
     data: sortedData,
-    getRowId: getRowId ?? ((_, index) => String(index)),
-    onSelect: onSelect ?? (() => {}),
+    getRowId: getRowId ?? defaultGetRowId,
+    onSelect: (onSelect ?? defaultOnSelect) as (selected: TData[]) => void,
     paginatedData,
     selectedItems,
   });
 
   // Sync valid selection back to parent when orphaned items are detected
   useEffect(() => {
-    if (isSelectable && validSelectedItems.length !== selectedItems.length) {
-      onSelect?.(validSelectedItems);
-    }
-  }, [isSelectable, validSelectedItems, selectedItems.length, onSelect]);
+    if (!onSelect || validSelectedItems.length === selectedItems.length) return;
+    onSelect(validSelectedItems);
+  }, [onSelect, validSelectedItems, selectedItems.length]);
 
   const rows: DataViewTr[] = useMemo(
     () =>
@@ -143,88 +126,20 @@ const KubevirtTable = <TData, TCallbacks = undefined>(
     ],
   );
 
-  const selectAllId = dataTest ? `${dataTest}-select-all` : 'select-all-rows';
-
-  const selectionColumn = useMemo(() => {
-    if (!isSelectable) return null;
-
-    if (!showSelectAllCheckbox) {
-      return {
-        cell: <span className="pf-v6-u-screen-reader">{t('Selection')}</span>,
-        props: { className: PF_TABLE_CHECK_CLASS },
-      };
-    }
-
-    const getCheckboxState = (): boolean | null => {
-      if (allSelected) return true;
-      if (someSelected) return null;
-      return false;
-    };
-
-    return {
-      cell: (
-        <Checkbox
-          aria-label={t('Select all rows')}
-          data-test={selectAllId}
-          id={selectAllId}
-          isChecked={getCheckboxState()}
-          onChange={handleSelectAll}
-        />
-      ),
-      props: { className: PF_TABLE_CHECK_CLASS },
-    };
-  }, [
-    isSelectable,
-    showSelectAllCheckbox,
+  const selectionColumn = useSelectionColumn({
     allSelected,
-    someSelected,
-    selectAllId,
+    dataTest,
     handleSelectAll,
-    t,
-  ]);
+    showSelectAllCheckbox: isSelectable && showSelectAllCheckbox,
+    someSelected,
+  });
 
   const effectiveTableColumns = useMemo(() => {
-    if (!isSelectable || !selectionColumn) return tableColumns;
+    if (!isSelectable) return tableColumns;
     return [selectionColumn, ...tableColumns];
   }, [isSelectable, selectionColumn, tableColumns]);
 
   const isUnfilteredDataEmpty = isEmpty(unfilteredData ?? data);
-  const isDataEmpty = isEmpty(data);
-
-  // Only apply default message when unfilteredData is explicitly provided (table has filtering)
-  const hasFiltering = unfilteredData !== undefined;
-  const defaultFilteredMsg = hasFiltering ? t('No results match the current filters') : undefined;
-  const effectiveNoFilteredDataMsg = renderNoFilteredDataContent(
-    noFilteredDataMsg ?? defaultFilteredMsg,
-  );
-
-  const showFilteredEmptyState = loaded && isDataEmpty && !isUnfilteredDataEmpty;
-
-  const table = (
-    <DataViewTable
-      aria-label={ariaLabel}
-      className="kubevirt-table"
-      columns={effectiveTableColumns}
-      rows={rows}
-    />
-  );
-
-  const renderContent = (): ReactNode => {
-    if (isUnfilteredDataEmpty && noDataMsg) {
-      return renderNoDataContent(noDataMsg);
-    }
-
-    if (showFilteredEmptyState) {
-      return (
-        <div className="pf-v6-u-text-align-center pf-v6-u-py-lg">{effectiveNoFilteredDataMsg}</div>
-      );
-    }
-
-    return fixedLayout ? <div className="kubevirt-table--fixed-layout">{table}</div> : table;
-  };
-
-  // Show loading when not loaded, regardless of stale data
-  // hasData is set to false during loading to ensure skeleton is shown
   const showLoading = !loaded;
   const hasDataForStateHandler = showLoading ? false : !isUnfilteredDataEmpty;
 
@@ -236,7 +151,17 @@ const KubevirtTable = <TData, TCallbacks = undefined>(
         loaded={loaded}
         showSkeletonLoading
       >
-        {renderContent()}
+        <KubevirtTableBody
+          ariaLabel={ariaLabel}
+          data={paginatedData}
+          effectiveTableColumns={effectiveTableColumns}
+          fixedLayout={fixedLayout}
+          loaded={loaded}
+          noDataMsg={noDataMsg}
+          noFilteredDataMsg={noFilteredDataMsg}
+          rows={rows}
+          unfilteredData={unfilteredData ?? data}
+        />
       </StateHandler>
     </div>
   );

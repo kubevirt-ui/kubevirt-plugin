@@ -1,17 +1,36 @@
-/* eslint-disable */
-import { useMemo, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 
 import { debounce } from '@kubevirt-utils/utils/debounce';
 
-export const useDebounceCallback = <T extends (...args: any[]) => any>(
+export const useDebounceCallback = <T extends (...args: never[]) => unknown>(
   callback: T,
   timeout = 500,
   immediate = false,
-): ((...args) => any) => {
-  const callbackRef = useRef<T>();
-  callbackRef.current = callback;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- debounced wrapper must accept varied caller args (legacy API)
+): ((...args: any[]) => any) => {
+  const callbackRef = useRef(callback);
+  const debouncedRef = useRef<((...args: Parameters<T>) => void) | null>(null);
 
-  return useMemo(() => {
-    return debounce((...args) => callbackRef.current(...args), timeout, immediate);
-  }, [immediate, timeout]);
+  useEffect(() => {
+    callbackRef.current = callback;
+  }, [callback]);
+
+  useEffect(() => {
+    debouncedRef.current = debounce(
+      (...args: Parameters<T>) => {
+        callbackRef.current(...args);
+      },
+      timeout,
+      immediate,
+    );
+
+    return (): void => {
+      debouncedRef.current = null;
+    };
+  }, [timeout, immediate]);
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- debounced wrapper must accept varied caller args (legacy API)
+  return useCallback((...args: any[]): any => {
+    return debouncedRef.current?.(...(args as Parameters<T>));
+  }, []);
 };

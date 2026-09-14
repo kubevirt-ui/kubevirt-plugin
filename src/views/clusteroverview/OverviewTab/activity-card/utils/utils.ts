@@ -1,7 +1,9 @@
-/* eslint-disable */
 import { VirtualMachineInstanceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { FirehoseResource, WatchK8sResource } from '@openshift-console/dynamic-plugin-sdk';
+import {
+  type WatchK8sResource,
+  type WatchK8sResourceWithProp,
+} from '@openshift-console/dynamic-plugin-sdk';
 
 export const eventTypes = [
   VirtualMachineModel.kind,
@@ -10,16 +12,18 @@ export const eventTypes = [
 ];
 
 export const asUniqueResource = (
-  resource: FirehoseResource,
+  resource: WatchK8sResourceWithProp,
   prefix: number | string,
-): FirehoseResource => ({
+): WatchK8sResourceWithProp => ({
   ...resource,
   prop: `${prefix}-${resource.prop}`,
 });
 
-export const asWatchK8sResource = (resource: FirehoseResource): WatchK8sResource => {
+export const asWatchK8sResource = (resource: WatchK8sResourceWithProp): WatchK8sResource => {
+  const { prop: _prop, ...watchResource } = resource;
+
   return {
-    ...resource,
-    isList: resource?.isList || true,
+    ...watchResource,
+    isList: resource.isList ?? true,
   };
 };

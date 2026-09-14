@@ -82,7 +82,7 @@ const Details: FC<DetailsProps> = ({ pathname, vmi }) => {
             <CPUMemory vmi={vmi} />
             <DescriptionItem
               bodyContent={t('The QEMU machine type.')}
-              descriptionData={getMachineType(vm) || NO_DATA_DASH}
+              descriptionData={getMachineType(vm) ?? NO_DATA_DASH}
               descriptionHeader={t('Machine type')}
               isPopover
               olsObj={vmi}

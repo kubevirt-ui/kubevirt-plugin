@@ -26,11 +26,11 @@ const useBootableVolumesActions: BootableVolumesActionsProps = (source, preferen
   const { createModal } = useModal();
 
   const updateAccessReview =
-    asAccessReview(PersistentVolumeClaimModel, source, 'update' as K8sVerb) || {};
+    asAccessReview(PersistentVolumeClaimModel, source, 'update' as K8sVerb) ?? {};
   const [canUpdatePVC] = useAccessReview(updateAccessReview);
 
   const deleteAccessReview =
-    asAccessReview(PersistentVolumeClaimModel, source, 'delete' as K8sVerb) || {};
+    asAccessReview(PersistentVolumeClaimModel, source, 'delete' as K8sVerb) ?? {};
   const [canDeletePVC] = useAccessReview(deleteAccessReview);
 
   const actions: Action[] = [
