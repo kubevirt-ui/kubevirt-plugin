@@ -100,20 +100,37 @@ export const findAllIndexes = <T>(
     [],
   );
 
-export const ensurePath = <T extends object>(data: T, paths: string | string[]): void => {
+type EnsuredPath<Path extends string> = string extends Path
+  ? unknown
+  : Path extends `${infer Head}.${infer Tail}`
+    ? { [Key in Head]: EnsuredPath<Tail> }
+    : { [Key in Path]: NonNullable<unknown> };
+
+type EnsuredPaths<Paths extends string | readonly string[]> = Paths extends string
+  ? EnsuredPath<Paths>
+  : Paths extends readonly [infer First extends string, ...infer Rest extends readonly string[]]
+    ? EnsuredPath<First> & EnsuredPaths<Rest>
+    : unknown;
+
+export function ensurePath<T extends object, const Paths extends string | readonly string[]>(
+  data: T,
+  paths: Paths,
+): asserts data is T & EnsuredPaths<Paths> {
   let current: Record<string, unknown> = data as Record<string, unknown>;
 
-  if (Array.isArray(paths)) {
-    for (const path of paths) ensurePath(data, path);
-  } else {
+  if (typeof paths === 'string') {
     const keys = paths.split('.');
 
     for (const key of keys) {
       if (!current[key]) current[key] = {};
       current = current[key] as Record<string, unknown>;
     }
+  } else if (Array.isArray(paths)) {
+    for (const path of paths) ensurePath(data, path);
+  } else {
+    throw new TypeError('paths must be a string or an array of strings');
   }
-};
+}
 
 export const getNoPermissionTooltipContent = (t: TFunction): string =>
   t(`You don't have permission to perform this action`);

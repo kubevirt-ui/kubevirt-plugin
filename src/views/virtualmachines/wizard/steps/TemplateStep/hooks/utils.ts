@@ -3,7 +3,7 @@ import { produce } from 'immer';
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { DYNAMIC_CREDENTIALS_SUPPORT } from '@kubevirt-utils/components/DynamicSSHKeyInjection/constants/constants';
 import { addSecretToVM } from '@kubevirt-utils/components/SSHSecretModal/utils/utils';
-import { getLabel, getName } from '@kubevirt-utils/resources/shared';
+import { getLabel, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import {
   getTemplateVirtualMachineObject,
   isVirtualMachineTemplate,
@@ -83,15 +83,27 @@ export const getVMObjectFromTemplate = ({
   vmName?: string;
 }): V1VirtualMachine => {
   const generatedVM = produce(vm, (draftVM) => {
-    ensurePath(draftVM, 'metadata.labels');
-    ensurePath(draftVM, 'metadata.annotations');
+    ensurePath(draftVM, ['metadata.labels', 'metadata.annotations']);
 
     if (!isEmpty(description)) {
       draftVM.metadata.annotations.description = description;
     }
 
-    draftVM.metadata.labels[LABEL_USED_TEMPLATE_NAME] = selectedTemplate?.metadata?.name;
-    draftVM.metadata.labels[LABEL_USED_TEMPLATE_NAMESPACE] = selectedTemplate?.metadata?.namespace;
+    const selectedTemplateName = getName(selectedTemplate);
+
+    if (selectedTemplateName) {
+      draftVM.metadata.labels[LABEL_USED_TEMPLATE_NAME] = selectedTemplateName;
+    } else {
+      delete draftVM.metadata.labels[LABEL_USED_TEMPLATE_NAME];
+    }
+
+    const selectedTemplateNamespace = getNamespace(selectedTemplate);
+    
+    if (selectedTemplateNamespace) {
+      draftVM.metadata.labels[LABEL_USED_TEMPLATE_NAMESPACE] = selectedTemplateNamespace;
+    } else {
+      delete draftVM.metadata.labels[LABEL_USED_TEMPLATE_NAMESPACE];
+    }
 
     if (folder) {
       draftVM.metadata.labels[VM_FOLDER_LABEL] = folder;

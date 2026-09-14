@@ -65,10 +65,12 @@ export const onDataImportCronManageSubmit = async ({
   const updatedDataImportCron = produce(dataImportCron, (dic) => {
     ensurePath(dic, 'spec.template.spec.source.registry.url');
 
-    delete dic.metadata.resourceVersion;
-    delete dic.metadata.creationTimestamp;
-    delete dic.metadata.generation;
-    delete dic.metadata.uid;
+    if (dic.metadata) {
+      delete dic.metadata.resourceVersion;
+      delete dic.metadata.creationTimestamp;
+      delete dic.metadata.generation;
+      delete dic.metadata.uid;
+    }
 
     dic.spec.template.spec.source.registry.url = url;
     dic.spec.importsToKeep = importsToKeep;

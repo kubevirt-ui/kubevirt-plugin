@@ -15,17 +15,13 @@ export const applyCPUMemoryToVM = (
   produce<V1VirtualMachine>(vm, (vmDraft: V1VirtualMachine) => {
     if (cpu) {
       ensurePath(vmDraft, 'spec.template.spec.domain.cpu');
-      const domain = vmDraft.spec?.template?.spec?.domain;
-      if (domain) {
-        domain.cpu = cpu;
-      }
+
+      vmDraft.spec.template.spec.domain.cpu = cpu;
     }
 
     if (memory && memoryUnit) {
       ensurePath(vmDraft, 'spec.template.spec.domain.memory.guest');
-      const domainMemory = vmDraft.spec?.template?.spec?.domain?.memory;
-      if (domainMemory) {
-        domainMemory.guest = `${memory}${memoryUnit}`;
-      }
+
+      vmDraft.spec.template.spec.domain.memory.guest = `${memory}${memoryUnit}`;
     }
   });

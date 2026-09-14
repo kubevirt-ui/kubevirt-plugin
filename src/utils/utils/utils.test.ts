@@ -32,6 +32,12 @@ describe('Test ensurePath', () => {
 
       expect(data.spec.template).toBeDefined();
     });
+
+    it('Rejects invalid runtime input', () => {
+      expect(() => ensurePath({}, 42 as unknown as string)).toThrow(
+        'paths must be a string or an array of strings',
+      );
+    });
   });
 
   describe('Multiple paths', () => {
@@ -45,8 +51,9 @@ describe('Test ensurePath', () => {
         },
       };
 
-      ensurePath(data, ['spec.template.spec.domain.devices']);
+      ensurePath(data, ['spec.template.metadata.annotations', 'spec.template.spec.domain.devices']);
 
+      expect(data.spec.template.metadata.annotations).toBeDefined();
       expect(data.spec.template.spec.domain.devices).toBeDefined();
     });
 
@@ -63,6 +70,23 @@ describe('Test ensurePath', () => {
       ensurePath(data, ['spec.template']);
 
       expect(data.spec.template).toBeDefined();
+    });
+
+    it('Preserves existing values', () => {
+      const data = {
+        spec: {
+          template: {
+            metadata: {
+              name: 'test-template',
+            },
+          },
+        },
+      };
+
+      ensurePath(data, ['spec.template.metadata', 'spec.template.spec']);
+
+      expect(data.spec.template.metadata).toEqual({ name: 'test-template' });
+      expect(data.spec.template.spec).toEqual({});
     });
   });
 });

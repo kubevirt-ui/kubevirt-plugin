@@ -47,6 +47,11 @@ export const resizeVMDataVolumeTemplate = (
   data: V1DiskFormState,
   vm: V1VirtualMachine,
 ): V1VirtualMachine => {
+  const expandPVCSize = data.expandPVCSize;
+  if (!expandPVCSize) {
+    return vm;
+  }
+
   return produce(vm, (draftVM: V1VirtualMachine): void => {
     if (!draftVM?.spec?.dataVolumeTemplates) {
       return;
@@ -60,6 +65,6 @@ export const resizeVMDataVolumeTemplate = (
       return;
     }
     ensurePath(vmDataVolumeTemplate, ['spec.storage.resources.requests.storage']);
-    vmDataVolumeTemplate.spec.storage.resources.requests.storage = data.expandPVCSize;
+    vmDataVolumeTemplate.spec.storage.resources.requests.storage = expandPVCSize;
   });
 };
