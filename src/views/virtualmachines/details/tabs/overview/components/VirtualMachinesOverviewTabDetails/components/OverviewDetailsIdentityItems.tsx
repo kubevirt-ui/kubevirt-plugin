@@ -1,6 +1,3 @@
-// Extracted from VirtualMachinesOverviewTabDetails.tsx
-// Root: src/views/virtualmachines/details/tabs/overview/components/VirtualMachinesOverviewTabDetails/VirtualMachinesOverviewTabDetails.tsx
-
 import React, { type FC } from 'react';
 
 import {

@@ -1,6 +1,3 @@
-// Extracted from virtualMachinesDefinition.tsx
-// Root: src/views/virtualmachines/list/virtualMachinesDefinition.tsx
-
 import {
   type V1VirtualMachine,
   type V1VirtualMachineInstance,

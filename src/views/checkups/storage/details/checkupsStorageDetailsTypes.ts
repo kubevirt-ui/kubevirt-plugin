@@ -1,6 +1,3 @@
-// Extracted from CheckupsStorageDetailsPageSection.tsx
-// Root: src/views/checkups/storage/details/CheckupsStorageDetailsPageSection.tsx
-
 import {
   type IoK8sApiBatchV1Job,
   type IoK8sApiCoreV1ConfigMap,

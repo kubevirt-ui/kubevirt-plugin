@@ -1,6 +1,3 @@
-// Extracted from QuotasList.tsx
-// Root: src/views/quotas/list/QuotasList.tsx
-
 import React, { type FC, type MouseEvent } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';

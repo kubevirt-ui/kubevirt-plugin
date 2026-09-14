@@ -1,6 +1,3 @@
-// Extracted from virtualMachinesDefinition.tsx
-// Root: src/views/virtualmachines/list/virtualMachinesDefinition.tsx
-
 import React, { type ReactNode } from 'react';
 import { type TFunction } from 'i18next';
 

@@ -1,6 +1,3 @@
-// Extracted from useVirtualMachineTemplatesActions.tsx
-// Root: src/views/templates/actions/hooks/useVirtualMachineTemplatesActions.tsx
-
 import { type Action } from '@openshift-console/dynamic-plugin-sdk';
 
 import { type GetTemplateActionsParams } from './getTemplateActionHelpers';

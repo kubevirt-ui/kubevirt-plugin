@@ -1,6 +1,3 @@
-// Extracted from resourceTemplates.ts
-// Root: src/views/checkups/self-validation/utils/selfValidationJob/resourceTemplates.ts
-
 import { type IoK8sApiCoreV1EnvVar } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 
 import {

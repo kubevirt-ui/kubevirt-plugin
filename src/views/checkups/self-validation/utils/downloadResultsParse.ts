@@ -1,6 +1,3 @@
-// Extracted from downloadResults.ts
-// Root: src/views/checkups/self-validation/utils/downloadResults.ts
-
 import { type TFunction } from 'i18next';
 
 import { type IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';

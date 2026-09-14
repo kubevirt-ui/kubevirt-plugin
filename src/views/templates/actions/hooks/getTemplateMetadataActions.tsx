@@ -1,6 +1,3 @@
-// Extracted from useVirtualMachineTemplatesActions.tsx
-// Root: src/views/templates/actions/hooks/useVirtualMachineTemplatesActions.tsx
-
 import React from 'react';
 
 import { TemplateModel, type V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';

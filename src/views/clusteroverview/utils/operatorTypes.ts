@@ -1,6 +1,3 @@
-// Extracted from types.ts
-// Root: src/views/clusteroverview/utils/types.ts
-
 import { type V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { type V1Condition } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { type K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';

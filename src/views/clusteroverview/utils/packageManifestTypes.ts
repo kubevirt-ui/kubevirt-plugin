@@ -1,6 +1,3 @@
-// Extracted from types.ts
-// Root: src/views/clusteroverview/utils/types.ts
-
 import { type K8sResourceKind } from './csvTypes';
 import { type InstallModeType } from './csvTypes';
 import { type APIServiceDefinition, type CRDDescription } from './descriptorTypes';

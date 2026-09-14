@@ -1,6 +1,3 @@
-// Extracted from jobLifecycle.ts
-// Root: src/views/checkups/self-validation/utils/selfValidationJob/jobLifecycle.ts
-
 import { JobModel, PersistentVolumeClaimModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { type IoK8sApiBatchV1Job } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { getUID } from '@kubevirt-utils/resources/shared';
