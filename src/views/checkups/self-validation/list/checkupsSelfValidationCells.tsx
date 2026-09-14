@@ -12,7 +12,6 @@ import useIsACMPage from '@multicluster/useIsACMPage';
 import { useHubClusterName } from '@stolostron/multicluster-sdk';
 
 import {
-  formatStatusTimestamp,
   getCompletedSummaryText,
   getInProgressSummaryText,
   getResultsConfigMapName,
@@ -20,7 +19,7 @@ import {
 
 import CheckupsStatusIcon from '../../CheckupsStatusIcon';
 import { ClusterCell, NamespaceCell } from '../../components/cells/CheckupsSharedCells';
-import { getIsJobCompleted, STATUS_START_TIME_STAMP } from '../../utils/utils';
+import { getIsJobCompleted } from '../../utils/utils';
 import CheckupsSelfValidationActions from '../components/actions/CheckupsSelfValidationActions';
 import { type CheckupsSelfValidationCallbacks } from './checkupsSelfValidationListDefinition';
 
@@ -55,25 +54,6 @@ export const StatusCell: FC<{
   const latestJob = jobs?.[0];
 
   return <CheckupsStatusIcon configMap={row} job={latestJob} onlyJob={true} />;
-};
-
-type TimeCellProps = {
-  callbacks: CheckupsSelfValidationCallbacks;
-  row: IoK8sApiCoreV1ConfigMap;
-  type: 'completion' | 'start';
-};
-
-export const TimeCell: FC<TimeCellProps> = ({ callbacks, row, type }) => {
-  const { t } = useKubevirtTranslation();
-  const jobs = callbacks.getJobByName(row?.metadata?.name, false);
-  const latestJob = jobs?.[0];
-
-  const timestamp =
-    type === 'start'
-      ? (latestJob?.status?.startTime ?? row?.data?.[STATUS_START_TIME_STAMP])
-      : latestJob?.status?.completionTime;
-
-  return <>{formatStatusTimestamp(timestamp, t, NO_DATA_DASH)}</>;
 };
 
 export const SummaryCell: FC<{

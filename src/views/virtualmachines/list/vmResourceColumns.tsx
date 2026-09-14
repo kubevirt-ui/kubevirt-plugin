@@ -13,9 +13,11 @@ import { getVirtualMachineStorageClasses } from '@virtualmachines/utils/mappers'
 
 import VMActionsCell from './cells/VMActionsCell';
 import VMStorageClassCell from './cells/VMStorageClassCell';
-import CPUPercentage from './components/VirtualMachineRow/components/CPUPercentage';
-import MemoryPercentage from './components/VirtualMachineRow/components/MemoryPercentage';
-import NetworkUsage from './components/VirtualMachineRow/components/NetworkUsage';
+import {
+  getCPUUsageDisplayValue,
+  getMemoryUsageDisplayValue,
+  getNetworkUsageDisplayValue,
+} from './usageDisplayValues';
 import { VM_COLUMN_KEYS, type VMCallbacks, type VMColumn } from './vmColumnTypes';
 import {
   sortByCPUUsage,
@@ -26,31 +28,29 @@ import {
 
 export const getMemoryColumn = (t: TFunction): VMColumn => ({
   additional: true,
+  getValue: (row: V1VirtualMachine, callbacks: VMCallbacks): string =>
+    getMemoryUsageDisplayValue(row, getMemory(callbacks?.getVmi(row))),
   key: VM_COLUMN_KEYS.memoryUsage,
   label: t('Memory'),
-  renderCell: (row: V1VirtualMachine, callbacks: VMCallbacks): ReactNode => (
-    <MemoryPercentage vm={row} vmiMemory={getMemory(callbacks.getVmi(row))} />
-  ),
   sort: sortByMemoryUsage,
   sortable: true,
 });
 
 export const getCPUColumn = (t: TFunction): VMColumn => ({
   additional: true,
+  getValue: (row: V1VirtualMachine, callbacks: VMCallbacks): string =>
+    getCPUUsageDisplayValue(row, getCPU(callbacks?.getVmi(row))),
   key: VM_COLUMN_KEYS.cpuUsage,
   label: t('CPU'),
-  renderCell: (row: V1VirtualMachine, callbacks: VMCallbacks): ReactNode => (
-    <CPUPercentage vm={row} vmiCPU={getCPU(callbacks.getVmi(row))} />
-  ),
   sort: sortByCPUUsage,
   sortable: true,
 });
 
 export const getNetworkColumn = (t: TFunction): VMColumn => ({
   additional: true,
+  getValue: (row: V1VirtualMachine): string => getNetworkUsageDisplayValue(row),
   key: VM_COLUMN_KEYS.networkUsage,
   label: t('Network'),
-  renderCell: (row: V1VirtualMachine): ReactNode => <NetworkUsage vm={row} />,
   sort: sortByNetworkUsage,
   sortable: true,
 });
@@ -60,9 +60,6 @@ export const getDeletionProtectionColumn = (t: TFunction): VMColumn => ({
   getValue: (row: V1VirtualMachine): string => getDeletionProtectionPrintableStatus(row),
   key: VM_COLUMN_KEYS.deletionProtection,
   label: t('Deletion protection'),
-  renderCell: (row: V1VirtualMachine): ReactNode => (
-    <>{getDeletionProtectionPrintableStatus(row)}</>
-  ),
   sortable: true,
 });
 

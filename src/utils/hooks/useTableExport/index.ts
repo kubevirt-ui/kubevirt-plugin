@@ -3,3 +3,7 @@ export { EXPORT_TABLE_KEYS, NON_EXPORTABLE_COLUMN_KEYS } from './constants';
 export { buildCSVContent, exportToCSV, getExportableColumns } from './exportToCSV';
 export type { KubevirtTableExportProps } from './KubevirtTableExport';
 export { default as KubevirtTableExport } from './KubevirtTableExport';
+export type {
+  ExportableColumnConfig,
+  TableExportColumnConfig,
+} from '@kubevirt-utils/hooks/useDataViewTableSort/types';

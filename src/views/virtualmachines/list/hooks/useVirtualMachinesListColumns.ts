@@ -3,7 +3,10 @@ import { useMemo } from 'react';
 import type { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { type ColumnLayout } from '@kubevirt-utils/components/KubevirtTable/types';
 import { buildColumnLayout } from '@kubevirt-utils/components/KubevirtTable/utils';
-import type { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
+import type {
+  ColumnConfig,
+  TableExportColumnConfig,
+} from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettingsTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettingsTableColumns';
 import { getVMColumns, type VMCallbacks } from '@virtualmachines/list/virtualMachinesDefinition';
@@ -17,7 +20,7 @@ const useVirtualMachineListColumns = (
 ): {
   activeColumnKeys: string[];
   columnLayout: ColumnLayout;
-  columns: ColumnConfig<V1VirtualMachine, VMCallbacks>[];
+  columns: TableExportColumnConfig<V1VirtualMachine, VMCallbacks>[];
   loadedColumns: boolean;
 } => {
   const { t } = useKubevirtTranslation();

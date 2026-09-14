@@ -6,7 +6,7 @@ import {
   type V1VirtualMachineInstance,
   type V1VirtualMachineInstanceMigration,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { type ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
+import type { TableExportColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { ACTIONS } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/const';
 import { type PVCMapper, type VMIMapper, type VMIMMapper } from '@virtualmachines/utils/mappers';
 
@@ -36,4 +36,4 @@ export type VMCallbacks = {
   vmimMapper: VMIMMapper;
 };
 
-export type VMColumn = ColumnConfig<V1VirtualMachine, VMCallbacks>;
+export type VMColumn = TableExportColumnConfig<V1VirtualMachine, VMCallbacks>;

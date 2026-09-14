@@ -7,14 +7,14 @@ import { type TFunction } from 'i18next';
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import Timestamp from '@kubevirt-utils/components/Timestamp/Timestamp';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
-import { getVMIIPAddresses, getVMINodeName } from '@kubevirt-utils/resources/vmi';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { getIPAddressesDisplayValue, getVMINodeName } from '@kubevirt-utils/resources/vmi';
 
 import VMIPCell from './cells/VMIPCell';
 import VMNodeCell from './cells/VMNodeCell';
 import VMStatusCell from './cells/VMStatusCell';
 import { filterConditions } from './components/VirtualMachineRow/utils/utils';
 import { VMStatusConditionLabelList } from './components/VMStatusConditionLabel';
+import { getConditionsDisplayValue } from './components/VMStatusConditionLabel/utils';
 import { VM_COLUMN_KEYS, type VMCallbacks, type VMColumn } from './vmColumnTypes';
 import { sortByNode } from './vmSortFunctions';
 
@@ -29,12 +29,7 @@ export const getStatusColumn = (t: TFunction): VMColumn => ({
 });
 
 export const getConditionsColumn = (t: TFunction): VMColumn => ({
-  getValue: (row: V1VirtualMachine): string => {
-    const types = filterConditions(row)
-      ?.map((condition) => condition?.type)
-      .filter(Boolean);
-    return !isEmpty(types) ? types.join(', ') : NO_DATA_DASH;
-  },
+  getValue: (row: V1VirtualMachine): string => getConditionsDisplayValue(filterConditions(row)),
   key: VM_COLUMN_KEYS.conditions,
   label: t('Conditions'),
   renderCell: (row: V1VirtualMachine): ReactNode => (
@@ -71,14 +66,8 @@ export const getCreatedColumn = (t: TFunction): VMColumn => ({
 });
 
 export const getIPAddressColumn = (t: TFunction): VMColumn => ({
-  getValue: (row: V1VirtualMachine, callbacks: VMCallbacks): string => {
-    const vmi = callbacks?.getVmi(row);
-    if (!vmi) {
-      return NO_DATA_DASH;
-    }
-    const ips = getVMIIPAddresses(vmi);
-    return !isEmpty(ips) ? ips.join(', ') : NO_DATA_DASH;
-  },
+  getValue: (row: V1VirtualMachine, callbacks: VMCallbacks): string =>
+    getIPAddressesDisplayValue(callbacks?.getVmi(row)),
   key: VM_COLUMN_KEYS.ipAddress,
   label: t('IP address'),
   renderCell: (row: V1VirtualMachine, callbacks: VMCallbacks): ReactNode => (

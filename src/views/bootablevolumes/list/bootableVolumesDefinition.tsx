@@ -7,7 +7,7 @@ import type {
 } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import type { V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getK8sRowId } from '@kubevirt-utils/components/KubevirtTable/utils';
-import type { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
+import type { TableExportColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { ACTIONS } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/const';
 import type { ClusterNamespacedResourceMap } from '@kubevirt-utils/resources/shared';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
@@ -16,15 +16,15 @@ import { ARCHITECTURE_ID, ARCHITECTURE_LABEL } from '@kubevirt-utils/utils/archi
 import { getCluster } from '@multicluster/helpers/selectors';
 
 import type { BootableResource } from '../utils/types';
-import { getPreferenceReadableOS, getSourcePreferenceLabelValue } from '../utils/utils';
+import { getSourcePreferenceLabelValue } from '../utils/utils';
 import BootableVolumeActionsCell from './cells/BootableVolumeActionsCell';
 import BootableVolumeArchitectureCell from './cells/BootableVolumeArchitectureCell';
 import BootableVolumeClusterCell from './cells/BootableVolumeClusterCell';
 import BootableVolumeDescriptionCell from './cells/BootableVolumeDescriptionCell';
 import BootableVolumeNameCell from './cells/BootableVolumeNameCell';
 import BootableVolumeNamespaceCell from './cells/BootableVolumeNamespaceCell';
-import BootableVolumeOSCell from './cells/BootableVolumeOSCell';
 import BootableVolumePreferenceCell from './cells/BootableVolumePreferenceCell';
+import { getBootableVolumeOSDisplayValue } from './utils/helpers';
 
 export const BOOTABLE_VOLUME_COLUMN_KEYS = {
   architecture: ARCHITECTURE_ID,
@@ -37,7 +37,7 @@ export const BOOTABLE_VOLUME_COLUMN_KEYS = {
 } as const;
 
 export type BootableVolumeCallbacks = {
-  clusterParam: string;
+  clusterParam: string | null;
   dataImportCrons: V1beta1DataImportCron[];
   dvSources: ClusterNamespacedResourceMap<V1beta1DataVolume>;
   preferences: V1beta1VirtualMachineClusterPreference[];
@@ -47,9 +47,8 @@ export const getBootableVolumeColumns = (
   t: TFunction,
   isAllClustersPage: boolean,
   isAllNamespaces: boolean,
-  preferences: V1beta1VirtualMachineClusterPreference[],
-): ColumnConfig<BootableResource, BootableVolumeCallbacks>[] => {
-  const columns: ColumnConfig<BootableResource, BootableVolumeCallbacks>[] = [
+): TableExportColumnConfig<BootableResource, BootableVolumeCallbacks>[] => {
+  const columns: TableExportColumnConfig<BootableResource, BootableVolumeCallbacks>[] = [
     {
       getValue: (row) => getName(row) ?? '',
       key: BOOTABLE_VOLUME_COLUMN_KEYS.name,
@@ -96,11 +95,10 @@ export const getBootableVolumeColumns = (
       sortable: true,
     },
     {
-      getValue: (row) => getPreferenceReadableOS(row, preferences) ?? '',
+      getValue: (row, callbacks) => getBootableVolumeOSDisplayValue(row, callbacks),
       key: BOOTABLE_VOLUME_COLUMN_KEYS.os,
       label: t('Operating system'),
       props: { className: 'pf-m-width-15' },
-      renderCell: (row, callbacks) => <BootableVolumeOSCell callbacks={callbacks} row={row} />,
       sortable: true,
     },
     {

@@ -27,6 +27,22 @@ export const isCommonVMTemplate = (template: V1Template): boolean =>
 export const isDedicatedCPUPlacement = (template: Template): boolean =>
   getCPU(getTemplateVirtualMachineObject(template))?.dedicatedCpuPlacement ?? false;
 
+export const getVirtualMachineTemplatesCPUMemoryValue = (
+  template: Template,
+  t: TFunction,
+): string => {
+  const { cpu, memory } = getMemoryCPU(getTemplateVirtualMachineObject(template));
+
+  if (!cpu && !memory) {
+    return t('None');
+  }
+
+  const cpuText = cpu ? `${vCPUCount(cpu)}` : NO_DATA_DASH;
+  const memoryText = memory ? readableSizeUnit(memory) : NO_DATA_DASH;
+
+  return t('{{cpu}} CPU | {{memory}} Memory', { cpu: cpuText, memory: memoryText });
+};
+
 export const getVirtualMachineTemplatesCPUMemoryText = (
   template: Template,
   t: TFunction,
@@ -37,14 +53,7 @@ export const getVirtualMachineTemplatesCPUMemoryText = (
     return <MutedTextSpan text={t('None')} />;
   }
 
-  const cpuText = cpu ? `${vCPUCount(cpu)}` : NO_DATA_DASH;
-  const memoryText = memory ? readableSizeUnit(memory) : NO_DATA_DASH;
-
-  return (
-    <>
-      {cpuText} {t('CPU')} | {memoryText} {t('Memory')}
-    </>
-  );
+  return getVirtualMachineTemplatesCPUMemoryValue(template, t);
 };
 
 export const getTemplateArchitecture = (template: TemplateOrRequest): string | undefined => {

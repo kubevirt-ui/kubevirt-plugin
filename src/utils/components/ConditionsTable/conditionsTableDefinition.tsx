@@ -15,14 +15,12 @@ export const getConditionsColumns = (t: TFunction): ColumnConfig<V1Condition, un
     getValue: (row) => row.type ?? '',
     key: 'type',
     label: t('Type'),
-    renderCell: (row) => row.type,
     sortable: true,
   },
   {
     getValue: (row) => row.status ?? '',
     key: 'status',
     label: t('Status'),
-    renderCell: (row) => row.status,
     sortable: true,
   },
   {

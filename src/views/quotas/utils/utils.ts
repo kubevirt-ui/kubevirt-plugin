@@ -5,11 +5,11 @@ import {
   ApplicationAwareResourceQuotaModel,
 } from '@kubevirt-utils/models';
 import {
+  type ApplicationAwareQuota,
   type ApplicationAwareResourceQuota,
   type QuotaStatus,
   type ResourceInfo,
 } from '@kubevirt-utils/resources/quotas/types';
-import { type ApplicationAwareQuota } from '@kubevirt-utils/resources/quotas/types';
 import { convertToBaseValue } from '@kubevirt-utils/utils/humanize.js';
 
 import { ResourceKeyKind } from '../details/types';

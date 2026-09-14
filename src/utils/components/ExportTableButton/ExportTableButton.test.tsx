@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { type ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
+import { type TableExportColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { exportToCSV } from '@kubevirt-utils/hooks/useTableExport';
 import { fireEvent, render, screen } from '@testing-library/react';
 
@@ -18,7 +18,7 @@ jest.mock('@kubevirt-utils/hooks/useKubevirtTranslation', () => ({
 
 type Row = { name: string };
 
-const columns: ColumnConfig<Row>[] = [
+const columns: TableExportColumnConfig<Row>[] = [
   {
     getValue: (row) => row.name,
     key: 'name',

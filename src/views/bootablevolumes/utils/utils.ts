@@ -20,7 +20,7 @@ export const getSourcePreferenceLabelValue = (obj: BootableVolume): string =>
 export const getPreferenceReadableOS = (
   obj: BootableVolume,
   preferences: V1beta1VirtualMachineClusterPreference[],
-  effectiveCluster?: string,
+  effectiveCluster?: string | null,
 ): string => {
   const preferenceLabelValue = getSourcePreferenceLabelValue(obj); // preference name
   const objCluster = effectiveCluster ?? getCluster(obj);
