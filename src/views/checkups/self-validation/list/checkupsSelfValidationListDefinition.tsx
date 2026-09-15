@@ -5,30 +5,29 @@ import {
   type IoK8sApiBatchV1Job,
   type IoK8sApiCoreV1ConfigMap,
 } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
-import { type ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
+import type { TableExportColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { ACTIONS } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/const';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
+import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { SortByDirection } from '@patternfly/react-table';
 
-import { groupJobsByConfigMapName } from '../utils';
-
 import { CHECKUPS_COLUMN_KEYS } from '../../utils/constants';
 import {
-  CheckupsStatus,
   columnsSorting,
-  getConfigMapStatus,
   getCSVExportStatusLabel,
   getJobStatus,
+  getJobStatusRank,
+  STATUS_COMPLETION_TIME_STAMP,
   STATUS_START_TIME_STAMP,
 } from '../../utils/utils';
+import { formatStatusTimestamp, groupJobsByConfigMapName } from '../utils/selfValidationResults';
 import {
   ActionsCell,
   ClusterCell,
   NameCell,
   NamespaceCell,
   StatusCell,
-  TimeCell,
 } from './checkupsSelfValidationCells';
 
 export type CheckupsSelfValidationCallbacks = {
@@ -40,7 +39,7 @@ export const getCheckupsSelfValidationColumns = (
   isACMPage: boolean,
   jobs: IoK8sApiBatchV1Job[],
   hubClusterName?: string,
-): ColumnConfig<IoK8sApiCoreV1ConfigMap, CheckupsSelfValidationCallbacks>[] => {
+): TableExportColumnConfig<IoK8sApiCoreV1ConfigMap, CheckupsSelfValidationCallbacks>[] => {
   const jobsByConfigMapName = groupJobsByConfigMapName(jobs);
 
   return [
@@ -73,55 +72,44 @@ export const getCheckupsSelfValidationColumns = (
     {
       getValue: (row, callbacks): string => {
         const latestJob = callbacks?.getJobByName(getName(row), false)?.[0];
-        return getCSVExportStatusLabel(getConfigMapStatus(row, getJobStatus(latestJob)), t);
+        return getCSVExportStatusLabel(getJobStatus(latestJob), t);
       },
       key: 'status',
       label: t('Status'),
       renderCell: (row, callbacks) => <StatusCell callbacks={callbacks} row={row} />,
-      sort: (data, sortDirection): IoK8sApiCoreV1ConfigMap[] => {
-        const statusOrder = {
-          [CheckupsStatus.Deleting]: 5,
-          [CheckupsStatus.Done]: 2,
-          [CheckupsStatus.Failed]: 3,
-          [CheckupsStatus.Pending]: 4,
-          [CheckupsStatus.Running]: 1,
-        };
-
-        return data.toSorted((a, b) => {
-          const jobA = jobsByConfigMapName.get(a?.metadata?.name)?.[0];
-          const jobB = jobsByConfigMapName.get(b?.metadata?.name)?.[0];
-          const statusA = getConfigMapStatus(a, getJobStatus(jobA));
-          const statusB = getConfigMapStatus(b, getJobStatus(jobB));
-
-          const orderA = statusOrder[statusA] ?? 999;
-          const orderB = statusOrder[statusB] ?? 999;
-
-          return sortDirection === SortByDirection.asc ? orderA - orderB : orderB - orderA;
-        });
-      },
+      sort: (data, sortDirection) =>
+        data.toSorted((a, b) => {
+          const rankA = getJobStatusRank(jobsByConfigMapName.get(a?.metadata?.name)?.[0]);
+          const rankB = getJobStatusRank(jobsByConfigMapName.get(b?.metadata?.name)?.[0]);
+          return sortDirection === SortByDirection.asc ? rankA - rankB : rankB - rankA;
+        }),
       sortable: true,
     },
     {
       getValue: (row, callbacks): string => {
         const latestJob = callbacks?.getJobByName(row?.metadata?.name, false)?.[0];
-        return latestJob?.status?.startTime ?? row?.data?.[STATUS_START_TIME_STAMP] ?? '';
+        return formatStatusTimestamp(
+          latestJob?.status?.startTime ?? row?.data?.[STATUS_START_TIME_STAMP],
+          t,
+          NO_DATA_DASH,
+        );
       },
       key: CHECKUPS_COLUMN_KEYS.START_TIME_CAMEL,
       label: t('Start time'),
-      renderCell: (row, callbacks) => <TimeCell callbacks={callbacks} row={row} type="start" />,
       sort: (data, direction) => columnsSorting(data, direction, STATUS_START_TIME_STAMP),
       sortable: true,
     },
     {
       getValue: (row, callbacks): string => {
         const latestJob = callbacks?.getJobByName(row?.metadata?.name, false)?.[0];
-        return latestJob?.status?.completionTime ?? '';
+        return formatStatusTimestamp(
+          latestJob?.status?.completionTime ?? row?.data?.[STATUS_COMPLETION_TIME_STAMP],
+          t,
+          NO_DATA_DASH,
+        );
       },
       key: 'completionTime',
       label: t('Completion time'),
-      renderCell: (row, callbacks) => (
-        <TimeCell callbacks={callbacks} row={row} type="completion" />
-      ),
       sort: (data, sortDirection): IoK8sApiCoreV1ConfigMap[] => {
         return data.toSorted((a, b) => {
           const jobA = jobsByConfigMapName.get(a?.metadata?.name)?.[0];

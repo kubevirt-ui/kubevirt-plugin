@@ -3,12 +3,14 @@ import React, { type FC, memo } from 'react';
 import { type V1VirtualMachineCondition } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { Label, LabelGroup, Popover, PopoverPosition } from '@patternfly/react-core';
 
+import { formatConditionLabel } from './utils';
+
 export const VMStatusConditionLabel: FC<V1VirtualMachineCondition> = memo((condition) => {
   const bodyContentMessage = condition?.message ?? condition?.reason;
 
   const InnerLabel = (
     <Label color="grey" onClick={bodyContentMessage ? (e): void => e.preventDefault() : undefined}>
-      {condition?.type}={condition?.status}
+      {formatConditionLabel(condition)}
     </Label>
   );
 

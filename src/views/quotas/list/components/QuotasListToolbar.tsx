@@ -5,7 +5,7 @@ import React, { type ComponentProps, type FC } from 'react';
 
 import KubevirtFilterToolbar from '@kubevirt-utils/components/KubevirtFilterToolbar/KubevirtFilterToolbar';
 import { type ColumnLayout } from '@kubevirt-utils/components/KubevirtTable/types';
-import { type ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
+import type { TableExportColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import {
   type KubevirtFilterState,
   type OnSetFilters,
@@ -24,7 +24,7 @@ type QuotasListToolbarProps = {
   callbacks: QuotaCallbacks;
   clearAllFilters: () => void;
   columnLayout: ColumnLayout;
-  columns: ColumnConfig<ApplicationAwareQuota, QuotaCallbacks>[];
+  columns: TableExportColumnConfig<ApplicationAwareQuota, QuotaCallbacks>[];
   filteredData: ApplicationAwareQuota[];
   filters: KubevirtFilterState;
   handlePerPageSelect: ComponentProps<typeof Pagination>['onPerPageSelect'];

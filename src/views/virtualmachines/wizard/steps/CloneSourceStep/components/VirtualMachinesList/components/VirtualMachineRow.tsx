@@ -2,6 +2,7 @@ import React, { type FC } from 'react';
 
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { type ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
+import { renderColumnCell } from '@kubevirt-utils/hooks/useDataViewTableSort/utils';
 import { getDescription } from '@kubevirt-utils/resources/shared';
 import { customizeWizardVMSignal } from '@kubevirt-utils/signals/customizeWizardVMSignal';
 import { Radio } from '@patternfly/react-core';
@@ -41,7 +42,7 @@ const VirtualMachineRow: FC<VirtualMachineRowProps> = ({ callbacks, columns, vm 
       </Td>
       {columns.map((col) => (
         <Td key={col.key} {...col.props}>
-          {col.renderCell(vm, callbacks)}
+          {renderColumnCell(col, vm, callbacks)}
         </Td>
       ))}
     </Tr>

@@ -129,6 +129,54 @@ describe('buildCSVContent', () => {
     expect(csv).toBe('Name,Status\n"say ""hello""","line1\nline2"');
   });
 
+  it('quotes two comma-containing fields in the same row', () => {
+    type MultiValueRow = { conditions: string; ips: string };
+    const cols: ColumnConfig<MultiValueRow>[] = [
+      {
+        getValue: (row) => row.ips,
+        key: 'ip',
+        label: 'IP address',
+        renderCell: () => null,
+      },
+      {
+        getValue: (row) => row.conditions,
+        key: 'conditions',
+        label: 'Conditions',
+        renderCell: () => null,
+      },
+    ];
+
+    const csv = buildCSVContent(
+      [
+        {
+          conditions: 'DataVolumesReady=True, LiveMigratable=True',
+          ips: '10.0.0.1, 10.0.0.2',
+        },
+      ],
+      cols,
+    );
+
+    expect(csv).toBe(
+      'IP address,Conditions\n"10.0.0.1, 10.0.0.2","DataVolumesReady=True, LiveMigratable=True"',
+    );
+  });
+
+  it.each([
+    ['=HYPERLINK("http://evil")', '"\'=HYPERLINK(""http://evil"")"'],
+    ['+cmd', '"\'+cmd"'],
+    ['-1+1', '"\'-1+1"'],
+    ['@SUM(A1)', '"\'@SUM(A1)"'],
+    ['\t=cmd', '"\'\t=cmd"'],
+    [' =HYPERLINK("http://evil")', '"\' =HYPERLINK(""http://evil"")"'],
+    ['\r=cmd', '"\'\r=cmd"'],
+    ['\uFEFF=HYPERLINK("http://evil")', '"\'\uFEFF=HYPERLINK(""http://evil"")"'],
+    ['\uFF1DHYPERLINK("http://evil")', '"\'\uFF1DHYPERLINK(""http://evil"")"'],
+    ['|cmd /c calc', '"\'|cmd /c calc"'],
+  ])('neutralizes spreadsheet formula prefix %j', (value, escaped) => {
+    const csv = buildCSVContent([{ name: value, status: 'Stopped' }], columns);
+    expect(csv).toBe(`Name,Status\n${escaped},Stopped`);
+  });
+
   it('passes callbacks to getValue', () => {
     type Callbacks = { suffix: string };
     const cols: ColumnConfig<Row, Callbacks>[] = [

@@ -1,11 +1,103 @@
 import { load as yamlLoad } from 'js-yaml';
 
 import { ADMIN_ONLY_TAG, T1, T1_TAG, VM_LIST_TAG } from '@/data-models/allure-constants';
-import type { KubernetesResource } from '@/data-models/kubernetes-types';
+import type { KubernetesCondition, KubernetesResource } from '@/data-models/kubernetes-types';
 import { expect, test } from '@/fixtures/vm-list-fixture';
 import { setupTestNamespace } from '@/utils/test-setup-helpers';
+import { waitForVmPrintableStatus } from '@/utils/vm-search-test-helpers';
 
 const SUITE = 'VM List CSV Export';
+const NO_DATA_DASH = '—';
+
+const parseCsv = (content: string): string[][] => {
+  const rows: string[][] = [];
+  let row: string[] = [];
+  let field = '';
+  let inQuotes = false;
+
+  const pushField = (): void => {
+    row.push(field);
+    field = '';
+  };
+
+  const pushRow = (): void => {
+    pushField();
+    rows.push(row);
+    row = [];
+  };
+
+  for (let i = 0; i < content.length; i++) {
+    const char = content[i];
+    if (inQuotes) {
+      if (char === '"' && content[i + 1] === '"') {
+        field += '"';
+        i += 1;
+      } else if (char === '"') {
+        inQuotes = false;
+      } else {
+        field += char;
+      }
+      continue;
+    }
+    if (char === '"') {
+      inQuotes = true;
+      continue;
+    }
+    if (char === ',') {
+      pushField();
+      continue;
+    }
+    if (char === '\n') {
+      pushRow();
+      continue;
+    }
+    if (char !== '\r') {
+      field += char;
+    }
+  }
+
+  if (inQuotes || field !== '' || row.length > 0) {
+    pushRow();
+  }
+
+  return rows;
+};
+
+const expectedConditionsCsvValue = (vm: KubernetesResource): string => {
+  const status = vm.status as
+    | { conditions?: KubernetesCondition[]; printableStatus?: string }
+    | undefined;
+  const conditions = status?.conditions ?? [];
+  const isActuallyLiveMigratable =
+    status?.printableStatus === 'Running' &&
+    conditions.some(
+      ({ status: conditionStatus, type }) => type === 'LiveMigratable' && conditionStatus === 'True',
+    );
+
+  const filtered = conditions.filter(
+    (condition) =>
+      (condition.type === 'LiveMigratable' && condition.status === 'True') ||
+      (Boolean(condition.reason) &&
+        !(condition.type === 'LiveMigratable' && condition.status === 'False')),
+  );
+
+  const labels = filtered
+    .map((condition) => {
+      const conditionStatus =
+        condition.type === 'LiveMigratable'
+          ? isActuallyLiveMigratable
+            ? 'True'
+            : 'False'
+          : condition.status;
+      if (!condition.type || !conditionStatus) {
+        return '';
+      }
+      return `${condition.type}=${conditionStatus}`;
+    })
+    .filter(Boolean);
+
+  return labels.length === 0 ? NO_DATA_DASH : labels.join(', ');
+};
 
 test.describe(SUITE, { tag: [T1_TAG, ADMIN_ONLY_TAG] }, () => {
   let namespace: string;
@@ -25,6 +117,7 @@ test.describe(SUITE, { tag: [T1_TAG, ADMIN_ONLY_TAG] }, () => {
     const payload = yamlLoad(yaml) as KubernetesResource;
     await apiClient.createVirtualMachine(namespace, payload);
     await apiClient.waitForVmExists(vmName, namespace);
+    await waitForVmPrintableStatus(apiClient, namespace, vmName, 'Stopped');
     apiClient.trackResource('VirtualMachine', vmName, namespace);
   });
 
@@ -40,7 +133,7 @@ test.describe(SUITE, { tag: [T1_TAG, ADMIN_ONLY_TAG] }, () => {
     await vmListPage.clickVmListTab();
   });
 
-  test('exports the namespaced VM list as CSV', async ({ vmListPage, utils }) => {
+  test('exports the namespaced VM list as CSV', async ({ apiClient, vmListPage, utils }) => {
     await utils.withAllure({
       suite: SUITE,
       feature: T1,
@@ -63,15 +156,25 @@ test.describe(SUITE, { tag: [T1_TAG, ADMIN_ONLY_TAG] }, () => {
         new RegExp(`${namespace}-virtual-machines\\.csv$`),
       );
 
-      const [headerLine, ...dataLines] = content.trimEnd().split('\n');
-      const headers = headerLine.split(',');
-
+      const [headers, ...dataRows] = parseCsv(content.trimEnd());
       expect(headers, 'CSV header should include Name').toContain('Name');
+      expect(headers, 'CSV header should include Conditions').toContain('Conditions');
+      expect(headers, 'CSV header should include IP address').toContain('IP address');
       expect(headers, 'CSV header should not include Actions').not.toContain('Actions');
-      expect(
-        dataLines.some((line) => line.includes(vmName)),
-        `CSV should contain a row for VM ${vmName}`,
-      ).toBe(true);
+
+      const nameIndex = headers.indexOf('Name');
+      const conditionsIndex = headers.indexOf('Conditions');
+      const ipIndex = headers.indexOf('IP address');
+      const vmRow = dataRows.find((row) => row[nameIndex] === vmName);
+      expect(vmRow, `CSV should contain a row for VM ${vmName}`).toBeDefined();
+      if (!vmRow) {
+        return;
+      }
+
+      const vm = (await apiClient.getVirtualMachine(namespace, vmName)) as KubernetesResource;
+      expect(vmRow[nameIndex]).toBe(vmName);
+      expect(vmRow[conditionsIndex]).toBe(expectedConditionsCsvValue(vm));
+      expect(vmRow[ipIndex]).toBe(NO_DATA_DASH);
     });
   });
 });

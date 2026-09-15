@@ -47,14 +47,12 @@ export const getAffinityColumns = (
     getValue: (row) => AFFINITY_TYPE_LABLES[row.type] ?? '',
     key: 'type',
     label: t('Type'),
-    renderCell: (row) => AFFINITY_TYPE_LABLES[row.type],
     sortable: true,
   },
   {
     getValue: (row) => AFFINITY_CONDITION_LABELS[row.condition] ?? '',
     key: 'condition',
     label: t('Condition'),
-    renderCell: (row) => AFFINITY_CONDITION_LABELS[row.condition],
     sortable: true,
   },
   {
