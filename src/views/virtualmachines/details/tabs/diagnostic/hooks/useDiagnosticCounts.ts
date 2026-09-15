@@ -23,13 +23,15 @@ const useDiagnosticCounts = ({
     let warnings = 0;
     let healthy = 0;
 
-    const allItems: DiagnosticSeverity[] = [
+    const countableItems: DiagnosticSeverity[] = [
       ...conditions.map((condition) => condition.severity),
-      ...volumeSnapshotStatuses.map((snapshot) => snapshot.severity),
+      ...volumeSnapshotStatuses
+        .filter((snapshot) => !snapshot.excludeFromWarningCount)
+        .map((snapshot) => snapshot.severity),
       ...dataVolumesStatuses.map((dataVolume) => dataVolume.severity),
     ];
 
-    for (const severity of allItems) {
+    for (const severity of countableItems) {
       if (severity === 'critical') critical++;
       else if (severity === 'warning') warnings++;
       else healthy++;
@@ -47,7 +49,7 @@ const useDiagnosticCounts = ({
           [SEVERITY_TO_CONDITION.warning]: warnings,
         },
       },
-      severityCounts: { all: allItems.length, critical, healthy, warnings },
+      severityCounts: { all: countableItems.length, critical, healthy, warnings },
     };
   }, [conditions, dataVolumesStatuses, volumeSnapshotStatuses]);
 };

@@ -7,6 +7,7 @@ import { type ThProps } from '@patternfly/react-table';
 export type DiagnosticSeverity = 'critical' | 'healthy' | 'warning';
 
 export type VirtualizationVolumeSnapshotStatus = {
+  excludeFromWarningCount?: boolean;
   id?: string;
   message?: string;
   metadata: { [key: string]: string };
