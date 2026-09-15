@@ -21,7 +21,7 @@ import useDuration from '@virtualmachines/details/tabs/metrics/hooks/useDuration
 import { UtilizationBlock } from '../UtilizationBlock';
 
 type MemoryUtilProps = {
-  vmi: V1VirtualMachineInstance;
+  vmi?: V1VirtualMachineInstance;
 };
 
 const MemoryUtil: FC<MemoryUtilProps> = ({ vmi }) => {
@@ -39,7 +39,7 @@ const MemoryUtil: FC<MemoryUtilProps> = ({ vmi }) => {
     query: queries?.MEMORY_USAGE,
   });
 
-  const isLoading = !loaded;
+  const isLoading = !vmi || !loaded;
   const memoryUsed = +data?.data?.result?.[0]?.value?.[1];
   const memoryAvailableBytes = Number(convertToBaseValue(memory));
   const hasMemoryCapacity = Number.isFinite(memoryAvailableBytes) && memoryAvailableBytes > 0;

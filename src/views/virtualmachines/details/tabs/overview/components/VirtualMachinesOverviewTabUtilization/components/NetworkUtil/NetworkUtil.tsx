@@ -20,7 +20,7 @@ import NetworkBreakdownPopover from './NetworkBreakdownPopover';
 import NetworkMetricsRow from './NetworkMetricsRow';
 
 type NetworkUtilProps = {
-  vmi: V1VirtualMachineInstance;
+  vmi?: V1VirtualMachineInstance;
 };
 
 const NetworkUtil: FC<NetworkUtilProps> = ({ vmi }) => {
@@ -52,7 +52,7 @@ const NetworkUtil: FC<NetworkUtilProps> = ({ vmi }) => {
   });
 
   const loaded = networkInLoaded && networkOutLoaded;
-  const isLoading = !loaded;
+  const isLoading = !vmi || !loaded;
   const error = networkInError || networkOutError;
 
   const hasNetworkInData = !isEmpty(networkIn?.data?.result);

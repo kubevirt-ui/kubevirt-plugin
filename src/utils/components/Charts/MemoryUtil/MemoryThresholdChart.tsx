@@ -39,7 +39,7 @@ import {
 } from '../utils/utils';
 
 type MemoryThresholdChartProps = {
-  vmi: V1VirtualMachineInstance;
+  vmi?: V1VirtualMachineInstance;
 };
 
 const MemoryThresholdChart: FC<MemoryThresholdChartProps> = ({ vmi }) => {
@@ -57,7 +57,7 @@ const MemoryThresholdChart: FC<MemoryThresholdChartProps> = ({ vmi }) => {
     timespan,
   });
 
-  const isLoading = !loaded;
+  const isLoading = !vmi || !loaded;
   const prometheusMemoryData = data?.data?.result?.[0]?.values;
   const memoryAvailableBytes = convertToBaseValue(getMemory(vmi));
 

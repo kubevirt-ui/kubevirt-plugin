@@ -18,7 +18,7 @@ import useDuration from '@virtualmachines/details/tabs/metrics/hooks/useDuration
 import { UtilizationBlock } from '../UtilizationBlock';
 
 type CPUUtilProps = {
-  vmi: V1VirtualMachineInstance;
+  vmi?: V1VirtualMachineInstance;
 };
 
 const CPUUtil: FC<CPUUtilProps> = ({ vmi }) => {
@@ -39,7 +39,7 @@ const CPUUtil: FC<CPUUtilProps> = ({ vmi }) => {
     query: queries?.CPU_USAGE,
   });
 
-  const isLoading = !loaded;
+  const isLoading = !vmi || !loaded;
   const vmCPU = getCPU(vmi);
   const hasData = dataCPUUsage?.data?.result?.length > 0;
 
