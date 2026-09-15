@@ -13,6 +13,7 @@ import {
 import { getAnnotation, getLabel, getLabels, getName } from '@kubevirt-utils/resources/shared';
 import { getCPU } from '@kubevirt-utils/resources/vm';
 import { getCluster } from '@multicluster/helpers/selectors';
+import { type K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
 import { ANNOTATIONS } from './annotations';
 import {
@@ -38,6 +39,16 @@ export const getTemplateVirtualMachineObject = (template: Template): V1VirtualMa
     : (template?.objects?.find((obj) => obj.kind === VirtualMachineModel.kind) as V1VirtualMachine);
 
   return { ...vm, cluster: getCluster(template) };
+};
+
+export const getTemplateAdditionalObjects = (template: Template): K8sResourceCommon[] => {
+  if (!isOpenShiftTemplate(template)) {
+    return [];
+  }
+
+  return (template.objects ?? []).filter(
+    (object) => object?.kind && object.kind !== VirtualMachineModel.kind,
+  ) as K8sResourceCommon[];
 };
 
 /**

@@ -4,6 +4,7 @@ import { type PreferenceOption } from '@kubevirt-utils/components/AddBootableVol
 import { type VolumeSnapshotKind } from '@kubevirt-utils/components/SelectSnapshot/types';
 import { type BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { type Template } from '@kubevirt-utils/resources/template';
+import { type K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { type OperatingSystemType } from '@virtualmachines/wizard/steps/InstanceTypesSteps/GuestOSStep/utils/constants';
 import { type VMCreationMethod } from '@virtualmachines/wizard/utils/constants';
 
@@ -26,6 +27,7 @@ type VMWizardUIState = {
   isTemplatesDrawerOpen: boolean;
   lastProcessedTemplateKey: string;
   shouldCheckVMNameProperly: boolean;
+  templateAdditionalObjects: K8sResourceCommon[];
   templateProcessError: null | string;
 };
 
