@@ -1,5 +1,8 @@
-import { OS_NAME_LABELS } from '@kubevirt-utils/resources/template';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { getAnnotation } from '@kubevirt-utils/resources/shared';
+import { ANNOTATIONS, OS_NAME_LABELS } from '@kubevirt-utils/resources/template';
 import {
+  getPreferenceMatcher,
   NAME_OS_TEMPLATE_ANNOTATION,
   OS_TEMPLATE_LABEL,
   VM_OS_ANNOTATION,
@@ -116,8 +119,23 @@ export const isWindows = (obj: K8sResourceCommon): boolean =>
  *
  * Handles the special case where Windows annotations use the "win" prefix.
  */
-export const matchOSName = (...terms: (string | undefined)[]): string | undefined =>
+export const getMatchingOSLabel = (...terms: (string | undefined)[]): string | undefined =>
   Object.values(OS_NAME_LABELS).find((osNameLabel) => {
     const prefix = osNameLabel === OS_NAME_LABELS.windows ? OS_WINDOWS_PREFIX : osNameLabel;
     return terms.some((term) => term?.toLowerCase()?.startsWith(prefix.toLowerCase()));
   });
+
+/**
+ * Get the OS label for a virtual machine. Combines the OS annotation, OS label, and preference name.
+ * @param {V1VirtualMachine} obj - The virtual machine object.
+ * @returns {string | undefined} The OS label or undefined if no matching OS label is found.
+ */
+export const getOSLabel = (obj: V1VirtualMachine): string | undefined => {
+  const osAnnotation = getAnnotation(obj?.spec?.template as K8sResourceCommon, ANNOTATIONS.os);
+  const osLabel =
+    getOperatingSystemName(obj as K8sResourceCommon) ??
+    getOperatingSystem(obj as K8sResourceCommon);
+  const osPreference = getPreferenceMatcher(obj)?.name;
+
+  return getMatchingOSLabel(osAnnotation, osLabel, osPreference);
+};

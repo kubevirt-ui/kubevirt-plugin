@@ -5,11 +5,11 @@ import type { KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFi
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getAnnotation } from '@kubevirt-utils/resources/shared';
 import { ANNOTATIONS, OS_NAME_LABELS } from '@kubevirt-utils/resources/template';
-import { matchOSName } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
+import { getMatchingOSLabel } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
 import { vmiStatuses } from '@kubevirt-utils/resources/vmi';
 
-const getOSName = (obj: V1VirtualMachineInstance): string | undefined =>
-  matchOSName(getAnnotation(obj, ANNOTATIONS.os));
+const getOSLabel = (obj: V1VirtualMachineInstance): string | undefined =>
+  getMatchingOSLabel(getAnnotation(obj as K8sResourceCommon, ANNOTATIONS.os));
 
 enum VMIFilterID {
   OS = 'vmi-os',
@@ -33,7 +33,7 @@ const useVMIListFilters = (): KubevirtFilter<V1VirtualMachineInstance>[] => {
       {
         categoryLabel: t('OS'),
         id: VMIFilterID.OS,
-        match: (obj, selected) => selected.includes(getOSName(obj)),
+        match: (obj, selected) => selected.includes(getOSLabel(obj) ?? OS_NAME_LABELS.other),
         options: Object.values(OS_NAME_LABELS).map((osName) => ({
           label: osName,
           value: osName,

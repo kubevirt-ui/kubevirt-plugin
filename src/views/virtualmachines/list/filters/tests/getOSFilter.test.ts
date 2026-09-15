@@ -2,8 +2,9 @@ import { type TFunction } from 'i18next';
 
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { OS_NAME_LABELS } from '@kubevirt-utils/resources/template';
+import { getOSLabel } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
 
-import { getOSFilter, getOSName } from '../getOSFilter';
+import { getOSFilter } from '../getOSFilter';
 
 import { createMockVM } from './mockVM';
 
@@ -156,7 +157,7 @@ describe('VM OS Filter', () => {
   describe('edge cases', () => {
     it('should return undefined for VM with no OS information', () => {
       const vm = createMockVM();
-      expect(getOSName(vm)).toBeUndefined();
+      expect(getOSLabel(vm)).toBeUndefined();
     });
 
     it('should handle multiple selected OS types', () => {

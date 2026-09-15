@@ -17,21 +17,17 @@ import VirtualMachinesOverviewTabDetailsConsoleWrapper from './components/Virtua
 import './virtual-machines-overview-tab-details.scss';
 
 type VirtualMachinesOverviewTabDetailsProps = {
-  error: Error;
   guestAgentData: V1VirtualMachineInstanceGuestAgentInfo;
-  guestAgentDataLoaded: boolean;
   instanceTypeExpandedSpec: V1VirtualMachine;
-  loaded: boolean;
+  isLoading: boolean;
   vm: V1VirtualMachine;
   vmi: V1VirtualMachineInstance;
 };
 
 const VirtualMachinesOverviewTabDetails: FC<VirtualMachinesOverviewTabDetailsProps> = ({
-  error,
   guestAgentData,
-  guestAgentDataLoaded,
   instanceTypeExpandedSpec,
-  loaded,
+  isLoading,
   vm,
   vmi,
 }) => {
@@ -59,10 +55,8 @@ const VirtualMachinesOverviewTabDetails: FC<VirtualMachinesOverviewTabDetailsPro
             <GridItem span={5}>
               <OverviewDetailsDescriptionList
                 cpuMemoryVM={cpuMemoryVM}
-                error={error}
                 guestAgentData={guestAgentData}
-                guestAgentDataLoaded={guestAgentDataLoaded}
-                loaded={loaded}
+                isLoading={isLoading}
                 vm={vm}
                 vmi={vmi}
               />
