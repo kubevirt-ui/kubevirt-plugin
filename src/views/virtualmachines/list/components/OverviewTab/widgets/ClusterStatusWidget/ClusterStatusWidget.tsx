@@ -57,27 +57,26 @@ const ClusterStatusWidget: FC<OverviewSectionData> = ({
           vmsCount={vms?.length || 0}
         />
       </OverviewSectionRow>
-      {isAllClustersPage ? (
+      {isAllClustersPage && (
         <OverviewSectionRow gridColumns={GRID_TWO_EQUAL}>
           <ClustersUtilizationCard metricsUnavailable={metricsUnavailable} />
           <ClustersLoadBalanceCard metricsUnavailable={metricsUnavailable} />
         </OverviewSectionRow>
-      ) : (
-        showNodeRelatedWidgets && (
-          <OverviewSectionRow
-            className="overview-section__row--single-column-wide"
-            gridColumns={GRID_NARROW_WIDE}
-          >
-            <ClusterUtilizationWidget
-              cpuLoad={cpuLoad}
-              isLoading={!utilizationLoaded}
-              memoryLoad={memoryLoad}
-              metricsUnavailable={metricsUnavailable}
-              storageLoad={storageLoad}
-            />
-            <NodeLoadDistributionCard cluster={cluster} metricsUnavailable={metricsUnavailable} />
-          </OverviewSectionRow>
-        )
+      )}
+      {!isAllClustersPage && showNodeRelatedWidgets && (
+        <OverviewSectionRow
+          className="overview-section__row--single-column-wide"
+          gridColumns={GRID_NARROW_WIDE}
+        >
+          <ClusterUtilizationWidget
+            cpuLoad={cpuLoad}
+            isLoading={!utilizationLoaded}
+            memoryLoad={memoryLoad}
+            metricsUnavailable={metricsUnavailable}
+            storageLoad={storageLoad}
+          />
+          <NodeLoadDistributionCard cluster={cluster} metricsUnavailable={metricsUnavailable} />
+        </OverviewSectionRow>
       )}
     </OverviewSection>
   );
