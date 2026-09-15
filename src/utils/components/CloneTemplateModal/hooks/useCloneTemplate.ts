@@ -22,14 +22,15 @@ const useCloneTemplate = (
   onTemplateCloned?: (clonedTemplate: V1Template) => void,
 ): UseCloneTemplateReturn => {
   const namespace = useNamespaceParam() as string | undefined;
+  const currentNamespace = namespace ?? OPENSHIFT_NAMESPACE;
 
   const form = useForm<CloneTemplateFormValues>({
-    defaultValues: getInitialFormValues(initialTemplate, namespace ?? OPENSHIFT_NAMESPACE),
+    defaultValues: getInitialFormValues(initialTemplate, currentNamespace, currentNamespace),
     mode: 'onChange',
   });
 
   const onTemplateSelected = (newTemplate: Template): void =>
-    form.reset(getInitialFormValues(newTemplate, getNamespace(newTemplate)));
+    form.reset(getInitialFormValues(newTemplate, getNamespace(newTemplate), currentNamespace));
 
   const onSubmit = async (): Promise<void> =>
     cloneTemplateSubmit({
