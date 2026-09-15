@@ -457,7 +457,7 @@ export function getSetupRules(): SetupRule[] {
           const patchData: Record<string, string> = {};
           for (const key of keysToUpdate) {
             patchData[key] = JSON.stringify({
-              navigation: { autoHideNav: true },
+              navigation: { autoHideNav: false },
               quickStart: { dontShowWelcomeModal: true, activeQuickStartID: '' },
               guidedTour: false,
               onboardingPopoversHidden: {
