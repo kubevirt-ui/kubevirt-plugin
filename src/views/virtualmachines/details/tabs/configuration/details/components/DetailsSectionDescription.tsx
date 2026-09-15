@@ -1,7 +1,7 @@
 // Extracted from DetailsSection.tsx
 // Root: src/views/virtualmachines/details/tabs/configuration/details/DetailsSection.tsx
 
-import React, { type FC } from 'react';
+import { type FC, type JSX } from 'react';
 
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
@@ -37,7 +37,7 @@ const DetailsSectionDescription: FC<DetailsSectionDescriptionProps> = ({ vm }) =
       isEdit
       onEditClick={(): void =>
         createModal(
-          ({ isOpen, onClose }: ModalComponentProps): React.JSX.Element => (
+          ({ isOpen, onClose }: ModalComponentProps): JSX.Element => (
             <DescriptionModal
               isOpen={isOpen}
               obj={vm}

@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import { type JSX, useRef, useState } from 'react';
 
 import { useClickOutside } from '@kubevirt-utils/hooks/useClickOutside/useClickOutside';
 import { Divider, Menu, MenuContent, Popper, Tooltip } from '@patternfly/react-core';
@@ -32,7 +32,7 @@ const Dropdown = <T,>({
   onChange,
   selectedItem,
   showSystemToggle,
-}: DropdownProps<T>): React.JSX.Element => {
+}: DropdownProps<T>): JSX.Element => {
   const menuRef = useRef<HTMLDivElement>(null);
   const toggleRef = useRef<HTMLButtonElement>(null);
   const filterRef = useRef<HTMLInputElement>(null);

@@ -1,4 +1,4 @@
-import React, { type Dispatch, type SetStateAction } from 'react';
+import { type Dispatch, type JSX, type SetStateAction } from 'react';
 import classNames from 'classnames';
 
 import { NAME_COLUMN_ID } from '@kubevirt-utils/components/ColumnManagementModal/constants';
@@ -36,7 +36,7 @@ const VirtualMachineDiagnosticTabRow = ({
   index,
   obj,
   setExpend,
-}: DiagnosticTabRowProps): React.JSX.Element => {
+}: DiagnosticTabRowProps): JSX.Element => {
   const namespace = useNamespaceParam();
 
   const isExpanded = expend?.expended.has(obj?.id) && !!obj?.message;

@@ -1,4 +1,4 @@
-import React from 'react';
+import { type ReactNode } from 'react';
 import { Link } from 'react-router';
 
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -30,7 +30,7 @@ export const getVMSidePanelNetworkAdapter = (element: GraphElement): NetworkAdap
   return { resource };
 };
 
-export const getVMSideBarResourceLink = (element: GraphElement): React.ReactNode => {
+export const getVMSideBarResourceLink = (element: GraphElement): ReactNode => {
   if (!isVMType(element.getType())) return null;
   const name = element.getLabel();
   const resource = getResource(element);

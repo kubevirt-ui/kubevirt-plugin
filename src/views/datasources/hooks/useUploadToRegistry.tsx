@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import { type ReactNode, useCallback } from 'react';
 
 import { type V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import ExportModal from '@kubevirt-utils/components/ExportModal/ExportModal';
@@ -9,7 +9,7 @@ import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sGet } from '@multicluster/k8sRequests';
 
 type CreateModalFn = (
-  renderer: (props: { isOpen: boolean; onClose: () => void }) => React.ReactNode,
+  renderer: (props: { isOpen: boolean; onClose: () => void }) => ReactNode,
 ) => void;
 
 const useUploadToRegistry = (

@@ -1,7 +1,7 @@
 // Extracted from useVirtualMachineTemplatesActions.tsx
 // Root: src/views/templates/actions/hooks/useVirtualMachineTemplatesActions.tsx
 
-import React from 'react';
+import { type JSX } from 'react';
 
 import { TemplateModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import CloneTemplateModal from '@kubevirt-utils/components/CloneTemplateModal/CloneTemplateModal';
@@ -44,7 +44,7 @@ export const getTemplateEditActions = ({
     accessReview: asAccessReview(TemplateModel, template, 'create'),
     cta: (): void =>
       createModal(
-        ({ isOpen, onClose }: ModalComponentProps): React.JSX.Element => (
+        ({ isOpen, onClose }: ModalComponentProps): JSX.Element => (
           <CloneTemplateModal
             isOpen={isOpen}
             obj={template}
@@ -75,7 +75,7 @@ export const getTemplateEditActions = ({
     accessReview: asAccessReview(TemplateModel, template, 'patch'),
     cta: (): void =>
       createModal(
-        ({ isOpen, onClose }: ModalComponentProps): React.JSX.Element => (
+        ({ isOpen, onClose }: ModalComponentProps): JSX.Element => (
           <EditBootSourceModal
             dataSource={bootDataSource}
             isOpen={isOpen}

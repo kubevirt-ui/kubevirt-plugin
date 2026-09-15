@@ -12,7 +12,7 @@ import { useSignals } from '@preact/signals-react/runtime';
 type UseWelcomeModalReturn = {
   isOpen: boolean;
   onClose: () => void;
-  onDontShowAgainCheckboxChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  onDontShowAgainCheckboxChange: (event: ChangeEvent<HTMLInputElement>) => void;
   quickStarts: QuickStartUserSettings | undefined;
 };
 

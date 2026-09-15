@@ -1,4 +1,4 @@
-import React, { type ComponentType, type FC } from 'react';
+import { type ComponentProps, type ComponentType, type FC } from 'react';
 import { Link } from 'react-router';
 
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
@@ -102,7 +102,7 @@ const MigrationProgressDisplay: FC<MigrationProgressDisplayProps> = ({
                   onClick: onClose,
                   to: basePath,
                   variant: ButtonVariant.link,
-                } as React.ComponentProps<typeof Button>)}
+                } as ComponentProps<typeof Button>)}
               >
                 {t('View storage migrations')}
               </Button>

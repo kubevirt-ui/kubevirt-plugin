@@ -1,7 +1,7 @@
 // Extracted from useVirtualMachineTemplatesActions.tsx
 // Root: src/views/templates/actions/hooks/useVirtualMachineTemplatesActions.tsx
 
-import React from 'react';
+import { type JSX } from 'react';
 
 import { TemplateModel, type V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { AnnotationsModal } from '@kubevirt-utils/components/AnnotationsModal/AnnotationsModal';
@@ -35,7 +35,7 @@ export const getTemplateMetadataActions = ({
     accessReview: asAccessReview(TemplateModel, template, 'patch'),
     cta: (): void =>
       createModal(
-        ({ isOpen, onClose }: ModalComponentProps): React.JSX.Element => (
+        ({ isOpen, onClose }: ModalComponentProps): JSX.Element => (
           <LabelsModal
             isOpen={isOpen}
             obj={template}
@@ -60,7 +60,7 @@ export const getTemplateMetadataActions = ({
     accessReview: asAccessReview(TemplateModel, template, 'patch'),
     cta: (): void =>
       createModal(
-        ({ isOpen, onClose }: ModalComponentProps): React.JSX.Element => (
+        ({ isOpen, onClose }: ModalComponentProps): JSX.Element => (
           <AnnotationsModal
             isOpen={isOpen}
             obj={template}
@@ -85,7 +85,7 @@ export const getTemplateMetadataActions = ({
     accessReview: asAccessReview(TemplateModel, template, 'delete'),
     cta: (): void =>
       createModal(
-        ({ isOpen, onClose }: ModalComponentProps): React.JSX.Element => (
+        ({ isOpen, onClose }: ModalComponentProps): JSX.Element => (
           <DeleteModal
             headerText={t('Delete VirtualMachine template?')}
             isOpen={isOpen}

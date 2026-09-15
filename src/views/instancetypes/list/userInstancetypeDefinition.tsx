@@ -1,4 +1,4 @@
-import React, { type JSX } from 'react';
+import { type JSX } from 'react';
 import { type TFunction } from 'i18next';
 
 import { VirtualMachineInstancetypeModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -40,7 +40,7 @@ const CPUCell = ({ row }: { row: V1beta1VirtualMachineInstancetype }): JSX.Eleme
   <>{row?.spec?.cpu?.guest ?? NO_DATA_DASH}</>
 );
 
-const VendorCell = ({ row }: { row: V1beta1VirtualMachineInstancetype }): React.JSX.Element => (
+const VendorCell = ({ row }: { row: V1beta1VirtualMachineInstancetype }): JSX.Element => (
   <>{getLabel(row, VENDOR_LABEL, NO_DATA_DASH)}</>
 );
 
