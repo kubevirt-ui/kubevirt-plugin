@@ -8,6 +8,7 @@ import type { K8sModel, K8sResourceCommon } from '@openshift-console/dynamic-plu
 import { DescriptionList, Grid } from '@patternfly/react-core';
 
 type AdvancedViewProps = {
+  isEditable?: boolean;
   model: K8sModel;
   onAnnotationsSubmit: (annotations: Record<string, string>) => Promise<K8sResourceCommon | void>;
   onLabelsSubmit: (labels: Record<string, string>) => Promise<K8sResourceCommon | void>;
@@ -15,6 +16,7 @@ type AdvancedViewProps = {
 };
 
 const AdvancedView: FC<AdvancedViewProps> = ({
+  isEditable = true,
   model,
   onAnnotationsSubmit,
   onLabelsSubmit,
@@ -24,6 +26,7 @@ const AdvancedView: FC<AdvancedViewProps> = ({
     <DescriptionList>
       <DescriptionItemLabels
         descriptionHeaderWrapper={(children) => <SearchItem id="labels">{children}</SearchItem>}
+        editable={isEditable}
         model={model}
         onLabelsSubmit={onLabelsSubmit}
         resource={resource}
@@ -32,6 +35,7 @@ const AdvancedView: FC<AdvancedViewProps> = ({
         descriptionHeaderWrapper={(children) => (
           <SearchItem id="annotations">{children}</SearchItem>
         )}
+        editable={isEditable}
         model={model}
         onAnnotationsSubmit={onAnnotationsSubmit}
         resource={resource}

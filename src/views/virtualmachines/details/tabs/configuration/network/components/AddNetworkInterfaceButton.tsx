@@ -10,6 +10,7 @@ import type {
   V1VirtualMachineInstance,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+import useIsVMEditable from '@kubevirt-utils/components/VMEditPermissionContext/useIsVMEditable';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ListPageCreateButton } from '@openshift-console/dynamic-plugin-sdk';
 
@@ -32,12 +33,14 @@ const AddNetworkInterfaceButton: FC<AddNetworkInterfaceButtonProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
+  const isEditable = useIsVMEditable();
 
   const actionText = t('Add network interface');
 
   return (
     <ListPageCreateButton
       className={classNames('add-network-interface-button pf-v6-u-mb-md')}
+      isDisabled={!isEditable}
       onClick={() =>
         createModal(({ isOpen, onClose }) => (
           <VirtualMachinesNetworkInterfaceModal

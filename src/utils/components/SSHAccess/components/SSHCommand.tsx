@@ -30,6 +30,7 @@ import SSHServiceSelect from './SSHServiceSelect';
 import SSHServiceStateIcon from './SSHServiceState';
 
 type SSHCommandProps = {
+  isDisabled?: boolean;
   sshService: IoK8sApiCoreV1Service;
   sshServiceError?: Error;
   sshServiceLoaded?: boolean;
@@ -37,6 +38,7 @@ type SSHCommandProps = {
 };
 
 const SSHCommand: FC<SSHCommandProps> = ({
+  isDisabled,
   sshService: initialSSHService,
   sshServiceError,
   sshServiceLoaded,
@@ -102,6 +104,7 @@ const SSHCommand: FC<SSHCommandProps> = ({
               <Flex direction={{ default: 'row' }}>
                 <FlexItem flex={{ default: 'flex_1' }}>
                   <SSHServiceSelect
+                    isDisabled={isDisabled}
                     onSSHChange={onSSHChange}
                     sshService={sshService}
                     sshServiceLoaded={sshServiceLoaded}

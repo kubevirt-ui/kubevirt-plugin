@@ -14,12 +14,14 @@ import { SelectOption } from '@patternfly/react-core';
 import { SERVICE_TYPES, serviceTypeTitles } from '../constants';
 
 type SSHServiceSelectProps = {
+  isDisabled?: boolean;
   onSSHChange: (serviceType: SERVICE_TYPES) => void;
   sshService: IoK8sApiCoreV1Service;
   sshServiceLoaded: boolean;
 };
 
 const SSHServiceSelect: FC<SSHServiceSelectProps> = ({
+  isDisabled,
   onSSHChange,
   sshService,
   sshServiceLoaded,
@@ -41,10 +43,11 @@ const SSHServiceSelect: FC<SSHServiceSelectProps> = ({
 
   return (
     <FormPFSelect
+      isDisabled={isDisabled || !sshServiceLoaded}
       onSelect={handleChange}
       selected={sshServiceType}
       selectedLabel={t(serviceTypeTitles[sshServiceType])}
-      toggleProps={{ isDisabled: !sshServiceLoaded, isFullWidth: true }}
+      toggleProps={{ isFullWidth: true }}
     >
       <SelectOption id={SERVICE_TYPES.NONE} value={SERVICE_TYPES.NONE}>
         {t(serviceTypeTitles.None)}

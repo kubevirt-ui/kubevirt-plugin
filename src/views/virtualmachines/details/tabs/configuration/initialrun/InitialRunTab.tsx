@@ -1,15 +1,12 @@
 import type { FC } from 'react';
 import React from 'react';
-import { VirtualMachineModel } from 'src/views/dashboard-extensions/utils';
 
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
+import useIsVMEditable from '@kubevirt-utils/components/VMEditPermissionContext/useIsVMEditable';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { asAccessReview } from '@kubevirt-utils/resources/shared';
 import { PATHS_TO_HIGHLIGHT } from '@kubevirt-utils/resources/vm/utils/constants';
-import type { K8sVerb } from '@openshift-console/dynamic-plugin-sdk';
 import { DescriptionList, Divider, PageSection, Title } from '@patternfly/react-core';
-import { useFleetAccessReview } from '@stolostron/multicluster-sdk';
 
 import { onSubmitYAML } from '../details/utils/utils';
 import type { ConfigurationInnerTabProps } from '../utils/types';
@@ -18,8 +15,7 @@ import InitialRunTabSysprep from './components/InitialRunTabSysprep';
 
 const InitialRunTab: FC<ConfigurationInnerTabProps> = ({ vm, vmi }) => {
   const { t } = useKubevirtTranslation();
-  const accessReview = asAccessReview(VirtualMachineModel, vm, 'update' as K8sVerb);
-  const [canUpdateVM] = useFleetAccessReview(accessReview || {});
+  const isEditable = useIsVMEditable();
 
   return (
     <SidebarEditor
@@ -34,13 +30,13 @@ const InitialRunTab: FC<ConfigurationInnerTabProps> = ({ vm, vmi }) => {
           </Title>
           <DescriptionList>
             <InitialRunTabCloudinit
-              canUpdateVM={canUpdateVM}
+              canUpdateVM={isEditable}
               onSubmit={onSubmitYAML}
               vm={resource}
               vmi={vmi}
             />
             <Divider />
-            <InitialRunTabSysprep canUpdateVM={canUpdateVM} vm={resource} />
+            <InitialRunTabSysprep canUpdateVM={isEditable} vm={resource} />
           </DescriptionList>
         </PageSection>
       )}

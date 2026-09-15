@@ -6,10 +6,11 @@ import useDeschedulerSetting from '@kubevirt-utils/hooks/useDeschedulerSetting/u
 import { Switch } from '@patternfly/react-core';
 
 type DeschedulerProps = {
+  isDisabled?: boolean;
   vm: V1VirtualMachine;
 };
 
-const Descheduler: FC<DeschedulerProps> = ({ vm }) => {
+const Descheduler: FC<DeschedulerProps> = ({ isDisabled, vm }) => {
   const { deschedulerEnabled, deschedulerSwitchDisabled, onDeschedulerChange } =
     useDeschedulerSetting(vm);
 
@@ -18,7 +19,7 @@ const Descheduler: FC<DeschedulerProps> = ({ vm }) => {
       data-test="descheduler-edit"
       id="descheduler-switch"
       isChecked={deschedulerEnabled}
-      isDisabled={deschedulerSwitchDisabled}
+      isDisabled={isDisabled || deschedulerSwitchDisabled}
       onChange={(_event, checked) => onDeschedulerChange(checked)}
     />
   );

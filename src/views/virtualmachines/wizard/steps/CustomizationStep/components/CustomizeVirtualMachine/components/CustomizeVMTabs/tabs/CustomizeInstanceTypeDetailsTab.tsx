@@ -25,7 +25,7 @@ const CustomizeInstanceTypeDetailsTab: FC = () => {
   const [preference, preferenceLoading] = usePreference(vm);
 
   const accessReview = asAccessReview(VirtualMachineModel, vm, 'update' as K8sVerb);
-  const [canUpdateVM] = useAccessReview(accessReview || {});
+  const [canUpdateVM] = useAccessReview(accessReview ?? {});
 
   const { featureEnabled: isGuestSystemLogsDisabled } = useFeatures(
     DISABLED_GUEST_SYSTEM_LOGS_ACCESS,

@@ -119,7 +119,7 @@ const SchedulingSectionLeftGrid: FC<SchedulingSectionLeftGridProps> = ({
         <DescriptionItem
           bodyContent={<DeschedulerPopover />}
           data-test="descheduler"
-          descriptionData={<Descheduler vm={vm} />}
+          descriptionData={<Descheduler isDisabled={!canUpdateVM} vm={vm} />}
           descriptionHeader={<SearchItem id="descheduler">{t('Descheduler')}</SearchItem>}
           isPopover
           olsObj={vm}

@@ -120,6 +120,7 @@ const DetailsSectionBoot: FC<DetailsSectionBootProps> = ({
         onEditClick={onBootModeEdit}
       />
       <DetailsSectionBootOrder
+        canUpdateVM={canUpdateVM}
         instanceTypeVM={instanceTypeVM}
         isCustomizeInstanceType={isCustomizeInstanceType}
         vm={vm}
@@ -131,7 +132,12 @@ const DetailsSectionBoot: FC<DetailsSectionBootProps> = ({
         )}
         className="pf-v6-u-mb-lg"
         descriptionData={
-          <Switch id="start-in-pause-mode" isChecked={isChecked} onChange={onStartStrategyChange} />
+          <Switch
+            id="start-in-pause-mode"
+            isChecked={isChecked}
+            isDisabled={!canUpdateVM}
+            onChange={onStartStrategyChange}
+          />
         }
         descriptionHeader={
           <SearchItem id="start-pause-mode">{t('Start in pause mode')}</SearchItem>

@@ -5,16 +5,18 @@ import { isHeadlessMode } from '@kubevirt-utils/resources/vm';
 import { Switch } from '@patternfly/react-core';
 
 type HeadlessModeProps = {
+  isDisabled?: boolean;
   updateHeadlessMode: (checked: boolean) => Promise<V1VirtualMachine>;
   vm: V1VirtualMachine;
 };
 
-const HeadlessMode: FC<HeadlessModeProps> = ({ updateHeadlessMode, vm }) => {
+const HeadlessMode: FC<HeadlessModeProps> = ({ isDisabled, updateHeadlessMode, vm }) => {
   const [isChecked, setIsChecked] = useState<boolean>(() => isHeadlessMode(vm));
   return (
     <Switch
       checked={isChecked}
       id="headless-mode"
+      isDisabled={isDisabled}
       onChange={(_event, checked: boolean) => {
         setIsChecked(checked);
         void updateHeadlessMode(checked);

@@ -3,6 +3,7 @@ import React from 'react';
 
 import EnvironmentForm from '@kubevirt-utils/components/EnvironmentEditor/EnvironmentForm';
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
+import useIsVMEditable from '@kubevirt-utils/components/VMEditPermissionContext/useIsVMEditable';
 import { PATHS_TO_HIGHLIGHT } from '@kubevirt-utils/resources/vm/utils/constants';
 import { Divider, Grid, GridItem, PageSection } from '@patternfly/react-core';
 
@@ -11,6 +12,8 @@ import type { ConfigurationInnerTabProps } from '../utils/types';
 import DiskList from './components/tables/disk/DiskList';
 
 const StorageTab: FC<ConfigurationInnerTabProps> = ({ vm, vmi }) => {
+  const isEditable = useIsVMEditable();
+
   return (
     <SidebarEditor
       onResourceUpdate={onSubmitYAML}
@@ -28,7 +31,7 @@ const StorageTab: FC<ConfigurationInnerTabProps> = ({ vm, vmi }) => {
         </GridItem>
         <GridItem>
           <PageSection>
-            <EnvironmentForm updateVM={onSubmitYAML} vm={vm} />
+            <EnvironmentForm isEditable={isEditable} updateVM={onSubmitYAML} vm={vm} />
           </PageSection>
         </GridItem>
       </Grid>

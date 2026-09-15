@@ -6,10 +6,12 @@ import { tourGuideVM } from '@kubevirt-utils/components/GuidedTour/utils/constan
 import { runningTourSignal } from '@kubevirt-utils/components/GuidedTour/utils/guidedTourSignals';
 import HorizontalNavbar from '@kubevirt-utils/components/HorizontalNavbar/HorizontalNavbar';
 import { SidebarEditorProvider } from '@kubevirt-utils/components/SidebarEditor/SidebarEditorContext';
+import { VMEditPermissionProvider } from '@kubevirt-utils/components/VMEditPermissionContext/VMEditPermissionContext';
 import { getResourceDetailsTitle } from '@kubevirt-utils/constants/page-constants';
 import { TELEMETRY_RESOURCE_TYPE } from '@kubevirt-utils/extensions/telemetry/utils/property-constants';
 import { VirtualMachineModelGroupVersionKind } from '@kubevirt-utils/models';
 import { getName } from '@kubevirt-utils/resources/shared';
+import useEditVMAccessReview from '@kubevirt-utils/resources/vm/hooks/useEditVMAccessReview';
 import useInstanceTypeExpandSpec from '@kubevirt-utils/resources/vm/hooks/useInstanceTypeExpandSpec';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
@@ -54,38 +56,46 @@ const VirtualMachineNavPage: FC = () => {
     useInstanceTypeExpandSpec(vmToShow);
 
   const pages = useVirtualMachineTabs(vmToShow);
+  const canEditVM = useEditVMAccessReview(vm);
+  const isEditable = Boolean(runningTourSignal.value) || canEditVM;
 
   return useMemo(
     () => (
-      <SidebarEditorProvider telemetryResourceType={TELEMETRY_RESOURCE_TYPE.VM}>
-        <div className="VirtualMachineNavPage">
-          <DocumentTitle>
-            {getResourceDetailsTitle(getName(vmToShow) ?? name, 'VirtualMachine')}
-          </DocumentTitle>
+      <VMEditPermissionProvider isEditable={isEditable}>
+        <SidebarEditorProvider
+          isEditable={isEditable}
+          telemetryResourceType={TELEMETRY_RESOURCE_TYPE.VM}
+        >
+          <div className="VirtualMachineNavPage">
+            <DocumentTitle>
+              {getResourceDetailsTitle(getName(vmToShow) ?? name, 'VirtualMachine')}
+            </DocumentTitle>
 
-          <VirtualMachineNavPageTitle
-            instanceTypeExpandedSpec={instanceTypeExpandedSpec}
-            isLoaded={isLoaded || !isEmpty(loadError)}
-            vm={vmToShow}
-          />
-          <div className="VirtualMachineNavPage--tabs__main">
-            <HorizontalNavbar
-              basePath={getVMURL(cluster, namespace, name)}
-              error={loadError || expandedSpecError}
+            <VirtualMachineNavPageTitle
               instanceTypeExpandedSpec={instanceTypeExpandedSpec}
-              loaded={isLoaded && !expandedSpecLoading}
-              pages={pages}
+              isLoaded={isLoaded || !isEmpty(loadError)}
               vm={vmToShow}
             />
+            <div className="VirtualMachineNavPage--tabs__main">
+              <HorizontalNavbar
+                basePath={getVMURL(cluster, namespace, name)}
+                error={loadError || expandedSpecError}
+                instanceTypeExpandedSpec={instanceTypeExpandedSpec}
+                loaded={isLoaded && !expandedSpecLoading}
+                pages={pages}
+                vm={vmToShow}
+              />
+            </div>
           </div>
-        </div>
-      </SidebarEditorProvider>
+        </SidebarEditorProvider>
+      </VMEditPermissionProvider>
     ),
     [
       cluster,
       expandedSpecError,
       expandedSpecLoading,
       instanceTypeExpandedSpec,
+      isEditable,
       isLoaded,
       loadError,
       name,

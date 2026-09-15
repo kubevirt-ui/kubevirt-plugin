@@ -7,6 +7,7 @@ import {
 import { isDeclarativeHotplugVolumesEnabled } from '@kubevirt-utils/components/DiskModal/utils/helpers';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import KebabToggle from '@kubevirt-utils/components/toggles/KebabToggle';
+import useIsVMEditable from '@kubevirt-utils/components/VMEditPermissionContext/useIsVMEditable';
 import { getCancelUploadLabel } from '@kubevirt-utils/hooks/useCDIUpload/utils';
 import useKubevirtHyperconvergeConfiguration from '@kubevirt-utils/hooks/useKubevirtHyperconvergeConfiguration';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -48,6 +49,7 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
+  const isEditable = useIsVMEditable();
   const { featureGates } = useKubevirtHyperconvergeConfiguration(getCluster(vm));
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const { name: diskName, source: diskSource } = obj ?? {};
@@ -92,6 +94,7 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({
       popperProps={{ appendTo: getContentScrollableElement, position: 'right' }}
       toggle={KebabToggle({
         id: `disk-actions-${diskName}`,
+        isDisabled: !isEditable,
         isExpanded: isDropdownOpen,
         onClick: (): void => setIsDropdownOpen((prevIsOpen) => !prevIsOpen),
       })}

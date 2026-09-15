@@ -3,6 +3,7 @@ import React, { type FC, useState } from 'react';
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import KebabToggle from '@kubevirt-utils/components/toggles/KebabToggle';
+import useIsVMEditable from '@kubevirt-utils/components/VMEditPermissionContext/useIsVMEditable';
 import useFQDN from '@kubevirt-utils/hooks/useFQDN/useFQDN';
 import useIsFQDNEnabled from '@kubevirt-utils/hooks/useFQDN/useIsFQDNEnabled';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -35,6 +36,7 @@ const NetworkInterfaceActions: FC<NetworkInterfaceActionsProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
+  const isEditable = useIsVMEditable();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const interfaceState = getConfigInterfaceStateFromVM(vm, nicName);
   const isInterfaceMissing = !getNetworkInterface(vm, nicName);
@@ -84,6 +86,7 @@ const NetworkInterfaceActions: FC<NetworkInterfaceActionsProps> = ({
       <DropdownList>
         {interfaceState === NetworkInterfaceState.DOWN && (
           <DropdownItem
+            isDisabled={!isEditable}
             key="network-interface-state-up"
             onClick={(): void => {
               setNetworkInterfaceState(vm, nicName, NetworkInterfaceState.UP)?.catch(
@@ -96,6 +99,7 @@ const NetworkInterfaceActions: FC<NetworkInterfaceActionsProps> = ({
         )}
         {interfaceState === NetworkInterfaceState.UP && (
           <DropdownItem
+            isDisabled={!isEditable}
             key="network-interface-state-down"
             onClick={(): void => {
               setNetworkInterfaceState(vm, nicName, NetworkInterfaceState.DOWN)?.catch(
@@ -117,10 +121,16 @@ const NetworkInterfaceActions: FC<NetworkInterfaceActionsProps> = ({
             {t('Copy FQDN')}
           </DropdownItem>
         )}
-        <DropdownItem data-test="network-interface-edit" onClick={onEditModalOpen}>
+        <DropdownItem
+          data-test="network-interface-edit"
+          isDisabled={!isEditable}
+          onClick={onEditModalOpen}
+        >
           {t('Edit')}
         </DropdownItem>
-        <DropdownItem onClick={onDeleteModalOpen}>{t('Delete')}</DropdownItem>
+        <DropdownItem isDisabled={!isEditable} onClick={onDeleteModalOpen}>
+          {t('Delete')}
+        </DropdownItem>
       </DropdownList>
     </Dropdown>
   );

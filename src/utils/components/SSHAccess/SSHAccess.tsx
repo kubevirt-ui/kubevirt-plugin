@@ -10,6 +10,7 @@ import SSHCommand from './components/SSHCommand';
 
 type SSHAccessProps = {
   isCustomizeInstanceType?: boolean;
+  isDisabled?: boolean;
   sshService: IoK8sApiCoreV1Service;
   sshServiceError?: Error;
   sshServiceLoaded?: boolean;
@@ -18,6 +19,7 @@ type SSHAccessProps = {
 
 const SSHAccess: FC<SSHAccessProps> = ({
   isCustomizeInstanceType,
+  isDisabled,
   sshService,
   sshServiceError,
   sshServiceLoaded,
@@ -27,6 +29,7 @@ const SSHAccess: FC<SSHAccessProps> = ({
     <DescriptionList>
       {!isCustomizeInstanceType && (
         <SSHCommand
+          isDisabled={isDisabled}
           sshService={sshService}
           sshServiceError={sshServiceError}
           sshServiceLoaded={sshServiceLoaded}
