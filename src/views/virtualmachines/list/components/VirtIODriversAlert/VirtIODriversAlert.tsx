@@ -7,6 +7,7 @@ import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useLocalStorage from '@kubevirt-utils/hooks/useLocalStorage';
 import { OS_NAME_LABELS } from '@kubevirt-utils/resources/template';
+import { getOSLabel } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
 import {
   Alert,
   AlertActionCloseButton,
@@ -17,7 +18,6 @@ import {
 import { DOWNLOADS_TAB_IDS } from '@settings/search/constants';
 import { createSettingsSearchURL } from '@settings/search/search';
 import { SETTINGS_TABS } from '@settings/tabs';
-import { getOSName } from '@virtualmachines/list/filters/getOSFilter';
 
 import { VIRTIO_DRIVERS_ALERT_DISMISSED_KEY } from './constants';
 
@@ -35,7 +35,7 @@ const VirtIODriversAlert: FC<VirtIODriversAlertProps> = ({ vms }) => {
   const [sessionDismissed, setSessionDismissed] = useState(false);
   const [dontShowAgain, setDontShowAgain] = useState(false);
 
-  const hasWindowsVMs = vms?.some((vm) => getOSName(vm) === OS_NAME_LABELS.windows);
+  const hasWindowsVMs = vms?.some((vm) => getOSLabel(vm) === OS_NAME_LABELS.windows);
 
   if (!hasWindowsVMs || permanentlyDismissed || sessionDismissed) {
     return null;

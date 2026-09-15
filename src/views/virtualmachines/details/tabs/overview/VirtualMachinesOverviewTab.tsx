@@ -33,6 +33,8 @@ const VirtualMachinesOverviewTab: FC<NavPageComponentProps> = ({
   );
   const [guestAgentData, guestAgentDataLoaded, guestAgentDataLoadError] = useGuestOS(vmi);
 
+  const isLoading = (!loaded && !error) || !guestAgentDataLoaded;
+
   const pageSectionRef = useRef<HTMLDivElement>(null);
   const pageSectionWidth = useContainerWidth(pageSectionRef);
   const isSmallPage = pageSectionWidth < 880;
@@ -45,11 +47,9 @@ const VirtualMachinesOverviewTab: FC<NavPageComponentProps> = ({
             <Grid hasGutter>
               <GridItem>
                 <VirtualMachinesOverviewTabDetails
-                  error={error}
                   guestAgentData={guestAgentData}
-                  guestAgentDataLoaded={guestAgentDataLoaded}
                   instanceTypeExpandedSpec={instanceTypeExpandedSpec}
-                  loaded={loaded}
+                  isLoading={isLoading}
                   vm={vm}
                   vmi={vmi}
                 />

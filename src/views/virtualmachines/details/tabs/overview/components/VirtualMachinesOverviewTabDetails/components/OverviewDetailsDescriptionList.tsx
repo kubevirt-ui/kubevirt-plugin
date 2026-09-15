@@ -1,7 +1,7 @@
 // Extracted from VirtualMachinesOverviewTabDetails.tsx
 // Root: src/views/virtualmachines/details/tabs/overview/components/VirtualMachinesOverviewTabDetails/VirtualMachinesOverviewTabDetails.tsx
 
-import React, { type FC, type ReactNode, useMemo } from 'react';
+import React, { type FC, useMemo } from 'react';
 
 import {
   type V1VirtualMachine,
@@ -19,6 +19,7 @@ import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getInstanceTypeMatcher, hasNUMAConfiguration } from '@kubevirt-utils/resources/vm';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
+import { getOSLabel } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
 import { getOSNameFromGuestAgent } from '@kubevirt-utils/resources/vmi';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { DescriptionList, Flex, pluralize, Skeleton } from '@patternfly/react-core';
@@ -27,28 +28,18 @@ import InstanceTypeDescription from './InstanceTypeDescription';
 import OverviewDetailsIdentityItems from './OverviewDetailsIdentityItems';
 import TemplateDescription from './TemplateDescription';
 
-type GuestAgentDisplay = {
-  fallback?: ReactNode;
-  hostname?: string;
-  osName?: string;
-};
-
 type OverviewDetailsDescriptionListProps = {
   cpuMemoryVM: V1VirtualMachine;
-  error: Error;
   guestAgentData: V1VirtualMachineInstanceGuestAgentInfo;
-  guestAgentDataLoaded: boolean;
-  loaded: boolean;
+  isLoading: boolean;
   vm: V1VirtualMachine;
   vmi: V1VirtualMachineInstance;
 };
 
 const OverviewDetailsDescriptionList: FC<OverviewDetailsDescriptionListProps> = ({
   cpuMemoryVM,
-  error,
   guestAgentData,
-  guestAgentDataLoaded,
-  loaded,
+  isLoading,
   vm,
   vmi,
 }) => {
@@ -65,19 +56,22 @@ const OverviewDetailsDescriptionList: FC<OverviewDetailsDescriptionListProps> = 
   const timestampPluralized =
     typeof timestamp === 'object' ? pluralize(timestamp.value, timestamp.time) : timestamp;
 
-  const { fallback, hostname, osName } = useMemo((): GuestAgentDisplay => {
-    const isLoadingVMI = !loaded && !error;
-    if (!guestAgentDataLoaded || isLoadingVMI) {
-      return { fallback: <Skeleton /> };
+  const hostname = useMemo(() => {
+    if (isLoading) {
+      return <Skeleton />;
+    }
+    return guestAgentData?.hostname ?? <GuestAgentIsRequiredText vmi={vmi} />;
+  }, [isLoading, guestAgentData, vmi]);
+
+  const osName = useMemo(() => {
+    if (isLoading) {
+      return <Skeleton />;
     }
     if (!isEmpty(guestAgentData)) {
-      return {
-        hostname: guestAgentData?.hostname,
-        osName: getOSNameFromGuestAgent(guestAgentData),
-      };
+      return getOSNameFromGuestAgent(guestAgentData);
     }
-    return { fallback: <GuestAgentIsRequiredText vmi={vmi} /> };
-  }, [loaded, error, guestAgentDataLoaded, guestAgentData, vmi]);
+    return getOSLabel(vm) ?? <GuestAgentIsRequiredText vmi={vmi} />;
+  }, [isLoading, guestAgentData, vmi, vm]);
 
   return (
     <DescriptionList isHorizontal>
@@ -90,7 +84,7 @@ const OverviewDetailsDescriptionList: FC<OverviewDetailsDescriptionListProps> = 
       />
       <DescriptionItem
         data-test="virtual-machine-overview-details-os"
-        descriptionData={osName ?? fallback}
+        descriptionData={osName}
         descriptionHeader={t('Operating system')}
       />
       <DescriptionItem
@@ -114,7 +108,7 @@ const OverviewDetailsDescriptionList: FC<OverviewDetailsDescriptionListProps> = 
       )}
       <DescriptionItem
         data-test="virtual-machine-overview-details-host"
-        descriptionData={hostname ?? fallback}
+        descriptionData={hostname}
         descriptionHeader={t('Hostname')}
       />
     </DescriptionList>
