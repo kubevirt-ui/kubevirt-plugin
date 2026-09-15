@@ -3,9 +3,14 @@ import { expect, test } from '@/fixtures/create-vm-fixture';
 import { setupTestNamespace } from '@/utils/test-setup-helpers';
 
 const SUITE = 'VM Creation Wizard';
+const CUSTOM_DESCRIPTION = 'Customization that should survive regeneration';
+const CUSTOM_HOSTNAME = 'reconciled-hostname';
+const EPHEMERAL_DISK_CONTAINER = 'quay.io/containerdisks/fedora:latest';
+const EPHEMERAL_DISK_NAME = 'test';
+const GENERATED_ROOT_DISK_NAME = 'rootdisk';
 
 test.describe(
-  'VM Creation Wizard — Custom configuration happy path',
+  'VM Creation Wizard — Custom configuration',
   { tag: [T1_TAG, '@catalog-wizard', ADMIN_ONLY_TAG] },
   () => {
     test('Custom configuration wizard creates a RHEL VM through all steps and reaches Running state', async ({
@@ -153,6 +158,165 @@ test.describe(
 
         const result = await apiClient.verifyVmCreated(vmName, wizardNs);
         expect.soft(result.exists, `VM '${vmName}' should exist`).toBe(true);
+      });
+    });
+
+    test('Custom configuration preserves unrelated customization when previous steps change', async ({
+      apiClient,
+      vmListPage,
+      vmWizardBootSourcePage,
+      vmWizardComputePage,
+      vmWizardNavigationPage,
+      utils,
+    }) => {
+      test.setTimeout(utils.TestTimeouts.TEST_VM_CREATION);
+      await utils.withAllure({
+        suite: SUITE,
+        feature: T1,
+        tags: [T1_TAG],
+      });
+
+      const wizardNamespace = await setupTestNamespace(apiClient, 'wizard-reconcile');
+
+      await vmListPage.switchToVirtualizationPerspective();
+      await vmListPage.navigateToProjectVmListViaUI(wizardNamespace);
+      await vmWizardNavigationPage.openWizardFromCreateDropdown();
+
+      await test.step('Configure an Other Linux VM without a boot source and with medium compute size', async () => {
+        await vmWizardNavigationPage.generateVmName();
+        await vmWizardNavigationPage.clickNext();
+
+        await vmWizardNavigationPage.selectOperatingSystem('otherLinux');
+        await vmWizardNavigationPage.clickNext();
+
+        await vmWizardBootSourcePage.selectNoBootSource();
+        await vmWizardNavigationPage.clickNext();
+
+        await vmWizardComputePage.selectInstanceTypeSeries('u');
+        await vmWizardComputePage.selectComputeSize('medium');
+        await vmWizardNavigationPage.clickNext();
+      });
+
+      await test.step('Customize hostname, description, storage, and boot order', async () => {
+        const generatedHostname = await vmWizardComputePage.getCustomizationVmName();
+        expect(generatedHostname, 'Generated hostname should be available').not.toBe('');
+
+        await vmWizardComputePage.openHostnameModal(generatedHostname);
+        await vmWizardComputePage.fillHostnameModal(CUSTOM_HOSTNAME);
+        await vmWizardComputePage.saveHostnameModal();
+        await vmWizardComputePage.editCustomizationDescription(CUSTOM_DESCRIPTION);
+        await vmWizardComputePage.addEphemeralDisk({
+          containerImage: EPHEMERAL_DISK_CONTAINER,
+          diskName: EPHEMERAL_DISK_NAME,
+          useAsBootSource: true,
+        });
+
+        await vmWizardComputePage.selectCustomizationTab('Details');
+        expect(await vmWizardComputePage.getCustomizationVmName()).toBe(CUSTOM_HOSTNAME);
+        expect(await vmWizardComputePage.getCustomizationDescription()).toContain(
+          CUSTOM_DESCRIPTION,
+        );
+        expect(await vmWizardComputePage.getCustomizationBootOrder()).toContain(
+          EPHEMERAL_DISK_NAME,
+        );
+        expect(await vmWizardComputePage.isStorageDiskPresent(EPHEMERAL_DISK_NAME)).toBe(true);
+      });
+
+      await test.step('Preserve customization after visiting Compute resources without changes', async () => {
+        await vmWizardNavigationPage.clickBack();
+        await vmWizardNavigationPage.clickNext();
+
+        await vmWizardComputePage.selectCustomizationTab('Details');
+        expect(await vmWizardComputePage.getCustomizationVmName()).toBe(CUSTOM_HOSTNAME);
+        expect(await vmWizardComputePage.getCustomizationDescription()).toContain(
+          CUSTOM_DESCRIPTION,
+        );
+        expect(await vmWizardComputePage.getCustomizationBootOrder()).toContain(
+          EPHEMERAL_DISK_NAME,
+        );
+        expect(await vmWizardComputePage.isStorageDiskPresent(EPHEMERAL_DISK_NAME)).toBe(true);
+      });
+
+      await test.step('Preserve customization after changing the compute size', async () => {
+        await vmWizardNavigationPage.clickBack();
+        await vmWizardComputePage.selectComputeSize('large');
+        await vmWizardNavigationPage.clickNext();
+
+        await vmWizardComputePage.selectCustomizationTab('Details');
+        expect(await vmWizardComputePage.getCustomizationVmName()).toBe(CUSTOM_HOSTNAME);
+        expect(await vmWizardComputePage.getCustomizationDescription()).toContain(
+          CUSTOM_DESCRIPTION,
+        );
+        expect(await vmWizardComputePage.getCustomizationBootOrder()).toContain(
+          EPHEMERAL_DISK_NAME,
+        );
+        expect(await vmWizardComputePage.isStorageDiskPresent(EPHEMERAL_DISK_NAME)).toBe(true);
+      });
+
+      await test.step('Preserve unrelated values but refresh storage after changing only the Guest OS', async () => {
+        await vmWizardNavigationPage.clickBack();
+        await vmWizardNavigationPage.clickBack();
+        await vmWizardNavigationPage.clickBack();
+
+        await vmWizardNavigationPage.selectOperatingSystem('rhel');
+        await vmWizardNavigationPage.clickNext();
+
+        await vmWizardBootSourcePage.selectNoBootSource();
+        await vmWizardNavigationPage.clickNext();
+        await vmWizardComputePage.selectInstanceTypeSeries('u');
+        await vmWizardComputePage.selectComputeSize('large');
+        await vmWizardNavigationPage.clickNext();
+
+        await vmWizardComputePage.selectCustomizationTab('Details');
+        expect(await vmWizardComputePage.getCustomizationVmName()).toBe(CUSTOM_HOSTNAME);
+        expect(await vmWizardComputePage.getCustomizationDescription()).toContain(
+          CUSTOM_DESCRIPTION,
+        );
+        expect(await vmWizardComputePage.getCustomizationBootOrder()).not.toContain(
+          EPHEMERAL_DISK_NAME,
+        );
+        expect(await vmWizardComputePage.isStorageDiskPresent(EPHEMERAL_DISK_NAME)).toBe(false);
+      });
+
+      await test.step('Add storage customization again before changing the boot source', async () => {
+        await vmWizardComputePage.addEphemeralDisk({
+          containerImage: EPHEMERAL_DISK_CONTAINER,
+          diskName: EPHEMERAL_DISK_NAME,
+          useAsBootSource: true,
+        });
+
+        await vmWizardComputePage.selectCustomizationTab('Details');
+        expect(await vmWizardComputePage.getCustomizationVmName()).toBe(CUSTOM_HOSTNAME);
+        expect(await vmWizardComputePage.getCustomizationDescription()).toContain(
+          CUSTOM_DESCRIPTION,
+        );
+        expect(await vmWizardComputePage.getCustomizationBootOrder()).toContain(
+          EPHEMERAL_DISK_NAME,
+        );
+        expect(await vmWizardComputePage.isStorageDiskPresent(EPHEMERAL_DISK_NAME)).toBe(true);
+      });
+
+      await test.step('Preserve unrelated values but refresh storage after changing only the boot source', async () => {
+        await vmWizardNavigationPage.clickBack();
+        await vmWizardNavigationPage.clickBack();
+
+        await vmWizardBootSourcePage.selectBootVolume();
+        await vmWizardBootSourcePage.selectBootVolumeByName('rhel');
+        await vmWizardNavigationPage.clickNext();
+        await vmWizardComputePage.selectInstanceTypeSeries('u');
+        await vmWizardComputePage.selectComputeSize('large');
+        await vmWizardNavigationPage.clickNext();
+
+        await vmWizardComputePage.selectCustomizationTab('Details');
+        expect(await vmWizardComputePage.getCustomizationVmName()).toBe(CUSTOM_HOSTNAME);
+        expect(await vmWizardComputePage.getCustomizationDescription()).toContain(
+          CUSTOM_DESCRIPTION,
+        );
+        const reconciledBootOrder = await vmWizardComputePage.getCustomizationBootOrder();
+        expect(reconciledBootOrder).not.toContain(EPHEMERAL_DISK_NAME);
+        expect(reconciledBootOrder).toContain(GENERATED_ROOT_DISK_NAME);
+        expect(await vmWizardComputePage.isStorageDiskPresent(EPHEMERAL_DISK_NAME)).toBe(false);
+        expect(await vmWizardComputePage.isStorageDiskPresent(GENERATED_ROOT_DISK_NAME)).toBe(true);
       });
     });
   },
