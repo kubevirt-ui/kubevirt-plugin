@@ -7,6 +7,7 @@ import {
   getNamespacesWithVMsCount,
 } from '@virtualmachines/list/utils/utils';
 
+import useCanListNodes from '../../hooks/useCanListNodes';
 import type { OverviewSectionData } from '../../types';
 import { GRID_NARROW_WIDE, GRID_THREE_EQUAL, GRID_TWO_EQUAL } from '../../types';
 import ClusterUtilizationWidget from '../ClusterUtilizationWidget/ClusterUtilizationWidget';
@@ -26,6 +27,8 @@ const ClusterStatusWidget: FC<OverviewSectionData> = ({
   vms,
 }) => {
   const isAllClustersPage = useIsAllClustersPage();
+  const [canListNodes, nodeAccessReviewLoading] = useCanListNodes();
+  const showNodeRelatedWidgets = nodeAccessReviewLoading || canListNodes;
   const {
     cpuLoad,
     loaded: utilizationLoaded,
@@ -54,12 +57,13 @@ const ClusterStatusWidget: FC<OverviewSectionData> = ({
           vmsCount={vms?.length || 0}
         />
       </OverviewSectionRow>
-      {isAllClustersPage ? (
+      {isAllClustersPage && (
         <OverviewSectionRow gridColumns={GRID_TWO_EQUAL}>
           <ClustersUtilizationCard metricsUnavailable={metricsUnavailable} />
           <ClustersLoadBalanceCard metricsUnavailable={metricsUnavailable} />
         </OverviewSectionRow>
-      ) : (
+      )}
+      {!isAllClustersPage && showNodeRelatedWidgets && (
         <OverviewSectionRow
           className="overview-section__row--single-column-wide"
           gridColumns={GRID_NARROW_WIDE}
