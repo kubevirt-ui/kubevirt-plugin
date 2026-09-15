@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router';
 
 import StateHandler from '@kubevirt-utils/components/StateHandler/StateHandler';
@@ -40,9 +40,14 @@ const CustomSelectionView: FC = () => {
   } = useReviewRecommendationModal(autopilotFeatures, autopilotStatusMap);
 
   const { columns, direction, sortBy } = useCustomSelectionColumns();
+  const resetSelection = useCallback(
+    () => capabilitySelection.onSelect(false),
+    [capabilitySelection],
+  );
   const { clearAllFilters, filteredData, filters, onSetFilters } = useCapabilityFilters(
     autopilotFeatures,
     getCapabilityInstallState,
+    resetSelection,
   );
 
   const sortedFeatures = useMemo(
