@@ -2,6 +2,7 @@ import { type FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
+import useCanListNodes from '../../../../hooks/useCanListNodes';
 import useResourcesQuantities from '../../hooks/useResourcesQuantities';
 import ResourceTile from './ResourceTile';
 
@@ -17,6 +18,8 @@ const SingleClusterResourcesCard: FC<SingleClusterResourcesCardProps> = ({
   vmsCount,
 }) => {
   const { t } = useKubevirtTranslation();
+  const [canListNodes, accessReviewLoading] = useCanListNodes();
+  const showNodesCount = accessReviewLoading || canListNodes;
   const { loaded: nodesLoaded, nodes: nodesCount } = useResourcesQuantities();
 
   return (
@@ -25,7 +28,9 @@ const SingleClusterResourcesCard: FC<SingleClusterResourcesCardProps> = ({
         aria-hidden="true"
         className="cluster-resources-card__tile cluster-resources-card__tile--placeholder"
       />
-      <ResourceTile count={nodesCount} isLoading={!nodesLoaded} label={t('Nodes')} />
+      {showNodesCount && (
+        <ResourceTile count={nodesCount} isLoading={!nodesLoaded} label={t('Nodes')} />
+      )}
       <ResourceTile count={projectsCount} label={t('Projects')} />
       <ResourceTile count={vmsCount} label={t('VMs')} />
     </div>

@@ -9,6 +9,7 @@ import useManagedClusterConsoleURLs from '@multicluster/hooks/useManagedClusterC
 import { buildSpokeConsoleUrl } from '@multicluster/urls';
 import { Skeleton } from '@patternfly/react-core';
 
+import useCanListNodes from '../../../../hooks/useCanListNodes';
 import DistributionBarChart from '../../../shared/DistributionBarChart/DistributionBarChart';
 import ViewAllLink from '../../../shared/ViewAllLink';
 import { TOP_N } from '../../hooks/clusterMetricConstants';
@@ -28,6 +29,7 @@ const NodeLoadDistributionCard: FC<NodeLoadDistributionCardProps> = ({
   metricsUnavailable,
 }) => {
   const { t } = useKubevirtTranslation();
+  const [canListNodes, accessReviewLoading] = useCanListNodes();
   const {
     buckets,
     deschedulerLoaded,
@@ -49,6 +51,10 @@ const NodeLoadDistributionCard: FC<NodeLoadDistributionCardProps> = ({
     }
     return { nodesHref: undefined, nodesLinkPath: NODES_PATH };
   }, [isSpokeCluster, spokeConsoleURL]);
+
+  if (!accessReviewLoading && !canListNodes) {
+    return null;
+  }
 
   return (
     <TwoColumnCard

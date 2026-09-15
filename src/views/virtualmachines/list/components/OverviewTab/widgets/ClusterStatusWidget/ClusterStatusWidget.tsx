@@ -7,6 +7,7 @@ import {
   getNamespacesWithVMsCount,
 } from '@virtualmachines/list/utils/utils';
 
+import useCanListNodes from '../../hooks/useCanListNodes';
 import type { OverviewSectionData } from '../../types';
 import { GRID_NARROW_WIDE, GRID_THREE_EQUAL, GRID_TWO_EQUAL } from '../../types';
 import ClusterUtilizationWidget from '../ClusterUtilizationWidget/ClusterUtilizationWidget';
@@ -26,6 +27,8 @@ const ClusterStatusWidget: FC<OverviewSectionData> = ({
   vms,
 }) => {
   const isAllClustersPage = useIsAllClustersPage();
+  const [canListNodes, nodeAccessReviewLoading] = useCanListNodes();
+  const showNodeRelatedWidgets = nodeAccessReviewLoading || canListNodes;
   const {
     cpuLoad,
     loaded: utilizationLoaded,
@@ -60,19 +63,21 @@ const ClusterStatusWidget: FC<OverviewSectionData> = ({
           <ClustersLoadBalanceCard metricsUnavailable={metricsUnavailable} />
         </OverviewSectionRow>
       ) : (
-        <OverviewSectionRow
-          className="overview-section__row--single-column-wide"
-          gridColumns={GRID_NARROW_WIDE}
-        >
-          <ClusterUtilizationWidget
-            cpuLoad={cpuLoad}
-            isLoading={!utilizationLoaded}
-            memoryLoad={memoryLoad}
-            metricsUnavailable={metricsUnavailable}
-            storageLoad={storageLoad}
-          />
-          <NodeLoadDistributionCard cluster={cluster} metricsUnavailable={metricsUnavailable} />
-        </OverviewSectionRow>
+        showNodeRelatedWidgets && (
+          <OverviewSectionRow
+            className="overview-section__row--single-column-wide"
+            gridColumns={GRID_NARROW_WIDE}
+          >
+            <ClusterUtilizationWidget
+              cpuLoad={cpuLoad}
+              isLoading={!utilizationLoaded}
+              memoryLoad={memoryLoad}
+              metricsUnavailable={metricsUnavailable}
+              storageLoad={storageLoad}
+            />
+            <NodeLoadDistributionCard cluster={cluster} metricsUnavailable={metricsUnavailable} />
+          </OverviewSectionRow>
+        )
       )}
     </OverviewSection>
   );
