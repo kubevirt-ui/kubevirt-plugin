@@ -20,7 +20,6 @@ export class VmCreationWizardNavigationComponent extends BaseComponent {
   }
 
   async clickNext(): Promise<void> {
-    await this.collapseSidebarIfExpanded();
     await this.page.keyboard.press('Escape');
     await this.page
       .locator('.pf-v6-c-tooltip, [role="tooltip"]')
