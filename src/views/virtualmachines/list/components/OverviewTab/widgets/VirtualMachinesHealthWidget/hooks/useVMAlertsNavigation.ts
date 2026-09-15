@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 
+import { AlertResource } from '@kubevirt-utils/components/HealthState/utils';
 import { KUBEVIRT, PERSPECTIVES } from '@kubevirt-utils/constants/constants';
 import { getAlertsPath } from '@kubevirt-utils/constants/prometheus';
 import { useMCOInstalled } from '@kubevirt-utils/hooks/useAlerts/utils/useMCOInstalled';
@@ -7,7 +8,6 @@ import useIsAllClustersPage from '@multicluster/hooks/useIsAllClustersPage';
 import useManagedClusterConsoleURLs from '@multicluster/hooks/useManagedClusterConsoleURLs';
 import { buildSpokeConsoleUrl } from '@multicluster/urls';
 import { useActivePerspective } from '@openshift-console/dynamic-plugin-sdk';
-import { AlertResource } from '@overview/OverviewTab/status-card/utils/utils';
 
 const buildVMAlertsUrlParams = (): string => {
   const params = new URLSearchParams();

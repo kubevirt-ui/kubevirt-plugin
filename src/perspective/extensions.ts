@@ -1,4 +1,4 @@
-import type { Perspective } from '@openshift-console/dynamic-plugin-sdk';
+import type { Perspective, RoutePage } from '@openshift-console/dynamic-plugin-sdk';
 import type {
   ConsolePluginBuildMetadata,
   EncodedExtension,
@@ -15,6 +15,7 @@ import { virtualizationSection } from './navigation/virtualizationSection';
 
 export const exposedModules: ConsolePluginBuildMetadata['exposedModules'] = {
   perspective: './perspective/perspective.ts',
+  VirtualizationLandingPage: './perspective/VirtualizationLandingPage.tsx',
 };
 
 export const extensions: EncodedExtension[] = [
@@ -32,6 +33,15 @@ export const extensions: EncodedExtension[] = [
     },
     type: 'console.perspective',
   } as EncodedExtension<Perspective>,
+  {
+    properties: {
+      component: {
+        $codeRef: 'VirtualizationLandingPage',
+      },
+      path: ['/k8s/virtualization-landing'],
+    },
+    type: 'console.page/route',
+  } as EncodedExtension<RoutePage>,
   ...virtualizationSection,
   ...clusterSection,
   ...migrationSection,

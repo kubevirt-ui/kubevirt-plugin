@@ -20,7 +20,6 @@
       "@kubevirt-utils/*": ["src/utils/*"],
       "@lightspeed/*": ["src/views/lightspeed/*"],
       "@multicluster/*": ["src/multicluster/*"],
-      "@overview/*": ["src/views/clusteroverview/*"],
       "@search/*": ["src/views/search/*"],
       "@settings/*": ["src/views/settings/*"],
       "@templates/*": ["src/views/templates/*"],

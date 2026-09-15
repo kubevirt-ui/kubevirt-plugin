@@ -1,10 +1,10 @@
 import defaultsDeep from 'lodash/defaultsDeep';
 
 import { NamespaceModel, RoleBindingModel, RoleModel } from '@kubevirt-utils/models';
+import { InstallModeType, type K8sResourceKind } from '@kubevirt-utils/types/olm';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { kubevirtK8sCreate } from '@multicluster/k8sRequests';
 import { type K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
-import { InstallModeType, type K8sResourceKind } from '@overview/utils/types';
 
 import {
   HTTP_CONFLICT_CODE,

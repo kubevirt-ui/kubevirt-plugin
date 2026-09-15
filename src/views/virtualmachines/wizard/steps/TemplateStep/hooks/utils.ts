@@ -98,7 +98,7 @@ export const getVMObjectFromTemplate = ({
     }
 
     const selectedTemplateNamespace = getNamespace(selectedTemplate);
-    
+
     if (selectedTemplateNamespace) {
       draftVM.metadata.labels[LABEL_USED_TEMPLATE_NAMESPACE] = selectedTemplateNamespace;
     } else {

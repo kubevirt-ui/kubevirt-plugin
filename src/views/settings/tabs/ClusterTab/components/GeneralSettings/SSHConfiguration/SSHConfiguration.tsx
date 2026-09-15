@@ -1,8 +1,8 @@
 import React, { type FC, useCallback, useEffect, useState } from 'react';
-import { useDebounceCallback } from 'src/views/clusteroverview/utils/hooks/useDebounceCallback';
 
 import { ConfigMapModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import SectionWithSwitch from '@kubevirt-utils/components/SectionWithSwitch/SectionWithSwitch';
+import { useDebounceCallback } from '@kubevirt-utils/hooks/useDebounceCallback';
 import {
   LOAD_BALANCER_ENABLED,
   NODE_PORT_ADDRESS,

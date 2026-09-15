@@ -1,5 +1,5 @@
-import type { FC } from 'react';
-import React, { useMemo } from 'react';
+import React, { type FC, useMemo } from 'react';
+import useMigrationCardDataAndFilters from 'src/views/migrations/components/MigrationsTable/hooks/useMigrationCardData';
 
 import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
 import useClusterVersion from '@kubevirt-utils/hooks/useClusterVersion/useClusterVersion';
@@ -9,14 +9,13 @@ import useIsAllClustersPage from '@multicluster/hooks/useIsAllClustersPage';
 import useManagedClusterConsoleURLs from '@multicluster/hooks/useManagedClusterConsoleURLs';
 import { buildSpokeConsoleUrl } from '@multicluster/urls';
 import useIsACMPage from '@multicluster/useIsACMPage';
-import useMigrationCardDataAndFilters from '@overview/MigrationsTab/hooks/useMigrationCardData';
 
 import { determineOverviewLevel } from '../../config';
-import type { OverviewSectionData } from '../../types';
 import {
   GRID_CLUSTER_MIGRATION_STATUS,
   OVERVIEW_LEVEL_CLUSTER,
   OVERVIEW_LEVEL_MULTICLUSTER,
+  type OverviewSectionData,
 } from '../../types';
 import MigrationsWidget from '../MigrationsWidget/MigrationsWidget';
 import OverviewSection from '../OverviewSection/OverviewSection';

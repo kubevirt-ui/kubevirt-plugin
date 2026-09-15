@@ -1,6 +1,6 @@
 import React, { type FC } from 'react';
 
-import { type SubscriptionKind, SubscriptionState } from '@overview/utils/types';
+import { type SubscriptionKind, SubscriptionState } from '@kubevirt-utils/types/olm';
 
 import SubscriptionStateAtLatest from './SubscriptionStates/SubscriptionStateAtLatest';
 import SubscriptionStateDefault from './SubscriptionStates/SubscriptionStateDefault';

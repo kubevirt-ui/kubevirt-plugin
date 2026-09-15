@@ -1,10 +1,10 @@
-import { type OLSPromptType } from '@lightspeed/utils/prompts';
-import { type K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import {
   type OperatorGroupKind,
   type PackageManifestKind,
   type SubscriptionKind,
-} from '@overview/utils/types';
+} from '@kubevirt-utils/types/olm';
+import { type OLSPromptType } from '@lightspeed/utils/prompts';
+import { type K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
 export type VirtualizationFeatureOperators =
   | 'cluster-kube-descheduler-operator'

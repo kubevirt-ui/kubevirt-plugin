@@ -9,11 +9,11 @@ import { FLAG_KUBEVIRT_VIRTUALIZATION_NAV } from './src/utils/flags/consts';
 import { extensions as BootableVolumesExtensions } from './src/views/bootablevolumes/extensions';
 import { extensions as CDIUploadProviderExtensions } from './src/views/cdi-upload-provider/extensions';
 import { extensions as CheckupsExtensions } from './src/views/checkups/extensions';
-import { extensions as ClusterOverviewExtensions } from './src/views/clusteroverview/extensions';
 import { extensions as dashboardExtensionsExtensions } from './src/views/dashboard-extensions/extensions';
 import { extensions as DataSourcesExtensions } from './src/views/datasources/extensions';
 import { extensions as InstanceTypesExtensions } from './src/views/instancetypes/extensions';
 import { extensions as MigrationPoliciesExtensions } from './src/views/migrationpolicies/extensions';
+import { extensions as MigrationsExtensions } from './src/views/migrations/extensions';
 import { extensions as VirtualizationSectionExtensions } from './src/views/navigation/virtualizationSection';
 import { extensions as PreferencesExtensions } from './src/views/preferences/extensions';
 import { extensions as QuotasExtensions } from './src/views/quotas/extensions';
@@ -39,7 +39,7 @@ const extensions: EncodedExtension[] = [
   ...VirtualMachineInstanceMigrationsExtensions,
   ...StorageClassExtensions,
   ...StorageMigrationExtensions,
-  ...ClusterOverviewExtensions,
+  ...MigrationsExtensions,
   ...VirtualMachinesExtensions,
   ...TemplatesExtensions,
   ...BootableVolumesExtensions,

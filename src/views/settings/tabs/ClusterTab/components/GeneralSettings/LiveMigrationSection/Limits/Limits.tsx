@@ -6,10 +6,10 @@ import {
   logVMMigrationNodeLimitConfigured,
   logVMMigrationNodeLimitReached,
 } from '@kubevirt-utils/extensions/telemetry/vm-migration';
+import { useDebounceCallback } from '@kubevirt-utils/hooks/useDebounceCallback';
 import { type HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
-import { useDebounceCallback } from '@overview/utils/hooks/useDebounceCallback';
 import { Content, ContentVariants } from '@patternfly/react-core';
 import { useSettingsCluster } from '@settings/context/SettingsClusterContext';
 

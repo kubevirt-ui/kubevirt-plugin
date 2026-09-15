@@ -1,5 +1,5 @@
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
-import { type OperatorGroupKind, type SubscriptionKind } from '@overview/utils/types';
+import { type OperatorGroupKind, type SubscriptionKind } from '@kubevirt-utils/types/olm';
 
 import { type UseOperatorResourcesReturn } from '../hooks/useOperatorResources/utils/types';
 import { RED_HAT } from './constants';

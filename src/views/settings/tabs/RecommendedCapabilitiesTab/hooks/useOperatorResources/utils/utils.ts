@@ -5,13 +5,13 @@ import {
   SubscriptionModel,
 } from '@kubevirt-utils/models';
 import { getName } from '@kubevirt-utils/resources/shared';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { getGroupVersionKindForModel } from '@openshift-console/dynamic-plugin-sdk';
 import {
   type OperatorGroupKind,
   type PackageManifestKind,
   type SubscriptionKind,
-} from '@overview/utils/types';
+} from '@kubevirt-utils/types/olm';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { getGroupVersionKindForModel } from '@openshift-console/dynamic-plugin-sdk';
 import { type FleetWatchK8sResource } from '@stolostron/multicluster-sdk';
 
 import { OPENSHIFT_MARKETPLACE_NAMESPACE, RED_HAT } from '../../../utils/constants';

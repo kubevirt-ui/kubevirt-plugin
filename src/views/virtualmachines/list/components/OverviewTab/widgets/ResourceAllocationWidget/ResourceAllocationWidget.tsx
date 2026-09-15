@@ -1,9 +1,9 @@
 import React, { type FC, type ReactNode, useMemo } from 'react';
 
+import { type MetricChartData } from '@kubevirt-utils/components/Charts/MetricChartUtils/hooks/useMetricChartData';
+import { getCurrentValue } from '@kubevirt-utils/components/Charts/MetricChartUtils/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { convertBinaryUnit } from '@kubevirt-utils/utils/units';
-import { type MetricChartData } from '@overview/OverviewTab/metric-charts-card/utils/hooks/useMetricChartData';
-import { getCurrentValue } from '@overview/OverviewTab/metric-charts-card/utils/utils';
 import { Card, CardBody, CardHeader, CardTitle, Content, Skeleton } from '@patternfly/react-core';
 
 import QuotaFooter from './components/QuotaFooter';

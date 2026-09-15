@@ -1,8 +1,8 @@
 import xbytes from 'xbytes';
 
+import { type ChartPoint } from '@kubevirt-utils/components/Charts/MetricChartUtils/hooks/types';
 import { timestampFor } from '@kubevirt-utils/components/Timestamp/utils/datetime';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { type ChartPoint } from '@overview/OverviewTab/metric-charts-card/utils/hooks/types';
 
 import { humanizeSeconds } from '../../../utils/humanize';
 

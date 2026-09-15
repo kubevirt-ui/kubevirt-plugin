@@ -3,7 +3,7 @@ import React, { type FC, type ReactNode, useMemo } from 'react';
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { STORAGE_MIGRATION_API } from '@kubevirt-utils/resources/migrations/constants';
-import { vmStatusIcon } from '@overview/OverviewTab/vm-statuses-card/utils/utils';
+import { vmStatusIcon } from '@kubevirt-utils/resources/vm/vmStatuses/utils/utils';
 import {
   Card,
   CardBody,

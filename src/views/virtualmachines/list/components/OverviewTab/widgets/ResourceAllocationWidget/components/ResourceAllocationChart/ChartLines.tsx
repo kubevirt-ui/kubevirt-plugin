@@ -1,6 +1,6 @@
 import React, { type FC } from 'react';
 
-import { type MetricChartData } from '@overview/OverviewTab/metric-charts-card/utils/hooks/useMetricChartData';
+import { type MetricChartData } from '@kubevirt-utils/components/Charts/MetricChartUtils/hooks/useMetricChartData';
 import { ChartLine } from '@patternfly/react-charts/victory';
 import chart_color_blue_300 from '@patternfly/react-tokens/dist/esm/chart_color_blue_300';
 import t_chart_theme_colorscales_gray_colorscale_100 from '@patternfly/react-tokens/dist/esm/t_chart_theme_colorscales_gray_colorscale_100';

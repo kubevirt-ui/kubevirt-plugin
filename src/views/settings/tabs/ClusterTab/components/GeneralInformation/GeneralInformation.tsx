@@ -2,8 +2,8 @@ import React, { type FC, type ReactNode } from 'react';
 
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { type SubscriptionKind } from '@kubevirt-utils/types/olm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { type SubscriptionKind } from '@overview/utils/types';
 import {
   Alert,
   AlertVariant,

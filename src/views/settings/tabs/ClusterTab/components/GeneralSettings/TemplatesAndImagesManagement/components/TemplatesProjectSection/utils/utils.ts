@@ -1,9 +1,9 @@
 import { HyperConvergedV1Beta1Model as HyperConvergedModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { type HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { TemplateModel, type V1Template } from '@kubevirt-utils/models';
+import { type TemplateList } from '@kubevirt-utils/resources/template/utils/types';
 import { getErrorMessage } from '@kubevirt-utils/utils/utils';
 import { kubevirtK8sDelete, kubevirtK8sGet, kubevirtK8sPatch } from '@multicluster/k8sRequests';
-import { type TemplateList } from '@overview/utils/types';
 
 const TYPE_LABEL = 'template.kubevirt.io/type';
 const BASE = 'base';

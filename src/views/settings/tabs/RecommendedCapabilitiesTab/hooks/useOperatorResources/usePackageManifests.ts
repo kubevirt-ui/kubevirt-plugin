@@ -2,8 +2,8 @@ import { useMemo } from 'react';
 
 import useDeepCompareMemoize from '@kubevirt-utils/hooks/useDeepCompareMemoize/useDeepCompareMemoize';
 import { getName } from '@kubevirt-utils/resources/shared';
+import { type PackageManifestKind } from '@kubevirt-utils/types/olm';
 import useKubevirtWatchResources from '@multicluster/hooks/useKubevirtWatchResources';
-import { type PackageManifestKind } from '@overview/utils/types';
 
 import { PACKAGE_MANIFESTS_WATCH_KEY } from './utils/constants';
 import { type UsePackageManifestsParams, type UsePackageManifestsReturn } from './utils/types';

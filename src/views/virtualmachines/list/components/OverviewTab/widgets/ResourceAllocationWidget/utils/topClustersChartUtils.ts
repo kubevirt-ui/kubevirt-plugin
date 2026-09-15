@@ -1,7 +1,7 @@
+import { type ChartDomain } from '@kubevirt-utils/components/Charts/MetricChartUtils/hooks/types';
+import { getHumanizedValue } from '@kubevirt-utils/components/Charts/MetricChartUtils/hooks/utils';
 import { MILLISECONDS_MULTIPLIER } from '@kubevirt-utils/components/Charts/utils/utils';
 import { type PrometheusResponse } from '@openshift-console/dynamic-plugin-sdk';
-import { type ChartDomain } from '@overview/OverviewTab/metric-charts-card/utils/hooks/types';
-import { getHumanizedValue } from '@overview/OverviewTab/metric-charts-card/utils/hooks/utils';
 import { chart_color_black_500 } from '@patternfly/react-tokens';
 import chart_color_blue_300 from '@patternfly/react-tokens/dist/esm/chart_color_blue_300';
 import chart_color_green_400 from '@patternfly/react-tokens/dist/esm/chart_color_green_400';
