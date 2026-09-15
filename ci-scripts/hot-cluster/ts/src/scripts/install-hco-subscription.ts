@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { type KubeClient, sleep } from '../kube-client';
 
 import type { PackageManifest } from '../types/olm';

@@ -1,4 +1,3 @@
-/* eslint-disable */
 /**
  * Resolve the starting CSV for a pinned CNV version.
  * Standalone entry point: npx tsx src/scripts/resolve-starting-csv.ts

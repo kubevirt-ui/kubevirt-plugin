@@ -1,10 +1,9 @@
-/* eslint-disable */
 import type { ConsoleUserSettingsLocation } from '@kubevirt-utils/hooks/consoleUserSettings/useConsoleUserSettingLocalStorage/consts';
 
 import './i18next';
-import './react';
 
 declare global {
+  // eslint-disable-next-line @typescript-eslint/consistent-type-definitions -- global augmentation requires interface
   interface Window {
     SERVER_FLAGS: {
       authDisabled: boolean;
