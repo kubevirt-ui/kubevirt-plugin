@@ -1,6 +1,6 @@
-import React, { FC, useState } from 'react';
+import React, { type FC, useState } from 'react';
 
-import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import DiskModal from '@kubevirt-utils/components/DiskModal/DiskModal';
 import { produceVMDisks } from '@kubevirt-utils/components/DiskModal/utils/helpers';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
@@ -8,7 +8,6 @@ import KebabToggle from '@kubevirt-utils/components/toggles/KebabToggle';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { getDataVolumeTemplates, getDisks, getVolumes } from '@kubevirt-utils/resources/vm';
-import { DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/constants';
 import { getContentScrollableElement } from '@kubevirt-utils/utils/utils';
 import { ButtonVariant, Dropdown, DropdownItem, DropdownList } from '@patternfly/react-core';
 import { updateDisks } from '@virtualmachines/details/tabs/configuration/details/utils/utils';
@@ -20,14 +19,7 @@ import DetachModal from '../../modal/DetachModal';
 import MakePersistentModal from '../../modal/MakePersistentModal';
 
 import { isHotplugVolume, isPVCSource } from './utils/helpers';
-
-type DiskRowActionsProps = {
-  customize?: boolean;
-  obj: DiskRowDataLayout;
-  onDiskUpdate?: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine>;
-  vm: V1VirtualMachine;
-  vmi?: V1VirtualMachineInstance;
-};
+import { type DiskRowActionsProps } from './types';
 
 const DiskRowActions: FC<DiskRowActionsProps> = ({
   customize = false,
@@ -53,36 +45,37 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({
   const deleteBtnText = t('Detach');
   const removeHotplugBtnText = t('Make persistent');
 
-  const onCustomizeDeleteDisk = () => {
+  const onCustomizeDeleteDisk = (): Promise<V1VirtualMachine> => {
     const newVM = produceVMDisks(vm, (draftVM) => {
-      const volumeToDelete = getVolumes(vm).find((v) => v.name === diskName);
+      const volumeToDelete = getVolumes(draftVM)?.find((vol) => vol.name === diskName);
+      const volumeName = volumeToDelete?.name ?? diskName;
       draftVM.spec.template.spec.domain.devices.disks = getDisks(draftVM)?.filter(
-        (disk) => disk.name !== volumeToDelete.name,
+        (disk) => disk.name !== volumeName,
       );
       draftVM.spec.template.spec.volumes = getVolumes(draftVM)?.filter(
-        (v) => v.name !== volumeToDelete.name,
+        (vol) => vol.name !== volumeName,
       );
       draftVM.spec.dataVolumeTemplates = getDataVolumeTemplates(draftVM)?.filter(
         (dataVolume) => getName(dataVolume) !== volumeToDelete?.dataVolume?.name,
       );
     });
 
-    return onDiskUpdate(newVM);
+    return (onDiskUpdate ?? updateDisks)(newVM);
   };
 
-  const createEditDiskModal = () =>
+  const createEditDiskModal = (): void =>
     createModal(({ isOpen, onClose }) => (
       <DiskModal
         createdPVCName={isPVCSource(obj) ? obj?.source : null}
         editDiskName={diskName}
         isOpen={isOpen}
         onClose={onClose}
-        onSubmit={onDiskUpdate || updateDisks}
+        onSubmit={onDiskUpdate ?? updateDisks}
         vm={vm}
       />
     ));
 
-  const createDeleteDiskModal = () =>
+  const createDeleteDiskModal = (): void =>
     createModal(({ isOpen, onClose }) =>
       customize ? (
         <DetachModal
@@ -107,23 +100,23 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({
       ),
     );
 
-  const createBootableVolume = () => {
+  const createBootableVolume = (): void => {
     createModal(({ isOpen, onClose }) => (
       <CreateBootableVolumeModal diskObj={obj} isOpen={isOpen} onClose={onClose} vm={vm} />
     ));
   };
 
-  const makePersistent = () =>
+  const makePersistent = (): void =>
     createModal(({ isOpen, onClose }) => (
       <MakePersistentModal isOpen={isOpen} onClose={onClose} vm={vm} vmi={vmi} volume={volume} />
     ));
 
-  const onModalOpen = (createModalCallback: () => void) => {
+  const onModalOpen = (createModalCallback: () => void): void => {
     createModalCallback();
     setIsDropdownOpen(false);
   };
 
-  const onToggle = () => setIsDropdownOpen((prevIsOpen) => !prevIsOpen);
+  const onToggle = (): void => setIsDropdownOpen((prevIsOpen) => !prevIsOpen);
 
   return (
     <Dropdown
