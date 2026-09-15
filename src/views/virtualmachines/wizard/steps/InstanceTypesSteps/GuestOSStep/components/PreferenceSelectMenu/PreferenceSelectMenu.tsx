@@ -1,4 +1,4 @@
-import React, { type FC, useMemo } from 'react';
+import { type FC, useMemo } from 'react';
 import { Controller, useWatch } from 'react-hook-form';
 
 import { type PreferenceOption } from '@kubevirt-utils/components/AddBootableVolumeModal/types';

@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import React, { useCallback } from 'react';
+import { type KeyboardEvent, useCallback } from 'react';
 
 import { ENTER_KEY, SPACE_SYMBOL } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -38,7 +38,7 @@ const CandidateRow: FC<CandidateRowProps> = ({
   const { t } = useKubevirtTranslation();
 
   const handleKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
+    (e: KeyboardEvent) => {
       if (e.key === ENTER_KEY || e.key === SPACE_SYMBOL) {
         e.preventDefault();
         onSelect?.(candidate.cluster);

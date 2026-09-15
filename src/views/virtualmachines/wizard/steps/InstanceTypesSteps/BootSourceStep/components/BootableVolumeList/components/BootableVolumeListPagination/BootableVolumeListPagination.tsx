@@ -1,4 +1,4 @@
-import React, { type Dispatch, type FC, type SetStateAction } from 'react';
+import { type Dispatch, type FC, type SetStateAction } from 'react';
 
 import { type PaginationState } from '@kubevirt-utils/hooks/usePagination/utils/types';
 import { type BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';

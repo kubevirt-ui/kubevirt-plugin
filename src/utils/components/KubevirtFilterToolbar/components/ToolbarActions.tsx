@@ -1,5 +1,4 @@
 import type { FC, ReactNode } from 'react';
-import React from 'react';
 
 import type { ColumnLayout } from '@openshift-console/dynamic-plugin-sdk';
 

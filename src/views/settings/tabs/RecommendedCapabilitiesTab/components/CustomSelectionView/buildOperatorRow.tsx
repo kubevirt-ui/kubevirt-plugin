@@ -1,4 +1,3 @@
-import React from 'react';
 import { type TFunction } from 'i18next';
 
 import ActionsDropdown from '@kubevirt-utils/components/ActionsDropdown/ActionsDropdown';

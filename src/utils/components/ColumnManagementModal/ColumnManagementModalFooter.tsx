@@ -1,4 +1,4 @@
-import React, { type FC, type MouseEventHandler } from 'react';
+import { type FC, type MouseEventHandler, type SyntheticEvent } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
@@ -15,7 +15,7 @@ type ColumnManagementModalFooterProps = {
   error: Error | null;
   loaded: boolean;
   onClose: () => void;
-  resetColumns: (event: React.SyntheticEvent) => void;
+  resetColumns: (event: SyntheticEvent) => void;
   submit: MouseEventHandler<HTMLButtonElement>;
 };
 

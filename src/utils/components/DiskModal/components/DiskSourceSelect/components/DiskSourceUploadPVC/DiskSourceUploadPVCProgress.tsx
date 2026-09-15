@@ -1,4 +1,4 @@
-import React, { type FC, type ReactElement } from 'react';
+import { type FC, type ReactElement } from 'react';
 
 import { type DataUpload } from '@kubevirt-utils/hooks/useCDIUpload/types';
 import {

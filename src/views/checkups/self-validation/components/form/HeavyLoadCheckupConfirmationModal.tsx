@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 
 import AckConfirmationModal from '@kubevirt-utils/components/AckConfirmationModal/AckConfirmationModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';

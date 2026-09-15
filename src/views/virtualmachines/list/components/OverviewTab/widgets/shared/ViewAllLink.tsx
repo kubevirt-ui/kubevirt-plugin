@@ -1,4 +1,4 @@
-import React, { type AnchorHTMLAttributes, type FC, type JSX, useMemo } from 'react';
+import { type AnchorHTMLAttributes, type FC, type JSX, useMemo } from 'react';
 import { Link } from 'react-router';
 
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';

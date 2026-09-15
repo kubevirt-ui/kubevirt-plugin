@@ -1,4 +1,4 @@
-import React, { type FC, type RefObject } from 'react';
+import { type FC, type ReactNode, type RefObject } from 'react';
 
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import ColumnManagement from '@kubevirt-utils/components/ColumnManagementModal/ColumnManagement';
@@ -31,7 +31,7 @@ type VirtualMachinesListToolbarProps = {
   clearAllFiltersWithReset: () => void;
   columnLayout: ColumnLayout;
   columns: ColumnConfig<V1VirtualMachine, VMCallbacks>[];
-  exportButton: React.ReactNode;
+  exportButton: ReactNode;
   filterDefinitions: KubevirtFilter<V1VirtualMachine>[];
   filteredVMs: V1VirtualMachine[];
   filters: KubevirtFilterState;

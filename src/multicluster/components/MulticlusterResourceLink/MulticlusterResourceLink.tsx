@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 
 import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
 import type { FleetResourceLinkProps } from '@stolostron/multicluster-sdk';

@@ -1,4 +1,4 @@
-import React, { type FC, memo } from 'react';
+import { type FC, memo } from 'react';
 import { useWatch } from 'react-hook-form';
 
 import CPUDescription from '@kubevirt-utils/components/CPUDescription/CPUDescription';

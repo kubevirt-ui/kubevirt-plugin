@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 
 import CheckboxSelect from '@kubevirt-utils/components/CheckboxSelect/CheckboxSelect';
 import type {

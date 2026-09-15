@@ -1,10 +1,4 @@
-import React, {
-  type Dispatch,
-  type FC,
-  type ReactElement,
-  type SetStateAction,
-  useState,
-} from 'react';
+import { type Dispatch, type FC, type ReactElement, type SetStateAction, useState } from 'react';
 
 import SelectToggle from '@kubevirt-utils/components/toggles/SelectToggle';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';

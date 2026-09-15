@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { useNavigate } from 'react-router';
 

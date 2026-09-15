@@ -1,5 +1,4 @@
 import type { Dispatch, FC, SetStateAction } from 'react';
-import React from 'react';
 
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';

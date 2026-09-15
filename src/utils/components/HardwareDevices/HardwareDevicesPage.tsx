@@ -1,4 +1,4 @@
-import React, { type FC, type JSX } from 'react';
+import { type FC, type JSX } from 'react';
 
 import { type V1PciHostDevice } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';

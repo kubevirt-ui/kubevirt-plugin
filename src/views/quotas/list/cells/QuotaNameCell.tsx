@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 import { Link } from 'react-router';
 
 import type { ApplicationAwareQuota } from '@kubevirt-utils/resources/quotas/types';

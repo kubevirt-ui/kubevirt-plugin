@@ -1,7 +1,7 @@
 // Extracted from virtualMachinesDefinition.tsx
 // Root: src/views/virtualmachines/list/virtualMachinesDefinition.tsx
 
-import React, { type ReactNode } from 'react';
+import { type ReactNode } from 'react';
 import { type TFunction } from 'i18next';
 
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';

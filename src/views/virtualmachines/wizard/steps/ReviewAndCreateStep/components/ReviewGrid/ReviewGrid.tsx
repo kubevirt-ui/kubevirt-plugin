@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 
 import { Grid, GridItem, Stack } from '@patternfly/react-core';
 import ReviewGridLeftColumn from '@virtualmachines/wizard/steps/ReviewAndCreateStep/components/ReviewGrid/components/ReviewGridLeftColumn';

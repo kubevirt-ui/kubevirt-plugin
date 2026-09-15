@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import React, { Suspense } from 'react';
+import { Suspense } from 'react';
 
 import type { V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import Loading from '@kubevirt-utils/components/Loading/Loading';

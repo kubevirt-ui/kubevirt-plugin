@@ -1,4 +1,4 @@
-import React, { type FC, useCallback, useEffect } from 'react';
+import { type FC, useCallback, useEffect } from 'react';
 import { Trans } from 'react-i18next';
 import uniq from 'lodash/uniq';
 

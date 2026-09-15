@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 import DedicatedResources from 'src/views/templates/details/tabs/scheduling/components//DedicatedResources';
 import EvictionStrategy from 'src/views/templates/details/tabs/scheduling/components//EvictionStrategy';
 

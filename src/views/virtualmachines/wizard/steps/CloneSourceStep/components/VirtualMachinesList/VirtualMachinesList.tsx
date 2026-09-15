@@ -1,4 +1,4 @@
-import React, { type FC, useMemo, useRef, useState } from 'react';
+import { type FC, useMemo, useRef, useState } from 'react';
 
 import useContainerWidth from '@kubevirt-utils/hooks/useContainerWidth';
 import useKubevirtDataViewFilters from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/useKubevirtDataViewFilters';

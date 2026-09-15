@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 
 import TemplateValue from '@kubevirt-utils/components/TemplateValue/TemplateValue';
 import { List, ListComponent, ListItem, OrderType } from '@patternfly/react-core';

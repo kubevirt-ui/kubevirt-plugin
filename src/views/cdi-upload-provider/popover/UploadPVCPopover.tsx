@@ -1,4 +1,4 @@
-import React, { type FC, useContext, useEffect, useState } from 'react';
+import { type FC, useContext, useEffect, useState } from 'react';
 
 import { type V1beta1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { cancelUploadPVC } from '@kubevirt-utils/hooks/useCDIUpload/utils';

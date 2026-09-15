@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 
 import ExpandableProjectList from '@kubevirt-utils/components/ExpandableProjectList/ExpandableProjectList';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';

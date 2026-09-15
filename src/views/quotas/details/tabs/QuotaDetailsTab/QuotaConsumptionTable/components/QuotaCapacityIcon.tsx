@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 
 import { YellowExclamationTriangleIcon } from '@openshift-console/dynamic-plugin-sdk';
 import {

@@ -1,4 +1,4 @@
-import React, { type FC, useState } from 'react';
+import { type FC, useState } from 'react';
 import useMigrationCardDataAndFilters from 'src/views/migrations/components/MigrationsTable/hooks/useMigrationCardData';
 
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';

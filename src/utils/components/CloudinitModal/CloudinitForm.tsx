@@ -1,4 +1,4 @@
-import React, { type FC, Fragment, Suspense, useState } from 'react';
+import { type FC, Fragment, Suspense, useState } from 'react';
 import { Trans } from 'react-i18next';
 import RandExp from 'randexp';
 

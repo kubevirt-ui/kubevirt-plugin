@@ -1,10 +1,4 @@
-import React, {
-  type Dispatch,
-  type FC,
-  type ReactElement,
-  type SetStateAction,
-  useEffect,
-} from 'react';
+import { type Dispatch, type FC, type ReactElement, type SetStateAction, useEffect } from 'react';
 
 import { type IoK8sApiCoreV1Node } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import NodeCheckerAlert from '@kubevirt-utils/components/NodeSelectorModal/components/NodeCheckerAlert';

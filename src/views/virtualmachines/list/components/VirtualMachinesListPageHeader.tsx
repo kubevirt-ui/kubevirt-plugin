@@ -1,11 +1,11 @@
-import React, { type FC } from 'react';
+import { type FC, type ReactNode } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ListPageHeader } from '@openshift-console/dynamic-plugin-sdk';
 import { type ListPageHeaderProps } from '@openshift-console/dynamic-plugin-sdk/lib/extensions/console-types';
 
 type VirtualMachinesListPageHeaderProps = {
-  children?: React.ReactNode;
+  children?: ReactNode;
 } & Omit<ListPageHeaderProps, 'title'>;
 
 const VirtualMachinesListPageHeader: FC<VirtualMachinesListPageHeaderProps> = ({

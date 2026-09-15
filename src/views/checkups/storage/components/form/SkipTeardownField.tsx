@@ -1,4 +1,4 @@
-import React, { type JSX, useMemo } from 'react';
+import { type JSX, useMemo } from 'react';
 import { Trans } from 'react-i18next';
 
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';

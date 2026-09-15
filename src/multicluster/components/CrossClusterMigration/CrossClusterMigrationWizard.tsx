@@ -1,6 +1,5 @@
 /* Copyright Contributors to the Open Cluster Management project */
 import type { FC } from 'react';
-import React from 'react';
 import { useNavigate } from 'react-router';
 import { useImmer } from 'use-immer';
 

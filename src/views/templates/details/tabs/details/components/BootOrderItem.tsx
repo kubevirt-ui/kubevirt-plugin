@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 import { Trans } from 'react-i18next';
 import { Link } from 'react-router';
 import BootOrder from 'src/views/virtualmachinesinstance/details/tabs/details/components/Details/BootOrder/BootOrder';

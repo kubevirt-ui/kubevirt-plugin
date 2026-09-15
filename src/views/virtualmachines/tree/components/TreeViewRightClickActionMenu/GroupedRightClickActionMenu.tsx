@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 
 import ActionDropdownItem from '@kubevirt-utils/components/ActionDropdownItem/ActionDropdownItem';
 import type { ActionDropdownItemType } from '@kubevirt-utils/components/ActionsDropdown/constants';

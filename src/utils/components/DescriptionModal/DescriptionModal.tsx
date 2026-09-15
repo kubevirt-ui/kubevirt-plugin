@@ -1,4 +1,4 @@
-import React, { type FC, memo, useEffect, useState } from 'react';
+import { type FC, memo, useEffect, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { type K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk-internal/lib/extensions/console-types';

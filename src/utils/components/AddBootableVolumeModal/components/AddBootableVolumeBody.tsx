@@ -1,10 +1,4 @@
-import React, {
-  type Dispatch,
-  type FC,
-  type ReactElement,
-  type SetStateAction,
-  useCallback,
-} from 'react';
+import { type Dispatch, type FC, type ReactElement, type SetStateAction, useCallback } from 'react';
 
 import {
   DROPDOWN_FORM_SELECTION,

@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 import { getQuotaModel } from 'src/views/quotas/utils/utils';
 
 import DescriptionItemCreatedAt from '@kubevirt-utils/components/DescriptionItem/components/DescriptionItemCreatedAt';

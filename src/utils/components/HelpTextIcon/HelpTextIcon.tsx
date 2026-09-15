@@ -1,5 +1,4 @@
 import type { FC, MouseEventHandler, ReactNode } from 'react';
-import React from 'react';
 
 import { logHelpItemOpened } from '@kubevirt-utils/extensions/telemetry/learning';
 import { TELEMETRY_HELP_ITEM_ID } from '@kubevirt-utils/extensions/telemetry/utils/property-constants';

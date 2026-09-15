@@ -1,4 +1,4 @@
-import React, { type FC, type ReactNode, useEffect } from 'react';
+import { type FC, type ReactNode, useEffect } from 'react';
 import { FormProvider, useForm, useFormContext, type UseFormReturn } from 'react-hook-form';
 
 import Loading from '@kubevirt-utils/components/Loading/Loading';

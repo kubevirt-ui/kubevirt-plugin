@@ -1,4 +1,4 @@
-import React, { type FC, type MouseEvent, type Ref, useCallback, useState } from 'react';
+import { type FC, type MouseEvent, type Ref, useCallback, useState } from 'react';
 import { useNavigate } from 'react-router';
 
 import { TemplateModel } from '@kubevirt-ui-ext/kubevirt-api/console';

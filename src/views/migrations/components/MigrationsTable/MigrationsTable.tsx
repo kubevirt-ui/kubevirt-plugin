@@ -1,4 +1,4 @@
-import React, { type FC, useMemo } from 'react';
+import { type FC, useMemo } from 'react';
 import { type UseMigrationCardDataAndFiltersValues } from 'src/views/migrations/components/MigrationsTable/hooks/useMigrationCardData';
 
 import { NodeModel } from '@kubevirt-ui-ext/kubevirt-api/console';

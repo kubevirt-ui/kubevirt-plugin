@@ -1,5 +1,4 @@
 /* eslint-disable @eslint-react/no-unnecessary-use-prefix */
-import React from 'react';
 
 import { type DetailsTabSectionExtensionHook } from '@openshift-console/dynamic-plugin-sdk';
 import { type GraphElement } from '@patternfly/react-topology';

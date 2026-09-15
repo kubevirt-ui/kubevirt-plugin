@@ -1,4 +1,12 @@
-import React, { type FC, useCallback, useMemo, useRef, useState } from 'react';
+import {
+  type FC,
+  type FormEvent,
+  type MouseEvent,
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 import { useClickOutside } from '@kubevirt-utils/hooks/useClickOutside/useClickOutside';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -40,7 +48,7 @@ const LabelKeyInput: FC<LabelKeyInputProps> = ({ existingKeys, onChange, value }
   );
 
   const onInputChange = useCallback(
-    (_event: React.FormEvent<HTMLInputElement>, newValue: string) => {
+    (_event: FormEvent<HTMLInputElement>, newValue: string) => {
       onChange(newValue);
       setIsOpen(true);
     },
@@ -56,7 +64,7 @@ const LabelKeyInput: FC<LabelKeyInputProps> = ({ existingKeys, onChange, value }
   }, []);
 
   const onSuggestionSelect = useCallback(
-    (_event: React.MouseEvent, itemId: string | number) => {
+    (_event: MouseEvent, itemId: string | number) => {
       const key = String(itemId);
       onChange(key);
       setIsOpen(false);

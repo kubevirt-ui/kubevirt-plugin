@@ -1,4 +1,4 @@
-import React, { type FC, type RefObject } from 'react';
+import { type FC, type RefObject } from 'react';
 import { Trans } from 'react-i18next';
 
 import { type KubevirtFilterState } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';

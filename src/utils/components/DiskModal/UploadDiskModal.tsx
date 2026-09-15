@@ -1,4 +1,4 @@
-import React, { type FC, type ReactElement } from 'react';
+import { type FC, type ReactElement } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
 import { isUploadCanceledError } from '@kubevirt-utils/hooks/useCDIUpload/errors';

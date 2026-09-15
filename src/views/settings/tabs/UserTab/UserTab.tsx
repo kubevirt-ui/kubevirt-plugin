@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 
 import { Divider } from '@patternfly/react-core';
 import { useIsSettingsSpokeCluster } from '@settings/context/SettingsClusterContext';

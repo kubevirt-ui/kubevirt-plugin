@@ -1,7 +1,7 @@
 // Extracted from EditBootableVolumesModal.tsx
 // Root: src/views/bootablevolumes/actions/components/EditBootableVolumesModal.tsx
 
-import React, { type FC, type ReactNode } from 'react';
+import { type FC, type ReactNode } from 'react';
 
 import { VirtualMachineClusterPreferenceModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import PreferencePopoverContent from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/PreferenceSelect/PreferencePopoverContent';

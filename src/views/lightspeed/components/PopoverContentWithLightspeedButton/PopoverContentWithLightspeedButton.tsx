@@ -1,5 +1,4 @@
 import type { FC, ReactNode } from 'react';
-import React from 'react';
 
 import LightspeedPopoverContentFooter from '@lightspeed/components/LightspeedPopoverContentFooter';
 import type { OLSPromptType } from '@lightspeed/utils/prompts';

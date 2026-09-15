@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 
 import DiskSourcePVCSelectName from './DiskSourcePVCSelectName';
 import DiskSourcePVCSelectNamespace from './DiskSourcePVCSelectNamespace';

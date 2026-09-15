@@ -1,4 +1,4 @@
-import React, { type CSSProperties, type FC, type ReactNode, useMemo } from 'react';
+import { type CSSProperties, type FC, type ReactNode, useMemo } from 'react';
 
 import useIsSmallScreen from '@kubevirt-utils/hooks/useIsSmallScreen';
 import useLocalStorage from '@kubevirt-utils/hooks/useLocalStorage';

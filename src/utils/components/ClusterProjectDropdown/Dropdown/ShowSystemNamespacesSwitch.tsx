@@ -1,4 +1,4 @@
-import React, { type FC, type JSX } from 'react';
+import { type FC, type JSX } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { MenuSearch, Switch } from '@patternfly/react-core';

@@ -1,5 +1,4 @@
 import type { FC, ReactNode } from 'react';
-import React from 'react';
 
 import { PageBreadcrumb, PageGroup, PageSection } from '@patternfly/react-core';
 

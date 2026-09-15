@@ -1,4 +1,4 @@
-import React, { type FC, type ReactNode, useCallback, useMemo } from 'react';
+import { type FC, type ReactNode, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router';
 
 import AutoAppliedBadge from '@kubevirt-utils/components/badges/AutoAppliedBadge/AutoAppliedBadge';

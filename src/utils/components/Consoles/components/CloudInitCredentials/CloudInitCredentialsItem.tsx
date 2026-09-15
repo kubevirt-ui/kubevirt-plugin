@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 import useHideCredentials from '@kubevirt-utils/hooks/useHideCredentials/useHideCredentials';
 import { Button, Flex, FlexItem, Tooltip } from '@patternfly/react-core';

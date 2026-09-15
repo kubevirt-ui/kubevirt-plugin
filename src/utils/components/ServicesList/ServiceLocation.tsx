@@ -1,4 +1,4 @@
-import React from 'react';
+import { type ReactNode } from 'react';
 
 import { type IoK8sApiCoreV1Service } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -7,7 +7,7 @@ type ServiceLocationProps = {
   service: IoK8sApiCoreV1Service;
 };
 
-const ServiceLocation = ({ service }: ServiceLocationProps): React.ReactNode => {
+const ServiceLocation = ({ service }: ServiceLocationProps): ReactNode => {
   const { t } = useKubevirtTranslation();
 
   if (!service) {

@@ -1,4 +1,4 @@
-import React, { type FC } from 'react';
+import { type FC } from 'react';
 
 import { SKELETON_TILE_COUNT } from './constants';
 

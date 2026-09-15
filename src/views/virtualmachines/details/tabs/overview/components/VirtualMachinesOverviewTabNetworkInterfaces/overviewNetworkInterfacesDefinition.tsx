@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 import type { TFunction } from 'i18next';
 import FirstItemListPopover from 'src/views/virtualmachines/list/components/FirstItemListPopover/FirstItemListPopover';
 

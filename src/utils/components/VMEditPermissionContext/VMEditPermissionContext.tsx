@@ -1,5 +1,5 @@
 import type { FC, ReactNode } from 'react';
-import React, { createContext } from 'react';
+import { createContext } from 'react';
 
 export const VMEditPermissionContext = createContext<boolean>(true);
 

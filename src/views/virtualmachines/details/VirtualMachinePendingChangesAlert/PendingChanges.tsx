@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 
 import PendingChangesBreadcrumb from '@kubevirt-utils/components/PendingChanges/PendingChangesBreadcrumb/PendingChangesBreadcrumb';
 import type { PendingChange } from '@kubevirt-utils/components/PendingChanges/utils/types';

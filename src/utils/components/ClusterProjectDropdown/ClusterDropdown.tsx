@@ -1,4 +1,4 @@
-import React, { type FC, type ReactElement, useMemo } from 'react';
+import { type FC, type ReactElement, useMemo } from 'react';
 
 import Dropdown, {
   type DropdownConfig,

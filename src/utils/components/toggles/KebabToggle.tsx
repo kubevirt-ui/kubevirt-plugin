@@ -1,4 +1,4 @@
-import React, { type ReactElement, type Ref } from 'react';
+import { type ReactElement, type Ref } from 'react';
 
 import { MenuToggle, type MenuToggleElement, type MenuToggleProps } from '@patternfly/react-core';
 import { EllipsisVIcon } from '@patternfly/react-icons';

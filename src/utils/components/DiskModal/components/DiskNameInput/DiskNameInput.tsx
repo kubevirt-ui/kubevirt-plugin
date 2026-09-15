@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/refs, @typescript-eslint/no-unsafe-assignment -- react-hook-form register() API requires ref access during render */
-import React, { type FC } from 'react';
+import { type FC } from 'react';
 import { useFormContext } from 'react-hook-form';
 import debounce from 'lodash/debounce';
 

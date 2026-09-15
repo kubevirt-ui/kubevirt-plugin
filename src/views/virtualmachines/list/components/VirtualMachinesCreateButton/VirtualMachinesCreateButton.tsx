@@ -1,4 +1,4 @@
-import React, { type FC, type MouseEvent, type Ref, useCallback, useMemo, useState } from 'react';
+import { type FC, type MouseEvent, type Ref, useCallback, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
 
 import HidableTooltip from '@kubevirt-utils/components/HidableTooltip/HidableTooltip';

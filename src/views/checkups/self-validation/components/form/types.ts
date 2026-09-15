@@ -1,3 +1,5 @@
+import { type Dispatch, type SetStateAction } from 'react';
+
 import { type IoK8sApiStorageV1StorageClass } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { type ClaimPropertySets } from '@kubevirt-utils/types/storage';
 import { type SelectProps } from '@patternfly/react-core';
@@ -76,11 +78,11 @@ export type CheckupFormState = {
   pipelinesLoaded: boolean;
   pvcSize: string;
   selectedTestSuites: string[];
-  setIsDryRun: React.Dispatch<React.SetStateAction<boolean>>;
-  setName: React.Dispatch<React.SetStateAction<string>>;
-  setPvcSize: React.Dispatch<React.SetStateAction<string>>;
-  setStorageClass: React.Dispatch<React.SetStateAction<string>>;
-  setTestSkips: React.Dispatch<React.SetStateAction<string>>;
+  setIsDryRun: Dispatch<SetStateAction<boolean>>;
+  setName: Dispatch<SetStateAction<string>>;
+  setPvcSize: Dispatch<SetStateAction<string>>;
+  setStorageClass: Dispatch<SetStateAction<string>>;
+  setTestSkips: Dispatch<SetStateAction<string>>;
   storageCapabilities: string[];
   storageClasses: IoK8sApiStorageV1StorageClass[];
   storageClassesLoaded: boolean;

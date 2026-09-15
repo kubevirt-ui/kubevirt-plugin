@@ -1,4 +1,4 @@
-import React, { type FC } from 'react';
+import { type FC } from 'react';
 
 import { type ColoredIconProps } from '@openshift-console/dynamic-plugin-sdk';
 import { UnknownIcon } from '@patternfly/react-icons';

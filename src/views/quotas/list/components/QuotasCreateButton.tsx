@@ -1,4 +1,4 @@
-import React, { type FC, useCallback } from 'react';
+import { type FC, useCallback } from 'react';
 import { useNavigate } from 'react-router';
 
 import NoPermissionButton from '@kubevirt-utils/components/NoPermissionButton/NoPermissionButton';

@@ -1,5 +1,4 @@
 import type { ReactNode } from 'react';
-import React from 'react';
 import type { TFunction } from 'i18next';
 
 import type { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';

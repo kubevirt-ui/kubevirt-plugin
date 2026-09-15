@@ -1,4 +1,4 @@
-import React, { type FC, useMemo } from 'react';
+import { type FC, useMemo } from 'react';
 
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import Timestamp from '@kubevirt-utils/components/Timestamp/Timestamp';

@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import { type ReactNode, useMemo } from 'react';
 
 import {
   VirtualMachineInstanceModel,
@@ -27,7 +27,7 @@ type UseVirtualMachineInstanceActionsProvider = (
 
 const renderLabelsModal =
   (vmi: V1VirtualMachineInstance) =>
-  ({ isOpen, onClose }: ModalProps): React.ReactNode => (
+  ({ isOpen, onClose }: ModalProps): ReactNode => (
     <LabelsModal
       isOpen={isOpen}
       obj={vmi}
@@ -44,7 +44,7 @@ const renderLabelsModal =
 
 const renderAnnotationsModal =
   (vmi: V1VirtualMachineInstance) =>
-  ({ isOpen, onClose }: ModalProps): React.ReactNode => (
+  ({ isOpen, onClose }: ModalProps): ReactNode => (
     <AnnotationsModal
       isOpen={isOpen}
       obj={vmi}
@@ -61,7 +61,7 @@ const renderAnnotationsModal =
 
 const renderDeleteModal =
   (vmi: V1VirtualMachineInstance, t: (key: string) => string) =>
-  ({ isOpen, onClose }: ModalProps): React.ReactNode => (
+  ({ isOpen, onClose }: ModalProps): ReactNode => (
     <DeleteModal
       headerText={t('Delete VirtualMachineInstance?')}
       isOpen={isOpen}

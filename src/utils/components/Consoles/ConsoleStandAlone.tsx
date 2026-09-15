@@ -1,4 +1,4 @@
-import React, { type FC } from 'react';
+import { type FC } from 'react';
 import { useParams } from 'react-router';
 
 import { type V1VirtualMachine } from '@forklift-ui/types';

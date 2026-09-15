@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { isSystemNamespace } from '@kubevirt-utils/resources/namespace/helper';
 import { type TreeViewDataItem } from '@patternfly/react-core';

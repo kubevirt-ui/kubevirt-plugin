@@ -1,4 +1,4 @@
-import React, { type FC, memo, type ReactElement, type ReactNode, useRef, useState } from 'react';
+import { type FC, memo, type ReactElement, type ReactNode, useRef, useState } from 'react';
 import classNames from 'classnames';
 
 import DropdownToggle from '@kubevirt-utils/components/toggles/DropdownToggle';

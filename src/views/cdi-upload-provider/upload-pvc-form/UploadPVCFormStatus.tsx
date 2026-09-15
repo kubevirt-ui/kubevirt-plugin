@@ -1,4 +1,4 @@
-import React, { type FC, useEffect, useState } from 'react';
+import { type FC, useEffect, useState } from 'react';
 
 import { cancelUploadPVC } from '@kubevirt-utils/hooks/useCDIUpload/utils';
 import { Bullseye } from '@patternfly/react-core';

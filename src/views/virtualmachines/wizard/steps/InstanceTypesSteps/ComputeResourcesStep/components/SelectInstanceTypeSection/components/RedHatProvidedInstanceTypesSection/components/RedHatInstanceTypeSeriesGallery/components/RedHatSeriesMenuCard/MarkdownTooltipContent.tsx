@@ -1,4 +1,4 @@
-import React, { type FC } from 'react';
+import { type FC } from 'react';
 
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Stack } from '@patternfly/react-core';

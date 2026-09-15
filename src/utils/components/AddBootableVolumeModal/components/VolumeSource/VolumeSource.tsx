@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 
 import HTTPSource from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeSource/components/HTTPSource';
 import type { DataUpload } from '@kubevirt-utils/hooks/useCDIUpload/types';

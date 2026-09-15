@@ -6,7 +6,7 @@
     "baseUrl": ".",
     "esModuleInterop": true,
     "experimentalDecorators": true,
-    "jsx": "react",
+    "jsx": "react-jsx",
     "lib": ["es2021", "dom"],
     "module": "esnext",
     "moduleResolution": "bundler",

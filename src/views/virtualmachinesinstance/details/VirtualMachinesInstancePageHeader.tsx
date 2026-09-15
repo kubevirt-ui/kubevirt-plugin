@@ -1,4 +1,4 @@
-import React, { createElement, type FC } from 'react';
+import { createElement, type FC } from 'react';
 
 import { type V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import DetailsPageTitle from '@kubevirt-utils/components/DetailsPageTitle/DetailsPageTitle';

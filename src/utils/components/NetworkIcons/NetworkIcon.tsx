@@ -1,4 +1,4 @@
-import React, { type FC } from 'react';
+import { createElement, type FC } from 'react';
 
 import { type NetworkInterfaceState } from '@kubevirt-utils/resources/vm/utils/network/types';
 
@@ -10,7 +10,7 @@ export type NetworkIconProps = {
 };
 
 const NetworkIcon: FC<NetworkIconProps> = ({ configuredState, runtimeState }) =>
-  React.createElement(getNetworkInterfaceStateIcon(runtimeState ?? configuredState), {
+  createElement(getNetworkInterfaceStateIcon(runtimeState ?? configuredState), {
     configuredState,
     runtimeState,
   });

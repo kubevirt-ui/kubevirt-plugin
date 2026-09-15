@@ -1,4 +1,4 @@
-import React, { type ComponentType } from 'react';
+import { type ComponentType } from 'react';
 
 import { PlanModel } from '@forklift-ui/types';
 import { type ACMVirtualMachineAction } from '@kubevirt-extensions/acm.virtualmachine';

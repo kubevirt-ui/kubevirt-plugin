@@ -1,4 +1,4 @@
-import React, { type FC, type FormEvent, useEffect } from 'react';
+import { type FC, type FormEvent, useEffect } from 'react';
 import { Trans } from 'react-i18next';
 import * as ipaddr from 'ipaddr.js';
 

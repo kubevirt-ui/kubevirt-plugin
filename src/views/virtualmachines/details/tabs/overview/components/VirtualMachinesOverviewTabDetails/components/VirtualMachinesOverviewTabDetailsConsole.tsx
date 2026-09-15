@@ -1,4 +1,4 @@
-import React, { type FC, memo, useState } from 'react';
+import { type FC, memo, useState } from 'react';
 
 import {
   ConsoleState,

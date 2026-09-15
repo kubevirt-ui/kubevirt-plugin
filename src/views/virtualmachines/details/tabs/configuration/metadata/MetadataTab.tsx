@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';
 import { PATHS_TO_HIGHLIGHT } from '@kubevirt-utils/resources/vm/utils/constants';

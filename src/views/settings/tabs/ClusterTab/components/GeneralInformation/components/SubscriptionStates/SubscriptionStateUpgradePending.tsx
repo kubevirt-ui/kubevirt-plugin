@@ -1,4 +1,4 @@
-import React, { type FC } from 'react';
+import { type FC } from 'react';
 
 import BlueArrowCircleUpIcon from '@kubevirt-utils/components/HealthState/BlueArrowCircleUpIcon';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';

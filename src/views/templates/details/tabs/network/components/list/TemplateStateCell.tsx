@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 
 import NetworkIcon from '@kubevirt-utils/components/NetworkIcons/NetworkIcon';
 import type { Template } from '@kubevirt-utils/resources/template';

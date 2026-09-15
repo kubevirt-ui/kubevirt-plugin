@@ -1,5 +1,5 @@
 /* eslint-disable */
-import React, { ReactElement, ReactNode, useEffect, useMemo } from 'react';
+import { ReactElement, ReactNode, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router';
 
 import { PF_TABLE_CHECK_CLASS } from '@kubevirt-utils/hooks/useDataViewTableSort/constants';

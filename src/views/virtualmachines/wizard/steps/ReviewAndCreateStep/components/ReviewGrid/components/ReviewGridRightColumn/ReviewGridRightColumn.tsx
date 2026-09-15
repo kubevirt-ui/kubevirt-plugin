@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 
 import DisksReviewTable from '@kubevirt-utils/components/DisksReviewTable/DisksReviewTable';
 import NetworksReviewTable from '@kubevirt-utils/components/NetworksReviewTable/NetworksReviewTable';

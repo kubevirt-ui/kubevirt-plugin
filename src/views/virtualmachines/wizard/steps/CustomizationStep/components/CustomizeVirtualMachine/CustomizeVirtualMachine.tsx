@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 
 import { Stack, StackItem } from '@patternfly/react-core';
 import { useSignals } from '@preact/signals-react/runtime';

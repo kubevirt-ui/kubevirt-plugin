@@ -1,4 +1,4 @@
-import React, { type FC } from 'react';
+import { type FC } from 'react';
 import { getVirtualMachineTemplatesCPUMemoryText } from 'src/views/templates/utils/utils';
 
 import CPUDescription from '@kubevirt-utils/components/CPUDescription/CPUDescription';

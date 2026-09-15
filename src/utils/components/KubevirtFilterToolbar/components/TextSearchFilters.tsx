@@ -1,4 +1,4 @@
-import React, { type Dispatch, type FC, type SetStateAction, useMemo, useState } from 'react';
+import { type Dispatch, type FC, type SetStateAction, useMemo, useState } from 'react';
 
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import { useDebounceCallback } from '@kubevirt-utils/hooks/useDebounceCallback';

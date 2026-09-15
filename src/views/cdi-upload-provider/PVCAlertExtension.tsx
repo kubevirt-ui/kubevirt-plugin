@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import React, { useContext } from 'react';
+import { useContext } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import type { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
