@@ -1,5 +1,4 @@
 import type { ComponentClass, FC } from 'react';
-import React from 'react';
 
 import { Button, ButtonVariant } from '@patternfly/react-core';
 import { getVMStatusIcon } from '@virtualmachines/utils';

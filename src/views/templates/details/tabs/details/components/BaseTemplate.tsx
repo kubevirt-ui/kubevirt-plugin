@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 import { getVMTemplateBaseName } from 'src/views/templates/utils/selectors';
 
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';

@@ -1,6 +1,6 @@
 /* Copyright Contributors to the Open Cluster Management project */
 import type { FC } from 'react';
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 
 import type { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { Modal, ModalBody } from '@patternfly/react-core';

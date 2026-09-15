@@ -1,4 +1,4 @@
-import React, { type ComponentClass, type FC, type ReactElement, type ReactNode } from 'react';
+import { type ComponentClass, type FC, type ReactElement, type ReactNode } from 'react';
 
 import { Divider, DrilldownMenu, MenuItem } from '@patternfly/react-core';
 

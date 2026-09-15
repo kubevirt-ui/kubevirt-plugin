@@ -1,4 +1,4 @@
-import React, { type FC, type JSX, type ReactNode, useState } from 'react';
+import { type FC, type JSX, type ReactNode, useState } from 'react';
 
 import { Select, SelectList, type SelectProps } from '@patternfly/react-core';
 

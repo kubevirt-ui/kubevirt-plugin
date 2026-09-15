@@ -1,4 +1,4 @@
-import React, { type FC, type JSX } from 'react';
+import { type FC, type JSX } from 'react';
 
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';

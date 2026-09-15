@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 import { Link } from 'react-router';
 import { getMigrationPolicyURL } from 'src/views/migrationpolicies/utils/utils';
 

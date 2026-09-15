@@ -1,4 +1,4 @@
-import React, { type FC, type ReactNode, useMemo, useState } from 'react';
+import { type FC, type ReactNode, useMemo, useState } from 'react';
 
 import { EMPTY_FILTERS } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/constants';
 import {

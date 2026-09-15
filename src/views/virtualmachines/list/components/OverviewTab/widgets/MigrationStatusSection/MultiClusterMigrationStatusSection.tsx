@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 
 import { PlanModel } from '@forklift-ui/types';
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';

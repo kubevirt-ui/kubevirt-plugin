@@ -1,4 +1,4 @@
-import React, { type FC, type ReactElement, useCallback, useEffect, useState } from 'react';
+import { type FC, type ReactElement, useCallback, useEffect, useState } from 'react';
 
 import AlertsCardAccordionItem from '@kubevirt-utils/components/AlertsCard/AlertsCardAccordionItem';
 import {

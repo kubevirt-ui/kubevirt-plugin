@@ -1,4 +1,4 @@
-import React, { type FC } from 'react';
+import { type FC } from 'react';
 import useCanCreateVMNetwork from 'src/views/vmnetworks/hooks/useCanCreateVMNetwork';
 
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';

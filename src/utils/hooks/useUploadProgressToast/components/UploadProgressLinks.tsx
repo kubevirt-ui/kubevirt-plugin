@@ -1,4 +1,4 @@
-import React, { type FC } from 'react';
+import { type FC } from 'react';
 
 import { Button, ButtonVariant } from '@patternfly/react-core';
 

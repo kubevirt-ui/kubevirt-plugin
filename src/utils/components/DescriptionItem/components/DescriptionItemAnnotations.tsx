@@ -1,4 +1,4 @@
-import React, { type FC, type ReactElement, type ReactNode } from 'react';
+import { type FC, type ReactElement, type ReactNode } from 'react';
 
 import { AnnotationsModal } from '@kubevirt-utils/components/AnnotationsModal/AnnotationsModal';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';

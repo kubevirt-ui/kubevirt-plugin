@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 import AffinityRules from 'src/views/templates/details/tabs/scheduling/components/AffinityRules';
 import Descheduler from 'src/views/templates/details/tabs/scheduling/components/Descheduler';
 import NodeSelector from 'src/views/templates/details/tabs/scheduling/components/NodeSelector';

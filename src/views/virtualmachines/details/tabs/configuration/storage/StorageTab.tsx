@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 
 import EnvironmentForm from '@kubevirt-utils/components/EnvironmentEditor/EnvironmentForm';
 import SidebarEditor from '@kubevirt-utils/components/SidebarEditor/SidebarEditor';

@@ -1,4 +1,4 @@
-import React, { type FC } from 'react';
+import { type FC } from 'react';
 
 import useResponsiveCharts from '@kubevirt-utils/components/Charts/hooks/useResponsiveCharts';
 import getYAxisTicks from '@kubevirt-utils/components/Charts/MetricChartUtils/hooks/getYAxisTicks';

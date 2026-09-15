@@ -1,4 +1,4 @@
-import React, { type ComponentType, type FC, useState } from 'react';
+import { type ComponentType, type FC, useState } from 'react';
 import isEqual from 'lodash/isEqual';
 
 import {

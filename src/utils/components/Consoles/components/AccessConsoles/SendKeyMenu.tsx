@@ -1,4 +1,4 @@
-import React, { type FC, type RefObject } from 'react';
+import { type FC, type RefObject } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {

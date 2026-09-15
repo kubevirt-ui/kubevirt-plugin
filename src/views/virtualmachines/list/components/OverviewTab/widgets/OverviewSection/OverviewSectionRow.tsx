@@ -1,5 +1,4 @@
 import type { CSSProperties, FC, ReactNode } from 'react';
-import React from 'react';
 import classNames from 'classnames';
 
 import './OverviewSection.scss';

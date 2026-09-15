@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 
 import type { V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import { ConditionsTable } from '@kubevirt-utils/components/ConditionsTable/ConditionsTable';

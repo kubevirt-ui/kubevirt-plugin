@@ -1,4 +1,4 @@
-import React, { type FC } from 'react';
+import { type FC } from 'react';
 
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import SelectTypeahead from '@kubevirt-utils/components/SelectTypeahead/SelectTypeahead';

@@ -1,7 +1,7 @@
 // Extracted from QuotasList.tsx
 // Root: src/views/quotas/list/QuotasList.tsx
 
-import React, { type ComponentProps, type FC } from 'react';
+import { type ComponentProps, type FC } from 'react';
 
 import KubevirtFilterToolbar from '@kubevirt-utils/components/KubevirtFilterToolbar/KubevirtFilterToolbar';
 import { type ColumnLayout } from '@kubevirt-utils/components/KubevirtTable/types';

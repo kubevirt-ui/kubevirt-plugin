@@ -1,4 +1,4 @@
-import React, { type JSX, type Ref } from 'react';
+import { type JSX, type Ref } from 'react';
 
 import { MenuToggle, type MenuToggleElement } from '@patternfly/react-core';
 

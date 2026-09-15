@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 import openCulture from 'images/openCulture.svg';
 
 import useIsWindowsSupportedArchitecture from '@kubevirt-utils/hooks/useIsWindowsSupportedArchitecture';

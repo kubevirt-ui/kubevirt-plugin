@@ -1,4 +1,4 @@
-import React, { type FC, useCallback, useEffect, useState } from 'react';
+import { type FC, useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 
 import { DataSourceModel } from '@kubevirt-ui-ext/kubevirt-api/console';

@@ -1,4 +1,4 @@
-import React, { type FC, memo, useMemo } from 'react';
+import { type FC, memo, useMemo } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
 
 import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-ui-ext/kubevirt-api/console';

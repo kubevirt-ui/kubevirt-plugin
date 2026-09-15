@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { tourGuideVM } from '@kubevirt-utils/components/GuidedTour/utils/constants';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';

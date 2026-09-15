@@ -1,4 +1,4 @@
-import React, { type ComponentType, type FC, type ReactElement } from 'react';
+import { type ComponentType, type FC, type ReactElement } from 'react';
 
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import useACMExtensionColumns from '@multicluster/hooks/useACMExtensionColumns/useACMExtensionColumns';

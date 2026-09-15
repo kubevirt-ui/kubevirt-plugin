@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 
 import type { SourceTypes } from '@kubevirt-utils/components/DiskModal/utils/types';
 import { SelectOption } from '@patternfly/react-core';

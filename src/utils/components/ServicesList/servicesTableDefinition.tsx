@@ -1,4 +1,4 @@
-import React, { type ReactNode } from 'react';
+import { type ReactNode } from 'react';
 import classNames from 'classnames';
 import { type TFunction } from 'i18next';
 

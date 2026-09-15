@@ -1,4 +1,4 @@
-import React, { type FC, type ReactElement } from 'react';
+import { type FC, type ReactElement } from 'react';
 
 import AlertStatusItem from '@kubevirt-utils/components/AlertsCard/AlertStatusItem';
 import { AlertType, type SimplifiedAlert } from '@kubevirt-utils/components/AlertsCard/utils/types';

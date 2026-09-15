@@ -1,4 +1,4 @@
-import React, { type FC } from 'react';
+import { type FC } from 'react';
 
 import { type Template } from '@kubevirt-utils/resources/template';
 import { DrawerPanelBody, DrawerPanelContent } from '@patternfly/react-core';

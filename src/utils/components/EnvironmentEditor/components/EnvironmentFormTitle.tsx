@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import React, { memo } from 'react';
+import { memo } from 'react';
 import { useLocation } from 'react-router';
 
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';

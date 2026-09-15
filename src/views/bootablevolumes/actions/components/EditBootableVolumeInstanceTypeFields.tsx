@@ -1,7 +1,7 @@
 // Extracted from EditBootableVolumesModal.tsx
 // Root: src/views/bootablevolumes/actions/components/EditBootableVolumesModal.tsx
 
-import React, { type FC, type ReactNode } from 'react';
+import { type FC, type ReactNode } from 'react';
 
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';

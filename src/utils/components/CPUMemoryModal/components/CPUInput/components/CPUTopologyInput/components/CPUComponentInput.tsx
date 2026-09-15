@@ -1,4 +1,4 @@
-import React, { type FC, type FormEvent, type ReactElement } from 'react';
+import { type FC, type FormEvent, type ReactElement } from 'react';
 
 import { type V1CPU } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getCPUComponentTitle } from '@kubevirt-utils/components/CPUMemoryModal/components/CPUInput/components/CPUTopologyInput/utils/utils';

@@ -1,4 +1,4 @@
-import React, { type FC, useRef } from 'react';
+import { type FC, useRef } from 'react';
 
 import AlertsCard from '@kubevirt-utils/components/AlertsCard/AlertsCard';
 import useContainerWidth from '@kubevirt-utils/hooks/useContainerWidth';

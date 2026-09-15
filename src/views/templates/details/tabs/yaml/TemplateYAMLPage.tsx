@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import React, { Suspense, useCallback, useState } from 'react';
+import { Suspense, useCallback, useState } from 'react';
 import { load } from 'js-yaml';
 
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';

@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 
 import type { IconComponentProps } from '@patternfly/react-core';
 import { Icon } from '@patternfly/react-core';

@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 import { useFormContext } from 'react-hook-form';
 
 import type { FormGroupProps } from '@patternfly/react-core';

@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import Timestamp from '@kubevirt-utils/components/Timestamp/Timestamp';

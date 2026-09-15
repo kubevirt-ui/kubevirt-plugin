@@ -1,4 +1,4 @@
-import React, { type FC } from 'react';
+import { type FC } from 'react';
 import { type FieldError, type UseFormRegister, type UseFormSetValue } from 'react-hook-form';
 
 import CapacityInput from '@kubevirt-utils/components/CapacityInput/CapacityInput';

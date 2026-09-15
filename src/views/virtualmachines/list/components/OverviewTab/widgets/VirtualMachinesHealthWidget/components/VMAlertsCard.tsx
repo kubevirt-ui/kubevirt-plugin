@@ -1,4 +1,4 @@
-import React, { type FC, type PropsWithChildren, type ReactNode } from 'react';
+import { type FC, type PropsWithChildren, type ReactNode } from 'react';
 
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';

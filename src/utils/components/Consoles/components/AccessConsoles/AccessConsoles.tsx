@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-shadow */
-import React, { type FC, type MouseEvent, useRef, useState } from 'react';
+import { type FC, type MouseEvent, useRef, useState } from 'react';
 
 import { type KeyboardLayout } from '@kubevirt-ui-ext/vnc-keymaps';
 import SelectToggle from '@kubevirt-utils/components/toggles/SelectToggle';

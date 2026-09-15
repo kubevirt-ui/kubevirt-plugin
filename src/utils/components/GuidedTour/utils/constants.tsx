@@ -1,4 +1,3 @@
-import React from 'react';
 import type { Step } from 'react-joyride';
 import type { TFunction } from 'i18next';
 

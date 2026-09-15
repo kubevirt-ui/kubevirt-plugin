@@ -1,4 +1,4 @@
-import React, { type Dispatch, type FC, type SetStateAction, useCallback, useEffect } from 'react';
+import { type Dispatch, type FC, type SetStateAction, useCallback, useEffect } from 'react';
 
 import { getSCSelectOptions } from '@kubevirt-utils/components/DiskModal/components/StorageClassAndPreallocation/utils/helpers';
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';

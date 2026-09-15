@@ -1,4 +1,4 @@
-import React, { type FC, type ReactElement, useCallback } from 'react';
+import { type FC, type ReactElement, useCallback } from 'react';
 import produce from 'immer';
 
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';

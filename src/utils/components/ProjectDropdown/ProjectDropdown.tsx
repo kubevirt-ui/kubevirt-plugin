@@ -1,4 +1,4 @@
-import React, { type FC, type JSX, useCallback, useMemo } from 'react';
+import { type FC, type JSX, useCallback, useMemo } from 'react';
 
 import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import ShowSystemNamespacesSwitch from '@kubevirt-utils/components/ClusterProjectDropdown/Dropdown/ShowSystemNamespacesSwitch';

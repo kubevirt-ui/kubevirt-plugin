@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 
 type PlugCircleCheckIconProps = {
   className?: string;

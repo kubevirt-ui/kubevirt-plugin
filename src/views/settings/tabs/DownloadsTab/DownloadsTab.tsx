@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 
 import VirtIODriversSection from './components/VirtIODriversSection/VirtIODriversSection';
 

@@ -1,4 +1,4 @@
-import React, { type Dispatch, type FC, type SetStateAction, useState } from 'react';
+import { type Dispatch, type FC, type SetStateAction, useState } from 'react';
 
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import SecretSelectionRadioGroup from '@kubevirt-utils/components/SSHSecretModal/components/SecretSelectionRadioGroup';

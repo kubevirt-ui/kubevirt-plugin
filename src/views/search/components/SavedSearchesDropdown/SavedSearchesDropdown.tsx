@@ -1,4 +1,4 @@
-import React, { type FC, type JSX, useMemo, useState } from 'react';
+import { type FC, type JSX, useMemo, useState } from 'react';
 
 import {
   type KubevirtFilterState,

@@ -1,4 +1,4 @@
-import React, { type FC, type MouseEvent, useState } from 'react';
+import { type FC, type MouseEvent, useState } from 'react';
 
 import { type V1PermittedHostDevices } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import SelectToggle from '@kubevirt-utils/components/toggles/SelectToggle';

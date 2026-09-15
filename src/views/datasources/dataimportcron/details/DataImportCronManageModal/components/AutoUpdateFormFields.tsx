@@ -1,4 +1,4 @@
-import React, { type FC } from 'react';
+import { type FC } from 'react';
 import { type FieldErrors, type UseFormRegister, type UseFormSetValue } from 'react-hook-form';
 
 import { type V1beta1DataImportCron } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';

@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import React, { useCallback } from 'react';
+import { useCallback } from 'react';
 import { useNavigate } from 'react-router';
 
 import type { V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';

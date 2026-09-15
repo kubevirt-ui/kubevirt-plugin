@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 
 import PlugCircleMinusIcon from '@kubevirt-utils/components/NetworkIcons/PlugCircleMinusIcon';
 import { Tooltip, TooltipPosition } from '@patternfly/react-core';

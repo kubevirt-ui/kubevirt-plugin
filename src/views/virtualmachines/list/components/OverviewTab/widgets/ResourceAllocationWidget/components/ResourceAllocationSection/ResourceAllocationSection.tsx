@@ -1,4 +1,4 @@
-import React, { type FC, useMemo, useState } from 'react';
+import { type FC, useMemo, useState } from 'react';
 
 import { METRICS } from '@kubevirt-utils/components/Charts/MetricChartUtils/constants';
 import useMetricChartData from '@kubevirt-utils/components/Charts/MetricChartUtils/hooks/useMetricChartData';

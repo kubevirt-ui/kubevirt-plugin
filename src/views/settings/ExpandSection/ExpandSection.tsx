@@ -1,4 +1,4 @@
-import React, { type FC, type ReactNode, useEffect } from 'react';
+import { type FC, type ReactNode, useEffect } from 'react';
 import classNames from 'classnames';
 
 import { ExpandableSection } from '@patternfly/react-core';

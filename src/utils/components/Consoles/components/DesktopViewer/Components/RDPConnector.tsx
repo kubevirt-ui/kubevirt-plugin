@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 
 import ComponentReady from '@kubevirt-utils/components/Charts/ComponentReady/ComponentReady';
 

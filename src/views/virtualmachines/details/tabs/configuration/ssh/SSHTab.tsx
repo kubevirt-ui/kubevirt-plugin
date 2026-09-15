@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 
 import LinuxLabel from '@kubevirt-utils/components/Labels/LinuxLabel';
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';

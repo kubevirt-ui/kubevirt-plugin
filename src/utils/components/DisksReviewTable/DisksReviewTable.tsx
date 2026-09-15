@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import React, { memo } from 'react';
+import { memo } from 'react';
 
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';

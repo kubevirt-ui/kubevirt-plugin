@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
 import { isHotPluggableEnabled } from '@kubevirt-utils/components/DiskModal/utils/helpers';

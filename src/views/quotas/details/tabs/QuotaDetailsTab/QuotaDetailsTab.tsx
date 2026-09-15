@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 import StandardResourceQuotaAlert from 'src/views/quotas/components/StandardResourceQuotaAlert';
 
 import type { ApplicationAwareResourceQuota } from '@kubevirt-utils/resources/quotas/types';

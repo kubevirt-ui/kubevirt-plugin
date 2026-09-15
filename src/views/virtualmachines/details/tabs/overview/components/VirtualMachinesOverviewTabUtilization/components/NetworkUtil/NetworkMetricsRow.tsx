@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 import xbytes from 'xbytes';
 
 import { Grid, GridItem } from '@patternfly/react-core';

@@ -1,4 +1,4 @@
-import React, { type FC, useState } from 'react';
+import { type FC, useState } from 'react';
 
 import DurationOption from '@kubevirt-utils/components/DurationOption/DurationOption';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';

@@ -1,5 +1,4 @@
 import type { FC, ReactNode } from 'react';
-import React from 'react';
 
 import { Tooltip, TooltipPosition } from '@patternfly/react-core';
 

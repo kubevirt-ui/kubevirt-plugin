@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 
 import { UPLOAD_PROGRESS_STATUS } from '../constants';
 import type { UploadEntry } from '../types';

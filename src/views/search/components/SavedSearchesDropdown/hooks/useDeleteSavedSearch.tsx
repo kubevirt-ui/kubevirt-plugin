@@ -1,4 +1,3 @@
-import React from 'react';
 import { useCallback } from 'react';
 
 import DeleteModal from '@kubevirt-utils/components/DeleteModal/DeleteModal';

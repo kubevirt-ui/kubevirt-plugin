@@ -1,5 +1,4 @@
 import type { FC, ReactNode } from 'react';
-import React from 'react';
 
 import { Menu, MenuContent, Popper } from '@patternfly/react-core';
 

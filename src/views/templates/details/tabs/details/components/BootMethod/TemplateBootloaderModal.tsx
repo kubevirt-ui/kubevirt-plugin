@@ -1,4 +1,4 @@
-import React, { type FC, type MouseEvent, useMemo, useState } from 'react';
+import { type FC, type MouseEvent, useMemo, useState } from 'react';
 import produce from 'immer';
 
 import { BootModeTitles } from '@kubevirt-utils/components/FirmwareBootloaderModal/utils/constants';

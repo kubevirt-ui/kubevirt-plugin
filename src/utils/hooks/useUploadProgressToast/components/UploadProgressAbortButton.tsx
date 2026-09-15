@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 
 import { getCancelUploadLabel } from '@kubevirt-utils/hooks/useCDIUpload/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';

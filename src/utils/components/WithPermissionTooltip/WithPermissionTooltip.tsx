@@ -1,4 +1,4 @@
-import React, { type FC, type ReactElement, type ReactNode } from 'react';
+import { type FC, type ReactElement, type ReactNode } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getNoPermissionTooltipContent } from '@kubevirt-utils/utils/utils';

@@ -1,4 +1,4 @@
-import React, { type FC } from 'react';
+import { type FC } from 'react';
 import classNames from 'classnames';
 
 import { createIcon } from '@patternfly/react-icons/dist/esm/createIcon';

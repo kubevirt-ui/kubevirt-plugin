@@ -1,4 +1,4 @@
-import React, { type FC } from 'react';
+import { type FC } from 'react';
 
 import { type OnSetFilters } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { Button, Flex, FlexItem } from '@patternfly/react-core';

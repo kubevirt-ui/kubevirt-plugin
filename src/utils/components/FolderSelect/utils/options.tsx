@@ -1,4 +1,3 @@
-import React from 'react';
 import type { TFunction } from 'i18next';
 
 import { isEmpty } from '@kubevirt-utils/utils/utils';

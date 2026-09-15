@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { POD_NETWORK } from '@kubevirt-utils/resources/vm';
 import { interfaceTypesProxy } from '@kubevirt-utils/resources/vm/utils/network/constants';
 import { Label } from '@patternfly/react-core';

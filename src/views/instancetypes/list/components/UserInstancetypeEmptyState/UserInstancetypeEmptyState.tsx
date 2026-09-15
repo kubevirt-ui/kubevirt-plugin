@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import React from 'react';
 
 import ListEmptyState from '@kubevirt-utils/components/ListEmptyState/ListEmptyState';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';

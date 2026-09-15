@@ -1,4 +1,4 @@
-import React, { type FC, useEffect, useState } from 'react';
+import { type FC, useEffect, useState } from 'react';
 import { produce } from 'immer';
 
 import { type TemplateParameter } from '@kubevirt-ui-ext/kubevirt-api/console';
