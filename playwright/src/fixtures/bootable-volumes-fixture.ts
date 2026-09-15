@@ -12,6 +12,7 @@ import BootableVolumesPage from '@/page-objects/create-vm/bootable-volumes-page'
 import CreateVmPage from '@/page-objects/create-vm/create-vm-page';
 import VirtualMachineDetailPage from '@/page-objects/vm/virtual-machine-detail-page';
 import VirtualMachinesPage from '@/page-objects/vm/virtual-machines-page';
+import VmWizardNavigationPage from '@/page-objects/vm-wizard/vm-wizard-navigation-page';
 
 import { baseTest, expect } from './scenario-test-fixture';
 
@@ -21,6 +22,7 @@ interface BootableVolumesFixtures {
   createVmPage: CreateVmPage;
   vmDetailPage: VirtualMachineDetailPage;
   vmListPage: VirtualMachinesPage;
+  vmWizardNavigationPage: VmWizardNavigationPage;
 }
 
 const test = baseTest.extend<BootableVolumesFixtures>({
@@ -38,6 +40,9 @@ const test = baseTest.extend<BootableVolumesFixtures>({
   },
   vmListPage: async ({ page }, use) => {
     await use(new VirtualMachinesPage(page));
+  },
+  vmWizardNavigationPage: async ({ page }, use) => {
+    await use(new VmWizardNavigationPage(page));
   },
 });
 

@@ -1149,7 +1149,7 @@ export default class RequestContextClient extends BaseClient implements ProxyApi
   async waitForDataVolumeGone(
     name: string,
     namespace: string,
-    timeoutMs = DATA_VOLUME_DELETION_POLLING.TIMEOUT_MS,
+    timeoutMs: number = DATA_VOLUME_DELETION_POLLING.TIMEOUT_MS,
   ): Promise<boolean> {
     const start = Date.now();
     while (Date.now() - start < timeoutMs) {

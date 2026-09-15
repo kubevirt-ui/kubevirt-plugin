@@ -4,8 +4,8 @@
 
 - **Project Name:** KubeVirt UI — Playwright E2E Tests
 - **Feature Area:** Tier1 — Bootable volumes
-- **Latest version:** CNV 5.0.0
-- **Latest update:** 2026-08-17
+- **Latest version:** CNV 5.1.0
+- **Latest update:** 2026-09-03
 - **Document Status:** Approved
 
 ## 2. Introduction
@@ -13,14 +13,15 @@
 ### 2.1 Purpose
 
 Verify the bootable volume "Add volume" upload flow: uploading a local image file, the resulting
-progress toast, background upload behavior when the modal is closed, and the ability to abort an
-in-progress upload from the toast.
+progress toast, background upload behavior when the modal is closed, the ability to abort an
+in-progress upload from the toast, and upload isolation when the VM creation wizard is opened and
+closed.
 
 ### 2.2 Scope
 
 - **In-Scope:** Add volume form (local file upload), upload progress toast, modal close-while-uploading
   behavior, abort/cancel upload action, DataVolume success/deletion outcomes, bootable volumes list row
-  visibility after upload.
+  visibility after upload, upload isolation from the VM creation wizard.
 - **Out-of-Scope:** Warning shown when navigating away while an upload is in progress (CNV-89814).
 
 ## 3. Test Environment & Prerequisites
@@ -98,17 +99,36 @@ in-progress upload from the toast.
 
 ---
 
+### `004`: Closing the VM creation wizard does not cancel an unrelated bootable volume upload
+
+- **Objective:** Verify that closing the VM creation wizard only cancels uploads that were started
+  within the wizard, and does not affect a bootable volume upload started from the Bootable Volumes
+  page.
+- **Target version:** CNV 5.0.0
+- **Jira References:** CNV-96397
+- **Pre-conditions:** None
+- **Tags:** `@nonpriv`
+
+| Step | Action                                                        | Expected Result                                        |
+| :--- | :------------------------------------------------------------ | :----------------------------------------------------- |
+| 1    | Start a bootable volume upload from the Bootable Volumes page | Uploading toast for the image file is visible          |
+| 2    | Open the VM creation wizard via the Create dropdown           | Wizard is visible                                      |
+| 3    | Cancel the wizard                                             | Wizard closes                                          |
+| 4    | Check the upload toast state                                  | Toast shows `uploading` or `success` — not `cancelled` |
+| 5    | Abort the upload if still in progress (cleanup)               | Aborted toast is shown and DataVolume is removed       |
+
 ## 5. Requirements Traceability Matrix
 
-| Jira Ticket | Test Case ID | Coverage Type    | Status    |
-| ----------- | ------------ | ---------------- | --------- |
-| CNV-89946   | `001`        | Feature coverage | Automated |
-| CNV-89946   | `002`        | Feature coverage | Automated |
-| CNV-89946   | `003`        | Feature coverage | Automated |
-| CNV-89800   | `001`        | Feature coverage | Automated |
-| CNV-89800   | `002`        | Feature coverage | Automated |
-| CNV-89800   | `003`        | Feature coverage | Automated |
-| CNV-87382   | `001`        | Feature coverage | Automated |
+| Jira Ticket | Test Case ID | Coverage Type           | Status    |
+| ----------- | ------------ | ----------------------- | --------- |
+| CNV-89946   | `001`        | Feature coverage        | Automated |
+| CNV-89946   | `002`        | Feature coverage        | Automated |
+| CNV-89946   | `003`        | Feature coverage        | Automated |
+| CNV-89800   | `001`        | Feature coverage        | Automated |
+| CNV-89800   | `002`        | Feature coverage        | Automated |
+| CNV-89800   | `003`        | Feature coverage        | Automated |
+| CNV-87382   | `001`        | Feature coverage        | Automated |
+| CNV-96397   | `004`        | Bugfix regression guard | Automated |
 
 **Coverage Type values:**
 

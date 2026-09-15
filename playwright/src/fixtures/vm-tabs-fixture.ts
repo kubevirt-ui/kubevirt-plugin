@@ -16,6 +16,7 @@ import PageCommons from '@/page-objects/page-commons';
 import VirtualMachineDetailPage from '@/page-objects/vm/virtual-machine-detail-page';
 import VirtualMachineSnapshotDetailPage from '@/page-objects/vm/virtual-machine-snapshot-detail-page';
 import VirtualMachinesPage from '@/page-objects/vm/virtual-machines-page';
+import VmWizardNavigationPage from '@/page-objects/vm-wizard/vm-wizard-navigation-page';
 
 import { baseTest, expect } from './scenario-test-fixture';
 
@@ -29,6 +30,7 @@ interface VmTabsFixtures {
   createVmPage: CreateVmPage;
   createVmCreatePage: CreateVmCreatePage;
   createVmTemplatesPage: CreateVmTemplatesPage;
+  vmWizardNavigationPage: VmWizardNavigationPage;
 }
 
 const test = baseTest.extend<VmTabsFixtures>({
@@ -58,6 +60,9 @@ const test = baseTest.extend<VmTabsFixtures>({
   },
   createVmTemplatesPage: async ({ page }, use) => {
     await use(new CreateVmTemplatesPage(page));
+  },
+  vmWizardNavigationPage: async ({ page }, use) => {
+    await use(new VmWizardNavigationPage(page));
   },
 });
 
