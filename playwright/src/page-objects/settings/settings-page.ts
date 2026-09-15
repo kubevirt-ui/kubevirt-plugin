@@ -293,6 +293,18 @@ export default class SettingsPage extends BasePage {
     return this._settings.isPasstBindingChecked(...args);
   }
 
+  isSSHOverNodePortChecked(
+    ...args: Parameters<OverviewSettingsPage['isSSHOverNodePortChecked']>
+  ): ReturnType<OverviewSettingsPage['isSSHOverNodePortChecked']> {
+    return this._settings.isSSHOverNodePortChecked(...args);
+  }
+
+  isSSHOverNodePortEnabled(
+    ...args: Parameters<OverviewSettingsPage['isSSHOverNodePortEnabled']>
+  ): ReturnType<OverviewSettingsPage['isSSHOverNodePortEnabled']> {
+    return this._settings.isSSHOverNodePortEnabled(...args);
+  }
+
   navigateToAutomaticImagesDownload(
     ...args: Parameters<OverviewSettingsPage['navigateToAutomaticImagesDownload']>
   ): ReturnType<OverviewSettingsPage['navigateToAutomaticImagesDownload']> {
@@ -377,6 +389,12 @@ export default class SettingsPage extends BasePage {
     return this._settings.navigateToSettingsViaUI(...args);
   }
 
+  openSSHOverNodePortConfiguration(
+    ...args: Parameters<OverviewSettingsPage['openSSHOverNodePortConfiguration']>
+  ): ReturnType<OverviewSettingsPage['openSSHOverNodePortConfiguration']> {
+    return this._settings.openSSHOverNodePortConfiguration(...args);
+  }
+
   // ── Cluster tab — Resource management section ────────────────────────────────
 
   navigateToSSHKeysManagement(
@@ -443,6 +461,18 @@ export default class SettingsPage extends BasePage {
     ...args: Parameters<OverviewSettingsPage['setGuestSystemLog']>
   ): ReturnType<OverviewSettingsPage['setGuestSystemLog']> {
     return this._settings.setGuestSystemLog(...args);
+  }
+
+  setSSHOverNodePortAddress(
+    ...args: Parameters<OverviewSettingsPage['setSSHOverNodePortAddress']>
+  ): ReturnType<OverviewSettingsPage['setSSHOverNodePortAddress']> {
+    return this._settings.setSSHOverNodePortAddress(...args);
+  }
+
+  setSSHOverNodePortEnabled(
+    ...args: Parameters<OverviewSettingsPage['setSSHOverNodePortEnabled']>
+  ): ReturnType<OverviewSettingsPage['setSSHOverNodePortEnabled']> {
+    return this._settings.setSSHOverNodePortEnabled(...args);
   }
 
   // ── User tab ─────────────────────────────────────────────────────────────────
