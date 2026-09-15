@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { useDataViewFilters } from '@patternfly/react-data-view';
@@ -18,6 +18,7 @@ const INITIAL_FILTERS: CapabilityFilterValues = {
 export const useCapabilityFilters = (
   features: CapabilityFeature[],
   getCapabilityInstallState: (feature: CapabilityFeature) => CapabilityInstallState,
+  resetSelection: () => void,
 ): {
   clearAllFilters: () => void;
   filteredData: CapabilityFeature[];
@@ -39,5 +40,23 @@ export const useCapabilityFilters = (
     [features, filters, getCapabilityInstallState],
   );
 
-  return { clearAllFilters, filteredData, filters, onSetFilters };
+  const handleSetFilters = useCallback(
+    (newFilters: Partial<CapabilityFilterValues>) => {
+      resetSelection();
+      onSetFilters(newFilters);
+    },
+    [onSetFilters, resetSelection],
+  );
+
+  const handleClearAllFilters = useCallback(() => {
+    resetSelection();
+    clearAllFilters();
+  }, [clearAllFilters, resetSelection]);
+
+  return {
+    clearAllFilters: handleClearAllFilters,
+    filteredData,
+    filters,
+    onSetFilters: handleSetFilters,
+  };
 };
