@@ -8,48 +8,36 @@ import { rewriteJiraKeysInText, stripOriginalJiraKeys } from '../version-parse';
 
 import type { CherryPickResult, ClonedTicket, JiraVersion } from '../types/index';
 import { CONFLICT_LABEL, JIRA_BASE_URL } from '../types/index';
-
-/** Run a git command via execFileSync, returning trimmed stdout. */
-const git = (...args: string[]): string =>
-  execFileSync('git', args, {
-    encoding: 'utf-8',
-    stdio: ['pipe', 'pipe', 'pipe'],
-  }).trim();
-
-/** Run a git command, returning empty string on failure. */
-const gitSafe = (...args: string[]): string => {
-  try {
-    return git(...args);
-  } catch {
-    return '';
-  }
-};
+import { buildCherryPickArgs, getRepoRoot, git, gitSafe, isMergeCommit } from './git-helpers';
 
 /** Amend the latest commit message, preserving multi-line bodies. */
 const amendCommitMessage = (message: string): void => {
   execFileSync('git', ['commit', '--amend', '-F', '-'], {
+    cwd: getRepoRoot(),
     encoding: 'utf-8',
     input: message,
     stdio: ['pipe', 'pipe', 'pipe'],
   });
 };
 
-/** Cherry-pick a commit onto a target branch; aborts cleanly on conflicts. */
+/** Cherry-pick a commit onto a target branch; opens a draft PR branch on conflicts. */
 export const performCherryPick = (
   targetBranch: string,
   commitSha: string,
   branchName: string,
   clonedTickets: ClonedTicket[],
 ): CherryPickResult => {
-  git('fetch', 'origin', targetBranch);
-  git('checkout', '-b', branchName, `origin/${targetBranch}`);
+  gitSafe('branch', '-D', branchName);
+  git('checkout', '-B', branchName, `origin/${targetBranch}`);
 
   const { cherryPickClean, conflictDetails } = ((): {
     cherryPickClean: boolean;
     conflictDetails: string;
   } => {
+    const pickArgs = buildCherryPickArgs(commitSha, isMergeCommit(commitSha));
+
     try {
-      git('cherry-pick', commitSha, '-m', '1', '--allow-empty');
+      git(...pickArgs);
 
       if (clonedTickets.length > 0) {
         const originalMessage = git('log', '-1', '--format=%B');
@@ -59,22 +47,31 @@ export const performCherryPick = (
         }
       }
       return { cherryPickClean: true, conflictDetails: '' };
-    } catch {
-      const details = gitSafe('diff', '--name-only', '--diff-filter=U');
-      git('cherry-pick', '--abort');
+    } catch (pickErr: unknown) {
+      const conflictedFiles = gitSafe('diff', '--name-only', '--diff-filter=U');
+      gitSafe('cherry-pick', '--abort');
       git(
         'commit',
         '--allow-empty',
         '-m',
         `[CONFLICTS] Cherry-pick ${commitSha} to ${targetBranch} - manual resolution required`,
       );
+
+      const details = conflictedFiles || formatCherryPickFailure(pickErr);
       return { cherryPickClean: false, conflictDetails: details };
     }
   })();
 
-  git('push', 'origin', branchName);
+  git('push', '--force-with-lease', '-u', 'origin', branchName);
 
   return { cherryPickBranch: branchName, cherryPickClean, conflictDetails };
+};
+
+const formatCherryPickFailure = (err: unknown): string => {
+  if (err instanceof Error) {
+    return err.message;
+  }
+  return 'Cherry-pick failed with an unknown error';
 };
 
 /** Build PR body with clone ticket references only (no original Jira keys). */
