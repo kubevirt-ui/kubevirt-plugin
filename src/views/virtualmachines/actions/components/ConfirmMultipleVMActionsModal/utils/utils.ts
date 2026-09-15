@@ -2,6 +2,7 @@ import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { logVMBulkActionPerformed, VMActionTelemetry } from '@kubevirt-utils/extensions/telemetry';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
+import { getCluster } from '@multicluster/helpers/selectors';
 
 export const getVMNamesByNamespace = (vms: V1VirtualMachine[]): { [key: string]: string[] } =>
   vms?.reduce((acc: { [key: string]: string[] }, vm) => {
@@ -15,6 +16,9 @@ export const getVMNamesByNamespace = (vms: V1VirtualMachine[]): { [key: string]:
 export const getNamespaces = (vms: V1VirtualMachine[]): string[] => [
   ...new Set(vms.map((vm) => getNamespace(vm))),
 ];
+
+export const getClusters = (vms: V1VirtualMachine[]): string[] =>
+  [...new Set(vms.map((vm) => getCluster(vm)))].filter((cluster) => cluster !== undefined);
 
 export const runActionOnVMs = async (
   vms: V1VirtualMachine[],
