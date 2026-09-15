@@ -55,10 +55,8 @@ const StatusCell: FC<SnapshotCellProps> = ({ row }) => (
 );
 
 const LastRestoredCell: FC<SnapshotCellProps> = ({ callbacks, row }) => {
-  const snapshotName = getName(row);
-  const relevantRestore = snapshotName ? callbacks?.restores?.[snapshotName] : undefined;
-  const restoreTime = relevantRestore?.status?.restoreTime;
-  return <Timestamp timestamp={restoreTime} />;
+  const relevantRestore = callbacks?.restores?.[getUID(row) ?? ''];
+  return <Timestamp timestamp={relevantRestore?.status?.restoreTime} />;
 };
 
 const renderActionsCell = (

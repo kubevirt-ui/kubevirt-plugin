@@ -58,16 +58,22 @@ const useSnapshotData = (vm: V1VirtualMachine): UseSnapshotData => {
 
   const error = useMemo(() => snapshotsError ?? restoresError, [snapshotsError, restoresError]);
 
+  const vmSnapshots = useMemo(
+    () => (snapshots ?? []).filter((snapshot) => snapshot?.spec?.source?.name === vmName),
+    [snapshots, vmName],
+  );
+
   const restoresMap = useMemo(
-    (): Record<string, V1beta1VirtualMachineRestore> => buildRestoresMap(restores),
-    [restores],
+    (): Record<string, V1beta1VirtualMachineRestore> =>
+      buildRestoresMap(vmSnapshots, restores, vmName),
+    [restores, vmName, vmSnapshots],
   );
 
   return {
     error,
     loaded,
     restoresMap,
-    snapshots: (snapshots ?? []).filter((snapshot) => snapshot?.spec?.source?.name === vmName),
+    snapshots: vmSnapshots,
   };
 };
 
