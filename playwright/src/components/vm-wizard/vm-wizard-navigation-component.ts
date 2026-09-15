@@ -107,7 +107,6 @@ export default class VmWizardNavigationComponent extends BaseComponent {
   }
 
   async clickCreateVm(): Promise<void> {
-    await this.collapseSidebarIfExpanded();
     const createBtn = this._wizardFooterCreateButton;
     await this.clickCreateVMButton(createBtn);
   }
@@ -131,7 +130,6 @@ export default class VmWizardNavigationComponent extends BaseComponent {
   }
 
   async clickCloneVm(): Promise<void> {
-    await this.collapseSidebarIfExpanded();
     const cloneBtn = this._wizardFooterCloneButton;
     await this.clickCreateVMButton(cloneBtn);
   }
@@ -147,7 +145,6 @@ export default class VmWizardNavigationComponent extends BaseComponent {
   }
 
   async clickNext(): Promise<void> {
-    await this.collapseSidebarIfExpanded();
     await this.page.keyboard.press('Escape');
     await this.page
       .locator('.pf-v6-c-tooltip, [role="tooltip"]')
@@ -415,7 +412,6 @@ export default class VmWizardNavigationComponent extends BaseComponent {
   }
 
   async openWizardFromCreateDropdown(): Promise<void> {
-    await this.collapseSidebarIfExpanded();
     const welcomeModal = this.page
       .getByRole('dialog', { name: /Welcome/i })
       .or(this.locator('#guided-tour-modal'));
