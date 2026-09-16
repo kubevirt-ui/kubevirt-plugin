@@ -9,7 +9,7 @@ import useIsACMPage from '@multicluster/useIsACMPage';
 import useVMQueries from './useVMQueries';
 
 const useVMQuery = (
-  vm: V1VirtualMachine | V1VirtualMachineInstance,
+  vm: V1VirtualMachine | V1VirtualMachineInstance | undefined,
   queryKey: VMQueries,
 ): {
   query?: string;

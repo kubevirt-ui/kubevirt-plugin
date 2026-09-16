@@ -7,7 +7,7 @@ import { getVMIPod } from '@kubevirt-utils/resources/vmi/utils/pod';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 
 type UseVMIAndPodForVMValues = {
-  error: Error | undefined;
+  error?: Error;
   loaded: boolean;
   pod: IoK8sApiCoreV1Pod | null | undefined;
   vmi: undefined | V1VirtualMachineInstance;
