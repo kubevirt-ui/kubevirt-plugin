@@ -1,4 +1,3 @@
-/* eslint-disable */
 /**
  * Auto-merge: determine merge-pool eligibility and merge directly via API.
  * Entry point: npx tsx src/merge/auto-merge.ts

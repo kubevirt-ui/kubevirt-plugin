@@ -1,5 +1,3 @@
-/* eslint-disable */
-/* eslint-disable @eslint-react/no-unnecessary-use-prefix */
 const multiclusterSDK = require('@stolostron/multicluster-sdk');
 
 module.exports = {
