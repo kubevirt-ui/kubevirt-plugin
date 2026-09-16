@@ -1,4 +1,4 @@
-import { getDisplayName, getName, getNamespace } from '@kubevirt-utils/resources/shared';
+import { getDisplayName, getName } from '@kubevirt-utils/resources/shared';
 import { type Template } from '@kubevirt-utils/resources/template';
 import { getRandomChars } from '@kubevirt-utils/utils/utils';
 
@@ -18,12 +18,13 @@ const generateTemplateName = (template: Template): string => {
 export const getInitialFormValues = (
   template: Template | undefined,
   sourceProject: string,
+  targetProject: string,
 ): CloneTemplateFormValues => {
   return {
     isCloneStorageEnabled: false,
     pvcName: getInitialPVCName(template),
     sourceProject,
-    targetProject: getNamespace(template),
+    targetProject,
     template,
     templateDisplayName: getDisplayName(template) ?? '',
     templateName: generateTemplateName(template),
