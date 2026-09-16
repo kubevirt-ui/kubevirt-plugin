@@ -2,6 +2,7 @@ import { type ReactNode } from 'react';
 import { type TFunction } from 'i18next';
 
 import ArchitectureLabel from '@kubevirt-utils/components/ArchitectureLabel/ArchitectureLabel';
+import { getCPUMemoryTitle } from '@kubevirt-utils/components/CPUMemory/utils';
 import { getK8sRowId } from '@kubevirt-utils/components/KubevirtTable/utils';
 import { type TableExportColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { ACTIONS } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/const';
@@ -141,7 +142,7 @@ export const getTemplateColumns = (
           ? NO_DATA_DASH
           : getVirtualMachineTemplatesCPUMemoryValue(row, t),
       key: TEMPLATE_COLUMN_KEYS.cpu,
-      label: t('CPU | Memory'),
+      label: getCPUMemoryTitle(t),
       renderCell: (row) => <TemplateCPUMemoryCell row={row} />,
     },
     {

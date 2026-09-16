@@ -594,7 +594,7 @@ export const getStatusNamespaces = (
  * @param {K8sResourceCommon} entity - entity to get the creation timestamp from
  * @returns {string} creation timestamp for the entity
  */
-export const getCreationTimestamp = (entity: K8sResourceCommon): string =>
+export const getCreationTimestamp = (entity: K8sResourceCommon): string | undefined =>
   entity?.metadata?.creationTimestamp;
 
 export const getLongestNameLength = (resources: K8sResourceCommon[]): number => {

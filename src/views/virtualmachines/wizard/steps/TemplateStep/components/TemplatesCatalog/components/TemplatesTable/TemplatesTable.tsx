@@ -3,6 +3,7 @@ import { useWatch } from 'react-hook-form';
 
 import { type V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import { type V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { getCPUMemoryTitle } from '@kubevirt-utils/components/CPUMemory/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getUID, type ResourceMap } from '@kubevirt-utils/resources/shared';
 import { getTemplateName, type Template } from '@kubevirt-utils/resources/template';
@@ -75,7 +76,7 @@ const TemplatesTable: FC<TemplatesTableProps> = ({
           </Th>
           <Th id="source">{t('Boot source')}</Th>
           <Th id="cpu-memory" width={20}>
-            {t('CPU | Memory')}
+            {getCPUMemoryTitle(t)}
           </Th>
         </Tr>
       </Thead>

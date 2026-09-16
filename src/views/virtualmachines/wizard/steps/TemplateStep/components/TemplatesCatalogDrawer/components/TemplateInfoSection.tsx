@@ -3,6 +3,7 @@ import { useWatch } from 'react-hook-form';
 
 import CPUDescription from '@kubevirt-utils/components/CPUDescription/CPUDescription';
 import CPUMemory from '@kubevirt-utils/components/CPUMemory/CPUMemory';
+import { getCPUMemoryTitle } from '@kubevirt-utils/components/CPUMemory/utils';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import DisksReviewTable from '@kubevirt-utils/components/DisksReviewTable/DisksReviewTable';
 import NetworksReviewTable from '@kubevirt-utils/components/NetworksReviewTable/NetworksReviewTable';
@@ -72,7 +73,7 @@ const TemplateInfoSection: FC = memo(() => {
       <DescriptionItem
         bodyContent={<CPUDescription cpu={getCPU(vm)} />}
         descriptionData={<CPUMemory vm={vm} />}
-        descriptionHeader={t('CPU | Memory')}
+        descriptionHeader={getCPUMemoryTitle(t)}
         isPopover
         olsObj={vm}
         promptType={OLSPromptType.CPU_MEMORY}

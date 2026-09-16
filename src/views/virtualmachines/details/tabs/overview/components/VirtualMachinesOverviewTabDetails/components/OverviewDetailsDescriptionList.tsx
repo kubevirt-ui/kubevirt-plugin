@@ -10,6 +10,7 @@ import {
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import NUMABadge from '@kubevirt-utils/components/badges/NUMABadge/NUMABadge';
 import CPUMemory from '@kubevirt-utils/components/CPUMemory/CPUMemory';
+import { getCPUMemoryTitle } from '@kubevirt-utils/components/CPUMemory/utils';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import GuestAgentIsRequiredText from '@kubevirt-utils/components/GuestAgentIsRequiredText/GuestAgentIsRequiredText';
 import { timestampFor } from '@kubevirt-utils/components/Timestamp/utils/datetime';
@@ -95,7 +96,7 @@ const OverviewDetailsDescriptionList: FC<OverviewDetailsDescriptionListProps> = 
             {hasNUMAConfiguration(cpuMemoryVM) && <NUMABadge />}
           </Flex>
         }
-        descriptionHeader={t('CPU | Memory')}
+        descriptionHeader={getCPUMemoryTitle(t)}
       />
       <DescriptionItem
         descriptionData={guestAgentData?.timezone?.split(',')[0] ?? NO_DATA_DASH}

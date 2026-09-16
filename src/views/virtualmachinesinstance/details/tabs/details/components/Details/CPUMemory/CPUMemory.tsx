@@ -3,6 +3,7 @@ import type { FC } from 'react';
 import type { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import CPUDescription from '@kubevirt-utils/components/CPUDescription/CPUDescription';
 import { CpuMemHelperTextResources } from '@kubevirt-utils/components/CPUDescription/utils/utils';
+import { getCPUMemoryTitle } from '@kubevirt-utils/components/CPUMemory/utils';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { vCPUCount } from '@kubevirt-utils/resources/template/utils';
@@ -26,7 +27,7 @@ const CPUMemory: FC<TolerationsProps> = ({ vmi }) => {
         <CPUDescription cpu={getCPU(vmi)} helperTextResource={CpuMemHelperTextResources.VMI} />
       }
       descriptionData={t('{{cpu}} CPU | {{memory}} Memory', { cpu, memory })}
-      descriptionHeader={t('CPU | Memory')}
+      descriptionHeader={getCPUMemoryTitle(t)}
       isPopover
       olsObj={vmi}
       promptType={OLSPromptType.CPU_MEMORY}

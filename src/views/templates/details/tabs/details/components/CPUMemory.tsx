@@ -3,6 +3,7 @@ import { getVirtualMachineTemplatesCPUMemoryText } from 'src/views/templates/uti
 
 import CPUDescription from '@kubevirt-utils/components/CPUDescription/CPUDescription';
 import { CpuMemHelperTextResources } from '@kubevirt-utils/components/CPUDescription/utils/utils';
+import { getCPUMemoryTitle } from '@kubevirt-utils/components/CPUMemory/utils';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -44,7 +45,7 @@ const CPUMemory: FC<CPUMemoryProps> = ({ editable, template }) => {
         />
       }
       descriptionData={CPUMemData}
-      descriptionHeader={t('CPU | Memory')}
+      descriptionHeader={getCPUMemoryTitle(t)}
       isEdit={editable}
       isPopover
       olsObj={template}
