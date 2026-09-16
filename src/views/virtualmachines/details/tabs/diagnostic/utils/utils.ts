@@ -1,5 +1,6 @@
 import { type TFunction } from 'i18next';
 
+import { type V1Volume } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { VirtualMachineDetailsTab } from '@kubevirt-utils/constants/tabs-constants';
 import { type LabelProps } from '@patternfly/react-core';
 
@@ -50,6 +51,34 @@ export const getDVSeverity = (phase: string): DiagnosticSeverity => {
 
 export const getSnapshotSeverity = (enabled: boolean): DiagnosticSeverity =>
   enabled ? 'healthy' : 'warning';
+
+export const isContainerDiskVolume = (volumeName: string, volumes: V1Volume[] = []): boolean =>
+  volumes.some((volume) => volume.name === volumeName && Boolean(volume.containerDisk));
+
+type ParsedDiagnosticReason = {
+  message?: string;
+  name: string;
+  reason: string;
+};
+
+export const parseDiagnosticReason = (
+  reason: string | undefined,
+  fallbackName: string,
+): ParsedDiagnosticReason => {
+  const separatorIndex = reason?.indexOf(':') ?? -1;
+
+  if (separatorIndex === -1) {
+    return { message: reason, name: reason ?? fallbackName, reason: fallbackName };
+  }
+
+  const reasonName = reason.slice(0, separatorIndex);
+
+  return {
+    message: reason.slice(separatorIndex + 1),
+    name: reasonName,
+    reason: reasonName,
+  };
+};
 
 type StatusLabel = { color: LabelProps['color']; text: string };
 
