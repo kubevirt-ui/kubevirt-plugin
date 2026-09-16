@@ -25,7 +25,9 @@ const useNodesData: UseNodesData = (vm) => {
 
   const vmiNodeName = useNode(vm);
   const currentNode = nodes?.find((node) => getName(node) === vmiNodeName);
-  const vmArch = getArchitecture(vm) ?? getNodeArchitecture(currentNode);
+  const vmArchitecture = getArchitecture(vm);
+  // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- empty string must fall back
+  const vmArch = vmArchitecture || getNodeArchitecture(currentNode);
 
   const filteredNodes = nodes?.filter((node) => {
     if (getName(node) === vmiNodeName || !isNodeSchedulable(node)) return false;

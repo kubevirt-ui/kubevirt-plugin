@@ -86,27 +86,27 @@ export const getConsoleStandaloneURL = (
 export const getVMURL = (cluster: string, namespace: string, name: string): string =>
   cluster
     ? getACMVMURL(cluster, namespace, name)
-    : getResourceUrl({
+    : (getResourceUrl({
         activeNamespace: namespace,
         model: VirtualMachineModel,
         resource: { metadata: { name, namespace } },
-      });
+      }) ?? '');
 
 export const getVMListURL = (cluster?: string, namespace?: string): string =>
   cluster
     ? getACMVMListURL(cluster, namespace)
-    : getResourceUrl({
+    : (getResourceUrl({
         activeNamespace: namespace,
         model: VirtualMachineModel,
-      });
+      }) ?? '');
 
 export const getVMListNamespacesURL = (cluster: string, namespace: string): string =>
   cluster
     ? getACMVMListNamespacesURL(cluster, namespace)
-    : getResourceUrl({
+    : (getResourceUrl({
         activeNamespace: namespace,
         model: VirtualMachineModel,
-      });
+      }) ?? '');
 
 export const getACMTextSearchURL = (textSearch: string): string => {
   const encodedTextFilter = encodeURIComponent(textSearch);

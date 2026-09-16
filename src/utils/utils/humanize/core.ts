@@ -77,7 +77,7 @@ export const convertValueWithUnitsToBaseValue = (
     }
     return false;
   });
-  if (startingUnitIndex <= 0) {
+  if (startingUnitIndex < 0) {
     return defaultReturn;
   }
 

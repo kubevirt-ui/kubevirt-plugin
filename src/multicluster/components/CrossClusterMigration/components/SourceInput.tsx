@@ -23,7 +23,7 @@ const SourceInput: FC<SourceInputProps> = ({ clustersOptions, sourceCluster, sou
           options={clustersOptions}
           selected={sourceCluster}
           selectProps={{ id: 'source-cluster-select' }}
-          setSelected={undefined}
+          setSelected={() => {}}
           toggleProps={{ children: sourceCluster, isDisabled: true, isFullWidth: true }}
         />
       </FormGroup>
@@ -33,7 +33,7 @@ const SourceInput: FC<SourceInputProps> = ({ clustersOptions, sourceCluster, sou
           options={[]}
           selected={sourceNamespace}
           selectProps={{ id: 'source-project-select' }}
-          setSelected={undefined}
+          setSelected={() => {}}
           toggleProps={{ children: sourceNamespace, isDisabled: true, isFullWidth: true }}
         />
       </FormGroup>

@@ -1,4 +1,4 @@
-import mockReact from 'react';
+import { createElement } from 'react';
 
 import { type V1VirtualMachineInstanceMigration } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { vmimStatuses } from '@kubevirt-utils/resources/vmim/statuses';
@@ -13,9 +13,7 @@ import MigrationsChartDonut from './MigrationsChartDonut';
 import { getMigrationChartData } from './utils';
 
 jest.mock('@patternfly/react-charts/victory', () => ({
-  ChartDonut: jest.fn(() =>
-    mockReact.createElement('div', { 'data-test': 'migrations-chart-donut' }),
-  ),
+  ChartDonut: jest.fn(() => createElement('div', { 'data-test': 'migrations-chart-donut' })),
   ChartLabel: () => null,
 }));
 

@@ -55,7 +55,10 @@ export const getAllowedTemplateResources = (projectNames: string[]): Record<stri
 export const getAvailableDataSources = (dataSources: V1beta1DataSource[]): V1beta1DataSource[] =>
   dataSources?.filter((dataSource) => isDataSourceReady(dataSource));
 
-export const isDataImportCronProgressing = (dataImportCron: V1beta1DataImportCron): boolean =>
+export const isDataImportCronProgressing = (
+  dataImportCron: V1beta1DataImportCron | undefined,
+): boolean =>
+  dataImportCron !== undefined &&
   getStatusConditionReason(dataImportCron, 'UpToDate') === 'ImportProgressing';
 
 export const getReadyOrCloningOrUploadingDataSources = (

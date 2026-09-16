@@ -19,5 +19,9 @@ export const createSnapshotDataSource = async (
     };
   });
 
-  return kubevirtK8sCreate({ data: dataSourceToCreate, model: DataSourceModel });
+  return kubevirtK8sCreate({
+    cluster: bootableVolume.bootableVolumeCluster,
+    data: dataSourceToCreate,
+    model: DataSourceModel,
+  });
 };

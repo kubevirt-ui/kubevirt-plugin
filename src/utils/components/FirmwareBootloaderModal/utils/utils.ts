@@ -31,8 +31,10 @@ export const getBootloaderFromVM = (
   defaultBootmode = BootMode.BIOS,
   clusterOnlyArchitecture?: string,
 ): BootloaderOptionValue => {
-  const architecture = getArchitecture(vm) ?? clusterOnlyArchitecture;
-  if (architecture === ARCHITECTURES.S390X) {
+  const architecture = getArchitecture(vm);
+  // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- empty string must fall back
+  const resolvedArchitecture = architecture || clusterOnlyArchitecture;
+  if (resolvedArchitecture === ARCHITECTURES.S390X) {
     return BootMode.IPL;
   }
 
@@ -64,9 +66,11 @@ export const getBootloaderOptions = (
   vm: V1VirtualMachine,
   clusterOnlyArchitecture?: string,
 ): BootloaderOption[] => {
-  const architecture = getArchitecture(vm) ?? clusterOnlyArchitecture;
+  const architecture = getArchitecture(vm);
+  // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- empty string must fall back
+  const resolvedArchitecture = architecture || clusterOnlyArchitecture;
 
-  if (architecture === ARCHITECTURES.S390X) {
+  if (resolvedArchitecture === ARCHITECTURES.S390X) {
     return s390xBootloaderOptions;
   }
 
@@ -86,8 +90,10 @@ export const updatedVMBootMode = (
   clusterOnlyArchitecture?: string,
 ): V1VirtualMachine =>
   produce<V1VirtualMachine>(vm as V1VirtualMachine, (vmDraft: V1VirtualMachine) => {
-    const architecture = getArchitecture(vm) ?? clusterOnlyArchitecture;
-    if (architecture === ARCHITECTURES.S390X && firmwareBootloader === BootMode.IPL) {
+    const architecture = getArchitecture(vm);
+    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- empty string must fall back
+    const resolvedArchitecture = architecture || clusterOnlyArchitecture;
+    if (resolvedArchitecture === ARCHITECTURES.S390X && firmwareBootloader === BootMode.IPL) {
       if (getBootloader(vmDraft)) {
         delete vmDraft.spec.template.spec.domain.firmware.bootloader;
       }

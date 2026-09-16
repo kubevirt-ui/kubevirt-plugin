@@ -46,11 +46,13 @@ export const createPVCBootableVolume = async (
       model: DataVolumeModel,
     });
   } catch (error) {
-    void kubevirtK8sDelete({
-      cluster: bootableVolume.bootableVolumeCluster,
-      model: DataSourceModel,
-      resource: createdDS,
-    });
+    await Promise.allSettled([
+      kubevirtK8sDelete({
+        cluster: bootableVolume.bootableVolumeCluster,
+        model: DataSourceModel,
+        resource: createdDS,
+      }),
+    ]);
     throw error;
   }
   return createdDS;

@@ -19,6 +19,7 @@ import { setDeletionProtectionForVM } from '@virtualmachines/details/tabs/config
 import { updatedHostname, updateGuestSystemAccessLog, updateHeadlessMode } from '../utils/utils';
 
 type DetailsSectionAccessItemsProps = {
+  canUpdateVM: boolean;
   deletionProtectionEnabled: boolean;
   isCheckedGuestSystemAccessLog?: boolean;
   isGuestSystemLogsDisabled: boolean;
@@ -29,6 +30,7 @@ type DetailsSectionAccessItemsProps = {
 };
 
 const DetailsSectionAccessItems: FC<DetailsSectionAccessItemsProps> = ({
+  canUpdateVM,
   deletionProtectionEnabled,
   isCheckedGuestSystemAccessLog,
   isGuestSystemLogsDisabled,
@@ -44,9 +46,12 @@ const DetailsSectionAccessItems: FC<DetailsSectionAccessItemsProps> = ({
     <>
       <DescriptionItem
         data-test={`${vmName}-hostname`}
-        descriptionData={vm?.spec?.template?.spec?.hostname ?? vmName}
+        descriptionData={
+          // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- empty string must fall back
+          vm?.spec?.template?.spec?.hostname || vmName
+        }
         descriptionHeader={<SearchItem id="hostname">{t('Hostname')}</SearchItem>}
-        isEdit
+        isEdit={canUpdateVM}
         onEditClick={() =>
           createModal(({ isOpen, onClose }) => (
             <HostnameModal
@@ -66,7 +71,11 @@ const DetailsSectionAccessItems: FC<DetailsSectionAccessItemsProps> = ({
         breadcrumb="VirtualMachine.spec.template.devices.autoattachGraphicsDevice"
         data-test={`${vmName}-headless`}
         descriptionData={
-          <HeadlessMode updateHeadlessMode={(checked) => updateHeadlessMode(vm, checked)} vm={vm} />
+          <HeadlessMode
+            isDisabled={!canUpdateVM}
+            updateHeadlessMode={(checked) => updateHeadlessMode(vm, checked)}
+            vm={vm}
+          />
         }
         descriptionHeader={<SearchItem id="headless-mode">{t('Headless mode')}</SearchItem>}
         isPopover
@@ -81,7 +90,7 @@ const DetailsSectionAccessItems: FC<DetailsSectionAccessItemsProps> = ({
           <Switch
             id="guest-system-log-access"
             isChecked={isCheckedGuestSystemAccessLog}
-            isDisabled={isGuestSystemLogsDisabled}
+            isDisabled={isGuestSystemLogsDisabled || !canUpdateVM}
             onChange={(_event, checked) => {
               setIsCheckedGuestSystemAccessLog(checked);
               void updateGuestSystemAccessLog(vm, checked);
@@ -103,6 +112,7 @@ const DetailsSectionAccessItems: FC<DetailsSectionAccessItemsProps> = ({
           <Switch
             id="deletion-protection"
             isChecked={deletionProtectionEnabled}
+            isDisabled={!canUpdateVM}
             onChange={(_event, checked) =>
               createModal(({ isOpen, onClose }) => (
                 <DeletionProtectionModal

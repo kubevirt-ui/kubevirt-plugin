@@ -82,7 +82,19 @@ export const getResourceFromClusterMap = <A extends K8sResourceCommon = K8sResou
   cluster: string,
   namespace: string,
   name: string,
-): A => clusterMap?.[cluster ?? SINGLE_CLUSTER_KEY]?.[namespace]?.[name];
+): A => {
+  const clusterResources = clusterMap?.[cluster ?? SINGLE_CLUSTER_KEY];
+  if (!clusterResources) {
+    return undefined as A;
+  }
+
+  const namespacedResource = (clusterResources as NamespacedResourceMap<A>)[namespace]?.[name];
+  if (namespacedResource) {
+    return namespacedResource;
+  }
+
+  return (clusterResources as ResourceMap<A>)[name];
+};
 
 export const getClusterKey = (resource: K8sResourceCommon): string =>
   getCluster(resource) ?? SINGLE_CLUSTER_KEY;

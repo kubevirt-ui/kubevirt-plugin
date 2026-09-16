@@ -132,7 +132,8 @@ export const getDefaultNetwork = (networks: Network[]): Network | null => {
   if (networks?.length > 1) {
     return (
       networks?.find((network) => network?.type === POD && network?.ip) ??
-      networks?.find((network) => network?.type === MULTUS)
+      networks?.find((network) => network?.type === MULTUS) ??
+      null
     );
   }
   return null;

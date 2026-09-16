@@ -136,31 +136,31 @@ export const createRDPService = (
     resource: vmi,
   });
 
-  const servicePromise = k8sCreate({
-    data: {
-      apiVersion: ServiceModel.apiVersion,
-      kind: ServiceModel.kind,
-      metadata: {
-        name: `${vm?.metadata?.name}-rdp`,
-        namespace: vm?.metadata?.namespace,
-        ownerReferences: [buildOwnerReference(vm, { blockOwnerDeletion: false })],
-      },
-      spec: {
-        ports: [
-          {
-            port: DEFAULT_RDP_PORT,
-            targetPort: DEFAULT_RDP_PORT,
-          },
-        ],
-        selector: {
-          [labelKey]: labelValue,
+  return Promise.all([vmPromise, vmiPromise]).then(([patchedVM, patchedVMI]) =>
+    k8sCreate({
+      data: {
+        apiVersion: ServiceModel.apiVersion,
+        kind: ServiceModel.kind,
+        metadata: {
+          name: `${vm?.metadata?.name}-rdp`,
+          namespace: vm?.metadata?.namespace,
+          ownerReferences: [buildOwnerReference(vm, { blockOwnerDeletion: false })],
         },
-        type: 'NodePort',
+        spec: {
+          ports: [
+            {
+              port: DEFAULT_RDP_PORT,
+              targetPort: DEFAULT_RDP_PORT,
+            },
+          ],
+          selector: {
+            [labelKey]: labelValue,
+          },
+          type: 'NodePort',
+        },
       },
-    },
-    model: ServiceModel,
-    ns: namespace,
-  });
-
-  return Promise.all([vmPromise, vmiPromise, servicePromise]);
+      model: ServiceModel,
+      ns: namespace,
+    }).then((service) => [patchedVM, patchedVMI, service]),
+  );
 };

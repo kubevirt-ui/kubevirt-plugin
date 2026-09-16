@@ -39,6 +39,7 @@ export const createDataSourceWithImportCron: CreateDataSourceWithImportCronType 
 
   if (addRegistrySecret) {
     await createUserPasswordSecret({
+      cluster: bootableVolumeCluster,
       namespace: OPENSHIFT_CNV,
       password,
       secretName: imageSecretName,
@@ -46,6 +47,7 @@ export const createDataSourceWithImportCron: CreateDataSourceWithImportCronType 
     });
 
     await createUserPasswordSecret({
+      cluster: bootableVolumeCluster,
       namespace: targetNamespace,
       password,
       secretName: imageSecretName,

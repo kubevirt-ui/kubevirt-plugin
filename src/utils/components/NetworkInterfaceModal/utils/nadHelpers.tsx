@@ -81,7 +81,7 @@ export const deleteNetworkInterface = (
   nicPresentation: NetworkPresentation,
 ): Promise<V1VirtualMachine> | undefined => {
   const existingInterface = getInterface(vm, nicName);
-  const existingNetwork = getNetworks(vm).find((net) => net.name === nicName);
+  const existingNetwork = (getNetworks(vm) ?? []).find((net) => net.name === nicName);
   if (!existingInterface || !existingNetwork) {
     return;
   }

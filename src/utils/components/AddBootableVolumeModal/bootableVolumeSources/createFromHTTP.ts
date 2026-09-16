@@ -24,17 +24,18 @@ export const createHTTPDataSource = async (
     draft.bootableVolumeName = draftDataSource.metadata.name;
   });
 
-  const certConfigMapName = await getOrCreateTLSCertConfigMapName(
-    {
-      cluster: bootableVolume.bootableVolumeCluster,
-      tlsCertConfigMapName: bootableVolume.tlsCertConfigMapName,
-      tlsCertificate: bootableVolume.tlsCertificate,
-      tlsCertificateRequired: bootableVolume.tlsCertificateRequired,
-      tlsCertProject: bootableVolume.tlsCertProject,
-      tlsCertSource: bootableVolume.tlsCertSource,
-    },
-    namespace,
-  );
+  const { configMapName: certConfigMapName, created: certConfigMapCreated } =
+    await getOrCreateTLSCertConfigMapName(
+      {
+        cluster: bootableVolume.bootableVolumeCluster,
+        tlsCertConfigMapName: bootableVolume.tlsCertConfigMapName,
+        tlsCertificate: bootableVolume.tlsCertificate,
+        tlsCertificateRequired: bootableVolume.tlsCertificateRequired,
+        tlsCertProject: bootableVolume.tlsCertProject,
+        tlsCertSource: bootableVolume.tlsCertSource,
+      },
+      namespace,
+    );
 
   const httpSource: V1beta1DataVolumeSource['http'] = {
     url: bootableVolume.url,
@@ -54,39 +55,55 @@ export const createHTTPDataSource = async (
     };
   });
 
-  const createdDS = await kubevirtK8sCreate({
-    cluster: bootableVolume.bootableVolumeCluster,
-    data: dataSourceToCreate,
-    model: DataSourceModel,
-    ns: namespace,
-  });
+  const deleteCreatedCertConfigMap = (): Promise<unknown> | undefined => {
+    if (!certConfigMapCreated || !certConfigMapName) {
+      return undefined;
+    }
+
+    return kubevirtK8sDelete({
+      cluster: bootableVolume.bootableVolumeCluster,
+      model: ConfigMapModel,
+      resource: { metadata: { name: certConfigMapName, namespace } },
+    });
+  };
 
   try {
-    await kubevirtK8sCreate({
+    const createdDS = await kubevirtK8sCreate({
       cluster: bootableVolume.bootableVolumeCluster,
-      data: bootableVolumeToCreate,
-      model: DataVolumeModel,
+      data: dataSourceToCreate,
+      model: DataSourceModel,
       ns: namespace,
     });
-  } catch (error) {
-    const cleanups: Promise<unknown>[] = [
-      kubevirtK8sDelete({
+
+    try {
+      await kubevirtK8sCreate({
         cluster: bootableVolume.bootableVolumeCluster,
-        model: DataSourceModel,
-        resource: createdDS,
-      }),
-    ];
-    if (certConfigMapName) {
-      cleanups.push(
+        data: bootableVolumeToCreate,
+        model: DataVolumeModel,
+        ns: namespace,
+      });
+    } catch (error) {
+      const cleanups: Promise<unknown>[] = [
         kubevirtK8sDelete({
           cluster: bootableVolume.bootableVolumeCluster,
-          model: ConfigMapModel,
-          resource: { metadata: { name: certConfigMapName, namespace } },
+          model: DataSourceModel,
+          resource: createdDS,
         }),
-      );
+      ];
+      const certConfigMapCleanup = deleteCreatedCertConfigMap();
+      if (certConfigMapCleanup) {
+        cleanups.push(certConfigMapCleanup);
+      }
+      await Promise.allSettled(cleanups);
+      throw error;
     }
-    await Promise.allSettled(cleanups);
+
+    return createdDS;
+  } catch (error) {
+    const certConfigMapCleanup = deleteCreatedCertConfigMap();
+    if (certConfigMapCleanup) {
+      await Promise.allSettled([certConfigMapCleanup]);
+    }
     throw error;
   }
-  return createdDS;
 };

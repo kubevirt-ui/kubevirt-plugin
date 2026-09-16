@@ -72,7 +72,7 @@ const DetailsSection: FC<DetailsSectionProps> = ({ allInstanceTypes, instanceTyp
       <Grid>
         <GridItem span={5}>
           <DescriptionList>
-            <DetailsSectionDescription vm={vm} />
+            <DetailsSectionDescription canUpdateVM={canUpdateVM} vm={vm} />
             <DetailsSectionComputeItems
               allInstanceTypes={allInstanceTypes}
               canUpdateVM={canUpdateVM}
@@ -84,6 +84,7 @@ const DetailsSection: FC<DetailsSectionProps> = ({ allInstanceTypes, instanceTyp
               vmName={vmName}
             />
             <DetailsSectionAccessItems
+              canUpdateVM={canUpdateVM}
               deletionProtectionEnabled={deletionProtectionEnabled}
               isCheckedGuestSystemAccessLog={isCheckedGuestSystemAccessLog}
               isGuestSystemLogsDisabled={isGuestSystemLogsDisabled}

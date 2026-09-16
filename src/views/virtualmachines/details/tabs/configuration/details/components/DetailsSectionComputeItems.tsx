@@ -74,7 +74,7 @@ const DetailsSectionComputeItems: FC<DetailsSectionComputeItemsProps> = ({
           data-test={`${vmName}-workload-profile`}
           descriptionData={getWorkloadLabel(vmWorkload, t)}
           descriptionHeader={<SearchItem id="workload-profile">{t('Workload profile')}</SearchItem>}
-          isEdit
+          isEdit={canUpdateVM}
           onEditClick={() =>
             createModal(({ isOpen, onClose }) => (
               <WorkloadProfileModal

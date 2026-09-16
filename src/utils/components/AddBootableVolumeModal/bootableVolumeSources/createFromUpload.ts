@@ -54,19 +54,19 @@ export const createBootableVolumeFromUpload = async (
 
   onUploadStart?.(uploadKey);
 
-  await uploadData({
-    dataVolume: bootableVolumeToCreate,
-    file: uploadFile as File,
-    uploadKey,
-    uploadTrackMetadata: {
-      dvCluster: bootableVolume.bootableVolumeCluster,
-      dvName: getName(bootableVolumeToCreate),
-      dvNamespace: getNamespace(bootableVolumeToCreate),
-      resourceName: volumeName,
-    },
-  });
-
   try {
+    await uploadData({
+      dataVolume: bootableVolumeToCreate,
+      file: uploadFile as File,
+      uploadKey,
+      uploadTrackMetadata: {
+        dvCluster: bootableVolume.bootableVolumeCluster,
+        dvName: getName(bootableVolumeToCreate),
+        dvNamespace: getNamespace(bootableVolumeToCreate),
+        resourceName: volumeName,
+      },
+    });
+
     const createdDataSource = await kubevirtK8sCreate({
       cluster: bootableVolume.bootableVolumeCluster,
       data: dataSourceToCreate,
