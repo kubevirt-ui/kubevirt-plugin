@@ -1,4 +1,4 @@
-import type React from 'react';
+import { type ReactNode } from 'react';
 import { type NavigateFunction } from 'react-router';
 import { type TFunction } from 'i18next';
 
@@ -26,9 +26,7 @@ export type BuildPendingChangesParams = {
   cloudInitChanged: boolean;
   cluster: string;
   cpuMemoryChanged: boolean;
-  createModal: (
-    render: (props: { isOpen: boolean; onClose: () => void }) => React.ReactNode,
-  ) => void;
+  createModal: (render: (props: { isOpen: boolean; onClose: () => void }) => ReactNode) => void;
   dedicatedResourcesChanged: boolean;
   evictionStrategyChanged: boolean;
   hideYamlTab: boolean;

@@ -1,4 +1,4 @@
-import React from 'react';
+import { type ReactNode } from 'react';
 import { type TFunction } from 'i18next';
 
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -115,7 +115,7 @@ export const deleteNetworkInterface = (
 
 export const getPASSTSelectableOptions = (
   t: TFunction,
-): { description: string; id: string; title: React.ReactNode }[] => [
+): { description: string; id: string; title: ReactNode }[] => [
   {
     description: t(
       'The default binding. Extends the L2 domain of the user-defined network into the VirtualMachine',

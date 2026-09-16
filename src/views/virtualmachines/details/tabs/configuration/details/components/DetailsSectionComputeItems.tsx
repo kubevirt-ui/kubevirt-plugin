@@ -1,4 +1,4 @@
-import { type FC } from 'react';
+import { type FC, type ReactNode } from 'react';
 import { type TFunction } from 'i18next';
 
 import {
@@ -45,7 +45,7 @@ type DetailsSectionComputeItemsProps = {
   vmName: string;
 };
 
-const getWorkloadLabel = (vmWorkload: WORKLOADS | undefined, t: TFunction): React.ReactNode => {
+const getWorkloadLabel = (vmWorkload: WORKLOADS | undefined, t: TFunction): ReactNode => {
   if (!vmWorkload) {
     return <MutedTextSpan text={t('Not available')} />;
   }

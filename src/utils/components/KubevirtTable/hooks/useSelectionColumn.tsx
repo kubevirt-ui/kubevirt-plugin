@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import { type ReactNode, useMemo } from 'react';
 
 import { PF_TABLE_CHECK_CLASS } from '@kubevirt-utils/hooks/useDataViewTableSort/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -18,7 +18,7 @@ export const useSelectionColumn = ({
   handleSelectAll,
   showSelectAllCheckbox,
   someSelected,
-}: SelectionColumnParams): { cell: React.ReactNode; props: { className: string } } => {
+}: SelectionColumnParams): { cell: ReactNode; props: { className: string } } => {
   const { t } = useKubevirtTranslation();
   const selectAllId = dataTest ? `${dataTest}-select-all` : 'select-all-rows';
 
