@@ -6,8 +6,9 @@ import {
 } from '@kubevirt-ui/kubevirt-api/console';
 import DataVolumeModel from '@kubevirt-ui/kubevirt-api/console/models/DataVolumeModel';
 import { VolumeTypes } from '@kubevirt-utils/components/DiskModal/utils/types';
+import { type K8sModel } from '@openshift-console/dynamic-plugin-sdk';
 
-export const mapVolumeTypeToK8sModel = {
+export const mapVolumeTypeToK8sModel: Partial<Record<VolumeTypes, K8sModel>> = {
   [VolumeTypes.CONFIG_MAP]: ConfigMapModel,
   [VolumeTypes.DATA_VOLUME]: DataVolumeModel,
   [VolumeTypes.PERSISTENT_VOLUME_CLAIM]: PersistentVolumeClaimModel,
