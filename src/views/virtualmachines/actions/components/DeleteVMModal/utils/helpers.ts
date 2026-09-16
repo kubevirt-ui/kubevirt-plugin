@@ -45,14 +45,6 @@ export const isResourceSavedByDefault = (
   return isResourceShared(sharableVolumes, resource);
 };
 
-export const findPVCOwner = (
-  pvc: IoK8sApiCoreV1PersistentVolumeClaim,
-  resources: K8sResourceCommon[],
-): K8sResourceCommon | undefined =>
-  resources.find((resource) =>
-    pvc?.metadata?.ownerReferences?.find((owner) => owner.uid === resource.metadata.uid),
-  );
-
 export const updateVolumeResources = (
   resources: (IoK8sApiCoreV1PersistentVolumeClaim | V1beta1DataVolume)[],
   vmOwnerRef: OwnerReference,
