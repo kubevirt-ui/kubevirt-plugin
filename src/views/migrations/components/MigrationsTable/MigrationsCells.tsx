@@ -1,4 +1,4 @@
-import { type ComponentType, type FC } from 'react';
+import { type FC } from 'react';
 
 import {
   modelToGroupVersionKind,

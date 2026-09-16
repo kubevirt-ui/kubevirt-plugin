@@ -1,4 +1,4 @@
-import { convertValueWithUnitsToBaseValue, formatValue, getType, humanize, round } from './core.js';
+import { convertValueWithUnitsToBaseValue, formatValue, getType, humanize, round } from './core';
 
 const formatPercentage = (value, options) => {
   const { locales, ...rest } = Object.assign({}, { style: 'percent' }, options, {

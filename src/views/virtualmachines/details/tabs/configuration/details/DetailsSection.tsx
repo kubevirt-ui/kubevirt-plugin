@@ -1,4 +1,4 @@
-import React, { type FC, useEffect, useMemo, useState } from 'react';
+import { type FC, useEffect, useMemo, useState } from 'react';
 
 import {
   type V1VirtualMachine,

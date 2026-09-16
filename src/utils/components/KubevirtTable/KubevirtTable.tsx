@@ -1,4 +1,4 @@
-import React, { type ReactElement, useEffect, useMemo } from 'react';
+import { type ReactElement, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router';
 
 import { useDataViewTableSort } from '@kubevirt-utils/hooks/useDataViewTableSort/useDataViewTableSort';

@@ -1,4 +1,4 @@
-export { getType } from './humanize/core.js';
+export { getType } from './humanize/core';
 export {
   humanizeBinaryBytes,
   humanizeBinaryBytesWithoutB,

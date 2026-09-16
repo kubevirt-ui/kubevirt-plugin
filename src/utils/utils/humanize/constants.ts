@@ -1,4 +1,10 @@
-export const TYPES = {
+export type HumanizeType = {
+  divisor: number;
+  space: boolean;
+  units: string[];
+};
+
+export const TYPES: Record<string, HumanizeType> = {
   binaryBytes: {
     divisor: 1024,
     space: true,

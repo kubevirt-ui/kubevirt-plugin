@@ -1,5 +1,3 @@
-import React from 'react';
-
 import AffinityModal from '@kubevirt-utils/components/AffinityModal/AffinityModal';
 import CloudinitModal from '@kubevirt-utils/components/CloudinitModal/CloudinitModal';
 import NodeSelectorModal from '@kubevirt-utils/components/NodeSelectorModal/NodeSelectorModal';

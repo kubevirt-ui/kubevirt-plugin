@@ -1,6 +1,6 @@
 import { isString } from '@kubevirt-utils/utils/utils';
 
-import { TYPES } from './constants.js';
+import { TYPES } from './constants';
 import { units } from './formatters.js';
 
 export const validate = {};

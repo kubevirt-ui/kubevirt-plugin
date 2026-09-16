@@ -1,5 +1,3 @@
-import React from 'react';
-
 import BootOrderModal from '@kubevirt-utils/components/BootOrderModal/BootOrderModal';
 import CPUMemoryModal from '@kubevirt-utils/components/CPUMemoryModal/CPUMemoryModal';
 import FirmwareBootloaderModal from '@kubevirt-utils/components/FirmwareBootloaderModal/FirmwareBootloaderModal';

@@ -1,4 +1,4 @@
-import React, { type FC, useCallback, useEffect, useMemo } from 'react';
+import { type FC, useCallback, useEffect, useMemo } from 'react';
 import { type Updater } from 'use-immer';
 
 import { type V1beta1Plan } from '@forklift-ui/types';
@@ -12,15 +12,17 @@ import {
 import { getName, getNamespace, getUID } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
-import { Title } from '@patternfly/react-core';
+import { Bullseye, Form, Split, SplitItem, Title } from '@patternfly/react-core';
+import { ArrowRightIcon } from '@patternfly/react-icons';
 import { useHubClusterName } from '@stolostron/multicluster-sdk';
 
 import { getClusterFromProvider } from '../utils';
 
 import useAdvisorRouteURL from '../hooks/useAdvisorRouteURL';
-import useClusterRecommendation from '../hooks/useClusterRecommendation';
 import useClustersAndProjects from '../hooks/useClustersAndProjects';
-import TargetStepForm from './TargetStepForm';
+import ClusterRecommendationSection from './ClusterRecommendationSection';
+import SourceInput from './SourceInput';
+import TargetInput from './TargetInput';
 
 import './TargetStep.scss';
 
@@ -35,8 +37,8 @@ const TargetStep: FC<TargetStepProps> = ({ migrationPlan, setMigrationPlan, vms 
   const [hubClusterName] = useHubClusterName();
   const sourceCluster = getCluster(vms?.[0]) ?? hubClusterName;
   const sourceNamespace = getNamespace(vms?.[0]);
-
   const [advisorBaseURL] = useAdvisorRouteURL();
+
   const vmQueryParams = useMemo(
     () => ({
       cluster: sourceCluster,
@@ -45,13 +47,6 @@ const TargetStep: FC<TargetStepProps> = ({ migrationPlan, setMigrationPlan, vms 
     }),
     [sourceCluster, vms, sourceNamespace],
   );
-  const {
-    data: recData,
-    error: recError,
-    fetchRecommendation,
-    loaded: recLoaded,
-    loading: recLoading,
-  } = useClusterRecommendation(advisorBaseURL, vmQueryParams);
 
   const selectedProviderTarget = getTargetProviderName(migrationPlan);
   const selectedClusterTarget = getClusterFromProvider(selectedProviderTarget);
@@ -130,25 +125,33 @@ const TargetStep: FC<TargetStepProps> = ({ migrationPlan, setMigrationPlan, vms 
       <Title className="cross-cluster-migration-title" headingLevel="h2" size="lg">
         {t('Target placement')}
       </Title>
-      <TargetStepForm
-        advisorBaseURL={advisorBaseURL}
-        clustersOptions={clustersOptions}
-        fetchRecommendation={fetchRecommendation}
-        onClusterChange={onClusterChange}
-        onProjectChange={onProjectChange}
-        onRecommendationSelect={onRecommendationSelect}
-        projectOptions={projectOptions}
-        projectsLoaded={projectsLoaded}
-        recData={recData}
-        recError={recError}
-        recLoaded={recLoaded}
-        recLoading={recLoading}
-        selectedClusterTarget={selectedClusterTarget}
-        selectedProjectTarget={selectedProjectTarget}
-        sourceCluster={sourceCluster}
-        sourceNamespace={sourceNamespace}
-        t={t}
-      />
+      <Form>
+        <Split hasGutter>
+          <SourceInput
+            clustersOptions={clustersOptions}
+            sourceCluster={sourceCluster}
+            sourceNamespace={sourceNamespace}
+          />
+          <SplitItem>
+            <Bullseye>
+              <ArrowRightIcon />
+            </Bullseye>
+          </SplitItem>
+          <TargetInput
+            clustersOptions={clustersOptions}
+            onClusterChange={onClusterChange}
+            onProjectChange={onProjectChange}
+            projectOptions={projectOptions}
+            projectsLoaded={projectsLoaded}
+            selectedClusterTarget={selectedClusterTarget}
+            selectedProjectTarget={selectedProjectTarget}
+          />
+        </Split>
+        <ClusterRecommendationSection
+          onRecommendationSelect={onRecommendationSelect}
+          vmQueryParams={vmQueryParams}
+        />
+      </Form>
     </StateHandler>
   );
 };
