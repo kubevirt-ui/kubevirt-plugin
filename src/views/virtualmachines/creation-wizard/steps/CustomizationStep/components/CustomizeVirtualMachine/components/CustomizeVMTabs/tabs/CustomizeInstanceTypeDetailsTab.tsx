@@ -36,6 +36,8 @@ import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
 
 import usePreference from '../hooks/usePreference';
 
+import CPUMemory from './components/CPUMemory';
+
 const CustomizeInstanceTypeDetailsTab = () => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
@@ -101,6 +103,7 @@ const CustomizeInstanceTypeDetailsTab = () => {
             descriptionHeader={<SearchItem id="description">{t('Description')}</SearchItem>}
             isEdit
           />
+          <CPUMemory />
           {treeViewFoldersEnabled && (
             <DescriptionItem
               onEditClick={() =>
