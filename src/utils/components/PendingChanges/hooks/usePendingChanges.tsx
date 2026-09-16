@@ -68,6 +68,7 @@ import {
   restartRequired,
 } from '../utils/helpers';
 import { PendingChange } from '../utils/types';
+import { getCPUMemoryTitle } from '@kubevirt-utils/components/CPUMemory/utils';
 
 export const usePendingChanges = (
   vm: V1VirtualMachine,
@@ -162,7 +163,7 @@ export const usePendingChanges = (
         )),
       ),
       hasPendingChange: !isInstanceTypeVM(vm) && cpuMemoryChanged && restartRequired(vm),
-      label: t('CPU | Memory'),
+      label: getCPUMemoryTitle(t),
     },
     {
       ...createProps(VirtualMachineDetailsTab.Details, () =>

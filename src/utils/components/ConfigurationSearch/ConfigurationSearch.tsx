@@ -1,4 +1,4 @@
-import { type FC, type FormEvent, type MouseEvent, useCallback, useState } from 'react';
+import { type FC, type FormEvent, type MouseEvent, useCallback, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
@@ -39,7 +39,12 @@ const ConfigurationSearch: FC<ConfigurationSearchProps> = ({
 
   const [value, setValue] = useState<string>('');
   const [isPopperVisible, setIsPopperVisible] = useState(false);
-  const [searchResultOptions, setSearchResultOptions] = useState(searchItems);
+
+  const enabledSearchItems = useMemo(
+    () => searchItems.filter(({ element }) => !element.isDisabled),
+    [searchItems],
+  );
+  const [searchResultOptions, setSearchResultOptions] = useState(enabledSearchItems);
 
   const onClear = useCallback(() => setValue(''), []);
 
@@ -47,10 +52,10 @@ const ConfigurationSearch: FC<ConfigurationSearchProps> = ({
     (_event: FormEvent<HTMLInputElement>, newValue: string) => {
       setIsPopperVisible(true);
       setValue(newValue);
-      const options = getOptions(searchItems, newValue);
+      const options = getOptions(enabledSearchItems, newValue);
       setSearchResultOptions(options);
     },
-    [searchItems],
+    [enabledSearchItems],
   );
 
   const onSelect = useCallback((e: MouseEvent<Element, globalThis.MouseEvent>, itemId: string) => {

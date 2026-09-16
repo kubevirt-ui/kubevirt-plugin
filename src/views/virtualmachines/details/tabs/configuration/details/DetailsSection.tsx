@@ -58,6 +58,7 @@ import {
 } from './utils/utils';
 
 import './details-section.scss';
+import { getCPUMemoryTitle } from '@kubevirt-utils/components/CPUMemory/utils';
 
 type DetailsSectionProps = {
   allInstanceTypes: InstanceTypeUnion[];
@@ -164,7 +165,7 @@ const DetailsSection: FC<DetailsSectionProps> = ({ allInstanceTypes, instanceTyp
             <DescriptionItem
               descriptionHeader={
                 <SearchItem id="cpu-memory">
-                  {isInstanceType ? t('InstanceType') : t('CPU | Memory')}
+                  {isInstanceType ? t('InstanceType') : getCPUMemoryTitle(t)}
                 </SearchItem>
               }
               onEditClick={() =>

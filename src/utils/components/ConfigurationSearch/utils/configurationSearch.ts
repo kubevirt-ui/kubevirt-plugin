@@ -14,10 +14,7 @@ export const getOptions = (
   const lowerCaseQueryValue = query.toLowerCase();
 
   const filteredAndSortedItems = searchItems
-    .filter(
-      ({ element }) =>
-        !element?.isDisabled && element?.title?.toLowerCase().includes(lowerCaseQueryValue),
-    )
+    .filter(({ element }) => element?.title?.toLowerCase().includes(lowerCaseQueryValue))
     .sort((firstItem, secondItem) => {
       const firstItemStartsWith = firstItem.element.title
         .toLowerCase()

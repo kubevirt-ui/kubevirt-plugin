@@ -4,6 +4,7 @@ import {
   type SearchItemWithTab,
 } from '@kubevirt-utils/components/ConfigurationSearch/types';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getCreationTimestamp } from '@kubevirt-utils/resources/shared';
 import { getInstanceTypeMatcher } from '@kubevirt-utils/resources/vm';
 import { hasS390xArchitecture } from '@kubevirt-utils/resources/vm/utils/architecture';
 
@@ -36,7 +37,11 @@ export const getDetailsTabMainIds: SearchItemGetter = (vm) => [
   { id: 'guest-system-log-access', title: t('Guest system log access') },
   { id: 'headless-mode', title: t('Headless mode') },
   { id: 'hostname', title: t('Hostname') },
-  { id: 'cpu-memory', title: t('CPU | Memory') },
+  {
+    id: 'cpu-memory',
+    isDisabled: Boolean(getInstanceTypeMatcher(vm)) && !getCreationTimestamp(vm),
+    title: t('CPU | Memory'),
+  },
   {
     id: 'workload-profile',
     isDisabled: Boolean(getInstanceTypeMatcher(vm)),
