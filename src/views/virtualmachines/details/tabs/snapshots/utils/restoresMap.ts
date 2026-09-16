@@ -1,6 +1,13 @@
-import { type V1beta1VirtualMachineRestore } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import {
+  type V1beta1VirtualMachineRestore,
+  type V1beta1VirtualMachineSnapshot,
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { getName, getUID } from '@kubevirt-utils/resources/shared';
 
 import { getVmRestoreSnapshotName, getVmRestoreTime } from './selectors';
+
+export const getVmRestoreTargetName = (restore: V1beta1VirtualMachineRestore): string | undefined =>
+  restore?.spec?.target?.name;
 
 const isNewerRestore = (
   currentRestore: V1beta1VirtualMachineRestore,
@@ -24,22 +31,53 @@ const isNewerRestore = (
   return new Date(existingRestoreTime).getTime() < new Date(currentRestoreTime).getTime();
 };
 
+export const isRestoreForSnapshot = (
+  restore: V1beta1VirtualMachineRestore,
+  snapshot: V1beta1VirtualMachineSnapshot,
+  vmName: string,
+): boolean => {
+  const restoreTime = getVmRestoreTime(restore);
+  const snapshotCreated = snapshot?.metadata?.creationTimestamp;
+
+  if (!restoreTime || !snapshotCreated) {
+    return false;
+  }
+
+  if (getVmRestoreTargetName(restore) !== vmName) {
+    return false;
+  }
+
+  if (getVmRestoreSnapshotName(restore) !== getName(snapshot)) {
+    return false;
+  }
+
+  return new Date(restoreTime).getTime() >= new Date(snapshotCreated).getTime();
+};
+
 export const buildRestoresMap = (
+  snapshots: V1beta1VirtualMachineSnapshot[],
   restores: V1beta1VirtualMachineRestore[] | undefined,
+  vmName: string,
 ): Record<string, V1beta1VirtualMachineRestore> =>
-  (restores ?? []).reduce<Record<string, V1beta1VirtualMachineRestore>>(
-    (restoreMap, currentRestore) => {
-      const snapshotName = getVmRestoreSnapshotName(currentRestore);
-      if (!snapshotName) {
-        return restoreMap;
-      }
+  snapshots.reduce<Record<string, V1beta1VirtualMachineRestore>>((map, snapshot) => {
+    const snapshotUID = getUID(snapshot);
+    if (!snapshotUID) {
+      return map;
+    }
 
-      const existingRestore = restoreMap[snapshotName];
-      if (isNewerRestore(currentRestore, existingRestore)) {
-        restoreMap[snapshotName] = currentRestore;
-      }
+    const latestRestore = (restores ?? [])
+      .filter((restore) => isRestoreForSnapshot(restore, snapshot, vmName))
+      .reduce<V1beta1VirtualMachineRestore | undefined>((latest, current) => {
+        if (isNewerRestore(current, latest)) {
+          return current;
+        }
 
-      return restoreMap;
-    },
-    {},
-  );
+        return latest;
+      }, undefined);
+
+    if (latestRestore) {
+      map[snapshotUID] = latestRestore;
+    }
+
+    return map;
+  }, {});
