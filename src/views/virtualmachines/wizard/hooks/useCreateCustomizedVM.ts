@@ -87,7 +87,7 @@ const useCreateCustomizedVM: UseCreateCustomizedVM = () => {
       logSuccessfulVMCreation(createdVM, creationMethod, selectedTemplate);
 
       if (isTemplateCreationMethod(creationMethod) && templateAdditionalObjects.length > 0) {
-        await createTemplateAdditionalObjects(templateAdditionalObjects, createdVM, models);
+        await createTemplateAdditionalObjects(templateAdditionalObjects, createdVM, models, t);
       }
 
       if (cluster && isACMPath(pathname)) {
