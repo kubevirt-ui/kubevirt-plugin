@@ -1,7 +1,6 @@
 import {
   CLUSTER_LIST_FILTER_TYPE,
   PROJECT_LIST_FILTER_TYPE,
-  ROW_FILTERS_PREFIX,
 } from '@kubevirt-utils/utils/constants';
 
 export const OBJECTS_FETCHING_LIMIT = 10000;
@@ -34,5 +33,3 @@ export enum VirtualMachineRowFilterType {
   Status = 'status',
   StorageClass = 'storageClass',
 }
-
-export const STATUS_LIST_FILTER_PARAM = `${ROW_FILTERS_PREFIX}${VirtualMachineRowFilterType.Status}`;

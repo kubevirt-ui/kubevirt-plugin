@@ -1,6 +1,6 @@
 import { type V1beta1Plan } from '@forklift-ui/types';
 
-import { buildFilterPath } from '../../shared/urlUtils';
+import { buildJsonArrayFilterPath } from '../../shared/urlUtils';
 
 export enum MTVPlanStatus {
   Archived = 'Archived',
@@ -94,7 +94,7 @@ const CROSS_CLUSTER_FAILED = new Set(CROSS_CLUSTER_FAILED_STATUSES);
 const CROSS_CLUSTER_RUNNING = new Set(CROSS_CLUSTER_RUNNING_STATUSES);
 
 export const buildPhaseFilterPath = (basePath: string, statuses: MTVPlanStatus[]): string =>
-  buildFilterPath(basePath, 'phase', JSON.stringify(statuses));
+  buildJsonArrayFilterPath(basePath, 'phase', statuses);
 
 export const getCrossClusterMigrationCounts = (
   plans: V1beta1Plan[],
