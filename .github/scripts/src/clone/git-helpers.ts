@@ -4,16 +4,21 @@ import { resolve } from 'node:path';
 const GIT_USER_NAME = 'github-actions[bot]';
 const GIT_USER_EMAIL = '41898282+github-actions[bot]@users.noreply.github.com';
 
+/** Redact credentials from token-bearing git remote URLs before publishing errors. */
+export const redactCredentials = (text: string): string =>
+  text.replace(/https:\/\/[^:@\s/]+:[^@\s/]+@/g, 'https://[REDACTED]@');
+
 /** Thrown when a git command fails; carries stderr for PR feedback. */
 export class GitCommandError extends Error {
   readonly command: string;
   readonly stderr: string;
 
   constructor(command: string, stderr: string) {
-    const detail = stderr.trim() || 'unknown error';
-    super(`git ${command} failed: ${detail}`);
+    const safeCommand = redactCredentials(command);
+    const detail = redactCredentials(stderr).trim() || 'unknown error';
+    super(`git ${safeCommand} failed: ${detail}`);
     this.name = 'GitCommandError';
-    this.command = command;
+    this.command = safeCommand;
     this.stderr = detail;
   }
 }

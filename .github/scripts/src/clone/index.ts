@@ -10,6 +10,7 @@ import { openCherryPickPR, performCherryPick } from './cherry-pick';
 import { formatCloneFailureMessage } from './clone-errors';
 import { cloneAllTickets } from './clone-tickets';
 import { postCloneError, validateCloneCommand } from './clone-validation';
+import { setupRepositoryForCherryPick } from './git-helpers';
 
 const clonedTicketsFooter = (clonedKeys: string[]): string =>
   clonedKeys.length > 0
@@ -80,6 +81,14 @@ export const runClone = async (): Promise<void> => {
 
   let result: CherryPickResult;
   try {
+    setupRepositoryForCherryPick({
+      commitSha,
+      owner: ghConfig.owner,
+      repo: ghConfig.repo,
+      targetBranch,
+      token: ghConfig.token,
+    });
+
     result = performCherryPick(targetBranch, commitSha, cherryPickBranch, clonedTickets);
   } catch (err) {
     await postCloneError(
