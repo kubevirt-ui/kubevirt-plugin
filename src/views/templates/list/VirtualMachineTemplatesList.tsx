@@ -34,6 +34,7 @@ const VirtualMachineTemplatesList: FC<ListPageProps> = ({
   hideColumnManagement,
   hideNameLabelFilters,
   hideTextFilter,
+  namespace,
   selector,
   showTitle = true,
 }) => {
@@ -44,9 +45,14 @@ const VirtualMachineTemplatesList: FC<ListPageProps> = ({
   const namespaceParam = useNamespaceParam();
   const isAllClustersPage = useIsAllClustersPage();
 
+  // Prefer the namespace passed down by Console as per console.page/resource/list extension.
+  // useNamespaceParam only matches /k8s/ns/:ns/* and the fleet path, so it returns undefined
+  // on routes such as Search.
+  const activeNamespace = namespace ?? namespaceParam;
+
   const { allTemplates, allTemplatesWithRequests, error, loaded } = useAllTemplateResources({
     fieldSelector,
-    namespace: namespaceParam,
+    namespace: activeNamespace,
     selector,
   });
 
@@ -60,7 +66,7 @@ const VirtualMachineTemplatesList: FC<ListPageProps> = ({
   } = useVirtualMachineTemplatesListFilters(allTemplates, allTemplatesWithRequests);
 
   const { activeColumnKeys, columnLayout, columns, loadedColumns } =
-    useVirtualMachineTemplatesListColumns(namespaceParam, isAllClustersPage);
+    useVirtualMachineTemplatesListColumns(activeNamespace, isAllClustersPage);
 
   if (
     !runningTourSignal.value &&
