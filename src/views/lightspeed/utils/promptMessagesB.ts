@@ -1,6 +1,3 @@
-// Extracted from prompts.ts
-// Root: src/views/lightspeed/utils/prompts.ts
-
 import { OLSPromptType } from './promptTypes';
 
 export const STATIC_PROMPT_MESSAGES_B: Partial<Record<OLSPromptType, string>> = {

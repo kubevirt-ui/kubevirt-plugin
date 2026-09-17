@@ -1,6 +1,3 @@
-// Extracted from jobLifecycle.ts
-// Root: src/views/checkups/self-validation/utils/selfValidationJob/jobLifecycle.ts
-
 import { ConfigMapModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { type IoK8sApiBatchV1Job } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { kubevirtK8sCreate } from '@multicluster/k8sRequests';

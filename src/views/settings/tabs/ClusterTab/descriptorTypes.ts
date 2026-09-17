@@ -1,6 +1,3 @@
-// Extracted from types.ts
-// Root: src/views/clusteroverview/utils/types.ts
-
 export type Descriptor<T = unknown> = {
   description: string;
   displayName: string;

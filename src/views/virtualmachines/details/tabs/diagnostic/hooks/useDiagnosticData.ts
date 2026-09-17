@@ -61,7 +61,7 @@ const volumeSnapshotStatusesTransformer = (
 
     return {
       ...vss,
-      id: uuidv4(),
+      id: uuidv4() as string,
       message: parsedReason.message,
       metadata: {
         condition: 'Other',

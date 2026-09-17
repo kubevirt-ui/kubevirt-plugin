@@ -1,6 +1,3 @@
-// Extracted from DiskRowActions.tsx
-// Root: src/views/virtualmachines/details/tabs/configuration/storage/components/tables/disk/DiskRowActions.tsx
-
 import { type FC } from 'react';
 
 import { type V1VirtualMachine, type V1Volume } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';

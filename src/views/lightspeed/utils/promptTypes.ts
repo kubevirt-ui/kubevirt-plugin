@@ -1,6 +1,3 @@
-// Extracted from prompts.ts
-// Root: src/views/lightspeed/utils/prompts.ts
-
 export enum OLSPromptType {
   AAQ_QUOTA_CALCULATION_METHOD = 'AAQ_QUOTA_CALCULATION_METHOD',
   ACCESS_MODE = 'ACCESS_MODE',
