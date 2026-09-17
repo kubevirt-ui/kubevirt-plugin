@@ -12,11 +12,17 @@ import { customizeWizardVMSignal } from '@kubevirt-utils/signals/customizeWizard
 import { getErrorMessage, kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { kubevirtK8sCreate } from '@multicluster/k8sRequests';
 import { getVMURL, isACMPath } from '@multicluster/urls';
+import { useK8sModels } from '@openshift-console/dynamic-plugin-sdk';
 import { useSignals } from '@preact/signals-react/runtime';
 
 import { useVMWizard } from '../state/vm-wizard-context/VMWizardContext';
-import { CREATE_VM_FORM_FIELDS_VM_DATA } from '../state/vm-wizard-form/consts';
+import {
+  CREATE_VM_FORM_FIELDS_UI_STATE,
+  CREATE_VM_FORM_FIELDS_VM_DATA,
+} from '../state/vm-wizard-form/consts';
 import { SELECTED_CLUSTER } from '../utils/constants';
+import { isTemplateCreationMethod } from '../utils/utils';
+import { createTemplateAdditionalObjects } from './utils/templateAdditionalObjects';
 import {
   createHeadlessServiceSafely,
   logFailedVMCreation,
@@ -43,6 +49,7 @@ const useCreateCustomizedVM: UseCreateCustomizedVM = () => {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<unknown>(null);
+  const [models] = useK8sModels();
   const [_clusterFromLocalStorage, setClusterInLocalStorage] = useLocalStorage(
     SELECTED_CLUSTER.LOCAL_STORAGE_KEY,
   );
@@ -53,6 +60,9 @@ const useCreateCustomizedVM: UseCreateCustomizedVM = () => {
       name: vmName,
       selectedTemplate,
     } = getValues(CREATE_VM_FORM_FIELDS_VM_DATA.ROOT);
+    const templateAdditionalObjects = getValues(
+      CREATE_VM_FORM_FIELDS_UI_STATE.TEMPLATE_ADDITIONAL_OBJECTS,
+    );
     const storeVM = customizeWizardVMSignal.value;
 
     if (!storeVM) {
@@ -75,6 +85,10 @@ const useCreateCustomizedVM: UseCreateCustomizedVM = () => {
       });
 
       logSuccessfulVMCreation(createdVM, creationMethod, selectedTemplate);
+
+      if (isTemplateCreationMethod(creationMethod) && templateAdditionalObjects.length > 0) {
+        await createTemplateAdditionalObjects(templateAdditionalObjects, createdVM, models, t);
+      }
 
       if (cluster && isACMPath(pathname)) {
         setClusterInLocalStorage(cluster);

@@ -5,6 +5,7 @@ import { DYNAMIC_CREDENTIALS_SUPPORT } from '@kubevirt-utils/components/DynamicS
 import { addSecretToVM } from '@kubevirt-utils/components/SSHSecretModal/utils/utils';
 import { getLabel, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import {
+  getTemplateAdditionalObjects,
   getTemplateVirtualMachineObject,
   isVirtualMachineTemplate,
   LABEL_USED_TEMPLATE_NAME,
@@ -16,15 +17,21 @@ import { processVirtualMachineTemplate } from '@kubevirt-utils/resources/templat
 import { getDefaultRunningStrategy } from '@kubevirt-utils/resources/vm';
 import { getDataVolumeSourceHTTP } from '@kubevirt-utils/resources/vm/utils/dataVolumeTemplate/selectors';
 import { ensurePath, isEmpty } from '@kubevirt-utils/utils/utils';
+import { type K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
 import { INSTALLATION_CDROM_NAME } from '@virtualmachines/wizard/steps/TemplateStep/components/TemplatesCatalog/utils/consts';
+
+export type ResolvedTemplateVM = {
+  additionalObjects: K8sResourceCommon[];
+  vm: V1VirtualMachine;
+};
 
 export const resolveVMFromTemplate = async (
   selectedTemplate: Template,
   namespace: string,
   cluster: string,
   vmName?: string,
-): Promise<V1VirtualMachine> => {
+): Promise<ResolvedTemplateVM> => {
   const isVMTemplate = isVirtualMachineTemplate(selectedTemplate);
 
   if (isVMTemplate) {
@@ -36,7 +43,7 @@ export const resolveVMFromTemplate = async (
 
     const vm = processedTemplate.virtualMachine;
     if (cluster) vm.cluster = cluster;
-    return vm;
+    return { additionalObjects: [], vm };
   }
 
   const processedTemplate = await processOpenShiftTemplate(
@@ -47,7 +54,10 @@ export const resolveVMFromTemplate = async (
   );
   const vm = getTemplateVirtualMachineObject(processedTemplate);
   if (cluster) vm.cluster = cluster;
-  return vm;
+  return {
+    additionalObjects: getTemplateAdditionalObjects(processedTemplate),
+    vm,
+  };
 };
 
 export const applyCertConfigMapToCDRom = (

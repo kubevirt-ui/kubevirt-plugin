@@ -37,6 +37,7 @@ export const createInitialVMWizardFormValues = ({
     isTemplatesDrawerOpen: false,
     lastProcessedTemplateKey: '',
     shouldCheckVMNameProperly: false,
+    templateAdditionalObjects: [],
     templateProcessError: null,
   },
   vmData: {
@@ -67,6 +68,7 @@ export const CREATE_VM_FORM_FIELDS_UI_STATE = {
   IS_TEMPLATES_DRAWER_OPEN: 'uiState.isTemplatesDrawerOpen',
   LAST_PROCESSED_TEMPLATE_KEY: 'uiState.lastProcessedTemplateKey',
   SHOULD_CHECK_VM_NAME_PROPERLY: 'uiState.shouldCheckVMNameProperly',
+  TEMPLATE_ADDITIONAL_OBJECTS: 'uiState.templateAdditionalObjects',
   TEMPLATE_PROCESS_ERROR: 'uiState.templateProcessError',
 } as const satisfies Record<string, FieldPath<VMWizardFormValues>>;
 

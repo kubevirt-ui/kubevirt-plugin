@@ -70,7 +70,12 @@ const useCreateVMFromTemplate: UseCreateVMFromTemplate = () => {
 
     setIsProcessing(true);
     try {
-      const vm = await resolveVMFromTemplate(selectedTemplate, namespace, cluster, vmName);
+      const { additionalObjects, vm } = await resolveVMFromTemplate(
+        selectedTemplate,
+        namespace,
+        cluster,
+        vmName,
+      );
 
       customizeWizardVMSignal.value = getVMObjectFromTemplate({
         description,
@@ -81,6 +86,7 @@ const useCreateVMFromTemplate: UseCreateVMFromTemplate = () => {
         vm,
       });
       setValue(CREATE_VM_FORM_FIELDS_UI_STATE.LAST_PROCESSED_TEMPLATE_KEY, selectedKey);
+      setValue(CREATE_VM_FORM_FIELDS_UI_STATE.TEMPLATE_ADDITIONAL_OBJECTS, additionalObjects);
       return true;
     } catch (error) {
       const message = (error as Error)?.message ?? String(error);
