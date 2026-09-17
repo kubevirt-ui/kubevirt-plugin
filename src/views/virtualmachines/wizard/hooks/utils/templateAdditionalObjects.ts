@@ -46,11 +46,9 @@ const prepareTemplateAdditionalObject = (
 
   const data = produce(resource, (draft) => {
     if (model?.namespaced && vmNamespace) {
-      ensurePath(draft, 'metadata.namespace');
+      ensurePath(draft, 'metadata');
 
-      if (!draft.metadata.namespace) {
-        draft.metadata.namespace = vmNamespace;
-      }
+      draft.metadata.namespace ??= vmNamespace;
     }
 
     if (shouldAddOwnerReference(model, draft.metadata?.namespace, vmNamespace)) {
