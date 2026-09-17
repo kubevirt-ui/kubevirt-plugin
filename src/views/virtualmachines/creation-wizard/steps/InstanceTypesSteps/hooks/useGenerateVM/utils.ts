@@ -225,22 +225,26 @@ export const generateVM: GenerateVMCallback = ({
   isIPv6SingleStack,
   isUDNManagedNamespace,
   populatedCloudInitYAML,
+  preference,
   pvcSource,
   selectedBootableVolume,
   selectedInstanceType,
   sshSecretName,
   targetNamespace,
+  useBootSource,
   vmDescription,
   vmName,
 }) => {
-  const selectedPreference = getLabel(selectedBootableVolume, DEFAULT_PREFERENCE_LABEL);
-  const selectPreferenceKind = getLabel(
+  const hasBootSource = useBootSource && !isEmpty(selectedBootableVolume);
+  const selectedPreference =
+    getLabel(selectedBootableVolume, DEFAULT_PREFERENCE_LABEL) || preference;
+  const selectedPreferenceKind = getLabel(
     selectedBootableVolume,
     DEFAULT_PREFERENCE_KIND_LABEL,
     null,
   );
 
-  const isIso = isBootableVolumeISO(selectedBootableVolume);
+  const isIso = hasBootSource && isBootableVolumeISO(selectedBootableVolume);
   const isWindowsVM = selectedPreference?.startsWith(OS_WINDOWS_PREFIX);
   const storageClassName = getPVCStorageClassName(pvcSource);
 
@@ -261,35 +265,37 @@ export const generateVM: GenerateVMCallback = ({
       ...(folder && { labels: { [VM_FOLDER_LABEL]: folder } }),
     },
     spec: {
-      dataVolumeTemplates: [
-        {
-          metadata: {
-            name: volumeName,
-          },
-          spec: {
-            sourceRef: {
-              kind: DataSourceModel.kind,
-              name: getName(selectedBootableVolume),
-              namespace: getNamespace(selectedBootableVolume),
+      ...(hasBootSource && {
+        dataVolumeTemplates: [
+          {
+            metadata: {
+              name: volumeName,
             },
-            storage: {
-              resources:
-                dvSource || pvcSource
-                  ? {
-                      requests: {
-                        storage: getDataVolumeSize(dvSource) || getPVCSize(pvcSource),
+            spec: {
+              sourceRef: {
+                kind: DataSourceModel.kind,
+                name: getName(selectedBootableVolume),
+                namespace: getNamespace(selectedBootableVolume),
+              },
+              storage: {
+                resources:
+                  dvSource || pvcSource
+                    ? {
+                        requests: {
+                          storage: getDataVolumeSize(dvSource) || getPVCSize(pvcSource),
+                        },
+                      }
+                    : {
+                        requests: {
+                          storage: DEFAULT_DISK_SIZE,
+                        },
                       },
-                    }
-                  : {
-                      requests: {
-                        storage: DEFAULT_DISK_SIZE,
-                      },
-                    },
-              storageClassName,
+                storageClassName,
+              },
             },
           },
-        },
-      ],
+        ],
+      }),
       instancetype: {
         ...(selectedInstanceType?.namespace && {
           kind: VirtualMachineInstancetypeModel.kind,
@@ -298,10 +304,12 @@ export const generateVM: GenerateVMCallback = ({
           selectedInstanceType?.name ||
           getLabels(selectedBootableVolume)?.[DEFAULT_INSTANCETYPE_LABEL],
       },
-      preference: {
-        name: selectedPreference,
-        ...(selectPreferenceKind && { kind: selectPreferenceKind }),
-      },
+      ...(selectedPreference && {
+        preference: {
+          name: selectedPreference,
+          ...(selectedPreferenceKind && { kind: selectedPreferenceKind }),
+        },
+      }),
       runStrategy: getDefaultRunningStrategy(),
       template: {
         metadata: {
@@ -322,10 +330,14 @@ export const generateVM: GenerateVMCallback = ({
           networks: isIPv6SingleStack ? [] : [DEFAULT_NETWORK],
           subdomain: HEADLESS_SERVICE_NAME,
           volumes: [
-            {
-              dataVolume: { name: volumeName },
-              name: ROOTDISK,
-            },
+            ...(hasBootSource
+              ? [
+                  {
+                    dataVolume: { name: volumeName },
+                    name: ROOTDISK,
+                  },
+                ]
+              : []),
             ...(!isWindowsVM
               ? [
                   {
@@ -348,19 +360,19 @@ export const generateVM: GenerateVMCallback = ({
     emptyVM.spec.template.metadata.labels[HEADLESS_SERVICE_LABEL] = HEADLESS_SERVICE_NAME;
   }
 
-  if (isBootableVolumePVCKind(selectedBootableVolume)) {
+  if (hasBootSource && isBootableVolumePVCKind(selectedBootableVolume)) {
     emptyVM = addPVCAsSourceDiskToVM(emptyVM, selectedBootableVolume);
   }
 
-  if (isIso) {
+  if (hasBootSource && isIso) {
     emptyVM = addISOFlowToVM(emptyVM, storageClassName);
   }
 
-  if (customDiskSize) {
+  if (hasBootSource && customDiskSize) {
     emptyVM = addSizeToROOTDISKVM(emptyVM, customDiskSize, isIso);
   }
 
-  emptyVM = addRootDiskToVM(emptyVM);
+  if (hasBootSource) emptyVM = addRootDiskToVM(emptyVM);
 
   if (sshSecretName) {
     const isDynamic = getLabel(selectedBootableVolume, DYNAMIC_CREDENTIALS_SUPPORT) === 'true';

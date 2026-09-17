@@ -32,8 +32,15 @@ const useGenerateVM: UseGenerateVM = () => {
 
   const { subscriptionData } = useRHELAutomaticSubscription();
   const store = useInstanceTypeVMStore();
-  const { customDiskSize, dvSource, pvcSource, selectedBootableVolume, selectedInstanceType } =
-    store;
+  const {
+    customDiskSize,
+    dvSource,
+    preference,
+    pvcSource,
+    selectedBootableVolume,
+    selectedInstanceType,
+    useBootSource,
+  } = store;
 
   const [isUDNManagedNamespace] = useNamespaceUDN(getValidNamespace(namespace));
   const isIPv6SingleStack = useIsIPv6SingleStackCluster(cluster);
@@ -41,8 +48,9 @@ const useGenerateVM: UseGenerateVM = () => {
   const enableMultiArchBootImageImport =
     hyperConverge?.spec?.featureGates?.enableMultiArchBootImageImport;
 
-  const selectedPreference = getLabel(selectedBootableVolume, DEFAULT_PREFERENCE_LABEL);
-  const osLabel = getLabel(selectedBootableVolume, KUBEVIRT_OS);
+  const selectedPreference =
+    getLabel(selectedBootableVolume, DEFAULT_PREFERENCE_LABEL) || preference;
+  const osLabel = getLabel(selectedBootableVolume, KUBEVIRT_OS) || preference;
   const populatedCloudInitYAML = useMemo(
     () =>
       createPopulatedCloudInitYAML(
@@ -69,11 +77,13 @@ const useGenerateVM: UseGenerateVM = () => {
         isIPv6SingleStack,
         isUDNManagedNamespace,
         populatedCloudInitYAML,
+        preference,
         pvcSource,
         selectedBootableVolume,
         selectedInstanceType,
         sshSecretName,
         targetNamespace: namespace,
+        useBootSource,
         vmDescription,
         vmName: vmName || generatedVMName,
       }),
@@ -88,10 +98,12 @@ const useGenerateVM: UseGenerateVM = () => {
       isUDNManagedNamespace,
       namespace,
       populatedCloudInitYAML,
+      preference,
       pvcSource,
       selectedBootableVolume,
       selectedInstanceType,
       sshSecretName,
+      useBootSource,
       vmDescription,
       vmName,
     ],

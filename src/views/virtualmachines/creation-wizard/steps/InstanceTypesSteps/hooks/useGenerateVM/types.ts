@@ -12,11 +12,13 @@ type GenerateVMArgs = {
   isIPv6SingleStack?: boolean;
   isUDNManagedNamespace: boolean;
   populatedCloudInitYAML: string;
+  preference: string;
   pvcSource: IoK8sApiCoreV1PersistentVolumeClaim;
   selectedBootableVolume: BootableVolume;
   selectedInstanceType: { name: string; namespace: string };
   sshSecretName?: string;
   targetNamespace: string;
+  useBootSource: boolean;
   vmDescription?: string;
   vmName?: string;
 };
