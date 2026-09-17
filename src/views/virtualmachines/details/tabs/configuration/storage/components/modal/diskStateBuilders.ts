@@ -1,5 +1,3 @@
-import produce from 'immer';
-
 import type { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import {
   DEFAULT_CDROM_DISK_SIZE,
@@ -11,48 +9,8 @@ import {
   InterfaceTypes,
   type V1DiskFormState,
 } from '@kubevirt-utils/components/DiskModal/utils/types';
-import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
-import { getDataVolumeName } from '@kubevirt-utils/resources/vm/utils/disk/selectors';
+import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { generateUploadDiskName } from '@kubevirt-utils/utils/utils';
-
-/**
- * Aligns mount upload volume with Add CD-ROM upload so Storage tab watches resolve the source.
- * Running hot-pluggable VMs use a dataVolume ref; stopped VMs use a PVC claim on the upload DV name.
- */
-export const produceMountUploadVolumeState = (
-  diskState: V1DiskFormState,
-  cdromName: string,
-  isHotPluggable: boolean,
-  isVMRunning: boolean,
-): V1DiskFormState =>
-  produce(diskState, (draft) => {
-    const dvName = getName(draft.dataVolumeTemplate) ?? getDataVolumeName(draft.volume);
-
-    if (!dvName) {
-      return;
-    }
-
-    if (isVMRunning && isHotPluggable) {
-      draft.volume = {
-        dataVolume: {
-          hotpluggable: true,
-          name: dvName,
-        },
-        name: cdromName,
-      };
-      delete draft.dataVolumeTemplate;
-      return;
-    }
-
-    draft.volume = {
-      name: cdromName,
-      persistentVolumeClaim: {
-        claimName: dvName,
-        ...(isHotPluggable && { hotpluggable: true }),
-      },
-    };
-    delete draft.dataVolumeTemplate;
-  });
 
 export const buildDiskState = (
   uploadMode: string,

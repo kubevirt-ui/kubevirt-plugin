@@ -1,6 +1,7 @@
 import { type TFunction } from 'i18next';
 
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { produceCdromUploadVolumeState } from '@kubevirt-utils/components/DiskModal/utils/cdromDataProducers';
 import {
   createEjectMountedDiskCancelCleanup,
   mountISOToCDROM,
@@ -16,7 +17,7 @@ import {
   getPVCClaimName,
 } from '@kubevirt-utils/resources/vm/utils/disk/selectors';
 
-import { buildDiskState, produceMountUploadVolumeState } from '../diskStateBuilders';
+import { buildDiskState } from '../diskStateBuilders';
 
 export type MountCDROMSubmitParams = {
   cdromName: string;
@@ -67,7 +68,7 @@ export const submitMountCDROM = async ({
   if (uploadFile?.file) {
     await checkUploadReady();
 
-    const diskStateForMount = produceMountUploadVolumeState(
+    const diskStateForMount = produceCdromUploadVolumeState(
       diskState,
       cdromName,
       isHotPluggable,

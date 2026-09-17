@@ -1,23 +1,28 @@
-import produce from 'immer';
-
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getVmCdromUploadKeyFromVm } from '@kubevirt-utils/hooks/useUploadProgressToast/keys/uploadKeys';
-import { getCustomizeWizardVM } from '@kubevirt-utils/signals/customizeWizardVMSignal';
 import { generateUploadDiskName } from '@kubevirt-utils/utils/utils';
 import { isRunning } from '@virtualmachines/utils';
 
 import { reorderBootDisk } from './bootDiskUtils';
-import { produceEmptyDriveData, produceExistingISOData } from './cdromDataProducers';
+import {
+  produceCdromUploadVolumeState,
+  produceEmptyDriveData,
+  produceExistingISOData,
+} from './cdromDataProducers';
 import { UPLOAD_SUFFIX } from './constants';
 import {
   createDetachDiskCancelCleanup,
   createEjectMountedDiskCancelCleanup,
   createMutableUploadData,
-  mountISOToCDROM,
 } from './helpers';
 import { addDisk } from './submit';
 import { type SubmitCDROMInput, type V1DiskFormState } from './types';
 import { logBackgroundUploadError, runVmCdromBackgroundUpload } from './vmCdromBackgroundUpload';
+
+const applyCdromDisk = (producedData: V1DiskFormState, vm: V1VirtualMachine): V1VirtualMachine => {
+  const vmWithDisk = addDisk(producedData, vm);
+  return reorderBootDisk(vmWithDisk, producedData.disk.name, producedData.isBootSource, false);
+};
 
 export const submitCDROM = async (
   data: V1DiskFormState,
@@ -36,16 +41,8 @@ export const submitCDROM = async (
   const uploadISO = uploadEnabled && data?.uploadFile?.file;
   const vmIsRunning = isRunning(vm);
 
-  const finalize = (producedData: V1DiskFormState): Promise<V1VirtualMachine | void> => {
-    const vmWithDisk = addDisk(producedData, vm);
-    const updatedVM = reorderBootDisk(
-      vmWithDisk,
-      producedData.disk.name,
-      producedData.isBootSource,
-      false,
-    );
-    return onSubmit(updatedVM);
-  };
+  const finalize = (producedData: V1DiskFormState): Promise<V1VirtualMachine | void> =>
+    onSubmit(applyCdromDisk(producedData, vm));
 
   if (selectedISO) {
     return finalize(produceExistingISOData(data, selectedISO, isHotPluggable));
@@ -66,72 +63,28 @@ export const submitCDROM = async (
       uploadFile: { file, filename: file?.name },
     };
 
-    if (vmIsRunning && isHotPluggable) {
-      const emptyData = produceEmptyDriveData(data);
-      const vmWithEmptyCdrom = addDisk(emptyData, vm);
-      const updatedVMWithEmpty = reorderBootDisk(
-        vmWithEmptyCdrom,
-        diskName,
-        data.isBootSource,
-        false,
-      );
+    const updatedVM = applyCdromDisk(
+      produceCdromUploadVolumeState(data, diskName, isHotPluggable, vmIsRunning, dvName),
+      vm,
+    );
+    const submitResult = (await onSubmit(updatedVM)) as V1VirtualMachine | undefined;
+    const vmAfterSubmit = submitResult ?? updatedVM;
 
-      const submitResult = (await onSubmit(updatedVMWithEmpty)) as V1VirtualMachine | undefined;
-      const vmAfterEmptyAdd = submitResult ?? updatedVMWithEmpty;
-
-      const runningVmUploadPromise = runVmCdromBackgroundUpload({
-        afterUpload: async () => {
-          const dataWithVolume = produce(data, (draft) => {
-            draft.volume = {
-              dataVolume: { hotpluggable: isHotPluggable, name: dvName },
-              name: diskName,
-            };
-            delete draft.dataVolumeTemplate;
-          });
-
-          const vmForMount = getCustomizeWizardVM() ?? vmAfterEmptyAdd;
-          const mountedVm = await mountISOToCDROM(vmForMount, dataWithVolume, isHotPluggable);
-          await onSubmit(mountedVm);
-        },
-        diskState: mutableData,
-        dvName,
-        isHotPluggable,
-        onCancelCleanup: createCancelCleanup(vmAfterEmptyAdd, diskName),
-        onUploadedDataVolume,
-        t,
-        uploadData,
-        uploadKey,
-        vm,
-      }).catch(logBackgroundUploadError);
-
-      onUploadStarted?.(runningVmUploadPromise, diskName);
-
-      return;
-    }
-
-    const stoppedVmUploadPromise = runVmCdromBackgroundUpload({
+    const uploadPromise = runVmCdromBackgroundUpload({
       diskState: mutableData,
       dvName,
       isHotPluggable,
-      onCancelCleanup: createCancelCleanup(vm, diskName),
+      onCancelCleanup: createCancelCleanup(vmAfterSubmit, diskName),
       onUploadedDataVolume,
       t,
       uploadData,
       uploadKey,
-      vm,
+      vm: vmAfterSubmit,
     }).catch(logBackgroundUploadError);
 
-    onUploadStarted?.(stoppedVmUploadPromise, diskName);
+    onUploadStarted?.(uploadPromise, diskName);
 
-    const dataWithVolume = produce(data, (draft) => {
-      draft.volume ??= { name: diskName };
-      draft.volume.name = diskName;
-      draft.volume.persistentVolumeClaim = { claimName: dvName };
-      delete draft.volume.dataVolume;
-      delete draft.dataVolumeTemplate;
-    });
-
-    return finalize(dataWithVolume);
+    return submitResult;
   }
 
   return finalize(produceEmptyDriveData(data));
