@@ -29,6 +29,9 @@ const DetailsEditableItems: FC<DetailsEditableItemsProps> = ({ treeViewFoldersEn
 
   const vm = customizeWizardVMSignal.value;
   const vmName = getName(vm);
+  const hostname = getHostname(vm);
+  // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- empty string must fall back
+  const displayHostname = hostname || vmName;
 
   return (
     <>
@@ -83,7 +86,7 @@ const DetailsEditableItems: FC<DetailsEditableItemsProps> = ({ treeViewFoldersEn
       )}
       <DescriptionItem
         data-test={`${vmName}-hostname`}
-        descriptionData={getHostname(vm) || vmName}
+        descriptionData={displayHostname}
         descriptionHeader={<SearchItem id="hostname">{t('Hostname')}</SearchItem>}
         isEdit
         onEditClick={() =>

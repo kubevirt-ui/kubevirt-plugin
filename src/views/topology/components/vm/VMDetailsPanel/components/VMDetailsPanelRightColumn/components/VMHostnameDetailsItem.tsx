@@ -24,12 +24,15 @@ const VMHostnameDetailsItem: FC<VMHostnameDetailsItemProps> = ({ vm, vmi }) => {
   const { createModal } = useModal();
 
   const vmName = getName(vm);
+  const hostname = getHostname(vm);
+  // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- empty string must fall back
+  const displayHostname = hostname || vmName;
 
   return (
     <DescriptionItem
       className="topology-vm-details-panel__item"
       data-test={`${vmName}-hostname`}
-      descriptionData={getHostname(vm) || vmName}
+      descriptionData={displayHostname}
       descriptionHeader={t('Hostname')}
       isEdit
       onEditClick={() =>

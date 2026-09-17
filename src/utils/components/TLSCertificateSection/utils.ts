@@ -36,6 +36,11 @@ const createTLSCertConfigMap = async (
   return name;
 };
 
+export type TLSCertConfigMapResult = {
+  configMapName?: string;
+  created: boolean;
+};
+
 /**
  * Resolves or creates a TLS certificate ConfigMap for an HTTP DataVolume source.
  * Returns the ConfigMap name for `spec.source.http.certConfigMap`, or undefined if not needed.
@@ -45,8 +50,8 @@ const createTLSCertConfigMap = async (
 export const getOrCreateTLSCertConfigMapName = async (
   tlsConfig: TLSCertConfig,
   targetNamespace: string,
-): Promise<string | undefined> => {
-  if (!tlsConfig?.tlsCertificateRequired) return undefined;
+): Promise<TLSCertConfigMapResult> => {
+  if (!tlsConfig?.tlsCertificateRequired) return { created: false };
 
   const { cluster, tlsCertConfigMapName, tlsCertificate, tlsCertProject, tlsCertSource } =
     tlsConfig;
@@ -56,10 +61,10 @@ export const getOrCreateTLSCertConfigMapName = async (
   if (useExisting && tlsCertConfigMapName?.trim()) {
     const trimmedName = tlsCertConfigMapName.trim();
     if (tlsCertProject === targetNamespace) {
-      return trimmedName;
+      return { configMapName: trimmedName, created: false };
     }
     if (!tlsCertProject) {
-      return undefined;
+      return { created: false };
     }
     const sourceConfigMap = await kubevirtK8sGet<IoK8sApiCoreV1ConfigMap>({
       cluster,
@@ -75,14 +80,14 @@ export const getOrCreateTLSCertConfigMapName = async (
     }
     const newName = `tls-cert-${getRandomChars()}`;
     await createTLSCertConfigMap(cluster, targetNamespace, newName, certData);
-    return newName;
+    return { configMapName: newName, created: true };
   }
 
   if (!useExisting && tlsCertificate?.trim()) {
     const name = `tls-cert-${getRandomChars()}`;
     await createTLSCertConfigMap(cluster, targetNamespace, name, tlsCertificate.trim());
-    return name;
+    return { configMapName: name, created: true };
   }
 
-  return undefined;
+  return { created: false };
 };

@@ -16,10 +16,11 @@ import { DESCRIPTION_ANNOTATION } from '@kubevirt-utils/resources/vm';
 import { updateDescription } from '../utils/utils';
 
 type DetailsSectionDescriptionProps = {
+  canUpdateVM: boolean;
   vm: V1VirtualMachine;
 };
 
-const DetailsSectionDescription: FC<DetailsSectionDescriptionProps> = ({ vm }) => {
+const DetailsSectionDescription: FC<DetailsSectionDescriptionProps> = ({ canUpdateVM, vm }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const vmName = getName(vm);
@@ -31,7 +32,7 @@ const DetailsSectionDescription: FC<DetailsSectionDescriptionProps> = ({ vm }) =
         getAnnotation(vm, DESCRIPTION_ANNOTATION) ?? <MutedTextSpan text={t('None')} />
       }
       descriptionHeader={<SearchItem id="description">{t('Description')}</SearchItem>}
-      isEdit
+      isEdit={canUpdateVM}
       onEditClick={(): void =>
         createModal(
           ({ isOpen, onClose }: ModalComponentProps): JSX.Element => (
