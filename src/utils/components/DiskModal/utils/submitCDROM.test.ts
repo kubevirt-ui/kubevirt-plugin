@@ -1,12 +1,10 @@
+import type { TFunction } from 'i18next';
+
 import type { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { getCustomizeWizardVM } from '@kubevirt-utils/signals/customizeWizardVMSignal';
 import { isRunning } from '@virtualmachines/utils';
 
-import {
-  createDetachDiskCancelCleanup,
-  createEjectMountedDiskCancelCleanup,
-  mountISOToCDROM,
-} from './helpers';
+import { createDetachDiskCancelCleanup, createEjectMountedDiskCancelCleanup } from './helpers';
+import { addDisk } from './submit';
 import { submitCDROM } from './submitCDROM';
 import type { V1DiskFormState } from './types';
 import { runVmCdromBackgroundUpload } from './vmCdromBackgroundUpload';
@@ -15,15 +13,10 @@ jest.mock('@virtualmachines/utils', () => ({
   isRunning: jest.fn(),
 }));
 
-jest.mock('@kubevirt-utils/signals/customizeWizardVMSignal', () => ({
-  getCustomizeWizardVM: jest.fn(),
-}));
-
 jest.mock('./helpers', () => ({
   createDetachDiskCancelCleanup: jest.fn(() => 'detach-cleanup'),
   createEjectMountedDiskCancelCleanup: jest.fn(() => 'eject-cleanup'),
   createMutableUploadData: jest.fn((data) => data),
-  mountISOToCDROM: jest.fn(async (vm) => vm),
 }));
 
 jest.mock('./submit', () => ({
@@ -51,27 +44,33 @@ const buildData = (overrides: Partial<V1DiskFormState> = {}): V1DiskFormState =>
   ...overrides,
 });
 
-describe('submitCDROM - cancel cleanup wiring', () => {
+const getAddedDiskState = (): V1DiskFormState => (addDisk as jest.Mock).mock.calls[0][0];
+
+describe('submitCDROM - upload volume wiring', () => {
   const onSubmit = jest.fn(async (vm: V1VirtualMachine) => vm);
+  const onUploadStarted = jest.fn();
   const uploadData = jest.fn();
-  const t = ((key: string) => key) as any;
+  const t = ((key: string) => key) as TFunction;
+  const baseParams = {
+    onSubmit,
+    selectedISO: '',
+    t,
+    uploadData,
+    uploadEnabled: true,
+    vm: baseVM,
+  };
 
   beforeEach(() => {
     jest.clearAllMocks();
     onSubmit.mockImplementation(async (vm: V1VirtualMachine) => vm);
     (isRunning as jest.Mock).mockReturnValue(false);
-    (getCustomizeWizardVM as jest.Mock).mockReturnValue(null);
   });
 
   it('builds an eject cancel cleanup (hotpluggable)', async () => {
     await submitCDROM(buildData(), {
+      ...baseParams,
       isHotPluggable: true,
-      onSubmit,
-      t,
-      uploadData,
-      uploadEnabled: true,
-      vm: baseVM,
-    } as any);
+    });
 
     expect(createEjectMountedDiskCancelCleanup).toHaveBeenCalledWith(baseVM, 'cdrom-1');
     expect(createDetachDiskCancelCleanup).not.toHaveBeenCalled();
@@ -79,56 +78,92 @@ describe('submitCDROM - cancel cleanup wiring', () => {
 
   it('builds a detach cancel cleanup (non-hotpluggable)', async () => {
     await submitCDROM(buildData(), {
+      ...baseParams,
       isHotPluggable: false,
-      onSubmit,
-      t,
-      uploadData,
-      uploadEnabled: true,
-      vm: baseVM,
-    } as any);
+    });
 
     expect(createDetachDiskCancelCleanup).toHaveBeenCalledWith(baseVM, 'cdrom-1');
     expect(createEjectMountedDiskCancelCleanup).not.toHaveBeenCalled();
   });
 
-  it('mounts the ISO against the live wizard signal VM (not the stale closure) once the upload completes', async () => {
+  it('attaches a dataVolume source before upload on a running hot-pluggable VM', async () => {
     (isRunning as jest.Mock).mockReturnValue(true);
-    const liveVM: V1VirtualMachine = {
-      ...baseVM,
-      metadata: { ...baseVM.metadata, name: 'live-vm' },
-    };
-    (getCustomizeWizardVM as jest.Mock).mockReturnValue(liveVM);
 
     await submitCDROM(buildData(), {
+      ...baseParams,
       isHotPluggable: true,
-      onSubmit,
-      t,
-      uploadData,
-      uploadEnabled: true,
-      vm: baseVM,
-    } as any);
+      onUploadStarted,
+    });
 
-    const backgroundUploadArgs = (runVmCdromBackgroundUpload as jest.Mock).mock.calls[0][0];
-    await backgroundUploadArgs.afterUpload();
-
-    expect(mountISOToCDROM).toHaveBeenCalledWith(liveVM, expect.anything(), true);
+    const added = getAddedDiskState();
+    expect(added.dataVolumeTemplate).toBeUndefined();
+    expect(added.volume?.dataVolume).toEqual({
+      hotpluggable: true,
+      name: expect.stringMatching(/^cdrom-1-upload-/),
+    });
+    expect(onSubmit).toHaveBeenCalledTimes(1);
+    expect(runVmCdromBackgroundUpload).toHaveBeenCalledWith(
+      expect.objectContaining({
+        dvName: added.volume?.dataVolume?.name,
+        vm: baseVM,
+      }),
+    );
+    expect(onUploadStarted).toHaveBeenCalledTimes(1);
   });
 
-  it('falls back to the closed-over VM for mounting when there is no wizard signal VM', async () => {
-    (isRunning as jest.Mock).mockReturnValue(true);
-
+  it('attaches a PVC claim before upload on a stopped VM', async () => {
     await submitCDROM(buildData(), {
+      ...baseParams,
       isHotPluggable: true,
-      onSubmit,
-      t,
-      uploadData,
-      uploadEnabled: true,
-      vm: baseVM,
-    } as any);
+    });
 
-    const backgroundUploadArgs = (runVmCdromBackgroundUpload as jest.Mock).mock.calls[0][0];
-    await backgroundUploadArgs.afterUpload();
+    const added = getAddedDiskState();
+    expect(added.dataVolumeTemplate).toBeUndefined();
+    expect(added.volume?.persistentVolumeClaim).toEqual({
+      claimName: expect.stringMatching(/^cdrom-1-upload-/),
+      hotpluggable: true,
+    });
+    expect(onSubmit).toHaveBeenCalledTimes(1);
+    expect(runVmCdromBackgroundUpload).toHaveBeenCalledWith(
+      expect.objectContaining({
+        dvName: added.volume?.persistentVolumeClaim?.claimName,
+      }),
+    );
+  });
 
-    expect(mountISOToCDROM).toHaveBeenCalledWith(baseVM, expect.anything(), true);
+  it('does not start the upload when attaching the DataVolume fails', async () => {
+    (isRunning as jest.Mock).mockReturnValue(true);
+    onSubmit.mockRejectedValueOnce(new Error('patch failed'));
+
+    await expect(
+      submitCDROM(buildData(), {
+        ...baseParams,
+        isHotPluggable: true,
+      }),
+    ).rejects.toThrow('patch failed');
+
+    expect(runVmCdromBackgroundUpload).not.toHaveBeenCalled();
+  });
+
+  it('does not start an upload when mounting an existing ISO', async () => {
+    await submitCDROM(buildData({ volume: { name: 'cdrom-1' } }), {
+      ...baseParams,
+      isHotPluggable: true,
+      selectedISO: 'existing-iso',
+    });
+
+    expect(runVmCdromBackgroundUpload).not.toHaveBeenCalled();
+    expect(getAddedDiskState().volume?.persistentVolumeClaim?.claimName).toBe('existing-iso');
+  });
+
+  it('does not start an upload when adding an empty drive', async () => {
+    await submitCDROM(buildData({ uploadFile: undefined }), {
+      ...baseParams,
+      isHotPluggable: true,
+      uploadEnabled: false,
+    });
+
+    expect(runVmCdromBackgroundUpload).not.toHaveBeenCalled();
+    expect(getAddedDiskState().volume).toBeUndefined();
   });
 });

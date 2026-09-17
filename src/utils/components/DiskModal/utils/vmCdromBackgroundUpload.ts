@@ -20,7 +20,6 @@ export const logBackgroundUploadError = (error: unknown): void => {
 };
 
 type RunVmCdromBackgroundUploadParams = {
-  afterUpload?: () => Promise<void>;
   diskState: V1DiskFormState;
   dvName: string;
   isHotPluggable: boolean;
@@ -33,7 +32,6 @@ type RunVmCdromBackgroundUploadParams = {
 };
 
 export const runVmCdromBackgroundUpload = async ({
-  afterUpload,
   diskState,
   dvName,
   isHotPluggable,
@@ -59,8 +57,6 @@ export const runVmCdromBackgroundUpload = async ({
     });
 
     onUploadedDataVolume?.(uploaded);
-
-    await afterUpload?.();
 
     completeVmCdromUpload({
       dataVolumeName: dvName,
