@@ -39,7 +39,7 @@ import {
 } from '../utils/utils';
 
 type StorageTotalReadWriteThresholdChartProps = {
-  vmi: V1VirtualMachineInstance;
+  vmi?: V1VirtualMachineInstance;
 };
 
 const StorageTotalReadWriteThresholdChart: FC<StorageTotalReadWriteThresholdChartProps> = ({
@@ -59,7 +59,7 @@ const StorageTotalReadWriteThresholdChart: FC<StorageTotalReadWriteThresholdChar
     timespan,
   });
 
-  const isLoading = !loaded;
+  const isLoading = !vmi || !loaded;
   const storageWriteData = data?.data?.result?.[0]?.values;
 
   const chartData = storageWriteData?.map(([timestamp, value]) => {

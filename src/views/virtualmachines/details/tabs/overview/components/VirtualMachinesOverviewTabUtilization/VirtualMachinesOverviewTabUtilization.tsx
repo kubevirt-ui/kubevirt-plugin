@@ -40,16 +40,22 @@ import UtilizationThresholdCharts from './components/UtilizationThresholdCharts'
 import './virtual-machines-overview-tab-utilization.scss';
 
 type VirtualMachinesOverviewTabUtilizationProps = {
+  error?: Error;
+  loaded?: boolean;
   vm: V1VirtualMachine;
-  vmi: V1VirtualMachineInstance;
+  vmi?: V1VirtualMachineInstance;
 };
 
 const VirtualMachinesOverviewTabUtilization: FC<VirtualMachinesOverviewTabUtilizationProps> = ({
+  error,
+  loaded,
   vm,
   vmi,
 }) => {
   const { t } = useKubevirtTranslation();
   const { mcoError, prometheusUnavailable } = usePrometheusAvailability(vm);
+  const vmIsRunning = isRunning(vm);
+  const isVmiLoading = vmIsRunning && (!loaded || !vmi);
 
   return (
     <Card className="VirtualMachinesOverviewTabUtilization--main">
@@ -79,7 +85,12 @@ const VirtualMachinesOverviewTabUtilization: FC<VirtualMachinesOverviewTabUtiliz
       </CardTitle>
       <Divider />
       <CardBody isFilled>
-        <ComponentReady isReady={isRunning(vm)} text={t('VirtualMachine is not running')}>
+        <ComponentReady
+          error={vmIsRunning ? error : undefined}
+          isLoading={isVmiLoading}
+          isReady={vmIsRunning && Boolean(vmi)}
+          text={t('VirtualMachine is not running')}
+        >
           {prometheusUnavailable && (
             <Alert
               className="pf-v6-u-mb-md"

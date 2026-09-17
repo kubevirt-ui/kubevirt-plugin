@@ -177,6 +177,26 @@ describe('getUtilizationQueries', () => {
   });
 
   describe('edge cases', () => {
+    it('should return undefined queries when obj is missing name or namespace', () => {
+      const queriesWithoutMetadata = getUtilizationQueries({
+        duration: DEFAULT_DURATION,
+        hubClusterName: HUB_CLUSTER_NAME,
+        obj: undefined,
+      });
+
+      for (const query of Object.values(queriesWithoutMetadata)) {
+        expect(query).toBeUndefined();
+      }
+
+      const queriesWithPartialMetadata = getUtilizationQueries({
+        duration: DEFAULT_DURATION,
+        hubClusterName: HUB_CLUSTER_NAME,
+        obj: { metadata: { name: TEST_VM_NAME } },
+      });
+
+      expect(queriesWithPartialMetadata[VMQueries.CPU_USAGE]).toBeUndefined();
+    });
+
     it('should treat any cluster as managed when hubClusterName is undefined', () => {
       const vmWithCluster = createMockVMObj({ cluster: ANY_CLUSTER_NAME });
 

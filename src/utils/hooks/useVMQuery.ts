@@ -9,18 +9,18 @@ import useIsACMPage from '@multicluster/useIsACMPage';
 import useVMQueries from './useVMQueries';
 
 const useVMQuery = (
-  vm: V1VirtualMachine | V1VirtualMachineInstance,
+  vm: V1VirtualMachine | V1VirtualMachineInstance | undefined,
   queryKey: VMQueries,
 ): {
-  query: string;
-  queryLink: string;
+  query?: string;
+  queryLink: null | string;
 } => {
   const isACMPage = useIsACMPage();
 
   const availableQueries = useVMQueries(vm);
   const query = availableQueries[queryKey];
 
-  const queryLink = queriesToLink(query);
+  const queryLink = query ? queriesToLink(query) : '';
 
   return { query, queryLink: isACMPage ? null : queryLink };
 };

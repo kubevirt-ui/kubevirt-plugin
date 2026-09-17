@@ -8,7 +8,7 @@ import StorageTotalReadWriteThresholdChart from '@kubevirt-utils/components/Char
 import { Grid, GridItem } from '@patternfly/react-core';
 
 type UtilizationThresholdChartsProps = {
-  vmi: V1VirtualMachineInstance;
+  vmi?: V1VirtualMachineInstance;
 };
 const UtilizationThresholdCharts: FC<UtilizationThresholdChartsProps> = ({ vmi }) => {
   return (
