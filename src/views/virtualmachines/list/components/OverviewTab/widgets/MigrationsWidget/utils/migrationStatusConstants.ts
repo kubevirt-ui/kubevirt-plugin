@@ -1,5 +1,4 @@
 import { vmimStatuses } from '@kubevirt-utils/resources/vmim/statuses';
-import { STATUS_LIST_FILTER_PARAM } from '@virtualmachines/utils/constants';
 
 import { buildFilterPath } from '../../shared/urlUtils';
 
@@ -17,5 +16,7 @@ export const OTHER_STATUSES = [
   vmimStatuses.WaitingForSync,
 ];
 
+const STATUS_LIST_FILTER_PARAM = 'status';
+
 export const buildStatusFilterPath = (basePath: string, statuses: string[]): string =>
-  buildFilterPath(basePath, STATUS_LIST_FILTER_PARAM, statuses.join(','));
+  buildFilterPath(basePath, STATUS_LIST_FILTER_PARAM, statuses);
