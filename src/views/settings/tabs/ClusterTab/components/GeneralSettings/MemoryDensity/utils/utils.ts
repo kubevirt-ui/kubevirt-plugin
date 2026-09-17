@@ -19,26 +19,28 @@ export type RatioLevelConfig = {
   title: string;
 };
 
+/* eslint-disable perfectionist/sort-objects -- help content lists safe level before caution */
 export const getRatioLevelConfig = (t: TFunction): Record<RatioLevel, RatioLevelConfig> => ({
+  recommended: {
+    color: 'var(--pf-t--global--color--status--success--default)',
+    description: t('Limits overcommit to improve cluster stability.'),
+    label: t('Safe level'),
+    title: t('Safe level (75% and above)'),
+  },
   caution: {
     color: 'var(--pf-t--global--color--status--warning--default)',
-    description: t('Moderate overcommit. Monitor cluster memory pressure.'),
+    description: t('Balances memory efficiency with moderate overcommit risk.'),
     label: t('Use with caution'),
     title: t('Use with caution (50% to 74.9%)'),
   },
-  recommended: {
-    color: 'var(--pf-t--global--color--status--success--default)',
-    description: t("Requests most of each VM's configured memory on the cluster."),
-    label: t('Recommended'),
-    title: t('Recommended (75% and above)'),
-  },
   risk: {
     color: 'var(--pf-t--global--color--status--danger--default)',
-    description: t('Each VM requests less than half of its configured memory.'),
-    label: t('High overcommit risk'),
-    title: t('High overcommit risk (25% to 49.9%)'),
+    description: t('Maximizes memory efficiency with high overcommit risk.'),
+    label: t('High risk'),
+    title: t('High risk (25% to 49.9%)'),
   },
 });
+/* eslint-enable perfectionist/sort-objects */
 
 /**
  * Converts a UI display value (25–100%) to the HCO API integer.
