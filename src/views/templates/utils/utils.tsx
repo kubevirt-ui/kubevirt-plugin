@@ -4,22 +4,16 @@ import { type TFunction } from 'i18next';
 import { type V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import {
+  getTemplateCPUMemoryDisplayValue,
   getTemplateVirtualMachineObject,
   isVirtualMachineTemplateRequest,
   type Template,
   TEMPLATE_TYPE_BASE,
   TEMPLATE_TYPE_LABEL,
   type TemplateOrRequest,
-  vCPUCount,
 } from '@kubevirt-utils/resources/template';
-import {
-  getArchitecture as getVMArchitecture,
-  getCPU,
-  getMemoryCPU,
-  NO_DATA_DASH,
-} from '@kubevirt-utils/resources/vm';
+import { getArchitecture as getVMArchitecture, getCPU } from '@kubevirt-utils/resources/vm';
 import { getArchitecture } from '@kubevirt-utils/utils/architecture';
-import { readableSizeUnit } from '@kubevirt-utils/utils/units';
 
 export const isCommonVMTemplate = (template: V1Template): boolean =>
   template?.metadata?.labels?.[TEMPLATE_TYPE_LABEL] === TEMPLATE_TYPE_BASE;
@@ -31,29 +25,26 @@ export const getVirtualMachineTemplatesCPUMemoryValue = (
   template: Template,
   t: TFunction,
 ): string => {
-  const { cpu, memory } = getMemoryCPU(getTemplateVirtualMachineObject(template));
+  const { cpuMemoryText, isEmpty } = getTemplateCPUMemoryDisplayValue(template, t);
 
-  if (!cpu && !memory) {
+  if (isEmpty) {
     return t('None');
   }
 
-  const cpuText = cpu ? `${vCPUCount(cpu)}` : NO_DATA_DASH;
-  const memoryText = memory ? readableSizeUnit(memory) : NO_DATA_DASH;
-
-  return t('{{cpu}} CPU | {{memory}} Memory', { cpu: cpuText, memory: memoryText });
+  return cpuMemoryText;
 };
 
 export const getVirtualMachineTemplatesCPUMemoryText = (
   template: Template,
   t: TFunction,
 ): ReactNode => {
-  const { cpu, memory } = getMemoryCPU(getTemplateVirtualMachineObject(template));
+  const { cpuMemoryText, isEmpty } = getTemplateCPUMemoryDisplayValue(template, t);
 
-  if (!cpu && !memory) {
+  if (isEmpty) {
     return <MutedTextSpan text={t('None')} />;
   }
 
-  return getVirtualMachineTemplatesCPUMemoryValue(template, t);
+  return cpuMemoryText;
 };
 
 export const getTemplateArchitecture = (template: TemplateOrRequest): string | undefined => {

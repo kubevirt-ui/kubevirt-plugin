@@ -8,14 +8,13 @@ import { getAnnotation, getName, getUID } from '@kubevirt-utils/resources/shared
 import {
   ANNOTATIONS,
   getTemplateCategoryDisplay,
-  getTemplateFlavorData,
+  getTemplateCPUMemoryDisplayValue,
   getTemplateName,
   type Template,
 } from '@kubevirt-utils/resources/template';
 import { getTemplateBootSourceType } from '@kubevirt-utils/resources/template/hooks/useVmTemplateSource/utils';
 import { getVMBootSourceLabel } from '@kubevirt-utils/resources/vm/utils/source';
 import { ARCHITECTURE_ID, getArchitecture } from '@kubevirt-utils/utils/architecture';
-import { readableSizeUnit } from '@kubevirt-utils/utils/units';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Content, ContentVariants, Flex, FlexItem, Label } from '@patternfly/react-core';
 import { Tr } from '@patternfly/react-table';
@@ -58,8 +57,7 @@ const TemplatesTableRow: FC<TemplatesTableRowProps> = ({
       ? availableDatasources[`${sourceRef.namespace}-${sourceRef.name}`]
       : undefined;
 
-  // Flavor data
-  const { cpuCount, memory } = getTemplateFlavorData(template);
+  const { cpuMemoryText } = getTemplateCPUMemoryDisplayValue(template, t);
 
   return (
     <Tr
@@ -103,9 +101,7 @@ const TemplatesTableRow: FC<TemplatesTableRowProps> = ({
         />
       </TemplatesTableRowCell>
       <TemplatesTableRowCell activeColumnIDs={activeColumnIDs} id="cpu-memory" width={20}>
-        <span data-test={`template-cpu-memory-${templateName}`}>
-          {t('CPU')} {cpuCount ?? 0} | {t('Memory')} {memory ? readableSizeUnit(memory) : t('N/A')}
-        </span>
+        <span data-test={`template-cpu-memory-${templateName}`}>{cpuMemoryText}</span>
       </TemplatesTableRowCell>
     </Tr>
   );

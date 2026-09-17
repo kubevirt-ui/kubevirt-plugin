@@ -6,13 +6,12 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { getName, getNamespace, getUID } from '@kubevirt-utils/resources/shared';
 import {
   getTemplateCategoryDisplay,
-  getTemplateFlavorData,
+  getTemplateCPUMemoryDisplayValue,
   isDeprecatedTemplate,
   isVirtualMachineTemplate,
   type Template,
 } from '@kubevirt-utils/resources/template';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm';
-import { readableSizeUnit } from '@kubevirt-utils/utils/units';
 import {
   Badge,
   Card,
@@ -44,7 +43,9 @@ const TemplatesCatalogTile: FC<TemplatesCatalogTileProps> = memo(
     const isDeprecated = isDeprecatedTemplate(template);
     const templateID = getUID(template);
     const templateName = getName(template);
-    const { cpuCount, memory } = getTemplateFlavorData(template);
+    const { cpuMemoryText } = getTemplateCPUMemoryDisplayValue(template, t, {
+      customFormat: (cpu, memory) => t('{{cpu}} | {{memory}}', { cpu, memory }),
+    });
     const architecture = getTemplateArchitecture(template);
     const osName = getTemplateOSName(template, clusterPreference, osDisplayNames) ?? NO_DATA_DASH;
     const icon = getTemplateOSIcon(template, clusterPreference);
@@ -115,7 +116,7 @@ const TemplatesCatalogTile: FC<TemplatesCatalogTileProps> = memo(
                   <b>{t('OS')}</b> {osName}
                 </StackItem>
                 <StackItem>
-                  <b>{t('vCPU | Memory')}</b> {cpuCount} | {readableSizeUnit(memory)}
+                  <b>{t('vCPU | Memory')}</b> {cpuMemoryText}
                 </StackItem>
               </Stack>
             </StackItem>

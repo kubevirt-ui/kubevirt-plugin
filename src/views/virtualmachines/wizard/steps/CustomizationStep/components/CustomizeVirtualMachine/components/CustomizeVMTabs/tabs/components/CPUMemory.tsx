@@ -4,11 +4,13 @@ import type { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import CPUDescription from '@kubevirt-utils/components/CPUDescription/CPUDescription';
 import { CpuMemHelperTextResources } from '@kubevirt-utils/components/CPUDescription/utils/utils';
 import CPUMemoryDisplay from '@kubevirt-utils/components/CPUMemory/CPUMemory';
+import { getCPUMemoryTitle } from '@kubevirt-utils/components/CPUMemory/utils';
 import CPUMemoryModal from '@kubevirt-utils/components/CPUMemoryModal/CPUMemoryModal';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { isInstanceTypeVM } from '@kubevirt-utils/resources/instancetype/helper';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { getCPU, getMemory } from '@kubevirt-utils/resources/vm';
 import {
@@ -31,7 +33,7 @@ const CPUMemory: FC = () => {
 
   const vm = customizeWizardVMSignal.value;
 
-  if (!vm) {
+  if (!vm || isInstanceTypeVM(vm)) {
     return null;
   }
 
@@ -42,7 +44,7 @@ const CPUMemory: FC = () => {
       }
       data-test={`${getName(vm)}-cpu-memory`}
       descriptionData={<CPUMemoryDisplay vm={vm} />}
-      descriptionHeader={<SearchItem id="cpu-memory">{t('CPU | Memory')}</SearchItem>}
+      descriptionHeader={<SearchItem id="cpu-memory">{getCPUMemoryTitle(t)}</SearchItem>}
       isEdit
       isPopover
       olsObj={vm}
