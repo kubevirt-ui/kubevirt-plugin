@@ -1,13 +1,11 @@
-import { type FC, type ReactElement } from 'react';
+import { type FC } from 'react';
 
 import {
   type V1VirtualMachine,
   type V1VirtualMachineInstance,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { vCPUCount } from '@kubevirt-utils/resources/template/utils';
-import { getCPU, getMemory } from '@kubevirt-utils/resources/vm';
-import { readableSizeUnit } from '@kubevirt-utils/utils/units';
+import { getCPU, getCPUMemoryDisplayValue, getMemory } from '@kubevirt-utils/resources/vm';
 import { Skeleton } from '@patternfly/react-core';
 import { isRunning } from '@virtualmachines/utils';
 
@@ -19,19 +17,20 @@ type CPUMemoryProps = {
   vmi?: V1VirtualMachineInstance;
 };
 
-const CPUMemory: FC<CPUMemoryProps> = ({ vm, vmi }): ReactElement => {
+const CPUMemory: FC<CPUMemoryProps> = ({ vm, vmi }) => {
   const { t } = useKubevirtTranslation();
   const isVMRunning = isRunning(vm);
 
   if ((isVMRunning && !vmi) || !vm) return <Skeleton className="pf-m-width-sm" />;
 
-  const cpu = vCPUCount(getCPU(vmi) ?? getCPU(vm));
+  const cpu = getCPU(vmi) ?? getCPU(vm);
+  const memory = getMemory(vmi) ?? getMemory(vm);
 
-  const memory = readableSizeUnit(getMemory(vmi) ?? getMemory(vm));
+  const { cpuMemoryText } = getCPUMemoryDisplayValue(cpu, memory, t);
 
   return (
     <span data-test="cpu-memory-value" id="virtual-machine-overview-details-cpu-memory">
-      {t('{{cpu}} CPU | {{memory}} Memory', { cpu, memory })}
+      {cpuMemoryText}
     </span>
   );
 };

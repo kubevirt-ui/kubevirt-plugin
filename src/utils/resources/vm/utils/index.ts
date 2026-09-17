@@ -1,5 +1,6 @@
 export * from './annotations';
 export * from './constants';
+export * from './cpuMemory';
 export * from './selectors';
 export * from './selectors';
 export * from './source';

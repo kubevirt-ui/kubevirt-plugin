@@ -1,7 +1,16 @@
+import { type TFunction } from 'i18next';
+
 import { type V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { type V1CPU, type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { type Template } from '@kubevirt-utils/resources/template';
-import { getCPU, getMemory } from '@kubevirt-utils/resources/vm';
+import {
+  type CPUMemoryDisplayOptions,
+  type CPUMemoryDisplayValue,
+  getCPU,
+  getCPUMemoryDisplayValue,
+  getMemory,
+  getMemoryCPU,
+} from '@kubevirt-utils/resources/vm';
 
 import {
   getTemplateFlavor,
@@ -91,4 +100,19 @@ export const getTemplateFlavorData = (
   const flavor = getTemplateFlavor(template);
 
   return { flavor, ...getVmCPUMemory(getTemplateVirtualMachineObject(template)) };
+};
+
+/**
+ * parses template and returns its cpu/memory display-ready values (see
+ * getCPUMemoryDisplayValue in @kubevirt-utils/resources/vm)
+ * @param {Template} template - template to parse
+ */
+export const getTemplateCPUMemoryDisplayValue = (
+  template: Template,
+  t: TFunction,
+  options?: CPUMemoryDisplayOptions,
+): CPUMemoryDisplayValue => {
+  const { cpu, memory } = getMemoryCPU(getTemplateVirtualMachineObject(template));
+
+  return getCPUMemoryDisplayValue(cpu, memory, t, options);
 };

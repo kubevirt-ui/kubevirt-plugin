@@ -6,9 +6,7 @@ import { CpuMemHelperTextResources } from '@kubevirt-utils/components/CPUDescrip
 import { getCPUMemoryTitle } from '@kubevirt-utils/components/CPUMemory/utils';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { vCPUCount } from '@kubevirt-utils/resources/template/utils';
-import { getCPU, getMemory } from '@kubevirt-utils/resources/vm';
-import { readableSizeUnit } from '@kubevirt-utils/utils/units';
+import { getCPU, getCPUMemoryDisplayValue, getMemory } from '@kubevirt-utils/resources/vm';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 
 type TolerationsProps = {
@@ -17,16 +15,15 @@ type TolerationsProps = {
 
 const CPUMemory: FC<TolerationsProps> = ({ vmi }) => {
   const { t } = useKubevirtTranslation();
-  const cpu = vCPUCount(getCPU(vmi));
 
-  const memory = readableSizeUnit(getMemory(vmi));
+  const { cpuMemoryText } = getCPUMemoryDisplayValue(getCPU(vmi), getMemory(vmi), t);
 
   return (
     <DescriptionItem
       bodyContent={
         <CPUDescription cpu={getCPU(vmi)} helperTextResource={CpuMemHelperTextResources.VMI} />
       }
-      descriptionData={t('{{cpu}} CPU | {{memory}} Memory', { cpu, memory })}
+      descriptionData={cpuMemoryText}
       descriptionHeader={getCPUMemoryTitle(t)}
       isPopover
       olsObj={vmi}

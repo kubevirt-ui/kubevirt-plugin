@@ -8,7 +8,6 @@ import MoveVMToFolderModal from '@kubevirt-utils/components/MoveVMToFolderModal/
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { isInstanceTypeVM } from '@kubevirt-utils/resources/instancetype/helper';
 import { getAnnotation, getLabel, getName } from '@kubevirt-utils/resources/shared';
 import { DESCRIPTION_ANNOTATION, getHostname } from '@kubevirt-utils/resources/vm';
 import {
@@ -56,7 +55,7 @@ const DetailsEditableItems: FC<DetailsEditableItemsProps> = ({ treeViewFoldersEn
           ))
         }
       />
-      {!isInstanceTypeVM(vm) && <CPUMemory />}
+      <CPUMemory />
       {treeViewFoldersEnabled && (
         <DescriptionItem
           data-test={`${vmName}-folder`}
