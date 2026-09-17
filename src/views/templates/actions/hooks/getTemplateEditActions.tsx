@@ -1,3 +1,4 @@
+import { type ReactElement } from 'react';
 
 import { TemplateModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import CloneTemplateModal from '@kubevirt-utils/components/CloneTemplateModal/CloneTemplateModal';
@@ -40,7 +41,7 @@ export const getTemplateEditActions = ({
     accessReview: asAccessReview(TemplateModel, template, 'create'),
     cta: (): void =>
       createModal(
-        ({ isOpen, onClose }: ModalComponentProps): JSX.Element => (
+        ({ isOpen, onClose }: ModalComponentProps): ReactElement => (
           <CloneTemplateModal
             isOpen={isOpen}
             obj={template}
@@ -71,7 +72,7 @@ export const getTemplateEditActions = ({
     accessReview: asAccessReview(TemplateModel, template, 'patch'),
     cta: (): void =>
       createModal(
-        ({ isOpen, onClose }: ModalComponentProps): JSX.Element => (
+        ({ isOpen, onClose }: ModalComponentProps): ReactElement => (
           <EditBootSourceModal
             dataSource={bootDataSource}
             isOpen={isOpen}

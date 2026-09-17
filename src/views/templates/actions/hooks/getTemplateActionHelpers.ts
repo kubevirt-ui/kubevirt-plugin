@@ -3,7 +3,7 @@ import { type TFunction } from 'i18next';
 
 import { TemplateModel, type V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { type V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
-import { type ModalComponentProps } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+import { type ModalComponent } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
 
 export const getCommonOrPermissionDescription = (
@@ -40,7 +40,7 @@ export type GetTemplateActionsParams = {
   canDeleteTemplate: boolean;
   canWriteToDataSourceNs: boolean;
   cluster: string;
-  createModal: (modal: (props: ModalComponentProps) => JSX.Element) => void;
+  createModal: (modal: ModalComponent) => void;
   editableBootSource: boolean;
   goToTemplatePage: (currentTemplate: V1Template) => void;
   hasEditPermission: boolean;
