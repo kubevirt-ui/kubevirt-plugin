@@ -1,7 +1,7 @@
 import { type TFunction } from 'i18next';
 
 import { type V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
-import { type UploadDataProps } from '@kubevirt-utils/hooks/useCDIUpload/types';
+import type { CdiUploadDataFn } from '@kubevirt-utils/hooks/useCDIUpload/types';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 
 import {
@@ -30,7 +30,7 @@ const getBootableVolumePromise = ({
   onUploadStart?: (uploadKey: string) => void;
   sourceType: DROPDOWN_FORM_SELECTION;
   t: TFunction;
-  uploadData: ({ dataVolume, file }: UploadDataProps) => Promise<void>;
+  uploadData: CdiUploadDataFn;
 }): Promise<V1beta1DataSource> => {
   const { bootableVolumeNamespace } = bootableVolume;
 

@@ -1,4 +1,3 @@
-import { type V1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { TELEMETRY_HOTPLUG_OPERATION } from '@kubevirt-utils/extensions/telemetry/utils/property-constants';
 import {
@@ -22,7 +21,11 @@ import {
   hotplugPromise,
 } from './helpers';
 import { addDisk, editDisk, resizeVMDataVolumeTemplate } from './submitDiskMutations';
-import { type SubmitInput, type UploadDataVolumeParams } from './types';
+import {
+  type SubmitInput,
+  type UploadDataVolumeParams,
+  type UploadDataVolumeResult,
+} from './types';
 
 export { addDisk, editDisk, resizeVMDataVolumeTemplate } from './submitDiskMutations';
 
@@ -34,7 +37,7 @@ export const uploadDataVolume = async ({
   uploadData,
   uploadKey,
   vm,
-}: UploadDataVolumeParams): Promise<V1beta1DataVolume> => {
+}: UploadDataVolumeParams): Promise<UploadDataVolumeResult> => {
   const { abortTooltip, onCancelCleanup } = options ?? {};
   const dataVolume = getEmptyVMDataVolumeResource(vm);
   const file = data?.uploadFile?.file;
@@ -46,7 +49,7 @@ export const uploadDataVolume = async ({
   dataVolume.spec.storage.resources.requests.storage =
     getDataVolumeTemplateSize(data) ?? defaultSize;
 
-  await uploadData({
+  const expectedGeneration = await uploadData({
     dataVolume,
     file,
     uploadKey,
@@ -67,7 +70,7 @@ export const uploadDataVolume = async ({
     delete data.dataVolumeTemplate.spec.source.upload;
   }
 
-  return dataVolume;
+  return { dataVolume, expectedGeneration };
 };
 
 export const submit = async ({

@@ -51,8 +51,15 @@ export const getUploadClusterForVm = (vm: V1VirtualMachine): string => getCluste
 export const getVmCdromUploadKeyFromVm = (vm: V1VirtualMachine, cdromDiskName: string): string =>
   getVmCdromUploadKey(getUploadClusterForVm(vm), getNamespace(vm), getName(vm), cdromDiskName);
 
-export const getBootableVolumeUploadKey = (namespace: string, name: string): string =>
-  buildScopedUploadKey(UPLOAD_KEY_PREFIX.bootableVolume, `${namespace}/${name}`);
+export const getBootableVolumeUploadKey = (
+  namespace: string,
+  name: string,
+  cluster?: string,
+): string =>
+  buildScopedUploadKey(
+    UPLOAD_KEY_PREFIX.bootableVolume,
+    cluster ? getClusterNamespaceNameKey(cluster, namespace, name) : `${namespace}/${name}`,
+  );
 
 export const getExportDiskUploadKey = (
   cluster: string,

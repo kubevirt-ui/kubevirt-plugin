@@ -19,7 +19,7 @@ const createMockDataUpload = (overrides: Partial<DataUpload> = {}): DataUpload =
 });
 
 const resetStore = () => {
-  useUploadProgressStore.setState({ uploads: {} });
+  useUploadProgressStore.setState({ generationsByKey: {}, uploads: {} });
 };
 
 describe('modalUploadCancel', () => {

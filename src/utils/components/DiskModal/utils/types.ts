@@ -8,7 +8,7 @@ import type {
   V1VirtualMachine,
   V1Volume,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import type { UploadDataProps } from '@kubevirt-utils/hooks/useCDIUpload/types';
+import type { CdiUploadDataFn } from '@kubevirt-utils/hooks/useCDIUpload/types';
 
 export type RegistryCredentials = { password: string; username: string };
 
@@ -85,12 +85,17 @@ export type UploadDataVolumeOptions = {
   onCancelCleanup?: () => Promise<void>;
 };
 
+export type UploadDataVolumeResult = {
+  dataVolume: V1beta1DataVolume;
+  expectedGeneration?: number;
+};
+
 export type UploadDataVolumeParams = {
   data: V1DiskFormState;
   dvName?: string;
   options?: UploadDataVolumeOptions;
   t: TFunction;
-  uploadData: ({ dataVolume, file }: UploadDataProps) => Promise<void>;
+  uploadData: CdiUploadDataFn;
   uploadKey?: string;
   vm: V1VirtualMachine;
 };
@@ -126,7 +131,7 @@ export type SubmitCDROMInput = {
   onUploadStarted?: V1DiskModalProps['onUploadStarted'];
   selectedISO: string;
   t: TFunction;
-  uploadData: ({ dataVolume, file }: UploadDataProps) => Promise<void>;
+  uploadData: CdiUploadDataFn;
   uploadEnabled: boolean;
   vm: V1VirtualMachine;
 };

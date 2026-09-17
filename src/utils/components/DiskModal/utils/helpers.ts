@@ -124,9 +124,7 @@ export const buildUploadTrackMetadata = ({
 
   return {
     abortTooltip,
-    contextLinks: getUID(vm)
-      ? getVmDiskUploadSuccessLinks(translate, vm, diskName, dvName, isCDROM)
-      : undefined,
+    contextLinks: getVmDiskUploadSuccessLinks(translate, vm, diskName, dvName, isCDROM),
     dvCluster: getCluster(vm),
     dvName,
     dvNamespace: getNamespace(dataVolume),
