@@ -2,19 +2,12 @@ import type { MouseEvent } from 'react';
 import { useCallback, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 
-import { OVERVIEW_TAB_INDEX, TAB_INDEX_MAP, TAB_KEY_MAP, VM_LIST_TAB_PARAM } from './constants';
+import { TAB_INDEX_MAP, VM_LIST_TAB_PARAM } from './constants';
+import { getNavigatorTabKeyFromSearch, setStoredNavigatorTab } from './tabStorage';
 
 type UseNavigatorTabsResult = {
   activeTabKey: number;
   handleTabSelect: (event: MouseEvent<HTMLElement>, tabIndex: number | string) => void;
-};
-
-const getTabKeyFromSearch = (search: string): number => {
-  const params = new URLSearchParams(search);
-  const tabParam = params.get(VM_LIST_TAB_PARAM);
-  return tabParam && TAB_KEY_MAP[tabParam] !== undefined
-    ? TAB_KEY_MAP[tabParam]
-    : OVERVIEW_TAB_INDEX;
 };
 
 const useNavigatorTabs = (): UseNavigatorTabsResult => {
@@ -22,11 +15,11 @@ const useNavigatorTabs = (): UseNavigatorTabsResult => {
   const navigate = useNavigate();
 
   const [activeTabKey, setActiveTabKey] = useState<number>(() =>
-    getTabKeyFromSearch(location.search),
+    getNavigatorTabKeyFromSearch(location.search),
   );
 
   useEffect(() => {
-    setActiveTabKey(getTabKeyFromSearch(location.search));
+    setActiveTabKey(getNavigatorTabKeyFromSearch(location.search));
   }, [location.search]);
 
   const handleTabSelect = useCallback(
@@ -35,6 +28,7 @@ const useNavigatorTabs = (): UseNavigatorTabsResult => {
       if (!tabValue) return;
 
       setActiveTabKey(tabIndex as number);
+      setStoredNavigatorTab(tabValue);
 
       const params = new URLSearchParams(location.search);
       params.set(VM_LIST_TAB_PARAM, tabValue);
