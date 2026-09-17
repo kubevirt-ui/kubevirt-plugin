@@ -246,7 +246,7 @@ const DetailsSection: FC<DetailsSectionProps> = ({ allInstanceTypes, instanceTyp
             />
             <DescriptionItem
               bodyContent={t(
-                'Applying the start/pause mode to this virtual machine will cause it to partially reboot and pause.',
+                'Allows access to the guest system logs through the serial console, typically retrieved using the QEMU guest agent. You can enable this per VM or cluster-wide.',
               )}
               descriptionData={
                 <Switch
