@@ -1,105 +1,85 @@
-import { type FC, useState } from 'react';
+import { type FC, useEffect, useState } from 'react';
 
+import { ConfigMapModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import useCanCreateResource from '@kubevirt-utils/hooks/useCanCreateResource';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { ExpandableSection, FormGroup, ModalVariant } from '@patternfly/react-core';
 
+import MutedTextSpan from '../MutedTextSpan/MutedTextSpan';
 import TabModal from '../TabModal/TabModal';
-import SelectSysprep from './SelectSysprep';
-import Sysprep from './Sysprep';
+import SysprepModalBody from './components/SysprepModalBody/SysprepModalBody';
+import { type SysprepModalProps, SysprepSelectionOption } from './types';
+import { getInitialSysprepSelection, isSysprepSubmitDisabled } from './utils';
 
-export const SysprepModal: FC<{
-  autoUnattend: string;
-  enableCreation?: boolean;
-  isOpen: boolean;
-  namespace: string;
-  onClose: () => void;
-  onSysprepCreation?: (unattended: string, autoUnattend: string) => Promise<void> | void;
-  onSysprepSelected?: (sysprepName: string) => Promise<void> | void;
-  shouldCreateConfigMap?: boolean;
-  sysprepSelected?: string;
-  unattend: string;
-}> = ({
-  autoUnattend: initialAutoUnattend,
-  enableCreation = true,
+export const SysprepModal: FC<SysprepModalProps> = ({
+  cluster,
   isOpen,
   namespace,
   onClose,
   onSysprepCreation,
   onSysprepSelected,
-  shouldCreateConfigMap = true,
   sysprepSelected,
-  unattend: initialUnattend,
 }) => {
   const { t } = useKubevirtTranslation();
-  const [autoUnattend, setAutoUnattend] = useState(initialAutoUnattend);
-  const [unattend, setUnattend] = useState(initialUnattend);
-  const [creationSectionOpen, setCreationSectionOpen] = useState(shouldCreateConfigMap);
-  const [selectedSysprepName, setSelectedSysprepName] = useState(sysprepSelected);
+  const canCreateConfigMap = useCanCreateResource({
+    cluster,
+    model: ConfigMapModel,
+    namespace,
+  });
+  const [autoUnattend, setAutoUnattend] = useState<string>('');
+  const [unattend, setUnattend] = useState<string>('');
+  const [selectionOption, setSelectionOption] = useState<SysprepSelectionOption>(() =>
+    getInitialSysprepSelection(sysprepSelected),
+  );
+  const [selectedSysprepName, setSelectedSysprepName] = useState(sysprepSelected ?? '');
+
+  useEffect(() => {
+    if (!canCreateConfigMap && selectionOption === SysprepSelectionOption.CreateNew) {
+      setSelectionOption(getInitialSysprepSelection(sysprepSelected));
+    }
+  }, [canCreateConfigMap, selectionOption, sysprepSelected]);
 
   const submitHandler = async (): Promise<void> => {
-    if (enableCreation && creationSectionOpen) {
+    if (selectionOption === SysprepSelectionOption.CreateNew && canCreateConfigMap) {
       return await onSysprepCreation(unattend, autoUnattend);
     }
 
-    if (onSysprepSelected) await onSysprepSelected(selectedSysprepName);
+    if (onSysprepSelected) {
+      await onSysprepSelected(
+        selectionOption === SysprepSelectionOption.None ? '' : selectedSysprepName,
+      );
+    }
   };
 
-  if (!enableCreation) {
-    return (
-      <TabModal
-        headerText={t('Sysprep')}
-        isOpen={isOpen}
-        onClose={onClose}
-        onSubmit={() => submitHandler()}
-      >
-        <div className="kv-sysprep-modal">
-          <FormGroup fieldId="select-sysprep" label={t('Attach existing sysprep')}>
-            <SelectSysprep
-              namespace={namespace}
-              onSelectSysprep={setSelectedSysprepName}
-              selectedSysprepName={selectedSysprepName}
-            />
-          </FormGroup>
-        </div>
-      </TabModal>
-    );
-  }
+  const isSubmitDisabled = isSysprepSubmitDisabled({
+    autoUnattend,
+    canCreateConfigMap,
+    initialSysprepSelected: sysprepSelected,
+    selectedSysprepName,
+    selectionOption,
+    unattend,
+  });
 
   return (
     <TabModal
       headerText={t('Sysprep')}
+      isDisabled={isSubmitDisabled}
       isOpen={isOpen}
-      modalVariant={ModalVariant.medium}
       onClose={onClose}
       onSubmit={() => submitHandler()}
     >
-      <div className="kv-sysprep-modal">
-        <ExpandableSection
-          isExpanded={creationSectionOpen}
-          isIndented
-          onToggle={(_event, val) => setCreationSectionOpen(val)}
-          toggleText={t('Create new sysprep')}
-        >
-          <Sysprep
-            autoUnattend={autoUnattend}
-            onAutoUnattendChange={setAutoUnattend}
-            onUnattendChange={setUnattend}
-            unattend={unattend}
-          />
-        </ExpandableSection>
-        <ExpandableSection
-          isExpanded={!creationSectionOpen}
-          isIndented
-          onToggle={() => setCreationSectionOpen(!creationSectionOpen)}
-          toggleText={t('Attach existing sysprep')}
-        >
-          <SelectSysprep
-            namespace={namespace}
-            onSelectSysprep={setSelectedSysprepName}
-            selectedSysprepName={selectedSysprepName}
-          />
-        </ExpandableSection>
-      </div>
+      <MutedTextSpan text={t('Sysprep is saved in the project as a config map')} />
+      <SysprepModalBody
+        autoUnattend={autoUnattend}
+        canCreateConfigMap={canCreateConfigMap}
+        namespace={namespace}
+        selectedSysprepName={selectedSysprepName}
+        selectionOption={selectionOption}
+        setAutoUnattend={setAutoUnattend}
+        setSelectedSysprepName={setSelectedSysprepName}
+        setSelectionOption={setSelectionOption}
+        setUnattend={setUnattend}
+        unattend={unattend}
+      />
     </TabModal>
   );
 };

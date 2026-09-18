@@ -1,5 +1,5 @@
 form.kv-sysprep--main.pf-v6-c-form {
-  grid-gap: 0;
+  gap: 0;
 }
 
 .kv-sysprep--title {
@@ -16,8 +16,3 @@ form.kv-sysprep--main.pf-v6-c-form {
   margin: 0;
 }
 
-.kv-sysprep-modal button.pf-m-danger {
-  padding-left: 0;
-  margin-bottom: var(--pf-v6-global-spacer-md);
-  margin-top: var(--pf-v6-global-spacer-sm);
-}

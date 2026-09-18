@@ -9,6 +9,8 @@ import {
   ValidatedOptions,
 } from '@patternfly/react-core';
 
+import { isValidSysprepXml } from './utils';
+
 export type SysprepFile = {
   fileName: string;
   isLoading: boolean;
@@ -22,31 +24,25 @@ type SysprepFileFieldProps = {
   value?: string;
 };
 
-const isValidXml = (xml: string): boolean => {
-  const doc = new DOMParser().parseFromString(xml, 'application/xml');
-
-  return doc.querySelector('parsererror') === null;
-};
-
 const SysprepFileField: FC<SysprepFileFieldProps> = ({ id, onChange, value }) => {
   const { t } = useKubevirtTranslation();
   const [data, setData] = useState<SysprepFile>({
     fileName: '',
     isLoading: false,
     validated: ValidatedOptions.default,
-    value,
+    value: value ?? '',
   });
 
   const onFieldChange = (newValue: string): void => {
     setData((currentSysprepFile) => ({
       ...currentSysprepFile,
-      validated: isValidXml(newValue) ? ValidatedOptions.default : ValidatedOptions.error,
+      validated: isValidSysprepXml(newValue) ? ValidatedOptions.default : ValidatedOptions.error,
       value: newValue,
     }));
   };
 
   useEffect(() => {
-    if (data.validated) {
+    if (data.validated !== ValidatedOptions.error) {
       onChange(data.value);
     }
   }, [data.validated, data.value, onChange]);
@@ -60,6 +56,15 @@ const SysprepFileField: FC<SysprepFileFieldProps> = ({ id, onChange, value }) =>
         id={`sysprep-${id}-input`}
         isLoading={data.isLoading}
         isReadOnly={false}
+        onClearClick={() => {
+          setData({
+            fileName: '',
+            isLoading: false,
+            validated: ValidatedOptions.default,
+            value: '',
+          });
+          onChange('');
+        }}
         onDataChange={(_event: DropEvent, text: string) => onFieldChange(text)}
         onFileInputChange={(_event: DropEvent, file: File) => {
           setData((currentData: SysprepFile) => ({ ...currentData, fileName: file.name }));

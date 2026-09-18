@@ -1,13 +1,12 @@
-import { type FC } from 'react';
+import { type FC, useMemo } from 'react';
 
-import { ConfigMapModel, modelToGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getName } from '@kubevirt-utils/resources/shared';
-import { Alert, AlertVariant, Button, ButtonVariant } from '@patternfly/react-core';
+import { Alert, AlertVariant } from '@patternfly/react-core';
 
 import InlineFilterSelect from '../FilterSelect/InlineFilterSelect';
 import Loading from '../Loading/Loading';
 import useSysprepConfigMaps from './hooks/useConfigMaps';
+import { getSysprepSelectOptions } from './utils';
 
 type SelectSysprepProps = {
   id?: string;
@@ -25,6 +24,11 @@ const SelectSysprep: FC<SelectSysprepProps> = ({
   const { t } = useKubevirtTranslation();
   const [sysprepConfigMaps, configmapsLoaded, configmapsError] = useSysprepConfigMaps(namespace);
 
+  const options = useMemo(
+    () => getSysprepSelectOptions(sysprepConfigMaps, selectedSysprepName),
+    [selectedSysprepName, sysprepConfigMaps],
+  );
+
   if (configmapsError)
     return (
       <Alert isInline title={t('Error')} variant={AlertVariant.danger}>
@@ -32,32 +36,16 @@ const SelectSysprep: FC<SelectSysprepProps> = ({
       </Alert>
     );
 
-  return (
-    <>
-      {configmapsLoaded ? (
-        <InlineFilterSelect
-          options={sysprepConfigMaps?.map((configMap) => {
-            const name = getName(configMap);
-            return {
-              children: name,
-              groupVersionKind: modelToGroupVersionKind(ConfigMapModel),
-              value: name,
-            };
-          })}
-          placeholder={t('Select sysprep')}
-          selected={selectedSysprepName}
-          setSelected={onSelectSysprep}
-          toggleProps={{ id }}
-        />
-      ) : (
-        <Loading />
-      )}
-      {selectedSysprepName && (
-        <Button isDanger onClick={() => onSelectSysprep(undefined)} variant={ButtonVariant.link}>
-          {t('Detach sysprep')}
-        </Button>
-      )}
-    </>
+  return configmapsLoaded ? (
+    <InlineFilterSelect
+      options={options}
+      placeholder={t('Select sysprep')}
+      selected={selectedSysprepName}
+      setSelected={onSelectSysprep}
+      toggleProps={{ id, isFullWidth: true }}
+    />
+  ) : (
+    <Loading />
   );
 };
 

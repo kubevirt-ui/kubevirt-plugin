@@ -12,6 +12,7 @@ type SysprepProps = {
   autoUnattend: string;
   onAutoUnattendChange: (value: string) => void;
   onUnattendChange: (value: string) => void;
+  showInfo?: boolean;
   unattend: string;
 };
 
@@ -19,10 +20,11 @@ const Sysprep: FC<SysprepProps> = ({
   autoUnattend,
   onAutoUnattendChange,
   onUnattendChange,
+  showInfo = true,
   unattend,
 }) => (
   <Form className="kv-sysprep--main">
-    <SysprepInfo />
+    {showInfo && <SysprepInfo />}
     <SysprepAutounattend onChange={onAutoUnattendChange} value={autoUnattend} />
     <SysprepUnattend onChange={onUnattendChange} value={unattend} />
   </Form>
