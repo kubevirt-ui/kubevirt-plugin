@@ -1,4 +1,5 @@
 import type { Dispatch, FC, SetStateAction } from 'react';
+import { useWatch } from 'react-hook-form';
 
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import HeadlessMode from '@kubevirt-utils/components/HeadlessMode/HeadlessMode';
@@ -6,15 +7,14 @@ import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName } from '@kubevirt-utils/resources/shared';
-import {
-  customizeWizardVMSignal,
-  patchCustomizeWizardVMSignal,
-} from '@kubevirt-utils/signals/customizeWizardVMSignal';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { Switch } from '@patternfly/react-core';
 import DeletionProtectionModal from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/DeletionProtectionModal';
 import { VM_DELETION_PROTECTION_LABEL } from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/utils/constants';
 import { VMDeletionProtectionOptions } from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/utils/types';
+import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
+import { CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
+import { patchWizardCustomizedVM } from '@virtualmachines/wizard/utils/patchWizardCustomizedVM';
 
 type DetailsToggleItemsProps = {
   deletionProtectionEnabled: boolean;
@@ -31,8 +31,9 @@ const DetailsToggleItems: FC<DetailsToggleItemsProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
+  const { control, getValues, setValue } = useVMWizard();
 
-  const vm = customizeWizardVMSignal.value;
+  const vm = useWatch({ control, name: CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM });
   const vmName = getName(vm);
 
   return (
@@ -45,16 +46,15 @@ const DetailsToggleItems: FC<DetailsToggleItemsProps> = ({
         data-test={`${vmName}-headless`}
         descriptionData={
           <HeadlessMode
-            updateHeadlessMode={(checked) =>
-              Promise.resolve(
-                patchCustomizeWizardVMSignal([
-                  {
-                    data: checked ? false : null,
-                    path: `spec.template.spec.domain.devices.autoattachGraphicsDevice`,
-                  },
-                ]),
-              )
-            }
+            updateHeadlessMode={(checked) => {
+              const headlessPatch = [
+                {
+                  data: checked ? false : null,
+                  path: `spec.template.spec.domain.devices.autoattachGraphicsDevice`,
+                },
+              ];
+              return Promise.resolve(patchWizardCustomizedVM(getValues, setValue, headlessPatch));
+            }}
             vm={vm}
           />
         }
@@ -74,9 +74,10 @@ const DetailsToggleItems: FC<DetailsToggleItemsProps> = ({
             isDisabled={isGuestSystemLogsDisabled}
             onChange={(_event, checked) => {
               setIsCheckedGuestSystemAccessLog(checked);
-              patchCustomizeWizardVMSignal([
+              const guestLogPatch = [
                 { data: checked, path: `spec.template.spec.domain.devices.logSerialConsole` },
-              ]);
+              ];
+              patchWizardCustomizedVM(getValues, setValue, guestLogPatch);
             }}
           />
         }
@@ -106,12 +107,14 @@ const DetailsToggleItems: FC<DetailsToggleItemsProps> = ({
                   isOpen={isOpen}
                   onCancel={onClose}
                   onConfirm={(enableDeletionProtection) => {
-                    patchCustomizeWizardVMSignal([
+                    const deletionProtectionPatch = [
                       {
                         data: enableDeletionProtection ? 'true' : 'false',
                         path: ['metadata', 'labels', VM_DELETION_PROTECTION_LABEL],
                       },
-                    ]);
+                    ];
+
+                    patchWizardCustomizedVM(getValues, setValue, deletionProtectionPatch);
                     onClose();
                   }}
                   vm={vm}

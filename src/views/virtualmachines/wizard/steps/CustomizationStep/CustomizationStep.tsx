@@ -1,36 +1,50 @@
 import type { FC } from 'react';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useWatch } from 'react-hook-form';
-import produce from 'immer';
 
-import useIsIPv6SingleStackCluster from '@kubevirt-utils/hooks/useIPStackType/useIsIPv6SingleStackCluster';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getNetworks } from '@kubevirt-utils/resources/vm';
-import { isPodNetwork } from '@kubevirt-utils/resources/vm/utils/network/selectors';
-import { removePodNetworkFromVM } from '@kubevirt-utils/resources/vm/utils/network/utils';
-import { customizeWizardVMSignal } from '@kubevirt-utils/signals/customizeWizardVMSignal';
 import { Stack, StackItem, Title, TitleSizes } from '@patternfly/react-core';
-import useApplyAutoLabels from '@virtualmachines/wizard/hooks/useApplyAutoLabels';
 import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
-import { CREATE_VM_FORM_FIELDS_VM_DATA } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
+import {
+  CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM,
+  CREATE_VM_FORM_FIELDS_VM_DATA,
+} from '@virtualmachines/wizard/state/vm-wizard-form/consts';
 import CustomizeVirtualMachine from '@virtualmachines/wizard/steps/CustomizationStep/components/CustomizeVirtualMachine/CustomizeVirtualMachine';
+import { VMCreationMethod } from '@virtualmachines/wizard/utils/constants';
+import { patchWizardCustomizedVM } from '@virtualmachines/wizard/utils/patchWizardCustomizedVM';
+
+import useGenerateVM from '../InstanceTypesSteps/hooks/useGenerateVM/useGenerateVM';
+import { getAdminLabelsToMerge } from '../InstanceTypesSteps/hooks/useGenerateVM/utils/generateVM';
 
 const CustomizationStep: FC = () => {
   const { t } = useKubevirtTranslation();
-  const { control } = useVMWizard();
-  const cluster = useWatch({ control, name: CREATE_VM_FORM_FIELDS_VM_DATA.CLUSTER });
-  const isIPv6SingleStack = useIsIPv6SingleStackCluster(cluster);
-  const vm = customizeWizardVMSignal.value;
+  const { control, getValues, setValue } = useVMWizard();
+  const creationMethod = useWatch({ control, name: CREATE_VM_FORM_FIELDS_VM_DATA.CREATION_METHOD });
+  const { adminLabels, generatedVM, loaded, userDefaults } = useGenerateVM();
 
-  useApplyAutoLabels();
+  const hasSeededCustomizedVMRef = useRef(false);
 
   useEffect(() => {
-    if (isIPv6SingleStack && vm && getNetworks(vm)?.some(isPodNetwork)) {
-      customizeWizardVMSignal.value = produce(vm, (draft) => {
-        removePodNetworkFromVM(draft);
-      });
+    if (!loaded || !generatedVM || hasSeededCustomizedVMRef.current) {
+      return;
     }
-  }, [isIPv6SingleStack, vm]);
+
+    if (creationMethod !== VMCreationMethod.INSTANCE_TYPE) {
+      patchWizardCustomizedVM(getValues, setValue, [
+        {
+          data: getAdminLabelsToMerge(adminLabels, userDefaults, getValues),
+          path: ['metadata', 'labels'],
+        },
+      ]);
+      setValue(CREATE_VM_FORM_FIELDS_VM_DATA.AUTO_LABELS_MERGED, true);
+      hasSeededCustomizedVMRef.current = true;
+      return;
+    }
+
+    setValue(CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM, generatedVM);
+    setValue(CREATE_VM_FORM_FIELDS_VM_DATA.AUTO_LABELS_MERGED, true);
+    hasSeededCustomizedVMRef.current = true;
+  }, [adminLabels, creationMethod, generatedVM, getValues, loaded, setValue, userDefaults]);
 
   return (
     <Stack hasGutter>

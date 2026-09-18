@@ -1,15 +1,18 @@
 import { type FC } from 'react';
+import { useWatch } from 'react-hook-form';
 
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { TREE_VIEW_FOLDERS } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getFolder, NO_DATA_DASH } from '@kubevirt-utils/resources/vm';
-import { customizeWizardVMSignal } from '@kubevirt-utils/signals/customizeWizardVMSignal';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { DescriptionList, ExpandableSection } from '@patternfly/react-core';
 import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
-import { CREATE_VM_FORM_FIELDS_VM_DATA } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
+import {
+  CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM,
+  CREATE_VM_FORM_FIELDS_VM_DATA,
+} from '@virtualmachines/wizard/state/vm-wizard-form/consts';
 import { isCloneCreationMethod } from '@virtualmachines/wizard/utils/utils';
 
 import CloneDescriptionInput from './CloneDescriptionInput';
@@ -17,7 +20,8 @@ import CloneNameInput from './CloneNameInput';
 
 const ReviewGridLeftColumn: FC = () => {
   const { t } = useKubevirtTranslation();
-  const vm = customizeWizardVMSignal.value;
+  const { control } = useVMWizard();
+  const vm = useWatch({ control, name: CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM });
 
   const { featureEnabled: treeViewFoldersEnabled, loading: treeViewFoldersLoading } =
     useFeatures(TREE_VIEW_FOLDERS);

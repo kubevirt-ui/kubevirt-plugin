@@ -8,7 +8,7 @@ import {
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Wizard, WizardHeader, WizardStep, type WizardStepType } from '@patternfly/react-core';
 import useCloseWizard from '@virtualmachines/wizard/hooks/useCloseWizard';
-import { useSyncDeploymentDetails } from '@virtualmachines/wizard/hooks/useSyncDeploymentDetails';
+import { useSyncDeploymentDetailsAndMetadataFields } from '@virtualmachines/wizard/hooks/useSyncDeploymentDetailsAndMetadataFields';
 import useWizardStepValidation from '@virtualmachines/wizard/hooks/useWizardStepValidation';
 
 import RequiredLabelsDrawerWrapper from './components/RequiredLabelsDrawerWrapper';
@@ -35,7 +35,7 @@ const VMCreationWizardContent: FC = () => {
   const { control, getValues, setValue } = useVMWizard();
   const creationMethod = useWatch({ control, name: CREATE_VM_FORM_FIELDS_VM_DATA.CREATION_METHOD });
   const navItemConfig = useVMGenerationNavClick(creationMethod);
-  const syncDeploymentDetails = useSyncDeploymentDetails();
+  const { syncOnDeploymentDetailsStepChange } = useSyncDeploymentDetailsAndMetadataFields();
   const hasLoggedCreationStartedRef = useRef(false);
 
   const stepsToDisplay: VMWizardStepDisplay[] = useMemo(
@@ -51,7 +51,7 @@ const VMCreationWizardContent: FC = () => {
 
   const onStepChange = useCallback(
     (currentStep: WizardStepType, prevStep: WizardStepType) => {
-      syncDeploymentDetails(currentStep, prevStep);
+      syncOnDeploymentDetailsStepChange(currentStep, prevStep);
       if (currentStep?.id !== VMWizardStep.TEMPLATE) {
         setValue(CREATE_VM_FORM_FIELDS_UI_STATE.IS_TEMPLATES_DRAWER_OPEN, false);
       }
@@ -70,7 +70,7 @@ const VMCreationWizardContent: FC = () => {
         logVMCreationStarted(creationMethodTelemetry);
       }
     },
-    [getValues, setValue, syncDeploymentDetails],
+    [getValues, setValue, syncOnDeploymentDetailsStepChange],
   );
 
   return (
