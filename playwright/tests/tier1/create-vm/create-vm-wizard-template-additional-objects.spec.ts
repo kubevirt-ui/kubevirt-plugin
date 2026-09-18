@@ -28,7 +28,6 @@ test.describe(
       const secretName = utils.generateRandomName('tpl-secret');
 
       const templateResource = utils.TemplateFactory.createResourceObject({
-        customLabels: { 'template.openshift.io/provider': 'default' },
         displayName: 'Template with additional Secret',
         name: templateName,
         namespace: wizardNs,
@@ -71,6 +70,8 @@ test.describe(
         expect(catalogVisible, 'Template catalog should be visible').toBe(true);
 
         await vmWizardNavigationPage.selectTemplateCatalogProject(wizardNs);
+        await vmWizardNavigationPage.selectUserTemplatesScopeFilter();
+        await vmWizardNavigationPage.filterTemplateCatalog(templateName);
         await vmWizardNavigationPage.selectTemplateByTestId(templateName);
         await vmWizardNavigationPage.clickNext();
       });

@@ -36,8 +36,8 @@ target namespace during wizard submission.
   for Playwright.
 - **Initial Setup:** Each test creates an isolated namespace via `setupTestNamespace`. The custom
   template, Secret, and created VM are tracked on `apiClient` for automatic cleanup. The template is
-  labeled with `template.openshift.io/provider: default` so it appears in the wizard template
-  catalog for the selected project.
+  created via API in the test namespace. The wizard catalog defaults to "Default templates";
+  the test selects the "User templates" scope filter so the custom template is visible.
 
 ---
 
@@ -62,16 +62,16 @@ target namespace during wizard submission.
   perspective.
 - **Tags:** `@tier1`, `@catalog-wizard`, `@adminOnly`, `@CNV-97155`
 
-| Step | Action                                                                                               | Expected Result                                                                                |
-| :--- | :--------------------------------------------------------------------------------------------------- | :--------------------------------------------------------------------------------------------- |
-| 1    | Create an isolated namespace and a custom OpenShift Template via API (VM + Secret without namespace) | Template exists in the namespace; Secret object in template has no `metadata.namespace`        |
-| 2    | Switch to Virtualization, open the namespaced VM list, and launch the creation wizard                | Wizard opens                                                                                   |
-| 3    | Select From Template, set the project to the test namespace, generate a VM name, click Next          | Wizard advances to the template catalog                                                        |
-| 4    | Filter the catalog to the test project and select the custom template                                | Template catalog is visible; custom template card is selectable; Next is enabled               |
-| 5    | Proceed through Customization with defaults and click Next                                           | Customization step is visible; wizard advances to Review                                       |
-| 6    | Review the configuration and click Create VirtualMachine                                             | Browser redirects to the VM detail page                                                        |
-| 7    | Verify the VM exists via API                                                                         | VirtualMachine resource exists in the test namespace                                           |
-| 8    | Verify the Secret exists via API in the test namespace                                               | Secret resource exists; `metadata.namespace` equals the VM namespace (not empty or a wrong NS) |
+| Step | Action                                                                                                              | Expected Result                                                                                |
+| :--- | :------------------------------------------------------------------------------------------------------------------ | :--------------------------------------------------------------------------------------------- |
+| 1    | Create an isolated namespace and a custom OpenShift Template via API (VM + Secret without namespace)                | Template exists in the namespace; Secret object in template has no `metadata.namespace`        |
+| 2    | Switch to Virtualization, open the namespaced VM list, and launch the creation wizard                               | Wizard opens                                                                                   |
+| 3    | Select From Template, set the project to the test namespace, generate a VM name, click Next                         | Wizard advances to the template catalog                                                        |
+| 4    | Filter the catalog to the test project, select User templates scope, search by name, and select the custom template | Template catalog is visible; custom template card is selectable; Next is enabled               |
+| 5    | Proceed through Customization with defaults and click Next                                                          | Customization step is visible; wizard advances to Review                                       |
+| 6    | Review the configuration and click Create VirtualMachine                                                            | Browser redirects to the VM detail page                                                        |
+| 7    | Verify the VM exists via API                                                                                        | VirtualMachine resource exists in the test namespace                                           |
+| 8    | Verify the Secret exists via API in the test namespace                                                              | Secret resource exists; `metadata.namespace` equals the VM namespace (not empty or a wrong NS) |
 
 ---
 

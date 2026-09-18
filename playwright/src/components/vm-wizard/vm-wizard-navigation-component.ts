@@ -212,6 +212,14 @@ export default class VmWizardNavigationComponent extends BaseComponent {
     });
   }
 
+  /** Select "User templates" in the catalog Template scope sidebar filter. */
+  async selectUserTemplatesScopeFilter(): Promise<void> {
+    const userTemplatesRadio = this.testId('catalog-template-filter-user');
+    await userTemplatesRadio.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
+    await this.robustClick(userTemplatesRadio);
+    await this.page.waitForTimeout(TestTimeouts.UI_DELAY_MEDIUM);
+  }
+
   async ensureVmNameFilled(): Promise<void> {
     const isVisible = await this._vmNameInput
       .first()
