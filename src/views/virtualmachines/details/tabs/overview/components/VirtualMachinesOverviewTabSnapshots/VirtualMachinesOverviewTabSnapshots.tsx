@@ -2,14 +2,10 @@ import type { FC } from 'react';
 import { Link } from 'react-router';
 
 import type { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
-import SnapshotModal from '@kubevirt-utils/components/SnapshotModal/SnapshotModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   Bullseye,
-  Button,
-  ButtonVariant,
   Card,
   CardBody,
   CardFooter,
@@ -18,6 +14,7 @@ import {
   Flex,
   Label,
 } from '@patternfly/react-core';
+import TakeSnapshotButton from '@virtualmachines/details/tabs/snapshots/components/TakeSnapshotButton/TakeSnapshotButton';
 
 import useSnapshotData from '../../../snapshots/hooks/useSnapshotData';
 import { createURL } from '../../utils/utils';
@@ -32,7 +29,6 @@ const VirtualMachinesOverviewTabSnapshots: FC<VirtualMachinesOverviewTabSnapshot
 }) => {
   const { t } = useKubevirtTranslation();
   const { snapshots } = useSnapshotData(vm);
-  const { createModal } = useModal();
   const snapshotsTabLink = createURL('snapshots', location?.pathname);
 
   return (
@@ -43,13 +39,7 @@ const VirtualMachinesOverviewTabSnapshots: FC<VirtualMachinesOverviewTabSnapshot
             <Link to={snapshotsTabLink}>
               {t('Snapshots ({{snapshots}})', { snapshots: snapshots.length || 0 })}
             </Link>
-            <Button
-              isInline
-              onClick={() => createModal((props) => <SnapshotModal vm={vm} {...props} />)}
-              variant={ButtonVariant.link}
-            >
-              {t('Take snapshot')}
-            </Button>
+            <TakeSnapshotButton variant="link" vm={vm} />
           </Flex>
         </CardTitle>
         <Divider />

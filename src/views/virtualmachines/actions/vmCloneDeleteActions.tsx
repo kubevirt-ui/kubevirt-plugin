@@ -101,6 +101,7 @@ export const createCloneDeleteActions = (t: TFunction): CloneDeleteActions => ({
   ): ActionDropdownItemType => ({
     accessReview: asAccessReview(VirtualMachineSnapshotModel, vm, 'create'),
     cta: () => createModal((props) => <SnapshotModal vm={vm} {...props} />),
+    disabledTooltip: getNoPermissionTooltipContent(t),
     id: ACTIONS_ID.SNAPSHOT,
     label: t('Take snapshot'),
   }),
