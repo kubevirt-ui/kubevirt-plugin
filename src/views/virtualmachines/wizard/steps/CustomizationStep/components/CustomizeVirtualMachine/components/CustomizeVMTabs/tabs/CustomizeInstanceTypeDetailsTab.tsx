@@ -1,4 +1,5 @@
 import React, { type FC, useEffect, useState } from 'react';
+import { useWatch } from 'react-hook-form';
 
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
@@ -10,17 +11,19 @@ import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { getPreferredBootmode } from '@kubevirt-utils/resources/preference/helper';
 import { asAccessReview } from '@kubevirt-utils/resources/shared';
 import { getDevices } from '@kubevirt-utils/resources/vm';
-import { customizeWizardVMSignal } from '@kubevirt-utils/signals/customizeWizardVMSignal';
 import { type K8sVerb, useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
 import { Grid } from '@patternfly/react-core';
 import { isDeletionProtectionEnabled } from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/utils/utils';
+import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
+import { CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
 
 import usePreference from '../hooks/usePreference';
 import DetailsLeftColumn from './components/DetailsLeftColumn';
 import DetailsRightColumn from './components/DetailsRightColumn';
 
 const CustomizeInstanceTypeDetailsTab: FC = () => {
-  const vm = customizeWizardVMSignal.value;
+  const { control } = useVMWizard();
+  const vm = useWatch({ control, name: CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM });
 
   const [preference, preferenceLoading] = usePreference(vm);
 

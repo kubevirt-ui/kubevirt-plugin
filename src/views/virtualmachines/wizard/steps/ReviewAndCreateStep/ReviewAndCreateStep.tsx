@@ -7,27 +7,24 @@ import {
   START_AFTER_CREATION_CHECKBOX_ID,
 } from '@kubevirt-utils/components/RunStrategyModal/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import {
-  customizeWizardVMSignal,
-  patchCustomizeWizardVMSignal,
-} from '@kubevirt-utils/signals/customizeWizardVMSignal';
 import { Checkbox, Stack, StackItem, Title, TitleSizes } from '@patternfly/react-core';
-import { useSignals } from '@preact/signals-react/runtime';
 import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
-import { CREATE_VM_FORM_FIELDS_VM_DATA } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
+import {
+  CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM,
+  CREATE_VM_FORM_FIELDS_VM_DATA,
+} from '@virtualmachines/wizard/state/vm-wizard-form/consts';
 import ReviewGrid from '@virtualmachines/wizard/steps/ReviewAndCreateStep/components/ReviewGrid/ReviewGrid';
+import { patchWizardCustomizedVM } from '@virtualmachines/wizard/utils/patchWizardCustomizedVM';
 import { isCloneCreationMethod } from '@virtualmachines/wizard/utils/utils';
 
 const ReviewAndCreateStep: FC = () => {
   const { t } = useKubevirtTranslation();
-  const { control } = useVMWizard();
+  const { control, getValues, setValue } = useVMWizard();
   const creationMethod = useWatch({ control, name: CREATE_VM_FORM_FIELDS_VM_DATA.CREATION_METHOD });
+  const vm = useWatch({ control, name: CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM });
   const isCloneMethod = isCloneCreationMethod(creationMethod);
 
-  useSignals();
-  const { isStartChecked, onToggle } = useRunStrategyToggle(
-    customizeWizardVMSignal.value ?? undefined,
-  );
+  const { isStartChecked, onToggle } = useRunStrategyToggle(vm ?? undefined);
   return (
     <Stack hasGutter>
       <StackItem>
@@ -53,7 +50,8 @@ const ReviewAndCreateStep: FC = () => {
           label={getStartAfterCreationLabel(t)}
           onChange={(_event, checked: boolean) => {
             const { newStrategy } = onToggle(checked);
-            patchCustomizeWizardVMSignal([{ data: newStrategy, path: 'spec.runStrategy' }]);
+            const runStrategyPatch = [{ data: newStrategy, path: 'spec.runStrategy' }];
+            patchWizardCustomizedVM(getValues, setValue, runStrategyPatch);
           }}
         />
       </StackItem>

@@ -14,7 +14,10 @@ import useIsACMPage from '@multicluster/useIsACMPage';
 import { Form, FormGroup } from '@patternfly/react-core';
 import { useHubClusterName } from '@stolostron/multicluster-sdk';
 import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
-import { CREATE_VM_FORM_FIELDS_VM_DATA } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
+import {
+  CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM,
+  CREATE_VM_FORM_FIELDS_VM_DATA,
+} from '@virtualmachines/wizard/state/vm-wizard-form/consts';
 
 import './VMCreationLocationForm.scss';
 
@@ -53,7 +56,7 @@ const VMCreationLocationForm: FC = () => {
                   setValue(CREATE_VM_FORM_FIELDS_VM_DATA.FOLDER, '');
                   if (selectedCluster !== cluster)
                     setValue(CREATE_VM_FORM_FIELDS_VM_DATA.PROJECT, '');
-                  setCustomizeWizardVMSignal(null);
+                  setValue(CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM, null);
                 }}
                 selectedCluster={value as string}
               />
@@ -75,6 +78,7 @@ const VMCreationLocationForm: FC = () => {
                 field.onChange(selectedProject);
                 setValue(CREATE_VM_FORM_FIELDS_VM_DATA.FOLDER, '');
                 setCustomizeWizardVMSignal(null);
+                setValue(CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM, null);
               }}
               selectedProject={project || DEFAULT_NAMESPACE}
             />

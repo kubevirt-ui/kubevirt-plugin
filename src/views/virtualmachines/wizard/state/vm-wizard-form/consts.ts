@@ -15,6 +15,7 @@ export const createInitialVMWizardFormValues = ({
   name,
   project,
 }: CreateInitialVMWizardFormValuesArgs): VMWizardFormValues => ({
+  customizedVM: null,
   instanceTypeData: {
     customDiskSize: '',
     dvSource: null,
@@ -74,6 +75,9 @@ export const CREATE_VM_FORM_FIELDS_STEP_NAVIGATION = {
   CURRENT_STEP: 'stepNavigation.currentStep',
   VISITED_STEPS: 'stepNavigation.visitedSteps',
 } as const satisfies Record<string, FieldPath<VMWizardFormValues>>;
+
+export const CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM =
+  'customizedVM' as const satisfies FieldPath<VMWizardFormValues>;
 
 export const CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA = {
   CUSTOM_DISK_SIZE: 'instanceTypeData.customDiskSize',

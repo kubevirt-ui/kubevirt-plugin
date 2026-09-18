@@ -1,3 +1,5 @@
+import { type UseFormGetValues } from 'react-hook-form';
+
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import {
@@ -9,33 +11,47 @@ import {
 import { DYNAMIC_CREDENTIALS_SUPPORT } from '@kubevirt-utils/components/DynamicSSHKeyInjection/constants/constants';
 import { addSecretToVM } from '@kubevirt-utils/components/SSHSecretModal/utils/utils';
 import { DEFAULT_PREFERENCE_LABEL } from '@kubevirt-utils/constants/instancetypes-and-preferences';
+import { type AutoAppliedLabel } from '@kubevirt-utils/hooks/useAutoAppliedLabels/types';
 import { type RHELAutomaticSubscriptionData } from '@kubevirt-utils/hooks/useRHELAutomaticSubscription/utils/types';
 import { type BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
-import { getLabel } from '@kubevirt-utils/resources/shared';
+import { getLabel, getLabels } from '@kubevirt-utils/resources/shared';
 import { OS_NAME_TYPES, OS_NAME_TYPES_NOT_SUPPORTED } from '@kubevirt-utils/resources/template';
 import { OS_WINDOWS_PREFIX } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
 import { getRandomChars, isEmpty } from '@kubevirt-utils/utils/utils';
 import { AutomaticSubscriptionTypeEnum } from '@settings/tabs/ClusterTab/components/GuestManagmentSection/AutomaticSubscriptionRHELGuests/components/AutomaticSubscriptionType/utils/utils';
 import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
+import { type GetMergedMetadataLabelsArgs } from '@virtualmachines/wizard/hooks/types/types';
+import { CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
+import { type VMWizardFormValues } from '@virtualmachines/wizard/state/vm-wizard-form/types';
 
 import { type GenerateVMCallback } from '../types';
 
 import { getSpecConfiguration } from './generateVMSpecConfig';
 
-export const generateVM: GenerateVMCallback = ({ context, instanceTypeData, vmData }) => {
+export const generateVM: GenerateVMCallback = ({
+  autoAppliedLabels,
+  context,
+  getValues,
+  instanceTypeData,
+  vmData,
+}) => {
   const { cluster, description, folder, project } = vmData;
   const { selectedBootableVolume } = instanceTypeData;
+  const { adminLabels, userDefaults } = autoAppliedLabels;
 
   const generatedVM: V1VirtualMachine = {
     apiVersion: `${VirtualMachineModel.apiGroup}/${VirtualMachineModel.apiVersion}`,
     kind: VirtualMachineModel.kind,
     ...(cluster && { cluster }),
-    metadata: {
-      ...(description && { annotations: { description } }),
-      name: context.vmName,
-      namespace: project,
-      ...(folder && { labels: { [VM_FOLDER_LABEL]: folder } }),
-    },
+    metadata: getMergedMetadataLabels({
+      adminLabels,
+      description,
+      folder,
+      getValues,
+      project,
+      userDefaults,
+      vmName: context.vmName,
+    }),
     spec: getSpecConfiguration({
       context,
       instanceTypeData,
@@ -93,4 +109,48 @@ export const createPopulatedCloudInitYAML = (
   }
 
   return convertUserDataObjectToYAML(cloudInitConfig, true);
+};
+
+export const getAdminLabelsToMerge = (
+  adminLabels: AutoAppliedLabel[],
+  userDefaults: Record<string, string>,
+  getValues: UseFormGetValues<VMWizardFormValues>,
+) => {
+  const customizedVM = getValues(CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM);
+  const existingLabels = customizedVM ? getLabels(customizedVM, {}) : {};
+  const adminLabelsToMerge = adminLabels?.reduce<Record<string, string>>((acc, { key, value }) => {
+    if (existingLabels[key]) {
+      return acc;
+    }
+    acc[key] = isEmpty(value) ? userDefaults?.[key] : (value ?? '');
+    return acc;
+  }, {});
+
+  return { ...adminLabelsToMerge, ...existingLabels };
+};
+export const getMergedMetadataLabels = ({
+  adminLabels,
+  description,
+  folder,
+  getValues,
+  project,
+  userDefaults,
+  vmName,
+}: GetMergedMetadataLabelsArgs) => {
+  const adminLabelsToMerge = getAdminLabelsToMerge(adminLabels, userDefaults, getValues);
+
+  const metadataLabels = {
+    labels: {
+      ...(folder && { [VM_FOLDER_LABEL]: folder }),
+      ...(adminLabelsToMerge ?? {}),
+    },
+  };
+
+  const metadata = {
+    ...(description && { annotations: { description } }),
+    name: vmName,
+    namespace: project,
+  };
+
+  return { ...metadata, ...metadataLabels };
 };

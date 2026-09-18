@@ -1,21 +1,24 @@
 import type { FC } from 'react';
 import React from 'react';
+import { useWatch } from 'react-hook-form';
 
 import DisksReviewTable from '@kubevirt-utils/components/DisksReviewTable/DisksReviewTable';
 import NetworksReviewTable from '@kubevirt-utils/components/NetworksReviewTable/NetworksReviewTable';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getInterfaces, getNetworks } from '@kubevirt-utils/resources/vm';
-import { customizeWizardVMSignal } from '@kubevirt-utils/signals/customizeWizardVMSignal';
 import { ExpandableSection, Stack, StackItem } from '@patternfly/react-core';
 import useWizardDisksTableData from '@virtualmachines/wizard/components/DisksReviewTable/hooks/useWizardDisksTableData/useWizardDisksTableData';
 import HardwareDevicesTable from '@virtualmachines/wizard/components/HardwareDevicesTable';
+import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
+import { CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
 
 import './ReviewGridRightColumn.scss';
 
 const ReviewGridRightColumn: FC = () => {
   const { t } = useKubevirtTranslation();
+  const { control } = useVMWizard();
+  const vm = useWatch({ control, name: CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM });
 
-  const vm = customizeWizardVMSignal.value;
   const [disks] = useWizardDisksTableData(vm);
   const interfaces = getInterfaces(vm);
   const networks = getNetworks(vm);

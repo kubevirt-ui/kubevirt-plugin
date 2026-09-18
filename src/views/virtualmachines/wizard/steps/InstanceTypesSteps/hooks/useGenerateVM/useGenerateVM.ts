@@ -3,6 +3,7 @@ import { useWatch } from 'react-hook-form';
 
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { KUBEVIRT_OS } from '@kubevirt-utils/constants/instancetypes-and-preferences';
+import { type AutoAppliedLabel } from '@kubevirt-utils/hooks/useAutoAppliedLabels/types';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import useHyperConvergeConfiguration from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import useIsIPv6SingleStackCluster from '@kubevirt-utils/hooks/useIPStackType/useIsIPv6SingleStackCluster';
@@ -16,7 +17,12 @@ import { addWinDriverVolume } from '@kubevirt-utils/resources/vm/utils/disk/driv
 import { useDriversImage } from '@kubevirt-utils/resources/vm/utils/disk/useDriversImage';
 import { generatePrettyName, getValidNamespace } from '@kubevirt-utils/utils/utils';
 import { AUTOMATIC_UPDATE_FEATURE_NAME } from '@settings/tabs/ClusterTab/components/GuestManagmentSection/AutomaticSubscriptionRHELGuests/utils/constants';
+import useApplyAutoLabels from '@virtualmachines/wizard/hooks/useApplyAutoLabels';
 import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
+import {
+  CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA,
+  CREATE_VM_FORM_FIELDS_VM_DATA,
+} from '@virtualmachines/wizard/state/vm-wizard-form/consts';
 import {
   createPopulatedCloudInitYAML,
   generateVM,
@@ -25,15 +31,17 @@ import {
 import { getSelectedPreferenceName } from '@virtualmachines/wizard/steps/InstanceTypesSteps/hooks/useGenerateVM/utils/getSelectedPreference';
 
 export type UseGenerateVMResult = {
-  generatedVM: V1VirtualMachine;
+  adminLabels: AutoAppliedLabel[];
+  generatedVM: undefined | V1VirtualMachine;
   loaded: boolean;
+  userDefaults: Record<string, string>;
 };
 
 const useGenerateVM = (): UseGenerateVMResult => {
-  const { control } = useVMWizard();
+  const { control, getValues } = useVMWizard();
   const [vmData, instanceTypeData] = useWatch({
     control,
-    name: ['vmData', 'instanceTypeData'],
+    name: [CREATE_VM_FORM_FIELDS_VM_DATA.ROOT, CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.ROOT],
   });
 
   const { cluster, name, project } = vmData;
@@ -67,6 +75,8 @@ const useGenerateVM = (): UseGenerateVMResult => {
   );
   const generatedVMName = useMemo(() => generatePrettyName(osLabel), [osLabel]);
 
+  const { adminLabels, isLoading: autoLabelsLoading, userDefaults } = useApplyAutoLabels();
+
   const [driversImage] = useDriversImage(cluster);
   const [authorizedSSHKeys] = useKubevirtUserSettings(USER_SETTINGS_KEYS.ssh, cluster);
   const defaultSSHSecretName =
@@ -74,41 +84,53 @@ const useGenerateVM = (): UseGenerateVMResult => {
       ? (authorizedSSHKeys[project] as string)
       : undefined;
 
-  const generatedVM = useMemo(
-    () =>
-      generateVM({
-        context: {
-          enableMultiArchBootImageImport,
-          isIPv6SingleStack,
-          isUDNManagedNamespace,
-          populatedCloudInitYAML,
-          sshSecretName: defaultSSHSecretName,
-          vmCreationNad,
-          vmName: name ?? generatedVMName,
-        },
-        instanceTypeData,
-        vmData,
-      }),
-    [
-      defaultSSHSecretName,
-      enableMultiArchBootImageImport,
-      generatedVMName,
+  const generatedVM = useMemo(() => {
+    if (autoLabelsLoading) {
+      return;
+    }
+
+    return generateVM({
+      autoAppliedLabels: { adminLabels, userDefaults },
+      context: {
+        enableMultiArchBootImageImport,
+        isIPv6SingleStack,
+        isUDNManagedNamespace,
+        populatedCloudInitYAML,
+        sshSecretName: defaultSSHSecretName,
+        vmCreationNad,
+        vmName: name ?? generatedVMName,
+      },
+      getValues,
       instanceTypeData,
-      isIPv6SingleStack,
-      isUDNManagedNamespace,
-      name,
-      populatedCloudInitYAML,
-      vmCreationNad,
       vmData,
-    ],
-  );
+    });
+  }, [
+    adminLabels,
+    autoLabelsLoading,
+    defaultSSHSecretName,
+    enableMultiArchBootImageImport,
+    generatedVMName,
+    instanceTypeData,
+    isIPv6SingleStack,
+    isUDNManagedNamespace,
+    name,
+    populatedCloudInitYAML,
+    userDefaults,
+    vmCreationNad,
+    vmData,
+    getValues,
+  ]);
 
   const vmWithDrivers = useMemo(() => {
+    if (!generatedVM) {
+      return;
+    }
+
     const isWindowsOSVolume = isWindowBootableVolume(selectedBootableVolume);
     return isWindowsOSVolume ? addWinDriverVolume(generatedVM, driversImage) : generatedVM;
   }, [driversImage, generatedVM, selectedBootableVolume]);
 
-  return { generatedVM: vmWithDrivers, loaded };
+  return { adminLabels, generatedVM: vmWithDrivers, loaded, userDefaults };
 };
 
 export default useGenerateVM;

@@ -12,9 +12,9 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
 import { USER_SETTINGS_KEYS } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/const';
 import { getResourceKey } from '@kubevirt-utils/resources/shared';
-import { customizeWizardVMSignal } from '@kubevirt-utils/signals/customizeWizardVMSignal';
 import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
 import {
+  CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM,
   CREATE_VM_FORM_FIELDS_UI_STATE,
   CREATE_VM_FORM_FIELDS_VM_DATA,
 } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
@@ -71,8 +71,7 @@ const useCreateVMFromTemplate: UseCreateVMFromTemplate = () => {
     setIsProcessing(true);
     try {
       const vm = await resolveVMFromTemplate(selectedTemplate, namespace, cluster, vmName);
-
-      customizeWizardVMSignal.value = getVMObjectFromTemplate({
+      const vmFromTemplate = getVMObjectFromTemplate({
         description,
         folder,
         namespace,
@@ -80,6 +79,9 @@ const useCreateVMFromTemplate: UseCreateVMFromTemplate = () => {
         sshSecretName: authorizedSSHKeys?.[namespace],
         vm,
       });
+
+      setValue(CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM, vmFromTemplate);
+
       setValue(CREATE_VM_FORM_FIELDS_UI_STATE.LAST_PROCESSED_TEMPLATE_KEY, selectedKey);
       return true;
     } catch (error) {

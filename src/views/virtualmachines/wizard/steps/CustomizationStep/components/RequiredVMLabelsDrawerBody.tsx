@@ -1,15 +1,18 @@
 import React, { type FC, useCallback, useMemo, useState } from 'react';
+import { useWatch } from 'react-hook-form';
 import { Link } from 'react-router';
 
 import { type AutoAppliedLabel } from '@kubevirt-utils/hooks/useAutoAppliedLabels/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
 import { USER_SETTINGS_KEYS } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/const';
-import { patchCustomizeWizardVMSignal } from '@kubevirt-utils/signals/customizeWizardVMSignal';
 import { Checkbox, Stack, StackItem } from '@patternfly/react-core';
 import { USER_SETTINGS_URL } from '@settings/constants';
 import { USER_TAB_IDS } from '@settings/search/constants';
 import DefaultVMLabelRow from '@settings/tabs/UserTab/components/DefaultVMLabelsSection/components/DefaultVMLabelRow';
+import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
+import { CREATE_VM_FORM_FIELDS_VM_DATA } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
+import { patchWizardCustomizedVM } from '@virtualmachines/wizard/utils/patchWizardCustomizedVM';
 
 type RequiredVMLabelsDrawerBodyProps = {
   requiredLabels: AutoAppliedLabel[];
@@ -21,8 +24,11 @@ const RequiredVMLabelsDrawerBody: FC<RequiredVMLabelsDrawerBodyProps> = ({
   vmLabels,
 }) => {
   const { t } = useKubevirtTranslation();
+  const { control, getValues, setValue } = useVMWizard();
+  const cluster = useWatch({ control, name: CREATE_VM_FORM_FIELDS_VM_DATA.CLUSTER });
   const [userDefaults, setUserDefaults] = useKubevirtUserSettings(
     USER_SETTINGS_KEYS.defaultVMLabels,
+    cluster,
   );
   const [saveAsDefaults, setSaveAsDefaults] = useState(false);
 
@@ -33,13 +39,15 @@ const RequiredVMLabelsDrawerBody: FC<RequiredVMLabelsDrawerBodyProps> = ({
 
   const handleSave = useCallback(
     (key: string, value: string): void => {
-      patchCustomizeWizardVMSignal([{ data: value, path: ['metadata', 'labels', key] }]);
+      const labelPatch = [{ data: value, path: ['metadata', 'labels', key] }];
+
+      patchWizardCustomizedVM(getValues, setValue, labelPatch);
 
       if (saveAsDefaults) {
         void setUserDefaults({ ...(userDefaults || {}), [key]: value });
       }
     },
-    [saveAsDefaults, setUserDefaults, userDefaults],
+    [getValues, saveAsDefaults, setUserDefaults, setValue, userDefaults],
   );
 
   return (

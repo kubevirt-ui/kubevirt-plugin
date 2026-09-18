@@ -1,19 +1,31 @@
-import React, { type FC } from 'react';
+import React, { type FC, useCallback } from 'react';
+import { useWatch } from 'react-hook-form';
 
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import {
-  customizeWizardVMSignal,
-  updateVMCustomizeIT,
-} from '@kubevirt-utils/signals/customizeWizardVMSignal';
 import { Grid, GridItem, PageSection, Stack, Title } from '@patternfly/react-core';
 import SSHTabAuthorizedSSHKey from '@virtualmachines/details/tabs/configuration/ssh/components/SSHTabAuthorizedSSHKey';
 import SSHTabSSHAccess from '@virtualmachines/details/tabs/configuration/ssh/components/SSHTabSSHAccess';
+import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
+import { CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
+import { patchWizardCustomizedVM } from '@virtualmachines/wizard/utils/patchWizardCustomizedVM';
 
 const CustomizeInstanceTypeSSHTab: FC = () => {
   const { t } = useKubevirtTranslation();
-  const vm = customizeWizardVMSignal.value;
+  const { getValues, setValue } = useVMWizard();
+  const { control } = useVMWizard();
+  const vm = useWatch({ control, name: CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM });
+
+  const updateVMFromForm = useCallback(
+    (updatedVM: V1VirtualMachine) => {
+      const replacePatch = [{ data: updatedVM }];
+
+      return Promise.resolve(patchWizardCustomizedVM(getValues, setValue, replacePatch));
+    },
+    [getValues, setValue],
+  );
 
   if (!vm) {
     return <Loading />;
@@ -28,11 +40,7 @@ const CustomizeInstanceTypeSSHTab: FC = () => {
         <GridItem>
           <Stack hasGutter>
             <SSHTabSSHAccess isCustomizeInstanceType vm={vm} />
-            <SSHTabAuthorizedSSHKey
-              isCustomizeInstanceType
-              onUpdateVM={updateVMCustomizeIT}
-              vm={vm}
-            />
+            <SSHTabAuthorizedSSHKey isCustomizeInstanceType onUpdateVM={updateVMFromForm} vm={vm} />
           </Stack>
         </GridItem>
       </Grid>

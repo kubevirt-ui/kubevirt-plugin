@@ -1,4 +1,5 @@
 import React, { type FC } from 'react';
+import { useWatch } from 'react-hook-form';
 
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { DescriptionModal } from '@kubevirt-utils/components/DescriptionModal/DescriptionModal';
@@ -10,11 +11,11 @@ import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getAnnotation, getLabel, getName } from '@kubevirt-utils/resources/shared';
 import { DESCRIPTION_ANNOTATION, getHostname } from '@kubevirt-utils/resources/vm';
-import {
-  customizeWizardVMSignal,
-  patchCustomizeWizardVMSignal,
-} from '@kubevirt-utils/signals/customizeWizardVMSignal';
 import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
+import { useSyncDeploymentDetailsAndMetadataFields } from '@virtualmachines/wizard/hooks/useSyncDeploymentDetailsAndMetadataFields';
+import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
+import { CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
+import { patchWizardCustomizedVM } from '@virtualmachines/wizard/utils/patchWizardCustomizedVM';
 
 type DetailsEditableItemsProps = {
   treeViewFoldersEnabled: boolean;
@@ -23,8 +24,12 @@ type DetailsEditableItemsProps = {
 const DetailsEditableItems: FC<DetailsEditableItemsProps> = ({ treeViewFoldersEnabled }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
+  const { getValues, setValue } = useVMWizard();
+  const { syncDescriptionFieldAndMetadataAnnotations, syncFolderFieldAndMetadataLabels } =
+    useSyncDeploymentDetailsAndMetadataFields();
 
-  const vm = customizeWizardVMSignal.value;
+  const { control } = useVMWizard();
+  const vm = useWatch({ control, name: CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM });
   const vmName = getName(vm);
 
   return (
@@ -43,11 +48,7 @@ const DetailsEditableItems: FC<DetailsEditableItemsProps> = ({ treeViewFoldersEn
               obj={vm}
               onClose={onClose}
               onSubmit={(description) =>
-                Promise.resolve(
-                  patchCustomizeWizardVMSignal([
-                    { data: description, path: `metadata.annotations.${DESCRIPTION_ANNOTATION}` },
-                  ]),
-                )
+                Promise.resolve(syncDescriptionFieldAndMetadataAnnotations(description))
               }
             />
           ))
@@ -65,11 +66,7 @@ const DetailsEditableItems: FC<DetailsEditableItemsProps> = ({ treeViewFoldersEn
                 isOpen={isOpen}
                 onClose={onClose}
                 onSubmit={(folderName) =>
-                  Promise.resolve(
-                    patchCustomizeWizardVMSignal([
-                      { data: folderName, path: ['metadata', 'labels', VM_FOLDER_LABEL] },
-                    ]),
-                  )
+                  Promise.resolve(syncFolderFieldAndMetadataLabels(folderName))
                 }
                 vm={vm}
               />
@@ -87,13 +84,12 @@ const DetailsEditableItems: FC<DetailsEditableItemsProps> = ({ treeViewFoldersEn
             <HostnameModal
               isOpen={isOpen}
               onClose={onClose}
-              onSubmit={(updatedVM) =>
-                Promise.resolve(
-                  patchCustomizeWizardVMSignal([
-                    { data: getHostname(updatedVM), path: `spec.template.spec.hostname` },
-                  ]),
-                )
-              }
+              onSubmit={(updatedVM) => {
+                const hostnamePatch = [
+                  { data: getHostname(updatedVM), path: `spec.template.spec.hostname` },
+                ];
+                return Promise.resolve(patchWizardCustomizedVM(getValues, setValue, hostnamePatch));
+              }}
               vm={vm}
             />
           ))

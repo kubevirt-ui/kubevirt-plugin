@@ -1,13 +1,15 @@
 import React, { type FC, useEffect, useMemo, useState } from 'react';
+import { useWatch } from 'react-hook-form';
 import { useLocation } from 'react-router';
 
 import ConfigurationSearch from '@kubevirt-utils/components/ConfigurationSearch/ConfigurationSearch';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { VirtualMachineDetailsTab } from '@kubevirt-utils/constants/tabs-constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { customizeWizardVMSignal } from '@kubevirt-utils/signals/customizeWizardVMSignal';
 import { PageSection, Tab, Tabs, TabTitleText } from '@patternfly/react-core';
 import { getSearchItems } from '@virtualmachines/details/tabs/configuration/utils/search';
+import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
+import { CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
 
 import { getTabs } from './utils/constants';
 import { getActiveTabFromLocation, getWizardSearchUrlPath } from './utils/utils';
@@ -20,8 +22,9 @@ const CustomizeVMTabs: FC = () => {
   const [activeTabKey, setActiveTabKey] = useState<number | string>(
     VirtualMachineDetailsTab.Details,
   );
+  const { control } = useVMWizard();
 
-  const vm = customizeWizardVMSignal.value;
+  const vm = useWatch({ control, name: CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM });
   const tabs = useMemo(() => getTabs(t), [t]);
   const searchItems = useMemo(() => (vm ? getSearchItems(vm) : []), [vm]);
 
