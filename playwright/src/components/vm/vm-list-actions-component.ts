@@ -534,19 +534,15 @@ export default class VmListActionsComponent extends BaseComponent {
     return resources;
   }
 
-  async waitForDeleteModalLoaded(): Promise<void> {
-    await this._dialogModal.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
-    const spinner = this._dialogModal.locator(
-      '.pf-v6-c-spinner, .pf-c-spinner, .pf-v5-c-spinner',
-    );
-    await spinner
-      .waitFor({ state: 'hidden', timeout: TestTimeouts.ELEMENT_WAIT })
-      .catch(() => undefined);
+  async waitForDeleteModalLoaded(timeoutMs = TestTimeouts.VM_CREATION): Promise<void> {
+    await this._dialogModal.waitFor({ state: 'visible', timeout: timeoutMs });
+    const loadingSpinner = this._dialogModal.getByTestId('loading-spinner');
+    await loadingSpinner.waitFor({ state: 'hidden', timeout: timeoutMs }).catch(() => undefined);
     await this._dialogModal
       .getByText(
         /Select the resources you want to permanently delete|No additional resources to delete/,
       )
-      .waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
+      .waitFor({ state: 'visible', timeout: timeoutMs });
   }
 
   async getDeletionCountFromModal(): Promise<number | null> {

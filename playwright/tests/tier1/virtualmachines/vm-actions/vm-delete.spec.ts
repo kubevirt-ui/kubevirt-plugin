@@ -33,7 +33,7 @@ test.describe('Tier1 VM Single Delete', { tag: [T1_TAG, '@tier1-vm-actions'] }, 
         feature: T1,
         tags: [T1_TAG, '@tier1-vm-actions', '@CNV-97104'],
       });
-      test.setTimeout(utils.TestTimeouts.TEST_VM_CREATION);
+      test.setTimeout(utils.TestTimeouts.TEST_EXTENDED);
 
       const ns = utils.generateTestNamespace('del');
       await apiClient.createNamespace(ns);
@@ -50,7 +50,8 @@ test.describe('Tier1 VM Single Delete', { tag: [T1_TAG, '@tier1-vm-actions'] }, 
       );
       apiClient.trackResource('VirtualMachine', vmName, ns);
 
-      await apiClient.waitForVmExists(vmName, ns);
+      const vmCreated = await apiClient.verifyVmCreated(vmName, ns, utils.TestTimeouts.VM_BOOTUP);
+      expect(vmCreated.exists, `VM '${vmName}' should be created from template`).toBe(true);
 
       const pvcName = utils.generateRandomDiskName('precreated');
       await apiClient.createResource(
@@ -89,6 +90,18 @@ test.describe('Tier1 VM Single Delete', { tag: [T1_TAG, '@tier1-vm-actions'] }, 
         'VM should have at least one DataVolume-backed disk',
       ).toBeGreaterThan(0);
 
+      for (const dataVolumeName of dataVolumeNames) {
+        const dvReady = await apiClient.waitForDataVolumeSucceeded(
+          dataVolumeName,
+          ns,
+          utils.TestTimeouts.DATA_VOLUME_STATUS,
+        );
+        expect(
+          dvReady,
+          `DataVolume '${dataVolumeName}' should be ready before creating a snapshot`,
+        ).toBe(true);
+      }
+
       const snapshotName = utils.generateRandomSnapshotName('del-snap');
       const snapshot = await apiClient.createVmSnapshot(snapshotName, vmName, ns);
       expect(snapshot, `Snapshot '${snapshotName}' should be created`).toBeTruthy();
@@ -97,7 +110,7 @@ test.describe('Tier1 VM Single Delete', { tag: [T1_TAG, '@tier1-vm-actions'] }, 
       const snapshotReady = await apiClient.waitForSnapshotReady(
         snapshotName,
         ns,
-        utils.TestTimeouts.TEST_VM_CREATION,
+        utils.TestTimeouts.VM_CREATION,
       );
       expect(snapshotReady, `Snapshot '${snapshotName}' should become ready`).toBe(true);
 
