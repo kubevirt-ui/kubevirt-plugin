@@ -1,6 +1,5 @@
 import produce from 'immer';
 
-import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { type IoK8sApiCoreV1Secret } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import {
   type V1CloudInitConfigDriveSource,
@@ -24,8 +23,6 @@ import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getVolumes } from '@kubevirt-utils/resources/vm';
 import { isWindows } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { getCluster } from '@multicluster/helpers/selectors';
-import { kubevirtK8sUpdate } from '@multicluster/k8sRequests';
 import { type WatchK8sResults } from '@openshift-console/dynamic-plugin-sdk';
 
 export * from './sshSecretHelpers';
@@ -82,14 +79,6 @@ export const removeSecretFromVM = (vm: V1VirtualMachine): V1VirtualMachine =>
   produce(vm, (vmDraft) => {
     delete vmDraft.spec.template.spec.accessCredentials;
   });
-
-export const detachVMSecret = async (vm: V1VirtualMachine): Promise<void> => {
-  await kubevirtK8sUpdate({
-    cluster: getCluster(vm),
-    data: removeSecretFromVM(vm),
-    model: VirtualMachineModel,
-  });
-};
 
 export const applyCloudDriveCloudInitVolume = (
   vm: V1VirtualMachine,
