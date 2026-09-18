@@ -516,4 +516,33 @@ test.describe(SUITE, { tag: [GATING_TAG, VM_SEARCH_TAG] }, () => {
 
     await vmListPage.pressKeyInVmSearchInput('Escape');
   });
+
+  test('empty state text formats exclusion filters using search language syntax', async ({
+    vmListPage,
+    utils,
+  }) => {
+    await utils.withAllure({
+      suite: SUITE,
+      feature: GATING,
+      tags: [GATING_TAG, VM_SEARCH_TAG, ADMIN_ONLY_TAG],
+    });
+
+    const searchText = 'status:Paused -os:RHEL';
+    const expectedText = `No results found for ${searchText}`;
+
+    await test.step('Submit a mixed include/exclude query that matches no VMs', async () => {
+      await vmListPage.appendToVmSearch(searchText);
+    });
+
+    await test.step('Empty state text renders both tokens in search-language syntax', async () => {
+      const emptyStateText = await vmListPage.getFilteredEmptyStateText();
+
+      expect
+        .soft(
+          emptyStateText === expectedText,
+          `Empty state text should be "${expectedText}" (got: "${emptyStateText}")`,
+        )
+        .toBe(true);
+    });
+  });
 });
