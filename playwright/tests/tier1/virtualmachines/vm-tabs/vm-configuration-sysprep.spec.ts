@@ -7,7 +7,7 @@ import { setupTestNamespace } from '@/utils/test-setup-helpers';
 
 const SUITE = 'VM Configuration — Sysprep';
 
-test.describe(SUITE, { tag: [T1_TAG, VM_TABS_TAG, ADMIN_ONLY_TAG] }, () => {
+test.describe(SUITE, { tag: [T1_TAG, ADMIN_ONLY_TAG] }, () => {
   test('Windows VM sysprep can be created, detached, and attached from existing', async ({
     apiClient,
     vmListPage,
