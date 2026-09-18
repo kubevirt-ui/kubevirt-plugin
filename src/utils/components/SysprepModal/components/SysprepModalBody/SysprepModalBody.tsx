@@ -14,6 +14,7 @@ import './SysprepModalBody.scss';
 type SysprepModalBodyProps = {
   autoUnattend: string;
   canCreateConfigMap: boolean;
+  cluster?: string;
   namespace: string;
   selectedSysprepName: string;
   selectionOption: SysprepSelectionOption;
@@ -27,6 +28,7 @@ type SysprepModalBodyProps = {
 const SysprepModalBody: FC<SysprepModalBodyProps> = ({
   autoUnattend,
   canCreateConfigMap,
+  cluster,
   namespace,
   selectedSysprepName,
   selectionOption,
@@ -56,6 +58,7 @@ const SysprepModalBody: FC<SysprepModalBodyProps> = ({
             label={t('Sysprep')}
           >
             <SelectSysprep
+              cluster={cluster}
               id="select-sysprep"
               namespace={namespace}
               onSelectSysprep={setSelectedSysprepName}

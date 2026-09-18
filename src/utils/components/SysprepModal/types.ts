@@ -9,7 +9,7 @@ export type SysprepModalProps = {
   isOpen: boolean;
   namespace: string;
   onClose: () => void;
-  onSysprepCreation?: (unattended: string, autoUnattend: string) => Promise<void> | void;
-  onSysprepSelected?: (sysprepName: string) => Promise<void> | void;
+  onSysprepCreation: (unattended: string, autoUnattend: string) => Promise<void> | void;
+  onSysprepSelected: (sysprepName: string) => Promise<void> | void;
   sysprepSelected?: string;
 };

@@ -43,11 +43,9 @@ export const SysprepModal: FC<SysprepModalProps> = ({
       return await onSysprepCreation(unattend, autoUnattend);
     }
 
-    if (onSysprepSelected) {
-      await onSysprepSelected(
-        selectionOption === SysprepSelectionOption.None ? '' : selectedSysprepName,
-      );
-    }
+    await onSysprepSelected(
+      selectionOption === SysprepSelectionOption.None ? '' : selectedSysprepName,
+    );
   };
 
   const isSubmitDisabled = isSysprepSubmitDisabled({
@@ -71,6 +69,7 @@ export const SysprepModal: FC<SysprepModalProps> = ({
       <SysprepModalBody
         autoUnattend={autoUnattend}
         canCreateConfigMap={canCreateConfigMap}
+        cluster={cluster}
         namespace={namespace}
         selectedSysprepName={selectedSysprepName}
         selectionOption={selectionOption}

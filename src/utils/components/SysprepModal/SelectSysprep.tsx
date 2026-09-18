@@ -9,6 +9,7 @@ import useSysprepConfigMaps from './hooks/useConfigMaps';
 import { getSysprepSelectOptions } from './utils';
 
 type SelectSysprepProps = {
+  cluster?: string;
   id?: string;
   namespace: string;
   onSelectSysprep: (secretName: string) => void;
@@ -16,13 +17,17 @@ type SelectSysprepProps = {
 };
 
 const SelectSysprep: FC<SelectSysprepProps> = ({
+  cluster,
   id,
   namespace,
   onSelectSysprep,
   selectedSysprepName,
 }) => {
   const { t } = useKubevirtTranslation();
-  const [sysprepConfigMaps, configmapsLoaded, configmapsError] = useSysprepConfigMaps(namespace);
+  const [sysprepConfigMaps, configmapsLoaded, configmapsError] = useSysprepConfigMaps(
+    namespace,
+    cluster,
+  );
 
   const options = useMemo(
     () => getSysprepSelectOptions(sysprepConfigMaps, selectedSysprepName),

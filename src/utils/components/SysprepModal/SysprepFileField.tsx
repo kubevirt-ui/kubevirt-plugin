@@ -42,7 +42,7 @@ const SysprepFileField: FC<SysprepFileFieldProps> = ({ id, onChange, value }) =>
   };
 
   useEffect(() => {
-    if (data.validated !== ValidatedOptions.error) {
+    if (data.validated !== ValidatedOptions.error || !data.value.trim()) {
       onChange(data.value);
     }
   }, [data.validated, data.value, onChange]);
