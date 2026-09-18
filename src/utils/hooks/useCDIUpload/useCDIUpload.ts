@@ -63,12 +63,13 @@ export const useCDIUpload = (clusterInput?: string): UseCDIUploadValues => {
     file,
     uploadKey,
     uploadTrackMetadata,
-  }: UploadDataProps): Promise<void> => {
+  }: UploadDataProps): Promise<number | undefined> => {
     const { CancelToken } = axios;
     const cancelSource = CancelToken.source();
     const noRouteFound = configError || !configLoaded || !uploadProxyURL;
     const namespace = getNamespace(dataVolume);
     const name = getName(dataVolume);
+    let uploadGeneration: number | undefined;
 
     const syncStore = (
       status: UPLOAD_STATUS,
@@ -78,7 +79,13 @@ export const useCDIUpload = (clusterInput?: string): UseCDIUploadValues => {
       if (!uploadKey) {
         return;
       }
-      syncCdiUploadProgressAndFailures({ progress, uploadError, uploadKey, uploadStatus: status });
+      syncCdiUploadProgressAndFailures({
+        expectedGeneration: uploadGeneration,
+        progress,
+        uploadError,
+        uploadKey,
+        uploadStatus: status,
+      });
     };
 
     const newUpload: DataUpload = {
@@ -109,7 +116,7 @@ export const useCDIUpload = (clusterInput?: string): UseCDIUploadValues => {
 
     setUpload({ ...newUpload, uploadStatus: UPLOAD_STATUS.ALLOCATING });
     if (uploadKey) {
-      registerCdiUpload({
+      uploadGeneration = registerCdiUpload({
         cancelUpload: newUpload.cancelUpload,
         fileName: file.name,
         metadata: uploadTrackMetadata,
@@ -117,7 +124,7 @@ export const useCDIUpload = (clusterInput?: string): UseCDIUploadValues => {
       });
     }
 
-    return performUpload({
+    await performUpload({
       cancelSource,
       dataVolume,
       file,
@@ -126,6 +133,8 @@ export const useCDIUpload = (clusterInput?: string): UseCDIUploadValues => {
       t,
       uploadProxyURL,
     });
+
+    return uploadGeneration;
   };
 
   return {

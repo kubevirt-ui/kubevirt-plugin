@@ -4,26 +4,26 @@ import { getUploadErrorMessage, UPLOAD_STATUS } from '@kubevirt-utils/hooks/useC
 import type { RegisterCdiUploadParams, SyncCdiUploadParams } from '../types';
 import { useUploadProgressStore } from '../uploadProgressStore';
 
-import { isTerminalUploadStatus } from '../toast/uploadTitles';
-
 const applyCdiStatusToStore = (
   uploadKey: string,
   uploadStatus: UPLOAD_STATUS,
   uploadError?: UploadError,
+  expectedGeneration?: number,
 ): void => {
   const store = useUploadProgressStore.getState();
 
   if (uploadStatus === UPLOAD_STATUS.ERROR) {
-    store.failUpload(uploadKey, getUploadErrorMessage(uploadError));
+    store.failUpload(uploadKey, getUploadErrorMessage(uploadError), expectedGeneration);
     return;
   }
 
   if (uploadStatus === UPLOAD_STATUS.CANCELED) {
-    store.markUploadCanceled(uploadKey);
+    store.markUploadCanceled(uploadKey, expectedGeneration);
   }
 };
 
 export const syncCdiUploadProgressAndFailures = ({
+  expectedGeneration,
   progress,
   uploadError,
   uploadKey,
@@ -36,12 +36,16 @@ export const syncCdiUploadProgressAndFailures = ({
     return;
   }
 
+  if (expectedGeneration !== undefined && upload.generation !== expectedGeneration) {
+    return;
+  }
+
   if (progress != null) {
     store.updateProgress(uploadKey, progress);
   }
 
   if (uploadStatus != null) {
-    applyCdiStatusToStore(uploadKey, uploadStatus, uploadError);
+    applyCdiStatusToStore(uploadKey, uploadStatus, uploadError, expectedGeneration);
   }
 };
 
@@ -50,13 +54,5 @@ export const registerCdiUpload = ({
   fileName,
   metadata,
   uploadKey,
-}: RegisterCdiUploadParams): void => {
-  const store = useUploadProgressStore.getState();
-  const existing = store.getUpload(uploadKey);
-
-  if (existing && !isTerminalUploadStatus(existing.status)) {
-    store.removeUpload(uploadKey);
-  }
-
-  store.startUpload(uploadKey, { ...metadata, cancelUpload, fileName });
-};
+}: RegisterCdiUploadParams): number =>
+  useUploadProgressStore.getState().startUpload(uploadKey, { ...metadata, cancelUpload, fileName });

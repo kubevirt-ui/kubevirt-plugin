@@ -3,7 +3,7 @@ import produce from 'immer';
 
 import { DataSourceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { type V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
-import { type UploadDataProps } from '@kubevirt-utils/hooks/useCDIUpload/types';
+import { type CdiUploadDataFn } from '@kubevirt-utils/hooks/useCDIUpload/types';
 import {
   completeBootableVolumeUpload,
   failBootableVolumeUpload,
@@ -21,7 +21,7 @@ export const createBootableVolumeFromUpload = async (
   bootableVolume: AddBootableVolumeState,
   namespace: string,
   draftDataSource: V1beta1DataSource,
-  uploadData: ({ dataVolume, file }: UploadDataProps) => Promise<void>,
+  uploadData: CdiUploadDataFn,
   t: TFunction,
   onUploadStart?: (uploadKey: string) => void,
 ): Promise<V1beta1DataSource> => {
@@ -50,34 +50,43 @@ export const createBootableVolumeFromUpload = async (
 
   const volumeName = getName(dataSourceToCreate);
   const volumeNamespace = getNamespace(dataSourceToCreate);
-  const uploadKey = getBootableVolumeUploadKey(volumeNamespace, volumeName);
+  const uploadKey = getBootableVolumeUploadKey(
+    volumeNamespace,
+    volumeName,
+    bootableVolume.bootableVolumeCluster,
+  );
 
   onUploadStart?.(uploadKey);
 
-  try {
-    await uploadData({
-      dataVolume: bootableVolumeToCreate,
-      file: uploadFile as File,
-      uploadKey,
-      uploadTrackMetadata: {
-        dvCluster: bootableVolume.bootableVolumeCluster,
-        dvName: getName(bootableVolumeToCreate),
-        dvNamespace: getNamespace(bootableVolumeToCreate),
-        resourceName: volumeName,
-      },
-    });
+  const expectedGeneration = await uploadData({
+    dataVolume: bootableVolumeToCreate,
+    file: uploadFile as File,
+    uploadKey,
+    uploadTrackMetadata: {
+      dvCluster: bootableVolume.bootableVolumeCluster,
+      dvName: getName(bootableVolumeToCreate),
+      dvNamespace: getNamespace(bootableVolumeToCreate),
+      resourceName: volumeName,
+    },
+  });
 
+  try {
     const createdDataSource = await kubevirtK8sCreate({
       cluster: bootableVolume.bootableVolumeCluster,
       data: dataSourceToCreate,
       model: DataSourceModel,
     });
 
-    completeBootableVolumeUpload({ dataSource: createdDataSource, t, uploadKey });
+    completeBootableVolumeUpload({
+      dataSource: createdDataSource,
+      expectedGeneration,
+      t,
+      uploadKey,
+    });
 
     return createdDataSource;
   } catch (error) {
-    failBootableVolumeUpload(uploadKey, error);
+    failBootableVolumeUpload(uploadKey, error, expectedGeneration);
     throw error;
   }
 };

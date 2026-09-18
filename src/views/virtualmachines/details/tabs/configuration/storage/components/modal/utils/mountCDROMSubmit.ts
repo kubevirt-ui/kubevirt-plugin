@@ -10,7 +10,7 @@ import {
   logBackgroundUploadError,
   runVmCdromBackgroundUpload,
 } from '@kubevirt-utils/components/DiskModal/utils/vmCdromBackgroundUpload';
-import { type UploadDataProps } from '@kubevirt-utils/hooks/useCDIUpload/types';
+import type { CdiUploadDataFn } from '@kubevirt-utils/hooks/useCDIUpload/types';
 import { getName } from '@kubevirt-utils/resources/shared';
 import {
   getDataVolumeName,
@@ -29,7 +29,7 @@ export type MountCDROMSubmitParams = {
   onSubmit?: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine>;
   selectedISO: string;
   t: TFunction;
-  uploadData: (props: UploadDataProps) => Promise<void>;
+  uploadData: CdiUploadDataFn;
   uploadFile?: { file: File; filename: string };
   uploadFilename: string;
   uploadMode: string;

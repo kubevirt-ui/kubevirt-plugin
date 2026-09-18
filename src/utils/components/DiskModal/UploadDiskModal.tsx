@@ -10,6 +10,7 @@ import {
   getUploadClusterForVm,
   getVmDiskUploadKey,
 } from '@kubevirt-utils/hooks/useUploadProgressToast/keys/uploadKeys';
+import { useUploadProgressStore } from '@kubevirt-utils/hooks/useUploadProgressToast/uploadProgressStore';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { isRunning } from '@virtualmachines/utils';
@@ -78,43 +79,59 @@ const UploadDiskModal: FC<V1SubDiskModalProps> = ({
               getName(vm),
               data.disk.name,
             );
+            let expectedGeneration: number | undefined;
             let uploadedDataVolume;
 
             try {
-              uploadedDataVolume = await uploadDataVolume({
+              const uploadResult = await uploadDataVolume({
                 data,
                 t,
                 uploadData,
                 uploadKey,
                 vm,
               });
+              expectedGeneration = uploadResult.expectedGeneration;
+              uploadedDataVolume = uploadResult.dataVolume;
+
+              onUploadedDataVolume?.(uploadedDataVolume);
+
+              data.dataVolumeTemplate.spec.source.pvc = {
+                name: getName(uploadedDataVolume),
+                namespace: getNamespace(uploadedDataVolume) ?? vmNamespace,
+              };
+
+              const vmWithDisk = addDisk(data, vm);
+              const newVM = reorderBootDisk(vmWithDisk, data.disk.name, data.isBootSource, false);
+              const result = !isVMRunning
+                ? await onSubmit(newVM)
+                : await hotplugPromise(newVM, data);
+
+              await completeVmDiskUpload({
+                dataVolumeName: getName(uploadedDataVolume),
+                diskName: data.disk.name,
+                expectedGeneration: uploadResult.expectedGeneration,
+                t,
+                uploadKey,
+                vm,
+              });
+
+              return result;
             } catch (error) {
               if (isUploadCanceledError(error)) {
                 return;
               }
+
+              if (expectedGeneration !== undefined) {
+                useUploadProgressStore
+                  .getState()
+                  .failUpload(
+                    uploadKey,
+                    error instanceof Error ? error.message : String(error),
+                    expectedGeneration,
+                  );
+              }
               throw error;
             }
-
-            completeVmDiskUpload({
-              dataVolumeName: getName(uploadedDataVolume),
-              diskName: data.disk.name,
-              t,
-              uploadKey,
-              vm,
-            });
-
-            onUploadedDataVolume?.(uploadedDataVolume);
-
-            data.dataVolumeTemplate.spec.source.pvc = {
-              name: getName(uploadedDataVolume),
-              namespace: getNamespace(uploadedDataVolume) ?? vmNamespace,
-            };
-
-            const vmWithDisk = addDisk(data, vm);
-
-            const newVM = reorderBootDisk(vmWithDisk, data.disk.name, data.isBootSource, false);
-
-            return !isVMRunning ? onSubmit(newVM) : hotplugPromise(newVM, data);
           })()
         }
         shouldWrapInForm

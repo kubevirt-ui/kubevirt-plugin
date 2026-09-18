@@ -1,5 +1,10 @@
 import { cancelUploadPVC } from '@kubevirt-utils/hooks/useCDIUpload/utils';
 
+import {
+  getBootableVolumeUrl,
+  getDataVolumeUrl,
+  getVmStorageUrlForIdentity,
+} from './completion/uploadLinks';
 import { UPLOAD_PROGRESS_STATUS } from './constants';
 import {
   getBootableVolumeUploadKey,
@@ -36,7 +41,7 @@ const LINK_LABEL_EXISTING = 'Existing link';
 const LINK_URL_EXISTING = '/existing';
 
 const resetStore = (): void => {
-  useUploadProgressStore.setState({ uploads: {} });
+  useUploadProgressStore.setState({ generationsByKey: {}, uploads: {} });
 };
 
 describe('useUploadProgressStore', () => {
@@ -63,6 +68,18 @@ describe('useUploadProgressStore', () => {
         progress: 0,
         status: UPLOAD_PROGRESS_STATUS.UPLOADING,
       });
+    });
+
+    it('should keep incrementing generation after the upload entry is removed', () => {
+      useUploadProgressStore.getState().startUpload(UPLOAD_KEY, { fileName: FILE_IMAGE_ISO });
+      useUploadProgressStore.getState().removeUpload(UPLOAD_KEY);
+
+      const generation = useUploadProgressStore
+        .getState()
+        .startUpload(UPLOAD_KEY, { fileName: FILE_IMAGE_ISO });
+
+      expect(generation).toBe(2);
+      expect(useUploadProgressStore.getState().getUpload(UPLOAD_KEY)?.generation).toBe(2);
     });
   });
 
@@ -118,6 +135,53 @@ describe('useUploadProgressStore', () => {
 
       expect(useUploadProgressStore.getState().uploads).toEqual({});
     });
+
+    it('should not overwrite a canceled upload', () => {
+      useUploadProgressStore.getState().startUpload(UPLOAD_KEY, { fileName: FILE_IMAGE_ISO });
+      useUploadProgressStore.getState().markUploadCanceled(UPLOAD_KEY);
+
+      useUploadProgressStore.getState().completeUpload(UPLOAD_KEY, {
+        successLinks: [{ label: LINK_LABEL_VIEW_DISK, url: LINK_URL_DISK }],
+      });
+
+      const upload = useUploadProgressStore.getState().getUpload(UPLOAD_KEY);
+      expect(upload?.status).toBe(UPLOAD_PROGRESS_STATUS.CANCELED);
+      expect(upload?.successLinks).toBeUndefined();
+    });
+
+    it('should not overwrite a retried upload with a stale generation', () => {
+      useUploadProgressStore.getState().startUpload(UPLOAD_KEY, { fileName: FILE_IMAGE_ISO });
+      useUploadProgressStore.getState().startUpload(UPLOAD_KEY, { fileName: FILE_IMAGE_ISO });
+
+      useUploadProgressStore.getState().completeUpload(UPLOAD_KEY, {
+        expectedGeneration: 1,
+        successLinks: [{ label: LINK_LABEL_VIEW_DISK, url: LINK_URL_DISK }],
+      });
+
+      const upload = useUploadProgressStore.getState().getUpload(UPLOAD_KEY);
+      expect(upload?.generation).toBe(2);
+      expect(upload?.status).toBe(UPLOAD_PROGRESS_STATUS.UPLOADING);
+      expect(upload?.successLinks).toBeUndefined();
+    });
+
+    it('should omit success links that were stripped before completion', () => {
+      const omittedUrl = '/k8s/ns/default/datavolumes/dv-disk-0';
+      useUploadProgressStore.getState().startUpload(UPLOAD_KEY, {
+        fileName: FILE_IMAGE_ISO,
+        omittedLinkUrls: [omittedUrl],
+      });
+
+      useUploadProgressStore.getState().completeUpload(UPLOAD_KEY, {
+        successLinks: [
+          { label: LINK_LABEL_VIEW_DISK, url: LINK_URL_DISK },
+          { label: 'View DataVolume', url: omittedUrl },
+        ],
+      });
+
+      expect(useUploadProgressStore.getState().getUpload(UPLOAD_KEY)?.successLinks).toEqual([
+        { label: LINK_LABEL_VIEW_DISK, url: LINK_URL_DISK },
+      ]);
+    });
   });
 
   describe('failUpload', () => {
@@ -137,6 +201,42 @@ describe('useUploadProgressStore', () => {
 
       expect(useUploadProgressStore.getState().uploads).toEqual({});
     });
+
+    it('should not overwrite a canceled upload', () => {
+      useUploadProgressStore.getState().startUpload(UPLOAD_KEY, { fileName: FILE_IMAGE_ISO });
+      useUploadProgressStore.getState().markUploadCanceled(UPLOAD_KEY);
+
+      useUploadProgressStore.getState().failUpload(UPLOAD_KEY, ERROR_UPLOAD_FAILED);
+
+      const upload = useUploadProgressStore.getState().getUpload(UPLOAD_KEY);
+      expect(upload?.status).toBe(UPLOAD_PROGRESS_STATUS.CANCELED);
+      expect(upload?.errorMessage).toBeUndefined();
+    });
+
+    it('should not overwrite a retried upload with a stale generation', () => {
+      useUploadProgressStore.getState().startUpload(UPLOAD_KEY, { fileName: FILE_IMAGE_ISO });
+      useUploadProgressStore.getState().startUpload(UPLOAD_KEY, { fileName: FILE_IMAGE_ISO });
+
+      useUploadProgressStore.getState().failUpload(UPLOAD_KEY, ERROR_UPLOAD_FAILED, 1);
+
+      const upload = useUploadProgressStore.getState().getUpload(UPLOAD_KEY);
+      expect(upload?.generation).toBe(2);
+      expect(upload?.status).toBe(UPLOAD_PROGRESS_STATUS.UPLOADING);
+      expect(upload?.errorMessage).toBeUndefined();
+    });
+
+    it('should not fail a later upload after the previous entry was removed', () => {
+      useUploadProgressStore.getState().startUpload(UPLOAD_KEY, { fileName: FILE_IMAGE_ISO });
+      useUploadProgressStore.getState().removeUpload(UPLOAD_KEY);
+      useUploadProgressStore.getState().startUpload(UPLOAD_KEY, { fileName: FILE_IMAGE_ISO });
+
+      useUploadProgressStore.getState().failUpload(UPLOAD_KEY, ERROR_UPLOAD_FAILED, 1);
+
+      const upload = useUploadProgressStore.getState().getUpload(UPLOAD_KEY);
+      expect(upload?.generation).toBe(2);
+      expect(upload?.status).toBe(UPLOAD_PROGRESS_STATUS.UPLOADING);
+      expect(upload?.errorMessage).toBeUndefined();
+    });
   });
 
   describe('markUploadCanceled', () => {
@@ -154,6 +254,18 @@ describe('useUploadProgressStore', () => {
       useUploadProgressStore.getState().markUploadCanceled(MISSING_KEY);
 
       expect(useUploadProgressStore.getState().uploads).toEqual({});
+    });
+
+    it('should not cancel a later upload with a stale generation', () => {
+      useUploadProgressStore.getState().startUpload(UPLOAD_KEY, { fileName: FILE_IMAGE_ISO });
+      useUploadProgressStore.getState().removeUpload(UPLOAD_KEY);
+      useUploadProgressStore.getState().startUpload(UPLOAD_KEY, { fileName: FILE_IMAGE_ISO });
+
+      useUploadProgressStore.getState().markUploadCanceled(UPLOAD_KEY, 1);
+
+      expect(useUploadProgressStore.getState().getUpload(UPLOAD_KEY)?.status).toBe(
+        UPLOAD_PROGRESS_STATUS.UPLOADING,
+      );
     });
   });
 
@@ -279,10 +391,59 @@ describe('useUploadProgressStore', () => {
       );
     });
 
+    it('should strip DataVolume links when cancellation succeeds', async () => {
+      const dataVolumeLink = {
+        label: 'View DataVolume',
+        url: getDataVolumeUrl(DV_NAME, NAMESPACE),
+      };
+      const storageLink = { label: LINK_LABEL_VIEW_DISK, url: LINK_URL_DISK };
+      const cancelUpload = jest.fn(async () => undefined);
+
+      useUploadProgressStore.getState().startUpload(UPLOAD_KEY, {
+        cancelUpload,
+        contextLinks: [storageLink, dataVolumeLink],
+        dvName: DV_NAME,
+        dvNamespace: NAMESPACE,
+        fileName: FILE_IMAGE_ISO,
+      });
+
+      await useUploadProgressStore.getState().cancelTrackedUpload(UPLOAD_KEY);
+
+      expect(useUploadProgressStore.getState().getUpload(UPLOAD_KEY)?.contextLinks).toEqual([
+        storageLink,
+      ]);
+    });
+
     it('should no-op when upload key does not exist', async () => {
       await useUploadProgressStore.getState().cancelTrackedUpload(MISSING_KEY);
 
       expect(cancelUploadPVC).not.toHaveBeenCalled();
+    });
+
+    it('should not cancel a retried upload after the original abort completes', async () => {
+      let resolveCancel: () => void = () => undefined;
+      const cancelUpload = jest.fn(
+        () =>
+          new Promise<void>((resolve) => {
+            resolveCancel = resolve;
+          }),
+      );
+
+      useUploadProgressStore.getState().startUpload(UPLOAD_KEY, {
+        cancelUpload,
+        fileName: FILE_IMAGE_ISO,
+      });
+
+      const cancelPromise = useUploadProgressStore.getState().cancelTrackedUpload(UPLOAD_KEY);
+      useUploadProgressStore.getState().startUpload(UPLOAD_KEY, { fileName: 'retry.iso' });
+
+      resolveCancel();
+      await cancelPromise;
+
+      const upload = useUploadProgressStore.getState().getUpload(UPLOAD_KEY);
+      expect(upload?.fileName).toBe('retry.iso');
+      expect(upload?.generation).toBe(2);
+      expect(upload?.status).toBe(UPLOAD_PROGRESS_STATUS.UPLOADING);
     });
   });
 
@@ -323,8 +484,12 @@ describe('useUploadProgressStore', () => {
       expect(cdromCancelUpload).toHaveBeenCalledTimes(1);
       expect(bootableCancelUpload).not.toHaveBeenCalled();
       expect(otherVmCancelUpload).not.toHaveBeenCalled();
-      expect(useUploadProgressStore.getState().getUpload(diskUploadKey)).toBeUndefined();
-      expect(useUploadProgressStore.getState().getUpload(cdromUploadKey)).toBeUndefined();
+      expect(useUploadProgressStore.getState().getUpload(diskUploadKey)?.status).toBe(
+        UPLOAD_PROGRESS_STATUS.CANCELED,
+      );
+      expect(useUploadProgressStore.getState().getUpload(cdromUploadKey)?.status).toBe(
+        UPLOAD_PROGRESS_STATUS.CANCELED,
+      );
       expect(useUploadProgressStore.getState().getUpload(bootableVolumeUploadKey)?.status).toBe(
         UPLOAD_PROGRESS_STATUS.UPLOADING,
       );
@@ -357,6 +522,29 @@ describe('useUploadProgressStore', () => {
       );
     });
 
+    it('should strip VM storage and DataVolume links from an already-canceled upload when the VM is deleted', async () => {
+      const diskUploadKey = getVmDiskUploadKey(CLUSTER, NAMESPACE, VM_NAME, VM_DISK_NAME);
+      const storageUrl = getVmStorageUrlForIdentity(CLUSTER, NAMESPACE, VM_NAME);
+      const dataVolumeLink = {
+        label: 'View DataVolume',
+        url: getDataVolumeUrl(DV_NAME, NAMESPACE),
+      };
+
+      useUploadProgressStore.getState().startUpload(diskUploadKey, {
+        contextLinks: [{ label: 'View disk', url: storageUrl }, dataVolumeLink],
+        dvName: DV_NAME,
+        dvNamespace: NAMESPACE,
+        fileName: FILE_IMAGE_ISO,
+      });
+      useUploadProgressStore.getState().markUploadCanceled(diskUploadKey);
+
+      await useUploadProgressStore.getState().cancelUploadsForVm(CLUSTER, NAMESPACE, VM_NAME);
+
+      const upload = useUploadProgressStore.getState().getUpload(diskUploadKey);
+      expect(upload?.status).toBe(UPLOAD_PROGRESS_STATUS.CANCELED);
+      expect(upload?.contextLinks).toEqual([]);
+    });
+
     it('should cancel empty-cluster uploads when deleting an ACM fleet VM', async () => {
       const emptyClusterUploadKey = getVmDiskUploadKey('', NAMESPACE, VM_NAME, VM_DISK_NAME);
       const cancelUpload = jest.fn(async () => undefined);
@@ -369,7 +557,65 @@ describe('useUploadProgressStore', () => {
       await useUploadProgressStore.getState().cancelUploadsForVm(CLUSTER, NAMESPACE, VM_NAME);
 
       expect(cancelUpload).toHaveBeenCalledTimes(1);
-      expect(useUploadProgressStore.getState().getUpload(emptyClusterUploadKey)).toBeUndefined();
+      expect(useUploadProgressStore.getState().getUpload(emptyClusterUploadKey)?.status).toBe(
+        UPLOAD_PROGRESS_STATUS.CANCELED,
+      );
+    });
+
+    it('should strip the View storage link from an in-progress CD-ROM upload when the VM is deleted', async () => {
+      const cdromUploadKey = getVmCdromUploadKey(CLUSTER, NAMESPACE, VM_NAME, CDROM_NAME);
+      const storageUrl = getVmStorageUrlForIdentity(CLUSTER, NAMESPACE, VM_NAME);
+      const cancelUpload = jest.fn(async () => undefined);
+
+      useUploadProgressStore.getState().startUpload(cdromUploadKey, {
+        cancelUpload,
+        contextLinks: [{ label: 'View test-vm storage', url: storageUrl }],
+        fileName: FILE_IMAGE_ISO,
+      });
+
+      await useUploadProgressStore.getState().cancelUploadsForVm(CLUSTER, NAMESPACE, VM_NAME);
+
+      const upload = useUploadProgressStore.getState().getUpload(cdromUploadKey);
+      expect(cancelUpload).toHaveBeenCalledTimes(1);
+      expect(upload?.status).toBe(UPLOAD_PROGRESS_STATUS.CANCELED);
+      expect(upload?.contextLinks).toEqual([]);
+      expect(upload?.omittedLinkUrls).toEqual(expect.arrayContaining([storageUrl]));
+    });
+
+    it('should leave a same-key retry untouched when the original abort finishes after replacement', async () => {
+      const cdromUploadKey = getVmCdromUploadKey(CLUSTER, NAMESPACE, VM_NAME, CDROM_NAME);
+      const storageUrl = getVmStorageUrlForIdentity(CLUSTER, NAMESPACE, VM_NAME);
+      let resolveCancel: () => void = () => undefined;
+      const cancelUpload = jest.fn(
+        () =>
+          new Promise<void>((resolve) => {
+            resolveCancel = resolve;
+          }),
+      );
+
+      useUploadProgressStore.getState().startUpload(cdromUploadKey, {
+        cancelUpload,
+        contextLinks: [{ label: 'View test-vm storage', url: storageUrl }],
+        fileName: FILE_IMAGE_ISO,
+      });
+
+      const cancelPromise = useUploadProgressStore
+        .getState()
+        .cancelUploadsForVm(CLUSTER, NAMESPACE, VM_NAME);
+
+      useUploadProgressStore.getState().startUpload(cdromUploadKey, {
+        contextLinks: [{ label: 'View test-vm storage', url: storageUrl }],
+        fileName: 'retry.iso',
+      });
+
+      resolveCancel();
+      await cancelPromise;
+
+      const upload = useUploadProgressStore.getState().getUpload(cdromUploadKey);
+      expect(upload?.fileName).toBe('retry.iso');
+      expect(upload?.generation).toBe(2);
+      expect(upload?.status).toBe(UPLOAD_PROGRESS_STATUS.UPLOADING);
+      expect(upload?.contextLinks).toEqual([{ label: 'View test-vm storage', url: storageUrl }]);
     });
   });
 
@@ -429,8 +675,12 @@ describe('useUploadProgressStore', () => {
       expect(bootableCancel).toHaveBeenCalledTimes(1);
       expect(otherVmCdromCancel).not.toHaveBeenCalled();
       expect(exportDiskCancel).not.toHaveBeenCalled();
-      expect(useUploadProgressStore.getState().getUpload(wizardDiskUploadKey)).toBeUndefined();
-      expect(useUploadProgressStore.getState().getUpload(wizardCdromUploadKey)).toBeUndefined();
+      expect(useUploadProgressStore.getState().getUpload(wizardDiskUploadKey)?.status).toBe(
+        UPLOAD_PROGRESS_STATUS.CANCELED,
+      );
+      expect(useUploadProgressStore.getState().getUpload(wizardCdromUploadKey)?.status).toBe(
+        UPLOAD_PROGRESS_STATUS.CANCELED,
+      );
       expect(useUploadProgressStore.getState().getUpload(bootableVolumeUploadKey)).toBeUndefined();
       expect(useUploadProgressStore.getState().getUpload(otherVmCdromUploadKey)?.status).toBe(
         UPLOAD_PROGRESS_STATUS.UPLOADING,
@@ -473,6 +723,44 @@ describe('useUploadProgressStore', () => {
       expect(useUploadProgressStore.getState().getUpload(otherVmCdromUploadKey)?.status).toBe(
         UPLOAD_PROGRESS_STATUS.UPLOADING,
       );
+    });
+  });
+
+  describe('stripBootableVolumeLinks', () => {
+    it('should remove the success link after the bootable volume is deleted', () => {
+      const uploadKey = getBootableVolumeUploadKey(BOOTABLE_VOLUME_NAMESPACE, BOOTABLE_VOLUME_NAME);
+      const volumeUrl = getBootableVolumeUrl(BOOTABLE_VOLUME_NAME, BOOTABLE_VOLUME_NAMESPACE);
+
+      useUploadProgressStore.getState().startUpload(uploadKey, { fileName: FILE_IMAGE_ISO });
+      useUploadProgressStore.getState().completeUpload(uploadKey, {
+        successLinks: [{ label: 'View bootable volume', url: volumeUrl }],
+      });
+
+      useUploadProgressStore
+        .getState()
+        .stripBootableVolumeLinks(BOOTABLE_VOLUME_NAMESPACE, BOOTABLE_VOLUME_NAME);
+
+      expect(useUploadProgressStore.getState().getUpload(uploadKey)?.successLinks).toEqual([]);
+    });
+  });
+
+  describe('stripDataVolumeLinksForResource', () => {
+    it('should remove the bootable volume success link when its DataVolume is deleted', () => {
+      const uploadKey = getBootableVolumeUploadKey(NAMESPACE, BOOTABLE_VOLUME_NAME);
+      const volumeUrl = getBootableVolumeUrl(BOOTABLE_VOLUME_NAME, NAMESPACE);
+
+      useUploadProgressStore.getState().startUpload(uploadKey, {
+        dvName: DV_NAME,
+        dvNamespace: NAMESPACE,
+        fileName: FILE_IMAGE_ISO,
+      });
+      useUploadProgressStore.getState().completeUpload(uploadKey, {
+        successLinks: [{ label: 'View bootable volume', url: volumeUrl }],
+      });
+
+      useUploadProgressStore.getState().stripDataVolumeLinksForResource(DV_NAME, NAMESPACE);
+
+      expect(useUploadProgressStore.getState().getUpload(uploadKey)?.successLinks).toEqual([]);
     });
   });
 });

@@ -35,6 +35,7 @@ const ExportUploadWatcherEntry: FC<ExportUploadWatcherEntryProps> = ({ upload })
   const uploadKey = getExportDiskUploadKey(cluster, namespace, pvcName);
   const prevPercentageRef = useRef(-1);
   const finishedRef = useRef(false);
+  const generationRef = useRef(useUploadProgressStore.getState().getUpload(uploadKey)?.generation);
 
   const [pod, loaded, watchError] = useKubevirtWatchResource<IoK8sApiCoreV1Pod>({
     cluster,
@@ -49,7 +50,9 @@ const ExportUploadWatcherEntry: FC<ExportUploadWatcherEntryProps> = ({ upload })
     if (watchError) {
       finishedRef.current = true;
       deleteSecret(cluster, namespace, secretName);
-      useUploadProgressStore.getState().failUpload(uploadKey, watchError.message);
+      useUploadProgressStore
+        .getState()
+        .failUpload(uploadKey, watchError.message, generationRef.current);
       useExportUploadStore.getState().clearUpload(cluster, namespace, pvcName);
     }
   }, [watchError, uploadKey, cluster, namespace, pvcName, secretName]);
@@ -75,6 +78,7 @@ const ExportUploadWatcherEntry: FC<ExportUploadWatcherEntryProps> = ({ upload })
       deleteSecret(cluster, namespace, secretName);
       const podLogsUrl = `${getResourceUrl({ model: PodModel, resource: pod })}/logs`;
       useUploadProgressStore.getState().completeUpload(uploadKey, {
+        expectedGeneration: generationRef.current,
         resourceName: podName,
         successLinks: [{ label: t('View pod logs'), url: podLogsUrl }],
       });
@@ -85,7 +89,7 @@ const ExportUploadWatcherEntry: FC<ExportUploadWatcherEntryProps> = ({ upload })
       finishedRef.current = true;
       deleteSecret(cluster, namespace, secretName);
       const errorMessage = getExportErrorMessage(pod, progress.errorMessage) ?? t('Unknown error');
-      useUploadProgressStore.getState().failUpload(uploadKey, errorMessage);
+      useUploadProgressStore.getState().failUpload(uploadKey, errorMessage, generationRef.current);
       useExportUploadStore.getState().clearUpload(cluster, namespace, pvcName);
     }
   }, [
