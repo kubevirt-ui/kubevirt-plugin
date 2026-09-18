@@ -14,7 +14,13 @@ import LabelRow from './components/LabelRow';
 import NodeCheckerAlert from './components/NodeCheckerAlert';
 import { useIDEntities } from './hooks/useIDEntities';
 import { useNodeLabelQualifier } from './hooks/useNodeLabelQualifier';
-import { isEqualObject, nodeSelectorToIDLabels } from './utils/helpers';
+import {
+  getIncompleteSelectorLabelsTooltip,
+  hasIncompleteSelectorLabels,
+  idLabelsToNodeSelector,
+  isEqualObject,
+  nodeSelectorToIDLabels,
+} from './utils/helpers';
 import { type IDLabel } from './utils/types';
 
 type NodeSelectorModalProps = {
@@ -43,6 +49,7 @@ const NodeSelectorModal: FC<NodeSelectorModalProps> = ({
   } = useIDEntities<IDLabel>(nodeSelectorToIDLabels(getNodeSelector(vm)));
 
   const qualifiedNodes = useNodeLabelQualifier(nodes, nodesLoaded, selectorLabels);
+  const isIncomplete = hasIncompleteSelectorLabels(selectorLabels);
 
   const onSelectorLabelAdd = (): void => onLabelAdd({ id: null, key: '', value: '' });
 
@@ -51,13 +58,7 @@ const NodeSelectorModal: FC<NodeSelectorModalProps> = ({
       ensurePath(vmDraft, ['spec.template.spec.nodeSelector']);
       vmDraft.spec.template.spec.nodeSelector ??= {};
 
-      const k8sSelector: { [key: string]: string } = selectorLabels.reduce(
-        (acc, { key, value }) => {
-          acc[key] = value;
-          return acc;
-        },
-        {},
-      );
+      const k8sSelector = idLabelsToNodeSelector(selectorLabels);
 
       if (!isEqualObject(getNodeSelector(vmDraft), k8sSelector)) {
         vmDraft.spec.template.spec.nodeSelector = k8sSelector;
@@ -69,11 +70,13 @@ const NodeSelectorModal: FC<NodeSelectorModalProps> = ({
   return (
     <TabModal
       headerText={t('Node selector')}
+      isDisabled={isIncomplete}
       isOpen={isOpen}
       obj={updatedVirtualMachine}
       onClose={onClose}
       onSubmit={onSubmit}
       shouldWrapInForm
+      submitDisabledTooltip={getIncompleteSelectorLabelsTooltip(isIncomplete, t)}
     >
       <LabelsList
         isEmpty={selectorLabels?.length === 0}

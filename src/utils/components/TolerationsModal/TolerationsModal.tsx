@@ -4,9 +4,7 @@ import produce from 'immer';
 import { NodeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { type IoK8sApiCoreV1Node } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import {
-  type K8sIoApiCoreV1Toleration,
   K8sIoApiCoreV1TolerationEffectEnum,
-  K8sIoApiCoreV1TolerationOperatorEnum,
   type V1VirtualMachine,
   type V1VirtualMachineInstance,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
@@ -24,7 +22,12 @@ import TolerationEditRow from './TolerationEditRow';
 import TolerationListHeaders from './TolerationListHeaders';
 import TolerationModalDescriptionText from './TolerationModalDescriptionText';
 import { type TolerationLabel } from './utils/constants';
-import { getNodeTaintQualifier } from './utils/helpers';
+import {
+  getIncompleteTolerationsTooltip,
+  getNodeTaintQualifier,
+  hasIncompleteTolerations,
+  toK8sTolerations,
+} from './utils/helpers';
 
 type TolerationsModalProps = {
   isOpen: boolean;
@@ -69,32 +72,25 @@ const TolerationsModal: FC<TolerationsModalProps> = ({
 
   const updatedVirtualMachine = useMemo(() => {
     const updatedVM = produce<V1VirtualMachine>(vm, (vmDraft: V1VirtualMachine) => {
-      ensurePath(vmDraft, ['spec.template.spec.tolerations']);
+      ensurePath(vmDraft, 'spec.template.spec.tolerations');
 
-      const updatedTolerations: K8sIoApiCoreV1Toleration[] = (tolerationsLabels || []).map(
-        (toleration) => {
-          return {
-            ...toleration,
-            operator: toleration?.value
-              ? K8sIoApiCoreV1TolerationOperatorEnum.Equal
-              : K8sIoApiCoreV1TolerationOperatorEnum.Exists,
-          };
-        },
-      );
-
-      vmDraft.spec.template.spec.tolerations = updatedTolerations;
+      vmDraft.spec.template.spec.tolerations = toK8sTolerations(tolerationsLabels);
     });
     return updatedVM;
   }, [tolerationsLabels, vm]);
 
+  const isIncomplete = hasIncompleteTolerations(tolerationsLabels);
+
   return (
     <TabModal
       headerText={t('Tolerations')}
+      isDisabled={isIncomplete}
       isOpen={isOpen}
       modalVariant={ModalVariant.medium}
       obj={updatedVirtualMachine}
       onClose={onClose}
       onSubmit={onSubmit}
+      submitDisabledTooltip={getIncompleteTolerationsTooltip(isIncomplete, t)}
     >
       <Stack hasGutter>
         <StackItem>{vmi && <ModalPendingChangesAlert />}</StackItem>
