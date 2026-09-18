@@ -9,7 +9,7 @@ import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { isEqualObject } from '../NodeSelectorModal/utils/helpers';
 import SSHSecretModal from '../SSHSecretModal/SSHSecretModal';
 import { SecretSelectionOption, SSHSecretDetails } from '../SSHSecretModal/utils/types';
-import { addSecretToVM, detachVMSecret } from '../SSHSecretModal/utils/utils';
+import { addSecretToVM, removeSecretFromVM } from '../SSHSecretModal/utils/utils';
 
 type VMSSHSecretModalProps = {
   authorizedSSHKeys: { [namespace: string]: string };
@@ -55,7 +55,7 @@ const VMSSHSecretModal: FC<VMSSHSecretModalProps> = ({
         secretOption === SecretSelectionOption.none &&
         initialSSHDetails.secretOption !== SecretSelectionOption.none
       ) {
-        return detachVMSecret(vm);
+        return updateVM(removeSecretFromVM(vm));
       }
 
       if (
