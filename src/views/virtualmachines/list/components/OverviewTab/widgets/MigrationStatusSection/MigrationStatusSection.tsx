@@ -11,6 +11,8 @@ import { buildSpokeConsoleUrl } from '@multicluster/urls';
 import useIsACMPage from '@multicluster/useIsACMPage';
 
 import { determineOverviewLevel } from '../../config';
+import useCanListComputeMigrations from '../../hooks/useCanListComputeMigrations';
+import useCanListStorageMigrationPlans from '../../hooks/useCanListStorageMigrationPlans';
 import {
   GRID_CLUSTER_MIGRATION_STATUS,
   OVERVIEW_LEVEL_CLUSTER,
@@ -42,6 +44,17 @@ const MigrationStatusSection: FC<OverviewSectionData> = ({
   const overviewLevel = determineOverviewLevel(namespace, isAllClustersPage);
   const isClusterLevel = overviewLevel === OVERVIEW_LEVEL_CLUSTER;
   const isMultiClusterLevel = overviewLevel === OVERVIEW_LEVEL_MULTICLUSTER;
+  const [canListComputeMigrations, computeAccessReviewLoading] = useCanListComputeMigrations();
+  const [canListStorageMigrationPlans, storageAccessReviewLoading] =
+    useCanListStorageMigrationPlans();
+
+  const permissionsLoaded = isClusterLevel
+    ? !computeAccessReviewLoading && !storageAccessReviewLoading
+    : !computeAccessReviewLoading;
+
+  const hasComputeMigrationAccess = canListComputeMigrations;
+  const hasStorageMigrationAccess = isClusterLevel && canListStorageMigrationPlans;
+  const hasAnyMigrationAccess = hasComputeMigrationAccess || hasStorageMigrationAccess;
 
   const { filteredVMIMS, loaded: migrationsLoaded } =
     useMigrationCardDataAndFilters(MIGRATIONS_DURATION);
@@ -85,21 +98,27 @@ const MigrationStatusSection: FC<OverviewSectionData> = ({
     return <MultiClusterMigrationStatusSection title={title} />;
   }
 
+  if (!permissionsLoaded || !hasAnyMigrationAccess) {
+    return null;
+  }
+
   return (
     <OverviewSection dataTestId="migration-status-section" title={title}>
       <OverviewSectionRow
         className="overview-section__row--single-column-wide"
         gridColumns={GRID_CLUSTER_MIGRATION_STATUS}
       >
-        <MigrationsWidget
-          cardTitle={t('Compute migrations')}
-          isLoading={!migrationsLoaded || !clusterVersionLoaded}
-          migrationsTabHref={migrationsTabHref}
-          migrationsTabPath={migrationsTabPath}
-          subHeader={t('Last day')}
-          vmims={folderFilteredVMIMS}
-        />
-        {isClusterLevel && <StorageMigrationPlansWidget cluster={cluster} />}
+        {hasComputeMigrationAccess && (
+          <MigrationsWidget
+            cardTitle={t('Compute migrations')}
+            isLoading={!migrationsLoaded || !clusterVersionLoaded}
+            migrationsTabHref={migrationsTabHref}
+            migrationsTabPath={migrationsTabPath}
+            subHeader={t('Last day')}
+            vmims={folderFilteredVMIMS}
+          />
+        )}
+        {hasStorageMigrationAccess && <StorageMigrationPlansWidget cluster={cluster} />}
       </OverviewSectionRow>
     </OverviewSection>
   );
