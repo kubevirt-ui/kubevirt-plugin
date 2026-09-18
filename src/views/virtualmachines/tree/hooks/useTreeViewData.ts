@@ -4,6 +4,7 @@ import { useLocation } from 'react-router';
 import { ALL_CLUSTERS } from '@kubevirt-utils/hooks/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { type TreeViewDataItem } from '@patternfly/react-core';
+import { getNavigatorTabSearch } from '@virtualmachines/navigator/tabStorage';
 
 import { createMultiClusterTreeViewData, createSingleClusterTreeViewData } from '../utils/utils';
 import { useTreeViewDataResources } from './useTreeViewDataResources';
@@ -29,6 +30,8 @@ export const useTreeViewData = (): UseTreeViewData => {
     vms,
   } = useTreeViewDataResources();
 
+  const navigatorTabSearch = getNavigatorTabSearch(location.search);
+
   const treeData = useMemo((): TreeViewDataItem[] => {
     if (!loaded) {
       return [];
@@ -41,7 +44,7 @@ export const useTreeViewData = (): UseTreeViewData => {
         treeViewFoldersEnabled,
         namespacesByCluster,
         t(ALL_CLUSTERS),
-        location.search,
+        navigatorTabSearch,
         clusterNames,
       );
     }
@@ -51,7 +54,7 @@ export const useTreeViewData = (): UseTreeViewData => {
       vms,
       location.pathname,
       treeViewFoldersEnabled,
-      location.search,
+      navigatorTabSearch,
       isTourRunning,
     );
   }, [
@@ -64,7 +67,7 @@ export const useTreeViewData = (): UseTreeViewData => {
     treeViewFoldersEnabled,
     clusterNames,
     namespacesByCluster,
-    location.search,
+    navigatorTabSearch,
     t,
   ]);
 

@@ -16,6 +16,7 @@ export * from './errorUtils';
 export * from './ipUtils';
 export * from './matchExpressions';
 export * from './nameGenerators';
+export * from './sessionStorage';
 export * from './sortingUtils';
 
 // JSON Pointer (RFC 6901) requires `/` in keys to be escaped as `~1`
