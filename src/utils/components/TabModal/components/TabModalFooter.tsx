@@ -1,4 +1,4 @@
-import { type FC, type ReactNode } from 'react';
+import { type FC, type MouseEvent, type ReactNode } from 'react';
 
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -13,6 +13,7 @@ import {
   ModalFooter,
   Stack,
   StackItem,
+  Tooltip,
 } from '@patternfly/react-core';
 
 type TabModalFooterProps = {
@@ -29,6 +30,7 @@ type TabModalFooterProps = {
   shouldWrapInForm?: boolean;
   submitBtnText?: string;
   submitBtnVariant?: ButtonVariant;
+  submitDisabledTooltip?: ReactNode;
 };
 
 const TabModalFooter: FC<TabModalFooterProps> = ({
@@ -45,11 +47,39 @@ const TabModalFooter: FC<TabModalFooterProps> = ({
   shouldWrapInForm,
   submitBtnText,
   submitBtnVariant,
+  submitDisabledTooltip,
 }) => {
   const { t } = useKubevirtTranslation();
 
   const errorMessage = error ? formatK8sError(error, t) : '';
   const errorHref = error ? getK8sErrorHref(error) : undefined;
+  const showSubmitTooltip = Boolean(isDisabled && submitDisabledTooltip && !isSubmitting);
+
+  const handleSaveClick = (event: MouseEvent<HTMLButtonElement>): void => {
+    if (isDisabled) {
+      event.preventDefault();
+      return;
+    }
+
+    if (!shouldWrapInForm) {
+      executeSubmit();
+    }
+  };
+
+  const saveButton = (
+    <Button
+      data-test="save-button"
+      form="tab-modal-form"
+      isAriaDisabled={showSubmitTooltip}
+      isDisabled={(isDisabled || isSubmitting) && !showSubmitTooltip}
+      isLoading={isLoading || isSubmitting}
+      onClick={handleSaveClick}
+      type={isDisabled ? 'button' : 'submit'}
+      variant={submitBtnVariant ?? ButtonVariant.primary}
+    >
+      {submitBtnText ?? t('Save')}
+    </Button>
+  );
 
   return (
     <ModalFooter>
@@ -74,17 +104,11 @@ const TabModalFooter: FC<TabModalFooterProps> = ({
           </StackItem>
         )}
         <Flex spaceItems={{ default: 'spaceItemsSm' }}>
-          <Button
-            data-test="save-button"
-            form="tab-modal-form"
-            isDisabled={isDisabled || isSubmitting}
-            isLoading={isLoading || isSubmitting}
-            onClick={shouldWrapInForm ? undefined : executeSubmit}
-            type="submit"
-            variant={submitBtnVariant ?? ButtonVariant.primary}
-          >
-            {submitBtnText ?? t('Save')}
-          </Button>
+          {showSubmitTooltip ? (
+            <Tooltip content={submitDisabledTooltip}>{saveButton}</Tooltip>
+          ) : (
+            saveButton
+          )}
           <Button
             data-test="cancel-button"
             onClick={() => {
