@@ -1,21 +1,15 @@
 import { type FC } from 'react';
-import { useParams } from 'react-router';
 
-import { ConfigMapModel, modelToGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { type IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import WindowsLabel from '@kubevirt-utils/components/Labels/WindowsLabel';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
-import { AUTOUNATTEND, UNATTEND } from '@kubevirt-utils/components/SysprepModal/sysprep-utils';
 import { SysprepDescription } from '@kubevirt-utils/components/SysprepModal/SysprepDescription';
 import { SysprepModal } from '@kubevirt-utils/components/SysprepModal/SysprepModal';
-import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { getTemplateVirtualMachineObject, type Template } from '@kubevirt-utils/resources/template';
 import { getVolumes } from '@kubevirt-utils/resources/vm';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
-import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 import { Button, ButtonVariant, Flex, FlexItem, Title } from '@patternfly/react-core';
 import { PencilAltIcon } from '@patternfly/react-icons';
 
@@ -33,7 +27,6 @@ type SysPrepItemProps = {
 };
 
 const SysPrepItem: FC<SysPrepItemProps> = ({ template }) => {
-  const { ns: namespace } = useParams<{ ns: string }>();
   const { isTemplateEditable } = useEditTemplateAccessReview(template);
   const vm = getTemplateVirtualMachineObject(template);
   const currentVMSysprepName = getVolumes(vm)?.find((volume) => volume?.sysprep?.configMap?.name)
@@ -43,23 +36,6 @@ const SysPrepItem: FC<SysPrepItemProps> = ({ template }) => {
 
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
-
-  const externalSysprepSelected = isEmpty(sysPrepObject) && currentVMSysprepName;
-
-  const [externalSysprepConfig, sysprepLoaded, sysprepLoadError] =
-    useK8sWatchData<IoK8sApiCoreV1ConfigMap>(
-      externalSysprepSelected
-        ? {
-            cluster: getCluster(template),
-            groupVersionKind: modelToGroupVersionKind(ConfigMapModel),
-            name: externalSysprepSelected,
-            namespace,
-          }
-        : null,
-    );
-
-  const { [AUTOUNATTEND]: autoUnattend, [UNATTEND]: unattend } =
-    externalSysprepConfig?.data ?? sysPrepObject?.data ?? {};
 
   const onSysprepSelected = async (newSysprepName: string): Promise<void> => {
     const templateNoSysprepObj = deleteTemplateSysprepObject(template, currentVMSysprepName);
@@ -78,13 +54,19 @@ const SysPrepItem: FC<SysPrepItemProps> = ({ template }) => {
     await updateTemplateWithSysprep(
       templateWithSysPrep,
       newSysPrepObject?.metadata?.name,
-      externalSysprepSelected,
+      currentVMSysprepName,
     );
   };
 
   return (
     <DescriptionItem
-      descriptionData={<SysprepDescription error={sysprepLoadError} loaded={sysprepLoaded} />}
+      descriptionData={
+        <SysprepDescription
+          cluster={getCluster(template)}
+          namespace={getNamespace(template)}
+          selectedSysprepName={currentVMSysprepName}
+        />
+      }
       descriptionHeader={
         <Flex className="vm-description-item__title">
           <FlexItem>
@@ -102,12 +84,11 @@ const SysPrepItem: FC<SysPrepItemProps> = ({ template }) => {
                 createModal((modalProps) => (
                   <SysprepModal
                     {...modalProps}
-                    autoUnattend={autoUnattend}
-                    namespace={vm?.metadata?.namespace ?? DEFAULT_NAMESPACE}
+                    cluster={getCluster(template)}
+                    namespace={getNamespace(template)}
                     onSysprepCreation={onSysprepCreation}
                     onSysprepSelected={onSysprepSelected}
-                    sysprepSelected={externalSysprepSelected}
-                    unattend={unattend}
+                    sysprepSelected={currentVMSysprepName}
                   />
                 ))
               }

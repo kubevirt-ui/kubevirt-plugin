@@ -14,6 +14,27 @@ import { SYSPREP } from './consts';
 export const AUTOUNATTEND = 'autounattend.xml';
 export const UNATTEND = 'unattend.xml';
 export const WINDOWS = 'windows';
+export const SYSPREP_CONFIG_MAP_NAME_PREFIX = 'sysprep-config-';
+
+const checkEqualCaseInsensitive = (a: string, b: string): boolean =>
+  a.localeCompare(b, 'en', { sensitivity: 'base' }) === 0;
+
+export const isSysprepConfigMap = (configmap: IoK8sApiCoreV1ConfigMap): boolean => {
+  const dataKeys = Object.keys(configmap?.data ?? {});
+
+  if (
+    dataKeys.some(
+      (key) =>
+        checkEqualCaseInsensitive(key, UNATTEND) || checkEqualCaseInsensitive(key, AUTOUNATTEND),
+    )
+  ) {
+    return true;
+  }
+
+  const name = configmap?.metadata?.name ?? '';
+
+  return name.startsWith(SYSPREP_CONFIG_MAP_NAME_PREFIX);
+};
 
 export type SysprepData = { autounattend?: string; unattended?: string };
 
