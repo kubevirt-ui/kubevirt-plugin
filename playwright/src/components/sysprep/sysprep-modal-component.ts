@@ -1,5 +1,6 @@
 import BaseComponent from '@/components/shared/base-component';
 import {
+  SYSPREP_CONFIG_MAP_NAME_PATTERN,
   SYSPREP_SAMPLE_AUTOUNATTEND_XML,
   SYSPREP_SAMPLE_UNATTEND_XML,
 } from '@/utils/sysprep-test-helpers';
@@ -49,9 +50,15 @@ export default class SysprepModalComponent extends BaseComponent {
     await toggle.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
     await this.robustClick(toggle);
 
+    const searchInput = this.page.getByRole('searchbox').last();
+    if (await searchInput.isVisible({ timeout: TestTimeouts.UI_DELAY_SHORT }).catch(() => false)) {
+      await searchInput.fill(configMapName);
+    }
+
     const option = this.page
       .getByRole('option', { name: configMapName })
-      .or(this.page.getByRole('menuitem', { name: configMapName }));
+      .or(this.page.getByRole('menuitem', { name: configMapName }))
+      .or(this.page.getByText(configMapName, { exact: true }));
     await option.first().waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
     await this.robustClick(option.first());
   }
@@ -69,25 +76,41 @@ export default class SysprepModalComponent extends BaseComponent {
     }
 
     await this.robustClick(saveButton);
-    await this.sysprepModal
-      .waitFor({ state: 'hidden', timeout: TestTimeouts.ELEMENT_WAIT })
-      .catch(() => undefined);
+    await this.sysprepModal.waitFor({ state: 'hidden', timeout: TestTimeouts.ELEMENT_WAIT });
+    await this.waitForLoadingComplete();
   }
 
   async getDisplayedSysprepName(): Promise<string | null> {
     const section = this.testId('sysprep-button');
-    const link = section.getByRole('link');
 
-    if (await link.isVisible({ timeout: TestTimeouts.UI_DELAY_MEDIUM }).catch(() => false)) {
-      return (await link.textContent())?.trim() ?? null;
+    const found = await this.waitForCondition(async () => {
+      const sectionText = await section.textContent().catch(() => null);
+      return Boolean(sectionText?.match(SYSPREP_CONFIG_MAP_NAME_PATTERN));
+    }, TestTimeouts.STATUS_VALIDATION);
+
+    if (!found) {
+      return null;
     }
 
-    return null;
+    const sectionText = await section.textContent();
+    return sectionText?.match(SYSPREP_CONFIG_MAP_NAME_PATTERN)?.[0] ?? null;
   }
 
   async isSysprepNotAvailable(): Promise<boolean> {
     const section = this.testId('sysprep-button');
-    return section.getByText('Not available').isVisible();
+
+    return this.waitForCondition(async () => {
+      const notAvailableVisible = await section
+        .getByText('Not available')
+        .isVisible()
+        .catch(() => false);
+      if (notAvailableVisible) {
+        return true;
+      }
+
+      const sectionText = await section.textContent().catch(() => null);
+      return !sectionText?.match(SYSPREP_CONFIG_MAP_NAME_PATTERN);
+    }, TestTimeouts.STATUS_VALIDATION);
   }
 
   async runCreateDetachAttachFlow(): Promise<string> {

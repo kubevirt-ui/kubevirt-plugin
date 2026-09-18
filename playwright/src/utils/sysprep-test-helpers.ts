@@ -1,6 +1,8 @@
 import type RequestContextClient from '@/clients/request-context-client';
 import type { KubernetesResource } from '@/data-models/kubernetes-types';
 
+export const SYSPREP_CONFIG_MAP_NAME_PATTERN = /sysprep-config-[a-z0-9-]+/i;
+
 export const SYSPREP_SAMPLE_AUTOUNATTEND_XML = `<?xml version="1.0" encoding="utf-8"?>
 <unattend xmlns="urn:schemas-microsoft-com:unattend"></unattend>`;
 
