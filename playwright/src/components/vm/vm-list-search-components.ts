@@ -491,6 +491,12 @@ export class VmListSearchComponent extends BaseComponent {
     return (await chips.allTextContents()).map((t) => t.trim()).filter(Boolean);
   }
 
+  async getFilteredEmptyStateText(): Promise<string> {
+    const emptyStateText = this.page.getByText('No results found for', { exact: false }).first();
+    await emptyStateText.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
+    return (await emptyStateText.textContent())?.trim() ?? '';
+  }
+
   async getSearchDropdownValues(): Promise<string[]> {
     await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
     const values = this._searchDropdown.locator('[data-test^="search-value-"]');

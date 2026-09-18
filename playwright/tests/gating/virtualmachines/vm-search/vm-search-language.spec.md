@@ -5,7 +5,7 @@
 - **Project Name:** KubeVirt UI — Playwright E2E Tests
 - **Feature Area:** Gating — Virtual machines / Search
 - **Latest version:** CNV 5.0.0
-- **Latest update:** 2026-09-01
+- **Latest update:** 2026-09-18
 - **Document Status:** Approved
 
 ## 2. Introduction
@@ -13,14 +13,17 @@
 ### 2.1 Purpose
 
 Verify the VM list search language: query syntax (plain text, `key:value`, OR/AND, numeric
-operators, exclusion), autocomplete (keys, values, examples), filter chips, clearing the search, and
-that submitted queries actually show and hide VirtualMachines in the list.
+operators, exclusion), autocomplete (keys, values, examples), filter chips, clearing the search, that
+submitted queries actually show and hide VirtualMachines in the list, and that the "No results found
+for ..." empty state renders the submitted query back using correct search-language syntax (including
+exclusion tokens) when a query matches zero VMs.
 
 ### 2.2 Scope
 
 - **In-Scope:** Search input on the namespaced VirtualMachines list, search dropdown (Search by keys,
   value suggestions, examples), filter chips produced by submitted queries, list visibility of fixture
-  VMs, and the clear-search control.
+  VMs, the clear-search control, and the "No results found for ..." filtered empty state text
+  (including its search-language formatting of exclusion filters).
 - **Out-of-Scope:** Advanced Search modal field-by-field coverage (other search suites). Group
   (`group:`) filter coverage (`vm-group-filter.spec.ts`, CNV-94097). Gating smoke for
   `status:Running` lives in `tests/gating/scenario-virtualization-pages.spec.ts`.
@@ -294,25 +297,46 @@ that submitted queries actually show and hide VirtualMachines in the list.
 
 ---
 
+### `016`: Empty state text formats exclusion filters using search language syntax
+
+- **Objective:** Verify that when a submitted query matches zero VMs, the "No results found for ..."
+  empty state renders each submitted token using search-language syntax (`key:value`, exclusions
+  prefixed with `-`) instead of the pre-fix raw filter dump (e.g. `os:!RHEL` or comma-joined values).
+  The empty state text may also include other active filters (e.g. `project:<name>`) depending on the
+  test environment, so the check only asserts that the expected tokens are present, regardless of order
+  or additional content.
+- **Target version:** CNV 5.1.0
+- **Jira References:** CNV-96225
+- **Pre-conditions:** Fixture VMs exist and are Stopped (none are Paused)
+- **Tags:** `@adminOnly`
+
+| Step | Action                           | Expected Result                                                                                                                                  |
+| :--- | :------------------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1    | Submit `status:Paused -os:RHEL`  | Query is submitted without error; no VM has status `Paused`, so the list is empty                                                                |
+| 2    | Observe the filtered empty state | Text contains both `status:Paused` and `-os:RHEL` (order-independent; other active filters, e.g. a `project:<name>` filter, may also be present) |
+
+---
+
 ## 5. Requirements Traceability Matrix
 
-| Jira Ticket | Test Case ID | Coverage Type    | Status    |
-| ----------- | ------------ | ---------------- | --------- |
-| CNV-74174   | `001`        | Feature coverage | Automated |
-| CNV-74174   | `002`        | Feature coverage | Automated |
-| CNV-74174   | `003`        | Feature coverage | Automated |
-| CNV-74174   | `004`        | Feature coverage | Automated |
-| CNV-74174   | `005`        | Feature coverage | Automated |
-| CNV-74174   | `006`        | Feature coverage | Automated |
-| CNV-74174   | `007`        | Feature coverage | Automated |
-| CNV-74174   | `008`        | Feature coverage | Automated |
-| CNV-74174   | `009`        | Feature coverage | Automated |
-| CNV-74174   | `010`        | Feature coverage | Automated |
-| CNV-74174   | `011`        | Feature coverage | Automated |
-| CNV-74174   | `012`        | Feature coverage | Automated |
-| CNV-74174   | `013`        | Feature coverage | Automated |
-| CNV-74174   | `014`        | Feature coverage | Automated |
-| CNV-74174   | `015`        | Feature coverage | Automated |
+| Jira Ticket | Test Case ID | Coverage Type           | Status    |
+| ----------- | ------------ | ----------------------- | --------- |
+| CNV-74174   | `001`        | Feature coverage        | Automated |
+| CNV-74174   | `002`        | Feature coverage        | Automated |
+| CNV-74174   | `003`        | Feature coverage        | Automated |
+| CNV-74174   | `004`        | Feature coverage        | Automated |
+| CNV-74174   | `005`        | Feature coverage        | Automated |
+| CNV-74174   | `006`        | Feature coverage        | Automated |
+| CNV-74174   | `007`        | Feature coverage        | Automated |
+| CNV-74174   | `008`        | Feature coverage        | Automated |
+| CNV-74174   | `009`        | Feature coverage        | Automated |
+| CNV-74174   | `010`        | Feature coverage        | Automated |
+| CNV-74174   | `011`        | Feature coverage        | Automated |
+| CNV-74174   | `012`        | Feature coverage        | Automated |
+| CNV-74174   | `013`        | Feature coverage        | Automated |
+| CNV-74174   | `014`        | Feature coverage        | Automated |
+| CNV-74174   | `015`        | Feature coverage        | Automated |
+| CNV-96225   | `016`        | Bugfix regression guard | Automated |
 
 **Coverage Type values:**
 
