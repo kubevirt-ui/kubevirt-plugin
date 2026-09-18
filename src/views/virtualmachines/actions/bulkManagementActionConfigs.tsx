@@ -1,6 +1,9 @@
 import { type TFunction } from 'i18next';
 
-import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import {
+  VirtualMachineModel,
+  VirtualMachineSnapshotModel,
+} from '@kubevirt-ui-ext/kubevirt-api/console';
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { type ActionDropdownItemType } from '@kubevirt-utils/components/ActionsDropdown/constants';
 import { LabelsModal } from '@kubevirt-utils/components/LabelsModal/LabelsModal';
@@ -12,6 +15,7 @@ import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
 import DeleteAllVMsConfirmationModal from '@virtualmachines/actions/components/DeleteAllConfirmationModal/DeleteAllVMsConfirmationModal';
 
+import { asBulkAccessReview } from './accessReviewUtils';
 import { ACTIONS_ID, BULK_ACTIONS_ID } from './hooks/constants';
 import {
   getBulkDeleteActionDescription,
@@ -36,6 +40,7 @@ export const createDeleteConfig =
     createModal: (modal: ModalComponent) => void,
     isTreeViewAction: boolean,
   ): ActionDropdownItemType => ({
+    accessReview: asBulkAccessReview(VirtualMachineModel, vms, 'delete'),
     cta: () =>
       createModal(({ isOpen, onClose }) => (
         <DeleteAllVMsConfirmationModal isOpen={isOpen} onClose={onClose} vms={vms} />
@@ -53,6 +58,7 @@ export const createEditLabelsConfig =
     createModal: (modal: ModalComponent) => void,
     isTreeViewAction: boolean,
   ): ActionDropdownItemType => ({
+    accessReview: asBulkAccessReview(VirtualMachineModel, vms, 'patch'),
     cta: (): void => {
       const commonLabels = getCommonLabels(vms);
 
@@ -88,6 +94,7 @@ export const createSnapshotConfig =
     vms: V1VirtualMachine[],
     createModal: (modal: ModalComponent) => void,
   ): ActionDropdownItemType => ({
+    accessReview: asBulkAccessReview(VirtualMachineSnapshotModel, vms, 'create'),
     cta: () =>
       createModal((props) =>
         vms.length === 1 ? (

@@ -7,18 +7,18 @@ import { type ModalComponent } from '@kubevirt-utils/components/ModalProvider/Mo
 import MoveBulkVMToFolderModal from '@kubevirt-utils/components/MoveVMToFolderModal/MoveBulkVMsToFolderModal';
 import RunStrategyModal from '@kubevirt-utils/components/RunStrategyModal/RunStrategyModal';
 import { updateRunStrategy } from '@kubevirt-utils/components/RunStrategyModal/utils';
-import { getNamespace, haveSameCluster, haveSameNamespace } from '@kubevirt-utils/resources/shared';
+import { haveSameCluster, haveSameNamespace } from '@kubevirt-utils/resources/shared';
 import {
   getEffectiveRunStrategy,
   isVMNotStopped,
 } from '@kubevirt-utils/resources/vm/utils/selectors';
 import { isEmpty, kubevirtConsole } from '@kubevirt-utils/utils/utils';
-import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
 import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
 
 import { isStopped } from '../utils';
 
+import { asBulkAccessReview } from './accessReviewUtils';
 import { BULK_ACTIONS_ID } from './hooks/constants';
 
 export const createEditRunStrategyConfig =
@@ -27,13 +27,7 @@ export const createEditRunStrategyConfig =
     vms: V1VirtualMachine[],
     createModal: (modal: ModalComponent) => void,
   ): ActionDropdownItemType => ({
-    accessReview: {
-      cluster: getCluster(vms?.[0]),
-      group: VirtualMachineModel.apiGroup,
-      namespace: getNamespace(vms?.[0]),
-      resource: VirtualMachineModel.plural,
-      verb: 'patch',
-    },
+    accessReview: asBulkAccessReview(VirtualMachineModel, vms, 'patch'),
     cta: (): void => {
       const effectiveStrategies = vms.map(getEffectiveRunStrategy);
       const allSameStrategy = effectiveStrategies.every(
@@ -78,6 +72,7 @@ export const createMoveToFolderConfig =
     vms: V1VirtualMachine[],
     createModal: (modal: ModalComponent) => void,
   ): ActionDropdownItemType => ({
+    accessReview: asBulkAccessReview(VirtualMachineModel, vms, 'patch'),
     cta: () =>
       createModal(({ isOpen, onClose }) => (
         <MoveBulkVMToFolderModal
