@@ -30,6 +30,12 @@ const AnnotationsTable: FC<AnnotationsTableProps> = ({
 
   const canDelete = useCallback((key: string): boolean => !isSystemKey(key), []);
 
+  const getDeleteTooltip = useCallback(
+    (key: string): string | undefined =>
+      isSystemKey(key) ? t('This annotation is system-managed and cannot be removed') : undefined,
+    [t],
+  );
+
   const onAdd = useCallback(
     (): void =>
       createModal(({ isOpen, onClose }) => (
@@ -65,6 +71,7 @@ const AnnotationsTable: FC<AnnotationsTableProps> = ({
       editable={editable}
       emptyMessage={t('No annotations yet.')}
       entries={entries}
+      getDeleteTooltip={getDeleteTooltip}
       helpText={t(
         'Annotations store extra metadata. Unlike labels, they cannot select resources and suit larger values or configuration details.',
       )}

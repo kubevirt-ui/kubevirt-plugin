@@ -47,6 +47,15 @@ const LabelsTable: FC<LabelsTableProps> = ({ editable = true, onLabelsSubmit, re
     [autoAppliedLoaded, autoAppliedMap],
   );
 
+  const getDeleteTooltip = useCallback(
+    (key: string): string | undefined => {
+      if (isSystemKey(key)) return t('This label is system-managed and cannot be removed');
+      if (autoAppliedMap.has(key)) return t('This label is auto-applied and cannot be removed');
+      return undefined;
+    },
+    [autoAppliedMap, t],
+  );
+
   const canEdit = useCallback(
     (key: string): boolean =>
       autoAppliedLoaded && autoAppliedMap.has(key) && !autoAppliedMap.get(key)?.value,
@@ -119,6 +128,7 @@ const LabelsTable: FC<LabelsTableProps> = ({ editable = true, onLabelsSubmit, re
       editable={editable}
       emptyMessage={t('No labels yet.')}
       entries={entries}
+      getDeleteTooltip={getDeleteTooltip}
       helpText={t('Labels can be used to organize and categorize VMs.')}
       onAdd={openLabelsModal}
       onDelete={onDelete}

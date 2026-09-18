@@ -11,12 +11,10 @@ import {
   CardBody,
   CardHeader,
   CardTitle,
-  Split,
-  SplitItem,
 } from '@patternfly/react-core';
-import { MinusCircleIcon, PencilAltIcon } from '@patternfly/react-icons';
 import { Table, Tbody, Td, Th, Thead, Tr } from '@patternfly/react-table';
 
+import LabelsAnnotationsRowActions from './LabelsAnnotationsRowActions';
 import MetadataEmptyState from './MetadataEmptyState';
 
 type LabelsAnnotationsTableProps = {
@@ -27,6 +25,7 @@ type LabelsAnnotationsTableProps = {
   editable: boolean;
   emptyMessage: string;
   entries: [string, string][];
+  getDeleteTooltip?: (key: string) => string | undefined;
   helpText: string;
   onAdd: () => void;
   onDelete: (key: string) => void;
@@ -46,6 +45,7 @@ const LabelsAnnotationsTable: FC<LabelsAnnotationsTableProps> = ({
   editable,
   emptyMessage,
   entries,
+  getDeleteTooltip,
   helpText,
   onAdd,
   onDelete,
@@ -114,27 +114,15 @@ const LabelsAnnotationsTable: FC<LabelsAnnotationsTableProps> = ({
                 <Td dataLabel={t('Value')}>{renderValue(key, value)}</Td>
                 {editable && (
                   <Td className="pf-v6-c-table__action">
-                    <Split>
-                      <SplitItem style={{ visibility: canEdit?.(key) ? 'visible' : 'hidden' }}>
-                        <Button
-                          aria-label={t('Edit {{key}}', { key })}
-                          data-test={`edit-${searchId}-${key}`}
-                          icon={<PencilAltIcon />}
-                          onClick={() => onEdit?.(key)}
-                          variant={ButtonVariant.plain}
-                        />
-                      </SplitItem>
-                      <SplitItem>
-                        <Button
-                          aria-label={t('Remove {{key}}', { key })}
-                          data-test={`delete-${searchId}-${key}`}
-                          icon={<MinusCircleIcon />}
-                          isDisabled={!canDelete(key)}
-                          onClick={() => onDelete(key)}
-                          variant={ButtonVariant.plain}
-                        />
-                      </SplitItem>
-                    </Split>
+                    <LabelsAnnotationsRowActions
+                      canDelete={canDelete(key)}
+                      canEdit={canEdit?.(key)}
+                      deleteTooltip={getDeleteTooltip?.(key)}
+                      entryKey={key}
+                      onDelete={onDelete}
+                      onEdit={onEdit}
+                      searchId={searchId}
+                    />
                   </Td>
                 )}
               </Tr>

@@ -1,4 +1,4 @@
-import { type FC, useEffect, useMemo, useState } from 'react';
+import { type FC, type ReactNode, useEffect, useMemo, useState } from 'react';
 
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -27,8 +27,15 @@ export const AnnotationsModal: FC<{
   const { t } = useKubevirtTranslation();
 
   const [annotations, setAnnotations] = useState<Record<number, AnnotationEntry>>({});
-  const { hasDuplicates, hasEmptyKeys } = getAnnotationRowValidation(annotations);
-  const initialKeys = useMemo(() => new Set(Object.keys(getAnnotations(obj, {}))), [obj]);
+  const annotationValidation = getAnnotationRowValidation(annotations);
+  const { hasDuplicates, hasEmptyKeys } = annotationValidation;
+  let submitDisabledTooltip: ReactNode = null;
+  if (hasEmptyKeys) {
+    submitDisabledTooltip = t('Annotation key is required');
+  } else if (hasDuplicates) {
+    submitDisabledTooltip = t('Duplicate keys found');
+  }
+  const initialKeys = useMemo(() => new Set(Object.keys(getAnnotations(obj, {}) ?? {})), [obj]);
 
   const onAnnotationAdd = (): void => {
     const keys = new Set(Object.keys(annotations));
@@ -55,10 +62,7 @@ export const AnnotationsModal: FC<{
   };
 
   useEffect(() => {
-    const baseAnnotations = getAnnotations(obj, {});
-    const idAnnotations = getIdAnnotations(baseAnnotations);
-
-    setAnnotations(idAnnotations);
+    setAnnotations(getIdAnnotations(getAnnotations(obj, {}) ?? {}));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);
 
@@ -70,11 +74,13 @@ export const AnnotationsModal: FC<{
       obj={obj}
       onClose={onClose}
       onSubmit={onAnnotationsSubmit}
+      submitDisabledTooltip={submitDisabledTooltip}
     >
       <Grid hasGutter>
         {Object.entries(annotations || {}).map(([id, { key, value }]) => (
           <AnnotationsModalRow
             annotation={{ key, value }}
+            id={id}
             isProtected={isSystemKey(key) && initialKeys.has(key)}
             key={id}
             onChange={(annotation) =>

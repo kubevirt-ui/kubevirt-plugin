@@ -1,30 +1,53 @@
-import { type FC, memo } from 'react';
+import { type FC, type FocusEvent, memo, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { Button, ButtonVariant, GridItem, TextInput } from '@patternfly/react-core';
-import { MinusCircleIcon } from '@patternfly/react-icons';
+import { GridItem, HelperText, HelperTextItem, TextInput } from '@patternfly/react-core';
+
+import RemoveAnnotation from './components/RemoveAnnotation';
+import { getAnnotationKeyRequiredMessage } from './utils';
 
 export const AnnotationsModalRow: FC<{
   annotation: { key: string; value: string };
+  id: string;
   isProtected?: boolean;
   onChange: ({ key, value }: { key: string; value: string }) => void;
   onDelete: () => void;
-}> = memo(({ annotation, isProtected, onChange, onDelete }) => {
+}> = memo(({ annotation, id, isProtected, onChange, onDelete }) => {
   const { t } = useKubevirtTranslation();
+  const [keyTouched, setKeyTouched] = useState(false);
+  const showKeyError = keyTouched && !annotation.key.trim();
+  const errorId = `annotation-${id}-error`;
+
+  const handleKeyBlur = (event: FocusEvent<HTMLInputElement>): void => {
+    const relatedTarget = event.relatedTarget;
+    if (relatedTarget instanceof HTMLElement && relatedTarget.dataset.test === 'cancel-button') {
+      return;
+    }
+
+    setKeyTouched(true);
+  };
+
   return (
     <>
       <GridItem span={5}>
         <TextInput
+          aria-describedby={showKeyError ? errorId : undefined}
           aria-label={t('annotation key')}
           autoFocus={!isProtected}
           className="annotation-form-input"
-          isDisabled={isProtected}
+          id={`annotation-${id}-key-input`}
+          isDisabled={Boolean(isProtected)}
           isRequired
           maxLength={255}
-          onChange={(_event, newKey) => onChange({ ...annotation, key: newKey })}
+          onBlur={handleKeyBlur}
+          onChange={(_event, newKey) => {
+            setKeyTouched(true);
+            onChange({ ...annotation, key: newKey });
+          }}
           placeholder={t('annotation key')}
           size={1}
           type="text"
+          validated={showKeyError ? 'error' : 'default'}
           value={annotation.key}
         />
       </GridItem>
@@ -32,7 +55,7 @@ export const AnnotationsModalRow: FC<{
         <TextInput
           aria-label={t('annotation value')}
           className="annotation-form-input"
-          isDisabled={isProtected}
+          isDisabled={Boolean(isProtected)}
           isRequired
           maxLength={255}
           onChange={(_event, newValue) => onChange({ ...annotation, value: newValue })}
@@ -42,15 +65,19 @@ export const AnnotationsModalRow: FC<{
         />
       </GridItem>
       <GridItem span={2}>
-        <Button
-          aria-label={t('Remove annotation')}
-          data-test={`delete-annotation-row-${annotation.key}`}
-          icon={<MinusCircleIcon />}
-          isDisabled={isProtected}
-          onClick={() => onDelete()}
-          variant={ButtonVariant.plain}
+        <RemoveAnnotation
+          annotationKey={annotation.key}
+          isProtected={Boolean(isProtected)}
+          onDelete={onDelete}
         />
       </GridItem>
+      {showKeyError && (
+        <GridItem span={12}>
+          <HelperText data-test={errorId} id={errorId}>
+            <HelperTextItem variant="error">{getAnnotationKeyRequiredMessage(t)}</HelperTextItem>
+          </HelperText>
+        </GridItem>
+      )}
     </>
   );
 });
