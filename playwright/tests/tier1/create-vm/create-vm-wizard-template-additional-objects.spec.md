@@ -93,5 +93,5 @@ indicate a planned coverage gap (status: Pending).
 ## 6. Approvals
 
 - **Prepared By:** Test automation / QE
-- **Reviewed By:** —
-- **Approval Signature:** —
+- **Reviewed By:** Ugo Palatucci
+- **Approval Signature:** Ugo Palatucci
