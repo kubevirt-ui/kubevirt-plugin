@@ -11,7 +11,7 @@ test.describe(
   () => {
     test('creates namespaced additional object in the VM namespace when template omits namespace', async ({
       apiClient,
-      vmTreePage,
+      vmListPage,
       vmWizardNavigationPage,
       vmWizardComputePage,
       utils,
@@ -51,9 +51,9 @@ test.describe(
         true,
       );
 
-      await vmTreePage.switchToVirtualizationPerspective();
-      await vmTreePage.navigateToNamespaceVirtualMachines(wizardNs);
-      await vmTreePage.clickVmListTab();
+      await vmListPage.switchToVirtualizationPerspective();
+      await vmListPage.navigateToNamespaceVirtualMachines(wizardNs);
+      await vmListPage.clickVmListTab();
       await vmWizardNavigationPage.openWizardFromCreateDropdown();
 
       const wizardVisible = await vmWizardNavigationPage.verifyWizardVisible();
