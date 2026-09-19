@@ -17,6 +17,7 @@ import { vmsSignal } from '@virtualmachines/tree/utils/signals';
 import VirtualMachineEmptyState from './components/VirtualMachineEmptyState/VirtualMachineEmptyState';
 import VirtualMachineFilteredEmptyState from './components/VirtualMachineFilteredEmptyState/VirtualMachineFilteredEmptyState';
 import VirtualMachinesListToolbar from './components/VirtualMachinesListToolbar';
+import useExistingSelectedVMs from './hooks/useExistingSelectedVMs';
 import { useVMDataSource } from './hooks/useVMDataSource';
 import { useVMListColumns } from './hooks/useVMListColumns';
 import { useVMListFilterState } from './hooks/useVMListFilterState';
@@ -70,6 +71,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({
 
   const { clearAllFiltersWithReset, filterDefinitions, filteredVMs, filters, handleSetFilters } =
     useVMListFilterState(vmsToShow, vmiMapper, pvcMapper, resetPagination);
+  const selectedVirtualMachines = useExistingSelectedVMs(filteredVMs ?? []);
 
   useEffect(() => {
     deselectAllVMs();
@@ -95,6 +97,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({
       exportKey={EXPORT_TABLE_KEYS.VIRTUAL_MACHINES}
       initialSortKey={VM_COLUMN_KEYS.name}
       loaded={loaded}
+      selectedData={selectedVirtualMachines}
     />
   );
 

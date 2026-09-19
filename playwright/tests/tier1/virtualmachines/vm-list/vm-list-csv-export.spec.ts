@@ -71,7 +71,8 @@ const expectedConditionsCsvValue = (vm: KubernetesResource): string => {
   const isActuallyLiveMigratable =
     status?.printableStatus === 'Running' &&
     conditions.some(
-      ({ status: conditionStatus, type }) => type === 'LiveMigratable' && conditionStatus === 'True',
+      ({ status: conditionStatus, type }) =>
+        type === 'LiveMigratable' && conditionStatus === 'True',
     );
 
   const filtered = conditions.filter(
@@ -102,29 +103,39 @@ const expectedConditionsCsvValue = (vm: KubernetesResource): string => {
 test.describe(SUITE, { tag: [T1_TAG, ADMIN_ONLY_TAG] }, () => {
   let namespace: string;
   let vmName: string;
+  let secondVmName: string;
 
   test.beforeAll(async ({ apiClient, utils }) => {
     namespace = await setupTestNamespace(apiClient, 'csv-export');
     vmName = utils.generateRandomVmName('csv-vm');
+    secondVmName = utils.generateRandomVmName('csv-vm');
 
-    const yaml = utils.VirtualMachineFactory.create({
-      name: vmName,
-      namespace,
-      runStrategy: 'Halted',
-      cpuCores: 1,
-      memory: '256Mi',
-    });
-    const payload = yamlLoad(yaml) as KubernetesResource;
-    await apiClient.createVirtualMachine(namespace, payload);
-    await apiClient.waitForVmExists(vmName, namespace);
-    await waitForVmPrintableStatus(apiClient, namespace, vmName, 'Stopped');
-    apiClient.trackResource('VirtualMachine', vmName, namespace);
+    for (const name of [vmName, secondVmName]) {
+      const yaml = utils.VirtualMachineFactory.create({
+        name,
+        namespace,
+        runStrategy: 'Halted',
+        cpuCores: 1,
+        memory: '256Mi',
+      });
+      const payload = yamlLoad(yaml) as KubernetesResource;
+      await apiClient.createVirtualMachine(namespace, payload);
+      await apiClient.waitForVmExists(name, namespace);
+      await waitForVmPrintableStatus(apiClient, namespace, name, 'Stopped');
+      apiClient.trackResource('VirtualMachine', name, namespace);
+    }
   });
 
   test.afterAll(async ({ apiClient }) => {
-    if (vmName && namespace) {
-      await apiClient.deleteVirtualMachine(namespace, vmName).catch(() => undefined);
-      await apiClient.waitForVmDeleted(vmName, namespace).catch(() => undefined);
+    if (!namespace) {
+      return;
+    }
+    for (const name of [vmName, secondVmName]) {
+      if (!name) {
+        continue;
+      }
+      await apiClient.deleteVirtualMachine(namespace, name).catch(() => undefined);
+      await apiClient.waitForVmDeleted(name, namespace).catch(() => undefined);
     }
   });
 
@@ -176,5 +187,48 @@ test.describe(SUITE, { tag: [T1_TAG, ADMIN_ONLY_TAG] }, () => {
       expect(vmRow[conditionsIndex]).toBe(expectedConditionsCsvValue(vm));
       expect(vmRow[ipIndex]).toBe(NO_DATA_DASH);
     });
+  });
+
+  test('exports selected VMs or the full list from the export dropdown', async ({
+    vmListPage,
+    utils,
+  }) => {
+    await utils.withAllure({
+      suite: SUITE,
+      feature: T1,
+      tags: [T1_TAG, VM_LIST_TAG, ADMIN_ONLY_TAG],
+    });
+
+    await test.step('Wait until both Halted VMs are listed', async () => {
+      const firstVisible = await vmListPage.isVmVisibleByDataTest(vmName);
+      const secondVisible = await vmListPage.isVmVisibleByDataTest(secondVmName);
+      expect(firstVisible, `VM ${vmName} should be visible in the namespaced list`).toBe(true);
+      expect(secondVisible, `VM ${secondVmName} should be visible in the namespaced list`).toBe(
+        true,
+      );
+    });
+
+    await test.step('Select one VM', async () => {
+      await vmListPage.selectVmByCheckbox(vmName);
+    });
+
+    const selectedDownload = await test.step('Export selected VMs', async () => {
+      return vmListPage.downloadCsvExport('selected');
+    });
+    const [selectedHeaders, ...selectedRows] = parseCsv(selectedDownload.content.trimEnd());
+    const selectedNameIndex = selectedHeaders.indexOf('Name');
+    const selectedNames = selectedRows.map((row) => row[selectedNameIndex]);
+    expect(selectedNames, 'Selected export should contain only the checked VM').toEqual([vmName]);
+
+    const allDownload = await test.step('Export all VMs', async () => {
+      return vmListPage.downloadCsvExport('all');
+    });
+    const [allHeaders, ...allRows] = parseCsv(allDownload.content.trimEnd());
+    const allNameIndex = allHeaders.indexOf('Name');
+    const allNames = allRows.map((row) => row[allNameIndex]);
+    expect(allNames, 'All export should contain both VMs').toEqual(
+      expect.arrayContaining([vmName, secondVmName]),
+    );
+    expect(allNames, 'All export should contain exactly the two test VMs').toHaveLength(2);
   });
 });
