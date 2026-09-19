@@ -23,6 +23,7 @@ export type KubevirtTableExportProps<TData, TCallbacks = undefined> = {
   initialSortDirection?: 'asc' | 'desc';
   initialSortKey?: string;
   loaded?: boolean;
+  selectedData?: TData[];
 };
 
 const KubevirtTableExport = <TData, TCallbacks = undefined>({
@@ -37,6 +38,7 @@ const KubevirtTableExport = <TData, TCallbacks = undefined>({
   initialSortDirection,
   initialSortKey,
   loaded = true,
+  selectedData,
 }: KubevirtTableExportProps<TData, TCallbacks>): ReactElement => {
   const { cluster, namespace } = useExportParams();
 
@@ -67,6 +69,14 @@ const KubevirtTableExport = <TData, TCallbacks = undefined>({
     callbacks,
   );
 
+  const sortedSelectedData = useMemo(() => {
+    if (isEmpty(selectedData)) {
+      return [];
+    }
+    const selectedSet = new Set(selectedData);
+    return sortedData.filter((item) => selectedSet.has(item));
+  }, [selectedData, sortedData]);
+
   return (
     <ExportTableButton
       activeColumnKeys={activeColumnKeys}
@@ -77,6 +87,7 @@ const KubevirtTableExport = <TData, TCallbacks = undefined>({
       filename={resolvedFilename}
       isDisabled={!loaded || isEmpty(data)}
       loaded={loaded}
+      selectedData={sortedSelectedData}
     />
   );
 };

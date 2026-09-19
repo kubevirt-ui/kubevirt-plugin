@@ -5,7 +5,7 @@
 - **Project Name:** KubeVirt UI — Playwright E2E Tests
 - **Feature Area:** Tier1 — Virtual machines / List
 - **Latest version:** CNV 5.1.0
-- **Latest update:** 2026-09-04
+- **Latest update:** 2026-09-18
 - **Document Status:** Approved
 
 ## 2. Introduction
@@ -18,23 +18,28 @@ columns such as Actions, and serializing empty cell values as an em dash (`—`)
 IP, so IP is `—`. Conditions may still be present (for example `Ready=False` with a reason) and are
 exported as `Type=Status` values, or `—` when none remain after the list filter.
 
+When no rows are selected, clicking export downloads the filtered list immediately. When one or more
+rows are selected, export opens a dropdown with **Export selected (n)** and **Export all (n)** so
+the user can download either the checked rows or the full filtered list.
+
 ### 2.2 Scope
 
 - **In-Scope:** Export button on the namespaced VirtualMachines list, downloaded filename, CSV
-  header columns (Name, Conditions, IP address; exclusion of Actions), presence of the created
-  Halted VM, IP address `—` for that Halted VM, and Conditions matching the filtered VM conditions
-  (`Type=Status`, or `—` when the filtered list is empty).
+  header columns (Name, Conditions, IP address; exclusion of Actions), presence of a created Halted
+  VM, IP address `—` for that Halted VM, and Conditions matching the filtered VM conditions
+  (`Type=Status`, or `—` when the filtered list is empty). With a subset of rows selected: export
+  dropdown options, selected-only CSV content, and export-all CSV content for two Halted VMs.
 - **Out-of-Scope:** Empty-list disable (covered by Jest). Loading disabled state. CSV export on
   other virtualization list views (shared `KubevirtTableExport` component). Column-management
   hiding columns or enabling additional columns (Created, Memory, CPU, Network) before export.
-  Populated Conditions / IP values on a Running VM.
+  Populated Conditions / IP values on a Running VM. Select-all / filters-clear-selection behavior.
 
 ## 3. Test Environment & Prerequisites
 
 - **Environment:** OpenShift with CNV operator installed; Playwright `Tier1` project.
 - **Configuration:** No special feature gates required.
-- **Initial Setup:** `beforeAll` creates one namespace and one Halted VM. `afterAll` deletes the VM.
-  Each test opens the namespaced VirtualMachines list tab through the UI.
+- **Initial Setup:** `beforeAll` creates one namespace and two Halted VMs. `afterAll` deletes both
+  VMs. Each test opens the namespaced VirtualMachines list tab through the UI.
 
 ---
 
@@ -48,21 +53,40 @@ exported as `Type=Status` values, or `—` when none remain after the list filte
 
 ### `001`: Exporting the namespaced VM list downloads CSV with listed VMs
 
-- **Objective:** Verify that clicking export on a namespaced VirtualMachines list downloads a CSV
-  whose filename includes the namespace, whose header includes Name, Conditions, and IP address and
-  excludes Actions, and whose Halted VM row has the VM name, filtered Conditions (`Type=Status` or
-  `—`), and IP address `—`.
+- **Objective:** Verify that clicking export on a namespaced VirtualMachines list with no row
+  selection downloads a CSV whose filename includes the namespace, whose header includes Name,
+  Conditions, and IP address and excludes Actions, and whose Halted VM row has the VM name, filtered
+  Conditions (`Type=Status` or `—`), and IP address `—`.
 - **Target version:** CNV 5.1.0
 - **Jira References:** CNV-89111, CNV-96389
-- **Pre-conditions:** A Halted VM exists in a dedicated test namespace
+- **Pre-conditions:** Two Halted VMs exist in a dedicated test namespace; no table rows are selected
 - **Tags:** `@adminOnly`
 
 | Step | Action                                   | Expected Result                                                                                                                                      |
 | :--- | :--------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 1    | Open the namespaced VirtualMachines list | The Halted VM row is visible                                                                                                                         |
-| 2    | Click the CSV export button              | A CSV file is downloaded                                                                                                                             |
+| 2    | Click the CSV export button              | A CSV file is downloaded immediately (no dropdown)                                                                                                   |
 | 3    | Observe the downloaded filename          | Filename ends with `<namespace>-virtual-machines.csv`                                                                                                |
 | 4    | Observe CSV headers and the VM row       | Header includes Name, Conditions, and IP address, and does not include Actions. The Halted VM row has the VM name, Conditions matching the filtered VM conditions (`Type=Status` or `—`), and IP address `—` |
+
+---
+
+### `002`: Export dropdown downloads selected VMs or the full filtered list
+
+- **Objective:** Verify that with one of two listed VMs checked, the export control opens a dropdown
+  and **Export selected** downloads only the checked VM while **Export all** downloads both VMs.
+- **Target version:** CNV 5.1.0
+- **Jira References:** CNV-96285
+- **Pre-conditions:** Two Halted VMs exist in a dedicated test namespace and both are visible in the
+  namespaced list
+- **Tags:** `@adminOnly`
+
+| Step | Action                                              | Expected Result                                              |
+| :--- | :-------------------------------------------------- | :----------------------------------------------------------- |
+| 1    | Open the namespaced VirtualMachines list            | Both Halted VM rows are visible                              |
+| 2    | Select one VM with its row checkbox                 | The VM is checked                                            |
+| 3    | Click export and choose **Export selected**         | A CSV is downloaded whose Name column contains only that VM  |
+| 4    | Click export and choose **Export all**              | A CSV is downloaded whose Name column contains both test VMs |
 
 ---
 
@@ -72,6 +96,7 @@ exported as `Type=Status` values, or `—` when none remain after the list filte
 | ----------- | ------------ | ------------------------- | --------- |
 | CNV-89111   | `001`        | Feature coverage          | Automated |
 | CNV-96389   | `001`        | Bugfix regression guard   | Automated |
+| CNV-96285   | `002`        | Bugfix regression guard   | Automated |
 
 **Coverage Type values:**
 

@@ -7,6 +7,8 @@ import type { Page } from '@playwright/test';
 
 import BaseComponent from './base-component';
 
+export type TableExportScope = 'all' | 'selected';
+
 export default class TableExportComponent extends BaseComponent {
   private readonly _exportButton = this.testId('export-table-csv');
 
@@ -14,7 +16,9 @@ export default class TableExportComponent extends BaseComponent {
     super(page);
   }
 
-  async downloadCsvExport(): Promise<{ content: string; filename: string }> {
+  async downloadCsvExport(
+    scope?: TableExportScope,
+  ): Promise<{ content: string; filename: string }> {
     await this._exportButton.waitFor({
       state: 'visible',
       timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
@@ -22,6 +26,18 @@ export default class TableExportComponent extends BaseComponent {
 
     const downloadPromise = this.page.waitForEvent('download');
     await this.robustClick(this._exportButton);
+
+    if (scope) {
+      const item = this.testId(
+        scope === 'selected' ? 'export-table-csv-selected' : 'export-table-csv-all',
+      );
+      await item.waitFor({
+        state: 'visible',
+        timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+      });
+      await this.robustClick(item);
+    }
+
     const download = await downloadPromise;
 
     const failure = await download.failure();
