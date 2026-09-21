@@ -492,6 +492,59 @@ export default class VmListActionsComponent extends BaseComponent {
     return (await body.textContent()) ?? '';
   }
 
+  async getDeleteModalListedResources(): Promise<Array<{ kind: string; name: string }>> {
+    const resourceCheckbox = this._dialogModal.locator(
+      [
+        'input[type="checkbox"][id^="DataVolume-"]',
+        'input[type="checkbox"][id^="PersistentVolumeClaim-"]',
+        'input[type="checkbox"][id^="VirtualMachineSnapshot-"]',
+      ].join(', '),
+    );
+    await resourceCheckbox
+      .first()
+      .waitFor({ state: 'attached', timeout: TestTimeouts.ELEMENT_WAIT })
+      .catch(() => undefined);
+
+    const count = await resourceCheckbox.count();
+    const resources: Array<{ kind: string; name: string }> = [];
+
+    for (let index = 0; index < count; index++) {
+      const id = await resourceCheckbox.nth(index).getAttribute('id');
+      if (!id) continue;
+
+      if (id.startsWith('DataVolume-')) {
+        resources.push({ kind: 'DataVolume', name: id.slice('DataVolume-'.length) });
+        continue;
+      }
+      if (id.startsWith('PersistentVolumeClaim-')) {
+        resources.push({
+          kind: 'PersistentVolumeClaim',
+          name: id.slice('PersistentVolumeClaim-'.length),
+        });
+        continue;
+      }
+      if (id.startsWith('VirtualMachineSnapshot-')) {
+        resources.push({
+          kind: 'VirtualMachineSnapshot',
+          name: id.slice('VirtualMachineSnapshot-'.length),
+        });
+      }
+    }
+
+    return resources;
+  }
+
+  async waitForDeleteModalLoaded(timeoutMs = TestTimeouts.VM_CREATION): Promise<void> {
+    await this._dialogModal.waitFor({ state: 'visible', timeout: timeoutMs });
+    const loadingSpinner = this._dialogModal.getByTestId('loading-spinner');
+    await loadingSpinner.waitFor({ state: 'hidden', timeout: timeoutMs }).catch(() => undefined);
+    await this._dialogModal
+      .getByText(
+        /Select the resources you want to permanently delete|No additional resources to delete/,
+      )
+      .waitFor({ state: 'visible', timeout: timeoutMs });
+  }
+
   async getDeletionCountFromModal(): Promise<number | null> {
     try {
       const modalTitle = this.locator('.pf-v6-c-modal-box__title, .pf-c-modal-box__title');

@@ -328,6 +328,41 @@ export class VirtualMachineProxyHandler {
     });
   }
 
+  async attachDataVolumeToVm(
+    namespace: string,
+    vmName: string,
+    dataVolumeName: string,
+    diskName: string,
+  ): Promise<KubernetesResource | null> {
+    const vm = await this.get(namespace, vmName);
+    if (!vm) return null;
+
+    const spec = vm.spec as Record<string, unknown>;
+    const templateSpec =
+      ((spec?.template as Record<string, unknown>)?.spec as Record<string, unknown>) || {};
+    const domain = (templateSpec.domain as Record<string, unknown>) || {};
+    const devices = (domain.devices as Record<string, unknown>) || {};
+    const existingDisks = (devices.disks as Array<Record<string, unknown>>) || [];
+    const existingVolumes = (templateSpec.volumes as Array<Record<string, unknown>>) || [];
+
+    const disks = [...existingDisks, { name: diskName, disk: { bus: 'virtio' } }];
+    const volumes = [
+      ...existingVolumes,
+      { name: diskName, dataVolume: { name: dataVolumeName } },
+    ];
+
+    return this.mergePatch(namespace, vmName, {
+      spec: {
+        template: {
+          spec: {
+            domain: { devices: { disks } },
+            volumes,
+          },
+        },
+      },
+    });
+  }
+
   async hotplugVolumeToVm(
     namespace: string,
     vmName: string,
