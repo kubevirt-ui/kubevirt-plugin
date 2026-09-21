@@ -10,6 +10,9 @@ import NodeCheckerAlert from '@kubevirt-utils/components/NodeSelectorModal/compo
 import { useIDEntities } from '@kubevirt-utils/components/NodeSelectorModal/hooks/useIDEntities';
 import { useNodeLabelQualifier } from '@kubevirt-utils/components/NodeSelectorModal/hooks/useNodeLabelQualifier';
 import {
+  getIncompleteSelectorLabelsTooltip,
+  hasIncompleteSelectorLabels,
+  idLabelsToNodeSelector,
   isEqualObject,
   nodeSelectorToIDLabels,
 } from '@kubevirt-utils/components/NodeSelectorModal/utils/helpers';
@@ -44,6 +47,7 @@ const NodeSelectorModal: FC<NodeSelectorModalProps> = ({ isOpen, onClose, onSubm
   });
 
   const qualifiedNodes = useNodeLabelQualifier(nodes, nodesLoaded, selectorLabels);
+  const isIncomplete = hasIncompleteSelectorLabels(selectorLabels);
 
   const onSelectorLabelAdd = (): void => {
     onLabelAdd({ id: null, key: '', value: '' });
@@ -57,13 +61,7 @@ const NodeSelectorModal: FC<NodeSelectorModalProps> = ({ isOpen, onClose, onSubm
           draftVM.spec.template.spec.nodeSelector = {};
         }
 
-        const k8sSelector: { [key: string]: string } = selectorLabels.reduce(
-          (acc, { key, value }) => {
-            acc[key] = value;
-            return acc;
-          },
-          {},
-        );
+        const k8sSelector = idLabelsToNodeSelector(selectorLabels);
 
         if (!isEqualObject(getNodeSelector(templateDraft), k8sSelector)) {
           draftVM.spec.template.spec.nodeSelector = k8sSelector;
@@ -75,11 +73,13 @@ const NodeSelectorModal: FC<NodeSelectorModalProps> = ({ isOpen, onClose, onSubm
   return (
     <TabModal
       headerText={t('Node selector')}
+      isDisabled={isIncomplete}
       isOpen={isOpen}
       obj={updatedTemplate}
       onClose={onClose}
       onSubmit={onSubmit}
       shouldWrapInForm
+      submitDisabledTooltip={getIncompleteSelectorLabelsTooltip(isIncomplete, t)}
     >
       <LabelsList
         isEmpty={selectorLabels?.length === 0}
