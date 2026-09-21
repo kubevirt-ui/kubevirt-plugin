@@ -12,6 +12,8 @@ type InlineFilterSelectOptionContentProps = {
 const InlineFilterSelectOptionContent: FC<InlineFilterSelectOptionContentProps> = ({
   option,
 }): JSX.Element => {
+  if (!option) return null;
+
   const name = String(option.label ?? option.value);
 
   return !isEmpty(option?.groupVersionKind) ? (

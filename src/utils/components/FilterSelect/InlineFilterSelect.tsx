@@ -77,6 +77,8 @@ const InlineFilterSelect: FC<InlineFilterSelectProps> = ({
     if (isEmpty(selected)) return placeholder;
 
     const selectOption = options?.find((opt) => opt?.value === selected);
+    if (!selectOption) return selected;
+
     return <InlineFilterSelectOptionContent option={selectOption} />;
   }, [selected, placeholder, options]);
 

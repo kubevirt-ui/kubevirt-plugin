@@ -5,11 +5,12 @@ import { createSSHSecret, getInitialSSHDetails } from '@kubevirt-utils/resources
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { getVMSSHSecretName } from '@kubevirt-utils/resources/vm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { useDynamicSSHInjection } from '@virtualmachines/details/tabs/configuration/ssh/hooks/useDynamicSSHInjection';
 
 import { isEqualObject } from '../NodeSelectorModal/utils/helpers';
 import SSHSecretModal from '../SSHSecretModal/SSHSecretModal';
 import { SecretSelectionOption, type SSHSecretDetails } from '../SSHSecretModal/utils/types';
-import { addSecretToVM, detachVMSecret } from '../SSHSecretModal/utils/utils';
+import { addSecretToVM, removeSecretFromVM } from '../SSHSecretModal/utils/utils';
 
 type VMSSHSecretModalProps = {
   authorizedSSHKeys: { [namespace: string]: string };
@@ -29,6 +30,7 @@ const VMSSHSecretModal: FC<VMSSHSecretModalProps> = ({
   vm,
 }) => {
   const [namespace, secretName] = useMemo(() => [getNamespace(vm), getVMSSHSecretName(vm)], [vm]);
+  const shouldUseDynamicSSH = useDynamicSSHInjection(vm);
 
   const initialSSHDetails = useMemo(
     () =>
@@ -55,7 +57,7 @@ const VMSSHSecretModal: FC<VMSSHSecretModalProps> = ({
         secretOption === SecretSelectionOption.None &&
         initialSSHDetails.secretOption !== SecretSelectionOption.None
       ) {
-        return detachVMSecret(vm);
+        return updateVM(removeSecretFromVM(vm, secretName));
       }
 
       if (
@@ -63,7 +65,7 @@ const VMSSHSecretModal: FC<VMSSHSecretModalProps> = ({
         initialSSHDetails.sshSecretName !== sshSecretName &&
         !isEmpty(sshSecretName)
       ) {
-        return updateVM(addSecretToVM(vm, sshSecretName));
+        return updateVM(addSecretToVM(vm, sshSecretName, shouldUseDynamicSSH));
       }
 
       if (
@@ -72,13 +74,22 @@ const VMSSHSecretModal: FC<VMSSHSecretModalProps> = ({
         !isEmpty(sshSecretName)
       ) {
         return createSSHSecret(sshPubKey, sshSecretName, getNamespace(vm)).then(() =>
-          updateVM(addSecretToVM(vm, sshSecretName)),
+          updateVM(addSecretToVM(vm, sshSecretName, shouldUseDynamicSSH)),
         );
       }
 
       return Promise.resolve();
     },
-    [authorizedSSHKeys, initialSSHDetails, namespace, updateAuthorizedSSHKeys, updateVM, vm],
+    [
+      authorizedSSHKeys,
+      initialSSHDetails,
+      namespace,
+      secretName,
+      shouldUseDynamicSSH,
+      updateAuthorizedSSHKeys,
+      updateVM,
+      vm,
+    ],
   );
 
   return (
