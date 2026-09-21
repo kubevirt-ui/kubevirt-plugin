@@ -56,7 +56,7 @@ const buildSSHServiceFromVM = (
       },
       type,
     },
-  } as unknown as IoK8sApiCoreV1Service;
+  };
 };
 
 export const deleteSSHService = (
