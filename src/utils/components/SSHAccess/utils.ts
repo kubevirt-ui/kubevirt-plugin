@@ -48,7 +48,7 @@ const buildSSHServiceFromVM = (
       ports: [
         {
           port: PORT,
-          targetPort: String(SSH_PORT),
+          targetPort: SSH_PORT,
         },
       ],
       selector: {
