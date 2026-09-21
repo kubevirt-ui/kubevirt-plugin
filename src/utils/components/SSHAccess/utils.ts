@@ -48,7 +48,7 @@ const buildSSHServiceFromVM = (
       ports: [
         {
           port: PORT,
-          targetPort: String(SSH_PORT),
+          targetPort: SSH_PORT,
         },
       ],
       selector: {
@@ -56,7 +56,7 @@ const buildSSHServiceFromVM = (
       },
       type,
     },
-  };
+  } as unknown as IoK8sApiCoreV1Service;
 };
 
 export const deleteSSHService = (
