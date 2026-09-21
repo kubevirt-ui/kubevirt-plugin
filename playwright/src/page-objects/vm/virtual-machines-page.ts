@@ -1,4 +1,6 @@
-import TableExportComponent from '@/components/shared/table-export-component';
+import TableExportComponent, {
+  type TableExportScope,
+} from '@/components/shared/table-export-component';
 import VmListActionsComponent from '@/components/vm/vm-list-actions-component';
 import VmListComponent from '@/components/vm/vm-list-component';
 import VmListOverviewWidgetsComponent from '@/components/vm/vm-list-overview-widgets-component';
@@ -325,8 +327,10 @@ export default class VirtualMachinesPage extends TreeContextMenuMixin(PageCommon
     return this.overviewWidgets.clickVmListTab();
   }
 
-  async downloadCsvExport(): Promise<{ content: string; filename: string }> {
-    return this.tableExport.downloadCsvExport();
+  async downloadCsvExport(
+    scope?: TableExportScope,
+  ): Promise<{ content: string; filename: string }> {
+    return this.tableExport.downloadCsvExport(scope);
   }
 
   async clickVmName(vmName: string, namespace: string): Promise<void> {

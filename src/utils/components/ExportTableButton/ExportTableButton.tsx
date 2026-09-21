@@ -7,6 +7,8 @@ import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Button, ButtonVariant, ToolbarItem, Tooltip } from '@patternfly/react-core';
 import { ExportIcon } from '@patternfly/react-icons';
 
+import ExportTableDropdown from './components/ExportTableDropdown';
+
 type ExportTableButtonProps<TData, TCallbacks = undefined> = {
   activeColumnKeys?: string[];
   /** When true, renders as a PatternFly ToolbarItem (use inside TableToolbarActionsGroup). */
@@ -17,6 +19,7 @@ type ExportTableButtonProps<TData, TCallbacks = undefined> = {
   filename: string;
   isDisabled?: boolean;
   loaded?: boolean;
+  selectedData?: TData[];
 };
 
 const ExportTableButton = <TData, TCallbacks = undefined>({
@@ -28,15 +31,28 @@ const ExportTableButton = <TData, TCallbacks = undefined>({
   filename,
   isDisabled,
   loaded = true,
+  selectedData,
 }: ExportTableButtonProps<TData, TCallbacks>): JSX.Element => {
   const { t } = useKubevirtTranslation();
 
   const disabled = isDisabled ?? (!loaded || isEmpty(data));
+  const hasSelection = !isEmpty(selectedData);
 
-  const handleExport = useCallback(() => {
-    if (disabled) return;
-    exportToCSV(data, columns, filename, activeColumnKeys, callbacks);
-  }, [activeColumnKeys, callbacks, columns, data, disabled, filename]);
+  const exportRows = useCallback(
+    (rows: TData[]) => {
+      if (disabled) return;
+      exportToCSV(rows, columns, filename, activeColumnKeys, callbacks);
+    },
+    [activeColumnKeys, callbacks, columns, disabled, filename],
+  );
+
+  const handleExportAll = useCallback(() => {
+    exportRows(data);
+  }, [data, exportRows]);
+
+  const handleExportSelected = useCallback(() => {
+    exportRows(selectedData ?? []);
+  }, [exportRows, selectedData]);
 
   const tooltipContent = useMemo(() => {
     if (!loaded) {
@@ -48,7 +64,17 @@ const ExportTableButton = <TData, TCallbacks = undefined>({
     return t('Export table data as CSV');
   }, [data, loaded, t]);
 
-  const button = (
+  const control = hasSelection ? (
+    <ExportTableDropdown
+      allCount={data.length}
+      asToolbarItem={asToolbarItem}
+      disabled={disabled}
+      onExportAll={handleExportAll}
+      onExportSelected={handleExportSelected}
+      selectedCount={selectedData?.length ?? 0}
+      tooltipContent={tooltipContent}
+    />
+  ) : (
     <Tooltip content={tooltipContent} trigger="mouseenter focus">
       <Button
         aria-label={t('Export table data to CSV')}
@@ -56,17 +82,17 @@ const ExportTableButton = <TData, TCallbacks = undefined>({
         data-test="export-table-csv"
         icon={<ExportIcon />}
         isAriaDisabled={disabled}
-        onClick={handleExport}
+        onClick={handleExportAll}
         variant={ButtonVariant.plain}
       />
     </Tooltip>
   );
 
   if (asToolbarItem) {
-    return <ToolbarItem>{button}</ToolbarItem>;
+    return <ToolbarItem>{control}</ToolbarItem>;
   }
 
-  return button;
+  return control;
 };
 
 export default ExportTableButton;
