@@ -8,6 +8,7 @@ import {
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import {
+  type CloudInitUserData,
   convertUserDataObjectToYAML,
   convertYAMLUserDataObject,
 } from '@kubevirt-utils/components/CloudinitModal/utils/cloudinit-utils';
@@ -16,6 +17,11 @@ import { getAccessCredentials } from '@kubevirt-utils/resources/vm';
 import { generatePrettyName, isEmpty, validateSSHPublicKey } from '@kubevirt-utils/utils/utils';
 
 import { DYNAMIC_SSH_INJECTION_CMD, MIN_NAME_LENGTH_FOR_GENERATED_SUFFIX } from './constants';
+
+const getFallbackUserData = (): CloudInitUserData => ({
+  password: '',
+  user: '',
+});
 
 export const getAllSecretsFromSecretData = (
   secretsResourceData: IoK8sApiCoreV1Secret[],
@@ -69,7 +75,8 @@ export const getCloudInitConfigDrive = (
   isDynamic: boolean,
   cloudInitVolumeData: V1CloudInitConfigDriveSource | V1CloudInitNoCloudSource,
 ): V1CloudInitConfigDriveSource => {
-  const userData = convertYAMLUserDataObject(cloudInitVolumeData?.userData);
+  const userData: CloudInitUserData =
+    convertYAMLUserDataObject(cloudInitVolumeData?.userData) ?? getFallbackUserData();
 
   userData.runcmd ??= [];
 
