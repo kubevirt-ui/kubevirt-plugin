@@ -1,5 +1,4 @@
 import React, { type FC, useState } from 'react';
-import { Trans } from 'react-i18next';
 
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { TELEMETRY_VM_ACTION } from '@kubevirt-utils/extensions/telemetry';
@@ -8,6 +7,7 @@ import { getName } from '@kubevirt-utils/resources/shared';
 import { Modal, ModalBody, ModalHeader, Stack, StackItem } from '@patternfly/react-core';
 import { deleteVM } from '@virtualmachines/actions/actions';
 import {
+  getClusters,
   getNamespaces,
   runActionOnVMs,
 } from '@virtualmachines/actions/components/ConfirmMultipleVMActionsModal/utils/utils';
@@ -15,7 +15,7 @@ import {
 import DeleteAllVMsConfirmation from './components/DeleteAllConfirmation';
 import DeleteAllVMsFooter from './components/DeleteAllVMsFooter';
 import DeleteAllVMsList from './components/DeleteAllVmsList';
-import DeleteModalMultipleProjectNames from './components/VMsNamespaceDeleteModal';
+import { DeleteAllVMsTitle } from './components/DeleteAllVMsTitle';
 import { DEFAULT_VM_COUNT } from './constants';
 
 import './delete-all-vms.scss';
@@ -39,9 +39,9 @@ const DeleteAllVMsConfirmationModal: FC<DeleteAllVMsConfirmationModalProps> = ({
   const [error, setError] = useState<Error | undefined>();
 
   const namespaces = getNamespaces(vms);
-  const firstProjectName = namespaces[0];
-  const extraNamespaces = namespaces.slice(1);
   const hasMultipleNamespaces = namespaces.length > 1;
+  const clusters = getClusters(vms);
+  const hasMultipleClusters = clusters.length > 1;
 
   const filteredVMs = searchVirtualMachines
     ? vms.filter((vm) => getName(vm)?.includes(searchVirtualMachines))
@@ -80,14 +80,6 @@ const DeleteAllVMsConfirmationModal: FC<DeleteAllVMsConfirmationModalProps> = ({
     }
   };
 
-  const projectDisplay = (
-    <DeleteModalMultipleProjectNames
-      extraNamespaces={extraNamespaces}
-      firstProjectName={firstProjectName}
-      hasMultipleNamespaces={hasMultipleNamespaces}
-    />
-  );
-
   return (
     <Modal
       isOpen={isOpen}
@@ -100,15 +92,18 @@ const DeleteAllVMsConfirmationModal: FC<DeleteAllVMsConfirmationModalProps> = ({
       <ModalBody>
         <Stack hasGutter>
           <StackItem>
-            <Trans ns="plugin__kubevirt-plugin" t={t}>
-              Are you sure you want to delete <strong>{{ numVMs }} VirtualMachines</strong> <br />{' '}
-              in project {projectDisplay}. All the selected VMs and their associated data will be
-              lost.
-            </Trans>
+            <DeleteAllVMsTitle
+              clusters={clusters}
+              hasMultipleClusters={hasMultipleClusters}
+              hasMultipleNamespaces={hasMultipleNamespaces}
+              namespaces={namespaces}
+              numVMs={numVMs}
+            />
           </StackItem>
           <DeleteAllVMsList
             filteredVMs={filteredVMs}
             handleSearchVirtualMachines={handleSearchVirtualMachines}
+            hasMultipleClusters={hasMultipleClusters}
             hasMultipleNamespaces={hasMultipleNamespaces}
             searchVirtualMachines={searchVirtualMachines}
             setShowAll={setShowAll}
