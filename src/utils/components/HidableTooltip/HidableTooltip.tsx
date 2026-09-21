@@ -19,7 +19,7 @@ const HidableTooltip: FC<HidableTooltipProps> = ({
     <>{children}</>
   ) : (
     <Tooltip content={content} position={position}>
-      <>{children}</>
+      <span>{children}</span>
     </Tooltip>
   );
 };

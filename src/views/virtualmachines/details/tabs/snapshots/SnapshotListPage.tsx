@@ -1,38 +1,24 @@
 import { type FC } from 'react';
 
-import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
-import SnapshotModal from '@kubevirt-utils/components/SnapshotModal/SnapshotModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import {
-  ListPageBody,
-  ListPageCreateButton,
-  ListPageHeader,
-} from '@openshift-console/dynamic-plugin-sdk';
+import { ListPageBody, ListPageHeader } from '@openshift-console/dynamic-plugin-sdk';
 import { type NavPageComponentProps } from '@virtualmachines/details/utils/types';
 
 import { printableVMStatus } from '../../../utils';
 import SnapshotList from './components/list/SnapshotList';
+import TakeSnapshotButton from './components/TakeSnapshotButton/TakeSnapshotButton';
 import useSnapshotData from './hooks/useSnapshotData';
 
 import './SnapshotListPage.scss';
 
 const SnapshotListPage: FC<NavPageComponentProps> = ({ obj: vm }) => {
   const { t } = useKubevirtTranslation();
-  const { createModal } = useModal();
   const { error, loaded, restoresMap, snapshots } = useSnapshotData(vm);
 
   return (
     <>
       <ListPageHeader title={t('Snapshots')}>
-        <ListPageCreateButton
-          onClick={() =>
-            createModal(({ isOpen, onClose }) => (
-              <SnapshotModal isOpen={isOpen} onClose={onClose} vm={vm} />
-            ))
-          }
-        >
-          {t('Take snapshot')}
-        </ListPageCreateButton>
+        <TakeSnapshotButton variant="listPageCreateButton" vm={vm} />
       </ListPageHeader>
       <ListPageBody>
         <SnapshotList
