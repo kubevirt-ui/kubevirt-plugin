@@ -43,8 +43,9 @@ export default class OverviewSettingsComponent extends BaseComponent {
   private readonly _loadBalancerServiceBtn = this.locator(
     'button:has-text("LoadBalancer service")',
   );
-  private readonly _nodePortFeatureInputTypeCheckbox = this.locator(
-    '#node-port-feature input[type="checkbox"]',
+  private readonly _nodePortFeatureInputTypeCheckbox = this.testId('node-port');
+  private readonly _nodePortServiceButton = this.locator(
+    'button:has-text("SSH over NodePort service")',
   );
   private readonly _passtUDNNetworkCheckbox = this.testId('passtUDNNetwork');
   private readonly _pfV6CFormGroupsubscriptionLabel = this.locator(
@@ -83,6 +84,20 @@ export default class OverviewSettingsComponent extends BaseComponent {
       timeout: TestTimeouts.UI_VISIBILITY_QUICK,
     });
     await this.robustClick(this._sshConfigurationsButton);
+  }
+
+  private async waitForFeaturesConfigMapPatch(action: () => Promise<void>): Promise<void> {
+    const patchPromise = this.page.waitForResponse(
+      (response) =>
+        response.url().includes('kubevirt-ui-features') &&
+        response.request().method() === 'PATCH' &&
+        response.status() >= 200 &&
+        response.status() < 300,
+      { timeout: TestTimeouts.DEFAULT },
+    );
+
+    await action();
+    await patchPromise;
   }
 
   private async waitForSuccessAlertVisible(): Promise<boolean> {
@@ -274,26 +289,25 @@ export default class OverviewSettingsComponent extends BaseComponent {
   async enableSSHOverNodePort(nodeAddress?: string): Promise<boolean> {
     try {
       await this.navigateToSettings();
-      await this.openSshConfigurations();
+      await this.openSSHOverNodePortConfiguration();
 
       if (nodeAddress) {
-        await this._inputIdNodeAddress.waitFor({
-          state: 'visible',
-          timeout: TestTimeouts.UI_VISIBILITY_QUICK,
-        });
-        await this._inputIdNodeAddress.clear();
-        await this._inputIdNodeAddress.fill(nodeAddress);
+        await this.setSSHOverNodePortAddress(nodeAddress);
       }
 
-      await this._nodePortFeatureInputTypeCheckbox.waitFor({
-        state: 'visible',
-        timeout: TestTimeouts.UI_VISIBILITY_QUICK,
-      });
-      await this._nodePortFeatureInputTypeCheckbox.click({ force: true });
+      await this.setSSHOverNodePortEnabled(true);
       return true;
     } catch {
       return false;
     }
+  }
+
+  async isSSHOverNodePortEnabled(): Promise<boolean> {
+    return this._nodePortFeatureInputTypeCheckbox.isEnabled();
+  }
+
+  async isSSHOverNodePortChecked(): Promise<boolean> {
+    return this._nodePortFeatureInputTypeCheckbox.isChecked();
   }
 
   async enableSSHUsingLoadBalancer(): Promise<boolean> {
@@ -826,6 +840,19 @@ export default class OverviewSettingsComponent extends BaseComponent {
     await this.navigateToSettingsViaSidebar();
   }
 
+  async openSSHOverNodePortConfiguration(): Promise<void> {
+    await this.openSshConfigurations();
+    await this._nodePortServiceButton.waitFor({
+      state: 'visible',
+      timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+    });
+    await this.robustClick(this._nodePortServiceButton);
+    await this._inputIdNodeAddress.waitFor({
+      state: 'visible',
+      timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+    });
+  }
+
   async navigateToTemplatesAndImagesManagement(): Promise<boolean> {
     try {
       await this._templatesAndImagesManagementBtn.waitFor({
@@ -850,6 +877,20 @@ export default class OverviewSettingsComponent extends BaseComponent {
     } catch {
       return false;
     }
+  }
+
+  async setSSHOverNodePortAddress(nodeAddress: string): Promise<void> {
+    await this.waitForFeaturesConfigMapPatch(async () => {
+      await this._inputIdNodeAddress.fill(nodeAddress);
+    });
+  }
+
+  async setSSHOverNodePortEnabled(enabled: boolean): Promise<void> {
+    if ((await this._nodePortFeatureInputTypeCheckbox.isChecked()) === enabled) return;
+
+    await this.waitForFeaturesConfigMapPatch(async () => {
+      await this._nodePortFeatureInputTypeCheckbox.click({ force: true });
+    });
   }
 
   async setGuestSystemLog(enabled: boolean): Promise<boolean> {

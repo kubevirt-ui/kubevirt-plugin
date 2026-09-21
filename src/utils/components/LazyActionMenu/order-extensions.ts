@@ -61,7 +61,6 @@ export const insertPositionedItems = <T extends ItemsToSort>(
     return;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const [positionedItems, sortedItems] = partition(insertItems, (item) =>
     isPositioned<T>(item, insertItems),
   );
@@ -82,7 +81,7 @@ export const orderExtensionBasedOnInsertBeforeAndAfter = <T extends ItemsToSort>
   if (isEmpty(items)) {
     return [];
   }
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+
   const [positionedItems, sortedItems] = partition(items, (item) => isPositioned<T>(item, items));
   insertPositionedItems<T>(positionedItems, sortedItems);
   return sortedItems;

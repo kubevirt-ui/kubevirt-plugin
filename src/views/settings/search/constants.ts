@@ -14,6 +14,7 @@ export const CLUSTER_TAB_IDS = {
   persistentReservation: 'persistent-reservation',
   resourceManagement: 'resource-management',
   sshConfiguration: 'ssh-configuration',
+  sshOverNodePortService: 'ssh-over-node-port-service',
   templatesManagement: 'templates-management',
   templatesProject: 'templates-project',
   virtualizationFeatures: 'virtualization-features',
