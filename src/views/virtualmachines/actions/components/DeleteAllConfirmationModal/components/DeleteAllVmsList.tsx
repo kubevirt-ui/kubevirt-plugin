@@ -3,6 +3,7 @@ import type { FC } from 'react';
 import type { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
+import { getCluster } from '@multicluster/helpers/selectors';
 import { Button, Form, FormGroup, SearchInput, Stack, StackItem } from '@patternfly/react-core';
 
 import { DEFAULT_VM_COUNT } from '../constants';
@@ -33,7 +34,7 @@ const DeleteAllVMsList: FC<DeleteAllVMsListProps> = ({
   const vmsList = visibleVMs.map((vm) => (
     <StackItem key={`${getNamespace(vm)}/${getName(vm)}`}>
       {hasMultipleNamespaces ? `${getNamespace(vm)}/ ` : ''}
-      {getName(vm)}
+      {getName(vm)} {`(${t('Cluster: {{clusterName}}', { clusterName: getCluster(vm) ?? '-' })})`}
     </StackItem>
   ));
 
