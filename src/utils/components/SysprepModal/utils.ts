@@ -18,6 +18,18 @@ type IsSysprepSubmitDisabledParams = {
 export const getInitialSysprepSelection = (sysprepSelected?: string): SysprepSelectionOption =>
   !isEmpty(sysprepSelected) ? SysprepSelectionOption.UseExisting : SysprepSelectionOption.None;
 
+export const resolveSysprepSelection = (
+  selectionOption: SysprepSelectionOption,
+  sysprepSelected?: string,
+  canCreateConfigMap = true,
+): SysprepSelectionOption => {
+  if (selectionOption === SysprepSelectionOption.CreateNew && !canCreateConfigMap) {
+    return getInitialSysprepSelection(sysprepSelected);
+  }
+
+  return selectionOption;
+};
+
 export const isValidSysprepXml = (xml: string): boolean => {
   try {
     const doc = new DOMParser().parseFromString(xml, 'application/xml');

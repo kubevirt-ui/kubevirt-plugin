@@ -100,16 +100,10 @@ export default class SysprepModalComponent extends BaseComponent {
     const section = this.testId('sysprep-button');
 
     return this.waitForCondition(async () => {
-      const notAvailableVisible = await section
+      return section
         .getByText('Not available')
         .isVisible()
         .catch(() => false);
-      if (notAvailableVisible) {
-        return true;
-      }
-
-      const sectionText = await section.textContent().catch(() => null);
-      return !sectionText?.match(SYSPREP_CONFIG_MAP_NAME_PATTERN);
     }, TestTimeouts.STATUS_VALIDATION);
   }
 

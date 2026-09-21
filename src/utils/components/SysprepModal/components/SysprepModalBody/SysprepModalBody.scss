@@ -1,8 +1,5 @@
 .sysprep-modal-section {
-  &__form-group {
-    margin-top: var(--pf-t--global--spacer--md);
-  }
-
+  &__form-group,
   &__radio-group {
     margin-top: var(--pf-t--global--spacer--md);
   }

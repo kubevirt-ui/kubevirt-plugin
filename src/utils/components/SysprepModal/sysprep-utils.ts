@@ -5,6 +5,7 @@ import {
   type V1VirtualMachine,
   type V1Volume,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { getName } from '@kubevirt-utils/resources/shared';
 import { getDisks, getVolumes } from '@kubevirt-utils/resources/vm';
 import { generatePrettyName } from '@kubevirt-utils/utils/utils';
 
@@ -31,7 +32,7 @@ export const isSysprepConfigMap = (configmap: IoK8sApiCoreV1ConfigMap): boolean 
     return true;
   }
 
-  const name = configmap?.metadata?.name ?? '';
+  const name = getName(configmap) ?? '';
 
   return name.startsWith(SYSPREP_CONFIG_MAP_NAME_PREFIX);
 };

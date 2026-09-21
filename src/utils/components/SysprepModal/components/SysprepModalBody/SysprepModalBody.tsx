@@ -45,10 +45,7 @@ const SysprepModalBody: FC<SysprepModalBodyProps> = ({
       <SysprepSelectionRadioGroup
         canCreateConfigMap={canCreateConfigMap}
         selectedOption={selectionOption}
-        setAutoUnattend={setAutoUnattend}
         setSelectedOption={setSelectionOption}
-        setSelectedSysprepName={setSelectedSysprepName}
-        setUnattend={setUnattend}
       />
       {selectionOption === SysprepSelectionOption.UseExisting && (
         <Form>

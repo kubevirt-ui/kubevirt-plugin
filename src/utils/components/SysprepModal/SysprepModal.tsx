@@ -1,4 +1,4 @@
-import { type FC, useEffect, useState } from 'react';
+import { type FC, useState } from 'react';
 
 import { ConfigMapModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import useCanCreateResource from '@kubevirt-utils/hooks/useCanCreateResource';
@@ -8,7 +8,11 @@ import MutedTextSpan from '../MutedTextSpan/MutedTextSpan';
 import TabModal from '../TabModal/TabModal';
 import SysprepModalBody from './components/SysprepModalBody/SysprepModalBody';
 import { type SysprepModalProps, SysprepSelectionOption } from './types';
-import { getInitialSysprepSelection, isSysprepSubmitDisabled } from './utils';
+import {
+  getInitialSysprepSelection,
+  isSysprepSubmitDisabled,
+  resolveSysprepSelection,
+} from './utils';
 
 export const SysprepModal: FC<SysprepModalProps> = ({
   cluster,
@@ -31,20 +35,19 @@ export const SysprepModal: FC<SysprepModalProps> = ({
     getInitialSysprepSelection(sysprepSelected),
   );
   const [selectedSysprepName, setSelectedSysprepName] = useState(sysprepSelected ?? '');
-
-  useEffect(() => {
-    if (!canCreateConfigMap && selectionOption === SysprepSelectionOption.CreateNew) {
-      setSelectionOption(getInitialSysprepSelection(sysprepSelected));
-    }
-  }, [canCreateConfigMap, selectionOption, sysprepSelected]);
+  const resolvedSelectionOption = resolveSysprepSelection(
+    selectionOption,
+    sysprepSelected,
+    canCreateConfigMap,
+  );
 
   const submitHandler = async (): Promise<void> => {
-    if (selectionOption === SysprepSelectionOption.CreateNew && canCreateConfigMap) {
+    if (resolvedSelectionOption === SysprepSelectionOption.CreateNew && canCreateConfigMap) {
       return await onSysprepCreation(unattend, autoUnattend);
     }
 
     await onSysprepSelected(
-      selectionOption === SysprepSelectionOption.None ? '' : selectedSysprepName,
+      resolvedSelectionOption === SysprepSelectionOption.None ? '' : selectedSysprepName,
     );
   };
 
@@ -53,7 +56,7 @@ export const SysprepModal: FC<SysprepModalProps> = ({
     canCreateConfigMap,
     initialSysprepSelected: sysprepSelected,
     selectedSysprepName,
-    selectionOption,
+    selectionOption: resolvedSelectionOption,
     unattend,
   });
 
@@ -72,7 +75,7 @@ export const SysprepModal: FC<SysprepModalProps> = ({
         cluster={cluster}
         namespace={namespace}
         selectedSysprepName={selectedSysprepName}
-        selectionOption={selectionOption}
+        selectionOption={resolvedSelectionOption}
         setAutoUnattend={setAutoUnattend}
         setSelectedSysprepName={setSelectedSysprepName}
         setSelectionOption={setSelectionOption}

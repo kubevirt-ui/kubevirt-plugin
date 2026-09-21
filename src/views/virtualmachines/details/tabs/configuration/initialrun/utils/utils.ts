@@ -47,7 +47,7 @@ export const patchVMWithExistingSysprepConfigMap = async (
             op: 'replace',
             path: `/spec/template/spec/domain/devices/disks`,
             value: [
-              ...vmDisks.filter((disk) => disk?.name !== SYSPREP),
+              ...(vmDisks ?? []).filter((disk) => disk?.name !== SYSPREP),
               ...(!isEmpty(name) ? [sysprepDisk()] : []),
             ],
           },
@@ -55,7 +55,7 @@ export const patchVMWithExistingSysprepConfigMap = async (
             op: 'replace',
             path: `/spec/template/spec/volumes`,
             value: [
-              ...vmVolumes.filter((vol) => vol?.name !== SYSPREP),
+              ...(vmVolumes ?? []).filter((vol) => vol?.name !== SYSPREP),
               ...(!isEmpty(name) ? [sysprepVolume(name)] : []),
             ],
           },

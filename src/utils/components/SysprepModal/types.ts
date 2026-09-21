@@ -1,3 +1,12 @@
+import { type ValidatedOptions } from '@patternfly/react-core';
+
+export type SysprepFile = {
+  fileName: string;
+  isLoading: boolean;
+  validated: ValidatedOptions;
+  value: string;
+};
+
 export enum SysprepSelectionOption {
   CreateNew = 'createNew',
   None = 'none',

@@ -9,14 +9,9 @@ import {
   ValidatedOptions,
 } from '@patternfly/react-core';
 
+import { EMPTY_SYSPREP_FILE } from './consts';
+import { type SysprepFile } from './types';
 import { isValidSysprepXml } from './utils';
-
-export type SysprepFile = {
-  fileName: string;
-  isLoading: boolean;
-  validated: ValidatedOptions;
-  value: string;
-};
 
 type SysprepFileFieldProps = {
   id: string;
@@ -27,9 +22,7 @@ type SysprepFileFieldProps = {
 const SysprepFileField: FC<SysprepFileFieldProps> = ({ id, onChange, value }) => {
   const { t } = useKubevirtTranslation();
   const [data, setData] = useState<SysprepFile>({
-    fileName: '',
-    isLoading: false,
-    validated: ValidatedOptions.default,
+    ...EMPTY_SYSPREP_FILE,
     value: value ?? '',
   });
 
@@ -57,12 +50,7 @@ const SysprepFileField: FC<SysprepFileFieldProps> = ({ id, onChange, value }) =>
         isLoading={data.isLoading}
         isReadOnly={false}
         onClearClick={() => {
-          setData({
-            fileName: '',
-            isLoading: false,
-            validated: ValidatedOptions.default,
-            value: '',
-          });
+          setData(EMPTY_SYSPREP_FILE);
           onChange('');
         }}
         onDataChange={(_event: DropEvent, text: string) => onFieldChange(text)}
