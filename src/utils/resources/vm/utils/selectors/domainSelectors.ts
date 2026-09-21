@@ -57,9 +57,15 @@ export const getAccessCredentials = (vm: V1VirtualMachine): V1AccessCredential[]
 export const getIsDynamicSSHInjectionEnabled = (
   vm: V1VirtualMachine,
   bootableVolume?: BootableVolume,
-): boolean =>
-  getLabel(bootableVolume ?? vm, DYNAMIC_CREDENTIALS_SUPPORT) === 'true' &&
-  Boolean(getAccessCredentials(vm)?.[0]?.sshPublicKey?.propagationMethod?.qemuGuestAgent);
+): boolean => {
+  const sshPublicKey = getAccessCredentials(vm)?.[0]?.sshPublicKey;
+
+  if (!sshPublicKey) {
+    return getLabel(bootableVolume ?? vm, DYNAMIC_CREDENTIALS_SUPPORT) === 'true';
+  }
+
+  return Boolean(sshPublicKey.propagationMethod?.qemuGuestAgent);
+};
 
 export const getVMSSHSecretName = (vm: V1VirtualMachine): string | undefined =>
   getAccessCredentials(vm)?.find(

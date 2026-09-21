@@ -1,4 +1,4 @@
-import { type Dispatch, type FC, type SetStateAction, useEffect, useState } from 'react';
+import { type Dispatch, type FC, type SetStateAction, useEffect, useMemo, useState } from 'react';
 
 import { type IoK8sApiCoreV1Secret } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
@@ -41,6 +41,25 @@ const SecretDropdown: FC<SecretDropdownProps> = ({
     }
   }, [sshDetails?.sshPubKey, sshDetails?.sshSecretName]);
 
+  const secretOptions = useMemo(() => {
+    const options =
+      selectedProjectSecrets?.map((secret: IoK8sApiCoreV1Secret) => {
+        const name = getName(secret);
+        return { children: name, value: name };
+      }) ?? [];
+
+    const attachedSecretName = sshDetails?.sshSecretName;
+
+    if (
+      !isEmpty(attachedSecretName) &&
+      !options.some((option) => option.value === attachedSecretName)
+    ) {
+      return [{ children: attachedSecretName, value: attachedSecretName }, ...options];
+    }
+
+    return options;
+  }, [selectedProjectSecrets, sshDetails?.sshSecretName]);
+
   const onSelect = (newSecretName: string): void => {
     const selectedSecret = selectedProjectSecrets.find(
       (secret: IoK8sApiCoreV1Secret) => getName(secret) === newSecretName,
@@ -62,10 +81,7 @@ const SecretDropdown: FC<SecretDropdownProps> = ({
 
   return (
     <InlineFilterSelect
-      options={selectedProjectSecrets?.map((secret: IoK8sApiCoreV1Secret) => {
-        const name = getName(secret);
-        return { children: name, value: name };
-      })}
+      options={secretOptions}
       placeholder={t('Select secret')}
       selected={secretName}
       setSelected={onSelect}

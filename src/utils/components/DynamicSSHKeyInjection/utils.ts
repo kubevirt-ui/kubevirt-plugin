@@ -12,5 +12,5 @@ export const hasDynamicSSHInjectionCommand = (vm: V1VirtualMachine): boolean => 
     cloudInitVolume?.cloudInitNoCloud?.userData ?? cloudInitVolume?.cloudInitConfigDrive?.userData,
   );
 
-  return !!userData.runcmd?.find(cmdIsSSHInjection);
+  return !!userData?.runcmd?.find(cmdIsSSHInjection);
 };

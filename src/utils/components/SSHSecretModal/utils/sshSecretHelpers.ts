@@ -1,10 +1,27 @@
-import { type IoK8sApiCoreV1Secret } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
-import { type V1SSHPublicKeyAccessCredentialPropagationMethod } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { decodeSecret } from '@kubevirt-utils/resources/secret/utils';
-import { generatePrettyName, validateSSHPublicKey } from '@kubevirt-utils/utils/utils';
+import produce from 'immer';
 
-import { MIN_NAME_LENGTH_FOR_GENERATED_SUFFIX } from './constants';
+import { type IoK8sApiCoreV1Secret } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import {
+  type V1CloudInitConfigDriveSource,
+  type V1CloudInitNoCloudSource,
+  type V1SSHPublicKeyAccessCredentialPropagationMethod,
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import {
+  type CloudInitUserData,
+  convertUserDataObjectToYAML,
+  convertYAMLUserDataObject,
+} from '@kubevirt-utils/components/CloudinitModal/utils/cloudinit-utils';
+import { decodeSecret } from '@kubevirt-utils/resources/secret/utils';
+import { getAccessCredentials } from '@kubevirt-utils/resources/vm';
+import { generatePrettyName, isEmpty, validateSSHPublicKey } from '@kubevirt-utils/utils/utils';
+
+import { DYNAMIC_SSH_INJECTION_CMD, MIN_NAME_LENGTH_FOR_GENERATED_SUFFIX } from './constants';
+
+const getFallbackUserData = (): CloudInitUserData => ({
+  password: '',
+  user: '',
+});
 
 export const getAllSecretsFromSecretData = (
   secretsResourceData: IoK8sApiCoreV1Secret[],
@@ -48,3 +65,57 @@ export const addNewSecret = (
   targetProject: string,
   activeNamespace: string,
 ): boolean => (namespace ? targetProject !== namespace : targetProject !== activeNamespace);
+
+export const cmdIsSSHInjection = (cmd: string | string[]): boolean => {
+  const extendedCommand = Array.isArray(cmd) ? cmd?.join(' ') : cmd;
+  return extendedCommand?.includes(DYNAMIC_SSH_INJECTION_CMD);
+};
+
+export const getCloudInitConfigDrive = (
+  isDynamic: boolean,
+  cloudInitVolumeData: V1CloudInitConfigDriveSource | V1CloudInitNoCloudSource,
+): V1CloudInitConfigDriveSource => {
+  const userData: CloudInitUserData =
+    convertYAMLUserDataObject(cloudInitVolumeData?.userData) ?? getFallbackUserData();
+
+  userData.runcmd ??= [];
+
+  if (isDynamic && !userData.runcmd.some(cmdIsSSHInjection))
+    userData.runcmd.push(DYNAMIC_SSH_INJECTION_CMD);
+
+  if (!isDynamic) userData.runcmd = userData.runcmd.filter((cmd) => !cmdIsSSHInjection(cmd));
+
+  return {
+    ...cloudInitVolumeData,
+    userData: convertUserDataObjectToYAML(userData, true),
+  };
+};
+
+export const removeSecretFromVM = (vm: V1VirtualMachine, secretName?: string): V1VirtualMachine => {
+  if (isEmpty(secretName)) {
+    return vm;
+  }
+
+  return produce(vm, (vmDraft) => {
+    const accessCredentials = getAccessCredentials(vmDraft);
+
+    if (isEmpty(accessCredentials)) {
+      return;
+    }
+
+    const filteredAccessCredentials = accessCredentials.filter(
+      (credential) => credential?.sshPublicKey?.source?.secret?.secretName !== secretName,
+    );
+
+    if (filteredAccessCredentials.length === accessCredentials.length) {
+      return;
+    }
+
+    if (filteredAccessCredentials.length > 0) {
+      vmDraft.spec.template.spec.accessCredentials = filteredAccessCredentials;
+      return;
+    }
+
+    delete vmDraft.spec.template.spec.accessCredentials;
+  });
+};

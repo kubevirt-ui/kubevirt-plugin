@@ -1,32 +1,25 @@
 import produce from 'immer';
 
-import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { type IoK8sApiCoreV1Secret } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import {
-  type V1CloudInitConfigDriveSource,
-  type V1CloudInitNoCloudSource,
   type V1SSHPublicKeyAccessCredentialPropagationMethod,
   type V1VirtualMachine,
   type V1Volume,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import {
-  convertUserDataObjectToYAML,
   convertYAMLUserDataObject,
   getCloudInitData,
   getCloudInitVolume,
 } from '@kubevirt-utils/components/CloudinitModal/utils/cloudinit-utils';
-import {
-  DYNAMIC_SSH_INJECTION_CMD,
-  MAX_NAME_LENGTH,
-} from '@kubevirt-utils/components/SSHSecretModal/utils/constants';
+import { MAX_NAME_LENGTH } from '@kubevirt-utils/components/SSHSecretModal/utils/constants';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getVolumes } from '@kubevirt-utils/resources/vm';
 import { isWindows } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { getCluster } from '@multicluster/helpers/selectors';
-import { kubevirtK8sUpdate } from '@multicluster/k8sRequests';
 import { type WatchK8sResults } from '@openshift-console/dynamic-plugin-sdk';
+
+import { getCloudInitConfigDrive } from './sshSecretHelpers';
 
 export * from './sshSecretHelpers';
 
@@ -76,19 +69,6 @@ export const getSecretNameErrorMessage = (
   if (!validateSecretNameNoDots(secretName)) return t('Secret name must not contain periods');
 
   return null;
-};
-
-export const removeSecretFromVM = (vm: V1VirtualMachine): V1VirtualMachine =>
-  produce(vm, (vmDraft) => {
-    delete vmDraft.spec.template.spec.accessCredentials;
-  });
-
-export const detachVMSecret = async (vm: V1VirtualMachine): Promise<void> => {
-  await kubevirtK8sUpdate({
-    cluster: getCluster(vm),
-    data: removeSecretFromVM(vm),
-    model: VirtualMachineModel,
-  });
 };
 
 export const applyCloudDriveCloudInitVolume = (
@@ -147,28 +127,4 @@ export const getCloudInitPropagationMethod = (
         },
       }
     : ({ noCloud: {} } as V1SSHPublicKeyAccessCredentialPropagationMethod);
-};
-
-export const cmdIsSSHInjection = (cmd: string | string[]): boolean => {
-  const extendedCommand = Array.isArray(cmd) ? cmd?.join(' ') : cmd;
-  return extendedCommand?.includes(DYNAMIC_SSH_INJECTION_CMD);
-};
-
-export const getCloudInitConfigDrive = (
-  isDynamic: boolean,
-  cloudInitVolumeData: V1CloudInitConfigDriveSource | V1CloudInitNoCloudSource,
-): V1CloudInitConfigDriveSource => {
-  const userData = convertYAMLUserDataObject(cloudInitVolumeData?.userData);
-
-  userData.runcmd ??= [];
-
-  if (isDynamic && !userData.runcmd.some(cmdIsSSHInjection))
-    userData.runcmd.push(DYNAMIC_SSH_INJECTION_CMD);
-
-  if (!isDynamic) userData.runcmd = userData.runcmd.filter((cmd) => !cmdIsSSHInjection(cmd));
-
-  return {
-    ...cloudInitVolumeData,
-    userData: convertUserDataObjectToYAML(userData, true),
-  };
 };
