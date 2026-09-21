@@ -1,13 +1,13 @@
-import { type ComponentType, type FormEvent, memo, type ReactNode, useState } from 'react';
+import { type ComponentType, memo, type ReactNode } from 'react';
 
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { type K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { type ButtonVariant, Modal, ModalHeader, ModalVariant } from '@patternfly/react-core';
 
 import TabModalBody from './components/TabModalBody';
 import TabModalFooter from './components/TabModalFooter';
+import useTabModalSubmit from './hooks/useTabModalSubmit';
 
 import './TabModal.scss';
 
@@ -42,6 +42,7 @@ export type TabModalProps<T extends K8sResourceCommon = K8sResourceCommon> = {
   shouldWrapInForm?: boolean;
   submitBtnText?: string;
   submitBtnVariant?: ButtonVariant;
+  submitDisabledTooltip?: ReactNode;
   titleIconVariant?: 'custom' | 'danger' | 'info' | 'success' | 'warning' | ComponentType<unknown>;
 };
 
@@ -74,44 +75,18 @@ const TabModal: TabModalFC = memo(
     shouldWrapInForm,
     submitBtnText,
     submitBtnVariant,
+    submitDisabledTooltip,
     titleIconVariant,
   }) => {
     const { t } = useKubevirtTranslation();
-
-    const [isSubmitting, setIsSubmitting] = useState(false);
-    const [apiError, setApiError] = useState<Error>(undefined);
-
-    const executeSubmit = (): void => {
-      setIsSubmitting(true);
-      setApiError(undefined);
-
-      onSubmit(obj)
-        .then(async (result) => {
-          onSuccess?.(result);
-          if (closeOnSubmit) {
-            await onClose();
-          }
-        })
-        .catch((submitError) => {
-          setApiError(submitError);
-          kubevirtConsole.error(submitError);
-        })
-        .finally(() => setIsSubmitting(false));
-    };
-
-    const closeModal = (): void => {
-      setApiError(undefined);
-      setIsSubmitting(false);
-
-      const promise = onClose();
-
-      if (promise) promise?.catch(setApiError);
-    };
-
-    const handleSubmit = (e: FormEvent<HTMLFormElement>): void => {
-      e.preventDefault();
-      executeSubmit();
-    };
+    const { apiError, closeModal, executeSubmit, handleSubmit, isSubmitting } = useTabModalSubmit({
+      closeOnSubmit,
+      isDisabled,
+      obj,
+      onClose,
+      onSubmit,
+      onSuccess,
+    });
 
     return (
       <Modal
@@ -140,7 +115,7 @@ const TabModal: TabModalFC = memo(
           actionItemLink={actionItemLink}
           cancelBtnText={cancelBtnText}
           cancelBtnVariant={cancelBtnVariant}
-          error={apiError || modalError}
+          error={apiError ?? modalError}
           executeSubmit={executeSubmit}
           isDisabled={isDisabled}
           isLoading={isLoading}
@@ -150,6 +125,7 @@ const TabModal: TabModalFC = memo(
           shouldWrapInForm={shouldWrapInForm}
           submitBtnText={submitBtnText ?? t('Save')}
           submitBtnVariant={submitBtnVariant}
+          submitDisabledTooltip={submitDisabledTooltip}
         />
       </Modal>
     );

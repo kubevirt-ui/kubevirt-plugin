@@ -4,11 +4,7 @@ import { getTolerations } from 'src/views/templates/utils/selectors';
 
 import { modelToGroupVersionKind, NodeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { type IoK8sApiCoreV1Node } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
-import {
-  type K8sIoApiCoreV1Toleration,
-  K8sIoApiCoreV1TolerationEffectEnum,
-  K8sIoApiCoreV1TolerationOperatorEnum,
-} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { K8sIoApiCoreV1TolerationEffectEnum } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import LabelsList from '@kubevirt-utils/components/NodeSelectorModal/components/LabelList';
 import NodeCheckerAlert from '@kubevirt-utils/components/NodeSelectorModal/components/NodeCheckerAlert';
 import { useIDEntities } from '@kubevirt-utils/components/NodeSelectorModal/hooks/useIDEntities';
@@ -17,10 +13,15 @@ import TolerationEditRow from '@kubevirt-utils/components/TolerationsModal/Toler
 import TolerationListHeaders from '@kubevirt-utils/components/TolerationsModal/TolerationListHeaders';
 import TolerationModalDescriptionText from '@kubevirt-utils/components/TolerationsModal/TolerationModalDescriptionText';
 import { type TolerationLabel } from '@kubevirt-utils/components/TolerationsModal/utils/constants';
-import { getNodeTaintQualifier } from '@kubevirt-utils/components/TolerationsModal/utils/helpers';
+import {
+  getIncompleteTolerationsTooltip,
+  getNodeTaintQualifier,
+  hasIncompleteTolerations,
+  toK8sTolerations,
+} from '@kubevirt-utils/components/TolerationsModal/utils/helpers';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getTemplateVirtualMachineObject, type Template } from '@kubevirt-utils/resources/template';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { ensurePath, isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 import { ModalVariant } from '@patternfly/react-core';
@@ -61,31 +62,25 @@ const TolerationsModal: FC<TolerationsModalProps> = ({ isOpen, onClose, onSubmit
   const updatedTemplate = useMemo(
     () =>
       produce<Template>(template, (templateDraft: Template) => {
-        const updatedTolerations: K8sIoApiCoreV1Toleration[] = (tolerationsLabels || []).map(
-          (toleration) => {
-            return {
-              ...toleration,
-              operator: toleration?.value
-                ? K8sIoApiCoreV1TolerationOperatorEnum.Equal
-                : K8sIoApiCoreV1TolerationOperatorEnum.Exists,
-            };
-          },
-        );
-
-        getTemplateVirtualMachineObject(templateDraft).spec.template.spec.tolerations =
-          updatedTolerations;
+        const draftVM = getTemplateVirtualMachineObject(templateDraft);
+        ensurePath(draftVM, 'spec.template.spec.tolerations');
+        draftVM.spec.template.spec.tolerations = toK8sTolerations(tolerationsLabels);
       }),
     [template, tolerationsLabels],
   );
 
+  const isIncomplete = hasIncompleteTolerations(tolerationsLabels);
+
   return (
     <TabModal
       headerText={t('Tolerations')}
+      isDisabled={isIncomplete}
       isOpen={isOpen}
       modalVariant={ModalVariant.medium}
       obj={updatedTemplate}
       onClose={onClose}
       onSubmit={onSubmit}
+      submitDisabledTooltip={getIncompleteTolerationsTooltip(isIncomplete, t)}
     >
       <TolerationModalDescriptionText />
       <div className="pf-v6-c-form">

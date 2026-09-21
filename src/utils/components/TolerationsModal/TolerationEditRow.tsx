@@ -1,4 +1,4 @@
-import { type FC } from 'react';
+import { type FC, useState } from 'react';
 
 import { K8sIoApiCoreV1TolerationEffectEnum } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -8,11 +8,14 @@ import {
   FormSelect,
   FormSelectOption,
   GridItem,
+  HelperText,
+  HelperTextItem,
   TextInput,
 } from '@patternfly/react-core';
 import { MinusCircleIcon } from '@patternfly/react-icons';
 
 import { type TolerationLabel } from './utils/constants';
+import { getTaintKeyRequiredMessage, isIncompleteToleration } from './utils/helpers';
 
 type TolerationEditRowProps = {
   label: TolerationLabel;
@@ -23,22 +26,32 @@ type TolerationEditRowProps = {
 const TolerationEditRow: FC<TolerationEditRowProps> = ({ label, onChange, onDelete }) => {
   const { effect, id, key, value } = label;
   const { t } = useKubevirtTranslation();
+  const [keyTouched, setKeyTouched] = useState(false);
+  const showKeyError = keyTouched && isIncompleteToleration(label);
+  const errorId = `toleration-${id}-error`;
+
   return (
     <>
       <GridItem span={4}>
         <TextInput
+          aria-describedby={showKeyError ? errorId : undefined}
+          aria-invalid={showKeyError}
           id={`toleration-${id}-key-input`}
           isRequired
-          onChange={(_event, newKey) => onChange({ ...label, key: newKey })}
+          onBlur={() => setKeyTouched(true)}
+          onChange={(_event, newKey) => {
+            setKeyTouched(true);
+            onChange({ ...label, key: newKey });
+          }}
           placeholder={t('Taint key')}
           type="text"
+          validated={showKeyError ? 'error' : 'default'}
           value={key}
         />
       </GridItem>
       <GridItem span={4}>
         <TextInput
           id={`toleration-${id}-value-input`}
-          isRequired
           onChange={(_event, newValue) => onChange({ ...label, value: newValue })}
           placeholder={t('Taint value')}
           type="text"
@@ -67,6 +80,15 @@ const TolerationEditRow: FC<TolerationEditRowProps> = ({ label, onChange, onDele
           variant={ButtonVariant.plain}
         />
       </GridItem>
+      {showKeyError && (
+        <GridItem span={12}>
+          <HelperText data-test={errorId}>
+            <HelperTextItem id={errorId} variant="error">
+              {getTaintKeyRequiredMessage(t)}
+            </HelperTextItem>
+          </HelperText>
+        </GridItem>
+      )}
     </>
   );
 };
