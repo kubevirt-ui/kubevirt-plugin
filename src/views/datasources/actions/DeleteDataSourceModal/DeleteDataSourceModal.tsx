@@ -10,8 +10,11 @@ import {
 import ConfirmActionMessage from '@kubevirt-utils/components/ConfirmActionMessage/ConfirmActionMessage';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { notifyBootableVolumeDeleted } from '@kubevirt-utils/hooks/useUploadProgressToast/cancel/notifyDeletedUploadResources';
 import { deleteDVAndRelatedResources } from '@kubevirt-utils/resources/bootableresources/helpers';
+import { isK8sNotFoundError } from '@kubevirt-utils/resources/errorStatusChecks';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
+import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sDelete } from '@multicluster/k8sRequests';
 import { ButtonVariant, Checkbox, Stack, StackItem } from '@patternfly/react-core';
 
@@ -47,10 +50,21 @@ const DeleteDataSourceModal: FC<DeleteDataSourceModalProps> = ({
       });
     }
 
-    await kubevirtK8sDelete({
-      model: DataSourceModel,
-      resource: dataSource,
-    });
+    try {
+      await kubevirtK8sDelete({
+        model: DataSourceModel,
+        resource: dataSource,
+      });
+    } catch (error) {
+      if (!isK8sNotFoundError(error)) {
+        throw error;
+      }
+    }
+    notifyBootableVolumeDeleted(
+      getName(dataSource),
+      getNamespace(dataSource),
+      getCluster(dataSource),
+    );
 
     if (deletePVC && sourceExists) {
       await deleteDVAndRelatedResources(dataVolume, dataSource, pvc);

@@ -10,7 +10,7 @@ import type {
   TLS_CERT_SOURCE_EXISTING,
   TLS_CERT_SOURCE_NEW,
 } from '@kubevirt-utils/components/TLSCertificateSection';
-import type { DataUpload, UploadDataProps } from '@kubevirt-utils/hooks/useCDIUpload/types';
+import type { CdiUploadDataFn, DataUpload } from '@kubevirt-utils/hooks/useCDIUpload/types';
 import type { ToastActions } from '@kubevirt-utils/hooks/useKubevirtToast';
 import type { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 
@@ -76,7 +76,7 @@ export type SubmitAddBootableVolumeParams = {
   onUploadStart?: (uploadKey: string) => void;
   sourceType: DROPDOWN_FORM_SELECTION;
   t: TFunction;
-  uploadData: (props: UploadDataProps) => Promise<void>;
+  uploadData: CdiUploadDataFn;
 };
 
 export type HandleAddBootableVolumeModalCloseParams = {
@@ -91,7 +91,7 @@ export type CreateBootableVolumeType = (input: {
   onUploadStart?: (uploadKey: string) => void;
   sourceType: DROPDOWN_FORM_SELECTION;
   t: TFunction;
-  uploadData: ({ dataVolume, file }: UploadDataProps) => Promise<void>;
+  uploadData: CdiUploadDataFn;
 }) => (dataSource: V1beta1DataSource) => Promise<V1beta1DataSource[]>;
 
 export type UseAddBootableVolumeFormValidationParams = {
@@ -106,7 +106,7 @@ export type UseAddBootableVolumeModalData = (lockedPreference?: PreferenceOption
   setSourceType: Dispatch<SetStateAction<DROPDOWN_FORM_SELECTION>>;
   sourceType: DROPDOWN_FORM_SELECTION;
   upload: DataUpload;
-  uploadData: ({ dataVolume, file }: UploadDataProps) => Promise<void>;
+  uploadData: CdiUploadDataFn;
 };
 
 export type BootableVolumeToastHandlers = Pick<ToastActions, 'addInfoToast' | 'addSuccessToast'> & {

@@ -17,11 +17,12 @@ import { buildOwnerReference, compareOwnerReferences } from '@kubevirt-utils/res
 import { getDataVolumeTemplates, getDisks, getVolumes } from '@kubevirt-utils/resources/vm';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sUpdate } from '@multicluster/k8sRequests';
-import { k8sDelete, type K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+import { type K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { ButtonVariant, Checkbox, Stack, StackItem } from '@patternfly/react-core';
 
 import { updateDisks } from '../../../details/utils/utils';
 import useVolumeOwnedResource from './hooks/useVolumeOwnedResource';
+import { deleteOwnedVolumeResource } from './utils/deleteOwnedVolumeResource';
 
 type DeleteDiskModalProps = {
   isHotPluginVolume: boolean;
@@ -84,12 +85,10 @@ const DeleteDiskModal: FC<DeleteDiskModalProps> = ({
     }
 
     if (deleteOwnedResource) {
-      return k8sDelete({
-        json: undefined,
-        model: volumeResourceModel,
-        requestInit: undefined,
-        resource: volumeResource,
-      });
+      if (volumeResourceModel) {
+        await deleteOwnedVolumeResource(volumeResource, volumeResourceModel);
+      }
+      return;
     }
 
     // we don't need to delete the owned resource

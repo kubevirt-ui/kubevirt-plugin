@@ -42,8 +42,10 @@ export type UploadDataProps = {
   uploadTrackMetadata?: CdiUploadTrackMetadata;
 };
 
+export type CdiUploadDataFn = (props: UploadDataProps) => Promise<number | undefined>;
+
 export type UseCDIUploadValues = {
   checkUploadReady: () => Promise<void>;
   upload: DataUpload;
-  uploadData: ({ dataVolume, file }: UploadDataProps) => Promise<void>;
+  uploadData: CdiUploadDataFn;
 };

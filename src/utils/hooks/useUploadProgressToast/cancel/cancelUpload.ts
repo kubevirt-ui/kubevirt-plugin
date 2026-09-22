@@ -74,16 +74,23 @@ export const performCancelTrackedUpload = async (
     return;
   }
 
-  const { cancelUpload, dvCluster, dvName, dvNamespace, onCancelCleanup } = upload;
+  const { cancelUpload, dvCluster, dvName, dvNamespace, generation, onCancelCleanup } = upload;
 
   const aborted =
     (await abortUploadStream(cancelUpload)) ||
     (await abortViaDataVolume(dvName, dvNamespace, dvCluster));
 
+  if (get().uploads[uploadKey]?.generation !== generation) {
+    return;
+  }
+
   if (removeAfterCancel && (!cancelUpload || aborted)) {
     get().removeUpload(uploadKey);
   } else if (!removeAfterCancel) {
-    get().markUploadCanceled(uploadKey);
+    get().markUploadCanceled(uploadKey, generation);
+    if (aborted) {
+      get().stripDataVolumeLinks(uploadKey);
+    }
   }
 
   await runCancelCleanup(onCancelCleanup);
@@ -92,10 +99,9 @@ export const performCancelTrackedUpload = async (
 const performCancelTrackedUploads = async (
   get: StoreAccessor,
   uploadKeys: string[],
+  options?: CancelTrackedUploadOptions,
 ): Promise<void> => {
-  await Promise.allSettled(
-    uploadKeys.map((key) => performCancelTrackedUpload(get, key, { removeAfterCancel: true })),
-  );
+  await Promise.allSettled(uploadKeys.map((key) => performCancelTrackedUpload(get, key, options)));
 };
 
 export const performCancelUploadsForVm = async (
@@ -104,11 +110,27 @@ export const performCancelUploadsForVm = async (
   namespace: string,
   vmName: string,
 ): Promise<void> => {
-  const matchingKeys = collectVmScopedUploadKeys(get().uploads, cluster, namespace, vmName).filter(
+  const generationByKey = Object.fromEntries(
+    collectVmScopedUploadKeys(get().uploads, cluster, namespace, vmName).map((key) => [
+      key,
+      get().uploads[key]?.generation,
+    ]),
+  );
+  const matchingKeys = Object.keys(generationByKey).filter(
     (key) => get().uploads[key]?.status === UPLOAD_PROGRESS_STATUS.UPLOADING,
   );
 
+  // Keep canceled entries so the terminal toast can merge stripped links instead of
+  // freezing a snapshot that still points at the deleted VM's storage page.
   await performCancelTrackedUploads(get, matchingKeys);
+  get().stripVmStorageLinksForVm(
+    cluster,
+    namespace,
+    vmName,
+    Object.keys(generationByKey).filter(
+      (key) => get().uploads[key]?.generation === generationByKey[key],
+    ),
+  );
 };
 
 export const performCancelWizardPendingUploads = async (
@@ -131,5 +153,5 @@ export const performCancelWizardPendingUploads = async (
     (key) => get().uploads[key]?.status === UPLOAD_PROGRESS_STATUS.UPLOADING,
   );
 
-  await performCancelTrackedUploads(get, pendingBootableKeys);
+  await performCancelTrackedUploads(get, pendingBootableKeys, { removeAfterCancel: true });
 };
