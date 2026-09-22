@@ -8,7 +8,6 @@ import AdvancedCDROMFeatures from '../AdvancedCDROMFeatures/AdvancedCDROMFeature
 import AutomaticallyGrantVirtualizationRoles from '../AutomaticallyGrantVirtualizationRoles/AutomaticallyGrantVirtualizationRoles';
 import HideYamlTab from '../HideYamlTab/HideYamlTab';
 import LiveMigrationSection from '../LiveMigrationSection/LiveMigrationSection';
-import KernelSamepageMerging from '../MemoryDensity/components/KernelSamepageMerging/KernelSamepageMerging';
 import MemoryDensity from '../MemoryDensity/MemoryDensity';
 import SSHConfiguration from '../SSHConfiguration/SSHConfiguration';
 import { type GeneralSettingsSectionProps } from './types';
@@ -23,7 +22,6 @@ type GeneralSettingsSection = {
 type GeneralSettingsLabels = {
   advancedCDROMFeatures: string;
   automaticallyGrantVirtualizationRoles: string;
-  kernelSamepageMerging: string;
   liveMigration: string;
   memoryRequestRatio: string;
   sshConfigurations: string;
@@ -35,7 +33,6 @@ type GeneralSettingsLabels = {
 export const getGeneralSettingsLabels = (t: TFunction): GeneralSettingsLabels => ({
   advancedCDROMFeatures: t('Advanced CD-ROM features'),
   automaticallyGrantVirtualizationRoles: t('Automatically grant Virtualization roles'),
-  kernelSamepageMerging: t('Kernel Samepage Merging (KSM)'),
   liveMigration: t('Live migration'),
   memoryRequestRatio: t('Memory request ratio'),
   sshConfigurations: t('SSH configurations'),
@@ -52,7 +49,6 @@ export const getGeneralSettingsSections = (t: TFunction): GeneralSettingsSection
       Component: AutomaticallyGrantVirtualizationRoles,
       label: labels.automaticallyGrantVirtualizationRoles,
     },
-    { Component: KernelSamepageMerging, label: labels.kernelSamepageMerging },
     { Component: LiveMigrationSection, label: labels.liveMigration },
     { Component: MemoryDensity, label: labels.memoryRequestRatio },
     { Component: SSHConfiguration, label: labels.sshConfigurations },
