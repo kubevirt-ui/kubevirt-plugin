@@ -10,8 +10,6 @@ import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
 import { Alert, AlertVariant } from '@patternfly/react-core';
 import { useSettingsCluster } from '@settings/context/SettingsClusterContext';
 
-import { getGeneralSettingsLabels } from '../../../consts/consts';
-
 import './KernelSamepageMerging.scss';
 
 type KernelSamepageMergingProps = {
@@ -75,7 +73,7 @@ const KernelSamepageMerging: FC<KernelSamepageMergingProps> = ({
         olsPromptType={OLSPromptType.KERNEL_SAMEPAGE_MERGING}
         popoverClassName="KernelSamepageMerging__HelpTextIcon"
         switchIsOn={isEnabled}
-        title={getGeneralSettingsLabels(t).kernelSamepageMerging}
+        title={t('Kernel Samepage Merging (KSM)')}
         turnOnSwitch={onKSMchange}
       />
       {error && (
