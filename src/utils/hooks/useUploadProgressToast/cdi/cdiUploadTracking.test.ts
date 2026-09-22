@@ -14,7 +14,7 @@ const MISSING_KEY = 'missing-key';
 const CDI_UPLOAD_ERROR_MESSAGE = 'CDI upload failed';
 
 const resetStore = () => {
-  useUploadProgressStore.setState({ uploads: {} });
+  useUploadProgressStore.setState({ generationsByKey: {}, uploads: {} });
 };
 
 describe('cdiUploadTracking', () => {
@@ -39,27 +39,28 @@ describe('cdiUploadTracking', () => {
       });
     });
 
-    it('should remove existing non-terminal entry before starting a new one', () => {
-      useUploadProgressStore.getState().startUpload(UPLOAD_KEY, { fileName: FILE_OLD_ISO });
+    it('should replace an existing upload and increment generation', () => {
+      registerCdiUpload({
+        fileName: FILE_OLD_ISO,
+        uploadKey: UPLOAD_KEY,
+      });
 
-      const removeUpload = jest.spyOn(useUploadProgressStore.getState(), 'removeUpload');
+      expect(useUploadProgressStore.getState().getUpload(UPLOAD_KEY)?.generation).toBe(1);
 
       registerCdiUpload({
         fileName: FILE_NEW_ISO,
         uploadKey: UPLOAD_KEY,
       });
 
-      expect(removeUpload).toHaveBeenCalledWith(UPLOAD_KEY);
       expect(useUploadProgressStore.getState().getUpload(UPLOAD_KEY)).toMatchObject({
         fileName: FILE_NEW_ISO,
+        generation: 2,
         progress: 0,
         status: UPLOAD_PROGRESS_STATUS.UPLOADING,
       });
-
-      removeUpload.mockRestore();
     });
 
-    it('should not remove an existing terminal entry before starting a new one', () => {
+    it('should replace a terminal upload without resetting generation', () => {
       useUploadProgressStore.getState().startUpload(UPLOAD_KEY, { fileName: FILE_OLD_ISO });
       useUploadProgressStore.getState().completeUpload(UPLOAD_KEY);
 
@@ -67,21 +68,17 @@ describe('cdiUploadTracking', () => {
         UPLOAD_PROGRESS_STATUS.SUCCESS,
       );
 
-      const removeUpload = jest.spyOn(useUploadProgressStore.getState(), 'removeUpload');
-
       registerCdiUpload({
         fileName: FILE_NEW_ISO,
         uploadKey: UPLOAD_KEY,
       });
 
-      expect(removeUpload).not.toHaveBeenCalled();
       expect(useUploadProgressStore.getState().getUpload(UPLOAD_KEY)).toMatchObject({
         fileName: FILE_NEW_ISO,
+        generation: 2,
         progress: 0,
         status: UPLOAD_PROGRESS_STATUS.UPLOADING,
       });
-
-      removeUpload.mockRestore();
     });
   });
 
@@ -110,6 +107,82 @@ describe('cdiUploadTracking', () => {
         errorMessage: CDI_UPLOAD_ERROR_MESSAGE,
         status: UPLOAD_PROGRESS_STATUS.ERROR,
       });
+    });
+
+    it('should not fail a retried upload when the error belongs to an older generation', () => {
+      useUploadProgressStore.getState().startUpload(UPLOAD_KEY, { fileName: FILE_NEW_ISO });
+
+      syncCdiUploadProgressAndFailures({
+        expectedGeneration: 1,
+        uploadError: { message: CDI_UPLOAD_ERROR_MESSAGE },
+        uploadKey: UPLOAD_KEY,
+        uploadStatus: UPLOAD_STATUS.ERROR,
+      });
+
+      expect(useUploadProgressStore.getState().getUpload(UPLOAD_KEY)).toMatchObject({
+        fileName: FILE_NEW_ISO,
+        generation: 2,
+        status: UPLOAD_PROGRESS_STATUS.UPLOADING,
+      });
+    });
+
+    it('should not fail a later upload after the previous entry was removed', () => {
+      useUploadProgressStore.getState().removeUpload(UPLOAD_KEY);
+      useUploadProgressStore.getState().startUpload(UPLOAD_KEY, { fileName: FILE_NEW_ISO });
+
+      syncCdiUploadProgressAndFailures({
+        expectedGeneration: 1,
+        uploadError: { message: CDI_UPLOAD_ERROR_MESSAGE },
+        uploadKey: UPLOAD_KEY,
+        uploadStatus: UPLOAD_STATUS.ERROR,
+      });
+
+      expect(useUploadProgressStore.getState().getUpload(UPLOAD_KEY)).toMatchObject({
+        fileName: FILE_NEW_ISO,
+        generation: 2,
+        status: UPLOAD_PROGRESS_STATUS.UPLOADING,
+      });
+    });
+
+    it('should not update progress when the update belongs to an older generation', () => {
+      useUploadProgressStore.getState().startUpload(UPLOAD_KEY, { fileName: FILE_NEW_ISO });
+
+      syncCdiUploadProgressAndFailures({
+        expectedGeneration: 1,
+        progress: 75,
+        uploadKey: UPLOAD_KEY,
+      });
+
+      expect(useUploadProgressStore.getState().getUpload(UPLOAD_KEY)?.progress).toBe(0);
+    });
+
+    it('should not cancel a retried upload when cancel belongs to an older generation', () => {
+      useUploadProgressStore.getState().startUpload(UPLOAD_KEY, { fileName: FILE_NEW_ISO });
+
+      syncCdiUploadProgressAndFailures({
+        expectedGeneration: 1,
+        uploadKey: UPLOAD_KEY,
+        uploadStatus: UPLOAD_STATUS.CANCELED,
+      });
+
+      expect(useUploadProgressStore.getState().getUpload(UPLOAD_KEY)?.status).toBe(
+        UPLOAD_PROGRESS_STATUS.UPLOADING,
+      );
+    });
+
+    it('should not cancel a later upload after the previous entry was removed', () => {
+      useUploadProgressStore.getState().removeUpload(UPLOAD_KEY);
+      useUploadProgressStore.getState().startUpload(UPLOAD_KEY, { fileName: FILE_NEW_ISO });
+
+      syncCdiUploadProgressAndFailures({
+        expectedGeneration: 1,
+        uploadKey: UPLOAD_KEY,
+        uploadStatus: UPLOAD_STATUS.CANCELED,
+      });
+
+      expect(useUploadProgressStore.getState().getUpload(UPLOAD_KEY)?.status).toBe(
+        UPLOAD_PROGRESS_STATUS.UPLOADING,
+      );
     });
 
     it('should call markUploadCanceled when status is CANCELED', () => {

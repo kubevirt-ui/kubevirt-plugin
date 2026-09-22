@@ -23,9 +23,14 @@ import {
   DEFAULT_PREFERENCE_LABEL,
 } from '@kubevirt-utils/constants/instancetypes-and-preferences';
 import {
+  notifyBootableVolumeDeleted,
+  notifyDataVolumeDeleted,
+} from '@kubevirt-utils/hooks/useUploadProgressToast/cancel/notifyDeletedUploadResources';
+import {
   getDataSourcePVCName,
   getDataSourcePVCNamespace,
 } from '@kubevirt-utils/resources/bootableresources/selectors';
+import { isK8sNotFoundError } from '@kubevirt-utils/resources/errorStatusChecks';
 import { isEmpty, kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sDelete } from '@multicluster/k8sRequests';
@@ -91,15 +96,37 @@ export const deleteDVAndRelatedResources = async (
   // We try to delete the created DV, if already GC, we want to fallback to delete the PVC
   try {
     await kubevirtK8sDelete({ model: DataVolumeModel, resource: dataVolume });
-  } catch {
+    notifyDataVolumeDeleted(getName(dataVolume), getNamespace(dataVolume), getCluster(dataVolume));
+  } catch (error) {
+    if (isK8sNotFoundError(error)) {
+      notifyDataVolumeDeleted(
+        getName(dataVolume),
+        getNamespace(dataVolume),
+        getCluster(dataVolume),
+      );
+    }
+
     await kubevirtK8sDelete({ model: PersistentVolumeClaimModel, resource: persistentVolumeClaim });
   }
 
   // A PVC not found error will be thrown if the DV and DS are in the same try block
   try {
     await kubevirtK8sDelete({ model: DataSourceModel, resource: dataSource });
+    notifyBootableVolumeDeleted(
+      getName(dataSource),
+      getNamespace(dataSource),
+      getCluster(dataSource),
+    );
   } catch (error) {
-    kubevirtConsole.log(error);
+    if (isK8sNotFoundError(error)) {
+      notifyBootableVolumeDeleted(
+        getName(dataSource),
+        getNamespace(dataSource),
+        getCluster(dataSource),
+      );
+    } else {
+      kubevirtConsole.log(error);
+    }
   }
 };
 

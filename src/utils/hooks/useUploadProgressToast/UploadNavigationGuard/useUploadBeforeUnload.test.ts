@@ -9,7 +9,7 @@ const UPLOAD_KEY = 'test-upload-key';
 const FILE_IMAGE_ISO = 'image.iso';
 
 const resetStore = (): void => {
-  useUploadProgressStore.setState({ uploads: {} });
+  useUploadProgressStore.setState({ generationsByKey: {}, uploads: {} });
 };
 
 describe('useUploadBeforeUnload', () => {

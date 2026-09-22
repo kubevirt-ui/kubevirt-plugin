@@ -63,6 +63,12 @@ describe('uploadKeys', () => {
         `bootable-volume/${BOOTABLE_VOLUME_NAMESPACE}/${BOOTABLE_VOLUME_NAME}`,
       );
     });
+
+    it('should include the cluster in ACM upload keys', () => {
+      expect(
+        getBootableVolumeUploadKey(BOOTABLE_VOLUME_NAMESPACE, BOOTABLE_VOLUME_NAME, CLUSTER),
+      ).toBe(`bootable-volume/${CLUSTER}/${BOOTABLE_VOLUME_NAMESPACE}/${BOOTABLE_VOLUME_NAME}`);
+    });
   });
 
   describe('isVmScopedUploadKey', () => {

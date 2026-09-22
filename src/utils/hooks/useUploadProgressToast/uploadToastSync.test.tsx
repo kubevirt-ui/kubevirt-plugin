@@ -117,7 +117,7 @@ describe('showInProgressUploadToast', () => {
 
 describe('replaceWithTerminalUploadToast', () => {
   afterEach(() => {
-    useUploadProgressStore.setState({ uploads: {} });
+    useUploadProgressStore.setState({ generationsByKey: {}, uploads: {} });
   });
 
   it('should skip non-terminal upload statuses', () => {
