@@ -1,6 +1,9 @@
+import { type UseFormGetValues } from 'react-hook-form';
+
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { type BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { type NetworkAttachmentDefinitionKind } from '@kubevirt-utils/resources/nad/types';
+import { type UseApplyAutoLabelsResult } from '@virtualmachines/wizard/hooks/useApplyAutoLabels';
 import { type VMWizardFormValues } from '@virtualmachines/wizard/state/vm-wizard-form/types';
 
 export type GenerateVMContext = {
@@ -14,7 +17,9 @@ export type GenerateVMContext = {
 };
 
 export type GenerateVMArgs = {
+  autoAppliedLabels: UseApplyAutoLabelsResult;
   context: GenerateVMContext;
+  getValues: UseFormGetValues<VMWizardFormValues>;
   instanceTypeData: VMWizardFormValues['instanceTypeData'];
   vmData: VMWizardFormValues['vmData'];
 };

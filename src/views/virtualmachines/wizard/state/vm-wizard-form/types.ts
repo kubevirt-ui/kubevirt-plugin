@@ -1,5 +1,6 @@
 import { type V1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import { type IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { type PreferenceOption } from '@kubevirt-utils/components/AddBootableVolumeModal/types';
 import { type VolumeSnapshotKind } from '@kubevirt-utils/components/SelectSnapshot/types';
 import { type BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
@@ -54,6 +55,7 @@ type VMWizardInstanceTypeData = {
 };
 
 export type VMWizardFormValues = {
+  customizedVM: null | V1VirtualMachine;
   instanceTypeData: VMWizardInstanceTypeData;
   stepNavigation: VMWizardStepNavigation;
   uiState: VMWizardUIState;

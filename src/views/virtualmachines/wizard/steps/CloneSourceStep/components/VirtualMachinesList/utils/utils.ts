@@ -2,7 +2,6 @@ import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { type ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { type PaginationState } from '@kubevirt-utils/hooks/usePagination/utils/types';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
-import { customizeWizardVMSignal } from '@kubevirt-utils/signals/customizeWizardVMSignal';
 import { isVM } from '@kubevirt-utils/utils/typeGuards';
 import { isEmpty, truncateToK8sName } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
@@ -94,9 +93,10 @@ type VMConfiguration = {
   rowId: string;
 };
 
-export const getVMConfiguration = (currentVM: V1VirtualMachine): VMConfiguration => {
-  const selectedVM = customizeWizardVMSignal.value;
-
+export const getVMConfiguration = (
+  currentVM: V1VirtualMachine,
+  selectedVM: V1VirtualMachine | null,
+): VMConfiguration => {
   const currentVMName = getName(currentVM);
   const currentVMNamespace = getNamespace(currentVM);
   const currentVMCluster = getCluster(currentVM);

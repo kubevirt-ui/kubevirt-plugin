@@ -1,21 +1,24 @@
 import { type FC } from 'react';
+import { useWatch } from 'react-hook-form';
 
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import EnvironmentForm from '@kubevirt-utils/components/EnvironmentEditor/EnvironmentForm';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { getDataVolumeTemplates, getDisks, getVolumes } from '@kubevirt-utils/resources/vm';
-import {
-  customizeWizardVMSignal,
-  patchCustomizeWizardVMSignal,
-  updateVMCustomizeIT,
-} from '@kubevirt-utils/signals/customizeWizardVMSignal';
 import { Divider, Grid, GridItem, PageSection } from '@patternfly/react-core';
-import { useSignals } from '@preact/signals-react/runtime';
 import DiskList from '@virtualmachines/details/tabs/configuration/storage/components/tables/disk/DiskList';
+import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
+import { CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
+import { patchWizardCustomizedVM } from '@virtualmachines/wizard/utils/patchWizardCustomizedVM';
+
+import useUpdateCustomizeInstanceTypeTab from '../hooks/useUpdateCustomizeInstanceTypeTab';
 
 const CustomizeInstanceTypeStorageTab: FC = () => {
-  useSignals();
-  const vm = customizeWizardVMSignal.value;
+  const { getValues, setValue } = useVMWizard();
+  const { control } = useVMWizard();
+  const vm = useWatch({ control, name: CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM });
+
+  const { updateVMFromForm } = useUpdateCustomizeInstanceTypeTab();
 
   if (!vm) {
     return <Loading />;
@@ -28,7 +31,7 @@ const CustomizeInstanceTypeStorageTab: FC = () => {
           <DiskList
             customize
             onDiskUpdate={(updatedVM: V1VirtualMachine) => {
-              const vmModified = patchCustomizeWizardVMSignal([
+              const diskPatches = [
                 {
                   data: getDisks(updatedVM),
                   path: `spec.template.spec.domain.devices.disks`,
@@ -41,7 +44,9 @@ const CustomizeInstanceTypeStorageTab: FC = () => {
                   data: getDataVolumeTemplates(updatedVM),
                   path: `spec.dataVolumeTemplates`,
                 },
-              ]);
+              ];
+
+              const vmModified = patchWizardCustomizedVM(getValues, setValue, diskPatches);
 
               return Promise.resolve(vmModified ?? updatedVM);
             }}
@@ -54,7 +59,7 @@ const CustomizeInstanceTypeStorageTab: FC = () => {
       </GridItem>
       <GridItem>
         <PageSection>
-          <EnvironmentForm updateVM={updateVMCustomizeIT} vm={vm} />
+          <EnvironmentForm updateVM={updateVMFromForm} vm={vm} />
         </PageSection>
       </GridItem>
     </Grid>

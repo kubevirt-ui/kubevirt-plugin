@@ -4,10 +4,11 @@ import { useWatch } from 'react-hook-form';
 import type { AutoAppliedLabel } from '@kubevirt-utils/hooks/useAutoAppliedLabels/types';
 import useAutoAppliedLabels from '@kubevirt-utils/hooks/useAutoAppliedLabels/useAutoAppliedLabels';
 import { getLabels } from '@kubevirt-utils/resources/shared';
-import { customizeWizardVMSignal } from '@kubevirt-utils/signals/customizeWizardVMSignal';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { useSignals } from '@preact/signals-react/runtime';
 import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
 import {
+  CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM,
   CREATE_VM_FORM_FIELDS_STEP_NAVIGATION,
   CREATE_VM_FORM_FIELDS_VM_DATA,
 } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
@@ -31,14 +32,15 @@ const useRequiredVMLabelsDrawer = (): UseRequiredVMLabelsDrawerResult => {
     control,
     name: CREATE_VM_FORM_FIELDS_STEP_NAVIGATION.CURRENT_STEP,
   });
+  const vm = useWatch({ control, name: CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM });
   const { labels } = useAutoAppliedLabels();
   const [isPanelOpen, setIsPanelOpen] = useState(false);
 
   const isOnCustomizationStep = currentStep === VMWizardStep.CUSTOMIZATION;
-  const vmLabels = getLabels(customizeWizardVMSignal.value, {});
+  const vmLabels = getLabels(vm, {});
   const requiredLabels = labels.filter((label) => label.required);
   const hasRequiredMissing =
-    autoLabelsMerged && requiredLabels.some((label) => !String(vmLabels[label.key] ?? '').trim());
+    autoLabelsMerged && requiredLabels.some((label) => isEmpty(vmLabels[label.key] ?? ''));
 
   useEffect(() => {
     setIsPanelOpen(isOnCustomizationStep && hasRequiredMissing);

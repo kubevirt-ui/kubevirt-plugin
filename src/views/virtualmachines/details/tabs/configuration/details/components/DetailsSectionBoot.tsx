@@ -22,7 +22,7 @@ import useHcoWorkloadArchitectures from '@kubevirt-utils/hooks/useHcoWorkloadArc
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useToggle } from '@kubevirt-utils/hooks/useToggle';
 import { getName } from '@kubevirt-utils/resources/shared';
-import { patchCustomizeWizardVMSignal } from '@kubevirt-utils/signals/customizeWizardVMSignal';
+import { type PatchCustomizeWizardVMSignal } from '@kubevirt-utils/signals/customizeWizardVMSignal';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { getCluster } from '@multicluster/helpers/selectors';
@@ -36,8 +36,8 @@ import DetailsSectionBootOrder from './DetailsSectionBootOrder';
 
 type DetailsSectionBootProps = {
   canUpdateVM: boolean;
+  customizeWizardVMPatch?: PatchCustomizeWizardVMSignal;
   instanceTypeVM?: V1VirtualMachine;
-  isCustomizeInstanceType?: boolean;
   preferredBootmode?: BootMode;
   vm: V1VirtualMachine;
   vmi?: V1VirtualMachineInstance;
@@ -45,8 +45,8 @@ type DetailsSectionBootProps = {
 
 const DetailsSectionBoot: FC<DetailsSectionBootProps> = ({
   canUpdateVM,
+  customizeWizardVMPatch,
   instanceTypeVM,
-  isCustomizeInstanceType,
   preferredBootmode,
   vm,
   vmi,
@@ -73,8 +73,8 @@ const DetailsSectionBoot: FC<DetailsSectionBootProps> = ({
           isOpen={isOpen}
           onClose={onClose}
           onSubmit={(updatedVM: V1VirtualMachine): Promise<V1VirtualMachine | void> =>
-            isCustomizeInstanceType
-              ? Promise.resolve(patchCustomizeWizardVMSignal([{ data: updatedVM }]))
+            customizeWizardVMPatch
+              ? Promise.resolve(customizeWizardVMPatch([{ data: updatedVM }]))
               : updateBootLoader(updatedVM, vm)
           }
           preferredBootmode={preferredBootmode}
@@ -87,9 +87,9 @@ const DetailsSectionBoot: FC<DetailsSectionBootProps> = ({
 
   const onStartStrategyChange = (_event: unknown, checked: boolean): void => {
     setIsChecked(checked);
-    const patchPromise = isCustomizeInstanceType
+    const patchPromise = customizeWizardVMPatch
       ? Promise.resolve(
-          patchCustomizeWizardVMSignal([
+          customizeWizardVMPatch([
             {
               data: checked ? printableVMStatus.Paused : null,
               path: `spec.template.spec.startStrategy`,
@@ -122,7 +122,6 @@ const DetailsSectionBoot: FC<DetailsSectionBootProps> = ({
       <DetailsSectionBootOrder
         canUpdateVM={canUpdateVM}
         instanceTypeVM={instanceTypeVM}
-        isCustomizeInstanceType={isCustomizeInstanceType}
         vm={vm}
         vmi={vmi}
       />

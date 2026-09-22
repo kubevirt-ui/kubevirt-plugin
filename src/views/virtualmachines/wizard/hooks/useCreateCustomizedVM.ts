@@ -8,15 +8,14 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import useLocalStorage from '@kubevirt-utils/hooks/useLocalStorage';
 import { getName } from '@kubevirt-utils/resources/shared';
 import useNamespaceUDN from '@kubevirt-utils/resources/udn/hooks/useNamespaceUDN';
-import { customizeWizardVMSignal } from '@kubevirt-utils/signals/customizeWizardVMSignal';
 import { getErrorMessage, kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { kubevirtK8sCreate } from '@multicluster/k8sRequests';
 import { getVMURL, isACMPath } from '@multicluster/urls';
 import { useK8sModels } from '@openshift-console/dynamic-plugin-sdk';
-import { useSignals } from '@preact/signals-react/runtime';
 
 import { useVMWizard } from '../state/vm-wizard-context/VMWizardContext';
 import {
+  CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM,
   CREATE_VM_FORM_FIELDS_UI_STATE,
   CREATE_VM_FORM_FIELDS_VM_DATA,
 } from '../state/vm-wizard-form/consts';
@@ -37,7 +36,6 @@ type UseCreateCustomizedVM = () => {
 };
 
 const useCreateCustomizedVM: UseCreateCustomizedVM = () => {
-  useSignals();
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
   const { pathname } = useLocation();
@@ -63,7 +61,7 @@ const useCreateCustomizedVM: UseCreateCustomizedVM = () => {
     const templateAdditionalObjects = getValues(
       CREATE_VM_FORM_FIELDS_UI_STATE.TEMPLATE_ADDITIONAL_OBJECTS,
     );
-    const storeVM = customizeWizardVMSignal.value;
+    const storeVM = getValues(CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM);
 
     if (!storeVM) {
       const emptyPayloadError = new Error(t('Cannot create VM: customized VM payload is empty'));

@@ -1,4 +1,5 @@
 import { type FC } from 'react';
+import { useWatch } from 'react-hook-form';
 
 import {
   type V1Disk,
@@ -9,17 +10,19 @@ import {
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import {
-  customizeWizardVMSignal,
-  patchCustomizeWizardVMSignal,
-} from '@kubevirt-utils/signals/customizeWizardVMSignal';
+import { type PatchCustomizeWizardVMSignalArgs } from '@kubevirt-utils/signals/customizeWizardVMSignal';
 import { PageSection, Title } from '@patternfly/react-core';
 import AddNetworkInterfaceButton from '@virtualmachines/details/tabs/configuration/network/components/AddNetworkInterfaceButton';
+import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
+import { CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
 import NetworkInterfaceList from '@virtualmachines/wizard/steps/CustomizationStep/components/CustomizeVirtualMachine/components/CustomizeVMTabs/tabs/network/NetworkInterfaceList';
+import { patchWizardCustomizedVM } from '@virtualmachines/wizard/utils/patchWizardCustomizedVM';
 
 const CustomizeInstanceTypeNetworkTab: FC = () => {
   const { t } = useKubevirtTranslation();
-  const vm = customizeWizardVMSignal.value;
+  const { getValues, setValue } = useVMWizard();
+  const { control } = useVMWizard();
+  const vm = useWatch({ control, name: CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM });
 
   if (!vm) {
     return <Loading />;
@@ -30,18 +33,20 @@ const CustomizeInstanceTypeNetworkTab: FC = () => {
     updatedInterfaces: V1Interface[],
     updatedDisks?: V1Disk[],
   ): Promise<V1VirtualMachine> => {
-    const updates: Parameters<typeof patchCustomizeWizardVMSignal>[0] = [
+    const updates: PatchCustomizeWizardVMSignalArgs = [
       { data: updatedNetworks, path: 'spec.template.spec.networks' },
       { data: updatedInterfaces, path: 'spec.template.spec.domain.devices.interfaces' },
     ];
     if (updatedDisks) {
       updates.push({ data: updatedDisks, path: 'spec.template.spec.domain.devices.disks' });
     }
-    return Promise.resolve(patchCustomizeWizardVMSignal(updates));
+    const patchedVM = patchWizardCustomizedVM(getValues, setValue, updates);
+
+    return Promise.resolve(patchedVM ?? vm);
   };
 
   const onUpdateVM = (updatedVM: V1VirtualMachine): Promise<void> => {
-    patchCustomizeWizardVMSignal([{ data: updatedVM }]);
+    patchWizardCustomizedVM(getValues, setValue, [{ data: updatedVM }]);
     return Promise.resolve();
   };
 

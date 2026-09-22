@@ -13,12 +13,14 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import useLocalStorage from '@kubevirt-utils/hooks/useLocalStorage';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { RUNSTRATEGY_HALTED } from '@kubevirt-utils/resources/vm';
-import { customizeWizardVMSignal } from '@kubevirt-utils/signals/customizeWizardVMSignal';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { isACMPath } from '@multicluster/urls';
 import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
-import { CREATE_VM_FORM_FIELDS_VM_DATA } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
+import {
+  CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM,
+  CREATE_VM_FORM_FIELDS_VM_DATA,
+} from '@virtualmachines/wizard/state/vm-wizard-form/consts';
 
 import { SELECTED_CLUSTER } from '../utils/constants';
 import { handleCloneRequestPhaseChange } from './utils/utils';
@@ -65,8 +67,8 @@ const useCloneVM: UseCloneVM = () => {
     if (isSubmitting || submittedCloneRequest) {
       return;
     }
+    const source = getValues(CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM);
 
-    const source = customizeWizardVMSignal.value;
     const {
       cluster,
       description,

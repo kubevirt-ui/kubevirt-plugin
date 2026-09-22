@@ -1,6 +1,5 @@
 import { useState } from 'react';
 
-import { setCustomizeWizardVMSignal } from '@kubevirt-utils/signals/customizeWizardVMSignal';
 import { type WizardStepType } from '@patternfly/react-core';
 import useCreateVMFromTemplate from '@virtualmachines/wizard/steps/TemplateStep/hooks/useCreateVMFromTemplate';
 import {
@@ -12,6 +11,8 @@ import {
   isTemplateCreationMethod,
 } from '@virtualmachines/wizard/utils/utils';
 
+import { useVMWizard } from '../state/vm-wizard-context/VMWizardContext';
+import { CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM } from '../state/vm-wizard-form/consts';
 import useGenerateVM from '../steps/InstanceTypesSteps/hooks/useGenerateVM/useGenerateVM';
 import { type WizardStepNavItemConfig } from '../utils/types';
 
@@ -19,6 +20,7 @@ const useVMGenerationNavClick = (creationMethod: VMCreationMethod): WizardStepNa
   const { generatedVM, loaded } = useGenerateVM();
   const { createVMFromTemplate } = useCreateVMFromTemplate();
   const [isGeneratingVM, setIsGeneratingVM] = useState(false);
+  const { setValue } = useVMWizard();
 
   const handleNavItemClick = async (
     step: WizardStepType,
@@ -28,8 +30,8 @@ const useVMGenerationNavClick = (creationMethod: VMCreationMethod): WizardStepNa
     if (VM_GENERATION_STEPS.has(activeStep?.id)) {
       setIsGeneratingVM(true);
       try {
-        if (isInstanceTypeCreationMethod(creationMethod)) {
-          setCustomizeWizardVMSignal(generatedVM);
+        if (isInstanceTypeCreationMethod(creationMethod) && generatedVM) {
+          setValue(CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM, generatedVM);
         }
         if (isTemplateCreationMethod(creationMethod)) {
           const success = await createVMFromTemplate();
