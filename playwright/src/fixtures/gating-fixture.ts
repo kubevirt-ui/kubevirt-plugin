@@ -90,18 +90,6 @@ const test = baseTest.extend<GatingFixtures>({
       await page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
     }
 
-    // Expand sidebar if collapsed after popover dismissal.
-    const navToggle = page.getByRole('button', { name: 'Side navigation toggle' });
-    const perspToggle = page
-      .getByTestId('perspective-switcher-toggle')
-      .or(page.locator('[data-test-id="perspective-switcher-toggle"]'));
-    if (!(await perspToggle.isVisible({ timeout: TestTimeouts.RETRY_DELAY }).catch(() => false))) {
-      if (await navToggle.isVisible({ timeout: TestTimeouts.RETRY_DELAY }).catch(() => false)) {
-        await navToggle.click().catch(() => undefined);
-        await page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
-      }
-    }
-
     // Dismiss guided tour modal if present.
     const tourSkipBtn = page.getByTestId('tour-step-footer-secondary');
     if (await tourSkipBtn.isVisible({ timeout: TestTimeouts.RETRY_DELAY }).catch(() => false)) {

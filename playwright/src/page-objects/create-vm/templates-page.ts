@@ -680,17 +680,18 @@ export default class TemplatesPage extends PageCommons {
    * Navigates to Templates page via sidebar UI click, falling back to URL navigation.
    */
   async navigateToTemplatesViaUI(): Promise<void> {
-    for (let attempt = 1; attempt <= 3; attempt++) {
-      await this.clickNavTemplates();
-      if (/template/i.test(this.page.url())) {
+    await this.navigateViaSidebarWithFallback(
+      async () => {
+        const navigated = await this.clickNavTemplates();
+        if (!navigated) return false;
         await this.page
           .getByRole('heading', { name: 'Templates', level: 1 })
           .waitFor({ state: 'visible', timeout: TestTimeouts.UI_DELAY_MEDIUM })
           .catch(() => undefined);
-        return;
-      }
-      await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
-    }
+        return true;
+      },
+      () => this.navigateToAllNamespacesTemplates(),
+    );
   }
 
   async openClusterFilter(): Promise<void> {

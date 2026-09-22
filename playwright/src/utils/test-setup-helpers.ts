@@ -173,14 +173,18 @@ type SetupDefaultSSHKeyArgs = DefaultSSHKeyArgs & {
 
 type UserSshSettings = { ssh?: Record<string, string> };
 
-async function resolveUserSettingsKey(client: RequestContextClient): Promise<string> {
+/** Matches useKubevirtUserSettings: uid, else sanitized metadata.name. */
+export async function resolveUserSettingsKey(client: RequestContextClient): Promise<string> {
   const user = await client.getResource('user.openshift.io', 'v1', 'users', '~');
-  const settingsKey =
-    user?.metadata?.uid ?? user?.metadata?.name?.replace(/[^-._a-zA-Z0-9]+/g, '-');
-  if (!settingsKey) {
+  const key =
+    user?.metadata?.uid ??
+    user?.metadata?.name?.replace(/[^-._a-zA-Z0-9]+/g, '-') ??
+    (EnvVariables.isNonPrivUser ? EnvVariables.testUsername : undefined);
+
+  if (!key) {
     throw new Error('Could not resolve kubevirt user-settings key for the current user');
   }
-  return settingsKey;
+  return key;
 }
 
 async function patchDefaultSshForNamespace({

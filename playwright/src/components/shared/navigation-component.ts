@@ -3,6 +3,21 @@ import { expect, type Locator, type Page } from '@playwright/test';
 
 import BaseComponent from './base-component';
 
+const SIDEBAR_SELECTOR = '.pf-v6-c-page__sidebar';
+const SIDEBAR_COLLAPSED_CLASS = 'pf-m-collapsed';
+
+/** List-route matchers — must not match detail or form sub-routes. */
+const LIST_URL_PATTERNS = {
+  bootableVolumes: /\/bootablevolumes(?:\?|$)/i,
+  checkups: /\/checkups(?:\?|$)/i,
+  instanceTypes: /VirtualMachineClusterInstancetype(?:\?|$)/i,
+  migrationPolicies: /MigrationPolicy(?:\?|$)/i,
+  settings: /\/virtualization-settings(?:[/?#]|$)/i,
+  templates: /template\.openshift\.io~v1~Template(?:\?|$)/i,
+  virtualMachines: /kubevirt\.io~v1~VirtualMachine(?:\?|$)/i,
+  overview: /\/dashboards(?:\?|$)/i,
+} as const;
+
 export default class NavigationComponent extends BaseComponent {
   private readonly _clusterOverviewNavItem = this.testId('cluster-overview-nav-item');
   private readonly _perspectiveSwitcherMenuOption = this.consoleTestId(
@@ -50,6 +65,27 @@ export default class NavigationComponent extends BaseComponent {
     return this._perspectiveSwitcherMenuOption.filter({
       has: this.locator('.pf-v6-c-menu__item-text', { hasText: label }),
     });
+  }
+
+  private async isSidebarCollapsed(): Promise<boolean> {
+    return this.page
+      .evaluate(
+        ([selector, collapsedClass]) =>
+          document.querySelector(selector)?.classList.contains(collapsedClass) ?? false,
+        [SIDEBAR_SELECTOR, SIDEBAR_COLLAPSED_CLASS],
+      )
+      .catch(() => false);
+  }
+
+  private async waitForSidebarExpanded(): Promise<void> {
+    await this.page
+      .waitForFunction(
+        ([selector, collapsedClass]) =>
+          !document.querySelector(selector)?.classList.contains(collapsedClass),
+        [SIDEBAR_SELECTOR, SIDEBAR_COLLAPSED_CLASS],
+        { timeout: TestTimeouts.UI_DELAY_MEDIUM },
+      )
+      .catch(() => undefined);
   }
 
   private async waitForSelectedPerspective(expected: RegExp): Promise<void> {
@@ -122,48 +158,48 @@ export default class NavigationComponent extends BaseComponent {
    * If the sidebar was auto-collapsed (e.g. by useAutoHideNavigation), expand it
    * by clicking the hamburger toggle so nav items become clickable.
    */
-  private async ensureSidebarExpanded(): Promise<void> {
-    // Wait for any pending requestAnimationFrame collapse to settle.
-    await this.page.waitForTimeout(500);
+  async ensureSidebarExpanded(): Promise<void> {
+    const expandSidebar = async (): Promise<void> => {
+      const toggleBtn = this.page
+        .locator('#nav-toggle')
+        .or(this.page.getByRole('button', { name: 'Side navigation toggle' }));
+      const visible = await toggleBtn.isVisible().catch(() => false);
+      if (!visible) return;
 
-    const isCollapsed = await this.page
-      .evaluate(
-        () =>
-          document.querySelector('.pf-v6-c-page__sidebar')?.classList.contains('pf-m-collapsed') ??
-          false,
-      )
-      .catch(() => false);
+      await toggleBtn.click({ force: true }).catch(async () => {
+        await toggleBtn.dispatchEvent('click').catch(() => undefined);
+      });
+      await this.waitForSidebarExpanded();
+    };
 
-    if (!isCollapsed) return;
+    // Auto-hide runs in requestAnimationFrame after VM pages mount — wait for it to settle.
+    await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
 
-    const toggleBtn = this.page.locator('#nav-toggle');
-    const visible = await toggleBtn.isVisible().catch(() => false);
-    if (!visible) return;
+    for (let attempt = 0; attempt < 3; attempt++) {
+      if (!(await this.isSidebarCollapsed())) {
+        await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
+        if (!(await this.isSidebarCollapsed())) return;
+      }
 
-    await toggleBtn.click({ force: true }).catch(async () => {
-      await toggleBtn.dispatchEvent('click');
-    });
-
-    // Wait for pf-m-collapsed to be removed from the sidebar.
-    await this.page
-      .waitForFunction(
-        () =>
-          !document.querySelector('.pf-v6-c-page__sidebar')?.classList.contains('pf-m-collapsed'),
-        null,
-        { timeout: 5_000 },
-      )
-      .catch(() => undefined);
-    await this.page.waitForTimeout(300);
+      await expandSidebar();
+      await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
+    }
   }
 
-  async clickNavBootableVolumes(): Promise<void> {
+  async clickNavBootableVolumes(): Promise<boolean> {
     await this.expandVirtualizationNavSection();
-    await this.clickSidebarNavItem(this.testId('bootablevolumes-nav-item'), /bootablevolumes/i);
+    return this.clickSidebarNavItem(
+      this.testId('bootablevolumes-nav-item'),
+      LIST_URL_PATTERNS.bootableVolumes,
+    );
   }
 
-  async clickNavCheckups(): Promise<void> {
+  async clickNavCheckups(): Promise<boolean> {
     await this.expandVirtualizationNavSection();
-    await this.clickSidebarNavItem(this.testId('virtualization-checkups-nav-item'), /checkups/i);
+    return this.clickSidebarNavItem(
+      this.testId('virtualization-checkups-nav-item'),
+      LIST_URL_PATTERNS.checkups,
+    );
   }
 
   async clickNavClusterOverview(): Promise<void> {
@@ -206,76 +242,98 @@ export default class NavigationComponent extends BaseComponent {
     await this.goTo('/dashboards');
   }
 
-  async clickNavInstanceTypes(): Promise<void> {
+  async clickNavInstanceTypes(): Promise<boolean> {
     await this.expandVirtualizationNavSection();
-    await this.clickSidebarNavItem(
+    return this.clickSidebarNavItem(
       this.testId('virtualmachineclusterinstancetypes-nav-item'),
-      /instancetype/i,
+      LIST_URL_PATTERNS.instanceTypes,
     );
   }
 
-  async clickNavMigrationPolicies(): Promise<void> {
+  async clickNavMigrationPolicies(): Promise<boolean> {
     await this.expandVirtualizationNavSection();
-    await this.clickSidebarNavItem(this.testId('migrationpolicies-nav-item'), /migrations/i);
+    return this.clickSidebarNavItem(
+      this.testId('migrationpolicies-nav-item'),
+      LIST_URL_PATTERNS.migrationPolicies,
+    );
   }
 
-  async clickNavSettings(): Promise<void> {
+  async clickNavSettings(): Promise<boolean> {
     await this.expandVirtualizationNavSection();
-    await this.clickSidebarNavItem(this.testId('virtualization-settings-nav-item'), /settings/i);
+    return this.clickSidebarNavItem(
+      this.testId('virtualization-settings-nav-item'),
+      LIST_URL_PATTERNS.settings,
+    );
   }
 
-  async clickNavTemplates(): Promise<void> {
+  async clickNavTemplates(): Promise<boolean> {
     await this.expandVirtualizationNavSection();
-    await this.clickSidebarNavItem(this.testId('templates-nav-item'), /templates/i);
+    return this.clickSidebarNavItem(
+      this.testId('templates-nav-item'),
+      LIST_URL_PATTERNS.templates,
+    );
   }
 
-  async clickNavVirtualizationOverview(): Promise<void> {
+  async clickNavVirtualizationOverview(): Promise<boolean> {
     await this.expandVirtualizationNavSection();
-    await this.clickSidebarNavItem(this._clusterOverviewNavItem, /dashboards|overview/i);
+    return this.clickSidebarNavItem(this._clusterOverviewNavItem, LIST_URL_PATTERNS.overview);
   }
 
-  async clickNavVirtualMachines(): Promise<void> {
+  async clickNavVirtualMachines(): Promise<boolean> {
     await this.expandVirtualizationNavSection();
-    await this.clickSidebarNavItem(this.testId('virtualmachines-nav-item'), /virtualmachine/i);
+    return this.clickSidebarNavItem(
+      this.testId('virtualmachines-nav-item'),
+      LIST_URL_PATTERNS.virtualMachines,
+    );
   }
 
   protected async clickSidebarNavItem(
     navLocator: Locator,
-    expectedUrlPattern?: RegExp,
-  ): Promise<void> {
+    expectedListUrlPattern?: RegExp,
+  ): Promise<boolean> {
     await this.waitForLoadingComplete(TestTimeouts.SHORT_WAIT);
     await this.ensureSidebarExpanded();
 
-    await navLocator.waitFor({ state: 'visible', timeout: TestTimeouts.DEFAULT });
+    const navVisible = await navLocator
+      .waitFor({ state: 'visible', timeout: TestTimeouts.DEFAULT })
+      .then(() => true)
+      .catch(() => false);
+    if (!navVisible) return false;
+
     await navLocator
       .scrollIntoViewIfNeeded({ timeout: TestTimeouts.UI_DELAY_MEDIUM })
       .catch(() => undefined);
     await this.page.waitForTimeout(TestTimeouts.UI_DELAY_MICRO);
 
-    await navLocator
-      .click({ force: true, timeout: TestTimeouts.UI_DELAY_MEDIUM })
-      .catch(async () => {
-        await navLocator.dispatchEvent('click');
-      });
+    const clickAndWaitForNavigation = async (): Promise<boolean> => {
+      const clicked = await navLocator
+        .click({ force: true, timeout: TestTimeouts.UI_DELAY_MEDIUM })
+        .then(() => true)
+        .catch(() =>
+          navLocator.dispatchEvent('click').then(() => true).catch(() => false),
+        );
+      if (!clicked) return false;
 
-    if (expectedUrlPattern) {
-      const navigated = await this.page
-        .waitForURL(expectedUrlPattern, { timeout: TestTimeouts.UI_DELAY_LONG })
+      if (!expectedListUrlPattern) return true;
+
+      return this.page
+        .waitForURL(expectedListUrlPattern, { timeout: TestTimeouts.UI_DELAY_LONG })
         .then(() => true)
         .catch(() => false);
-      if (!navigated) {
-        await this.closePerspectiveMenu();
-        await navLocator
-          .click({ force: true, timeout: TestTimeouts.UI_DELAY_MEDIUM })
-          .catch(async () => {
-            await navLocator.dispatchEvent('click');
-          });
-        await this.page.waitForURL(expectedUrlPattern, { timeout: TestTimeouts.UI_DELAY_LONG });
-      }
+    };
+
+    let navigated = await clickAndWaitForNavigation();
+    if (!navigated && expectedListUrlPattern) {
+      await this.closePerspectiveMenu().catch(() => undefined);
+      await this.ensureSidebarExpanded();
+      navigated = await clickAndWaitForNavigation();
     }
 
     await this.page.waitForLoadState('domcontentloaded');
     await this.waitForLoadingComplete(TestTimeouts.SHORT_WAIT);
+
+    if (!expectedListUrlPattern) return navigated;
+    return navigated || expectedListUrlPattern.test(this.page.url());
   }
 
   async clickVirtualMachinesNavItem(): Promise<void> {
@@ -329,9 +387,9 @@ export default class NavigationComponent extends BaseComponent {
 
     const isExpanded = await this._virtNavSection.getAttribute('aria-expanded');
     if (isExpanded === 'false') {
-      await this._virtNavSection.click().catch(async () => {
-        await this._virtNavSection.dispatchEvent('click');
-      });
+      await this._virtNavSection.click().catch(() =>
+        this._virtNavSection.dispatchEvent('click').catch(() => undefined),
+      );
       await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
     }
 

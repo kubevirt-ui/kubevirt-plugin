@@ -386,10 +386,6 @@ export default class BootableVolumesPage extends PageCommons {
     }
     return false;
   }
-  async navigateToBootableVolumesViaUI(): Promise<void> {
-    await this.clickNavBootableVolumes();
-    await this.page.waitForLoadState('domcontentloaded');
-  }
   async navigateToNamespaceBootableVolumesViaUI(namespace: string): Promise<void> {
     await this.clickNavBootableVolumes();
     await this.page.waitForLoadState('domcontentloaded');

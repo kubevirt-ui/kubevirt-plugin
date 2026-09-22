@@ -330,11 +330,10 @@ export default class MigrationPoliciesPage extends PageCommons {
    * Navigates to Migration Policies page via sidebar UI click, falling back to URL navigation.
    */
   async navigateToMigrationPoliciesViaUI(): Promise<void> {
-    for (let attempt = 1; attempt <= 3; attempt++) {
-      await this.clickNavMigrationPolicies();
-      if (/migration/i.test(this.page.url())) return;
-      await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
-    }
+    await this.navigateViaSidebarWithFallback(
+      () => this.clickNavMigrationPolicies(),
+      () => this.navigateToMigrationPolicies(),
+    );
   }
 
   /**

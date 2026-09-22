@@ -215,10 +215,6 @@ export default class BootableVolumesListPage extends PageCommons {
     return await saveButton.isDisabled();
   }
 
-  async navigateToBootableVolumesViaUI(): Promise<void> {
-    await this.clickNavBootableVolumes();
-  }
-
   async navigateToNamespaceBootableVolumesViaUI(namespace: string): Promise<void> {
     await this.switchToVirtualizationPerspective();
     await this.clickNavBootableVolumes();

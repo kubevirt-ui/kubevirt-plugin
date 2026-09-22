@@ -29,6 +29,7 @@ const patchConfigMapData = async (
 };
 
 const USER_SETTINGS = JSON.stringify({
+  navigation: { autoHideNav: false },
   onboardingPopoversHidden: { catalog: true, createProject: true, navCollapse: true, vmsTab: true },
   quickStart: { dontShowWelcomeModal: true },
 });
