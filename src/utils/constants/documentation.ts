@@ -70,5 +70,6 @@ export const documentationURL = {
   VIRTIO_WIN_DRIVERS: `${REDHAT_DOC_URL}/html/virtualization/managing-vms#virt-install-virtio-drivers-on-windows-vms`,
   VIRTUALIZATION_BLOG: `https://cloud.redhat.com/learn/topics/virtualization/`,
   VIRTUALIZATION_WHAT_YOU_CAN_DO: `${REDHAT_DOC_URL}/html/virtualization/about#virt-what-you-can-do-with-virt_about-virt`,
+  VM_MEMORY_RESOURCE_LIMITS: `${REDHAT_DOC_URL}/html-single/virtualization/index#virt-setting-resource-quota-limits-for-vms_virt-working-with-resource-quotas-for-vms`,
   VOLUME_MODE: `${K8S_PERSISTENT_VOLUMES_URL}/#volume-mode`,
 };
