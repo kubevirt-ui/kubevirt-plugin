@@ -487,6 +487,14 @@ export default class VirtualMachinesPage extends TreeContextMenuMixin(PageCommon
     return this.listActions.getDeleteModalDescriptionText();
   }
 
+  async getDeleteModalListedResources(): Promise<Array<{ kind: string; name: string }>> {
+    return this.listActions.getDeleteModalListedResources();
+  }
+
+  async waitForDeleteModalLoaded(): Promise<void> {
+    return this.listActions.waitForDeleteModalLoaded();
+  }
+
   async getDeletionCountFromModal(): Promise<number | null> {
     return this.listActions.getDeletionCountFromModal();
   }

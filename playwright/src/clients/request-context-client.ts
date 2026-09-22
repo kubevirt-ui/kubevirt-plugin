@@ -775,6 +775,15 @@ export default class RequestContextClient extends BaseClient implements ProxyApi
     return this.vm.hotplugVolumeEphemeral(namespace, vmName, volumeName, diskName);
   }
 
+  attachDataVolumeToVm(
+    vmName: string,
+    namespace: string,
+    dataVolumeName: string,
+    diskName: string,
+  ) {
+    return this.vm.attachDataVolumeToVm(namespace, vmName, dataVolumeName, diskName);
+  }
+
   hotplugVolumeToVm(vmName: string, namespace: string, volumeName: string, diskName: string) {
     return this.vm.hotplugVolumeToVm(namespace, vmName, volumeName, diskName);
   }
