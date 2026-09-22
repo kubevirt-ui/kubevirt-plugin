@@ -83,5 +83,7 @@ export const getVMIDisksTableColumns = (t: TFunction): ColumnConfig<DiskPresenta
   },
 ];
 
-export const getVMIDiskRowId = (disk: DiskPresentation, index: number): string =>
-  disk.name ? `${disk.name}-${disk.source ?? 'no-source'}` : `disk-${index}`;
+export const getVMIDiskRowId = (disk: DiskPresentation): string =>
+  disk.name
+    ? `${disk.name}-${disk.source ?? 'no-source'}`
+    : `${disk.drive}-${disk.interface}-${disk.source ?? 'no-source'}`;

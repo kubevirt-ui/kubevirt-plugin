@@ -3,7 +3,7 @@ import { type JSX, useMemo } from 'react';
 import { type IoK8sApiBatchV1Job } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import KubevirtFilterToolbar from '@kubevirt-utils/components/KubevirtFilterToolbar/KubevirtFilterToolbar';
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
-import { buildColumnLayout } from '@kubevirt-utils/components/KubevirtTable/utils';
+import { buildColumnLayout, getK8sRowId } from '@kubevirt-utils/components/KubevirtTable/utils';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
 import useKubevirtDataViewFilters from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/useKubevirtDataViewFilters';
@@ -19,7 +19,7 @@ import { ListPageBody } from '@openshift-console/dynamic-plugin-sdk';
 import { Pagination } from '@patternfly/react-core';
 import { useHubClusterName } from '@stolostron/multicluster-sdk';
 
-import { getCheckupsConfigMapRowId, getJobByName } from '../../utils/utils';
+import { getJobByName } from '../../utils/utils';
 import useCheckupsStorageData from '../components/hooks/useCheckupsStorageData';
 import { useCheckupsStoragePermissions } from '../components/hooks/useCheckupsStoragePermissions';
 import { getFilters } from '../utils/filters';
@@ -144,7 +144,7 @@ const CheckupsStorageList = (): JSX.Element => {
         data={filteredData ?? []}
         dataTest="checkups-storage-table"
         fixedLayout
-        getRowId={getCheckupsConfigMapRowId}
+        getRowId={getK8sRowId}
         loaded={isLoaded}
         loadError={error}
         noDataMsg={t('No storage checkups found')}

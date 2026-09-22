@@ -4,7 +4,7 @@ import { useMemo } from 'react';
 import { VirtualMachineClusterInstancetypeModelRef } from '@kubevirt-ui-ext/kubevirt-api/console';
 import KubevirtFilterToolbar from '@kubevirt-utils/components/KubevirtFilterToolbar/KubevirtFilterToolbar';
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
-import { buildColumnLayout } from '@kubevirt-utils/components/KubevirtTable/utils';
+import { buildColumnLayout, getK8sRowId } from '@kubevirt-utils/components/KubevirtTable/utils';
 import useClusterInstanceTypes from '@kubevirt-utils/hooks/useClusterInstanceTypes';
 import useClusterFilter from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/filters/useClusterFilter';
 import useKubevirtDataViewFilters from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/useKubevirtDataViewFilters';
@@ -20,10 +20,7 @@ import useIsACMPage from '@multicluster/useIsACMPage';
 import { ListPageBody } from '@openshift-console/dynamic-plugin-sdk';
 import { Pagination } from '@patternfly/react-core';
 
-import {
-  getClusterInstancetypeColumns,
-  getClusterInstancetypeRowId,
-} from './clusterInstancetypeDefinition';
+import { getClusterInstancetypeColumns } from './clusterInstancetypeDefinition';
 
 import '@kubevirt-utils/styles/list-managment-group.scss';
 
@@ -114,7 +111,7 @@ const ClusterInstancetypeList: FC<ListPageProps> = ({
         columns={columns}
         data={filteredData ?? []}
         dataTest="cluster-instancetype-list"
-        getRowId={getClusterInstancetypeRowId}
+        getRowId={getK8sRowId}
         loaded={isLoaded}
         loadError={loadError}
         noDataMsg={t("You don't have any VirtualMachineClusterInstanceTypes yet")}

@@ -3,7 +3,7 @@ import { useMemo } from 'react';
 
 import KubevirtFilterToolbar from '@kubevirt-utils/components/KubevirtFilterToolbar/KubevirtFilterToolbar';
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
-import { buildColumnLayout } from '@kubevirt-utils/components/KubevirtTable/utils';
+import { buildColumnLayout, getK8sRowId } from '@kubevirt-utils/components/KubevirtTable/utils';
 import useClusterPreferences from '@kubevirt-utils/hooks/useClusterPreferences';
 import useKubevirtDataViewFilters from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/useKubevirtDataViewFilters';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -16,10 +16,7 @@ import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { ListPageBody } from '@openshift-console/dynamic-plugin-sdk';
 import { Pagination } from '@patternfly/react-core';
 
-import {
-  getClusterPreferenceColumns,
-  getClusterPreferenceRowId,
-} from './clusterPreferenceDefinition';
+import { getClusterPreferenceColumns } from './clusterPreferenceDefinition';
 
 import '@kubevirt-utils/styles/list-managment-group.scss';
 
@@ -87,7 +84,7 @@ const ClusterPreferenceList: FC<ListPageProps> = ({
         columns={columns}
         data={filteredData ?? []}
         dataTest="cluster-preference-list"
-        getRowId={getClusterPreferenceRowId}
+        getRowId={getK8sRowId}
         loaded={isLoaded}
         loadError={loadError}
         noDataMsg={t('No preferences found')}

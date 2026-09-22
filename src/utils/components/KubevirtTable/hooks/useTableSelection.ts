@@ -5,7 +5,7 @@ import { addItemsToSelection, removeItemsFromSelection } from '../utils/getBulkS
 export type UseTableSelectionProps<TData> = {
   /** Full dataset (sorted but not paginated) - used for validating selected items */
   data: TData[];
-  getRowId: (row: TData, index: number) => string;
+  getRowId: (row: TData) => string;
   onSelect: (selected: TData[]) => void;
   /** Current page data - used for allSelected/someSelected state on current page */
   paginatedData: TData[];
@@ -14,9 +14,9 @@ export type UseTableSelectionProps<TData> = {
 
 export type UseTableSelectionResult<TData> = {
   allSelected: boolean;
-  handleRowSelect: (row: TData, index: number) => void;
+  handleRowSelect: (row: TData) => void;
   handleSelectAll: () => void;
-  isRowSelected: (row: TData, index: number) => boolean;
+  isRowSelected: (row: TData) => boolean;
   selectedIds: Set<string>;
   someSelected: boolean;
   validSelectedItems: TData[];
@@ -30,33 +30,30 @@ export const useTableSelection = <TData>({
   selectedItems,
 }: UseTableSelectionProps<TData>): UseTableSelectionResult<TData> => {
   const selectedIds = useMemo(
-    () => new Set(selectedItems.map((item, index) => getRowId(item, index))),
+    () => new Set(selectedItems.map((item) => getRowId(item))),
     [selectedItems, getRowId],
   );
 
   // Use full data for validation (prevents clearing selection when changing pages)
-  const dataIds = useMemo(
-    () => new Set(data.map((item, index) => getRowId(item, index))),
-    [data, getRowId],
-  );
+  const dataIds = useMemo(() => new Set(data.map((item) => getRowId(item))), [data, getRowId]);
 
   const validSelectedItems = useMemo(
-    () => selectedItems.filter((item, index) => dataIds.has(getRowId(item, index))),
+    () => selectedItems.filter((item) => dataIds.has(getRowId(item))),
     [selectedItems, dataIds, getRowId],
   );
 
   const isRowSelected = useCallback(
-    (row: TData, index: number): boolean => selectedIds.has(getRowId(row, index)),
+    (row: TData): boolean => selectedIds.has(getRowId(row)),
     [getRowId, selectedIds],
   );
 
   const handleRowSelect = useCallback(
-    (row: TData, index: number) => {
-      const rowId = getRowId(row, index);
+    (row: TData) => {
+      const rowId = getRowId(row);
       const isCurrentlySelected = selectedIds.has(rowId);
 
       if (isCurrentlySelected) {
-        onSelect(selectedItems.filter((item, i) => getRowId(item, i) !== rowId));
+        onSelect(selectedItems.filter((item) => getRowId(item) !== rowId));
       } else {
         onSelect([...selectedItems, row]);
       }
@@ -66,12 +63,12 @@ export const useTableSelection = <TData>({
 
   // Use paginatedData for allSelected/someSelected (reflects current page state)
   const allSelected = useMemo(
-    () => paginatedData.length > 0 && paginatedData.every((row, i) => isRowSelected(row, i)),
+    () => paginatedData.length > 0 && paginatedData.every((row) => isRowSelected(row)),
     [paginatedData, isRowSelected],
   );
 
   const someSelected = useMemo(
-    () => paginatedData.some((row, i) => isRowSelected(row, i)),
+    () => paginatedData.some((row) => isRowSelected(row)),
     [paginatedData, isRowSelected],
   );
 

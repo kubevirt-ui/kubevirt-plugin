@@ -5,6 +5,7 @@ import { VirtualMachineInstanceModelGroupVersionKind } from '@kubevirt-ui-ext/ku
 import type { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import KubevirtFilterToolbar from '@kubevirt-utils/components/KubevirtFilterToolbar/KubevirtFilterToolbar';
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
+import { getK8sRowId } from '@kubevirt-utils/components/KubevirtTable/utils';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import useKubevirtDataViewFilters from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/useKubevirtDataViewFilters';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -14,7 +15,7 @@ import { ListPageBody, ListPageHeader } from '@openshift-console/dynamic-plugin-
 
 import VirtualMachineInstanceEmptyState from './components/VirtualMachineInstanceEmptyState/VirtualMachineInstanceEmptyState';
 import useVMIListFilters from './hooks/useVMIListFilters';
-import { getVMIColumns, getVMIRowId, VMI_COLUMN_KEYS } from './virtualMachinesInstancesDefinition';
+import { getVMIColumns, VMI_COLUMN_KEYS } from './virtualMachinesInstancesDefinition';
 
 type VirtualMachinesInstancesListProps = {
   namespace: string;
@@ -55,7 +56,7 @@ const VirtualMachinesInstancesList: FC<VirtualMachinesInstancesListProps> = ({ n
           ariaLabel={t('VirtualMachineInstances table')}
           columns={columns}
           data={filteredData ?? []}
-          getRowId={getVMIRowId}
+          getRowId={getK8sRowId}
           initialSortKey={VMI_COLUMN_KEYS.name}
           loaded={loaded}
           loadError={loadError}

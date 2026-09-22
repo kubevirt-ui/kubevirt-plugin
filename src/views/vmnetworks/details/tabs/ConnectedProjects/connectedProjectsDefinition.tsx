@@ -24,5 +24,4 @@ export const getConnectedProjectsColumns = (t: TFunction): ColumnConfig<ProjectW
   },
 ];
 
-export const getConnectedProjectRowId = (row: ProjectWithVMCount, index: number): string =>
-  row.projectName || `unknown-project-${index}`;
+export const getConnectedProjectRowId = (row: ProjectWithVMCount): string => row.projectName;

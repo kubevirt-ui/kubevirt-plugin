@@ -3,7 +3,6 @@ import { type TFunction } from 'i18next';
 
 import { VirtualMachineClusterPreferenceModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { type V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { getK8sRowId } from '@kubevirt-utils/components/KubevirtTable/utils';
 import RedHatLabel from '@kubevirt-utils/components/RedHatLabel/RedHatLabel';
 import { VENDOR_LABEL } from '@kubevirt-utils/constants/constants';
 import { type ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
@@ -61,8 +60,3 @@ export const getClusterPreferenceColumns = (
     renderCell: (row) => <ActionsCell row={row} />,
   },
 ];
-
-export const getClusterPreferenceRowId = (
-  preference: V1beta1VirtualMachineClusterPreference,
-  index: number,
-): string => getK8sRowId(preference, index, 'cluster-preference');

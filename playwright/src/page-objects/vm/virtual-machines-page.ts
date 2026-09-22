@@ -517,6 +517,11 @@ export default class VirtualMachinesPage extends TreeContextMenuMixin(PageCommon
     return this.overviewWidgets.getHealthSectionWidgetsVisibility(timeout);
   }
 
+  async getListedVmNames(): Promise<string[]> {
+    const vmList = new VmListComponent(this.page);
+    return vmList.getListedVmNames();
+  }
+
   async getMigrationPlanProgress(): Promise<{ percentage: number; title: string }> {
     return this.overviewWidgets.getMigrationPlanProgress();
   }
@@ -808,6 +813,11 @@ export default class VirtualMachinesPage extends TreeContextMenuMixin(PageCommon
 
   async isTreeviewVisible(): Promise<boolean> {
     return this.tree.isTreeviewVisible();
+  }
+
+  async isVmCheckboxChecked(vmName: string): Promise<boolean> {
+    const vmList = new VmListComponent(this.page);
+    return vmList.isVmCheckboxChecked(vmName);
   }
 
   async isVmListContentVisible(timeout?: number): Promise<boolean> {
@@ -1149,6 +1159,14 @@ export default class VirtualMachinesPage extends TreeContextMenuMixin(PageCommon
 
   async setAdvancedSearchVmName(vmName: string): Promise<void> {
     return this.search.setAdvancedSearchVmName(vmName);
+  }
+
+  async sortTableByColumn(
+    columnName: string,
+    direction: 'ascending' | 'descending',
+  ): Promise<void> {
+    const vmList = new VmListComponent(this.page);
+    return vmList.sortTableByColumn(columnName, direction);
   }
 
   async startStorageMigrationAndCancelWhileInProgress(vmName: string): Promise<void> {

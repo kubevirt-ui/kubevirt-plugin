@@ -3,7 +3,7 @@ import { type TFunction } from 'i18next';
 import { type V1alpha1MigrationPolicy } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import type { TableExportColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { ACTIONS } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/const';
-import { getName, getUID } from '@kubevirt-utils/resources/shared';
+import { getName } from '@kubevirt-utils/resources/shared';
 import { getCluster } from '@multicluster/helpers/selectors';
 
 import { MIGRATION_POLICY_COLUMN_KEYS, migrationPolicySpecKeys } from '../utils/constants';
@@ -120,18 +120,4 @@ export const getMigrationPoliciesColumns = (
   );
 
   return columns;
-};
-
-export const getMigrationPoliciesRowId = (row: V1alpha1MigrationPolicy, index: number): string => {
-  const uid = getUID(row);
-  if (uid) return uid;
-
-  const cluster = getCluster(row) ?? 'local';
-  const name = getName(row);
-
-  if (name) {
-    return `${cluster}-${name}`;
-  }
-
-  return `migration-policy-${index}`;
 };

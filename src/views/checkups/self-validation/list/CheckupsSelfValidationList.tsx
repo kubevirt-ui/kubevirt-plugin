@@ -3,13 +3,11 @@ import { type FC, useMemo } from 'react';
 import { type IoK8sApiBatchV1Job } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import KubevirtFilterToolbar from '@kubevirt-utils/components/KubevirtFilterToolbar/KubevirtFilterToolbar';
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
+import { buildColumnLayout, getK8sRowId } from '@kubevirt-utils/components/KubevirtTable/utils';
 import useKubevirtDataViewFilters from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/useKubevirtDataViewFilters';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtTableColumns';
-import {
-  ACTIONS,
-  COLUMN_MANAGEMENT_IDS,
-} from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/const';
+import { COLUMN_MANAGEMENT_IDS } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/const';
 import usePaginationWithFilters from '@kubevirt-utils/hooks/usePagination/usePaginationWithFilters';
 import { paginationDefaultValues } from '@kubevirt-utils/hooks/usePagination/utils/constants';
 import { EXPORT_TABLE_KEYS, KubevirtTableExport } from '@kubevirt-utils/hooks/useTableExport';
@@ -22,7 +20,7 @@ import { useHubClusterName } from '@stolostron/multicluster-sdk';
 import { getCheckupsSelfValidationListFilters } from '../utils';
 
 import { CHECKUPS_COLUMN_KEYS } from '../../utils/constants';
-import { getCheckupsConfigMapRowId, getJobByName } from '../../utils/utils';
+import { getJobByName } from '../../utils/utils';
 import useCheckupsSelfValidationData from '../components/hooks/useCheckupsSelfValidationData';
 import useCheckupsSelfValidationPermissions from '../components/hooks/useCheckupsSelfValidationPermissions';
 import {
@@ -80,14 +78,13 @@ const CheckupsSelfValidationList: FC = () => {
   );
 
   const columnLayout = useMemo(
-    () => ({
-      columns: columns
-        .filter((col) => col.key !== ACTIONS)
-        .map(({ additional, key, label }) => ({ additional, id: key, title: label })),
-      id: COLUMN_MANAGEMENT_IDS.CHECKUPS_SELF_VALIDATION,
-      selectedColumns: new Set(activeColumnKeys),
-      type: t('Checkups'),
-    }),
+    () =>
+      buildColumnLayout(
+        columns,
+        activeColumnKeys,
+        COLUMN_MANAGEMENT_IDS.CHECKUPS_SELF_VALIDATION,
+        t('Checkups'),
+      ),
     [columns, activeColumnKeys, t],
   );
 
@@ -149,7 +146,7 @@ const CheckupsSelfValidationList: FC = () => {
         data={filteredData ?? []}
         dataTest="checkups-self-validation-table"
         fixedLayout
-        getRowId={getCheckupsConfigMapRowId}
+        getRowId={getK8sRowId}
         initialSortDirection="desc"
         initialSortKey={CHECKUPS_COLUMN_KEYS.START_TIME_CAMEL}
         loaded={isLoaded}

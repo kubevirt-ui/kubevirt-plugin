@@ -52,5 +52,5 @@ export const getConnectedVMsColumns = (
   },
 ];
 
-export const getConnectedVMRowId = (row: V1VirtualMachine, index: number): string =>
-  getUID(row) ?? `${getNamespace(row)}-${getName(row)}-${index}`;
+export const getConnectedVMRowId = (row: V1VirtualMachine): string =>
+  getUID(row) ?? `${getNamespace(row) ?? ''}-${getName(row) ?? ''}`;

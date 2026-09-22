@@ -86,5 +86,5 @@ export const getWizardNetworkColumns = (
   },
 ];
 
-export const getWizardNetworkRowId = (row: NetworkPresentation, index: number): string =>
-  row.network?.name ?? `network-${index}`;
+export const getWizardNetworkRowId = (row: NetworkPresentation): string =>
+  row.network?.name ?? row.iface?.name ?? '';

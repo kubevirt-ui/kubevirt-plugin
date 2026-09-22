@@ -5,7 +5,6 @@ import type {
   V1beta1DataVolume,
 } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import type { V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { getK8sRowId } from '@kubevirt-utils/components/KubevirtTable/utils';
 import type { TableExportColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { ACTIONS } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/const';
 import type { ClusterNamespacedResourceMap } from '@kubevirt-utils/resources/shared';
@@ -126,6 +125,3 @@ export const getBootableVolumeColumns = (
 
   return columns;
 };
-
-export const getBootableVolumeRowId = (resource: BootableResource, index: number): string =>
-  getK8sRowId(resource, index, 'bootable-volume');

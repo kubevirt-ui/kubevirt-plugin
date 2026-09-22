@@ -17,7 +17,7 @@ import './KubevirtTable.scss';
 
 export type { KubevirtTableProps } from './types';
 
-const defaultGetRowId = (_row: unknown, index: number): string => String(index);
+const defaultGetRowId = (_row: unknown): string => '';
 const defaultOnSelect = (_items: unknown[]): void => {};
 
 const KubevirtTable = <TData, TCallbacks = undefined>(

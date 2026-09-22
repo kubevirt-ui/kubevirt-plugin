@@ -24,9 +24,9 @@ export type GenerateRowsParams<TData, TCallbacks = undefined> = {
   callbacks: TCallbacks;
   columns: ColumnConfig<TData, TCallbacks>[];
   data: TData[];
-  getRowId?: (row: TData, index: number) => string;
-  isRowSelected?: (row: TData, index: number) => boolean;
-  onRowSelect?: (row: TData, index: number) => void;
+  getRowId?: (row: TData) => string;
+  isRowSelected?: (row: TData) => boolean;
+  onRowSelect?: (row: TData) => void;
   selectable?: boolean;
 };
 
@@ -40,8 +40,9 @@ export const generateRows = <TData, TCallbacks = undefined>({
   selectable,
 }: GenerateRowsParams<TData, TCallbacks>): DataViewTr[] =>
   (data ?? []).map((row, index) => {
-    const rowId = getRowId?.(row, index) ?? String(index);
-    const isSelected = selectable && isRowSelected ? isRowSelected(row, index) : false;
+    const providedRowId = getRowId?.(row) ?? '';
+    const rowId = providedRowId === '' ? String(index) : providedRowId;
+    const isSelected = selectable && isRowSelected ? isRowSelected(row) : false;
 
     const baseCells = columns.map((col) => ({
       cell: renderColumnCell(col, row, callbacks),
@@ -49,15 +50,15 @@ export const generateRows = <TData, TCallbacks = undefined>({
     }));
 
     if (selectable) {
-      const sanitizedRowId = `${rowId.replace(/[^a-zA-Z0-9-_]/g, '-')}-${index}`;
+      const encodedRowId = encodeURIComponent(rowId);
       const selectionCell = {
         cell: (
           <Checkbox
-            aria-label={`Select row ${sanitizedRowId}`}
-            data-test={`select-row-${sanitizedRowId}`}
-            id={`select-row-${sanitizedRowId}`}
+            aria-label={`Select row ${rowId}`}
+            data-test={`select-row-${encodedRowId}`}
+            id={`select-row-${encodedRowId}`}
             isChecked={isSelected}
-            onChange={() => onRowSelect?.(row, index)}
+            onChange={() => onRowSelect?.(row)}
           />
         ),
         props: { className: PF_TABLE_CHECK_CLASS },

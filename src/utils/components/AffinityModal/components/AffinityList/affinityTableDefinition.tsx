@@ -75,5 +75,4 @@ export const getAffinityColumns = (
   },
 ];
 
-export const getAffinityRowId = (affinity: AffinityRowData, index: number): string =>
-  `${affinity.type}-${affinity.condition}-${index}`;
+export const getAffinityRowId = (affinity: AffinityRowData): string => affinity.id;

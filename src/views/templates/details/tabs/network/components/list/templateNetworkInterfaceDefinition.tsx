@@ -85,5 +85,5 @@ export const getTemplateNetworkColumns = (
   },
 ];
 
-export const getTemplateNetworkRowId = (row: NetworkPresentation, index: number): string =>
-  row.network?.name ?? `network-${index}`;
+export const getTemplateNetworkRowId = (row: NetworkPresentation): string =>
+  row.network?.name ?? row.iface?.name ?? '';

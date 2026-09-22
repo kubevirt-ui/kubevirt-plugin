@@ -93,5 +93,7 @@ export const getTemplateDiskColumns = (
   },
 ];
 
-export const getTemplateDiskRowId = (row: DiskRowDataLayout, index: number): string =>
-  row?.name ?? `disk-${index}`;
+export const getTemplateDiskRowId = (row: DiskRowDataLayout): string =>
+  row.name
+    ? `${row.name}-${row.source ?? 'no-source'}`
+    : `${row.drive}-${row.interface}-${row.source ?? 'no-source'}`;

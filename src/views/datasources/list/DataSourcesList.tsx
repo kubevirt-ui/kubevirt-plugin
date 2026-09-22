@@ -4,7 +4,7 @@ import { DataSourceModelRef } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { type V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import KubevirtFilterToolbar from '@kubevirt-utils/components/KubevirtFilterToolbar/KubevirtFilterToolbar';
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
-import { buildColumnLayout } from '@kubevirt-utils/components/KubevirtTable/utils';
+import { buildColumnLayout, getK8sRowId } from '@kubevirt-utils/components/KubevirtTable/utils';
 import useKubevirtDataViewFilters from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/useKubevirtDataViewFilters';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtTableColumns';
@@ -20,7 +20,7 @@ import {
 import { Pagination } from '@patternfly/react-core';
 
 import DataSourceCreateButton from './components/DataSourceCreateButton/DataSourceCreateButton';
-import { getDataSourceColumns, getDataSourceRowId } from './dataSourcesDefinition';
+import { getDataSourceColumns } from './dataSourcesDefinition';
 import { getDataImportCronFilter } from './DataSourcesListFilters';
 
 import '@kubevirt-utils/styles/list-managment-group.scss';
@@ -112,7 +112,7 @@ const DataSourcesList: FC<DataSourcesListProps> = ({ kind, namespace }) => {
           columns={columns}
           data={filteredData ?? []}
           dataTest="datasources-list"
-          getRowId={getDataSourceRowId}
+          getRowId={getK8sRowId}
           loaded={isLoaded}
           loadError={loadError}
           noDataMsg={t("You don't have any DataSources yet")}

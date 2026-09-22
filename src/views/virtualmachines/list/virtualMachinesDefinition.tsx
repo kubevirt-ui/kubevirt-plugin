@@ -1,8 +1,5 @@
 import { type TFunction } from 'i18next';
 
-import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { getK8sRowId } from '@kubevirt-utils/components/KubevirtTable/utils';
-
 import {
   getClusterColumns,
   getNameColumn,
@@ -72,6 +69,3 @@ export const getVMColumns = (
   getStorageClassColumn(t),
   ...getActionsColumns(hideActions),
 ];
-
-export const getVMRowId = (vm: V1VirtualMachine, index: number): string =>
-  getK8sRowId(vm, index, 'vm');

@@ -1,6 +1,6 @@
 import { BulkSelectValue } from '@patternfly/react-component-groups/dist/dynamic/BulkSelect';
 
-export type GetItemId<T> = (item: T, index: number) => string;
+export type GetItemId<T> = (item: T) => string;
 
 export type GetBulkSelectedItemsArgs<T> = {
   allItems: T[];
@@ -15,8 +15,8 @@ export const addItemsToSelection = <T>(
   itemsToAdd: T[],
   getItemId: GetItemId<T>,
 ): T[] => {
-  const existingIds = new Set(selectedItems.map((item, index) => getItemId(item, index)));
-  const newItems = itemsToAdd.filter((item, index) => !existingIds.has(getItemId(item, index)));
+  const existingIds = new Set(selectedItems.map((item) => getItemId(item)));
+  const newItems = itemsToAdd.filter((item) => !existingIds.has(getItemId(item)));
 
   return [...selectedItems, ...newItems];
 };
@@ -26,9 +26,9 @@ export const removeItemsFromSelection = <T>(
   itemsToRemove: T[],
   getItemId: GetItemId<T>,
 ): T[] => {
-  const idsToRemove = new Set(itemsToRemove.map((item, index) => getItemId(item, index)));
+  const idsToRemove = new Set(itemsToRemove.map((item) => getItemId(item)));
 
-  return selectedItems.filter((item, index) => !idsToRemove.has(getItemId(item, index)));
+  return selectedItems.filter((item) => !idsToRemove.has(getItemId(item)));
 };
 
 export const getBulkSelectedItems = <T>({

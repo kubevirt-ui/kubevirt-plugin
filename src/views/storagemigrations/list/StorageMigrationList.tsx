@@ -3,7 +3,7 @@ import { useMemo } from 'react';
 
 import KubevirtFilterToolbar from '@kubevirt-utils/components/KubevirtFilterToolbar/KubevirtFilterToolbar';
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
-import { buildColumnLayout } from '@kubevirt-utils/components/KubevirtTable/utils';
+import { buildColumnLayout, getK8sRowId } from '@kubevirt-utils/components/KubevirtTable/utils';
 import useKubevirtDataViewFilters from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/useKubevirtDataViewFilters';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtTableColumns';
@@ -16,7 +16,7 @@ import { Pagination } from '@patternfly/react-core';
 
 import { COLUMN_MANAGEMENT_ID_STORAGE_MIGRATIONS } from './constants';
 import useStorageMigrationResources from './hooks/useStorageMigrationResources';
-import { getStorageMigrationColumns, getStorageMigrationRowId } from './storageMigrationDefinition';
+import { getStorageMigrationColumns } from './storageMigrationDefinition';
 import { getStorageMigrationStatusFilters } from './StorageMigrationListFilters';
 
 import '@kubevirt-utils/styles/list-managment-group.scss';
@@ -102,7 +102,7 @@ const StorageMigrationList: FC = () => {
           columns={columns}
           data={filteredData ?? []}
           dataTest="storage-migrations-list"
-          getRowId={getStorageMigrationRowId}
+          getRowId={getK8sRowId}
           loaded={isLoaded}
           loadError={loadError}
           noDataMsg={t("You don't have any storage migrations yet")}

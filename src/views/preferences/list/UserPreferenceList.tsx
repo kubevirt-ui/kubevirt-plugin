@@ -4,7 +4,7 @@ import { useMemo } from 'react';
 import { VirtualMachinePreferenceModelRef } from '@kubevirt-ui-ext/kubevirt-api/console';
 import KubevirtFilterToolbar from '@kubevirt-utils/components/KubevirtFilterToolbar/KubevirtFilterToolbar';
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
-import { buildColumnLayout } from '@kubevirt-utils/components/KubevirtTable/utils';
+import { buildColumnLayout, getK8sRowId } from '@kubevirt-utils/components/KubevirtTable/utils';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
 import useKubevirtDataViewFilters from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/useKubevirtDataViewFilters';
@@ -19,7 +19,7 @@ import { ListPageBody } from '@openshift-console/dynamic-plugin-sdk';
 import { Pagination } from '@patternfly/react-core';
 
 import UserPreferencesEmptyState from './components/UserPreferencesEmptyState';
-import { getUserPreferenceColumns, getUserPreferenceRowId } from './userPreferenceDefinition';
+import { getUserPreferenceColumns } from './userPreferenceDefinition';
 
 const UserPreferenceList: FC<ListPageProps> = ({
   fieldSelector,
@@ -102,7 +102,7 @@ const UserPreferenceList: FC<ListPageProps> = ({
         columns={columns}
         data={filteredData ?? []}
         dataTest="user-preference-list"
-        getRowId={getUserPreferenceRowId}
+        getRowId={getK8sRowId}
         loaded={isLoaded}
         loadError={loadError}
         noDataMsg={t("You don't have any VirtualMachinePreferences yet")}
