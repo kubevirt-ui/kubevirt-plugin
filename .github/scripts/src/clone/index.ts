@@ -7,15 +7,11 @@ import { failStep } from '../shared/output';
 import type { CherryPickResult, GitHubConfig } from '../types/index';
 import { JIRA_BASE_URL, JIRA_PROJECT_KEY } from '../types/index';
 import { openCherryPickPR, performCherryPick } from './cherry-pick';
+import { buildSourcePrCloneSuccessComment } from './clone-comments';
 import { formatCloneFailureMessage } from './clone-errors';
 import { cloneAllTickets } from './clone-tickets';
 import { postCloneError, validateCloneCommand } from './clone-validation';
 import { setupRepositoryForCherryPick } from './git-helpers';
-
-const clonedTicketsFooter = (clonedKeys: string[]): string =>
-  clonedKeys.length > 0
-    ? `Cloned tickets: ${clonedKeys.map((key) => `[${key}](${JIRA_BASE_URL}/browse/${key})`).join(', ')}`
-    : '';
 
 /** Parse /clone command, clone Jira tickets, cherry-pick, and open a new PR. */
 export const runClone = async (): Promise<void> => {
@@ -73,8 +69,6 @@ export const runClone = async (): Promise<void> => {
     failStep(`Failed to clone any tickets: ${ticketIds.join(', ')}`);
   }
 
-  const clonedKeys = clonedTickets.map((ticket) => ticket.clonedKey);
-  const clonedFooter = clonedTicketsFooter(clonedKeys);
   const primaryClone = clonedTickets[0];
   const cherryPickBranch = `cherry-pick-${primaryClone.clonedKey.toLowerCase()}-to-${targetBranch}`;
   const commitSha = mergeCommitSha || headSha;
@@ -95,7 +89,7 @@ export const runClone = async (): Promise<void> => {
       octokit,
       ghConfig,
       prNumber,
-      formatCloneFailureMessage('Cherry-pick failed', err, clonedFooter),
+      formatCloneFailureMessage('Cherry-pick failed', err),
     );
     return failStep(`Cherry-pick failed: ${safeErrorMessage(err)}`);
   }
@@ -122,34 +116,17 @@ export const runClone = async (): Promise<void> => {
       octokit,
       ghConfig,
       prNumber,
-      formatCloneFailureMessage('Failed to open cherry-pick PR', err, clonedFooter),
+      formatCloneFailureMessage('Failed to open cherry-pick PR', err),
     );
     return failStep(`Failed to open cherry-pick PR: ${safeErrorMessage(err)}`);
   }
 
-  const statusIcon = result.cherryPickClean ? ':white_check_mark:' : ':warning:';
-  const draftNote = result.cherryPickClean ? '' : ' (opened as **draft**)';
-  const conflictNote = result.cherryPickClean
-    ? 'Clean'
-    : `Conflicts — see PR and resolve manually:\n\`\`\`\n${result.conflictDetails}\n\`\`\``;
-  const rows = clonedTickets.map(
-    (ticket) =>
-      `| ${ticket.originalKey} → ${ticket.clonedKey} | [${ticket.clonedKey}](${JIRA_BASE_URL}/browse/${ticket.clonedKey}) |`,
-  );
-
-  const comment = [
-    `${statusIcon} **Clone to \`${targetBranch}\` complete**${draftNote}`,
-    '',
-    '| Ticket mapping | Link |',
-    '|----------------|------|',
-    ...rows,
-    '',
-    '| | |',
-    '|---|---|',
-    `| **Fix version** | ${matchedVersion.name} |`,
-    `| **New PR** | #${newPr.number} |`,
-    `| **Cherry-pick** | ${conflictNote} |`,
-  ].join('\n');
+  const comment = buildSourcePrCloneSuccessComment({
+    cherryPickClean: result.cherryPickClean,
+    conflictDetails: result.conflictDetails,
+    newPrUrl: newPr.html_url,
+    targetBranch,
+  });
 
   await upsertComment(
     octokit,
