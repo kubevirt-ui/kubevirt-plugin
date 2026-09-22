@@ -295,7 +295,7 @@ A PR is merge-pool eligible when **all** of the following hold (`isMergePoolPr`)
 
 - Publishes a **`Merge Gate`** commit status (`repos.createCommitStatus`) reflecting current eligibility.
 - When eligible AND all required checks pass (`Run Gating Tests`, `Code Checks`), **merges directly via `pulls.merge()`** using the bot App token. This bypasses GitHub's native auto-merge (`enablePullRequestAutoMerge`) which has a known platform bug where `mergeStateStatus` reports `BLOCKED` even when all required checks pass.
-- Names the **specific** condition(s) on every outcome -- e.g. `Not eligible: Missing lgtm`, `Waiting: Run Gating Tests`, or `Merged` on success.
+- Names the **specific** condition(s) on every outcome -- e.g. `Missing lgtm` (pending), `Waiting: Run Gating Tests` (pending), `Failed: build; Waiting: Run Gating Tests` (pending), `E2E tests failed` (failure), or `Merged` on success.
 
 Branch protection must require **`Merge Gate`** and **`Run Gating Tests`** (plus build/test as before).
 

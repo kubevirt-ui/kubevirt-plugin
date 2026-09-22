@@ -27,6 +27,13 @@ import { getMergePoolBlockers } from '../shared/merge-pool';
 import { addStepSummary, warnStep } from '../shared/output';
 import type { Reason } from './merge-eligibility';
 import { describeEligibility } from './merge-eligibility';
+import {
+  buildStepSummary,
+  checkRequiredStatuses,
+  fetchCheckRunsForRef,
+  isGatingCheckFailed,
+  resolveMergeGateOutcome,
+} from './merge-gate-status';
 
 const MERGE_GATE_CONTEXT = 'Merge Gate';
 
@@ -98,52 +105,6 @@ const evaluateEligibility = async (
   }
 };
 
-type StatusCheckResult = {
-  allPassed: boolean;
-  pending: string[];
-};
-
-const checkRequiredStatuses = async (
-  octokit: Octokit,
-  owner: string,
-  repo: string,
-  sha: string,
-  requiredContexts: ReadonlySet<string>,
-): Promise<StatusCheckResult> => {
-  const remaining = new Set(requiredContexts);
-
-  const { data: combined } = await octokit.repos.getCombinedStatusForRef({
-    owner,
-    ref: sha,
-    repo,
-  });
-  for (const status of combined.statuses) {
-    if (remaining.has(status.context) && status.state === 'success') {
-      remaining.delete(status.context);
-    }
-  }
-
-  const checkRuns: Awaited<ReturnType<typeof octokit.checks.listForRef>>['data']['check_runs'] = [];
-  for await (const page of octokit.paginate.iterator(octokit.checks.listForRef, {
-    owner,
-    ref: sha,
-    repo,
-  })) {
-    checkRuns.push(...page.data);
-  }
-  for (const run of checkRuns) {
-    if (
-      remaining.has(run.name) &&
-      run.status === 'completed' &&
-      (run.conclusion === 'success' || run.conclusion === 'skipped' || run.conclusion === 'neutral')
-    ) {
-      remaining.delete(run.name);
-    }
-  }
-
-  return { allPassed: remaining.size === 0, pending: [...remaining] };
-};
-
 const tryMerge = async (
   botOctokit: Octokit,
   owner: string,
@@ -168,36 +129,49 @@ const tryMerge = async (
   }
 };
 
-const buildStepSummary = (
+const publishMergeGateStatus = async (
+  octokit: Octokit,
+  owner: string,
+  repo: string,
+  headSha: string,
   result: EligibilityResult,
-  statusResult?: StatusCheckResult,
-  merged?: boolean,
-): string => {
-  if (!result.determined) {
-    return (
-      '## Merge Gate\n\n' +
-      ':warning: Could not determine eligibility — failed to read PR labels. ' +
-      'Failing closed until a later event retries.'
-    );
-  }
-  if (!result.eligible) {
-    const lines = result.reasons.map((r) => `- **${r.short}** — ${r.long}`);
-    return '## Merge Gate\n\n' + ':x: **Not eligible for merge**\n\n' + lines.join('\n');
-  }
-  if (statusResult && !statusResult.allPassed) {
-    return (
-      '## Merge Gate\n\n' +
-      ':hourglass: **Eligible but waiting for required checks:**\n\n' +
-      statusResult.pending.map((c) => `- \`${c}\``).join('\n')
-    );
-  }
-  if (merged) {
-    return '## Merge Gate\n\n' + ':white_check_mark: **Merged** — all checks passed.';
-  }
-  return (
-    '## Merge Gate\n\n' +
-    ':white_check_mark: **Merge-pool eligible** — PR carries `lgtm` + `approved` with no blocking labels.'
+  params: {
+    gatingFailed: boolean;
+    merged?: boolean;
+    operationalError?: string;
+    readyToMerge?: boolean;
+    statusResult?: Awaited<ReturnType<typeof checkRequiredStatuses>>;
+  },
+): Promise<void> => {
+  const outcome = resolveMergeGateOutcome({
+    determined: result.determined,
+    eligible: result.eligible,
+    gatingFailed: params.gatingFailed,
+    merged: params.merged,
+    operationalError: params.operationalError,
+    readyToMerge: params.readyToMerge,
+    reasons: result.reasons,
+    statusResult: params.statusResult,
+  });
+
+  addStepSummary(
+    buildStepSummary(result, params.statusResult, params.gatingFailed, params.merged),
   );
+  await setCommitStatus(
+    octokit,
+    owner,
+    repo,
+    headSha,
+    outcome.state,
+    outcome.description,
+    MERGE_GATE_CONTEXT,
+  );
+
+  if (outcome.state === 'failure') {
+    warnStep(outcome.description);
+  } else if (outcome.state === 'pending') {
+    console.log(`Merge Gate pending: ${outcome.description}`);
+  }
 };
 
 const main = async (): Promise<void> => {
@@ -208,23 +182,12 @@ const main = async (): Promise<void> => {
   const prNumber = Number(requireEnv('PR_NUMBER'));
   const octokit = new Octokit({ auth: token });
 
+  const checkRuns = await fetchCheckRunsForRef(octokit, owner, repo, headSha);
+  const gatingFailed = isGatingCheckFailed(checkRuns);
   const result = await evaluateEligibility(octokit, owner, repo, prNumber);
 
-  if (!result.eligible) {
-    addStepSummary(buildStepSummary(result));
-
-    const description =
-      result.reasons.map((r) => r.short).join(', ') || 'could not determine eligibility';
-    await setCommitStatus(
-      octokit,
-      owner,
-      repo,
-      headSha,
-      'failure',
-      description,
-      MERGE_GATE_CONTEXT,
-    );
-    warnStep(`Not eligible: ${description}`);
+  if (gatingFailed || !result.eligible) {
+    await publishMergeGateStatus(octokit, owner, repo, headSha, result, { gatingFailed });
     return;
   }
 
@@ -237,17 +200,10 @@ const main = async (): Promise<void> => {
   );
 
   if (!requiredChecksResult.ok) {
-    addStepSummary(buildStepSummary(result));
-    await setCommitStatus(
-      octokit,
-      owner,
-      repo,
-      headSha,
-      'failure',
-      requiredChecksResult.error.slice(0, 140),
-      MERGE_GATE_CONTEXT,
-    );
-    warnStep(requiredChecksResult.error);
+    await publishMergeGateStatus(octokit, owner, repo, headSha, result, {
+      gatingFailed,
+      operationalError: requiredChecksResult.error,
+    });
     return;
   }
 
@@ -257,45 +213,28 @@ const main = async (): Promise<void> => {
     repo,
     headSha,
     requiredChecksResult.checks,
+    checkRuns,
   );
 
   if (!statusResult.allPassed) {
-    addStepSummary(buildStepSummary(result, statusResult));
-    const pending = statusResult.pending.join(', ');
-    await setCommitStatus(
-      octokit,
-      owner,
-      repo,
-      headSha,
-      'pending',
-      `Waiting: ${pending}`.slice(0, 140),
-      MERGE_GATE_CONTEXT,
-    );
-    console.log(`PR #${prNumber} eligible but required checks pending: ${pending}`);
+    await publishMergeGateStatus(octokit, owner, repo, headSha, result, {
+      gatingFailed,
+      statusResult,
+    });
     return;
   }
 
   if (!botToken) {
-    addStepSummary(buildStepSummary(result, statusResult));
-    await setCommitStatus(
-      octokit,
-      owner,
-      repo,
-      headSha,
-      'failure',
-      'BOT_TOKEN unavailable — cannot merge',
-      MERGE_GATE_CONTEXT,
-    );
-    warnStep('BOT_TOKEN is missing — merge requires the bot App token.');
+    await publishMergeGateStatus(octokit, owner, repo, headSha, result, {
+      gatingFailed,
+      operationalError: 'BOT_TOKEN unavailable — cannot merge',
+    });
     return;
   }
 
   const recheck = await evaluateEligibility(octokit, owner, repo, prNumber);
   if (!recheck.eligible) {
-    const desc = recheck.reasons.map((r) => r.short).join(', ') || 'labels changed before merge';
-    addStepSummary(buildStepSummary(recheck));
-    await setCommitStatus(octokit, owner, repo, headSha, 'failure', desc, MERGE_GATE_CONTEXT);
-    warnStep(`Not eligible on re-check: ${desc}`);
+    await publishMergeGateStatus(octokit, owner, repo, headSha, recheck, { gatingFailed });
     return;
   }
 
@@ -304,32 +243,28 @@ const main = async (): Promise<void> => {
   // Merge Gate is required by branch protection. Mark it successful only after
   // eligibility + other required checks pass, and before calling the merge API.
   // Otherwise GitHub rejects the merge when Merge Gate is still pending/failed.
-  await setCommitStatus(
-    octokit,
-    owner,
-    repo,
-    headSha,
-    'success',
-    'Ready to merge',
-    MERGE_GATE_CONTEXT,
-  );
+  await publishMergeGateStatus(octokit, owner, repo, headSha, result, {
+    gatingFailed,
+    readyToMerge: true,
+    statusResult,
+  });
 
   const merged = await tryMerge(botOctokit, owner, repo, prNumber, headSha);
-  addStepSummary(buildStepSummary(result, statusResult, merged));
 
   if (!merged) {
-    await setCommitStatus(
-      octokit,
-      owner,
-      repo,
-      headSha,
-      'failure',
-      'Merge failed — see workflow log',
-      MERGE_GATE_CONTEXT,
-    );
-  } else {
-    await setCommitStatus(octokit, owner, repo, headSha, 'success', 'Merged', MERGE_GATE_CONTEXT);
+    await publishMergeGateStatus(octokit, owner, repo, headSha, result, {
+      gatingFailed,
+      operationalError: 'Merge failed — see workflow log',
+      statusResult,
+    });
+    return;
   }
+
+  await publishMergeGateStatus(octokit, owner, repo, headSha, result, {
+    gatingFailed,
+    merged: true,
+    statusResult,
+  });
 };
 
 void main().catch(async (err) => {
