@@ -1,8 +1,18 @@
+/* eslint-disable max-lines */
 import { type FC, memo, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getConsoleStandaloneURL } from '@multicluster/urls';
-import { Button, ButtonVariant, Flex, FlexItem, Stack, StackItem } from '@patternfly/react-core';
+import {
+  Button,
+  ButtonVariant,
+  EmptyState,
+  EmptyStateBody,
+  Flex,
+  FlexItem,
+  Stack,
+  StackItem,
+} from '@patternfly/react-core';
 import { ExternalLinkAltIcon } from '@patternfly/react-icons';
 
 import { AccessConsoles } from './components/AccessConsoles/AccessConsoles';
@@ -27,6 +37,7 @@ import { type ConsolesProps } from './ConsolesTypes';
 import './consoles.scss';
 
 const Consoles: FC<ConsolesProps> = ({
+  canConnectConsole = true,
   consoleContainerClass,
   isHeadlessMode,
   isStandAlone = false,
@@ -49,8 +60,9 @@ const Consoles: FC<ConsolesProps> = ({
     return <div>{t('Console is disabled in headless mode')}</div>;
   }
 
+  const isForbidden = !canConnectConsole || state === ConsoleState.Forbidden;
   const isConnected = state === ConsoleState.Connected;
-  const showConnect = isConnectableState(state);
+  const showConnect = !isForbidden && isConnectableState(state);
 
   return (
     <Stack>
@@ -106,10 +118,19 @@ const Consoles: FC<ConsolesProps> = ({
         </Flex>
       </StackItem>
       <StackItem className={consoleContainerClass}>
+        {isForbidden && (
+          <EmptyState>
+            <EmptyStateBody>
+              {t(
+                "You don't have permission to access this VirtualMachine's console. Contact your administrator to request access.",
+              )}
+            </EmptyStateBody>
+          </EmptyState>
+        )}
         {type === VNC_CONSOLE_TYPE && showConnect && (
           <VncConnect connect={actions?.connect} isConnecting={state === ConsoleState.Connecting} />
         )}
-        {type === VNC_CONSOLE_TYPE && (
+        {type === VNC_CONSOLE_TYPE && !isForbidden && (
           <HideConsole isHidden={!isConnected}>
             <VncConsole
               basePath={path}
@@ -126,7 +147,7 @@ const Consoles: FC<ConsolesProps> = ({
             isConnecting={state === ConsoleState.Connecting}
           />
         )}
-        {type === SERIAL_CONSOLE_TYPE && (
+        {type === SERIAL_CONSOLE_TYPE && !isForbidden && (
           <HideConsole isHidden={!isConnected}>
             <SerialConsole basePath={path} setState={setConsoleState} />
           </HideConsole>
