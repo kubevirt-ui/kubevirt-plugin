@@ -143,6 +143,13 @@ export default class InstanceTypesPage extends PageCommons {
     await this.page.waitForLoadState('domcontentloaded');
   }
 
+  async navigateToAllNamespacesInstanceTypes(): Promise<void> {
+    await this.goTo(
+      '/k8s/cluster/instancetype.kubevirt.io~v1beta1~VirtualMachineClusterInstancetype',
+    );
+    await this.page.waitForLoadState('domcontentloaded');
+  }
+
   async navigateToCrdPage(crdPlural: string): Promise<void> {
     await this.goTo(`/k8s/cluster/customresourcedefinitions/${crdPlural}/instances`);
     await this.page.waitForLoadState('load');
@@ -159,11 +166,10 @@ export default class InstanceTypesPage extends PageCommons {
   }
 
   async navigateToInstanceTypesViaUI(): Promise<void> {
-    for (let attempt = 1; attempt <= 3; attempt++) {
-      await this.clickNavInstanceTypes();
-      if (/instancetype/i.test(this.page.url())) return;
-      await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
-    }
+    await this.navigateViaSidebarWithFallback(
+      () => this.clickNavInstanceTypes(),
+      () => this.navigateToAllNamespacesInstanceTypes(),
+    );
   }
 
   async navigateToNamespaceInstanceTypesViaUI(namespace: string): Promise<void> {

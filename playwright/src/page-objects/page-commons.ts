@@ -16,6 +16,9 @@ import type { Page } from '@playwright/test';
 
 import BasePage from './base-page';
 
+/** Initial sidebar click plus one retry for transient auto-hide or overlay races. */
+const SIDEBAR_NAV_MAX_ATTEMPTS = 2;
+
 export default class PageCommons extends BasePage {
   private readonly _btnRoleMenuitem = this.locator('button[role="menuitem"]');
   private readonly _dropdownTextFilter = this.testId('dropdown-text-filter');
@@ -189,40 +192,66 @@ export default class PageCommons extends BasePage {
     await this.pageContent.clickMinusButton();
   }
 
-  async clickNavBootableVolumes(): Promise<void> {
-    await this._navComponent.clickNavBootableVolumes();
+  async clickNavBootableVolumes(): Promise<boolean> {
+    return this._navComponent.clickNavBootableVolumes();
   }
 
-  async clickNavCheckups(): Promise<void> {
-    await this._navComponent.clickNavCheckups();
+  async clickNavCheckups(): Promise<boolean> {
+    return this._navComponent.clickNavCheckups();
   }
 
   async clickNavClusterOverview(): Promise<void> {
     await this._navComponent.clickNavClusterOverview();
   }
 
-  async clickNavInstanceTypes(): Promise<void> {
-    await this._navComponent.clickNavInstanceTypes();
+  async clickNavInstanceTypes(): Promise<boolean> {
+    return this._navComponent.clickNavInstanceTypes();
   }
 
-  async clickNavMigrationPolicies(): Promise<void> {
-    await this._navComponent.clickNavMigrationPolicies();
+  async clickNavMigrationPolicies(): Promise<boolean> {
+    return this._navComponent.clickNavMigrationPolicies();
   }
 
-  async clickNavSettings(): Promise<void> {
-    await this._navComponent.clickNavSettings();
+  async clickNavSettings(): Promise<boolean> {
+    return this._navComponent.clickNavSettings();
   }
 
-  async clickNavTemplates(): Promise<void> {
-    await this._navComponent.clickNavTemplates();
+  async clickNavTemplates(): Promise<boolean> {
+    return this._navComponent.clickNavTemplates();
   }
 
-  async clickNavVirtualizationOverview(): Promise<void> {
-    await this._navComponent.clickNavVirtualizationOverview();
+  async clickNavVirtualizationOverview(): Promise<boolean> {
+    return this._navComponent.clickNavVirtualizationOverview();
   }
 
-  async clickNavVirtualMachines(): Promise<void> {
-    await this._navComponent.clickNavVirtualMachines();
+  async clickNavVirtualMachines(): Promise<boolean> {
+    return this._navComponent.clickNavVirtualMachines();
+  }
+
+  async navigateToAllNamespacesBootableVolumes(): Promise<void> {
+    await this.goTo('/k8s/all-namespaces/bootablevolumes');
+    await this.page.waitForLoadState('domcontentloaded');
+  }
+
+  async navigateToBootableVolumesViaUI(): Promise<void> {
+    await this.navigateViaSidebarWithFallback(
+      () => this.clickNavBootableVolumes(),
+      () => this.navigateToAllNamespacesBootableVolumes(),
+    );
+    await this.page.waitForLoadState('domcontentloaded');
+  }
+
+  protected async navigateViaSidebarWithFallback(
+    clickNav: () => Promise<boolean>,
+    fallback: () => Promise<void>,
+    maxAttempts = SIDEBAR_NAV_MAX_ATTEMPTS,
+  ): Promise<void> {
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      if (await clickNav()) return;
+      await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
+    }
+
+    await fallback();
   }
 
   async clickNext() {
@@ -261,8 +290,8 @@ export default class PageCommons extends BasePage {
   protected async clickSidebarNavItem(
     navLocator: ReturnType<typeof this.locator>,
     expectedUrlPattern?: RegExp,
-  ): Promise<void> {
-    await this._navComponent['clickSidebarNavItem'](navLocator, expectedUrlPattern);
+  ): Promise<boolean> {
+    return this._navComponent['clickSidebarNavItem'](navLocator, expectedUrlPattern);
   }
 
   async clickVirtualMachinesNavItem(): Promise<void> {
@@ -708,6 +737,10 @@ export default class PageCommons extends BasePage {
 
   async dismissStartupOverlays(): Promise<void> {
     await this._navComponent.dismissStartupOverlays();
+  }
+
+  async ensureSidebarExpanded(): Promise<void> {
+    await this._navComponent.ensureSidebarExpanded();
   }
 
   async ensureInitialPerspective(): Promise<void> {

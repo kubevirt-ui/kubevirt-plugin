@@ -22,9 +22,20 @@ test.describe(SUITE, { tag: [GATING_TAG] }, () => {
       tags: [GATING_TAG, VM_LIST_TAG, ADMIN_ONLY_TAG, 'CNV-90652'],
     });
 
-    await test.step('Navigate to VirtualMachines and turn the filter on', async () => {
+    await test.step('Navigate to VirtualMachines and confirm the empty project exists', async () => {
       await vmListPage.navigateToVirtualMachinesViaUI();
       await vmListPage.tryCloseWelcomeModal();
+      await vmListPage.toggleEmptyProjectsDisplay(true);
+      await vmListPage.searchTreeView(emptyNamespace);
+      await expect
+        .poll(() => vmListPage.isTreeNodeVisible(emptyNamespace), {
+          message: `Empty project ${emptyNamespace} should exist in the tree before filter assertions`,
+          timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+        })
+        .toBe(true);
+    });
+
+    await test.step('Turn the filter on and scope the tree search', async () => {
       await vmListPage.toggleEmptyProjectsDisplay(false);
       await vmListPage.searchTreeView(emptyNamespace);
     });

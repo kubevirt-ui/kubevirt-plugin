@@ -5,6 +5,7 @@ import type { ClusterAuthConfig } from '@/clients/base-client';
 import RequestContextClient from '@/clients/request-context-client';
 import { EnvVariables } from '@/utils/env-variables';
 import { logger } from '@/utils/logger';
+import { resolveUserSettingsKey } from '@/utils/test-setup-helpers';
 import { type SharedTestConfig, MINUTE, SECOND, TestConfigManager } from '@/utils/test-config';
 import { type Browser, type BrowserContext, type Page, chromium } from '@playwright/test';
 
@@ -357,10 +358,7 @@ export function getSetupRules(): SetupRule[] {
           throw new Error('RequestContextClient not initialized');
         }
 
-        const consoleUsername = EnvVariables.isNonPrivUser
-          ? EnvVariables.testUsername
-          : 'kubeadmin';
-        const settingsKey = consoleUsername === 'kubeadmin' ? 'kube-admin' : consoleUsername;
+        const settingsKey = await resolveUserSettingsKey(apiClient);
 
         // Patch console user settings (guided tour, welcome modals).
         const consoleConfigMapName = `user-settings-${settingsKey}`;
@@ -391,8 +389,9 @@ export function getSetupRules(): SetupRule[] {
           );
         }
 
-        // Patch KubeVirt plugin user settings (auto-hide nav).
+        // Patch KubeVirt plugin user settings (sidebar + welcome modals).
         const kubevirtSettings = JSON.stringify({
+          guidedTour: false,
           navigation: { autoHideNav: false },
           onboardingPopoversHidden: {
             catalog: true,
@@ -400,7 +399,7 @@ export function getSetupRules(): SetupRule[] {
             navCollapse: true,
             vmsTab: true,
           },
-          quickStart: { dontShowWelcomeModal: true },
+          quickStart: { activeQuickStartID: '', dontShowWelcomeModal: true },
         });
         try {
           await apiClient.mergePatchResource(
@@ -411,7 +410,7 @@ export function getSetupRules(): SetupRule[] {
             { data: { [settingsKey]: kubevirtSettings } },
             ctx.cnvNamespace,
           );
-          logger.success(`✓ KubeVirt sidebar auto-hide disabled for '${settingsKey}'`);
+          logger.success(`✓ KubeVirt user settings updated for '${settingsKey}'`);
         } catch {
           logger.info(
             `ℹ ConfigMap kubevirt-user-settings not found in ${ctx.cnvNamespace} — will use defaults`,
@@ -430,74 +429,11 @@ export function getSetupRules(): SetupRule[] {
           throw new Error('RequestContextClient not initialized');
         }
 
-        const virtUsername = EnvVariables.isNonPrivUser ? EnvVariables.testUsername : 'kube-admin';
+        const settingsKey = await resolveUserSettingsKey(apiClient);
+        logger.info(`Resolved kubevirt user-settings key: ${settingsKey}`);
 
-        let userUid: string | undefined;
-        if (EnvVariables.isNonPrivUser) {
-          try {
-            const userObj = await apiClient.getResourceByKind('user', virtUsername);
-            userUid = userObj?.metadata?.uid;
-          } catch {
-            // User may not exist yet
-          }
-          if (userUid) {
-            logger.info(`Resolved '${virtUsername}' UID: ${userUid}`);
-          } else {
-            logger.warn(`⚠️ Could not resolve UID for '${virtUsername}', patching by name only`);
-          }
-        }
-
-        let virtResult = false;
-        try {
-          const keysToUpdate = [virtUsername];
-          if (userUid && userUid !== virtUsername) {
-            keysToUpdate.push(userUid);
-          }
-
-          const patchData: Record<string, string> = {};
-          for (const key of keysToUpdate) {
-            patchData[key] = JSON.stringify({
-              navigation: { autoHideNav: false },
-              quickStart: { dontShowWelcomeModal: true, activeQuickStartID: '' },
-              guidedTour: false,
-              onboardingPopoversHidden: {
-                catalog: true,
-                createProject: true,
-                navCollapse: true,
-                vmsTab: true,
-              },
-            });
-          }
-          await apiClient.mergePatchResource(
-            '',
-            'v1',
-            'configmaps',
-            'kubevirt-user-settings',
-            { data: patchData },
-            ctx.cnvNamespace,
-          );
-          virtResult = true;
-        } catch {
-          virtResult = false;
-        }
-
-        if (virtResult) {
-          logger.success(
-            `✓ Virtualization welcome settings disabled for '${virtUsername}'${
-              userUid ? ` (UID: ${userUid})` : ''
-            } in ${ctx.cnvNamespace}`,
-          );
-        } else {
-          logger.warn(
-            `⚠️ Could not disable virtualization welcome settings (ConfigMap may not exist yet)`,
-          );
-        }
-
-        const consoleUsername = EnvVariables.isNonPrivUser
-          ? EnvVariables.testUsername
-          : EnvVariables.username;
         const consoleSettingsNs = 'openshift-console-user-settings';
-        const configMapName = `user-settings-${consoleUsername}`;
+        const configMapName = `user-settings-${settingsKey}`;
         const maxAttempts = EnvVariables.isNonPrivUser ? 1 : 5;
         const patchData: Record<string, string> = {
           'console.guidedTour': JSON.stringify({
@@ -528,14 +464,16 @@ export function getSetupRules(): SetupRule[] {
         }
 
         if (coreResult) {
-          logger.success(`✓ Core console guided tours marked completed for '${consoleUsername}'`);
+          logger.success(
+            `✓ Core console guided tours marked completed for '${settingsKey}'`,
+          );
         } else if (EnvVariables.isNonPrivUser) {
           logger.info(
-            `ℹ️ Console user-settings ConfigMap not yet available for '${consoleUsername}' (first login)`,
+            `ℹ️ Console user-settings ConfigMap not yet available for '${settingsKey}' (first login)`,
           );
         } else {
           logger.warn(
-            `⚠️ Could not disable core welcome modal (ConfigMap may not exist for '${consoleUsername}')`,
+            `⚠️ Could not disable core welcome modal (ConfigMap may not exist for '${settingsKey}')`,
           );
         }
       },

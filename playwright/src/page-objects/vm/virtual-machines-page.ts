@@ -989,7 +989,10 @@ export default class VirtualMachinesPage extends TreeContextMenuMixin(PageCommon
    * Navigates to Virtual Machines page via sidebar UI click, falling back to URL navigation.
    */
   async navigateToVirtualMachinesViaUI(): Promise<void> {
-    await this.clickNavVirtualMachines();
+    await this.navigateViaSidebarWithFallback(
+      () => this.clickNavVirtualMachines(),
+      () => this.navigateToAllNamespacesVirtualMachines(),
+    );
   }
 
   async navigateToVmViaTreeView(namespace: string, vmName: string): Promise<void> {
