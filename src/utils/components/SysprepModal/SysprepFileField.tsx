@@ -9,12 +9,9 @@ import {
   ValidatedOptions,
 } from '@patternfly/react-core';
 
-export type SysprepFile = {
-  fileName: string;
-  isLoading: boolean;
-  validated: ValidatedOptions;
-  value: string;
-};
+import { EMPTY_SYSPREP_FILE } from './consts';
+import { type SysprepFile } from './types';
+import { isValidSysprepXml } from './utils';
 
 type SysprepFileFieldProps = {
   id: string;
@@ -22,31 +19,23 @@ type SysprepFileFieldProps = {
   value?: string;
 };
 
-const isValidXml = (xml: string): boolean => {
-  const doc = new DOMParser().parseFromString(xml, 'application/xml');
-
-  return doc.querySelector('parsererror') === null;
-};
-
 const SysprepFileField: FC<SysprepFileFieldProps> = ({ id, onChange, value }) => {
   const { t } = useKubevirtTranslation();
   const [data, setData] = useState<SysprepFile>({
-    fileName: '',
-    isLoading: false,
-    validated: ValidatedOptions.default,
-    value,
+    ...EMPTY_SYSPREP_FILE,
+    value: value ?? '',
   });
 
   const onFieldChange = (newValue: string): void => {
     setData((currentSysprepFile) => ({
       ...currentSysprepFile,
-      validated: isValidXml(newValue) ? ValidatedOptions.default : ValidatedOptions.error,
+      validated: isValidSysprepXml(newValue) ? ValidatedOptions.default : ValidatedOptions.error,
       value: newValue,
     }));
   };
 
   useEffect(() => {
-    if (data.validated) {
+    if (data.validated !== ValidatedOptions.error || !data.value.trim()) {
       onChange(data.value);
     }
   }, [data.validated, data.value, onChange]);
@@ -60,6 +49,10 @@ const SysprepFileField: FC<SysprepFileFieldProps> = ({ id, onChange, value }) =>
         id={`sysprep-${id}-input`}
         isLoading={data.isLoading}
         isReadOnly={false}
+        onClearClick={() => {
+          setData(EMPTY_SYSPREP_FILE);
+          onChange('');
+        }}
         onDataChange={(_event: DropEvent, text: string) => onFieldChange(text)}
         onFileInputChange={(_event: DropEvent, file: File) => {
           setData((currentData: SysprepFile) => ({ ...currentData, fileName: file.name }));

@@ -1,25 +1,18 @@
 import { type FC } from 'react';
 
-import { ConfigMapModel, modelToGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { type IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import WindowsLabel from '@kubevirt-utils/components/Labels/WindowsLabel';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
-import {
-  AUTOUNATTEND,
-  getSysprepConfigMapName,
-  UNATTEND,
-} from '@kubevirt-utils/components/SysprepModal/sysprep-utils';
+import { getSysprepConfigMapName } from '@kubevirt-utils/components/SysprepModal/sysprep-utils';
 import { SysprepDescription } from '@kubevirt-utils/components/SysprepModal/SysprepDescription';
 import { SysprepModal } from '@kubevirt-utils/components/SysprepModal/SysprepModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { getVolumes } from '@kubevirt-utils/resources/vm';
 import { type PatchCustomizeWizardVMSignal } from '@kubevirt-utils/signals/customizeWizardVMSignal';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
-import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 
 import { createSysprepConfigMap, patchVMWithExistingSysprepConfigMap } from '../utils/utils';
 
@@ -37,24 +30,11 @@ const InitialRunTabSysprep: FC<InitialRunTabSysprepProps> = ({ canUpdateVM, onSu
   const currentSysprepVolume = vmVolumes?.find(getSysprepConfigMapName);
   const currentVMSysprepName = getSysprepConfigMapName(currentSysprepVolume);
 
-  const sysprepSelected = !isEmpty(currentVMSysprepName) && currentVMSysprepName;
-  const [externalSysprepConfig, sysprepLoaded, sysprepLoadError] =
-    useK8sWatchData<IoK8sApiCoreV1ConfigMap>(
-      sysprepSelected && {
-        cluster,
-        groupVersionKind: modelToGroupVersionKind(ConfigMapModel),
-        name: sysprepSelected,
-        namespace: vm?.metadata?.namespace,
-      },
-    );
-
-  const { [AUTOUNATTEND]: autoUnattend, [UNATTEND]: unattend } = externalSysprepConfig?.data ?? {};
-
   const onSysprepSelected = (name: string): Promise<void> =>
     patchVMWithExistingSysprepConfigMap(name, vm, onSubmit);
 
   const onSysprepCreation = async (unattended: string, autounattend: string): Promise<void> =>
-    createSysprepConfigMap(unattended, autounattend, externalSysprepConfig, vm, onSubmit);
+    createSysprepConfigMap(unattended, autounattend, vm, onSubmit);
 
   return (
     <DescriptionItem
@@ -62,8 +42,7 @@ const InitialRunTabSysprep: FC<InitialRunTabSysprepProps> = ({ canUpdateVM, onSu
       descriptionData={
         <SysprepDescription
           cluster={cluster}
-          error={sysprepLoadError}
-          loaded={sysprepLoaded}
+          namespace={getNamespace(vm)}
           selectedSysprepName={currentVMSysprepName}
         />
       }
@@ -75,12 +54,11 @@ const InitialRunTabSysprep: FC<InitialRunTabSysprepProps> = ({ canUpdateVM, onSu
         createModal((modalProps) => (
           <SysprepModal
             {...modalProps}
-            autoUnattend={autoUnattend}
-            namespace={vm?.metadata?.namespace}
+            cluster={cluster}
+            namespace={getNamespace(vm)}
             onSysprepCreation={onSysprepCreation}
             onSysprepSelected={onSysprepSelected}
-            sysprepSelected={sysprepSelected}
-            unattend={unattend}
+            sysprepSelected={currentVMSysprepName}
           />
         ))
       }

@@ -1,5 +1,4 @@
 import { ConfigMapModel, VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { type IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { SYSPREP } from '@kubevirt-utils/components/SysprepModal/consts';
 import {
@@ -48,7 +47,7 @@ export const patchVMWithExistingSysprepConfigMap = async (
             op: 'replace',
             path: `/spec/template/spec/domain/devices/disks`,
             value: [
-              ...vmDisks.filter((disk) => disk?.name !== SYSPREP),
+              ...(vmDisks ?? []).filter((disk) => disk?.name !== SYSPREP),
               ...(!isEmpty(name) ? [sysprepDisk()] : []),
             ],
           },
@@ -56,7 +55,7 @@ export const patchVMWithExistingSysprepConfigMap = async (
             op: 'replace',
             path: `/spec/template/spec/volumes`,
             value: [
-              ...vmVolumes.filter((vol) => vol?.name !== SYSPREP),
+              ...(vmVolumes ?? []).filter((vol) => vol?.name !== SYSPREP),
               ...(!isEmpty(name) ? [sysprepVolume(name)] : []),
             ],
           },
@@ -69,7 +68,6 @@ export const patchVMWithExistingSysprepConfigMap = async (
 export const createSysprepConfigMap = async (
   unattended: string,
   autounattend: string,
-  externalSysprepConfig: IoK8sApiCoreV1ConfigMap,
   vm: V1VirtualMachine,
   onSubmit?: PatchCustomizeWizardVMSignal,
 ): Promise<void> => {
@@ -80,24 +78,7 @@ export const createSysprepConfigMap = async (
 
   const configMap = generateNewSysprepConfig({
     data: sysprepData,
-    sysprepName: externalSysprepConfig?.metadata?.name,
   });
-
-  if (externalSysprepConfig) {
-    await kubevirtK8sPatch({
-      cluster: getCluster(externalSysprepConfig),
-      data: [
-        {
-          op: 'replace',
-          path: `/data`,
-          value: configMap.data,
-        },
-      ],
-      model: ConfigMapModel,
-      resource: externalSysprepConfig,
-    });
-    return;
-  }
 
   await kubevirtK8sCreate({
     cluster: getCluster(vm),
@@ -105,16 +86,21 @@ export const createSysprepConfigMap = async (
     model: ConfigMapModel,
     ns: getNamespace(vm),
   });
+
+  const updatedDisks = [...(vmDisks ?? []).filter((disk) => disk?.name !== SYSPREP), sysprepDisk()];
+  const updatedVolumes = [
+    ...(vmVolumes ?? []).filter((vol) => vol?.name !== SYSPREP),
+    sysprepVolume(configMap.metadata.name),
+  ];
+
   onSubmit
     ? onSubmit([
         {
-          data: [sysprepDisk()],
-          merge: true,
+          data: updatedDisks,
           path: 'spec.template.spec.domain.devices.disks',
         },
         {
-          data: [sysprepVolume(configMap.metadata.name)],
-          merge: true,
+          data: updatedVolumes,
           path: `spec.template.spec.volumes`,
         },
       ])
@@ -124,12 +110,12 @@ export const createSysprepConfigMap = async (
           {
             op: 'replace',
             path: `/spec/template/spec/domain/devices/disks`,
-            value: [...(vmDisks ?? []), sysprepDisk()],
+            value: updatedDisks,
           },
           {
             op: 'replace',
             path: `/spec/template/spec/volumes`,
-            value: [...(vmVolumes ?? []), sysprepVolume(configMap.metadata.name)],
+            value: updatedVolumes,
           },
         ],
         model: VirtualMachineModel,
