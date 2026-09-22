@@ -30,30 +30,21 @@ export const buildColumnLayout = <TData, TCallbacks = undefined>(
 
 /**
  * Creates a unique row ID for K8s resources in tables.
- * Uses UID when available (guaranteed unique), falls back to cluster/namespace/name composite.
- *
- * @param resource - The K8s resource
- * @param index - Row index for fallback when resource has no identifying info
- * @param fallbackPrefix - Prefix for index-based fallback ID
- * @returns Unique string identifier for the row
+ * Uses UID when available, then cluster/namespace/name, then generateName, then kind.
  */
-export const getK8sRowId = <T extends K8sResourceCommon>(
-  resource: T,
-  index: number,
-  fallbackPrefix: string,
-): string => {
+export const getK8sRowId = <T extends K8sResourceCommon>(resource: T): string => {
   const uid = resource?.metadata?.uid;
   if (uid) return uid;
 
   const cluster = getCluster(resource) ?? '';
   const namespace = getNamespace(resource) ?? '';
-  const name = getName(resource) ?? '';
+  const name = getName(resource) ?? resource?.metadata?.generateName ?? '';
 
   if (name) {
-    return [cluster, namespace, name].filter(Boolean).join('/') || name;
+    return [cluster, namespace, name].filter(Boolean).join('/');
   }
 
-  return `${fallbackPrefix}-${index}`;
+  return resource?.kind ?? '';
 };
 
 /**

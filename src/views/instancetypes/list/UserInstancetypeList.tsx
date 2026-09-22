@@ -4,7 +4,7 @@ import { useMemo } from 'react';
 import { VirtualMachineInstancetypeModelRef } from '@kubevirt-ui-ext/kubevirt-api/console';
 import KubevirtFilterToolbar from '@kubevirt-utils/components/KubevirtFilterToolbar/KubevirtFilterToolbar';
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
-import { buildColumnLayout } from '@kubevirt-utils/components/KubevirtTable/utils';
+import { buildColumnLayout, getK8sRowId } from '@kubevirt-utils/components/KubevirtTable/utils';
 import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
 import useClusterFilter from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/filters/useClusterFilter';
 import useProjectFilter from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/filters/useProjectFilter';
@@ -23,7 +23,7 @@ import { ListPageBody } from '@openshift-console/dynamic-plugin-sdk';
 import { Pagination } from '@patternfly/react-core';
 
 import UserInstancetypeEmptyState from './components/UserInstancetypeEmptyState/UserInstancetypeEmptyState';
-import { getUserInstancetypeColumns, getUserInstancetypeRowId } from './userInstancetypeDefinition';
+import { getUserInstancetypeColumns } from './userInstancetypeDefinition';
 import type { UserInstancetypeListProps } from './utils/types';
 
 import '@kubevirt-utils/styles/list-managment-group.scss';
@@ -132,7 +132,7 @@ const UserInstancetypeList: FC<UserInstancetypeListProps> = ({
         columns={columns}
         data={filteredData ?? []}
         dataTest="user-instancetype-list"
-        getRowId={getUserInstancetypeRowId}
+        getRowId={getK8sRowId}
         loaded={isLoaded}
         loadError={loadError}
         noDataMsg={t("You don't have any VirtualMachineInstanceTypes yet")}

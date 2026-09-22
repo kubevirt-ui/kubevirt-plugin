@@ -2,7 +2,7 @@ import { type FC, useMemo } from 'react';
 
 import KubevirtFilterToolbar from '@kubevirt-utils/components/KubevirtFilterToolbar/KubevirtFilterToolbar';
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
-import { buildColumnLayout } from '@kubevirt-utils/components/KubevirtTable/utils';
+import { buildColumnLayout, getK8sRowId } from '@kubevirt-utils/components/KubevirtTable/utils';
 import useKubevirtDataViewFilters from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/useKubevirtDataViewFilters';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtTableColumns';
@@ -19,10 +19,7 @@ import { COLUMN_MANAGEMENT_ID_MIGRATION_POLICIES } from '../utils/constants';
 import MigrationPoliciesCreateButton from './components/MigrationPoliciesCreateButton/MigrationPoliciesCreateButton';
 import MigrationPoliciesEmptyState from './components/MigrationPoliciesEmptyState/MigrationPoliciesEmptyState';
 import useMigrationPoliciesFilters from './hooks/useMigrationPoliciesFilters';
-import {
-  getMigrationPoliciesColumns,
-  getMigrationPoliciesRowId,
-} from './migrationPoliciesDefinition';
+import { getMigrationPoliciesColumns } from './migrationPoliciesDefinition';
 
 const MigrationPoliciesList: FC<ListPageProps> = ({
   fieldSelector,
@@ -104,7 +101,7 @@ const MigrationPoliciesList: FC<ListPageProps> = ({
           columns={columns}
           data={filteredData ?? []}
           dataTest="migration-policies-list"
-          getRowId={getMigrationPoliciesRowId}
+          getRowId={getK8sRowId}
           loaded={isLoaded}
           loadError={loadError}
           noDataMsg={t("You don't have any MigrationPolicies yet")}

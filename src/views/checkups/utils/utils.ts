@@ -6,9 +6,7 @@ import {
   type IoK8sApiCoreV1ConfigMap,
 } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
-import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { sortByDirection, universalComparator } from '@kubevirt-utils/utils/utils';
-import { getCluster } from '@multicluster/helpers/selectors';
 import {
   type K8sResourceCommon,
   type Operator,
@@ -118,19 +116,3 @@ export const getCurrentCheckupType = (pathname: string): CheckupType | null => {
 
 export const getSelectProjectText = (t: TFunction): string =>
   t('Select a specific project in order to run a checkup');
-
-export const getCheckupsConfigMapRowId = (
-  configMap: IoK8sApiCoreV1ConfigMap,
-  index: number,
-): string => {
-  if (configMap?.metadata?.uid) {
-    return configMap.metadata.uid;
-  }
-  const cluster = getCluster(configMap) ?? 'local';
-  const namespace = getNamespace(configMap);
-  const name = getName(configMap);
-  if (namespace && name) {
-    return `${cluster}-${namespace}-${name}`;
-  }
-  return `configmap-${index}`;
-};

@@ -28,7 +28,7 @@ type BaseKubevirtTableProps<TData, TCallbacks = undefined> = {
   data: TData[];
   dataTest?: string;
   fixedLayout?: boolean;
-  getRowId?: (row: TData, index: number) => string;
+  getRowId?: (row: TData) => string;
   initialSortColumnIndex?: number;
   initialSortDirection?: 'asc' | 'desc';
   initialSortKey?: string;
@@ -54,7 +54,7 @@ type SelectableTableProps<TData, TCallbacks = undefined> = BaseKubevirtTableProp
   TData,
   TCallbacks
 > & {
-  getRowId: (row: TData, index: number) => string;
+  getRowId: (row: TData) => string;
   onSelect: (selected: TData[]) => void;
   selectable: true;
   selectedItems: TData[];

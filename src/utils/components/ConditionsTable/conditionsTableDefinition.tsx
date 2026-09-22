@@ -44,5 +44,7 @@ export const getConditionsColumns = (t: TFunction): ColumnConfig<V1Condition, un
   },
 ];
 
-export const getConditionRowId = (condition: V1Condition, index: number): string =>
-  `${condition.type}-${index}`;
+export const getConditionRowId = (condition: V1Condition): string =>
+  [condition.type, condition.status, condition.reason, condition.lastTransitionTime]
+    .filter(Boolean)
+    .join('-');

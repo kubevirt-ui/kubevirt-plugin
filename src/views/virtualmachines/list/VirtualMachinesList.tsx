@@ -4,6 +4,7 @@ import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { tourGuideVM } from '@kubevirt-utils/components/GuidedTour/utils/constants';
 import { runningTourSignal } from '@kubevirt-utils/components/GuidedTour/utils/guidedTourSignals';
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
+import { getK8sRowId } from '@kubevirt-utils/components/KubevirtTable/utils';
 import { PageTitles } from '@kubevirt-utils/constants/page-constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import usePagination from '@kubevirt-utils/hooks/usePagination/usePagination';
@@ -25,7 +26,7 @@ import useVMListTelemetry from './hooks/useVMListTelemetry';
 import useVMMetrics from './hooks/useVMMetrics';
 import { deselectAllVMs } from './selectedVMs';
 import { filterVMsByClusterAndNamespace } from './utils/utils';
-import { getVMRowId, VM_COLUMN_KEYS, type VMCallbacks } from './virtualMachinesDefinition';
+import { VM_COLUMN_KEYS, type VMCallbacks } from './virtualMachinesDefinition';
 
 import './VirtualMachinesList.scss';
 
@@ -133,7 +134,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({
                 callbacks={callbacks}
                 columns={columns}
                 data={filteredVMs ?? []}
-                getRowId={getVMRowId}
+                getRowId={getK8sRowId}
                 initialSortKey={VM_COLUMN_KEYS.name}
                 loaded={loaded}
                 loadError={vmsLoadError}

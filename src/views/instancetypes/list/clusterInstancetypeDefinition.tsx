@@ -3,7 +3,6 @@ import { type TFunction } from 'i18next';
 
 import { VirtualMachineClusterInstancetypeModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { type V1beta1VirtualMachineClusterInstancetype } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { getK8sRowId } from '@kubevirt-utils/components/KubevirtTable/utils';
 import RedHatLabel from '@kubevirt-utils/components/RedHatLabel/RedHatLabel';
 import { VENDOR_LABEL } from '@kubevirt-utils/constants/constants';
 import type { TableExportColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
@@ -92,8 +91,3 @@ export const getClusterInstancetypeColumns = (
     renderCell: (row) => <ActionsCell row={row} />,
   },
 ];
-
-export const getClusterInstancetypeRowId = (
-  instanceType: V1beta1VirtualMachineClusterInstancetype,
-  index: number,
-): string => getK8sRowId(instanceType, index, 'cluster-instancetype');

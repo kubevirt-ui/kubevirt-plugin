@@ -4,6 +4,7 @@ import GuidedTour from '@kubevirt-utils/components/GuidedTour/GuidedTour';
 import { runningTourSignal } from '@kubevirt-utils/components/GuidedTour/utils/guidedTourSignals';
 import KubevirtFilterToolbar from '@kubevirt-utils/components/KubevirtFilterToolbar/KubevirtFilterToolbar';
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
+import { getK8sRowId } from '@kubevirt-utils/components/KubevirtTable/utils';
 import TemplatesFilter from '@kubevirt-utils/components/TemplatesFilter/TemplatesFilter';
 import { TemplatesFilterVariant } from '@kubevirt-utils/components/TemplatesFilter/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -25,7 +26,6 @@ import VirtualMachineTemplatesEmptyState from './components/VirtualMachineTempla
 import useAllTemplateResources from './hooks/useAllTemplateResources';
 import useVirtualMachineTemplatesListColumns from './hooks/useVirtualMachineTemplatesListColumns';
 import useVirtualMachineTemplatesListFilters from './hooks/useVirtualMachineTemplatesListFilters';
-import { getTemplateRowId } from './virtualMachineTemplatesDefinition';
 
 import '@kubevirt-utils/styles/list-managment-group.scss';
 
@@ -122,7 +122,7 @@ const VirtualMachineTemplatesList: FC<ListPageProps> = ({
           ariaLabel={t('Templates table')}
           columns={columns}
           data={filteredData}
-          getRowId={getTemplateRowId}
+          getRowId={getK8sRowId}
           initialSortKey="none"
           loaded={loaded && loadedColumns}
           loadError={error}

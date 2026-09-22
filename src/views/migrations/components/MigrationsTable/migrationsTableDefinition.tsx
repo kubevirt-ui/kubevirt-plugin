@@ -1,14 +1,14 @@
 import { type TFunction } from 'i18next';
 
+import { getK8sRowId } from '@kubevirt-utils/components/KubevirtTable/utils';
 import { type ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { ACTIONS } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/const';
-import { getName, getNamespace, getUID } from '@kubevirt-utils/resources/shared';
+import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import {
   getMigrationPhase,
   getMigrationSourceNode,
   getMigrationTargetNode,
 } from '@kubevirt-utils/resources/vmim/selectors';
-import { getCluster } from '@multicluster/helpers/selectors';
 
 import {
   ActionsCell,
@@ -121,17 +121,10 @@ export const getMigrationsTableColumns = (
   return columns;
 };
 
-export const getMigrationsTableRowId = (row: MigrationTableDataLayout, index: number): string => {
-  const uid = getUID(row.vmim);
-  if (uid) return uid;
-
-  const cluster = getCluster(row.vmim) ?? getCluster(row.vmiObj) ?? 'local';
-  const namespace = getNamespace(row.vmim) ?? getNamespace(row.vmiObj) ?? 'unknown-ns';
-  const name = getName(row.vmim) ?? getName(row.vmiObj);
-
-  if (name) {
-    return `${cluster}-${namespace}-${name}`;
+export const getMigrationsTableRowId = (row: MigrationTableDataLayout): string => {
+  if (row.vmim?.metadata?.uid || getName(row.vmim) || row.vmim?.metadata?.generateName) {
+    return getK8sRowId(row.vmim);
   }
 
-  return `${cluster}-${namespace}-migration-${index}`;
+  return getK8sRowId(row.vmiObj);
 };

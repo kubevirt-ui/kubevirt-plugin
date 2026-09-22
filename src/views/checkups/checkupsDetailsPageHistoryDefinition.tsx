@@ -98,16 +98,3 @@ export const getCheckupsHistoryColumns = (
     sortable: false,
   },
 ];
-
-export const getCheckupsHistoryRowId = (job: IoK8sApiBatchV1Job, index: number): string => {
-  if (job?.metadata?.uid) {
-    return job.metadata.uid;
-  }
-  const cluster = getCluster(job) ?? 'local';
-  const namespace = job?.metadata?.namespace;
-  const name = job?.metadata?.name;
-  if (namespace && name) {
-    return `${cluster}-${namespace}-${name}`;
-  }
-  return `job-${index}`;
-};

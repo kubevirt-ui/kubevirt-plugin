@@ -15,6 +15,7 @@ import {
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import ColumnManagement from '@kubevirt-utils/components/ColumnManagementModal/ColumnManagement';
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
+import { getK8sRowId } from '@kubevirt-utils/components/KubevirtTable/utils';
 import { PageTitles } from '@kubevirt-utils/constants/page-constants';
 import { KUBEVIRT_APISERVER_PROXY } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
@@ -36,7 +37,7 @@ import useVirtualMachineListColumnUtils from '../../list/hooks/useVirtualMachine
 import useVirtualMachineListColumns from '../../list/hooks/useVirtualMachinesListColumns';
 import useVMMetrics from '../../list/hooks/useVMMetrics';
 import { VM_FILTER_OPTIONS } from '../../list/utils/constants';
-import { getVMRowId, VM_COLUMN_KEYS, type VMCallbacks } from '../../list/virtualMachinesDefinition';
+import { VM_COLUMN_KEYS, type VMCallbacks } from '../../list/virtualMachinesDefinition';
 import { useAccessibleResources } from '../../search/hooks/useAccessibleResources';
 import { getVMIFromMapper } from '../../utils/mappers';
 import NodeVirtualMachineEmptyState from '../NodeVirtualMachineEmptyState/NodeVirtualMachineEmptyState';
@@ -146,7 +147,7 @@ const NodeVirtualMachinesList: FC<NodeVirtualMachinesListProps> = ({ obj }) => {
                 callbacks={callbacks}
                 columns={columns}
                 data={filteredVMs ?? []}
-                getRowId={getVMRowId}
+                getRowId={getK8sRowId}
                 initialSortKey={VM_COLUMN_KEYS.name}
                 loaded={loaded}
                 loadError={vmsLoadError}

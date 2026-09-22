@@ -77,4 +77,26 @@ describe('generateRows', () => {
       row: [{ cell: 'vm-a' }],
     });
   });
+
+  it('should use the list index when getRowId returns an empty string', () => {
+    const columns: ColumnConfig<Row>[] = [
+      {
+        getValue: (row) => row.name,
+        key: 'name',
+        label: 'Name',
+      },
+    ];
+
+    const rows = generateRows({
+      callbacks: undefined,
+      columns,
+      data: [
+        { count: 0, name: 'a' },
+        { count: 1, name: 'b' },
+      ],
+      getRowId: () => '',
+    });
+
+    expect(rows).toMatchObject([{ id: '0' }, { id: '1' }]);
+  });
 });

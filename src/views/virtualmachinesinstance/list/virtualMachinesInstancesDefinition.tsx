@@ -6,7 +6,6 @@ import {
   type V1VirtualMachineCondition,
   type V1VirtualMachineInstance,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { getK8sRowId } from '@kubevirt-utils/components/KubevirtTable/utils';
 import { type ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { ACTIONS } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/const';
 import {
@@ -135,6 +134,3 @@ export const getVMIColumns = (
 
   return columns;
 };
-
-export const getVMIRowId = (vmi: V1VirtualMachineInstance, index: number): string =>
-  getK8sRowId(vmi, index, 'vmi');

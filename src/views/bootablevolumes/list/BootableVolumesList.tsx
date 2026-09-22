@@ -2,7 +2,7 @@ import { type FC, useMemo } from 'react';
 import { useParams } from 'react-router';
 
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
-import { buildColumnLayout } from '@kubevirt-utils/components/KubevirtTable/utils';
+import { buildColumnLayout, getK8sRowId } from '@kubevirt-utils/components/KubevirtTable/utils';
 import { PageTitles } from '@kubevirt-utils/constants/page-constants';
 import useClusterPreferences from '@kubevirt-utils/hooks/useClusterPreferences';
 import useKubevirtDataViewFilters from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/useKubevirtDataViewFilters';
@@ -27,7 +27,6 @@ import { type BootableResource } from '../utils/types';
 import {
   type BootableVolumeCallbacks,
   getBootableVolumeColumns,
-  getBootableVolumeRowId,
 } from './bootableVolumesDefinition';
 import BootableVolumeAddButton from './components/BootableVolumeAddButton';
 import BootableVolumesEmptyState from './components/BootableVolumesEmptyState';
@@ -138,7 +137,7 @@ const BootableVolumesList: FC = () => {
             columns={columns}
             data={filteredData ?? []}
             dataTest="bootable-volumes-list"
-            getRowId={getBootableVolumeRowId}
+            getRowId={getK8sRowId}
             loaded={isLoaded}
             loadError={error}
             noDataMsg={t("You don't have any bootable volumes yet")}

@@ -1,7 +1,6 @@
 import type { TFunction } from 'i18next';
 
 import type { V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
-import { getK8sRowId } from '@kubevirt-utils/components/KubevirtTable/utils';
 import type { TableExportColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { ACTIONS } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/const';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
@@ -85,6 +84,3 @@ export const getDataSourceColumns = (
 
   return columns;
 };
-
-export const getDataSourceRowId = (dataSource: V1beta1DataSource, index: number): string =>
-  getK8sRowId(dataSource, index, 'datasource');

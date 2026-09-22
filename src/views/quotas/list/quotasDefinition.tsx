@@ -1,6 +1,5 @@
 import type { TFunction } from 'i18next';
 
-import { getK8sRowId } from '@kubevirt-utils/components/KubevirtTable/utils';
 import type { TableExportColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { ACTIONS } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/const';
 import type { ApplicationAwareQuota } from '@kubevirt-utils/resources/quotas/types';
@@ -119,6 +118,3 @@ export const getQuotaColumns = (
 
   return columns;
 };
-
-export const getQuotaRowId = (quota: ApplicationAwareQuota, index: number): string =>
-  getK8sRowId(quota, index, 'quota');

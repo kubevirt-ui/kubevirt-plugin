@@ -3,7 +3,6 @@ import { type TFunction } from 'i18next';
 
 import ArchitectureLabel from '@kubevirt-utils/components/ArchitectureLabel/ArchitectureLabel';
 import { getCPUMemoryTitle } from '@kubevirt-utils/components/CPUMemory/utils';
-import { getK8sRowId } from '@kubevirt-utils/components/KubevirtTable/utils';
 import { type TableExportColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { ACTIONS } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/const';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
@@ -155,6 +154,3 @@ export const getTemplateColumns = (
 
   return columns;
 };
-
-export const getTemplateRowId = (resource: TemplateOrRequest, index: number): string =>
-  getK8sRowId(resource, index, 'template');

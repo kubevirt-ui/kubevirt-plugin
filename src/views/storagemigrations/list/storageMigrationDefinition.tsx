@@ -7,8 +7,7 @@ import {
   getMigrationStartTimestamp,
   getVolumeCountFromMigPlan,
 } from '@kubevirt-utils/resources/migrations/utils';
-import { getName, getUID } from '@kubevirt-utils/resources/shared';
-import { getCluster } from '@multicluster/helpers/selectors';
+import { getName } from '@kubevirt-utils/resources/shared';
 
 import { getMigrationPercentage } from './components/utils';
 import { STORAGE_MIGRATION_COLUMN_KEYS } from './constants';
@@ -82,20 +81,3 @@ export const getStorageMigrationColumns = (
     sortable: false,
   },
 ];
-
-export const getStorageMigrationRowId = (
-  row: MultiNamespaceVirtualMachineStorageMigrationPlan,
-  index: number,
-): string => {
-  const uid = getUID(row);
-  if (uid) return uid;
-
-  const cluster = getCluster(row) ?? 'local';
-  const name = getName(row);
-
-  if (name) {
-    return `${cluster}-${name}`;
-  }
-
-  return `storage-migration-${index}`;
-};

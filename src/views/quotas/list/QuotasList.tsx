@@ -1,7 +1,7 @@
 import { type FC, useMemo } from 'react';
 
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
-import { buildColumnLayout } from '@kubevirt-utils/components/KubevirtTable/utils';
+import { buildColumnLayout, getK8sRowId } from '@kubevirt-utils/components/KubevirtTable/utils';
 import useKubevirtDataViewFilters from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/useKubevirtDataViewFilters';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtTableColumns';
@@ -27,7 +27,7 @@ import QuotasListHeader from './components/QuotasListHeader';
 import QuotasListToolbar from './components/QuotasListToolbar';
 import { QuotaScope } from './constants';
 import useQuotasListTab from './hooks/useQuotasListTab';
-import { getQuotaColumns, getQuotaRowId } from './quotasDefinition';
+import { getQuotaColumns } from './quotasDefinition';
 import { type QuotaCallbacks } from './utils/helpers';
 
 import '@kubevirt-utils/styles/list-managment-group.scss';
@@ -146,7 +146,7 @@ const QuotasList: FC = () => {
               columns={columns}
               data={filteredData ?? []}
               dataTest="quotas-list"
-              getRowId={getQuotaRowId}
+              getRowId={getK8sRowId}
               loaded={isLoaded}
               loadError={loadError}
               noDataMsg={t("You don't have any application-aware quotas yet")}

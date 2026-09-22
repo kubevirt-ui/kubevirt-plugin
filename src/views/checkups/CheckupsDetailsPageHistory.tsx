@@ -3,15 +3,15 @@ import { useMemo } from 'react';
 
 import type { IoK8sApiBatchV1Job } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
+import { getK8sRowId } from '@kubevirt-utils/components/KubevirtTable/utils';
 import { TableToolbarActionsFlex } from '@kubevirt-utils/components/TableToolbarActions/TableToolbarActionsFlex';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { EXPORT_TABLE_KEYS, KubevirtTableExport } from '@kubevirt-utils/hooks/useTableExport';
 import { Title } from '@patternfly/react-core';
 
-import type { CheckupsHistoryCallbacks } from './checkupsDetailsPageHistoryDefinition';
 import {
+  type CheckupsHistoryCallbacks,
   getCheckupsHistoryColumns,
-  getCheckupsHistoryRowId,
 } from './checkupsDetailsPageHistoryDefinition';
 
 import './CheckupsDetailsPageHistory.scss';
@@ -69,7 +69,7 @@ const CheckupsDetailsPageHistory: FC<CheckupsDetailsPageHistoryProps> = ({
         columns={columns}
         data={jobs}
         dataTest="checkups-history-table"
-        getRowId={getCheckupsHistoryRowId}
+        getRowId={getK8sRowId}
         initialSortDirection={initialSortDirection}
         initialSortKey={initialSortKey}
         loaded={loaded}
