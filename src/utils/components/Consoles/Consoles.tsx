@@ -7,6 +7,7 @@ import { ExternalLinkAltIcon } from '@patternfly/react-icons';
 
 import { AccessConsoles } from './components/AccessConsoles/AccessConsoles';
 import CloudInitCredentials from './components/CloudInitCredentials/CloudInitCredentials';
+import ConsoleTypePanel from './components/ConsoleTypePanel';
 import DesktopViewer from './components/DesktopViewer/DesktopViewer';
 import SerialConnect from './components/SerialConsole/SerialConnect';
 import SerialConsole from './components/SerialConsole/SerialConsole';
@@ -17,9 +18,7 @@ import {
   VNC_CONSOLE_TYPE,
 } from './components/utils/ConsoleConsts';
 import { type ConsoleComponentState, type ConsoleType } from './components/utils/types';
-import HideConsole from './components/vnc-console/HideConsole';
 import SessionAlreadyInUseModal from './components/vnc-console/SessionAlreadyInUseModal';
-import { isConnectableState } from './components/vnc-console/utils/util';
 import VncConnect from './components/vnc-console/VncConnect';
 import VncConsole from './components/vnc-console/VncConsole';
 import { type ConsolesProps } from './ConsolesTypes';
@@ -27,6 +26,8 @@ import { type ConsolesProps } from './ConsolesTypes';
 import './consoles.scss';
 
 const Consoles: FC<ConsolesProps> = ({
+  canConnectSerial = true,
+  canConnectVnc = true,
   consoleContainerClass,
   isHeadlessMode,
   isStandAlone = false,
@@ -48,9 +49,6 @@ const Consoles: FC<ConsolesProps> = ({
   if (isHeadlessMode) {
     return <div>{t('Console is disabled in headless mode')}</div>;
   }
-
-  const isConnected = state === ConsoleState.Connected;
-  const showConnect = isConnectableState(state);
 
   return (
     <Stack>
@@ -106,31 +104,29 @@ const Consoles: FC<ConsolesProps> = ({
         </Flex>
       </StackItem>
       <StackItem className={consoleContainerClass}>
-        {type === VNC_CONSOLE_TYPE && showConnect && (
-          <VncConnect connect={actions?.connect} isConnecting={state === ConsoleState.Connecting} />
-        )}
-        {type === VNC_CONSOLE_TYPE && (
-          <HideConsole isHidden={!isConnected}>
-            <VncConsole
-              basePath={path}
-              // force re-create on change
-              key={`vnc-${path}-${vncLogLevel}`}
-              setState={setConsoleState}
-              vncLogLevel={vncLogLevel}
-            />
-          </HideConsole>
-        )}
-        {type === SERIAL_CONSOLE_TYPE && showConnect && (
-          <SerialConnect
-            connect={actions?.connect}
-            isConnecting={state === ConsoleState.Connecting}
+        <ConsoleTypePanel
+          canConnect={canConnectVnc}
+          connectComponent={VncConnect}
+          isActive={type === VNC_CONSOLE_TYPE}
+          onConnect={actions?.connect}
+          state={state}
+        >
+          <VncConsole
+            basePath={path}
+            key={`vnc-${path}-${vncLogLevel}`}
+            setState={setConsoleState}
+            vncLogLevel={vncLogLevel}
           />
-        )}
-        {type === SERIAL_CONSOLE_TYPE && (
-          <HideConsole isHidden={!isConnected}>
-            <SerialConsole basePath={path} setState={setConsoleState} />
-          </HideConsole>
-        )}
+        </ConsoleTypePanel>
+        <ConsoleTypePanel
+          canConnect={canConnectSerial}
+          connectComponent={SerialConnect}
+          isActive={type === SERIAL_CONSOLE_TYPE}
+          onConnect={actions?.connect}
+          state={state}
+        >
+          <SerialConsole basePath={path} setState={setConsoleState} />
+        </ConsoleTypePanel>
         {type === DESKTOP_VIEWER_CONSOLE_TYPE && (
           <DesktopViewer vmCluster={vmCluster} vmName={vmName} vmNamespace={vmNamespace} />
         )}

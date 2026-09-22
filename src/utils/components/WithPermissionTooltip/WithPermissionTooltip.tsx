@@ -25,7 +25,7 @@ const WithPermissionTooltip: FC<WithPermissionTooltipProps> = ({
       hidden={allowed}
       position={TooltipPosition.right}
     >
-      <>{children}</>
+      {children}
     </HidableTooltip>
   );
 };

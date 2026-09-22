@@ -19,6 +19,7 @@ import { ModalProvider, useModalValue } from '../ModalProvider/ModalProvider';
 import { KUBEVIRT_UI_VNC_LOG_LEVEL_LABEL } from './components/vnc-console/utils/constants';
 import { isVncLogLevel } from './components/vnc-console/utils/util';
 import Consoles from './Consoles';
+import useCanConnectConsole from './hooks/useCanConnectConsole';
 import { getConsoleBasePath } from './utils/utils';
 
 const ConsoleStandAlone: FC = () => {
@@ -31,6 +32,11 @@ const ConsoleStandAlone: FC = () => {
     namespace: ns,
   });
   const { vmi, vmiLoadError } = useVMI(name, ns, cluster);
+  const {
+    canConnectSerial,
+    canConnectVnc,
+    loading: canConnectLoading,
+  } = useCanConnectConsole(name, ns, cluster);
   const isFleetAvailable = useIsFleetAvailable();
   const value = useModalValue();
 
@@ -42,7 +48,7 @@ const ConsoleStandAlone: FC = () => {
 
   const waitingForVm = !vmLoaded && !vmLoadError;
 
-  if (!apiPathLoaded || waitingForVm)
+  if (!apiPathLoaded || waitingForVm || canConnectLoading)
     return (
       <Bullseye>
         <Spinner />
@@ -53,6 +59,8 @@ const ConsoleStandAlone: FC = () => {
     <ModalProvider value={value}>
       <DocumentTitle>{getResourceDetailsTitle(name, VirtualMachineModel.kind)}</DocumentTitle>
       <Consoles
+        canConnectSerial={canConnectSerial}
+        canConnectVnc={canConnectVnc}
         consoleContainerClass="console-container-stand-alone"
         isHeadlessMode={isHeadlessMode(vmi)}
         isStandAlone

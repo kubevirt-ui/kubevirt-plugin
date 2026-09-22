@@ -5,9 +5,19 @@ import { Button, EmptyState, EmptyStateBody, EmptyStateFooter } from '@patternfl
 
 import type { CustomConnectComponentProps } from './vnc-console/utils/VncConsoleTypes';
 
-const ConnectToConsole: FC<
-  CustomConnectComponentProps & { connectingMsg: string; connectMsg: string; message: string }
-> = ({ connect, connectingMsg, connectMsg, isConnecting, message }) => {
+type ConnectToConsoleProps = CustomConnectComponentProps & {
+  connectingMsg: string;
+  connectMsg: string;
+  message: string;
+};
+
+const ConnectToConsole: FC<ConnectToConsoleProps> = ({
+  connect,
+  connectingMsg,
+  connectMsg,
+  isConnecting,
+  message,
+}) => {
   return (
     <>
       {!isConnecting && (
