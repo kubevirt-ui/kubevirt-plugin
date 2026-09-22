@@ -40,7 +40,7 @@ const useSSHService = (vm: V1VirtualMachine): UseSSHServiceReturnType => {
   const vmiServices = getServicesForVmi(services, pod, vm, vmi);
 
   const sshVMIService = vmiServices.find((service) =>
-    service?.spec?.ports?.find((port) => parseInt(port.targetPort, 10) === SSH_PORT),
+    service?.spec?.ports?.find((port) => Number(port.targetPort) === SSH_PORT),
   );
 
   return [sshVMIService, servicesLoaded, servicesError];

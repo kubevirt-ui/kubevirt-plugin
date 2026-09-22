@@ -77,7 +77,7 @@ export const OS_IMAGES_NS = isUpstream ? KUBEVIRT_OS_IMAGES_NS : OPENSHIFT_OS_IM
 export const isString = (val: unknown): boolean => val !== null && typeof val === 'string';
 
 export const getSSHNodePort = (sshService: IoK8sApiCoreV1Service): number =>
-  sshService?.spec?.ports?.find((port) => parseInt(port.targetPort, 10) === 22)?.nodePort;
+  sshService?.spec?.ports?.find((port) => Number(port.targetPort) === 22)?.nodePort;
 
 export const isTemplateParameter = (value: string): boolean => Boolean(/^\${\w+}$/.test(value));
 
