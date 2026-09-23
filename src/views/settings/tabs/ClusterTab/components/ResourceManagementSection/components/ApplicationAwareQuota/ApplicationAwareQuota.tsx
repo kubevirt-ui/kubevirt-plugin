@@ -11,11 +11,10 @@ import { CalculationMethod } from '@kubevirt-utils/resources/quotas/types';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
-import { Alert, AlertVariant, Flex } from '@patternfly/react-core';
+import { Alert, AlertVariant } from '@patternfly/react-core';
 import { useSettingsCluster } from '@settings/context/SettingsClusterContext';
 import SettingsLink from '@settings/context/SettingsLink';
 
-import EditCalculationMethodButton from './components/EditCalculationMethodButton';
 import QuotaCalculationMethodTerm from './components/QuotaCalculationMethodTerm';
 import { getCalculationMethodContentMapper } from './constants';
 
@@ -92,16 +91,11 @@ const ApplicationAwareQuota: FC<ApplicationAwareQuotaProps> = ({
       )}
       {isEnabled && (
         <>
-          <Flex className="pf-v6-u-mt-sm pf-v6-u-mb-xs" spaceItems={{ default: 'spaceItems2xl' }}>
-            <QuotaCalculationMethodTerm
-              calculationMethodContentMapper={calculationMethodContentMapper}
-            />
-            <EditCalculationMethodButton
-              calculationMethodContentMapper={calculationMethodContentMapper}
-              hyperConverge={hyperConverge}
-              selectedCalculationMethod={getAAQCalculationMethod(hyperConverge)}
-            />
-          </Flex>
+          <QuotaCalculationMethodTerm
+            calculationMethodContentMapper={calculationMethodContentMapper}
+            hyperConverge={hyperConverge}
+            selectedCalculationMethod={getAAQCalculationMethod(hyperConverge)}
+          />
           <SettingsLink showExternalIcon to={getQuotaListURL()}>
             {t('Manage quotas')}
           </SettingsLink>
