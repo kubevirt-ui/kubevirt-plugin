@@ -10,7 +10,7 @@ import {
   type MultiNamespaceVirtualMachineStorageMigrationPlan,
   STORAGE_MIGRATION_PLAN_RETENTION_POLICY,
 } from '@kubevirt-utils/resources/migrations/constants';
-import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
+import { buildOwnerReference, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getRandomChars, truncateToK8sName } from '@kubevirt-utils/utils/utils';
 import { kubevirtK8sCreate } from '@multicluster/k8sRequests';
 
@@ -44,6 +44,7 @@ export const getMigration = (
       '',
     ),
     namespace: getNamespace(migrationPlan),
+    ownerReferences: [buildOwnerReference(migrationPlan)],
   },
   spec: {
     multiNamespaceVirtualMachineStorageMigrationPlanRef: {
