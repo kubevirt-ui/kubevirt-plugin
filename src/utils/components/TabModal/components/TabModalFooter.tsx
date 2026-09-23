@@ -114,6 +114,8 @@ const TabModalFooter: FC<TabModalFooterProps> = ({
                 .then(() => (onCancel ?? onClose)())
                 .catch(kubevirtConsole.error);
             }}
+            onMouseDown={(event) => event.preventDefault()}
+            type="button"
             variant={cancelBtnVariant ?? ButtonVariant.link}
           >
             {cancelBtnText ?? t('Cancel')}
