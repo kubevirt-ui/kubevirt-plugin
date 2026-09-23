@@ -77,6 +77,12 @@ export default class SettingsPage extends BasePage {
     return this._settings.disableGuidedTour(...args);
   }
 
+  disableKSM(
+    ...args: Parameters<OverviewVirtualizationFeaturesPage['disableKSM']>
+  ): ReturnType<OverviewVirtualizationFeaturesPage['disableKSM']> {
+    return this._features.disableKSM(...args);
+  }
+
   disableMemoryDensity(
     ...args: Parameters<OverviewMigrationsPage['disableMemoryDensity']>
   ): ReturnType<OverviewMigrationsPage['disableMemoryDensity']> {
