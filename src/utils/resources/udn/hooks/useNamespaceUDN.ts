@@ -15,11 +15,14 @@ const useNamespaceUDN = (
   vmsNotSupported: boolean,
   nad?: NetworkAttachmentDefinitionKind,
 ] => {
-  const [nads] = useK8sWatchResource<NetworkAttachmentDefinitionKind[]>({
-    groupVersionKind: NetworkAttachmentDefinitionModelGroupVersionKind,
-    isList: true,
-    namespace,
-  });
+  // Skip watching until namespace is known, otherwise it falls back to an unscoped watch.
+  const [nads] = useK8sWatchResource<NetworkAttachmentDefinitionKind[]>(
+    namespace && {
+      groupVersionKind: NetworkAttachmentDefinitionModelGroupVersionKind,
+      isList: true,
+      namespace,
+    },
+  );
 
   const udnNAD = useMemo(
     () =>

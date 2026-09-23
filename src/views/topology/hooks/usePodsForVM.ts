@@ -34,25 +34,29 @@ const usePodsForVM: UsePodsForVM = (vm) => {
   const vmName = getName(vm);
   const vmNamespace = getNamespace(vm);
 
+  // Skip watching until vmNamespace is known, otherwise it falls back to an unscoped watch.
   const watchedResources = useMemo(
-    () => ({
-      pods: {
-        groupVersionKind: getGroupVersionKindForModel(PodModel),
-        isList: true,
-        vmNamespace,
-      },
-      replicationControllers: {
-        groupVersionKind: getGroupVersionKindForModel(ReplicationControllerModel),
-        isList: true,
-        vmNamespace,
-      },
-      virtualmachineinstances: {
-        groupVersionKind: getGroupVersionKindForModel(VirtualMachineInstanceModel),
-        isList: true,
-        optional: true,
-        vmNamespace,
-      },
-    }),
+    () =>
+      vmNamespace
+        ? {
+            pods: {
+              groupVersionKind: getGroupVersionKindForModel(PodModel),
+              isList: true,
+              namespace: vmNamespace,
+            },
+            replicationControllers: {
+              groupVersionKind: getGroupVersionKindForModel(ReplicationControllerModel),
+              isList: true,
+              namespace: vmNamespace,
+            },
+            virtualmachineinstances: {
+              groupVersionKind: getGroupVersionKindForModel(VirtualMachineInstanceModel),
+              isList: true,
+              namespace: vmNamespace,
+              optional: true,
+            },
+          }
+        : {},
     [vmNamespace],
   );
 
