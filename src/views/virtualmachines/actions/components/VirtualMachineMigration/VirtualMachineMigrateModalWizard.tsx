@@ -1,16 +1,17 @@
-import { type FC, useEffect } from 'react';
+import { type FC } from 'react';
 
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import Loading from '@kubevirt-utils/components/Loading/Loading';
 import StateHandler from '@kubevirt-utils/components/StateHandler/StateHandler';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { type StorageMigrationAPI } from '@kubevirt-utils/resources/migrations/constants';
-import { Wizard, WizardHeader } from '@patternfly/react-core';
+import { Wizard, WizardHeader, WizardStep } from '@patternfly/react-core';
 
-import useMigrationModalState from './hooks/useMigrationModalState';
 import useMigrationNamespacesPVCs from './hooks/useMigrationNamespacesPVCs';
-import useMigrationState from './hooks/useMigrationState';
-import { getAllSelectedMigrations } from './utils/utils';
-import VirtualMachineMigrateWizardSteps from './VirtualMachineMigrateWizardSteps';
+import useMigrationWizardState from './hooks/useMigrationWizardState';
+import VirtualMachineMigrationDestinationTab from './tabs/VirtualMachineMigrationDestinationTab';
+import VirtualMachineMigrationDetails from './tabs/VirtualMachineMigrationDetails';
+import VirtualMachineMigrationReviewTab from './tabs/VirtualMachineMigrationReviewTab';
 import VirtualMachineMigrationStatus from './VirtualMachineMigrationStatus';
 
 type VirtualMachineMigrateModalWizardProps = {
@@ -29,28 +30,35 @@ const VirtualMachineMigrateModalWizard: FC<VirtualMachineMigrateModalWizardProps
   const [migrationNamespacesPVCs, migrationNamespacesPVCsLoaded, migrationNamespacesPVCsError] =
     useMigrationNamespacesPVCs(vms);
 
-  const modalState = useMigrationModalState(vms);
-  const { cluster, selectedMigrations, setSelectedMigrations } = modalState;
-
-  useEffect(() => {
-    if (selectedMigrations !== null || !migrationNamespacesPVCsLoaded) return;
-    setSelectedMigrations(getAllSelectedMigrations(vms, migrationNamespacesPVCs));
-  }, [
+  const {
+    cluster,
+    defaultStorageClassName,
+    destinationStorageClass,
+    isDestinationStepInvalid,
+    isDetailsStepInvalid,
+    isSameStorageClass,
+    keepOriginalVolumes,
+    migrationError,
+    migrationLoading,
+    migrationPlan,
+    migrationPlanName,
+    migrationStarted,
+    onSubmit,
+    scLoaded,
+    selectedMigrations,
+    selectedPVCs,
+    setKeepOriginalVolumes,
+    setMigrationPlanName,
+    setSelectedMigrations,
+    setSelectedStorageClass,
+    sortedStorageClasses,
+    vmStorageClassNames,
+  } = useMigrationWizardState({
     migrationNamespacesPVCs,
     migrationNamespacesPVCsLoaded,
+    storageMigAPI,
     vms,
-    setSelectedMigrations,
-    selectedMigrations,
-  ]);
-
-  const { migrationError, migrationLoading, migrationPlan, migrationStarted, onSubmit } =
-    useMigrationState(
-      selectedMigrations,
-      modalState.destinationStorageClass,
-      modalState.migrationPlanName,
-      modalState.keepOriginalVolumes,
-      storageMigAPI,
-    );
+  });
 
   return (
     <StateHandler
@@ -80,13 +88,62 @@ const VirtualMachineMigrateModalWizard: FC<VirtualMachineMigrateModalWizardProps
           onSave={onSubmit}
           title={t('Migrate VirtualMachine storage')}
         >
-          <VirtualMachineMigrateWizardSteps
-            {...modalState}
-            migrationError={migrationError}
-            migrationLoading={migrationLoading}
-            migrationNamespacesPVCs={migrationNamespacesPVCs}
-            vms={vms}
-          />
+          <WizardStep
+            footer={{ isNextDisabled: isDetailsStepInvalid }}
+            id="wizard-migration-details"
+            name={t('Migration details')}
+          >
+            {scLoaded ? (
+              <VirtualMachineMigrationDetails
+                migrationPlanName={migrationPlanName}
+                pvcs={migrationNamespacesPVCs ?? []}
+                selectedPVCs={selectedPVCs}
+                setMigrationPlanName={setMigrationPlanName}
+                setSelectedMigrations={setSelectedMigrations}
+                vms={vms}
+              />
+            ) : (
+              <Loading />
+            )}
+          </WizardStep>
+          <WizardStep
+            footer={{ isNextDisabled: isDestinationStepInvalid }}
+            id="wizard-migrate-destination"
+            isDisabled={isDetailsStepInvalid}
+            name={t('Source and target StorageClass')}
+          >
+            <VirtualMachineMigrationDestinationTab
+              defaultStorageClassName={defaultStorageClassName}
+              destinationStorageClass={destinationStorageClass}
+              isSameStorageClass={isSameStorageClass}
+              keepOriginalVolumes={keepOriginalVolumes}
+              setKeepOriginalVolumes={setKeepOriginalVolumes}
+              setSelectedStorageClass={setSelectedStorageClass}
+              sortedStorageClasses={sortedStorageClasses}
+              vmStorageClassNames={vmStorageClassNames}
+            />
+          </WizardStep>
+          <WizardStep
+            footer={{
+              isNextDisabled: migrationLoading,
+              nextButtonProps: { isLoading: migrationLoading },
+              nextButtonText: t('Migrate VirtualMachine storage'),
+            }}
+            id="wizard-migrate-review"
+            isDisabled={isDestinationStepInvalid}
+            name={t('Review')}
+          >
+            <VirtualMachineMigrationReviewTab
+              defaultStorageClassName={defaultStorageClassName}
+              destinationStorageClass={destinationStorageClass}
+              keepOriginalVolumes={keepOriginalVolumes}
+              migrationError={migrationError}
+              migrationPlanName={migrationPlanName}
+              pvcs={selectedPVCs}
+              vms={vms}
+              vmStorageClassNames={vmStorageClassNames}
+            />
+          </WizardStep>
         </Wizard>
       )}
     </StateHandler>
