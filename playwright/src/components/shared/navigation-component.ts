@@ -13,7 +13,7 @@ const LIST_URL_PATTERNS = {
   instanceTypes: /VirtualMachineClusterInstancetype(?:\?|$)/i,
   migrationPolicies: /MigrationPolicy(?:\?|$)/i,
   settings: /\/virtualization-settings(?:[/?#]|$)/i,
-  templates: /template\.openshift\.io~v1~Template(?:\?|$)/i,
+  templates: /\/templates(?:\?|$)/i,
   virtualMachines: /kubevirt\.io~v1~VirtualMachine(?:\?|$)/i,
   overview: /\/dashboards(?:\?|$)/i,
 } as const;

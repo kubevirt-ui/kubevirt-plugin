@@ -1,4 +1,4 @@
-import type { ResourceDetailsPage, ResourceListPage } from '@openshift-console/dynamic-plugin-sdk';
+import type { ResourceDetailsPage, RoutePage } from '@openshift-console/dynamic-plugin-sdk';
 import type {
   ConsolePluginBuildMetadata,
   EncodedExtension,
@@ -13,14 +13,11 @@ export const extensions: EncodedExtension[] = [
   {
     properties: {
       component: { $codeRef: 'VirtualMachineTemplatesList' },
-      model: {
-        group: 'template.openshift.io',
-        kind: 'Template',
-        version: 'v1',
-      },
+      exact: true,
+      path: ['/k8s/ns/:ns/templates', '/k8s/all-namespaces/templates'],
     },
-    type: 'console.page/resource/list',
-  } as EncodedExtension<ResourceListPage>,
+    type: 'console.page/route',
+  } as EncodedExtension<RoutePage>,
   {
     properties: {
       component: { $codeRef: 'TemplateNavPage' },
