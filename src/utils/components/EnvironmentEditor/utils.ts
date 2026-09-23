@@ -18,22 +18,23 @@ const getKindFromEnvVolume = (volume: V1Volume): EnvironmentKind | null => {
 };
 
 export const getVMEnvironmentsVariables = (vm: V1VirtualMachine): EnvironmentVariable[] => {
-  const disksWithSerial = (getDisks(vm) ?? []).filter((disk) => disk?.serial);
+  const disks = getDisks(vm) ?? [];
 
   return (getVolumes(vm) ?? []).reduce((acc, volume) => {
-    const envDisk = disksWithSerial.find((disk) => disk.name === volume.name);
+    const kind = getKindFromEnvVolume(volume);
+    if (!kind) return acc;
 
-    if (envDisk) {
-      acc.push({
-        diskName: volume.name,
-        kind: getKindFromEnvVolume(volume),
-        name:
-          volume?.configMap?.name ??
-          volume?.secret?.secretName ??
-          volume?.serviceAccount?.serviceAccountName,
-        serial: envDisk?.serial,
-      });
-    }
+    const matchingDisk = disks.find((disk) => disk.name === volume.name);
+
+    acc.push({
+      diskName: volume.name,
+      kind,
+      name:
+        volume?.configMap?.name ??
+        volume?.secret?.secretName ??
+        volume?.serviceAccount?.serviceAccountName,
+      serial: matchingDisk?.serial,
+    });
 
     return acc;
   }, []);

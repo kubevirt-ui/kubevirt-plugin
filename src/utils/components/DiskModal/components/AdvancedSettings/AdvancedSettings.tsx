@@ -1,6 +1,7 @@
-import type { FC } from 'react';
+import { type FC, useEffect, useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
+import type { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { FEATURE_HCO_PERSISTENT_RESERVATION } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
@@ -15,18 +16,28 @@ import type { V1DiskFormState } from '../../utils/types';
 import ApplyStorageProfileSettings from '../StorageProfileSettings/ApplyStorageProfileSettings';
 import { LUN_RESERVATION_FIELD, SHARABLE_FIELD } from '../utils/constants';
 import { getDiskSharable, getLunReservation } from '../utils/selectors';
+import SerialNumberInput from './SerialNumberInput';
 
 type AdvancedSettingsProps = {
+  editDiskName?: string;
   olsObj: K8sResourceCommon;
   showApplyStorageProfileSettings?: boolean;
+  vm?: V1VirtualMachine;
 };
 
 const AdvancedSettings: FC<AdvancedSettingsProps> = ({
+  editDiskName,
   olsObj,
   showApplyStorageProfileSettings,
+  vm,
 }) => {
   const { t } = useKubevirtTranslation();
-  const { control, setValue, watch } = useFormContext<V1DiskFormState>();
+  const {
+    control,
+    formState: { errors },
+    setValue,
+    watch,
+  } = useFormContext<V1DiskFormState>();
   const disk = watch('disk');
 
   const diskType = getDiskDrive(disk);
@@ -36,9 +47,21 @@ const AdvancedSettings: FC<AdvancedSettingsProps> = ({
 
   const { featureEnabled } = useFeatures(FEATURE_HCO_PERSISTENT_RESERVATION);
 
+  const hasSerialError = Boolean(errors?.disk?.serial);
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  useEffect(() => {
+    if (hasSerialError) setIsExpanded(true);
+  }, [hasSerialError]);
+
   const isLunType = diskType === diskTypes.lun;
   return (
-    <ExpandableSection isIndented toggleText={t('Advanced settings')}>
+    <ExpandableSection
+      isExpanded={isExpanded}
+      isIndented
+      onToggle={(_event, expanded) => setIsExpanded(expanded)}
+      toggleText={t('Advanced settings')}
+    >
       <Stack hasGutter>
         {showApplyStorageProfileSettings && <ApplyStorageProfileSettings />}
         <StackItem>
@@ -90,6 +113,9 @@ const AdvancedSettings: FC<AdvancedSettingsProps> = ({
               )}
             />
           </Split>
+        </StackItem>
+        <StackItem>
+          <SerialNumberInput editDiskName={editDiskName} vm={vm} />
         </StackItem>
       </Stack>
     </ExpandableSection>

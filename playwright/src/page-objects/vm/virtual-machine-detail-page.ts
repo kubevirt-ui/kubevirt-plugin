@@ -70,6 +70,23 @@ export default class VirtualMachineDetailPage extends PageCommons {
     return this.disks.addBlankDisk(diskName, size, storageClass);
   }
 
+  async addBlankDiskWithSerial(
+    diskName: string,
+    serial: string,
+    size = '1',
+    storageClass?: string,
+  ): Promise<boolean> {
+    return this.disks.addBlankDiskWithSerial(diskName, serial, size, storageClass);
+  }
+
+  async getDiskSerialValue(diskName: string): Promise<string | null> {
+    return this.disks.getDiskSerialValue(diskName);
+  }
+
+  async editDiskSerial(diskName: string, newSerial: string): Promise<boolean> {
+    return this.disks.editDiskSerial(diskName, newSerial);
+  }
+
   async addCDROMDisk(
     diskName: string,
     cdromSource: 'Upload new ISO' | 'Use existing ISO' | 'Leave empty drive' = 'Upload new ISO',

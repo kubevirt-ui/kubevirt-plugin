@@ -12,6 +12,7 @@ export const EXPAND_PVC_SIZE = 'expandPVCSize';
 export const VM_CLUSTER_FIELD = 'cluster';
 export const SHARABLE_FIELD = 'disk.shareable';
 export const LUN_RESERVATION_FIELD = 'disk.lun.reservation';
+export const DISK_SERIAL_FIELD = 'disk.serial';
 export const DATAVOLUME_PVC_NAME = 'dataVolumeTemplate.spec.source.pvc.name';
 export const DATAVOLUME_PVC_NAMESPACE = 'dataVolumeTemplate.spec.source.pvc.namespace';
 export const DATAVOLUME_SNAPSHOT_NAME = 'dataVolumeTemplate.spec.source.snapshot.name';

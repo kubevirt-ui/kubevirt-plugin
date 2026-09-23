@@ -98,9 +98,14 @@ const useEnvironments = (
       const envVolumeIndex = volumes?.findIndex((volume) => volume.name === diskName) ?? -1;
       const envDisk = getDisks(draftVM)?.find((disk) => disk.name === diskName);
 
-      if (!envDisk || envVolumeIndex < 0) setError(undefined);
+      if (envVolumeIndex < 0) {
+        setError(undefined);
+        return;
+      }
 
-      envDisk.serial = serial;
+      if (envDisk) {
+        envDisk.serial = serial;
+      }
 
       const newEnvVolume = updateVolumeForKind(volumes[envVolumeIndex], name, kind);
 

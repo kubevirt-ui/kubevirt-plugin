@@ -68,7 +68,7 @@ const ContainerDiskModal: FC<V1SubDiskModalProps> = ({
         <DynamicSize />
         <DiskTypeSelect isVMRunning={isVMRunning} />
         <DiskInterfaceSelect isVMRunning={isVMRunning} />
-        <AdvancedSettings olsObj={vm} />
+        <AdvancedSettings editDiskName={editDiskName} olsObj={vm} vm={vm} />
       </TabModal>
     </FormProvider>
   );
