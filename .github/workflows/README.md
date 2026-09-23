@@ -12,17 +12,17 @@ Index of workflows in this directory. Deep design notes (check-run model, merge 
 | `hot-cluster-e2e-run.yml`             | `workflow_call` / `workflow_dispatch`  | Build plugin image + run Playwright/Cypress on ARC                                                                           |
 | `hot-cluster-check.yml`               | `workflow_call` (+ manual health)      | Cluster readiness / health                                                                                                   |
 | `hot-cluster-e2e-pr-gate.yml`         | PR opened / synchronize / reopened     | Thin gate → dispatch `hot-cluster-e2e.yml`                                                                                   |
-| `pr-validation.yml`                   | All PR events (push + label)           | Unified PR validation: Jira, path checks, review labels, E2E dispatch, merge-pool sync |
-| `ok-to-test-reset.yml`                | synchronize while `ok-to-test` present | Remove `ok-to-test` when head moves                                                    |
-| `hot-cluster-e2e-cancel-on-close.yml` | PR closed                              | Cancel in-flight when PR closes                                                        |
-| `on-main-push.yml`                    | push to `main`                         | Mark checks stale; retest merge-pool PRs; sync needs-rebase                            |
+| `pr-validation.yml`                   | All PR events (push + label)           | Unified PR validation: Jira, path checks, review labels, E2E dispatch, merge-pool sync                                       |
+| `ok-to-test-reset.yml`                | synchronize while `ok-to-test` present | Remove `ok-to-test` when head moves                                                                                          |
+| `hot-cluster-e2e-cancel-on-close.yml` | PR closed                              | Cancel in-flight when PR closes                                                                                              |
+| `on-main-push.yml`                    | push to `main`                         | Mark checks stale; retest merge-pool PRs; sync needs-rebase                                                                  |
 
 ## Merge automation (Prow / Tide replacements)
 
 | Workflow                      | Trigger                       | Role                                                                                                                                   |
 | ----------------------------- | ----------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| `auto-merge.yml`              | label / review / synchronize… | Required **Merge Gate** + enable/disable GitHub auto-merge                                                                             |
-| `pr-commands.yml`             | issue comment                 | Unified dispatcher for all PR commands (`/lgtm`, `/approve`, `/hold`, `/retest-e2e`, `/test-e2e`, etc.)                                 |
+| `auto-merge.yml`              | label / review / synchronize… | Publishes required **Merge Gate** status, verifies checks, squash-merges via bot when ready                                            |
+| `pr-commands.yml`             | issue comment                 | Unified dispatcher for all PR commands (`/lgtm`, `/approve`, `/hold`, `/retest-e2e`, `/test-e2e`, etc.)                                |
 | `pr_review_commands.yml`      | review submitted              | Captures review data only (no secrets -- see below), uploads artifact                                                                  |
 | `pr_review_commands_sync.yml` | `workflow_run` (after above)  | Approve / Request changes ↔ `lgtm` (+ `approved` for root OWNERS); split out since `pull_request_review` withholds secrets on fork PRs |
 | `needs-rebase.yml`            | PR events                     | Sync `needs-rebase` from GitHub `mergeable`                                                                                            |
@@ -31,10 +31,23 @@ Pool eligibility (`isMergePoolPr`): `lgtm` + `approved`, and no blockers (`hold`
 
 `/hold` blocks merge; `/hold-e2e` only pauses Hot Cluster E2E (different label: `do-not-merge/hold` vs `e2e-hold`).
 
+### Merge Gate commit status
+
+`auto-merge.yml` runs [`.github/scripts/src/merge/auto-merge.ts`](../scripts/src/merge/auto-merge.ts), which publishes the required **Merge Gate** commit status on every label/review/sync event. Outcomes:
+
+| State     | When                                                                         | Example description                        |
+| --------- | ---------------------------------------------------------------------------- | ------------------------------------------ |
+| `pending` | Missing `lgtm`/`approved`, blocking labels, or required checks still running | `Missing lgtm`                             |
+| `pending` | Non-E2E required check failed (still in progress overall)                    | `Failed: build; Waiting: Run Gating Tests` |
+| `failure` | **Run Gating Tests** failed, or script/merge error                           | `E2E tests failed`                         |
+| `success` | Ready to merge / merged                                                      | `Merged`                                   |
+
+Only E2E failure turns Merge Gate red; label waits and other check gaps stay yellow/pending. Full merge-pool design: [`ci-scripts/README.md`](../../ci-scripts/README.md#merge-automation-prow--tide-replacement).
+
 ## PR validation (OWNERS-gated paths)
 
-| Workflow            | Trigger               | Role                                                   |
-| ------------------- | --------------------- | ------------------------------------------------------ |
+| Workflow            | Trigger               | Role                                                    |
+| ------------------- | --------------------- | ------------------------------------------------------- |
 | `pr-validation.yml` | `pull_request_target` | Jira status + AI/CI/i18n path labels (`do-not-merge/*`) |
 
 Sensitive-path review uses `/ai-approved`, `/ci-approved`, and `/i18n-approved` (`.github/OWNERS`), not `/approve`. Blocking is via `do-not-merge/*` labels (Merge Gate); review label trust enforcement is handled by the label-gate route in `pr-validation.yml`.
