@@ -516,4 +516,38 @@ test.describe(SUITE, { tag: [GATING_TAG, VM_SEARCH_TAG] }, () => {
 
     await vmListPage.pressKeyInVmSearchInput('Escape');
   });
+
+  test('empty state text formats exclusion filters using search language syntax', async ({
+    vmListPage,
+    utils,
+  }) => {
+    await utils.withAllure({
+      suite: SUITE,
+      feature: GATING,
+      tags: [GATING_TAG, VM_SEARCH_TAG, ADMIN_ONLY_TAG],
+    });
+
+    const searchText = 'status:Paused -os:RHEL';
+    const expectedTokens = ['status:Paused', '-os:RHEL'];
+
+    await test.step('Submit a mixed include/exclude query that matches no VMs', async () => {
+      await vmListPage.appendToVmSearch(searchText);
+    });
+
+    await test.step('Empty state text renders both tokens in search-language syntax', async () => {
+      const emptyStateText = await vmListPage.getFilteredEmptyStateText();
+
+      // The empty state may also include other active filters (e.g. a project:<name> filter
+      // depending on the test environment), so only assert that each expected key:value /
+      // -key:value token is present, regardless of order or additional tokens.
+      for (const token of expectedTokens) {
+        expect
+          .soft(
+            emptyStateText.includes(token),
+            `Empty state text should contain "${token}" (got: "${emptyStateText}")`,
+          )
+          .toBe(true);
+      }
+    });
+  });
 });

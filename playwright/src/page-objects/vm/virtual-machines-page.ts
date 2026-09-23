@@ -515,6 +515,10 @@ export default class VirtualMachinesPage extends TreeContextMenuMixin(PageCommon
     return this.search.getFilterChipTexts();
   }
 
+  async getFilteredEmptyStateText(): Promise<string> {
+    return this.search.getFilteredEmptyStateText();
+  }
+
   async getGuestAgentWidgetTitle(timeout?: number): Promise<string | null> {
     return this.overviewWidgets.getGuestAgentWidgetTitle(timeout);
   }
