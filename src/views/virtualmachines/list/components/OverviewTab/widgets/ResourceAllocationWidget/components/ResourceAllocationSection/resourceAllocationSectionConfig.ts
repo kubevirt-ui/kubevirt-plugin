@@ -61,3 +61,53 @@ export const getWidgetConfigs = (t: TFunction): WidgetConfig[] => [
     title: t('Storage allocated'),
   },
 ];
+
+type WidgetDataMapParams = {
+  cpuClusterData: TopClustersMetricData;
+  cpuData: MetricChartData;
+  memClusterData: TopClustersMetricData;
+  memoryData: MetricChartData;
+  projectQuota?: {
+    cpu?: MetricQuotaData;
+    memory?: MetricQuotaData;
+    storage?: MetricQuotaData;
+    vms?: MetricQuotaData;
+  };
+  runningVmData: MetricChartData;
+  storageClusterData: TopClustersMetricData;
+  storageData: MetricChartData;
+  vmClusterData: TopClustersMetricData;
+};
+
+export const buildWidgetDataMap = ({
+  cpuClusterData,
+  cpuData,
+  memClusterData,
+  memoryData,
+  projectQuota,
+  runningVmData,
+  storageClusterData,
+  storageData,
+  vmClusterData,
+}: WidgetDataMapParams): WidgetDataMap => ({
+  [METRICS.MEMORY]: {
+    clusterData: memClusterData,
+    metricChartData: memoryData,
+    quotaData: projectQuota?.memory,
+  },
+  [METRICS.RUNNING_VMS]: {
+    clusterData: vmClusterData,
+    metricChartData: runningVmData,
+    quotaData: projectQuota?.vms,
+  },
+  [METRICS.STORAGE]: {
+    clusterData: storageClusterData,
+    metricChartData: storageData,
+    quotaData: projectQuota?.storage,
+  },
+  [METRICS.VCPU_USAGE]: {
+    clusterData: cpuClusterData,
+    metricChartData: cpuData,
+    quotaData: projectQuota?.cpu,
+  },
+});

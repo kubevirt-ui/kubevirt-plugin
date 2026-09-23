@@ -1,6 +1,7 @@
 import { type FC, type PropsWithChildren, type ReactNode } from 'react';
 
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
+import { getClusterMetricsUnavailableMessage } from '@kubevirt-utils/errors/clusterMetricsAccess';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getNoDataAvailableMessage } from '@kubevirt-utils/utils/utils';
 import { Bullseye, Card, CardBody, CardHeader, CardTitle } from '@patternfly/react-core';
@@ -13,6 +14,7 @@ import './VMAlerts.scss';
 
 type VMAlertsCardProps = PropsWithChildren<
   VMAlertsProps & {
+    restrictMetricsAccess?: boolean;
     titleExtra?: ReactNode;
   }
 >;
@@ -21,10 +23,12 @@ const VMAlertsCard: FC<VMAlertsCardProps> = ({
   alertsBaseHref,
   alertsBasePath,
   children,
+  restrictMetricsAccess,
   titleExtra,
 }) => {
   const { t } = useKubevirtTranslation();
   const baseUrl = alertsBasePath ?? alertsBaseHref;
+  const restrictedMessage = getClusterMetricsUnavailableMessage(t);
 
   return (
     <Card className="vm-alerts health-card" data-test="vm-alerts-widget" isCompact>
@@ -32,7 +36,14 @@ const VMAlertsCard: FC<VMAlertsCardProps> = ({
         actions={
           baseUrl != null
             ? {
-                actions: <ViewAllLink href={alertsBaseHref} linkPath={alertsBasePath} />,
+                actions: (
+                  <ViewAllLink
+                    disabled={restrictMetricsAccess}
+                    disabledTooltip={restrictMetricsAccess ? restrictedMessage : undefined}
+                    href={alertsBaseHref}
+                    linkPath={alertsBasePath}
+                  />
+                ),
                 hasNoOffset: false,
               }
             : undefined
@@ -45,10 +56,16 @@ const VMAlertsCard: FC<VMAlertsCardProps> = ({
         </CardTitle>
       </CardHeader>
       <CardBody className="vm-alerts__body">
-        {children ?? (
+        {restrictMetricsAccess ? (
           <Bullseye>
-            <MutedTextSpan text={getNoDataAvailableMessage(t)} />
+            <MutedTextSpan text={restrictedMessage} />
           </Bullseye>
+        ) : (
+          (children ?? (
+            <Bullseye>
+              <MutedTextSpan text={getNoDataAvailableMessage(t)} />
+            </Bullseye>
+          ))
         )}
       </CardBody>
     </Card>

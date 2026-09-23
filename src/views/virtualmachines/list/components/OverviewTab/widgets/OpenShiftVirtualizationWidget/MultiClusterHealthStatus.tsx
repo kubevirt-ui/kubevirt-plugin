@@ -1,6 +1,11 @@
 import type { FC, ReactNode } from 'react';
 
+import {
+  getClusterMetricsNotAvailableLabel,
+  getClusterMetricsUnavailableMessage,
+} from '@kubevirt-utils/errors/clusterMetricsAccess';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   RedExclamationCircleIcon,
   YellowExclamationTriangleIcon,
@@ -14,6 +19,7 @@ type MultiClusterHealthStatusProps = {
   criticalCount: number;
   degradedClusters: string[];
   degradedCount: number;
+  healthForbidden?: boolean;
   isLoading: boolean;
 };
 
@@ -22,9 +28,12 @@ const MultiClusterHealthStatus: FC<MultiClusterHealthStatusProps> = ({
   criticalCount,
   degradedClusters,
   degradedCount,
+  healthForbidden,
   isLoading,
 }) => {
   const { t } = useKubevirtTranslation();
+  const permissionMessage = healthForbidden ? getClusterMetricsUnavailableMessage(t) : undefined;
+  const notAvailableLabel = healthForbidden ? getClusterMetricsNotAvailableLabel(t) : undefined;
 
   const items: {
     clusters: string[];
@@ -48,17 +57,31 @@ const MultiClusterHealthStatus: FC<MultiClusterHealthStatusProps> = ({
 
   return (
     <>
-      {items.map(({ clusters, count, icon, label }) => (
-        <StatusCountItem
-          count={count}
-          icon={icon}
-          isLoading={isLoading}
-          key={label}
-          label={label}
-          span={6}
-          tooltip={clusters.length > 0 ? <ClusterNameTooltip clusters={clusters} /> : null}
-        />
-      ))}
+      {items.map(({ clusters, count, icon, label }) => {
+        if (healthForbidden) {
+          return (
+            <StatusCountItem
+              key={label}
+              label={label}
+              span={6}
+              statusMessage={notAvailableLabel}
+              tooltip={permissionMessage}
+            />
+          );
+        }
+
+        return (
+          <StatusCountItem
+            count={count}
+            icon={icon}
+            isLoading={isLoading}
+            key={label}
+            label={label}
+            span={6}
+            tooltip={!isEmpty(clusters) ? <ClusterNameTooltip clusters={clusters} /> : undefined}
+          />
+        );
+      })}
     </>
   );
 };

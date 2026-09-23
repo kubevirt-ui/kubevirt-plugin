@@ -15,12 +15,13 @@ export type AlertsBySeverity = { [key in AlertType]: Alert[] };
 
 type UseInfrastructureAlerts = () => {
   alerts: AlertsBySeverity;
+  error: Error | unknown;
   loaded: boolean;
   numberOfAlerts: number;
 };
 
 const useInfrastructureAlerts: UseInfrastructureAlerts = () => {
-  const { alerts, loaded } = useAlerts();
+  const { alerts, error, loaded } = useAlerts();
 
   const alertsBySeverity = useMemo((): AlertsBySeverity => {
     const filteredAlerts = alerts?.filter(
@@ -35,6 +36,7 @@ const useInfrastructureAlerts: UseInfrastructureAlerts = () => {
 
   return {
     alerts: alertsBySeverity,
+    error,
     loaded,
     numberOfAlerts: getNumberOfAlerts(alertsBySeverity) || 0,
   };

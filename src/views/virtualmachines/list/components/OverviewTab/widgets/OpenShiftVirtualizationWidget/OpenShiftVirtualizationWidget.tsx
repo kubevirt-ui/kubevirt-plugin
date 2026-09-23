@@ -1,6 +1,7 @@
 import { type FC, useMemo } from 'react';
 
 import { healthStateMapping } from '@kubevirt-utils/components/HealthState/utils';
+import { isForbiddenError } from '@kubevirt-utils/errors/clusterMetricsAccess';
 import useInfrastructureAlerts from '@kubevirt-utils/hooks/useInfrastructureAlerts/useInfrastructureAlerts';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { HealthState } from '@openshift-console/dynamic-plugin-sdk';
@@ -28,7 +29,7 @@ const OpenShiftVirtualizationWidget: FC<OpenShiftVirtualizationWidgetProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const { installedCSV, loaded: csvLoaded, loadErrors: csvError } = useKubeVirtOverviewClusterCsv();
-  const { loaded: alertsLoaded, numberOfAlerts } = useInfrastructureAlerts();
+  const { error: alertsError, loaded: alertsLoaded, numberOfAlerts } = useInfrastructureAlerts();
   const {
     criticalClusters,
     criticalCount,
@@ -47,10 +48,12 @@ const OpenShiftVirtualizationWidget: FC<OpenShiftVirtualizationWidgetProps> = ({
   const statusIcon = healthStateMapping[healthState]?.icon;
   const healthMessages = getHealthStateToMessage(t);
   const statusMessage = healthMessages[healthState] ?? healthMessages[HealthState.NOT_AVAILABLE];
+  const alertsForbidden = isForbiddenError(alertsError);
+  const healthForbidden = isForbiddenError(healthError);
 
   const isLoading = isAllClustersPage
-    ? !healthLoaded
-    : !csvLoaded || !alertsLoaded || !healthLoaded;
+    ? !healthLoaded && !healthForbidden
+    : !csvLoaded || (!alertsLoaded && !alertsForbidden) || (!healthLoaded && !healthForbidden);
 
   const subtitleContent = useMemo(() => {
     if (isAllClustersPage) {
@@ -81,12 +84,14 @@ const OpenShiftVirtualizationWidget: FC<OpenShiftVirtualizationWidgetProps> = ({
       <CardBody>
         <div className="openshift-virtualization-widget__subtitle">{subtitleContent}</div>
         <OpenShiftVirtualizationWidgetBody
+          alertsError={alertsError}
           criticalClusters={criticalClusters}
           criticalCount={criticalCount}
           csvError={csvError}
           degradedClusters={degradedClusters}
           degradedCount={degradedCount}
           healthError={healthError}
+          healthForbidden={healthForbidden}
           isAllClustersPage={isAllClustersPage}
           isLoading={isLoading}
           metricsUnavailable={metricsUnavailable}

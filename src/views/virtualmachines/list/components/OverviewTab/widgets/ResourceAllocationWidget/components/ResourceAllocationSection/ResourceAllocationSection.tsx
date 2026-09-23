@@ -2,12 +2,11 @@ import { type FC, useMemo, useState } from 'react';
 
 import { METRICS } from '@kubevirt-utils/components/Charts/MetricChartUtils/constants';
 import useMetricChartData from '@kubevirt-utils/components/Charts/MetricChartUtils/hooks/useMetricChartData';
-import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
+import { hasForbiddenLoadedError } from '@kubevirt-utils/errors/clusterMetricsAccess';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getNoDataAvailableMessage } from '@kubevirt-utils/utils/utils';
 import useIsAllClustersPage from '@multicluster/hooks/useIsAllClustersPage';
-import { Bullseye, Card, CardBody } from '@patternfly/react-core';
 
+import ClusterMetricsUnavailableEmptyState from '../../../../components/ClusterMetricsUnavailableEmptyState';
 import { determineOverviewLevel } from '../../../../config';
 import {
   GRID_FOUR_EQUAL,
@@ -21,7 +20,7 @@ import { useTopClusterNames, useTopClustersChartData } from '../../hooks/useTopC
 import ResourceAllocationWidget from '../../ResourceAllocationWidget';
 import ClusterLegend from '../ResourceAllocationChart/ClusterLegend';
 import ResourceAllocationSubHeader from '../ResourceAllocationSubHeader/ResourceAllocationSubHeader';
-import { getWidgetConfigs, type WidgetDataMap } from './resourceAllocationSectionConfig';
+import { buildWidgetDataMap, getWidgetConfigs } from './resourceAllocationSectionConfig';
 
 const ResourceAllocationSection: FC<OverviewSectionData> = ({
   metricsUnavailable,
@@ -43,7 +42,7 @@ const ResourceAllocationSection: FC<OverviewSectionData> = ({
 
   const { projectQuota } = useProjectResourceQuota(namespace);
 
-  const { topClusterNames } = useTopClusterNames(selectedMetric, isAllClusters);
+  const { error, loaded, topClusterNames } = useTopClusterNames(selectedMetric, isAllClusters);
   const vmClusterData = useTopClustersChartData(
     METRICS.RUNNING_VMS,
     topClusterNames,
@@ -61,29 +60,19 @@ const ResourceAllocationSection: FC<OverviewSectionData> = ({
     isAllClusters,
   );
 
-  const dataMap: WidgetDataMap = useMemo(
-    () => ({
-      [METRICS.MEMORY]: {
-        clusterData: memClusterData,
-        metricChartData: memoryData,
-        quotaData: projectQuota?.memory,
-      },
-      [METRICS.RUNNING_VMS]: {
-        clusterData: vmClusterData,
-        metricChartData: runningVmData,
-        quotaData: projectQuota?.vms,
-      },
-      [METRICS.STORAGE]: {
-        clusterData: storageClusterData,
-        metricChartData: storageData,
-        quotaData: projectQuota?.storage,
-      },
-      [METRICS.VCPU_USAGE]: {
-        clusterData: cpuClusterData,
-        metricChartData: cpuData,
-        quotaData: projectQuota?.cpu,
-      },
-    }),
+  const dataMap = useMemo(
+    () =>
+      buildWidgetDataMap({
+        cpuClusterData,
+        cpuData,
+        memClusterData,
+        memoryData,
+        projectQuota,
+        runningVmData,
+        storageClusterData,
+        storageData,
+        vmClusterData,
+      }),
     [
       runningVmData,
       cpuData,
@@ -98,6 +87,11 @@ const ResourceAllocationSection: FC<OverviewSectionData> = ({
   );
 
   const legendSeries = vmClusterData?.chartSeries ?? [];
+  const metricsForbidden = hasForbiddenLoadedError(
+    isAllClusters
+      ? [{ error, loaded }, vmClusterData, cpuClusterData, memClusterData, storageClusterData]
+      : [runningVmData, cpuData, memoryData, storageData],
+  );
 
   const subHeader = (
     <ResourceAllocationSubHeader
@@ -109,16 +103,10 @@ const ResourceAllocationSection: FC<OverviewSectionData> = ({
     />
   );
 
-  if (metricsUnavailable) {
+  if (metricsUnavailable || metricsForbidden) {
     return (
       <OverviewSection dataTestId="resource-allocation-section" title={title}>
-        <Card isCompact>
-          <CardBody className="pf-v6-u-pb-lg">
-            <Bullseye>
-              <MutedTextSpan text={getNoDataAvailableMessage(t)} />
-            </Bullseye>
-          </CardBody>
-        </Card>
+        <ClusterMetricsUnavailableEmptyState metricsForbidden={metricsForbidden} />
       </OverviewSection>
     );
   }

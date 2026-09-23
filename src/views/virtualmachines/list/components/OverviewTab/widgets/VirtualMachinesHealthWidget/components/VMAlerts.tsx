@@ -1,5 +1,6 @@
 import { type FC, useMemo } from 'react';
 
+import { isForbiddenError } from '@kubevirt-utils/errors/clusterMetricsAccess';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Alert, Flex } from '@patternfly/react-core';
 
@@ -14,11 +15,22 @@ const VMAlerts: FC<VMAlertsProps> = ({ alertsBaseHref, alertsBasePath, vmNames }
   const { critical, error, info, loaded, warning } = useVMAlerts(vmNames);
   const totalAlerts = critical + warning + info;
   const isLoading = !loaded;
+  const restrictMetricsAccess = isForbiddenError(error);
 
   const isExternal = alertsBasePath == null && alertsBaseHref != null;
   const baseUrl = alertsBasePath ?? alertsBaseHref;
 
   const severityUrls = useMemo(() => getSeverityUrls(baseUrl), [baseUrl]);
+
+  if (restrictMetricsAccess) {
+    return (
+      <VMAlertsCard
+        alertsBaseHref={alertsBaseHref}
+        alertsBasePath={alertsBasePath}
+        restrictMetricsAccess
+      />
+    );
+  }
 
   return (
     <VMAlertsCard
