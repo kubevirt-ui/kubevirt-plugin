@@ -13,13 +13,16 @@ type UseVMI = (
 };
 
 const useVMI: UseVMI = (vmName, vmNamespace, fetch = true) => {
+  // Skip watching until name and namespace are known, otherwise it falls back to an unscoped VMI list.
   const [vmi, vmiLoaded, vmiLoadError] = useK8sWatchResource<V1VirtualMachineInstance>(
-    fetch && {
-      groupVersionKind: VirtualMachineInstanceModelGroupVersionKind,
-      isList: false,
-      name: vmName,
-      namespace: vmNamespace,
-    },
+    fetch &&
+      vmName &&
+      vmNamespace && {
+        groupVersionKind: VirtualMachineInstanceModelGroupVersionKind,
+        isList: false,
+        name: vmName,
+        namespace: vmNamespace,
+      },
   );
 
   return {

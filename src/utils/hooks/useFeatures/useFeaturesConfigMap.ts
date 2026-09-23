@@ -3,6 +3,8 @@ import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { DEFAULT_OPERATOR_NAMESPACE } from '@kubevirt-utils/utils/utils';
 import {
   getGroupVersionKindForModel,
+  K8sVerb,
+  useAccessReview,
   useK8sWatchResource,
   WatchK8sResult,
 } from '@openshift-console/dynamic-plugin-sdk';
@@ -19,12 +21,34 @@ type UseFeaturesConfigMap = () => {
 const useFeaturesConfigMap: UseFeaturesConfigMap = () => {
   const isAdmin = useIsAdmin();
 
-  const featuresConfigMapData = useK8sWatchResource<IoK8sApiCoreV1ConfigMap>({
-    groupVersionKind: getGroupVersionKindForModel(ConfigMapModel),
-    isList: false,
+  // Non-admins only get `watch` once the RBAC bootstrap in useFeatures.ts has run.
+  const [canGetFeaturesConfigMap, canGetFeaturesConfigMapLoading] = useAccessReview({
+    group: ConfigMapModel.apiGroup,
     name: FEATURES_CONFIG_MAP_NAME,
     namespace: DEFAULT_OPERATOR_NAMESPACE,
+    resource: ConfigMapModel.plural,
+    verb: 'watch' as K8sVerb,
   });
+
+  const canWatch = isAdmin || (!canGetFeaturesConfigMapLoading && canGetFeaturesConfigMap);
+
+  const featuresConfigMapData = useK8sWatchResource<IoK8sApiCoreV1ConfigMap>(
+    canWatch && {
+      groupVersionKind: getGroupVersionKindForModel(ConfigMapModel),
+      isList: false,
+      name: FEATURES_CONFIG_MAP_NAME,
+      namespace: DEFAULT_OPERATOR_NAMESPACE,
+    },
+  );
+
+  if (!isAdmin && canGetFeaturesConfigMapLoading) {
+    return { featuresConfigMapData: [undefined, false, null], isAdmin };
+  }
+
+  if (!canWatch) {
+    return { featuresConfigMapData: [undefined, true, null], isAdmin };
+  }
+
   return { featuresConfigMapData: [...featuresConfigMapData], isAdmin };
 };
 

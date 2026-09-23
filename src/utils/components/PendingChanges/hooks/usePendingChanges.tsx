@@ -1,9 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom-v5-compat';
 
-import { modelToGroupVersionKind, NodeModel } from '@kubevirt-ui/kubevirt-api/console';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
-import { IoK8sApiCoreV1Node } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import AffinityModal from '@kubevirt-utils/components/AffinityModal/AffinityModal';
 import BootOrderModal from '@kubevirt-utils/components/BootOrderModal/BootOrderModal';
@@ -31,11 +29,12 @@ import {
 import useHyperConvergeConfiguration from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
+import useNodes from '@kubevirt-utils/hooks/useNodes';
 import { isInstanceTypeVM } from '@kubevirt-utils/resources/instancetype/helper';
 import { getCPU, getGPUDevices, getHostDevices } from '@kubevirt-utils/resources/vm';
 import { DESCHEDULER_EVICT_LABEL } from '@kubevirt-utils/resources/vmi';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { k8sUpdate, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
+import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 import { updatedInstanceType } from '@virtualmachines/details/tabs/configuration/details/utils/utils';
 
 import {
@@ -79,10 +78,7 @@ export const usePendingChanges = (
 
   const [hyperConverge, hyperLoaded, hyperLoadingError] = useHyperConvergeConfiguration();
 
-  const [nodes, nodesLoaded] = useK8sWatchResource<IoK8sApiCoreV1Node[]>({
-    groupVersionKind: modelToGroupVersionKind(NodeModel),
-    isList: true,
-  });
+  const [nodes, nodesLoaded] = useNodes();
 
   const instanceTypeChanged = checkInstanceTypeChanged(vm, vmi);
   const cpuMemoryChanged = checkCPUMemoryChanged(vm, vmi);

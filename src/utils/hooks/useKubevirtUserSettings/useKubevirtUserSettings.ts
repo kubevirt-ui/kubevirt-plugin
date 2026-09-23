@@ -1,13 +1,9 @@
 import { useEffect, useState } from 'react';
 
-import {
-  ConfigMapModel,
-  modelToGroupVersionKind,
-  UserModel,
-} from '@kubevirt-ui/kubevirt-api/console';
+import { ConfigMapModel, UserModel } from '@kubevirt-ui/kubevirt-api/console';
 import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { DEFAULT_OPERATOR_NAMESPACE, isEmpty } from '@kubevirt-utils/utils/utils';
-import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
+import { k8sGet } from '@openshift-console/dynamic-plugin-sdk';
 
 import { KUBEVIRT_USER_SETTINGS_CONFIG_MAP_NAME } from './utils/const';
 import { UseKubevirtUserSettings } from './utils/types';
@@ -19,21 +15,60 @@ const useKubevirtUserSettings: UseKubevirtUserSettings = (key) => {
   const [userSettings, setUserSettings] = useState<UserSettingsState>();
   const [loading, setLoading] = useState<boolean>(false);
 
-  const [user, loadedUser, errorUser] = useK8sWatchResource<IoK8sApiCoreV1ConfigMap>({
-    groupVersionKind: modelToGroupVersionKind(UserModel),
-    name: '~',
-  });
+  const [userName, setUserName] = useState<string>();
+  const [loadedUser, setLoadedUser] = useState<boolean>(false);
+  const [errorUser, setErrorUser] = useState<Error>();
 
-  const userName = user?.metadata?.uid || user?.metadata?.name?.replace(/[^-._a-zA-Z0-9]+/g, '-');
+  const [userConfigMap, setUserConfigMap] = useState<IoK8sApiCoreV1ConfigMap>();
+  const [loadedConfigMap, setLoadedConfigMap] = useState<boolean>(false);
+  const [configMapError, setConfigMapError] = useState<Error>();
 
-  const [userConfigMap, loadedConfigMap, configMapError] =
-    useK8sWatchResource<IoK8sApiCoreV1ConfigMap>(
-      userName && {
-        groupVersionKind: modelToGroupVersionKind(ConfigMapModel),
-        name: KUBEVIRT_USER_SETTINGS_CONFIG_MAP_NAME,
-        namespace: DEFAULT_OPERATOR_NAMESPACE,
-      },
-    );
+  // Regular users only have `get` (no `watch`/`list`) here, so fetch once instead of watching.
+  useEffect(() => {
+    let isMounted = true;
+
+    k8sGet({ model: UserModel, name: '~' })
+      .then((user) => {
+        if (!isMounted) return;
+        setUserName(user?.metadata?.uid || user?.metadata?.name?.replace(/[^-._a-zA-Z0-9]+/g, '-'));
+        setLoadedUser(true);
+      })
+      .catch((getUserError) => {
+        if (!isMounted) return;
+        setErrorUser(getUserError);
+        setLoadedUser(true);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!userName) return;
+
+    let isMounted = true;
+
+    k8sGet<IoK8sApiCoreV1ConfigMap>({
+      model: ConfigMapModel,
+      name: KUBEVIRT_USER_SETTINGS_CONFIG_MAP_NAME,
+      ns: DEFAULT_OPERATOR_NAMESPACE,
+    })
+      .then((configMap) => {
+        if (!isMounted) return;
+        setUserConfigMap(configMap);
+        setLoadedConfigMap(true);
+      })
+      .catch((getConfigMapError) => {
+        if (!isMounted) return;
+        setConfigMapError(getConfigMapError);
+        setLoadedConfigMap(true);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [userName]);
 
   useEffect(() => {
     if (!isEmpty(userConfigMap) && userName) {
@@ -47,7 +82,8 @@ const useKubevirtUserSettings: UseKubevirtUserSettings = (key) => {
     setLoading(true);
 
     try {
-      await patchUserConfigMap(userConfigMap, userName, data);
+      const updatedConfigMap = await patchUserConfigMap(userConfigMap, userName, data);
+      setUserConfigMap(updatedConfigMap);
       resolve(key ? data[key] : data);
     } catch (apiError) {
       setError(apiError);
@@ -57,20 +93,19 @@ const useKubevirtUserSettings: UseKubevirtUserSettings = (key) => {
     setLoading(false);
   };
 
+  // Kept out of a setUserSettings updater: updaters must stay pure and can run more than once.
   const updateUserSetting = (val: any) => {
+    const data = key ? { ...userSettings, [key]: val } : val;
+
     return new Promise((resolve, reject) => {
-      setUserSettings((prevUserSettings) => {
-        const data = key ? { ...prevUserSettings, [key]: val } : val;
-
-        pushUserSettingsChanges(data, resolve, reject);
-
-        return data;
-      });
+      setUserSettings(data);
+      pushUserSettingsChanges(data, resolve, reject);
     });
   };
 
-  const loadedCM = loadedConfigMap || !isEmpty(configMapError);
   const loadedUsr = loadedUser || !isEmpty(errorUser);
+  // No userName means the configmap fetch never runs, so there's nothing left to wait for.
+  const loadedCM = loadedConfigMap || !isEmpty(configMapError) || (loadedUsr && !userName);
 
   return [
     key ? userSettings?.[key] : userSettings,

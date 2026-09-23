@@ -3,7 +3,7 @@ import { useMemo } from 'react';
 import { VirtualMachineModelGroupVersionKind } from '@kubevirt-ui/kubevirt-api/console';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
-import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
+import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource';
 import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
 
 type UseVMsPerResource = () => {
@@ -19,7 +19,7 @@ const useVMsPerResource: UseVMsPerResource = () => {
     [activeNamespace],
   );
 
-  const [vms, loaded, loadedError] = useK8sWatchResource<V1VirtualMachine[]>({
+  const [vms, loaded, loadedError] = useKubevirtWatchResource<V1VirtualMachine[]>({
     groupVersionKind: VirtualMachineModelGroupVersionKind,
     isList: true,
     namespace,

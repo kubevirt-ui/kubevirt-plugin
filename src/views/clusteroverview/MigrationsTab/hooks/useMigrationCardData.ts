@@ -7,11 +7,11 @@ import {
   V1VirtualMachineInstanceMigration,
 } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
+import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource';
 import useMigrationPolicies from '@kubevirt-utils/hooks/useMigrationPolicies';
 import {
   OnFilterChange,
   RowFilter,
-  useK8sWatchResource,
   useListPageFilter,
 } from '@openshift-console/dynamic-plugin-sdk';
 import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
@@ -44,7 +44,7 @@ const useMigrationCardDataAndFilters: UseMigrationCardDataAndFilters = (duration
   const [activeNamespace] = useActiveNamespace();
   const namespace = activeNamespace !== ALL_NAMESPACES_SESSION_KEY ? activeNamespace : null;
 
-  const [vmims, vmimsLoaded, vmimsErrors] = useK8sWatchResource<
+  const [vmims, vmimsLoaded, vmimsErrors] = useKubevirtWatchResource<
     V1VirtualMachineInstanceMigration[]
   >({
     groupVersionKind: VirtualMachineInstanceMigrationModelGroupVersionKind,
@@ -52,7 +52,7 @@ const useMigrationCardDataAndFilters: UseMigrationCardDataAndFilters = (duration
     namespace,
   });
 
-  const [vmis, vmisLoaded, vmisErrors] = useK8sWatchResource<V1VirtualMachineInstance[]>({
+  const [vmis, vmisLoaded, vmisErrors] = useKubevirtWatchResource<V1VirtualMachineInstance[]>({
     groupVersionKind: VirtualMachineInstanceModelGroupVersionKind,
     isList: true,
     namespace,

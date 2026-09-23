@@ -2,8 +2,7 @@ import * as React from 'react';
 import produce from 'immer';
 import { getNodeSelector } from 'src/views/templates/utils/selectors';
 
-import { modelToGroupVersionKind, NodeModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
-import { IoK8sApiCoreV1Node } from '@kubevirt-ui/kubevirt-api/kubernetes/models';
+import { NodeModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import LabelsList from '@kubevirt-utils/components/NodeSelectorModal/components/LabelList';
 import LabelRow from '@kubevirt-utils/components/NodeSelectorModal/components/LabelRow';
 import NodeCheckerAlert from '@kubevirt-utils/components/NodeSelectorModal/components/NodeCheckerAlert';
@@ -16,9 +15,9 @@ import {
 import { IDLabel } from '@kubevirt-utils/components/NodeSelectorModal/utils/types';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import useNodes from '@kubevirt-utils/hooks/useNodes';
 import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import { Form } from '@patternfly/react-core';
 
 type NodeSelectorModalProps = {
@@ -42,10 +41,7 @@ const NodeSelectorModal: React.FC<NodeSelectorModalProps> = ({
     onEntityDelete: onLabelDelete,
   } = useIDEntities<IDLabel>(nodeSelectorToIDLabels(getNodeSelector(template)));
 
-  const [nodes, nodesLoaded] = useK8sWatchResource<IoK8sApiCoreV1Node[]>({
-    groupVersionKind: modelToGroupVersionKind(NodeModel),
-    isList: true,
-  });
+  const [nodes, nodesLoaded] = useNodes();
 
   const qualifiedNodes = useNodeLabelQualifier(nodes, nodesLoaded, selectorLabels);
 

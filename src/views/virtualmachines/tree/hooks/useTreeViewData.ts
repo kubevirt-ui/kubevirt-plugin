@@ -5,6 +5,7 @@ import {
   VirtualMachineInstanceMigrationModelGroupVersionKind,
   VirtualMachineModelGroupVersionKind,
 } from '@kubevirt-ui/kubevirt-api/console';
+import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import {
   V1VirtualMachine,
   V1VirtualMachineInstanceMigration,
@@ -13,8 +14,14 @@ import { TREE_VIEW_FOLDERS } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource';
+import useMultipleAccessReviews from '@kubevirt-utils/hooks/useMultipleAccessReviews';
 import useProjects from '@kubevirt-utils/hooks/useProjects';
-import { useK8sWatchResource, useK8sWatchResources } from '@openshift-console/dynamic-plugin-sdk';
+import {
+  AccessReviewResourceAttributes,
+  K8sVerb,
+  useK8sWatchResource,
+  useK8sWatchResources,
+} from '@openshift-console/dynamic-plugin-sdk';
 import { TreeViewDataItem } from '@patternfly/react-core';
 import { getLatestMigrationForEachVM, OBJECTS_FETCHING_LIMIT } from '@virtualmachines/utils';
 
@@ -35,17 +42,45 @@ export const useTreeViewData = (): UseTreeViewData => {
   const { featureEnabled: treeViewFoldersEnabled } = useFeatures(TREE_VIEW_FOLDERS);
   const [projectNames, projectNamesLoaded, projectNamesError] = useProjects();
 
-  const [allVMs, allVMsLoaded] = useK8sWatchResource<V1VirtualMachine[]>({
-    groupVersionKind: VirtualMachineModelGroupVersionKind,
-    isList: true,
-    limit: OBJECTS_FETCHING_LIMIT,
-  });
+  // Only admins can list VMs cluster-wide; non-admins rely on the per-namespace watches below.
+  const [allVMs, allVMsLoaded] = useK8sWatchResource<V1VirtualMachine[]>(
+    isAdmin && {
+      groupVersionKind: VirtualMachineModelGroupVersionKind,
+      isList: true,
+      limit: OBJECTS_FETCHING_LIMIT,
+    },
+  );
+
+  const vmAccessReviewAttributes = useMemo<AccessReviewResourceAttributes[]>(
+    () =>
+      !isAdmin
+        ? (projectNames || []).map((namespace) => ({
+            group: VirtualMachineModel.apiGroup,
+            namespace,
+            resource: VirtualMachineModel.plural,
+            verb: 'list' as K8sVerb,
+          }))
+        : [],
+    [isAdmin, projectNames],
+  );
+  const [vmAccessReviews, vmAccessReviewsLoading] =
+    useMultipleAccessReviews(vmAccessReviewAttributes);
+
+  // Drops namespaces the user can't list VMs in, even if the Project is visible.
+  const allowedNamespaces = useMemo(
+    () =>
+      (vmAccessReviews || [])
+        .filter((review) => review.allowed)
+        .map((review) => review.resourceAttributes?.namespace)
+        .filter(Boolean),
+    [vmAccessReviews],
+  );
 
   // user has limited access, so we can only get vms from allowed namespaces
   const allowedResources = useK8sWatchResources<{ [key: string]: V1VirtualMachine[] }>(
     Object.fromEntries(
-      projectNamesLoaded && !isAdmin
-        ? (projectNames || []).map((namespace) => [
+      !isAdmin
+        ? allowedNamespaces.map((namespace) => [
             namespace,
             {
               groupVersionKind: VirtualMachineModelGroupVersionKind,
@@ -57,19 +92,21 @@ export const useTreeViewData = (): UseTreeViewData => {
     ),
   );
 
-  const [allVMIM] = useKubevirtWatchResource<V1VirtualMachineInstanceMigration[]>({
-    groupVersionKind: VirtualMachineInstanceMigrationModelGroupVersionKind,
-    isList: true,
-    limit: OBJECTS_FETCHING_LIMIT,
-    namespaced: true,
-  });
+  const [allVMIM] = useKubevirtWatchResource<V1VirtualMachineInstanceMigration[]>(
+    isAdmin && {
+      groupVersionKind: VirtualMachineInstanceMigrationModelGroupVersionKind,
+      isList: true,
+      limit: OBJECTS_FETCHING_LIMIT,
+      namespaced: true,
+    },
+  );
 
   const allowedVMIMResources = useK8sWatchResources<{
     [key: string]: V1VirtualMachineInstanceMigration[];
   }>(
     Object.fromEntries(
-      projectNamesLoaded && !isAdmin
-        ? (projectNames || []).map((namespace) => [
+      !isAdmin
+        ? allowedNamespaces.map((namespace) => [
             namespace,
             {
               groupVersionKind: VirtualMachineInstanceMigrationModelGroupVersionKind,
@@ -94,7 +131,10 @@ export const useTreeViewData = (): UseTreeViewData => {
   vmimMapperSignal.value = memoizedVMIMs;
 
   const memoizedVMs = useMemo(
-    () => (isAdmin ? allVMs : Object.values(allowedResources).flatMap((resource) => resource.data)),
+    () =>
+      isAdmin
+        ? allVMs
+        : Object.values(allowedResources).flatMap((resource) => resource?.data ?? []),
     [allVMs, allowedResources, isAdmin],
   );
 
@@ -102,20 +142,27 @@ export const useTreeViewData = (): UseTreeViewData => {
 
   const loaded =
     projectNamesLoaded &&
-    (isAdmin ? allVMsLoaded : Object.values(allowedResources).some((resource) => resource.loaded));
+    (isAdmin
+      ? allVMsLoaded
+      : !vmAccessReviewsLoading &&
+        (allowedNamespaces.length === 0 ||
+          Object.values(allowedResources).every((resource) => resource?.loaded)));
+
+  // Otherwise the tree would still render (and link into) namespaces the user can't list VMs in.
+  const treeViewNamespaces = isAdmin ? projectNames : allowedNamespaces;
 
   const treeData = useMemo(
     () =>
       loaded
         ? createTreeViewData(
-            projectNames,
+            treeViewNamespaces,
             memoizedVMs,
             isAdmin,
             location.pathname,
             treeViewFoldersEnabled,
           )
         : [],
-    [projectNames, memoizedVMs, loaded, isAdmin, treeViewFoldersEnabled, location.pathname],
+    [treeViewNamespaces, memoizedVMs, loaded, isAdmin, treeViewFoldersEnabled, location.pathname],
   );
 
   const hideSwitch = useMemo(() => projectNames.every(isSystemNamespace), [projectNames]);

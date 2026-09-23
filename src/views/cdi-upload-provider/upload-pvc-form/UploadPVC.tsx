@@ -18,6 +18,7 @@ import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { createUploadPVC } from '@kubevirt-utils/hooks/useCDIUpload/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import useMultipleAccessReviews from '@kubevirt-utils/hooks/useMultipleAccessReviews';
 import {
   TEMPLATE_TYPE_BASE,
   TEMPLATE_TYPE_LABEL,
@@ -42,7 +43,6 @@ import {
 } from '@patternfly/react-core';
 
 import useBaseImages from '../hooks/useBaseImages';
-import useMultipleAccessReviews from '../hooks/useMultipleAccessReviews';
 import { CDI_UPLOAD_OS_URL_PARAM, CDI_UPLOAD_URL_BUILDER, uploadErrorType } from '../utils/consts';
 import { CDIUploadContext } from '../utils/context';
 import { getName, getNamespace, getPVCNamespace } from '../utils/selectors';
