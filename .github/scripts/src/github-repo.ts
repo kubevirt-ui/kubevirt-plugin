@@ -47,7 +47,7 @@ export const getPullRequestFiles = async (
   owner: string,
   repo: string,
   pullNumber: number,
-): Promise<Array<{ filename: string; patch?: string }>> =>
+): Promise<Array<{ filename: string; patch?: string; status?: string }>> =>
   octokit.paginate(octokit.pulls.listFiles, {
     owner,
     per_page: 100,

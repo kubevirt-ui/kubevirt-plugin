@@ -82,6 +82,16 @@ jobs:
         working-directory: .github/scripts
         run: npx tsx src/e2e/pr-gate-dispatch.ts
 
+      - name: Auto-dispatch changed non-gating test files
+        if: "!contains(github.event.pull_request.labels.*.name, 'e2e-hold')"
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          BASE_REF: ${{ github.event.pull_request.base.ref }}
+        working-directory: .github/scripts
+        run: npx tsx src/e2e/changed-tests-dispatch.ts
+
       - name: Post queued status for immediate visibility
         if: "!contains(github.event.pull_request.labels.*.name, 'e2e-hold')"
         uses: ./.github/actions/publish-gating-check
