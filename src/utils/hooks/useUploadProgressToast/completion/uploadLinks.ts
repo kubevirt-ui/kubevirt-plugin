@@ -10,7 +10,7 @@ import { VirtualMachineDetailsTab } from '@kubevirt-utils/constants/tabs-constan
 import { appendBootableVolumeContext } from '@kubevirt-utils/resources/bootableresources/constants';
 import { getName, getNamespace, getResourceUrl, getUID } from '@kubevirt-utils/resources/shared';
 import { getCluster } from '@multicluster/helpers/selectors';
-import { getMulticlusterSearchURL, getVMURL } from '@multicluster/urls';
+import { getFleetBootableVolumesURL, getMulticlusterSearchURL, getVMURL } from '@multicluster/urls';
 
 import type { UploadSuccessLink } from '../types';
 
@@ -62,6 +62,9 @@ export const getBootableVolumeUrl = (name: string, namespace?: string, cluster?:
         }),
   );
 
+export const getBootableVolumesListUrl = (namespace: string, cluster?: string): string =>
+  cluster ? getFleetBootableVolumesURL(cluster, namespace) : `/k8s/ns/${namespace}/bootablevolumes`;
+
 const isVmAlive = (vm: V1VirtualMachine): boolean =>
   Boolean(getUID(vm) && !vm.metadata?.deletionTimestamp);
 
@@ -77,6 +80,16 @@ const getVmStorageLink = (
     getCluster(vm),
   ),
   url: getVmStorageUrl(vm),
+});
+
+export const getBootableVolumeContextLink = (
+  t: TFunction,
+  name: string,
+  namespace: string,
+  cluster?: string,
+): UploadSuccessLink => ({
+  label: t('Uploading Bootable volume {{name}}', { name }),
+  url: getBootableVolumesListUrl(namespace, cluster),
 });
 
 export const getBootableVolumeSuccessLink = (

@@ -106,5 +106,8 @@ export const collectVmScopedUploadKeys = (
   );
 };
 
+export const isBootableVolumeUploadKey = (uploadKey: string): boolean =>
+  uploadKey.startsWith(`${UPLOAD_KEY_PREFIX.bootableVolume}/`);
+
 export const collectBootableVolumeUploadKeys = (uploads: Record<string, unknown>): string[] =>
-  Object.keys(uploads).filter((key) => key.startsWith(`${UPLOAD_KEY_PREFIX.bootableVolume}/`));
+  Object.keys(uploads).filter(isBootableVolumeUploadKey);

@@ -1,6 +1,7 @@
 import { cancelUploadPVC } from '@kubevirt-utils/hooks/useCDIUpload/utils';
 
 import {
+  getBootableVolumesListUrl,
   getBootableVolumeUrl,
   getDataVolumeUrl,
   getVmStorageUrlForIdentity,
@@ -412,6 +413,30 @@ describe('useUploadProgressStore', () => {
       expect(useUploadProgressStore.getState().getUpload(UPLOAD_KEY)?.contextLinks).toEqual([
         storageLink,
       ]);
+    });
+
+    it('should strip the bootable volumes list link when a bootable volume upload is aborted', async () => {
+      const uploadKey = getBootableVolumeUploadKey(BOOTABLE_VOLUME_NAMESPACE, BOOTABLE_VOLUME_NAME);
+      const listLink = {
+        label: 'Bootable volume fedora-40',
+        url: getBootableVolumesListUrl(BOOTABLE_VOLUME_NAMESPACE),
+      };
+      const cancelUpload = jest.fn(async () => undefined);
+
+      useUploadProgressStore.getState().startUpload(uploadKey, {
+        cancelUpload,
+        contextLinks: [listLink],
+        dvName: BOOTABLE_VOLUME_NAME,
+        dvNamespace: BOOTABLE_VOLUME_NAMESPACE,
+        fileName: FILE_IMAGE_ISO,
+      });
+
+      await useUploadProgressStore.getState().cancelTrackedUpload(uploadKey);
+
+      const upload = useUploadProgressStore.getState().getUpload(uploadKey);
+      expect(upload?.status).toBe(UPLOAD_PROGRESS_STATUS.CANCELED);
+      expect(upload?.contextLinks).toEqual([]);
+      expect(upload?.omittedLinkUrls).toEqual(expect.arrayContaining([listLink.url]));
     });
 
     it('should no-op when upload key does not exist', async () => {

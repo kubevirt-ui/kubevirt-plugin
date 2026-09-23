@@ -67,7 +67,7 @@ export const useUploadProgressStore = create<UploadProgressStoreState>((set, get
         return state;
       }
 
-      const nextUpload = stripDataVolumeLinksFromUpload(current);
+      const nextUpload = stripDataVolumeLinksFromUpload(current, uploadKey);
       if (nextUpload === current) {
         return state;
       }

@@ -3,7 +3,12 @@ import type { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { UPLOAD_PROGRESS_STATUS } from '../constants';
 import { type UploadEntry } from '../types';
 
-import { getBootableVolumeUrl, getDataVolumeUrl, getVmStorageUrl } from '../completion/uploadLinks';
+import {
+  getBootableVolumesListUrl,
+  getBootableVolumeUrl,
+  getDataVolumeUrl,
+  getVmStorageUrl,
+} from '../completion/uploadLinks';
 import {
   getBootableVolumeUploadKey,
   getVmCdromUploadKey,
@@ -51,6 +56,30 @@ describe('stripDataVolumeLinksFromUpload', () => {
     expect(nextUpload.contextLinks).toEqual([storageLink]);
     expect(nextUpload.successLinks).toEqual([storageLink]);
     expect(nextUpload.omittedLinkUrls).toEqual([dataVolumeLink.url]);
+  });
+
+  it('should remove the bootable volumes list link from an aborted bootable volume upload', () => {
+    const volumeName = 'fedora-volume';
+    const listLink = {
+      label: 'Bootable volume fedora-volume',
+      url: getBootableVolumesListUrl(NAMESPACE),
+    };
+    const upload: UploadEntry = {
+      contextLinks: [listLink],
+      dvName: volumeName,
+      dvNamespace: NAMESPACE,
+      fileName: 'image.iso',
+      progress: 40,
+      status: UPLOAD_PROGRESS_STATUS.CANCELED,
+    };
+
+    const nextUpload = stripDataVolumeLinksFromUpload(
+      upload,
+      getBootableVolumeUploadKey(NAMESPACE, volumeName),
+    );
+
+    expect(nextUpload.contextLinks).toEqual([]);
+    expect(nextUpload.omittedLinkUrls).toEqual(expect.arrayContaining([listLink.url]));
   });
 });
 
