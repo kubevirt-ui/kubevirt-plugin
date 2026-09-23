@@ -87,7 +87,7 @@ const VirtualMachineNavPageTitle: FC<VirtualMachineNavPageTitleProps> = ({
           )}
         </Split>
       </PaneHeading>
-      <MemoryLimitsWarning vm={vm} vmi={vmi} />
+      <MemoryLimitsWarning vm={vm} />
       <VirtualMachinePendingChangesAlert
         instanceTypeExpandedSpec={instanceTypeExpandedSpec}
         vm={vm}

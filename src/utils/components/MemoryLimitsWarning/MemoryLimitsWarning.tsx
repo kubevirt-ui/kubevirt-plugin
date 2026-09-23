@@ -1,9 +1,6 @@
 import { type FC } from 'react';
 
-import {
-  type V1VirtualMachine,
-  type V1VirtualMachineInstance,
-} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -18,29 +15,20 @@ import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { Alert, AlertVariant } from '@patternfly/react-core';
 
 type MemoryLimitsWarningProps = {
-  guestMemory?: string;
   isInline?: boolean;
   vm: V1VirtualMachine;
-  vmi?: V1VirtualMachineInstance;
 };
 
-const MemoryLimitsWarning: FC<MemoryLimitsWarningProps> = ({
-  guestMemory,
-  isInline = true,
-  vm,
-  vmi: providedVmi,
-}) => {
+const MemoryLimitsWarning: FC<MemoryLimitsWarningProps> = ({ isInline = true, vm }) => {
   const { t } = useKubevirtTranslation();
   const cluster = useClusterParam();
   const name = getName(vm);
   const namespace = getNamespace(vm);
-  const shouldFetchVmi = !providedVmi && Boolean(name && namespace);
-  const { vmi: fetchedVmi } = useVMI(name, namespace, cluster, shouldFetchVmi);
-  const vmi = providedVmi ?? fetchedVmi;
+  const { vmi } = useVMI(name, namespace, cluster, Boolean(name && namespace));
 
   const memoryLimit = getVMMemoryLimit(vm);
 
-  if (!hasRiskyMemoryLimits(vm, vmi, guestMemory) || !memoryLimit) return null;
+  if (!hasRiskyMemoryLimits(vm, vmi) || !memoryLimit) return null;
 
   return (
     <Alert

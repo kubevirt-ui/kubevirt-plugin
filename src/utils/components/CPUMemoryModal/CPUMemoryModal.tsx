@@ -1,4 +1,4 @@
-import { type FC, useState } from 'react';
+import { type FC, useMemo, useState } from 'react';
 
 import { type V1CPU, type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import CPUInput from '@kubevirt-utils/components/CPUMemoryModal/components/CPUInput/CPUInput';
@@ -71,8 +71,10 @@ const CPUMemoryModal: FC<CPUMemoryModalProps> = ({
   const { unit: defaultMemoryUnit, value: defaultMemorySize } = defaultMemory ?? {};
 
   const templateName = getLabel(vm, VM_TEMPLATE_ANNOTATION);
-  const guestMemory =
-    memory !== undefined && memoryUnit !== undefined ? `${memory}${memoryUnit}` : undefined;
+  const previewVM = useMemo(
+    () => applyCPUMemoryToVM(vm, cpu, memory, memoryUnit),
+    [vm, cpu, memory, memoryUnit],
+  );
 
   const handleSubmit = async (): Promise<void> => {
     setUpdateInProcess(true);
@@ -115,7 +117,7 @@ const CPUMemoryModal: FC<CPUMemoryModalProps> = ({
             setMemoryUnit={setMemoryUnit}
           />
         </div>
-        <MemoryLimitsWarning guestMemory={guestMemory} vm={vm} />
+        <MemoryLimitsWarning vm={previewVM} />
         {updateError && (
           <Alert isInline title={t('Error')} variant={AlertVariant.danger}>
             {updateError}

@@ -10,11 +10,7 @@ import { getCPU, getDomain, getMemory } from './selectors';
 
 const quantityToMemoryString = (
   quantity: K8sIoApimachineryPkgApiResourceQuantity | undefined,
-): string | undefined => {
-  if (quantity === undefined) return undefined;
-
-  return quantity.toString();
-};
+): string | undefined => quantity?.toString();
 
 const parseMemoryToBytes = (
   quantity: K8sIoApimachineryPkgApiResourceQuantity | string | undefined,
@@ -35,6 +31,23 @@ export const getVMIMemoryOverhead = (vmi: V1VirtualMachineInstance): string | un
 export const getVMMemoryLimit = (vm: V1VirtualMachine): string | undefined =>
   quantityToMemoryString(getDomain(vm)?.resources?.limits?.['memory']);
 
+const getComparableMemory = (
+  vm: V1VirtualMachine,
+  memoryOverhead: string | undefined,
+): string | undefined => {
+  const domain = getDomain(vm);
+
+  if (memoryOverhead !== undefined) {
+    return domain?.memory?.guest?.toString() ?? getMemory(vm);
+  }
+
+  return (
+    quantityToMemoryString(domain?.resources?.requests?.memory) ??
+    domain?.memory?.guest?.toString() ??
+    getMemory(vm)
+  );
+};
+
 /**
  * Checks whether memory limits leave insufficient headroom for hypervisor overhead.
  * Per KubeVirt docs, limits.memory must account for guest RAM plus virt-launcher overhead.
@@ -43,21 +56,19 @@ export const getVMMemoryLimit = (vm: V1VirtualMachine): string | undefined =>
 export const hasRiskyMemoryLimits = (
   vm: V1VirtualMachine,
   vmi?: V1VirtualMachineInstance,
-  guestMemoryOverride?: string,
 ): boolean => {
-  const domain = getDomain(vm);
-  const memoryLimits = domain?.resources?.limits?.['memory'];
-  const guestMemory = guestMemoryOverride ?? domain?.memory?.guest ?? getMemory(vm);
+  const memoryLimits = getVMMemoryLimit(vm);
   const memoryOverhead = getVMIMemoryOverhead(vmi);
+  const comparableMemory = getComparableMemory(vm, memoryOverhead);
 
-  if (!memoryLimits || !guestMemory) return false;
+  if (!memoryLimits || !comparableMemory) return false;
   if (getCPU(vm)?.dedicatedCpuPlacement) return false;
 
   const limitsBytes = parseMemoryToBytes(memoryLimits);
-  const guestBytes = parseMemoryToBytes(guestMemory);
+  const comparableBytes = parseMemoryToBytes(comparableMemory);
   const overheadBytes = parseMemoryToBytes(memoryOverhead) ?? 0;
 
-  if (limitsBytes === null || guestBytes === null) return false;
+  if (limitsBytes === null || comparableBytes === null) return false;
 
-  return limitsBytes <= guestBytes + overheadBytes;
+  return limitsBytes <= comparableBytes + overheadBytes;
 };
