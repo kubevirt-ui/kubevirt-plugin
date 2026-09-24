@@ -8,6 +8,7 @@ import {
   completeBootableVolumeUpload,
   failBootableVolumeUpload,
 } from '@kubevirt-utils/hooks/useUploadProgressToast/completion/uploadCompletion';
+import { getBootableVolumeContextLink } from '@kubevirt-utils/hooks/useUploadProgressToast/completion/uploadLinks';
 import { getBootableVolumeUploadKey } from '@kubevirt-utils/hooks/useUploadProgressToast/keys/uploadKeys';
 import { KUBEVIRT_ISO_LABEL } from '@kubevirt-utils/resources/bootableresources/constants';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
@@ -63,6 +64,14 @@ export const createBootableVolumeFromUpload = async (
     file: uploadFile as File,
     uploadKey,
     uploadTrackMetadata: {
+      contextLinks: [
+        getBootableVolumeContextLink(
+          t,
+          volumeName ?? '',
+          volumeNamespace ?? namespace,
+          bootableVolume.bootableVolumeCluster,
+        ),
+      ],
       dvCluster: bootableVolume.bootableVolumeCluster,
       dvName: getName(bootableVolumeToCreate),
       dvNamespace: getNamespace(bootableVolumeToCreate),

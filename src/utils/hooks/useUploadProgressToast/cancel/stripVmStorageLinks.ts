@@ -4,7 +4,7 @@ import { getDataVolumeUrl } from '../completion/uploadLinks';
 import {
   collectVmScopedUploadKeys,
   getBootableVolumeUploadKey,
-  UPLOAD_KEY_PREFIX,
+  isBootableVolumeUploadKey,
 } from '../keys/uploadKeys';
 import {
   collectLinkUrls,
@@ -16,8 +16,20 @@ import {
   updateUploads,
 } from './stripUploadLinksUtils';
 
-export const stripDataVolumeLinksFromUpload = (upload: UploadEntry): UploadEntry =>
-  omitUploadLinksByUrl(upload, getDataVolumeUrls(upload));
+export const stripDataVolumeLinksFromUpload = (
+  upload: UploadEntry,
+  uploadKey?: string,
+): UploadEntry => {
+  const urlsToOmit = getDataVolumeUrls(upload);
+
+  if (uploadKey && isBootableVolumeUploadKey(uploadKey)) {
+    for (const url of collectLinkUrls(upload)) {
+      urlsToOmit.add(url);
+    }
+  }
+
+  return omitUploadLinksByUrl(upload, urlsToOmit);
+};
 
 export const stripLinksForDeletedDataVolume = (
   uploads: Record<string, UploadEntry>,
@@ -45,7 +57,7 @@ export const stripLinksForDeletedDataVolume = (
     }
 
     const urlsToOmit = new Set(urlsToOmitForVolume);
-    if (key.startsWith(`${UPLOAD_KEY_PREFIX.bootableVolume}/`)) {
+    if (isBootableVolumeUploadKey(key)) {
       for (const url of collectLinkUrls(upload)) {
         urlsToOmit.add(url);
       }

@@ -9,6 +9,8 @@ import {
 import type { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 
 import {
+  getBootableVolumeContextLink,
+  getBootableVolumesListUrl,
   getBootableVolumeSuccessLink,
   getBootableVolumeUrl,
   getDataVolumeUrl,
@@ -133,6 +135,28 @@ describe('getBootableVolumeSuccessLink', () => {
       },
       url: getBootableVolumeUrl('fedora', NAMESPACE, 'spoke-1'),
     });
+  });
+});
+
+describe('getBootableVolumeContextLink', () => {
+  it('should point to the local bootable volumes list without DataSource identity', () => {
+    const link = getBootableVolumeContextLink(t, 'fedora', NAMESPACE);
+
+    expect(link).toEqual({
+      label: 'Uploading Bootable volume {{name}}:fedora',
+      url: getBootableVolumesListUrl(NAMESPACE),
+    });
+    expect(link.url).toBe(`/k8s/ns/${NAMESPACE}/bootablevolumes`);
+  });
+
+  it('should use the fleet bootable volumes list when a cluster is set', () => {
+    const link = getBootableVolumeContextLink(t, 'fedora', NAMESPACE, 'spoke-1');
+
+    expect(link).toEqual({
+      label: 'Uploading Bootable volume {{name}}:fedora',
+      url: getBootableVolumesListUrl(NAMESPACE, 'spoke-1'),
+    });
+    expect(link.url).toBe('/fleet-virtualization/bootablevolumes/cluster/spoke-1/ns/default');
   });
 });
 
