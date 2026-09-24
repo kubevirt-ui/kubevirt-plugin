@@ -7,6 +7,7 @@ import { logTemplateFlowEvent, TEMPLATE_SELECTED } from '@kubevirt-utils/extensi
 import { type Template } from '@kubevirt-utils/resources/template';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Card, Split, SplitItem } from '@patternfly/react-core';
+import { useVMWizardState } from '@virtualmachines/wizard/state/useVMWizardState';
 import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
 import TemplatesCatalogEmptyState from '@virtualmachines/wizard/steps/TemplateStep/components/TemplatesCatalog/components/TemplatesCatalogEmptyState';
 import TemplatesCatalogItems from '@virtualmachines/wizard/steps/TemplateStep/components/TemplatesCatalog/components/TemplatesCatalogItems/TemplatesCatalogItems';
@@ -37,6 +38,7 @@ const TemplatesCatalog: FC = () => {
   } = useTemplatesCatalog();
 
   const { control, setValue } = useVMWizard();
+  const { setIsTemplateDrawerOpen, setTemplateProcessError } = useVMWizardState();
   const selectedTemplate = useWatch({
     control,
     name: 'template.selectedTemplate',
@@ -45,12 +47,12 @@ const TemplatesCatalog: FC = () => {
   const handleTemplateSelect = useCallback(
     (template: Template) => {
       setValue('template.selectedTemplate', template);
-      setValue('template.processError', null);
+      setTemplateProcessError(null);
       setValue('template.lastProcessedKey', '');
       logTemplateFlowEvent(TEMPLATE_SELECTED, template);
-      setValue('template.isDrawerOpen', true);
+      setIsTemplateDrawerOpen(true);
     },
-    [setValue],
+    [setIsTemplateDrawerOpen, setTemplateProcessError, setValue],
   );
 
   if (!loaded) {

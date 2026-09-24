@@ -10,6 +10,7 @@ import { Wizard, WizardHeader, WizardStep, type WizardStepType } from '@patternf
 import useCloseWizard from '@virtualmachines/wizard/hooks/useCloseWizard';
 import { useSyncDeploymentDetailsAndMetadataFields } from '@virtualmachines/wizard/hooks/useSyncDeploymentDetailsAndMetadataFields';
 import useWizardStepValidation from '@virtualmachines/wizard/hooks/useWizardStepValidation';
+import { useVMWizardState } from '@virtualmachines/wizard/state/useVMWizardState';
 
 import RequiredLabelsDrawerWrapper from './components/RequiredLabelsDrawerWrapper';
 import TemplatesDrawerWrapper from './components/TemplatesDrawerWrapper';
@@ -18,16 +19,16 @@ import { useVMWizard } from './state/vm-wizard-context/VMWizardContext';
 import { type VMCreationMethod, VMWizardStep } from './utils/constants';
 import { getStepsToDisplayByCreationMethod } from './utils/displaySteps';
 import { type VMWizardStepDisplay } from './utils/types';
-import { markStepVisited } from './utils/utils';
 
 import './Wizard.scss';
 
 const VMCreationWizardContent: FC = () => {
   const { t } = useKubevirtTranslation();
+  const { setCurrentStep, setIsTemplateDrawerOpen } = useVMWizardState();
   const closeWizard = useCloseWizard();
 
   const { isNextDisabledForStep, isStepDisabled } = useWizardStepValidation();
-  const { control, getValues, setValue } = useVMWizard();
+  const { control } = useVMWizard();
   const creationMethod = useWatch({ control, name: 'creationMethod' });
   const navItemConfig = useVMGenerationNavClick(creationMethod);
   const { syncOnDeploymentDetailsStepChange } = useSyncDeploymentDetailsAndMetadataFields();
@@ -48,12 +49,11 @@ const VMCreationWizardContent: FC = () => {
     (currentStep: WizardStepType, prevStep: WizardStepType) => {
       syncOnDeploymentDetailsStepChange(currentStep, prevStep);
       if (currentStep?.id !== VMWizardStep.TEMPLATE) {
-        setValue('template.isDrawerOpen', false);
+        setIsTemplateDrawerOpen(false);
       }
 
       if (currentStep?.id) {
-        setValue('navigation.currentStep', String(currentStep.id));
-        markStepVisited(String(currentStep.id), getValues, setValue);
+        setCurrentStep(String(currentStep.id));
       }
 
       const creationMethodTelemetry = mapWizardStepToCreationMethodTelemetry(
@@ -65,7 +65,7 @@ const VMCreationWizardContent: FC = () => {
         logVMCreationStarted(creationMethodTelemetry);
       }
     },
-    [getValues, setValue, syncOnDeploymentDetailsStepChange],
+    [setCurrentStep, setIsTemplateDrawerOpen, syncOnDeploymentDetailsStepChange],
   );
 
   return (

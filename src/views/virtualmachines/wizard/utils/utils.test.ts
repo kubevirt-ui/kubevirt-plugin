@@ -6,11 +6,10 @@ import { act, renderHook } from '@testing-library/react';
 
 import { createInitialVMWizardFormValues } from '../state/vm-wizard-form/consts';
 import { type VMWizardFormValues } from '../state/vm-wizard-form/types';
-import { VMCreationMethod, VMWizardStep } from './constants';
+import { VMCreationMethod } from './constants';
 import {
   applySelectedBootableVolumeToForm,
   clearVMPendingUploads,
-  markStepVisited,
   resetBootableVolumeFields,
 } from './utils';
 jest.mock('@kubevirt-utils/hooks/useUploadProgressToast', () => ({
@@ -35,11 +34,7 @@ describe('wizard form mappings', () => {
     expect(first.instanceType.compute).toBeNull();
     expect(first.clone.sourceVM).toBeNull();
     expect(first.customization.vmDraft).toBeNull();
-    first.navigation.visitedSteps.add(VMWizardStep.GUEST_OS);
     first.customization.pendingBootableVolumeUploadKeys.push('upload');
-    expect(createInitialVMWizardFormValues().navigation.visitedSteps).toEqual(
-      new Set([VMWizardStep.DEPLOYMENT_DETAILS]),
-    );
     expect(createInitialVMWizardFormValues().customization.pendingBootableVolumeUploadKeys).toEqual(
       [],
     );
@@ -76,21 +71,16 @@ describe('wizard form mappings', () => {
     expect(result.current.getValues('instanceType.bootVolume')).toBeNull();
     expect(result.current.getValues('instanceType.compute')).toBeNull();
   });
-  it('keeps visits unique and cancels the current draft and boot uploads before reset', () => {
+  it('cancels the current draft and boot uploads before reset', () => {
     const result = setup();
     const vm = { metadata: { name: 'draft', namespace: 'test' }, spec: { template: {} } };
     act(() => {
       result.current.setValue('customization.vmDraft', vm);
       result.current.setValue('customization.pendingBootableVolumeUploadKeys', ['boot-upload']);
-      markStepVisited(VMWizardStep.GUEST_OS, result.current.getValues, result.current.setValue);
-      markStepVisited(VMWizardStep.GUEST_OS, result.current.getValues, result.current.setValue);
       clearVMPendingUploads(result.current.getValues, result.current.setValue);
     });
     expect(cancelAllWizardPendingUploads).toHaveBeenCalledWith(vm, ['boot-upload']);
     expect(result.current.getValues('customization.pendingBootableVolumeUploadKeys')).toEqual([]);
-    expect(result.current.getValues('navigation.visitedSteps')).toEqual(
-      new Set([VMWizardStep.DEPLOYMENT_DETAILS, VMWizardStep.GUEST_OS]),
-    );
     act(() =>
       result.current.reset(
         createInitialVMWizardFormValues({
@@ -101,9 +91,7 @@ describe('wizard form mappings', () => {
     );
     expect(result.current.getValues('customization.vmDraft')).toBeNull();
     expect(result.current.getValues('template')).toEqual({
-      isDrawerOpen: false,
       lastProcessedKey: '',
-      processError: null,
       selectedTemplate: null,
     });
   });

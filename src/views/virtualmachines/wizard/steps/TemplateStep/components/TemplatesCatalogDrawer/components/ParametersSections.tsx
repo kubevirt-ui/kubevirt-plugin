@@ -4,6 +4,7 @@ import { produce } from 'immer';
 import { type TemplateParameter } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Button, ButtonVariant, Form, Stack, StackItem } from '@patternfly/react-core';
+import { useVMWizardState } from '@virtualmachines/wizard/state/useVMWizardState';
 import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
 import { useDrawerContext } from '@virtualmachines/wizard/steps/TemplateStep/components/TemplatesCatalogDrawer/hooks/useDrawerContext';
 import {
@@ -24,6 +25,7 @@ const ParametersSections: FC<ParametersSectionProps> = ({
   showValidation = false,
 }) => {
   const { t } = useKubevirtTranslation();
+  const { setTemplateProcessError } = useVMWizardState();
   const { setTemplate, template } = useDrawerContext();
   const { setValue } = useVMWizard();
   const [isEdit, setIsEdit] = useState<boolean>(showValidation);
@@ -54,7 +56,7 @@ const ParametersSections: FC<ParametersSectionProps> = ({
       }
 
       setValue('template.selectedTemplate', template);
-      setValue('template.processError', null);
+      setTemplateProcessError(null);
       setValue('template.lastProcessedKey', '');
     }
 

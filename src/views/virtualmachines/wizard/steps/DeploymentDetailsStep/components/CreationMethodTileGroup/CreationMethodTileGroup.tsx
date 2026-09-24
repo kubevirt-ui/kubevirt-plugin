@@ -2,6 +2,7 @@ import { type FC } from 'react';
 import { useWatch } from 'react-hook-form';
 
 import { Flex, FlexItem } from '@patternfly/react-core';
+import { useVMWizardState } from '@virtualmachines/wizard/state/useVMWizardState';
 import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
 import { createInitialVMWizardFormValues } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
 import { type VMWizardDeploymentValues } from '@virtualmachines/wizard/state/vm-wizard-form/types';
@@ -14,6 +15,7 @@ import './CreationMethodTileGroup.scss';
 
 const CreationMethodTileGroup: FC = () => {
   const { control, getValues, reset, setValue } = useVMWizard();
+  const { resetState } = useVMWizardState();
   const creationMethod: VMCreationMethod = useWatch({
     control,
     name: 'creationMethod',
@@ -28,6 +30,7 @@ const CreationMethodTileGroup: FC = () => {
       getValues('deployment');
 
     clearVMPendingUploads(getValues, setValue);
+    resetState();
     reset(
       createInitialVMWizardFormValues({
         cluster,

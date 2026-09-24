@@ -48,10 +48,8 @@ export type VMWizardInstanceTypeValues = {
 };
 
 export type VMWizardTemplateValues = {
-  // Preserve the existing template processing cache and error presentation.
-  isDrawerOpen: boolean;
+  // Preserve the existing template processing cache.
   lastProcessedKey: string;
-  processError: null | string;
   selectedTemplate: null | Template;
 };
 
@@ -66,19 +64,12 @@ export type VMWizardCustomizationValues = {
   vmDraft: null | V1VirtualMachine;
 };
 
-export type VMWizardNavigationValues = {
-  currentStep: string;
-  strictVMName: boolean;
-  visitedSteps: Set<string>;
-};
-
 export type VMWizardFormValues = {
   clone: VMWizardCloneValues;
   creationMethod: VMCreationMethod;
   customization: VMWizardCustomizationValues;
   deployment: VMWizardDeploymentValues;
   instanceType: VMWizardInstanceTypeValues;
-  navigation: VMWizardNavigationValues;
   template: VMWizardTemplateValues;
 };
 

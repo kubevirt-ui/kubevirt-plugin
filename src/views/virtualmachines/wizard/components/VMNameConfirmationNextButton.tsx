@@ -4,6 +4,7 @@ import { useWatch } from 'react-hook-form';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isDNS1123Label, isDNS1123LabelLenient } from '@kubevirt-utils/utils/validation';
 import { Button, Tooltip } from '@patternfly/react-core';
+import { useVMWizardState } from '@virtualmachines/wizard/state/useVMWizardState';
 
 import { useVMWizard } from '../state/vm-wizard-context/VMWizardContext';
 
@@ -21,16 +22,13 @@ const VMNameConfirmationNextButton: FC<VMNameConfirmationNextButtonProps> = ({
   onClick,
 }) => {
   const { t } = useKubevirtTranslation();
-  const { control, setValue } = useVMWizard();
+  const { setStrictVMName, strictVMName } = useVMWizardState();
+  const { control } = useVMWizard();
   const vmName = useWatch({ control, name: 'deployment.name' });
-  const shouldCheckVMNameProperly = useWatch({
-    control,
-    name: 'navigation.strictVMName',
-  });
 
   const isVMNameValid = isDNS1123Label(vmName);
   const isVMNameAlmostValid = isDNS1123LabelLenient(vmName);
-  const isVMNameInvalid = shouldCheckVMNameProperly ? !isVMNameValid : !isVMNameAlmostValid;
+  const isVMNameInvalid = strictVMName ? !isVMNameValid : !isVMNameAlmostValid;
   const isDisabled = isSubmitting || isVMNameInvalid;
 
   const handleClick = (): void => {
@@ -38,7 +36,7 @@ const VMNameConfirmationNextButton: FC<VMNameConfirmationNextButtonProps> = ({
       onClick();
       return;
     }
-    setValue('navigation.strictVMName', true);
+    setStrictVMName(true);
   };
 
   const nextButton = (

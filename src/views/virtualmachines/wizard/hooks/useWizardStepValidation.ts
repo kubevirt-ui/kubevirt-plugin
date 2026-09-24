@@ -6,6 +6,7 @@ import { getLabels } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { isDNS1123Label } from '@kubevirt-utils/utils/validation';
 import { useSignals } from '@preact/signals-react/runtime';
+import { useVMWizardState } from '@virtualmachines/wizard/state/useVMWizardState';
 import { VMWizardStep } from '@virtualmachines/wizard/utils/constants';
 import { getActiveFlow, isCloneCreationMethod } from '@virtualmachines/wizard/utils/utils';
 
@@ -19,12 +20,12 @@ type WizardStepValidation = {
 const useWizardStepValidation = (): WizardStepValidation => {
   useSignals();
   const { control } = useVMWizard();
+  const { visitedSteps } = useVMWizardState();
   const [
     autoLabelsMerged,
     creationMethod,
     name,
     selectedTemplate,
-    visitedSteps,
     operatingSystemType,
     preference,
     useBootSource,
@@ -39,7 +40,6 @@ const useWizardStepValidation = (): WizardStepValidation => {
       'creationMethod',
       'deployment.name',
       'template.selectedTemplate',
-      'navigation.visitedSteps',
       'instanceType.operatingSystem',
       'instanceType.preference',
       'instanceType.useBootSource',

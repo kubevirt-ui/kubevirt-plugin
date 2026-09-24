@@ -1,12 +1,11 @@
 import { type FC, memo, useCallback, useEffect, useState } from 'react';
-import { useWatch } from 'react-hook-form';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getResourceKey } from '@kubevirt-utils/resources/shared';
 import { getParameters } from '@kubevirt-utils/resources/template';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Alert, AlertVariant, Spinner, Tab, Tabs, TabTitleText } from '@patternfly/react-core';
-import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
+import { useVMWizardState } from '@virtualmachines/wizard/state/useVMWizardState';
 import { TemplatesDrawerTabKey } from '@virtualmachines/wizard/steps/TemplateStep/components/TemplatesCatalogDrawer/components/TemplatesCatalogDrawerPanel/utils/types';
 import { useDrawerContext } from '@virtualmachines/wizard/steps/TemplateStep/components/TemplatesCatalogDrawer/hooks/useDrawerContext';
 import {
@@ -19,11 +18,8 @@ import TemplateInfoSection from '../TemplateInfoSection';
 
 const TemplatesCatalogDrawerPanel: FC = memo(() => {
   const { t } = useKubevirtTranslation();
-  const { control } = useVMWizard();
-  const templateProcessError = useWatch({
-    control,
-    name: 'template.processError',
-  });
+  const { templateProcessError } = useVMWizardState();
+
   const [activeTabKey, setActiveTabKey] = useState<TemplatesDrawerTabKey>(
     TemplatesDrawerTabKey.Details,
   );

@@ -1,5 +1,5 @@
 import { OperatingSystemType } from '@virtualmachines/wizard/steps/InstanceTypesSteps/GuestOSStep/utils/constants';
-import { VMCreationMethod, VMWizardStep } from '@virtualmachines/wizard/utils/constants';
+import { VMCreationMethod } from '@virtualmachines/wizard/utils/constants';
 
 import { type CreateInitialVMWizardFormValuesArgs, type VMWizardFormValues } from './types';
 export const createInitialVMWizardFormValues = ({
@@ -33,15 +33,8 @@ export const createInitialVMWizardFormValues = ({
     useBootSource: true,
     volumeNamespace: '',
   },
-  navigation: {
-    currentStep: VMWizardStep.DEPLOYMENT_DETAILS,
-    strictVMName: false,
-    visitedSteps: new Set([VMWizardStep.DEPLOYMENT_DETAILS]),
-  },
   template: {
-    isDrawerOpen: false,
     lastProcessedKey: '',
-    processError: null,
     selectedTemplate: null,
   },
 });

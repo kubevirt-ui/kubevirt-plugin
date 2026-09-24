@@ -8,22 +8,22 @@ import {
 } from '@virtualmachines/wizard/components/constants';
 import useCloseWizard from '@virtualmachines/wizard/hooks/useCloseWizard';
 import useWizardStepValidation from '@virtualmachines/wizard/hooks/useWizardStepValidation';
-import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
+import { useVMWizardState } from '@virtualmachines/wizard/state/useVMWizardState';
 import useCreateVMFromTemplate from '@virtualmachines/wizard/steps/TemplateStep/hooks/useCreateVMFromTemplate';
 import { VMWizardStep } from '@virtualmachines/wizard/utils/constants';
 
 const TemplateStepFooter: FC = () => {
   const { activeStep, goToNextStep, goToPrevStep } = useWizardContext();
+  const { setIsTemplateDrawerOpen } = useVMWizardState();
   const { createVMFromTemplate, isProcessing } = useCreateVMFromTemplate();
   const closeWizard = useCloseWizard();
-  const { setValue } = useVMWizard();
   const { isNextDisabledForStep } = useWizardStepValidation();
 
   const handleGoToNextStep = async (): Promise<void> => {
     const success = await createVMFromTemplate();
     if (!success) return;
 
-    setValue('template.isDrawerOpen', false);
+    setIsTemplateDrawerOpen(false);
     void goToNextStep();
   };
 
