@@ -5,7 +5,6 @@ import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getInstanceTypeFromVolume } from '@kubevirt-utils/components/AddBootableVolumeModal/utils';
 import { cancelAllWizardPendingUploads } from '@kubevirt-utils/hooks/useUploadProgressToast';
 import { getDiskSize } from '@kubevirt-utils/resources/bootableresources/selectors';
-import { setCustomizeWizardVMSignal } from '@kubevirt-utils/signals/customizeWizardVMSignal';
 import {
   clearWizardBootableVolumeUploadKeys,
   getWizardBootableVolumeUploadKeys,
@@ -137,9 +136,8 @@ export const markStepVisited = (
   setValue(CREATE_VM_FORM_FIELDS_STEP_NAVIGATION.VISITED_STEPS, nextVisitedSteps);
 };
 
-export const clearVMPendingUploadsAndSignal = (vm?: V1VirtualMachine): void => {
+export const clearVMPendingUploads = (vm?: V1VirtualMachine): void => {
   const uploadKeys = getWizardBootableVolumeUploadKeys();
   clearWizardBootableVolumeUploadKeys();
   cancelAllWizardPendingUploads(vm, uploadKeys);
-  setCustomizeWizardVMSignal(null);
 };

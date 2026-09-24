@@ -1,4 +1,5 @@
 import { type FC } from 'react';
+import { useWatch } from 'react-hook-form';
 
 import type { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import CPUDescription from '@kubevirt-utils/components/CPUDescription/CPUDescription';
@@ -13,25 +14,25 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { isInstanceTypeVM } from '@kubevirt-utils/resources/instancetype/helper';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { getCPU, getMemory } from '@kubevirt-utils/resources/vm';
-import {
-  customizeWizardVMSignal,
-  patchCustomizeWizardVMSignal,
-} from '@kubevirt-utils/signals/customizeWizardVMSignal';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
-
-const onSubmitCPUMemory = (updatedVM: V1VirtualMachine): Promise<V1VirtualMachine | undefined> =>
-  Promise.resolve(
-    patchCustomizeWizardVMSignal([
-      { data: getCPU(updatedVM), path: 'spec.template.spec.domain.cpu' },
-      { data: getMemory(updatedVM), path: 'spec.template.spec.domain.memory.guest' },
-    ]),
-  );
+import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
+import { CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
+import { patchWizardCustomizedVM } from '@virtualmachines/wizard/utils/patchWizardCustomizedVM';
 
 const CPUMemory: FC = () => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
 
-  const vm = customizeWizardVMSignal.value;
+  const { control, getValues, setValue } = useVMWizard();
+  const vm = useWatch({ control, name: CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM });
+
+  const onSubmitCPUMemory = (updatedVM: V1VirtualMachine): Promise<V1VirtualMachine | undefined> =>
+    Promise.resolve(
+      patchWizardCustomizedVM(getValues, setValue, [
+        { data: getCPU(updatedVM), path: 'spec.template.spec.domain.cpu' },
+        { data: getMemory(updatedVM), path: 'spec.template.spec.domain.memory.guest' },
+      ]),
+    );
 
   if (!vm || isInstanceTypeVM(vm)) {
     return null;
