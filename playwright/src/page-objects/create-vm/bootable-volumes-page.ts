@@ -548,15 +548,18 @@ export default class BootableVolumesPage extends PageCommons {
   }
 
   async verifyBootableVolumeDoesNotExist(volumeName: string, timeout = 60000): Promise<boolean> {
-    try {
-      await this.page.waitForLoadState('load', { timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
-      await this.page.waitForTimeout(TestTimeouts.UI_DELAY_EXTRA);
-      return !(await this.locator(`tr:has-text("${volumeName}")`)
-        .isVisible({ timeout })
-        .catch(() => false));
-    } catch {
-      return true;
+    const row = this.locator(`tr:has-text("${volumeName}")`);
+    const deadline = Date.now() + timeout;
+
+    while (Date.now() < deadline) {
+      const visible = await row.isVisible({ timeout: TestTimeouts.SHORT_WAIT }).catch(() => false);
+      if (!visible) {
+        return true;
+      }
+      await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
     }
+
+    return !(await row.isVisible().catch(() => false));
   }
 
   async verifyBootableVolumeExistsInList(volumeName: string, timeout = 10000): Promise<boolean> {

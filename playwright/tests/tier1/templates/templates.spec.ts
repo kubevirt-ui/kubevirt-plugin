@@ -131,8 +131,20 @@ test.describe.serial('Tier1 Template Tests', { tag: [T1_TAG, '@tier1-templates']
       await pageCommons.switchProject(sharedNs);
     }
 
-    await templatesPage.navigateToTemplatesViaUI();
-    await templatesPage.filterTemplatesByName(templateName);
+    await templatesPage.navigateToNamespaceTemplatesViaUI(sharedNs);
+    await expect
+      .poll(
+        async () => {
+          await templatesPage.filterTemplatesByName(templateName);
+          return templatesPage.isTemplateVisible(templateName);
+        },
+        {
+          message: `Template ${templateName} should appear in the list`,
+          timeout: utils.TestTimeouts.ELEMENT_WAIT,
+          intervals: [2000, 5000],
+        },
+      )
+      .toBe(true);
     await templatesPage.clickTemplateByTestId(templateName);
 
     await templateDetailPage.navigateToDisks();

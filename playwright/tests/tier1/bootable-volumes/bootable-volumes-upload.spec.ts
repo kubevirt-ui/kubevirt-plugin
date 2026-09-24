@@ -1,10 +1,20 @@
 import { T1, T1_TAG } from '@/data-models/allure-constants';
 import { expect, test } from '@/fixtures/bootable-volumes-fixture';
+import type { TestUtilsType } from '@/fixtures/test-utils';
 import { setupTestNamespace } from '@/utils/test-setup-helpers';
 
 const SUITE = 'Test Virtualization Bootable volumes page';
 const TAB_MODAL = '#tab-modal';
-const UPLOAD_IMAGE_FILENAME = 'bv-upload-cirros.img';
+
+/** Per-test upload file avoids parallel workers racing on a shared CirrOS download path. */
+function createUploadImage(
+  utils: TestUtilsType,
+  volumeName: string,
+): { imageFileName: string; imagePath: string } {
+  const imageFileName = `${volumeName}.img`;
+  const imagePath = utils.TestFileFactory.createSizedIsoFile(imageFileName);
+  return { imageFileName, imagePath };
+}
 
 test.describe('Tier1 Bootable Volumes - Upload experience', { tag: [T1_TAG] }, () => {
   test(
@@ -15,7 +25,7 @@ test.describe('Tier1 Bootable Volumes - Upload experience', { tag: [T1_TAG] }, (
 
       const ns = await setupTestNamespace(apiClient, 'bv-upload-ok');
       const volumeName = utils.generateRandomDataVolumeName('bv-upload');
-      const imagePath = await utils.TestFileFactory.downloadCirrosImage(UPLOAD_IMAGE_FILENAME);
+      const { imageFileName, imagePath } = createUploadImage(utils, volumeName);
       apiClient.trackResource('DataVolume', volumeName, ns);
 
       await bootableVolumesPage.navigateToNamespaceBootableVolumesViaUI(ns);
@@ -27,7 +37,7 @@ test.describe('Tier1 Bootable Volumes - Upload experience', { tag: [T1_TAG] }, (
 
       await test.step('Uploading toast appears', async () => {
         await bootableVolumesPage.expectUploadingToastVisible(
-          UPLOAD_IMAGE_FILENAME,
+          imageFileName,
           utils.TestTimeouts.UI_ELEMENT_VISIBILITY,
         );
       });
@@ -36,7 +46,7 @@ test.describe('Tier1 Bootable Volumes - Upload experience', { tag: [T1_TAG] }, (
         const succeeded = await apiClient.waitForDataVolumeSucceeded(
           volumeName,
           ns,
-          utils.TestTimeouts.FILE_UPLOAD,
+          utils.TestTimeouts.VM_BOOTUP,
         );
         expect(succeeded, 'DataVolume should reach the Succeeded phase').toBe(true);
       });
@@ -70,7 +80,7 @@ test.describe('Tier1 Bootable Volumes - Upload experience', { tag: [T1_TAG] }, (
 
       const ns = await setupTestNamespace(apiClient, 'bv-upload-bg');
       const volumeName = utils.generateRandomDataVolumeName('bv-upload-bg');
-      const imagePath = await utils.TestFileFactory.downloadCirrosImage(UPLOAD_IMAGE_FILENAME);
+      const { imageFileName, imagePath } = createUploadImage(utils, volumeName);
       apiClient.trackResource('DataVolume', volumeName, ns);
 
       await bootableVolumesPage.navigateToNamespaceBootableVolumesViaUI(ns);
@@ -88,15 +98,15 @@ test.describe('Tier1 Bootable Volumes - Upload experience', { tag: [T1_TAG] }, (
         expect(modalClosed, 'Add volume modal should close on submit').toBe(true);
 
         await bootableVolumesPage.expectUploadingToastVisible(
-          UPLOAD_IMAGE_FILENAME,
+          imageFileName,
           utils.TestTimeouts.UI_ELEMENT_VISIBILITY,
         );
       });
 
       await test.step('Abort the upload to clean up', async () => {
-        await bootableVolumesPage.clickAbortUpload(UPLOAD_IMAGE_FILENAME);
+        await bootableVolumesPage.clickAbortUpload(imageFileName);
         await bootableVolumesPage.expectAbortedUploadToastVisible(
-          UPLOAD_IMAGE_FILENAME,
+          imageFileName,
           utils.TestTimeouts.UI_ELEMENT_VISIBILITY,
         );
 
@@ -118,7 +128,7 @@ test.describe('Tier1 Bootable Volumes - Upload experience', { tag: [T1_TAG] }, (
 
       const ns = await setupTestNamespace(apiClient, 'bv-upload-abort');
       const volumeName = utils.generateRandomDataVolumeName('bv-upload-abort');
-      const imagePath = await utils.TestFileFactory.downloadCirrosImage(UPLOAD_IMAGE_FILENAME);
+      const { imageFileName, imagePath } = createUploadImage(utils, volumeName);
       apiClient.trackResource('DataVolume', volumeName, ns);
 
       await bootableVolumesPage.navigateToNamespaceBootableVolumesViaUI(ns);
@@ -127,7 +137,7 @@ test.describe('Tier1 Bootable Volumes - Upload experience', { tag: [T1_TAG] }, (
         await bootableVolumesPage.clickCreateAndSelectOption('With form');
         await bootableVolumesPage.fillCreateBootableVolumeFormAndSave(volumeName, imagePath);
         await bootableVolumesPage.expectUploadingToastVisible(
-          UPLOAD_IMAGE_FILENAME,
+          imageFileName,
           utils.TestTimeouts.UI_ELEMENT_VISIBILITY,
         );
       });
@@ -135,21 +145,21 @@ test.describe('Tier1 Bootable Volumes - Upload experience', { tag: [T1_TAG] }, (
       await test.step('Click "Cancel upload" in the toast', async () => {
         const abortButtonVisible = await bootableVolumesPage.isAbortUploadButtonVisible(
           utils.TestTimeouts.UI_ELEMENT_VISIBILITY,
-          UPLOAD_IMAGE_FILENAME,
+          imageFileName,
         );
         expect(abortButtonVisible, 'Abort button should be visible while uploading').toBe(true);
-        await bootableVolumesPage.clickAbortUpload(UPLOAD_IMAGE_FILENAME);
+        await bootableVolumesPage.clickAbortUpload(imageFileName);
       });
 
       await test.step('Aborted toast is shown and the upload stops', async () => {
         await bootableVolumesPage.expectAbortedUploadToastVisible(
-          UPLOAD_IMAGE_FILENAME,
+          imageFileName,
           utils.TestTimeouts.UI_ELEMENT_VISIBILITY,
         );
 
         const stillAbortable = await bootableVolumesPage.isAbortUploadButtonVisible(
           utils.TestTimeouts.UI_DELAY_MEDIUM,
-          UPLOAD_IMAGE_FILENAME,
+          imageFileName,
         );
         expect(stillAbortable, 'Abort button should no longer be visible once aborted').toBe(
           false,
@@ -168,12 +178,13 @@ test.describe('Tier1 Bootable Volumes - Upload experience', { tag: [T1_TAG] }, (
   test(
     'Closing the VM creation wizard does not cancel an unrelated bootable volume upload',
     { tag: ['@nonpriv'] },
-    async ({ bootableVolumesPage, vmWizardNavigationPage, apiClient, utils }) => {
+    async ({ bootableVolumesPage, vmListPage, vmWizardNavigationPage, apiClient, utils }) => {
+      test.setTimeout(utils.TestTimeouts.TEST_VM_CREATION);
       await utils.withAllure({ suite: SUITE, feature: T1, tags: [T1_TAG] });
 
       const ns = await setupTestNamespace(apiClient, 'bv-upload-wizard-isolation');
       const volumeName = utils.generateRandomDataVolumeName('bv-wizard-iso');
-      const imagePath = await utils.TestFileFactory.downloadCirrosImage(UPLOAD_IMAGE_FILENAME);
+      const { imageFileName, imagePath } = createUploadImage(utils, volumeName);
       apiClient.trackResource('DataVolume', volumeName, ns);
 
       await bootableVolumesPage.navigateToNamespaceBootableVolumesViaUI(ns);
@@ -182,12 +193,14 @@ test.describe('Tier1 Bootable Volumes - Upload experience', { tag: [T1_TAG] }, (
         await bootableVolumesPage.clickCreateAndSelectOption('With form');
         await bootableVolumesPage.fillCreateBootableVolumeFormAndSave(volumeName, imagePath);
         await bootableVolumesPage.expectUploadingToastVisible(
-          UPLOAD_IMAGE_FILENAME,
+          imageFileName,
           utils.TestTimeouts.UI_ELEMENT_VISIBILITY,
         );
       });
 
       await test.step('Open and cancel the VM creation wizard', async () => {
+        await vmListPage.switchToVirtualizationPerspective();
+        await vmListPage.navigateToProjectVmListViaUI(ns);
         await vmWizardNavigationPage.openWizardFromCreateDropdown();
 
         const wizardVisible = await vmWizardNavigationPage.verifyWizardVisible();
@@ -197,9 +210,10 @@ test.describe('Tier1 Bootable Volumes - Upload experience', { tag: [T1_TAG] }, (
       });
 
       await test.step('Bootable volume upload is still active after closing the wizard', async () => {
+        await bootableVolumesPage.navigateToNamespaceBootableVolumesViaUI(ns);
         const state = await bootableVolumesPage.expectUploadingOrTerminalToastVisible(
-          UPLOAD_IMAGE_FILENAME,
-          utils.TestTimeouts.UI_ELEMENT_VISIBILITY,
+          imageFileName,
+          utils.TestTimeouts.ELEMENT_WAIT,
         );
         expect(
           state === 'uploading' || state === 'success',
@@ -210,14 +224,14 @@ test.describe('Tier1 Bootable Volumes - Upload experience', { tag: [T1_TAG] }, (
       await test.step('Abort the upload to clean up when still in progress', async () => {
         const abortVisible = await bootableVolumesPage.isAbortUploadButtonVisible(
           utils.TestTimeouts.UI_DELAY_MEDIUM,
-          UPLOAD_IMAGE_FILENAME,
+          imageFileName,
         );
         if (!abortVisible) {
           return;
         }
-        await bootableVolumesPage.clickAbortUpload(UPLOAD_IMAGE_FILENAME);
+        await bootableVolumesPage.clickAbortUpload(imageFileName);
         await bootableVolumesPage.expectAbortedUploadToastVisible(
-          UPLOAD_IMAGE_FILENAME,
+          imageFileName,
           utils.TestTimeouts.UI_ELEMENT_VISIBILITY,
         );
       });

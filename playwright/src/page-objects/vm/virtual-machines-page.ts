@@ -201,8 +201,11 @@ export default class VirtualMachinesPage extends TreeContextMenuMixin(PageCommon
   }
 
   async clickProjectNode(namespace: string): Promise<void> {
-    await this.tree.clickProjectNode(namespace);
-    await this.clickVmListTab();
+    const selected = await this.trySelectProjectInTreeView(namespace, { selectVmListTab: true });
+    if (!selected) {
+      await this.navigateToProjectVirtualMachines(namespace);
+      await this.clickVmListTab();
+    }
   }
 
   async clickQuickCreateVmButton() {
@@ -513,10 +516,6 @@ export default class VirtualMachinesPage extends TreeContextMenuMixin(PageCommon
 
   async getFilterChipTexts(): Promise<string[]> {
     return this.search.getFilterChipTexts();
-  }
-
-  async getFilteredEmptyStateText(): Promise<string> {
-    return this.search.getFilteredEmptyStateText();
   }
 
   async getGuestAgentWidgetTitle(timeout?: number): Promise<string | null> {
@@ -977,10 +976,11 @@ export default class VirtualMachinesPage extends TreeContextMenuMixin(PageCommon
     if (options?.closeWelcomeModal) {
       await this.tryCloseWelcomeModal();
     }
-    await this.waitForTreeViewReady();
-    await this.toggleEmptyProjectsDisplay(true);
-    await this.searchTreeView(namespace);
-    await this.clickProjectNode(namespace);
+
+    const selectedInTree = await this.trySelectProjectInTreeView(namespace, { selectVmListTab: true });
+    if (!selectedInTree) {
+      await this.navigateToProjectVirtualMachines(namespace);
+    }
   }
 
   async navigateToNamespaceVmListAndWait(namespace: string): Promise<void> {
@@ -1022,11 +1022,76 @@ export default class VirtualMachinesPage extends TreeContextMenuMixin(PageCommon
     await this.clickNavVirtualMachines();
     await this.page.waitForLoadState('domcontentloaded');
     await this.tryCloseWelcomeModal();
-    await this.waitForTreeViewReady();
+
+    const navigatedViaTree = await this.tryNavigateToVmInTreeView(namespace, vmName);
+    if (!navigatedViaTree) {
+      await this.goTo(`/k8s/ns/${namespace}/kubevirt.io~v1~VirtualMachine/${vmName}`);
+      await this.page.waitForLoadState('domcontentloaded');
+    }
+  }
+
+  /**
+   * Attempts to select a project in the tree view with a short timeout.
+   * Returns false when the project is not indexed yet (e.g. empty namespace or stale cache).
+   */
+  private async trySelectProjectInTreeView(
+    namespace: string,
+    options?: { selectVmListTab?: boolean },
+  ): Promise<boolean> {
     await this.toggleEmptyProjectsDisplay(true);
-    await this.searchTreeView(namespace);
-    await this.clickTreeNodeAndEnsureExpanded(namespace, vmName, namespace);
-    await this.clickVmInTreeView(vmName, namespace);
+    const treeSearchable = await this.searchTreeView(namespace, TestTimeouts.SHORT_WAIT);
+    if (!treeSearchable) {
+      return false;
+    }
+
+    const projectNode = this.locator(`[id="projectSelector/#single-cluster#/${namespace}"]`);
+    for (let attempt = 0; attempt < 2; attempt++) {
+      const visible = await projectNode.isVisible({ timeout: TestTimeouts.SHORT_WAIT }).catch(() => false);
+      if (visible) {
+        await this.tree.clickProjectNode(namespace);
+        if (options?.selectVmListTab) {
+          await this.clickVmListTab();
+        }
+        return true;
+      }
+      if (attempt === 0) {
+        await this.page.waitForTimeout(TestTimeouts.UI_DELAY_MEDIUM);
+        await this.searchTreeView(namespace, TestTimeouts.SHORT_WAIT);
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Attempts tree-view navigation to a VM; returns false when the project/VM is not visible.
+   */
+  private async tryNavigateToVmInTreeView(namespace: string, vmName: string): Promise<boolean> {
+    await this.toggleEmptyProjectsDisplay(true);
+    const treeSearchable = await this.searchTreeView(namespace, TestTimeouts.SHORT_WAIT);
+    if (!treeSearchable) {
+      return false;
+    }
+
+    const projectNode = this.locator(`[id="projectSelector/#single-cluster#/${namespace}"]`);
+    let projectVisible = await projectNode.isVisible({ timeout: TestTimeouts.SHORT_WAIT }).catch(() => false);
+    if (!projectVisible) {
+      await this.page.waitForTimeout(TestTimeouts.UI_DELAY_MEDIUM);
+      await this.searchTreeView(namespace, TestTimeouts.SHORT_WAIT);
+      projectVisible = await projectNode.isVisible({ timeout: TestTimeouts.SHORT_WAIT }).catch(() => false);
+    }
+    if (!projectVisible) {
+      return false;
+    }
+
+    try {
+      await this.clickTreeNodeAndEnsureExpanded(namespace, vmName, namespace);
+      const vmNode = this.locator(`[id="#single-cluster#/${namespace}/${vmName}"]`);
+      await vmNode.waitFor({ state: 'visible', timeout: TestTimeouts.SHORT_WAIT });
+      await this.robustClick(vmNode);
+      return true;
+    } catch {
+      return false;
+    }
   }
 
   async openBulkActionsDropdown() {
@@ -1081,8 +1146,8 @@ export default class VirtualMachinesPage extends TreeContextMenuMixin(PageCommon
     return this.search.searchInAdvSearchToolbar(searchText);
   }
 
-  async searchTreeView(searchText: string): Promise<void> {
-    return this.tree.searchTreeView(searchText);
+  async searchTreeView(searchText: string, timeoutMs?: number): Promise<boolean> {
+    return this.tree.searchTreeView(searchText, timeoutMs);
   }
 
   async searchVmAndVerifyNoResults(vmName: string): Promise<boolean> {

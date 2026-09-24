@@ -485,9 +485,9 @@ export class VirtualMachineDetailConfigurationComponent extends BaseComponent {
     await this._cpuMemoryButton.waitFor({ state: 'visible', timeout: TestTimeouts.VM_CREATION });
     await this._cpuMemoryButton.click();
 
-    await this.locator('label[for="editVCPU"] button[aria-label="Plus"]').click();
+    await this.locator('.cpu-input button[aria-label="Plus"]').click();
 
-    await this.locator('div.input-memory button[aria-label="Plus"]').click();
+    await this.locator('.input-memory button[aria-label="Plus"]').click();
 
     await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
 

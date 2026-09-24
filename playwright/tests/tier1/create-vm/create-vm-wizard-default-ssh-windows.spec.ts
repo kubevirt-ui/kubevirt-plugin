@@ -23,7 +23,7 @@ test.describe(
     test('Windows guest is created without accessCredentials when a default SSH key is set', async ({
       apiClient,
       testConfig,
-      vmTreePage,
+      vmListPage,
       vmWizardNavigationPage,
       vmWizardBootSourcePage,
       vmWizardComputePage,
@@ -40,9 +40,9 @@ test.describe(
       const secretName = utils.generateRandomSecretName('ssh-key');
       await setupDefaultSSHKey({ client: apiClient, namespace: wizardNs, secretName });
 
-      await vmTreePage.switchToVirtualizationPerspective();
-      await vmTreePage.navigateToNamespaceVirtualMachines(wizardNs);
-      await vmTreePage.clickVmListTab();
+      await vmListPage.switchToVirtualizationPerspective();
+      await vmListPage.navigateToNamespaceVirtualMachines(wizardNs);
+      await vmListPage.clickVmListTab();
       await vmWizardNavigationPage.openWizardFromCreateDropdown();
 
       const wizardVisible = await vmWizardNavigationPage.verifyWizardVisible();

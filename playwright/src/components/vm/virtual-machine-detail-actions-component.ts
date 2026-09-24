@@ -357,23 +357,56 @@ export default class VirtualMachineDetailActionsComponent extends PageCommons {
       await this.robustClick(projectOption);
     }
 
+    await modal
+      .locator('.pf-v6-c-skeleton')
+      .first()
+      .waitFor({ state: 'hidden', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY })
+      .catch(() => undefined);
+
     if (options?.category) {
       const categorySelect = modal.locator('[data-test="template-category-select"]');
-      await categorySelect.waitFor({
-        state: 'visible',
-        timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
-      });
-      const categoryInput = categorySelect.locator('input[role="combobox"]');
+      const categoryVisible = await categorySelect
+        .isVisible({ timeout: TestTimeouts.DEFAULT })
+        .catch(() => false);
+      if (!categoryVisible) {
+        throw new Error(
+          'Template category field is not available (HCO v1 category support may be disabled)',
+        );
+      }
+      const categoryInput = categorySelect.locator('[role="combobox"]');
+      const normalizedCategory = options.category.replace(/\s+/g, '-');
       await this.robustClick(categoryInput);
-      await categoryInput.fill(options.category);
-      const categoryOption = this.page
-        .getByRole('option', { name: options.category, exact: true })
+      await categoryInput.clear();
+
+      const existingOption = this.page
+        .getByRole('option', { name: normalizedCategory, exact: true })
         .first();
-      await categoryOption.waitFor({
-        state: 'visible',
-        timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
-      });
-      await this.robustClick(categoryOption);
+      if (
+        await existingOption.isVisible({ timeout: TestTimeouts.SHORT_WAIT }).catch(() => false)
+      ) {
+        await this.robustClick(existingOption);
+      } else {
+        await categoryInput.fill(options.category);
+        const createOption = this.page
+          .getByRole('option', {
+            name: new RegExp(`Create category.*${normalizedCategory}`),
+          })
+          .first();
+        if (
+          await createOption.isVisible({ timeout: TestTimeouts.SHORT_WAIT }).catch(() => false)
+        ) {
+          await this.robustClick(createOption);
+        } else {
+          const filteredOption = this.page
+            .getByRole('option', { name: normalizedCategory, exact: true })
+            .first();
+          await filteredOption.waitFor({
+            state: 'visible',
+            timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+          });
+          await this.robustClick(filteredOption);
+        }
+      }
     }
 
     const submitBtn = this.locator('button:has-text("Save as template")').last();

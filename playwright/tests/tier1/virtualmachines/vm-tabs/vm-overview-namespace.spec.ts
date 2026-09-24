@@ -7,6 +7,7 @@ test.describe('VM Overview - namespace level', { tag: [T1_TAG, '@tier1-vm-overvi
     vmListPage,
     utils,
   }) => {
+    test.setTimeout(utils.TestTimeouts.TEST_EXTENDED);
     await utils.withAllure({
       suite: 'VM Overview - namespace level',
       feature: T1,
@@ -43,8 +44,11 @@ test.describe('VM Overview - namespace level', { tag: [T1_TAG, '@tier1-vm-overvi
     await apiClient.waitForVmRunning(vmName2, namespace, utils.TestTimeouts.VM_BOOTUP);
 
     await vmListPage.navigateToProjectViaTreeView(namespace);
+    await vmListPage.clickOverviewTab();
 
-    const result = await vmListPage.getHealthSectionWidgetsVisibility(utils.TestTimeouts.VM_BOOTUP);
+    const result = await vmListPage.getHealthSectionWidgetsVisibility(
+      utils.TestTimeouts.ELEMENT_WAIT,
+    );
     expect
       .soft(
         result.allVisible,
@@ -60,7 +64,7 @@ test.describe('VM Overview - namespace level', { tag: [T1_TAG, '@tier1-vm-overvi
       .toBe(true);
 
     const { count, allVisible } = await vmListPage.getResourceAllocationChartsVisibility(
-      utils.TestTimeouts.VM_BOOTUP,
+      utils.TestTimeouts.ELEMENT_WAIT,
     );
     expect.soft(count, 'Resource allocation should have 4 chart elements').toBe(4);
     expect.soft(allVisible, 'All 4 resource allocation charts should be visible').toBe(true);

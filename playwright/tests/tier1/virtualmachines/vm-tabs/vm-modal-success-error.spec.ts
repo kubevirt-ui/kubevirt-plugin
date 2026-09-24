@@ -63,14 +63,14 @@ test.describe.serial(
     });
 
     test('PVC resize API error stays in the Edit Disk modal', async ({
-      vmTreePage,
+      vmListPage,
       vmDetailPage,
       utils,
     }) => {
       await utils.withAllure({ suite: SUITE, feature: T1, tags: [T1_TAG, VM_TABS_TAG] });
       test.setTimeout(utils.TestTimeouts.TEST_VM_CREATION);
 
-      await vmTreePage.navigateToVmViaTreeView(ns, vmName);
+      await vmListPage.navigateToVmViaTreeView(ns, vmName);
       await vmDetailPage.mockPvcPatchForbidden();
 
       const forbiddenPatch = vmDetailPage.waitForForbiddenPvcPatch(utils.TestTimeouts.VM_CREATION);
@@ -90,14 +90,14 @@ test.describe.serial(
     });
 
     test('Cancel after a PVC resize error dismisses the modal', async ({
-      vmTreePage,
+      vmListPage,
       vmDetailPage,
       utils,
     }) => {
       await utils.withAllure({ suite: SUITE, feature: T1, tags: [T1_TAG, VM_TABS_TAG] });
       test.setTimeout(utils.TestTimeouts.TEST_VM_CREATION);
 
-      await vmTreePage.navigateToVmViaTreeView(ns, vmName);
+      await vmListPage.navigateToVmViaTreeView(ns, vmName);
       await vmDetailPage.mockPvcPatchForbidden();
 
       const forbiddenPatch = vmDetailPage.waitForForbiddenPvcPatch(utils.TestTimeouts.VM_CREATION);

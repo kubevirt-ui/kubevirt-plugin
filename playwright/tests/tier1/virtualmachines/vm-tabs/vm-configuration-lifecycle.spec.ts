@@ -46,13 +46,7 @@ test.describe('VM full lifecycle: start, pause, unpause, restart, stop', { tag: 
         utils.TestTimeouts.VM_BOOTUP,
       );
 
-      await vmListPage.navigateToVirtualMachinesViaUI();
-      await vmListPage.tryCloseWelcomeModal();
-      await vmListPage.toggleEmptyProjectsDisplay(true);
-      await vmListPage.searchTreeView(namespace);
-      await vmListPage.clickProjectNode(namespace);
-      await vmListPage.clickVmListTab();
-      await vmListPage.clickVmByTestId(vmName);
+      await vmListPage.navigateToVmViaTreeView(namespace, vmName);
 
       const isStopped = await pageCommons.waitForStatusText('Stopped');
       expect.soft(isStopped, 'VM should be stopped initially').toBe(true);

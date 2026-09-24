@@ -689,7 +689,7 @@ export default class PageCommons extends BasePage {
     await this.page.waitForLoadState('domcontentloaded');
     await this.page.waitForLoadState('load');
 
-    const namespaceDropdown = this.testId('namespace-bar-dropdown').locator('button');
+    const namespaceDropdown = this.testId('namespace-bar-dropdown').locator('button').first();
 
     const dropdownVisible = await namespaceDropdown
       .isVisible({ timeout: TestTimeouts.UI_DELAY_MEDIUM })
