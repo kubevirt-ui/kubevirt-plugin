@@ -63,6 +63,8 @@ export type V1DiskModalProps = {
   createdPVCName?: string;
   defaultFormValues?: DefaultFormValues;
   editDiskName?: string;
+  // Read the live draft when a background upload is canceled after the modal closes.
+  getCurrentVM?: () => null | undefined | V1VirtualMachine;
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (
@@ -125,6 +127,7 @@ export type SubmitInput = {
 };
 
 export type SubmitCDROMInput = {
+  getCurrentVM?: V1DiskModalProps['getCurrentVM'];
   isHotPluggable: boolean;
   onSubmit: V1DiskModalProps['onSubmit'];
   onUploadedDataVolume?: V1DiskModalProps['onUploadedDataVolume'];

@@ -1,10 +1,15 @@
 import { type UseFormGetValues, type UseFormSetValue } from 'react-hook-form';
 import { type TFunction } from 'i18next';
 
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getInstanceTypeFromVolume } from '@kubevirt-utils/components/AddBootableVolumeModal/utils';
 import { cancelAllWizardPendingUploads } from '@kubevirt-utils/hooks/useUploadProgressToast';
 import { getDiskSize } from '@kubevirt-utils/resources/bootableresources/selectors';
 import { setCustomizeWizardVMSignal } from '@kubevirt-utils/signals/customizeWizardVMSignal';
+import {
+  clearWizardBootableVolumeUploadKeys,
+  getWizardBootableVolumeUploadKeys,
+} from '@kubevirt-utils/signals/wizardBootableVolumeKeysSignal';
 import CloneIcon from '@virtualmachines/wizard/steps/DeploymentDetailsStep/components/CreationMethodTileGroup/components/CreationMethodTile/components/CloneIcon';
 import { InstanceTypeIcon } from '@virtualmachines/wizard/steps/DeploymentDetailsStep/components/CreationMethodTileGroup/components/CreationMethodTile/components/InstanceTypeIcon';
 import TemplateIcon from '@virtualmachines/wizard/steps/DeploymentDetailsStep/components/CreationMethodTileGroup/components/CreationMethodTile/components/TemplateIcon';
@@ -132,7 +137,9 @@ export const markStepVisited = (
   setValue(CREATE_VM_FORM_FIELDS_STEP_NAVIGATION.VISITED_STEPS, nextVisitedSteps);
 };
 
-export const clearVMPendingUploadsAndSignal = (): void => {
-  cancelAllWizardPendingUploads();
+export const clearVMPendingUploadsAndSignal = (vm?: V1VirtualMachine): void => {
+  const uploadKeys = getWizardBootableVolumeUploadKeys();
+  clearWizardBootableVolumeUploadKeys();
+  cancelAllWizardPendingUploads(vm, uploadKeys);
   setCustomizeWizardVMSignal(null);
 };

@@ -72,17 +72,30 @@ describe('submitCDROM - upload volume wiring', () => {
       isHotPluggable: true,
     });
 
-    expect(createEjectMountedDiskCancelCleanup).toHaveBeenCalledWith(baseVM, 'cdrom-1');
+    expect(createEjectMountedDiskCancelCleanup).toHaveBeenCalledWith(
+      baseVM,
+      'cdrom-1',
+      undefined,
+      onSubmit,
+    );
     expect(createDetachDiskCancelCleanup).not.toHaveBeenCalled();
   });
 
-  it('builds a detach cancel cleanup (non-hotpluggable)', async () => {
+  it('passes the draft getter to deferred detach cleanup (non-hotpluggable)', async () => {
+    const getCurrentVM = jest.fn(() => baseVM);
     await submitCDROM(buildData(), {
       ...baseParams,
+      getCurrentVM,
       isHotPluggable: false,
     });
 
-    expect(createDetachDiskCancelCleanup).toHaveBeenCalledWith(baseVM, 'cdrom-1');
+    expect(getCurrentVM).not.toHaveBeenCalled();
+    expect(createDetachDiskCancelCleanup).toHaveBeenCalledWith(
+      baseVM,
+      'cdrom-1',
+      getCurrentVM,
+      onSubmit,
+    );
     expect(createEjectMountedDiskCancelCleanup).not.toHaveBeenCalled();
   });
 
