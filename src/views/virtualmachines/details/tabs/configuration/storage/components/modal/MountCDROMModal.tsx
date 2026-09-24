@@ -27,6 +27,7 @@ import { submitMountCDROM } from './utils/mountCDROMSubmit';
 
 type MountCDROMModalProps = {
   cdromName: string;
+  getCurrentVM?: () => null | undefined | V1VirtualMachine;
   isOpen: boolean;
   onClose: () => void;
   onSubmit?: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine>;
@@ -35,6 +36,7 @@ type MountCDROMModalProps = {
 
 const MountCDROMModal: FC<MountCDROMModalProps> = ({
   cdromName,
+  getCurrentVM,
   isOpen,
   onClose,
   onSubmit,
@@ -86,6 +88,7 @@ const MountCDROMModal: FC<MountCDROMModalProps> = ({
         cdromName,
         cdromUploadKey,
         checkUploadReady,
+        getCurrentVM,
         isHotPluggable,
         isVMRunning,
         onClose,
