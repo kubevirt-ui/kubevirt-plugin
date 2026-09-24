@@ -103,21 +103,6 @@ export const resetBootableVolumeFields = (
   });
 };
 
-export const markStepVisited = (
-  stepId: string,
-  getValues: UseFormGetValues<VMWizardFormValues>,
-  setValue: UseFormSetValue<VMWizardFormValues>,
-): void => {
-  const visitedSteps = getValues('navigation.visitedSteps');
-  if (visitedSteps.has(stepId)) {
-    return;
-  }
-
-  const nextVisitedSteps = new Set(visitedSteps);
-  nextVisitedSteps.add(stepId);
-  setValue('navigation.visitedSteps', nextVisitedSteps);
-};
-
 export const clearVMPendingUploads = (
   getValues: UseFormGetValues<VMWizardFormValues>,
   setValue: UseFormSetValue<VMWizardFormValues>,

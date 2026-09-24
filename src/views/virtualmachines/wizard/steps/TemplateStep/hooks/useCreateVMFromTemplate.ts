@@ -12,6 +12,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
 import { USER_SETTINGS_KEYS } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/const';
 import { getResourceKey } from '@kubevirt-utils/resources/shared';
+import { useVMWizardState } from '@virtualmachines/wizard/state/useVMWizardState';
 import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
 import { getFirstUnfulfilledRequiredParameter } from '@virtualmachines/wizard/steps/TemplateStep/components/TemplatesCatalogDrawer/utils/utils';
 import {
@@ -26,14 +27,15 @@ type UseCreateVMFromTemplate = () => {
 
 const useCreateVMFromTemplate: UseCreateVMFromTemplate = () => {
   const { t } = useKubevirtTranslation();
+  const { setIsTemplateDrawerOpen, setTemplateProcessError } = useVMWizardState();
   const [isProcessing, setIsProcessing] = useState(false);
   const { control, getValues, setValue } = useVMWizard();
   const cluster = useWatch({ control, name: 'deployment.cluster' });
   const [authorizedSSHKeys] = useKubevirtUserSettings(USER_SETTINGS_KEYS.ssh, cluster);
 
   const failWithProcessError = (message: string): false => {
-    setValue('template.processError', message);
-    setValue('template.isDrawerOpen', true);
+    setTemplateProcessError(message);
+    setIsTemplateDrawerOpen(true);
     return false;
   };
 
@@ -42,7 +44,7 @@ const useCreateVMFromTemplate: UseCreateVMFromTemplate = () => {
     const selectedTemplate = getValues('template.selectedTemplate');
     const namespace = project || DEFAULT_NAMESPACE;
     const lastProcessedTemplateKey = getValues('template.lastProcessedKey');
-    setValue('template.processError', null);
+    setTemplateProcessError(null);
 
     const selectedKey = getResourceKey(selectedTemplate);
     if (selectedKey === lastProcessedTemplateKey) return true;

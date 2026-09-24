@@ -9,27 +9,26 @@ import {
   getDNS1123LabelErrorLenient,
 } from '@kubevirt-utils/utils/validation';
 import { InputGroup, InputGroupItem, TextInput } from '@patternfly/react-core';
+import { useVMWizardState } from '@virtualmachines/wizard/state/useVMWizardState';
 
 import { useVMWizard } from '../state/vm-wizard-context/VMWizardContext';
 import GenerateVMNameButton from './GenerateVMNameButton';
 
 const NameInput: FC = () => {
   const { t } = useKubevirtTranslation();
+  const { setStrictVMName, strictVMName } = useVMWizardState();
   const { control, setValue } = useVMWizard();
   const vmName = useWatch({ control, name: 'deployment.name' });
-  const shouldCheckVMNameProperly = useWatch({
-    control,
-    name: 'navigation.strictVMName',
-  });
-  const getError = shouldCheckVMNameProperly ? getDNS1123LabelError : getDNS1123LabelErrorLenient;
+
+  const getError = strictVMName ? getDNS1123LabelError : getDNS1123LabelErrorLenient;
   const { errorText, validated } = useNameValidation({ getError, name: vmName });
 
   const applyName = useCallback(
     (newName: string) => {
-      setValue('navigation.strictVMName', false);
+      setStrictVMName(false);
       setValue('deployment.name', newName);
     },
-    [setValue],
+    [setStrictVMName, setValue],
   );
 
   return (
