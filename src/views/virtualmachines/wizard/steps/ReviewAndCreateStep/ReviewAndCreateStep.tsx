@@ -1,6 +1,7 @@
 import { type FC } from 'react';
 import { useWatch } from 'react-hook-form';
 
+import RerunOnFailureCloneWarning from '@kubevirt-utils/components/CloneVMModal/components/StartClonedVMCheckbox/components/RerunOnFailureCloneWarning';
 import { useRunStrategyToggle } from '@kubevirt-utils/components/RunStrategyModal/useRunStrategyToggle';
 import {
   getStartAfterCreationLabel,
@@ -17,6 +18,8 @@ import ReviewGrid from '@virtualmachines/wizard/steps/ReviewAndCreateStep/compon
 import { patchWizardCustomizedVM } from '@virtualmachines/wizard/utils/patchWizardCustomizedVM';
 import { isCloneCreationMethod } from '@virtualmachines/wizard/utils/utils';
 
+import usePreservedRunStrategy from './hooks/usePreservedRunStrategy';
+
 const ReviewAndCreateStep: FC = () => {
   const { t } = useKubevirtTranslation();
   const { control, getValues, setValue } = useVMWizard();
@@ -25,6 +28,8 @@ const ReviewAndCreateStep: FC = () => {
   const isCloneMethod = isCloneCreationMethod(creationMethod);
 
   const { isStartChecked, onToggle } = useRunStrategyToggle(vm ?? undefined);
+  const preservedRunStrategy = usePreservedRunStrategy(vm ?? undefined);
+
   return (
     <Stack hasGutter>
       <StackItem>
@@ -54,6 +59,12 @@ const ReviewAndCreateStep: FC = () => {
             patchWizardCustomizedVM(getValues, setValue, runStrategyPatch);
           }}
         />
+        {isCloneMethod && (
+          <RerunOnFailureCloneWarning
+            runStrategy={preservedRunStrategy}
+            startCloneVM={isStartChecked}
+          />
+        )}
       </StackItem>
     </Stack>
   );
