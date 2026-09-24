@@ -6,10 +6,6 @@ import { isDNS1123Label, isDNS1123LabelLenient } from '@kubevirt-utils/utils/val
 import { Button, Tooltip } from '@patternfly/react-core';
 
 import { useVMWizard } from '../state/vm-wizard-context/VMWizardContext';
-import {
-  CREATE_VM_FORM_FIELDS_UI_STATE,
-  CREATE_VM_FORM_FIELDS_VM_DATA,
-} from '../state/vm-wizard-form/consts';
 
 type VMNameConfirmationNextButtonProps = {
   children: ReactNode;
@@ -26,10 +22,10 @@ const VMNameConfirmationNextButton: FC<VMNameConfirmationNextButtonProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const { control, setValue } = useVMWizard();
-  const vmName = useWatch({ control, name: CREATE_VM_FORM_FIELDS_VM_DATA.NAME });
+  const vmName = useWatch({ control, name: 'deployment.name' });
   const shouldCheckVMNameProperly = useWatch({
     control,
-    name: CREATE_VM_FORM_FIELDS_UI_STATE.SHOULD_CHECK_VM_NAME_PROPERLY,
+    name: 'navigation.strictVMName',
   });
 
   const isVMNameValid = isDNS1123Label(vmName);
@@ -42,7 +38,7 @@ const VMNameConfirmationNextButton: FC<VMNameConfirmationNextButtonProps> = ({
       onClick();
       return;
     }
-    setValue(CREATE_VM_FORM_FIELDS_UI_STATE.SHOULD_CHECK_VM_NAME_PROPERLY, true);
+    setValue('navigation.strictVMName', true);
   };
 
   const nextButton = (

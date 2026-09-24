@@ -6,7 +6,7 @@ import { type BootableVolume } from '@kubevirt-utils/resources/bootableresources
 import { getLabel } from '@kubevirt-utils/resources/shared';
 import { type VMWizardFormValues } from '@virtualmachines/wizard/state/vm-wizard-form/types';
 
-type PreferenceFormValue = VMWizardFormValues['instanceTypeData']['preference'];
+type PreferenceFormValue = VMWizardFormValues['instanceType']['preference'];
 
 export const getSelectedPreferenceName = (
   selectedBootableVolume: BootableVolume | null,

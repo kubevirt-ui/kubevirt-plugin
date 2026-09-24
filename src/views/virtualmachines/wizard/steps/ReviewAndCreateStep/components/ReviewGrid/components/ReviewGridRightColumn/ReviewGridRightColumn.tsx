@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import { useWatch } from 'react-hook-form';
 
 import DisksReviewTable from '@kubevirt-utils/components/DisksReviewTable/DisksReviewTable';
 import NetworksReviewTable from '@kubevirt-utils/components/NetworksReviewTable/NetworksReviewTable';
@@ -8,15 +7,14 @@ import { getInterfaces, getNetworks } from '@kubevirt-utils/resources/vm';
 import { ExpandableSection, Stack, StackItem } from '@patternfly/react-core';
 import useWizardDisksTableData from '@virtualmachines/wizard/components/DisksReviewTable/hooks/useWizardDisksTableData/useWizardDisksTableData';
 import HardwareDevicesTable from '@virtualmachines/wizard/components/HardwareDevicesTable';
-import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
-import { CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
+import { useWizardReviewVM } from '@virtualmachines/wizard/hooks/useWizardReviewVM';
 
 import './ReviewGridRightColumn.scss';
 
 const ReviewGridRightColumn: FC = () => {
   const { t } = useKubevirtTranslation();
-  const { control } = useVMWizard();
-  const vm = useWatch({ control, name: CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM });
+
+  const vm = useWizardReviewVM();
 
   const [disks] = useWizardDisksTableData(vm);
   const interfaces = getInterfaces(vm);

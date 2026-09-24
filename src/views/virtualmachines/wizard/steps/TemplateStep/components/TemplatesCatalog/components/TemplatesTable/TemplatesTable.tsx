@@ -10,7 +10,6 @@ import { getTemplateName, type Template } from '@kubevirt-utils/resources/templa
 import { ARCHITECTURE_ID, ARCHITECTURE_TITLE } from '@kubevirt-utils/utils/architecture';
 import { Table, TableVariant, Tbody, Th, Thead, Tr } from '@patternfly/react-table';
 import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
-import { CREATE_VM_FORM_FIELDS_VM_DATA } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
 
 import { getTemplateClusterPreference } from '../../../../utils/getTemplateClusterPreference';
 import TemplatesTableRow from './TemplatesTableRow';
@@ -40,7 +39,7 @@ const TemplatesTable: FC<TemplatesTableProps> = ({
   const { control } = useVMWizard();
   const selectedTemplate = useWatch({
     control,
-    name: CREATE_VM_FORM_FIELDS_VM_DATA.SELECTED_TEMPLATE,
+    name: 'template.selectedTemplate',
   });
 
   const activeColumnIDs = useMemo(

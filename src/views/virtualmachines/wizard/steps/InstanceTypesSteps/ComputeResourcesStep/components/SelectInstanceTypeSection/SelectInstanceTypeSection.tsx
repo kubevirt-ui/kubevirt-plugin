@@ -6,10 +6,6 @@ import Loading from '@kubevirt-utils/components/Loading/Loading';
 import useInstanceTypesAndPreferences from '@kubevirt-utils/hooks/useInstanceTypesAndPreferences';
 import { Tab, Tabs } from '@patternfly/react-core';
 import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
-import {
-  CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA,
-  CREATE_VM_FORM_FIELDS_VM_DATA,
-} from '@virtualmachines/wizard/state/vm-wizard-form/consts';
 import RedHatProvidedInstanceTypesSection from '@virtualmachines/wizard/steps/InstanceTypesSteps/ComputeResourcesStep/components/SelectInstanceTypeSection/components/RedHatProvidedInstanceTypesSection/RedHatProvidedInstanceTypesSection';
 import UserProvidedInstanceTypesList from '@virtualmachines/wizard/steps/InstanceTypesSteps/ComputeResourcesStep/components/SelectInstanceTypeSection/components/UserProvidedInstanceTypeList/UserProvidedInstanceTypeList';
 import { getUserProvidedInstanceTypes } from '@virtualmachines/wizard/steps/InstanceTypesSteps/ComputeResourcesStep/components/SelectInstanceTypeSection/components/UserProvidedInstanceTypeList/utils/utils';
@@ -23,11 +19,7 @@ const SelectInstanceTypeSection: FC = () => {
   const { control } = useVMWizard();
   const [cluster, project, selectedInstanceType] = useWatch({
     control,
-    name: [
-      CREATE_VM_FORM_FIELDS_VM_DATA.CLUSTER,
-      CREATE_VM_FORM_FIELDS_VM_DATA.PROJECT,
-      CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.SELECTED_INSTANCE_TYPE,
-    ],
+    name: ['deployment.cluster', 'deployment.project', 'instanceType.compute'],
   });
   const { allInstanceTypes, loaded } = useInstanceTypesAndPreferences(project, cluster);
 

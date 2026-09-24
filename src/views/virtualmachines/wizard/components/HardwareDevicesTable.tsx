@@ -1,18 +1,15 @@
 import type { FC } from 'react';
-import { useWatch } from 'react-hook-form';
 
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getGPUDevices, getHostDevices } from '@kubevirt-utils/resources/vm';
 import { DescriptionList, Stack, StackItem } from '@patternfly/react-core';
-
-import { useVMWizard } from '../state/vm-wizard-context/VMWizardContext';
-import { CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM } from '../state/vm-wizard-form/consts';
+import { useWizardReviewVM } from '@virtualmachines/wizard/hooks/useWizardReviewVM';
 
 const HardwareDevicesTable: FC = () => {
   const { t } = useKubevirtTranslation();
-  const { control } = useVMWizard();
-  const vm = useWatch({ control, name: CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM });
+
+  const vm = useWizardReviewVM();
   const hostDevices = getHostDevices(vm);
   const gpuDevices = getGPUDevices(vm);
   const devices = [...hostDevices, ...gpuDevices];

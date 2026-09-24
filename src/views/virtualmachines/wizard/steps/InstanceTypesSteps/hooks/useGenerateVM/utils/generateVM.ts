@@ -24,7 +24,6 @@ import { getRandomChars, isEmpty } from '@kubevirt-utils/utils/utils';
 import { AutomaticSubscriptionTypeEnum } from '@settings/tabs/ClusterTab/components/GuestManagmentSection/AutomaticSubscriptionRHELGuests/components/AutomaticSubscriptionType/utils/utils';
 import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
 import { type GetMergedMetadataLabelsArgs } from '@virtualmachines/wizard/hooks/types/types';
-import { CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
 import { type VMWizardFormValues } from '@virtualmachines/wizard/state/vm-wizard-form/types';
 
 import { type GenerateVMCallback } from '../types';
@@ -34,12 +33,12 @@ import { getSpecConfiguration } from './generateVMSpecConfig';
 export const generateVM: GenerateVMCallback = ({
   autoAppliedLabels,
   context,
+  deployment,
   getValues,
-  instanceTypeData,
-  vmData,
+  instanceType,
 }) => {
-  const { cluster, description, folder, project } = vmData;
-  const { selectedBootableVolume } = instanceTypeData;
+  const { cluster, description, folder, project } = deployment;
+  const selectedBootableVolume = instanceType.bootVolume?.volume;
   const { adminLabels, userDefaults } = autoAppliedLabels;
 
   const generatedVM: V1VirtualMachine = {
@@ -57,7 +56,7 @@ export const generateVM: GenerateVMCallback = ({
     }),
     spec: getSpecConfiguration({
       context,
-      instanceTypeData,
+      instanceType,
     }),
   };
 
@@ -119,7 +118,7 @@ export const getAdminLabelsToMerge = (
   userDefaults: Record<string, string>,
   getValues: UseFormGetValues<VMWizardFormValues>,
 ): Record<string, string> => {
-  const customizedVM = getValues(CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM);
+  const customizedVM = getValues('customization.vmDraft');
   const existingLabels = customizedVM ? getLabels(customizedVM, {}) : {};
   const adminLabelsToMerge = adminLabels?.reduce<Record<string, string>>((acc, { key, value }) => {
     if (Object.prototype.hasOwnProperty.call(existingLabels, key)) {

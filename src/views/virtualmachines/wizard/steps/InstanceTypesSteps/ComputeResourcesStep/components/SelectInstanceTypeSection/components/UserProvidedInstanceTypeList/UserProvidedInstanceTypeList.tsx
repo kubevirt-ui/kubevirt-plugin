@@ -8,10 +8,6 @@ import { getName } from '@kubevirt-utils/resources/shared';
 import { isAllNamespaces, isEmpty } from '@kubevirt-utils/utils/utils';
 import { ActionList, ActionListItem, Pagination, SearchInput } from '@patternfly/react-core';
 import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
-import {
-  CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA,
-  CREATE_VM_FORM_FIELDS_VM_DATA,
-} from '@virtualmachines/wizard/state/vm-wizard-form/consts';
 import { type InstanceTypes } from '@virtualmachines/wizard/utils/types';
 
 import UserProvidedComputeResourcesEmptyState from './components/UserProvidedComputeResourcesEmptyState';
@@ -34,11 +30,11 @@ const UserProvidedInstanceTypesList: FC<UserProvidedInstanceTypesListProps> = ({
   const { control, setValue } = useVMWizard();
   const selectedInstanceType = useWatch({
     control,
-    name: CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.SELECTED_INSTANCE_TYPE,
+    name: 'instanceType.compute',
   });
   const namespace = useWatch({
     control,
-    name: CREATE_VM_FORM_FIELDS_VM_DATA.PROJECT,
+    name: 'deployment.project',
   });
 
   const [searchInput, setSearchInput] = useState('');
@@ -73,9 +69,10 @@ const UserProvidedInstanceTypesList: FC<UserProvidedInstanceTypesListProps> = ({
   }
 
   const handleRowClick = (instanceTypeName: string, instanceTypeNamespace: string): void => {
-    setValue(CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.SELECTED_INSTANCE_TYPE, {
+    setValue('instanceType.compute', {
       name: instanceTypeName,
       namespace: instanceTypeNamespace,
+      type: 'user',
     });
   };
 

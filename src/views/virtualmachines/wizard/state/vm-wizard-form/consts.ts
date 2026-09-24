@@ -1,12 +1,7 @@
-import { type FieldPath } from 'react-hook-form';
-
-import {
-  type CreateInitialVMWizardFormValuesArgs,
-  type VMWizardFormValues,
-} from '@virtualmachines/wizard/state/vm-wizard-form/types';
 import { OperatingSystemType } from '@virtualmachines/wizard/steps/InstanceTypesSteps/GuestOSStep/utils/constants';
 import { VMCreationMethod, VMWizardStep } from '@virtualmachines/wizard/utils/constants';
 
+import { type CreateInitialVMWizardFormValuesArgs, type VMWizardFormValues } from './types';
 export const createInitialVMWizardFormValues = ({
   cluster,
   creationMethod,
@@ -14,84 +9,39 @@ export const createInitialVMWizardFormValues = ({
   folder,
   name,
   project,
-}: CreateInitialVMWizardFormValuesArgs): VMWizardFormValues => ({
-  customizedVM: null,
-  instanceTypeData: {
-    customDiskSize: '',
-    dvSource: null,
-    operatingSystemType: OperatingSystemType.RHEL,
-    preference: null,
-    pvcSource: null,
-    selectedBootableVolume: null,
-    selectedInstanceType: null,
-    selectedSeries: '',
-    selectedSize: '',
-    useBootSource: true,
-    volumeListNamespace: '',
-    volumeSnapshotSource: null,
-  },
-  stepNavigation: {
-    currentStep: VMWizardStep.DEPLOYMENT_DETAILS,
-    visitedSteps: new Set([VMWizardStep.DEPLOYMENT_DETAILS]),
-  },
-  uiState: {
-    isTemplatesDrawerOpen: false,
-    lastProcessedTemplateKey: '',
-    shouldCheckVMNameProperly: false,
+}: CreateInitialVMWizardFormValuesArgs = {}): VMWizardFormValues => ({
+  clone: { sourceVM: null },
+  creationMethod: creationMethod ?? VMCreationMethod.INSTANCE_TYPE,
+  customization: {
+    autoLabelsApplied: false,
+    pendingBootableVolumeUploadKeys: [],
     templateAdditionalObjects: [],
-    templateProcessError: null,
+    vmDraft: null,
   },
-  vmData: {
-    autoLabelsMerged: false,
+  deployment: {
     cluster: cluster ?? '',
-    creationMethod: creationMethod ?? VMCreationMethod.INSTANCE_TYPE,
     description: description ?? '',
     folder: folder ?? '',
     name: name ?? undefined,
     project: project ?? '',
+  },
+  instanceType: {
+    bootVolume: null,
+    compute: null,
+    operatingSystem: OperatingSystemType.RHEL,
+    preference: null,
+    useBootSource: true,
+    volumeNamespace: '',
+  },
+  navigation: {
+    currentStep: VMWizardStep.DEPLOYMENT_DETAILS,
+    strictVMName: false,
+    visitedSteps: new Set([VMWizardStep.DEPLOYMENT_DETAILS]),
+  },
+  template: {
+    isDrawerOpen: false,
+    lastProcessedKey: '',
+    processError: null,
     selectedTemplate: null,
   },
 });
-
-export const CREATE_VM_FORM_FIELDS_VM_DATA = {
-  AUTO_LABELS_MERGED: 'vmData.autoLabelsMerged',
-  CLUSTER: 'vmData.cluster',
-  CREATION_METHOD: 'vmData.creationMethod',
-  DESCRIPTION: 'vmData.description',
-  FOLDER: 'vmData.folder',
-  NAME: 'vmData.name',
-  PROJECT: 'vmData.project',
-  ROOT: 'vmData',
-  SELECTED_TEMPLATE: 'vmData.selectedTemplate',
-} as const satisfies Record<string, FieldPath<VMWizardFormValues>>;
-
-export const CREATE_VM_FORM_FIELDS_UI_STATE = {
-  IS_TEMPLATES_DRAWER_OPEN: 'uiState.isTemplatesDrawerOpen',
-  LAST_PROCESSED_TEMPLATE_KEY: 'uiState.lastProcessedTemplateKey',
-  SHOULD_CHECK_VM_NAME_PROPERLY: 'uiState.shouldCheckVMNameProperly',
-  TEMPLATE_ADDITIONAL_OBJECTS: 'uiState.templateAdditionalObjects',
-  TEMPLATE_PROCESS_ERROR: 'uiState.templateProcessError',
-} as const satisfies Record<string, FieldPath<VMWizardFormValues>>;
-
-export const CREATE_VM_FORM_FIELDS_STEP_NAVIGATION = {
-  CURRENT_STEP: 'stepNavigation.currentStep',
-  VISITED_STEPS: 'stepNavigation.visitedSteps',
-} as const satisfies Record<string, FieldPath<VMWizardFormValues>>;
-
-export const CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM =
-  'customizedVM' as const satisfies FieldPath<VMWizardFormValues>;
-
-export const CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA = {
-  CUSTOM_DISK_SIZE: 'instanceTypeData.customDiskSize',
-  DV_SOURCE: 'instanceTypeData.dvSource',
-  OPERATING_SYSTEM_TYPE: 'instanceTypeData.operatingSystemType',
-  PREFERENCE: 'instanceTypeData.preference',
-  PVC_SOURCE: 'instanceTypeData.pvcSource',
-  ROOT: 'instanceTypeData',
-  SELECTED_BOOTABLE_VOLUME: 'instanceTypeData.selectedBootableVolume',
-  SELECTED_INSTANCE_TYPE: 'instanceTypeData.selectedInstanceType',
-  SELECTED_SERIES: 'instanceTypeData.selectedSeries',
-  SELECTED_SIZE: 'instanceTypeData.selectedSize',
-  USE_BOOT_SOURCE: 'instanceTypeData.useBootSource',
-  VOLUME_LIST_NAMESPACE: 'instanceTypeData.volumeListNamespace',
-} as const satisfies Record<string, FieldPath<VMWizardFormValues>>;

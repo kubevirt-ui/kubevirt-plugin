@@ -17,17 +17,13 @@ type VMSpec = NonNullable<V1VirtualMachine['spec']>;
 
 export const getSpecConfiguration = ({
   context,
-  instanceTypeData,
+  instanceType,
 }: GenerateVMSpecConfiguration): VMSpec => {
-  const {
-    customDiskSize,
-    dvSource,
-    preference,
-    pvcSource,
-    selectedBootableVolume,
-    selectedInstanceType,
-    useBootSource,
-  } = instanceTypeData;
+  const { bootVolume, compute: selectedInstanceType, preference, useBootSource } = instanceType;
+  const selectedBootableVolume = bootVolume?.volume;
+  const customDiskSize = bootVolume?.diskSize;
+  const dvSource = bootVolume?.dataVolumeSource;
+  const pvcSource = bootVolume?.persistentVolumeClaimSource;
   const {
     enableMultiArchBootImageImport,
     isIPv6SingleStack,
@@ -64,9 +60,10 @@ export const getSpecConfiguration = ({
       }),
     ...(instanceTypeName && {
       instancetype: {
-        ...(selectedInstanceType?.namespace && {
-          kind: VirtualMachineInstancetypeModel.kind,
-        }),
+        ...(selectedInstanceType?.type === 'user' &&
+          selectedInstanceType.namespace && {
+            kind: VirtualMachineInstancetypeModel.kind,
+          }),
         name: instanceTypeName,
       },
     }),

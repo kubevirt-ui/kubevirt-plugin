@@ -15,7 +15,7 @@ const RedHatProvidedInstanceTypesSection: FC<RedHatProvidedInstanceTypesSectionP
   redHatMenuItems,
 }) => {
   const { control } = useVMWizard();
-  const selectedSeries = useWatch({ control, name: 'instanceTypeData.selectedSeries' });
+  const selectedSeries = useWatch({ control, name: 'instanceType.compute.series' });
 
   const sizes = redHatMenuItems?.items?.find((item) => item?.seriesName === selectedSeries)?.sizes;
 

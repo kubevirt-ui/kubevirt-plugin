@@ -5,7 +5,6 @@ import useCreateCustomizedVM from '@virtualmachines/wizard/hooks/useCreateCustom
 import { isCloneCreationMethod } from '@virtualmachines/wizard/utils/utils';
 
 import { useVMWizard } from '../state/vm-wizard-context/VMWizardContext';
-import { CREATE_VM_FORM_FIELDS_VM_DATA } from '../state/vm-wizard-form/consts';
 
 type UseCreateVM = () => {
   createVM: () => Promise<void>;
@@ -15,7 +14,7 @@ type UseCreateVM = () => {
 
 const useCreateVM: UseCreateVM = () => {
   const { control } = useVMWizard();
-  const creationMethod = useWatch({ control, name: CREATE_VM_FORM_FIELDS_VM_DATA.CREATION_METHOD });
+  const creationMethod = useWatch({ control, name: 'creationMethod' });
   const { cloneVM, error: cloneError, isSubmitting: isCloneSubmitting } = useCloneVM();
   const {
     createCustomizedVM,

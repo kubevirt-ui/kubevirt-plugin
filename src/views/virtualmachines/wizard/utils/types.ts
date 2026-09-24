@@ -98,7 +98,7 @@ export type HandleWizardStepClick = {
 
 export type HandleCloneRequestPhaseChangeParams = {
   cloneRequest: undefined | V1beta1VirtualMachineClone;
-  formValues: VMWizardFormValues['vmData'];
+  formValues: VMWizardFormValues['deployment'];
   navigate: NavigateFunction;
   setError: (error: unknown) => void;
   setIsSubmitting: (isSubmitting: boolean) => void;

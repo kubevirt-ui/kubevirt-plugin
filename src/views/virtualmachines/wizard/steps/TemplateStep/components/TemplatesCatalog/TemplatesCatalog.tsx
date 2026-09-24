@@ -8,10 +8,6 @@ import { type Template } from '@kubevirt-utils/resources/template';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Card, Split, SplitItem } from '@patternfly/react-core';
 import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
-import {
-  CREATE_VM_FORM_FIELDS_UI_STATE,
-  CREATE_VM_FORM_FIELDS_VM_DATA,
-} from '@virtualmachines/wizard/state/vm-wizard-form/consts';
 import TemplatesCatalogEmptyState from '@virtualmachines/wizard/steps/TemplateStep/components/TemplatesCatalog/components/TemplatesCatalogEmptyState';
 import TemplatesCatalogItems from '@virtualmachines/wizard/steps/TemplateStep/components/TemplatesCatalog/components/TemplatesCatalogItems/TemplatesCatalogItems';
 import CatalogSkeleton from '@virtualmachines/wizard/steps/TemplateStep/components/TemplatesCatalog/components/TemplatesCatalogSkeleton';
@@ -43,16 +39,16 @@ const TemplatesCatalog: FC = () => {
   const { control, setValue } = useVMWizard();
   const selectedTemplate = useWatch({
     control,
-    name: CREATE_VM_FORM_FIELDS_VM_DATA.SELECTED_TEMPLATE,
+    name: 'template.selectedTemplate',
   });
 
   const handleTemplateSelect = useCallback(
     (template: Template) => {
-      setValue(CREATE_VM_FORM_FIELDS_VM_DATA.SELECTED_TEMPLATE, template);
-      setValue(CREATE_VM_FORM_FIELDS_UI_STATE.TEMPLATE_PROCESS_ERROR, null);
-      setValue(CREATE_VM_FORM_FIELDS_UI_STATE.LAST_PROCESSED_TEMPLATE_KEY, '');
+      setValue('template.selectedTemplate', template);
+      setValue('template.processError', null);
+      setValue('template.lastProcessedKey', '');
       logTemplateFlowEvent(TEMPLATE_SELECTED, template);
-      setValue(CREATE_VM_FORM_FIELDS_UI_STATE.IS_TEMPLATES_DRAWER_OPEN, true);
+      setValue('template.isDrawerOpen', true);
     },
     [setValue],
   );

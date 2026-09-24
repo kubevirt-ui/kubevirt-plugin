@@ -5,10 +5,6 @@ import { useWatch } from 'react-hook-form';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Stack, StackItem, Title, TitleSizes } from '@patternfly/react-core';
 import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
-import {
-  CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM,
-  CREATE_VM_FORM_FIELDS_VM_DATA,
-} from '@virtualmachines/wizard/state/vm-wizard-form/consts';
 import CustomizeVirtualMachine from '@virtualmachines/wizard/steps/CustomizationStep/components/CustomizeVirtualMachine/CustomizeVirtualMachine';
 import { VMCreationMethod } from '@virtualmachines/wizard/utils/constants';
 import { patchWizardCustomizedVM } from '@virtualmachines/wizard/utils/patchWizardCustomizedVM';
@@ -19,7 +15,7 @@ import { getAdminLabelsToMerge } from '../InstanceTypesSteps/hooks/useGenerateVM
 const CustomizationStep: FC = () => {
   const { t } = useKubevirtTranslation();
   const { control, getValues, setValue } = useVMWizard();
-  const creationMethod = useWatch({ control, name: CREATE_VM_FORM_FIELDS_VM_DATA.CREATION_METHOD });
+  const creationMethod = useWatch({ control, name: 'creationMethod' });
   const { adminLabels, generatedVM, loaded, userDefaults } = useGenerateVM();
 
   const hasSeededCustomizedVMRef = useRef(false);
@@ -36,13 +32,13 @@ const CustomizationStep: FC = () => {
           path: ['metadata', 'labels'],
         },
       ]);
-      setValue(CREATE_VM_FORM_FIELDS_VM_DATA.AUTO_LABELS_MERGED, true);
+      setValue('customization.autoLabelsApplied', true);
       hasSeededCustomizedVMRef.current = true;
       return;
     }
 
-    setValue(CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM, generatedVM);
-    setValue(CREATE_VM_FORM_FIELDS_VM_DATA.AUTO_LABELS_MERGED, true);
+    setValue('customization.vmDraft', generatedVM);
+    setValue('customization.autoLabelsApplied', true);
     hasSeededCustomizedVMRef.current = true;
   }, [adminLabels, creationMethod, generatedVM, getValues, loaded, setValue, userDefaults]);
 

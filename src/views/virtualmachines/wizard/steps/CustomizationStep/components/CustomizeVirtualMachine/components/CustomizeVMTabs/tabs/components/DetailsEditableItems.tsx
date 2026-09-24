@@ -14,7 +14,6 @@ import { DESCRIPTION_ANNOTATION, getHostname } from '@kubevirt-utils/resources/v
 import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
 import { useSyncDeploymentDetailsAndMetadataFields } from '@virtualmachines/wizard/hooks/useSyncDeploymentDetailsAndMetadataFields';
 import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
-import { CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
 import { patchWizardCustomizedVM } from '@virtualmachines/wizard/utils/patchWizardCustomizedVM';
 
 import CPUMemory from './CPUMemory';
@@ -31,7 +30,7 @@ const DetailsEditableItems: FC<DetailsEditableItemsProps> = ({ treeViewFoldersEn
     useSyncDeploymentDetailsAndMetadataFields();
 
   const { control } = useVMWizard();
-  const vm = useWatch({ control, name: CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM });
+  const vm = useWatch({ control, name: 'customization.vmDraft' });
   const vmName = getName(vm);
   const hostname = getHostname(vm);
 

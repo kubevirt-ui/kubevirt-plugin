@@ -8,10 +8,6 @@ import { PageSection } from '@patternfly/react-core';
 import MetadataTabContent from '@virtualmachines/details/tabs/configuration/metadata/components/MetadataTabContent';
 import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
 import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
-import {
-  CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM,
-  CREATE_VM_FORM_FIELDS_VM_DATA,
-} from '@virtualmachines/wizard/state/vm-wizard-form/consts';
 import { type VMWizardFormValues } from '@virtualmachines/wizard/state/vm-wizard-form/types';
 import { patchWizardCustomizedVM } from '@virtualmachines/wizard/utils/patchWizardCustomizedVM';
 
@@ -19,7 +15,7 @@ import '@virtualmachines/details/tabs/configuration/metadata/metadata-tab.scss';
 
 const CustomizeInstanceTypeMetadataTab: FC = () => {
   const { control, getValues, setValue } = useVMWizard();
-  const vm = useWatch({ control, name: CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM });
+  const vm = useWatch({ control, name: 'customization.vmDraft' });
 
   const updateMetadata = useCallback(
     (data: Record<string, string>, type: string) => {
@@ -53,7 +49,7 @@ const CustomizeInstanceTypeMetadataTab: FC = () => {
 
   const onLabelsSubmit = useCallback(
     (labels: Record<string, string>) =>
-      syncMetadataWithForm(labels, 'labels', VM_FOLDER_LABEL, CREATE_VM_FORM_FIELDS_VM_DATA.FOLDER),
+      syncMetadataWithForm(labels, 'labels', VM_FOLDER_LABEL, 'deployment.folder'),
     [syncMetadataWithForm],
   );
 
@@ -63,7 +59,7 @@ const CustomizeInstanceTypeMetadataTab: FC = () => {
         annotations,
         'annotations',
         DESCRIPTION_ANNOTATION,
-        CREATE_VM_FORM_FIELDS_VM_DATA.DESCRIPTION,
+        'deployment.description',
       ),
     [syncMetadataWithForm],
   );

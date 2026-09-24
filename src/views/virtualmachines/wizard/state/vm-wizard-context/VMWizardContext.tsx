@@ -4,10 +4,7 @@ import { FormProvider, useForm, useFormContext, type UseFormReturn } from 'react
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { getErrorMessage, isEmpty } from '@kubevirt-utils/utils/utils';
 import useWizardInitialValues from '@virtualmachines/wizard/hooks/useWizardInitialValues';
-import {
-  CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM,
-  createInitialVMWizardFormValues,
-} from '@virtualmachines/wizard/state/vm-wizard-form/consts';
+import { createInitialVMWizardFormValues } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
 import { type VMWizardFormValues } from '@virtualmachines/wizard/state/vm-wizard-form/types';
 import { clearVMPendingUploads } from '@virtualmachines/wizard/utils/utils';
 
@@ -22,11 +19,8 @@ export const VMWizardProvider: FC<VMWizardProviderProps> = ({ children }) => {
     defaultValues: createInitialVMWizardFormValues({ cluster, project: namespace }),
   });
 
-  const { getValues } = methods;
-  useEffect(
-    () => (): void => clearVMPendingUploads(getValues(CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM)),
-    [getValues],
-  );
+  const { getValues, setValue } = methods;
+  useEffect(() => (): void => clearVMPendingUploads(getValues, setValue), [getValues, setValue]);
 
   if (isLoadingHubCluster) {
     return <Loading />;

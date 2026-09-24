@@ -14,11 +14,6 @@ import { getVMURL, isACMPath } from '@multicluster/urls';
 import { useK8sModels } from '@openshift-console/dynamic-plugin-sdk';
 
 import { useVMWizard } from '../state/vm-wizard-context/VMWizardContext';
-import {
-  CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM,
-  CREATE_VM_FORM_FIELDS_UI_STATE,
-  CREATE_VM_FORM_FIELDS_VM_DATA,
-} from '../state/vm-wizard-form/consts';
 import { SELECTED_CLUSTER } from '../utils/constants';
 import { isTemplateCreationMethod } from '../utils/utils';
 import { createTemplateAdditionalObjects } from './utils/templateAdditionalObjects';
@@ -40,8 +35,8 @@ const useCreateCustomizedVM: UseCreateCustomizedVM = () => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const { control, getValues } = useVMWizard();
-  const cluster = useWatch({ control, name: CREATE_VM_FORM_FIELDS_VM_DATA.CLUSTER });
-  const vmNamespaceTarget = useWatch({ control, name: CREATE_VM_FORM_FIELDS_VM_DATA.PROJECT });
+  const cluster = useWatch({ control, name: 'deployment.cluster' });
+  const vmNamespaceTarget = useWatch({ control, name: 'deployment.project' });
   const isIPv6SingleStack = useIsIPv6SingleStackCluster(cluster);
   const [isUDNManagedNamespace] = useNamespaceUDN(vmNamespaceTarget, cluster);
 
@@ -53,15 +48,11 @@ const useCreateCustomizedVM: UseCreateCustomizedVM = () => {
   );
 
   const createCustomizedVM = async (): Promise<void> => {
-    const {
-      creationMethod,
-      name: vmName,
-      selectedTemplate,
-    } = getValues(CREATE_VM_FORM_FIELDS_VM_DATA.ROOT);
-    const templateAdditionalObjects = getValues(
-      CREATE_VM_FORM_FIELDS_UI_STATE.TEMPLATE_ADDITIONAL_OBJECTS,
-    );
-    const storeVM = getValues(CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM);
+    const { name: vmName } = getValues('deployment');
+    const creationMethod = getValues('creationMethod');
+    const selectedTemplate = getValues('template.selectedTemplate');
+    const templateAdditionalObjects = getValues('customization.templateAdditionalObjects');
+    const storeVM = getValues('customization.vmDraft');
 
     if (!storeVM) {
       const emptyPayloadError = new Error(t('Cannot create VM: customized VM payload is empty'));

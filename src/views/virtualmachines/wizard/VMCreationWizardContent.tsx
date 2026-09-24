@@ -15,11 +15,6 @@ import RequiredLabelsDrawerWrapper from './components/RequiredLabelsDrawerWrappe
 import TemplatesDrawerWrapper from './components/TemplatesDrawerWrapper';
 import useVMGenerationNavClick from './hooks/useVMGenerationNavClick';
 import { useVMWizard } from './state/vm-wizard-context/VMWizardContext';
-import {
-  CREATE_VM_FORM_FIELDS_STEP_NAVIGATION,
-  CREATE_VM_FORM_FIELDS_UI_STATE,
-  CREATE_VM_FORM_FIELDS_VM_DATA,
-} from './state/vm-wizard-form/consts';
 import { type VMCreationMethod, VMWizardStep } from './utils/constants';
 import { getStepsToDisplayByCreationMethod } from './utils/displaySteps';
 import { type VMWizardStepDisplay } from './utils/types';
@@ -33,7 +28,7 @@ const VMCreationWizardContent: FC = () => {
 
   const { isNextDisabledForStep, isStepDisabled } = useWizardStepValidation();
   const { control, getValues, setValue } = useVMWizard();
-  const creationMethod = useWatch({ control, name: CREATE_VM_FORM_FIELDS_VM_DATA.CREATION_METHOD });
+  const creationMethod = useWatch({ control, name: 'creationMethod' });
   const navItemConfig = useVMGenerationNavClick(creationMethod);
   const { syncOnDeploymentDetailsStepChange } = useSyncDeploymentDetailsAndMetadataFields();
   const hasLoggedCreationStartedRef = useRef(false);
@@ -53,11 +48,11 @@ const VMCreationWizardContent: FC = () => {
     (currentStep: WizardStepType, prevStep: WizardStepType) => {
       syncOnDeploymentDetailsStepChange(currentStep, prevStep);
       if (currentStep?.id !== VMWizardStep.TEMPLATE) {
-        setValue(CREATE_VM_FORM_FIELDS_UI_STATE.IS_TEMPLATES_DRAWER_OPEN, false);
+        setValue('template.isDrawerOpen', false);
       }
 
       if (currentStep?.id) {
-        setValue(CREATE_VM_FORM_FIELDS_STEP_NAVIGATION.CURRENT_STEP, String(currentStep.id));
+        setValue('navigation.currentStep', String(currentStep.id));
         markStepVisited(String(currentStep.id), getValues, setValue);
       }
 

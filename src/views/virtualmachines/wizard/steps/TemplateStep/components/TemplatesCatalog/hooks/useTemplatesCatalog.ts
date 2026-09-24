@@ -20,7 +20,6 @@ import {
 import { getTemplateOS } from '@kubevirt-utils/resources/template/utils/selectors';
 import useVirtualMachineTemplatesFilters from '@templates/list/filters/useVirtualMachineTemplatesFilters';
 import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
-import { CREATE_VM_FORM_FIELDS_VM_DATA } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
 import useTemplatesWithAvailableSource from '@virtualmachines/wizard/steps/TemplateStep/components/TemplatesCatalog/hooks/useTemplatesWithAvailableSource/useTemplatesWithAvailableSource';
 
 import { buildOSDisplayNameMap } from '../../../utils/buildOSDisplayNameMap';
@@ -46,7 +45,7 @@ type UseTemplatesCatalogReturn = {
 
 const useTemplatesCatalog = (): UseTemplatesCatalogReturn => {
   const { control } = useVMWizard();
-  const cluster = useWatch({ control, name: CREATE_VM_FORM_FIELDS_VM_DATA.CLUSTER });
+  const cluster = useWatch({ control, name: 'deployment.cluster' });
   const { isList, namespace, setIsList, setNamespace } = useCatalogUIState();
 
   const { availableDataSources, availableTemplatesUID, bootSourcesLoaded, loaded, templates } =
