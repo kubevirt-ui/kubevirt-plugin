@@ -9,7 +9,7 @@ import {
   createInitialVMWizardFormValues,
 } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
 import { type VMWizardFormValues } from '@virtualmachines/wizard/state/vm-wizard-form/types';
-import { clearVMPendingUploadsAndSignal } from '@virtualmachines/wizard/utils/utils';
+import { clearVMPendingUploads } from '@virtualmachines/wizard/utils/utils';
 
 type VMWizardProviderProps = {
   children?: ReactNode;
@@ -24,8 +24,7 @@ export const VMWizardProvider: FC<VMWizardProviderProps> = ({ children }) => {
 
   const { getValues } = methods;
   useEffect(
-    () => (): void =>
-      clearVMPendingUploadsAndSignal(getValues(CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM)),
+    () => (): void => clearVMPendingUploads(getValues(CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM)),
     [getValues],
   );
 

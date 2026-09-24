@@ -10,13 +10,15 @@ import {
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { type PatchCustomizeWizardVMSignalArgs } from '@kubevirt-utils/signals/customizeWizardVMSignal';
 import { PageSection, Title } from '@patternfly/react-core';
 import AddNetworkInterfaceButton from '@virtualmachines/details/tabs/configuration/network/components/AddNetworkInterfaceButton';
 import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
 import { CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
 import NetworkInterfaceList from '@virtualmachines/wizard/steps/CustomizationStep/components/CustomizeVirtualMachine/components/CustomizeVMTabs/tabs/network/NetworkInterfaceList';
-import { patchWizardCustomizedVM } from '@virtualmachines/wizard/utils/patchWizardCustomizedVM';
+import {
+  patchWizardCustomizedVM,
+  type PatchWizardCustomizedVMArgs,
+} from '@virtualmachines/wizard/utils/patchWizardCustomizedVM';
 
 const CustomizeInstanceTypeNetworkTab: FC = () => {
   const { t } = useKubevirtTranslation();
@@ -33,7 +35,7 @@ const CustomizeInstanceTypeNetworkTab: FC = () => {
     updatedInterfaces: V1Interface[],
     updatedDisks?: V1Disk[],
   ): Promise<V1VirtualMachine> => {
-    const updates: PatchCustomizeWizardVMSignalArgs = [
+    const updates: PatchWizardCustomizedVMArgs = [
       { data: updatedNetworks, path: 'spec.template.spec.networks' },
       { data: updatedInterfaces, path: 'spec.template.spec.domain.devices.interfaces' },
     ];
