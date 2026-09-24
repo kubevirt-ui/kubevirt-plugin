@@ -977,6 +977,7 @@ export default class VirtualMachinesPage extends TreeContextMenuMixin(PageCommon
     if (options?.closeWelcomeModal) {
       await this.tryCloseWelcomeModal();
     }
+    await this.waitForTreeViewReady();
     await this.toggleEmptyProjectsDisplay(true);
     await this.searchTreeView(namespace);
     await this.clickProjectNode(namespace);
@@ -1021,6 +1022,7 @@ export default class VirtualMachinesPage extends TreeContextMenuMixin(PageCommon
     await this.clickNavVirtualMachines();
     await this.page.waitForLoadState('domcontentloaded');
     await this.tryCloseWelcomeModal();
+    await this.waitForTreeViewReady();
     await this.toggleEmptyProjectsDisplay(true);
     await this.searchTreeView(namespace);
     await this.clickTreeNodeAndEnsureExpanded(namespace, vmName, namespace);
@@ -1339,6 +1341,10 @@ export default class VirtualMachinesPage extends TreeContextMenuMixin(PageCommon
 
   async verifyVmsTreeviewExists(): Promise<boolean> {
     return this.tree.verifyVmsTreeviewExists();
+  }
+
+  async waitForTreeViewReady(timeout?: number): Promise<void> {
+    return this.tree.waitForTreeViewReady(timeout);
   }
 
   async waitForFolderToDisappear(

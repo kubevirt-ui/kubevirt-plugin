@@ -20,13 +20,12 @@ export default class ModalComponent extends BaseComponent {
 
   private async _tryCloseGenericBackdropModal(): Promise<boolean> {
     try {
-      await this.page.waitForLoadState('networkidle').catch(() => undefined);
       const backdrop = this.page.locator('.pf-v5-c-backdrop, .pf-v6-c-backdrop');
-      await backdrop.waitFor({ state: 'visible', timeout: TestTimeouts.UI_DELAY_MEDIUM });
+      await backdrop.waitFor({ state: 'visible', timeout: TestTimeouts.UI_DELAY_SHORT });
 
       const closeBtn = this.page.locator('[aria-label="Close"]').first();
       await closeBtn.click({ force: true, timeout: TestTimeouts.UI_DELAY_SHORT });
-      await backdrop.waitFor({ state: 'hidden', timeout: TestTimeouts.UI_ACTION_COMPLETE });
+      await backdrop.waitFor({ state: 'hidden', timeout: TestTimeouts.UI_DELAY_MEDIUM });
       return true;
     } catch {
       return false;
@@ -156,7 +155,7 @@ export default class ModalComponent extends BaseComponent {
         await this.robustClick(this._welcomeModalCloseButton);
         await this._welcomeModal.waitFor({
           state: 'hidden',
-          timeout: TestTimeouts.UI_ACTION_COMPLETE,
+          timeout: TestTimeouts.UI_DELAY_MEDIUM,
         });
         return true;
       } catch {
@@ -169,7 +168,7 @@ export default class ModalComponent extends BaseComponent {
           await this.robustClick(modalCloseButton);
           await this._welcomeModal.waitFor({
             state: 'hidden',
-            timeout: TestTimeouts.UI_ACTION_COMPLETE,
+            timeout: TestTimeouts.UI_DELAY_MEDIUM,
           });
           return true;
         } catch {
