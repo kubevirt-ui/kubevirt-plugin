@@ -67,7 +67,12 @@ const BlankDiskModal: FC<V1SubDiskModalProps> = ({
         <DiskTypeSelect isVMRunning={isVMRunning} />
         <DiskInterfaceSelect isVMRunning={isVMRunning} />
         {!isCreated && <StorageClassAndPreallocation vm={vm} />}
-        <AdvancedSettings olsObj={pvc} showApplyStorageProfileSettings={!isCreated} />
+        <AdvancedSettings
+          editDiskName={editDiskName}
+          olsObj={pvc}
+          showApplyStorageProfileSettings={!isCreated}
+          vm={vm}
+        />
       </TabModal>
     </FormProvider>
   );

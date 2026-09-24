@@ -59,6 +59,7 @@ export const getDiskRowDataLayout = (
       metadata: { name: volume?.name },
       name: volume?.name,
       namespace: getNamespace(pvc),
+      serial: disk?.serial,
       size: NO_DATA_DASH,
       source: OTHER,
       storageClass: dataVolumeTemplate?.spec?.storage?.storageClassName ?? NO_DATA_DASH,

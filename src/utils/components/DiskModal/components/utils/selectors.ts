@@ -12,6 +12,7 @@ export const getPVCClaimName = (diskState: V1DiskFormState): string =>
 
 export const getLunReservation = (disk: V1Disk): boolean => disk?.lun?.reservation;
 export const getDiskSharable = (disk: V1Disk): boolean => disk?.shareable;
+export const getDiskSerial = (disk: V1Disk): string | undefined => disk?.serial;
 
 export const getErrorPVCName = (errors: FieldErrorsImpl<V1DiskFormState>): FieldError =>
   errors?.dataVolumeTemplate?.spec?.source?.pvc?.name;

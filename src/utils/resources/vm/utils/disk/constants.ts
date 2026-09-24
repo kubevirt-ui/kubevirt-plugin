@@ -24,6 +24,7 @@ export type DiskRowDataLayout = {
   metadata: { name: string };
   name: string;
   namespace?: string;
+  serial?: string;
   size: string;
   source: string;
   sourceStatus?: string;

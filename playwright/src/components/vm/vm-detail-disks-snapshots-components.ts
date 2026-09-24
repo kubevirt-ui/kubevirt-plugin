@@ -1070,6 +1070,124 @@ export class VirtualMachineDetailDisksComponent extends BaseComponent {
       return false;
     }
   }
+  async addBlankDiskWithSerial(
+    diskName: string,
+    serial: string,
+    size = '1',
+    storageClass?: string,
+  ): Promise<boolean> {
+    const visibleWait = {
+      state: 'visible' as const,
+      timeout: TestTimeouts.INSTANCE_TYPE_VERIFICATION,
+    };
+    try {
+      await this.navigateToConfigurationStorage();
+
+      await this._addDiskButtonInStorage.waitFor({
+        state: 'visible',
+        timeout: TestTimeouts.VM_CREATION,
+      });
+      await this.robustClick(this._addDiskButtonInStorage);
+
+      await this._blankDiskOption.waitFor({ state: 'visible', timeout: TestTimeouts.VM_CREATION });
+      await this.robustClick(this._blankDiskOption);
+
+      const diskNameField = this.page
+        .locator('[role="dialog"] #name, #tab-modal #name, input[name="disk.name"]')
+        .first();
+      await diskNameField.waitFor(visibleWait);
+      await diskNameField.clear();
+      await diskNameField.fill(diskName);
+
+      if (size) {
+        const sizeInputExists = await this._inputInput
+          .isVisible({ timeout: TestTimeouts.UI_DELAY_LONG })
+          .catch(() => false);
+        if (sizeInputExists) {
+          await this._inputInput.clear();
+          for (let i = 0; i < parseInt(size); i++) {
+            await this.robustClick(this.locator('button[aria-label="Increment"]'));
+          }
+        }
+      }
+
+      if (storageClass) {
+        await this._storageClassSelect.waitFor(visibleWait);
+        await this.robustClick(this._storageClassSelect);
+        const storageClassOption = this.getStorageClassOption(storageClass);
+        await storageClassOption.waitFor(visibleWait);
+        await this.robustClick(storageClassOption);
+      }
+
+      await this._advancedSettingsButton.waitFor(visibleWait);
+      await this.robustClick(this._advancedSettingsButton);
+
+      const serialInput = this.testId('disk-serial-input');
+      await serialInput.waitFor(visibleWait);
+      await serialInput.fill(serial);
+
+      await this.clickDialogSaveButton();
+      await this.page.waitForTimeout(TestTimeouts.UI_DELAY_EXTRA);
+
+      return (
+        (await this.verifyDiskNameExists(diskName)) || (await this.verifyDiskExists(diskName))
+      );
+    } catch {
+      return false;
+    }
+  }
+
+  async getDiskSerialValue(diskName: string): Promise<string | null> {
+    try {
+      const cell = this.testId(`disk-serial-${diskName}`).first();
+      await cell.waitFor({
+        state: 'visible',
+        timeout: TestTimeouts.INSTANCE_TYPE_VERIFICATION,
+      });
+      return (await cell.textContent())?.trim() || null;
+    } catch {
+      return null;
+    }
+  }
+
+  async editDiskSerial(diskName: string, newSerial: string): Promise<boolean> {
+    const visibleWait = {
+      state: 'visible' as const,
+      timeout: TestTimeouts.INSTANCE_TYPE_VERIFICATION,
+    };
+    try {
+      await this.navigateToConfigurationStorage();
+
+      const diskRow = this.getDiskRow(diskName);
+      await diskRow.waitFor({ state: 'visible', timeout: TestTimeouts.VM_CREATION });
+
+      const actionsBtn = diskRow.locator(this._diskRowActionsButton);
+      await actionsBtn.waitFor(visibleWait);
+      await this.robustClick(actionsBtn);
+
+      const editBtn = this.locator('[role="menu"] button', { hasText: 'Edit' });
+      await editBtn.waitFor(visibleWait);
+      await this.robustClick(editBtn);
+
+      await this._roleDialog.filter({ hasText: 'Edit' }).waitFor(visibleWait);
+
+      await this._advancedSettingsButton.waitFor(visibleWait);
+      await this.robustClick(this._advancedSettingsButton);
+
+      const serialInput = this.testId('disk-serial-input');
+      await serialInput.waitFor(visibleWait);
+      await serialInput.clear();
+      await serialInput.fill(newSerial);
+
+      await this.clickDialogSaveButton();
+      await this.page.waitForTimeout(TestTimeouts.UI_DELAY_EXTRA);
+
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
   async verifyDiskDoesNotExist(diskName: string): Promise<boolean> {
     try {
       await this.navigateToConfigurationStorage();

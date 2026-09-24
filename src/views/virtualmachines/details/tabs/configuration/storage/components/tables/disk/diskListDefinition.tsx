@@ -87,6 +87,15 @@ export const getDiskListColumns = (
     sortable: true,
   },
   {
+    getValue: (row) => row.serial ?? '',
+    key: 'serial',
+    label: t('Serial'),
+    renderCell: (row) => (
+      <span data-test={`disk-serial-${row.name}`}>{row.serial ?? NO_DATA_DASH}</span>
+    ),
+    sortable: true,
+  },
+  {
     getValue: (row) => row.storageClass ?? '',
     key: 'storage-class',
     label: t('Storage class'),

@@ -144,7 +144,7 @@ const UploadDiskModal: FC<V1SubDiskModalProps> = ({
         <DiskTypeSelect isVMRunning={isVMRunning} />
         <DiskInterfaceSelect isVMRunning={isVMRunning} />
         <StorageClassAndPreallocation vm={vm} />
-        <AdvancedSettings olsObj={vm} showApplyStorageProfileSettings={true} />
+        <AdvancedSettings olsObj={vm} showApplyStorageProfileSettings={true} vm={vm} />
       </TabModal>
     </FormProvider>
   );
