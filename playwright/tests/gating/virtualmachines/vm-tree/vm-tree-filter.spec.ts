@@ -25,6 +25,7 @@ test.describe(SUITE, { tag: [GATING_TAG] }, () => {
     await test.step('Navigate to VirtualMachines and confirm the empty project exists', async () => {
       await vmListPage.navigateToVirtualMachinesViaUI();
       await vmListPage.tryCloseWelcomeModal();
+      await vmListPage.waitForTreeViewReady();
       await vmListPage.toggleEmptyProjectsDisplay(true);
       await vmListPage.searchTreeView(emptyNamespace);
       await expect

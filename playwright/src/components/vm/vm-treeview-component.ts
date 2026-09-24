@@ -22,6 +22,13 @@ export default class VmTreeViewComponent extends BaseComponent {
     super(page);
   }
 
+  async waitForTreeViewReady(timeout = TestTimeouts.ELEMENT_WAIT): Promise<void> {
+    await this._treeView
+      .or(this._idVmsTreeViewSearchInput)
+      .first()
+      .waitFor({ state: 'visible', timeout });
+  }
+
   async clearTreeViewSearch(): Promise<void> {
     const searchInput = this._idVmsTreeViewSearchInput;
     await searchInput.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
@@ -344,8 +351,8 @@ export default class VmTreeViewComponent extends BaseComponent {
     const searchInput = this._idVmsTreeViewSearchInput;
     await searchInput.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
     await searchInput.clear();
-    await searchInput.pressSequentially(searchText, { delay: 250 });
-    await this.page.waitForTimeout(TestTimeouts.UI_DELAY_EXTRA);
+    await searchInput.pressSequentially(searchText, { delay: 100 });
+    await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
   }
 
   async toggleEmptyProjectsDisplay(show: boolean): Promise<void> {
