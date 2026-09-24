@@ -20,7 +20,6 @@ import { isEmpty } from '@kubevirt-utils/utils/utils';
 import type { ColumnLayout } from '@openshift-console/dynamic-plugin-sdk';
 import type { ThSortType } from '@patternfly/react-table/dist/esm/components/Table/base/types';
 import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
-import { CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
 import useBootVolumeColumns from '@virtualmachines/wizard/steps/InstanceTypesSteps/BootSourceStep/components/BootableVolumeList/hooks/useBootVolumeColumns';
 import useBootVolumeSortColumns from '@virtualmachines/wizard/steps/InstanceTypesSteps/BootSourceStep/components/BootableVolumeList/hooks/useBootVolumeSortColumns';
 import { paginationInitialStateForm } from '@virtualmachines/wizard/steps/InstanceTypesSteps/BootSourceStep/components/BootableVolumeList/utils/constants';
@@ -68,7 +67,7 @@ const useBootableVolumesTableData: UseBootableVolumesTableData = (
   const { t } = useKubevirtTranslation();
   const preference = useWatch({
     control,
-    name: CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.PREFERENCE,
+    name: 'instanceType.preference',
   });
   const preferenceName = preference?.name;
 

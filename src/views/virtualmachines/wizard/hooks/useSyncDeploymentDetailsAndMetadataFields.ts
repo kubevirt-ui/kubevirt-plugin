@@ -4,7 +4,6 @@ import { DESCRIPTION_ANNOTATION } from '@kubevirt-utils/resources/vm';
 import type { WizardStepType } from '@patternfly/react-core';
 import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
 import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
-import { CREATE_VM_FORM_FIELDS_VM_DATA } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
 import { VMWizardStep } from '@virtualmachines/wizard/utils/constants';
 import { patchWizardCustomizedVM } from '@virtualmachines/wizard/utils/patchWizardCustomizedVM';
 
@@ -18,10 +17,10 @@ type UseSyncDeploymentDetailsAndMetadataFieldsReturn = {
 };
 
 /**
- * CustomizedVM form field can edit annotations (includes description) and labels (includes folder) in Customization step.
- * This hook keeps the form's Deployment Details buffers in sync with customizedVM's annotation
- * across step transitions. Flushes the form value to the customizedVM when leaving Deployment Details,
- * and hydrates the form from the customizedVM when entering Deployment Details.
+ * The customization.vmDraft form field can edit annotations (includes description) and labels (includes folder) in the Customization step.
+ * This hook keeps the form's Deployment Details buffers in sync with customization.vmDraft's metadata
+ * across step transitions. Flushes non-empty deployment.description and deployment.folder values
+ * to customization.vmDraft when entering or leaving Deployment Details.
  */
 export const useSyncDeploymentDetailsAndMetadataFields =
   (): UseSyncDeploymentDetailsAndMetadataFieldsReturn => {
@@ -39,7 +38,7 @@ export const useSyncDeploymentDetailsAndMetadataFields =
           : [];
 
         patchWizardCustomizedVM(getValues, setValue, metadataPatch);
-        setValue(CREATE_VM_FORM_FIELDS_VM_DATA.DESCRIPTION, description);
+        setValue('deployment.description', description);
       },
       [getValues, setValue],
     );
@@ -56,7 +55,7 @@ export const useSyncDeploymentDetailsAndMetadataFields =
           : [];
 
         patchWizardCustomizedVM(getValues, setValue, metadataPatch);
-        setValue(CREATE_VM_FORM_FIELDS_VM_DATA.FOLDER, folder);
+        setValue('deployment.folder', folder);
       },
       [getValues, setValue],
     );
@@ -69,7 +68,7 @@ export const useSyncDeploymentDetailsAndMetadataFields =
         ) {
           return;
         }
-        const { description, folder } = getValues(CREATE_VM_FORM_FIELDS_VM_DATA.ROOT);
+        const { description, folder } = getValues('deployment');
         syncDescriptionFieldAndMetadataAnnotations(description);
         syncFolderFieldAndMetadataLabels(folder);
       },

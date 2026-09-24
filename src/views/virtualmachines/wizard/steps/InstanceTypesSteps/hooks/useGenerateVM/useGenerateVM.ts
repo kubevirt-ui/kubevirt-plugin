@@ -20,10 +20,6 @@ import { AUTOMATIC_UPDATE_FEATURE_NAME } from '@settings/tabs/ClusterTab/compone
 import useApplyAutoLabels from '@virtualmachines/wizard/hooks/useApplyAutoLabels';
 import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
 import {
-  CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA,
-  CREATE_VM_FORM_FIELDS_VM_DATA,
-} from '@virtualmachines/wizard/state/vm-wizard-form/consts';
-import {
   createPopulatedCloudInitYAML,
   generateVM,
   isWindowBootableVolume,
@@ -39,13 +35,14 @@ export type UseGenerateVMResult = {
 
 const useGenerateVM = (): UseGenerateVMResult => {
   const { control, getValues } = useVMWizard();
-  const [vmData, instanceTypeData] = useWatch({
+  const [deployment, instanceType] = useWatch({
     control,
-    name: [CREATE_VM_FORM_FIELDS_VM_DATA.ROOT, CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.ROOT],
+    name: ['deployment', 'instanceType'],
   });
 
-  const { cluster, name, project } = vmData;
-  const { preference, selectedBootableVolume } = instanceTypeData;
+  const { cluster, name, project } = deployment;
+  const { bootVolume, preference } = instanceType;
+  const selectedBootableVolume = bootVolume?.volume;
 
   const { featureEnabled: autoUpdateEnabled } = useFeatures(AUTOMATIC_UPDATE_FEATURE_NAME);
   const { subscriptionData } = useRHELAutomaticSubscription();
@@ -100,9 +97,9 @@ const useGenerateVM = (): UseGenerateVMResult => {
         vmCreationNad,
         vmName: name ?? generatedVMName,
       },
+      deployment,
       getValues,
-      instanceTypeData,
-      vmData,
+      instanceType,
     });
   }, [
     adminLabels,
@@ -110,14 +107,14 @@ const useGenerateVM = (): UseGenerateVMResult => {
     defaultSSHSecretName,
     enableMultiArchBootImageImport,
     generatedVMName,
-    instanceTypeData,
+    instanceType,
     isIPv6SingleStack,
     isUDNManagedNamespace,
     name,
     populatedCloudInitYAML,
     userDefaults,
     vmCreationNad,
-    vmData,
+    deployment,
     getValues,
   ]);
 

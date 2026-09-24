@@ -13,7 +13,6 @@ import DeletionProtectionModal from '@virtualmachines/details/tabs/configuration
 import { VM_DELETION_PROTECTION_LABEL } from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/utils/constants';
 import { VMDeletionProtectionOptions } from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/utils/types';
 import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
-import { CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
 import { patchWizardCustomizedVM } from '@virtualmachines/wizard/utils/patchWizardCustomizedVM';
 
 type DetailsToggleItemsProps = {
@@ -33,7 +32,7 @@ const DetailsToggleItems: FC<DetailsToggleItemsProps> = ({
   const { createModal } = useModal();
   const { control, getValues, setValue } = useVMWizard();
 
-  const vm = useWatch({ control, name: CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM });
+  const vm = useWatch({ control, name: 'customization.vmDraft' });
   const vmName = getName(vm);
 
   return (

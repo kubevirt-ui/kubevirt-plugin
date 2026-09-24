@@ -11,7 +11,6 @@ import { USER_SETTINGS_URL } from '@settings/constants';
 import { USER_TAB_IDS } from '@settings/search/constants';
 import DefaultVMLabelRow from '@settings/tabs/UserTab/components/DefaultVMLabelsSection/components/DefaultVMLabelRow';
 import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
-import { CREATE_VM_FORM_FIELDS_VM_DATA } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
 import { patchWizardCustomizedVM } from '@virtualmachines/wizard/utils/patchWizardCustomizedVM';
 
 type RequiredVMLabelsDrawerBodyProps = {
@@ -25,7 +24,7 @@ const RequiredVMLabelsDrawerBody: FC<RequiredVMLabelsDrawerBodyProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const { control, getValues, setValue } = useVMWizard();
-  const cluster = useWatch({ control, name: CREATE_VM_FORM_FIELDS_VM_DATA.CLUSTER });
+  const cluster = useWatch({ control, name: 'deployment.cluster' });
   const [userDefaults, setUserDefaults] = useKubevirtUserSettings(
     USER_SETTINGS_KEYS.defaultVMLabels,
     cluster,

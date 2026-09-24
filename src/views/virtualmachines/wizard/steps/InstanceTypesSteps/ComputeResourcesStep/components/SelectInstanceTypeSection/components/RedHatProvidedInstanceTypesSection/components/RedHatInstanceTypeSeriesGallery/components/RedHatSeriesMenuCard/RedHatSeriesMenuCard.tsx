@@ -14,7 +14,6 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { type InstanceTypeSeries } from '@kubevirt-utils/resources/instancetype/types';
 import { Card, CardBody, CardHeader, Flex, Tooltip } from '@patternfly/react-core';
 import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
-import { CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
 import MarkdownTooltipContent from '@virtualmachines/wizard/steps/InstanceTypesSteps/ComputeResourcesStep/components/SelectInstanceTypeSection/components/RedHatProvidedInstanceTypesSection/components/RedHatInstanceTypeSeriesGallery/components/RedHatSeriesMenuCard/MarkdownTooltipContent';
 
 import './RedHatSeriesMenuCard.scss';
@@ -29,7 +28,7 @@ const RedHatSeriesMenuCard: FC<RedHatSeriesMenuCardProps> = ({ rhSeriesItem }) =
   const { control, setValue } = useVMWizard();
   const selectedSeries = useWatch({
     control,
-    name: CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.SELECTED_SERIES,
+    name: 'instanceType.compute.series',
   }) as string;
 
   const { classDisplayNameAnnotation, descriptionAnnotation, seriesName, sizes } = rhSeriesItem;
@@ -53,11 +52,11 @@ const RedHatSeriesMenuCard: FC<RedHatSeriesMenuCardProps> = ({ rhSeriesItem }) =
       ? sizes?.filter((size) => !is1GiInstanceType(size.sizeLabel))
       : sizes;
     const defaultSize = (standardSizes?.[0] ?? sizes?.[0])?.sizeLabel;
-    setValue(CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.SELECTED_SERIES, seriesName);
-    setValue(CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.SELECTED_SIZE, defaultSize);
-    setValue(CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.SELECTED_INSTANCE_TYPE, {
+    setValue('instanceType.compute', {
       name: defaultSize ? `${seriesName}.${defaultSize}` : seriesName,
-      namespace: null,
+      series: seriesName,
+      size: defaultSize ?? '',
+      type: 'redhat',
     });
   };
 

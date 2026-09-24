@@ -25,7 +25,6 @@ import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { Alert, DescriptionList } from '@patternfly/react-core';
 import useWizardDisksTableData from '@virtualmachines/wizard/components/DisksReviewTable/hooks/useWizardDisksTableData/useWizardDisksTableData';
 import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
-import { CREATE_VM_FORM_FIELDS_VM_DATA } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
 import { useDrawerContext } from '@virtualmachines/wizard/steps/TemplateStep/components/TemplatesCatalogDrawer/hooks/useDrawerContext';
 import { getTemplateOSName } from '@virtualmachines/wizard/steps/TemplateStep/utils/getTemplateOSName';
 
@@ -34,7 +33,7 @@ import TemplateExpandableDescription from './TemplateExpandableDescription';
 const TemplateInfoSection: FC = memo(() => {
   const { t } = useKubevirtTranslation();
   const { control } = useVMWizard();
-  const cluster = useWatch({ control, name: CREATE_VM_FORM_FIELDS_VM_DATA.CLUSTER });
+  const cluster = useWatch({ control, name: 'deployment.cluster' });
   const isIPv6SingleStack = useIsIPv6SingleStackCluster(cluster);
   const { clusterPreference, osDisplayNames, template, vm } = useDrawerContext();
   const [disks] = useWizardDisksTableData(vm);

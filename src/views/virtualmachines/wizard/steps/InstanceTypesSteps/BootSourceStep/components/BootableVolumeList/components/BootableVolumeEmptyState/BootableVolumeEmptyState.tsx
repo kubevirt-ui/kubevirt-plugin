@@ -6,7 +6,6 @@ import useInstanceTypesAndPreferences from '@kubevirt-utils/hooks/useInstanceTyp
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { EmptyState, Title } from '@patternfly/react-core';
 import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
-import { CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
 import AddBootableVolumeLink from '@virtualmachines/wizard/steps/InstanceTypesSteps/BootSourceStep/components/BootableVolumeList/components/AddBootableVolumeLink/AddBootableVolumeLink';
 import BootableVolumeOSIcons from '@virtualmachines/wizard/steps/InstanceTypesSteps/BootSourceStep/components/BootableVolumeList/components/BootableVolumeEmptyState/BootableVolumeOSIcons';
 import { getOsNameFromPreference } from '@virtualmachines/wizard/steps/InstanceTypesSteps/BootSourceStep/components/BootableVolumeList/utils/utils';
@@ -23,7 +22,7 @@ const BootableVolumeEmptyState: FC<BootableVolumeEmptyStateProps> = ({ isPrefere
   const { control } = useVMWizard();
   const preference = useWatch({
     control,
-    name: CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.PREFERENCE,
+    name: 'instanceType.preference',
   });
 
   const osName = getOsNameFromPreference(preference?.name);

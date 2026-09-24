@@ -16,7 +16,6 @@ import {
 import { Table, TableVariant, Tbody, Th, Thead, Tr } from '@patternfly/react-table';
 import { type ThSortType } from '@patternfly/react-table/dist/esm/components/Table/base/types';
 import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
-import { CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
 import { getBootableVolumeRowData } from '@virtualmachines/wizard/steps/InstanceTypesSteps/BootSourceStep/components/BootableVolumeList/utils/getBootableVolumeRowData';
 import {
   type ApplySelectedBootableVolumeToForm,
@@ -50,7 +49,7 @@ const BootableVolumeTable: FC<BootableVolumeTableProps> = ({
 
   const selectedBootableVolume = useWatch({
     control,
-    name: CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.SELECTED_BOOTABLE_VOLUME,
+    name: 'instanceType.bootVolume.volume',
   });
 
   const onSelectBootableVolume = useCallback(

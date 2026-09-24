@@ -16,14 +16,13 @@ import {
 import VMNameConfirmationNextButton from '@virtualmachines/wizard/components/VMNameConfirmationNextButton';
 import useCloseWizard from '@virtualmachines/wizard/hooks/useCloseWizard';
 import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
-import { CREATE_VM_FORM_FIELDS_VM_DATA } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
 import { isCloneCreationMethod } from '@virtualmachines/wizard/utils/utils';
 
 const DeploymentDetailsStepFooter: FC = () => {
   const hasOLSConsole = useFlag(FLAG_LIGHTSPEED_PLUGIN);
   const { goToNextStep } = useWizardContext();
   const { control } = useVMWizard();
-  const creationMethod = useWatch({ control, name: CREATE_VM_FORM_FIELDS_VM_DATA.CREATION_METHOD });
+  const creationMethod = useWatch({ control, name: 'creationMethod' });
   const isCloneMethod = isCloneCreationMethod(creationMethod);
   const closeWizard = useCloseWizard();
   const { backButtonText, cancelButtonText, nextButtonText } = useWizardFooterProps();

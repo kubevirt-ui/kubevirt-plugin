@@ -1,14 +1,9 @@
 import { type UseFormGetValues, type UseFormSetValue } from 'react-hook-form';
 import { type TFunction } from 'i18next';
 
-import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getInstanceTypeFromVolume } from '@kubevirt-utils/components/AddBootableVolumeModal/utils';
 import { cancelAllWizardPendingUploads } from '@kubevirt-utils/hooks/useUploadProgressToast';
 import { getDiskSize } from '@kubevirt-utils/resources/bootableresources/selectors';
-import {
-  clearWizardBootableVolumeUploadKeys,
-  getWizardBootableVolumeUploadKeys,
-} from '@kubevirt-utils/signals/wizardBootableVolumeKeysSignal';
 import CloneIcon from '@virtualmachines/wizard/steps/DeploymentDetailsStep/components/CreationMethodTileGroup/components/CreationMethodTile/components/CloneIcon';
 import { InstanceTypeIcon } from '@virtualmachines/wizard/steps/DeploymentDetailsStep/components/CreationMethodTileGroup/components/CreationMethodTile/components/InstanceTypeIcon';
 import TemplateIcon from '@virtualmachines/wizard/steps/DeploymentDetailsStep/components/CreationMethodTileGroup/components/CreationMethodTile/components/TemplateIcon';
@@ -20,10 +15,6 @@ import {
   type VMWizardStep,
 } from '@virtualmachines/wizard/utils/constants';
 
-import {
-  CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA,
-  CREATE_VM_FORM_FIELDS_STEP_NAVIGATION,
-} from '../state/vm-wizard-form/consts';
 import { type VMWizardFormValues } from '../state/vm-wizard-form/types';
 import {
   type ApplySelectedBootableVolumeToForm,
@@ -88,19 +79,16 @@ export const applySelectedBootableVolumeToForm = ({
   const instanceTypeName = getInstanceTypeFromVolume(selectedVolume);
   const [series = '', size = ''] = instanceTypeName?.split('.') || [];
 
-  setValue(CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.ROOT, {
-    ...getValues(CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.ROOT),
-    customDiskSize: getDiskSize(dvSource, pvcSource, volumeSnapshotSource),
-    dvSource,
-    pvcSource,
-    selectedBootableVolume: selectedVolume,
-    selectedInstanceType: {
-      name: instanceTypeName,
-      namespace: null,
+  setValue('instanceType', {
+    ...getValues('instanceType'),
+    bootVolume: {
+      dataVolumeSource: dvSource,
+      diskSize: getDiskSize(dvSource, pvcSource, volumeSnapshotSource),
+      persistentVolumeClaimSource: pvcSource,
+      volume: selectedVolume,
+      volumeSnapshotSource,
     },
-    selectedSeries: series,
-    selectedSize: size,
-    volumeSnapshotSource,
+    compute: instanceTypeName ? { name: instanceTypeName, series, size, type: 'redhat' } : null,
   });
 };
 
@@ -108,16 +96,10 @@ export const resetBootableVolumeFields = (
   getValues: UseFormGetValues<VMWizardFormValues>,
   setValue: UseFormSetValue<VMWizardFormValues>,
 ): void => {
-  setValue(CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.ROOT, {
-    ...getValues(CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.ROOT),
-    customDiskSize: '',
-    dvSource: null,
-    pvcSource: null,
-    selectedBootableVolume: null,
-    selectedInstanceType: null,
-    selectedSeries: '',
-    selectedSize: '',
-    volumeSnapshotSource: null,
+  setValue('instanceType', {
+    ...getValues('instanceType'),
+    bootVolume: null,
+    compute: null,
   });
 };
 
@@ -126,18 +108,21 @@ export const markStepVisited = (
   getValues: UseFormGetValues<VMWizardFormValues>,
   setValue: UseFormSetValue<VMWizardFormValues>,
 ): void => {
-  const visitedSteps = getValues(CREATE_VM_FORM_FIELDS_STEP_NAVIGATION.VISITED_STEPS);
+  const visitedSteps = getValues('navigation.visitedSteps');
   if (visitedSteps.has(stepId)) {
     return;
   }
 
   const nextVisitedSteps = new Set(visitedSteps);
   nextVisitedSteps.add(stepId);
-  setValue(CREATE_VM_FORM_FIELDS_STEP_NAVIGATION.VISITED_STEPS, nextVisitedSteps);
+  setValue('navigation.visitedSteps', nextVisitedSteps);
 };
 
-export const clearVMPendingUploads = (vm?: V1VirtualMachine): void => {
-  const uploadKeys = getWizardBootableVolumeUploadKeys();
-  clearWizardBootableVolumeUploadKeys();
-  cancelAllWizardPendingUploads(vm, uploadKeys);
+export const clearVMPendingUploads = (
+  getValues: UseFormGetValues<VMWizardFormValues>,
+  setValue: UseFormSetValue<VMWizardFormValues>,
+): void => {
+  const uploadKeys = getValues('customization.pendingBootableVolumeUploadKeys');
+  setValue('customization.pendingBootableVolumeUploadKeys', []);
+  cancelAllWizardPendingUploads(getValues('customization.vmDraft'), uploadKeys);
 };

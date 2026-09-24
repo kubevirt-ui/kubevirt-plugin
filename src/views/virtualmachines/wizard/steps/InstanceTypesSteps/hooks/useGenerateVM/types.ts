@@ -19,16 +19,16 @@ export type GenerateVMContext = {
 export type GenerateVMArgs = {
   autoAppliedLabels: UseApplyAutoLabelsResult;
   context: GenerateVMContext;
+  deployment: VMWizardFormValues['deployment'];
   getValues: UseFormGetValues<VMWizardFormValues>;
-  instanceTypeData: VMWizardFormValues['instanceTypeData'];
-  vmData: VMWizardFormValues['vmData'];
+  instanceType: VMWizardFormValues['instanceType'];
 };
 
 export type GenerateVMCallback = (props: GenerateVMArgs) => V1VirtualMachine;
 
 export type GenerateVMSpecConfiguration = {
   context: Omit<GenerateVMContext, 'sshSecretName'>;
-  instanceTypeData: VMWizardFormValues['instanceTypeData'];
+  instanceType: VMWizardFormValues['instanceType'];
 };
 
 export type GenerateVMSpecTemplateConfiguration = {
@@ -47,9 +47,11 @@ export type GenerateVMSpecTemplateConfiguration = {
 
 export type GenerateVMSpecDataVolumeTemplates = {
   customDiskSize: string | undefined;
-  dvSource: VMWizardFormValues['instanceTypeData']['dvSource'];
+  dvSource: NonNullable<VMWizardFormValues['instanceType']['bootVolume']>['dataVolumeSource'];
   isIso: boolean;
-  pvcSource: VMWizardFormValues['instanceTypeData']['pvcSource'];
+  pvcSource: NonNullable<
+    VMWizardFormValues['instanceType']['bootVolume']
+  >['persistentVolumeClaimSource'];
   selectedBootableVolume: BootableVolume;
   storageClassName: string;
   vmName: string;

@@ -16,10 +16,6 @@ import {
   TitleSizes,
 } from '@patternfly/react-core';
 import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
-import {
-  CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA,
-  CREATE_VM_FORM_FIELDS_VM_DATA,
-} from '@virtualmachines/wizard/state/vm-wizard-form/consts';
 import BootableVolumeList from '@virtualmachines/wizard/steps/InstanceTypesSteps/BootSourceStep/components/BootableVolumeList/BootableVolumeList';
 
 import AddBootableVolumeButton from './components/AddBootableVolumeButton';
@@ -31,17 +27,17 @@ const BootSourceStep: FC = () => {
   const { control } = useVMWizard();
   const [cluster, project] = useWatch({
     control,
-    name: [CREATE_VM_FORM_FIELDS_VM_DATA.CLUSTER, CREATE_VM_FORM_FIELDS_VM_DATA.PROJECT],
+    name: ['deployment.cluster', 'deployment.project'],
   });
   const volumeListNamespace = useWatch({
     control,
-    name: CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.VOLUME_LIST_NAMESPACE,
+    name: 'instanceType.volumeNamespace',
   });
   const {
     field: { onChange, value },
   } = useController({
     control,
-    name: CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.USE_BOOT_SOURCE,
+    name: 'instanceType.useBootSource',
   });
   const instanceTypesAndPreferencesData = useInstanceTypesAndPreferences(
     getValidNamespace(project),

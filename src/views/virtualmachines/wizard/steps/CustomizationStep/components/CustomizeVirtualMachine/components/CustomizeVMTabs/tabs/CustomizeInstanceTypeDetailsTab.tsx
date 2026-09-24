@@ -15,7 +15,6 @@ import { type K8sVerb, useAccessReview } from '@openshift-console/dynamic-plugin
 import { Grid } from '@patternfly/react-core';
 import { isDeletionProtectionEnabled } from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/utils/utils';
 import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
-import { CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
 
 import usePreference from '../hooks/usePreference';
 import DetailsLeftColumn from './components/DetailsLeftColumn';
@@ -23,7 +22,7 @@ import DetailsRightColumn from './components/DetailsRightColumn';
 
 const CustomizeInstanceTypeDetailsTab: FC = () => {
   const { control } = useVMWizard();
-  const vm = useWatch({ control, name: CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM });
+  const vm = useWatch({ control, name: 'customization.vmDraft' });
 
   const [preference, preferenceLoading] = usePreference(vm);
 

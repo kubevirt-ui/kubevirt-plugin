@@ -7,11 +7,6 @@ import { getLabels } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { useSignals } from '@preact/signals-react/runtime';
 import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
-import {
-  CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM,
-  CREATE_VM_FORM_FIELDS_STEP_NAVIGATION,
-  CREATE_VM_FORM_FIELDS_VM_DATA,
-} from '@virtualmachines/wizard/state/vm-wizard-form/consts';
 import { VMWizardStep } from '@virtualmachines/wizard/utils/constants';
 
 type UseRequiredVMLabelsDrawerResult = {
@@ -26,13 +21,13 @@ const useRequiredVMLabelsDrawer = (): UseRequiredVMLabelsDrawerResult => {
   const { control } = useVMWizard();
   const autoLabelsMerged = useWatch({
     control,
-    name: CREATE_VM_FORM_FIELDS_VM_DATA.AUTO_LABELS_MERGED,
+    name: 'customization.autoLabelsApplied',
   });
   const currentStep = useWatch({
     control,
-    name: CREATE_VM_FORM_FIELDS_STEP_NAVIGATION.CURRENT_STEP,
+    name: 'navigation.currentStep',
   });
-  const vm = useWatch({ control, name: CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM });
+  const vm = useWatch({ control, name: 'customization.vmDraft' });
   const { labels } = useAutoAppliedLabels();
   const [isPanelOpen, setIsPanelOpen] = useState(false);
 

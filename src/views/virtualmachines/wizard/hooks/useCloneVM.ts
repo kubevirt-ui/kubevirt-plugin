@@ -17,10 +17,6 @@ import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { isACMPath } from '@multicluster/urls';
 import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
-import {
-  CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM,
-  CREATE_VM_FORM_FIELDS_VM_DATA,
-} from '@virtualmachines/wizard/state/vm-wizard-form/consts';
 
 import { SELECTED_CLUSTER } from '../utils/constants';
 import { handleCloneRequestPhaseChange } from './utils/utils';
@@ -53,7 +49,7 @@ const useCloneVM: UseCloneVM = () => {
   useEffect(() => {
     handleCloneRequestPhaseChange({
       cloneRequest,
-      formValues: getValues(CREATE_VM_FORM_FIELDS_VM_DATA.ROOT),
+      formValues: getValues('deployment'),
       navigate,
       setError,
       setIsSubmitting,
@@ -67,14 +63,9 @@ const useCloneVM: UseCloneVM = () => {
     if (isSubmitting || submittedCloneRequest) {
       return;
     }
-    const source = getValues(CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM);
+    const source = getValues('clone.sourceVM');
 
-    const {
-      cluster,
-      description,
-      name,
-      project: targetNamespace,
-    } = getValues(CREATE_VM_FORM_FIELDS_VM_DATA.ROOT);
+    const { cluster, description, name, project: targetNamespace } = getValues('deployment');
 
     if (!source) {
       setError(new Error(t('Select a VirtualMachine to clone')));

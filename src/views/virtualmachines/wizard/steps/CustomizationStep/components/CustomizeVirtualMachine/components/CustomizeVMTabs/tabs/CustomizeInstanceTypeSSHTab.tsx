@@ -8,14 +8,13 @@ import { Grid, GridItem, PageSection, Stack, Title } from '@patternfly/react-cor
 import SSHTabAuthorizedSSHKey from '@virtualmachines/details/tabs/configuration/ssh/components/SSHTabAuthorizedSSHKey';
 import SSHTabSSHAccess from '@virtualmachines/details/tabs/configuration/ssh/components/SSHTabSSHAccess';
 import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
-import { CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
 
 import useUpdateCustomizeInstanceTypeTab from '../hooks/useUpdateCustomizeInstanceTypeTab';
 
 const CustomizeInstanceTypeSSHTab: FC = () => {
   const { t } = useKubevirtTranslation();
   const { control } = useVMWizard();
-  const vm = useWatch({ control, name: CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM });
+  const vm = useWatch({ control, name: 'customization.vmDraft' });
 
   const { updateVMFromForm } = useUpdateCustomizeInstanceTypeTab();
 

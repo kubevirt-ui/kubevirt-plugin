@@ -9,7 +9,6 @@ import {
 import useCloseWizard from '@virtualmachines/wizard/hooks/useCloseWizard';
 import useWizardStepValidation from '@virtualmachines/wizard/hooks/useWizardStepValidation';
 import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
-import { CREATE_VM_FORM_FIELDS_UI_STATE } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
 import useCreateVMFromTemplate from '@virtualmachines/wizard/steps/TemplateStep/hooks/useCreateVMFromTemplate';
 import { VMWizardStep } from '@virtualmachines/wizard/utils/constants';
 
@@ -24,7 +23,7 @@ const TemplateStepFooter: FC = () => {
     const success = await createVMFromTemplate();
     if (!success) return;
 
-    setValue(CREATE_VM_FORM_FIELDS_UI_STATE.IS_TEMPLATES_DRAWER_OPEN, false);
+    setValue('template.isDrawerOpen', false);
     void goToNextStep();
   };
 

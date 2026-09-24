@@ -13,11 +13,6 @@ import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettin
 import { USER_SETTINGS_KEYS } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/const';
 import { getResourceKey } from '@kubevirt-utils/resources/shared';
 import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
-import {
-  CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM,
-  CREATE_VM_FORM_FIELDS_UI_STATE,
-  CREATE_VM_FORM_FIELDS_VM_DATA,
-} from '@virtualmachines/wizard/state/vm-wizard-form/consts';
 import { getFirstUnfulfilledRequiredParameter } from '@virtualmachines/wizard/steps/TemplateStep/components/TemplatesCatalogDrawer/utils/utils';
 import {
   getVMObjectFromTemplate,
@@ -33,28 +28,21 @@ const useCreateVMFromTemplate: UseCreateVMFromTemplate = () => {
   const { t } = useKubevirtTranslation();
   const [isProcessing, setIsProcessing] = useState(false);
   const { control, getValues, setValue } = useVMWizard();
-  const cluster = useWatch({ control, name: CREATE_VM_FORM_FIELDS_VM_DATA.CLUSTER });
+  const cluster = useWatch({ control, name: 'deployment.cluster' });
   const [authorizedSSHKeys] = useKubevirtUserSettings(USER_SETTINGS_KEYS.ssh, cluster);
 
   const failWithProcessError = (message: string): false => {
-    setValue(CREATE_VM_FORM_FIELDS_UI_STATE.TEMPLATE_PROCESS_ERROR, message);
-    setValue(CREATE_VM_FORM_FIELDS_UI_STATE.IS_TEMPLATES_DRAWER_OPEN, true);
+    setValue('template.processError', message);
+    setValue('template.isDrawerOpen', true);
     return false;
   };
 
   const createVMFromTemplate = async (): Promise<boolean> => {
-    const {
-      description,
-      folder,
-      name: vmName,
-      project,
-      selectedTemplate,
-    } = getValues(CREATE_VM_FORM_FIELDS_VM_DATA.ROOT);
+    const { description, folder, name: vmName, project } = getValues('deployment');
+    const selectedTemplate = getValues('template.selectedTemplate');
     const namespace = project || DEFAULT_NAMESPACE;
-    const lastProcessedTemplateKey = getValues(
-      CREATE_VM_FORM_FIELDS_UI_STATE.LAST_PROCESSED_TEMPLATE_KEY,
-    );
-    setValue(CREATE_VM_FORM_FIELDS_UI_STATE.TEMPLATE_PROCESS_ERROR, null);
+    const lastProcessedTemplateKey = getValues('template.lastProcessedKey');
+    setValue('template.processError', null);
 
     const selectedKey = getResourceKey(selectedTemplate);
     if (selectedKey === lastProcessedTemplateKey) return true;
@@ -86,10 +74,10 @@ const useCreateVMFromTemplate: UseCreateVMFromTemplate = () => {
         vm,
       });
 
-      setValue(CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM, vmFromTemplate);
+      setValue('customization.vmDraft', vmFromTemplate);
 
-      setValue(CREATE_VM_FORM_FIELDS_UI_STATE.LAST_PROCESSED_TEMPLATE_KEY, selectedKey);
-      setValue(CREATE_VM_FORM_FIELDS_UI_STATE.TEMPLATE_ADDITIONAL_OBJECTS, additionalObjects);
+      setValue('template.lastProcessedKey', selectedKey);
+      setValue('customization.templateAdditionalObjects', additionalObjects);
       return true;
     } catch (error) {
       const message = (error as Error)?.message ?? String(error);

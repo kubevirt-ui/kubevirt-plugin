@@ -9,7 +9,6 @@ import {
   setValueAtPath,
 } from '@kubevirt-utils/signals/customizeWizardVMSignalPathUtils';
 
-import { CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM } from '../state/vm-wizard-form/consts';
 import { type VMWizardFormValues } from '../state/vm-wizard-form/types';
 
 /* TODO: this file is a copy of customizedWizardVMSignal.ts file, but manage the form field values instead of the signal.
@@ -105,12 +104,11 @@ export const patchWizardCustomizedVM = (
     return undefined;
   }
 
-  const currentCustomized = (getValues(CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM) ??
-    {}) as V1VirtualMachine;
+  const currentCustomized = (getValues('customization.vmDraft') ?? {}) as V1VirtualMachine;
   const initialVM = produce(currentCustomized, (draft) => draft);
   const updatedVM = applyVMPatches(initialVM, patches);
 
-  setValue(CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM, updatedVM);
+  setValue('customization.vmDraft', updatedVM);
 
   return updatedVM;
 };
