@@ -16,6 +16,7 @@ import { SSHSecretDetails } from '@kubevirt-utils/components/SSHSecretModal/util
 import { SysprepData } from '@kubevirt-utils/components/SysprepModal/sysprep-utils';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { ClusterNamespacedResourceMap } from '@kubevirt-utils/resources/shared';
+import { RunStrategy } from '@kubevirt-utils/resources/vm/utils/constants';
 
 export type InstanceTypes = (
   | V1beta1VirtualMachineClusterInstancetype
@@ -86,7 +87,7 @@ type InstanceTypeAction = {
 export type InstanceTypeVMStoreState = {
   instanceTypeVMState: InstanceTypeVMState;
   isChangingNamespace: boolean;
-  startVM: boolean;
+  runStrategy: RunStrategy;
   vm: V1VirtualMachine; // vm object for customization flow
   vmNamespaceTarget: string;
   volumeListNamespace: string;
@@ -104,8 +105,8 @@ export type InstanceTypeVMStoreActions = {
   setCustomDiskSize: (diskSize: null | string) => void;
   setInstanceTypeVMState: Dispatch<InstanceTypeAction>;
   setIsChangingNamespace: () => void;
+  setRunStrategy: (runStrategy: RunStrategy) => void;
   setSelectedStorageClass: (storageClass: string) => void;
-  setStartVM: (checked: boolean) => void;
   setVM: (vm: V1VirtualMachine) => Promise<void>;
   setVMNamespaceTarget: (sshSecretName: string, targetNamespace: string, cluster?: string) => void;
   setVolumeListNamespace: (namespace: string) => void;
