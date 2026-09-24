@@ -46,8 +46,8 @@ const usePreferenceSelectOptions: UsePreferenceSelectOptions = (
 
   const preferences = useMemo(() => {
     const allPreferences = [...(clusterPreferences || []), ...(userPreferences || [])];
-    return getSortedPreferencesByOSType(allPreferences, operatingSystemType);
-  }, [clusterPreferences, userPreferences, operatingSystemType]);
+    return getSortedPreferencesByOSType(allPreferences, operatingSystemType, architectures);
+  }, [architectures, clusterPreferences, userPreferences, operatingSystemType]);
 
   useEffect(() => {
     if (!isPreferencesLoaded) return;
@@ -56,8 +56,8 @@ const usePreferenceSelectOptions: UsePreferenceSelectOptions = (
     const isCurrentPreferenceValid =
       preference && preferences.some((pref) => pref.name === preference.name);
 
-    if (!isCurrentPreferenceValid && defaultPref) {
-      setValue(CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.PREFERENCE, defaultPref);
+    if (!isCurrentPreferenceValid) {
+      setValue(CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.PREFERENCE, defaultPref ?? null);
     }
   }, [architectures, isPreferencesLoaded, operatingSystemType, preference, preferences, setValue]);
 

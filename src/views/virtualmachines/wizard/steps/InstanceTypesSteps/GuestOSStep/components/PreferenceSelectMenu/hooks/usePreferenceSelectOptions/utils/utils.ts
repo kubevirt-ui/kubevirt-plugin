@@ -5,6 +5,10 @@ import {
 import { type PreferenceOption } from '@kubevirt-utils/components/AddBootableVolumeModal/types';
 import { getClusterOnlyArchitecture } from '@kubevirt-utils/components/FirmwareBootloaderModal/utils/utils';
 import { ARCHITECTURES } from '@kubevirt-utils/constants/constants';
+import {
+  filterPreferencesByClusterArchitecture,
+  getPreferenceArchitecture,
+} from '@kubevirt-utils/resources/preference/architecture';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { LINUX, OS_NAME_TYPES, RHEL, WINDOWS } from '@kubevirt-utils/resources/template';
 import { VM_OS_ANNOTATION } from '@kubevirt-utils/resources/vm';
@@ -67,10 +71,7 @@ const getPreferenceForSingleWorkloadArchitecture = (
   if (!singleWorkloadArchitecture || singleWorkloadArchitecture === ARCHITECTURES.AMD64)
     return undefined;
 
-  return preferences.find((preference) => {
-    const [, , architecture] = preference.name.split('.');
-    return architecture === singleWorkloadArchitecture;
-  });
+  return preferences.find((preference) => preference.architecture === singleWorkloadArchitecture);
 };
 
 const getOtherLinuxDefaultPreference = (
@@ -112,29 +113,42 @@ export const getDefaultPreference = (
 const getFilteredPreferencesByOsType = (
   preferences: (V1beta1VirtualMachineClusterPreference | V1beta1VirtualMachinePreference)[],
   osType: OperatingSystemType,
+  architectures?: string[],
 ): PreferenceOption[] =>
-  preferences.reduce<PreferenceOption[]>((filteredPreferences, preference) => {
-    const osAnnotation = preference?.spec?.annotations?.[VM_OS_ANNOTATION];
-    const preferenceName = getName(preference);
-    const name = preferenceName?.toLowerCase() ?? '';
+  filterPreferencesByClusterArchitecture(preferences, architectures).reduce<PreferenceOption[]>(
+    (filteredPreferences, preference) => {
+      const osAnnotation = preference?.spec?.annotations?.[VM_OS_ANNOTATION];
+      const preferenceName = getName(preference);
+      const name = preferenceName?.toLowerCase() ?? '';
 
-    if (
-      isEmpty(preferenceName) ||
-      !operatingSystemPreferenceFilters[osType]({ name, os: osAnnotation })
-    ) {
+      if (
+        isEmpty(preferenceName) ||
+        !operatingSystemPreferenceFilters[osType]({ name, os: osAnnotation })
+      ) {
+        return filteredPreferences;
+      }
+
+      filteredPreferences.push({
+        architecture: getPreferenceArchitecture(preference),
+        kind: preference.kind,
+        name: preferenceName,
+      });
+
       return filteredPreferences;
-    }
-
-    filteredPreferences.push({ kind: preference.kind, name: preferenceName });
-
-    return filteredPreferences;
-  }, []);
+    },
+    [],
+  );
 
 export const getSortedPreferencesByOSType = (
   preferences: (V1beta1VirtualMachineClusterPreference | V1beta1VirtualMachinePreference)[],
   osType: OperatingSystemType,
+  architectures?: string[],
 ): PreferenceOption[] => {
-  const preferencesKindAndNameByOsType = getFilteredPreferencesByOsType(preferences, osType);
+  const preferencesKindAndNameByOsType = getFilteredPreferencesByOsType(
+    preferences,
+    osType,
+    architectures,
+  );
 
   if (osType === OperatingSystemType.OTHER_LINUX) {
     return preferencesKindAndNameByOsType.sort((firstEntry, secondEntry) =>

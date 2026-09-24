@@ -17,6 +17,7 @@ import type { BootableVolume } from '@kubevirt-utils/resources/bootableresources
 import type { DROPDOWN_FORM_SELECTION } from './consts';
 
 export type PreferenceOption = {
+  architecture?: string;
   kind?: string;
   name: string;
 };
