@@ -1,6 +1,7 @@
 import { type FC, type JSX, useEffect, useState } from 'react';
 import { useLocation } from 'react-router';
 import classNames from 'classnames';
+import produce from 'immer';
 
 import {
   type V1VirtualMachine,
@@ -22,8 +23,7 @@ import useHcoWorkloadArchitectures from '@kubevirt-utils/hooks/useHcoWorkloadArc
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useToggle } from '@kubevirt-utils/hooks/useToggle';
 import { getName } from '@kubevirt-utils/resources/shared';
-import { type PatchCustomizeWizardVMSignal } from '@kubevirt-utils/signals/customizeWizardVMSignal';
-import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
+import { ensurePath, kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { ExpandableSection, Switch } from '@patternfly/react-core';
@@ -36,8 +36,9 @@ import DetailsSectionBootOrder from './DetailsSectionBootOrder';
 
 type DetailsSectionBootProps = {
   canUpdateVM: boolean;
-  customizeWizardVMPatch?: PatchCustomizeWizardVMSignal;
+
   instanceTypeVM?: V1VirtualMachine;
+  onUpdateVM?: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine | undefined>;
   preferredBootmode?: BootMode;
   vm: V1VirtualMachine;
   vmi?: V1VirtualMachineInstance;
@@ -45,8 +46,8 @@ type DetailsSectionBootProps = {
 
 const DetailsSectionBoot: FC<DetailsSectionBootProps> = ({
   canUpdateVM,
-  customizeWizardVMPatch,
   instanceTypeVM,
+  onUpdateVM,
   preferredBootmode,
   vm,
   vmi,
@@ -73,9 +74,7 @@ const DetailsSectionBoot: FC<DetailsSectionBootProps> = ({
           isOpen={isOpen}
           onClose={onClose}
           onSubmit={(updatedVM: V1VirtualMachine): Promise<V1VirtualMachine | void> =>
-            customizeWizardVMPatch
-              ? Promise.resolve(customizeWizardVMPatch([{ data: updatedVM }]))
-              : updateBootLoader(updatedVM, vm)
+            onUpdateVM ? onUpdateVM(updatedVM) : updateBootLoader(updatedVM, vm)
           }
           preferredBootmode={preferredBootmode}
           vm={firmwareVM}
@@ -87,15 +86,12 @@ const DetailsSectionBoot: FC<DetailsSectionBootProps> = ({
 
   const onStartStrategyChange = (_event: unknown, checked: boolean): void => {
     setIsChecked(checked);
-    const patchPromise = customizeWizardVMPatch
-      ? Promise.resolve(
-          customizeWizardVMPatch([
-            {
-              data: checked ? printableVMStatus.Paused : null,
-              path: `spec.template.spec.startStrategy`,
-            },
-          ]),
-        )
+    const updatedVM = produce(vm, (draft) => {
+      ensurePath(draft, 'spec.template.spec');
+      draft.spec.template.spec.startStrategy = checked ? printableVMStatus.Paused : null;
+    });
+    const patchPromise = onUpdateVM
+      ? onUpdateVM(updatedVM)
       : Promise.resolve(updateStartStrategy(checked, vm));
     patchPromise.catch(kubevirtConsole.error);
   };
@@ -122,6 +118,7 @@ const DetailsSectionBoot: FC<DetailsSectionBootProps> = ({
       <DetailsSectionBootOrder
         canUpdateVM={canUpdateVM}
         instanceTypeVM={instanceTypeVM}
+        onUpdateVM={onUpdateVM}
         vm={vm}
         vmi={vmi}
       />

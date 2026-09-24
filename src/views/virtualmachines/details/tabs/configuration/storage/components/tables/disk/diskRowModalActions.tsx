@@ -88,20 +88,31 @@ export const openCDROMModal = (
   params: {
     diskName: string;
     diskSource: string | undefined;
+    getCurrentVM?: () => null | undefined | V1VirtualMachine;
     isCDROMMountedState: boolean;
     onDiskSubmit: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine>;
     vm: V1VirtualMachine;
   },
 ): void => {
-  const Component = params.isCDROMMountedState ? EjectCDROMModal : MountCDROMModal;
-  createModal(({ isOpen, onClose }) => (
-    <Component
-      cdromName={params.diskName}
-      isOpen={isOpen}
-      onClose={onClose}
-      onSubmit={params.onDiskSubmit}
-      vm={params.vm}
-      {...(params.isCDROMMountedState && { source: params.diskSource })}
-    />
-  ));
+  createModal(({ isOpen, onClose }) =>
+    params.isCDROMMountedState ? (
+      <EjectCDROMModal
+        cdromName={params.diskName}
+        isOpen={isOpen}
+        onClose={onClose}
+        onSubmit={params.onDiskSubmit}
+        source={params.diskSource}
+        vm={params.vm}
+      />
+    ) : (
+      <MountCDROMModal
+        cdromName={params.diskName}
+        getCurrentVM={params.getCurrentVM}
+        isOpen={isOpen}
+        onClose={onClose}
+        onSubmit={params.onDiskSubmit}
+        vm={params.vm}
+      />
+    ),
+  );
 };

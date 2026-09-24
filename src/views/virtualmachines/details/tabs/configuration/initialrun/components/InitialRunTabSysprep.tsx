@@ -16,16 +16,20 @@ import { SysprepDescription } from '@kubevirt-utils/components/SysprepModal/Sysp
 import { SysprepModal } from '@kubevirt-utils/components/SysprepModal/SysprepModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getVolumes } from '@kubevirt-utils/resources/vm';
-import { type PatchCustomizeWizardVMSignal } from '@kubevirt-utils/signals/customizeWizardVMSignal';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 
-import { createSysprepConfigMap, patchVMWithExistingSysprepConfigMap } from '../utils/utils';
+import {
+  createSysprepConfigMap,
+  patchVMWithExistingSysprepConfigMap,
+  type SubmitSysprepVM,
+} from '../utils/utils';
 
 type InitialRunTabSysprepProps = {
   canUpdateVM: boolean;
-  onSubmit?: PatchCustomizeWizardVMSignal;
+
+  onSubmit?: SubmitSysprepVM;
   vm: V1VirtualMachine;
 };
 const InitialRunTabSysprep: FC<InitialRunTabSysprepProps> = ({ canUpdateVM, onSubmit, vm }) => {

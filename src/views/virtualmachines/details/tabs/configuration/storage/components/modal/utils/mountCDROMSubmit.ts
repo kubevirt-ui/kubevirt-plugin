@@ -23,6 +23,7 @@ export type MountCDROMSubmitParams = {
   cdromName: string;
   cdromUploadKey: string;
   checkUploadReady: () => Promise<void>;
+  getCurrentVM?: () => null | undefined | V1VirtualMachine;
   isHotPluggable: boolean;
   isVMRunning: boolean;
   onClose: () => void;
@@ -40,6 +41,7 @@ export const submitMountCDROM = async ({
   cdromName,
   cdromUploadKey,
   checkUploadReady,
+  getCurrentVM,
   isHotPluggable,
   isVMRunning,
   onClose,
@@ -87,7 +89,12 @@ export const submitMountCDROM = async ({
       diskState,
       dvName,
       isHotPluggable,
-      onCancelCleanup: createEjectMountedDiskCancelCleanup(vmAfterMount, cdromName),
+      onCancelCleanup: createEjectMountedDiskCancelCleanup(
+        vmAfterMount,
+        cdromName,
+        getCurrentVM,
+        onSubmit,
+      ),
       t,
       uploadData,
       uploadKey: cdromUploadKey,

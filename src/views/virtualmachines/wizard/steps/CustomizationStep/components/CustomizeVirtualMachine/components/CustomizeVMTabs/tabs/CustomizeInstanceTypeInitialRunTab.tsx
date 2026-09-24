@@ -1,34 +1,22 @@
-import { type FC, useCallback } from 'react';
+import { type FC } from 'react';
 import { useWatch } from 'react-hook-form';
 
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import {
-  type PatchCustomizeWizardVMSignal,
-  type PatchCustomizeWizardVMSignalArgs,
-} from '@kubevirt-utils/signals/customizeWizardVMSignal';
 import { DescriptionList, Divider, PageSection, Title } from '@patternfly/react-core';
 import InitialRunTabCloudinit from '@virtualmachines/details/tabs/configuration/initialrun/components/InitialRunTabCloudinit';
 import InitialRunTabSysprep from '@virtualmachines/details/tabs/configuration/initialrun/components/InitialRunTabSysprep';
 import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
 import { CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
-import { patchWizardCustomizedVM } from '@virtualmachines/wizard/utils/patchWizardCustomizedVM';
 
 import useUpdateCustomizeInstanceTypeTab from '../hooks/useUpdateCustomizeInstanceTypeTab';
 
 const CustomizeInstanceTypeInitialRunTab: FC = () => {
   const { t } = useKubevirtTranslation();
-  const { getValues, setValue } = useVMWizard();
   const { control } = useVMWizard();
   const vm = useWatch({ control, name: CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM });
   const { updateVMFromForm } = useUpdateCustomizeInstanceTypeTab();
-
-  const patchInitialRunSpec: PatchCustomizeWizardVMSignal = useCallback(
-    (patches: PatchCustomizeWizardVMSignalArgs) =>
-      patchWizardCustomizedVM(getValues, setValue, patches),
-    [getValues, setValue],
-  );
 
   if (!vm) {
     return <Loading />;
@@ -42,7 +30,7 @@ const CustomizeInstanceTypeInitialRunTab: FC = () => {
       <DescriptionList>
         <InitialRunTabCloudinit canUpdateVM onSubmit={updateVMFromForm} vm={vm} />
         <Divider />
-        <InitialRunTabSysprep canUpdateVM onSubmit={patchInitialRunSpec} vm={vm} />
+        <InitialRunTabSysprep canUpdateVM onSubmit={updateVMFromForm} vm={vm} />
       </DescriptionList>
     </PageSection>
   );

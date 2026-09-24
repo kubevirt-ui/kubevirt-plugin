@@ -4,6 +4,7 @@ import { useWatch } from 'react-hook-form';
 import { Flex, FlexItem } from '@patternfly/react-core';
 import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
 import {
+  CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM,
   CREATE_VM_FORM_FIELDS_VM_DATA,
   createInitialVMWizardFormValues,
 } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
@@ -30,7 +31,7 @@ const CreationMethodTileGroup: FC = () => {
     const { cluster, description, folder, name, project }: Partial<VMWizardVirtualMachineData> =
       getValues(CREATE_VM_FORM_FIELDS_VM_DATA.ROOT);
 
-    clearVMPendingUploadsAndSignal();
+    clearVMPendingUploadsAndSignal(getValues(CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM));
     reset(
       createInitialVMWizardFormValues({
         cluster,
