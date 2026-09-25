@@ -8,7 +8,6 @@ type VMGenerationWizardNavItemProps = {
   goToStepByIndex: (index: number) => void;
   handleNavItemClick: VMGenerationNavItemClickHandler;
   isGeneratingVM: boolean;
-  loaded: boolean;
   step: WizardStepType;
 };
 
@@ -17,14 +16,13 @@ const VMGenerationWizardNavItem: FC<VMGenerationWizardNavItemProps> = ({
   goToStepByIndex,
   handleNavItemClick,
   isGeneratingVM,
-  loaded = true,
   step,
 }) => (
   <WizardNavItem
     content={step.name}
     id={step.id}
     isCurrent={step.id === activeStep?.id}
-    isDisabled={step.isDisabled || isGeneratingVM || !loaded}
+    isDisabled={step.isDisabled || isGeneratingVM}
     onClick={() => handleNavItemClick(step, activeStep, goToStepByIndex)}
     stepIndex={step.index}
   />

@@ -19,7 +19,7 @@ import {
 } from '@kubevirt-utils/resources/template';
 import { getTemplateOS } from '@kubevirt-utils/resources/template/utils/selectors';
 import useVirtualMachineTemplatesFilters from '@templates/list/filters/useVirtualMachineTemplatesFilters';
-import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
+import { useVMWizardForm } from '@virtualmachines/wizard/form/VMWizardFormProvider';
 import useTemplatesWithAvailableSource from '@virtualmachines/wizard/steps/TemplateStep/components/TemplatesCatalog/hooks/useTemplatesWithAvailableSource/useTemplatesWithAvailableSource';
 
 import { buildOSDisplayNameMap } from '../../../utils/buildOSDisplayNameMap';
@@ -44,7 +44,7 @@ type UseTemplatesCatalogReturn = {
 };
 
 const useTemplatesCatalog = (): UseTemplatesCatalogReturn => {
-  const { control } = useVMWizard();
+  const { control } = useVMWizardForm();
   const cluster = useWatch({ control, name: 'deployment.cluster' });
   const { isList, namespace, setIsList, setNamespace } = useCatalogUIState();
 

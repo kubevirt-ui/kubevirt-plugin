@@ -14,7 +14,7 @@ import { type PaginationState } from '@kubevirt-utils/hooks/usePagination/utils/
 import { type BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { type ColumnLayout } from '@openshift-console/dynamic-plugin-sdk';
 import { FormGroup, Split, SplitItem } from '@patternfly/react-core';
-import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
+import { useVMWizardForm } from '@virtualmachines/wizard/form/VMWizardFormProvider';
 
 import BootableVolumeListPagination from '../BootableVolumeListPagination/BootableVolumeListPagination';
 
@@ -51,7 +51,7 @@ const BootableVolumeListToolbar: FC<BootableVolumeListToolbarProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const isAdmin = useIsAdmin();
-  const { control } = useVMWizard();
+  const { control } = useVMWizardForm();
 
   return (
     <Split hasGutter>

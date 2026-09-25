@@ -1,5 +1,4 @@
 import { type FC } from 'react';
-import { useWatch } from 'react-hook-form';
 
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
@@ -7,19 +6,16 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { DescriptionList, Divider, PageSection, Title } from '@patternfly/react-core';
 import InitialRunTabCloudinit from '@virtualmachines/details/tabs/configuration/initialrun/components/InitialRunTabCloudinit';
 import InitialRunTabSysprep from '@virtualmachines/details/tabs/configuration/initialrun/components/InitialRunTabSysprep';
-import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
-
-import useUpdateCustomizeInstanceTypeTab from '../hooks/useUpdateCustomizeInstanceTypeTab';
+import { type SubmitSysprepVM } from '@virtualmachines/details/tabs/configuration/initialrun/utils/utils';
+import { useWizardVMDraft } from '@virtualmachines/wizard/hooks/useWizardVMDraft';
 
 const CustomizeInstanceTypeInitialRunTab: FC = () => {
   const { t } = useKubevirtTranslation();
-  const { control } = useVMWizard();
-  const vm = useWatch({ control, name: 'customization.vmDraft' });
-  const { updateVMFromForm } = useUpdateCustomizeInstanceTypeTab();
+  const { replaceDraft, vmDraft: vm } = useWizardVMDraft();
 
-  if (!vm) {
-    return <Loading />;
-  }
+  if (!vm) return <Loading />;
+
+  const onSysprepSubmit: SubmitSysprepVM = (updatedVM) => replaceDraft(updatedVM);
 
   return (
     <PageSection>
@@ -27,9 +23,13 @@ const CustomizeInstanceTypeInitialRunTab: FC = () => {
         <SearchItem id="initial-run">{t('Initial run')}</SearchItem>
       </Title>
       <DescriptionList>
-        <InitialRunTabCloudinit canUpdateVM onSubmit={updateVMFromForm} vm={vm} />
+        <InitialRunTabCloudinit
+          canUpdateVM
+          onSubmit={async (updatedVM) => replaceDraft(updatedVM) ?? updatedVM}
+          vm={vm}
+        />
         <Divider />
-        <InitialRunTabSysprep canUpdateVM onSubmit={updateVMFromForm} vm={vm} />
+        <InitialRunTabSysprep canUpdateVM onSubmit={onSysprepSubmit} vm={vm} />
       </DescriptionList>
     </PageSection>
   );

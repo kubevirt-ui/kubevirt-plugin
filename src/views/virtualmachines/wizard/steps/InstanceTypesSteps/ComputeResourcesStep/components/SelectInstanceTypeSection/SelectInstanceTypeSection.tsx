@@ -5,7 +5,7 @@ import { getInstanceTypeMenuItems } from '@kubevirt-utils/components/AddBootable
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import useInstanceTypesAndPreferences from '@kubevirt-utils/hooks/useInstanceTypesAndPreferences';
 import { Tab, Tabs } from '@patternfly/react-core';
-import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
+import { useVMWizardForm } from '@virtualmachines/wizard/form/VMWizardFormProvider';
 import RedHatProvidedInstanceTypesSection from '@virtualmachines/wizard/steps/InstanceTypesSteps/ComputeResourcesStep/components/SelectInstanceTypeSection/components/RedHatProvidedInstanceTypesSection/RedHatProvidedInstanceTypesSection';
 import UserProvidedInstanceTypesList from '@virtualmachines/wizard/steps/InstanceTypesSteps/ComputeResourcesStep/components/SelectInstanceTypeSection/components/UserProvidedInstanceTypeList/UserProvidedInstanceTypeList';
 import { getUserProvidedInstanceTypes } from '@virtualmachines/wizard/steps/InstanceTypesSteps/ComputeResourcesStep/components/SelectInstanceTypeSection/components/UserProvidedInstanceTypeList/utils/utils';
@@ -16,7 +16,7 @@ import { getActiveTabKey } from './utils/utils';
 const SelectInstanceTypeSection: FC = () => {
   const [activeTabKey, setActiveTabKey] = useState<TabKey>(TabKey.RedHat);
 
-  const { control } = useVMWizard();
+  const { control } = useVMWizardForm();
   const [cluster, project, selectedInstanceType] = useWatch({
     control,
     name: ['deployment.cluster', 'deployment.project', 'instanceType.compute'],

@@ -9,7 +9,7 @@ import { getUID, type ResourceMap } from '@kubevirt-utils/resources/shared';
 import { getTemplateName, type Template } from '@kubevirt-utils/resources/template';
 import { ARCHITECTURE_ID, ARCHITECTURE_TITLE } from '@kubevirt-utils/utils/architecture';
 import { Table, TableVariant, Tbody, Th, Thead, Tr } from '@patternfly/react-table';
-import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
+import { useVMWizardForm } from '@virtualmachines/wizard/form/VMWizardFormProvider';
 
 import { getTemplateClusterPreference } from '../../../../utils/getTemplateClusterPreference';
 import TemplatesTableRow from './TemplatesTableRow';
@@ -36,7 +36,7 @@ const TemplatesTable: FC<TemplatesTableProps> = ({
   templates,
 }) => {
   const { t } = useKubevirtTranslation();
-  const { control } = useVMWizard();
+  const { control } = useVMWizardForm();
   const selectedTemplate = useWatch({
     control,
     name: 'template.selectedTemplate',

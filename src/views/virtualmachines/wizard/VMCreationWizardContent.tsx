@@ -7,57 +7,71 @@ import {
 } from '@kubevirt-utils/extensions/telemetry';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Wizard, WizardHeader, WizardStep, type WizardStepType } from '@patternfly/react-core';
+import {
+  useVMWizardForm,
+  type VMWizardFormResources,
+} from '@virtualmachines/wizard/form/VMWizardFormProvider';
 import useCloseWizard from '@virtualmachines/wizard/hooks/useCloseWizard';
-import { useSyncDeploymentDetailsAndMetadataFields } from '@virtualmachines/wizard/hooks/useSyncDeploymentDetailsAndMetadataFields';
-import useWizardStepValidation from '@virtualmachines/wizard/hooks/useWizardStepValidation';
+import { useWizardVMDraft } from '@virtualmachines/wizard/hooks/useWizardVMDraft';
 import { useVMWizardState } from '@virtualmachines/wizard/state/useVMWizardState';
 
 import RequiredLabelsDrawerWrapper from './components/RequiredLabelsDrawerWrapper';
 import TemplatesDrawerWrapper from './components/TemplatesDrawerWrapper';
 import useVMGenerationNavClick from './hooks/useVMGenerationNavClick';
-import { useVMWizard } from './state/vm-wizard-context/VMWizardContext';
 import { type VMCreationMethod, VMWizardStep } from './utils/constants';
 import { getStepsToDisplayByCreationMethod } from './utils/displaySteps';
+import { getVMGenerationNavItem } from './utils/steps';
 import { type VMWizardStepDisplay } from './utils/types';
+import { isCloneCreationMethod } from './utils/utils';
 
 import './Wizard.scss';
 
-const VMCreationWizardContent: FC = () => {
+const VMCreationWizardContent: FC<VMWizardFormResources> = ({ autoAppliedLabels }) => {
   const { t } = useKubevirtTranslation();
-  const { setCurrentStep, setIsTemplateDrawerOpen } = useVMWizardState();
   const closeWizard = useCloseWizard();
 
-  const { isNextDisabledForStep, isStepDisabled } = useWizardStepValidation();
-  const { control } = useVMWizard();
-  const creationMethod = useWatch({ control, name: 'creationMethod' });
+  const { control } = useVMWizardForm();
+  const creationMethod = useWatch({
+    control,
+    name: 'creationMethod',
+  });
+
+  const { currentStep, setCurrentStep, setIsTemplateDrawerOpen } = useVMWizardState();
+
   const navItemConfig = useVMGenerationNavClick(creationMethod);
-  const { syncOnDeploymentDetailsStepChange } = useSyncDeploymentDetailsAndMetadataFields();
+
+  const { finalizeDraft } = useWizardVMDraft();
   const hasLoggedCreationStartedRef = useRef(false);
 
   const stepsToDisplay: VMWizardStepDisplay[] = useMemo(
     () =>
       getStepsToDisplayByCreationMethod({
-        isNextDisabledForStep,
-        isStepDisabled,
         navItemConfig,
         t,
       })[creationMethod as VMCreationMethod].toSorted((a, b) => a.displayIndex - b.displayIndex),
-    [navItemConfig, isStepDisabled, isNextDisabledForStep, creationMethod, t],
+    [navItemConfig, creationMethod, t],
   );
 
   const onStepChange = useCallback(
-    (currentStep: WizardStepType, prevStep: WizardStepType) => {
-      syncOnDeploymentDetailsStepChange(currentStep, prevStep);
-      if (currentStep?.id !== VMWizardStep.TEMPLATE) {
+    (nextWizardStep: WizardStepType, prevStep: WizardStepType) => {
+      if (
+        !isCloneCreationMethod(creationMethod) &&
+        (nextWizardStep?.id === VMWizardStep.DEPLOYMENT_DETAILS ||
+          prevStep?.id === VMWizardStep.DEPLOYMENT_DETAILS)
+      ) {
+        finalizeDraft();
+      }
+      if (nextWizardStep?.id !== VMWizardStep.TEMPLATE) {
         setIsTemplateDrawerOpen(false);
       }
 
-      if (currentStep?.id) {
-        setCurrentStep(String(currentStep.id));
+      if (nextWizardStep?.id) {
+        const nextStep = nextWizardStep.id as VMWizardStep;
+        setCurrentStep(nextStep);
       }
 
       const creationMethodTelemetry = mapWizardStepToCreationMethodTelemetry(
-        String(currentStep?.id),
+        String(nextWizardStep?.id),
       );
 
       if (!hasLoggedCreationStartedRef.current && creationMethodTelemetry) {
@@ -65,27 +79,32 @@ const VMCreationWizardContent: FC = () => {
         logVMCreationStarted(creationMethodTelemetry);
       }
     },
-    [setCurrentStep, setIsTemplateDrawerOpen, syncOnDeploymentDetailsStepChange],
+    [creationMethod, finalizeDraft, setCurrentStep, setIsTemplateDrawerOpen],
   );
 
   return (
-    <RequiredLabelsDrawerWrapper>
+    <RequiredLabelsDrawerWrapper
+      autoAppliedLabels={autoAppliedLabels}
+      currentStep={currentStep as VMWizardStep}
+    >
       <TemplatesDrawerWrapper>
         <Wizard
           className="vm-creation-wizard"
           header={<WizardHeader isCloseHidden title={t('Create VirtualMachine')} />}
           onClose={closeWizard}
-          onStepChange={(_event, currentStep, prevStep) => onStepChange(currentStep, prevStep)}
+          onStepChange={(_event, nextWizardStep, prevStep) =>
+            onStepChange(nextWizardStep, prevStep)
+          }
           title={t('Create VirtualMachine')}
         >
-          {stepsToDisplay?.map(({ children, footer, id, isDisabled, name, navItem }) => (
+          {stepsToDisplay?.map(({ children, footer, id, name }) => (
             <WizardStep
               footer={footer}
               id={id}
-              isDisabled={isDisabled}
+              isDisabled={Boolean(navItemConfig.isStepDisabled(id as VMWizardStep))}
               key={id}
               name={name}
-              navItem={navItem}
+              navItem={getVMGenerationNavItem(navItemConfig)}
             >
               {children}
             </WizardStep>

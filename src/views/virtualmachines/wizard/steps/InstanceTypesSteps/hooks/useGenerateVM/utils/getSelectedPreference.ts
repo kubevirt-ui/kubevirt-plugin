@@ -4,7 +4,7 @@ import {
 } from '@kubevirt-utils/constants/instancetypes-and-preferences';
 import { type BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { getLabel } from '@kubevirt-utils/resources/shared';
-import { type VMWizardFormValues } from '@virtualmachines/wizard/state/vm-wizard-form/types';
+import { type VMWizardFormValues } from '@virtualmachines/wizard/form/types';
 
 type PreferenceFormValue = VMWizardFormValues['instanceType']['preference'];
 

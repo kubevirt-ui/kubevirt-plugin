@@ -15,14 +15,14 @@ import { isInstanceTypeVM } from '@kubevirt-utils/resources/instancetype/helper'
 import { getName } from '@kubevirt-utils/resources/shared';
 import { getCPU, getMemory } from '@kubevirt-utils/resources/vm';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
-import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
+import { useVMWizardForm } from '@virtualmachines/wizard/form/VMWizardFormProvider';
 import { patchWizardCustomizedVM } from '@virtualmachines/wizard/utils/patchWizardCustomizedVM';
 
 const CPUMemory: FC = () => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
 
-  const { control, getValues, setValue } = useVMWizard();
+  const { control, getValues, setValue } = useVMWizardForm();
   const vm = useWatch({ control, name: 'customization.vmDraft' });
 
   const onSubmitCPUMemory = (updatedVM: V1VirtualMachine): Promise<V1VirtualMachine | undefined> =>

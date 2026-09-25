@@ -5,7 +5,7 @@ import { type PreferenceOption } from '@kubevirt-utils/components/AddBootableVol
 import useClusterPreferences from '@kubevirt-utils/hooks/useClusterPreferences';
 import useHcoWorkloadArchitectures from '@kubevirt-utils/hooks/useHcoWorkloadArchitectures';
 import useUserPreferences from '@kubevirt-utils/hooks/useUserPreferences';
-import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
+import { useVMWizardForm } from '@virtualmachines/wizard/form/VMWizardFormProvider';
 import {
   getDefaultPreference,
   getSortedPreferencesByOSType,
@@ -26,7 +26,7 @@ const usePreferenceSelectOptions: UsePreferenceSelectOptions = (
   cluster,
   operatingSystemType,
 ) => {
-  const { control, setValue } = useVMWizard();
+  const { control, setValue } = useVMWizardForm();
   const preference = useWatch({
     control,
     name: 'instanceType.preference',
@@ -56,7 +56,7 @@ const usePreferenceSelectOptions: UsePreferenceSelectOptions = (
       preference && preferences.some((pref) => pref.name === preference.name);
 
     if (!isCurrentPreferenceValid && defaultPref) {
-      setValue('instanceType.preference', defaultPref);
+      setValue('instanceType.preference', defaultPref, { shouldValidate: true });
     }
   }, [architectures, isPreferencesLoaded, operatingSystemType, preference, preferences, setValue]);
 

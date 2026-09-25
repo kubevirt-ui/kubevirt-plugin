@@ -1,7 +1,9 @@
 import { type FC } from 'react';
 
-import { useWizardContext, WizardFooter } from '@patternfly/react-core';
+import { WizardFooter } from '@patternfly/react-core';
 import useCloseWizard from '@virtualmachines/wizard/hooks/useCloseWizard';
+import useWizardFooterNavigation from '@virtualmachines/wizard/hooks/useWizardFooterNavigation';
+import { type WizardStepNavItemConfig } from '@virtualmachines/wizard/utils/types';
 
 import {
   WIZARD_BACK_BUTTON_PROPS,
@@ -10,24 +12,25 @@ import {
 } from './constants';
 
 type DefaultWizardFooterProps = {
-  isNextDisabled?: boolean;
+  navigation: WizardStepNavItemConfig;
 };
 
-const DefaultWizardFooter: FC<DefaultWizardFooterProps> = ({ isNextDisabled }) => {
-  const { activeStep, goToNextStep, goToPrevStep } = useWizardContext();
+const DefaultWizardFooter: FC<DefaultWizardFooterProps> = ({ navigation }) => {
+  const { activeStep, isBackDisabled, isNextDisabled, onBack, onNext } =
+    useWizardFooterNavigation(navigation);
   const closeWizard = useCloseWizard();
 
   return (
     <WizardFooter
       activeStep={activeStep}
       backButtonProps={WIZARD_BACK_BUTTON_PROPS}
-      cancelButtonProps={WIZARD_CANCEL_BUTTON_PROPS}
-      isBackDisabled={activeStep.index === 1}
+      cancelButtonProps={{ ...WIZARD_CANCEL_BUTTON_PROPS, isDisabled: navigation.isGeneratingVM }}
+      isBackDisabled={isBackDisabled}
       isNextDisabled={isNextDisabled}
-      nextButtonProps={WIZARD_NEXT_BUTTON_PROPS}
-      onBack={goToPrevStep}
+      nextButtonProps={{ ...WIZARD_NEXT_BUTTON_PROPS, isLoading: navigation.isGeneratingVM }}
+      onBack={onBack}
       onClose={closeWizard}
-      onNext={goToNextStep}
+      onNext={onNext}
     />
   );
 };

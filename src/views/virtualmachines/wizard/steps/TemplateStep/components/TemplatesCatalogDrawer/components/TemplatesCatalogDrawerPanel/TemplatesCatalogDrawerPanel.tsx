@@ -16,10 +16,9 @@ import {
 import ParametersSections from '../ParametersSections';
 import TemplateInfoSection from '../TemplateInfoSection';
 
-const TemplatesCatalogDrawerPanel: FC = memo(() => {
+const TemplatesCatalogDrawerPanel: FC = () => {
+  const { setTemplateProcessError, templateProcessError } = useVMWizardState();
   const { t } = useKubevirtTranslation();
-  const { templateProcessError } = useVMWizardState();
-
   const [activeTabKey, setActiveTabKey] = useState<TemplatesDrawerTabKey>(
     TemplatesDrawerTabKey.Details,
   );
@@ -84,7 +83,8 @@ const TemplatesCatalogDrawerPanel: FC = memo(() => {
             title={<TabTitleText>{t('Required parameters')}</TabTitleText>}
           >
             <ParametersSections
-              requiredParameters={requiredParameters}
+              key={templateKey}
+              onCommit={() => setTemplateProcessError(null)}
               showValidation={Boolean(templateProcessError)}
             />
           </Tab>
@@ -92,6 +92,6 @@ const TemplatesCatalogDrawerPanel: FC = memo(() => {
       </Tabs>
     </>
   );
-});
+};
 
-export default TemplatesCatalogDrawerPanel;
+export default memo(TemplatesCatalogDrawerPanel);

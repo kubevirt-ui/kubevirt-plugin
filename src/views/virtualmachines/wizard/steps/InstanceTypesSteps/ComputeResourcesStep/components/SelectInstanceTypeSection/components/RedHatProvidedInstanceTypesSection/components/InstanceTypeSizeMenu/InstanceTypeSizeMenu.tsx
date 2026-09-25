@@ -4,7 +4,7 @@ import { Controller, useWatch } from 'react-hook-form';
 import { type InstanceTypeSize } from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/InstanceTypeDrilldownSelect/utils/types';
 import { logITFlowEvent } from '@kubevirt-utils/extensions/telemetry/telemetry';
 import { INSTANCETYPE_SELECTED } from '@kubevirt-utils/extensions/telemetry/utils/constants';
-import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
+import { useVMWizardForm } from '@virtualmachines/wizard/form/VMWizardFormProvider';
 import InstanceTypeSizeDropdown from '@virtualmachines/wizard/steps/InstanceTypesSteps/ComputeResourcesStep/components/SelectInstanceTypeSection/components/RedHatProvidedInstanceTypesSection/components/InstanceTypeSizeMenu/InstanceTypeSizeDropdown/InstanceTypeSizeDropdown';
 
 type InstanceTypeSizeMenuProps = {
@@ -12,7 +12,7 @@ type InstanceTypeSizeMenuProps = {
 };
 
 const InstanceTypeSizeMenu: FC<InstanceTypeSizeMenuProps> = ({ instanceTypeSizes }) => {
-  const { control } = useVMWizard();
+  const { control } = useVMWizardForm();
   const selectedSeries = useWatch({
     control,
     name: 'instanceType.compute.series',

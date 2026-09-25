@@ -1,17 +1,19 @@
 import type { FC } from 'react';
 
-import { VMWizardProvider } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
+import { VMWizardFormProviderBoundary } from '@virtualmachines/wizard/form/VMWizardFormProviderBoundary';
 
 import VMWizardStateProvider from './state/VMWizardStateProvider';
 import VMCreationWizardContent from './VMCreationWizardContent';
 
 const VMCreationWizard: FC = () => {
   return (
-    <VMWizardStateProvider>
-      <VMWizardProvider>
-        <VMCreationWizardContent />
-      </VMWizardProvider>
-    </VMWizardStateProvider>
+    <VMWizardFormProviderBoundary>
+      {(resources) => (
+        <VMWizardStateProvider>
+          <VMCreationWizardContent {...resources} />
+        </VMWizardStateProvider>
+      )}
+    </VMWizardFormProviderBoundary>
   );
 };
 

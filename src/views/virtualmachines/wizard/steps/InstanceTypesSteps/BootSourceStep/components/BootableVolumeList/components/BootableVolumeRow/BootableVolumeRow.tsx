@@ -27,9 +27,7 @@ import '../../BootableVolumeList.scss';
 type BootableVolumeRowProps = {
   activeColumnIDs: string[];
   bootableVolume: BootableVolume;
-  onSelectBootableVolume: (
-    args: Omit<ApplySelectedBootableVolumeToForm, 'getValues' | 'setValue'>,
-  ) => void;
+  onSelectBootableVolume: (args: Omit<ApplySelectedBootableVolumeToForm, 'setValue'>) => void;
   rowData: BootableVolumeRowData;
   selectedBootableVolume?: BootableVolume;
 };

@@ -3,7 +3,7 @@ import { useCallback } from 'react';
 import { DESCRIPTION_ANNOTATION } from '@kubevirt-utils/resources/vm';
 import type { WizardStepType } from '@patternfly/react-core';
 import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
-import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
+import { useVMWizardForm } from '@virtualmachines/wizard/form/VMWizardFormProvider';
 import { VMWizardStep } from '@virtualmachines/wizard/utils/constants';
 import { patchWizardCustomizedVM } from '@virtualmachines/wizard/utils/patchWizardCustomizedVM';
 
@@ -24,7 +24,7 @@ type UseSyncDeploymentDetailsAndMetadataFieldsReturn = {
  */
 export const useSyncDeploymentDetailsAndMetadataFields =
   (): UseSyncDeploymentDetailsAndMetadataFieldsReturn => {
-    const { getValues, setValue } = useVMWizard();
+    const { getValues, setValue } = useVMWizardForm();
 
     const syncDescriptionFieldAndMetadataAnnotations = useCallback(
       (description: string) => {

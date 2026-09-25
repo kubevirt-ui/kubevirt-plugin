@@ -15,7 +15,7 @@ import {
 } from '@kubevirt-utils/resources/shared';
 import { Table, TableVariant, Tbody, Th, Thead, Tr } from '@patternfly/react-table';
 import { type ThSortType } from '@patternfly/react-table/dist/esm/components/Table/base/types';
-import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
+import { useVMWizardForm } from '@virtualmachines/wizard/form/VMWizardFormProvider';
 import { getBootableVolumeRowData } from '@virtualmachines/wizard/steps/InstanceTypesSteps/BootSourceStep/components/BootableVolumeList/utils/getBootableVolumeRowData';
 import {
   type ApplySelectedBootableVolumeToForm,
@@ -45,7 +45,7 @@ const BootableVolumeTable: FC<BootableVolumeTableProps> = ({
   userPreferencesMap,
   volumeListNamespace,
 }) => {
-  const { control, getValues, setValue } = useVMWizard();
+  const { control, setValue } = useVMWizardForm();
 
   const selectedBootableVolume = useWatch({
     control,
@@ -56,14 +56,13 @@ const BootableVolumeTable: FC<BootableVolumeTableProps> = ({
     (args: ApplySelectedBootableVolumeToForm) => {
       applySelectedBootableVolumeToForm({
         ...args,
-        getValues,
         setValue,
       });
       logITFlowEvent(BOOTABLE_VOLUME_SELECTED, null, {
         selectedBootableVolume: getName(args.selectedVolume),
       });
     },
-    [getValues, setValue],
+    [setValue],
   );
 
   return (

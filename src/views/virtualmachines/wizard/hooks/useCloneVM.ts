@@ -16,13 +16,14 @@ import { RUNSTRATEGY_HALTED } from '@kubevirt-utils/resources/vm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { isACMPath } from '@multicluster/urls';
-import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
+import { type VMWizardFormValues } from '@virtualmachines/wizard/form/types';
+import { useVMWizardForm } from '@virtualmachines/wizard/form/VMWizardFormProvider';
 
 import { SELECTED_CLUSTER } from '../utils/constants';
 import { handleCloneRequestPhaseChange } from './utils/utils';
 
 type UseCloneVM = () => {
-  cloneVM: () => Promise<void>;
+  cloneVM: (values: VMWizardFormValues) => Promise<void>;
   error: unknown;
   isSubmitting: boolean;
 };
@@ -31,7 +32,7 @@ const useCloneVM: UseCloneVM = () => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  const { getValues } = useVMWizard();
+  const { getValues } = useVMWizardForm();
 
   const [submittedCloneRequest, setSubmittedCloneRequest] = useState<V1beta1VirtualMachineClone>();
   const [error, setError] = useState<unknown>(null);
@@ -59,13 +60,20 @@ const useCloneVM: UseCloneVM = () => {
     });
   }, [cloneRequest, getValues, navigate, submittedCloneRequest, t]);
 
-  const cloneVM = async (): Promise<void> => {
+  const cloneVM = async (values: VMWizardFormValues): Promise<void> => {
     if (isSubmitting || submittedCloneRequest) {
       return;
     }
-    const source = getValues('clone.sourceVM');
 
-    const { cluster, description, name, project: targetNamespace } = getValues('deployment');
+    const {
+      clone: { sourceVM: source },
+      deployment: {
+        cluster: targetCluster,
+        description: targetDescription,
+        name: targetName,
+        project: targetProject,
+      },
+    } = values;
 
     if (!source) {
       setError(new Error(t('Select a VirtualMachine to clone')));
@@ -76,11 +84,11 @@ const useCloneVM: UseCloneVM = () => {
     setError(null);
 
     try {
-      const targetCluster = getCluster(source) ?? cluster;
+      const cloneCluster = getCluster(source) ?? targetCluster;
       const sourceName = getName(source) ?? '';
-      const vmToClonePromise = vmExists(sourceName, getNamespace(source) ?? '', targetCluster);
+      const vmToClonePromise = vmExists(sourceName, getNamespace(source) ?? '', cloneCluster);
 
-      const targetVMAlreadyExistsPromise = vmExists(name, targetNamespace, targetCluster);
+      const targetVMAlreadyExistsPromise = vmExists(targetName, targetProject, cloneCluster);
 
       const [vmToClone, targetVMAlreadyExists] = await Promise.all([
         vmToClonePromise,
@@ -95,17 +103,16 @@ const useCloneVM: UseCloneVM = () => {
         throw new Error(t('VirtualMachine with this name already exists'));
       }
 
-      const shouldStartClonedVM = source.spec?.runStrategy !== RUNSTRATEGY_HALTED;
       const request = await createCloneRequest(
         source,
-        name,
-        targetNamespace,
-        shouldStartClonedVM,
-        description,
+        targetName,
+        targetProject,
+        source.spec?.runStrategy !== RUNSTRATEGY_HALTED,
+        targetDescription,
       );
 
-      if (targetCluster && isACMPath(pathname)) {
-        setClusterInLocalStorage(targetCluster);
+      if (cloneCluster && isACMPath(pathname)) {
+        setClusterInLocalStorage(cloneCluster);
       }
 
       setSubmittedCloneRequest(request);

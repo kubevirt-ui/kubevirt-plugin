@@ -1,5 +1,3 @@
-import { type UseFormGetValues } from 'react-hook-form';
-
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
   type K8sIoApimachineryPkgApisMetaV1ObjectMeta,
@@ -24,7 +22,6 @@ import { getRandomChars, isEmpty } from '@kubevirt-utils/utils/utils';
 import { AutomaticSubscriptionTypeEnum } from '@settings/tabs/ClusterTab/components/GuestManagmentSection/AutomaticSubscriptionRHELGuests/components/AutomaticSubscriptionType/utils/utils';
 import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
 import { type GetMergedMetadataLabelsArgs } from '@virtualmachines/wizard/hooks/types/types';
-import { type VMWizardFormValues } from '@virtualmachines/wizard/state/vm-wizard-form/types';
 
 import { type GenerateVMCallback } from '../types';
 
@@ -114,12 +111,11 @@ export const createPopulatedCloudInitYAML = (
 };
 
 export const getAdminLabelsToMerge = (
-  adminLabels: AutoAppliedLabel[],
+  adminLabels: readonly AutoAppliedLabel[],
   userDefaults: Record<string, string>,
-  getValues: UseFormGetValues<VMWizardFormValues>,
+  vmDraft: V1VirtualMachine | null,
 ): Record<string, string> => {
-  const customizedVM = getValues('customization.vmDraft');
-  const existingLabels = customizedVM ? getLabels(customizedVM, {}) : {};
+  const existingLabels = vmDraft ? getLabels(vmDraft, {}) : {};
   const adminLabelsToMerge = adminLabels?.reduce<Record<string, string>>((acc, { key, value }) => {
     if (Object.prototype.hasOwnProperty.call(existingLabels, key)) {
       return acc;
@@ -140,7 +136,11 @@ export const getMergedMetadataLabels = ({
   userDefaults,
   vmName,
 }: GetMergedMetadataLabelsArgs): K8sIoApimachineryPkgApisMetaV1ObjectMeta => {
-  const adminLabelsToMerge = getAdminLabelsToMerge(adminLabels, userDefaults, getValues);
+  const adminLabelsToMerge = getAdminLabelsToMerge(
+    adminLabels,
+    userDefaults,
+    getValues('customization.vmDraft'),
+  );
 
   const metadataLabels = {
     labels: {

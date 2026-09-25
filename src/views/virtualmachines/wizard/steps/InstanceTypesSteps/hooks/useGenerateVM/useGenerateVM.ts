@@ -17,8 +17,8 @@ import { addWinDriverVolume } from '@kubevirt-utils/resources/vm/utils/disk/driv
 import { useDriversImage } from '@kubevirt-utils/resources/vm/utils/disk/useDriversImage';
 import { generatePrettyName, getValidNamespace } from '@kubevirt-utils/utils/utils';
 import { AUTOMATIC_UPDATE_FEATURE_NAME } from '@settings/tabs/ClusterTab/components/GuestManagmentSection/AutomaticSubscriptionRHELGuests/utils/constants';
+import { useVMWizardForm } from '@virtualmachines/wizard/form/VMWizardFormProvider';
 import useApplyAutoLabels from '@virtualmachines/wizard/hooks/useApplyAutoLabels';
-import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
 import {
   createPopulatedCloudInitYAML,
   generateVM,
@@ -34,7 +34,7 @@ export type UseGenerateVMResult = {
 };
 
 const useGenerateVM = (): UseGenerateVMResult => {
-  const { control, getValues } = useVMWizard();
+  const { control, getValues } = useVMWizardForm();
   const [deployment, instanceType] = useWatch({
     control,
     name: ['deployment', 'instanceType'],

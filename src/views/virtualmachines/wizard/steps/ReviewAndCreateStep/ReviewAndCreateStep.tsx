@@ -9,15 +9,15 @@ import {
 } from '@kubevirt-utils/components/RunStrategyModal/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Checkbox, Stack, StackItem, Title, TitleSizes } from '@patternfly/react-core';
+import { useVMWizardForm } from '@virtualmachines/wizard/form/VMWizardFormProvider';
 import { useWizardReviewVM } from '@virtualmachines/wizard/hooks/useWizardReviewVM';
-import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
 import ReviewGrid from '@virtualmachines/wizard/steps/ReviewAndCreateStep/components/ReviewGrid/ReviewGrid';
 import { patchWizardCustomizedVM } from '@virtualmachines/wizard/utils/patchWizardCustomizedVM';
 import { isCloneCreationMethod } from '@virtualmachines/wizard/utils/utils';
 
 const ReviewAndCreateStep: FC = () => {
   const { t } = useKubevirtTranslation();
-  const { control, getValues, setValue } = useVMWizard();
+  const { control, getValues, setValue } = useVMWizardForm();
   const creationMethod = useWatch({ control, name: 'creationMethod' });
   const vm = useWizardReviewVM();
   const isCloneMethod = isCloneCreationMethod(creationMethod);

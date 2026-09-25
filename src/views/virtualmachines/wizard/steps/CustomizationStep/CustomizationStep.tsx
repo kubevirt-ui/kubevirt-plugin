@@ -4,7 +4,7 @@ import { useWatch } from 'react-hook-form';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Stack, StackItem, Title, TitleSizes } from '@patternfly/react-core';
-import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
+import { useVMWizardForm } from '@virtualmachines/wizard/form/VMWizardFormProvider';
 import CustomizeVirtualMachine from '@virtualmachines/wizard/steps/CustomizationStep/components/CustomizeVirtualMachine/CustomizeVirtualMachine';
 import { VMCreationMethod } from '@virtualmachines/wizard/utils/constants';
 import { patchWizardCustomizedVM } from '@virtualmachines/wizard/utils/patchWizardCustomizedVM';
@@ -14,7 +14,7 @@ import { getAdminLabelsToMerge } from '../InstanceTypesSteps/hooks/useGenerateVM
 
 const CustomizationStep: FC = () => {
   const { t } = useKubevirtTranslation();
-  const { control, getValues, setValue } = useVMWizard();
+  const { control, getValues, setValue } = useVMWizardForm();
   const creationMethod = useWatch({ control, name: 'creationMethod' });
   const { adminLabels, generatedVM, loaded, userDefaults } = useGenerateVM();
 
@@ -28,17 +28,25 @@ const CustomizationStep: FC = () => {
     if (creationMethod !== VMCreationMethod.INSTANCE_TYPE) {
       patchWizardCustomizedVM(getValues, setValue, [
         {
-          data: getAdminLabelsToMerge(adminLabels, userDefaults, getValues),
+          data: getAdminLabelsToMerge(
+            adminLabels,
+            userDefaults,
+            getValues('customization.vmDraft'),
+          ),
           path: ['metadata', 'labels'],
         },
       ]);
-      setValue('customization.autoLabelsApplied', true);
+
+      setValue('customization.autoLabelsApplied', true, { shouldValidate: true });
+
       hasSeededCustomizedVMRef.current = true;
+
       return;
     }
 
-    setValue('customization.vmDraft', generatedVM);
-    setValue('customization.autoLabelsApplied', true);
+    setValue('customization.vmDraft', generatedVM, { shouldValidate: true });
+    setValue('customization.autoLabelsApplied', true, { shouldValidate: true });
+
     hasSeededCustomizedVMRef.current = true;
   }, [adminLabels, creationMethod, generatedVM, getValues, loaded, setValue, userDefaults]);
 

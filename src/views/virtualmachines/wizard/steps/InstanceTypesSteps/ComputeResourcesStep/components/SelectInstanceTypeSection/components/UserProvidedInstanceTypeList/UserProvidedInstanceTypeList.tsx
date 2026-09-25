@@ -7,7 +7,7 @@ import { type PaginationState } from '@kubevirt-utils/hooks/usePagination/utils/
 import { getName } from '@kubevirt-utils/resources/shared';
 import { isAllNamespaces, isEmpty } from '@kubevirt-utils/utils/utils';
 import { ActionList, ActionListItem, Pagination, SearchInput } from '@patternfly/react-core';
-import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
+import { useVMWizardForm } from '@virtualmachines/wizard/form/VMWizardFormProvider';
 import { type InstanceTypes } from '@virtualmachines/wizard/utils/types';
 
 import UserProvidedComputeResourcesEmptyState from './components/UserProvidedComputeResourcesEmptyState';
@@ -27,14 +27,10 @@ const UserProvidedInstanceTypesList: FC<UserProvidedInstanceTypesListProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const activeNamespace = useActiveNamespace();
-  const { control, setValue } = useVMWizard();
-  const selectedInstanceType = useWatch({
+  const { control, setValue } = useVMWizardForm();
+  const [selectedInstanceType, namespace] = useWatch({
     control,
-    name: 'instanceType.compute',
-  });
-  const namespace = useWatch({
-    control,
-    name: 'deployment.project',
+    name: ['instanceType.compute', 'deployment.project'],
   });
 
   const [searchInput, setSearchInput] = useState('');
@@ -69,11 +65,15 @@ const UserProvidedInstanceTypesList: FC<UserProvidedInstanceTypesListProps> = ({
   }
 
   const handleRowClick = (instanceTypeName: string, instanceTypeNamespace: string): void => {
-    setValue('instanceType.compute', {
-      name: instanceTypeName,
-      namespace: instanceTypeNamespace,
-      type: 'user',
-    });
+    setValue(
+      'instanceType.compute',
+      {
+        name: instanceTypeName,
+        namespace: instanceTypeNamespace,
+        type: 'user',
+      },
+      { shouldValidate: true },
+    );
   };
 
   return (

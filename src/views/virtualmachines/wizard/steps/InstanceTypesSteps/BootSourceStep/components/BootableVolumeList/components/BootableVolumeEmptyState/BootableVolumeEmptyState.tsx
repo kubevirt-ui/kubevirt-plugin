@@ -5,7 +5,7 @@ import { Trans } from 'react-i18next';
 import useInstanceTypesAndPreferences from '@kubevirt-utils/hooks/useInstanceTypesAndPreferences';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { EmptyState, Title } from '@patternfly/react-core';
-import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
+import { useVMWizardForm } from '@virtualmachines/wizard/form/VMWizardFormProvider';
 import AddBootableVolumeLink from '@virtualmachines/wizard/steps/InstanceTypesSteps/BootSourceStep/components/BootableVolumeList/components/AddBootableVolumeLink/AddBootableVolumeLink';
 import BootableVolumeOSIcons from '@virtualmachines/wizard/steps/InstanceTypesSteps/BootSourceStep/components/BootableVolumeList/components/BootableVolumeEmptyState/BootableVolumeOSIcons';
 import { getOsNameFromPreference } from '@virtualmachines/wizard/steps/InstanceTypesSteps/BootSourceStep/components/BootableVolumeList/utils/utils';
@@ -19,7 +19,8 @@ type BootableVolumeEmptyStateProps = {
 const BootableVolumeEmptyState: FC<BootableVolumeEmptyStateProps> = ({ isPreferenceFilter }) => {
   const { t } = useKubevirtTranslation();
   const { loadError } = useInstanceTypesAndPreferences();
-  const { control } = useVMWizard();
+  const { control } = useVMWizardForm();
+
   const preference = useWatch({
     control,
     name: 'instanceType.preference',

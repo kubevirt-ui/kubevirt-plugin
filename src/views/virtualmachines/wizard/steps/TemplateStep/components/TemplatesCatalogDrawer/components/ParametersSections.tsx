@@ -1,88 +1,106 @@
-import { type FC, useEffect, useState } from 'react';
-import { produce } from 'immer';
+import { type FC, useEffect, useMemo, useState } from 'react';
+import { Controller, type Resolver, useForm } from 'react-hook-form';
+import * as yup from 'yup';
 
+import { yupResolver } from '@hookform/resolvers/yup';
 import { type TemplateParameter } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getParameters, replaceTemplateParameters } from '@kubevirt-utils/resources/template';
 import { Button, ButtonVariant, Form, Stack, StackItem } from '@patternfly/react-core';
-import { useVMWizardState } from '@virtualmachines/wizard/state/useVMWizardState';
-import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
+import { createTemplateParametersSchema } from '@virtualmachines/wizard/form/schema/template/createTemplateSchema';
+import { useVMWizardForm } from '@virtualmachines/wizard/form/VMWizardFormProvider';
+import { NAME_INPUT_FIELD } from '@virtualmachines/wizard/steps/TemplateStep/components/TemplatesCatalog/utils/consts';
 import { useDrawerContext } from '@virtualmachines/wizard/steps/TemplateStep/components/TemplatesCatalogDrawer/hooks/useDrawerContext';
-import {
-  changeTemplateParameterValue,
-  getPasswordParameterValueError,
-  hasAnyParameterValidationError,
-} from '@virtualmachines/wizard/steps/TemplateStep/components/TemplatesCatalogDrawer/utils/utils';
 
 import FieldGroup from './FieldGroup';
 
+type ParameterDraftValues = { parameters: TemplateParameter[] };
+
 type ParametersSectionProps = {
-  requiredParameters: TemplateParameter[];
+  onCommit: () => void;
   showValidation?: boolean;
 };
 
-const ParametersSections: FC<ParametersSectionProps> = ({
-  requiredParameters,
-  showValidation = false,
-}) => {
+const ParametersSections: FC<ParametersSectionProps> = ({ onCommit, showValidation = false }) => {
   const { t } = useKubevirtTranslation();
-  const { setTemplateProcessError } = useVMWizardState();
-  const { setTemplate, template } = useDrawerContext();
-  const { setValue } = useVMWizard();
+  const { setTemplate, template: drawerTemplate } = useDrawerContext();
+  const { setValue: setTargetValue } = useVMWizardForm();
+
+  const draftParameters = useMemo(() => getParameters(drawerTemplate) ?? [], [drawerTemplate]);
+
+  const schema = useMemo(
+    () =>
+      yup.object({
+        parameters: createTemplateParametersSchema(t),
+      }),
+    [t],
+  );
+
+  const {
+    control,
+    formState: { isSubmitting, isValid },
+    handleSubmit,
+    trigger,
+  } = useForm<ParameterDraftValues>({
+    mode: 'onChange',
+    resolver: yupResolver(schema) as Resolver<ParameterDraftValues>,
+    values: { parameters: draftParameters },
+  });
   const [isEdit, setIsEdit] = useState<boolean>(showValidation);
-  const [showPasswordValidationError, setShowPasswordValidationError] = useState<boolean>(false);
+  const startEditing = (): void => {
+    setIsEdit(true);
+    void trigger();
+  };
 
   useEffect(() => {
     if (showValidation) {
       setIsEdit(true);
+      void trigger();
     }
-  }, [showValidation]);
+  }, [showValidation, trigger]);
 
-  const onFieldValueChange = (parameter: TemplateParameter): void => {
-    const { name, value } = parameter;
-    const passwordError = getPasswordParameterValueError(t, value ?? '');
-    setShowPasswordValidationError(Boolean(passwordError));
+  const commitDraft = handleSubmit(({ parameters: submittedParameters }) => {
+    const committedTemplate = replaceTemplateParameters(drawerTemplate, submittedParameters);
 
-    const updatedTemplate = produce(template, (draft) => {
-      changeTemplateParameterValue(draft, name, value ?? '');
+    setTemplate(committedTemplate);
+    setTargetValue('template.lastProcessedKey', '');
+    setTargetValue('template.selectedTemplate', committedTemplate, {
+      shouldValidate: true,
     });
-
-    setTemplate(updatedTemplate);
-  };
-
-  const onEditClick = (): void => {
-    if (isEdit) {
-      if (hasAnyParameterValidationError(requiredParameters, t)) {
-        return;
-      }
-
-      setValue('template.selectedTemplate', template);
-      setTemplateProcessError(null);
-      setValue('template.lastProcessedKey', '');
-    }
-
-    setIsEdit((prev) => !prev);
-  };
+    onCommit();
+    setIsEdit(false);
+  });
 
   return (
     <Form className="pf-v6-u-mt-lg">
       <Stack hasGutter>
         <StackItem>
-          {requiredParameters.map((param) => (
-            <FieldGroup
-              field={param}
-              isDisabled={!isEdit}
-              key={param.name}
-              onChange={(name, value) => onFieldValueChange({ ...param, name, value })}
-              showError={showValidation || showPasswordValidationError}
-            />
-          ))}
+          {draftParameters.map((parameter, index) => {
+            if (!parameter.required || parameter.name === NAME_INPUT_FIELD) return null;
+
+            return (
+              <Controller
+                control={control}
+                key={parameter.name}
+                name={`parameters.${index}.value`}
+                render={({ field, fieldState }) => (
+                  <FieldGroup
+                    errorMessage={fieldState.error?.message}
+                    field={{ ...parameter, value: field.value ?? '' }}
+                    isDisabled={!isEdit}
+                    onChange={(_name, value) => field.onChange(value)}
+                  />
+                )}
+              />
+            );
+          })}
         </StackItem>
         <StackItem isFilled />
         <StackItem>
           <Button
             data-test="edit-parameters-button"
-            isDisabled={showValidation || showPasswordValidationError}
-            onClick={onEditClick}
+            isDisabled={isSubmitting || (isEdit && !isValid)}
+            onClick={isEdit ? commitDraft : startEditing}
             size="sm"
             variant={ButtonVariant.primary}
           >

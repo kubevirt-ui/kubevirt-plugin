@@ -19,6 +19,7 @@ import {
   getValueTypeFromParameter,
   isPasswordParameter,
 } from '@templates/details/tabs/parameters/utils';
+import { createParameterValueSchema } from '@virtualmachines/wizard/form/schema/template/createTemplateSchema';
 import { NAME_INPUT_FIELD } from '@virtualmachines/wizard/steps/TemplateStep/components/TemplatesCatalog/utils/consts';
 
 export const getRequiredTemplateParameter = (
@@ -85,16 +86,13 @@ export const getFirstUnfulfilledRequiredParameter = (
 export const allRequiredParametersAreFulfilled = (template: Template): boolean =>
   !getFirstUnfulfilledRequiredParameter(template);
 
-const MIN_CLOUD_USER_PASSWORD_LENGTH = 5;
-
 export const getPasswordParameterValueError = (t: TFunction, value: string): string | undefined => {
-  if (value?.length >= MIN_CLOUD_USER_PASSWORD_LENGTH) {
-    return;
+  try {
+    createParameterValueSchema(t).validateSync(value);
+    return undefined;
+  } catch (error) {
+    return (error as Error).message;
   }
-
-  return t('Minimum password length is {{ minLength }} characters', {
-    minLength: MIN_CLOUD_USER_PASSWORD_LENGTH,
-  });
 };
 
 export const hasPasswordParameterValueError = (t: TFunction, value: string): boolean =>

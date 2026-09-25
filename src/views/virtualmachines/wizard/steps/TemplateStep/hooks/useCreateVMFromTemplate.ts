@@ -12,8 +12,8 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
 import { USER_SETTINGS_KEYS } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/const';
 import { getResourceKey } from '@kubevirt-utils/resources/shared';
+import { useVMWizardForm } from '@virtualmachines/wizard/form/VMWizardFormProvider';
 import { useVMWizardState } from '@virtualmachines/wizard/state/useVMWizardState';
-import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
 import { getFirstUnfulfilledRequiredParameter } from '@virtualmachines/wizard/steps/TemplateStep/components/TemplatesCatalogDrawer/utils/utils';
 import {
   getVMObjectFromTemplate,
@@ -29,7 +29,7 @@ const useCreateVMFromTemplate: UseCreateVMFromTemplate = () => {
   const { t } = useKubevirtTranslation();
   const { setIsTemplateDrawerOpen, setTemplateProcessError } = useVMWizardState();
   const [isProcessing, setIsProcessing] = useState(false);
-  const { control, getValues, setValue } = useVMWizard();
+  const { control, getValues, setValue } = useVMWizardForm();
   const cluster = useWatch({ control, name: 'deployment.cluster' });
   const [authorizedSSHKeys] = useKubevirtUserSettings(USER_SETTINGS_KEYS.ssh, cluster);
 
@@ -76,7 +76,7 @@ const useCreateVMFromTemplate: UseCreateVMFromTemplate = () => {
         vm,
       });
 
-      setValue('customization.vmDraft', vmFromTemplate);
+      setValue('customization.vmDraft', vmFromTemplate, { shouldValidate: true });
 
       setValue('template.lastProcessedKey', selectedKey);
       setValue('customization.templateAdditionalObjects', additionalObjects);

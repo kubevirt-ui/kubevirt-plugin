@@ -15,7 +15,7 @@ import {
   type VMWizardStep,
 } from '@virtualmachines/wizard/utils/constants';
 
-import { type VMWizardFormValues } from '../state/vm-wizard-form/types';
+import { type VMWizardFormValues } from '../form/types';
 import {
   type ApplySelectedBootableVolumeToForm,
   type VMCreationMethodCardDetails,
@@ -70,37 +70,33 @@ export const isInstanceTypeCreationMethod = (creationMethod: VMCreationMethod): 
 
 export const applySelectedBootableVolumeToForm = ({
   dvSource,
-  getValues,
   pvcSource,
   selectedVolume,
   setValue,
   volumeSnapshotSource,
 }: ApplySelectedBootableVolumeToForm): void => {
-  const instanceTypeName = getInstanceTypeFromVolume(selectedVolume);
-  const [series = '', size = ''] = instanceTypeName?.split('.') || [];
+  const name = getInstanceTypeFromVolume(selectedVolume) ?? '';
+  const [series = '', size = ''] = name.split('.');
 
-  setValue('instanceType', {
-    ...getValues('instanceType'),
-    bootVolume: {
+  setValue(
+    'instanceType.bootVolume',
+    {
       dataVolumeSource: dvSource,
       diskSize: getDiskSize(dvSource, pvcSource, volumeSnapshotSource),
       persistentVolumeClaimSource: pvcSource,
       volume: selectedVolume,
       volumeSnapshotSource,
     },
-    compute: instanceTypeName ? { name: instanceTypeName, series, size, type: 'redhat' } : null,
+    { shouldValidate: true },
+  );
+  setValue('instanceType.compute', series && size ? { name, series, size, type: 'redhat' } : null, {
+    shouldValidate: true,
   });
 };
 
-export const resetBootableVolumeFields = (
-  getValues: UseFormGetValues<VMWizardFormValues>,
-  setValue: UseFormSetValue<VMWizardFormValues>,
-): void => {
-  setValue('instanceType', {
-    ...getValues('instanceType'),
-    bootVolume: null,
-    compute: null,
-  });
+export const resetBootableVolumeFields = (setValue: UseFormSetValue<VMWizardFormValues>): void => {
+  setValue('instanceType.bootVolume', null, { shouldValidate: true });
+  setValue('instanceType.compute', null, { shouldValidate: true });
 };
 
 export const clearVMPendingUploads = (

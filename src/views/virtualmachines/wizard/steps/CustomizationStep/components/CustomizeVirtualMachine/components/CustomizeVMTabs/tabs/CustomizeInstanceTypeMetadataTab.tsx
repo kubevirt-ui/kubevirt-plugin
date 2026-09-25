@@ -1,50 +1,57 @@
 import type { FC } from 'react';
 import { useCallback } from 'react';
-import { type Path, useWatch } from 'react-hook-form';
+import produce from 'immer';
 
 import Loading from '@kubevirt-utils/components/Loading/Loading';
-import { DESCRIPTION_ANNOTATION } from '@kubevirt-utils/resources/vm';
+import { DESCRIPTION_ANNOTATION } from '@kubevirt-utils/resources/vm/utils/annotations';
+import { ensurePath } from '@kubevirt-utils/utils/utils';
 import { PageSection } from '@patternfly/react-core';
 import MetadataTabContent from '@virtualmachines/details/tabs/configuration/metadata/components/MetadataTabContent';
 import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
-import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
-import { type VMWizardFormValues } from '@virtualmachines/wizard/state/vm-wizard-form/types';
-import { patchWizardCustomizedVM } from '@virtualmachines/wizard/utils/patchWizardCustomizedVM';
+import { useVMWizardForm } from '@virtualmachines/wizard/form/VMWizardFormProvider';
+import { useWizardVMDraft } from '@virtualmachines/wizard/hooks/useWizardVMDraft';
 
 import '@virtualmachines/details/tabs/configuration/metadata/metadata-tab.scss';
 
 const CustomizeInstanceTypeMetadataTab: FC = () => {
-  const { control, getValues, setValue } = useVMWizard();
-  const vm = useWatch({ control, name: 'customization.vmDraft' });
+  const { replaceDraft, vmDraft: vm } = useWizardVMDraft();
+  const { getValues, setValue } = useVMWizardForm();
 
-  const updateMetadata = useCallback(
-    (data: Record<string, string>, type: string) => {
-      const metadataPatch = [{ data, path: `metadata.${type}` }];
+  const commitMetadata = useCallback(
+    (data: Record<string, string>, type: 'annotations' | 'labels') => {
+      if (!vm) return Promise.resolve(undefined);
 
-      return Promise.resolve(patchWizardCustomizedVM(getValues, setValue, metadataPatch));
+      const updatedVM = produce(vm, (draft) => {
+        ensurePath(draft, ['metadata']);
+
+        draft.metadata[type] = data;
+      });
+
+      return Promise.resolve(replaceDraft(updatedVM));
     },
-    [getValues, setValue],
+    [replaceDraft, vm],
   );
 
   const syncMetadataWithForm = useCallback(
     async (
-      payload: Record<string, string>,
-      metadataType: 'labels' | 'annotations',
-      payloadKey: string,
-      formField: Path<VMWizardFormValues>,
-    ): Promise<void> => {
-      await updateMetadata(payload, metadataType);
+      data: Record<string, string>,
+      type: 'annotations' | 'labels',
+      key: string,
+      field: 'deployment.description' | 'deployment.folder',
+    ) => {
+      const committedVM = await commitMetadata(data, type);
 
-      const newValue = payload[payloadKey];
-      const existingValue = getValues(formField) as string;
+      if (!committedVM) return undefined;
 
-      if (newValue === existingValue) {
-        return;
+      const value = data[key] ?? '';
+
+      if (getValues(field) !== value) {
+        setValue(field, value, { shouldDirty: true });
       }
 
-      setValue(formField, newValue ?? '');
+      return committedVM;
     },
-    [getValues, setValue, updateMetadata],
+    [commitMetadata, getValues, setValue],
   );
 
   const onLabelsSubmit = useCallback(

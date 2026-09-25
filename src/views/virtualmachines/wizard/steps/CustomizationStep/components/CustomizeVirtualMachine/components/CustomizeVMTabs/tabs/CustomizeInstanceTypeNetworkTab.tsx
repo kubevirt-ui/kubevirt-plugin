@@ -12,7 +12,7 @@ import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { PageSection, Title } from '@patternfly/react-core';
 import AddNetworkInterfaceButton from '@virtualmachines/details/tabs/configuration/network/components/AddNetworkInterfaceButton';
-import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
+import { useVMWizardForm } from '@virtualmachines/wizard/form/VMWizardFormProvider';
 import NetworkInterfaceList from '@virtualmachines/wizard/steps/CustomizationStep/components/CustomizeVirtualMachine/components/CustomizeVMTabs/tabs/network/NetworkInterfaceList';
 import {
   patchWizardCustomizedVM,
@@ -21,8 +21,8 @@ import {
 
 const CustomizeInstanceTypeNetworkTab: FC = () => {
   const { t } = useKubevirtTranslation();
-  const { getValues, setValue } = useVMWizard();
-  const { control } = useVMWizard();
+  const { getValues, setValue } = useVMWizardForm();
+  const { control } = useVMWizardForm();
   const vm = useWatch({ control, name: 'customization.vmDraft' });
 
   if (!vm) {

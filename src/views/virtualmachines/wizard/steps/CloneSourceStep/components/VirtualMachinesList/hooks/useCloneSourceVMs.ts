@@ -17,7 +17,7 @@ import { useAccessibleResources } from '@virtualmachines/search/hooks/useAccessi
 import useVMSearchQueries from '@virtualmachines/search/hooks/useVMSearchQueries';
 import { OBJECTS_FETCHING_LIMIT } from '@virtualmachines/utils';
 import type { PVCMapper, VMIMapper, VMIMMapper } from '@virtualmachines/utils/mappers';
-import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
+import { useVMWizardForm } from '@virtualmachines/wizard/form/VMWizardFormProvider';
 
 import { resolveVMListSource } from '../utils/utils';
 import { useCloneSourceVMFilters } from './useCloneSourceVMFilters';
@@ -41,7 +41,7 @@ export const useCloneSourceVMs = (): UseCloneSourceVMsReturn => {
   useSignals();
   useVMMetrics();
 
-  const { control } = useVMWizard();
+  const { control } = useVMWizardForm();
   const [cluster, targetNamespace] = useWatch({
     control,
     name: ['deployment.cluster', 'deployment.project'],

@@ -1,32 +1,49 @@
 import { type FC, useCallback } from 'react';
-import { Controller, useWatch } from 'react-hook-form';
+import { useController } from 'react-hook-form';
 
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useNameValidation } from '@kubevirt-utils/hooks/useNameValidation';
-import {
-  getDNS1123LabelError,
-  getDNS1123LabelErrorLenient,
-} from '@kubevirt-utils/utils/validation';
-import { InputGroup, InputGroupItem, TextInput } from '@patternfly/react-core';
+import { getDNS1123LabelErrorLenient } from '@kubevirt-utils/utils/validation';
+import { InputGroup, InputGroupItem, TextInput, ValidatedOptions } from '@patternfly/react-core';
 import { useVMWizardState } from '@virtualmachines/wizard/state/useVMWizardState';
 
-import { useVMWizard } from '../state/vm-wizard-context/VMWizardContext';
+import { useVMWizardForm } from '../form/VMWizardFormProvider';
 import GenerateVMNameButton from './GenerateVMNameButton';
 
 const NameInput: FC = () => {
   const { t } = useKubevirtTranslation();
+  const { control, setValue, trigger } = useVMWizardForm();
+  const {
+    field,
+    fieldState: { error, isTouched },
+  } = useController({ control, name: 'deployment.name' });
+  const vmName = field.value;
   const { setStrictVMName, strictVMName } = useVMWizardState();
-  const { control, setValue } = useVMWizard();
-  const vmName = useWatch({ control, name: 'deployment.name' });
+  const showValidation = isTouched || Boolean(vmName) || strictVMName;
 
-  const getError = strictVMName ? getDNS1123LabelError : getDNS1123LabelErrorLenient;
-  const { errorText, validated } = useNameValidation({ getError, name: vmName });
+  const lenientValidation = useNameValidation({
+    getError: getDNS1123LabelErrorLenient,
+    name: showValidation ? vmName : undefined,
+  });
 
-  const applyName = useCallback(
+  let errorText = lenientValidation.errorText;
+  let validated = lenientValidation.validated;
+
+  if (strictVMName) {
+    errorText = error?.message;
+    validated = error ? ValidatedOptions.error : ValidatedOptions.default;
+  }
+
+  const onChange = useCallback(
     (newName: string) => {
       setStrictVMName(false);
-      setValue('deployment.name', newName);
+      // Keep errors visible after typing and clearing, even when the value is no longer dirty.
+      setValue('deployment.name', newName, {
+        shouldDirty: true,
+        shouldTouch: true,
+        shouldValidate: true,
+      });
     },
     [setStrictVMName, setValue],
   );
@@ -35,23 +52,22 @@ const NameInput: FC = () => {
     <>
       <InputGroup>
         <InputGroupItem isFill>
-          <Controller
-            control={control}
-            name="deployment.name"
-            render={({ field: { ref: _ref, ...field } }) => (
-              <TextInput
-                id="vm-name"
-                {...field}
-                onChange={(_event, value) => applyName(value)}
-                placeholder={t('Enter a name or click the refresh icon to generate one')}
-                type="text"
-                validated={validated}
-              />
-            )}
+          <TextInput
+            id="vm-name"
+            {...field}
+            onBlur={() => {
+              field.onBlur();
+              setStrictVMName(true);
+              void trigger('deployment.name');
+            }}
+            onChange={(_event, value) => onChange(value)}
+            placeholder={t('Enter a name or click the refresh icon to generate one')}
+            type="text"
+            validated={validated}
           />
         </InputGroupItem>
         <InputGroupItem>
-          <GenerateVMNameButton applyName={applyName} />
+          <GenerateVMNameButton applyName={onChange} />
         </InputGroupItem>
       </InputGroup>
       {errorText && <FormGroupHelperText validated={validated}>{errorText}</FormGroupHelperText>}

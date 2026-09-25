@@ -3,7 +3,7 @@ import { useWatch } from 'react-hook-form';
 import { type PreferenceOption } from '@kubevirt-utils/components/AddBootableVolumeModal/types';
 import useCanCreateBootableVolume from '@kubevirt-utils/resources/bootableresources/hooks/useCanCreateBootableVolume';
 import { type BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
-import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
+import { useVMWizardForm } from '@virtualmachines/wizard/form/VMWizardFormProvider';
 import { applySelectedBootableVolumeToForm } from '@virtualmachines/wizard/utils/utils';
 
 export type AddBootableVolume = {
@@ -14,7 +14,7 @@ export type AddBootableVolume = {
 };
 
 const useAddBootableVolume = (): AddBootableVolume => {
-  const { control, getValues, setValue } = useVMWizard();
+  const { control, getValues, setValue } = useVMWizardForm();
 
   const [volumeListNamespace, preference] = useWatch({
     control,
@@ -27,7 +27,6 @@ const useAddBootableVolume = (): AddBootableVolume => {
   const onCreateVolume = (volume: BootableVolume): void => {
     applySelectedBootableVolumeToForm({
       dvSource: null,
-      getValues,
       pvcSource: null,
       selectedVolume: volume,
       setValue,
@@ -37,6 +36,7 @@ const useAddBootableVolume = (): AddBootableVolume => {
 
   const onUploadStart = (uploadKey: string): void => {
     const keys = getValues('customization.pendingBootableVolumeUploadKeys');
+
     if (!keys.includes(uploadKey))
       setValue('customization.pendingBootableVolumeUploadKeys', [...keys, uploadKey]);
   };

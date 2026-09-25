@@ -9,7 +9,7 @@ import {
   setValueAtPath,
 } from '@kubevirt-utils/signals/customizeWizardVMSignalPathUtils';
 
-import { type VMWizardFormValues } from '../state/vm-wizard-form/types';
+import { type VMWizardFormValues } from '../form/types';
 
 /* TODO: this file is a copy of customizedWizardVMSignal.ts file, but manage the form field values instead of the signal.
 after we migrate the wizard to use the form values instead of the signal, we can remove the previous file.
@@ -108,7 +108,7 @@ export const patchWizardCustomizedVM = (
   const initialVM = produce(currentCustomized, (draft) => draft);
   const updatedVM = applyVMPatches(initialVM, patches);
 
-  setValue('customization.vmDraft', updatedVM);
+  setValue('customization.vmDraft', updatedVM, { shouldValidate: true });
 
   return updatedVM;
 };

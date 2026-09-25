@@ -7,8 +7,8 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { getFolder, NO_DATA_DASH } from '@kubevirt-utils/resources/vm';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { DescriptionList, ExpandableSection } from '@patternfly/react-core';
+import { useVMWizardForm } from '@virtualmachines/wizard/form/VMWizardFormProvider';
 import { useWizardReviewVM } from '@virtualmachines/wizard/hooks/useWizardReviewVM';
-import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
 import { isCloneCreationMethod } from '@virtualmachines/wizard/utils/utils';
 
 import CloneDescriptionInput from './CloneDescriptionInput';
@@ -22,7 +22,7 @@ const ReviewGridLeftColumn: FC = () => {
   const { featureEnabled: treeViewFoldersEnabled, loading: treeViewFoldersLoading } =
     useFeatures(TREE_VIEW_FOLDERS);
 
-  const { getValues } = useVMWizard();
+  const { getValues } = useVMWizardForm();
   const { name, project } = getValues('deployment');
   const creationMethod = getValues('creationMethod');
 

@@ -1,5 +1,4 @@
 import { type FC } from 'react';
-import { useWatch } from 'react-hook-form';
 
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
@@ -7,20 +6,13 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { Grid, GridItem, PageSection, Stack, Title } from '@patternfly/react-core';
 import SSHTabAuthorizedSSHKey from '@virtualmachines/details/tabs/configuration/ssh/components/SSHTabAuthorizedSSHKey';
 import SSHTabSSHAccess from '@virtualmachines/details/tabs/configuration/ssh/components/SSHTabSSHAccess';
-import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
-
-import useUpdateCustomizeInstanceTypeTab from '../hooks/useUpdateCustomizeInstanceTypeTab';
+import { useWizardVMDraft } from '@virtualmachines/wizard/hooks/useWizardVMDraft';
 
 const CustomizeInstanceTypeSSHTab: FC = () => {
   const { t } = useKubevirtTranslation();
-  const { control } = useVMWizard();
-  const vm = useWatch({ control, name: 'customization.vmDraft' });
+  const { replaceDraft, vmDraft: vm } = useWizardVMDraft();
 
-  const { updateVMFromForm } = useUpdateCustomizeInstanceTypeTab();
-
-  if (!vm) {
-    return <Loading />;
-  }
+  if (!vm) return <Loading />;
 
   return (
     <PageSection>
@@ -31,7 +23,11 @@ const CustomizeInstanceTypeSSHTab: FC = () => {
         <GridItem>
           <Stack hasGutter>
             <SSHTabSSHAccess isCustomizeInstanceType vm={vm} />
-            <SSHTabAuthorizedSSHKey isCustomizeInstanceType onUpdateVM={updateVMFromForm} vm={vm} />
+            <SSHTabAuthorizedSSHKey
+              isCustomizeInstanceType
+              onUpdateVM={async (updatedVM) => replaceDraft(updatedVM) ?? updatedVM}
+              vm={vm}
+            />
           </Stack>
         </GridItem>
       </Grid>
