@@ -31,7 +31,7 @@ const TemplateNetwork: FC<TemplateNetworkProps> = ({ obj: template }) => {
               className="template-network-tab__button"
               isDisabled={!isTemplateEditable}
               onClick={() =>
-                createModal(({ isOpen, onClose }) => (
+                createModal?.(({ isOpen, onClose }) => (
                   <TemplatesNetworkInterfaceModal
                     headerText={actionText}
                     isOpen={isOpen}

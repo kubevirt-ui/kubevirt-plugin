@@ -74,16 +74,14 @@ const SerialNumberInput: FC<SerialNumberInputProps> = ({ editDiskName, vm }) => 
         return (
           <FormGroup
             fieldId="disk-serial-number"
-            label={
-              <>
-                {t('Serial number (optional)')}
-                <HelpTextIcon
-                  bodyContent={t(
-                    'A unique identifier for the disk device visible to the guest operating system. Useful for disk identification and troubleshooting.',
-                  )}
-                  headerContent={t('Serial number')}
-                />
-              </>
+            label={t('Serial number (optional)')}
+            labelHelp={
+              <HelpTextIcon
+                bodyContent={t(
+                  'A unique identifier for the disk device visible to the guest operating system. Useful for disk identification and troubleshooting.',
+                )}
+                headerContent={t('Serial number')}
+              />
             }
           >
             <InputGroup>

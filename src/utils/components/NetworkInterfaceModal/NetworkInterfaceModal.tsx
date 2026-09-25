@@ -1,9 +1,10 @@
-import { type FC, useCallback, useEffect, useState } from 'react';
+import { type FC, useCallback, useEffect, useMemo, useState } from 'react';
 
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import usePasstFeatureFlag from '@kubevirt-utils/hooks/usePasstFeatureFlag';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
+import { getInterfaces } from '@kubevirt-utils/resources/vm';
 import { interfaceTypesProxy } from '@kubevirt-utils/resources/vm/utils/network/constants';
 import { getNetworkInterfaceType } from '@kubevirt-utils/resources/vm/utils/network/selectors';
 import { NetworkInterfaceState } from '@kubevirt-utils/resources/vm/utils/network/types';
@@ -15,7 +16,6 @@ import {
   isLinkStateEditable,
 } from '@virtualmachines/details/tabs/configuration/network/utils/utils';
 
-import NameFormField from './components/NameFormField';
 import NetworkInterfaceAdvancedSettings from './components/NetworkInterfaceAdvancedSettings';
 import NetworkInterfaceModelSelect from './components/NetworkInterfaceModelSelect';
 import NetworkInterfaceNetworkSelect from './components/NetworkInterfaceNetworkSelect/NetworkInterfaceNetworkSelect';
@@ -23,11 +23,9 @@ import { type NetworkInterfaceModalProps } from './types';
 import { interfaceModelType } from './utils/constants';
 import { getNetworkName } from './utils/helpers';
 
-import './NetworkInterfaceModal.scss';
 export type { NetworkInterfaceModalOnSubmit } from './types';
 
 const NetworkInterfaceModal: FC<NetworkInterfaceModalProps> = ({
-  fixedName = false,
   headerText,
   isOpen,
   namespace,
@@ -60,7 +58,15 @@ const NetworkInterfaceModal: FC<NetworkInterfaceModalProps> = ({
       setInterfaceLinkState(NetworkInterfaceState.UNSUPPORTED);
   }, [interfaceType]);
 
-  const isValid = nicName && networkName && !networkSelectError && !macError;
+  const isNicNameTaken = useMemo(
+    () =>
+      (getInterfaces(vm) ?? []).some(
+        (otherInterface) => otherInterface.name === nicName && otherInterface.name !== iface?.name,
+      ),
+    [vm, nicName, iface],
+  );
+
+  const isValid = nicName && networkName && !networkSelectError && !macError && !isNicNameTaken;
 
   const onSubmitModal = useCallback(() => {
     return onSubmit?.({
@@ -95,7 +101,6 @@ const NetworkInterfaceModal: FC<NetworkInterfaceModalProps> = ({
       onSubmit={onSubmitModal()}
       shouldWrapInForm
     >
-      <NameFormField isDisabled={fixedName} objName={nicName} setObjName={setNicName} />
       <NetworkInterfaceModelSelect
         interfaceModel={interfaceModel}
         setInterfaceModel={setInterfaceModel}
@@ -123,13 +128,16 @@ const NetworkInterfaceModal: FC<NetworkInterfaceModalProps> = ({
         interfaceMACAddress={interfaceMACAddress}
         interfaceType={interfaceType}
         isExpanded={isExpanded}
+        isNicNameTaken={isNicNameTaken}
         networkName={networkName}
+        nicName={nicName}
         passtEnabled={passtEnabled}
         setInterfaceLinkState={setInterfaceLinkState}
         setInterfaceMACAddress={setInterfaceMACAddress}
         setInterfaceType={setInterfaceType}
         setIsExpanded={setIsExpanded}
         setMacError={setMacError}
+        setNicName={setNicName}
         vm={vm}
       />
     </TabModal>
