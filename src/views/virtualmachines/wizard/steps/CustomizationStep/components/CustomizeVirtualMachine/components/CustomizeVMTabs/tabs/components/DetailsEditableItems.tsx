@@ -1,5 +1,5 @@
 import { type FC } from 'react';
-import { useWatch } from 'react-hook-form';
+import { produce } from 'immer';
 
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { DescriptionModal } from '@kubevirt-utils/components/DescriptionModal/DescriptionModal';
@@ -11,10 +11,10 @@ import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getAnnotation, getLabel, getName } from '@kubevirt-utils/resources/shared';
 import { DESCRIPTION_ANNOTATION, getHostname } from '@kubevirt-utils/resources/vm';
+import { ensurePath } from '@kubevirt-utils/utils/utils';
 import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
 import { useVMWizardForm } from '@virtualmachines/wizard/form/VMWizardFormProvider';
-import { useSyncDeploymentDetailsAndMetadataFields } from '@virtualmachines/wizard/hooks/useSyncDeploymentDetailsAndMetadataFields';
-import { patchWizardCustomizedVM } from '@virtualmachines/wizard/utils/patchWizardCustomizedVM';
+import { useWizardVMDraft } from '@virtualmachines/wizard/hooks/useWizardVMDraft';
 
 import CPUMemory from './CPUMemory';
 
@@ -25,16 +25,42 @@ type DetailsEditableItemsProps = {
 const DetailsEditableItems: FC<DetailsEditableItemsProps> = ({ treeViewFoldersEnabled }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
-  const { getValues, setValue } = useVMWizardForm();
-  const { syncDescriptionFieldAndMetadataAnnotations, syncFolderFieldAndMetadataLabels } =
-    useSyncDeploymentDetailsAndMetadataFields();
-
-  const { control } = useVMWizardForm();
-  const vm = useWatch({ control, name: 'customization.vmDraft' });
+  const { setValue } = useVMWizardForm();
+  const { replaceDraft, vmDraft: vm } = useWizardVMDraft();
   const vmName = getName(vm);
   const hostname = getHostname(vm);
 
   const displayHostname = hostname ?? vmName;
+
+  const onDescriptionSubmit = (description: string): Promise<void> => {
+    if (description) {
+      const updatedVM = produce(vm, (draft) => {
+        ensurePath(draft, 'metadata.annotations');
+        draft.metadata.annotations[DESCRIPTION_ANNOTATION] = description;
+      });
+
+      replaceDraft(updatedVM, vm);
+    }
+
+    setValue('deployment.description', description);
+
+    return Promise.resolve();
+  };
+
+  const onFolderSubmit = (folderName: string): Promise<void> => {
+    if (folderName) {
+      const updatedVM = produce(vm, (draft) => {
+        ensurePath(draft, 'metadata.labels');
+        draft.metadata.labels[VM_FOLDER_LABEL] = folderName;
+      });
+
+      replaceDraft(updatedVM, vm);
+    }
+
+    setValue('deployment.folder', folderName);
+
+    return Promise.resolve();
+  };
 
   return (
     <>
@@ -45,18 +71,18 @@ const DetailsEditableItems: FC<DetailsEditableItemsProps> = ({ treeViewFoldersEn
         }
         descriptionHeader={<SearchItem id="description">{t('Description')}</SearchItem>}
         isEdit
-        onEditClick={() =>
+        onEditClick={() => {
+          if (!vm) return;
+
           createModal(({ isOpen, onClose }) => (
             <DescriptionModal
               isOpen={isOpen}
               obj={vm}
               onClose={onClose}
-              onSubmit={(description) =>
-                Promise.resolve(syncDescriptionFieldAndMetadataAnnotations(description))
-              }
+              onSubmit={onDescriptionSubmit}
             />
-          ))
-        }
+          ));
+        }}
       />
       <CPUMemory />
       {treeViewFoldersEnabled && (
@@ -65,18 +91,18 @@ const DetailsEditableItems: FC<DetailsEditableItemsProps> = ({ treeViewFoldersEn
           descriptionData={getLabel(vm, VM_FOLDER_LABEL)}
           descriptionHeader={<SearchItem id="folder">{t('Group')}</SearchItem>}
           isEdit
-          onEditClick={() =>
+          onEditClick={() => {
+            if (!vm) return;
+
             createModal(({ isOpen, onClose }) => (
               <MoveVMToFolderModal
                 isOpen={isOpen}
                 onClose={onClose}
-                onSubmit={(folderName) =>
-                  Promise.resolve(syncFolderFieldAndMetadataLabels(folderName))
-                }
+                onSubmit={onFolderSubmit}
                 vm={vm}
               />
-            ))
-          }
+            ));
+          }}
         />
       )}
       <DescriptionItem
@@ -84,21 +110,18 @@ const DetailsEditableItems: FC<DetailsEditableItemsProps> = ({ treeViewFoldersEn
         descriptionData={displayHostname}
         descriptionHeader={<SearchItem id="hostname">{t('Hostname')}</SearchItem>}
         isEdit
-        onEditClick={() =>
+        onEditClick={() => {
+          if (!vm) return;
+
           createModal(({ isOpen, onClose }) => (
             <HostnameModal
               isOpen={isOpen}
               onClose={onClose}
-              onSubmit={(updatedVM) => {
-                const hostnamePatch = [
-                  { data: getHostname(updatedVM), path: `spec.template.spec.hostname` },
-                ];
-                return Promise.resolve(patchWizardCustomizedVM(getValues, setValue, hostnamePatch));
-              }}
+              onSubmit={(updatedVM) => Promise.resolve(replaceDraft(updatedVM, vm) ?? undefined)}
               vm={vm}
             />
-          ))
-        }
+          ));
+        }}
       />
     </>
   );

@@ -1,19 +1,20 @@
 import type { Dispatch, FC, SetStateAction } from 'react';
-import { useWatch } from 'react-hook-form';
+import produce from 'immer';
 
+import type { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import HeadlessMode from '@kubevirt-utils/components/HeadlessMode/HeadlessMode';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName } from '@kubevirt-utils/resources/shared';
+import { ensurePath } from '@kubevirt-utils/utils/utils';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { Switch } from '@patternfly/react-core';
 import DeletionProtectionModal from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/DeletionProtectionModal';
 import { VM_DELETION_PROTECTION_LABEL } from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/utils/constants';
 import { VMDeletionProtectionOptions } from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/utils/types';
-import { useVMWizardForm } from '@virtualmachines/wizard/form/VMWizardFormProvider';
-import { patchWizardCustomizedVM } from '@virtualmachines/wizard/utils/patchWizardCustomizedVM';
+import { useWizardVMDraft } from '@virtualmachines/wizard/hooks/useWizardVMDraft';
 
 type DetailsToggleItemsProps = {
   deletionProtectionEnabled: boolean;
@@ -21,6 +22,13 @@ type DetailsToggleItemsProps = {
   isGuestSystemLogsDisabled: boolean;
   setIsCheckedGuestSystemAccessLog: Dispatch<SetStateAction<boolean>>;
 };
+
+const withDeletionProtection = (vm: V1VirtualMachine, enabled: boolean): V1VirtualMachine =>
+  produce(vm, (draft) => {
+    ensurePath(draft, ['metadata.labels']);
+
+    draft.metadata.labels[VM_DELETION_PROTECTION_LABEL] = enabled ? 'true' : 'false';
+  });
 
 const DetailsToggleItems: FC<DetailsToggleItemsProps> = ({
   deletionProtectionEnabled,
@@ -30,10 +38,10 @@ const DetailsToggleItems: FC<DetailsToggleItemsProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
-  const { control, getValues, setValue } = useVMWizardForm();
-
-  const vm = useWatch({ control, name: 'customization.vmDraft' });
+  const { replaceDraft, vmDraft: vm } = useWizardVMDraft();
   const vmName = getName(vm);
+
+  if (!vm) return null;
 
   return (
     <>
@@ -46,13 +54,17 @@ const DetailsToggleItems: FC<DetailsToggleItemsProps> = ({
         descriptionData={
           <HeadlessMode
             updateHeadlessMode={(checked) => {
-              const headlessPatch = [
-                {
-                  data: checked ? false : null,
-                  path: `spec.template.spec.domain.devices.autoattachGraphicsDevice`,
-                },
-              ];
-              return Promise.resolve(patchWizardCustomizedVM(getValues, setValue, headlessPatch));
+              return Promise.resolve(
+                replaceDraft(
+                  produce(vm, (draft) => {
+                    ensurePath(draft, 'spec.template.spec.domain.devices');
+                    draft.spec.template.spec.domain.devices.autoattachGraphicsDevice = checked
+                      ? false
+                      : null;
+                  }),
+                  vm,
+                ),
+              );
             }}
             vm={vm}
           />
@@ -73,10 +85,13 @@ const DetailsToggleItems: FC<DetailsToggleItemsProps> = ({
             isDisabled={isGuestSystemLogsDisabled}
             onChange={(_event, checked) => {
               setIsCheckedGuestSystemAccessLog(checked);
-              const guestLogPatch = [
-                { data: checked, path: `spec.template.spec.domain.devices.logSerialConsole` },
-              ];
-              patchWizardCustomizedVM(getValues, setValue, guestLogPatch);
+              replaceDraft(
+                produce(vm, (draft) => {
+                  ensurePath(draft, 'spec.template.spec.domain.devices');
+                  draft.spec.template.spec.domain.devices.logSerialConsole = checked;
+                }),
+                vm,
+              );
             }}
           />
         }
@@ -106,14 +121,7 @@ const DetailsToggleItems: FC<DetailsToggleItemsProps> = ({
                   isOpen={isOpen}
                   onCancel={onClose}
                   onConfirm={(enableDeletionProtection) => {
-                    const deletionProtectionPatch = [
-                      {
-                        data: enableDeletionProtection ? 'true' : 'false',
-                        path: ['metadata', 'labels', VM_DELETION_PROTECTION_LABEL],
-                      },
-                    ];
-
-                    patchWizardCustomizedVM(getValues, setValue, deletionProtectionPatch);
+                    replaceDraft(withDeletionProtection(vm, Boolean(enableDeletionProtection)), vm);
                     onClose();
                   }}
                   vm={vm}

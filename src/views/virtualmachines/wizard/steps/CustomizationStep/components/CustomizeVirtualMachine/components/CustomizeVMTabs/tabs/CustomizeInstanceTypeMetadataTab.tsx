@@ -27,7 +27,7 @@ const CustomizeInstanceTypeMetadataTab: FC = () => {
         draft.metadata[type] = data;
       });
 
-      return Promise.resolve(replaceDraft(updatedVM));
+      return Promise.resolve(replaceDraft(updatedVM, vm));
     },
     [replaceDraft, vm],
   );
