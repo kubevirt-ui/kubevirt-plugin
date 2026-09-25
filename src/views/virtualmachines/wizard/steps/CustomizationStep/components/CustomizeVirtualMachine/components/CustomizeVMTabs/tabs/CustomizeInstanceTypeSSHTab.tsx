@@ -25,7 +25,7 @@ const CustomizeInstanceTypeSSHTab: FC = () => {
             <SSHTabSSHAccess isCustomizeInstanceType vm={vm} />
             <SSHTabAuthorizedSSHKey
               isCustomizeInstanceType
-              onUpdateVM={async (updatedVM) => replaceDraft(updatedVM) ?? updatedVM}
+              onUpdateVM={async (updatedVM) => replaceDraft(updatedVM, vm) ?? updatedVM}
               vm={vm}
             />
           </Stack>

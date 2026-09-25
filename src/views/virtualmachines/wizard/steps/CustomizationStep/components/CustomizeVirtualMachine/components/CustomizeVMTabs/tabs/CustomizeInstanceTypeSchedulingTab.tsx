@@ -13,7 +13,7 @@ const CustomizeInstanceTypeSchedulingTab: FC = () => {
   return (
     <PageSection>
       <SchedulingSection
-        onSubmit={async (updatedVM) => replaceDraft(updatedVM) ?? updatedVM}
+        onSubmit={async (updatedVM) => replaceDraft(updatedVM, vm) ?? updatedVM}
         vm={vm}
       />
     </PageSection>

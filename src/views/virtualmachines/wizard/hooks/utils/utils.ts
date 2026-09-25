@@ -1,5 +1,4 @@
 import type { TFunction } from 'i18next';
-import produce from 'immer';
 
 import type { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import {
@@ -23,9 +22,7 @@ import {
   mapCreationMethodToTelemetry,
 } from '@kubevirt-utils/extensions/telemetry/vm-creation';
 import { logResourceCreated } from '@kubevirt-utils/extensions/telemetry/yaml-vs-ui';
-import { getName } from '@kubevirt-utils/resources/shared';
 import type { Template } from '@kubevirt-utils/resources/template';
-import { removePodNetworkFromVM } from '@kubevirt-utils/resources/vm/utils/network/utils';
 import { createHeadlessService } from '@kubevirt-utils/utils/headless-service';
 import { getErrorMessage, kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
@@ -35,20 +32,6 @@ import {
   type GetClusterInitialValueParams,
   type HandleCloneRequestPhaseChangeParams,
 } from '@virtualmachines/wizard/utils/types';
-
-export const prepareVMToCreate = (
-  storeVM: V1VirtualMachine,
-  vmName: string | undefined,
-  isIPv6SingleStack: boolean,
-): V1VirtualMachine =>
-  produce(storeVM, (draft) => {
-    if (vmName && vmName !== getName(draft)) {
-      draft.metadata.name = vmName;
-    }
-    if (isIPv6SingleStack) {
-      removePodNetworkFromVM(draft);
-    }
-  });
 
 export const logSuccessfulVMCreation = (
   createdVM: V1VirtualMachine,

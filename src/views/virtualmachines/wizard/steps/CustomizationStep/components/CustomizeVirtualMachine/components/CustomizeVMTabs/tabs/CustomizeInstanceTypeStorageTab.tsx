@@ -1,23 +1,19 @@
 import { type FC } from 'react';
-import { useWatch } from 'react-hook-form';
+import produce from 'immer';
 
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import EnvironmentForm from '@kubevirt-utils/components/EnvironmentEditor/EnvironmentForm';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { getDataVolumeTemplates, getDisks, getVolumes } from '@kubevirt-utils/resources/vm';
+import { ensurePath } from '@kubevirt-utils/utils/utils';
 import { Divider, Grid, GridItem, PageSection } from '@patternfly/react-core';
 import DiskList from '@virtualmachines/details/tabs/configuration/storage/components/tables/disk/DiskList';
 import { useVMWizardForm } from '@virtualmachines/wizard/form/VMWizardFormProvider';
-import { patchWizardCustomizedVM } from '@virtualmachines/wizard/utils/patchWizardCustomizedVM';
-
-import useUpdateCustomizeInstanceTypeTab from '../hooks/useUpdateCustomizeInstanceTypeTab';
+import { useWizardVMDraft } from '@virtualmachines/wizard/hooks/useWizardVMDraft';
 
 const CustomizeInstanceTypeStorageTab: FC = () => {
-  const { getValues, setValue } = useVMWizardForm();
-  const { control } = useVMWizardForm();
-  const vm = useWatch({ control, name: 'customization.vmDraft' });
-
-  const { updateVMFromForm } = useUpdateCustomizeInstanceTypeTab();
+  const { getValues } = useVMWizardForm();
+  const { replaceDraft, vmDraft: vm } = useWizardVMDraft();
 
   if (!vm) {
     return <Loading />;
@@ -31,22 +27,18 @@ const CustomizeInstanceTypeStorageTab: FC = () => {
             customize
             getCurrentVM={() => getValues('customization.vmDraft')}
             onDiskUpdate={(updatedVM: V1VirtualMachine) => {
-              const diskPatches = [
-                {
-                  data: getDisks(updatedVM),
-                  path: `spec.template.spec.domain.devices.disks`,
-                },
-                {
-                  data: getVolumes(updatedVM),
-                  path: `spec.template.spec.volumes`,
-                },
-                {
-                  data: getDataVolumeTemplates(updatedVM),
-                  path: `spec.dataVolumeTemplates`,
-                },
-              ];
+              const currentVM = getValues('customization.vmDraft');
+              if (!currentVM) return Promise.resolve(updatedVM);
 
-              const vmModified = patchWizardCustomizedVM(getValues, setValue, diskPatches);
+              const vmModified = replaceDraft(
+                produce(currentVM, (draft) => {
+                  ensurePath(draft, 'spec.template.spec.domain.devices');
+                  draft.spec.template.spec.domain.devices.disks = getDisks(updatedVM);
+                  draft.spec.template.spec.volumes = getVolumes(updatedVM);
+                  draft.spec.dataVolumeTemplates = getDataVolumeTemplates(updatedVM);
+                }),
+                currentVM,
+              );
 
               return Promise.resolve(vmModified ?? updatedVM);
             }}
@@ -59,7 +51,10 @@ const CustomizeInstanceTypeStorageTab: FC = () => {
       </GridItem>
       <GridItem>
         <PageSection>
-          <EnvironmentForm updateVM={updateVMFromForm} vm={vm} />
+          <EnvironmentForm
+            updateVM={async (updatedVM) => replaceDraft(updatedVM, vm) ?? updatedVM}
+            vm={vm}
+          />
         </PageSection>
       </GridItem>
     </Grid>

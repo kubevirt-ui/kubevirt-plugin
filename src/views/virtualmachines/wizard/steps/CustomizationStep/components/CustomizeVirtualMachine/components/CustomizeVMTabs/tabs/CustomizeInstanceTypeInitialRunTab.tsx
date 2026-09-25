@@ -15,7 +15,7 @@ const CustomizeInstanceTypeInitialRunTab: FC = () => {
 
   if (!vm) return <Loading />;
 
-  const onSysprepSubmit: SubmitSysprepVM = (updatedVM) => replaceDraft(updatedVM);
+  const onSysprepSubmit: SubmitSysprepVM = (updatedVM) => replaceDraft(updatedVM, vm);
 
   return (
     <PageSection>
@@ -25,7 +25,7 @@ const CustomizeInstanceTypeInitialRunTab: FC = () => {
       <DescriptionList>
         <InitialRunTabCloudinit
           canUpdateVM
-          onSubmit={async (updatedVM) => replaceDraft(updatedVM) ?? updatedVM}
+          onSubmit={async (updatedVM) => replaceDraft(updatedVM, vm) ?? updatedVM}
           vm={vm}
         />
         <Divider />

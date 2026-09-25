@@ -4,6 +4,7 @@ import { useWatch } from 'react-hook-form';
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { finalizeWizardVMDraft } from '@virtualmachines/wizard/form/finalizeWizardVMDraft';
 import { useVMWizardForm } from '@virtualmachines/wizard/form/VMWizardFormProvider';
+import { reconcileVMDraftUpdate } from '@virtualmachines/wizard/utils/reconcileVMDraftUpdate';
 
 const options = {
   shouldValidate: true,
@@ -12,7 +13,10 @@ const options = {
 type WizardVMDraft = {
   clearDraft: () => void;
   finalizeDraft: () => V1VirtualMachine | undefined;
-  replaceDraft: (replacement: V1VirtualMachine) => V1VirtualMachine | undefined;
+  replaceDraft: (
+    replacement: V1VirtualMachine,
+    expectedCurrentDraft?: V1VirtualMachine,
+  ) => V1VirtualMachine | undefined;
   vmDraft: null | V1VirtualMachine;
 };
 
@@ -43,12 +47,21 @@ export const useWizardVMDraft = (): WizardVMDraft => {
   }, [getValues, setValue]);
 
   const replaceDraft = useCallback(
-    (replacement: V1VirtualMachine) => {
-      setValue('customization.vmDraft', replacement, options);
+    (replacement: V1VirtualMachine, expectedCurrentDraft?: V1VirtualMachine) => {
+      const current = getValues('customization.vmDraft');
 
-      return replacement;
+      if (!current && expectedCurrentDraft) return undefined;
+
+      const nextDraft =
+        expectedCurrentDraft && current
+          ? reconcileVMDraftUpdate(expectedCurrentDraft, current, replacement)
+          : replacement;
+
+      setValue('customization.vmDraft', nextDraft, options);
+
+      return nextDraft;
     },
-    [setValue],
+    [getValues, setValue],
   );
 
   return { clearDraft, finalizeDraft, replaceDraft, vmDraft };
