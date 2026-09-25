@@ -19,6 +19,7 @@ import { createMinimalVirtualMachineSnapshotYaml } from '@/data-factories/virtua
 import { createVmMetricsSet } from '@/data-factories/vm-metrics-mock-factory';
 import * as constants from '@/data-models/constants';
 import { withAllure } from '@/utils/allure';
+import { moveFirstDeviceDown, normalizeBootOrder } from '@/utils/boot-order-helpers';
 import { EnvVariables } from '@/utils/env-variables';
 import { FileUtils } from '@/utils/file-utils';
 import {
@@ -49,7 +50,7 @@ import {
   TEMPLATE_METADATA_NAMES,
 } from '@/utils/template-constants';
 import { MINUTE, TestTimeouts } from '@/utils/test-config';
-import { createAdvancedSearchTestVms } from '@/utils/test-setup-helpers';
+import { createAdvancedSearchTestVms, setupTestNamespace } from '@/utils/test-setup-helpers';
 import {
   cleanupMigrationPlans,
   createPwPrefixedName,
@@ -328,6 +329,10 @@ export class TestUtils {
     return lazyLoad('NAMESPACES', () => constants.NAMESPACES);
   }
 
+  get moveFirstDeviceDown() {
+    return lazyLoad('moveFirstDeviceDown', () => moveFirstDeviceDown);
+  }
+
   get navigateToProjectVmListForNamespace() {
     return lazyLoad(
       'navigateToProjectVmListForNamespace',
@@ -355,6 +360,10 @@ export class TestUtils {
 
   get NETWORKING() {
     return lazyLoad('NETWORKING', () => constants.NETWORKING);
+  }
+
+  get normalizeBootOrder() {
+    return lazyLoad('normalizeBootOrder', () => normalizeBootOrder);
   }
 
   get OS_FILTER_VALUES() {
@@ -411,6 +420,10 @@ export class TestUtils {
 
   get SERVICE_NAMES() {
     return lazyLoad('SERVICE_NAMES', () => constants.SERVICE_NAMES);
+  }
+
+  get setupTestNamespace() {
+    return lazyLoad('setupTestNamespace', () => setupTestNamespace);
   }
 
   get setupPwTestNamespace() {
@@ -582,6 +595,8 @@ export interface TestUtilsType {
   EnvVariables: typeof EnvVariables;
   TestTimeouts: typeof TestTimeouts;
   MINUTE: typeof MINUTE;
+  moveFirstDeviceDown: typeof moveFirstDeviceDown;
+  normalizeBootOrder: typeof normalizeBootOrder;
   isLocalhostBaseUrl: typeof isLocalhostBaseUrl;
   waitForApiResponse: typeof waitForApiResponse;
   waitForCondition: typeof waitForCondition;
@@ -600,6 +615,7 @@ export interface TestUtilsType {
   getMigrationPlanCount: typeof getMigrationPlanCount;
   waitForDataVolumeReady: typeof waitForDataVolumeReady;
   setupPwTestNamespace: typeof setupPwTestNamespace;
+  setupTestNamespace: typeof setupTestNamespace;
   createPwPrefixedName: typeof createPwPrefixedName;
   navigateToVirtualMachinesWithEmptyProjectsInTree: typeof navigateToVirtualMachinesWithEmptyProjectsInTree;
   navigateToProjectVmListForNamespace: typeof navigateToProjectVmListForNamespace;
