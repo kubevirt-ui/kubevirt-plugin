@@ -9,6 +9,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { Wizard, WizardHeader, WizardStep, type WizardStepType } from '@patternfly/react-core';
 import { useVMWizardForm } from '@virtualmachines/wizard/form/VMWizardFormProvider';
 import useCloseWizard from '@virtualmachines/wizard/hooks/useCloseWizard';
+import useVMGenerationCoordinator from '@virtualmachines/wizard/hooks/useVMGenerationCoordinator/useVMGenerationCoordinator';
 import { useWizardVMDraft } from '@virtualmachines/wizard/hooks/useWizardVMDraft';
 import { useVMWizardState } from '@virtualmachines/wizard/state/useVMWizardState';
 
@@ -35,7 +36,8 @@ const VMCreationWizardContent: FC = () => {
 
   const { currentStep, setCurrentStep, setIsTemplateDrawerOpen } = useVMWizardState();
 
-  const navItemConfig = useVMGenerationNavClick(creationMethod);
+  const generationCoordinator = useVMGenerationCoordinator();
+  const navItemConfig = useVMGenerationNavClick(creationMethod, generationCoordinator);
 
   const { finalizeDraft } = useWizardVMDraft();
   const hasLoggedCreationStartedRef = useRef(false);

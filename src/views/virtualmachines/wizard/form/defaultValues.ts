@@ -46,7 +46,6 @@ export const createInstanceTypeDefaultValues = (): VMWizardInstanceTypeValues =>
 });
 
 export const createTemplateDefaultValues = (): VMWizardTemplateValues => ({
-  lastProcessedKey: '',
   selectedTemplate: null,
 });
 
