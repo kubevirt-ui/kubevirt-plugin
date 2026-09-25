@@ -1,127 +1,64 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback } from 'react';
 import { useWatch } from 'react-hook-form';
 
-import useAutoAppliedLabels from '@kubevirt-utils/hooks/useAutoAppliedLabels/useAutoAppliedLabels';
-import { getLabels } from '@kubevirt-utils/resources/shared';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { isDNS1123Label } from '@kubevirt-utils/utils/validation';
-import { useSignals } from '@preact/signals-react/runtime';
+import { vmNameInputSchema } from '@virtualmachines/wizard/form/schema/deployment/createDeploymentSchema';
+import {
+  getNavigationPrerequisites,
+  mapWizardErrorsToSteps,
+  triggerWizardStepsValidation,
+} from '@virtualmachines/wizard/form/stepValidation';
+import { useVMWizardForm } from '@virtualmachines/wizard/form/VMWizardFormProvider';
 import { useVMWizardState } from '@virtualmachines/wizard/state/useVMWizardState';
 import { VMWizardStep } from '@virtualmachines/wizard/utils/constants';
-import { getActiveFlow, isCloneCreationMethod } from '@virtualmachines/wizard/utils/utils';
-
-import { useVMWizard } from '../state/vm-wizard-context/VMWizardContext';
 
 type WizardStepValidation = {
-  isNextDisabledForStep: (stepId: VMWizardStep) => boolean;
   isStepDisabled: (stepId: VMWizardStep) => boolean;
+  validateSteps: (steps: readonly VMWizardStep[]) => Promise<boolean>;
 };
 
+// Derives navigation gates directly from the current RHF errors and active flow
 const useWizardStepValidation = (): WizardStepValidation => {
-  useSignals();
-  const { control } = useVMWizard();
-  const { visitedSteps } = useVMWizardState();
-  const [
-    autoLabelsMerged,
-    creationMethod,
-    name,
-    selectedTemplate,
-    operatingSystemType,
-    preference,
-    useBootSource,
-    selectedBootableVolume,
-    selectedInstanceType,
-    selectedSeries,
-    selectedSize,
-  ] = useWatch({
+  const { control, formState, getValues, trigger } = useVMWizardForm();
+  const { currentStep, strictVMName, visitedSteps } = useVMWizardState();
+  const [creationMethod, vmName] = useWatch({
     control,
-    name: [
-      'customization.autoLabelsApplied',
-      'creationMethod',
-      'deployment.name',
-      'template.selectedTemplate',
-      'instanceType.operatingSystem',
-      'instanceType.preference',
-      'instanceType.useBootSource',
-      'instanceType.bootVolume.volume',
-      'instanceType.compute',
-      'instanceType.compute.series',
-      'instanceType.compute.size',
-    ],
+    name: ['creationMethod', 'deployment.name'],
   });
 
-  const { labels: autoAppliedLabels } = useAutoAppliedLabels();
+  const errorsByStep = mapWizardErrorsToSteps(formState.errors, creationMethod);
 
-  const activeFlow = useMemo(() => getActiveFlow(creationMethod), [creationMethod]);
-  const cloneSource = useWatch({ control, name: 'clone.sourceVM' });
-  const currentVMValue = useWatch({ control, name: 'customization.vmDraft' });
+  const isStepValid = useCallback(
+    (stepId: VMWizardStep): boolean => {
+      if (
+        stepId === VMWizardStep.DEPLOYMENT_DETAILS &&
+        currentStep === stepId &&
+        !strictVMName &&
+        errorsByStep[stepId]
+      ) {
+        return vmNameInputSchema.isValidSync(vmName);
+      }
 
-  const hasRequiredLabelsMissing = useMemo(() => {
-    if (!autoLabelsMerged) return false;
-    const vmLabels = getLabels(currentVMValue, {});
-    return autoAppliedLabels.some(
-      (label) => label.required && !String(vmLabels[label.key] ?? '').trim(),
-    );
-  }, [autoAppliedLabels, currentVMValue, autoLabelsMerged]);
-
-  const stepNextDisabled: Record<VMWizardStep, boolean> = useMemo(() => {
-    const isRedHatProvided = Boolean(selectedSeries) && Boolean(selectedSize);
-    const isUserProvided =
-      Boolean(selectedInstanceType?.type === 'user' && selectedInstanceType.namespace) &&
-      Boolean(selectedInstanceType?.name);
-    const isValidVMName = isCloneCreationMethod(creationMethod) || isDNS1123Label(name);
-
-    return {
-      [VMWizardStep.BOOT_SOURCE]: useBootSource && isEmpty(selectedBootableVolume),
-      [VMWizardStep.CLONE]: isEmpty(cloneSource),
-      [VMWizardStep.COMPUTE_RESOURCES]: !isRedHatProvided && !isUserProvided,
-      [VMWizardStep.CUSTOMIZATION]: hasRequiredLabelsMissing,
-      [VMWizardStep.DEPLOYMENT_DETAILS]: !isValidVMName,
-      [VMWizardStep.GUEST_OS]: !operatingSystemType || !preference,
-      [VMWizardStep.REVIEW_AND_CREATE]: false,
-      [VMWizardStep.TEMPLATE]: isEmpty(selectedTemplate),
-    };
-  }, [
-    creationMethod,
-    cloneSource,
-    hasRequiredLabelsMissing,
-    name,
-    operatingSystemType,
-    preference,
-    selectedBootableVolume,
-    selectedInstanceType,
-    selectedSeries,
-    selectedSize,
-    selectedTemplate,
-    useBootSource,
-  ]);
+      return !errorsByStep[stepId];
+    },
+    [currentStep, errorsByStep, strictVMName, vmName],
+  );
 
   const isStepDisabled = useCallback(
     (stepId: VMWizardStep): boolean => {
-      if (!activeFlow.includes(stepId)) return false;
-
-      const stepIndex = activeFlow.indexOf(stepId);
-
-      if (stepIndex <= 0) return false;
-
-      const activeFlowUntilCurrentStep = activeFlow.slice(0, stepIndex);
-
-      const isSomePreviousStepsDisabledOrNotVisited = activeFlowUntilCurrentStep.some(
-        (activeFlowStepId) =>
-          stepNextDisabled[activeFlowStepId] || !visitedSteps.has(activeFlowStepId),
+      return getNavigationPrerequisites(creationMethod, currentStep as VMWizardStep, stepId).some(
+        (step) => !isStepValid(step) || !visitedSteps.has(step),
       );
-
-      return isSomePreviousStepsDisabledOrNotVisited;
     },
-    [activeFlow, stepNextDisabled, visitedSteps],
+    [creationMethod, currentStep, isStepValid, visitedSteps],
   );
 
-  const isNextDisabledForStep = useCallback(
-    (stepId: VMWizardStep): boolean => Boolean(stepNextDisabled[stepId]),
-    [stepNextDisabled],
+  const validateSteps = useCallback(
+    (steps: readonly VMWizardStep[]) =>
+      triggerWizardStepsValidation(trigger, getValues('creationMethod'), steps),
+    [getValues, trigger],
   );
 
-  return { isNextDisabledForStep, isStepDisabled };
+  return { isStepDisabled, validateSteps };
 };
 
 export default useWizardStepValidation;

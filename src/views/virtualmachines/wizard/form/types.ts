@@ -72,7 +72,3 @@ export type VMWizardFormValues = {
   instanceType: VMWizardInstanceTypeValues;
   template: VMWizardTemplateValues;
 };
-
-export type CreateInitialVMWizardFormValuesArgs = Partial<VMWizardDeploymentValues> & {
-  creationMethod?: VMCreationMethod;
-};

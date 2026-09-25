@@ -1,5 +1,5 @@
 import { type InstanceTypesMenuItemsData } from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/InstanceTypeDrilldownSelect/utils/types';
-import { type InstanceTypeSelection } from '@virtualmachines/wizard/state/vm-wizard-form/types';
+import { type InstanceTypeSelection } from '@virtualmachines/wizard/form/types';
 
 import { TabKey } from './constants';
 

@@ -12,8 +12,8 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { getAnnotation, getLabel, getName } from '@kubevirt-utils/resources/shared';
 import { DESCRIPTION_ANNOTATION, getHostname } from '@kubevirt-utils/resources/vm';
 import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
+import { useVMWizardForm } from '@virtualmachines/wizard/form/VMWizardFormProvider';
 import { useSyncDeploymentDetailsAndMetadataFields } from '@virtualmachines/wizard/hooks/useSyncDeploymentDetailsAndMetadataFields';
-import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
 import { patchWizardCustomizedVM } from '@virtualmachines/wizard/utils/patchWizardCustomizedVM';
 
 import CPUMemory from './CPUMemory';
@@ -25,11 +25,11 @@ type DetailsEditableItemsProps = {
 const DetailsEditableItems: FC<DetailsEditableItemsProps> = ({ treeViewFoldersEnabled }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
-  const { getValues, setValue } = useVMWizard();
+  const { getValues, setValue } = useVMWizardForm();
   const { syncDescriptionFieldAndMetadataAnnotations, syncFolderFieldAndMetadataLabels } =
     useSyncDeploymentDetailsAndMetadataFields();
 
-  const { control } = useVMWizard();
+  const { control } = useVMWizardForm();
   const vm = useWatch({ control, name: 'customization.vmDraft' });
   const vmName = getName(vm);
   const hostname = getHostname(vm);

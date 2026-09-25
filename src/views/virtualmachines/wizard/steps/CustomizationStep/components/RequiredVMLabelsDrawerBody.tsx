@@ -1,36 +1,34 @@
 import { type FC, useCallback, useMemo, useState } from 'react';
 import { useWatch } from 'react-hook-form';
 import { Link } from 'react-router';
+import produce from 'immer';
 
 import { type AutoAppliedLabel } from '@kubevirt-utils/hooks/useAutoAppliedLabels/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
 import { USER_SETTINGS_KEYS } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/const';
+import { ensurePath } from '@kubevirt-utils/utils/utils';
 import { Checkbox, Stack, StackItem } from '@patternfly/react-core';
 import { USER_SETTINGS_URL } from '@settings/constants';
 import { USER_TAB_IDS } from '@settings/search/constants';
 import DefaultVMLabelRow from '@settings/tabs/UserTab/components/DefaultVMLabelsSection/components/DefaultVMLabelRow';
-import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
-import { patchWizardCustomizedVM } from '@virtualmachines/wizard/utils/patchWizardCustomizedVM';
+import { useVMWizardForm } from '@virtualmachines/wizard/form/VMWizardFormProvider';
+import { useWizardVMDraft } from '@virtualmachines/wizard/hooks/useWizardVMDraft';
 
 type RequiredVMLabelsDrawerBodyProps = {
   requiredLabels: AutoAppliedLabel[];
-  vmLabels: Record<string, string>;
 };
 
-const RequiredVMLabelsDrawerBody: FC<RequiredVMLabelsDrawerBodyProps> = ({
-  requiredLabels,
-  vmLabels,
-}) => {
+const RequiredVMLabelsDrawerBody: FC<RequiredVMLabelsDrawerBodyProps> = ({ requiredLabels }) => {
   const { t } = useKubevirtTranslation();
-  const { control, getValues, setValue } = useVMWizard();
+  const { replaceDraft, vmDraft } = useWizardVMDraft();
+  const { control } = useVMWizardForm();
   const cluster = useWatch({ control, name: 'deployment.cluster' });
   const [userDefaults, setUserDefaults] = useKubevirtUserSettings(
     USER_SETTINGS_KEYS.defaultVMLabels,
     cluster,
   );
   const [saveAsDefaults, setSaveAsDefaults] = useState(false);
-
   const labelsToShow = useMemo(
     () => requiredLabels.filter((label) => !label.value),
     [requiredLabels],
@@ -38,15 +36,20 @@ const RequiredVMLabelsDrawerBody: FC<RequiredVMLabelsDrawerBodyProps> = ({
 
   const handleSave = useCallback(
     (key: string, value: string): void => {
-      const labelPatch = [{ data: value, path: ['metadata', 'labels', key] }];
+      if (!vmDraft) return;
+      replaceDraft(
+        produce(vmDraft, (draft) => {
+          ensurePath(draft, ['metadata.labels']);
 
-      patchWizardCustomizedVM(getValues, setValue, labelPatch);
+          draft.metadata.labels[key] = value;
+        }),
+      );
 
       if (saveAsDefaults) {
         void setUserDefaults({ ...(userDefaults || {}), [key]: value });
       }
     },
-    [getValues, saveAsDefaults, setUserDefaults, setValue, userDefaults],
+    [replaceDraft, saveAsDefaults, setUserDefaults, userDefaults, vmDraft],
   );
 
   return (
@@ -56,7 +59,7 @@ const RequiredVMLabelsDrawerBody: FC<RequiredVMLabelsDrawerBodyProps> = ({
           <DefaultVMLabelRow
             label={label}
             onValueChange={handleSave}
-            userValue={vmLabels[label.key] ?? ''}
+            userValue={vmDraft?.metadata?.labels?.[label.key] ?? ''}
           />
         </StackItem>
       ))}

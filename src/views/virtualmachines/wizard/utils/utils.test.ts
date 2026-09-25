@@ -4,8 +4,8 @@ import { DEFAULT_INSTANCETYPE_LABEL } from '@kubevirt-utils/constants/instancety
 import { cancelAllWizardPendingUploads } from '@kubevirt-utils/hooks/useUploadProgressToast';
 import { act, renderHook } from '@testing-library/react';
 
-import { createInitialVMWizardFormValues } from '../state/vm-wizard-form/consts';
-import { type VMWizardFormValues } from '../state/vm-wizard-form/types';
+import { createVMWizardDefaultValues, resetCreationMethodValues } from '../form/defaultValues';
+import { type VMWizardFormValues } from '../form/types';
 import { VMCreationMethod } from './constants';
 import {
   applySelectedBootableVolumeToForm,
@@ -16,13 +16,12 @@ jest.mock('@kubevirt-utils/hooks/useUploadProgressToast', () => ({
   cancelAllWizardPendingUploads: jest.fn(),
 }));
 const setup = () =>
-  renderHook(() =>
-    useForm<VMWizardFormValues>({ defaultValues: createInitialVMWizardFormValues() }),
-  ).result;
+  renderHook(() => useForm<VMWizardFormValues>({ defaultValues: createVMWizardDefaultValues() }))
+    .result;
 
 describe('wizard form mappings', () => {
   it('creates isolated nullable defaults and retains initial placement and name behavior', () => {
-    const first = createInitialVMWizardFormValues({ cluster: 'remote', project: 'test' });
+    const first = createVMWizardDefaultValues({ cluster: 'remote', namespace: 'test' });
     expect(first.deployment).toEqual({
       cluster: 'remote',
       description: '',
@@ -35,9 +34,7 @@ describe('wizard form mappings', () => {
     expect(first.clone.sourceVM).toBeNull();
     expect(first.customization.vmDraft).toBeNull();
     first.customization.pendingBootableVolumeUploadKeys.push('upload');
-    expect(createInitialVMWizardFormValues().customization.pendingBootableVolumeUploadKeys).toEqual(
-      [],
-    );
+    expect(createVMWizardDefaultValues().customization.pendingBootableVolumeUploadKeys).toEqual([]);
   });
   it('maps a boot selection and clears its dependent compute choice on reset', () => {
     const result = setup();
@@ -67,14 +64,22 @@ describe('wizard form mappings', () => {
       size: 'small',
       type: 'redhat',
     });
-    act(() => resetBootableVolumeFields(result.current.getValues, result.current.setValue));
+    act(() => resetBootableVolumeFields(result.current.setValue));
     expect(result.current.getValues('instanceType.bootVolume')).toBeNull();
     expect(result.current.getValues('instanceType.compute')).toBeNull();
   });
   it('cancels the current draft and boot uploads before reset', () => {
     const result = setup();
     const vm = { metadata: { name: 'draft', namespace: 'test' }, spec: { template: {} } };
+    const deployment = {
+      cluster: 'remote',
+      description: 'Keep description',
+      folder: 'group',
+      name: 'draft',
+      project: 'test',
+    };
     act(() => {
+      result.current.setValue('deployment', deployment);
       result.current.setValue('customization.vmDraft', vm);
       result.current.setValue('customization.pendingBootableVolumeUploadKeys', ['boot-upload']);
       clearVMPendingUploads(result.current.getValues, result.current.setValue);
@@ -83,12 +88,11 @@ describe('wizard form mappings', () => {
     expect(result.current.getValues('customization.pendingBootableVolumeUploadKeys')).toEqual([]);
     act(() =>
       result.current.reset(
-        createInitialVMWizardFormValues({
-          ...result.current.getValues('deployment'),
-          creationMethod: VMCreationMethod.TEMPLATE,
-        }),
+        resetCreationMethodValues(result.current.getValues(), VMCreationMethod.TEMPLATE),
       ),
     );
+    expect(result.current.getValues('deployment')).toEqual(deployment);
+    expect(result.current.getValues('creationMethod')).toBe(VMCreationMethod.TEMPLATE);
     expect(result.current.getValues('customization.vmDraft')).toBeNull();
     expect(result.current.getValues('template')).toEqual({
       lastProcessedKey: '',

@@ -7,14 +7,14 @@ import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { getDataVolumeTemplates, getDisks, getVolumes } from '@kubevirt-utils/resources/vm';
 import { Divider, Grid, GridItem, PageSection } from '@patternfly/react-core';
 import DiskList from '@virtualmachines/details/tabs/configuration/storage/components/tables/disk/DiskList';
-import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
+import { useVMWizardForm } from '@virtualmachines/wizard/form/VMWizardFormProvider';
 import { patchWizardCustomizedVM } from '@virtualmachines/wizard/utils/patchWizardCustomizedVM';
 
 import useUpdateCustomizeInstanceTypeTab from '../hooks/useUpdateCustomizeInstanceTypeTab';
 
 const CustomizeInstanceTypeStorageTab: FC = () => {
-  const { getValues, setValue } = useVMWizard();
-  const { control } = useVMWizard();
+  const { getValues, setValue } = useVMWizardForm();
+  const { control } = useVMWizardForm();
   const vm = useWatch({ control, name: 'customization.vmDraft' });
 
   const { updateVMFromForm } = useUpdateCustomizeInstanceTypeTab();

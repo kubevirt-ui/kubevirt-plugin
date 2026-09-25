@@ -15,7 +15,7 @@ import {
   Title,
   TitleSizes,
 } from '@patternfly/react-core';
-import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
+import { useVMWizardForm } from '@virtualmachines/wizard/form/VMWizardFormProvider';
 import BootableVolumeList from '@virtualmachines/wizard/steps/InstanceTypesSteps/BootSourceStep/components/BootableVolumeList/BootableVolumeList';
 
 import AddBootableVolumeButton from './components/AddBootableVolumeButton';
@@ -24,21 +24,21 @@ import { getEffectiveVolumeNamespace } from './components/BootableVolumeList/uti
 const BootSourceStep: FC = () => {
   const { t } = useKubevirtTranslation();
   const isAdmin = useIsAdmin();
-  const { control } = useVMWizard();
-  const [cluster, project] = useWatch({
+  const { control } = useVMWizardForm();
+
+  const [cluster, project, volumeListNamespace] = useWatch({
     control,
-    name: ['deployment.cluster', 'deployment.project'],
+    name: ['deployment.cluster', 'deployment.project', 'instanceType.volumeNamespace'],
   });
-  const volumeListNamespace = useWatch({
-    control,
-    name: 'instanceType.volumeNamespace',
-  });
+
   const {
     field: { onChange, value },
   } = useController({
     control,
     name: 'instanceType.useBootSource',
+    rules: { deps: 'instanceType.bootVolume' },
   });
+
   const instanceTypesAndPreferencesData = useInstanceTypesAndPreferences(
     getValidNamespace(project),
     cluster,

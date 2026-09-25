@@ -11,7 +11,6 @@ export const getVMGenerationNavItem =
       goToStepByIndex={goToStepByIndex}
       handleNavItemClick={navItemConfig.handleNavItemClick}
       isGeneratingVM={navItemConfig.isGeneratingVM}
-      loaded={navItemConfig.loaded}
       step={step}
     />
   );
