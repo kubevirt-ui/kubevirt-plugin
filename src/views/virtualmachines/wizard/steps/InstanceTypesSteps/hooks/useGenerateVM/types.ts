@@ -1,10 +1,7 @@
-import { type UseFormGetValues } from 'react-hook-form';
-
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { type BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { type NetworkAttachmentDefinitionKind } from '@kubevirt-utils/resources/nad/types';
 import { type VMWizardFormValues } from '@virtualmachines/wizard/form/types';
-import { type UseApplyAutoLabelsResult } from '@virtualmachines/wizard/hooks/useApplyAutoLabels';
 
 export type GenerateVMContext = {
   enableMultiArchBootImageImport?: boolean;
@@ -17,10 +14,8 @@ export type GenerateVMContext = {
 };
 
 export type GenerateVMArgs = {
-  autoAppliedLabels: UseApplyAutoLabelsResult;
   context: GenerateVMContext;
   deployment: VMWizardFormValues['deployment'];
-  getValues: UseFormGetValues<VMWizardFormValues>;
   instanceType: VMWizardFormValues['instanceType'];
 };
 

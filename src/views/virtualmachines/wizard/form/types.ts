@@ -48,8 +48,6 @@ export type VMWizardInstanceTypeValues = {
 };
 
 export type VMWizardTemplateValues = {
-  // Preserve the existing template processing cache.
-  lastProcessedKey: string;
   selectedTemplate: null | Template;
 };
 

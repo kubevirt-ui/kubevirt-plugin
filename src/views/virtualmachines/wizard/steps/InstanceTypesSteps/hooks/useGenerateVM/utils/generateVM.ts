@@ -1,8 +1,5 @@
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import {
-  type K8sIoApimachineryPkgApisMetaV1ObjectMeta,
-  type V1VirtualMachine,
-} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import {
   addDNFUpdateToRunCMD,
   addSubscriptionManagerToRunCMD,
@@ -21,36 +18,27 @@ import { OS_WINDOWS_PREFIX } from '@kubevirt-utils/resources/vm/utils/operation-
 import { getRandomChars, isEmpty } from '@kubevirt-utils/utils/utils';
 import { AutomaticSubscriptionTypeEnum } from '@settings/tabs/ClusterTab/components/GuestManagmentSection/AutomaticSubscriptionRHELGuests/components/AutomaticSubscriptionType/utils/utils';
 import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
-import { type GetMergedMetadataLabelsArgs } from '@virtualmachines/wizard/hooks/types/types';
 
 import { type GenerateVMCallback } from '../types';
 
 import { getSpecConfiguration } from './generateVMSpecConfig';
 
-export const generateVM: GenerateVMCallback = ({
-  autoAppliedLabels,
-  context,
-  deployment,
-  getValues,
-  instanceType,
-}) => {
+export const generateVM: GenerateVMCallback = ({ context, deployment, instanceType }) => {
   const { cluster, description, folder, project } = deployment;
   const selectedBootableVolume = instanceType.bootVolume?.volume;
-  const { adminLabels, userDefaults } = autoAppliedLabels;
 
   const generatedVM: V1VirtualMachine = {
     apiVersion: `${VirtualMachineModel.apiGroup}/${VirtualMachineModel.apiVersion}`,
     kind: VirtualMachineModel.kind,
     ...(cluster && { cluster }),
-    metadata: getMergedMetadataLabels({
-      adminLabels,
-      description,
-      folder,
-      getValues,
-      project,
-      userDefaults,
-      vmName: context.vmName,
-    }),
+    metadata: {
+      ...(description && { annotations: { description } }),
+      labels: {
+        ...(folder && { [VM_FOLDER_LABEL]: folder }),
+      },
+      name: context.vmName,
+      namespace: project,
+    },
     spec: getSpecConfiguration({
       context,
       instanceType,
@@ -126,34 +114,4 @@ export const getAdminLabelsToMerge = (
   }, {});
 
   return { ...adminLabelsToMerge, ...existingLabels };
-};
-export const getMergedMetadataLabels = ({
-  adminLabels,
-  description,
-  folder,
-  getValues,
-  project,
-  userDefaults,
-  vmName,
-}: GetMergedMetadataLabelsArgs): K8sIoApimachineryPkgApisMetaV1ObjectMeta => {
-  const adminLabelsToMerge = getAdminLabelsToMerge(
-    adminLabels,
-    userDefaults,
-    getValues('customization.vmDraft'),
-  );
-
-  const metadataLabels = {
-    labels: {
-      ...(folder && { [VM_FOLDER_LABEL]: folder }),
-      ...(adminLabelsToMerge ?? {}),
-    },
-  };
-
-  const metadata = {
-    ...(description && { annotations: { description } }),
-    name: vmName,
-    namespace: project,
-  };
-
-  return { ...metadata, ...metadataLabels };
 };

@@ -95,7 +95,6 @@ describe('wizard form mappings', () => {
     expect(result.current.getValues('creationMethod')).toBe(VMCreationMethod.TEMPLATE);
     expect(result.current.getValues('customization.vmDraft')).toBeNull();
     expect(result.current.getValues('template')).toEqual({
-      lastProcessedKey: '',
       selectedTemplate: null,
     });
   });

@@ -12,6 +12,7 @@ import {
   type VMWizardFormResources,
 } from '@virtualmachines/wizard/form/VMWizardFormProvider';
 import useCloseWizard from '@virtualmachines/wizard/hooks/useCloseWizard';
+import useVMGenerationCoordinator from '@virtualmachines/wizard/hooks/useVMGenerationCoordinator/useVMGenerationCoordinator';
 import { useWizardVMDraft } from '@virtualmachines/wizard/hooks/useWizardVMDraft';
 import { useVMWizardState } from '@virtualmachines/wizard/state/useVMWizardState';
 
@@ -26,7 +27,10 @@ import { isCloneCreationMethod } from './utils/utils';
 
 import './Wizard.scss';
 
-const VMCreationWizardContent: FC<VMWizardFormResources> = ({ autoAppliedLabels }) => {
+const VMCreationWizardContent: FC<VMWizardFormResources> = ({
+  autoAppliedLabels,
+  autoLabelsLoading,
+}) => {
   const { t } = useKubevirtTranslation();
   const closeWizard = useCloseWizard();
 
@@ -38,7 +42,8 @@ const VMCreationWizardContent: FC<VMWizardFormResources> = ({ autoAppliedLabels 
 
   const { currentStep, setCurrentStep, setIsTemplateDrawerOpen } = useVMWizardState();
 
-  const navItemConfig = useVMGenerationNavClick(creationMethod);
+  const generationCoordinator = useVMGenerationCoordinator({ autoLabelsLoading });
+  const navItemConfig = useVMGenerationNavClick(creationMethod, generationCoordinator);
 
   const { finalizeDraft } = useWizardVMDraft();
   const hasLoggedCreationStartedRef = useRef(false);

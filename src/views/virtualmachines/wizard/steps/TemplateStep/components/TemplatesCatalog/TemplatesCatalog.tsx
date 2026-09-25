@@ -38,7 +38,8 @@ const TemplatesCatalog: FC = () => {
   } = useTemplatesCatalog();
 
   const { control, setValue } = useVMWizardForm();
-  const { setIsTemplateDrawerOpen, setTemplateProcessError } = useVMWizardState();
+  const { invalidateTemplateGeneration, setIsTemplateDrawerOpen, setTemplateProcessError } =
+    useVMWizardState();
   const selectedTemplate = useWatch({
     control,
     name: 'template.selectedTemplate',
@@ -47,13 +48,13 @@ const TemplatesCatalog: FC = () => {
   const handleTemplateSelect = useCallback(
     (template: Template) => {
       const options = { shouldValidate: true } as const;
+      invalidateTemplateGeneration();
       setValue('template.selectedTemplate', template, options);
       setTemplateProcessError(null);
-      setValue('template.lastProcessedKey', '');
       logTemplateFlowEvent(TEMPLATE_SELECTED, template);
       setIsTemplateDrawerOpen(true);
     },
-    [setIsTemplateDrawerOpen, setTemplateProcessError, setValue],
+    [invalidateTemplateGeneration, setIsTemplateDrawerOpen, setTemplateProcessError, setValue],
   );
 
   if (!loaded) {

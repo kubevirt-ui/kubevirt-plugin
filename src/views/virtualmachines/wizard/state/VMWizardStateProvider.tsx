@@ -1,4 +1,4 @@
-import { type FC, type PropsWithChildren, useCallback, useMemo, useState } from 'react';
+import { type FC, type PropsWithChildren, useCallback, useMemo, useRef, useState } from 'react';
 
 import { VMWizardStep } from '../utils/constants';
 import { type VMWizardNavigationState } from './types';
@@ -14,6 +14,14 @@ const VMWizardStateProvider: FC<PropsWithChildren> = ({ children }) => {
   const [navigation, setNavigation] = useState(createNavigationState);
   const [isTemplateDrawerOpen, setIsTemplateDrawerOpen] = useState(false);
   const [templateProcessError, setTemplateProcessError] = useState<null | string>(null);
+  const templateGenerationRevisionRef = useRef(0);
+  const getTemplateGenerationRevision = useCallback(
+    () => templateGenerationRevisionRef.current,
+    [],
+  );
+  const invalidateTemplateGeneration = useCallback(() => {
+    templateGenerationRevisionRef.current += 1;
+  }, []);
 
   const setCurrentStep = useCallback((step: string): void => {
     setNavigation((current) => ({
@@ -30,6 +38,7 @@ const VMWizardStateProvider: FC<PropsWithChildren> = ({ children }) => {
   }, []);
 
   const resetState = useCallback((): void => {
+    templateGenerationRevisionRef.current = 0;
     setNavigation(createNavigationState());
     setIsTemplateDrawerOpen(false);
     setTemplateProcessError(null);
@@ -38,6 +47,8 @@ const VMWizardStateProvider: FC<PropsWithChildren> = ({ children }) => {
   const value = useMemo(
     () => ({
       ...navigation,
+      getTemplateGenerationRevision,
+      invalidateTemplateGeneration,
       isTemplateDrawerOpen,
       resetState,
       setCurrentStep,
@@ -48,6 +59,8 @@ const VMWizardStateProvider: FC<PropsWithChildren> = ({ children }) => {
     }),
     [
       navigation,
+      getTemplateGenerationRevision,
+      invalidateTemplateGeneration,
       isTemplateDrawerOpen,
       resetState,
       setCurrentStep,

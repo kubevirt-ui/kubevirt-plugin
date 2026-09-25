@@ -9,6 +9,7 @@ import { getParameters, replaceTemplateParameters } from '@kubevirt-utils/resour
 import { Button, ButtonVariant, Form, Stack, StackItem } from '@patternfly/react-core';
 import { createTemplateParametersSchema } from '@virtualmachines/wizard/form/schema/template/createTemplateSchema';
 import { useVMWizardForm } from '@virtualmachines/wizard/form/VMWizardFormProvider';
+import { useVMWizardState } from '@virtualmachines/wizard/state/useVMWizardState';
 import { NAME_INPUT_FIELD } from '@virtualmachines/wizard/steps/TemplateStep/components/TemplatesCatalog/utils/consts';
 import { useDrawerContext } from '@virtualmachines/wizard/steps/TemplateStep/components/TemplatesCatalogDrawer/hooks/useDrawerContext';
 
@@ -25,6 +26,7 @@ const ParametersSections: FC<ParametersSectionProps> = ({ onCommit, showValidati
   const { t } = useKubevirtTranslation();
   const { setTemplate, template: drawerTemplate } = useDrawerContext();
   const { setValue: setTargetValue } = useVMWizardForm();
+  const { invalidateTemplateGeneration } = useVMWizardState();
 
   const draftParameters = useMemo(() => getParameters(drawerTemplate) ?? [], [drawerTemplate]);
 
@@ -63,7 +65,7 @@ const ParametersSections: FC<ParametersSectionProps> = ({ onCommit, showValidati
     const committedTemplate = replaceTemplateParameters(drawerTemplate, submittedParameters);
 
     setTemplate(committedTemplate);
-    setTargetValue('template.lastProcessedKey', '');
+    invalidateTemplateGeneration();
     setTargetValue('template.selectedTemplate', committedTemplate, {
       shouldValidate: true,
     });
