@@ -98,15 +98,34 @@ export default class VmTreeViewComponent extends BaseComponent {
     const nodeId = `projectSelector/#single-cluster#/${namespace}`;
     const containerNode = this.locator(`[id="${nodeId}"]`);
 
-    const waitForNode = async (): Promise<void> => {
-      await containerNode.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
+    // Timeouts for the first two attempts are shortened relative to ELEMENT_WAIT: neither can
+    // reveal a namespace the page hasn't fetched yet (searchTreeView only filters the
+    // already-loaded, in-memory tree data), so waiting the full duration on them is wasted time
+    // that's better spent on the reload-based fallback below.
+    const fastWaitTimeout = TestTimeouts.SHORT_WAIT * 4;
+
+    const waitForNode = async (timeout: number): Promise<void> => {
+      await containerNode.waitFor({ state: 'visible', timeout });
     };
 
     try {
-      await waitForNode();
+      await waitForNode(fastWaitTimeout);
     } catch {
-      await this.searchTreeView(namespace);
-      await waitForNode();
+      try {
+        await this.searchTreeView(namespace);
+        await waitForNode(fastWaitTimeout);
+      } catch {
+        // A namespace created immediately before navigating here can lose a race with the
+        // console's project/namespace list: the API confirms "Active" (see
+        // setupTestNamespace/waitForNamespaceReady), but the already-rendered tree view may
+        // have fetched its project list just before that. Reload to force a fresh fetch, then
+        // retry once more with the full budget — this is the fallback most likely to succeed.
+        await this.page.reload();
+        await this.page.waitForLoadState('domcontentloaded');
+        await this._treeView.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
+        await this.searchTreeView(namespace);
+        await waitForNode(TestTimeouts.ELEMENT_WAIT);
+      }
     }
 
     const buttonChild = containerNode.locator('button', { hasText: namespace });

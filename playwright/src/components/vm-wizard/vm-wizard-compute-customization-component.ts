@@ -11,9 +11,10 @@ export default class VmWizardComputeCustomizationComponent extends BaseComponent
   };
   private readonly _inputTypeText = this.locator('input[type="text"]');
   private readonly _pfV6CMenuToggle = this.locator('.pf-v6-c-menu-toggle');
-  private readonly _wizardFooterCreateButton = this.page
-    .getByTestId('wizard-create-button')
-    .filter({ hasText: 'Create VirtualMachine' });
+  // Not filtered by label text: this button reads "Clone VirtualMachine" for the Clone flow
+  // and "Create VirtualMachine" otherwise (see getCreateButtonText/ReviewAndCreateStepFooter),
+  // but it's the same single button in both cases.
+  private readonly _wizardFooterCreateButton = this.page.getByTestId('wizard-create-button');
   private readonly _pfV6CWizardInputPlaceholderFindSettings = this.locator(
     '.pf-v6-c-wizard input[placeholder="Find settings"]',
   );
@@ -26,6 +27,18 @@ export default class VmWizardComputeCustomizationComponent extends BaseComponent
     name: 'Hostname',
   });
   private readonly _hostnameModalSaveButton = this._hostnameModal.getByTestId('save-button');
+  private readonly _descriptionModal = this.testId('dialog-modal').filter({
+    has: this.page.getByRole('heading', { name: 'Description', exact: true }),
+  });
+  private readonly _descriptionModalTextarea = this._descriptionModal.getByRole('textbox', {
+    name: 'description text area',
+  });
+  private readonly _bootOrderModal = this.testId('dialog-modal').filter({
+    has: this.page.getByRole('heading', { name: 'VirtualMachine boot order' }),
+  });
+  private readonly _bootOrderModalListItems = this._bootOrderModal.locator(
+    '[aria-label="draggable data list example"] .pf-v6-c-data-list__item',
+  );
   private readonly _startAfterCreateCheckbox = this.locator('#start-after-create-checkbox');
   private readonly _startThisVirtualMachineAfterCreation = this.locator(
     'text=Start this VirtualMachine after creation',
@@ -266,9 +279,163 @@ export default class VmWizardComputeCustomizationComponent extends BaseComponent
     await this._hostnameModalInput.press('Enter');
   }
 
+  /** Opens the Description edit modal from the Customization > Details tab. */
+  async openCustomizationDescriptionModal(vmName: string): Promise<void> {
+    const editButton = this.testId(`${vmName}-description`);
+    await editButton.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+    await this.robustClick(editButton);
+    await this._descriptionModal.waitFor({
+      state: 'visible',
+      timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+    });
+  }
+
+  async fillCustomizationDescriptionModal(text: string): Promise<void> {
+    const textarea = this._descriptionModalTextarea;
+    await textarea.waitFor({ state: 'visible', timeout: TestTimeouts.SHORT_WAIT });
+    await textarea.fill(text);
+  }
+
+  async saveCustomizationDescriptionModal(): Promise<void> {
+    const saveButton = this._descriptionModal.getByTestId('save-button');
+    await this.robustClick(saveButton);
+    await this._descriptionModal.waitFor({
+      state: 'hidden',
+      timeout: TestTimeouts.UI_ACTION_COMPLETE,
+    });
+  }
+
+  /** Reads the description value as displayed on the Customization > Details tab (post-save). */
+  async getCustomizationDescription(vmName: string): Promise<string> {
+    const editButton = this.testId(`${vmName}-description`);
+    return (await editButton.textContent({ timeout: TestTimeouts.SHORT_WAIT }))?.trim() ?? '';
+  }
+
+  /** Expands the "Boot management" section on the Customization > Details tab, if collapsed. */
+  async expandBootManagementSection(): Promise<void> {
+    const toggle = this._roleTabpanel.locator('button').filter({ hasText: 'Boot management' });
+    await toggle.first().waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+    const isExpanded = await toggle.first().getAttribute('aria-expanded');
+    if (isExpanded !== 'true') {
+      await this.robustClick(toggle.first());
+      await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
+    }
+  }
+
+  /** Opens the boot order edit modal from the Customization > Details tab (expands the section first). */
+  async openBootOrderModal(vmName: string): Promise<void> {
+    await this.expandBootManagementSection();
+    const editButton = this.testId(`${vmName}-boot-order`);
+    await editButton.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+    await this.robustClick(editButton);
+    await this._bootOrderModal.waitFor({
+      state: 'visible',
+      timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+    });
+  }
+
+  /** Device names in their current order, as listed inside the open boot order modal. */
+  async getBootOrderModalDeviceNames(): Promise<string[]> {
+    const items = this._bootOrderModalListItems;
+    await items.first().waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+    const count = await items.count();
+    const names: string[] = [];
+    for (let i = 0; i < count; i++) {
+      const text = (await items.nth(i).locator('span[id]').first().textContent())?.trim();
+      if (text) names.push(text);
+    }
+    return names;
+  }
+
+  /**
+   * Reorders a boot device within the open modal by dragging its drag handle with real mouse
+   * events.
+   *
+   * Note: the underlying list (PatternFly's deprecated DragDrop/Draggable/Droppable) is
+   * implemented purely with native mouse events — `dragstart` is intercepted and
+   * `preventDefault()`-ed, then the rest of the interaction is tracked via `mousemove`/`mouseup`
+   * listeners (see `@patternfly/react-core/deprecated` `Draggable.js`). Despite the drag
+   * button's `aria-describedby` text mentioning Space/Arrow keys/Enter, no keyboard handling is
+   * actually registered, so keyboard-only interaction cannot reorder anything here.
+   */
+  async reorderBootDeviceInModal(
+    deviceName: string,
+    direction: 'up' | 'down',
+    steps = 1,
+  ): Promise<void> {
+    const items = this._bootOrderModalListItems;
+    await items.first().waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+
+    const count = await items.count();
+    let sourceIndex = -1;
+    for (let i = 0; i < count; i++) {
+      const text = (await items.nth(i).locator('span[id]').first().textContent())?.trim();
+      if (text === deviceName) {
+        sourceIndex = i;
+        break;
+      }
+    }
+    if (sourceIndex === -1) {
+      throw new Error(`Could not find boot device "${deviceName}" in the boot order modal`);
+    }
+
+    const targetIndex =
+      direction === 'down'
+        ? Math.min(sourceIndex + steps, count - 1)
+        : Math.max(sourceIndex - steps, 0);
+    if (targetIndex === sourceIndex) return;
+
+    const dragButton = items.nth(sourceIndex).locator('button[aria-label="Reorder"]');
+    const [dragButtonBox, targetBox] = await Promise.all([
+      dragButton.boundingBox(),
+      items.nth(targetIndex).boundingBox(),
+    ]);
+    if (!dragButtonBox || !targetBox) {
+      throw new Error(`Could not compute bounding boxes to reorder boot device "${deviceName}"`);
+    }
+
+    const startX = dragButtonBox.x + dragButtonBox.width / 2;
+    const startY = dragButtonBox.y + dragButtonBox.height / 2;
+    // Land past the target row's midpoint so the drag crosses the halfway threshold the
+    // component uses to compute the new index.
+    const endX = startX;
+    const endY =
+      direction === 'down' ? targetBox.y + targetBox.height * 0.75 : targetBox.y + targetBox.height * 0.25;
+
+    await this.page.mouse.move(startX, startY);
+    await this.page.mouse.down();
+    const moveSteps = Math.max(5, Math.abs(targetIndex - sourceIndex) * 5);
+    await this.page.mouse.move(endX, endY, { steps: moveSteps });
+    await this.page.waitForTimeout(TestTimeouts.UI_DELAY_MICRO);
+    await this.page.mouse.up();
+  }
+
+  async saveBootOrderModal(): Promise<void> {
+    const saveButton = this._bootOrderModal.getByTestId('save-button');
+    await this.robustClick(saveButton);
+    await this._bootOrderModal.waitFor({
+      state: 'hidden',
+      timeout: TestTimeouts.UI_ACTION_COMPLETE,
+    });
+  }
+
+  /** Reads the boot order device names as displayed on the Customization > Details tab (post-save). */
+  async getDisplayedBootOrder(vmName: string): Promise<string[]> {
+    const container = this.testId(`${vmName}-boot-order`);
+    await container.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+    const items = container.locator('li');
+    const count = await items.count();
+    const names: string[] = [];
+    for (let i = 0; i < count; i++) {
+      const text = (await items.nth(i).textContent())?.trim();
+      if (text) names.push(text);
+    }
+    return names;
+  }
+
   async getReviewDescription(): Promise<string> {
     try {
-      const descInput = this._pfV6CWizardInputTypeText.nth(1);
+      const descInput = this.locator('#vm-description');
       return (await descInput.inputValue()) || '';
     } catch {
       return '';
@@ -298,10 +465,28 @@ export default class VmWizardComputeCustomizationComponent extends BaseComponent
     }
   }
 
+  /** Reads the VM name from the Review step's editable name input — Clone flow only (see
+   * CloneNameInput.tsx). For Custom configuration / Create from Template flows, the Review
+   * step's Name field is static read-only text; use getReviewVmNameFromDetails() instead. */
   async getReviewVmName(): Promise<string> {
     try {
       const nameInput = this._inputTypeText.first();
       return (await nameInput.inputValue()) || '';
+    } catch {
+      return '';
+    }
+  }
+
+  /** Reads the VM name from the Review step's read-only "Name" field — Custom configuration /
+   * Create from Template flows only (see ReviewGridLeftColumn.tsx, non-clone branch). */
+  async getReviewVmNameFromDetails(): Promise<string> {
+    const group = this.locator('.pf-v6-c-wizard .pf-v6-c-description-list__group').filter({
+      has: this.page.locator('.pf-v6-c-description-list__term', { hasText: 'Name' }),
+    });
+    const dd = group.locator('.pf-v6-c-description-list__description, dd');
+    try {
+      await dd.first().waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+      return (await dd.first().textContent())?.trim() ?? '';
     } catch {
       return '';
     }
@@ -496,7 +681,7 @@ export default class VmWizardComputeCustomizationComponent extends BaseComponent
     await this.robustClick(tab.first());
   }
 
-  async selectLargestComputeSize(): Promise<void> {
+  async selectLargestComputeSize(): Promise<string> {
     const sizeBtn = this._pfV6CMenuToggle.filter({
       hasText: /CPUs.*Memory/,
     });
@@ -509,6 +694,7 @@ export default class VmWizardComputeCustomizationComponent extends BaseComponent
     await menu.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
 
     const menuItems = menu.getByRole('menuitem');
+    const largestSize = (await menuItems.last().textContent())?.trim() ?? '';
     await this.robustClick(menuItems.last());
 
     await menu
@@ -518,6 +704,7 @@ export default class VmWizardComputeCustomizationComponent extends BaseComponent
       });
 
     await this.dismissSeriesTooltip();
+    return largestSize;
   }
 
   async selectInstanceTypeSeries(series: 'cx' | 'd' | 'u' | 'm' | 'n' | 'o' | 'rt'): Promise<void> {
@@ -899,6 +1086,14 @@ export default class VmWizardComputeCustomizationComponent extends BaseComponent
       const nameInput = this._pfV6CWizardInputTypeText.first();
       const isEditable = await nameInput.isEditable({ timeout: TestTimeouts.SHORT_WAIT });
       return isEditable;
+    } catch {
+      return false;
+    }
+  }
+
+  async verifyReviewDescriptionEditable(): Promise<boolean> {
+    try {
+      return await this.locator('#vm-description').isEditable({ timeout: TestTimeouts.SHORT_WAIT });
     } catch {
       return false;
     }

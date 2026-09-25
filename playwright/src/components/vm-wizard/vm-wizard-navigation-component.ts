@@ -367,6 +367,19 @@ export default class VmWizardNavigationComponent extends BaseComponent {
     return await nextButton.isDisabled();
   }
 
+  /**
+   * Whether the wizard's left-hand step navigation link for `stepId` is disabled.
+   * `stepId` matches the `WizardStep` id rendered by PatternFly as the nav link's DOM id
+   * (e.g. `vm-creation-review-and-create-step`).
+   */
+  async isStepNavDisabled(stepId: string): Promise<boolean> {
+    const navLink = this.locator(`#${stepId}`);
+    await navLink.first().waitFor({ state: 'attached', timeout: TestTimeouts.SHORT_WAIT });
+    const disabled = await navLink.first().getAttribute('disabled');
+    const ariaDisabled = await navLink.first().getAttribute('aria-disabled');
+    return disabled !== null || ariaDisabled === 'true';
+  }
+
   async navigateToStepByName(stepName: string): Promise<void> {
     const toggle = this.locator('button:has-text("Wizard toggle")');
     await this.robustClick(toggle.first());
@@ -374,6 +387,19 @@ export default class VmWizardNavigationComponent extends BaseComponent {
       `nav[aria-label="Wizard steps"] button:has-text("${stepName}")`,
     );
     await this.robustClick(stepButton.first());
+  }
+
+  /**
+   * Jumps directly to a wizard step via the left-hand step navigation, using the step's DOM id
+   * (e.g. `vm-creation-customization-step`). No-op if the nav link is disabled.
+   */
+  async navigateToStepById(stepId: string): Promise<void> {
+    const navLink = this.locator(`#${stepId}`);
+    await navLink
+      .first()
+      .waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+    await this.robustClick(navLink.first());
+    await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
   }
 
   async navigateToWizardInNamespace(_namespace: string): Promise<void> {
@@ -498,6 +524,13 @@ export default class VmWizardNavigationComponent extends BaseComponent {
     await this.robustClick(row.first());
   }
 
+  /** Selects the first available VM row in the Clone source step's table, regardless of name. */
+  async selectFirstAvailableCloneSourceVm(): Promise<void> {
+    const firstRow = this.locator('.pf-v6-c-wizard tbody tr').first();
+    await firstRow.waitFor({ state: 'visible', timeout: TestTimeouts.VM_OPERATION });
+    await this.robustClick(firstRow);
+  }
+
   async selectCreationMethod(method: 'newVm' | 'fromTemplate' | 'cloneVm'): Promise<void> {
     const radioMap = {
       newVm: this._newVmRadio,
@@ -531,8 +564,7 @@ export default class VmWizardNavigationComponent extends BaseComponent {
     }
   }
 
-  async selectTemplateByTestId(templateTestId: string): Promise<void> {
-    const card = this.testId(templateTestId);
+  private async selectTemplateCard(card: Locator): Promise<void> {
     await card.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
     await this.robustClick(card);
 
@@ -556,6 +588,30 @@ export default class VmWizardNavigationComponent extends BaseComponent {
           }, 3000);
         }),
     );
+  }
+
+  async selectTemplateByTestId(templateTestId: string): Promise<void> {
+    const card = this.testId(templateTestId);
+    await this.selectTemplateCard(card);
+  }
+
+  async isTemplateSelectedByTestId(templateTestId: string): Promise<boolean> {
+    const card = this.testId(templateTestId);
+    await card.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+    return await card.evaluate((element) => element.classList.contains('pf-m-selected'));
+  }
+
+  /** Selects the first available template card/row in the Template catalog step, regardless of name. */
+  async selectFirstAvailableTemplate(): Promise<void> {
+    const gridCard = this._pfV6CWizardTemplatesCatalogTile.first();
+    const isGridVisible = await gridCard
+      .isVisible({ timeout: TestTimeouts.SHORT_WAIT })
+      .catch(() => false);
+    const card = isGridVisible
+      ? gridCard
+      : this.locator('.pf-v6-c-wizard tr.pf-m-clickable').first();
+
+    await this.selectTemplateCard(card);
   }
 
   async selectTemplateCatalogProject(projectName: string): Promise<void> {
