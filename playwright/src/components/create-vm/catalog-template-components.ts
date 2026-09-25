@@ -209,7 +209,15 @@ export class TemplateDetailComponent extends BaseComponent {
         await this.page.waitForTimeout(TestTimeouts.UI_DELAY_EXTRA);
 
         if (nic.name) {
-          const nicNameInput = this.locator('input[aria-label="Network interface name"]');
+          // The Name field lives under the modal's Advanced settings section.
+          const advancedSettingsBtn = this.locator('button:has-text("Advanced settings")');
+          await advancedSettingsBtn.waitFor({
+            state: 'visible',
+            timeout: TestTimeouts.UI_VISIBILITY_QUICK,
+          });
+          await this.robustClick(advancedSettingsBtn);
+
+          const nicNameInput = this.locator('[role="dialog"] #name, #tab-modal #name');
           await nicNameInput.waitFor({
             state: 'visible',
             timeout: TestTimeouts.UI_VISIBILITY_QUICK,

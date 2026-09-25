@@ -336,7 +336,7 @@ export class VirtualMachineDetailDisksComponent extends BaseComponent {
   private readonly _persistentHotplugLabel = this.locator(
     '.pf-v6-c-label__content:has-text("Persistent Hotplug")',
   );
-  private readonly _roleDialog = this.locator('[role="dialog"]');
+  private readonly _modal = this.locator('[role="dialog"]');
   private readonly _storageClassSelect = this.testId('storage-class-select');
   private readonly _windowsDriversCheckbox = this.testId('cdrom-drivers');
 
@@ -347,10 +347,6 @@ export class VirtualMachineDetailDisksComponent extends BaseComponent {
     super(page);
     this.cdrom = new VirtualMachineDetailCdromComponent(page);
     this.configurationCdrom = new VirtualMachineDetailConfigurationCdromComponent(page);
-  }
-
-  private getDiskNameInModal(diskName: string) {
-    return this.locator(`strong:has-text("${diskName}")`);
   }
 
   private getDiskRow(diskName: string) {
@@ -369,28 +365,53 @@ export class VirtualMachineDetailDisksComponent extends BaseComponent {
     await this.navigateToTab(this._configurationTab, TestTimeouts.UI_ACTION_COMPLETE);
   }
 
+  /** Opens the blank-disk form without submitting it. Used by name-validation coverage. */
+  async openAddBlankDiskModal(): Promise<void> {
+    await this.navigateToConfigurationStorage();
+    await this._addDiskButtonInStorage.waitFor({
+      state: 'visible',
+      timeout: TestTimeouts.VM_CREATION,
+    });
+    await this.robustClick(this._addDiskButtonInStorage);
+    await this._blankDiskOption.waitFor({ state: 'visible', timeout: TestTimeouts.VM_CREATION });
+    await this.robustClick(this._blankDiskOption);
+    await this._modal.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ACTION_COMPLETE });
+  }
+
+  async openEditDiskModal(diskName: string): Promise<void> {
+    await this.navigateToConfigurationStorage();
+    const diskRow = this.getDiskRow(diskName);
+    await diskRow.waitFor({ state: 'visible', timeout: TestTimeouts.VM_CREATION });
+    await this.robustClick(diskRow.locator(this._diskRowActionsButton));
+
+    const editButton = this.locator('[role="menu"] button', { hasText: 'Edit' });
+    await editButton.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ACTION_COMPLETE });
+    await this.robustClick(editButton);
+    await this._modal.filter({ hasText: 'Edit Disk' }).waitFor({
+      state: 'visible',
+      timeout: TestTimeouts.UI_ACTION_COMPLETE,
+    });
+  }
+
+  async expandDiskAdvancedSettings(): Promise<void> {
+    await this._advancedSettingsButton.waitFor({
+      state: 'visible',
+      timeout: TestTimeouts.UI_ACTION_COMPLETE,
+    });
+    await this.robustClick(this._advancedSettingsButton);
+  }
+
   async addBlankDisk(diskName: string, size = '1', storageClass?: string): Promise<boolean> {
     try {
-      await this.navigateToConfigurationStorage();
+      await this.openAddBlankDiskModal();
+      await this.expandDiskAdvancedSettings();
 
-      await this._addDiskButtonInStorage.waitFor({
-        state: 'visible',
-        timeout: TestTimeouts.VM_CREATION,
-      });
-      await this.robustClick(this._addDiskButtonInStorage);
-
-      await this._blankDiskOption.waitFor({ state: 'visible', timeout: TestTimeouts.VM_CREATION });
-      await this.robustClick(this._blankDiskOption);
-
-      const diskNameField = this.page
-        .locator('[role="dialog"] #name, #tab-modal #name, input[name="disk.name"]')
-        .first();
-      await diskNameField.waitFor({
+      await this._name.waitFor({
         state: 'visible',
         timeout: TestTimeouts.INSTANCE_TYPE_VERIFICATION,
       });
-      await diskNameField.clear();
-      await diskNameField.fill(diskName);
+      await this._name.clear();
+      await this._name.fill(diskName);
 
       if (size) {
         const sizeInputExists = await this._inputInput
@@ -462,15 +483,6 @@ export class VirtualMachineDetailDisksComponent extends BaseComponent {
     await blankDiskOption.waitFor({ state: 'visible', timeout: TestTimeouts.VM_CREATION });
     await blankDiskOption.click();
 
-    await this._name.waitFor({
-      state: 'visible',
-      timeout: TestTimeouts.INSTANCE_TYPE_VERIFICATION,
-    });
-    await this._name.clear();
-    await this._name.fill(diskName);
-
-    const actualDiskName = await this._name.inputValue();
-
     await this._diskTypeSelect.waitFor({
       state: 'visible',
       timeout: TestTimeouts.INSTANCE_TYPE_VERIFICATION,
@@ -489,6 +501,16 @@ export class VirtualMachineDetailDisksComponent extends BaseComponent {
     await this.robustClick(this._advancedSettingsButton);
 
     await this.page.waitForTimeout(TestTimeouts.UI_DELAY_EXTRA);
+
+    // The Name field lives under Advanced settings; fill it after expanding.
+    await this._name.waitFor({
+      state: 'visible',
+      timeout: TestTimeouts.INSTANCE_TYPE_VERIFICATION,
+    });
+    await this._name.clear();
+    await this._name.fill(diskName);
+
+    const actualDiskName = await this._name.inputValue();
 
     await this._lunReservation.waitFor({
       state: 'visible',
@@ -513,23 +535,23 @@ export class VirtualMachineDetailDisksComponent extends BaseComponent {
     await this._blankDiskOption.waitFor({ state: 'visible', timeout: TestTimeouts.VM_CREATION });
     await this._blankDiskOption.click();
 
-    const volumeNameInput = this.locator('input[name="volume.name"]');
-    await volumeNameInput.waitFor({
-      state: 'visible',
-      timeout: TestTimeouts.INSTANCE_TYPE_VERIFICATION,
-    });
-    await volumeNameInput.clear();
-    await volumeNameInput.fill(diskName);
-
-    const actualDiskName = await volumeNameInput
-      .inputValue({ timeout: TestTimeouts.SHORT_WAIT })
-      .catch(() => diskName);
-
     await this._advancedSettingsButton.waitFor({
       state: 'visible',
       timeout: TestTimeouts.INSTANCE_TYPE_VERIFICATION,
     });
     await this.robustClick(this._advancedSettingsButton);
+
+    // The Name field lives under Advanced settings; fill it after expanding.
+    await this._name.waitFor({
+      state: 'visible',
+      timeout: TestTimeouts.INSTANCE_TYPE_VERIFICATION,
+    });
+    await this._name.clear();
+    await this._name.fill(diskName);
+
+    const actualDiskName = await this._name
+      .inputValue({ timeout: TestTimeouts.SHORT_WAIT })
+      .catch(() => diskName);
 
     const shareableCheckbox = this.locator('input[id="sharable-disk"]');
     await shareableCheckbox.waitFor({
@@ -764,7 +786,7 @@ export class VirtualMachineDetailDisksComponent extends BaseComponent {
       timeout: TestTimeouts.INSTANCE_TYPE_VERIFICATION,
     });
 
-    const editDiskModal = this._roleDialog.filter({ hasText: 'Edit Disk' });
+    const editDiskModal = this._modal.filter({ hasText: 'Edit Disk' });
     const sizeInput = editDiskModal
       .locator('input[aria-label="Input"], input[type="number"]')
       .first();
@@ -931,7 +953,7 @@ export class VirtualMachineDetailDisksComponent extends BaseComponent {
         timeout: TestTimeouts.INSTANCE_TYPE_VERIFICATION,
       });
 
-      const editDiskModal = this._roleDialog.filter({ hasText: 'Edit Disk' });
+      const editDiskModal = this._modal.filter({ hasText: 'Edit Disk' });
       const sizeInput = editDiskModal
         .locator('input[aria-label="Input"], input[type="number"]')
         .first();
@@ -1017,7 +1039,7 @@ export class VirtualMachineDetailDisksComponent extends BaseComponent {
       timeout: TestTimeouts.INSTANCE_TYPE_VERIFICATION,
     });
 
-    const editDiskModal = this._roleDialog.filter({ hasText: 'Edit Disk' });
+    const editDiskModal = this._modal.filter({ hasText: 'Edit Disk' });
     await editDiskModal
       .getByText('PersistentVolumeClaim size')
       .waitFor({ state: 'visible', timeout: TestTimeouts.VM_CREATION });
@@ -1092,13 +1114,6 @@ export class VirtualMachineDetailDisksComponent extends BaseComponent {
       await this._blankDiskOption.waitFor({ state: 'visible', timeout: TestTimeouts.VM_CREATION });
       await this.robustClick(this._blankDiskOption);
 
-      const diskNameField = this.page
-        .locator('[role="dialog"] #name, #tab-modal #name, input[name="disk.name"]')
-        .first();
-      await diskNameField.waitFor(visibleWait);
-      await diskNameField.clear();
-      await diskNameField.fill(diskName);
-
       if (size) {
         const sizeInputExists = await this._inputInput
           .isVisible({ timeout: TestTimeouts.UI_DELAY_LONG })
@@ -1122,6 +1137,11 @@ export class VirtualMachineDetailDisksComponent extends BaseComponent {
       await this._advancedSettingsButton.waitFor(visibleWait);
       await this.robustClick(this._advancedSettingsButton);
 
+      // The Name field lives under Advanced settings; fill it after expanding.
+      await this._name.waitFor(visibleWait);
+      await this._name.clear();
+      await this._name.fill(diskName);
+
       const serialInput = this.testId('disk-serial-input');
       await serialInput.waitFor(visibleWait);
       await serialInput.fill(serial);
@@ -1129,9 +1149,7 @@ export class VirtualMachineDetailDisksComponent extends BaseComponent {
       await this.clickDialogSaveButton();
       await this.page.waitForTimeout(TestTimeouts.UI_DELAY_EXTRA);
 
-      return (
-        (await this.verifyDiskNameExists(diskName)) || (await this.verifyDiskExists(diskName))
-      );
+      return (await this.verifyDiskNameExists(diskName)) || (await this.verifyDiskExists(diskName));
     } catch {
       return false;
     }
@@ -1169,7 +1187,7 @@ export class VirtualMachineDetailDisksComponent extends BaseComponent {
       await editBtn.waitFor(visibleWait);
       await this.robustClick(editBtn);
 
-      await this._roleDialog.filter({ hasText: 'Edit' }).waitFor(visibleWait);
+      await this._modal.filter({ hasText: 'Edit' }).waitFor(visibleWait);
 
       await this._advancedSettingsButton.waitFor(visibleWait);
       await this.robustClick(this._advancedSettingsButton);

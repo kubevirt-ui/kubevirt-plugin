@@ -563,6 +563,12 @@ export class VmStorageAddDiskComponent extends BaseComponent {
       await this._blankDiskOption.waitFor({ state: 'visible', timeout: TestTimeouts.VM_CREATION });
       await this.robustClick(this._blankDiskOption);
 
+      await this._advancedSettingsButton.waitFor({
+        state: 'visible',
+        timeout: TestTimeouts.INSTANCE_TYPE_VERIFICATION,
+      });
+      await this.robustClick(this._advancedSettingsButton);
+
       const diskNameField = this.page
         .locator('[role="dialog"] #name, #tab-modal #name, input[name="disk.name"]')
         .first();
@@ -767,15 +773,6 @@ export class VmStorageAddDiskComponent extends BaseComponent {
     await blankDiskOption.waitFor({ state: 'visible', timeout: TestTimeouts.VM_CREATION });
     await blankDiskOption.click();
 
-    await this._name.waitFor({
-      state: 'visible',
-      timeout: TestTimeouts.INSTANCE_TYPE_VERIFICATION,
-    });
-    await this._name.clear();
-    await this._name.fill(diskName);
-
-    const actualDiskName = await this._name.inputValue();
-
     await this._diskTypeSelect.waitFor({
       state: 'visible',
       timeout: TestTimeouts.INSTANCE_TYPE_VERIFICATION,
@@ -794,6 +791,16 @@ export class VmStorageAddDiskComponent extends BaseComponent {
     await this.robustClick(this._advancedSettingsButton);
 
     await this.page.waitForTimeout(TestTimeouts.UI_DELAY_EXTRA);
+
+    // The Name field lives under Advanced settings; fill it after expanding.
+    await this._name.waitFor({
+      state: 'visible',
+      timeout: TestTimeouts.INSTANCE_TYPE_VERIFICATION,
+    });
+    await this._name.clear();
+    await this._name.fill(diskName);
+
+    const actualDiskName = await this._name.inputValue();
 
     await this._lunReservation.waitFor({
       state: 'visible',
@@ -818,23 +825,23 @@ export class VmStorageAddDiskComponent extends BaseComponent {
     await this._blankDiskOption.waitFor({ state: 'visible', timeout: TestTimeouts.VM_CREATION });
     await this._blankDiskOption.click();
 
-    const volumeNameInput = this.locator('input[name="volume.name"]');
-    await volumeNameInput.waitFor({
-      state: 'visible',
-      timeout: TestTimeouts.INSTANCE_TYPE_VERIFICATION,
-    });
-    await volumeNameInput.clear();
-    await volumeNameInput.fill(diskName);
-
-    const actualDiskName = await volumeNameInput
-      .inputValue({ timeout: TestTimeouts.SHORT_WAIT })
-      .catch(() => diskName);
-
     await this._advancedSettingsButton.waitFor({
       state: 'visible',
       timeout: TestTimeouts.INSTANCE_TYPE_VERIFICATION,
     });
     await this.robustClick(this._advancedSettingsButton);
+
+    // The Name field lives under Advanced settings; fill it after expanding.
+    await this._name.waitFor({
+      state: 'visible',
+      timeout: TestTimeouts.INSTANCE_TYPE_VERIFICATION,
+    });
+    await this._name.clear();
+    await this._name.fill(diskName);
+
+    const actualDiskName = await this._name
+      .inputValue({ timeout: TestTimeouts.SHORT_WAIT })
+      .catch(() => diskName);
 
     const shareableCheckbox = this.locator('input[id="sharable-disk"]');
     await shareableCheckbox.waitFor({

@@ -817,6 +817,13 @@ export class TemplateCustomizeWizardComponent extends BaseComponent {
         await this.page.waitForTimeout(TestTimeouts.UI_DELAY_EXTRA);
 
         if (nic.name) {
+          // The Name field lives under the modal's Advanced settings section.
+          await this._advancedSettingsBtn.waitFor({
+            state: 'visible',
+            timeout: TestTimeouts.RESOURCE_CREATION,
+          });
+          await this.robustClick(this._advancedSettingsBtn);
+
           const wizardNicNameInput = this._inputname;
           await wizardNicNameInput.waitFor({
             state: 'visible',
