@@ -1,12 +1,10 @@
 import type { FC } from 'react';
-import { useCallback } from 'react';
 import { useWatch } from 'react-hook-form';
 
 import type { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import type { BootMode } from '@kubevirt-utils/components/FirmwareBootloaderModal/utils/constants';
 import type { HARDWARE_DEVICE_TYPE } from '@kubevirt-utils/components/HardwareDevices/utils/constants';
 import { getDevices } from '@kubevirt-utils/resources/vm';
-import { type PatchCustomizeWizardVMSignalArgs } from '@kubevirt-utils/signals/customizeWizardVMSignal';
 import { DescriptionList, GridItem } from '@patternfly/react-core';
 import DetailsSectionBoot from '@virtualmachines/details/tabs/configuration/details/components/DetailsSectionBoot';
 import DetailsSectionHardware from '@virtualmachines/details/tabs/configuration/details/components/DetailsSectionHardware';
@@ -23,12 +21,6 @@ const DetailsRightColumn: FC<DetailsRightColumnProps> = ({ canUpdateVM, preferre
   const { getValues, setValue } = useVMWizard();
   const { control } = useVMWizard();
   const vm = useWatch({ control, name: CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM });
-
-  const customizeWizardVMPatch = useCallback(
-    (patches: PatchCustomizeWizardVMSignalArgs) =>
-      patchWizardCustomizedVM(getValues, setValue, patches),
-    [getValues, setValue],
-  );
 
   return (
     <GridItem span={5}>
@@ -48,7 +40,9 @@ const DetailsRightColumn: FC<DetailsRightColumnProps> = ({ canUpdateVM, preferre
         />
         <DetailsSectionBoot
           canUpdateVM={canUpdateVM}
-          customizeWizardVMPatch={customizeWizardVMPatch}
+          onUpdateVM={(updatedVM) =>
+            Promise.resolve(patchWizardCustomizedVM(getValues, setValue, [{ data: updatedVM }]))
+          }
           preferredBootmode={preferredBootmode}
           vm={vm}
         />

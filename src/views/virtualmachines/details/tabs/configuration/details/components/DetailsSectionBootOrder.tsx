@@ -14,23 +14,22 @@ import {
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName } from '@kubevirt-utils/resources/shared';
-import { getDisks, getInterfaces } from '@kubevirt-utils/resources/vm';
-import { type PatchCustomizeWizardVMSignal } from '@kubevirt-utils/signals/customizeWizardVMSignal';
 
 import { updateBootOrder } from '../utils/utils';
 
 type DetailsSectionBootOrderProps = {
   canUpdateVM?: boolean;
-  customizeWizardVMPatch?: PatchCustomizeWizardVMSignal;
+
   instanceTypeVM?: V1VirtualMachine;
+  onUpdateVM?: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine | undefined>;
   vm: V1VirtualMachine;
   vmi?: V1VirtualMachineInstance;
 };
 
 const DetailsSectionBootOrder: FC<DetailsSectionBootOrderProps> = ({
   canUpdateVM = true,
-  customizeWizardVMPatch,
   instanceTypeVM,
+  onUpdateVM,
   vm,
   vmi,
 }) => {
@@ -39,18 +38,8 @@ const DetailsSectionBootOrder: FC<DetailsSectionBootOrderProps> = ({
   const vmName = getName(vm);
 
   const submitBootOrder = (updatedVM: V1VirtualMachine): Promise<V1VirtualMachine> => {
-    if (customizeWizardVMPatch) {
-      customizeWizardVMPatch([
-        {
-          data: getDisks(updatedVM),
-          path: `spec.template.spec.domain.devices.disks`,
-        },
-        {
-          data: getInterfaces(updatedVM),
-          path: `spec.template.spec.domain.devices.interfaces`,
-        },
-      ]);
-      return Promise.resolve(updatedVM);
+    if (onUpdateVM) {
+      return onUpdateVM(updatedVM).then((result) => result ?? updatedVM);
     }
 
     return updateBootOrder(updatedVM);

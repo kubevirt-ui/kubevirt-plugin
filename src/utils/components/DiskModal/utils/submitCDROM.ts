@@ -27,6 +27,7 @@ const applyCdromDisk = (producedData: V1DiskFormState, vm: V1VirtualMachine): V1
 export const submitCDROM = async (
   data: V1DiskFormState,
   {
+    getCurrentVM,
     isHotPluggable,
     onSubmit,
     onUploadedDataVolume,
@@ -74,7 +75,7 @@ export const submitCDROM = async (
       diskState: mutableData,
       dvName,
       isHotPluggable,
-      onCancelCleanup: createCancelCleanup(vmAfterSubmit, diskName),
+      onCancelCleanup: createCancelCleanup(vmAfterSubmit, diskName, getCurrentVM, onSubmit),
       onUploadedDataVolume,
       t,
       uploadData,
