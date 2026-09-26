@@ -1,7 +1,8 @@
 import {
-  V1Network,
-  V1VirtualMachine,
-  V1VirtualMachineInstance,
+  type V1Network,
+  type V1VirtualMachine,
+  type V1VirtualMachineInstance,
+  type V1VirtualMachineInstanceNetworkInterface,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import {
   DEFAULT_NETWORK_INTERFACE,
@@ -14,20 +15,31 @@ import {
   getVMIStatusInterfaces,
 } from '@kubevirt-utils/resources/vmi/utils/selectors';
 import { sortByDirection, universalComparator } from '@kubevirt-utils/utils/utils';
-import { SortByDirection } from '@patternfly/react-table';
+import { type SortByDirection } from '@patternfly/react-table';
 
-import { NetworkPresentation } from './constants';
+import { type NetworkPresentation } from './constants';
 import { getPrintableNetworkInterfaceType, isPodNetwork } from './selectors';
-import { NICState } from './types';
+import { type NICState } from './types';
 
-export const sortNICs = (nics: NetworkPresentation[], direction: SortByDirection) =>
-  nics.sort((a: NetworkPresentation, b: NetworkPresentation) =>
+export const sortNICs = (
+  nics: NetworkPresentation[],
+  direction: SortByDirection,
+): NetworkPresentation[] =>
+  nics.toSorted((a: NetworkPresentation, b: NetworkPresentation) =>
     sortByDirection(universalComparator, direction)(
       getPrintableNetworkInterfaceType(a.iface),
       getPrintableNetworkInterfaceType(b.iface),
     ),
   );
 
+const isLoopbackOrPseudoInterface = (status: V1VirtualMachineInstanceNetworkInterface): boolean => {
+  const { interfaceName = '', ipAddress = '', ipAddresses = [] } = status ?? {};
+
+  const isLoopbackName = interfaceName.toLowerCase().includes('loopback');
+  const isLoopbackIP = ipAddress === '127.0.0.1' || ipAddresses.includes('::1');
+
+  return isLoopbackName || isLoopbackIP;
+};
 export const getInterfacesAndNetworks = (
   vm: V1VirtualMachine,
   vmi: V1VirtualMachineInstance,
@@ -61,7 +73,8 @@ export const getInterfacesAndNetworks = (
   }));
 
   const runtimeInterfacesOnly = vmiStatusInterfaces
-    .filter((iface) => !allNetworkNames.has(iface.name))
+    .filter((iface) => iface.name && !allNetworkNames.has(iface.name))
+    .filter((iface) => !isLoopbackOrPseudoInterface(iface))
     .map((status) => ({ runtime: { status } }));
 
   return [...withNetwork, ...runtimeInterfacesOnly];
