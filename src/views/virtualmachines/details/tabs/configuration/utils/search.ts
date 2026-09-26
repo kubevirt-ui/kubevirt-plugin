@@ -63,6 +63,7 @@ export const getSchedulingTabIds: SearchItemGetter = () => [
   { id: 'descheduler', title: t('Descheduler') },
   { id: 'dedicated-resources', title: t('Dedicated resources') },
   { id: 'eviction-strategy', title: t('Eviction strategy') },
+  { id: 'run-strategy', title: t('Run strategy') },
 ];
 
 export const getSSHTabIds: SearchItemGetter = () => [

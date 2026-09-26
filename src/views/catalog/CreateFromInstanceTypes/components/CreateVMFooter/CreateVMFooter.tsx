@@ -8,6 +8,8 @@ import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+import { useRunStrategyToggle } from '@kubevirt-utils/components/RunStrategyModal/useRunStrategyToggle';
+import { getStartAfterCreationLabel } from '@kubevirt-utils/components/RunStrategyModal/utils';
 import { SecretSelectionOption } from '@kubevirt-utils/components/SSHSecretModal/utils/types';
 import {
   AUTOUNATTEND,
@@ -61,11 +63,12 @@ const CreateVMFooter: FC = () => {
 
   const [isUDNManagedNamespace, vmsNotSupported] = useNamespaceUDN(getValidNamespace(namespace));
 
-  const { instanceTypeVMState, setStartVM, setVM, startVM, vmNamespaceTarget } =
+  const { instanceTypeVMState, runStrategy, setRunStrategy, setVM, vmNamespaceTarget } =
     useInstanceTypeVMStore();
   const { sshSecretCredentials, sysprepConfigMapData, vmName } = instanceTypeVMState;
   const { applyKeyToProject, secretOption, sshPubKey, sshSecretName } = sshSecretCredentials || {};
   const isWindowsOSVolume = useIsWindowsBootableVolume();
+  const { isStartChecked, onToggle } = useRunStrategyToggle(runStrategy);
 
   const generatedVM = useGeneratedVM();
 
@@ -158,10 +161,13 @@ const CreateVMFooter: FC = () => {
         )}
         <StackItem>
           <Checkbox
-            id="start-after-creation-checkbox"
-            isChecked={startVM}
-            label={t('Start this VirtualMachine after creation')}
-            onChange={(_event, val) => setStartVM(val)}
+            onChange={(_event, checked) => {
+              const { newStrategy } = onToggle(checked);
+              setRunStrategy(newStrategy);
+            }}
+            id="start-after-create-checkbox"
+            isChecked={isStartChecked}
+            label={getStartAfterCreationLabel(t)}
           />
         </StackItem>
         <StackItem>

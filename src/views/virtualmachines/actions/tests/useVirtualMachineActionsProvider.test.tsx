@@ -36,6 +36,7 @@ const testTopLevelActions = (actions: ActionDropdownItemType[]) => {
     'vm-action-copy-ssh',
     'vm-action-move-to-folder',
     'vm-action-edit-labels',
+    'vm-action-change-run-strategy',
     'vm-action-delete',
   ]);
 };

@@ -89,7 +89,11 @@ const CloneVMModal: FC<CloneVMModalProps> = ({ headerText, isOpen, onClose, sour
       submitBtnText={isVM(source) ? t('Clone') : t('Create')}
     >
       <NameInput autoFocus name={cloneName} setIsValid={setIsVMNameValid} setName={setCloneName} />
-      <StartClonedVMCheckbox setStartCloneVM={setStartCloneVM} startCloneVM={startCloneVM} />
+      <StartClonedVMCheckbox
+        setStartCloneVM={setStartCloneVM}
+        source={source}
+        startCloneVM={startCloneVM}
+      />
       {isVM(source) ? (
         <ConfigurationSummary vm={source} />
       ) : (
