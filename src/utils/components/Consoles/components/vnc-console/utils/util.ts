@@ -2,19 +2,21 @@ import { type MutableRefObject } from 'react';
 import partition from 'lodash/partition';
 
 import { sleep } from '@kubevirt-utils/components/Consoles/utils/utils';
+import { isForbiddenError } from '@kubevirt-utils/errors/errorTypes';
 import RFBCreate from '@novnc/novnc/lib/rfb';
 import { consoleFetchText } from '@openshift-console/dynamic-plugin-sdk';
 
 import { ConsoleState } from '../../utils/ConsoleConsts';
 import { type ConsoleComponentState } from '../../utils/types';
 import { ALL_SESSIONS, KEYBOARD_DELAY, VNC_IN_USE_ERROR_TEXT, VNC_LOG_LEVELS } from './constants';
+import { notifyParentAboutDisconnect } from './notifyAboutDisconnect';
 import { type RFB, type RfbSession, type VncLogLevel } from './VncConsoleTypes';
 
 export function isVncLogLevel(value: unknown): value is VncLogLevel {
   return value === false || (VNC_LOG_LEVELS as unknown as unknown[]).includes(value);
 }
 
-export const isSessionAlreadyInUse = (error: Error): boolean => {
+const isSessionAlreadyInUse = (error: Error): boolean => {
   return error?.message?.includes?.(VNC_IN_USE_ERROR_TEXT) ?? false;
 };
 
@@ -44,36 +46,6 @@ export async function typeAndWait(
 // Example: 10 -> "U+000A"
 export const toUnicodeFormat = (codePoint: number): string =>
   `U+${codePoint.toString(16).padStart(4, '0').toUpperCase()}`;
-
-export const notifyParentAboutDisconnect = ({
-  log,
-  sessionAlreadyInUse,
-  sessionRef,
-  setVncState,
-  sourceLabel,
-  targetSession,
-}: {
-  log: (...args: unknown[]) => void;
-  sessionAlreadyInUse?: boolean;
-  sessionRef: MutableRefObject<number>;
-  setVncState: (producer: (state: ConsoleComponentState) => Partial<ConsoleComponentState>) => void;
-  sourceLabel: string;
-  targetSession: number;
-}): void => {
-  if (targetSession !== sessionRef.current) {
-    log(
-      `[VncConsole][${sourceLabel}] notifyParentAboutDisconnect. Session already closed. Target session ${targetSession}, active session ${sessionRef.current}.`,
-    );
-    return;
-  }
-  log(
-    `[VncConsole][${sourceLabel}] notifyParentAboutDisconnect. Target session ${targetSession}, active session ${sessionRef.current}, inUse=${sessionAlreadyInUse}.`,
-  );
-  setVncState((prev) => ({
-    actions: { connect: prev.actions.connect, disconnect: prev.actions.disconnect },
-    state: sessionAlreadyInUse ? ConsoleState.SessionAlreadyInUse : ConsoleState.Disconnected,
-  }));
-};
 
 export const buildUrl = ({
   hostname,
@@ -157,6 +129,7 @@ export const disconnect = ({
     )
     .catch((error) =>
       notifyParentAboutDisconnect({
+        forbidden: isForbiddenError(error),
         log,
         sessionAlreadyInUse: isSessionAlreadyInUse(error),
         sessionRef,

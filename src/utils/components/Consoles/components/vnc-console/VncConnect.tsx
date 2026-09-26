@@ -10,13 +10,11 @@ const VncConnect: FC<CustomConnectComponentProps> = ({ connect, isConnecting }) 
   const { t } = useKubevirtTranslation();
   return (
     <ConnectToConsole
-      {...{
-        connect,
-        connectingMsg: t('Connecting'),
-        connectMsg: t('Connect'),
-        isConnecting,
-        message: t('Click Connect to open the VNC console.'),
-      }}
+      connect={connect}
+      connectingMsg={t('Connecting')}
+      connectMsg={t('Connect')}
+      isConnecting={isConnecting}
+      message={t('Click Connect to open the VNC console.')}
     />
   );
 };

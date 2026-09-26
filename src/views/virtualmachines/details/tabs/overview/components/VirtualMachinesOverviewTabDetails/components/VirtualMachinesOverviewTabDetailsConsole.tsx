@@ -10,6 +10,7 @@ import { isConnectableState } from '@kubevirt-utils/components/Consoles/componen
 import { type VncLogLevel } from '@kubevirt-utils/components/Consoles/components/vnc-console/utils/VncConsoleTypes';
 import VncConsole from '@kubevirt-utils/components/Consoles/components/vnc-console/VncConsole';
 import { getConsoleBasePath } from '@kubevirt-utils/components/Consoles/utils/utils';
+import WithPermissionTooltip from '@kubevirt-utils/components/WithPermissionTooltip/WithPermissionTooltip';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useK8sBaseAPIPath from '@multicluster/hooks/useK8sBaseAPIPath';
 import { getConsoleStandaloneURL } from '@multicluster/urls';
@@ -51,6 +52,7 @@ const VirtualMachinesOverviewTabDetailsConsole: FC<
   const showConnect =
     !enableConsole || // connect component is also empty state here
     isConnectableState(state);
+  const isPermissionDenied = isVMRunning && !isHeadlessMode && !canConnectConsole;
 
   if (!apiPathLoaded)
     return (
@@ -63,25 +65,27 @@ const VirtualMachinesOverviewTabDetailsConsole: FC<
   return (
     <Bullseye className="console-overview">
       <div className="link">
-        <Button
-          component="a"
-          href={getConsoleStandaloneURL(vmNamespace, vmName, vmCluster)}
-          icon={<ExternalLinkAltIcon className="icon" />}
-          iconPosition="end"
-          isDisabled={!enableConsole}
-          onClick={(e) => {
-            e.preventDefault();
-            actions?.disconnect?.();
-            window.open(
-              getConsoleStandaloneURL(vmNamespace, vmName, vmCluster),
-              '_blank',
-              'noopener',
-            );
-          }}
-          variant={ButtonVariant.link}
-        >
-          {t('Open web console')}
-        </Button>
+        <WithPermissionTooltip allowed={!isPermissionDenied}>
+          <Button
+            component="a"
+            href={getConsoleStandaloneURL(vmNamespace, vmName, vmCluster)}
+            icon={<ExternalLinkAltIcon className="icon" />}
+            iconPosition="end"
+            isAriaDisabled={!enableConsole}
+            onClick={(e) => {
+              e.preventDefault();
+              actions?.disconnect?.();
+              window.open(
+                getConsoleStandaloneURL(vmNamespace, vmName, vmCluster),
+                '_blank',
+                'noopener',
+              );
+            }}
+            variant={ButtonVariant.link}
+          >
+            {t('Open web console')}
+          </Button>
+        </WithPermissionTooltip>
       </div>
       {enableConsole && (
         <HideConsole isHidden={state !== ConsoleState.Connected}>
