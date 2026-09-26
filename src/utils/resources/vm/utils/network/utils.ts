@@ -2,6 +2,7 @@ import {
   type V1Network,
   type V1VirtualMachine,
   type V1VirtualMachineInstance,
+  type V1VirtualMachineInstanceNetworkInterface,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import {
   DEFAULT_NETWORK_INTERFACE,
@@ -30,6 +31,15 @@ export const sortNICs = (
       getPrintableNetworkInterfaceType(b.iface),
     ),
   );
+
+const isLoopbackOrPseudoInterface = (status: V1VirtualMachineInstanceNetworkInterface): boolean => {
+  const { interfaceName = '', ipAddress = '', ipAddresses = [] } = status ?? {};
+
+  const isLoopbackName = interfaceName.toLowerCase().includes('loopback');
+  const isLoopbackIP = ipAddress === '127.0.0.1' || ipAddresses.includes('::1');
+
+  return isLoopbackName || isLoopbackIP;
+};
 
 export const getInterfacesAndNetworks = (
   vm: V1VirtualMachine,
@@ -64,7 +74,8 @@ export const getInterfacesAndNetworks = (
   }));
 
   const runtimeInterfacesOnly = vmiStatusInterfaces
-    .filter((iface) => !allNetworkNames.has(iface.name))
+    .filter((iface) => iface.name && !allNetworkNames.has(iface.name))
+    .filter((iface) => !isLoopbackOrPseudoInterface(iface))
     .map((status) => ({ runtime: { status } }));
 
   return [...withNetwork, ...runtimeInterfacesOnly];
