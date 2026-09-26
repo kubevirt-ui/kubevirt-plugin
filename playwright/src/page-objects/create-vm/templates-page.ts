@@ -632,7 +632,7 @@ export default class TemplatesPage extends PageCommons {
    * @deprecated Use navigateToTemplatesViaUI() for more reliable navigation
    */
   async navigateToAllNamespacesTemplates() {
-    await this.goTo('/k8s/all-namespaces/template.openshift.io~v1~Template');
+    await this.goTo('/k8s/all-namespaces/templates');
     await this.page.waitForLoadState('domcontentloaded');
   }
 
@@ -646,7 +646,7 @@ export default class TemplatesPage extends PageCommons {
   }
 
   async navigateToProjectTemplates(projectName: string) {
-    await this.goTo(`/k8s/ns/${projectName}/template.openshift.io~v1~Template`);
+    await this.goTo(`/k8s/ns/${projectName}/templates`);
   }
 
   async navigateToTemplateDetail(templateName: string) {
