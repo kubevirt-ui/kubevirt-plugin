@@ -620,7 +620,7 @@ export default class TemplatesPage extends PageCommons {
   async isTemplateVisible(templateMetadataName: string): Promise<boolean> {
     const templateLocator = this.testId(templateMetadataName);
     try {
-      await templateLocator.waitFor({ state: 'visible', timeout: TestTimeouts.UI_DELAY_MEDIUM });
+      await templateLocator.waitFor({ state: 'visible', timeout: TestTimeouts.DEFAULT });
       return true;
     } catch {
       return false;

@@ -93,7 +93,7 @@ export default class CheckupsPage extends PageCommons {
   async clickRun() {
     await this._runButton.waitFor({ state: 'visible', timeout: TestTimeouts.DEFAULT });
     await this.robustClick(this._runButton);
-    await this.page.waitForLoadState('networkidle', { timeout: TestTimeouts.DEFAULT });
+    await this.page.waitForLoadState('domcontentloaded', { timeout: TestTimeouts.DEFAULT });
   }
 
   async clickRunAndConfirm() {

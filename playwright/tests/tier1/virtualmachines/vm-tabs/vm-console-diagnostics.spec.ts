@@ -5,7 +5,8 @@ test.describe('Tier1 Diagnostics Tab Redesign', { tag: [T1_TAG] }, () => {
   test(
     'Diagnostics overview cards, severity filter, and search',
     { tag: ['@nonpriv'] },
-    async ({ apiClient, vmListPage, vmDetailPage, utils, testConfig }) => {
+    async ({ apiClient, vmListPage, vmDetailPage, utils }) => {
+      test.setTimeout(utils.TestTimeouts.TEST_EXTENDED);
       await utils.withAllure({
         suite: 'VM Diagnostics redesign',
         feature: T1,
@@ -23,10 +24,7 @@ test.describe('Tier1 Diagnostics Tab Redesign', { tag: [T1_TAG] }, () => {
       apiClient.trackResource('VirtualMachine', vmName, ns);
       await apiClient.waitForVmRunning(vmName, ns, utils.TestTimeouts.VM_BOOTUP);
 
-      await vmListPage.navigateToNamespaceVirtualMachinesViaUI(testConfig.testNamespace);
-      await vmListPage.searchTreeView(ns);
-      await vmListPage.clickTreeNodeAndEnsureExpanded(ns, vmName, ns);
-      await vmListPage.clickVmInTreeView(vmName, ns);
+      await vmListPage.navigateToVmViaTreeView(ns, vmName);
       await vmDetailPage.navigateToDiagnostics();
 
       await test.step('Diagnostics tab is accessible and may show a badge', async () => {

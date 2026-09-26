@@ -33,16 +33,7 @@ test.describe(SUITE, { tag: [T1_TAG] }, () => {
     apiClient.trackResource('VirtualMachine', vmName, namespace);
     await apiClient.waitForVmRunning(vmName, namespace, utils.TestTimeouts.VM_RUNNING);
 
-    await vmListPage.navigateToVirtualMachinesViaUI();
-    await vmListPage.toggleEmptyProjectsDisplay(true);
-    await vmListPage.searchTreeView(namespace);
-    await vmListPage.clickProjectNode(namespace);
-    await vmListPage.clickVmListTab();
-
-    const pageLoaded = await vmListPage.verifyPageLoaded();
-    expect.soft(pageLoaded, 'VM list page should load').toBe(true);
-
-    await vmListPage.clickVmByTestId(vmName);
+    await vmListPage.navigateToVmViaTreeView(namespace, vmName);
 
     const vmNameVisible = await vmDetailPage.isVmNameVisible(
       vmName,
@@ -74,8 +65,13 @@ test.describe(SUITE, { tag: [T1_TAG] }, () => {
 
     await vmDetailPage.navigateToConsole();
     await vmDetailPage.tryDismissVncTryLaterDialog();
-    const guestLogin = await vmDetailPage.verifyGuestLogin();
-    expect.soft(guestLogin, 'Guest login visible in Console tab').toBe(true);
+    await expect
+      .poll(() => vmDetailPage.verifyGuestLogin(), {
+        message: 'Guest login visible in Console tab',
+        timeout: utils.TestTimeouts.VM_RUNNING,
+        intervals: [3000, 5000],
+      })
+      .toBe(true);
 
     await vmDetailPage.navigateToSnapshots();
     const noSnapshots = await vmDetailPage.verifyNoSnapshots();
@@ -85,12 +81,7 @@ test.describe(SUITE, { tag: [T1_TAG] }, () => {
     const utilization = await vmDetailPage.verifyUtilization();
     expect.soft(utilization, 'Utilization visible in Metrics tab').toBe(true);
 
-    await vmListPage.navigateToVirtualMachinesViaUI();
-    await vmListPage.toggleEmptyProjectsDisplay(true);
-    await vmListPage.searchTreeView(namespace);
-    await vmListPage.clickProjectNode(namespace);
-    await vmListPage.clickVmListTab();
-    await vmListPage.clickVmByTestId(vmName);
+    await vmListPage.navigateToVmViaTreeView(namespace, vmName);
     await vmDetailPage.navigateToOverview();
     await vmDetailPage.clickVmiByTestId(vmName);
 
@@ -111,8 +102,13 @@ test.describe(SUITE, { tag: [T1_TAG] }, () => {
 
     await vmDetailPage.navigateToConsole();
     await vmDetailPage.tryDismissVncTryLaterDialog();
-    const guestLoginVmi = await vmDetailPage.verifyGuestLogin();
-    expect.soft(guestLoginVmi, 'Guest login visible in VMI Console tab').toBe(true);
+    await expect
+      .poll(() => vmDetailPage.verifyGuestLogin(), {
+        message: 'Guest login visible in VMI Console tab',
+        timeout: utils.TestTimeouts.VM_BOOTUP,
+        intervals: [3000, 5000],
+      })
+      .toBe(true);
 
     await vmDetailPage.navigateToNetworks();
     const podNetworking = await vmDetailPage.verifyPodNetworking();

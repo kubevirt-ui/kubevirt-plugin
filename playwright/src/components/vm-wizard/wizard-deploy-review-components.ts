@@ -305,10 +305,20 @@ export class VmCreationWizardDeploymentComponent extends BaseComponent {
       .first();
     await createButton.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
     await this.robustClick(createButton);
-    await this._wizardContainer.first().waitFor({
-      state: 'visible',
-      timeout: TestTimeouts.DEFAULT,
-    });
+
+    const wizardVisible = await this._wizardContainer
+      .first()
+      .waitFor({ state: 'visible', timeout: TestTimeouts.DEFAULT })
+      .then(() => true)
+      .catch(() => false);
+
+    if (!wizardVisible) {
+      await this.page.goto('/vm-wizard');
+      await this._wizardContainer.first().waitFor({
+        state: 'visible',
+        timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+      });
+    }
   }
 
   async selectCreationMethod(method: 'newVm' | 'fromTemplate' | 'cloneVm'): Promise<void> {

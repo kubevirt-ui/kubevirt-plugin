@@ -28,7 +28,7 @@ test.describe(SUITE, { tag: [T1_TAG, ADMIN_ONLY_TAG] }, () => {
 
   test('swaps a running VM NIC NAD and shows pending changes', async ({
     apiClient,
-    vmTreePage,
+    vmListPage,
     vmDetailPage,
     utils,
   }) => {
@@ -55,7 +55,7 @@ test.describe(SUITE, { tag: [T1_TAG, ADMIN_ONLY_TAG] }, () => {
     });
 
     await test.step('Edit the NIC network to the second NAD', async () => {
-      await vmTreePage.navigateToVmViaTreeView(namespace, vmName);
+      await vmListPage.navigateToVmViaTreeView(namespace, vmName);
       await vmDetailPage.navigateToConfigurationNetwork();
 
       await expect

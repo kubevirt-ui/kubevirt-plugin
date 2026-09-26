@@ -1,6 +1,5 @@
 import { NONPRIV_TAG, T1, T1_TAG, VM_LIST_TAG } from '@/data-models/allure-constants';
 import { expect, test } from '@/fixtures/vm-search-fixture';
-import { withSafeActions } from '@/page-objects/base-page';
 import SettingsPage from '@/page-objects/settings/settings-page';
 import type VirtualMachinesPage from '@/page-objects/vm/virtual-machines-page';
 import { TestTimeouts } from '@/utils/test-config';
@@ -14,9 +13,37 @@ const openNamespaceVmList = async (
   namespace: string,
   vmName: string,
 ): Promise<void> => {
-  await vmListPage.navigateToNamespaceVirtualMachinesViaUI(namespace);
-  await vmListPage.clickVmListTab();
-  await vmListPage.waitForVmRowVisible(vmName);
+  await vmListPage.navigateToVirtualMachinesViaUI();
+  await vmListPage.clickLocalClusterInTree();
+  await vmListPage.clickProjectNode(namespace);
+
+  await expect
+    .poll(
+      () => new URL(vmListPage.page.url()).pathname.includes(`/ns/${namespace}/`),
+      {
+        message: `URL should stay scoped to namespace ${namespace}`,
+        timeout: TestTimeouts.ELEMENT_WAIT,
+      },
+    )
+    .toBe(true);
+
+  await expect
+    .poll(
+      async () => {
+        try {
+          await vmListPage.waitForVmRowVisible(vmName, TestTimeouts.SHORT_WAIT);
+          return true;
+        } catch {
+          return false;
+        }
+      },
+      {
+        message: `VM row ${vmName} should appear in namespace ${namespace}`,
+        timeout: TestTimeouts.ELEMENT_WAIT,
+        intervals: [2000, 5000],
+      },
+    )
+    .toBe(true);
 };
 
 test.describe(SUITE, { tag: [T1_TAG, NONPRIV_TAG] }, () => {
@@ -88,7 +115,7 @@ test.describe(SUITE, { tag: [T1_TAG, NONPRIV_TAG] }, () => {
       tags: [T1_TAG, VM_LIST_TAG, NONPRIV_TAG],
     });
 
-    const settingsPage = withSafeActions(new SettingsPage(page));
+    const settingsPage = new SettingsPage(page);
 
     await test.step('Open the VM list for the Windows namespace', async () => {
       await openNamespaceVmList(vmListPage, windowsNs, windowsVm);

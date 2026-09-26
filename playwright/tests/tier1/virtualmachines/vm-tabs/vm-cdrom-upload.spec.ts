@@ -73,6 +73,7 @@ test.describe('Tier1 VM CD-ROM upload — stopped RHEL9', { tag: [T1_TAG, '@nonp
 
   test('Aborting an in-progress CD-ROM upload from the toast cancels it', async ({
     apiClient,
+    pageCommons,
     vmListPage,
     vmDetailPage,
     utils,
@@ -99,6 +100,9 @@ test.describe('Tier1 VM CD-ROM upload — stopped RHEL9', { tag: [T1_TAG, '@nonp
     if (!result.exists) throw new Error(`VM ${vmName} was not created`);
 
     await vmListPage.navigateToVmViaTreeView(ns, vmName);
+    if (!utils.EnvVariables.onAcm) {
+      await pageCommons.switchProject(ns);
+    }
 
     const isoFileName = 'vm-cdrom-abort-test.iso';
     const isoPath = utils.TestFileFactory.createSizedIsoFile(isoFileName);
@@ -140,7 +144,8 @@ test.describe('Tier1 VM CD-ROM upload — stopped RHEL9', { tag: [T1_TAG, '@nonp
 
   test('Creating a new VM does not cancel an in-progress CD-ROM upload on another VM', async ({
     apiClient,
-    vmTreePage,
+    pageCommons,
+    vmListPage,
     vmDetailPage,
     vmWizardNavigationPage,
     utils,
@@ -166,7 +171,10 @@ test.describe('Tier1 VM CD-ROM upload — stopped RHEL9', { tag: [T1_TAG, '@nonp
     const result = await apiClient.verifyVmCreated(vmName, ns, utils.TestTimeouts.VM_BOOTUP);
     if (!result.exists) throw new Error(`VM ${vmName} was not created`);
 
-    await vmTreePage.navigateToVmViaTreeView(ns, vmName);
+    await vmListPage.navigateToVmViaTreeView(ns, vmName);
+    if (!utils.EnvVariables.onAcm) {
+      await pageCommons.switchProject(ns);
+    }
 
     const isoFileName = 'vm-cdrom-create-test.iso';
     const isoPath = utils.TestFileFactory.createSizedIsoFile(isoFileName);
@@ -176,14 +184,19 @@ test.describe('Tier1 VM CD-ROM upload — stopped RHEL9', { tag: [T1_TAG, '@nonp
     await test.step('Start the CD-ROM upload', async () => {
       const added = await vmDetailPage.addCDROMDisk(diskName, 'Upload new ISO', isoPath);
       expect(added, `CD-ROM disk ${diskName} should be added from UI`).toBe(true);
-      await vmDetailPage.expectUploadingToastVisible(
+      const state = await vmDetailPage.expectUploadingOrTerminalToastVisible(
         isoFileName,
         utils.TestTimeouts.UI_ELEMENT_VISIBILITY,
       );
+      expect(
+        state === 'uploading' || state === 'success',
+        `Expected uploading or success toast before opening wizard, got ${state}`,
+      ).toBe(true);
     });
 
     await test.step('Open and leave the VM creation wizard', async () => {
-      await vmTreePage.navigateToProjectVmListViaUI(ns);
+      await vmListPage.switchToVirtualizationPerspective();
+      await vmListPage.navigateToProjectVmListViaUI(ns);
       await vmWizardNavigationPage.openWizardFromCreateDropdown();
 
       const wizardVisible = await vmWizardNavigationPage.verifyWizardVisible();

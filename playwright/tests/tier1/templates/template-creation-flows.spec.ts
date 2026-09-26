@@ -6,6 +6,26 @@ import { setupTestNamespace } from '@/utils/test-setup-helpers';
 
 const SUITE = 'Template creation flows';
 
+async function isHcoV1CategorySupported(apiClient: {
+  getResource: (
+    group: string,
+    version: string,
+    resource: string,
+    name: string,
+    namespace?: string,
+  ) => Promise<{ spec?: { versions?: Array<{ name: string; served?: boolean }> } } | null>;
+}): Promise<boolean> {
+  const crd = await apiClient.getResource(
+    'apiextensions.k8s.io',
+    'v1',
+    'customresourcedefinitions',
+    'hyperconvergeds.hco.kubevirt.io',
+  );
+  return (
+    crd?.spec?.versions?.some((version) => version.name === 'v1' && version.served) ?? false
+  );
+}
+
 test.describe.serial('Template creation flows', { tag: [T1_TAG, '@tier1-templates'] }, () => {
   let sharedNs: string;
 
@@ -53,82 +73,89 @@ test.describe.serial('Template creation flows', { tag: [T1_TAG, '@tier1-template
 
     const vmExists = await apiClient.waitForVmExists(vmName, sharedNs);
     expect.soft(vmExists, `VM ${vmName} should exist before saving as template`).toBe(true);
+    const categorySupported = await isHcoV1CategorySupported(apiClient);
 
     await vmListPage.navigateToVmViaTreeView(sharedNs, vmName);
     const isVmVisible = await vmDetailPage.isVmNameVisible(vmName);
     expect.soft(isVmVisible, `VM ${vmName} should be visible on detail page`).toBe(true);
 
-    await vmDetailPage.saveAsTemplate(templateName, sharedNs, {
-      category: saveAsTemplateCategory.display,
-    });
+    await vmDetailPage.saveAsTemplate(
+      templateName,
+      sharedNs,
+      categorySupported ? { category: saveAsTemplateCategory.display } : undefined,
+    );
     apiClient.trackResource('VirtualMachineTemplate', templateName, sharedNs);
 
-    await expect
-      .poll(
-        async () => {
-          const template = await apiClient.getResource(
-            'template.kubevirt.io',
-            'v1beta1',
-            'virtualmachinetemplates',
-            templateName,
-            sharedNs,
-          );
-          return template?.metadata?.labels?.['vm.kubevirt.io/category'];
-        },
-        {
-          message: `Template ${templateName} should have category label "${saveAsTemplateCategory.label}"`,
-          timeout: utils.TestTimeouts.DEFAULT,
-          intervals: [2000, 3000, 5000],
-        },
-      )
-      .toBe(saveAsTemplateCategory.label);
+    if (categorySupported) {
+      await expect
+        .poll(
+          async () => {
+            const template = await apiClient.getResource(
+              'template.kubevirt.io',
+              'v1beta1',
+              'virtualmachinetemplates',
+              templateName,
+              sharedNs,
+            );
+            return template?.metadata?.labels?.['vm.kubevirt.io/category'];
+          },
+          {
+            message: `Template ${templateName} should have category label "${saveAsTemplateCategory.label}"`,
+            timeout: utils.TestTimeouts.DEFAULT,
+            intervals: [2000, 3000, 5000],
+          },
+        )
+        .toBe(saveAsTemplateCategory.label);
+    }
 
     if (!utils.EnvVariables.onAcm) {
       await pageCommons.switchProject(sharedNs);
     }
 
+    await templatesPage.navigateToNamespaceTemplatesViaUI(sharedNs);
     await expect
       .poll(
         async () => {
-          await templatesPage.navigateToTemplatesViaUI();
           await templatesPage.filterTemplatesByName(templateName);
           return templatesPage.isTemplateVisible(templateName);
         },
         {
           message: `Template ${templateName} should be visible in the list`,
-          timeout: utils.TestTimeouts.DEFAULT,
+          timeout: utils.TestTimeouts.ELEMENT_WAIT,
           intervals: [2000, 3000, 5000],
         },
       )
       .toBe(true);
 
-    await templatesPage.navigateToTemplateDetail(templateName);
-    await templatesPage.editCategoryFromDetails(editedCategory);
-    await expect
-      .poll(() => templatesPage.isCategoryVisibleOnDetails(editedCategory), {
-        message: `Template details should show category ${editedCategory}`,
-        timeout: utils.TestTimeouts.DEFAULT,
-        intervals: [1000, 2000],
-      })
-      .toBe(true);
+    if (categorySupported) {
+      await templatesPage.navigateToTemplateDetail(templateName);
+      await templatesPage.editCategoryFromDetails(editedCategory);
+      await expect
+        .poll(() => templatesPage.isCategoryVisibleOnDetails(editedCategory), {
+          message: `Template details should show category ${editedCategory}`,
+          timeout: utils.TestTimeouts.DEFAULT,
+          intervals: [1000, 2000],
+        })
+        .toBe(true);
 
-    await templatesPage.navigateToTemplatesViaUI();
-    await templatesPage.filterTemplatesByName(templateName);
-    const categoryInList = await templatesPage.hasCategoryInTemplateRow(
-      templateName,
-      editedCategory,
-    );
-    expect.soft(categoryInList, `Template row should show category ${editedCategory}`).toBe(true);
+      await templatesPage.navigateToTemplatesViaUI();
+      await templatesPage.filterTemplatesByName(templateName);
+      const categoryInList = await templatesPage.hasCategoryInTemplateRow(
+        templateName,
+        editedCategory,
+      );
+      expect.soft(categoryInList, `Template row should show category ${editedCategory}`).toBe(true);
 
-    await templatesPage.navigateToTemplateDetail(templateName);
-    await templatesPage.editCategoryFromDetails(finalCategory);
-    await expect
-      .poll(() => templatesPage.isCategoryVisibleOnDetails(finalCategory), {
-        message: `Template details should show updated category ${finalCategory}`,
-        timeout: utils.TestTimeouts.DEFAULT,
-        intervals: [1000, 2000],
-      })
-      .toBe(true);
+      await templatesPage.navigateToTemplateDetail(templateName);
+      await templatesPage.editCategoryFromDetails(finalCategory);
+      await expect
+        .poll(() => templatesPage.isCategoryVisibleOnDetails(finalCategory), {
+          message: `Template details should show updated category ${finalCategory}`,
+          timeout: utils.TestTimeouts.DEFAULT,
+          intervals: [1000, 2000],
+        })
+        .toBe(true);
+    }
   });
 
   test('Clone a template via the kebab menu', async ({

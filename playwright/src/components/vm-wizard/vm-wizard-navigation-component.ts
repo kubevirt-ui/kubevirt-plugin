@@ -449,11 +449,11 @@ export default class VmWizardNavigationComponent extends BaseComponent {
 
     await dismissWelcomeModal();
 
-    const createButton = this.testId('item-create')
-      .and(this.locator('.pf-m-primary'))
+    // Prefer the split-button "Create" action — clicking the MenuToggle only opens the YAML dropdown.
+    const createButton = this.locator('button[aria-label="Create VirtualMachine"]')
+      .or(this.testId('item-create').and(this.locator('.pf-m-primary')))
       .or(this.locator('.pf-m-primary').locator('[data-test="item-create"]'))
       .or(this.testId('vms-treeview').locator('[data-test="item-create"]'))
-      .or(this.locator('button[aria-label="Create VirtualMachine"]'))
       .first();
     await createButton.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
     await this.robustClick(createButton);
@@ -477,10 +477,7 @@ export default class VmWizardNavigationComponent extends BaseComponent {
       }
     }
 
-    await this._wizardContainer.first().waitFor({
-      state: 'visible',
-      timeout: TestTimeouts.DEFAULT,
-    });
+    await this.navigateToWizardInNamespace('');
   }
 
   async searchCloneSourceByName(name: string): Promise<void> {
