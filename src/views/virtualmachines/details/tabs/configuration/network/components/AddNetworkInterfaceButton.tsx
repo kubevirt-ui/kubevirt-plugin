@@ -41,7 +41,7 @@ const AddNetworkInterfaceButton: FC<AddNetworkInterfaceButtonProps> = ({
       className={classNames('add-network-interface-button pf-v6-u-mb-md')}
       isDisabled={!isEditable}
       onClick={() =>
-        createModal(({ isOpen, onClose }) => (
+        createModal?.(({ isOpen, onClose }) => (
           <VirtualMachinesNetworkInterfaceModal
             headerText={actionText}
             isOpen={isOpen}

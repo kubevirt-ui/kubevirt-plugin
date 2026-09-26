@@ -8,7 +8,6 @@ import TabModal from '../TabModal/TabModal';
 import AdvancedSettings from './components/AdvancedSettings/AdvancedSettings';
 import BootSourceCheckbox from './components/BootSourceCheckbox/BootSourceCheckbox';
 import DiskInterfaceSelect from './components/DiskInterfaceSelect/DiskInterfaceSelect';
-import DiskNameInput from './components/DiskNameInput/DiskNameInput';
 import DynamicSize from './components/DiskSizeInput/DynamicSize';
 import DiskSourceContainer from './components/DiskSourceSelect/components/DiskSourceContainer/DiskSourceContainer';
 import DiskTypeSelect from './components/DiskTypeSelect/DiskTypeSelect';
@@ -59,7 +58,6 @@ const ContainerDiskModal: FC<V1SubDiskModalProps> = ({
       >
         <PendingChanges isVMRunning={isVMRunning} />
         <BootSourceCheckbox editDiskName={editDiskName} isDisabled={isVMRunning} vm={vm} />
-        <DiskNameInput />
         <DiskSourceContainer
           fieldName={CONTAINERDISK_IMAGE_FIELD}
           isEphemeralDiskSource

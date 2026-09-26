@@ -49,7 +49,6 @@ const NetworkInterfacePasst: FC<NetworkInterfacePasstProps> = ({
 
   return (
     <FormGroup
-      className="form-group-margin"
       fieldId="passt-checkbox"
       label={t('Binding')}
       labelHelp={

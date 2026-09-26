@@ -15,6 +15,22 @@ export default class VirtualMachineDetailNetworkPage extends VirtualMachineDetai
     return this.configNetwork.changeNicNetworkAttachment(nicName, nadName);
   }
 
+  async openAddNetworkInterfaceModal(): Promise<void> {
+    return this.configNetwork.openAddNetworkInterfaceModal();
+  }
+
+  async openEditNetworkInterfaceModal(nicName: string): Promise<void> {
+    return this.configNetwork.openEditNetworkInterfaceModal(nicName);
+  }
+
+  async waitForNetworkAutoSelection(): Promise<void> {
+    return this.configNetwork.waitForNetworkAutoSelection();
+  }
+
+  async expandNetworkInterfaceAdvancedSettings(): Promise<void> {
+    return this.configNetwork.expandNetworkInterfaceAdvancedSettings();
+  }
+
   async getNicNetworkName(nicName: string): Promise<string> {
     return this.configNetwork.getNicNetworkName(nicName);
   }

@@ -34,10 +34,11 @@ export const produceUpdatedVM = (
   resultNetwork: V1Network,
   existingInterface: V1Interface,
   existingNetwork: V1Network,
-  nicName: string,
 ): V1VirtualMachine => {
   const { disksWithOrder, needsDiskUpdate, nicBootOrder } = prepareNICBootOrder(vm);
   if (isBootSource) resultInterface.bootOrder = nicBootOrder;
+
+  const nicName = existingInterface.name;
 
   return produce(vm, (draftVM) => {
     if (isBootSource && needsDiskUpdate) {
