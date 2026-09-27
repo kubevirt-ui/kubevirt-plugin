@@ -11,6 +11,7 @@ import {
   getVmDiskUploadKey,
 } from '@kubevirt-utils/hooks/useUploadProgressToast/keys/uploadKeys';
 import { useUploadProgressStore } from '@kubevirt-utils/hooks/useUploadProgressToast/uploadProgressStore';
+import { trackWizardPendingUploadKey } from '@kubevirt-utils/hooks/useUploadProgressToast/wizard/trackWizardPendingUploadKey';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { isRunning } from '@virtualmachines/utils';
@@ -33,6 +34,7 @@ import { SourceTypes, type V1DiskFormState, type V1SubDiskModalProps } from './u
 
 const UploadDiskModal: FC<V1SubDiskModalProps> = ({
   isOpen,
+  isWizardCustomizationStep,
   onClose,
   onSubmit,
   onUploadedDataVolume,
@@ -83,6 +85,7 @@ const UploadDiskModal: FC<V1SubDiskModalProps> = ({
             let uploadedDataVolume;
 
             try {
+              trackWizardPendingUploadKey(uploadKey, isWizardCustomizationStep);
               const uploadResult = await uploadDataVolume({
                 data,
                 t,

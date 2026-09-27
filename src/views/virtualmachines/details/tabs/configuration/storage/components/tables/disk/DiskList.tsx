@@ -36,13 +36,18 @@ import { getDiskListColumns, getDiskRowId } from './diskListDefinition';
 import './disklist.scss';
 
 type DiskListProps = {
-  customize?: boolean;
+  isWizardCustomizationStep?: boolean;
   onDiskUpdate?: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine>;
   vm: V1VirtualMachine;
   vmi?: V1VirtualMachineInstance;
 };
 
-const DiskList: FC<DiskListProps> = ({ customize = false, onDiskUpdate, vm, vmi }) => {
+const DiskList: FC<DiskListProps> = ({
+  isWizardCustomizationStep = false,
+  onDiskUpdate,
+  vm,
+  vmi,
+}) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const isWindowsSupported = useIsWindowsSupportedArchitecture();
@@ -81,14 +86,14 @@ const DiskList: FC<DiskListProps> = ({ customize = false, onDiskUpdate, vm, vmi 
 
   const callbacks: DiskListCallbacks = useMemo(
     () => ({
-      customize,
+      isWizardCustomizationStep,
       onSubmit,
       provisioningPercentages,
       sourcesLoaded,
       vm,
       vmi,
     }),
-    [customize, onSubmit, provisioningPercentages, sourcesLoaded, vm, vmi],
+    [isWizardCustomizationStep, onSubmit, provisioningPercentages, sourcesLoaded, vm, vmi],
   );
 
   return (
@@ -102,6 +107,7 @@ const DiskList: FC<DiskListProps> = ({ customize = false, onDiskUpdate, vm, vmi 
             <DiskModal
               createDiskSource={diskSource}
               isOpen={isOpen}
+              isWizardCustomizationStep={isWizardCustomizationStep}
               onClose={onClose}
               onSubmit={onSubmit}
               vm={vm}

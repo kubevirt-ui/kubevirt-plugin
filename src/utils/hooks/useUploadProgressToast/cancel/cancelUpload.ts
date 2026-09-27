@@ -1,15 +1,19 @@
-import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { cancelUploadPVC } from '@kubevirt-utils/hooks/useCDIUpload/utils';
 import { isK8sNotFoundError } from '@kubevirt-utils/resources/errorStatusChecks';
-import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 
 import { UPLOAD_PROGRESS_STATUS } from '../constants';
 import { type UploadEntry, type UploadProgressStoreState } from '../types';
 
-import { collectVmScopedUploadKeys, getUploadClusterForVm } from '../keys/uploadKeys';
+import { collectVmScopedUploadKeys } from '../keys/uploadKeys';
 
 type StoreAccessor = () => UploadProgressStoreState;
+
+type UploadProgressSetState = (
+  partial:
+    | Partial<UploadProgressStoreState>
+    | ((state: UploadProgressStoreState) => Partial<UploadProgressStoreState>),
+) => void;
 
 type CancelTrackedUploadOptions = {
   removeAfterCancel?: boolean;
@@ -133,25 +137,16 @@ export const performCancelUploadsForVm = async (
   );
 };
 
-export const performCancelWizardPendingUploads = async (
+export const performClearWizardPendingUploadKeys = async (
   get: StoreAccessor,
-  wizardVm?: V1VirtualMachine,
-  wizardBootableVolumeKeys?: string[],
+  set: UploadProgressSetState,
 ): Promise<void> => {
-  // Step 1: cancel VM-scoped uploads (vm-disk, vm-cdrom) tied to this wizard VM
-  if (wizardVm) {
-    const namespace = getNamespace(wizardVm);
-    const name = getName(wizardVm);
+  const wizardPendingKeys = [...get().wizardPendingUploadKeys];
 
-    if (namespace && name) {
-      await performCancelUploadsForVm(get, getUploadClusterForVm(wizardVm), namespace, name);
-    }
-  }
-
-  // Step 2: cancel bootable volume uploads registered during this wizard session
-  const pendingBootableKeys = (wizardBootableVolumeKeys ?? []).filter(
+  const pendingWizardKeys = wizardPendingKeys.filter(
     (key) => get().uploads[key]?.status === UPLOAD_PROGRESS_STATUS.UPLOADING,
   );
 
-  await performCancelTrackedUploads(get, pendingBootableKeys, { removeAfterCancel: true });
+  set({ wizardPendingUploadKeys: [] });
+  await performCancelTrackedUploads(get, pendingWizardKeys, { removeAfterCancel: true });
 };

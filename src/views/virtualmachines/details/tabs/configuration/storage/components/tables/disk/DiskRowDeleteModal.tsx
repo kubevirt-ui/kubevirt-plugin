@@ -8,11 +8,11 @@ import DeleteDiskModal from '../../modal/DeleteDiskModal';
 import DetachModal from '../../modal/DetachModal';
 
 type DiskRowDeleteModalProps = {
-  customize: boolean;
   diskName: string;
   isCDROM: boolean;
   isHotplug: boolean;
   isOpen: boolean;
+  isWizardCustomizationStep: boolean;
   onClose: () => void;
   onCustomizeDeleteDisk: () => Promise<V1VirtualMachine>;
   vm: V1VirtualMachine;
@@ -20,11 +20,11 @@ type DiskRowDeleteModalProps = {
 };
 
 const DiskRowDeleteModal: FC<DiskRowDeleteModalProps> = ({
-  customize,
   diskName,
   isCDROM,
   isHotplug,
   isOpen,
+  isWizardCustomizationStep,
   onClose,
   onCustomizeDeleteDisk,
   vm,
@@ -32,7 +32,7 @@ const DiskRowDeleteModal: FC<DiskRowDeleteModalProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
 
-  if (customize || isCDROM) {
+  if (isWizardCustomizationStep || isCDROM) {
     return (
       <DetachModal
         diskName={diskName}

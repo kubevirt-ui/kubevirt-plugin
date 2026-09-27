@@ -6,10 +6,6 @@ import {
   type V1VirtualMachine,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
-import {
-  getCustomizeWizardVM,
-  updateVMCustomizeIT,
-} from '@kubevirt-utils/signals/customizeWizardVMSignal';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sGet } from '@multicluster/k8sRequests';
 import { updateDisks } from '@virtualmachines/details/tabs/configuration/details/utils/utils';
@@ -132,17 +128,8 @@ export const detachDiskFromVM = (vm: V1VirtualMachine, diskName: string): V1Virt
   });
 };
 
-// All disk cancel-cleanups for the same VM must run one at a time (see runExclusiveForVm),
-// since each one reads the VM, transforms it, and patches it back.
-// If the VM only exists as an in-memory draft (the creation wizard), the wizard signal is
-// the live source of truth: patch it instead of re-fetching from the cluster, since the
-// draft VM has never been persisted and kubevirtK8sGet would fail.
-const CUSTOMIZE_WIZARD_DRAFT_QUEUE_KEY = 'customize-wizard-draft';
-
 const getVmCancelCleanupQueueKey = (vm: V1VirtualMachine): string =>
-  getCustomizeWizardVM()
-    ? CUSTOMIZE_WIZARD_DRAFT_QUEUE_KEY
-    : `${getCluster(vm) ?? ''}/${getNamespace(vm) ?? ''}/${getName(vm) ?? ''}`;
+  `${getCluster(vm) ?? ''}/${getNamespace(vm) ?? ''}/${getName(vm) ?? ''}`;
 
 const createDiskCancelCleanup =
   (
@@ -154,13 +141,6 @@ const createDiskCancelCleanup =
     const vmKey = getVmCancelCleanupQueueKey(vm);
 
     return runExclusiveForVm(vmKey, async () => {
-      const draftVM = getCustomizeWizardVM();
-
-      if (draftVM) {
-        await updateVMCustomizeIT(transform(draftVM, diskName));
-        return;
-      }
-
       const freshVM = await kubevirtK8sGet<V1VirtualMachine>({
         cluster: getCluster(vm),
         model: VirtualMachineModel,

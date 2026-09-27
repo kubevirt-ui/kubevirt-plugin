@@ -1,6 +1,5 @@
 import { type ReactNode } from 'react';
 
-import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { type UPLOAD_STATUS, type UploadError } from '@kubevirt-utils/hooks/useCDIUpload/types';
 import type { K8sGroupVersionKind } from '@openshift-console/dynamic-plugin-sdk';
 
@@ -82,16 +81,15 @@ export type RegisterCdiUploadParams = {
 };
 
 export type UploadProgressStoreState = {
+  addWizardPendingUploadKey: (uploadKey: string) => void;
   cancelTrackedUpload: (uploadKey: string) => Promise<void>;
   cancelUploadsForVm: (cluster: string, namespace: string, vmName: string) => Promise<void>;
-  cancelWizardPendingUploads: (
-    wizardVm?: V1VirtualMachine,
-    wizardBootableVolumeKeys?: string[],
-  ) => Promise<void>;
+  cancelWizardPendingUploads: () => void;
   completeUpload: (uploadKey: string, options?: CompleteUploadOptions) => void;
   failUpload: (uploadKey: string, errorMessage: string, expectedGeneration?: number) => void;
   generationsByKey: Record<string, number>;
   getUpload: (uploadKey: string) => undefined | UploadEntry;
+  getWizardPendingUploadKeys: () => string[];
   markUploadCanceled: (uploadKey: string, expectedGeneration?: number) => void;
   removeUpload: (uploadKey: string) => void;
   startUpload: (uploadKey: string, entry: StartUploadEntry) => number;
@@ -108,4 +106,5 @@ export type UploadProgressStoreState = {
   trySetToastId: (uploadKey: string, toastId: string) => boolean;
   updateProgress: (uploadKey: string, progress: number) => void;
   uploads: Record<string, UploadEntry>;
+  wizardPendingUploadKeys: string[];
 };

@@ -17,6 +17,7 @@ const DiskModal: FC<V1DiskModalProps> = ({
   defaultFormValues,
   editDiskName,
   isOpen,
+  isWizardCustomizationStep,
   onClose,
   onSubmit,
   onUploadedDataVolume,
@@ -44,6 +45,7 @@ const DiskModal: FC<V1DiskModalProps> = ({
       editDiskName={editDiskName}
       isCreated={!isEmpty(createdPVCName)}
       isOpen={isOpen}
+      isWizardCustomizationStep={isWizardCustomizationStep}
       onClose={onClose}
       onSubmit={onSubmit}
       onUploadedDataVolume={onUploadedDataVolume}

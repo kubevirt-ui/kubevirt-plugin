@@ -18,7 +18,7 @@ import DiskRowActions from './DiskRowActions';
 import '../tables.scss';
 
 export type DiskListCallbacks = {
-  customize?: boolean;
+  isWizardCustomizationStep?: boolean;
   onSubmit?: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine>;
   provisioningPercentages: NameWithPercentages;
   sourcesLoaded?: boolean;
@@ -27,9 +27,15 @@ export type DiskListCallbacks = {
 };
 
 const renderActionsCell = (row: DiskRowDataLayout, callbacks: DiskListCallbacks): ReactNode => {
-  const { customize, onSubmit, vm, vmi } = callbacks;
+  const { isWizardCustomizationStep, onSubmit, vm, vmi } = callbacks;
   return (
-    <DiskRowActions customize={customize} obj={row} onDiskUpdate={onSubmit} vm={vm} vmi={vmi} />
+    <DiskRowActions
+      isWizardCustomizationStep={isWizardCustomizationStep}
+      obj={row}
+      onDiskUpdate={onSubmit}
+      vm={vm}
+      vmi={vmi}
+    />
   );
 };
 

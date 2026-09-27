@@ -1,7 +1,7 @@
 import { type FC, useCallback } from 'react';
 import { useWatch } from 'react-hook-form';
 
-import type { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import CPUDescription from '@kubevirt-utils/components/CPUDescription/CPUDescription';
 import { CpuMemHelperTextResources } from '@kubevirt-utils/components/CPUDescription/utils/utils';
 import CPUMemoryDisplay from '@kubevirt-utils/components/CPUMemory/CPUMemory';

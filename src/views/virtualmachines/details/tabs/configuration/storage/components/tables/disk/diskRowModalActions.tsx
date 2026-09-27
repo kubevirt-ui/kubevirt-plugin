@@ -22,12 +22,14 @@ export const openEditDiskModal = (
   diskName: string,
   onDiskSubmit: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine>,
   vm: V1VirtualMachine,
+  isWizardCustomizationStep?: boolean,
 ): void => {
   createModal(({ isOpen, onClose }) => (
     <DiskModal
       createdPVCName={isPVCSource(obj) ? obj?.source : null}
       editDiskName={diskName}
       isOpen={isOpen}
+      isWizardCustomizationStep={isWizardCustomizationStep}
       onClose={onClose}
       onSubmit={onDiskSubmit}
       vm={vm}
@@ -38,10 +40,10 @@ export const openEditDiskModal = (
 export const openDeleteDiskModal = (
   createModal: CreateModal,
   params: {
-    customize: boolean;
     diskName: string;
     isCDROM: boolean;
     isHotplug: boolean;
+    isWizardCustomizationStep: boolean;
     onCustomizeDeleteDisk: () => Promise<V1VirtualMachine>;
     vm: V1VirtualMachine;
     volume: undefined | V1Volume;
@@ -49,11 +51,11 @@ export const openDeleteDiskModal = (
 ): void => {
   createModal(({ isOpen, onClose }) => (
     <DiskRowDeleteModal
-      customize={params.customize}
       diskName={params.diskName}
       isCDROM={params.isCDROM}
       isHotplug={params.isHotplug}
       isOpen={isOpen}
+      isWizardCustomizationStep={params.isWizardCustomizationStep}
       onClose={onClose}
       onCustomizeDeleteDisk={params.onCustomizeDeleteDisk}
       vm={params.vm}
@@ -89,19 +91,22 @@ export const openCDROMModal = (
     diskName: string;
     diskSource: string | undefined;
     isCDROMMountedState: boolean;
+    isWizardCustomizationStep?: boolean;
     onDiskSubmit: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine>;
     vm: V1VirtualMachine;
   },
 ): void => {
-  const Component = params.isCDROMMountedState ? EjectCDROMModal : MountCDROMModal;
+  const isCDROMMountedState = params.isCDROMMountedState;
+  const Component = isCDROMMountedState ? EjectCDROMModal : MountCDROMModal;
   createModal(({ isOpen, onClose }) => (
     <Component
       cdromName={params.diskName}
       isOpen={isOpen}
+      isWizardCustomizationStep={isCDROMMountedState ? undefined : params.isWizardCustomizationStep}
       onClose={onClose}
       onSubmit={params.onDiskSubmit}
+      source={isCDROMMountedState ? params.diskSource : undefined}
       vm={params.vm}
-      {...(params.isCDROMMountedState && { source: params.diskSource })}
     />
   ));
 };

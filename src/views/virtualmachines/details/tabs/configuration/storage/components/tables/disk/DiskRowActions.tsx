@@ -33,7 +33,7 @@ import {
 import { isHotplugVolume } from './utils/helpers';
 
 type DiskRowActionsProps = {
-  customize?: boolean;
+  isWizardCustomizationStep?: boolean;
   obj: DiskRowDataLayout;
   onDiskUpdate?: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine>;
   vm: V1VirtualMachine;
@@ -41,7 +41,7 @@ type DiskRowActionsProps = {
 };
 
 const DiskRowActions: FC<DiskRowActionsProps> = ({
-  customize = false,
+  isWizardCustomizationStep = false,
   obj,
   onDiskUpdate,
   vm,
@@ -107,23 +107,24 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({
             diskName,
             diskSource,
             isCDROMMountedState,
+            isWizardCustomizationStep,
             onDiskSubmit,
             vm,
           })
         }
         createDeleteDiskModal={(): void =>
           openDeleteDiskModal(createModal, {
-            customize,
             diskName,
             isCDROM,
             isHotplug,
+            isWizardCustomizationStep,
             onCustomizeDeleteDisk,
             vm,
             volume,
           })
         }
         createEditDiskModal={(): void =>
-          openEditDiskModal(createModal, obj, diskName, onDiskSubmit, vm)
+          openEditDiskModal(createModal, obj, diskName, onDiskSubmit, vm, isWizardCustomizationStep)
         }
         deleteBtnText={t('Detach')}
         editBtnText={t('Edit')}

@@ -1,5 +1,6 @@
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getVmCdromUploadKeyFromVm } from '@kubevirt-utils/hooks/useUploadProgressToast/keys/uploadKeys';
+import { trackWizardPendingUploadKey } from '@kubevirt-utils/hooks/useUploadProgressToast/wizard/trackWizardPendingUploadKey';
 import { generateUploadDiskName } from '@kubevirt-utils/utils/utils';
 import { isRunning } from '@virtualmachines/utils';
 
@@ -28,6 +29,7 @@ export const submitCDROM = async (
   data: V1DiskFormState,
   {
     isHotPluggable,
+    isWizardCustomizationStep,
     onSubmit,
     onUploadedDataVolume,
     onUploadStarted,
@@ -69,6 +71,8 @@ export const submitCDROM = async (
     );
     const submitResult = (await onSubmit(updatedVM)) as V1VirtualMachine | undefined;
     const vmAfterSubmit = submitResult ?? updatedVM;
+
+    trackWizardPendingUploadKey(uploadKey, isWizardCustomizationStep);
 
     const uploadPromise = runVmCdromBackgroundUpload({
       diskState: mutableData,

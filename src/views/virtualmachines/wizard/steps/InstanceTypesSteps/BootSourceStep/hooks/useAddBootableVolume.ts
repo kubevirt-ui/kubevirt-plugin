@@ -1,9 +1,9 @@
 import { useWatch } from 'react-hook-form';
 
 import { type PreferenceOption } from '@kubevirt-utils/components/AddBootableVolumeModal/types';
+import { useUploadProgressStore } from '@kubevirt-utils/hooks/useUploadProgressToast/uploadProgressStore';
 import useCanCreateBootableVolume from '@kubevirt-utils/resources/bootableresources/hooks/useCanCreateBootableVolume';
 import { type BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
-import { addWizardBootableVolumeUploadKey } from '@kubevirt-utils/signals/wizardBootableVolumeKeysSignal';
 import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
 import { CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
 import { applySelectedBootableVolumeToForm } from '@virtualmachines/wizard/utils/utils';
@@ -40,7 +40,8 @@ const useAddBootableVolume = (): AddBootableVolume => {
     });
   };
 
-  const onUploadStart = (uploadKey: string): void => addWizardBootableVolumeUploadKey(uploadKey);
+  const onUploadStart = (uploadKey: string): void =>
+    useUploadProgressStore.getState().addWizardPendingUploadKey(uploadKey);
 
   return {
     canCreate,

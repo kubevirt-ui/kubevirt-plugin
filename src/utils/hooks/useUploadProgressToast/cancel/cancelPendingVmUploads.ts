@@ -1,40 +1,23 @@
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
-import {
-  customizeWizardVMSignal,
-  getCustomizeWizardVM,
-} from '@kubevirt-utils/signals/customizeWizardVMSignal';
-import {
-  clearWizardBootableVolumeUploadKeys,
-  getWizardBootableVolumeUploadKeys,
-} from '@kubevirt-utils/signals/wizardBootableVolumeKeysSignal';
 
 import { useUploadProgressStore } from '../uploadProgressStore';
 
 import { getUploadClusterForVm } from '../keys/uploadKeys';
 
 export const cancelPendingVmUploads = (vm?: V1VirtualMachine): Promise<void> => {
-  const target = vm ?? customizeWizardVMSignal.value;
-  const namespace = getNamespace(target);
-  const name = getName(target);
+  const namespace = getNamespace(vm);
+  const name = getName(vm);
 
-  if (!namespace || !name || !target) {
+  if (!namespace || !name || !vm) {
     return Promise.resolve();
   }
 
   return useUploadProgressStore
     .getState()
-    .cancelUploadsForVm(getUploadClusterForVm(target), namespace, name);
+    .cancelUploadsForVm(getUploadClusterForVm(vm), namespace, name);
 };
 
 export const cancelAllWizardPendingUploads = (): void => {
-  const wizardVm = getCustomizeWizardVM();
-  const wizardBootableVolumeKeys = getWizardBootableVolumeUploadKeys();
-
-  clearWizardBootableVolumeUploadKeys();
-
-  useUploadProgressStore
-    .getState()
-    .cancelWizardPendingUploads(wizardVm ?? undefined, wizardBootableVolumeKeys)
-    .catch(() => {});
+  useUploadProgressStore.getState().cancelWizardPendingUploads();
 };

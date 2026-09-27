@@ -64,6 +64,7 @@ export type V1DiskModalProps = {
   defaultFormValues?: DefaultFormValues;
   editDiskName?: string;
   isOpen: boolean;
+  isWizardCustomizationStep?: boolean;
   onClose: () => void;
   onSubmit: (
     updatedVM: V1VirtualMachine,
@@ -126,6 +127,7 @@ export type SubmitInput = {
 
 export type SubmitCDROMInput = {
   isHotPluggable: boolean;
+  isWizardCustomizationStep?: boolean;
   onSubmit: V1DiskModalProps['onSubmit'];
   onUploadedDataVolume?: V1DiskModalProps['onUploadedDataVolume'];
   onUploadStarted?: V1DiskModalProps['onUploadStarted'];

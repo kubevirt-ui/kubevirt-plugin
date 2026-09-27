@@ -5,7 +5,7 @@ import {
 import { type DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/constants';
 
 export type DiskRowActionsProps = {
-  customize?: boolean;
+  isWizardCustomizationStep?: boolean;
   obj: DiskRowDataLayout;
   onDiskUpdate?: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine>;
   vm: V1VirtualMachine;

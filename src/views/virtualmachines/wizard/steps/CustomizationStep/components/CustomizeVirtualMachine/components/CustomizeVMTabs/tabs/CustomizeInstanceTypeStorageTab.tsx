@@ -29,7 +29,7 @@ const CustomizeInstanceTypeStorageTab: FC = () => {
       <GridItem>
         <PageSection>
           <DiskList
-            customize
+            isWizardCustomizationStep
             onDiskUpdate={(updatedVM: V1VirtualMachine) => {
               const diskPatches = [
                 {

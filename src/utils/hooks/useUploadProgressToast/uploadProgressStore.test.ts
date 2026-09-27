@@ -645,7 +645,12 @@ describe('useUploadProgressStore', () => {
   });
 
   describe('cancelWizardPendingUploads', () => {
-    it('should cancel draft-VM and bootable-volume uploads without canceling other VM uploads', async () => {
+    const flushWizardPendingUploadCancel = (): Promise<void> =>
+      new Promise((resolve) => {
+        setTimeout(resolve, 0);
+      });
+
+    it('should cancel registered wizard pending uploads without canceling other uploads', async () => {
       const wizardDiskUploadKey = getVmDiskUploadKey(CLUSTER, NAMESPACE, VM_NAME, VM_DISK_NAME);
       const wizardCdromUploadKey = getVmCdromUploadKey(CLUSTER, NAMESPACE, VM_NAME, CDROM_NAME);
       const otherVmCdromUploadKey = getVmCdromUploadKey(
@@ -686,26 +691,20 @@ describe('useUploadProgressStore', () => {
         fileName: FILE_IMAGE_ISO,
       });
 
-      await useUploadProgressStore.getState().cancelWizardPendingUploads(
-        {
-          cluster: CLUSTER,
-          metadata: { name: VM_NAME, namespace: NAMESPACE },
-          spec: { template: {} },
-        },
-        [bootableVolumeUploadKey],
-      );
+      const store = useUploadProgressStore.getState();
+      store.addWizardPendingUploadKey(wizardDiskUploadKey);
+      store.addWizardPendingUploadKey(wizardCdromUploadKey);
+      store.addWizardPendingUploadKey(bootableVolumeUploadKey);
+      store.cancelWizardPendingUploads();
+      await flushWizardPendingUploadCancel();
 
       expect(wizardDiskCancel).toHaveBeenCalledTimes(1);
       expect(wizardCdromCancel).toHaveBeenCalledTimes(1);
       expect(bootableCancel).toHaveBeenCalledTimes(1);
       expect(otherVmCdromCancel).not.toHaveBeenCalled();
       expect(exportDiskCancel).not.toHaveBeenCalled();
-      expect(useUploadProgressStore.getState().getUpload(wizardDiskUploadKey)?.status).toBe(
-        UPLOAD_PROGRESS_STATUS.CANCELED,
-      );
-      expect(useUploadProgressStore.getState().getUpload(wizardCdromUploadKey)?.status).toBe(
-        UPLOAD_PROGRESS_STATUS.CANCELED,
-      );
+      expect(useUploadProgressStore.getState().getUpload(wizardDiskUploadKey)).toBeUndefined();
+      expect(useUploadProgressStore.getState().getUpload(wizardCdromUploadKey)).toBeUndefined();
       expect(useUploadProgressStore.getState().getUpload(bootableVolumeUploadKey)).toBeUndefined();
       expect(useUploadProgressStore.getState().getUpload(otherVmCdromUploadKey)?.status).toBe(
         UPLOAD_PROGRESS_STATUS.UPLOADING,
@@ -715,7 +714,7 @@ describe('useUploadProgressStore', () => {
       );
     });
 
-    it('should cancel bootable-volume uploads when no draft VM is provided', async () => {
+    it('should cancel only registered wizard pending uploads', async () => {
       const bootableVolumeUploadKey = getBootableVolumeUploadKey(
         BOOTABLE_VOLUME_NAMESPACE,
         BOOTABLE_VOLUME_NAME,
@@ -738,9 +737,10 @@ describe('useUploadProgressStore', () => {
         fileName: FILE_IMAGE_ISO,
       });
 
-      await useUploadProgressStore
-        .getState()
-        .cancelWizardPendingUploads(undefined, [bootableVolumeUploadKey]);
+      const store = useUploadProgressStore.getState();
+      store.addWizardPendingUploadKey(bootableVolumeUploadKey);
+      store.cancelWizardPendingUploads();
+      await flushWizardPendingUploadCancel();
 
       expect(bootableCancel).toHaveBeenCalledTimes(1);
       expect(otherVmCdromCancel).not.toHaveBeenCalled();

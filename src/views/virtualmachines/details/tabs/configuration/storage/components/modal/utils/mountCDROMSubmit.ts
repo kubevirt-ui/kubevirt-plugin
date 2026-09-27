@@ -11,6 +11,7 @@ import {
   runVmCdromBackgroundUpload,
 } from '@kubevirt-utils/components/DiskModal/utils/vmCdromBackgroundUpload';
 import type { CdiUploadDataFn } from '@kubevirt-utils/hooks/useCDIUpload/types';
+import { trackWizardPendingUploadKey } from '@kubevirt-utils/hooks/useUploadProgressToast/wizard/trackWizardPendingUploadKey';
 import { getName } from '@kubevirt-utils/resources/shared';
 import {
   getDataVolumeName,
@@ -25,6 +26,7 @@ export type MountCDROMSubmitParams = {
   checkUploadReady: () => Promise<void>;
   isHotPluggable: boolean;
   isVMRunning: boolean;
+  isWizardCustomizationStep?: boolean;
   onClose: () => void;
   onSubmit?: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine>;
   selectedISO: string;
@@ -42,6 +44,7 @@ export const submitMountCDROM = async ({
   checkUploadReady,
   isHotPluggable,
   isVMRunning,
+  isWizardCustomizationStep,
   onClose,
   onSubmit,
   selectedISO,
@@ -82,6 +85,8 @@ export const submitMountCDROM = async ({
     const vmWithMountedDv = await mountISOToCDROM(vm, diskStateForMount, isHotPluggable);
     const submitResult = await onSubmit?.(vmWithMountedDv);
     const vmAfterMount = submitResult ?? vmWithMountedDv;
+
+    trackWizardPendingUploadKey(cdromUploadKey, isWizardCustomizationStep);
 
     runVmCdromBackgroundUpload({
       diskState,
