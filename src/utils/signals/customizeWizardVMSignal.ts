@@ -110,9 +110,6 @@ export const patchCustomizeWizardVMSignal: PatchCustomizeWizardVMSignal = (vmEle
   return updatedVM;
 };
 
-export const updateVMCustomizeIT = (vm: V1VirtualMachine): Promise<V1VirtualMachine | undefined> =>
-  Promise.resolve(patchCustomizeWizardVMSignal([{ data: vm }]));
-
 export const setCustomizeWizardVMSignal = (vm: V1VirtualMachine | null): void => {
   customizeWizardVMSignal.value = vm;
 };
