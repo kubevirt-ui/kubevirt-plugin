@@ -13,6 +13,9 @@ export default class VmConfigurationNetworkComponent extends BaseComponent {
   private readonly _nadSelectInput = this.testId('select-nad-input').locator('input');
   private readonly _nadSelectToggle = this.testId('select-nad');
   private readonly _pendingChangesAlert = this.testId('pending-changes-alert');
+  private readonly _addNetworkInterfaceButton = this.page.getByRole('button', {
+    name: 'Add network interface',
+  });
 
   constructor(page: Page) {
     super(page);
@@ -27,20 +30,7 @@ export default class VmConfigurationNetworkComponent extends BaseComponent {
   }
 
   async changeNicNetworkAttachment(nicName: string, nadName: string): Promise<void> {
-    await this.navigateToConfigurationNetwork();
-
-    const kebab = this.nicActionsKebab(nicName);
-    await kebab.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
-    await this.robustClick(kebab);
-
-    const editItem = this.testId('network-interface-edit');
-    await editItem.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
-    await this.robustClick(editItem);
-
-    await this._editNicModal.waitFor({
-      state: 'visible',
-      timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
-    });
+    await this.openEditNetworkInterfaceModal(nicName);
 
     await this._nadSelectToggle.waitFor({
       state: 'visible',
@@ -66,6 +56,63 @@ export default class VmConfigurationNetworkComponent extends BaseComponent {
       state: 'hidden',
       timeout: TestTimeouts.ELEMENT_WAIT,
     });
+  }
+
+  async openAddNetworkInterfaceModal(): Promise<void> {
+    await this.navigateToConfigurationNetwork();
+    await this._addNetworkInterfaceButton.waitFor({
+      state: 'visible',
+      timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+    });
+    await this.robustClick(this._addNetworkInterfaceButton);
+    await this._editNicModal.waitFor({
+      state: 'visible',
+      timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+    });
+  }
+
+  async openEditNetworkInterfaceModal(nicName: string): Promise<void> {
+    await this.navigateToConfigurationNetwork();
+    const kebab = this.nicActionsKebab(nicName);
+    await kebab.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+    await this.robustClick(kebab);
+
+    const editItem = this.testId('network-interface-edit');
+    await editItem.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+    await this.robustClick(editItem);
+    await this._editNicModal.waitFor({
+      state: 'visible',
+      timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+    });
+  }
+
+  async waitForNetworkAutoSelection(): Promise<void> {
+    await this._nadSelectToggle.waitFor({
+      state: 'visible',
+      timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+    });
+
+    const hasSelection = await this.waitForCondition(
+      async () => {
+        const value = await this._nadSelectInput.inputValue().catch(() => '');
+        return value.trim().length > 0;
+      },
+      TestTimeouts.UI_ELEMENT_VISIBILITY,
+      TestTimeouts.UI_DELAY_SHORT,
+    );
+
+    if (!hasSelection) {
+      throw new Error('No network was auto-selected in the NIC modal');
+    }
+  }
+
+  async expandNetworkInterfaceAdvancedSettings(): Promise<void> {
+    const advancedSettings = this._editNicModal.getByRole('button', { name: 'Advanced settings' });
+    await advancedSettings.waitFor({
+      state: 'visible',
+      timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+    });
+    await this.robustClick(advancedSettings);
   }
 
   async getNicNetworkName(nicName: string): Promise<string> {

@@ -17,7 +17,6 @@ export type NetworkInterfaceModalOnSubmit = {
 };
 
 export type NetworkInterfaceModalProps = {
-  fixedName?: boolean;
   Header?: ReactNode;
   headerText: string;
   isEdit?: boolean;

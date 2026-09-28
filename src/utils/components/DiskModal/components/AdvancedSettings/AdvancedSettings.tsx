@@ -13,6 +13,7 @@ import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { Checkbox, ExpandableSection, Split, Stack, StackItem } from '@patternfly/react-core';
 
 import type { V1DiskFormState } from '../../utils/types';
+import DiskNameInput from '../DiskNameInput/DiskNameInput';
 import ApplyStorageProfileSettings from '../StorageProfileSettings/ApplyStorageProfileSettings';
 import { LUN_RESERVATION_FIELD, SHARABLE_FIELD } from '../utils/constants';
 import { getDiskSharable, getLunReservation } from '../utils/selectors';
@@ -22,7 +23,7 @@ type AdvancedSettingsProps = {
   editDiskName?: string;
   olsObj: K8sResourceCommon;
   showApplyStorageProfileSettings?: boolean;
-  vm?: V1VirtualMachine;
+  vm: V1VirtualMachine;
 };
 
 const AdvancedSettings: FC<AdvancedSettingsProps> = ({
@@ -63,6 +64,7 @@ const AdvancedSettings: FC<AdvancedSettingsProps> = ({
       toggleText={t('Advanced settings')}
     >
       <Stack hasGutter>
+        <DiskNameInput editDiskName={editDiskName} vm={vm} />
         {showApplyStorageProfileSettings && <ApplyStorageProfileSettings />}
         <StackItem>
           <Split hasGutter>

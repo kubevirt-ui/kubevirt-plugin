@@ -11,7 +11,7 @@ import useAddCDROMModalState from './hooks/useAddCDROMModalState';
 import { type V1SubDiskModalProps } from './utils/types';
 
 const AddCDROMModal: FC<V1SubDiskModalProps> = (props) => {
-  const { isOpen, onClose } = props;
+  const { isOpen, onClose, vm } = props;
 
   const {
     closesOnSubmitAfterSave,
@@ -52,7 +52,7 @@ const AddCDROMModal: FC<V1SubDiskModalProps> = (props) => {
             variant="add"
           />
           <StackItem>
-            <DiskNameInput />
+            <DiskNameInput vm={vm} />
           </StackItem>
           <CDROMSourceOptions
             emptyDriveOption={emptyDriveOption}

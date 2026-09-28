@@ -11,7 +11,6 @@ import TabModal from '../TabModal/TabModal';
 import AdvancedSettings from './components/AdvancedSettings/AdvancedSettings';
 import BootSourceCheckbox from './components/BootSourceCheckbox/BootSourceCheckbox';
 import DiskInterfaceSelect from './components/DiskInterfaceSelect/DiskInterfaceSelect';
-import DiskNameInput from './components/DiskNameInput/DiskNameInput';
 import ExpandPVC from './components/DiskSizeInput/ExpandPVC';
 import DiskSourcePVCSelect from './components/DiskSourceSelect/components/DiskSourcePVCSelect/DiskSourcePVCSelect';
 import DiskTypeSelect from './components/DiskTypeSelect/DiskTypeSelect';
@@ -66,7 +65,6 @@ const PVCDiskModal: FC<V1SubDiskModalProps> = ({
       >
         <PendingChanges isVMRunning={isVMRunning} />
         <BootSourceCheckbox editDiskName={editDiskName} isDisabled={isVMRunning} vm={vm} />
-        <DiskNameInput />
         <DiskSourcePVCSelect vmNamepace={getNamespace(vm)} />
         {isCreated && <ExpandPVC pvc={pvc} />}
         <DiskTypeSelect isVMRunning={isVMRunning} />

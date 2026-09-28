@@ -25,7 +25,7 @@ const NetworkInterfaceLinkState: FC<NetworkInterfaceLinkStateProps> = ({
   };
 
   return (
-    <FormGroup className="form-group-margin" fieldId="link-state" label={t('Link state')}>
+    <FormGroup fieldId="link-state" label={t('Link state')}>
       <div>
         <FormPFSelect
           isDisabled={isDisabled}

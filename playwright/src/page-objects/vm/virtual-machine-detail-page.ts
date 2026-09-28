@@ -122,6 +122,34 @@ export default class VirtualMachineDetailPage extends PageCommons {
     return this.network.changeNicNetworkAttachment(nicName, nadName);
   }
 
+  async openAddBlankDiskModal(): Promise<void> {
+    return this.disks.openAddBlankDiskModal();
+  }
+
+  async openEditDiskModal(diskName: string): Promise<void> {
+    return this.disks.openEditDiskModal(diskName);
+  }
+
+  async expandDiskAdvancedSettings(): Promise<void> {
+    return this.disks.expandDiskAdvancedSettings();
+  }
+
+  async openAddNetworkInterfaceModal(): Promise<void> {
+    return this.network.openAddNetworkInterfaceModal();
+  }
+
+  async openEditNetworkInterfaceModal(nicName: string): Promise<void> {
+    return this.network.openEditNetworkInterfaceModal(nicName);
+  }
+
+  async waitForNetworkInterfaceAutoSelection(): Promise<void> {
+    return this.network.waitForNetworkAutoSelection();
+  }
+
+  async expandNetworkInterfaceAdvancedSettings(): Promise<void> {
+    return this.network.expandNetworkInterfaceAdvancedSettings();
+  }
+
   async getConfigurationNetworkNicName(nicName: string): Promise<string> {
     return this.network.getNicNetworkName(nicName);
   }

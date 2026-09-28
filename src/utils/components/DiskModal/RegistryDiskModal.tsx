@@ -4,7 +4,6 @@ import { FormProvider, useForm, useWatch } from 'react-hook-form';
 import AdvancedSettings from '@kubevirt-utils/components/DiskModal/components/AdvancedSettings/AdvancedSettings';
 import BootSourceCheckbox from '@kubevirt-utils/components/DiskModal/components/BootSourceCheckbox/BootSourceCheckbox';
 import DiskInterfaceSelect from '@kubevirt-utils/components/DiskModal/components/DiskInterfaceSelect/DiskInterfaceSelect';
-import DiskNameInput from '@kubevirt-utils/components/DiskModal/components/DiskNameInput/DiskNameInput';
 import DiskSizeInput from '@kubevirt-utils/components/DiskModal/components/DiskSizeInput/DiskSizeInput';
 import DiskSourceContainer from '@kubevirt-utils/components/DiskModal/components/DiskSourceSelect/components/DiskSourceContainer/DiskSourceContainer';
 import DiskTypeSelect from '@kubevirt-utils/components/DiskModal/components/DiskTypeSelect/DiskTypeSelect';
@@ -70,7 +69,6 @@ const RegistryDiskModal: FC<V1SubDiskModalProps> = (props) => {
       >
         <PendingChanges isVMRunning={isVMRunning} />
         <BootSourceCheckbox editDiskName={editDiskName} isDisabled={isVMRunning} vm={vm} />
-        <DiskNameInput />{' '}
         {!isCreated && <DiskSourceContainer fieldName={REGISTRYURL_DATAVOLUME_FIELD} os={osName} />}
         <DiskSizeInput isCreated={isCreated} namespace={namespace} pvc={pvc} />
         <DiskTypeSelect isVMRunning={isVMRunning} />

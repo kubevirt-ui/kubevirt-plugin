@@ -4,6 +4,7 @@
  */
 
 import type RequestContextClient from '@/clients/request-context-client';
+import { DISK_NAMES } from '@/data-models';
 import type { JsonPatchOp, KubernetesResource } from '@/data-models/kubernetes-types';
 import { EnvVariables } from '@/utils/env-variables';
 import {
@@ -308,14 +309,14 @@ export async function createVmWithEmptyDisk(
           domain: {
             cpu: { cores: 1 },
             devices: {
-              disks: [{ bootOrder: 1, disk: { bus: 'virtio' }, name: 'emptydisk' }],
+              disks: [{ bootOrder: 1, disk: { bus: 'virtio' }, name: DISK_NAMES.EMPTY }],
               interfaces: [{ masquerade: {}, name: 'default' }],
             },
             memory: { guest: '1Gi' },
           },
           networks: [{ name: 'default', pod: {} }],
           terminationGracePeriodSeconds: 0,
-          volumes: [{ emptyDisk: { capacity: '1Gi' }, name: 'emptydisk' }],
+          volumes: [{ emptyDisk: { capacity: '1Gi' }, name: DISK_NAMES.EMPTY }],
         },
       },
     },

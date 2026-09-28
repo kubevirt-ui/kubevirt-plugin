@@ -19,7 +19,6 @@ import TabModal from '../TabModal/TabModal';
 import AdvancedSettings from './components/AdvancedSettings/AdvancedSettings';
 import BootSourceCheckbox from './components/BootSourceCheckbox/BootSourceCheckbox';
 import DiskInterfaceSelect from './components/DiskInterfaceSelect/DiskInterfaceSelect';
-import DiskNameInput from './components/DiskNameInput/DiskNameInput';
 import DiskSizeInput from './components/DiskSizeInput/DiskSizeInput';
 import DiskSourceUploadPVC from './components/DiskSourceSelect/components/DiskSourceUploadPVC/DiskSourceUploadPVC';
 import DiskTypeSelect from './components/DiskTypeSelect/DiskTypeSelect';
@@ -138,7 +137,6 @@ const UploadDiskModal: FC<V1SubDiskModalProps> = ({
       >
         <PendingChanges isVMRunning={isVMRunning} />
         <BootSourceCheckbox isDisabled={isVMRunning} vm={vm} />
-        <DiskNameInput />
         <DiskSourceUploadPVC relevantUpload={upload} />
         <DiskSizeInput namespace={vmNamespace} />
         <DiskTypeSelect isVMRunning={isVMRunning} />

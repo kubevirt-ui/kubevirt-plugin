@@ -9,7 +9,7 @@ import {
   createNetwork,
 } from '@kubevirt-utils/components/NetworkInterfaceModal/utils/helpers';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getInterface, getInterfaces, getNetworks } from '@kubevirt-utils/resources/vm';
+import { getInterfaces, getNetworks } from '@kubevirt-utils/resources/vm';
 import { type NetworkPresentation } from '@kubevirt-utils/resources/vm/utils/network/constants';
 import {
   patchVM,
@@ -54,8 +54,8 @@ const VirtualMachinesEditNetworkInterfaceModal: FC<
         nicName,
       });
 
-      const existingInterface = getInterface(vm, nicName);
-      const existingNetwork = getNetworks(vm)?.find(({ name }) => name === nicName);
+      const existingInterface = nicPresentation.iface;
+      const existingNetwork = nicPresentation.network;
 
       return () => {
         if (!existingNetwork || !existingInterface) {
@@ -72,7 +72,6 @@ const VirtualMachinesEditNetworkInterfaceModal: FC<
             resultNetwork,
             existingInterface,
             existingNetwork,
-            nicName,
           );
 
           return kubevirtK8sUpdate({
@@ -98,12 +97,11 @@ const VirtualMachinesEditNetworkInterfaceModal: FC<
         ]);
       };
     },
-    [vm],
+    [vm, nicPresentation],
   );
 
   return (
     <NetworkInterfaceModal
-      fixedName
       headerText={t('Edit network interface')}
       isOpen={isOpen}
       nicPresentation={nicPresentation}

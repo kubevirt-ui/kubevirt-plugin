@@ -10,7 +10,6 @@ import TabModal from '../TabModal/TabModal';
 import AdvancedSettings from './components/AdvancedSettings/AdvancedSettings';
 import BootSourceCheckbox from './components/BootSourceCheckbox/BootSourceCheckbox';
 import DiskInterfaceSelect from './components/DiskInterfaceSelect/DiskInterfaceSelect';
-import DiskNameInput from './components/DiskNameInput/DiskNameInput';
 import DiskSizeInput from './components/DiskSizeInput/DiskSizeInput';
 import DiskSourceUrlInput from './components/DiskSourceSelect/components/DiskSourceUrlInput/DiskSourceUrlInput';
 import DiskTypeSelect from './components/DiskTypeSelect/DiskTypeSelect';
@@ -64,7 +63,6 @@ const HTTPDiskModal: FC<V1SubDiskModalProps> = ({
       >
         <PendingChanges isVMRunning={isVMRunning} />
         <BootSourceCheckbox editDiskName={editDiskName} isDisabled={isVMRunning} vm={vm} />
-        <DiskNameInput />
         {!isCreated && (
           <DiskSourceUrlInput
             os={OS_NAME_TYPES[getOSNameWithoutVersionNumber(osName) as keyof typeof OS_NAME_TYPES]}

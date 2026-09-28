@@ -9,7 +9,6 @@ import TabModal from '../TabModal/TabModal';
 import AdvancedSettings from './components/AdvancedSettings/AdvancedSettings';
 import BootSourceCheckbox from './components/BootSourceCheckbox/BootSourceCheckbox';
 import DiskInterfaceSelect from './components/DiskInterfaceSelect/DiskInterfaceSelect';
-import DiskNameInput from './components/DiskNameInput/DiskNameInput';
 import DiskSizeInput from './components/DiskSizeInput/DiskSizeInput';
 import DiskSourceSnapshotVolumeSelect from './components/DiskSourceSelect/components/DiskSourceSnapshotVolumeSelect/DiskSourceSnapshotVolumeSelect';
 import DiskTypeSelect from './components/DiskTypeSelect/DiskTypeSelect';
@@ -63,7 +62,6 @@ const VolumeSnapshotDiskModal: FC<V1SubDiskModalProps> = ({
       >
         <PendingChanges isVMRunning={isVMRunning} />
         <BootSourceCheckbox editDiskName={editDiskName} isDisabled={isVMRunning} vm={vm} />
-        <DiskNameInput />
         {!isCreated && <DiskSourceSnapshotVolumeSelect />}
         <DiskSizeInput isCreated={isCreated} namespace={namespace} pvc={pvc} />
         <DiskTypeSelect isVMRunning={isVMRunning} />
