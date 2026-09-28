@@ -1,5 +1,4 @@
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { customizeWizardVMSignal } from '@kubevirt-utils/signals/customizeWizardVMSignal';
 
 import { useUploadProgressStore } from '../uploadProgressStore';
 
@@ -27,7 +26,6 @@ describe('cancelPendingVmUploads', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     sessionStorage.clear();
-    customizeWizardVMSignal.value = null;
     (useUploadProgressStore.getState as jest.Mock).mockReturnValue({
       cancelUploadsForVm,
     });
@@ -41,15 +39,7 @@ describe('cancelPendingVmUploads', () => {
     expect(cancelUploadsForVm).toHaveBeenCalledWith(CLUSTER, NAMESPACE, VM_NAME);
   });
 
-  it('should read vmSignal when no VM is provided', async () => {
-    customizeWizardVMSignal.value = createVm();
-
-    await cancelPendingVmUploads();
-
-    expect(cancelUploadsForVm).toHaveBeenCalledWith(CLUSTER, NAMESPACE, VM_NAME);
-  });
-
-  it('should no-op when vmSignal is null and no VM is provided', async () => {
+  it('should no-op when no VM is provided', async () => {
     await cancelPendingVmUploads();
 
     expect(cancelUploadsForVm).not.toHaveBeenCalled();
@@ -79,7 +69,6 @@ describe('cancelAllWizardPendingUploads', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    customizeWizardVMSignal.value = null;
     (useUploadProgressStore.getState as jest.Mock).mockReturnValue({ cancelWizardPendingUploads });
   });
 

@@ -12,10 +12,6 @@ import {
 import { CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM } from '../state/vm-wizard-form/consts';
 import { type VMWizardFormValues } from '../state/vm-wizard-form/types';
 
-/* TODO: this file is a copy of customizedWizardVMSignal.ts file, but manage the form field values instead of the signal.
-after we migrate the wizard to use the form values instead of the signal, we can remove the previous file.
-CNV-97978
-**/
 type PatchWizardCustomizedVMReplace = {
   data: V1VirtualMachine;
   merge?: never;
@@ -32,6 +28,10 @@ export type PatchWizardCustomizedVMArgs = (
   | PatchWizardCustomizedVMReplace
   | PatchWizardCustomizedVMUpdate
 )[];
+
+export type PatchWizardCustomizedVMPatch = (
+  patches: PatchWizardCustomizedVMArgs,
+) => V1VirtualMachine | undefined;
 
 const isVMReplaceEntry = (
   entry: PatchWizardCustomizedVMReplace | PatchWizardCustomizedVMUpdate,

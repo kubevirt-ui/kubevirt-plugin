@@ -22,12 +22,12 @@ import useHcoWorkloadArchitectures from '@kubevirt-utils/hooks/useHcoWorkloadArc
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useToggle } from '@kubevirt-utils/hooks/useToggle';
 import { getName } from '@kubevirt-utils/resources/shared';
-import { type PatchCustomizeWizardVMSignal } from '@kubevirt-utils/signals/customizeWizardVMSignal';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { ExpandableSection, Switch } from '@patternfly/react-core';
 import { printableVMStatus } from '@virtualmachines/utils';
+import { type PatchWizardCustomizedVMPatch } from '@virtualmachines/wizard/utils/patchWizardCustomizedVM';
 
 import { getSearchItemsIds } from '../../search/utils/utils';
 import { expandURLHash, getDetailsTabBootIds } from '../../utils/search';
@@ -36,7 +36,7 @@ import DetailsSectionBootOrder from './DetailsSectionBootOrder';
 
 type DetailsSectionBootProps = {
   canUpdateVM: boolean;
-  customizeWizardVMPatch?: PatchCustomizeWizardVMSignal;
+  customizeWizardVMPatch?: PatchWizardCustomizedVMPatch;
   instanceTypeVM?: V1VirtualMachine;
   preferredBootmode?: BootMode;
   vm: V1VirtualMachine;

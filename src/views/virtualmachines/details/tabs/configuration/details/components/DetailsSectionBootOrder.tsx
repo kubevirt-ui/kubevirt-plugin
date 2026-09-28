@@ -15,13 +15,13 @@ import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { getDisks, getInterfaces } from '@kubevirt-utils/resources/vm';
-import { type PatchCustomizeWizardVMSignal } from '@kubevirt-utils/signals/customizeWizardVMSignal';
+import { type PatchWizardCustomizedVMPatch } from '@virtualmachines/wizard/utils/patchWizardCustomizedVM';
 
 import { updateBootOrder } from '../utils/utils';
 
 type DetailsSectionBootOrderProps = {
   canUpdateVM?: boolean;
-  customizeWizardVMPatch?: PatchCustomizeWizardVMSignal;
+  customizeWizardVMPatch?: PatchWizardCustomizedVMPatch;
   instanceTypeVM?: V1VirtualMachine;
   vm: V1VirtualMachine;
   vmi?: V1VirtualMachineInstance;

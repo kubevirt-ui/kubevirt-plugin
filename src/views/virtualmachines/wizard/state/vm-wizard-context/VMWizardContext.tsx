@@ -6,7 +6,7 @@ import { getErrorMessage, isEmpty } from '@kubevirt-utils/utils/utils';
 import useWizardInitialValues from '@virtualmachines/wizard/hooks/useWizardInitialValues';
 import { createInitialVMWizardFormValues } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
 import { type VMWizardFormValues } from '@virtualmachines/wizard/state/vm-wizard-form/types';
-import { clearVMPendingUploadsAndSignal } from '@virtualmachines/wizard/utils/utils';
+import { clearWizardPendingUploads } from '@virtualmachines/wizard/utils/utils';
 
 type VMWizardProviderProps = {
   children?: ReactNode;
@@ -19,7 +19,7 @@ export const VMWizardProvider: FC<VMWizardProviderProps> = ({ children }) => {
     defaultValues: createInitialVMWizardFormValues({ cluster, project: namespace }),
   });
 
-  useEffect(() => (): void => clearVMPendingUploadsAndSignal(), []);
+  useEffect(() => (): void => clearWizardPendingUploads(), []);
 
   if (isLoadingHubCluster) {
     return <Loading />;

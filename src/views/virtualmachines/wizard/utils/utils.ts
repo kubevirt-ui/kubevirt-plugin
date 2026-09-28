@@ -131,6 +131,6 @@ export const markStepVisited = (
   setValue(CREATE_VM_FORM_FIELDS_STEP_NAVIGATION.VISITED_STEPS, nextVisitedSteps);
 };
 
-export const clearVMPendingUploadsAndSignal = (): void => {
+export const clearWizardPendingUploads = (): void => {
   cancelAllWizardPendingUploads();
 };

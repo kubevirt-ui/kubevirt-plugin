@@ -9,7 +9,7 @@ import {
 } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
 import { type VMWizardVirtualMachineData } from '@virtualmachines/wizard/state/vm-wizard-form/types';
 import { VMCreationMethod } from '@virtualmachines/wizard/utils/constants';
-import { clearVMPendingUploadsAndSignal } from '@virtualmachines/wizard/utils/utils';
+import { clearWizardPendingUploads } from '@virtualmachines/wizard/utils/utils';
 
 import CreationMethodTile from './components/CreationMethodTile/CreationMethodTile';
 
@@ -30,7 +30,7 @@ const CreationMethodTileGroup: FC = () => {
     const { cluster, description, folder, name, project }: Partial<VMWizardVirtualMachineData> =
       getValues(CREATE_VM_FORM_FIELDS_VM_DATA.ROOT);
 
-    clearVMPendingUploadsAndSignal();
+    clearWizardPendingUploads();
     reset(
       createInitialVMWizardFormValues({
         cluster,

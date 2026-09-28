@@ -6,13 +6,15 @@ import type { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import type { BootMode } from '@kubevirt-utils/components/FirmwareBootloaderModal/utils/constants';
 import type { HARDWARE_DEVICE_TYPE } from '@kubevirt-utils/components/HardwareDevices/utils/constants';
 import { getDevices } from '@kubevirt-utils/resources/vm';
-import { type PatchCustomizeWizardVMSignalArgs } from '@kubevirt-utils/signals/customizeWizardVMSignal';
 import { DescriptionList, GridItem } from '@patternfly/react-core';
 import DetailsSectionBoot from '@virtualmachines/details/tabs/configuration/details/components/DetailsSectionBoot';
 import DetailsSectionHardware from '@virtualmachines/details/tabs/configuration/details/components/DetailsSectionHardware';
 import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
 import { CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
-import { patchWizardCustomizedVM } from '@virtualmachines/wizard/utils/patchWizardCustomizedVM';
+import {
+  patchWizardCustomizedVM,
+  type PatchWizardCustomizedVMArgs,
+} from '@virtualmachines/wizard/utils/patchWizardCustomizedVM';
 
 type DetailsRightColumnProps = {
   canUpdateVM: boolean;
@@ -25,8 +27,7 @@ const DetailsRightColumn: FC<DetailsRightColumnProps> = ({ canUpdateVM, preferre
   const vm = useWatch({ control, name: CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM });
 
   const customizeWizardVMPatch = useCallback(
-    (patches: PatchCustomizeWizardVMSignalArgs) =>
-      patchWizardCustomizedVM(getValues, setValue, patches),
+    (patches: PatchWizardCustomizedVMArgs) => patchWizardCustomizedVM(getValues, setValue, patches),
     [getValues, setValue],
   );
 

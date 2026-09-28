@@ -10,15 +10,15 @@ import {
 } from '@kubevirt-utils/components/SysprepModal/sysprep-utils';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { getDisks, getVolumes } from '@kubevirt-utils/resources/vm';
-import { type PatchCustomizeWizardVMSignal } from '@kubevirt-utils/signals/customizeWizardVMSignal';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sCreate, kubevirtK8sPatch } from '@multicluster/k8sRequests';
+import { type PatchWizardCustomizedVMPatch } from '@virtualmachines/wizard/utils/patchWizardCustomizedVM';
 
 export const patchVMWithExistingSysprepConfigMap = async (
   name: string,
   vm: V1VirtualMachine,
-  onSubmit?: PatchCustomizeWizardVMSignal,
+  onSubmit?: PatchWizardCustomizedVMPatch,
 ): Promise<void> => {
   const vmVolumes = getVolumes(vm);
   const vmDisks = getDisks(vm);
@@ -69,7 +69,7 @@ export const createSysprepConfigMap = async (
   unattended: string,
   autounattend: string,
   vm: V1VirtualMachine,
-  onSubmit?: PatchCustomizeWizardVMSignal,
+  onSubmit?: PatchWizardCustomizedVMPatch,
 ): Promise<void> => {
   const vmVolumes = getVolumes(vm);
   const vmDisks = getDisks(vm);
