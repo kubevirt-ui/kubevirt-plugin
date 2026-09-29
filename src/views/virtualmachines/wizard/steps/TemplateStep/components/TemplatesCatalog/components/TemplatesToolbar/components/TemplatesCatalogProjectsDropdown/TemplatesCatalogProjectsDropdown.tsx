@@ -7,7 +7,6 @@ import { ALL_PROJECTS } from '@kubevirt-utils/hooks/constants';
 import { getName } from '@kubevirt-utils/resources/shared';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 import { type K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
-import { CREATE_VM_FORM_FIELDS_VM_DATA } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
 import { type VMWizardFormValues } from '@virtualmachines/wizard/state/vm-wizard-form/types';
 
 import './TemplatesCatalogProjectsDropdown.scss';
@@ -20,7 +19,7 @@ type TemplatesCatalogProjectsDropdownProps = {
 export const TemplatesCatalogProjectsDropdown: FC<TemplatesCatalogProjectsDropdownProps> = memo(
   ({ onChange, selectedProject }) => {
     const { control } = useFormContext<VMWizardFormValues>();
-    const cluster = useWatch({ control, name: CREATE_VM_FORM_FIELDS_VM_DATA.CLUSTER });
+    const cluster = useWatch({ control, name: 'deployment.cluster' });
     const [projects] = useK8sWatchData<K8sResourceCommon[]>({
       cluster,
       groupVersionKind: modelToGroupVersionKind(ProjectModel),

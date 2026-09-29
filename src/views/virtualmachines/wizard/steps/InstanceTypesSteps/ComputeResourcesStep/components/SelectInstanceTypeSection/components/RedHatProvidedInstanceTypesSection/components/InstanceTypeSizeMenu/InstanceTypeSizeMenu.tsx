@@ -5,7 +5,6 @@ import { type InstanceTypeSize } from '@kubevirt-utils/components/AddBootableVol
 import { logITFlowEvent } from '@kubevirt-utils/extensions/telemetry/telemetry';
 import { INSTANCETYPE_SELECTED } from '@kubevirt-utils/extensions/telemetry/utils/constants';
 import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
-import { CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
 import InstanceTypeSizeDropdown from '@virtualmachines/wizard/steps/InstanceTypesSteps/ComputeResourcesStep/components/SelectInstanceTypeSection/components/RedHatProvidedInstanceTypesSection/components/InstanceTypeSizeMenu/InstanceTypeSizeDropdown/InstanceTypeSizeDropdown';
 
 type InstanceTypeSizeMenuProps = {
@@ -13,10 +12,10 @@ type InstanceTypeSizeMenuProps = {
 };
 
 const InstanceTypeSizeMenu: FC<InstanceTypeSizeMenuProps> = ({ instanceTypeSizes }) => {
-  const { control, setValue } = useVMWizard();
+  const { control } = useVMWizard();
   const selectedSeries = useWatch({
     control,
-    name: CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.SELECTED_SERIES,
+    name: 'instanceType.compute.series',
   }) as string | undefined;
 
   if (!instanceTypeSizes) return null;
@@ -25,20 +24,21 @@ const InstanceTypeSizeMenu: FC<InstanceTypeSizeMenuProps> = ({ instanceTypeSizes
     <div className="instance-type-series-menu-card__size-dropdown">
       <Controller
         control={control}
-        name={CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.SELECTED_SIZE}
+        name="instanceType.compute"
         render={({ field: { onChange, ref: _ref, value } }) => (
           <InstanceTypeSizeDropdown
             onSizeSelect={(size: string) => {
-              onChange(size);
               logITFlowEvent(INSTANCETYPE_SELECTED, null, {
                 selectedInstanceType: selectedSeries ? `${selectedSeries}.${size}` : size,
               });
-              setValue(CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.SELECTED_INSTANCE_TYPE, {
+              onChange({
                 name: selectedSeries ? `${selectedSeries}.${size}` : size,
-                namespace: null,
+                series: selectedSeries ?? '',
+                size,
+                type: 'redhat',
               });
             }}
-            selectedSize={value as string}
+            selectedSize={value?.type === 'redhat' ? value.size : ''}
             seriesName={selectedSeries}
             sizes={instanceTypeSizes}
           />

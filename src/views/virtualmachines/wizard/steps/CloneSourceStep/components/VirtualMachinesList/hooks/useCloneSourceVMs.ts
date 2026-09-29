@@ -18,7 +18,6 @@ import useVMSearchQueries from '@virtualmachines/search/hooks/useVMSearchQueries
 import { OBJECTS_FETCHING_LIMIT } from '@virtualmachines/utils';
 import type { PVCMapper, VMIMapper, VMIMMapper } from '@virtualmachines/utils/mappers';
 import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
-import { CREATE_VM_FORM_FIELDS_VM_DATA } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
 
 import { resolveVMListSource } from '../utils/utils';
 import { useCloneSourceVMFilters } from './useCloneSourceVMFilters';
@@ -45,7 +44,7 @@ export const useCloneSourceVMs = (): UseCloneSourceVMsReturn => {
   const { control } = useVMWizard();
   const [cluster, targetNamespace] = useWatch({
     control,
-    name: [CREATE_VM_FORM_FIELDS_VM_DATA.CLUSTER, CREATE_VM_FORM_FIELDS_VM_DATA.PROJECT],
+    name: ['deployment.cluster', 'deployment.project'],
   });
 
   const { loading: loadingFeatureProxy } = useFeatures(KUBEVIRT_APISERVER_PROXY);

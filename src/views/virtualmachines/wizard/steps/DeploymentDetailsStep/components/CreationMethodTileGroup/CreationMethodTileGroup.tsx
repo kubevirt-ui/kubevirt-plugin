@@ -3,12 +3,8 @@ import { useWatch } from 'react-hook-form';
 
 import { Flex, FlexItem } from '@patternfly/react-core';
 import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
-import {
-  CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM,
-  CREATE_VM_FORM_FIELDS_VM_DATA,
-  createInitialVMWizardFormValues,
-} from '@virtualmachines/wizard/state/vm-wizard-form/consts';
-import { type VMWizardVirtualMachineData } from '@virtualmachines/wizard/state/vm-wizard-form/types';
+import { createInitialVMWizardFormValues } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
+import { type VMWizardDeploymentValues } from '@virtualmachines/wizard/state/vm-wizard-form/types';
 import { VMCreationMethod } from '@virtualmachines/wizard/utils/constants';
 import { clearVMPendingUploads } from '@virtualmachines/wizard/utils/utils';
 
@@ -17,10 +13,10 @@ import CreationMethodTile from './components/CreationMethodTile/CreationMethodTi
 import './CreationMethodTileGroup.scss';
 
 const CreationMethodTileGroup: FC = () => {
-  const { control, getValues, reset } = useVMWizard();
+  const { control, getValues, reset, setValue } = useVMWizard();
   const creationMethod: VMCreationMethod = useWatch({
     control,
-    name: CREATE_VM_FORM_FIELDS_VM_DATA.CREATION_METHOD,
+    name: 'creationMethod',
   });
 
   const handleCreationMethodChange = (selectedCreationMethod: VMCreationMethod): void => {
@@ -28,10 +24,10 @@ const CreationMethodTileGroup: FC = () => {
       return;
     }
 
-    const { cluster, description, folder, name, project }: Partial<VMWizardVirtualMachineData> =
-      getValues(CREATE_VM_FORM_FIELDS_VM_DATA.ROOT);
+    const { cluster, description, folder, name, project }: Partial<VMWizardDeploymentValues> =
+      getValues('deployment');
 
-    clearVMPendingUploads(getValues(CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM));
+    clearVMPendingUploads(getValues, setValue);
     reset(
       createInitialVMWizardFormValues({
         cluster,

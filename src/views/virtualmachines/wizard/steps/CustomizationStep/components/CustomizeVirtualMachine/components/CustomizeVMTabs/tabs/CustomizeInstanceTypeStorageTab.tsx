@@ -8,7 +8,6 @@ import { getDataVolumeTemplates, getDisks, getVolumes } from '@kubevirt-utils/re
 import { Divider, Grid, GridItem, PageSection } from '@patternfly/react-core';
 import DiskList from '@virtualmachines/details/tabs/configuration/storage/components/tables/disk/DiskList';
 import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
-import { CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
 import { patchWizardCustomizedVM } from '@virtualmachines/wizard/utils/patchWizardCustomizedVM';
 
 import useUpdateCustomizeInstanceTypeTab from '../hooks/useUpdateCustomizeInstanceTypeTab';
@@ -16,7 +15,7 @@ import useUpdateCustomizeInstanceTypeTab from '../hooks/useUpdateCustomizeInstan
 const CustomizeInstanceTypeStorageTab: FC = () => {
   const { getValues, setValue } = useVMWizard();
   const { control } = useVMWizard();
-  const vm = useWatch({ control, name: CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM });
+  const vm = useWatch({ control, name: 'customization.vmDraft' });
 
   const { updateVMFromForm } = useUpdateCustomizeInstanceTypeTab();
 
@@ -30,7 +29,7 @@ const CustomizeInstanceTypeStorageTab: FC = () => {
         <PageSection>
           <DiskList
             customize
-            getCurrentVM={() => getValues(CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM)}
+            getCurrentVM={() => getValues('customization.vmDraft')}
             onDiskUpdate={(updatedVM: V1VirtualMachine) => {
               const diskPatches = [
                 {

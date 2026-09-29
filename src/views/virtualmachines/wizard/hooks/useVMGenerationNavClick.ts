@@ -12,7 +12,6 @@ import {
 } from '@virtualmachines/wizard/utils/utils';
 
 import { useVMWizard } from '../state/vm-wizard-context/VMWizardContext';
-import { CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM } from '../state/vm-wizard-form/consts';
 import useGenerateVM from '../steps/InstanceTypesSteps/hooks/useGenerateVM/useGenerateVM';
 import { type WizardStepNavItemConfig } from '../utils/types';
 
@@ -31,7 +30,7 @@ const useVMGenerationNavClick = (creationMethod: VMCreationMethod): WizardStepNa
       setIsGeneratingVM(true);
       try {
         if (isInstanceTypeCreationMethod(creationMethod) && generatedVM) {
-          setValue(CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM, generatedVM);
+          setValue('customization.vmDraft', generatedVM);
         }
         if (isTemplateCreationMethod(creationMethod)) {
           const success = await createVMFromTemplate();

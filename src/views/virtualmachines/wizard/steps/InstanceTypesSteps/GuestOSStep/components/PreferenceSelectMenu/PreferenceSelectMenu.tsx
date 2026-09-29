@@ -8,10 +8,6 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { FormGroup, SelectOption } from '@patternfly/react-core';
 import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
-import {
-  CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA,
-  CREATE_VM_FORM_FIELDS_VM_DATA,
-} from '@virtualmachines/wizard/state/vm-wizard-form/consts';
 import usePreferenceSelectOptions from '@virtualmachines/wizard/steps/InstanceTypesSteps/GuestOSStep/components/PreferenceSelectMenu/hooks/usePreferenceSelectOptions/usePreferenceSelectOptions';
 import { resetBootableVolumeFields } from '@virtualmachines/wizard/utils/utils';
 
@@ -22,11 +18,7 @@ const PreferenceSelectMenu: FC = () => {
   const { control, getValues, setValue } = useVMWizard();
   const [cluster, project, operatingSystemType] = useWatch({
     control,
-    name: [
-      CREATE_VM_FORM_FIELDS_VM_DATA.CLUSTER,
-      CREATE_VM_FORM_FIELDS_VM_DATA.PROJECT,
-      CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.OPERATING_SYSTEM_TYPE,
-    ],
+    name: ['deployment.cluster', 'deployment.project', 'instanceType.operatingSystem'],
   });
 
   const { isPreferencesLoaded, preferences } = usePreferenceSelectOptions(
@@ -56,7 +48,7 @@ const PreferenceSelectMenu: FC = () => {
       ) : (
         <Controller
           control={control}
-          name={CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.PREFERENCE}
+          name="instanceType.preference"
           render={({ field: { onChange, value } }) => {
             return (
               <FormPFSelect

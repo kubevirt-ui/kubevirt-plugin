@@ -17,7 +17,6 @@ import VMNameConfirmationNextButton from '@virtualmachines/wizard/components/VMN
 import useCloseWizard from '@virtualmachines/wizard/hooks/useCloseWizard';
 import useCreateVM from '@virtualmachines/wizard/hooks/useCreateVM';
 import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
-import { CREATE_VM_FORM_FIELDS_VM_DATA } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
 import { isCloneCreationMethod } from '@virtualmachines/wizard/utils/utils';
 
 import { getCreateButtonText } from '../utils/utils';
@@ -26,7 +25,7 @@ const ReviewAndCreateStepFooter: FC = () => {
   const { t } = useKubevirtTranslation();
   const { goToPrevStep } = useWizardContext();
   const { control } = useVMWizard();
-  const creationMethod = useWatch({ control, name: CREATE_VM_FORM_FIELDS_VM_DATA.CREATION_METHOD });
+  const creationMethod = useWatch({ control, name: 'creationMethod' });
   const isCloneMethod = isCloneCreationMethod(creationMethod);
   const { createVM, error, isSubmitting } = useCreateVM();
   const closeWizard = useCloseWizard();

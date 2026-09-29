@@ -9,57 +9,79 @@ import { type K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { type OperatingSystemType } from '@virtualmachines/wizard/steps/InstanceTypesSteps/GuestOSStep/utils/constants';
 import { type VMCreationMethod } from '@virtualmachines/wizard/utils/constants';
 
-export type SelectedInstanceType = { name: string; namespace: null | string };
+export type BootVolumeSelection = {
+  dataVolumeSource?: null | V1beta1DataVolume;
+  diskSize?: string;
+  persistentVolumeClaimSource?: IoK8sApiCoreV1PersistentVolumeClaim | null;
+  volume: BootableVolume;
+  volumeSnapshotSource?: null | VolumeSnapshotKind;
+};
 
-/** VM identity, placement, and provisioning choices collected across wizard steps. */
-export type VMWizardVirtualMachineData = {
-  autoLabelsMerged: boolean;
+export type InstanceTypeSelection =
+  | {
+      name: string;
+      series: string;
+      size: string;
+      type: 'redhat';
+    }
+  | {
+      name: string;
+      namespace: string;
+      type: 'user';
+    };
+
+export type VMWizardDeploymentValues = {
   cluster: string;
-  creationMethod: VMCreationMethod;
   description: string;
   folder: string;
   name: string | undefined;
   project: string;
+};
+
+export type VMWizardInstanceTypeValues = {
+  bootVolume: BootVolumeSelection | null;
+  compute: InstanceTypeSelection | null;
+  operatingSystem: OperatingSystemType;
+  preference: null | PreferenceOption;
+  useBootSource: boolean;
+  volumeNamespace: string;
+};
+
+export type VMWizardTemplateValues = {
+  // Preserve the existing template processing cache and error presentation.
+  isDrawerOpen: boolean;
+  lastProcessedKey: string;
+  processError: null | string;
   selectedTemplate: null | Template;
 };
 
-/** Ephemeral UI state that does not belong on the VM resource. */
-type VMWizardUIState = {
-  isTemplatesDrawerOpen: boolean;
-  lastProcessedTemplateKey: string;
-  shouldCheckVMNameProperly: boolean;
-  templateAdditionalObjects: K8sResourceCommon[];
-  templateProcessError: null | string;
+export type VMWizardCloneValues = {
+  sourceVM: null | V1VirtualMachine;
 };
 
-/** Wizard flow position and per-step next-button availability. */
-type VMWizardStepNavigation = {
+export type VMWizardCustomizationValues = {
+  autoLabelsApplied: boolean;
+  pendingBootableVolumeUploadKeys: string[];
+  templateAdditionalObjects: K8sResourceCommon[];
+  vmDraft: null | V1VirtualMachine;
+};
+
+export type VMWizardNavigationValues = {
   currentStep: string;
+  strictVMName: boolean;
   visitedSteps: Set<string>;
 };
 
-/** Guest OS, boot source, and compute resource selections for the instance-type flow. */
-type VMWizardInstanceTypeData = {
-  customDiskSize: string;
-  dvSource: null | V1beta1DataVolume;
-  operatingSystemType: OperatingSystemType;
-  preference: null | PreferenceOption;
-  pvcSource: IoK8sApiCoreV1PersistentVolumeClaim | null;
-  selectedBootableVolume: BootableVolume | null;
-  selectedInstanceType: { name: string; namespace: null | string } | null;
-  selectedSeries: string;
-  selectedSize: string;
-  useBootSource: boolean;
-  volumeListNamespace: string;
-  volumeSnapshotSource: null | VolumeSnapshotKind;
-};
-
 export type VMWizardFormValues = {
-  customizedVM: null | V1VirtualMachine;
-  instanceTypeData: VMWizardInstanceTypeData;
-  stepNavigation: VMWizardStepNavigation;
-  uiState: VMWizardUIState;
-  vmData: VMWizardVirtualMachineData;
+  clone: VMWizardCloneValues;
+  creationMethod: VMCreationMethod;
+  customization: VMWizardCustomizationValues;
+  deployment: VMWizardDeploymentValues;
+  instanceType: VMWizardInstanceTypeValues;
+  navigation: VMWizardNavigationValues;
+  template: VMWizardTemplateValues;
 };
 
-export type CreateInitialVMWizardFormValuesArgs = Partial<VMWizardVirtualMachineData>;
+export type CreateInitialVMWizardFormValuesArgs = Partial<VMWizardDeploymentValues> & {
+  creationMethod?: VMCreationMethod;
+};
