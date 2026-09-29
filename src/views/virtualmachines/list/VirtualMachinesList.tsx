@@ -136,6 +136,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({
                 data={filteredVMs ?? []}
                 getRowId={getK8sRowId}
                 initialSortKey={VM_COLUMN_KEYS.name}
+                isResizable
                 loaded={loaded}
                 loadError={vmsLoadError}
                 noFilteredDataMsg={

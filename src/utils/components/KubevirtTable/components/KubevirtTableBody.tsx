@@ -1,4 +1,5 @@
 import { type ReactNode } from 'react';
+import classNames from 'classnames';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -12,6 +13,7 @@ type KubevirtTableBodyProps = {
   data: unknown[];
   effectiveTableColumns: DataViewTh[];
   fixedLayout?: boolean;
+  isResizable?: boolean;
   loaded: boolean;
   noDataMsg?: ReactNode;
   noFilteredDataMsg?: ReactNode;
@@ -24,6 +26,7 @@ const KubevirtTableBody = ({
   data,
   effectiveTableColumns,
   fixedLayout,
+  isResizable,
   loaded,
   noDataMsg,
   noFilteredDataMsg,
@@ -43,8 +46,9 @@ const KubevirtTableBody = ({
   const table = (
     <DataViewTable
       aria-label={ariaLabel}
-      className="kubevirt-table"
+      className={classNames('kubevirt-table', isResizable && 'kubevirt-table__resizable')}
       columns={effectiveTableColumns}
+      isResizable={isResizable}
       rows={rows}
     />
   );

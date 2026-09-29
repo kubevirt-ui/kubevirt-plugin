@@ -16,6 +16,7 @@ import {
   type VMIMapper,
   type VMIMMapper,
 } from '../../utils/mappers';
+import { useInstanceTypeMapper } from './useInstanceTypeMapper';
 import { useVirtualMachineInstanceMapper } from './useVirtualMachineInstanceMapper';
 
 const useVirtualMachineListColumnUtils = (
@@ -36,6 +37,7 @@ const useVirtualMachineListColumnUtils = (
 
   const vmimMapper = useVirtualMachineInstanceMigrationMapper(vmims);
   const pvcMapper = usePVCMapper(namespace, cluster);
+  const { instanceTypeMapper, instanceTypesLoaded } = useInstanceTypeMapper();
 
   const callbacks: VMCallbacks = useMemo(
     () => ({
@@ -47,14 +49,21 @@ const useVirtualMachineListColumnUtils = (
           getNamespace(virtunalMachine),
           getCluster(virtunalMachine),
         ),
+      instanceTypeMapper,
       pvcMapper,
       vmiMapper,
       vmimMapper,
     }),
-    [vmiMapper, vmimMapper, pvcMapper],
+    [vmiMapper, vmimMapper, pvcMapper, instanceTypeMapper],
   );
 
-  return { callbacks, loaded: vmisLoaded && vmimsLoaded, pvcMapper, vmiMapper, vmimMapper };
+  return {
+    callbacks,
+    loaded: vmisLoaded && vmimsLoaded && instanceTypesLoaded,
+    pvcMapper,
+    vmiMapper,
+    vmimMapper,
+  };
 };
 
 export default useVirtualMachineListColumnUtils;

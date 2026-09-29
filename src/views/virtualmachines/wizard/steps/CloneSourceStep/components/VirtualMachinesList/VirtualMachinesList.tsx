@@ -6,6 +6,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { paginationInitialState } from '@kubevirt-utils/hooks/usePagination/utils/constants';
 import { type PaginationState } from '@kubevirt-utils/hooks/usePagination/utils/types';
 import { Label } from '@patternfly/react-core';
+import { useInstanceTypeMapper } from '@virtualmachines/list/hooks/useInstanceTypeMapper';
 import { getListPageBodySize, ListPageBodySize } from '@virtualmachines/list/listPageBodySize';
 
 import VirtualMachineFilter from './components/VirtualMachineFilter';
@@ -57,11 +58,19 @@ const VirtualMachinesList: FC = () => {
     setPagination({ endIndex, page, perPage, startIndex });
   };
 
-  const loaded = vmsLoaded && vmisLoaded && vmimsLoaded && !loadingFeatureProxy && loadedColumns;
+  const { instanceTypeMapper, instanceTypesLoaded } = useInstanceTypeMapper();
+
+  const loaded =
+    vmsLoaded &&
+    vmisLoaded &&
+    vmimsLoaded &&
+    instanceTypesLoaded &&
+    !loadingFeatureProxy &&
+    loadedColumns;
 
   const callbacks = useMemo(
-    () => getVMTableCallbacks(vmiMapper, vmimMapper, pvcMapper),
-    [vmiMapper, vmimMapper, pvcMapper],
+    () => getVMTableCallbacks(vmiMapper, vmimMapper, pvcMapper, instanceTypeMapper),
+    [instanceTypeMapper, vmiMapper, vmimMapper, pvcMapper],
   );
 
   const paginatedVMsData = useMemo(

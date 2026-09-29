@@ -50,6 +50,11 @@ import {
   VMI_COLUMN_KEYS,
 } from '../../../views/virtualmachinesinstance/list/virtualMachinesInstancesDefinition';
 
+const emptyInstanceTypeMapper: VMCallbacks['instanceTypeMapper'] = {
+  clusterInstanceTypes: {},
+  namespacedInstanceTypes: {},
+};
+
 jest.mock('../../../views/migrationpolicies/list/MigrationPoliciesCells', () => ({
   ActionsCell: () => null,
   AutoConvergeCell: () => null,
@@ -225,6 +230,7 @@ describe('VM list CSV export', () => {
     const callbacks = {
       getVmi: (vm: V1VirtualMachine) => (vm.metadata?.name === runningName ? vmi : undefined),
       getVmim: () => undefined,
+      instanceTypeMapper: emptyInstanceTypeMapper,
       pvcMapper: {},
       vmiMapper: { mapper: {}, nodeNames: {} },
       vmimMapper: {},
@@ -242,7 +248,7 @@ describe('VM list CSV export', () => {
       callbacks,
     );
 
-    expect(csv).toContain('Name,Memory,CPU,Network');
+    expect(csv).toContain('Name,Memory Utilization,CPU Utilization,Network');
     expect(csv).toContain(`${runningName},50.00%,50.00%,1 MiBps`);
     expect(csv).toContain(`csv-stopped-vm,${NO_DATA_DASH},${NO_DATA_DASH},${NO_DATA_DASH}`);
   });
@@ -266,6 +272,7 @@ describe('VM list CSV export', () => {
       {
         getVmi: () => undefined,
         getVmim: () => undefined,
+        instanceTypeMapper: emptyInstanceTypeMapper,
         pvcMapper: {},
         vmiMapper: { mapper: {}, nodeNames: {} },
         vmimMapper: {},
@@ -336,6 +343,7 @@ describe('VM list CSV export', () => {
               } as V1VirtualMachineInstance)
             : undefined,
         getVmim: () => undefined,
+        instanceTypeMapper: emptyInstanceTypeMapper,
         pvcMapper: {},
         vmiMapper: { mapper: {}, nodeNames: {} },
         vmimMapper: {},

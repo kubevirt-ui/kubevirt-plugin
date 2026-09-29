@@ -8,6 +8,18 @@
   table-layout: fixed;
   width: 100%;
 
+  &.kubevirt-table__resizable {
+    table-layout: auto;
+
+    thead .pf-v6-c-table__check,
+    tbody .pf-v6-c-table__check {
+      width: 2.5rem;
+      min-width: 2.5rem;
+      max-width: 2.5rem;
+      padding-inline-end: var(--pf-t--global--spacer--sm);
+    }
+  }
+
   // Actions column - fixed small width for kebab menu
   .pf-v6-c-table__action {
     width: 50px;
@@ -39,14 +51,14 @@
   width: 8.333%;
 }
 
-@media screen and (min-width: 768px) {
+@media screen and (width >= 768px) {
   .kubevirt-table--fixed-layout .pf-v6-c-table thead .pf-v6-c-table__check,
   .kubevirt-table--fixed-layout .pf-v6-c-table tbody .pf-v6-c-table__check {
     width: 8.333%;
   }
 }
 
-@media screen and (max-width: 767px) {
+@media screen and (width <= 767px) {
   .kubevirt-table--fixed-layout .pf-v6-c-table thead .pf-v6-c-table__check,
   .kubevirt-table--fixed-layout .pf-v6-c-table tbody .pf-v6-c-table__check {
     width: 16.66%;
@@ -59,7 +71,7 @@
   width: 5%;
 }
 
-@media screen and (max-width: 991px) {
+@media screen and (width <= 991px) {
   .kubevirt-table--fixed-layout .pf-v6-c-table thead .pf-v6-c-table__action,
   .kubevirt-table--fixed-layout .pf-v6-c-table tbody .pf-v6-c-table__action {
     width: 10%;

@@ -1,8 +1,15 @@
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import {
+  getInstanceTypeCPU,
+  getInstanceTypeMemory,
+} from '@kubevirt-utils/resources/instancetype/selectors';
+import { vCPUCount } from '@kubevirt-utils/resources/template';
 import { getCPU, getMemory } from '@kubevirt-utils/resources/vm';
 import { getVMINodeName } from '@kubevirt-utils/resources/vmi';
+import { convertToBaseValue } from '@kubevirt-utils/utils/humanize.js';
 import { SortByDirection } from '@patternfly/react-table';
 import { getVirtualMachineStorageClasses } from '@virtualmachines/utils/mappers';
+import { getInstanceTypeFromMapper } from '@virtualmachines/utils/mappers';
 
 import {
   getCPUUsagePercentage,
@@ -70,3 +77,17 @@ export const sortByStorageClass = createNullSafeSort(
     callbacks?.pvcMapper ? getVirtualMachineStorageClasses(vm, callbacks.pvcMapper)[0] : undefined,
   true,
 );
+export const sortByMemory = createNullSafeSort((vm, callbacks) => {
+  const vmi = callbacks?.getVmi(vm);
+  const memory =
+    getMemory(vm) ??
+    getMemory(vmi) ??
+    getInstanceTypeMemory(getInstanceTypeFromMapper(callbacks?.instanceTypeMapper, vm))?.toString();
+  return memory ? convertToBaseValue(memory) : undefined;
+});
+export const sortByVCPU = createNullSafeSort((vm, callbacks) => {
+  const vmi = callbacks?.getVmi(vm);
+  const cpuSpec = getCPU(vm) ?? getCPU(vmi);
+  if (cpuSpec) return vCPUCount(cpuSpec);
+  return getInstanceTypeCPU(getInstanceTypeFromMapper(callbacks?.instanceTypeMapper, vm));
+});

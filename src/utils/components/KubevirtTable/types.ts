@@ -32,8 +32,11 @@ type BaseKubevirtTableProps<TData, TCallbacks = undefined> = {
   initialSortColumnIndex?: number;
   initialSortDirection?: 'asc' | 'desc';
   initialSortKey?: string;
+  isResizable?: boolean;
   loaded?: boolean;
   loadError?: unknown;
+  /** Minimum width in pixels for resizable columns. Defaults to 48. */
+  minResizableColumnWidth?: number;
   noDataMsg?: ReactNode;
   noFilteredDataMsg?: ReactNode;
   /** Pagination state from usePagination hook. When provided, table will slice sorted data accordingly */

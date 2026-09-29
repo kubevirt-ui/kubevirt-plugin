@@ -5,7 +5,12 @@ import {
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import type { TableExportColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { ACTIONS } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/const';
-import { type PVCMapper, type VMIMapper, type VMIMMapper } from '@virtualmachines/utils/mappers';
+import {
+  type InstanceTypeMapper,
+  type PVCMapper,
+  type VMIMapper,
+  type VMIMMapper,
+} from '@virtualmachines/utils/mappers';
 
 export const VM_COLUMN_KEYS = {
   actions: ACTIONS,
@@ -15,6 +20,7 @@ export const VM_COLUMN_KEYS = {
   created: 'created',
   deletionProtection: 'deletion-protection',
   ipAddress: 'ip-address',
+  memory: 'memory',
   memoryUsage: 'memory-usage',
   name: 'name',
   namespace: 'namespace',
@@ -23,11 +29,13 @@ export const VM_COLUMN_KEYS = {
   selection: 'selection',
   status: 'status',
   storageclassname: 'storageclassname',
+  vcpu: 'vcpu',
 } as const;
 
 export type VMCallbacks = {
   getVmi: (vm: V1VirtualMachine) => undefined | V1VirtualMachineInstance;
   getVmim: (vm: V1VirtualMachine) => undefined | V1VirtualMachineInstanceMigration;
+  instanceTypeMapper: InstanceTypeMapper;
   pvcMapper: PVCMapper;
   vmiMapper: VMIMapper;
   vmimMapper: VMIMMapper;

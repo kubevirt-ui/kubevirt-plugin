@@ -16,11 +16,13 @@ import {
 } from './vmNodeColumns';
 import {
   getActionsColumns,
-  getCPUColumn,
+  getCPUUsageColumn,
   getDeletionProtectionColumn,
   getMemoryColumn,
-  getNetworkColumn,
+  getMemoryUsageColumn,
+  getNetworkUsageColumn,
   getStorageClassColumn,
+  getVCPUColumn,
 } from './vmResourceColumns';
 
 export {
@@ -39,11 +41,13 @@ export {
 } from './vmNodeColumns';
 export {
   getActionsColumns,
-  getCPUColumn,
+  getCPUUsageColumn,
   getDeletionProtectionColumn,
   getMemoryColumn,
-  getNetworkColumn,
+  getMemoryUsageColumn,
+  getNetworkUsageColumn,
   getStorageClassColumn,
+  getVCPUColumn,
 } from './vmResourceColumns';
 
 export const getVMColumns = (
@@ -62,9 +66,11 @@ export const getVMColumns = (
   ...getNodeColumns(t, canGetNode),
   getCreatedColumn(t),
   getIPAddressColumn(t),
+  getVCPUColumn(t),
   getMemoryColumn(t),
-  getCPUColumn(t),
-  getNetworkColumn(t),
+  getMemoryUsageColumn(t),
+  getCPUUsageColumn(t),
+  getNetworkUsageColumn(t),
   getDeletionProtectionColumn(t),
   getStorageClassColumn(t),
   ...getActionsColumns(hideActions),
