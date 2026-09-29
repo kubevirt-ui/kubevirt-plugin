@@ -1,9 +1,19 @@
 import { type FC, useCallback, useState } from 'react';
 
-import { HyperConvergedV1Beta1Model as HyperConvergedModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import SectionWithSwitch from '@kubevirt-utils/components/SectionWithSwitch/SectionWithSwitch';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getHyperConvergedModelFromResource } from '@kubevirt-utils/resources/hyperconverged/model';
+import {
+  buildHyperConvergedPatch,
+  getDataImportCronTemplatesPatchPath,
+  getEnableCommonBootImageImportPatchPath,
+} from '@kubevirt-utils/resources/hyperconverged/patchUtils';
+import {
+  getDataImportCronTemplates,
+  getEnableCommonBootImageImport,
+  getSpecDataImportCronTemplates,
+} from '@kubevirt-utils/resources/hyperconverged/selectors';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
@@ -31,26 +41,21 @@ const AutomaticImagesDownload: FC<AutomaticImagesDownloadProps> = ({
   const [imageLoadingIndex, setImageLoadingIndex] = useState<number>(-1);
 
   const [hyperConverged, loaded] = hyperConvergeConfiguration;
-  const isEnabledAutomaticImagesDownload =
-    hyperConverged?.spec?.enableCommonBootImageImport ?? true;
+  const isEnabledAutomaticImagesDownload = getEnableCommonBootImageImport(hyperConverged) ?? true;
 
-  const bootSources =
-    hyperConverged?.spec?.dataImportCronTemplates ||
-    hyperConverged?.status?.dataImportCronTemplates;
+  const bootSources = getDataImportCronTemplates(hyperConverged);
 
   const onChangeAutomaticImagesDownload = useCallback(
     (val: boolean) => {
       setIsLoading(true);
       void kubevirtK8sPatch({
         cluster,
-        data: [
-          {
-            op: 'replace',
-            path: `/spec/enableCommonBootImageImport`,
-            value: val,
-          },
-        ],
-        model: HyperConvergedModel,
+        data: buildHyperConvergedPatch(hyperConverged, {
+          op: 'replace',
+          path: getEnableCommonBootImageImportPatchPath(hyperConverged),
+          value: val,
+        }),
+        model: getHyperConvergedModelFromResource(hyperConverged),
         resource: hyperConverged,
       }).finally(() => setIsLoading(false));
     },
@@ -76,14 +81,12 @@ const AutomaticImagesDownload: FC<AutomaticImagesDownloadProps> = ({
       );
       void kubevirtK8sPatch({
         cluster,
-        data: [
-          {
-            op: hyperConverged?.spec?.dataImportCronTemplates ? 'replace' : 'add',
-            path: `/spec/dataImportCronTemplates`,
-            value: copyBootSources,
-          },
-        ],
-        model: HyperConvergedModel,
+        data: buildHyperConvergedPatch(hyperConverged, {
+          op: getSpecDataImportCronTemplates(hyperConverged) ? 'replace' : 'add',
+          path: getDataImportCronTemplatesPatchPath(hyperConverged),
+          value: copyBootSources,
+        }),
+        model: getHyperConvergedModelFromResource(hyperConverged),
         resource: hyperConverged,
       }).finally(() => setImageLoadingIndex(-1));
     },
@@ -112,7 +115,7 @@ const AutomaticImagesDownload: FC<AutomaticImagesDownloadProps> = ({
         {isEnabledAutomaticImagesDownload && (
           <>
             <Divider />
-            {(bootSources || []).map((bootSource, index) => {
+            {(bootSources ?? []).map((bootSource, index) => {
               const name = getName(bootSource);
               return (
                 <SectionWithSwitch

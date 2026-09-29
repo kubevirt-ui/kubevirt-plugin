@@ -1,9 +1,9 @@
-import { HyperConvergedV1Beta1Model as HyperConvergedModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { K8S_OPS } from '@kubevirt-utils/constants/constants';
 import useHyperConvergeConfiguration, {
   type HyperConverged,
 } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
+import { getHyperConvergedModelFromResource } from '@kubevirt-utils/resources/hyperconverged/model';
 import { getAnnotations } from '@kubevirt-utils/resources/shared';
 import { escapeJsonPointerToken, isEmpty } from '@kubevirt-utils/utils/utils';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
@@ -69,7 +69,7 @@ const useVMTemplateFeatureFlag: UseVMTemplateFeatureFlag = (clusterOverride) => 
       return kubevirtK8sPatch({
         cluster,
         data: patch,
-        model: HyperConvergedModel,
+        model: getHyperConvergedModelFromResource(hyperConvergeConfiguration),
         resource: hyperConvergeConfiguration,
       });
     },

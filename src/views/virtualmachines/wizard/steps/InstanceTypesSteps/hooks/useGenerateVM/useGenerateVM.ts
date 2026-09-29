@@ -10,6 +10,8 @@ import useIsIPv6SingleStackCluster from '@kubevirt-utils/hooks/useIPStackType/us
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
 import { USER_SETTINGS_KEYS } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/const';
 import useRHELAutomaticSubscription from '@kubevirt-utils/hooks/useRHELAutomaticSubscription/useRHELAutomaticSubscription';
+import { ENABLE_MULTI_ARCH_BOOT_IMAGE_IMPORT_FEATURE_GATE } from '@kubevirt-utils/resources/hyperconverged/constants';
+import { isFeatureGateEnabled } from '@kubevirt-utils/resources/hyperconverged/selectors';
 import useProjectDefaultNad from '@kubevirt-utils/resources/namespace/hooks/useProjectDefaultNad';
 import { getLabel } from '@kubevirt-utils/resources/shared';
 import useNamespaceUDN from '@kubevirt-utils/resources/udn/hooks/useNamespaceUDN';
@@ -55,8 +57,10 @@ const useGenerateVM = (): UseGenerateVMResult => {
   });
   const isIPv6SingleStack = useIsIPv6SingleStackCluster(cluster);
   const [hyperConverge] = useHyperConvergeConfiguration();
-  const enableMultiArchBootImageImport =
-    hyperConverge?.spec?.featureGates?.enableMultiArchBootImageImport;
+  const enableMultiArchBootImageImport = isFeatureGateEnabled(
+    hyperConverge,
+    ENABLE_MULTI_ARCH_BOOT_IMAGE_IMPORT_FEATURE_GATE,
+  );
 
   const selectedPreference = getSelectedPreferenceName(selectedBootableVolume, preference);
   const osLabel = getLabel(selectedBootableVolume, KUBEVIRT_OS) ?? preference?.name;

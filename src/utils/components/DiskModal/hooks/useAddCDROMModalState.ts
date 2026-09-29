@@ -12,6 +12,7 @@ import {
 import { useCDIUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
 import useHyperConvergeConfiguration from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { isFeatureGateEnabled } from '@kubevirt-utils/resources/hyperconverged/selectors';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
@@ -32,8 +33,9 @@ const useAddCDROMModalState = (props: V1SubDiskModalProps): UseAddCDROMModalStat
   const isVMRunning = isRunning(vm);
   const [hyperConvergeConfig] = useHyperConvergeConfiguration(getCluster(vm));
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const isDeclarativeHotplugEnabled = Boolean(
-    hyperConvergeConfig?.spec?.featureGates?.[DECLARATIVE_HOTPLUG_VOLUMES_FEATURE_GATE],
+  const isDeclarativeHotplugEnabled = isFeatureGateEnabled(
+    hyperConvergeConfig,
+    DECLARATIVE_HOTPLUG_VOLUMES_FEATURE_GATE,
   );
   const { isoOptions } = useISOOptions(getNamespace(vm));
 

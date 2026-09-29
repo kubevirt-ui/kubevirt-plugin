@@ -10,6 +10,7 @@ import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import useHyperConvergeConfiguration from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getEvictionStrategy as getHCOEvictionStrategy } from '@kubevirt-utils/resources/hyperconverged/selectors';
 import { getTemplateVirtualMachineObject, type Template } from '@kubevirt-utils/resources/template';
 import { Checkbox, FormGroup } from '@patternfly/react-core';
 
@@ -38,8 +39,9 @@ const EvictionStrategyModal: FC<EvictionStrategyModalProps> = ({
   useEffect(() => {
     if (templateEvictionStrategy || hyperLoadingError || !hyperLoaded) return;
 
-    if (hyperConverge?.spec?.evictionStrategy) {
-      setIsChecked(hyperConverge?.spec?.evictionStrategy === EVICTION_STRATEGIES.LiveMigrate);
+    const hcoEvictionStrategy = getHCOEvictionStrategy(hyperConverge);
+    if (hcoEvictionStrategy) {
+      setIsChecked(hcoEvictionStrategy === EVICTION_STRATEGIES.LiveMigrate);
       return;
     }
 

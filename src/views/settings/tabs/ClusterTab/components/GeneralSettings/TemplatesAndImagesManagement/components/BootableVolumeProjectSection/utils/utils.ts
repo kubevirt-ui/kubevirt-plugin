@@ -1,11 +1,16 @@
-import { HyperConvergedV1Beta1Model as HyperConvergedModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { OPENSHIFT_OS_IMAGES_NS } from '@kubevirt-utils/constants/constants';
 import { type HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
+import { getHyperConvergedModelFromResource } from '@kubevirt-utils/resources/hyperconverged/model';
+import {
+  buildHyperConvergedPatch,
+  getCommonBootImageNamespacePatchPath,
+} from '@kubevirt-utils/resources/hyperconverged/patchUtils';
+import { getCommonBootImageNamespace } from '@kubevirt-utils/resources/hyperconverged/selectors';
 import { getErrorMessage } from '@kubevirt-utils/utils/utils';
 import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
 
 export const getCurrentBootableVolumesNamespaceFromHCO = (hyperConverged: HyperConverged): string =>
-  hyperConverged?.spec?.commonBootImageNamespace ?? OPENSHIFT_OS_IMAGES_NS;
+  getCommonBootImageNamespace(hyperConverged) ?? OPENSHIFT_OS_IMAGES_NS;
 
 export const updateHCOBootableVolumesNamespace = async (
   hyperConverged: HyperConverged,
@@ -20,14 +25,12 @@ export const updateHCOBootableVolumesNamespace = async (
     try {
       await kubevirtK8sPatch<HyperConverged>({
         cluster,
-        data: [
-          {
-            op: 'replace',
-            path: `/spec/commonBootImageNamespace`,
-            value: newNamespace === OPENSHIFT_OS_IMAGES_NS ? null : newNamespace,
-          },
-        ],
-        model: HyperConvergedModel,
+        data: buildHyperConvergedPatch(hyperConverged, {
+          op: 'replace',
+          path: getCommonBootImageNamespacePatchPath(hyperConverged),
+          value: newNamespace === OPENSHIFT_OS_IMAGES_NS ? null : newNamespace,
+        }),
+        model: getHyperConvergedModelFromResource(hyperConverged),
         resource: hyperConverged,
       });
     } catch (error: unknown) {

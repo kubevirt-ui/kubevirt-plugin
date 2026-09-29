@@ -1,6 +1,11 @@
-import { HyperConvergedV1Beta1Model as HyperConvergedModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { type HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { TemplateModel, type V1Template } from '@kubevirt-utils/models';
+import { getHyperConvergedModelFromResource } from '@kubevirt-utils/resources/hyperconverged/model';
+import {
+  buildHyperConvergedPatch,
+  getCommonTemplatesNamespacePatchPath,
+} from '@kubevirt-utils/resources/hyperconverged/patchUtils';
+import { getCommonTemplatesNamespace } from '@kubevirt-utils/resources/hyperconverged/selectors';
 import { type TemplateList } from '@kubevirt-utils/resources/template/utils/types';
 import { getErrorMessage } from '@kubevirt-utils/utils/utils';
 import { kubevirtK8sDelete, kubevirtK8sGet, kubevirtK8sPatch } from '@multicluster/k8sRequests';
@@ -11,7 +16,7 @@ const BASE = 'base';
 export const OPENSHIFT = 'openshift';
 
 export const getCurrentTemplatesNamespaceFromHCO = (hyperConverged: HyperConverged): string =>
-  hyperConverged?.spec?.commonTemplatesNamespace ?? OPENSHIFT;
+  getCommonTemplatesNamespace(hyperConverged) ?? OPENSHIFT;
 
 export const updateHCOCommonTemplatesNamespace = async (
   hyperConverged: HyperConverged,
@@ -26,14 +31,12 @@ export const updateHCOCommonTemplatesNamespace = async (
     try {
       await kubevirtK8sPatch<HyperConverged>({
         cluster,
-        data: [
-          {
-            op: 'replace',
-            path: `/spec/commonTemplatesNamespace`,
-            value: newNamespace === OPENSHIFT ? null : newNamespace,
-          },
-        ],
-        model: HyperConvergedModel,
+        data: buildHyperConvergedPatch(hyperConverged, {
+          op: 'replace',
+          path: getCommonTemplatesNamespacePatchPath(hyperConverged),
+          value: newNamespace === OPENSHIFT ? null : newNamespace,
+        }),
+        model: getHyperConvergedModelFromResource(hyperConverged),
         resource: hyperConverged,
       });
 

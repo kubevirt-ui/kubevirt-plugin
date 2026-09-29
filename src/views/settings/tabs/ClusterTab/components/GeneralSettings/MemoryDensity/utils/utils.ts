@@ -1,7 +1,12 @@
 import type { TFunction } from 'i18next';
 
-import { HyperConvergedV1Beta1Model as HyperConvergedModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import type { HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
+import { getHyperConvergedModelFromResource } from '@kubevirt-utils/resources/hyperconverged/model';
+import {
+  buildHyperConvergedPatch,
+  getMemoryOvercommitPatchPath,
+} from '@kubevirt-utils/resources/hyperconverged/patchUtils';
+import { getMemoryOvercommitPercentage } from '@kubevirt-utils/resources/hyperconverged/selectors';
 import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
 
 import {
@@ -74,21 +79,17 @@ export const updateMemoryOvercommit = async (
 
   await kubevirtK8sPatch({
     cluster,
-    data: [
-      {
-        op: 'add',
-        path: `/spec/higherWorkloadDensity/memoryOvercommitPercentage`,
-        value: displayToApiValue(displayValue),
-      },
-    ],
-    model: HyperConvergedModel,
+    data: buildHyperConvergedPatch(hyperConverge, {
+      op: 'add',
+      path: getMemoryOvercommitPatchPath(hyperConverge),
+      value: displayToApiValue(displayValue),
+    }),
+    model: getHyperConvergedModelFromResource(hyperConverge),
     resource: hyperConverge,
   });
 };
 
 export const getCurrentOvercommit = (hyperConverge: HyperConverged): number => {
-  const apiValue =
-    hyperConverge?.spec?.higherWorkloadDensity?.memoryOvercommitPercentage ??
-    MEMORY_OVERCOMMIT_STARTING_VALUE;
+  const apiValue = getMemoryOvercommitPercentage(hyperConverge) ?? MEMORY_OVERCOMMIT_STARTING_VALUE;
   return apiValueToDisplay(apiValue);
 };

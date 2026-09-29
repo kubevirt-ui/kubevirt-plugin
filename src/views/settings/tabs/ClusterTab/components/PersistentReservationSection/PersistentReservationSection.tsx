@@ -1,6 +1,5 @@
 import { type FC, useState } from 'react';
 
-import { HyperConvergedV1Beta1Model as HyperConvergedModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import SectionWithSwitch from '@kubevirt-utils/components/SectionWithSwitch/SectionWithSwitch';
 import {
   FEATURE_HCO_PERSISTENT_RESERVATION,
@@ -9,6 +8,9 @@ import {
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { type HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { buildFeatureGatePatches } from '@kubevirt-utils/resources/hyperconverged/featureGates';
+import { getHyperConvergedModelFromResource } from '@kubevirt-utils/resources/hyperconverged/model';
+import { isFeatureGateEnabled } from '@kubevirt-utils/resources/hyperconverged/selectors';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
 import { Alert, AlertVariant } from '@patternfly/react-core';
@@ -26,9 +28,7 @@ const PersistentReservationSection: FC<PersistentReservationSectionProps> = ({
   const { t } = useKubevirtTranslation();
   const cluster = useSettingsCluster();
   const [hyperConverge, hyperLoaded] = hyperConvergeConfiguration;
-  const persistentReservation = Boolean(
-    hyperConverge?.spec?.featureGates?.[FEATURE_PERSISTENT_RESERVATION],
-  );
+  const persistentReservation = isFeatureGateEnabled(hyperConverge, FEATURE_PERSISTENT_RESERVATION);
 
   const [error, setError] = useState<string>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -38,20 +38,11 @@ const PersistentReservationSection: FC<PersistentReservationSectionProps> = ({
     if (!hyperConverge) return;
     setError(null);
     setIsLoading(true);
-    const featureGates = hyperConverge.spec?.featureGates;
-    const hasGate = featureGates?.hasOwnProperty(FEATURE_PERSISTENT_RESERVATION);
     try {
       await kubevirtK8sPatch<HyperConverged>({
         cluster,
-        data: [
-          ...(!featureGates ? [{ op: 'add' as const, path: '/spec/featureGates', value: {} }] : []),
-          {
-            op: hasGate ? 'replace' : 'add',
-            path: `/spec/featureGates/${FEATURE_PERSISTENT_RESERVATION}`,
-            value: checked,
-          },
-        ],
-        model: HyperConvergedModel,
+        data: buildFeatureGatePatches(hyperConverge, FEATURE_PERSISTENT_RESERVATION, checked),
+        model: getHyperConvergedModelFromResource(hyperConverge),
         resource: hyperConverge,
       });
 

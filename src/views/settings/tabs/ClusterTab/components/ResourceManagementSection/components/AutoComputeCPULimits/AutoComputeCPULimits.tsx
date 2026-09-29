@@ -3,6 +3,7 @@ import { type FC, useEffect, useState } from 'react';
 import SectionWithSwitch from '@kubevirt-utils/components/SectionWithSwitch/SectionWithSwitch';
 import { type HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { isFeatureGateEnabled } from '@kubevirt-utils/resources/hyperconverged/selectors';
 import { Alert, AlertVariant } from '@patternfly/react-core';
 import { useSettingsCluster } from '@settings/context/SettingsClusterContext';
 
@@ -20,26 +21,22 @@ const AutoComputeCPULimits: FC<AutoComputeCPULimitsProps> = ({
   const { t } = useKubevirtTranslation();
   const cluster = useSettingsCluster();
   const [hco, hcoLoaded] = hyperConvergeConfiguration;
-  const featureGates = hco?.spec?.featureGates;
+  const featureEnabled = isFeatureGateEnabled(hco, AUTO_RESOURCE_LIMITS_FEATURE_GATE);
 
-  const [featureEnabled, setFeatureEnabled] = useState<boolean>(
-    Boolean(featureGates?.[AUTO_RESOURCE_LIMITS_FEATURE_GATE]),
-  );
+  const [isFeatureEnabled, setIsFeatureEnabled] = useState<boolean>(featureEnabled);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>();
 
   useEffect(() => {
     setError(undefined);
-    setFeatureEnabled(
-      hcoLoaded ? Boolean(featureGates?.[AUTO_RESOURCE_LIMITS_FEATURE_GATE]) : false,
-    );
-  }, [cluster, featureGates, hcoLoaded]);
+    setIsFeatureEnabled(hcoLoaded ? featureEnabled : false);
+  }, [cluster, featureEnabled, hcoLoaded]);
 
   const onFeatureChange = (switchOn: boolean): void => {
     setError(undefined);
     setIsLoading(true);
     updateAutoResourceLimitsFeatureGate(hco, switchOn, cluster)
-      .then(() => setFeatureEnabled(switchOn))
+      .then(() => setIsFeatureEnabled(switchOn))
       .catch((err) => setError(err.message))
       .finally(() => setIsLoading(false));
   };
@@ -51,7 +48,7 @@ const AutoComputeCPULimits: FC<AutoComputeCPULimitsProps> = ({
         isDisabled={!hcoLoaded}
         isLoading={isLoading}
         newBadge={newBadge}
-        switchIsOn={featureEnabled}
+        switchIsOn={isFeatureEnabled}
         title={t('Auto-compute CPU and memory limits')}
         turnOnSwitch={onFeatureChange}
       />

@@ -10,6 +10,7 @@ import ModalPendingChangesAlert from '@kubevirt-utils/components/PendingChanges/
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import useHyperConvergeConfiguration from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getEvictionStrategy as getHCOEvictionStrategy } from '@kubevirt-utils/resources/hyperconverged/selectors';
 import { getEvictionStrategy } from '@kubevirt-utils/resources/vm';
 import { ensurePath } from '@kubevirt-utils/utils/utils';
 import { Checkbox, FormGroup } from '@patternfly/react-core';
@@ -46,8 +47,9 @@ const EvictionStrategyModal: FC<EvictionStrategyModalProps> = ({
       return;
     }
 
-    if (hyperConverge?.spec?.evictionStrategy) {
-      setIsChecked(hyperConverge?.spec?.evictionStrategy === EVICTION_STRATEGIES.LiveMigrate);
+    const hcoEvictionStrategy = getHCOEvictionStrategy(hyperConverge);
+    if (hcoEvictionStrategy) {
+      setIsChecked(hcoEvictionStrategy === EVICTION_STRATEGIES.LiveMigrate);
       return;
     }
   }, [hyperConverge, hyperLoaded, hyperLoadingError, vm]);

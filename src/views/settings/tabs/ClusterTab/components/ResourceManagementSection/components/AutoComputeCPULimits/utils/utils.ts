@@ -1,6 +1,6 @@
-import { HyperConvergedV1Beta1Model as HyperConvergedModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { K8S_OPS } from '@kubevirt-utils/constants/constants';
 import { type HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
+import { buildFeatureGatePatches } from '@kubevirt-utils/resources/hyperconverged/featureGates';
+import { getHyperConvergedModelFromResource } from '@kubevirt-utils/resources/hyperconverged/model';
 import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
 
 import { AUTO_RESOURCE_LIMITS_FEATURE_GATE } from './constants';
@@ -12,13 +12,7 @@ export const updateAutoResourceLimitsFeatureGate = (
 ): Promise<HyperConverged> =>
   kubevirtK8sPatch<HyperConverged>({
     cluster,
-    data: [
-      {
-        op: K8S_OPS.REPLACE,
-        path: `/spec/featureGates/${AUTO_RESOURCE_LIMITS_FEATURE_GATE}`,
-        value: switchState,
-      },
-    ],
-    model: HyperConvergedModel,
+    data: buildFeatureGatePatches(hcoCR, AUTO_RESOURCE_LIMITS_FEATURE_GATE, switchState),
+    model: getHyperConvergedModelFromResource(hcoCR),
     resource: hcoCR,
   });

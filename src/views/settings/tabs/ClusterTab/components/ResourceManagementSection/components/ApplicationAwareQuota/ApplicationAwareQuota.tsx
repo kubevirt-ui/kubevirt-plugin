@@ -1,10 +1,10 @@
 import { type FC, useEffect, useMemo, useState } from 'react';
 import { getQuotaListURL } from 'src/views/quotas/utils/url';
 
-import { HyperConvergedV1Beta1Model as HyperConvergedModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import SectionWithSwitch from '@kubevirt-utils/components/SectionWithSwitch/SectionWithSwitch';
 import { type HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getHyperConvergedModelFromResource } from '@kubevirt-utils/resources/hyperconverged/model';
 import { getAAQCalculationMethod } from '@kubevirt-utils/resources/hyperconverged/selectors';
 import { isAAQEnabled } from '@kubevirt-utils/resources/hyperconverged/utils';
 import { CalculationMethod } from '@kubevirt-utils/resources/quotas/types';
@@ -61,7 +61,7 @@ const ApplicationAwareQuota: FC<ApplicationAwareQuotaProps> = ({
           },
         },
       ],
-      model: HyperConvergedModel,
+      model: getHyperConvergedModelFromResource(hyperConverge),
       resource: hyperConverge,
     })
       .then(() => setIsEnabled(checked))

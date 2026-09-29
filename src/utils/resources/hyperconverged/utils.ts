@@ -1,5 +1,3 @@
-import type { HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
+import { isAAQEnabled } from './selectors';
 
-export const isAAQEnabled = (hyperConverge: HyperConverged): boolean => {
-  return Boolean(hyperConverge?.spec?.enableApplicationAwareQuota);
-};
+export { isAAQEnabled };
