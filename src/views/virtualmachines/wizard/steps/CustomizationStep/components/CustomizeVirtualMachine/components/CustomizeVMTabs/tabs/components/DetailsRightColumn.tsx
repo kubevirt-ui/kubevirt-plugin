@@ -8,7 +8,7 @@ import { getDevices } from '@kubevirt-utils/resources/vm';
 import { DescriptionList, GridItem } from '@patternfly/react-core';
 import DetailsSectionBoot from '@virtualmachines/details/tabs/configuration/details/components/DetailsSectionBoot';
 import DetailsSectionHardware from '@virtualmachines/details/tabs/configuration/details/components/DetailsSectionHardware';
-import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
+import { useVMWizardForm } from '@virtualmachines/wizard/form/VMWizardFormProvider';
 import { patchWizardCustomizedVM } from '@virtualmachines/wizard/utils/patchWizardCustomizedVM';
 
 type DetailsRightColumnProps = {
@@ -17,8 +17,8 @@ type DetailsRightColumnProps = {
 };
 
 const DetailsRightColumn: FC<DetailsRightColumnProps> = ({ canUpdateVM, preferredBootmode }) => {
-  const { getValues, setValue } = useVMWizard();
-  const { control } = useVMWizard();
+  const { getValues, setValue } = useVMWizardForm();
+  const { control } = useVMWizardForm();
   const vm = useWatch({ control, name: 'customization.vmDraft' });
 
   return (

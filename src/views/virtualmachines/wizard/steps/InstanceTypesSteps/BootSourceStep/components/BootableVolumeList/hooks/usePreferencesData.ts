@@ -12,7 +12,7 @@ import {
   type NamespacedResourceMap,
   type ResourceMap,
 } from '@kubevirt-utils/resources/shared';
-import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
+import { useVMWizardForm } from '@virtualmachines/wizard/form/VMWizardFormProvider';
 
 type UsePreferencesData = (
   volumeListNamespace: string,
@@ -25,7 +25,7 @@ type UsePreferencesData = (
 };
 
 const usePreferencesData: UsePreferencesData = (volumeListNamespace, preferencesData) => {
-  const { control } = useVMWizard();
+  const { control } = useVMWizardForm();
   const cluster = useWatch({ control, name: 'deployment.cluster' });
   const namespace =
     volumeListNamespace === ALL_PROJECTS ? ALL_NAMESPACES_SESSION_KEY : volumeListNamespace;

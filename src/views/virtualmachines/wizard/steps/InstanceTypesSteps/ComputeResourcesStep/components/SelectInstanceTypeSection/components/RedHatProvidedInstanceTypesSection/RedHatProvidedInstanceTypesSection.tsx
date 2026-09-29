@@ -3,7 +3,7 @@ import { useWatch } from 'react-hook-form';
 
 import type { RedHatInstanceTypeMetadata } from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/InstanceTypeDrilldownSelect/utils/types';
 import { Stack, StackItem } from '@patternfly/react-core';
-import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
+import { useVMWizardForm } from '@virtualmachines/wizard/form/VMWizardFormProvider';
 import InstanceTypeSizeMenu from '@virtualmachines/wizard/steps/InstanceTypesSteps/ComputeResourcesStep/components/SelectInstanceTypeSection/components/RedHatProvidedInstanceTypesSection/components/InstanceTypeSizeMenu/InstanceTypeSizeMenu';
 import RedHatInstanceTypeSeriesGallery from '@virtualmachines/wizard/steps/InstanceTypesSteps/ComputeResourcesStep/components/SelectInstanceTypeSection/components/RedHatProvidedInstanceTypesSection/components/RedHatInstanceTypeSeriesGallery/RedHatInstanceTypeSeriesGallery';
 
@@ -14,7 +14,7 @@ type RedHatProvidedInstanceTypesSectionProps = {
 const RedHatProvidedInstanceTypesSection: FC<RedHatProvidedInstanceTypesSectionProps> = ({
   redHatMenuItems,
 }) => {
-  const { control } = useVMWizard();
+  const { control } = useVMWizardForm();
   const selectedSeries = useWatch({ control, name: 'instanceType.compute.series' });
 
   const sizes = redHatMenuItems?.items?.find((item) => item?.seriesName === selectedSeries)?.sizes;

@@ -13,7 +13,7 @@ import {
   useVMTemplateSource,
 } from '@kubevirt-utils/resources/template';
 import { useOpenShiftTemplates } from '@templates/list/hooks/useOpenShiftTemplates';
-import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
+import { useVMWizardForm } from '@virtualmachines/wizard/form/VMWizardFormProvider';
 import useVMTemplateGeneratedParams from '@virtualmachines/wizard/steps/TemplateStep/hooks/useVMTemplateGeneratedParams';
 import { buildOSDisplayNameMap } from '@virtualmachines/wizard/steps/TemplateStep/utils/buildOSDisplayNameMap';
 import { getTemplateClusterPreference } from '@virtualmachines/wizard/steps/TemplateStep/utils/getTemplateClusterPreference';
@@ -35,7 +35,7 @@ type DrawerContextProviderProps = {
 
 const useDrawer = (initialTemplate: Template): DrawerContext => {
   const [template, setTemplate] = useImmer(initialTemplate);
-  const { control } = useVMWizard();
+  const { control } = useVMWizardForm();
   const cluster = useWatch({ control, name: 'deployment.cluster' });
   const [templateWithGeneratedParams, loading, error] =
     useVMTemplateGeneratedParams(initialTemplate);

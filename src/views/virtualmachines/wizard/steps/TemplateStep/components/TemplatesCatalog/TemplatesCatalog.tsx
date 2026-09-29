@@ -7,8 +7,8 @@ import { logTemplateFlowEvent, TEMPLATE_SELECTED } from '@kubevirt-utils/extensi
 import { type Template } from '@kubevirt-utils/resources/template';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Card, Split, SplitItem } from '@patternfly/react-core';
+import { useVMWizardForm } from '@virtualmachines/wizard/form/VMWizardFormProvider';
 import { useVMWizardState } from '@virtualmachines/wizard/state/useVMWizardState';
-import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
 import TemplatesCatalogEmptyState from '@virtualmachines/wizard/steps/TemplateStep/components/TemplatesCatalog/components/TemplatesCatalogEmptyState';
 import TemplatesCatalogItems from '@virtualmachines/wizard/steps/TemplateStep/components/TemplatesCatalog/components/TemplatesCatalogItems/TemplatesCatalogItems';
 import CatalogSkeleton from '@virtualmachines/wizard/steps/TemplateStep/components/TemplatesCatalog/components/TemplatesCatalogSkeleton';
@@ -37,7 +37,7 @@ const TemplatesCatalog: FC = () => {
     setNamespace,
   } = useTemplatesCatalog();
 
-  const { control, setValue } = useVMWizard();
+  const { control, setValue } = useVMWizardForm();
   const { setIsTemplateDrawerOpen, setTemplateProcessError } = useVMWizardState();
   const selectedTemplate = useWatch({
     control,
@@ -46,7 +46,8 @@ const TemplatesCatalog: FC = () => {
 
   const handleTemplateSelect = useCallback(
     (template: Template) => {
-      setValue('template.selectedTemplate', template);
+      const options = { shouldValidate: true } as const;
+      setValue('template.selectedTemplate', template, options);
       setTemplateProcessError(null);
       setValue('template.lastProcessedKey', '');
       logTemplateFlowEvent(TEMPLATE_SELECTED, template);

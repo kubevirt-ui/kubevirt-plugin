@@ -7,7 +7,7 @@ import { ALL_PROJECTS } from '@kubevirt-utils/hooks/constants';
 import { getName } from '@kubevirt-utils/resources/shared';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 import { type K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
-import { type VMWizardFormValues } from '@virtualmachines/wizard/state/vm-wizard-form/types';
+import { type VMWizardFormValues } from '@virtualmachines/wizard/form/types';
 
 import './TemplatesCatalogProjectsDropdown.scss';
 

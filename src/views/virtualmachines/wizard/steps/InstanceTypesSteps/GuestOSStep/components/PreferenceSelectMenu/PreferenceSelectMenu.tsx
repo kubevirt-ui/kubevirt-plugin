@@ -7,7 +7,7 @@ import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { FormGroup, SelectOption } from '@patternfly/react-core';
-import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
+import { useVMWizardForm } from '@virtualmachines/wizard/form/VMWizardFormProvider';
 import usePreferenceSelectOptions from '@virtualmachines/wizard/steps/InstanceTypesSteps/GuestOSStep/components/PreferenceSelectMenu/hooks/usePreferenceSelectOptions/usePreferenceSelectOptions';
 import { resetBootableVolumeFields } from '@virtualmachines/wizard/utils/utils';
 
@@ -15,7 +15,7 @@ import './PreferenceSelectMenu.scss';
 
 const PreferenceSelectMenu: FC = () => {
   const { t } = useKubevirtTranslation();
-  const { control, getValues, setValue } = useVMWizard();
+  const { control, setValue } = useVMWizardForm();
   const [cluster, project, operatingSystemType] = useWatch({
     control,
     name: ['deployment.cluster', 'deployment.project', 'instanceType.operatingSystem'],
@@ -56,7 +56,7 @@ const PreferenceSelectMenu: FC = () => {
                 isDisabled={noPreferences}
                 onSelect={(_event, selectedValue) => {
                   onChange(selectedValue as PreferenceOption);
-                  resetBootableVolumeFields(getValues, setValue);
+                  resetBootableVolumeFields(setValue);
                 }}
                 placeholder={placeholderText}
                 selected={(value?.name as string) || ''}

@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
+import { useVMWizardForm } from '@virtualmachines/wizard/form/VMWizardFormProvider';
 import { patchWizardCustomizedVM } from '@virtualmachines/wizard/utils/patchWizardCustomizedVM';
 
 type UseUpdateCustomizeInstanceTypeTabReturn = {
@@ -9,7 +9,7 @@ type UseUpdateCustomizeInstanceTypeTabReturn = {
 };
 
 const useUpdateCustomizeInstanceTypeTab = (): UseUpdateCustomizeInstanceTypeTabReturn => {
-  const { getValues, setValue } = useVMWizard();
+  const { getValues, setValue } = useVMWizardForm();
   const updateVMFromForm = useCallback(
     (updatedVM: V1VirtualMachine): Promise<V1VirtualMachine> => {
       const replacePatch = [{ data: updatedVM }];

@@ -9,7 +9,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm';
 import useIsACMPage from '@multicluster/useIsACMPage';
 import { ButtonVariant } from '@patternfly/react-core';
-import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
+import { useVMWizardForm } from '@virtualmachines/wizard/form/VMWizardFormProvider';
 
 import './VMCreationLocationDisplay.scss';
 
@@ -28,7 +28,7 @@ const VMCreationLocationDisplay: FC<VMCreationLocationDisplayProps> = ({
   const { featureEnabled: treeViewFoldersEnabled, loading: treeViewFoldersLoading } =
     useFeatures(TREE_VIEW_FOLDERS);
 
-  const { control } = useVMWizard();
+  const { control } = useVMWizardForm();
   const [cluster, folder, project] = useWatch({
     control,
     name: ['deployment.cluster', 'deployment.folder', 'deployment.project'],

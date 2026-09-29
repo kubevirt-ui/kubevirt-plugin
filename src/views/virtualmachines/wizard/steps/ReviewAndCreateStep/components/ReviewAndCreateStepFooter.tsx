@@ -10,21 +10,22 @@ import {
   ActionListItem,
   Button,
   Stack,
-  useWizardContext,
   WizardFooterWrapper,
 } from '@patternfly/react-core';
 import VMNameConfirmationNextButton from '@virtualmachines/wizard/components/VMNameConfirmationNextButton';
+import { useVMWizardForm } from '@virtualmachines/wizard/form/VMWizardFormProvider';
 import useCloseWizard from '@virtualmachines/wizard/hooks/useCloseWizard';
 import useCreateVM from '@virtualmachines/wizard/hooks/useCreateVM';
-import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
+import useWizardFooterNavigation from '@virtualmachines/wizard/hooks/useWizardFooterNavigation';
+import { type WizardStepNavItemConfig } from '@virtualmachines/wizard/utils/types';
 import { isCloneCreationMethod } from '@virtualmachines/wizard/utils/utils';
 
 import { getCreateButtonText } from '../utils/utils';
 
-const ReviewAndCreateStepFooter: FC = () => {
+const ReviewAndCreateStepFooter: FC<{ navigation: WizardStepNavItemConfig }> = ({ navigation }) => {
   const { t } = useKubevirtTranslation();
-  const { goToPrevStep } = useWizardContext();
-  const { control } = useVMWizard();
+  const { isBackDisabled, onBack } = useWizardFooterNavigation(navigation);
+  const { control } = useVMWizardForm();
   const creationMethod = useWatch({ control, name: 'creationMethod' });
   const isCloneMethod = isCloneCreationMethod(creationMethod);
   const { createVM, error, isSubmitting } = useCreateVM();
@@ -40,7 +41,12 @@ const ReviewAndCreateStepFooter: FC = () => {
         <ActionList>
           <ActionListGroup>
             <ActionListItem>
-              <Button data-test="wizard-back-button" onClick={goToPrevStep} variant="secondary">
+              <Button
+                data-test="wizard-back-button"
+                isDisabled={isBackDisabled}
+                onClick={onBack}
+                variant="secondary"
+              >
                 {backButtonText}
               </Button>
             </ActionListItem>

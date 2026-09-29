@@ -1,7 +1,7 @@
 import { type UseFormGetValues } from 'react-hook-form';
 
 import { type AutoAppliedLabel } from '@kubevirt-utils/hooks/useAutoAppliedLabels/types';
-import { type VMWizardFormValues } from '@virtualmachines/wizard/state/vm-wizard-form/types';
+import { type VMWizardFormValues } from '@virtualmachines/wizard/form/types';
 
 export type GetMergedMetadataLabelsArgs = {
   adminLabels: AutoAppliedLabel[];

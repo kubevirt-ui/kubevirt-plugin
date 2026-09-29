@@ -19,7 +19,7 @@ import type { NamespacedResourceMap, ResourceMap } from '@kubevirt-utils/resourc
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import type { ColumnLayout } from '@openshift-console/dynamic-plugin-sdk';
 import type { ThSortType } from '@patternfly/react-table/dist/esm/components/Table/base/types';
-import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
+import { useVMWizardForm } from '@virtualmachines/wizard/form/VMWizardFormProvider';
 import useBootVolumeColumns from '@virtualmachines/wizard/steps/InstanceTypesSteps/BootSourceStep/components/BootableVolumeList/hooks/useBootVolumeColumns';
 import useBootVolumeSortColumns from '@virtualmachines/wizard/steps/InstanceTypesSteps/BootSourceStep/components/BootableVolumeList/hooks/useBootVolumeSortColumns';
 import { paginationInitialStateForm } from '@virtualmachines/wizard/steps/InstanceTypesSteps/BootSourceStep/components/BootableVolumeList/utils/constants';
@@ -63,12 +63,14 @@ const useBootableVolumesTableData: UseBootableVolumesTableData = (
   preferencesMap,
   userPreferencesMap,
 ) => {
-  const { control } = useVMWizard();
+  const { control } = useVMWizardForm();
   const { t } = useKubevirtTranslation();
+
   const preference = useWatch({
     control,
     name: 'instanceType.preference',
   });
+
   const preferenceName = preference?.name;
 
   const { bootableVolumes, dvSources, pvcSources, volumeSnapshotSources } = bootableVolumesData;

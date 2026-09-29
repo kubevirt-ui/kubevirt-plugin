@@ -18,14 +18,9 @@ import RequiredVMLabelsDrawerBody from './RequiredVMLabelsDrawerBody';
 type RequiredVMLabelsDrawerProps = {
   onClose: () => void;
   requiredLabels: AutoAppliedLabel[];
-  vmLabels: Record<string, string>;
 };
 
-const RequiredVMLabelsDrawer: FC<RequiredVMLabelsDrawerProps> = ({
-  onClose,
-  requiredLabels,
-  vmLabels,
-}) => {
+const RequiredVMLabelsDrawer: FC<RequiredVMLabelsDrawerProps> = ({ onClose, requiredLabels }) => {
   const { t } = useKubevirtTranslation();
 
   return (
@@ -43,7 +38,7 @@ const RequiredVMLabelsDrawer: FC<RequiredVMLabelsDrawerProps> = ({
         </DrawerActions>
       </DrawerHead>
       <DrawerPanelBody>
-        <RequiredVMLabelsDrawerBody requiredLabels={requiredLabels} vmLabels={vmLabels} />
+        <RequiredVMLabelsDrawerBody requiredLabels={requiredLabels} />
       </DrawerPanelBody>
     </DrawerPanelContent>
   );

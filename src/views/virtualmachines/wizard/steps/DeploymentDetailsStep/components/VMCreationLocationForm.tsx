@@ -12,7 +12,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import useIsACMPage from '@multicluster/useIsACMPage';
 import { Form, FormGroup } from '@patternfly/react-core';
 import { useHubClusterName } from '@stolostron/multicluster-sdk';
-import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
+import { useVMWizardForm } from '@virtualmachines/wizard/form/VMWizardFormProvider';
 
 import './VMCreationLocationForm.scss';
 
@@ -24,7 +24,7 @@ const VMCreationLocationForm: FC = () => {
   const { featureEnabled: treeViewFoldersEnabled, loading: treeViewFoldersLoading } =
     useFeatures(TREE_VIEW_FOLDERS);
 
-  const { control, setValue } = useVMWizard();
+  const { control, setValue } = useVMWizardForm();
   const [cluster, folder, project] = useWatch({
     control,
     name: ['deployment.cluster', 'deployment.folder', 'deployment.project'],
@@ -46,7 +46,7 @@ const VMCreationLocationForm: FC = () => {
                   field.onChange(selectedCluster);
                   setValue('deployment.folder', '');
                   if (selectedCluster !== cluster) setValue('deployment.project', '');
-                  setValue('customization.vmDraft', null);
+                  setValue('customization.vmDraft', null, { shouldValidate: true });
                 }}
                 selectedCluster={value as string}
               />
@@ -67,7 +67,7 @@ const VMCreationLocationForm: FC = () => {
               onChange={(selectedProject) => {
                 field.onChange(selectedProject);
                 setValue('deployment.folder', '');
-                setValue('customization.vmDraft', null);
+                setValue('customization.vmDraft', null, { shouldValidate: true });
               }}
               selectedProject={project || DEFAULT_NAMESPACE}
             />

@@ -4,10 +4,10 @@ import { Controller } from 'react-hook-form';
 import { Button, InputGroup, InputGroupItem, TextInput } from '@patternfly/react-core';
 import { SyncAltIcon } from '@patternfly/react-icons';
 
-import { useVMWizard } from '../state/vm-wizard-context/VMWizardContext';
+import { useVMWizardForm } from '../form/VMWizardFormProvider';
 
 const DescriptionInput: FC = () => {
-  const { control } = useVMWizard();
+  const { control } = useVMWizardForm();
 
   return (
     <InputGroup>
