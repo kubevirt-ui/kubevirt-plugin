@@ -34,6 +34,7 @@ import { isHotplugVolume } from './utils/helpers';
 
 type DiskRowActionsProps = {
   customize?: boolean;
+  getCurrentVM?: () => null | undefined | V1VirtualMachine;
   obj: DiskRowDataLayout;
   onDiskUpdate?: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine>;
   vm: V1VirtualMachine;
@@ -42,6 +43,7 @@ type DiskRowActionsProps = {
 
 const DiskRowActions: FC<DiskRowActionsProps> = ({
   customize = false,
+  getCurrentVM,
   obj,
   onDiskUpdate,
   vm,
@@ -106,6 +108,7 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({
           openCDROMModal(createModal, {
             diskName,
             diskSource,
+            getCurrentVM,
             isCDROMMountedState,
             onDiskSubmit,
             vm,

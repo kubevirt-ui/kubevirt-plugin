@@ -1,5 +1,10 @@
 import { cancelAllWizardPendingUploads } from '@kubevirt-utils/hooks/useUploadProgressToast';
 import { setCustomizeWizardVMSignal } from '@kubevirt-utils/signals/customizeWizardVMSignal';
+import {
+  addWizardBootableVolumeUploadKey,
+  clearWizardBootableVolumeUploadKeys,
+  getWizardBootableVolumeUploadKeys,
+} from '@kubevirt-utils/signals/wizardBootableVolumeKeysSignal';
 
 import { clearVMPendingUploadsAndSignal } from './utils';
 
@@ -14,6 +19,7 @@ jest.mock('@kubevirt-utils/signals/customizeWizardVMSignal', () => ({
 describe('clearVMPendingUploadsAndSignal', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    clearWizardBootableVolumeUploadKeys();
   });
 
   it('cancels wizard pending uploads before clearing the signal', () => {
@@ -34,10 +40,13 @@ describe('clearVMPendingUploadsAndSignal', () => {
     expect(setCustomizeWizardVMSignal).toHaveBeenCalledWith(null);
   });
 
-  it('cancels pending wizard uploads', () => {
-    clearVMPendingUploadsAndSignal();
+  it('cancels uploads for the explicit form draft and clears tracked boot uploads', () => {
+    const vm = { metadata: { name: 'draft', namespace: 'test' }, spec: { template: {} } };
+    addWizardBootableVolumeUploadKey('boot-upload');
+    clearVMPendingUploadsAndSignal(vm);
 
     expect(cancelAllWizardPendingUploads).toHaveBeenCalledTimes(1);
-    expect(cancelAllWizardPendingUploads).toHaveBeenCalledWith();
+    expect(cancelAllWizardPendingUploads).toHaveBeenCalledWith(vm, ['boot-upload']);
+    expect(getWizardBootableVolumeUploadKeys()).toEqual([]);
   });
 });

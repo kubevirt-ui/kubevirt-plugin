@@ -30,6 +30,7 @@ const CustomizeInstanceTypeStorageTab: FC = () => {
         <PageSection>
           <DiskList
             customize
+            getCurrentVM={() => getValues(CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM)}
             onDiskUpdate={(updatedVM: V1VirtualMachine) => {
               const diskPatches = [
                 {
