@@ -4,6 +4,7 @@ import { TemplateModel, type V1Template } from '@kubevirt-ui-ext/kubevirt-api/co
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
+import VMTemplateLink from '@kubevirt-utils/components/VMTemplateLink/VMTemplateLink';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getLabel } from '@kubevirt-utils/resources/shared';
 import {
@@ -14,8 +15,6 @@ import {
   getGroupVersionKindForModel,
   useK8sWatchResource,
 } from '@openshift-console/dynamic-plugin-sdk';
-
-import VMTemplateLink from './VMTemplateLink';
 
 import '../../../../TopologyVMDetailsPanel.scss';
 

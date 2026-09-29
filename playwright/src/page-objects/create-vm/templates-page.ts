@@ -632,7 +632,7 @@ export default class TemplatesPage extends PageCommons {
    * @deprecated Use navigateToTemplatesViaUI() for more reliable navigation
    */
   async navigateToAllNamespacesTemplates() {
-    await this.goTo('/k8s/all-namespaces/templates');
+    await this.goTo('/k8s/all-namespaces/vm-templates');
     await this.page.waitForLoadState('domcontentloaded');
   }
 
@@ -646,7 +646,7 @@ export default class TemplatesPage extends PageCommons {
   }
 
   async navigateToProjectTemplates(projectName: string) {
-    await this.goTo(`/k8s/ns/${projectName}/templates`);
+    await this.goTo(`/k8s/ns/${projectName}/vm-templates`);
   }
 
   async navigateToTemplateDetail(templateName: string) {
@@ -989,7 +989,7 @@ export default class TemplatesPage extends PageCommons {
         { timeout: TestTimeouts.ELEMENT_WAIT },
       );
       const currentUrl = this.page.url();
-      const isCorrectPath = currentUrl.includes('/fleet-virtualization/templates/cluster/');
+      const isCorrectPath = currentUrl.includes('/fleet-virtualization/vm-templates/cluster/');
       const hasOldBrokenPath = currentUrl.includes('template.openshift.io~v1~Template');
       return { isValid: isCorrectPath && !hasOldBrokenPath, url: currentUrl };
     } catch {

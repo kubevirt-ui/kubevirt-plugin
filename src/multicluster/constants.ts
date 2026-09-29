@@ -6,6 +6,9 @@ import {
 } from '@kubevirt-ui-ext/kubevirt-api/console';
 import type { K8sModel } from '@openshift-console/dynamic-plugin-sdk';
 
+// relative import: this module is loaded by the rspack config, which does not resolve tsconfig paths
+import { VM_TEMPLATES_PATH_SEGMENT } from '../views/templates/constants';
+
 export const BASE_K8S_API_PATH = '/api/kubernetes';
 
 /** Proxy path prefix used by the multicluster SDK to reach spoke-cluster K8s APIs. */
@@ -15,7 +18,7 @@ export const FLEET_SPOKE_PROXY_BASE_PATH =
 export const FLEET_BASE_PATH = '/fleet-virtualization';
 
 export const FLEET_VIRTUAL_MACHINES_PATH = `${FLEET_BASE_PATH}/${VirtualMachineModelRef}`;
-export const FLEET_TEMPLATES_PATH = `${FLEET_BASE_PATH}/templates`;
+export const FLEET_TEMPLATES_PATH = `${FLEET_BASE_PATH}/${VM_TEMPLATES_PATH_SEGMENT}`;
 export const FLEET_BOOTABLE_VOLUMES_PATH = `${FLEET_BASE_PATH}/bootablevolumes`;
 export const FLEET_INSTANCETYPES_PATH = `${FLEET_BASE_PATH}/${VirtualMachineClusterInstancetypeModelRef}`;
 export const FLEET_NS_INSTANCETYPES_PATH = `${FLEET_BASE_PATH}/${VirtualMachineInstancetypeModelRef}`;

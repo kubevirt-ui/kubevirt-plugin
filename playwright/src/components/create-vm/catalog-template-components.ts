@@ -625,7 +625,7 @@ export class TemplateDetailComponent extends BaseComponent {
   }
 
   async navigateToTemplateDetail(templateName: string, namespace: string) {
-    await this.goTo(`/k8s/ns/${namespace}/templates/${templateName}`);
+    await this.goTo(`/k8s/ns/${namespace}/vm-templates/${templateName}`);
   }
 
   async navigateToYAML() {

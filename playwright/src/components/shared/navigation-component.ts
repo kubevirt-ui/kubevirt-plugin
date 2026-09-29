@@ -13,7 +13,7 @@ const LIST_URL_PATTERNS = {
   instanceTypes: /VirtualMachineClusterInstancetype(?:\?|$)/i,
   migrationPolicies: /MigrationPolicy(?:\?|$)/i,
   settings: /\/virtualization-settings(?:[/?#]|$)/i,
-  templates: /\/templates(?:\?|$)/i,
+  templates: /\/vm-templates(?:\?|$)/i,
   virtualMachines: /kubevirt\.io~v1~VirtualMachine(?:\?|$)/i,
   overview: /\/dashboards(?:\?|$)/i,
 } as const;

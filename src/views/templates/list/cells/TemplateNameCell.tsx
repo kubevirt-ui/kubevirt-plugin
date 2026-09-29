@@ -1,9 +1,11 @@
 import { type FC } from 'react';
 
+import VMTemplateLink from '@kubevirt-utils/components/VMTemplateLink/VMTemplateLink';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import {
   isDeprecatedTemplate,
+  isOpenShiftTemplate,
   isVirtualMachineTemplateRequest,
   type TemplateOrRequest,
 } from '@kubevirt-utils/resources/template';
@@ -33,13 +35,17 @@ const TemplateNameCell: FC<TemplateNameCellProps> = ({ row }) => {
     <Stack>
       <StackItem>
         <Split hasGutter>
-          <MulticlusterResourceLink
-            cluster={cluster}
-            data-test={name}
-            groupVersionKind={getGroupVersionKindForResource(row)}
-            name={name}
-            namespace={namespace}
-          />
+          {isOpenShiftTemplate(row) ? (
+            <VMTemplateLink cluster={cluster} name={name} namespace={namespace} />
+          ) : (
+            <MulticlusterResourceLink
+              cluster={cluster}
+              data-test={name}
+              groupVersionKind={getGroupVersionKindForResource(row)}
+              name={name}
+              namespace={namespace}
+            />
+          )}
           {!isVMTR && isDeprecatedTemplate(row) && <Label isCompact>{t('Deprecated')}</Label>}
         </Split>
       </StackItem>

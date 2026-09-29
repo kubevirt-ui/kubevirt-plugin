@@ -1,19 +1,18 @@
 import { type FC } from 'react';
-import { Link } from 'react-router';
 
 import { TemplateModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { type V1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
+import VMTemplateLink from '@kubevirt-utils/components/VMTemplateLink/VMTemplateLink';
 import {
   getGroupVersionKindForModel,
   type K8sActivityProps,
-  ResourceIcon,
   ResourceLink,
 } from '@openshift-console/dynamic-plugin-sdk';
 import { ActivityItem } from '@openshift-console/dynamic-plugin-sdk-internal';
 
 import ActivityProgress from './ActivityProgress';
-import { diskImportKindMapping, VIRTUALMACHINES_TEMPLATES_BASE_URL } from './utils';
+import { diskImportKindMapping } from './utils';
 
 export const DiskImportActivity: FC<K8sActivityProps<V1beta1DataVolume>> = ({ resource }) => {
   const progress = parseInt(resource?.status?.progress ?? '', 10);
@@ -27,17 +26,7 @@ export const DiskImportActivity: FC<K8sActivityProps<V1beta1DataVolume>> = ({ re
   const model = diskImportKindMapping[kind];
   const ownerLink =
     model === TemplateModel ? (
-      <>
-        <ResourceIcon groupVersionKind={getGroupVersionKindForModel(TemplateModel)} />
-        <Link
-          className="co-resource-item__resource-name"
-          data-test={name}
-          title={uid}
-          to={`/k8s/ns/${resource?.metadata?.namespace}/${VIRTUALMACHINES_TEMPLATES_BASE_URL}/${name}`}
-        >
-          {name}
-        </Link>
-      </>
+      <VMTemplateLink name={name} namespace={resource?.metadata?.namespace} uid={uid} />
     ) : (
       <ResourceLink
         groupVersionKind={getGroupVersionKindForModel(model)}
