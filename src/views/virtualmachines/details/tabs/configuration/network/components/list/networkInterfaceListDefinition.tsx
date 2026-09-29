@@ -95,6 +95,7 @@ export const getNetworkInterfaceListColumns = (
     getValue: (row) => row.iface?.model ?? '',
     key: 'model',
     label: t('Model'),
+    props: { className: 'pf-m-width-10' },
     renderCell: (row) => (
       <span data-test={`nic-model-${row.network?.name}`}>{row.iface?.model ?? NO_DATA_DASH}</span>
     ),
@@ -104,6 +105,7 @@ export const getNetworkInterfaceListColumns = (
     getValue: (row) => row.network?.multus?.networkName ?? '',
     key: 'network',
     label: t('Network'),
+    props: { className: 'pf-m-width-25' },
     renderCell: (row, callbacks) => <NetworkCell callbacks={callbacks} row={row} />,
     sortable: true,
   },

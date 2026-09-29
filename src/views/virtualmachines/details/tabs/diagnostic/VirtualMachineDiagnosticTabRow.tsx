@@ -2,10 +2,10 @@ import { type Dispatch, type JSX, type SetStateAction } from 'react';
 import classNames from 'classnames';
 
 import { NAME_COLUMN_ID } from '@kubevirt-utils/components/ColumnManagementModal/constants';
+import VerifiedResourceLink from '@kubevirt-utils/components/VerifiedResourceLink/VerifiedResourceLink';
 import useNamespaceParam from '@kubevirt-utils/hooks/useNamespaceParam';
 import { DataVolumeModelGroupVersionKind } from '@kubevirt-utils/models';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
-import MulticlusterResourceLink from '@multicluster/components/MulticlusterResourceLink/MulticlusterResourceLink';
 import { getCluster } from '@multicluster/helpers/selectors';
 import {
   RedExclamationCircleIcon,
@@ -62,7 +62,7 @@ const VirtualMachineDiagnosticTabRow = ({
         {[...activeColumnsObj]?.map((column) => (
           <Td id={column} key={column}>
             {column === NAME_COLUMN_ID && dataVolumeResourceLink ? (
-              <MulticlusterResourceLink
+              <VerifiedResourceLink
                 cluster={getCluster(obj)}
                 groupVersionKind={DataVolumeModelGroupVersionKind}
                 name={obj?.[column]?.toString()}

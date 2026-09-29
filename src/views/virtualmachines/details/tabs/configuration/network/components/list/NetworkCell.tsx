@@ -1,14 +1,14 @@
 import { type FC } from 'react';
 
-import { NetworkAttachmentDefinitionModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { parseVMMultusIntoNAD } from '@kubevirt-utils/resources/nad/utils';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
-import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
+import { getCluster } from '@multicluster/helpers/selectors';
 
 import { type SimpleNICPresentation } from '../../utils/types';
 import { type NetworkInterfaceListCallbacks } from './networkInterfaceListDefinition';
+import NetworkResourceLink from './NetworkResourceLink';
 
 type NetworkCellProps = {
   callbacks: NetworkInterfaceListCallbacks;
@@ -36,11 +36,7 @@ const NetworkCell: FC<NetworkCellProps> = ({ callbacks, row }) => {
 
   return (
     <span data-test={`nic-network-${row.network?.name}`}>
-      <ResourceLink
-        groupVersionKind={NetworkAttachmentDefinitionModelGroupVersionKind}
-        name={name}
-        namespace={namespace}
-      />
+      <NetworkResourceLink cluster={getCluster(callbacks.vm)} name={name} namespace={namespace} />
     </span>
   );
 };
