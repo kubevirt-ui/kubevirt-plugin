@@ -9,7 +9,6 @@ import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { TREE_VIEW_FOLDERS } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { setCustomizeWizardVMSignal } from '@kubevirt-utils/signals/customizeWizardVMSignal';
 import useIsACMPage from '@multicluster/useIsACMPage';
 import { Form, FormGroup } from '@patternfly/react-core';
 import { useHubClusterName } from '@stolostron/multicluster-sdk';
@@ -77,7 +76,6 @@ const VMCreationLocationForm: FC = () => {
               onChange={(selectedProject) => {
                 field.onChange(selectedProject);
                 setValue(CREATE_VM_FORM_FIELDS_VM_DATA.FOLDER, '');
-                setCustomizeWizardVMSignal(null);
                 setValue(CREATE_VM_FORM_FIELDS_CUSTOMIZED_VM, null);
               }}
               selectedProject={project || DEFAULT_NAMESPACE}
