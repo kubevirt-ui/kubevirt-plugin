@@ -154,6 +154,22 @@ export default class VirtualMachineDetailPage extends PageCommons {
     return this.network.getNicNetworkName(nicName);
   }
 
+  async getConfigurationNetworkNicBrokenLinkTooltip(nicName: string): Promise<string> {
+    return this.network.getNicNetworkBrokenLinkTooltipText(nicName);
+  }
+
+  async isConfigurationNetworkNicResourceLinkVisible(nicName: string): Promise<boolean> {
+    return this.network.isNicNetworkResourceLinkVisible(nicName);
+  }
+
+  async waitForConfigurationNetworkNicBrokenLink(
+    nicName: string,
+    nadName: string,
+    timeout: number = TestTimeouts.ELEMENT_WAIT,
+  ): Promise<void> {
+    return this.network.waitForNicNetworkBrokenLink(nicName, nadName, timeout);
+  }
+
   async changeMetricsTimeRange() {
     return this.metricsSnapshots.changeMetricsTimeRange();
   }

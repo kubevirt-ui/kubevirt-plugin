@@ -29,6 +29,10 @@ export default class VmConfigurationNetworkComponent extends BaseComponent {
     return this.testId(`nic-network-${nicName}`);
   }
 
+  private nicNetworkDisconnectState(nicName: string): Locator {
+    return this.nicNetworkCell(nicName).getByTestId('verified-resource-link-disconnect');
+  }
+
   async changeNicNetworkAttachment(nicName: string, nadName: string): Promise<void> {
     await this.openEditNetworkInterfaceModal(nicName);
 
@@ -119,6 +123,43 @@ export default class VmConfigurationNetworkComponent extends BaseComponent {
     const cell = this.nicNetworkCell(nicName);
     await cell.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
     return (await cell.textContent())?.trim() ?? '';
+  }
+
+  async getNicNetworkBrokenLinkTooltipText(nicName: string): Promise<string> {
+    const disconnectState = this.nicNetworkDisconnectState(nicName);
+    await disconnectState.waitFor({
+      state: 'visible',
+      timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+    });
+    await disconnectState.hover();
+    const tooltip = this.page.getByRole('tooltip');
+    await tooltip.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+    return (await tooltip.textContent())?.trim() ?? '';
+  }
+
+  async isNicNetworkResourceLinkVisible(nicName: string): Promise<boolean> {
+    const link = this.nicNetworkCell(nicName).getByRole('link');
+    try {
+      await link.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+      return await link.isVisible();
+    } catch {
+      return false;
+    }
+  }
+
+  async waitForNicNetworkBrokenLink(
+    nicName: string,
+    nadName: string,
+    timeout: number = TestTimeouts.ELEMENT_WAIT,
+  ): Promise<void> {
+    const disconnectState = this.nicNetworkDisconnectState(nicName);
+    await disconnectState.waitFor({ state: 'visible', timeout });
+    const text = (await disconnectState.textContent())?.trim() ?? '';
+    if (!text.includes(nadName)) {
+      throw new Error(
+        `Expected broken NAD link for ${nicName} to show "${nadName}", got "${text}"`,
+      );
+    }
   }
 
   async navigateToConfigurationNetwork(): Promise<void> {

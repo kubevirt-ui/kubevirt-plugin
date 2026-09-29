@@ -44,4 +44,20 @@ export default class VirtualMachineDetailNetworkPage extends VirtualMachineDetai
   ): Promise<boolean> {
     return this.configNetwork.waitForPendingChangesAlert(timeout);
   }
+
+  async getNicNetworkBrokenLinkTooltipText(nicName: string): Promise<string> {
+    return this.configNetwork.getNicNetworkBrokenLinkTooltipText(nicName);
+  }
+
+  async isNicNetworkResourceLinkVisible(nicName: string): Promise<boolean> {
+    return this.configNetwork.isNicNetworkResourceLinkVisible(nicName);
+  }
+
+  async waitForNicNetworkBrokenLink(
+    nicName: string,
+    nadName: string,
+    timeout: number = TestTimeouts.ELEMENT_WAIT,
+  ): Promise<void> {
+    return this.configNetwork.waitForNicNetworkBrokenLink(nicName, nadName, timeout);
+  }
 }
