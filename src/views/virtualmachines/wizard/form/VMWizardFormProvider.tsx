@@ -24,6 +24,7 @@ import { type VMWizardFormValues } from './types';
 
 type VMWizardFormContextValue = UseFormReturn<VMWizardFormValues> & {
   autoAppliedLabels: readonly AutoAppliedLabel[];
+  autoLabelsLoading: boolean;
 };
 
 type VMWizardFormProviderProps = PropsWithChildren<{
@@ -118,6 +119,7 @@ export const VMWizardFormProvider: FC<VMWizardFormProviderProps> = ({
   const contextValue: VMWizardFormContextValue = {
     ...methods,
     autoAppliedLabels: availableLabels,
+    autoLabelsLoading: Boolean(autoLabelsLoading),
   };
 
   return <FormProvider {...contextValue}>{children}</FormProvider>;

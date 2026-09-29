@@ -13,6 +13,8 @@ import useIsACMPage from '@multicluster/useIsACMPage';
 import { Form, FormGroup } from '@patternfly/react-core';
 import { useHubClusterName } from '@stolostron/multicluster-sdk';
 import { useVMWizardForm } from '@virtualmachines/wizard/form/VMWizardFormProvider';
+import { useWizardVMDraft } from '@virtualmachines/wizard/hooks/useWizardVMDraft';
+import { VMCreationMethod } from '@virtualmachines/wizard/utils/constants';
 
 import './VMCreationLocationForm.scss';
 
@@ -24,11 +26,20 @@ const VMCreationLocationForm: FC = () => {
   const { featureEnabled: treeViewFoldersEnabled, loading: treeViewFoldersLoading } =
     useFeatures(TREE_VIEW_FOLDERS);
 
-  const { control, setValue } = useVMWizardForm();
+  const { control, getValues, setValue } = useVMWizardForm();
+  const { clearDraft } = useWizardVMDraft();
+
   const [cluster, folder, project] = useWatch({
     control,
     name: ['deployment.cluster', 'deployment.folder', 'deployment.project'],
   });
+
+  const clearLocationDependentVM = (): void => {
+    if (getValues('creationMethod') === VMCreationMethod.CLONE) {
+      setValue('clone.sourceVM', null, { shouldValidate: true });
+    }
+    clearDraft();
+  };
 
   return (
     <Form className="vm-creation-location-form">
@@ -45,8 +56,9 @@ const VMCreationLocationForm: FC = () => {
                 onChange={(selectedCluster) => {
                   field.onChange(selectedCluster);
                   setValue('deployment.folder', '');
-                  if (selectedCluster !== cluster) setValue('deployment.project', '');
-                  setValue('customization.vmDraft', null, { shouldValidate: true });
+                  if (selectedCluster !== cluster)
+                    setValue('deployment.project', '', { shouldValidate: true });
+                  clearLocationDependentVM();
                 }}
                 selectedCluster={value as string}
               />
@@ -67,7 +79,7 @@ const VMCreationLocationForm: FC = () => {
               onChange={(selectedProject) => {
                 field.onChange(selectedProject);
                 setValue('deployment.folder', '');
-                setValue('customization.vmDraft', null, { shouldValidate: true });
+                clearLocationDependentVM();
               }}
               selectedProject={project || DEFAULT_NAMESPACE}
             />

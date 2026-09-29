@@ -39,7 +39,6 @@ export const createTemplateParametersSchema = (t: TFunction): yup.Schema<Templat
 export const createTemplateSchema = (t: TFunction): yup.ObjectSchema<VMWizardTemplateValues> =>
   yup
     .object({
-      lastProcessedKey: yup.string().defined(),
       selectedTemplate: yup
         .mixed<Template>()
         .typeError(getValidationMessage('INVALID_FIELD_MESSAGE', t))

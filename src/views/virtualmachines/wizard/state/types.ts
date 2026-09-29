@@ -12,6 +12,8 @@ export type VMWizardState = VMWizardNavigationState & {
 };
 
 export type VMWizardStateContextValue = VMWizardState & {
+  getTemplateGenerationRevision: () => number;
+  invalidateTemplateGeneration: () => void;
   resetState: () => void;
   setCurrentStep: (step: string) => void;
   setIsTemplateDrawerOpen: Dispatch<SetStateAction<boolean>>;
