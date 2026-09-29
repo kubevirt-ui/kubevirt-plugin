@@ -1,12 +1,12 @@
 import { type FC, useMemo } from 'react';
 
+import VerifiedResourceLink from '@kubevirt-utils/components/VerifiedResourceLink/VerifiedResourceLink';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useNamespaceParam from '@kubevirt-utils/hooks/useNamespaceParam';
 import { DataVolumeModelGroupVersionKind } from '@kubevirt-utils/models';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { columnSorting, isEmpty } from '@kubevirt-utils/utils/utils';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
-import MulticlusterResourceLink from '@multicluster/components/MulticlusterResourceLink/MulticlusterResourceLink';
 import { ListPageBody } from '@openshift-console/dynamic-plugin-sdk';
 import { Label } from '@patternfly/react-core';
 import { Table, Tbody, Td, Th, Thead, Tr } from '@patternfly/react-table';
@@ -61,7 +61,7 @@ const VirtualMachineDiagnosticTabDataVolumeStatus: FC<
                 if (colId === 'name') {
                   return (
                     <Td key={colId}>
-                      <MulticlusterResourceLink
+                      <VerifiedResourceLink
                         groupVersionKind={DataVolumeModelGroupVersionKind}
                         name={row.name}
                         namespace={namespace}

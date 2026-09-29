@@ -13,11 +13,11 @@ import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { type V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import { dateTimeFormatter } from '@kubevirt-utils/components/Timestamp/utils/datetime';
+import VerifiedResourceLink from '@kubevirt-utils/components/VerifiedResourceLink/VerifiedResourceLink';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getResourceUrl } from '@kubevirt-utils/resources/shared';
 import useVirtualMachineInstanceMigration from '@kubevirt-utils/resources/vmi/hooks/useVirtualMachineInstanceMigration';
 import { formatElapsedTime, getElapsedTimeInSeconds } from '@kubevirt-utils/utils/elapsedTime';
-import MulticlusterResourceLink from '@multicluster/components/MulticlusterResourceLink/MulticlusterResourceLink';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { Popover, PopoverPosition, Stack, StackItem } from '@patternfly/react-core';
 
@@ -72,7 +72,7 @@ const MigrationProgressPopover: FC<MigrationProgressPopoverProps> = ({ children,
           <StackItem>
             <b>{t('Policy')}</b>{' '}
             {vmi?.status?.migrationState?.migrationPolicyName ? (
-              <MulticlusterResourceLink
+              <VerifiedResourceLink
                 cluster={getCluster(vmi)}
                 groupVersionKind={MigrationPolicyModelGroupVersionKind}
                 name={vmi.status.migrationState.migrationPolicyName}
