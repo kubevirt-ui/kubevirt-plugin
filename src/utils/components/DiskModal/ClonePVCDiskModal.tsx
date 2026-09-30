@@ -57,8 +57,7 @@ const ClonePVCDiskModal: FC<V1SubDiskModalProps> = ({
     namespace,
     vmCluster,
   );
-  const hasClonePermission =
-    !requiresClonePermission || isCreated || isEditDisk || (!isChecking && canClone);
+  const hasClonePermission = !requiresClonePermission || isCreated || (!isChecking && canClone);
 
   return (
     <FormProvider {...methods}>
@@ -76,8 +75,12 @@ const ClonePVCDiskModal: FC<V1SubDiskModalProps> = ({
       >
         <PendingChanges isVMRunning={isVMRunning} />
         <BootSourceCheckbox editDiskName={editDiskName} isDisabled={isVMRunning} vm={vm} />
-        <DiskNameInput />
-        {!isCreated && <DiskSourceClonePVCSelect destinationNamespace={namespace} />}
+        <DiskNameInput editDiskName={editDiskName} vm={vm} />
+        {!isCreated && (
+          <DiskSourceClonePVCSelect
+            clonePermission={{ canClone, isChecking, requiresClonePermission }}
+          />
+        )}
         <DiskSizeInput isCreated={isCreated} namespace={namespace} pvc={pvc} />
         <DiskTypeSelect isVMRunning={isVMRunning} />
         <DiskInterfaceSelect isVMRunning={isVMRunning} />

@@ -2,7 +2,6 @@ import { useMemo } from 'react';
 
 import { TLS_CERT_SOURCE_EXISTING } from '@kubevirt-utils/components/TLSCertificateSection';
 import { DEFAULT_PREFERENCE_LABEL } from '@kubevirt-utils/constants/instancetypes-and-preferences';
-import useCanClonePVCFromNamespace from '@kubevirt-utils/hooks/useCanClonePVCFromNamespace';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { isValidCronExpression } from '@kubevirt-utils/utils/validation';
 
@@ -11,13 +10,10 @@ import { type UseAddBootableVolumeFormValidationParams } from '../types';
 
 export const useAddBootableVolumeFormValidation = ({
   bootableVolume,
+  clonePermission,
   sourceType,
 }: UseAddBootableVolumeFormValidationParams): boolean => {
-  const { canClone, isChecking, requiresClonePermission } = useCanClonePVCFromNamespace(
-    bootableVolume?.pvcNamespace,
-    bootableVolume?.bootableVolumeNamespace,
-    bootableVolume?.bootableVolumeCluster,
-  );
+  const { canClone, isChecking, requiresClonePermission } = clonePermission;
 
   const hasClonePermission = useMemo(() => {
     if (sourceType !== DROPDOWN_FORM_SELECTION.USE_EXISTING_PVC) {

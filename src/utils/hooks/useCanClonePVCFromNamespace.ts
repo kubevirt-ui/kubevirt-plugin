@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import {
   requiresCrossNamespaceClone,
@@ -6,7 +6,7 @@ import {
 } from '@kubevirt-utils/resources/cdi/pvcClonePermission';
 import useIsACMPage from '@multicluster/useIsACMPage';
 
-type UseCanClonePVCFromNamespaceResult = {
+export type PVCClonePermissionState = {
   canClone: boolean;
   isChecking: boolean;
   requiresClonePermission: boolean;
@@ -14,46 +14,37 @@ type UseCanClonePVCFromNamespaceResult = {
 
 type ResolvedClonePermission = {
   canClone: boolean;
-  key: string;
+  requestId: number;
 };
-
-const buildPermissionKey = (
-  sourceNamespace: string,
-  destinationNamespace?: string,
-  cluster?: string,
-): string => `${sourceNamespace}|${destinationNamespace ?? ''}|${cluster ?? ''}`;
 
 const useCanClonePVCFromNamespace = (
   sourceNamespace?: string,
   destinationNamespace?: string,
   cluster?: string,
-): UseCanClonePVCFromNamespaceResult => {
+): PVCClonePermissionState => {
   const isACMPage = useIsACMPage();
   const requiresClonePermission = requiresCrossNamespaceClone(
     sourceNamespace,
     destinationNamespace,
   );
-
-  const permissionKey = useMemo(() => {
-    if (!requiresClonePermission || !sourceNamespace) {
-      return null;
-    }
-
-    return buildPermissionKey(sourceNamespace, destinationNamespace, cluster);
-  }, [cluster, destinationNamespace, requiresClonePermission, sourceNamespace]);
-
+  const requestIdRef = useRef(0);
+  const [activeRequestId, setActiveRequestId] = useState(0);
   const [resolvedPermission, setResolvedPermission] = useState<ResolvedClonePermission | null>(
     null,
   );
 
   useEffect(() => {
+    if (!requiresClonePermission || !sourceNamespace) {
+      return undefined;
+    }
+
+    const requestId = requestIdRef.current + 1;
+    requestIdRef.current = requestId;
+    setActiveRequestId(requestId);
+
     let cancelled = false;
 
     const runPermissionCheck = async (): Promise<void> => {
-      if (!permissionKey || !sourceNamespace) {
-        return;
-      }
-
       const result = await resolvePVCClonePermission({
         cluster,
         destinationNamespace,
@@ -61,11 +52,11 @@ const useCanClonePVCFromNamespace = (
         sourceNamespace,
       });
 
-      if (cancelled) {
+      if (cancelled || requestId !== requestIdRef.current) {
         return;
       }
 
-      setResolvedPermission({ canClone: result.canClone, key: permissionKey });
+      setResolvedPermission({ canClone: result.canClone, requestId });
     };
 
     void runPermissionCheck();
@@ -73,16 +64,13 @@ const useCanClonePVCFromNamespace = (
     return (): void => {
       cancelled = true;
     };
-  }, [cluster, destinationNamespace, isACMPage, permissionKey, sourceNamespace]);
+  }, [cluster, destinationNamespace, isACMPage, requiresClonePermission, sourceNamespace]);
 
-  const isResolvedForCurrentSelection =
-    permissionKey !== null && resolvedPermission?.key === permissionKey;
-  const isChecking = Boolean(permissionKey) && !isResolvedForCurrentSelection;
-
-  let canClone = true;
-  if (requiresClonePermission) {
-    canClone = isResolvedForCurrentSelection ? resolvedPermission.canClone : false;
-  }
+  const isCurrentResult = resolvedPermission?.requestId === activeRequestId;
+  const isChecking = requiresClonePermission && Boolean(sourceNamespace) && !isCurrentResult;
+  const canClone = requiresClonePermission
+    ? Boolean(isCurrentResult && resolvedPermission?.canClone)
+    : true;
 
   return { canClone, isChecking, requiresClonePermission };
 };

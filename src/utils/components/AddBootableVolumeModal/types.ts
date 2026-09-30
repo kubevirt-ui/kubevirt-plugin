@@ -10,6 +10,7 @@ import type {
   TLS_CERT_SOURCE_EXISTING,
   TLS_CERT_SOURCE_NEW,
 } from '@kubevirt-utils/components/TLSCertificateSection';
+import type { PVCClonePermissionState } from '@kubevirt-utils/hooks/useCanClonePVCFromNamespace';
 import type { CdiUploadDataFn, DataUpload } from '@kubevirt-utils/hooks/useCDIUpload/types';
 import type { ToastActions } from '@kubevirt-utils/hooks/useKubevirtToast';
 import type { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
@@ -97,6 +98,7 @@ export type CreateBootableVolumeType = (input: {
 
 export type UseAddBootableVolumeFormValidationParams = {
   bootableVolume: AddBootableVolumeState;
+  clonePermission: PVCClonePermissionState;
   sourceType: DROPDOWN_FORM_SELECTION;
 };
 

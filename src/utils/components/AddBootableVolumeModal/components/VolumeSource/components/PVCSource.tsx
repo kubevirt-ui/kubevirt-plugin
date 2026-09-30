@@ -6,7 +6,7 @@ import type {
 } from '@kubevirt-utils/components/AddBootableVolumeModal/types';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import PVCClonePermissionAlert from '@kubevirt-utils/components/PVCClonePermissionAlert/PVCClonePermissionAlert';
-import useCanClonePVCFromNamespace from '@kubevirt-utils/hooks/useCanClonePVCFromNamespace';
+import type { PVCClonePermissionState } from '@kubevirt-utils/hooks/useCanClonePVCFromNamespace';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverContentWithLightspeedButton/PopoverContentWithLightspeedButton';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
@@ -16,19 +16,18 @@ import DiskSourcePVCSelect from './DiskSourcePVCSelect';
 
 type PVCSourceProps = {
   bootableVolume: AddBootableVolumeState;
+  clonePermission: PVCClonePermissionState;
   setBootableVolumeField: SetBootableVolumeFieldType;
 };
 
-const PVCSource: FC<PVCSourceProps> = ({ bootableVolume, setBootableVolumeField }) => {
+const PVCSource: FC<PVCSourceProps> = ({
+  bootableVolume,
+  clonePermission,
+  setBootableVolumeField,
+}) => {
   const { t } = useKubevirtTranslation();
-  const { bootableVolumeCluster, bootableVolumeNamespace, pvcName, pvcNamespace } =
-    bootableVolume || {};
-
-  const { canClone, isChecking, requiresClonePermission } = useCanClonePVCFromNamespace(
-    pvcNamespace,
-    bootableVolumeNamespace,
-    bootableVolumeCluster,
-  );
+  const { bootableVolumeCluster, pvcName, pvcNamespace } = bootableVolume || {};
+  const { canClone, isChecking, requiresClonePermission } = clonePermission;
 
   const showClonePermissionError =
     requiresClonePermission && !isChecking && !canClone && Boolean(pvcNamespace);
