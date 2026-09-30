@@ -1,7 +1,7 @@
 import BaseComponent from '@/components/shared/base-component';
 import NavigationComponent from '@/components/shared/navigation-component';
 import { TestTimeouts } from '@/utils/test-config';
-import type { Page } from '@playwright/test';
+import type { Locator, Page } from '@playwright/test';
 
 export default class OverviewSettingsComponent extends BaseComponent {
   private readonly _advancedCDROMFeaturesBtn = this.locator(
@@ -18,6 +18,10 @@ export default class OverviewSettingsComponent extends BaseComponent {
   );
   private readonly _automaticSubscriptionTypeMainButton = this.locator(
     '.AutomaticSubscriptionType--main button',
+  );
+  private readonly _automaticGrantToggle = this.testId('automatic-grant-virtualization-roles');
+  private readonly _automaticGrantSectionButton = this.locator(
+    'button:has-text("Automatically grant Virtualization roles")',
   );
   private readonly _centosStream9ImageCronSwitch = this.testId(
     'centos-stream9-image-cron-auto-image-download-switch',
@@ -64,6 +68,9 @@ export default class OverviewSettingsComponent extends BaseComponent {
   private readonly _vmActionsConfirmationToggle = this.locator(
     '[id="confirm-vm-actions"] [role="switch"]',
   );
+  private readonly _controlDefaultVirtualizationPermissions = this.testId(
+    'controlDefaultVirtualizationPermissions',
+  );
   private readonly _vmTemplates = this.testId('vmTemplates');
   private readonly _yAMLTabVisibilityBtn = this.locator('button:has-text("YAML tab visibility")');
   protected readonly nav = new NavigationComponent(this.page);
@@ -84,6 +91,24 @@ export default class OverviewSettingsComponent extends BaseComponent {
       timeout: TestTimeouts.UI_VISIBILITY_QUICK,
     });
     await this.robustClick(this._sshConfigurationsButton);
+  }
+
+  private async setPreviewFeatureSwitch(toggle: Locator, enable: boolean): Promise<boolean> {
+    try {
+      await toggle.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
+      if ((await toggle.isChecked()) === enable) {
+        return true;
+      }
+
+      await this.waitForFeaturesConfigMapPatch(async () => {
+        await toggle.click({ force: true });
+      });
+      await this.page.waitForTimeout(TestTimeouts.UI_DELAY_MEDIUM);
+
+      return (await toggle.isChecked().catch(() => !enable)) === enable;
+    } catch {
+      return false;
+    }
   }
 
   private async waitForFeaturesConfigMapPatch(action: () => Promise<void>): Promise<void> {
@@ -151,6 +176,10 @@ export default class OverviewSettingsComponent extends BaseComponent {
     } catch {
       return false;
     }
+  }
+
+  async disableControlDefaultVirtualizationPermissions(): Promise<boolean> {
+    return this.setPreviewFeatureSwitch(this._controlDefaultVirtualizationPermissions, false);
   }
 
   async disableCentosStream9ImageCron(): Promise<boolean> {
@@ -250,6 +279,10 @@ export default class OverviewSettingsComponent extends BaseComponent {
     } catch {
       return false;
     }
+  }
+
+  async enableControlDefaultVirtualizationPermissions(): Promise<boolean> {
+    return this.setPreviewFeatureSwitch(this._controlDefaultVirtualizationPermissions, true);
   }
 
   async enableCentosStream9ImageCron(): Promise<boolean> {
@@ -788,6 +821,33 @@ export default class OverviewSettingsComponent extends BaseComponent {
     }
   }
 
+  async isAutomaticGrantVirtualizationRolesChecked(): Promise<boolean> {
+    return this._automaticGrantToggle.isChecked().catch(() => false);
+  }
+
+  async isAutomaticGrantVirtualizationRolesEnabled(): Promise<boolean> {
+    return this._automaticGrantToggle.isEnabled().catch(() => false);
+  }
+
+  async navigateToClusterTab(): Promise<boolean> {
+    try {
+      await this.navigateToSettings();
+      const clusterTab = this.testId('settings-tab-cluster');
+      await clusterTab.waitFor({
+        state: 'visible',
+        timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+      });
+      await this.robustClick(clusterTab);
+      await this._generalSettingsButton.waitFor({
+        state: 'visible',
+        timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+      });
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
   async navigateToGuestManagement(): Promise<boolean> {
     try {
       await this.navigateToSettings();
@@ -840,6 +900,34 @@ export default class OverviewSettingsComponent extends BaseComponent {
     await this.navigateToSettingsViaSidebar();
   }
 
+  async openAutomaticGrantVirtualizationRolesSection(): Promise<boolean> {
+    try {
+      await this._generalSettingsButton.waitFor({
+        state: 'visible',
+        timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+      });
+      if ((await this._generalSettingsButton.getAttribute('aria-expanded')) !== 'true') {
+        await this.robustClick(this._generalSettingsButton);
+      }
+
+      await this._automaticGrantSectionButton.waitFor({
+        state: 'visible',
+        timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+      });
+      if ((await this._automaticGrantSectionButton.getAttribute('aria-expanded')) !== 'true') {
+        await this.robustClick(this._automaticGrantSectionButton);
+      }
+
+      await this._automaticGrantToggle.waitFor({
+        state: 'visible',
+        timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+      });
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
   async openSSHOverNodePortConfiguration(): Promise<void> {
     await this.openSshConfigurations();
     await this._nodePortServiceButton.waitFor({
@@ -851,6 +939,22 @@ export default class OverviewSettingsComponent extends BaseComponent {
       state: 'visible',
       timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
     });
+  }
+
+  async setAutomaticGrantVirtualizationRoles(enable: boolean): Promise<boolean> {
+    try {
+      await this._automaticGrantToggle.waitFor({
+        state: 'visible',
+        timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+      });
+      if ((await this._automaticGrantToggle.isChecked()) !== enable) {
+        await this._automaticGrantToggle.click({ force: true });
+        await this.page.waitForTimeout(TestTimeouts.CLUSTER_STATE_PROPAGATION);
+      }
+      return (await this._automaticGrantToggle.isChecked()) === enable;
+    } catch {
+      return false;
+    }
   }
 
   async navigateToTemplatesAndImagesManagement(): Promise<boolean> {

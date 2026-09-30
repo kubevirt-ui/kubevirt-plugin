@@ -48,7 +48,7 @@ const ApplicationAwareQuota: FC<ApplicationAwareQuotaProps> = ({
       cluster,
       data: [
         {
-          op: isEmpty(aaqEnabled) ? 'add' : 'replace',
+          op: hyperConverge?.spec?.enableApplicationAwareQuota === undefined ? 'add' : 'replace',
           path: `/spec/enableApplicationAwareQuota`,
           value: checked,
         },

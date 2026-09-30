@@ -5,9 +5,7 @@ import { waitForCondition } from '@/utils/wait-helpers';
 import type { Page } from '@playwright/test';
 
 export default class OverviewVirtualizationFeaturesComponent extends BaseComponent {
-  private readonly _aaqSwitch = this.locator(
-    '.section-with-switch:has-text("Application Aware Quota") .pf-v6-c-switch input',
-  );
+  private readonly _aaqSwitch = this.testId('application-aware-quota');
   private readonly _generalSettingsButton = this.locator('button:has-text("General settings")');
   private readonly _inputSliderValueInput = this.locator('input[aria-label="Slider value input"]');
   private readonly _ksmToggle = this.testId('kernel-samepage-merging');
