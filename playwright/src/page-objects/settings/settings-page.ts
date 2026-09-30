@@ -293,6 +293,12 @@ export default class SettingsPage extends BasePage {
     return this._features.isManageQuotasLinkVisible(...args);
   }
 
+  isPasstBindingOn(
+    ...args: Parameters<OverviewSettingsPage['isPasstBindingOn']>
+  ): ReturnType<OverviewSettingsPage['isPasstBindingOn']> {
+    return this._settings.isPasstBindingOn(...args);
+  }
+
   isPasstBindingChecked(
     ...args: Parameters<OverviewSettingsPage['isPasstBindingChecked']>
   ): ReturnType<OverviewSettingsPage['isPasstBindingChecked']> {
@@ -501,6 +507,12 @@ export default class SettingsPage extends BasePage {
     ...args: Parameters<OverviewMigrationsPage['setMemoryDensityPercentage']>
   ): ReturnType<OverviewMigrationsPage['setMemoryDensityPercentage']> {
     return this._migrations.setMemoryDensityPercentage(...args);
+  }
+
+  setPasstBindingEnabled(
+    ...args: Parameters<OverviewSettingsPage['setPasstBindingEnabled']>
+  ): ReturnType<OverviewSettingsPage['setPasstBindingEnabled']> {
+    return this._settings.setPasstBindingEnabled(...args);
   }
 
   setVmActionsConfirmation(

@@ -709,6 +709,18 @@ export default class OverviewSettingsComponent extends BaseComponent {
     }
   }
 
+  async isPasstBindingOn(): Promise<boolean> {
+    try {
+      await this._passtUDNNetworkCheckbox.waitFor({
+        state: 'visible',
+        timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+      });
+      return await this._passtUDNNetworkCheckbox.isChecked();
+    } catch {
+      return false;
+    }
+  }
+
   async isPasstBindingChecked(): Promise<boolean> {
     try {
       await this._passtUDNNetworkCheckbox.waitFor({
@@ -939,6 +951,22 @@ export default class OverviewSettingsComponent extends BaseComponent {
       state: 'visible',
       timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
     });
+  }
+
+  async setPasstBindingEnabled(enable: boolean): Promise<boolean> {
+    try {
+      await this._passtUDNNetworkCheckbox.waitFor({
+        state: 'visible',
+        timeout: TestTimeouts.ELEMENT_WAIT,
+      });
+      if ((await this._passtUDNNetworkCheckbox.isChecked()) !== enable) {
+        await this._passtUDNNetworkCheckbox.click({ force: true });
+        await this.page.waitForTimeout(TestTimeouts.CLUSTER_STATE_PROPAGATION);
+      }
+      return (await this._passtUDNNetworkCheckbox.isChecked()) === enable;
+    } catch {
+      return false;
+    }
   }
 
   async setAutomaticGrantVirtualizationRoles(enable: boolean): Promise<boolean> {
