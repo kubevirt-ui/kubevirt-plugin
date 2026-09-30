@@ -977,9 +977,15 @@ export default class OverviewSettingsComponent extends BaseComponent {
       });
       if ((await this._automaticGrantToggle.isChecked()) !== enable) {
         await this._automaticGrantToggle.click({ force: true });
-        await this.page.waitForTimeout(TestTimeouts.CLUSTER_STATE_PROPAGATION);
       }
-      return (await this._automaticGrantToggle.isChecked()) === enable;
+      const deadline = Date.now() + TestTimeouts.DEFAULT;
+      while (Date.now() < deadline) {
+        if ((await this._automaticGrantToggle.isChecked()) === enable) {
+          return true;
+        }
+        await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
+      }
+      return false;
     } catch {
       return false;
     }

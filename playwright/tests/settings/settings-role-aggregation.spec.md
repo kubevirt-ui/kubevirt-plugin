@@ -22,8 +22,8 @@ This covers the Settings feature area at the **Gating** tier: the Preview Featur
 
 ## 3. Test Environment & Prerequisites
 
-- **Environment:** OpenShift cluster with CNV operator installed (OCP 4.23+)
-- **Configuration:** HyperConverged CR (`kubevirt-hyperconverged`) must exist in the CNV namespace; HCO API version v1
+- **Environment:** OpenShift cluster with CNV operator installed
+- **Configuration:** HyperConverged CR (`kubevirt-hyperconverged`) must exist in the CNV namespace. The test skips when the served HyperConverged CRD schema does not include `roleAggregationStrategy` (the API prunes the field and the grant switch cannot change).
 - **Initial Setup:** User logged in as cluster-admin; no additional beforeAll resource creation required
 
 ---
@@ -44,13 +44,13 @@ This covers the Settings feature area at the **Gating** tier: the Preview Featur
 - **Pre-conditions:** "Control default Virtualization permissions" preview toggle is OFF
 - **Tags:** `@gating`
 
-| Step | Action                                                                        | Expected Result                           |
-| :--- | :---------------------------------------------------------------------------- | :---------------------------------------- |
-| 1    | Navigate to **Settings → Preview features** tab                               | Preview features tab loads                |
-| 2    | Enable the "Control default Virtualization permissions" toggle                 | Toggle switches to ON                     |
-| 3    | Navigate to **Settings → Cluster** tab                                        | Cluster tab loads                         |
-| 4    | Expand the "Automatically grant Virtualization roles" section                  | Section expands                           |
-| 5    | Observe the grant toggle state                                                | Grant toggle is **enabled** (interactive) |
+| Step | Action                                                         | Expected Result                           |
+| :--- | :------------------------------------------------------------- | :---------------------------------------- |
+| 1    | Navigate to **Settings → Preview features** tab                | Preview features tab loads                |
+| 2    | Enable the "Control default Virtualization permissions" toggle | Toggle switches to ON                     |
+| 3    | Navigate to **Settings → Cluster** tab                         | Cluster tab loads                         |
+| 4    | Expand the "Automatically grant Virtualization roles" section  | Section expands                           |
+| 5    | Observe the grant toggle state                                 | Grant toggle is **enabled** (interactive) |
 
 ---
 
@@ -62,13 +62,13 @@ This covers the Settings feature area at the **Gating** tier: the Preview Featur
 - **Pre-conditions:** Preview feature is enabled; grant toggle is currently OFF
 - **Tags:** `@gating`
 
-| Step | Action                                                            | Expected Result                                                     |
-| :--- | :---------------------------------------------------------------- | :------------------------------------------------------------------ |
-| 1    | Turn the "Automatically grant Virtualization roles" toggle **ON** | Toggle switches to ON (checked)                                     |
-| 2    | Query HyperConverged CR `spec.roleAggregationStrategy` via API    | Value is `AggregateToDefault`                                       |
-| 3    | Query ClusterRole `kubevirt.io:admin` labels via API              | Label `rbac.authorization.k8s.io/aggregate-to-admin` = `"true"`     |
-| 4    | Query ClusterRole `kubevirt.io:edit` labels via API               | Label `rbac.authorization.k8s.io/aggregate-to-edit` = `"true"`      |
-| 5    | Query ClusterRole `kubevirt.io:view` labels via API               | Label `rbac.authorization.k8s.io/aggregate-to-view` = `"true"`      |
+| Step | Action                                                            | Expected Result                                                 |
+| :--- | :---------------------------------------------------------------- | :-------------------------------------------------------------- |
+| 1    | Turn the "Automatically grant Virtualization roles" toggle **ON** | Toggle switches to ON (checked)                                 |
+| 2    | Query HyperConverged CR `spec.roleAggregationStrategy` via API    | Value is `AggregateToDefault`                                   |
+| 3    | Query ClusterRole `kubevirt.io:admin` labels via API              | Label `rbac.authorization.k8s.io/aggregate-to-admin` = `"true"` |
+| 4    | Query ClusterRole `kubevirt.io:edit` labels via API               | Label `rbac.authorization.k8s.io/aggregate-to-edit` = `"true"`  |
+| 5    | Query ClusterRole `kubevirt.io:view` labels via API               | Label `rbac.authorization.k8s.io/aggregate-to-view` = `"true"`  |
 
 ---
 
@@ -98,13 +98,13 @@ This covers the Settings feature area at the **Gating** tier: the Preview Featur
 - **Pre-conditions:** "Control default Virtualization permissions" preview toggle is ON
 - **Tags:** `@gating`
 
-| Step | Action                                                            | Expected Result                               |
-| :--- | :---------------------------------------------------------------- | :-------------------------------------------- |
-| 1    | Navigate to **Settings → Preview features** tab                   | Preview features tab loads                    |
-| 2    | Disable the "Control default Virtualization permissions" toggle    | Toggle switches to OFF                        |
-| 3    | Navigate to **Settings → Cluster** tab                            | Cluster tab loads                             |
-| 4    | Expand the "Automatically grant Virtualization roles" section      | Section expands                               |
-| 5    | Observe the grant toggle state                                    | Grant toggle is **disabled** (non-interactive) |
+| Step | Action                                                          | Expected Result                                |
+| :--- | :-------------------------------------------------------------- | :--------------------------------------------- |
+| 1    | Navigate to **Settings → Preview features** tab                 | Preview features tab loads                     |
+| 2    | Disable the "Control default Virtualization permissions" toggle | Toggle switches to OFF                         |
+| 3    | Navigate to **Settings → Cluster** tab                          | Cluster tab loads                              |
+| 4    | Expand the "Automatically grant Virtualization roles" section   | Section expands                                |
+| 5    | Observe the grant toggle state                                  | Grant toggle is **disabled** (non-interactive) |
 
 ---
 
@@ -128,5 +128,5 @@ Maps Jira tickets to the test cases that provide coverage. Tickets without a spe
 ## 6. Approvals
 
 **Prepared By:** Test automation / QE
-**Reviewed By:** _______________
-**Approval Signature:** _______________
+**Reviewed By:** ******\_\_\_******
+**Approval Signature:** ******\_\_\_******

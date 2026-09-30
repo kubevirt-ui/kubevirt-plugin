@@ -17,6 +17,40 @@ const AGGREGATE_LABELS: Record<string, string> = {
 const isHyperConvergedV1 = (apiVersion: string | undefined): boolean =>
   Boolean(apiVersion && !apiVersion.includes('v1beta1'));
 
+type HyperConvergedCRDVersion = {
+  name?: string;
+  schema?: { openAPIV3Schema?: unknown };
+  served?: boolean;
+};
+
+async function hcoSupportsRoleAggregationStrategy(
+  apiClient: RequestContextClient,
+): Promise<boolean> {
+  try {
+    const [crd, hyperConverged] = await Promise.all([
+      apiClient.getResource(
+        'apiextensions.k8s.io',
+        'v1',
+        'customresourcedefinitions',
+        'hyperconvergeds.hco.kubevirt.io',
+      ),
+      apiClient.getHyperConverged(EnvVariables.cnvNamespace, HCO_NAME),
+    ]);
+    const versions =
+      (crd?.spec as { versions?: HyperConvergedCRDVersion[] } | undefined)?.versions ?? [];
+    const servedVersion = hyperConverged?.apiVersion?.split('/').pop();
+    const version =
+      versions.find((item) => item.name === servedVersion && item.served !== false) ??
+      versions.find((item) => item.served !== false);
+
+    return JSON.stringify(version?.schema?.openAPIV3Schema ?? {}).includes(
+      '"roleAggregationStrategy"',
+    );
+  } catch {
+    return false;
+  }
+}
+
 async function getHcoStrategyField(apiClient: RequestContextClient): Promise<string | undefined> {
   const hco = await apiClient.getHyperConverged(EnvVariables.cnvNamespace, HCO_NAME);
   const spec = hco?.spec as Record<string, unknown> | undefined;
@@ -62,6 +96,11 @@ test.describe('Role aggregation strategy', { tag: [GATING_TAG, CNV_SETTINGS_TAG]
     settingsPage,
     apiClient,
   }) => {
+    test.skip(
+      !(await hcoSupportsRoleAggregationStrategy(apiClient)),
+      'HyperConverged CRD does not include roleAggregationStrategy on this cluster',
+    );
+
     await settingsPage.navigateToSettings();
     await assertPreviewControlsGrantToggle(settingsPage, true);
     await setGrantAndAssertAggregation(settingsPage, apiClient, {
