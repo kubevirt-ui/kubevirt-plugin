@@ -14,7 +14,6 @@ import {
   updateBootableVolumeField,
 } from '@kubevirt-utils/components/AddBootableVolumeModal/utils';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
-import { type PVCClonePermissionState } from '@kubevirt-utils/hooks/useCanClonePVCFromNamespace';
 import { type DataUpload } from '@kubevirt-utils/hooks/useCDIUpload/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getValidNamespace } from '@kubevirt-utils/utils/utils';
@@ -33,7 +32,6 @@ import VolumeSource from './VolumeSource/VolumeSource';
 
 type AddBootableVolumeBodyProps = {
   bootableVolume: AddBootableVolumeState;
-  clonePermission: PVCClonePermissionState;
   isUploading?: boolean;
   setBootableVolume: Dispatch<SetStateAction<AddBootableVolumeState>>;
   setSourceType: Dispatch<SetStateAction<DROPDOWN_FORM_SELECTION>>;
@@ -43,7 +41,6 @@ type AddBootableVolumeBodyProps = {
 
 const AddBootableVolumeBody: FC<AddBootableVolumeBodyProps> = ({
   bootableVolume,
-  clonePermission,
   isUploading,
   setBootableVolume,
   setSourceType,
@@ -90,7 +87,6 @@ const AddBootableVolumeBody: FC<AddBootableVolumeBodyProps> = ({
       </Title>
       <VolumeSource
         bootableVolume={bootableVolume}
-        clonePermission={clonePermission}
         setBootableVolumeField={setBootableVolumeField}
         sourceType={sourceType}
         upload={upload}

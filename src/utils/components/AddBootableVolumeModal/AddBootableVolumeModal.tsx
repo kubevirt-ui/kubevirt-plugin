@@ -13,7 +13,6 @@ import {
   submitAddBootableVolume,
 } from '@kubevirt-utils/components/AddBootableVolumeModal/utils';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
-import useCanClonePVCFromNamespace from '@kubevirt-utils/hooks/useCanClonePVCFromNamespace';
 import { isUploadingDisk } from '@kubevirt-utils/hooks/useCDIUpload/utils';
 import useKubevirtToast from '@kubevirt-utils/hooks/useKubevirtToast';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -39,14 +38,8 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
     uploadData,
   } = useAddBootableVolumeModalData(lockedPreference);
 
-  const clonePermission = useCanClonePVCFromNamespace(
-    bootableVolume?.pvcNamespace,
-    bootableVolume?.bootableVolumeNamespace,
-    bootableVolume?.bootableVolumeCluster,
-  );
   const isFormValid = useAddBootableVolumeFormValidation({
     bootableVolume,
-    clonePermission,
     sourceType,
   });
 
@@ -80,7 +73,6 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
       <Content>{t('Add a new bootable volume to the cluster.')}</Content>
       <AddBootableVolumeBody
         bootableVolume={bootableVolume}
-        clonePermission={clonePermission}
         isUploading={isUploading}
         setBootableVolume={setBootableVolume}
         setSourceType={setSourceType}

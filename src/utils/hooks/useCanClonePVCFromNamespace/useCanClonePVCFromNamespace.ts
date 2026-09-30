@@ -1,10 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 
-import {
-  requiresCrossNamespaceClone,
-  resolvePVCClonePermission,
-} from '@kubevirt-utils/resources/cdi/pvcClonePermission';
+import { requiresCrossNamespaceClone } from '@kubevirt-utils/resources/cdi/pvcClonePermission';
 import useIsACMPage from '@multicluster/useIsACMPage';
+
+import { loadClonePermission } from './utils';
 
 export type PVCClonePermissionState = {
   canClone: boolean;
@@ -45,7 +44,7 @@ const useCanClonePVCFromNamespace = (
     let cancelled = false;
 
     const runPermissionCheck = async (): Promise<void> => {
-      const result = await resolvePVCClonePermission({
+      const result = await loadClonePermission({
         cluster,
         destinationNamespace,
         isACMPage,

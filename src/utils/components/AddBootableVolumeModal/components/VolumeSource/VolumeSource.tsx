@@ -1,7 +1,6 @@
 import type { FC } from 'react';
 
 import HTTPSource from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeSource/components/HTTPSource';
-import type { PVCClonePermissionState } from '@kubevirt-utils/hooks/useCanClonePVCFromNamespace';
 import type { DataUpload } from '@kubevirt-utils/hooks/useCDIUpload/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
@@ -14,7 +13,6 @@ import SnapshotSource from './components/SnapshotSource';
 
 type VolumeSourceProps = {
   bootableVolume: AddBootableVolumeState;
-  clonePermission: PVCClonePermissionState;
   setBootableVolumeField: SetBootableVolumeFieldType;
   sourceType: DROPDOWN_FORM_SELECTION;
   upload: DataUpload;
@@ -22,7 +20,6 @@ type VolumeSourceProps = {
 
 const VolumeSource: FC<VolumeSourceProps> = ({
   bootableVolume,
-  clonePermission,
   setBootableVolumeField,
   sourceType,
   upload,
@@ -44,11 +41,7 @@ const VolumeSource: FC<VolumeSourceProps> = ({
       />
     ),
     [DROPDOWN_FORM_SELECTION.USE_EXISTING_PVC]: (
-      <PVCSource
-        bootableVolume={bootableVolume}
-        clonePermission={clonePermission}
-        setBootableVolumeField={setBootableVolumeField}
-      />
+      <PVCSource bootableVolume={bootableVolume} setBootableVolumeField={setBootableVolumeField} />
     ),
     [DROPDOWN_FORM_SELECTION.USE_HTTP]: (
       <HTTPSource bootableVolume={bootableVolume} setBootableVolumeField={setBootableVolumeField} />
