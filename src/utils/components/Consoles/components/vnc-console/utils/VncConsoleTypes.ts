@@ -12,7 +12,7 @@ export type VncConsoleActionsProps = {
 };
 
 export type CustomConnectComponentProps = {
-  connect: () => void;
+  connect?: () => void;
   isConnecting: boolean;
 };
 

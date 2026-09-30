@@ -6,6 +6,7 @@ import { type ActionDropdownItemType } from '@kubevirt-utils/components/ActionsD
 import { type ModalComponent } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { logVMConsoleOpened } from '@kubevirt-utils/extensions/telemetry/dashboard';
 import { TELEMETRY_CONSOLE_SESSION_TYPE } from '@kubevirt-utils/extensions/telemetry/utils/property-constants';
+import { VirtualMachineInstanceSubresourcesModel } from '@kubevirt-utils/models';
 import { asAccessReview, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getVMSSHSecretName } from '@kubevirt-utils/resources/vm';
 import { isEmpty, kubevirtConsole } from '@kubevirt-utils/utils/utils';
@@ -84,6 +85,7 @@ export const createMetadataConsoleActions = (t: TFunction): MetadataConsoleActio
     label: t('Move to group'),
   }),
   openConsole: (vm: V1VirtualMachine): ActionDropdownItemType => ({
+    accessReview: asAccessReview(VirtualMachineInstanceSubresourcesModel, vm, 'get', 'vnc'),
     cta: (): void => {
       logVMConsoleOpened(TELEMETRY_CONSOLE_SESSION_TYPE.VNC);
       window.open(getConsoleStandaloneURL(getNamespace(vm), getName(vm), getCluster(vm)));

@@ -1,6 +1,8 @@
 import { type VncLogLevel } from './components/vnc-console/utils/VncConsoleTypes';
 
 export type ConsolesProps = {
+  canConnectSerial?: boolean;
+  canConnectVnc?: boolean;
   consoleContainerClass?: string;
   isHeadlessMode: boolean;
   isStandAlone?: boolean;

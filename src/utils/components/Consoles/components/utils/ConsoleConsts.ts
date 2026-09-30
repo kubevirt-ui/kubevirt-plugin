@@ -8,6 +8,7 @@ export enum ConsoleState {
   Destroyed = 'destroyed',
   Disconnected = 'disconnected',
   Disconnecting = 'disconnecting',
+  Forbidden = 'forbidden',
   Init = 'init',
   Loading = 'loading',
   Open = 'open',
