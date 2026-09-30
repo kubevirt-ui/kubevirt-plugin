@@ -1,0 +1,1 @@
+export const ENABLE_MULTI_ARCH_BOOT_IMAGE_IMPORT_FEATURE_GATE = 'enableMultiArchBootImageImport';

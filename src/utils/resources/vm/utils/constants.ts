@@ -36,6 +36,7 @@ export const DEFAULT_NETWORK: V1Network = { name: 'default', pod: {} };
 export const UDN_BINDING_NAME = 'l2bridge';
 export const PASST_BINDING_NAME = 'passt';
 export const PASST_ANNOTATION = 'hco.kubevirt.io/deployPasstNetworkBinding';
+export const PASST_BINDING_FEATURE_GATE = 'PasstBinding';
 export const PASS_IP_STACK_MIGRATION_GATE = 'PassIPStackMigration';
 export const BRIDGE = 'bridge';
 export const MASQUERADE = 'masquerade';

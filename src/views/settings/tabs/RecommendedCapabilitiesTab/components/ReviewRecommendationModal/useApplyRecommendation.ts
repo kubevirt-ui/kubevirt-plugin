@@ -1,9 +1,9 @@
 import { useMemo } from 'react';
 import { dump } from 'js-yaml';
 
-import { HyperConvergedV1Beta1Model as HyperConvergedModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import useHyperConvergeConfiguration from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getHyperConvergedModelFromResource } from '@kubevirt-utils/resources/hyperconverged/model';
 import { getAnnotation } from '@kubevirt-utils/resources/shared';
 import { escapeJsonPointerToken } from '@kubevirt-utils/utils/utils';
 import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
@@ -49,7 +49,7 @@ const useApplyRecommendation = (
             value: 'true',
           },
         ],
-        model: HyperConvergedModel,
+        model: getHyperConvergedModelFromResource(hco),
         resource: hco,
       });
     };
@@ -81,7 +81,7 @@ const useApplyRecommendation = (
             value: 'true',
           },
         ],
-        model: HyperConvergedModel,
+        model: getHyperConvergedModelFromResource(hco),
         resource: hco,
       });
       return;

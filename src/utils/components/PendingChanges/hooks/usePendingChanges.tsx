@@ -13,6 +13,7 @@ import useHyperConvergeConfiguration from '@kubevirt-utils/hooks/useHyperConverg
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
 import { USER_SETTINGS_KEYS } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/const';
+import { getEvictionStrategy as getHCOEvictionStrategy } from '@kubevirt-utils/resources/hyperconverged/selectors';
 import { getCPU } from '@kubevirt-utils/resources/vm';
 import { getCluster } from '@multicluster/helpers/selectors';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
@@ -91,7 +92,7 @@ export const usePendingChanges = (
       getChangedEvictionStrategy(
         vm,
         vmi,
-        hyperConverge?.spec?.evictionStrategy ?? EVICTION_STRATEGY_DEFAULT,
+        getHCOEvictionStrategy(hyperConverge) ?? EVICTION_STRATEGY_DEFAULT,
       ),
     hideYamlTab,
     hostnameChanged: getChangedHostname(vm, vmi),

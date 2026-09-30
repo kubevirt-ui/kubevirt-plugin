@@ -1,16 +1,20 @@
 import { useMemo } from 'react';
 
-import { HyperConvergedV1Beta1Model as HyperConvergedModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { K8S_OPS } from '@kubevirt-utils/constants/constants';
 import useHyperConvergeConfiguration, {
   type HyperConverged,
 } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
-import useKubevirtHyperconvergeConfiguration from '@kubevirt-utils/hooks/useKubevirtHyperconvergeConfiguration';
+import useKubevirtHyperconvergeConfiguration, {
+  type KubevirtHyperconverged,
+} from '@kubevirt-utils/hooks/useKubevirtHyperconvergeConfiguration';
+import { getHyperConvergedModelFromResource } from '@kubevirt-utils/resources/hyperconverged/model';
 import { getHyperconvergedConfiguration } from '@kubevirt-utils/resources/hyperconverged/selectors';
 import { getAnnotations } from '@kubevirt-utils/resources/shared';
 import {
   PASS_IP_STACK_MIGRATION_GATE,
   PASST_ANNOTATION,
+  PASST_BINDING_FEATURE_GATE,
   PASST_BINDING_NAME,
 } from '@kubevirt-utils/resources/vm/utils/constants';
 import { escapeJsonPointerToken, isEmpty } from '@kubevirt-utils/utils/utils';
@@ -26,6 +30,25 @@ type UsePasstFeatureFlag = (clusterOverride?: string) => {
   toggleFeature: (val: boolean) => Promise<HyperConverged>;
 };
 
+export const isPasstNetworkBindingEnabled = (
+  hyperConverged: HyperConverged | undefined,
+  kubeVirtConfig: KubevirtHyperconverged | undefined,
+  featureGates: string[] | undefined,
+): boolean => {
+  const passtAnnotation = getAnnotations(hyperConverged)?.[PASST_ANNOTATION];
+  if (passtAnnotation !== undefined) {
+    return passtAnnotation === 'true';
+  }
+
+  if (featureGates?.includes(PASST_BINDING_FEATURE_GATE)) {
+    return true;
+  }
+
+  return Boolean(
+    getHyperconvergedConfiguration(kubeVirtConfig)?.network?.binding?.[PASST_BINDING_NAME],
+  );
+};
+
 const usePasstFeatureFlag: UsePasstFeatureFlag = (clusterOverride) => {
   const clusterParam = useClusterParam();
   const cluster = clusterOverride ?? clusterParam;
@@ -34,8 +57,8 @@ const usePasstFeatureFlag: UsePasstFeatureFlag = (clusterOverride) => {
   const isAdmin = useIsAdmin();
 
   const featureEnabled = useMemo(
-    () => Boolean(getHyperconvergedConfiguration(hcConfig)?.network?.binding?.[PASST_BINDING_NAME]),
-    [hcConfig],
+    () => isPasstNetworkBindingEnabled(hyperConvergeConfiguration, hcConfig, featureGates),
+    [featureGates, hcConfig, hyperConvergeConfiguration],
   );
 
   const isLegacyPasst = useMemo(
@@ -49,12 +72,18 @@ const usePasstFeatureFlag: UsePasstFeatureFlag = (clusterOverride) => {
     isLegacyPasst,
     loading: !hcLoaded,
     toggleFeature: (val: boolean): Promise<HyperConverged> => {
+      if (!hyperConvergeConfiguration) {
+        return Promise.reject(new Error('HyperConverged configuration is not loaded'));
+      }
+
+      const annotations = getAnnotations(hyperConvergeConfiguration) ?? {};
+      const hasAnnotations = !isEmpty(annotations);
+      const hasPasstAnnotation = PASST_ANNOTATION in annotations;
+
       const patch: Patch[] = [
-        ...(isEmpty(getAnnotations(hyperConvergeConfiguration))
-          ? [{ op: 'add', path: '/metadata/annotations', value: {} }]
-          : []),
+        ...(!hasAnnotations ? [{ op: K8S_OPS.ADD, path: '/metadata/annotations', value: {} }] : []),
         {
-          op: 'replace',
+          op: hasPasstAnnotation ? K8S_OPS.REPLACE : K8S_OPS.ADD,
           path: `/metadata/annotations/${escapeJsonPointerToken(PASST_ANNOTATION)}`,
           value: val.toString(),
         },
@@ -63,7 +92,7 @@ const usePasstFeatureFlag: UsePasstFeatureFlag = (clusterOverride) => {
       return kubevirtK8sPatch({
         cluster,
         data: patch,
-        model: HyperConvergedModel,
+        model: getHyperConvergedModelFromResource(hyperConvergeConfiguration),
         resource: hyperConvergeConfiguration,
       });
     },

@@ -1,11 +1,10 @@
-import { HCO_MANUAL_ROLE_AGGREGATION_STRATEGY } from '@kubevirt-utils/flags/consts';
+import {
+  HCO_AGGREGATE_TO_DEFAULT_ROLE_AGGREGATION_STRATEGY,
+  HCO_MANUAL_ROLE_AGGREGATION_STRATEGY,
+} from '@kubevirt-utils/flags/consts';
 import type { HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
 
-import {
-  HCO_AGGREGATE_TO_DEFAULT_ROLE_AGGREGATION_STRATEGY,
-  HCO_ROLE_AGGREGATION_STRATEGY_PATH,
-} from '../consts/consts';
 import { isAutomaticRoleGrantEnabled, setRoleAggregationStrategy } from './utils';
 
 jest.mock('@multicluster/k8sRequests', () => ({
@@ -14,11 +13,27 @@ jest.mock('@multicluster/k8sRequests', () => ({
 
 const mockKubevirtK8sPatch = kubevirtK8sPatch as jest.Mock;
 
-const createHyperConverge = (strategy?: string): HyperConverged =>
+const V1_ROLE_AGGREGATION_STRATEGY_PATH = '/spec/virtualization/roleAggregationStrategy';
+const V1BETA1_ROLE_AGGREGATION_STRATEGY_PATH = '/spec/roleAggregationStrategy';
+
+const createHyperConverge = (
+  strategy?: string,
+  apiVersion = 'hco.kubevirt.io/v1beta1',
+): HyperConverged =>
   ({
+    apiVersion,
     metadata: { name: 'kubevirt-hyperconverged', namespace: 'openshift-cnv' },
     spec: {
       ...(strategy ? { roleAggregationStrategy: strategy } : {}),
+    },
+  }) as HyperConverged;
+
+const createHyperConvergeV1 = (strategy?: string): HyperConverged =>
+  ({
+    apiVersion: 'hco.kubevirt.io/v1',
+    metadata: { name: 'kubevirt-hyperconverged', namespace: 'openshift-cnv' },
+    spec: {
+      ...(strategy ? { virtualization: { roleAggregationStrategy: strategy } } : {}),
     },
   }) as HyperConverged;
 
@@ -49,7 +64,7 @@ describe('AutomaticallyGrantVirtualizationRoles utils', () => {
   });
 
   describe('updateRoleAggregationStrategy', () => {
-    it('ADDs AggregateToDefault when field is missing', async () => {
+    it('ADDs AggregateToDefault when field is missing on v1beta1', async () => {
       const hyperConverge = createHyperConverge();
 
       await setRoleAggregationStrategy(hyperConverge, true, 'cluster-a');
@@ -60,7 +75,7 @@ describe('AutomaticallyGrantVirtualizationRoles utils', () => {
           data: [
             {
               op: 'add',
-              path: HCO_ROLE_AGGREGATION_STRATEGY_PATH,
+              path: V1BETA1_ROLE_AGGREGATION_STRATEGY_PATH,
               value: HCO_AGGREGATE_TO_DEFAULT_ROLE_AGGREGATION_STRATEGY,
             },
           ],
@@ -69,7 +84,7 @@ describe('AutomaticallyGrantVirtualizationRoles utils', () => {
       );
     });
 
-    it('REPLACEs with Manual when field exists', async () => {
+    it('REPLACEs with Manual when field exists on v1beta1', async () => {
       const hyperConverge = createHyperConverge(HCO_AGGREGATE_TO_DEFAULT_ROLE_AGGREGATION_STRATEGY);
 
       await setRoleAggregationStrategy(hyperConverge, false);
@@ -79,7 +94,52 @@ describe('AutomaticallyGrantVirtualizationRoles utils', () => {
           data: [
             {
               op: 'replace',
-              path: HCO_ROLE_AGGREGATION_STRATEGY_PATH,
+              path: V1BETA1_ROLE_AGGREGATION_STRATEGY_PATH,
+              value: HCO_MANUAL_ROLE_AGGREGATION_STRATEGY,
+            },
+          ],
+        }),
+      );
+    });
+
+    it('ADDs AggregateToDefault when field is missing on v1', async () => {
+      const hyperConverge = createHyperConvergeV1();
+
+      await setRoleAggregationStrategy(hyperConverge, true, 'cluster-a');
+
+      expect(mockKubevirtK8sPatch).toHaveBeenCalledWith(
+        expect.objectContaining({
+          cluster: 'cluster-a',
+          data: [
+            {
+              op: 'add',
+              path: '/spec/virtualization',
+              value: {},
+            },
+            {
+              op: 'add',
+              path: V1_ROLE_AGGREGATION_STRATEGY_PATH,
+              value: HCO_AGGREGATE_TO_DEFAULT_ROLE_AGGREGATION_STRATEGY,
+            },
+          ],
+          resource: hyperConverge,
+        }),
+      );
+    });
+
+    it('REPLACEs with Manual when field exists on v1', async () => {
+      const hyperConverge = createHyperConvergeV1(
+        HCO_AGGREGATE_TO_DEFAULT_ROLE_AGGREGATION_STRATEGY,
+      );
+
+      await setRoleAggregationStrategy(hyperConverge, false);
+
+      expect(mockKubevirtK8sPatch).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: [
+            {
+              op: 'replace',
+              path: V1_ROLE_AGGREGATION_STRATEGY_PATH,
               value: HCO_MANUAL_ROLE_AGGREGATION_STRATEGY,
             },
           ],

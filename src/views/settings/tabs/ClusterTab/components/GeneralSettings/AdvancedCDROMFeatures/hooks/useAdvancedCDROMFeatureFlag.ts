@@ -1,11 +1,11 @@
 import { useState } from 'react';
 
-import { HyperConvergedV1Beta1Model as HyperConvergedModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { K8S_OPS } from '@kubevirt-utils/constants/constants';
-import useHyperConvergeConfiguration, {
-  type HyperConverged,
-} from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
+import useHyperConvergeConfiguration from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
+import { type HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
+import { buildFeatureGatePatches } from '@kubevirt-utils/resources/hyperconverged/featureGates';
+import { getHyperConvergedModelFromResource } from '@kubevirt-utils/resources/hyperconverged/model';
+import { isFeatureGateEnabled } from '@kubevirt-utils/resources/hyperconverged/selectors';
 import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
 
 import { DECLARATIVE_HOTPLUG_VOLUMES_FEATURE_GATE } from './constants';
@@ -21,32 +21,22 @@ const updateDeclarativeHotplugVolumesFeatureGate = (
   hcoCR: HyperConverged,
   switchState: boolean,
   cluster?: string,
-): Promise<HyperConverged> => {
-  const featureGates = hcoCR.spec?.featureGates;
-  const hasGate = featureGates?.hasOwnProperty(DECLARATIVE_HOTPLUG_VOLUMES_FEATURE_GATE);
-
-  return kubevirtK8sPatch<HyperConverged>({
+): Promise<HyperConverged> =>
+  kubevirtK8sPatch<HyperConverged>({
     cluster,
-    data: [
-      ...(!featureGates ? [{ op: K8S_OPS.ADD, path: '/spec/featureGates', value: {} }] : []),
-      {
-        op: hasGate ? K8S_OPS.REPLACE : K8S_OPS.ADD,
-        path: `/spec/featureGates/${DECLARATIVE_HOTPLUG_VOLUMES_FEATURE_GATE}`,
-        value: switchState,
-      },
-    ],
-    model: HyperConvergedModel,
+    data: buildFeatureGatePatches(hcoCR, DECLARATIVE_HOTPLUG_VOLUMES_FEATURE_GATE, switchState),
+    model: getHyperConvergedModelFromResource(hcoCR),
     resource: hcoCR,
   });
-};
 
 const useAdvancedCDROMFeatureFlag = (cluster?: string): AdvancedCDROMFeatureFlag => {
   const [loading, setLoading] = useState(false);
   const [hyperConvergeConfiguration, hcoLoaded] = useHyperConvergeConfiguration(cluster);
   const isAdmin = useIsAdmin();
 
-  const featureEnabled = Boolean(
-    hyperConvergeConfiguration?.spec?.featureGates?.declarativeHotplugVolumes,
+  const featureEnabled = isFeatureGateEnabled(
+    hyperConvergeConfiguration,
+    DECLARATIVE_HOTPLUG_VOLUMES_FEATURE_GATE,
   );
 
   return {

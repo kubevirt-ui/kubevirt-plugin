@@ -1,17 +1,22 @@
 import { type FC, useEffect, useState } from 'react';
 
-import { HyperConvergedV1Beta1Model as HyperConvergedModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import SectionWithSwitch from '@kubevirt-utils/components/SectionWithSwitch/SectionWithSwitch';
 import { DISABLED_GUEST_SYSTEM_LOGS_ACCESS } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { type HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getHyperConvergedModelFromResource } from '@kubevirt-utils/resources/hyperconverged/model';
+import {
+  buildHyperConvergedPatch,
+  getVirtualMachineOptionsPatchPath,
+} from '@kubevirt-utils/resources/hyperconverged/patchUtils';
+import { getDisableSerialConsoleLog } from '@kubevirt-utils/resources/hyperconverged/selectors';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
 import { Alert, AlertVariant } from '@patternfly/react-core';
 import { useSettingsCluster } from '@settings/context/SettingsClusterContext';
 
-import { type HyperConvergeConfigurationWatch } from '../../GeneralSettings/consts/types';
+import { type HyperConvergeConfigurationWatch } from '../../GeneralSettings/consts/consts';
 
 import './guest-system-logs-access.scss';
 
@@ -31,8 +36,7 @@ const GuestSystemLogsAccess: FC<GuestSystemLogsAccessProps> = ({
     DISABLED_GUEST_SYSTEM_LOGS_ACCESS,
     cluster,
   );
-  const disableSerialConsoleLog =
-    hyperConverge?.spec?.virtualMachineOptions?.disableSerialConsoleLog;
+  const disableSerialConsoleLog = getDisableSerialConsoleLog(hyperConverge);
 
   const [error, setError] = useState<string>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -49,14 +53,12 @@ const GuestSystemLogsAccess: FC<GuestSystemLogsAccessProps> = ({
     try {
       await kubevirtK8sPatch<HyperConverged>({
         cluster,
-        data: [
-          {
-            op: 'replace',
-            path: `/spec/virtualMachineOptions/disableSerialConsoleLog`,
-            value: !checked,
-          },
-        ],
-        model: HyperConvergedModel,
+        data: buildHyperConvergedPatch(hyperConverge, {
+          op: 'replace',
+          path: getVirtualMachineOptionsPatchPath(hyperConverge, 'disableSerialConsoleLog'),
+          value: !checked,
+        }),
+        model: getHyperConvergedModelFromResource(hyperConverge),
         resource: hyperConverge,
       });
       void guestSystemLogsAccessToggle(!checked);

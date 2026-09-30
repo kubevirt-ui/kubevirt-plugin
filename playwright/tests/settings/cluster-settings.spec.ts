@@ -332,6 +332,7 @@ test.describe('Cluster Settings', { tag: [CNV_SETTINGS_TAG, '@adminOnly'] }, () 
   // ── Preview features tab ────────────────────────────────────────────────────────
 
   test('Preview features tab shows VM folders and Passt binding options', async ({
+    apiClient,
     settingsPage,
     utils,
   }) => {
@@ -358,10 +359,12 @@ test.describe('Cluster Settings', { tag: [CNV_SETTINGS_TAG, '@adminOnly'] }, () 
       expect.soft(hasPasst, 'Passt binding preview feature should be listed').toBe(true);
     });
 
-    // Assumes HCO v1 (OCP 4.23+): Template is Beta / first-class, so the
-    // Preview Features jsonpatch toggle is hidden. HCO v1beta1 still shows it
-    // and is not covered here.
-    await test.step('Native VirtualMachine templates feature flag is absent (HCO v1)', async () => {
+    // HCO v1 (Template is Beta) hides the preview toggle. HCO v1beta1 still shows it.
+    await test.step('Native VirtualMachine templates feature flag matches the HCO version', async () => {
+      const hyperConverged = await apiClient.getHyperConverged();
+      const isHCOV1 = Boolean(
+        hyperConverged?.apiVersion && !String(hyperConverged.apiVersion).includes('v1beta1'),
+      );
       const hasNativeTemplates = labels.some(
         (l) =>
           l.toLowerCase().includes('native virtualmachine template') ||
@@ -370,9 +373,11 @@ test.describe('Cluster Settings', { tag: [CNV_SETTINGS_TAG, '@adminOnly'] }, () 
       expect
         .soft(
           hasNativeTemplates,
-          'Native VM templates should not appear in preview features on HCO v1 (CNV-92254)',
+          isHCOV1
+            ? 'Native VM templates should not appear in preview features on HCO v1 (CNV-92254)'
+            : 'Native VM templates should appear in preview features on HCO v1beta1',
         )
-        .toBe(false);
+        .toBe(!isHCOV1);
     });
   });
 

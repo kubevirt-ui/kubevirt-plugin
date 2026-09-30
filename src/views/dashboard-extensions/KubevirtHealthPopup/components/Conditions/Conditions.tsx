@@ -1,11 +1,11 @@
 import { type FC } from 'react';
 import { Link } from 'react-router';
 
-import { HyperConvergedV1Beta1Model as HyperConvergedModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { AlertType } from '@kubevirt-utils/components/AlertsCard/utils/types';
 import useHyperConvergeConfiguration from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import useInfrastructureAlerts from '@kubevirt-utils/hooks/useInfrastructureAlerts/useInfrastructureAlerts';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getHyperConvergedModelFromResource } from '@kubevirt-utils/resources/hyperconverged/model';
 import { getResourceUrl } from '@kubevirt-utils/resources/shared';
 import { Skeleton, StackItem } from '@patternfly/react-core';
 
@@ -42,7 +42,12 @@ const Conditions: FC = () => {
       </StackItem>
       <StackItem className="kv-health-popup__alerts-count">
         <ConditionIcon conditionValue={condition} />
-        <Link to={getResourceUrl({ model: HyperConvergedModel, resource: hyperConverge })}>
+        <Link
+          to={getResourceUrl({
+            model: getHyperConvergedModelFromResource(hyperConverge),
+            resource: hyperConverge,
+          })}
+        >
           {label}
         </Link>
       </StackItem>

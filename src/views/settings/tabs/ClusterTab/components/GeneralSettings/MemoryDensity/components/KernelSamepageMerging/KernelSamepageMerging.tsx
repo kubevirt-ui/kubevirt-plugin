@@ -1,9 +1,14 @@
 import { type FC, useEffect, useState } from 'react';
 
-import { HyperConvergedV1Beta1Model as HyperConvergedModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import SectionWithSwitch from '@kubevirt-utils/components/SectionWithSwitch/SectionWithSwitch';
 import { type HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getHyperConvergedModelFromResource } from '@kubevirt-utils/resources/hyperconverged/model';
+import {
+  buildHyperConvergedPatch,
+  getKsmConfigurationPatchPath,
+} from '@kubevirt-utils/resources/hyperconverged/patchUtils';
+import { getKsmConfiguration } from '@kubevirt-utils/resources/hyperconverged/selectors';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
@@ -23,7 +28,7 @@ const KernelSamepageMerging: FC<KernelSamepageMergingProps> = ({
   const { t } = useKubevirtTranslation();
   const cluster = useSettingsCluster();
   const [hyperConverge, hyperLoaded] = hyperConvergeConfiguration;
-  const ksmConfiguration = hyperConverge?.spec?.ksmConfiguration;
+  const ksmConfiguration = getKsmConfiguration(hyperConverge);
   const [isEnabled, setIsEnabled] = useState<boolean>();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<null | string>(null);
@@ -44,14 +49,12 @@ const KernelSamepageMerging: FC<KernelSamepageMergingProps> = ({
     setIsLoading(true);
     kubevirtK8sPatch<HyperConverged>({
       cluster,
-      data: [
-        {
-          op: !ksmConfiguration ? 'add' : 'replace',
-          path: `/spec/ksmConfiguration`,
-          value: value ? { nodeLabelSelector: {} } : {},
-        },
-      ],
-      model: HyperConvergedModel,
+      data: buildHyperConvergedPatch(hyperConverge, {
+        op: !ksmConfiguration ? 'add' : 'replace',
+        path: getKsmConfigurationPatchPath(hyperConverge),
+        value: value ? { nodeLabelSelector: {} } : {},
+      }),
+      model: getHyperConvergedModelFromResource(hyperConverge),
       resource: hyperConverge,
     })
       .then(() => setIsEnabled(value))
