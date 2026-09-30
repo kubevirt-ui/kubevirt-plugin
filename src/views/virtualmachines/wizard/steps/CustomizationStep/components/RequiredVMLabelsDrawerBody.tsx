@@ -43,6 +43,7 @@ const RequiredVMLabelsDrawerBody: FC<RequiredVMLabelsDrawerBodyProps> = ({ requi
 
           draft.metadata.labels[key] = value;
         }),
+        vmDraft,
       );
 
       if (saveAsDefaults) {

@@ -1,5 +1,5 @@
 import { type FC } from 'react';
-import { useWatch } from 'react-hook-form';
+import produce from 'immer';
 
 import {
   type V1Disk,
@@ -10,20 +10,15 @@ import {
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { ensurePath } from '@kubevirt-utils/utils/utils';
 import { PageSection, Title } from '@patternfly/react-core';
 import AddNetworkInterfaceButton from '@virtualmachines/details/tabs/configuration/network/components/AddNetworkInterfaceButton';
-import { useVMWizardForm } from '@virtualmachines/wizard/form/VMWizardFormProvider';
+import { useWizardVMDraft } from '@virtualmachines/wizard/hooks/useWizardVMDraft';
 import NetworkInterfaceList from '@virtualmachines/wizard/steps/CustomizationStep/components/CustomizeVirtualMachine/components/CustomizeVMTabs/tabs/network/NetworkInterfaceList';
-import {
-  patchWizardCustomizedVM,
-  type PatchWizardCustomizedVMArgs,
-} from '@virtualmachines/wizard/utils/patchWizardCustomizedVM';
 
 const CustomizeInstanceTypeNetworkTab: FC = () => {
   const { t } = useKubevirtTranslation();
-  const { getValues, setValue } = useVMWizardForm();
-  const { control } = useVMWizardForm();
-  const vm = useWatch({ control, name: 'customization.vmDraft' });
+  const { replaceDraft, vmDraft: vm } = useWizardVMDraft();
 
   if (!vm) {
     return <Loading />;
@@ -34,20 +29,21 @@ const CustomizeInstanceTypeNetworkTab: FC = () => {
     updatedInterfaces: V1Interface[],
     updatedDisks?: V1Disk[],
   ): Promise<V1VirtualMachine> => {
-    const updates: PatchWizardCustomizedVMArgs = [
-      { data: updatedNetworks, path: 'spec.template.spec.networks' },
-      { data: updatedInterfaces, path: 'spec.template.spec.domain.devices.interfaces' },
-    ];
-    if (updatedDisks) {
-      updates.push({ data: updatedDisks, path: 'spec.template.spec.domain.devices.disks' });
-    }
-    const patchedVM = patchWizardCustomizedVM(getValues, setValue, updates);
+    const patchedVM = replaceDraft(
+      produce(vm, (draft) => {
+        ensurePath(draft, 'spec.template.spec.domain.devices');
+        draft.spec.template.spec.networks = updatedNetworks;
+        draft.spec.template.spec.domain.devices.interfaces = updatedInterfaces;
+        if (updatedDisks) draft.spec.template.spec.domain.devices.disks = updatedDisks;
+      }),
+      vm,
+    );
 
     return Promise.resolve(patchedVM ?? vm);
   };
 
   const onUpdateVM = (updatedVM: V1VirtualMachine): Promise<void> => {
-    patchWizardCustomizedVM(getValues, setValue, [{ data: updatedVM }]);
+    replaceDraft(updatedVM, vm);
     return Promise.resolve();
   };
 

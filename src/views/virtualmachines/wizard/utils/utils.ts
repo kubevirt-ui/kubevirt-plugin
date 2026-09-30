@@ -7,13 +7,7 @@ import { getDiskSize } from '@kubevirt-utils/resources/bootableresources/selecto
 import CloneIcon from '@virtualmachines/wizard/steps/DeploymentDetailsStep/components/CreationMethodTileGroup/components/CreationMethodTile/components/CloneIcon';
 import { InstanceTypeIcon } from '@virtualmachines/wizard/steps/DeploymentDetailsStep/components/CreationMethodTileGroup/components/CreationMethodTile/components/InstanceTypeIcon';
 import TemplateIcon from '@virtualmachines/wizard/steps/DeploymentDetailsStep/components/CreationMethodTileGroup/components/CreationMethodTile/components/TemplateIcon';
-import {
-  CLONE_FLOW,
-  INSTANCE_TYPE_FLOW,
-  TEMPLATE_FLOW,
-  VMCreationMethod,
-  type VMWizardStep,
-} from '@virtualmachines/wizard/utils/constants';
+import { VMCreationMethod } from '@virtualmachines/wizard/utils/constants';
 
 import { type VMWizardFormValues } from '../form/types';
 import {
@@ -24,7 +18,6 @@ import {
 
 const VM_CREATION_METHOD_MAPPER: Record<VMCreationMethod, VMCreationMethodConfig> = {
   [VMCreationMethod.CLONE]: {
-    activeFlow: CLONE_FLOW,
     cardDetails: (t) => ({
       description: t('Create a copy of an existing VirtualMachine.'),
       IconComponent: CloneIcon,
@@ -32,7 +25,6 @@ const VM_CREATION_METHOD_MAPPER: Record<VMCreationMethod, VMCreationMethodConfig
     }),
   },
   [VMCreationMethod.INSTANCE_TYPE]: {
-    activeFlow: INSTANCE_TYPE_FLOW,
     cardDetails: (t) => ({
       description: t(
         'Create a new VM by selecting an operating system and the right performance for your workload.',
@@ -42,7 +34,6 @@ const VM_CREATION_METHOD_MAPPER: Record<VMCreationMethod, VMCreationMethodConfig
     }),
   },
   [VMCreationMethod.TEMPLATE]: {
-    activeFlow: TEMPLATE_FLOW,
     cardDetails: (t) => ({
       description: t(
         'Create a pre-configured VM using standardized images. This option requires an existing template.',
@@ -52,9 +43,6 @@ const VM_CREATION_METHOD_MAPPER: Record<VMCreationMethod, VMCreationMethodConfig
     }),
   },
 };
-
-export const getActiveFlow = (creationMethod: VMCreationMethod): readonly VMWizardStep[] =>
-  VM_CREATION_METHOD_MAPPER[creationMethod].activeFlow;
 
 export const getVMCreationMethodDetails = (
   creationMethod: VMCreationMethod,

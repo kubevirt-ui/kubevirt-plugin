@@ -6,13 +6,7 @@ import {
   type V1ContainerDiskSource,
   type V1VirtualMachine,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { type V1beta1VirtualMachineTemplateSpecParameters } from '@kubevirt-ui-ext/kubevirt-api/virt-template';
-import {
-  getParameters,
-  isOpenShiftTemplate,
-  isVirtualMachineTemplate,
-  type Template,
-} from '@kubevirt-utils/resources/template';
+import { getParameters, type Template } from '@kubevirt-utils/resources/template';
 import { getDisks, getVolumes } from '@kubevirt-utils/resources/vm';
 import { PARAMETER_VALUE_TYPES } from '@templates/details/tabs/parameters/constants';
 import {
@@ -54,24 +48,6 @@ export const getDiskSource = (
   }
 };
 
-export const changeTemplateParameterValue = (
-  template: Template,
-  parameterName: string,
-  value: string,
-): Template => {
-  const parameters = getParameters(template)?.map((parameter) => {
-    if (parameter.name === parameterName) parameter.value = value;
-
-    return parameter;
-  });
-
-  if (isOpenShiftTemplate(template)) template.parameters = parameters;
-  if (isVirtualMachineTemplate(template))
-    template.spec.parameters = parameters as V1beta1VirtualMachineTemplateSpecParameters[];
-
-  return template;
-};
-
 export const isRequiredParameterUnfulfilled = (param: TemplateParameter): boolean =>
   Boolean(param.required) &&
   param.name !== NAME_INPUT_FIELD &&
@@ -97,12 +73,6 @@ export const getPasswordParameterValueError = (t: TFunction, value: string): str
 
 export const hasPasswordParameterValueError = (t: TFunction, value: string): boolean =>
   Boolean(getPasswordParameterValueError(t, value));
-
-export const hasAnyParameterValidationError = (
-  parameters: TemplateParameter[],
-  t: TFunction,
-): boolean =>
-  parameters.some((parameter) => hasPasswordParameterValueError(t, parameter.value ?? ''));
 
 export const hasInvalidPasswordParameter = (
   parameters: TemplateParameter[],

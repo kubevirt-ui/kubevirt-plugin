@@ -8,16 +8,18 @@ import {
   START_AFTER_CREATION_CHECKBOX_ID,
 } from '@kubevirt-utils/components/RunStrategyModal/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { ensurePath } from '@kubevirt-utils/utils/utils';
 import { Checkbox, Stack, StackItem, Title, TitleSizes } from '@patternfly/react-core';
 import { useVMWizardForm } from '@virtualmachines/wizard/form/VMWizardFormProvider';
 import { useWizardReviewVM } from '@virtualmachines/wizard/hooks/useWizardReviewVM';
+import { useWizardVMDraft } from '@virtualmachines/wizard/hooks/useWizardVMDraft';
 import ReviewGrid from '@virtualmachines/wizard/steps/ReviewAndCreateStep/components/ReviewGrid/ReviewGrid';
-import { patchWizardCustomizedVM } from '@virtualmachines/wizard/utils/patchWizardCustomizedVM';
 import { isCloneCreationMethod } from '@virtualmachines/wizard/utils/utils';
 
 const ReviewAndCreateStep: FC = () => {
   const { t } = useKubevirtTranslation();
   const { control, getValues, setValue } = useVMWizardForm();
+  const { replaceDraft } = useWizardVMDraft();
   const creationMethod = useWatch({ control, name: 'creationMethod' });
   const vm = useWizardReviewVM();
   const isCloneMethod = isCloneCreationMethod(creationMethod);
@@ -48,7 +50,6 @@ const ReviewAndCreateStep: FC = () => {
           label={getStartAfterCreationLabel(t)}
           onChange={(_event, checked: boolean) => {
             const { newStrategy } = onToggle(checked);
-            const runStrategyPatch = [{ data: newStrategy, path: 'spec.runStrategy' }];
             if (isCloneMethod) {
               setValue(
                 'clone.sourceVM',
@@ -57,7 +58,16 @@ const ReviewAndCreateStep: FC = () => {
                 }),
               );
             } else {
-              patchWizardCustomizedVM(getValues, setValue, runStrategyPatch);
+              const currentVM = getValues('customization.vmDraft');
+              if (!currentVM) return;
+
+              replaceDraft(
+                produce(currentVM, (draft) => {
+                  ensurePath(draft, 'spec');
+                  draft.spec.runStrategy = newStrategy;
+                }),
+                currentVM,
+              );
             }
           }}
         />
