@@ -23,8 +23,8 @@ export const useUploadProgressStore = create<UploadProgressStoreState>((set, get
   cancelTrackedUpload: (uploadKey): Promise<void> => performCancelTrackedUpload(get, uploadKey),
   cancelUploadsForVm: (cluster, namespace, vmName): Promise<void> =>
     performCancelUploadsForVm(get, cluster, namespace, vmName),
-  cancelWizardPendingUploads: (wizardVm, wizardBootableVolumeKeys): Promise<void> =>
-    performCancelWizardPendingUploads(get, wizardVm, wizardBootableVolumeKeys),
+  cancelWizardPendingUploads: (uploadKeys): Promise<void> =>
+    performCancelWizardPendingUploads(get, uploadKeys),
   completeUpload: (uploadKey, options): void =>
     set((state) => completeUploadState(state, uploadKey, options)),
   failUpload: (uploadKey, errorMessage, expectedGeneration): void =>

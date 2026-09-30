@@ -12,3 +12,12 @@ export type DiskRowActionsProps = {
   vm: V1VirtualMachine;
   vmi?: V1VirtualMachineInstance;
 };
+
+export type DiskListProps = {
+  customize?: boolean;
+  getCurrentVM?: () => null | undefined | V1VirtualMachine;
+  onDiskUpdate?: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine>;
+  onUploadStart?: (uploadKey: string) => void;
+  vm: V1VirtualMachine;
+  vmi?: V1VirtualMachineInstance;
+};

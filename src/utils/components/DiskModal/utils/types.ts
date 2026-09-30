@@ -72,6 +72,7 @@ export type V1DiskModalProps = {
     diskFormState?: V1DiskFormState,
   ) => Promise<V1VirtualMachine | void>;
   onUploadedDataVolume?: (dataVolume: V1beta1DataVolume) => void;
+  onUploadStart?: (uploadKey: string) => void;
   onUploadStarted?: (uploadPromise: Promise<unknown>, cdromDiskName?: string) => void;
   vm: V1VirtualMachine;
 };
@@ -131,6 +132,7 @@ export type SubmitCDROMInput = {
   isHotPluggable: boolean;
   onSubmit: V1DiskModalProps['onSubmit'];
   onUploadedDataVolume?: V1DiskModalProps['onUploadedDataVolume'];
+  onUploadStart?: V1DiskModalProps['onUploadStart'];
   onUploadStarted?: V1DiskModalProps['onUploadStarted'];
   selectedISO: string;
   t: TFunction;

@@ -3,6 +3,7 @@ import { type TFunction } from 'i18next';
 
 import { getInstanceTypeFromVolume } from '@kubevirt-utils/components/AddBootableVolumeModal/utils';
 import { cancelAllWizardPendingUploads } from '@kubevirt-utils/hooks/useUploadProgressToast';
+import { isBootableVolumeUploadKey } from '@kubevirt-utils/hooks/useUploadProgressToast/keys/uploadKeys';
 import { getDiskSize } from '@kubevirt-utils/resources/bootableresources/selectors';
 import CloneIcon from '@virtualmachines/wizard/steps/DeploymentDetailsStep/components/CreationMethodTileGroup/components/CreationMethodTile/components/CloneIcon';
 import { InstanceTypeIcon } from '@virtualmachines/wizard/steps/DeploymentDetailsStep/components/CreationMethodTileGroup/components/CreationMethodTile/components/InstanceTypeIcon';
@@ -91,7 +92,30 @@ export const clearVMPendingUploads = (
   getValues: UseFormGetValues<VMWizardFormValues>,
   setValue: UseFormSetValue<VMWizardFormValues>,
 ): void => {
-  const uploadKeys = getValues('customization.pendingBootableVolumeUploadKeys');
-  setValue('customization.pendingBootableVolumeUploadKeys', []);
-  cancelAllWizardPendingUploads(getValues('customization.vmDraft'), uploadKeys);
+  const uploadKeys = getValues('customization.pendingUploadKeys');
+
+  setValue('customization.pendingUploadKeys', []);
+  cancelAllWizardPendingUploads(uploadKeys);
+};
+
+export const trackWizardPendingUploadKey = (
+  getValues: UseFormGetValues<VMWizardFormValues>,
+  setValue: UseFormSetValue<VMWizardFormValues>,
+  uploadKey: string,
+): void => {
+  const keys = getValues('customization.pendingUploadKeys');
+
+  if (uploadKey && !keys.includes(uploadKey)) {
+    setValue('customization.pendingUploadKeys', [...keys, uploadKey]);
+  }
+};
+
+export const clearWizardDraftPendingUploads = (
+  getValues: UseFormGetValues<VMWizardFormValues>,
+  setValue: UseFormSetValue<VMWizardFormValues>,
+): void => {
+  const uploadKeys = getValues('customization.pendingUploadKeys');
+
+  setValue('customization.pendingUploadKeys', uploadKeys.filter(isBootableVolumeUploadKey));
+  cancelAllWizardPendingUploads(uploadKeys.filter((key) => !isBootableVolumeUploadKey(key)));
 };

@@ -1,6 +1,5 @@
 import { type ReactNode } from 'react';
 
-import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { type UPLOAD_STATUS, type UploadError } from '@kubevirt-utils/hooks/useCDIUpload/types';
 import type { K8sGroupVersionKind } from '@openshift-console/dynamic-plugin-sdk';
 
@@ -84,10 +83,7 @@ export type RegisterCdiUploadParams = {
 export type UploadProgressStoreState = {
   cancelTrackedUpload: (uploadKey: string) => Promise<void>;
   cancelUploadsForVm: (cluster: string, namespace: string, vmName: string) => Promise<void>;
-  cancelWizardPendingUploads: (
-    wizardVm?: V1VirtualMachine,
-    wizardBootableVolumeKeys?: string[],
-  ) => Promise<void>;
+  cancelWizardPendingUploads: (uploadKeys: string[]) => Promise<void>;
   completeUpload: (uploadKey: string, options?: CompleteUploadOptions) => void;
   failUpload: (uploadKey: string, errorMessage: string, expectedGeneration?: number) => void;
   generationsByKey: Record<string, number>;

@@ -31,6 +31,7 @@ type MountCDROMModalProps = {
   isOpen: boolean;
   onClose: () => void;
   onSubmit?: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine>;
+  onUploadStart?: (uploadKey: string) => void;
   vm: V1VirtualMachine;
 };
 
@@ -40,6 +41,7 @@ const MountCDROMModal: FC<MountCDROMModalProps> = ({
   isOpen,
   onClose,
   onSubmit,
+  onUploadStart,
   vm,
 }) => {
   const { t } = useKubevirtTranslation();
@@ -93,6 +95,7 @@ const MountCDROMModal: FC<MountCDROMModalProps> = ({
         isVMRunning,
         onClose,
         onSubmit,
+        onUploadStart,
         selectedISO,
         t,
         uploadData,

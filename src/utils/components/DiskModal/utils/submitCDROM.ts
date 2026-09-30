@@ -31,6 +31,7 @@ export const submitCDROM = async (
     isHotPluggable,
     onSubmit,
     onUploadedDataVolume,
+    onUploadStart,
     onUploadStarted,
     selectedISO,
     t,
@@ -70,6 +71,8 @@ export const submitCDROM = async (
     );
     const submitResult = (await onSubmit(updatedVM)) as V1VirtualMachine | undefined;
     const vmAfterSubmit = submitResult ?? updatedVM;
+
+    onUploadStart?.(uploadKey);
 
     const uploadPromise = runVmCdromBackgroundUpload({
       diskState: mutableData,

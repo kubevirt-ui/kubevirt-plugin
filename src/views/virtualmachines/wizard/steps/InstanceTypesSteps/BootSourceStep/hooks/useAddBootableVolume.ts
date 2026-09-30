@@ -4,7 +4,10 @@ import { type PreferenceOption } from '@kubevirt-utils/components/AddBootableVol
 import useCanCreateBootableVolume from '@kubevirt-utils/resources/bootableresources/hooks/useCanCreateBootableVolume';
 import { type BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { useVMWizardForm } from '@virtualmachines/wizard/form/VMWizardFormProvider';
-import { applySelectedBootableVolumeToForm } from '@virtualmachines/wizard/utils/utils';
+import {
+  applySelectedBootableVolumeToForm,
+  trackWizardPendingUploadKey,
+} from '@virtualmachines/wizard/utils/utils';
 
 export type AddBootableVolume = {
   canCreate: boolean;
@@ -34,12 +37,8 @@ const useAddBootableVolume = (): AddBootableVolume => {
     });
   };
 
-  const onUploadStart = (uploadKey: string): void => {
-    const keys = getValues('customization.pendingBootableVolumeUploadKeys');
-
-    if (!keys.includes(uploadKey))
-      setValue('customization.pendingBootableVolumeUploadKeys', [...keys, uploadKey]);
-  };
+  const onUploadStart = (uploadKey: string): void =>
+    trackWizardPendingUploadKey(getValues, setValue, uploadKey);
 
   return {
     canCreate,

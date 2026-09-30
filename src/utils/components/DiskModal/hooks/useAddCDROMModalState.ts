@@ -27,7 +27,15 @@ import { SourceTypes, type V1DiskFormState, type V1SubDiskModalProps } from '../
 import { type UseAddCDROMModalStateResult } from './types';
 
 const useAddCDROMModalState = (props: V1SubDiskModalProps): UseAddCDROMModalStateResult => {
-  const { getCurrentVM, onClose, onSubmit, onUploadedDataVolume, onUploadStarted, vm } = props;
+  const {
+    getCurrentVM,
+    onClose,
+    onSubmit,
+    onUploadedDataVolume,
+    onUploadStart,
+    onUploadStarted,
+    vm,
+  } = props;
   const { t } = useKubevirtTranslation();
   const { checkUploadReady, uploadData } = useCDIUpload(getCluster(vm));
   const isVMRunning = isRunning(vm);
@@ -95,6 +103,7 @@ const useAddCDROMModalState = (props: V1SubDiskModalProps): UseAddCDROMModalStat
         isHotPluggable: isDeclarativeHotplugEnabled,
         onSubmit,
         onUploadedDataVolume,
+        onUploadStart,
         onUploadStarted,
         selectedISO,
         t,
