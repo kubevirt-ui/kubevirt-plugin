@@ -11,8 +11,8 @@ import { useActivePerspective } from '@openshift-console/dynamic-plugin-sdk';
 
 const buildVMAlertsUrlParams = (): string => {
   const params = new URLSearchParams();
-  params.set('rowFilter-alert-state', 'firing');
-  params.set('rowFilter-alert-source', 'platform');
+  params.set('alert-state', 'firing');
+  params.set('alert-source', 'platform');
   params.append('alerts', `kubernetes_operator_part_of=${KUBEVIRT}`);
   params.append('alerts', 'operator_health_impact=none');
   return `?${params.toString()}`;
