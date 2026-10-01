@@ -5,6 +5,7 @@ import {
   type V1beta1DataVolume,
 } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import { type V1beta1DataVolumeSource } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { KUBEVIRT_ISO_LABEL } from '@kubevirt-utils/resources/bootableresources/constants';
 import { ARCHITECTURE_LABEL } from '@kubevirt-utils/utils/architecture';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 
@@ -42,7 +43,7 @@ export const setDataSourceMetadata = (
   dataSource: V1beta1DataSource,
   architecture: string,
 ): V1beta1DataSource => {
-  const { annotations, bootableVolumeName, labels } = bootableVolume || {};
+  const { annotations, bootableVolumeName, isIso, labels } = bootableVolume || {};
 
   const hasSelectedArchitecture = !isEmpty(architecture);
 
@@ -55,5 +56,12 @@ export const setDataSourceMetadata = (
     draftDS.metadata.labels = hasSelectedArchitecture
       ? { ...labels, [ARCHITECTURE_LABEL]: architecture }
       : labels;
+
+    if (isIso) {
+      draftDS.metadata.labels = {
+        ...(draftDS.metadata.labels ?? {}),
+        [KUBEVIRT_ISO_LABEL]: 'true',
+      };
+    }
   });
 };

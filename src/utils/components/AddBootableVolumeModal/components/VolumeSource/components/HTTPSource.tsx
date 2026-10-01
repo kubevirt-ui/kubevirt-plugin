@@ -13,6 +13,8 @@ import { useRequiredFieldValidation } from '@kubevirt-utils/hooks/useRequiredFie
 import { getFieldRequiredMessage } from '@kubevirt-utils/utils/validation';
 import { FormGroup } from '@patternfly/react-core';
 
+import DiskSourceUploadISO from './DiskSourceUploadISO';
+
 type HTTPSourceProps = {
   bootableVolume: AddBootableVolumeState;
   setBootableVolumeField: SetBootableVolumeFieldType;
@@ -62,6 +64,11 @@ const HTTPSource: FC<HTTPSourceProps> = ({
           )}
         </FormGroupHelperText>
       </FormGroup>
+
+      <DiskSourceUploadISO
+        isIso={bootableVolume.isIso ?? false}
+        setIsIso={setBootableVolumeField('isIso')}
+      />
 
       <TLSCertificateSection
         cluster={bootableVolume?.bootableVolumeCluster}

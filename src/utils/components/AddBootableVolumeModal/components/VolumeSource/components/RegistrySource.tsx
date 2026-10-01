@@ -7,6 +7,8 @@ import { removeAllWhitespace } from '@kubevirt-utils/utils/utils';
 
 import { type AddBootableVolumeState, type SetBootableVolumeFieldType } from '../../../types';
 
+import DiskSourceUploadISO from './DiskSourceUploadISO';
+
 type RegistrySourceProps = {
   bootableVolume: AddBootableVolumeState;
   setBootableVolumeField: SetBootableVolumeFieldType;
@@ -29,15 +31,21 @@ const RegistrySource: FC<RegistrySourceProps> = ({
   };
 
   return (
-    <ContainerSource
-      containerImage={registryURL}
-      onInputValueChange={handleInputValueChange}
-      registryCredentials={registryCredentials}
-      registrySourceHelperText={t('Example: quay.io/containerdisks/centos:7-2009')}
-      selectedSourceType="registry"
-      setRegistryCredentials={handleCredentialsChange}
-      testId="volume-registry"
-    />
+    <>
+      <ContainerSource
+        containerImage={registryURL}
+        onInputValueChange={handleInputValueChange}
+        registryCredentials={registryCredentials}
+        registrySourceHelperText={t('Example: quay.io/containerdisks/centos:7-2009')}
+        selectedSourceType="registry"
+        setRegistryCredentials={handleCredentialsChange}
+        testId="volume-registry"
+      />
+      <DiskSourceUploadISO
+        isIso={bootableVolume.isIso ?? false}
+        setIsIso={setBootableVolumeField('isIso')}
+      />
+    </>
   );
 };
 
