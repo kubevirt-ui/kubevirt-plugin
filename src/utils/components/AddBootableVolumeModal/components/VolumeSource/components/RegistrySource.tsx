@@ -6,7 +6,6 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { removeAllWhitespace } from '@kubevirt-utils/utils/utils';
 
 import { type AddBootableVolumeState, type SetBootableVolumeFieldType } from '../../../types';
-
 import DiskSourceUploadISO from './DiskSourceUploadISO';
 
 type RegistrySourceProps = {
