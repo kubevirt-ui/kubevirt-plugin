@@ -1,6 +1,6 @@
 import { AlertType } from '@kubevirt-utils/components/AlertsCard/utils/types';
 
-export const SEVERITY_FILTER_PARAM = 'rowFilter-alert-severity';
+export const SEVERITY_FILTER_PARAM = 'alert-severity';
 
 export const appendSeverityFilter = (baseUrl: string, severity: AlertType): string => {
   const separator = baseUrl.includes('?') ? '&' : '?';
