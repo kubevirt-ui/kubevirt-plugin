@@ -23,7 +23,7 @@ export const iconMapper: Record<string, FC<ColoredIconProps>> = {
 };
 
 // https://kubevirt.io/user-guide/operations/snapshot_restore_api/#snapshot-a-virtualmachine
-export enum DeadlineUnits {
+export enum TimeoutUnits {
   Hours = 'h',
   Minutes = 'm',
   Seconds = 's',
