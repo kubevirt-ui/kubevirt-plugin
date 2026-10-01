@@ -10,9 +10,10 @@ import { Divider, Grid, GridItem, PageSection } from '@patternfly/react-core';
 import DiskList from '@virtualmachines/details/tabs/configuration/storage/components/tables/disk/DiskList';
 import { useVMWizardForm } from '@virtualmachines/wizard/form/VMWizardFormProvider';
 import { useWizardVMDraft } from '@virtualmachines/wizard/hooks/useWizardVMDraft';
+import { trackWizardPendingUploadKey } from '@virtualmachines/wizard/utils/utils';
 
 const CustomizeInstanceTypeStorageTab: FC = () => {
-  const { getValues } = useVMWizardForm();
+  const { getValues, setValue } = useVMWizardForm();
   const { replaceDraft, vmDraft: vm } = useWizardVMDraft();
 
   if (!vm) {
@@ -42,6 +43,9 @@ const CustomizeInstanceTypeStorageTab: FC = () => {
 
               return Promise.resolve(vmModified ?? updatedVM);
             }}
+            onUploadStart={(uploadKey) =>
+              trackWizardPendingUploadKey(getValues, setValue, uploadKey)
+            }
             vm={vm}
           />
         </PageSection>

@@ -48,11 +48,13 @@ const getAddedDiskState = (): V1DiskFormState => (addDisk as jest.Mock).mock.cal
 
 describe('submitCDROM - upload volume wiring', () => {
   const onSubmit = jest.fn(async (vm: V1VirtualMachine) => vm);
+  const onUploadStart = jest.fn();
   const onUploadStarted = jest.fn();
   const uploadData = jest.fn();
   const t = ((key: string) => key) as TFunction;
   const baseParams = {
     onSubmit,
+    onUploadStart,
     selectedISO: '',
     t,
     uploadData,
@@ -121,6 +123,12 @@ describe('submitCDROM - upload volume wiring', () => {
         vm: baseVM,
       }),
     );
+    expect(onUploadStart).toHaveBeenCalledWith(
+      (runVmCdromBackgroundUpload as jest.Mock).mock.calls[0][0].uploadKey,
+    );
+    expect(onUploadStart.mock.invocationCallOrder[0]).toBeLessThan(
+      (runVmCdromBackgroundUpload as jest.Mock).mock.invocationCallOrder[0],
+    );
     expect(onUploadStarted).toHaveBeenCalledTimes(1);
   });
 
@@ -156,6 +164,7 @@ describe('submitCDROM - upload volume wiring', () => {
     ).rejects.toThrow('patch failed');
 
     expect(runVmCdromBackgroundUpload).not.toHaveBeenCalled();
+    expect(onUploadStart).not.toHaveBeenCalled();
   });
 
   it('does not start an upload when mounting an existing ISO', async () => {
@@ -166,6 +175,7 @@ describe('submitCDROM - upload volume wiring', () => {
     });
 
     expect(runVmCdromBackgroundUpload).not.toHaveBeenCalled();
+    expect(onUploadStart).not.toHaveBeenCalled();
     expect(getAddedDiskState().volume?.persistentVolumeClaim?.claimName).toBe('existing-iso');
   });
 
@@ -177,6 +187,7 @@ describe('submitCDROM - upload volume wiring', () => {
     });
 
     expect(runVmCdromBackgroundUpload).not.toHaveBeenCalled();
+    expect(onUploadStart).not.toHaveBeenCalled();
     expect(getAddedDiskState().volume).toBeUndefined();
   });
 });

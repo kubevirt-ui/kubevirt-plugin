@@ -55,7 +55,7 @@ export const createCloneDefaultValues = (): VMWizardCloneValues => ({
 
 export const createCustomizationDefaultValues = (): VMWizardCustomizationValues => ({
   autoLabelsApplied: false,
-  pendingBootableVolumeUploadKeys: [],
+  pendingUploadKeys: [],
   templateAdditionalObjects: [],
   vmDraft: null,
 });

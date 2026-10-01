@@ -15,6 +15,7 @@ import { useHubClusterName } from '@stolostron/multicluster-sdk';
 import { useVMWizardForm } from '@virtualmachines/wizard/form/VMWizardFormProvider';
 import { useWizardVMDraft } from '@virtualmachines/wizard/hooks/useWizardVMDraft';
 import { VMCreationMethod } from '@virtualmachines/wizard/utils/constants';
+import { clearWizardDraftPendingUploads } from '@virtualmachines/wizard/utils/utils';
 
 import './VMCreationLocationForm.scss';
 
@@ -35,6 +36,7 @@ const VMCreationLocationForm: FC = () => {
   });
 
   const clearLocationDependentVM = (): void => {
+    clearWizardDraftPendingUploads(getValues, setValue);
     if (getValues('creationMethod') === VMCreationMethod.CLONE) {
       setValue('clone.sourceVM', null, { shouldValidate: true });
     }
@@ -54,10 +56,10 @@ const VMCreationLocationForm: FC = () => {
                 bookmarkCluster={hubClusterName}
                 includeAllClusters={false}
                 onChange={(selectedCluster) => {
+                  if (selectedCluster === getValues('deployment.cluster')) return;
                   field.onChange(selectedCluster);
                   setValue('deployment.folder', '');
-                  if (selectedCluster !== cluster)
-                    setValue('deployment.project', '', { shouldValidate: true });
+                  setValue('deployment.project', '', { shouldValidate: true });
                   clearLocationDependentVM();
                 }}
                 selectedCluster={value as string}
@@ -77,6 +79,7 @@ const VMCreationLocationForm: FC = () => {
               cluster={cluster}
               includeAllProjects={false}
               onChange={(selectedProject) => {
+                if (selectedProject === getValues('deployment.project')) return;
                 field.onChange(selectedProject);
                 setValue('deployment.folder', '');
                 clearLocationDependentVM();

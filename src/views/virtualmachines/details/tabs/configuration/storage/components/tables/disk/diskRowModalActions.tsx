@@ -91,6 +91,7 @@ export const openCDROMModal = (
     getCurrentVM?: () => null | undefined | V1VirtualMachine;
     isCDROMMountedState: boolean;
     onDiskSubmit: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine>;
+    onUploadStart?: (uploadKey: string) => void;
     vm: V1VirtualMachine;
   },
 ): void => {
@@ -112,6 +113,7 @@ export const openCDROMModal = (
         isOpen={isOpen}
         onClose={onClose}
         onSubmit={params.onDiskSubmit}
+        onUploadStart={params.onUploadStart}
         vm={params.vm}
       />
     ),

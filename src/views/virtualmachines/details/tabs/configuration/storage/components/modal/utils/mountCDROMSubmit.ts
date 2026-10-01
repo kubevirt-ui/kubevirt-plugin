@@ -28,6 +28,7 @@ export type MountCDROMSubmitParams = {
   isVMRunning: boolean;
   onClose: () => void;
   onSubmit?: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine>;
+  onUploadStart?: (uploadKey: string) => void;
   selectedISO: string;
   t: TFunction;
   uploadData: CdiUploadDataFn;
@@ -46,6 +47,7 @@ export const submitMountCDROM = async ({
   isVMRunning,
   onClose,
   onSubmit,
+  onUploadStart,
   selectedISO,
   t,
   uploadData,
@@ -76,6 +78,7 @@ export const submitMountCDROM = async ({
       isHotPluggable,
       isVMRunning,
     );
+
     const dvName =
       getName(diskState.dataVolumeTemplate) ??
       getDataVolumeName(diskState.volume) ??
@@ -84,6 +87,8 @@ export const submitMountCDROM = async ({
     const vmWithMountedDv = await mountISOToCDROM(vm, diskStateForMount, isHotPluggable);
     const submitResult = await onSubmit?.(vmWithMountedDv);
     const vmAfterMount = submitResult ?? vmWithMountedDv;
+
+    onUploadStart?.(cdromUploadKey);
 
     runVmCdromBackgroundUpload({
       diskState,

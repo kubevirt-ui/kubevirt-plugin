@@ -57,7 +57,7 @@ export type VMWizardCloneValues = {
 
 export type VMWizardCustomizationValues = {
   autoLabelsApplied: boolean;
-  pendingBootableVolumeUploadKeys: string[];
+  pendingUploadKeys: string[];
   templateAdditionalObjects: K8sResourceCommon[];
   vmDraft: null | V1VirtualMachine;
 };

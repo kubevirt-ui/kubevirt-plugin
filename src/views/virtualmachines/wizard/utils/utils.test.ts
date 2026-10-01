@@ -10,7 +10,9 @@ import { VMCreationMethod } from './constants';
 import {
   applySelectedBootableVolumeToForm,
   clearVMPendingUploads,
+  clearWizardDraftPendingUploads,
   resetBootableVolumeFields,
+  trackWizardPendingUploadKey,
 } from './utils';
 jest.mock('@kubevirt-utils/hooks/useUploadProgressToast', () => ({
   cancelAllWizardPendingUploads: jest.fn(),
@@ -33,8 +35,8 @@ describe('wizard form mappings', () => {
     expect(first.instanceType.compute).toBeNull();
     expect(first.clone.sourceVM).toBeNull();
     expect(first.customization.vmDraft).toBeNull();
-    first.customization.pendingBootableVolumeUploadKeys.push('upload');
-    expect(createVMWizardDefaultValues().customization.pendingBootableVolumeUploadKeys).toEqual([]);
+    first.customization.pendingUploadKeys.push('upload');
+    expect(createVMWizardDefaultValues().customization.pendingUploadKeys).toEqual([]);
   });
   it('maps a boot selection and clears its dependent compute choice on reset', () => {
     const result = setup();
@@ -68,7 +70,34 @@ describe('wizard form mappings', () => {
     expect(result.current.getValues('instanceType.bootVolume')).toBeNull();
     expect(result.current.getValues('instanceType.compute')).toBeNull();
   });
-  it('cancels the current draft and boot uploads before reset', () => {
+  it('retains deduplicated upload keys when the draft is cleared', () => {
+    const result = setup();
+    act(() => {
+      for (const key of ['boot', 'disk', 'cdrom', 'disk']) {
+        trackWizardPendingUploadKey(result.current.getValues, result.current.setValue, key);
+      }
+      result.current.setValue('customization.vmDraft', null);
+      clearVMPendingUploads(result.current.getValues, result.current.setValue);
+    });
+    expect(cancelAllWizardPendingUploads).toHaveBeenCalledWith(['boot', 'disk', 'cdrom']);
+    expect(result.current.getValues('customization.pendingUploadKeys')).toEqual([]);
+  });
+  it('cancels draft uploads on location change and retains boot uploads for exit cleanup', () => {
+    const result = setup();
+    const bootKey = 'bootable-volume/namespace/image';
+    const diskKey = 'vm-disk/cluster/namespace/draft/disk';
+    const cdromKey = 'vm-cdrom/cluster/namespace/draft/cdrom';
+    act(() => {
+      result.current.setValue('customization.pendingUploadKeys', [bootKey, diskKey, cdromKey]);
+      clearWizardDraftPendingUploads(result.current.getValues, result.current.setValue);
+    });
+    expect(cancelAllWizardPendingUploads).toHaveBeenLastCalledWith([diskKey, cdromKey]);
+    expect(result.current.getValues('customization.pendingUploadKeys')).toEqual([bootKey]);
+    act(() => clearVMPendingUploads(result.current.getValues, result.current.setValue));
+    expect(cancelAllWizardPendingUploads).toHaveBeenLastCalledWith([bootKey]);
+    expect(result.current.getValues('customization.pendingUploadKeys')).toEqual([]);
+  });
+  it('cancels registered uploads before reset', () => {
     const result = setup();
     const vm = { metadata: { name: 'draft', namespace: 'test' }, spec: { template: {} } };
     const deployment = {
@@ -81,11 +110,11 @@ describe('wizard form mappings', () => {
     act(() => {
       result.current.setValue('deployment', deployment);
       result.current.setValue('customization.vmDraft', vm);
-      result.current.setValue('customization.pendingBootableVolumeUploadKeys', ['boot-upload']);
+      result.current.setValue('customization.pendingUploadKeys', ['boot-upload']);
       clearVMPendingUploads(result.current.getValues, result.current.setValue);
     });
-    expect(cancelAllWizardPendingUploads).toHaveBeenCalledWith(vm, ['boot-upload']);
-    expect(result.current.getValues('customization.pendingBootableVolumeUploadKeys')).toEqual([]);
+    expect(cancelAllWizardPendingUploads).toHaveBeenCalledWith(['boot-upload']);
+    expect(result.current.getValues('customization.pendingUploadKeys')).toEqual([]);
     act(() =>
       result.current.reset(
         resetCreationMethodValues(result.current.getValues(), VMCreationMethod.TEMPLATE),

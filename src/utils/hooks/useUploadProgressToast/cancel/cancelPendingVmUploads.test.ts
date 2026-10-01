@@ -72,18 +72,16 @@ describe('cancelAllWizardPendingUploads', () => {
     (useUploadProgressStore.getState as jest.Mock).mockReturnValue({ cancelWizardPendingUploads });
   });
 
-  it('should cancel wizard-scoped pending uploads for the current wizard VM', () => {
-    const vm = createVm();
-
-    cancelAllWizardPendingUploads(vm, ['boot-volume-upload']);
+  it('should cancel wizard-scoped pending uploads by key', () => {
+    cancelAllWizardPendingUploads(['boot-volume-upload']);
 
     expect(cancelWizardPendingUploads).toHaveBeenCalledTimes(1);
-    expect(cancelWizardPendingUploads).toHaveBeenCalledWith(vm, ['boot-volume-upload']);
+    expect(cancelWizardPendingUploads).toHaveBeenCalledWith(['boot-volume-upload']);
   });
 
-  it('should pass undefined when wizard VM is null', () => {
+  it('should pass an empty list when no keys are provided', () => {
     cancelAllWizardPendingUploads();
 
-    expect(cancelWizardPendingUploads).toHaveBeenCalledWith(undefined, []);
+    expect(cancelWizardPendingUploads).toHaveBeenCalledWith([]);
   });
 });

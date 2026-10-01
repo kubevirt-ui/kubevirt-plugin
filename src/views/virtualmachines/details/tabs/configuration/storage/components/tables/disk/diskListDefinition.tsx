@@ -21,6 +21,7 @@ export type DiskListCallbacks = {
   customize?: boolean;
   getCurrentVM?: () => null | undefined | V1VirtualMachine;
   onSubmit?: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine>;
+  onUploadStart?: (uploadKey: string) => void;
   provisioningPercentages: NameWithPercentages;
   sourcesLoaded?: boolean;
   vm: V1VirtualMachine;
@@ -28,13 +29,14 @@ export type DiskListCallbacks = {
 };
 
 const renderActionsCell = (row: DiskRowDataLayout, callbacks: DiskListCallbacks): ReactNode => {
-  const { customize, getCurrentVM, onSubmit, vm, vmi } = callbacks;
+  const { customize, getCurrentVM, onSubmit, onUploadStart, vm, vmi } = callbacks;
   return (
     <DiskRowActions
       customize={customize}
       getCurrentVM={getCurrentVM}
       obj={row}
       onDiskUpdate={onSubmit}
+      onUploadStart={onUploadStart}
       vm={vm}
       vmi={vmi}
     />

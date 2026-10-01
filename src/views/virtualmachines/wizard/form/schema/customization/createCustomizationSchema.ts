@@ -23,7 +23,7 @@ export const createCustomizationSchema = (
   return yup
     .object({
       autoLabelsApplied: yup.boolean().defined(),
-      pendingBootableVolumeUploadKeys: yup.array().of(yup.string().defined()).defined(),
+      pendingUploadKeys: yup.array().of(yup.string().defined()).defined(),
       templateAdditionalObjects: yup
         .array()
         .typeError(getValidationMessage('INVALID_FIELD_MESSAGE', t))

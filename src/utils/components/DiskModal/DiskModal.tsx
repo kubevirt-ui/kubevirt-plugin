@@ -21,6 +21,7 @@ const DiskModal: FC<V1DiskModalProps> = ({
   onClose,
   onSubmit,
   onUploadedDataVolume,
+  onUploadStart,
   onUploadStarted,
   vm,
 }) => {
@@ -49,6 +50,7 @@ const DiskModal: FC<V1DiskModalProps> = ({
       onClose={onClose}
       onSubmit={onSubmit}
       onUploadedDataVolume={onUploadedDataVolume}
+      onUploadStart={onUploadStart}
       onUploadStarted={onUploadStarted}
       pvc={pvc}
       vm={vm}

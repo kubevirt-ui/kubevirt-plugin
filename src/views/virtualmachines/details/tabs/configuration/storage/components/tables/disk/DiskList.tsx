@@ -2,10 +2,6 @@ import type { FC } from 'react';
 import { useMemo } from 'react';
 
 import { DataVolumeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import type {
-  V1VirtualMachine,
-  V1VirtualMachineInstance,
-} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import DiskListTitle from '@kubevirt-utils/components/DiskListTitle/DiskListTitle';
 import DiskSourceSelect from '@kubevirt-utils/components/DiskModal/components/DiskSourceSelect/DiskSourceSelect';
 import DiskModal from '@kubevirt-utils/components/DiskModal/DiskModal';
@@ -32,21 +28,15 @@ import { isRunning } from '@virtualmachines/utils';
 import useDisksFilters from '../../hooks/useDisksFilters';
 import type { DiskListCallbacks } from './diskListDefinition';
 import { getDiskListColumns, getDiskRowId } from './diskListDefinition';
+import { type DiskListProps } from './types';
 
 import './disklist.scss';
-
-type DiskListProps = {
-  customize?: boolean;
-  getCurrentVM?: () => null | undefined | V1VirtualMachine;
-  onDiskUpdate?: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine>;
-  vm: V1VirtualMachine;
-  vmi?: V1VirtualMachineInstance;
-};
 
 const DiskList: FC<DiskListProps> = ({
   customize = false,
   getCurrentVM,
   onDiskUpdate,
+  onUploadStart,
   vm,
   vmi,
 }) => {
@@ -91,12 +81,22 @@ const DiskList: FC<DiskListProps> = ({
       customize,
       getCurrentVM,
       onSubmit,
+      onUploadStart,
       provisioningPercentages,
       sourcesLoaded,
       vm,
       vmi,
     }),
-    [customize, getCurrentVM, onSubmit, provisioningPercentages, sourcesLoaded, vm, vmi],
+    [
+      customize,
+      getCurrentVM,
+      onSubmit,
+      onUploadStart,
+      provisioningPercentages,
+      sourcesLoaded,
+      vm,
+      vmi,
+    ],
   );
 
   return (
@@ -113,6 +113,7 @@ const DiskList: FC<DiskListProps> = ({
               isOpen={isOpen}
               onClose={onClose}
               onSubmit={onSubmit}
+              onUploadStart={onUploadStart}
               vm={vm}
             />
           ));

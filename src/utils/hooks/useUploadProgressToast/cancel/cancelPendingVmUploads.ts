@@ -18,12 +18,9 @@ export const cancelPendingVmUploads = (vm?: V1VirtualMachine): Promise<void> => 
     .cancelUploadsForVm(getUploadClusterForVm(vm), namespace, name);
 };
 
-export const cancelAllWizardPendingUploads = (
-  wizardVm?: null | V1VirtualMachine,
-  wizardBootableVolumeKeys: string[] = [],
-): void => {
+export const cancelAllWizardPendingUploads = (uploadKeys: string[] = []): void => {
   useUploadProgressStore
     .getState()
-    .cancelWizardPendingUploads(wizardVm ?? undefined, wizardBootableVolumeKeys)
+    .cancelWizardPendingUploads(uploadKeys)
     .catch(() => {});
 };
