@@ -6,6 +6,7 @@ import useVirtualMachineInstanceMigrationMapper from '@kubevirt-utils/resources/
 import useVirtualMachineInstanceMigrations from '@kubevirt-utils/resources/vmim/hooks/useVirtualMachineInstanceMigrations';
 import useIsACMPage from '@multicluster/useIsACMPage';
 import useMultipleVirtualMachineActions from '@virtualmachines/actions/hooks/useMultipleVirtualMachineActions';
+import useDeleteProjectAction from '@virtualmachines/tree/hooks/useDeleteProjectAction';
 import {
   FOLDER_SELECTOR_PREFIX,
   PROJECT_SELECTOR_PREFIX,
@@ -31,6 +32,7 @@ const DefaultRightClickActionMenu: FC<DefaultRightClickActionMenuProps> = ({
   const [vmims] = useVirtualMachineInstanceMigrations(cluster, namespace);
   const vmimMapper = useVirtualMachineInstanceMigrationMapper(vmims);
   const baseActions = useMultipleVirtualMachineActions(vms, vmimMapper, true);
+  const deleteProjectAction = useDeleteProjectAction(cluster, namespace);
 
   const navigate = useNavigate();
 
@@ -54,6 +56,9 @@ const DefaultRightClickActionMenu: FC<DefaultRightClickActionMenuProps> = ({
     <GroupedRightClickActionMenu
       actions={baseActions}
       createVMAction={createVMAction}
+      deleteProjectAction={
+        prefix === PROJECT_SELECTOR_PREFIX && vms?.length === 0 ? deleteProjectAction : undefined
+      }
       hideMenu={hideMenu}
       nestedLevel={nestedLevel}
       triggerRef={() => triggerElement.children.item(0) as HTMLElement}

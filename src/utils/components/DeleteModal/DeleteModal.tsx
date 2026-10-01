@@ -1,16 +1,17 @@
-import { type FC, memo, type ReactNode } from 'react';
+import { type FC, memo, type ReactNode, useState } from 'react';
+import { Trans } from 'react-i18next';
 import { useNavigate } from 'react-router';
 
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useNamespaceParam from '@kubevirt-utils/hooks/useNamespaceParam';
-import { getResourceUrl } from '@kubevirt-utils/resources/shared';
+import { getName, getResourceUrl } from '@kubevirt-utils/resources/shared';
 import {
   getGroupVersionKindForResource,
   type K8sResourceCommon,
   useK8sModel,
 } from '@openshift-console/dynamic-plugin-sdk';
-import { ButtonVariant } from '@patternfly/react-core';
+import { ButtonVariant, Content, TextInput } from '@patternfly/react-core';
 
 import ConfirmActionMessage from '../ConfirmActionMessage/ConfirmActionMessage';
 
@@ -22,6 +23,7 @@ type DeleteModalProps = {
   onClose: () => void;
   onDeleteSubmit: () => Promise<K8sResourceCommon | void>;
   redirectUrl?: string;
+  requireNameConfirmation?: boolean;
   shouldRedirect?: boolean;
 };
 
@@ -34,10 +36,13 @@ const DeleteModal: FC<DeleteModalProps> = memo(
     onClose,
     onDeleteSubmit,
     redirectUrl,
+    requireNameConfirmation = false,
     shouldRedirect = true,
   }) => {
     const { t } = useKubevirtTranslation();
     const navigate = useNavigate();
+    const [confirmationName, setConfirmationName] = useState('');
+    const name = getName(obj);
 
     const [model] = useK8sModel(getGroupVersionKindForResource(obj));
     const namespace = useNamespaceParam();
@@ -46,6 +51,7 @@ const DeleteModal: FC<DeleteModalProps> = memo(
     return (
       <TabModal<K8sResourceCommon>
         headerText={headerText ?? t('Delete resource?')}
+        isDisabled={requireNameConfirmation && confirmationName !== name}
         isOpen={isOpen}
         obj={obj}
         onClose={onClose}
@@ -58,6 +64,24 @@ const DeleteModal: FC<DeleteModalProps> = memo(
         titleIconVariant="warning"
       >
         {body || <ConfirmActionMessage obj={obj} />}
+        {requireNameConfirmation && (
+          <>
+            <Content component="p">
+              <Trans t={t}>
+                Confirm deletion by typing <strong>{{ name }}</strong> below:
+              </Trans>
+            </Content>
+            <TextInput
+              aria-label={t('Enter the name of the resource to delete')}
+              autoFocus
+              id="delete-resource-name"
+              onChange={(_event, value) => setConfirmationName(value)}
+              placeholder={t('Enter name')}
+              type="text"
+              value={confirmationName}
+            />
+          </>
+        )}
       </TabModal>
     );
   },
