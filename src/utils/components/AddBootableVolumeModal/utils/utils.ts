@@ -149,7 +149,7 @@ const setDataSourceMetadata = (
   dataSource: V1beta1DataSource,
   architecture: string,
 ): V1beta1DataSource => {
-  const { annotations, bootableVolumeName, labels } = bootableVolume || {};
+  const { annotations, bootableVolumeName, isIso, labels } = bootableVolume || {};
 
   const hasSelectedArchitecture = !isEmpty(architecture);
 
@@ -162,6 +162,13 @@ const setDataSourceMetadata = (
     draftDS.metadata.labels = hasSelectedArchitecture
       ? { ...labels, [ARCHITECTURE_LABEL]: architecture }
       : labels;
+
+    if (isIso) {
+      draftDS.metadata.labels = {
+        ...(draftDS.metadata.labels ?? {}),
+        [KUBEVIRT_ISO_LABEL]: 'true',
+      };
+    }
   });
 };
 
@@ -171,7 +178,7 @@ const createBootableVolumeFromUpload = async (
   draftDataSource: V1beta1DataSource,
   uploadData: ({ dataVolume, file }: UploadDataProps) => Promise<void>,
 ) => {
-  const { isIso, uploadFile } = bootableVolume || {};
+  const { uploadFile } = bootableVolume || {};
   const updatedNameBootableVolume = produce(bootableVolume, (draft) => {
     draft.bootableVolumeName = draftDataSource.metadata.name;
   });
@@ -180,12 +187,6 @@ const createBootableVolumeFromUpload = async (
   });
 
   const dataSourceToCreate = produce(draftDataSource, (draftDS) => {
-    if (isIso) {
-      draftDS.metadata.labels = {
-        ...(draftDS.metadata.labels || {}),
-        [KUBEVIRT_ISO_LABEL]: 'true',
-      };
-    }
     draftDS.spec.source = {
       pvc: {
         name: getName(bootableVolumeToCreate),
