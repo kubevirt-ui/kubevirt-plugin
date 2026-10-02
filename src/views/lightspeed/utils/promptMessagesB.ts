@@ -59,6 +59,8 @@ export const STATIC_PROMPT_MESSAGES_B: Partial<Record<OLSPromptType, string>> = 
     'Provide a detailed explanation of SCSI disk reservations in the context of OpenShift Virtualization.',
   [OLSPromptType.SHARE_THIS_DISK_BETWEEN_MULTI_VMS]:
     'Provide a detailed explanation of the capability to share disks between multiple VirtualMachines in OpenShift Virtualization.',
+  [OLSPromptType.SNAPSHOT_TIMEOUT]:
+    'Provide a detailed explanation of the VirtualMachineSnapshot failureDeadline field in OpenShift Virtualization, including what happens when a snapshot exceeds this timeout.',
   [OLSPromptType.SNAPSHOTS]:
     'Provide a detailed explanation of snapshots in OpenShift Virtualization.',
   [OLSPromptType.SSH_OVER_LOADBALANCER_SERVICE]:

@@ -60,13 +60,13 @@ export const getVolumeSnapshotStatusesPartitionPerVM = (
 
 const POSITIVE_INTEGER_PATTERN = /^\d+$/;
 
-export const validateSnapshotDeadline = (t: TFunction, deadline: string): string => {
-  if (deadline?.length > 0) {
-    if (!POSITIVE_INTEGER_PATTERN.test(deadline)) {
-      return t('Deadline must be a number');
+export const validateSnapshotTimeout = (t: TFunction, timeout: string): string => {
+  if (timeout?.length > 0) {
+    if (!POSITIVE_INTEGER_PATTERN.test(timeout)) {
+      return t('Timeout must be a number');
     }
-    if (Number(deadline) <= 0) {
-      return t('Deadline must be greater than 0');
+    if (Number(timeout) <= 0) {
+      return t('Timeout must be greater than 0');
     }
   }
 
