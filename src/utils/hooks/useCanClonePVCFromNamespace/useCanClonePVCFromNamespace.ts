@@ -12,7 +12,6 @@ type ResolvedClonePermission = {
 
 type UseCanClonePVCFromNamespaceResult = {
   blocksCloneAction: boolean;
-  requiresClonePermission: boolean;
   showClonePermissionError: boolean;
 };
 
@@ -76,7 +75,7 @@ const useCanClonePVCFromNamespace = (
   const showClonePermissionError =
     requiresClonePermission && hasSourceNamespace && !isChecking && !canClone;
 
-  return { blocksCloneAction, requiresClonePermission, showClonePermissionError };
+  return { blocksCloneAction, showClonePermissionError };
 };
 
 export default useCanClonePVCFromNamespace;
