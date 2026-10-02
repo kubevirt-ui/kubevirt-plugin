@@ -10,7 +10,14 @@
 
 import { execSync } from 'node:child_process';
 
-import { requireEnv } from '../kube-client';
+import { requireEnv, sleep } from '../kube-client';
+
+// IBM Cloud error code for "COS instance not found" -- can fire transiently
+// right after creating a brand-new COS instance, before ROKS's view of
+// resource-controller instances catches up.
+const COS_NOT_VISIBLE_YET_ERROR = 'E4acb';
+const CLUSTER_CREATE_MAX_ATTEMPTS = 5;
+const CLUSTER_CREATE_RETRY_DELAY_MS = 30_000;
 
 const main = async (): Promise<void> => {
   const clusterName = requireEnv('CLUSTER_NAME');
@@ -70,22 +77,46 @@ const main = async (): Promise<void> => {
   console.log(
     `Creating VPC cluster '${clusterName}' with ${workerCount}x ${workerFlavor} workers in zone ${zone} (CNI: ${cniPlugin})...`,
   );
-  execSync(
-    [
-      'ibmcloud oc cluster create vpc-gen2',
-      `--name "${clusterName}"`,
-      `--version "${openshiftVersion}"`,
-      `--flavor "${workerFlavor}"`,
-      `--workers "${workerCount}"`,
-      `--zone "${zone}"`,
-      `--vpc-id "${vpcId}"`,
-      `--subnet-id "${subnetId}"`,
-      `--cos-instance "${cosCrn}"`,
-      `--cni "${cniPlugin}"`,
-      '--disable-outbound-traffic-protection',
-    ].join(' '),
-    { stdio: 'inherit' },
-  );
+  const createCmd = [
+    'ibmcloud oc cluster create vpc-gen2',
+    `--name "${clusterName}"`,
+    `--version "${openshiftVersion}"`,
+    `--flavor "${workerFlavor}"`,
+    `--workers "${workerCount}"`,
+    `--zone "${zone}"`,
+    `--vpc-id "${vpcId}"`,
+    `--subnet-id "${subnetId}"`,
+    `--cos-instance "${cosCrn}"`,
+    `--cni "${cniPlugin}"`,
+    '--disable-outbound-traffic-protection',
+  ].join(' ');
+
+  for (let attempt = 1; attempt <= CLUSTER_CREATE_MAX_ATTEMPTS; attempt += 1) {
+    try {
+      // Captured (not 'inherit') so a transient failure's output can be
+      // inspected for the COS-not-visible-yet error code below; printed
+      // through console.log/console.error so it still reaches the Actions
+      // log either way.
+      const output = execSync(createCmd, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
+      console.log(output);
+      return;
+    } catch (err) {
+      const typedErr = err as { stderr?: string; stdout?: string };
+      console.log(typedErr.stdout ?? '');
+      console.error(typedErr.stderr ?? '');
+      const combined = `${typedErr.stdout ?? ''}${typedErr.stderr ?? ''}`;
+      const cosNotVisibleYet = combined.includes(COS_NOT_VISIBLE_YET_ERROR);
+
+      if (!cosNotVisibleYet || attempt === CLUSTER_CREATE_MAX_ATTEMPTS) {
+        throw err;
+      }
+
+      console.log(
+        `COS instance '${cosCrn}' not visible to ROKS yet (${COS_NOT_VISIBLE_YET_ERROR}, attempt ${attempt}/${CLUSTER_CREATE_MAX_ATTEMPTS}) — retrying in ${CLUSTER_CREATE_RETRY_DELAY_MS / 1000}s...`,
+      );
+      await sleep(CLUSTER_CREATE_RETRY_DELAY_MS);
+    }
+  }
 };
 
 void main().catch((err) => {
