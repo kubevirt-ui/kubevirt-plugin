@@ -30,10 +30,10 @@ const VolumeSource: FC<VolumeSourceProps> = ({
   const sourceComponentByType = {
     [DROPDOWN_FORM_SELECTION.UPLOAD_VOLUME]: (
       <DiskSourceUploadPVC
-        isIso={bootableVolume.isIso}
+        bootableVolume={bootableVolume}
         label={t('Upload PVC image')}
         relevantUpload={upload}
-        setIsIso={setBootableVolumeField('isIso')}
+        setBootableVolumeField={setBootableVolumeField}
         setUploadFile={setBootableVolumeField('uploadFile')}
         setUploadFileName={setBootableVolumeField('uploadFilename')}
         uploadFile={uploadFile}

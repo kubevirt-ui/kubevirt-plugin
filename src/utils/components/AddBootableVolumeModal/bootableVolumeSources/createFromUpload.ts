@@ -10,7 +10,6 @@ import {
 } from '@kubevirt-utils/hooks/useUploadProgressToast/completion/uploadCompletion';
 import { getBootableVolumeContextLink } from '@kubevirt-utils/hooks/useUploadProgressToast/completion/uploadLinks';
 import { getBootableVolumeUploadKey } from '@kubevirt-utils/hooks/useUploadProgressToast/keys/uploadKeys';
-import { KUBEVIRT_ISO_LABEL } from '@kubevirt-utils/resources/bootableresources/constants';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { kubevirtK8sCreate } from '@multicluster/k8sRequests';
 
@@ -26,7 +25,7 @@ export const createBootableVolumeFromUpload = async (
   t: TFunction,
   onUploadStart?: (uploadKey: string) => void,
 ): Promise<V1beta1DataSource> => {
-  const { isIso, uploadFile } = bootableVolume || {};
+  const { uploadFile } = bootableVolume || {};
   const updatedNameBootableVolume = produce(bootableVolume, (draft) => {
     draft.bootableVolumeName = draftDataSource.metadata.name;
   });
@@ -35,12 +34,6 @@ export const createBootableVolumeFromUpload = async (
   });
 
   const dataSourceToCreate = produce(draftDataSource, (draftDS) => {
-    if (isIso) {
-      draftDS.metadata.labels = {
-        ...(draftDS.metadata.labels ?? {}),
-        [KUBEVIRT_ISO_LABEL]: 'true',
-      };
-    }
     draftDS.spec.source = {
       pvc: {
         name: getName(bootableVolumeToCreate),

@@ -39,6 +39,7 @@ const getBootableVolumePromise = ({
     bootableVolumeNamespace,
     dataSource,
     arch,
+    sourceType,
   );
 
   const actionBySourceType: Record<string, () => Promise<V1beta1DataSource>> = {

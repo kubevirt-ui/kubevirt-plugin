@@ -1,24 +1,32 @@
 import { type FC } from 'react';
 
+import {
+  type AddBootableVolumeState,
+  type SetBootableVolumeFieldType,
+} from '@kubevirt-utils/components/AddBootableVolumeModal/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Checkbox } from '@patternfly/react-core';
 
 type DiskSourceUploadISOProps = {
+  bootableVolume: AddBootableVolumeState;
   isDisabled?: boolean;
-  isIso: boolean;
-  setIsIso: (value: boolean) => void;
+  setBootableVolumeField: SetBootableVolumeFieldType;
 };
 
-const DiskSourceUploadISO: FC<DiskSourceUploadISOProps> = ({ isDisabled, isIso, setIsIso }) => {
+const DiskSourceUploadISO: FC<DiskSourceUploadISOProps> = ({
+  bootableVolume,
+  isDisabled,
+  setBootableVolumeField,
+}) => {
   const { t } = useKubevirtTranslation();
 
   return (
     <Checkbox
       id="iso-checkbox"
-      isChecked={isIso}
+      isChecked={bootableVolume.isIso ?? false}
       isDisabled={isDisabled}
       label={t('This is an ISO file')}
-      onChange={(_event, value: boolean) => setIsIso(value)}
+      onChange={(_event, value: boolean) => setBootableVolumeField('isIso')(value)}
     />
   );
 };
