@@ -10,7 +10,7 @@ import useCanCreateResource from '@kubevirt-utils/hooks/useCanCreateResource';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useListNamespaces from '@kubevirt-utils/hooks/useListNamespaces';
 import useSelectedCluster from '@kubevirt-utils/hooks/useSelectedCluster';
-import { getTemplateListURL } from '@kubevirt-utils/resources/template';
+import { getTemplateCreateURL } from '@kubevirt-utils/resources/template';
 import { getVMListPath } from '@kubevirt-utils/resources/vm';
 import { getFleetTemplatesURL } from '@multicluster/urls';
 import useIsACMPage from '@multicluster/useIsACMPage';
@@ -52,7 +52,7 @@ const VirtualMachineTemplatesCreateButton: FC = () => {
         return navigate(
           isACMPage && cluster
             ? `${getFleetTemplatesURL(cluster, namespace)}/~new`
-            : `${getTemplateListURL(namespace)}/~new`,
+            : getTemplateCreateURL(namespace),
         );
       }
 

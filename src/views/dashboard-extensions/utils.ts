@@ -88,8 +88,6 @@ export const getVmStatusLabelFromPrintable = (
 ): StatusSimpleLabel | VMStatusSimpleLabel =>
   printableStatusToLabel?.[printableStatus] ?? StatusSimpleLabel.Other;
 
-export const VIRTUALMACHINES_TEMPLATES_BASE_URL = 'virtualmachinetemplates';
-
 export const getTimestamp = (resource: K8sResourceCommon): Date | undefined =>
   resource.metadata?.creationTimestamp ? new Date(resource.metadata.creationTimestamp) : undefined;
 
