@@ -12,7 +12,7 @@ import { createNewFolderOption } from './options';
  */
 export const getFolderSelectOptions = (
   folderOptions: SelectOptionProps[] | undefined,
-  selectedFolder: string,
+  selectedFolder?: string,
 ): SelectTypeaheadOptionProps[] => {
   const mappedOptions =
     folderOptions?.map((option) => ({

@@ -1,17 +1,23 @@
-import { type FC, useState } from 'react';
-import { Trans } from 'react-i18next';
+import { type FC, useMemo, useState } from 'react';
 
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import FolderSelect from '@kubevirt-utils/components/FolderSelect/FolderSelect';
+import { isValidFolderName } from '@kubevirt-utils/components/FolderSelect/utils/validation';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getLabel, getName, getNamespace } from '@kubevirt-utils/resources/shared';
+import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { Stack, StackItem } from '@patternfly/react-core';
-import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
 
+import SingleVmMoveGroupSummary from './components/SingleVmMoveGroupSummary';
 import useRemoveFolderQuery from './hooks/useRemoveFolderQuery';
 import SelectedFolderIndicator from './SelectedFolderIndicator';
+import {
+  getFolderDisplayName,
+  getInitialFolderName,
+  getMoveToFolderSubmitDisabledTooltip,
+  hasFolderDestinationChanged,
+} from './utils';
 
 type MoveVMToFolderModalProps = {
   isOpen: boolean;
@@ -22,31 +28,50 @@ type MoveVMToFolderModalProps = {
 
 const MoveVMToFolderModal: FC<MoveVMToFolderModalProps> = ({ isOpen, onClose, onSubmit, vm }) => {
   const { t } = useKubevirtTranslation();
-  const [folderName, setFolderName] = useState<string>(() => getLabel(vm, VM_FOLDER_LABEL));
+  const initialFolderName = useMemo(() => getInitialFolderName(vm), [vm]);
+  const [folderName, setFolderName] = useState<string>(() => initialFolderName);
 
   const removeFolderQuery = useRemoveFolderQuery([vm]);
+  const hasDestinationChanged = hasFolderDestinationChanged(initialFolderName, folderName);
+  const isSubmitDisabled = !hasDestinationChanged || !isValidFolderName(folderName);
+  const namespace = getNamespace(vm);
+  const sourceGroupName = getFolderDisplayName(initialFolderName, t);
+  const destinationGroupName = getFolderDisplayName(folderName, t);
 
   return (
     <TabModal<V1VirtualMachine>
       headerText={t('Move to group')}
+      isDisabled={isSubmitDisabled}
       isOpen={isOpen}
       onClose={onClose}
       onSubmit={() => {
         removeFolderQuery?.(folderName);
-        return onSubmit(folderName);
+        return onSubmit(folderName).catch((error) => {
+          setFolderName(initialFolderName);
+          throw error;
+        });
       }}
+      submitDisabledTooltip={getMoveToFolderSubmitDisabledTooltip(
+        folderName,
+        hasDestinationChanged,
+        t,
+      )}
     >
       <Stack hasGutter>
         <StackItem>
-          <Trans t={t}>
-            Move <b>{getName(vm)}</b> VirtualMachine to group
-          </Trans>
+          <SingleVmMoveGroupSummary
+            destinationGroupName={destinationGroupName}
+            hasDestinationChanged={hasDestinationChanged}
+            namespace={namespace}
+            sourceGroupName={sourceGroupName}
+            vm={vm}
+          />
         </StackItem>
         <StackItem>
           <FolderSelect
             cluster={getCluster(vm)}
             isFullWidth
-            namespace={getNamespace(vm)}
+            namespace={namespace}
             selectedFolder={folderName}
             setSelectedFolder={setFolderName}
           />

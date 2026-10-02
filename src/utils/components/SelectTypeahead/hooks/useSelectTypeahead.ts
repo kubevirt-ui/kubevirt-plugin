@@ -11,7 +11,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { getRandomChars } from '@kubevirt-utils/utils/utils';
 
 import { CREATE_NEW, INVALID } from '../utils/constants';
-import { getNextArrowIndex } from '../utils/keyboard';
+import { getNextArrowIndex, handleEnterKeySelect } from '../utils/keyboard';
 import { buildSelectOptions } from '../utils/options';
 import {
   type SelectTypeaheadOptionProps,
@@ -105,8 +105,15 @@ export const useSelectTypeahead = ({
     switch (event.key) {
       case 'Enter':
         event.preventDefault();
-        if (isOpen && focusedItem && !focusedItem.optionProps?.isAriaDisabled)
-          onSelect(undefined, focusedItem.value);
+        handleEnterKeySelect({
+          canCreate,
+          createActionId,
+          focusedItem,
+          inputValue,
+          isOpen,
+          onSelect,
+          selectOptions,
+        });
         openMenu();
         break;
       case 'ArrowUp':
