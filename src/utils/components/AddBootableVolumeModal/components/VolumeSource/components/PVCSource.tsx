@@ -5,6 +5,8 @@ import type {
   SetBootableVolumeFieldType,
 } from '@kubevirt-utils/components/AddBootableVolumeModal/types';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
+import PVCClonePermissionAlert from '@kubevirt-utils/components/PVCClonePermissionAlert/PVCClonePermissionAlert';
+import useCanClonePVCFromNamespace from '@kubevirt-utils/hooks/useCanClonePVCFromNamespace';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverContentWithLightspeedButton/PopoverContentWithLightspeedButton';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
@@ -19,7 +21,13 @@ type PVCSourceProps = {
 
 const PVCSource: FC<PVCSourceProps> = ({ bootableVolume, setBootableVolumeField }) => {
   const { t } = useKubevirtTranslation();
-  const { bootableVolumeCluster, pvcName, pvcNamespace } = bootableVolume || {};
+  const { bootableVolumeCluster, bootableVolumeNamespace, pvcName, pvcNamespace } =
+    bootableVolume || {};
+  const { showClonePermissionError } = useCanClonePVCFromNamespace(
+    pvcNamespace,
+    bootableVolumeNamespace,
+    bootableVolumeCluster,
+  );
 
   return (
     <>
@@ -31,6 +39,9 @@ const PVCSource: FC<PVCSourceProps> = ({ bootableVolume, setBootableVolumeField 
         selectPVCNamespace={setBootableVolumeField('pvcNamespace')}
         setDiskSize={(newSize) => setBootableVolumeField('size')(newSize)}
       />
+      {showClonePermissionError && (
+        <PVCClonePermissionAlert className="pf-v6-u-mt-sm" sourceNamespace={pvcNamespace} />
+      )}
       <Split hasGutter>
         <SplitItem>
           <Checkbox
