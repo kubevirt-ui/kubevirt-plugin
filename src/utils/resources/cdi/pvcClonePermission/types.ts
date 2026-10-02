@@ -7,11 +7,11 @@ export type CheckAccessDelegate = (
   resourceAttributes: AccessReviewResourceAttributes,
 ) => Promise<SelfSubjectAccessReviewKind>;
 
-export type PVCClonePermissionParams = {
+export type ClonePermissionRequest = {
   cluster?: string;
   destinationNamespace?: string;
   isACMPage: boolean;
-  sourceNamespace?: string;
+  sourceNamespace: string;
 };
 
 export type PVCClonePermissionResult = {

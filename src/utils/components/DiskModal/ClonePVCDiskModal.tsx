@@ -10,7 +10,6 @@ import TabModal from '../TabModal/TabModal';
 import AdvancedSettings from './components/AdvancedSettings/AdvancedSettings';
 import BootSourceCheckbox from './components/BootSourceCheckbox/BootSourceCheckbox';
 import DiskInterfaceSelect from './components/DiskInterfaceSelect/DiskInterfaceSelect';
-import DiskNameInput from './components/DiskNameInput/DiskNameInput';
 import DiskSizeInput from './components/DiskSizeInput/DiskSizeInput';
 import DiskSourceClonePVCSelect from './components/DiskSourceSelect/components/DiskSourceClonePVCSelect/DiskSourceClonePVCSelect';
 import DiskTypeSelect from './components/DiskTypeSelect/DiskTypeSelect';
@@ -52,12 +51,8 @@ const ClonePVCDiskModal: FC<V1SubDiskModalProps> = ({
 
   const sourceNamespace = watch(DATAVOLUME_PVC_NAMESPACE);
   const vmCluster = watch(VM_CLUSTER_FIELD);
-  const { canClone, isChecking, requiresClonePermission } = useCanClonePVCFromNamespace(
-    sourceNamespace,
-    namespace,
-    vmCluster,
-  );
-  const hasClonePermission = !requiresClonePermission || isCreated || (!isChecking && canClone);
+  const { blocksCloneAction } = useCanClonePVCFromNamespace(sourceNamespace, namespace, vmCluster);
+  const hasClonePermission = isCreated || !blocksCloneAction;
 
   return (
     <FormProvider {...methods}>
@@ -75,7 +70,6 @@ const ClonePVCDiskModal: FC<V1SubDiskModalProps> = ({
       >
         <PendingChanges isVMRunning={isVMRunning} />
         <BootSourceCheckbox editDiskName={editDiskName} isDisabled={isVMRunning} vm={vm} />
-        <DiskNameInput editDiskName={editDiskName} vm={vm} />
         {!isCreated && <DiskSourceClonePVCSelect destinationNamespace={namespace} />}
         <DiskSizeInput isCreated={isCreated} namespace={namespace} pvc={pvc} />
         <DiskTypeSelect isVMRunning={isVMRunning} />

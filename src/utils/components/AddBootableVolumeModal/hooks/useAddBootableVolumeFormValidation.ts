@@ -13,27 +13,14 @@ export const useAddBootableVolumeFormValidation = ({
   bootableVolume,
   sourceType,
 }: UseAddBootableVolumeFormValidationParams): boolean => {
-  const { canClone, isChecking, requiresClonePermission } = useCanClonePVCFromNamespace(
+  const { blocksCloneAction } = useCanClonePVCFromNamespace(
     bootableVolume?.pvcNamespace,
     bootableVolume?.bootableVolumeNamespace,
     bootableVolume?.bootableVolumeCluster,
   );
 
-  const hasClonePermission = useMemo(() => {
-    if (sourceType !== DROPDOWN_FORM_SELECTION.USE_EXISTING_PVC) {
-      return true;
-    }
-
-    if (!requiresClonePermission) {
-      return true;
-    }
-
-    if (isChecking) {
-      return false;
-    }
-
-    return canClone;
-  }, [canClone, isChecking, requiresClonePermission, sourceType]);
+  const hasClonePermission =
+    sourceType !== DROPDOWN_FORM_SELECTION.USE_EXISTING_PVC || !blocksCloneAction;
 
   const isRegistryFormValid = useMemo((): boolean => {
     if (sourceType !== DROPDOWN_FORM_SELECTION.USE_REGISTRY) return true;

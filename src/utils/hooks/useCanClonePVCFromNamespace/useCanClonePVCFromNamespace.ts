@@ -5,22 +5,22 @@ import useIsACMPage from '@multicluster/useIsACMPage';
 
 import { loadClonePermission } from './utils';
 
-export type PVCClonePermissionState = {
-  canClone: boolean;
-  isChecking: boolean;
-  requiresClonePermission: boolean;
-};
-
 type ResolvedClonePermission = {
   canClone: boolean;
   requestId: number;
+};
+
+type UseCanClonePVCFromNamespaceResult = {
+  blocksCloneAction: boolean;
+  requiresClonePermission: boolean;
+  showClonePermissionError: boolean;
 };
 
 const useCanClonePVCFromNamespace = (
   sourceNamespace?: string,
   destinationNamespace?: string,
   cluster?: string,
-): PVCClonePermissionState => {
+): UseCanClonePVCFromNamespaceResult => {
   const isACMPage = useIsACMPage();
   const requiresClonePermission = requiresCrossNamespaceClone(
     sourceNamespace,
@@ -70,8 +70,13 @@ const useCanClonePVCFromNamespace = (
   const canClone = requiresClonePermission
     ? Boolean(isCurrentResult && resolvedPermission?.canClone)
     : true;
+  const hasSourceNamespace = Boolean(sourceNamespace);
+  const blocksCloneAction =
+    requiresClonePermission && hasSourceNamespace && (isChecking || !canClone);
+  const showClonePermissionError =
+    requiresClonePermission && hasSourceNamespace && !isChecking && !canClone;
 
-  return { canClone, isChecking, requiresClonePermission };
+  return { blocksCloneAction, requiresClonePermission, showClonePermissionError };
 };
 
 export default useCanClonePVCFromNamespace;

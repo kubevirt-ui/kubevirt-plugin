@@ -4,15 +4,19 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { Alert, AlertVariant } from '@patternfly/react-core';
 
 type PVCClonePermissionAlertProps = {
+  className?: string;
   sourceNamespace: string;
 };
 
-const PVCClonePermissionAlert: FC<PVCClonePermissionAlertProps> = ({ sourceNamespace }) => {
+const PVCClonePermissionAlert: FC<PVCClonePermissionAlertProps> = ({
+  className,
+  sourceNamespace,
+}) => {
   const { t } = useKubevirtTranslation();
 
   return (
     <Alert
-      className="pf-v6-u-mt-sm"
+      className={className}
       isInline
       title={t('An error occurred')}
       variant={AlertVariant.danger}

@@ -1,15 +1,10 @@
 import {
+  type ClonePermissionRequest,
   type PVCClonePermissionResult,
   resolvePVCClonePermission,
 } from '@kubevirt-utils/resources/cdi/pvcClonePermission';
 
-export type ClonePermissionRequest = {
-  cluster?: string;
-  destinationNamespace?: string;
-  isACMPage: boolean;
-  sourceNamespace: string;
-};
-
+// Reuse one in-flight access review when multiple hook callers share the same selection.
 const inFlightClonePermissionChecks = new Map<string, Promise<PVCClonePermissionResult>>();
 
 export const clonePermissionKey = ({

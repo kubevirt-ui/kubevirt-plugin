@@ -17,20 +17,19 @@ const DiskSourceClonePVCSelect: FC<DiskSourceClonePVCSelectProps> = ({ destinati
   const { watch } = useFormContext<V1DiskFormState>();
   const vmCluster = watch(VM_CLUSTER_FIELD);
   const sourceNamespace = watch(DATAVOLUME_PVC_NAMESPACE);
-  const { canClone, isChecking, requiresClonePermission } = useCanClonePVCFromNamespace(
+  const { showClonePermissionError } = useCanClonePVCFromNamespace(
     sourceNamespace,
     destinationNamespace,
     vmCluster,
   );
 
-  const showClonePermissionError =
-    requiresClonePermission && !isChecking && !canClone && Boolean(sourceNamespace);
-
   return (
     <>
       <DiskSourceClonePVCSelectNamespace />
       <DiskSourceClonePVCSelectName />
-      {showClonePermissionError && <PVCClonePermissionAlert sourceNamespace={sourceNamespace} />}
+      {showClonePermissionError && (
+        <PVCClonePermissionAlert className="pf-v6-u-mt-sm" sourceNamespace={sourceNamespace} />
+      )}
     </>
   );
 };

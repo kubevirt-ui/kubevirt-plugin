@@ -23,14 +23,11 @@ const PVCSource: FC<PVCSourceProps> = ({ bootableVolume, setBootableVolumeField 
   const { t } = useKubevirtTranslation();
   const { bootableVolumeCluster, bootableVolumeNamespace, pvcName, pvcNamespace } =
     bootableVolume || {};
-  const { canClone, isChecking, requiresClonePermission } = useCanClonePVCFromNamespace(
+  const { showClonePermissionError } = useCanClonePVCFromNamespace(
     pvcNamespace,
     bootableVolumeNamespace,
     bootableVolumeCluster,
   );
-
-  const showClonePermissionError =
-    requiresClonePermission && !isChecking && !canClone && Boolean(pvcNamespace);
 
   return (
     <>
@@ -42,7 +39,9 @@ const PVCSource: FC<PVCSourceProps> = ({ bootableVolume, setBootableVolumeField 
         selectPVCNamespace={setBootableVolumeField('pvcNamespace')}
         setDiskSize={(newSize) => setBootableVolumeField('size')(newSize)}
       />
-      {showClonePermissionError && <PVCClonePermissionAlert sourceNamespace={pvcNamespace} />}
+      {showClonePermissionError && (
+        <PVCClonePermissionAlert className="pf-v6-u-mt-sm" sourceNamespace={pvcNamespace} />
+      )}
       <Split hasGutter>
         <SplitItem>
           <Checkbox

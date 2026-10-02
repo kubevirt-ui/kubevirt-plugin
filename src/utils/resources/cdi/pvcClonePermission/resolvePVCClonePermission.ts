@@ -6,20 +6,20 @@ import {
   getCheckAccessDelegate,
   requiresCrossNamespaceClone,
 } from './accessReview';
-import { type PVCClonePermissionParams, type PVCClonePermissionResult } from './types';
+import { type ClonePermissionRequest, type PVCClonePermissionResult } from './types';
 
 export const resolvePVCClonePermission = async ({
   cluster,
   destinationNamespace,
   isACMPage,
   sourceNamespace,
-}: PVCClonePermissionParams): Promise<PVCClonePermissionResult> => {
+}: ClonePermissionRequest): Promise<PVCClonePermissionResult> => {
   const requiresClonePermission = requiresCrossNamespaceClone(
     sourceNamespace,
     destinationNamespace,
   );
 
-  if (!requiresClonePermission || !sourceNamespace) {
+  if (!requiresClonePermission) {
     return { canClone: true, requiresClonePermission };
   }
 
