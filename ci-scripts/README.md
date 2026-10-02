@@ -134,6 +134,8 @@ Ghost runner cleanup reuses the ARC Authentication GitHub App credentials above 
 
 All paths converge after cluster creation: the workflow installs HCO, builds the ARC runner image, installs ARC controller + scale set, deploys the ci-env-controller, and runs health checks.
 
+**Failure/cancellation cleanup:** if `ibmcloud oc cluster create vpc-gen2` fails (e.g. the just-created COS instance isn't visible to ROKS yet -- IBM Cloud error `E4acb`, which `create-roks-vpc.ts` retries a few times before giving up) or the job is cancelled, `ibmc-cluster-setup.yml` runs `cleanup-vpc-resources.sh` as a backstop for the **vpc** path too (previously IPI-only), so a VPC/subnet/gateway/COS instance provisioned earlier in the same run doesn't orphan. This sweep only runs when the ROKS cluster record didn't already exist at job start, so a job that resumed against a pre-existing cluster never sweeps that cluster's live VPC on an unrelated later failure.
+
 ## Running E2E Tests
 
 1. Actions → **Hot Cluster E2E** → Run workflow (or triggered on PR)
@@ -161,6 +163,8 @@ additions.
 **Automatic:** The auto-teardown workflow runs every 30 minutes and tears down the cluster after 2 hours of CI inactivity. It detects both ROKS clusters (via `ibmcloud oc`) and IPI clusters (via DNS probe).
 
 For IPI teardown, the workflow auto-discovers the latest successful setup run to download the install state (`metadata.json`) needed by `openshift-install destroy cluster`. You can also provide `ipi_setup_run_id` manually to target a specific setup run.
+
+**Leftover-resource safety net:** `delete-roks-cluster.ts` doesn't just fire `ibmcloud oc cluster rm` and move on -- it polls (up to 40 min) until IBM Cloud confirms the cluster is actually gone, since the worker nodes holding the VPC subnet take a while to drain after the delete request is merely _accepted_. The VPC cleanup step that follows runs even if the ROKS cluster record was already gone (e.g. a rerun after a prior attempt deleted the cluster but left the VPC/subnet behind -- the sweep is a no-op once nothing matches), and, like the IPI sweep, no longer uses `continue-on-error`: a subnet/VPC still present after `cleanup-vpc-resources.sh`'s own retry budget now fails the teardown job instead of reporting success.
 
 ## Security
 
@@ -203,20 +207,20 @@ ci-scripts/
 
 ## Scripts
 
-| Script                                            | Purpose                                                                                                        |
-| ------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
-| `hot-cluster/install-hco.sh`                      | Installs HCO operator, HPP storage, and virtctl                                                                |
-| `hot-cluster/check-cluster-health.sh`             | Verifies cluster, HCO, ARC, storage, console                                                                   |
-| `hot-cluster/check-roks-cluster-state.sh`         | Polls until ROKS cluster is ready                                                                              |
-| `hot-cluster/log-ibmcloud-iam-diagnostics.sh`     | Logs IAM permissions for debugging (classic, VPC, and IPI)                                                     |
-| `hot-cluster/cleanup-vpc-resources.sh`            | Single source of truth for VPC-resource cleanup by cluster-name prefix (setup, retries, teardown, cleanup-all) |
-| `hot-cluster/create-ipi-cluster.sh`               | Creates IPI cluster with retry logic                                                                           |
-| `hot-cluster/configure-kubeconfig.sh`             | Configures kubeconfig with DNS retry                                                                           |
-| `hot-cluster/provision-vpc-resources.sh`          | Provisions VPC, subnet, and public gateway                                                                     |
-| `hot-cluster/configure-image-registry.sh`         | Configures the internal image registry                                                                         |
-| `hot-cluster/arc/install-arc-controller.sh`       | Installs ARC controller (once per cluster)                                                                     |
-| `hot-cluster/arc/install-runner-scale-set.sh`     | Installs ARC runner scale set                                                                                  |
-| `hot-cluster/ci-env/install-ci-env-controller.sh` | Installs the ConfigMap-driven CI environment controller                                                        |
+| Script                                            | Purpose                                                                                                                                                                                                                                                                                                                                 |
+| ------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `hot-cluster/install-hco.sh`                      | Installs HCO operator, HPP storage, and virtctl                                                                                                                                                                                                                                                                                         |
+| `hot-cluster/check-cluster-health.sh`             | Verifies cluster, HCO, ARC, storage, console                                                                                                                                                                                                                                                                                            |
+| `hot-cluster/check-roks-cluster-state.sh`         | Polls until ROKS cluster is ready                                                                                                                                                                                                                                                                                                       |
+| `hot-cluster/log-ibmcloud-iam-diagnostics.sh`     | Logs IAM permissions for debugging (classic, VPC, and IPI)                                                                                                                                                                                                                                                                              |
+| `hot-cluster/cleanup-vpc-resources.sh`            | Single source of truth for VPC-resource cleanup by cluster-name prefix (setup, retries, teardown, cleanup-all). Polls subnet/VPC deletes for up to 10 min while blocked by draining IKS worker nodes, and (outside `DRY_RUN`) exits 1 if a matching subnet/VPC still remains, so callers that care don't report success over a leftover |
+| `hot-cluster/create-ipi-cluster.sh`               | Creates IPI cluster with retry logic                                                                                                                                                                                                                                                                                                    |
+| `hot-cluster/configure-kubeconfig.sh`             | Configures kubeconfig with DNS retry                                                                                                                                                                                                                                                                                                    |
+| `hot-cluster/provision-vpc-resources.sh`          | Provisions VPC, subnet, and public gateway                                                                                                                                                                                                                                                                                              |
+| `hot-cluster/configure-image-registry.sh`         | Configures the internal image registry                                                                                                                                                                                                                                                                                                  |
+| `hot-cluster/arc/install-arc-controller.sh`       | Installs ARC controller (once per cluster)                                                                                                                                                                                                                                                                                              |
+| `hot-cluster/arc/install-runner-scale-set.sh`     | Installs ARC runner scale set                                                                                                                                                                                                                                                                                                           |
+| `hot-cluster/ci-env/install-ci-env-controller.sh` | Installs the ConfigMap-driven CI environment controller                                                                                                                                                                                                                                                                                 |
 
 See [`hot-cluster/arc/README.md`](hot-cluster/arc/README.md) for ARC-specific details and [`hot-cluster/ci-env/README.md`](hot-cluster/ci-env/README.md) for the ci-env-controller.
 

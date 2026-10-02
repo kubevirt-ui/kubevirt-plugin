@@ -136,9 +136,14 @@ jobs:
         working-directory: ci-scripts/hot-cluster/ts
         run: npx tsx src/scripts/delete-roks-cluster.ts
 
+      # Runs even if the cluster record is already gone (e.g. a rerun after
+      # a previous teardown attempt deleted the ROKS cluster but left the
+      # VPC/subnet behind) -- the sweep is idempotent and a no-op once
+      # nothing matches CLUSTER_NAME. continue-on-error is intentionally
+      # NOT set: a subnet/VPC still present after cleanup-vpc-resources.sh's
+      # own retry budget should fail this job instead of reporting success.
       - name: Clean up VPC resources
-        if: inputs.infrastructure_type == 'vpc' && steps.check_cluster.outputs.exists == 'true'
-        continue-on-error: true
+        if: inputs.infrastructure_type == 'vpc'
         env:
           IC_API_KEY: ${{ secrets.IC_KEY }}
           ZONE: ${{ inputs.zone }}
@@ -170,9 +175,10 @@ jobs:
 
       # Guaranteed backstop: sweeps by name prefix regardless of whether the
       # steps above found install state or ran openshift-install destroy.
+      # continue-on-error is intentionally NOT set here either: a leftover
+      # subnet/VPC after this sweep's own retry budget should fail the job.
       - name: Sweep any remaining VPC resources
         if: inputs.infrastructure_type == 'ipi'
-        continue-on-error: true
         env:
           IC_API_KEY: ${{ secrets.IC_KEY }}
           ZONE: ${{ inputs.zone }}
@@ -208,4 +214,4 @@ jobs:
         env:
           INFRASTRUCTURE_TYPE: ${{ inputs.infrastructure_type || 'classic' }}
           CLUSTER_EXISTS: ${{ steps.check_cluster.outputs.exists || 'N/A (IPI)' }}
-        run: npx tsx src/scripts/write-teardown-summary.ts
+        run: npx tsx src/scripts/write-teardown-cluster-summary.ts

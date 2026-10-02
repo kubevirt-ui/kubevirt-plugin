@@ -64,8 +64,13 @@ for attempt in $(seq 1 "${MAX_ATTEMPTS}"); do
 
   # Guaranteed backstop: openshift-install destroy alone may leave
   # resources behind if it failed before metadata.json was even written.
+  # `|| true`: cleanup-vpc-resources.sh now exits 1 if a subnet/VPC is
+  # still draining after its own retry budget -- don't let that abort
+  # this install retry loop (set -e is active in this script); the next
+  # attempt's own pre-create sweep, and the final attempt's destroy, will
+  # catch anything still left behind.
   echo "Sweeping any remaining VPC resources for '${CLUSTER_NAME}' before retry..."
-  bash ./ci-scripts/hot-cluster/cleanup-vpc-resources.sh
+  bash ./ci-scripts/hot-cluster/cleanup-vpc-resources.sh || true
 
   echo "Waiting 60s before retry..."
   sleep 60

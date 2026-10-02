@@ -530,6 +530,23 @@ jobs:
         working-directory: ci-scripts/hot-cluster/ts
         run: npx tsx src/scripts/delete-roks-cluster.ts
 
+      # Backstop sweep: provision-vpc-resources.sh and create-roks-vpc.ts's
+      # COS creation can leave a VPC/subnet/gateway/COS instance behind when
+      # cluster create fails (e.g. a brand-new COS instance not yet visible
+      # to ROKS) or the job is cancelled before any cluster exists for the
+      # step above to delete. Gated on the same exists == 'false' check as
+      # that step: when the cluster already existed before this job ran,
+      # provisioning was skipped, so sweeping here on an unrelated later
+      # failure/cancellation would risk deleting that pre-existing cluster's
+      # live VPC/subnet instead of leftovers this job created.
+      - name: Sweep any remaining VPC resources on failure (vpc)
+        if: always() && inputs.infrastructure_type == 'vpc' && (job.status == 'failure' || job.status == 'cancelled') && steps.check_cluster.outputs.exists == 'false'
+        env:
+          IC_API_KEY: ${{ secrets.IC_KEY }}
+          ZONE: ${{ inputs.zone }}
+        continue-on-error: true
+        run: bash ./ci-scripts/hot-cluster/cleanup-vpc-resources.sh
+
       - name: Destroy IPI cluster on failure
         if: always() && inputs.infrastructure_type == 'ipi' && job.status == 'failure'
         env:
