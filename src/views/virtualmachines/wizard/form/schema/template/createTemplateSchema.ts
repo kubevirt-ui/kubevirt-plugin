@@ -39,6 +39,10 @@ export const createTemplateParametersSchema = (t: TFunction): yup.Schema<Templat
 export const createTemplateSchema = (t: TFunction): yup.ObjectSchema<VMWizardTemplateValues> =>
   yup
     .object({
+      bootSourceOverride: yup
+        .mixed<VMWizardTemplateValues['bootSourceOverride']>()
+        .nullable()
+        .defined(),
       selectedTemplate: yup
         .mixed<Template>()
         .typeError(getValidationMessage('INVALID_FIELD_MESSAGE', t))

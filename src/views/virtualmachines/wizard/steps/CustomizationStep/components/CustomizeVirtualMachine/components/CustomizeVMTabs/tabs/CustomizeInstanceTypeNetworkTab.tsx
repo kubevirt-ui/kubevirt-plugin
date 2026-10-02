@@ -9,6 +9,7 @@ import {
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
+import VirtIORecommendationAlert from '@kubevirt-utils/components/VirtIORecommendationAlert/VirtIORecommendationAlert';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ensurePath } from '@kubevirt-utils/utils/utils';
 import { PageSection, Title } from '@patternfly/react-core';
@@ -47,11 +48,16 @@ const CustomizeInstanceTypeNetworkTab: FC = () => {
     return Promise.resolve();
   };
 
+  const onSwitchToVirtio = (updatedVM: V1VirtualMachine): void => {
+    replaceDraft(updatedVM, vm);
+  };
+
   return (
     <PageSection>
       <Title headingLevel="h2">
         <SearchItem id="network">{t('Network interfaces')}</SearchItem>
       </Title>
+      <VirtIORecommendationAlert kind="network" onSwitchToVirtio={onSwitchToVirtio} vm={vm} />
       <AddNetworkInterfaceButton onAddNetworkInterface={onAddNetworkInterface} vm={vm} />
       <NetworkInterfaceList onUpdateVM={onUpdateVM} vm={vm} />
     </PageSection>

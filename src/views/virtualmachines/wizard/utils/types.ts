@@ -75,6 +75,10 @@ export type ApplySelectedBootableVolumeToForm = {
   volumeSnapshotSource: null | VolumeSnapshotKind;
 };
 
+export type OnSelectBootableVolume = (
+  args: Omit<ApplySelectedBootableVolumeToForm, 'getValues' | 'setValue'>,
+) => void;
+
 export type VMCreationMethodCardDetails = {
   description: string;
   IconComponent: FC;

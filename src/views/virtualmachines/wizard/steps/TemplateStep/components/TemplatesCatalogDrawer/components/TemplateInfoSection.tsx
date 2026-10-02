@@ -28,6 +28,7 @@ import { useVMWizardForm } from '@virtualmachines/wizard/form/VMWizardFormProvid
 import { useDrawerContext } from '@virtualmachines/wizard/steps/TemplateStep/components/TemplatesCatalogDrawer/hooks/useDrawerContext';
 import { getTemplateOSName } from '@virtualmachines/wizard/steps/TemplateStep/utils/getTemplateOSName';
 
+import TemplateBootSourceItem from './TemplateBootSourceItem';
 import TemplateExpandableDescription from './TemplateExpandableDescription';
 
 const TemplateInfoSection: FC = memo(() => {
@@ -45,7 +46,6 @@ const TemplateInfoSection: FC = memo(() => {
   const networks = getTemplateNetworks(template);
   const interfaces = getTemplateInterfaces(template);
   const isDefaultTemplate = isDefaultVariantTemplate(template);
-
   const hasPodNetwork = networksHavePodNetwork(networks);
 
   const operatingSystem =
@@ -77,9 +77,12 @@ const TemplateInfoSection: FC = memo(() => {
         olsObj={vm}
         promptType={OLSPromptType.CPU_MEMORY}
       />
+      <TemplateBootSourceItem />
       <DescriptionItem
         descriptionData={<NetworksReviewTable interfaces={interfaces} networks={networks} />}
-        descriptionHeader={t('Network interfaces ({{networks}})', { networks: networks?.length })}
+        descriptionHeader={t('Network interfaces ({{networks}})', {
+          networks: networks?.length ?? 0,
+        })}
       />
       {isIPv6SingleStack && hasPodNetwork && (
         <Alert
