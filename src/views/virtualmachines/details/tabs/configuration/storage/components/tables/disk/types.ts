@@ -1,3 +1,5 @@
+import { type ReactNode } from 'react';
+
 import {
   type V1VirtualMachine,
   type V1VirtualMachineInstance,
@@ -14,6 +16,7 @@ export type DiskRowActionsProps = {
 };
 
 export type DiskListProps = {
+  afterTitle?: ReactNode;
   customize?: boolean;
   getCurrentVM?: () => null | undefined | V1VirtualMachine;
   onDiskUpdate?: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine>;

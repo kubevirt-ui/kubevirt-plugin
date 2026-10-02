@@ -47,7 +47,14 @@ export type VMWizardInstanceTypeValues = {
   volumeNamespace: string;
 };
 
+export type BootSourceOverride = {
+  kind: 'DataSource';
+  name: string;
+  namespace: string;
+};
+
 export type VMWizardTemplateValues = {
+  bootSourceOverride: BootSourceOverride | null;
   selectedTemplate: null | Template;
 };
 

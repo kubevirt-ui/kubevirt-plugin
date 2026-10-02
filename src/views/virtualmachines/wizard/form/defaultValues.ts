@@ -46,6 +46,7 @@ export const createInstanceTypeDefaultValues = (): VMWizardInstanceTypeValues =>
 });
 
 export const createTemplateDefaultValues = (): VMWizardTemplateValues => ({
+  bootSourceOverride: null,
   selectedTemplate: null,
 });
 

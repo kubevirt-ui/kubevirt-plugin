@@ -17,6 +17,7 @@ import { useVMWizardForm } from '@virtualmachines/wizard/form/VMWizardFormProvid
 import { useVMWizardState } from '@virtualmachines/wizard/state/useVMWizardState';
 import { getFirstUnfulfilledRequiredParameter } from '@virtualmachines/wizard/steps/TemplateStep/components/TemplatesCatalogDrawer/utils/utils';
 import {
+  applyBootSourceOverrideToVM,
   getVMObjectFromTemplate,
   resolveVMFromTemplate,
 } from '@virtualmachines/wizard/steps/TemplateStep/hooks/utils';
@@ -157,14 +158,17 @@ const useTemplateVMGeneration = ({
           requestSnapshot.vmName,
         );
 
-        const generatedVM = getVMObjectFromTemplate({
-          description: requestSnapshot.description,
-          folder: requestSnapshot.folder,
-          namespace,
-          selectedTemplate: processingTemplate,
-          sshSecretName: requestSnapshot.authorizedSSHKey,
-          vm,
-        });
+        const generatedVM = applyBootSourceOverrideToVM(
+          getVMObjectFromTemplate({
+            description: requestSnapshot.description,
+            folder: requestSnapshot.folder,
+            namespace,
+            selectedTemplate: processingTemplate,
+            sshSecretName: requestSnapshot.authorizedSSHKey,
+            vm,
+          }),
+          values.template.bootSourceOverride,
+        );
 
         if (!isRequestCurrent()) return false;
 
