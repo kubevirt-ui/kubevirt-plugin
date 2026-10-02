@@ -64,7 +64,7 @@ const mapTestFailed = (map: MapParams, poolSuffix: string): ResultDetails => {
 
   const summary = [
     baseSummary,
-    map.testFailureSummary ? `\n\n---\n\n### Failed Tests\n\n${map.testFailureSummary}` : '',
+    map.testFailureSummary ? `\n\n---\n\n### Test results\n\n${map.testFailureSummary}` : '',
     `\n\nSee the [workflow run](${map.workflowRunUrl}) for full details, or comment \`/retest-e2e\` once fixed.`,
   ].join('');
 

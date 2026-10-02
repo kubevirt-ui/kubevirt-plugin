@@ -25,6 +25,7 @@ import { getRepoContext, getRunUrl } from '../shared/actions-context';
 import { isRequiredGatingSuite } from '../shared/is-required-gating-suite';
 import { E2E_HOLD_LABEL } from '../shared/merge-pool';
 import { failStep, setOutput } from '../shared/output';
+import { buildAdHocResultComment } from './adhoc-comment';
 import { mapResultDetails, type VerifyReason } from './result-mapper';
 import {
   checkHoldState,
@@ -73,17 +74,14 @@ const main = async (): Promise<void> => {
   const isGatingSuite = isRequiredGatingSuite(testProject, testArgs);
 
   if (!isGatingSuite) {
-    const suiteLabel = testArgs ? `${testProject} (${testArgs})` : testProject;
     const passed = reason === 'passed';
-    const emoji = passed ? '✅' : '❌';
-    const body = [
-      `${emoji} Hot Cluster E2E ad-hoc suite \`${suiteLabel}\` ${passed ? 'passed' : 'failed'}.`,
-      '',
-      `[View run](${runUrl})`,
-      testFailureSummary ? `\n${testFailureSummary}` : '',
-    ]
-      .filter(Boolean)
-      .join('\n');
+    const body = buildAdHocResultComment({
+      passed,
+      runUrl,
+      testArgs,
+      testFailureSummary,
+      testProject,
+    });
 
     console.log(
       `test_project=${testProject} -- skipping Run Gating Tests publish; commenting on PR #${prNumber}.`,
