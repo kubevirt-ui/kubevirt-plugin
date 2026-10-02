@@ -5,17 +5,16 @@ import FolderSelect from '@kubevirt-utils/components/FolderSelect/FolderSelect';
 import { isValidFolderName } from '@kubevirt-utils/components/FolderSelect/utils/validation';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getNamespace } from '@kubevirt-utils/resources/shared';
+import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { Stack, StackItem } from '@patternfly/react-core';
 
-import SingleVmMoveGroupSummary from './components/SingleVmMoveGroupSummary';
 import useRemoveFolderQuery from './hooks/useRemoveFolderQuery';
 import SelectedFolderIndicator from './SelectedFolderIndicator';
 import {
-  getFolderDisplayName,
   getInitialFolderName,
   getMoveToFolderSubmitDisabledTooltip,
+  getSingleVmMoveGroupSummary,
   hasFolderDestinationChanged,
 } from './utils';
 
@@ -35,8 +34,6 @@ const MoveVMToFolderModal: FC<MoveVMToFolderModalProps> = ({ isOpen, onClose, on
   const hasDestinationChanged = hasFolderDestinationChanged(initialFolderName, folderName);
   const isSubmitDisabled = !hasDestinationChanged || !isValidFolderName(folderName);
   const namespace = getNamespace(vm);
-  const sourceGroupName = getFolderDisplayName(initialFolderName, t);
-  const destinationGroupName = getFolderDisplayName(folderName, t);
 
   return (
     <TabModal<V1VirtualMachine>
@@ -59,13 +56,14 @@ const MoveVMToFolderModal: FC<MoveVMToFolderModalProps> = ({ isOpen, onClose, on
     >
       <Stack hasGutter>
         <StackItem>
-          <SingleVmMoveGroupSummary
-            destinationGroupName={destinationGroupName}
-            hasDestinationChanged={hasDestinationChanged}
-            namespace={namespace}
-            sourceGroupName={sourceGroupName}
-            vm={vm}
-          />
+          {getSingleVmMoveGroupSummary(
+            t,
+            getName(vm),
+            namespace,
+            hasDestinationChanged,
+            initialFolderName,
+            folderName,
+          )}
         </StackItem>
         <StackItem>
           <FolderSelect
