@@ -1,5 +1,9 @@
 import { type ChangeEvent, type FC, useState } from 'react';
 
+import {
+  type AddBootableVolumeState,
+  type SetBootableVolumeFieldType,
+} from '@kubevirt-utils/components/AddBootableVolumeModal/types';
 import { type DataUpload } from '@kubevirt-utils/hooks/useCDIUpload/types';
 import { isUploadingDisk } from '@kubevirt-utils/hooks/useCDIUpload/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -9,10 +13,10 @@ import DiskSourceUploadISO from './DiskSourceUploadISO';
 import { DiskSourceUploadPVCProgress } from './DiskSourceUploadPVCProgress';
 
 type DiskSourceUploadPVCProps = {
-  isIso: boolean;
+  bootableVolume: AddBootableVolumeState;
   label?: string;
   relevantUpload: DataUpload;
-  setIsIso: (value: boolean) => void;
+  setBootableVolumeField: SetBootableVolumeFieldType;
   setUploadFile: (file: File | string) => void;
   setUploadFileName: (name: string) => void;
   uploadFile: File | string;
@@ -20,10 +24,10 @@ type DiskSourceUploadPVCProps = {
 };
 
 const DiskSourceUploadPVC: FC<DiskSourceUploadPVCProps> = ({
-  isIso,
+  bootableVolume,
   label,
   relevantUpload,
-  setIsIso,
+  setBootableVolumeField,
   setUploadFile,
   setUploadFileName,
   uploadFile,
@@ -61,7 +65,11 @@ const DiskSourceUploadPVC: FC<DiskSourceUploadPVCProps> = ({
           value={uploadFile}
         />
       </FormGroup>
-      <DiskSourceUploadISO isDisabled={isUploading} isIso={isIso} setIsIso={setIsIso} />
+      <DiskSourceUploadISO
+        bootableVolume={bootableVolume}
+        isDisabled={isUploading}
+        setBootableVolumeField={setBootableVolumeField}
+      />
       {relevantUpload && <DiskSourceUploadPVCProgress upload={relevantUpload} />}
     </>
   );

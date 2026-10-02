@@ -6,10 +6,15 @@ import {
 } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import { type V1beta1DataVolumeSource } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { KUBEVIRT_ISO_LABEL } from '@kubevirt-utils/resources/bootableresources/constants';
+import { getLabels } from '@kubevirt-utils/resources/shared';
 import { ARCHITECTURE_LABEL } from '@kubevirt-utils/utils/architecture';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 
-import { emptySourceDataVolume } from '../consts';
+import {
+  type DROPDOWN_FORM_SELECTION,
+  emptySourceDataVolume,
+  ISO_SUPPORTED_SOURCE_TYPES,
+} from '../consts';
 import { type AddBootableVolumeState } from '../types';
 
 export const getDataVolumeWithSource = (
@@ -42,6 +47,7 @@ export const setDataSourceMetadata = (
   namespace: string,
   dataSource: V1beta1DataSource,
   architecture: string,
+  sourceType: DROPDOWN_FORM_SELECTION,
 ): V1beta1DataSource => {
   const { annotations, bootableVolumeName, isIso, labels } = bootableVolume || {};
 
@@ -57,9 +63,9 @@ export const setDataSourceMetadata = (
       ? { ...labels, [ARCHITECTURE_LABEL]: architecture }
       : labels;
 
-    if (isIso) {
+    if (isIso && ISO_SUPPORTED_SOURCE_TYPES.includes(sourceType)) {
       draftDS.metadata.labels = {
-        ...(draftDS.metadata.labels ?? {}),
+        ...getLabels(draftDS, {}),
         [KUBEVIRT_ISO_LABEL]: 'true',
       };
     }

@@ -66,8 +66,8 @@ const HTTPSource: FC<HTTPSourceProps> = ({
       </FormGroup>
 
       <DiskSourceUploadISO
-        isIso={bootableVolume.isIso ?? false}
-        setIsIso={setBootableVolumeField('isIso')}
+        bootableVolume={bootableVolume}
+        setBootableVolumeField={setBootableVolumeField}
       />
 
       <TLSCertificateSection

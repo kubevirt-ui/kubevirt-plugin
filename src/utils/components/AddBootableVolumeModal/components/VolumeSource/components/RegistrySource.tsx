@@ -41,8 +41,8 @@ const RegistrySource: FC<RegistrySourceProps> = ({
         testId="volume-registry"
       />
       <DiskSourceUploadISO
-        isIso={bootableVolume.isIso ?? false}
-        setIsIso={setBootableVolumeField('isIso')}
+        bootableVolume={bootableVolume}
+        setBootableVolumeField={setBootableVolumeField}
       />
     </>
   );
