@@ -38,6 +38,8 @@ const useFolderOptions: UseFolderOptions = (namespace, cluster) => {
       return uniqueValues;
     }, []);
 
+    folderOptions.sort((a, b) => String(a.value).localeCompare(String(b.value)));
+
     setFolders(folderOptions);
   }, [vms]);
 

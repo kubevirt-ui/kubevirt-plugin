@@ -1,17 +1,26 @@
 import type { FC } from 'react';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
+import { Trans } from 'react-i18next';
 
 import type { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import FolderSelect from '@kubevirt-utils/components/FolderSelect/FolderSelect';
+import { isValidFolderName } from '@kubevirt-utils/components/FolderSelect/utils/validation';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { getCluster } from '@multicluster/helpers/selectors';
-import { Popover, PopoverPosition, Stack, StackItem } from '@patternfly/react-core';
+import { Stack, StackItem } from '@patternfly/react-core';
 
-import BulkVMsPopover from './BulkVMsPopover';
+import VmCountPopoverLink from './components/VmCountPopoverLink';
 import useRemoveFolderQuery from './hooks/useRemoveFolderQuery';
 import SelectedFolderIndicator from './SelectedFolderIndicator';
+import {
+  getBulkInitialFolderName,
+  getBulkSharedFolderName,
+  getBulkVmsMoveGroupSummaryChangePhrase,
+  getMoveToFolderSubmitDisabledTooltip,
+  hasFolderDestinationChanged,
+} from './utils';
 
 type MoveBulkVMToFolderModalProps = {
   isOpen: boolean;
@@ -27,38 +36,45 @@ const MoveBulkVMToFolderModal: FC<MoveBulkVMToFolderModalProps> = ({
   vms,
 }) => {
   const { t } = useKubevirtTranslation();
-  const [folderName, setFolderName] = useState<string>();
+  const initialFolderName = useMemo(() => getBulkInitialFolderName(vms), [vms]);
+  const [folderName, setFolderName] = useState<string>(() => initialFolderName);
 
   const namespace = getNamespace(vms?.[0]);
+  const hasSharedSourceFolder = getBulkSharedFolderName(vms) !== null;
 
   const removeFolderQuery = useRemoveFolderQuery(vms);
+  const hasDestinationChanged = hasFolderDestinationChanged(initialFolderName, folderName);
+  const isSubmitDisabled = !hasDestinationChanged || !isValidFolderName(folderName);
+  const groupChangePhrase = getBulkVmsMoveGroupSummaryChangePhrase(
+    t,
+    hasDestinationChanged,
+    hasSharedSourceFolder,
+    initialFolderName,
+    folderName,
+  );
 
   return (
     <TabModal<V1VirtualMachine>
       headerText={t('Move to group')}
+      isDisabled={isSubmitDisabled}
       isOpen={isOpen}
       onClose={onClose}
       onSubmit={() => {
         removeFolderQuery?.(folderName);
         return onSubmit(folderName);
       }}
+      submitDisabledTooltip={getMoveToFolderSubmitDisabledTooltip(
+        folderName,
+        hasDestinationChanged,
+        t,
+      )}
     >
       <Stack hasGutter>
         <StackItem>
-          <Popover
-            bodyContent={<BulkVMsPopover vms={vms} />}
-            className="confirm-multiple-vm-actions-modal__popover"
-            position={PopoverPosition.right}
-          >
-            <a>
-              {vms.length === 1
-                ? t('1 VirtualMachine in {{namespace}} namespace?', { namespace })
-                : t('{{numVMs}} VirtualMachines in {{namespace}} namespace?', {
-                    namespace,
-                    numVMs: vms.length,
-                  })}
-            </a>
-          </Popover>
+          <Trans t={t}>
+            Move <VmCountPopoverLink vms={vms} /> in namespace <strong>{{ namespace }}</strong>
+          </Trans>
+          {groupChangePhrase ? ` ${groupChangePhrase}` : null}
         </StackItem>
         <StackItem>
           <FolderSelect

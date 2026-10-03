@@ -4,8 +4,10 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { StackItem } from '@patternfly/react-core';
 import { FolderIcon, ProjectDiagramIcon } from '@patternfly/react-icons';
 
+import { getFolderDisplayName } from './utils';
+
 type SelectedFolderIndicatorProps = {
-  folderName: string;
+  folderName?: string;
 };
 
 const SelectedFolderIndicator: FC<SelectedFolderIndicatorProps> = ({ folderName }) => {
@@ -13,7 +15,7 @@ const SelectedFolderIndicator: FC<SelectedFolderIndicatorProps> = ({ folderName 
   return (
     <StackItem>
       {folderName ? <FolderIcon /> : <ProjectDiagramIcon />}
-      <span className="pf-v6-u-ml-sm">{folderName || t('Project root')}</span>
+      <span className="pf-v6-u-ml-sm">{getFolderDisplayName(folderName, t)}</span>
     </StackItem>
   );
 };

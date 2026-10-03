@@ -22,7 +22,7 @@ export const getCreateNewFolderOption = (filterValue: string, t: TFunction): Sel
     };
   }
 
-  const errorMessage = getCreationNotAllowedMessage(filterValue);
+  const errorMessage = getCreationNotAllowedMessage(filterValue, t);
   if (errorMessage) {
     return {
       children: (
