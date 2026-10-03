@@ -43,10 +43,7 @@ const MoveVMToFolderModal: FC<MoveVMToFolderModalProps> = ({ isOpen, onClose, on
       onClose={onClose}
       onSubmit={() => {
         removeFolderQuery?.(folderName);
-        return onSubmit(folderName).catch((error) => {
-          setFolderName(initialFolderName);
-          throw error;
-        });
+        return onSubmit(folderName);
       }}
       submitDisabledTooltip={getMoveToFolderSubmitDisabledTooltip(
         folderName,

@@ -114,11 +114,7 @@ test.describe.serial(
         });
 
         await test.step('Selecting a different group enables Save', async () => {
-          await vmDetailPage.moveToFolderModal.fillSearchGroup(GROUP_BETA);
-          await vmDetailPage.moveToFolderModal.openDropdown();
-          await vmDetailPage.page
-            .locator(`#select-typeahead-${GROUP_BETA}`)
-            .click({ timeout: utils.TestTimeouts.ELEMENT_WAIT });
+          await vmDetailPage.moveToFolderModal.selectFolderOption(GROUP_BETA);
           const bodyText = await vmDetailPage.moveToFolderModal.getModalBodyText();
           expect(bodyText).toMatch(/from group/i);
           expect(bodyText).toMatch(/to group/i);
@@ -183,13 +179,16 @@ test.describe.serial(
           );
         });
 
-        await test.step('Oversize group names show validation and keep Save disabled', async () => {
+        await test.step('Oversize input does not replace the selected destination', async () => {
+          await vmDetailPage.moveToFolderModal.selectFolderOption(GROUP_BETA);
+
           const oversizeName = 'a'.repeat(64);
           await vmDetailPage.moveToFolderModal.fillSearchGroup(oversizeName);
           await vmDetailPage.moveToFolderModal.openDropdown();
           const validationError = await vmDetailPage.moveToFolderModal.getValidationErrorText();
           expect(validationError).toMatch(/63 bytes or fewer/i);
-          expect(await vmDetailPage.moveToFolderModal.isSaveButtonEnabled()).toBe(false);
+          expect(await vmDetailPage.moveToFolderModal.getModalBodyText()).toContain(GROUP_BETA);
+          expect(await vmDetailPage.moveToFolderModal.isSaveButtonEnabled()).toBe(true);
           await vmDetailPage.moveToFolderModal.clickCancel();
         });
       },
