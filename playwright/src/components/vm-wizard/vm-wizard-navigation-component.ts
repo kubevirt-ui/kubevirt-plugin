@@ -524,13 +524,6 @@ export default class VmWizardNavigationComponent extends BaseComponent {
     await this.robustClick(row.first());
   }
 
-  /** Selects the first available VM row in the Clone source step's table, regardless of name. */
-  async selectFirstAvailableCloneSourceVm(): Promise<void> {
-    const firstRow = this.locator('.pf-v6-c-wizard tbody tr').first();
-    await firstRow.waitFor({ state: 'visible', timeout: TestTimeouts.VM_OPERATION });
-    await this.robustClick(firstRow);
-  }
-
   async selectCreationMethod(method: 'newVm' | 'fromTemplate' | 'cloneVm'): Promise<void> {
     const radioMap = {
       newVm: this._newVmRadio,
@@ -564,7 +557,8 @@ export default class VmWizardNavigationComponent extends BaseComponent {
     }
   }
 
-  private async selectTemplateCard(card: Locator): Promise<void> {
+  async selectTemplateByTestId(templateTestId: string): Promise<void> {
+    const card = this.testId(templateTestId);
     await card.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
     await this.robustClick(card);
 
@@ -590,28 +584,10 @@ export default class VmWizardNavigationComponent extends BaseComponent {
     );
   }
 
-  async selectTemplateByTestId(templateTestId: string): Promise<void> {
-    const card = this.testId(templateTestId);
-    await this.selectTemplateCard(card);
-  }
-
   async isTemplateSelectedByTestId(templateTestId: string): Promise<boolean> {
     const card = this.testId(templateTestId);
     await card.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
     return await card.evaluate((element) => element.classList.contains('pf-m-selected'));
-  }
-
-  /** Selects the first available template card/row in the Template catalog step, regardless of name. */
-  async selectFirstAvailableTemplate(): Promise<void> {
-    const gridCard = this._pfV6CWizardTemplatesCatalogTile.first();
-    const isGridVisible = await gridCard
-      .isVisible({ timeout: TestTimeouts.SHORT_WAIT })
-      .catch(() => false);
-    const card = isGridVisible
-      ? gridCard
-      : this.locator('.pf-v6-c-wizard tr.pf-m-clickable').first();
-
-    await this.selectTemplateCard(card);
   }
 
   async selectTemplateCatalogProject(projectName: string): Promise<void> {

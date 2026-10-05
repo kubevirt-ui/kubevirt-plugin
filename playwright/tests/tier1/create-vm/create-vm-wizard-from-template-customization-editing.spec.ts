@@ -1,5 +1,7 @@
 import { ADMIN_ONLY_TAG, T1, T1_TAG } from '@/data-models/allure-constants';
 import { expect, test } from '@/fixtures/create-vm-fixture';
+import { moveFirstDeviceDown, normalizeBootOrder } from '@/utils/boot-order-helpers';
+import { setupTestNamespace } from '@/utils/test-setup-helpers';
 
 const SUITE = 'VM Creation Wizard';
 const RHEL9_TEMPLATE = 'rhel9-server-small';
@@ -22,7 +24,7 @@ test.describe(
         tags: [T1_TAG],
       });
 
-      const wizardNs = await utils.setupTestNamespace(apiClient, 'wizard-tpl-edit');
+      const wizardNs = await setupTestNamespace(apiClient, 'wizard-tpl-edit');
 
       await vmListPage.switchToVirtualizationPerspective();
       await vmListPage.navigateToProjectVmListViaUI(wizardNs);
@@ -102,21 +104,23 @@ test.describe(
         await vmWizardComputePage.reorderBootDeviceInModal(initialOrder[0], 'down');
         await vmWizardComputePage.saveBootOrderModal();
 
-        const displayedOrderAfterFirstEdit = utils.normalizeBootOrder(
+        const displayedOrderAfterFirstEdit = normalizeBootOrder(
           await vmWizardComputePage.getDisplayedBootOrder(vmName),
         );
         expect(
           displayedOrderAfterFirstEdit,
           'The first boot-order edit should move a device',
-        ).toEqual(utils.moveFirstDeviceDown(initialOrder));
+        ).toEqual(moveFirstDeviceDown(initialOrder));
 
         await vmWizardComputePage.openBootOrderModal(vmName);
         await vmWizardComputePage.reorderBootDeviceInModal(displayedOrderAfterFirstEdit[0], 'down');
         await vmWizardComputePage.saveBootOrderModal();
 
-        bootOrderAfterEdit = utils.normalizeBootOrder(await vmWizardComputePage.getDisplayedBootOrder(vmName));
+        bootOrderAfterEdit = normalizeBootOrder(
+          await vmWizardComputePage.getDisplayedBootOrder(vmName),
+        );
         expect(bootOrderAfterEdit, 'The second boot-order edit should move a device again').toEqual(
-          utils.moveFirstDeviceDown(displayedOrderAfterFirstEdit),
+          moveFirstDeviceDown(displayedOrderAfterFirstEdit),
         );
       });
 
@@ -138,7 +142,9 @@ test.describe(
           'test test',
         );
 
-        const bootOrder = utils.normalizeBootOrder(await vmWizardComputePage.getDisplayedBootOrder(vmName));
+        const bootOrder = normalizeBootOrder(
+          await vmWizardComputePage.getDisplayedBootOrder(vmName),
+        );
         expect(bootOrder, 'Boot order edit should persist after Back/Next').toEqual(
           bootOrderAfterEdit,
         );

@@ -1,6 +1,7 @@
 import { ADMIN_ONLY_TAG, T2, T2_TAG } from '@/data-models/allure-constants';
 import { expect, test } from '@/fixtures/create-vm-fixture';
 import { TEMPLATE_METADATA_NAMES } from '@/utils/template-constants';
+import { setupTestNamespace } from '@/utils/test-setup-helpers';
 
 const SUITE = 'VM Creation Wizard';
 
@@ -8,7 +9,7 @@ test.describe(
   'VM Creation Wizard — Clone existing VirtualMachine: Review step values',
   { tag: [T2_TAG, '@catalog-wizard', ADMIN_ONLY_TAG] },
   () => {
-    test('Clone wizard selects the first available source VM and the Review step displays it', async ({
+    test('Clone wizard selects its source VM and the Review step displays it', async ({
       apiClient,
       vmListPage,
       vmWizardNavigationPage,
@@ -22,7 +23,7 @@ test.describe(
         tags: [T2_TAG],
       });
 
-      const cloneNs = await utils.setupTestNamespace(apiClient, 'wizard-clone-review');
+      const cloneNs = await setupTestNamespace(apiClient, 'wizard-clone-review');
       const sourceVmName = utils.generateRandomVmName('clone-src');
 
       await test.step('Precondition: Create source VM via K8s API', async () => {
@@ -65,14 +66,15 @@ test.describe(
         await vmWizardNavigationPage.clickNext();
       });
 
-      await test.step('Step 2: Source — select the first available VirtualMachine', async () => {
+      await test.step('Step 2: Source — select the source VirtualMachine', async () => {
         const sourceStepVisible = await vmWizardNavigationPage.verifyCloneSourceStepVisible();
         expect(sourceStepVisible, 'Source step heading should be visible').toBe(true);
 
         const vmListVisible = await vmWizardNavigationPage.verifyCloneVmListVisible();
         expect(vmListVisible, 'VM list should be visible in Source step').toBe(true);
 
-        await vmWizardNavigationPage.selectFirstAvailableCloneSourceVm();
+        await vmWizardNavigationPage.searchCloneSourceByName(sourceVmName);
+        await vmWizardNavigationPage.selectCloneSourceVm(sourceVmName);
 
         const nextDisabled = await vmWizardNavigationPage.isNextButtonDisabled();
         expect(nextDisabled, 'Next should be enabled after selecting a source VM').toBe(false);

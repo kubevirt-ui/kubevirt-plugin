@@ -3,6 +3,7 @@ import { expect, test } from '@/fixtures/create-vm-fixture';
 import { TEMPLATE_METADATA_NAMES } from '@/utils/template-constants';
 
 const SUITE = 'VM Creation Wizard';
+const RHEL9_TEMPLATE = 'rhel9-server-small';
 
 test.describe(
   'VM Creation Wizard — Required field validation',
@@ -64,7 +65,7 @@ test.describe(
         'Next should be disabled before selecting a template',
       ).toBe(true);
 
-      await vmWizardNavigationPage.selectFirstAvailableTemplate();
+      await vmWizardNavigationPage.selectTemplateByTestId(RHEL9_TEMPLATE);
 
       const nextDisabledAfterTemplate = await vmWizardNavigationPage.isNextButtonDisabled();
       expect(nextDisabledAfterTemplate, 'Next should be enabled once a template is selected').toBe(
@@ -109,7 +110,8 @@ test.describe(
         true,
       );
 
-      await vmWizardNavigationPage.selectFirstAvailableCloneSourceVm();
+      await vmWizardNavigationPage.searchCloneSourceByName(sourceVmName);
+      await vmWizardNavigationPage.selectCloneSourceVm(sourceVmName);
 
       const nextDisabledAfterSource = await vmWizardNavigationPage.isNextButtonDisabled();
       expect(nextDisabledAfterSource, 'Next should be enabled once a source VM is selected').toBe(

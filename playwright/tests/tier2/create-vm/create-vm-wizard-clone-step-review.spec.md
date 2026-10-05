@@ -13,14 +13,14 @@
 ### 2.1 Purpose
 
 Verify the Clone existing VirtualMachine wizard flow: selecting Clone (Name is not required at
-Deployment details), selecting the first available source VM, and confirming that the Review and
+Deployment details), selecting the created source VM, and confirming that the Review and
 create step displays the generated clone name, editable Name and Description fields, and the
 expected review sections before creating the clone.
 
 ### 2.2 Scope
 
 - **In-Scope:** Clone wizard flow (3 steps: Deployment details, Source, Review and create);
-  Deployment details Next-button state for Clone (Name not required); selecting the first available
+  Deployment details Next-button state for Clone (Name not required); selecting the created
   source VM; Review step display of the auto-generated clone name, Name and Description
   editability, the Description's initial empty value, Create button label, and visible sections;
   clone VM creation.
@@ -50,10 +50,10 @@ expected review sections before creating the clone.
 
 ---
 
-### `001`: Clone wizard selects the first available source VM and the Review step displays it
+### `001`: Clone wizard selects its source VM and the Review step displays it
 
 - **Objective:** Verify that Next is already enabled on Deployment details for the Clone method
-  (Name is not required), that selecting the first available source VM enables Next on the Source
+  (Name is not required), that selecting the created source VM enables Next on the Source
   step, and that Review displays an auto-generated, editable clone name plus the expected sections
   before creation.
 - **Target version:** CNV 5.1.0
@@ -66,7 +66,7 @@ expected review sections before creating the clone.
 | 1    | Create a source VM via the API and wait for it to reach Running state           | Source VM exists and is Running                                                                                                                                                  |
 | 2    | Open the wizard and select Clone existing VirtualMachine                        | Clone is selected; Next is already enabled — Name is not required for this flow                                                                                                  |
 | 3    | Click Next; verify the Source step and VM list are visible                      | Source step heading and VM list are visible                                                                                                                                      |
-| 4    | Select the first available VM in the list                                       | Next becomes enabled after a source VM is selected                                                                                                                               |
+| 4    | Search for and select the created source VM                                     | Next becomes enabled after the source VM is selected                                                                                                                             |
 | 5    | Click Next to Review; verify the auto-generated name, editability, and sections | Clone name is generated and contains "clone"; Name and Description are editable; Description is initially empty; review sections are visible; Create says "Clone VirtualMachine" |
 | 6    | Click Clone VirtualMachine                                                      | The console redirects to VM details                                                                                                                                              |
 | 7    | Verify the clone VM exists via API                                              | VirtualMachine resource exists in the test namespace                                                                                                                             |

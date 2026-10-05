@@ -1,5 +1,6 @@
 import { ADMIN_ONLY_TAG, T1, T1_TAG } from '@/data-models/allure-constants';
 import { expect, test } from '@/fixtures/create-vm-fixture';
+import { setupTestNamespace } from '@/utils/test-setup-helpers';
 
 const SUITE = 'VM Creation Wizard';
 const CUSTOMIZATION_STEP_ID = 'vm-creation-customization-step';
@@ -23,7 +24,7 @@ test.describe(
       test.setTimeout(utils.TestTimeouts.TEST_MEDIUM);
       await utils.withAllure({ suite: SUITE, feature: T1, tags: [T1_TAG] });
 
-      const wizardNs = await utils.setupTestNamespace(apiClient, 'wizard-nav');
+      const wizardNs = await setupTestNamespace(apiClient, 'wizard-nav');
       await vmListPage.switchToVirtualizationPerspective();
       await vmListPage.navigateToProjectVmListViaUI(wizardNs);
       await vmWizardNavigationPage.openWizardFromCreateDropdown();
@@ -85,7 +86,7 @@ test.describe(
       test.setTimeout(utils.TestTimeouts.TEST_MEDIUM);
       await utils.withAllure({ suite: SUITE, feature: T1, tags: [T1_TAG] });
 
-      const wizardNs = await utils.setupTestNamespace(apiClient, 'wizard-nav-tpl');
+      const wizardNs = await setupTestNamespace(apiClient, 'wizard-nav-tpl');
       await vmListPage.switchToVirtualizationPerspective();
       await vmListPage.navigateToProjectVmListViaUI(wizardNs);
       await vmWizardNavigationPage.openWizardFromCreateDropdown();

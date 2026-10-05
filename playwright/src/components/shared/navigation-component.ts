@@ -543,19 +543,6 @@ export default class NavigationComponent extends BaseComponent {
     await this.dismissBlockingModals();
 
     const toggle = this.consoleTestId('perspective-switcher-toggle');
-    const hasVirtNav = async (): Promise<boolean> => {
-      const navItem = this.testId('bootablevolumes-nav-item')
-        .or(this.testId('virtualmachines-nav-item'))
-        .or(this.testId('templates-nav-item'))
-        .or(this.testId('virtualmachineclusterinstancetypes-nav-item'));
-      return (
-        (await this._virtNavSection.isVisible().catch(() => false)) ||
-        (await navItem
-          .first()
-          .isVisible()
-          .catch(() => false))
-      );
-    };
 
     // Wait for the toggle to render (page may still be loading React components).
     let toggleVisible = await toggle
@@ -590,9 +577,6 @@ export default class NavigationComponent extends BaseComponent {
       }
 
       if (!toggleVisible) {
-        // Handles layouts without perspective switcher and with Virtualization in the sidebar menu.
-        if (await hasVirtNav()) return;
-
         throw new Error('Perspective switcher toggle not visible after expanding sidebar');
       }
     }
@@ -602,6 +586,20 @@ export default class NavigationComponent extends BaseComponent {
 
     const isVirtualizationToggle = (text: string): boolean =>
       /virtualization/i.test(text) && !/fleet/i.test(text);
+
+    const hasVirtNav = async (): Promise<boolean> => {
+      const navItem = this.testId('bootablevolumes-nav-item')
+        .or(this.testId('virtualmachines-nav-item'))
+        .or(this.testId('templates-nav-item'))
+        .or(this.testId('virtualmachineclusterinstancetypes-nav-item'));
+      return (
+        (await this._virtNavSection.isVisible().catch(() => false)) ||
+        (await navItem
+          .first()
+          .isVisible()
+          .catch(() => false))
+      );
+    };
 
     // Already on Virtualization (or Core Platform with virt nav) — do not open the menu.
     if (isVirtualizationToggle(await getToggleText()) || (await hasVirtNav())) {

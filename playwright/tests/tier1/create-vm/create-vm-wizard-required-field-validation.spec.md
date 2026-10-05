@@ -77,7 +77,7 @@ required at Deployment details but a source VM selection is required on the Sour
 | 2    | Observe the Next button before providing a Name     | Next is disabled                                          |
 | 3    | Generate a VM name, then click Next                 | Next becomes enabled; wizard advances to Template catalog |
 | 4    | Observe the Next button before selecting a template | Next is disabled                                          |
-| 5    | Select the first available template                 | Next becomes enabled                                      |
+| 5    | Select the RHEL 9 template                          | Next becomes enabled                                      |
 
 ---
 
@@ -96,7 +96,7 @@ required at Deployment details but a source VM selection is required on the Sour
 | 2    | Select Clone existing VirtualMachine                 | Clone is selected; Next is already enabled — Name is not required |
 | 3    | Click Next; verify the Source step is visible        | Source step is visible                                            |
 | 4    | Observe the Next button before selecting a source VM | Next is disabled                                                  |
-| 5    | Select the first available source VM                 | Next becomes enabled                                              |
+| 5    | Search for and select the created source VM          | Next becomes enabled                                              |
 
 ---
 

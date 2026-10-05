@@ -400,7 +400,9 @@ export default class VmWizardComputeCustomizationComponent extends BaseComponent
     // component uses to compute the new index.
     const endX = startX;
     const endY =
-      direction === 'down' ? targetBox.y + targetBox.height * 0.75 : targetBox.y + targetBox.height * 0.25;
+      direction === 'down'
+        ? targetBox.y + targetBox.height * 0.75
+        : targetBox.y + targetBox.height * 0.25;
 
     await this.page.mouse.move(startX, startY);
     await this.page.mouse.down();

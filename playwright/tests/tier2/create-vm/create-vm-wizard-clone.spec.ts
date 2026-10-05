@@ -1,6 +1,7 @@
 import { ADMIN_ONLY_TAG, T2, T2_TAG } from '@/data-models/allure-constants';
 import { expect, test } from '@/fixtures/create-vm-fixture';
 import { TEMPLATE_METADATA_NAMES } from '@/utils/template-constants';
+import { setupTestNamespace } from '@/utils/test-setup-helpers';
 
 const SUITE = 'VM Creation Wizard';
 
@@ -22,7 +23,7 @@ test.describe(
         tags: [T2_TAG],
       });
 
-      const cloneNs = await utils.setupTestNamespace(apiClient, 'wizard-clone');
+      const cloneNs = await setupTestNamespace(apiClient, 'wizard-clone');
       const sourceVmName = utils.generateRandomVmName('clone-src');
 
       await test.step('Precondition: Create source VM via K8s API', async () => {
@@ -101,7 +102,6 @@ test.describe(
           .toContain('Clone');
 
         apiClient.trackResource('VirtualMachine', cloneVmName, cloneNs);
-        // Clone flow: the footer button reads "Clone VirtualMachine", not "Create VirtualMachine".
         await vmWizardNavigationPage.clickCloneVm();
         const redirected = await vmWizardNavigationPage.verifyRedirectedToVmDetails();
         expect(redirected, 'Should redirect to VM details after cloning').toBe(true);

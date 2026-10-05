@@ -1,5 +1,6 @@
 import { ADMIN_ONLY_TAG, T1, T1_TAG } from '@/data-models/allure-constants';
 import { expect, test } from '@/fixtures/create-vm-fixture';
+import { setupTestNamespace } from '@/utils/test-setup-helpers';
 
 const SUITE = 'VM Creation Wizard';
 
@@ -55,7 +56,7 @@ test.describe(
       test.setTimeout(utils.TestTimeouts.TEST_VM_CREATION);
       await utils.withAllure({ suite: SUITE, feature: T1, tags: [T1_TAG] });
 
-      const wizardNs = await utils.setupTestNamespace(apiClient, 'wizard-reset-create');
+      const wizardNs = await setupTestNamespace(apiClient, 'wizard-reset-create');
 
       await vmListPage.switchToVirtualizationPerspective();
       await vmListPage.navigateToProjectVmListViaUI(wizardNs);
