@@ -47,7 +47,7 @@ describe('mapResultDetails', () => {
       testFailureSummary: '**2** tests failed',
     });
     assert.equal(result.conclusion, 'failure');
-    assert.match(result.summary, /Failed Tests/);
+    assert.match(result.summary, /Test results/);
     assert.match(result.summary, /2\*\* tests failed/);
     assert.match(result.summary, /retest-e2e/);
   });
@@ -58,7 +58,7 @@ describe('mapResultDetails', () => {
       reason: 'test-failed',
     });
     assert.equal(result.conclusion, 'failure');
-    assert.ok(!result.summary.includes('Failed Tests'));
+    assert.ok(!result.summary.includes('Test results'));
   });
 
   it('handles merge-conflict', () => {
