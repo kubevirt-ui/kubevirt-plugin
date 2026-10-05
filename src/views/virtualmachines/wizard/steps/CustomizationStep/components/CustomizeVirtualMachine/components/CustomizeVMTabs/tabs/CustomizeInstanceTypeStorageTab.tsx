@@ -4,6 +4,7 @@ import produce from 'immer';
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import EnvironmentForm from '@kubevirt-utils/components/EnvironmentEditor/EnvironmentForm';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
+import VirtIORecommendationAlert from '@kubevirt-utils/components/VirtIORecommendationAlert/VirtIORecommendationAlert';
 import { getDataVolumeTemplates, getDisks, getVolumes } from '@kubevirt-utils/resources/vm';
 import { ensurePath } from '@kubevirt-utils/utils/utils';
 import { Divider, Grid, GridItem, PageSection } from '@patternfly/react-core';
@@ -20,11 +21,18 @@ const CustomizeInstanceTypeStorageTab: FC = () => {
     return <Loading />;
   }
 
+  const onSwitchToVirtio = (updatedVM: V1VirtualMachine): void => {
+    replaceDraft(updatedVM, vm);
+  };
+
   return (
     <Grid hasGutter>
       <GridItem>
         <PageSection>
           <DiskList
+            afterTitle={
+              <VirtIORecommendationAlert kind="disk" onSwitchToVirtio={onSwitchToVirtio} vm={vm} />
+            }
             customize
             getCurrentVM={() => getValues('customization.vmDraft')}
             onDiskUpdate={(updatedVM: V1VirtualMachine) => {

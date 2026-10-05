@@ -16,6 +16,7 @@ import { Divider } from '@patternfly/react-core';
 type ProjectDropdownProps = {
   bookmarkCluster?: string;
   cluster?: string;
+  id?: string;
   includeAllProjects?: boolean;
   isDisabled?: boolean;
   onChange: (project: string) => void;
@@ -26,6 +27,7 @@ type ProjectDropdownProps = {
 const ProjectDropdown: FC<ProjectDropdownProps> = ({
   bookmarkCluster,
   cluster,
+  id,
   includeAllProjects = true,
   isDisabled = false,
   onChange,
@@ -114,7 +116,7 @@ const ProjectDropdown: FC<ProjectDropdownProps> = ({
         options={options}
         selected={selectedProject || ALL_PROJECTS}
         setSelected={onChange}
-        toggleProps={{ isDisabled, isFullWidth: true }}
+        toggleProps={{ id, isDisabled, isFullWidth: true }}
       />
     </div>
   );

@@ -16,9 +16,14 @@ import { processOpenShiftTemplate } from '@kubevirt-utils/resources/template/uti
 import { processVirtualMachineTemplate } from '@kubevirt-utils/resources/template/utils/processVirtualMachineTemplate';
 import { getDefaultRunningStrategy } from '@kubevirt-utils/resources/vm';
 import { getDataVolumeSourceHTTP } from '@kubevirt-utils/resources/vm/utils/dataVolumeTemplate/selectors';
+import {
+  getDataVolumeTemplates,
+  getRootDataVolumeTemplateSpec,
+} from '@kubevirt-utils/resources/vm/utils/selectors/deviceSelectors';
 import { ensurePath, isEmpty } from '@kubevirt-utils/utils/utils';
 import { type K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
+import { type BootSourceOverride } from '@virtualmachines/wizard/form/types';
 import { INSTALLATION_CDROM_NAME } from '@virtualmachines/wizard/steps/TemplateStep/components/TemplatesCatalog/utils/consts';
 
 export type ResolvedTemplateVM = {
@@ -130,4 +135,26 @@ export const getVMObjectFromTemplate = ({
   }
 
   return generatedVM;
+};
+
+export const applyBootSourceOverrideToVM = (
+  vm: V1VirtualMachine,
+  bootSourceOverride: BootSourceOverride | null,
+): V1VirtualMachine => {
+  if (!bootSourceOverride) return vm;
+
+  const rootDataVolumeTemplateSpec = getRootDataVolumeTemplateSpec(vm);
+
+  if (!rootDataVolumeTemplateSpec) return vm;
+
+  return produce(vm, (draftVM) => {
+    const dataVolumeTemplate = getDataVolumeTemplates(draftVM).find(
+      (dvTemplate) => getName(dvTemplate) === getName(rootDataVolumeTemplateSpec),
+    );
+
+    if (!dataVolumeTemplate) return;
+
+    dataVolumeTemplate.spec.source = undefined;
+    dataVolumeTemplate.spec.sourceRef = bootSourceOverride;
+  });
 };

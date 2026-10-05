@@ -7,7 +7,8 @@ import {
   type V1VirtualMachine,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getParameters, type Template } from '@kubevirt-utils/resources/template';
-import { getDisks, getVolumes } from '@kubevirt-utils/resources/vm';
+import { type BOOT_SOURCE } from '@kubevirt-utils/resources/template/utils/constants';
+import { getDisks, getVMBootSourceLabel, getVolumes } from '@kubevirt-utils/resources/vm';
 import { PARAMETER_VALUE_TYPES } from '@templates/details/tabs/parameters/constants';
 import {
   getValueTypeFromParameter,
@@ -88,3 +89,19 @@ export const hasInvalidPasswordParameter = (
 
     return hasPasswordParameterValueError(t, parameter.value ?? '');
   });
+
+export const getTemplateBootSourceLabel = (
+  bootSourceType: BOOT_SOURCE | undefined,
+  sourceRef: { name?: string; namespace?: string } | null | undefined,
+  t: TFunction,
+): string => {
+  if (!sourceRef?.name) {
+    return t(getVMBootSourceLabel(bootSourceType));
+  }
+
+  if (sourceRef.namespace) {
+    return t('{{name}} ({{namespace}})', { name: sourceRef.name, namespace: sourceRef.namespace });
+  }
+
+  return sourceRef.name;
+};

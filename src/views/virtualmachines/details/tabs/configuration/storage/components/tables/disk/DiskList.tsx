@@ -33,6 +33,7 @@ import { type DiskListProps } from './types';
 import './disklist.scss';
 
 const DiskList: FC<DiskListProps> = ({
+  afterTitle,
   customize = false,
   getCurrentVM,
   onDiskUpdate,
@@ -102,6 +103,7 @@ const DiskList: FC<DiskListProps> = ({
   return (
     <div className="kv-configuration-vm-disk-list">
       <DiskListTitle />
+      {afterTitle}
       <DiskSourceSelect
         canCreateDataVolume={canCreateDataVolume}
         canUpdate={canAddDisk}
