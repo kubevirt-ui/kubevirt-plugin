@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import { checkArcListenerReady } from './arc-listener';
+import { checkArcListenerReady, findArcListenerPodName, isPodReady } from './arc-listener';
 
 const SCALE_SET_NS = 'arc-runners';
 
@@ -154,5 +154,95 @@ describe('checkArcListenerReady', () => {
 
     assert.equal(result.ready, false);
     assert.match(result.detail, /Lookup failed/);
+  });
+});
+
+describe('findArcListenerPodName', () => {
+  it('returns null when no AutoscalingListener exists', async () => {
+    const client = makeClient({ listenerItems: [] });
+
+    const name = await findArcListenerPodName(client as never, {
+      controllerNamespace: 'arc-systems',
+      scaleSetName: 'kubevirt-plugin-ci',
+      scaleSetNamespace: SCALE_SET_NS,
+    });
+
+    assert.equal(name, null);
+  });
+
+  it('returns null when only a different scale set/namespace has a listener', async () => {
+    const client = makeClient({
+      listenerItems: [listenerSpec('listener-421', 'kubevirt-plugin-421')],
+    });
+
+    const name = await findArcListenerPodName(client as never, {
+      controllerNamespace: 'arc-systems',
+      scaleSetName: 'kubevirt-plugin-ci',
+      scaleSetNamespace: SCALE_SET_NS,
+    });
+
+    assert.equal(name, null);
+  });
+
+  it('returns the listener pod name for a matching scale set + namespace', async () => {
+    const client = makeClient({
+      listenerItems: [listenerSpec('listener-ci', 'kubevirt-plugin-ci')],
+    });
+
+    const name = await findArcListenerPodName(client as never, {
+      controllerNamespace: 'arc-systems',
+      scaleSetName: 'kubevirt-plugin-ci',
+      scaleSetNamespace: SCALE_SET_NS,
+    });
+
+    assert.equal(name, 'listener-ci');
+  });
+
+  it('propagates a listener-list failure (caller decides how to handle it)', async () => {
+    const client = {
+      customObjects: {
+        listNamespacedCustomObject: async () => {
+          throw new Error('connection refused');
+        },
+      },
+    };
+
+    await assert.rejects(
+      () =>
+        findArcListenerPodName(client as never, {
+          controllerNamespace: 'arc-systems',
+          scaleSetName: 'kubevirt-plugin-ci',
+          scaleSetNamespace: SCALE_SET_NS,
+        }),
+      /connection refused/,
+    );
+  });
+});
+
+describe('isPodReady', () => {
+  it('is true when Running with every container ready', () => {
+    assert.equal(
+      isPodReady({ status: { containerStatuses: [{ ready: true }, { ready: true }], phase: 'Running' } }),
+      true,
+    );
+  });
+
+  it('is false when a container is not ready', () => {
+    assert.equal(
+      isPodReady({ status: { containerStatuses: [{ ready: true }, { ready: false }], phase: 'Running' } }),
+      false,
+    );
+  });
+
+  it('is false when not in the Running phase', () => {
+    assert.equal(isPodReady({ status: { containerStatuses: [{ ready: true }], phase: 'Terminating' } }), false);
+  });
+
+  it('is false when there are no containerStatuses at all', () => {
+    assert.equal(isPodReady({ status: { containerStatuses: [], phase: 'Running' } }), false);
+  });
+
+  it('is false when status is missing entirely', () => {
+    assert.equal(isPodReady({}), false);
   });
 });

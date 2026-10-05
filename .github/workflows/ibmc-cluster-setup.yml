@@ -517,6 +517,26 @@ jobs:
           ./ci-scripts/hot-cluster/arc/install-arc-controller.sh && \
           ./ci-scripts/hot-cluster/arc/install-runner-scale-set.sh
 
+      # `helm upgrade --install` above is idempotent: if nothing in its
+      # values actually changed since the last install (the common case --
+      # same app config, same image, same version), Helm correctly no-ops
+      # and leaves the existing listener Pod completely untouched. That
+      # means force_arc_reinstall alone does NOT guarantee a fresh
+      # listener -- confirmed live, the listener pod's name was identical
+      # before and after a forced helm upgrade, and the stale GitHub-side
+      # registration persisted. Explicitly deleting the Pod is what
+      # actually forces a fresh connection: the ARC controller recreates
+      # it immediately. See ci-scripts/hot-cluster/arc/README.md.
+      # No continue-on-error: this is the forced recovery path itself, so a
+      # bounce failure must fail the job rather than silently proceeding to
+      # "Execute tests" having done nothing.
+      - name: Force-bounce ARC listener pod
+        if: inputs.force_arc_reinstall == true
+        env:
+          RUNNER_SCALE_SET_NAME: ${{ env.CLUSTER_NAME }}
+        working-directory: ci-scripts/hot-cluster/ts
+        run: npx tsx src/scripts/force-bounce-arc-listener.ts
+
       - name: Bootstrap manual-console RBAC
         # Optional feature; E2E does not depend on it. continue-on-error so
         # a hiccup here never fails the multi-hour provisioning job.
