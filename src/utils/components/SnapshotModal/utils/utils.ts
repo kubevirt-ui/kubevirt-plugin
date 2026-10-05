@@ -6,7 +6,7 @@ import {
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { buildOwnerReference, getName } from '@kubevirt-utils/resources/shared';
 import { MAX_K8S_NAME_LENGTH } from '@kubevirt-utils/utils/constants';
-import { type DeadlineUnits } from '@virtualmachines/details/tabs/snapshots/utils/consts';
+import { type TimeoutUnits } from '@virtualmachines/details/tabs/snapshots/utils/consts';
 import { getEmptyVMSnapshotResource } from '@virtualmachines/details/tabs/snapshots/utils/helpers';
 
 const DEFAULT_SUFFIX_LENGTH = 'snapshot-yyyyMMdd-kkmmss'.length as 24;
@@ -42,8 +42,8 @@ export const generateSnapshot = (
   vm: V1VirtualMachine,
   snapshotName: string,
   description: string,
-  deadline: string,
-  deadlineUnit: DeadlineUnits,
+  timeout: string,
+  timeoutUnit: TimeoutUnits,
 ): V1beta1VirtualMachineSnapshot => {
   const snapshot = getEmptyVMSnapshotResource(vm);
   const ownerReference = buildOwnerReference(vm, { blockOwnerDeletion: false });
@@ -53,8 +53,8 @@ export const generateSnapshot = (
   if (description) {
     snapshot.metadata.annotations = { description };
   }
-  if (deadline) {
-    snapshot.spec.failureDeadline = `${deadline}${deadlineUnit}`;
+  if (timeout) {
+    snapshot.spec.failureDeadline = `${timeout}${timeoutUnit}`;
   }
 
   return snapshot;

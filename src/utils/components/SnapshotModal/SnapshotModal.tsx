@@ -30,15 +30,15 @@ import {
   TextInput,
   ValidatedOptions,
 } from '@patternfly/react-core';
-import { DeadlineUnits } from '@virtualmachines/details/tabs/snapshots/utils/consts';
+import { TimeoutUnits } from '@virtualmachines/details/tabs/snapshots/utils/consts';
 import { getVolumeSnapshotStatusesPartition } from '@virtualmachines/details/tabs/snapshots/utils/helpers';
 import { printableVMStatus } from '@virtualmachines/utils';
 
 import FormGroupHelperText from '../FormGroupHelperText/FormGroupHelperText';
 import SupportedVolumesAlert from './alerts/SupportedVolumesAlert';
 import UnsupportedVolumesAlert from './alerts/UnsupportedVolumesAlert';
-import SnapshotDeadlineFormField from './SnapshotFormFields/SnapshotDeadlineFormField';
 import SnapshotSupportedVolumeList from './SnapshotFormFields/SnapshotSupportedVolumeList';
+import SnapshotTimeoutFormField from './SnapshotFormFields/SnapshotTimeoutFormField';
 
 import './SnapshotModal.scss';
 
@@ -53,8 +53,10 @@ const SnapshotModal: FC<SnapshotModalProps> = ({ isOpen, onClose, vm }) => {
   const [snapshotName, setSnapshotName] = useState<string>(() => generateSnapshotName(vm));
   const isSnapshotNameValid = isDNS1123Label(snapshotName);
   const [description, setDescription] = useState<string>(undefined);
-  const [deadline, setDeadline] = useState<string>(undefined);
-  const [deadlineUnit, setDeadlineUnit] = useState<DeadlineUnits>(DeadlineUnits.Seconds);
+  const [snapshotTimeout, setSnapshotTimeout] = useState<string>(undefined);
+  const [snapshotTimeoutUnit, setSnapshotTimeoutUnit] = useState<TimeoutUnits>(
+    TimeoutUnits.Seconds,
+  );
 
   const volumeSnapshotStatuses = getVolumeSnapshotStatuses(vm);
   const { supportedVolumes, unsupportedVolumes } =
@@ -63,8 +65,8 @@ const SnapshotModal: FC<SnapshotModalProps> = ({ isOpen, onClose, vm }) => {
   const [isSubmitDisabled, setIsSubmitDisabled] = useState<boolean>(false);
 
   const resultSnapshot = useMemo(
-    () => generateSnapshot(vm, snapshotName, description, deadline, deadlineUnit),
-    [deadline, deadlineUnit, description, snapshotName, vm],
+    () => generateSnapshot(vm, snapshotName, description, snapshotTimeout, snapshotTimeoutUnit),
+    [description, snapshotName, snapshotTimeout, snapshotTimeoutUnit, vm],
   );
 
   return (
@@ -119,12 +121,12 @@ const SnapshotModal: FC<SnapshotModalProps> = ({ isOpen, onClose, vm }) => {
           value={description}
         />
       </FormGroup>
-      <SnapshotDeadlineFormField
-        deadline={deadline}
-        deadlineUnit={deadlineUnit}
-        setDeadline={setDeadline}
-        setDeadlineUnit={setDeadlineUnit}
+      <SnapshotTimeoutFormField
         setIsError={setIsSubmitDisabled}
+        setSnapshotTimeout={setSnapshotTimeout}
+        setSnapshotTimeoutUnit={setSnapshotTimeoutUnit}
+        snapshotTimeout={snapshotTimeout}
+        snapshotTimeoutUnit={snapshotTimeoutUnit}
       />
       <SnapshotSupportedVolumeList volumesCount={supportedVolumes?.length ?? 0}>
         <List>

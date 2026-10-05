@@ -15,15 +15,15 @@ import { addRandomSuffix } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sCreate } from '@multicluster/k8sRequests';
 import { FormGroup, List, ListItem, Stack, StackItem, TextArea } from '@patternfly/react-core';
-import { DeadlineUnits } from '@virtualmachines/details/tabs/snapshots/utils/consts';
+import { TimeoutUnits } from '@virtualmachines/details/tabs/snapshots/utils/consts';
 import { getVolumeSnapshotStatusesPartitionPerVM } from '@virtualmachines/details/tabs/snapshots/utils/helpers';
 
 import TabModal from '../TabModal/TabModal';
 import BulkUnsupportedVolumesAlert from './alerts/BulkUnsupportedVolumesAlert';
 import { useSuffixValidation } from './hooks/useSuffixValidation';
-import SnapshotDeadlineFormField from './SnapshotFormFields/SnapshotDeadlineFormField';
 import SnapshotSuffixFormField from './SnapshotFormFields/SnapshotSuffixFormField';
 import SnapshotSupportedVolumeList from './SnapshotFormFields/SnapshotSupportedVolumeList';
+import SnapshotTimeoutFormField from './SnapshotFormFields/SnapshotTimeoutFormField';
 
 import './BulkSnapshotModal.scss';
 
@@ -46,8 +46,10 @@ const BulkSnapshotModal: FC<BulkSnapshotModalProps> = ({ isOpen, onClose, vms })
   } = useSuffixValidation(vms, snapshotSuffix);
 
   const [description, setDescription] = useState<string>(undefined);
-  const [deadline, setDeadline] = useState<string>(undefined);
-  const [deadlineUnit, setDeadlineUnit] = useState<DeadlineUnits>(DeadlineUnits.Seconds);
+  const [snapshotTimeout, setSnapshotTimeout] = useState<string>(undefined);
+  const [snapshotTimeoutUnit, setSnapshotTimeoutUnit] = useState<TimeoutUnits>(
+    TimeoutUnits.Seconds,
+  );
 
   const [isSubmitDisabled, setIsSubmitDisabled] = useState<boolean>(false);
 
@@ -58,7 +60,13 @@ const BulkSnapshotModal: FC<BulkSnapshotModalProps> = ({ isOpen, onClose, vms })
       vms.map((vm) => {
         const shortenVMName = getName(vm).substring(0, maxVMNameLength);
         const snapshotName = `${addRandomSuffix(shortenVMName)}-${snapshotSuffix}`;
-        const snapshot = generateSnapshot(vm, snapshotName, description, deadline, deadlineUnit);
+        const snapshot = generateSnapshot(
+          vm,
+          snapshotName,
+          description,
+          snapshotTimeout,
+          snapshotTimeoutUnit,
+        );
 
         return kubevirtK8sCreate<V1beta1VirtualMachineSnapshot>({
           cluster: getCluster(vm),
@@ -94,12 +102,12 @@ const BulkSnapshotModal: FC<BulkSnapshotModalProps> = ({ isOpen, onClose, vms })
           value={description}
         />
       </FormGroup>
-      <SnapshotDeadlineFormField
-        deadline={deadline}
-        deadlineUnit={deadlineUnit}
-        setDeadline={setDeadline}
-        setDeadlineUnit={setDeadlineUnit}
+      <SnapshotTimeoutFormField
         setIsError={setIsSubmitDisabled}
+        setSnapshotTimeout={setSnapshotTimeout}
+        setSnapshotTimeoutUnit={setSnapshotTimeoutUnit}
+        snapshotTimeout={snapshotTimeout}
+        snapshotTimeoutUnit={snapshotTimeoutUnit}
       />
       <SnapshotSupportedVolumeList volumesCount={Object.values(supportedVolumes).flat().length}>
         <Stack className="vm-disks-list" hasGutter>
