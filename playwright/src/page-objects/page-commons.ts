@@ -9,6 +9,7 @@ import ModalComponent from '@/components/shared/modal-component';
 import NavigationComponent from '@/components/shared/navigation-component';
 import PageContentComponent from '@/components/shared/page-content-component';
 import VmActionsComponent from '@/components/shared/vm-actions-component';
+import VmMoveToFolderModalComponent from '@/components/vm/vm-move-to-folder-modal-component';
 import { logUrlToAllure } from '@/utils/allure';
 import { TestTimeouts } from '@/utils/test-config';
 import { waitForElementStable } from '@/utils/wait-helpers';
@@ -25,6 +26,7 @@ export default class PageCommons extends BasePage {
   private readonly _namespaceBarDropdown = this.testId('namespace-bar-dropdown');
   private readonly _roleDialogPfV6CModalBox = this.locator('[role="dialog"], .pf-v6-c-modal-box');
   protected readonly vmActions = new VmActionsComponent(this.page);
+  readonly moveToFolderModal = new VmMoveToFolderModalComponent(this.page);
 
   // ============================================================================
   // Locator properties — delegated to components for subclass compatibility

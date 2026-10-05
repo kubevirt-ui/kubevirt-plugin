@@ -1,5 +1,35 @@
 import { type SelectTypeaheadOptionProps } from './types';
 
+const isSelectableOption = (option: SelectTypeaheadOptionProps): boolean =>
+  !option.optionProps?.isDisabled && !option.optionProps?.isAriaDisabled;
+
+type GetEnterKeySelectionParams = {
+  canCreate: boolean;
+  createActionId: string;
+  focusedItem: SelectTypeaheadOptionProps | null;
+  inputValue: string;
+  isOpen: boolean;
+  selectOptions: SelectTypeaheadOptionProps[];
+};
+
+export const getEnterKeySelection = ({
+  canCreate,
+  createActionId,
+  focusedItem,
+  inputValue,
+  isOpen,
+  selectOptions,
+}: GetEnterKeySelectionParams): number | string | undefined => {
+  if (isOpen && focusedItem && isSelectableOption(focusedItem)) {
+    return focusedItem.value;
+  }
+
+  if (!canCreate || !inputValue) return undefined;
+
+  const createOption = selectOptions.find((option) => option.value === createActionId);
+  return createOption && !createOption.optionProps?.isDisabled ? createActionId : undefined;
+};
+
 const wrapIndex = (index: number, length: number): number => ((index % length) + length) % length;
 
 const skipDisabled = (

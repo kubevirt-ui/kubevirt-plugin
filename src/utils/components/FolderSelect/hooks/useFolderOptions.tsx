@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import type { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { VirtualMachineModelGroupVersionKind } from '@kubevirt-utils/models';
 import { getLabel } from '@kubevirt-utils/resources/shared';
+import { universalComparator } from '@kubevirt-utils/utils/sortingUtils';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 import type { SelectOptionProps } from '@patternfly/react-core';
@@ -37,6 +38,8 @@ const useFolderOptions: UseFolderOptions = (namespace, cluster) => {
       }
       return uniqueValues;
     }, []);
+
+    folderOptions.sort((a, b) => universalComparator(a.value, b.value));
 
     setFolders(folderOptions);
   }, [vms]);

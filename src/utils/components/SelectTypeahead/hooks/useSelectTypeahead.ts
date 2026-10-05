@@ -8,17 +8,16 @@ import {
 } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getRandomChars } from '@kubevirt-utils/utils/utils';
 
-import { CREATE_NEW, INVALID } from '../utils/constants';
-import { getNextArrowIndex } from '../utils/keyboard';
+import { getEnterKeySelection } from '../utils/keyboard';
 import { buildSelectOptions } from '../utils/options';
 import {
   type SelectTypeaheadOptionProps,
   type UseSelectTypeaheadProps,
   type UseSelectTypeaheadResult,
 } from '../utils/types';
-import { createItemId, getDisplayValue, getSelectedDisplayValue } from '../utils/utils';
+import { createSelectTypeaheadIds, getDisplayValue, getSelectedDisplayValue } from '../utils/utils';
+import { useSelectTypeaheadMenu } from './useSelectTypeaheadMenu';
 
 export const useSelectTypeahead = ({
   addOption,
@@ -29,24 +28,13 @@ export const useSelectTypeahead = ({
   setSelectedValue,
 }: UseSelectTypeaheadProps): UseSelectTypeaheadResult => {
   const { t } = useKubevirtTranslation();
-  const [randomIdSuffix] = useState(() => getRandomChars());
-  const createActionId = `${CREATE_NEW}-${randomIdSuffix}`;
-  const invalidActionId = `${INVALID}-${randomIdSuffix}`;
-  const listboxId = `select-typeahead-listbox-${randomIdSuffix}`;
+  const [{ createActionId, invalidActionId, listboxId }] = useState(createSelectTypeaheadIds);
 
   const selected = options.find((option) => option.value === selectedValue);
-  const [isOpen, setIsOpen] = useState(false);
   const [inputValue, setInputValue] = useState<string>(() =>
     getSelectedDisplayValue(selectedValue, options),
   );
-  const [focusedItemIndex, setFocusedItemIndex] = useState<null | number>(null);
-  const [activeItemId, setActiveItemId] = useState<null | string>(null);
   const textInputRef = useRef<HTMLInputElement>();
-
-  useEffect(() => {
-    if (isOpen) return;
-    setInputValue(getSelectedDisplayValue(selectedValue, options));
-  }, [isOpen, options, selectedValue]);
 
   const selectOptions = buildSelectOptions({
     canCreate,
@@ -59,21 +47,22 @@ export const useSelectTypeahead = ({
     t,
   });
 
-  const setActiveAndFocusedItem = (itemIndex: number): void => {
-    setFocusedItemIndex(itemIndex);
-    setActiveItemId(createItemId(selectOptions[itemIndex].value));
-  };
-  const resetActiveAndFocusedItem = (): void => {
-    setFocusedItemIndex(null);
-    setActiveItemId(null);
-  };
-  const openMenu = (): void => {
-    if (!isOpen) setIsOpen(true);
-  };
-  const closeMenu = (): void => {
-    setIsOpen(false);
-    resetActiveAndFocusedItem();
-  };
+  const {
+    activeItemId,
+    closeMenu,
+    focusedItemIndex,
+    handleMenuArrowKeys,
+    isOpen,
+    openMenu,
+    resetActiveAndFocusedItem,
+    setIsOpen,
+  } = useSelectTypeaheadMenu({ selectOptions });
+
+  useEffect(() => {
+    if (isOpen) return;
+    setInputValue(getSelectedDisplayValue(selectedValue, options));
+  }, [isOpen, options, selectedValue]);
+
   const selectOptionAndClose = (option: SelectTypeaheadOptionProps): void => {
     closeMenu();
     setInputValue(getDisplayValue(option));
@@ -81,7 +70,7 @@ export const useSelectTypeahead = ({
   };
 
   const onSelect = (_event: MouseEvent | undefined, value: number | string | undefined): void => {
-    if (!value) return;
+    if (value === undefined) return;
     if (value === createActionId) {
       const result = addOption?.(inputValue);
       if (result) selectOptionAndClose({ value: typeof result === 'string' ? result : inputValue });
@@ -95,20 +84,24 @@ export const useSelectTypeahead = ({
     if (value) openMenu();
     resetActiveAndFocusedItem();
   };
-  const handleMenuArrowKeys = (key: string): void => {
-    openMenu();
-    if (selectOptions.every((opt) => opt.optionProps?.isDisabled)) return;
-    setActiveAndFocusedItem(getNextArrowIndex(key, selectOptions, focusedItemIndex));
-  };
+
   const onInputKeyDown = (event: KeyboardEvent<HTMLInputElement>): void => {
-    const focusedItem = focusedItemIndex !== null ? selectOptions[focusedItemIndex] : null;
     switch (event.key) {
-      case 'Enter':
+      case 'Enter': {
         event.preventDefault();
-        if (isOpen && focusedItem && !focusedItem.optionProps?.isAriaDisabled)
-          onSelect(undefined, focusedItem.value);
+        const focusedItem = focusedItemIndex !== null ? selectOptions[focusedItemIndex] : null;
+        const value = getEnterKeySelection({
+          canCreate,
+          createActionId,
+          focusedItem,
+          inputValue,
+          isOpen,
+          selectOptions,
+        });
+        if (value !== undefined) onSelect(undefined, value);
         openMenu();
         break;
+      }
       case 'ArrowUp':
       case 'ArrowDown':
         event.preventDefault();

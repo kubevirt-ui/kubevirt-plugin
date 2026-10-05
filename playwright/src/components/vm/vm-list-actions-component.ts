@@ -23,6 +23,7 @@ export default class VmListActionsComponent extends BaseComponent {
   private readonly _vmActionDelete = this.testId('vm-action-delete');
   private readonly _vmActionEditLabels = this.testId('vm-action-edit-labels');
   private readonly _vmActionMigrateCompute = this.testId('vm-action-migrate-compute');
+  private readonly _selectedVmsActionMoveToFolder = this.testId('selected-vms-action-move-to-folder');
   private readonly _vmActionMoveToFolder = this.testId('vm-action-move-to-folder');
   private readonly _vmActionOpenConsole = this.testId('vm-action-open-console');
   private readonly _vmActionPauseButton = this.testId('vm-action-pause-button');
@@ -72,7 +73,7 @@ export default class VmListActionsComponent extends BaseComponent {
         await this.robustClick(this._vmActionReset);
         break;
       case 'move-to-folder':
-        await this.robustClick(this._vmActionMoveToFolder);
+        await this.robustClick(this._selectedVmsActionMoveToFolder);
         break;
       case 'edit-labels':
         await this.robustClick(this._vmActionEditLabels);
@@ -132,7 +133,7 @@ export default class VmListActionsComponent extends BaseComponent {
         await this.robustClick(this._vmActionBulkMigration);
         break;
       case 'move-to-folder':
-        await this.robustClick(this._vmActionMoveToFolder);
+        await this.robustClick(this._selectedVmsActionMoveToFolder);
         break;
       case 'edit-labels':
         await this.robustClick(this.testId('selected-vms-action-edit-labels'));

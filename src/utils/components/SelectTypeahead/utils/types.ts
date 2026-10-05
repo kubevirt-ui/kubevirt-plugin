@@ -19,7 +19,7 @@ export type SelectTypeaheadProps = {
   isFullWidth?: boolean;
   options: SelectTypeaheadOptionProps[];
   placeholder?: string;
-  selectedValue: string;
+  selectedValue?: string;
   setSelectedValue: (value: string) => void;
 };
 

@@ -4,6 +4,7 @@ import { Tooltip, TooltipPosition } from '@patternfly/react-core';
 
 type HidableTooltipProps = {
   children?: ReactNode;
+  className?: string;
   content: ReactNode;
   hidden: boolean;
   position?: TooltipPosition;
@@ -11,6 +12,7 @@ type HidableTooltipProps = {
 
 const HidableTooltip: FC<HidableTooltipProps> = ({
   children,
+  className,
   content,
   hidden,
   position = TooltipPosition.right,
@@ -19,7 +21,7 @@ const HidableTooltip: FC<HidableTooltipProps> = ({
     <>{children}</>
   ) : (
     <Tooltip content={content} position={position}>
-      <span>{children}</span>
+      <span className={className}>{children}</span>
     </Tooltip>
   );
 };

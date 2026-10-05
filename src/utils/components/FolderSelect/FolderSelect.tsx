@@ -7,14 +7,14 @@ import SelectTypeahead from '../SelectTypeahead/SelectTypeahead';
 import useFolderOptions from './hooks/useFolderOptions';
 import { getFolderSelectOptions } from './utils/getFolderSelectOptions';
 import { createNewFolderOption, getCreateNewFolderOption } from './utils/options';
-import { getToggleStatus } from './utils/validation';
+import { getToggleStatus, isValidFolderName } from './utils/validation';
 
 type FoldersSelectProps = {
   cluster?: string;
   isDisabled?: boolean;
   isFullWidth?: boolean;
   namespace: string;
-  selectedFolder: string;
+  selectedFolder?: string;
   setSelectedFolder: (newFolder: string) => void;
 };
 const FolderSelect: FC<FoldersSelectProps> = ({
@@ -28,13 +28,17 @@ const FolderSelect: FC<FoldersSelectProps> = ({
   const { t } = useKubevirtTranslation();
   const [folderOptions, setFolderOptions] = useFolderOptions(namespace, cluster);
   const options = useMemo(
-    () => getFolderSelectOptions(folderOptions, selectedFolder),
-    [folderOptions, selectedFolder],
+    () => getFolderSelectOptions(folderOptions, t, selectedFolder),
+    [folderOptions, selectedFolder, t],
   );
 
   return (
     <SelectTypeahead
       addOption={(input) => {
+        if (!isValidFolderName(input)) {
+          return false;
+        }
+
         setFolderOptions((prev) => [
           ...(prev ?? []).filter((opt) => opt.value !== input),
           createNewFolderOption(input),
