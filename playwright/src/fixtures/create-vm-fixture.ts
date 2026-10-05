@@ -17,6 +17,7 @@ import { baseTest, expect } from './scenario-test-fixture';
 
 interface CreateVmFixtures {
   vmListPage: VirtualMachinesPage;
+  vmTreePage: VirtualMachinesPage;
   vmWizardNavigationPage: VmWizardNavigationPage;
   vmWizardBootSourcePage: VmWizardBootSourcePage;
   vmWizardComputePage: VmWizardComputeCustomizationPage;
@@ -25,6 +26,9 @@ interface CreateVmFixtures {
 
 const test = baseTest.extend<CreateVmFixtures>({
   vmListPage: async ({ page }, use) => {
+    await use(new VirtualMachinesPage(page));
+  },
+  vmTreePage: async ({ page }, use) => {
     await use(new VirtualMachinesPage(page));
   },
   vmWizardNavigationPage: async ({ page }, use) => {

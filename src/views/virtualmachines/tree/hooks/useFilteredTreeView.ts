@@ -20,36 +20,27 @@ type UseFilteredTreeView = (treeData: TreeViewDataItem[]) => {
 const useFilteredTreeView: UseFilteredTreeView = (treeData) => {
   useSignals();
   const [showEmptyProjects] = useLocalStorage(SHOW_EMPTY_PROJECTS_KEY, HIDE);
-  const [filteredItems, setFilteredItems] = useState<TreeViewDataItem[]>(null);
   const [searchText, setSearchText] = useState('');
   const hasVMs = !isEmpty(vmsSignal.value);
   const effectiveShowEmptyProjects = getEffectiveShowEmptyProjects(hasVMs, showEmptyProjects);
 
-  const onSearch = useCallback(
-    (event: ChangeEvent<HTMLInputElement>) => {
-      const input = event.target.value;
-      setSearchText(input);
-
-      if (input === '') {
-        return setFilteredItems(null);
-      }
-
-      const filtered = treeData
-        .map((opt) => Object.assign({}, opt))
-        .filter((item) => filterItems(item, input));
-
-      setFilteredItems(filtered);
-    },
-    [treeData],
-  );
+  const onSearch = useCallback((event: ChangeEvent<HTMLInputElement>) => {
+    setSearchText(event.target.value);
+  }, []);
 
   const filteredTreeData = useMemo(() => {
-    const items = filteredItems ?? treeData;
+    let items = treeData;
+
+    if (searchText) {
+      items = treeData
+        .map((opt) => Object.assign({}, opt))
+        .filter((item) => filterItems(item, searchText));
+    }
 
     return items
       .map((opt) => Object.assign({}, opt))
       .filter((item) => filterNamespaceItems(item, effectiveShowEmptyProjects === SHOW));
-  }, [effectiveShowEmptyProjects, filteredItems, treeData]);
+  }, [effectiveShowEmptyProjects, searchText, treeData]);
 
   return { filteredTreeData, hasVMs, onSearch, searchText };
 };

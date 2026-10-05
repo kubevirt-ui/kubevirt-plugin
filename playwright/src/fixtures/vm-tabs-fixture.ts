@@ -23,6 +23,7 @@ import { baseTest, expect } from './scenario-test-fixture';
 interface VmTabsFixtures {
   vmDetailPage: VirtualMachineDetailPage;
   vmListPage: VirtualMachinesPage;
+  vmTreePage: VirtualMachinesPage;
   pageCommons: PageCommons;
   overviewPage: OverviewPage;
   snapshotDetailPage: VirtualMachineSnapshotDetailPage;
@@ -38,6 +39,9 @@ const test = baseTest.extend<VmTabsFixtures>({
     await use(new VirtualMachineDetailPage(page));
   },
   vmListPage: async ({ page }, use) => {
+    await use(new VirtualMachinesPage(page));
+  },
+  vmTreePage: async ({ page }, use) => {
     await use(new VirtualMachinesPage(page));
   },
   pageCommons: async ({ page }, use) => {
