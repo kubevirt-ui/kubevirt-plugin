@@ -26,6 +26,51 @@ export type ArcListenerHealth = {
   ready: boolean;
 };
 
+export type PodStatusLike = {
+  metadata?: { uid?: string };
+  status?: { containerStatuses?: Array<{ ready?: boolean }>; phase?: string };
+};
+
+/**
+ * Running + every container Ready. Shared by the health check below and
+ * force-bounce-arc-listener.ts, which polls this against a freshly
+ * recreated pod (identified by a new UID) rather than the one it deleted.
+ */
+export const isPodReady = (pod: PodStatusLike): boolean => {
+  const containerStatuses = pod.status?.containerStatuses ?? [];
+  return (
+    pod.status?.phase === 'Running' &&
+    containerStatuses.length > 0 &&
+    containerStatuses.every((status) => status.ready === true)
+  );
+};
+
+/**
+ * Find the Pod name backing a scale set's AutoscalingListener (same name
+ * as the listener object itself), or null if no such listener exists.
+ * Shared by the health check below and force-bounce-arc-listener.ts.
+ */
+export const findArcListenerPodName = async (
+  client: Pick<KubeClient, 'customObjects'>,
+  params: { controllerNamespace: string; scaleSetName: string; scaleSetNamespace: string },
+): Promise<string | null> => {
+  const { controllerNamespace, scaleSetName, scaleSetNamespace } = params;
+
+  const listenersResult = (await client.customObjects.listNamespacedCustomObject({
+    group: 'actions.github.com',
+    namespace: controllerNamespace,
+    plural: 'autoscalinglisteners',
+    version: 'v1alpha1',
+  })) as unknown as { items?: AutoscalingListener[] };
+
+  const listener = listenersResult.items?.find(
+    (item) =>
+      item.spec?.autoscalingRunnerSetName === scaleSetName &&
+      item.spec?.autoscalingRunnerSetNamespace === scaleSetNamespace,
+  );
+  return listener?.metadata?.name ?? null;
+};
+
 export const checkArcListenerReady = async (
   client: Pick<KubeClient, 'coreV1' | 'customObjects'>,
   params: { controllerNamespace: string; scaleSetName: string; scaleSetNamespace: string },
@@ -33,19 +78,7 @@ export const checkArcListenerReady = async (
   const { controllerNamespace, scaleSetName, scaleSetNamespace } = params;
 
   try {
-    const listenersResult = (await client.customObjects.listNamespacedCustomObject({
-      group: 'actions.github.com',
-      namespace: controllerNamespace,
-      plural: 'autoscalinglisteners',
-      version: 'v1alpha1',
-    })) as unknown as { items?: AutoscalingListener[] };
-
-    const listener = listenersResult.items?.find(
-      (item) =>
-        item.spec?.autoscalingRunnerSetName === scaleSetName &&
-        item.spec?.autoscalingRunnerSetNamespace === scaleSetNamespace,
-    );
-    const listenerName = listener?.metadata?.name;
+    const listenerName = await findArcListenerPodName(client, params);
 
     if (!listenerName) {
       return {
@@ -57,21 +90,17 @@ export const checkArcListenerReady = async (
     const pod = (await client.coreV1.readNamespacedPod({
       name: listenerName,
       namespace: controllerNamespace,
-    })) as unknown as {
-      status?: { containerStatuses?: Array<{ ready?: boolean }>; phase?: string };
-    };
+    })) as unknown as PodStatusLike;
 
-    const phase = pod.status?.phase;
-    const containerStatuses = pod.status?.containerStatuses ?? [];
-    const allContainersReady =
-      containerStatuses.length > 0 && containerStatuses.every((status) => status.ready === true);
-
-    if (phase === 'Running' && allContainersReady) {
+    if (isPodReady(pod)) {
       return { detail: `Listener pod '${listenerName}' is Running and Ready`, ready: true };
     }
 
+    const containerStatuses = pod.status?.containerStatuses ?? [];
+    const allContainersReady =
+      containerStatuses.length > 0 && containerStatuses.every((status) => status.ready === true);
     return {
-      detail: `Listener pod '${listenerName}' phase=${phase ?? 'unknown'}, containersReady=${allContainersReady}`,
+      detail: `Listener pod '${listenerName}' phase=${pod.status?.phase ?? 'unknown'}, containersReady=${allContainersReady}`,
       ready: false,
     };
   } catch (err) {
