@@ -62,6 +62,12 @@
       "workflow": ".github/workflows/cancel-e2e.yml"
     },
     {
+      "command": "/force-arc-reinstall",
+      "description": "Force a reinstall of the ARC GitHub runner listener on this PR's cluster even if it looks Ready, and dispatch a fresh Hot Cluster E2E run. Use when 'Execute tests' stays queued with no runner ever claiming it. Affects the shared cluster -- may transiently disrupt other PRs' queued jobs.",
+      "trust": "owners",
+      "workflow": ".github/workflows/pr-commands.yml"
+    },
+    {
       "command": "/hold-e2e",
       "description": "Pause Hot Cluster E2E only (e2e-hold label) -- not the same as /hold. No new E2E run is dispatched until /retest-e2e; e2e-hold also blocks the merge pool.",
       "trust": "owners",

@@ -1,6 +1,16 @@
 /**
- * /retest-e2e command — cancel existing runs, dispatch fresh E2E, lift hold.
- * Entry point: npx tsx src/commands/retest-e2e.ts
+ * /force-arc-reinstall command — force a reinstall of the ARC GitHub
+ * runner listener on this PR's cluster (even if its Kubernetes health
+ * check reports Ready) and dispatch a fresh Hot Cluster E2E run.
+ *
+ * Use this when `Execute tests` stays `queued` with no runner ever
+ * claiming it: the listener pod can be Ready in Kubernetes while GitHub
+ * has no working registration for it. See ci-scripts/hot-cluster/arc/README.md.
+ *
+ * This affects the shared cluster for the PR's branch pool -- it may
+ * transiently disrupt queued jobs for other PRs using the same cluster.
+ *
+ * Entry point: npx tsx src/commands/force-arc-reinstall.ts
  *
  * Required env: BOT_TOKEN, GITHUB_REPOSITORY, PR_NUMBER, COMMENT_ID,
  *               COMMENT_AUTHOR, TRUSTED
@@ -20,7 +30,10 @@ import { dispatchWorkflow } from '../shared/dispatch';
 import { failStep, setOutput } from '../shared/output';
 import type { CommandContext } from './command-registry';
 import { findRunningE2ERun, liftE2EHold } from './e2e-dispatch-helpers';
-import { buildRetestReport, reportRetestE2EError } from './retest-e2e-helpers';
+import {
+  buildForceArcReinstallReport,
+  reportForceArcReinstallError,
+} from './force-arc-reinstall-helpers';
 
 const main = async (): Promise<void> => {
   const token = process.env.BOT_TOKEN ?? requireEnv('GITHUB_TOKEN');
@@ -33,7 +46,15 @@ const main = async (): Promise<void> => {
 
   try {
     if (
-      !(await enforceCommentTrust(octokit, owner, repo, commentId, author, trusted, '/retest-e2e'))
+      !(await enforceCommentTrust(
+        octokit,
+        owner,
+        repo,
+        commentId,
+        author,
+        trusted,
+        '/force-arc-reinstall',
+      ))
     ) {
       return;
     }
@@ -43,18 +64,18 @@ const main = async (): Promise<void> => {
     const baseRef = pullRequest.base.ref;
 
     console.log(
-      `/retest-e2e requested by ${author} on PR #${prNumber} (HEAD: ${headSha}, base: ${baseRef})`,
+      `/force-arc-reinstall requested by ${author} on PR #${prNumber} (HEAD: ${headSha}, base: ${baseRef})`,
     );
 
     const runningCandidate = await findRunningE2ERun(octokit, owner, repo, prNumber, headSha);
 
     if (runningCandidate) {
       console.warn(
-        `Run ${runningCandidate.id} for PR #${prNumber} is still ${runningCandidate.status} -- cancelling it and dispatching a fresh run instead.`,
+        `Run ${runningCandidate.id} for PR #${prNumber} is still ${runningCandidate.status} -- cancelling it and dispatching a fresh run with a forced ARC reinstall instead.`,
       );
     } else {
       console.log(
-        `No in-progress Hot Cluster E2E run found for PR #${prNumber} (base: ${baseRef}) -- dispatching a fresh run.`,
+        `No in-progress Hot Cluster E2E run found for PR #${prNumber} (base: ${baseRef}) -- dispatching a fresh run with a forced ARC reinstall.`,
       );
     }
 
@@ -63,6 +84,7 @@ const main = async (): Promise<void> => {
     await dispatchWorkflow(octokit, {
       inputs: {
         base_ref: baseRef,
+        force_arc_reinstall: 'true',
         pr_number: String(prNumber),
         skip_pool_check: 'true',
       },
@@ -72,13 +94,15 @@ const main = async (): Promise<void> => {
       workflowId: 'hot-cluster-e2e.yml',
     });
 
-    console.log(`Fresh run dispatched for PR #${prNumber} (base_ref=${baseRef}).`);
+    console.log(
+      `Fresh run dispatched for PR #${prNumber} (base_ref=${baseRef}) with force_arc_reinstall=true.`,
+    );
     setOutput('dispatched', 'true');
     setOutput('was_running', runningCandidate ? 'true' : 'false');
 
     await liftE2EHold(octokit, owner, repo, prNumber);
 
-    const body = buildRetestReport(owner, repo, !!runningCandidate);
+    const body = buildForceArcReinstallReport(owner, repo, !!runningCandidate);
     try {
       await octokit.issues.createComment({ body, issue_number: prNumber, owner, repo });
     } catch (err) {
@@ -87,11 +111,11 @@ const main = async (): Promise<void> => {
     }
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
-    await reportRetestE2EError(octokit, owner, repo, prNumber, msg);
+    await reportForceArcReinstallError(octokit, owner, repo, prNumber, msg);
   }
 };
 
-export const executeRetestE2E = async (ctx: CommandContext): Promise<void> => {
+export const executeForceArcReinstall = async (ctx: CommandContext): Promise<void> => {
   process.env.BOT_TOKEN = process.env.BOT_TOKEN ?? '';
   process.env.PR_NUMBER = String(ctx.prNumber);
   process.env.COMMENT_ID = String(ctx.commentId);

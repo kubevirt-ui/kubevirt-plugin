@@ -117,6 +117,16 @@ on:
         required: false
         default: false
         type: boolean
+      force_arc_reinstall:
+        description: |
+          Forwarded to ibmc-cluster-setup.yml -- force a helm upgrade of
+          ARC even when the existing-cluster listener check reports Ready.
+          Use when Execute tests stays queued with no runner ever assigned
+          on GitHub despite the in-cluster listener pod looking healthy --
+          see ci-scripts/hot-cluster/arc/README.md.
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   contents: read
@@ -280,6 +290,7 @@ jobs:
       branch_name: ${{ needs.prepare.outputs.branch_name || github.ref_name }}
       should_run: ${{ inputs.pr_number == '' || needs.prepare.outputs.pr_trusted == 'true' }}
       run_health_check: ${{ github.event_name == 'workflow_dispatch' && inputs.pr_number == '' }}
+      force_arc_reinstall: ${{ inputs.force_arc_reinstall }}
       # ibm_region/ibm_resource_group/base_domain rely on hot-cluster-check.yml's
       # own defaults -- env context isn't available in a uses: job's with: block.
     secrets: inherit

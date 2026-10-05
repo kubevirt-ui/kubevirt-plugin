@@ -77,6 +77,19 @@ on:
         required: false
         default: ''
         type: string
+      force_arc_reinstall:
+        description: |
+          Force a helm upgrade of ARC (controller + runner scale set) even
+          when the existing-cluster listener check reports Ready. Use when
+          Execute tests stays queued with no runner ever assigned on
+          GitHub, despite the in-cluster listener pod looking healthy --
+          see ci-scripts/hot-cluster/arc/README.md. No effect for an
+          already-existing infrastructure_type: ipi cluster -- IPI has no
+          reconnect path, so that combination is a no-op rather than
+          risking a destructive re-create against a live cluster.
+        required: false
+        default: false
+        type: boolean
   workflow_call:
     inputs:
       infrastructure_type:
@@ -148,6 +161,19 @@ on:
         required: false
         default: ''
         type: string
+      force_arc_reinstall:
+        description: |
+          Force a helm upgrade of ARC (controller + runner scale set) even
+          when the existing-cluster listener check reports Ready. Use when
+          Execute tests stays queued with no runner ever assigned on
+          GitHub, despite the in-cluster listener pod looking healthy --
+          see ci-scripts/hot-cluster/arc/README.md. No effect for an
+          already-existing infrastructure_type: ipi cluster -- IPI has no
+          reconnect path, so that combination is a no-op rather than
+          risking a destructive re-create against a live cluster.
+        required: false
+        default: false
+        type: boolean
     secrets:
       IC_KEY:
         required: true
@@ -208,7 +234,20 @@ jobs:
   provision-cluster:
     name: Provision OpenShift Cluster
     needs: precheck
-    if: needs.precheck.outputs.already_ready != 'true'
+    # force_arc_reinstall must still enter this job even when the cluster
+    # already exists -- otherwise the flag silently no-ops for an existing
+    # cluster, which is its main intended use case. Restricted to non-IPI
+    # here: vpc/classic re-check existence *inside* this job via
+    # check_cluster.outputs.exists (precheck's DNS-only already_ready is
+    # always 'false' for them, so this OR is a no-op there), but IPI has
+    # no equivalent reconnect path -- its kubeconfig only ever lives in
+    # the ephemeral runner.temp of the job run that created it, so forcing
+    # this job to run for an already-ready IPI cluster would re-trigger
+    # the create/destroy/cleanup steps below against a live cluster
+    # instead of safely reaching the ARC-reinstall steps.
+    if: |
+      needs.precheck.outputs.already_ready != 'true' ||
+      (inputs.force_arc_reinstall == true && inputs.infrastructure_type != 'ipi')
     runs-on: ubuntu-latest
     timeout-minutes: 360
     steps:
@@ -429,6 +468,9 @@ jobs:
       # (helm upgrade) on every concurrent dispatch is how "Execute tests"
       # jobs end up queued forever with no runner ever claiming them -- see
       # https://github.com/kubevirt-ui/kubevirt-plugin/actions/runs/37301023503/job/111736216051.
+      # Still runs (for diagnostics in the step summary/logs) even when
+      # force_arc_reinstall is set -- only the skip decision below is
+      # overridden, not this check itself.
       - name: Check ARC listener health (existing cluster)
         id: arc_listener_check
         if: steps.check_cluster.outputs.exists == 'true'
@@ -438,9 +480,18 @@ jobs:
         working-directory: ci-scripts/hot-cluster/ts
         run: npx tsx src/scripts/check-arc-listener.ts
 
+      # force_arc_reinstall exists for the case the listener check above
+      # cannot detect: the listener pod is Ready in-cluster but GitHub
+      # never assigns it a job (e.g. a stale/broken registration). Use it
+      # to force a helm upgrade when Execute tests stays queued with no
+      # runner -- see ci-scripts/hot-cluster/arc/README.md.
+      - name: Log force_arc_reinstall override
+        if: inputs.force_arc_reinstall == true
+        run: echo "::notice::force_arc_reinstall=true -- ARC will be reinstalled regardless of listener health."
+
       - name: Build ARC runner image
         id: build_runner
-        if: steps.check_cluster.outputs.exists == 'false' || steps.arc_listener_check.outputs.listener_ready != 'true'
+        if: steps.check_cluster.outputs.exists == 'false' || steps.arc_listener_check.outputs.listener_ready != 'true' || inputs.force_arc_reinstall == true
         env:
           ARC_RUNNER_IMAGE_FILE: ${{ runner.temp }}/arc-runner-image-ref.txt
         run: |
@@ -451,7 +502,7 @@ jobs:
           echo "image_ref=${IMAGE_REF}" >> "$GITHUB_OUTPUT"
 
       - name: Install ARC
-        if: steps.check_cluster.outputs.exists == 'false' || steps.arc_listener_check.outputs.listener_ready != 'true'
+        if: steps.check_cluster.outputs.exists == 'false' || steps.arc_listener_check.outputs.listener_ready != 'true' || inputs.force_arc_reinstall == true
         env:
           ARC_CONFIG_URL: 'https://github.com/${{ github.repository }}'
           ARC_APP_ID: ${{ secrets.ARC_GITHUB_APP_ID }}
