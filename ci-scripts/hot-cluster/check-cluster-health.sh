@@ -6,11 +6,15 @@
 # Returns exit code 0 if all checks pass, non-zero otherwise.
 #
 # Optional environment variables:
-#   ARC_RUNNERS_NS  - Namespace for ARC runner scale set (default: "arc-runners")
+#   ARC_RUNNERS_NS         - Namespace for ARC runner scale set (default: "arc-runners")
+#   ARC_CONTROLLER_NS      - Namespace for ARC controller + listener (default: "arc-systems")
+#   RUNNER_SCALE_SET_NAME  - Scale set to check the listener for (default: "kubevirt-plugin-ci")
 
 set -uo pipefail
 
 ARC_RUNNERS_NS="${ARC_RUNNERS_NS:-arc-runners}"
+ARC_CONTROLLER_NS="${ARC_CONTROLLER_NS:-arc-systems}"
+RUNNER_SCALE_SET_NAME="${RUNNER_SCALE_SET_NAME:-kubevirt-plugin-ci}"
 FAILURES=0
 
 check() {
@@ -82,25 +86,44 @@ check "ARC AutoscalingRunnerSet in ${ARC_RUNNERS_NS}" bash -c "
   fi
 "
 
-# --- ARC listener pod ---
-# The listener pod stays Running even when the scale set is idle (no ephemeral runner pods).
-# A missing or non-Running listener means the scale set cannot pick up jobs.
-# This is a non-fatal warning: the cluster is usable without it, and the listener
-# may start later once the ARC controller reconciles.
-ARC_CONTROLLER_NS="${ARC_CONTROLLER_NS:-arc-systems}"
-check "ARC listener pod in ${ARC_CONTROLLER_NS}" bash -c "
+# --- ARC controller pod ---
+check "ARC controller pod in ${ARC_CONTROLLER_NS}" bash -c "
+  running=\$(oc get pods -n '${ARC_CONTROLLER_NS}' -l app.kubernetes.io/name=gha-rs-controller --no-headers 2>/dev/null | grep -c 'Running' || true)
+  [[ \"\${running}\" -ge 1 ]]
+"
+
+# --- ARC listener pod for this specific scale set ---
+# The controller always creates each scale set's AutoscalingListener object
+# -- and its Pod -- in *its own* namespace (ARC_CONTROLLER_NS), never in
+# the runner scale set's own namespace (ARC_RUNNERS_NS). Confirmed against
+# upstream source (autoscalinglistener_controller.go). A generic "N pods
+# Running" count in ARC_CONTROLLER_NS is a false positive: it can pass on
+# controller-only pods with no listener at all, and never confirms the
+# listener actually belongs to this scale set. Look up this scale set's
+# own AutoscalingListener object by name instead, then verify its pod is
+# Running with every container Ready. A missing/unready listener means
+# this scale set cannot pick up jobs -- this is a hard failure, same as
+# every other check in this script.
+check "ARC listener pod for '${RUNNER_SCALE_SET_NAME}' in ${ARC_CONTROLLER_NS}" bash -c "
   for attempt in 1 2 3 4 5 6; do
-    running=\$(oc get pods -n '${ARC_CONTROLLER_NS}' --no-headers 2>/dev/null | grep -c 'Running' || true)
-    if [[ \"\${running}\" -ge 2 ]]; then
-      echo \"  \${running} Running pod(s) (controller + listener)\"
-      exit 0
+    listener_name=\$(oc get autoscalinglisteners -n '${ARC_CONTROLLER_NS}' -o json 2>/dev/null \\
+      | jq -r --arg name '${RUNNER_SCALE_SET_NAME}' --arg ns '${ARC_RUNNERS_NS}' \\
+        '.items[] | select(.spec.autoscalingRunnerSetName == \$name and .spec.autoscalingRunnerSetNamespace == \$ns) | .metadata.name' \\
+      | head -n1)
+    if [[ -n \"\${listener_name}\" ]]; then
+      phase=\$(oc get pod \"\${listener_name}\" -n '${ARC_CONTROLLER_NS}' -o jsonpath='{.status.phase}' 2>/dev/null || true)
+      ready=\$(oc get pod \"\${listener_name}\" -n '${ARC_CONTROLLER_NS}' -o jsonpath='{.status.containerStatuses[*].ready}' 2>/dev/null || true)
+      if [[ \"\${phase}\" == 'Running' && -n \"\${ready}\" && \"\${ready}\" != *'false'* ]]; then
+        echo \"  Listener pod '\${listener_name}' is Running and Ready\"
+        exit 0
+      fi
     fi
     if [[ \"\${attempt}\" -lt 6 ]]; then
       sleep 30
     fi
   done
-  echo '  Expected 2+ Running pods (controller + listener) in ${ARC_CONTROLLER_NS}:'
-  oc get pods -n '${ARC_CONTROLLER_NS}' --no-headers 2>/dev/null || echo '  (no pods found)'
+  echo \"  No Ready AutoscalingListener pod found for scale set '${RUNNER_SCALE_SET_NAME}' in ${ARC_CONTROLLER_NS}:\"
+  oc get autoscalinglisteners -n '${ARC_CONTROLLER_NS}' 2>/dev/null || echo '  (no AutoscalingListener objects found)'
   exit 1
 "
 

@@ -1,9 +1,41 @@
+type ApiErrorShape = {
+  body?: { reason?: string } | string;
+  reason?: string;
+  response?: { body?: { reason?: string } };
+  statusCode?: number;
+};
+
+const kubernetesApiErrorReason = (err: unknown): string | undefined => {
+  const apiErr = err as ApiErrorShape;
+  if (apiErr.reason) {
+    return apiErr.reason;
+  }
+  const body = apiErr.body ?? apiErr.response?.body;
+  if (typeof body === 'string') {
+    try {
+      const parsed = JSON.parse(body) as { reason?: string };
+      return parsed.reason;
+    } catch {
+      return undefined;
+    }
+  }
+  return body?.reason;
+};
+
 /** Check if an error is retryable (transient network / 5xx). */
 export const isRetryableError = (err: unknown): boolean => {
   if (!(err instanceof Error)) return false;
-  const status = (err as { statusCode?: number }).statusCode;
+  const status = (err as ApiErrorShape).statusCode;
   if (status !== undefined) {
-    return status >= 500 || status === 429;
+    if (status >= 500 || status === 429) {
+      return true;
+    }
+    // 409 is used for both transient Conflict (stale resourceVersion) and
+    // permanent AlreadyExists -- only the former should be retried.
+    if (status === 409) {
+      return kubernetesApiErrorReason(err) === 'Conflict';
+    }
+    return false;
   }
   const code = (err as { code?: string }).code;
   return code === 'ECONNRESET' || code === 'ETIMEDOUT' || code === 'ENOTFOUND';

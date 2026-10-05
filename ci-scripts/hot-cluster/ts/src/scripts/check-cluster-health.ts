@@ -1,11 +1,13 @@
 /** Check hot cluster health: API, nodes, HCO, KubeVirt pods, ARC, storage, console. */
 
+import { checkArcListenerReady } from '../arc-listener';
 import { KubeClient } from '../kube-client';
 
 import type { HyperConverged } from '../types/hyperconverged';
 
 const ARC_RUNNERS_NS = process.env.ARC_RUNNERS_NS ?? 'arc-runners';
 const ARC_CONTROLLER_NS = process.env.ARC_CONTROLLER_NS ?? 'arc-systems';
+const RUNNER_SCALE_SET_NAME = process.env.RUNNER_SCALE_SET_NAME ?? 'kubevirt-plugin-ci';
 const CNV_NS = 'openshift-cnv';
 
 type CheckResult = { detail: string; name: string; passed: boolean };
@@ -114,21 +116,47 @@ const main = async (): Promise<void> => {
     }),
   );
 
-  // ARC listener pod
+  // ARC controller pod
   results.push(
-    await check(`ARC listener pod in ${ARC_CONTROLLER_NS}`, async () => {
-      for (const attempt of Array.from({ length: 6 }, (_unused, idx) => idx + 1)) {
-        const { items } = await client.coreV1.listNamespacedPod({ namespace: ARC_CONTROLLER_NS });
-        const running = items.filter((pod) => pod.status?.phase === 'Running');
-        if (running.length >= 2) {
-          return `${running.length} Running pods (controller + listener)`;
-        }
-        if (attempt < 6) {
-          await new Promise((resolve) => setTimeout(resolve, 30000));
-        }
+    await check(`ARC controller pod in ${ARC_CONTROLLER_NS}`, async () => {
+      const { items } = await client.coreV1.listNamespacedPod({
+        labelSelector: 'app.kubernetes.io/name=gha-rs-controller',
+        namespace: ARC_CONTROLLER_NS,
+      });
+      const running = items.filter((pod) => pod.status?.phase === 'Running');
+      if (running.length === 0) {
+        throw new Error(`No Running gha-rs-controller pods in ${ARC_CONTROLLER_NS}`);
       }
-      throw new Error(`Expected 2+ Running pods in ${ARC_CONTROLLER_NS}`);
+      return `${running.length} running`;
     }),
+  );
+
+  // ARC listener pod for this specific scale set. The controller always
+  // places it in its own namespace (ARC_CONTROLLER_NS), not the runner
+  // scale set's namespace -- see arc-listener.ts for why a generic
+  // "N pods Running" count is a false positive.
+  results.push(
+    await check(
+      `ARC listener pod for '${RUNNER_SCALE_SET_NAME}' in ${ARC_CONTROLLER_NS}`,
+      async () => {
+        for (const attempt of Array.from({ length: 6 }, (_unused, idx) => idx + 1)) {
+          const health = await checkArcListenerReady(client, {
+            controllerNamespace: ARC_CONTROLLER_NS,
+            scaleSetName: RUNNER_SCALE_SET_NAME,
+            scaleSetNamespace: ARC_RUNNERS_NS,
+          });
+          if (health.ready) {
+            return health.detail;
+          }
+          if (attempt < 6) {
+            await new Promise((resolve) => setTimeout(resolve, 30000));
+          } else {
+            throw new Error(health.detail);
+          }
+        }
+        throw new Error('Unreachable');
+      },
+    ),
   );
 
   // Default StorageClass
