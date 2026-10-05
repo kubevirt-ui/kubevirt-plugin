@@ -20,3 +20,16 @@ export type AutoscalingRunnerSet = {
     state?: string;
   };
 };
+
+// The controller always creates each scale set's AutoscalingListener (and
+// its Pod) in *its own* namespace, not the AutoscalingRunnerSet's -- see
+// https://github.com/actions/actions-runner-controller/blob/master/controllers/actions.github.com/autoscalinglistener_controller.go
+export type AutoscalingListener = {
+  apiVersion: 'actions.github.com/v1alpha1';
+  kind: 'AutoscalingListener';
+  metadata: V1ObjectMeta;
+  spec: {
+    autoscalingRunnerSetName: string;
+    autoscalingRunnerSetNamespace: string;
+  };
+};

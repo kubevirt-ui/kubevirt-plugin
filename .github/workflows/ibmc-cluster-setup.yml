@@ -421,8 +421,26 @@ jobs:
         working-directory: ci-scripts/hot-cluster/ts
         run: npx tsx src/scripts/verify-arc-secrets.ts
 
+      # Only meaningful when the cluster already existed (steps.check_cluster
+      # had nothing to create). A freshly-created cluster has no listener
+      # yet, so this is skipped and ARC install always runs below. This is
+      # what lets a PR's E2E dispatch skip bouncing a healthy listener on a
+      # shared, already-running cluster -- repeatedly reinstalling ARC
+      # (helm upgrade) on every concurrent dispatch is how "Execute tests"
+      # jobs end up queued forever with no runner ever claiming them -- see
+      # https://github.com/kubevirt-ui/kubevirt-plugin/actions/runs/37301023503/job/111736216051.
+      - name: Check ARC listener health (existing cluster)
+        id: arc_listener_check
+        if: steps.check_cluster.outputs.exists == 'true'
+        continue-on-error: true
+        env:
+          RUNNER_SCALE_SET_NAME: ${{ env.CLUSTER_NAME }}
+        working-directory: ci-scripts/hot-cluster/ts
+        run: npx tsx src/scripts/check-arc-listener.ts
+
       - name: Build ARC runner image
         id: build_runner
+        if: steps.check_cluster.outputs.exists == 'false' || steps.arc_listener_check.outputs.listener_ready != 'true'
         env:
           ARC_RUNNER_IMAGE_FILE: ${{ runner.temp }}/arc-runner-image-ref.txt
         run: |
@@ -433,6 +451,7 @@ jobs:
           echo "image_ref=${IMAGE_REF}" >> "$GITHUB_OUTPUT"
 
       - name: Install ARC
+        if: steps.check_cluster.outputs.exists == 'false' || steps.arc_listener_check.outputs.listener_ready != 'true'
         env:
           ARC_CONFIG_URL: 'https://github.com/${{ github.repository }}'
           ARC_APP_ID: ${{ secrets.ARC_GITHUB_APP_ID }}
@@ -463,6 +482,7 @@ jobs:
       - name: Verify cluster health
         env:
           GITHUB_REPOSITORY: ${{ github.repository }}
+          RUNNER_SCALE_SET_NAME: ${{ env.CLUSTER_NAME }}
         run: ./ci-scripts/hot-cluster/check-cluster-health.sh
 
       # Optional: create an htpasswd admin user for ROKS clusters (no kubeadmin).

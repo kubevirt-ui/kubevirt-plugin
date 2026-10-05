@@ -247,6 +247,60 @@ jobs:
         working-directory: ci-scripts/hot-cluster/ts
         run: npx tsx src/scripts/build-and-push-image.ts
 
+  # Runs in parallel with run-gating-tests (never gates it -- a hang here
+  # must not delay a healthy run). `runs-on: <self-hosted label>` jobs
+  # queue indefinitely if ARC never registers an online runner for that
+  # label; GitHub's own job timeout-minutes doesn't start counting until a
+  # runner claims the job, so that failure is otherwise silent -- see
+  # https://github.com/kubevirt-ui/kubevirt-plugin/actions/runs/37301023503/job/111736216051.
+  # Cancelling the whole run (the only cancellation granularity the API
+  # offers) also resolves the sibling queued run-gating-tests job, so the
+  # required "Run Gating Tests" check doesn't stay in_progress forever.
+  watch-runner-pickup:
+    name: Watch for Runner Pickup
+    needs: [build-kubevirt-plugin-image]
+    if: always() && needs.build-kubevirt-plugin-image.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      actions: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+          sparse-checkout: ci-scripts/hot-cluster/ts
+
+      - name: Install infra script dependencies
+        working-directory: ci-scripts/hot-cluster/ts
+        run: npm ci --ignore-scripts --no-audit
+
+      # The self-hosted runners list is an admin-scoped API that the
+      # default GITHUB_TOKEN cannot call (same gotcha as
+      # check-runner-busy.ts). continue-on-error so a token-minting hiccup
+      # degrades this watchdog to a no-op (fail open) instead of failing
+      # the whole E2E run over an observability feature.
+      - name: Generate ARC app token for runner-pickup watchdog
+        id: arc-app-token
+        continue-on-error: true
+        uses: actions/create-github-app-token@v3
+        with:
+          app-id: ${{ secrets.ARC_GITHUB_APP_ID }}
+          private-key: ${{ secrets.ARC_GITHUB_APP_PRIVATE_KEY }}
+          permission-administration: read
+
+      - name: Watch for ARC runner pickup
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ARC_GH_TOKEN: ${{ steps.arc-app-token.outputs.token }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          RUN_ID: ${{ github.run_id }}
+          JOB_NAME: ${{ inputs.is_reusable_call && 'Run E2E Tests / Execute tests' || 'Execute tests (standalone dispatch)' }}
+          RUNNER_LABEL: ${{ inputs.runner_label || 'kubevirt-plugin-ci' }}
+        working-directory: ci-scripts/hot-cluster/ts
+        run: npx tsx src/scripts/watch-runner-pickup.ts
+
   run-gating-tests:
     name: ${{ inputs.is_reusable_call && 'Execute tests' || 'Execute tests (standalone dispatch)' }}
     needs: [build-kubevirt-plugin-image]

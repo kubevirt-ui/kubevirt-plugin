@@ -38,8 +38,9 @@ describe('withRetry', () => {
       async () => {
         counter.attempts++;
         if (counter.attempts < 3) {
-          const err = new Error('conflict') as Error & { statusCode: number };
+          const err = new Error('conflict') as Error & { reason: string; statusCode: number };
           err.statusCode = 409;
+          err.reason = 'Conflict';
           throw err;
         }
         return 'ok';
@@ -61,6 +62,22 @@ describe('withRetry', () => {
         }, 'no-retry-test'),
       /not found/,
     );
+  });
+
+  it('does not retry 409 AlreadyExists', async () => {
+    const counter = { attempts: 0 };
+    await assert.rejects(
+      () =>
+        withRetry(async () => {
+          counter.attempts++;
+          const err = new Error('exists') as Error & { reason: string; statusCode: number };
+          err.statusCode = 409;
+          err.reason = 'AlreadyExists';
+          throw err;
+        }, 'already-exists-test'),
+      /exists/,
+    );
+    assert.equal(counter.attempts, 1);
   });
 
   it('throws after max retries', async () => {
