@@ -49,6 +49,21 @@ Do **not** re-run **`install-arc-controller.sh`**. Set `ARC_RUNNERS_NS`, `RUNNER
 
 You do **not** need to re-apply **`arc-openshift-scc.yaml`**.
 
+## Ops: Execute tests stuck `queued` with no runner
+
+[`ibmc-cluster-setup.yml`](../../../.github/workflows/ibmc-cluster-setup.yml) skips reinstalling ARC on an already-running cluster whenever its own **Check ARC listener health** step reports the listener pod Ready in `arc-systems`. That check is Kubernetes-only: it cannot see whether GitHub actually has that listener registered and assigning jobs. If the listener pod looks Ready but **`Execute tests` stays `queued` with no runner ever claiming it**, the registration itself is likely stale or broken, and the skip above is hiding it.
+
+**From a PR:** comment **`/force-arc-reinstall`**. It dispatches `hot-cluster-e2e.yml` with `force_arc_reinstall: true` for that PR, which also cancels and supersedes any already-queued/in-progress run for it — no separate `/retest-e2e` follow-up needed. Stuck `queued` jobs are often **not re-offered** by GitHub once ARC recovers, so re-dispatching (rather than waiting on the original queued job) is required, and this command does both in one step. Gated the same as `/retest-e2e` (OWNERS approvers/reviewers only), since it reinstalls ARC on the **shared** cluster for that branch's pool and can transiently disrupt other PRs' queued jobs on it.
+
+**Outside a PR** (e.g. periodic/standalone cluster upkeep), dispatch either workflow manually instead:
+
+- **Hot Cluster E2E** (`hot-cluster-e2e.yml`) with `force_arc_reinstall: true`, or
+- **IBM Cloud Hot Cluster Setup** (`ibmc-cluster-setup.yml`) directly with `force_arc_reinstall: true` on the affected `cluster_name`.
+
+Either way, this re-runs `install-arc-controller.sh` + `install-runner-scale-set.sh` (helm upgrade) regardless of the listener check result. If you dispatch manually and a job is already stuck `queued`, remember to **cancel** the affected run(s) and re-dispatch (e.g. `/retest-e2e`) rather than waiting for the original queued job to pick up.
+
+`force_arc_reinstall` has **no effect** on an already-existing `infrastructure_type: ipi` cluster: unlike ROKS (vpc/classic), IPI has no way to reconnect to an existing cluster from a fresh job run (its kubeconfig only ever lives in that job's ephemeral `runner.temp`), so forcing the job to re-enter would re-trigger cluster creation/destruction instead of safely reaching the ARC-reinstall steps -- this is deliberately a no-op there rather than something destructive. `kubevirt-plugin-ci` (the shared gating cluster) uses `vpc`, so this does not affect normal PR gating.
+
 ## Files in this directory
 
 | File                            | Purpose                                                                   |

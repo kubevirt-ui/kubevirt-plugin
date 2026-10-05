@@ -105,6 +105,14 @@ on:
         type: string
         required: false
         default: cnv-ui
+      force_arc_reinstall:
+        description: |
+          Forwarded as-is to ibmc-cluster-setup.yml -- force a helm upgrade
+          of ARC even when the existing-cluster listener check reports
+          Ready. See that workflow's own force_arc_reinstall input.
+        type: boolean
+        required: false
+        default: false
     outputs:
       cluster_ready:
         description: Whether the cluster is ready (true/false)
@@ -152,7 +160,13 @@ jobs:
   provision:
     name: Provision Cluster
     needs: probe
-    if: inputs.should_run && needs.probe.outputs.cluster_ready == 'false'
+    # force_arc_reinstall must still enter this job (and its concurrency
+    # group) even when probe already reports the cluster ready -- otherwise
+    # the flag silently no-ops for an existing, DNS-healthy cluster, which
+    # is its main intended use case.
+    if: |
+      inputs.should_run &&
+      (needs.probe.outputs.cluster_ready == 'false' || inputs.force_arc_reinstall == true)
     concurrency:
       group: hot-cluster-provision-${{ inputs.cluster_name }}
       cancel-in-progress: false
@@ -172,6 +186,7 @@ jobs:
       # input -- compare to produce a real boolean instead of passing the
       # raw string through, which fails Actions' strict type validation.
       kvm_emulation: ${{ inputs.kvm_emulation == 'true' }}
+      force_arc_reinstall: ${{ inputs.force_arc_reinstall }}
     secrets: inherit
 
   result:

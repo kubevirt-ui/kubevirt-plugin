@@ -4,6 +4,7 @@ import { executeCancelE2E } from './cancel-e2e';
 import { executeCleanupConsole } from './cleanup-manual-console-dispatch';
 import { executeClone } from './clone-handler';
 import { executeDeployConsole } from './deploy-manual-console-dispatch';
+import { executeForceArcReinstall } from './force-arc-reinstall';
 import { executeHelp } from './help';
 import { executeHoldE2E } from './hold-e2e';
 import { executeRetestE2E } from './retest-e2e';
@@ -57,6 +58,12 @@ export const COMMANDS: CommandConfig[] = [
     execute: executeCancelE2E,
     name: 'cancel-e2e',
     pattern: /(^|\s)\/cancel-e2e(\s|$)/,
+    requiresTrust: true,
+  },
+  {
+    execute: executeForceArcReinstall,
+    name: 'force-arc-reinstall',
+    pattern: /(^|\s)\/force-arc-reinstall(\s|$)/,
     requiresTrust: true,
   },
   {
