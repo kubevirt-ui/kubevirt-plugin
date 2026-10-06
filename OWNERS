@@ -3,7 +3,6 @@
 
 approvers:
   - vojtechszocs
-  - pcbailey
   - metalice
   - avivtur
   - upalatucci
@@ -14,12 +13,9 @@ approvers:
   - mayarub
 reviewers:
   - metalice
-  - pcbailey
-  - avivtur
   - vojtechszocs
   - upalatucci
   - adamviktora
-  - rszwajko
   - batyana
   - benbassatido
   - mayarub
