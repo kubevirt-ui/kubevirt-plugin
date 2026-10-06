@@ -288,6 +288,16 @@ const testingLibraryConfig = {
   files: ['**/*.test.{ts,tsx}', '**/*.spec.{ts,tsx}', '**/__tests__/**/*.{ts,tsx}'],
 };
 
+/** Playwright gallery stories — harness markup, not production UI copy. */
+const storyFilesOverrides = {
+  files: ['**/*.scene.{ts,tsx}'],
+  rules: {
+    '@eslint-react/use-state': 'off',
+    'i18next/no-literal-string': 'off',
+    'max-lines': 'off',
+  },
+};
+
 const testFilesOverrides = {
   files: ['**/*.test.{ts,tsx}', '**/*.spec.{ts,tsx}', '**/__tests__/**/*.{ts,tsx}'],
   rules: {
@@ -353,6 +363,7 @@ export default [
   sonarConfig,
   simpleImportSortConfig,
   testingLibraryConfig,
+  storyFilesOverrides,
   testFilesOverrides,
   prettier,
   prettierOverrides,

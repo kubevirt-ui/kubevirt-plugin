@@ -1,6 +1,9 @@
-# Playwright E2E Tests
+# Playwright Tests
 
-End-to-end test suite for the KubeVirt Plugin, covering VM lifecycle management, resource CRUD operations, and cluster settings validation.
+Test suite for the KubeVirt plugin:
+
+- **Scenario E2E** — real OpenShift Console against a cluster (Gating, Tier1/2, Settings, API).
+- **Component scenes** — isolated UI flows via a local **story gallery** (no cluster, no global setup). See [Component tests (story gallery)](#component-tests-story-gallery).
 
 ---
 
@@ -100,13 +103,14 @@ IS_LOCAL=1 ./playwright-runner-hc-e2e.sh Gating --workers=4 --headed
 
 Specs live under **route folders** (console pages). **Playwright projects** select the CI cycle by tag (`grep`), not by directory.
 
-| Project    | Tag filter (`grep`) | Scope                                                         | Example folders                                      |
-| ---------- | ------------------- | ------------------------------------------------------------- | ---------------------------------------------------- |
-| `Gating`   | `@gating`           | Page loads, resource creation, VM search/tree filters         | scope-named specs (e.g. `vm-list-page-load.spec.ts`) |
-| `Tier1`    | `@tier1`            | Single-resource CRUD lifecycle per module                     | `bootable-volumes/`, `virtual-machines/detail/`, …   |
-| `Tier2`    | `@tier2`            | Cross-module integration, migrations, multi-step workflows    | `virtual-machines/migrations/`, `vm-wizard/`, …      |
-| `Settings` | `@cnv-settings`     | Cluster and user settings (runs in isolation)                 | `virtualization-settings/`, `quotas/`                |
-| `API`      | _(directory only)_  | API contract tests via `RequestContextClient` (no browser UI) | `api/`                                               |
+| Project            | Tag filter (`grep`) | Scope                                                         | Example folders / match                            |
+| ------------------ | ------------------- | ------------------------------------------------------------- | -------------------------------------------------- |
+| `Gating`           | `@gating`           | Page loads, resource creation, VM search/tree filters         | scope-named specs (e.g. `vm-list-page-load.spec.ts`) |
+| `Tier1`            | `@tier1`            | Single-resource CRUD lifecycle per module                     | `bootable-volumes/`, `virtual-machines/detail/`, … |
+| `Tier2`            | `@tier2`            | Cross-module integration, migrations, multi-step workflows    | `virtual-machines/migrations/`, `vm-wizard/`, …    |
+| `Settings`         | `@cnv-settings`     | Cluster and user settings (runs in isolation)                 | `virtualization-settings/`, `quotas/`              |
+| `API`              | _(directory only)_  | API contract tests via `RequestContextClient` (no browser UI) | `api/`                                             |
+| `component-scenes` | _(directory only)_  | Gallery-mounted React scenes (VM wizard example today)        | `tests/components/scenes/**/*.spec.ts`             |
 
 **Route tags** (orthogonal to tier): every spec also carries `@route-<folder-path>` (hyphens instead of `/`), e.g. `@route-vm-wizard`, `@route-virtual-machines-list`. Constants are in `playwright/src/data-models/route-tags.ts`. Combine with a project or `auto`:
 
@@ -176,6 +180,9 @@ HEADED=1 npx playwright test --project=Tier1 --workers=1
 
 # List tests without running
 npx playwright test --list --project=Tier1
+
+# Component scenes (starts gallery on port 3100; no cluster auth)
+npm run test-playwright-components
 ```
 
 ### Type Checking
@@ -252,6 +259,12 @@ playwright/
 │   ├── data-factories/            # Test data generators (SSH keys, VM specs)
 │   └── utils/                     # Env vars, test config, random names, helpers
 ├── project-dependencies/          # Global setup/teardown + rule engine
+├── gallery/                       # Gallery host page (`window.mount` / `window.unmount`)
+├── scenes/                        # `*.scene.tsx` — production UI wrapped for the gallery
+├── stories/                       # Gallery fixtures, i18n, watch registry, scene data presets
+├── stubs/                         # Console/SDK/multicluster shims for gallery bundling
+├── gallery-deps/                  # Rspack resolve aliases + import manifest sync
+├── rspack.gallery.config.mts      # Gallery dev server / bundle config
 └── playwright.config.ts           # Project definitions
 ```
 
@@ -259,11 +272,161 @@ Each route folder that contains `*.spec.ts` also has one **route STD** markdown 
 
 ---
 
+## Component tests (story gallery)
+
+### Goals
+
+| Goal                        | Detail                                                                                                                                                 |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Fast, local UI checks**   | Exercise multi-step React flows (wizard tabs, drawers, tables) without logging into a cluster or running scenario global setup.                        |
+| **Stable selectors**        | Assert on `data-test` and roles the same way tier E2E does, but scoped to `#root` after `mount(storyId)`.                                              |
+| **Living documentation**    | Each scene is a runnable story you can open in the browser at `http://localhost:3100/playwright/gallery/`.                                             |
+| **Thin production surface** | Scenes import real `src/` views; gallery **stubs** replace Console host, OpenShift SDK, and selected hooks so the bundle runs in a plain browser page. |
+
+**Non-goals:** Component scenes do not replace scenario E2E for RBAC, multi-cluster, CDI uploads, or full console navigation. They do not use feature fixtures, `apiClient`, or `RequestContextClient`.
+
+**Current coverage:** VM creation wizard (`VmCreationWizardShell`) — deployment step chrome and a template flow through review. More scenes can follow the same pattern.
+
+### Setup required
+
+| Requirement                      | Notes                                                                                                                                       |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| Node.js / npm                    | Same as repo root (`npm install`).                                                                                                          |
+| Playwright browsers              | `npx playwright install` (Chromium is enough).                                                                                              |
+| **No** OpenShift login           | `component-scenes` sets `SKIP_GLOBAL_SETUP=true` / `SKIP_GLOBAL_TEARDOWN=true` via `npm run test-playwright-components`.                    |
+| **No** plugin dev server on 9001 | Gallery is self-contained on **port 3100**.                                                                                                 |
+| Port 3100 free                   | Playwright starts `npm run gallery:dev` when you run the `component-scenes` project (reuses an existing server locally unless `CI` is set). |
+
+**Environment variables** (optional):
+
+| Variable                      | Effect                                                                 |
+| ----------------------------- | ---------------------------------------------------------------------- |
+| `SKIP_GLOBAL_SETUP=true`      | Skip cluster auth (set automatically by `test-playwright-components`). |
+| `SKIP_GLOBAL_TEARDOWN=true`   | Skip cluster teardown (set automatically).                             |
+| `HEADLESS=false` / `HEADED=1` | Run component tests headed.                                            |
+| `CI`                          | Gallery web server is always started fresh (no `reuseExistingServer`). |
+
+**Manual gallery (debugging):**
+
+```bash
+npm run gallery:dev
+# Open http://localhost:3100/playwright/gallery/
+# In devtools: await window.mount({ story: 'scenes/vm-wizard/VmCreationWizardShell/Default' })
+```
+
+### How it works
+
+```text
+Spec (*.spec.ts in tests/components/scenes/)
+  → import { test, expect } from '@playwright/test'   # not scenario fixtures
+  → mount('scenes/.../Default')  # Playwright built-in fixture; baseURL = gallery
+  → gallery main.tsx resolves story via import.meta.glob on playwright/scenes/**/*.scene.tsx
+  → VirtSceneScaffold (router, i18n, form provider, GalleryDataInitializer)
+  → Production component (e.g. VMCreationWizard) + gallery stubs / watch registry data
+```
+
+**Story id format:** `scenes/<path>/<SceneFile>/<ExportName>` — e.g. `scenes/vm-wizard/VmCreationWizardShell/Default` for export `Default` in `VmCreationWizardShell.scene.tsx`.
+
+**Mount lifecycle:** `expectGalleryStoryReflectsState` calls `window.unmount()` before each mount so stories do not leak state. The project uses `workers: 1` and `reuseContext: true` for speed; avoid relying on order across files.
+
+**Data:** `GalleryDataInitializer` calls `applyGallerySceneDataPreset('populated' | 'empty')` so `useKubevirtWatchResource` stubs read from `playwright/stories/gallery-watch-registry.ts`. The wizard scene starts on **`populated`** (templates, bootable volumes, clone source VM, instance types).
+
+### Folder map (component-specific)
+
+| Path                                                | Role                                                                |
+| --------------------------------------------------- | ------------------------------------------------------------------- |
+| `playwright/gallery/`                               | HTML shell, `window.mount` / `window.unmount`, story catalog        |
+| `playwright/scenes/**/*.scene.tsx`                  | Scene components (export `Default` or named exports)                |
+| `playwright/scenes/shared/VirtSceneScaffold.tsx`    | `MemoryRouter`, i18n, `StoryFormProvider`, `GalleryDataInitializer` |
+| `playwright/stories/gallery-scene-data.ts`          | Presets + registry updates for watch stubs                          |
+| `playwright/stories/virt-page-fixtures.ts`          | Minimal K8s/template fixtures referenced by wizard tests            |
+| `playwright/stubs/`                                 | SDK/console/multicluster and hook stubs                             |
+| `playwright/gallery-deps/gallery-resolve.ts`        | Rspack aliases + `resolveGalleryRequest` redirect rules             |
+| `playwright/tests/components/gallery-assertions.ts` | `expectGalleryStoryReflectsState`, story state helpers              |
+| `playwright/tests/components/scenes/**/`            | Specs and flow helpers (e.g. `wizard-flow-helpers.ts`)              |
+
+### Implementation guidelines
+
+**Specs**
+
+1. Import `test` and `expect` from **`@playwright/test`** — not from scenario feature fixtures.
+2. Place specs under `playwright/tests/components/scenes/<area>/`.
+3. Prefer **`expectGalleryStoryReflectsState(mount, page, storyId, expectations)`** on first mount to catch React runtime errors and baseline `data-test` visibility.
+4. Scope interactions to the locator returned by `mount` (usually `#root`): `root.getByTestId('wizard-next-button').click()`.
+5. Use **`data-test`** values aligned with production (`testIdAttribute: 'data-test'` in config). Add `data-test="story-surface"` on scenes for accessibility/debug.
+6. Extract multi-step flows into `*-helpers.ts` next to the spec; keep specs readable.
+7. No `page.goto()` to the real console — the gallery `baseURL` is `http://localhost:3100/playwright/gallery/`.
+
+**Scenes (`*.scene.tsx`)**
+
+1. One primary export per file (`Default` is the convention).
+2. Wrap content in **`VirtSceneScaffold`** with `initialEntries` matching the route the view expects (wizard: `['/vm-wizard']`).
+3. Set **`initialPreset="populated"`** when the flow needs list/watch data on first paint; use `empty` only if you test empty-state transitions.
+4. Keep scenes under **150 lines** where possible; split layout-only pieces into sibling TSX files without `.scene.` in the name if needed.
+5. Scene files use relaxed ESLint overrides (`*.scene.tsx` in `eslint.config.mjs`) — still use `useKubevirtTranslation` / `t()` for any user-visible copy you add in the scene shell.
+
+**Stubs and resolve**
+
+1. Do not import Console host or live SDK in the gallery — use existing stubs under `playwright/stubs/`.
+2. When a wizard hook hits the real cluster (watch, features, templates), add or extend a **`-gallery.ts`** stub and wire it in `gallery-resolve.ts` (`getGalleryResolveAlias` and/or `resolveGalleryRequest` suffix rules).
+3. Keep stubs **minimal**: return static data matching `virt-page-fixtures` / `gallery-scene-data` presets.
+4. Prune unused stubs when removing scenes; verify with `npm run test-playwright-components`.
+5. Path aliases `@kubevirt-utils`, `@virtualmachines`, `@settings`, `@search`, `@multicluster` point at `src/`; only stub what cannot run in the gallery.
+
+**Assertions**
+
+- Use Playwright web-first assertions (`toBeVisible`, `toBeEnabled`, …).
+- For dialogs that portal outside `#root`, helpers may scope to `page` when a dialog is open (`gallery-assertions.ts`).
+- Listen for `pageerror` on initial mount via `expectGalleryStoryReflectsState`; extend with `page.on('pageerror')` in longer flows if debugging.
+
+**Example (abbreviated)**
+
+```typescript
+import { test } from '@playwright/test';
+
+import { expectGalleryStoryReflectsState } from '../../gallery-assertions';
+import { WIZARD_STORY, expectWizardStepActive, clickWizardNext } from './wizard-flow-helpers';
+import { WizardSceneStep } from '../../../../stories/wizard-scene-constants';
+
+test('deployment step — creation methods visible', async ({ mount, page }) => {
+  const root = await expectGalleryStoryReflectsState(mount, page, WIZARD_STORY, [
+    { id: 'scene-vm-creation-wizard', type: 'visibleTestId' },
+    { id: 'creation-method-template', type: 'visibleTestId' },
+  ]);
+  await expectWizardStepActive(root, WizardSceneStep.DEPLOYMENT_DETAILS);
+});
+```
+
+### Adding a new component scene
+
+1. Add `playwright/scenes/<area>/<Name>.scene.tsx` with `VirtSceneScaffold` + production view.
+2. Confirm the story appears: `npm run gallery:dev` → index or `window.mount({ story: 'scenes/.../Default' })`.
+3. Add `playwright/tests/components/scenes/<area>/<name>.spec.ts` using `mount` and gallery assertions.
+4. Add stub/alias entries in `gallery-resolve.ts` when the gallery build reports missing modules or live watches.
+5. Run `npm run test-playwright-components` and `npm run lint`.
+
+Shorter cheat sheet: `playwright/tests/components/COMPONENT-TEST-STRATEGY.md`.
+
+### Component test troubleshooting
+
+| Symptom                           | Likely cause                              | What to do                                                                                     |
+| --------------------------------- | ----------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| `Unknown story: scenes/...`       | Scene failed to compile or wrong story id | Check terminal running `gallery:dev` for Rspack errors; verify export name and path.           |
+| `EADDRINUSE :3100`                | Stale gallery process                     | `fuser -k 3100/tcp` and re-run tests.                                                          |
+| `Runtime errors: ...` on mount    | Missing stub or bad fixture data          | Fix stub or `gallery-scene-data` / `virt-page-fixtures`; check browser console in headed mode. |
+| `Module not found: @settings/...` | Missing path alias                        | Ensure `@settings` / `@search` remain in `getGalleryResolveAlias()`.                           |
+| Flaky visibility after mount      | Async data or animation                   | Use `expect(...).toBeVisible()` (auto-retry); avoid fixed `waitForTimeout`.                    |
+| Global setup runs unexpectedly    | Wrong project                             | Use `npm run test-playwright-components` or `--project=component-scenes`.                      |
+
+---
+
 ## Implementation Rules
+
+These rules apply to **scenario E2E** (Gating, Tier1/2, Settings, API). **Component scene** specs intentionally use `@playwright/test` and the gallery — see [Component tests (story gallery)](#component-tests-story-gallery).
 
 ### Spec Files
 
-1. **Import `test` and `expect` from the feature fixture** — never from `@playwright/test` directly.
+1. **Import `test` and `expect` from the feature fixture** — never from `@playwright/test` directly (except component scenes).
 2. **Define `const SUITE`** at module scope for Allure reporting.
 3. **Tag `test.describe`** with the **route** constant first (`ROUTE_*_TAG` from `route-tags.ts`), then tier tag + feature-area tag (`allure-constants.ts`).
 4. **Every `test()` calls `utils.withAllure(...)`** first, with `suite`, `feature`, and `tags`.
