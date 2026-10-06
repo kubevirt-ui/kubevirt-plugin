@@ -21,7 +21,7 @@
  * Optional env: BASE_DOMAIN (enables IPI detection via DNS)
  */
 
-import { execSync } from 'node:child_process';
+import { execFileSync } from 'node:child_process';
 import dns from 'node:dns/promises';
 
 import { requireEnv } from '../kube-client';
@@ -38,13 +38,20 @@ const detectActualInfraType = async (
 ): Promise<DetectedInfraType | null> => {
   let clusterGetOutput: string | null = null;
   try {
-    // stdio captures stderr into the thrown error below instead of
-    // discarding it via 2>/dev/null -- needed to tell a confirmed-absent
-    // cluster apart from a genuine CLI/API/auth error.
-    clusterGetOutput = execSync(`ibmcloud oc cluster get --cluster "${clusterName}" --output json`, {
-      encoding: 'utf8',
-      stdio: ['ignore', 'pipe', 'pipe'],
-    });
+    // execFileSync (not execSync + string interpolation): clusterName is
+    // a workflow_dispatch input and must never be parsed by a shell, no
+    // matter what characters it contains. stdio captures stderr into the
+    // thrown error below instead of discarding it via 2>/dev/null --
+    // needed to tell a confirmed-absent cluster apart from a genuine
+    // CLI/API/auth error.
+    clusterGetOutput = execFileSync(
+      'ibmcloud',
+      ['oc', 'cluster', 'get', '--cluster', clusterName, '--output', 'json'],
+      {
+        encoding: 'utf8',
+        stdio: ['ignore', 'pipe', 'pipe'],
+      },
+    );
   } catch (err) {
     const execErr = err as { stderr?: string; stdout?: string };
     const output = `${execErr.stdout ?? ''}${execErr.stderr ?? ''}`;
@@ -73,8 +80,20 @@ const detectActualInfraType = async (
       if (addresses.length > 0) {
         return 'ipi';
       }
-    } catch {
-      // DNS does not resolve -- no IPI cluster by this name either.
+    } catch (err) {
+      const code = (err as NodeJS.ErrnoException).code;
+      // Only a confirmed absence (NXDOMAIN-equivalent, or a resolved
+      // domain with no A record) means no IPI cluster exists. Anything
+      // else (SERVFAIL, TIMEOUT, ECONNREFUSED, ...) is a DNS
+      // infrastructure problem, not an answer -- propagate it instead of
+      // letting this whole validation silently succeed on a guess.
+      if (code !== 'ENOTFOUND' && code !== 'ENODATA') {
+        throw new Error(
+          `DNS lookup for 'api.${clusterName}.${baseDomain}' failed with an unexpected error -- refusing to assume no IPI cluster exists: ${
+            err instanceof Error ? err.message : String(err)
+          }`,
+        );
+      }
     }
   }
 
