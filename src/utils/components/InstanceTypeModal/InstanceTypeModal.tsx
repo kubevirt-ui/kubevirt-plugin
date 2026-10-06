@@ -1,9 +1,12 @@
 import { type FC } from 'react';
+import isEqual from 'lodash/isEqual';
 
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { type InstanceTypeUnion } from '@kubevirt-utils/resources/instancetype/types';
 import { getName } from '@kubevirt-utils/resources/shared';
+import { getNoModalChangesTooltip } from '@kubevirt-utils/utils/text';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import {
   getGroupVersionKindForResource,
   ResourceLink,
@@ -47,12 +50,15 @@ const InstanceTypeModal: FC<InstanceTypeModalProps> = ({
   return (
     <TabModal
       headerText={t('Edit InstanceType')}
-      isDisabled={!selectedInstanceType}
+      isDisabled={!selectedInstanceType || isEqual(selectedInstanceType, instanceType)}
       isOpen={isOpen}
       obj={selectedInstanceType}
       onClose={onClose}
       onSubmit={handleSubmit}
       shouldWrapInForm
+      submitDisabledTooltip={
+        !selectedInstanceType ? t('Select an instance type') : getNoModalChangesTooltip(t)
+      }
     >
       <InstanceTypeProviderRadios
         redHatProvided={redHatProvided}
@@ -118,18 +124,22 @@ const InstanceTypeModal: FC<InstanceTypeModalProps> = ({
             }
             toggleProps={{ isFullWidth: true }}
           >
-            {userInstanceTypes.map((instanceTypeItem) => {
-              const instanceTypeName = getName(instanceTypeItem);
-              return (
-                <SelectOption key={instanceTypeName} value={instanceTypeName}>
-                  <ResourceLink
-                    groupVersionKind={getGroupVersionKindForResource(instanceTypeItem)}
-                    linkTo={false}
-                    name={instanceTypeName}
-                  />
-                </SelectOption>
-              );
-            })}
+            {isEmpty(userInstanceTypes) ? (
+              <SelectOption isDisabled>{t('No options found')}</SelectOption>
+            ) : (
+              userInstanceTypes.map((instanceTypeItem) => {
+                const instanceTypeName = getName(instanceTypeItem);
+                return (
+                  <SelectOption key={instanceTypeName} value={instanceTypeName}>
+                    <ResourceLink
+                      groupVersionKind={getGroupVersionKindForResource(instanceTypeItem)}
+                      linkTo={false}
+                      name={instanceTypeName}
+                    />
+                  </SelectOption>
+                );
+              })
+            )}
           </FormPFSelect>
         </FormGroup>
       )}
