@@ -1,14 +1,24 @@
 **/node_modules
+.npm-cache
+.tmp
+.tmp-plugin-cert.*/
 npm-debug.log
 dist
 **/.env
 .env.local
 /coverage
 /gui-test-screenshots
+cypress/gui-test-screenshots
+cypress/cypress-a11y-report.json
 # Playwright - ignore all test results (artifacts, traces, reports)
 playwright/test-results/
+allure-results/
 playwright/.auth/
 .playwright-mcp
+.kubeconfigs/
+.storage-states/
+.test-configs/
+.test-data/
 .DS_Store
 .devcontainer/dev.env
 console-extensions.md
@@ -23,4 +33,7 @@ ci-scripts/generated/
 
 # Personal Cursor rules (not shared with team)
 .cursor/rules/personal-*.mdc
-.cursor/debug-*.log
+test-results/
+
+# Ignore Claude Code local settings
+.claude/settings.local.json
