@@ -116,6 +116,18 @@ jobs:
           group: ${{ env.IBM_RESOURCE_GROUP }}
           plugins: kubernetes-service, vpc-infrastructure
 
+      # Always runs, regardless of `force` -- force is meant to bypass the
+      # "CI is active" check above, never a wrong infrastructure_type
+      # selection. Selecting the wrong type here skips every ROKS-aware
+      # step below and falls into an unconditional VPC-resource sweep with
+      # no liveness check of its own -- see validate-teardown-infra-type.ts.
+      - name: Validate infrastructure_type matches the actual cluster
+        env:
+          INFRASTRUCTURE_TYPE: ${{ inputs.infrastructure_type || 'classic' }}
+          BASE_DOMAIN: cnv-ui.com
+        working-directory: ci-scripts/hot-cluster/ts
+        run: npx tsx src/scripts/validate-teardown-infra-type.ts
+
       # ──────────────────────────────────────────────────────────────────────
       # ROKS teardown (classic + vpc)
       # ──────────────────────────────────────────────────────────────────────
@@ -142,6 +154,18 @@ jobs:
       # nothing matches CLUSTER_NAME. continue-on-error is intentionally
       # NOT set: a subnet/VPC still present after cleanup-vpc-resources.sh's
       # own retry budget should fail this job instead of reporting success.
+      # No ALLOW_LIVE_CLUSTER_SWEEP override here -- the liveness guard is
+      # left on and re-verifies for itself. In the normal case, "Delete
+      # ROKS cluster" above already polled up to 40 minutes for
+      # confirmation, so the guard finds the cluster gone and proceeds
+      # with no override needed. If it's somehow still draining past that
+      # budget (or a future edit changes when the delete step runs),
+      # blindly bypassing the guard here would reopen exactly the "sweep
+      # ran against a still-live cluster" hole this script exists to
+      # close -- so this step fails loudly instead, same as any other
+      # caller. This is NOT the same as a wrong infrastructure_type
+      # selection skipping deletion entirely -- that case is caught by
+      # validate-teardown-infra-type.ts earlier in this job.
       - name: Clean up VPC resources
         if: inputs.infrastructure_type == 'vpc'
         env:

@@ -554,6 +554,10 @@ jobs:
         env:
           GITHUB_REPOSITORY: ${{ github.repository }}
           RUNNER_SCALE_SET_NAME: ${{ env.CLUSTER_NAME }}
+          # Enables the public-gateway/egress check for vpc only -- matches
+          # provision-vpc-resources.sh's VPC_NAME convention.
+          VPC_NAME: ${{ env.INFRASTRUCTURE_TYPE == 'vpc' && format('{0}-vpc', env.CLUSTER_NAME) || '' }}
+          ZONE: ${{ env.INFRASTRUCTURE_TYPE == 'vpc' && inputs.zone || '' }}
         run: ./ci-scripts/hot-cluster/check-cluster-health.sh
 
       # Optional: create an htpasswd admin user for ROKS clusters (no kubeadmin).

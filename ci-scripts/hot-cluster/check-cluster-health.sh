@@ -1,7 +1,8 @@
 #!/bin/bash
 #
 # Check the health of the hot cluster: API server, nodes, HCO, KubeVirt pods,
-# ARC runner scale set, storage, and console route.
+# ARC runner scale set, image registry, public gateway (vpc), storage, and
+# console route.
 #
 # Returns exit code 0 if all checks pass, non-zero otherwise.
 #
@@ -9,6 +10,12 @@
 #   ARC_RUNNERS_NS         - Namespace for ARC runner scale set (default: "arc-runners")
 #   ARC_CONTROLLER_NS      - Namespace for ARC controller + listener (default: "arc-systems")
 #   RUNNER_SCALE_SET_NAME  - Scale set to check the listener for (default: "kubevirt-plugin-ci")
+#   VPC_NAME, ZONE         - If both set, also verifies the cluster's VPC
+#                            subnet ("${VPC_NAME}-subnet-${ZONE}") has a
+#                            public gateway attached. Requires the
+#                            vpc-infrastructure ibmcloud CLI plugin and an
+#                            already-targeted region. Skipped (not
+#                            failed) if either is unset.
 
 set -uo pipefail
 
@@ -126,6 +133,61 @@ check "ARC listener pod for '${RUNNER_SCALE_SET_NAME}' in ${ARC_CONTROLLER_NS}" 
   oc get autoscalinglisteners -n '${ARC_CONTROLLER_NS}' 2>/dev/null || echo '  (no AutoscalingListener objects found)'
   exit 1
 "
+
+# --- Image registry ---
+# Catches a broken/unreconciled internal registry (e.g. a missing or
+# InvalidAccessKeyId COS backing store) at health-check time, with a clear
+# diagnostic -- instead of discovering it an hour later as a silent
+# ImagePullBackOff on ARC runner pods, or a 15-minute "Watch for ARC
+# runner pickup" timeout with no indication of the real cause.
+check "image-registry ClusterOperator Available" bash -c '
+  available=$(oc get co image-registry -o jsonpath="{.status.conditions[?(@.type==\"Available\")].status}" 2>/dev/null)
+  if [[ "${available}" == "True" ]]; then
+    exit 0
+  else
+    echo "  image-registry Available condition: ${available:-unknown}"
+    oc get co image-registry 2>&1 | tail -5
+    exit 1
+  fi
+'
+
+# --- Public gateway / egress (VPC only) ---
+# A subnet without a public gateway gives every pod zero outbound
+# internet access -- the ARC listener can't reach GitHub, runner pods
+# can't register, and the only visible symptom is a 15-minute "Watch for
+# ARC runner pickup" timeout with no online runners. VPC_NAME/ZONE are
+# optional: this check is a no-op for infra types where it doesn't apply
+# or when the caller hasn't wired them through.
+if [[ -n "${VPC_NAME:-}" && -n "${ZONE:-}" ]]; then
+  export VPC_NAME ZONE
+  # Single-quoted body + exported env vars, not string interpolation: ZONE
+  # is an unvalidated free-text workflow input, so baking it directly into
+  # the command string would let shell metacharacters in it affect this
+  # subshell's parsing.
+  check "public gateway attached to VPC subnet" bash -c '
+    vpc_region="${ZONE%-*}"
+    if ! ibmcloud target -r "${vpc_region}" >/dev/null 2>&1; then
+      echo "  Failed to target region \"${vpc_region}\" (derived from ZONE=\"${ZONE}\") -- cannot verify public gateway"
+      exit 1
+    fi
+    subnet_name="${VPC_NAME}-subnet-${ZONE}"
+    if ! subnets_json=$(ibmcloud is subnets --output json 2>&1); then
+      echo "  Failed to list subnets in region \"${vpc_region}\" -- cannot distinguish this from a genuine missing gateway: ${subnets_json}"
+      exit 1
+    fi
+    pgw_id=$(echo "${subnets_json}" | jq -r --arg n "${subnet_name}" ".[] | select(.name == \$n) | .public_gateway.id // empty")
+    if [[ -n "${pgw_id}" ]]; then
+      echo "  Subnet \"${subnet_name}\" has public gateway ${pgw_id} attached"
+      exit 0
+    else
+      echo "  Subnet \"${subnet_name}\" has NO public gateway attached -- pods have no outbound internet access"
+      exit 1
+    fi
+  '
+else
+  echo "Skipping public gateway check (VPC_NAME/ZONE not set)"
+  echo ""
+fi
 
 # --- Default StorageClass ---
 check "default StorageClass" bash -c '

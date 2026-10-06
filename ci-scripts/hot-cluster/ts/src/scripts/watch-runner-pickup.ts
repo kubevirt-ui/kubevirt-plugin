@@ -20,7 +20,8 @@
  *
  * Required env: GH_TOKEN, GITHUB_REPOSITORY, RUN_ID, JOB_NAME, RUNNER_LABEL
  * Optional env: ARC_GH_TOKEN, PICKUP_TIMEOUT_MINUTES (default: 15),
- *               POLL_INTERVAL_SECONDS (default: 30)
+ *               POLL_INTERVAL_SECONDS (default: 30),
+ *               CANCEL_GRACE_SECONDS (default: 120)
  */
 
 import { execSync } from 'node:child_process';
@@ -32,6 +33,7 @@ type Runner = { labels?: Array<{ name: string }>; status: string };
 
 const DEFAULT_PICKUP_TIMEOUT_MINUTES = 15;
 const DEFAULT_POLL_INTERVAL_SECONDS = 30;
+const DEFAULT_CANCEL_GRACE_SECONDS = 120;
 
 const positiveFiniteEnv = (raw: string | undefined, fallback: number): number => {
   const parsed = Number(raw ?? String(fallback));
@@ -98,6 +100,48 @@ const hasOnlineRunnerSafe = (
   }
 };
 
+type PollDeps = {
+  arcToken: string;
+  jobName: string;
+  repo: string;
+  runId: string;
+  runnerLabel: string;
+  token: string;
+};
+
+// Polls until either a healthy signal is observed (job left 'queued', or
+// an online runner for this label exists) or `untilMs` is reached.
+// Shared by the main wait and the grace-confirmation window below, so
+// "what counts as healthy" only has to be defined once.
+const pollUntilHealthyOrDeadline = async (
+  deps: PollDeps,
+  untilMs: number,
+  pollIntervalMs: number,
+): Promise<boolean> => {
+  const { arcToken, jobName, repo, runId, runnerLabel, token } = deps;
+  for (;;) {
+    const status = getJobStatusSafe(repo, runId, jobName, token);
+    if (status !== undefined && status !== 'queued') {
+      console.log(`Job '${jobName}' is now '${status}'. Watchdog done.`);
+      return true;
+    }
+
+    const runnerOnline = hasOnlineRunnerSafe(repo, runnerLabel, arcToken);
+    if (runnerOnline === true) {
+      console.log(
+        `An online '${runnerLabel}' runner exists -- ARC is healthy; job is legitimately queued behind capacity. Watchdog done.`,
+      );
+      return true;
+    }
+
+    const remainingMs = untilMs - Date.now();
+    if (remainingMs <= 0) {
+      return false;
+    }
+    await sleep(Math.min(pollIntervalMs, remainingMs));
+  }
+};
+
 const main = async (): Promise<void> => {
   const token = requireEnv('GH_TOKEN');
   const repo = requireEnv('GITHUB_REPOSITORY');
@@ -111,6 +155,10 @@ const main = async (): Promise<void> => {
   );
   const pollIntervalMs =
     positiveFiniteEnv(process.env.POLL_INTERVAL_SECONDS, DEFAULT_POLL_INTERVAL_SECONDS) * 1000;
+  const graceSeconds = positiveFiniteEnv(
+    process.env.CANCEL_GRACE_SECONDS,
+    DEFAULT_CANCEL_GRACE_SECONDS,
+  );
 
   if (!arcToken) {
     console.log(
@@ -119,27 +167,29 @@ const main = async (): Promise<void> => {
     return;
   }
 
+  const deps: PollDeps = { arcToken, jobName, repo, runId, runnerLabel, token };
   const deadline = Date.now() + timeoutMinutes * 60 * 1000;
   console.log(
     `Watching job '${jobName}' on run ${runId}: waiting for an online '${runnerLabel}' runner (timeout: ${timeoutMinutes}m)...`,
   );
 
-  while (Date.now() < deadline) {
-    const status = getJobStatusSafe(repo, runId, jobName, token);
-    if (status !== undefined && status !== 'queued') {
-      console.log(`Job '${jobName}' is now '${status}'. Watchdog done.`);
-      return;
-    }
+  if (await pollUntilHealthyOrDeadline(deps, deadline, pollIntervalMs)) {
+    return;
+  }
 
-    const runnerOnline = hasOnlineRunnerSafe(repo, runnerLabel, arcToken);
-    if (runnerOnline === true) {
-      console.log(
-        `An online '${runnerLabel}' runner exists -- ARC is healthy; job is legitimately queued behind capacity. Watchdog done.`,
-      );
-      return;
-    }
-
-    await sleep(Math.min(pollIntervalMs, Math.max(deadline - Date.now(), 0)));
+  // A single immediate check right at the deadline races a last-moment
+  // pickup: a slow-but-not-broken ARC cold start (or plain read-after-
+  // write lag on the jobs/runners list endpoints) can land an online
+  // runner or an 'in_progress' job status just after the deadline was
+  // checked, which previously meant a run that was about to succeed got
+  // cancelled anyway -- see
+  // https://github.com/kubevirt-ui/kubevirt-plugin/actions/runs/37472650615/job/112304407587.
+  // Confirm over a short grace window instead of deciding off one snapshot.
+  console.log(
+    `No healthy signal within ${timeoutMinutes}m -- confirming over a ${graceSeconds}s grace window before cancelling, to rule out a last-moment pickup race.`,
+  );
+  if (await pollUntilHealthyOrDeadline(deps, Date.now() + graceSeconds * 1000, pollIntervalMs)) {
+    return;
   }
 
   const finalStatus = getJobStatusSafe(repo, runId, jobName, token);
@@ -169,7 +219,7 @@ const main = async (): Promise<void> => {
   }
 
   console.error(
-    `::error::No online '${runnerLabel}' runner appeared within ${timeoutMinutes} minutes, and job '${jobName}' is still 'queued' -- ARC never claimed it. Cancelling run ${runId} so the required check does not hang forever.`,
+    `::error::No online '${runnerLabel}' runner appeared within ${timeoutMinutes} minutes (confirmed again after a further ${graceSeconds}s grace window), and job '${jobName}' is still 'queued' -- ARC never claimed it. Cancelling run ${runId} so the required check does not hang forever.`,
   );
 
   try {

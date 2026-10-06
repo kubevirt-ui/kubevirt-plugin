@@ -8,10 +8,16 @@ set -euo pipefail
 #
 # Required env: CLUSTER_NAME, IC_API_KEY
 # Optional env:
-#   ZONE       - if set, re-targets the CLI to this zone's region first.
-#   DRY_RUN    - "true" to only list matching resources (default: "false").
-#   CLEAN_VPC  - "false" to skip deleting the VPC itself, while still
-#                cleaning everything inside it (default: "true").
+#   ZONE                    - if set, re-targets the CLI to this zone's
+#                              region first.
+#   DRY_RUN                 - "true" to only list matching resources
+#                              (default: "false").
+#   CLEAN_VPC                - "false" to skip deleting the VPC itself,
+#                              while still cleaning everything inside it
+#                              (default: "true").
+#   ALLOW_LIVE_CLUSTER_SWEEP - "true" to skip the cluster-liveness guard
+#                              below (default: "false"). Only intended for
+#                              a cluster that is already confirmed deleting.
 #
 # Exit code: when DRY_RUN is not "true", exits 1 if a matching subnet (or,
 # with CLEAN_VPC=true, a matching VPC) is still present once cleanup
@@ -25,10 +31,101 @@ set -euo pipefail
 export IC_API_KEY
 DRY_RUN="${DRY_RUN:-false}"
 CLEAN_VPC="${CLEAN_VPC:-true}"
+ALLOW_LIVE_CLUSTER_SWEEP="${ALLOW_LIVE_CLUSTER_SWEEP:-false}"
+
+# CLUSTER_NAME is set but unset -u only catches *unset* vars -- every
+# resource-matching filter below is a startswith(CLUSTER_NAME) check, and
+# every string starts with "". An empty CLUSTER_NAME would silently match
+# (and delete) every resource in the account instead of failing loudly.
+if [[ -z "${CLUSTER_NAME:-}" ]]; then
+  echo "::error::CLUSTER_NAME must be set and non-empty -- refusing to run with an empty name, which would match every resource in the account."
+  exit 1
+fi
 
 if [[ -n "${ZONE:-}" ]]; then
   VPC_REGION="${ZONE%-*}"
   ibmcloud target -r "${VPC_REGION}" 2>/dev/null || true
+fi
+
+# Cluster-liveness guard (defense-in-depth): this script deletes every VPC
+# resource whose name starts with CLUSTER_NAME -- including a live
+# cluster's public gateway, load balancer(s), and COS instance -- with no
+# awareness of whether a ROKS cluster by that name is still running. Every
+# call site is *expected* to only invoke this once the owning cluster is
+# already gone, but relying on each call site to gate that correctly is
+# exactly what failed previously: a teardown run selected the wrong
+# infrastructure_type, skipped the ROKS-aware deletion steps entirely, and
+# fell into an unconditional sweep here that deleted a live cluster's
+# gateway/LB/COS while its worker nodes (and the subnet they're attached
+# to) kept running -- see ibmc-cluster-teardown.yml's
+# validate-teardown-infra-type.ts step. Check directly here too, so this
+# script is safe no matter how it's invoked.
+if [[ "${DRY_RUN}" != "true" && "${ALLOW_LIVE_CLUSTER_SWEEP}" != "true" ]]; then
+  echo "0. Verifying no live ROKS cluster named '${CLUSTER_NAME}' still exists..."
+  ibmcloud plugin install kubernetes-service -f >/dev/null 2>&1 || true
+  # The $(...) assignment must be the direct condition of this `if` --
+  # under `set -e`, a bare `CLUSTER_CHECK_OUTPUT=$(cmd)` statement exits
+  # the whole script immediately whenever cmd fails (which is the normal,
+  # expected outcome here whenever the cluster genuinely doesn't exist),
+  # never reaching CLUSTER_CHECK_EXIT=$? or any of the branches below.
+  if CLUSTER_CHECK_OUTPUT=$(ibmcloud oc cluster get --cluster "${CLUSTER_NAME}" 2>&1); then
+    CLUSTER_CHECK_EXIT=0
+  else
+    CLUSTER_CHECK_EXIT=$?
+  fi
+  if [[ "${CLUSTER_CHECK_EXIT}" -eq 0 ]]; then
+    echo "::error::Refusing to sweep VPC resources for '${CLUSTER_NAME}': a live ROKS cluster by this exact name still exists. This script deletes any resource whose name starts with CLUSTER_NAME -- including this cluster's public gateway, load balancer(s), and COS instance (--recursive) -- while leaving the ROKS cluster and its worker nodes untouched. If the ROKS cluster record should also be deleted, do that first (see 'Delete ROKS cluster' in ibmc-cluster-teardown.yml). If this sweep is expected to run alongside an already-in-progress cluster deletion, set ALLOW_LIVE_CLUSTER_SWEEP=true explicitly."
+    exit 1
+  elif ! echo "${CLUSTER_CHECK_OUTPUT}" | grep -q "could not be found"; then
+    # Inconclusive (e.g. a transient API/auth hiccup, or the
+    # kubernetes-service plugin failed to install) -- NOT the same as
+    # confirmed-gone. Matches this codebase's existing philosophy for
+    # this exact check elsewhere (check-roks-exists-teardown.ts,
+    # delete-roks-cluster.ts): an ambiguous result must never be treated
+    # as "safe to proceed" on a destructive, non-dry-run path -- stop
+    # instead of risking a live cluster's resources on a guess. This
+    # whole block is already skipped entirely when DRY_RUN=true, so
+    # dry-run's preview-only behavior is unaffected.
+    echo "::error::Could not conclusively determine whether a ROKS cluster named '${CLUSTER_NAME}' exists ('ibmcloud oc cluster get' failed for a reason other than 'could not be found'): ${CLUSTER_CHECK_OUTPUT}"
+    exit 1
+  else
+    echo "  No live ROKS cluster named '${CLUSTER_NAME}' found -- safe to proceed."
+  fi
+
+  # The exact-name check above isn't enough on its own: every deletion
+  # below matches by *prefix* (startswith(CLUSTER_NAME)), so a distinct,
+  # concurrently-running cluster named e.g. "${CLUSTER_NAME}-91" would
+  # still have its public gateway/LB/COS swept even though it's not the
+  # exact-name cluster just checked. Same prefix-collision risk already
+  # called out by ibmc-cleanup-all.yml's own "expected_cluster_count"
+  # safety input.
+  echo "  Checking for other live clusters sharing the '${CLUSTER_NAME}' name prefix..."
+  # Fail closed, not open: listing/parsing errors here must never be
+  # treated as "no collision found" -- that would silently let the
+  # destructive sweep below proceed unchecked, the exact ambiguity this
+  # whole guard exists to rule out. ibmcloud and jq failures are handled
+  # as separate `if` conditions (not a bare assignment) so `set -e`
+  # doesn't exit before either failure can be reported.
+  # stderr is captured separately (not merged via 2>&1) so a successful
+  # call's stdout stays pure JSON for jq below -- some ibmcloud commands
+  # print CLI update/deprecation notices to stderr even on success, which
+  # would otherwise corrupt ALL_CLUSTERS_JSON and cause a false "could not
+  # parse" failure. Only read into the error message when the call fails.
+  CLUSTER_LS_ERR_FILE=$(mktemp)
+  if ! ALL_CLUSTERS_JSON=$(ibmcloud oc cluster ls --output json 2>"${CLUSTER_LS_ERR_FILE}"); then
+    echo "::error::Could not list ROKS clusters to check for a name-prefix collision with '${CLUSTER_NAME}': $(cat "${CLUSTER_LS_ERR_FILE}")"
+    rm -f "${CLUSTER_LS_ERR_FILE}"
+    exit 1
+  fi
+  rm -f "${CLUSTER_LS_ERR_FILE}"
+  if ! OTHER_PREFIX_MATCHES=$(echo "${ALL_CLUSTERS_JSON}" | jq -r --arg cn "${CLUSTER_NAME}" '[.[] | select(.name != $cn) | select(.name | startswith($cn)) | .name] | join(", ")' 2>&1); then
+    echo "::error::Could not parse 'ibmcloud oc cluster ls' output to check for a name-prefix collision with '${CLUSTER_NAME}': ${OTHER_PREFIX_MATCHES}"
+    exit 1
+  fi
+  if [[ -n "${OTHER_PREFIX_MATCHES}" ]]; then
+    echo "::error::Refusing to sweep VPC resources for '${CLUSTER_NAME}': other live cluster(s) share this name prefix and would also be matched by this script's deletion filters (every jq filter below uses startswith(\"${CLUSTER_NAME}\")): ${OTHER_PREFIX_MATCHES}. Narrow CLUSTER_NAME, or tear down/rename those clusters first."
+    exit 1
+  fi
 fi
 
 # Wraps a mutating ibmcloud call: prints what would happen under DRY_RUN,
