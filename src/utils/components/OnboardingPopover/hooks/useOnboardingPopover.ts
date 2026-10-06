@@ -24,7 +24,8 @@ const useOnboardingPopover = ({
   triggerElement,
 }: UseOnboardingPopoverArgs): UseOnboardingPopoverReturn => {
   useSignals();
-  const [userSettings, setUserSettings, userSettingsLoaded] = useKubevirtUserSettings();
+  const [userSettings, setUserSettings, userSettingsLoaded, userSettingsError] =
+    useKubevirtUserSettings();
   const onboardingPopoversHidden = userSettings?.onboardingPopoversHidden;
 
   const tourStepsSeen = getTourStepsSeen(userSettings?.quickStart);
@@ -35,6 +36,7 @@ const useOnboardingPopover = ({
     popoverKey,
     triggerElement,
     userSettings,
+    userSettingsError,
     userSettingsLoaded,
   });
 

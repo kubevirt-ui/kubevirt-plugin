@@ -39,6 +39,7 @@ type IsPopoverVisibleArgs = {
   popoverKey: OnboardingPopoverKey;
   triggerElement: HTMLElement | null;
   userSettings: Partial<UserSettingsState> | undefined;
+  userSettingsError: Error | undefined;
   userSettingsLoaded: boolean;
 };
 
@@ -47,30 +48,31 @@ export const isPopoverVisible = ({
   popoverKey,
   triggerElement,
   userSettings,
+  userSettingsError,
   userSettingsLoaded,
 }: IsPopoverVisibleArgs): boolean => {
+  if (userSettingsError) return false;
+
   const onboardingPopoversHidden = userSettings?.onboardingPopoversHidden;
-  const quickStart = userSettings?.quickStart;
+
+  if (
+    dismissedPopoverKeysSignal.value.has(popoverKey) ||
+    !!onboardingPopoversHidden?.[popoverKey]
+  ) {
+    return false;
+  }
 
   const shouldDismissOnboardingByWelcomeModal =
-    dismissOnboardingPopoverByWelcomeModalSignal.value || quickStart?.dontShowWelcomeModal;
+    dismissOnboardingPopoverByWelcomeModalSignal.value ||
+    userSettings?.quickStart?.dontShowWelcomeModal;
 
   if (!userSettingsLoaded || !triggerElement || shouldDismissOnboardingByWelcomeModal) return false;
 
-  const isAlreadyDismissed =
-    dismissedPopoverKeysSignal.value.has(popoverKey) || !!onboardingPopoversHidden?.[popoverKey];
+  if (isCoveredByTour || runningTourSignal.value) return false;
 
-  const predecessorPopoversDismissed = arePredecessorPopoversDismissed(
+  return arePredecessorPopoversDismissed(
     popoverKey,
     onboardingPopoversHidden,
     dismissedPopoverKeysSignal.value,
   );
-
-  const isVisible =
-    !isAlreadyDismissed &&
-    predecessorPopoversDismissed &&
-    !isCoveredByTour &&
-    !runningTourSignal.value;
-
-  return isVisible;
 };

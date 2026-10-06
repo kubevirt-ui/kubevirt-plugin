@@ -27,3 +27,16 @@ export const isConflictError = (error: unknown): boolean => isErrorWithStatusCod
  * Check whether an unknown error represents an HTTP 403 Forbidden.
  */
 export const isForbiddenError = (error: unknown): boolean => isErrorWithStatusCode(error, 403);
+
+type IsAny<T> = 0 extends 1 & T ? true : false;
+
+/**
+ * Maps over a hook return tuple and replaces `any` elements with `K8sApiError | undefined`.
+ *
+ * @example
+ * type FleetClusters = ConvertAnyToK8sApiError<ReturnType<typeof useFleetClusterNames>>;
+ * // [string[], boolean, K8sApiError | undefined]
+ */
+export type ConvertAnyToK8sApiError<T> = T extends readonly unknown[]
+  ? { [K in keyof T]: IsAny<T[K]> extends true ? K8sApiError | undefined : T[K] }
+  : T;

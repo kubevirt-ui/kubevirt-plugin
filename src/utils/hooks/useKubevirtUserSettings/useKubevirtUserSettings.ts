@@ -57,8 +57,10 @@ function useKubevirtUserSettings(
   const loadedCM = (loadedConfigMap || !isEmpty(configMapError)) && !isEmpty(operatorNamespace);
   const loadedUsr = loadedUser || !isEmpty(errorUser);
 
+  const loadedUserSettings = loadedCM && loadedUsr;
+
   useEffect(() => {
-    if (!loadedCM || !loadedUsr) return;
+    if (!loadedUserSettings) return;
 
     if (!isEmpty(userConfigMap) && userName) {
       setUserSettings(
@@ -67,7 +69,7 @@ function useKubevirtUserSettings(
     }
 
     setSettingsInitialized(true);
-  }, [userConfigMap, userName, loadedCM, loadedUsr]);
+  }, [userConfigMap, userName, loadedUserSettings]);
 
   const pushUserSettingsChanges = async (
     data: UserSettingsState,
@@ -104,8 +106,8 @@ function useKubevirtUserSettings(
   return [
     key ? userSettings?.[key] : userSettings,
     userSettings && updateUserSetting,
-    !loading && settingsInitialized,
-    error ?? errorUser ?? configMapError,
+    !loading && loadedUserSettings && settingsInitialized,
+    (error ?? errorUser) || configMapError,
   ] as KubevirtUserSettingResult<UserSettingsState | UserSettingsState[keyof UserSettingsState]>;
 }
 

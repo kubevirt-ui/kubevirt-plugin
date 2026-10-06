@@ -2,6 +2,7 @@ import { useCallback, useMemo } from 'react';
 
 import { type V1beta1Provider } from '@forklift-ui/types';
 import { type EnhancedSelectOptionProps } from '@kubevirt-utils/components/FilterSelect/utils/types';
+import { type ConvertAnyToK8sApiError } from '@kubevirt-utils/errors/errorTypes';
 import useProjects from '@kubevirt-utils/hooks/useProjects';
 import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-utils/models';
 import { getName } from '@kubevirt-utils/resources/shared';
@@ -28,11 +29,8 @@ type UseClustersAndProjects = (
 };
 
 const useClustersAndProjects: UseClustersAndProjects = (sourceCluster, selectedClusterTarget) => {
-  const [clusterNames, clustersLoaded, clustersError] = useFleetClusterNames() as [
-    string[],
-    boolean,
-    Error | undefined,
-  ];
+  const [clusterNames, clustersLoaded, clustersError] =
+    useFleetClusterNames() as ConvertAnyToK8sApiError<ReturnType<typeof useFleetClusterNames>>;
   const [providers, providersLoaded, providersError] = useProviders();
 
   const selectableClusters = useMemo(
