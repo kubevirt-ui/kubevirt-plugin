@@ -1,8 +1,6 @@
 import { type TFunction, type TOptions } from 'i18next';
 
 type ValidationMessageType =
-  | 'REQUIRED_FIELD_MESSAGE'
-  | 'INVALID_FIELD_MESSAGE'
   | 'DNS1123_NAME_MESSAGE'
   | 'MAX_NAME_LENGTH_MESSAGE'
   | 'MIN_PASSWORD_LENGTH_MESSAGE'
@@ -19,10 +17,6 @@ export const getValidationMessage = (
   options?: TOptions,
 ): string => {
   switch (key) {
-    case 'REQUIRED_FIELD_MESSAGE':
-      return t('This field is required', options);
-    case 'INVALID_FIELD_MESSAGE':
-      return t('This field must have a valid value', options);
     case 'DNS1123_NAME_MESSAGE':
       return t(
         "a lowercase RFC 1123 label must consist of lower case alphanumeric characters or '-', and must start and end with an alphanumeric character",

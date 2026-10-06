@@ -1,3 +1,4 @@
+/* eslint-disable max-lines -- Keep the upload permission guard with the existing DataSource actions. */
 import { useCallback, useMemo, useState } from 'react';
 
 import { DataImportCronModel, DataSourceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -6,12 +7,18 @@ import {
   type V1beta1DataSource,
 } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import { AnnotationsModal } from '@kubevirt-utils/components/AnnotationsModal/AnnotationsModal';
+import useCanExport from '@kubevirt-utils/components/ExportModal/hooks/useCanExport';
 import { LabelsModal } from '@kubevirt-utils/components/LabelsModal/LabelsModal';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { asAccessReview } from '@kubevirt-utils/resources/shared';
-import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
+import {
+  getNoPermissionTooltipContent,
+  isEmpty,
+  kubevirtConsole,
+} from '@kubevirt-utils/utils/utils';
+import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sGet, kubevirtK8sPatch } from '@multicluster/k8sRequests';
 import { type Action } from '@openshift-console/dynamic-plugin-sdk';
 import { Split, SplitItem } from '@patternfly/react-core';
@@ -38,6 +45,10 @@ export const useDataSourceActionsProvider: UseDataSourceActionsProvider = (
   const isOwnedBySSP = isDataResourceOwnedBySSP(dataSource);
   const dataImportCronName = getDataSourceCronJob(dataSource);
   const handleUploadToRegistry = useUploadToRegistry(createModal, dataSource);
+  const exportNamespace = isEmpty(dataSource?.spec?.source?.snapshot?.name)
+    ? dataSource?.spec?.source?.pvc?.namespace
+    : dataSource?.spec?.source?.snapshot?.namespace;
+  const canExport = useCanExport(getCluster(dataSource), exportNamespace);
 
   const lazyLoadDataImportCron = useCallback(() => {
     if (dataImportCronName && !dataImportCron && !isOwnedBySSP) {
@@ -100,7 +111,11 @@ export const useDataSourceActionsProvider: UseDataSourceActionsProvider = (
         label: t('Edit annotations'),
       },
       {
-        cta: handleUploadToRegistry,
+        cta: (): void => {
+          if (canExport) void handleUploadToRegistry();
+        },
+        disabled: !canExport,
+        disabledTooltip: getNoPermissionTooltipContent(t),
         id: 'datasource-action-upload-to-registry',
         label: t('Upload to registry'),
       },
@@ -153,6 +168,7 @@ export const useDataSourceActionsProvider: UseDataSourceActionsProvider = (
     isBootableVolume,
     createModal,
     handleUploadToRegistry,
+    canExport,
   ]);
 
   return [actions, lazyLoadDataImportCron];

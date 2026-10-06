@@ -1,7 +1,7 @@
 import { type TFunction } from 'i18next';
-import * as yup from 'yup';
 
 import { isDNS1123Label, isDNS1123LabelLenient } from '@kubevirt-utils/utils/validation';
+import * as yup from '@kubevirt-utils/yup';
 
 import { type VMWizardDeploymentValues } from '../../types';
 import { getValidationMessage } from '../shared/messages';
@@ -15,8 +15,7 @@ export const vmNameInputSchema = yup
 const createNameSchema = (t: TFunction): yup.StringSchema<string> =>
   yup
     .string()
-    .typeError(getValidationMessage('INVALID_FIELD_MESSAGE', t))
-    .required(getValidationMessage('REQUIRED_FIELD_MESSAGE', t))
+    .required()
     .max(63, getValidationMessage('MAX_NAME_LENGTH_MESSAGE', t, { maxNameLength: 63 }))
     .test(
       'dns-1123-name',
@@ -25,24 +24,10 @@ const createNameSchema = (t: TFunction): yup.StringSchema<string> =>
     );
 
 export const createDeploymentSchema = (t: TFunction): yup.ObjectSchema<VMWizardDeploymentValues> =>
-  yup
-    .object({
-      cluster: yup
-        .string()
-        .typeError(getValidationMessage('INVALID_FIELD_MESSAGE', t))
-        .defined(getValidationMessage('REQUIRED_FIELD_MESSAGE', t)),
-      description: yup
-        .string()
-        .typeError(getValidationMessage('INVALID_FIELD_MESSAGE', t))
-        .defined(getValidationMessage('REQUIRED_FIELD_MESSAGE', t)),
-      folder: yup
-        .string()
-        .typeError(getValidationMessage('INVALID_FIELD_MESSAGE', t))
-        .defined(getValidationMessage('REQUIRED_FIELD_MESSAGE', t)),
-      name: createNameSchema(t),
-      project: yup
-        .string()
-        .typeError(getValidationMessage('INVALID_FIELD_MESSAGE', t))
-        .defined(getValidationMessage('REQUIRED_FIELD_MESSAGE', t)),
-    })
-    .typeError(getValidationMessage('INVALID_FIELD_MESSAGE', t));
+  yup.object({
+    cluster: yup.string().defined(),
+    description: yup.string().defined(),
+    folder: yup.string().defined(),
+    name: createNameSchema(t),
+    project: yup.string().defined(),
+  });

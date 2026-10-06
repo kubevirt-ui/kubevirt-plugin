@@ -10,7 +10,7 @@ import {
   roleBinding,
   serviceAccount,
   UPSTREAM_UPLOADER_IMAGE,
-} from './constants';
+} from '../constants';
 
 const createOrUpdateRole = async (cluster: string, namespace: string): Promise<void> => {
   try {

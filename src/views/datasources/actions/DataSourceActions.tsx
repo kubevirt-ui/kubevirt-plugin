@@ -49,6 +49,8 @@ const DataSourceActions: FC<DataSourceActionProps> = ({
     : DropdownToggle({ children: t('Actions'), isExpanded: isOpen, onClick: onToggle });
 
   const handleClick = (action: Action): void => {
+    if (action?.disabled) return;
+
     if (typeof action?.cta === 'function') {
       action.cta();
     }
@@ -72,9 +74,14 @@ const DataSourceActions: FC<DataSourceActionProps> = ({
             <DropdownItem
               data-test={action?.id}
               description={action?.description}
-              isDisabled={action?.disabled}
+              isAriaDisabled={action?.disabled}
               key={action?.id}
               onClick={() => handleClick(action)}
+              tooltipProps={
+                action?.disabled && action?.disabledTooltip
+                  ? { content: action.disabledTooltip }
+                  : undefined
+              }
             >
               {action?.label}
             </DropdownItem>

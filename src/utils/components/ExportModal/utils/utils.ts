@@ -8,18 +8,16 @@ import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sDelete } from '@multicluster/k8sRequests';
 
-import { UploadStatuses } from './constants';
-import { parseLogEntry, reduceProgress } from './hooks/parseUploaderLog';
-import { type UploaderProgress } from './hooks/types';
+import { UploadStatuses } from '../constants';
+
+import { parseLogEntry, reduceProgress } from '../hooks/parseUploaderLog';
+import { type UploaderProgress } from '../hooks/types';
 
 export const exportFailed = (pod: IoK8sApiCoreV1Pod): boolean =>
   [UploadStatuses.Failed, UploadStatuses.Unknown].includes(getStatusPhase<UploadStatuses>(pod));
 
 export const exportSucceeded = (pod: IoK8sApiCoreV1Pod): boolean =>
   [UploadStatuses.Succeeded].includes(getStatusPhase<UploadStatuses>(pod));
-
-export const isExportFormIncomplete = (fields: string[]): boolean =>
-  fields.some((field) => !field?.trim());
 
 export const shouldConnectToUploader = (pod: IoK8sApiCoreV1Pod | undefined): boolean => {
   const isRunning = getStatusPhase(pod) === UploadStatuses.Running;

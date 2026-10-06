@@ -2,10 +2,12 @@ import { PersistentVolumeClaimModel } from '@kubevirt-ui-ext/kubevirt-api/consol
 import type { V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import DeleteModal from '@kubevirt-utils/components/DeleteModal/DeleteModal';
 import ExportModal from '@kubevirt-utils/components/ExportModal/ExportModal';
+import useCanExport from '@kubevirt-utils/components/ExportModal/hooks/useCanExport';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { deleteDVAndRelatedResources } from '@kubevirt-utils/resources/bootableresources/helpers';
 import { asAccessReview, getName, getNamespace } from '@kubevirt-utils/resources/shared';
+import { getNoPermissionTooltipContent } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import type { Action, K8sVerb } from '@openshift-console/dynamic-plugin-sdk';
 import { useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
@@ -22,6 +24,7 @@ type BootableVolumesActionsProps = (
 const useBootableVolumesActions: BootableVolumesActionsProps = (source, preferences) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
+  const canExport = useCanExport(getCluster(source), getNamespace(source));
 
   const updateAccessReview =
     asAccessReview(PersistentVolumeClaimModel, source, 'update' as K8sVerb) ?? {};
@@ -50,6 +53,7 @@ const useBootableVolumesActions: BootableVolumesActionsProps = (source, preferen
     },
     {
       cta: () =>
+        canExport &&
         createModal(({ isOpen, onClose }) => (
           <ExportModal
             cluster={getCluster(source)}
@@ -59,6 +63,8 @@ const useBootableVolumesActions: BootableVolumesActionsProps = (source, preferen
             pvcName={getName(source)}
           />
         )),
+      disabled: !canExport,
+      disabledTooltip: getNoPermissionTooltipContent(t),
       id: 'bootablevolume-action-upload-to-registry',
       label: t('Upload to registry'),
     },
