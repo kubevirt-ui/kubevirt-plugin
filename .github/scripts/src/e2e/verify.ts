@@ -26,6 +26,11 @@ import { isRequiredGatingSuite } from '../shared/is-required-gating-suite';
 import { E2E_HOLD_LABEL } from '../shared/merge-pool';
 import { failStep, setOutput } from '../shared/output';
 import { buildAdHocResultComment } from './adhoc-comment';
+
+const hasAllTestsPassed = (summary: string): boolean => {
+  const match = /\*\*(\d+)\*\* of \*\*(\d+)\*\* tests failed/.exec(summary);
+  return match !== null && match[1] === '0' && Number(match[2]) > 0;
+};
 import { mapResultDetails, type VerifyReason } from './result-mapper';
 import {
   checkHoldState,
@@ -74,7 +79,7 @@ const main = async (): Promise<void> => {
   const isGatingSuite = isRequiredGatingSuite(testProject, testArgs);
 
   if (!isGatingSuite) {
-    const passed = reason === 'passed';
+    const passed = reason === 'passed' || hasAllTestsPassed(testFailureSummary);
     const body = buildAdHocResultComment({
       passed,
       runUrl,
