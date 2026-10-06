@@ -6,6 +6,7 @@ import { OPENSHIFT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { SINGLE_CLUSTER_KEY } from '@kubevirt-utils/resources/constants';
 import { RUNSTRATEGY_ALWAYS } from '@kubevirt-utils/resources/vm/utils/constants';
+import { VM_TEMPLATES_PATH_SEGMENT } from '@templates/constants';
 import { NAV_TOGGLE_BUTTON_SELECTORS } from '@virtualmachines/hooks/useAutoHideNavigation/constants';
 
 import CreateTemplateContent from '../components/CreateTemplateContent/CreateTemplateContent';
@@ -17,7 +18,7 @@ const TOUR_GUIDE_VM_NAME = 'rhel9-tour-guide';
 export const TOUR_GUIDE_VM_TREE_ID = `${SINGLE_CLUSTER_KEY}/${TOUR_GUIDE_VM_NAMESPACE}/${TOUR_GUIDE_VM_NAME}`;
 
 const VM_LIST_ROUTE = '/k8s/all-namespaces/kubevirt.io~v1~VirtualMachine';
-const TEMPLATES_LIST_ROUTE = `/k8s/ns/${OPENSHIFT_NAMESPACE}/templates`;
+const TEMPLATES_LIST_ROUTE = `/k8s/ns/${OPENSHIFT_NAMESPACE}/${VM_TEMPLATES_PATH_SEGMENT}`;
 
 export const getTourSteps = (t: TFunction): Step[] => [
   {

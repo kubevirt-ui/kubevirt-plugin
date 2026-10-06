@@ -26,6 +26,7 @@ import {
   Label,
   Title,
 } from '@patternfly/react-core';
+import { VM_TEMPLATES_PATH_SEGMENT } from '@templates/constants';
 
 import VirtualMachineTemplatesActions from '../actions/VirtualMachineTemplatesActions';
 import VirtualMachineTemplateActions from '../components/VirtualMachineTemplate/VirtualMachineTemplateActions';
@@ -62,7 +63,9 @@ const TemplatePageTitle: FC<TemplatePageTitleTitleProps> = ({ template }) => {
               isInline
               onClick={() =>
                 navigate(
-                  isACMPage ? getACMTemplateListURL() : `/k8s/${lastNamespacePath}/templates`,
+                  isACMPage
+                    ? getACMTemplateListURL()
+                    : `/k8s/${lastNamespacePath}/${VM_TEMPLATES_PATH_SEGMENT}`,
                 )
               }
               variant={ButtonVariant.link}

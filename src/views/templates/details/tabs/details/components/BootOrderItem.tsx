@@ -5,8 +5,14 @@ import BootOrder from 'src/views/virtualmachinesinstance/details/tabs/details/co
 
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import type { Template } from '@kubevirt-utils/resources/template';
-import { getTemplateDisks, getTemplateInterfaces } from '@kubevirt-utils/resources/template';
+import {
+  getTemplateDisks,
+  getTemplateInterfaces,
+  getTemplateURL,
+} from '@kubevirt-utils/resources/template';
+import { getCluster } from '@multicluster/helpers/selectors';
 
 type BootOrderProps = {
   template: Template;
@@ -16,7 +22,7 @@ const BootOrderItem: FC<BootOrderProps> = ({ template }) => {
   const { t } = useKubevirtTranslation();
   const disks = getTemplateDisks(template);
   const interfaces = getTemplateInterfaces(template);
-  const disksTabLink = `/k8s/ns/${template.metadata.namespace}/templates/${template.metadata.name}/disks`;
+  const disksTabLink = `${getTemplateURL(getName(template), getNamespace(template), getCluster(template))}/disks`;
 
   return (
     <DescriptionItem

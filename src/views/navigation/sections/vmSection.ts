@@ -3,6 +3,9 @@ import { type EncodedExtension } from '@openshift-console/dynamic-plugin-sdk-web
 
 import { NAV_ID, VIRT_SECTION_ID } from '../constants';
 
+// relative import: this module is loaded by the rspack config, which does not resolve tsconfig paths
+import { VM_TEMPLATES_PATH_SEGMENT } from '../../templates/constants';
+
 export const vmSectionNavItems: EncodedExtension[] = [
   {
     properties: {
@@ -28,7 +31,7 @@ export const vmSectionNavItems: EncodedExtension[] = [
         'data-quickstart-id': 'qs-nav-templates',
         'data-test': 'templates-nav-item',
       },
-      href: 'templates',
+      href: VM_TEMPLATES_PATH_SEGMENT,
       id: NAV_ID.TEMPLATES,
       insertAfter: NAV_ID.VIRTUAL_MACHINES,
       name: '%plugin__kubevirt-plugin~Templates%',

@@ -2,10 +2,9 @@ import type { FC } from 'react';
 import { getVMTemplateBaseName } from 'src/views/templates/utils/selectors';
 
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
+import VMTemplateLink from '@kubevirt-utils/components/VMTemplateLink/VMTemplateLink';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { modelToGroupVersionKind, TemplateModel } from '@kubevirt-utils/models';
 import type { Template } from '@kubevirt-utils/resources/template';
-import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
 import { Content } from '@patternfly/react-core';
 
 type BaseTemplateProps = {
@@ -20,10 +19,7 @@ const BaseTemplate: FC<BaseTemplateProps> = ({ template }) => {
     <DescriptionItem
       descriptionData={
         baseTemplate ? (
-          <ResourceLink
-            groupVersionKind={modelToGroupVersionKind(TemplateModel)}
-            {...baseTemplate}
-          />
+          <VMTemplateLink {...baseTemplate} />
         ) : (
           <Content className="pf-v6-u-text-color-subtle" component="p">
             {t('Not available')}

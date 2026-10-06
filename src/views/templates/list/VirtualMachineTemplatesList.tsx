@@ -45,9 +45,8 @@ const VirtualMachineTemplatesList: FC<ListPageProps> = ({
   const namespaceParam = useNamespaceParam();
   const isAllClustersPage = useIsAllClustersPage();
 
-  // Prefer the namespace passed down by Console as per console.page/resource/list extension.
-  // useNamespaceParam only matches /k8s/ns/:ns/* and the fleet path, so it returns undefined
-  // on routes such as Search.
+  // Prefer the namespace passed down by Console over the one parsed from the URL,
+  // since useNamespaceParam only matches /k8s/ns/:ns/* and the fleet path.
   const activeNamespace = namespace ?? namespaceParam;
 
   const { allTemplates, allTemplatesWithRequests, error, loaded } = useAllTemplateResources({
