@@ -171,7 +171,7 @@ if [[ -n "${VPC_NAME:-}" && -n "${ZONE:-}" ]]; then
       exit 1
     fi
     subnet_name="${VPC_NAME}-subnet-${ZONE}"
-    if ! subnets_json=$(ibmcloud is subnets --output json 2>&1); then
+    if ! subnets_json=$(ibmcloud is subnets --vpc "${VPC_NAME}" --output json 2>&1); then
       echo "  Failed to list subnets in region \"${vpc_region}\" -- cannot distinguish this from a genuine missing gateway: ${subnets_json}"
       exit 1
     fi
