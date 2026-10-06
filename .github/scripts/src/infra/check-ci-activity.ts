@@ -126,7 +126,17 @@ export const checkCIActivity = async (
   };
 };
 
-/** Simple check whether any tagged workflows are active (used by teardown/cleanup safety checks). */
+/**
+ * Simple check whether any tagged workflows are active (used by teardown/cleanup safety checks).
+ *
+ * Checks both 'in_progress' AND 'queued' -- a run whose last job hasn't
+ * been picked up by a runner yet (e.g. because ARC itself is broken, or a
+ * runner-capacity backlog) has top-level status 'queued', not
+ * 'in_progress'. Checking only 'in_progress' previously let a real,
+ * waiting-for-a-runner backlog slip past this exact safety check and
+ * allowed a teardown to proceed -- see checkCIActivity below, which
+ * already checks both and is the reference for this fix.
+ */
 export const hasActiveWorkflows = async (
   octokit: Octokit,
   owner: string,
@@ -134,16 +144,18 @@ export const hasActiveWorkflows = async (
   workflows: string[] = DEFAULT_WORKFLOWS,
 ): Promise<number> => {
   const totals = await Promise.all(
-    workflows.map(async (workflow) => {
-      const { data } = await octokit.actions.listWorkflowRuns({
-        owner,
-        per_page: 1,
-        repo,
-        status: 'in_progress',
-        workflow_id: workflow,
-      });
-      return data.total_count;
-    }),
+    workflows.flatMap((workflow) =>
+      (['in_progress', 'queued'] as const).map(async (status) => {
+        const { data } = await octokit.actions.listWorkflowRuns({
+          owner,
+          per_page: 1,
+          repo,
+          status,
+          workflow_id: workflow,
+        });
+        return data.total_count;
+      }),
+    ),
   );
   return totals.reduce((sum, count) => sum + count, 0);
 };

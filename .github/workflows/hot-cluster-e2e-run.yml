@@ -348,14 +348,6 @@ jobs:
       test_failure_summary: ${{ steps.test-summary.outputs.test_summary }}
 
     steps:
-      # Folded in from a former standalone "Check Runner Image" job (same
-      # runner) to drop a merge-box row; also fails fast before spending
-      # any real test-environment cost.
-      - name: Log environment, versions, and HCO operands
-        continue-on-error: true
-        working-directory: ci-scripts/hot-cluster/ts
-        run: npx tsx src/scripts/log-env-summary.ts
-
       # Pinned to @main (not local ./) since checkout_ref can point at a
       # release branch predating this CI infra, or nothing may be checked
       # out yet. Both this and the actions below it are self-contained, so
@@ -365,6 +357,16 @@ jobs:
         with:
           checkout-ref: ${{ inputs.checkout_ref }}
           pr-number: ${{ inputs.pr_number }}
+
+      # Folded in from a former standalone "Check Runner Image" job (same
+      # runner) to drop a merge-box row; also fails fast before spending
+      # any real test-environment cost. Must run after Checkout -- it
+      # shells out to a script under ci-scripts/hot-cluster/ts, which
+      # doesn't exist on the runner until the repo is checked out.
+      - name: Log environment, versions, and HCO operands
+        continue-on-error: true
+        working-directory: ci-scripts/hot-cluster/ts
+        run: npx tsx src/scripts/log-env-summary.ts
 
       - name: Provision CI test environment
         id: ci-env
