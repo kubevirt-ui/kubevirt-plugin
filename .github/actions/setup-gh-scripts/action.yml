@@ -17,6 +17,7 @@ runs:
           .github/scripts
           .github/actions
           ci-scripts/hot-cluster/js
+          ci-scripts/hot-cluster/ts
         persist-credentials: false
 
     - name: Setup Node
