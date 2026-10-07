@@ -10,6 +10,7 @@ import ModalPendingChangesAlert from '@kubevirt-utils/components/PendingChanges/
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getHostname } from '@kubevirt-utils/resources/vm';
+import { getNoModalChangesTooltip } from '@kubevirt-utils/utils/text';
 import { ensurePath } from '@kubevirt-utils/utils/utils';
 import {
   getDNS1123LabelError,
@@ -70,11 +71,12 @@ const HostnameModal: FC<HostnameModalProps> = ({ isOpen, onClose, onSubmit, vm, 
     <TabModal
       closeOnSubmit={false}
       headerText={t('Edit hostname')}
-      isDisabled={!!hostnameError}
+      isDisabled={!isDirty || !!hostnameError}
       isOpen={isOpen}
       onClose={onClose}
       onSubmit={handleSubmit}
       shouldWrapInForm
+      submitDisabledTooltip={!isDirty ? getNoModalChangesTooltip(t) : undefined}
     >
       {vmi && <ModalPendingChangesAlert />}
 

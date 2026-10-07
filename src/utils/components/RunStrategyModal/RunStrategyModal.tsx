@@ -1,8 +1,9 @@
-import { type FC, type MouseEvent, useEffect, useMemo, useState } from 'react';
+import { type FC, type MouseEvent, useMemo, useState } from 'react';
 
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { type RunStrategy } from '@kubevirt-utils/resources/vm/utils/constants';
+import { getNoModalChangesTooltip } from '@kubevirt-utils/utils/text';
 import {
   Content,
   ContentVariants,
@@ -21,7 +22,6 @@ import {
   isValidRunStrategy,
   MIXED_HINT_ID,
   type RunStrategyModalProps,
-  type RunStrategySelection,
 } from './utils';
 
 import './RunStrategyModal.scss';
@@ -37,15 +37,9 @@ const RunStrategyModal: FC<RunStrategyModalProps> = ({
   vmCount = 1,
 }) => {
   const { t } = useKubevirtTranslation();
-  const [runStrategy, setRunStrategy] = useState<RunStrategySelection>(initialRunStrategy ?? '');
+  const [runStrategy, setRunStrategy] = useState<RunStrategy | undefined>(initialRunStrategy);
   const labels = getRunStrategyLabels(t);
   const descriptions = getRunStrategyDescriptions(t);
-
-  useEffect(() => {
-    if (isOpen) {
-      setRunStrategy(initialRunStrategy ?? '');
-    }
-  }, [isOpen, initialRunStrategy]);
 
   const handleChange = (_event: MouseEvent<Element>, value: string): void => {
     if (isValidRunStrategy(value)) {
@@ -74,11 +68,14 @@ const RunStrategyModal: FC<RunStrategyModalProps> = ({
   return (
     <TabModal
       headerText={t('Edit run strategy')}
-      isDisabled={!runStrategy}
+      isDisabled={!runStrategy || runStrategy === initialRunStrategy}
       isOpen={isOpen}
       onClose={onClose}
       onSubmit={() => onSubmit(runStrategy as RunStrategy)}
       shouldWrapInForm
+      submitDisabledTooltip={
+        !runStrategy ? t('Select a run strategy') : getNoModalChangesTooltip(t)
+      }
     >
       <Stack hasGutter>
         <StackItem>
@@ -86,8 +83,8 @@ const RunStrategyModal: FC<RunStrategyModalProps> = ({
             <FormPFSelect
               onSelect={handleChange}
               placeholder={t('Select a run strategy')}
-              selected={runStrategy || undefined}
-              selectedLabel={runStrategy ? labels[runStrategy] || runStrategy : undefined}
+              selected={runStrategy}
+              selectedLabel={runStrategy ? labels[runStrategy] : undefined}
               toggleProps={{
                 'aria-describedby': showMixedStrategiesHint ? MIXED_HINT_ID : undefined,
                 id: 'run-strategy-select',

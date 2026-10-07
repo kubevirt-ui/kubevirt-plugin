@@ -48,8 +48,8 @@ export const getTolerations = (vm: V1VirtualMachine): V1VirtualMachineInstanceSp
 export const getAffinity = (vm: V1VirtualMachine): V1VirtualMachineInstanceSpec['affinity'] =>
   vm?.spec?.template?.spec?.affinity;
 
-export const getWorkload = (vm: V1VirtualMachine): WORKLOADS =>
-  getAnnotation(vm?.spec?.template, VM_WORKLOAD_ANNOTATION) as WORKLOADS;
+export const getWorkload = (vm: V1VirtualMachine): WORKLOADS | undefined =>
+  getAnnotation(vm?.spec?.template, VM_WORKLOAD_ANNOTATION) as WORKLOADS | undefined;
 
 export const getAccessCredentials = (vm: V1VirtualMachine): V1AccessCredential[] | undefined =>
   vm?.spec?.template?.spec?.accessCredentials;

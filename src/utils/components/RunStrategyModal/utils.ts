@@ -18,7 +18,7 @@ import {
 import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
 
-export type { RunStrategyModalProps, RunStrategySelection, WarningMessage } from './types';
+export type { RunStrategyModalProps, WarningMessage } from './types';
 export { getRunStrategyWarningMessage } from './warnings';
 
 export const MIXED_HINT_ID = 'run-strategy-mixed-hint';

@@ -9,6 +9,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import {
   getTemplateVirtualMachineObject,
   getTemplateWorkload,
+  isVirtualMachineTemplate,
   type Template,
   TEMPLATE_WORKLOAD_LABEL,
   updateTemplate,
@@ -22,7 +23,12 @@ import { type TemplateDetailsGridProps } from '../TemplateDetailsPage';
 const WorkloadProfile: FC<TemplateDetailsGridProps> = ({ editable, template }) => {
   const { createModal } = useModal();
   const { t } = useKubevirtTranslation();
-  const workload = getWorkloadProfile(template);
+
+  if (isVirtualMachineTemplate(template)) {
+    return null;
+  }
+
+  const workload = t(getWorkloadProfile(template));
 
   const updateWorkload = (updatedWorkload: WORKLOADS): Promise<Template> => {
     const updatedTemplate = produce(template, (draftTemplate) => {
@@ -44,7 +50,7 @@ const WorkloadProfile: FC<TemplateDetailsGridProps> = ({ editable, template }) =
   const onEditClick = (): void =>
     createModal(({ isOpen, onClose }) => (
       <WorkloadProfileModal
-        initialWorkload={getTemplateWorkload(template) as WORKLOADS}
+        initialWorkload={getTemplateWorkload(template)}
         isOpen={isOpen}
         onClose={onClose}
         onSubmit={updateWorkload}

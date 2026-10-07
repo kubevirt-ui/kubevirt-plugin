@@ -6,8 +6,6 @@ export type WarningMessage = {
   title: string;
 };
 
-export type RunStrategySelection = '' | RunStrategy;
-
 export type RunStrategyModalProps = {
   hasMixedStrategies?: boolean;
   hasStoppedVMs?: boolean;

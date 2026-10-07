@@ -125,11 +125,11 @@ export const getTemplateFlavor = (template: Template): string => {
  * A selector that returns the workload of a given template
  * @param {Template} template - template
  */
-export const getTemplateWorkload = (template: Template): string => {
+export const getTemplateWorkload = (template: Template): WORKLOADS | undefined => {
   const isWorkloadExist = (workload: string): boolean =>
     getLabel(template, `${TEMPLATE_WORKLOAD_LABEL}/${workload}`) === 'true';
 
-  return Object.values(WORKLOADS).find((flavor) => isWorkloadExist(flavor)) ?? 'unknown';
+  return Object.values(WORKLOADS).find((flavor) => isWorkloadExist(flavor));
 };
 
 /**

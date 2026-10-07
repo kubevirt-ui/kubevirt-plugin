@@ -3,6 +3,7 @@ import { type FC, useState } from 'react';
 import CategorySelect from '@kubevirt-utils/components/CategorySelect/CategorySelect';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getNoModalChangesTooltip } from '@kubevirt-utils/utils/text';
 import { FormGroup } from '@patternfly/react-core';
 
 type EditCategoryModalProps = {
@@ -26,10 +27,12 @@ const EditCategoryModal: FC<EditCategoryModalProps> = ({
   return (
     <TabModal
       headerText={t('Edit category')}
+      isDisabled={category === initialCategory}
       isOpen={isOpen}
       onClose={onClose}
       onSubmit={() => onSubmit(category)}
       shouldWrapInForm
+      submitDisabledTooltip={getNoModalChangesTooltip(t)}
     >
       <FormGroup fieldId="template-category" label={t('Category')}>
         <CategorySelect
