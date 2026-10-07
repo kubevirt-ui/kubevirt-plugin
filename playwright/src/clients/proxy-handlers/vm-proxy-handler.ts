@@ -259,6 +259,24 @@ export class VirtualMachineProxyHandler {
   // VirtualMachineInstanceMigrations
   // ---------------------------------------------------------------------------
 
+  async getVmDiskBus(namespace: string, vmName: string, diskName: string): Promise<string | null> {
+    const vm = await this.get(namespace, vmName);
+    if (!vm) return null;
+    const spec = vm.spec as Record<string, unknown>;
+    const templateSpec =
+      ((spec?.template as Record<string, unknown>)?.spec as Record<string, unknown>) || {};
+    const domain = (templateSpec.domain as Record<string, unknown>) || {};
+    const devices = (domain.devices as Record<string, unknown>) || {};
+    const disks = (devices.disks as Array<Record<string, unknown>>) || [];
+    const disk = disks.find((d) => d.name === diskName);
+    if (!disk) return null;
+    const diskInfo = disk.disk as Record<string, unknown> | undefined;
+    if (diskInfo?.bus) return diskInfo.bus as string;
+    const cdromInfo = disk.cdrom as Record<string, unknown> | undefined;
+    if (cdromInfo?.bus) return cdromInfo.bus as string;
+    return null;
+  }
+
   async getVmiDiskBus(namespace: string, vmName: string, diskName: string): Promise<string | null> {
     const vmi = await this.getInstance(namespace, vmName);
     if (!vmi) return null;

@@ -914,4 +914,69 @@ export default class VmWizardNavigationComponent extends BaseComponent {
       return false;
     }
   }
+
+  // ── Boot source (template drawer) ──────────────────────────────────
+
+  private get _changeBootSourceModal() {
+    return this.page.locator('[aria-labelledby="change-boot-source-modal-title"]');
+  }
+
+  async getTemplateDrawerBootSourceText(): Promise<string> {
+    const item = this.testId('template-boot-source');
+    await item.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+    return ((await item.textContent()) ?? '').trim();
+  }
+
+  async isTemplateBootSourceEditable(): Promise<boolean> {
+    try {
+      await this.testId('template-boot-source').waitFor({
+        state: 'visible',
+        timeout: TestTimeouts.SHORT_WAIT,
+      });
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  async clickEditBootSource(): Promise<void> {
+    const editButton = this.testId('template-boot-source');
+    await editButton.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+    await this.robustClick(editButton);
+    await this._changeBootSourceModal.waitFor({
+      state: 'visible',
+      timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+    });
+  }
+
+  async isChangeBootSourceModalOpen(): Promise<boolean> {
+    return this._changeBootSourceModal
+      .isVisible({ timeout: TestTimeouts.SHORT_WAIT })
+      .catch(() => false);
+  }
+
+  async selectBootableVolumeInChangeModal(volumeName: string): Promise<void> {
+    const modal = this._changeBootSourceModal;
+    const row = modal.locator('table.BootableVolumeList-table tbody tr').filter({
+      has: this.page.locator('td').getByText(volumeName, { exact: true }),
+    });
+    await row.first().waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+    await this.robustClick(row.first());
+  }
+
+  async confirmChangeBootSource(): Promise<void> {
+    await this.robustClick(this.testId('change-boot-source-confirm'));
+    await this._changeBootSourceModal.waitFor({
+      state: 'hidden',
+      timeout: TestTimeouts.UI_ACTION_COMPLETE,
+    });
+  }
+
+  async cancelChangeBootSource(): Promise<void> {
+    await this.robustClick(this.testId('change-boot-source-cancel'));
+    await this._changeBootSourceModal.waitFor({
+      state: 'hidden',
+      timeout: TestTimeouts.UI_ACTION_COMPLETE,
+    });
+  }
 }
