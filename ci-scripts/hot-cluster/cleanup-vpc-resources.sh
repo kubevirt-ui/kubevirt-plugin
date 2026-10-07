@@ -394,7 +394,12 @@ echo "14. Deleting orphaned custom images (RHCOS)..."
   | jq -r --arg cn "${CLUSTER_NAME}" 'if type == "array" then .[] | select(.name | startswith($cn)) | .id else empty end' \
   | while read -r id; do echo "  Deleting image ${id}"; run_or_dry ibmcloud is image-delete "${id}" -f; done
 
-echo "15. Deleting orphaned COS instances..."
+echo "15. Deleting orphaned block storage volumes (PVC data volumes from deleted clusters)..."
+(ibmcloud is volumes --output json 2>/dev/null || echo '[]') \
+  | jq -r 'if type == "array" then .[] | select(.name | startswith("pvc-")) | .id else empty end' \
+  | while read -r id; do echo "  Deleting volume ${id}"; run_or_dry ibmcloud is volume-delete "${id}" -f; done
+
+echo "16. Deleting orphaned COS instances..."
 (ibmcloud resource service-instances --service-name cloud-object-storage --output json 2>/dev/null || echo '[]') \
   | jq -r --arg cn "${CLUSTER_NAME}" 'if type == "array" then .[] | select(.name | startswith($cn)) | .id else empty end' \
   | while read -r id; do echo "  Deleting COS ${id}"; run_or_dry ibmcloud resource service-instance-delete "${id}" -f --recursive; done
