@@ -106,7 +106,9 @@ Automated E2E coverage for console routes under `tests/bootable-volumes/`.
 ### Module: `bootable-volumes-upload-to-registry.spec.ts`
 
 **Spec file:** `tests/bootable-volumes/bootable-volumes-upload-to-registry.spec.ts`
-**Describe:** `Tier1 Bootable Volumes - Upload to registry` — **Tags:** `@tier1`
+**Describe:** `Tier1 Bootable Volumes - Upload to registry` / `Tier1 Bootable Volumes - Upload to
+registry is unavailable without permission` — **Tags:** `@route-bootable-volumes`, `@tier1`,
+`@nonpriv`
 **Allure:** suite `Test Virtualization Bootable volumes page`, feature `Tier 1`
 
 ---
@@ -130,21 +132,57 @@ Automated E2E coverage for console routes under `tests/bootable-volumes/`.
 
 ---
 
-### `002`: Form submits successfully, closes the modal automatically, and shows an uploading or terminal toast
+### `002`: Form submits successfully, creates the uploader resources, closes the modal, and shows an upload toast
 
-- **Objective:** Verify that a completed and submitted Upload to registry form closes the modal
-  automatically and surfaces a background progress toast (or an expected terminal state given dummy
-  credentials).
+- **Objective:** Verify that submitting the Upload to registry form creates a correctly configured
+  uploader Pod and credentials Secret, closes the modal, and surfaces a background progress or
+  terminal toast.
 - **Target version:** CNV 5.1.0
-- **Jira References:** CNV-89946, CNV-87382, CNV-89815
+- **Jira References:** CNV-89946, CNV-87382, CNV-89815, CNV-95818
 - **Pre-conditions:** A bootable volume (DataVolume + DataSource) already exists in the test namespace
 - **Tags:** `@nonpriv`
 
-| Step | Action                                                                             | Expected Result                                                                                                                                                                                     |
-| :--- | :--------------------------------------------------------------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1    | Fill the Upload to registry form with destination/username/password and click Save | Form submits without client-side validation errors                                                                                                                                                  |
-| 2    | Observe the modal                                                                  | Modal (`#tab-modal`) closes automatically while the export continues in the background                                                                                                              |
-| 3    | Observe the resulting toast                                                        | Uploading toast is shown, **or** the export reaches a terminal `error`/`aborted` toast state because the dummy registry credentials are invalid; if still uploading, the test aborts it to clean up |
+| Step | Action                                                           | Expected Result                                                                                                                        |
+| :--- | :--------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------- |
+| 1    | Fill the form with destination/username/password and click Save  | Form submits without client-side validation errors                                                                                     |
+| 2    | Observe the modal                                                | Modal closes automatically while the export continues in the background                                                                |
+| 3    | Fetch the uploader Pod and its referenced Secret through the API | Pod contains the destination, volume, PVC source kind, and Secret references; Secret is Opaque with both credential keys               |
+| 4    | Observe the resulting toast                                      | Uploading toast is shown, or the export reaches an expected terminal error/aborted state; an in-progress export is aborted for cleanup |
+
+---
+
+### `003`: Upload to registry action is enabled for a user with export permissions
+
+- **Objective:** Verify that a user with the required export permissions can open the Upload to
+  registry modal from the row action.
+- **Target version:** CNV 5.1.0
+- **Jira References:** CNV-95818
+- **Pre-conditions:** A bootable volume exists in a test namespace where the acting user can create
+  the resources required by the export flow.
+- **Tags:** `@nonpriv`
+
+| Step | Action                                           | Expected Result                      |
+| :--- | :----------------------------------------------- | :----------------------------------- |
+| 1    | Open the row menu and inspect Upload to registry | Action is enabled                    |
+| 2    | Click the enabled action                         | Upload to registry modal opens       |
+| 3    | Cancel the modal                                 | Modal closes without creating export |
+
+---
+
+### `004`: Upload to registry action is disabled without export permissions
+
+- **Objective:** Verify that a non-privileged user without the required export permissions cannot
+  invoke the row action and sees the explanatory tooltip.
+- **Target version:** CNV 5.1.0
+- **Jira References:** CNV-95818
+- **Pre-conditions:** Run with `NON_PRIV=1`; a bootable volume exists in the shared non-privileged
+  namespace, where the user lacks create access for the export resources.
+- **Tags:** `@nonpriv`
+
+| Step | Action                                           | Expected Result                                                 |
+| :--- | :----------------------------------------------- | :-------------------------------------------------------------- |
+| 1    | Open the row menu and inspect Upload to registry | Action has `aria-disabled="true"`                               |
+| 2    | Hover the disabled action                        | Tooltip explains that the user lacks permission for this action |
 
 ---
 
