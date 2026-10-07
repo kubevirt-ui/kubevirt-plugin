@@ -95,6 +95,11 @@ jobs:
           MATCHED_CLUSTERS: ${{ steps.detect_clusters.outputs.clusters }}
         run: npx tsx src/scripts/enforce-cluster-count.ts
 
+      - name: Delete ROKS cluster (force mode)
+        if: inputs.force == 'true' && env.DRY_RUN == 'false'
+        working-directory: ci-scripts/hot-cluster/ts
+        run: npx tsx src/scripts/delete-roks-cluster.ts
+
       - name: Setup scripts
         if: env.DRY_RUN == 'false' && steps.detect_clusters.outputs.detection_available == 'true'
         uses: ./.github/actions/setup-gh-scripts
@@ -108,11 +113,6 @@ jobs:
           MATCHED_CLUSTERS: ${{ steps.detect_clusters.outputs.clusters }}
         working-directory: .github/scripts
         run: npx tsx src/infra/cleanup-busy-check.ts
-
-      - name: Delete ROKS cluster (force mode)
-        if: inputs.force == 'true' && env.DRY_RUN == 'false'
-        working-directory: ci-scripts/hot-cluster/ts
-        run: npx tsx src/scripts/delete-roks-cluster.ts
 
       - name: Clean up VPC resources for matching prefix
         continue-on-error: true
