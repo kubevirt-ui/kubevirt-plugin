@@ -57,7 +57,7 @@ const main = async (): Promise<void> => {
   })();
 
   const roksRaw = execSafe(
-    `ibmcloud oc cluster ls --output json 2>/dev/null | jq -c --arg cn "${clusterName}" '[.[] | select(.name | startswith($cn)) | .name] // []'`,
+    `ibmcloud oc cluster ls --provider vpc-gen2 --output json 2>/dev/null | jq -c --arg cn "${clusterName}" '[.[] | select(.name | startswith($cn)) | .name] // []'`,
   );
   const roksClusters = parseJsonArray(roksRaw);
 

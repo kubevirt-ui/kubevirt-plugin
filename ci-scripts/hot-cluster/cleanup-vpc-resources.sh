@@ -112,7 +112,7 @@ if [[ "${DRY_RUN}" != "true" && "${ALLOW_LIVE_CLUSTER_SWEEP}" != "true" ]]; then
   # would otherwise corrupt ALL_CLUSTERS_JSON and cause a false "could not
   # parse" failure. Only read into the error message when the call fails.
   CLUSTER_LS_ERR_FILE=$(mktemp)
-  if ! ALL_CLUSTERS_JSON=$(ibmcloud oc cluster ls --output json 2>"${CLUSTER_LS_ERR_FILE}"); then
+  if ! ALL_CLUSTERS_JSON=$(ibmcloud oc cluster ls --provider vpc-gen2 --output json 2>"${CLUSTER_LS_ERR_FILE}"); then
     echo "::error::Could not list ROKS clusters to check for a name-prefix collision with '${CLUSTER_NAME}': $(cat "${CLUSTER_LS_ERR_FILE}")"
     rm -f "${CLUSTER_LS_ERR_FILE}"
     exit 1
