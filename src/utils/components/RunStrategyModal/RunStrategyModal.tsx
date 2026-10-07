@@ -68,7 +68,7 @@ const RunStrategyModal: FC<RunStrategyModalProps> = ({
   return (
     <TabModal
       headerText={t('Edit run strategy')}
-      isDisabled={!runStrategy || runStrategy === initialRunStrategy}
+      isDisabled={!runStrategy || (!hasMixedStrategies && runStrategy === initialRunStrategy)}
       isOpen={isOpen}
       onClose={onClose}
       onSubmit={() => onSubmit(runStrategy as RunStrategy)}

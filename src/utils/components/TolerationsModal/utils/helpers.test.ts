@@ -4,11 +4,12 @@ import {
   K8sIoApiCoreV1TolerationEffectEnum,
   K8sIoApiCoreV1TolerationOperatorEnum,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { getNoModalChangesTooltip } from '@kubevirt-utils/utils/text';
 
 import { type TolerationLabel } from './constants';
 import {
-  getIncompleteTolerationsTooltip,
   getTaintKeyRequiredMessage,
+  getTolerationsModalSubmitTooltip,
   hasIncompleteTolerations,
   toK8sTolerations,
 } from './helpers';
@@ -84,10 +85,14 @@ describe('getIncompleteTolerationsTooltip', () => {
   const t = ((key: string) => key) as TFunction;
 
   it('should return a tooltip when rows are incomplete', () => {
-    expect(getIncompleteTolerationsTooltip(true, t)).toBe('Taint key is required');
+    expect(getTolerationsModalSubmitTooltip(true, true, t)).toBe('Taint key is required');
   });
 
-  it('should return undefined when rows are complete', () => {
-    expect(getIncompleteTolerationsTooltip(false, t)).toBeUndefined();
+  it('should return the "No changes have been made." tooltip when there are no changes', () => {
+    expect(getTolerationsModalSubmitTooltip(false, false, t)).toBe(getNoModalChangesTooltip(t));
+  });
+
+  it('should return undefined when there are changes and rows are complete', () => {
+    expect(getTolerationsModalSubmitTooltip(true, false, t)).toBeUndefined();
   });
 });

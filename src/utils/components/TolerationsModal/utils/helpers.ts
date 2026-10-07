@@ -5,6 +5,7 @@ import {
   type K8sIoApiCoreV1Toleration,
   K8sIoApiCoreV1TolerationOperatorEnum,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { getNoModalChangesTooltip } from '@kubevirt-utils/utils/text';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 
 import { type TolerationLabel } from './constants';
@@ -25,10 +26,19 @@ export const hasIncompleteTolerations = (labels: TolerationLabel[] = []): boolea
 
 export const getTaintKeyRequiredMessage = (t: TFunction): string => t('Taint key is required');
 
-export const getIncompleteTolerationsTooltip = (
+export const getTolerationsModalSubmitTooltip = (
+  isDirty: boolean,
   isIncomplete: boolean,
   t: TFunction,
-): string | undefined => (isIncomplete ? getTaintKeyRequiredMessage(t) : undefined);
+): string | undefined => {
+  if (!isDirty) {
+    return getNoModalChangesTooltip(t);
+  }
+  if (isIncomplete) {
+    return getTaintKeyRequiredMessage(t);
+  }
+  return undefined;
+};
 
 export const getNodeTaintQualifier = <T extends TolerationLabel = TolerationLabel>(
   nodes: IoK8sApiCoreV1Node[],

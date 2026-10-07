@@ -10,6 +10,7 @@ import type {
 import ModalPendingChangesAlert from '@kubevirt-utils/components/PendingChanges/ModalPendingChangesAlert/ModalPendingChangesAlert';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getNoModalChangesTooltip } from '@kubevirt-utils/utils/text';
 import { ensurePath } from '@kubevirt-utils/utils/utils';
 import { Checkbox, FormGroup } from '@patternfly/react-core';
 
@@ -33,7 +34,8 @@ const StartPauseModal: FC<StartPauseModalProps> = ({
   vmi,
 }) => {
   const { t } = useKubevirtTranslation();
-  const [checked, setChecked] = useState<boolean>(!!vm?.spec?.template?.spec?.startStrategy);
+  const [initialChecked] = useState<boolean>(() => !!vm?.spec?.template?.spec?.startStrategy);
+  const [checked, setChecked] = useState<boolean>(initialChecked);
 
   const updatedVirtualMachine = useMemo(() => {
     const updatedVM = produce<V1VirtualMachine>(vm, (vmDraft: V1VirtualMachine) => {
@@ -49,11 +51,13 @@ const StartPauseModal: FC<StartPauseModalProps> = ({
   return (
     <TabModal
       headerText={headerText}
+      isDisabled={checked === initialChecked}
       isOpen={isOpen}
       obj={updatedVirtualMachine}
       onClose={onClose}
       onSubmit={onSubmit}
       shouldWrapInForm
+      submitDisabledTooltip={getNoModalChangesTooltip(t)}
     >
       {vmi && <ModalPendingChangesAlert />}
       <FormGroup fieldId="start-pause-mode" isInline>

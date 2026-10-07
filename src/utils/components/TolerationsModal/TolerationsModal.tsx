@@ -1,4 +1,4 @@
-import { type FC, useMemo } from 'react';
+import { type FC, useMemo, useState } from 'react';
 import produce from 'immer';
 
 import { NodeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
@@ -11,6 +11,7 @@ import {
 import LabelsList from '@kubevirt-utils/components/NodeSelectorModal/components/LabelList';
 import NodeCheckerAlert from '@kubevirt-utils/components/NodeSelectorModal/components/NodeCheckerAlert';
 import { useIDEntities } from '@kubevirt-utils/components/NodeSelectorModal/hooks/useIDEntities';
+import { isEqualObject } from '@kubevirt-utils/components/NodeSelectorModal/utils/helpers';
 import ModalPendingChangesAlert from '@kubevirt-utils/components/PendingChanges/ModalPendingChangesAlert/ModalPendingChangesAlert';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -23,8 +24,8 @@ import TolerationListHeaders from './TolerationListHeaders';
 import TolerationModalDescriptionText from './TolerationModalDescriptionText';
 import { type TolerationLabel } from './utils/constants';
 import {
-  getIncompleteTolerationsTooltip,
   getNodeTaintQualifier,
+  getTolerationsModalSubmitTooltip,
   hasIncompleteTolerations,
   toK8sTolerations,
 } from './utils/helpers';
@@ -49,16 +50,21 @@ const TolerationsModal: FC<TolerationsModalProps> = ({
   vmi,
 }) => {
   const { t } = useKubevirtTranslation();
+  const [initialTolerations] = useState(() =>
+    toK8sTolerations((getTolerations(vm) ?? []).map((toleration, id) => ({ ...toleration, id }))),
+  );
   const {
     entities: tolerationsLabels,
     onEntityAdd: onTolerationAdd,
     onEntityChange: onTolerationChange,
     onEntityDelete: onTolerationDelete,
   } = useIDEntities<TolerationLabel>(
-    (getTolerations(vm) ?? []).map((toleration, id) => ({ ...toleration, id })),
+    initialTolerations.map((toleration, id) => ({ ...toleration, id })),
   );
 
   const tolerationLabelsEmpty = tolerationsLabels?.length === 0;
+
+  const tolerations = toK8sTolerations(tolerationsLabels);
 
   const qualifiedNodes = getNodeTaintQualifier(nodes, nodesLoaded, tolerationsLabels);
 
@@ -74,23 +80,24 @@ const TolerationsModal: FC<TolerationsModalProps> = ({
     const updatedVM = produce<V1VirtualMachine>(vm, (vmDraft: V1VirtualMachine) => {
       ensurePath(vmDraft, 'spec.template.spec.tolerations');
 
-      vmDraft.spec.template.spec.tolerations = toK8sTolerations(tolerationsLabels);
+      vmDraft.spec.template.spec.tolerations = tolerations;
     });
     return updatedVM;
-  }, [tolerationsLabels, vm]);
+  }, [tolerations, vm]);
 
   const isIncomplete = hasIncompleteTolerations(tolerationsLabels);
+  const isDirty = !isEqualObject(tolerations, initialTolerations);
 
   return (
     <TabModal
       headerText={t('Tolerations')}
-      isDisabled={isIncomplete}
+      isDisabled={!isDirty || isIncomplete}
       isOpen={isOpen}
       modalVariant={ModalVariant.medium}
       obj={updatedVirtualMachine}
       onClose={onClose}
       onSubmit={onSubmit}
-      submitDisabledTooltip={getIncompleteTolerationsTooltip(isIncomplete, t)}
+      submitDisabledTooltip={getTolerationsModalSubmitTooltip(isDirty, isIncomplete, t)}
     >
       <Stack hasGutter>
         <StackItem>{vmi && <ModalPendingChangesAlert />}</StackItem>
