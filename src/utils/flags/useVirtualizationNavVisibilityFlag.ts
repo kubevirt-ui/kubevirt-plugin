@@ -21,7 +21,7 @@ import { FLAG_KUBEVIRT_VIRTUALIZATION_NAV, HCO_MANUAL_ROLE_AGGREGATION_STRATEGY 
 
 const useVirtualizationNavVisibilityFlag = (setFeatureFlag: SetFeatureFlag): void => {
   const hcConfiguration = useKubevirtHyperconvergeConfiguration();
-  const { hcConfig, hcLoaded } = hcConfiguration;
+  const { hcConfig, hcError, hcLoaded } = hcConfiguration;
 
   const [projects, projectsLoaded] = useK8sWatchResource<K8sResourceCommon[]>({
     groupVersionKind: modelToGroupVersionKind(ProjectModel),
@@ -65,12 +65,18 @@ const useVirtualizationNavVisibilityFlag = (setFeatureFlag: SetFeatureFlag): voi
   const isAllowed = useMemo(() => allowed.some((accessReview) => accessReview.allowed), [allowed]);
 
   useEffect(() => {
-    if (hcConfiguration.hcError) {
-      setFeatureFlag(FLAG_KUBEVIRT_VIRTUALIZATION_NAV, true);
+    if (hcError) {
+      setFeatureFlag(FLAG_KUBEVIRT_VIRTUALIZATION_NAV, false);
       return;
     }
 
     if (!hcLoaded) return;
+
+    // CNV is not installed — hide local Virtualization nav and perspective.
+    if (isEmpty(hcConfig)) {
+      setFeatureFlag(FLAG_KUBEVIRT_VIRTUALIZATION_NAV, false);
+      return;
+    }
 
     if (!isManualRoleAggregation) {
       setFeatureFlag(FLAG_KUBEVIRT_VIRTUALIZATION_NAV, true);
@@ -91,9 +97,10 @@ const useVirtualizationNavVisibilityFlag = (setFeatureFlag: SetFeatureFlag): voi
   }, [
     setFeatureFlag,
     isAllowed,
+    hcConfig,
     isManualRoleAggregation,
     hcLoaded,
-    hcConfiguration.hcError,
+    hcError,
     accessReviewsLoading,
   ]);
 };

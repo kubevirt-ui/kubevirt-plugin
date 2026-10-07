@@ -4,6 +4,7 @@ import type { EncodedExtension } from '@openshift-console/dynamic-plugin-sdk-web
 
 import {
   FLAG_DISALLOWED_KUBEVIRT_DYNAMIC_ACM,
+  FLAG_KUBEVIRT_DYNAMIC_ACM,
   FLEET_BOOTABLE_VOLUMES_PATH,
   FLEET_CHECKUPS_PATH,
   FLEET_INSTANCETYPES_PATH,
@@ -14,12 +15,11 @@ import {
 } from '../constants';
 
 import { PERSPECTIVES } from '../../utils/constants/constants';
-import { FLAG_KUBEVIRT_VIRTUALIZATION_NAV } from '../../utils/flags/consts';
 
 export const perspectiveExtension: EncodedExtension<Perspective> = {
   flags: {
     disallowed: [FLAG_DISALLOWED_KUBEVIRT_DYNAMIC_ACM],
-    required: [FLAG_KUBEVIRT_VIRTUALIZATION_NAV],
+    required: [FLAG_KUBEVIRT_DYNAMIC_ACM],
   },
   properties: {
     icon: { $codeRef: 'perspective.icon' },
