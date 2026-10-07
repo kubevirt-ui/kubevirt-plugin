@@ -24,6 +24,14 @@ on:
         options:
           - 'false'
           - 'true'
+      force:
+        description: 'Force cleanup even if a live ROKS cluster exists (sets ALLOW_LIVE_CLUSTER_SWEEP)'
+        required: false
+        default: 'false'
+        type: choice
+        options:
+          - 'false'
+          - 'true'
       expected_cluster_count:
         description: >-
           Safety gate (destructive runs only): cluster_name is a PREFIX match, and
@@ -110,6 +118,7 @@ jobs:
         env:
           IC_API_KEY: ${{ secrets.IC_KEY }}
           CLEAN_VPC: ${{ inputs.clean_vpc }}
+          ALLOW_LIVE_CLUSTER_SWEEP: ${{ inputs.force || 'false' }}
         run: bash ./ci-scripts/hot-cluster/cleanup-vpc-resources.sh
 
       - name: Find ROKS clusters
