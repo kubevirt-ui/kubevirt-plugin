@@ -24,9 +24,9 @@ on:
         default: 'us-south-1'
         type: string
       openshift_version:
-        description: 'OpenShift version (e.g. 4.21_openshift)'
+        description: 'OpenShift version (e.g. 4.22_openshift)'
         required: true
-        default: '4.21_openshift'
+        default: '4.22_openshift'
         type: string
       worker_flavor:
         description: 'Worker node flavor (classic: mb4c.4x32; vpc/ipi: bx2.8x32)'
@@ -108,9 +108,9 @@ on:
         default: 'us-south-1'
         type: string
       openshift_version:
-        description: 'OpenShift version (e.g. 4.21_openshift)'
+        description: 'OpenShift version (e.g. 4.22_openshift)'
         required: false
-        default: '4.21_openshift'
+        default: '4.22_openshift'
         type: string
       worker_flavor:
         description: 'Worker node flavor (classic: mb4c.4x32; vpc/ipi: bx2.8x32)'
@@ -495,7 +495,7 @@ jobs:
         env:
           ARC_RUNNER_IMAGE_FILE: ${{ runner.temp }}/arc-runner-image-ref.txt
         run: |
-          OC_VERSION="${{ inputs.openshift_version || '4.21_openshift' }}"
+          OC_VERSION="${{ inputs.openshift_version || '4.22_openshift' }}"
           export OC_VERSION="${OC_VERSION%%_*}"
           ./ci-scripts/hot-cluster/images/setup-arc-runner-image.sh
           IMAGE_REF=$(cat "$ARC_RUNNER_IMAGE_FILE")
