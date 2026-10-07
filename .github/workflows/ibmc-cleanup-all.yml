@@ -109,10 +109,11 @@ jobs:
         working-directory: .github/scripts
         run: npx tsx src/infra/cleanup-busy-check.ts
 
-      # Delegates to the same shared script used by ibmc-cluster-setup.yml
-      # and ibmc-cluster-teardown.yml so all cleanup call sites stay in
-      # sync. No ZONE passed -- "Setup IBM Cloud CLI" above already
-      # targets us-south directly for this workflow.
+      - name: Delete ROKS cluster (force mode)
+        if: inputs.force == 'true' && env.DRY_RUN == 'false'
+        working-directory: ci-scripts/hot-cluster/ts
+        run: npx tsx src/scripts/delete-roks-cluster.ts
+
       - name: Clean up VPC resources for matching prefix
         continue-on-error: true
         env:
