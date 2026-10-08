@@ -12,6 +12,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { modelToGroupVersionKind, NodeModel } from '@kubevirt-utils/models';
 import { getName, getUID } from '@kubevirt-utils/resources/shared';
 import { getCPU } from '@kubevirt-utils/resources/vm';
+import { getNoModalChangesTooltip } from '@kubevirt-utils/utils/text';
 import { ensurePath, isEmpty } from '@kubevirt-utils/utils/utils';
 import MulticlusterResourceLink from '@multicluster/components/MulticlusterResourceLink/MulticlusterResourceLink';
 import { getCluster } from '@multicluster/helpers/selectors';
@@ -40,7 +41,8 @@ const DedicatedResourcesModal: FC<DedicatedResourcesModalProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const cluster = getCluster(vm);
-  const [checked, setChecked] = useState<boolean>(() => !!getCPU(vm)?.dedicatedCpuPlacement);
+  const [initialChecked] = useState<boolean>(() => !!getCPU(vm)?.dedicatedCpuPlacement);
+  const [checked, setChecked] = useState<boolean>(initialChecked);
 
   const [nodes, loaded, loadError] = useK8sWatchData<IoK8sApiCoreV1Node[]>({
     cluster,
@@ -64,14 +66,17 @@ const DedicatedResourcesModal: FC<DedicatedResourcesModalProps> = ({
       }),
     [vm, checked],
   );
+
   return (
     <TabModal
       headerText={headerText}
+      isDisabled={checked === initialChecked}
       isOpen={isOpen}
       obj={updatedVirtualMachine}
       onClose={onClose}
       onSubmit={onSubmit}
       shouldWrapInForm
+      submitDisabledTooltip={getNoModalChangesTooltip(t)}
     >
       {vmi && <ModalPendingChangesAlert />}
       <FormGroup fieldId="dedicated-resources" isInline>

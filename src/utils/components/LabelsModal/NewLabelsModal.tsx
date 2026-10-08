@@ -32,25 +32,26 @@ const NewLabelsModal: FC<NewLabelsModalProps> = ({
     autoAppliedKeys,
     existingKeys,
     handleSubmit,
-    hasEmptyKeys,
-    hasValidationErrors,
     initialKeys,
+    isSubmitDisabled,
     keyProtectedIds,
     labels,
     onLabelAdd,
     onLabelChange,
     onLabelDelete,
+    submitDisabledTooltip,
     valueProtectedIds,
   } = useLabelsModalState({ autoAppliedLabels, initialLabels, obj, onLabelsSubmit });
 
   return (
     <TabModal
       headerText={t('Edit labels')}
-      isDisabled={hasEmptyKeys || hasValidationErrors}
+      isDisabled={isSubmitDisabled}
       isOpen={isOpen}
       obj={obj}
       onClose={onClose}
       onSubmit={handleSubmit}
+      submitDisabledTooltip={submitDisabledTooltip}
     >
       <Stack hasGutter>
         <StackItem>

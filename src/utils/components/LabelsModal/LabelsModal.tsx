@@ -4,6 +4,7 @@ import TagsInput from 'react-tagsinput';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { logVMLabelsCollectedIfVirtualMachine } from '@kubevirt-utils/extensions/telemetry/labels';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getNoModalChangesTooltip } from '@kubevirt-utils/utils/text';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { type K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { Label as PFLabel, Stack, StackItem, Truncate } from '@patternfly/react-core';
@@ -57,7 +58,10 @@ export const LabelsModal: FC<LabelsModalProps> = memo(
       return {};
     }, [initialLabels, obj?.metadata?.labels]);
 
-    const [labels, setLabels] = useState<string[]>(() => labelsToArray(initLabels));
+    const [initialLabelsArray] = useState<string[]>(() => labelsToArray(initLabels));
+    const [labels, setLabels] = useState<string[]>(initialLabelsArray);
+
+    const isLabelsUnchanged = JSON.stringify(labels) === JSON.stringify(initialLabelsArray);
 
     const onInputChange = (e: ChangeEvent<HTMLInputElement>): void => {
       const value = e.target.value;
@@ -119,10 +123,12 @@ export const LabelsModal: FC<LabelsModalProps> = memo(
     return (
       <TabModal
         headerText={t('Edit labels')}
+        isDisabled={isLabelsUnchanged}
         isOpen={isOpen}
         obj={obj}
         onClose={onClose}
         onSubmit={handleSubmit}
+        submitDisabledTooltip={getNoModalChangesTooltip(t)}
       >
         <Stack hasGutter>
           <StackItem>

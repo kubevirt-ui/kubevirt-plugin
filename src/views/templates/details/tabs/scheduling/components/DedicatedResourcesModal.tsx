@@ -15,6 +15,7 @@ import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { modelToGroupVersionKind, NodeModel } from '@kubevirt-utils/models';
 import { getTemplateVirtualMachineObject, type Template } from '@kubevirt-utils/resources/template';
+import { getNoModalChangesTooltip } from '@kubevirt-utils/utils/text';
 import { ensurePath, isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { ResourceLink, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
@@ -44,7 +45,8 @@ const DedicatedResourcesModal: FC<DedicatedResourcesModalProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const cluster = getCluster(template);
-  const [checked, setChecked] = useState<boolean>(() => isDedicatedCPUPlacement(template));
+  const [initialChecked] = useState<boolean>(() => isDedicatedCPUPlacement(template));
+  const [checked, setChecked] = useState<boolean>(initialChecked);
   const [nodes, nodesLoaded, loadError] = useK8sWatchResource<IoK8sApiCoreV1Node[]>({
     groupVersionKind: modelToGroupVersionKind(NodeModel),
     isList: true,
@@ -71,11 +73,13 @@ const DedicatedResourcesModal: FC<DedicatedResourcesModalProps> = ({
   return (
     <TabModal
       headerText={t('Dedicated resources')}
+      isDisabled={checked === initialChecked}
       isOpen={isOpen}
       obj={updatedTemplate}
       onClose={onClose}
       onSubmit={onSubmit}
       shouldWrapInForm
+      submitDisabledTooltip={getNoModalChangesTooltip(t)}
     >
       <FormGroup fieldId="dedicated-resources" isInline>
         <Checkbox

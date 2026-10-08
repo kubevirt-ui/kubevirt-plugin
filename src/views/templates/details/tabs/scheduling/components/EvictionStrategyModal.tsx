@@ -1,4 +1,4 @@
-import { type FC, useEffect, useMemo, useState } from 'react';
+import { type FC, useMemo, useState } from 'react';
 import produce from 'immer';
 import { getEvictionStrategy } from 'src/views/templates/utils/selectors';
 
@@ -12,6 +12,8 @@ import useHyperConvergeConfiguration from '@kubevirt-utils/hooks/useHyperConverg
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getEvictionStrategy as getHCOEvictionStrategy } from '@kubevirt-utils/resources/hyperconverged/selectors';
 import { getTemplateVirtualMachineObject, type Template } from '@kubevirt-utils/resources/template';
+import { getNoModalChangesTooltip } from '@kubevirt-utils/utils/text';
+import { ensurePath } from '@kubevirt-utils/utils/utils';
 import { Checkbox, FormGroup } from '@patternfly/react-core';
 
 type EvictionStrategyModalProps = {
@@ -29,51 +31,55 @@ const EvictionStrategyModal: FC<EvictionStrategyModalProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const templateEvictionStrategy = getEvictionStrategy(template);
-
-  const [isChecked, setIsChecked] = useState<boolean>(
-    templateEvictionStrategy === EVICTION_STRATEGIES.LiveMigrate,
-  );
-
   const [hyperConverge, hyperLoaded, hyperLoadingError] = useHyperConvergeConfiguration();
 
-  useEffect(() => {
-    if (templateEvictionStrategy || hyperLoadingError || !hyperLoaded) return;
+  const initialIsChecked = useMemo(() => {
+    if (templateEvictionStrategy || hyperLoadingError || !hyperLoaded) {
+      return templateEvictionStrategy === EVICTION_STRATEGIES.LiveMigrate;
+    }
 
     const hcoEvictionStrategy = getHCOEvictionStrategy(hyperConverge);
     if (hcoEvictionStrategy) {
-      setIsChecked(hcoEvictionStrategy === EVICTION_STRATEGIES.LiveMigrate);
-      return;
+      return hcoEvictionStrategy === EVICTION_STRATEGIES.LiveMigrate;
     }
 
-    setIsChecked(EVICTION_STRATEGY_DEFAULT === EVICTION_STRATEGIES.LiveMigrate);
+    return EVICTION_STRATEGY_DEFAULT === EVICTION_STRATEGIES.LiveMigrate;
   }, [hyperConverge, hyperLoaded, hyperLoadingError, templateEvictionStrategy]);
+
+  const [userChecked, setUserChecked] = useState<boolean | undefined>(undefined);
+  const isChecked = userChecked ?? initialIsChecked;
+
+  const isInitialStable =
+    Boolean(templateEvictionStrategy) || hyperLoaded || Boolean(hyperLoadingError);
+  const noChangesMade = isInitialStable && isChecked === initialIsChecked;
 
   const updatedTemplate = useMemo(() => {
     return produce<Template>(template, (templateDraft: Template) => {
       const draftVM = getTemplateVirtualMachineObject(templateDraft);
-      if (isChecked) {
-        draftVM.spec.template.spec.evictionStrategy = EVICTION_STRATEGIES.LiveMigrate;
-      } else {
-        draftVM.spec.template.spec.evictionStrategy = EVICTION_STRATEGIES.None;
-      }
+      ensurePath(draftVM, 'spec.template.spec');
+      draftVM.spec.template.spec.evictionStrategy = isChecked
+        ? EVICTION_STRATEGIES.LiveMigrate
+        : EVICTION_STRATEGIES.None;
     });
   }, [isChecked, template]);
 
   return (
     <TabModal
       headerText={t('Eviction strategy')}
+      isDisabled={noChangesMade}
       isOpen={isOpen}
       obj={updatedTemplate}
       onClose={onClose}
       onSubmit={onSubmit}
       shouldWrapInForm
+      submitDisabledTooltip={getNoModalChangesTooltip(t)}
     >
       <FormGroup fieldId="eviction-strategy" isInline>
         <Checkbox
           id="eviction-strategy"
           isChecked={isChecked}
           label={t('LiveMigrate')}
-          onChange={(_event, val) => setIsChecked(val)}
+          onChange={(_event, val) => setUserChecked(val)}
         />
         <FormGroupHelperText>
           {t(

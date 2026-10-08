@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 
+import { isEqualObject } from '@kubevirt-utils/components/NodeSelectorModal/utils/helpers';
 import { logVMLabelsCollectedIfVirtualMachine } from '@kubevirt-utils/extensions/telemetry/labels';
 import { type AutoAppliedLabel } from '@kubevirt-utils/hooks/useAutoAppliedLabels/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -8,6 +9,7 @@ import {
   hasDuplicateKeys,
   validateLabelEntry,
 } from '@kubevirt-utils/utils/labelValidation/labelValidation';
+import { getNoModalChangesTooltip } from '@kubevirt-utils/utils/text';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { type K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
@@ -25,14 +27,14 @@ type UseLabelsModalStateReturn = {
   autoAppliedKeys: Set<string>;
   existingKeys: string[];
   handleSubmit: () => Promise<unknown>;
-  hasEmptyKeys: boolean;
-  hasValidationErrors: boolean;
   initialKeys: Set<string>;
+  isSubmitDisabled: boolean;
   keyProtectedIds: Set<number>;
   labels: LabelEntry[];
   onLabelAdd: () => void;
   onLabelChange: (entryId: number, updated: { key: string; value: string }) => void;
   onLabelDelete: (entryId: number) => void;
+  submitDisabledTooltip: string | undefined;
   valueProtectedIds: Set<number>;
 };
 
@@ -85,6 +87,20 @@ const useLabelsModalState = ({
     [labels, t, initialKeys, existingKeys, autoAppliedKeys],
   );
 
+  const isDirty = useMemo(() => {
+    const currentLabels = entriesToLabels(labels.filter(({ key }) => key.trim()));
+    return !isEqualObject(currentLabels, initLabels);
+  }, [labels, initLabels]);
+
+  const isSubmitDisabled = !isDirty || hasEmptyKeys || hasValidationErrors;
+
+  const submitDisabledTooltip = useMemo(() => {
+    if (!isDirty) return getNoModalChangesTooltip(t);
+    if (hasEmptyKeys) return t('Label key is required');
+    if (hasValidationErrors) return t('Please fix the validation errors');
+    return undefined;
+  }, [isDirty, hasEmptyKeys, hasValidationErrors, t]);
+
   const onLabelAdd = (): void => {
     const nextId = labels.length ? labels[labels.length - 1].id + 1 : 0;
     setLabels([...labels, { id: nextId, key: '', value: '' }]);
@@ -112,14 +128,14 @@ const useLabelsModalState = ({
     autoAppliedKeys,
     existingKeys,
     handleSubmit,
-    hasEmptyKeys,
-    hasValidationErrors,
     initialKeys,
+    isSubmitDisabled,
     keyProtectedIds,
     labels,
     onLabelAdd,
     onLabelChange,
     onLabelDelete,
+    submitDisabledTooltip,
     valueProtectedIds,
   };
 };
