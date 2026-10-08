@@ -1,153 +1,67 @@
-import { type FC, useMemo, useState } from 'react';
-import { Link } from 'react-router';
-import produce from 'immer';
+import { type ReactNode, useState } from 'react';
 
 import { type IoK8sApiCoreV1Node } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
-import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { getDedicatedResourcesSearchHREF } from '@kubevirt-utils/components/DedicatedResourcesModal/utils/utils';
-import Loading from '@kubevirt-utils/components/Loading/Loading';
 import ModalPendingChangesAlert from '@kubevirt-utils/components/PendingChanges/ModalPendingChangesAlert/ModalPendingChangesAlert';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { modelToGroupVersionKind, NodeModel } from '@kubevirt-utils/models';
-import { getName, getUID } from '@kubevirt-utils/resources/shared';
-import { getCPU } from '@kubevirt-utils/resources/vm';
 import { getNoModalChangesTooltip } from '@kubevirt-utils/utils/text';
-import { ensurePath, isEmpty } from '@kubevirt-utils/utils/utils';
-import MulticlusterResourceLink from '@multicluster/components/MulticlusterResourceLink/MulticlusterResourceLink';
 import { getCluster } from '@multicluster/helpers/selectors';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
-import {
-  Alert,
-  AlertVariant,
-  Button,
-  ButtonVariant,
-  Checkbox,
-  FormGroup,
-  Label,
-  Popover,
-} from '@patternfly/react-core';
+import { type K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
-import { cpuManagerLabel, cpuManagerLabelKey, cpuManagerLabelValue } from './utils/constants';
-import { type DedicatedResourcesModalProps } from './utils/types';
+import DedicatedResourcesModalBody from './components/DedicatedResourcesModalBody';
 
-const DedicatedResourcesModal: FC<DedicatedResourcesModalProps> = ({
-  headerText,
+type DedicatedResourcesModalProps<T extends K8sResourceCommon = K8sResourceCommon> = {
+  initialChecked: boolean;
+  isOpen: boolean;
+  onClose: () => void;
+  onSubmit: (updatedResource: T) => Promise<T | void>;
+  produceUpdatedResource: (checked: boolean) => T;
+  showPendingChangesAlert?: boolean;
+};
+
+const DedicatedResourcesModal = <T extends K8sResourceCommon>({
+  initialChecked,
   isOpen,
   onClose,
   onSubmit,
-  vm,
-  vmi,
-}) => {
+  produceUpdatedResource,
+  showPendingChangesAlert,
+}: DedicatedResourcesModalProps<T>): ReactNode => {
   const { t } = useKubevirtTranslation();
-  const cluster = getCluster(vm);
-  const [initialChecked] = useState<boolean>(() => !!getCPU(vm)?.dedicatedCpuPlacement);
   const [checked, setChecked] = useState<boolean>(initialChecked);
+
+  const updatedResource = produceUpdatedResource(checked);
+
+  const cluster = getCluster(updatedResource);
 
   const [nodes, loaded, loadError] = useK8sWatchData<IoK8sApiCoreV1Node[]>({
     cluster,
     groupVersionKind: modelToGroupVersionKind(NodeModel),
     isList: true,
   });
-  const { hasNodes, qualifiedNodes } = useMemo(() => {
-    const filteredNodes = nodes?.filter(
-      (node) => node?.metadata?.labels?.[cpuManagerLabelKey] === cpuManagerLabelValue,
-    );
-    return {
-      hasNodes: !!filteredNodes?.length,
-      qualifiedNodes: filteredNodes,
-    };
-  }, [nodes]);
-  const updatedVirtualMachine = useMemo(
-    () =>
-      produce<V1VirtualMachine>(vm, (vmDraft: V1VirtualMachine) => {
-        ensurePath(vmDraft, ['spec.template.spec.domain.cpu']);
-        vmDraft.spec.template.spec.domain.cpu.dedicatedCpuPlacement = checked;
-      }),
-    [vm, checked],
-  );
 
   return (
-    <TabModal
-      headerText={headerText}
+    <TabModal<T>
+      headerText={t('Dedicated resources')}
       isDisabled={checked === initialChecked}
       isOpen={isOpen}
-      obj={updatedVirtualMachine}
+      obj={updatedResource}
       onClose={onClose}
       onSubmit={onSubmit}
       shouldWrapInForm
       submitDisabledTooltip={getNoModalChangesTooltip(t)}
     >
-      {vmi && <ModalPendingChangesAlert />}
-      <FormGroup fieldId="dedicated-resources" isInline>
-        <Checkbox
-          description={
-            <>
-              {t('Available only on Nodes with labels')}{' '}
-              <Label className="pf-v6-u-ml-xs" color="purple" variant="outline">
-                {!isEmpty(nodes) ? (
-                  <Link target="_blank" to={getDedicatedResourcesSearchHREF(cluster)}>
-                    {cpuManagerLabel}
-                  </Link>
-                ) : (
-                  cpuManagerLabel
-                )}
-              </Label>
-            </>
-          }
-          id="dedicated-resources"
-          isChecked={checked}
-          label={t('Schedule this workload with dedicated resources (guaranteed policy)')}
-          onChange={(_event, val) => setChecked(val)}
-        />
-      </FormGroup>
-      <FormGroup fieldId="dedicated-resources-node">
-        {!isEmpty(nodes) ? (
-          <Alert
-            isInline
-            title={
-              hasNodes
-                ? t('{{qualifiedNodesCount}} matching nodes found', {
-                    qualifiedNodesCount: qualifiedNodes?.length,
-                  })
-                : t('No matching nodes found for the {{cpuManagerLabel}} label', {
-                    cpuManagerLabel,
-                  })
-            }
-            variant={hasNodes ? AlertVariant.success : AlertVariant.warning}
-          >
-            {hasNodes ? (
-              <Popover
-                bodyContent={
-                  <>
-                    {qualifiedNodes?.map((node) => (
-                      <MulticlusterResourceLink
-                        cluster={getCluster(node)}
-                        groupVersionKind={modelToGroupVersionKind(NodeModel)}
-                        key={getUID(node)}
-                        name={getName(node)}
-                      />
-                    ))}
-                  </>
-                }
-                headerContent={t('{{qualifiedNodesCount}} nodes found', {
-                  qualifiedNodesCount: qualifiedNodes?.length,
-                })}
-              >
-                <Button isInline onClick={() => setChecked(false)} variant={ButtonVariant.link}>
-                  {t('view {{qualifiedNodesCount}} matching nodes', {
-                    qualifiedNodesCount: qualifiedNodes?.length,
-                  })}
-                </Button>
-              </Popover>
-            ) : (
-              t('Scheduling will not be possible at this state')
-            )}
-          </Alert>
-        ) : (
-          !loaded && !loadError && <Loading />
-        )}
-      </FormGroup>
+      {showPendingChangesAlert && <ModalPendingChangesAlert />}
+      <DedicatedResourcesModalBody
+        checked={checked}
+        cluster={cluster}
+        loadError={loadError}
+        nodes={nodes}
+        nodesLoaded={loaded}
+        onCheckedChange={setChecked}
+      />
     </TabModal>
   );
 };
