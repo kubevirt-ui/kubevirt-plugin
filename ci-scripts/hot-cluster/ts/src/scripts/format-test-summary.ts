@@ -6,6 +6,14 @@
  * prefix the project name back onto the testDir-relative path it reports.
  */
 
+import {
+  resolveCommitUrl,
+  resolvePrUrlForEnvironment,
+  type TestRunEnvironment,
+} from './resolve-test-run-environment';
+
+export type { TestRunEnvironment };
+
 const decode = (text: string): string =>
   text
     .replace(/&amp;/g, '&')
@@ -150,8 +158,80 @@ const formatFailedSection = (failedSpecs: SpecSummary[]): string => {
 const formatSpecPathList = (title: string, specs: SpecSummary[]): string =>
   [`### ${title}`, ...specs.map((spec) => `- \`${spec.path}\``)].join('\n');
 
+type EnvironmentRow = {
+  href?: string;
+  label: string;
+  value: string;
+};
+
+const formatEnvironmentValue = (row: EnvironmentRow): string =>
+  row.href ? `[${row.value}](${row.href})` : `\`${row.value}\``;
+
+const formatEnvironmentSection = (environment: TestRunEnvironment): string | undefined => {
+  const consoleUrl = environment.consoleRoute ?? environment.bridgeBaseAddress;
+  const prUrl = resolvePrUrlForEnvironment(environment);
+  const commitUrl = resolveCommitUrl(environment);
+
+  const rows: Array<EnvironmentRow | undefined> = [
+    environment.workflowRunUrl && environment.workflowRunLabel
+      ? { href: environment.workflowRunUrl, label: 'Workflow', value: environment.workflowRunLabel }
+      : undefined,
+    environment.gitSha
+      ? { href: commitUrl, label: 'Git SHA', value: environment.gitSha }
+      : undefined,
+    environment.prNumber
+      ? {
+          href: environment.prUrl ?? prUrl,
+          label: 'PR',
+          value: `#${environment.prNumber}`,
+        }
+      : undefined,
+    environment.checkoutRef
+      ? { label: 'Checkout ref', value: environment.checkoutRef }
+      : undefined,
+    environment.clusterName ? { label: 'Cluster', value: environment.clusterName } : undefined,
+    environment.runnerLabel ? { label: 'Runner', value: environment.runnerLabel } : undefined,
+    environment.infrastructureType
+      ? { label: 'Infrastructure', value: environment.infrastructureType }
+      : undefined,
+    environment.openshiftVersion
+      ? { label: 'OpenShift (target)', value: environment.openshiftVersion }
+      : undefined,
+    environment.openshiftClusterVersion
+      ? { label: 'OpenShift (cluster)', value: environment.openshiftClusterVersion }
+      : undefined,
+    environment.cnvChannel ? { label: 'CNV channel', value: environment.cnvChannel } : undefined,
+    environment.cnvPinVersion ? { label: 'CNV pin', value: environment.cnvPinVersion } : undefined,
+    environment.cnvVersion ? { label: 'KubeVirt (cluster)', value: environment.cnvVersion } : undefined,
+    environment.testEngine ? { label: 'Engine', value: environment.testEngine } : undefined,
+    environment.testProject ? { label: 'Suite', value: environment.testProject } : undefined,
+    environment.testArgs ? { label: 'Test args', value: environment.testArgs } : undefined,
+    environment.testNamespace ? { label: 'Namespace', value: environment.testNamespace } : undefined,
+    consoleUrl ? { label: 'Console', value: consoleUrl } : undefined,
+    environment.consoleImage ? { label: 'Console image', value: environment.consoleImage } : undefined,
+    environment.pluginImage ? { label: 'Plugin image', value: environment.pluginImage } : undefined,
+  ];
+
+  const definedRows = rows.filter((row): row is EnvironmentRow => Boolean(row?.value));
+
+  if (definedRows.length === 0) {
+    return undefined;
+  }
+
+  return [
+    '### Environment',
+    '',
+    '| Setting | Value |',
+    '| --- | --- |',
+    ...definedRows.map((row) => `| ${row.label} | ${formatEnvironmentValue(row)} |`),
+  ].join('\n');
+};
+
 /** Format a parsed JUnit summary as a spec-grouped pass/fail markdown block. */
-export const formatTestSummary = (summary: JUnitSummary): string => {
+export const formatTestSummary = (
+  summary: JUnitSummary,
+  environment: TestRunEnvironment = {},
+): string => {
   if (summary.specs.length === 0) {
     return '';
   }
@@ -162,7 +242,9 @@ export const formatTestSummary = (summary: JUnitSummary): string => {
     (spec) => spec.failed === 0 && spec.passed === 0 && spec.skipped > 0,
   );
 
-  const sections = [formatHeader(summary)];
+  const sections = [formatEnvironmentSection(environment), formatHeader(summary)].filter(
+    (section): section is string => Boolean(section),
+  );
   if (failedSpecs.length > 0) {
     sections.push(formatFailedSection(failedSpecs));
   }

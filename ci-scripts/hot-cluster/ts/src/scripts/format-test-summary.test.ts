@@ -197,6 +197,46 @@ describe('formatTestSummary', () => {
     assert.ok(markdown.includes('test 24'));
   });
 
+  it('prepends an Environment section when run metadata is provided', () => {
+    const markdown = formatTestSummary(parseJUnitSummary(ALL_PASSING_XML), {
+      cnvChannel: 'stable',
+      cnvPinVersion: '4.21',
+      cnvVersion: 'v1.4.0',
+      clusterName: 'kubevirt-plugin-ci',
+      consoleImage: 'quay.io/openshift/origin-console:5.0',
+      consoleRoute: 'https://ci-env-123-console.apps.example.com',
+      gitSha: 'abc1234',
+      infrastructureType: 'vpc',
+      openshiftClusterVersion: '4.21.5',
+      openshiftVersion: '4.21_openshift',
+      prNumber: '4567',
+      prUrl: 'https://github.com/org/repo/pull/4567',
+      testEngine: 'playwright',
+      testNamespace: 'kubevirt-plugin-ci-test-123',
+      testProject: 'gating',
+      workflowRunLabel: '#99',
+      workflowRunUrl: 'https://github.com/org/repo/actions/runs/99',
+    });
+
+    assert.match(markdown, /### Environment/);
+    assert.match(markdown, /\| Workflow \| \[#99\]\(https:\/\/github\.com\/org\/repo\/actions\/runs\/99\) \|/);
+    assert.match(markdown, /\| Git SHA \| `abc1234` \|/);
+    assert.match(markdown, /\| PR \| \[#4567\]/);
+    assert.match(markdown, /\| Cluster \| `kubevirt-plugin-ci` \|/);
+    assert.match(markdown, /\| Infrastructure \| `vpc` \|/);
+    assert.match(markdown, /\| OpenShift \(target\) \| `4\.21_openshift` \|/);
+    assert.match(markdown, /\| OpenShift \(cluster\) \| `4\.21\.5` \|/);
+    assert.match(markdown, /\| CNV channel \| `stable` \|/);
+    assert.match(markdown, /\| KubeVirt \(cluster\) \| `v1\.4\.0` \|/);
+    assert.match(markdown, /\| Console image \| `quay\.io\/openshift\/origin-console:5\.0` \|/);
+    assert.match(markdown, /### Passed/);
+  });
+
+  it('omits the Environment section when no run metadata is provided', () => {
+    const markdown = formatTestSummary(parseJUnitSummary(ALL_PASSING_XML));
+    assert.ok(!markdown.includes('### Environment'));
+  });
+
   it('sanitizes newlines and backticks in failing test names and messages', () => {
     const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <testsuites id="" name="" tests="1" failures="1" skipped="0" errors="0" time="1.0">
