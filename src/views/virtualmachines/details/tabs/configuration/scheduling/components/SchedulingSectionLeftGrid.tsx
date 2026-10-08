@@ -15,7 +15,9 @@ import NodeSelectorModal from '@kubevirt-utils/components/NodeSelectorModal/Node
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import Tolerations from '@kubevirt-utils/components/Tolerations/Tolerations';
 import TolerationsModal from '@kubevirt-utils/components/TolerationsModal/TolerationsModal';
+import { produceVMWithTolerations } from '@kubevirt-utils/components/TolerationsModal/utils/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getTolerations } from '@kubevirt-utils/resources/vm';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sUpdate } from '@multicluster/k8sRequests';
@@ -86,15 +88,14 @@ const SchedulingSectionLeftGrid: FC<SchedulingSectionLeftGridProps> = ({
           descriptionHeader={<SearchItem id="tolerations">{t('Tolerations')}</SearchItem>}
           isEdit={canUpdateVM}
           onEditClick={() =>
-            createModal(({ isOpen, onClose }) => (
+            createModal?.(({ isOpen, onClose }) => (
               <TolerationsModal
+                initialTolerationsProp={getTolerations(vm)}
                 isOpen={isOpen}
-                nodes={nodes}
-                nodesLoaded={nodesLoaded}
                 onClose={onClose}
                 onSubmit={onSubmit}
-                vm={vm}
-                vmi={vmi}
+                produceUpdatedResource={(tolerations) => produceVMWithTolerations(vm, tolerations)}
+                showPendingChangesAlert={!!vmi}
               />
             ))
           }
