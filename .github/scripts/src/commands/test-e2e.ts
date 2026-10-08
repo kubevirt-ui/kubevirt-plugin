@@ -7,8 +7,8 @@
  *   /test-e2e tier1
  *   /test-e2e tier2
  *   /test-e2e suite
- *   /test-e2e tier1 playwright/tests/tier1/foo.spec.ts
- *   /test-e2e playwright/tests/tier1/foo.spec.ts
+ *   /test-e2e tier1 playwright/tests/bootable-volumes/bootable-volumes.spec.ts
+ *   /test-e2e playwright/tests/virtual-machines/list/vm-list-page-load.spec.ts
  *   /test-e2e gating -g MyTestName
  *   /test-e2e -g "creates a bootable volume"
  *   /test-e2e tier1 -g "VM Search Language"
@@ -60,20 +60,26 @@ const main = async (): Promise<void> => {
           '',
           'Usage:',
           '- `/test-e2e <suite> [playwright-args…]`',
-          '- `/test-e2e <spec-path>`',
+          '- `/test-e2e <spec-path>` (under `playwright/tests/<route>/…`)',
           '- `/test-e2e -g "test title"`',
           '',
-          `Suites: \`${VALID_TEST_E2E_PROJECTS.join('` · `')}\``,
+          `Suites (Playwright projects / \`@tag\` filters): \`${VALID_TEST_E2E_PROJECTS.join('` · `')}\``,
+          '',
+          'Specs are grouped by console route (not tier folders), e.g. `virtual-machines/`, `vm-wizard/`, `virtualization-settings/`.',
           '',
           'Examples:',
           '- `/test-e2e tier1`',
           '- `/test-e2e tier2`',
           '- `/test-e2e suite`',
-          '- `/test-e2e tier1 playwright/tests/tier1/foo.spec.ts`',
-          '- `/test-e2e playwright/tests/tier1/bootable-volumes/bootable-volumes.spec.ts`',
+          '- `/test-e2e gating`',
+          '- `/test-e2e tier1 playwright/tests/bootable-volumes/bootable-volumes.spec.ts`',
+          '- `/test-e2e playwright/tests/virtual-machines/list/vm-search-language.spec.ts`',
+          '- `/test-e2e settings playwright/tests/virtualization-settings/cluster-settings.spec.ts`',
           '- `/test-e2e gating -g MyTestName`',
           '- `/test-e2e -g "creates a bootable volume"`',
           '- `/test-e2e tier1 -g "VM Search Language"`',
+          '- `/test-e2e auto -g @route-vm-wizard`',
+          '- `/test-e2e Tier1 -g @route-virtual-machines-list`',
         ].join('\n'),
         issue_number: prNumber,
         owner,

@@ -443,7 +443,7 @@ jobs:
       - name: Run E2E tests
         env:
           BRIDGE_BASE_ADDRESS: ${{ steps.ci-env.outputs.bridge-base-address }}
-          TEST_PROJECT: ${{ inputs.test_project }}
+          TEST_PROJECT: ${{ inputs.test_project || 'gating' }}
           TEST_ARGS: ${{ inputs.test_args || '' }}
         working-directory: ci-scripts/hot-cluster/ts
         run: npx tsx src/scripts/run-gating-tests.ts

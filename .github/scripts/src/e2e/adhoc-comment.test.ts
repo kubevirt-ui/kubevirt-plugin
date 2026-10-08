@@ -37,11 +37,11 @@ describe('buildAdHocResultComment', () => {
       ...baseParams,
       passed: false,
       testArgs:
-        'playwright/tests/tier1/a.spec.ts playwright/tests/tier1/b.spec.ts playwright/tests/tier2/c.spec.ts',
+        'playwright/tests/vm-wizard/a.spec.ts playwright/tests/virtual-machines/list/b.spec.ts playwright/tests/api/c.spec.ts',
       testFailureSummary: '',
     });
     assert.match(body, /no JUnit results found/);
-    assert.ok(!body.includes('playwright/tests/tier1/a.spec.ts'));
+    assert.ok(!body.includes('playwright/tests/vm-wizard/a.spec.ts'));
   });
 
   it('surfaces a -g filter but never a multi-path file list', () => {
@@ -56,11 +56,12 @@ describe('buildAdHocResultComment', () => {
     const multiPath = buildAdHocResultComment({
       ...baseParams,
       passed: false,
-      testArgs: 'playwright/tests/tier1/a.spec.ts playwright/tests/tier1/b.spec.ts',
+      testArgs:
+        'playwright/tests/vm-wizard/a.spec.ts playwright/tests/virtual-machines/list/b.spec.ts',
       testFailureSummary: '**1** of **2** tests failed, **1** passed',
     });
     assert.ok(!multiPath.includes('Filter:'));
-    assert.ok(!multiPath.includes('playwright/tests/tier1/a.spec.ts'));
+    assert.ok(!multiPath.includes('playwright/tests/vm-wizard/a.spec.ts'));
   });
 
   it('shows the suite title for a non-auto project', () => {

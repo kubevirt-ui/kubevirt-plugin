@@ -180,7 +180,7 @@ npm test                       # Unit tests
 npm run test-cypress           # Cypress E2E tests (interactive)
 npm run test-cypress-headless  # Cypress E2E tests (CI)
 USE_SCENARIO_INFRA=true npm run test-playwright -- --project=scenario  # Scenario tests
-npm run test-playwright -- --project=setup --project=Gating            # Gating tests
+IS_LOCAL=1 ./playwright-runner-hc-e2e.sh Gating --workers=4   # Local HC E2E (nvm + .env)
 ```
 
 ---

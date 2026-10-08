@@ -4,6 +4,8 @@
  * Import from this file in all spec files for withAllure({ suite, feature, tags })
  * and for test.describe({ tag: [...] }) tier/feature-area tags.
  *
+ * Route folder tags (`@route-*`) live in `@/data-models/route-tags` — use both tier and route tags on describes.
+ *
  * Never use raw string literals for these values — always reference a constant.
  */
 

@@ -25,57 +25,48 @@ Without `--local`, locator discovery relies on the live UI via Playwright MCP (`
 
 ## Architecture
 
-### Test Tiers and Directories
+### Test cycles (tags) and route folders
 
-| Tier     | Directory                | Fixture source                | Project name | Tags            | Scope                                                                                                                   |
-| -------- | ------------------------ | ----------------------------- | ------------ | --------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| Gating   | `tests/gating/`          | `@/fixtures/gating-fixture`   | `Gating`     | `@gating`       | Page load verification; resource creation (form + YAML); VM search and tree filters (no VM boot)                        |
-| Tier 1   | `tests/tier1/<feature>/` | Per-feature fixture           | `Tier1`      | `@tier1`        | Single-resource CRUD lifecycle per module (templates, BVs, instance types, migration policies); must NOT overlap gating |
-| Tier 2   | `tests/tier2/<feature>/` | Per-feature fixture           | `Tier2`      | `@tier2`        | Cross-module integration (BV→VM wizard, snapshot→clone); VM live/storage migration; multi-step workflows                |
-| Settings | `tests/settings/`        | `@/fixtures/settings-fixture` | `Settings`   | `@cnv-settings` | Cluster and user settings pages                                                                                         |
-| API      | `tests/api/`             | `@/fixtures/api-test-fixture` | `API`        | `@api`          | API contract tests — CRUD lifecycle and endpoint validation via `RequestContextClient` (no browser UI)                  |
+Pick the **route folder** from the console page under test. Pick the **CI cycle** with Playwright tags on `test.describe` (`@gating`, `@tier1`, `@tier2`, `@cnv-settings`). Every `test.describe` (and `gatingTest.describe` / `scenarioTest.describe`) must also include the matching **route tag** from `@/data-models/route-tags` (e.g. `ROUTE_VM_WIZARD_TAG` → `@route-vm-wizard`) so you can filter by route: `./playwright-runner-hc-e2e.sh Tier1 -g @route-bootable-volumes`.
+
+| Cycle    | Project (`grep`) | Tags            | Fixture (typical)             | Scope                                                                                                                   |
+| -------- | ---------------- | --------------- | ----------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| Gating   | `Gating`         | `@gating`       | `@/fixtures/gating-fixture`   | Page load verification; resource creation (form + YAML); VM search and tree filters (no VM boot)                        |
+| Tier 1   | `Tier1`          | `@tier1`        | Per-feature fixture           | Single-resource CRUD lifecycle per module (templates, BVs, instance types, migration policies); must NOT overlap gating |
+| Tier 2   | `Tier2`          | `@tier2`        | Per-feature fixture           | Cross-module integration (BV→VM wizard, snapshot→clone); VM live/storage migration; multi-step workflows                |
+| Settings | `Settings`       | `@cnv-settings` | `@/fixtures/settings-fixture` | Cluster and user settings pages                                                                                         |
+| API      | `API`            | `@api`          | `@/fixtures/api-test-fixture` | API contract tests — CRUD lifecycle and endpoint validation via `RequestContextClient` (no browser UI)                  |
 
 ### Where to place a new test
 
-1. **Does it verify a page loads and shows expected content?** → **Gating** (add to existing `scenario-virtualization-pages.spec.ts`)
-2. **Does it create a resource via form or YAML?** → Check if gating already has it; if not, add to gating's `scenario-resource-creation.spec.ts`. If it's a full CRUD lifecycle, add to **Tier 1**.
-3. **Does it test VM search language, tree view or filters?** → **Gating** under `tests/gating/virtualmachines/`
-4. **Does it test VM tabs, lifecycle/delete, disks/CD-ROM, or list alerts?** → **Tier 1** under `tests/tier1/virtualmachines/`
-5. **Does it test a single resource's lifecycle (create → configure → verify → delete)?** → **Tier 1** under `tests/tier1/<feature>/`
-6. **Does it test cross-module integration, multi-resource workflows, or migration?** → **Tier 2** under `tests/tier2/<feature>/`
-7. **Does it test cluster or user settings?** → **Settings** under `tests/settings/`
+1. **Does it verify a page loads and shows expected content?** → Tag `@gating`; add to a scope-named file in the route folder (e.g. `bootable-volumes-page-load.spec.ts`).
+2. **Does it create a resource via form or YAML?** → Tag `@gating` in a scope-named create spec (e.g. `bootable-volumes-create-yaml.spec.ts`); full CRUD lifecycle → `@tier1` in the same route folder.
+3. **Does it test VM search language, tree view or filters?** → `@gating` under `tests/virtual-machines/list/`
+4. **Does it test VM tabs, lifecycle/delete, disks/CD-ROM, or list alerts?** → `@tier1` under `tests/virtual-machines/detail/*`, `actions/`, or `list/`
+5. **Does it test a single resource's lifecycle (create → configure → verify → delete)?** → `@tier1` under the route folder (`bootable-volumes/`, `vm-templates/`, etc.)
+6. **Does it test cross-module integration, multi-resource workflows, or migration?** → `@tier2` under the primary route folder (e.g. `virtual-machines/migrations/`, `vm-wizard/`)
+7. **Does it test cluster or user settings?** → `@cnv-settings` under `tests/virtualization-settings/` or `tests/quotas/`
 8. **Does it validate API contracts (CRUD, list, subresources) without browser UI?** → **API** under `tests/api/`
 
 ### Current test file map
 
 ```
 tests/
-├── gating/
-│   ├── scenario-virtualization-pages.spec.ts   # Page load + navigation verification
-│   ├── scenario-resource-creation.spec.ts      # VM, template, BV creation (form + YAML)
-│   └── virtualmachines/
-│       ├── vm-search/                          # VM search language and filters (halted VMs)
-│       └── vm-tree/                            # Tree view
-├── tier1/
-│   ├── bootable-volumes/                       # BV list, create, delete
-│   ├── checkups/                               # Network/storage checkup lifecycle
-│   ├── create-vm/                              # VM wizard (template, custom config)
-│   ├── instanceTypes/                          # Instance type CRUD
-│   ├── migrationpolicies/                      # Migration policy CRUD
-│   ├── templates/                              # Template creation, detail tabs, lifecycle
-│   └── virtualmachines/
-│       ├── vm-list/                            # VM list alerts
-│       ├── vm-actions/                         # Start/stop/restart, delete, bulk actions
-│       └── vm-tabs/                            # Configuration, diagnostics, disks, CD-ROM, overview
-├── tier2/
-│   ├── bootable-volumes/                       # BV cross-module (API → UI list → cleanup)
-│   ├── create-vm/                              # Clone wizard (clone existing VM)
-│   ├── migrations/                             # Live migration, storage migration
-│   └── virtualmachines/                        # Snapshots (take/restore/clone), VM clone
-├── settings/
-│   ├── aaq-quotas.spec.ts                      # AAQ quota settings
-│   ├── cluster-settings.spec.ts                # Cluster-level settings
-│   └── user-settings.spec.ts                   # User preferences
+├── virtualization-landing/                     # Welcome modal (@tier2)
+├── virtual-machines/
+│   ├── list/                                   # Search, tree, list (@gating / @tier1)
+│   ├── detail/                                 # Tabs navigation (@tier1)
+│   ├── detail/overview|configuration|disks|network|diagnostics/
+│   ├── actions/                                # Lifecycle, delete (@tier1)
+│   └── migrations/                             # Live/storage migration (@tier2)
+├── vm-wizard/                                  # Creation wizard (@tier1 / @tier2)
+├── vm-templates/
+├── bootable-volumes/
+├── instance-types/
+├── migration-policies/
+├── checkups/
+├── quotas/                                     # AAQ (@cnv-settings)
+├── virtualization-settings/                    # Settings + recommended capabilities
 └── api/                                        # API contract tests (no browser UI)
     ├── vm-vmi-lifecycle-api.spec.ts             # VM/VMI lifecycle (start/stop/restart/delete)
     ├── vm-crud-api.spec.ts                      # VM CRUD operations
@@ -117,11 +108,12 @@ Key points:
 
 ```typescript
 import { ADMIN_ONLY_TAG, T1, T1_TAG } from '@/data-models/allure-constants';
+import { ROUTE_BOOTABLE_VOLUMES_TAG } from '@/data-models/route-tags';
 import { expect, test } from '@/fixtures/<feature>-fixture';
 
 const SUITE = 'Feature Name';
 
-test.describe(SUITE, { tag: [T1_TAG, '@tier1-feature-area'] }, () => {
+test.describe(SUITE, { tag: [ROUTE_BOOTABLE_VOLUMES_TAG, T1_TAG, '@tier1-feature-area'] }, () => {
   test.beforeEach(async ({ somePage }) => {
     await somePage.navigateToFeatureViaUI();
   });
@@ -266,11 +258,12 @@ export default class FeatureComponent extends BaseComponent {
 
 #### 3. Create the spec file
 
-- Place in the correct tier directory: `playwright/tests/<tier>/<feature>/`
+- Place under the route folder: `playwright/tests/<route>/` (see map below)
 - Import `test` and `expect` from the feature fixture
 - Import allure constants from `@/data-models/allure-constants`
+- Import the matching `ROUTE_*_TAG` from `@/data-models/route-tags` for that route folder
 - Define `const SUITE = '...'` at module scope
-- Tag `test.describe` with tier tag + feature-area tag
+- Tag `test.describe` with **route tag first**, then tier tag + feature-area tag
 - Every `test()` must call `utils.withAllure(...)` first
 - Use descriptive assertion messages on every `expect`
 - **Never put `ID(CNV-XXXXX)` in test names or step names** — use only in allure tags

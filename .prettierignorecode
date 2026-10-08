@@ -14,12 +14,16 @@ ci-scripts/hot-cluster/helm/**/templates/
 
 # Playwright artifacts
 .playwright-mcp/
+.playwright-cli/
 test-results/
 allure-results/
 playwright/.auth/
+.storage-states/
+.test-configs/
+.test-data/
 
-# Ignore Claude Code local settings
-.claude/settings.local.json
+# Local agent tooling
+.claude/
 
 # Ignore anything that eslint will look at since eslint also applies prettier.
 **/*.js

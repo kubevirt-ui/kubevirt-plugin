@@ -76,6 +76,10 @@ export const buildTestE2EReport = (
   }
 
   lines.push(
+    'Playwright specs live under `playwright/tests/<route>/` (e.g. `vm-wizard/`, `virtual-machines/list/`).',
+    'Each spec is tagged `@route-<path>` (see `playwright/src/data-models/route-tags.ts`) — combine with `-g @route-vm-wizard` to filter by route.',
+    'The suite name picks the project (`gating`, `tier1`, `tier2`, `settings`, …); optional args narrow to a spec path or `-g` filter.',
+    '',
     `Track progress in the [Actions tab](https://github.com/${owner}/${repo}/actions/workflows/hot-cluster-e2e.yml).`,
   );
   return lines.join('\n');

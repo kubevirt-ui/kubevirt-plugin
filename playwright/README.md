@@ -50,6 +50,8 @@ When developing locally with `npm run start-console` (port 9000) and `npm run de
 IS_LOCAL=1 ./playwright-runner-hc-e2e.sh Gating --workers=4
 ```
 
+Hot-cluster **CI** uses `ci-scripts/hot-cluster/ts/src/scripts/run-gating-tests.ts` — not for local runs.
+
 Your `.env` still needs credentials for the backing cluster:
 
 ```bash
@@ -83,10 +85,10 @@ CLUSTER_URL=https://api.mycluster.example.com:6443
 npm install
 npx playwright install
 
-# Run gating tests against a remote cluster
+# Run gating tests (from repo root; use nvm for Node)
 ./playwright-runner-hc-e2e.sh Gating --workers=4
 
-# Run against local dev console in headed mode
+# Local dev console (localhost:9000) in headed mode
 IS_LOCAL=1 ./playwright-runner-hc-e2e.sh Gating --workers=4 --headed
 ```
 
@@ -96,24 +98,56 @@ IS_LOCAL=1 ./playwright-runner-hc-e2e.sh Gating --workers=4 --headed
 
 ### Projects
 
-Tests are organized into projects. Each project maps to a tier with its own scope and test directory.
+Specs live under **route folders** (console pages). **Playwright projects** select the CI cycle by tag (`grep`), not by directory.
 
-| Project    | Directory                | Scope                                                         | Tags            |
-| ---------- | ------------------------ | ------------------------------------------------------------- | --------------- |
-| `Gating`   | `tests/gating/`          | Page loads, resource creation, VM search/tree filters         | `@gating`       |
-| `Tier1`    | `tests/tier1/<feature>/` | Single-resource CRUD lifecycle per module                     | `@tier1`        |
-| `Tier2`    | `tests/tier2/<feature>/` | Cross-module integration, migrations, multi-step workflows    | `@tier2`        |
-| `Settings` | `tests/settings/`        | Cluster and user settings (runs in isolation)                 | `@cnv-settings` |
-| `API`      | `tests/api/`             | API contract tests via `RequestContextClient` (no browser UI) | `@api`          |
+| Project    | Tag filter (`grep`) | Scope                                                         | Example folders                                      |
+| ---------- | ------------------- | ------------------------------------------------------------- | ---------------------------------------------------- |
+| `Gating`   | `@gating`           | Page loads, resource creation, VM search/tree filters         | scope-named specs (e.g. `vm-list-page-load.spec.ts`) |
+| `Tier1`    | `@tier1`            | Single-resource CRUD lifecycle per module                     | `bootable-volumes/`, `virtual-machines/detail/`, …   |
+| `Tier2`    | `@tier2`            | Cross-module integration, migrations, multi-step workflows    | `virtual-machines/migrations/`, `vm-wizard/`, …      |
+| `Settings` | `@cnv-settings`     | Cluster and user settings (runs in isolation)                 | `virtualization-settings/`, `quotas/`                |
+| `API`      | _(directory only)_  | API contract tests via `RequestContextClient` (no browser UI) | `api/`                                               |
+
+**Route tags** (orthogonal to tier): every spec also carries `@route-<folder-path>` (hyphens instead of `/`), e.g. `@route-vm-wizard`, `@route-virtual-machines-list`. Constants are in `playwright/src/data-models/route-tags.ts`. Combine with a project or `auto`:
+
+```bash
+./playwright-runner-hc-e2e.sh Tier1 -g @route-bootable-volumes
+./playwright-runner-hc-e2e.sh auto -g @route-virtual-machines-list
+```
+
+Gating excludes specs that also carry `@cnv-settings` (e.g. role aggregation runs under **Settings** only).
+
+**Layout vs CI cycles:** Folders follow **console routes** (`playwright/tests/<route>/`). **Tier** (`@gating`, `@tier1`, `@tier2`) and **route** (`@route-*`) tags on `test.describe` select what runs — there are no `tier1/`, `tier2/`, or `gating/` directories anymore.
+
+### Route map (`playwright/tests/`)
+
+| Route folder                                                                  | Console area                                      |
+| ----------------------------------------------------------------------------- | ------------------------------------------------- |
+| `virtualization-landing/`                                                     | Virtualization home / welcome                     |
+| `virtual-machines/list/`                                                      | VM list, search, tree, YAML create                |
+| `virtual-machines/detail/`                                                    | VM detail tabs (navigation)                       |
+| `virtual-machines/detail/{overview,configuration,disks,network,diagnostics}/` | VM detail sub-routes                              |
+| `virtual-machines/actions/`                                                   | List/detail lifecycle, delete                     |
+| `virtual-machines/migrations/`                                                | Live / storage migration                          |
+| `vm-wizard/`                                                                  | VM creation wizard                                |
+| `vm-templates/`                                                               | Templates catalog & detail                        |
+| `bootable-volumes/`                                                           | Bootable volumes                                  |
+| `instance-types/`                                                             | Instance types                                    |
+| `migration-policies/`                                                         | Migration policies                                |
+| `checkups/`                                                                   | Checkups                                          |
+| `virtualization-settings/`                                                    | Cluster & user settings, recommended capabilities |
+| `quotas/`                                                                     | AAQ quotas (`@cnv-settings`)                      |
+| `api/`                                                                        | API contract tests (no UI)                        |
+
+Nested routes get nested `@route-*` tags (e.g. `@route-virtual-machines-detail-disks`). Import constants from `playwright/src/data-models/route-tags.ts`.
 
 ### Running Tests
 
 Use the runner scripts from the project root. They handle `.env` loading, URL derivation, and project selection.
 
 ```bash
-# ── Via runner scripts (recommended) ──────────────────────────────────────
+# ── Via runner script (local; recommended) ─────────────────────────────────
 
-# Remote cluster
 ./playwright-runner-hc-e2e.sh Gating --workers=4
 ./playwright-runner-hc-e2e.sh Tier1 --workers=2
 ./playwright-runner-hc-e2e.sh Tier2
@@ -121,6 +155,7 @@ Use the runner scripts from the project root. They handle `.env` loading, URL de
 ./playwright-runner-hc-e2e.sh API
 ./playwright-runner-hc-e2e.sh suite               # Gating + Tier1 + Tier2
 ./playwright-runner-hc-e2e.sh all                 # All projects
+./playwright-runner-hc-e2e.sh auto -g @route-bootable-volumes
 
 # Local dev console (localhost:9000)
 IS_LOCAL=1 ./playwright-runner-hc-e2e.sh Gating --workers=4 --headed
@@ -131,7 +166,7 @@ IS_LOCAL=1 ./playwright-runner-hc-e2e.sh Gating --workers=4 --headed
 # ── Direct npx (useful for single files/tests) ───────────────────────────
 
 # Specific spec file
-npx playwright test playwright/tests/tier1/bootable-volumes/bootable-volumes.spec.ts --workers=1
+npx playwright test playwright/tests/bootable-volumes/bootable-volumes.spec.ts --workers=1
 
 # Specific test by name
 npx playwright test -g "creates a bootable volume" --workers=1
@@ -175,11 +210,17 @@ RequestContextClient (clients/request-context-client.ts) → console proxy → K
 ```text
 playwright/
 ├── tests/
-│   ├── gating/                    # Gating specs (gating-fixture)
-│   ├── tier1/<feature>/           # Tier 1 specs (per-feature fixtures)
-│   ├── tier2/<feature>/           # Tier 2 specs (per-feature fixtures)
-│   ├── settings/                  # Settings specs (settings-fixture)
-│   └── api/                       # API contract specs (api-test-fixture)
+│   ├── virtualization-landing/  # Onboarding / welcome modal
+│   ├── virtual-machines/        # List, detail/*, actions, migrations
+│   ├── vm-wizard/               # /vm-wizard creation flows
+│   ├── vm-templates/            # VM templates catalog
+│   ├── bootable-volumes/
+│   ├── instance-types/
+│   ├── migration-policies/
+│   ├── checkups/
+│   ├── quotas/
+│   ├── virtualization-settings/ # Settings + recommended capabilities
+│   └── api/                     # API contract specs (api-test-fixture)
 ├── src/
 │   ├── components/                # UI components (extend BaseComponent)
 │   │   ├── shared/                # Base classes (base-component, navigation)
@@ -206,12 +247,15 @@ playwright/
 │   │   ├── proxy-handlers/            # Domain-specific handlers (vm, core, infra, project)
 │   │   └── kind-resolver.ts           # Maps resource kinds to GVR tuples
 │   ├── data-models/               # Constants, types, allure metadata
-│   │   └── allure-constants.ts    # Suite/feature/tag constants
+│   │   ├── allure-constants.ts    # Suite/feature/tier tags
+│   │   └── route-tags.ts          # @route-* tag constants per tests/ folder
 │   ├── data-factories/            # Test data generators (SSH keys, VM specs)
 │   └── utils/                     # Env vars, test config, random names, helpers
 ├── project-dependencies/          # Global setup/teardown + rule engine
 └── playwright.config.ts           # Project definitions
 ```
+
+Each route folder that contains `*.spec.ts` also has one **route STD** markdown file beside the specs: path under `tests/` with `/` → `-`, plus `.md` (e.g. `bootable-volumes/bootable-volumes.md`, `virtual-machines/list/virtual-machines-list.md`). Structure follows `playwright/docs/STD-TEMPLATE.md`. Update the relevant module under `## 4. Test Case Definitions` when adding or changing tests.
 
 ---
 
@@ -221,7 +265,7 @@ playwright/
 
 1. **Import `test` and `expect` from the feature fixture** — never from `@playwright/test` directly.
 2. **Define `const SUITE`** at module scope for Allure reporting.
-3. **Tag `test.describe`** with the tier tag + feature-area tag (from `allure-constants.ts`).
+3. **Tag `test.describe`** with the **route** constant first (`ROUTE_*_TAG` from `route-tags.ts`), then tier tag + feature-area tag (`allure-constants.ts`).
 4. **Every `test()` calls `utils.withAllure(...)`** first, with `suite`, `feature`, and `tags`.
 5. **Every `expect()` has a descriptive message string.**
 6. **Use `TestTimeouts.*` constants** — never inline timeout numbers.
@@ -303,13 +347,13 @@ apiClient.trackResource('VirtualMachine', vmName, ns);
 
 ### File Size Limits
 
-| File type                    | Max lines |
-| ---------------------------- | --------- |
-| Spec file (`.spec.ts`)       | 300       |
-| Page object (`*-page.ts`)    | 500       |
-| Component (`*-component.ts`) | 400       |
-| Fixture (`*-fixture.ts`)     | 150       |
-| Utility module               | 400       |
+| File type                    | Max lines | Notes                                                                                                                                                                           |
+| ---------------------------- | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Spec file (`.spec.ts`)       | 300       | Co-locate specs in the same route folder when combined length ≤ 300; use multiple `test.describe` blocks (e.g. `templates-gating.spec.ts` for `@gating` beside `@tier1` specs). |
+| Page object (`*-page.ts`)    | 500       |                                                                                                                                                                                 |
+| Component (`*-component.ts`) | 400       |                                                                                                                                                                                 |
+| Fixture (`*-fixture.ts`)     | 150       |                                                                                                                                                                                 |
+| Utility module               | 400       |                                                                                                                                                                                 |
 
 ---
 
@@ -409,11 +453,12 @@ Explore live UI workflows to find visual, functional, or UX issues.
 
 ```typescript
 import { ADMIN_ONLY_TAG, T1, T1_TAG } from '@/data-models/allure-constants';
+import { ROUTE_BOOTABLE_VOLUMES_TAG } from '@/data-models/route-tags';
 import { expect, test } from '@/fixtures/<feature>-fixture';
 
 const SUITE = 'Feature Name';
 
-test.describe(SUITE, { tag: [T1_TAG, '@tier1-feature-area'] }, () => {
+test.describe(SUITE, { tag: [ROUTE_BOOTABLE_VOLUMES_TAG, T1_TAG, '@tier1-feature-area'] }, () => {
   test.beforeEach(async ({ somePage }) => {
     await somePage.navigateToFeatureViaUI();
   });

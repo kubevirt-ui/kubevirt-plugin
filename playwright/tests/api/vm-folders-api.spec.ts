@@ -3,8 +3,9 @@ import { load as yamlLoad } from 'js-yaml';
 import type { KubernetesResource } from '@/data-models/kubernetes-types';
 import { expect, test } from '@/fixtures/api-test-fixture';
 import { FOLDER_LABEL, listVmsInFolder } from '@/utils/api-builders';
+import { ROUTE_API_TAG } from '@/data-models/route-tags';
 
-test.describe('VM folders — single folder CRUD API', { tag: ['@api'] }, () => {
+test.describe('VM folders — single folder CRUD API', { tag: [ROUTE_API_TAG, '@api'] }, () => {
   test.describe.configure({ mode: 'serial' });
 
   let vm1Name: string;
@@ -114,7 +115,7 @@ test.describe('VM folders — single folder CRUD API', { tag: ['@api'] }, () => 
   });
 });
 
-test.describe('VM folders — multi-folder bulk operations API', { tag: ['@api'] }, () => {
+test.describe('VM folders — multi-folder bulk operations API', { tag: [ROUTE_API_TAG, '@api'] }, () => {
   test.describe.configure({ mode: 'serial' });
 
   let vmNames: string[];

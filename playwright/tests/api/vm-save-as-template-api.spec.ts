@@ -3,6 +3,7 @@ import { load as yamlLoad } from 'js-yaml';
 import type { KubernetesResource } from '@/data-models/kubernetes-types';
 import { expect, test } from '@/fixtures/api-test-fixture';
 import { buildTemplateFromVm } from '@/utils/api-builders';
+import { ROUTE_API_TAG } from '@/data-models/route-tags';
 
 interface ProxyVmSpec {
   template?: {
@@ -26,7 +27,7 @@ function templateParameters(tmpl: KubernetesResource): KubernetesResource[] {
   return Array.isArray(raw) ? (raw as KubernetesResource[]) : [];
 }
 
-test.describe('VM save-as-template — spec parity API', { tag: ['@api'] }, () => {
+test.describe('VM save-as-template — spec parity API', { tag: [ROUTE_API_TAG, '@api'] }, () => {
   let vmName: string;
   let templateName: string;
 
@@ -150,7 +151,7 @@ test.describe('VM save-as-template — spec parity API', { tag: ['@api'] }, () =
   });
 });
 
-test.describe('VM save-as-template — label propagation API', { tag: ['@api'] }, () => {
+test.describe('VM save-as-template — label propagation API', { tag: [ROUTE_API_TAG, '@api'] }, () => {
   let vmName: string;
   let templateName: string;
 

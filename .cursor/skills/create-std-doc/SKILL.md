@@ -1,58 +1,51 @@
 ---
 name: create-std-doc
 description: >-
-  Create or update a Software Test Description (STD) markdown file for a
-  KubeVirt Playwright E2E spec, colocated next to the .spec.ts file and
-  following playwright/docs/STD-TEMPLATE.md.
+  Create or update the route-level Software Test Description markdown for a
+  Playwright E2E spec, following playwright/docs/STD-TEMPLATE.md.
 disable-model-invocation: true
 ---
 
 # Create STD Doc
 
-You are an expert QA Automation Engineer. Your task is to generate or update a colocated Software Test Description (STD) markdown file (`.spec.md`) for a Playwright E2E spec (`.spec.ts`).
+Generate or update the **route-level** STD markdown for a Playwright spec. Each folder under `playwright/tests/<route>/` has one file named from the route path (path segments joined with `-`), e.g. `virtual-machines-list.md` in `tests/virtual-machines/list/`. Each `*.spec.ts` in that folder is a **module** under `## 4. Test Case Definitions`.
 
 ## 1. Execution Workflow
 
-1. **Analyze Files:** Read the target `.spec.ts` file, the official template (`playwright/docs/STD-TEMPLATE.md`), and the existing `.spec.md` (if it exists).
-2. **Sanitize:** Redact any credentials, tokens, cookies, or unnecessary PII found in the spec file.
-3. **Plan:** Output a brief, 2-3 sentence summary of the test cases identified and what existing data (Approvals, IDs, Matrix rows) will be preserved.
-4. **Generate:** Write the `.spec.md` file to the exact same directory as the `.spec.ts` file, replacing the `.ts` extension with `.md`.
-5. **Validate:** Output the Validation Checklist at the end.
+1. **Resolve spec:** Identify the target `*.spec.ts` and its route folder (`dirname(spec)`).
+2. **Analyze:** Read the spec, `playwright/docs/STD-TEMPLATE.md`, and the route STD file (create from template if missing).
+3. **Sanitize:** Redact credentials, tokens, and unnecessary PII from the spec.
+4. **Plan:** Summarize test cases and which module section to add or preserve.
+5. **Generate:** Update **only** the `### Module: \`<name>.spec.ts\``section (and shared sections 1–3 when route-wide context changes). Do **not** create`\*.spec.md` beside specs. Do **not** add an Approvals section or Requirements Traceability Matrix.
+6. **Validate:** Print the checklist below.
 
 ## 2. Extraction & Mapping Rules
 
-Strictly follow `STD-TEMPLATE.md` for structure and section names.
+Follow `STD-TEMPLATE.md` for structure.
 
 | Spec Source                    | STD Field / Action                                             |
 | ------------------------------ | -------------------------------------------------------------- |
-| `test.describe(...)`           | Describe / Tags line                                           |
+| `test.describe(...)`           | Module header Describe / Tags line                             |
 | `utils.withAllure(...)`        | Allure line (Suite & Feature). Fallback to describe tags.      |
 | `test(...)`                    | Numbered test case. **Preserve existing IDs; never renumber.** |
 | `test.step(...)`               | Step / Expected Result table rows.                             |
-| Setup helpers / hooks          | Test Environment & Prerequisites.                              |
-| `test.skip()` / `test.fixme()` | Document as **Pending** cases (include the block reason).      |
+| Setup helpers / hooks          | Section 3 (route or per-module subsection).                    |
+| `test.skip()` / `test.fixme()` | **Pending** cases (include reason).                            |
 
-- **Objectives:** Derive the test case `Objective` from what the test _actually asserts_, not just the title string.
-- **Skipped/Deferred Tests:** Do not omit them. If a skip is conditional and evaluates to false, mark it as `Automated`. If unconditional or true, mark it `Pending`.
+- **Objectives:** From assertions, not title strings alone.
+- **Skipped tests:** Document; mark `Pending` when skip is unconditional.
 
-## 3. Design Conventions & Traceability
+## 3. Conventions
 
-- **Versioning:** Use `Latest version` and `Target version` formatted as three-part `CNV <major>.<minor>.<patch>` (e.g. `CNV 5.0.0`). Never `CNV 5.0` or `CNV 5.00`. Derive from PR base branch or Jira `fixVersions`. Ensure they match. Default `Document Status` to `Draft`.
-- **Titles & Jira IDs:** Write precise scenario titles. **Do not put Jira IDs in scenario titles.** Place `CNV-[0-9]+` keys in the per-scenario `Jira References` field and the Traceability Matrix.
-- **Scope Definition:**
-  - _In-Scope:_ Derived directly from the file's assertions.
-  - _Out-of-Scope:_ Only note adjacent, untested variants of the _same_ feature/modal covered in this file. (Do not list unrelated features).
-- **Preservation Rule:** If updating an existing `.spec.md`, you **must preserve** manually maintained Approvals, Traceability Matrix rows, and existing Test Case IDs unless explicitly told otherwise.
+- **Versioning:** `CNV <major>.<minor>.<patch>` (e.g. `CNV 5.0.0`). Default `Document Status` to `Draft`.
+- **Jira:** Use per-test-case `Jira References` — not scenario titles.
+- **Preservation:** Keep existing test case IDs when updating a module; never renumber.
 
 ## 4. Validation Checklist
 
-Print and check off these items at the end of your response:
-
-- [ ] Placed the generated `.spec.md` in the exact same directory as the `.spec.ts` file.
-- [ ] Used exact section headers from `playwright/docs/STD-TEMPLATE.md`.
-- [ ] Documented every test case (including `.skip` and `.fixme`).
-- [ ] Preserved existing Test Case IDs, Approvals, and historical Traceability Matrix rows.
-- [ ] Placed Jira IDs in `Jira References` and the Matrix, NOT in scenario titles.
-- [ ] Redacted all credentials, secrets, and cluster IDs.
-- [ ] Formatted `Latest version` and `Target version` as `CNV <major>.<minor>.<patch>` (e.g. `CNV 5.0.0`), not `5.0` or `5.00
-  > > > > > > > c8ff20e69 (NV-76355: Add relevant tests)
+- [ ] Updated the route-named STD file in the route folder (not a per-spec `.spec.md`).
+- [ ] Module section matches `### Module: \`<file>.spec.ts\``.
+- [ ] Section headers match `playwright/docs/STD-TEMPLATE.md` (sections 1–4 only).
+- [ ] Every test case documented (including `.skip` / `.fixme`).
+- [ ] Preserved test case IDs where applicable.
+- [ ] Redacted secrets and cluster-specific credentials.

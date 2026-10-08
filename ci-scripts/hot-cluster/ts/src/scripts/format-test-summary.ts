@@ -38,7 +38,7 @@ export type SpecSummary = {
   failed: number;
   failures: SpecFailure[];
   passed: number;
-  /** Reconstructed path, e.g. "tier1/create-vm/foo.spec.ts". */
+  /** Reconstructed path, e.g. "tier1/vm-wizard/foo.spec.ts" (project + path under testDir). */
   path: string;
   skipped: number;
 };

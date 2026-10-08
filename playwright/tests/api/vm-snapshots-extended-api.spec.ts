@@ -8,6 +8,7 @@ import {
   pollUntilSnapshotDeleted,
   pollUntilSnapshotReady,
 } from '@/utils/api-poll';
+import { ROUTE_API_TAG } from '@/data-models/route-tags';
 
 interface SnapshotSourceRef {
   apiGroup?: string;
@@ -15,7 +16,7 @@ interface SnapshotSourceRef {
   name?: string;
 }
 
-test.describe('VirtualMachineSnapshot — full lifecycle API', { tag: ['@api'] }, () => {
+test.describe('VirtualMachineSnapshot — full lifecycle API', { tag: [ROUTE_API_TAG, '@api'] }, () => {
   test.describe.configure({ mode: 'serial' });
 
   let vmName: string;
@@ -209,7 +210,7 @@ test.describe('VirtualMachineSnapshot — full lifecycle API', { tag: ['@api'] }
   });
 });
 
-test.describe('VirtualMachineSnapshot — metadata API', { tag: ['@api'] }, () => {
+test.describe('VirtualMachineSnapshot — metadata API', { tag: [ROUTE_API_TAG, '@api'] }, () => {
   let vmName: string;
   let snapshotName: string;
 

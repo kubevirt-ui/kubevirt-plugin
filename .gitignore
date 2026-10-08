@@ -13,6 +13,7 @@ playwright/test-results/
 allure-results/
 playwright/.auth/
 .playwright-mcp
+.playwright-cli/
 .kubeconfigs/
 .storage-states/
 .test-configs/
@@ -33,5 +34,5 @@ ci-scripts/generated/
 .cursor/rules/personal-*.mdc
 test-results/
 
-# Ignore Claude Code local settings
-.claude/settings.local.json
+# Local Claude / agent tooling (not shared)
+.claude/

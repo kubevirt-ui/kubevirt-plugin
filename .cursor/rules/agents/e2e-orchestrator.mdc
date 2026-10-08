@@ -25,10 +25,22 @@ Tests are organized by tiers. Each tier maps to a Playwright project and has its
 
 | Tier | Directory | Fixture | Project | Tags |
 |------|-----------|---------|---------|------|
-| Gating | `tests/gating/` | `gating-fixture` | `Gating` | `@gating` |
-| Tier 1 | `tests/tier1/<feature>/` | Per-feature fixture | `Tier1` | `@tier1` |
-| Tier 2 | `tests/tier2/<feature>/` | Per-feature fixture | `Tier2` | `@tier2` |
-| Settings | `tests/settings/` | `settings-fixture` | `Settings` | `@cnv-settings` |
+| Gating | Route folders + `@gating` tag | `gating-fixture` | `Gating` | `@gating` |
+| Tier 1 | Route folders + `@tier1` tag | Per-feature fixture | `Tier1` | `@tier1` |
+| Tier 2 | Route folders + `@tier2` tag | Per-feature fixture | `Tier2` | `@tier2` |
+| Settings | `tests/virtualization-settings/`, `tests/quotas/` | `settings-fixture` | `Settings` | `@cnv-settings` |
+
+### Running E2E (agents, local)
+
+From **repo root** (Node via **nvm**; repo `.env` for credentials). Do **not** use `run-gating-tests.ts` locally — that script is **hot-cluster CI only**.
+
+```bash
+IS_LOCAL=1 ./playwright-runner-hc-e2e.sh Gating --workers=4
+./playwright-runner-hc-e2e.sh Tier1 --workers=2
+./playwright-runner-hc-e2e.sh auto -g @route-vm-wizard
+```
+
+`IS_LOCAL=1` in `.env` targets `http://localhost:9000` (`npm run dev` + `npm run start-console`).
 
 ### Architecture
 
