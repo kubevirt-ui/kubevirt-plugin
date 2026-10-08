@@ -14,7 +14,8 @@ import {
 } from '@kubevirt-utils/resources/template';
 import { processOpenShiftTemplate } from '@kubevirt-utils/resources/template/utils/processOpenShiftTemplate';
 import { processVirtualMachineTemplate } from '@kubevirt-utils/resources/template/utils/processVirtualMachineTemplate';
-import { getDefaultRunningStrategy } from '@kubevirt-utils/resources/vm';
+import { getStartingRunStrategy } from '@kubevirt-utils/components/RunStrategyModal/utils';
+import { type RunStrategy } from '@kubevirt-utils/resources/vm/utils/constants';
 import { getDataVolumeSourceHTTP } from '@kubevirt-utils/resources/vm/utils/dataVolumeTemplate/selectors';
 import {
   getDataVolumeTemplates,
@@ -126,7 +127,7 @@ export const getVMObjectFromTemplate = ({
 
     draftVM.metadata.name = vmName ?? getName(draftVM) ?? draftVM.metadata.labels?.app;
     draftVM.metadata.namespace = namespace;
-    draftVM.spec.runStrategy = getDefaultRunningStrategy();
+    draftVM.spec.runStrategy = getStartingRunStrategy(draftVM.spec.runStrategy as RunStrategy);
   });
 
   if (sshSecretName) {
