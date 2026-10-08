@@ -8,14 +8,13 @@ import { type DataViewTr } from '@patternfly/react-data-view';
 
 import StateHandler from '../StateHandler/StateHandler';
 import KubevirtTableBody from './components/KubevirtTableBody';
+import { useResizableColumns } from './hooks/useResizableColumns';
 import { useSelectionColumn } from './hooks/useSelectionColumn';
 import { useTableSelection } from './hooks/useTableSelection';
 import { type KubevirtTableProps } from './types';
 import { getActiveColumns } from './utils/getActiveColumns';
 
 import './KubevirtTable.scss';
-
-export type { KubevirtTableProps } from './types';
 
 const defaultGetRowId = (_row: unknown): string => '';
 const defaultOnSelect = (_items: unknown[]): void => {};
@@ -36,8 +35,10 @@ const KubevirtTable = <TData, TCallbacks = undefined>(
     initialSortColumnIndex,
     initialSortDirection,
     initialSortKey,
+    isResizable = false,
     loaded = true,
     loadError,
+    minResizableColumnWidth,
     noDataMsg,
     noFilteredDataMsg,
     pagination,
@@ -76,11 +77,8 @@ const KubevirtTable = <TData, TCallbacks = undefined>(
   );
 
   const paginatedData = useMemo(() => {
-    if (!pagination) {
-      return sortedData;
-    }
-    const { endIndex, startIndex } = pagination;
-    return sortedData.slice(startIndex, endIndex);
+    if (!pagination) return sortedData;
+    return sortedData.slice(pagination.startIndex, pagination.endIndex);
   }, [sortedData, pagination]);
 
   const {
@@ -98,7 +96,6 @@ const KubevirtTable = <TData, TCallbacks = undefined>(
     selectedItems,
   });
 
-  // Sync valid selection back to parent when orphaned items are detected
   useEffect(() => {
     if (!onSelect || validSelectedItems.length === selectedItems.length) return;
     onSelect(validSelectedItems);
@@ -134,14 +131,13 @@ const KubevirtTable = <TData, TCallbacks = undefined>(
     someSelected,
   });
 
-  const effectiveTableColumns = useMemo(() => {
-    if (!isSelectable) return tableColumns;
-    return [selectionColumn, ...tableColumns];
-  }, [isSelectable, selectionColumn, tableColumns]);
-
-  const isUnfilteredDataEmpty = isEmpty(unfilteredData ?? data);
-  const showLoading = !loaded;
-  const hasDataForStateHandler = showLoading ? false : !isUnfilteredDataEmpty;
+  const effectiveTableColumns = useMemo(
+    () => (isSelectable ? [selectionColumn, ...tableColumns] : tableColumns),
+    [isSelectable, selectionColumn, tableColumns],
+  );
+  const { columnKey: resizableTableColumnKey, columns: resizableTableColumns } =
+    useResizableColumns(effectiveTableColumns, isResizable, minResizableColumnWidth);
+  const hasDataForStateHandler = loaded ? !isEmpty(unfilteredData ?? data) : false;
 
   return (
     <div className={className} data-test={dataTest}>
@@ -154,8 +150,10 @@ const KubevirtTable = <TData, TCallbacks = undefined>(
         <KubevirtTableBody
           ariaLabel={ariaLabel}
           data={paginatedData}
-          effectiveTableColumns={effectiveTableColumns}
+          effectiveTableColumns={resizableTableColumns}
           fixedLayout={fixedLayout}
+          isResizable={isResizable}
+          key={isResizable ? resizableTableColumnKey : undefined}
           loaded={loaded}
           noDataMsg={noDataMsg}
           noFilteredDataMsg={noFilteredDataMsg}

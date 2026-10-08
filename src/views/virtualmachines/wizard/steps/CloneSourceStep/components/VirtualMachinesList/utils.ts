@@ -10,6 +10,7 @@ import { type VMCallbacks } from '@virtualmachines/list/virtualMachinesDefinitio
 import {
   getVMIFromMapper,
   getVMIMFromMapper,
+  type InstanceTypeMapper,
   type PVCMapper,
   type VMIMapper,
   type VMIMMapper,
@@ -63,10 +64,12 @@ export const getVMTableCallbacks = (
   vmiMapper: VMIMapper,
   vmimMapper: VMIMMapper,
   pvcMapper: PVCMapper,
+  instanceTypeMapper: InstanceTypeMapper,
 ): VMCallbacks => ({
   getVmi: (vm: V1VirtualMachine) => getVMIFromMapper(vmiMapper, vm),
   getVmim: (vm: V1VirtualMachine) =>
     getVMIMFromMapper(vmimMapper, getName(vm), getNamespace(vm), getCluster(vm)),
+  instanceTypeMapper,
   pvcMapper,
   vmiMapper,
   vmimMapper,

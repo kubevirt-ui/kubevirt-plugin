@@ -78,7 +78,7 @@ export const useDataViewTableSort = <TData, TCallbacks = undefined>(
     () =>
       visibleColumns.map((col, index) => ({
         cell: col.label,
-        props: { ...col.props, sort: getSortParams(index) },
+        props: { ...col.props, id: col.key, sort: getSortParams(index) },
       })),
     [visibleColumns, getSortParams],
   );

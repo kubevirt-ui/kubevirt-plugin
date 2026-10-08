@@ -1,3 +1,5 @@
+import { type ReactNode } from 'react';
+
 import { type ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { ACTIONS } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/const';
 import {
@@ -9,6 +11,9 @@ import { getCluster } from '@multicluster/helpers/selectors';
 import { type K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
 import { type ColumnLayout } from './types';
+
+export const isEmptyCell = (cell: ReactNode): boolean =>
+  cell == null || (typeof cell === 'string' && cell.trim().length === 0);
 
 export const buildColumnLayout = <TData, TCallbacks = undefined>(
   columns: ColumnConfig<TData, TCallbacks>[],

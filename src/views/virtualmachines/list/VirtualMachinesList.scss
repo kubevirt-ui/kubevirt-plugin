@@ -26,15 +26,13 @@
     &__toolbar {
       z-index: 0;
       flex-wrap: nowrap;
-
-      .pf-v6-c-toolbar__content {
-        .pf-v6-c-toolbar__group {
-          display: flex;
-          flex-wrap: wrap;
-        }
-      }
     }
   }
+}
+
+.vm-listpagebody .list-managment-group__toolbar .pf-v6-c-toolbar__group {
+  display: flex;
+  flex-wrap: wrap;
 }
 
 .vm-actions-toggle {
