@@ -77,12 +77,11 @@ export const getHardwarePendingChanges = ({
     ...createProps(VirtualMachineDetailsTab.Scheduling, () =>
       createModal(({ isOpen, onClose }) => (
         <DedicatedResourcesModal
-          headerText={t('Dedicated resources')}
           isOpen={isOpen}
           onClose={onClose}
           onSubmit={onSubmit}
+          showPendingChangesAlert={!!vmi}
           vm={vm}
-          vmi={vmi}
         />
       )),
     ),
@@ -93,12 +92,11 @@ export const getHardwarePendingChanges = ({
     ...createProps(VirtualMachineDetailsTab.Scheduling, () =>
       createModal(({ isOpen, onClose }) => (
         <EvictionStrategyModal
-          headerText={t('Eviction strategy')}
           isOpen={isOpen}
           onClose={onClose}
           onSubmit={onSubmit}
+          showPendingChangesAlert={!!vmi}
           vm={vm}
-          vmi={vmi}
         />
       )),
     ),

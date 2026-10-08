@@ -5,7 +5,7 @@ import EvictionStrategy from 'src/views/templates/details/tabs/scheduling/compon
 import { updateTemplate } from '@kubevirt-utils/resources/template';
 import { DescriptionList } from '@patternfly/react-core';
 
-import type { TemplateSchedulingGridProps } from './TemplateSchedulingLeftGrid';
+import type { TemplateSchedulingGridProps } from '../types';
 
 const TemplateSchedulingRightGrid: FC<TemplateSchedulingGridProps> = ({ editable, template }) => {
   return (

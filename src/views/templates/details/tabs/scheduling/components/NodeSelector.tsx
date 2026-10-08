@@ -1,5 +1,4 @@
 import { type FC } from 'react';
-import { type TemplateSchedulingGridProps } from 'src/views/templates/details/tabs/scheduling/components/TemplateSchedulingLeftGrid';
 import { getNodeSelector } from 'src/views/templates/utils/selectors';
 
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
@@ -7,14 +6,16 @@ import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider
 import NodeSelectorDetailItem from '@kubevirt-utils/components/NodeSelectorDetailItem/NodeSelectorDetailItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
+import { type TemplateSchedulingGridDetailsProps } from '../types';
+
 import NodeSelectorModal from './NodeSelectorModal';
 
-const NodeSelector: FC<TemplateSchedulingGridProps> = ({ editable, onSubmit, template }) => {
+const NodeSelector: FC<TemplateSchedulingGridDetailsProps> = ({ editable, onSubmit, template }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
 
   const onEditClick = (): void => {
-    createModal(({ isOpen, onClose }) => (
+    createModal?.(({ isOpen, onClose }) => (
       <NodeSelectorModal
         isOpen={isOpen}
         onClose={onClose}

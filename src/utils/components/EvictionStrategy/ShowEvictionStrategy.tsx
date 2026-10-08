@@ -5,7 +5,7 @@ import useHCOEvictionStrategy from './useHCOEvictionStrategy';
 
 type ShowEvictionStrategyProps = {
   cluster?: string;
-  evictionStrategy: string;
+  evictionStrategy: string | undefined;
 };
 
 const ShowEvictionStrategy: FC<ShowEvictionStrategyProps> = ({ cluster, evictionStrategy }) => {

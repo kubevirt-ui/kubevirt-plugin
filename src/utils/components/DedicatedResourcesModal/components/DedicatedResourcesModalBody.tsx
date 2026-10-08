@@ -1,24 +1,14 @@
-import { type FC, useMemo, useState } from 'react';
+import { type FC, useMemo } from 'react';
 import { Link } from 'react-router';
-import produce from 'immer';
-import { isDedicatedCPUPlacement } from 'src/views/templates/utils/utils';
 
 import { type IoK8sApiCoreV1Node } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
-import {
-  cpuManagerLabel,
-  cpuManagerLabelKey,
-  cpuManagerLabelValue,
-} from '@kubevirt-utils/components/DedicatedResourcesModal/utils/constants';
-import { getDedicatedResourcesSearchHREF } from '@kubevirt-utils/components/DedicatedResourcesModal/utils/utils';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
-import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { modelToGroupVersionKind, NodeModel } from '@kubevirt-utils/models';
-import { getTemplateVirtualMachineObject, type Template } from '@kubevirt-utils/resources/template';
-import { getNoModalChangesTooltip } from '@kubevirt-utils/utils/text';
-import { ensurePath, isEmpty } from '@kubevirt-utils/utils/utils';
+import { getName, getUID } from '@kubevirt-utils/resources/shared';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
+import MulticlusterResourceLink from '@multicluster/components/MulticlusterResourceLink/MulticlusterResourceLink';
 import { getCluster } from '@multicluster/helpers/selectors';
-import { ResourceLink, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Alert,
   AlertVariant,
@@ -30,27 +20,27 @@ import {
   Popover,
 } from '@patternfly/react-core';
 
-type DedicatedResourcesModalProps = {
-  isOpen: boolean;
-  onClose: () => void;
-  onSubmit: (updatedTemplate: Template) => Promise<Template | void>;
-  template: Template;
+import { cpuManagerLabel, cpuManagerLabelKey, cpuManagerLabelValue } from '../utils/constants';
+import { getDedicatedResourcesSearchHREF } from '../utils/utils';
+
+type DedicatedResourcesModalBodyProps = {
+  checked: boolean;
+  cluster?: string;
+  loadError: Error | undefined;
+  nodes: IoK8sApiCoreV1Node[];
+  nodesLoaded: boolean;
+  onCheckedChange: (checked: boolean) => void;
 };
 
-const DedicatedResourcesModal: FC<DedicatedResourcesModalProps> = ({
-  isOpen,
-  onClose,
-  onSubmit,
-  template,
+const DedicatedResourcesModalBody: FC<DedicatedResourcesModalBodyProps> = ({
+  checked,
+  cluster,
+  loadError,
+  nodes,
+  nodesLoaded,
+  onCheckedChange,
 }) => {
   const { t } = useKubevirtTranslation();
-  const cluster = getCluster(template);
-  const [initialChecked] = useState<boolean>(() => isDedicatedCPUPlacement(template));
-  const [checked, setChecked] = useState<boolean>(initialChecked);
-  const [nodes, nodesLoaded, loadError] = useK8sWatchResource<IoK8sApiCoreV1Node[]>({
-    groupVersionKind: modelToGroupVersionKind(NodeModel),
-    isList: true,
-  }) as [IoK8sApiCoreV1Node[], boolean, Error];
 
   const { hasNodes, qualifiedNodes } = useMemo(() => {
     const filteredNodes = nodes?.filter(
@@ -62,25 +52,8 @@ const DedicatedResourcesModal: FC<DedicatedResourcesModalProps> = ({
     };
   }, [nodes]);
 
-  const updatedTemplate = useMemo(() => {
-    return produce<Template>(template, (templateDraft: Template) => {
-      const draftVM = getTemplateVirtualMachineObject(templateDraft);
-      ensurePath(draftVM, ['spec.template.spec.domain.cpu']);
-      draftVM.spec.template.spec.domain.cpu.dedicatedCpuPlacement = checked;
-    });
-  }, [checked, template]);
-
   return (
-    <TabModal
-      headerText={t('Dedicated resources')}
-      isDisabled={checked === initialChecked}
-      isOpen={isOpen}
-      obj={updatedTemplate}
-      onClose={onClose}
-      onSubmit={onSubmit}
-      shouldWrapInForm
-      submitDisabledTooltip={getNoModalChangesTooltip(t)}
-    >
+    <>
       <FormGroup fieldId="dedicated-resources" isInline>
         <Checkbox
           description={
@@ -100,7 +73,7 @@ const DedicatedResourcesModal: FC<DedicatedResourcesModalProps> = ({
           id="dedicated-resources"
           isChecked={checked}
           label={t('Schedule this workload with dedicated resources (guaranteed policy)')}
-          onChange={(_event, check: boolean) => setChecked(check)}
+          onChange={(_event, val) => onCheckedChange(val)}
         />
       </FormGroup>
       <FormGroup fieldId="dedicated-resources-node">
@@ -123,10 +96,11 @@ const DedicatedResourcesModal: FC<DedicatedResourcesModalProps> = ({
                 bodyContent={
                   <>
                     {qualifiedNodes?.map((node) => (
-                      <ResourceLink
+                      <MulticlusterResourceLink
+                        cluster={getCluster(node)}
                         groupVersionKind={modelToGroupVersionKind(NodeModel)}
-                        key={node.metadata.uid}
-                        name={node.metadata.name}
+                        key={getUID(node)}
+                        name={getName(node)}
                       />
                     ))}
                   </>
@@ -135,7 +109,11 @@ const DedicatedResourcesModal: FC<DedicatedResourcesModalProps> = ({
                   qualifiedNodesCount: qualifiedNodes?.length,
                 })}
               >
-                <Button isInline onClick={() => setChecked(false)} variant={ButtonVariant.link}>
+                <Button
+                  isInline
+                  onClick={() => onCheckedChange(false)}
+                  variant={ButtonVariant.link}
+                >
                   {t('view {{qualifiedNodesCount}} matching nodes', {
                     qualifiedNodesCount: qualifiedNodes?.length,
                   })}
@@ -149,8 +127,8 @@ const DedicatedResourcesModal: FC<DedicatedResourcesModalProps> = ({
           !loadError && !nodesLoaded && <Loading />
         )}
       </FormGroup>
-    </TabModal>
+    </>
   );
 };
 
-export default DedicatedResourcesModal;
+export default DedicatedResourcesModalBody;
