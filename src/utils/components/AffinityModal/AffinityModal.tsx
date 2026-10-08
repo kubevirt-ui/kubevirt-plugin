@@ -1,53 +1,61 @@
 import { type FC, useMemo, useState } from 'react';
-import produce from 'immer';
 
+import { modelToGroupVersionKind, NodeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { type IoK8sApiCoreV1Node } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { isEqualObject } from '@kubevirt-utils/components/NodeSelectorModal/utils/helpers';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getAffinity } from '@kubevirt-utils/resources/vm';
+import { getNoModalChangesTooltip } from '@kubevirt-utils/utils/text';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
+import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 import { ModalVariant } from '@patternfly/react-core';
 
 import AffinityEditModal from './components/AffinityEditModal/AffinityEditModal';
 import AffinityEmptyState from './components/AffinityEmptyState';
 import AffinityList from './components/AffinityList/AffinityList';
 import { useRequiredAndPreferredQualifiedNodes } from './hooks/useRequiredAndPreferredQualifiedNodes';
+import { getRowsDataFromAffinity } from './utils/affinityToRows';
 import { defaultNewAffinity } from './utils/constants';
-import {
-  getAffinityFromRowsData,
-  getAvailableAffinityID,
-  getRowsDataFromAffinity,
-} from './utils/helpers';
+import { getAffinityFromRowsData, getAvailableAffinityID } from './utils/helpers';
 import { type AffinityRowData } from './utils/types';
+import { produceVMWithAffinity } from './utils/utils';
 
 type AffinityModalProps = {
   isOpen: boolean;
-  nodes: IoK8sApiCoreV1Node[];
-  nodesLoaded: boolean;
   onClose: () => void;
   onSubmit: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine | void>;
   vm: V1VirtualMachine;
 };
 
-const AffinityModal: FC<AffinityModalProps> = ({
-  isOpen,
-  nodes,
-  nodesLoaded,
-  onClose,
-  onSubmit,
-  vm,
-}) => {
+const AffinityModal: FC<AffinityModalProps> = ({ isOpen, onClose, onSubmit, vm }) => {
   const { t } = useKubevirtTranslation();
+  const cluster = useClusterParam();
+
+  const initialAffinity = getAffinity(vm);
 
   const [affinities, setAffinities] = useState<AffinityRowData[]>(() =>
-    getRowsDataFromAffinity(getAffinity(vm)),
+    getRowsDataFromAffinity(initialAffinity),
   );
   const [focusedAffinity, setFocusedAffinity] = useState<AffinityRowData>(defaultNewAffinity);
 
   const [isEditing, setIsEditing] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
+
+  const updatedAffinity = useMemo(() => getAffinityFromRowsData(affinities), [affinities]);
+
+  const updatedVM = useMemo(
+    () => produceVMWithAffinity(vm, updatedAffinity),
+    [vm, updatedAffinity],
+  );
+
+  const [nodes, nodesLoaded] = useK8sWatchData<IoK8sApiCoreV1Node[]>({
+    cluster,
+    groupVersionKind: modelToGroupVersionKind(NodeModel),
+    isList: true,
+  });
 
   const [qualifiedRequiredNodes, qualifiedPreferredNodes] = useRequiredAndPreferredQualifiedNodes(
     nodes,
@@ -55,16 +63,20 @@ const AffinityModal: FC<AffinityModalProps> = ({
     affinities,
   );
 
+  const noChangesMade =
+    (isEmpty(initialAffinity) && isEmpty(updatedAffinity)) ||
+    isEqualObject(initialAffinity, updatedAffinity);
+
   const onAffinityAdd = (affinity: AffinityRowData): void => {
     setAffinities((prevAffinities) => [...(prevAffinities || []), affinity]);
     setIsEditing(false);
     setIsCreating(false);
   };
 
-  const onAffinityChange = (updatedAffinity: AffinityRowData): void => {
+  const onAffinityChange = (updatedAffinityRow: AffinityRowData): void => {
     setAffinities((prevAffinities) =>
       prevAffinities.map((affinity) => {
-        if (affinity.id === updatedAffinity.id) return { ...affinity, ...updatedAffinity };
+        if (affinity.id === updatedAffinityRow.id) return { ...affinity, ...updatedAffinityRow };
         return affinity;
       }),
     );
@@ -92,19 +104,6 @@ const AffinityModal: FC<AffinityModalProps> = ({
 
   const onSaveAffinity = isCreating ? onAffinityAdd : onAffinityChange;
 
-  const updatedVirtualMachine = useMemo(() => {
-    const updatedVM = produce<V1VirtualMachine>(vm, (vmDraft: V1VirtualMachine) => {
-      vmDraft.spec.template.spec.affinity ??= {};
-
-      const updatedAffinity = getAffinityFromRowsData(affinities);
-
-      if (!isEqualObject(getAffinity(vmDraft), updatedAffinity)) {
-        vmDraft.spec.template.spec.affinity = updatedAffinity;
-      }
-    });
-    return updatedVM;
-  }, [vm, affinities]);
-
   const list = isEmpty(affinities) ? (
     <AffinityEmptyState onAffinityClickAdd={onAffinityClickAdd} />
   ) : (
@@ -131,14 +130,16 @@ const AffinityModal: FC<AffinityModalProps> = ({
       title={isCreating ? t('Add affinity rule') : t('Edit affinity rule')}
     />
   ) : (
-    <TabModal
+    <TabModal<V1VirtualMachine>
       headerText={t('Affinity rules')}
+      isDisabled={noChangesMade}
       isOpen={isOpen}
       modalVariant={ModalVariant.medium}
-      obj={updatedVirtualMachine}
+      obj={updatedVM}
       onClose={onClose}
       onSubmit={onSubmit}
       submitBtnText={t('Apply rules')}
+      submitDisabledTooltip={getNoModalChangesTooltip(t)}
     >
       {list}
     </TabModal>

@@ -2,7 +2,6 @@ import type { FC } from 'react';
 import { useCallback } from 'react';
 
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import type { IoK8sApiCoreV1Node } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import type {
   V1VirtualMachine,
   V1VirtualMachineInstance,
@@ -27,8 +26,6 @@ import Affinity from './Affinity';
 
 type SchedulingSectionLeftGridProps = {
   canUpdateVM: boolean;
-  nodes: IoK8sApiCoreV1Node[];
-  nodesLoaded: boolean;
   onUpdateVM?: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine>;
   vm: V1VirtualMachine;
   vmi?: V1VirtualMachineInstance;
@@ -36,8 +33,6 @@ type SchedulingSectionLeftGridProps = {
 
 const SchedulingSectionLeftGrid: FC<SchedulingSectionLeftGridProps> = ({
   canUpdateVM,
-  nodes,
-  nodesLoaded,
   onUpdateVM,
   vm,
   vmi,
@@ -69,15 +64,8 @@ const SchedulingSectionLeftGrid: FC<SchedulingSectionLeftGridProps> = ({
           descriptionHeader={<SearchItem id="node-selector">{t('Node selector')}</SearchItem>}
           isEdit={canUpdateVM}
           onEditClick={() =>
-            createModal(({ isOpen, onClose }) => (
-              <NodeSelectorModal
-                isOpen={isOpen}
-                nodes={nodes}
-                nodesLoaded={nodesLoaded}
-                onClose={onClose}
-                onSubmit={onSubmit}
-                vm={vm}
-              />
+            createModal?.(({ isOpen, onClose }) => (
+              <NodeSelectorModal isOpen={isOpen} onClose={onClose} onSubmit={onSubmit} vm={vm} />
             ))
           }
         />
@@ -86,15 +74,13 @@ const SchedulingSectionLeftGrid: FC<SchedulingSectionLeftGridProps> = ({
           descriptionHeader={<SearchItem id="tolerations">{t('Tolerations')}</SearchItem>}
           isEdit={canUpdateVM}
           onEditClick={() =>
-            createModal(({ isOpen, onClose }) => (
+            createModal?.(({ isOpen, onClose }) => (
               <TolerationsModal
                 isOpen={isOpen}
-                nodes={nodes}
-                nodesLoaded={nodesLoaded}
                 onClose={onClose}
                 onSubmit={onSubmit}
+                showPendingChangesAlert={!!vmi}
                 vm={vm}
-                vmi={vmi}
               />
             ))
           }
@@ -105,14 +91,7 @@ const SchedulingSectionLeftGrid: FC<SchedulingSectionLeftGridProps> = ({
           isEdit={canUpdateVM}
           onEditClick={() =>
             createModal(({ isOpen, onClose }) => (
-              <AffinityModal
-                isOpen={isOpen}
-                nodes={nodes}
-                nodesLoaded={nodesLoaded}
-                onClose={onClose}
-                onSubmit={onSubmit}
-                vm={vm}
-              />
+              <AffinityModal isOpen={isOpen} onClose={onClose} onSubmit={onSubmit} vm={vm} />
             ))
           }
         />

@@ -1,8 +1,6 @@
 import type { FC } from 'react';
 import { memo } from 'react';
 
-import { modelToGroupVersionKind, NodeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import type { IoK8sApiCoreV1Node } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import type {
   V1VirtualMachine,
   V1VirtualMachineInstance,
@@ -10,8 +8,6 @@ import type {
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import useIsVMEditable from '@kubevirt-utils/components/VMEditPermissionContext/useIsVMEditable';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getCluster } from '@multicluster/helpers/selectors';
-import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 import { Grid, GridItem, Title } from '@patternfly/react-core';
 
 import SchedulingSectionLeftGrid from './SchedulingSectionLeftGrid';
@@ -26,11 +22,6 @@ type SchedulingSectionProps = {
 
 const SchedulingSection: FC<SchedulingSectionProps> = ({ instanceTypeVM, onSubmit, vm, vmi }) => {
   const { t } = useKubevirtTranslation();
-  const [nodes, nodesLoaded] = useK8sWatchData<IoK8sApiCoreV1Node[]>({
-    cluster: getCluster(vm),
-    groupVersionKind: modelToGroupVersionKind(NodeModel),
-    isList: true,
-  });
   const canUpdateVM = useIsVMEditable();
 
   return (
@@ -41,8 +32,6 @@ const SchedulingSection: FC<SchedulingSectionProps> = ({ instanceTypeVM, onSubmi
       <Grid hasGutter>
         <SchedulingSectionLeftGrid
           canUpdateVM={canUpdateVM}
-          nodes={nodes}
-          nodesLoaded={nodesLoaded}
           onUpdateVM={onSubmit}
           vm={vm}
           vmi={vmi}

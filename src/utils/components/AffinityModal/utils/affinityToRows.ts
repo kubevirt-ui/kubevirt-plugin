@@ -10,7 +10,9 @@ import { AffinityCondition, type AffinityRowData, AffinityType } from './types';
 const setIDsToEntity = <T>(entity: T[]): (T & { id: number })[] =>
   entity?.map((elm, i) => ({ ...elm, id: i }));
 
-const getNodeAffinityRows = (nodeAffinity: K8sIoApiCoreV1NodeAffinity): AffinityRowData[] => {
+const getNodeAffinityRows = (
+  nodeAffinity: K8sIoApiCoreV1NodeAffinity | undefined,
+): AffinityRowData[] => {
   const requiredTerms =
     nodeAffinity?.requiredDuringSchedulingIgnoredDuringExecution?.nodeSelectorTerms ?? [];
   const preferredTerms = nodeAffinity?.preferredDuringSchedulingIgnoredDuringExecution ?? [];
@@ -36,7 +38,7 @@ const getNodeAffinityRows = (nodeAffinity: K8sIoApiCoreV1NodeAffinity): Affinity
 };
 
 const getPodLikeAffinityRows = (
-  podLikeAffinity: K8sIoApiCoreV1PodAffinity | K8sIoApiCoreV1PodAntiAffinity,
+  podLikeAffinity: K8sIoApiCoreV1PodAffinity | K8sIoApiCoreV1PodAntiAffinity | undefined,
   isAnti = false,
 ): AffinityRowData[] => {
   const requiredTerms = podLikeAffinity?.requiredDuringSchedulingIgnoredDuringExecution ?? [];
@@ -64,7 +66,9 @@ const getPodLikeAffinityRows = (
   return [...required, ...preferred] as AffinityRowData[];
 };
 
-export const getRowsDataFromAffinity = (affinity: K8sIoApiCoreV1Affinity): AffinityRowData[] => [
+export const getRowsDataFromAffinity = (
+  affinity: K8sIoApiCoreV1Affinity | undefined,
+): AffinityRowData[] => [
   ...getNodeAffinityRows(affinity?.nodeAffinity),
   ...getPodLikeAffinityRows(affinity?.podAffinity),
   ...getPodLikeAffinityRows(affinity?.podAntiAffinity, true),
