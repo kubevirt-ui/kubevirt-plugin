@@ -130,6 +130,21 @@ on:
         type: string
         required: false
         default: ''
+      openshift_version:
+        description: Target OpenShift version (from hot-cluster-e2e.yml prepare job)
+        type: string
+        required: false
+        default: ''
+      infrastructure_type:
+        description: Cluster infrastructure type (vpc, classic, ipi)
+        type: string
+        required: false
+        default: ''
+      cnv_channel:
+        description: CNV OLM subscription channel resolved for this run
+        type: string
+        required: false
+        default: ''
       checkout_ref:
         description: |
           Ref/SHA to check out for the code under test. Leave empty for
@@ -327,6 +342,16 @@ jobs:
       HEADLESS: 'true'
       RUN_FEATURE_TESTS: ${{ inputs.test_project == 'features' && 'true' || 'false' }}
       TEST_ENGINE: ${{ inputs.test_engine || 'playwright' }}
+      CLUSTER_NAME: ${{ inputs.cluster_name || inputs.runner_label || 'kubevirt-plugin-ci' }}
+      RUNNER_LABEL: ${{ inputs.runner_label || inputs.cluster_name || 'kubevirt-plugin-ci' }}
+      TEST_PROJECT: ${{ inputs.test_project || 'gating' }}
+      CNV_PIN_VERSION: ${{ inputs.cnv_pin_version }}
+      OPENSHIFT_VERSION: ${{ inputs.openshift_version }}
+      INFRASTRUCTURE_TYPE: ${{ inputs.infrastructure_type }}
+      CNV_CHANNEL: ${{ inputs.cnv_channel }}
+      CHECKOUT_REF: ${{ inputs.checkout_ref }}
+      PR_NUMBER: ${{ inputs.pr_number }}
+      TEST_ARGS: ${{ inputs.test_args }}
       # release-4.20's Cypress content hardcodes TEST_NS=auto-test-ns and
       # TEST_SECRET_NAME=auto-test-secret; release-4.21/4.22 read both
       # dynamically, so they get a genuine per-run name instead (avoiding
@@ -427,6 +452,9 @@ jobs:
         id: test-summary
         if: always()
         working-directory: ci-scripts/hot-cluster/ts
+        env:
+          BRIDGE_BASE_ADDRESS: ${{ steps.ci-env.outputs.bridge-base-address }}
+          CONSOLE_ROUTE: ${{ steps.ci-env.outputs.console-route }}
         run: npx tsx src/scripts/extract-test-summary.ts
 
       - name: Upload test artifacts

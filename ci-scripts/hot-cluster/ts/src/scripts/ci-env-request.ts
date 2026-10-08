@@ -20,6 +20,10 @@ const pluginImage = requireEnv('PLUGIN_IMAGE');
 const testNs = requireEnv('TEST_NS');
 const timeout = Number(requireEnv('TIMEOUT'));
 const userSettingsLocation = process.env.USER_SETTINGS_LOCATION ?? '';
+// E2E bridge only: pin console 5.0 for PF6 plugin compatibility. Manual-console
+// and hot-cluster defaults stay on :latest (see ci-env-controller.sh).
+const consoleImage =
+  process.env.CONSOLE_IMAGE ?? 'quay.io/openshift/origin-console:5.0';
 
 const manifest = `
 apiVersion: v1
@@ -33,6 +37,7 @@ data:
   desired-state: "present"
   plugin-image: "${pluginImage}"
   test-namespace: "${testNs}"
+  console-image: "${consoleImage}"
   user-settings-location: "${userSettingsLocation}"
 `.trim();
 
