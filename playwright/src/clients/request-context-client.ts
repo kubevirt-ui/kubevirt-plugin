@@ -747,6 +747,10 @@ export default class RequestContextClient extends BaseClient implements ProxyApi
     return this.vm.getVmiCpuSockets(namespace, vmName);
   }
 
+  getVmDiskBus(vmName: string, namespace: string, diskName: string) {
+    return this.vm.getVmDiskBus(namespace, vmName, diskName);
+  }
+
   getVmiDiskBus(vmName: string, namespace: string, diskName: string) {
     return this.vm.getVmiDiskBus(namespace, vmName, diskName);
   }

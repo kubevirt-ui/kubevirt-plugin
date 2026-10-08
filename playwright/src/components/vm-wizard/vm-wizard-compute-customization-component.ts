@@ -2,6 +2,8 @@ import BaseComponent from '@/components/shared/base-component';
 import { TestTimeouts } from '@/utils/test-config';
 import type { Locator, Page } from '@playwright/test';
 
+type VirtIORecommendationKind = 'disk' | 'network';
+
 export default class VmWizardComputeCustomizationComponent extends BaseComponent {
   private static readonly strategyLabels: Record<string, string> = {
     Always: 'Always',
@@ -9,6 +11,7 @@ export default class VmWizardComputeCustomizationComponent extends BaseComponent
     Manual: 'Manual',
     RerunOnFailure: 'Rerun on failure',
   };
+
   private readonly _inputTypeText = this.locator('input[type="text"]');
   private readonly _pfV6CMenuToggle = this.locator('.pf-v6-c-menu-toggle');
   private readonly _wizardFooterCreateButton = this.page
@@ -1022,5 +1025,57 @@ export default class VmWizardComputeCustomizationComponent extends BaseComponent
         .isVisible({ timeout: TestTimeouts.SHORT_WAIT })
         .catch(() => false),
     };
+  }
+
+  private virtioRecommendationAlertTitle(kind: VirtIORecommendationKind): string {
+    return kind === 'disk'
+      ? 'Non-VirtIO disk interfaces detected'
+      : 'Non-VirtIO network interfaces detected';
+  }
+
+  virtioRecommendationAlert(kind: VirtIORecommendationKind) {
+    return this._roleTabpanel
+      .locator('.pf-v6-c-alert.pf-m-info')
+      .filter({ hasText: this.virtioRecommendationAlertTitle(kind) });
+  }
+
+  async isVirtioRecommendationAlertVisible(kind: VirtIORecommendationKind): Promise<boolean> {
+    try {
+      await this.virtioRecommendationAlert(kind).waitFor({
+        state: 'visible',
+        timeout: TestTimeouts.SHORT_WAIT,
+      });
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  async clickSwitchAllToVirtio(kind: VirtIORecommendationKind): Promise<void> {
+    const alert = this.virtioRecommendationAlert(kind);
+    await alert.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+    const switchButton = alert.locator('button:has-text("Switch all to VirtIO")');
+    await this.robustClick(switchButton);
+  }
+
+  async waitForVirtioAlertToDisappear(kind: VirtIORecommendationKind): Promise<void> {
+    await this.virtioRecommendationAlert(kind).waitFor({
+      state: 'hidden',
+      timeout: TestTimeouts.UI_ACTION_COMPLETE,
+    });
+  }
+
+  async getDiskInterfaceValueInWizard(diskName: string): Promise<string> {
+    const panel = this._roleTabpanel;
+    const cell = panel.getByTestId(`disk-interface-${diskName}`);
+    await cell.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+    return ((await cell.textContent()) ?? '').trim();
+  }
+
+  async getNetworkInterfaceModelInWizard(nicName: string): Promise<string> {
+    const panel = this._roleTabpanel;
+    const cell = panel.getByTestId(`nic-model-${nicName}`);
+    await cell.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+    return ((await cell.textContent()) ?? '').trim();
   }
 }

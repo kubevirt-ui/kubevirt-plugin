@@ -46,7 +46,9 @@ export const getWizardNetworkColumns = (
     getValue: (row) => row.iface?.model ?? '',
     key: 'model',
     label: t('Model'),
-    renderCell: (row) => <>{row.iface?.model ?? NO_DATA_DASH}</>,
+    renderCell: (row) => (
+      <span data-test={`nic-model-${row.network?.name}`}>{row.iface?.model ?? NO_DATA_DASH}</span>
+    ),
     sortable: true,
   },
   {
