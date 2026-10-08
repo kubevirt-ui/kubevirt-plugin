@@ -1,76 +1,124 @@
 import { type FC } from 'react';
+import { Controller, useFormContext } from 'react-hook-form';
 
+import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import { FormPasswordInput } from '@kubevirt-utils/components/FormPasswordInput/FormPasswordInput';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getFieldValidationState } from '@kubevirt-utils/utils/getFieldValidationState';
 import { FormGroup, StackItem, TextInput } from '@patternfly/react-core';
 
+import { type ExportFormValues } from '../types/types';
+
 type ExportModalFormProps = {
-  destination: string;
   isDisabled: boolean;
-  password: string;
-  registryName: string;
-  setDestination: (value: string) => void;
-  setPassword: (value: string) => void;
-  setRegistryName: (value: string) => void;
-  setUsername: (value: string) => void;
-  username: string;
 };
 
-const ExportModalForm: FC<ExportModalFormProps> = ({
-  destination,
-  isDisabled,
-  password,
-  registryName,
-  setDestination,
-  setPassword,
-  setRegistryName,
-  setUsername,
-  username,
-}) => {
+const ExportModalForm: FC<ExportModalFormProps> = ({ isDisabled }) => {
   const { t } = useKubevirtTranslation();
+  const { control } = useFormContext<ExportFormValues>();
 
   return (
     <>
       <StackItem>
         <FormGroup fieldId="registryName" isRequired label={t('Name')}>
-          <TextInput
-            id="registryName"
-            isDisabled={isDisabled}
-            onChange={(_event, value: string) => setRegistryName(value)}
-            type="text"
-            value={registryName}
+          <Controller
+            control={control}
+            name="registryName"
+            render={({ field, fieldState: { error } }) => {
+              const { message, validated } = getFieldValidationState(error);
+
+              return (
+                <>
+                  <TextInput
+                    {...field}
+                    id="registryName"
+                    isDisabled={isDisabled}
+                    type="text"
+                    validated={validated}
+                  />
+                  {error && (
+                    <FormGroupHelperText validated={validated}>{message}</FormGroupHelperText>
+                  )}
+                </>
+              );
+            }}
           />
         </FormGroup>
       </StackItem>
       <StackItem>
         <FormGroup fieldId="destination" isRequired label={t('Destination')}>
-          <TextInput
-            id="destination"
-            isDisabled={isDisabled}
-            onChange={(_event, value: string) => setDestination(value)}
-            type="text"
-            value={destination}
+          <Controller
+            control={control}
+            name="destination"
+            render={({ field, fieldState: { error } }) => {
+              const { message, validated } = getFieldValidationState(error);
+
+              return (
+                <>
+                  <TextInput
+                    {...field}
+                    id="destination"
+                    isDisabled={isDisabled}
+                    type="text"
+                    validated={validated}
+                  />
+                  {error && (
+                    <FormGroupHelperText validated={validated}>{message}</FormGroupHelperText>
+                  )}
+                </>
+              );
+            }}
           />
         </FormGroup>
       </StackItem>
       <StackItem>
         <FormGroup fieldId="username" isRequired label={t('Username')}>
-          <TextInput
-            id="username"
-            isDisabled={isDisabled}
-            onChange={(_event, value: string) => setUsername(value)}
-            type="text"
-            value={username}
+          <Controller
+            control={control}
+            name="username"
+            render={({ field, fieldState: { error } }) => {
+              const { message, validated } = getFieldValidationState(error);
+
+              return (
+                <>
+                  <TextInput
+                    {...field}
+                    id="username"
+                    isDisabled={isDisabled}
+                    type="text"
+                    validated={validated}
+                  />
+                  {error && (
+                    <FormGroupHelperText validated={validated}>{message}</FormGroupHelperText>
+                  )}
+                </>
+              );
+            }}
           />
         </FormGroup>
       </StackItem>
       <StackItem>
         <FormGroup fieldId="password" isRequired label={t('Password')}>
-          <FormPasswordInput
-            id="password"
-            isDisabled={isDisabled}
-            onChange={(event) => setPassword((event.target as HTMLInputElement).value)}
-            value={password}
+          <Controller
+            control={control}
+            name="password"
+            render={({ field, fieldState: { error } }) => {
+              const { message, validated } = getFieldValidationState(error);
+
+              return (
+                <>
+                  <FormPasswordInput
+                    {...field}
+                    id="password"
+                    isDisabled={isDisabled}
+                    validated={validated}
+                  />
+                  {error && (
+                    <FormGroupHelperText validated={validated}>{message}</FormGroupHelperText>
+                  )}
+                </>
+              );
+            }}
           />
         </FormGroup>
       </StackItem>

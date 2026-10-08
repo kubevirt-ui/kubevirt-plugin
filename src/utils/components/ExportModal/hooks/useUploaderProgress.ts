@@ -8,14 +8,14 @@ import { getCluster } from '@multicluster/helpers/selectors';
 import useK8sBaseAPIPath from '@multicluster/hooks/useK8sBaseAPIPath';
 
 import { UPLOADER_CONTAINER_NAME } from '../constants';
+
 import {
   buildPodLogWsUrl,
   exportFailed,
   exportSucceeded,
   processUploaderMessage,
   shouldConnectToUploader,
-} from '../utils';
-
+} from '../utils/utils';
 import { initialProgress } from './parseUploaderLog';
 import { UploaderPhase, type UploaderProgress } from './types';
 

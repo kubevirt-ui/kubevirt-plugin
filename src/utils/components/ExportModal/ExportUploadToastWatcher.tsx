@@ -1,7 +1,7 @@
 import { type FC } from 'react';
 
 import ExportUploadWatcherEntry from './components/ExportUploadWatcherEntry';
-import { useExportUploadStore } from './exportUploadStore';
+import { useExportUploadStore } from './utils/exportUploadStore';
 
 const ExportUploadToastWatcher: FC = () => {
   const uploads = useExportUploadStore((state) => state.uploads);

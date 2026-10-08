@@ -1,11 +1,11 @@
 import { type FC, useEffect, useMemo, useState } from 'react';
 import { Controller, type Resolver, useForm } from 'react-hook-form';
-import * as yup from 'yup';
 
 import { yupResolver } from '@hookform/resolvers/yup';
 import { type TemplateParameter } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getParameters, replaceTemplateParameters } from '@kubevirt-utils/resources/template';
+import * as yup from '@kubevirt-utils/yup';
 import { Button, ButtonVariant, Form, Stack, StackItem } from '@patternfly/react-core';
 import { createTemplateParametersSchema } from '@virtualmachines/wizard/form/schema/template/createTemplateSchema';
 import { useVMWizardForm } from '@virtualmachines/wizard/form/VMWizardFormProvider';

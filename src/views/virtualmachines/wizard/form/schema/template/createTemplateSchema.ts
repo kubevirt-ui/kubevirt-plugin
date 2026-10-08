@@ -1,8 +1,8 @@
 import { type TFunction } from 'i18next';
-import * as yup from 'yup';
 
 import { type TemplateParameter } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { type Template } from '@kubevirt-utils/resources/template';
+import * as yup from '@kubevirt-utils/yup';
 import { NAME_INPUT_FIELD } from '@virtualmachines/wizard/steps/TemplateStep/components/TemplatesCatalog/utils/consts';
 
 import { type VMWizardTemplateValues } from '../../types';
@@ -37,15 +37,12 @@ export const createTemplateParametersSchema = (t: TFunction): yup.Schema<Templat
     .defined();
 
 export const createTemplateSchema = (t: TFunction): yup.ObjectSchema<VMWizardTemplateValues> =>
-  yup
-    .object({
-      bootSourceOverride: yup
-        .mixed<VMWizardTemplateValues['bootSourceOverride']>()
-        .nullable()
-        .defined(),
-      selectedTemplate: yup
-        .mixed<Template>()
-        .typeError(getValidationMessage('INVALID_FIELD_MESSAGE', t))
-        .required(getValidationMessage('SELECT_TEMPLATE_MESSAGE', t)),
-    })
-    .typeError(getValidationMessage('INVALID_FIELD_MESSAGE', t));
+  yup.object({
+    bootSourceOverride: yup
+      .mixed<VMWizardTemplateValues['bootSourceOverride']>()
+      .nullable()
+      .defined(),
+    selectedTemplate: yup
+      .mixed<Template>()
+      .required(getValidationMessage('SELECT_TEMPLATE_MESSAGE', t)),
+  });
