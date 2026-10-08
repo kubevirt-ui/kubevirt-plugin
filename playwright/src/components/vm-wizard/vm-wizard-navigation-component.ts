@@ -261,12 +261,12 @@ export default class VmWizardNavigationComponent extends BaseComponent {
   }
 
   async getCloneWizardStepIds(): Promise<string[]> {
-    return await this.page.evaluate(() => {
-      const links = document.querySelectorAll('.pf-v6-c-wizard__nav-link');
-      return Array.from(links)
-        .map((el) => el.closest('[id]')?.id || '')
-        .filter(Boolean);
-    });
+    const stepIds = await this._wizardContainer
+      .locator('.pf-v6-c-wizard__nav-link:visible')
+      .evaluateAll((links) => links.map((link) => link.closest('[id]')?.id ?? '').filter(Boolean));
+
+    // PatternFly can briefly retain duplicate shared steps while switching wizard flows.
+    return [...new Set(stepIds)];
   }
 
   async getCreatedVmNameFromUrl(): Promise<string> {
@@ -367,6 +367,19 @@ export default class VmWizardNavigationComponent extends BaseComponent {
     return await nextButton.isDisabled();
   }
 
+  /**
+   * Whether the wizard's left-hand step navigation link for `stepId` is disabled.
+   * `stepId` matches the `WizardStep` id rendered by PatternFly as the nav link's DOM id
+   * (e.g. `vm-creation-review-and-create-step`).
+   */
+  async isStepNavDisabled(stepId: string): Promise<boolean> {
+    const navLink = this.locator(`#${stepId}`);
+    await navLink.first().waitFor({ state: 'attached', timeout: TestTimeouts.SHORT_WAIT });
+    const disabled = await navLink.first().getAttribute('disabled');
+    const ariaDisabled = await navLink.first().getAttribute('aria-disabled');
+    return disabled !== null || ariaDisabled === 'true';
+  }
+
   async navigateToStepByName(stepName: string): Promise<void> {
     const toggle = this.locator('button:has-text("Wizard toggle")');
     await this.robustClick(toggle.first());
@@ -374,6 +387,19 @@ export default class VmWizardNavigationComponent extends BaseComponent {
       `nav[aria-label="Wizard steps"] button:has-text("${stepName}")`,
     );
     await this.robustClick(stepButton.first());
+  }
+
+  /**
+   * Jumps directly to a wizard step via the left-hand step navigation, using the step's DOM id
+   * (e.g. `vm-creation-customization-step`). No-op if the nav link is disabled.
+   */
+  async navigateToStepById(stepId: string): Promise<void> {
+    const navLink = this.locator(`#${stepId}`);
+    await navLink
+      .first()
+      .waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+    await this.robustClick(navLink.first());
+    await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
   }
 
   async navigateToWizardInNamespace(_namespace: string): Promise<void> {
@@ -556,6 +582,12 @@ export default class VmWizardNavigationComponent extends BaseComponent {
           }, 3000);
         }),
     );
+  }
+
+  async isTemplateSelectedByTestId(templateTestId: string): Promise<boolean> {
+    const card = this.testId(templateTestId);
+    await card.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+    return await card.evaluate((element) => element.classList.contains('pf-m-selected'));
   }
 
   async selectTemplateCatalogProject(projectName: string): Promise<void> {

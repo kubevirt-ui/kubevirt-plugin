@@ -2,11 +2,9 @@ import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { type VMWizardFormValues } from '@virtualmachines/wizard/form/types';
 import { type VMGenerationSource } from '@virtualmachines/wizard/steps/InstanceTypesSteps/hooks/useGenerateVM/utils/getVMGenerationSource';
 
-import { type TemplateGenerationSource } from './utils/getTemplateGenerationSource';
+import { type TemplateGeneratedDraftSource } from './utils/getTemplateGenerationSource';
 
-export type GeneratedDraftSource =
-  | VMGenerationSource
-  | (Omit<TemplateGenerationSource, 'selectedTemplate'> & { templateKey: string });
+export type GeneratedDraftSource = VMGenerationSource | TemplateGeneratedDraftSource;
 
 export type GenerationScope = {
   cluster: string;
