@@ -12,4 +12,11 @@ declare global {
       userSettingsLocation?: ConsoleUserSettingsLocation;
     };
   }
+
+  namespace NodeJS {
+    // eslint-disable-next-line @typescript-eslint/consistent-type-definitions -- global augmentation requires interface
+    interface ProcessEnv {
+      OLS_API_BASE_URL?: string;
+    }
+  }
 }
