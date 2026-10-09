@@ -1,12 +1,19 @@
+/* eslint-disable max-lines */
 import DedicatedResourcesModal from '@kubevirt-utils/components/DedicatedResourcesModal/DedicatedResourcesModal';
 import { produceVMWithDedicatedCPU } from '@kubevirt-utils/components/DedicatedResourcesModal/utils/utils';
 import EvictionStrategyModal from '@kubevirt-utils/components/EvictionStrategy/EvictionStrategyModal';
+import { produceVMWithEvictionStrategy } from '@kubevirt-utils/components/EvictionStrategy/utils';
 import HardwareDevicesHeadlessModeModal from '@kubevirt-utils/components/HardwareDevices/modal/HardwareDevicesHeadlessModeModal';
 import HardwareDevicesModal from '@kubevirt-utils/components/HardwareDevices/modal/HardwareDevicesModal';
 import { HARDWARE_DEVICE_TYPE } from '@kubevirt-utils/components/HardwareDevices/utils/constants';
 import StartPauseModal from '@kubevirt-utils/components/StartPauseModal/StartPauseModal';
 import { VirtualMachineDetailsTab } from '@kubevirt-utils/constants/tabs-constants';
-import { getCPU, getGPUDevices, getHostDevices } from '@kubevirt-utils/resources/vm';
+import {
+  getCPU,
+  getEvictionStrategy,
+  getGPUDevices,
+  getHostDevices,
+} from '@kubevirt-utils/resources/vm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 
 import { type PendingChange } from '../../utils/types';
@@ -94,12 +101,12 @@ export const getHardwarePendingChanges = ({
     ...createProps(VirtualMachineDetailsTab.Scheduling, () =>
       createModal(({ isOpen, onClose }) => (
         <EvictionStrategyModal
-          headerText={t('Eviction strategy')}
+          evictionStrategy={getEvictionStrategy(vm)}
           isOpen={isOpen}
           onClose={onClose}
           onSubmit={onSubmit}
-          vm={vm}
-          vmi={vmi}
+          produceUpdatedResource={(isChecked) => produceVMWithEvictionStrategy(vm, isChecked)}
+          showPendingChangesAlert={!!vmi}
         />
       )),
     ),

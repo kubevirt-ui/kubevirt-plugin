@@ -9,6 +9,7 @@ import { produceVMWithDedicatedCPU } from '@kubevirt-utils/components/DedicatedR
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import EvictionStrategyModal from '@kubevirt-utils/components/EvictionStrategy/EvictionStrategyModal';
 import ShowEvictionStrategy from '@kubevirt-utils/components/EvictionStrategy/ShowEvictionStrategy';
+import { produceVMWithEvictionStrategy } from '@kubevirt-utils/components/EvictionStrategy/utils';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import RunStrategyModal from '@kubevirt-utils/components/RunStrategyModal/RunStrategyModal';
@@ -53,15 +54,15 @@ const SchedulingSectionRightGrid: FC<SchedulingSectionRightGridProps> = ({
   const onEditEvictionStrategy = useCallback(() => {
     createModal?.(({ isOpen, onClose }) => (
       <EvictionStrategyModal
-        headerText={t('Eviction strategy')}
+        evictionStrategy={getEvictionStrategy(vm)}
         isOpen={isOpen}
         onClose={onClose}
         onSubmit={onSubmit}
-        vm={vm}
-        vmi={vmi}
+        produceUpdatedResource={(isChecked) => produceVMWithEvictionStrategy(vm, isChecked)}
+        showPendingChangesAlert={!!vmi}
       />
     ));
-  }, [createModal, onSubmit, t, vm, vmi]);
+  }, [createModal, onSubmit, vm, vmi]);
 
   return (
     <GridItem span={5}>
