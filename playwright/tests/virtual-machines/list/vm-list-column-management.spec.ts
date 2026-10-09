@@ -1,4 +1,5 @@
 import { ADMIN_ONLY_TAG, T1, T1_TAG, VM_LIST_TAG } from '@/data-models/allure-constants';
+import { ROUTE_VIRTUAL_MACHINES_LIST_TAG } from '@/data-models/route-tags';
 import { expect, test } from '@/fixtures/vm-list-fixture';
 import type VirtualMachinesPage from '@/page-objects/vm/virtual-machines-page';
 import { TestTimeouts } from '@/utils/test-config';
@@ -17,13 +18,7 @@ const EXPECTED_VISIBLE_COLUMN_HEADERS = [
   'CPU Utilization',
 ] as const;
 
-const COLUMNS_TO_ENABLE = [
-  'namespace',
-  'vcpu',
-  'memory',
-  'memory-usage',
-  'cpu-usage',
-] as const;
+const COLUMNS_TO_ENABLE = ['namespace', 'vcpu', 'memory', 'memory-usage', 'cpu-usage'] as const;
 
 const NAME_COLUMN_ID = 'name';
 
@@ -176,14 +171,19 @@ const openAllProjectsVmList = async (
   await vmListPage.waitForVmRowVisible(vmName);
 };
 
-const expectTableHeadersExactly = async (page: Page, expected: readonly string[]): Promise<void> => {
+const expectTableHeadersExactly = async (
+  page: Page,
+  expected: readonly string[],
+): Promise<void> => {
   await expect(async () => {
     const headers = await getTableColumnHeaders(page);
-    expect(headers, `Table headers should be exactly ${expected.join(', ')}`).toEqual([...expected]);
+    expect(headers, `Table headers should be exactly ${expected.join(', ')}`).toEqual([
+      ...expected,
+    ]);
   }).toPass({ timeout: TestTimeouts.ELEMENT_WAIT });
 };
 
-test.describe(SUITE, { tag: [T1_TAG, ADMIN_ONLY_TAG] }, () => {
+test.describe(SUITE, { tag: [ROUTE_VIRTUAL_MACHINES_LIST_TAG, T1_TAG, ADMIN_ONLY_TAG] }, () => {
   let namespace: string;
   let vmName: string;
 
@@ -213,7 +213,7 @@ test.describe(SUITE, { tag: [T1_TAG, ADMIN_ONLY_TAG] }, () => {
     await utils.withAllure({
       suite: SUITE,
       feature: T1,
-      tags: [T1_TAG, VM_LIST_TAG, ADMIN_ONLY_TAG],
+      tags: [ROUTE_VIRTUAL_MACHINES_LIST_TAG, T1_TAG, VM_LIST_TAG, ADMIN_ONLY_TAG],
     });
 
     await test.step('Open Manage columns and select the resource column set', async () => {

@@ -3,6 +3,7 @@ import { load as yamlLoad } from 'js-yaml';
 import { ADMIN_ONLY_TAG, GATING, GATING_TAG, VM_SEARCH_TAG } from '@/data-models/allure-constants';
 import type { KubernetesResource } from '@/data-models/kubernetes-types';
 import { expect, test } from '@/fixtures/vm-search-fixture';
+import type VirtualMachinesPage from '@/page-objects/vm/virtual-machines-page';
 import { TestTimeouts } from '@/utils/test-config';
 import { setupTestNamespace } from '@/utils/test-setup-helpers';
 import { ROUTE_VIRTUAL_MACHINES_LIST_TAG } from '@/data-models/route-tags';
@@ -13,6 +14,45 @@ const projectParams = (url: string): string[] => new URL(url).searchParams.getAl
 
 const isAllNamespacesPath = (url: string): boolean =>
   new URL(url).pathname.includes('/all-namespaces/');
+
+/** Wait until tree + URL + search UI no longer reflect a project filter. */
+const waitForProjectFilterCleared = async (
+  vmListPage: VirtualMachinesPage,
+  projectName: string,
+): Promise<void> => {
+  await expect
+    .poll(
+      async () => {
+        const url = vmListPage.page.url();
+        if (projectParams(url).length > 0 || !isAllNamespacesPath(url)) {
+          return false;
+        }
+
+        const searchValue = await vmListPage.getSearchInputValue();
+        if (/project:/i.test(searchValue) || searchValue.includes(projectName)) {
+          return false;
+        }
+
+        const chips = await vmListPage.getFilterChipTexts();
+        return !chips.some((chip) => chip.includes(projectName));
+      },
+      { timeout: TestTimeouts.UI_ELEMENT_VISIBILITY },
+    )
+    .toBe(true);
+};
+
+/** All-namespaces list is paginated; name search can lag behind filter changes. */
+const searchVmAndWaitForRow = async (
+  vmListPage: VirtualMachinesPage,
+  vmName: string,
+): Promise<void> => {
+  await vmListPage.fillVmSearchInput(vmName);
+  await expect
+    .poll(() => vmListPage.isVmVisibleByDataTest(vmName, TestTimeouts.SHORT_WAIT), {
+      timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+    })
+    .toBe(true);
+};
 
 test.describe(SUITE, { tag: [ROUTE_VIRTUAL_MACHINES_LIST_TAG, GATING_TAG, VM_SEARCH_TAG] }, () => {
   let projectA: string;
@@ -145,62 +185,24 @@ test.describe(SUITE, { tag: [ROUTE_VIRTUAL_MACHINES_LIST_TAG, GATING_TAG, VM_SEA
         .toContain(projectA);
     });
 
-    await test.step('Click Local cluster', async () => {
+    await test.step('Click Local cluster and wait for the Project filter to clear', async () => {
       await vmListPage.clickLocalClusterInTree();
-    });
-
-    await test.step('URL no longer contains project parameter', async () => {
-      await expect
-        .poll(() => projectParams(vmListPage.page.url()), {
-          timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
-        })
-        .toEqual([]);
-      expect
-        .soft(
-          isAllNamespacesPath(vmListPage.page.url()),
-          `URL should be all-namespaces (got: ${vmListPage.page.url()})`,
-        )
-        .toBe(true);
-    });
-
-    await test.step('Search input does not contain the Project filter', async () => {
-      // fillVmSearchInput() clears the box first; asserting here so a leftover
-      // project query cannot be wiped and make the next step pass anyway.
-      const searchValue = await vmListPage.getSearchInputValue();
-      expect(
-        searchValue,
-        `Search input should not contain a project filter (got: "${searchValue}")`,
-      ).not.toMatch(/project:/i);
-      expect(
-        searchValue,
-        `Search input should not contain project A "${projectA}" (got: "${searchValue}")`,
-      ).not.toContain(projectA);
-
-      const chips = await vmListPage.getFilterChipTexts();
-      expect(
-        chips.some((chip) => chip.includes(projectA)),
-        `Project chip "${projectA}" should not be in the search box (got: ${chips.join(', ')})`,
-      ).toBe(false);
+      await vmListPage.waitForTreeViewReady();
+      await vmListPage.clickVmListTab();
+      await waitForProjectFilterCleared(vmListPage, projectA);
     });
 
     await test.step('VMs from both projects are visible', async () => {
-      // Paginated all-namespaces list; search each name (name filter uses selected[0] only).
-      await vmListPage.fillVmSearchInput(vmA);
-      expect
-        .soft(
-          await vmListPage.isVmVisibleByDataTest(vmA),
-          `VM ${vmA} should be visible after clearing the project filter`,
-        )
-        .toBe(true);
+      await searchVmAndWaitForRow(vmListPage, vmA);
 
       await vmListPage.clickClearSearchButton();
-      await vmListPage.fillVmSearchInput(vmB);
-      expect
-        .soft(
-          await vmListPage.isVmVisibleByDataTest(vmB),
-          `VM ${vmB} should be visible after clearing the project filter`,
-        )
+      await expect
+        .poll(() => vmListPage.verifyVmSearchInputEmpty(), {
+          timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+        })
         .toBe(true);
+
+      await searchVmAndWaitForRow(vmListPage, vmB);
     });
   });
 

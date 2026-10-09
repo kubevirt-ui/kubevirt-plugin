@@ -28,6 +28,8 @@ Automated E2E coverage for console routes under `tests/virtual-machines/list/`.
 
 ### vm-group-filter
 
+### vm-list-column-management
+
 ### vm-list-csv-export
 
 ### vm-list-selection-sort
@@ -250,6 +252,33 @@ Automated E2E coverage for console routes under `tests/virtual-machines/list/`.
 | 4    | Switch to the VM list tab and observe the list        | Alpha, beta, and gamma VMs are visible |
 
 ---
+
+---
+
+### Module: `vm-list-column-management.spec.ts`
+
+**Spec file:** `tests/virtual-machines/list/vm-list-column-management.spec.ts`
+**Describe:** `VM List Column Management` — **Tags:** `@route-virtual-machines-list`, `@tier1`, `@adminOnly`
+**Allure:** suite `VM List Column Management`, feature `Tier 1`
+
+---
+
+### `001`: Only selected resource columns appear after Manage columns
+
+- **Objective:** Verify that after choosing **Name**, **Namespace**, **vCPU**, **Memory**, **Memory
+  Utilization**, and **CPU Utilization** in Manage columns, the table headers match that set exactly
+  and no other labeled columns remain.
+- **Target version:** CNV 5.1.0
+- **Jira References:** CNV-97374
+- **Pre-conditions:** One Halted VM exists in a dedicated test namespace
+- **Tags:** `@adminOnly`
+
+| Step | Action                                                                | Expected Result                                                                     |
+| :--- | :-------------------------------------------------------------------- | :---------------------------------------------------------------------------------- |
+| 1    | Open the all-projects VirtualMachines list and locate the test VM     | The Halted VM row is visible                                                        |
+| 2    | Open Manage columns, disable default columns, enable resource columns | **Name** checkbox is checked and disabled                                           |
+| 3    | Click Save                                                            | Modal closes                                                                        |
+| 4    | Observe table headers                                                 | Headers are only Name, Namespace, vCPU, Memory, Memory Utilization, CPU Utilization |
 
 ---
 
