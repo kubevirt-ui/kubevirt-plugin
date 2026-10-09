@@ -1,5 +1,7 @@
 import { type FC, type PropsWithChildren, useCallback, useMemo, useRef, useState } from 'react';
 
+import useNavigationAllowance from '../hooks/useNavigationAllowance';
+import useWizardBeforeUnload from '../hooks/useWizardBeforeUnload';
 import { VMWizardStep } from '../utils/constants';
 import { type VMWizardNavigationState } from './types';
 import { VMWizardStateContext } from './useVMWizardState';
@@ -12,8 +14,13 @@ const createNavigationState = (): VMWizardNavigationState => ({
 
 const VMWizardStateProvider: FC<PropsWithChildren> = ({ children }) => {
   const [navigation, setNavigation] = useState(createNavigationState);
+  const [isCompleted, setIsCompleted] = useState(false);
+  const { allowNextWizardNavigation, consumeWizardNavigationAllowance, navigationAllowedRef } =
+    useNavigationAllowance();
   const [isTemplateDrawerOpen, setIsTemplateDrawerOpen] = useState(false);
   const [templateProcessError, setTemplateProcessError] = useState<null | string>(null);
+
+  useWizardBeforeUnload(!isCompleted);
   const templateGenerationRevisionRef = useRef(0);
   const getTemplateGenerationRevision = useCallback(
     () => templateGenerationRevisionRef.current,
@@ -39,19 +46,26 @@ const VMWizardStateProvider: FC<PropsWithChildren> = ({ children }) => {
 
   const resetState = useCallback((): void => {
     templateGenerationRevisionRef.current = 0;
+    navigationAllowedRef.current = false;
     setNavigation(createNavigationState());
+    setIsCompleted(false);
     setIsTemplateDrawerOpen(false);
     setTemplateProcessError(null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const value = useMemo(
     () => ({
       ...navigation,
+      allowNextWizardNavigation,
+      consumeWizardNavigationAllowance,
       getTemplateGenerationRevision,
       invalidateTemplateGeneration,
+      isCompleted,
       isTemplateDrawerOpen,
       resetState,
       setCurrentStep,
+      setIsCompleted,
       setIsTemplateDrawerOpen,
       setStrictVMName,
       setTemplateProcessError,
@@ -59,8 +73,11 @@ const VMWizardStateProvider: FC<PropsWithChildren> = ({ children }) => {
     }),
     [
       navigation,
+      allowNextWizardNavigation,
+      consumeWizardNavigationAllowance,
       getTemplateGenerationRevision,
       invalidateTemplateGeneration,
+      isCompleted,
       isTemplateDrawerOpen,
       resetState,
       setCurrentStep,

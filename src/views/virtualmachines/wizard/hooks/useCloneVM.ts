@@ -18,6 +18,7 @@ import { getCluster } from '@multicluster/helpers/selectors';
 import { isACMPath } from '@multicluster/urls';
 import { type VMWizardFormValues } from '@virtualmachines/wizard/form/types';
 import { useVMWizardForm } from '@virtualmachines/wizard/form/VMWizardFormProvider';
+import { useVMWizardState } from '@virtualmachines/wizard/state/useVMWizardState';
 
 import { SELECTED_CLUSTER } from '../utils/constants';
 import { handleCloneRequestPhaseChange } from './utils/utils';
@@ -33,6 +34,7 @@ const useCloneVM: UseCloneVM = () => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const { getValues } = useVMWizardForm();
+  const { allowNextWizardNavigation, setIsCompleted } = useVMWizardState();
 
   const [submittedCloneRequest, setSubmittedCloneRequest] = useState<V1beta1VirtualMachineClone>();
   const [error, setError] = useState<unknown>(null);
@@ -52,13 +54,25 @@ const useCloneVM: UseCloneVM = () => {
       cloneRequest,
       formValues: getValues('deployment'),
       navigate,
+      onCompleted: () => {
+        setIsCompleted(true);
+        allowNextWizardNavigation();
+      },
       setError,
       setIsSubmitting,
       setSubmittedCloneRequest,
       submittedCloneRequest,
       t,
     });
-  }, [cloneRequest, getValues, navigate, submittedCloneRequest, t]);
+  }, [
+    allowNextWizardNavigation,
+    cloneRequest,
+    getValues,
+    navigate,
+    setIsCompleted,
+    submittedCloneRequest,
+    t,
+  ]);
 
   const cloneVM = async (values: VMWizardFormValues): Promise<void> => {
     if (isSubmitting || submittedCloneRequest) {

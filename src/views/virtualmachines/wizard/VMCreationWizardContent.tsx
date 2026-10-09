@@ -16,6 +16,7 @@ import { useVMWizardState } from '@virtualmachines/wizard/state/useVMWizardState
 import RequiredLabelsDrawerWrapper from './components/RequiredLabelsDrawerWrapper';
 import TemplatesDrawerWrapper from './components/TemplatesDrawerWrapper';
 import useVMGenerationNavClick from './hooks/useVMGenerationNavClick';
+import useWizardNavigationBlocker from './hooks/useWizardNavigationBlocker';
 import { type VMCreationMethod, VMWizardStep } from './utils/constants';
 import { getStepsToDisplayByCreationMethod } from './utils/displaySteps';
 import { getVMGenerationNavItem } from './utils/steps';
@@ -41,6 +42,8 @@ const VMCreationWizardContent: FC = () => {
 
   const { finalizeDraft } = useWizardVMDraft();
   const hasLoggedCreationStartedRef = useRef(false);
+
+  useWizardNavigationBlocker();
 
   const stepsToDisplay: VMWizardStepDisplay[] = useMemo(
     () =>
