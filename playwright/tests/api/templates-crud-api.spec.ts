@@ -2,6 +2,7 @@ import { load as yamlLoad } from 'js-yaml';
 
 import type { KubernetesResource } from '@/data-models/kubernetes-types';
 import { expect, test } from '@/fixtures/api-test-fixture';
+import { ROUTE_API_TAG } from '@/data-models/route-tags';
 
 const RH_TEMPLATES_NS = 'openshift';
 
@@ -29,7 +30,7 @@ function templateParameters(tmpl: KubernetesResource): KubernetesResource[] {
   return Array.isArray(raw) ? (raw as KubernetesResource[]) : [];
 }
 
-test.describe('Template — user template lifecycle API', { tag: ['@api'] }, () => {
+test.describe('Template — user template lifecycle API', { tag: [ROUTE_API_TAG, '@api'] }, () => {
   let templateName: string;
 
   test.beforeAll(async ({ testNamespace, apiClient, utils }) => {
@@ -157,7 +158,7 @@ test.describe('Template — user template lifecycle API', { tag: ['@api'] }, () 
   });
 });
 
-test.describe('Template — dedicated resources API', { tag: ['@api'] }, () => {
+test.describe('Template — dedicated resources API', { tag: [ROUTE_API_TAG, '@api'] }, () => {
   let templateName: string;
 
   test.beforeAll(async ({ testNamespace, apiClient, utils }) => {
@@ -219,7 +220,7 @@ test.describe('Template — dedicated resources API', { tag: ['@api'] }, () => {
   });
 });
 
-test.describe('Template — clone API', { tag: ['@api'] }, () => {
+test.describe('Template — clone API', { tag: [ROUTE_API_TAG, '@api'] }, () => {
   let sourceName: string;
   let cloneName: string;
 
@@ -296,49 +297,57 @@ test.describe('Template — clone API', { tag: ['@api'] }, () => {
   });
 });
 
-test.describe('Template — Red Hat templates read-only API', { tag: ['@api'] }, () => {
-  test('GET: openshift namespace has VM templates', async ({ apiClient }) => {
-    const list = await apiClient.getTemplates(
-      RH_TEMPLATES_NS,
-      'template.kubevirt.io/type in (base,vm)',
-    );
-    expect(list.kind).toBe('TemplateList');
-    expect(
-      list.items.length,
-      'Red Hat VM templates must exist in openshift namespace',
-    ).toBeGreaterThan(0);
-  });
+test.describe(
+  'Template — Red Hat templates read-only API',
+  { tag: [ROUTE_API_TAG, '@api'] },
+  () => {
+    test('GET: openshift namespace has VM templates', async ({ apiClient }) => {
+      const list = await apiClient.getTemplates(
+        RH_TEMPLATES_NS,
+        'template.kubevirt.io/type in (base,vm)',
+      );
+      expect(list.kind).toBe('TemplateList');
+      expect(
+        list.items.length,
+        'Red Hat VM templates must exist in openshift namespace',
+      ).toBeGreaterThan(0);
+    });
 
-  test('GET: RHEL9 template exists and has expected structure', async ({ apiClient }) => {
-    const tmpl = await apiClient.getTemplate(RH_TEMPLATES_NS, RHEL9_TEMPLATE_NAME);
-    expect(tmpl.kind).toBe('Template');
-    expect(
-      templateParameters(tmpl).length > 0,
-      'RHEL9 template must have at least one parameter',
-    ).toBe(true);
-    expect(templateObjects(tmpl).length > 0, 'RHEL9 template must have objects').toBe(true);
-    const vm = templateObjects(tmpl).find((o) => o.kind === 'VirtualMachine');
-    expect(vm, 'RHEL9 template objects must include a VirtualMachine').toBeDefined();
-  });
+    test('GET: RHEL9 template exists and has expected structure', async ({ apiClient }) => {
+      const tmpl = await apiClient.getTemplate(RH_TEMPLATES_NS, RHEL9_TEMPLATE_NAME);
+      expect(tmpl.kind).toBe('Template');
+      expect(
+        templateParameters(tmpl).length > 0,
+        'RHEL9 template must have at least one parameter',
+      ).toBe(true);
+      expect(templateObjects(tmpl).length > 0, 'RHEL9 template must have objects').toBe(true);
+      const vm = templateObjects(tmpl).find((o) => o.kind === 'VirtualMachine');
+      expect(vm, 'RHEL9 template objects must include a VirtualMachine').toBeDefined();
+    });
 
-  test('GET: RHEL9 template has os and type labels', async ({ apiClient }) => {
-    const tmpl = await apiClient.getTemplate(RH_TEMPLATES_NS, RHEL9_TEMPLATE_NAME);
-    expect(tmpl.metadata.labels?.['template.kubevirt.io/type']).toMatch(/^(base|vm)$/);
-    const hasOsLabel = Object.keys(tmpl.metadata.labels ?? {}).some((k) =>
-      k.startsWith('os.template.kubevirt.io/'),
-    );
-    expect(hasOsLabel, 'RHEL9 template must have an os.template.kubevirt.io/* label').toBe(true);
-  });
+    test('GET: RHEL9 template has os and type labels', async ({ apiClient }) => {
+      const tmpl = await apiClient.getTemplate(RH_TEMPLATES_NS, RHEL9_TEMPLATE_NAME);
+      expect(tmpl.metadata.labels?.['template.kubevirt.io/type']).toMatch(/^(base|vm)$/);
+      const hasOsLabel = Object.keys(tmpl.metadata.labels ?? {}).some((k) =>
+        k.startsWith('os.template.kubevirt.io/'),
+      );
+      expect(hasOsLabel, 'RHEL9 template must have an os.template.kubevirt.io/* label').toBe(true);
+    });
 
-  test('GET: template list returns all-namespaces results when namespace omitted', async ({
-    apiClient,
-  }) => {
-    const list = await apiClient.getTemplates(undefined, 'template.kubevirt.io/type in (base,vm)');
-    expect(list.kind).toBe('TemplateList');
-    expect(list.items.length).toBeGreaterThan(0);
-    const namespaces = new Set(list.items.map((t: KubernetesResource) => t.metadata?.namespace));
-    expect(namespaces.has(RH_TEMPLATES_NS), 'cross-namespace list must include openshift ns').toBe(
-      true,
-    );
-  });
-});
+    test('GET: template list returns all-namespaces results when namespace omitted', async ({
+      apiClient,
+    }) => {
+      const list = await apiClient.getTemplates(
+        undefined,
+        'template.kubevirt.io/type in (base,vm)',
+      );
+      expect(list.kind).toBe('TemplateList');
+      expect(list.items.length).toBeGreaterThan(0);
+      const namespaces = new Set(list.items.map((t: KubernetesResource) => t.metadata?.namespace));
+      expect(
+        namespaces.has(RH_TEMPLATES_NS),
+        'cross-namespace list must include openshift ns',
+      ).toBe(true);
+    });
+  },
+);

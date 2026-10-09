@@ -1,13 +1,14 @@
 import * as path from 'path';
 
-import { defineConfig, devices } from '@playwright/test';
 import * as dotenv from 'dotenv';
+
+import { defineConfig, devices } from '@playwright/test';
 
 dotenv.config({ path: path.resolve(__dirname, '.env'), quiet: true });
 
-export const baseURL = (() => {
+export const baseURL = ((): string => {
   const addr =
-    process.env.WEB_CONSOLE_URL || process.env.BRIDGE_BASE_ADDRESS || 'http://localhost:9000';
+    process.env.WEB_CONSOLE_URL ?? process.env.BRIDGE_BASE_ADDRESS ?? 'http://localhost:9000';
   const basePath = process.env.BRIDGE_BASE_PATH ?? '/';
   return `${addr}${basePath}`.replace(/\/$/, '');
 })();
@@ -40,6 +41,12 @@ const migrationUse = {
   viewport: { height: 1080, width: 1920 },
 };
 
+/** Route-based UI specs; API specs live under `playwright/tests/api`. */
+const uiTestDir = './playwright/tests';
+const uiTestIgnoreApi = '**/api/**';
+/** Avoid running `@cnv-settings` specs twice (Gating + Settings). */
+const uiGrepInvertSettings = /@cnv-settings/;
+
 export default defineConfig({
   expect: { timeout: 60_000 },
   forbidOnly: !!process.env.CI,
@@ -48,39 +55,48 @@ export default defineConfig({
   globalTeardown: './playwright/project-dependencies/global.teardown.ts',
   outputDir: './playwright/test-results/artifacts',
   projects: [
-    // ── Gating project (scenario infrastructure) ─────────────────────
+    // ── Gating project (tag @gating) ─────────────────────────────────
     {
       fullyParallel: true,
+      grep: /@gating/,
+      grepInvert: uiGrepInvertSettings,
       name: 'Gating',
       retries: 0,
-      testDir: './playwright/tests/gating',
+      testDir: uiTestDir,
+      testIgnore: uiTestIgnoreApi,
       use: migrationUse,
     },
 
-    // ── Tier1 project (scenario infrastructure) ────────────────────
+    // ── Tier1 project ────────────────────────────────────────────────
     {
       fullyParallel: false,
+      grep: /@tier1/,
       name: 'Tier1',
       retries: 0,
-      testDir: './playwright/tests/tier1',
+      testDir: uiTestDir,
+      testIgnore: uiTestIgnoreApi,
       use: migrationUse,
     },
 
-    // ── Tier2 project (scenario infrastructure) ────────────────────
+    // ── Tier2 project ────────────────────────────────────────────────
     {
       fullyParallel: false,
+      grep: /@tier2/,
       name: 'Tier2',
       retries: 0,
-      testDir: './playwright/tests/tier2',
+      testDir: uiTestDir,
+      testIgnore: uiTestIgnoreApi,
       use: migrationUse,
     },
 
-    // ── Settings project (scenario infrastructure) ────────────────────
+    // ── Settings project ─────────────────────────────────────────────
     {
       fullyParallel: false,
+      grep: /@cnv-settings/,
       name: 'Settings',
       retries: 0,
-      testDir: './playwright/tests/settings',
+      testDir: uiTestDir,
+      testIgnore: uiTestIgnoreApi,
       use: migrationUse,
     },
 
@@ -107,9 +123,9 @@ export default defineConfig({
     baseURL,
     headless: process.env.HEADLESS !== 'false',
     ignoreHTTPSErrors: true,
-    testIdAttribute: 'data-test',
     navigationTimeout: 120_000,
     screenshot: 'only-on-failure',
+    testIdAttribute: 'data-test',
     trace: 'off',
     video: 'off',
     viewport: { height: 1080, width: 1920 },

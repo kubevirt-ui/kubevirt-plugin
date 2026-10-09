@@ -5,9 +5,17 @@ import type { Page } from '@playwright/test';
 export class VmCreationWizardReviewComponent extends BaseComponent {
   private readonly _inputTypeText = this.locator('input[type="text"]');
 
-  private readonly _pfV6CWizardButtonpfV6CButtonpfMPrimary = this.locator(
-    '.pf-v6-c-wizard button.pf-v6-c-button.pf-m-primary',
-  );
+  private readonly _wizardFooterCreateButton = this.page
+    .getByTestId('wizard-create-button')
+    .filter({ hasText: 'Create VirtualMachine' })
+    .or(this.testId('create-virtual-machine').getByRole('button'))
+    .or(
+      this.locator(
+        '.pf-v6-c-wizard__footer button.pf-m-primary, .pf-c-wizard__footer button.pf-m-primary',
+      ).filter({
+        hasText: 'Create VirtualMachine',
+      }),
+    );
   private readonly _pfV6CWizardInputTypeText = this.locator('.pf-v6-c-wizard input[type="text"]');
   private readonly _startAfterCreateCheckbox = this.locator('#start-after-create-checkbox');
   private readonly _startThisVirtualMachineAfterCreation = this.locator(
@@ -24,14 +32,13 @@ export class VmCreationWizardReviewComponent extends BaseComponent {
   }
 
   async clickCreateVm(): Promise<void> {
-    await this.collapseSidebarIfExpanded();
-    const createBtn = this._pfV6CWizardButtonpfV6CButtonpfMPrimary;
+    const createBtn = this._wizardFooterCreateButton;
     await createBtn.first().waitFor({
       state: 'visible',
-      timeout: TestTimeouts.SHORT_WAIT,
+      timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
     });
 
-    if (await createBtn.first().isDisabled()) {
+    if (await createBtn.isDisabled()) {
       const nameInput = this.locator('#vm-name');
       if ((await nameInput.count()) > 0) {
         await nameInput.press('Tab');
@@ -58,10 +65,8 @@ export class VmCreationWizardReviewComponent extends BaseComponent {
 
   async getCreateButtonText(): Promise<string> {
     try {
-      const createBtn = this._pfV6CWizardButtonpfV6CButtonpfMPrimary;
-      return (
-        (await createBtn.first().textContent({ timeout: TestTimeouts.SHORT_WAIT }))?.trim() || ''
-      );
+      const createBtn = this._wizardFooterCreateButton;
+      return (await createBtn.textContent({ timeout: TestTimeouts.SHORT_WAIT }))?.trim() || '';
     } catch {
       return '';
     }
@@ -120,7 +125,7 @@ export class VmCreationWizardReviewComponent extends BaseComponent {
 
   async isCreateButtonDisabled(): Promise<boolean> {
     try {
-      const createBtn = this._pfV6CWizardButtonpfV6CButtonpfMPrimary.first();
+      const createBtn = this._wizardFooterCreateButton;
       await createBtn.waitFor({ state: 'visible', timeout: TestTimeouts.SHORT_WAIT });
       return createBtn.isDisabled();
     } catch {
@@ -299,7 +304,6 @@ export class VmCreationWizardDeploymentComponent extends BaseComponent {
   }
 
   async openWizardFromCreateDropdown(): Promise<void> {
-    await this.collapseSidebarIfExpanded();
     const createButton = this.locator('button[aria-label="Create VirtualMachine"]')
       .or(this.testId('item-create').and(this.locator('.pf-m-primary')))
       .or(this.locator('.pf-m-primary').locator('[data-test="item-create"]'))

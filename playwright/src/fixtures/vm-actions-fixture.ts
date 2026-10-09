@@ -8,7 +8,6 @@
  */
 
 import RequestContextClient from '@/clients/request-context-client';
-import { withSafeActions } from '@/page-objects/base-page';
 import CreateVmCreatePage from '@/page-objects/create-vm/create-vm-create-page';
 import CreateVmTemplatesPage from '@/page-objects/create-vm/create-vm-templates-page';
 import TemplatesPage from '@/page-objects/create-vm/templates-page';
@@ -17,14 +16,12 @@ import PageCommons from '@/page-objects/page-commons';
 import VirtualMachineDetailPage from '@/page-objects/vm/virtual-machine-detail-page';
 import VirtualMachinesPage from '@/page-objects/vm/virtual-machines-page';
 import VmOverviewTabPage from '@/page-objects/vm/vm-overview-tab-page';
-import VmTreePage from '@/page-objects/vm/vm-tree-page';
 import { EnvVariables } from '@/utils/env-variables';
 import { TestConfigManager } from '@/utils/test-config';
 
 import { baseTest, expect } from './scenario-test-fixture';
 
 interface VmActionsFixtures {
-  vmTreePage: VmTreePage;
   vmDetailPage: VirtualMachineDetailPage;
   vmListPage: VirtualMachinesPage;
   vmOverviewTabPage: VmOverviewTabPage;
@@ -37,32 +34,29 @@ interface VmActionsFixtures {
 }
 
 const test = baseTest.extend<VmActionsFixtures>({
-  vmTreePage: async ({ page }, use) => {
-    await use(withSafeActions(new VmTreePage(page)));
-  },
   vmDetailPage: async ({ page }, use) => {
-    await use(withSafeActions(new VirtualMachineDetailPage(page)));
+    await use(new VirtualMachineDetailPage(page));
   },
   vmListPage: async ({ page }, use) => {
-    await use(withSafeActions(new VirtualMachinesPage(page)));
+    await use(new VirtualMachinesPage(page));
   },
   vmOverviewTabPage: async ({ page }, use) => {
-    await use(withSafeActions(new VmOverviewTabPage(page)));
+    await use(new VmOverviewTabPage(page));
   },
   pageCommons: async ({ page }, use) => {
-    await use(withSafeActions(new PageCommons(page)));
+    await use(new PageCommons(page));
   },
   overviewPage: async ({ page }, use) => {
-    await use(withSafeActions(new OverviewPage(page)));
+    await use(new OverviewPage(page));
   },
   templatesPage: async ({ page }, use) => {
-    await use(withSafeActions(new TemplatesPage(page)));
+    await use(new TemplatesPage(page));
   },
   createVmTemplatesPage: async ({ page }, use) => {
-    await use(withSafeActions(new CreateVmTemplatesPage(page)));
+    await use(new CreateVmTemplatesPage(page));
   },
   createVmCreatePage: async ({ page }, use) => {
-    await use(withSafeActions(new CreateVmCreatePage(page)));
+    await use(new CreateVmCreatePage(page));
   },
   requestContextClient: async ({ page }, use) => {
     const testConfig = TestConfigManager.getConfig();

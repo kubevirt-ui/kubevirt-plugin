@@ -10,6 +10,9 @@
 #   • Supports IS_LOCAL=1 for localhost development (localhost:9000).
 #   • Extra args (file paths, -g patterns, --workers, …) are forwarded to Playwright.
 #
+# Local / agent entry (repo root; use nvm for Node). CI invokes this via
+# ci-scripts/hot-cluster/ts/src/scripts/run-gating-tests.ts — do not use that script locally.
+#
 # Usage:
 #   ./playwright-runner-hc-e2e.sh [project] [extra-args...]
 #
@@ -20,8 +23,8 @@
 # Examples:
 #   ./playwright-runner-hc-e2e.sh Gating --workers=4
 #   ./playwright-runner-hc-e2e.sh Tier1
-#   ./playwright-runner-hc-e2e.sh Tier2 playwright/tests/tier2/foo.spec.ts
-#   ./playwright-runner-hc-e2e.sh auto playwright/tests/tier1/foo.spec.ts
+#   ./playwright-runner-hc-e2e.sh Tier2 playwright/tests/virtual-machines/migrations/foo.spec.ts
+#   ./playwright-runner-hc-e2e.sh auto playwright/tests/bootable-volumes/foo.spec.ts
 #   ./playwright-runner-hc-e2e.sh auto -g "creates a bootable volume"
 #   IS_LOCAL=1 ./playwright-runner-hc-e2e.sh Gating --headed
 #   ./playwright-runner-hc-e2e.sh suite
@@ -109,6 +112,23 @@ EXTRA_ARGS=("$@")
 
 PROJECT_LOWER=$(echo "${PROJECT}" | tr '[:upper:]' '[:lower:]')
 
+# Route-based layout: each Playwright project filters by tag in playwright.config.ts.
+# Repeat tag filters on the CLI so CI still scopes correctly if project grep is missing.
+project_tag_grep_args() {
+  case "$1" in
+    gating)
+      echo --grep '@gating' --grep-invert '@cnv-settings'
+      ;;
+    tier1) echo --grep '@tier1' ;;
+    tier2) echo --grep '@tier2' ;;
+    settings) echo --grep '@cnv-settings' ;;
+    api) echo ;;
+    *) echo ;;
+  esac
+}
+
+read -r -a TAG_GREP_ARGS <<< "$(project_tag_grep_args "${PROJECT_LOWER}")"
+
 if [[ "${PROJECT_LOWER}" == "auto" ]]; then
   if [[ ${#EXTRA_ARGS[@]} -eq 0 ]]; then
     echo "❌ Project 'auto' requires Playwright filter args (spec path or -g)."
@@ -135,5 +155,9 @@ elif [[ "${PROJECT_LOWER}" == "all" ]]; then
   npx playwright test "${PROJECT_ARGS[@]}" "${EXTRA_ARGS[@]}"
 else
   echo "🚀 Running project: ${PROJECT} (HC E2E mode)..."
-  npx playwright test --project="${PROJECT}" "${EXTRA_ARGS[@]}"
+  if [[ ${#TAG_GREP_ARGS[@]} -gt 0 ]]; then
+    npx playwright test --project="${PROJECT}" "${TAG_GREP_ARGS[@]}" "${EXTRA_ARGS[@]}"
+  else
+    npx playwright test --project="${PROJECT}" "${EXTRA_ARGS[@]}"
+  fi
 fi
