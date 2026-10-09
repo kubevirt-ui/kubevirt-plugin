@@ -41,13 +41,13 @@ Read-only coverage assessment of the virtualization module. Uses two complementa
 
 ## Test Infrastructure
 
-| Tier         | Directory                    | Purpose                                          | Status                       |
-| ------------ | ---------------------------- | ------------------------------------------------ | ---------------------------- |
-| **Gating**   | `playwright/tests/gating/`   | Smoke, resource creation, VM search/tree filters | Must always pass, no retries |
-| **Tier 1**   | `playwright/tests/tier1/`    | Single-resource CRUD lifecycle                   | Active                       |
-| **Tier 2**   | `playwright/tests/tier2/`    | Cross-module integration                         | Active                       |
-| **Settings** | `playwright/tests/settings/` | Cluster-wide config (runs in isolation)          | Active                       |
-| **API**      | `playwright/tests/api/`      | API contract validation                          | Active                       |
+| Tier         | Directory                                                           | Purpose                                          | Status                       |
+| ------------ | ------------------------------------------------------------------- | ------------------------------------------------ | ---------------------------- |
+| **Gating**   | `@gating` (scope-named specs per route, e.g. `*-page-load.spec.ts`) | Smoke, resource creation, VM search/tree filters | Must always pass, no retries |
+| **Tier 1**   | `@tier1` (route folders per console page)                           | Single-resource CRUD lifecycle                   | Active                       |
+| **Tier 2**   | `@tier2` (route folders per console page)                           | Cross-module integration                         | Active                       |
+| **Settings** | `@cnv-settings` (`virtualization-settings/`, `quotas/`)             | Cluster-wide config (runs in isolation)          | Active                       |
+| **API**      | `playwright/tests/api/`                                             | API contract validation                          | Active                       |
 
 Coverage analysis scans **all** directories. Proposals for new coverage target `tier1/` or `tier2/` based on complexity.
 

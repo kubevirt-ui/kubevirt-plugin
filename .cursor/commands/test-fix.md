@@ -11,11 +11,11 @@ Run Playwright tests, analyze failures, fix test code issues, and re-run until s
 | Scope         | What runs                                                             |
 | ------------- | --------------------------------------------------------------------- |
 | _(none)_      | All active projects (`./playwright-runner.sh all`)                    |
-| `gating`      | Gating tests (`npx playwright test --project=Gating`)                 |
-| `tier1`       | Tier 1 tests (`npx playwright test --project=Tier1`)                  |
-| `tier2`       | Tier 2 tests (`npx playwright test --project=Tier2`)                  |
-| `settings`    | Settings tests (`npx playwright test --project=Settings`)             |
-| `api`         | API contract tests (`npx playwright test --project=API`)              |
+| `gating`      | Gating (`./playwright-runner-hc-e2e.sh Gating`)                       |
+| `tier1`       | Tier 1 (`./playwright-runner-hc-e2e.sh Tier1`)                        |
+| `tier2`       | Tier 2 (`./playwright-runner-hc-e2e.sh Tier2`)                        |
+| `settings`    | Settings (`./playwright-runner-hc-e2e.sh Settings`)                   |
+| `api`         | API (`./playwright-runner-hc-e2e.sh API`)                             |
 | `<file-path>` | Specific spec file (`npx playwright test <path>`)                     |
 | `<test-name>` | Specific test by name (`npx playwright test -g "<name>" --workers=1`) |
 
@@ -34,13 +34,17 @@ Run Playwright tests, analyze failures, fix test code issues, and re-run until s
 
 ### Phase 1: Run Tests
 
-Use the runner script or `npx playwright test` with the appropriate project:
+Use **`playwright-runner-hc-e2e.sh`** from the repo root (loads `.env`; use **nvm** for Node):
 
 ```bash
-# Via runner script (recommended)
-./playwright-runner.sh <project>
+IS_LOCAL=1 ./playwright-runner-hc-e2e.sh Gating --workers=4
+./playwright-runner-hc-e2e.sh Tier1 --workers=2
+```
 
-# Or directly
+For lighter debugging without HC auth setup:
+
+```bash
+./playwright-runner.sh <project>
 PLAYWRIGHT_RETRIES=0 npx playwright test --project=<Tier1|Tier2|Gating|Settings> --workers=1
 ```
 

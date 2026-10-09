@@ -15,9 +15,11 @@ If no path or feature name is given, ask the user which spec to document.
 
 ### Feature-name resolution
 
-STD docs are written only for Playwright `.spec.ts` files (as a colocated
-`.spec.md`). Feature-name search must return only `*.spec.ts` candidates —
-never `.spec.md`, helpers, fixtures, or other TypeScript files.
+STD docs live in the route folder as a **route-named `.md` file** (e.g.
+`bootable-volumes/bootable-volumes.md`, `virtual-machines/list/virtual-machines-list.md`).
+Each `.spec.ts` in that folder is a module inside that file. Feature-name search
+must return only `*.spec.ts` candidates — not route STD markdown, helpers,
+fixtures, or other TypeScript files.
 
 When the input is not a `.spec.ts` path, map the description to `.spec.ts`
 files **before** generating an STD:

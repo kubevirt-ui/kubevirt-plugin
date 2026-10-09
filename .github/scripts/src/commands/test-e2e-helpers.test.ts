@@ -20,10 +20,15 @@ describe('parseTestE2ECommand', () => {
   });
 
   it('parses optional Playwright args', () => {
-    assert.deepEqual(parseTestE2ECommand('/test-e2e tier1 playwright/tests/tier1/foo.spec.ts'), {
-      testArgs: 'playwright/tests/tier1/foo.spec.ts',
-      testProject: 'tier1',
-    });
+    assert.deepEqual(
+      parseTestE2ECommand(
+        '/test-e2e tier1 playwright/tests/virtual-machines/actions/vm-actions.spec.ts',
+      ),
+      {
+        testArgs: 'playwright/tests/virtual-machines/actions/vm-actions.spec.ts',
+        testProject: 'tier1',
+      },
+    );
     assert.deepEqual(parseTestE2ECommand('/test-e2e gating -g MyTestName'), {
       testArgs: '-g MyTestName',
       testProject: 'gating',
@@ -33,10 +38,10 @@ describe('parseTestE2ECommand', () => {
   it('parses filter-only commands without a suite (auto)', () => {
     assert.deepEqual(
       parseTestE2ECommand(
-        '/test-e2e playwright/tests/tier1/bootable-volumes/bootable-volumes.spec.ts',
+        '/test-e2e playwright/tests/bootable-volumes/bootable-volumes.spec.ts',
       ),
       {
-        testArgs: 'playwright/tests/tier1/bootable-volumes/bootable-volumes.spec.ts',
+        testArgs: 'playwright/tests/bootable-volumes/bootable-volumes.spec.ts',
         testProject: 'auto',
       },
     );
@@ -52,9 +57,11 @@ describe('parseTestE2ECommand', () => {
 
   it('strips invisible bidi / zero-width marks from copied spec paths', () => {
     assert.deepEqual(
-      parseTestE2ECommand('/test-e2e tier1 playwright/tests/tier1/foo.spec.ts\u200e'),
+      parseTestE2ECommand(
+        '/test-e2e tier1 playwright/tests/vm-wizard/create-vm-wizard-from-template.spec.ts\u200e',
+      ),
       {
-        testArgs: 'playwright/tests/tier1/foo.spec.ts',
+        testArgs: 'playwright/tests/vm-wizard/create-vm-wizard-from-template.spec.ts',
         testProject: 'tier1',
       },
     );
@@ -83,5 +90,9 @@ describe('buildTestE2EReport', () => {
     assert.match(buildTestE2EReport('o', 'r', 'gating', '-g Foo'), /does \*\*not\*\* update/);
     assert.match(buildTestE2EReport('o', 'r', 'auto', 'foo.spec.ts'), /does \*\*not\*\* update/);
     assert.doesNotMatch(buildTestE2EReport('o', 'r', 'gating', ''), /does \*\*not\*\* update/);
+    assert.match(
+      buildTestE2EReport('o', 'r', 'tier1', 'playwright/tests/vm-wizard/foo.spec.ts'),
+      /playwright\/tests\/<route>\//,
+    );
   });
 });

@@ -2,6 +2,7 @@ import { load as yamlLoad } from 'js-yaml';
 
 import type { KubernetesResource } from '@/data-models/kubernetes-types';
 import { expect, test } from '@/fixtures/api-test-fixture';
+import { ROUTE_API_TAG } from '@/data-models/route-tags';
 
 const RH_TEMPLATES_NS = 'openshift';
 
@@ -29,7 +30,7 @@ function templateParameters(tmpl: KubernetesResource): KubernetesResource[] {
   return Array.isArray(raw) ? (raw as KubernetesResource[]) : [];
 }
 
-test.describe('Template — user template lifecycle API', { tag: ['@api'] }, () => {
+test.describe('Template — user template lifecycle API', { tag: [ROUTE_API_TAG, '@api'] }, () => {
   let templateName: string;
 
   test.beforeAll(async ({ testNamespace, apiClient, utils }) => {
@@ -157,7 +158,7 @@ test.describe('Template — user template lifecycle API', { tag: ['@api'] }, () 
   });
 });
 
-test.describe('Template — dedicated resources API', { tag: ['@api'] }, () => {
+test.describe('Template — dedicated resources API', { tag: [ROUTE_API_TAG, '@api'] }, () => {
   let templateName: string;
 
   test.beforeAll(async ({ testNamespace, apiClient, utils }) => {
@@ -219,7 +220,7 @@ test.describe('Template — dedicated resources API', { tag: ['@api'] }, () => {
   });
 });
 
-test.describe('Template — clone API', { tag: ['@api'] }, () => {
+test.describe('Template — clone API', { tag: [ROUTE_API_TAG, '@api'] }, () => {
   let sourceName: string;
   let cloneName: string;
 
@@ -296,7 +297,7 @@ test.describe('Template — clone API', { tag: ['@api'] }, () => {
   });
 });
 
-test.describe('Template — Red Hat templates read-only API', { tag: ['@api'] }, () => {
+test.describe('Template — Red Hat templates read-only API', { tag: [ROUTE_API_TAG, '@api'] }, () => {
   test('GET: openshift namespace has VM templates', async ({ apiClient }) => {
     const list = await apiClient.getTemplates(
       RH_TEMPLATES_NS,

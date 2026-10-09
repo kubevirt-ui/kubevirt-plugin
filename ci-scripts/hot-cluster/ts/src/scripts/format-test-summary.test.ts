@@ -12,10 +12,10 @@ const buildSuite = (
 const ALL_PASSING_XML = `<?xml version="1.0" encoding="UTF-8"?>
 <testsuites id="" name="" tests="2" failures="0" skipped="0" errors="0" time="5.0">
   ${buildSuite(
-    { hostname: 'Tier1', name: 'create-vm/foo.spec.ts' },
+    { hostname: 'Tier1', name: 'vm-wizard/foo.spec.ts' },
     `
-    <testcase name="Foo suite › test one" classname="create-vm/foo.spec.ts" time="2.0"></testcase>
-    <testcase name="Foo suite › test two" classname="create-vm/foo.spec.ts" time="3.0"></testcase>
+    <testcase name="Foo suite › test one" classname="vm-wizard/foo.spec.ts" time="2.0"></testcase>
+    <testcase name="Foo suite › test two" classname="vm-wizard/foo.spec.ts" time="3.0"></testcase>
   `,
   )}
 </testsuites>`;
@@ -26,23 +26,23 @@ const ALL_PASSING_XML = `<?xml version="1.0" encoding="UTF-8"?>
 const MIXED_XML = `<?xml version="1.0" encoding="UTF-8"?>
 <testsuites id="" name="" tests="6" failures="1" skipped="1" errors="0" time="20.0">
   ${buildSuite(
-    { hostname: 'Tier1', name: 'create-vm/wizard-customization.spec.ts' },
+    { hostname: 'Tier1', name: 'vm-wizard/wizard-customization.spec.ts' },
     `
-    <testcase name="VM Wizard › boot order persists" classname="create-vm/wizard-customization.spec.ts" time="4.0">
+    <testcase name="VM Wizard › boot order persists" classname="vm-wizard/wizard-customization.spec.ts" time="4.0">
       <failure message="expect(received).toBeGreaterThan(expected)&#10;Expected: &gt; 0" type="expect.toBeGreaterThan"><![CDATA[stack trace here]]></failure>
     </testcase>
   `,
   )}
   ${buildSuite(
-    { hostname: 'Tier1', name: 'create-vm/wizard-draft-reset.spec.ts' },
+    { hostname: 'Tier1', name: 'vm-wizard/wizard-draft-reset.spec.ts' },
     `
-    <testcase name="VM Wizard › draft resets" classname="create-vm/wizard-draft-reset.spec.ts" time="2.0"></testcase>
+    <testcase name="VM Wizard › draft resets" classname="vm-wizard/wizard-draft-reset.spec.ts" time="2.0"></testcase>
   `,
   )}
   ${buildSuite(
-    { hostname: 'Tier2', name: 'create-vm/wizard-clone.spec.ts' },
+    { hostname: 'Tier2', name: 'vm-wizard/wizard-clone.spec.ts' },
     `
-    <testcase name="VM Wizard › clone skipped" classname="create-vm/wizard-clone.spec.ts" time="0">
+    <testcase name="VM Wizard › clone skipped" classname="vm-wizard/wizard-clone.spec.ts" time="0">
       <skipped/>
     </testcase>
   `,
@@ -57,16 +57,16 @@ describe('parseJUnitSummary', () => {
     assert.equal(summary.passed, 2);
     assert.equal(summary.skipped, 0);
     assert.equal(summary.specs.length, 1);
-    assert.equal(summary.specs[0].path, 'tier1/create-vm/foo.spec.ts');
+    assert.equal(summary.specs[0].path, 'tier1/vm-wizard/foo.spec.ts');
   });
 
   it('reconstructs spec paths by prefixing the lowercased project name', () => {
     const summary = parseJUnitSummary(MIXED_XML);
     const paths = summary.specs.map((spec) => spec.path);
     assert.deepEqual(paths, [
-      'tier1/create-vm/wizard-customization.spec.ts',
-      'tier1/create-vm/wizard-draft-reset.spec.ts',
-      'tier2/create-vm/wizard-clone.spec.ts',
+      'tier1/vm-wizard/wizard-customization.spec.ts',
+      'tier1/vm-wizard/wizard-draft-reset.spec.ts',
+      'tier2/vm-wizard/wizard-clone.spec.ts',
     ]);
   });
 
@@ -103,8 +103,8 @@ describe('parseJUnitSummary', () => {
     const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <testsuites id="" name="" tests="1" failures="0" skipped="0" errors="1" time="480.0">
   ${buildSuite(
-    { hostname: 'Tier2', name: 'create-vm/wizard-clone.spec.ts' },
-    '<testcase name="clone reaches Running state" classname="create-vm/wizard-clone.spec.ts" time="480.0"><error message="VM pw-clone-src did not become Running within 480000ms" type="Error"><![CDATA[stack trace here]]></error></testcase>',
+    { hostname: 'Tier2', name: 'vm-wizard/wizard-clone.spec.ts' },
+    '<testcase name="clone reaches Running state" classname="vm-wizard/wizard-clone.spec.ts" time="480.0"><error message="VM pw-clone-src did not become Running within 480000ms" type="Error"><![CDATA[stack trace here]]></error></testcase>',
   )}
 </testsuites>`;
 
@@ -121,8 +121,8 @@ describe('parseJUnitSummary', () => {
     const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <testsuites id="" name="" tests="1" failures="0" skipped="0" errors="0" time="1.0">
   ${buildSuite(
-    { hostname: 'Tier1', name: 'create-vm/logs-html.spec.ts' },
-    '<testcase name="logs raw html" classname="create-vm/logs-html.spec.ts" time="0.1"><system-out><![CDATA[<failure message="not real" type="Error"></failure><skipped></skipped>]]></system-out></testcase>',
+    { hostname: 'Tier1', name: 'vm-wizard/logs-html.spec.ts' },
+    '<testcase name="logs raw html" classname="vm-wizard/logs-html.spec.ts" time="0.1"><system-out><![CDATA[<failure message="not real" type="Error"></failure><skipped></skipped>]]></system-out></testcase>',
   )}
 </testsuites>`;
 
@@ -162,8 +162,8 @@ describe('formatTestSummary', () => {
   it('lists every failing spec path even when failure details are capped', () => {
     const suites = Array.from({ length: 30 }, (_unused, index) =>
       buildSuite(
-        { hostname: 'Tier1', name: `create-vm/spec-${index}.spec.ts` },
-        `<testcase name="test ${index}" classname="create-vm/spec-${index}.spec.ts" time="0.1"><failure message="boom ${index}" type="Error"/></testcase>`,
+        { hostname: 'Tier1', name: `vm-wizard/spec-${index}.spec.ts` },
+        `<testcase name="test ${index}" classname="vm-wizard/spec-${index}.spec.ts" time="0.1"><failure message="boom ${index}" type="Error"/></testcase>`,
       ),
     ).join('');
     const xml = `<?xml version="1.0" encoding="UTF-8"?>
@@ -173,7 +173,7 @@ describe('formatTestSummary', () => {
 
     const markdown = formatTestSummary(parseJUnitSummary(xml));
     assert.match(markdown, /and 5 more failing tests/);
-    assert.ok(markdown.includes('`tier1/create-vm/spec-29.spec.ts`'));
+    assert.ok(markdown.includes('`tier1/vm-wizard/spec-29.spec.ts`'));
     assert.ok(!markdown.includes('test 29'));
     assert.ok(markdown.includes('test 24'));
   });
@@ -182,11 +182,11 @@ describe('formatTestSummary', () => {
     const manyFailuresXml = `<?xml version="1.0" encoding="UTF-8"?>
 <testsuites id="" name="" tests="30" failures="30" skipped="0" errors="0" time="1.0">
   ${buildSuite(
-    { hostname: 'Tier1', name: 'create-vm/many-failures.spec.ts' },
+    { hostname: 'Tier1', name: 'vm-wizard/many-failures.spec.ts' },
     Array.from(
       { length: 30 },
       (_unused, index) =>
-        `<testcase name="test ${index}" classname="create-vm/many-failures.spec.ts" time="0.1"><failure message="boom ${index}" type="Error"/></testcase>`,
+        `<testcase name="test ${index}" classname="vm-wizard/many-failures.spec.ts" time="0.1"><failure message="boom ${index}" type="Error"/></testcase>`,
     ).join(''),
   )}
 </testsuites>`;
@@ -241,8 +241,8 @@ describe('formatTestSummary', () => {
     const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <testsuites id="" name="" tests="1" failures="1" skipped="0" errors="0" time="1.0">
   ${buildSuite(
-    { hostname: 'Tier1', name: 'create-vm/weird.spec.ts' },
-    '<testcase name="uses `backticks`" classname="create-vm/weird.spec.ts" time="0.1"><failure message="line one&#10;line two" type="Error"/></testcase>',
+    { hostname: 'Tier1', name: 'vm-wizard/weird.spec.ts' },
+    '<testcase name="uses `backticks`" classname="vm-wizard/weird.spec.ts" time="0.1"><failure message="line one&#10;line two" type="Error"/></testcase>',
   )}
 </testsuites>`;
 

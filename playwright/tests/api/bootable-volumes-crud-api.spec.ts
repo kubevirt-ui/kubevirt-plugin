@@ -1,7 +1,8 @@
 import type { KubernetesResource } from '@/data-models/kubernetes-types';
 import { expect, test } from '@/fixtures/api-test-fixture';
+import { ROUTE_API_TAG } from '@/data-models/route-tags';
 
-test.describe('Bootable Volume — DataVolume CRUD API', { tag: ['@api'] }, () => {
+test.describe('Bootable Volume — DataVolume CRUD API', { tag: [ROUTE_API_TAG, '@api'] }, () => {
   let dvName: string;
 
   test.beforeAll(async ({ testNamespace, apiClient, utils }) => {
@@ -65,7 +66,7 @@ test.describe('Bootable Volume — DataVolume CRUD API', { tag: ['@api'] }, () =
   });
 });
 
-test.describe('Bootable Volume — DataSource CRUD API', { tag: ['@api'] }, () => {
+test.describe('Bootable Volume — DataSource CRUD API', { tag: [ROUTE_API_TAG, '@api'] }, () => {
   let dsName: string;
 
   test.beforeAll(async ({ testNamespace, apiClient, utils }) => {
