@@ -4,17 +4,24 @@ declare interface Window {
     branding: string;
 
     telemetry?: {
-      DEVSANDBOX_SEGMENT_API_KEY: string;
+      // Populated from OCM subscription; empty when OCM is unreachable.
+      ACCOUNT_MAIL?: string;
+      DEVSANDBOX?: string;
+      DEVSANDBOX_DISABLED?: string;
+      DEVSANDBOX_SEGMENT_API_KEY?: string;
+      DISABLED?: string;
+      ORGANIZATION_ID?: string;
       // All of the following should be always available on prod env.
-      SEGMENT_API_HOST: string;
+      SEGMENT_API_HOST?: string;
 
       // One of the following should be always available on prod env.
-      SEGMENT_API_KEY: string;
-      SEGMENT_JS_HOST: string;
+      SEGMENT_API_KEY?: string;
+      SEGMENT_JS_HOST?: string;
       // Optional override for analytics.min.js script URL
-      SEGMENT_JS_URL: string;
+      SEGMENT_JS_URL?: string;
 
-      SEGMENT_PUBLIC_API_KEY: string;
+      SEGMENT_PUBLIC_API_KEY?: string;
+      TELEMETER_CLIENT_DISABLED?: string;
     };
   };
 }
