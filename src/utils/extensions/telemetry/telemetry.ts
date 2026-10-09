@@ -4,6 +4,11 @@ import { createVMFlowTypes } from '@kubevirt-utils/extensions/telemetry/utils/co
 import { getName } from '@kubevirt-utils/resources/shared';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 
+import {
+  getTelemetryApiKey,
+  isSegmentTelemetryEnabled,
+} from './isSegmentTelemetryEnabled';
+
 // Segment "apiHost" parameter, should be like "api.segment.io/v1"
 const apiHost = window.SERVER_FLAGS.telemetry?.SEGMENT_API_HOST || '';
 
@@ -11,11 +16,7 @@ const apiHost = window.SERVER_FLAGS.telemetry?.SEGMENT_API_HOST || '';
 const jsHost = window.SERVER_FLAGS.telemetry?.SEGMENT_JS_HOST || 'cdn.segment.com';
 
 // Segment API key, should look like a hash
-const apiKey =
-  window.SERVER_FLAGS.telemetry?.SEGMENT_API_KEY ||
-  window.SERVER_FLAGS.telemetry?.SEGMENT_PUBLIC_API_KEY ||
-  window.SERVER_FLAGS.telemetry?.DEVSANDBOX_SEGMENT_API_KEY ||
-  '';
+const apiKey = getTelemetryApiKey();
 
 // Segment analytics.min.js script URL
 const jsURL =
@@ -87,14 +88,16 @@ const initSegment = () => {
   analytics.load(apiKey, options);
 };
 
-if (apiKey) {
+// Only load analytics.min.js when telemetry is fully available and opted-in.
+// Do not initialize based on SEGMENT_* hosts / API key alone (CNV-98836).
+if (isSegmentTelemetryEnabled()) {
   initSegment();
 }
 
 export const eventMonitor = async (eventType: string, properties?: any) => {
-  if (!apiKey) {
+  if (!isSegmentTelemetryEnabled()) {
     kubevirtConsole.warn(
-      'Segment API key not available, ignoring telemetry event',
+      'Segment telemetry is disabled or account data is unavailable, ignoring telemetry event',
       eventType,
       properties,
     );
