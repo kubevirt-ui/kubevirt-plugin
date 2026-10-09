@@ -5,8 +5,7 @@ import { TestTimeouts } from '@/utils/test-config';
 type Constructor<T = BasePage> = new (...args: any[]) => T;
 
 /**
- * Mixin that adds tree-view right-click and context menu methods.
- * Applied to both VmTreePage and VirtualMachinesPage to eliminate duplication.
+ * Mixin that adds tree-view right-click and context menu methods to VirtualMachinesPage.
  */
 export function TreeContextMenuMixin<TBase extends Constructor>(Base: TBase) {
   return class extends Base {
@@ -43,24 +42,15 @@ export function TreeContextMenuMixin<TBase extends Constructor>(Base: TBase) {
       );
     }
 
-    async clickContextMenuItem(itemIdOrText: string): Promise<void> {
+    async clickContextMenuItemByText(text: string): Promise<void> {
       const menu = this.locator('[role="menu"]').first();
       await menu.waitFor({ state: 'visible', timeout: TestTimeouts.DEFAULT });
 
-      const byTestId = menu.getByTestId(itemIdOrText);
-      const hasTestId = await byTestId
-        .waitFor({ state: 'visible', timeout: TestTimeouts.SHORT_WAIT })
-        .then(() => true)
-        .catch(() => false);
-
-      if (hasTestId) {
-        await this.robustClick(byTestId);
-        return;
-      }
-
-      const byText = menu.getByText(itemIdOrText, { exact: true });
-      await byText.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
-      await this.robustClick(byText);
+      const item = this.locator('[role="menuitem"]').filter({
+        has: this.locator('.pf-v6-c-menu__item-text', { hasText: text }),
+      });
+      await item.waitFor({ state: 'visible', timeout: TestTimeouts.DEFAULT });
+      await this.robustClick(item);
     }
 
     async dismissContextMenu(): Promise<void> {
@@ -107,10 +97,10 @@ export function TreeContextMenuMixin<TBase extends Constructor>(Base: TBase) {
 
     async rightClickFolderInTreeView(folderName: string, namespace: string): Promise<void> {
       await this.waitForTreeStable();
-      // DOM: LI[id="folderSelector/..."] > DIV > DIV#label-selectable > SPAN.node-container > BUTTON.node-text
+      // Target only the folder row's label button (direct child div), not nested VM buttons.
       const folderButton = this.locator(
-        `[id="folderSelector/#single-cluster#/${namespace}/${folderName}"] button.pf-v6-c-tree-view__node-text`,
-      );
+        `[id="folderSelector/#single-cluster#/${namespace}/${folderName}"] > div`,
+      ).getByRole('button', { name: folderName, exact: true });
       await folderButton.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
       await folderButton.scrollIntoViewIfNeeded();
       await folderButton.click({ button: 'right' });
@@ -164,6 +154,23 @@ export function TreeContextMenuMixin<TBase extends Constructor>(Base: TBase) {
     async rightClickVmInTreeView(vmName: string, namespace: string): Promise<void> {
       const vmId = this.locator(`[id="#single-cluster#/${namespace}/${vmName}"]`);
       await vmId.click({ button: 'right' });
+    }
+
+    async fillDeleteProjectConfirmationName(name: string): Promise<void> {
+      const confirmationInput = this.locator('#delete-resource-name');
+      await confirmationInput.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
+      await confirmationInput.fill(name);
+    }
+
+    async deleteProjectViaContextMenu(namespace: string): Promise<void> {
+      await this.rightClickNamespaceInTreeView(namespace);
+      await this.clickContextMenuItemByText('Delete project');
+      await this.fillDeleteProjectConfirmationName(namespace);
+      await this.clickDeleteConfirmationButton();
+      await this.locator('[data-test="dialog-modal"]').waitFor({
+        state: 'hidden',
+        timeout: TestTimeouts.DEFAULT,
+      });
     }
   };
 }

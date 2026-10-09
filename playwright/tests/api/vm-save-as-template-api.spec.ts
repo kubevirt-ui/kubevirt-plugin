@@ -3,6 +3,7 @@ import { load as yamlLoad } from 'js-yaml';
 import type { KubernetesResource } from '@/data-models/kubernetes-types';
 import { expect, test } from '@/fixtures/api-test-fixture';
 import { buildTemplateFromVm } from '@/utils/api-builders';
+import { ROUTE_API_TAG } from '@/data-models/route-tags';
 
 interface ProxyVmSpec {
   template?: {
@@ -26,7 +27,7 @@ function templateParameters(tmpl: KubernetesResource): KubernetesResource[] {
   return Array.isArray(raw) ? (raw as KubernetesResource[]) : [];
 }
 
-test.describe('VM save-as-template — spec parity API', { tag: ['@api'] }, () => {
+test.describe('VM save-as-template — spec parity API', { tag: [ROUTE_API_TAG, '@api'] }, () => {
   let vmName: string;
   let templateName: string;
 
@@ -150,85 +151,89 @@ test.describe('VM save-as-template — spec parity API', { tag: ['@api'] }, () =
   });
 });
 
-test.describe('VM save-as-template — label propagation API', { tag: ['@api'] }, () => {
-  let vmName: string;
-  let templateName: string;
+test.describe(
+  'VM save-as-template — label propagation API',
+  { tag: [ROUTE_API_TAG, '@api'] },
+  () => {
+    let vmName: string;
+    let templateName: string;
 
-  test.beforeAll(async ({ testNamespace, apiClient, utils }) => {
-    vmName = utils.generateRandomVmName('sat-vm-lb');
-    templateName = utils.generateRandomTemplateName('sat-tpl-lb');
+    test.beforeAll(async ({ testNamespace, apiClient, utils }) => {
+      vmName = utils.generateRandomVmName('sat-vm-lb');
+      templateName = utils.generateRandomTemplateName('sat-tpl-lb');
 
-    await test.step('CREATE source VM with OS and workload labels', async () => {
-      const yaml = utils.VirtualMachineFactory.create({
-        name: vmName,
-        namespace: testNamespace,
-        runStrategy: 'Halted',
-        cpuCores: 1,
-        memory: '512Mi',
+      await test.step('CREATE source VM with OS and workload labels', async () => {
+        const yaml = utils.VirtualMachineFactory.create({
+          name: vmName,
+          namespace: testNamespace,
+          runStrategy: 'Halted',
+          cpuCores: 1,
+          memory: '512Mi',
+        });
+        const vmPayload = yamlLoad(yaml) as KubernetesResource;
+        vmPayload.metadata = {
+          ...(vmPayload.metadata ?? {}),
+          labels: {
+            ...(vmPayload.metadata?.labels ?? {}),
+            'vm.kubevirt.io/os': 'fedora',
+            'vm.kubevirt.io/workload': 'server',
+          },
+        };
+        const created = await apiClient.createVirtualMachine(testNamespace, vmPayload);
+        expect(created.kind).toBe('VirtualMachine');
       });
-      const vmPayload = yamlLoad(yaml) as KubernetesResource;
-      vmPayload.metadata = {
-        ...(vmPayload.metadata ?? {}),
-        labels: {
-          ...(vmPayload.metadata?.labels ?? {}),
-          'vm.kubevirt.io/os': 'fedora',
-          'vm.kubevirt.io/workload': 'server',
-        },
-      };
-      const created = await apiClient.createVirtualMachine(testNamespace, vmPayload);
-      expect(created.kind).toBe('VirtualMachine');
+
+      await test.step('WAIT: VM exists', async () => {
+        await apiClient.waitForVmExists(vmName, testNamespace);
+      });
+
+      await test.step('GET VM + build template + POST', async () => {
+        const vm = await apiClient.getVirtualMachine(testNamespace, vmName);
+        const tmpl = buildTemplateFromVm(vm, templateName, `Label test from ${vmName}`);
+        const osLabel = vm.metadata.labels?.['vm.kubevirt.io/os'];
+        const workloadLabel = vm.metadata.labels?.['vm.kubevirt.io/workload'];
+        if (osLabel) tmpl.metadata.labels[`os.template.kubevirt.io/${osLabel}`] = 'true';
+        if (workloadLabel)
+          tmpl.metadata.labels[`workload.template.kubevirt.io/${workloadLabel}`] = 'true';
+
+        const created = await apiClient.createTemplate(testNamespace, tmpl);
+        expect(created.kind).toBe('Template');
+      });
     });
 
-    await test.step('WAIT: VM exists', async () => {
-      await apiClient.waitForVmExists(vmName, testNamespace);
+    test.afterAll(async ({ testNamespace, apiClient }) => {
+      if (templateName) {
+        await apiClient.deleteTemplate(testNamespace, templateName).catch(() => undefined);
+      }
+      if (vmName) {
+        await apiClient.deleteVirtualMachine(testNamespace, vmName).catch(() => undefined);
+        await apiClient.waitForVmDeleted(vmName, testNamespace).catch(() => undefined);
+      }
     });
 
-    await test.step('GET VM + build template + POST', async () => {
-      const vm = await apiClient.getVirtualMachine(testNamespace, vmName);
-      const tmpl = buildTemplateFromVm(vm, templateName, `Label test from ${vmName}`);
-      const osLabel = vm.metadata.labels?.['vm.kubevirt.io/os'];
-      const workloadLabel = vm.metadata.labels?.['vm.kubevirt.io/workload'];
-      if (osLabel) tmpl.metadata.labels[`os.template.kubevirt.io/${osLabel}`] = 'true';
-      if (workloadLabel)
-        tmpl.metadata.labels[`workload.template.kubevirt.io/${workloadLabel}`] = 'true';
-
-      const created = await apiClient.createTemplate(testNamespace, tmpl);
-      expect(created.kind).toBe('Template');
+    test('READ: saved template has os.template.kubevirt.io/* label', async ({
+      testNamespace,
+      apiClient,
+    }) => {
+      const tmpl = await apiClient.getTemplate(testNamespace, templateName);
+      const hasOsLabel = Object.keys(tmpl.metadata.labels ?? {}).some((k) =>
+        k.startsWith('os.template.kubevirt.io/'),
+      );
+      expect(hasOsLabel, 'saved template must have an os.template.kubevirt.io/* label').toBe(true);
     });
-  });
 
-  test.afterAll(async ({ testNamespace, apiClient }) => {
-    if (templateName) {
-      await apiClient.deleteTemplate(testNamespace, templateName).catch(() => undefined);
-    }
-    if (vmName) {
-      await apiClient.deleteVirtualMachine(testNamespace, vmName).catch(() => undefined);
-      await apiClient.waitForVmDeleted(vmName, testNamespace).catch(() => undefined);
-    }
-  });
-
-  test('READ: saved template has os.template.kubevirt.io/* label', async ({
-    testNamespace,
-    apiClient,
-  }) => {
-    const tmpl = await apiClient.getTemplate(testNamespace, templateName);
-    const hasOsLabel = Object.keys(tmpl.metadata.labels ?? {}).some((k) =>
-      k.startsWith('os.template.kubevirt.io/'),
-    );
-    expect(hasOsLabel, 'saved template must have an os.template.kubevirt.io/* label').toBe(true);
-  });
-
-  test('READ: saved template has workload.template.kubevirt.io/* label', async ({
-    testNamespace,
-    apiClient,
-  }) => {
-    const tmpl = await apiClient.getTemplate(testNamespace, templateName);
-    const hasWorkloadLabel = Object.keys(tmpl.metadata.labels ?? {}).some((k) =>
-      k.startsWith('workload.template.kubevirt.io/'),
-    );
-    expect(
-      hasWorkloadLabel,
-      'saved template must have a workload.template.kubevirt.io/* label',
-    ).toBe(true);
-  });
-});
+    test('READ: saved template has workload.template.kubevirt.io/* label', async ({
+      testNamespace,
+      apiClient,
+    }) => {
+      const tmpl = await apiClient.getTemplate(testNamespace, templateName);
+      const hasWorkloadLabel = Object.keys(tmpl.metadata.labels ?? {}).some((k) =>
+        k.startsWith('workload.template.kubevirt.io/'),
+      );
+      expect(
+        hasWorkloadLabel,
+        'saved template must have a workload.template.kubevirt.io/* label',
+      ).toBe(true);
+    });
+  },
+);

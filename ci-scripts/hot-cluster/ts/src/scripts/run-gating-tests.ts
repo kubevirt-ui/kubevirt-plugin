@@ -1,6 +1,9 @@
 /**
  * Run E2E tests: dispatches to the correct test engine (Cypress or Playwright).
  *
+ * **Hot-cluster CI only** (see hot-cluster-e2e-run.yml). For local development use
+ * `./playwright-runner-hc-e2e.sh` from the repo root (with nvm + repo `.env`).
+ *
  * Required env: TEST_ENGINE, BRIDGE_BASE_ADDRESS, TEST_PROJECT
  * Optional env: TEST_ARGS
  * Cypress-specific env: TEST_NS, OS_IMAGES_NS, CNV_NS, TEST_SECRET_NAME
@@ -11,35 +14,12 @@ import { execFileSync, execSync } from 'node:child_process';
 import { requireEnv } from '../utils';
 
 import { parseTestArgs } from './parse-test-args';
-
-/** Playwright (main) TEST_PROJECT → playwright-runner-hc-e2e.sh project name. */
-const PLAYWRIGHT_PROJECT_BY_TEST_PROJECT: Record<string, string> = {
-  all: 'all',
-  api: 'API',
-  auto: 'auto',
-  gating: 'Gating',
-  settings: 'Settings',
-  suite: 'suite',
-  tier1: 'Tier1',
-  tier2: 'Tier2',
-};
+import { normalizeTestProject, resolvePlaywrightProject } from './resolve-playwright-test-project';
 
 /** Cypress (release) TEST_PROJECT → spec file. `features` is Cypress's Tier1 suite. */
 const CYPRESS_TEST_PROJECTS: Record<string, string> = {
   features: 'tests/tier1.cy.ts',
   gating: 'tests/gating.cy.ts',
-};
-
-const resolvePlaywrightProject = (testProject: string): string => {
-  const key = testProject.toLowerCase();
-  const mapped = PLAYWRIGHT_PROJECT_BY_TEST_PROJECT[key];
-  if (mapped) {
-    return mapped;
-  }
-  throw new Error(
-    `Unsupported TEST_PROJECT '${testProject}' for Playwright. ` +
-      `Expected one of: ${Object.keys(PLAYWRIGHT_PROJECT_BY_TEST_PROJECT).join(', ')}`,
-  );
 };
 
 const resolveCypressSpec = (testProject: string): string => {
@@ -56,7 +36,13 @@ const resolveCypressSpec = (testProject: string): string => {
 
 const main = async (): Promise<void> => {
   const testEngine = requireEnv('TEST_ENGINE');
-  const testProject = requireEnv('TEST_PROJECT');
+  const rawTestProject = process.env.TEST_PROJECT;
+  const testProject = normalizeTestProject(rawTestProject);
+  if (!rawTestProject?.trim()) {
+    console.log(
+      `TEST_PROJECT unset or blank — defaulting to '${testProject}' (route-tagged @gating specs).`,
+    );
+  }
   const testArgs = parseTestArgs(process.env.TEST_ARGS ?? '');
 
   if (testEngine === 'cypress') {
@@ -88,12 +74,15 @@ const main = async (): Promise<void> => {
           'Omit auto and pick a suite to run an entire project.',
       );
     }
-    console.log(
-      playwrightProject === 'auto'
-        ? `Running Playwright without --project filter with args: ${testArgs.join(' ')}`
-        : `Running Playwright project '${playwrightProject}'` +
-            (testArgs.length > 0 ? ` with args: ${testArgs.join(' ')}` : ''),
-    );
+    let runMessage: string;
+    if (playwrightProject === 'auto') {
+      runMessage = `Running Playwright without --project filter with args: ${testArgs.join(' ')}`;
+    } else if (testArgs.length > 0) {
+      runMessage = `Running Playwright project '${playwrightProject}' with args: ${testArgs.join(' ')}`;
+    } else {
+      runMessage = `Running Playwright project '${playwrightProject}'`;
+    }
+    console.log(runMessage);
     execFileSync('./playwright-runner-hc-e2e.sh', [playwrightProject, ...testArgs], {
       cwd: repoRoot,
       stdio: 'inherit',
