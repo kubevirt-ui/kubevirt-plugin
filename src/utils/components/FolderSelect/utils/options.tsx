@@ -3,9 +3,10 @@ import type { TFunction } from 'i18next';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import type { SelectOptionProps } from '@patternfly/react-core';
 import { HelperText, HelperTextItem } from '@patternfly/react-core';
-import { FolderIcon, InfoIcon } from '@patternfly/react-icons';
+import { FolderIcon, InfoIcon, ProjectDiagramIcon } from '@patternfly/react-icons';
 
-import { getCreationNotAllowedMessage } from './validation';
+import { PROJECT_ROOT_FOLDER_VALUE } from './constants';
+import { getFolderNameValidationError } from './validation';
 
 export const getCreateNewFolderOption = (filterValue: string, t: TFunction): SelectOptionProps => {
   const filterIsEmpty = isEmpty(filterValue);
@@ -22,7 +23,7 @@ export const getCreateNewFolderOption = (filterValue: string, t: TFunction): Sel
     };
   }
 
-  const errorMessage = getCreationNotAllowedMessage(filterValue);
+  const errorMessage = getFolderNameValidationError(filterValue, t);
   if (errorMessage) {
     return {
       children: (
@@ -44,4 +45,10 @@ export const createNewFolderOption = (filterValue: string): SelectOptionProps =>
   children: filterValue,
   icon: <FolderIcon />,
   value: filterValue,
+});
+
+export const createProjectRootOption = (t: TFunction): SelectOptionProps => ({
+  children: t('Project root'),
+  icon: <ProjectDiagramIcon />,
+  value: PROJECT_ROOT_FOLDER_VALUE,
 });

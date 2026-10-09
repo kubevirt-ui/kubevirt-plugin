@@ -104,7 +104,11 @@ const TabModalFooter: FC<TabModalFooterProps> = ({
           </StackItem>
         )}
         <Flex spaceItems={{ default: 'spaceItemsSm' }}>
-          <HidableTooltip content={submitDisabledTooltip} hidden={!showSubmitTooltip}>
+          <HidableTooltip
+            className={showSubmitTooltip ? 'pf-v6-u-mr-sm' : undefined}
+            content={submitDisabledTooltip}
+            hidden={!showSubmitTooltip}
+          >
             {saveButton}
           </HidableTooltip>
           <Button
