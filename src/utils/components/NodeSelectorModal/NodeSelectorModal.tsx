@@ -1,13 +1,12 @@
-import { type FC, useMemo } from 'react';
-import produce from 'immer';
+import { type ReactNode } from 'react';
 
-import { NodeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { modelToGroupVersionKind, NodeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { type IoK8sApiCoreV1Node } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
-import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getNodeSelector } from '@kubevirt-utils/resources/vm';
-import { ensurePath, isEmpty } from '@kubevirt-utils/utils/utils';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { getCluster } from '@multicluster/helpers/selectors';
+import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 
 import LabelsList from './components/LabelList';
 import LabelRow from './components/LabelRow';
@@ -15,7 +14,7 @@ import NodeCheckerAlert from './components/NodeCheckerAlert';
 import { useIDEntities } from './hooks/useIDEntities';
 import { useNodeLabelQualifier } from './hooks/useNodeLabelQualifier';
 import {
-  getIncompleteSelectorLabelsTooltip,
+  getNodeSelectorModalSubmitTooltip,
   hasIncompleteSelectorLabels,
   idLabelsToNodeSelector,
   isEqualObject,
@@ -23,67 +22,61 @@ import {
 } from './utils/helpers';
 import { type IDLabel } from './utils/types';
 
-type NodeSelectorModalProps = {
+type NodeSelectorModalProps<T extends K8sResourceCommon = K8sResourceCommon> = {
   isOpen: boolean;
-  nodes?: IoK8sApiCoreV1Node[];
-  nodesLoaded?: boolean;
+  nodeSelector: Record<string, string> | undefined;
   onClose: () => void;
-  onSubmit: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine | void>;
-  vm: V1VirtualMachine;
+  onSubmit: (updatedResource: T) => Promise<T | void>;
+  produceUpdatedResource: (selectorLabels: IDLabel[]) => T;
 };
 
-const NodeSelectorModal: FC<NodeSelectorModalProps> = ({
+const NodeSelectorModal = <T extends K8sResourceCommon>({
   isOpen,
-  nodes,
-  nodesLoaded,
+  nodeSelector = {},
   onClose,
   onSubmit,
-  vm,
-}) => {
+  produceUpdatedResource,
+}: NodeSelectorModalProps<T>): ReactNode => {
   const { t } = useKubevirtTranslation();
   const {
     entities: selectorLabels,
     onEntityAdd: onLabelAdd,
     onEntityChange: onLabelChange,
     onEntityDelete: onLabelDelete,
-  } = useIDEntities<IDLabel>(nodeSelectorToIDLabels(getNodeSelector(vm)));
+  } = useIDEntities<IDLabel>(nodeSelectorToIDLabels(nodeSelector));
+
+  const updatedResource = produceUpdatedResource(selectorLabels);
+
+  const [nodes, nodesLoaded] = useK8sWatchData<IoK8sApiCoreV1Node[]>({
+    cluster: getCluster(updatedResource),
+    groupVersionKind: modelToGroupVersionKind(NodeModel),
+    isList: true,
+  });
 
   const qualifiedNodes = useNodeLabelQualifier(nodes, nodesLoaded, selectorLabels);
   const isIncomplete = hasIncompleteSelectorLabels(selectorLabels);
+  const isEmptySelectorLabels = isEmpty(selectorLabels);
+  const hasNotChanged = isEqualObject(nodeSelector, idLabelsToNodeSelector(selectorLabels));
 
   const onSelectorLabelAdd = (): void => onLabelAdd({ id: null, key: '', value: '' });
-
-  const updatedVirtualMachine = useMemo(() => {
-    const updatedVM = produce<V1VirtualMachine>(vm, (vmDraft: V1VirtualMachine) => {
-      ensurePath(vmDraft, ['spec.template.spec.nodeSelector']);
-      vmDraft.spec.template.spec.nodeSelector ??= {};
-
-      const k8sSelector = idLabelsToNodeSelector(selectorLabels);
-
-      if (!isEqualObject(getNodeSelector(vmDraft), k8sSelector)) {
-        vmDraft.spec.template.spec.nodeSelector = k8sSelector;
-      }
-    });
-    return updatedVM;
-  }, [vm, selectorLabels]);
 
   return (
     <TabModal
       headerText={t('Node selector')}
-      isDisabled={isIncomplete}
+      isDisabled={hasNotChanged || isIncomplete}
       isOpen={isOpen}
-      obj={updatedVirtualMachine}
+      obj={updatedResource}
       onClose={onClose}
       onSubmit={onSubmit}
       shouldWrapInForm
-      submitDisabledTooltip={getIncompleteSelectorLabelsTooltip(isIncomplete, t)}
+      submitDisabledTooltip={getNodeSelectorModalSubmitTooltip(hasNotChanged, isIncomplete, t)}
     >
       <LabelsList
-        isEmpty={selectorLabels?.length === 0}
-        model={!isEmpty(nodes) && NodeModel}
+        isEmpty={isEmptySelectorLabels}
+        model={!isEmpty(nodes) ? NodeModel : undefined}
         onLabelAdd={onSelectorLabelAdd}
       >
-        {selectorLabels.length > 0 && (
+        {!isEmptySelectorLabels && (
           <>
             {selectorLabels.map((label, index) => (
               <LabelRow
@@ -99,8 +92,8 @@ const NodeSelectorModal: FC<NodeSelectorModalProps> = ({
       </LabelsList>
       {!isEmpty(nodes) && (
         <NodeCheckerAlert
-          nodesLoaded={nodesLoaded}
-          qualifiedNodes={selectorLabels?.length === 0 ? nodes : qualifiedNodes}
+          nodesLoaded={true}
+          qualifiedNodes={isEmptySelectorLabels ? nodes : qualifiedNodes}
         />
       )}
     </TabModal>

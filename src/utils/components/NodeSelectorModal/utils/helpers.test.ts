@@ -2,7 +2,7 @@ import { type TFunction } from 'i18next';
 
 import {
   getIncompleteSelectorLabelMessage,
-  getIncompleteSelectorLabelsTooltip,
+  getNodeSelectorModalSubmitTooltip,
   hasIncompleteSelectorLabels,
   idLabelsToNodeSelector,
   isEqualObject,
@@ -77,15 +77,19 @@ describe('getIncompleteSelectorLabelMessage', () => {
   });
 });
 
-describe('getIncompleteSelectorLabelsTooltip', () => {
+describe('getNodeSelectorModalSubmitTooltip', () => {
   const t = ((key: string) => key) as TFunction;
 
-  it('should return a tooltip when rows are incomplete', () => {
-    expect(getIncompleteSelectorLabelsTooltip(true, t)).toBe('Key must not be empty');
+  it('should return no-changes tooltip when has not changed', () => {
+    expect(getNodeSelectorModalSubmitTooltip(true, false, t)).toBe('No changes have been made.');
   });
 
-  it('should return undefined when rows are complete', () => {
-    expect(getIncompleteSelectorLabelsTooltip(false, t)).toBeUndefined();
+  it('should return incomplete tooltip when has changed but incomplete', () => {
+    expect(getNodeSelectorModalSubmitTooltip(false, true, t)).toBe('Key must not be empty');
+  });
+
+  it('should return undefined when has changed and complete', () => {
+    expect(getNodeSelectorModalSubmitTooltip(false, false, t)).toBeUndefined();
   });
 });
 

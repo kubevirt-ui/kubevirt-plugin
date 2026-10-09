@@ -1,11 +1,12 @@
 import AffinityModal from '@kubevirt-utils/components/AffinityModal/AffinityModal';
 import CloudinitModal from '@kubevirt-utils/components/CloudinitModal/CloudinitModal';
 import NodeSelectorModal from '@kubevirt-utils/components/NodeSelectorModal/NodeSelectorModal';
+import { produceVMWithNodeSelector } from '@kubevirt-utils/components/NodeSelectorModal/utils/helpers';
 import TolerationsModal from '@kubevirt-utils/components/TolerationsModal/TolerationsModal';
 import { produceVMWithTolerations } from '@kubevirt-utils/components/TolerationsModal/utils/utils';
 import VMSSHSecretModal from '@kubevirt-utils/components/VMSSHSecretModal/VMSSHSecretModal';
 import { VirtualMachineDetailsTab } from '@kubevirt-utils/constants/tabs-constants';
-import { getTolerations } from '@kubevirt-utils/resources/vm';
+import { getNodeSelector, getTolerations } from '@kubevirt-utils/resources/vm';
 
 import { type PendingChange } from '../../utils/types';
 import { type PendingChangeContext } from './types';
@@ -35,11 +36,10 @@ export const getSchedulingPendingChanges = ({
       createModal(({ isOpen, onClose }) => (
         <NodeSelectorModal
           isOpen={isOpen}
-          nodes={nodes}
-          nodesLoaded={nodesLoaded}
+          nodeSelector={getNodeSelector(vm)}
           onClose={onClose}
           onSubmit={onSubmit}
-          vm={vm}
+          produceUpdatedResource={(selectorLabels) => produceVMWithNodeSelector(vm, selectorLabels)}
         />
       )),
     ),
