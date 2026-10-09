@@ -1,9 +1,10 @@
 /**
  * SettingsPage — standalone page object for the Virtualization Settings area.
  *
- * Covers all three tabs reachable from Virtualization → Settings:
+ * Covers Settings tabs reachable from Virtualization → Settings:
  *   /k8s/all-namespaces/virtualization-settings/cluster
  *   /k8s/all-namespaces/virtualization-settings/user
+ *   /k8s/all-namespaces/virtualization-settings/recommended
  *   /k8s/all-namespaces/virtualization-settings/features
  *
  * Composes the existing sub-page-objects without going through OverviewPage.
@@ -38,6 +39,12 @@ export default class SettingsPage extends BasePage {
     return this._features.adjustMemoryRequestRatio(...args);
   }
 
+  clickDownloadsTab(
+    ...args: Parameters<OverviewSettingsPage['clickDownloadsTab']>
+  ): ReturnType<OverviewSettingsPage['clickDownloadsTab']> {
+    return this._settings.clickDownloadsTab(...args);
+  }
+
   disableAaq(
     ...args: Parameters<OverviewVirtualizationFeaturesPage['disableAaq']>
   ): ReturnType<OverviewVirtualizationFeaturesPage['disableAaq']> {
@@ -68,6 +75,12 @@ export default class SettingsPage extends BasePage {
     ...args: Parameters<OverviewSettingsPage['disableGuidedTour']>
   ): ReturnType<OverviewSettingsPage['disableGuidedTour']> {
     return this._settings.disableGuidedTour(...args);
+  }
+
+  disableKSM(
+    ...args: Parameters<OverviewVirtualizationFeaturesPage['disableKSM']>
+  ): ReturnType<OverviewVirtualizationFeaturesPage['disableKSM']> {
+    return this._features.disableKSM(...args);
   }
 
   disableMemoryDensity(
@@ -232,6 +245,18 @@ export default class SettingsPage extends BasePage {
     return this._settings.isAdvancedCdromFeaturesEnabled(...args);
   }
 
+  isDownloadIsoButtonVisible(
+    ...args: Parameters<OverviewSettingsPage['isDownloadIsoButtonVisible']>
+  ): ReturnType<OverviewSettingsPage['isDownloadIsoButtonVisible']> {
+    return this._settings.isDownloadIsoButtonVisible(...args);
+  }
+
+  isDownloadsTabContentVisible(
+    ...args: Parameters<OverviewSettingsPage['isDownloadsTabContentVisible']>
+  ): ReturnType<OverviewSettingsPage['isDownloadsTabContentVisible']> {
+    return this._settings.isDownloadsTabContentVisible(...args);
+  }
+
   isAutomaticGrantVirtualizationRolesChecked(
     ...args: Parameters<OverviewSettingsPage['isAutomaticGrantVirtualizationRolesChecked']>
   ): ReturnType<OverviewSettingsPage['isAutomaticGrantVirtualizationRolesChecked']> {
@@ -268,10 +293,28 @@ export default class SettingsPage extends BasePage {
     return this._features.isManageQuotasLinkVisible(...args);
   }
 
+  isPasstBindingOn(
+    ...args: Parameters<OverviewSettingsPage['isPasstBindingOn']>
+  ): ReturnType<OverviewSettingsPage['isPasstBindingOn']> {
+    return this._settings.isPasstBindingOn(...args);
+  }
+
   isPasstBindingChecked(
     ...args: Parameters<OverviewSettingsPage['isPasstBindingChecked']>
   ): ReturnType<OverviewSettingsPage['isPasstBindingChecked']> {
     return this._settings.isPasstBindingChecked(...args);
+  }
+
+  isSSHOverNodePortChecked(
+    ...args: Parameters<OverviewSettingsPage['isSSHOverNodePortChecked']>
+  ): ReturnType<OverviewSettingsPage['isSSHOverNodePortChecked']> {
+    return this._settings.isSSHOverNodePortChecked(...args);
+  }
+
+  isSSHOverNodePortEnabled(
+    ...args: Parameters<OverviewSettingsPage['isSSHOverNodePortEnabled']>
+  ): ReturnType<OverviewSettingsPage['isSSHOverNodePortEnabled']> {
+    return this._settings.isSSHOverNodePortEnabled(...args);
   }
 
   navigateToAutomaticImagesDownload(
@@ -326,6 +369,12 @@ export default class SettingsPage extends BasePage {
     return this._settings.navigateToPreviewFeatures(...args);
   }
 
+  navigateToRecommendedCapabilities(
+    ...args: Parameters<OverviewSettingsPage['navigateToRecommendedCapabilities']>
+  ): ReturnType<OverviewSettingsPage['navigateToRecommendedCapabilities']> {
+    return this._settings.navigateToRecommendedCapabilities(...args);
+  }
+
   // ── Cluster tab — Resource management section ────────────────────────────────
 
   navigateToResourceManagement(
@@ -350,6 +399,12 @@ export default class SettingsPage extends BasePage {
     ...args: Parameters<OverviewSettingsPage['navigateToSettingsViaUI']>
   ): ReturnType<OverviewSettingsPage['navigateToSettingsViaUI']> {
     return this._settings.navigateToSettingsViaUI(...args);
+  }
+
+  openSSHOverNodePortConfiguration(
+    ...args: Parameters<OverviewSettingsPage['openSSHOverNodePortConfiguration']>
+  ): ReturnType<OverviewSettingsPage['openSSHOverNodePortConfiguration']> {
+    return this._settings.openSSHOverNodePortConfiguration(...args);
   }
 
   // ── Cluster tab — Resource management section ────────────────────────────────
@@ -420,6 +475,18 @@ export default class SettingsPage extends BasePage {
     return this._settings.setGuestSystemLog(...args);
   }
 
+  setSSHOverNodePortAddress(
+    ...args: Parameters<OverviewSettingsPage['setSSHOverNodePortAddress']>
+  ): ReturnType<OverviewSettingsPage['setSSHOverNodePortAddress']> {
+    return this._settings.setSSHOverNodePortAddress(...args);
+  }
+
+  setSSHOverNodePortEnabled(
+    ...args: Parameters<OverviewSettingsPage['setSSHOverNodePortEnabled']>
+  ): ReturnType<OverviewSettingsPage['setSSHOverNodePortEnabled']> {
+    return this._settings.setSSHOverNodePortEnabled(...args);
+  }
+
   // ── User tab ─────────────────────────────────────────────────────────────────
 
   // YAML tab visibility
@@ -440,6 +507,12 @@ export default class SettingsPage extends BasePage {
     ...args: Parameters<OverviewMigrationsPage['setMemoryDensityPercentage']>
   ): ReturnType<OverviewMigrationsPage['setMemoryDensityPercentage']> {
     return this._migrations.setMemoryDensityPercentage(...args);
+  }
+
+  setPasstBindingEnabled(
+    ...args: Parameters<OverviewSettingsPage['setPasstBindingEnabled']>
+  ): ReturnType<OverviewSettingsPage['setPasstBindingEnabled']> {
+    return this._settings.setPasstBindingEnabled(...args);
   }
 
   setVmActionsConfirmation(

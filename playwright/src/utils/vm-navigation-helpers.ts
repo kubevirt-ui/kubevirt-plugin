@@ -1,11 +1,11 @@
 import type VirtualMachineDetailPage from '@/page-objects/vm/virtual-machine-detail-page';
-import type VmTreePage from '@/page-objects/vm/vm-tree-page';
+import type VirtualMachinesPage from '@/page-objects/vm/virtual-machines-page';
 
 const VM_CONFIG_NAV_MAX_ATTEMPTS = 3;
 const CLOUD_INIT_VERIFY_ATTEMPTS = 5;
 
 export interface VmNavPages {
-  vmTreePage: VmTreePage;
+  vmListPage: VirtualMachinesPage;
   vmDetailPage: VirtualMachineDetailPage;
 }
 
@@ -14,7 +14,7 @@ export interface VmNavPages {
  * @param vmName - Target VirtualMachine name.
  */
 export async function navigateToVmDetailAndConfigurationSubTab(
-  { vmTreePage, vmDetailPage }: VmNavPages,
+  { vmListPage, vmDetailPage }: VmNavPages,
   namespace: string,
   vmName: string,
   openConfigurationSubTab: () => Promise<void>,
@@ -22,11 +22,11 @@ export async function navigateToVmDetailAndConfigurationSubTab(
   let lastError: unknown;
   for (let attempt = 0; attempt < VM_CONFIG_NAV_MAX_ATTEMPTS; attempt++) {
     try {
-      await vmTreePage.navigateToVirtualMachinesViaUI();
-      await vmTreePage.toggleEmptyProjectsDisplay(true);
-      await vmTreePage.searchTreeView(namespace);
-      await vmTreePage.clickTreeNodeAndEnsureExpanded(namespace, vmName, namespace);
-      await vmTreePage.clickVmInTreeView(vmName, namespace);
+      await vmListPage.navigateToVirtualMachinesViaUI();
+      await vmListPage.toggleEmptyProjectsDisplay(true);
+      await vmListPage.searchTreeView(namespace);
+      await vmListPage.clickTreeNodeAndEnsureExpanded(namespace, vmName, namespace);
+      await vmListPage.clickVmInTreeView(vmName, namespace);
       await openConfigurationSubTab();
       return;
     } catch (error) {

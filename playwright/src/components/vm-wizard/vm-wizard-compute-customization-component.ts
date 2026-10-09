@@ -1,6 +1,8 @@
 import BaseComponent from '@/components/shared/base-component';
 import { TestTimeouts } from '@/utils/test-config';
-import type { Page } from '@playwright/test';
+import type { Locator, Page } from '@playwright/test';
+
+type VirtIORecommendationKind = 'disk' | 'network';
 
 export default class VmWizardComputeCustomizationComponent extends BaseComponent {
   private static readonly strategyLabels: Record<string, string> = {
@@ -9,16 +11,24 @@ export default class VmWizardComputeCustomizationComponent extends BaseComponent
     Manual: 'Manual',
     RerunOnFailure: 'Rerun on failure',
   };
+
   private readonly _inputTypeText = this.locator('input[type="text"]');
   private readonly _pfV6CMenuToggle = this.locator('.pf-v6-c-menu-toggle');
-  private readonly _pfV6CWizardButtonpfV6CButtonpfMPrimary = this.locator(
-    '.pf-v6-c-wizard button.pf-v6-c-button.pf-m-primary',
-  );
+  private readonly _wizardFooterCreateButton = this.page
+    .getByTestId('wizard-create-button')
+    .filter({ hasText: 'Create VirtualMachine' });
   private readonly _pfV6CWizardInputPlaceholderFindSettings = this.locator(
     '.pf-v6-c-wizard input[placeholder="Find settings"]',
   );
   private readonly _pfV6CWizardInputTypeText = this.locator('.pf-v6-c-wizard input[type="text"]');
   private readonly _roleTabpanel = this.locator('[role="tabpanel"]');
+  private readonly _hostnameModal = this.testId('dialog-modal').filter({
+    has: this.page.getByRole('heading', { name: 'Edit hostname' }),
+  });
+  private readonly _hostnameModalInput = this._hostnameModal.getByRole('textbox', {
+    name: 'Hostname',
+  });
+  private readonly _hostnameModalSaveButton = this._hostnameModal.getByTestId('save-button');
   private readonly _startAfterCreateCheckbox = this.locator('#start-after-create-checkbox');
   private readonly _startThisVirtualMachineAfterCreation = this.locator(
     'text=Start this VirtualMachine after creation',
@@ -26,6 +36,23 @@ export default class VmWizardComputeCustomizationComponent extends BaseComponent
 
   constructor(page: Page) {
     super(page);
+  }
+
+  private metadataDialog(): Locator {
+    return this.page.getByRole('dialog', { name: /Edit (labels|annotations)/i });
+  }
+
+  private async dismissSeriesTooltip(): Promise<void> {
+    await this.page.keyboard.press('Escape');
+    const nextButton = this.page.getByTestId('wizard-next-button');
+    if (await nextButton.isVisible().catch(() => false)) {
+      await nextButton.hover().catch(() => undefined);
+    }
+    await this.page
+      .locator('.pf-v6-c-tooltip, [role="tooltip"]')
+      .first()
+      .waitFor({ state: 'hidden', timeout: TestTimeouts.SHORT_WAIT })
+      .catch(() => undefined);
   }
 
   private async dismissOverlayIfPresent(): Promise<void> {
@@ -186,10 +213,8 @@ export default class VmWizardComputeCustomizationComponent extends BaseComponent
 
   async getCreateButtonText(): Promise<string> {
     try {
-      const createBtn = this._pfV6CWizardButtonpfV6CButtonpfMPrimary;
-      return (
-        (await createBtn.first().textContent({ timeout: TestTimeouts.SHORT_WAIT }))?.trim() || ''
-      );
+      const createBtn = this._wizardFooterCreateButton;
+      return (await createBtn.textContent({ timeout: TestTimeouts.SHORT_WAIT }))?.trim() || '';
     } catch {
       return '';
     }
@@ -205,6 +230,43 @@ export default class VmWizardComputeCustomizationComponent extends BaseComponent
     } catch {
       return '';
     }
+  }
+
+  async fillHostnameModal(value: string): Promise<void> {
+    await this._hostnameModalInput.fill(value);
+  }
+
+  async isHostnameModalOpen(): Promise<boolean> {
+    return this._hostnameModal.isVisible();
+  }
+
+  async isHostnameModalSaveEnabled(): Promise<boolean> {
+    return this._hostnameModalSaveButton.isEnabled();
+  }
+
+  async isHostnameModalValidationErrorVisible(expected: RegExp | string): Promise<boolean> {
+    return this._hostnameModal.getByText(expected).isVisible();
+  }
+
+  async openHostnameModal(hostname: string): Promise<void> {
+    const hostnameValue = this._roleTabpanel.getByRole('button', { exact: true, name: hostname });
+    await this.robustClick(hostnameValue);
+    await this._hostnameModal.waitFor({
+      state: 'visible',
+      timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+    });
+  }
+
+  async saveHostnameModal(): Promise<void> {
+    await this.robustClick(this._hostnameModalSaveButton);
+    await this._hostnameModal.waitFor({
+      state: 'hidden',
+      timeout: TestTimeouts.UI_ACTION_COMPLETE,
+    });
+  }
+
+  async submitHostnameModalWithEnter(): Promise<void> {
+    await this._hostnameModalInput.press('Enter');
   }
 
   async getReviewDescription(): Promise<string> {
@@ -321,7 +383,7 @@ export default class VmWizardComputeCustomizationComponent extends BaseComponent
 
   async isCreateButtonDisabled(): Promise<boolean> {
     try {
-      const createBtn = this._pfV6CWizardButtonpfV6CButtonpfMPrimary.first();
+      const createBtn = this._wizardFooterCreateButton;
       await createBtn.waitFor({ state: 'visible', timeout: TestTimeouts.SHORT_WAIT });
       return createBtn.isDisabled();
     } catch {
@@ -398,10 +460,23 @@ export default class VmWizardComputeCustomizationComponent extends BaseComponent
       hasText: /Select size|CPUs.*Memory/,
     });
     await this.robustClick(sizeToggle.first());
-    await this.page.waitForTimeout(500);
 
-    const sizeOption = this.page.getByRole('menuitem').filter({ hasText: sizeName });
+    const menu = this.page
+      .locator('[role="menu"], .pf-v6-c-menu')
+      .filter({ hasText: /CPUs/ })
+      .first();
+    await menu.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+
+    const sizeOption = menu.getByRole('menuitem').filter({ hasText: sizeName });
     await this.robustClick(sizeOption.first());
+
+    await menu
+      .waitFor({ state: 'hidden', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY })
+      .catch(async () => {
+        await this.page.keyboard.press('Escape');
+      });
+
+    await this.dismissSeriesTooltip();
   }
 
   async selectComputeTab(tab: 'redhat' | 'user'): Promise<void> {
@@ -424,20 +499,35 @@ export default class VmWizardComputeCustomizationComponent extends BaseComponent
     await this.robustClick(tab.first());
   }
 
+  async selectLargestComputeSize(): Promise<void> {
+    const sizeBtn = this._pfV6CMenuToggle.filter({
+      hasText: /CPUs.*Memory/,
+    });
+    await this.robustClick(sizeBtn.first());
+
+    const menu = this.page
+      .locator('[role="menu"], .pf-v6-c-menu')
+      .filter({ hasText: /CPUs/ })
+      .first();
+    await menu.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+
+    const menuItems = menu.getByRole('menuitem');
+    await this.robustClick(menuItems.last());
+
+    await menu
+      .waitFor({ state: 'hidden', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY })
+      .catch(async () => {
+        await this.page.keyboard.press('Escape');
+      });
+
+    await this.dismissSeriesTooltip();
+  }
+
   async selectInstanceTypeSeries(series: 'cx' | 'd' | 'u' | 'm' | 'n' | 'o' | 'rt'): Promise<void> {
-    const seriesMap: Record<string, string> = {
-      cx: 'Compute Exclusive',
-      d: 'Dedicated vCPU',
-      u: 'General Purpose',
-      m: 'Memory Intensive',
-      n: 'Network',
-      o: 'Overcommitted',
-      rt: 'Realtime',
-    };
-    const card = this.locator(
-      `.instance-type-series-menu-card__toggle-card:has-text("${seriesMap[series]}")`,
-    );
-    await this.robustClick(card.first());
+    const card = this.testId(`instance-type-series-${series}1`);
+    await card.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+    await this.robustClick(card);
+    await this.dismissSeriesTooltip();
   }
 
   async selectUserProvidedInstanceTypeByName(name: string): Promise<void> {
@@ -650,6 +740,117 @@ export default class VmWizardComputeCustomizationComponent extends BaseComponent
     }
   }
 
+  async clickAddMoreInAnnotationsModal(): Promise<void> {
+    const addMoreButton = this.metadataDialog().locator('button:has-text("Add more")');
+    await addMoreButton.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+    await this.robustClick(addMoreButton);
+  }
+
+  async closeAnnotationsModal(): Promise<void> {
+    const dialog = this.metadataDialog();
+    await dialog.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+
+    const cancelButton = dialog.getByTestId('cancel-button');
+    if (
+      await cancelButton
+        .first()
+        .isVisible({ timeout: TestTimeouts.UI_DELAY_MEDIUM })
+        .catch(() => false)
+    ) {
+      await this.robustClick(cancelButton.first());
+    } else {
+      const closeButton = dialog.locator('button[aria-label="Close"]');
+      if (await closeButton.isVisible().catch(() => false)) {
+        await this.robustClick(closeButton);
+      } else {
+        await this.page.keyboard.press('Escape');
+      }
+    }
+
+    if (await dialog.isVisible().catch(() => false)) {
+      await this.page.keyboard.press('Escape');
+    }
+
+    await dialog.waitFor({
+      state: 'hidden',
+      timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+    });
+  }
+
+  async closeLabelsModal(): Promise<void> {
+    await this.closeAnnotationsModal();
+  }
+
+  async isAnnotationDeleteDisabledInModal(key: string): Promise<boolean> {
+    const deleteButton = this.metadataDialog().getByTestId(`delete-annotation-row-${key}`);
+    await deleteButton.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+    return deleteButton.isDisabled();
+  }
+
+  async isAnnotationPresentInTable(key: string): Promise<boolean> {
+    const table = this._roleTabpanel.getByTestId('annotations-card-table');
+    return table
+      .locator('td')
+      .filter({ hasText: key })
+      .first()
+      .isVisible({ timeout: TestTimeouts.SHORT_WAIT })
+      .catch(() => false);
+  }
+
+  async isAnnotationTableDeleteDisabled(key: string): Promise<boolean> {
+    const deleteButton = this._roleTabpanel.getByTestId(`delete-annotations-${key}`);
+    await deleteButton.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+    return deleteButton.isDisabled();
+  }
+
+  async isAnnotationsModalSaveDisabled(): Promise<boolean> {
+    const saveButton = this.metadataDialog().getByTestId('save-button');
+    await saveButton.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+    return saveButton.isDisabled();
+  }
+
+  async isLabelDeleteDisabledInModal(key: string): Promise<boolean> {
+    const deleteButton = this.metadataDialog().getByTestId(`delete-label-row-${key}`);
+    await deleteButton.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+    return deleteButton.isDisabled();
+  }
+
+  async isLabelPresentInTable(key: string): Promise<boolean> {
+    const table = this._roleTabpanel.getByTestId('labels-card-table');
+    return table
+      .locator('td')
+      .filter({ hasText: key })
+      .first()
+      .isVisible({ timeout: TestTimeouts.SHORT_WAIT })
+      .catch(() => false);
+  }
+
+  async isLabelTableDeleteDisabled(key: string): Promise<boolean> {
+    const deleteButton = this._roleTabpanel.getByTestId(`delete-labels-${key}`);
+    await deleteButton.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+    return deleteButton.isDisabled();
+  }
+
+  async openAnnotationsModal(): Promise<void> {
+    const addButton = this._roleTabpanel.getByTestId('annotations-card-add-btn');
+    await addButton.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+    await this.robustClick(addButton);
+    await this.metadataDialog().waitFor({
+      state: 'visible',
+      timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+    });
+  }
+
+  async openLabelsModal(): Promise<void> {
+    const addButton = this._roleTabpanel.getByTestId('labels-card-add-btn');
+    await addButton.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+    await this.robustClick(addButton);
+    await this.metadataDialog().waitFor({
+      state: 'visible',
+      timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+    });
+  }
+
   async verifyMetadataTabContent(): Promise<{
     labelsEditButton: boolean;
     annotationsButton: boolean;
@@ -824,5 +1025,57 @@ export default class VmWizardComputeCustomizationComponent extends BaseComponent
         .isVisible({ timeout: TestTimeouts.SHORT_WAIT })
         .catch(() => false),
     };
+  }
+
+  private virtioRecommendationAlertTitle(kind: VirtIORecommendationKind): string {
+    return kind === 'disk'
+      ? 'Non-VirtIO disk interfaces detected'
+      : 'Non-VirtIO network interfaces detected';
+  }
+
+  virtioRecommendationAlert(kind: VirtIORecommendationKind) {
+    return this._roleTabpanel
+      .locator('.pf-v6-c-alert.pf-m-info')
+      .filter({ hasText: this.virtioRecommendationAlertTitle(kind) });
+  }
+
+  async isVirtioRecommendationAlertVisible(kind: VirtIORecommendationKind): Promise<boolean> {
+    try {
+      await this.virtioRecommendationAlert(kind).waitFor({
+        state: 'visible',
+        timeout: TestTimeouts.SHORT_WAIT,
+      });
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  async clickSwitchAllToVirtio(kind: VirtIORecommendationKind): Promise<void> {
+    const alert = this.virtioRecommendationAlert(kind);
+    await alert.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+    const switchButton = alert.locator('button:has-text("Switch all to VirtIO")');
+    await this.robustClick(switchButton);
+  }
+
+  async waitForVirtioAlertToDisappear(kind: VirtIORecommendationKind): Promise<void> {
+    await this.virtioRecommendationAlert(kind).waitFor({
+      state: 'hidden',
+      timeout: TestTimeouts.UI_ACTION_COMPLETE,
+    });
+  }
+
+  async getDiskInterfaceValueInWizard(diskName: string): Promise<string> {
+    const panel = this._roleTabpanel;
+    const cell = panel.getByTestId(`disk-interface-${diskName}`);
+    await cell.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+    return ((await cell.textContent()) ?? '').trim();
+  }
+
+  async getNetworkInterfaceModelInWizard(nicName: string): Promise<string> {
+    const panel = this._roleTabpanel;
+    const cell = panel.getByTestId(`nic-model-${nicName}`);
+    await cell.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+    return ((await cell.textContent()) ?? '').trim();
   }
 }

@@ -2,8 +2,9 @@ import { load as yamlLoad } from 'js-yaml';
 
 import type { KubernetesResource } from '@/data-models/kubernetes-types';
 import { expect, test } from '@/fixtures/api-test-fixture';
+import { ROUTE_API_TAG } from '@/data-models/route-tags';
 
-test.describe('VirtualMachine CRUD — API', { tag: ['@api'] }, () => {
+test.describe('VirtualMachine CRUD — API', { tag: [ROUTE_API_TAG, '@api'] }, () => {
   let vmName: string;
 
   test.beforeAll(async ({ testNamespace, apiClient, utils }) => {
