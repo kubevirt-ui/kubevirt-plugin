@@ -1,9 +1,13 @@
 import AffinityModal from '@kubevirt-utils/components/AffinityModal/AffinityModal';
+import { produceVMWithAffinity } from '@kubevirt-utils/components/AffinityModal/utils/utils';
 import CloudinitModal from '@kubevirt-utils/components/CloudinitModal/CloudinitModal';
 import NodeSelectorModal from '@kubevirt-utils/components/NodeSelectorModal/NodeSelectorModal';
+import { produceVMWithNodeSelector } from '@kubevirt-utils/components/NodeSelectorModal/utils/helpers';
 import TolerationsModal from '@kubevirt-utils/components/TolerationsModal/TolerationsModal';
+import { produceVMWithTolerations } from '@kubevirt-utils/components/TolerationsModal/utils/utils';
 import VMSSHSecretModal from '@kubevirt-utils/components/VMSSHSecretModal/VMSSHSecretModal';
 import { VirtualMachineDetailsTab } from '@kubevirt-utils/constants/tabs-constants';
+import { getAffinity, getNodeSelector, getTolerations } from '@kubevirt-utils/resources/vm';
 
 import { type PendingChange } from '../../utils/types';
 import { type PendingChangeContext } from './types';
@@ -17,9 +21,7 @@ export const getSchedulingPendingChanges = ({
     authorizedSSHKeys,
     cloudInitChanged,
     hideYamlTab,
-    nodes,
     nodeSelectorChanged,
-    nodesLoaded,
     sshServiceChanged,
     t,
     tolerationsChanged,
@@ -33,11 +35,10 @@ export const getSchedulingPendingChanges = ({
       createModal(({ isOpen, onClose }) => (
         <NodeSelectorModal
           isOpen={isOpen}
-          nodes={nodes}
-          nodesLoaded={nodesLoaded}
+          nodeSelector={getNodeSelector(vm)}
           onClose={onClose}
           onSubmit={onSubmit}
-          vm={vm}
+          produceUpdatedResource={(selectorLabels) => produceVMWithNodeSelector(vm, selectorLabels)}
         />
       )),
     ),
@@ -64,13 +65,12 @@ export const getSchedulingPendingChanges = ({
     ...createProps(VirtualMachineDetailsTab.Scheduling, () =>
       createModal(({ isOpen, onClose }) => (
         <TolerationsModal
+          initialTolerationsProp={getTolerations(vm)}
           isOpen={isOpen}
-          nodes={nodes}
-          nodesLoaded={nodesLoaded}
           onClose={onClose}
           onSubmit={onSubmit}
-          vm={vm}
-          vmi={vmi}
+          produceUpdatedResource={(tolerations) => produceVMWithTolerations(vm, tolerations)}
+          showPendingChangesAlert={!!vmi}
         />
       )),
     ),
@@ -81,12 +81,11 @@ export const getSchedulingPendingChanges = ({
     ...createProps(VirtualMachineDetailsTab.Scheduling, () =>
       createModal(({ isOpen, onClose }) => (
         <AffinityModal
+          initialAffinity={getAffinity(vm)}
           isOpen={isOpen}
-          nodes={nodes}
-          nodesLoaded={nodesLoaded}
           onClose={onClose}
           onSubmit={onSubmit}
-          vm={vm}
+          produceUpdatedResource={(affinity) => produceVMWithAffinity(vm, affinity)}
         />
       )),
     ),

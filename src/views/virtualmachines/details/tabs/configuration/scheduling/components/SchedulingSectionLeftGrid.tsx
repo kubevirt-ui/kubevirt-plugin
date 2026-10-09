@@ -2,20 +2,23 @@ import type { FC } from 'react';
 import { useCallback } from 'react';
 
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import type { IoK8sApiCoreV1Node } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import type {
   V1VirtualMachine,
   V1VirtualMachineInstance,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import AffinityModal from '@kubevirt-utils/components/AffinityModal/AffinityModal';
+import { produceVMWithAffinity } from '@kubevirt-utils/components/AffinityModal/utils/utils';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import NodeSelectorDetailItem from '@kubevirt-utils/components/NodeSelectorDetailItem/NodeSelectorDetailItem';
 import NodeSelectorModal from '@kubevirt-utils/components/NodeSelectorModal/NodeSelectorModal';
+import { produceVMWithNodeSelector } from '@kubevirt-utils/components/NodeSelectorModal/utils/helpers';
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import Tolerations from '@kubevirt-utils/components/Tolerations/Tolerations';
 import TolerationsModal from '@kubevirt-utils/components/TolerationsModal/TolerationsModal';
+import { produceVMWithTolerations } from '@kubevirt-utils/components/TolerationsModal/utils/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getAffinity, getNodeSelector, getTolerations } from '@kubevirt-utils/resources/vm';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sUpdate } from '@multicluster/k8sRequests';
@@ -27,8 +30,6 @@ import Affinity from './Affinity';
 
 type SchedulingSectionLeftGridProps = {
   canUpdateVM: boolean;
-  nodes: IoK8sApiCoreV1Node[];
-  nodesLoaded: boolean;
   onUpdateVM?: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine>;
   vm: V1VirtualMachine;
   vmi?: V1VirtualMachineInstance;
@@ -36,8 +37,6 @@ type SchedulingSectionLeftGridProps = {
 
 const SchedulingSectionLeftGrid: FC<SchedulingSectionLeftGridProps> = ({
   canUpdateVM,
-  nodes,
-  nodesLoaded,
   onUpdateVM,
   vm,
   vmi,
@@ -69,14 +68,15 @@ const SchedulingSectionLeftGrid: FC<SchedulingSectionLeftGridProps> = ({
           descriptionHeader={<SearchItem id="node-selector">{t('Node selector')}</SearchItem>}
           isEdit={canUpdateVM}
           onEditClick={() =>
-            createModal(({ isOpen, onClose }) => (
+            createModal?.(({ isOpen, onClose }) => (
               <NodeSelectorModal
                 isOpen={isOpen}
-                nodes={nodes}
-                nodesLoaded={nodesLoaded}
+                nodeSelector={getNodeSelector(vm)}
                 onClose={onClose}
                 onSubmit={onSubmit}
-                vm={vm}
+                produceUpdatedResource={(selectorLabels) =>
+                  produceVMWithNodeSelector(vm, selectorLabels)
+                }
               />
             ))
           }
@@ -86,15 +86,14 @@ const SchedulingSectionLeftGrid: FC<SchedulingSectionLeftGridProps> = ({
           descriptionHeader={<SearchItem id="tolerations">{t('Tolerations')}</SearchItem>}
           isEdit={canUpdateVM}
           onEditClick={() =>
-            createModal(({ isOpen, onClose }) => (
+            createModal?.(({ isOpen, onClose }) => (
               <TolerationsModal
+                initialTolerationsProp={getTolerations(vm)}
                 isOpen={isOpen}
-                nodes={nodes}
-                nodesLoaded={nodesLoaded}
                 onClose={onClose}
                 onSubmit={onSubmit}
-                vm={vm}
-                vmi={vmi}
+                produceUpdatedResource={(tolerations) => produceVMWithTolerations(vm, tolerations)}
+                showPendingChangesAlert={!!vmi}
               />
             ))
           }
@@ -106,12 +105,11 @@ const SchedulingSectionLeftGrid: FC<SchedulingSectionLeftGridProps> = ({
           onEditClick={() =>
             createModal(({ isOpen, onClose }) => (
               <AffinityModal
+                initialAffinity={getAffinity(vm)}
                 isOpen={isOpen}
-                nodes={nodes}
-                nodesLoaded={nodesLoaded}
                 onClose={onClose}
                 onSubmit={onSubmit}
-                vm={vm}
+                produceUpdatedResource={(affinity) => produceVMWithAffinity(vm, affinity)}
               />
             ))
           }
