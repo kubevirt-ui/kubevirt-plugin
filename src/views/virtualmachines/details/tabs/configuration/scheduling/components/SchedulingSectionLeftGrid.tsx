@@ -2,12 +2,12 @@ import type { FC } from 'react';
 import { useCallback } from 'react';
 
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import type { IoK8sApiCoreV1Node } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import type {
   V1VirtualMachine,
   V1VirtualMachineInstance,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import AffinityModal from '@kubevirt-utils/components/AffinityModal/AffinityModal';
+import { produceVMWithAffinity } from '@kubevirt-utils/components/AffinityModal/utils/utils';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import NodeSelectorDetailItem from '@kubevirt-utils/components/NodeSelectorDetailItem/NodeSelectorDetailItem';
@@ -18,7 +18,7 @@ import Tolerations from '@kubevirt-utils/components/Tolerations/Tolerations';
 import TolerationsModal from '@kubevirt-utils/components/TolerationsModal/TolerationsModal';
 import { produceVMWithTolerations } from '@kubevirt-utils/components/TolerationsModal/utils/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getNodeSelector, getTolerations } from '@kubevirt-utils/resources/vm';
+import { getAffinity, getNodeSelector, getTolerations } from '@kubevirt-utils/resources/vm';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sUpdate } from '@multicluster/k8sRequests';
@@ -30,8 +30,6 @@ import Affinity from './Affinity';
 
 type SchedulingSectionLeftGridProps = {
   canUpdateVM: boolean;
-  nodes: IoK8sApiCoreV1Node[];
-  nodesLoaded: boolean;
   onUpdateVM?: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine>;
   vm: V1VirtualMachine;
   vmi?: V1VirtualMachineInstance;
@@ -39,8 +37,6 @@ type SchedulingSectionLeftGridProps = {
 
 const SchedulingSectionLeftGrid: FC<SchedulingSectionLeftGridProps> = ({
   canUpdateVM,
-  nodes,
-  nodesLoaded,
   onUpdateVM,
   vm,
   vmi,
@@ -109,12 +105,11 @@ const SchedulingSectionLeftGrid: FC<SchedulingSectionLeftGridProps> = ({
           onEditClick={() =>
             createModal(({ isOpen, onClose }) => (
               <AffinityModal
+                initialAffinity={getAffinity(vm)}
                 isOpen={isOpen}
-                nodes={nodes}
-                nodesLoaded={nodesLoaded}
                 onClose={onClose}
                 onSubmit={onSubmit}
-                vm={vm}
+                produceUpdatedResource={(affinity) => produceVMWithAffinity(vm, affinity)}
               />
             ))
           }
