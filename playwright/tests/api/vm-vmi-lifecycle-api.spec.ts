@@ -3,6 +3,7 @@ import { load as yamlLoad } from 'js-yaml';
 import type { KubernetesResource } from '@/data-models/kubernetes-types';
 import { expect, test } from '@/fixtures/api-test-fixture';
 import { pollUntilVmiGone, pollUntilVmiRunning, pollUntilVmiUidChanged } from '@/utils/api-poll';
+import { ROUTE_API_TAG } from '@/data-models/route-tags';
 
 interface ProxyVmSpec {
   runStrategy?: string;
@@ -22,7 +23,7 @@ interface VmiGuestSpec {
   };
 }
 
-test.describe('VirtualMachine and VMI lifecycle — API', { tag: ['@api'] }, () => {
+test.describe('VirtualMachine and VMI lifecycle — API', { tag: [ROUTE_API_TAG, '@api'] }, () => {
   test.describe.configure({ mode: 'serial' });
 
   let vmName: string;

@@ -4,6 +4,8 @@
  * Import from this file in all spec files for withAllure({ suite, feature, tags })
  * and for test.describe({ tag: [...] }) tier/feature-area tags.
  *
+ * Route folder tags (`@route-*`) live in `@/data-models/route-tags` — use both tier and route tags on describes.
+ *
  * Never use raw string literals for these values — always reference a constant.
  */
 
@@ -87,3 +89,12 @@ export const VISUAL = 'Visual';
 
 /** Playwright/Allure tag for visual regression tests. */
 export const VISUAL_TAG = '@visual';
+
+/** Playwright/Allure tag for auto-applied labels feature tests. */
+export const AUTO_LABELS_TAG = '@auto-labels';
+
+/** Allure feature label for auto-applied labels tests. */
+export const AUTO_LABELS_FEATURE = 'Auto-Applied Labels';
+
+/** Playwright/Allure tag for Recommended capabilities tab tests. */
+export const RECOMMENDED_CAPABILITIES_TAG = '@tier2-recommended-capabilities';

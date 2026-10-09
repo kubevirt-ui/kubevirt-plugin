@@ -7,7 +7,6 @@
  *   import { test, expect } from '@/fixtures/checkups-fixture';
  */
 
-import { withSafeActions } from '@/page-objects/base-page';
 import CheckupsPage from '@/page-objects/cluster/checkups-page';
 import OverviewPage from '@/page-objects/overview/overview-page';
 import PageCommons from '@/page-objects/page-commons';
@@ -22,13 +21,13 @@ interface CheckupsFixtures {
 
 const test = baseTest.extend<CheckupsFixtures>({
   checkupsPage: async ({ page }, use) => {
-    await use(withSafeActions(new CheckupsPage(page)));
+    await use(new CheckupsPage(page));
   },
   overviewPage: async ({ page }, use) => {
-    await use(withSafeActions(new OverviewPage(page)));
+    await use(new OverviewPage(page));
   },
   pageCommons: async ({ page }, use) => {
-    await use(withSafeActions(new PageCommons(page)));
+    await use(new PageCommons(page));
   },
 });
 

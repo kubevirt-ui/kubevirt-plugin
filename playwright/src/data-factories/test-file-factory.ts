@@ -248,11 +248,16 @@ export class TestFileFactory {
   /** Resolves a basename-only filename under `.test-data`, rejecting path traversal. */
   private static resolveSafeFilePath(filename: string): string {
     const base = path.basename(filename);
-    if (!filename || filename === '.' || base !== filename || filename.includes('..') || path.isAbsolute(filename)) {
+    if (
+      !filename ||
+      filename === '.' ||
+      base !== filename ||
+      filename.includes('..') ||
+      path.isAbsolute(filename)
+    ) {
       throw new Error(`Invalid test filename (basename only required): ${filename}`);
     }
     const testDataDir = this.ensureTestDataDirectory();
     return path.join(testDataDir, base);
   }
 }
-

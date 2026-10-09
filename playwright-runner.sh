@@ -8,7 +8,7 @@
 # Examples:
 #   ./playwright-runner.sh Gating
 #   ./playwright-runner.sh suite --workers=4
-#   ./playwright-runner.sh Tier1 playwright/tests/tier1/foo.spec.ts
+#   ./playwright-runner.sh Tier1 playwright/tests/bootable-volumes/foo.spec.ts
 #   ./playwright-runner.sh all
 #
 # Note: --project=Name (equals form) is required so Playwright's variadic
@@ -75,6 +75,20 @@ EXTRA_ARGS=("$@")
 
 PROJECT_LOWER=$(echo "${PROJECT}" | tr '[:upper:]' '[:lower:]')
 
+project_tag_grep_args() {
+  case "$1" in
+    gating)
+      echo --grep '@gating' --grep-invert '@cnv-settings'
+      ;;
+    tier1) echo --grep '@tier1' ;;
+    tier2) echo --grep '@tier2' ;;
+    settings) echo --grep '@cnv-settings' ;;
+    *) echo ;;
+  esac
+}
+
+read -r -a TAG_GREP_ARGS <<< "$(project_tag_grep_args "${PROJECT_LOWER}")"
+
 if [[ "${PROJECT_LOWER}" == "suite" ]]; then
   echo "🚀 Running suite: Gating + Tier1 + Tier2..."
   npx playwright test --project=Gating --project=Tier1 --project=Tier2 "${EXTRA_ARGS[@]}"
@@ -94,5 +108,9 @@ elif [[ "${PROJECT_LOWER}" == "all" ]]; then
   npx playwright test "${PROJECT_ARGS[@]}" "${EXTRA_ARGS[@]}"
 else
   echo "🚀 Running project: ${PROJECT}..."
-  npx playwright test --project="${PROJECT}" "${EXTRA_ARGS[@]}"
+  if [[ ${#TAG_GREP_ARGS[@]} -gt 0 ]]; then
+    npx playwright test --project="${PROJECT}" "${TAG_GREP_ARGS[@]}" "${EXTRA_ARGS[@]}"
+  else
+    npx playwright test --project="${PROJECT}" "${EXTRA_ARGS[@]}"
+  fi
 fi

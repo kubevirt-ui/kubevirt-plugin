@@ -1,10 +1,10 @@
 import BaseComponent from '@/components/shared/base-component';
 import { TestTimeouts } from '@/utils/test-config';
-import type { Page } from '@playwright/test';
+import { expect, type Page } from '@playwright/test';
 
 /** VM list split Create control, template quick-create form, and catalog navigation from the list page. */
 export default class VmListTemplateCreateComponent extends BaseComponent {
-  private readonly _createButton = this.testId('item-create');
+  private readonly _pageHeaderCreateButton = this.testId('page-heading').getByTestId('item-create');
   private readonly _quickCreateVmButton = this.testId('quick-create-vm-btn');
   private readonly _roleMenuitem = this.locator('[role="menuitem"]');
   private readonly _startAfterCreateCheckbox = this.locator('#start-after-create-checkbox');
@@ -39,9 +39,19 @@ export default class VmListTemplateCreateComponent extends BaseComponent {
   ): Promise<void> {
     switch (option) {
       case 'With YAML': {
-        await this.robustClick(this._createButton);
-        await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
-        await this.robustClick(this.locator('button[role="menuitem"]:has-text("With YAML")'));
+        await this._pageHeaderCreateButton.waitFor({
+          state: 'visible',
+          timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+        });
+        await expect(this._pageHeaderCreateButton).toBeEnabled({
+          timeout: TestTimeouts.UI_ACTION_COMPLETE,
+        });
+
+        await this.robustClick(this._pageHeaderCreateButton);
+
+        const yamlOption = this.page.getByRole('menuitem', { name: 'With YAML' });
+        await yamlOption.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ACTION_COMPLETE });
+        await this.robustClick(yamlOption);
         break;
       }
       case 'From template': {
@@ -66,9 +76,14 @@ export default class VmListTemplateCreateComponent extends BaseComponent {
 
   async getCreateSplitButtonDropdownOptions(): Promise<string[]> {
     try {
-      const toggle = this.testId('item-create');
-      await this.robustClick(toggle);
-      await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
+      await this._pageHeaderCreateButton.waitFor({
+        state: 'visible',
+        timeout: TestTimeouts.UI_ACTION_COMPLETE,
+      });
+      await expect(this._pageHeaderCreateButton).toBeEnabled({
+        timeout: TestTimeouts.UI_ACTION_COMPLETE,
+      });
+      await this.robustClick(this._pageHeaderCreateButton);
       const items = this._roleMenuitem;
       const texts = await items.allTextContents();
       await this.page.keyboard.press('Escape');

@@ -5,7 +5,7 @@
 import UploadProgressToastComponent from '@/components/shared/upload-progress-toast-component';
 import { DISK_NAMES } from '@/data-models';
 import { TestTimeouts } from '@/utils/test-config';
-import type { Page } from '@playwright/test';
+import type { Page, Response } from '@playwright/test';
 
 import PageCommons from '../page-commons';
 
@@ -70,6 +70,23 @@ export default class VirtualMachineDetailPage extends PageCommons {
     return this.disks.addBlankDisk(diskName, size, storageClass);
   }
 
+  async addBlankDiskWithSerial(
+    diskName: string,
+    serial: string,
+    size = '1',
+    storageClass?: string,
+  ): Promise<boolean> {
+    return this.disks.addBlankDiskWithSerial(diskName, serial, size, storageClass);
+  }
+
+  async getDiskSerialValue(diskName: string): Promise<string | null> {
+    return this.disks.getDiskSerialValue(diskName);
+  }
+
+  async editDiskSerial(diskName: string, newSerial: string): Promise<boolean> {
+    return this.disks.editDiskSerial(diskName, newSerial);
+  }
+
   async addCDROMDisk(
     diskName: string,
     cdromSource: 'Upload new ISO' | 'Use existing ISO' | 'Leave empty drive' = 'Upload new ISO',
@@ -100,59 +117,57 @@ export default class VirtualMachineDetailPage extends PageCommons {
 
   /**
    * Configuration → Network: row actions → Edit → change NetworkAttachmentDefinition (live NAD ref).
-   * @see STP hotpluggable-nad-ref P0 scenario.
    */
-  async changeConfigurationNetworkNicNad(
+  async changeConfigurationNetworkNicNad(nicName: string, nadName: string): Promise<void> {
+    return this.network.changeNicNetworkAttachment(nicName, nadName);
+  }
+
+  async openAddBlankDiskModal(): Promise<void> {
+    return this.disks.openAddBlankDiskModal();
+  }
+
+  async openEditDiskModal(diskName: string): Promise<void> {
+    return this.disks.openEditDiskModal(diskName);
+  }
+
+  async expandDiskAdvancedSettings(): Promise<void> {
+    return this.disks.expandDiskAdvancedSettings();
+  }
+
+  async openAddNetworkInterfaceModal(): Promise<void> {
+    return this.network.openAddNetworkInterfaceModal();
+  }
+
+  async openEditNetworkInterfaceModal(nicName: string): Promise<void> {
+    return this.network.openEditNetworkInterfaceModal(nicName);
+  }
+
+  async waitForNetworkInterfaceAutoSelection(): Promise<void> {
+    return this.network.waitForNetworkAutoSelection();
+  }
+
+  async expandNetworkInterfaceAdvancedSettings(): Promise<void> {
+    return this.network.expandNetworkInterfaceAdvancedSettings();
+  }
+
+  async getConfigurationNetworkNicName(nicName: string): Promise<string> {
+    return this.network.getNicNetworkName(nicName);
+  }
+
+  async getConfigurationNetworkNicBrokenLinkTooltip(nicName: string): Promise<string> {
+    return this.network.getNicNetworkBrokenLinkTooltipText(nicName);
+  }
+
+  async isConfigurationNetworkNicResourceLinkVisible(nicName: string): Promise<boolean> {
+    return this.network.isNicNetworkResourceLinkVisible(nicName);
+  }
+
+  async waitForConfigurationNetworkNicBrokenLink(
     nicName: string,
-    nadMenuOptionText: string,
+    nadName: string,
+    timeout: number = TestTimeouts.ELEMENT_WAIT,
   ): Promise<void> {
-    await this.navigateToConfigurationNetwork();
-
-    const nicRow = this.locator(`tr.pf-v6-c-table__tr:has-text("${nicName}")`);
-    await nicRow.waitFor({ state: 'visible', timeout: TestTimeouts.UI_VISIBILITY_QUICK });
-
-    const actionsBtn = nicRow.locator('.pf-v6-c-table__action button').first();
-    await actionsBtn.waitFor({
-      state: 'visible',
-      timeout: TestTimeouts.INSTANCE_TYPE_VERIFICATION,
-    });
-    await this.robustClick(actionsBtn);
-
-    const editItem = this.page
-      .locator('[role="menu"] [role="menuitem"], [role="menu"] button')
-      .filter({ hasText: /^Edit$/ });
-    await editItem.first().waitFor({ state: 'visible', timeout: TestTimeouts.UI_DELAY_MEDIUM });
-    await this.robustClick(editItem.first());
-
-    await this.page
-      .locator('h1')
-      .filter({ hasText: 'Edit network interface' })
-      .waitFor({ state: 'visible', timeout: TestTimeouts.INSTANCE_TYPE_VERIFICATION });
-
-    const modalScope = this.page
-      .locator('[role="dialog"], #tab-modal')
-      .filter({ hasText: 'Edit network interface' })
-      .first();
-    const nadSelectRoot = modalScope.getByTestId('network-attachment-definition-select');
-    await nadSelectRoot.waitFor({ state: 'visible', timeout: TestTimeouts.UI_DELAY_MEDIUM });
-
-    const menuToggle = nadSelectRoot
-      .locator('button.pf-v6-c-menu-toggle__button, button[aria-label="Menu toggle"]')
-      .first();
-    await menuToggle.waitFor({ state: 'visible', timeout: TestTimeouts.UI_DELAY_MEDIUM });
-    await this.robustClick(menuToggle);
-
-    const nadOption = this.page
-      .locator('[role="menu"] button, [role="option"]')
-      .filter({ hasText: nadMenuOptionText });
-    await nadOption.first().waitFor({ state: 'visible', timeout: TestTimeouts.UI_DELAY_MEDIUM });
-    await this.robustClick(nadOption.first());
-
-    await this.clickSave();
-    await modalScope
-      .waitFor({ state: 'hidden', timeout: TestTimeouts.ELEMENT_WAIT })
-      .catch(() => undefined);
-    await this.page.waitForTimeout(TestTimeouts.UI_DELAY_MEDIUM);
+    return this.network.waitForNicNetworkBrokenLink(nicName, nadName, timeout);
   }
 
   async changeMetricsTimeRange() {
@@ -720,6 +735,30 @@ export default class VirtualMachineDetailPage extends PageCommons {
     return this.disks.resizeDisk(diskName, newSize);
   }
 
+  async mockPvcPatchForbidden(): Promise<void> {
+    return this.disks.mockPvcPatchForbidden();
+  }
+
+  async submitEditDiskResizeKeepingModalOpen(diskName: string, newSize: string): Promise<void> {
+    return this.disks.submitEditDiskResizeKeepingModalOpen(diskName, newSize);
+  }
+
+  async unroutePvcPatchForbidden(): Promise<void> {
+    return this.disks.unroutePvcPatchForbidden();
+  }
+
+  waitForForbiddenPvcPatch(timeout: number): Promise<Response> {
+    return this.disks.waitForForbiddenPvcPatch(timeout);
+  }
+
+  async waitForEditDiskModalHidden(): Promise<void> {
+    return this.disks.waitForEditDiskModalHidden();
+  }
+
+  async waitForEditDiskModalVisible(): Promise<void> {
+    return this.disks.waitForEditDiskModalVisible();
+  }
+
   async restartVmFromActionsDropdown() {
     return this.actions.restartVmFromActionsDropdown();
   }
@@ -823,22 +862,12 @@ export default class VirtualMachineDetailPage extends PageCommons {
   async verifyConfigurationDetails(vmName: string, expectedWorkload?: string): Promise<boolean> {
     return this.configuration.verifyConfigurationDetails(vmName, expectedWorkload);
   }
-  /** Returns true if the Configuration → Network table row for the NIC shows the expected NAD name in the third cell. */
+  /** Returns true if the Configuration → Network table row for the NIC shows the expected NAD name. */
   async verifyConfigurationNetworkNicDisplaysNad(
     nicName: string,
     expectedNadName: string,
   ): Promise<boolean> {
-    try {
-      await this.navigateToConfigurationNetwork();
-      const nicRow = this.locator(`tr.pf-v6-c-table__tr:has-text("${nicName}")`);
-      await nicRow.waitFor({ state: 'visible', timeout: TestTimeouts.UI_VISIBILITY_QUICK });
-      const networkCell = nicRow.locator('td').nth(2);
-      await networkCell.waitFor({ state: 'visible', timeout: TestTimeouts.UI_VISIBILITY_QUICK });
-      const text = (await networkCell.textContent())?.trim() ?? '';
-      return text.includes(expectedNadName);
-    } catch {
-      return false;
-    }
+    return this.network.verifyNicDisplaysNad(nicName, expectedNadName);
   }
   async verifyConsoleNotVisible(): Promise<boolean> {
     return this.console.verifyConsoleNotVisible();
@@ -1157,8 +1186,8 @@ export default class VirtualMachineDetailPage extends PageCommons {
     void namespace;
     await this.page.waitForTimeout(Math.min(TestTimeouts.NETWORK_DELAY, timeout));
   }
-  async waitForPendingChanges(timeout = 60000): Promise<boolean> {
-    return this.configuration.waitForPendingChanges(timeout);
+  async waitForPendingChanges(timeout: number = TestTimeouts.PENDING_CHANGES): Promise<boolean> {
+    return this.network.waitForPendingChangesAlert(timeout);
   }
   async waitForPendingChangesToDisappear(timeout = 60000): Promise<boolean> {
     return this.configuration.waitForPendingChangesToDisappear(timeout);

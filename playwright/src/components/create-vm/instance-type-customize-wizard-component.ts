@@ -384,7 +384,14 @@ export default class InstanceTypeCustomizeWizardComponent extends BaseComponent 
         await this.page.waitForTimeout(TestTimeouts.UI_DELAY_EXTRA);
 
         if (nic.name) {
-          const wizardNicNameInput = this.locator('input[aria-label="Network interface name"]');
+          // The Name field lives under the modal's Advanced settings section.
+          await this._advancedSettingsBtn.waitFor({
+            state: 'visible',
+            timeout: TestTimeouts.RESOURCE_CREATION,
+          });
+          await this.robustClick(this._advancedSettingsBtn);
+
+          const wizardNicNameInput = this.locator('[role="dialog"] #name, #tab-modal #name');
           await wizardNicNameInput.waitFor({
             state: 'visible',
             timeout: TestTimeouts.RESOURCE_CREATION,
