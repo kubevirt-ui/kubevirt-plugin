@@ -1,7 +1,8 @@
 import { expect, test } from '@/fixtures/api-test-fixture';
 import { assertList } from '@/utils/api-assertions';
+import { ROUTE_API_TAG } from '@/data-models/route-tags';
 
-test.describe('VirtualMachines list page — API endpoints', { tag: ['@api'] }, () => {
+test.describe('VirtualMachines list page — API endpoints', { tag: [ROUTE_API_TAG, '@api'] }, () => {
   test('GET virtualmachines (cluster-wide) returns VirtualMachineList', async ({ apiClient }) => {
     const body = await apiClient.getVirtualMachines();
     assertList(body, 'VirtualMachineList');

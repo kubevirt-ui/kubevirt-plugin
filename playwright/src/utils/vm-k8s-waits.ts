@@ -1,8 +1,12 @@
 import type RequestContextClient from '@/clients/request-context-client';
 import { TestTimeouts } from '@/utils/test-config';
 
+type VmStatus = {
+  printableStatus?: string;
+};
+
 /**
- * Poll until VirtualMachine status.ready is true (mirrors K8s VM lifecycle step driver).
+ * Poll until VirtualMachine status.printableStatus is Running.
  */
 export async function waitForVirtualMachineReady(
   client: RequestContextClient,
@@ -11,12 +15,14 @@ export async function waitForVirtualMachineReady(
   timeoutMs: number = TestTimeouts.VM_BOOTUP,
 ): Promise<void> {
   const start = Date.now();
+  let lastStatus = 'unknown';
   while (Date.now() - start < timeoutMs) {
     try {
       const vm = (await client.getVirtualMachine(namespace, vmName)) as {
-        status?: { ready?: boolean };
+        status?: VmStatus;
       } | null;
-      if (vm?.status?.ready === true) {
+      lastStatus = vm?.status?.printableStatus ?? 'unknown';
+      if (lastStatus === 'Running') {
         return;
       }
     } catch {
@@ -24,11 +30,13 @@ export async function waitForVirtualMachineReady(
     }
     await new Promise((r) => setTimeout(r, TestTimeouts.SHORT_WAIT));
   }
-  throw new Error(`VM ${vmName} did not become ready within ${timeoutMs}ms`);
+  throw new Error(
+    `VM ${vmName} did not become Running within ${timeoutMs}ms (last printableStatus=${lastStatus})`,
+  );
 }
 
 /**
- * Poll until the VM is stopped (VMI no longer exists).
+ * Poll until the VM is stopped (printableStatus Stopped, or VMI gone).
  */
 export async function waitForVirtualMachineStopped(
   client: RequestContextClient,
@@ -37,12 +45,18 @@ export async function waitForVirtualMachineStopped(
   timeoutMs: number = TestTimeouts.VM_BOOTUP,
 ): Promise<void> {
   const start = Date.now();
+  let lastStatus = 'unknown';
   while (Date.now() - start < timeoutMs) {
     try {
       const vm = (await client.getVirtualMachine(namespace, vmName)) as {
-        status?: { ready?: boolean };
+        status?: VmStatus;
       } | null;
-      if (!vm || !vm.status?.ready) {
+      if (!vm) return;
+      lastStatus = vm.status?.printableStatus ?? 'unknown';
+      if (lastStatus === 'Stopped') {
+        return;
+      }
+      if (lastStatus !== 'Running' && lastStatus !== 'Stopping') {
         const vmi = await client.getVirtualMachineInstance(namespace, vmName);
         if (!vmi) return;
       }
@@ -51,7 +65,9 @@ export async function waitForVirtualMachineStopped(
     }
     await new Promise((r) => setTimeout(r, TestTimeouts.SHORT_WAIT));
   }
-  throw new Error(`VM ${vmName} did not stop within ${timeoutMs}ms`);
+  throw new Error(
+    `VM ${vmName} did not stop within ${timeoutMs}ms (last printableStatus=${lastStatus})`,
+  );
 }
 
 /**

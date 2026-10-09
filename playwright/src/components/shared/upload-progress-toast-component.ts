@@ -3,12 +3,19 @@
  * (see `useUploadProgressToast` in product code). Covers the "uploading" toast
  * (with abort action and context links), the terminal success toast (with links),
  * and the terminal aborted/error toasts.
+ *
+ * Console renders each toast as a PatternFly Alert: the filename is in the Alert
+ * title, while `data-test="upload-progress-*"` marks only the Alert description
+ * (progress bar / links). Match by title + body, not `hasText` on the body.
  */
 
 import { TestTimeouts } from '@/utils/test-config';
 import type { Locator, Page } from '@playwright/test';
 
 import BaseComponent from './base-component';
+
+const TOAST_ALERT = '.pf-v6-c-alert, .pf-v5-c-alert, .pf-c-alert';
+const TOAST_ALERT_TITLE = '.pf-v6-c-alert__title, .pf-v5-c-alert__title, .pf-c-alert__title';
 
 export default class UploadProgressToastComponent extends BaseComponent {
   private readonly _abortButton = this.testId('upload-progress-abort');
@@ -67,26 +74,56 @@ export default class UploadProgressToastComponent extends BaseComponent {
     const aborted = this.toastContaining(this._abortedToast, fileName);
 
     const start = Date.now();
-    await uploading
-      .or(success)
-      .or(error)
-      .or(aborted)
-      .first()
-      .waitFor({ state: 'visible', timeout });
+    try {
+      await uploading
+        .or(success)
+        .or(error)
+        .or(aborted)
+        .first()
+        .waitFor({ state: 'visible', timeout });
+    } catch {
+      throw new Error(
+        `Expected an upload toast${fileName ? ` for "${fileName}"` : ''} within ${timeout}ms. ${await this.toastDebugSuffix()}`,
+      );
+    }
 
     // The toast that triggered the wait above may have already transitioned to another
     // state by the time we classify it (e.g. a fast upload moving from "uploading" to
     // "success"), so keep polling for the remaining time budget instead of checking once.
     while (Date.now() - start < timeout) {
-      if (await uploading.first().isVisible().catch(() => false)) return 'uploading';
-      if (await success.first().isVisible().catch(() => false)) return 'success';
-      if (await error.first().isVisible().catch(() => false)) return 'error';
-      if (await aborted.first().isVisible().catch(() => false)) return 'aborted';
+      if (
+        await uploading
+          .first()
+          .isVisible()
+          .catch(() => false)
+      )
+        return 'uploading';
+      if (
+        await success
+          .first()
+          .isVisible()
+          .catch(() => false)
+      )
+        return 'success';
+      if (
+        await error
+          .first()
+          .isVisible()
+          .catch(() => false)
+      )
+        return 'error';
+      if (
+        await aborted
+          .first()
+          .isVisible()
+          .catch(() => false)
+      )
+        return 'aborted';
       await this.page.waitForTimeout(100);
     }
 
     throw new Error(
-      `Upload toast became visible but could not classify state${fileName ? ` for "${fileName}"` : ''}`,
+      `Upload toast became visible but could not classify state${fileName ? ` for "${fileName}"` : ''}. ${await this.toastDebugSuffix()}`,
     );
   }
 
@@ -145,11 +182,27 @@ export default class UploadProgressToastComponent extends BaseComponent {
       .catch(() => false);
   }
 
+  /**
+   * Toast Alert whose title includes `fileName` and whose description is `root`
+   * (`data-test="upload-progress-*"`). The filename is the Alert title, not body text.
+   */
   private toastContaining(root: Locator, fileName?: string): Locator {
     if (!fileName) {
       return root;
     }
-    return root.filter({ hasText: fileName });
+
+    return this.page
+      .locator(TOAST_ALERT)
+      .filter({ has: this.page.locator(TOAST_ALERT_TITLE).filter({ hasText: fileName }) })
+      .filter({ has: root });
+  }
+
+  private async toastDebugSuffix(): Promise<string> {
+    const titles = (await this.page.locator(TOAST_ALERT_TITLE).allTextContents())
+      .map((title) => title.trim())
+      .filter(Boolean);
+
+    return `Visible toast titles: ${titles.length ? titles.join('; ') : '(none)'}`;
   }
 
   private async waitForToastVisible(
@@ -159,12 +212,12 @@ export default class UploadProgressToastComponent extends BaseComponent {
     kind: string,
   ): Promise<void> {
     try {
-      await this.toastContaining(root, fileName)
-        .first()
-        .waitFor({ state: 'visible', timeout });
+      await this.toastContaining(root, fileName).first().waitFor({ state: 'visible', timeout });
     } catch {
       const suffix = fileName ? ` for "${fileName}"` : '';
-      throw new Error(`Expected ${kind} upload toast to be visible${suffix} within ${timeout}ms`);
+      throw new Error(
+        `Expected ${kind} upload toast to be visible${suffix} within ${timeout}ms. ${await this.toastDebugSuffix()}`,
+      );
     }
   }
 }

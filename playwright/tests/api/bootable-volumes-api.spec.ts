@@ -1,7 +1,8 @@
 import { expect, test } from '@/fixtures/api-test-fixture';
 import { assertList } from '@/utils/api-assertions';
+import { ROUTE_API_TAG } from '@/data-models/route-tags';
 
-test.describe('Bootable volumes page — API endpoints', { tag: ['@api'] }, () => {
+test.describe('Bootable volumes page — API endpoints', { tag: [ROUTE_API_TAG, '@api'] }, () => {
   test('GET DataSources (ns-scoped) with default-preference label returns list', async ({
     apiClient,
     testNamespace,

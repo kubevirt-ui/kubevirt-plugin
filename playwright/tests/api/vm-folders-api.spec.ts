@@ -3,8 +3,9 @@ import { load as yamlLoad } from 'js-yaml';
 import type { KubernetesResource } from '@/data-models/kubernetes-types';
 import { expect, test } from '@/fixtures/api-test-fixture';
 import { FOLDER_LABEL, listVmsInFolder } from '@/utils/api-builders';
+import { ROUTE_API_TAG } from '@/data-models/route-tags';
 
-test.describe('VM folders — single folder CRUD API', { tag: ['@api'] }, () => {
+test.describe('VM folders — single folder CRUD API', { tag: [ROUTE_API_TAG, '@api'] }, () => {
   test.describe.configure({ mode: 'serial' });
 
   let vm1Name: string;
@@ -114,92 +115,96 @@ test.describe('VM folders — single folder CRUD API', { tag: ['@api'] }, () => 
   });
 });
 
-test.describe('VM folders — multi-folder bulk operations API', { tag: ['@api'] }, () => {
-  test.describe.configure({ mode: 'serial' });
+test.describe(
+  'VM folders — multi-folder bulk operations API',
+  { tag: [ROUTE_API_TAG, '@api'] },
+  () => {
+    test.describe.configure({ mode: 'serial' });
 
-  let vmNames: string[];
-  let folderX: string;
-  let folderY: string;
+    let vmNames: string[];
+    let folderX: string;
+    let folderY: string;
 
-  test.beforeAll(async ({ testNamespace, apiClient, utils }) => {
-    folderX = utils.generateRandomFolderName('folder-x');
-    folderY = utils.generateRandomFolderName('folder-y');
-    vmNames = [
-      utils.generateRandomVmName('folder-mx0'),
-      utils.generateRandomVmName('folder-mx1'),
-      utils.generateRandomVmName('folder-my2'),
-    ];
-    const folderAssignments = [folderX, folderX, folderY];
+    test.beforeAll(async ({ testNamespace, apiClient, utils }) => {
+      folderX = utils.generateRandomFolderName('folder-x');
+      folderY = utils.generateRandomFolderName('folder-y');
+      vmNames = [
+        utils.generateRandomVmName('folder-mx0'),
+        utils.generateRandomVmName('folder-mx1'),
+        utils.generateRandomVmName('folder-my2'),
+      ];
+      const folderAssignments = [folderX, folderX, folderY];
 
-    for (let i = 0; i < vmNames.length; i++) {
-      const yaml = utils.VirtualMachineFactory.create({
-        name: vmNames[i],
-        namespace: testNamespace,
-        runStrategy: 'Halted',
-        cpuCores: 1,
-        memory: '256Mi',
-      });
-      const payload = yamlLoad(yaml) as KubernetesResource;
-      payload.metadata = {
-        ...(payload.metadata ?? {}),
-        labels: {
-          ...(payload.metadata?.labels ?? {}),
-          [FOLDER_LABEL]: folderAssignments[i],
-        },
-      };
-      await test.step(`CREATE ${vmNames[i]} in folder "${folderAssignments[i]}"`, async () => {
-        const created = await apiClient.createVirtualMachine(testNamespace, payload);
-        expect(created.kind).toBe('VirtualMachine');
-      });
-      await apiClient.waitForVmExists(vmNames[i], testNamespace);
-    }
-  });
-
-  test.afterAll(async ({ testNamespace, apiClient }) => {
-    for (const name of vmNames ?? []) {
-      await apiClient.deleteVirtualMachine(testNamespace, name).catch(() => undefined);
-      await apiClient.waitForVmDeleted(name, testNamespace).catch(() => undefined);
-    }
-  });
-
-  test('READ: folder X has 2 VMs, folder Y has 1 VM', async ({ testNamespace, apiClient }) => {
-    const [xVms, yVms] = await Promise.all([
-      listVmsInFolder(apiClient, testNamespace, folderX),
-      listVmsInFolder(apiClient, testNamespace, folderY),
-    ]);
-    expect(xVms.length, 'folder X must have 2 VMs').toBe(2);
-    expect(yVms.length, 'folder Y must have 1 VM').toBe(1);
-  });
-
-  test('PATCH: bulk-move folder-X VMs to folder-Y (mirrors bulk folder action)', async ({
-    testNamespace,
-    apiClient,
-  }) => {
-    const xVms = await listVmsInFolder(apiClient, testNamespace, folderX);
-    await Promise.all(
-      xVms.map((vm) =>
-        apiClient.patchVirtualMachine(testNamespace, vm.metadata.name, [
-          {
-            op: 'add',
-            path: `/metadata/labels/${FOLDER_LABEL.replace(/\//g, '~1')}`,
-            value: folderY,
+      for (let i = 0; i < vmNames.length; i++) {
+        const yaml = utils.VirtualMachineFactory.create({
+          name: vmNames[i],
+          namespace: testNamespace,
+          runStrategy: 'Halted',
+          cpuCores: 1,
+          memory: '256Mi',
+        });
+        const payload = yamlLoad(yaml) as KubernetesResource;
+        payload.metadata = {
+          ...(payload.metadata ?? {}),
+          labels: {
+            ...(payload.metadata?.labels ?? {}),
+            [FOLDER_LABEL]: folderAssignments[i],
           },
-        ]),
-      ),
-    );
-  });
+        };
+        await test.step(`CREATE ${vmNames[i]} in folder "${folderAssignments[i]}"`, async () => {
+          const created = await apiClient.createVirtualMachine(testNamespace, payload);
+          expect(created.kind).toBe('VirtualMachine');
+        });
+        await apiClient.waitForVmExists(vmNames[i], testNamespace);
+      }
+    });
 
-  test('READ: folder X is empty after bulk move', async ({ testNamespace, apiClient }) => {
-    const vms = await listVmsInFolder(apiClient, testNamespace, folderX);
-    expect(vms.length, 'folder X must be empty after bulk move').toBe(0);
-  });
+    test.afterAll(async ({ testNamespace, apiClient }) => {
+      for (const name of vmNames ?? []) {
+        await apiClient.deleteVirtualMachine(testNamespace, name).catch(() => undefined);
+        await apiClient.waitForVmDeleted(name, testNamespace).catch(() => undefined);
+      }
+    });
 
-  test('READ: folder Y has all 3 VMs after bulk move', async ({ testNamespace, apiClient }) => {
-    const vms = await listVmsInFolder(apiClient, testNamespace, folderY);
-    expect(vms.length, 'folder Y must have all 3 VMs after bulk move').toBe(3);
-    const names = vms.map((v) => v.metadata.name);
-    for (const n of vmNames) {
-      expect(names).toContain(n);
-    }
-  });
-});
+    test('READ: folder X has 2 VMs, folder Y has 1 VM', async ({ testNamespace, apiClient }) => {
+      const [xVms, yVms] = await Promise.all([
+        listVmsInFolder(apiClient, testNamespace, folderX),
+        listVmsInFolder(apiClient, testNamespace, folderY),
+      ]);
+      expect(xVms.length, 'folder X must have 2 VMs').toBe(2);
+      expect(yVms.length, 'folder Y must have 1 VM').toBe(1);
+    });
+
+    test('PATCH: bulk-move folder-X VMs to folder-Y (mirrors bulk folder action)', async ({
+      testNamespace,
+      apiClient,
+    }) => {
+      const xVms = await listVmsInFolder(apiClient, testNamespace, folderX);
+      await Promise.all(
+        xVms.map((vm) =>
+          apiClient.patchVirtualMachine(testNamespace, vm.metadata.name, [
+            {
+              op: 'add',
+              path: `/metadata/labels/${FOLDER_LABEL.replace(/\//g, '~1')}`,
+              value: folderY,
+            },
+          ]),
+        ),
+      );
+    });
+
+    test('READ: folder X is empty after bulk move', async ({ testNamespace, apiClient }) => {
+      const vms = await listVmsInFolder(apiClient, testNamespace, folderX);
+      expect(vms.length, 'folder X must be empty after bulk move').toBe(0);
+    });
+
+    test('READ: folder Y has all 3 VMs after bulk move', async ({ testNamespace, apiClient }) => {
+      const vms = await listVmsInFolder(apiClient, testNamespace, folderY);
+      expect(vms.length, 'folder Y must have all 3 VMs after bulk move').toBe(3);
+      const names = vms.map((v) => v.metadata.name);
+      for (const n of vmNames) {
+        expect(names).toContain(n);
+      }
+    });
+  },
+);

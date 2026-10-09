@@ -1,11 +1,12 @@
 import { expect, test } from '@/fixtures/api-test-fixture';
 import { assertList } from '@/utils/api-assertions';
+import { ROUTE_API_TAG } from '@/data-models/route-tags';
 
 const OS_IMAGES_NS = 'openshift-virtualization-os-images';
 
 const WELL_KNOWN_OS_DATASOURCES = ['fedora', 'rhel9', 'rhel8', 'centos-stream9'] as const;
 
-test.describe('VM Creation — API endpoints', { tag: ['@api'] }, () => {
+test.describe('VM Creation — API endpoints', { tag: [ROUTE_API_TAG, '@api'] }, () => {
   test('GET VirtualMachineClusterInstanceTypes returns list', async ({ apiClient }) => {
     const body = await apiClient.getVirtualMachineClusterInstanceTypes();
     assertList(body, 'VirtualMachineClusterInstancetypeList');

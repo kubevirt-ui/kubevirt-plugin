@@ -7,7 +7,6 @@
  *   import { test, expect } from '@/fixtures/migration-policies-fixture';
  */
 
-import { withSafeActions } from '@/page-objects/base-page';
 import MigrationPoliciesPage from '@/page-objects/cluster/migration-policies-page';
 import PageCommons from '@/page-objects/page-commons';
 
@@ -20,10 +19,10 @@ interface MigrationPoliciesFixtures {
 
 const test = baseTest.extend<MigrationPoliciesFixtures>({
   migrationPoliciesPage: async ({ page }, use) => {
-    await use(withSafeActions(new MigrationPoliciesPage(page)));
+    await use(new MigrationPoliciesPage(page));
   },
   pageCommons: async ({ page }, use) => {
-    await use(withSafeActions(new PageCommons(page)));
+    await use(new PageCommons(page));
   },
 });
 

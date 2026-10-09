@@ -299,7 +299,9 @@ const prettierOverrides = {
 const githubScriptsOverrides = {
   files: ['.github/**/*.{ts,tsx,js,jsx}', 'ci-scripts/**/*.{ts,tsx,js,jsx}'],
   rules: {
+    '@typescript-eslint/no-unsafe-assignment': 'off',
     'i18next/no-literal-string': 'off',
+    'max-lines': 'off',
     'no-console': 'off',
     'perfectionist/sort-classes': 'off',
     'sonarjs/cognitive-complexity': 'off',
@@ -310,6 +312,8 @@ const githubScriptsOverrides = {
     'sonarjs/pseudo-random': 'off',
     'sonarjs/publicly-writable-directories': 'off',
     'sonarjs/super-linear-regex': 'off',
+    'sonarjs/no-nested-template-literals': 'off',
+    'sonarjs/no-nested-conditional': 'off',
   },
 };
 

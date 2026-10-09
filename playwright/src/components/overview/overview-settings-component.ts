@@ -1,7 +1,7 @@
 import BaseComponent from '@/components/shared/base-component';
 import NavigationComponent from '@/components/shared/navigation-component';
 import { TestTimeouts } from '@/utils/test-config';
-import type { Page } from '@playwright/test';
+import type { Locator, Page } from '@playwright/test';
 
 export default class OverviewSettingsComponent extends BaseComponent {
   private readonly _advancedCDROMFeaturesBtn = this.locator(
@@ -19,12 +19,19 @@ export default class OverviewSettingsComponent extends BaseComponent {
   private readonly _automaticSubscriptionTypeMainButton = this.locator(
     '.AutomaticSubscriptionType--main button',
   );
+  private readonly _automaticGrantToggle = this.testId('automatic-grant-virtualization-roles');
+  private readonly _automaticGrantSectionButton = this.locator(
+    'button:has-text("Automatically grant Virtualization roles")',
+  );
   private readonly _centosStream9ImageCronSwitch = this.testId(
     'centos-stream9-image-cron-auto-image-download-switch',
   );
   private readonly _divIdAutoUpdateRhelVmsInputpfV6CSwitchInput = this.locator(
     'div[id="auto-update-rhel-vms"] input.pf-v6-c-switch__input',
   );
+  private readonly _downloadIsoButton = this.testId('virtio-drivers-section-download-iso');
+  private readonly _downloadsTab = this.testId('settings-tab-downloads');
+  private readonly _downloadsTabContent = this.testId('downloads');
   private readonly _generalSettingsButton = this.locator('button:has-text("General settings")');
   private readonly _guestManagementButton = this.locator('button:has-text("Guest management")');
   private readonly _guestSystemLog = this.testId('guest-system-log');
@@ -40,8 +47,9 @@ export default class OverviewSettingsComponent extends BaseComponent {
   private readonly _loadBalancerServiceBtn = this.locator(
     'button:has-text("LoadBalancer service")',
   );
-  private readonly _nodePortFeatureInputTypeCheckbox = this.locator(
-    '#node-port-feature input[type="checkbox"]',
+  private readonly _nodePortFeatureInputTypeCheckbox = this.testId('node-port');
+  private readonly _nodePortServiceButton = this.locator(
+    'button:has-text("SSH over NodePort service")',
   );
   private readonly _passtUDNNetworkCheckbox = this.testId('passtUDNNetwork');
   private readonly _pfV6CFormGroupsubscriptionLabel = this.locator(
@@ -59,6 +67,9 @@ export default class OverviewSettingsComponent extends BaseComponent {
   );
   private readonly _vmActionsConfirmationToggle = this.locator(
     '[id="confirm-vm-actions"] [role="switch"]',
+  );
+  private readonly _controlDefaultVirtualizationPermissions = this.testId(
+    'controlDefaultVirtualizationPermissions',
   );
   private readonly _vmTemplates = this.testId('vmTemplates');
   private readonly _yAMLTabVisibilityBtn = this.locator('button:has-text("YAML tab visibility")');
@@ -82,6 +93,38 @@ export default class OverviewSettingsComponent extends BaseComponent {
     await this.robustClick(this._sshConfigurationsButton);
   }
 
+  private async setPreviewFeatureSwitch(toggle: Locator, enable: boolean): Promise<boolean> {
+    try {
+      await toggle.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
+      if ((await toggle.isChecked()) === enable) {
+        return true;
+      }
+
+      await this.waitForFeaturesConfigMapPatch(async () => {
+        await toggle.click({ force: true });
+      });
+      await this.page.waitForTimeout(TestTimeouts.UI_DELAY_MEDIUM);
+
+      return (await toggle.isChecked().catch(() => !enable)) === enable;
+    } catch {
+      return false;
+    }
+  }
+
+  private async waitForFeaturesConfigMapPatch(action: () => Promise<void>): Promise<void> {
+    const patchPromise = this.page.waitForResponse(
+      (response) =>
+        response.url().includes('kubevirt-ui-features') &&
+        response.request().method() === 'PATCH' &&
+        response.status() >= 200 &&
+        response.status() < 300,
+      { timeout: TestTimeouts.DEFAULT },
+    );
+
+    await action();
+    await patchPromise;
+  }
+
   private async waitForSuccessAlertVisible(): Promise<boolean> {
     const successAlert = this.locator('[role="alert"].pf-m-success');
     try {
@@ -90,6 +133,10 @@ export default class OverviewSettingsComponent extends BaseComponent {
     } catch {
       return false;
     }
+  }
+
+  async clickDownloadsTab(): Promise<void> {
+    await this.navigateToTab(this._downloadsTab);
   }
 
   async clickSearchResultMenuItem(
@@ -129,6 +176,10 @@ export default class OverviewSettingsComponent extends BaseComponent {
     } catch {
       return false;
     }
+  }
+
+  async disableControlDefaultVirtualizationPermissions(): Promise<boolean> {
+    return this.setPreviewFeatureSwitch(this._controlDefaultVirtualizationPermissions, false);
   }
 
   async disableCentosStream9ImageCron(): Promise<boolean> {
@@ -230,6 +281,10 @@ export default class OverviewSettingsComponent extends BaseComponent {
     }
   }
 
+  async enableControlDefaultVirtualizationPermissions(): Promise<boolean> {
+    return this.setPreviewFeatureSwitch(this._controlDefaultVirtualizationPermissions, true);
+  }
+
   async enableCentosStream9ImageCron(): Promise<boolean> {
     try {
       await this._centosStream9ImageCronSwitch.waitFor({
@@ -267,26 +322,25 @@ export default class OverviewSettingsComponent extends BaseComponent {
   async enableSSHOverNodePort(nodeAddress?: string): Promise<boolean> {
     try {
       await this.navigateToSettings();
-      await this.openSshConfigurations();
+      await this.openSSHOverNodePortConfiguration();
 
       if (nodeAddress) {
-        await this._inputIdNodeAddress.waitFor({
-          state: 'visible',
-          timeout: TestTimeouts.UI_VISIBILITY_QUICK,
-        });
-        await this._inputIdNodeAddress.clear();
-        await this._inputIdNodeAddress.fill(nodeAddress);
+        await this.setSSHOverNodePortAddress(nodeAddress);
       }
 
-      await this._nodePortFeatureInputTypeCheckbox.waitFor({
-        state: 'visible',
-        timeout: TestTimeouts.UI_VISIBILITY_QUICK,
-      });
-      await this._nodePortFeatureInputTypeCheckbox.click({ force: true });
+      await this.setSSHOverNodePortEnabled(true);
       return true;
     } catch {
       return false;
     }
+  }
+
+  async isSSHOverNodePortEnabled(): Promise<boolean> {
+    return this._nodePortFeatureInputTypeCheckbox.isEnabled();
+  }
+
+  async isSSHOverNodePortChecked(): Promise<boolean> {
+    return this._nodePortFeatureInputTypeCheckbox.isChecked();
   }
 
   async enableSSHUsingLoadBalancer(): Promise<boolean> {
@@ -607,6 +661,30 @@ export default class OverviewSettingsComponent extends BaseComponent {
     }
   }
 
+  async isDownloadIsoButtonVisible(): Promise<boolean> {
+    try {
+      await this._downloadIsoButton.waitFor({
+        state: 'visible',
+        timeout: TestTimeouts.ELEMENT_WAIT,
+      });
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  async isDownloadsTabContentVisible(): Promise<boolean> {
+    try {
+      await this._downloadsTabContent.waitFor({
+        state: 'visible',
+        timeout: TestTimeouts.ELEMENT_WAIT,
+      });
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
   async isGuestSystemLogEnabled(): Promise<boolean> {
     try {
       await this._guestSystemLog.waitFor({
@@ -626,6 +704,18 @@ export default class OverviewSettingsComponent extends BaseComponent {
         timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
       });
       return await this._hideCredentials.isChecked();
+    } catch {
+      return false;
+    }
+  }
+
+  async isPasstBindingOn(): Promise<boolean> {
+    try {
+      await this._passtUDNNetworkCheckbox.waitFor({
+        state: 'visible',
+        timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+      });
+      return await this._passtUDNNetworkCheckbox.isChecked();
     } catch {
       return false;
     }
@@ -743,6 +833,33 @@ export default class OverviewSettingsComponent extends BaseComponent {
     }
   }
 
+  async isAutomaticGrantVirtualizationRolesChecked(): Promise<boolean> {
+    return this._automaticGrantToggle.isChecked().catch(() => false);
+  }
+
+  async isAutomaticGrantVirtualizationRolesEnabled(): Promise<boolean> {
+    return this._automaticGrantToggle.isEnabled().catch(() => false);
+  }
+
+  async navigateToClusterTab(): Promise<boolean> {
+    try {
+      await this.navigateToSettings();
+      const clusterTab = this.testId('settings-tab-cluster');
+      await clusterTab.waitFor({
+        state: 'visible',
+        timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+      });
+      await this.robustClick(clusterTab);
+      await this._generalSettingsButton.waitFor({
+        state: 'visible',
+        timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+      });
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
   async navigateToGuestManagement(): Promise<boolean> {
     try {
       await this.navigateToSettings();
@@ -778,6 +895,11 @@ export default class OverviewSettingsComponent extends BaseComponent {
     }
   }
 
+  async navigateToRecommendedCapabilities(): Promise<void> {
+    await this.navigateToSettingsViaSidebar();
+    await this.navigateToTab(this.testId('settings-tab-recommended'));
+  }
+
   async navigateToSettings() {
     await this.navigateToSettingsViaSidebar();
   }
@@ -788,6 +910,85 @@ export default class OverviewSettingsComponent extends BaseComponent {
 
   async navigateToSettingsViaUI(): Promise<void> {
     await this.navigateToSettingsViaSidebar();
+  }
+
+  async openAutomaticGrantVirtualizationRolesSection(): Promise<boolean> {
+    try {
+      await this._generalSettingsButton.waitFor({
+        state: 'visible',
+        timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+      });
+      if ((await this._generalSettingsButton.getAttribute('aria-expanded')) !== 'true') {
+        await this.robustClick(this._generalSettingsButton);
+      }
+
+      await this._automaticGrantSectionButton.waitFor({
+        state: 'visible',
+        timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+      });
+      if ((await this._automaticGrantSectionButton.getAttribute('aria-expanded')) !== 'true') {
+        await this.robustClick(this._automaticGrantSectionButton);
+      }
+
+      await this._automaticGrantToggle.waitFor({
+        state: 'visible',
+        timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+      });
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  async openSSHOverNodePortConfiguration(): Promise<void> {
+    await this.openSshConfigurations();
+    await this._nodePortServiceButton.waitFor({
+      state: 'visible',
+      timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+    });
+    await this.robustClick(this._nodePortServiceButton);
+    await this._inputIdNodeAddress.waitFor({
+      state: 'visible',
+      timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+    });
+  }
+
+  async setPasstBindingEnabled(enable: boolean): Promise<boolean> {
+    try {
+      await this._passtUDNNetworkCheckbox.waitFor({
+        state: 'visible',
+        timeout: TestTimeouts.ELEMENT_WAIT,
+      });
+      if ((await this._passtUDNNetworkCheckbox.isChecked()) !== enable) {
+        await this._passtUDNNetworkCheckbox.click({ force: true });
+        await this.page.waitForTimeout(TestTimeouts.CLUSTER_STATE_PROPAGATION);
+      }
+      return (await this._passtUDNNetworkCheckbox.isChecked()) === enable;
+    } catch {
+      return false;
+    }
+  }
+
+  async setAutomaticGrantVirtualizationRoles(enable: boolean): Promise<boolean> {
+    try {
+      await this._automaticGrantToggle.waitFor({
+        state: 'visible',
+        timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+      });
+      if ((await this._automaticGrantToggle.isChecked()) !== enable) {
+        await this._automaticGrantToggle.click({ force: true });
+      }
+      const deadline = Date.now() + TestTimeouts.DEFAULT;
+      while (Date.now() < deadline) {
+        if ((await this._automaticGrantToggle.isChecked()) === enable) {
+          return true;
+        }
+        await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
+      }
+      return false;
+    } catch {
+      return false;
+    }
   }
 
   async navigateToTemplatesAndImagesManagement(): Promise<boolean> {
@@ -814,6 +1015,20 @@ export default class OverviewSettingsComponent extends BaseComponent {
     } catch {
       return false;
     }
+  }
+
+  async setSSHOverNodePortAddress(nodeAddress: string): Promise<void> {
+    await this.waitForFeaturesConfigMapPatch(async () => {
+      await this._inputIdNodeAddress.fill(nodeAddress);
+    });
+  }
+
+  async setSSHOverNodePortEnabled(enabled: boolean): Promise<void> {
+    if ((await this._nodePortFeatureInputTypeCheckbox.isChecked()) === enabled) return;
+
+    await this.waitForFeaturesConfigMapPatch(async () => {
+      await this._nodePortFeatureInputTypeCheckbox.click({ force: true });
+    });
   }
 
   async setGuestSystemLog(enabled: boolean): Promise<boolean> {

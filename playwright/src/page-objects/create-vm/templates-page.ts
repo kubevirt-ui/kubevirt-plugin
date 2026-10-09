@@ -107,6 +107,7 @@ export default class TemplatesPage extends PageCommons {
   async clickCreateTemplateOption(
     option: 'From an existing template' | 'From a virtual machine' | 'With YAML',
   ): Promise<void> {
+    await this.ensureOnTemplatesListPage();
     const createTemplateButton = this.testId('item-create');
     await createTemplateButton.waitFor({
       state: 'visible',
@@ -383,6 +384,46 @@ export default class TemplatesPage extends PageCommons {
     }
   }
 
+  /** Prefer OpenShift-templates toggle (4.23+); fall back to legacy/main filter controls. */
+  async filterByOpenShiftOrDefaultTemplates(): Promise<void> {
+    const openshiftToggle = this.page.locator('#templates-type-openshift');
+    const toggleVisible = await openshiftToggle
+      .isVisible({ timeout: TestTimeouts.UI_STABILIZE })
+      .catch(() => false);
+    if (toggleVisible) {
+      const selected = await openshiftToggle.getAttribute('aria-pressed');
+      if (selected !== 'true') {
+        await this.robustClick(openshiftToggle);
+      }
+      await this.page.waitForLoadState('domcontentloaded').catch(() => undefined);
+      await this.page.waitForTimeout(TestTimeouts.UI_FILTER_APPLY / 3);
+      return;
+    }
+
+    const legacyTemplatesCheckbox = this.locator(
+      '[data-test-row-filter="templates"] [type="checkbox"]',
+    );
+    const legacyVisible = await legacyTemplatesCheckbox
+      .isVisible({ timeout: TestTimeouts.UI_STABILIZE })
+      .catch(() => false);
+    if (legacyVisible) {
+      const isChecked = await legacyTemplatesCheckbox.isChecked().catch(() => false);
+      if (!isChecked) {
+        await this.robustClick(legacyTemplatesCheckbox);
+      }
+      await this.page.waitForLoadState('domcontentloaded').catch(() => undefined);
+      await this.page.waitForTimeout(TestTimeouts.UI_FILTER_APPLY / 3);
+      return;
+    }
+
+    const filterToolbarVisible = await this.testId('filter-toolbar')
+      .isVisible({ timeout: TestTimeouts.UI_DELAY_SHORT })
+      .catch(() => false);
+    if (filterToolbarVisible) {
+      await this.filterByDefaultTemplates();
+    }
+  }
+
   async filterByDefaultTemplates() {
     await this.openFilterDropdown();
     const newRadio = this.locator('input[data-test-row-filter="default"]');
@@ -467,20 +508,59 @@ export default class TemplatesPage extends PageCommons {
     }
   }
 
-  async filterTemplatesByName(templateName: string) {
-    const templateNameFilter = this.testId('item-filter').or(this.testId('name-filter-input'));
-    await templateNameFilter.waitFor({
-      state: 'visible',
-      timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
-    });
+  /** Wait until the templates list name filter (`data-test="item-filter"`) is ready. */
+  async waitForTemplatesNameFilterReady(
+    timeout: number = TestTimeouts.UI_ELEMENT_VISIBILITY,
+  ): Promise<void> {
+    const nameFilter = this.testId('item-filter')
+      .or(this.testId('name-filter-input'))
+      .or(this.locator('input[placeholder="Search by name..."]'))
+      .or(this._inputSearchInput);
+    await nameFilter.first().waitFor({ state: 'visible', timeout });
+  }
+
+  private async getTemplateNameFilterInput(): Promise<Locator> {
+    await this.waitForTemplatesNameFilterReady();
+    const itemFilter = this.testId('item-filter').first();
+    if (await itemFilter.isVisible().catch(() => false)) {
+      return itemFilter;
+    }
+    return this.testId('name-filter-input')
+      .or(this.locator('input[placeholder="Search by name..."]'))
+      .or(this._inputSearchInput)
+      .first();
+  }
+
+  /** Filter the templates list by name (uses `data-test="item-filter"` when present). */
+  async filterTemplatesByName(templateName: string): Promise<void> {
+    const templateNameFilter = await this.getTemplateNameFilterInput();
+    await templateNameFilter.scrollIntoViewIfNeeded();
+    await this.robustClick(templateNameFilter);
     await templateNameFilter.clear();
     await templateNameFilter.fill(templateName);
+    await templateNameFilter.press('Enter');
+    await templateNameFilter.press('Tab');
     await this.page.waitForTimeout(TestTimeouts.UI_FILTER_APPLY / 3);
     await this.page
       .waitForLoadState('domcontentloaded', { timeout: TestTimeouts.UI_ACTION_COMPLETE })
       .catch(() => {
         return;
       });
+  }
+
+  /** Name search + row visibility (used after create flows; list can be paginated). */
+  async isTemplateListedByName(templateName: string): Promise<boolean> {
+    await this.filterTemplatesByName(templateName);
+    if (await this.isTemplateVisible(templateName)) {
+      return true;
+    }
+    const row = this.locator('tbody tr').filter({ has: this.testId(templateName) });
+    try {
+      await row.first().waitFor({ state: 'visible', timeout: TestTimeouts.UI_DELAY_MEDIUM });
+      return true;
+    } catch {
+      return false;
+    }
   }
 
   async hasBadgeInTemplateRow(templateName: string, badgeText: string): Promise<boolean> {
@@ -627,13 +707,60 @@ export default class TemplatesPage extends PageCommons {
     }
   }
 
+  private async isTemplatesPageNotFound(): Promise<boolean> {
+    return await this.page
+      .getByRole('heading', { name: /page not found/i })
+      .isVisible({ timeout: TestTimeouts.UI_DELAY_SHORT })
+      .catch(() => false);
+  }
+
+  private async isTemplatesListHeadingVisible(
+    timeout = TestTimeouts.UI_DELAY_MEDIUM,
+  ): Promise<boolean> {
+    if (await this.isTemplatesPageNotFound()) {
+      return false;
+    }
+    return await this.page
+      .getByRole('heading', { name: 'Templates', level: 1 })
+      .isVisible({ timeout })
+      .catch(() => false);
+  }
+
+  /** Recover from vm-templates 404 or other bad routes before interacting with the list. */
+  async ensureOnTemplatesListPage(): Promise<void> {
+    if (await this.isTemplatesListHeadingVisible()) {
+      return;
+    }
+    await this.navigateToAllNamespacesTemplates();
+    if (!(await this.isTemplatesListHeadingVisible(TestTimeouts.UI_ELEMENT_VISIBILITY))) {
+      throw new Error('Templates list page did not load (expected Templates heading)');
+    }
+  }
+
   /**
    * Navigates to the all-namespaces Templates list page via URL.
    * @deprecated Use navigateToTemplatesViaUI() for more reliable navigation
    */
-  async navigateToAllNamespacesTemplates() {
-    await this.goTo('/k8s/all-namespaces/template.openshift.io~v1~Template');
+  async navigateToAllNamespacesTemplates(): Promise<void> {
+    const openshift = '/k8s/all-namespaces/template.openshift.io~v1~Template';
+    const native = '/k8s/all-namespaces/vm-templates';
+
+    for (const path of [openshift, native]) {
+      await this.goTo(path);
+      await this.page.waitForLoadState('domcontentloaded');
+      if (await this.isTemplatesPageNotFound()) {
+        continue;
+      }
+      if (await this.isTemplatesListHeadingVisible()) {
+        return;
+      }
+    }
+
+    await this.goTo(openshift);
     await this.page.waitForLoadState('domcontentloaded');
+    await this.page
+      .getByRole('heading', { name: 'Templates', level: 1 })
+      .waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
   }
 
   /**
@@ -645,8 +772,24 @@ export default class TemplatesPage extends PageCommons {
     await this.switchToNamespace(namespace);
   }
 
-  async navigateToProjectTemplates(projectName: string) {
-    await this.goTo(`/k8s/ns/${projectName}/template.openshift.io~v1~Template`);
+  async navigateToProjectTemplates(
+    projectName: string,
+    options?: { preferNativeTemplates?: boolean },
+  ): Promise<void> {
+    const openshift = `/k8s/ns/${projectName}/template.openshift.io~v1~Template`;
+    const native = `/k8s/ns/${projectName}/vm-templates`;
+    const paths = options?.preferNativeTemplates ? [native, openshift] : [openshift, native];
+    for (const path of paths) {
+      await this.goTo(path);
+      await this.page.waitForLoadState('domcontentloaded');
+      if (await this.isTemplatesPageNotFound()) {
+        continue;
+      }
+      if (await this.isTemplatesListHeadingVisible()) {
+        await this.waitForTemplatesNameFilterReady().catch(() => undefined);
+        return;
+      }
+    }
   }
 
   async navigateToTemplateDetail(templateName: string) {
@@ -680,17 +823,20 @@ export default class TemplatesPage extends PageCommons {
    * Navigates to Templates page via sidebar UI click, falling back to URL navigation.
    */
   async navigateToTemplatesViaUI(): Promise<void> {
-    for (let attempt = 1; attempt <= 3; attempt++) {
-      await this.clickNavTemplates();
-      if (/template/i.test(this.page.url())) {
-        await this.page
+    await this.navigateViaSidebarWithFallback(
+      async () => {
+        const navigated = await this.clickNavTemplates();
+        if (!navigated) return false;
+        const headingVisible = await this.page
           .getByRole('heading', { name: 'Templates', level: 1 })
-          .waitFor({ state: 'visible', timeout: TestTimeouts.UI_DELAY_MEDIUM })
-          .catch(() => undefined);
-        return;
-      }
-      await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
-    }
+          .isVisible({ timeout: TestTimeouts.UI_DELAY_MEDIUM })
+          .catch(() => false);
+        return headingVisible;
+      },
+      () => this.navigateToAllNamespacesTemplates(),
+    );
+
+    await this.ensureOnTemplatesListPage();
   }
 
   async openClusterFilter(): Promise<void> {
@@ -988,7 +1134,7 @@ export default class TemplatesPage extends PageCommons {
         { timeout: TestTimeouts.ELEMENT_WAIT },
       );
       const currentUrl = this.page.url();
-      const isCorrectPath = currentUrl.includes('/fleet-virtualization/templates/cluster/');
+      const isCorrectPath = currentUrl.includes('/fleet-virtualization/vm-templates/cluster/');
       const hasOldBrokenPath = currentUrl.includes('template.openshift.io~v1~Template');
       return { isValid: isCorrectPath && !hasOldBrokenPath, url: currentUrl };
     } catch {

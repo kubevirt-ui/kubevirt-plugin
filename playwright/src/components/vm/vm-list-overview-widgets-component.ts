@@ -1,5 +1,6 @@
 import BaseComponent from '@/components/shared/base-component';
 import NavigationComponent from '@/components/shared/navigation-component';
+import type VmTreeViewComponent from '@/components/vm/vm-treeview-component';
 import type { VmMetricEntry } from '@/data-factories/vm-metrics-mock-factory';
 import { buildPrometheusVectorResponse } from '@/data-factories/vm-metrics-mock-factory';
 import { TestTimeouts } from '@/utils/test-config';
@@ -30,7 +31,6 @@ export default class VmListOverviewWidgetsComponent extends BaseComponent {
   private readonly _resourceAllocationWidget = this.testId('resource-allocation-widget');
   private readonly _somethingWrongHappened = this.locator('text=Something wrong happened');
   private readonly _storageMigrationPlansWidget = this.testId('storage-migration-plans-widget');
-  private readonly _treeView = this.locator('.pf-v6-c-tree-view');
   private readonly _vmAlertsWidget = this.testId('vm-alerts-widget');
   private readonly _vmListSummary = this.testId('vm-list-summary');
   private readonly _vmListTab = this.locator('button[role="tab"]', {
@@ -43,9 +43,7 @@ export default class VmListOverviewWidgetsComponent extends BaseComponent {
 
   constructor(
     page: Page,
-    private readonly hostTree: {
-      searchTreeView: (searchText: string) => Promise<void>;
-    },
+    private readonly tree: VmTreeViewComponent,
   ) {
     super(page);
     this.nav = new NavigationComponent(page);
@@ -69,8 +67,8 @@ export default class VmListOverviewWidgetsComponent extends BaseComponent {
 
     this.page.on('request', handler);
 
-    await this.hostTree.searchTreeView(clusterName);
-    await this.clickClusterNodeInTree(clusterName);
+    await this.tree.searchTreeView(clusterName);
+    await this.tree.clickClusterNodeInTree(clusterName);
     await this.page.waitForTimeout(5000);
 
     this.page.removeListener('request', handler);
@@ -142,12 +140,6 @@ export default class VmListOverviewWidgetsComponent extends BaseComponent {
     await this.page.unrouteAll({ behavior: 'ignoreErrors' });
   }
 
-  async clickClusterNodeInTree(clusterName: string): Promise<void> {
-    const clusterNode = this._treeView.locator('button', { hasText: clusterName }).first();
-    await clusterNode.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
-    await this.robustClick(clusterNode);
-    await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
-  }
   async clickCreateVmLinkInNoDataAlert(): Promise<void> {
     const noDataText = this.page.getByText('No data to display yet.');
     await noDataText.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
@@ -157,36 +149,6 @@ export default class VmListOverviewWidgetsComponent extends BaseComponent {
       .first();
     await createVmLink.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
     await this.robustClick(createVmLink);
-  }
-
-  async clickLocalClusterInTree(): Promise<void> {
-    let treeVisible = await this._treeView
-      .waitFor({ state: 'visible', timeout: TestTimeouts.UI_DELAY_MEDIUM })
-      .then(() => true)
-      .catch(() => false);
-
-    if (!treeVisible) {
-      await this.goTo('/k8s/all-namespaces/kubevirt.io~v1~VirtualMachine');
-      await this.page.waitForLoadState('domcontentloaded');
-      treeVisible = await this._treeView
-        .waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT })
-        .then(() => true)
-        .catch(() => false);
-    }
-
-    const treeItem = this._treeView.locator('[id="#ALL_NS#"]').first();
-    await treeItem.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
-
-    const labelButton = treeItem.locator('button', { hasText: 'Local cluster' });
-    await labelButton.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
-    await this.robustClick(labelButton);
-
-    const tabOrError = this.page.locator('[role="tab"], :text("Something wrong happened")').first();
-    await tabOrError
-      .waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT })
-      .catch(() => undefined);
-
-    await this.recoverFromErrorBoundaryIfNeeded();
   }
 
   async clickOverviewTab(): Promise<void> {
@@ -788,26 +750,6 @@ export default class VmListOverviewWidgetsComponent extends BaseComponent {
     });
     await this.robustClick(storageMigrationsLink);
     await this.page.waitForLoadState('domcontentloaded');
-  }
-
-  async recoverFromErrorBoundaryIfNeeded(timeout = TestTimeouts.ELEMENT_WAIT): Promise<boolean> {
-    const errorIndicator = this._somethingWrongHappened;
-    const hasError = await errorIndicator
-      .waitFor({ state: 'visible', timeout: 3000 })
-      .then(() => true)
-      .catch(() => false);
-
-    if (!hasError) return false;
-
-    const currentUrl = new URL(this.page.url());
-    const tabParam = currentUrl.searchParams.get('tab');
-    const vmUrl = new URL('/k8s/all-namespaces/kubevirt.io~v1~VirtualMachine', currentUrl.origin);
-    if (tabParam) vmUrl.searchParams.set('tab', tabParam);
-
-    await this.page.goto(vmUrl.toString(), { waitUntil: 'domcontentloaded', timeout });
-    await this.page.waitForSelector('[role="tab"]', { state: 'visible', timeout });
-    await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
-    return true;
   }
 
   async toggleOverviewSection(sectionDataTest: string): Promise<void> {

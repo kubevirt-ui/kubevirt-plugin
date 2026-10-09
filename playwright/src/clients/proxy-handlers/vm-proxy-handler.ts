@@ -259,6 +259,24 @@ export class VirtualMachineProxyHandler {
   // VirtualMachineInstanceMigrations
   // ---------------------------------------------------------------------------
 
+  async getVmDiskBus(namespace: string, vmName: string, diskName: string): Promise<string | null> {
+    const vm = await this.get(namespace, vmName);
+    if (!vm) return null;
+    const spec = vm.spec as Record<string, unknown>;
+    const templateSpec =
+      ((spec?.template as Record<string, unknown>)?.spec as Record<string, unknown>) || {};
+    const domain = (templateSpec.domain as Record<string, unknown>) || {};
+    const devices = (domain.devices as Record<string, unknown>) || {};
+    const disks = (devices.disks as Array<Record<string, unknown>>) || [];
+    const disk = disks.find((d) => d.name === diskName);
+    if (!disk) return null;
+    const diskInfo = disk.disk as Record<string, unknown> | undefined;
+    if (diskInfo?.bus) return diskInfo.bus as string;
+    const cdromInfo = disk.cdrom as Record<string, unknown> | undefined;
+    if (cdromInfo?.bus) return cdromInfo.bus as string;
+    return null;
+  }
+
   async getVmiDiskBus(namespace: string, vmName: string, diskName: string): Promise<string | null> {
     const vmi = await this.getInstance(namespace, vmName);
     if (!vmi) return null;
@@ -325,6 +343,38 @@ export class VirtualMachineProxyHandler {
         volumeSource: { persistentVolumeClaim: { claimName: volumeName, hotpluggable: true } },
       },
       headers: { Accept: '*/*' },
+    });
+  }
+
+  async attachDataVolumeToVm(
+    namespace: string,
+    vmName: string,
+    dataVolumeName: string,
+    diskName: string,
+  ): Promise<KubernetesResource | null> {
+    const vm = await this.get(namespace, vmName);
+    if (!vm) return null;
+
+    const spec = vm.spec as Record<string, unknown>;
+    const templateSpec =
+      ((spec?.template as Record<string, unknown>)?.spec as Record<string, unknown>) || {};
+    const domain = (templateSpec.domain as Record<string, unknown>) || {};
+    const devices = (domain.devices as Record<string, unknown>) || {};
+    const existingDisks = (devices.disks as Array<Record<string, unknown>>) || [];
+    const existingVolumes = (templateSpec.volumes as Array<Record<string, unknown>>) || [];
+
+    const disks = [...existingDisks, { name: diskName, disk: { bus: 'virtio' } }];
+    const volumes = [...existingVolumes, { name: diskName, dataVolume: { name: dataVolumeName } }];
+
+    return this.mergePatch(namespace, vmName, {
+      spec: {
+        template: {
+          spec: {
+            domain: { devices: { disks } },
+            volumes,
+          },
+        },
+      },
     });
   }
 
@@ -558,13 +608,12 @@ export class VirtualMachineProxyHandler {
     const start = Date.now();
     while (Date.now() - start < timeoutMs) {
       try {
-        const vmi = await this.getInstance(namespace, vmName);
-        if (vmi) {
-          const status = vmi.status as Record<string, unknown> | undefined;
-          if (status?.phase === 'Running') return true;
-        }
+        const vm = await this.get(namespace, vmName);
+        const printableStatus = (vm?.status as { printableStatus?: string } | undefined)
+          ?.printableStatus;
+        if (printableStatus === 'Running') return true;
       } catch {
-        // VMI not yet available
+        // VM not yet available
       }
       await new Promise((r) => setTimeout(r, 5000));
     }

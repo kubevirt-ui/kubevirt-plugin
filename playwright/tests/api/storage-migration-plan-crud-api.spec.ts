@@ -1,5 +1,6 @@
 import type { KubernetesResource } from '@/data-models/kubernetes-types';
 import { expect, test } from '@/fixtures/api-test-fixture';
+import { ROUTE_API_TAG } from '@/data-models/route-tags';
 
 function buildMultiNsPlanSpec(
   name: string,
@@ -40,7 +41,7 @@ function buildMultiNsPlanSpec(
   } as unknown as KubernetesResource;
 }
 
-test.describe('Storage Migration Plan CRUD — API', { tag: ['@api'] }, () => {
+test.describe('Storage Migration Plan CRUD — API', { tag: [ROUTE_API_TAG, '@api'] }, () => {
   test.describe.configure({ mode: 'serial' });
 
   let planName: string;

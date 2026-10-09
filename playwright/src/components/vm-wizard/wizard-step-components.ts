@@ -35,6 +35,35 @@ export class VmCreationWizardLocationComponent extends BaseComponent {
     await this.page.waitForTimeout(500);
   }
 
+  async selectLocationProject(namespace: string): Promise<void> {
+    const current = await this.getLocationProject();
+    if (current.includes(namespace)) {
+      return;
+    }
+
+    await this.openEditLocationPanel();
+
+    const toggle = this.locator('.vm-creation-wizard').getByTestId(
+      'namespace-dropdown-menu-toggle',
+    );
+    await toggle.first().waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
+    await this.robustClick(toggle.first());
+
+    const filter = this.page.getByTestId('dropdown-text-filter');
+    await filter.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
+    await filter.clear();
+    await filter.fill(namespace);
+
+    const option = this.page.getByRole('menuitem', { name: namespace, exact: true });
+    await option.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
+    await this.robustClick(option);
+
+    await toggle
+      .filter({ hasText: namespace })
+      .first()
+      .waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
+  }
+
   async verifyEditLocationButtonVisible(): Promise<boolean> {
     try {
       const editBtn = this._buttonEditVMCreationLocation;
@@ -168,6 +197,11 @@ export class VmCreationWizardComputeComponent extends BaseComponent {
 
     const sizeOption = this.page.getByRole('menuitem').filter({ hasText: sizeName });
     await this.robustClick(sizeOption.first());
+    await this.page.keyboard.press('Escape');
+    await this.page
+      .getByTestId('wizard-next-button')
+      .hover()
+      .catch(() => undefined);
   }
 
   async selectComputeTab(tab: 'redhat' | 'user'): Promise<void> {
@@ -177,19 +211,14 @@ export class VmCreationWizardComputeComponent extends BaseComponent {
   }
 
   async selectInstanceTypeSeries(series: 'cx' | 'd' | 'u' | 'm' | 'n' | 'o' | 'rt'): Promise<void> {
-    const seriesMap: Record<string, string> = {
-      cx: 'Compute Exclusive',
-      d: 'Dedicated vCPU',
-      u: 'General Purpose',
-      m: 'Memory Intensive',
-      n: 'Network',
-      o: 'Overcommitted',
-      rt: 'Realtime',
-    };
-    const card = this.locator(
-      `.instance-type-series-menu-card__toggle-card:has-text("${seriesMap[series]}")`,
-    );
-    await this.robustClick(card.first());
+    const card = this.testId(`instance-type-series-${series}1`);
+    await card.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+    await this.robustClick(card);
+    await this.page.keyboard.press('Escape');
+    await this.page
+      .getByTestId('wizard-next-button')
+      .hover()
+      .catch(() => undefined);
   }
 
   /**
@@ -415,7 +444,7 @@ export class VmCreationWizardBootSourceComponent extends BaseComponent {
 
   async isBootVolumeEmptyStateVisible(): Promise<boolean> {
     try {
-      const heading = this.locator('h3:has-text("No volumes found")');
+      const heading = this.locator('h3:has-text("You don\'t have any volumes yet")');
       return await heading.isVisible({ timeout: TestTimeouts.SHORT_WAIT }).catch(() => false);
     } catch {
       return false;
@@ -486,10 +515,28 @@ export class VmCreationWizardBootSourceComponent extends BaseComponent {
     }
 
     const table = this.locator('.pf-v6-c-wizard table, .pf-v6-c-wizard [role="grid"]');
-    await table.first().waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+    const tableVisible = await table
+      .first()
+      .waitFor({ state: 'visible', timeout: TestTimeouts.UI_DELAY_LONG })
+      .then(() => true)
+      .catch(() => false);
+
+    if (!tableVisible || (await this.isBootVolumeEmptyStateVisible())) {
+      await this.selectNoBootSource();
+      return;
+    }
 
     const nameCell = this._pfV6CWizardTableTbodyTr.first().locator('td[id="name"]');
-    await nameCell.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+    const rowVisible = await nameCell
+      .waitFor({ state: 'visible', timeout: TestTimeouts.UI_DELAY_LONG })
+      .then(() => true)
+      .catch(() => false);
+
+    if (!rowVisible) {
+      await this.selectNoBootSource();
+      return;
+    }
+
     await this.robustClick(nameCell);
   }
 

@@ -24,11 +24,7 @@ import SettingsPage from '@/page-objects/settings/settings-page';
 import VirtualMachineDetailPage from '@/page-objects/vm/virtual-machine-detail-page';
 import VirtualMachinesPage from '@/page-objects/vm/virtual-machines-page';
 import VmOverviewTabPage from '@/page-objects/vm/vm-overview-tab-page';
-import VmTreePage from '@/page-objects/vm/vm-tree-page';
 import VmCreationWizardPage from '@/page-objects/vm-wizard/vm-creation-wizard-page';
-import VmWizardBootSourcePage from '@/page-objects/vm-wizard/vm-wizard-boot-source-page';
-import VmWizardComputeCustomizationPage from '@/page-objects/vm-wizard/vm-wizard-compute-customization-page';
-import VmWizardNavigationPage from '@/page-objects/vm-wizard/vm-wizard-navigation-page';
 import { EnvVariables } from '@/utils/env-variables';
 import { TestTimeouts } from '@/utils/test-config';
 
@@ -39,7 +35,6 @@ interface GatingFixtures {
   overviewPage: OverviewPage;
   pageCommons: PageCommons;
   settingsPage: SettingsPage;
-  vmTreePage: VmTreePage;
   vmDetailPage: VirtualMachineDetailPage;
   vmListPage: VirtualMachinesPage;
   vmOverviewTabPage: VmOverviewTabPage;
@@ -53,9 +48,6 @@ interface GatingFixtures {
   quotasPage: QuotasPage;
   virtualizationOverviewPage: VirtualizationOverviewPage;
   vmCreationWizardPage: VmCreationWizardPage;
-  vmWizardBootSourcePage: VmWizardBootSourcePage;
-  vmWizardComputePage: VmWizardComputeCustomizationPage;
-  vmWizardNavigationPage: VmWizardNavigationPage;
 }
 
 const test = baseTest.extend<GatingFixtures>({
@@ -98,18 +90,6 @@ const test = baseTest.extend<GatingFixtures>({
       await page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
     }
 
-    // Expand sidebar if collapsed after popover dismissal.
-    const navToggle = page.getByRole('button', { name: 'Side navigation toggle' });
-    const perspToggle = page
-      .getByTestId('perspective-switcher-toggle')
-      .or(page.locator('[data-test-id="perspective-switcher-toggle"]'));
-    if (!(await perspToggle.isVisible({ timeout: TestTimeouts.RETRY_DELAY }).catch(() => false))) {
-      if (await navToggle.isVisible({ timeout: TestTimeouts.RETRY_DELAY }).catch(() => false)) {
-        await navToggle.click().catch(() => undefined);
-        await page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
-      }
-    }
-
     // Dismiss guided tour modal if present.
     const tourSkipBtn = page.getByTestId('tour-step-footer-secondary');
     if (await tourSkipBtn.isVisible({ timeout: TestTimeouts.RETRY_DELAY }).catch(() => false)) {
@@ -133,9 +113,6 @@ const test = baseTest.extend<GatingFixtures>({
   },
   settingsPage: async ({ page }, use) => {
     await use(new SettingsPage(page));
-  },
-  vmTreePage: async ({ page }, use) => {
-    await use(new VmTreePage(page));
   },
   vmDetailPage: async ({ page }, use) => {
     await use(new VirtualMachineDetailPage(page));
@@ -175,15 +152,6 @@ const test = baseTest.extend<GatingFixtures>({
   },
   vmCreationWizardPage: async ({ page }, use) => {
     await use(new VmCreationWizardPage(page));
-  },
-  vmWizardBootSourcePage: async ({ page }, use) => {
-    await use(new VmWizardBootSourcePage(page));
-  },
-  vmWizardComputePage: async ({ page }, use) => {
-    await use(new VmWizardComputeCustomizationPage(page));
-  },
-  vmWizardNavigationPage: async ({ page }, use) => {
-    await use(new VmWizardNavigationPage(page));
   },
 });
 

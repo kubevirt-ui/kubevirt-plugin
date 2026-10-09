@@ -1,3 +1,6 @@
+import TableExportComponent, {
+  type TableExportScope,
+} from '@/components/shared/table-export-component';
 import VmListActionsComponent from '@/components/vm/vm-list-actions-component';
 import VmListComponent from '@/components/vm/vm-list-component';
 import VmListOverviewWidgetsComponent from '@/components/vm/vm-list-overview-widgets-component';
@@ -8,9 +11,10 @@ import {
 import {
   VmListEmptyStateComponent,
   VmListMigrationComponent,
-  VmListTreeComponent,
 } from '@/components/vm/vm-list-state-migration-components';
 import VmListTemplateCreateComponent from '@/components/vm/vm-list-template-create-component';
+import VmListVirtioAlertComponent from '@/components/vm/vm-list-virtio-alert-component';
+import VmTreeViewComponent from '@/components/vm/vm-treeview-component';
 import type { VmMetricEntry } from '@/data-factories/vm-metrics-mock-factory';
 import PageCommons from '@/page-objects/page-commons';
 import { TreeContextMenuMixin } from '@/page-objects/vm/tree-context-menu-mixin';
@@ -28,9 +32,11 @@ export default class VirtualMachinesPage extends TreeContextMenuMixin(PageCommon
   readonly listMigration: VmListMigrationComponent;
   readonly overviewWidgets: VmListOverviewWidgetsComponent;
   readonly search: VmListSearchComponent;
+  readonly tableExport: TableExportComponent;
   readonly templateCreate: VmListTemplateCreateComponent;
 
-  readonly tree: VmListTreeComponent;
+  readonly tree: VmTreeViewComponent;
+  readonly virtioAlert: VmListVirtioAlertComponent;
 
   /**
    * Creates a new VirtualMachinesPage instance.
@@ -40,17 +46,17 @@ export default class VirtualMachinesPage extends TreeContextMenuMixin(PageCommon
   constructor(page: Page) {
     super(page);
     this.templateCreate = new VmListTemplateCreateComponent(page);
-    this.tree = new VmListTreeComponent(page);
+    this.tree = new VmTreeViewComponent(page);
     this.emptyState = new VmListEmptyStateComponent(page);
     this.search = new VmListSearchComponent(page);
+    this.tableExport = new TableExportComponent(page);
     this.listActions = new VmListActionsComponent(page);
     this.listFilters = new VmListFiltersComponent(page);
     this.listMigration = new VmListMigrationComponent(page, (vm) =>
       this.listActions.openVmRowActions(vm),
     );
-    this.overviewWidgets = new VmListOverviewWidgetsComponent(page, {
-      searchTreeView: (t) => this.tree.searchTreeView(t),
-    });
+    this.overviewWidgets = new VmListOverviewWidgetsComponent(page, this.tree);
+    this.virtioAlert = new VmListVirtioAlertComponent(page);
   }
 
   async areAllCheckboxesChecked(): Promise<boolean> {
@@ -87,24 +93,12 @@ export default class VirtualMachinesPage extends TreeContextMenuMixin(PageCommon
     return this.overviewWidgets.clearVmListMetricsMocks();
   }
 
-  async clearVmToolbarSearch(): Promise<void> {
-    return this.search.clearVmToolbarSearch();
-  }
-
   override async clickActionsDropdown() {
     return this.listActions.clickActionsDropdown();
   }
 
   async clickAdvancedSearchButton(): Promise<void> {
     return this.search.clickAdvancedSearchButton();
-  }
-
-  async clickAdvancedSearchClose(): Promise<void> {
-    return this.search.clickAdvancedSearchClose();
-  }
-
-  async clickAdvancedSearchReset(): Promise<void> {
-    return this.search.clickAdvancedSearchReset();
   }
 
   async clickBackToVirtualMachinesList(): Promise<void> {
@@ -124,11 +118,12 @@ export default class VirtualMachinesPage extends TreeContextMenuMixin(PageCommon
   }
 
   async clickClearSearchButton(): Promise<void> {
-    return this.search.clickClearSearchButton();
+    await this.search.clickClearSearchButton();
+    await this.clickVmListTab();
   }
 
   async clickClusterNodeInTree(clusterName: string): Promise<void> {
-    return this.overviewWidgets.clickClusterNodeInTree(clusterName);
+    return this.tree.clickClusterNodeInTree(clusterName);
   }
 
   override async clickCreateAndSelectOption(
@@ -155,7 +150,8 @@ export default class VirtualMachinesPage extends TreeContextMenuMixin(PageCommon
   }
 
   async clickFolderNode(folderName: string, namespace: string): Promise<void> {
-    return this.tree.clickFolderNode(folderName, namespace);
+    await this.tree.clickFolderNode(folderName, namespace);
+    await this.clickVmListTab();
   }
 
   async clickFolderOption(folderName: string): Promise<void> {
@@ -173,7 +169,7 @@ export default class VirtualMachinesPage extends TreeContextMenuMixin(PageCommon
   }
 
   async clickFolderSelector(folderName: string, namespace: string): Promise<void> {
-    return this.listActions.clickFolderSelector(folderName, namespace);
+    return this.tree.clickFolderSelector(folderName, namespace);
   }
 
   async clickFooterSearchButton(): Promise<void> {
@@ -205,7 +201,8 @@ export default class VirtualMachinesPage extends TreeContextMenuMixin(PageCommon
   }
 
   async clickProjectNode(namespace: string): Promise<void> {
-    return this.tree.clickProjectNode(namespace);
+    await this.tree.clickProjectNode(namespace);
+    await this.clickVmListTab();
   }
 
   async clickQuickCreateVmButton() {
@@ -328,6 +325,12 @@ export default class VirtualMachinesPage extends TreeContextMenuMixin(PageCommon
 
   async clickVmListTab(): Promise<void> {
     return this.overviewWidgets.clickVmListTab();
+  }
+
+  async downloadCsvExport(
+    scope?: TableExportScope,
+  ): Promise<{ content: string; filename: string }> {
+    return this.tableExport.downloadCsvExport(scope);
   }
 
   async clickVmName(vmName: string, namespace: string): Promise<void> {
@@ -484,6 +487,14 @@ export default class VirtualMachinesPage extends TreeContextMenuMixin(PageCommon
     return this.listActions.getDeleteModalDescriptionText();
   }
 
+  async getDeleteModalListedResources(): Promise<Array<{ kind: string; name: string }>> {
+    return this.listActions.getDeleteModalListedResources();
+  }
+
+  async waitForDeleteModalLoaded(): Promise<void> {
+    return this.listActions.waitForDeleteModalLoaded();
+  }
+
   async getDeletionCountFromModal(): Promise<number | null> {
     return this.listActions.getDeletionCountFromModal();
   }
@@ -504,6 +515,10 @@ export default class VirtualMachinesPage extends TreeContextMenuMixin(PageCommon
     return this.search.getFilterChipTexts();
   }
 
+  async getFilteredEmptyStateText(): Promise<string> {
+    return this.search.getFilteredEmptyStateText();
+  }
+
   async getGuestAgentWidgetTitle(timeout?: number): Promise<string | null> {
     return this.overviewWidgets.getGuestAgentWidgetTitle(timeout);
   }
@@ -512,6 +527,11 @@ export default class VirtualMachinesPage extends TreeContextMenuMixin(PageCommon
     timeout?: number,
   ): Promise<{ allVisible: boolean; missing: string[] }> {
     return this.overviewWidgets.getHealthSectionWidgetsVisibility(timeout);
+  }
+
+  async getListedVmNames(): Promise<string[]> {
+    const vmList = new VmListComponent(this.page);
+    return vmList.getListedVmNames();
   }
 
   async getMigrationPlanProgress(): Promise<{ percentage: number; title: string }> {
@@ -640,7 +660,7 @@ export default class VirtualMachinesPage extends TreeContextMenuMixin(PageCommon
   }
 
   async isFolderSelectorVisible(folderName: string, namespace: string): Promise<boolean> {
-    return this.listActions.isFolderSelectorVisible(folderName, namespace);
+    return this.tree.isFolderSelectorVisible(folderName, namespace);
   }
 
   async isGuidedTourPopoverVisible(
@@ -755,6 +775,14 @@ export default class VirtualMachinesPage extends TreeContextMenuMixin(PageCommon
     return this.listActions.isShareableLabelVisibleInDeleteModal();
   }
 
+  async isShowOnlyVMProjectsSwitchChecked(): Promise<boolean> {
+    return this.tree.isShowOnlyVMProjectsSwitchChecked();
+  }
+
+  async isShowOnlyVMProjectsSwitchEnabled(): Promise<boolean> {
+    return this.tree.isShowOnlyVMProjectsSwitchEnabled();
+  }
+
   async isStartAfterCreateCheckboxChecked(): Promise<boolean> {
     return this.templateCreate.isStartAfterCreateCheckboxChecked();
   }
@@ -797,6 +825,11 @@ export default class VirtualMachinesPage extends TreeContextMenuMixin(PageCommon
 
   async isTreeviewVisible(): Promise<boolean> {
     return this.tree.isTreeviewVisible();
+  }
+
+  async isVmCheckboxChecked(vmName: string): Promise<boolean> {
+    const vmList = new VmListComponent(this.page);
+    return vmList.isVmCheckboxChecked(vmName);
   }
 
   async isVmListContentVisible(timeout?: number): Promise<boolean> {
@@ -935,9 +968,16 @@ export default class VirtualMachinesPage extends TreeContextMenuMixin(PageCommon
    * Tries sidebar UI click first then selects the namespace; falls back to URL navigation.
    * @param namespace - The namespace to switch to
    */
-  async navigateToNamespaceVirtualMachinesViaUI(namespace: string): Promise<void> {
+  async navigateToNamespaceVirtualMachinesViaUI(
+    namespace: string,
+    options?: { closeWelcomeModal?: boolean },
+  ): Promise<void> {
     await this.clickNavVirtualMachines();
     await this.page.waitForLoadState('domcontentloaded');
+    if (options?.closeWelcomeModal) {
+      await this.tryCloseWelcomeModal();
+    }
+    await this.waitForTreeViewReady();
     await this.toggleEmptyProjectsDisplay(true);
     await this.searchTreeView(namespace);
     await this.clickProjectNode(namespace);
@@ -947,8 +987,17 @@ export default class VirtualMachinesPage extends TreeContextMenuMixin(PageCommon
     return this.emptyState.navigateToNamespaceVmListAndWait(namespace);
   }
 
+  async navigateToProjectViaTreeView(namespace: string): Promise<void> {
+    await this.navigateToNamespaceVirtualMachinesViaUI(namespace, { closeWelcomeModal: true });
+  }
+
   async navigateToProjectVirtualMachines(projectName: string) {
     await this.goTo(`/k8s/ns/${projectName}/kubevirt.io~v1~VirtualMachine`);
+  }
+
+  async navigateToProjectVmListViaUI(namespace: string): Promise<void> {
+    await this.navigateToNamespaceVirtualMachinesViaUI(namespace);
+    await this.clickVmListTab();
   }
 
   async navigateToStorageMigrationPlans(namespace: string): Promise<void> {
@@ -963,7 +1012,21 @@ export default class VirtualMachinesPage extends TreeContextMenuMixin(PageCommon
    * Navigates to Virtual Machines page via sidebar UI click, falling back to URL navigation.
    */
   async navigateToVirtualMachinesViaUI(): Promise<void> {
+    await this.navigateViaSidebarWithFallback(
+      () => this.clickNavVirtualMachines(),
+      () => this.navigateToAllNamespacesVirtualMachines(),
+    );
+  }
+
+  async navigateToVmViaTreeView(namespace: string, vmName: string): Promise<void> {
     await this.clickNavVirtualMachines();
+    await this.page.waitForLoadState('domcontentloaded');
+    await this.tryCloseWelcomeModal();
+    await this.waitForTreeViewReady();
+    await this.toggleEmptyProjectsDisplay(true);
+    await this.searchTreeView(namespace);
+    await this.clickTreeNodeAndEnsureExpanded(namespace, vmName, namespace);
+    await this.clickVmInTreeView(vmName, namespace);
   }
 
   async openBulkActionsDropdown() {
@@ -1003,7 +1066,7 @@ export default class VirtualMachinesPage extends TreeContextMenuMixin(PageCommon
   }
 
   async recoverFromErrorBoundaryIfNeeded(timeout?: number): Promise<boolean> {
-    return this.overviewWidgets.recoverFromErrorBoundaryIfNeeded(timeout);
+    return this.tree.recoverFromErrorBoundaryIfNeeded(timeout);
   }
 
   async reloadVirtualMachinesView(): Promise<void> {
@@ -1113,6 +1176,14 @@ export default class VirtualMachinesPage extends TreeContextMenuMixin(PageCommon
 
   async setAdvancedSearchVmName(vmName: string): Promise<void> {
     return this.search.setAdvancedSearchVmName(vmName);
+  }
+
+  async sortTableByColumn(
+    columnName: string,
+    direction: 'ascending' | 'descending',
+  ): Promise<void> {
+    const vmList = new VmListComponent(this.page);
+    return vmList.sortTableByColumn(columnName, direction);
   }
 
   async startStorageMigrationAndCancelWhileInProgress(vmName: string): Promise<void> {
@@ -1270,6 +1341,10 @@ export default class VirtualMachinesPage extends TreeContextMenuMixin(PageCommon
 
   async verifyVmsTreeviewExists(): Promise<boolean> {
     return this.tree.verifyVmsTreeviewExists();
+  }
+
+  async waitForTreeViewReady(timeout?: number): Promise<void> {
+    return this.tree.waitForTreeViewReady(timeout);
   }
 
   async waitForFolderToDisappear(

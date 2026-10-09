@@ -3,8 +3,9 @@ import { load as yamlLoad } from 'js-yaml';
 import type { KubernetesResource } from '@/data-models/kubernetes-types';
 import { expect, test } from '@/fixtures/api-test-fixture';
 import { assertList } from '@/utils/api-assertions';
+import { ROUTE_API_TAG } from '@/data-models/route-tags';
 
-test.describe('VM detail page — API endpoints', { tag: ['@api'] }, () => {
+test.describe('VM detail page — API endpoints', { tag: [ROUTE_API_TAG, '@api'] }, () => {
   test.describe.configure({ mode: 'serial' });
 
   let vmName: string;

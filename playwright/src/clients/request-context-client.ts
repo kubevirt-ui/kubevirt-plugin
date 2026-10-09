@@ -19,6 +19,7 @@ import {
   SnapshotProxyHandler,
   TemplateProxyHandler,
   VirtualMachineProxyHandler,
+  VmTemplateProxyHandler,
 } from './proxy-handlers';
 
 function isPage(p: Page | APIRequestContext): p is Page {
@@ -46,6 +47,7 @@ function isPage(p: Page | APIRequestContext): p is Page {
  *   - `apiClient.vm.*`         — VirtualMachines, VMIs, Migrations
  *   - `apiClient.snapshot.*`   — Snapshots, Restores, VolumeSnapshots
  *   - `apiClient.template.*`   — OpenShift Templates
+ *   - `apiClient.vmTemplate.*` — KubeVirt VirtualMachineTemplates
  *   - `apiClient.instanceType.*` — InstanceTypes & Preferences
  *   - `apiClient.cdi.*`        — DataVolumes, DataSources, etc.
  *   - `apiClient.infra.*`      — HCO, KubeVirt CR, MigrationPolicies, NADs
@@ -70,6 +72,7 @@ export default class RequestContextClient extends BaseClient implements ProxyApi
   readonly snapshot: SnapshotProxyHandler;
   readonly template: TemplateProxyHandler;
   readonly vm: VirtualMachineProxyHandler;
+  readonly vmTemplate: VmTemplateProxyHandler;
 
   constructor(page: Page, config: ClusterAuthConfig);
   constructor(apiContext: APIRequestContext, config: ClusterAuthConfig);
@@ -81,6 +84,7 @@ export default class RequestContextClient extends BaseClient implements ProxyApi
     this.vm = new VirtualMachineProxyHandler(this);
     this.snapshot = new SnapshotProxyHandler(this);
     this.template = new TemplateProxyHandler(this);
+    this.vmTemplate = new VmTemplateProxyHandler(this);
     this.instanceType = new InstanceTypeProxyHandler(this);
     this.cdi = new CdiProxyHandler(this);
     this.infra = new InfraProxyHandler(this);
@@ -315,7 +319,13 @@ export default class RequestContextClient extends BaseClient implements ProxyApi
     return this.createDataVolume(namespace, {
       apiVersion: 'cdi.kubevirt.io/v1beta1',
       kind: 'DataVolume',
-      metadata: { name, namespace },
+      metadata: {
+        name,
+        namespace,
+        // HPP CSI (hot-cluster default) uses WaitForFirstConsumer. Without this,
+        // CDI leaves the DV in WaitForFirstConsumer until a consumer pod exists.
+        annotations: { 'cdi.kubevirt.io/storage.bind.immediate.requested': 'true' },
+      },
       spec: {
         source: { blank: {} },
         storage: { resources: { requests: { storage: size } } },
@@ -395,6 +405,9 @@ export default class RequestContextClient extends BaseClient implements ProxyApi
   }
   createTemplate(namespace: string, spec: KubernetesResource) {
     return this.template.create(namespace, spec);
+  }
+  createVmTemplate(namespace: string, spec: KubernetesResource) {
+    return this.vmTemplate.create(namespace, spec);
   }
   createVirtualMachine(namespace: string, spec: KubernetesResource) {
     return this.vm.create(namespace, spec);
@@ -604,6 +617,9 @@ export default class RequestContextClient extends BaseClient implements ProxyApi
   getNodes() {
     return this.core.getNodes();
   }
+  getPersistentVolumeClaim(namespace: string, name: string) {
+    return this.core.getPersistentVolumeClaim(namespace, name);
+  }
   getPersistentVolumeClaims(namespace: string) {
     return this.core.listPersistentVolumeClaims(namespace);
   }
@@ -658,6 +674,13 @@ export default class RequestContextClient extends BaseClient implements ProxyApi
   // -- Templates --
   getTemplates(namespace?: string, labelSelector?: string) {
     return this.template.list(namespace, labelSelector);
+  }
+  // -- VirtualMachineTemplates --
+  getVmTemplate(namespace: string, name: string) {
+    return this.vmTemplate.get(namespace, name);
+  }
+  getVmTemplates(namespace?: string, labelSelector?: string) {
+    return this.vmTemplate.list(namespace, labelSelector);
   }
   getVirtualMachine(namespace: string, name: string) {
     return this.vm.get(namespace, name);
@@ -724,6 +747,10 @@ export default class RequestContextClient extends BaseClient implements ProxyApi
     return this.vm.getVmiCpuSockets(namespace, vmName);
   }
 
+  getVmDiskBus(vmName: string, namespace: string, diskName: string) {
+    return this.vm.getVmDiskBus(namespace, vmName, diskName);
+  }
+
   getVmiDiskBus(vmName: string, namespace: string, diskName: string) {
     return this.vm.getVmiDiskBus(namespace, vmName, diskName);
   }
@@ -750,6 +777,15 @@ export default class RequestContextClient extends BaseClient implements ProxyApi
 
   hotplugVolumeEphemeral(vmName: string, namespace: string, volumeName: string, diskName: string) {
     return this.vm.hotplugVolumeEphemeral(namespace, vmName, volumeName, diskName);
+  }
+
+  attachDataVolumeToVm(
+    vmName: string,
+    namespace: string,
+    dataVolumeName: string,
+    diskName: string,
+  ) {
+    return this.vm.attachDataVolumeToVm(namespace, vmName, dataVolumeName, diskName);
   }
 
   hotplugVolumeToVm(vmName: string, namespace: string, volumeName: string, diskName: string) {
@@ -1090,6 +1126,11 @@ export default class RequestContextClient extends BaseClient implements ProxyApi
       try {
         const dv = await this.getDataVolume(namespace, name);
         if ((dv?.status as Record<string, unknown>)?.phase === 'Succeeded') return true;
+        // CDI may GC the DV after Succeeded; a Bound PVC is still ready to use.
+        if (!dv) {
+          const pvc = await this.getPersistentVolumeClaim(namespace, name);
+          if ((pvc?.status as Record<string, unknown>)?.phase === 'Bound') return true;
+        }
       } catch {
         // not ready yet
       }
@@ -1098,10 +1139,30 @@ export default class RequestContextClient extends BaseClient implements ProxyApi
     return false;
   }
 
+  async waitForPersistentVolumeClaim(
+    name: string,
+    namespace: string,
+    timeoutMs = 60_000,
+  ): Promise<KubernetesResource | null> {
+    const start = Date.now();
+    while (Date.now() - start < timeoutMs) {
+      try {
+        const pvc = await this.getPersistentVolumeClaim(namespace, name);
+        const requested = (pvc?.spec as { resources?: { requests?: { storage?: string } } })
+          ?.resources?.requests?.storage;
+        if (requested) return pvc;
+      } catch {
+        // not created yet
+      }
+      await new Promise((r) => setTimeout(r, 2000));
+    }
+    return null;
+  }
+
   async waitForDataVolumeGone(
     name: string,
     namespace: string,
-    timeoutMs = DATA_VOLUME_DELETION_POLLING.TIMEOUT_MS,
+    timeoutMs: number = DATA_VOLUME_DELETION_POLLING.TIMEOUT_MS,
   ): Promise<boolean> {
     const start = Date.now();
     while (Date.now() - start < timeoutMs) {

@@ -380,7 +380,7 @@ export default class VirtualMachineDetailActionsComponent extends PageCommons {
     await submitBtn.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
     await this.robustClick(submitBtn);
     await this.page
-      .waitForURL(/\/templates/, { timeout: TestTimeouts.NAVIGATION })
+      .waitForURL(/\/vm-templates/, { timeout: TestTimeouts.NAVIGATION })
       .catch(() => undefined);
     await this.waitForLoadingComplete(TestTimeouts.UI_DELAY_MEDIUM);
   }

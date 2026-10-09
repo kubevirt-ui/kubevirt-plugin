@@ -190,6 +190,19 @@ export default class VmWizardBootSourceComponent extends BaseComponent {
     await this.page.waitForTimeout(500);
   }
 
+  async selectFirstBootVolumeOrNone(): Promise<void> {
+    const paginationCount = await this.getBootVolumeCount();
+    const rowCount = await this._pfV6CWizardTableTbodyTr.count();
+    if (paginationCount === 0 && rowCount === 0) {
+      await this.selectNoBootSource();
+      return;
+    }
+
+    const row = this._pfV6CWizardTableTbodyTr.first();
+    await row.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+    await this.robustClick(row);
+  }
+
   async selectBootVolumeByName(volumeName: string): Promise<void> {
     const table = this.locator('.pf-v6-c-wizard table, .pf-v6-c-wizard [role="grid"]');
     await table.first().waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });

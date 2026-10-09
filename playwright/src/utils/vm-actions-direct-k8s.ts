@@ -4,7 +4,7 @@ import type RequestContextClient from '@/clients/request-context-client';
 import type CreateVmCreatePage from '@/page-objects/create-vm/create-vm-create-page';
 import type CreateVmTemplatesPage from '@/page-objects/create-vm/create-vm-templates-page';
 import type PageCommons from '@/page-objects/page-commons';
-import type VmTreePage from '@/page-objects/vm/vm-tree-page';
+import type VirtualMachinesPage from '@/page-objects/vm/virtual-machines-page';
 import { EnvVariables } from '@/utils/env-variables';
 import { generateRandomString } from '@/utils/random-data-generator';
 import { TestConfigManager, TestTimeouts } from '@/utils/test-config';
@@ -243,34 +243,34 @@ export function createPwPrefixedName(prefix: string): { name: string } {
 }
 
 export async function navigateToVirtualMachinesWithEmptyProjectsInTree(
-  vmTreePage: VmTreePage,
+  vmListPage: VirtualMachinesPage,
   defaultNamespace: string,
 ): Promise<void> {
-  await vmTreePage.navigateToNamespaceVirtualMachinesViaUI(defaultNamespace);
+  await vmListPage.navigateToNamespaceVirtualMachinesViaUI(defaultNamespace);
 }
 
 /** Opens the VM list tab for a project in the tree view. */
 export async function navigateToProjectVmListForNamespace(
-  vmTreePage: VmTreePage,
+  vmListPage: VirtualMachinesPage,
   namespace: string,
 ): Promise<void> {
   try {
-    await vmTreePage.searchTreeView(namespace);
-    await vmTreePage.clickProjectNode(namespace);
-    await vmTreePage.clickVmListTab();
+    await vmListPage.searchTreeView(namespace);
+    await vmListPage.clickProjectNode(namespace);
+    await vmListPage.clickVmListTab();
   } catch {
-    await vmTreePage.navigateToNamespaceVirtualMachines(namespace);
-    await vmTreePage.clickVmListTab();
+    await vmListPage.navigateToNamespaceVirtualMachines(namespace);
+    await vmListPage.clickVmListTab();
   }
 }
 
 export async function navigateToProjectVmListViaUI(
-  vmTreePage: VmTreePage,
+  vmListPage: VirtualMachinesPage,
   defaultNamespace: string,
   projectNamespace: string,
 ): Promise<void> {
-  await navigateToVirtualMachinesWithEmptyProjectsInTree(vmTreePage, defaultNamespace);
-  await navigateToProjectVmListForNamespace(vmTreePage, projectNamespace);
+  await navigateToVirtualMachinesWithEmptyProjectsInTree(vmListPage, defaultNamespace);
+  await navigateToProjectVmListForNamespace(vmListPage, projectNamespace);
 }
 
 /** Creates a VM via the catalog template UI flow. */

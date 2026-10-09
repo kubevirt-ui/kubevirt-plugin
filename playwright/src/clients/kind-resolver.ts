@@ -75,6 +75,16 @@ const KIND_MAP = new Map<string, GvrTuple>([
   ['storageprofile', { group: 'cdi.kubevirt.io', version: 'v1beta1', plural: 'storageprofiles' }],
   ['cdiconfig', { group: 'cdi.kubevirt.io', version: 'v1beta1', plural: 'cdiconfigs' }],
 
+  // KubeVirt VM Templates (group: 'template.kubevirt.io', version: 'v1beta1')
+  [
+    'virtualmachinetemplate',
+    { group: 'template.kubevirt.io', version: 'v1beta1', plural: 'virtualmachinetemplates' },
+  ],
+  [
+    'vmtemplate',
+    { group: 'template.kubevirt.io', version: 'v1beta1', plural: 'virtualmachinetemplates' },
+  ],
+
   // OpenShift - Templates
   ['template', { group: 'template.openshift.io', version: 'v1', plural: 'templates' }],
 

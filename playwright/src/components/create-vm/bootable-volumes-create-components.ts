@@ -15,6 +15,50 @@ export interface CreateBootableVolumeFormOptions {
   instanceType?: string;
 }
 
+type RegistrySelectHost = {
+  page: Page;
+  testId: (id: string) => Locator;
+  robustClick: (locator: Locator) => Promise<unknown>;
+};
+
+async function selectRegistrySourceTypeInAddVolumeModal(
+  host: RegistrySelectHost,
+  dialog: Locator,
+): Promise<void> {
+  const sourceTypeSelect = dialog.getByTestId('source-type-select');
+  await sourceTypeSelect.waitFor({
+    state: 'visible',
+    timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+  });
+
+  const containerImageInput = dialog.getByTestId('volume-registry-container-source-input');
+
+  await expect
+    .poll(
+      async () => {
+        await host.robustClick(sourceTypeSelect);
+        const useRegistry = host.testId('use-registry');
+        await useRegistry.waitFor({
+          state: 'visible',
+          timeout: TestTimeouts.UI_ACTION_COMPLETE,
+        });
+        if (await useRegistry.isDisabled().catch(() => false)) {
+          throw new Error(
+            'Registry source option is disabled (likely missing DataSource create permission)',
+          );
+        }
+        await host.robustClick(useRegistry);
+        return containerImageInput.isVisible();
+      },
+      {
+        timeout: TestTimeouts.UI_ACTION_COMPLETE,
+        intervals: [TestTimeouts.UI_DELAY_SHORT],
+        message: 'Failed to select Registry source type in Add volume modal',
+      },
+    )
+    .toBe(true);
+}
+
 export class BootableVolumesRowActionsComponent extends BaseComponent {
   private readonly _dialogModal = this.testId('dialog-modal');
 
@@ -935,29 +979,14 @@ export class BootableVolumesCreateFormsComponent extends BaseComponent {
       timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
     });
 
-    const sourceTypeSelect = this._addVolumeDialog.getByTestId('source-type-select');
-    await sourceTypeSelect.waitFor({
-      state: 'visible',
-      timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
-    });
-    await this.robustClick(sourceTypeSelect);
-    await this.page.waitForTimeout(TestTimeouts.UI_DELAY_MEDIUM);
-
-    const useRegistry = this.testId('use-registry');
-    await useRegistry.waitFor({
-      state: 'visible',
-      timeout: TestTimeouts.UI_ACTION_COMPLETE,
-    });
-    await this.robustClick(useRegistry);
-    await this.page.waitForTimeout(TestTimeouts.UI_DELAY_MEDIUM);
+    await selectRegistrySourceTypeInAddVolumeModal(
+      this as unknown as RegistrySelectHost,
+      this._addVolumeDialog,
+    );
 
     const containerImageInput = this._addVolumeDialog.getByTestId(
       'volume-registry-container-source-input',
     );
-    await containerImageInput.waitFor({
-      state: 'visible',
-      timeout: TestTimeouts.UI_ACTION_COMPLETE,
-    });
     await containerImageInput.fill(registryUrl);
 
     const cronExpInput = this._addVolumeDialog
@@ -1603,115 +1632,6 @@ export class BootableVolumesCreateComponent extends BaseComponent {
     await this.robustClick(this._createFormSaveButton);
   }
 
-  async fillCreateBootableVolumeFormFromRegistryAndSave(
-    volumeName: string,
-    registryUrl: string,
-    cronExpression: string,
-    options: CreateBootableVolumeFormOptions = {},
-  ): Promise<void> {
-    const { preference = 'alpine', instanceType = 'nano' } = options;
-
-    await this._addVolumeDialog.waitFor({
-      state: 'visible',
-      timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
-    });
-
-    const sourceTypeSelect = this._addVolumeDialog.getByTestId('source-type-select');
-    await sourceTypeSelect.waitFor({
-      state: 'visible',
-      timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
-    });
-    await this.robustClick(sourceTypeSelect);
-    await this.page.waitForTimeout(TestTimeouts.UI_DELAY_MEDIUM);
-
-    const useRegistry = this.testId('use-registry');
-    await useRegistry.waitFor({
-      state: 'visible',
-      timeout: TestTimeouts.UI_ACTION_COMPLETE,
-    });
-    await this.robustClick(useRegistry);
-    await this.page.waitForTimeout(TestTimeouts.UI_DELAY_MEDIUM);
-
-    const containerImageInput = this._addVolumeDialog.getByTestId(
-      'volume-registry-container-source-input',
-    );
-    await containerImageInput.waitFor({
-      state: 'visible',
-      timeout: TestTimeouts.UI_ACTION_COMPLETE,
-    });
-    await containerImageInput.fill(registryUrl);
-
-    const cronExpInput = this._addVolumeDialog
-      .locator('[data-test="volume-registry-retain-cron-expression"]')
-      .or(this._addVolumeDialog.locator('#volume-registry-retain-cron-expression'));
-    await cronExpInput.scrollIntoViewIfNeeded();
-    await cronExpInput.waitFor({
-      state: 'visible',
-      timeout: TestTimeouts.UI_ACTION_COMPLETE,
-    });
-    await cronExpInput.clear();
-    await cronExpInput.fill(cronExpression);
-
-    await this._createFormNameInput.waitFor({
-      state: 'visible',
-      timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
-    });
-    await this._createFormNameInput.fill(volumeName);
-
-    const selectPreferenceButton = this._addVolumeDialog.locator(
-      'button:has-text("Select preference")',
-    );
-    await selectPreferenceButton.waitFor({
-      state: 'visible',
-      timeout: TestTimeouts.UI_ACTION_COMPLETE,
-    });
-    await this.robustClick(selectPreferenceButton);
-
-    const searchPreferenceInput = this._selectInlineFilterInput;
-    await searchPreferenceInput.waitFor({
-      state: 'visible',
-      timeout: TestTimeouts.UI_ACTION_COMPLETE,
-    });
-    await searchPreferenceInput.fill(preference);
-
-    const preferenceOption = this.locator(
-      `#select-inline-filter-VirtualMachineClusterPreference-${preference}`,
-    );
-    await this.robustClick(preferenceOption);
-
-    const selectInstanceButton = this._addVolumeDialog.locator(
-      'button:has-text("Select InstanceType")',
-    );
-    await selectInstanceButton.waitFor({
-      state: 'visible',
-      timeout: TestTimeouts.UI_ACTION_COMPLETE,
-    });
-    await this.robustClick(selectInstanceButton);
-
-    const redHatProvided = this._addVolumeDialog
-      .locator('button:has-text("Red Hat provided")')
-      .first();
-    await this.robustClick(redHatProvided);
-
-    const uSeries = this._addVolumeDialog.locator('button:has-text("U series")').first();
-    await this.robustClick(uSeries);
-
-    const instanceTypeOption = this.locator(`#u1 button:has-text("${instanceType}:")`).first();
-    await this.robustClick(instanceTypeOption);
-
-    await this._createFormSaveButton.waitFor({
-      state: 'visible',
-      timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
-    });
-    await expect(
-      this._createFormSaveButton,
-      'Create volume form Save button should be enabled after selecting registry source and instance type',
-    ).toBeEnabled({
-      timeout: TestTimeouts.FILE_UPLOAD,
-    });
-    await this.robustClick(this._createFormSaveButton);
-  }
-
   async fillCreateBootableVolumeFormFromSnapshotAndSave(
     volumeName: string,
     snapshotName: string,
@@ -1799,17 +1719,24 @@ export class BootableVolumesCreateComponent extends BaseComponent {
   async selectSourceTypeInAddVolumeModal(
     sourceType: 'URL' | 'Registry' | 'Volume' | 'Volume snapshot',
   ): Promise<void> {
-    const sourceTypeLocators: Record<string, Locator> = {
-      URL: this.testId('use-http'),
-      Registry: this.testId('use-registry'),
-      Volume: this.locator('button[role="option"]:has-text("Volume"):not(:has-text("snapshot"))'),
-      'Volume snapshot': this.locator('button[role="option"]:has-text("Volume snapshot")'),
-    };
-
     await this._addVolumeDialog.waitFor({
       state: 'visible',
       timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
     });
+
+    if (sourceType === 'Registry') {
+      await selectRegistrySourceTypeInAddVolumeModal(
+        this as unknown as RegistrySelectHost,
+        this._addVolumeDialog,
+      );
+      return;
+    }
+
+    const sourceTypeLocators: Record<string, Locator> = {
+      URL: this.testId('use-http'),
+      Volume: this.locator('button[role="option"]:has-text("Volume"):not(:has-text("snapshot"))'),
+      'Volume snapshot': this.locator('button[role="option"]:has-text("Volume snapshot")'),
+    };
 
     const sourceTypeSelect = this._addVolumeDialog.getByTestId('source-type-select');
     await sourceTypeSelect.waitFor({

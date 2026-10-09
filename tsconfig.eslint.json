@@ -22,6 +22,7 @@
     "@types/**/*",
     ".github/scripts/src/**/*",
     "ci-scripts/hot-cluster/ts/src/**/*",
-    "ci-scripts/hot-cluster/controller/src/**/*"
+    "ci-scripts/hot-cluster/controller/src/**/*",
+    "playwright.config.ts"
   ]
 }

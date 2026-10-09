@@ -12,8 +12,8 @@ import type { Page } from '@playwright/test';
 export class CreateVmWizardDisksComponent extends BaseComponent {
   private readonly _advancedSettingsBtn = this.locator('button:has-text("Advanced settings")');
   private readonly _buttonIncrement = this.locator('button[aria-label="Increment"]');
+  private readonly _diskNameInput = this.locator('[role="dialog"] #name, #tab-modal #name');
   private readonly _inputInput = this.locator('input[aria-label="Input"]');
-  private readonly _inputNameVolumename = this.locator('input[name="volume.name"]');
   private readonly _selectPersistentVolumeClaimBtn = this.locator(
     'button:has-text("Select PersistentVolumeClaim")',
   );
@@ -51,7 +51,14 @@ export class CreateVmWizardDisksComponent extends BaseComponent {
       await this.page.waitForTimeout(TestTimeouts.UI_DELAY_MEDIUM);
     }
 
-    const nameInput = this._inputNameVolumename;
+    // The Name field lives under the modal's Advanced settings section.
+    await this._advancedSettingsBtn.waitFor({
+      state: 'visible',
+      timeout: TestTimeouts.RESOURCE_CREATION,
+    });
+    await this.robustClick(this._advancedSettingsBtn);
+
+    const nameInput = this._diskNameInput;
     await nameInput.waitFor({ state: 'visible', timeout: TestTimeouts.RESOURCE_CREATION });
     await nameInput.clear();
     await nameInput.fill(diskConfig.name);
@@ -152,7 +159,14 @@ export class CreateVmWizardDisksComponent extends BaseComponent {
     await this.robustClick(diskTypeOption);
     await this.page.waitForTimeout(TestTimeouts.UI_DELAY_MEDIUM);
 
-    const nameInput = this._inputNameVolumename;
+    // The Name field lives under the modal's Advanced settings section.
+    await this._advancedSettingsBtn.waitFor({
+      state: 'visible',
+      timeout: TestTimeouts.RESOURCE_CREATION,
+    });
+    await this.robustClick(this._advancedSettingsBtn);
+
+    const nameInput = this._diskNameInput;
     await nameInput.waitFor({ state: 'visible', timeout: TestTimeouts.RESOURCE_CREATION });
     await nameInput.clear();
     await nameInput.fill(diskConfig.name);
@@ -964,6 +978,7 @@ export class CreateVmWizardComponent extends BaseComponent {
   private readonly _dedicatedResourcesEdit = this.testId('dedicated-resources-edit');
   private readonly _descheduler = this.locator('#descheduler');
   private readonly _deschedulerEdit = this.testId('descheduler-edit');
+  private readonly _diskNameInput = this.locator('[role="dialog"] #name, #tab-modal #name');
   private readonly _evictionStrategy = this.locator('#eviction-strategy');
   private readonly _evictionStrategyButton = this.testId('eviction-strategy').locator('button');
   private readonly _headlessMode = this.locator('#headless-mode');
@@ -971,7 +986,6 @@ export class CreateVmWizardComponent extends BaseComponent {
   private readonly _inputInput = this.locator('input[aria-label="Input"]');
   private readonly _inputNameCpuInput = this.locator('input[name="cpu-input"]');
   private readonly _inputNameMemoryInput = this.locator('input[name="memory-input"]');
-  private readonly _inputNameVolumename = this.locator('input[name="volume.name"]');
   private readonly _selectPersistentVolumeClaimBtn = this.locator(
     'button:has-text("Select PersistentVolumeClaim")',
   );
@@ -1012,7 +1026,14 @@ export class CreateVmWizardComponent extends BaseComponent {
       await this.page.waitForTimeout(TestTimeouts.UI_DELAY_MEDIUM);
     }
 
-    const nameInput = this._inputNameVolumename;
+    // The Name field lives under the modal's Advanced settings section.
+    await this._advancedSettingsBtn.waitFor({
+      state: 'visible',
+      timeout: TestTimeouts.RESOURCE_CREATION,
+    });
+    await this.robustClick(this._advancedSettingsBtn);
+
+    const nameInput = this._diskNameInput;
     await nameInput.waitFor({ state: 'visible', timeout: TestTimeouts.RESOURCE_CREATION });
     await nameInput.clear();
     await nameInput.fill(diskConfig.name);
@@ -1107,7 +1128,14 @@ export class CreateVmWizardComponent extends BaseComponent {
     await this.robustClick(diskTypeOption);
     await this.page.waitForTimeout(TestTimeouts.UI_DELAY_MEDIUM);
 
-    const nameInput = this._inputNameVolumename;
+    // The Name field lives under the modal's Advanced settings section.
+    await this._advancedSettingsBtn.waitFor({
+      state: 'visible',
+      timeout: TestTimeouts.RESOURCE_CREATION,
+    });
+    await this.robustClick(this._advancedSettingsBtn);
+
+    const nameInput = this._diskNameInput;
     await nameInput.waitFor({ state: 'visible', timeout: TestTimeouts.RESOURCE_CREATION });
     await nameInput.clear();
     await nameInput.fill(diskConfig.name);

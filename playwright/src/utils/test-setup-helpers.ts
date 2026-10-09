@@ -4,7 +4,9 @@
  */
 
 import type RequestContextClient from '@/clients/request-context-client';
-import type { JsonPatchOp } from '@/data-models/kubernetes-types';
+import { DISK_NAMES } from '@/data-models';
+import type { JsonPatchOp, KubernetesResource } from '@/data-models/kubernetes-types';
+import { EnvVariables } from '@/utils/env-variables';
 import {
   generateRandomName,
   generateRandomString,
@@ -160,6 +162,94 @@ export async function setupTestNamespace(
   return namespace;
 }
 
+type DefaultSSHKeyArgs = {
+  client: RequestContextClient;
+  cnvNamespace?: string;
+  namespace: string;
+};
+
+type SetupDefaultSSHKeyArgs = DefaultSSHKeyArgs & {
+  secretName: string;
+};
+
+type UserSshSettings = { ssh?: Record<string, string> };
+
+/** Matches useKubevirtUserSettings: uid, else sanitized metadata.name. */
+export async function resolveUserSettingsKey(client: RequestContextClient): Promise<string> {
+  const user = await client.getResource('user.openshift.io', 'v1', 'users', '~');
+  const key =
+    user?.metadata?.uid ??
+    user?.metadata?.name?.replace(/[^-._a-zA-Z0-9]+/g, '-') ??
+    (EnvVariables.isNonPrivUser ? EnvVariables.testUsername : undefined);
+
+  if (!key) {
+    throw new Error('Could not resolve kubevirt user-settings key for the current user');
+  }
+  return key;
+}
+
+async function patchDefaultSshForNamespace({
+  client,
+  cnvNamespace = EnvVariables.cnvNamespace,
+  namespace,
+  secretName,
+}: DefaultSSHKeyArgs & { secretName: string | null }): Promise<void> {
+  const settingsKey = await resolveUserSettingsKey(client);
+  const userSettingsCm = await client.getKubeVirtUserSettings(cnvNamespace);
+  if (!userSettingsCm) {
+    throw new Error(`kubevirt-user-settings ConfigMap not found in ${cnvNamespace}`);
+  }
+  const cmData = (userSettingsCm?.data ?? {}) as Record<string, string>;
+  const parsed = JSON.parse(cmData[settingsKey] || '{}') as UserSshSettings;
+  const ssh = { ...parsed.ssh };
+  if (secretName) {
+    ssh[namespace] = secretName;
+  } else {
+    delete ssh[namespace];
+  }
+  parsed.ssh = ssh;
+
+  const op: JsonPatchOp = cmData[settingsKey]
+    ? { op: 'replace', path: `/data/${settingsKey}`, value: JSON.stringify(parsed) }
+    : { op: 'add', path: `/data/${settingsKey}`, value: JSON.stringify(parsed) };
+
+  await client.patchConfigMap('kubevirt-user-settings', cnvNamespace, [op]);
+}
+
+/**
+ * Creates an SSH public-key Secret and records it as the user's default key
+ * for the given namespace in kubevirt-user-settings.
+ */
+export async function setupDefaultSSHKey({
+  client,
+  cnvNamespace = EnvVariables.cnvNamespace,
+  namespace,
+  secretName,
+}: SetupDefaultSSHKeyArgs): Promise<void> {
+  await client.createSSHKeySecret(namespace, secretName);
+  client.trackResource('Secret', secretName, namespace);
+  await patchDefaultSshForNamespace({ client, cnvNamespace, namespace, secretName });
+}
+
+/**
+ * Removes the default SSH key mapping for a namespace from kubevirt-user-settings.
+ * Used when the test namespace is reused (HC E2E) so leftover defaults do not leak.
+ */
+export async function clearDefaultSSHKey({
+  client,
+  cnvNamespace = EnvVariables.cnvNamespace,
+  namespace,
+}: DefaultSSHKeyArgs): Promise<void> {
+  await patchDefaultSshForNamespace({ client, cnvNamespace, namespace, secretName: null });
+}
+
+export const getVmAccessCredentials = (vm: KubernetesResource | null): unknown[] | undefined => {
+  const spec = vm?.spec as {
+    template?: { spec?: { accessCredentials?: unknown[] } };
+  };
+  return spec?.template?.spec?.accessCredentials;
+};
+
 export type ProjectNetworkSettingsAnnotations = {
   /** Value for kubevirt.io/default-network (NAD name in the project). */
   defaultNetwork?: string;
@@ -195,6 +285,97 @@ export async function createBridgeNetworkAttachmentDefinition(
     namespace,
   );
   client.trackResource('NetworkAttachmentDefinition', name, namespace);
+}
+
+/**
+ * Creates a VM with a KubeVirt emptyDisk and no bootable volume.
+ * Skipping DataSource clones / container image pulls makes the VM much more
+ * likely to reach Running in CI.
+ */
+export async function createVmWithEmptyDisk(
+  client: RequestContextClient,
+  vmName: string,
+  namespace: string,
+  startVm = true,
+): Promise<void> {
+  await client.createVirtualMachine(namespace, {
+    apiVersion: 'kubevirt.io/v1',
+    kind: 'VirtualMachine',
+    metadata: { name: vmName, namespace },
+    spec: {
+      runStrategy: startVm ? 'Always' : 'Halted',
+      template: {
+        spec: {
+          domain: {
+            cpu: { cores: 1 },
+            devices: {
+              disks: [{ bootOrder: 1, disk: { bus: 'virtio' }, name: DISK_NAMES.EMPTY }],
+              interfaces: [{ masquerade: {}, name: 'default' }],
+            },
+            memory: { guest: '1Gi' },
+          },
+          networks: [{ name: 'default', pod: {} }],
+          terminationGracePeriodSeconds: 0,
+          volumes: [{ emptyDisk: { capacity: '1Gi' }, name: DISK_NAMES.EMPTY }],
+        },
+      },
+    },
+  });
+  client.trackResource('VirtualMachine', vmName, namespace);
+  const exists = await client.waitForVmExists(vmName, namespace);
+  if (!exists) {
+    throw new Error(`Empty-disk VM ${vmName} was not created in namespace ${namespace}`);
+  }
+}
+
+/**
+ * Appends a bridge Multus NIC to a VirtualMachine spec.
+ * Safe to call on a running VM (hot-plug add); the UI then lists the interface for NAD edit.
+ */
+export async function attachBridgeNetworkInterface(
+  client: RequestContextClient,
+  vmName: string,
+  namespace: string,
+  nicName: string,
+  nadName: string,
+): Promise<void> {
+  await client.patchVirtualMachine(namespace, vmName, [
+    {
+      op: 'add',
+      path: '/spec/template/spec/domain/devices/interfaces/-',
+      value: {
+        bridge: {},
+        model: 'virtio',
+        name: nicName,
+      },
+    },
+    {
+      op: 'add',
+      path: '/spec/template/spec/networks/-',
+      value: {
+        multus: { networkName: nadName },
+        name: nicName,
+      },
+    },
+  ]);
+}
+
+export function getVmMultusNetworkName(
+  vm: KubernetesResource | null,
+  nicName: string,
+): string | undefined {
+  const spec = vm?.spec as
+    | {
+        template?: {
+          spec?: {
+            networks?: Array<{ name?: string; multus?: { networkName?: string } }>;
+          };
+        };
+      }
+    | undefined;
+
+  return spec?.template?.spec?.networks?.find((network) => network.name === nicName)?.multus
+    ?.networkName;
 }
 
 /**

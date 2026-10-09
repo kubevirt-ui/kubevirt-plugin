@@ -4,6 +4,7 @@
  */
 
 import BaseComponent from '@/components/shared/base-component';
+import { getPendingStatusMessageLocator } from '@/utils/pending-changes-locator';
 import { TestTimeouts } from '@/utils/test-config';
 import type { Page } from '@playwright/test';
 
@@ -172,6 +173,7 @@ export class VirtualMachineDetailConfigurationCdromComponent extends BaseCompone
 
     const successAlert = this.page
       .locator('.pf-v6-c-alert.pf-m-success, .pf-c-alert.pf-m-success')
+      .filter({ hasNot: this.page.locator('[data-test^="upload-progress-"]') })
       .first();
     const closeButton = successAlert.locator(
       'button[aria-label="Close success alert"], button.pf-v6-c-button.pf-m-plain, button.pf-c-button.pf-m-plain',
@@ -317,9 +319,7 @@ export class VirtualMachineDetailConfigurationComponent extends BaseComponent {
   private readonly _dataVolumeDetails = this.locator('text=DataVolume details');
   private readonly _evictionStrategyElement = this.testId('eviction-strategy');
   private readonly _headlessCheckbox = this.locator('input[id="headless-mode"]');
-  private readonly _isTextPendingChangesTextRestartRequired = this.locator(
-    ':is(:text("Pending changes"), :text("Restart required"))',
-  );
+  private readonly _pendingStatusMessage = getPendingStatusMessageLocator(this.page);
   private readonly _restoreTemplateSettingsBtn = this.locator(
     'button:has-text("Restore template settings")',
   );
@@ -930,7 +930,7 @@ export class VirtualMachineDetailConfigurationComponent extends BaseComponent {
   }
 
   async waitForPendingChanges(timeout = 60000): Promise<boolean> {
-    const pendingLocator = this._isTextPendingChangesTextRestartRequired;
+    const pendingLocator = this._pendingStatusMessage;
     try {
       await pendingLocator
         .first()
@@ -946,7 +946,7 @@ export class VirtualMachineDetailConfigurationComponent extends BaseComponent {
   }
 
   async waitForPendingChangesToDisappear(timeout = 60000): Promise<boolean> {
-    const pendingLocator = this._isTextPendingChangesTextRestartRequired;
+    const pendingLocator = this._pendingStatusMessage;
     try {
       await pendingLocator
         .first()

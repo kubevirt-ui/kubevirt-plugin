@@ -120,8 +120,7 @@ export class EnvVariables {
 
   /**
    * Enable the failure diagnosis harness (default: off).
-   * When DIAGNOSE_FAILURES=1, withSafeActions captures a screenshot on timeout
-   * On failure, spawns a Cursor SDK agent (requires CURSOR_API_KEY) that
+   * When DIAGNOSE_FAILURES=1, on failure a Cursor SDK agent (requires CURSOR_API_KEY)
    * inspects the screenshot, ARIA snapshot, cluster health, and Jira context
    * to produce a verdict (pass/skip/fail). Falls back to heuristic
    * classification if the SDK is unavailable or the agent fails.

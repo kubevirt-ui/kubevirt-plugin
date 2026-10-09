@@ -15,10 +15,15 @@ export default class VmListComponent extends BaseComponent {
   private readonly _statusCells = this.locator('tbody td:nth-child(3)');
   private readonly _templateVmNameInput = this.testId('template-catalog-vm-name-input');
   private readonly _vmListSaveButton = this.testId('save-button');
+  private readonly _vmTable = this.locator('table.kubevirt-table, table.pf-v6-c-table').first();
   readonly _createButton = this.testId('item-create');
 
   constructor(page: Page) {
     super(page);
+  }
+
+  private getColumnHeader(columnName: string) {
+    return this._vmTable.getByRole('columnheader', { exact: true, name: columnName });
   }
 
   async areAllCheckboxesChecked(): Promise<boolean> {
@@ -225,6 +230,18 @@ export default class VmListComponent extends BaseComponent {
     await this._templateVmNameInput.fill(vmName);
   }
 
+  async getListedVmNames(): Promise<string[]> {
+    const checkboxes = this._vmTable.locator('[data-test^="select-vm-"]');
+    await checkboxes.first().waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
+    const count = await checkboxes.count();
+    const names: string[] = [];
+    for (let i = 0; i < count; i++) {
+      const dataTest = await checkboxes.nth(i).getAttribute('data-test');
+      names.push((dataTest ?? '').replace(/^select-vm-/, ''));
+    }
+    return names;
+  }
+
   async getTemplateVmName(): Promise<string> {
     return await this._templateVmNameInput.inputValue();
   }
@@ -367,6 +384,12 @@ export default class VmListComponent extends BaseComponent {
     return await this._templateVmNameInput.isVisible();
   }
 
+  async isVmCheckboxChecked(vmName: string): Promise<boolean> {
+    const checkbox = this.testId(`select-vm-${vmName}`);
+    await checkbox.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
+    return checkbox.isChecked();
+  }
+
   async isVmNameHidden(
     vmName: string,
     timeout: number = TestTimeouts.ELEMENT_WAIT,
@@ -474,6 +497,31 @@ export default class VmListComponent extends BaseComponent {
     const isChecked = await checkbox.isChecked();
     if (!isChecked) {
       await checkbox.click({ force: true });
+    }
+    await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
+  }
+
+  async sortTableByColumn(
+    columnName: string,
+    direction: 'ascending' | 'descending',
+  ): Promise<void> {
+    const header = this.getColumnHeader(columnName);
+    await header.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
+
+    for (let attempt = 0; attempt < 4; attempt++) {
+      const current = await header.getAttribute('aria-sort');
+      if (current === direction) {
+        return;
+      }
+      await this.robustClick(header.getByRole('button'));
+      await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
+    }
+
+    const finalDirection = await header.getAttribute('aria-sort');
+    if (finalDirection !== direction) {
+      throw new Error(
+        `Could not sort ${columnName} to ${direction}; aria-sort is ${finalDirection}`,
+      );
     }
     await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
   }

@@ -25,6 +25,8 @@ export const DISK_NAMES = {
   EPHEMERAL: 'disk-ephemeral',
   /** Root disk name */
   ROOT: 'rootdisk',
+  /** Empty disk name (used by createVmWithEmptyDisk helper) */
+  EMPTY: 'emptydisk',
   /** Boot volume name pattern */
   BOOT_VOL: (diskName: string) => `${diskName}-bootvol`,
   /** CD-ROM disk name */

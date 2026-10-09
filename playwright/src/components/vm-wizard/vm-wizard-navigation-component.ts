@@ -1,6 +1,6 @@
 import BaseComponent from '@/components/shared/base-component';
 import { TestTimeouts } from '@/utils/test-config';
-import type { Page } from '@playwright/test';
+import type { Locator, Page } from '@playwright/test';
 
 export default class VmWizardNavigationComponent extends BaseComponent {
   private readonly _buttonEditVMCreationLocation = this.locator(
@@ -22,9 +22,15 @@ export default class VmWizardNavigationComponent extends BaseComponent {
 
   private readonly _pfV6CMenuToggle = this.locator('.pf-v6-c-menu-toggle');
 
-  private readonly _pfV6CWizardButtonpfV6CButtonpfMPrimary = this.locator(
-    '.pf-v6-c-wizard button.pf-v6-c-button.pf-m-primary',
-  );
+  private readonly _wizardFooterCreateButton = this.page
+    .getByTestId('wizard-create-button')
+    .filter({ hasText: 'Create VirtualMachine' });
+  private readonly _wizardFooterCloneButton = this.page
+    .getByTestId('wizard-create-button')
+    .filter({ hasText: 'Clone VirtualMachine' });
+  private readonly _wizardFooterNextButton = this.page
+    .getByTestId('wizard-next-button')
+    .filter({ hasText: 'Next' });
   private readonly _pfV6CWizardMain = this.locator('.pf-v6-c-wizard__main');
   private readonly _pfV6CWizardTemplatesCatalogTile = this.locator(
     '.pf-v6-c-wizard .templates-catalog-tile',
@@ -64,6 +70,10 @@ export default class VmWizardNavigationComponent extends BaseComponent {
     await this.robustClick(
       this.locator('.pf-v6-c-wizard button.pf-v6-c-button.pf-m-link:has-text("Cancel")').first(),
     );
+    await this._wizardContainer.first().waitFor({
+      state: 'hidden',
+      timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+    });
   }
 
   async clearCloneSourceFilters(): Promise<void> {
@@ -97,14 +107,17 @@ export default class VmWizardNavigationComponent extends BaseComponent {
   }
 
   async clickCreateVm(): Promise<void> {
-    await this.collapseSidebarIfExpanded();
-    const createBtn = this._pfV6CWizardButtonpfV6CButtonpfMPrimary;
-    await createBtn.first().waitFor({
+    const createBtn = this._wizardFooterCreateButton;
+    await this.clickCreateVMButton(createBtn);
+  }
+
+  async clickCreateVMButton(createBtn: Locator): Promise<void> {
+    await createBtn.waitFor({
       state: 'visible',
       timeout: TestTimeouts.SHORT_WAIT,
     });
 
-    if (await createBtn.first().isDisabled()) {
+    if (await createBtn.isDisabled()) {
       const nameInput = this._vmNameInput.first();
       if ((await nameInput.count()) > 0) {
         await nameInput.press('Tab');
@@ -112,17 +125,45 @@ export default class VmWizardNavigationComponent extends BaseComponent {
       }
     }
 
-    await this.robustClick(createBtn.first());
+    await this.robustClick(createBtn);
     await this.page.waitForTimeout(2000);
   }
 
+  async clickCloneVm(): Promise<void> {
+    const cloneBtn = this._wizardFooterCloneButton;
+    await this.clickCreateVMButton(cloneBtn);
+  }
+
+  async getWizardErrorAlertMessage(): Promise<string> {
+    try {
+      const alert = this._wizardContainer.locator('.pf-v6-c-alert.pf-m-danger');
+      await alert.waitFor({ state: 'visible', timeout: TestTimeouts.SHORT_WAIT });
+      return (await alert.textContent())?.trim() || '';
+    } catch {
+      return '';
+    }
+  }
+
   async clickNext(): Promise<void> {
-    await this.collapseSidebarIfExpanded();
-    const nextButton = this._pfV6CWizardButtonpfV6CButtonpfMPrimary;
+    await this.page.keyboard.press('Escape');
+    await this.page
+      .locator('.pf-v6-c-tooltip, [role="tooltip"]')
+      .first()
+      .waitFor({ state: 'hidden', timeout: TestTimeouts.SHORT_WAIT })
+      .catch(() => undefined);
+
+    const footerNext = this.locator(
+      '.pf-v6-c-wizard__footer button.pf-m-primary, .pf-c-wizard__footer button.pf-m-primary',
+    ).filter({ hasText: 'Next' });
+    const nextButton = this._wizardFooterNextButton.or(footerNext);
     await nextButton.first().waitFor({
       state: 'visible',
-      timeout: TestTimeouts.SHORT_WAIT,
+      timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
     });
+    await nextButton
+      .first()
+      .hover()
+      .catch(() => undefined);
     await this.robustClick(nextButton.first());
     await this.page.waitForTimeout(1000);
   }
@@ -175,6 +216,14 @@ export default class VmWizardNavigationComponent extends BaseComponent {
       state: 'visible',
       timeout: TestTimeouts.ELEMENT_WAIT,
     });
+  }
+
+  /** Select "User templates" in the catalog Template scope sidebar filter. */
+  async selectUserTemplatesScopeFilter(): Promise<void> {
+    const userTemplatesRadio = this.testId('catalog-template-filter-user');
+    await userTemplatesRadio.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
+    await this.robustClick(userTemplatesRadio);
+    await this.page.waitForTimeout(TestTimeouts.UI_DELAY_MEDIUM);
   }
 
   async ensureVmNameFilled(): Promise<void> {
@@ -316,12 +365,12 @@ export default class VmWizardNavigationComponent extends BaseComponent {
   }
 
   async isNextButtonDisabled(): Promise<boolean> {
-    const nextButton = this._pfV6CWizardButtonpfV6CButtonpfMPrimary;
-    await nextButton.first().waitFor({
+    const nextButton = this._wizardFooterNextButton;
+    await nextButton.waitFor({
       state: 'visible',
       timeout: TestTimeouts.SHORT_WAIT,
     });
-    return await nextButton.first().isDisabled();
+    return await nextButton.isDisabled();
   }
 
   async navigateToStepByName(stepName: string): Promise<void> {
@@ -347,8 +396,36 @@ export default class VmWizardNavigationComponent extends BaseComponent {
     await this.page.waitForTimeout(500);
   }
 
+  async selectLocationProject(namespace: string): Promise<void> {
+    const current = await this.getLocationProject();
+    if (current.includes(namespace)) {
+      return;
+    }
+
+    await this.openEditLocationPanel();
+
+    const toggle = this.locator('.vm-creation-wizard').getByTestId(
+      'namespace-dropdown-menu-toggle',
+    );
+    await toggle.first().waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
+    await this.robustClick(toggle.first());
+
+    const filter = this.page.getByTestId('dropdown-text-filter');
+    await filter.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
+    await filter.clear();
+    await filter.fill(namespace);
+
+    const option = this.page.getByRole('menuitem', { name: namespace, exact: true });
+    await option.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
+    await this.robustClick(option);
+
+    await toggle
+      .filter({ hasText: namespace })
+      .first()
+      .waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
+  }
+
   async openWizardFromCreateDropdown(): Promise<void> {
-    await this.collapseSidebarIfExpanded();
     const welcomeModal = this.page
       .getByRole('dialog', { name: /Welcome/i })
       .or(this.locator('#guided-tour-modal'));
@@ -842,5 +919,70 @@ export default class VmWizardNavigationComponent extends BaseComponent {
     } catch {
       return false;
     }
+  }
+
+  // ── Boot source (template drawer) ──────────────────────────────────
+
+  private get _changeBootSourceModal() {
+    return this.page.locator('[aria-labelledby="change-boot-source-modal-title"]');
+  }
+
+  async getTemplateDrawerBootSourceText(): Promise<string> {
+    const item = this.testId('template-boot-source');
+    await item.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+    return ((await item.textContent()) ?? '').trim();
+  }
+
+  async isTemplateBootSourceEditable(): Promise<boolean> {
+    try {
+      await this.testId('template-boot-source').waitFor({
+        state: 'visible',
+        timeout: TestTimeouts.SHORT_WAIT,
+      });
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  async clickEditBootSource(): Promise<void> {
+    const editButton = this.testId('template-boot-source');
+    await editButton.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+    await this.robustClick(editButton);
+    await this._changeBootSourceModal.waitFor({
+      state: 'visible',
+      timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+    });
+  }
+
+  async isChangeBootSourceModalOpen(): Promise<boolean> {
+    return this._changeBootSourceModal
+      .isVisible({ timeout: TestTimeouts.SHORT_WAIT })
+      .catch(() => false);
+  }
+
+  async selectBootableVolumeInChangeModal(volumeName: string): Promise<void> {
+    const modal = this._changeBootSourceModal;
+    const row = modal.locator('table.BootableVolumeList-table tbody tr').filter({
+      has: this.page.locator('td').getByText(volumeName, { exact: true }),
+    });
+    await row.first().waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+    await this.robustClick(row.first());
+  }
+
+  async confirmChangeBootSource(): Promise<void> {
+    await this.robustClick(this.testId('change-boot-source-confirm'));
+    await this._changeBootSourceModal.waitFor({
+      state: 'hidden',
+      timeout: TestTimeouts.UI_ACTION_COMPLETE,
+    });
+  }
+
+  async cancelChangeBootSource(): Promise<void> {
+    await this.robustClick(this.testId('change-boot-source-cancel'));
+    await this._changeBootSourceModal.waitFor({
+      state: 'hidden',
+      timeout: TestTimeouts.UI_ACTION_COMPLETE,
+    });
   }
 }

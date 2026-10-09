@@ -5,12 +5,10 @@ import { waitForCondition } from '@/utils/wait-helpers';
 import type { Page } from '@playwright/test';
 
 export default class OverviewVirtualizationFeaturesComponent extends BaseComponent {
-  private readonly _aaqSwitch = this.locator(
-    '.section-with-switch:has-text("Application Aware Quota") .pf-v6-c-switch input',
-  );
+  private readonly _aaqSwitch = this.testId('application-aware-quota');
   private readonly _generalSettingsButton = this.locator('button:has-text("General settings")');
   private readonly _inputSliderValueInput = this.locator('input[aria-label="Slider value input"]');
-  private readonly _ksmCheckbox = this.testId('kernel-samepage-merging');
+  private readonly _ksmToggle = this.testId('kernel-samepage-merging');
   private readonly _memoryDensityBtn = this.locator('button:has-text("Memory density")');
   private readonly _memoryDensityDisableConfirmButton = this.testId(
     'memory-density-disable-confirm-button',
@@ -80,6 +78,18 @@ export default class OverviewVirtualizationFeaturesComponent extends BaseCompone
     }
   }
 
+  async disableKSM(): Promise<boolean> {
+    try {
+      const alreadyDisabled = !(await this.verifyKSMEnabled());
+      if (alreadyDisabled) return true;
+      await this._ksmToggle.click({ force: true });
+      await this.page.waitForTimeout(TestTimeouts.CLUSTER_STATE_PROPAGATION);
+      return !(await this.verifyKSMEnabled());
+    } catch {
+      return false;
+    }
+  }
+
   async disableMemoryDensity(): Promise<boolean> {
     const maxRetries = 3;
     let lastError: Error | undefined;
@@ -139,12 +149,18 @@ export default class OverviewVirtualizationFeaturesComponent extends BaseCompone
     }
   }
 
-  async enableKSM(): Promise<void> {
-    await this._ksmCheckbox.waitFor({
-      state: 'visible',
-      timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
-    });
-    await this._ksmCheckbox.click({ force: true });
+  async enableKSM(): Promise<boolean> {
+    try {
+      const alreadyEnabled = await this.verifyKSMEnabled();
+      if (alreadyEnabled) return true;
+      await this._ksmToggle.click({ force: true });
+      console.log('clicked');
+      await this.page.waitForTimeout(TestTimeouts.CLUSTER_STATE_PROPAGATION);
+      console.log('waited');
+      return await this.verifyKSMEnabled();
+    } catch {
+      return false;
+    }
   }
 
   async enableMemoryDensity(): Promise<boolean> {
@@ -246,7 +262,9 @@ export default class OverviewVirtualizationFeaturesComponent extends BaseCompone
   }
 
   async isKsmControlVisible(timeoutMs: number = TestTimeouts.ELEMENT_WAIT): Promise<boolean> {
-    return await this._ksmCheckbox.isVisible({ timeout: timeoutMs }).catch(() => false);
+    return await this.testId('kernel-samepage-merging')
+      .isVisible({ timeout: timeoutMs })
+      .catch(() => false);
   }
 
   async isManageQuotasLinkVisible(): Promise<boolean> {
@@ -444,11 +462,11 @@ export default class OverviewVirtualizationFeaturesComponent extends BaseCompone
 
   async verifyKSMEnabled(): Promise<boolean> {
     try {
-      await this._ksmCheckbox.waitFor({
+      await this._ksmToggle.waitFor({
         state: 'visible',
         timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
       });
-      return await this._ksmCheckbox.isChecked().catch(() => false);
+      return await this._ksmToggle.isChecked().catch(() => false);
     } catch {
       return false;
     }
