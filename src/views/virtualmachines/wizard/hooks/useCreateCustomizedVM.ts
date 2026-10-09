@@ -15,6 +15,7 @@ import { useK8sModels } from '@openshift-console/dynamic-plugin-sdk';
 import { mapWizardValuesToFinalVM } from '@virtualmachines/wizard/form/mapWizardValuesToFinalVM';
 import { type VMWizardFormValues } from '@virtualmachines/wizard/form/types';
 import { useVMWizardForm } from '@virtualmachines/wizard/form/VMWizardFormProvider';
+import { useVMWizardState } from '@virtualmachines/wizard/state/useVMWizardState';
 
 import { SELECTED_CLUSTER } from '../utils/constants';
 import { isTemplateCreationMethod } from '../utils/utils';
@@ -36,6 +37,7 @@ const useCreateCustomizedVM: UseCreateCustomizedVM = () => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const { control } = useVMWizardForm();
+  const { allowNextWizardNavigation, setIsCompleted } = useVMWizardState();
   const [cluster, vmNamespaceTarget] = useWatch({
     control,
     name: ['deployment.cluster', 'deployment.project'],
@@ -93,6 +95,8 @@ const useCreateCustomizedVM: UseCreateCustomizedVM = () => {
         await createHeadlessServiceSafely(createdVM, t);
       }
 
+      setIsCompleted(true);
+      allowNextWizardNavigation();
       navigate(getVMURL(deployment.cluster, deployment.project, getName(createdVM)));
     } catch (err) {
       setError(err);

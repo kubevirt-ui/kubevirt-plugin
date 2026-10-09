@@ -93,6 +93,7 @@ export type HandleCloneRequestPhaseChangeParams = {
   cloneRequest: undefined | V1beta1VirtualMachineClone;
   formValues: VMWizardFormValues['deployment'];
   navigate: NavigateFunction;
+  onCompleted?: () => void;
   setError: (error: unknown) => void;
   setIsSubmitting: (isSubmitting: boolean) => void;
   setSubmittedCloneRequest: (cloneRequest: undefined | V1beta1VirtualMachineClone) => void;

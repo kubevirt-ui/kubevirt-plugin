@@ -50,7 +50,7 @@ export const getACMVMListNamespacesURL = (cluster: string, namespace: string): s
 
 export const isVMWizardURL = (path: string = ''): boolean =>
   path === '/vm-wizard' ||
-  path.startsWith('/vm-wizard/') ||
+  path.startsWith('/vm-wizard') ||
   path === FLEET_WIZARD_PATH ||
   path.startsWith(`${FLEET_WIZARD_PATH}/`);
 

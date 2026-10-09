@@ -76,6 +76,7 @@ export const handleCloneRequestPhaseChange = ({
   cloneRequest,
   formValues: { cluster, name, project: targetNamespace },
   navigate,
+  onCompleted,
   setError,
   setIsSubmitting,
   setSubmittedCloneRequest,
@@ -90,6 +91,7 @@ export const handleCloneRequestPhaseChange = ({
 
   if (clonePhase === CLONING_STATUSES.SUCCEEDED) {
     logVMCreated(TELEMETRY_VM_CREATION_METHOD.CLONE);
+    onCompleted?.();
     navigate(getVMURL(getCluster(cloneRequest) ?? cluster, targetNamespace, name));
     return;
   }
