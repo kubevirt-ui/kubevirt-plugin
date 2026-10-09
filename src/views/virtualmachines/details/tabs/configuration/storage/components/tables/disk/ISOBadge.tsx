@@ -1,10 +1,9 @@
 import { type FC } from 'react';
 
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import BaseISOBadge from '@kubevirt-utils/components/ISOBadge/ISOBadge';
 import { getDisks } from '@kubevirt-utils/resources/vm';
 import { isCDROMDisk } from '@kubevirt-utils/resources/vm/utils/disk/selectors';
-import { Badge, Popover, PopoverPosition } from '@patternfly/react-core';
 
 type ISOBadgeProps = {
   diskName: string;
@@ -12,8 +11,6 @@ type ISOBadgeProps = {
 };
 
 const ISOBadge: FC<ISOBadgeProps> = ({ diskName, vm }) => {
-  const { t } = useKubevirtTranslation();
-
   const disks = getDisks(vm) ?? [];
   const disk = disks.find((vmDisk) => vmDisk.name === diskName);
 
@@ -21,16 +18,7 @@ const ISOBadge: FC<ISOBadgeProps> = ({ diskName, vm }) => {
     return null;
   }
 
-  return (
-    <Popover
-      bodyContent={diskName}
-      hasAutoWidth
-      position={PopoverPosition.top}
-      triggerAction="hover"
-    >
-      <Badge isRead>{t('ISO')}</Badge>
-    </Popover>
-  );
+  return <BaseISOBadge name={disk.name} />;
 };
 
 export default ISOBadge;
