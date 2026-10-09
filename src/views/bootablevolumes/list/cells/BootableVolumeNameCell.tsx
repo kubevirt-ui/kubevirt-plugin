@@ -6,9 +6,11 @@ import type { TFunction } from 'i18next';
 import { DataSourceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import type { V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import DeprecatedBadge from '@kubevirt-utils/components/badges/DeprecatedBadge/DeprecatedBadge';
+import ISOBadge from '@kubevirt-utils/components/ISOBadge/ISOBadge';
 import {
   getBootableVolumeGroupVersionKind,
   getDataImportCronFromDataSource,
+  isBootableVolumeISO,
   isDeprecated,
 } from '@kubevirt-utils/resources/bootableresources/helpers';
 import {
@@ -24,7 +26,7 @@ import {
 } from '@kubevirt-utils/resources/template/hooks/useVmTemplateSource/utils';
 import MulticlusterResourceLink from '@multicluster/components/MulticlusterResourceLink/MulticlusterResourceLink';
 import { ResourceIcon } from '@openshift-console/dynamic-plugin-sdk';
-import { Label } from '@patternfly/react-core';
+import { Flex, Label } from '@patternfly/react-core';
 
 import type { BootableVolumeCallbacks } from '../bootableVolumesDefinition';
 
@@ -45,6 +47,8 @@ const BootableVolumeNameCell: FC<BootableVolumeNameCellProps> = ({ callbacks, ro
   const bootableVolumeName = getName(row);
   const bootableVolumeNamespace = getNamespace(row);
   const isDataSource = row.kind === DataSourceModel.kind;
+
+  const isISO = isBootableVolumeISO(row);
 
   const isCloning = useMemo(() => {
     if (!isDataSource) return false;
@@ -97,7 +101,10 @@ const BootableVolumeNameCell: FC<BootableVolumeNameCellProps> = ({ callbacks, ro
 
   return (
     <span data-test={bootableVolumeName}>
-      {resourceLink}
+      <Flex>
+        {resourceLink}
+        {isISO && <ISOBadge name={bootableVolumeName ?? ''} />}
+      </Flex>
       {isDeprecated(bootableVolumeName) && <DeprecatedBadge />}
       {isDataSource && isCloning && <Label>{t('Clone in progress')}</Label>}
     </span>
