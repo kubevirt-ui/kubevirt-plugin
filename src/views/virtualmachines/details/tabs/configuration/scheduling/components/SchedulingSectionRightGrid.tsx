@@ -1,38 +1,34 @@
-import { type FC, useCallback, useMemo } from 'react';
-import produce from 'immer';
+import { type FC, useCallback } from 'react';
 
-import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
   type V1VirtualMachine,
   type V1VirtualMachineInstance,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import DedicatedResourcesModal from '@kubevirt-utils/components/DedicatedResourcesModal/DedicatedResourcesModal';
+import { produceVMWithDedicatedCPU } from '@kubevirt-utils/components/DedicatedResourcesModal/utils/utils';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import EvictionStrategyModal from '@kubevirt-utils/components/EvictionStrategy/EvictionStrategyModal';
 import ShowEvictionStrategy from '@kubevirt-utils/components/EvictionStrategy/ShowEvictionStrategy';
+import { produceVMWithEvictionStrategy } from '@kubevirt-utils/components/EvictionStrategy/utils';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import RunStrategyModal from '@kubevirt-utils/components/RunStrategyModal/RunStrategyModal';
 import {
-  applyRunStrategyToSpec,
   getRunStrategyDisplayValue,
   getRunStrategyHelpText,
-  updateRunStrategy,
 } from '@kubevirt-utils/components/RunStrategyModal/utils';
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isExpandableSpecVM } from '@kubevirt-utils/resources/instancetype/helper';
-import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
-import { getEvictionStrategy } from '@kubevirt-utils/resources/vm';
-import { type RunStrategy } from '@kubevirt-utils/resources/vm/utils/constants';
+import { getCPU, getEvictionStrategy } from '@kubevirt-utils/resources/vm';
 import {
   getEffectiveRunStrategy,
   isVMNotStopped,
 } from '@kubevirt-utils/resources/vm/utils/selectors';
 import { getCluster } from '@multicluster/helpers/selectors';
-import { kubevirtK8sUpdate } from '@multicluster/k8sRequests';
 import { DescriptionList, GridItem } from '@patternfly/react-core';
 
+import useSchedulingSectionCallbacks from '../hooks/useSchedulingSectionCallbacks';
 import DedicatedResources from './DedicatedResources';
 
 type SchedulingSectionRightGridProps = {
@@ -53,47 +49,20 @@ const SchedulingSectionRightGrid: FC<SchedulingSectionRightGridProps> = ({
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
 
-  const onSubmit = useCallback(
-    (updatedVM: V1VirtualMachine) =>
-      onUpdateVM
-        ? onUpdateVM(updatedVM)
-        : kubevirtK8sUpdate({
-            cluster: getCluster(vm),
-            data: updatedVM,
-            model: VirtualMachineModel,
-            name: getName(updatedVM),
-            ns: getNamespace(updatedVM),
-          }),
-    [onUpdateVM, vm],
-  );
+  const { onSubmit, onSubmitRunStrategy } = useSchedulingSectionCallbacks({ onUpdateVM, vm });
 
   const onEditEvictionStrategy = useCallback(() => {
-    createModal(({ isOpen, onClose }) => (
+    createModal?.(({ isOpen, onClose }) => (
       <EvictionStrategyModal
-        headerText={t('Eviction strategy')}
+        evictionStrategy={getEvictionStrategy(vm)}
         isOpen={isOpen}
         onClose={onClose}
         onSubmit={onSubmit}
-        vm={vm}
-        vmi={vmi}
+        produceUpdatedResource={(isChecked) => produceVMWithEvictionStrategy(vm, isChecked)}
+        showPendingChangesAlert={!!vmi}
       />
     ));
-  }, [createModal, onSubmit, t, vm, vmi]);
-
-  const evictionStrategy = useMemo(
-    () => (
-      <ShowEvictionStrategy cluster={getCluster(vm)} evictionStrategy={getEvictionStrategy(vm)} />
-    ),
-    [vm],
-  );
-
-  const onSubmitRunStrategy = useCallback(
-    (runStrategy: RunStrategy) =>
-      onUpdateVM
-        ? onUpdateVM(produce(vm, (draft) => applyRunStrategyToSpec(draft.spec, runStrategy)))
-        : updateRunStrategy(vm, runStrategy),
-    [onUpdateVM, vm],
-  );
+  }, [createModal, onSubmit, vm, vmi]);
 
   return (
     <GridItem span={5}>
@@ -110,21 +79,26 @@ const SchedulingSectionRightGrid: FC<SchedulingSectionRightGridProps> = ({
             'Can not configure dedicated resources if the VirtualMachine is created from an instance type',
           )}
           onEditClick={() =>
-            createModal(({ isOpen, onClose }) => (
+            createModal?.(({ isOpen, onClose }) => (
               <DedicatedResourcesModal
-                headerText={t('Dedicated resources')}
+                initialChecked={!!getCPU(vm)?.dedicatedCpuPlacement}
                 isOpen={isOpen}
                 onClose={onClose}
                 onSubmit={onSubmit}
-                vm={vm}
-                vmi={vmi}
+                produceUpdatedResource={(checked) => produceVMWithDedicatedCPU(vm, checked)}
+                showPendingChangesAlert={!!vmi}
               />
             ))
           }
         />
         <DescriptionItem
           data-test="eviction-strategy"
-          descriptionData={evictionStrategy}
+          descriptionData={
+            <ShowEvictionStrategy
+              cluster={getCluster(vm)}
+              evictionStrategy={getEvictionStrategy(vm)}
+            />
+          }
           descriptionHeader={
             <SearchItem id="eviction-strategy">{t('Eviction strategy')}</SearchItem>
           }
@@ -141,7 +115,7 @@ const SchedulingSectionRightGrid: FC<SchedulingSectionRightGridProps> = ({
           isEdit={canUpdateVM}
           isPopover
           onEditClick={() =>
-            createModal(({ isOpen, onClose }) => (
+            createModal?.(({ isOpen, onClose }) => (
               <RunStrategyModal
                 initialRunStrategy={getEffectiveRunStrategy(vm)}
                 isOpen={isOpen}
