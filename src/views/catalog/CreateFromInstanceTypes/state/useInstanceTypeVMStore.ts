@@ -74,15 +74,15 @@ export const useInstanceTypeVMStore = create<InstanceTypeVMStore>()((set, get) =
         }),
       ),
     setIsChangingNamespace: () => set({ isChangingNamespace: true }),
+    setRunStrategy: (runStrategy) => {
+      set({ runStrategy });
+    },
     setSelectedStorageClass: (storageClass: string) =>
       set(
         produce<InstanceTypeVMStore>(({ instanceTypeVMState }) => {
           instanceTypeVMState.selectedStorageClass = storageClass;
         }),
       ),
-    setStartVM: (checked) => {
-      set({ startVM: checked });
-    },
     setVM: async (vm) => {
       await kubevirtK8sCreate<V1VirtualMachine>({
         cluster: getCluster(vm),

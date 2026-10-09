@@ -3,11 +3,11 @@ import { useNavigate } from 'react-router-dom-v5-compat';
 
 import { useWizardSourceAvailable } from '@catalog/utils/useWizardSourceAvailable';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+import { useRunStrategyToggle } from '@kubevirt-utils/components/RunStrategyModal/useRunStrategyToggle';
 import {
-  RUNSTRATEGY_ALWAYS,
-  RUNSTRATEGY_HALTED,
-  RUNSTRATEGY_RERUNONFAILURE,
-} from '@kubevirt-utils/constants/constants';
+  applyRunStrategyToSpec,
+  getStartAfterCreationLabel,
+} from '@kubevirt-utils/components/RunStrategyModal/utils';
 import { logTemplateFlowEvent } from '@kubevirt-utils/extensions/telemetry/telemetry';
 import {
   CANCEL_CUSTOMIZE_VM_BUTTON_CLICKED,
@@ -81,37 +81,25 @@ export const WizardFooter: FC<{ namespace: string }> = ({ namespace }) => {
 
   const loaded = vmContextLoaded && vmCreateLoaded && bootSourceLoaded;
 
+  const { isStartChecked, onToggle } = useRunStrategyToggle(vm);
+
   const onChangeStartVM = useCallback(
     (checked: boolean) => {
-      updateVM((draftVM) => {
-        delete draftVM.spec.running;
-        draftVM.spec.runStrategy = checked ? RUNSTRATEGY_ALWAYS : RUNSTRATEGY_HALTED;
-      });
+      const { newStrategy } = onToggle(checked);
+      updateVM((draftVM) => applyRunStrategyToSpec(draftVM.spec, newStrategy));
     },
-    [updateVM],
+    [onToggle, updateVM],
   );
-
-  const runStrategy = vm?.spec?.runStrategy;
 
   return (
     <footer className="vm-wizard-footer">
       <Stack hasGutter>
         <StackItem>
           <Checkbox
-            isChecked={
-              vm?.spec?.running ||
-              runStrategy === RUNSTRATEGY_ALWAYS ||
-              runStrategy === RUNSTRATEGY_RERUNONFAILURE
-            }
-            label={
-              runStrategy
-                ? t('Start this VirtualMachine after creation ({{runStrategy}})', {
-                    runStrategy,
-                  })
-                : t('Start this VirtualMachine after creation')
-            }
             id="start-after-create-checkbox"
+            isChecked={isStartChecked}
             isDisabled={!loaded || disableVmCreate || !isBootSourceAvailable}
+            label={getStartAfterCreationLabel(t)}
             onChange={(_, checked: boolean) => onChangeStartVM(checked)}
           />
         </StackItem>
