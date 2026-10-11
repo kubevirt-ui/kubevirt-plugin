@@ -40,7 +40,10 @@ const VMCreationLocationDisplay: FC<VMCreationLocationDisplayProps> = ({
         'vm-creation-location-display--editing': editCreationLocation,
       })}
     >
-      <div className="vm-creation-location-display__form-control pf-v6-c-form-control">
+      <button
+        className="vm-creation-location-display__form-control pf-v6-c-form-control"
+        onClick={() => setEditCreationLocation(true)}
+      >
         <span className="vm-creation-location-display__content">
           {isACMPage && (
             <span>
@@ -59,7 +62,7 @@ const VMCreationLocationDisplay: FC<VMCreationLocationDisplayProps> = ({
             </>
           )}
         </span>
-      </div>
+      </button>
       <EditButton
         ariaLabel={t('Edit VM creation location')}
         className="pf-v6-u-ml-sm"
