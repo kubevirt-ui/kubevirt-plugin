@@ -123,9 +123,30 @@ export const defaultVirtFeatureOperatorItemsMap = {
 export const getPackageUID = (pkg: PackageManifestKind) =>
   `${pkg.metadata.name}-${pkg.status.catalogSource}-${pkg.status.catalogSourceNamespace}`;
 
+const isDefaultCatalog = (catalogSource: string): boolean =>
+  Object.values(DefaultCatalogSource).includes(catalogSource as DefaultCatalogSource);
+
+const isRedHatProvider = (packageManifest: PackageManifestKind): boolean => {
+  const { channels, defaultChannel } = packageManifest?.status ?? {};
+  const providerName = channels?.find((ch) => ch.name === defaultChannel)?.currentCSVDesc?.provider
+    ?.name;
+
+  return providerName?.toLowerCase().startsWith('red hat') ?? false;
+};
+
+const isEligibleOperator = (item: VirtFeatureOperatorItem): boolean => {
+  if (isInstalled(item?.installState)) return true;
+
+  const catalogSource = item?.obj?.status?.catalogSource;
+
+  if (isDefaultCatalog(catalogSource)) return true;
+
+  return isRedHatProvider(item?.obj);
+};
+
 export const groupOperatorItems = (items: VirtFeatureOperatorItem[]): VirtFeatureOperatorItemsMap =>
   items.reduce((acc, item) => {
-    if (getPackageSource(item?.obj) !== 'Red Hat' && !isInstalled(item?.installState)) return acc;
+    if (!isEligibleOperator(item)) return acc;
 
     const operatorName = getName(item?.obj);
     if (!acc?.[operatorName]) acc[operatorName] = [];
