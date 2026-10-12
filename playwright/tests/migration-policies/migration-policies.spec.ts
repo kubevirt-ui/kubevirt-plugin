@@ -160,6 +160,7 @@ test.describe.serial(
       );
 
       await migrationPoliciesPage.navigateToMigrationPoliciesViaUI();
+      await migrationPoliciesPage.reloadPage();
       await migrationPoliciesPage.filterByName(autoConvergePolicyName);
       await expect
         .poll(() => migrationPoliciesPage.isPolicyVisible(autoConvergePolicyName), {

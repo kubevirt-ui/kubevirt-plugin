@@ -113,10 +113,18 @@ test.describe('Tier1 Bootable Volumes - Create and Delete', { tag: [ROUTE_BOOTAB
           bootableVolumesPage.clickRowActionDelete(dvName),
         );
         await bootableVolumesPage.clickSaveInDeleteModal();
+
+        await expect
+          .poll(async () => (await apiClient.getDataSource(ns, dvName)) === null, {
+            timeout: utils.TestTimeouts.UI_ACTION_COMPLETE,
+            message: `DataSource ${dvName} should be deleted`,
+          })
+          .toBe(true);
       });
 
       await test.step('Verify the volume is removed from the list', async () => {
         await bootableVolumesPage.navigateToNamespaceBootableVolumesViaUI(ns);
+        await bootableVolumesPage.reloadAndWaitForTable();
         const volumeGone = await bootableVolumesPage.verifyBootableVolumeDoesNotExist(
           dvName,
           utils.TestTimeouts.DEFAULT,

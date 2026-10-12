@@ -548,15 +548,13 @@ export default class BootableVolumesPage extends PageCommons {
   }
 
   async verifyBootableVolumeDoesNotExist(volumeName: string, timeout = 60000): Promise<boolean> {
-    try {
-      await this.page.waitForLoadState('load', { timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
-      await this.page.waitForTimeout(TestTimeouts.UI_DELAY_EXTRA);
-      return !(await this.locator(`tr:has-text("${volumeName}")`)
-        .isVisible({ timeout })
-        .catch(() => false));
-    } catch {
-      return true;
-    }
+    if (!(await this.waitForTableData(timeout))) return false;
+
+    const volumeRow = this.locator('tbody tr').filter({ hasText: volumeName }).first();
+    return volumeRow
+      .waitFor({ state: 'hidden', timeout })
+      .then(() => true)
+      .catch(() => false);
   }
 
   async verifyBootableVolumeExistsInList(volumeName: string, timeout = 10000): Promise<boolean> {
@@ -684,7 +682,14 @@ export default class BootableVolumesPage extends PageCommons {
   }
 
   async waitForTableData(timeout = TestTimeouts.NAVIGATION): Promise<boolean> {
-    return this._row
+    await this.waitForLoadingComplete(timeout);
+
+    const loadedTableState = this.page
+      .getByRole('table', { name: 'Bootable volumes table' })
+      .or(this.page.getByText("You don't have any bootable volumes yet", { exact: true }))
+      .or(this.page.getByText('No results match the current filters', { exact: true }));
+
+    return loadedTableState
       .first()
       .waitFor({ state: 'visible', timeout })
       .then(() => true)

@@ -60,7 +60,7 @@ test.describe.serial('Template creation flows', { tag: [ROUTE_VM_TEMPLATES_TAG, 
     expect.soft(isVmVisible, `VM ${vmName} should be visible on detail page`).toBe(true);
 
     await vmDetailPage.saveAsTemplate(templateName, sharedNs, {
-      category: saveAsTemplateCategory.display,
+      category: saveAsTemplateCategory.label,
     });
     apiClient.trackResource('VirtualMachineTemplate', templateName, sharedNs);
 

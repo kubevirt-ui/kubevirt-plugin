@@ -297,14 +297,22 @@ export default class TemplatesPage extends PageCommons {
       state: 'visible',
       timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
     });
-    await this.robustClick(categoryValue);
-
     const modal = this.locator('[role="dialog"]');
-    await modal.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+    let modalVisible = false;
+    for (let attempt = 0; attempt < 3 && !modalVisible; attempt++) {
+      await this.robustClick(categoryValue);
+      modalVisible = await modal
+        .waitFor({ state: 'visible', timeout: TestTimeouts.SHORT_WAIT })
+        .then(() => true)
+        .catch(() => false);
+    }
+    if (!modalVisible) throw new Error('Edit category modal did not open after 3 attempts');
+
     const categorySelect = modal.locator('[data-test="template-category-select"]');
     const categoryInput = categorySelect.locator('input[role="combobox"]');
     await this.robustClick(categoryInput);
     await categoryInput.fill(category);
+
     const categoryOption = this.page.getByRole('option', { name: category, exact: true }).first();
     await categoryOption.waitFor({
       state: 'visible',

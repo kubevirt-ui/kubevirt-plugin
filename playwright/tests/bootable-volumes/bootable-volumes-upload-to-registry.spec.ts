@@ -31,6 +31,11 @@ async function createBootableVolumeViaApi(
     metadata: {
       name,
       namespace,
+      // HPP CSI (hot-cluster default) uses WaitForFirstConsumer. Without this,
+      // CDI leaves the DV in WaitForFirstConsumer until a consumer pod exists.
+      annotations: {
+        'cdi.kubevirt.io/storage.bind.immediate.requested': 'true',
+      },
       labels: {
         'instancetype.kubevirt.io/default-instancetype': 'u1.medium',
         'instancetype.kubevirt.io/default-preference': 'fedora',
@@ -108,10 +113,20 @@ test.describe('Tier1 Bootable Volumes - Upload to registry', { tag: [ROUTE_BOOTA
 
       const ns = await setupTestNamespace(apiClient, 'bv-registry-validate');
       const volumeName = utils.generateRandomDataVolumeName('bv-reg-validate');
-      await createBootableVolumeViaApi(apiClient, ns, volumeName, utils.TestTimeouts.DEFAULT);
+      await createBootableVolumeViaApi(
+        apiClient,
+        ns,
+        volumeName,
+        utils.TestTimeouts.DATA_VOLUME_STATUS,
+      );
 
       await bootableVolumesPage.navigateToNamespaceBootableVolumesViaUI(ns);
-      await bootableVolumesPage.ensureDataVolumeRowVisibleWithReNav(volumeName, ns);
+      await bootableVolumesPage.filterByName(volumeName);
+      const rowVisible = await bootableVolumesPage.ensureDataVolumeRowVisibleWithReNav(
+        volumeName,
+        ns,
+      );
+      expect(rowVisible, `Bootable volume ${volumeName} should be visible`).toBe(true);
 
       await test.step('Open the "Upload to registry" modal', async () => {
         await bootableVolumesPage.clickRowActionUploadToRegistry(volumeName);
@@ -156,7 +171,12 @@ test.describe('Tier1 Bootable Volumes - Upload to registry', { tag: [ROUTE_BOOTA
 
       const ns = await setupTestNamespace(apiClient, 'bv-registry-submit');
       const volumeName = utils.generateRandomDataVolumeName('bv-reg-submit');
-      await createBootableVolumeViaApi(apiClient, ns, volumeName, utils.TestTimeouts.DEFAULT);
+      await createBootableVolumeViaApi(
+        apiClient,
+        ns,
+        volumeName,
+        utils.TestTimeouts.DATA_VOLUME_STATUS,
+      );
 
       await bootableVolumesPage.navigateToNamespaceBootableVolumesViaUI(ns);
       await bootableVolumesPage.ensureDataVolumeRowVisibleWithReNav(volumeName, ns);

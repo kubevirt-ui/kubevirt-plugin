@@ -23,7 +23,13 @@ export default class VmListComponent extends BaseComponent {
   }
 
   private getColumnHeader(columnName: string) {
-    return this._vmTable.getByRole('columnheader', { exact: true, name: columnName });
+    return this._vmTable.getByRole('columnheader').filter({
+      has: this.page.getByRole('button', { exact: true, name: columnName }),
+    });
+  }
+
+  private getSortButton(columnName: string) {
+    return this._vmTable.getByRole('button', { exact: true, name: columnName });
   }
 
   async areAllCheckboxesChecked(): Promise<boolean> {
@@ -506,14 +512,15 @@ export default class VmListComponent extends BaseComponent {
     direction: 'ascending' | 'descending',
   ): Promise<void> {
     const header = this.getColumnHeader(columnName);
-    await header.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
+    const sortButton = this.getSortButton(columnName);
+    await sortButton.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
 
     for (let attempt = 0; attempt < 4; attempt++) {
       const current = await header.getAttribute('aria-sort');
       if (current === direction) {
         return;
       }
-      await this.robustClick(header.getByRole('button'));
+      await this.robustClick(sortButton);
       await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
     }
 
