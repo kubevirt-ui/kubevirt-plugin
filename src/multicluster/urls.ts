@@ -1,3 +1,4 @@
+export { getFleetTemplateURL, getFleetVMTemplateURL } from './urls/fleetDetailsPageUrls';
 export {
   extractClusterFromPath,
   getFleetBootableVolumesURL,

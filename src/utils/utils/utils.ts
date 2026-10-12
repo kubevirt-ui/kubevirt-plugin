@@ -26,7 +26,7 @@ export const kubevirtConsole = console;
 
 export const clusterBasePath = k8sBasePath.slice(0, k8sBasePath.lastIndexOf('api/kubernetes'));
 
-export const isAllNamespaces = (namespace: string): boolean =>
+export const isAllNamespaces = (namespace: string | undefined): boolean =>
   !namespace || namespace === ALL_NAMESPACES || namespace === ALL_NAMESPACES_SESSION_KEY;
 
 export const getValidNamespace = (activeNamespace: string): string =>

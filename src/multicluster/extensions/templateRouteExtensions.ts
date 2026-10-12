@@ -3,6 +3,11 @@ import type { EncodedExtension } from '@openshift-console/dynamic-plugin-sdk-web
 
 import { FLEET_TEMPLATES_PATH, FLEET_VIRTUAL_MACHINES_PATH } from '../constants';
 
+import {
+  FLEET_TEMPLATES_DETAILS_PATH,
+  FLEET_TEMPLATES_VMT_DETAILS_PATH,
+} from '../constants/templateConstants';
+
 export const templateRouteExtensions: EncodedExtension[] = [
   {
     properties: {
@@ -22,7 +27,7 @@ export const templateRouteExtensions: EncodedExtension[] = [
       component: {
         $codeRef: 'TemplateNavPage',
       },
-      path: [`${FLEET_TEMPLATES_PATH}/cluster/:cluster/ns/:ns/:name`],
+      path: [FLEET_TEMPLATES_DETAILS_PATH],
     },
     type: 'console.page/route',
   } as EncodedExtension<RoutePage>,
@@ -31,7 +36,7 @@ export const templateRouteExtensions: EncodedExtension[] = [
       component: {
         $codeRef: 'TemplateNavPage',
       },
-      path: [`${FLEET_TEMPLATES_PATH}/cluster/:cluster/ns/:ns/vmt/:name`],
+      path: [FLEET_TEMPLATES_VMT_DETAILS_PATH],
     },
     type: 'console.page/route',
   } as EncodedExtension<RoutePage>,

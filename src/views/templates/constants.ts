@@ -11,3 +11,8 @@ export const VM_TEMPLATES_NS_PATH = `/k8s/ns/:ns/${VM_TEMPLATES_PATH_SEGMENT}`;
 export const VM_TEMPLATES_ALL_NAMESPACES_PATH = `/k8s/all-namespaces/${VM_TEMPLATES_PATH_SEGMENT}`;
 export const VM_TEMPLATES_NEW_PATH = `${VM_TEMPLATES_NS_PATH}/~new`;
 export const VM_TEMPLATES_DETAILS_PATH = `${VM_TEMPLATES_NS_PATH}/:name`;
+
+/** This URL path segment distinguishes VirtualMachineTemplate resource details page (VMT) from OpenShift Template resource (T) details page. */
+export const VMT_PATH_SEGMENT = 'vmt';
+
+export const VMT_VM_TEMPLATES_DETAILS_PATH = `${VM_TEMPLATES_NS_PATH}/${VMT_PATH_SEGMENT}/:name`;
