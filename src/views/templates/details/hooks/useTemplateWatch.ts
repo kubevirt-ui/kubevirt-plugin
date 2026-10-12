@@ -1,4 +1,4 @@
-import { useLocation, useParams } from 'react-router';
+import { useParams } from 'react-router';
 
 import useNamespaceParam from '@kubevirt-utils/hooks/useNamespaceParam';
 import type { Template } from '@kubevirt-utils/resources/template';
@@ -9,16 +9,14 @@ import {
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 
-const VMT_PATH_SEGMENT = '/vmt/';
-const VMT_KIND = 'VirtualMachineTemplate';
+import useIsVMTRoute from './useIsVMTRoute';
 
 const useTemplateWatch = (): [template: Template, loaded: boolean, isVMT: boolean] => {
   const { name } = useParams<{ name: string }>();
   const namespace = useNamespaceParam();
   const cluster = useClusterParam();
-  const { pathname } = useLocation();
 
-  const isVMT = pathname.includes(VMT_KIND) || pathname.includes(VMT_PATH_SEGMENT);
+  const isVMT = useIsVMTRoute();
 
   const groupVersionKind = isVMT
     ? VirtualMachineTemplateGroupVersionKind

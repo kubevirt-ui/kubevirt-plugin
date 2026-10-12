@@ -4,7 +4,7 @@ import { type ResourceRouteHandler } from '@stolostron/multicluster-sdk';
 
 import { FLEET_BASE_PATH } from '../constants';
 
-import { getFleetTemplatesURL } from './fleetPageUrls';
+import { getFleetTemplateURL, getFleetVMTemplateURL } from './fleetDetailsPageUrls';
 
 export type GetFleetResourceRouteProps = (input: {
   cluster: string;
@@ -20,13 +20,13 @@ export const getFleetResourceRoute: GetFleetResourceRouteProps = ({
   namespace,
 }) => {
   if (model.kind === TemplateModel.kind && model.apiGroup === TemplateModel.apiGroup) {
-    return `${getFleetTemplatesURL(cluster, namespace)}/${name}`;
+    return getFleetTemplateURL(name, namespace, cluster);
   }
   if (
     model.kind === VirtualMachineTemplateModel.kind &&
     model.apiGroup === VirtualMachineTemplateModel.apiGroup
   ) {
-    return `${getFleetTemplatesURL(cluster, namespace)}/vmt/${name}`;
+    return getFleetVMTemplateURL(name, namespace, cluster);
   }
   const extensionModel = {
     group: model.apiGroup,

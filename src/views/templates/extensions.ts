@@ -9,6 +9,7 @@ import {
   VM_TEMPLATES_DETAILS_PATH,
   VM_TEMPLATES_NEW_PATH,
   VM_TEMPLATES_NS_PATH,
+  VMT_VM_TEMPLATES_DETAILS_PATH,
 } from './constants';
 
 export const exposedModules: ConsolePluginBuildMetadata['exposedModules'] = {
@@ -39,7 +40,7 @@ export const extensions: EncodedExtension[] = [
     properties: {
       component: { $codeRef: 'TemplateNavPage' },
       // no `exact`, the details page owns its tab sub-paths i.e. /yaml, /disks etc.
-      path: [VM_TEMPLATES_DETAILS_PATH],
+      path: [VM_TEMPLATES_DETAILS_PATH, VMT_VM_TEMPLATES_DETAILS_PATH],
     },
     type: 'console.page/route',
   } as EncodedExtension<RoutePage>,

@@ -1,22 +1,18 @@
-import { VirtualMachineTemplateModelRef } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
-import { ALL_NAMESPACES, ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
+import { isAllNamespaces } from '@kubevirt-utils/utils/utils';
 import { FLEET_TEMPLATES_PATH } from '@multicluster/constants';
-import { getFleetTemplatesURL } from '@multicluster/urls';
-import { VM_TEMPLATES_PATH_SEGMENT } from '@templates/constants';
-
-const isAllNamespaces = (namespace?: string): boolean =>
-  !namespace || namespace === ALL_NAMESPACES || namespace === ALL_NAMESPACES_SESSION_KEY;
+import { getFleetTemplateURL, getFleetVMTemplateURL } from '@multicluster/urls';
+import { VM_TEMPLATES_PATH_SEGMENT, VMT_PATH_SEGMENT } from '@templates/constants';
 
 export const getTemplateURL = (name: string, namespace: string, cluster?: string): string =>
   cluster
-    ? `${getFleetTemplatesURL(cluster, namespace)}/${name}`
+    ? getFleetTemplateURL(name, namespace, cluster)
     : `/k8s/ns/${namespace}/${VM_TEMPLATES_PATH_SEGMENT}/${name}`;
 
 export const getVMTemplateURL = (name: string, namespace: string, cluster?: string): string =>
   cluster
-    ? `${getFleetTemplatesURL(cluster, namespace)}/vmt/${name}`
-    : `/k8s/ns/${namespace}/${VirtualMachineTemplateModelRef}/${name}`;
+    ? getFleetVMTemplateURL(name, namespace, cluster)
+    : `/k8s/ns/${namespace}/${VM_TEMPLATES_PATH_SEGMENT}/${VMT_PATH_SEGMENT}/${name}`;
 
 export const getTemplateListURL = (namespace?: string): string => {
   if (isAllNamespaces(namespace)) {

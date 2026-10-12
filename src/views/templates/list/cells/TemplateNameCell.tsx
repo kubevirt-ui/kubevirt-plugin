@@ -5,15 +5,15 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import {
   isDeprecatedTemplate,
-  isOpenShiftTemplate,
   isVirtualMachineTemplateRequest,
   type TemplateOrRequest,
 } from '@kubevirt-utils/resources/template';
 import MulticlusterResourceLink from '@multicluster/components/MulticlusterResourceLink/MulticlusterResourceLink';
 import { getCluster } from '@multicluster/helpers/selectors';
-import useClusterParam from '@multicluster/hooks/useClusterParam';
+import useIsACMPage from '@multicluster/useIsACMPage';
 import { getGroupVersionKindForResource } from '@openshift-console/dynamic-plugin-sdk';
 import { Label, Split, Stack, StackItem } from '@patternfly/react-core';
+import { useHubClusterName } from '@stolostron/multicluster-sdk';
 
 import VirtualMachineTemplateRequestStatusIcon from '../../components/VirtualMachineTemplateRequest/VirtualMachineTemplateRequestStatusIcon';
 
@@ -23,11 +23,12 @@ type TemplateNameCellProps = {
 
 const TemplateNameCell: FC<TemplateNameCellProps> = ({ row }) => {
   const { t } = useKubevirtTranslation();
-  const clusterParam = useClusterParam();
+  const [hubCluster] = useHubClusterName();
+  const isACMPage = useIsACMPage();
 
   const name = getName(row);
   const namespace = getNamespace(row);
-  const cluster = getCluster(row) ?? clusterParam;
+  const cluster = isACMPage ? (getCluster(row) ?? hubCluster) : undefined;
 
   const isVMTR = isVirtualMachineTemplateRequest(row);
 
@@ -35,9 +36,7 @@ const TemplateNameCell: FC<TemplateNameCellProps> = ({ row }) => {
     <Stack>
       <StackItem>
         <Split hasGutter>
-          {isOpenShiftTemplate(row) ? (
-            <VMTemplateLink cluster={cluster} name={name} namespace={namespace} />
-          ) : (
+          {isVMTR ? (
             <MulticlusterResourceLink
               cluster={cluster}
               data-test={name}
@@ -45,6 +44,8 @@ const TemplateNameCell: FC<TemplateNameCellProps> = ({ row }) => {
               name={name}
               namespace={namespace}
             />
+          ) : (
+            <VMTemplateLink cluster={cluster} name={name} namespace={namespace} template={row} />
           )}
           {!isVMTR && isDeprecatedTemplate(row) && <Label isCompact>{t('Deprecated')}</Label>}
         </Split>
