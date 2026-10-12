@@ -108,6 +108,7 @@ export const InstanceTypeDrilldownSelect: FC<InstanceTypeMenuItemsProps> = ({
       >
         <DrilldownMenuItem {...menuItems.redHatProvided} label={t(menuItems.redHatProvided.label)}>
           <RedHatInstanceTypeSeriesMenu
+            cluster={bootableVolumeCluster}
             onSelect={(value, keepMenuOpen) =>
               onSelect(VirtualMachineClusterInstancetypeModel.kind, value, keepMenuOpen)
             }

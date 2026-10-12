@@ -6,12 +6,14 @@ import { type V1beta1VirtualMachineClusterInstancetype } from '@kubevirt-ui-ext/
 import RedHatLabel from '@kubevirt-utils/components/RedHatLabel/RedHatLabel';
 import { VENDOR_LABEL } from '@kubevirt-utils/constants/constants';
 import type { TableExportColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
+import { getInstanceTypePrefix } from '@kubevirt-utils/resources/bootableresources/helpers';
 import { getLabel, getName } from '@kubevirt-utils/resources/shared';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import MulticlusterResourceLink from '@multicluster/components/MulticlusterResourceLink/MulticlusterResourceLink';
 import { getCluster } from '@multicluster/helpers/selectors';
 
 import ClusterInstancetypeActions from '../actions/ClusterInstancetypeActions';
+import FamilyStatusCell from './components/FamilyStatusCell/FamilyStatusCell';
 import { getInstancetypeMemoryDisplayValue, sortByInstancetypeMemory } from './utils/utils';
 
 const NameCell = ({ row }: { row: V1beta1VirtualMachineClusterInstancetype }): JSX.Element => (
@@ -85,6 +87,16 @@ export const getClusterInstancetypeColumns = (
     renderCell: (row) => <VendorCell row={row} />,
   },
   {
+    getValue: (row): string => {
+      const name = getName(row);
+      return name ? getInstanceTypePrefix(name) : '';
+    },
+    key: 'familyStatus',
+    label: t('Family status'),
+    renderCell: (row) => <FamilyStatusCell row={row} />,
+  },
+  {
+    getValue: () => '',
     key: 'actions',
     label: '',
     props: { className: 'pf-v6-c-table__action' },

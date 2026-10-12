@@ -39,7 +39,10 @@ const SelectInstanceTypeSection: FC = () => {
   return (
     <Tabs activeKey={activeTabKey} className="pf-v6-u-mt-md" onSelect={handleTabClick}>
       <Tab eventKey={TabKey.RedHat} title={menuItems.redHatProvided.label}>
-        <RedHatProvidedInstanceTypesSection redHatMenuItems={menuItems?.redHatProvided} />
+        <RedHatProvidedInstanceTypesSection
+          cluster={cluster}
+          redHatMenuItems={menuItems?.redHatProvided}
+        />
       </Tab>
       <Tab eventKey={TabKey.Users} title={menuItems.userProvided.label}>
         <UserProvidedInstanceTypesList

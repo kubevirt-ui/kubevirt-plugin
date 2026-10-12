@@ -26,10 +26,7 @@ const DrilldownMenuItemWrapper: FC<DrilldownMenuItemWrapperProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const { seriesName, sizes } = series;
-  const seriesConfig = instanceTypeSeriesNameMapper[seriesName as InstanceTypeSeries];
-  const disabled = seriesConfig?.disabled;
-  const Icon = seriesConfig?.Icon;
-
+  const Icon = instanceTypeSeriesNameMapper[seriesName as InstanceTypeSeries]?.Icon;
   const seriesLabel = useMemo(() => getSeriesLabel(seriesName, t), [seriesName, t]);
 
   const getMenuItems = (isHugepages?: boolean): ReactNode => (
@@ -43,7 +40,7 @@ const DrilldownMenuItemWrapper: FC<DrilldownMenuItemWrapperProps> = ({
     />
   );
 
-  return disabled ? null : (
+  return (
     <DrilldownMenuItem icon={Icon} id={seriesName} key={seriesName} label={seriesLabel}>
       {seriesHasHugepagesVariant(seriesName) ? (
         <>

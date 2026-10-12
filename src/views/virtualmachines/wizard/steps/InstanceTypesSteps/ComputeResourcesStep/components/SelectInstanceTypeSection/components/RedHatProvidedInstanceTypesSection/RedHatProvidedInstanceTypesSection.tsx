@@ -8,10 +8,12 @@ import InstanceTypeSizeMenu from '@virtualmachines/wizard/steps/InstanceTypesSte
 import RedHatInstanceTypeSeriesGallery from '@virtualmachines/wizard/steps/InstanceTypesSteps/ComputeResourcesStep/components/SelectInstanceTypeSection/components/RedHatProvidedInstanceTypesSection/components/RedHatInstanceTypeSeriesGallery/RedHatInstanceTypeSeriesGallery';
 
 type RedHatProvidedInstanceTypesSectionProps = {
+  cluster?: string;
   redHatMenuItems: RedHatInstanceTypeMetadata;
 };
 
 const RedHatProvidedInstanceTypesSection: FC<RedHatProvidedInstanceTypesSectionProps> = ({
+  cluster,
   redHatMenuItems,
 }) => {
   const { control } = useVMWizardForm();
@@ -22,7 +24,11 @@ const RedHatProvidedInstanceTypesSection: FC<RedHatProvidedInstanceTypesSectionP
   return (
     <Stack hasGutter>
       <StackItem>
-        <RedHatInstanceTypeSeriesGallery redHatMenuItems={redHatMenuItems} />
+        <RedHatInstanceTypeSeriesGallery
+          cluster={cluster}
+          preserveFamily={selectedSeries}
+          redHatMenuItems={redHatMenuItems}
+        />
       </StackItem>
       <StackItem>
         <InstanceTypeSizeMenu instanceTypeSizes={sizes} />

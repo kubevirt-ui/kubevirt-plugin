@@ -6,19 +6,15 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { type InstanceTypeUnion } from '@kubevirt-utils/resources/instancetype/types';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { getNoModalChangesTooltip } from '@kubevirt-utils/utils/text';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
-import {
-  getGroupVersionKindForResource,
-  ResourceLink,
-} from '@openshift-console/dynamic-plugin-sdk';
-import { FormGroup, SelectOption } from '@patternfly/react-core';
+import { getCluster } from '@multicluster/helpers/selectors';
 
-import FormPFSelect from '../FormPFSelect/FormPFSelect';
 import TabModal from '../TabModal/TabModal';
+import InstanceTypeModalRedHatSeriesFields from './components/InstanceTypeModalRedHatSeriesFields';
+import InstanceTypeModalUserInstanceTypeSelect from './components/InstanceTypeModalUserInstanceTypeSelect';
 import InstanceTypeProviderRadios from './components/InstanceTypeProviderRadios';
 import useEditInstanceType from './hooks/useEditInstanceType';
+import useVisibleInstanceTypeSeriesEntries from './hooks/useVisibleInstanceTypeSeriesEntries';
 import { type InstanceTypeModalProps } from './utils/types';
-import { getInstanceTypeSizes } from './utils/util';
 
 const InstanceTypeModal: FC<InstanceTypeModalProps> = ({
   allInstanceTypes,
@@ -44,6 +40,12 @@ const InstanceTypeModal: FC<InstanceTypeModalProps> = ({
     userInstanceTypes,
   } = useEditInstanceType({ allInstanceTypes, instanceType });
 
+  const visibleSeriesEntries = useVisibleInstanceTypeSeriesEntries({
+    cluster: getCluster(vm),
+    instanceTypeName: getName(instanceType),
+    mappedInstanceTypes,
+  });
+
   const handleSubmit = (newInstanceType: InstanceTypeUnion): Promise<V1VirtualMachine> =>
     onSubmit(vm, newInstanceType);
 
@@ -65,83 +67,22 @@ const InstanceTypeModal: FC<InstanceTypeModalProps> = ({
         setRedHatProvided={setRedHatProvided}
       />
       {redHatProvided && (
-        <>
-          <FormGroup isRequired label={t('Series')}>
-            <FormPFSelect
-              onSelect={(_event, value): void => {
-                if (value !== series) {
-                  setSeries(value as string);
-                  setSize(undefined);
-                }
-              }}
-              placeholder={t('Select series')}
-              selected={series}
-              toggleProps={{ isFullWidth: true }}
-            >
-              {Object.entries(mappedInstanceTypes).map(([key, value]) => (
-                <SelectOption
-                  description={value.descriptionSeries}
-                  key={key}
-                  value={value.displayNameSeries}
-                >
-                  {value.displayNameSeries}
-                </SelectOption>
-              ))}
-            </FormPFSelect>
-          </FormGroup>
-          <FormGroup isRequired label={t('Size')}>
-            <FormPFSelect
-              onSelect={(_event, value): void => {
-                setSize(value as string);
-              }}
-              placeholder={t('Select size')}
-              selected={size}
-              toggleProps={{ isFullWidth: true }}
-            >
-              {getInstanceTypeSizes(mappedInstanceTypes, series)?.map((item) => (
-                <SelectOption key={item.prettyDisplaySize} value={item.prettyDisplaySize}>
-                  {item?.prettyDisplaySize}
-                </SelectOption>
-              ))}
-            </FormPFSelect>
-          </FormGroup>
-        </>
+        <InstanceTypeModalRedHatSeriesFields
+          mappedInstanceTypes={mappedInstanceTypes}
+          series={series}
+          setSeries={setSeries}
+          setSize={setSize}
+          size={size}
+          visibleSeriesEntries={visibleSeriesEntries}
+        />
       )}
       {!redHatProvided && (
-        <FormGroup isRequired label={t('InstanceType')}>
-          <FormPFSelect
-            onSelect={(_event, value: string): void => setSelectedName(value)}
-            placeholder={t('Select InstanceType')}
-            selected={selectedName}
-            selectedLabel={
-              selectedName && selectedInstanceType ? (
-                <ResourceLink
-                  groupVersionKind={getGroupVersionKindForResource(selectedInstanceType)}
-                  linkTo={false}
-                  name={selectedName}
-                />
-              ) : undefined
-            }
-            toggleProps={{ isFullWidth: true }}
-          >
-            {isEmpty(userInstanceTypes) ? (
-              <SelectOption isDisabled>{t('No options found')}</SelectOption>
-            ) : (
-              userInstanceTypes.map((instanceTypeItem) => {
-                const instanceTypeName = getName(instanceTypeItem);
-                return (
-                  <SelectOption key={instanceTypeName} value={instanceTypeName}>
-                    <ResourceLink
-                      groupVersionKind={getGroupVersionKindForResource(instanceTypeItem)}
-                      linkTo={false}
-                      name={instanceTypeName}
-                    />
-                  </SelectOption>
-                );
-              })
-            )}
-          </FormPFSelect>
-        </FormGroup>
+        <InstanceTypeModalUserInstanceTypeSelect
+          onSelectName={setSelectedName}
+          selectedInstanceType={selectedInstanceType}
+          selectedName={selectedName}
+          userInstanceTypes={userInstanceTypes}
+        />
       )}
     </TabModal>
   );
