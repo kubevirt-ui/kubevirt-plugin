@@ -1,0 +1,67 @@
+name: Cancel Hot Cluster E2E on PR Close
+run-name: 'Cancel Hot Cluster E2E [PR #${{ github.event.pull_request.number }}]'
+
+on:
+  pull_request_target:
+    types: [closed]
+
+permissions:
+  actions: write
+
+jobs:
+  # Best-effort bookkeeping only -- cancelWorkflowRun() below doesn't
+  # actually stop a uses: job (see cancel-e2e.yml's identical comment), and
+  # this listWorkflowRuns lookup can itself miss the run (API lag, or it
+  # hasn't reached in_progress/queued yet). The two jobs below are the real
+  # cancellation mechanism and must not depend on this job finding anything.
+  detect:
+    name: Detect Pending E2E Runs
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          persist-credentials: false
+          sparse-checkout: .github
+
+      - name: Setup scripts
+        uses: ./.github/actions/setup-gh-scripts
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+
+      - name: Find and cancel in-progress/queued hot-cluster-e2e runs for this PR
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        working-directory: .github/scripts
+        run: npx tsx src/e2e/cancel-on-close.ts
+
+  # Unconditional on every PR close, independent of detect above -- entering
+  # this group is the only mechanism that actually cancels a same-PR
+  # cluster-check in progress (see hot-cluster-e2e.yml's own concurrency on
+  # that job). Gating this on detect's findings would leave a real
+  # in-progress job running untouched whenever that lookup misses it (API
+  # lag, or the run hasn't reached in_progress/queued yet).
+  cancel-cluster-check:
+    name: Cancel Cluster Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    concurrency:
+      group: hot-cluster-check-${{ github.event.pull_request.number }}
+      cancel-in-progress: true
+    steps:
+      - run: echo "Entered the cluster-check concurrency group for PR ${{ github.event.pull_request.number }} -- cancels any in-progress instance."
+
+  # Same as above, for run-e2e-tests -- the job that actually costs real
+  # cluster/test time.
+  cancel-run-e2e-tests:
+    name: Cancel Run E2E Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    concurrency:
+      group: hot-cluster-run-e2e-${{ github.event.pull_request.number }}
+      cancel-in-progress: true
+    steps:
+      - run: echo "Entered the run-e2e-tests concurrency group for PR ${{ github.event.pull_request.number }} -- cancels any in-progress instance."

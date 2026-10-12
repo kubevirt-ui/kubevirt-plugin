@@ -8,3 +8,10 @@ i18n-scripts/
 cypress/gui-test-screenshots
 cypress/cypress-a11y-report.json
 /locales
+
+# Linted via eslintv10 / package-local config (hot-cluster + Playwright)
+playwright/
+playwright.config.ts
+.github/scripts/
+ci-scripts/
+eslintv10.config.mjs

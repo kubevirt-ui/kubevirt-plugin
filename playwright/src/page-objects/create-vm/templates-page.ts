@@ -1,0 +1,1230 @@
+/**
+ * Page object for the Templates list page.
+ */
+
+import { TestTimeouts } from '@/utils/test-config';
+import type { Locator, Page } from '@playwright/test';
+
+import PageCommons from '../page-commons';
+
+export default class TemplatesPage extends PageCommons {
+  private readonly _btnPlaceholderSelectProject = this.locator(
+    'button[placeholder="Select project"]',
+  );
+  private readonly _closeFilterLabelGroup = this.locator(
+    '[aria-label="Close label group"]',
+  ).first();
+  private readonly _columnsSaveButton = this.testId('save-button');
+  private readonly _filterToolbarClusterButton = this.testId('filter-toolbar')
+    .locator('button.pf-v6-c-menu-toggle')
+    .filter({ hasText: 'Cluster' })
+    .first();
+  private readonly _filterToolbarProjectButton = this.testId('filter-toolbar')
+    .locator('button.pf-v6-c-menu-toggle')
+    .filter({ hasText: 'Project' })
+    .first();
+  private readonly _footerSaveButton = this.locator('footer').locator('[data-test="save-button"]');
+
+  private readonly _inputSearchInput = this.locator('input[aria-label="Search input"]');
+  private readonly _provider = this.locator('#provider');
+  private readonly _roleMenuitem = this.locator('[role="menuitem"]');
+  private readonly _templateActionsDropdown = this.testId('actions-dropdown');
+  private readonly _tr = this.locator('tr');
+
+  constructor(page: Page) {
+    super(page);
+  }
+
+  private getTemplateActionsButton(templateName: string): Locator {
+    const row = this.getTemplateRow(templateName);
+    return row.getByTestId('actions-dropdown').locator('button').first();
+  }
+
+  private getTemplateRow(templateName: string): Locator {
+    return this.locator('tbody tr').filter({ hasText: templateName });
+  }
+
+  async areAllCreateOptionsVisibleAndEnabled(): Promise<boolean> {
+    const createTemplateButton = this.testId('item-create');
+    await createTemplateButton.waitFor({
+      state: 'visible',
+      timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+    });
+    await this.robustClick(createTemplateButton);
+
+    const options = ['From an existing template', 'From a virtual machine', 'With YAML'];
+    try {
+      for (const option of options) {
+        const menuItem = this.page.getByRole('menuitem', { name: option });
+        const isVisible = await menuItem
+          .isVisible({ timeout: TestTimeouts.UI_DELAY_MEDIUM })
+          .catch(() => false);
+        if (!isVisible) return false;
+
+        const isDisabled = await menuItem.getAttribute('aria-disabled');
+        if (isDisabled === 'true') return false;
+      }
+      return true;
+    } finally {
+      await this.page.keyboard.press('Escape');
+    }
+  }
+
+  async clickCloneModalCloneButton() {
+    await this.robustClick(this.locator('button:has-text("Clone")'));
+  }
+
+  async clickCloneTemplate(templateName: string) {
+    const actionsButton = this.getTemplateActionsButton(templateName);
+    await this.robustClick(actionsButton);
+    await this.robustClick(this.page.getByRole('menuitem', { name: 'Clone' }));
+  }
+
+  async clickCreateButtonInModal() {
+    const createButton = this.testId('save-changes').or(this.locator('button:has-text("Create")'));
+    await createButton.first().waitFor({ state: 'visible', timeout: TestTimeouts.UI_DELAY_LONG });
+    await this.robustClick(createButton.first());
+    await this.page.waitForTimeout(TestTimeouts.RETRY_DELAY);
+  }
+
+  async clickCreateTemplate() {
+    const createTemplateButton = this.testId('item-create');
+    await createTemplateButton.waitFor({
+      state: 'visible',
+      timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+    });
+    await this.robustClick(createTemplateButton);
+
+    const yamlOption = this.page.getByRole('menuitem', { name: 'With YAML' });
+    const hasDropdown = await yamlOption
+      .isVisible({ timeout: TestTimeouts.UI_DELAY_MEDIUM })
+      .catch(() => false);
+    if (hasDropdown) {
+      await this.robustClick(yamlOption);
+    }
+  }
+
+  async clickCreateTemplateOption(
+    option: 'From an existing template' | 'From a virtual machine' | 'With YAML',
+  ): Promise<void> {
+    await this.ensureOnTemplatesListPage();
+    const createTemplateButton = this.testId('item-create');
+    await createTemplateButton.waitFor({
+      state: 'visible',
+      timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+    });
+    await this.robustClick(createTemplateButton);
+
+    const menuItem = this.page.getByRole('menuitem', { name: option });
+    await menuItem.waitFor({ state: 'visible', timeout: TestTimeouts.DEFAULT });
+    await this.robustClick(menuItem);
+  }
+
+  async clickEditBootSourceReference(templateName: string) {
+    const actionsButton = this.getTemplateActionsButton(templateName);
+    await this.robustClick(actionsButton);
+    await this.robustClick(this.locator('button:has-text("Edit boot source reference")'));
+  }
+
+  async clickFooterSaveButton() {
+    await this.robustClick(this._footerSaveButton);
+  }
+
+  override async clickTemplateByTestId(templateName: string) {
+    const templateLink = this.testId(templateName);
+
+    const loadingSpinner = this.locator('.pf-v6-c-spinner, .pf-c-spinner').or(
+      this.testId('loading'),
+    );
+    await loadingSpinner
+      .waitFor({ state: 'hidden', timeout: TestTimeouts.UI_DELAY_MEDIUM })
+      .catch(() => {
+        return;
+      });
+
+    await templateLink.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+
+    const urlBefore = this.page.url();
+    const maxAttempts = 3;
+
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      await this.page.waitForTimeout(TestTimeouts.UI_ANIMATION_DELAY);
+
+      try {
+        await templateLink.click({ timeout: TestTimeouts.UI_DELAY_MEDIUM });
+      } catch {
+        await templateLink.dispatchEvent('click');
+      }
+
+      try {
+        await this.page.waitForURL((url) => url.href !== urlBefore, { timeout: 8000 });
+        await this.page.waitForLoadState('domcontentloaded');
+        return;
+      } catch {
+        if (attempt < maxAttempts) {
+          await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
+        }
+      }
+    }
+
+    await this.robustClick(templateLink);
+  }
+
+  /**
+   * Clone a template via "Create → From an existing template" modal.
+   * Opens the modal, selects the source template, fills target fields, and submits.
+   */
+  async cloneTemplateFromExisting(opts: {
+    sourceTemplateName: string;
+    newTemplateName: string;
+    sourceProject?: string;
+    targetProject?: string;
+    displayName?: string;
+    provider?: string;
+  }): Promise<void> {
+    await this.clickCreateTemplateOption('From an existing template');
+
+    const dialog = this.page.getByRole('dialog');
+    await dialog.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+
+    if (opts.sourceProject) {
+      const sourceProjectBtn = dialog
+        .locator('button')
+        .filter({ hasText: /Source template project/ });
+      if (await sourceProjectBtn.count()) {
+        await this.robustClick(
+          dialog
+            .locator('button')
+            .filter({ hasText: /Project/ })
+            .first(),
+        );
+        const searchInput = dialog.locator('[role="listbox"]').locator('input[type="text"]');
+        if (
+          await searchInput.isVisible({ timeout: TestTimeouts.UI_DELAY_SHORT }).catch(() => false)
+        ) {
+          await searchInput.fill(opts.sourceProject);
+        }
+        await this.robustClick(
+          dialog.locator(`[role="option"]`).filter({ hasText: opts.sourceProject }),
+        );
+      }
+    }
+
+    const templateDropdown = dialog.locator('button').filter({ hasText: 'Select a template' });
+    await this.robustClick(templateDropdown);
+    await this.robustClick(
+      dialog.locator('[role="option"]').filter({ hasText: opts.sourceTemplateName }),
+    );
+
+    const nameInput = dialog.locator('#templateName');
+    await nameInput.clear();
+    await nameInput.fill(opts.newTemplateName);
+
+    if (opts.targetProject) {
+      const projectBtn = dialog.locator('button').filter({ hasText: 'Select project' });
+      await this.robustClick(projectBtn);
+      const searchInput = dialog.locator('[role="listbox"]').locator('input[type="text"]');
+      if (
+        await searchInput.isVisible({ timeout: TestTimeouts.UI_DELAY_SHORT }).catch(() => false)
+      ) {
+        await searchInput.fill(opts.targetProject);
+      }
+      await this.robustClick(
+        dialog.locator('[role="option"]').filter({ hasText: opts.targetProject }),
+      );
+    }
+
+    if (opts.displayName) {
+      const displayInput = dialog.locator('#templateDisplayName');
+      await displayInput.clear();
+      await displayInput.fill(opts.displayName);
+    }
+
+    if (opts.provider) {
+      const providerInput = dialog.locator('#templateProvider');
+      await providerInput.clear();
+      await providerInput.fill(opts.provider);
+    }
+
+    const cloneBtn = dialog.locator('footer button').filter({ hasText: 'Clone' });
+    await this.robustClick(cloneBtn);
+  }
+
+  async closeDialog(): Promise<void> {
+    await this.page.keyboard.press('Escape');
+  }
+
+  async closeFilterLabelGroup(): Promise<void> {
+    await this._closeFilterLabelGroup.waitFor({
+      state: 'visible',
+      timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+    });
+    await this.robustClick(this._closeFilterLabelGroup);
+  }
+
+  async deleteTemplate() {
+    await this.robustClick(this._templateActionsDropdown);
+    await this.robustClick(this.page.getByRole('menuitem', { name: 'Delete' }));
+    await this.robustClick(this._footerSaveButton);
+  }
+
+  async deleteTemplateFromList(templateName: string) {
+    const actionsButton = this.getTemplateActionsButton(templateName);
+    await this.robustClick(actionsButton);
+    await this.robustClick(this.page.getByRole('menuitem', { name: 'Delete' }));
+    await this.robustClick(this._footerSaveButton);
+  }
+
+  async editBootSourceForDisk(diskName: string) {
+    await this.robustClick(this._templateActionsDropdown);
+    await this.robustClick(this.testId('edit-boot-source'));
+
+    const diskRow = this._tr.filter({ hasText: diskName });
+    const diskToggle = diskRow.locator('#toggle-id-disk');
+    await this.robustClick(diskToggle);
+
+    await this.robustClick(
+      this._roleMenuitem.filter({
+        hasText: 'Edit',
+      }),
+    );
+    await this.locator('#enable-bootsource').check({ force: true });
+    await this.robustClick(this._footerSaveButton);
+  }
+
+  async editCategoryFromDetails(category: string): Promise<void> {
+    const categoryValue = this.locator('[data-test="template-category"]');
+    await categoryValue.waitFor({
+      state: 'visible',
+      timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+    });
+    await this.robustClick(categoryValue);
+
+    const modal = this.locator('[role="dialog"]');
+    await modal.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+    const categorySelect = modal.locator('[data-test="template-category-select"]');
+    const categoryInput = categorySelect.locator('input[role="combobox"]');
+    await this.robustClick(categoryInput);
+    await categoryInput.fill(category);
+    const categoryOption = this.page.getByRole('option', { name: category, exact: true }).first();
+    await categoryOption.waitFor({
+      state: 'visible',
+      timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+    });
+    await this.robustClick(categoryOption);
+
+    const saveButton = modal.locator('button:has-text("Save")').last();
+    await this.robustClick(saveButton);
+    await modal.waitFor({ state: 'hidden', timeout: TestTimeouts.UI_ACTION_COMPLETE });
+  }
+
+  async fillCloneTemplateModal(
+    metadataName: string,
+    displayName?: string,
+    provider?: string,
+    namespace?: string,
+  ) {
+    const dialog = this.page.getByRole('dialog');
+    await dialog.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+
+    const nameInput = dialog.locator(
+      'input[id="name"], input[id="templateName"], input#clone-name',
+    );
+    await nameInput
+      .first()
+      .waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+    await nameInput.first().clear();
+    await nameInput.first().fill(metadataName);
+
+    if (displayName) {
+      const displayInput = dialog.locator(
+        'input[id="display-name"], input[id="templateDisplayName"]',
+      );
+      if (
+        await displayInput
+          .first()
+          .isVisible({ timeout: TestTimeouts.UI_DELAY_SHORT })
+          .catch(() => false)
+      ) {
+        await displayInput.first().clear();
+        await displayInput.first().fill(displayName);
+      }
+    }
+
+    if (namespace) {
+      const projectBtn = dialog.locator('button').filter({ hasText: /Select project|Project/ });
+      if (
+        await projectBtn
+          .first()
+          .isVisible({ timeout: TestTimeouts.UI_DELAY_SHORT })
+          .catch(() => false)
+      ) {
+        await this.robustClick(projectBtn.first());
+        const searchInput = dialog.locator('[role="listbox"]').locator('input[type="text"]');
+        if (
+          await searchInput.isVisible({ timeout: TestTimeouts.UI_DELAY_SHORT }).catch(() => false)
+        ) {
+          await searchInput.fill(namespace);
+        }
+        await this.robustClick(dialog.locator('[role="option"]').filter({ hasText: namespace }));
+      }
+    }
+
+    if (provider) {
+      const providerInput = dialog.locator('input[id="provider"], input[id="templateProvider"]');
+      if (
+        await providerInput
+          .first()
+          .isVisible({ timeout: TestTimeouts.UI_DELAY_SHORT })
+          .catch(() => false)
+      ) {
+        await providerInput.first().clear();
+        await providerInput.first().fill(provider);
+      }
+    }
+  }
+
+  /** Prefer OpenShift-templates toggle (4.23+); fall back to legacy/main filter controls. */
+  async filterByOpenShiftOrDefaultTemplates(): Promise<void> {
+    const openshiftToggle = this.page.locator('#templates-type-openshift');
+    const toggleVisible = await openshiftToggle
+      .isVisible({ timeout: TestTimeouts.UI_STABILIZE })
+      .catch(() => false);
+    if (toggleVisible) {
+      const selected = await openshiftToggle.getAttribute('aria-pressed');
+      if (selected !== 'true') {
+        await this.robustClick(openshiftToggle);
+      }
+      await this.page.waitForLoadState('domcontentloaded').catch(() => undefined);
+      await this.page.waitForTimeout(TestTimeouts.UI_FILTER_APPLY / 3);
+      return;
+    }
+
+    const legacyTemplatesCheckbox = this.locator(
+      '[data-test-row-filter="templates"] [type="checkbox"]',
+    );
+    const legacyVisible = await legacyTemplatesCheckbox
+      .isVisible({ timeout: TestTimeouts.UI_STABILIZE })
+      .catch(() => false);
+    if (legacyVisible) {
+      const isChecked = await legacyTemplatesCheckbox.isChecked().catch(() => false);
+      if (!isChecked) {
+        await this.robustClick(legacyTemplatesCheckbox);
+      }
+      await this.page.waitForLoadState('domcontentloaded').catch(() => undefined);
+      await this.page.waitForTimeout(TestTimeouts.UI_FILTER_APPLY / 3);
+      return;
+    }
+
+    const filterToolbarVisible = await this.testId('filter-toolbar')
+      .isVisible({ timeout: TestTimeouts.UI_DELAY_SHORT })
+      .catch(() => false);
+    if (filterToolbarVisible) {
+      await this.filterByDefaultTemplates();
+    }
+  }
+
+  async filterByDefaultTemplates() {
+    await this.openFilterDropdown();
+    const newRadio = this.locator('input[data-test-row-filter="default"]');
+    const oldCheckbox = this.locator('[data-test-row-filter="templates"] [type="checkbox"]');
+    const isNewVisible = await newRadio
+      .isVisible({ timeout: TestTimeouts.UI_STABILIZE })
+      .catch(() => false);
+    if (isNewVisible) {
+      const isChecked = await newRadio.isChecked().catch(() => false);
+      if (!isChecked) {
+        await newRadio.click({ force: true });
+      }
+      await this.page.waitForLoadState('domcontentloaded').catch(() => undefined);
+      await this.page.waitForTimeout(TestTimeouts.UI_FILTER_APPLY / 3);
+      return;
+    }
+    const isOldVisible = await oldCheckbox
+      .isVisible({ timeout: TestTimeouts.UI_STABILIZE })
+      .catch(() => false);
+    if (!isOldVisible) {
+      await this.openFilterDropdown();
+    }
+    await oldCheckbox.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+    const isChecked = await oldCheckbox.isChecked();
+    if (!isChecked) {
+      await oldCheckbox.click({ force: true });
+    }
+  }
+
+  async filterByOS(os: 'rhel' | 'windows' | 'fedora' | 'centos') {
+    await this.openFilterDropdown();
+    const filterCheckbox = this.locator(`[data-test-row-filter="${os}"] [type="checkbox"]`).first();
+    const isVisible = await filterCheckbox
+      .isVisible({ timeout: TestTimeouts.UI_STABILIZE })
+      .catch(() => false);
+    if (!isVisible) {
+      await this.openFilterDropdown();
+    }
+    await filterCheckbox.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+    const isChecked = await filterCheckbox.isChecked();
+    if (!isChecked) {
+      await filterCheckbox.click({ force: true });
+    }
+  }
+
+  async filterByProvider(provider: string) {
+    await this.openFilterDropdown();
+    const filterCheckbox = this.locator(
+      `[data-test-row-filter="${provider}"] [type="checkbox"]`,
+    ).first();
+    const isVisible = await filterCheckbox
+      .isVisible({ timeout: TestTimeouts.UI_STABILIZE })
+      .catch(() => false);
+    if (!isVisible) {
+      await this.openFilterDropdown();
+    }
+    await filterCheckbox.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+    const isChecked = await filterCheckbox.isChecked();
+    if (!isChecked) {
+      await filterCheckbox.click({ force: true });
+    }
+  }
+
+  /**
+   * Filter by template type (OpenShift-provided vs user VirtualMachine templates).
+   */
+  async filterByType(type: 'templates' | 'vm-templates') {
+    await this.openFilterDropdown();
+    const filterCheckbox = this.locator(
+      `[data-test-row-filter="${type}"] [type="checkbox"]`,
+    ).first();
+    const isVisible = await filterCheckbox
+      .isVisible({ timeout: TestTimeouts.UI_STABILIZE })
+      .catch(() => false);
+    if (!isVisible) {
+      await this.openFilterDropdown();
+    }
+    await filterCheckbox.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+    const isChecked = await filterCheckbox.isChecked();
+    if (!isChecked) {
+      await filterCheckbox.click({ force: true });
+    }
+  }
+
+  /** Wait until the templates list name filter (`data-test="item-filter"`) is ready. */
+  async waitForTemplatesNameFilterReady(
+    timeout: number = TestTimeouts.UI_ELEMENT_VISIBILITY,
+  ): Promise<void> {
+    const nameFilter = this.testId('item-filter')
+      .or(this.testId('name-filter-input'))
+      .or(this.locator('input[placeholder="Search by name..."]'))
+      .or(this._inputSearchInput);
+    await nameFilter.first().waitFor({ state: 'visible', timeout });
+  }
+
+  private async getTemplateNameFilterInput(): Promise<Locator> {
+    await this.waitForTemplatesNameFilterReady();
+    const itemFilter = this.testId('item-filter').first();
+    if (await itemFilter.isVisible().catch(() => false)) {
+      return itemFilter;
+    }
+    return this.testId('name-filter-input')
+      .or(this.locator('input[placeholder="Search by name..."]'))
+      .or(this._inputSearchInput)
+      .first();
+  }
+
+  /** Filter the templates list by name (uses `data-test="item-filter"` when present). */
+  async filterTemplatesByName(templateName: string): Promise<void> {
+    const templateNameFilter = await this.getTemplateNameFilterInput();
+    await templateNameFilter.scrollIntoViewIfNeeded();
+    await this.robustClick(templateNameFilter);
+    await templateNameFilter.clear();
+    await templateNameFilter.fill(templateName);
+    await templateNameFilter.press('Enter');
+    await templateNameFilter.press('Tab');
+    await this.page.waitForTimeout(TestTimeouts.UI_FILTER_APPLY / 3);
+    await this.page
+      .waitForLoadState('domcontentloaded', { timeout: TestTimeouts.UI_ACTION_COMPLETE })
+      .catch(() => {
+        return;
+      });
+  }
+
+  /** Name search + row visibility (used after create flows; list can be paginated). */
+  async isTemplateListedByName(templateName: string): Promise<boolean> {
+    await this.filterTemplatesByName(templateName);
+    if (await this.isTemplateVisible(templateName)) {
+      return true;
+    }
+    const row = this.locator('tbody tr').filter({ has: this.testId(templateName) });
+    try {
+      await row.first().waitFor({ state: 'visible', timeout: TestTimeouts.UI_DELAY_MEDIUM });
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  async hasBadgeInTemplateRow(templateName: string, badgeText: string): Promise<boolean> {
+    const row = this.getTemplateRow(templateName);
+    const badge = row.locator(`text=${badgeText}`);
+    try {
+      await badge.waitFor({ state: 'visible', timeout: TestTimeouts.UI_DELAY_MEDIUM });
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  async hasCategoryInTemplateRow(templateName: string, category: string): Promise<boolean> {
+    const row = this.getTemplateRow(templateName);
+    const categoryCell = row.locator(`[data-test="template-category-${templateName}"]`);
+    try {
+      await categoryCell.waitFor({ state: 'visible', timeout: TestTimeouts.UI_DELAY_MEDIUM });
+      const text = await categoryCell.textContent();
+      return text?.trim() === category;
+    } catch {
+      return false;
+    }
+  }
+
+  async isBaseTemplateVisible(templateName: string): Promise<boolean> {
+    const baseTemplateElement = this.testId(templateName);
+    await baseTemplateElement
+      .waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY })
+      .catch(() => {
+        return;
+      });
+    return await baseTemplateElement.isVisible().catch(() => false);
+  }
+
+  async isCategoryVisibleOnDetails(category: string): Promise<boolean> {
+    const categoryValue = this.locator('[data-test="template-category"]');
+    try {
+      await categoryValue.waitFor({
+        state: 'visible',
+        timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+      });
+      const text = await categoryValue.textContent();
+      return text?.includes(category) ?? false;
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * Opens the column manager and returns whether the given column checkbox is currently checked.
+   */
+  async isColumnEnabled(
+    columnName: 'namespace' | 'category' | 'architecture' | 'cpu',
+  ): Promise<boolean> {
+    const columnManagementButton = this.testId('manage-columns');
+    await columnManagementButton.waitFor({
+      state: 'visible',
+      timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+    });
+    await this.robustClick(columnManagementButton);
+    const idMap: Record<string, string> = {
+      namespace: '#data-list-namespace',
+      category: '#data-list-category',
+      architecture: '#data-list-architecture',
+      cpu: '#data-list-cpu',
+    };
+    const checkbox = this.locator(idMap[columnName]);
+    await checkbox.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+    const checked = await checkbox.isChecked();
+    await this.page.keyboard.press('Escape');
+    await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
+    return checked;
+  }
+
+  /**
+   * Returns true if the create template modal shows visible cluster and namespace selection (Fleet ACM).
+   */
+  async isCreateTemplateModalShowingClusterAndNamespaceOptions(): Promise<boolean> {
+    try {
+      const clusterToggle = this.testId('cluster-dropdown-menu-toggle').first();
+      const namespaceToggle = this.testId('namespace-dropdown-menu-toggle').first();
+      await clusterToggle.waitFor({
+        state: 'visible',
+        timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+      });
+      await namespaceToggle.waitFor({
+        state: 'visible',
+        timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+      });
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  async isDiskBootable(diskName: string): Promise<boolean> {
+    const diskRow = this._tr.filter({ hasText: diskName });
+    await diskRow.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+
+    const bootableText = diskRow.locator('text=bootable');
+    await bootableText
+      .waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY })
+      .catch(() => {
+        return;
+      });
+    const isBootable = await bootableText.isVisible().catch(() => false);
+
+    return isBootable;
+  }
+
+  async isEmptyMessageVisible(): Promise<boolean> {
+    try {
+      const filterEmpty = this.page.getByText('No templates found');
+      const namespaceEmpty = this.page.getByText("You don't have any templates yet");
+      const combined = filterEmpty.or(namespaceEmpty);
+      await combined.first().waitFor({
+        state: 'visible',
+        timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+      });
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  async isTemplateNameLinkVisible(templateMetadataName: string): Promise<boolean> {
+    const templateLocator = this.testId(`${templateMetadataName}-name`);
+    await templateLocator
+      .waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY })
+      .catch(() => {
+        return;
+      });
+    return await templateLocator.isVisible().catch(() => false);
+  }
+
+  async isTemplateVisible(templateMetadataName: string): Promise<boolean> {
+    const templateLocator = this.testId(templateMetadataName);
+    try {
+      await templateLocator.waitFor({ state: 'visible', timeout: TestTimeouts.UI_DELAY_MEDIUM });
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  private async isTemplatesPageNotFound(): Promise<boolean> {
+    return await this.page
+      .getByRole('heading', { name: /page not found/i })
+      .isVisible({ timeout: TestTimeouts.UI_DELAY_SHORT })
+      .catch(() => false);
+  }
+
+  private async isTemplatesListHeadingVisible(
+    timeout = TestTimeouts.UI_DELAY_MEDIUM,
+  ): Promise<boolean> {
+    if (await this.isTemplatesPageNotFound()) {
+      return false;
+    }
+    return await this.page
+      .getByRole('heading', { name: 'Templates', level: 1 })
+      .isVisible({ timeout })
+      .catch(() => false);
+  }
+
+  /** Recover from vm-templates 404 or other bad routes before interacting with the list. */
+  async ensureOnTemplatesListPage(): Promise<void> {
+    if (await this.isTemplatesListHeadingVisible()) {
+      return;
+    }
+    await this.navigateToAllNamespacesTemplates();
+    if (!(await this.isTemplatesListHeadingVisible(TestTimeouts.UI_ELEMENT_VISIBILITY))) {
+      throw new Error('Templates list page did not load (expected Templates heading)');
+    }
+  }
+
+  /**
+   * Navigates to the all-namespaces Templates list page via URL.
+   * @deprecated Use navigateToTemplatesViaUI() for more reliable navigation
+   */
+  async navigateToAllNamespacesTemplates(): Promise<void> {
+    const openshift = '/k8s/all-namespaces/template.openshift.io~v1~Template';
+    const native = '/k8s/all-namespaces/vm-templates';
+
+    for (const path of [openshift, native]) {
+      await this.goTo(path);
+      await this.page.waitForLoadState('domcontentloaded');
+      if (await this.isTemplatesPageNotFound()) {
+        continue;
+      }
+      if (await this.isTemplatesListHeadingVisible()) {
+        return;
+      }
+    }
+
+    await this.goTo(openshift);
+    await this.page.waitForLoadState('domcontentloaded');
+    await this.page
+      .getByRole('heading', { name: 'Templates', level: 1 })
+      .waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+  }
+
+  /**
+   * Navigates to Templates page for a specific namespace via sidebar UI click.
+   * @param namespace - The namespace to switch to
+   */
+  async navigateToNamespaceTemplatesViaUI(namespace: string): Promise<void> {
+    await this.clickNavTemplates();
+    await this.switchToNamespace(namespace);
+  }
+
+  async navigateToProjectTemplates(
+    projectName: string,
+    options?: { preferNativeTemplates?: boolean },
+  ): Promise<void> {
+    const openshift = `/k8s/ns/${projectName}/template.openshift.io~v1~Template`;
+    const native = `/k8s/ns/${projectName}/vm-templates`;
+    const paths = options?.preferNativeTemplates ? [native, openshift] : [openshift, native];
+    for (const path of paths) {
+      await this.goTo(path);
+      await this.page.waitForLoadState('domcontentloaded');
+      if (await this.isTemplatesPageNotFound()) {
+        continue;
+      }
+      if (await this.isTemplatesListHeadingVisible()) {
+        await this.waitForTemplatesNameFilterReady().catch(() => undefined);
+        return;
+      }
+    }
+  }
+
+  async navigateToTemplateDetail(templateName: string) {
+    const row = this.getTemplateRow(templateName);
+    const templateLink = row
+      .getByTestId(templateName)
+      .or(row.locator('a'))
+      .filter({ hasText: templateName })
+      .first();
+    await this.robustClick(templateLink);
+  }
+
+  /**
+   * Navigates to Templates page by clicking [data-test="templates-nav-item"] (Fleet context).
+   * Expands the Virtualization nav section first so the item is visible.
+   */
+  async navigateToTemplatesViaTemplatesNavItem(): Promise<void> {
+    await this.expandVirtualizationNavSection();
+    const navItem = this.testId('templates-nav-item');
+    await navItem.waitFor({
+      state: 'visible',
+      timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+    });
+    await this.robustClick(navItem);
+    await this.page.waitForLoadState('load', {
+      timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+    });
+  }
+
+  /**
+   * Navigates to Templates page via sidebar UI click, falling back to URL navigation.
+   */
+  async navigateToTemplatesViaUI(): Promise<void> {
+    await this.navigateViaSidebarWithFallback(
+      async () => {
+        const navigated = await this.clickNavTemplates();
+        if (!navigated) return false;
+        const headingVisible = await this.page
+          .getByRole('heading', { name: 'Templates', level: 1 })
+          .isVisible({ timeout: TestTimeouts.UI_DELAY_MEDIUM })
+          .catch(() => false);
+        return headingVisible;
+      },
+      () => this.navigateToAllNamespacesTemplates(),
+    );
+
+    await this.ensureOnTemplatesListPage();
+  }
+
+  async openClusterFilter(): Promise<void> {
+    await this._filterToolbarClusterButton.waitFor({
+      state: 'visible',
+      timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+    });
+    await this.robustClick(this._filterToolbarClusterButton);
+  }
+
+  async openFilterDropdown() {
+    const dropdownMenu = this.locator('[data-test-row-filter]').first();
+    const isVisible = await dropdownMenu
+      .isVisible({ timeout: TestTimeouts.UI_STABILIZE })
+      .catch(() => false);
+
+    if (!isVisible) {
+      await this.robustClick(this.testId('filter-toolbar').getByTestId('filter-dropdown-toggle'));
+      await dropdownMenu.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+    }
+  }
+
+  async openProjectFilter(): Promise<void> {
+    await this._filterToolbarProjectButton.waitFor({
+      state: 'visible',
+      timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+    });
+    await this.robustClick(this._filterToolbarProjectButton);
+  }
+
+  async resetColumns() {
+    const columnManagementButton = this.testId('manage-columns');
+    await columnManagementButton.waitFor({
+      state: 'visible',
+      timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+    });
+    await this.page.waitForTimeout(TestTimeouts.UI_DELAY_EXTRA);
+    await this.robustClick(columnManagementButton);
+    const resetColumnsButton = this.testId('reset-button');
+    await resetColumnsButton.waitFor({
+      state: 'visible',
+      timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+    });
+    await this.robustClick(resetColumnsButton);
+    await this.robustClick(this._columnsSaveButton);
+  }
+
+  async selectClusterInFilterMenu(clusterName: string): Promise<void> {
+    const checkboxOption = this.locator('#checkbox-select li', { hasText: clusterName }).first();
+    const menuitemOption = this._roleMenuitem.filter({ hasText: clusterName }).first();
+    const option = (await checkboxOption.isVisible().catch(() => false))
+      ? checkboxOption
+      : menuitemOption;
+    await option.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+    await this.robustClick(option);
+  }
+
+  async selectNamespaceInFilterMenu(namespaceName: string): Promise<void> {
+    const menuitem = this._roleMenuitem.filter({ hasText: namespaceName }).first();
+    await menuitem.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+    await this.robustClick(menuitem);
+  }
+
+  async selectPvcAsBootSource(projectName: string, pvcName: string) {
+    await this.robustClick(this.locator('button:has-text("Select boot source")'));
+    await this.robustClick(this.testId('disk-source-select-persistentVolumeClaim'));
+    await this.robustClick(this.locator('text=--- Select PVC project ---'));
+    await this.clickButtonByText(projectName);
+    await this.robustClick(this.locator('.pf-c-form-control.pf-c-select__toggle-typeahead'));
+    await this.page.waitForTimeout(TestTimeouts.UI_DELAY_EXTRA);
+    await this.clickButtonByText(pvcName);
+  }
+
+  /**
+   * Sets the template name in the create-template-from-example YAML editor.
+   */
+  async setCreateTemplateExampleNameInYamlEditor(
+    templateName: string,
+    namespace?: string,
+  ): Promise<void> {
+    await this.page.waitForSelector('.monaco-editor', {
+      state: 'visible',
+      timeout: TestTimeouts.ELEMENT_WAIT,
+    });
+
+    await this.page.waitForFunction(
+      () => {
+        const w = window as unknown as {
+          monaco?: {
+            editor?: {
+              getEditors: () => Array<{
+                getModel: () => { getValue: () => string } | null | undefined;
+              }>;
+            };
+          };
+        };
+        const editors = w.monaco?.editor?.getEditors();
+        return Boolean(editors && editors.length > 0 && editors[0].getModel());
+      },
+      { timeout: TestTimeouts.UI_VISIBILITY_QUICK as number },
+    );
+
+    const content = await this.page.evaluate(() => {
+      try {
+        const w = window as unknown as {
+          monaco?: {
+            editor?: {
+              getEditors: () => Array<{
+                getModel: () => { getValue: () => string } | null | undefined;
+              }>;
+            };
+          };
+        };
+        const editors = w.monaco?.editor?.getEditors();
+        if (editors && editors.length > 0) {
+          const editor = editors[0];
+          const model = editor.getModel();
+          if (model) return model.getValue();
+        }
+      } catch {}
+      return null;
+    });
+
+    if (!content) {
+      throw new Error('Could not get create-template YAML editor content');
+    }
+
+    let updated = content
+      .replace(/\bname: example\b/, `name: ${templateName}`)
+      .replace(/vm\.kubevirt\.io\/template: example\b/, `vm.kubevirt.io/template: ${templateName}`);
+
+    if (namespace) {
+      updated = updated.replace(/^(\s*namespace:\s+)\S+/m, `$1${namespace}`);
+    }
+
+    await this.fillYamlEditor(updated);
+  }
+
+  async toggleColumn(
+    columnName: 'namespace' | 'workload' | 'category' | 'architecture' | 'cpu',
+  ): Promise<void> {
+    const columnManagementButton = this.testId('manage-columns');
+    await columnManagementButton.waitFor({
+      state: 'visible',
+      timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+    });
+    await this.page.waitForTimeout(TestTimeouts.UI_DELAY_EXTRA);
+    await this.robustClick(columnManagementButton);
+    let checkbox;
+    switch (columnName) {
+      case 'namespace':
+        checkbox = this.locator('#data-list-namespace');
+        break;
+      case 'workload':
+        checkbox = this.locator('#data-list-workload');
+        break;
+      case 'category':
+        checkbox = this.locator('#data-list-category');
+        break;
+      case 'architecture':
+        checkbox = this.locator('#data-list-architecture');
+        break;
+      case 'cpu':
+        checkbox = this.locator('#data-list-cpu');
+        break;
+    }
+    await checkbox.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+    await checkbox.click({ force: true });
+    await this.robustClick(this._columnsSaveButton);
+    await this.page.waitForTimeout(TestTimeouts.UI_DELAY_EXTRA);
+  }
+
+  async verifyCloneDialogOpen(): Promise<{
+    dialogVisible: boolean;
+    cloneEnabled: boolean;
+    hasSourceProjectSelector: boolean;
+    templateNameValue: string;
+  }> {
+    const dialog = this.page.getByRole('dialog');
+    const dialogVisible = await dialog
+      .waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY })
+      .then(() => true)
+      .catch(() => false);
+
+    const hasSourceProjectSelector = await this.page
+      .getByText('Source template project')
+      .isVisible()
+      .catch(() => false);
+
+    const templateNameInput = dialog.getByRole('textbox', { name: 'Template name' });
+    const templateNameValue = await templateNameInput.inputValue().catch(() => '');
+
+    const cloneButton = dialog.locator('footer button').filter({ hasText: 'Clone' });
+    const cloneEnabled = await cloneButton.isEnabled().catch(() => false);
+
+    return { dialogVisible, cloneEnabled, hasSourceProjectSelector, templateNameValue };
+  }
+
+  /**
+   * Verifies the filter toolbar contains Cluster and Project filter buttons (Fleet ACM).
+   */
+  async verifyClusterAndProjectFilterButtonsVisible(): Promise<boolean> {
+    try {
+      await this._filterToolbarClusterButton.waitFor({
+        state: 'visible',
+        timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+      });
+      await this._filterToolbarProjectButton.waitFor({
+        state: 'visible',
+        timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+      });
+      return (
+        (await this._filterToolbarClusterButton.isVisible()) &&
+        (await this._filterToolbarProjectButton.isVisible())
+      );
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * Outcome of Create template → "From a virtual machine": VM list URL and guidance toast.
+   */
+  async verifyNavigatedToVmsPage(): Promise<{ onVmList: boolean; toastVisible: boolean }> {
+    const toastVisiblePromise = this.page
+      .getByText('To create a template from a VM', { exact: false })
+      .waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY })
+      .then(() => true)
+      .catch(() => false);
+
+    let onVmList = false;
+    try {
+      await this.page.waitForURL(
+        (url) => url.href.includes('tab=vms') && /VirtualMachine/i.test(url.pathname),
+        { timeout: TestTimeouts.UI_ACTION_COMPLETE },
+      );
+      onVmList = true;
+    } catch {
+      onVmList = false;
+    }
+
+    return { onVmList, toastVisible: await toastVisiblePromise };
+  }
+
+  override async verifyPageLoaded(
+    templateNameOrIndicators?: string | string[],
+    includeCreateButton?: boolean,
+    timeout?: number,
+  ): Promise<boolean> {
+    if (typeof templateNameOrIndicators === 'string') {
+      const templateName = templateNameOrIndicators;
+      await this.page.waitForLoadState('domcontentloaded');
+      await this.page.waitForTimeout(TestTimeouts.UI_STABILIZE);
+
+      const templateNameLocator = this.testId(templateName);
+      try {
+        await templateNameLocator.waitFor({
+          state: 'visible',
+          timeout: timeout || TestTimeouts.DEFAULT,
+        });
+        return await templateNameLocator.isVisible().catch(() => false);
+      } catch {
+        return false;
+      }
+    }
+    const indicators = Array.isArray(templateNameOrIndicators) ? templateNameOrIndicators : [];
+    if (indicators.length === 0) {
+      const templateNameLocator = this.testId('template-name');
+      const createButton = this.testId('item-create');
+      const indicator = includeCreateButton
+        ? templateNameLocator.or(createButton)
+        : templateNameLocator;
+      try {
+        await indicator.first().waitFor({
+          state: 'visible',
+          timeout: timeout || TestTimeouts.UI_VISIBILITY_QUICK,
+        });
+        return true;
+      } catch {
+        return false;
+      }
+    }
+    return await super.verifyPageLoaded(indicators, includeCreateButton, timeout);
+  }
+
+  /**
+   * After submitting the create-template YAML form, waits for navigation away from the `~new`
+   * creation URL and verifies that the redirect lands on the correct fleet-virtualization templates
+   * detail URL.
+   */
+  async verifyRedirectAfterTemplateCreation(): Promise<{ isValid: boolean; url: string }> {
+    try {
+      await this.page.waitForURL(
+        (url) => !url.pathname.endsWith('~new') && !url.pathname.includes('~new'),
+        { timeout: TestTimeouts.ELEMENT_WAIT },
+      );
+      const currentUrl = this.page.url();
+      const isCorrectPath = currentUrl.includes('/fleet-virtualization/vm-templates/cluster/');
+      const hasOldBrokenPath = currentUrl.includes('template.openshift.io~v1~Template');
+      return { isValid: isCorrectPath && !hasOldBrokenPath, url: currentUrl };
+    } catch {
+      return { isValid: false, url: this.page.url() };
+    }
+  }
+
+  async verifySourceAvailableTextDoesNotExist(): Promise<boolean> {
+    try {
+      const sourceAvailableLocator = this.locator('text=Source available');
+      const exists = await sourceAvailableLocator
+        .isVisible({ timeout: TestTimeouts.UI_DELAY_MEDIUM })
+        .catch(() => false);
+      return !exists;
+    } catch {
+      return true;
+    }
+  }
+
+  async verifyTableHeaderExists(
+    headerLabel: 'Namespace' | 'Architecture' | 'Category' | 'CPU | Memory',
+    shouldExist: boolean,
+  ): Promise<boolean> {
+    const header = this.page.locator('table.kubevirt-table th', { hasText: headerLabel });
+    await header
+      .first()
+      .waitFor({ state: 'visible', timeout: TestTimeouts.SHORT_WAIT })
+      .catch(() => {
+        return;
+      });
+    const exists = await header
+      .first()
+      .isVisible()
+      .catch(() => false);
+    return exists === shouldExist;
+  }
+
+  async verifyTemplateContains(expectedText: string): Promise<boolean> {
+    try {
+      const textLocator = this.locator(`text=${expectedText}`);
+      await textLocator.waitFor({ state: 'visible', timeout: TestTimeouts.UI_VISIBILITY_QUICK });
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  async verifyTemplateCreationFromExample(expectedText: string): Promise<boolean> {
+    try {
+      const textLocator = this.locator(`text=${expectedText}`);
+      await textLocator.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  async verifyTemplateDetailsPage(): Promise<boolean> {
+    try {
+      const templateDetailsLocator = this.locator('text=Template details');
+      await templateDetailsLocator.waitFor({
+        state: 'visible',
+        timeout: TestTimeouts.UI_VISIBILITY_QUICK,
+      });
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  async verifyYamlEditorOpen(): Promise<boolean> {
+    return this.page
+      .locator('.monaco-editor')
+      .waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY })
+      .then(() => true)
+      .catch(() => false);
+  }
+
+  async waitForClusterFilterApplied(): Promise<void> {
+    await this._closeFilterLabelGroup.waitFor({
+      state: 'visible',
+      timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+    });
+  }
+
+  async waitForTemplateRowDetached(
+    templateName: string,
+    timeout: number = TestTimeouts.DEFAULT,
+  ): Promise<void> {
+    const row = this.getTemplateRow(templateName);
+    await row.waitFor({ state: 'detached', timeout });
+  }
+}

@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "ci-test-stack.pluginName" . }}
+  labels:
+    {{- include "ci-test-stack.labels" . | nindent 4 }}
+    app.kubernetes.io/component: plugin
+spec:
+  replicas: {{ .Values.plugin.replicas }}
+  selector:
+    matchLabels:
+      app: {{ include "ci-test-stack.pluginName" . }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "ci-test-stack.pluginName" . }}
+        {{- include "ci-test-stack.labels" . | nindent 8 }}
+    spec:
+      containers:
+        - name: plugin
+          image: {{ required "plugin.image is required" .Values.plugin.image | quote }}
+          ports:
+            - containerPort: {{ .Values.plugin.port }}
+              protocol: TCP
+          volumeMounts:
+            - name: nginx-conf
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
+              readOnly: true
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+          readinessProbe:
+            httpGet:
+              path: /plugin-manifest.json
+              port: {{ .Values.plugin.port }}
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /plugin-manifest.json
+              port: {{ .Values.plugin.port }}
+            initialDelaySeconds: 10
+            periodSeconds: 30
+      volumes:
+        - name: nginx-conf
+          configMap:
+            name: {{ include "ci-test-stack.pluginName" . }}-nginx

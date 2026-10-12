@@ -1,0 +1,97 @@
+name: Hot Cluster E2E PR Gate
+
+# Thin gatekeeper for PR events: dispatches hot-cluster-e2e.yml via
+# workflow_dispatch so only this job (plus Progress/Run Gating Tests) shows
+# in the merge box, not the full nested job graph. See ci-scripts/README.md
+# ("Check-Run & Retest Model").
+#
+# Single job handles both the dispatch path and the held path, so the PR
+# checks UI never shows a "Skipped" entry for the inactive branch.
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  actions: write
+  checks: write
+
+jobs:
+  gate:
+    name: E2E Gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+          ref: ${{ github.event.repository.default_branch }}
+
+      - name: Generate bot token
+        id: bot-token
+        uses: ./.github/actions/create-bot-token
+        with:
+          app-id: ${{ secrets.BOT_APP_ID }}
+          private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
+          permission-checks: write
+
+      - name: Clear stale e2e-passed/e2e-failed on push
+        if: github.event.action == 'synchronize'
+        continue-on-error: true
+        uses: ./.github/actions/clear-e2e-result-labels
+        with:
+          pr-number: ${{ github.event.pull_request.number }}
+          github-token: ${{ steps.bot-token.outputs.token || github.token }}
+
+      # ── Held path: republish neutral marker onto new HEAD ──
+      - name: Publish held marker for current HEAD
+        if: contains(github.event.pull_request.labels.*.name, 'e2e-hold')
+        uses: ./.github/actions/publish-gating-check
+        with:
+          head-sha: ${{ github.event.pull_request.head.sha }}
+          status: completed
+          conclusion: neutral
+          title: 'Hot Cluster E2E: held via /hold-e2e'
+          github-token: ${{ steps.bot-token.outputs.token }}
+          summary: |
+            Required check not satisfied -- hold active. Testing is on hold for this PR.
+
+            No new run will be dispatched automatically -- neither by a push, the `ok-to-test` label, nor `main` advancing -- while this hold is active. Comment `/retest-e2e` to lift the hold and get a fresh result.
+
+            Removing the `e2e-hold` label directly (e.g. from the UI) does **not** lift the hold or refresh this result -- only `/retest-e2e` does both.
+
+      # ── Dispatch path: fire E2E and post immediate queued status ──
+      - name: Setup scripts
+        if: "!contains(github.event.pull_request.labels.*.name, 'e2e-hold')"
+        uses: ./.github/actions/setup-gh-scripts
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+
+      - name: Dispatch hot-cluster-e2e.yml
+        id: dispatch
+        if: "!contains(github.event.pull_request.labels.*.name, 'e2e-hold')"
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          BASE_REF: ${{ github.event.pull_request.base.ref }}
+        working-directory: .github/scripts
+        run: npx tsx src/e2e/pr-gate-dispatch.ts
+
+      - name: Post queued status for immediate visibility
+        if: "!contains(github.event.pull_request.labels.*.name, 'e2e-hold')"
+        uses: ./.github/actions/publish-gating-check
+        with:
+          head-sha: ${{ github.event.pull_request.head.sha }}
+          status: queued
+          title: 'Hot Cluster E2E: dispatched, waiting for cluster'
+          details-url: ${{ steps.dispatch.outputs.run_url || format('{0}/{1}/actions/workflows/hot-cluster-e2e.yml', github.server_url, github.repository) }}
+          summary: |
+            E2E run has been dispatched. Waiting for a hot cluster to become available.
+
+            The status will update to **in_progress** once the cluster is ready and tests begin running.
+          github-token: ${{ steps.bot-token.outputs.token }}

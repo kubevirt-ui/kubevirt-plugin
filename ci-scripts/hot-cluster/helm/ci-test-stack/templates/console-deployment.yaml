@@ -1,0 +1,121 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "ci-test-stack.consoleName" . }}
+  labels:
+    {{- include "ci-test-stack.labels" . | nindent 4 }}
+    app.kubernetes.io/component: console
+spec:
+  replicas: {{ .Values.console.replicas }}
+  selector:
+    matchLabels:
+      app: {{ include "ci-test-stack.consoleName" . }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "ci-test-stack.consoleName" . }}
+        {{- include "ci-test-stack.labels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ include "ci-test-stack.consoleName" . }}
+      containers:
+        - name: console
+          image: {{ required "console.image is required" .Values.console.image | quote }}
+          ports:
+            - containerPort: {{ .Values.console.port }}
+              protocol: TCP
+          env:
+            # Off-cluster mode settings
+            - name: BRIDGE_K8S_MODE
+              value: "off-cluster"
+            - name: BRIDGE_K8S_MODE_OFF_CLUSTER_ENDPOINT
+              value: {{ required "console.apiServer is required" .Values.console.apiServer | quote }}
+            - name: BRIDGE_K8S_MODE_OFF_CLUSTER_SKIP_VERIFY_TLS
+              value: "true"
+            {{- if .Values.console.monitoring.thanosUrl }}
+            - name: BRIDGE_K8S_MODE_OFF_CLUSTER_THANOS
+              value: {{ .Values.console.monitoring.thanosUrl | quote }}
+            {{- end }}
+            {{- if .Values.console.monitoring.alertmanagerUrl }}
+            - name: BRIDGE_K8S_MODE_OFF_CLUSTER_ALERTMANAGER
+              value: {{ .Values.console.monitoring.alertmanagerUrl | quote }}
+            {{- end }}
+
+            # User auth settings
+            {{- if eq .Values.console.auth.mode "openshift" }}
+            - name: BRIDGE_USER_AUTH
+              value: "openshift"
+            - name: BRIDGE_K8S_AUTH
+              value: "openshift"
+            - name: BRIDGE_CA_FILE
+              value: "/etc/console-auth/ca.crt"
+            # Required so bridge builds an absolute redirect_uri (matching the
+            # OAuthClient's registered redirectURIs) instead of a relative
+            # "/auth/callback", which the OAuth server rejects as invalid_request.
+            - name: BRIDGE_BASE_ADDRESS
+              value: {{ printf "https://%s" (required "console.route.host is required for auth.mode=openshift" .Values.console.route.host) | quote }}
+            - name: BRIDGE_USER_AUTH_OIDC_CLIENT_ID
+              value: {{ include "ci-test-stack.oauthClientName" . | quote }}
+            - name: BRIDGE_USER_AUTH_OIDC_CLIENT_SECRET_FILE
+              value: "/etc/console-auth/client-secret"
+            - name: BRIDGE_USER_AUTH_OIDC_CA_FILE
+              value: "/etc/console-auth/ca.crt"
+            {{- else }}
+            - name: BRIDGE_USER_AUTH
+              value: "disabled"
+            - name: BRIDGE_K8S_AUTH_BEARER_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "ci-test-stack.consoleName" . }}-token
+                  key: token
+            {{- end }}
+
+            # Branding and docs settings
+            - name: BRIDGE_BRANDING
+              value: "ocp"
+
+            # Customization settings
+            - name: BRIDGE_USER_SETTINGS_LOCATION
+              value: {{ .Values.console.userSettingsLocation | default "localstorage" | quote }}
+
+            # Plugins
+            - name: BRIDGE_PLUGINS
+              value: "kubevirt-plugin={{ include "ci-test-stack.pluginUrl" . }}"
+            {{- if .Values.console.pluginProxy.endpoint }}
+            - name: BRIDGE_PLUGIN_PROXY
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "ci-test-stack.consoleName" . }}-config
+                  key: pluginProxy
+            {{- end }}
+            - name: BRIDGE_I18N_NAMESPACES
+              value: "plugin__kubevirt-plugin"
+
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
+          readinessProbe:
+            httpGet:
+              path: /
+              port: {{ .Values.console.port }}
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /
+              port: {{ .Values.console.port }}
+            initialDelaySeconds: 15
+            periodSeconds: 30
+          {{- if eq .Values.console.auth.mode "openshift" }}
+          volumeMounts:
+            - name: console-auth
+              mountPath: /etc/console-auth
+              readOnly: true
+      volumes:
+        - name: console-auth
+          secret:
+            secretName: {{ include "ci-test-stack.consoleName" . }}-oauth
+          {{- end }}

@@ -1,13 +1,13 @@
 type AdfNode = {
-  type: string;
-  content?: AdfNode[];
   [key: string]: unknown;
+  content?: AdfNode[];
+  type: string;
 };
 
 type AdfDoc = {
+  content: AdfNode[];
   type: string;
   version: number;
-  content: AdfNode[];
 };
 
 /** ADF node types that reference issue-specific assets and cannot be reused on create. */
@@ -34,8 +34,8 @@ const sanitizeAdfNode = (node: AdfNode): AdfNode | null => {
 };
 
 /** Remove embedded media and other issue-bound nodes from an ADF description before cloning. */
-export const sanitizeDescriptionForClone = (description: unknown): unknown | undefined => {
-  if (description == null) {
+export const sanitizeDescriptionForClone = (description: unknown): undefined | unknown => {
+  if (description === null || description === undefined) {
     return undefined;
   }
 

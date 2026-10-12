@@ -1,0 +1,115 @@
+# Grants the ARC runner ServiceAccount CI permissions. Applied automatically
+# by install-runner-scale-set.sh (subject substituted for
+# RUNNER_SCALE_SET_NAME/ARC_RUNNERS_NS). Skip with SKIP_ARC_RUNNER_RBAC=1.
+#
+# Manual apply (defaults only): oc apply -f ci-scripts/hot-cluster/arc/arc-runner-rbac.yaml
+#
+# ConfigMap access in ci-env is granted separately by a namespaced RoleBinding
+# from install-ci-env-controller.sh, not by this ClusterRole.
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: arc-runner-ci
+  labels:
+    app.kubernetes.io/component: arc-runner-rbac
+rules:
+  # --- Cluster reads (console URL, version logging) ---
+  - apiGroups: ['']
+    resources: ['nodes']
+    verbs: ['get', 'list']
+
+  # --- Test namespaces: unrestricted, names are dynamic ---
+  - apiGroups: ['']
+    resources: ['namespaces']
+    verbs: ['get', 'list', 'create', 'delete']
+
+  # --- Test-env console SA UID, for onboarding-suppression ConfigMaps ---
+  - apiGroups: ['']
+    resources: ['serviceaccounts']
+    verbs: ['get', 'list']
+
+  # --- Re-apply of the long-lived "manual-console" namespace (create is
+  # covered by the unrestricted rule above). resourceName-scoped so an
+  # unscoped patch can't touch openshift-* namespaces. ---
+  - apiGroups: ['']
+    resources: ['namespaces']
+    verbs: ['patch']
+    resourceNames: ['manual-console']
+  - apiGroups: ['config.openshift.io']
+    resources: ['consoles', 'clusterversions', 'ingresses']
+    verbs: ['get', 'list']
+
+  # --- Diagnostics (pod logs, events in test namespaces) ---
+  - apiGroups: ['']
+    resources: ['pods', 'pods/log', 'events']
+    verbs: ['get', 'list']
+
+  # --- Cypress cy.exec runs / Playwright scenario tests: VM create/patch/delete ---
+  - apiGroups: ['kubevirt.io']
+    resources: ['virtualmachines']
+    verbs: ['get', 'list', 'watch', 'patch', 'create', 'delete']
+
+  # NOTE: secrets delete is deliberately NOT granted here -- cluster-wide
+  # access would be a credential-exposure risk. auto-test-ns (the one
+  # namespace that needs it) gets a namespace-scoped Role instead, from
+  # ci-env-controller.sh's provision().
+
+  # NOTE: PVCs/Snapshots/DataVolumes/DataSources/Templates/net-attach-defs/
+  # instancetypes&preferences deletes use the namespace-scoped
+  # ci-env-test-runner RoleBinding instead -- a cluster-wide grant here
+  # would risk shared golden-image resources.
+
+  # --- E2E test setup: user-settings and feature-flag configmaps in HCO namespace ---
+  - apiGroups: ['']
+    resources: ['configmaps']
+    verbs: ['get', 'list', 'create', 'patch']
+
+  # --- Cypress settings tests: reads HCO's spec directly ---
+  - apiGroups: ['hco.kubevirt.io']
+    resources: ['hyperconvergeds']
+    verbs: ['get', 'list']
+
+  # --- Cluster-scoped test leftovers (fixed "example" name) -- not
+  # covered by the namespaced RoleBinding above ---
+  - apiGroups: ['instancetype.kubevirt.io']
+    resources: ['virtualmachineclusterinstancetypes', 'virtualmachineclusterpreferences']
+    verbs: ['get', 'list', 'delete']
+  - apiGroups: ['migrations.kubevirt.io']
+    resources: ['migrationpolicies']
+    verbs: ['get', 'list', 'delete']
+
+  # --- Runner-diagnostics steps: HCO / operator version logging ---
+  - apiGroups: ['operators.coreos.com']
+    resources: ['clusterserviceversions']
+    verbs: ['get', 'list']
+  - apiGroups: ['kubevirt.io']
+    resources: ['kubevirts']
+    verbs: ['get', 'list']
+  - apiGroups: ['cdi.kubevirt.io']
+    resources: ['cdis']
+    verbs: ['get', 'list']
+  - apiGroups: ['ssp.kubevirt.io']
+    resources: ['ssps']
+    verbs: ['get', 'list']
+  - apiGroups: ['networkaddonsoperator.network.kubevirt.io']
+    resources: ['networkaddonsconfigs']
+    verbs: ['get', 'list']
+  - apiGroups: ['hostpathprovisioner.kubevirt.io']
+    resources: ['hostpathprovisioners']
+    verbs: ['get', 'list']
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: arc-runner-ci
+  labels:
+    app.kubernetes.io/component: arc-runner-rbac
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: arc-runner-ci
+subjects:
+  - kind: ServiceAccount
+    name: kubevirt-plugin-ci-gha-rs-no-permission
+    namespace: arc-runners

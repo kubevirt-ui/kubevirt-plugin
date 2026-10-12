@@ -1,0 +1,126 @@
+import { T1, T1_TAG, VM_TABS_TAG } from '@/data-models/allure-constants';
+import { expect, test } from '@/fixtures/vm-tabs-fixture';
+import { ROUTE_VIRTUAL_MACHINES_DETAIL_CONFIGURATION_TAG } from '@/data-models/route-tags';
+
+test.describe.serial(
+  'Tier1 VM Configuration Scheduling — shared stopped RHEL9',
+  { tag: [ROUTE_VIRTUAL_MACHINES_DETAIL_CONFIGURATION_TAG, T1_TAG, '@nonpriv'] },
+  () => {
+    let vmName: string;
+
+    test.beforeAll(async ({ apiClient, utils, testConfig }) => {
+      vmName = utils.generateRandomVmName('vm-scheduling');
+      await apiClient.createVmFromTemplate(
+        utils.TEMPLATE_METADATA_NAMES.RHEL9,
+        vmName,
+        testConfig.testNamespace,
+        'openshift',
+        false,
+      );
+      apiClient.trackResource('VirtualMachine', vmName, testConfig.testNamespace);
+
+      const verifyResult = await apiClient.verifyVmCreated(
+        vmName,
+        testConfig.testNamespace,
+        utils.TestTimeouts.VM_BOOTUP,
+      );
+      if (!verifyResult.exists) throw new Error(`VM ${vmName} was not created`);
+    });
+
+    test.beforeEach(async ({ vmListPage, utils, testConfig }) => {
+      test.setTimeout(utils.TestTimeouts.TEST_VM_CREATION);
+      await utils.withAllure({
+        suite: 'VM Configuration Scheduling',
+        feature: T1,
+        tags: [T1_TAG, VM_TABS_TAG],
+      });
+      await vmListPage.navigateToNamespaceVirtualMachinesViaUI(testConfig.testNamespace);
+    });
+
+    test('Configuration Scheduling: requirements and eviction strategy after patch', async ({
+      apiClient,
+      vmListPage,
+      vmDetailPage,
+      testConfig,
+    }) => {
+      await vmListPage.searchTreeView(testConfig.testNamespace);
+      await vmListPage.clickTreeNodeAndEnsureExpanded(
+        testConfig.testNamespace,
+        vmName,
+        testConfig.testNamespace,
+      );
+      await vmListPage.clickVmInTreeView(vmName, testConfig.testNamespace);
+
+      await vmDetailPage.navigateToConfigurationScheduling();
+      const schedulingVisible = await vmDetailPage.verifySchedulingAndResourceRequirements();
+      expect
+        .soft(
+          schedulingVisible,
+          'Scheduling sub-tab should show scheduling and resource requirements',
+        )
+        .toBe(true);
+
+      await apiClient.patchVmEvictionStrategy(vmName, testConfig.testNamespace, 'LiveMigrate');
+
+      await expect
+        .poll(
+          async () => {
+            await vmDetailPage.reloadAndNavigateToScheduling();
+            return vmDetailPage.verifyEvictionStrategyLiveMigrate();
+          },
+          {
+            timeout: 60_000,
+            intervals: [5_000],
+            message: 'Eviction strategy should display LiveMigrate after cluster patch',
+          },
+        )
+        .toBe(true);
+    });
+
+    test('Edit run strategy via Configuration > Scheduling', async ({
+      vmListPage,
+      vmDetailPage,
+      testConfig,
+    }) => {
+      await vmListPage.searchTreeView(testConfig.testNamespace);
+      await vmListPage.clickTreeNodeAndEnsureExpanded(
+        testConfig.testNamespace,
+        vmName,
+        testConfig.testNamespace,
+      );
+      await vmListPage.clickVmInTreeView(vmName, testConfig.testNamespace);
+
+      await test.step('Verify run strategy is visible in Configuration > Scheduling', async () => {
+        await vmDetailPage.navigateToConfigurationScheduling();
+        const runStrategy = await vmDetailPage.getRunStrategyValue();
+        expect
+          .soft(runStrategy.length, 'Run strategy should have a displayed value')
+          .toBeGreaterThan(0);
+      });
+
+      await test.step('Edit run strategy to Manual via RunStrategyModal', async () => {
+        const edited = await vmDetailPage.editRunStrategy('Manual');
+        expect(edited, 'Run strategy should be editable via the modal').toBe(true);
+      });
+
+      await test.step('Verify run strategy updated in UI', async () => {
+        const runStrategy = await vmDetailPage.getRunStrategyValue();
+        expect.soft(runStrategy, 'UI should show Manual run strategy').toContain('Manual');
+      });
+
+      await test.step('Edit run strategy to RerunOnFailure and verify', async () => {
+        const edited = await vmDetailPage.editRunStrategy('RerunOnFailure');
+        expect(edited, 'Should switch to RerunOnFailure').toBe(true);
+        const runStrategy = await vmDetailPage.getRunStrategyValue();
+        expect.soft(runStrategy, 'UI should show Rerun on failure').toContain('Rerun on failure');
+      });
+
+      await test.step('Cycle through all four strategies', async () => {
+        const edited = await vmDetailPage.editRunStrategy('Always');
+        expect(edited, 'Should switch to Always').toBe(true);
+        const runStrategy = await vmDetailPage.getRunStrategyValue();
+        expect.soft(runStrategy, 'UI should show Always').toContain('Always');
+      });
+    });
+  },
+);

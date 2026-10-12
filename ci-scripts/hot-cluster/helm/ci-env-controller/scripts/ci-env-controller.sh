@@ -1,0 +1,563 @@
+#!/usr/bin/env bash
+# ci-env-controller: watches labeled ConfigMaps in the ci-env namespace and
+# reconciles CI test environments (namespace, Helm chart) on demand.
+#
+# Designed to run as a long-lived Deployment pod. The script is mounted via
+# a ConfigMap volume so it can be updated without rebuilding the image.
+#
+# Environment variables (set on the Deployment):
+#   CI_ENV_NS              Namespace where trigger ConfigMaps live (default: ci-env)
+#   CI_ENV_TTL_SECONDS     Force-clean environments older than this (default: 7200 = 2h)
+#   CI_ENV_LABEL           Label selector for E2E trigger ConfigMaps (TTL-reaped)
+#   CI_ENV_MANUAL_LABEL    Label selector for persistent manual-console
+#                          ConfigMaps; reconciled like CI_ENV_LABEL but
+#                          never reaped (see reap_stale)
+#   HELM_CHART_PATH        Path to the ci-test-stack Helm chart inside the container
+#   ENSURE_MANUAL_CONSOLE_USER_SCRIPT
+#                          Path to ensure-manual-console-user.sh inside the
+#                          container; only invoked (to add or, on teardown,
+#                          --remove) when a ConfigMap sets auth-mode=openshift
+#                          (default: /opt/ci-env/manual-console/ensure-manual-console-user.sh)
+#
+# Trigger ConfigMap data field (per-request, optional):
+#   user-settings-location  Overrides the console's BRIDGE_USER_SETTINGS_LOCATION
+#                            ("configmap" or "localstorage"). Empty keeps
+#                            the ci-test-stack chart's own default.
+
+set -uo pipefail
+
+CI_ENV_NS="${CI_ENV_NS:-ci-env}"
+CI_ENV_TTL_SECONDS="${CI_ENV_TTL_SECONDS:-7200}"
+CI_ENV_LABEL="${CI_ENV_LABEL:-ci.kubevirt-plugin/type=test-environment}"
+CI_ENV_MANUAL_LABEL="${CI_ENV_MANUAL_LABEL:-ci.kubevirt-plugin/type=manual-console}"
+HELM_CHART_PATH="${HELM_CHART_PATH:-/opt/ci-env/helm/ci-test-stack}"
+ENSURE_MANUAL_CONSOLE_USER_SCRIPT="${ENSURE_MANUAL_CONSOLE_USER_SCRIPT:-/opt/ci-env/manual-console/ensure-manual-console-user.sh}"
+
+RUNNER_SA_NAME="${RUNNER_SA_NAME:-kubevirt-plugin-ci-gha-rs-no-permission}"
+RUNNER_SA_NS="${RUNNER_SA_NS:-arc-runners}"
+
+CONSOLE_IMAGE_REGISTRY="${CONSOLE_IMAGE_REGISTRY:-quay.io/openshift/origin-console}"
+
+log() { echo "[$(date -u '+%Y-%m-%dT%H:%M:%SZ')] $*"; }
+
+# --------------------------------------------------------------------------- #
+#  Cluster discovery (cached per reconciliation cycle)
+# --------------------------------------------------------------------------- #
+discover_cluster() {
+  API_SERVER="${KUBERNETES_SERVICE_HOST:+https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT:-443}}"
+  API_SERVER="${API_SERVER:-$(oc whoami --show-server 2>/dev/null || true)}"
+
+  APPS_DOMAIN="$(oc get ingress.config.openshift.io/cluster \
+    -o jsonpath='{.spec.domain}' 2>/dev/null || true)"
+
+  THANOS_URL="$(oc -n openshift-config-managed get configmap monitoring-shared-config \
+    -o jsonpath='{.data.thanosPublicURL}' 2>/dev/null || true)"
+
+  ALERTMANAGER_URL="$(oc -n openshift-config-managed get configmap monitoring-shared-config \
+    -o jsonpath='{.data.alertmanagerPublicURL}' 2>/dev/null || true)"
+
+  if [[ -z "${APPS_DOMAIN}" ]]; then
+    log "ERROR: could not discover APPS_DOMAIN from ingress.config.openshift.io/cluster"
+    return 1
+  fi
+  log "Cluster: API_SERVER=${API_SERVER}  APPS_DOMAIN=${APPS_DOMAIN}"
+}
+
+# --------------------------------------------------------------------------- #
+#  Console image resolution (same logic as resolve-console-image.sh)
+# --------------------------------------------------------------------------- #
+resolve_console_image() {
+  local override="${1:-}"
+  if [[ -n "${override}" ]]; then
+    echo "${override}"
+    return
+  fi
+
+  # Default to :latest so the test console always matches the plugin SDK
+  # version on main (which tracks the newest console API / PatternFly).
+  # A newer console can load older-SDK plugins, but an older console
+  # cannot load newer-SDK plugins (e.g. PF5 console vs PF6 plugin).
+  # Release branches can override via the ConfigMap's console-image field.
+  echo "${CONSOLE_IMAGE_REGISTRY}:latest"
+}
+
+# --------------------------------------------------------------------------- #
+#  Ensure kubevirt-apiserver-proxy Route exists
+# --------------------------------------------------------------------------- #
+ensure_proxy_route() {
+  local route_name="kubevirt-apiserver-proxy"
+  local route_ns="openshift-cnv"
+  local proxy_host="${route_name}.${APPS_DOMAIN}"
+
+  if oc get route "${route_name}" -n "${route_ns}" &>/dev/null; then
+    log "Proxy route already exists in ${route_ns}"
+  else
+    log "Creating proxy route ${route_name} in ${route_ns}..."
+    cat <<EOF | oc create -f - 2>/dev/null || log "Proxy route create skipped (may already exist or namespace missing)"
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: ${route_name}
+  namespace: ${route_ns}
+  annotations:
+    haproxy.router.openshift.io/hsts_header: max-age=31536000;includeSubDomains;preload
+spec:
+  host: ${proxy_host}
+  to:
+    kind: Service
+    name: ${route_name}-service
+    weight: 100
+  port:
+    targetPort: 8080
+  tls:
+    termination: reencrypt
+  wildcardPolicy: None
+EOF
+  fi
+
+  PLUGIN_PROXY_ENDPOINT="https://${proxy_host}"
+}
+
+# --------------------------------------------------------------------------- #
+#  Patch ConfigMap helper
+# --------------------------------------------------------------------------- #
+patch_cm() {
+  local name="$1"
+  shift
+  local patch_data="$*"
+  oc patch configmap "${name}" -n "${CI_ENV_NS}" --type merge -p "${patch_data}" 2>/dev/null || true
+}
+
+# --------------------------------------------------------------------------- #
+#  Ensure an htpasswd user for OAuth-mode deploys (manual-console)
+#
+#  Reads the plaintext password from a short-lived Secret named by
+#  htpasswd_secret_name (in CI_ENV_NS), deletes that Secret immediately
+#  (best-effort, regardless of outcome below), then delegates to
+#  ensure-manual-console-user.sh to upsert the htpasswd user and extract the
+#  cluster CA bundle. Sets MANUAL_AUTH_CA_CERT_FILE on success.
+# --------------------------------------------------------------------------- #
+ensure_manual_console_auth() {
+  local htpasswd_user="$1"
+  local htpasswd_secret_name="$2"
+
+  if [[ -z "${htpasswd_user}" || -z "${htpasswd_secret_name}" ]]; then
+    log "ERROR: auth-mode=openshift requires htpasswd-user and htpasswd-secret-name"
+    return 1
+  fi
+
+  local htpasswd_password
+  htpasswd_password="$(oc get secret "${htpasswd_secret_name}" -n "${CI_ENV_NS}" \
+    -o jsonpath='{.data.password}' 2>/dev/null | base64 -d || true)"
+
+  # The password must never outlive this single reconciliation: delete the
+  # Secret now regardless of whether reading it succeeded.
+  oc delete secret "${htpasswd_secret_name}" -n "${CI_ENV_NS}" --ignore-not-found 2>/dev/null || true
+
+  if [[ -z "${htpasswd_password}" ]]; then
+    log "ERROR: could not read password from Secret ${htpasswd_secret_name}"
+    return 1
+  fi
+
+  log "Ensuring htpasswd user ${htpasswd_user} via ${ENSURE_MANUAL_CONSOLE_USER_SCRIPT}..."
+  local ensure_output
+  # Password goes over stdin, never argv: CLI args are visible to any
+  # co-located process for the child's whole lifetime via `ps`/
+  # `/proc/<pid>/cmdline`, unlike a pipe that only exists transiently.
+  if ! ensure_output="$(printf '%s' "${htpasswd_password}" \
+    | bash "${ENSURE_MANUAL_CONSOLE_USER_SCRIPT}" "${htpasswd_user}" 2>&1)"; then
+    log "ERROR: ensure-manual-console-user.sh failed: ${ensure_output}"
+    return 1
+  fi
+  log "${ensure_output}"
+
+  MANUAL_AUTH_CA_CERT_FILE="$(echo "${ensure_output}" | grep '^CA_CERT_FILE=' | cut -d= -f2-)"
+  if [[ -z "${MANUAL_AUTH_CA_CERT_FILE}" || ! -f "${MANUAL_AUTH_CA_CERT_FILE}" ]]; then
+    log "ERROR: ensure-manual-console-user.sh did not produce a CA_CERT_FILE"
+    return 1
+  fi
+}
+
+# --------------------------------------------------------------------------- #
+#  Remove an htpasswd user provisioned for a manual-console instance
+# --------------------------------------------------------------------------- #
+remove_manual_console_auth() {
+  local htpasswd_user="$1"
+
+  log "Removing htpasswd user ${htpasswd_user} via ${ENSURE_MANUAL_CONSOLE_USER_SCRIPT}..."
+  local remove_output
+  if ! remove_output="$(bash "${ENSURE_MANUAL_CONSOLE_USER_SCRIPT}" --remove "${htpasswd_user}" 2>&1)"; then
+    log "ERROR: failed to remove htpasswd user ${htpasswd_user}: ${remove_output}"
+    return 1
+  fi
+  log "${remove_output}"
+}
+
+# --------------------------------------------------------------------------- #
+#  Provision a test environment
+# --------------------------------------------------------------------------- #
+provision() {
+  local cm_name="$1"
+  local plugin_image="$2"
+  local test_ns="$3"
+  local console_image_override="${4:-}"
+  local helm_release_override="${5:-}"
+  local auth_mode="${6:-disabled}"
+  local htpasswd_user="${7:-}"
+  local htpasswd_secret_name="${8:-}"
+  local user_settings_location="${9:-}"
+
+  local helm_release="${helm_release_override:-${cm_name}}"
+
+  log "Provisioning: cm=${cm_name} ns=${test_ns} release=${helm_release} auth-mode=${auth_mode}"
+  patch_cm "${cm_name}" '{"data":{"status":"provisioning"}}'
+
+  discover_cluster || {
+    patch_cm "${cm_name}" '{"data":{"status":"error","error-message":"cluster discovery failed"}}'
+    return 1
+  }
+
+  local console_image
+  console_image="$(resolve_console_image "${console_image_override}")"
+  local route_host="console-${cm_name}.${APPS_DOMAIN}"
+
+  ensure_proxy_route
+
+  log "Creating namespace ${test_ns}..."
+  oc create namespace "${test_ns}" --dry-run=client -o yaml | oc apply -f - || true
+
+  # Namespace-scoped (not cluster-wide, see arc-runner-rbac.yaml) fallback
+  # so test-cleanup.sh's secret delete works in the one namespace that
+  # isn't torn down and recreated by a fresh Helm release each run: the
+  # fixed 'auto-test-ns' Cypress namespace. Applied directly here (not via
+  # the Helm chart) rather than once at bootstrap, so the Role/RoleBinding
+  # are reconciled fresh on every provisioning run regardless of any
+  # earlier drift.
+  if [[ "${test_ns}" == "auto-test-ns" ]]; then
+    log "Ensuring auto-test-ns secret-cleanup RBAC..."
+    local secret_rbac_applied="false"
+    for attempt in 1 2 3; do
+      if cat <<EOF | oc apply -f -
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: ci-env-secret-cleanup
+  namespace: ${test_ns}
+rules:
+  - apiGroups: ['']
+    resources: ['secrets']
+    verbs: ['get', 'list', 'delete']
+    resourceNames: ['auto-test-secret']
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: ci-env-secret-cleanup
+  namespace: ${test_ns}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: ci-env-secret-cleanup
+subjects:
+  - kind: ServiceAccount
+    name: ${RUNNER_SA_NAME}
+    namespace: ${RUNNER_SA_NS}
+EOF
+      then
+        secret_rbac_applied="true"
+        break
+      fi
+      log "  Retry ${attempt}/3 for auto-test-ns secret-cleanup RBAC apply (API may be transiently unavailable)..."
+      sleep 5
+    done
+    # Not `|| true`: fail the run visibly rather than let test-cleanup.sh
+    # silently Forbidden-fail later on the secret this RBAC exists for.
+    if [[ "${secret_rbac_applied}" != "true" ]]; then
+      local err="failed to apply auto-test-ns secret-cleanup RBAC after 3 attempts"
+      log "ERROR: ${err}"
+      patch_cm "${cm_name}" "{\"data\":{\"status\":\"error\",\"error-message\":\"${err}\"}}"
+      return 1
+    fi
+  fi
+
+  # Opt-in only: unset/disabled auth-mode (the default for every existing E2E
+  # ConfigMap) skips this block entirely and behaves exactly as before.
+  local extra_helm_args=()
+  local MANUAL_AUTH_CA_CERT_FILE=""
+  if [[ "${auth_mode}" == "openshift" ]]; then
+    if ! ensure_manual_console_auth "${htpasswd_user}" "${htpasswd_secret_name}"; then
+      patch_cm "${cm_name}" '{"data":{"status":"error","error-message":"failed to provision htpasswd user"}}'
+      return 1
+    fi
+    extra_helm_args+=(--set "console.auth.mode=openshift")
+    extra_helm_args+=(--set-file "console.auth.caCert=${MANUAL_AUTH_CA_CERT_FILE}")
+  fi
+
+  # Opt-in only: empty means "don't override" -- the chart's own default
+  # (localstorage) applies. Cypress flips this to "configmap" since its
+  # before-all hook can't otherwise dismiss the console's welcome modal
+  # (see hot-cluster-e2e-run.yml's "Seed kubevirt-user-settings ConfigMap").
+  if [[ -n "${user_settings_location}" ]]; then
+    if [[ "${user_settings_location}" != "configmap" && "${user_settings_location}" != "localstorage" ]]; then
+      local err="invalid user-settings-location '${user_settings_location}' (must be 'configmap' or 'localstorage')"
+      log "ERROR: ${err}"
+      patch_cm "${cm_name}" "{\"data\":{\"status\":\"error\",\"error-message\":\"${err}\"}}"
+      return 1
+    fi
+    extra_helm_args+=(--set "console.userSettingsLocation=${user_settings_location}")
+  fi
+
+  log "Running helm upgrade --install ${helm_release}..."
+  if ! helm upgrade --install "${helm_release}" \
+    "${HELM_CHART_PATH}" \
+    --namespace "${test_ns}" \
+    --set "plugin.image=${plugin_image}" \
+    --set "console.image=${console_image}" \
+    --set "console.apiServer=${API_SERVER}" \
+    --set "console.route.host=${route_host}" \
+    --set "console.pluginProxy.endpoint=${PLUGIN_PROXY_ENDPOINT}" \
+    --set "console.monitoring.thanosUrl=${THANOS_URL}" \
+    --set "console.monitoring.alertmanagerUrl=${ALERTMANAGER_URL}" \
+    --set "rbac.consoleClusterRole=cluster-admin" \
+    --set "runner.saName=${RUNNER_SA_NAME}" \
+    --set "runner.saNamespace=${RUNNER_SA_NS}" \
+    "${extra_helm_args[@]}" \
+    --wait --timeout 5m 2>&1; then
+
+    local err="helm install failed"
+    log "ERROR: ${err}"
+    patch_cm "${cm_name}" "{\"data\":{\"status\":\"error\",\"error-message\":\"${err}\"}}"
+    [[ -n "${MANUAL_AUTH_CA_CERT_FILE}" ]] && rm -f "${MANUAL_AUTH_CA_CERT_FILE}"
+    return 1
+  fi
+  [[ -n "${MANUAL_AUTH_CA_CERT_FILE}" ]] && rm -f "${MANUAL_AUTH_CA_CERT_FILE}"
+
+  local bridge_base="http://${helm_release}-console.${test_ns}.svc.cluster.local:9000"
+  log "Waiting for console at ${bridge_base}..."
+  local ready=false
+  for i in $(seq 1 60); do
+    if curl -s -o /dev/null -w "%{http_code}" "${bridge_base}/" 2>/dev/null | grep -qE '200|301|302'; then
+      ready=true
+      break
+    fi
+    sleep 5
+  done
+
+  if [[ "${ready}" != "true" ]]; then
+    local err="console did not become ready within 5 minutes"
+    log "ERROR: ${err}"
+    patch_cm "${cm_name}" "{\"data\":{\"status\":\"error\",\"error-message\":\"${err}\"}}"
+    return 1
+  fi
+
+  # The console answering HTTP only proves the bridge is up, not that the
+  # plugin's own bundle (a fresh pod every run) is fetchable yet -- without
+  # this check, tests can start clicking around a console still showing a
+  # loading overlay for the not-yet-servable Virtualization perspective.
+  local plugin_base="http://${helm_release}-plugin.${test_ns}.svc.cluster.local:9080"
+  log "Waiting for plugin bundle at ${plugin_base}..."
+  local plugin_ready=false
+  for i in $(seq 1 60); do
+    # jq validates the body is the plugin manifest (non-empty "name"), not
+    # just any response.
+    if curl -s --max-time 5 --fail "${plugin_base}/plugin-manifest.json" 2>/dev/null \
+      | jq -e '(.name // "") | length > 0' &>/dev/null; then
+      plugin_ready=true
+      break
+    fi
+    sleep 5
+  done
+
+  if [[ "${plugin_ready}" != "true" ]]; then
+    local err="plugin bundle did not become ready within 5 minutes"
+    log "ERROR: ${err}"
+    patch_cm "${cm_name}" "{\"data\":{\"status\":\"error\",\"error-message\":\"${err}\"}}"
+    return 1
+  fi
+
+  local console_route="https://${route_host}"
+  log "Environment ready: bridge=${bridge_base} route=${console_route}"
+  patch_cm "${cm_name}" "{\"data\":{\"status\":\"ready\",\"bridge-base-address\":\"${bridge_base}\",\"console-route\":\"${console_route}\"}}"
+}
+
+# --------------------------------------------------------------------------- #
+#  Tear down a test environment
+# --------------------------------------------------------------------------- #
+teardown() {
+  local cm_name="$1"
+  local test_ns="$2"
+  local helm_release="${3:-${cm_name}}"
+  local auth_mode="${4:-disabled}"
+  local htpasswd_user="${5:-}"
+
+  log "Tearing down: cm=${cm_name} ns=${test_ns} release=${helm_release}"
+  patch_cm "${cm_name}" '{"data":{"status":"cleaning"}}'
+
+  helm uninstall "${helm_release}" -n "${test_ns}" --wait 2>/dev/null || true
+
+  # A failure here must not be silently swallowed into "cleaned": that
+  # status stops reconcile_one from ever retrying (see its absent-branch
+  # check), which would leave a cluster-admin htpasswd user stranded
+  # indefinitely. Setting status=error instead keeps this CM eligible for
+  # another teardown attempt next reconciliation cycle.
+  if [[ "${auth_mode}" == "openshift" && -n "${htpasswd_user}" ]]; then
+    if ! remove_manual_console_auth "${htpasswd_user}"; then
+      local err="failed to remove htpasswd user ${htpasswd_user}; will retry"
+      log "ERROR: ${err}"
+      patch_cm "${cm_name}" "{\"data\":{\"status\":\"error\",\"error-message\":\"${err}\"}}"
+      return 1
+    fi
+  fi
+
+  # auth-mode=openshift is the manual-console signal (never set for E2E --
+  # see provision()'s comment above). Its namespace is declared-shared by
+  # design: concurrent instances from distinct Helm releases, plus a
+  # one-time RBAC bootstrap (install-manual-console-rbac.sh) that must
+  # survive between deploys. Never auto-delete it here based on a
+  # point-in-time `helm list` snapshot -- that's both racy (a concurrent
+  # provision() elsewhere in the same reconciliation pass may not have
+  # registered its release yet) and wrong even when accurate (it would
+  # destroy the RBAC bootstrap too). Every namespace on the E2E path is
+  # either exclusively per-run/ephemeral or GitHub Actions-concurrency-
+  # serialized, so deleting it once its own release is gone stays safe.
+  if [[ "${auth_mode}" == "openshift" ]]; then
+    log "${test_ns} is a manual-console namespace; not auto-deleting it"
+  else
+    local remaining
+    remaining="$(helm list -n "${test_ns}" -q 2>/dev/null | wc -l | tr -d ' ')"
+    if [[ "${remaining}" == "0" ]]; then
+      oc delete namespace "${test_ns}" --wait=false 2>/dev/null || true
+    else
+      log "${remaining} other Helm release(s) still in ${test_ns}; leaving namespace in place"
+    fi
+  fi
+
+  log "Teardown complete for ${cm_name}"
+  patch_cm "${cm_name}" '{"data":{"status":"cleaned"}}'
+}
+
+# --------------------------------------------------------------------------- #
+#  Reconcile a single ConfigMap
+# --------------------------------------------------------------------------- #
+reconcile_one() {
+  local cm_json="$1"
+
+  local cm_name desired status plugin_image test_ns console_image helm_release
+  local auth_mode htpasswd_user htpasswd_secret_name user_settings_location
+  cm_name="$(echo "${cm_json}" | jq -r '.metadata.name')"
+  desired="$(echo "${cm_json}" | jq -r '.data["desired-state"] // "unknown"')"
+  status="$(echo "${cm_json}" | jq -r '.data["status"] // ""')"
+  plugin_image="$(echo "${cm_json}" | jq -r '.data["plugin-image"] // ""')"
+  test_ns="$(echo "${cm_json}" | jq -r '.data["test-namespace"] // ""')"
+  console_image="$(echo "${cm_json}" | jq -r '.data["console-image"] // ""')"
+  helm_release="$(echo "${cm_json}" | jq -r '.data["helm-release"] // ""')"
+  # Manual-console-only fields; empty for every E2E ConfigMap, which keeps
+  # provision() on its original disabled-auth path.
+  auth_mode="$(echo "${cm_json}" | jq -r '.data["auth-mode"] // "disabled"')"
+  htpasswd_user="$(echo "${cm_json}" | jq -r '.data["htpasswd-user"] // ""')"
+  htpasswd_secret_name="$(echo "${cm_json}" | jq -r '.data["htpasswd-secret-name"] // ""')"
+  user_settings_location="$(echo "${cm_json}" | jq -r '.data["user-settings-location"] // ""')"
+
+  if [[ "${desired}" == "present" && "${status}" != "ready" && "${status}" != "provisioning" ]]; then
+    if [[ -z "${plugin_image}" || -z "${test_ns}" ]]; then
+      log "WARN: ConfigMap ${cm_name} missing required fields (plugin-image, test-namespace)"
+      patch_cm "${cm_name}" '{"data":{"status":"error","error-message":"missing required fields: plugin-image and test-namespace"}}'
+      return
+    fi
+    if ! provision "${cm_name}" "${plugin_image}" "${test_ns}" "${console_image}" "${helm_release}" \
+      "${auth_mode}" "${htpasswd_user}" "${htpasswd_secret_name}" "${user_settings_location}"; then
+      log "ERROR: provision failed for ${cm_name}, ensuring status=error"
+      local cur_status
+      cur_status="$(oc get configmap "${cm_name}" -n "${CI_ENV_NS}" -o jsonpath='{.data.status}' 2>/dev/null || echo "")"
+      if [[ "${cur_status}" != "error" ]]; then
+        patch_cm "${cm_name}" '{"data":{"status":"error","error-message":"provision failed unexpectedly"}}'
+      fi
+    fi
+
+  elif [[ "${desired}" == "absent" && "${status}" != "cleaned" && "${status}" != "cleaning" ]]; then
+    if [[ -z "${test_ns}" ]]; then
+      log "WARN: ConfigMap ${cm_name} missing test-namespace for teardown"
+      patch_cm "${cm_name}" '{"data":{"status":"cleaned"}}'
+      return
+    fi
+    teardown "${cm_name}" "${test_ns}" "${helm_release}" "${auth_mode}" "${htpasswd_user}" || \
+      log "WARN: teardown encountered errors for ${cm_name} (non-fatal)"
+  fi
+}
+
+# --------------------------------------------------------------------------- #
+#  Stale environment reaper
+# --------------------------------------------------------------------------- #
+reap_stale() {
+  local now_epoch
+  now_epoch="$(date +%s)"
+
+  local cms
+  cms="$(oc get configmap -n "${CI_ENV_NS}" -l "${CI_ENV_LABEL}" -o json 2>/dev/null || echo '{"items":[]}')"
+
+  echo "${cms}" | jq -c '.items[]' 2>/dev/null | while IFS= read -r cm; do
+    local cm_name desired status created_ts
+    cm_name="$(echo "${cm}" | jq -r '.metadata.name')"
+    desired="$(echo "${cm}" | jq -r '.data["desired-state"] // ""')"
+    status="$(echo "${cm}" | jq -r '.data["status"] // ""')"
+    created_ts="$(echo "${cm}" | jq -r '.metadata.creationTimestamp // ""')"
+
+    if [[ "${desired}" != "present" || "${status}" == "cleaning" || "${status}" == "cleaned" ]]; then
+      continue
+    fi
+
+    if [[ -n "${created_ts}" ]]; then
+      local created_epoch
+      created_epoch="$(date -d "${created_ts}" +%s 2>/dev/null || echo 0)"
+      local age=$(( now_epoch - created_epoch ))
+      if (( age > CI_ENV_TTL_SECONDS )); then
+        log "REAPER: ConfigMap ${cm_name} is ${age}s old (TTL=${CI_ENV_TTL_SECONDS}s), forcing cleanup"
+        local test_ns helm_release
+        test_ns="$(echo "${cm}" | jq -r '.data["test-namespace"] // ""')"
+        helm_release="$(echo "${cm}" | jq -r '.data["helm-release"] // ""')"
+        teardown "${cm_name}" "${test_ns}" "${helm_release}"
+      fi
+    fi
+  done
+}
+
+# --------------------------------------------------------------------------- #
+#  Main watch loop
+# --------------------------------------------------------------------------- #
+main() {
+  log "ci-env-controller starting"
+  log "  CI_ENV_NS=${CI_ENV_NS}"
+  log "  CI_ENV_TTL_SECONDS=${CI_ENV_TTL_SECONDS}"
+  log "  CI_ENV_LABEL=${CI_ENV_LABEL}"
+  log "  CI_ENV_MANUAL_LABEL=${CI_ENV_MANUAL_LABEL}"
+  log "  HELM_CHART_PATH=${HELM_CHART_PATH}"
+
+  local reap_interval=300
+  local last_reap=0
+
+  while true; do
+    local now
+    now="$(date +%s)"
+    if (( now - last_reap > reap_interval )); then
+      # Only scans CI_ENV_LABEL (E2E) -- manual-console ConfigMaps are
+      # never force-cleaned by the TTL reaper.
+      reap_stale
+      last_reap="${now}"
+    fi
+
+    # Reconcile both the ephemeral E2E stream and the persistent
+    # manual-console stream in the same pass.
+    local cms manual_cms combined
+    cms="$(oc get configmap -n "${CI_ENV_NS}" -l "${CI_ENV_LABEL}" -o json 2>/dev/null || echo '{"items":[]}')"
+    manual_cms="$(oc get configmap -n "${CI_ENV_NS}" -l "${CI_ENV_MANUAL_LABEL}" -o json 2>/dev/null || echo '{"items":[]}')"
+    combined="$(jq -n --argjson a "${cms}" --argjson b "${manual_cms}" '{items: ($a.items + $b.items)}' 2>/dev/null || echo '{"items":[]}')"
+
+    echo "${combined}" | jq -c '.items[]' 2>/dev/null | while IFS= read -r cm; do
+      reconcile_one "${cm}"
+    done
+
+    sleep 10
+  done
+}
+
+main "$@"

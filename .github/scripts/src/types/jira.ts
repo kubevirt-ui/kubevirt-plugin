@@ -1,22 +1,22 @@
 export type JiraUser = {
   accountId: string;
+  active: boolean;
   displayName: string;
   emailAddress?: string;
-  active: boolean;
 };
 
 export type JiraVersion = {
+  archived: boolean;
+  description?: string;
   id: string;
   name: string;
-  archived: boolean;
   released: boolean;
-  description?: string;
 };
 
 export type JiraComponent = {
+  description?: string;
   id: string;
   name: string;
-  description?: string;
 };
 
 export type JiraPriority = {
@@ -38,58 +38,58 @@ export type JiraStatus = {
 
 export type JiraIssueLink = {
   id: string;
-  type: { id: string; name: string; inward: string; outward: string };
   inwardIssue?: { key: string };
   outwardIssue?: { key: string };
+  type: { id: string; inward: string; name: string; outward: string };
 };
 
 export type JiraIssueFields = {
-  summary: string;
-  description: unknown;
-  issuetype: JiraIssueType;
-  status: JiraStatus;
-  priority: JiraPriority;
+  [customField: `customfield_${string}`]: unknown;
   assignee: JiraUser | null;
-  reporter: JiraUser | null;
-  labels: string[];
   components: JiraComponent[];
+  description: unknown;
   fixVersions: JiraVersion[];
   issuelinks: JiraIssueLink[];
-  [customField: `customfield_${string}`]: unknown;
+  issuetype: JiraIssueType;
+  labels: string[];
+  priority: JiraPriority;
+  reporter: JiraUser | null;
+  status: JiraStatus;
+  summary: string;
 };
 
 export type JiraIssue = {
+  fields: JiraIssueFields;
   id: string;
   key: string;
   self: string;
-  fields: JiraIssueFields;
 };
 
 export type JiraFieldMeta = {
+  custom: boolean;
   id: string;
   key: string;
   name: string;
-  custom: boolean;
-  schema?: { type: string; custom?: string };
+  schema?: { custom?: string; type: string };
 };
 
 export type JiraCreateIssuePayload = {
   fields: {
-    project: { key: string };
-    issuetype: { id: string };
-    summary: string;
-    description?: unknown;
-    labels?: string[];
-    components?: Array<{ id: string }>;
-    assignee?: { accountId: string } | null;
-    reporter?: { accountId: string } | null;
-    priority?: { id: string };
-    fixVersions?: Array<{ id: string }>;
     [customField: `customfield_${string}`]: unknown;
+    assignee?: { accountId: string } | null;
+    components?: Array<{ id: string }>;
+    description?: unknown;
+    fixVersions?: Array<{ id: string }>;
+    issuetype: { id: string };
+    labels?: string[];
+    priority?: { id: string };
+    project: { key: string };
+    reporter?: { accountId: string } | null;
+    summary: string;
   };
 };
 
 export type DiscoveredFields = {
-  storyPointsFieldId: string | null;
-  activityTypeFieldId: string | null;
+  activityTypeFieldId: null | string;
+  storyPointsFieldId: null | string;
 };

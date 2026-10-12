@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "ci-test-stack.pluginName" . }}
+  labels:
+    {{- include "ci-test-stack.labels" . | nindent 4 }}
+    app.kubernetes.io/component: plugin
+spec:
+  type: ClusterIP
+  ports:
+    - port: {{ .Values.plugin.port }}
+      targetPort: {{ .Values.plugin.port }}
+      protocol: TCP
+      name: http
+  selector:
+    app: {{ include "ci-test-stack.pluginName" . }}

@@ -1,0 +1,60 @@
+/**
+ * Migration test fixture.
+ *
+ * Provides page objects for VM migration E2E tests (compute + storage).
+ * All tests in this fixture require cluster-admin privileges.
+ *
+ * Usage:
+ *   import { test, expect } from '@/fixtures/migration-fixture';
+ */
+
+import RequestContextClient from '@/clients/request-context-client';
+import CreateVmCreatePage from '@/page-objects/create-vm/create-vm-create-page';
+import CreateVmTemplatesPage from '@/page-objects/create-vm/create-vm-templates-page';
+import PageCommons from '@/page-objects/page-commons';
+import VirtualMachineDetailPage from '@/page-objects/vm/virtual-machine-detail-page';
+import VirtualMachinesPage from '@/page-objects/vm/virtual-machines-page';
+import { EnvVariables } from '@/utils/env-variables';
+import { TestConfigManager } from '@/utils/test-config';
+
+import { baseTest, expect } from './scenario-test-fixture';
+
+interface MigrationFixtures {
+  vmDetailPage: VirtualMachineDetailPage;
+  vmListPage: VirtualMachinesPage;
+  pageCommons: PageCommons;
+  createVmTemplatesPage: CreateVmTemplatesPage;
+  createVmCreatePage: CreateVmCreatePage;
+  requestContextClient: RequestContextClient;
+}
+
+const test = baseTest.extend<MigrationFixtures>({
+  vmDetailPage: async ({ page }, use) => {
+    await use(new VirtualMachineDetailPage(page));
+  },
+  vmListPage: async ({ page }, use) => {
+    await use(new VirtualMachinesPage(page));
+  },
+  pageCommons: async ({ page }, use) => {
+    await use(new PageCommons(page));
+  },
+  createVmTemplatesPage: async ({ page }, use) => {
+    await use(new CreateVmTemplatesPage(page));
+  },
+  createVmCreatePage: async ({ page }, use) => {
+    await use(new CreateVmCreatePage(page));
+  },
+  requestContextClient: async ({ page }, use) => {
+    const testConfig = TestConfigManager.getConfig();
+    await use(
+      new RequestContextClient(page, {
+        baseUrl: EnvVariables.clusterUrl,
+        username: EnvVariables.username,
+        password: EnvVariables.password,
+        ...(testConfig?.authToken ? { token: testConfig.authToken } : {}),
+      }),
+    );
+  },
+});
+
+export { expect, test };

@@ -1,0 +1,275 @@
+name: Hot Cluster Availability Check
+
+on:
+  workflow_call:
+    inputs:
+      cluster_name:
+        description: Cluster name to check
+        type: string
+        required: false
+        default: kubevirt-plugin-ci
+      base_domain:
+        description: Base domain for IPI cluster DNS
+        type: string
+        required: false
+        default: cnv-ui.com
+      infrastructure_type:
+        description: Infrastructure type for provisioning
+        type: string
+        required: false
+        default: vpc
+      zone:
+        description: Zone for cluster provisioning
+        type: string
+        required: false
+        default: us-south-1
+      openshift_version:
+        description: OpenShift version
+        type: string
+        required: false
+        default: '4.21_openshift'
+      branch_name:
+        description: |
+          Branch identity to report in the "Hot cluster ready" Slack
+          notification if provisioning happens (main/release-4.X, or a
+          plain branch name for ad-hoc dispatches). Forwarded as-is to
+          ibmc-cluster-setup.yml -- see its own branch_name input for the
+          fallback used when this is left empty.
+        type: string
+        required: false
+        default: ''
+      cnv_channel:
+        description: |
+          CNV OLM subscription channel to install if provisioning happens.
+          Defaults to the catalog's unversioned 'stable' channel
+          (redhat-operators has no stable-4.X for kubevirt-hyperconverged).
+          Forwarded as-is to ibmc-cluster-setup.yml.
+        type: string
+        required: false
+        default: 'stable'
+      cnv_pin_version:
+        description: |
+          "<major>.<minor>" to pin CNV to the newest matching CSV within
+          cnv_channel via startingCSV (e.g. for a release branch under
+          test); empty installs whatever cnv_channel currently resolves to.
+          If provisioning happens and no matching CSV can be found for this
+          version, the build fails rather than silently installing an
+          unpinned/newer CNV -- pass an explicit cnv_channel instead to
+          install unpinned deliberately. Forwarded as-is to
+          ibmc-cluster-setup.yml.
+        type: string
+        required: false
+        default: ''
+      worker_flavor:
+        description: Worker node flavor
+        type: string
+        required: false
+        default: bx2.8x32
+      worker_count:
+        description: Number of worker nodes
+        type: string
+        required: false
+        default: '2'
+      kvm_emulation:
+        description: KVM emulation
+        type: string
+        required: false
+        default: 'true'
+      should_run:
+        description: |
+          Whether this check should actually probe/provision. Set to false
+          for no-op/irrelevant trigger events so the caller can invoke this
+          workflow unconditionally (keeping check names stable) while
+          still getting a fast success and cluster_ready: 'false'.
+        type: boolean
+        required: false
+        default: true
+      run_health_check:
+        description: |
+          Run the deeper manual health check (DNS/API probe for IPI, or
+          IBM Cloud CLI + oc for ROKS) as extra steps of the `result` job
+          once the cluster is confirmed ready. Only meaningful for
+          workflow_dispatch -- folded in here (instead of a separate
+          top-level job in the caller) so pull_request_target runs never
+          show a permanently-skipped health-check row.
+        type: boolean
+        required: false
+        default: false
+      ibm_region:
+        description: IBM Cloud region, for the health check's IBM Cloud CLI setup (ROKS only)
+        type: string
+        required: false
+        default: eu-de
+      ibm_resource_group:
+        description: IBM Cloud resource group, for the health check's IBM Cloud CLI setup (ROKS only)
+        type: string
+        required: false
+        default: cnv-ui
+    outputs:
+      cluster_ready:
+        description: Whether the cluster is ready (true/false)
+        value: ${{ jobs.result.outputs.cluster_ready }}
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    name: Probe for Cluster
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    outputs:
+      cluster_ready: ${{ steps.probe.outputs.cluster_ready }}
+    steps:
+      # Skipped for a no-op/irrelevant event -- result's compute step
+      # already forces cluster_ready=false when should_run is false.
+      - name: Checkout
+        if: inputs.should_run
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+          sparse-checkout: ci-scripts/hot-cluster/ts
+
+      - name: Install infra-script dependencies
+        if: inputs.should_run
+        working-directory: ci-scripts/hot-cluster/ts
+        run: npm ci
+
+      - name: Probe for cluster
+        id: probe
+        if: inputs.should_run
+        env:
+          CLUSTER_NAME: ${{ inputs.cluster_name }}
+          INFRASTRUCTURE_TYPE: ${{ inputs.infrastructure_type }}
+          BASE_DOMAIN: ${{ inputs.base_domain }}
+        working-directory: ci-scripts/hot-cluster/ts
+        run: npx tsx src/scripts/probe-cluster-dns.ts
+
+  # Native reusable-workflow call so the cluster build shows up as a real,
+  # nested job in the Checks tab. ibmc-cluster-setup.yml's own `precheck`
+  # job re-probes DNS right after the concurrency lock below is acquired,
+  # so a PR queued behind an already-finished build skips straight through.
+  provision:
+    name: Provision Cluster
+    needs: probe
+    if: inputs.should_run && needs.probe.outputs.cluster_ready == 'false'
+    concurrency:
+      group: hot-cluster-provision-${{ inputs.cluster_name }}
+      cancel-in-progress: false
+      queue: max
+    uses: ./.github/workflows/ibmc-cluster-setup.yml
+    with:
+      infrastructure_type: ${{ inputs.infrastructure_type }}
+      cluster_name: ${{ inputs.cluster_name }}
+      zone: ${{ inputs.zone }}
+      openshift_version: ${{ inputs.openshift_version }}
+      branch_name: ${{ inputs.branch_name }}
+      cnv_channel: ${{ inputs.cnv_channel }}
+      cnv_pin_version: ${{ inputs.cnv_pin_version }}
+      worker_flavor: ${{ inputs.worker_flavor }}
+      worker_count: ${{ inputs.worker_count }}
+      # Declared as a string here but boolean on the callee's workflow_call
+      # input -- compare to produce a real boolean instead of passing the
+      # raw string through, which fails Actions' strict type validation.
+      kvm_emulation: ${{ inputs.kvm_emulation == 'true' }}
+    secrets: inherit
+
+  result:
+    name: Availability Result
+    needs: [probe, provision]
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      cluster_ready: ${{ steps.compute.outputs.cluster_ready }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+          sparse-checkout: ci-scripts/hot-cluster
+
+      - name: Install infra-script dependencies
+        working-directory: ci-scripts/hot-cluster/ts
+        run: npm ci
+
+      - name: Compute final readiness
+        id: compute
+        env:
+          SHOULD_RUN: ${{ inputs.should_run }}
+          PROBE_READY: ${{ needs.probe.outputs.cluster_ready }}
+          PROVISION_RESULT: ${{ needs.provision.result }}
+        working-directory: ci-scripts/hot-cluster/ts
+        run: npx tsx src/scripts/compute-cluster-readiness.ts
+
+      # The manual health check's own extra steps below fail this job
+      # directly (a failed command/exit 1, same as before it was folded in
+      # from a separate top-level job) -- no separate output needed, the
+      # caller reads this job's own result alongside cluster_ready.
+      - name: Setup IBM Cloud CLI (manual health check)
+        if: |
+          inputs.run_health_check && steps.compute.outputs.cluster_ready == 'true' &&
+          inputs.infrastructure_type != 'ipi'
+        uses: IBM/actions-ibmcloud-cli@v2
+        with:
+          api_key: ${{ secrets.IC_KEY }}
+          region: ${{ inputs.ibm_region }}
+          group: ${{ inputs.ibm_resource_group }}
+          plugins: kubernetes-service
+
+      - name: Install oc client (manual health check, ROKS)
+        if: |
+          inputs.run_health_check && steps.compute.outputs.cluster_ready == 'true' &&
+          inputs.infrastructure_type != 'ipi'
+        env:
+          CLUSTER_NAME: ${{ inputs.cluster_name }}
+        run: |
+          CLUSTER_JSON="$(ibmcloud oc cluster get --cluster "${CLUSTER_NAME}" --output json)"
+          export CLUSTER_JSON
+          cd ci-scripts/hot-cluster/ts && npx tsx src/scripts/install-oc-client.ts
+
+      - name: Configure kubeconfig (manual health check, ROKS)
+        if: |
+          inputs.run_health_check && steps.compute.outputs.cluster_ready == 'true' &&
+          inputs.infrastructure_type != 'ipi'
+        env:
+          CLUSTER_NAME: ${{ inputs.cluster_name }}
+        working-directory: ci-scripts/hot-cluster/ts
+        run: npx tsx src/scripts/configure-kubeconfig-roks.ts
+
+      - name: Manual health check (IPI, DNS probe)
+        if: |
+          inputs.run_health_check && steps.compute.outputs.cluster_ready == 'true' &&
+          inputs.infrastructure_type == 'ipi'
+        env:
+          CLUSTER_NAME: ${{ inputs.cluster_name }}
+          BASE_DOMAIN: ${{ inputs.base_domain }}
+        working-directory: ci-scripts/hot-cluster/ts
+        run: npx tsx src/scripts/ipi-health-check.ts
+
+      - name: Manual health check summary
+        if: always() && inputs.run_health_check
+        env:
+          CLUSTER_NAME: ${{ inputs.cluster_name }}
+          INFRASTRUCTURE_TYPE: ${{ inputs.infrastructure_type }}
+          JOB_STATUS: ${{ job.status }}
+        working-directory: ci-scripts/hot-cluster/ts
+        run: npx tsx src/scripts/write-health-check-summary.ts
+
+      - name: Summary
+        if: always()
+        env:
+          CLUSTER_NAME: ${{ inputs.cluster_name }}
+          PROBE_READY: ${{ needs.probe.outputs.cluster_ready }}
+          PROVISION_RESULT: ${{ needs.provision.result }}
+        working-directory: ci-scripts/hot-cluster/ts
+        run: npx tsx src/scripts/write-availability-summary.ts
+
+      - name: Fail if cluster is not ready
+        if: inputs.should_run && steps.compute.outputs.cluster_ready != 'true'
+        env:
+          CLUSTER_NAME: ${{ inputs.cluster_name }}
+          PROBE_READY: ${{ needs.probe.outputs.cluster_ready }}
+          PROVISION_RESULT: ${{ needs.provision.result }}
+        working-directory: ci-scripts/hot-cluster/ts
+        run: npx tsx src/scripts/fail-if-not-ready.ts

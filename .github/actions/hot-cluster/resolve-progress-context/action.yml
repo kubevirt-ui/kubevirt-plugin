@@ -1,0 +1,47 @@
+name: Resolve Hot Cluster Progress Status Context
+description: |
+  Computes the head SHA and commit-status context name that every "Hot
+  Cluster E2E Progress" posting in this pipeline must agree on, so all
+  phase updates (waiting / building / running / done) land on the same
+  commit-status entry. Also reports whether this is an ad-hoc dispatch
+  (bare workflow_dispatch, no pr_number) -- callers use is-adhoc-dispatch
+  to post under a distinct context so it can't collide with a real PR's
+  own status.
+
+inputs:
+  resolved-head-sha:
+    description: |
+      Freshly-resolved PR head SHA from the resolve-pr-context composite
+      (only meaningful for the pr_number retest path). Falls back to
+      context.sha when empty.
+    required: false
+    default: ''
+  pr-number:
+    description: |
+      inputs.pr_number from the calling workflow_dispatch, if any. Empty
+      for a bare ad-hoc dispatch or a normal pull_request_target event.
+    required: false
+    default: ''
+
+outputs:
+  head-sha:
+    description: Resolved commit SHA to post the progress status against
+    value: ${{ steps.resolve.outputs.head_sha }}
+  status-context:
+    description: Commit-status context name to post under
+    value: ${{ steps.resolve.outputs.status_context }}
+  is-adhoc-dispatch:
+    description: "'true' if this is a bare workflow_dispatch with no pr_number"
+    value: ${{ steps.resolve.outputs.is_adhoc_dispatch }}
+
+runs:
+  using: composite
+  steps:
+    - name: Resolve progress status head SHA and context name
+      id: resolve
+      shell: bash
+      env:
+        RESOLVED_HEAD_SHA: ${{ inputs.resolved-head-sha }}
+        PR_NUMBER: ${{ inputs.pr-number }}
+      working-directory: .github/scripts
+      run: npx tsx src/e2e/resolve-progress-context.ts

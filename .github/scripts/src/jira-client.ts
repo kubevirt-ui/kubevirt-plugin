@@ -8,8 +8,8 @@ import type {
 } from './types/index';
 
 type RequestOptions = {
-  method?: string;
   body?: unknown;
+  method?: string;
   params?: Record<string, string>;
 };
 
@@ -20,22 +20,19 @@ export class JiraClient {
   private fieldCache: DiscoveredFields | null = null;
 
   private request = async <T>(path: string, options: RequestOptions = {}): Promise<T> => {
-    const { method = 'GET', body, params } = options;
-    let url = `${this.baseUrl}/rest/api/3${path}`;
-
-    if (params) {
-      const searchParams = new URLSearchParams(params);
-      url += `?${searchParams.toString()}`;
-    }
+    const { body, method = 'GET', params } = options;
+    const url = params
+      ? `${this.baseUrl}/rest/api/3${path}?${new URLSearchParams(params).toString()}`
+      : `${this.baseUrl}/rest/api/3${path}`;
 
     const response = await fetch(url, {
-      method,
+      body: body ? JSON.stringify(body) : undefined,
       headers: {
-        Authorization: this.authHeader,
         Accept: 'application/json',
+        Authorization: this.authHeader,
         'Content-Type': 'application/json',
       },
-      body: body ? JSON.stringify(body) : undefined,
+      method,
     });
 
     if (!response.ok) {
@@ -55,20 +52,20 @@ export class JiraClient {
   /** Add a text comment to a Jira issue using ADF format. */
   addComment = async (issueKey: string, bodyText: string): Promise<void> => {
     await this.request<unknown>(`/issue/${issueKey}/comment`, {
-      method: 'POST',
       body: {
         body: {
+          content: [{ content: [{ text: bodyText, type: 'text' }], type: 'paragraph' }],
           type: 'doc',
           version: 1,
-          content: [{ type: 'paragraph', content: [{ type: 'text', text: bodyText }] }],
         },
       },
+      method: 'POST',
     });
   };
 
   /** Create a new Jira issue. */
   createIssue = async (payload: JiraCreateIssuePayload): Promise<JiraIssue> =>
-    this.request<JiraIssue>('/issue', { method: 'POST', body: payload });
+    this.request<JiraIssue>('/issue', { body: payload, method: 'POST' });
 
   /** Link two issues (e.g., "Cloners" link type). */
   createIssueLink = async (
@@ -77,35 +74,29 @@ export class JiraClient {
     linkTypeName: string = 'Cloners',
   ): Promise<void> => {
     await this.request<void>('/issueLink', {
-      method: 'POST',
       body: {
-        type: { name: linkTypeName },
         inwardIssue: { key: inwardIssueKey },
         outwardIssue: { key: outwardIssueKey },
+        type: { name: linkTypeName },
       },
+      method: 'POST',
     });
   };
 
   /** Auto-discover custom field IDs for "Story Points" and "Activity Type" (cached). */
   discoverCustomFields = async (): Promise<DiscoveredFields> => {
-    if (this.fieldCache) return this.fieldCache;
-
-    const fields = await this.getAllFields();
-    let storyPointsFieldId: string | null = null;
-    let activityTypeFieldId: string | null = null;
-
-    for (const field of fields) {
-      const nameLower = field.name.toLowerCase();
-      if (!storyPointsFieldId && nameLower === 'story points') {
-        storyPointsFieldId = field.id;
-      }
-      if (!activityTypeFieldId && nameLower === 'activity type') {
-        activityTypeFieldId = field.id;
-      }
-      if (storyPointsFieldId && activityTypeFieldId) break;
+    if (this.fieldCache) {
+      return this.fieldCache;
     }
 
-    this.fieldCache = { storyPointsFieldId, activityTypeFieldId };
+    const fields = await this.getAllFields();
+    const storyPointsField = fields.find((field) => field.name.toLowerCase() === 'story points');
+    const activityTypeField = fields.find((field) => field.name.toLowerCase() === 'activity type');
+
+    this.fieldCache = {
+      activityTypeFieldId: activityTypeField?.id ?? null,
+      storyPointsFieldId: storyPointsField?.id ?? null,
+    };
     return this.fieldCache;
   };
 

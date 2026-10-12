@@ -1,11 +1,12 @@
-import { sanitizeDescriptionForClone } from './adf-utils';
-import { buildClonedIssueSummary } from '../version-utils';
+import { buildClonedIssueSummary } from '../version-compare';
+
 import type {
   DiscoveredFields,
   JiraCreateIssuePayload,
   JiraIssue,
   JiraVersion,
 } from '../types/index';
+import { sanitizeDescriptionForClone } from './adf-utils';
 
 const isCustomFieldOption = (value: unknown): value is { id: string } =>
   typeof value === 'object' &&
@@ -21,7 +22,7 @@ export const buildClonePayload = (
 ): JiraCreateIssuePayload => {
   const { fields } = original;
   const description = sanitizeDescriptionForClone(fields.description);
-  if (description == null) {
+  if (description === null || description === undefined) {
     throw new Error(
       `Cannot clone ${original.key}: description is missing or empty after sanitization`,
     );
@@ -29,13 +30,13 @@ export const buildClonePayload = (
 
   const payload: JiraCreateIssuePayload = {
     fields: {
-      project: { key: 'CNV' },
-      issuetype: { id: fields.issuetype.id },
-      summary: buildClonedIssueSummary(fields.summary, targetFixVersion.name),
+      components: fields.components.map((comp) => ({ id: comp.id })),
       description,
-      labels: [...fields.labels],
-      components: fields.components.map((c) => ({ id: c.id })),
       fixVersions: [{ id: targetFixVersion.id }],
+      issuetype: { id: fields.issuetype.id },
+      labels: [...fields.labels],
+      project: { key: 'CNV' },
+      summary: buildClonedIssueSummary(fields.summary, targetFixVersion.name),
     },
   };
   if (fields.assignee) {
@@ -50,7 +51,7 @@ export const buildClonePayload = (
 
   if (discoveredFields.storyPointsFieldId) {
     const spValue = fields[discoveredFields.storyPointsFieldId as `customfield_${string}`];
-    if (spValue != null) {
+    if (spValue !== null && spValue !== undefined) {
       payload.fields[discoveredFields.storyPointsFieldId as `customfield_${string}`] = spValue;
     }
   }

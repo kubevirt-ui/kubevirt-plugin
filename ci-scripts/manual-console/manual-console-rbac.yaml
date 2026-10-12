@@ -1,0 +1,53 @@
+# Grants the ARC runner ServiceAccount just enough permission to build the
+# kubevirt-plugin image in-cluster, scoped to the manual-console namespace
+# only. arc-runner-rbac.yaml intentionally does NOT grant this cluster-wide,
+# to keep the E2E path's RBAC surface minimal.
+#
+# Idempotent, one-time bootstrap per cluster. Apply via:
+#   ./ci-scripts/manual-console/install-manual-console-rbac.sh
+#
+# That script substitutes the ServiceAccount subject below from
+# RUNNER_SCALE_SET_NAME / ARC_RUNNERS_NS -- do not apply this file directly
+# with `oc apply -f` unless your runner scale set is actually named
+# "kubevirt-plugin-ci" (the default); a release cluster's runner is named
+# "<RUNNER_SCALE_SET_NAME>-gha-rs-no-permission", which the raw subject
+# below never matches.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: manual-console-image-build
+  namespace: manual-console
+  labels:
+    app.kubernetes.io/component: manual-console-rbac
+rules:
+  - apiGroups: ['image.openshift.io']
+    resources: ['imagestreams', 'imagestreams/layers', 'imagestreamtags']
+    verbs: ['get', 'list', 'watch', 'create', 'update', 'patch']
+  - apiGroups: ['build.openshift.io']
+    resources: ['buildconfigs']
+    verbs: ['get', 'list', 'watch', 'create', 'update', 'patch']
+  - apiGroups: ['build.openshift.io']
+    resources: ['buildconfigs/instantiatebinary']
+    verbs: ['create']
+  - apiGroups: ['build.openshift.io']
+    resources: ['builds']
+    verbs: ['get', 'list', 'watch']
+  - apiGroups: ['build.openshift.io']
+    resources: ['builds/log']
+    verbs: ['get']
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: manual-console-image-build
+  namespace: manual-console
+  labels:
+    app.kubernetes.io/component: manual-console-rbac
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: manual-console-image-build
+subjects:
+  - kind: ServiceAccount
+    name: kubevirt-plugin-ci-gha-rs-no-permission
+    namespace: arc-runners

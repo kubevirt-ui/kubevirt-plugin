@@ -1,0 +1,23 @@
+{{- if .Values.console.route.enabled }}
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: {{ include "ci-test-stack.consoleName" . }}
+  labels:
+    {{- include "ci-test-stack.labels" . | nindent 4 }}
+    app.kubernetes.io/component: console
+spec:
+  {{- if .Values.console.route.host }}
+  host: {{ .Values.console.route.host | quote }}
+  {{- end }}
+  to:
+    kind: Service
+    name: {{ include "ci-test-stack.consoleName" . }}
+    weight: 100
+  port:
+    targetPort: http
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
+  wildcardPolicy: None
+{{- end }}
