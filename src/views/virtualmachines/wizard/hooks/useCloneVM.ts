@@ -103,13 +103,13 @@ const useCloneVM: UseCloneVM = () => {
         throw new Error(t('VirtualMachine with this name already exists'));
       }
 
-      const request = await createCloneRequest(
+      const request = await createCloneRequest({
+        description: targetDescription,
+        namespace: targetProject,
         source,
+        startVM: source.spec?.runStrategy !== RUNSTRATEGY_HALTED,
         targetName,
-        targetProject,
-        source.spec?.runStrategy !== RUNSTRATEGY_HALTED,
-        targetDescription,
-      );
+      });
 
       if (cloneCluster && isACMPath(pathname)) {
         setClusterInLocalStorage(cloneCluster);

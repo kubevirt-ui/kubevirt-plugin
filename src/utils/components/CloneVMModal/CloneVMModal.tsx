@@ -1,34 +1,28 @@
-import { type FC, useEffect, useRef, useState } from 'react';
+import { type FC, useMemo, useState } from 'react';
 
 import {
-  type V1beta1VirtualMachineClone,
   type V1beta1VirtualMachineSnapshot,
   type V1VirtualMachine,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
-import {
-  TELEMETRY_STATUS,
-  TELEMETRY_VM_ACTION,
-} from '@kubevirt-utils/extensions/telemetry/utils/property-constants';
-import { logVMActionPerformed } from '@kubevirt-utils/extensions/telemetry/vm-actions';
-import { logVMCloned } from '@kubevirt-utils/extensions/telemetry/vm-storage';
+import { logVMCloned, TELEMETRY_STATUS } from '@kubevirt-utils/extensions/telemetry';
 import useKubevirtToast from '@kubevirt-utils/hooks/useKubevirtToast';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useNameValidation } from '@kubevirt-utils/hooks/useNameValidation';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
+import { pushNewWatchedToast } from '@kubevirt-utils/signals/toastRequestResultSignal';
 import { isVM } from '@kubevirt-utils/utils/typeGuards';
-import { truncateToK8sName } from '@kubevirt-utils/utils/utils';
+import { getRandomChars, truncateToK8sName } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { Divider, ModalVariant } from '@patternfly/react-core';
 
-import CloneStatusAlerts from './components/CloneStatusAlerts';
 import CloneVMModalConfigSection from './components/CloneVMModalConfigSection';
 import DescriptionInput from './components/DescriptionInput';
 import NameInput from './components/NameInput';
 import SnapshotContentConfigurationSummary from './components/SnapshotContentConfigurationSummary';
 import StartClonedVMCheckbox from './components/StartClonedVMCheckbox/StartClonedVMCheckbox';
-import useCloneVMModal from './hooks/useCloneVMModal';
-import { CLONING_STATUSES, isClonePhaseFailed, isClonePhaseInProgress } from './utils/constants';
+import { getFailedCloneToastOptions, getToastWatchResourceData } from './utils/cloneWatchedToast';
+import { CLONE_VM_TOAST_TITLE } from './utils/constants';
 import getSubmitBtnText from './utils/getSubmitBtnText';
 import { cloneVM, vmExists } from './utils/helpers';
 
@@ -41,7 +35,6 @@ type CloneVMModalProps = {
 
 const CloneVMModal: FC<CloneVMModalProps> = ({ headerText, isOpen, onClose, source }) => {
   const { t } = useKubevirtTranslation();
-  const { addSuccessToast } = useKubevirtToast();
   const namespace = getNamespace(source);
   const name = getName(source);
 
@@ -55,78 +48,76 @@ const CloneVMModal: FC<CloneVMModalProps> = ({ headerText, isOpen, onClose, sour
     validated,
   } = useNameValidation({ name: cloneName });
 
+  const { addInfoToast } = useKubevirtToast();
+
   const [cloneDescription, setCloneDescription] = useState('');
   const [startCloneVM, setStartCloneVM] = useState(false);
-  const [initialCloneRequest, setInitialCloneRequest] = useState<V1beta1VirtualMachineClone>();
 
-  const sendCloneRequest = async (): Promise<void> => {
-    const vmSameName = await vmExists(cloneName, namespace, getCluster(source));
+  const title = useMemo(() => `${CLONE_VM_TOAST_TITLE} - ${cloneName}`, [cloneName]);
+
+  const handleSendCloneRequest = async (cluster: string | undefined): Promise<void> => {
+    const metadataName = truncateToK8sName(cloneName, `${getRandomChars(6)}-cr`);
+    const watchedToastData = getToastWatchResourceData({
+      cluster,
+      metadataName,
+      namespace,
+      t,
+      title,
+    });
+    try {
+      await cloneVM({
+        description: cloneDescription,
+        metadataName,
+        namespace,
+        source,
+        startVM: startCloneVM,
+        targetName: cloneName,
+      });
+      pushNewWatchedToast(watchedToastData);
+      logVMCloned({ status: TELEMETRY_STATUS.SUCCESS });
+    } catch (error) {
+      logVMCloned({ status: TELEMETRY_STATUS.FAILURE });
+      pushNewWatchedToast({
+        ...watchedToastData,
+        ...getFailedCloneToastOptions(t, title, watchedToastData, error),
+      });
+    }
+  };
+
+  const handleSubmit = async (): Promise<void> => {
+    const cluster = getCluster(source);
+    const vmSameName = await vmExists(cloneName, namespace, cluster);
 
     if (vmSameName) {
       throw new Error(t('VirtualMachine with this name already exists'));
     }
 
-    const request = await cloneVM(source, cloneName, namespace, startCloneVM, cloneDescription);
-    setInitialCloneRequest(request);
+    addInfoToast({
+      content: t(
+        'Cloning may take several minutes. You can close this dialog — the process will continue in the background. The cloned virtual machine may take some time to appear in the list.',
+      ),
+      title,
+    });
+
+    await handleSendCloneRequest(cluster);
+    onClose();
   };
-
-  const cloneRequest = useCloneVMModal(
-    getName(initialCloneRequest),
-    getNamespace(initialCloneRequest),
-    getCluster(initialCloneRequest),
-  );
-
-  const clonePhase = cloneRequest?.status?.phase;
-  const isCloneSucceeded = clonePhase === CLONING_STATUSES.SUCCEEDED;
-  const isCloneFailed = isClonePhaseFailed(clonePhase);
-  const isCloneInProgress =
-    Boolean(initialCloneRequest) &&
-    !isCloneSucceeded &&
-    !isCloneFailed &&
-    isClonePhaseInProgress(clonePhase);
-  const cloneFailureMessage = cloneRequest?.status?.conditions?.find(
-    (condition) => condition.status === 'False',
-  )?.message;
-
-  const hasLoggedCloneSuccessRef = useRef(false);
-
-  useEffect(() => {
-    if (isCloneSucceeded && !hasLoggedCloneSuccessRef.current) {
-      hasLoggedCloneSuccessRef.current = true;
-      logVMCloned({ status: TELEMETRY_STATUS.SUCCESS });
-      if (isVM(source)) {
-        logVMActionPerformed(TELEMETRY_VM_ACTION.CLONE, source);
-      }
-      addSuccessToast({
-        title: t(
-          'Clone completed. The cloned virtual machine may take some time to appear in the list.',
-        ),
-      });
-      onClose();
-    }
-  }, [addSuccessToast, isCloneSucceeded, onClose, source, t]);
 
   return (
     <TabModal
-      cancelBtnText={initialCloneRequest ? t('Close') : undefined}
+      cancelBtnText={t('Close')}
       closeOnSubmit={false}
       headerText={headerText ?? t('Clone {{sourceKind}}', { sourceKind: source.kind })}
-      isDisabled={!isCloneNameValid || isCloneInProgress}
+      isDisabled={!isCloneNameValid}
       isHorizontal
-      isLoading={isCloneInProgress}
       isOpen={isOpen}
       modalVariant={ModalVariant.medium}
       obj={source}
       onClose={onClose}
-      onSubmit={sendCloneRequest}
+      onSubmit={handleSubmit}
       shouldWrapInForm
-      submitBtnText={getSubmitBtnText(isCloneInProgress, isVM(source), t)}
+      submitBtnText={getSubmitBtnText(false, isVM(source), t)}
     >
-      <CloneStatusAlerts
-        cloneFailureMessage={cloneFailureMessage}
-        isCloneFailed={isCloneFailed}
-        isCloneInProgress={isCloneInProgress}
-      />
       <NameInput
         autoFocus
         errorText={errorText}

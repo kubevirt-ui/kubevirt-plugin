@@ -7,6 +7,7 @@ import {
   useState,
 } from 'react';
 
+import KubevirtToastListener from '@kubevirt-utils/hooks/useKubevirtToast/KubevirtToastListener';
 import UploadProgressToastProvider from '@kubevirt-utils/hooks/useUploadProgressToast/UploadProgressToastProvider';
 
 export type ModalComponentProps = {
@@ -75,6 +76,7 @@ export const ModalProvider: FC<{
 
   return (
     <ModalContext.Provider value={value}>
+      <KubevirtToastListener />
       <UploadProgressToastProvider>
         {Modal && isOpen && (
           <Modal
