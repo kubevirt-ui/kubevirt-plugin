@@ -59,7 +59,7 @@ const VMCreationLocationForm: FC = () => {
                   if (selectedCluster === getValues('deployment.cluster')) return;
                   field.onChange(selectedCluster);
                   setValue('deployment.folder', '');
-                  setValue('deployment.project', '', { shouldValidate: true });
+                  setValue('deployment.project', DEFAULT_NAMESPACE, { shouldValidate: true });
                   clearLocationDependentVM();
                 }}
                 selectedCluster={value as string}
