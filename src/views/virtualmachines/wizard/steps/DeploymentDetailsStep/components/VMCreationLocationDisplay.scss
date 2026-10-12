@@ -5,11 +5,15 @@
   align-items: center;
 
   &__form-control {
+    appearance: none;
+    border: 0;
+    text-align: start;
+
     .vm-creation-location-display__content {
-      padding-block-start: var(--pf-t--global--spacer--control--vertical--default);
-      padding-block-end: var(--pf-t--global--spacer--control--vertical--default);
-      padding-inline-start: var(--pf-t--global--spacer--control--horizontal--default);
-      padding-inline-end: var(--pf-t--global--spacer--control--horizontal--default);
+      padding-block: var(--pf-t--global--spacer--control--vertical--default)
+        var(--pf-t--global--spacer--control--vertical--default);
+      padding-inline: var(--pf-t--global--spacer--control--horizontal--default)
+        var(--pf-t--global--spacer--control--horizontal--default);
       color: var(--pf-t--global--text--color--regular);
       font-size: var(--pf-t--global--font--size--body--default);
       line-height: var(--pf-t--global--font--line-height--body);
