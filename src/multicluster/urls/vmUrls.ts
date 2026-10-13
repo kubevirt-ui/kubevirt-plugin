@@ -48,11 +48,19 @@ export const getACMVMListURL = (cluster?: string, namespace?: string): string =>
 export const getACMVMListNamespacesURL = (cluster: string, namespace: string): string =>
   `${FLEET_VIRTUAL_MACHINES_PATH}/cluster/${cluster}/ns/${namespace}`;
 
+const isPathUnderPrefix = (path: string, prefix: string): boolean => {
+  if (!path.startsWith(prefix)) {
+    return false;
+  }
+  if (path.length === prefix.length) {
+    return true;
+  }
+  const boundary = path[prefix.length];
+  return boundary === '/' || boundary === '?' || boundary === '#';
+};
+
 export const isVMWizardURL = (path: string = ''): boolean =>
-  path === '/vm-wizard' ||
-  path.startsWith('/vm-wizard/') ||
-  path === FLEET_WIZARD_PATH ||
-  path.startsWith(`${FLEET_WIZARD_PATH}/`);
+  isPathUnderPrefix(path, '/vm-wizard') || isPathUnderPrefix(path, FLEET_WIZARD_PATH);
 
 export const getVMWizardURL = (isACM?: boolean): string =>
   isACM ? FLEET_WIZARD_PATH : '/vm-wizard';
