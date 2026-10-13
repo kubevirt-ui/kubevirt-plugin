@@ -17,9 +17,7 @@ export const getSchedulingPendingChanges = ({
     authorizedSSHKeys,
     cloudInitChanged,
     hideYamlTab,
-    nodes,
     nodeSelectorChanged,
-    nodesLoaded,
     sshServiceChanged,
     t,
     tolerationsChanged,
@@ -31,14 +29,7 @@ export const getSchedulingPendingChanges = ({
   {
     ...createProps(VirtualMachineDetailsTab.Scheduling, () =>
       createModal(({ isOpen, onClose }) => (
-        <NodeSelectorModal
-          isOpen={isOpen}
-          nodes={nodes}
-          nodesLoaded={nodesLoaded}
-          onClose={onClose}
-          onSubmit={onSubmit}
-          vm={vm}
-        />
+        <NodeSelectorModal isOpen={isOpen} onClose={onClose} onSubmit={onSubmit} vm={vm} />
       )),
     ),
     hasPendingChange: nodeSelectorChanged,
@@ -65,12 +56,10 @@ export const getSchedulingPendingChanges = ({
       createModal(({ isOpen, onClose }) => (
         <TolerationsModal
           isOpen={isOpen}
-          nodes={nodes}
-          nodesLoaded={nodesLoaded}
           onClose={onClose}
           onSubmit={onSubmit}
+          showPendingChangesAlert={!!vmi}
           vm={vm}
-          vmi={vmi}
         />
       )),
     ),
@@ -80,14 +69,7 @@ export const getSchedulingPendingChanges = ({
   {
     ...createProps(VirtualMachineDetailsTab.Scheduling, () =>
       createModal(({ isOpen, onClose }) => (
-        <AffinityModal
-          isOpen={isOpen}
-          nodes={nodes}
-          nodesLoaded={nodesLoaded}
-          onClose={onClose}
-          onSubmit={onSubmit}
-          vm={vm}
-        />
+        <AffinityModal isOpen={isOpen} onClose={onClose} onSubmit={onSubmit} vm={vm} />
       )),
     ),
     hasPendingChange: affinityChanged,

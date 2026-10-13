@@ -4,7 +4,6 @@ import { Operator } from '@openshift-console/dynamic-plugin-sdk';
 import { intersectionWith } from './predicates';
 import { type AffinityLabel, type AffinityRowData } from './types';
 
-export { getRowsDataFromAffinity } from './affinityToRows';
 export { get, has, intersectionWith, unionWith, withOperatorPredicate } from './predicates';
 export { getAffinityFromRowsData } from './rowsToAffinity';
 

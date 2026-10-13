@@ -1,7 +1,5 @@
 import { useNavigate } from 'react-router';
 
-import { modelToGroupVersionKind, NodeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { type IoK8sApiCoreV1Node } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import {
   type V1VirtualMachine,
   type V1VirtualMachineInstance,
@@ -16,7 +14,6 @@ import { USER_SETTINGS_KEYS } from '@kubevirt-utils/hooks/useKubevirtUserSetting
 import { getEvictionStrategy as getHCOEvictionStrategy } from '@kubevirt-utils/resources/hyperconverged/selectors';
 import { getCPU } from '@kubevirt-utils/resources/vm';
 import { getCluster } from '@multicluster/helpers/selectors';
-import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 import { isRunning } from '@virtualmachines/utils';
 
 import {
@@ -62,12 +59,6 @@ export const usePendingChanges = (
 
   const [hyperConverge, hyperLoaded, hyperLoadingError] = useHyperConvergeConfiguration(cluster);
 
-  const [nodes, nodesLoaded] = useK8sWatchData<IoK8sApiCoreV1Node[]>({
-    cluster,
-    groupVersionKind: modelToGroupVersionKind(NodeModel),
-    isList: true,
-  });
-
   if (!vmi || !isRunning(vm)) {
     return [];
   }
@@ -107,9 +98,7 @@ export const usePendingChanges = (
     modifiedNICs: getChangedNICs(vm, vmi),
     modifiedVolumesHotplug: getChangedVolumesHotplug(vm, vmi),
     navigate,
-    nodes,
     nodeSelectorChanged: getChangedNodeSelector(vm, vmi),
-    nodesLoaded,
     sshServiceChanged: getChangedAuthorizedSSHKey(vm, vmi),
     startStrategyChanged: getChangedStartStrategy(vm, vmi),
     t,

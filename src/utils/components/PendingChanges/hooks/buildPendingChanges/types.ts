@@ -3,7 +3,6 @@ import { type NavigateFunction } from 'react-router';
 import { type TFunction } from 'i18next';
 
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { type IoK8sApiCoreV1Node } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import {
   type V1VirtualMachine,
   type V1VirtualMachineInstance,
@@ -42,9 +41,7 @@ export type BuildPendingChangesParams = {
   modifiedNICs: string[];
   modifiedVolumesHotplug: V1VirtualMachine['spec']['template']['spec']['volumes'];
   navigate: NavigateFunction;
-  nodes: IoK8sApiCoreV1Node[];
   nodeSelectorChanged: boolean;
-  nodesLoaded: boolean;
   sshServiceChanged: boolean;
   startStrategyChanged: boolean;
   t: TFunction;

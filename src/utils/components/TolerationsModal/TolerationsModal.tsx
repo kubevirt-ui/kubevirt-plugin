@@ -1,24 +1,25 @@
-import { type FC, useMemo, useState } from 'react';
-import produce from 'immer';
+import { type FC, useMemo } from 'react';
 
-import { NodeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { type IoK8sApiCoreV1Node } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import {
   K8sIoApiCoreV1TolerationEffectEnum,
   type V1VirtualMachine,
-  type V1VirtualMachineInstance,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import LabelsList from '@kubevirt-utils/components/NodeSelectorModal/components/LabelList';
 import NodeCheckerAlert from '@kubevirt-utils/components/NodeSelectorModal/components/NodeCheckerAlert';
-import { useIDEntities } from '@kubevirt-utils/components/NodeSelectorModal/hooks/useIDEntities';
 import { isEqualObject } from '@kubevirt-utils/components/NodeSelectorModal/utils/helpers';
 import ModalPendingChangesAlert from '@kubevirt-utils/components/PendingChanges/ModalPendingChangesAlert/ModalPendingChangesAlert';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { modelToGroupVersionKind, NodeModel } from '@kubevirt-utils/models';
 import { getTolerations } from '@kubevirt-utils/resources/vm';
-import { ensurePath, isEmpty } from '@kubevirt-utils/utils/utils';
-import { ModalVariant, Stack, StackItem } from '@patternfly/react-core';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
+import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
+import { ModalVariant } from '@patternfly/react-core';
+import { Stack, StackItem } from '@patternfly/react-core';
 
+import { useIDEntities } from '../NodeSelectorModal/hooks/useIDEntities';
 import TolerationEditRow from './TolerationEditRow';
 import TolerationListHeaders from './TolerationListHeaders';
 import TolerationModalDescriptionText from './TolerationModalDescriptionText';
@@ -29,29 +30,30 @@ import {
   hasIncompleteTolerations,
   toK8sTolerations,
 } from './utils/helpers';
+import { produceVMWithTolerations } from './utils/utils';
 
 type TolerationsModalProps = {
   isOpen: boolean;
-  nodes?: IoK8sApiCoreV1Node[];
-  nodesLoaded?: boolean;
   onClose: () => void;
   onSubmit: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine | void>;
-  vm?: V1VirtualMachine;
-  vmi?: V1VirtualMachineInstance;
+  showPendingChangesAlert?: boolean;
+  vm: V1VirtualMachine;
 };
 
 const TolerationsModal: FC<TolerationsModalProps> = ({
   isOpen,
-  nodes,
-  nodesLoaded,
   onClose,
   onSubmit,
+  showPendingChangesAlert,
   vm,
-  vmi,
 }) => {
   const { t } = useKubevirtTranslation();
-  const [initialTolerations] = useState(() =>
-    toK8sTolerations((getTolerations(vm) ?? []).map((toleration, id) => ({ ...toleration, id }))),
+  const cluster = useClusterParam();
+
+  const initialTolerations = useMemo(
+    () =>
+      toK8sTolerations((getTolerations(vm) ?? []).map((toleration, id) => ({ ...toleration, id }))),
+    [vm],
   );
   const {
     entities: tolerationsLabels,
@@ -62,11 +64,19 @@ const TolerationsModal: FC<TolerationsModalProps> = ({
     initialTolerations.map((toleration, id) => ({ ...toleration, id })),
   );
 
-  const tolerationLabelsEmpty = tolerationsLabels?.length === 0;
+  const tolerationLabelsEmpty = isEmpty(tolerationsLabels);
 
   const tolerations = toK8sTolerations(tolerationsLabels);
 
-  const qualifiedNodes = getNodeTaintQualifier(nodes, nodesLoaded, tolerationsLabels);
+  const updatedVM = useMemo(() => produceVMWithTolerations(vm, tolerations), [vm, tolerations]);
+
+  const [nodes, nodesLoaded] = useK8sWatchData<IoK8sApiCoreV1Node[]>({
+    cluster,
+    groupVersionKind: modelToGroupVersionKind(NodeModel),
+    isList: true,
+  });
+
+  const qualifiedNodes = getNodeTaintQualifier(nodes, tolerationsLabels);
 
   const onSelectorLabelAdd = (): void =>
     onTolerationAdd({
@@ -76,31 +86,22 @@ const TolerationsModal: FC<TolerationsModalProps> = ({
       value: '',
     });
 
-  const updatedVirtualMachine = useMemo(() => {
-    const updatedVM = produce<V1VirtualMachine>(vm, (vmDraft: V1VirtualMachine) => {
-      ensurePath(vmDraft, 'spec.template.spec.tolerations');
-
-      vmDraft.spec.template.spec.tolerations = tolerations;
-    });
-    return updatedVM;
-  }, [tolerations, vm]);
-
   const isIncomplete = hasIncompleteTolerations(tolerationsLabels);
   const isDirty = !isEqualObject(tolerations, initialTolerations);
 
   return (
-    <TabModal
+    <TabModal<V1VirtualMachine>
       headerText={t('Tolerations')}
       isDisabled={!isDirty || isIncomplete}
       isOpen={isOpen}
       modalVariant={ModalVariant.medium}
-      obj={updatedVirtualMachine}
+      obj={updatedVM}
       onClose={onClose}
       onSubmit={onSubmit}
       submitDisabledTooltip={getTolerationsModalSubmitTooltip(isDirty, isIncomplete, t)}
     >
       <Stack hasGutter>
-        <StackItem>{vmi && <ModalPendingChangesAlert />}</StackItem>
+        <StackItem>{showPendingChangesAlert && <ModalPendingChangesAlert />} </StackItem>
         <StackItem>
           <TolerationModalDescriptionText />
         </StackItem>
@@ -110,7 +111,7 @@ const TolerationsModal: FC<TolerationsModalProps> = ({
               addRowText={t('Add toleration')}
               emptyStateAddRowText={t('Add toleration to specify qualifying Nodes')}
               isEmpty={tolerationLabelsEmpty}
-              model={!isEmpty(nodes) && NodeModel}
+              model={!isEmpty(nodes) ? NodeModel : undefined}
               onLabelAdd={onSelectorLabelAdd}
             >
               {!tolerationLabelsEmpty && (
@@ -127,11 +128,8 @@ const TolerationsModal: FC<TolerationsModalProps> = ({
                 </>
               )}
             </LabelsList>
-            {!tolerationLabelsEmpty && nodesLoaded && (
-              <NodeCheckerAlert
-                nodesLoaded={nodesLoaded}
-                qualifiedNodes={tolerationsLabels?.length === 0 ? nodes : qualifiedNodes}
-              />
+            {nodesLoaded && (
+              <NodeCheckerAlert nodesLoaded={nodesLoaded} qualifiedNodes={qualifiedNodes} />
             )}
           </div>
         </StackItem>
