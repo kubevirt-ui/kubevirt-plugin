@@ -1,15 +1,15 @@
 import { type TFunction } from 'i18next';
 
-import { type V1beta1VirtualMachineClone } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { modelToGroupVersionKind, VirtualMachineCloneModel } from '@kubevirt-utils/models';
 import { type WatchedToastData } from '@kubevirt-utils/signals/toastRequestResultSignal';
 import { getErrorMessage } from '@kubevirt-utils/utils/errorUtils';
+import { type FleetWatchK8sResource } from '@stolostron/multicluster-sdk';
 
 export const getWatchResourceCloneData = (
   name: string,
   namespace: string,
   cluster: string | undefined,
-): V1beta1VirtualMachineClone | undefined => {
+): FleetWatchK8sResource | undefined => {
   if (!name || !namespace) {
     return;
   }
@@ -22,7 +22,7 @@ export const getWatchResourceCloneData = (
   };
 };
 
-type GetToastWatchResourceDataProps = {
+type GetToastWatchResourceDataParams = {
   cluster?: string;
   metadataName: string;
   namespace: string;
@@ -36,7 +36,7 @@ export const getToastWatchResourceData = ({
   namespace,
   t,
   title,
-}: GetToastWatchResourceDataProps): Omit<WatchedToastData, 'id'> => ({
+}: GetToastWatchResourceDataParams): Omit<WatchedToastData, 'id'> => ({
   toastOptions: {
     content: t(
       'Clone completed. The cloned virtual machine may take some time to appear in the list.',

@@ -12,7 +12,7 @@ import { useNameValidation } from '@kubevirt-utils/hooks/useNameValidation';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { pushNewWatchedToast } from '@kubevirt-utils/signals/toastRequestResultSignal';
 import { isVM } from '@kubevirt-utils/utils/typeGuards';
-import { getRandomChars, truncateToK8sName } from '@kubevirt-utils/utils/utils';
+import { truncateToK8sName } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { Divider, ModalVariant } from '@patternfly/react-core';
 
@@ -24,7 +24,7 @@ import StartClonedVMCheckbox from './components/StartClonedVMCheckbox/StartClone
 import { getFailedCloneToastOptions, getToastWatchResourceData } from './utils/cloneWatchedToast';
 import { CLONE_VM_TOAST_TITLE } from './utils/constants';
 import getSubmitBtnText from './utils/getSubmitBtnText';
-import { cloneVM, vmExists } from './utils/helpers';
+import { cloneVM, getMetadataName, vmExists } from './utils/helpers';
 
 type CloneVMModalProps = {
   headerText?: string;
@@ -56,7 +56,7 @@ const CloneVMModal: FC<CloneVMModalProps> = ({ headerText, isOpen, onClose, sour
   const title = useMemo(() => `${CLONE_VM_TOAST_TITLE} - ${cloneName}`, [cloneName]);
 
   const handleSendCloneRequest = async (cluster: string | undefined): Promise<void> => {
-    const metadataName = truncateToK8sName(cloneName, `${getRandomChars(6)}-cr`);
+    const metadataName = getMetadataName(cloneName);
     const watchedToastData = getToastWatchResourceData({
       cluster,
       metadataName,

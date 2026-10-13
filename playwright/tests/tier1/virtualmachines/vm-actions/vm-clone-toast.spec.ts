@@ -8,7 +8,7 @@ type AlertVariant = 'danger' | 'info' | 'success';
 const alertVariantSelector = (variant: AlertVariant): string =>
   `.pf-v6-c-alert.pf-m-${variant}, .pf-v5-c-alert.pf-m-${variant}, .pf-c-alert.pf-m-${variant}`;
 
-const cloneToastTitle = (targetVmName: string): string => `Clone VM - ${targetVmName}`;
+const cloneToastTitle = (targetVmName: string): string => `Clone virtual machine - ${targetVmName}`;
 
 const expectToastByVariant = (page: Page, variant: AlertVariant, targetVmName: string) => {
   const toast = page

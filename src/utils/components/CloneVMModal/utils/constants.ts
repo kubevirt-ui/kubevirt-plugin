@@ -37,4 +37,4 @@ export const STATUS_TO_PROGRESS_VARIANT = {
   Unknown: ProgressStepVariant.danger,
 };
 
-export const CLONE_VM_TOAST_TITLE = 'Clone VM';
+export const CLONE_VM_TOAST_TITLE = 'Clone virtual machine';

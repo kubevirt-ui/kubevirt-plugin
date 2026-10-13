@@ -41,7 +41,10 @@ const cloneVMToVM: V1beta1VirtualMachineClone = {
   },
 };
 
-type CloneVMProps = {
+export const getMetadataName = (targetName: string): string =>
+  truncateToK8sName(targetName, `${getRandomChars(6)}-cr`);
+
+type CloneVMParams = {
   description?: string;
   metadataName?: string;
   namespace: string;
@@ -57,7 +60,7 @@ export const cloneVM = ({
   source,
   startVM,
   targetName,
-}: CloneVMProps): Promise<V1beta1VirtualMachineClone> => {
+}: CloneVMParams): Promise<V1beta1VirtualMachineClone> => {
   const cloningRequest = produce(cloneVMToVM, (draftCloneData) => {
     draftCloneData.spec.source = {
       apiGroup: isVM(source) ? VirtualMachineModel.apiGroup : VirtualMachineSnapshotModel.apiGroup,
@@ -69,8 +72,7 @@ export const cloneVM = ({
 
     draftCloneData.metadata.namespace = namespace;
 
-    draftCloneData.metadata.name =
-      metadataName ?? truncateToK8sName(targetName, `${getRandomChars(6)}-cr`);
+    draftCloneData.metadata.name = metadataName ?? getMetadataName(targetName);
 
     draftCloneData.spec.volumeNamePolicy = VolumeNamePolicy.PrefixTargetName;
 
