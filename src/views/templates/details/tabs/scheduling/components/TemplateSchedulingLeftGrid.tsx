@@ -4,15 +4,10 @@ import Descheduler from 'src/views/templates/details/tabs/scheduling/components/
 import NodeSelector from 'src/views/templates/details/tabs/scheduling/components/NodeSelector';
 import Tolerations from 'src/views/templates/details/tabs/scheduling/components/Tolerations';
 
-import type { Template } from '@kubevirt-utils/resources/template';
 import { updateTemplate } from '@kubevirt-utils/resources/template';
 import { DescriptionList } from '@patternfly/react-core';
 
-export type TemplateSchedulingGridProps = {
-  editable: boolean;
-  onSubmit?: (updatedTemplate: Template) => Promise<Template | void>;
-  template: Template;
-};
+import { type TemplateSchedulingGridProps } from '../types';
 
 const TemplateSchedulingLeftGrid: FC<TemplateSchedulingGridProps> = ({ editable, template }) => {
   return (

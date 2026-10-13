@@ -1,5 +1,4 @@
 import { type FC } from 'react';
-import { type TemplateSchedulingGridProps } from 'src/views/templates/details/tabs/scheduling/components/TemplateSchedulingLeftGrid';
 import { getAffinity } from 'src/views/templates/utils/selectors';
 
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
@@ -7,9 +6,15 @@ import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getAffinityRules } from '@kubevirt-utils/resources/vmi';
 
+import { type TemplateSchedulingGridDetailsProps } from '../types';
+
 import AffinityRulesModal from './AffinityRulesModal';
 
-const AffinityRules: FC<TemplateSchedulingGridProps> = ({ editable, onSubmit, template }) => {
+const AffinityRules: FC<TemplateSchedulingGridDetailsProps> = ({
+  editable,
+  onSubmit,
+  template,
+}) => {
   const { createModal } = useModal();
   const { t } = useKubevirtTranslation();
   const rulesCount = t('{{rules}} Affinity rules', {
@@ -17,7 +22,7 @@ const AffinityRules: FC<TemplateSchedulingGridProps> = ({ editable, onSubmit, te
   });
 
   const onEditClick = (): void =>
-    createModal(({ isOpen, onClose }) => (
+    createModal?.(({ isOpen, onClose }) => (
       <AffinityRulesModal
         isOpen={isOpen}
         onClose={onClose}
