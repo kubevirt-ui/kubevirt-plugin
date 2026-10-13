@@ -50,9 +50,9 @@ async function createBootableVolumeViaApi(
   });
   apiClient.trackResource('DataVolume', name, namespace);
 
-  const succeeded = await apiClient.waitForDataVolumeSucceeded(name, namespace, timeoutMs);
-  if (!succeeded) {
-    throw new Error(`Blank DataVolume ${name} did not reach Succeeded in ${namespace}`);
+  const pvc = await apiClient.waitForPersistentVolumeClaim(name, namespace, timeoutMs);
+  if (!pvc) {
+    throw new Error(`PVC ${name} was not created in ${namespace}`);
   }
 
   await apiClient.createDataSource(namespace, {
@@ -117,7 +117,7 @@ test.describe('Tier1 Bootable Volumes - Upload to registry', { tag: [ROUTE_BOOTA
         apiClient,
         ns,
         volumeName,
-        utils.TestTimeouts.DATA_VOLUME_STATUS,
+        utils.TestTimeouts.RESOURCE_CREATION,
       );
 
       await bootableVolumesPage.navigateToNamespaceBootableVolumesViaUI(ns);
@@ -175,7 +175,7 @@ test.describe('Tier1 Bootable Volumes - Upload to registry', { tag: [ROUTE_BOOTA
         apiClient,
         ns,
         volumeName,
-        utils.TestTimeouts.DATA_VOLUME_STATUS,
+        utils.TestTimeouts.RESOURCE_CREATION,
       );
 
       await bootableVolumesPage.navigateToNamespaceBootableVolumesViaUI(ns);
