@@ -1,3 +1,7 @@
+import type { ComponentType } from 'react';
+
+import type { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+
 export type DropdownOption = {
   disabled?: boolean;
   key: string;
@@ -29,6 +33,19 @@ export type ShowSystemToggle = {
   show: boolean;
 };
 
+export type DropdownMenuFooterContext = {
+  closeMenu: () => void;
+  filterText: string;
+};
+
+export type DropdownCreateProjectMenuFooterProps = {
+  initialCluster?: string;
+  onProjectCreated: (project: K8sResourceCommon) => void;
+};
+
+export type DropdownMenuFooterComponentProps = DropdownMenuFooterContext &
+  DropdownCreateProjectMenuFooterProps;
+
 export type DropdownProps<T> = {
   bookmarks: DropdownBookmarks;
   config: DropdownConfig;
@@ -41,8 +58,16 @@ export type DropdownProps<T> = {
   isItemDisabled?: (key: string) => boolean;
   items: null | T[] | undefined;
   itemsLoaded: boolean;
+  menuFooter?: ComponentType<DropdownMenuFooterComponentProps>;
+  menuFooterProps?: DropdownCreateProjectMenuFooterProps;
   omittedItems?: string[];
   onChange: (item: string) => void;
+  preserveUnknownSelectedItem?: boolean;
   selectedItem: string;
   showSystemToggle?: ShowSystemToggle;
+};
+
+export type DropdownMenuContentProps<T> = {
+  dropdownProps: DropdownProps<T>;
+  filterText: string;
 };

@@ -21,8 +21,7 @@
   }
 }
 
-// Base dropdown styles
-%co-dropdown-base {
+@mixin co-dropdown-base {
   &__menu {
     display: flex;
     flex-direction: column;
@@ -36,19 +35,24 @@
   &__menu-content {
     flex: 1;
     max-height: 60vh;
-    overflow-y: auto;
-    overflow-x: hidden;
+    overflow: hidden auto;
+  }
+
+  &__menu-footer {
+    flex-shrink: 0;
+    padding: var(--pf-t--global--spacer--md);
   }
 }
 
 // Cluster dropdown specific styles
 .co-cluster-dropdown {
-  @extend %co-dropdown-base;
+  @include co-dropdown-base;
 }
 
 // Namespace dropdown specific styles
 .co-namespace-dropdown {
-  @extend %co-dropdown-base;
+  @include co-dropdown-base;
+
   max-width: 100%;
 
   &__menu-content {

@@ -19,11 +19,16 @@ export class VmCreationWizardLocationComponent extends BaseComponent {
 
   async getLocationProject(): Promise<string> {
     try {
-      const projectText = this.locator('.pf-v6-c-wizard').getByText('Project').first();
-      const container = projectText.locator('..');
-      const text = await container.textContent({ timeout: TestTimeouts.SHORT_WAIT });
-      const match = text?.match(/Project\s*(.+?)(?:>|$)/);
-      return match?.[1]?.trim() || '';
+      const wizard = this.locator('.vm-creation-wizard');
+      const projectToggle = wizard.getByTestId('namespace-dropdown-menu-toggle').first();
+      if (await projectToggle.isVisible({ timeout: TestTimeouts.SHORT_WAIT }).catch(() => false)) {
+        return (await projectToggle.textContent())?.trim() ?? '';
+      }
+
+      const displayContent = this.locator('.vm-creation-location-display__content');
+      const text = await displayContent.innerText({ timeout: TestTimeouts.SHORT_WAIT });
+      const match = text.match(/Project\s+(\S+)/);
+      return match?.[1]?.trim() ?? '';
     } catch {
       return '';
     }

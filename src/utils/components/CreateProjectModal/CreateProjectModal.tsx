@@ -19,6 +19,7 @@ import SelectCluster from './components/SelectCluster';
 type CreateProjectModalProps = {
   createdProject?: (value: K8sResourceCommon) => void;
   initialCluster?: string;
+  initialName?: string;
   isOpen: boolean;
   onClose: () => void;
 };
@@ -26,11 +27,12 @@ type CreateProjectModalProps = {
 const CreateProjectModal: FC<CreateProjectModalProps> = ({
   createdProject,
   initialCluster,
+  initialName,
   isOpen,
   onClose,
 }) => {
   const { t } = useKubevirtTranslation();
-  const [name, setName] = useState<string>();
+  const [name, setName] = useState<string>(initialName);
   const [cluster, setCluster] = useState<string>(initialCluster);
   const [description, setDescription] = useState<string>();
   const [displayName, setDisplayName] = useState<string>();
