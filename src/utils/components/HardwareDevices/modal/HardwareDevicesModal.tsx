@@ -7,8 +7,11 @@ import {
   type V1VirtualMachineInstance,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { produceVMDevices } from '@kubevirt-utils/components/DiskModal/utils/helpers';
+import { isEqualObject } from '@kubevirt-utils/components/NodeSelectorModal/utils/helpers';
 import ModalPendingChangesAlert from '@kubevirt-utils/components/PendingChanges/ModalPendingChangesAlert/ModalPendingChangesAlert';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getNoModalChangesTooltip } from '@kubevirt-utils/utils/text';
 import { generatePrettyName, isEmpty } from '@kubevirt-utils/utils/utils';
 import { Button, ButtonVariant, FormGroup, Grid, GridItem } from '@patternfly/react-core';
 import { MinusCircleIcon, PlusCircleIcon } from '@patternfly/react-icons';
@@ -45,9 +48,9 @@ const HardwareDevicesModal: FC<HardwareDevicesModalProps> = ({
   vm,
   vmi,
 }) => {
-  const [devices, setDevices] = useState<HardwareDeviceModalRow[]>(() =>
-    getInitialDevices(initialDevices, type),
-  );
+  const { t } = useKubevirtTranslation();
+  const initialDeviceRows = getInitialDevices(initialDevices, type);
+  const [devices, setDevices] = useState<HardwareDeviceModalRow[]>(initialDeviceRows);
   const { permittedHostDevices } = useHCPermittedHostDevices();
 
   const onAddDevice = (): void => {
@@ -65,7 +68,8 @@ const HardwareDevicesModal: FC<HardwareDevicesModalProps> = ({
     );
   };
 
-  const disableSubmit = devices.some((device) => isEmpty(device?.deviceName));
+  const hasEmptyDeviceName = devices.some((device) => isEmpty(device?.deviceName));
+  const noChangesMade = isEqualObject(devices, initialDeviceRows);
 
   const toK8sDevice = ({ deviceName, name }: HardwareDeviceModalRow): V1GPU | V1HostDevice => ({
     deviceName,
@@ -81,12 +85,15 @@ const HardwareDevicesModal: FC<HardwareDevicesModalProps> = ({
   return (
     <TabModal
       headerText={headerText}
-      isDisabled={disableSubmit}
+      isDisabled={hasEmptyDeviceName || noChangesMade}
       isOpen={isOpen}
       obj={updatedVM}
       onClose={onClose}
       onSubmit={onSubmit}
       shouldWrapInForm
+      submitDisabledTooltip={
+        hasEmptyDeviceName ? t("Device name can't be empty.") : getNoModalChangesTooltip(t)
+      }
     >
       {vmi && <ModalPendingChangesAlert />}
       <HardwareDeviceModalDescription type={type} />

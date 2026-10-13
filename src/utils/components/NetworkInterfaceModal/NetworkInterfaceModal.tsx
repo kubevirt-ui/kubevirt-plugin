@@ -8,6 +8,7 @@ import { getInterfaces } from '@kubevirt-utils/resources/vm';
 import { interfaceTypesProxy } from '@kubevirt-utils/resources/vm/utils/network/constants';
 import { getNetworkInterfaceType } from '@kubevirt-utils/resources/vm/utils/network/selectors';
 import { NetworkInterfaceState } from '@kubevirt-utils/resources/vm/utils/network/types';
+import { getNoModalChangesTooltip } from '@kubevirt-utils/utils/text';
 import { generatePrettyName } from '@kubevirt-utils/utils/utils';
 import { type K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { Checkbox, FormGroup } from '@patternfly/react-core';
@@ -19,6 +20,7 @@ import {
 import NetworkInterfaceAdvancedSettings from './components/NetworkInterfaceAdvancedSettings';
 import NetworkInterfaceModelSelect from './components/NetworkInterfaceModelSelect';
 import NetworkInterfaceNetworkSelect from './components/NetworkInterfaceNetworkSelect/NetworkInterfaceNetworkSelect';
+import { useNoChangesMade } from './hooks/useNoChangesMade';
 import { type NetworkInterfaceModalProps } from './types';
 import { interfaceModelType } from './utils/constants';
 import { getNetworkName } from './utils/helpers';
@@ -68,6 +70,16 @@ const NetworkInterfaceModal: FC<NetworkInterfaceModalProps> = ({
 
   const isValid = nicName && networkName && !networkSelectError && !macError && !isNicNameTaken;
 
+  const noChangesMade = useNoChangesMade({
+    interfaceLinkState,
+    interfaceMACAddress,
+    interfaceModel,
+    interfaceType,
+    isBootSource,
+    networkName,
+    nicName,
+  });
+
   const onSubmitModal = useCallback(() => {
     return onSubmit?.({
       interfaceLinkState: isLinkStateEditable(interfaceLinkState) ? interfaceLinkState : undefined,
@@ -94,12 +106,13 @@ const NetworkInterfaceModal: FC<NetworkInterfaceModalProps> = ({
   return (
     <TabModal<K8sResourceCommon>
       headerText={headerText}
-      isDisabled={!isValid}
+      isDisabled={!isValid || noChangesMade}
       isOpen={isOpen}
       obj={vm}
       onClose={onClose}
       onSubmit={onSubmitModal()}
       shouldWrapInForm
+      submitDisabledTooltip={noChangesMade ? getNoModalChangesTooltip(t) : undefined}
     >
       <NetworkInterfaceModelSelect
         interfaceModel={interfaceModel}

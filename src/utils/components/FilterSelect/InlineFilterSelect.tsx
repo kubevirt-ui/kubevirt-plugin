@@ -37,7 +37,7 @@ type InlineFilterSelectProps = {
   placeholder?: string;
   popperProps?: PopperOptions;
   searchPlaceholder?: string;
-  selected: string;
+  selected?: string;
   selectProps?: Omit<SelectProps, 'toggle'>;
   setSelected: (val: string) => void;
   showSearch?: boolean;

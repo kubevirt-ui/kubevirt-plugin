@@ -5,6 +5,7 @@ import {
   type V1VirtualMachine,
   type V1VirtualMachineInstance,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { isEqualObject } from '@kubevirt-utils/components/NodeSelectorModal/utils/helpers';
 import ModalPendingChangesAlert from '@kubevirt-utils/components/PendingChanges/ModalPendingChangesAlert/ModalPendingChangesAlert';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
@@ -12,6 +13,7 @@ import {
   DeviceType,
   getSortedBootableDevices,
 } from '@kubevirt-utils/resources/vm/utils/boot-order/bootOrder';
+import { getNoModalChangesTooltip } from '@kubevirt-utils/utils/text';
 import { ensurePath } from '@kubevirt-utils/utils/utils';
 
 import TabModal from '../TabModal/TabModal';
@@ -35,6 +37,8 @@ const BootOrderModal: FC<{
     sortedBootableDevices.some((device) => !!device.value.bootOrder),
   );
 
+  const noChangesMade = isEqualObject(devices, sortedBootableDevices);
+
   const updatedVirtualMachine = produce<V1VirtualMachine>(vm, (draftVM) => {
     ensurePath(draftVM, ['spec.template.spec.domain.devices']);
     const updatedDevices = devices.map((device, index) => ({
@@ -57,9 +61,11 @@ const BootOrderModal: FC<{
   return (
     <TabModal
       headerText={t('VirtualMachine boot order')}
+      isDisabled={noChangesMade}
       isOpen={isOpen}
       onClose={onClose}
       onSubmit={() => onSubmit(updatedVirtualMachine)}
+      submitDisabledTooltip={getNoModalChangesTooltip(t)}
     >
       {vmi && <ModalPendingChangesAlert />}
       <BootOrderModalBody

@@ -1,4 +1,4 @@
-import { type FC, useState } from 'react';
+import { type FC } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { isDataImportCronAutoUpdated } from 'src/views/datasources/utils';
 
@@ -11,6 +11,7 @@ import { FormTextInput } from '@kubevirt-utils/components/FormTextInput/FormText
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getNoModalChangesTooltip } from '@kubevirt-utils/utils/text';
 import { getFieldRequiredMessage } from '@kubevirt-utils/utils/validation';
 import {
   Checkbox,
@@ -26,6 +27,7 @@ import AutoUpdateFormFields from './components/AutoUpdateFormFields';
 import { onDataImportCronManageSubmit } from './utils';
 
 export type DataImportCronManageFormType = {
+  allowAutoUpdate: boolean;
   importsToKeep: number;
   schedule: string;
   url: string;
@@ -45,29 +47,27 @@ export const DataImportCronManageModal: FC<DataImportCronManageModalProps> = ({
   onClose,
 }) => {
   const { t } = useKubevirtTranslation();
-  const [allowAutoUpdate, setAllowAutoUpdate] = useState(() =>
-    isDataImportCronAutoUpdated(dataSource, dataImportCron),
-  );
   const {
     control,
-    formState: { errors },
+    formState: { errors, isDirty },
     handleSubmit,
     register,
     setValue,
   } = useForm<DataImportCronManageFormType>({
     defaultValues: {
+      allowAutoUpdate: isDataImportCronAutoUpdated(dataSource, dataImportCron),
       importsToKeep: dataImportCron?.spec?.importsToKeep ?? 3,
+      schedule: dataImportCron?.spec?.schedule ?? '',
+      url: dataImportCron?.spec?.template.spec?.source?.registry?.url ?? '',
     },
   });
+  const allowAutoUpdate = useWatch({ control, name: 'allowAutoUpdate' });
   const importsToKeep = useWatch({ control, name: 'importsToKeep' });
 
   const onSubmit = handleSubmit(
     (data) =>
       onDataImportCronManageSubmit({
-        data: {
-          ...data,
-          allowAutoUpdate,
-        },
+        data,
         resources: {
           dataImportCron,
           dataSource,
@@ -81,9 +81,11 @@ export const DataImportCronManageModal: FC<DataImportCronManageModalProps> = ({
       headerText={t('Manage source for {{dataSource}}', {
         dataSource: dataImportCron?.spec?.managedDataSource,
       })}
+      isDisabled={!isDirty}
       isOpen={isOpen}
       onClose={onClose}
       onSubmit={() => onSubmit()}
+      submitDisabledTooltip={getNoModalChangesTooltip(t)}
     >
       <Stack hasGutter>
         <StackItem>
@@ -100,7 +102,6 @@ export const DataImportCronManageModal: FC<DataImportCronManageModalProps> = ({
                 {...register('url', { required: true })}
                 aria-label={t('Registry URL')}
                 data-test={'dataimportcron-manage-source-url'}
-                defaultValue={dataImportCron?.spec?.template.spec?.source?.registry?.url}
                 id={'dataimportcron-manage-source-url'}
                 type="text"
                 validated={errors?.['url'] ? ValidatedOptions.error : ValidatedOptions.default}
@@ -121,13 +122,14 @@ export const DataImportCronManageModal: FC<DataImportCronManageModalProps> = ({
                 id={'dataimportcron-manage-allow-checkbox'}
                 isChecked={allowAutoUpdate}
                 label={t('Allow automatic update')}
-                onChange={() => setAllowAutoUpdate(!allowAutoUpdate)}
+                onChange={() =>
+                  setValue('allowAutoUpdate', !allowAutoUpdate, { shouldDirty: true })
+                }
               />
             </FormGroup>
             {allowAutoUpdate && (
               <AutoUpdateFormFields
                 allowAutoUpdate={allowAutoUpdate}
-                dataImportCron={dataImportCron}
                 errors={errors}
                 importsToKeep={importsToKeep}
                 register={register}
