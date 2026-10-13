@@ -4,7 +4,7 @@ import { useLocation, useNavigate } from 'react-router';
 import { runningTourSignal } from '@kubevirt-utils/components/GuidedTour/utils/guidedTourSignals';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { VIRTUALIZATION_PATHS } from '@kubevirt-utils/constants/constants';
-import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
+import { useCanListNamespaces } from '@kubevirt-utils/hooks/useCanListNamespaces';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { ALL_NAMESPACES_PATH } from '@virtualmachines/tree/hooks/constants';
 
@@ -16,7 +16,7 @@ export const useForceProjectSelection = (
 ): void => {
   const location = useLocation();
   const navigate = useNavigate();
-  const isAdmin = useIsAdmin();
+  const isAdmin = useCanListNamespaces();
   const [projectNames, projectNamesLoaded] = useProjects();
 
   useEffect(() => {

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 
 import { OPENSHIFT_NAMESPACE } from '@kubevirt-utils/constants/constants';
-import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
+import { useCanListNamespaces } from '@kubevirt-utils/hooks/useCanListNamespaces';
 import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-utils/models';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -20,7 +20,7 @@ const useWatchNonAdminTemplates = (): {
   allowedTemplatesError: Error | string;
   allowedTemplatesLoaded: boolean;
 } => {
-  const isAdmin = useIsAdmin();
+  const isAdmin = useCanListNamespaces();
   const [hubClusterName] = useHubClusterName();
   const cluster = useClusterParam();
 

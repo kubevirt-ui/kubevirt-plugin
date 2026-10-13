@@ -16,7 +16,7 @@ import {
 } from '@kubevirt-utils/components/AlertsCard/utils/utils';
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import { getAlertsPath } from '@kubevirt-utils/constants/prometheus';
-import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
+import { useCanListNamespaces } from '@kubevirt-utils/hooks/useCanListNamespaces';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useLocalStorage from '@kubevirt-utils/hooks/useLocalStorage';
 import { useActivePerspective } from '@openshift-console/dynamic-plugin-sdk';
@@ -33,7 +33,7 @@ type AlertsCardProps = {
 
 const AlertsCard: FC<AlertsCardProps> = ({ className, isOverviewPage = false, sortedAlerts }) => {
   const { t } = useKubevirtTranslation();
-  const isAdmin = useIsAdmin();
+  const isAdmin = useCanListNamespaces();
   const [perspective] = useActivePerspective();
   const [alertScope, setAlertScope] = useLocalStorage(
     ALERTS_SCOPE_KEY,

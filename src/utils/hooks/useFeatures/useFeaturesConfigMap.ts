@@ -5,7 +5,7 @@ import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 import type { WatchK8sResult } from '@openshift-console/dynamic-plugin-sdk';
 import { getGroupVersionKindForModel } from '@openshift-console/dynamic-plugin-sdk';
 
-import { useIsAdmin } from '../useIsAdmin';
+import { useCanListNamespaces } from '../useCanListNamespaces';
 
 import { FEATURES_CONFIG_MAP_NAME } from './constants';
 
@@ -18,7 +18,7 @@ type UseFeaturesConfigMap = (
 };
 
 const useFeaturesConfigMap: UseFeaturesConfigMap = (cluster, enableQuery: boolean = true) => {
-  const isAdmin = useIsAdmin();
+  const isAdmin = useCanListNamespaces();
   const operatorNamespace = operatorNamespaceSignal.value;
 
   const featuresConfigMapData = useK8sWatchData<IoK8sApiCoreV1ConfigMap>(

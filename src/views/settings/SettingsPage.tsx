@@ -5,7 +5,7 @@ import ClusterDropdown from '@kubevirt-utils/components/ClusterProjectDropdown/C
 import ConfigurationSearch from '@kubevirt-utils/components/ConfigurationSearch/ConfigurationSearch';
 import GuidedTour from '@kubevirt-utils/components/GuidedTour/GuidedTour';
 import LoadingEmptyState from '@kubevirt-utils/components/LoadingEmptyState/LoadingEmptyState';
-import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
+import { useCanListNamespaces } from '@kubevirt-utils/hooks/useCanListNamespaces';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { VirtualMachineModelRef } from '@kubevirt-utils/models';
 import { getNamespacePathSegment } from '@kubevirt-utils/utils/utils';
@@ -33,7 +33,7 @@ const SettingsPage: FC = () => {
   useSignals();
 
   const { t } = useKubevirtTranslation();
-  const isAdmin = useIsAdmin();
+  const isAdmin = useCanListNamespaces();
   const [activeNamespace] = useActiveNamespace();
   const [clusterNames, clustersLoaded] = useFleetClusterNames();
   const [hubClusterName] = useHubClusterName();

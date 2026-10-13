@@ -1,13 +1,13 @@
 import { useState } from 'react';
 
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { useCanListNamespaces } from '@kubevirt-utils/hooks/useCanListNamespaces';
 import { useDeschedulerInstalled } from '@kubevirt-utils/hooks/useDeschedulerInstalled';
 import {
   isDeschedulerEnabled,
   updateDeschedulerForTemplate,
   updateDeschedulerForVM,
 } from '@kubevirt-utils/hooks/useDeschedulerSetting/utils';
-import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import { getTemplateVirtualMachineObject, type Template } from '@kubevirt-utils/resources/template';
 import { getVMTemplateAnnotations } from '@kubevirt-utils/resources/vm';
 import { isVM } from '@kubevirt-utils/utils/typeGuards';
@@ -21,7 +21,7 @@ type UseDeschedulerSetting = (obj: Template | V1VirtualMachine) => {
 };
 
 const useDeschedulerSetting: UseDeschedulerSetting = (obj) => {
-  const isAdmin = useIsAdmin();
+  const isAdmin = useCanListNamespaces();
   const isVMObj = isVM(obj);
   const isMigratable = isVMObj ? isLiveMigratable(obj) : true;
   const { isDeschedulerInstalled } = useDeschedulerInstalled(getCluster(obj));

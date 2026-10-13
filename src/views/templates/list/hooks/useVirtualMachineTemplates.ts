@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 
 import { VirtualMachineTemplateModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { type V1beta1VirtualMachineTemplate } from '@kubevirt-ui-ext/kubevirt-api/virt-template';
-import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
+import { useCanListNamespaces } from '@kubevirt-utils/hooks/useCanListNamespaces';
 import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
 import useListClusters from '@kubevirt-utils/hooks/useListClusters';
 import isResourceNotFoundError from '@kubevirt-utils/utils/isResourceNotFoundError';
@@ -29,7 +29,7 @@ const useVirtualMachineTemplates: UseVirtualMachineTemplates = (
     [clusterOverride, clustersInParam],
   );
   const cluster = clusters?.length === 1 ? clusters[0] : undefined;
-  const isAdmin = useIsAdmin();
+  const isAdmin = useCanListNamespaces();
   const [model, inFlight] = useK8sModel(VirtualMachineTemplateModelGroupVersionKind);
 
   const modelAvailable = !!model && !inFlight;

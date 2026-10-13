@@ -2,7 +2,7 @@ import { type FC, useState } from 'react';
 
 import NewBadge from '@kubevirt-utils/components/badges/NewBadge/NewBadge';
 import ExpandSectionWithCustomToggle from '@kubevirt-utils/components/ExpandSectionWithCustomToggle/ExpandSectionWithCustomToggle';
-import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
+import { useCanListNamespaces } from '@kubevirt-utils/hooks/useCanListNamespaces';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Skeleton, Stack, StackItem } from '@patternfly/react-core';
 import { useSettingsCluster } from '@settings/context/SettingsClusterContext';
@@ -24,7 +24,7 @@ type MemoryDensityProps = {
 const MemoryDensity: FC<MemoryDensityProps> = ({ hyperConvergeConfiguration }) => {
   const { t } = useKubevirtTranslation();
   const cluster = useSettingsCluster();
-  const isAdmin = useIsAdmin();
+  const isAdmin = useCanListNamespaces();
   const [hyperConverge, hyperLoaded] = hyperConvergeConfiguration;
   const [error, setError] = useState<unknown>(null);
 

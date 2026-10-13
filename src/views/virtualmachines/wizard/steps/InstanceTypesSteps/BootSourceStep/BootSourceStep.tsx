@@ -2,8 +2,8 @@ import type { FC } from 'react';
 import { useController, useWatch } from 'react-hook-form';
 
 import { BOOTABLE_VOLUME_SELECTED, logITFlowEvent } from '@kubevirt-utils/extensions/telemetry';
+import { useCanListNamespaces } from '@kubevirt-utils/hooks/useCanListNamespaces';
 import useInstanceTypesAndPreferences from '@kubevirt-utils/hooks/useInstanceTypesAndPreferences';
-import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useBootableVolumes from '@kubevirt-utils/resources/bootableresources/hooks/useBootableVolumes';
 import { getName } from '@kubevirt-utils/resources/shared';
@@ -28,7 +28,7 @@ import useAddBootableVolume from './hooks/useAddBootableVolume';
 
 const BootSourceStep: FC = () => {
   const { t } = useKubevirtTranslation();
-  const isAdmin = useIsAdmin();
+  const isAdmin = useCanListNamespaces();
   const { control, setValue } = useVMWizardForm();
 
   const [cluster, project, volumeListNamespace, selectedBootableVolume, preference] = useWatch({

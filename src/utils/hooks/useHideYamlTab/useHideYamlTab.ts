@@ -1,7 +1,7 @@
 import { HIDE_YAML_TAB } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 
-import { useIsAdmin } from '../useIsAdmin';
+import { useCanListNamespaces } from '../useCanListNamespaces';
 
 export type UseHideYamlTab = () => {
   hideYamlTab: boolean;
@@ -9,7 +9,7 @@ export type UseHideYamlTab = () => {
 };
 
 const useHideYamlTab: UseHideYamlTab = () => {
-  const isAdmin = useIsAdmin();
+  const isAdmin = useCanListNamespaces();
   const { featureEnabled, loading } = useFeatures(HIDE_YAML_TAB);
 
   // Return false while loading to prevent flash of hidden tabs

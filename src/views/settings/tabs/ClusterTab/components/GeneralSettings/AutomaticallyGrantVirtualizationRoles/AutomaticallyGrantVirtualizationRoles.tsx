@@ -1,10 +1,10 @@
 import { type FC, useMemo, useState } from 'react';
 
 import SectionWithSwitch from '@kubevirt-utils/components/SectionWithSwitch/SectionWithSwitch';
+import { useCanListNamespaces } from '@kubevirt-utils/hooks/useCanListNamespaces';
 import { CONTROL_DEFAULT_VIRTUALIZATION_PERMISSIONS } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { type HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
-import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getErrorMessage } from '@kubevirt-utils/utils/utils';
 import { Alert, AlertVariant } from '@patternfly/react-core';
@@ -26,7 +26,7 @@ const AutomaticallyGrantVirtualizationRoles: FC<AutomaticallyGrantVirtualization
 }) => {
   const { t } = useKubevirtTranslation();
   const cluster = useSettingsCluster();
-  const isAdmin = useIsAdmin();
+  const isAdmin = useCanListNamespaces();
   const [hyperConverge, hyperLoaded, hyperError] = hyperConvergeConfiguration;
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<null | string>(null);

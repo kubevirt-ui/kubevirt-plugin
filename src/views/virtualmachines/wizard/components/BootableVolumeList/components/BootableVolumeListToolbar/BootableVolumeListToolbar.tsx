@@ -2,7 +2,7 @@ import { type Dispatch, type FC, type SetStateAction } from 'react';
 
 import KubevirtFilterToolbar from '@kubevirt-utils/components/KubevirtFilterToolbar/KubevirtFilterToolbar';
 import ProjectDropdown from '@kubevirt-utils/components/ProjectDropdown/ProjectDropdown';
-import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
+import { useCanListNamespaces } from '@kubevirt-utils/hooks/useCanListNamespaces';
 import {
   type KubevirtFilter,
   type KubevirtFilterState,
@@ -51,7 +51,7 @@ const BootableVolumeListToolbar: FC<BootableVolumeListToolbarProps> = ({
   unfilteredData,
 }) => {
   const { t } = useKubevirtTranslation();
-  const isAdmin = useIsAdmin();
+  const isAdmin = useCanListNamespaces();
 
   return (
     <Split className="bootable-volume-list__toolbar" hasGutter>
