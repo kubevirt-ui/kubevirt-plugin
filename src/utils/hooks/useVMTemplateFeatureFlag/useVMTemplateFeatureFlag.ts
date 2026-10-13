@@ -1,8 +1,8 @@
 import { K8S_OPS } from '@kubevirt-utils/constants/constants';
+import { useCanListNamespaces } from '@kubevirt-utils/hooks/useCanListNamespaces';
 import useHyperConvergeConfiguration, {
   type HyperConverged,
 } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
-import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import { getHyperConvergedModelFromResource } from '@kubevirt-utils/resources/hyperconverged/model';
 import { getAnnotations } from '@kubevirt-utils/resources/shared';
 import { escapeJsonPointerToken, isEmpty } from '@kubevirt-utils/utils/utils';
@@ -29,7 +29,7 @@ const useVMTemplateFeatureFlag: UseVMTemplateFeatureFlag = (clusterOverride) => 
 
   const [hyperConvergeConfiguration, hcConfigLoaded] = useHyperConvergeConfiguration(cluster);
 
-  const isAdmin = useIsAdmin();
+  const isAdmin = useCanListNamespaces();
 
   return {
     canEdit: isAdmin,

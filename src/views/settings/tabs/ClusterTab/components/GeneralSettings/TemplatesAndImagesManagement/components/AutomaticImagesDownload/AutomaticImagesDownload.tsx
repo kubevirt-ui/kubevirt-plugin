@@ -1,7 +1,7 @@
 import { type FC, useCallback, useState } from 'react';
 
 import SectionWithSwitch from '@kubevirt-utils/components/SectionWithSwitch/SectionWithSwitch';
-import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
+import { useCanListNamespaces } from '@kubevirt-utils/hooks/useCanListNamespaces';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getHyperConvergedModelFromResource } from '@kubevirt-utils/resources/hyperconverged/model';
 import {
@@ -36,7 +36,7 @@ const AutomaticImagesDownload: FC<AutomaticImagesDownloadProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const cluster = useSettingsCluster();
-  const isAdmin = useIsAdmin();
+  const isAdmin = useCanListNamespaces();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [imageLoadingIndex, setImageLoadingIndex] = useState<number>(-1);
 

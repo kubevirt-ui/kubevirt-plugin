@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
+import { useCanListNamespaces } from '@kubevirt-utils/hooks/useCanListNamespaces';
 import { type KubevirtDataPodFilters } from '@kubevirt-utils/hooks/useKubevirtDataPod/types';
 import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
 import useProjects from '@kubevirt-utils/hooks/useProjects';
@@ -46,7 +46,7 @@ export const useAccessibleResources = <T>({
   selector,
   watchNamespaces,
 }: UseAccessibleResourcesArgs): UseAccessibleResourcesReturn<T> => {
-  const isAdmin = useIsAdmin();
+  const isAdmin = useCanListNamespaces();
   const isACMPage = useIsACMPage();
   const cluster = useClusterParam();
   const [projectNames, projectNamesLoaded, projectNamesError] = useProjects();

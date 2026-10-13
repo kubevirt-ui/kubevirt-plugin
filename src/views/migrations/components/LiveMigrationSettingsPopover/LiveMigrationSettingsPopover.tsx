@@ -1,6 +1,6 @@
 import { type FC } from 'react';
 
-import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
+import { useCanListNamespaces } from '@kubevirt-utils/hooks/useCanListNamespaces';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Button, Popover, Stack, StackItem, Title } from '@patternfly/react-core';
 import { OutlinedQuestionCircleIcon } from '@patternfly/react-icons';
@@ -10,7 +10,7 @@ import useHyperConvergedMigrations from './hooks/useHyperConvergedMigrations';
 const LiveMigrationSettingsPopover: FC = () => {
   const { t } = useKubevirtTranslation();
   const migrations = useHyperConvergedMigrations();
-  const isAdmin = useIsAdmin();
+  const isAdmin = useCanListNamespaces();
 
   if (!isAdmin) return null;
 

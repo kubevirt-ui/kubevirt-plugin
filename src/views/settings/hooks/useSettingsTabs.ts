@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 
 import { VIRTUALIZATION_PATHS } from '@kubevirt-utils/constants/constants';
-import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
+import { useCanListNamespaces } from '@kubevirt-utils/hooks/useCanListNamespaces';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
 import { getTabs, type SettingsTabConfig } from '../tabs';
@@ -15,7 +15,7 @@ export const useSettingsTabs = (): {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
   const location = useLocation();
-  const isAdmin = useIsAdmin();
+  const isAdmin = useCanListNamespaces();
 
   const tabs = useMemo(() => getTabs(isAdmin, t).filter((tab) => tab.isEnabled), [isAdmin, t]);
 

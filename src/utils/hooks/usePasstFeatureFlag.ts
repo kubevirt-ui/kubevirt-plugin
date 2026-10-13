@@ -1,10 +1,10 @@
 import { useMemo } from 'react';
 
 import { K8S_OPS } from '@kubevirt-utils/constants/constants';
+import { useCanListNamespaces } from '@kubevirt-utils/hooks/useCanListNamespaces';
 import useHyperConvergeConfiguration, {
   type HyperConverged,
 } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
-import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import useKubevirtHyperconvergeConfiguration, {
   type KubevirtHyperconverged,
 } from '@kubevirt-utils/hooks/useKubevirtHyperconvergeConfiguration';
@@ -54,7 +54,7 @@ const usePasstFeatureFlag: UsePasstFeatureFlag = (clusterOverride) => {
   const cluster = clusterOverride ?? clusterParam;
   const { featureGates, hcConfig, hcLoaded } = useKubevirtHyperconvergeConfiguration(cluster);
   const [hyperConvergeConfiguration] = useHyperConvergeConfiguration(cluster);
-  const isAdmin = useIsAdmin();
+  const isAdmin = useCanListNamespaces();
 
   const featureEnabled = useMemo(
     () => isPasstNetworkBindingEnabled(hyperConvergeConfiguration, hcConfig, featureGates),

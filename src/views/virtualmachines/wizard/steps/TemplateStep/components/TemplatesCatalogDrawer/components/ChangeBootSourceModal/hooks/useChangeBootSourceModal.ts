@@ -5,8 +5,8 @@ import {
   BOOTABLE_VOLUME_SELECTED,
   logTemplateFlowEvent,
 } from '@kubevirt-utils/extensions/telemetry';
+import { useCanListNamespaces } from '@kubevirt-utils/hooks/useCanListNamespaces';
 import useInstanceTypesAndPreferences from '@kubevirt-utils/hooks/useInstanceTypesAndPreferences';
-import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import useBootableVolumes from '@kubevirt-utils/resources/bootableresources/hooks/useBootableVolumes';
 import useCanCreateBootableVolume from '@kubevirt-utils/resources/bootableresources/hooks/useCanCreateBootableVolume';
 import { type BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
@@ -31,7 +31,7 @@ const useChangeBootSourceModal: UseChangeBootSourceModal = ({ isOpen, onClose, v
   const { control, setValue } = useVMWizardForm();
   const { invalidateTemplateGeneration } = useVMWizardState();
   const { template } = useDrawerContext();
-  const isAdmin = useIsAdmin();
+  const isAdmin = useCanListNamespaces();
 
   const [cluster, project] = useWatch({
     control,

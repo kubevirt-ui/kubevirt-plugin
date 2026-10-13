@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
-import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
+import { useCanListNamespaces } from '@kubevirt-utils/hooks/useCanListNamespaces';
 import type { PrometheusRulesResponse } from '@kubevirt-utils/types/prometheus';
 import type { Alert, PrometheusResponse } from '@openshift-console/dynamic-plugin-sdk';
 import { PrometheusEndpoint, usePrometheusPoll } from '@openshift-console/dynamic-plugin-sdk';
@@ -24,7 +24,7 @@ type UseSingleClusterAlerts = () => {
  */
 const useSingleClusterAlerts: UseSingleClusterAlerts = () => {
   const { silences } = useSilences();
-  const isAdmin = useIsAdmin();
+  const isAdmin = useCanListNamespaces();
   const activeNamespace = useActiveNamespace();
 
   const [rulesResponse, rulesLoaded, rulesError] = usePrometheusPoll({

@@ -3,7 +3,7 @@ import { Link } from 'react-router';
 
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
-import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
+import { useCanListNamespaces } from '@kubevirt-utils/hooks/useCanListNamespaces';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getValidNamespace } from '@kubevirt-utils/utils/utils';
 import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
@@ -14,7 +14,7 @@ import './MTVNotInstalledCard.scss';
 
 const MTVNotInstalledCard: FC = () => {
   const { t } = useKubevirtTranslation();
-  const isAdmin = useIsAdmin();
+  const isAdmin = useCanListNamespaces();
   const [activeNamespace] = useActiveNamespace();
   const validNamespace = getValidNamespace(activeNamespace);
 

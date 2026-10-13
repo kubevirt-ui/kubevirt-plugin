@@ -9,9 +9,9 @@ import {
   type V1VirtualMachineInstanceMigration,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { runningTourSignal } from '@kubevirt-utils/components/GuidedTour/utils/guidedTourSignals';
+import { useCanListNamespaces } from '@kubevirt-utils/hooks/useCanListNamespaces';
 import { TREE_VIEW_FOLDERS } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
-import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
 import useProjects from '@kubevirt-utils/hooks/useProjects';
 import { getName } from '@kubevirt-utils/resources/shared';
@@ -41,7 +41,7 @@ export type UseTreeViewDataResources = {
 };
 
 export const useTreeViewDataResources = (): UseTreeViewDataResources => {
-  const isAdmin = useIsAdmin();
+  const isAdmin = useCanListNamespaces();
   const [clusterNames] = useFleetClusterNames();
   const isACMTreeView = useIsACMPage();
   const isTourRunning = runningTourSignal.value;

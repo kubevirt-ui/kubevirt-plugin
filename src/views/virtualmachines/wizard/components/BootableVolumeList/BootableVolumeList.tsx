@@ -1,6 +1,6 @@
 import { type FC, useCallback, useState } from 'react';
 
-import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
+import { useCanListNamespaces } from '@kubevirt-utils/hooks/useCanListNamespaces';
 import type { OnSetFilters } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { Card } from '@patternfly/react-core';
 
@@ -30,7 +30,7 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
   syncFiltersWithURL = true,
   volumeListNamespace,
 }) => {
-  const isAdmin = useIsAdmin();
+  const isAdmin = useCanListNamespaces();
   const effectiveNamespace = getEffectiveVolumeNamespace(volumeListNamespace, isAdmin);
   const { preferences: preferencesData } = instanceTypesAndPreferencesData;
   const { loaded } = bootableVolumesData;

@@ -9,7 +9,7 @@ import {
   TELEMETRY_EXTERNAL_MONITORING_TOOL,
   TELEMETRY_VM_DETAIL_TAB,
 } from '@kubevirt-utils/extensions/telemetry/utils/property-constants';
-import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
+import { useCanListNamespaces } from '@kubevirt-utils/hooks/useCanListNamespaces';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useVirtualizationObservabilityLink } from '@kubevirt-utils/hooks/useVirtualizationObservabilityLink/useVirtualizationObservabilityLink';
 import useIsACMPage from '@multicluster/useIsACMPage';
@@ -20,7 +20,7 @@ import { MONITORING_LINK } from '../utils/constants';
 const TimeRange: FC = () => {
   const { t } = useKubevirtTranslation();
   const isACMPage = useIsACMPage();
-  const isAdmin = useIsAdmin();
+  const isAdmin = useCanListNamespaces();
   const virtualizationObservabilityLink = useVirtualizationObservabilityLink();
 
   const { duration, setDuration } = useDuration();

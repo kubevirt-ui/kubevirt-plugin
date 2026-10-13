@@ -1,9 +1,9 @@
 import type { FC } from 'react';
 
 import SectionWithSwitch from '@kubevirt-utils/components/SectionWithSwitch/SectionWithSwitch';
+import { useCanListNamespaces } from '@kubevirt-utils/hooks/useCanListNamespaces';
 import { CONFIRM_VM_ACTIONS } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
-import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { useSettingsCluster } from '@settings/context/SettingsClusterContext';
@@ -19,7 +19,7 @@ type VMActionsConfirmationProps = {
 const VMActionsConfirmation: FC<VMActionsConfirmationProps> = ({ newBadge }) => {
   const { t } = useKubevirtTranslation();
   const cluster = useSettingsCluster();
-  const isAdmin = useIsAdmin();
+  const isAdmin = useCanListNamespaces();
   const {
     featureEnabled: confirmVMActionsEnabled,
     loading,

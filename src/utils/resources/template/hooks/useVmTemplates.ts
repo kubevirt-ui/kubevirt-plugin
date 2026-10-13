@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 
 import { type V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
+import { useCanListNamespaces } from '@kubevirt-utils/hooks/useCanListNamespaces';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 import { Operator } from '@openshift-console/dynamic-plugin-sdk-internal/lib/api/common-types';
 
@@ -14,7 +14,7 @@ import useWatchNonAdminTemplates from './useWatchNonAdminTemplates';
  * @param cluster
  */
 export const useVmTemplates = (namespace?: string, cluster?: string): UseVmTemplatesValues => {
-  const isAdmin = useIsAdmin();
+  const isAdmin = useCanListNamespaces();
 
   const { allowedTemplates, allowedTemplatesError, allowedTemplatesLoaded } =
     useWatchNonAdminTemplates();

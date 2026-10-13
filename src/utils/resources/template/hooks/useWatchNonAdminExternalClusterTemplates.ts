@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 
 import { OPENSHIFT_NAMESPACE } from '@kubevirt-utils/constants/constants';
-import { useIsAdmin } from '@kubevirt-utils/hooks/useIsAdmin';
+import { useCanListNamespaces } from '@kubevirt-utils/hooks/useCanListNamespaces';
 import useNamespaceParam from '@kubevirt-utils/hooks/useNamespaceParam';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
@@ -32,7 +32,7 @@ const useWatchNonAdminExternalClusterTemplates = (): {
 
   const isLocalCluster = isEmpty(cluster) || cluster === hubClusterName;
 
-  const isAdmin = useIsAdmin();
+  const isAdmin = useCanListNamespaces();
 
   const [
     externalClusterOpenshiftTemplates,
