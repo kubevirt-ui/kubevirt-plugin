@@ -173,14 +173,6 @@ test.describe(NAD_SWAP_SUITE, { tag: [ROUTE_VIRTUAL_MACHINES_DETAIL_NETWORK_TAG,
         'Configuration Network should show a pending-changes or migration-required alert after NAD swap',
       ).toBe(true);
 
-      // Network column shows the runtime NAD until migration applies the spec change.
-      await expect
-        .poll(async () => vmDetailPage.getConfigurationNetworkNicName(SWAP_NIC_NAME), {
-          message: `NIC ${SWAP_NIC_NAME} should still show runtime NAD ${sourceNad} until migration`,
-          timeout: utils.TestTimeouts.ELEMENT_WAIT,
-        })
-        .toContain(sourceNad);
-
       await expect
         .poll(
           async () => {

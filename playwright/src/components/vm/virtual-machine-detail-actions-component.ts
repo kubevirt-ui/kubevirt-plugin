@@ -366,7 +366,10 @@ export default class VirtualMachineDetailActionsComponent extends PageCommons {
       const categoryInput = categorySelect.locator('input[role="combobox"]');
       await this.robustClick(categoryInput);
       await categoryInput.fill(options.category);
+      const listboxId = await categoryInput.getAttribute('aria-controls');
+      if (!listboxId) throw new Error('Category typeahead is missing its listbox reference');
       const categoryOption = this.page
+        .locator(`#${listboxId}`)
         .getByRole('option', { name: options.category, exact: true })
         .first();
       await categoryOption.waitFor({
@@ -374,6 +377,12 @@ export default class VirtualMachineDetailActionsComponent extends PageCommons {
         timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
       });
       await this.robustClick(categoryOption);
+      await expect(categoryInput).toHaveAttribute('aria-expanded', 'false', {
+        timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+      });
+      await expect(categoryInput).toHaveValue(options.category, {
+        timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+      });
     }
 
     const submitBtn = this.locator('button:has-text("Save as template")').last();

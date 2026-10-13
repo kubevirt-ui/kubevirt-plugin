@@ -1025,6 +1025,30 @@ export default class VirtualMachinesPage extends TreeContextMenuMixin(PageCommon
     await this.waitForTreeViewReady();
     await this.toggleEmptyProjectsDisplay(true);
     await this.searchTreeView(namespace);
+
+    const projectNode = this.locator(`[id="projectSelector/#single-cluster#/${namespace}"]`);
+    const projectVisible = await projectNode
+      .waitFor({ state: 'visible', timeout: TestTimeouts.UI_VISIBILITY_QUICK })
+      .then(() => true)
+      .catch(() => false);
+
+    if (!projectVisible) {
+      await this.page.reload({
+        waitUntil: 'domcontentloaded',
+        timeout: TestTimeouts.NAVIGATION,
+      });
+      await this.tryCloseWelcomeModal();
+      await this.waitForTreeViewReady();
+      await this.toggleEmptyProjectsDisplay(true);
+      await this.searchTreeView(namespace);
+
+      await projectNode
+        .waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT })
+        .catch(() => {
+          throw new Error(`Project ${namespace} is missing from the VM tree after reload`);
+        });
+    }
+
     await this.clickTreeNodeAndEnsureExpanded(namespace, vmName, namespace);
     await this.clickVmInTreeView(vmName, namespace);
   }

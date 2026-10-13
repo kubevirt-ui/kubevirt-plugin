@@ -235,6 +235,10 @@ export class BootableVolumesRowActionsComponent extends BaseComponent {
       timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
     });
     await this.robustClick(saveButton);
+    await dialog.waitFor({
+      state: 'hidden',
+      timeout: TestTimeouts.UI_ACTION_COMPLETE,
+    });
   }
 
   /**
@@ -1058,6 +1062,10 @@ export class BootableVolumesCreateFormsComponent extends BaseComponent {
       timeout: TestTimeouts.FILE_UPLOAD,
     });
     await this.robustClick(this._createFormSaveButton);
+    await this._addVolumeDialog.waitFor({
+      state: 'hidden',
+      timeout: TestTimeouts.UI_ACTION_COMPLETE,
+    });
   }
 
   /**

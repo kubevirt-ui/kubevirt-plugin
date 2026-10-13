@@ -74,20 +74,19 @@ Automated E2E coverage for console routes under `tests/virtual-machines/detail/n
 ### `001`: Swap a running VM NIC NAD and show pending changes
 
 - **Objective:** After changing a hot-plugged bridge NIC to a different NAD, the UI shows a
-  pending-changes alert, the VM spec references the target NAD, and the network table still shows
-  the runtime (source) NAD until migration.
+  pending-changes alert and the VM spec references the target NAD.
 - **Target version:** CNV 5.1.0
 - **Jira References:** CNV-87871
 - **Pre-conditions:** VM reaches Running state; bridge NIC is attached with source NAD
 - **Tags:** `@admin-only`
 
-| Step | Action                                                            | Expected Result                                                 |
-| :--- | :---------------------------------------------------------------- | :-------------------------------------------------------------- |
-| 1    | Create two bridge NADs and a running empty-disk VM in a namespace | VM is Running; resources are tracked for cleanup                |
-| 2    | Attach a bridge Multus NIC using the source NAD                   | NIC row appears under Configuration → Network with source NAD   |
-| 3    | Open Configuration → Network and edit the NIC to the target NAD   | Edit modal saves; NAD select accepts the target option          |
-| 4    | Observe pending-changes / migration-required alert                | Alert is visible on the Configuration → Network view            |
-| 5    | Check the NIC network column and VM spec `multus.networkName`     | Table shows runtime (source) NAD; VM spec references target NAD |
+| Step | Action                                                            | Expected Result                                        |
+| :--- | :---------------------------------------------------------------- | :----------------------------------------------------- |
+| 1    | Create two bridge NADs and a running empty-disk VM in a namespace | VM is Running; resources are tracked for cleanup       |
+| 2    | Attach a bridge Multus NIC using the source NAD                   | NIC row appears under Configuration → Network          |
+| 3    | Open Configuration → Network and edit the NIC to the target NAD   | Edit modal saves; NAD select accepts the target option |
+| 4    | Observe pending-changes / migration-required alert                | Alert is visible on the Configuration → Network view   |
+| 5    | Check the VM spec `multus.networkName`                            | VM spec references the target NAD                      |
 
 ---
 

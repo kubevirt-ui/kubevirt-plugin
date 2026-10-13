@@ -78,17 +78,49 @@ export default class MigrationPoliciesPage extends PageCommons {
    */
   async clickDeleteAction() {
     const deleteAction = this.testId('mp-action-delete');
-    await deleteAction.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
-    await this.robustClick(deleteAction);
+    const deleteDialog = this.page
+      .getByRole('dialog')
+      .filter({ hasText: 'Delete MigrationPolicy?' });
+
+    for (let attempt = 0; attempt < 2; attempt++) {
+      if (!(await deleteAction.isVisible())) {
+        await this.clickActionsDropdown();
+      }
+
+      await this.robustClick(deleteAction, {
+        retries: 1,
+        timeout: TestTimeouts.UI_ACTION_COMPLETE,
+      });
+
+      try {
+        await deleteDialog.waitFor({
+          state: 'visible',
+          timeout: TestTimeouts.UI_VISIBILITY_QUICK,
+        });
+        return;
+      } catch {
+        // The console occasionally accepts the menu-item click without invoking its action.
+        // Retry only when its expected postcondition (the confirmation dialog) is absent.
+      }
+    }
+
+    throw new Error('Delete MigrationPolicy confirmation dialog did not open');
   }
 
   /**
    * Clicks the save button in the delete confirmation modal.
    */
   async clickSaveButton() {
-    const saveButton = this.testId('save-button');
+    const deleteDialog = this.page
+      .getByRole('dialog')
+      .filter({ hasText: 'Delete MigrationPolicy?' });
+    const saveButton = deleteDialog.getByTestId('save-button');
     await saveButton.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
     await this.robustClick(saveButton);
+    await deleteDialog.waitFor({
+      state: 'hidden',
+      timeout: TestTimeouts.UI_ACTION_COMPLETE,
+    });
   }
 
   /**
