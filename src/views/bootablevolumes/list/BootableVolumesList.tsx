@@ -89,6 +89,8 @@ const BootableVolumesList: FC = () => {
     [clusterParam, dataImportCrons, dvSources, preferences],
   );
 
+  const isLoaded = loaded && loadedColumns;
+
   const toolbarEndContent = (
     <KubevirtTableExport<BootableResource, BootableVolumeCallbacks>
       activeColumnKeys={activeColumnKeys}
@@ -96,13 +98,11 @@ const BootableVolumesList: FC = () => {
       columns={columns}
       data={filteredData ?? []}
       exportKey={EXPORT_TABLE_KEYS.BOOTABLE_VOLUMES}
-      loaded={loaded && loadedColumns}
+      loaded={isLoaded}
     />
   );
 
-  const isLoaded = loaded && loadedColumns;
-
-  if (loaded && !error && isEmpty(bootableVolumes)) {
+  if (loaded && !error && isEmpty(bootableVolumes) && !isAllClustersPage) {
     return <BootableVolumesEmptyState namespace={namespace} />;
   }
 
@@ -126,7 +126,7 @@ const BootableVolumesList: FC = () => {
             handlePerPageSelect={handlePerPageSelect}
             handleSetFilters={handleSetFilters}
             handleSetPage={handleSetPage}
-            isLoaded={isLoaded}
+            isLoaded={loadedColumns}
             pagination={pagination}
             toolbarEndContent={toolbarEndContent}
           />

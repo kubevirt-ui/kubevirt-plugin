@@ -13,6 +13,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import useVirtualMachineInstanceTypes from '@kubevirt-utils/hooks/useVirtualMachineInstanceTypes';
 import { type ListPageProps } from '@kubevirt-utils/utils/types';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
+import useIsACMPage from '@multicluster/useIsACMPage';
 import {
   DocumentTitle,
   ListPageHeader,
@@ -32,6 +33,7 @@ const InstanceTypePage: FC<ListPageProps> = (props) => {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
   const location = useLocation();
+  const isACMPage = useIsACMPage();
 
   const { fieldSelector, selector } = props;
 
@@ -95,7 +97,7 @@ const InstanceTypePage: FC<ListPageProps> = (props) => {
 
       <div
         className={classNames({
-          'list-header-spacer': activeTabKey === CLUSTER_INSTANCETYPE_TAB_INDEX,
+          'list-header-spacer': activeTabKey === CLUSTER_INSTANCETYPE_TAB_INDEX && !isACMPage,
         })}
       >
         <ListPageHeader title={pageTitle}>

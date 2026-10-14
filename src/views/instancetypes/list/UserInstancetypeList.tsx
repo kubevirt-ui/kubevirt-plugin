@@ -101,7 +101,7 @@ const UserInstancetypeList: FC<UserInstancetypeListProps> = ({
           filterDefinitions={filterDefinitions}
           filters={filters}
           hideColumnManagement={hideColumnManagement}
-          loaded={isLoaded}
+          loaded={loadedColumns}
           onSetFilters={handleSetFilters}
           toolbarEndContent={
             <KubevirtTableExport
