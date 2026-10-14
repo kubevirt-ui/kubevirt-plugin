@@ -2,9 +2,11 @@ import { type FC, useState } from 'react';
 import { FormProvider, useForm, useWatch } from 'react-hook-form';
 
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
+import HidableTooltip from '@kubevirt-utils/components/HidableTooltip/HidableTooltip';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ClusterUserDefinedNetworkModel } from '@kubevirt-utils/models';
 import { type ClusterUserDefinedNetworkKind } from '@kubevirt-utils/resources/udn/types';
+import { getNoModalChangesTooltip } from '@kubevirt-utils/utils/text';
 import { k8sUpdate } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Alert,
@@ -40,7 +42,7 @@ const EditProjectMappingModal: FC<EditProjectMappingModalProps> = ({ closeModal,
   });
 
   const {
-    formState: { isSubmitting },
+    formState: { isDirty, isSubmitting },
     handleSubmit,
   } = methods;
 
@@ -54,7 +56,7 @@ const EditProjectMappingModal: FC<EditProjectMappingModalProps> = ({ closeModal,
   });
 
   const isSubmitDisabled =
-    isSubmitting || !isValidProjectMapping(projectMappingOption, namespaceSelector);
+    isSubmitting || !isValidProjectMapping(projectMappingOption, namespaceSelector) || !isDirty;
 
   const onSubmit = async (data: VMNetworkForm): Promise<void> => {
     try {
@@ -101,9 +103,11 @@ const EditProjectMappingModal: FC<EditProjectMappingModalProps> = ({ closeModal,
         </FormProvider>
       </ModalBody>
       <ModalFooter>
-        <Button isDisabled={isSubmitDisabled} onClick={handleSubmit(onSubmit)}>
-          {t('Save')}
-        </Button>
+        <HidableTooltip content={getNoModalChangesTooltip(t)} hidden={isDirty}>
+          <Button isDisabled={isSubmitDisabled} onClick={handleSubmit(onSubmit)}>
+            {t('Save')}
+          </Button>
+        </HidableTooltip>
         <Button onClick={closeModal} variant="link">
           {t('Cancel')}
         </Button>

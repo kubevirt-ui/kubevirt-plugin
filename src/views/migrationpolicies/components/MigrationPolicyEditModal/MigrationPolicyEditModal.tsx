@@ -4,9 +4,11 @@ import { useLocation, useNavigate } from 'react-router';
 import { MigrationPolicyModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { type V1alpha1MigrationPolicy } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
+import { isEqualObject } from '@kubevirt-utils/components/NodeSelectorModal/utils/helpers';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName } from '@kubevirt-utils/resources/shared';
+import { getNoModalChangesTooltip } from '@kubevirt-utils/utils/text';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { kubevirtK8sCreate, kubevirtK8sDelete, kubevirtK8sUpdate } from '@multicluster/k8sRequests';
 import { FormGroup, TextInput } from '@patternfly/react-core';
@@ -32,9 +34,8 @@ const MigrationPolicyEditModal: FC<MigrationPolicyEditModalProps> = ({ isOpen, m
   const location = useLocation();
   const cluster = useClusterParam();
   const migrationPoliciesBaseURL = useMigrationPoliciesListURL();
-  const [state, setState] = useState<EditMigrationPolicyInitialState>(() =>
-    extractEditMigrationPolicyInitialValues(mp),
-  );
+  const initialState = extractEditMigrationPolicyInitialValues(mp);
+  const [state, setState] = useState<EditMigrationPolicyInitialState>(initialState);
 
   const actualPathArray = location.pathname.split('/');
   const lastPolicyPathElement = actualPathArray[actualPathArray.length - 1]; // last part of url after "/", MigrationPolicy's previous name or ''
@@ -66,6 +67,8 @@ const MigrationPolicyEditModal: FC<MigrationPolicyEditModalProps> = ({ isOpen, m
     [mp, state],
   );
 
+  const noChangesMade = isEqualObject(state, initialState);
+
   const onSubmit = async (
     updatedMP: V1alpha1MigrationPolicy,
   ): Promise<V1alpha1MigrationPolicy | void> => {
@@ -90,11 +93,13 @@ const MigrationPolicyEditModal: FC<MigrationPolicyEditModalProps> = ({ isOpen, m
   return (
     <TabModal
       headerText={t('Edit MigrationPolicy')}
+      isDisabled={noChangesMade}
       isOpen={isOpen}
       obj={updatedMigrationPolicy}
       onClose={onClose}
       onSubmit={onSubmit}
       shouldWrapInForm
+      submitDisabledTooltip={getNoModalChangesTooltip(t)}
     >
       <FormGroup fieldId="migration-policy-name" isRequired label={t('MigrationPolicy name')}>
         <TextInput

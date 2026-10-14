@@ -1,7 +1,6 @@
 import { type FC } from 'react';
 import { type FieldErrors, type UseFormRegister, type UseFormSetValue } from 'react-hook-form';
 
-import { type V1beta1DataImportCron } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import { FormTextInput } from '@kubevirt-utils/components/FormTextInput/FormTextInput';
@@ -16,7 +15,6 @@ import { type DataImportCronManageFormType } from '../DataImportCronManageModal'
 
 type AutoUpdateFormFieldsProps = {
   allowAutoUpdate: boolean;
-  dataImportCron: V1beta1DataImportCron;
   errors: FieldErrors<DataImportCronManageFormType>;
   importsToKeep: number;
   register: UseFormRegister<DataImportCronManageFormType>;
@@ -25,7 +23,6 @@ type AutoUpdateFormFieldsProps = {
 
 const AutoUpdateFormFields: FC<AutoUpdateFormFieldsProps> = ({
   allowAutoUpdate,
-  dataImportCron,
   errors,
   importsToKeep,
   register,
@@ -91,7 +88,6 @@ const AutoUpdateFormFields: FC<AutoUpdateFormFieldsProps> = ({
           })}
           aria-label={t('Cron expression')}
           data-test={'dataimportcron-manage-cron'}
-          defaultValue={dataImportCron?.spec?.schedule}
           id={'dataimportcron-manage-source-cron'}
           type="text"
           validated={errors?.['schedule'] ? ValidatedOptions.error : ValidatedOptions.default}

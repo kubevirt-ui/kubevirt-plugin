@@ -11,6 +11,7 @@ import {
   getPropagationMethod,
 } from '@kubevirt-utils/components/SSHSecretModal/utils/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getNoModalChangesTooltip } from '@kubevirt-utils/utils/text';
 import { Radio, Split, SplitItem, Stack, StackItem } from '@patternfly/react-core';
 
 import CloudInitInfoHelper from '../CloudinitDescription/CloudinitInfoHelper';
@@ -29,7 +30,7 @@ const CloudinitModal: FC<{
   vmi?: V1VirtualMachineInstance;
 }> = ({ hideYAMLEditor = false, isOpen, onClose, onSubmit, vm, vmi }) => {
   const { t } = useKubevirtTranslation();
-  const { updatedVM, updateFromYAML, ...cloudInitHookValues } = useCloudInit(vm);
+  const { hasChanges, updatedVM, updateFromYAML, ...cloudInitHookValues } = useCloudInit(vm);
 
   const [showEditor, setShowEditor] = useState<boolean>(false);
   const [isSubmitDisabled, setIsSubmitDisabled] = useState<boolean>(false);
@@ -55,11 +56,12 @@ const CloudinitModal: FC<{
   return (
     <TabModal
       headerText={t('Cloud-init')}
-      isDisabled={isSubmitDisabled}
+      isDisabled={isSubmitDisabled || !hasChanges}
       isOpen={isOpen}
       onClose={onClose}
       onSubmit={onSubmitModal}
       submitBtnText={t('Apply')}
+      submitDisabledTooltip={isSubmitDisabled ? undefined : getNoModalChangesTooltip(t)}
     >
       <Stack hasGutter>
         <StackItem>{vmi && <ModalPendingChangesAlert />}</StackItem>

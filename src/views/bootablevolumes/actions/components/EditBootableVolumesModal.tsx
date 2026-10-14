@@ -7,8 +7,13 @@ import {
   DEFAULT_PREFERENCE_LABEL,
 } from '@kubevirt-utils/constants/instancetypes-and-preferences';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { convertResourceArrayToMap } from '@kubevirt-utils/resources/shared';
+import {
+  convertResourceArrayToMap,
+  getDescription,
+  getLabel,
+} from '@kubevirt-utils/resources/shared';
 import { ANNOTATIONS } from '@kubevirt-utils/resources/template';
+import { getNoModalChangesTooltip } from '@kubevirt-utils/utils/text';
 import { type K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import {
   type CategoryDetails,
@@ -44,23 +49,24 @@ const EditBootableVolumesModal: FC<EditBootableVolumesModalProps> = ({
   );
 
   const initialParams = useMemo(() => {
-    const instanceTypeLabel = source?.metadata?.labels?.[DEFAULT_INSTANCETYPE_LABEL]?.split('.');
-    const initialCategory = Object.entries(categoryDetailsMap).find(
-      (category) => category[1].prefix === instanceTypeLabel?.[0],
-    );
+    const instanceTypeLabel = getLabel(source, DEFAULT_INSTANCETYPE_LABEL)?.split('.');
+    const initialCategory =
+      Object.entries(categoryDetailsMap).find(
+        ([_category, details]) => details.prefix === instanceTypeLabel?.[0],
+      )?.[0] ?? '';
 
     return {
-      description: source?.metadata?.annotations?.[ANNOTATIONS.description],
+      description: getDescription(source) ?? '',
       instanceType: initialCategory,
-      preference: source?.metadata?.labels?.[DEFAULT_PREFERENCE_LABEL],
-      size: initialCategory && instanceTypeLabel?.[1],
+      preference: getLabel(source, DEFAULT_PREFERENCE_LABEL),
+      size: initialCategory ? (instanceTypeLabel?.[1] ?? '') : '',
     };
   }, [source]);
 
-  const [preference, setPreference] = useState<string>(initialParams.preference);
-  const [instanceType, setInstanceType] = useState<string>(initialParams.instanceType?.[0] ?? '');
-  const [size, setSize] = useState<string>(initialParams.size ?? '');
-  const [description, setDescription] = useState<string>(initialParams.description ?? '');
+  const [preference, setPreference] = useState<string | undefined>(initialParams.preference);
+  const [instanceType, setInstanceType] = useState<string>(initialParams.instanceType);
+  const [size, setSize] = useState<string>(initialParams.size);
+  const [description, setDescription] = useState<string>(initialParams.description);
 
   const selectedCategory: CategoryDetails | undefined = instanceType
     ? categoryDetailsMap[instanceType as InstanceTypeCategory]
@@ -78,6 +84,12 @@ const EditBootableVolumesModal: FC<EditBootableVolumesModalProps> = ({
   const onSizeSelect = (_event: unknown, newSize: string): void => {
     setSize(newSize);
   };
+
+  const noChangesMade =
+    preference === initialParams.preference &&
+    instanceType === initialParams.instanceType &&
+    size === initialParams.size &&
+    description === initialParams.description;
 
   const onSubmitVolumeParams = useCallback((): ReturnType<typeof changeBootableVolumeMetadata> => {
     const preferenceLabel = preference && { [DEFAULT_PREFERENCE_LABEL]: preference };
@@ -109,11 +121,13 @@ const EditBootableVolumesModal: FC<EditBootableVolumesModalProps> = ({
   return (
     <TabModal<K8sResourceCommon>
       headerText={t('Edit volume metadata')}
+      isDisabled={noChangesMade}
       isOpen={isOpen}
       obj={source}
       onClose={onClose}
       onSubmit={onSubmitVolumeParams()}
       shouldWrapInForm
+      submitDisabledTooltip={getNoModalChangesTooltip(t)}
     >
       <EditBootableVolumePreferenceField
         preference={preference}

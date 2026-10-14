@@ -13,7 +13,7 @@ import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { FormGroup, PopoverPosition } from '@patternfly/react-core';
 
 type EditBootableVolumePreferenceFieldProps = {
-  preference: string;
+  preference: string | undefined;
   preferencesNames: string[];
   setPreference: (preference: string) => void;
 };

@@ -7,6 +7,7 @@ import {
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { produceVMDisks } from '@kubevirt-utils/components/DiskModal/utils/helpers';
 import { InterfaceTypes } from '@kubevirt-utils/components/DiskModal/utils/types';
+import { isEqualObject } from '@kubevirt-utils/components/NodeSelectorModal/utils/helpers';
 import { getVolumes } from '@kubevirt-utils/resources/vm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { safeYAMLToJS } from '@kubevirt-utils/utils/yaml';
@@ -141,9 +142,12 @@ export const useCloudInit = (vm: V1VirtualMachine): UseCloudInitValues => {
     [vm, cloudInitVol?.name, cloudInitVolume],
   );
 
+  const hasChanges = !isEqualObject(yamlJSObject, cloudInit);
+
   return {
     cloudInitVolume,
     enableNetworkData,
+    hasChanges,
     networkData,
     setEnableNetworkData: wrappedSetEnableNetworkData,
     updatedVM,
@@ -157,6 +161,7 @@ export const useCloudInit = (vm: V1VirtualMachine): UseCloudInitValues => {
 type UseCloudInitValues = {
   cloudInitVolume: V1Volume;
   enableNetworkData: boolean;
+  hasChanges: boolean;
   networkData: CloudInitNetworkData;
   setEnableNetworkData: (enableNetwork: boolean) => void;
   updatedVM: V1VirtualMachine;
