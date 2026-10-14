@@ -1,0 +1,208 @@
+import { ConsoleRoutes } from '@/utils/console-routes';
+import {
+  fillLabelsModalInput,
+  openResourceAnnotationsEditor,
+  openResourceLabelsEditor,
+} from '@/utils/resource-summary';
+import { MINUTE, TestTimeouts } from '@/utils/test-config';
+import type { Locator } from '@playwright/test';
+
+import { ResourceListPage } from './resource-list-page';
+
+export class DataSourcesPage extends ResourceListPage {
+  readonly listPath = '/k8s/all-namespaces/cdi.kubevirt.io~v1beta1~DataSource';
+
+  private actionsButton(): Locator {
+    return this.page
+      .locator('.co-actions button')
+      .filter({ hasText: /^Actions$/ })
+      .or(this.page.getByRole('button', { name: 'Actions' }).last());
+  }
+
+  annotationsSummary(): Locator {
+    return this.page
+      .locator('.pf-c-description-list__group, .pf-v6-c-description-list__group')
+      .filter({ has: this.page.getByText('Annotations', { exact: true }) });
+  }
+
+  annotationsLink(): Locator {
+    return this.annotationsSummary().getByText(/\d+ Annotation/i);
+  }
+
+  editLabelsModalHeading(): Locator {
+    return this.page.getByRole('heading', { name: /edit labels/i });
+  }
+
+  editAnnotationsModalHeading(): Locator {
+    return this.page.getByRole('heading', { name: /edit annotations/i });
+  }
+
+  tagsInput(): Locator {
+    return this.page.locator('#tags-input, [data-test="tags-input"]');
+  }
+
+  labelOnDetail(text: string): Locator {
+    return this.page.getByText(text, { exact: false }).first();
+  }
+
+  labelsEditButton(_name: string): Locator {
+    return this.page
+      .getByTestId(`${_name}-labels-edit`)
+      .or(
+        this.page
+          .locator('dt')
+          .filter({ hasText: /^Labels$/ })
+          .getByRole('link', { name: 'Edit' }),
+      )
+      .or(this.page.getByRole('button', { name: /edit labels/i }));
+  }
+
+  async goToList(): Promise<void> {
+    await this.gotoList(this.listPath);
+  }
+
+  async goToNamespaceList(namespace: string): Promise<void> {
+    await this.gotoList(ConsoleRoutes.dataSourcesInNamespace(namespace));
+    await this.page
+      .locator('[data-test-id="resource-title"]')
+      .filter({ hasText: /DataSources/i })
+      .waitFor({ timeout: TestTimeouts.LONG_OPERATION });
+  }
+
+  async createFromYaml(manifestYaml?: string): Promise<void> {
+    await this.openCreateDropdown('Create DataSource');
+    await this.createFromYamlAndSubmit(manifestYaml);
+    await this.waitForResourceDetailUrl(/cdi\.kubevirt\.io~v1beta1~DataSource\/[^/]+(?:\/|$)/);
+    await this.resourceTitle().waitFor({
+      state: 'visible',
+      timeout: TestTimeouts.RESOURCE_CREATION,
+    });
+  }
+
+  async createFromForm(name: string, url: string, cron: string): Promise<void> {
+    await this.openCreateDropdown('Create DataSource');
+    await this.chooseCreateOption(/with form/i);
+    await this.page.locator('#datasource-create-name').fill(name);
+    await this.page.locator('#datasource-create-source-url').fill(url);
+    await this.page.locator('#datasource-create-source-cron').fill(cron);
+    await this.page.getByRole('button', { name: /^Save$/ }).click();
+    await this.page
+      .locator('#create-datasource-modal, .pf-c-modal-box')
+      .waitFor({ state: 'hidden' })
+      .catch(() => undefined);
+    await this.page.waitForURL(new RegExp(`DataSource/${name}`), { timeout: 120_000 });
+    await this.resourceTitle().waitFor({ state: 'visible', timeout: 120_000 });
+  }
+
+  async openDetail(namespace: string, name: string): Promise<void> {
+    await this.page.goto(`/k8s/ns/${namespace}/cdi.kubevirt.io~v1beta1~DataSource/${name}`, {
+      waitUntil: 'domcontentloaded',
+    });
+    await this.resourceTitle().waitFor({ state: 'visible' });
+  }
+
+  async getDetailTitleText(): Promise<string> {
+    return await this.getResourceTitleText();
+  }
+
+  async editLabels(_name: string, label: string): Promise<void> {
+    await openResourceLabelsEditor(this.page);
+    await fillLabelsModalInput(this.page, label);
+  }
+
+  async openAnnotationsModal(): Promise<void> {
+    await this.page.keyboard.press('Escape');
+    const actions = this.actionsButton();
+    if (await actions.isVisible().catch(() => false)) {
+      await actions.click();
+      await this.page.getByRole('menuitem', { name: /Edit annotations/i }).click();
+      await this.editAnnotationsModalHeading().waitFor({ state: 'visible' });
+      return;
+    }
+    const countLink = this.annotationsSummary().getByRole('link', { name: /\d+ Annotation/i });
+    if (await countLink.isVisible().catch(() => false)) {
+      await countLink.click();
+      await this.editAnnotationsModalHeading().waitFor({ state: 'visible' });
+      return;
+    }
+    await openResourceAnnotationsEditor(this.page);
+    await this.editAnnotationsModalHeading().waitFor({ state: 'visible' });
+  }
+
+  annotationsModal(): Locator {
+    return this.page.locator('#tab-modal').filter({ has: this.editAnnotationsModalHeading() });
+  }
+
+  async saveAnnotationsModal(): Promise<void> {
+    const modal = this.page.locator('#tab-modal');
+    const save = modal.getByText('Save', { exact: true });
+    await save.click();
+    try {
+      await this.editAnnotationsModalHeading().waitFor({ state: 'hidden', timeout: 120_000 });
+    } catch {
+      await save.click();
+      await this.editAnnotationsModalHeading().waitFor({ state: 'hidden', timeout: 120_000 });
+    }
+  }
+
+  async addAnnotation(key: string, value: string): Promise<void> {
+    const modal = this.annotationsModal();
+    const addMore = modal.getByRole('button', { name: /add more/i });
+    if (await addMore.isVisible().catch(() => false)) {
+      await addMore.click();
+    }
+    await modal.locator('input[aria-label="annotation key"]').last().fill(key);
+    await modal.locator('input[aria-label="annotation value"]').last().fill(value);
+    await this.saveAnnotationsModal();
+  }
+
+  async deleteAnnotationByKey(key: string): Promise<void> {
+    const modal = this.annotationsModal();
+    const keys = modal.locator('input[aria-label="annotation key"]');
+    const count = await keys.count();
+    for (let i = 0; i < count; i += 1) {
+      if ((await keys.nth(i).inputValue()) === key) {
+        await modal.locator('button.pf-m-plain, button.pf-v6-c-button.pf-m-plain').nth(i).click();
+        await this.saveAnnotationsModal();
+        return;
+      }
+    }
+    throw new Error(`Annotation key not found in modal: ${key}`);
+  }
+
+  /** KubeVirt `DeleteModal` or console delete dialog from list actions. */
+  async confirmDelete(resourceName?: string): Promise<void> {
+    const deleteModal = this.deleteConfirmationDialog();
+    await deleteModal.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
+    await this.fillDeleteConfirmationName(deleteModal, resourceName);
+    await this.confirmDeleteDialog(deleteModal);
+  }
+
+  async deleteFromDetail(name?: string): Promise<void> {
+    await this.actionsButton().click({ timeout: 120_000 });
+    const menu = this.page.locator('.pf-c-dropdown__menu, .pf-v6-c-menu__content, [role="menu"]');
+    await menu.waitFor({ state: 'visible', timeout: 120_000 });
+    await menu
+      .getByRole('menuitem', { name: /^Delete$/ })
+      .or(menu.getByText(/^Delete$/))
+      .click();
+    await this.confirmDelete();
+    if (name) {
+      await this.page
+        .waitForURL((url) => !url.pathname.includes(`/DataSource/${name}`), { timeout: 2 * MINUTE })
+        .catch(() => undefined);
+    }
+  }
+
+  async getAnnotationsLinkText(): Promise<string> {
+    return (await this.annotationsLink().textContent()) ?? '';
+  }
+
+  async deleteFromList(name: string): Promise<void> {
+    await this.filterByName(name);
+    await this.row(name).waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
+    await this.page.waitForTimeout(TestTimeouts.NETWORK_DELAY);
+    await this.openDeleteDialog(name);
+    await this.confirmDelete(name);
+  }
+}

@@ -1,0 +1,10 @@
+**/node_modules
+dist
+allure-results
+allure-report
+junit-results
+test-results
+playwright/test-results
+playwright/docs/exploration-uit-412
+coverage
+package-lock.json
