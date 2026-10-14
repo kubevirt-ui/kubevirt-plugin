@@ -4,7 +4,7 @@ import { operatorNamespaceSignal } from '@kubevirt-utils/store/operatorNamespace
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 import { getGroupVersionKindForModel } from '@openshift-console/dynamic-plugin-sdk';
 
-import { useCanListNamespaces } from '../useCanListNamespaces';
+import useCanUpdateFeaturesConfigMap from '../useCanUpdateFeaturesConfigMap';
 
 import { FEATURES_CONFIG_MAP_NAME } from './constants';
 
@@ -12,12 +12,12 @@ type UseFeaturesConfigMap = (
   cluster?: string,
   enableQuery?: boolean,
 ) => {
+  canEditFeaturesConfigMap: boolean;
   featuresConfigMapData: [IoK8sApiCoreV1ConfigMap, boolean, Error | undefined];
-  isAdmin: boolean;
 };
 
 const useFeaturesConfigMap: UseFeaturesConfigMap = (cluster, enableQuery: boolean = true) => {
-  const isAdmin = useCanListNamespaces();
+  const [canEditFeaturesConfigMap] = useCanUpdateFeaturesConfigMap(cluster);
   const operatorNamespace = operatorNamespaceSignal.value;
 
   const featuresConfigMapData = useK8sWatchData<IoK8sApiCoreV1ConfigMap>(
@@ -30,7 +30,7 @@ const useFeaturesConfigMap: UseFeaturesConfigMap = (cluster, enableQuery: boolea
         namespace: operatorNamespace,
       },
   );
-  return { featuresConfigMapData: [...featuresConfigMapData], isAdmin };
+  return { canEditFeaturesConfigMap, featuresConfigMapData: [...featuresConfigMapData] };
 };
 
 export default useFeaturesConfigMap;

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { useCanListNamespaces } from '@kubevirt-utils/hooks/useCanListNamespaces';
+import useCanPatchHyperConverged from '@kubevirt-utils/hooks/useCanPatchHyperConverged';
 import useHyperConvergeConfiguration from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { type HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { buildFeatureGatePatches } from '@kubevirt-utils/resources/hyperconverged/featureGates';
@@ -32,7 +32,7 @@ const updateDeclarativeHotplugVolumesFeatureGate = (
 const useAdvancedCDROMFeatureFlag = (cluster?: string): AdvancedCDROMFeatureFlag => {
   const [loading, setLoading] = useState(false);
   const [hyperConvergeConfiguration, hcoLoaded] = useHyperConvergeConfiguration(cluster);
-  const isAdmin = useCanListNamespaces();
+  const [canPatchHyperConverged] = useCanPatchHyperConverged(cluster);
 
   const featureEnabled = isFeatureGateEnabled(
     hyperConvergeConfiguration,
@@ -40,7 +40,7 @@ const useAdvancedCDROMFeatureFlag = (cluster?: string): AdvancedCDROMFeatureFlag
   );
 
   return {
-    canEdit: isAdmin,
+    canEdit: canPatchHyperConverged,
     featureEnabled,
     loading: !hcoLoaded || loading,
     toggleFeature: async (val: boolean): Promise<HyperConverged> => {

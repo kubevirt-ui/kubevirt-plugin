@@ -2,10 +2,12 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 
 import { VIRTUALIZATION_PATHS } from '@kubevirt-utils/constants/constants';
-import { useCanListNamespaces } from '@kubevirt-utils/hooks/useCanListNamespaces';
+import useCanManageClusterSettings from '@kubevirt-utils/hooks/useCanManageClusterSettings';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
 import { getTabs, type SettingsTabConfig } from '../tabs';
+
+import { useSettingsCluster } from '../context/SettingsClusterContext';
 
 export const useSettingsTabs = (): {
   activeTab: string;
@@ -15,9 +17,13 @@ export const useSettingsTabs = (): {
   const { t } = useKubevirtTranslation();
   const navigate = useNavigate();
   const location = useLocation();
-  const isAdmin = useCanListNamespaces();
+  const settingsCluster = useSettingsCluster();
+  const [canManageClusterSettings] = useCanManageClusterSettings(settingsCluster);
 
-  const tabs = useMemo(() => getTabs(isAdmin, t).filter((tab) => tab.isEnabled), [isAdmin, t]);
+  const tabs = useMemo(
+    () => getTabs(canManageClusterSettings, t).filter((tab) => tab.isEnabled),
+    [canManageClusterSettings, t],
+  );
 
   const getActiveTabFromURL = useCallback(() => {
     const settingsPath = VIRTUALIZATION_PATHS.SETTINGS;

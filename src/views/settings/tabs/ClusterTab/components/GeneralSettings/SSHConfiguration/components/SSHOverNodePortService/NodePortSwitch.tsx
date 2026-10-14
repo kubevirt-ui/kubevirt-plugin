@@ -15,8 +15,8 @@ export const NodePortSwitch: FC = () => {
   const { isLoading, updateSSHConfiguration } = useUpdateSSHConfiguration(NODE_PORT_ENABLED);
 
   const {
+    canEditFeaturesConfigMap,
     featuresConfigMapData: [featureConfigMap, loaded],
-    isAdmin,
   } = useFeaturesConfigMap(cluster);
 
   const isChecked =
@@ -31,7 +31,9 @@ export const NodePortSwitch: FC = () => {
       className={isLoading ? 'kv-cursor--loading' : undefined}
       data-test="node-port"
       isChecked={isChecked}
-      isDisabled={!loaded || !isAdmin || isEmpty(featureConfigMap?.data?.[NODE_PORT_ADDRESS])}
+      isDisabled={
+        !loaded || !canEditFeaturesConfigMap || isEmpty(featureConfigMap?.data?.[NODE_PORT_ADDRESS])
+      }
       onChange={(_event, checked) => updateSSHConfiguration(checked.toString())}
     />
   );

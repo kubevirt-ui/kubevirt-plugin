@@ -1,5 +1,5 @@
 import { K8S_OPS } from '@kubevirt-utils/constants/constants';
-import { useCanListNamespaces } from '@kubevirt-utils/hooks/useCanListNamespaces';
+import useCanPatchHyperConverged from '@kubevirt-utils/hooks/useCanPatchHyperConverged';
 import useHyperConvergeConfiguration, {
   type HyperConverged,
 } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
@@ -29,10 +29,10 @@ const useVMTemplateFeatureFlag: UseVMTemplateFeatureFlag = (clusterOverride) => 
 
   const [hyperConvergeConfiguration, hcConfigLoaded] = useHyperConvergeConfiguration(cluster);
 
-  const isAdmin = useCanListNamespaces();
+  const [canPatchHyperConverged] = useCanPatchHyperConverged(cluster);
 
   return {
-    canEdit: isAdmin,
+    canEdit: canPatchHyperConverged,
     featureEnabled,
     loading: featureEnabledLoading || !hcConfigLoaded,
     toggleFeature: (isChecked: boolean): Promise<HyperConverged> => {

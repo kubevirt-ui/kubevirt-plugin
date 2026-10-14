@@ -66,7 +66,7 @@ const useDisabledInstanceTypeFamilies: UseDisabledInstanceTypeFamilies = (cluste
   const clusterParam = useClusterParam();
   const cluster = clusterOverride ?? clusterParam;
   const operatorNamespace = operatorNamespaceSignal.value;
-  const { featuresConfigMapData, isAdmin } = useFeaturesConfigMap(cluster);
+  const { canEditFeaturesConfigMap, featuresConfigMapData } = useFeaturesConfigMap(cluster);
   const [featureConfigMap, featureConfigMapLoaded] = featuresConfigMapData;
   const familiesLoaded = Boolean(featureConfigMapLoaded);
 
@@ -86,7 +86,7 @@ const useDisabledInstanceTypeFamilies: UseDisabledInstanceTypeFamilies = (cluste
 
   const setFamilyAvailable = useCallback(
     async (series: InstanceTypeSeries, available: boolean): Promise<void> => {
-      if (!isAdmin) {
+      if (!canEditFeaturesConfigMap) {
         throw new Error('User is not authorized to update instance type family availability');
       }
       if (!operatorNamespace || !featureConfigMap) {
@@ -104,11 +104,11 @@ const useDisabledInstanceTypeFamilies: UseDisabledInstanceTypeFamilies = (cluste
         resource: featureConfigMap,
       });
     },
-    [cluster, disabledFamiliesList, featureConfigMap, isAdmin, operatorNamespace],
+    [canEditFeaturesConfigMap, cluster, disabledFamiliesList, featureConfigMap, operatorNamespace],
   );
 
   return {
-    canEdit: isAdmin,
+    canEdit: canEditFeaturesConfigMap,
     disabledFamilies,
     isFamilyVisible,
     loaded: familiesLoaded,

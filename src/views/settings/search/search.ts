@@ -80,11 +80,14 @@ const getDownloadsTabIds = (t: TFunction): SearchItem[] => [
   { id: DOWNLOADS_TAB_IDS.virtioDriversWindows, title: t('Windows drivers') },
 ];
 
-export const getSearchItems = (t: TFunction, isAdmin: boolean): SearchItemWithTab[] => {
+export const getSearchItems = (
+  t: TFunction,
+  canManageClusterSettings: boolean,
+): SearchItemWithTab[] => {
   const tabsIds: { [key: string]: SearchItem[] } = {
     downloads: getDownloadsTabIds(t),
     user: getUserTabIds(t),
-    ...(isAdmin && {
+    ...(canManageClusterSettings && {
       cluster: getClusterTabIds(t),
       features: getPreviewFeaturesTabIds(t),
       recommended: getRecommendedTabIds(t),

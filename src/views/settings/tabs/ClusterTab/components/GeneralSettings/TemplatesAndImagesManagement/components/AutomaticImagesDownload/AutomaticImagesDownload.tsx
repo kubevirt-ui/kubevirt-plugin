@@ -1,7 +1,7 @@
 import { type FC, useCallback, useState } from 'react';
 
 import SectionWithSwitch from '@kubevirt-utils/components/SectionWithSwitch/SectionWithSwitch';
-import { useCanListNamespaces } from '@kubevirt-utils/hooks/useCanListNamespaces';
+import useCanPatchHyperConverged from '@kubevirt-utils/hooks/useCanPatchHyperConverged';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getHyperConvergedModelFromResource } from '@kubevirt-utils/resources/hyperconverged/model';
 import {
@@ -36,7 +36,7 @@ const AutomaticImagesDownload: FC<AutomaticImagesDownloadProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const cluster = useSettingsCluster();
-  const isAdmin = useCanListNamespaces();
+  const [canPatchHyperConverged] = useCanPatchHyperConverged(cluster);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [imageLoadingIndex, setImageLoadingIndex] = useState<number>(-1);
 
@@ -104,7 +104,7 @@ const AutomaticImagesDownload: FC<AutomaticImagesDownloadProps> = ({
           dataTestID="auto-image-download"
           helpTextIconContent={t('Enable automatic images download and update')}
           id="auto-image-download"
-          isDisabled={!loaded || !isAdmin}
+          isDisabled={!loaded || !canPatchHyperConverged}
           isLoading={isLoading}
           newBadge={newBadge}
           olsPromptType={OLSPromptType.AUTO_IMAGE_DOWNLOADS}
@@ -122,6 +122,7 @@ const AutomaticImagesDownload: FC<AutomaticImagesDownloadProps> = ({
                   dataTestID={`${name}-auto-image-download-switch`}
                   id={`${name}-auto-image-download-switch`}
                   inlineCheckbox
+                  isDisabled={!loaded || !canPatchHyperConverged}
                   isLoading={index === imageLoadingIndex}
                   key={name}
                   newBadge={newBadge}

@@ -25,11 +25,11 @@ import AutoAppliedLabelRow from './components/AutoAppliedLabelRow';
 const AutoAppliedLabelsTable: FC = () => {
   const { t } = useKubevirtTranslation();
   const { addDangerToast } = useKubevirtToast();
-  const { error, isAdmin, labels, loaded, updateLabels } = useAutoAppliedLabels();
+  const { canEdit, error, labels, loaded, updateLabels } = useAutoAppliedLabels();
   const [isAdding, setIsAdding] = useState(false);
 
   const existingKeys = labels.map((label) => label.key);
-  const isDisabled = !isAdmin;
+  const isDisabled = !canEdit;
 
   const persist = useCallback(
     async (next: AutoAppliedLabel[]): Promise<void> => {
