@@ -9,7 +9,7 @@ test.describe(
   'VM Creation Wizard — Create from Template happy path',
   { tag: [ROUTE_VM_WIZARD_TAG, T1_TAG, '@catalog-wizard', ADMIN_ONLY_TAG] },
   () => {
-    test('From Template wizard selects RHEL9 template, creates VM, and reaches Running state', async ({
+    test('From Template wizard validates customization and creates a VM', async ({
       apiClient,
       vmListPage,
       vmWizardNavigationPage,
@@ -81,7 +81,7 @@ test.describe(
         await expect
           .poll(
             () =>
-              vmWizardComputePage.isHostnameModalValidationErrorVisible('This field is required'),
+              vmWizardComputePage.isHostnameModalValidationErrorVisible('Please provide hostname.'),
             {
               message: 'Empty hostname should show the required validation error',
               timeout: utils.TestTimeouts.UI_VISIBILITY_QUICK,

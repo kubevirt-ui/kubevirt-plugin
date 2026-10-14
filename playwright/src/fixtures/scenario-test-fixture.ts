@@ -6,6 +6,7 @@ import { detectAuthExpired, healBrowserAuth } from '@/utils/auth-healer';
 import { waitForClusterResources, waitForNamespaceReady } from '@/utils/cluster-resource-checker';
 import { EnvVariables } from '@/utils/env-variables';
 import { FileUtils } from '@/utils/file-utils';
+import { collectRuntimeErrors } from '@/utils/runtime-errors';
 import { getStorageStatePath } from '@/utils/storage-state';
 import type { SharedTestConfig } from '@/utils/test-config';
 import { TestConfigManager, TestTimeouts } from '@/utils/test-config';
@@ -231,9 +232,16 @@ const _test = base.extend<TestFixtures, WorkerFixtures>({
       });
     }
 
+    const attachRuntimeErrors = collectRuntimeErrors(testContext, testInfo);
     try {
       await use(testPage);
     } finally {
+      // Save diagnostics even when navigation failed or the page/browser has already closed.
+      try {
+        await attachRuntimeErrors();
+      } catch (error) {
+        console.warn('Failed to attach runtime-errors.md:', error);
+      }
       try {
         const testFailed = testInfo.status !== 'passed' && testInfo.status !== 'skipped';
         const needsScreenshot = testFailed;

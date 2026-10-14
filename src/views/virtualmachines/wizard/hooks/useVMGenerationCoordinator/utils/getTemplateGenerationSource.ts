@@ -1,5 +1,6 @@
 import cloneDeep from 'lodash/cloneDeep';
 
+import { getResourceKey } from '@kubevirt-utils/resources/shared';
 import { type Template } from '@kubevirt-utils/resources/template';
 import { type VMWizardFormValues } from '@virtualmachines/wizard/form/types';
 
@@ -13,6 +14,34 @@ export type TemplateGenerationSource = {
   project: string;
   selectedTemplate: Template;
   vmName: string | undefined;
+};
+
+export type TemplateGeneratedDraftSource = Omit<
+  TemplateGenerationSource,
+  'description' | 'folder' | 'selectedTemplate'
+> & {
+  templateKey: string;
+};
+
+/**
+ * Values that identify the generated VM structure. Description and folder are intentionally
+ * excluded because their editors patch the current VM draft directly; changing either must not
+ * regenerate the template and overwrite unrelated customizations.
+ */
+export const getTemplateGeneratedDraftSource = (
+  source: TemplateGenerationSource,
+): TemplateGeneratedDraftSource => {
+  const {
+    description: _description,
+    folder: _folder,
+    selectedTemplate,
+    ...generationInputs
+  } = source;
+
+  return {
+    ...generationInputs,
+    templateKey: getResourceKey(selectedTemplate),
+  };
 };
 
 export const getTemplateGenerationSource = (

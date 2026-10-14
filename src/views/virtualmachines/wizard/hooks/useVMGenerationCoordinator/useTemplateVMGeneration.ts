@@ -12,7 +12,6 @@ import { logVMCreationFailedFromTemplate } from '@kubevirt-utils/extensions/tele
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
 import { USER_SETTINGS_KEYS } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/const';
-import { getResourceKey } from '@kubevirt-utils/resources/shared';
 import { useVMWizardForm } from '@virtualmachines/wizard/form/VMWizardFormProvider';
 import { useVMWizardState } from '@virtualmachines/wizard/state/useVMWizardState';
 import { getFirstUnfulfilledRequiredParameter } from '@virtualmachines/wizard/steps/TemplateStep/components/TemplatesCatalogDrawer/utils/utils';
@@ -24,6 +23,7 @@ import {
 
 import { type GeneratedVMDraft, type GenerationScope, type TemplateVMGeneration } from './types';
 import {
+  getTemplateGeneratedDraftSource,
   getTemplateGenerationSource,
   type TemplateGenerationSource,
 } from './utils/getTemplateGenerationSource';
@@ -101,12 +101,8 @@ const useTemplateVMGeneration = ({
 
     setProcessError(null);
 
-    const { selectedTemplate: processingTemplate, ...sourceInputs } = requestSnapshot;
-
-    const generatedDraftKey = {
-      ...sourceInputs,
-      templateKey: getResourceKey(processingTemplate),
-    };
+    const { selectedTemplate: processingTemplate } = requestSnapshot;
+    const generatedDraftKey = getTemplateGeneratedDraftSource(requestSnapshot);
 
     if (isCurrentGeneratedDraft(generatedDraftKey)) return Promise.resolve(true);
 

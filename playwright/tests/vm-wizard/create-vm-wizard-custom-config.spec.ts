@@ -9,7 +9,7 @@ test.describe(
   'VM Creation Wizard — Custom configuration happy path',
   { tag: [ROUTE_VM_WIZARD_TAG, T1_TAG, '@catalog-wizard', ADMIN_ONLY_TAG] },
   () => {
-    test('Custom configuration wizard creates a RHEL VM through all steps and reaches Running state', async ({
+    test('Custom configuration wizard creates a VM through all steps', async ({
       apiClient,
       vmListPage,
       vmWizardNavigationPage,
