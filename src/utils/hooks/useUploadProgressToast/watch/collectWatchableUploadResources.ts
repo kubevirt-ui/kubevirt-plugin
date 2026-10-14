@@ -1,4 +1,8 @@
-import type { UploadEntry, UploadLinkedResource, UploadSuccessLink } from '../types';
+import {
+  type UploadEntry,
+  type UploadLinkedResource,
+  type UploadSuccessLink,
+} from '../uploads/types/types';
 
 export const getUploadLinkedResourceWatchKey = (resource: UploadLinkedResource): string =>
   [

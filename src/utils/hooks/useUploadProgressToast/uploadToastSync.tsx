@@ -5,8 +5,8 @@ import type useKubevirtToast from '@kubevirt-utils/hooks/useKubevirtToast';
 import UploadProgressToastContent from './components/UploadProgressToastContent';
 import { UPLOAD_PROGRESS_STATUS } from './constants';
 import { getUploadTitle, isTerminalUploadStatus } from './toast/uploadTitles';
-import { type UploadEntry } from './types';
 import { useUploadProgressStore } from './uploadProgressStore';
+import { type UploadEntry } from './uploads/types/types';
 
 type ToastActions = ReturnType<typeof useKubevirtToast>;
 
@@ -80,7 +80,7 @@ export const replaceWithTerminalUploadToast = (
     ),
     dismissible: true,
     onClose: (): void => {
-      const latestUpload = useUploadProgressStore.getState().getUpload(uploadKey);
+      const latestUpload = useUploadProgressStore.getState().uploads.actions?.getUpload(uploadKey);
       if (latestUpload && latestUpload.generation !== capturedGeneration) {
         return;
       }

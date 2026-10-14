@@ -1,7 +1,7 @@
 import { modelToGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import type { K8sGroupVersionKind, K8sModel } from '@openshift-console/dynamic-plugin-sdk';
 
-import type { UploadLinkedResource } from '../types';
+import { type UploadLinkedResource } from '../uploads/types/types';
 
 export const getUploadLinkedResource = (
   model: K8sModel,

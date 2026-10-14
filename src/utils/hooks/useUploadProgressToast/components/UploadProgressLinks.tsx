@@ -3,7 +3,7 @@ import { type FC } from 'react';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Button, ButtonVariant } from '@patternfly/react-core';
 
-import { type UploadSuccessLink } from '../types';
+import { type UploadSuccessLink } from '../uploads/types/types';
 
 type UploadProgressLinksProps = {
   links?: UploadSuccessLink[];

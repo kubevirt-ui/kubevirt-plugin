@@ -5,7 +5,7 @@ import { useUploadProgressStore } from '../uploadProgressStore';
 
 const useUploadBeforeUnload = (): void => {
   const hasActiveUploads = useUploadProgressStore((state) =>
-    Object.values(state.uploads).some(
+    Object.values(state.uploads.data).some(
       (entry) =>
         entry.status === UPLOAD_PROGRESS_STATUS.UPLOADING && entry.blockNavigation !== false,
     ),

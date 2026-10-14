@@ -1,7 +1,8 @@
 import type { TFunction } from 'i18next';
 
 import { UPLOAD_PROGRESS_STATUS } from '../constants';
-import type { UploadEntry, UploadProgressStatus } from '../types';
+
+import { type UploadEntry, type UploadProgressStatus } from '../uploads/types/types';
 
 export const isTerminalUploadStatus = (status?: UploadProgressStatus): boolean =>
   status === UPLOAD_PROGRESS_STATUS.SUCCESS ||

@@ -1,10 +1,10 @@
 import type { FC } from 'react';
 
 import { UPLOAD_PROGRESS_STATUS } from '../constants';
-import type { UploadEntry } from '../types';
 import { useUploadProgressStore } from '../uploadProgressStore';
 
 import { resolveToastUpload } from '../toast/resolveToastUpload';
+import { type UploadEntry } from '../uploads/types/types';
 import UploadProgressCanceledToast from './UploadProgressCanceledToast';
 import UploadProgressErrorToast from './UploadProgressErrorToast';
 import UploadProgressSuccessToast from './UploadProgressSuccessToast';
@@ -21,7 +21,7 @@ const UploadProgressToastContent: FC<UploadProgressToastContentProps> = ({
   uploadKey,
   uploadSnapshot,
 }) => {
-  const storeUpload = useUploadProgressStore((state) => state.uploads[uploadKey]);
+  const storeUpload = useUploadProgressStore((state) => state.uploads.data?.[uploadKey]);
   const upload = resolveToastUpload(uploadSnapshot, storeUpload);
 
   if (!upload) {

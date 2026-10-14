@@ -2,7 +2,7 @@ import { DROPDOWN_FORM_SELECTION } from '@kubevirt-utils/components/AddBootableV
 import type { DataUpload } from '@kubevirt-utils/hooks/useCDIUpload/types';
 import { UPLOAD_STATUS } from '@kubevirt-utils/hooks/useCDIUpload/types';
 
-import { useUploadProgressStore } from '../uploadProgressStore';
+import { resetUploadProgressStore, useUploadProgressStore } from '../uploadProgressStore';
 
 import {
   cancelTrackedUploadOnModalClose,
@@ -19,7 +19,7 @@ const createMockDataUpload = (overrides: Partial<DataUpload> = {}): DataUpload =
 });
 
 const resetStore = () => {
-  useUploadProgressStore.setState({ generationsByKey: {}, uploads: {} });
+  resetUploadProgressStore();
 };
 
 describe('modalUploadCancel', () => {
@@ -63,7 +63,7 @@ describe('modalUploadCancel', () => {
   describe('cancelTrackedUploadOnModalClose', () => {
     it('should preserve upload when source is upload type', () => {
       const cancelTrackedUpload = jest.spyOn(
-        useUploadProgressStore.getState(),
+        useUploadProgressStore.getState().uploads?.actions,
         'cancelTrackedUpload',
       );
 
@@ -78,7 +78,7 @@ describe('modalUploadCancel', () => {
 
     it('should cancel via store when uploadKey is provided', () => {
       const cancelTrackedUpload = jest
-        .spyOn(useUploadProgressStore.getState(), 'cancelTrackedUpload')
+        .spyOn(useUploadProgressStore.getState().uploads?.actions, 'cancelTrackedUpload')
         .mockResolvedValue(undefined);
 
       cancelTrackedUploadOnModalClose({
@@ -108,7 +108,7 @@ describe('modalUploadCancel', () => {
 
     it('should no-op when upload is not in progress', () => {
       const cancelTrackedUpload = jest.spyOn(
-        useUploadProgressStore.getState(),
+        useUploadProgressStore.getState().uploads?.actions,
         'cancelTrackedUpload',
       );
       const cancelUpload = jest.fn();

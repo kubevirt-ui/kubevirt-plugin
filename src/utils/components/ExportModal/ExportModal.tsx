@@ -77,7 +77,7 @@ const ExportModal: FC<ExportModalProps> = ({
 
       const podLogsUrl = `${getResourceUrl({ model: PodModel, resource: pod })}/logs`;
       const uploadKey = getExportDiskUploadKey(cluster, namespace, pvcName);
-      useUploadProgressStore.getState().startUpload(uploadKey, {
+      useUploadProgressStore.getState().uploads.actions?.startUpload(uploadKey, {
         blockNavigation: false,
         cancelUpload: () => deleteExportResources(pod, secretName),
         contextLinks: [{ label: t('View pod logs'), url: podLogsUrl }],

@@ -3,9 +3,10 @@ import { isK8sNotFoundError } from '@kubevirt-utils/resources/errorStatusChecks'
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 
 import { UPLOAD_PROGRESS_STATUS } from '../constants';
-import { type UploadEntry, type UploadProgressStoreState } from '../types';
+import { type UploadProgressStoreState } from '../types';
 
 import { collectVmScopedUploadKeys } from '../keys/uploadKeys';
+import { type UploadEntry } from '../uploads/types/types';
 
 type StoreAccessor = () => UploadProgressStoreState;
 
@@ -67,7 +68,7 @@ export const performCancelTrackedUpload = async (
   uploadKey: string,
   { removeAfterCancel = false }: CancelTrackedUploadOptions = {},
 ): Promise<void> => {
-  const upload = get().uploads[uploadKey];
+  const upload = get().uploads.data?.[uploadKey];
   if (!upload) {
     return;
   }
@@ -78,16 +79,18 @@ export const performCancelTrackedUpload = async (
     (await abortUploadStream(cancelUpload)) ||
     (await abortViaDataVolume(dvName, dvNamespace, dvCluster));
 
-  if (get().uploads[uploadKey]?.generation !== generation) {
+  if (get().uploads.data?.[uploadKey]?.generation !== generation) {
     return;
   }
 
+  const { markUploadCanceled, removeUpload, stripDataVolumeLinks } = get().uploads.actions;
+
   if (removeAfterCancel && (!cancelUpload || aborted)) {
-    get().removeUpload(uploadKey);
+    removeUpload(uploadKey);
   } else if (!removeAfterCancel) {
-    get().markUploadCanceled(uploadKey, generation);
+    markUploadCanceled(uploadKey, generation);
     if (aborted) {
-      get().stripDataVolumeLinks(uploadKey);
+      stripDataVolumeLinks(uploadKey);
     }
   }
 
@@ -108,25 +111,26 @@ export const performCancelUploadsForVm = async (
   namespace: string,
   vmName: string,
 ): Promise<void> => {
+  const uploadsData = get().uploads.data;
   const generationByKey = Object.fromEntries(
-    collectVmScopedUploadKeys(get().uploads, cluster, namespace, vmName).map((key) => [
+    collectVmScopedUploadKeys(uploadsData, cluster, namespace, vmName).map((key) => [
       key,
-      get().uploads[key]?.generation,
+      uploadsData[key]?.generation,
     ]),
   );
   const matchingKeys = Object.keys(generationByKey).filter(
-    (key) => get().uploads[key]?.status === UPLOAD_PROGRESS_STATUS.UPLOADING,
+    (key) => uploadsData?.[key]?.status === UPLOAD_PROGRESS_STATUS.UPLOADING,
   );
 
   // Keep canceled entries so the terminal toast can merge stripped links instead of
   // freezing a snapshot that still points at the deleted VM's storage page.
   await performCancelTrackedUploads(get, matchingKeys);
-  get().stripVmStorageLinksForVm(
+  get().uploads.actions?.stripVmStorageLinksForVm(
     cluster,
     namespace,
     vmName,
     Object.keys(generationByKey).filter(
-      (key) => get().uploads[key]?.generation === generationByKey[key],
+      (key) => get().uploads.data?.[key]?.generation === generationByKey[key],
     ),
   );
 };
@@ -136,7 +140,7 @@ export const performCancelWizardPendingUploads = async (
   uploadKeys: string[],
 ): Promise<void> => {
   const pendingKeys = uploadKeys.filter(
-    (key) => get().uploads[key]?.status === UPLOAD_PROGRESS_STATUS.UPLOADING,
+    (key) => get().uploads.data?.[key]?.status === UPLOAD_PROGRESS_STATUS.UPLOADING,
   );
 
   await performCancelTrackedUploads(get, pendingKeys, { removeAfterCancel: true });

@@ -1,7 +1,6 @@
 import type { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 
 import { UPLOAD_PROGRESS_STATUS } from '../constants';
-import { type UploadEntry } from '../types';
 
 import {
   getBootableVolumesListUrl,
@@ -14,6 +13,7 @@ import {
   getVmCdromUploadKey,
   getVmDiskUploadKey,
 } from '../keys/uploadKeys';
+import { type UploadEntry } from '../uploads/types/types';
 import {
   stripDataVolumeLinksFromUpload,
   stripLinksForDeletedBootableVolume,
