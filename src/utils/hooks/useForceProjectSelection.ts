@@ -16,7 +16,7 @@ export const useForceProjectSelection = (
 ): void => {
   const location = useLocation();
   const navigate = useNavigate();
-  const isAdmin = useCanListNamespaces();
+  const canListAllNamespaces = useCanListNamespaces();
   const [projectNames, projectNamesLoaded] = useProjects();
 
   useEffect(() => {
@@ -31,7 +31,7 @@ export const useForceProjectSelection = (
 
     // Redirect to default project if user is not admin and is on all-namespaces path
     const shouldForceProjectRedirect =
-      !isAdmin && shouldRedirect && projectNamesLoaded && !isEmpty(projectNames);
+      !canListAllNamespaces && shouldRedirect && projectNamesLoaded && !isEmpty(projectNames);
 
     if (shouldForceProjectRedirect) {
       const defaultProject = projectNames.includes(DEFAULT_NAMESPACE)
@@ -43,7 +43,7 @@ export const useForceProjectSelection = (
     }
   }, [
     location.pathname,
-    isAdmin,
+    canListAllNamespaces,
     projectNames,
     projectNamesLoaded,
     navigate,

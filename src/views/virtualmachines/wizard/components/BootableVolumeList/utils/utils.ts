@@ -155,11 +155,11 @@ export const getOSFromDefaultPreference = (
 // namespace — they cannot do cluster-wide watches. Respect any explicit selection.
 export const getEffectiveVolumeNamespace = (
   volumeListNamespace: string,
-  isAdmin: boolean,
+  canListAllNamespaces: boolean,
 ): string => {
   const isNamespaceUnset = !volumeListNamespace || volumeListNamespace === ALL_PROJECTS;
 
-  return !isAdmin && isNamespaceUnset ? OS_IMAGES_NS : volumeListNamespace;
+  return !canListAllNamespaces && isNamespaceUnset ? OS_IMAGES_NS : volumeListNamespace;
 };
 
 export const getCreateBootSourcesPermissionDeniedMessage = (t: TFunction): string =>

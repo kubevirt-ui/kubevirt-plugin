@@ -11,14 +11,14 @@ import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Bullseye } from '@patternfly/react-core';
 
 const VirtualizationLandingPage: FC = () => {
-  const isAdmin = useCanListNamespaces();
+  const canListAllNamespaces = useCanListNamespaces();
   const [projects, projectsLoaded] = useProjects();
   const navigate = useNavigate();
 
   useEffect(() => {
     if (!projectsLoaded) return;
 
-    if (isAdmin) {
+    if (canListAllNamespaces) {
       navigate(`/k8s/all-namespaces/${VirtualMachineModelRef}`);
       return;
     }
@@ -32,7 +32,7 @@ const VirtualizationLandingPage: FC = () => {
     }
 
     navigate(`/k8s/all-namespaces/${VirtualMachineModelRef}`);
-  }, [isAdmin, projects, projectsLoaded, navigate]);
+  }, [canListAllNamespaces, projects, projectsLoaded, navigate]);
 
   return (
     <Bullseye>

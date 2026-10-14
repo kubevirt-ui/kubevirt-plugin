@@ -20,7 +20,7 @@ import { MONITORING_LINK } from '../utils/constants';
 const TimeRange: FC = () => {
   const { t } = useKubevirtTranslation();
   const isACMPage = useIsACMPage();
-  const isAdmin = useCanListNamespaces();
+  const canListAllNamespaces = useCanListNamespaces();
   const virtualizationObservabilityLink = useVirtualizationObservabilityLink();
 
   const { duration, setDuration } = useDuration();
@@ -51,7 +51,7 @@ const TimeRange: FC = () => {
         </ExternalLink>
       )}
 
-      {!isACMPage && isAdmin && (
+      {!isACMPage && canListAllNamespaces && (
         <Link
           onClick={() =>
             logExternalMonitoringNavigation(

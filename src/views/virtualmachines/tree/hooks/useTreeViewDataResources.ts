@@ -41,7 +41,7 @@ export type UseTreeViewDataResources = {
 };
 
 export const useTreeViewDataResources = (): UseTreeViewDataResources => {
-  const isAdmin = useCanListNamespaces();
+  const canListAllNamespaces = useCanListNamespaces();
   const [clusterNames] = useFleetClusterNames();
   const isACMTreeView = useIsACMPage();
   const isTourRunning = runningTourSignal.value;
@@ -50,8 +50,8 @@ export const useTreeViewDataResources = (): UseTreeViewDataResources => {
   const namespacesResult = useMulticlusterNamespaces();
   const { loaded: multiclusterNamespacesLoaded, namespacesByCluster } = namespacesResult;
 
-  const loadVMsPerNamespace = !isACMTreeView && projectNamesLoaded && !isAdmin;
-  const clusterScopedEnabled = isAdmin || isACMTreeView;
+  const loadVMsPerNamespace = !isACMTreeView && projectNamesLoaded && !canListAllNamespaces;
+  const clusterScopedEnabled = canListAllNamespaces || isACMTreeView;
 
   const [allVMs, allVMsLoaded] = useKubevirtWatchResource<V1VirtualMachine[]>(
     allClustersWatch(clusterScopedEnabled, VirtualMachineModelGroupVersionKind),

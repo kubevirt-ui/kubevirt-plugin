@@ -51,7 +51,7 @@ const BootableVolumeListToolbar: FC<BootableVolumeListToolbarProps> = ({
   unfilteredData,
 }) => {
   const { t } = useKubevirtTranslation();
-  const isAdmin = useCanListNamespaces();
+  const canListAllNamespaces = useCanListNamespaces();
 
   return (
     <Split className="bootable-volume-list__toolbar" hasGutter>
@@ -63,7 +63,7 @@ const BootableVolumeListToolbar: FC<BootableVolumeListToolbarProps> = ({
         >
           <ProjectDropdown
             id={VOLUMES_PROJECT_FIELD_ID}
-            includeAllProjects={isAdmin}
+            includeAllProjects={canListAllNamespaces}
             onChange={onVolumeListNamespaceChange}
             selectedProject={effectiveNamespace}
           />

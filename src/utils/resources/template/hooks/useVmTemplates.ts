@@ -14,13 +14,13 @@ import useWatchNonAdminTemplates from './useWatchNonAdminTemplates';
  * @param cluster
  */
 export const useVmTemplates = (namespace?: string, cluster?: string): UseVmTemplatesValues => {
-  const isAdmin = useCanListNamespaces();
+  const canListAllNamespaces = useCanListNamespaces();
 
   const { allowedTemplates, allowedTemplatesError, allowedTemplatesLoaded } =
     useWatchNonAdminTemplates();
 
   const [allTemplates, allTemplatesLoaded, allTemplatesError] = useK8sWatchData<V1Template[]>(
-    isAdmin
+    canListAllNamespaces
       ? {
           cluster,
           groupVersionKind: TemplateModelGroupVersionKind,
@@ -39,8 +39,8 @@ export const useVmTemplates = (namespace?: string, cluster?: string): UseVmTempl
   );
 
   const templates = useMemo(
-    () => (isAdmin ? allTemplates : allowedTemplates),
-    [allTemplates, allowedTemplates, isAdmin],
+    () => (canListAllNamespaces ? allTemplates : allowedTemplates),
+    [allTemplates, allowedTemplates, canListAllNamespaces],
   );
 
   const memoizedTemplates = useMemo(
@@ -49,8 +49,8 @@ export const useVmTemplates = (namespace?: string, cluster?: string): UseVmTempl
   );
 
   return {
-    loaded: isAdmin ? allTemplatesLoaded : allowedTemplatesLoaded,
-    loadError: isAdmin ? allTemplatesError : allowedTemplatesError,
+    loaded: canListAllNamespaces ? allTemplatesLoaded : allowedTemplatesLoaded,
+    loadError: canListAllNamespaces ? allTemplatesError : allowedTemplatesError,
     templates: memoizedTemplates,
   };
 };

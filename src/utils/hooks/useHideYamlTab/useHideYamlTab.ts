@@ -9,11 +9,11 @@ export type UseHideYamlTab = () => {
 };
 
 const useHideYamlTab: UseHideYamlTab = () => {
-  const isAdmin = useCanListNamespaces();
+  const canListAllNamespaces = useCanListNamespaces();
   const { featureEnabled, loading } = useFeatures(HIDE_YAML_TAB);
 
   // Return false while loading to prevent flash of hidden tabs
-  const hideYamlTab = !loading && featureEnabled && !isAdmin;
+  const hideYamlTab = !loading && featureEnabled && !canListAllNamespaces;
 
   return { hideYamlTab, loading };
 };

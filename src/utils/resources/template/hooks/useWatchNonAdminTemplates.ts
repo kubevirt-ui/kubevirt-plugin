@@ -20,7 +20,7 @@ const useWatchNonAdminTemplates = (): {
   allowedTemplatesError: Error | string;
   allowedTemplatesLoaded: boolean;
 } => {
-  const isAdmin = useCanListNamespaces();
+  const canListAllNamespaces = useCanListNamespaces();
   const [hubClusterName] = useHubClusterName();
   const cluster = useClusterParam();
 
@@ -45,7 +45,7 @@ const useWatchNonAdminTemplates = (): {
   // user has limited access, so we can only get templates from allowed namespaces
   const allowedResources = useK8sWatchResources<{ [key: string]: V1Template[] }>(
     Object.fromEntries(
-      loaded && !isAdmin && isLocalCluster
+      loaded && !canListAllNamespaces && isLocalCluster
         ? (projectNames || []).map((name) => [
             name,
             {
@@ -74,7 +74,7 @@ const useWatchNonAdminTemplates = (): {
   } = useWatchNonAdminExternalTemplates();
 
   useEffect(() => {
-    if (!isAdmin) {
+    if (!canListAllNamespaces) {
       const errorKey = Object.keys(allowedResources).find((key) => allowedResources[key].loadError);
       if (errorKey) {
         setAllowedTemplatesError(allowedResources[errorKey].loadError);
@@ -95,7 +95,7 @@ const useWatchNonAdminTemplates = (): {
         setAllowedTemplatesLoaded(true);
       }
     }
-  }, [allowedResources, isAdmin, loaded]);
+  }, [allowedResources, canListAllNamespaces, loaded]);
 
   return useMemo(
     () => ({

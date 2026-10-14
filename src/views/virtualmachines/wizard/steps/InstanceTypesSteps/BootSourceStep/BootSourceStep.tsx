@@ -28,7 +28,7 @@ import useAddBootableVolume from './hooks/useAddBootableVolume';
 
 const BootSourceStep: FC = () => {
   const { t } = useKubevirtTranslation();
-  const isAdmin = useCanListNamespaces();
+  const canListAllNamespaces = useCanListNamespaces();
   const { control, setValue } = useVMWizardForm();
 
   const [cluster, project, volumeListNamespace, selectedBootableVolume, preference] = useWatch({
@@ -56,7 +56,7 @@ const BootSourceStep: FC = () => {
   );
   const { canCreate, lockedPreference, onCreateVolume, onUploadStart } = useAddBootableVolume();
 
-  const effectiveNamespace = getEffectiveVolumeNamespace(volumeListNamespace, isAdmin);
+  const effectiveNamespace = getEffectiveVolumeNamespace(volumeListNamespace, canListAllNamespaces);
 
   const bootableVolumesData = useBootableVolumes(effectiveNamespace, cluster);
 

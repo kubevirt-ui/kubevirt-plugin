@@ -32,14 +32,14 @@ const useWatchNonAdminExternalClusterTemplates = (): {
 
   const isLocalCluster = isEmpty(cluster) || cluster === hubClusterName;
 
-  const isAdmin = useCanListNamespaces();
+  const canListAllNamespaces = useCanListNamespaces();
 
   const [
     externalClusterOpenshiftTemplates,
     externalClusterOpenshiftTemplatesLoaded,
     externalClusterOpenshiftTemplatesError,
   ] = useK8sWatchData<V1Template[]>(
-    !isAdmin && !isLocalCluster
+    !canListAllNamespaces && !isLocalCluster
       ? {
           cluster,
           groupVersionKind: TemplateModelGroupVersionKind,
@@ -54,7 +54,7 @@ const useWatchNonAdminExternalClusterTemplates = (): {
     externalClusterNamespaceTemplatesLoaded,
     externalClusterNamespaceTemplatesError,
   ] = useK8sWatchData<V1Template[]>(
-    !isAdmin && !isLocalCluster
+    !canListAllNamespaces && !isLocalCluster
       ? {
           cluster,
           groupVersionKind: TemplateModelGroupVersionKind,
