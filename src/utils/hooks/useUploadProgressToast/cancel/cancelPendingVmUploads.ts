@@ -15,12 +15,12 @@ export const cancelPendingVmUploads = (vm?: V1VirtualMachine): Promise<void> => 
 
   return useUploadProgressStore
     .getState()
-    .cancelUploadsForVm(getUploadClusterForVm(vm), namespace, name);
+    .uploads.actions?.cancelUploadsForVm(getUploadClusterForVm(vm), namespace, name);
 };
 
 export const cancelAllWizardPendingUploads = (uploadKeys: string[] = []): void => {
   useUploadProgressStore
     .getState()
-    .cancelWizardPendingUploads(uploadKeys)
+    .uploads.actions?.cancelWizardPendingUploads(uploadKeys)
     .catch(() => {});
 };

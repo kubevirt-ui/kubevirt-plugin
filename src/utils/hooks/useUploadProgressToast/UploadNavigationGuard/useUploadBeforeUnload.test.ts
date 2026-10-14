@@ -1,7 +1,7 @@
 import { act, renderHook } from '@testing-library/react';
 
 import { UPLOAD_PROGRESS_STATUS } from '../constants';
-import { useUploadProgressStore } from '../uploadProgressStore';
+import { resetUploadProgressStore, useUploadProgressStore } from '../uploadProgressStore';
 
 import useUploadBeforeUnload from './useUploadBeforeUnload';
 
@@ -9,7 +9,7 @@ const UPLOAD_KEY = 'test-upload-key';
 const FILE_IMAGE_ISO = 'image.iso';
 
 const resetStore = (): void => {
-  useUploadProgressStore.setState({ generationsByKey: {}, uploads: {} });
+  resetUploadProgressStore();
 };
 
 describe('useUploadBeforeUnload', () => {
@@ -40,7 +40,9 @@ describe('useUploadBeforeUnload', () => {
     const { rerender } = renderHook(() => useUploadBeforeUnload());
 
     act(() => {
-      useUploadProgressStore.getState().startUpload(UPLOAD_KEY, { fileName: FILE_IMAGE_ISO });
+      useUploadProgressStore
+        .getState()
+        .uploads.actions?.startUpload(UPLOAD_KEY, { fileName: FILE_IMAGE_ISO });
     });
     rerender();
 
@@ -51,7 +53,9 @@ describe('useUploadBeforeUnload', () => {
     const { rerender } = renderHook(() => useUploadBeforeUnload());
 
     act(() => {
-      useUploadProgressStore.getState().startUpload(UPLOAD_KEY, { fileName: FILE_IMAGE_ISO });
+      useUploadProgressStore
+        .getState()
+        .uploads.actions?.startUpload(UPLOAD_KEY, { fileName: FILE_IMAGE_ISO });
     });
     rerender();
 
@@ -60,7 +64,7 @@ describe('useUploadBeforeUnload', () => {
     )?.[1] as EventListener;
 
     act(() => {
-      useUploadProgressStore.getState().completeUpload(UPLOAD_KEY);
+      useUploadProgressStore.getState().uploads.actions?.completeUpload(UPLOAD_KEY);
     });
     rerender();
 
@@ -71,7 +75,9 @@ describe('useUploadBeforeUnload', () => {
     const { rerender } = renderHook(() => useUploadBeforeUnload());
 
     act(() => {
-      useUploadProgressStore.getState().startUpload(UPLOAD_KEY, { fileName: FILE_IMAGE_ISO });
+      useUploadProgressStore
+        .getState()
+        .uploads.actions?.startUpload(UPLOAD_KEY, { fileName: FILE_IMAGE_ISO });
     });
     rerender();
 
@@ -90,16 +96,21 @@ describe('useUploadBeforeUnload', () => {
 
   it('should not register listener for terminal upload statuses', () => {
     act(() => {
-      useUploadProgressStore.getState().startUpload(UPLOAD_KEY, { fileName: FILE_IMAGE_ISO });
-      useUploadProgressStore.setState({
+      useUploadProgressStore
+        .getState()
+        .uploads.actions?.startUpload(UPLOAD_KEY, { fileName: FILE_IMAGE_ISO });
+      useUploadProgressStore.setState((state) => ({
         uploads: {
-          [UPLOAD_KEY]: {
-            fileName: FILE_IMAGE_ISO,
-            progress: 100,
-            status: UPLOAD_PROGRESS_STATUS.SUCCESS,
+          ...state.uploads,
+          data: {
+            [UPLOAD_KEY]: {
+              fileName: FILE_IMAGE_ISO,
+              progress: 100,
+              status: UPLOAD_PROGRESS_STATUS.SUCCESS,
+            },
           },
         },
-      });
+      }));
     });
 
     renderHook(() => useUploadBeforeUnload());
@@ -111,9 +122,10 @@ describe('useUploadBeforeUnload', () => {
     const { rerender } = renderHook(() => useUploadBeforeUnload());
 
     act(() => {
-      useUploadProgressStore
-        .getState()
-        .startUpload(UPLOAD_KEY, { blockNavigation: false, fileName: FILE_IMAGE_ISO });
+      useUploadProgressStore.getState().uploads.actions?.startUpload(UPLOAD_KEY, {
+        blockNavigation: false,
+        fileName: FILE_IMAGE_ISO,
+      });
     });
     rerender();
 

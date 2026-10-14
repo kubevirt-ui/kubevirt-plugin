@@ -1,8 +1,9 @@
 import type { UploadError } from '@kubevirt-utils/hooks/useCDIUpload/types';
 import { getUploadErrorMessage, UPLOAD_STATUS } from '@kubevirt-utils/hooks/useCDIUpload/types';
 
-import type { RegisterCdiUploadParams, SyncCdiUploadParams } from '../types';
 import { useUploadProgressStore } from '../uploadProgressStore';
+
+import { type RegisterCdiUploadParams, type SyncCdiUploadParams } from '../uploads/types/types';
 
 const applyCdiStatusToStore = (
   uploadKey: string,
@@ -10,15 +11,15 @@ const applyCdiStatusToStore = (
   uploadError?: UploadError,
   expectedGeneration?: number,
 ): void => {
-  const store = useUploadProgressStore.getState();
+  const { failUpload, markUploadCanceled } = useUploadProgressStore.getState().uploads.actions;
 
   if (uploadStatus === UPLOAD_STATUS.ERROR) {
-    store.failUpload(uploadKey, getUploadErrorMessage(uploadError), expectedGeneration);
+    failUpload(uploadKey, getUploadErrorMessage(uploadError), expectedGeneration);
     return;
   }
 
   if (uploadStatus === UPLOAD_STATUS.CANCELED) {
-    store.markUploadCanceled(uploadKey, expectedGeneration);
+    markUploadCanceled(uploadKey, expectedGeneration);
   }
 };
 
@@ -29,8 +30,8 @@ export const syncCdiUploadProgressAndFailures = ({
   uploadKey,
   uploadStatus,
 }: SyncCdiUploadParams): void => {
-  const store = useUploadProgressStore.getState();
-  const upload = store.getUpload(uploadKey);
+  const { getUpload, updateProgress } = useUploadProgressStore.getState().uploads.actions;
+  const upload = getUpload(uploadKey);
 
   if (!upload) {
     return;
@@ -41,7 +42,7 @@ export const syncCdiUploadProgressAndFailures = ({
   }
 
   if (progress != null) {
-    store.updateProgress(uploadKey, progress);
+    updateProgress(uploadKey, progress);
   }
 
   if (uploadStatus != null) {
@@ -55,4 +56,6 @@ export const registerCdiUpload = ({
   metadata,
   uploadKey,
 }: RegisterCdiUploadParams): number =>
-  useUploadProgressStore.getState().startUpload(uploadKey, { ...metadata, cancelUpload, fileName });
+  useUploadProgressStore
+    .getState()
+    .uploads.actions?.startUpload(uploadKey, { ...metadata, cancelUpload, fileName });

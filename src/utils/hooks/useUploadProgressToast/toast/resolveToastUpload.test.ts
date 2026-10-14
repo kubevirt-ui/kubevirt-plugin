@@ -1,6 +1,6 @@
 import { UPLOAD_PROGRESS_STATUS } from '../constants';
-import { type UploadEntry } from '../types';
 
+import { type UploadEntry } from '../uploads/types/types';
 import { resolveToastUpload } from './resolveToastUpload';
 
 const snapshot: UploadEntry = {

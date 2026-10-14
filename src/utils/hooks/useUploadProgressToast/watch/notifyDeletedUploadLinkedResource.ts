@@ -7,7 +7,6 @@ import {
 import { isK8sNotFoundError } from '@kubevirt-utils/resources/errorStatusChecks';
 import type { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
-import type { UploadLinkedResource } from '../types';
 import { useUploadProgressStore } from '../uploadProgressStore';
 
 import {
@@ -15,6 +14,7 @@ import {
   notifyDataVolumeDeleted,
 } from '../cancel/notifyDeletedUploadResources';
 import { isSameGroupVersionKind } from '../completion/uploadLinkedResource';
+import { type UploadLinkedResource } from '../uploads/types/types';
 
 export const isUploadLinkedResourceGone = (
   resource: K8sResourceCommon | undefined,
@@ -38,7 +38,9 @@ export const notifyDeletedUploadLinkedResource = (resource: UploadLinkedResource
 
   if (isSameGroupVersionKind(groupVersionKind, modelToGroupVersionKind(VirtualMachineModel))) {
     if (namespace && name) {
-      useUploadProgressStore.getState().stripVmStorageLinksForVm(cluster ?? '', namespace, name);
+      useUploadProgressStore
+        .getState()
+        .uploads.actions?.stripVmStorageLinksForVm(cluster ?? '', namespace, name);
     }
     return;
   }

@@ -5,8 +5,8 @@ import {
   type V1VirtualMachine,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { type CdiUploadTrackMetadata } from '@kubevirt-utils/hooks/useUploadProgressToast';
 import { getVmDiskUploadSuccessLinks } from '@kubevirt-utils/hooks/useUploadProgressToast/completion/uploadLinks';
-import { type CdiUploadTrackMetadata } from '@kubevirt-utils/hooks/useUploadProgressToast/types';
 import {
   buildOwnerReference,
   getName,

@@ -1,5 +1,5 @@
 import { UPLOAD_PROGRESS_STATUS } from '../constants';
-import { useUploadProgressStore } from '../uploadProgressStore';
+import { resetUploadProgressStore, useUploadProgressStore } from '../uploadProgressStore';
 
 import { getBootableVolumeUrl } from '../completion/uploadLinks';
 import { getBootableVolumeUploadKey } from '../keys/uploadKeys';
@@ -12,7 +12,7 @@ const NAMESPACE = 'default';
 const VOLUME_NAME = 'fedora-volume';
 
 const resetStore = (): void => {
-  useUploadProgressStore.setState({ generationsByKey: {}, uploads: {} });
+  resetUploadProgressStore();
 };
 
 describe('notifyDeletedUploadResources', () => {
@@ -28,15 +28,19 @@ describe('notifyDeletedUploadResources', () => {
     const uploadKey = getBootableVolumeUploadKey(NAMESPACE, VOLUME_NAME);
     const volumeUrl = getBootableVolumeUrl(VOLUME_NAME, NAMESPACE);
 
-    useUploadProgressStore.getState().startUpload(uploadKey, { fileName: 'image.iso' });
-    useUploadProgressStore.getState().completeUpload(uploadKey, {
+    useUploadProgressStore
+      .getState()
+      .uploads.actions?.startUpload(uploadKey, { fileName: 'image.iso' });
+    useUploadProgressStore.getState().uploads.actions?.completeUpload(uploadKey, {
       successLinks: [{ label: 'View bootable volume', url: volumeUrl }],
     });
 
     notifyBootableVolumeDeleted(VOLUME_NAME, NAMESPACE);
 
-    expect(useUploadProgressStore.getState().getUpload(uploadKey)?.successLinks).toEqual([]);
-    expect(useUploadProgressStore.getState().getUpload(uploadKey)?.status).toBe(
+    expect(
+      useUploadProgressStore.getState().uploads.actions?.getUpload(uploadKey)?.successLinks,
+    ).toEqual([]);
+    expect(useUploadProgressStore.getState().uploads.actions?.getUpload(uploadKey)?.status).toBe(
       UPLOAD_PROGRESS_STATUS.SUCCESS,
     );
   });
@@ -45,18 +49,20 @@ describe('notifyDeletedUploadResources', () => {
     const uploadKey = getBootableVolumeUploadKey(NAMESPACE, VOLUME_NAME);
     const volumeUrl = getBootableVolumeUrl(VOLUME_NAME, NAMESPACE);
 
-    useUploadProgressStore.getState().startUpload(uploadKey, {
+    useUploadProgressStore.getState().uploads.actions?.startUpload(uploadKey, {
       dvName: VOLUME_NAME,
       dvNamespace: NAMESPACE,
       fileName: 'image.iso',
     });
-    useUploadProgressStore.getState().completeUpload(uploadKey, {
+    useUploadProgressStore.getState().uploads.actions?.completeUpload(uploadKey, {
       successLinks: [{ label: 'View bootable volume', url: volumeUrl }],
     });
 
     notifyDataVolumeDeleted(VOLUME_NAME, NAMESPACE);
 
-    expect(useUploadProgressStore.getState().getUpload(uploadKey)?.successLinks).toEqual([]);
+    expect(
+      useUploadProgressStore.getState().uploads.actions?.getUpload(uploadKey)?.successLinks,
+    ).toEqual([]);
   });
 
   it('should only strip the matching cluster when same-name DataVolumes exist on different clusters', () => {
@@ -66,37 +72,39 @@ describe('notifyDeletedUploadResources', () => {
     const remoteKey = getBootableVolumeUploadKey(NAMESPACE, VOLUME_NAME, remoteCluster);
     const volumeUrl = getBootableVolumeUrl(VOLUME_NAME, NAMESPACE);
 
-    useUploadProgressStore.getState().startUpload(localKey, {
+    useUploadProgressStore.getState().uploads.actions?.startUpload(localKey, {
       dvCluster: localCluster,
       dvName: VOLUME_NAME,
       dvNamespace: NAMESPACE,
       fileName: 'image.iso',
     });
-    useUploadProgressStore.getState().completeUpload(localKey, {
+    useUploadProgressStore.getState().uploads.actions?.completeUpload(localKey, {
       successLinks: [{ label: 'View bootable volume', url: volumeUrl }],
     });
-    useUploadProgressStore.getState().startUpload(remoteKey, {
+    useUploadProgressStore.getState().uploads.actions?.startUpload(remoteKey, {
       dvCluster: remoteCluster,
       dvName: VOLUME_NAME,
       dvNamespace: NAMESPACE,
       fileName: 'image.iso',
     });
-    useUploadProgressStore.getState().completeUpload(remoteKey, {
+    useUploadProgressStore.getState().uploads.actions?.completeUpload(remoteKey, {
       successLinks: [{ label: 'View bootable volume', url: volumeUrl }],
     });
 
     notifyDataVolumeDeleted(VOLUME_NAME, NAMESPACE, localCluster);
 
-    expect(useUploadProgressStore.getState().getUpload(localKey)?.successLinks).toEqual([]);
-    expect(useUploadProgressStore.getState().getUpload(remoteKey)?.successLinks).toEqual([
-      { label: 'View bootable volume', url: volumeUrl },
-    ]);
+    expect(
+      useUploadProgressStore.getState().uploads.actions?.getUpload(localKey)?.successLinks,
+    ).toEqual([]);
+    expect(
+      useUploadProgressStore.getState().uploads.actions?.getUpload(remoteKey)?.successLinks,
+    ).toEqual([{ label: 'View bootable volume', url: volumeUrl }]);
   });
 
   it('should no-op when name or namespace is missing', () => {
     notifyBootableVolumeDeleted(undefined, NAMESPACE);
     notifyDataVolumeDeleted(VOLUME_NAME, undefined);
 
-    expect(useUploadProgressStore.getState().uploads).toEqual({});
+    expect(useUploadProgressStore.getState().uploads.data).toEqual({});
   });
 });

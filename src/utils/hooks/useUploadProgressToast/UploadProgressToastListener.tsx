@@ -14,14 +14,16 @@ const UploadProgressToastListener: FC = () => {
   const { t } = useKubevirtTranslation();
   const { addDangerToast, addInfoToast, addSuccessToast, addWarningToast, removeToast } =
     useKubevirtToast();
-  const uploads = useUploadProgressStore((state) => state.uploads);
-  const cancelTrackedUpload = useUploadProgressStore((state) => state.cancelTrackedUpload);
-  const tryMarkTerminalToastShown = useUploadProgressStore(
-    (state) => state.tryMarkTerminalToastShown,
+  const uploads = useUploadProgressStore((state) => state.uploads.data);
+  const cancelTrackedUpload = useUploadProgressStore(
+    (state) => state.uploads.actions?.cancelTrackedUpload,
   );
-  const trySetToastId = useUploadProgressStore((state) => state.trySetToastId);
-  const removeUpload = useUploadProgressStore((state) => state.removeUpload);
-  const prevUploadsRef = useRef(useUploadProgressStore.getState().uploads);
+  const tryMarkTerminalToastShown = useUploadProgressStore(
+    (state) => state.uploads.actions?.tryMarkTerminalToastShown,
+  );
+  const trySetToastId = useUploadProgressStore((state) => state.uploads.actions?.trySetToastId);
+  const removeUpload = useUploadProgressStore((state) => state.uploads.actions?.removeUpload);
+  const prevUploadsRef = useRef(useUploadProgressStore.getState().uploads.data);
   const processedToastsRef = useRef<Set<string>>(new Set());
 
   useEffect(() => {

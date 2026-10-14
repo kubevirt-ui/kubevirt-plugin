@@ -9,7 +9,9 @@ export const notifyDataVolumeDeleted = (
     return;
   }
 
-  useUploadProgressStore.getState().stripDataVolumeLinksForResource(name, namespace, cluster);
+  useUploadProgressStore
+    .getState()
+    .uploads.actions?.stripDataVolumeLinksForResource(name, namespace, cluster);
 };
 
 export const notifyBootableVolumeDeleted = (
@@ -21,5 +23,7 @@ export const notifyBootableVolumeDeleted = (
     return;
   }
 
-  useUploadProgressStore.getState().stripBootableVolumeLinks(namespace, name, cluster);
+  useUploadProgressStore
+    .getState()
+    .uploads.actions?.stripBootableVolumeLinks(namespace, name, cluster);
 };
