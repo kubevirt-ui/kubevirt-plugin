@@ -18,6 +18,9 @@ set -euo pipefail
 #   ALLOW_LIVE_CLUSTER_SWEEP - "true" to skip the cluster-liveness guard
 #                              below (default: "false"). Only intended for
 #                              a cluster that is already confirmed deleting.
+#   RELEASE_UNATTACHED_IPS   - "true" to release all floating IPs with no
+#                              target (account-wide). Off by default since
+#                              unattached IPs may belong to other projects.
 #
 # Exit code: when DRY_RUN is not "true", exits 1 if a matching subnet (or,
 # with CLEAN_VPC=true, a matching VPC) is still present once cleanup
@@ -32,6 +35,7 @@ export IC_API_KEY
 DRY_RUN="${DRY_RUN:-false}"
 CLEAN_VPC="${CLEAN_VPC:-true}"
 ALLOW_LIVE_CLUSTER_SWEEP="${ALLOW_LIVE_CLUSTER_SWEEP:-false}"
+RELEASE_UNATTACHED_IPS="${RELEASE_UNATTACHED_IPS:-false}"
 
 # CLUSTER_NAME is set but unset -u only catches *unset* vars -- every
 # resource-matching filter below is a startswith(CLUSTER_NAME) check, and
@@ -41,6 +45,9 @@ if [[ -z "${CLUSTER_NAME:-}" ]]; then
   echo "::error::CLUSTER_NAME must be set and non-empty -- refusing to run with an empty name, which would match every resource in the account."
   exit 1
 fi
+
+# shellcheck source=../_vpc-cleanup-helpers.sh
+source "$(dirname "${BASH_SOURCE[0]}")/../_vpc-cleanup-helpers.sh"
 
 if [[ -n "${ZONE:-}" ]]; then
   VPC_REGION="${ZONE%-*}"
@@ -127,126 +134,6 @@ if [[ "${DRY_RUN}" != "true" && "${ALLOW_LIVE_CLUSTER_SWEEP}" != "true" ]]; then
     exit 1
   fi
 fi
-
-# Wraps a mutating ibmcloud call: prints what would happen under DRY_RUN,
-# otherwise runs it for real, tolerating failure (best-effort throughout).
-run_or_dry() {
-  if [[ "${DRY_RUN}" == "true" ]]; then
-    echo "  [dry-run] would run: $*"
-  else
-    "$@" 2>&1 || echo "  WARNING: command failed: $*"
-  fi
-}
-
-# How long to keep retrying a subnet/VPC delete that's failing only
-# because a dependent resource (an IKS worker node still attached to the
-# subnet, or an undeleted subnet still attached to the VPC) hasn't
-# finished draining yet.
-RETRY_BUDGET_SECONDS=600
-RETRY_INTERVAL_SECONDS=30
-
-# Repeatedly deletes every subnet matching CLUSTER_NAME, tolerating the
-# transient "still has IKS worker nodes" error. Stops once none remain or
-# the retry budget is exhausted.
-poll_delete_subnets() {
-  if [[ "${DRY_RUN}" == "true" ]]; then
-    (ibmcloud is subnets --output json 2>/dev/null || echo '[]') \
-      | jq -r --arg cn "${CLUSTER_NAME}" 'if type == "array" then .[] | select(.name | startswith($cn)) | .id else empty end' \
-      | while read -r id; do echo "  [dry-run] would run: ibmcloud is subnet-delete ${id} -f"; done
-    return 0
-  fi
-
-  local deadline=$(($(date +%s) + RETRY_BUDGET_SECONDS))
-  while true; do
-    local subnets_json
-    if subnets_json=$(ibmcloud is subnets --output json 2>/dev/null); then
-      local ids
-      ids=$(echo "${subnets_json}" \
-        | jq -r --arg cn "${CLUSTER_NAME}" 'if type == "array" then .[] | select(.name | startswith($cn)) | .id else empty end')
-      if [[ -z "${ids}" ]]; then
-        return 0
-      fi
-
-      local blocked="false"
-      while read -r id; do
-        [[ -z "${id}" ]] && continue
-        local out
-        if out=$(ibmcloud is subnet-delete "${id}" -f 2>&1); then
-          echo "  Deleted subnet ${id}"
-        else
-          echo "${out}"
-          if echo "${out}" | grep -q "subnet_in_use_iks_worker_node_exists"; then
-            blocked="true"
-          fi
-        fi
-      done <<<"${ids}"
-
-      if [[ "${blocked}" == "true" ]]; then
-        echo "  Subnet(s) still in use by IKS worker nodes, retrying in ${RETRY_INTERVAL_SECONDS}s..."
-      fi
-    else
-      # A failed listing call is NOT "no subnets left" -- don't let a
-      # transient API error short-circuit this into a false success.
-      echo "  WARNING: 'ibmcloud is subnets' failed to list resources, will retry."
-    fi
-
-    if (($(date +%s) >= deadline)); then
-      return 1
-    fi
-    sleep "${RETRY_INTERVAL_SECONDS}"
-  done
-}
-
-# Same idea for the VPC itself: retries while it's blocked by a subnet
-# that hasn't finished deleting yet.
-poll_delete_vpcs() {
-  if [[ "${DRY_RUN}" == "true" ]]; then
-    (ibmcloud is vpcs --output json 2>/dev/null || echo '[]') \
-      | jq -r --arg cn "${CLUSTER_NAME}" 'if type == "array" then .[] | select(.name | startswith($cn)) | .id else empty end' \
-      | while read -r id; do echo "  [dry-run] would run: ibmcloud is vpc-delete ${id} -f"; done
-    return 0
-  fi
-
-  local deadline=$(($(date +%s) + RETRY_BUDGET_SECONDS))
-  while true; do
-    local vpcs_json
-    if vpcs_json=$(ibmcloud is vpcs --output json 2>/dev/null); then
-      local ids
-      ids=$(echo "${vpcs_json}" \
-        | jq -r --arg cn "${CLUSTER_NAME}" 'if type == "array" then .[] | select(.name | startswith($cn)) | .id else empty end')
-      if [[ -z "${ids}" ]]; then
-        return 0
-      fi
-
-      local blocked="false"
-      while read -r id; do
-        [[ -z "${id}" ]] && continue
-        local out
-        if out=$(ibmcloud is vpc-delete "${id}" -f 2>&1); then
-          echo "  Deleted VPC ${id}"
-        else
-          echo "${out}"
-          if echo "${out}" | grep -q "vpc_in_use"; then
-            blocked="true"
-          fi
-        fi
-      done <<<"${ids}"
-
-      if [[ "${blocked}" == "true" ]]; then
-        echo "  VPC still in use by an undeleted subnet, retrying in ${RETRY_INTERVAL_SECONDS}s..."
-      fi
-    else
-      # A failed listing call is NOT "no VPCs left" -- don't let a
-      # transient API error short-circuit this into a false success.
-      echo "  WARNING: 'ibmcloud is vpcs' failed to list resources, will retry."
-    fi
-
-    if (($(date +%s) >= deadline)); then
-      return 1
-    fi
-    sleep "${RETRY_INTERVAL_SECONDS}"
-  done
-}
 
 echo "=== Cleaning VPC resources for '${CLUSTER_NAME}' (dry_run=${DRY_RUN}, clean_vpc=${CLEAN_VPC}) ==="
 
@@ -337,12 +224,42 @@ echo "9. Deleting stale floating IPs..."
   | jq -r --arg cn "${CLUSTER_NAME}" 'if type == "array" then .[] | select(.name | startswith($cn)) | .id else empty end' \
   | while read -r id; do echo "  Releasing IP ${id}"; run_or_dry ibmcloud is floating-ip-release "${id}" -f; done
 
-echo "10. Stripping security group rules (breaks circular references)..."
+# IBM Cloud auto-creates floating IPs with random names (not cluster-prefixed)
+# for load balancers and public gateways. When the parent resource is deleted
+# the IP becomes unattached (target == null) but is not auto-released.
+# This sweep is account-wide, so it requires explicit opt-in.
+if [[ "${RELEASE_UNATTACHED_IPS}" == "true" ]]; then
+  echo "9b. Releasing orphan floating IPs (unattached, any name)..."
+  (ibmcloud is ips --output json 2>/dev/null || echo '[]') \
+    | jq -r 'if type == "array" then .[] | select(.target == null) | .id else empty end' \
+    | while read -r id; do echo "  Releasing orphan IP ${id}"; run_or_dry ibmcloud is floating-ip-release "${id}" -f; done
+fi
+
+# IBM Cloud auto-creates security groups with kube-* and random names inside
+# the cluster's VPC. Match by name prefix OR by VPC membership so these are
+# cleaned up too -- otherwise they block VPC deletion.
+collect_stale_vpc_ids
+collect_default_sg_ids
+
+# Endpoint gateways (iks-*) hold references to security groups and must be
+# deleted before SGs can be removed.
+echo "10. Deleting VPC endpoint gateways..."
+(ibmcloud is endpoint-gateways --output json 2>/dev/null || echo '[]') \
+  | jq -r --arg cn "${CLUSTER_NAME}" --argjson vids "${STALE_VPC_FILTER}" \
+    'if type == "array" then .[] | select((.name | startswith($cn)) or (.vpc.id as $vid | $vids | any(. == $vid))) | .id else empty end' \
+  | while read -r id; do echo "  Deleting endpoint gateway ${id}"; run_or_dry ibmcloud is endpoint-gateway-delete "${id}" -f; done
+[[ "${DRY_RUN}" != "true" ]] && sleep 10
+
+# Non-default SGs matched by name prefix or VPC membership. Default SGs
+# cannot be deleted independently -- they are removed with the VPC.
+SG_MATCH_FILTER='if type == "array" then .[] | select(((.name | startswith($cn)) or (.vpc.id as $vid | $vids | any(. == $vid))) and (.id as $sid | $dsgs | any(. == $sid) | not)) | .id else empty end'
+
+echo "11. Stripping security group rules (breaks circular references)..."
 if [[ "${DRY_RUN}" == "true" ]]; then
   echo "  [dry-run] skipping rule strip"
 else
   (ibmcloud is security-groups --output json 2>/dev/null || echo '[]') \
-    | jq -r --arg cn "${CLUSTER_NAME}" 'if type == "array" then .[] | select(.name | startswith($cn)) | .id else empty end' \
+    | jq -r --arg cn "${CLUSTER_NAME}" --argjson vids "${STALE_VPC_FILTER}" --argjson dsgs "${DEFAULT_SG_FILTER}" "${SG_MATCH_FILTER}" \
     | while read -r sg_id; do
         (ibmcloud is security-group-rules "${sg_id}" --output json 2>/dev/null || echo '[]') \
           | jq -r 'if type == "array" then .[] | .id else empty end' \
@@ -352,54 +269,56 @@ else
       done
 fi
 
-echo "11. Deleting stale security groups..."
+echo "12. Deleting stale security groups..."
+SG_COUNT_FILTER='if type == "array" then [.[] | select(((.name | startswith($cn)) or (.vpc.id as $vid | $vids | any(. == $vid))) and (.id as $sid | $dsgs | any(. == $sid) | not))] | length else 0 end'
 if [[ "${DRY_RUN}" == "true" ]]; then
   (ibmcloud is security-groups --output json 2>/dev/null || echo '[]') \
-    | jq -r --arg cn "${CLUSTER_NAME}" 'if type == "array" then .[] | select(.name | startswith($cn)) | "  [dry-run] would delete SG \(.id) (\(.name))" else empty end'
+    | jq -r --arg cn "${CLUSTER_NAME}" --argjson vids "${STALE_VPC_FILTER}" --argjson dsgs "${DEFAULT_SG_FILTER}" \
+      'if type == "array" then .[] | select(((.name | startswith($cn)) or (.vpc.id as $vid | $vids | any(. == $vid))) and (.id as $sid | $dsgs | any(. == $sid) | not)) | "  [dry-run] would delete SG \(.id) (\(.name))" else empty end'
 else
   for pass in 1 2 3; do
     REMAINING_SGS=$(ibmcloud is security-groups --output json 2>/dev/null \
-      | jq -r --arg cn "${CLUSTER_NAME}" 'if type == "array" then [.[] | select(.name | startswith($cn))] | length else 0 end' 2>/dev/null || echo "0")
+      | jq -r --arg cn "${CLUSTER_NAME}" --argjson vids "${STALE_VPC_FILTER}" --argjson dsgs "${DEFAULT_SG_FILTER}" "${SG_COUNT_FILTER}" 2>/dev/null || echo "0")
     if [[ "${REMAINING_SGS}" -eq 0 || -z "${REMAINING_SGS}" ]]; then
       break
     fi
     echo "  Pass ${pass}: ${REMAINING_SGS} security group(s) remaining..."
     (ibmcloud is security-groups --output json 2>/dev/null || echo '[]') \
-      | jq -r --arg cn "${CLUSTER_NAME}" 'if type == "array" then .[] | select(.name | startswith($cn)) | .id else empty end' \
+      | jq -r --arg cn "${CLUSTER_NAME}" --argjson vids "${STALE_VPC_FILTER}" --argjson dsgs "${DEFAULT_SG_FILTER}" "${SG_MATCH_FILTER}" \
       | while read -r id; do ibmcloud is security-group-delete "${id}" -f 2>&1 || true; done
     sleep 10
   done
 fi
 
-echo "12. Retrying stale subnets (polling up to ${RETRY_BUDGET_SECONDS}s for IKS worker nodes to drain)..."
+echo "13. Retrying stale subnets (polling up to ${RETRY_BUDGET_SECONDS}s for IKS worker nodes to drain)..."
 SUBNETS_CLEARED="true"
-if ! poll_delete_subnets; then
+if ! poll_delete_resource "ibmcloud is subnets" "ibmcloud is subnet-delete" "subnet_in_use_iks_worker_node_exists" "subnet"; then
   SUBNETS_CLEARED="false"
   echo "  WARNING: subnet(s) matching '${CLUSTER_NAME}' still exist after ${RETRY_BUDGET_SECONDS}s of retries."
 fi
 
 VPCS_CLEARED="true"
 if [[ "${CLEAN_VPC}" == "true" ]]; then
-  echo "13. Deleting stale VPCs (polling up to ${RETRY_BUDGET_SECONDS}s while a lingering subnet is removed)..."
-  if ! poll_delete_vpcs; then
+  echo "14. Deleting stale VPCs (polling up to ${RETRY_BUDGET_SECONDS}s while a lingering subnet is removed)..."
+  if ! poll_delete_resource "ibmcloud is vpcs" "ibmcloud is vpc-delete" "vpc_in_use" "VPC"; then
     VPCS_CLEARED="false"
     echo "  WARNING: VPC(s) matching '${CLUSTER_NAME}' still exist after ${RETRY_BUDGET_SECONDS}s of retries."
   fi
 else
-  echo "13. Skipping VPC deletion (CLEAN_VPC=false)."
+  echo "14. Skipping VPC deletion (CLEAN_VPC=false)."
 fi
 
-echo "14. Deleting orphaned custom images (RHCOS)..."
+echo "15. Deleting orphaned custom images (RHCOS)..."
 (ibmcloud is images --visibility private --output json 2>/dev/null || echo '[]') \
   | jq -r --arg cn "${CLUSTER_NAME}" 'if type == "array" then .[] | select(.name | startswith($cn)) | .id else empty end' \
   | while read -r id; do echo "  Deleting image ${id}"; run_or_dry ibmcloud is image-delete "${id}" -f; done
 
-echo "15. Deleting orphaned block storage volumes (PVC data volumes from deleted clusters)..."
+echo "16. Deleting orphaned block storage volumes (PVC data volumes from deleted clusters)..."
 (ibmcloud is volumes --output json 2>/dev/null || echo '[]') \
-  | jq -r 'if type == "array" then .[] | select(.name | startswith("pvc-")) | .id else empty end' \
+  | jq -r 'if type == "array" then .[] | select((.name | startswith("pvc-")) and (.volume_attachments | length == 0)) | .id else empty end' \
   | while read -r id; do echo "  Deleting volume ${id}"; run_or_dry ibmcloud is volume-delete "${id}" -f; done
 
-echo "16. Deleting orphaned COS instances..."
+echo "17. Deleting orphaned COS instances..."
 (ibmcloud resource service-instances --service-name cloud-object-storage --output json 2>/dev/null || echo '[]') \
   | jq -r --arg cn "${CLUSTER_NAME}" 'if type == "array" then .[] | select(.name | startswith($cn)) | .id else empty end' \
   | while read -r id; do echo "  Deleting COS ${id}"; run_or_dry ibmcloud resource service-instance-delete "${id}" -f --recursive; done

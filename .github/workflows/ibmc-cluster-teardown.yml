@@ -171,6 +171,7 @@ jobs:
         env:
           IC_API_KEY: ${{ secrets.IC_KEY }}
           ZONE: ${{ inputs.zone }}
+          RELEASE_UNATTACHED_IPS: 'true'
         run: bash ./ci-scripts/hot-cluster/cleanup-vpc-resources.sh
 
       # ──────────────────────────────────────────────────────────────────────
@@ -206,6 +207,7 @@ jobs:
         env:
           IC_API_KEY: ${{ secrets.IC_KEY }}
           ZONE: ${{ inputs.zone }}
+          RELEASE_UNATTACHED_IPS: 'true'
         run: bash ./ci-scripts/hot-cluster/cleanup-vpc-resources.sh
 
       # ──────────────────────────────────────────────────────────────────────
