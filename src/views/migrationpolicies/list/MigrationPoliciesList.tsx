@@ -83,7 +83,7 @@ const MigrationPoliciesList: FC<ListPageProps> = ({
           filterDefinitions={filterDefinitions}
           filters={filters}
           hideColumnManagement={hideColumnManagement}
-          loaded={isLoaded}
+          loaded={loadedColumns}
           onSetFilters={onSetFilters}
           toolbarEndContent={
             <KubevirtTableExport
