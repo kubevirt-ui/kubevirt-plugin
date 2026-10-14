@@ -6,7 +6,7 @@
 - **Route folder:** `tests/vm-wizard/`
 - **Feature Area:** Tier1 / Tier2 — VM creation wizard
 - **Latest version:** CNV 5.1.0
-- **Latest update:** 2026-10-13
+- **Latest update:** 2026-10-14
 - **Document Status:** Approved
 
 ## 2. Introduction
@@ -59,6 +59,8 @@ Automated E2E coverage for console routes under `tests/vm-wizard/`.
 ### create-vm-wizard-required-field-validation
 
 ### create-vm-wizard-step-navigation-persistence
+
+### create-vm-wizard-exit-modal
 
 ---
 
@@ -862,5 +864,130 @@ Automated E2E coverage for console routes under `tests/vm-wizard/`.
 | 1    | Select Create from Template, generate a name, and choose `rhel9-server-small` | Wizard advances to Customization with the RHEL9 template selected       |
 | 2    | Jump directly to Template with the step navigation sidebar                    | Template is active; the same template remains selected; Next is enabled |
 | 3    | Jump directly to Customization                                                | Customization becomes active                                            |
+
+---
+
+### Module: `create-vm-wizard-exit-modal.spec.ts`
+
+**Spec file:** `tests/vm-wizard/create-vm-wizard-exit-modal.spec.ts`
+**Describe:** `VM Creation Wizard — Exit modal guards unsaved changes` — **Tags:** @tier1, @catalog-wizard, @adminOnly, @route-vm-wizard
+**Allure:** suite `VM Creation Wizard`, feature `Tier 1`
+
+---
+
+### `001`: No exit modal when navigating away from a clean wizard
+
+- **Objective:** Verify that cancelling the wizard without modifying any fields does not trigger the exit confirmation modal.
+- **Target version:** CNV 5.1.0
+- **Jira References:** CNV-97288
+- **Pre-conditions:** None
+- **Tags:** `@tier1`, `@catalog-wizard`, `@adminOnly`
+
+| Step | Action                                         | Expected Result                                    |
+| :--- | :--------------------------------------------- | :------------------------------------------------- |
+| 1    | Navigate to VMs list, open the creation wizard | Wizard opens with default state                    |
+| 2    | Click Cancel without changing any fields       | Wizard closes immediately                          |
+| 3    | Assert exit modal was not shown                | No exit modal appeared; wizard container is hidden |
+
+---
+
+### `002`: Exit modal appears when cancelling a dirty wizard
+
+- **Objective:** Verify that the exit confirmation modal is displayed when cancelling the wizard after modifying a field.
+- **Target version:** CNV 5.1.0
+- **Jira References:** CNV-97288
+- **Pre-conditions:** None
+- **Tags:** `@tier1`, `@catalog-wizard`, `@adminOnly`
+
+| Step | Action                                         | Expected Result                                                                  |
+| :--- | :--------------------------------------------- | :------------------------------------------------------------------------------- |
+| 1    | Navigate to VMs list, open the creation wizard | Wizard opens                                                                     |
+| 2    | Fill in the VM name field                      | Form becomes dirty                                                               |
+| 3    | Click Cancel                                   | Exit modal appears with title "Exit VirtualMachine creation?"                    |
+| 4    | Verify modal body text                         | Body contains "If you leave now, any information you've entered won't be saved." |
+
+---
+
+### `003`: Clicking "Exit without saving" discards changes and navigates away
+
+- **Objective:** Verify that clicking "Exit without saving" in the exit modal discards form data and navigates the user back to the VM list.
+- **Target version:** CNV 5.1.0
+- **Jira References:** CNV-97288
+- **Pre-conditions:** None
+- **Tags:** `@tier1`, `@catalog-wizard`, `@adminOnly`
+
+| Step | Action                                             | Expected Result                          |
+| :--- | :------------------------------------------------- | :--------------------------------------- |
+| 1    | Navigate to VMs list, open the wizard, fill a name | Wizard is dirty                          |
+| 2    | Click Cancel                                       | Exit modal appears                       |
+| 3    | Click "Exit without saving"                        | Modal closes, wizard closes              |
+| 4    | Assert redirected to VM list                       | User is on the VirtualMachines list page |
+
+---
+
+### `004`: Clicking "Continue creating" keeps the wizard open with changes intact
+
+- **Objective:** Verify that clicking "Continue creating" dismisses the exit modal and preserves the entered form data.
+- **Target version:** CNV 5.1.0
+- **Jira References:** CNV-97288
+- **Pre-conditions:** None
+- **Tags:** `@tier1`, `@catalog-wizard`, `@adminOnly`
+
+| Step | Action                                               | Expected Result                                    |
+| :--- | :--------------------------------------------------- | :------------------------------------------------- |
+| 1    | Navigate to VMs list, open the wizard, fill a name   | Wizard is dirty with the entered name              |
+| 2    | Click Cancel                                         | Exit modal appears                                 |
+| 3    | Click "Continue creating"                            | Modal closes, wizard remains open                  |
+| 4    | Verify the VM name input still has the entered value | Name field value matches the originally typed name |
+
+---
+
+### `005`: Browser reload shows native beforeunload dialog on a dirty wizard
+
+- **Objective:** Verify that reloading the page while the wizard has unsaved changes triggers the browser's native "Changes you made may not be saved" dialog.
+- **Target version:** CNV 5.1.0
+- **Jira References:** CNV-97288
+- **Pre-conditions:** None
+- **Tags:** `@tier1`, `@catalog-wizard`, `@adminOnly`
+
+| Step | Action                                             | Expected Result                                             |
+| :--- | :------------------------------------------------- | :---------------------------------------------------------- |
+| 1    | Navigate to VMs list, open the wizard, fill a name | Wizard is dirty                                             |
+| 2    | Register a dialog listener, then reload the page   | A beforeunload dialog is triggered by the browser           |
+| 3    | Accept the dialog                                  | Page reloads; the dialog event was captured by the listener |
+
+---
+
+### `006`: Browser back button triggers exit modal on a dirty wizard
+
+- **Objective:** Verify that pressing the browser back button while the wizard has unsaved changes displays the exit confirmation modal.
+- **Target version:** CNV 5.1.0
+- **Jira References:** CNV-97288
+- **Pre-conditions:** None
+- **Tags:** `@tier1`, `@catalog-wizard`, `@adminOnly`
+
+| Step | Action                                             | Expected Result        |
+| :--- | :------------------------------------------------- | :--------------------- |
+| 1    | Navigate to VMs list, open the wizard, fill a name | Wizard is dirty        |
+| 2    | Press browser back                                 | Exit modal appears     |
+| 3    | Click "Exit without saving"                        | Modal and wizard close |
+
+---
+
+### `007`: Successful VM creation completes without showing the exit modal
+
+- **Objective:** Verify that completing the wizard flow and creating a VM does not trigger the exit modal.
+- **Target version:** CNV 5.1.0
+- **Jira References:** CNV-97288
+- **Pre-conditions:** The `rhel9-server-small` template is available in the catalog.
+- **Tags:** `@tier1`, `@catalog-wizard`, `@adminOnly`
+
+| Step | Action                                                                    | Expected Result                                     |
+| :--- | :------------------------------------------------------------------------ | :-------------------------------------------------- |
+| 1    | Set up a test namespace, navigate to VM list, open the wizard             | Wizard opens                                        |
+| 2    | Select Create from Template, generate a name, select `rhel9-server-small` | Wizard advances through the template steps          |
+| 3    | Click through remaining steps and click Create VirtualMachine             | VM creation starts                                  |
+| 4    | Verify redirect to VM details page                                        | User is on the VM details page, no exit modal shown |
+| 5    | Verify the VM exists via API                                              | VM resource exists in the namespace                 |
 
 ---
