@@ -337,12 +337,53 @@ echo "9. Deleting stale floating IPs..."
   | jq -r --arg cn "${CLUSTER_NAME}" 'if type == "array" then .[] | select(.name | startswith($cn)) | .id else empty end' \
   | while read -r id; do echo "  Releasing IP ${id}"; run_or_dry ibmcloud is floating-ip-release "${id}" -f; done
 
-echo "10. Stripping security group rules (breaks circular references)..."
+# IBM Cloud auto-creates floating IPs with random names (not cluster-prefixed)
+# for load balancers and public gateways. When the parent resource is deleted
+# the IP becomes unattached (target == null) but is not auto-released.
+echo "9b. Releasing orphan floating IPs (unattached, any name)..."
+(ibmcloud is ips --output json 2>/dev/null || echo '[]') \
+  | jq -r 'if type == "array" then .[] | select(.target == null) | .id else empty end' \
+  | while read -r id; do echo "  Releasing orphan IP ${id}"; run_or_dry ibmcloud is floating-ip-release "${id}" -f; done
+
+# IBM Cloud auto-creates security groups with kube-* and random names inside
+# the cluster's VPC. Match by name prefix OR by VPC membership so these are
+# cleaned up too -- otherwise they block VPC deletion.
+STALE_VPC_IDS=$(ibmcloud is vpcs --output json 2>/dev/null \
+  | jq -r --arg cn "${CLUSTER_NAME}" 'if type == "array" then [.[] | select(.name | startswith($cn)) | .id] else [] end | join("\n")' 2>/dev/null || true)
+if [[ -n "${STALE_VPC_IDS}" ]]; then
+  STALE_VPC_FILTER=$(echo "${STALE_VPC_IDS}" | jq -R -s 'split("\n") | map(select(length > 0))')
+else
+  STALE_VPC_FILTER='[]'
+fi
+
+# Endpoint gateways (iks-*) hold references to security groups and must be
+# deleted before SGs can be removed.
+echo "10. Deleting VPC endpoint gateways..."
+(ibmcloud is endpoint-gateways --output json 2>/dev/null || echo '[]') \
+  | jq -r --arg cn "${CLUSTER_NAME}" --argjson vids "${STALE_VPC_FILTER}" \
+    'if type == "array" then .[] | select((.name | startswith($cn)) or (.vpc.id as $vid | $vids | any(. == $vid))) | .id else empty end' \
+  | while read -r id; do echo "  Deleting endpoint gateway ${id}"; run_or_dry ibmcloud is endpoint-gateway-delete "${id}" -f; done
+[[ "${DRY_RUN}" != "true" ]] && sleep 10
+
+# Non-default SGs matched by name prefix or VPC membership. Default SGs
+# cannot be deleted independently -- they are removed with the VPC.
+# Collect default SG IDs from the stale VPCs so we can exclude them.
+DEFAULT_SG_IDS=$(ibmcloud is vpcs --output json 2>/dev/null \
+  | jq -r --arg cn "${CLUSTER_NAME}" \
+    'if type == "array" then [.[] | select(.name | startswith($cn)) | .default_security_group.id // empty] else [] end | join("\n")' 2>/dev/null || true)
+if [[ -n "${DEFAULT_SG_IDS}" ]]; then
+  DEFAULT_SG_FILTER=$(echo "${DEFAULT_SG_IDS}" | jq -R -s 'split("\n") | map(select(length > 0))')
+else
+  DEFAULT_SG_FILTER='[]'
+fi
+SG_MATCH_FILTER='if type == "array" then .[] | select(((.name | startswith($cn)) or (.vpc.id as $vid | $vids | any(. == $vid))) and (.id as $sid | $dsgs | any(. == $sid) | not)) | .id else empty end'
+
+echo "11. Stripping security group rules (breaks circular references)..."
 if [[ "${DRY_RUN}" == "true" ]]; then
   echo "  [dry-run] skipping rule strip"
 else
   (ibmcloud is security-groups --output json 2>/dev/null || echo '[]') \
-    | jq -r --arg cn "${CLUSTER_NAME}" 'if type == "array" then .[] | select(.name | startswith($cn)) | .id else empty end' \
+    | jq -r --arg cn "${CLUSTER_NAME}" --argjson vids "${STALE_VPC_FILTER}" --argjson dsgs "${DEFAULT_SG_FILTER}" "${SG_MATCH_FILTER}" \
     | while read -r sg_id; do
         (ibmcloud is security-group-rules "${sg_id}" --output json 2>/dev/null || echo '[]') \
           | jq -r 'if type == "array" then .[] | .id else empty end' \
@@ -352,26 +393,28 @@ else
       done
 fi
 
-echo "11. Deleting stale security groups..."
+echo "12. Deleting stale security groups..."
+SG_COUNT_FILTER='if type == "array" then [.[] | select(((.name | startswith($cn)) or (.vpc.id as $vid | $vids | any(. == $vid))) and (.id as $sid | $dsgs | any(. == $sid) | not))] | length else 0 end'
 if [[ "${DRY_RUN}" == "true" ]]; then
   (ibmcloud is security-groups --output json 2>/dev/null || echo '[]') \
-    | jq -r --arg cn "${CLUSTER_NAME}" 'if type == "array" then .[] | select(.name | startswith($cn)) | "  [dry-run] would delete SG \(.id) (\(.name))" else empty end'
+    | jq -r --arg cn "${CLUSTER_NAME}" --argjson vids "${STALE_VPC_FILTER}" --argjson dsgs "${DEFAULT_SG_FILTER}" \
+      'if type == "array" then .[] | select(((.name | startswith($cn)) or (.vpc.id as $vid | $vids | any(. == $vid))) and (.id as $sid | $dsgs | any(. == $sid) | not)) | "  [dry-run] would delete SG \(.id) (\(.name))" else empty end'
 else
   for pass in 1 2 3; do
     REMAINING_SGS=$(ibmcloud is security-groups --output json 2>/dev/null \
-      | jq -r --arg cn "${CLUSTER_NAME}" 'if type == "array" then [.[] | select(.name | startswith($cn))] | length else 0 end' 2>/dev/null || echo "0")
+      | jq -r --arg cn "${CLUSTER_NAME}" --argjson vids "${STALE_VPC_FILTER}" --argjson dsgs "${DEFAULT_SG_FILTER}" "${SG_COUNT_FILTER}" 2>/dev/null || echo "0")
     if [[ "${REMAINING_SGS}" -eq 0 || -z "${REMAINING_SGS}" ]]; then
       break
     fi
     echo "  Pass ${pass}: ${REMAINING_SGS} security group(s) remaining..."
     (ibmcloud is security-groups --output json 2>/dev/null || echo '[]') \
-      | jq -r --arg cn "${CLUSTER_NAME}" 'if type == "array" then .[] | select(.name | startswith($cn)) | .id else empty end' \
+      | jq -r --arg cn "${CLUSTER_NAME}" --argjson vids "${STALE_VPC_FILTER}" --argjson dsgs "${DEFAULT_SG_FILTER}" "${SG_MATCH_FILTER}" \
       | while read -r id; do ibmcloud is security-group-delete "${id}" -f 2>&1 || true; done
     sleep 10
   done
 fi
 
-echo "12. Retrying stale subnets (polling up to ${RETRY_BUDGET_SECONDS}s for IKS worker nodes to drain)..."
+echo "13. Retrying stale subnets (polling up to ${RETRY_BUDGET_SECONDS}s for IKS worker nodes to drain)..."
 SUBNETS_CLEARED="true"
 if ! poll_delete_subnets; then
   SUBNETS_CLEARED="false"
@@ -380,26 +423,26 @@ fi
 
 VPCS_CLEARED="true"
 if [[ "${CLEAN_VPC}" == "true" ]]; then
-  echo "13. Deleting stale VPCs (polling up to ${RETRY_BUDGET_SECONDS}s while a lingering subnet is removed)..."
+  echo "14. Deleting stale VPCs (polling up to ${RETRY_BUDGET_SECONDS}s while a lingering subnet is removed)..."
   if ! poll_delete_vpcs; then
     VPCS_CLEARED="false"
     echo "  WARNING: VPC(s) matching '${CLUSTER_NAME}' still exist after ${RETRY_BUDGET_SECONDS}s of retries."
   fi
 else
-  echo "13. Skipping VPC deletion (CLEAN_VPC=false)."
+  echo "14. Skipping VPC deletion (CLEAN_VPC=false)."
 fi
 
-echo "14. Deleting orphaned custom images (RHCOS)..."
+echo "15. Deleting orphaned custom images (RHCOS)..."
 (ibmcloud is images --visibility private --output json 2>/dev/null || echo '[]') \
   | jq -r --arg cn "${CLUSTER_NAME}" 'if type == "array" then .[] | select(.name | startswith($cn)) | .id else empty end' \
   | while read -r id; do echo "  Deleting image ${id}"; run_or_dry ibmcloud is image-delete "${id}" -f; done
 
-echo "15. Deleting orphaned block storage volumes (PVC data volumes from deleted clusters)..."
+echo "16. Deleting orphaned block storage volumes (PVC data volumes from deleted clusters)..."
 (ibmcloud is volumes --output json 2>/dev/null || echo '[]') \
-  | jq -r 'if type == "array" then .[] | select(.name | startswith("pvc-")) | .id else empty end' \
+  | jq -r 'if type == "array" then .[] | select((.name | startswith("pvc-")) and (.volume_attachments | length == 0)) | .id else empty end' \
   | while read -r id; do echo "  Deleting volume ${id}"; run_or_dry ibmcloud is volume-delete "${id}" -f; done
 
-echo "16. Deleting orphaned COS instances..."
+echo "17. Deleting orphaned COS instances..."
 (ibmcloud resource service-instances --service-name cloud-object-storage --output json 2>/dev/null || echo '[]') \
   | jq -r --arg cn "${CLUSTER_NAME}" 'if type == "array" then .[] | select(.name | startswith($cn)) | .id else empty end' \
   | while read -r id; do echo "  Deleting COS ${id}"; run_or_dry ibmcloud resource service-instance-delete "${id}" -f --recursive; done
