@@ -18,6 +18,23 @@ import {
   failUploadState,
   markUploadCanceledState,
 } from './uploadStatusUpdates';
+import {
+  applyPushNewWatchedToast,
+  applyRemoveWatchedToast,
+} from './watchedResources/utils/watchedResourceUtils';
+
+/* 
+TODO: create a store structured like this: 
+  ToastNotificationsStore = {
+  uploads: {
+    data: Record<string, UploadEntry>,
+    actions: UploadProgressStoreActions
+  }
+  watchedResources: {
+    data: Record<string, WatchedResourceEntry>,
+    actions: WatchedResourcesActions
+  }
+*/
 
 export const useUploadProgressStore = create<UploadProgressStoreState>((set, get) => ({
   cancelTrackedUpload: (uploadKey): Promise<void> => performCancelTrackedUpload(get, uploadKey),
@@ -142,4 +159,12 @@ export const useUploadProgressStore = create<UploadProgressStoreState>((set, get
       };
     }),
   uploads: {},
+  watchedResources: {
+    actions: {
+      pushNewWatchedToast: (watchedToastData): void =>
+        applyPushNewWatchedToast(watchedToastData, set),
+      removeWatchedToast: (id): void => applyRemoveWatchedToast(id, set),
+    },
+    data: {},
+  },
 }));

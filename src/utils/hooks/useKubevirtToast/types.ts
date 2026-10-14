@@ -1,4 +1,5 @@
 import type { useToast } from '@openshift-console/dynamic-plugin-sdk';
+import { type AlertVariant } from '@patternfly/react-core';
 
 export type ToastOptions = Parameters<ReturnType<typeof useToast>['addToast']>[0];
 export type HelperOptions = Omit<ToastOptions, 'content' | 'variant'> & {
@@ -19,4 +20,8 @@ export type ToastActions = {
 
 export type UseKubevirtToastResult = ToastActions & {
   addToast: AddToast;
+};
+
+export type KubevirtToastOptions = HelperOptions & {
+  variant?: AlertVariant;
 };

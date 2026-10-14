@@ -9,8 +9,8 @@ import { logVMCloned, TELEMETRY_STATUS } from '@kubevirt-utils/extensions/teleme
 import useKubevirtToast from '@kubevirt-utils/hooks/useKubevirtToast';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useNameValidation } from '@kubevirt-utils/hooks/useNameValidation';
+import { pushNewWatchedToast } from '@kubevirt-utils/hooks/useUploadProgressToast/watchedResources/utils/watchedResourceUtils';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
-import { pushNewWatchedToast } from '@kubevirt-utils/signals/toastRequestResultSignal';
 import { isVM } from '@kubevirt-utils/utils/typeGuards';
 import { truncateToK8sName } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
@@ -22,7 +22,7 @@ import NameInput from './components/NameInput';
 import SnapshotContentConfigurationSummary from './components/SnapshotContentConfigurationSummary';
 import StartClonedVMCheckbox from './components/StartClonedVMCheckbox/StartClonedVMCheckbox';
 import { getFailedCloneToastOptions, getToastWatchResourceData } from './utils/cloneWatchedToast';
-import { CLONE_VM_TOAST_TITLE } from './utils/constants';
+import { CLONE_IN_PROGRESS_CONTENT, CLONE_VM_TOAST_TITLE } from './utils/constants';
 import getSubmitBtnText from './utils/getSubmitBtnText';
 import { cloneVM, getMetadataName, vmExists } from './utils/helpers';
 
@@ -93,9 +93,7 @@ const CloneVMModal: FC<CloneVMModalProps> = ({ headerText, isOpen, onClose, sour
     }
 
     addInfoToast({
-      content: t(
-        'Cloning may take several minutes. You can close this dialog — the process will continue in the background. The cloned virtual machine may take some time to appear in the list.',
-      ),
+      content: t(CLONE_IN_PROGRESS_CONTENT),
       title,
     });
 

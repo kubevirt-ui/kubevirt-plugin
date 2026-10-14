@@ -1,9 +1,14 @@
 import { type TFunction } from 'i18next';
 
+import {
+  type WatchedResourceData,
+  type WatchedResourceToast,
+} from '@kubevirt-utils/hooks/useUploadProgressToast/watchedResources/types/types';
 import { modelToGroupVersionKind, VirtualMachineCloneModel } from '@kubevirt-utils/models';
-import { type WatchedToastData } from '@kubevirt-utils/signals/toastRequestResultSignal';
 import { getErrorMessage } from '@kubevirt-utils/utils/errorUtils';
 import { type FleetWatchK8sResource } from '@stolostron/multicluster-sdk';
+
+import { CLONE_COMPLETED_CONTENT } from './constants';
 
 export const getWatchResourceCloneData = (
   name: string,
@@ -36,11 +41,9 @@ export const getToastWatchResourceData = ({
   namespace,
   t,
   title,
-}: GetToastWatchResourceDataParams): Omit<WatchedToastData, 'id'> => ({
+}: GetToastWatchResourceDataParams): WatchedResourceData => ({
   toastOptions: {
-    content: t(
-      'Clone completed. The cloned virtual machine may take some time to appear in the list.',
-    ),
+    content: t(CLONE_COMPLETED_CONTENT),
     title,
   },
   watchDataResource: getWatchResourceCloneData(metadataName, namespace, cluster),
@@ -49,9 +52,9 @@ export const getToastWatchResourceData = ({
 export const getFailedCloneToastOptions = (
   t: TFunction,
   title: string,
-  watchedToastData: Omit<WatchedToastData, 'id'>,
+  watchedToastData: WatchedResourceData,
   error: unknown,
-): Partial<WatchedToastData> => ({
+): Partial<WatchedResourceToast> => ({
   toastOptions: {
     ...(watchedToastData.toastOptions ?? {}),
     content: t(getErrorMessage(error)),

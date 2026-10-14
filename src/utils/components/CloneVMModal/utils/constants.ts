@@ -38,3 +38,8 @@ export const STATUS_TO_PROGRESS_VARIANT = {
 };
 
 export const CLONE_VM_TOAST_TITLE = 'Clone virtual machine';
+
+export const CLONE_IN_PROGRESS_CONTENT =
+  'Cloning may take several minutes — the process will continue in the background. The cloned virtual machine may take some time to appear in the list.';
+
+export const CLONE_COMPLETED_CONTENT = 'Clone completed';

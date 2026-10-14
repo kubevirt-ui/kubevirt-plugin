@@ -1,6 +1,6 @@
 import { type TFunction } from 'i18next';
 
-import { type WatchedToastData } from '@kubevirt-utils/signals/toastRequestResultSignal';
+import { type WatchedResourceToast } from '@kubevirt-utils/hooks/useUploadProgressToast/watchedResources/types/types';
 import { getErrorMessage, isEmpty } from '@kubevirt-utils/utils/utils';
 import { type K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { AlertVariant } from '@patternfly/react-core';
@@ -47,7 +47,7 @@ const getResourceFailureMessage = (status?: WatchedResourceStatus): string | und
 
 const getToastOptionsByResourceStatus = (
   resource: WatchedResource | undefined,
-  watchedToast: WatchedToastData,
+  watchedToast: WatchedResourceToast,
 ): ToastOptions | undefined => {
   if (isEmpty(resource)) {
     return;
@@ -82,7 +82,7 @@ const getToastOptionsByResourceStatus = (
 
 export const getToastOptionsToDisplay = (
   resource: K8sResourceCommon | undefined,
-  watchedToast: WatchedToastData,
+  watchedToast: WatchedResourceToast,
   t: TFunction,
   watchError?: Error,
 ): ToastOptions | undefined => {

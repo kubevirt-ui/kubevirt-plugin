@@ -4,6 +4,7 @@ import { type UPLOAD_STATUS, type UploadError } from '@kubevirt-utils/hooks/useC
 import type { K8sGroupVersionKind } from '@openshift-console/dynamic-plugin-sdk';
 
 import { type UPLOAD_PROGRESS_STATUS } from './constants';
+import { type WatchedResourceStoreState } from './watchedResources/types/types';
 
 export type UploadProgressStatus =
   (typeof UPLOAD_PROGRESS_STATUS)[keyof typeof UPLOAD_PROGRESS_STATUS];
@@ -80,7 +81,7 @@ export type RegisterCdiUploadParams = {
   uploadKey: string;
 };
 
-export type UploadProgressStoreState = {
+export type UploadProgressStoreActions = {
   cancelTrackedUpload: (uploadKey: string) => Promise<void>;
   cancelUploadsForVm: (cluster: string, namespace: string, vmName: string) => Promise<void>;
   cancelWizardPendingUploads: (uploadKeys: string[]) => Promise<void>;
@@ -103,5 +104,25 @@ export type UploadProgressStoreState = {
   tryMarkTerminalToastShown: (uploadKey: string) => boolean;
   trySetToastId: (uploadKey: string, toastId: string) => boolean;
   updateProgress: (uploadKey: string, progress: number) => void;
-  uploads: Record<string, UploadEntry>;
 };
+
+export type UploadProgressStoreState = UploadProgressStoreActions & {
+  /* TODO: change uploads type to UploadsStoreState
+      type UploadsStoreState = {
+      actions: UploadProgressStoreActions;
+      data: Record<string, UploadEntry>;
+    };
+   */
+  uploads: Record<string, UploadEntry>;
+  watchedResources: WatchedResourceStoreState;
+};
+
+export type UploadProgressStoreSetState = (
+  partial:
+    | UploadProgressStoreState
+    | Partial<UploadProgressStoreState>
+    | ((
+        state: UploadProgressStoreState,
+      ) => UploadProgressStoreState | Partial<UploadProgressStoreState>),
+  replace?: boolean | undefined,
+) => void;
