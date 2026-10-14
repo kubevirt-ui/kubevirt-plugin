@@ -74,8 +74,8 @@ export const createHeadlessServiceSafely = async (
 
 export const handleCloneRequestPhaseChange = ({
   cloneRequest,
+  completeWizardAndNavigate,
   formValues: { cluster, name, project: targetNamespace },
-  navigate,
   setError,
   setIsSubmitting,
   setSubmittedCloneRequest,
@@ -90,7 +90,7 @@ export const handleCloneRequestPhaseChange = ({
 
   if (clonePhase === CLONING_STATUSES.SUCCEEDED) {
     logVMCreated(TELEMETRY_VM_CREATION_METHOD.CLONE);
-    navigate(getVMURL(getCluster(cloneRequest) ?? cluster, targetNamespace, name));
+    completeWizardAndNavigate(getVMURL(getCluster(cloneRequest) ?? cluster, targetNamespace, name));
     return;
   }
 

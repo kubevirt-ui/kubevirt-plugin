@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router';
+import { useLocation } from 'react-router';
 
 import { type V1beta1VirtualMachineClone } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import useCloneVMModal from '@kubevirt-utils/components/CloneVMModal/hooks/useCloneVMModal';
@@ -18,6 +18,7 @@ import { getCluster } from '@multicluster/helpers/selectors';
 import { isACMPath } from '@multicluster/urls';
 import { type VMWizardFormValues } from '@virtualmachines/wizard/form/types';
 import { useVMWizardForm } from '@virtualmachines/wizard/form/VMWizardFormProvider';
+import { useWizardNavigationGuard } from '@virtualmachines/wizard/state/useWizardNavigationGuard';
 
 import { SELECTED_CLUSTER } from '../utils/constants';
 import { handleCloneRequestPhaseChange } from './utils/utils';
@@ -30,9 +31,9 @@ type UseCloneVM = () => {
 
 const useCloneVM: UseCloneVM = () => {
   const { t } = useKubevirtTranslation();
-  const navigate = useNavigate();
   const { pathname } = useLocation();
   const { getValues } = useVMWizardForm();
+  const { completeWizardAndNavigate } = useWizardNavigationGuard();
 
   const [submittedCloneRequest, setSubmittedCloneRequest] = useState<V1beta1VirtualMachineClone>();
   const [error, setError] = useState<unknown>(null);
@@ -50,15 +51,15 @@ const useCloneVM: UseCloneVM = () => {
   useEffect(() => {
     handleCloneRequestPhaseChange({
       cloneRequest,
+      completeWizardAndNavigate,
       formValues: getValues('deployment'),
-      navigate,
       setError,
       setIsSubmitting,
       setSubmittedCloneRequest,
       submittedCloneRequest,
       t,
     });
-  }, [cloneRequest, getValues, navigate, submittedCloneRequest, t]);
+  }, [cloneRequest, completeWizardAndNavigate, getValues, submittedCloneRequest, t]);
 
   const cloneVM = async (values: VMWizardFormValues): Promise<void> => {
     if (isSubmitting || submittedCloneRequest) {

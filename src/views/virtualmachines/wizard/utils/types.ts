@@ -1,6 +1,5 @@
 import { type FC, type ReactNode } from 'react';
 import { type UseFormSetValue } from 'react-hook-form';
-import { type NavigateFunction } from 'react-router';
 import { type TFunction } from 'i18next';
 
 import {
@@ -91,8 +90,8 @@ export type VMCreationMethodConfig = {
 
 export type HandleCloneRequestPhaseChangeParams = {
   cloneRequest: undefined | V1beta1VirtualMachineClone;
+  completeWizardAndNavigate: (destinationUrl: string) => void;
   formValues: VMWizardFormValues['deployment'];
-  navigate: NavigateFunction;
   setError: (error: unknown) => void;
   setIsSubmitting: (isSubmitting: boolean) => void;
   setSubmittedCloneRequest: (cloneRequest: undefined | V1beta1VirtualMachineClone) => void;

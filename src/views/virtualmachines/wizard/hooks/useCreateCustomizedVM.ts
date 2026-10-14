@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useWatch } from 'react-hook-form';
-import { useLocation, useNavigate } from 'react-router';
+import { useLocation } from 'react-router';
 
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import useIsIPv6SingleStackCluster from '@kubevirt-utils/hooks/useIPStackType/useIsIPv6SingleStackCluster';
@@ -15,6 +15,7 @@ import { useK8sModels } from '@openshift-console/dynamic-plugin-sdk';
 import { mapWizardValuesToFinalVM } from '@virtualmachines/wizard/form/mapWizardValuesToFinalVM';
 import { type VMWizardFormValues } from '@virtualmachines/wizard/form/types';
 import { useVMWizardForm } from '@virtualmachines/wizard/form/VMWizardFormProvider';
+import { useWizardNavigationGuard } from '@virtualmachines/wizard/state/useWizardNavigationGuard';
 
 import { SELECTED_CLUSTER } from '../utils/constants';
 import { isTemplateCreationMethod } from '../utils/utils';
@@ -33,9 +34,9 @@ type UseCreateCustomizedVM = () => {
 
 const useCreateCustomizedVM: UseCreateCustomizedVM = () => {
   const { t } = useKubevirtTranslation();
-  const navigate = useNavigate();
   const { pathname } = useLocation();
   const { control } = useVMWizardForm();
+  const { completeWizardAndNavigate } = useWizardNavigationGuard();
   const [cluster, vmNamespaceTarget] = useWatch({
     control,
     name: ['deployment.cluster', 'deployment.project'],
@@ -93,7 +94,9 @@ const useCreateCustomizedVM: UseCreateCustomizedVM = () => {
         await createHeadlessServiceSafely(createdVM, t);
       }
 
-      navigate(getVMURL(deployment.cluster, deployment.project, getName(createdVM)));
+      completeWizardAndNavigate(
+        getVMURL(deployment.cluster, deployment.project, getName(createdVM)),
+      );
     } catch (err) {
       setError(err);
 

@@ -5,6 +5,7 @@ import { Flex, FlexItem } from '@patternfly/react-core';
 import { resetCreationMethodValues } from '@virtualmachines/wizard/form/defaultValues';
 import { useVMWizardForm } from '@virtualmachines/wizard/form/VMWizardFormProvider';
 import { useVMWizardState } from '@virtualmachines/wizard/state/useVMWizardState';
+import { useWizardNavigationGuard } from '@virtualmachines/wizard/state/useWizardNavigationGuard';
 import { VMCreationMethod } from '@virtualmachines/wizard/utils/constants';
 import { clearVMPendingUploads } from '@virtualmachines/wizard/utils/utils';
 
@@ -15,6 +16,7 @@ import './CreationMethodTileGroup.scss';
 const CreationMethodTileGroup: FC = () => {
   const { control, getValues, reset, setValue } = useVMWizardForm();
   const { resetState } = useVMWizardState();
+  const { blockWizardNavigation } = useWizardNavigationGuard();
   const creationMethod: VMCreationMethod = useWatch({
     control,
     name: 'creationMethod',
@@ -27,6 +29,7 @@ const CreationMethodTileGroup: FC = () => {
 
     clearVMPendingUploads(getValues, setValue);
     resetState();
+    blockWizardNavigation();
     reset(resetCreationMethodValues(getValues(), selectedCreationMethod));
   };
 
