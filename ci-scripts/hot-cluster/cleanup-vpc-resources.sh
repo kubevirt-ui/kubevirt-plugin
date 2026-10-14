@@ -18,6 +18,9 @@ set -euo pipefail
 #   ALLOW_LIVE_CLUSTER_SWEEP - "true" to skip the cluster-liveness guard
 #                              below (default: "false"). Only intended for
 #                              a cluster that is already confirmed deleting.
+#   RELEASE_UNATTACHED_IPS   - "true" to release all floating IPs with no
+#                              target (account-wide). Off by default since
+#                              unattached IPs may belong to other projects.
 #
 # Exit code: when DRY_RUN is not "true", exits 1 if a matching subnet (or,
 # with CLEAN_VPC=true, a matching VPC) is still present once cleanup
@@ -32,6 +35,7 @@ export IC_API_KEY
 DRY_RUN="${DRY_RUN:-false}"
 CLEAN_VPC="${CLEAN_VPC:-true}"
 ALLOW_LIVE_CLUSTER_SWEEP="${ALLOW_LIVE_CLUSTER_SWEEP:-false}"
+RELEASE_UNATTACHED_IPS="${RELEASE_UNATTACHED_IPS:-false}"
 
 # CLUSTER_NAME is set but unset -u only catches *unset* vars -- every
 # resource-matching filter below is a startswith(CLUSTER_NAME) check, and
@@ -223,10 +227,13 @@ echo "9. Deleting stale floating IPs..."
 # IBM Cloud auto-creates floating IPs with random names (not cluster-prefixed)
 # for load balancers and public gateways. When the parent resource is deleted
 # the IP becomes unattached (target == null) but is not auto-released.
-echo "9b. Releasing orphan floating IPs (unattached, any name)..."
-(ibmcloud is ips --output json 2>/dev/null || echo '[]') \
-  | jq -r 'if type == "array" then .[] | select(.target == null) | .id else empty end' \
-  | while read -r id; do echo "  Releasing orphan IP ${id}"; run_or_dry ibmcloud is floating-ip-release "${id}" -f; done
+# This sweep is account-wide, so it requires explicit opt-in.
+if [[ "${RELEASE_UNATTACHED_IPS}" == "true" ]]; then
+  echo "9b. Releasing orphan floating IPs (unattached, any name)..."
+  (ibmcloud is ips --output json 2>/dev/null || echo '[]') \
+    | jq -r 'if type == "array" then .[] | select(.target == null) | .id else empty end' \
+    | while read -r id; do echo "  Releasing orphan IP ${id}"; run_or_dry ibmcloud is floating-ip-release "${id}" -f; done
+fi
 
 # IBM Cloud auto-creates security groups with kube-* and random names inside
 # the cluster's VPC. Match by name prefix OR by VPC membership so these are

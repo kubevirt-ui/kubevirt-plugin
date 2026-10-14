@@ -120,6 +120,7 @@ jobs:
           IC_API_KEY: ${{ secrets.IC_KEY }}
           CLEAN_VPC: ${{ inputs.clean_vpc }}
           ALLOW_LIVE_CLUSTER_SWEEP: ${{ inputs.force || 'false' }}
+          RELEASE_UNATTACHED_IPS: 'true'
         run: bash ./ci-scripts/hot-cluster/cleanup-vpc-resources.sh
 
       - name: Find ROKS clusters
