@@ -43,6 +43,20 @@ export default class VmWizardNavigationComponent extends BaseComponent {
     '.operating-system-tile:has-text("Microsoft Windows")',
   );
   private readonly _wizardContainer = this.locator('.pf-v6-c-wizard.vm-creation-wizard');
+
+  // ── Exit wizard modal ──────────────────────────────────────────────
+  private readonly _exitModal = this.page
+    .locator('.pf-v6-c-modal-box')
+    .filter({ hasText: 'Exit VirtualMachine creation?' });
+
+  private readonly _exitModalExitButton = this._exitModal.getByRole('button', {
+    name: 'Exit without saving',
+  });
+
+  private readonly _exitModalContinueButton = this._exitModal.getByRole('button', {
+    name: 'Continue creating',
+  });
+
   constructor(page: Page) {
     super(page);
   }
@@ -74,6 +88,78 @@ export default class VmWizardNavigationComponent extends BaseComponent {
       state: 'hidden',
       timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
     });
+  }
+
+  async clickCancelButton(): Promise<void> {
+    await this.robustClick(
+      this.locator('.pf-v6-c-wizard button.pf-v6-c-button.pf-m-link:has-text("Cancel")').first(),
+    );
+  }
+
+  async clickContinueCreating(): Promise<void> {
+    await this._exitModalContinueButton.waitFor({
+      state: 'visible',
+      timeout: TestTimeouts.ELEMENT_WAIT,
+    });
+    await this.robustClick(this._exitModalContinueButton);
+    await this._exitModal.waitFor({
+      state: 'hidden',
+      timeout: TestTimeouts.ELEMENT_WAIT,
+    });
+  }
+
+  async clickExitWithoutSaving(): Promise<void> {
+    await this._exitModalExitButton.waitFor({
+      state: 'visible',
+      timeout: TestTimeouts.ELEMENT_WAIT,
+    });
+    await this.robustClick(this._exitModalExitButton);
+    await this._exitModal.waitFor({
+      state: 'hidden',
+      timeout: TestTimeouts.ELEMENT_WAIT,
+    });
+  }
+
+  async getExitModalBody(): Promise<string> {
+    const body = this._exitModal.locator('.pf-v6-c-modal-box__body');
+    await body.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
+    return ((await body.textContent()) ?? '').trim();
+  }
+
+  async getExitModalTitle(): Promise<string> {
+    const title = this._exitModal
+      .locator('.pf-v6-c-modal-box__title')
+      .getByText('Exit VirtualMachine creation?', { exact: true });
+    await title.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
+    return ((await title.textContent()) ?? '').trim();
+  }
+
+  async getVmName(): Promise<string> {
+    return await this._vmNameInput.first().inputValue();
+  }
+
+  async isExitModalVisible(): Promise<boolean> {
+    try {
+      await this._exitModal.waitFor({
+        state: 'visible',
+        timeout: TestTimeouts.SHORT_WAIT,
+      });
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  async verifyExitModalNotShown(): Promise<boolean> {
+    try {
+      await this._exitModal.waitFor({
+        state: 'visible',
+        timeout: TestTimeouts.SHORT_WAIT,
+      });
+      return false;
+    } catch {
+      return true;
+    }
   }
 
   async clearCloneSourceFilters(): Promise<void> {
