@@ -9,10 +9,10 @@ export type UseHideCredentials = () => {
 };
 
 const useHideCredentials: UseHideCredentials = () => {
-  const isAdmin = useCanListNamespaces();
+  const canListAllNamespaces = useCanListNamespaces();
   const { featureEnabled, loading } = useFeatures(HIDE_CREDENTIALS_NON_PRIVILEGED);
 
-  const shouldHideCredentials = featureEnabled && !isAdmin;
+  const shouldHideCredentials = featureEnabled && !canListAllNamespaces;
 
   return {
     loading,

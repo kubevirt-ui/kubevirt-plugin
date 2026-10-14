@@ -29,11 +29,11 @@ const useVirtualMachineTemplates: UseVirtualMachineTemplates = (
     [clusterOverride, clustersInParam],
   );
   const cluster = clusters?.length === 1 ? clusters[0] : undefined;
-  const isAdmin = useCanListNamespaces();
+  const canListAllNamespaces = useCanListNamespaces();
   const [model, inFlight] = useK8sModel(VirtualMachineTemplateModelGroupVersionKind);
 
   const modelAvailable = !!model && !inFlight;
-  const shouldWatch = enabled && modelAvailable && (isAdmin || Boolean(namespace));
+  const shouldWatch = enabled && modelAvailable && (canListAllNamespaces || Boolean(namespace));
 
   const [vmTemplates, loaded, loadError] = useKubevirtWatchResource<
     V1beta1VirtualMachineTemplate[]

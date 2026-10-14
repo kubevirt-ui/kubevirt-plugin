@@ -31,7 +31,7 @@ const useChangeBootSourceModal: UseChangeBootSourceModal = ({ isOpen, onClose, v
   const { control, setValue } = useVMWizardForm();
   const { invalidateTemplateGeneration } = useVMWizardState();
   const { template } = useDrawerContext();
-  const isAdmin = useCanListNamespaces();
+  const canListAllNamespaces = useCanListNamespaces();
 
   const [cluster, project] = useWatch({
     control,
@@ -50,7 +50,7 @@ const useChangeBootSourceModal: UseChangeBootSourceModal = ({ isOpen, onClose, v
     }
   }, [isOpen]);
 
-  const effectiveNamespace = getEffectiveVolumeNamespace(volumeListNamespace, isAdmin);
+  const effectiveNamespace = getEffectiveVolumeNamespace(volumeListNamespace, canListAllNamespaces);
   const bootableVolumesData = useBootableVolumes(effectiveNamespace, cluster);
   const instanceTypesAndPreferencesData = useInstanceTypesAndPreferences(
     effectiveNamespace,

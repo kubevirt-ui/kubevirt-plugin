@@ -30,8 +30,8 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
   syncFiltersWithURL = true,
   volumeListNamespace,
 }) => {
-  const isAdmin = useCanListNamespaces();
-  const effectiveNamespace = getEffectiveVolumeNamespace(volumeListNamespace, isAdmin);
+  const canListAllNamespaces = useCanListNamespaces();
+  const effectiveNamespace = getEffectiveVolumeNamespace(volumeListNamespace, canListAllNamespaces);
   const { preferences: preferencesData } = instanceTypesAndPreferencesData;
   const { loaded } = bootableVolumesData;
 

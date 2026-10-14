@@ -46,7 +46,7 @@ export const useAccessibleResources = <T>({
   selector,
   watchNamespaces,
 }: UseAccessibleResourcesArgs): UseAccessibleResourcesReturn<T> => {
-  const isAdmin = useCanListNamespaces();
+  const canListAllNamespaces = useCanListNamespaces();
   const isACMPage = useIsACMPage();
   const cluster = useClusterParam();
   const [projectNames, projectNamesLoaded, projectNamesError] = useProjects();
@@ -62,9 +62,9 @@ export const useAccessibleResources = <T>({
     return projectNames.filter((ns) => !isSystemNamespace(ns));
   }, [onlyUserProjects, projectNames, watchNamespaces]);
 
-  const loadPerNamespace = !isACMPage && projectNamesLoaded && !isAdmin;
+  const loadPerNamespace = !isACMPage && projectNamesLoaded && !canListAllNamespaces;
 
-  const shouldFetchClusterWide = isAdmin || isACMPage;
+  const shouldFetchClusterWide = canListAllNamespaces || isACMPage;
   const [allResources, allResourcesLoaded, allResourcesLoadError] = useKubevirtWatchResource<T[]>(
     shouldFetchClusterWide
       ? {
