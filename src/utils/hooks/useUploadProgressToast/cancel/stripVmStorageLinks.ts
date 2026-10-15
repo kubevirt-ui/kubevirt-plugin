@@ -1,11 +1,10 @@
-import { type UploadEntry } from '../types';
-
 import { getDataVolumeUrl } from '../completion/uploadLinks';
 import {
   collectVmScopedUploadKeys,
   getBootableVolumeUploadKey,
   isBootableVolumeUploadKey,
 } from '../keys/uploadKeys';
+import { type UploadEntry } from '../uploads/types/types';
 import {
   collectLinkUrls,
   getBootableVolumeUrlsToOmit,

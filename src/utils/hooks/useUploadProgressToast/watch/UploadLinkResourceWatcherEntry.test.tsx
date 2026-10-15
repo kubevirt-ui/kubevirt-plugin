@@ -2,7 +2,7 @@ import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
 import { render } from '@testing-library/react';
 
-import { useUploadProgressStore } from '../uploadProgressStore';
+import { resetUploadProgressStore, useUploadProgressStore } from '../uploadProgressStore';
 
 import { getUploadLinkedResource } from '../completion/uploadLinkedResource';
 import { getVmStorageUrlForIdentity } from '../completion/uploadLinks';
@@ -28,8 +28,8 @@ const storageLink = {
 const vmResource = getUploadLinkedResource(VirtualMachineModel, VM_NAME, NAMESPACE, CLUSTER);
 
 const startVmUpload = (): void => {
-  useUploadProgressStore.setState({ generationsByKey: {}, uploads: {} });
-  useUploadProgressStore.getState().startUpload(UPLOAD_KEY, {
+  resetUploadProgressStore();
+  useUploadProgressStore.getState().uploads.actions?.startUpload(UPLOAD_KEY, {
     contextLinks: [storageLink],
     fileName: 'image.iso',
   });
@@ -42,7 +42,7 @@ describe('UploadLinkResourceWatcherEntry', () => {
   });
 
   afterEach(() => {
-    useUploadProgressStore.setState({ generationsByKey: {}, uploads: {} });
+    resetUploadProgressStore();
   });
 
   it('should not strip links for a first-watch 404 before the resource exists', () => {
@@ -50,9 +50,9 @@ describe('UploadLinkResourceWatcherEntry', () => {
 
     render(<UploadLinkResourceWatcherEntry resource={vmResource} />);
 
-    expect(useUploadProgressStore.getState().getUpload(UPLOAD_KEY)?.contextLinks).toEqual([
-      storageLink,
-    ]);
+    expect(
+      useUploadProgressStore.getState().uploads.actions?.getUpload(UPLOAD_KEY)?.contextLinks,
+    ).toEqual([storageLink]);
   });
 
   it('should strip VM storage links when a previously observed resource returns 404', () => {
@@ -62,7 +62,9 @@ describe('UploadLinkResourceWatcherEntry', () => {
     mockWatch.mockReturnValue([undefined, true, { code: 404 }]);
     rerender(<UploadLinkResourceWatcherEntry resource={vmResource} />);
 
-    expect(useUploadProgressStore.getState().getUpload(UPLOAD_KEY)?.contextLinks).toEqual([]);
+    expect(
+      useUploadProgressStore.getState().uploads.actions?.getUpload(UPLOAD_KEY)?.contextLinks,
+    ).toEqual([]);
   });
 
   it('should strip VM storage links when the resource has a deletionTimestamp', () => {
@@ -74,7 +76,9 @@ describe('UploadLinkResourceWatcherEntry', () => {
 
     render(<UploadLinkResourceWatcherEntry resource={vmResource} />);
 
-    expect(useUploadProgressStore.getState().getUpload(UPLOAD_KEY)?.contextLinks).toEqual([]);
+    expect(
+      useUploadProgressStore.getState().uploads.actions?.getUpload(UPLOAD_KEY)?.contextLinks,
+    ).toEqual([]);
   });
 
   it('should not strip links for a healthy resource', () => {
@@ -82,9 +86,9 @@ describe('UploadLinkResourceWatcherEntry', () => {
 
     render(<UploadLinkResourceWatcherEntry resource={vmResource} />);
 
-    expect(useUploadProgressStore.getState().getUpload(UPLOAD_KEY)?.contextLinks).toEqual([
-      storageLink,
-    ]);
+    expect(
+      useUploadProgressStore.getState().uploads.actions?.getUpload(UPLOAD_KEY)?.contextLinks,
+    ).toEqual([storageLink]);
   });
 
   it('should not strip links for a non-404 watch error', () => {
@@ -92,8 +96,8 @@ describe('UploadLinkResourceWatcherEntry', () => {
 
     render(<UploadLinkResourceWatcherEntry resource={vmResource} />);
 
-    expect(useUploadProgressStore.getState().getUpload(UPLOAD_KEY)?.contextLinks).toEqual([
-      storageLink,
-    ]);
+    expect(
+      useUploadProgressStore.getState().uploads.actions?.getUpload(UPLOAD_KEY)?.contextLinks,
+    ).toEqual([storageLink]);
   });
 });

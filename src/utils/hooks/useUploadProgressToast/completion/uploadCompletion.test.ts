@@ -50,8 +50,12 @@ describe('completeVmDiskUpload', () => {
       status: UPLOAD_PROGRESS_STATUS.UPLOADING,
     });
     (useUploadProgressStore.getState as jest.Mock).mockReturnValue({
-      completeUpload,
-      getUpload,
+      uploads: {
+        actions: {
+          completeUpload,
+          getUpload,
+        },
+      },
     });
   });
 
@@ -227,8 +231,12 @@ describe('completeVmCdromUpload', () => {
       status: UPLOAD_PROGRESS_STATUS.UPLOADING,
     });
     (useUploadProgressStore.getState as jest.Mock).mockReturnValue({
-      completeUpload,
-      getUpload,
+      uploads: {
+        actions: {
+          completeUpload,
+          getUpload,
+        },
+      },
     });
   });
 

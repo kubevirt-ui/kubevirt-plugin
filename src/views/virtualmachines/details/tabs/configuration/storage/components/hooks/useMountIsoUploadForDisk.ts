@@ -14,7 +14,7 @@ export const cancelMountIsoUpload = async (
   cdromDiskName: string,
 ): Promise<boolean> => {
   const uploadKey = getVmCdromUploadKeyFromVm(vm, cdromDiskName);
-  const { cancelTrackedUpload, getUpload } = useUploadProgressStore.getState();
+  const { cancelTrackedUpload, getUpload } = useUploadProgressStore.getState().uploads.actions;
   const upload = getUpload(uploadKey);
 
   if (upload?.status !== UPLOAD_PROGRESS_STATUS.UPLOADING) {
@@ -35,7 +35,7 @@ export const useMountIsoUploadForDisk = (
   diskName: string,
 ): UseMountIsoUploadForDiskResult => {
   const uploadKey = getVmCdromUploadKeyFromVm(vm, diskName);
-  const upload = useUploadProgressStore((state) => state.uploads[uploadKey]);
+  const upload = useUploadProgressStore((state) => state.uploads.data?.[uploadKey]);
 
   const isUploadInProgress = upload?.status === UPLOAD_PROGRESS_STATUS.UPLOADING;
 

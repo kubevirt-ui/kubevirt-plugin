@@ -88,7 +88,7 @@ const completeVmStorageUpload = async ({
   uploadKey,
   vm,
 }: CompleteVmDiskUploadParams & { isCdrom?: boolean }): Promise<void> => {
-  const current = useUploadProgressStore.getState().getUpload(uploadKey);
+  const current = useUploadProgressStore.getState().uploads.actions?.getUpload(uploadKey);
   if (
     current?.status !== UPLOAD_PROGRESS_STATUS.UPLOADING ||
     (expectedGeneration !== undefined && current.generation !== expectedGeneration)
@@ -103,7 +103,7 @@ const completeVmStorageUpload = async ({
       : isDataVolumeAlive(dataVolumeName, getNamespace(vm), getCluster(vm)),
   ]);
 
-  useUploadProgressStore.getState().completeUpload(uploadKey, {
+  useUploadProgressStore.getState().uploads.actions?.completeUpload(uploadKey, {
     expectedGeneration: expectedGeneration ?? current.generation,
     resourceName: diskName,
     successLinks: getVmDiskUploadSuccessLinks(
@@ -131,7 +131,7 @@ export const completeBootableVolumeUpload = ({
 }: CompleteBootableVolumeUploadParams): void => {
   const volumeName = getName(dataSource) ?? '';
 
-  useUploadProgressStore.getState().completeUpload(uploadKey, {
+  useUploadProgressStore.getState().uploads.actions?.completeUpload(uploadKey, {
     expectedGeneration,
     resourceName: volumeName,
     successLinks: [
@@ -146,5 +146,7 @@ export const failBootableVolumeUpload = (
   expectedGeneration?: number,
 ): void => {
   const errorMessage = error instanceof Error ? error.message : String(error);
-  useUploadProgressStore.getState().failUpload(uploadKey, errorMessage, expectedGeneration);
+  useUploadProgressStore
+    .getState()
+    .uploads.actions?.failUpload(uploadKey, errorMessage, expectedGeneration);
 };

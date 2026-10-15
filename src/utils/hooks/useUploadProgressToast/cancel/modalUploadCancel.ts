@@ -33,7 +33,7 @@ export const cancelTrackedUploadOnModalClose = ({
   if (uploadKey) {
     useUploadProgressStore
       .getState()
-      .cancelTrackedUpload(uploadKey)
+      .uploads.actions?.cancelTrackedUpload(uploadKey)
       .catch(() => {});
     return;
   }

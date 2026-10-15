@@ -10,7 +10,7 @@ import UploadLinkResourceWatcherEntry from './UploadLinkResourceWatcherEntry';
 
 const UploadLinkResourceWatcher: FC = () => {
   const resources = useUploadProgressStore((state) =>
-    collectWatchableUploadResources(state.uploads),
+    collectWatchableUploadResources(state.uploads.data),
   );
 
   return (

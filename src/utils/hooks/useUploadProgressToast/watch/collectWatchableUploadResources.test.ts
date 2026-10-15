@@ -1,9 +1,9 @@
 import { DataVolumeModel, VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 
 import { UPLOAD_PROGRESS_STATUS } from '../constants';
-import type { UploadEntry } from '../types';
 
 import { getUploadLinkedResource } from '../completion/uploadLinkedResource';
+import { type UploadEntry } from '../uploads/types/types';
 import {
   collectWatchableUploadResources,
   getUploadLinkedResourceWatchKey,

@@ -5,7 +5,7 @@ import {
 } from '@kubevirt-ui-ext/kubevirt-api/console';
 
 import { UPLOAD_PROGRESS_STATUS } from '../constants';
-import { useUploadProgressStore } from '../uploadProgressStore';
+import { resetUploadProgressStore, useUploadProgressStore } from '../uploadProgressStore';
 
 import { getUploadLinkedResource } from '../completion/uploadLinkedResource';
 import {
@@ -30,7 +30,7 @@ const storageUrl = getVmStorageUrlForIdentity(CLUSTER, NAMESPACE, VM_NAME);
 const storageLink = { label: 'View disk', url: storageUrl };
 
 const resetStore = (): void => {
-  useUploadProgressStore.setState({ generationsByKey: {}, uploads: {} });
+  resetUploadProgressStore();
 };
 
 describe('isUploadLinkedResourceGone', () => {
@@ -78,7 +78,7 @@ describe('notifyDeletedUploadLinkedResource', () => {
 
   it('should strip VM storage links without canceling the upload', () => {
     const uploadKey = getVmDiskUploadKey(CLUSTER, NAMESPACE, VM_NAME, DISK_NAME);
-    useUploadProgressStore.getState().startUpload(uploadKey, {
+    useUploadProgressStore.getState().uploads.actions?.startUpload(uploadKey, {
       contextLinks: [storageLink],
       fileName: 'image.iso',
     });
@@ -87,7 +87,7 @@ describe('notifyDeletedUploadLinkedResource', () => {
       getUploadLinkedResource(VirtualMachineModel, VM_NAME, NAMESPACE, CLUSTER),
     );
 
-    const upload = useUploadProgressStore.getState().getUpload(uploadKey);
+    const upload = useUploadProgressStore.getState().uploads.actions?.getUpload(uploadKey);
     expect(upload?.status).toBe(UPLOAD_PROGRESS_STATUS.UPLOADING);
     expect(upload?.contextLinks).toEqual([]);
   });
@@ -95,7 +95,7 @@ describe('notifyDeletedUploadLinkedResource', () => {
   it('should strip DataVolume links', () => {
     const uploadKey = getVmDiskUploadKey(CLUSTER, NAMESPACE, VM_NAME, DISK_NAME);
     const dataVolumeUrl = getDataVolumeUrl(DV_NAME, NAMESPACE, CLUSTER);
-    useUploadProgressStore.getState().startUpload(uploadKey, {
+    useUploadProgressStore.getState().uploads.actions?.startUpload(uploadKey, {
       contextLinks: [storageLink, { label: 'View DataVolume', url: dataVolumeUrl }],
       dvCluster: CLUSTER,
       dvName: DV_NAME,
@@ -107,19 +107,19 @@ describe('notifyDeletedUploadLinkedResource', () => {
       getUploadLinkedResource(DataVolumeModel, DV_NAME, NAMESPACE, CLUSTER),
     );
 
-    expect(useUploadProgressStore.getState().getUpload(uploadKey)?.contextLinks).toEqual([
-      storageLink,
-    ]);
+    expect(
+      useUploadProgressStore.getState().uploads.actions?.getUpload(uploadKey)?.contextLinks,
+    ).toEqual([storageLink]);
   });
 
   it('should strip bootable volume links', () => {
     const uploadKey = getBootableVolumeUploadKey(NAMESPACE, VOLUME_NAME, CLUSTER);
     const volumeUrl = getBootableVolumeUrl(VOLUME_NAME, NAMESPACE, CLUSTER);
-    useUploadProgressStore.getState().startUpload(uploadKey, {
+    useUploadProgressStore.getState().uploads.actions?.startUpload(uploadKey, {
       dvCluster: CLUSTER,
       fileName: 'image.iso',
     });
-    useUploadProgressStore.getState().completeUpload(uploadKey, {
+    useUploadProgressStore.getState().uploads.actions?.completeUpload(uploadKey, {
       successLinks: [{ label: 'View bootable volume', url: volumeUrl }],
     });
 
@@ -127,6 +127,8 @@ describe('notifyDeletedUploadLinkedResource', () => {
       getUploadLinkedResource(DataSourceModel, VOLUME_NAME, NAMESPACE, CLUSTER),
     );
 
-    expect(useUploadProgressStore.getState().getUpload(uploadKey)?.successLinks).toEqual([]);
+    expect(
+      useUploadProgressStore.getState().uploads.actions?.getUpload(uploadKey)?.successLinks,
+    ).toEqual([]);
   });
 });
