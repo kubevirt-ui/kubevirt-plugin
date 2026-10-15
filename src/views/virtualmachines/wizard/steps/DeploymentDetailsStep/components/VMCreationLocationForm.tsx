@@ -1,14 +1,18 @@
-import { type FC } from 'react';
+import { type FC, useCallback } from 'react';
 import { Controller, useWatch } from 'react-hook-form';
 
 import ClusterDropdown from '@kubevirt-utils/components/ClusterProjectDropdown/ClusterDropdown';
-import NamespaceDropdown from '@kubevirt-utils/components/ClusterProjectDropdown/NamespaceDropdown';
+import NamespaceDropdown, {
+  type NamespaceDropdownProjectCreatedHandler,
+} from '@kubevirt-utils/components/ClusterProjectDropdown/NamespaceDropdown';
 import FolderSelect from '@kubevirt-utils/components/FolderSelect/FolderSelect';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { TREE_VIEW_FOLDERS } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getName } from '@kubevirt-utils/resources/shared';
+import { getCluster } from '@multicluster/helpers/selectors';
 import useIsACMPage from '@multicluster/useIsACMPage';
 import { Form, FormGroup } from '@patternfly/react-core';
 import { useHubClusterName } from '@stolostron/multicluster-sdk';
@@ -35,13 +39,30 @@ const VMCreationLocationForm: FC = () => {
     name: ['deployment.cluster', 'deployment.folder', 'deployment.project'],
   });
 
-  const clearLocationDependentVM = (): void => {
+  const clearLocationDependentVM = useCallback((): void => {
     clearWizardDraftPendingUploads(getValues, setValue);
     if (getValues('creationMethod') === VMCreationMethod.CLONE) {
       setValue('clone.sourceVM', null, { shouldValidate: true });
     }
     clearDraft();
-  };
+  }, [clearDraft, getValues, setValue]);
+
+  const onLocationProjectCreated = useCallback<NamespaceDropdownProjectCreatedHandler>(
+    (createdProject) => {
+      const projectName = getName(createdProject);
+      const projectCluster = getCluster(createdProject);
+      if (!projectName) {
+        return;
+      }
+      if (isACMPage && projectCluster) {
+        setValue('deployment.cluster', projectCluster, { shouldValidate: true });
+      }
+      setValue('deployment.project', projectName, { shouldValidate: true });
+      setValue('deployment.folder', '');
+      clearLocationDependentVM();
+    },
+    [clearLocationDependentVM, isACMPage, setValue],
+  );
 
   return (
     <Form className="vm-creation-location-form">
@@ -72,18 +93,18 @@ const VMCreationLocationForm: FC = () => {
         <Controller
           control={control}
           name="deployment.project"
-          render={({ field: { ref: _ref, ...field } }) => (
+          render={({ field: { onChange: onProjectFieldChange, ref: _ref } }) => (
             <NamespaceDropdown
-              {...field}
               bookmarkCluster={hubClusterName}
               cluster={cluster}
               includeAllProjects={false}
               onChange={(selectedProject) => {
                 if (selectedProject === getValues('deployment.project')) return;
-                field.onChange(selectedProject);
+                onProjectFieldChange(selectedProject);
                 setValue('deployment.folder', '');
                 clearLocationDependentVM();
               }}
+              onProjectCreated={onLocationProjectCreated}
               selectedProject={project || DEFAULT_NAMESPACE}
             />
           )}

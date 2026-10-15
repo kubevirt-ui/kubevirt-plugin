@@ -1,157 +1,63 @@
-import { type JSX, useRef, useState } from 'react';
+import { type JSX, useRef } from 'react';
 
-import { useClickOutside } from '@kubevirt-utils/hooks/useClickOutside/useClickOutside';
-import { Divider, Menu, MenuContent, Popper, Tooltip } from '@patternfly/react-core';
+import HidableTooltip from '@kubevirt-utils/components/HidableTooltip/HidableTooltip';
 
-import DropdownGroup from './DropdownGroup';
-import DropdownMenuToggle from './DropdownMenuToggle';
-import Filter from './Filter';
-import NoResults from './NoResults';
-import ShowSystemNamespacesSwitch from './ShowSystemNamespacesSwitch';
+import DropdownMenuContent from './DropdownMenuContent';
+import DropdownMenuFilterSection from './DropdownMenuFilterSection';
+import DropdownMenuFooter from './DropdownMenuFooter';
+import DropdownToggle from './DropdownToggle';
 import type { DropdownConfig, DropdownProps } from './types';
-import { useDropdownCallbacks } from './useDropdownCallbacks';
-import { useDropdownOptions } from './useDropdownOptions';
-import { useFilteredOptions } from './useFilteredOptions';
+import { useDropdownBookmarkActions } from './useDropdownBookmarkActions';
+import { useDropdownMenuSelect } from './useDropdownMenuSelect';
+import { useDropdownMenuState } from './useDropdownMenuState';
+
 export type { DropdownConfig };
 
 import './Dropdown.scss';
 
-const Dropdown = <T,>({
-  bookmarks,
-  config,
-  disabled = false,
-  disabledItemTooltip,
-  disabledTooltip,
-  extractKey,
-  extractTitle,
-  includeAllItems = true,
-  isItemDisabled,
-  items,
-  itemsLoaded,
-  omittedItems,
-  onChange,
-  selectedItem,
-  showSystemToggle,
-}: DropdownProps<T>): JSX.Element => {
-  const menuRef = useRef<HTMLDivElement>(null);
-  const toggleRef = useRef<HTMLButtonElement>(null);
+const Dropdown = <T,>(props: DropdownProps<T>): JSX.Element => {
+  const {
+    bookmarks,
+    config,
+    disabled = false,
+    disabledTooltip,
+    onChange,
+    selectedItem,
+    showSystemToggle,
+  } = props;
   const filterRef = useRef<HTMLInputElement>(null);
-  const [isOpen, setIsOpen] = useState(false);
-  const [filterText, setFilterText] = useState('');
-
-  useClickOutside([menuRef, toggleRef], () => {
-    setIsOpen(false);
-    setFilterText('');
-  });
+  const { closeMenu, filterText, isOpen, setFilterText, setIsOpen } = useDropdownMenuState();
 
   const { allItemsTitle } = config;
   const title = selectedItem === config.allItemsKey ? allItemsTitle : selectedItem;
 
-  const optionItems = useDropdownOptions({
-    config,
-    disabledItemTooltip,
-    extractKey,
-    extractTitle,
-    includeAllItems,
-    isItemDisabled,
-    items,
-    itemsLoaded,
-    omittedItems,
-    onChange,
-    selectedItem,
-  });
+  const { onSelect } = useDropdownMenuSelect({ onChange, setIsOpen });
+  const { onActionClick } = useDropdownBookmarkActions({ bookmarks });
 
-  const { filteredFavorites, filteredOptions } = useFilteredOptions({
-    bookmarks,
-    filterText,
-    optionItems,
-    showSystemToggle,
-  });
-
-  const { onActionClick, onClearFilters, onSelect } = useDropdownCallbacks({
-    bookmarks,
-    filterRef,
-    onChange,
-    setFilterText,
-    setIsOpen,
-    showSystemToggle,
-  });
-
-  const dropdown = (
-    <div className={config.cssPrefix}>
-      <DropdownMenuToggle
+  return (
+    <HidableTooltip content={disabledTooltip ?? ''} hidden={!disabled || !disabledTooltip}>
+      <DropdownToggle
         config={config}
         disabled={disabled}
         isOpen={isOpen}
+        onActionClick={onActionClick}
+        onCloseMenu={closeMenu}
+        onSelect={onSelect}
         onToggle={setIsOpen}
+        selectedItem={selectedItem}
         title={title}
-        toggleRef={toggleRef}
-      />
-      <Popper
-        isVisible={isOpen}
-        placement="bottom-start"
-        popper={
-          <Menu
-            activeItemId={selectedItem}
-            className={`${config.cssPrefix}__menu`}
-            containsFlyout
-            data-test={config.dataTestId}
-            onActionClick={onActionClick}
-            onSelect={onSelect}
-            ref={menuRef}
-          >
-            <div className={`${config.cssPrefix}__search-wrapper`}>
-              <Filter
-                config={config}
-                filterRef={filterRef}
-                filterText={filterText}
-                onFilterChange={setFilterText}
-              />
-            </div>
-            <Divider />
-            {showSystemToggle && (
-              <>
-                <ShowSystemNamespacesSwitch
-                  hasSystemNamespaces={showSystemToggle.hasSystemItems}
-                  isChecked={showSystemToggle.show}
-                  onChange={showSystemToggle.onChange}
-                />
-                <Divider />
-              </>
-            )}
-            <MenuContent className={`${config.cssPrefix}__menu-content`} maxMenuHeight="60vh">
-              {filteredOptions.length === 0 &&
-              (!bookmarks.bookmarksLoaded || filteredFavorites.length === 0) ? (
-                <NoResults noItemsFoundTitle={config.noItemsFoundTitle} onClear={onClearFilters} />
-              ) : null}
-              {bookmarks.bookmarksLoaded && filteredFavorites.length > 0 && (
-                <DropdownGroup
-                  config={config}
-                  favorites={bookmarks.bookmarks}
-                  isFavorites
-                  options={filteredFavorites}
-                  selectedKey={selectedItem}
-                  showBottomDivider={filteredOptions.length > 0}
-                />
-              )}
-              <DropdownGroup
-                config={config}
-                favorites={bookmarks.bookmarks}
-                options={filteredOptions}
-                selectedKey={selectedItem}
-              />
-            </MenuContent>
-          </Menu>
-        }
-        triggerRef={toggleRef}
-      />
-    </div>
-  );
-
-  return disabled && disabledTooltip ? (
-    <Tooltip content={disabledTooltip}>{dropdown}</Tooltip>
-  ) : (
-    dropdown
+      >
+        <DropdownMenuFilterSection
+          config={config}
+          filterRef={filterRef}
+          filterText={filterText}
+          onFilterChange={setFilterText}
+          showSystemToggle={showSystemToggle}
+        />
+        <DropdownMenuContent dropdownProps={props} filterText={filterText} />
+        <DropdownMenuFooter closeMenu={closeMenu} dropdownProps={props} filterText={filterText} />
+      </DropdownToggle>
+    </HidableTooltip>
   );
 };
 

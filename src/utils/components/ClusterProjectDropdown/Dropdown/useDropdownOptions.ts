@@ -13,6 +13,7 @@ type UseDropdownOptionsParams<T> = {
   itemsLoaded: boolean;
   omittedItems?: string[];
   onChange: (item: string) => void;
+  preserveUnknownSelectedItem?: boolean;
   selectedItem: string;
 };
 
@@ -27,6 +28,7 @@ export const useDropdownOptions = <T>({
   itemsLoaded,
   omittedItems,
   onChange,
+  preserveUnknownSelectedItem = false,
   selectedItem,
 }: UseDropdownOptionsParams<T>): DropdownOption[] => {
   const { allItemsKey, allItemsTitle } = config;
@@ -78,7 +80,7 @@ export const useDropdownOptions = <T>({
   ]);
 
   useEffect(() => {
-    if (!itemsLoaded || !optionItems.length) return;
+    if (!itemsLoaded || !optionItems.length || preserveUnknownSelectedItem) return;
 
     if (selectedItem && !optionItems.some((item) => item.key === selectedItem)) {
       const firstEnabledItem =
@@ -87,7 +89,7 @@ export const useDropdownOptions = <T>({
         onChange(firstEnabledItem);
       }
     }
-  }, [itemsLoaded, optionItems, selectedItem, onChange]);
+  }, [itemsLoaded, onChange, optionItems, preserveUnknownSelectedItem, selectedItem]);
 
   return optionItems;
 };
