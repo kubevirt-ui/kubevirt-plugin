@@ -17,6 +17,25 @@ const DEFAULT_CNV_CHANNEL = 'stable';
 const LAST_CYPRESS_MAJOR = 4;
 const LAST_CYPRESS_MINOR = 22;
 
+// IBM Cloud ROKS only offers OpenShift versions in this window. A release
+// branch outside it still provisions, clamped to the nearest supported
+// version; the branch's own cluster_name/test_engine stay tied to the real
+// branch, and CNV is left unpinned when a clamp happens (see below).
+const MIN_SUPPORTED = { major: 4, minor: 18 };
+const MAX_SUPPORTED = { major: 4, minor: 22 };
+
+// Clamp a branch's major.minor into the IBM Cloud supported range.
+const clampVersion = (major: number, minor: number): { major: number; minor: number } => {
+  const encoded = major * 1000 + minor;
+  if (encoded < MIN_SUPPORTED.major * 1000 + MIN_SUPPORTED.minor) {
+    return { ...MIN_SUPPORTED };
+  }
+  if (encoded > MAX_SUPPORTED.major * 1000 + MAX_SUPPORTED.minor) {
+    return { ...MAX_SUPPORTED };
+  }
+  return { major, minor };
+};
+
 export type ClusterConfig = {
   branchName: string;
   clusterName: string;
@@ -43,16 +62,32 @@ export const resolveClusterConfig = (params: {
       const major = Number(releaseMatch[1]);
       const minor = Number(releaseMatch[2]);
       const clusterName = `kubevirt-plugin-${major}${minor}`;
-      const openshiftVersion = `${major}.${minor}_openshift`;
       const cnvChannel = DEFAULT_CNV_CHANNEL;
-      const cnvPinVersion = `${major}.${minor}`;
+
+      // Clamp the cluster's OpenShift version into the IBM Cloud supported
+      // range. When a clamp happens, leave CNV unpinned: the branch's CNV CSV
+      // won't exist in the clamped cluster's catalog, so install-hco.sh would
+      // hard-fail on it.
+      const clamped = clampVersion(major, minor);
+      const isClamped = clamped.major !== major || clamped.minor !== minor;
+      const openshiftVersion = `${clamped.major}.${clamped.minor}_openshift`;
+      const cnvPinVersion = isClamped ? '' : `${major}.${minor}`;
       const testEngine =
         major * 1000 + minor <= LAST_CYPRESS_MAJOR * 1000 + LAST_CYPRESS_MINOR
           ? 'cypress'
           : 'playwright';
 
+      if (isClamped) {
+        console.error(
+          `Branch version ${major}.${minor} is outside the IBM Cloud supported range ` +
+            `${MIN_SUPPORTED.major}.${MIN_SUPPORTED.minor}-${MAX_SUPPORTED.major}.${MAX_SUPPORTED.minor}; ` +
+            `clamping cluster OpenShift version to ${clamped.major}.${clamped.minor} and installing CNV unpinned (stable)`,
+        );
+      }
       console.error(
-        `Base branch '${baseRef}' is a release branch → cluster '${clusterName}' (${openshiftVersion}, CNV channel '${cnvChannel}', pinned to CNV ${cnvPinVersion}.x)`,
+        `Base branch '${baseRef}' is a release branch → cluster '${clusterName}' (${openshiftVersion}, CNV channel '${cnvChannel}', ${
+          cnvPinVersion ? `pinned to CNV ${cnvPinVersion}.x` : 'CNV unpinned'
+        })`,
       );
       console.error(`Base branch '${baseRef}' → test engine '${testEngine}'`);
       return { clusterName, cnvChannel, cnvPinVersion, openshiftVersion, testEngine };

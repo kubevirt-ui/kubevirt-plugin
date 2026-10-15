@@ -26,6 +26,30 @@ DEFAULT_CNV_CHANNEL="stable"
 LAST_CYPRESS_MAJOR=4
 LAST_CYPRESS_MINOR=22
 
+# IBM Cloud ROKS only offers OpenShift versions in this window. A release
+# branch outside it still provisions, clamped to the nearest supported
+# version; the branch's own cluster_name/test_engine stay tied to the real
+# branch, and CNV is left unpinned when a clamp happens (see below).
+MIN_SUPPORTED_MAJOR=4
+MIN_SUPPORTED_MINOR=18
+MAX_SUPPORTED_MAJOR=4
+MAX_SUPPORTED_MINOR=22
+
+# Clamp a "<major> <minor>" pair into the supported range; echoes "<major> <minor>".
+clamp_version() {
+  local major="$1" minor="$2"
+  local v=$(( major * 1000 + minor ))
+  local min=$(( MIN_SUPPORTED_MAJOR * 1000 + MIN_SUPPORTED_MINOR ))
+  local max=$(( MAX_SUPPORTED_MAJOR * 1000 + MAX_SUPPORTED_MINOR ))
+  if (( v < min )); then
+    echo "${MIN_SUPPORTED_MAJOR} ${MIN_SUPPORTED_MINOR}"
+  elif (( v > max )); then
+    echo "${MAX_SUPPORTED_MAJOR} ${MAX_SUPPORTED_MINOR}"
+  else
+    echo "${major} ${minor}"
+  fi
+}
+
 BASE_REF="${BASE_REF:-}"
 INPUT_CLUSTER_NAME="${INPUT_CLUSTER_NAME:-}"
 INPUT_OPENSHIFT_VERSION="${INPUT_OPENSHIFT_VERSION:-}"
@@ -36,10 +60,23 @@ if [[ "${BASE_REF}" =~ ^release-([0-9]+)\.([0-9]+)$ ]]; then
   MAJOR="${BASH_REMATCH[1]}"
   MINOR="${BASH_REMATCH[2]}"
   CLUSTER_NAME="kubevirt-plugin-${MAJOR}${MINOR}"
-  OPENSHIFT_VERSION="${MAJOR}.${MINOR}_openshift"
   CNV_CHANNEL="${DEFAULT_CNV_CHANNEL}"
-  CNV_PIN_VERSION="${MAJOR}.${MINOR}"
-  echo "Base branch '${BASE_REF}' is a release branch → cluster '${CLUSTER_NAME}' (${OPENSHIFT_VERSION}, CNV channel '${CNV_CHANNEL}', pinned to CNV ${CNV_PIN_VERSION}.x)" >&2
+
+  # Clamp the cluster's OpenShift version into the IBM Cloud supported range.
+  # When a clamp happens, leave CNV unpinned: the branch's CNV CSV won't exist
+  # in the clamped cluster's catalog, so install-hco.sh would hard-fail on it.
+  CLAMPED="$(clamp_version "${MAJOR}" "${MINOR}")"
+  CLAMPED_MAJOR="${CLAMPED% *}"
+  CLAMPED_MINOR="${CLAMPED#* }"
+  OPENSHIFT_VERSION="${CLAMPED_MAJOR}.${CLAMPED_MINOR}_openshift"
+  if [[ "${CLAMPED_MAJOR}.${CLAMPED_MINOR}" != "${MAJOR}.${MINOR}" ]]; then
+    CNV_PIN_VERSION=""
+    echo "Branch version ${MAJOR}.${MINOR} is outside the IBM Cloud supported range ${MIN_SUPPORTED_MAJOR}.${MIN_SUPPORTED_MINOR}-${MAX_SUPPORTED_MAJOR}.${MAX_SUPPORTED_MINOR}; clamping cluster OpenShift version to ${CLAMPED_MAJOR}.${CLAMPED_MINOR} and installing CNV unpinned (stable)" >&2
+    echo "Base branch '${BASE_REF}' is a release branch → cluster '${CLUSTER_NAME}' (${OPENSHIFT_VERSION}, CNV channel '${CNV_CHANNEL}', CNV unpinned)" >&2
+  else
+    CNV_PIN_VERSION="${MAJOR}.${MINOR}"
+    echo "Base branch '${BASE_REF}' is a release branch → cluster '${CLUSTER_NAME}' (${OPENSHIFT_VERSION}, CNV channel '${CNV_CHANNEL}', pinned to CNV ${CNV_PIN_VERSION}.x)" >&2
+  fi
 
   if (( MAJOR * 1000 + MINOR <= LAST_CYPRESS_MAJOR * 1000 + LAST_CYPRESS_MINOR )); then
     TEST_ENGINE="cypress"
