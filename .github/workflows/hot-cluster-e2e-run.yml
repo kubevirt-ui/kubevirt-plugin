@@ -225,13 +225,28 @@ jobs:
           checkout-ref: ${{ inputs.checkout_ref }}
           pr-number: ${{ inputs.pr_number }}
 
+      # ci-scripts/hot-cluster exists only on main; a release-branch checkout
+      # above has none of it. Overlay the infra from the ref this run was
+      # dispatched at (github.sha -- main's tip in production, the fix branch
+      # during a workflow_dispatch validation) into an isolated subdir.
+      # GITHUB_WORKSPACE stays pointed at the product checkout at the workspace
+      # root, so the TS scripts still build/test the branch's own code.
+      - name: Overlay hot-cluster CI infra from main
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          sparse-checkout: ci-scripts/hot-cluster
+          path: .hc-infra
+          clean: false
+
       - name: Install infra script dependencies
-        working-directory: ci-scripts/hot-cluster/ts
+        working-directory: .hc-infra/ci-scripts/hot-cluster/ts
         run: npm ci --ignore-scripts --no-audit
 
       - name: Check if kubevirt-plugin image exists in registry
         id: check_image
-        working-directory: ci-scripts/hot-cluster/ts
+        working-directory: .hc-infra/ci-scripts/hot-cluster/ts
         run: npx tsx src/scripts/check-image-exists.ts
 
       - name: Generate tags for the kubevirt-plugin image
@@ -259,7 +274,7 @@ jobs:
         if: steps.check_image.outputs.IMAGE_EXISTS == 'false'
         env:
           LABELS: ${{ steps.meta.outputs.labels }}
-        working-directory: ci-scripts/hot-cluster/ts
+        working-directory: .hc-infra/ci-scripts/hot-cluster/ts
         run: npx tsx src/scripts/build-and-push-image.ts
 
   # Runs in parallel with run-gating-tests (never gates it -- a hang here
@@ -383,14 +398,37 @@ jobs:
           checkout-ref: ${{ inputs.checkout_ref }}
           pr-number: ${{ inputs.pr_number }}
 
+      # ci-scripts/hot-cluster exists only on main; a release-branch checkout
+      # above has none of it. Overlay the infra from the ref this run was
+      # dispatched at (github.sha -- main's tip in production, the fix branch
+      # during a workflow_dispatch validation) into an isolated subdir.
+      # GITHUB_WORKSPACE stays pointed at the product checkout at the workspace
+      # root, so the test runner still runs the branch's own specs.
+      - name: Overlay hot-cluster CI infra from main
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          sparse-checkout: ci-scripts/hot-cluster
+          path: .hc-infra
+          clean: false
+
+      # The overlay is a fresh sparse checkout with no node_modules; install
+      # the infra scripts' deps (tsx, @kubernetes/client-node, ...) before any
+      # overlay TS script runs. These deps live only in the infra package.json,
+      # not the product root, so they can't resolve via upward module lookup.
+      - name: Install infra script dependencies
+        working-directory: .hc-infra/ci-scripts/hot-cluster/ts
+        run: npm ci --ignore-scripts --no-audit
+
       # Folded in from a former standalone "Check Runner Image" job (same
       # runner) to drop a merge-box row; also fails fast before spending
-      # any real test-environment cost. Must run after Checkout -- it
-      # shells out to a script under ci-scripts/hot-cluster/ts, which
-      # doesn't exist on the runner until the repo is checked out.
+      # any real test-environment cost. Must run after the infra overlay --
+      # it shells out to a script under ci-scripts/hot-cluster/ts, served
+      # from .hc-infra.
       - name: Log environment, versions, and HCO operands
         continue-on-error: true
-        working-directory: ci-scripts/hot-cluster/ts
+        working-directory: .hc-infra/ci-scripts/hot-cluster/ts
         run: npx tsx src/scripts/log-env-summary.ts
 
       - name: Provision CI test environment
@@ -406,11 +444,11 @@ jobs:
           user-settings-location: ${{ env.TEST_ENGINE == 'cypress' && 'configmap' || '' }}
 
       - name: Create test secret
-        working-directory: ci-scripts/hot-cluster/ts
+        working-directory: .hc-infra/ci-scripts/hot-cluster/ts
         run: npx tsx src/scripts/create-test-secret.ts
 
       - name: Seed kubevirt-user-settings ConfigMap
-        working-directory: ci-scripts/hot-cluster/ts
+        working-directory: .hc-infra/ci-scripts/hot-cluster/ts
         run: npx tsx src/scripts/seed-user-settings.ts
 
       - name: Install dependencies
@@ -420,7 +458,12 @@ jobs:
           if [[ "${TEST_ENGINE}" == "cypress" ]]; then
             npx cypress install
           else
-            npm run playwright-install
+            # A branch predating the Playwright migration may not define the
+            # playwright-install script; npm run exits non-zero when it's
+            # absent, so fall back to installing the browser directly.
+            # (Don't use --if-present: it exits 0 when missing, so the
+            # fallback would never fire.)
+            npm run playwright-install 2>/dev/null || npx playwright install chromium
           fi
 
       - name: Install GH script dependencies
@@ -445,13 +488,13 @@ jobs:
           BRIDGE_BASE_ADDRESS: ${{ steps.ci-env.outputs.bridge-base-address }}
           TEST_PROJECT: ${{ inputs.test_project || 'gating' }}
           TEST_ARGS: ${{ inputs.test_args || '' }}
-        working-directory: ci-scripts/hot-cluster/ts
+        working-directory: .hc-infra/ci-scripts/hot-cluster/ts
         run: npx tsx src/scripts/run-gating-tests.ts
 
       - name: Extract test failure summary
         id: test-summary
         if: always()
-        working-directory: ci-scripts/hot-cluster/ts
+        working-directory: .hc-infra/ci-scripts/hot-cluster/ts
         env:
           BRIDGE_BASE_ADDRESS: ${{ steps.ci-env.outputs.bridge-base-address }}
           CONSOLE_ROUTE: ${{ steps.ci-env.outputs.console-route }}
@@ -470,7 +513,7 @@ jobs:
       - name: e2e CI diagnostics - Collect pod logs
         if: always()
         continue-on-error: true
-        working-directory: ci-scripts/hot-cluster/ts
+        working-directory: .hc-infra/ci-scripts/hot-cluster/ts
         run: npx tsx src/scripts/collect-diagnostics.ts
 
       - name: e2e CI diagnostics - Collect cluster info (on failure)
@@ -478,7 +521,7 @@ jobs:
         continue-on-error: true
         env:
           COLLECT_CLUSTER_INFO: 'true'
-        working-directory: ci-scripts/hot-cluster/ts
+        working-directory: .hc-infra/ci-scripts/hot-cluster/ts
         run: npx tsx src/scripts/collect-diagnostics.ts
 
       - name: e2e CI diagnostics - Upload artifacts
@@ -493,7 +536,7 @@ jobs:
       - name: Clean up test entities
         if: always()
         continue-on-error: true
-        working-directory: ci-scripts/hot-cluster/ts
+        working-directory: .hc-infra/ci-scripts/hot-cluster/ts
         run: npx tsx src/scripts/test-cleanup.ts
 
       - name: Release CI test environment

@@ -1,8 +1,13 @@
 node_modules/
+**/node_modules
 .cursor/
 .github/
 .husky/
 .vscode/
+
+# Hot-cluster CI infra overlaid at build time from main (see
+# build-and-push-image.ts); never part of the product image.
+.hc-infra/
 
 coverage/
 cypress/

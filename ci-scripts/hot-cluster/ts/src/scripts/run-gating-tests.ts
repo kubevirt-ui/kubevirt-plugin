@@ -48,6 +48,13 @@ const main = async (): Promise<void> => {
   }
   const testArgs = parseTestArgs(process.env.TEST_ARGS ?? '');
 
+  // The product repo root (where package.json and the test specs live). This
+  // script is invoked from the infra overlay dir (.hc-infra/ci-scripts/...),
+  // so every test command must run from here, not the script's own cwd.
+  const repoRoot =
+    process.env.GITHUB_WORKSPACE ??
+    execFileSync('git', ['rev-parse', '--show-toplevel'], { encoding: 'utf8' }).trim();
+
   if (testEngine === 'cypress') {
     const testNs = requireEnv('TEST_NS');
     const osImagesNs = requireEnv('OS_IMAGES_NS');
@@ -62,14 +69,15 @@ const main = async (): Promise<void> => {
       CYPRESS_TEST_SECRET_NAME: testSecretName,
     };
 
-    execSync(`oc project "${testNs}"`, { env, stdio: 'inherit' });
+    execSync(`oc project "${testNs}"`, { cwd: repoRoot, env, stdio: 'inherit' });
 
     const spec = resolveCypressSpec(testProject);
-    execSync(`npm run test-cypress-headless -- --spec ${spec}`, { env, stdio: 'inherit' });
+    execSync(`npm run test-cypress-headless -- --spec ${spec}`, {
+      cwd: repoRoot,
+      env,
+      stdio: 'inherit',
+    });
   } else {
-    const repoRoot =
-      process.env.GITHUB_WORKSPACE ??
-      execFileSync('git', ['rev-parse', '--show-toplevel'], { encoding: 'utf8' }).trim();
     const playwrightProject = resolvePlaywrightProject(testProject);
     if (playwrightProject === 'auto' && testArgs.length === 0) {
       throw new Error(
