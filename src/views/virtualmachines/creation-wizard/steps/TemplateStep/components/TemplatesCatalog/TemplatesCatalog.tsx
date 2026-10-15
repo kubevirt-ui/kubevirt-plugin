@@ -8,6 +8,7 @@ import { PageSection, Stack } from '@patternfly/react-core';
 import useVMWizardStore from '@virtualmachines/creation-wizard/state/vm-wizard-store/useVMWizardStore';
 import TemplatesCatalogEmptyState from '@virtualmachines/creation-wizard/steps/TemplateStep/components/TemplatesCatalog/components/TemplatesCatalogEmptyState';
 import TemplatesCatalogItems from '@virtualmachines/creation-wizard/steps/TemplateStep/components/TemplatesCatalog/components/TemplatesCatalogItems/TemplatesCatalogItems';
+import TemplatesCatalogRadioFilters from '@virtualmachines/creation-wizard/steps/TemplateStep/components/TemplatesCatalog/components/TemplatesCatalogRadioFilters/TemplatesCatalogRadioFilters';
 import CatalogSkeleton from '@virtualmachines/creation-wizard/steps/TemplateStep/components/TemplatesCatalog/components/TemplatesCatalogSkeleton';
 import TemplatesToolbar from '@virtualmachines/creation-wizard/steps/TemplateStep/components/TemplatesCatalog/components/TemplatesToolbar/TemplatesToolbar';
 import useHideDeprecatedTemplateTiles from '@virtualmachines/creation-wizard/steps/TemplateStep/components/TemplatesCatalog/hooks/useHideDeprecatedTemplateTiles';
@@ -49,6 +50,7 @@ const TemplatesCatalog: FC = () => {
       {loaded ? (
         <div>
           <TemplatesToolbar filters={filters} onFilterChange={onFilterChange} />
+          <TemplatesCatalogRadioFilters filters={filters} onFilterChange={onFilterChange} />
           <Stack className="co-catalog-page__content">
             {!isEmpty(filteredTemplates) ? (
               <TemplatesCatalogItems
