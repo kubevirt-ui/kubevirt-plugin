@@ -79,7 +79,7 @@ const TemplatesCatalogTile: FC<TemplatesCatalogTileProps> = memo(
                   </SplitItem>
                 )}
                 <SplitItem>
-                  <div className="pf-v6-u-font-weight-bold">{displayName}</div>
+                  <div className="pf-v6-u-font-weight-bold">{templateName}</div>
                 </SplitItem>
                 <SplitItem isFilled />
                 <SplitItem>
