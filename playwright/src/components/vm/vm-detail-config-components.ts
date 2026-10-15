@@ -319,6 +319,7 @@ export class VirtualMachineDetailConfigurationComponent extends BaseComponent {
   private readonly _dataVolumeDetails = this.locator('text=DataVolume details');
   private readonly _evictionStrategyElement = this.testId('eviction-strategy');
   private readonly _headlessCheckbox = this.locator('input[id="headless-mode"]');
+  private readonly _vsockSwitch = this.locator('#enable-vsock');
   private readonly _pendingStatusMessage = getPendingStatusMessageLocator(this.page);
   private readonly _restoreTemplateSettingsBtn = this.locator(
     'button:has-text("Restore template settings")',
@@ -876,6 +877,20 @@ export class VirtualMachineDetailConfigurationComponent extends BaseComponent {
     } catch {
       return false;
     }
+  }
+
+  async setVsockEnabled(enabled: boolean): Promise<void> {
+    await this._vsockSwitch.waitFor({ state: 'visible', timeout: TestTimeouts.VM_CREATION });
+    if (enabled) {
+      await this._vsockSwitch.check({ force: true });
+    } else {
+      await this._vsockSwitch.uncheck({ force: true });
+    }
+    await this.page.waitForTimeout(TestTimeouts.UI_DELAY_EXTRA);
+  }
+
+  async isVsockToggleVisible(): Promise<boolean> {
+    return this._vsockSwitch.isVisible().catch(() => false);
   }
 
   async verifyHostname(vmName: string, expectedHostname: string): Promise<boolean> {

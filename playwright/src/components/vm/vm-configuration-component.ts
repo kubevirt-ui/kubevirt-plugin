@@ -15,6 +15,8 @@ export default class VmConfigurationComponent extends PageCommons {
 
   private readonly _headlessCheckbox = this.locator('input[id="headless-mode"]');
 
+  private readonly _vsockSwitch = this.locator('#enable-vsock');
+
   private readonly _pendingStatusMessage = getPendingStatusMessageLocator(this.page);
 
   private readonly _restoreTemplateSettingsBtn = this.locator(
@@ -649,6 +651,20 @@ export default class VmConfigurationComponent extends PageCommons {
 
   async verifyHeadlessMode(): Promise<boolean> {
     return await super.verifyTextVisible('Headless mode');
+  }
+
+  async setVsockEnabled(enabled: boolean): Promise<void> {
+    await this._vsockSwitch.waitFor({ state: 'visible', timeout: TestTimeouts.VM_CREATION });
+    if (enabled) {
+      await this._vsockSwitch.check({ force: true });
+    } else {
+      await this._vsockSwitch.uncheck({ force: true });
+    }
+    await this.page.waitForTimeout(TestTimeouts.UI_DELAY_EXTRA);
+  }
+
+  async isVsockToggleVisible(): Promise<boolean> {
+    return this._vsockSwitch.isVisible().catch(() => false);
   }
 
   async verifyHostname(vmName: string, expectedHostname: string): Promise<boolean> {

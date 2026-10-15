@@ -23,6 +23,7 @@ export const getHardwarePendingChanges = ({
     modifiedHeadlessMode,
     modifiedHostDevices,
     modifiedVolumesHotplug,
+    modifiedVSOCK,
     startStrategyChanged,
     t,
     vm,
@@ -143,7 +144,13 @@ export const getHardwarePendingChanges = ({
   },
   {
     ...createProps(VirtualMachineDetailsTab.Details),
+    hasPendingChange: modifiedVSOCK,
+    label: t('Enable VSOCK'),
+  },
+  {
+    ...createProps(VirtualMachineDetailsTab.Details),
     hasPendingChange: modifiedGuestSystemAccessLog,
+    // eslint-disable-next-line max-lines
     label: t('Guest system log access'),
   },
 ];

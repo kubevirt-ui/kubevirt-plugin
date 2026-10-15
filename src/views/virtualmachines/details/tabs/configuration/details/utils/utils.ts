@@ -16,5 +16,6 @@ export {
   updatedVirtualMachine,
   updateGuestSystemAccessLog,
   updateHeadlessMode,
+  updateVSOCK,
   updateWorkload,
 } from './vmUpdateUtils';
