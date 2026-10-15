@@ -8,7 +8,9 @@
  */
 
 import { execFileSync } from 'node:child_process';
-import { appendFileSync } from 'node:fs';
+import { appendFileSync, existsSync, readFileSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 
 import { requireEnv } from '../kube-client';
 
@@ -37,7 +39,29 @@ const main = async (): Promise<void> => {
   const repoRoot =
     process.env.GITHUB_WORKSPACE ??
     execFileSync('git', ['rev-parse', '--show-toplevel'], { encoding: 'utf8' }).trim();
-  const buildArgs = ['build', ...labelArgs, '-t', image, '-f', `${repoRoot}/Dockerfile`, repoRoot];
+  // Exclude the infra overlay (and any nested node_modules) from the build
+  // context without discarding the branch's own .dockerignore rules. The
+  // overlay (.hc-infra) sits under repoRoot, so it would otherwise be copied
+  // into the builder stage. Merge the branch's existing ignore file (if any)
+  // with our extra patterns into a temp ignorefile and point podman at it --
+  // branch-independent, since release branches may have no .dockerignore.
+  const branchIgnore = existsSync(`${repoRoot}/.dockerignore`)
+    ? readFileSync(`${repoRoot}/.dockerignore`, 'utf8')
+    : '';
+  const ignoreFile = join(tmpdir(), 'hc-build.dockerignore');
+  writeFileSync(ignoreFile, `${branchIgnore}\n.hc-infra\n**/node_modules\n`);
+
+  const buildArgs = [
+    'build',
+    '--ignorefile',
+    ignoreFile,
+    ...labelArgs,
+    '-t',
+    image,
+    '-f',
+    `${repoRoot}/Dockerfile`,
+    repoRoot,
+  ];
   console.log(`Building: ${image}`);
   execFileSync('podman', buildArgs, { stdio: 'inherit' });
 
