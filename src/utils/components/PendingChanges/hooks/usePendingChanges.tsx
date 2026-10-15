@@ -38,6 +38,7 @@ import {
   getChangedStartStrategy,
   getChangedTolerations,
   getChangedVolumesHotplug,
+  getChangedVSOCK,
 } from '../utils/helpers';
 import { type PendingChange } from '../utils/types';
 import { buildPendingChanges } from './buildPendingChanges';
@@ -97,6 +98,7 @@ export const usePendingChanges = (
     modifiedHostDevices: getChangedHostDevices(vm, vmi),
     modifiedNICs: getChangedNICs(vm, vmi),
     modifiedVolumesHotplug: getChangedVolumesHotplug(vm, vmi),
+    modifiedVSOCK: getChangedVSOCK(vm, vmi),
     navigate,
     nodeSelectorChanged: getChangedNodeSelector(vm, vmi),
     sshServiceChanged: getChangedAuthorizedSSHKey(vm, vmi),

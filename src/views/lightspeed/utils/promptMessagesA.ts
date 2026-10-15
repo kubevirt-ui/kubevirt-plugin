@@ -65,6 +65,8 @@ export const STATIC_PROMPT_MESSAGES_A: Partial<Record<OLSPromptType, string>> = 
     'Provide a detailed explanation of persistent SCSI reservation for VirtualMachine disks in OpenShift Virtualization.',
   [OLSPromptType.ENABLE_PREALLOCATION]:
     'Provide a detailed explanation of preallocation in OpenShift Virtualization.',
+  [OLSPromptType.ENABLE_VSOCK]:
+    'Provide a detailed explanation of VSOCK (VM Sockets) in the context of OpenShift Virtualization. Explain how enabling autoattachVSOCK provides fast guest-host communication without requiring a network interface, its use cases such as virtctl guest commands, and the requirement for the VSOCK feature gate to be enabled at the cluster level.',
   [OLSPromptType.ENVIRONMENT_VARS]:
     'Explain the process of adding environment variables to a VirtualMachine from existing ConfigMaps, Secrets, or ServiceAccounts as disks in OpenShiftVirtualization.',
   [OLSPromptType.FENCE_AGENTS_REMEDIATION_OPERATOR_ALTERNATIVES]:

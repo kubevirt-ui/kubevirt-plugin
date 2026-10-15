@@ -9,6 +9,7 @@ import HeadlessMode from '@kubevirt-utils/components/HeadlessMode/HeadlessMode';
 import HostnameModal from '@kubevirt-utils/components/HostnameModal/HostnameModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
+import VSOCKDetailsDescriptionItem from '@kubevirt-utils/components/VSOCKDetailsDescriptionItem/VSOCKDetailsDescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { Switch } from '@patternfly/react-core';
@@ -16,7 +17,12 @@ import DeletionProtectionModal from '@virtualmachines/details/tabs/configuration
 import { VMDeletionProtectionOptions } from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/utils/types';
 import { setDeletionProtectionForVM } from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/utils/utils';
 
-import { updatedHostname, updateGuestSystemAccessLog, updateHeadlessMode } from '../utils/utils';
+import {
+  updatedHostname,
+  updateGuestSystemAccessLog,
+  updateHeadlessMode,
+  updateVSOCK,
+} from '../utils/utils';
 
 type DetailsSectionAccessItemsProps = {
   canUpdateVM: boolean;
@@ -82,6 +88,12 @@ const DetailsSectionAccessItems: FC<DetailsSectionAccessItemsProps> = ({
         olsObj={vm}
         promptType={OLSPromptType.HEADLESS_MODE}
       />
+      <VSOCKDetailsDescriptionItem
+        disabledTooltipText={t("You don't have permission to update this virtual machine")}
+        isDisabled={!canUpdateVM}
+        updateVSOCK={(checked) => updateVSOCK(vm, checked)}
+        vm={vm}
+      />
       <DescriptionItem
         bodyContent={t(
           'Applying the start/pause mode to this virtual machine will cause it to partially reboot and pause.',
@@ -142,6 +154,7 @@ const DetailsSectionAccessItems: FC<DetailsSectionAccessItemsProps> = ({
       />
     </>
   );
+  // eslint-disable-next-line max-lines
 };
 
 export default DetailsSectionAccessItems;
