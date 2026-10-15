@@ -21,6 +21,7 @@ import { ListPageBody } from '@openshift-console/dynamic-plugin-sdk';
 import { Pagination } from '@patternfly/react-core';
 
 import { getClusterInstancetypeColumns } from './clusterInstancetypeDefinition';
+import FamilyAvailabilitySection from './components/FamilyAvailabilitySection/FamilyAvailabilitySection';
 
 import '@kubevirt-utils/styles/list-managment-group.scss';
 
@@ -72,6 +73,7 @@ const ClusterInstancetypeList: FC<ListPageProps> = ({
 
   return (
     <ListPageBody>
+      <FamilyAvailabilitySection />
       <div className="list-managment-group">
         <KubevirtFilterToolbar
           clearAllFilters={clearAllFilters}

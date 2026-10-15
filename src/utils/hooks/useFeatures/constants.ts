@@ -27,6 +27,7 @@ export const PASST_UDN_NETWORK = 'passtUDNNetwork';
 export const VM_TEMPLATES = 'vmTemplates';
 export const AUTO_APPLIED_LABELS = 'autoAppliedLabels';
 export const CONTROL_DEFAULT_VIRTUALIZATION_PERMISSIONS = 'controlDefaultVirtualizationPermissions';
+export const DISABLED_INSTANCE_TYPE_FAMILIES = 'disabledInstanceTypeFamilies';
 
 export const FEATURES_CONFIG_MAP_NAME = 'kubevirt-ui-features';
 const FEATURES_ROLE_NAME = 'kubevirt-ui-features-reader';
@@ -42,6 +43,7 @@ export const FEATURES_CONFIG_MAP_INITIAL_DATA: Record<string, string> = {
   [CONFIRM_VM_ACTIONS]: 'false',
   [CONTROL_DEFAULT_VIRTUALIZATION_PERMISSIONS]: 'false',
   [DISABLED_GUEST_SYSTEM_LOGS_ACCESS]: 'false',
+  [DISABLED_INSTANCE_TYPE_FAMILIES]: '[]',
   [HIDE_CREDENTIALS_NON_PRIVILEGED]: 'false',
   [HIDE_YAML_TAB]: 'false',
   [KUBEVIRT_APISERVER_PROXY]: 'true',

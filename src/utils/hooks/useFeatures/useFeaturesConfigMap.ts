@@ -2,7 +2,6 @@ import { ConfigMapModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import type { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { operatorNamespaceSignal } from '@kubevirt-utils/store/operatorNamespace';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
-import type { WatchK8sResult } from '@openshift-console/dynamic-plugin-sdk';
 import { getGroupVersionKindForModel } from '@openshift-console/dynamic-plugin-sdk';
 
 import { useCanListNamespaces } from '../useCanListNamespaces';
@@ -13,7 +12,7 @@ type UseFeaturesConfigMap = (
   cluster?: string,
   enableQuery?: boolean,
 ) => {
-  featuresConfigMapData: WatchK8sResult<IoK8sApiCoreV1ConfigMap>;
+  featuresConfigMapData: [IoK8sApiCoreV1ConfigMap, boolean, Error | undefined];
   isAdmin: boolean;
 };
 

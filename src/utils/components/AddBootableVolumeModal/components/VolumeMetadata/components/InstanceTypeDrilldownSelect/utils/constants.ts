@@ -42,7 +42,6 @@ export const initialMenuItems: InstanceTypesMenuItemsData = {
 // Note: series labels are generated via getSeriesLabel() at render time using t('{{symbol}} series', { symbol })
 export const instanceTypeSeriesNameMapper: {
   [key in InstanceTypeSeries]: {
-    disabled?: boolean;
     Icon: ComponentClass;
   };
 } = {
