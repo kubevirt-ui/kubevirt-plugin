@@ -17,6 +17,11 @@ inputs:
 
 runs:
   using: composite
+  # The infra scripts are served from the .hc-infra overlay (checked out from
+  # main by the calling job), not the product checkout -- a release branch's
+  # product tree has no ci-scripts/hot-cluster/ts. This action is only invoked
+  # by hot-cluster-e2e-run.yml's run-gating-tests job, which creates that
+  # overlay before calling here.
   steps:
     - name: Release environment
       shell: bash
@@ -24,5 +29,5 @@ runs:
         CM_NAME: ${{ inputs.configmap-name }}
         CM_NS: ${{ inputs.ci-env-namespace }}
         TIMEOUT: ${{ inputs.timeout }}
-      working-directory: ci-scripts/hot-cluster/ts
+      working-directory: .hc-infra/ci-scripts/hot-cluster/ts
       run: npx tsx src/scripts/ci-env-release.ts
