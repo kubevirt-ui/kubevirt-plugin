@@ -44,6 +44,7 @@ export const createVMTemplateRequest = async ({
       ...(!isEmpty(category) && {
         templateLabels: { [TEMPLATE_CATEGORY_LABEL]: category },
       }),
+      ttlSecondsAfterFinished: 0,
       virtualMachineRef: {
         name: getName(vm),
         namespace: getNamespace(vm),
