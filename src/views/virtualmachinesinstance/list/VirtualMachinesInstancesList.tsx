@@ -1,5 +1,6 @@
 import * as React from 'react';
 
+import { VirtualMachineInstanceModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { V1VirtualMachineInstance } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -35,11 +36,11 @@ const VirtualMachinesInstancesList: React.FC<VirtualMachinesInstancesListProps> 
 
   const [vmis, loaded, loadError] = useK8sWatchData<V1VirtualMachineInstance[]>({
     cluster,
+    groupVersionKind: VirtualMachineInstanceModelGroupVersionKind,
     isList: true,
-    kind,
     namespace,
   });
-  const [data, filteredData, onFilterChange] = useListPageFilter(vmis, filters);
+  const [data, filteredData, onFilterChange] = useListPageFilter(vmis ?? [], filters);
   const columns = useVirtualMachinesInstancesColumns();
 
   return (
@@ -47,20 +48,20 @@ const VirtualMachinesInstancesList: React.FC<VirtualMachinesInstancesListProps> 
       <ListPageHeader title={t('VirtualMachineInstances')} />
       <ListPageBody>
         <ListPageFilter
-          data={data}
+          data={data ?? []}
           loaded={loaded}
           onFilterChange={onFilterChange}
           rowFilters={filters}
         />
         <VirtualizedTable<K8sResourceCommon>
           columns={columns}
-          data={filteredData}
+          data={filteredData ?? []}
           EmptyMsg={() => <VirtualMachineInstanceEmptyState catalogURL={catalogURL} />}
           loaded={loaded}
           loadError={loadError}
           Row={VirtualMachinesInstancesRow}
           rowData={{ kind }}
-          unfilteredData={data}
+          unfilteredData={data ?? []}
         />
       </ListPageBody>
     </>
