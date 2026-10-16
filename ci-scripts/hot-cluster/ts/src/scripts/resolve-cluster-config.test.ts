@@ -71,14 +71,21 @@ describe('resolveClusterConfig', () => {
   it('clamps a below-range release branch to the min version and unpins CNV', () => {
     const config = resolveClusterConfig({ baseRef: 'release-4.12' });
     assert.equal(config.clusterName, 'kubevirt-plugin-412');
-    assert.equal(config.openshiftVersion, '4.18_openshift');
+    assert.equal(config.openshiftVersion, '4.20_openshift');
     assert.equal(config.cnvPinVersion, '');
   });
 
-  it('keeps the min boundary (4.18) unchanged and pinned', () => {
+  it('clamps 4.18 (below the 4.20 VPC/CNI floor) up to the min version and unpins CNV', () => {
     const config = resolveClusterConfig({ baseRef: 'release-4.18' });
-    assert.equal(config.openshiftVersion, '4.18_openshift');
-    assert.equal(config.cnvPinVersion, '4.18');
+    assert.equal(config.clusterName, 'kubevirt-plugin-418');
+    assert.equal(config.openshiftVersion, '4.20_openshift');
+    assert.equal(config.cnvPinVersion, '');
+  });
+
+  it('keeps the min boundary (4.20) unchanged and pinned', () => {
+    const config = resolveClusterConfig({ baseRef: 'release-4.20' });
+    assert.equal(config.openshiftVersion, '4.20_openshift');
+    assert.equal(config.cnvPinVersion, '4.20');
   });
 
   it('keeps the max boundary (4.22) unchanged and pinned', () => {
