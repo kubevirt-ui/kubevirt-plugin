@@ -49,18 +49,25 @@ type HCOWorkloadSourcesSpec = {
   enableCommonBootImageImport?: boolean;
 };
 
-type HyperConvergedSpecCommon = {
-  applicationAwareConfig?: {
-    allowApplicationAwareClusterResourceQuota?: boolean;
-    vmiCalcConfigName?: CalculationMethod;
-  };
-  enableApplicationAwareQuota?: boolean;
+type HCOApplicationAwareConfigV1Beta1 = {
+  allowApplicationAwareClusterResourceQuota?: boolean;
+  vmiCalcConfigName?: CalculationMethod;
 };
 
-export type HyperConvergedSpecV1Beta1 = HyperConvergedSpecCommon & {
+type HCOApplicationAwareConfigV1 = HCOApplicationAwareConfigV1Beta1 & {
+  enable?: boolean;
+};
+
+type HCODeploymentSpec = {
+  applicationAwareConfig?: HCOApplicationAwareConfigV1;
+};
+
+export type HyperConvergedSpecV1Beta1 = {
+  applicationAwareConfig?: HCOApplicationAwareConfigV1Beta1;
   commonBootImageNamespace?: string;
   commonTemplatesNamespace?: string;
   dataImportCronTemplates?: K8sResourceCommon[];
+  enableApplicationAwareQuota?: boolean;
   enableCommonBootImageImport?: boolean;
   evictionStrategy?: string;
   featureGates?: HCOFeatureGatesV1Beta1;
@@ -74,7 +81,8 @@ export type HyperConvergedSpecV1Beta1 = HyperConvergedSpecCommon & {
   virtualMachineOptions?: { disableSerialConsoleLog?: string };
 };
 
-export type HyperConvergedSpecV1 = HyperConvergedSpecCommon & {
+export type HyperConvergedSpecV1 = {
+  deployment?: HCODeploymentSpec;
   featureGates?: HCOFeatureGateEntry[];
   virtualization?: HCOVirtualizationSpec;
   workloadSources?: HCOWorkloadSourcesSpec;

@@ -30,10 +30,15 @@ const getWorkloadSourcesSpec = (
 
 export const getAAQCalculationMethod = (
   hyperConverge: HyperConverged | undefined,
-): CalculationMethod | undefined => hyperConverge?.spec?.applicationAwareConfig?.vmiCalcConfigName;
+): CalculationMethod | undefined =>
+  isHyperConvergedV1(hyperConverge)
+    ? hyperConverge?.spec?.deployment?.applicationAwareConfig?.vmiCalcConfigName
+    : hyperConverge?.spec?.applicationAwareConfig?.vmiCalcConfigName;
 
 export const isAAQEnabled = (hyperConverge: HyperConverged | undefined): boolean =>
-  Boolean(hyperConverge?.spec?.enableApplicationAwareQuota);
+  isHyperConvergedV1(hyperConverge)
+    ? Boolean(hyperConverge?.spec?.deployment?.applicationAwareConfig?.enable)
+    : Boolean(hyperConverge?.spec?.enableApplicationAwareQuota);
 
 export const getHyperconvergedConfiguration = (
   hyperConverged: KubevirtHyperconverged | undefined,

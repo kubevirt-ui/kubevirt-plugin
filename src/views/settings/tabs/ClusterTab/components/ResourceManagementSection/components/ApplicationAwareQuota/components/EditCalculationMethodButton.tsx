@@ -27,8 +27,10 @@ const EditCalculationMethodButton: FC<EditCalculationMethodButtonProps> = ({
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
 
+  const selectedLabel = calculationMethodContentMapper[selectedCalculationMethod]?.label;
+
   const onClick = (): void => {
-    createModal(({ isOpen, onClose }) => (
+    createModal?.(({ isOpen, onClose }) => (
       <EditCalculationMethodModal
         calculationMethodContentMapper={calculationMethodContentMapper}
         hyperConverge={hyperConverge}
@@ -47,7 +49,9 @@ const EditCalculationMethodButton: FC<EditCalculationMethodButtonProps> = ({
       position={PopoverPosition.right}
       triggerAction="hover"
     >
-      <EditButton onClick={onClick} variant={ButtonVariant.link} />
+      <EditButton onClick={onClick} variant={ButtonVariant.link}>
+        {selectedLabel}
+      </EditButton>
     </Popover>
   );
 };

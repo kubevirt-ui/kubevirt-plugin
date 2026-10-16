@@ -4,6 +4,10 @@ import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { type HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getHyperConvergedModelFromResource } from '@kubevirt-utils/resources/hyperconverged/model';
+import {
+  buildHyperConvergedPatch,
+  getAAQCalculationMethodPatchPath,
+} from '@kubevirt-utils/resources/hyperconverged/patchUtils';
 import { type CalculationMethod } from '@kubevirt-utils/resources/quotas/types';
 import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
 import { FormGroup, Radio } from '@patternfly/react-core';
@@ -38,13 +42,11 @@ const EditCalculationMethodModal: FC<EditCalculationMethodModalProps> = ({
     }
     await kubevirtK8sPatch<HyperConverged>({
       cluster,
-      data: [
-        {
-          op: 'replace',
-          path: '/spec/applicationAwareConfig/vmiCalcConfigName',
-          value: checkedMethod,
-        },
-      ],
+      data: buildHyperConvergedPatch(hyperConverge, {
+        op: 'replace',
+        path: getAAQCalculationMethodPatchPath(hyperConverge),
+        value: checkedMethod,
+      }),
       model: getHyperConvergedModelFromResource(hyperConverge),
       resource: hyperConverge,
     });
