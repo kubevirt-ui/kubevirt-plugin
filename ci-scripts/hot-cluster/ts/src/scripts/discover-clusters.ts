@@ -67,8 +67,11 @@ const main = async (): Promise<void> => {
 
   // --- ROKS clusters ---
   console.log('=== Discovering ROKS clusters ===');
+  // --provider vpc-gen2 is required: `oc cluster ls --output json` without it
+  // returns only classic clusters ([] for our all-VPC fleet), even though the
+  // plain-text listing shows them. Matches detect-matching-clusters.ts.
   const roksClusters = execJson<Array<{ name?: string }>>(
-    'ibmcloud oc cluster ls --output json 2>/dev/null',
+    'ibmcloud oc cluster ls --provider vpc-gen2 --output json 2>/dev/null',
     [],
   );
   const roksNames = roksClusters
