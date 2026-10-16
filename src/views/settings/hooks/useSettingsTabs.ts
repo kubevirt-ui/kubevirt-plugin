@@ -18,7 +18,8 @@ export const useSettingsTabs = (): {
   const navigate = useNavigate();
   const location = useLocation();
   const settingsCluster = useSettingsCluster();
-  const [canManageClusterSettings] = useCanManageClusterSettings(settingsCluster);
+  const [canManageClusterSettings, canManageClusterSettingsLoading] =
+    useCanManageClusterSettings(settingsCluster);
 
   const tabs = useMemo(
     () => getTabs(canManageClusterSettings, t).filter((tab) => tab.isEnabled),
@@ -64,14 +65,25 @@ export const useSettingsTabs = (): {
   );
 
   useEffect(() => {
-    const tabFromURL = getActiveTabFromURL();
-
-    if (tabFromURL) {
-      setActiveTab(tabFromURL);
-    } else {
-      redirectTab(tabs[0]?.name, true);
+    if (canManageClusterSettingsLoading) {
+      return;
     }
-  }, [getActiveTabFromURL, redirectTab, tabs]);
+
+    const defaultTabName = tabs[0]?.name;
+    if (!defaultTabName) {
+      return;
+    }
+
+    const tabFromURL = getActiveTabFromURL();
+    const enabledUrlTab = tabs.find((tab) => tab.name === tabFromURL)?.name;
+
+    if (enabledUrlTab) {
+      setActiveTab(enabledUrlTab);
+      return;
+    }
+
+    redirectTab(defaultTabName, true);
+  }, [canManageClusterSettingsLoading, getActiveTabFromURL, redirectTab, tabs]);
 
   return { activeTab, redirectTab, tabs };
 };
