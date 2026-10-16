@@ -1,6 +1,8 @@
 import { type FC, type ReactElement, useState } from 'react';
 
+import HidableTooltip from '@kubevirt-utils/components/HidableTooltip/HidableTooltip';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getNoModalChangesTooltip } from '@kubevirt-utils/utils/text';
 import {
   ActionGroup,
   Alert,
@@ -18,6 +20,7 @@ type EnvironmentFormActionsProps = {
   closeError: () => void;
   error?: Error | undefined;
   isSaveDisabled?: boolean;
+  noChangesMade?: boolean;
   onReload: () => void;
   onSave: () => Promise<unknown>;
 };
@@ -26,6 +29,7 @@ const EnvironmentFormActions: FC<EnvironmentFormActionsProps> = ({
   closeError,
   error,
   isSaveDisabled,
+  noChangesMade,
   onReload,
   onSave,
 }): ReactElement => {
@@ -81,15 +85,17 @@ const EnvironmentFormActions: FC<EnvironmentFormActionsProps> = ({
       </StackItem>
       <StackItem>
         <ActionGroup className="pf-v6-c-form">
-          <Button
-            data-test="save-button"
-            isDisabled={isSaveDisabled || loading}
-            isLoading={loading}
-            onClick={onSubmit}
-            type="submit"
-          >
-            {t('Save')}
-          </Button>
+          <HidableTooltip content={getNoModalChangesTooltip(t)} hidden={!noChangesMade}>
+            <Button
+              data-test="save-button"
+              isDisabled={noChangesMade || isSaveDisabled || loading}
+              isLoading={loading}
+              onClick={onSubmit}
+              type="submit"
+            >
+              {t('Save')}
+            </Button>
+          </HidableTooltip>
           <Button onClick={onReload} type="button" variant={ButtonVariant.secondary}>
             {t('Reload')}
           </Button>

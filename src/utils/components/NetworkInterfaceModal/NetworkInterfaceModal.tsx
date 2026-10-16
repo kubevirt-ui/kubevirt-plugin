@@ -2,6 +2,7 @@ import { type FC, useCallback, useEffect, useMemo, useState } from 'react';
 
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { useNoChangesMade } from '@kubevirt-utils/hooks/useNoChangesMade';
 import usePasstFeatureFlag from '@kubevirt-utils/hooks/usePasstFeatureFlag';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { getInterfaces } from '@kubevirt-utils/resources/vm';
@@ -20,7 +21,6 @@ import {
 import NetworkInterfaceAdvancedSettings from './components/NetworkInterfaceAdvancedSettings';
 import NetworkInterfaceModelSelect from './components/NetworkInterfaceModelSelect';
 import NetworkInterfaceNetworkSelect from './components/NetworkInterfaceNetworkSelect/NetworkInterfaceNetworkSelect';
-import { useNoChangesMade } from './hooks/useNoChangesMade';
 import { type NetworkInterfaceModalProps } from './types';
 import { interfaceModelType } from './utils/constants';
 import { getNetworkName } from './utils/helpers';

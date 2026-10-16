@@ -114,6 +114,7 @@ const EnvironmentForm: FC<EnvironmentFormProps> = ({
           closeError={() => setFormError(null)}
           error={formError}
           isSaveDisabled={!edited || !environments.every((env) => env.name)}
+          noChangesMade={!edited}
           onReload={() =>
             setTemporaryVM((draftVM) => {
               draftVM.spec = vm.spec;
