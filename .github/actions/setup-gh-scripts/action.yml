@@ -19,6 +19,13 @@ runs:
           ci-scripts/hot-cluster/js
           ci-scripts/hot-cluster/ts
         persist-credentials: false
+        # clean: false so this second checkout doesn't git-clean the workspace
+        # and wipe node_modules an earlier step already installed (e.g. the
+        # `npm ci` in ci-scripts/hot-cluster/ts in the teardown / auto-teardown
+        # jobs, whose later tsx steps would then fail "Cannot find module").
+        # Safe: every caller runs on a fresh GitHub-hosted runner, so there are
+        # no stale tracked files to clean on the first checkout.
+        clean: false
 
     - name: Setup Node
       uses: actions/setup-node@v6
