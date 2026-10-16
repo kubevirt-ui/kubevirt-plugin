@@ -16,6 +16,9 @@ export default class VmListComponent extends BaseComponent {
   private readonly _templateVmNameInput = this.testId('template-catalog-vm-name-input');
   private readonly _vmListSaveButton = this.testId('save-button');
   readonly _createButton = this.testId('item-create');
+  private readonly _pageHeadingCreateButton = this.testId('page-heading').locator(
+    '[data-test="item-create"]:not([disabled]):not([aria-disabled="true"])',
+  );
 
   constructor(page: Page) {
     super(page);
@@ -77,9 +80,16 @@ export default class VmListComponent extends BaseComponent {
   ) {
     switch (option) {
       case 'With YAML': {
-        await this.robustClick(this._createButton);
-        await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
-        await this.robustClick(this.locator('button[role="menuitem"]:has-text("With YAML")'));
+        // Wait for the enabled page-heading Create dropdown so we never click the
+        // empty-state Create button or a still-disabled header control.
+        const createButton = this._pageHeadingCreateButton;
+        await createButton.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
+        await this.robustClick(createButton);
+
+        // Wait for the "With YAML" menu item to render before clicking it.
+        const withYamlItem = this.locator('button[role="menuitem"]:has-text("With YAML")');
+        await withYamlItem.waitFor({ state: 'visible', timeout: TestTimeouts.SHORT_WAIT });
+        await this.robustClick(withYamlItem);
         break;
       }
       case 'From template': {
