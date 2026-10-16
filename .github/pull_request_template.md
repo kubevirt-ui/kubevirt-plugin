@@ -4,7 +4,7 @@ Thanks for creating a Pull Request 💖!
 Please read the following before submitting:
 - PR title MUST start with a Jira ticket ID: "CNV-XXXXX: short description"
   - For release branches: "[release-4.XX] CNV-XXXXX: short description"
-  - The Jira ticket must have: story points > 1, fix version set, component "CNV User Interface", product type set
+  - The Jira ticket must have: story points > 1, fix version set, component "CNV User Interface", activity type set, priority set (not Undefined)
 - PRs that adds new external dependencies might take a while to review.
 - PRs that modify `.cursor/`, `.claude/`, `.vscode/`, or `.github/scripts/` require **strict security review**, CodeRabbit approval of findings, and the **`ai-config-reviewed`** label before merge.
 - PRs that modify `locales/` require the **`i18n-reviewed`** label (`.github/OWNERS` via `/i18n-approved`) before merge.

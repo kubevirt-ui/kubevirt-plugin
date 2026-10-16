@@ -52,7 +52,7 @@ export type JiraIssueFields = {
   issuelinks: JiraIssueLink[];
   issuetype: JiraIssueType;
   labels: string[];
-  priority: JiraPriority;
+  priority: JiraPriority | null;
   reporter: JiraUser | null;
   status: JiraStatus;
   summary: string;

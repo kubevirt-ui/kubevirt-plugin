@@ -38,3 +38,5 @@ export const BLOCK_LABEL = 'do-not-merge/jira-invalid';
 export const SKIP_LABEL = 'skip-jira-check';
 export const CONFLICT_LABEL = 'do-not-merge/has-conflicts';
 export const MIN_STORY_POINTS = 2;
+/** Jira priority names that count as unset for PR validation (case-insensitive). */
+export const UNSET_JIRA_PRIORITY_NAMES = ['Undefined'];
