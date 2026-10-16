@@ -11,8 +11,8 @@ import {
 } from './constants';
 
 const galleryDepsDir = path.dirname(fileURLToPath(import.meta.url));
-export const projectRoot = path.resolve(galleryDepsDir, '../..');
-export const stubsDir = path.join(projectRoot, 'playwright/stubs');
+export const projectRoot = path.resolve(galleryDepsDir, '../../..');
+export const stubsDir = path.join(projectRoot, 'playwright/component-dependencies/stubs');
 
 const stubPath = (file: string): string => path.join(stubsDir, file);
 
@@ -132,12 +132,12 @@ export const getGalleryResolveAlias = (): Record<string, string> => ({
       'useIsVMTemplateFeatureEnabled-gallery.ts',
     ),
     alias(
-      'src/views/virtualmachines/wizard/hooks/useVMGenerationNavClick.ts',
-      'useVMGenerationNavClick-gallery.ts',
-    ),
-    alias(
       'src/views/virtualmachines/wizard/steps/TemplateStep/hooks/useCreateVMFromTemplate.ts',
       'useCreateVMFromTemplate-gallery.ts',
+    ),
+    alias(
+      'src/views/virtualmachines/wizard/hooks/useVMGenerationCoordinator/useTemplateVMGeneration.ts',
+      'useTemplateVMGeneration-gallery.ts',
     ),
     alias(
       'src/views/virtualmachines/wizard/steps/InstanceTypesSteps/GuestOSStep/components/PreferenceSelectMenu/hooks/usePreferenceSelectOptions/usePreferenceSelectOptions.ts',
@@ -196,8 +196,8 @@ export const resolveGalleryRequest = (request: string): string => {
     ['useInstanceTypesAndPreferences.ts', 'useInstanceTypesAndPreferences-gallery.ts'],
     ['useTemplatesWithAvailableSource.ts', 'useWizardTemplatesWithAvailableSource-gallery.ts'],
     ['useIsVMTemplateFeatureEnabled.ts', 'useIsVMTemplateFeatureEnabled-gallery.ts'],
-    ['useVMGenerationNavClick.ts', 'useVMGenerationNavClick-gallery.ts'],
     ['useCreateVMFromTemplate.ts', 'useCreateVMFromTemplate-gallery.ts'],
+    ['useTemplateVMGeneration.ts', 'useTemplateVMGeneration-gallery.ts'],
     ['usePreferenceSelectOptions.ts', 'usePreferenceSelectOptions-gallery.ts'],
     ['useOpenShiftTemplates.ts', 'useOpenShiftTemplates-gallery.ts'],
     ['useBootableVolumes.ts', 'useBootableVolumes-gallery.ts'],

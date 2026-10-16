@@ -25,6 +25,7 @@ const ignoresConfig = {
     'cypress/cypress-a11y-report.json',
     'locales/**',
     'playwright/**',
+    '.playwright-cli/**',
     '.github/**',
     'ci-scripts/**',
     '__mocks__/**',

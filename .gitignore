@@ -33,6 +33,7 @@ ci-scripts/generated/
 # Personal Cursor rules (not shared with team)
 .cursor/rules/personal-*.mdc
 test-results/
+junit-results/
 
 # Local Claude / agent tooling (not shared)
 .claude/

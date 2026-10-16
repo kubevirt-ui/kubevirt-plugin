@@ -5,14 +5,14 @@ import type { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import type { KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
 import type { PVCMapper, VMIMapper, VMIMMapper } from '@virtualmachines/utils/mappers';
-import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
+import { useVMWizardForm } from '@virtualmachines/wizard/form/VMWizardFormProvider';
 import { OBJECTS_FETCHING_LIMIT } from '@virtualmachines/utils';
 
 const emptyMapper = { mapper: {}, nodeNames: {} } as VMIMapper;
 
 /** Gallery: namespaced VM watch only (avoids fleet search / mapper stack on clone step). */
 export const useCloneSourceVMs = () => {
-  const { control } = useVMWizard();
+  const { control } = useVMWizardForm();
   const [cluster, targetNamespace] = useWatch({
     control,
     name: ['deployment.cluster', 'deployment.project'],

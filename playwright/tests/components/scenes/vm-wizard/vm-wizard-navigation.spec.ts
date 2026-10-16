@@ -1,176 +1,146 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from '@component-deps/fixtures/scene-component-fixture';
 
-import { WizardSceneStep } from '../../../../stories/wizard-scene-constants';
-import {
-  clickWizardBack,
-  clickWizardNext,
-  completeBootSourceStep,
-  completeComputeResourcesStep,
-  completeDeploymentDetailsForNamedFlows,
-  completeGuestOsStep,
-  expectGuestOsPreferenceToggle,
-  expectGuestOsTileSelected,
-  selectGuestOsTile,
-  expectWizardBackEnabled,
-  expectWizardNavItemEnabled,
-  expectWizardNextEnabled,
-  expectWizardStepActive,
-  expectWizardStepInactive,
-  fillWizardVmName,
-  jumpToWizardNavStep,
-  selectCloneSourceVm,
-  selectCreationMethod,
-  vmNameInput,
-  WIZARD_STORY,
-} from './wizard-flow-helpers';
+import { WizardSceneStep } from '@component-deps/stories/wizard-scene-constants';
 
 test.describe.configure({ mode: 'serial' });
 
 test.describe('VM wizard — creation method and deployment UI', () => {
-  test('clone method hides name field and allows Next without a VM name', async ({ mount }) => {
-    const root = await mount(WIZARD_STORY);
-    await selectCreationMethod(root, 'clone');
+  test('clone method hides name field and allows Next without a VM name', async ({ vmWizard }) => {
+    await vmWizard.selectSceneCreationMethod('clone');
 
-    await expect(vmNameInput(root)).toHaveCount(0);
-    await expectWizardNextEnabled(root, true);
-    await clickWizardNext(root);
-    await expectWizardStepActive(root, WizardSceneStep.CLONE);
+    await expect(vmWizard.getVmNameInput()).toHaveCount(0);
+    await vmWizard.expectFooterNextEnabled(true);
+    await vmWizard.clickNext();
+    await vmWizard.expectStepActiveById(WizardSceneStep.CLONE);
   });
 
-  test('switching creation method toggles general info (name) section', async ({ mount }) => {
-    const root = await mount(WIZARD_STORY);
-    await selectCreationMethod(root, 'template');
-    await expect(vmNameInput(root)).toBeVisible();
+  test('switching creation method toggles general info (name) section', async ({ vmWizard }) => {
+    await vmWizard.selectSceneCreationMethod('template');
+    await expect(vmWizard.getVmNameInput()).toBeVisible();
 
-    await selectCreationMethod(root, 'clone');
-    await expect(vmNameInput(root)).toHaveCount(0);
+    await vmWizard.selectSceneCreationMethod('clone');
+    await expect(vmWizard.getVmNameInput()).toHaveCount(0);
 
-    await selectCreationMethod(root, 'instance-type');
-    await expect(vmNameInput(root)).toBeVisible();
+    await vmWizard.selectSceneCreationMethod('instance-type');
+    await expect(vmWizard.getVmNameInput()).toBeVisible();
   });
 });
 
 test.describe('VM wizard — sidebar navigation gating (template flow)', () => {
-  test('later steps stay disabled until deployment has a valid VM name', async ({ mount }) => {
-    const root = await mount(WIZARD_STORY);
-    await selectCreationMethod(root, 'template');
+  test('later steps stay disabled until deployment has a valid VM name', async ({ vmWizard }) => {
+    await vmWizard.selectSceneCreationMethod('template');
 
-    await expectWizardNavItemEnabled(root, 'Template', false);
-    await expectWizardNavItemEnabled(root, /Customization/, false);
-    await expectWizardNavItemEnabled(root, /Review and create/, false);
+    await vmWizard.expectWizardNavItemEnabled('Template', false);
+    await vmWizard.expectWizardNavItemEnabled(/Customization/, false);
+    await vmWizard.expectWizardNavItemEnabled(/Review and create/, false);
 
-    await fillWizardVmName(root, 'nav-gating-vm');
+    await vmWizard.fillVmNameExpectingValue('nav-gating-vm');
 
-    await expectWizardNavItemEnabled(root, 'Template', true);
-    await expectWizardNavItemEnabled(root, /Customization/, false);
+    await vmWizard.expectWizardNavItemEnabled('Template', true);
+    await vmWizard.expectWizardNavItemEnabled(/Customization/, false);
   });
 
-  test('jump to Template via nav after deployment is valid', async ({ mount }) => {
-    const root = await mount(WIZARD_STORY);
-    await selectCreationMethod(root, 'template');
-    await fillWizardVmName(root, 'nav-jump-vm');
+  test('jump to Template via nav after deployment is valid', async ({ vmWizard }) => {
+    await vmWizard.selectSceneCreationMethod('template');
+    await vmWizard.fillVmNameExpectingValue('nav-jump-vm');
 
-    await jumpToWizardNavStep(root, 'Template');
-    await expectWizardStepActive(root, WizardSceneStep.TEMPLATE);
-    await expectWizardStepInactive(root, WizardSceneStep.DEPLOYMENT_DETAILS);
-    await expect(root.getByTestId('scene-rhel-template')).toBeVisible();
+    await vmWizard.jumpToWizardNavStep('Template');
+    await vmWizard.expectStepActiveById(WizardSceneStep.TEMPLATE);
+    await vmWizard.expectStepInactiveById(WizardSceneStep.DEPLOYMENT_DETAILS);
+    await expect(vmWizard.getSceneRoot().getByTestId('scene-rhel-template')).toBeVisible();
   });
 });
 
 test.describe('VM wizard — back / forward (template flow)', () => {
-  test('Back from template returns to deployment and preserves VM name', async ({ mount }) => {
-    const root = await mount(WIZARD_STORY);
-    await selectCreationMethod(root, 'template');
-    await fillWizardVmName(root, 'back-nav-vm');
-    await clickWizardNext(root);
-    await expectWizardStepActive(root, WizardSceneStep.TEMPLATE);
-    await expectWizardBackEnabled(root, true);
+  test('Back from template returns to deployment and preserves VM name', async ({ vmWizard }) => {
+    await vmWizard.selectSceneCreationMethod('template');
+    await vmWizard.fillVmNameExpectingValue('back-nav-vm');
+    await vmWizard.clickNext();
+    await vmWizard.expectStepActiveById(WizardSceneStep.TEMPLATE);
+    await vmWizard.expectFooterBackEnabled(true);
 
-    await clickWizardBack(root);
-    await expectWizardStepActive(root, WizardSceneStep.DEPLOYMENT_DETAILS);
-    await expect(vmNameInput(root)).toHaveValue('back-nav-vm');
-    await expectWizardBackEnabled(root, false);
+    await vmWizard.clickWizardBackButton();
+    await vmWizard.expectStepActiveById(WizardSceneStep.DEPLOYMENT_DETAILS);
+    await expect(vmWizard.getVmNameInput()).toHaveValue('back-nav-vm');
+    await vmWizard.expectFooterBackEnabled(false);
   });
 });
 
 test.describe('VM wizard — clone flow navigation', () => {
-  test('clone source step gates Next until a VM is selected', async ({ mount }) => {
-    const root = await mount(WIZARD_STORY);
-    await selectCreationMethod(root, 'clone');
-    await clickWizardNext(root);
-    await expectWizardStepActive(root, WizardSceneStep.CLONE);
+  test('clone source step gates Next until a VM is selected', async ({ vmWizard }) => {
+    await vmWizard.selectSceneCreationMethod('clone');
+    await vmWizard.clickNext();
+    await vmWizard.expectStepActiveById(WizardSceneStep.CLONE);
 
-    await expectWizardNextEnabled(root, false);
-    await selectCloneSourceVm(root);
-    await expectWizardNextEnabled(root, true);
+    await vmWizard.expectFooterNextEnabled(false);
+    await vmWizard.selectSceneCloneSource();
+    await vmWizard.expectFooterNextEnabled(true);
 
-    await clickWizardNext(root);
-    await expectWizardStepActive(root, WizardSceneStep.REVIEW_AND_CREATE);
+    await vmWizard.clickNext();
+    await vmWizard.expectStepActiveById(WizardSceneStep.REVIEW_AND_CREATE);
   });
 });
 
 test.describe('VM wizard — instance-type step gating', () => {
-  test('boot source and compute gate Next (guest OS pre-filled for RHEL defaults)', async ({ mount }) => {
-    const root = await mount(WIZARD_STORY);
-    await selectCreationMethod(root, 'instance-type');
-    await completeDeploymentDetailsForNamedFlows(root);
-    await clickWizardNext(root);
-    await expectWizardStepActive(root, WizardSceneStep.GUEST_OS);
-    // Form defaults to RHEL; gallery preference stub selects rhel.9 — Next is already valid here.
-    await expectWizardNextEnabled(root, true);
-    await clickWizardNext(root);
+  test('boot source and compute gate Next (guest OS pre-filled for RHEL defaults)', async ({
+    vmWizard,
+  }) => {
+    await vmWizard.selectSceneCreationMethod('instance-type');
+    await vmWizard.completeDeploymentDetailsForScene();
+    await vmWizard.clickNext();
+    await vmWizard.expectStepActiveById(WizardSceneStep.GUEST_OS);
+    await vmWizard.expectFooterNextEnabled(true);
+    await vmWizard.clickNext();
 
-    await expectWizardStepActive(root, WizardSceneStep.BOOT_SOURCE);
-    await expectWizardNextEnabled(root, false);
-    await completeBootSourceStep(root);
-    await expectWizardNextEnabled(root, true);
-    await clickWizardNext(root);
+    await vmWizard.expectStepActiveById(WizardSceneStep.BOOT_SOURCE);
+    await vmWizard.expectFooterNextEnabled(false);
+    await vmWizard.completeBootSourceStepForScene();
+    await vmWizard.expectFooterNextEnabled(true);
+    await vmWizard.clickNext();
 
-    await expectWizardStepActive(root, WizardSceneStep.COMPUTE_RESOURCES);
-    await expectWizardNextEnabled(root, false);
-    await completeComputeResourcesStep(root);
-    await expectWizardNextEnabled(root, true);
+    await vmWizard.expectStepActiveById(WizardSceneStep.COMPUTE_RESOURCES);
+    await vmWizard.expectFooterNextEnabled(false);
+    await vmWizard.completeComputeResourcesStepForScene();
+    await vmWizard.expectFooterNextEnabled(true);
   });
 
   test('switching guest OS family updates tile selection and guest OS type preference', async ({
-    mount,
+    vmWizard,
   }) => {
-    const root = await mount(WIZARD_STORY);
-    await selectCreationMethod(root, 'instance-type');
-    await completeDeploymentDetailsForNamedFlows(root);
-    await clickWizardNext(root);
-    await expectWizardStepActive(root, WizardSceneStep.GUEST_OS);
+    await vmWizard.selectSceneCreationMethod('instance-type');
+    await vmWizard.completeDeploymentDetailsForScene();
+    await vmWizard.clickNext();
+    await vmWizard.expectStepActiveById(WizardSceneStep.GUEST_OS);
 
-    await expectGuestOsTileSelected(root, 'RHEL', true);
-    await expectGuestOsTileSelected(root, 'OTHER_LINUX', false);
-    await expectGuestOsPreferenceToggle(root, 'rhel.9');
+    await vmWizard.expectGuestOsTileSelected('RHEL', true);
+    await vmWizard.expectGuestOsTileSelected('OTHER_LINUX', false);
+    await vmWizard.expectGuestOsPreferenceVisible('rhel.9');
 
-    await selectGuestOsTile(root, 'OTHER_LINUX');
-    await expectGuestOsTileSelected(root, 'OTHER_LINUX', true);
-    await expectGuestOsTileSelected(root, 'RHEL', false);
-    await expectGuestOsPreferenceToggle(root, 'centos.stream9');
+    await vmWizard.selectGuestOsTileByTestId('OTHER_LINUX');
+    await vmWizard.expectGuestOsTileSelected('OTHER_LINUX', true);
+    await vmWizard.expectGuestOsTileSelected('RHEL', false);
+    await vmWizard.expectGuestOsPreferenceVisible('centos.stream9');
 
-    await selectGuestOsTile(root, 'RHEL');
-    await expectGuestOsTileSelected(root, 'RHEL', true);
-    await expectGuestOsPreferenceToggle(root, 'rhel.9');
+    await vmWizard.selectGuestOsTileByTestId('RHEL');
+    await vmWizard.expectGuestOsTileSelected('RHEL', true);
+    await vmWizard.expectGuestOsPreferenceVisible('rhel.9');
   });
 
   test('instance-type nav: compute stays disabled until guest OS path is complete', async ({
-    mount,
+    vmWizard,
   }) => {
-    const root = await mount(WIZARD_STORY);
-    await selectCreationMethod(root, 'instance-type');
-    await completeDeploymentDetailsForNamedFlows(root);
-    await clickWizardNext(root);
-    await expectWizardStepActive(root, WizardSceneStep.GUEST_OS);
+    await vmWizard.selectSceneCreationMethod('instance-type');
+    await vmWizard.completeDeploymentDetailsForScene();
+    await vmWizard.clickNext();
+    await vmWizard.expectStepActiveById(WizardSceneStep.GUEST_OS);
 
-    await expectWizardNavItemEnabled(root, /Compute resources/, false);
-    await completeGuestOsStep(root);
-    await clickWizardNext(root);
-    await completeBootSourceStep(root);
-    await clickWizardNext(root);
+    await vmWizard.expectWizardNavItemEnabled(/Compute resources/, false);
+    await vmWizard.completeGuestOsStepForScene();
+    await vmWizard.clickNext();
+    await vmWizard.completeBootSourceStepForScene();
+    await vmWizard.clickNext();
 
-    await expectWizardStepActive(root, WizardSceneStep.COMPUTE_RESOURCES);
-    await expectWizardNavItemEnabled(root, /Customization/, false);
+    await vmWizard.expectStepActiveById(WizardSceneStep.COMPUTE_RESOURCES);
+    await vmWizard.expectWizardNavItemEnabled(/Customization/, false);
   });
 });

@@ -1,6 +1,6 @@
 import type { JSX } from 'react';
 
-import VMCreationWizard from 'src/views/virtualmachines/wizard/VMCreationWizard';
+import VMCreationWizard from '@virtualmachines/wizard/VMCreationWizard';
 
 import { VirtSceneScaffold } from '../shared/VirtSceneScaffold';
 

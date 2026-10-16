@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from 'react';
 
 import type { PreferenceOption } from '@kubevirt-utils/components/AddBootableVolumeModal/types';
-import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
+import { useVMWizardForm } from '@virtualmachines/wizard/form/VMWizardFormProvider';
 import { OperatingSystemType } from '@virtualmachines/wizard/steps/InstanceTypesSteps/GuestOSStep/utils/constants';
 
 const sceneRhelPreference: PreferenceOption = {
@@ -25,7 +25,7 @@ const usePreferenceSelectOptions = (
   _cluster: string,
   operatingSystemType: OperatingSystemType,
 ): { isPreferencesLoaded: boolean; preferences: PreferenceOption[] } => {
-  const { control, setValue } = useVMWizard();
+  const { control, setValue } = useVMWizardForm();
 
   const preferences = useMemo(
     () => preferencesByOsType[operatingSystemType] ?? [],

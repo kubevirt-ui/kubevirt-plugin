@@ -14,9 +14,14 @@ export type ColumnLayout = Record<string, unknown>;
 export const ContextProvider = ({ children }: { children?: unknown }): unknown => children ?? null;
 export type DashboardsInventoryItemGroup = Record<string, unknown>;
 export type DashboardsOverviewHealthPrometheusSubsystem = Record<string, unknown>;
-export const DashboardsOverviewInventoryItem = ({ children }: { children?: unknown }): unknown => children ?? null;
+export const DashboardsOverviewInventoryItem = ({ children }: { children?: unknown }): unknown =>
+  children ?? null;
 export type DashboardsOverviewResourceActivity = Record<string, unknown>;
-export const DashboardsProjectOverviewInventoryItem = ({ children }: { children?: unknown }): unknown => children ?? null;
+export const DashboardsProjectOverviewInventoryItem = ({
+  children,
+}: {
+  children?: unknown;
+}): unknown => children ?? null;
 export const DetailsItem = ({ children }: { children?: unknown }): unknown => children ?? null;
 export type DetailsItemComponentProps = Record<string, unknown>;
 export type DetailsTabSectionExtensionHook = Record<string, unknown>;
@@ -24,7 +29,8 @@ export type ExtPodKind = Record<string, unknown>;
 export type ExtensionHook = Record<string, unknown>;
 export type ExtensionK8sModel = Record<string, unknown>;
 export type FeatureFlag = Record<string, unknown>;
-export const FeatureFlagHookProvider = ({ children }: { children?: unknown }): unknown => children ?? null;
+export const FeatureFlagHookProvider = ({ children }: { children?: unknown }): unknown =>
+  children ?? null;
 export const GenericStatus = ({ children }: { children?: unknown }): unknown => children ?? null;
 export type GroupedMenuOption = Record<string, unknown>;
 export const HorizontalNav = ({ children }: { children?: unknown }): unknown => children ?? null;
@@ -37,9 +43,12 @@ export type K8sResourceKind = Record<string, unknown>;
 export type K8sResourceKindReference = Record<string, unknown>;
 export type K8sVerb = Record<string, unknown>;
 export type LazyActionMenuProps = Record<string, unknown>;
-export const ListPageCreateButton = ({ children }: { children?: unknown }): unknown => children ?? null;
-export const ListPageCreateDropdown = ({ children }: { children?: unknown }): unknown => children ?? null;
-export const ListPageCreateLink = ({ children }: { children?: unknown }): unknown => children ?? null;
+export const ListPageCreateButton = ({ children }: { children?: unknown }): unknown =>
+  children ?? null;
+export const ListPageCreateDropdown = ({ children }: { children?: unknown }): unknown =>
+  children ?? null;
+export const ListPageCreateLink = ({ children }: { children?: unknown }): unknown =>
+  children ?? null;
 export type ManagedColumn = Record<string, unknown>;
 export type MatchExpression = Record<string, unknown>;
 export const MenuOptionType = {} as Record<string, string>;
@@ -67,20 +76,26 @@ export type PrometheusResult = Record<string, unknown>;
 export type PrometheusRule = Record<string, unknown>;
 export type PrometheusValue = Record<string, unknown>;
 export type QueryParams = Record<string, unknown>;
-export const ResourceActionProvider = ({ children }: { children?: unknown }): unknown => children ?? null;
-export const ResourceClusterNavItem = ({ children }: { children?: unknown }): unknown => children ?? null;
-export const ResourceDetailsPage = ({ children }: { children?: unknown }): unknown => children ?? null;
+export const ResourceActionProvider = ({ children }: { children?: unknown }): unknown =>
+  children ?? null;
+export const ResourceClusterNavItem = ({ children }: { children?: unknown }): unknown =>
+  children ?? null;
+export const ResourceDetailsPage = ({ children }: { children?: unknown }): unknown =>
+  children ?? null;
 export const ResourceIcon = ({ children }: { children?: unknown }): unknown => children ?? null;
 export const ResourceListPage = ({ children }: { children?: unknown }): unknown => children ?? null;
-export const ResourceNSNavItem = ({ children }: { children?: unknown }): unknown => children ?? null;
-export const ResourceYAMLEditor = ({ children }: { children?: unknown }): unknown => children ?? null;
+export const ResourceNSNavItem = ({ children }: { children?: unknown }): unknown =>
+  children ?? null;
+export const ResourceYAMLEditor = ({ children }: { children?: unknown }): unknown =>
+  children ?? null;
 export const RoutePage = ({ children }: { children?: unknown }): unknown => children ?? null;
 export type Rule = Record<string, unknown>;
 export type SelfSubjectAccessReviewKind = Record<string, unknown>;
 export type Separator = Record<string, unknown>;
 export type SetFeatureFlag = Record<string, unknown>;
 export type Silence = Record<string, unknown>;
-export const StandaloneRoutePage = ({ children }: { children?: unknown }): unknown => children ?? null;
+export const StandaloneRoutePage = ({ children }: { children?: unknown }): unknown =>
+  children ?? null;
 export type StatusGroupMapper = Record<string, unknown>;
 export type TableColumn = Record<string, unknown>;
 export type TableData = Record<string, unknown>;
@@ -97,7 +112,11 @@ export const consoleFetchJSON = async (): Promise<unknown> => ({});
 export const consoleFetchText = async (): Promise<Response> =>
   new Response('{}', { headers: { 'Content-Type': 'application/json' }, status: 200 });
 export const getAPIVersionForModel = (..._args: unknown[]): unknown => undefined;
-export const getGroupVersionKindForModel = (): { group: string; kind: string; version: string } => ({
+export const getGroupVersionKindForModel = (): {
+  group: string;
+  kind: string;
+  version: string;
+} => ({
   group: '',
   kind: 'ConfigMap',
   version: 'v1',
@@ -116,4 +135,3 @@ export const useFlag = (..._args: unknown[]): unknown => [[], true, null];
 export const useLabelsModal = (..._args: unknown[]): unknown => [[], true, null];
 export const usePrometheusPoll = (..._args: unknown[]): unknown => [[], true, null];
 export const useToast = (..._args: unknown[]): unknown => [[], true, null];
-

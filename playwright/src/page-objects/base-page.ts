@@ -7,11 +7,11 @@ import BaseComponent from '@/components/shared/base-component';
 import type { ContextKey, ContextValueType } from '@/context-managers/context-keys';
 import ScenarioContextManager from '@/context-managers/scenario-context-manager';
 import type { TrackedResourceType } from '@/utils/test-resource-tracker';
-import type { Page } from '@playwright/test';
+import type { Locator, Page } from '@playwright/test';
 
 export default abstract class BasePage extends BaseComponent {
-  constructor(page: Page) {
-    super(page);
+  constructor(page: Page, root?: Locator) {
+    super(page, root);
   }
 
   protected get ctx(): ScenarioContextManager {

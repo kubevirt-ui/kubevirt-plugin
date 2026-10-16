@@ -20,7 +20,8 @@ const GalleryIndex = ({ onSelectStory, storyIds }: GalleryIndexProps): JSX.Eleme
     </Content>
     {storyIds.length === 0 ? (
       <Content component="p" className="pf-v6-u-mt-lg">
-        No stories found. Add a <code>*.scene.tsx</code> file under <code>playwright/scenes/</code>.
+        No stories found. Add a <code>*.scene.tsx</code> file under{' '}
+        <code>playwright/component-dependencies/scenes/</code>.
       </Content>
     ) : (
       <ul className="pf-v6-u-mt-lg">

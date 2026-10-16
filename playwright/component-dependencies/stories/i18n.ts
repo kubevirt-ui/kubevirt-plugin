@@ -1,7 +1,7 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 
-import en from '../../locales/en/plugin__kubevirt-plugin.json';
+import en from '../../../locales/en/plugin__kubevirt-plugin.json';
 
 const NAMESPACE = 'plugin__kubevirt-plugin';
 

@@ -1,3 +1,9 @@
+/** Namespace used by gallery wizard stubs and scene fixtures. */
+export const WIZARD_SCENE_NAMESPACE = 'default';
+
+/** Default VM creation wizard story in the component gallery. */
+export const WIZARD_STORY = 'scenes/vm-wizard/VmCreationWizardShell/Default';
+
 /** Wizard step element ids (mirror `VMWizardStep` in production). */
 export const WizardSceneStep = {
   BOOT_SOURCE: 'vm-creation-boot-source-step',

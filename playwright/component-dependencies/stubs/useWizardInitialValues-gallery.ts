@@ -1,4 +1,4 @@
-import { WIZARD_SCENE_NAMESPACE } from '../scenes/shared/wizard-scene-constants';
+import { WIZARD_SCENE_NAMESPACE } from '../stories/wizard-scene-constants';
 
 const useWizardInitialValues = (): {
   cluster: string;

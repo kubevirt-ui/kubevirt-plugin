@@ -3,11 +3,14 @@ import { fileURLToPath } from 'url';
 
 import { Configuration, DefinePlugin, HtmlRspackPlugin, ProvidePlugin } from '@rspack/core';
 
-import { GalleryDepsRspackPlugin } from './gallery-deps/GalleryDepsRspackPlugin';
-import { getGalleryResolveAlias, projectRoot } from './gallery-deps/gallery-resolve';
+import { GalleryDepsRspackPlugin } from './component-dependencies/bundle/GalleryDepsRspackPlugin';
+import {
+  getGalleryResolveAlias,
+  projectRoot,
+} from './component-dependencies/bundle/gallery-resolve';
 
 const configDir = path.dirname(fileURLToPath(import.meta.url));
-const galleryRoot = path.join(configDir, 'gallery');
+const galleryRoot = path.join(configDir, 'component-dependencies/gallery');
 
 const config: Configuration = {
   context: projectRoot,
