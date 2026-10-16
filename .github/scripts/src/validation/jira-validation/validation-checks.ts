@@ -1,6 +1,10 @@
 import { type JiraClient } from '../../jira-client';
 import type { JiraIssue, ValidationCheck } from '../../types/index';
-import { MIN_STORY_POINTS, REQUIRED_COMPONENT } from '../../types/index';
+import {
+  MIN_STORY_POINTS,
+  REQUIRED_COMPONENT,
+  UNSET_JIRA_PRIORITY_NAMES,
+} from '../../types/index';
 import { fixVersionMatchesBranch, suggestBranchForFixVersion } from '../../version-compare';
 import { extractVersionNumber, parseVersionToNumber } from '../../version-parse';
 
@@ -111,7 +115,29 @@ const buildActivityTypeMessage = (
   return 'Could not discover "Activity Type" custom field';
 };
 
-/** Validate story points, fix version, component, and activity type on a Jira ticket. */
+const isUnsetPriorityName = (name: string): boolean =>
+  UNSET_JIRA_PRIORITY_NAMES.some((unsetName) => unsetName.toLowerCase() === name.toLowerCase());
+
+const validatePriority = (issue: JiraIssue): ValidationCheck => {
+  const priorityName = issue.fields.priority?.name?.trim();
+
+  if (!priorityName || isUnsetPriorityName(priorityName)) {
+    const detail = priorityName ? ` (current: ${priorityName})` : '';
+    return {
+      message: `Priority is not set on the ticket${detail}`,
+      name: 'Priority',
+      passed: false,
+    };
+  }
+
+  return {
+    message: `Priority: ${priorityName}`,
+    name: 'Priority',
+    passed: true,
+  };
+};
+
+/** Validate story points, fix version, component, activity type, and priority on a Jira ticket. */
 export const validateTicket = async (
   jira: JiraClient,
   issue: JiraIssue,
@@ -157,6 +183,8 @@ export const validateTicket = async (
     name: 'Activity Type',
     passed: activityTypeSet,
   });
+
+  checks.push(validatePriority(issue));
 
   return checks;
 };
