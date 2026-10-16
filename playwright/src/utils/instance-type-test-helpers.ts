@@ -3,8 +3,47 @@ import { TestTimeouts } from '@/utils/test-config';
 
 const IT_GROUP = 'instancetype.kubevirt.io';
 const IT_VERSION = 'v1beta1';
+const FEATURES_CONFIG_MAP_NAME = 'kubevirt-ui-features';
+export const DISABLED_INSTANCE_TYPE_FAMILIES_KEY = 'disabledInstanceTypeFamilies';
 
 export { IT_GROUP, IT_VERSION };
+
+export const parseDisabledInstanceTypeFamiliesFromConfigMap = (raw?: string): string[] => {
+  if (!raw) {
+    return [];
+  }
+  try {
+    const parsed = JSON.parse(raw) as unknown;
+    return Array.isArray(parsed) ? parsed.filter((item): item is string => typeof item === 'string') : [];
+  } catch {
+    return [];
+  }
+};
+
+export async function getDisabledInstanceTypeFamilies(
+  client: RequestContextClient,
+  namespace: string,
+): Promise<string[]> {
+  const configMap = await client.getConfigMap(FEATURES_CONFIG_MAP_NAME, namespace);
+  const data = configMap?.data as Record<string, string> | undefined;
+  return parseDisabledInstanceTypeFamiliesFromConfigMap(data?.[DISABLED_INSTANCE_TYPE_FAMILIES_KEY]);
+}
+
+export async function setDisabledInstanceTypeFamilies(
+  client: RequestContextClient,
+  namespace: string,
+  families: string[],
+): Promise<void> {
+  const serialized = JSON.stringify([...new Set(families)].sort((a, b) => a.localeCompare(b)));
+  await client.mergePatchResource(
+    '',
+    'v1',
+    'configmaps',
+    FEATURES_CONFIG_MAP_NAME,
+    { data: { [DISABLED_INSTANCE_TYPE_FAMILIES_KEY]: serialized } },
+    namespace,
+  );
+}
 
 export async function createClusterInstanceTypeApi(
   client: RequestContextClient,
