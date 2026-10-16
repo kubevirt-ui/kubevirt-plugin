@@ -308,6 +308,59 @@ export default class InstanceTypesPage extends PageCommons {
     return { state: 'empty', rowCount: 0 };
   }
 
+  async expandFamilyAvailabilitySection(): Promise<void> {
+    const content = this.locator('#family-availability-section--content');
+    const isExpanded = await content.isVisible().catch(() => false);
+    if (!isExpanded) {
+      const toggle = this.locator('#family-availability-section--toggle');
+      await toggle.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+      await this.robustClick(toggle);
+      await content.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+    }
+  }
+
+  async getFamilyStatusLabelText(series: string): Promise<string> {
+    const label = this.testId(`family-status-${series}`).first();
+    await label.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+    return (await label.textContent())?.trim() ?? '';
+  }
+
+  async isFamilyAvailabilityCardVisible(seriesName: string): Promise<boolean> {
+    try {
+      const card = this.testId(`family-availability-card-${seriesName}`);
+      await card.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+      return await card.isVisible();
+    } catch {
+      return false;
+    }
+  }
+
+  async isFamilyAvailabilitySectionVisible(): Promise<boolean> {
+    try {
+      const toggle = this.locator('#family-availability-section--toggle');
+      await toggle.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+      return await toggle.isVisible();
+    } catch {
+      return false;
+    }
+  }
+
+  async setFamilyAvailable(seriesName: string, available: boolean): Promise<void> {
+    await this.expandFamilyAvailabilitySection();
+    const card = this.testId(`family-availability-card-${seriesName}`);
+    await card.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+    const switchLocator = card.getByRole('switch');
+    const isChecked = await switchLocator.isChecked();
+    if (isChecked !== available) {
+      await this.robustClick(switchLocator);
+      await this.waitForCondition(
+        async () => (await switchLocator.isChecked()) === available,
+        TestTimeouts.DEFAULT,
+        TestTimeouts.POLLING_INTERVAL,
+      );
+    }
+  }
+
   async waitForInstanceTypesListReady(timeoutMs = TestTimeouts.UI_FILTER_APPLY): Promise<void> {
     await this.waitForCondition(
       async () => {
