@@ -55,6 +55,19 @@ export const getDataImportCronTemplatesPatchPath = (hyperConverged: HyperConverg
     ? '/spec/workloadSources/dataImportCronTemplates'
     : '/spec/dataImportCronTemplates';
 
+export const getAAQConfigPatchPath = (hyperConverged: HyperConverged): string =>
+  isHyperConvergedV1(hyperConverged)
+    ? '/spec/deployment/applicationAwareConfig'
+    : '/spec/applicationAwareConfig';
+
+export const getAAQCalculationMethodPatchPath = (hyperConverged: HyperConverged): string =>
+  `${getAAQConfigPatchPath(hyperConverged)}/vmiCalcConfigName`;
+
+export const getAAQEnabledPatchPath = (hyperConverged: HyperConverged): string =>
+  isHyperConvergedV1(hyperConverged)
+    ? '/spec/deployment/applicationAwareConfig/enable'
+    : '/spec/enableApplicationAwareQuota';
+
 const getObjectChild = (value: unknown, key: string): unknown => {
   if (typeof value !== 'object' || value === null) {
     return undefined;

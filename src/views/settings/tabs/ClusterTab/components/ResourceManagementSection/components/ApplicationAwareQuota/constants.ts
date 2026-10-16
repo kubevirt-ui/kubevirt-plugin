@@ -38,3 +38,5 @@ export const calculationMethods: CalculationMethod[] = [
   CalculationMethod.VmiPodUsage,
   CalculationMethod.DedicatedVirtualResources,
 ];
+
+export const DEFAULT_CALCULATION_METHOD = CalculationMethod.DedicatedVirtualResources;

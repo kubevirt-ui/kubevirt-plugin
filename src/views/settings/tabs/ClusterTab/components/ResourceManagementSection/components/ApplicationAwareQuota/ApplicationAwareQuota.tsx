@@ -7,8 +7,6 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { getHyperConvergedModelFromResource } from '@kubevirt-utils/resources/hyperconverged/model';
 import { getAAQCalculationMethod } from '@kubevirt-utils/resources/hyperconverged/selectors';
 import { isAAQEnabled } from '@kubevirt-utils/resources/hyperconverged/utils';
-import { CalculationMethod } from '@kubevirt-utils/resources/quotas/types';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
 import { Alert, AlertVariant } from '@patternfly/react-core';
@@ -17,6 +15,7 @@ import SettingsLink from '@settings/context/SettingsLink';
 
 import QuotaCalculationMethodTerm from './components/QuotaCalculationMethodTerm';
 import { getCalculationMethodContentMapper } from './constants';
+import { buildAAQEnablePatches } from './utils';
 
 type ApplicationAwareQuotaProps = {
   hyperConvergeConfiguration: [hyperConvergeConfig: HyperConverged, loaded: boolean, error: Error];
@@ -46,21 +45,7 @@ const ApplicationAwareQuota: FC<ApplicationAwareQuotaProps> = ({
     setIsLoading(true);
     kubevirtK8sPatch<HyperConverged>({
       cluster,
-      data: [
-        {
-          op: hyperConverge?.spec?.enableApplicationAwareQuota === undefined ? 'add' : 'replace',
-          path: `/spec/enableApplicationAwareQuota`,
-          value: checked,
-        },
-        {
-          op: isEmpty(hyperConverge?.spec?.applicationAwareConfig) ? 'add' : 'replace',
-          path: `/spec/applicationAwareConfig`,
-          value: {
-            allowApplicationAwareClusterResourceQuota: true,
-            vmiCalcConfigName: CalculationMethod.VirtualResources,
-          },
-        },
-      ],
+      data: buildAAQEnablePatches(hyperConverge, checked),
       model: getHyperConvergedModelFromResource(hyperConverge),
       resource: hyperConverge,
     })
