@@ -31,11 +31,13 @@ OC_PASS=<password>
 3. `npm run dev`
 4. Navigate to <http://localhost:9000>
 
-#### Cypress Testing inside the container
+#### Playwright E2E
 
-1. `npm run test-cypress-docker`
-2. Navigate to <http://localhost:10000>
-3. login with password `kubevirt` (no need for username)
+See [playwright/README.md](playwright/README.md). Create a repo-root `.env` (documented there), then:
+
+```bash
+./playwright-runner.sh Gating --workers=2
+```
 
 ### Option 2:
 

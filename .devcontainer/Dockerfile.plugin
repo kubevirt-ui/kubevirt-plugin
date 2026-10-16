@@ -14,4 +14,4 @@ RUN apt-get update && \
     libasound2 \
     libxtst6 xauth xvfb
 
-RUN npx cypress verify
+RUN npx playwright install chromium
