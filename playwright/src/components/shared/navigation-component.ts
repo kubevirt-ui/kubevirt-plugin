@@ -378,10 +378,21 @@ export default class NavigationComponent extends BaseComponent {
         const innerBtn = virtOption.locator('button').first();
         const hasBtn = await innerBtn.isVisible().catch(() => false);
         const clickTarget = hasBtn ? innerBtn : virtOption;
-        await clickTarget.click({ force: true, timeout: TestTimeouts.DEFAULT });
-        await this.page.waitForLoadState('domcontentloaded');
+
+        // Bound the click so a missed/intercepted click falls back to a synthetic
+        // dispatch and then to the next attempt, instead of hanging on the 30s
+        // default timeout (the observed flake).
+        await clickTarget
+          .click({ force: true, timeout: TestTimeouts.UI_DELAY_LONG })
+          .catch(() => clickTarget.dispatchEvent('click').catch(() => undefined));
+
+        await this.page.waitForLoadState('domcontentloaded').catch(() => undefined);
         await this.waitForLoadingComplete(TestTimeouts.SHORT_WAIT);
-        return;
+
+        // Confirm the perspective actually switched before returning; a click that
+        // did not register leaves the toggle on its previous label, so retry.
+        const switchedText = (await toggle.textContent().catch(() => '')) ?? '';
+        if (switchedText.toLowerCase().includes('virtualization')) return;
       }
 
       await this.page.keyboard.press('Escape').catch(() => undefined);
