@@ -17,11 +17,14 @@ const DEFAULT_CNV_CHANNEL = 'stable';
 const LAST_CYPRESS_MAJOR = 4;
 const LAST_CYPRESS_MINOR = 22;
 
-// IBM Cloud ROKS only offers OpenShift versions in this window. A release
-// branch outside it still provisions, clamped to the nearest supported
+// Window of OpenShift versions we can actually provision on IBM Cloud. The
+// lower bound is 4.20 because VPC cluster creation with an explicit CNI
+// (--cni OVNKubernetes) is rejected below it ("version is not supported for
+// CNI selection in VPC. Specify 4.20 or later", E0723). A release branch
+// outside this window still provisions, clamped to the nearest supported
 // version; the branch's own cluster_name/test_engine stay tied to the real
 // branch, and CNV is left unpinned when a clamp happens (see below).
-const MIN_SUPPORTED = { major: 4, minor: 18 };
+const MIN_SUPPORTED = { major: 4, minor: 20 };
 const MAX_SUPPORTED = { major: 4, minor: 22 };
 
 // Clamp a branch's major.minor into the IBM Cloud supported range.
