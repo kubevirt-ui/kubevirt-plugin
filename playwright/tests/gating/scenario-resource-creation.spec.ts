@@ -183,7 +183,10 @@ test.describe('Resource creation (gating)', { tag: [GATING_TAG, '@resource-creat
     testConfig,
     utils,
   }) => {
-    test.skip(!(await isNativeVmTemplatesEnabled(apiClient)), 'Native VM templates not enabled');
+    test.skip(
+      !(await isNativeVmTemplatesEnabled(apiClient)),
+      'Native VM templates (template.kubevirt.io) not available on this cluster (requires CNV 4.22+)',
+    );
     await utils.withAllure({ suite: SUITE, feature: GATING, tags: [GATING_TAG] });
 
     const vmName = utils.generateRandomVmName('save-tpl');
