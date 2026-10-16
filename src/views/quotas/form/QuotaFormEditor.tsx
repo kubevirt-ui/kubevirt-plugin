@@ -3,21 +3,16 @@ import { useNavigate } from 'react-router';
 
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
+import HidableTooltip from '@kubevirt-utils/components/HidableTooltip/HidableTooltip';
 import ProjectDropdown from '@kubevirt-utils/components/ProjectDropdown/ProjectDropdown';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useNamespaceParam from '@kubevirt-utils/hooks/useNamespaceParam';
+import { useNoChangesMade } from '@kubevirt-utils/hooks/useNoChangesMade';
 import { type ApplicationAwareResourceQuota } from '@kubevirt-utils/resources/quotas/types';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
+import { getNoModalChangesTooltip } from '@kubevirt-utils/utils/text';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import {
-  Button,
-  Flex,
-  Form,
-  FormGroup,
-  PageSection,
-  TextInput,
-  Tooltip,
-} from '@patternfly/react-core';
+import { Button, Flex, Form, FormGroup, PageSection, TextInput } from '@patternfly/react-core';
 
 import AdvancedConfigAlert from '../components/AdvancedConfigAlert';
 import StandardResourceQuotaAlert from '../components/StandardResourceQuotaAlert';
@@ -40,6 +35,7 @@ const QuotaFormEditor: FC<QuotaFormEditorProps> = ({ formData, isEdit = false, o
   const [error, setError] = useState<Error | null>(null);
   const onQuotaSubmit = useOnQuotaSubmit(setError, isEdit);
   const { updateHardValue, updateMetadata } = useOnQuotaUpdate(formData, onChange);
+  const noChangesMade = useNoChangesMade(formData) && isEdit;
 
   const handleSubmit = async (e: FormEvent): Promise<void> => {
     e.preventDefault();
@@ -59,12 +55,10 @@ const QuotaFormEditor: FC<QuotaFormEditorProps> = ({ formData, isEdit = false, o
   const selectedNamespace = getNamespace(formData) ?? namespace;
   const hasAdditionalResources = !isEmpty(getAdditionalResourceKeys(formData, 'fromSpec'));
 
+  const isSubmitDisabled = !quotaName?.trim() || hasAdditionalResources || noChangesMade;
+
   const submitButton = (
-    <Button
-      isAriaDisabled={!quotaName?.trim() || hasAdditionalResources}
-      type="submit"
-      variant="primary"
-    >
+    <Button isAriaDisabled={isSubmitDisabled} type="submit" variant="primary">
       {isEdit ? t('Save') : t('Create quota')}
     </Button>
   );
@@ -104,17 +98,18 @@ const QuotaFormEditor: FC<QuotaFormEditorProps> = ({ formData, isEdit = false, o
         <QuotaFormResourceLimitFields formData={formData} updateHardValue={updateHardValue} />
         {error && <ErrorAlert error={error} />}
         <Flex className="pf-v6-u-mt-lg" gap={{ default: 'gapMd' }}>
-          {hasAdditionalResources ? (
-            <Tooltip
-              content={t(
-                'Advanced configuration detected. Switch to the YAML view to review all settings and create this quota.',
-              )}
-            >
-              {submitButton}
-            </Tooltip>
-          ) : (
-            submitButton
-          )}
+          <HidableTooltip
+            content={
+              hasAdditionalResources
+                ? t(
+                    'Advanced configuration detected. Switch to the YAML view to review all settings and create this quota.',
+                  )
+                : getNoModalChangesTooltip(t)
+            }
+            hidden={!hasAdditionalResources && !noChangesMade}
+          >
+            {submitButton}
+          </HidableTooltip>
           <Button onClick={() => navigate(getQuotaListURL(namespace))} variant="secondary">
             {t('Cancel')}
           </Button>
