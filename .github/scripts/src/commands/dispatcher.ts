@@ -23,6 +23,7 @@ import { getRepoContext } from '../shared/actions-context';
 import { reactToComment } from '../shared/command-helpers';
 import { setOutput } from '../shared/output';
 import { isListedInLocalOwners } from '../shared/owners';
+import { HandledValidationError } from '../validation/pr-path-validation/errors';
 import { COMMANDS } from './command-registry';
 
 export type { CommandContext } from './command-registry';
@@ -72,6 +73,16 @@ const main = async (): Promise<void> => {
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     console.error(`Command ${matched.name} failed: ${msg}`);
+
+    // Handled validation failures (e.g. the Jira checks) already posted their own
+    // detailed comment (the pass/fail table) -- don't stack a generic
+    // "unexpected error" comment on top of it.
+    if (err instanceof HandledValidationError) {
+      console.log(
+        `${matched.name} reported a handled validation failure -- detailed comment already posted.`,
+      );
+      return;
+    }
 
     try {
       await octokit.issues.createComment({

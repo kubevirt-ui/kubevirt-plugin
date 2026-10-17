@@ -2,6 +2,30 @@ import { type Octokit } from '@octokit/rest';
 
 import { BLOCK_LABEL, VALIDATION_COMMENT_MARKER } from './types/index';
 
+/** Find an existing PR comment identified by a hidden HTML marker (null if none). */
+export const findCommentByMarker = async (
+  octokit: Octokit,
+  owner: string,
+  repo: string,
+  issueNumber: number,
+  marker: string,
+): Promise<{ html_url: string; id: number } | null> => {
+  const comments = await octokit.paginate(octokit.issues.listComments, {
+    issue_number: issueNumber,
+    owner,
+    per_page: 100,
+    repo,
+  });
+
+  // Only match our own bot-authored marker comment. The marker strings are public
+  // constants, so a human could post a comment embedding one -- never update, delete,
+  // or link to that. Mirrors the guard in deleteCommentByMarker.
+  const existing = comments.find(
+    (comment) => comment.body?.includes(marker) && comment.user?.type === 'Bot',
+  );
+  return existing ? { html_url: existing.html_url, id: existing.id } : null;
+};
+
 /** Post or update an idempotent comment identified by a hidden HTML marker. */
 export const upsertComment = async (
   octokit: Octokit,
@@ -13,14 +37,7 @@ export const upsertComment = async (
 ): Promise<void> => {
   const markedBody = `${marker}\n${body}`;
 
-  const comments = await octokit.paginate(octokit.issues.listComments, {
-    issue_number: issueNumber,
-    owner,
-    per_page: 100,
-    repo,
-  });
-
-  const existing = comments.find((comment) => comment.body?.includes(marker));
+  const existing = await findCommentByMarker(octokit, owner, repo, issueNumber, marker);
 
   if (existing) {
     await octokit.issues.updateComment({ body: markedBody, comment_id: existing.id, owner, repo });
@@ -31,6 +48,31 @@ export const upsertComment = async (
       owner,
       repo,
     });
+  }
+};
+
+/** Delete an idempotent marker comment if present (no-op otherwise). */
+export const deleteCommentByMarker = async (
+  octokit: Octokit,
+  owner: string,
+  repo: string,
+  issueNumber: number,
+  marker: string,
+): Promise<void> => {
+  const comments = await octokit.paginate(octokit.issues.listComments, {
+    issue_number: issueNumber,
+    owner,
+    per_page: 100,
+    repo,
+  });
+
+  // Only delete our own bot-authored marker comment. The marker strings are public
+  // constants, so a human could post a comment embedding one -- never delete that.
+  const existing = comments.find(
+    (comment) => comment.body?.includes(marker) && comment.user?.type === 'Bot',
+  );
+  if (existing) {
+    await octokit.issues.deleteComment({ comment_id: existing.id, owner, repo });
   }
 };
 
