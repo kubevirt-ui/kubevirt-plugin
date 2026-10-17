@@ -13,11 +13,12 @@ const DEFAULT_WORKFLOWS = [
 
 /**
  * Resolve a display_title bracket token to a cluster name.
- * hot-cluster-e2e.yml's run-name can contain either an already-resolved
- * cluster name or a raw base branch like "release-4.20".
+ * hot-cluster-e2e.yml's run-name is "Hot Cluster E2E [<test_project>] [<ref>] @ ...",
+ * where the second bracket is the branch/cluster token -- either an already-resolved
+ * cluster name ("kubevirt-plugin-420") or a raw base branch like "release-4.20".
  */
-const resolveClusterFromTitle = (title: string): null | string => {
-  const bracketed = /^Hot Cluster E2E \[([^\]]+)\]/.exec(title);
+export const resolveClusterFromTitle = (title: string): null | string => {
+  const bracketed = /^Hot Cluster E2E \[[^\]]*\] \[([^\]]+)\]/.exec(title);
   if (!bracketed) {
     return null;
   }
