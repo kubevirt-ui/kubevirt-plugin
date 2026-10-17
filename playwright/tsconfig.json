@@ -14,9 +14,11 @@
     "useUnknownInCatchVariables": true,
     "noEmit": true,
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@component-deps/*": ["./component-dependencies/*"],
+      "@virtualmachines/*": ["../src/views/virtualmachines/*"]
     }
   },
-  "include": ["./**/*.ts", "../playwright.config.ts"],
+  "include": ["./**/*.{ts,tsx}", "../playwright.config.ts"],
   "exclude": ["node_modules"]
 }

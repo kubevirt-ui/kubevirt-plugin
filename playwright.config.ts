@@ -46,6 +46,30 @@ const uiTestIgnoreApi = '**/api/**';
 /** Avoid running `@cnv-settings` specs twice (Gating + Settings). */
 const uiGrepInvertSettings = /@cnv-settings/;
 
+const galleryOrigin = 'http://localhost:3100';
+const galleryURL = `${galleryOrigin}/playwright/gallery/`;
+
+/** Start the Rspack story gallery only when component tests are part of this run. */
+const shouldStartGalleryWebServer = (): boolean => {
+  const argv = process.argv;
+  const selectedProjects: string[] = [];
+
+  for (let i = 0; i < argv.length; i++) {
+    const arg = argv[i];
+    if (arg === '--project' && argv[i + 1]) {
+      selectedProjects.push(argv[i + 1]);
+    } else if (arg?.startsWith('--project=')) {
+      selectedProjects.push(arg.slice('--project='.length));
+    }
+  }
+
+  if (selectedProjects.length === 0) {
+    return true;
+  }
+
+  return selectedProjects.some((name) => name === 'component-scenes');
+};
+
 export default defineConfig({
   expect: { timeout: 60_000 },
   forbidOnly: !!process.env.CI,
@@ -108,6 +132,24 @@ export default defineConfig({
       use: migrationUse,
     },
 
+    // ── Component scenes (gallery; multi-widget layouts, no cluster setup) ──
+    {
+      // Serial worker + shared context: faster gallery mounts; unmount between stories in tests.
+      fullyParallel: false,
+      name: 'component-scenes',
+      retries: 0,
+      testDir: './playwright/tests/components',
+      testMatch: '**/scenes/**/*.spec.ts',
+      timeout: 60_000,
+      workers: 1,
+      use: {
+        ...devices['Desktop Chrome'],
+        baseURL: galleryURL,
+        reuseContext: true,
+        serviceWorkers: 'block',
+      },
+    },
+
     // ── Migration projects (use global setup/teardown) ───────────────
   ],
   reporter: [
@@ -130,4 +172,14 @@ export default defineConfig({
     viewport: { height: 1080, width: 1920 },
   },
   workers: process.env.WORKERS ? parseInt(process.env.WORKERS, 10) : 4,
+  ...(shouldStartGalleryWebServer()
+    ? {
+        webServer: {
+          command: 'npm run gallery:dev',
+          reuseExistingServer: !process.env.CI,
+          timeout: 120_000,
+          url: galleryURL,
+        },
+      }
+    : {}),
 });
