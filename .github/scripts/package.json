@@ -10,7 +10,7 @@
     "tsx": "^4.19.4"
   },
   "scripts": {
-    "test": "node --import tsx --test src/**/*.test.ts",
+    "test": "node --import tsx --test \"src/**/*.test.ts\"",
     "check-types": "tsc --noEmit"
   },
   "devDependencies": {

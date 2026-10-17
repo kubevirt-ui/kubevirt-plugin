@@ -34,6 +34,7 @@ export const JIRA_PROJECT_KEY = 'CNV';
 export const REQUIRED_COMPONENT = 'CNV User Interface';
 export const VALIDATION_COMMENT_MARKER = '<!-- jira-validation -->';
 export const CLONE_COMMENT_MARKER = '<!-- jira-clone-result -->';
+export const COMMAND_FAILURE_SUMMARY_MARKER = '<!-- command-failure-summary -->';
 export const BLOCK_LABEL = 'do-not-merge/jira-invalid';
 export const SKIP_LABEL = 'skip-jira-check';
 export const CONFLICT_LABEL = 'do-not-merge/has-conflicts';

@@ -3,9 +3,25 @@ import { describe, it } from 'node:test';
 
 import type { Octokit } from '@octokit/rest';
 
-import { removeLabel } from './github-comments';
+import { deleteCommentByMarker, removeLabel } from './github-comments';
 
 type Call = { args: unknown; method: string };
+
+const MARKER = '<!-- command-failure-summary -->';
+
+const fakeCommentOctokit = (
+  comments: { body: string; id: number; user: { type: string } }[],
+  calls: Call[],
+): Octokit =>
+  ({
+    issues: {
+      deleteComment: async (args: unknown) => {
+        calls.push({ args, method: 'deleteComment' });
+      },
+      listComments: () => undefined,
+    },
+    paginate: async () => comments,
+  }) as unknown as Octokit;
 
 const fakeOctokit = (behavior: 'ok' | number, calls: Call[]): Octokit =>
   ({
@@ -52,5 +68,34 @@ describe('removeLabel', () => {
       () => removeLabel(fakeOctokit(500, calls), 'kubevirt-ui', 'kubevirt-plugin', 42, 'lgtm'),
       (err: unknown) => (err as { status?: number }).status === 500,
     );
+  });
+});
+
+describe('deleteCommentByMarker', () => {
+  it('deletes the bot-authored marker comment', async () => {
+    const calls: Call[] = [];
+    const octokit = fakeCommentOctokit(
+      [{ body: `${MARKER}\nsummary`, id: 5, user: { type: 'Bot' } }],
+      calls,
+    );
+    await deleteCommentByMarker(octokit, 'kubevirt-ui', 'kubevirt-plugin', 42, MARKER);
+    assert.equal(calls.length, 1);
+    assert.equal((calls[0].args as { comment_id: number }).comment_id, 5);
+  });
+
+  it('never deletes a human comment that embeds the (public) marker', async () => {
+    const calls: Call[] = [];
+    const octokit = fakeCommentOctokit(
+      [{ body: `look what I found: ${MARKER}`, id: 9, user: { type: 'User' } }],
+      calls,
+    );
+    await deleteCommentByMarker(octokit, 'kubevirt-ui', 'kubevirt-plugin', 42, MARKER);
+    assert.equal(calls.length, 0, 'human comment must be left untouched');
+  });
+
+  it('is a no-op when no marker comment exists', async () => {
+    const calls: Call[] = [];
+    await deleteCommentByMarker(fakeCommentOctokit([], calls), 'o', 'r', 42, MARKER);
+    assert.equal(calls.length, 0);
   });
 });
