@@ -3,7 +3,7 @@ import { describe, it } from 'node:test';
 
 import type { Octokit } from '@octokit/rest';
 
-import { hasActiveWorkflows } from './check-ci-activity';
+import { hasActiveWorkflows, resolveClusterFromTitle } from './check-ci-activity';
 
 type ListParams = { status?: string; workflow_id?: string };
 
@@ -20,6 +20,40 @@ const fakeOctokit = (
       },
     },
   }) as unknown as Octokit;
+
+describe('resolveClusterFromTitle', () => {
+  it('reads the branch/cluster from the second bracket, not the test_project', () => {
+    assert.equal(
+      resolveClusterFromTitle('Hot Cluster E2E [gating] [release-4.23] @ PR#4912 retest'),
+      'kubevirt-plugin-423',
+    );
+  });
+
+  it('handles a different test_project token and release-5.0', () => {
+    assert.equal(
+      resolveClusterFromTitle('Hot Cluster E2E [auto] [release-5.0] @ PR#4910 retest'),
+      'kubevirt-plugin-50',
+    );
+  });
+
+  it('maps the main branch to the default cluster', () => {
+    assert.equal(
+      resolveClusterFromTitle('Hot Cluster E2E [gating] [main] @ PR#4914 retest'),
+      'kubevirt-plugin-ci',
+    );
+  });
+
+  it('passes through an already-resolved cluster name verbatim', () => {
+    assert.equal(
+      resolveClusterFromTitle('Hot Cluster E2E [gating] [kubevirt-plugin-ci] @ main'),
+      'kubevirt-plugin-ci',
+    );
+  });
+
+  it('returns null for a non-matching title', () => {
+    assert.equal(resolveClusterFromTitle('Some Other Workflow [gating] [release-4.23]'), null);
+  });
+});
 
 describe('hasActiveWorkflows', () => {
   it('counts queued runs as active, not just in_progress', async () => {
