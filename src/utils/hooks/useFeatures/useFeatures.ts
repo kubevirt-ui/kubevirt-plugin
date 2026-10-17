@@ -25,7 +25,10 @@ export const useFeatures: UseFeatures = (featureName, clusterOverride) => {
   const cluster = configMapCluster ?? undefined;
   const operatorNamespace = operatorNamespaceSignal.value;
 
-  const { featuresConfigMapData, isAdmin } = useFeaturesConfigMap(configMapCluster, !createError);
+  const { canEditFeaturesConfigMap, featuresConfigMapData } = useFeaturesConfigMap(
+    configMapCluster,
+    !createError,
+  );
 
   const configMapWatchResult = featuresConfigMapData as WatchK8sResult<IoK8sApiCoreV1ConfigMap>;
   const featureConfigMap = configMapWatchResult[0];
@@ -147,7 +150,7 @@ export const useFeatures: UseFeatures = (featureName, clusterOverride) => {
   );
 
   return {
-    canEdit: isAdmin,
+    canEdit: canEditFeaturesConfigMap,
     error,
     featureEnabled,
     loading: loading && !loadError,

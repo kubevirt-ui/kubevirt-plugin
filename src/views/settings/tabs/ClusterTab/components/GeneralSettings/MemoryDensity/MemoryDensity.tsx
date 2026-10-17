@@ -2,7 +2,7 @@ import { type FC, useState } from 'react';
 
 import NewBadge from '@kubevirt-utils/components/badges/NewBadge/NewBadge';
 import ExpandSectionWithCustomToggle from '@kubevirt-utils/components/ExpandSectionWithCustomToggle/ExpandSectionWithCustomToggle';
-import { useCanListNamespaces } from '@kubevirt-utils/hooks/useCanListNamespaces';
+import useCanPatchHyperConverged from '@kubevirt-utils/hooks/useCanPatchHyperConverged';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Skeleton, Stack, StackItem } from '@patternfly/react-core';
 import { useSettingsCluster } from '@settings/context/SettingsClusterContext';
@@ -24,7 +24,7 @@ type MemoryDensityProps = {
 const MemoryDensity: FC<MemoryDensityProps> = ({ hyperConvergeConfiguration }) => {
   const { t } = useKubevirtTranslation();
   const cluster = useSettingsCluster();
-  const isAdmin = useCanListNamespaces();
+  const [canPatchHyperConverged] = useCanPatchHyperConverged(cluster);
   const [hyperConverge, hyperLoaded] = hyperConvergeConfiguration;
   const [error, setError] = useState<unknown>(null);
 
@@ -43,7 +43,6 @@ const MemoryDensity: FC<MemoryDensityProps> = ({ hyperConvergeConfiguration }) =
     }
   };
 
-  if (!isAdmin) return null;
   if (!hyperLoaded) return <Skeleton width={'300px'} />;
 
   return (
@@ -65,6 +64,7 @@ const MemoryDensity: FC<MemoryDensityProps> = ({ hyperConvergeConfiguration }) =
           <MemoryRequestRatioInput
             hasChanged={hasChanged}
             inputValue={inputValue}
+            isDisabled={!canPatchHyperConverged}
             isLoading={isLoading}
             onChange={onChange}
             onRestoreDefault={onRestoreDefault}

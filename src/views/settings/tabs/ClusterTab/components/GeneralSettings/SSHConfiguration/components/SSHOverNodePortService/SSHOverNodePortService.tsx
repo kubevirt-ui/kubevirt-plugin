@@ -24,8 +24,8 @@ const SSHOverNodePortService: FC<SSHOverNodePortServiceProps> = ({ newBadge }) =
   const { updateSSHConfiguration } = useUpdateSSHConfiguration(NODE_PORT_ADDRESS);
 
   const {
+    canEditFeaturesConfigMap,
     featuresConfigMapData: [featureConfigMap, loaded],
-    isAdmin,
   } = useFeaturesConfigMap(cluster);
 
   const onTextChange = useMemo(
@@ -58,7 +58,7 @@ const SSHOverNodePortService: FC<SSHOverNodePortServiceProps> = ({ newBadge }) =
         <TextInput
           className="pf-v6-u-mr-md"
           id="node-address"
-          isDisabled={!loaded || !isAdmin}
+          isDisabled={!loaded || !canEditFeaturesConfigMap}
           isRequired
           name="node-address"
           onChange={(_event, value: string) => {

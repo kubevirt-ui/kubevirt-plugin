@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 
 import { K8S_OPS } from '@kubevirt-utils/constants/constants';
-import { useCanListNamespaces } from '@kubevirt-utils/hooks/useCanListNamespaces';
+import useCanPatchHyperConverged from '@kubevirt-utils/hooks/useCanPatchHyperConverged';
 import useHyperConvergeConfiguration, {
   type HyperConverged,
 } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
@@ -54,7 +54,7 @@ const usePasstFeatureFlag: UsePasstFeatureFlag = (clusterOverride) => {
   const cluster = clusterOverride ?? clusterParam;
   const { featureGates, hcConfig, hcLoaded } = useKubevirtHyperconvergeConfiguration(cluster);
   const [hyperConvergeConfiguration] = useHyperConvergeConfiguration(cluster);
-  const isAdmin = useCanListNamespaces();
+  const [canPatchHyperConverged] = useCanPatchHyperConverged(cluster);
 
   const featureEnabled = useMemo(
     () => isPasstNetworkBindingEnabled(hyperConvergeConfiguration, hcConfig, featureGates),
@@ -67,7 +67,7 @@ const usePasstFeatureFlag: UsePasstFeatureFlag = (clusterOverride) => {
   );
 
   return {
-    canEdit: isAdmin,
+    canEdit: canPatchHyperConverged,
     featureEnabled,
     isLegacyPasst,
     loading: !hcLoaded,

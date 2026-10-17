@@ -45,7 +45,7 @@ export const getMigrationsTableData = (
   vmims: V1VirtualMachineInstanceMigration[],
   vmis: V1VirtualMachineInstance[],
   mps: V1alpha1MigrationPolicy[],
-  migrationsDefaultConfigurations: V1MigrationConfiguration,
+  migrationsDefaultConfigurations: V1MigrationConfiguration | undefined,
   selectedDuration: string,
 ): MigrationTableDataLayout[] => {
   const filteredVMIMS = getFilteredDurationVMIMS(vmims, selectedDuration);

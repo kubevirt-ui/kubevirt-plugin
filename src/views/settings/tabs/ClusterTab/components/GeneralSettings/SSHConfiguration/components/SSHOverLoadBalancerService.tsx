@@ -18,8 +18,8 @@ const SSHOverLoadBalancerService: FC<SSHOverLoadBalancerServiceProps> = ({ newBa
   const { isLoading, updateSSHConfiguration } = useUpdateSSHConfiguration(LOAD_BALANCER_ENABLED);
 
   const {
+    canEditFeaturesConfigMap,
     featuresConfigMapData: [featureConfigMap, loaded],
-    isAdmin,
   } = useFeaturesConfigMap(cluster);
   const hasMetalLBInstalled = useMetalLBOperatorInstalled(cluster);
 
@@ -30,7 +30,7 @@ const SSHOverLoadBalancerService: FC<SSHOverLoadBalancerServiceProps> = ({ newBa
         'Enable the creation of LoadBalancer services for SSH connections to VirtualMachines. A load balancer must be configured',
       )}
       id="load-balancer-feature"
-      isDisabled={!loaded || !isAdmin || hasMetalLBInstalled}
+      isDisabled={!loaded || !canEditFeaturesConfigMap || hasMetalLBInstalled}
       isLoading={isLoading}
       newBadge={newBadge}
       olsPromptType={OLSPromptType.SSH_OVER_LOADBALANCER_SERVICE}

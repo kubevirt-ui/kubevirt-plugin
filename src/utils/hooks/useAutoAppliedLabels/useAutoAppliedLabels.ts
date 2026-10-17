@@ -31,7 +31,7 @@ const parseLabels = (raw: string | undefined): AutoAppliedLabel[] => {
 const useAutoAppliedLabels = (cluster?: string): UseAutoAppliedLabelsResult => {
   const settingsCluster = useSettingsCluster();
   const resolvedCluster = cluster ?? settingsCluster;
-  const { featuresConfigMapData, isAdmin } = useFeaturesConfigMap(resolvedCluster);
+  const { canEditFeaturesConfigMap, featuresConfigMapData } = useFeaturesConfigMap(resolvedCluster);
   const [featureConfigMap, loaded] = featuresConfigMapData;
   const loadError: unknown = featuresConfigMapData[2];
   const [updateError, setUpdateError] = useState<Error | null>(null);
@@ -69,8 +69,8 @@ const useAutoAppliedLabels = (cluster?: string): UseAutoAppliedLabelsResult => {
   );
 
   return {
+    canEdit: canEditFeaturesConfigMap,
     error: updateError ?? (loadError instanceof Error ? loadError : null),
-    isAdmin,
     labels,
     loaded: Boolean(loaded),
     updateLabels,
