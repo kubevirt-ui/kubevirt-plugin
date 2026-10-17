@@ -1,4 +1,4 @@
-import { type FC, useEffect, useRef, useState } from 'react';
+import { type FC, useState } from 'react';
 
 import {
   type V1beta1VirtualMachineClone,
@@ -6,13 +6,6 @@ import {
   type V1VirtualMachine,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
-import {
-  TELEMETRY_STATUS,
-  TELEMETRY_VM_ACTION,
-} from '@kubevirt-utils/extensions/telemetry/utils/property-constants';
-import { logVMActionPerformed } from '@kubevirt-utils/extensions/telemetry/vm-actions';
-import { logVMCloned } from '@kubevirt-utils/extensions/telemetry/vm-storage';
-import useKubevirtToast from '@kubevirt-utils/hooks/useKubevirtToast';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useNameValidation } from '@kubevirt-utils/hooks/useNameValidation';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
@@ -27,6 +20,7 @@ import DescriptionInput from './components/DescriptionInput';
 import NameInput from './components/NameInput';
 import SnapshotContentConfigurationSummary from './components/SnapshotContentConfigurationSummary';
 import StartClonedVMCheckbox from './components/StartClonedVMCheckbox/StartClonedVMCheckbox';
+import useCloneSuccessHandler from './hooks/useCloneSuccessHandler';
 import useCloneVMModal from './hooks/useCloneVMModal';
 import { CLONING_STATUSES, isClonePhaseFailed, isClonePhaseInProgress } from './utils/constants';
 import getSubmitBtnText from './utils/getSubmitBtnText';
@@ -41,7 +35,6 @@ type CloneVMModalProps = {
 
 const CloneVMModal: FC<CloneVMModalProps> = ({ headerText, isOpen, onClose, source }) => {
   const { t } = useKubevirtTranslation();
-  const { addSuccessToast } = useKubevirtToast();
   const namespace = getNamespace(source);
   const name = getName(source);
 
@@ -88,23 +81,7 @@ const CloneVMModal: FC<CloneVMModalProps> = ({ headerText, isOpen, onClose, sour
     (condition) => condition.status === 'False',
   )?.message;
 
-  const hasLoggedCloneSuccessRef = useRef(false);
-
-  useEffect(() => {
-    if (isCloneSucceeded && !hasLoggedCloneSuccessRef.current) {
-      hasLoggedCloneSuccessRef.current = true;
-      logVMCloned({ status: TELEMETRY_STATUS.SUCCESS });
-      if (isVM(source)) {
-        logVMActionPerformed(TELEMETRY_VM_ACTION.CLONE, source);
-      }
-      addSuccessToast({
-        title: t(
-          'Clone completed. The cloned virtual machine may take some time to appear in the list.',
-        ),
-      });
-      onClose();
-    }
-  }, [addSuccessToast, isCloneSucceeded, onClose, source, t]);
+  useCloneSuccessHandler({ isCloneSucceeded, onClose, source });
 
   return (
     <TabModal
@@ -143,7 +120,11 @@ const CloneVMModal: FC<CloneVMModalProps> = ({ headerText, isOpen, onClose, sour
         }
         setDescription={setCloneDescription}
       />
-      <StartClonedVMCheckbox setStartCloneVM={setStartCloneVM} startCloneVM={startCloneVM} />
+      <StartClonedVMCheckbox
+        setStartCloneVM={setStartCloneVM}
+        source={source}
+        startCloneVM={startCloneVM}
+      />
       <Divider />
       {isVM(source) ? (
         <CloneVMModalConfigSection vm={source} />
