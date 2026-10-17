@@ -937,6 +937,13 @@ export default class VmWizardComputeCustomizationComponent extends BaseComponent
     }
   }
 
+  async isInstanceTypeSeriesCardVisible(
+    series: 'cx' | 'd' | 'u' | 'm' | 'n' | 'o' | 'rt',
+  ): Promise<boolean> {
+    const card = this.testId(`instance-type-series-${series}1`);
+    return card.isVisible({ timeout: TestTimeouts.SHORT_WAIT }).catch(() => false);
+  }
+
   async clickAddMoreInAnnotationsModal(): Promise<void> {
     const addMoreButton = this.metadataDialog().locator('button:has-text("Add more")');
     await addMoreButton.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
