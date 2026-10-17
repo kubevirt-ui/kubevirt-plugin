@@ -85,8 +85,14 @@ jobs:
         with:
           app-id: ${{ secrets.BOT_APP_ID }}
           private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
+          # Needed so the next step's publish-gating-check can create/update the
+          # "Run Gating Tests" check-run. create-bot-token omits checks by
+          # default, which made Mark check stale 403 (and the clear below then
+          # stripped e2e-passed while the check stayed success).
+          permission-checks: write
 
       - name: Mark check stale
+        id: mark-stale
         if: steps.check.outputs.should_mark == 'true'
         uses: ./.github/actions/publish-gating-check
         with:
@@ -98,7 +104,15 @@ jobs:
           github-token: ${{ steps.bot-token.outputs.token }}
 
       - name: Clear stale e2e-passed/e2e-failed
-        if: always()
+        # Clear the labels ONLY when the stale marker was actually published
+        # (the Mark check stale step succeeded). Previously this ran with
+        # if: always(), so when marking the check stale failed, the e2e-passed
+        # label was still removed -- leaving the PR with a success "Run Gating
+        # Tests" check but no e2e-passed label (passed, yet unlabeled). Coupling
+        # the clear to the marker keeps label and check consistent: both flip to
+        # stale together, or neither does (the job still fails, so the next main
+        # push retries). A passing retest re-adds the label.
+        if: steps.mark-stale.outcome == 'success'
         continue-on-error: true
         uses: ./.github/actions/clear-e2e-result-labels
         with:

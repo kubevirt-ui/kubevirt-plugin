@@ -21,6 +21,14 @@
 #   HCO_CR_PATH            - Path to HCO CR yaml (default: playwright/fixtures/hco.yaml)
 #   SKIP_HPP               - Set to "true" to skip HPP installation
 #   HPP_VERSION            - HostPath Provisioner release branch
+#   DEFAULT_STORAGE_CLASS  - Storage class to mark as the cluster default and the
+#                            KubeVirt virt-default (default:
+#                            "ibmc-vpc-block-10iops-tier"). Upstream HPP's
+#                            hostpath-csi CSI driver bind-mounts /var/lib/kubelet
+#                            and does not work on IBM ROKS (kubelet root is
+#                            /var/data/kubelet), so golden-image imports hang on
+#                            it. Golden images must use a working class such as
+#                            IBM VPC block.
 #
 set -euo pipefail
 
@@ -31,6 +39,7 @@ CNV_PIN_FALLBACK_UNPINNED="${CNV_PIN_FALLBACK_UNPINNED:-false}"
 HCO_CR_PATH="${HCO_CR_PATH:-playwright/fixtures/hco.yaml}"
 SKIP_HPP="${SKIP_HPP:-false}"
 HPP_VERSION="${HPP_VERSION:-release-v0.21}"
+DEFAULT_STORAGE_CLASS="${DEFAULT_STORAGE_CLASS:-ibmc-vpc-block-10iops-tier}"
 
 CNV_NS="openshift-cnv"
 
@@ -43,6 +52,7 @@ echo "  CNV_CHANNEL:     ${CNV_CHANNEL}"
 echo "  CNV_PIN_VERSION: ${CNV_PIN_VERSION:-<none, unpinned>}"
 echo "  CNV_NS:          ${CNV_NS}"
 echo "  SKIP_HPP:        ${SKIP_HPP}"
+echo "  DEFAULT_SC:      ${DEFAULT_STORAGE_CLASS}"
 echo ""
 
 # --- Namespace + OperatorGroup ---
@@ -286,9 +296,15 @@ done
 
 echo "CNV operands are ready."
 
-# --- HPP (optional) ---
+# --- Storage ---
+# HPP is still installed for workloads that request hostpath-csi explicitly, but
+# it must NOT be the default on IBM ROKS: upstream HPP's CSI driver bind-mounts
+# /var/lib/kubelet while ROKS runs kubelet at /var/data/kubelet, so hostpath-csi
+# cannot publish volumes and CDI golden-image imports hang indefinitely. We make
+# a working IBM VPC block class the single default (and KubeVirt virt-default) so
+# golden images and VM disks provision successfully.
 if [[ "${SKIP_HPP}" != "true" ]]; then
-  echo "Installing HostPath Provisioner..."
+  echo "Installing HostPath Provisioner (non-default)..."
 
   HPP_BASE="https://raw.githubusercontent.com/kubevirt/hostpath-provisioner-operator/${HPP_VERSION}/deploy"
   for manifest in hostpathprovisioner_cr.yaml storageclass-wffc-csi.yaml; do
@@ -301,17 +317,26 @@ if [[ "${SKIP_HPP}" != "true" ]]; then
     done
   done
 
-  for sc in $(oc get storageclasses -o jsonpath='{.items[*].metadata.name}'); do
-    if [[ "${sc}" != "hostpath-csi" ]]; then
-      oc annotate storageclass "${sc}" storageclass.kubernetes.io/is-default-class='false' --overwrite || true
-    fi
-  done
-  oc annotate storageclass hostpath-csi storageclass.kubernetes.io/is-default-class='true' --overwrite
-
   echo "HPP installation complete"
 else
   echo "Skipping HPP installation (SKIP_HPP=true)"
 fi
+
+echo "Setting '${DEFAULT_STORAGE_CLASS}' as the default (and virt-default) storage class..."
+if ! oc get storageclass "${DEFAULT_STORAGE_CLASS}" >/dev/null 2>&1; then
+  echo "ERROR: storage class '${DEFAULT_STORAGE_CLASS}' not found. Available classes:"
+  oc get storageclass -o name
+  echo "Set DEFAULT_STORAGE_CLASS to a class that works on this cluster."
+  exit 1
+fi
+for sc in $(oc get storageclasses -o jsonpath='{.items[*].metadata.name}'); do
+  if [[ "${sc}" != "${DEFAULT_STORAGE_CLASS}" ]]; then
+    oc annotate storageclass "${sc}" storageclass.kubernetes.io/is-default-class='false' --overwrite || true
+  fi
+done
+oc annotate storageclass "${DEFAULT_STORAGE_CLASS}" \
+  storageclass.kubernetes.io/is-default-class='true' \
+  storageclass.kubevirt.io/is-default-virt-class='true' --overwrite
 
 echo ""
 echo "=== OpenShift Virtualization Installation Complete ==="

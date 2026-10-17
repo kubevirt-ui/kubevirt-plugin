@@ -40,6 +40,17 @@ jobs:
           private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
           permission-checks: write
 
+      # Install .github/scripts deps before any step that runs `npx tsx`
+      # (clear-result-labels below, pr-gate-dispatch later). This must precede
+      # the clear step: when it ran afterwards, the clear crashed with "Cannot
+      # find module '@octokit/rest'" and -- masked by continue-on-error -- left
+      # the e2e-passed/e2e-failed labels in place on every push. Unconditional
+      # so the clear (synchronize) and held paths both have their deps.
+      - name: Setup scripts
+        uses: ./.github/actions/setup-gh-scripts
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+
       - name: Clear stale e2e-passed/e2e-failed on push
         if: github.event.action == 'synchronize'
         continue-on-error: true
@@ -66,12 +77,6 @@ jobs:
             Removing the `e2e-hold` label directly (e.g. from the UI) does **not** lift the hold or refresh this result -- only `/retest-e2e` does both.
 
       # ── Dispatch path: fire E2E and post immediate queued status ──
-      - name: Setup scripts
-        if: "!contains(github.event.pull_request.labels.*.name, 'e2e-hold')"
-        uses: ./.github/actions/setup-gh-scripts
-        with:
-          ref: ${{ github.event.repository.default_branch }}
-
       - name: Dispatch hot-cluster-e2e.yml
         id: dispatch
         if: "!contains(github.event.pull_request.labels.*.name, 'e2e-hold')"
