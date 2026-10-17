@@ -228,7 +228,7 @@ See [`hot-cluster/arc/README.md`](hot-cluster/arc/README.md) for ARC-specific de
 
 `resolve-cluster-config.sh` picks the cluster name, OpenShift version, test engine, and CNV channel/pin for a run, from the PR's base branch (or `workflow_dispatch` overrides):
 
-- **Release branches** (`release-<major>.<minor>`) get a dedicated cluster (`kubevirt-plugin-<major><minor>`) instead of sharing `kubevirt-plugin-ci`, and a CNV `startingCSV` pin to that major.minor -- `install-hco.sh` fails the build if no matching CSV exists, rather than silently installing a newer one.
+- **Release branches** (`release-<major>.<minor>`) get a dedicated cluster (`kubevirt-plugin-<major><minor>`) instead of sharing `kubevirt-plugin-ci`, and a CNV `startingCSV` pin to that major.minor. By default `install-hco.sh` fails the build if no matching CSV exists, rather than silently installing a newer one; the hot-cluster workflow sets `CNV_PIN_FALLBACK_UNPINNED=true` so that case instead installs unpinned (channel head) with a loud warning, keeping a release-branch PR green when its CNV version isn't in the catalog yet (e.g. not GA).
 - **Test engine**: `release-4.22` and earlier predate the Cypress-to-Playwright migration and still carry a `cypress/` suite; everything else (main, future releases, non-release bases) uses Playwright. An explicit `workflow_dispatch` override always wins over this auto-detection.
 - **CNV channel**: always resolves to the catalog's real `stable` channel (there is no per-version `stable-4.X` channel); version pinning happens via `startingCSV`, not a different channel name.
 

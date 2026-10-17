@@ -63,9 +63,11 @@ on:
           "<major>.<minor>" to pin CNV to the newest matching CSV within
           cnv_channel via startingCSV. Leave empty to install whatever
           cnv_channel currently resolves to. If set and no matching CSV is
-          found in the channel's entries, install-hco.sh fails the build
-          rather than silently falling back to an unpinned/newer install --
-          pass an explicit cnv_channel instead to opt into that.
+          found in the channel's entries, this workflow installs unpinned from
+          the channel head with a loud warning (CNV_PIN_FALLBACK_UNPINNED=true)
+          rather than failing the build -- so a release-branch PR isn't blocked
+          when its CNV version simply isn't in the catalog yet (e.g. not GA).
+          The run then tests against the channel head, not the requested pin.
         required: false
         default: ''
         type: string
@@ -147,9 +149,11 @@ on:
           "<major>.<minor>" to pin CNV to the newest matching CSV within
           cnv_channel via startingCSV. Leave empty to install whatever
           cnv_channel currently resolves to. If set and no matching CSV is
-          found in the channel's entries, install-hco.sh fails the build
-          rather than silently falling back to an unpinned/newer install --
-          pass an explicit cnv_channel instead to opt into that.
+          found in the channel's entries, this workflow installs unpinned from
+          the channel head with a loud warning (CNV_PIN_FALLBACK_UNPINNED=true)
+          rather than failing the build -- so a release-branch PR isn't blocked
+          when its CNV version simply isn't in the catalog yet (e.g. not GA).
+          The run then tests against the channel head, not the requested pin.
         required: false
         default: ''
         type: string
@@ -442,6 +446,11 @@ jobs:
           KVM_EMULATION: ${{ steps.kvm_check.outputs.kvm_emulation || inputs.kvm_emulation }}
           CNV_CHANNEL: ${{ inputs.cnv_channel || 'stable' }}
           CNV_PIN_VERSION: ${{ inputs.cnv_pin_version }}
+          # Don't block a release-branch PR when its pinned CNV version simply
+          # isn't in the catalog yet (e.g. not GA): install unpinned with a loud
+          # warning instead of hard-failing. The step log/summary makes clear the
+          # run tested against the channel head, not the requested pin.
+          CNV_PIN_FALLBACK_UNPINNED: 'true'
         run: |
           echo "KVM_EMULATION=${KVM_EMULATION} (auto-detected)"
           echo "CNV_CHANNEL=${CNV_CHANNEL}"
