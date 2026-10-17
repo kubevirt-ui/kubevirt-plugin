@@ -3,7 +3,12 @@ import {
   type V1VirtualMachine,
   type V1VirtualMachineInstance,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { getDevices, getGPUDevices, getHostDevices } from '@kubevirt-utils/resources/vm';
+import {
+  getDevices,
+  getGPUDevices,
+  getHostDevices,
+  isVSOCKEnabled,
+} from '@kubevirt-utils/resources/vm';
 import { getVMIDevices } from '@kubevirt-utils/resources/vmi/utils/selectors';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 
@@ -77,4 +82,12 @@ export const getChangedHeadlessMode = (
   }
 
   return isHeadlessMode(vm) !== isHeadlessMode(vmi);
+};
+
+export const getChangedVSOCK = (vm: V1VirtualMachine, vmi: V1VirtualMachineInstance): boolean => {
+  if (isEmpty(vm) || isEmpty(vmi)) {
+    return false;
+  }
+
+  return isVSOCKEnabled(vm) !== isVSOCKEnabled(vmi);
 };

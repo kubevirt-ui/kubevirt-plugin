@@ -986,6 +986,12 @@ export default class VirtualMachineDetailPage extends PageCommons {
   async verifyHeadlessChecked(expectedChecked: boolean): Promise<boolean> {
     return this.configuration.verifyHeadlessChecked(expectedChecked);
   }
+  async setVsockEnabled(enabled: boolean): Promise<void> {
+    return this.configuration.setVsockEnabled(enabled);
+  }
+  async isVsockToggleVisible(): Promise<boolean> {
+    return this.configuration.isVsockToggleVisible();
+  }
   async verifyHeadlessMode(): Promise<boolean> {
     return this.diagnostics.verifyHeadlessMode();
   }

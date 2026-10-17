@@ -16,6 +16,8 @@ import { VM_DELETION_PROTECTION_LABEL } from '@virtualmachines/details/tabs/conf
 import { VMDeletionProtectionOptions } from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/utils/types';
 import { useWizardVMDraft } from '@virtualmachines/wizard/hooks/useWizardVMDraft';
 
+import WizardDetailsVSOCKToggleItem from './WizardDetailsVSOCKToggleItem';
+
 type DetailsToggleItemsProps = {
   deletionProtectionEnabled: boolean;
   isCheckedGuestSystemAccessLog: boolean;
@@ -74,6 +76,7 @@ const DetailsToggleItems: FC<DetailsToggleItemsProps> = ({
         olsObj={vm}
         promptType={OLSPromptType.HEADLESS_MODE}
       />
+      <WizardDetailsVSOCKToggleItem />
       <DescriptionItem
         bodyContent={t(
           "Enables access to the VirtualMachine's guest system log. Wait a few seconds for logging to start before viewing the log.",

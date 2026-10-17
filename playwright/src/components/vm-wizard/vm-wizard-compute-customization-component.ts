@@ -598,6 +598,10 @@ export default class VmWizardComputeCustomizationComponent extends BaseComponent
     return await this.locator('#headless-mode').isChecked();
   }
 
+  async isVsockEnabled(): Promise<boolean> {
+    return await this.locator('#enable-vsock').isChecked();
+  }
+
   async isPodNetworkingOptionVisibleInAddNetworkModal(): Promise<boolean> {
     const modal = this.networkInterfaceModal();
     const selectRoot = modal.getByTestId('network-attachment-definition-select');
@@ -753,6 +757,13 @@ export default class VmWizardComputeCustomizationComponent extends BaseComponent
 
   async toggleHeadlessMode(): Promise<void> {
     await this.toggleSwitch('headless-mode');
+  }
+
+  async setVsockEnabled(enabled: boolean): Promise<void> {
+    const isEnabled = await this.isVsockEnabled();
+    if (isEnabled !== enabled) {
+      await this.toggleSwitch('enable-vsock');
+    }
   }
 
   async toggleStartAfterCreation(): Promise<void> {
