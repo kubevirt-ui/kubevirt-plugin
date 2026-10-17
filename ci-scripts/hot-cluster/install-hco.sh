@@ -8,10 +8,16 @@
 #   CNV_CHANNEL            - OLM subscription channel (default: "stable")
 #   CNV_PIN_VERSION        - "<major>.<minor>" to pin CNV to the newest matching CSV
 #                            within CNV_CHANNEL via startingCSV (default: unpinned).
-#                            Resolved dynamically against the live PackageManifest;
-#                            no matching CSV is a hard failure, not a silent fallback
-#                            to the channel head. Only takes effect at Subscription
-#                            creation time -- can't re-pin an already-installed cluster.
+#                            Resolved dynamically against the live PackageManifest.
+#                            Only takes effect at Subscription creation time --
+#                            can't re-pin an already-installed cluster.
+#   CNV_PIN_FALLBACK_UNPINNED - "true" to install unpinned (channel head) with a
+#                            loud warning when CNV_PIN_VERSION has no matching CSV
+#                            in the channel, instead of hard-failing (default:
+#                            "false"). Lets release-branch CI stay green when the
+#                            pinned CNV version simply isn't in the catalog yet
+#                            (e.g. not GA), while a bare `install-hco.sh` run still
+#                            fails hard by default.
 #   HCO_CR_PATH            - Path to HCO CR yaml (default: playwright/fixtures/hco.yaml)
 #   SKIP_HPP               - Set to "true" to skip HPP installation
 #   HPP_VERSION            - HostPath Provisioner release branch
@@ -21,6 +27,7 @@ set -euo pipefail
 export KVM_EMULATION="${KVM_EMULATION:-true}"
 export CNV_CHANNEL="${CNV_CHANNEL:-stable}"
 CNV_PIN_VERSION="${CNV_PIN_VERSION:-}"
+CNV_PIN_FALLBACK_UNPINNED="${CNV_PIN_FALLBACK_UNPINNED:-false}"
 HCO_CR_PATH="${HCO_CR_PATH:-playwright/fixtures/hco.yaml}"
 SKIP_HPP="${SKIP_HPP:-false}"
 HPP_VERSION="${HPP_VERSION:-release-v0.21}"
@@ -59,6 +66,7 @@ EOF
 # --- Resolve a pinned startingCSV, if requested ---
 STARTING_CSV=""
 INSTALL_PLAN_APPROVAL="Automatic"
+PIN_FALLBACK_OCCURRED="false"
 
 if [[ -n "${CNV_PIN_VERSION}" ]]; then
   if [[ ! "${CNV_PIN_VERSION}" =~ ^[0-9]+\.[0-9]+$ ]]; then
@@ -71,25 +79,44 @@ if [[ -n "${CNV_PIN_VERSION}" ]]; then
   # guaranteed unique across sources. Retried since a transient `oc get`
   # failure would otherwise trip `set -e`; a genuine "no match" still
   # exits 0, so this only retries real command failures.
+  # Distinguishes a successful lookup that found no match (exit 0, empty output)
+  # from a lookup that never completed (all retries failed). Only the former is a
+  # genuine "this version isn't in the catalog"; the latter must not be mistaken
+  # for it, or a transient API outage would wrongly trigger the unpinned fallback.
+  LOOKUP_SUCCEEDED="false"
   for attempt in 1 2 3; do
     if STARTING_CSV="$(oc get packagemanifest -n openshift-marketplace -o json 2>/dev/null \
       | jq -r --arg ch "${CNV_CHANNEL}" --arg ver "${CNV_PIN_VERSION}." \
         '.items[]? | select(.metadata.name == "kubevirt-hyperconverged" and .status.catalogSource == "redhat-operators") | .status.channels[]? | select(.name == $ch) | .entries[]? | select((.version // "") | startswith($ver)) | "\(.version) \(.name)"' \
       | sort -V | tail -1 | awk '{print $2}')"; then
+      LOOKUP_SUCCEEDED="true"
       break
     fi
     echo "  Retry ${attempt}/3 for packagemanifest lookup (API may be transiently unavailable)..."
     sleep 10
   done
 
-  if [[ -z "${STARTING_CSV}" ]]; then
-    echo "ERROR: No CSV matching version prefix '${CNV_PIN_VERSION}.' found in channel '${CNV_CHANNEL}' (redhat-operators)."
-    echo "This is a hard failure rather than a silent fallback to the latest channel head. To deliberately install unpinned, override cnv_channel explicitly on the workflow dispatch."
+  if [[ "${LOOKUP_SUCCEEDED}" != "true" ]]; then
+    echo "ERROR: Could not query the PackageManifest catalog after 3 attempts (redhat-operators API unavailable)."
+    echo "This is a lookup failure, not a confirmed 'no matching CSV' -- refusing to fall back to unpinned even with CNV_PIN_FALLBACK_UNPINNED=true, since the pin may well be valid."
     exit 1
   fi
 
-  echo "Resolved pinned CSV: ${STARTING_CSV}"
-  INSTALL_PLAN_APPROVAL="Manual"
+  if [[ -z "${STARTING_CSV}" ]]; then
+    if [[ "${CNV_PIN_FALLBACK_UNPINNED}" == "true" ]]; then
+      echo "::warning::No CSV matching version prefix '${CNV_PIN_VERSION}.' found in channel '${CNV_CHANNEL}' (redhat-operators) -- CNV_PIN_FALLBACK_UNPINNED=true, so installing UNPINNED from the '${CNV_CHANNEL}' channel head instead of failing. The cluster will NOT be running the requested CNV ${CNV_PIN_VERSION}.x (it likely isn't in the catalog yet); treat these results as tested against the channel head, not the pinned release."
+      PIN_FALLBACK_OCCURRED="true"
+      # Leave STARTING_CSV empty and INSTALL_PLAN_APPROVAL=Automatic so the
+      # rest of the script behaves exactly like an unpinned install.
+    else
+      echo "ERROR: No CSV matching version prefix '${CNV_PIN_VERSION}.' found in channel '${CNV_CHANNEL}' (redhat-operators)."
+      echo "This is a hard failure rather than a silent fallback to the latest channel head. Set CNV_PIN_FALLBACK_UNPINNED=true to install unpinned instead, or override cnv_channel explicitly on the workflow dispatch."
+      exit 1
+    fi
+  else
+    echo "Resolved pinned CSV: ${STARTING_CSV}"
+    INSTALL_PLAN_APPROVAL="Manual"
+  fi
 fi
 
 # --- Subscription ---
@@ -292,6 +319,8 @@ echo "  Namespace:   ${CNV_NS}"
 echo "  Channel:     ${CNV_CHANNEL}"
 if [[ -n "${STARTING_CSV}" ]]; then
   echo "  Pinned CSV:  ${STARTING_CSV} (installPlanApproval: Manual)"
+elif [[ "${PIN_FALLBACK_OCCURRED}" == "true" ]]; then
+  echo "  Pinned CSV:  <none> -- requested CNV ${CNV_PIN_VERSION}.x was not in the catalog; fell back to unpinned '${CNV_CHANNEL}' head (CNV_PIN_FALLBACK_UNPINNED=true)"
 else
   echo "  Pinned CSV:  <none, unpinned>"
 fi
