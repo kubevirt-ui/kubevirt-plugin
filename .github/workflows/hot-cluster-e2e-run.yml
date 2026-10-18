@@ -398,18 +398,21 @@ jobs:
           checkout-ref: ${{ inputs.checkout_ref }}
           pr-number: ${{ inputs.pr_number }}
 
-      # ci-scripts/hot-cluster exists only on main; a release-branch checkout
-      # above has none of it. Overlay the infra from the ref this run was
-      # dispatched at (github.sha -- main's tip in production, the fix branch
-      # during a workflow_dispatch validation) into an isolated subdir.
-      # GITHUB_WORKSPACE stays pointed at the product checkout at the workspace
-      # root, so the test runner still runs the branch's own specs.
+      # ci-scripts/hot-cluster and the .github/scripts e2e orchestration code
+      # exist only on main; a release-branch checkout above has neither (an old
+      # release branch predates the e2e scripts entirely). Overlay both from the
+      # ref this run was dispatched at (github.sha -- main's tip in production,
+      # the fix branch during a workflow_dispatch validation) into an isolated
+      # subdir. GITHUB_WORKSPACE stays pointed at the product checkout at the
+      # workspace root, so the test runner still runs the branch's own specs.
       - name: Overlay hot-cluster CI infra from main
         uses: actions/checkout@v4
         with:
           ref: ${{ github.sha }}
           persist-credentials: false
-          sparse-checkout: ci-scripts/hot-cluster
+          sparse-checkout: |
+            ci-scripts/hot-cluster
+            .github/scripts
           path: .hc-infra
           clean: false
 
@@ -468,7 +471,7 @@ jobs:
 
       - name: Install GH script dependencies
         if: inputs.progress_status_sha != '' && inputs.progress_status_context != ''
-        working-directory: .github/scripts
+        working-directory: .hc-infra/.github/scripts
         run: npm ci --ignore-scripts --no-audit
 
       # Best-effort follow-up to hot-cluster-e2e.yml's own progress update;
@@ -476,7 +479,7 @@ jobs:
       - name: Update progress status
         if: inputs.progress_status_sha != '' && inputs.progress_status_context != ''
         continue-on-error: true
-        working-directory: .github/scripts
+        working-directory: .hc-infra/.github/scripts
         env:
           GITHUB_TOKEN: ${{ github.token }}
           STATUS_SHA: ${{ inputs.progress_status_sha }}
