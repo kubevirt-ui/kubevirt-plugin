@@ -13,6 +13,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import {
   getTemplateModel,
   getTemplateVirtualMachineObject,
+  isTemplateWithInstanceType,
   isVirtualMachineTemplate,
 } from '@kubevirt-utils/resources/template';
 import { getMachineType } from '@kubevirt-utils/resources/vm';
@@ -32,6 +33,7 @@ import BootMethod from './BootMethod/BootMethod';
 import CPUMemory from './CPUMemory';
 import DisplayName from './DisplayName';
 import TemplateCategory from './TemplateCategory';
+import TemplateInstanceTypeDescriptionItem from './TemplateInstanceTypeDescriptionItem';
 import WorkloadProfile from './WorkloadProfile';
 
 const TemplateDetailsLeftGrid: FC<TemplateDetailsGridProps> = ({ template }) => {
@@ -40,6 +42,7 @@ const TemplateDetailsLeftGrid: FC<TemplateDetailsGridProps> = ({ template }) => 
   const { isTemplateEditable } = useEditTemplateAccessReview(template);
   const model = getTemplateModel(template);
   const isVMTemplate = isVirtualMachineTemplate(template);
+  const hasInstanceType = isTemplateWithInstanceType(template);
 
   return (
     <DescriptionList>
@@ -58,7 +61,11 @@ const TemplateDetailsLeftGrid: FC<TemplateDetailsGridProps> = ({ template }) => 
         descriptionHeader={t('Operating system')}
       />
       <WorkloadProfile editable={isTemplateEditable} template={template} />
-      <CPUMemory editable={isTemplateEditable} template={template} />
+      {hasInstanceType ? (
+        <TemplateInstanceTypeDescriptionItem editable={isTemplateEditable} template={template} />
+      ) : (
+        <CPUMemory editable={isTemplateEditable} template={template} />
+      )}
       <DescriptionItem
         bodyContent={t('The QEMU machine type.')}
         descriptionData={machineType}
