@@ -25,6 +25,9 @@ export default class VmWizardNavigationComponent extends BaseComponent {
   private readonly _pfV6CWizardButtonpfV6CButtonpfMPrimary = this.locator(
     '.pf-v6-c-wizard button.pf-v6-c-button.pf-m-primary',
   );
+  private readonly _wizardFooterNextButton = this.locator(
+    '.pf-v6-c-wizard__footer button.pf-v6-c-button.pf-m-primary',
+  );
   private readonly _pfV6CWizardMain = this.locator('.pf-v6-c-wizard__main');
   private readonly _pfV6CWizardTemplatesCatalogTile = this.locator(
     '.pf-v6-c-wizard .templates-catalog-tile',
@@ -98,7 +101,9 @@ export default class VmWizardNavigationComponent extends BaseComponent {
 
   async clickCreateVm(): Promise<void> {
     await this.collapseSidebarIfExpanded();
-    const createBtn = this._pfV6CWizardButtonpfV6CButtonpfMPrimary;
+    // The Create button is the primary button of the Review step footer; scope to
+    // the footer so we never resolve to the hidden list page `item-create` control.
+    const createBtn = this._wizardFooterNextButton;
     await createBtn.first().waitFor({
       state: 'visible',
       timeout: TestTimeouts.SHORT_WAIT,
@@ -118,12 +123,25 @@ export default class VmWizardNavigationComponent extends BaseComponent {
 
   async clickNext(): Promise<void> {
     await this.collapseSidebarIfExpanded();
-    const nextButton = this._pfV6CWizardButtonpfV6CButtonpfMPrimary;
-    await nextButton.first().waitFor({
+
+    // Dismiss any lingering tooltip that could intercept the click on the footer button.
+    await this.page.keyboard.press('Escape');
+    await this.page
+      .locator('.pf-v6-c-tooltip, [role="tooltip"]')
+      .first()
+      .waitFor({ state: 'hidden', timeout: TestTimeouts.SHORT_WAIT })
+      .catch(() => undefined);
+
+    // Target the primary button inside the wizard footer rather than the broad
+    // `.pf-v6-c-wizard ... .pf-m-primary` selector, which could resolve to the
+    // hidden list page `item-create` control and time out.
+    const nextButton = this._wizardFooterNextButton.first();
+    await nextButton.waitFor({
       state: 'visible',
       timeout: TestTimeouts.SHORT_WAIT,
     });
-    await this.robustClick(nextButton.first());
+    await nextButton.hover().catch(() => undefined);
+    await this.robustClick(nextButton);
     await this.page.waitForTimeout(1000);
   }
 
