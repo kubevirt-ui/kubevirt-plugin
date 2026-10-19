@@ -10,8 +10,7 @@ import {
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getAnnotation, getName } from '@kubevirt-utils/resources/shared';
-import { DESCRIPTION_ANNOTATION } from '@kubevirt-utils/resources/vm';
+import { getDescription, getName } from '@kubevirt-utils/resources/shared';
 
 import { updateDescription } from '../utils/utils';
 
@@ -28,9 +27,7 @@ const DetailsSectionDescription: FC<DetailsSectionDescriptionProps> = ({ canUpda
   return (
     <DescriptionItem
       data-test={`${vmName}-description`}
-      descriptionData={
-        getAnnotation(vm, DESCRIPTION_ANNOTATION) ?? <MutedTextSpan text={t('None')} />
-      }
+      descriptionData={getDescription(vm) || <MutedTextSpan text={t('None')} />}
       descriptionHeader={<SearchItem id="description">{t('Description')}</SearchItem>}
       isEdit={canUpdateVM}
       onEditClick={(): void =>

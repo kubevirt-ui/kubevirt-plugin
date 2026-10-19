@@ -19,6 +19,10 @@ export default class LabelsModalComponent extends BaseComponent {
     return this.dialog().getByTestId('label-key-input').last().locator('input');
   }
 
+  private getSaveButton(): Locator {
+    return this.dialog().getByTestId('save-button');
+  }
+
   async waitForOpen(): Promise<void> {
     await this.dialog().waitFor({
       state: 'visible',
@@ -46,9 +50,15 @@ export default class LabelsModalComponent extends BaseComponent {
   }
 
   async isSaveDisabled(): Promise<boolean> {
-    const saveButton = this.dialog().getByTestId('save-button');
+    const saveButton = this.getSaveButton();
     await saveButton.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
     return saveButton.isDisabled();
+  }
+
+  async getSaveButtonTooltipText(): Promise<string | null> {
+    const btn = this.getSaveButton();
+    await btn.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+    return this.getAriaDisabledTooltipText(btn);
   }
 
   async waitForValidationError(): Promise<void> {

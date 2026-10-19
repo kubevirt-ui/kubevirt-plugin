@@ -327,6 +327,9 @@ export class VirtualMachineDetailConfigurationComponent extends BaseComponent {
   private readonly _tabModalSaveButton = this.locator('#tab-modal').locator(
     '[data-test="save-button"]',
   );
+  private readonly _tabModalCancelButton = this.locator('#tab-modal').locator(
+    '[data-test="cancel-button"]',
+  );
   private readonly _vmConfigurationDetails = this.testId('vm-configuration-details');
   private readonly _vmDetailSaveButton = this.testId('save-button');
 
@@ -357,6 +360,77 @@ export class VirtualMachineDetailConfigurationComponent extends BaseComponent {
     } catch {
       return false;
     }
+  }
+
+  /**
+   * Closes the currently open tab modal via Cancel button.
+   */
+  async cancelTabModal(): Promise<void> {
+    await this.robustClick(this._tabModalCancelButton);
+    await this._tabModal
+      .waitFor({ state: 'hidden', timeout: TestTimeouts.ELEMENT_WAIT })
+      .catch(() => null);
+  }
+
+  /**
+   * Returns the aria-disabled state and tooltip text of the Save button inside #tab-modal.
+   * Hovers the button first to trigger any tooltip rendering.
+   */
+  async getTabModalSaveButtonState(): Promise<{
+    isAriaDisabled: boolean;
+    tooltipText: string | null;
+  }> {
+    const saveButton = this._tabModalSaveButton;
+    await saveButton.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+
+    const isAriaDisabled = (await saveButton.getAttribute('aria-disabled')) === 'true';
+    const tooltipText = await this.getAriaDisabledTooltipText(saveButton);
+
+    return { isAriaDisabled, tooltipText };
+  }
+
+  /**
+   * Opens the Description modal for a VM and returns the disabled state and tooltip
+   * of the Save button before any edits are made.
+   */
+  async getDescriptionModalSaveButtonState(
+    vmName: string,
+  ): ReturnType<typeof this.getTabModalSaveButtonState> {
+    const descButton = this.testId(`${vmName}-description`).first();
+    await descButton.waitFor({ state: 'visible', timeout: TestTimeouts.VM_CREATION });
+    await this.robustClick(descButton);
+    await this._tabModal.waitFor({
+      state: 'visible',
+      timeout: TestTimeouts.INSTANCE_TYPE_VERIFICATION,
+    });
+
+    return this.getTabModalSaveButtonState();
+  }
+
+  /**
+   * Types into the Description modal textarea (modal must already be open).
+   */
+  async typeInDescriptionModal(text: string): Promise<void> {
+    const descTextarea = this._tabModal.locator('textarea[aria-label="description text area"]');
+    await descTextarea.waitFor({
+      state: 'visible',
+      timeout: TestTimeouts.INSTANCE_TYPE_VERIFICATION,
+    });
+    await descTextarea.clear();
+    await descTextarea.fill(text);
+  }
+
+  /**
+   * Opens the Workload profile modal for a VM.
+   */
+  async openWorkloadProfileModal(vmName: string): Promise<void> {
+    const workloadButton = this.testId(`${vmName}-workload-profile`).first();
+    await workloadButton.waitFor({ state: 'visible', timeout: TestTimeouts.VM_CREATION });
+    await this.robustClick(workloadButton);
+    await this._tabModal.waitFor({
+      state: 'visible',
+      timeout: TestTimeouts.INSTANCE_TYPE_VERIFICATION,
+    });
   }
 
   async editDetails(
