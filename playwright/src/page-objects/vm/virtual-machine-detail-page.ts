@@ -311,6 +311,31 @@ export default class VirtualMachineDetailPage extends PageCommons {
     return this.disks.detachDisk(diskName);
   }
 
+  async cancelTabModal(): Promise<void> {
+    return this.configuration.cancelTabModal();
+  }
+
+  async getTabModalSaveButtonState(): Promise<{
+    isAriaDisabled: boolean;
+    tooltipText: string | null;
+  }> {
+    return this.configuration.getTabModalSaveButtonState();
+  }
+
+  async getDescriptionModalSaveButtonState(
+    vmName: string,
+  ): ReturnType<typeof this.getTabModalSaveButtonState> {
+    return this.configuration.getDescriptionModalSaveButtonState(vmName);
+  }
+
+  async openWorkloadProfileModal(vmName: string): Promise<void> {
+    return this.configuration.openWorkloadProfileModal(vmName);
+  }
+
+  async typeInDescriptionModal(text: string): Promise<void> {
+    return this.configuration.typeInDescriptionModal(text);
+  }
+
   async editDetails(
     vmName: string,
     vmData: {

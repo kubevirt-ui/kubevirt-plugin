@@ -18,7 +18,7 @@ type DescriptionModalProps = {
 export const DescriptionModal: FC<DescriptionModalProps> = memo(
   ({ isOpen, obj, onClose, onSubmit }) => {
     const { t } = useKubevirtTranslation();
-    const initialDescription = getDescription(obj);
+    const initialDescription = getDescription(obj) ?? '';
     const [description, setDescription] = useState(initialDescription);
 
     return (

@@ -180,6 +180,22 @@ export default class BaseComponent {
     await this.robustClick(saveButton);
   }
 
+  /**
+   * Returns the tooltip text shown when a button is `aria-disabled`.
+   * Returns `null` if the button is not aria-disabled or no tooltip appears.
+   */
+  protected async getAriaDisabledTooltipText(button: Locator): Promise<string | null> {
+    if ((await button.getAttribute('aria-disabled')) !== 'true') return null;
+
+    await button.hover();
+    await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
+    const tooltip = this.page.locator('[role="tooltip"]');
+    if (await tooltip.isVisible({ timeout: TestTimeouts.UI_VISIBILITY_QUICK }).catch(() => false)) {
+      return (await tooltip.textContent())?.trim() ?? null;
+    }
+    return null;
+  }
+
   async clickSaveBtn(): Promise<void> {
     const saveButton = this.locator('button#save-changes');
     await this.robustClick(saveButton);
