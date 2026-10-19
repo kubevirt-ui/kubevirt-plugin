@@ -1,5 +1,5 @@
+import useCanPatchFeaturesConfigMap from './useCanPatchFeaturesConfigMap';
 import useCanPatchHyperConverged from './useCanPatchHyperConverged';
-import useCanUpdateFeaturesConfigMap from './useCanUpdateFeaturesConfigMap';
 
 type UseCanManageClusterSettings = (cluster?: string) => [boolean, boolean];
 
@@ -9,9 +9,9 @@ type UseCanManageClusterSettings = (cluster?: string) => [boolean, boolean];
  */
 const useCanManageClusterSettings: UseCanManageClusterSettings = (cluster) => {
   const [canPatchHyperConverged, hcoLoading] = useCanPatchHyperConverged(cluster);
-  const [canUpdateFeaturesConfigMap, featuresLoading] = useCanUpdateFeaturesConfigMap(cluster);
+  const [canPatchFeaturesConfigMap, featuresLoading] = useCanPatchFeaturesConfigMap(cluster);
 
-  return [canPatchHyperConverged || canUpdateFeaturesConfigMap, hcoLoading || featuresLoading];
+  return [canPatchHyperConverged || canPatchFeaturesConfigMap, hcoLoading || featuresLoading];
 };
 
 export default useCanManageClusterSettings;

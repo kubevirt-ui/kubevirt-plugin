@@ -6,9 +6,9 @@ import { useFleetAccessReview } from '@stolostron/multicluster-sdk';
 
 import { FEATURES_CONFIG_MAP_NAME } from './useFeatures/constants';
 
-type UseCanUpdateFeaturesConfigMap = (cluster?: string) => [boolean, boolean];
+type UseCanPatchFeaturesConfigMap = (cluster?: string) => [boolean, boolean];
 
-const useCanUpdateFeaturesConfigMap: UseCanUpdateFeaturesConfigMap = (clusterOverride) => {
+const useCanPatchFeaturesConfigMap: UseCanPatchFeaturesConfigMap = (clusterOverride) => {
   const clusterParam = useClusterParam();
   const cluster = clusterOverride ?? clusterParam;
   const operatorNamespace = operatorNamespaceSignal.value;
@@ -37,4 +37,4 @@ const useCanUpdateFeaturesConfigMap: UseCanUpdateFeaturesConfigMap = (clusterOve
   return [canPatch, loading];
 };
 
-export default useCanUpdateFeaturesConfigMap;
+export default useCanPatchFeaturesConfigMap;

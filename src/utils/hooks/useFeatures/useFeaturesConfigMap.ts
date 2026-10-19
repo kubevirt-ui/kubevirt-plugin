@@ -4,7 +4,7 @@ import { operatorNamespaceSignal } from '@kubevirt-utils/store/operatorNamespace
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 import { getGroupVersionKindForModel } from '@openshift-console/dynamic-plugin-sdk';
 
-import useCanUpdateFeaturesConfigMap from '../useCanUpdateFeaturesConfigMap';
+import useCanPatchFeaturesConfigMap from '../useCanPatchFeaturesConfigMap';
 
 import { FEATURES_CONFIG_MAP_NAME } from './constants';
 
@@ -17,7 +17,7 @@ type UseFeaturesConfigMap = (
 };
 
 const useFeaturesConfigMap: UseFeaturesConfigMap = (cluster, enableQuery: boolean = true) => {
-  const [canEditFeaturesConfigMap] = useCanUpdateFeaturesConfigMap(cluster);
+  const [canEditFeaturesConfigMap] = useCanPatchFeaturesConfigMap(cluster);
   const operatorNamespace = operatorNamespaceSignal.value;
 
   const featuresConfigMapData = useK8sWatchData<IoK8sApiCoreV1ConfigMap>(
