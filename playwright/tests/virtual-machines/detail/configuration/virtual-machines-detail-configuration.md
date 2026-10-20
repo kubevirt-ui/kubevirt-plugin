@@ -6,7 +6,7 @@
 - **Route folder:** `tests/virtual-machines/detail/configuration/`
 - **Feature Area:** Tier1 — VM configuration
 - **Latest version:** CNV 5.1.0
-- **Latest update:** 2026-10-07
+- **Latest update:** 2026-10-20
 - **Document Status:** Draft
 
 ## 2. Introduction
@@ -33,6 +33,8 @@ Automated E2E coverage for console routes under `tests/virtual-machines/detail/c
 ### vm-configuration-storage
 
 ### vm-configuration-sysprep
+
+### vm-modal-submit-buttons
 
 ---
 
@@ -271,3 +273,59 @@ Automated E2E coverage for console routes under `tests/virtual-machines/detail/c
 | 2    | Navigate to Configuration → Initial run                  | Step completes without assertion failure |
 | 3    | Create new sysprep, detach it, then attach from existing | Step completes without assertion failure |
 | 4    | Verify VM spec references the sysprep ConfigMap          | Step completes without assertion failure |
+
+---
+
+### Module: `vm-modal-submit-buttons.spec.ts`
+
+**Spec file:** `tests/virtual-machines/detail/configuration/vm-modal-submit-buttons.spec.ts`
+**Describe:** `Modal submit button disabled when no changes (CNV-96343)` — **Tags:** `@route-virtual-machines-detail-configuration`, `@tier1`, `@nonpriv`
+**Allure:** suite `Modal submit button disabled when no changes (CNV-96343)`, feature `Tier 1`
+
+---
+
+### `001`: Description modal — Save disabled until text changes
+
+- **Objective:** Verify the Description modal Save button is aria-disabled with "No changes have been made." tooltip when the description has not been edited, becomes enabled after editing, and returns to disabled after reverting
+- **Target version:** CNV 5.1.0
+- **Jira References:** CNV-96343
+- **Pre-conditions:** Stopped RHEL9 VM with no description set
+- **Tags:** `@tier1`, `@nonpriv`
+
+| Step | Action                                                              | Expected Result                                                        |
+| :--- | :------------------------------------------------------------------ | :--------------------------------------------------------------------- |
+| 1    | Navigate to VM Configuration Details and open the Description modal | Save button is aria-disabled with "No changes have been made." tooltip |
+| 2    | Type a new description into the textarea                            | Save button becomes enabled                                            |
+| 3    | Clear the textarea back to empty                                    | Save button is aria-disabled again (empty matches initial empty value) |
+| 4    | Cancel the modal                                                    | Modal closes                                                           |
+
+---
+
+### `002`: Workload profile modal — Save disabled until value changes
+
+- **Objective:** Verify the Workload profile modal Save button is aria-disabled with "No changes have been made." tooltip when the selection has not changed
+- **Target version:** CNV 5.1.0
+- **Jira References:** CNV-96343
+- **Pre-conditions:** Stopped RHEL9 VM
+- **Tags:** `@tier1`, `@nonpriv`
+
+| Step | Action                                                                   | Expected Result                                                        |
+| :--- | :----------------------------------------------------------------------- | :--------------------------------------------------------------------- |
+| 1    | Navigate to VM Configuration Details and open the Workload profile modal | Save button is aria-disabled with "No changes have been made." tooltip |
+| 2    | Cancel the modal                                                         | Modal closes                                                           |
+
+---
+
+### `003`: Labels modal — Save disabled until labels change
+
+- **Objective:** Verify the Labels modal Save button is disabled with "No changes have been made." tooltip when labels have not been modified, and becomes enabled after adding a label
+- **Target version:** CNV 5.1.0
+- **Jira References:** CNV-96343
+- **Pre-conditions:** Stopped RHEL9 VM
+- **Tags:** `@tier1`, `@nonpriv`
+
+| Step | Action                                                          | Expected Result                                                   |
+| :--- | :-------------------------------------------------------------- | :---------------------------------------------------------------- |
+| 1    | Navigate to VM Configuration Metadata and open the Labels modal | Save button is disabled with "No changes have been made." tooltip |
+| 2    | Add a new label row and fill in a key                           | Save button becomes enabled                                       |
+| 3    | Close the modal                                                 | Modal closes                                                      |
