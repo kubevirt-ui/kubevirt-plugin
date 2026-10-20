@@ -31,16 +31,18 @@ const BootSourceStep: FC = () => {
   const canListAllNamespaces = useCanListNamespaces();
   const { control, setValue } = useVMWizardForm();
 
-  const [cluster, project, volumeListNamespace, selectedBootableVolume, preference] = useWatch({
-    control,
-    name: [
-      'deployment.cluster',
-      'deployment.project',
-      'instanceType.volumeNamespace',
-      'instanceType.bootVolume.volume',
-      'instanceType.preference',
-    ],
-  });
+  const [cluster, project, volumeListNamespace, selectedBootableVolume, preference, useBootSource] =
+    useWatch({
+      control,
+      name: [
+        'deployment.cluster',
+        'deployment.project',
+        'instanceType.volumeNamespace',
+        'instanceType.bootVolume.volume',
+        'instanceType.preference',
+        'instanceType.useBootSource',
+      ],
+    });
 
   const {
     field: { onChange, value },
@@ -89,7 +91,9 @@ const BootSourceStep: FC = () => {
           </SplitItem>
           <SplitItem isFilled />
           <SplitItem>
-            <AddBootableVolumeButton loadError={instanceTypesAndPreferencesData?.loadError} />
+            {useBootSource && (
+              <AddBootableVolumeButton loadError={instanceTypesAndPreferencesData?.loadError} />
+            )}
           </SplitItem>
         </Split>
       </StackItem>
