@@ -131,6 +131,11 @@ export default class BootableVolumesPage extends PageCommons {
     return this.rowActions.clickRowActionUploadToRegistry(volumeName);
   }
 
+  /** Clicks "Upload to registry" in an already-open kebab menu (see isUploadToRegistryActionDisabled). */
+  async clickOpenUploadToRegistryAction(): Promise<void> {
+    return this.rowActions.clickOpenUploadToRegistryAction();
+  }
+
   async clickSaveInDeleteModal(): Promise<void> {
     return this.rowActions.clickSaveInDeleteModal();
   }
@@ -337,6 +342,11 @@ export default class BootableVolumesPage extends PageCommons {
   async getUploadToRegistryModalButtonText(): Promise<string> {
     return this.rowActions.getUploadToRegistryModalButtonText();
   }
+
+  /** Tooltip text shown when hovering the disabled "Upload to registry" action. */
+  async getUploadToRegistryActionTooltipText(): Promise<string> {
+    return this.rowActions.getUploadToRegistryActionTooltipText();
+  }
   async getVisibleRowCount(): Promise<number> {
     return this._row.count();
   }
@@ -371,6 +381,15 @@ export default class BootableVolumesPage extends PageCommons {
   }
   async isUploadToRegistryModalButtonDisabled(): Promise<boolean> {
     return this.rowActions.isUploadToRegistryModalButtonDisabled();
+  }
+
+  /**
+   * Opens the row kebab for the given volume and returns whether the
+   * "Upload to registry" action is disabled (lacking export permissions).
+   * Leaves the kebab open — call closeKebabMenu() or clickOpenUploadToRegistryAction() next.
+   */
+  async isUploadToRegistryActionDisabled(volumeName: string): Promise<boolean> {
+    return this.rowActions.isUploadToRegistryActionDisabled(volumeName);
   }
   async navigateToBootableVolumesForNamespaceWithRetry(
     namespace: string,
