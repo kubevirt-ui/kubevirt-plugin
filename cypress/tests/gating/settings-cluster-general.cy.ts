@@ -52,7 +52,9 @@ describe('Test Cluster General settings', () => {
       cy.checkHCOSpec(percentage, '150', true);
     });
 
-    it('disable memory density', () => {
+    // Toggling the PF Switch off via .uncheck() intermittently doesn't fire the
+    // React onChange, so retry on failure.
+    it('disable memory density', { retries: { runMode: 3 } }, () => {
       cy.get('[id="memory-density-feature"]')
         .find('input[type="checkbox"]')
         .uncheck({ force: true });

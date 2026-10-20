@@ -32,8 +32,8 @@ describe('isSegmentTelemetryEnabled', () => {
   it('enables telemetry when API key and ACCOUNT_MAIL are present', () => {
     setTelemetry({
       ACCOUNT_MAIL: 'user@example.com',
-      SEGMENT_API_KEY: 'api-key',
       SEGMENT_API_HOST: 'console.redhat.com/connections/api/v1',
+      SEGMENT_API_KEY: 'api-key',
       SEGMENT_JS_HOST: 'console.redhat.com/connections/cdn',
     });
 
@@ -42,8 +42,8 @@ describe('isSegmentTelemetryEnabled', () => {
 
   it('disables telemetry when ACCOUNT_MAIL is missing (disconnected / OCM unavailable)', () => {
     setTelemetry({
-      SEGMENT_API_KEY: 'api-key',
       SEGMENT_API_HOST: 'console.redhat.com/connections/api/v1',
+      SEGMENT_API_KEY: 'api-key',
       SEGMENT_JS_HOST: 'console.redhat.com/connections/cdn',
     });
 
@@ -74,8 +74,8 @@ describe('isSegmentTelemetryEnabled', () => {
     (flag) => {
       setTelemetry({
         ACCOUNT_MAIL: 'user@example.com',
-        SEGMENT_API_KEY: 'api-key',
         [flag]: 'true',
+        SEGMENT_API_KEY: 'api-key',
       });
 
       expect(isSegmentTelemetryEnabled()).toBe(false);
