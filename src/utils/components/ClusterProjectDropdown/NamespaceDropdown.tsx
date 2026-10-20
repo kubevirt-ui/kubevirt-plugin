@@ -8,6 +8,7 @@ import type {
   DropdownCreateProjectMenuFooterProps,
 } from '@kubevirt-utils/components/ClusterProjectDropdown/Dropdown/types';
 import { ALL_PROJECTS } from '@kubevirt-utils/hooks/constants';
+import useAllowedNamespaces from '@kubevirt-utils/hooks/useAllowedNamespaces/useAllowedNamespaces';
 import useConsoleNamespaceBookmarks from '@kubevirt-utils/hooks/useConsoleNamespaceBookmarks/useConsoleNamespaceBookmarks';
 import useConsoleShowSystemNamespaces from '@kubevirt-utils/hooks/useConsoleShowSystemNamespaces/useConsoleShowSystemNamespaces';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -15,6 +16,7 @@ import { isSystemNamespace } from '@kubevirt-utils/resources/namespace/helper';
 import { getName } from '@kubevirt-utils/resources/shared';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 import type { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+import { type FleetAccessReviewResourceAttributes } from '@stolostron/multicluster-sdk';
 
 import CreateProjectFromDropdownFooter from './components/CreateProjectFromDropdownFooter';
 import { extractName } from './utils';
@@ -29,6 +31,7 @@ export type NamespaceDropdownProps = {
   includeAllProjects?: boolean;
   onChange: (project: string) => void;
   onProjectCreated?: NamespaceDropdownProjectCreatedHandler;
+  projectAccessReview?: FleetAccessReviewResourceAttributes;
   selectedProject: string;
 };
 
@@ -40,6 +43,7 @@ const NamespaceDropdown: FC<NamespaceDropdownProps> = ({
   includeAllProjects = true,
   onChange,
   onProjectCreated,
+  projectAccessReview,
   selectedProject,
 }): JSX.Element => {
   const { t } = useKubevirtTranslation();
@@ -52,6 +56,20 @@ const NamespaceDropdown: FC<NamespaceDropdownProps> = ({
     isList: true,
     namespaced: false,
   });
+
+  const {
+    allowedNamespaces,
+    filterByAllowedNamespaces,
+    loaded: allowedNamespacesLoaded,
+  } = useAllowedNamespaces(projectAccessReview ?? null);
+
+  const filteredProjects = useMemo(() => {
+    if (!projectAccessReview || !filterByAllowedNamespaces) {
+      return projects;
+    }
+    const allowedSet = new Set(allowedNamespaces);
+    return (projects ?? []).filter((project) => allowedSet.has(getName(project)));
+  }, [allowedNamespaces, filterByAllowedNamespaces, projectAccessReview, projects]);
 
   const [bookmarks, updateBookmarks, bookmarksLoaded] =
     useConsoleNamespaceBookmarks(consoleSettingsCluster);
@@ -120,8 +138,8 @@ const NamespaceDropdown: FC<NamespaceDropdownProps> = ({
       extractKey={extractName}
       extractTitle={extractName}
       includeAllItems={includeAllProjects}
-      items={projects || null}
-      itemsLoaded={projectsLoaded}
+      items={filteredProjects || null}
+      itemsLoaded={projectsLoaded && (!projectAccessReview || allowedNamespacesLoaded)}
       menuFooter={onProjectCreated ? CreateProjectFromDropdownFooter : undefined}
       menuFooterProps={menuFooterProps}
       onChange={onChange}

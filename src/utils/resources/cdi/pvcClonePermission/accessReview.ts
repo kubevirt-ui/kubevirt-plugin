@@ -5,6 +5,7 @@ import {
   checkAccess,
   type SelfSubjectAccessReviewKind,
 } from '@openshift-console/dynamic-plugin-sdk';
+import { type FleetAccessReviewResourceAttributes } from '@stolostron/multicluster-sdk';
 
 import { type CheckAccessDelegate } from './types';
 
@@ -18,6 +19,20 @@ export const getCheckAccessDelegate = (
   cluster?: string,
   isACMPage?: boolean,
 ): CheckAccessDelegate => (cluster && isACMPage ? checkAccessForFleet : checkAccess);
+
+const cloneSourceFleetAccessReviewAttributes = {
+  group: DataVolumeModel.apiGroup,
+  resource: DataVolumeModel.plural,
+  subresource: 'source',
+  verb: 'create',
+} satisfies Omit<FleetAccessReviewResourceAttributes, 'cluster'>;
+
+export const getCloneSourceFleetAccessReview = (
+  cluster?: string,
+): FleetAccessReviewResourceAttributes => ({
+  ...cloneSourceFleetAccessReviewAttributes,
+  cluster,
+});
 
 export const buildCloneSourceAccessReview = (
   sourceNamespace: string,
