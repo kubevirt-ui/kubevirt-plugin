@@ -28,11 +28,11 @@ export type SettingsTabConfig = {
   title: string;
 };
 
-export const getTabs = (isAdmin: boolean, t: TFunction): SettingsTabConfig[] => [
+export const getTabs = (canManageClusterSettings: boolean, t: TFunction): SettingsTabConfig[] => [
   {
     Component: ClusterTab,
     dataTest: 'cluster-settings',
-    isEnabled: isAdmin,
+    isEnabled: canManageClusterSettings,
     name: SETTINGS_TABS.CLUSTER,
     title: t('Cluster'),
   },
@@ -46,7 +46,7 @@ export const getTabs = (isAdmin: boolean, t: TFunction): SettingsTabConfig[] => 
   {
     Component: RecommendedCapabilitiesTab,
     dataTest: 'recommended-capabilities',
-    isEnabled: isAdmin,
+    isEnabled: canManageClusterSettings,
     isFullWidth: true,
     name: SETTINGS_TABS.RECOMMENDED,
     title: t('Recommended capabilities'),
@@ -54,7 +54,7 @@ export const getTabs = (isAdmin: boolean, t: TFunction): SettingsTabConfig[] => 
   {
     Component: PreviewFeaturesTab,
     dataTest: 'preview-features',
-    isEnabled: isAdmin,
+    isEnabled: canManageClusterSettings,
     name: SETTINGS_TABS.FEATURES,
     title: t('Preview features'),
   },

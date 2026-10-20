@@ -5,7 +5,7 @@ import ClusterDropdown from '@kubevirt-utils/components/ClusterProjectDropdown/C
 import ConfigurationSearch from '@kubevirt-utils/components/ConfigurationSearch/ConfigurationSearch';
 import GuidedTour from '@kubevirt-utils/components/GuidedTour/GuidedTour';
 import LoadingEmptyState from '@kubevirt-utils/components/LoadingEmptyState/LoadingEmptyState';
-import { useCanListNamespaces } from '@kubevirt-utils/hooks/useCanListNamespaces';
+import useCanManageClusterSettings from '@kubevirt-utils/hooks/useCanManageClusterSettings';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { VirtualMachineModelRef } from '@kubevirt-utils/models';
 import { getNamespacePathSegment } from '@kubevirt-utils/utils/utils';
@@ -33,7 +33,6 @@ const SettingsPage: FC = () => {
   useSignals();
 
   const { t } = useKubevirtTranslation();
-  const isAdmin = useCanListNamespaces();
   const [activeNamespace] = useActiveNamespace();
   const [clusterNames, clustersLoaded] = useFleetClusterNames();
   const [hubClusterName] = useHubClusterName();
@@ -44,6 +43,8 @@ const SettingsPage: FC = () => {
 
   const contextCluster =
     activeCluster && activeCluster !== hubClusterName ? activeCluster : undefined;
+
+  const [canManageClusterSettings] = useCanManageClusterSettings(contextCluster);
 
   const onClusterChange = useCallback((cluster: string) => {
     setSelectedCluster(cluster);
@@ -94,7 +95,7 @@ const SettingsPage: FC = () => {
                 <ConfigurationSearch
                   createSearchURL={createSettingsSearchURL}
                   placeholder={showClusterDropdown ? t('Find in selected cluster') : undefined}
-                  searchItems={getSearchItems(t, isAdmin)}
+                  searchItems={getSearchItems(t, canManageClusterSettings)}
                 />
               </GridItem>
             </Grid>

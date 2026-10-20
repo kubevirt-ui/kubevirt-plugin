@@ -44,7 +44,7 @@ type UseMigrationCardDataAndFilters = (duration: string) => UseMigrationCardData
 
 const useMigrationCardDataAndFilters: UseMigrationCardDataAndFilters = (duration: string) => {
   const { t } = useKubevirtTranslation();
-  const migrationsDefaultConfigurations = useHyperConvergedMigrations();
+  const { migrations: migrationsDefaultConfigurations } = useHyperConvergedMigrations();
   const activeNamespace = useActiveNamespace();
   const cluster = useActiveClusterParam();
   const namespace = useMemo(

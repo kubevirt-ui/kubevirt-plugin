@@ -5,8 +5,8 @@ export type AutoAppliedLabel = {
 };
 
 export type UseAutoAppliedLabelsResult = {
+  canEdit: boolean;
   error: Error | null;
-  isAdmin: boolean;
   labels: AutoAppliedLabel[];
   loaded: boolean;
   updateLabels: (labels: AutoAppliedLabel[]) => Promise<void>;

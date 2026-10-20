@@ -1,7 +1,7 @@
 import { type FC, useMemo, useState } from 'react';
 
 import SectionWithSwitch from '@kubevirt-utils/components/SectionWithSwitch/SectionWithSwitch';
-import { useCanListNamespaces } from '@kubevirt-utils/hooks/useCanListNamespaces';
+import useCanPatchHyperConverged from '@kubevirt-utils/hooks/useCanPatchHyperConverged';
 import { CONTROL_DEFAULT_VIRTUALIZATION_PERMISSIONS } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { type HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
@@ -26,7 +26,7 @@ const AutomaticallyGrantVirtualizationRoles: FC<AutomaticallyGrantVirtualization
 }) => {
   const { t } = useKubevirtTranslation();
   const cluster = useSettingsCluster();
-  const isAdmin = useCanListNamespaces();
+  const [canPatchHyperConverged] = useCanPatchHyperConverged(cluster);
   const [hyperConverge, hyperLoaded, hyperError] = hyperConvergeConfiguration;
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<null | string>(null);
@@ -40,12 +40,17 @@ const AutomaticallyGrantVirtualizationRoles: FC<AutomaticallyGrantVirtualization
   const displayError = useMemo(() => error ?? hyperError?.message, [error, hyperError]);
 
   const isDisabled = useMemo(
-    () => !isAdmin || !hyperLoaded || isLoading || Boolean(hyperError) || !previewFeatureEnabled,
-    [isAdmin, hyperLoaded, isLoading, hyperError, previewFeatureEnabled],
+    () =>
+      !canPatchHyperConverged ||
+      !hyperLoaded ||
+      isLoading ||
+      Boolean(hyperError) ||
+      !previewFeatureEnabled,
+    [canPatchHyperConverged, hyperLoaded, isLoading, hyperError, previewFeatureEnabled],
   );
 
   const onChange = async (checked: boolean): Promise<void> => {
-    if (!hyperConverge || !isAdmin) {
+    if (!hyperConverge || !canPatchHyperConverged) {
       return;
     }
 

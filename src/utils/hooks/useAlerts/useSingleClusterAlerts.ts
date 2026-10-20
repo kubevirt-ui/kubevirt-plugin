@@ -2,7 +2,6 @@ import { useMemo } from 'react';
 
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
-import { useCanListNamespaces } from '@kubevirt-utils/hooks/useCanListNamespaces';
 import type { PrometheusRulesResponse } from '@kubevirt-utils/types/prometheus';
 import type { Alert, PrometheusResponse } from '@openshift-console/dynamic-plugin-sdk';
 import { PrometheusEndpoint, usePrometheusPoll } from '@openshift-console/dynamic-plugin-sdk';
@@ -19,27 +18,28 @@ type UseSingleClusterAlerts = () => {
 
 /**
  * Hook for fetching alerts in non-ACM (single cluster) environments.
- * Admins use RULES endpoint for complete alert metadata.
- * Non-admins use QUERY with ALERTS metric for namespace-scoped access.
+ * Users with cluster monitoring access use the RULES endpoint for complete alert metadata.
+ * Others use QUERY with the ALERTS metric for namespace-scoped access.
  */
 const useSingleClusterAlerts: UseSingleClusterAlerts = () => {
   const { silences } = useSilences();
-  const isAdmin = useCanListNamespaces();
   const activeNamespace = useActiveNamespace();
 
   const [rulesResponse, rulesLoaded, rulesError] = usePrometheusPoll({
     endpoint: PrometheusEndpoint.RULES,
   });
 
+  const canUsePrometheusRules = rulesLoaded && !rulesError;
+
   const alertsQuery = useMemo(() => {
-    if (isAdmin) return;
+    if (canUsePrometheusRules) return;
 
     if (!activeNamespace || activeNamespace === ALL_NAMESPACES_SESSION_KEY) {
       return;
     }
 
     return `ALERTS{namespace="${activeNamespace}",alertstate="firing",kubernetes_operator_part_of="kubevirt"}`;
-  }, [isAdmin, activeNamespace]);
+  }, [activeNamespace, canUsePrometheusRules]);
 
   const [alertsResponse, alertsLoaded, alertsError] = usePrometheusPoll({
     endpoint: PrometheusEndpoint.QUERY,
@@ -47,24 +47,24 @@ const useSingleClusterAlerts: UseSingleClusterAlerts = () => {
   });
 
   const alerts = useMemo(() => {
-    const response = isAdmin ? rulesResponse : alertsResponse;
-    const error = isAdmin ? rulesError : alertsError;
+    const response = canUsePrometheusRules ? rulesResponse : alertsResponse;
+    const error = canUsePrometheusRules ? rulesError : alertsError;
 
     if (!response || error) {
       return [];
     }
 
-    const convertedAlerts = isAdmin
+    const convertedAlerts = canUsePrometheusRules
       ? convertRulesToAlerts(response as PrometheusRulesResponse)
       : convertMetricResultsToAlerts(response as PrometheusResponse);
 
     return silenceFiringAlerts(convertedAlerts, silences);
-  }, [isAdmin, rulesResponse, rulesError, alertsResponse, alertsError, silences]);
+  }, [alertsError, alertsResponse, canUsePrometheusRules, rulesError, rulesResponse, silences]);
 
   return {
     alerts,
-    error: isAdmin ? rulesError : alertsError,
-    loaded: isAdmin ? rulesLoaded : alertsLoaded,
+    error: canUsePrometheusRules ? rulesError : alertsError,
+    loaded: canUsePrometheusRules ? rulesLoaded : alertsLoaded,
   };
 };
 

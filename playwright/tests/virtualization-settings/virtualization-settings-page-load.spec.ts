@@ -26,6 +26,8 @@ test.describe('Virtualization settings page load', { tag: [ROUTE_VIRTUALIZATION_
     });
 
     await test.step('Cluster tab lists all expected sections', async () => {
+      const onClusterTab = await settingsPage.navigateToClusterTab();
+      expect.soft(onClusterTab, 'Cluster tab should be active').toBe(true);
       const sections = await settingsPage.getClusterSettingsSectionNames();
       for (const expected of [
         'General settings',

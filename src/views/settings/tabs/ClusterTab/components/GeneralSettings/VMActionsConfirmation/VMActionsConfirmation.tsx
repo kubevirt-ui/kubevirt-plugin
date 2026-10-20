@@ -1,7 +1,6 @@
 import type { FC } from 'react';
 
 import SectionWithSwitch from '@kubevirt-utils/components/SectionWithSwitch/SectionWithSwitch';
-import { useCanListNamespaces } from '@kubevirt-utils/hooks/useCanListNamespaces';
 import { CONFIRM_VM_ACTIONS } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -19,8 +18,8 @@ type VMActionsConfirmationProps = {
 const VMActionsConfirmation: FC<VMActionsConfirmationProps> = ({ newBadge }) => {
   const { t } = useKubevirtTranslation();
   const cluster = useSettingsCluster();
-  const isAdmin = useCanListNamespaces();
   const {
+    canEdit,
     featureEnabled: confirmVMActionsEnabled,
     loading,
     toggleFeature: toggleConfirmVMActionsEnabled,
@@ -36,7 +35,7 @@ const VMActionsConfirmation: FC<VMActionsConfirmationProps> = ({ newBadge }) => 
         dataTestID="confirm-vm-actions"
         helpTextIconContent={t('Confirm requested VirtualMachine actions before executing them')}
         id="confirm-vm-actions"
-        isDisabled={!isAdmin}
+        isDisabled={!canEdit}
         isLoading={loading}
         newBadge={newBadge}
         olsPromptType={OLSPromptType.CONFIRM_VM_ACTIONS}

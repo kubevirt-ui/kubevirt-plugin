@@ -1,6 +1,5 @@
 import { type FC } from 'react';
 
-import { useCanListNamespaces } from '@kubevirt-utils/hooks/useCanListNamespaces';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Button, Popover, Stack, StackItem, Title } from '@patternfly/react-core';
 import { OutlinedQuestionCircleIcon } from '@patternfly/react-icons';
@@ -9,10 +8,11 @@ import useHyperConvergedMigrations from './hooks/useHyperConvergedMigrations';
 
 const LiveMigrationSettingsPopover: FC = () => {
   const { t } = useKubevirtTranslation();
-  const migrations = useHyperConvergedMigrations();
-  const isAdmin = useCanListNamespaces();
+  const { error, loaded, migrations } = useHyperConvergedMigrations();
 
-  if (!isAdmin) return null;
+  if (!loaded || error || !migrations) {
+    return null;
+  }
 
   return (
     <Popover
@@ -21,11 +21,11 @@ const LiveMigrationSettingsPopover: FC = () => {
           <Title headingLevel="h3">{t('Live migration settings')}</Title>
           <StackItem>
             <b>{t('Max. running migrations per cluster')}</b>
-            <div>{migrations?.parallelMigrationsPerCluster}</div>
+            <div>{migrations.parallelMigrationsPerCluster}</div>
           </StackItem>
           <StackItem>
             <b>{t('Max. running migrations per node')}</b>
-            <div>{migrations?.parallelOutboundMigrationsPerNode}</div>
+            <div>{migrations.parallelOutboundMigrationsPerNode}</div>
           </StackItem>
         </Stack>
       }

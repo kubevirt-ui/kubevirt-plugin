@@ -11,7 +11,7 @@ import {
 import useFeaturesConfigMap from '@kubevirt-utils/hooks/useFeatures/useFeaturesConfigMap';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
-import { kubevirtK8sUpdate } from '@multicluster/k8sRequests';
+import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
 
 import {
   type RHELAutomaticSubscriptionData,
@@ -33,7 +33,7 @@ const toLoadError = (value: unknown): Error => {
 const useRHELAutomaticSubscription: UseRHELAutomaticSubscription = (clusterOverride) => {
   const clusterParam = useClusterParam();
   const cluster = clusterOverride ?? clusterParam;
-  const { featuresConfigMapData, isAdmin } = useFeaturesConfigMap(cluster);
+  const { canEditFeaturesConfigMap, featuresConfigMapData } = useFeaturesConfigMap(cluster);
   const featureConfigMap = featuresConfigMapData[0];
   const loaded = Boolean(featuresConfigMapData[1]);
   const loadError = toLoadError(featuresConfigMapData[2]);
@@ -64,15 +64,29 @@ const useRHELAutomaticSubscription: UseRHELAutomaticSubscription = (clusterOverr
         type ?? draftCM.data[AUTOMATIC_SUBSCRIPTION_TYPE_KEY];
     });
 
-    void kubevirtK8sUpdate({
+    const patchData = (
+      [
+        AUTOMATIC_SUBSCRIPTION_ACTIVATION_KEY,
+        AUTOMATIC_SUBSCRIPTION_ORGANIZATION_ID,
+        AUTOMATIC_SUBSCRIPTION_CUSTOM_URL,
+        AUTOMATIC_SUBSCRIPTION_TYPE_KEY,
+      ] as const
+    ).map((key) => ({
+      op: featureConfigMap.data?.[key] === undefined ? 'add' : 'replace',
+      path: `/data/${key}`,
+      value: updatedConfigMap.data[key],
+    }));
+
+    void kubevirtK8sPatch({
       cluster,
-      data: updatedConfigMap,
+      data: patchData,
       model: ConfigMapModel,
+      resource: featureConfigMap,
     }).finally(() => setLoading(false));
   };
 
   return {
-    canEdit: isAdmin,
+    canEdit: canEditFeaturesConfigMap,
     loaded,
     loadError,
     loading,

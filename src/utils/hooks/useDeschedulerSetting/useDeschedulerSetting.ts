@@ -1,14 +1,19 @@
 import { useState } from 'react';
 
+import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { useCanListNamespaces } from '@kubevirt-utils/hooks/useCanListNamespaces';
+import useCanEditResource from '@kubevirt-utils/hooks/useCanEditResource';
 import { useDeschedulerInstalled } from '@kubevirt-utils/hooks/useDeschedulerInstalled';
 import {
   isDeschedulerEnabled,
   updateDeschedulerForTemplate,
   updateDeschedulerForVM,
 } from '@kubevirt-utils/hooks/useDeschedulerSetting/utils';
-import { getTemplateVirtualMachineObject, type Template } from '@kubevirt-utils/resources/template';
+import {
+  getTemplateModel,
+  getTemplateVirtualMachineObject,
+  type Template,
+} from '@kubevirt-utils/resources/template';
 import { getVMTemplateAnnotations } from '@kubevirt-utils/resources/vm';
 import { isVM } from '@kubevirt-utils/utils/typeGuards';
 import { getCluster } from '@multicluster/helpers/selectors';
@@ -21,8 +26,9 @@ type UseDeschedulerSetting = (obj: Template | V1VirtualMachine) => {
 };
 
 const useDeschedulerSetting: UseDeschedulerSetting = (obj) => {
-  const isAdmin = useCanListNamespaces();
   const isVMObj = isVM(obj);
+  const resourceModel = isVMObj ? VirtualMachineModel : getTemplateModel(obj);
+  const [canEditObj, canEditLoading] = useCanEditResource(resourceModel, obj);
   const isMigratable = isVMObj ? isLiveMigratable(obj) : true;
   const { isDeschedulerInstalled } = useDeschedulerInstalled(getCluster(obj));
 
@@ -39,7 +45,8 @@ const useDeschedulerSetting: UseDeschedulerSetting = (obj) => {
 
   return {
     deschedulerEnabled: isEnabled,
-    deschedulerSwitchDisabled: !isAdmin || !isDeschedulerInstalled || !isMigratable,
+    deschedulerSwitchDisabled:
+      canEditLoading || !canEditObj || !isDeschedulerInstalled || !isMigratable,
     onDeschedulerChange,
   };
 };

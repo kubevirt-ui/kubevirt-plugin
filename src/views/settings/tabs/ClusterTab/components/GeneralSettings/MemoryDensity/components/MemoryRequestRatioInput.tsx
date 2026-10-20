@@ -26,6 +26,7 @@ import RequestRatioHelpContent from './RequestRatioHelpContent';
 type MemoryRequestRatioInputProps = {
   hasChanged: boolean;
   inputValue: number;
+  isDisabled?: boolean;
   isLoading: boolean;
   onChange: (value: number) => void;
   onRestoreDefault: () => void;
@@ -35,6 +36,7 @@ type MemoryRequestRatioInputProps = {
 const MemoryRequestRatioInput: FC<MemoryRequestRatioInputProps> = ({
   hasChanged,
   inputValue,
+  isDisabled = false,
   isLoading,
   onChange,
   onRestoreDefault,
@@ -63,18 +65,22 @@ const MemoryRequestRatioInput: FC<MemoryRequestRatioInputProps> = ({
             <NumberInput
               inputAriaLabel={t('Memory request ratio percentage')}
               inputName="memory-request-ratio"
-              isDisabled={isLoading}
+              isDisabled={isDisabled || isLoading}
               max={MEMORY_REQUEST_RATIO_MAX}
               min={MEMORY_REQUEST_RATIO_MIN}
               minusBtnAriaLabel={t('Decrease ratio')}
-              minusBtnProps={{ isDisabled: isLoading || inputValue <= MEMORY_REQUEST_RATIO_MIN }}
+              minusBtnProps={{
+                isDisabled: isDisabled || isLoading || inputValue <= MEMORY_REQUEST_RATIO_MIN,
+              }}
               onChange={(event: ChangeEvent<HTMLInputElement>) =>
                 onChange(Number(event.target.value))
               }
               onMinus={() => onChange(inputValue - 1)}
               onPlus={() => onChange(inputValue + 1)}
               plusBtnAriaLabel={t('Increase ratio')}
-              plusBtnProps={{ isDisabled: isLoading || inputValue >= MEMORY_REQUEST_RATIO_MAX }}
+              plusBtnProps={{
+                isDisabled: isDisabled || isLoading || inputValue >= MEMORY_REQUEST_RATIO_MAX,
+              }}
               unit="%"
               value={inputValue}
             />
@@ -109,7 +115,7 @@ const MemoryRequestRatioInput: FC<MemoryRequestRatioInputProps> = ({
               <Split hasGutter>
                 <SplitItem>
                   <Button
-                    isDisabled={isLoading || !isValid}
+                    isDisabled={isDisabled || isLoading || !isValid}
                     isLoading={isLoading}
                     onClick={onSave}
                     variant="secondary"
@@ -119,7 +125,7 @@ const MemoryRequestRatioInput: FC<MemoryRequestRatioInputProps> = ({
                 </SplitItem>
                 <SplitItem>
                   <Button
-                    isDisabled={isLoading}
+                    isDisabled={isDisabled || isLoading}
                     onClick={onRestoreDefault}
                     variant={ButtonVariant.link}
                   >

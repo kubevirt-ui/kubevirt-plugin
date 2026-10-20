@@ -3,7 +3,7 @@ import { Link } from 'react-router';
 
 import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
-import { useCanListNamespaces } from '@kubevirt-utils/hooks/useCanListNamespaces';
+import useCanCreateSubscriptionInNamespace from '@kubevirt-utils/hooks/useCanCreateSubscriptionInNamespace';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getValidNamespace } from '@kubevirt-utils/utils/utils';
 import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
@@ -14,9 +14,9 @@ import './MTVNotInstalledCard.scss';
 
 const MTVNotInstalledCard: FC = () => {
   const { t } = useKubevirtTranslation();
-  const isAdmin = useCanListNamespaces();
   const [activeNamespace] = useActiveNamespace();
   const validNamespace = getValidNamespace(activeNamespace);
+  const canInstallOperator = useCanCreateSubscriptionInNamespace(validNamespace);
 
   return (
     <Card className="mtv-not-installed-card" isCompact>
@@ -34,7 +34,7 @@ const MTVNotInstalledCard: FC = () => {
         )}
       </CardBody>
       <CardFooter className="mtv-not-installed-card__footer">
-        {isAdmin ? (
+        {canInstallOperator ? (
           <>
             <Link to={`/catalog/ns/${validNamespace}?keyword=MTV`}>
               {t('Install MTV operator')}
