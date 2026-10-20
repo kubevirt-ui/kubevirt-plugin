@@ -1,0 +1,72 @@
+import * as fs from 'fs';
+import * as path from 'path';
+
+import { logger } from '@/utils/logger';
+import { getStorageStatePath } from '@/utils/storage-state';
+import type { FullConfig } from '@playwright/test';
+
+import {
+  getTeardownRules,
+  RuleEngine,
+  type SetupContext,
+  type TeardownContext,
+} from './rule-engine';
+
+function resolveUseSharding(): { useSharding: boolean; shardIndex?: string } {
+  const pwShards = process.env.PW_SHARDS;
+  const shardIndex = process.env.PLAYWRIGHT_SHARD_INDEX;
+  const useSharding = Boolean(pwShards && pwShards !== '1' && parseInt(pwShards, 10) > 1);
+  return { useSharding, shardIndex };
+}
+
+function createSetupContextForTeardown(): SetupContext {
+  const projectRoot = path.resolve(__dirname, '..', '..');
+  const { useSharding, shardIndex } = resolveUseSharding();
+  return {
+    cnvNamespace: process.env.CNV_NAMESPACE || 'openshift-cnv',
+    kubeConfigPath: path.join(projectRoot, '.kubeconfigs', 'test-config'),
+    projectRoot,
+    shardIndex,
+    storageStatePath: getStorageStatePath(),
+    testNamespace: process.env.TEST_NAMESPACE || '',
+    useSharding,
+  };
+}
+
+function createTeardownContext(setupCtx: SetupContext): TeardownContext {
+  const { useSharding, shardIndex } = resolveUseSharding();
+  const shouldCleanupClusterResources = !useSharding || shardIndex === '1';
+  const kubeConfigPath = fs.existsSync(setupCtx.kubeConfigPath)
+    ? setupCtx.kubeConfigPath
+    : setupCtx.effectiveKubeConfigPath;
+
+  return {
+    kubeConfigPath,
+    shardIndex,
+    shouldCleanupClusterResources,
+    testNamespace: setupCtx.testNamespace,
+    useSharding,
+  };
+}
+
+function applyKubeconfigToProcess(kubeConfigPath?: string): void {
+  if (kubeConfigPath) {
+    process.env.KUBECONFIG = kubeConfigPath;
+  }
+}
+
+async function globalTeardown(_: FullConfig): Promise<void> {
+  if (process.env.SKIP_GLOBAL_TEARDOWN === 'true') {
+    return;
+  }
+
+  const setupCtx = createSetupContextForTeardown();
+  const ctx = createTeardownContext(setupCtx);
+  applyKubeconfigToProcess(ctx.kubeConfigPath);
+
+  logger.info('🧹 Running global teardown rules...');
+  const engine = new RuleEngine();
+  await engine.runTeardown(getTeardownRules(), ctx);
+}
+
+export default globalTeardown;

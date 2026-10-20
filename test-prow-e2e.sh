@@ -53,7 +53,7 @@ NAMESPACE="openshift-marketplace"
 SECRET_NAME="ocs-secret"
 NS="kubevirt-hyperconverged"
 ARTIFACT_DIR=${ARTIFACT_DIR:=/tmp/artifacts}
-SCREENSHOTS_DIR="cypress/gui-test-screenshots"
+SCREENSHOTS_DIR="playwright/test-results"
 
 function createSecret {
     oc create secret generic ${SECRET_NAME} --from-file=.dockerconfigjson=${PULL_SECRET_PATH} --type=kubernetes.io/dockerconfigjson -n $1
@@ -126,15 +126,19 @@ export BRIDGE_KUBEADMIN_PASSWORD
 BRIDGE_BASE_ADDRESS="$(oc get consoles.config.openshift.io cluster -o jsonpath='{.status.consoleURL}')"
 export BRIDGE_BASE_ADDRESS
 
-# Disable color codes in Cypress since they do not render well CI test logs.
-# https://docs.cypress.io/guides/guides/continuous-integration.html#Colors
+# Playwright (same as release-4.12 Prow): console URL + creds from the cluster under test.
+export CI=1
+export IS_LOCAL=0
+export WEB_CONSOLE_URL="${WEB_CONSOLE_URL:-$BRIDGE_BASE_ADDRESS}"
+export OPENSHIFT_PASSWORD="${OPENSHIFT_PASSWORD:-$BRIDGE_KUBEADMIN_PASSWORD}"
+unset REUSE_STORAGE_STATE
+
 export NO_COLOR=1
+export PLAYWRIGHT_PROJECT="${PLAYWRIGHT_PROJECT:-Gating}"
 
 # Install dependencies.
-npm ci --ignore-scripts
+npm ci
+npm run playwright-install
 
 # Run tests.
-npm run test-cypress-headless
-
-# Generate Cypress report.
-npm run cypress-postreport
+npm run test-playwright-headless -- --project="${PLAYWRIGHT_PROJECT}"
