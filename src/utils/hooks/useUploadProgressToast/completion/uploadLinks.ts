@@ -12,8 +12,7 @@ import { getName, getNamespace, getResourceUrl, getUID } from '@kubevirt-utils/r
 import { getCluster } from '@multicluster/helpers/selectors';
 import { getFleetBootableVolumesURL, getMulticlusterSearchURL, getVMURL } from '@multicluster/urls';
 
-import type { UploadSuccessLink } from '../types';
-
+import { type UploadSuccessLink } from '../uploads/types/types';
 import { getUploadLinkedResource } from './uploadLinkedResource';
 
 export const getVmStorageUrlForIdentity = (

@@ -1,8 +1,8 @@
 import type { TFunction } from 'i18next';
 
 import { UPLOAD_PROGRESS_STATUS } from '../constants';
-import type { UploadEntry } from '../types';
 
+import { type UploadEntry } from '../uploads/types/types';
 import { getUploadTitle, isTerminalUploadStatus } from './uploadTitles';
 
 const t = ((key: string, options?: { fileName?: string }) =>

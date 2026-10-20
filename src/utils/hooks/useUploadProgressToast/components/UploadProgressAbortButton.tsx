@@ -16,7 +16,9 @@ const UploadProgressAbortButton: FC<UploadProgressAbortButtonProps> = ({
   uploadKey,
 }) => {
   const { t } = useKubevirtTranslation();
-  const cancelTrackedUpload = useUploadProgressStore((state) => state.cancelTrackedUpload);
+  const cancelTrackedUpload = useUploadProgressStore(
+    (state) => state.uploads.actions?.cancelTrackedUpload,
+  );
 
   const button = (
     <Button

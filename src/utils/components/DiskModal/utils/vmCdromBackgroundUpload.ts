@@ -78,7 +78,7 @@ export const runVmCdromBackgroundUpload = async ({
     if (expectedGeneration !== undefined) {
       useUploadProgressStore
         .getState()
-        .failUpload(
+        .uploads.actions?.failUpload(
           uploadKey,
           error instanceof Error ? error.message : String(error),
           expectedGeneration,

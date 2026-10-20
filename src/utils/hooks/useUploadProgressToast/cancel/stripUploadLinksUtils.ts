@@ -1,11 +1,10 @@
-import { type UploadEntry } from '../types';
-
 import {
   getBootableVolumeUrl,
   getDataVolumeUrl,
   getVmStorageUrlForIdentity,
   omitLinksByUrl,
 } from '../completion/uploadLinks';
+import { type UploadEntry } from '../uploads/types/types';
 
 export const getVmStorageUrls = (cluster: string, namespace: string, vmName: string): Set<string> =>
   new Set([

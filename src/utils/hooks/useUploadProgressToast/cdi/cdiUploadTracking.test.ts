@@ -1,7 +1,7 @@
 import { UPLOAD_STATUS } from '@kubevirt-utils/hooks/useCDIUpload/types';
 
 import { UPLOAD_PROGRESS_STATUS } from '../constants';
-import { useUploadProgressStore } from '../uploadProgressStore';
+import { resetUploadProgressStore, useUploadProgressStore } from '../uploadProgressStore';
 
 import { registerCdiUpload, syncCdiUploadProgressAndFailures } from './cdiUploadTracking';
 
@@ -14,7 +14,7 @@ const MISSING_KEY = 'missing-key';
 const CDI_UPLOAD_ERROR_MESSAGE = 'CDI upload failed';
 
 const resetStore = () => {
-  useUploadProgressStore.setState({ generationsByKey: {}, uploads: {} });
+  resetUploadProgressStore();
 };
 
 describe('cdiUploadTracking', () => {
@@ -31,7 +31,9 @@ describe('cdiUploadTracking', () => {
         uploadKey: UPLOAD_KEY,
       });
 
-      expect(useUploadProgressStore.getState().getUpload(UPLOAD_KEY)).toMatchObject({
+      expect(
+        useUploadProgressStore.getState().uploads.actions?.getUpload(UPLOAD_KEY),
+      ).toMatchObject({
         fileName: FILE_IMAGE_ISO,
         progress: 0,
         resourceName: DISK_NAME,
@@ -45,14 +47,18 @@ describe('cdiUploadTracking', () => {
         uploadKey: UPLOAD_KEY,
       });
 
-      expect(useUploadProgressStore.getState().getUpload(UPLOAD_KEY)?.generation).toBe(1);
+      expect(
+        useUploadProgressStore.getState().uploads.actions?.getUpload(UPLOAD_KEY)?.generation,
+      ).toBe(1);
 
       registerCdiUpload({
         fileName: FILE_NEW_ISO,
         uploadKey: UPLOAD_KEY,
       });
 
-      expect(useUploadProgressStore.getState().getUpload(UPLOAD_KEY)).toMatchObject({
+      expect(
+        useUploadProgressStore.getState().uploads.actions?.getUpload(UPLOAD_KEY),
+      ).toMatchObject({
         fileName: FILE_NEW_ISO,
         generation: 2,
         progress: 0,
@@ -61,10 +67,12 @@ describe('cdiUploadTracking', () => {
     });
 
     it('should replace a terminal upload without resetting generation', () => {
-      useUploadProgressStore.getState().startUpload(UPLOAD_KEY, { fileName: FILE_OLD_ISO });
-      useUploadProgressStore.getState().completeUpload(UPLOAD_KEY);
+      useUploadProgressStore
+        .getState()
+        .uploads.actions?.startUpload(UPLOAD_KEY, { fileName: FILE_OLD_ISO });
+      useUploadProgressStore.getState().uploads.actions?.completeUpload(UPLOAD_KEY);
 
-      expect(useUploadProgressStore.getState().getUpload(UPLOAD_KEY)?.status).toBe(
+      expect(useUploadProgressStore.getState().uploads.actions?.getUpload(UPLOAD_KEY)?.status).toBe(
         UPLOAD_PROGRESS_STATUS.SUCCESS,
       );
 
@@ -73,7 +81,9 @@ describe('cdiUploadTracking', () => {
         uploadKey: UPLOAD_KEY,
       });
 
-      expect(useUploadProgressStore.getState().getUpload(UPLOAD_KEY)).toMatchObject({
+      expect(
+        useUploadProgressStore.getState().uploads.actions?.getUpload(UPLOAD_KEY),
+      ).toMatchObject({
         fileName: FILE_NEW_ISO,
         generation: 2,
         progress: 0,
@@ -84,7 +94,9 @@ describe('cdiUploadTracking', () => {
 
   describe('syncCdiUploadProgressAndFailures', () => {
     beforeEach(() => {
-      useUploadProgressStore.getState().startUpload(UPLOAD_KEY, { fileName: FILE_IMAGE_ISO });
+      useUploadProgressStore
+        .getState()
+        .uploads.actions?.startUpload(UPLOAD_KEY, { fileName: FILE_IMAGE_ISO });
     });
 
     it('should update progress when given progress value', () => {
@@ -93,7 +105,9 @@ describe('cdiUploadTracking', () => {
         uploadKey: UPLOAD_KEY,
       });
 
-      expect(useUploadProgressStore.getState().getUpload(UPLOAD_KEY)?.progress).toBe(75);
+      expect(
+        useUploadProgressStore.getState().uploads.actions?.getUpload(UPLOAD_KEY)?.progress,
+      ).toBe(75);
     });
 
     it('should call failUpload when status is ERROR', () => {
@@ -103,14 +117,18 @@ describe('cdiUploadTracking', () => {
         uploadStatus: UPLOAD_STATUS.ERROR,
       });
 
-      expect(useUploadProgressStore.getState().getUpload(UPLOAD_KEY)).toMatchObject({
+      expect(
+        useUploadProgressStore.getState().uploads.actions?.getUpload(UPLOAD_KEY),
+      ).toMatchObject({
         errorMessage: CDI_UPLOAD_ERROR_MESSAGE,
         status: UPLOAD_PROGRESS_STATUS.ERROR,
       });
     });
 
     it('should not fail a retried upload when the error belongs to an older generation', () => {
-      useUploadProgressStore.getState().startUpload(UPLOAD_KEY, { fileName: FILE_NEW_ISO });
+      useUploadProgressStore
+        .getState()
+        .uploads.actions?.startUpload(UPLOAD_KEY, { fileName: FILE_NEW_ISO });
 
       syncCdiUploadProgressAndFailures({
         expectedGeneration: 1,
@@ -119,7 +137,9 @@ describe('cdiUploadTracking', () => {
         uploadStatus: UPLOAD_STATUS.ERROR,
       });
 
-      expect(useUploadProgressStore.getState().getUpload(UPLOAD_KEY)).toMatchObject({
+      expect(
+        useUploadProgressStore.getState().uploads.actions?.getUpload(UPLOAD_KEY),
+      ).toMatchObject({
         fileName: FILE_NEW_ISO,
         generation: 2,
         status: UPLOAD_PROGRESS_STATUS.UPLOADING,
@@ -127,8 +147,10 @@ describe('cdiUploadTracking', () => {
     });
 
     it('should not fail a later upload after the previous entry was removed', () => {
-      useUploadProgressStore.getState().removeUpload(UPLOAD_KEY);
-      useUploadProgressStore.getState().startUpload(UPLOAD_KEY, { fileName: FILE_NEW_ISO });
+      useUploadProgressStore.getState().uploads.actions?.removeUpload(UPLOAD_KEY);
+      useUploadProgressStore
+        .getState()
+        .uploads.actions?.startUpload(UPLOAD_KEY, { fileName: FILE_NEW_ISO });
 
       syncCdiUploadProgressAndFailures({
         expectedGeneration: 1,
@@ -137,7 +159,9 @@ describe('cdiUploadTracking', () => {
         uploadStatus: UPLOAD_STATUS.ERROR,
       });
 
-      expect(useUploadProgressStore.getState().getUpload(UPLOAD_KEY)).toMatchObject({
+      expect(
+        useUploadProgressStore.getState().uploads.actions?.getUpload(UPLOAD_KEY),
+      ).toMatchObject({
         fileName: FILE_NEW_ISO,
         generation: 2,
         status: UPLOAD_PROGRESS_STATUS.UPLOADING,
@@ -145,7 +169,9 @@ describe('cdiUploadTracking', () => {
     });
 
     it('should not update progress when the update belongs to an older generation', () => {
-      useUploadProgressStore.getState().startUpload(UPLOAD_KEY, { fileName: FILE_NEW_ISO });
+      useUploadProgressStore
+        .getState()
+        .uploads.actions?.startUpload(UPLOAD_KEY, { fileName: FILE_NEW_ISO });
 
       syncCdiUploadProgressAndFailures({
         expectedGeneration: 1,
@@ -153,11 +179,15 @@ describe('cdiUploadTracking', () => {
         uploadKey: UPLOAD_KEY,
       });
 
-      expect(useUploadProgressStore.getState().getUpload(UPLOAD_KEY)?.progress).toBe(0);
+      expect(
+        useUploadProgressStore.getState().uploads.actions?.getUpload(UPLOAD_KEY)?.progress,
+      ).toBe(0);
     });
 
     it('should not cancel a retried upload when cancel belongs to an older generation', () => {
-      useUploadProgressStore.getState().startUpload(UPLOAD_KEY, { fileName: FILE_NEW_ISO });
+      useUploadProgressStore
+        .getState()
+        .uploads.actions?.startUpload(UPLOAD_KEY, { fileName: FILE_NEW_ISO });
 
       syncCdiUploadProgressAndFailures({
         expectedGeneration: 1,
@@ -165,14 +195,16 @@ describe('cdiUploadTracking', () => {
         uploadStatus: UPLOAD_STATUS.CANCELED,
       });
 
-      expect(useUploadProgressStore.getState().getUpload(UPLOAD_KEY)?.status).toBe(
+      expect(useUploadProgressStore.getState().uploads.actions?.getUpload(UPLOAD_KEY)?.status).toBe(
         UPLOAD_PROGRESS_STATUS.UPLOADING,
       );
     });
 
     it('should not cancel a later upload after the previous entry was removed', () => {
-      useUploadProgressStore.getState().removeUpload(UPLOAD_KEY);
-      useUploadProgressStore.getState().startUpload(UPLOAD_KEY, { fileName: FILE_NEW_ISO });
+      useUploadProgressStore.getState().uploads.actions?.removeUpload(UPLOAD_KEY);
+      useUploadProgressStore
+        .getState()
+        .uploads.actions?.startUpload(UPLOAD_KEY, { fileName: FILE_NEW_ISO });
 
       syncCdiUploadProgressAndFailures({
         expectedGeneration: 1,
@@ -180,7 +212,7 @@ describe('cdiUploadTracking', () => {
         uploadStatus: UPLOAD_STATUS.CANCELED,
       });
 
-      expect(useUploadProgressStore.getState().getUpload(UPLOAD_KEY)?.status).toBe(
+      expect(useUploadProgressStore.getState().uploads.actions?.getUpload(UPLOAD_KEY)?.status).toBe(
         UPLOAD_PROGRESS_STATUS.UPLOADING,
       );
     });
@@ -191,7 +223,7 @@ describe('cdiUploadTracking', () => {
         uploadStatus: UPLOAD_STATUS.CANCELED,
       });
 
-      expect(useUploadProgressStore.getState().getUpload(UPLOAD_KEY)?.status).toBe(
+      expect(useUploadProgressStore.getState().uploads.actions?.getUpload(UPLOAD_KEY)?.status).toBe(
         UPLOAD_PROGRESS_STATUS.CANCELED,
       );
     });
@@ -202,7 +234,7 @@ describe('cdiUploadTracking', () => {
         uploadKey: MISSING_KEY,
       });
 
-      expect(useUploadProgressStore.getState().uploads).toEqual({
+      expect(useUploadProgressStore.getState().uploads.data).toEqual({
         [UPLOAD_KEY]: expect.objectContaining({ fileName: FILE_IMAGE_ISO }),
       });
     });

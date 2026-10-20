@@ -27,7 +27,7 @@ describe('cancelPendingVmUploads', () => {
     jest.clearAllMocks();
     sessionStorage.clear();
     (useUploadProgressStore.getState as jest.Mock).mockReturnValue({
-      cancelUploadsForVm,
+      uploads: { actions: { cancelUploadsForVm } },
     });
   });
 
@@ -69,7 +69,9 @@ describe('cancelAllWizardPendingUploads', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    (useUploadProgressStore.getState as jest.Mock).mockReturnValue({ cancelWizardPendingUploads });
+    (useUploadProgressStore.getState as jest.Mock).mockReturnValue({
+      uploads: { actions: { cancelWizardPendingUploads } },
+    });
   });
 
   it('should cancel wizard-scoped pending uploads by key', () => {

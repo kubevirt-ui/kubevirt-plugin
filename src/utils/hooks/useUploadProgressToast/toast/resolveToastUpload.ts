@@ -1,4 +1,4 @@
-import { type UploadEntry } from '../types';
+import { type UploadEntry } from '../uploads/types/types';
 
 export const resolveToastUpload = (
   uploadSnapshot: UploadEntry | undefined,

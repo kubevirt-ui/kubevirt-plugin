@@ -1,10 +1,10 @@
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 
 import { UPLOAD_PROGRESS_STATUS } from './constants';
-import { type CompleteUploadOptions, type UploadEntry } from './types';
+import { type CompleteUploadOptions, type UploadEntry } from './uploads/types/types';
 
-type UploadsState = {
-  uploads: Record<string, UploadEntry>;
+type UploadsDataState = {
+  data: Record<string, UploadEntry>;
 };
 
 const canUpdateUploadingEntry = (
@@ -28,11 +28,11 @@ const omitRemovedSuccessLinks = (
 };
 
 export const completeUploadState = (
-  state: UploadsState,
+  state: UploadsDataState,
   uploadKey: string,
   options?: CompleteUploadOptions,
-): UploadsState => {
-  const current = state.uploads[uploadKey];
+): UploadsDataState => {
+  const current = state.data?.[uploadKey];
   const completeOptions = options ?? {};
   if (!canUpdateUploadingEntry(current, completeOptions.expectedGeneration)) {
     return state;
@@ -44,8 +44,8 @@ export const completeUploadState = (
   );
 
   return {
-    uploads: {
-      ...state.uploads,
+    data: {
+      ...state.data,
       [uploadKey]: {
         ...current,
         progress: 100,
@@ -59,19 +59,19 @@ export const completeUploadState = (
 };
 
 export const failUploadState = (
-  state: UploadsState,
+  state: UploadsDataState,
   uploadKey: string,
   errorMessage: string,
   expectedGeneration?: number,
-): UploadsState => {
-  const current = state.uploads[uploadKey];
+): UploadsDataState => {
+  const current = state.data?.[uploadKey];
   if (!canUpdateUploadingEntry(current, expectedGeneration)) {
     return state;
   }
 
   return {
-    uploads: {
-      ...state.uploads,
+    data: {
+      ...state.data,
       [uploadKey]: {
         ...current,
         errorMessage,
@@ -82,18 +82,18 @@ export const failUploadState = (
 };
 
 export const markUploadCanceledState = (
-  state: UploadsState,
+  state: UploadsDataState,
   uploadKey: string,
   expectedGeneration?: number,
-): UploadsState => {
-  const current = state.uploads[uploadKey];
+): UploadsDataState => {
+  const current = state.data?.[uploadKey];
   if (!current || (expectedGeneration !== undefined && current.generation !== expectedGeneration)) {
     return state;
   }
 
   return {
-    uploads: {
-      ...state.uploads,
+    data: {
+      ...state.data,
       [uploadKey]: {
         ...current,
         status: UPLOAD_PROGRESS_STATUS.CANCELED,
