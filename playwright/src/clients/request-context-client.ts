@@ -82,8 +82,8 @@ export default class RequestContextClient {
 
   private url(k8sPath: string): string {
     const origin = this.consoleOrigin.replace(/\/$/, '');
-    const path = k8sPath.startsWith('/') ? k8sPath : `/${k8sPath}`;
-    return `${origin}/api/kubernetes${path}`;
+    const normalizedPath = k8sPath.startsWith('/') ? k8sPath : `/${k8sPath}`;
+    return `${origin}/api/kubernetes${normalizedPath}`;
   }
 
   private proxyHeaders(extra?: Record<string, string>): Record<string, string> {

@@ -1,5 +1,6 @@
-import ComponentReady from '@kubevirt-utils/components/Charts/ComponentReady/ComponentReady';
 import React from 'react';
+
+import ComponentReady from '@kubevirt-utils/components/Charts/ComponentReady/ComponentReady';
 
 import { RDPConnectorProps } from '../utils/types';
 
