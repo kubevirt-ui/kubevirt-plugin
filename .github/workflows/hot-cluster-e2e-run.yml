@@ -367,6 +367,18 @@ jobs:
       CHECKOUT_REF: ${{ inputs.checkout_ref }}
       PR_NUMBER: ${{ inputs.pr_number }}
       TEST_ARGS: ${{ inputs.test_args }}
+      # A release-branch run tests against the console that ships with that
+      # release (e.g. origin-console:4.21) rather than ci-env-request.ts's
+      # default (origin-console:5.0) -- console features/DOM differ between
+      # versions (e.g. the NetworkAttachmentDefinition create form). Empty for
+      # main/unpinned runs, which keep the default. cnv_pin_version is the
+      # resolved version (see below).
+      CONSOLE_IMAGE: >-
+        ${{
+          inputs.cnv_pin_version != '' &&
+          format('quay.io/openshift/origin-console:{0}', inputs.cnv_pin_version) ||
+          ''
+        }}
       # release-4.20's Cypress content hardcodes TEST_NS=auto-test-ns and
       # TEST_SECRET_NAME=auto-test-secret; release-4.21/4.22 read both
       # dynamically, so they get a genuine per-run name instead (avoiding
@@ -436,12 +448,14 @@ jobs:
 
       - name: Provision CI test environment
         id: ci-env
-        uses: kubevirt-ui/kubevirt-plugin/.github/actions/ci-env-request@main
+        uses: ./.github/actions/ci-env-request
         with:
           plugin-image: ${{ env.PLUGIN_IMAGE }}
           test-namespace: ${{ env.TEST_NS }}
           configmap-name: ${{ env.CI_ENV_CM }}
           ci-env-namespace: ${{ env.CI_ENV_NS }}
+          # Pin the console to the pinned release version (empty -> default).
+          console-image: ${{ env.CONSOLE_IMAGE }}
           # Cypress needs the console's welcome-modal dismissed server-side
           # (configmap); Playwright already seeds this client-side.
           user-settings-location: ${{ env.TEST_ENGINE == 'cypress' && 'configmap' || '' }}

@@ -26,6 +26,14 @@ inputs:
       ci-test-stack chart's own default (localstorage).
     required: false
     default: ''
+  console-image:
+    description: |
+      Optional override for the console container image. Leave empty (default)
+      to let ci-env-request.ts pick its default (origin-console:5.0). A release
+      branch run passes the matching console (e.g. origin-console:4.21) so the
+      product is tested against the console it actually ships with.
+    required: false
+    default: ''
 
 outputs:
   bridge-base-address:
@@ -54,6 +62,7 @@ runs:
       env:
         CM_NAME: ${{ inputs.configmap-name }}
         CM_NS: ${{ inputs.ci-env-namespace }}
+        CONSOLE_IMAGE: ${{ inputs.console-image }}
         PLUGIN_IMAGE: ${{ inputs.plugin-image }}
         TEST_NS: ${{ inputs.test-namespace }}
         TIMEOUT: ${{ inputs.timeout }}
