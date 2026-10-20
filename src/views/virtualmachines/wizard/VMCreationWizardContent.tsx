@@ -5,10 +5,8 @@ import {
   logVMCreationStarted,
   mapWizardStepToCreationMethodTelemetry,
 } from '@kubevirt-utils/extensions/telemetry';
-import useAllowedNamespaces from '@kubevirt-utils/hooks/useAllowedNamespaces/useAllowedNamespaces';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Wizard, WizardHeader, WizardStep, type WizardStepType } from '@patternfly/react-core';
-import { getVmCreateFleetAccessReview } from '@virtualmachines/list/utils/utils';
 import { useVMWizardForm } from '@virtualmachines/wizard/form/VMWizardFormProvider';
 import useCloseWizard from '@virtualmachines/wizard/hooks/useCloseWizard';
 import useVMGenerationCoordinator from '@virtualmachines/wizard/hooks/useVMGenerationCoordinator/useVMGenerationCoordinator';
@@ -17,6 +15,7 @@ import { useVMWizardState } from '@virtualmachines/wizard/state/useVMWizardState
 
 import RequiredLabelsDrawerWrapper from './components/RequiredLabelsDrawerWrapper';
 import TemplatesDrawerWrapper from './components/TemplatesDrawerWrapper';
+import VMCreationWizardAllowedNamespacesPrefetch from './components/VMCreationWizardAllowedNamespacesPrefetch';
 import useVMGenerationNavClick from './hooks/useVMGenerationNavClick';
 import { type VMCreationMethod, VMWizardStep } from './utils/constants';
 import { getStepsToDisplayByCreationMethod } from './utils/displaySteps';
@@ -31,17 +30,10 @@ const VMCreationWizardContent: FC = () => {
   const closeWizard = useCloseWizard();
 
   const { control } = useVMWizardForm();
-  const cluster = useWatch({
-    control,
-    name: 'deployment.cluster',
-  });
   const creationMethod = useWatch({
     control,
     name: 'creationMethod',
   });
-
-  const vmCreateAccessReview = useMemo(() => getVmCreateFleetAccessReview(cluster), [cluster]);
-  useAllowedNamespaces(vmCreateAccessReview);
 
   const { currentStep, setCurrentStep, setIsTemplateDrawerOpen } = useVMWizardState();
 
@@ -92,6 +84,7 @@ const VMCreationWizardContent: FC = () => {
 
   return (
     <RequiredLabelsDrawerWrapper currentStep={currentStep as VMWizardStep}>
+      <VMCreationWizardAllowedNamespacesPrefetch />
       <TemplatesDrawerWrapper>
         <Wizard
           className="vm-creation-wizard"
