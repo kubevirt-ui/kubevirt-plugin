@@ -448,7 +448,11 @@ jobs:
 
       - name: Provision CI test environment
         id: ci-env
-        uses: ./.github/actions/ci-env-request
+        # Pinned to @main (like the sibling hot-cluster actions): this workflow's
+        # workspace root is the branch under test, which may not carry this
+        # action (or carries an older copy), so a local ./ reference can't be
+        # resolved. @main now has the console-image input.
+        uses: kubevirt-ui/kubevirt-plugin/.github/actions/ci-env-request@main
         with:
           plugin-image: ${{ env.PLUGIN_IMAGE }}
           test-namespace: ${{ env.TEST_NS }}
