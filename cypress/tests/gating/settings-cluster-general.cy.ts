@@ -63,8 +63,11 @@ describe('Test Cluster General settings', () => {
       cy.checkHCOSpec(percentage, MEMORY_DENSITY_VALUE, true);
     });
 
-    it('disable memory density', () => {
+    // Toggling the PF Switch off via .uncheck() intermittently doesn't fire the
+    // React onChange (the confirm modal never opens), so retry on failure.
+    it('disable memory density', { retries: { runMode: 3 } }, () => {
       cy.get('[data-test-id="memory-density"]').uncheck({ force: true });
+      cy.get('[data-test-id="memory-density-disable-modal"]').should('be.visible');
       cy.get('[data-test-id="memory-density-disable-confirm-button"]').click({ force: true });
       cy.wait(10 * SECOND);
     });

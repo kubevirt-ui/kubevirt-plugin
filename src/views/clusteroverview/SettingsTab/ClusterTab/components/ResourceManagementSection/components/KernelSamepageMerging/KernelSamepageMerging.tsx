@@ -25,18 +25,17 @@ const KernelSamepageMerging: FC<KernelSamepageMergingProps> = ({
   const ksmConfiguration = hyperConverge?.spec?.ksmConfiguration;
   const [isEnabled, setIsEnabled] = useState<boolean>();
 
-  useEffect(
-    () =>
-      hyperLoaded &&
+  useEffect(() => {
+    if (hyperLoaded) {
       setIsEnabled(
         !!(
           ksmConfiguration?.hasOwnProperty('nodeLabelSelector') &&
           // Empty nodeLabelSelector will enable KSM on every node.
           isEmpty(ksmConfiguration?.nodeLabelSelector)
         ),
-      ),
-    [ksmConfiguration, hyperLoaded],
-  );
+      );
+    }
+  }, [ksmConfiguration, hyperLoaded]);
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<null | string>(null);
