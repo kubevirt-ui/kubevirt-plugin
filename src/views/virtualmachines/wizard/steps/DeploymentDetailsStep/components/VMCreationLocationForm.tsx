@@ -1,7 +1,6 @@
 import { type FC, useCallback, useMemo } from 'react';
 import { Controller, useWatch } from 'react-hook-form';
 
-import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import ClusterDropdown from '@kubevirt-utils/components/ClusterProjectDropdown/ClusterDropdown';
 import NamespaceDropdown, {
   type NamespaceDropdownProjectCreatedHandler,
@@ -16,10 +15,8 @@ import { getName } from '@kubevirt-utils/resources/shared';
 import { getCluster } from '@multicluster/helpers/selectors';
 import useIsACMPage from '@multicluster/useIsACMPage';
 import { Form, FormGroup } from '@patternfly/react-core';
-import {
-  type FleetAccessReviewResourceAttributes,
-  useHubClusterName,
-} from '@stolostron/multicluster-sdk';
+import { useHubClusterName } from '@stolostron/multicluster-sdk';
+import { getVmCreateFleetAccessReview } from '@virtualmachines/list/utils/utils';
 import { useVMWizardForm } from '@virtualmachines/wizard/form/VMWizardFormProvider';
 import { useWizardVMDraft } from '@virtualmachines/wizard/hooks/useWizardVMDraft';
 import { VMCreationMethod } from '@virtualmachines/wizard/utils/constants';
@@ -43,14 +40,10 @@ const VMCreationLocationForm: FC = () => {
     name: ['deployment.cluster', 'deployment.folder', 'deployment.project'],
   });
 
-  const vmCreateProjectAccessReview = useMemo((): FleetAccessReviewResourceAttributes => {
-    return {
-      cluster,
-      group: VirtualMachineModel.apiGroup,
-      resource: VirtualMachineModel.plural,
-      verb: 'create',
-    };
-  }, [cluster]);
+  const vmCreateProjectAccessReview = useMemo(
+    () => getVmCreateFleetAccessReview(cluster),
+    [cluster],
+  );
 
   const clearLocationDependentVM = useCallback((): void => {
     clearWizardDraftPendingUploads(getValues, setValue);
