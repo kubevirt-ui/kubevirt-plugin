@@ -137,6 +137,12 @@ export const TestTimeouts = {
   /** Timeout for page navigation (3 minutes) */
   NAVIGATION: 3 * MINUTE,
 
+  /** Console OAuth login, IDP selection, and post-login shell (4 minutes; slow CI clusters) */
+  CONSOLE_LOGIN: 4 * MINUTE,
+
+  /** Direct console route loads and overview title cards (4 minutes) */
+  CONSOLE_PAGE_LOAD: 4 * MINUTE,
+
   /** Short wait for search results and quick verifications (5 seconds) */
   SHORT_WAIT: 5 * SECOND,
 

@@ -1,4 +1,4 @@
-import { MINUTE, SECOND, TestTimeouts } from '@/utils/test-config';
+import { SECOND, TestTimeouts } from '@/utils/test-config';
 import type { Page } from '@playwright/test';
 
 /**
@@ -21,7 +21,10 @@ export class LoginPage {
 
   async navigateToLogin(baseUrl: string): Promise<void> {
     const root = baseUrl.replace(/\/$/, '');
-    await this.page.goto(`${root}/auth/login`, { waitUntil: 'load', timeout: 2 * MINUTE });
+    await this.page.goto(`${root}/auth/login`, {
+      waitUntil: 'load',
+      timeout: TestTimeouts.CONSOLE_LOGIN,
+    });
   }
 
   async isKubeAdminButtonVisible(timeoutMs = 10 * SECOND): Promise<boolean> {
