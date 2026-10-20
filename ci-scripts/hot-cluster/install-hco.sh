@@ -28,7 +28,12 @@
 #                            and does not work on IBM ROKS (kubelet root is
 #                            /var/data/kubelet), so golden-image imports hang on
 #                            it. Golden images must use a working class such as
-#                            IBM VPC block.
+#                            IBM VPC block. Since this script re-runs on every CI
+#                            job against the same persistent hot cluster, it also
+#                            repairs any golden-image DataVolume that was already
+#                            stuck importing on a broken storage class from before
+#                            DEFAULT_STORAGE_CLASS was corrected -- see the
+#                            "Repair stuck golden images" step below.
 #
 set -euo pipefail
 
@@ -337,6 +342,47 @@ done
 oc annotate storageclass "${DEFAULT_STORAGE_CLASS}" \
   storageclass.kubernetes.io/is-default-class='true' \
   storageclass.kubevirt.io/is-default-virt-class='true' --overwrite
+
+# --- Repair stuck golden images ---
+# Re-annotating the default storage class above does not retroactively fix
+# golden-image DataVolumes that already started (and got permanently stuck)
+# importing on a broken storage class before DEFAULT_STORAGE_CLASS pointed
+# here -- e.g. on a persistent hot cluster created before this script set the
+# default correctly. Delete any DataVolume in the os-images namespace that
+# hasn't reached Succeeded; CDI's DataImportCronJob controller notices its
+# managed DataVolume is missing and immediately recreates one (it does not
+# wait for the next scheduled cron tick), this time under the now-correct
+# default storage class. On a healthy cluster every DataVolume is already
+# Succeeded, so this is a no-op.
+echo "Checking for stuck golden-image imports in openshift-virtualization-os-images..."
+STUCK_DVS="$(oc get datavolume -n openshift-virtualization-os-images -o json 2>/dev/null \
+  | jq -r '.items[]? | select(.status.phase != "Succeeded") | .metadata.name' || true)"
+
+if [[ -n "${STUCK_DVS}" ]]; then
+  echo "Found stuck DataVolume(s), deleting so CDI reimports them on '${DEFAULT_STORAGE_CLASS}':"
+  while IFS= read -r dv; do
+    [[ -z "${dv}" ]] && continue
+    echo "  Repairing ${dv}..."
+    oc delete datavolume "${dv}" -n openshift-virtualization-os-images --ignore-not-found
+    oc delete pvc "${dv}" -n openshift-virtualization-os-images --ignore-not-found
+  done <<< "${STUCK_DVS}"
+
+  echo "Waiting for repaired golden images to re-import (best-effort, up to 10 minutes)..."
+  for i in $(seq 1 60); do
+    REMAINING="$(oc get datavolume -n openshift-virtualization-os-images -o json 2>/dev/null \
+      | jq -r '[.items[]? | select(.status.phase != "Succeeded")] | length' || echo "0")"
+    if [[ "${REMAINING}" -eq 0 ]]; then
+      echo "  All golden images are now Succeeded"
+      break
+    fi
+    if [[ "${i}" -eq 60 ]]; then
+      echo "  WARNING: ${REMAINING} golden image(s) still not Succeeded after 10 minutes; they may need more time or further investigation"
+    fi
+    sleep 10
+  done
+else
+  echo "No stuck golden-image imports found"
+fi
 
 echo ""
 echo "=== OpenShift Virtualization Installation Complete ==="
