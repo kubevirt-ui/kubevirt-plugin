@@ -135,7 +135,7 @@ export default defineConfig({
     baseURL,
     headless: process.env.HEADLESS !== 'false',
     ignoreHTTPSErrors: true,
-    navigationTimeout: 120_000,
+    navigationTimeout: TestTimeouts.CONSOLE_PAGE_LOAD,
     screenshot: 'only-on-failure',
     storageState,
     testIdAttribute: 'data-test',

@@ -1,7 +1,7 @@
 import BasePage from '@/page-objects/base-page';
 import { dismissConsoleObstructions } from '@/utils/console-modals';
 import { ConsoleRoutes, DEFAULT_CATALOG_NAMESPACE } from '@/utils/console-routes';
-import { MINUTE, TestTimeouts } from '@/utils/test-config';
+import { TestTimeouts } from '@/utils/test-config';
 import type { Page } from '@playwright/test';
 
 export class NavigationPage extends BasePage {
@@ -12,7 +12,10 @@ export class NavigationPage extends BasePage {
   /** Direct console navigation (stable on 4.12); avoids fragile sidebar expand/collapse. */
   private async gotoConsolePath(path: string): Promise<void> {
     await dismissConsoleObstructions(this.page);
-    await this.page.goto(path, { waitUntil: 'domcontentloaded', timeout: 2 * MINUTE });
+    await this.page.goto(path, {
+      waitUntil: 'domcontentloaded',
+      timeout: TestTimeouts.CONSOLE_PAGE_LOAD,
+    });
     await dismissConsoleObstructions(this.page);
   }
 
@@ -56,22 +59,23 @@ export class NavigationPage extends BasePage {
   }
 
   async goToOverview(): Promise<void> {
+    await this.switchToAdministratorPerspective();
     await this.gotoConsolePath(ConsoleRoutes.virtualizationOverview());
     await this.page
       .locator('[data-test-id="resource-title"]')
       .filter({ hasText: 'Virtualization' })
-      .waitFor({ timeout: 2 * MINUTE });
+      .waitFor({ timeout: TestTimeouts.CONSOLE_PAGE_LOAD });
     await this.page
       .locator('[data-test-id="kv-overview-status-card"], [data-test="getting-started"]')
       .first()
-      .waitFor({ timeout: 2 * MINUTE });
+      .waitFor({ timeout: TestTimeouts.CONSOLE_PAGE_LOAD });
   }
 
   async goToCatalog(namespace = DEFAULT_CATALOG_NAMESPACE): Promise<void> {
     await this.gotoConsolePath(ConsoleRoutes.catalog(namespace));
     await this.page
       .getByText('Create VirtualMachine from catalog')
-      .waitFor({ timeout: 2 * MINUTE });
+      .waitFor({ timeout: TestTimeouts.CONSOLE_PAGE_LOAD });
   }
 
   async goToVirtualMachines(): Promise<void> {
@@ -79,7 +83,7 @@ export class NavigationPage extends BasePage {
     await this.page
       .locator('[data-test-id="resource-title"]')
       .filter({ hasText: 'VirtualMachines' })
-      .waitFor({ timeout: 2 * MINUTE });
+      .waitFor({ timeout: TestTimeouts.CONSOLE_PAGE_LOAD });
   }
 
   async goToTemplates(): Promise<void> {
@@ -92,7 +96,7 @@ export class NavigationPage extends BasePage {
           .filter({ hasText: /VirtualMachine Templates|Templates/i }),
       )
       .first()
-      .waitFor({ timeout: 2 * MINUTE });
+      .waitFor({ timeout: TestTimeouts.CONSOLE_PAGE_LOAD });
   }
 
   async goToDataSources(): Promise<void> {
@@ -100,7 +104,7 @@ export class NavigationPage extends BasePage {
     await this.page
       .locator('[data-test-id="resource-title"]')
       .filter({ hasText: 'DataSources' })
-      .waitFor({ timeout: 2 * MINUTE });
+      .waitFor({ timeout: TestTimeouts.CONSOLE_PAGE_LOAD });
   }
 
   async goToMigrationPolicies(): Promise<void> {
@@ -108,7 +112,7 @@ export class NavigationPage extends BasePage {
     await this.page
       .locator('[data-test-id="resource-title"]')
       .filter({ hasText: /Migration\s*Policies/i })
-      .waitFor({ timeout: 2 * MINUTE });
+      .waitFor({ timeout: TestTimeouts.CONSOLE_PAGE_LOAD });
   }
 
   async switchProject(projectName: string): Promise<void> {

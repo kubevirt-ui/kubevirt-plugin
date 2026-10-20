@@ -1,21 +1,20 @@
 import { LoginPage } from '@/page-objects/cluster/login-page';
 import { EnvVariables } from '@/utils/env-variables';
 import { NONPRIV_IDP_NAME } from '@/utils/nonpriv-user-setup';
-import { MINUTE } from '@/utils/test-config';
-import { SECOND } from '@/utils/test-config';
+import { SECOND, TestTimeouts } from '@/utils/test-config';
 import type { BrowserContext, Page } from '@playwright/test';
 
 async function waitForConsoleReady(page: Page): Promise<void> {
   await page
     .locator('[data-test-id="perspective-switcher-toggle"]')
-    .waitFor({ state: 'visible', timeout: 2 * MINUTE });
+    .waitFor({ state: 'visible', timeout: TestTimeouts.CONSOLE_LOGIN });
 }
 
 /**
  * Local `start-console.sh` bridge: `BRIDGE_USER_AUTH=disabled` — no login route, only load the app.
  */
 export async function bootstrapLocalConsoleSession(page: Page, baseURL: string): Promise<void> {
-  await page.goto(baseURL, { waitUntil: 'load', timeout: 2 * MINUTE });
+  await page.goto(baseURL, { waitUntil: 'load', timeout: TestTimeouts.CONSOLE_LOGIN });
   await waitForConsoleReady(page);
 }
 
@@ -29,7 +28,7 @@ export async function loginToOpenShiftConsole(page: Page, baseURL: string): Prom
     return;
   }
 
-  await page.goto(baseURL, { waitUntil: 'domcontentloaded', timeout: 2 * MINUTE });
+  await page.goto(baseURL, { waitUntil: 'domcontentloaded', timeout: TestTimeouts.CONSOLE_LOGIN });
 
   const authDisabled = await page
     .evaluate(
@@ -67,7 +66,7 @@ export async function loginToOpenShiftConsole(page: Page, baseURL: string): Prom
   await loginPage.fillAndSubmitLoginForm(EnvVariables.loginUsername, EnvVariables.loginPassword);
 
   await page.waitForURL((url) => !url.pathname.includes('/auth/login'), {
-    timeout: 2 * MINUTE,
+    timeout: TestTimeouts.CONSOLE_LOGIN,
   });
   await waitForConsoleReady(page);
 }

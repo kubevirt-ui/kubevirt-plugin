@@ -1,3 +1,7 @@
+import * as fs from 'fs';
+import * as os from 'os';
+import * as path from 'path';
+
 import yaml from 'js-yaml';
 
 import { canRunOc, runOcCommand } from '@/utils/cluster-oc';
@@ -97,6 +101,34 @@ export default class RequestContextClient {
     throw new Error(`${action} failed (${response.status()}): ${body.slice(0, 500)}`);
   }
 
+  /** Kubeadmin kubeconfig — used when the console proxy runs as a user without create RBAC (e.g. NAD). */
+  private applyDocViaOc(doc: K8sObject): void {
+    const tmp = path.join(os.tmpdir(), `pw-e2e-${doc.kind}-${Date.now()}.yaml`);
+    fs.writeFileSync(tmp, yaml.dump(doc), 'utf8');
+    try {
+      const ns = doc.metadata?.namespace;
+      const nsFlag = ns ? `-n ${ns}` : '';
+      runOcCommand(`oc apply -f "${tmp}" ${nsFlag}`);
+    } finally {
+      fs.unlinkSync(tmp);
+    }
+  }
+
+  private async expectOkOrApplyViaOc(
+    response: { ok: () => boolean; status: () => number; text: () => Promise<string> },
+    doc: K8sObject,
+    action: string,
+  ): Promise<void> {
+    if (response.ok()) {
+      return;
+    }
+    if (response.status() === 403 && canRunOc()) {
+      this.applyDocViaOc(doc);
+      return;
+    }
+    await this.expectOk(response, action);
+  }
+
   async applyYaml(manifestYaml: string): Promise<void> {
     const doc = yaml.load(manifestYaml) as K8sObject;
     await this.createOrReplace(doc);
@@ -114,7 +146,7 @@ export default class RequestContextClient {
         data: doc,
         headers: this.proxyHeaders({ 'Content-Type': 'application/json' }),
       });
-      await this.expectOk(put, `PUT ${doc.kind}/${name}`);
+      await this.expectOkOrApplyViaOc(put, doc, `PUT ${doc.kind}/${name}`);
       return;
     }
     const post = await this.request.post(this.url(resourceCollectionPath(doc)), {
@@ -126,10 +158,10 @@ export default class RequestContextClient {
         data: doc,
         headers: this.proxyHeaders({ 'Content-Type': 'application/json' }),
       });
-      await this.expectOk(put, `PUT ${doc.kind}/${name} after conflict`);
+      await this.expectOkOrApplyViaOc(put, doc, `PUT ${doc.kind}/${name} after conflict`);
       return;
     }
-    await this.expectOk(post, `POST ${doc.kind}/${name}`);
+    await this.expectOkOrApplyViaOc(post, doc, `POST ${doc.kind}/${name}`);
   }
 
   async deleteResource(
