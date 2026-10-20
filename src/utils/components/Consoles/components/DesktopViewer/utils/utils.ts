@@ -1,18 +1,17 @@
 import { saveAs } from 'file-saver';
+
 import { ServiceModel } from '@kubevirt-ui/kubevirt-api/console';
 import VirtualMachineInstanceModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineInstanceModel';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
-import { k8sCreate, k8sPatch, K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
-
-import { buildOwnerReference } from '../../../../../resources/shared';
-
 import {
   IoK8sApiCoreV1Pod,
   IoK8sApiCoreV1Service,
   IoK8sApiCoreV1ServicePort,
 } from '@kubevirt-ui/kubevirt-api/kubernetes';
 import { V1VirtualMachine, V1VirtualMachineInstance } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { k8sCreate, k8sPatch, K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
+import { buildOwnerReference } from '../../../../../resources/shared';
 import { RDP_CONSOLE_TYPE, SPICE_CONSOLE_TYPE, VNC_CONSOLE_TYPE } from '../../utils/ConsoleConsts';
 
 import {
