@@ -12,6 +12,8 @@ import { ActionDropdownItemType } from '@kubevirt-utils/components/ActionsDropdo
 import CloneVMModal from '@kubevirt-utils/components/CloneVMModal/CloneVMModal';
 import { LabelsModal } from '@kubevirt-utils/components/LabelsModal/LabelsModal';
 import { ModalComponent } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+import RunStrategyModal from '@kubevirt-utils/components/RunStrategyModal/RunStrategyModal';
+import { updateRunStrategy } from '@kubevirt-utils/components/RunStrategyModal/utils';
 import SnapshotModal from '@kubevirt-utils/components/SnapshotModal/SnapshotModal';
 import { t } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
@@ -31,6 +33,10 @@ import {
 } from '@kubevirt-utils/resources/migrations/constants';
 import { asAccessReview, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getVMSSHSecretName } from '@kubevirt-utils/resources/vm';
+import {
+  getEffectiveRunStrategy,
+  isVMNotStopped,
+} from '@kubevirt-utils/resources/vm/utils/selectors';
 import { getMigratableVolumeSnapshotStatuses } from '@kubevirt-utils/resources/vm/utils/snapshotStatuses';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
@@ -53,6 +59,7 @@ import {
 
 import ConfirmVMActionModal from './components/ConfirmVMActionModal/ConfirmVMActionModal';
 import DeleteVMModal from './components/DeleteVMModal/DeleteVMModal';
+import { ACTIONS_ID } from './hooks/constants';
 import {
   cancelMigration,
   cancelStorageMigrationPlan,
@@ -210,6 +217,24 @@ export const VirtualMachineActionFactory = {
       )),
     id: 'vm-action-edit-labels',
     label: t('Edit labels'),
+  }),
+  editRunStrategy: (
+    vm: V1VirtualMachine,
+    createModal: (modal: ModalComponent) => void,
+  ): ActionDropdownItemType => ({
+    accessReview: asAccessReview(VirtualMachineModel, vm, 'patch'),
+    cta: () =>
+      createModal(({ isOpen, onClose }) => (
+        <RunStrategyModal
+          initialRunStrategy={getEffectiveRunStrategy(vm)}
+          isOpen={isOpen}
+          isVMRunning={isVMNotStopped(vm)}
+          onClose={onClose}
+          onSubmit={(runStrategy) => updateRunStrategy(vm, runStrategy)}
+        />
+      )),
+    id: ACTIONS_ID.EDIT_RUN_STRATEGY,
+    label: t('Edit run strategy'),
   }),
   forceStop: (vm: V1VirtualMachine): ActionDropdownItemType => {
     return {

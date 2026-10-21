@@ -3,6 +3,7 @@ export const ACTIONS_ID = {
   BULK_MIGRATE_STORAGE: 'vm-action-migrate-storage',
   DELETE: 'vm-action-delete',
   EDIT_LABELS: 'vm-action-edit-labels',
+  EDIT_RUN_STRATEGY: 'vm-action-change-run-strategy',
   MOVE_TO_FOLDER: 'vm-action-move-to-folder',
   PAUSE: 'vm-action-pause',
   RESET: 'vm-action-reset',

@@ -4,12 +4,9 @@ import { DRAWER_FORM_ID } from '@catalog/templatescatalog/utils/consts';
 import { NOT_SUPPORTED_VM_ERROR } from '@catalog/utils/constants';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import FolderSelect from '@kubevirt-utils/components/FolderSelect/FolderSelect';
+import { getStartAfterCreationLabel } from '@kubevirt-utils/components/RunStrategyModal/utils';
 import { validateVMName } from '@kubevirt-utils/components/VMNameValidationHelperText/utils/utils';
 import VMNameValidationHelperText from '@kubevirt-utils/components/VMNameValidationHelperText/VMNameValidationHelperText';
-import {
-  RUNSTRATEGY_ALWAYS,
-  RUNSTRATEGY_RERUNONFAILURE,
-} from '@kubevirt-utils/constants/constants';
 import { TREE_VIEW_FOLDERS } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -70,7 +67,6 @@ export const TemplatesCatalogDrawerCreateForm: FC<TemplatesCatalogDrawerCreateFo
       onCustomize,
       onQuickCreate,
       onVMNameChange,
-      runStrategy,
       startVM,
     } = useCreateDrawerForm(namespace, subscriptionData, authorizedSSHKey);
 
@@ -135,19 +131,9 @@ export const TemplatesCatalogDrawerCreateForm: FC<TemplatesCatalogDrawerCreateFo
             <StackItem />
             <StackItem>
               <Checkbox
-                isChecked={
-                  startVM ||
-                  runStrategy === RUNSTRATEGY_ALWAYS ||
-                  runStrategy === RUNSTRATEGY_RERUNONFAILURE
-                }
-                label={
-                  runStrategy
-                    ? t('Start this VirtualMachine after creation ({{runStrategy}})', {
-                        runStrategy,
-                      })
-                    : t('Start this VirtualMachine after creation')
-                }
                 id="start-after-create-checkbox"
+                isChecked={startVM}
+                label={getStartAfterCreationLabel(t)}
                 onChange={(_, checked: boolean) => onChangeStartVM(checked)}
               />
             </StackItem>
