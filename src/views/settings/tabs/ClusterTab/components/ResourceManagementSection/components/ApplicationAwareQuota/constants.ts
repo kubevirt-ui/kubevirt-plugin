@@ -13,8 +13,15 @@ export const getCalculationMethodContentMapper = (
     ),
     label: t('Dedicated virtual resources'),
     popover: t(
-      'Applies to both VMs and their associated pods, tracking quota usage separately for each resource type.',
+      'applies to both VMs and their associated pods, tracking quota usage separately for each resource type.',
     ),
+  },
+  [CalculationMethod.GuestEffectiveResources]: {
+    description: t(
+      'Applies to pods that run VM workloads, excluding memory overhead for a closer match to guest-requested resources. Useful when accounting for CPU allocation or overcommitment ratios while ignoring infrastructure overhead.',
+    ),
+    label: t('Guest effective resources'),
+    popover: t('counts the full pod running the VM, excluding memory overhead.'),
   },
   [CalculationMethod.VirtualResources]: {
     description: t(
@@ -34,9 +41,10 @@ export const getCalculationMethodContentMapper = (
 });
 
 export const calculationMethods: CalculationMethod[] = [
+  CalculationMethod.DedicatedVirtualResources,
   CalculationMethod.VirtualResources,
   CalculationMethod.VmiPodUsage,
-  CalculationMethod.DedicatedVirtualResources,
+  CalculationMethod.GuestEffectiveResources,
 ];
 
 export const DEFAULT_CALCULATION_METHOD = CalculationMethod.DedicatedVirtualResources;

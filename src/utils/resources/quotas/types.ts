@@ -2,6 +2,7 @@ import type { K8sResourceKind, Selector } from '@openshift-console/dynamic-plugi
 
 export enum CalculationMethod {
   DedicatedVirtualResources = 'DedicatedVirtualResources',
+  GuestEffectiveResources = 'GuestEffectiveResources',
   VirtualResources = 'VirtualResources',
   VmiPodUsage = 'VmiPodUsage',
 }
