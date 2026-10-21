@@ -11,8 +11,6 @@ import { type CalculationMethodContentMapper } from '../types';
 
 import EditCalculationMethodModal from './EditCalculationMethodModal';
 
-import './EditCalculationMethodButton.scss';
-
 type EditCalculationMethodButtonProps = {
   calculationMethodContentMapper: CalculationMethodContentMapper;
   hyperConverge: HyperConverged;
