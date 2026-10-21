@@ -1,6 +1,8 @@
+import { type ExportDiskStoreState } from './exportDisk/types/types';
 import { type UploadsStoreState } from './uploads/types/types';
 
 export type UploadProgressStoreState = {
+  exportDisk: ExportDiskStoreState;
   uploads: UploadsStoreState;
 };
 

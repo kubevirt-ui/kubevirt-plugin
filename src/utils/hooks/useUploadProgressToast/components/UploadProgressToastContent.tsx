@@ -22,7 +22,7 @@ const UploadProgressToastContent: FC<UploadProgressToastContentProps> = ({
   uploadSnapshot,
 }) => {
   const storeUpload = useUploadProgressStore((state) => state.uploads.data?.[uploadKey]);
-  const upload = resolveToastUpload(uploadSnapshot, storeUpload);
+  const upload = resolveToastUpload(uploadSnapshot, storeUpload.progressToastState);
 
   if (!upload) {
     return null;

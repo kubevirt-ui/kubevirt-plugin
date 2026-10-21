@@ -4,7 +4,7 @@ import {
   getBootableVolumeUploadKey,
   isBootableVolumeUploadKey,
 } from '../keys/uploadKeys';
-import { type UploadEntry } from '../uploads/types/types';
+import { type UploadEntry, type UploadsStoreStateData } from '../uploads/types/types';
 import {
   collectLinkUrls,
   getBootableVolumeUrlsToOmit,
@@ -31,13 +31,13 @@ export const stripDataVolumeLinksFromUpload = (
 };
 
 export const stripLinksForDeletedDataVolume = (
-  uploads: Record<string, UploadEntry>,
+  uploadsData: UploadsStoreStateData,
   dvName: string,
   dvNamespace: string,
   cluster?: string,
-): Record<string, UploadEntry> => {
+): UploadsStoreStateData => {
   if (!dvName || !dvNamespace) {
-    return uploads;
+    return uploadsData;
   }
 
   const urlsToOmitForVolume = new Set([
@@ -45,7 +45,7 @@ export const stripLinksForDeletedDataVolume = (
     getDataVolumeUrl(dvName, dvNamespace),
   ]);
 
-  return updateUploads(uploads, (key, upload) => {
+  return updateUploads(uploadsData, (key, upload) => {
     const matchesVolume =
       upload.dvName === dvName &&
       upload.dvNamespace === dvNamespace &&
@@ -67,13 +67,13 @@ export const stripLinksForDeletedDataVolume = (
 };
 
 export const stripLinksForDeletedBootableVolume = (
-  uploads: Record<string, UploadEntry>,
+  uploadsData: UploadsStoreStateData,
   namespace: string,
   name: string,
   cluster?: string,
-): Record<string, UploadEntry> => {
+): UploadsStoreStateData => {
   if (!namespace || !name) {
-    return uploads;
+    return uploadsData;
   }
 
   const matchingKeys = new Set([
@@ -82,7 +82,7 @@ export const stripLinksForDeletedBootableVolume = (
   ]);
   const urlsToOmit = getBootableVolumeUrlsToOmit(name, namespace, cluster);
 
-  return updateUploads(uploads, (key, upload) => {
+  return updateUploads(uploadsData, (key, upload) => {
     if (!matchingKeys.has(key) || !matchesUploadCluster(upload, cluster)) {
       return new Set();
     }
@@ -96,21 +96,22 @@ export const stripLinksForDeletedBootableVolume = (
 };
 
 export const stripVmStorageLinksFromUploads = (
-  uploads: Record<string, UploadEntry>,
+  uploadsData: UploadsStoreStateData,
   cluster: string,
   namespace: string,
   vmName: string,
   uploadKeys?: string[],
-): Record<string, UploadEntry> => {
-  const matchingKeys = uploadKeys ?? collectVmScopedUploadKeys(uploads, cluster, namespace, vmName);
+): UploadsStoreStateData => {
+  const matchingKeys =
+    uploadKeys ?? collectVmScopedUploadKeys(uploadsData, cluster, namespace, vmName);
   if (matchingKeys.length === 0) {
-    return uploads;
+    return uploadsData;
   }
 
   const vmStorageUrls = getVmStorageUrls(cluster, namespace, vmName);
 
   return updateUploads(
-    uploads,
+    uploadsData,
     (_key, upload) => new Set([...vmStorageUrls, ...getDataVolumeUrls(upload)]),
     matchingKeys,
   );
