@@ -4,10 +4,7 @@ import { createVMFlowTypes } from '@kubevirt-utils/extensions/telemetry/utils/co
 import { getName } from '@kubevirt-utils/resources/shared';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 
-import {
-  getTelemetryApiKey,
-  isSegmentTelemetryEnabled,
-} from './isSegmentTelemetryEnabled';
+import { getTelemetryApiKey, isSegmentTelemetryEnabled } from './isSegmentTelemetryEnabled';
 
 // Segment "apiHost" parameter, should be like "api.segment.io/v1"
 const apiHost = window.SERVER_FLAGS.telemetry?.SEGMENT_API_HOST || '';
