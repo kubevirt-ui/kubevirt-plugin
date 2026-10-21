@@ -11,14 +11,14 @@ import { type AdvancedSearchFilter } from '@stolostron/multicluster-sdk';
 
 import { type KubevirtDataPodFilters } from '../useKubevirtDataPod/types';
 import useKubevirtDataPod from '../useKubevirtDataPod/useKubevirtDataPod';
-import { type Result } from './useKubevirtWatchResource';
+import { type UseKubevirtWatchResourceResult } from './useKubevirtWatchResource';
 
 const useRedirectWatchHooks = <T extends K8sResourceCommon | K8sResourceCommon[]>(
   watchOptions: WatchK8sResource & { cluster?: string },
   filterOptions?: KubevirtDataPodFilters,
   searchQueries?: AdvancedSearchFilter,
   shouldUseProxyPod?: boolean | null,
-): Result<T> => {
+): UseKubevirtWatchResourceResult<T> => {
   const isACMTreeView = useIsACMPage();
 
   const useMulticlusterSearch = useMemo(() => {
@@ -44,9 +44,10 @@ const useRedirectWatchHooks = <T extends K8sResourceCommon | K8sResourceCommon[]
   return useMemo(() => {
     const defaultData: T = watchOptions?.isList ? ([] as T) : undefined;
 
-    if (shouldUseProxyPod === null) return [defaultData, false, undefined] as Result<T>;
+    if (shouldUseProxyPod === null)
+      return [defaultData, false, undefined] as UseKubevirtWatchResourceResult<T>;
 
-    if (usePod) return kubevirtPodWatch as Result<T>;
+    if (usePod) return kubevirtPodWatch as UseKubevirtWatchResourceResult<T>;
 
     if (useMulticlusterSearch)
       return [
@@ -54,9 +55,9 @@ const useRedirectWatchHooks = <T extends K8sResourceCommon | K8sResourceCommon[]
         multiSearchLoaded,
         multiSearchError,
         multiSearchRefresh,
-      ] as Result<T>;
+      ] as UseKubevirtWatchResourceResult<T>;
 
-    return k8sWatch as Result<T>;
+    return k8sWatch as UseKubevirtWatchResourceResult<T>;
   }, [
     watchOptions?.isList,
     shouldUseProxyPod,

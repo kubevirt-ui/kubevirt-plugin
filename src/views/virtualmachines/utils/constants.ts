@@ -28,6 +28,7 @@ export enum VirtualMachineRowFilterType {
   Name = 'name',
   Node = 'node',
   OS = 'os',
+  OutdatedVirtioDrivers = 'outdatedVirtioDrivers',
   Project = PROJECT_LIST_FILTER_TYPE,
   Scheduling = 'scheduling',
   Status = 'status',

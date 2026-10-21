@@ -31,6 +31,7 @@ import { getSchedulingFilter } from '../filters/getSchedulingFilter';
 import { getStatusFilter } from '../filters/getStatusFilter';
 import useArchitectureFilter from '../filters/useArchitectureFilter';
 import useNodeFilter from '../filters/useNodeFilter';
+import useOutdatedVirtioDriversFilter from '../filters/useOutdatedVirtioDriversFilter';
 import useStorageClassFilter from '../filters/useStorageClassFilter';
 import { filterVMsByClusterAndNamespace } from '../utils/utils';
 import { useInstanceTypeMapper } from './useInstanceTypeMapper';
@@ -60,6 +61,7 @@ const useVMListFilters = (
   const nodeFilter = useNodeFilter(vmiMapper);
   const storageClassFilter = useStorageClassFilter(vms, pvcMapper);
   const architectureFilter = useArchitectureFilter(vms);
+  const outdatedVirtioDriversFilter = useOutdatedVirtioDriversFilter();
 
   return useMemo(() => {
     const filters: KubevirtFilter<V1VirtualMachine>[] = [];
@@ -96,6 +98,7 @@ const useVMListFilters = (
       architectureFilter,
       getIPFilter(t, vmiMapper),
       getNADsFilter(t),
+      outdatedVirtioDriversFilter,
     );
 
     return filters;
@@ -111,6 +114,7 @@ const useVMListFilters = (
     vmiMapper,
     instanceTypeMapper,
     architectureFilter,
+    outdatedVirtioDriversFilter,
   ]);
 };
 

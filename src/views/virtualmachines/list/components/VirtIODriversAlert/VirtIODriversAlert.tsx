@@ -1,51 +1,46 @@
-import { type FC, useState } from 'react';
-import { Link, useLocation } from 'react-router';
+import { type FC, useCallback, useState } from 'react';
 
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
-import { documentationURL } from '@kubevirt-utils/constants/documentation';
+import { type KubevirtFilterState } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useLocalStorage from '@kubevirt-utils/hooks/useLocalStorage';
 import { OS_NAME_LABELS } from '@kubevirt-utils/resources/template';
 import { getOSLabel } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
+import useVirtIODriversAlert from '@kubevirt-utils/resources/vm/utils/virtio-drivers/useVirtIODriversAlert';
+import { getOutdatedDriversAlertTitle } from '@kubevirt-utils/resources/vm/utils/virtio-drivers/utils';
 import {
   Alert,
   AlertActionCloseButton,
   AlertVariant,
+  Button,
   Checkbox,
   Flex,
 } from '@patternfly/react-core';
-import { DOWNLOADS_TAB_IDS } from '@settings/search/constants';
-import { createSettingsSearchURL } from '@settings/search/search';
-import { SETTINGS_TABS } from '@settings/tabs';
+import { VirtualMachineRowFilterType } from '@virtualmachines/utils/constants';
 
+import VirtIODownloadsSettingsLink from './components/VirtIODownloadsSettingsLink';
+import VirtIODriversDocLink from './components/VirtIODriversDocLink';
 import { VIRTIO_DRIVERS_ALERT_DISMISSED_KEY } from './constants';
 
 type VirtIODriversAlertProps = {
+  clearAllFiltersWithReset: () => void;
+  handleSetFilters: (newFilters: Partial<KubevirtFilterState>) => void;
   vms: V1VirtualMachine[];
 };
 
-const VirtIODriversAlert: FC<VirtIODriversAlertProps> = ({ vms }) => {
+const VirtIODriversAlert: FC<VirtIODriversAlertProps> = ({
+  clearAllFiltersWithReset,
+  handleSetFilters,
+  vms,
+}) => {
   const { t } = useKubevirtTranslation();
-  const location = useLocation();
 
   const [permanentlyDismissed, setPermanentlyDismissed] = useLocalStorage<boolean>(
     VIRTIO_DRIVERS_ALERT_DISMISSED_KEY,
   );
-  const [sessionDismissed, setSessionDismissed] = useState(false);
   const [dontShowAgain, setDontShowAgain] = useState(false);
 
-  const hasWindowsVMs = vms?.some((vm) => getOSLabel(vm) === OS_NAME_LABELS.windows);
-
-  if (!hasWindowsVMs || permanentlyDismissed || sessionDismissed) {
-    return null;
-  }
-
-  const settingsURL = createSettingsSearchURL(
-    SETTINGS_TABS.DOWNLOADS,
-    DOWNLOADS_TAB_IDS.virtioDriversWindows,
-    location.pathname,
-  );
+  const { setSessionDismissed, showAlert, showBackupAlert, vmsCount } = useVirtIODriversAlert();
 
   const handleClose = (): void => {
     if (dontShowAgain) {
@@ -54,6 +49,22 @@ const VirtIODriversAlert: FC<VirtIODriversAlertProps> = ({ vms }) => {
     setSessionDismissed(true);
   };
 
+  const handleViewOutdatedDrivers = useCallback((): void => {
+    clearAllFiltersWithReset();
+    handleSetFilters({
+      [VirtualMachineRowFilterType.OutdatedVirtioDrivers]: ['true'],
+    });
+  }, [clearAllFiltersWithReset, handleSetFilters]);
+
+  if (permanentlyDismissed || (!showAlert && !showBackupAlert)) {
+    return null;
+  }
+
+  const hasWindowsVM = vms?.some((vm) => getOSLabel(vm) === OS_NAME_LABELS.windows);
+  if (showBackupAlert && !hasWindowsVM) {
+    return null;
+  }
+
   return (
     <Alert
       actionClose={<AlertActionCloseButton onClose={handleClose} />}
@@ -61,20 +72,31 @@ const VirtIODriversAlert: FC<VirtIODriversAlertProps> = ({ vms }) => {
       data-test="virtio-drivers-alert"
       isExpandable
       isInline
-      title={t('Stay up to date with your VirtIO drivers')}
+      title={
+        showBackupAlert
+          ? t('Stay up to date with your VirtIO drivers')
+          : getOutdatedDriversAlertTitle(vmsCount, t)
+      }
       variant={AlertVariant.warning}
     >
       <p className="pf-v6-u-mt-xs">
-        {t(
-          'The latest version of VirtIO drivers includes critical enhancements for Windows VMs. You can download the latest cluster-provided version from Virtualization > Settings > Downloads tab.',
-        )}
+        {showBackupAlert
+          ? t(
+              'The latest version of VirtIO drivers includes critical enhancements for Windows VMs. You can download the latest cluster-provided version from Virtualization > Settings > Downloads tab.',
+            )
+          : t(
+              'Running older driver versions might cause instability after platform upgrades. Update the {{vmsCount}} VMs to the latest VirtIO drivers to ensure cluster compatibility.',
+              { vmsCount },
+            )}
       </p>
       <Flex className="pf-v6-u-mt-sm">
-        <Link to={settingsURL}>{t('Go to Downloads')}</Link>
-        <ExternalLink
-          href={documentationURL.VIRTIO_WIN_DRIVERS}
-          text={t('How to update Windows VMs')}
-        />
+        {showAlert && (
+          <Button isInline onClick={handleViewOutdatedDrivers} variant="link">
+            {t('View VMs with outdated drivers')}
+          </Button>
+        )}
+        <VirtIODownloadsSettingsLink />
+        <VirtIODriversDocLink />
       </Flex>
       <Checkbox
         className="pf-v6-u-mt-md"

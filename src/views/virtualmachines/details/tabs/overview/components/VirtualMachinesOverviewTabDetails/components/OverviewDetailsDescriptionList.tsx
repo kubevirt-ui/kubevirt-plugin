@@ -24,6 +24,7 @@ import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { DescriptionList, Flex, pluralize, Skeleton } from '@patternfly/react-core';
 
 import InstanceTypeDescription from './InstanceTypeDescription';
+import OutdatedVirtIODriversDescriptionItem from './OutdatedVirtIODriversDescriptionItem';
 import OverviewDetailsIdentityItems from './OverviewDetailsIdentityItems';
 import TemplateDescription from './TemplateDescription';
 
@@ -91,6 +92,7 @@ const OverviewDetailsDescriptionList: FC<OverviewDetailsDescriptionListProps> = 
         descriptionData={osName}
         descriptionHeader={t('Operating system')}
       />
+      <OutdatedVirtIODriversDescriptionItem vm={vm} />
       <DescriptionItem
         data-test="virtual-machine-overview-details-cpu-memory"
         descriptionData={

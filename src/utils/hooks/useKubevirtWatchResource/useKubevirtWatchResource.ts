@@ -15,7 +15,7 @@ import { type KubevirtDataPodFilters } from '../useKubevirtDataPod/types';
 import { hasActiveProxyFilter } from '../useKubevirtDataViewFilters/utils';
 import useRedirectWatchHooks from './useRedirectWatchHooks';
 
-export type Result<R extends K8sResourceCommon | K8sResourceCommon[]> = [
+export type UseKubevirtWatchResourceResult<R extends K8sResourceCommon | K8sResourceCommon[]> = [
   resource: R,
   resourceLoaded: boolean,
   resourceLoadError: Error,
@@ -26,7 +26,7 @@ const useKubevirtWatchResource = <T extends K8sResourceCommon | K8sResourceCommo
   watchOptions: WatchK8sResource & { cluster?: string },
   filterOptions?: KubevirtDataPodFilters,
   searchQueries?: AdvancedSearchFilter,
-): Result<T> => {
+): UseKubevirtWatchResourceResult<T> => {
   const isProxyPodAlive = useKubevirtDataPodHealth();
   const { featureEnabled, loading } = useFeatures(KUBEVIRT_APISERVER_PROXY);
   const query = useQuery();

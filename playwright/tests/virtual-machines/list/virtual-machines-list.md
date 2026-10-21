@@ -54,28 +54,51 @@ Automated E2E coverage for console routes under `tests/virtual-machines/list/`.
 
 ---
 
-### `001`: Alert is shown only when a Windows VM is in the list
+### `001`: Count-based alert is shown only when Prometheus reports outdated VirtIO drivers
 
-- **Objective:** Verify the VirtIO drivers alert is hidden on a Linux-only VM list and visible when
-  a Windows-labeled VM is listed in the namespace.
-- **Target version:** CNV 5.0.0
-- **Jira References:** CNV-93277
-- **Pre-conditions:** Dedicated Linux and Windows namespaces each contain one halted VM; dismiss
-  localStorage key is cleared
+- **Objective:** Verify the count-based VirtIO drivers alert is driven by the Prometheus
+  recording rule `vmi:kubevirt_vmi_guest_device_driver_build_number:max`, not by the VM OS label: it
+  is hidden in a namespace whose scope returns no outdated-driver series and visible in a namespace
+  whose scope returns one.
+- **Target version:** CNV 5.1.0
+- **Jira References:** CNV-93277, CNV-92062
+- **Pre-conditions:** Prometheus QUERY is mocked so the outdated-driver recording rule returns a
+  series only for the Windows namespace; dedicated Linux and Windows namespaces each contain one
+  halted VM; dismiss localStorage key is cleared
 - **Tags:** `@nonpriv`
 
-| Step | Action                                                             | Expected Result                    |
-| :--- | :----------------------------------------------------------------- | :--------------------------------- |
-| 1    | Open the Linux namespace VM list and wait for the Linux VM row     | VM list table shows the Linux VM   |
-| 2    | Check for the VirtIO drivers alert                                 | Alert is not visible               |
-| 3    | Open the Windows namespace VM list and wait for the Windows VM row | VM list table shows the Windows VM |
-| 4    | Check for the VirtIO drivers alert                                 | Alert is visible                   |
+| Step | Action                                                     | Expected Result                                      |
+| :--- | :--------------------------------------------------------- | :--------------------------------------------------- |
+| 1    | Open the Linux namespace VM list and wait for the VM row   | VM list table shows the VM; no outdated series match |
+| 2    | Check for the VirtIO drivers alert                         | Alert is not visible                                 |
+| 3    | Open the Windows namespace VM list and wait for the VM row | VM list table shows the VM; outdated series match    |
+| 4    | Check for the VirtIO drivers alert                         | Count-based (main) alert variant is visible          |
 
 ---
 
-### `002`: Go to Downloads opens the Downloads tab with the Download ISO button
+### `002`: Backup alert is shown for a Windows VM when the Prometheus count is unavailable
 
-- **Objective:** Verify that expanding the alert and clicking Go to Downloads navigates to the
+- **Objective:** Verify the generic ("backup") VirtIO drivers alert is shown when the outdated count
+  is unavailable (the recording-rule query fails), but only when the VM list actually contains a
+  Windows VM.
+- **Target version:** CNV 5.1.0
+- **Jira References:** CNV-93277, CNV-92062
+- **Pre-conditions:** Prometheus QUERY for the outdated-driver recording rule is mocked to fail (HTTP 500) so the count is unavailable; dedicated Linux and Windows namespaces each contain one halted
+  VM; dismiss localStorage key is cleared
+- **Tags:** `@nonpriv`
+
+| Step | Action                                                     | Expected Result                                    |
+| :--- | :--------------------------------------------------------- | :------------------------------------------------- |
+| 1    | Open the Linux namespace VM list and wait for the VM row   | VM list table shows the VM (no Windows VM present) |
+| 2    | Check for the VirtIO drivers alert                         | Alert is not visible                               |
+| 3    | Open the Windows namespace VM list and wait for the VM row | VM list table shows the Windows VM                 |
+| 4    | Check for the VirtIO drivers alert                         | Generic (backup) alert variant is visible          |
+
+---
+
+### `003`: "Get updated drivers" button opens the Downloads tab with the Download ISO button
+
+- **Objective:** Verify that expanding the alert and clicking "Get updated drivers" navigates to the
   Settings Downloads tab and shows the Download ISO button.
 - **Target version:** CNV 5.0.0
 - **Jira References:** CNV-93277
@@ -85,12 +108,12 @@ Automated E2E coverage for console routes under `tests/virtual-machines/list/`.
 | Step | Action                                                    | Expected Result                                                                     |
 | :--- | :-------------------------------------------------------- | :---------------------------------------------------------------------------------- |
 | 1    | Open the Windows namespace VM list                        | Alert is visible                                                                    |
-| 2    | Expand the alert and click Go to Downloads                | URL contains `virtualization-settings/downloads` and hash `#virtio-drivers-windows` |
+| 2    | Expand the alert and click "Get updated drivers"          | URL contains `virtualization-settings/downloads` and hash `#virtio-drivers-windows` |
 | 3    | Observe Downloads tab content and the Download ISO button | Tab content and Download ISO button are visible                                     |
 
 ---
 
-### `003`: Checking Don't show again and closing the alert hides it after reload
+### `004`: Checking Don't show again and closing the alert hides it after reload
 
 - **Objective:** Verify that checking "Don't show this message again" and closing the alert writes
   localStorage and keeps the alert hidden after reload.
