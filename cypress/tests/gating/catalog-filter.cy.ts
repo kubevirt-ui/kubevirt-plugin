@@ -77,6 +77,11 @@ describe('Test filter in InstanceType', () => {
 });
 
 describe('Test filter in Templates', () => {
+  before(() => {
+    cy.beforeSpec();
+    cy.visitCatalogVirt();
+  });
+
   it('visit catalog template tab', () => {
     cy.get(cView.templateTab).click();
   });

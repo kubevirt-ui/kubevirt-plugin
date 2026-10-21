@@ -1,6 +1,6 @@
 import { TEST_NS, TEST_SECRET_NAME } from '../../utils/const/index';
 import { authSSHKey, YAML } from '../../utils/const/string';
-import { itemCreateBtn, mastheadLogo, saveBtn } from '../../views/selector';
+import { itemCreateBtn, mastheadLogo } from '../../views/selector';
 import { manageKeysText, useExisting } from '../../views/selector-catalog';
 import { tab } from '../../views/tab';
 
@@ -50,6 +50,6 @@ describe('Cluster Test Preparation', () => {
     cy.visitVMsVirt();
     cy.get(itemCreateBtn, { timeout: 60000 }).first().click();
     cy.byButtonText(YAML).click();
-    cy.get(saveBtn).click();
+    cy.saveYAML();
   });
 });
