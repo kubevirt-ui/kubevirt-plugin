@@ -40,6 +40,8 @@ const main = async (): Promise<void> => {
       infrastructure_type: infraType,
       openshift_version: process.env.OPENSHIFT_VERSION ?? '',
       pr_number: prNumber,
+      // Comment author — resolve-trusted-pr checks this when GITHUB_ACTOR is the bot.
+      triggered_by: process.env.COMMENT_AUTHOR ?? '',
     },
     owner,
     ref: 'main',

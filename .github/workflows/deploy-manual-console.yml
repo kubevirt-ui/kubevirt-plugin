@@ -42,7 +42,15 @@ on:
         default: main
         type: string
       pr_number:
-        description: 'PR number to deploy instead (works with PRs from forks -- the OWNERS-listed author check below still applies). Takes precedence over "branch" when set.'
+        description: 'PR number to deploy instead (works with PRs from forks -- the OWNERS-listed triggerer check below still applies). Takes precedence over "branch" when set.'
+        required: false
+        default: ''
+        type: string
+      triggered_by:
+        description: >-
+          GitHub login of the human who authorized this run (set automatically
+          by /deploy-manual-console). Leave empty for UI dispatch -- your
+          own login (GITHUB_ACTOR) is checked against OWNERS instead.
         required: false
         default: ''
         type: string
@@ -120,11 +128,10 @@ jobs:
         run: npx tsx src/scripts/compute-instance-key.ts
 
   # Only runs for the "deploy" action when pr_number is set (deploying a PR,
-  # possibly from a fork). Mirrors hot-cluster-e2e.yml's check-trust: only PR
-  # authors listed in OWNERS can have their PR deployed here, with no
-  # "ok-to-test" escape hatch -- push the branch directly and use "branch"
-  # instead if needed. Teardown skips this: it doesn't build the PR's code,
-  # and /cleanup-manual-console already gates who can trigger it.
+  # possibly from a fork). The workflow triggerer (UI actor, or the commenter
+  # passed as triggered_by from /deploy-manual-console) must be listed in
+  # OWNERS -- not the PR author. Teardown skips this: it doesn't build the
+  # PR's code, and /cleanup-manual-console already gates who can trigger it.
   resolve-pr:
     name: Resolve PR
     if: inputs.pr_number != '' && inputs.action != 'teardown'
@@ -142,16 +149,17 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Resolve PR and verify author is a trusted repo owner
+      - name: Resolve PR and verify triggerer is a trusted repo owner
         id: resolve
         uses: ./.github/actions/hot-cluster/resolve-trusted-pr
         with:
           pr-number: ${{ inputs.pr_number }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
+          triggered-by: ${{ inputs.triggered_by }}
 
   # Probes the target cluster and provisions it if it isn't up yet -- same
   # reusable workflow hot-cluster-e2e.yml already uses for this. Gated on
-  # resolve-pr the same way deploy is below -- an untrusted PR author must
+  # resolve-pr the same way deploy is below -- an untrusted triggerer must
   # not be able to trigger real cluster provisioning (secrets: inherit)
   # just because deploy itself will later be skipped; skipped resolve-pr
   # (the plain "branch" input path, no pr_number) still runs this normally.

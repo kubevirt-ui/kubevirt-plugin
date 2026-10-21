@@ -32,9 +32,17 @@ on:
       pr_number:
         description: >-
           PR number to redeploy instead (works with PRs from forks -- the
-          OWNERS-listed author check below still applies). Takes precedence
+          OWNERS-listed triggerer check below still applies). Takes precedence
           over "branch" when set. Must match the pr_number the console was
           originally deployed with, or this targets a different instance.
+        required: false
+        default: ''
+        type: string
+      triggered_by:
+        description: >-
+          GitHub login of the human who authorized this run. Leave empty for
+          UI dispatch -- your own login (GITHUB_ACTOR) is checked against
+          OWNERS instead.
         required: false
         default: ''
         type: string
@@ -99,12 +107,13 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Resolve PR and verify author is a trusted repo owner
+      - name: Resolve PR and verify triggerer is a trusted repo owner
         id: resolve
         uses: ./.github/actions/hot-cluster/resolve-trusted-pr
         with:
           pr-number: ${{ inputs.pr_number }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
+          triggered-by: ${{ inputs.triggered_by }}
 
   redeploy:
     name: Redeploy Plugin

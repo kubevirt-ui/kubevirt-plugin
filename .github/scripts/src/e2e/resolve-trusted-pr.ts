@@ -1,12 +1,22 @@
 /**
- * Resolve a PR's head SHA/repo and verify its author is listed in OWNERS
- * before any in-cluster build touches their code. Security-critical:
- * untrusted fork PRs must not run on self-hosted ARC runners.
+ * Resolve a PR's head SHA/repo and verify the workflow triggerer is listed
+ * in OWNERS before any in-cluster build touches PR code. Security-critical:
+ * untrusted actors must not run arbitrary PR source on self-hosted ARC runners.
  *
- * Required env: GITHUB_TOKEN, GITHUB_REPOSITORY, PR_NUMBER
+ * Trust subject is who triggered the run (not the PR author):
+ * - UI / workflow_dispatch: GITHUB_ACTOR must be in OWNERS
+ * - Bot-dispatched (e.g. /deploy-manual-console): TRIGGERED_BY is the
+ *   commenter already gated by the PR command dispatcher; that login must
+ *   be in OWNERS (GITHUB_ACTOR is the bot and is not listed)
+ * - Re-run: GITHUB_TRIGGERING_ACTOR must be in OWNERS — never reuse the
+ *   original GITHUB_ACTOR or TRIGGERED_BY from the first attempt
+ *
+ * Required env: GITHUB_TOKEN, GITHUB_REPOSITORY, PR_NUMBER, GITHUB_ACTOR
+ * Optional env: TRIGGERED_BY (commenter login when a bot dispatches),
+ *               GITHUB_TRIGGERING_ACTOR, GITHUB_RUN_ATTEMPT (set by Actions)
  *
  * Outputs: head_sha, head_repo
- * Fails the step if the author is not in OWNERS.
+ * Fails the step if the triggerer is not in OWNERS.
  */
 
 import { Octokit } from '@octokit/rest';
@@ -15,7 +25,7 @@ import { requireEnv } from '../utils';
 
 import { getRepoContext } from '../shared/actions-context';
 import { failStep, setOutput } from '../shared/output';
-import { isListedInLocalOwners } from '../shared/owners';
+import { isListedInLocalOwners, resolveTrustLogin } from '../shared/owners';
 
 const main = async (): Promise<void> => {
   const octokit = new Octokit({ auth: requireEnv('GITHUB_TOKEN') });
@@ -35,11 +45,33 @@ const main = async (): Promise<void> => {
     ? pullRequest.head.repo.full_name
     : '(source repository deleted)';
 
-  console.log(`PR #${prNumber}: author=${author}, head=${headRepo}@${headSha}`);
+  const actor = process.env.GITHUB_ACTOR ?? '';
+  const triggeredBy = process.env.TRIGGERED_BY ?? '';
+  const triggeringActor = process.env.GITHUB_TRIGGERING_ACTOR ?? '';
+  const runAttempt = Number.parseInt(process.env.GITHUB_RUN_ATTEMPT ?? '1', 10);
+  const trustLogin = resolveTrustLogin(actor, triggeredBy, {
+    runAttempt: Number.isFinite(runAttempt) ? runAttempt : 1,
+    triggeringActor,
+  });
 
-  const trusted = isListedInLocalOwners(author);
+  console.log(`PR #${prNumber}: author=${author}, head=${headRepo}@${headSha}`);
   console.log(
-    `${author} is ${trusted ? '' : 'not '}listed in OWNERS (approvers/reviewers) — ${trusted ? 'trusted' : 'untrusted'}.`,
+    `Trust subject: ${trustLogin || '(empty)'} (actor=${actor || '(empty)'}, ` +
+      `triggering_actor=${triggeringActor || '(empty)'}, triggered_by=${triggeredBy || '(none)'}, ` +
+      `run_attempt=${Number.isFinite(runAttempt) ? runAttempt : 1})`,
+  );
+
+  if (!trustLogin) {
+    failStep(
+      'Cannot determine who triggered this workflow for the OWNERS trust check. ' +
+        'Expected GITHUB_ACTOR (or TRIGGERED_BY when dispatched by a bot); ' +
+        'on re-runs, GITHUB_TRIGGERING_ACTOR is required.',
+    );
+  }
+
+  const trusted = isListedInLocalOwners(trustLogin);
+  console.log(
+    `${trustLogin} is ${trusted ? '' : 'not '}listed in OWNERS (approvers/reviewers) — ${trusted ? 'trusted' : 'untrusted'}.`,
   );
 
   setOutput('head_sha', headSha);
@@ -47,13 +79,15 @@ const main = async (): Promise<void> => {
 
   if (!trusted) {
     failStep(
-      `PR #${prNumber}'s author '${author}' is not listed in OWNERS (approvers/reviewers). ` +
-        'Only PRs from trusted repo owners can be built on a self-hosted runner via this workflow. ' +
+      `'${trustLogin}' is not listed in OWNERS (approvers/reviewers). ` +
+        'Only trusted repo owners can build a PR on a self-hosted runner via this workflow. ' +
         'To use this PR\'s changes anyway, push its branch to this repository directly and use the "branch" input instead.',
     );
   }
 };
 
-void main().catch((err) => {
-  failStep(err instanceof Error ? err.message : String(err));
-});
+if (require.main === module) {
+  void main().catch((err) => {
+    failStep(err instanceof Error ? err.message : String(err));
+  });
+}
