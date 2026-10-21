@@ -74,10 +74,10 @@
       "workflow": ".github/workflows/hold-e2e.yml"
     },
     {
-      "command": "/deploy-manual-console",
-      "description": "Deploy a manual console + kubevirt-plugin instance for this PR. Cluster name/infra type are auto-resolved from the PR's base branch; the cluster is provisioned automatically if not already up. Credentials are sent to Slack.",
+      "command": "/deploy-manual-console <cluster>",
+      "description": "Deploy a manual console + kubevirt-plugin instance for this PR on the named hot cluster (defaults to ROKS VPC infra). The cluster is provisioned automatically if not already up. Credentials are sent to Slack.",
       "trust": "owners",
-      "workflow": ".github/workflows/deploy-manual-console-command.yml"
+      "workflow": ".github/workflows/pr-commands.yml"
     },
     {
       "command": "/cleanup-manual-console",
