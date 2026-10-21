@@ -69,20 +69,26 @@ on:
           - classic
           - ipi
       openshift_version:
-        description: 'OpenShift version to provision if the cluster is not already up (e.g. 4.22_openshift)'
+        description: >-
+          OpenShift version to provision if the cluster is not already up
+          (e.g. 4.20_openshift). Leave empty to auto-resolve from "branch"
+          the same way Hot Cluster E2E /retest-e2e does.
         required: false
-        default: '4.22_openshift'
+        default: ''
         type: string
       cnv_channel:
-        description: CNV OLM subscription channel to install if the cluster is not already up
+        description: >-
+          Explicit CNV OLM subscription channel override when provisioning.
+          Leave empty to use the resolver default (and keep release-branch
+          CNV pins). Same rules as hot-cluster-e2e.yml.
         required: false
-        default: stable
+        default: ''
         type: string
       cnv_pin_version:
         description: |
-          "<major>.<minor>" to pin CNV to if the cluster is not already up
-          (e.g. for a release branch under test). Leave empty to install
-          whatever cnv_channel currently resolves to.
+          "<major>.<minor>" to pin CNV to if the cluster is not already up.
+          Leave empty to auto-resolve from "branch" (release-X.Y → pin X.Y)
+          or install unpinned when no pin applies.
         required: false
         default: ''
         type: string
@@ -157,6 +163,35 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           triggered-by: ${{ inputs.triggered_by }}
 
+  # Same resolver hot-cluster-e2e.yml uses for /retest-e2e: derive
+  # openshift_version / cnv_channel / cnv_pin_version from inputs.branch
+  # (PR base ref when dispatched by /deploy-manual-console). Keeps the
+  # caller-supplied cluster_name — only the provision versions are resolved.
+  resolve-config:
+    name: Resolve Cluster Config
+    if: inputs.action != 'teardown'
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    outputs:
+      openshift_version: ${{ steps.resolve.outputs.openshift-version }}
+      cnv_channel: ${{ steps.resolve.outputs.cnv-channel }}
+      cnv_pin_version: ${{ steps.resolve.outputs.cnv-pin-version }}
+      branch_name: ${{ steps.resolve.outputs.branch-name }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Resolve OpenShift / CNV versions for this branch
+        id: resolve
+        uses: ./.github/actions/hot-cluster/resolve-cluster-config
+        with:
+          base-ref: ${{ inputs.branch }}
+          cluster-name: ${{ inputs.cluster_name }}
+          openshift-version: ${{ inputs.openshift_version }}
+          cnv-channel: ${{ inputs.cnv_channel }}
+
   # Probes the target cluster and provisions it if it isn't up yet -- same
   # reusable workflow hot-cluster-e2e.yml already uses for this. Gated on
   # resolve-pr the same way deploy is below -- an untrusted triggerer must
@@ -166,16 +201,22 @@ jobs:
   # run_health_check stays false -- this isn't an E2E gating context.
   cluster-check:
     name: Cluster Check
-    needs: resolve-pr
-    if: always() && needs.resolve-pr.result != 'failure' && inputs.action != 'teardown'
+    needs: [resolve-pr, resolve-config]
+    if: |
+      always() &&
+      needs.resolve-pr.result != 'failure' &&
+      needs.resolve-config.result == 'success' &&
+      inputs.action != 'teardown'
     uses: ./.github/workflows/hot-cluster-check.yml
     with:
       cluster_name: ${{ inputs.cluster_name }}
       infrastructure_type: ${{ inputs.infrastructure_type }}
-      openshift_version: ${{ inputs.openshift_version }}
-      cnv_channel: ${{ inputs.cnv_channel }}
-      cnv_pin_version: ${{ inputs.cnv_pin_version }}
-      branch_name: ${{ inputs.branch }}
+      openshift_version: ${{ needs.resolve-config.outputs.openshift_version }}
+      cnv_channel: ${{ needs.resolve-config.outputs.cnv_channel }}
+      # Prefer an explicit workflow_dispatch pin; otherwise use the resolver
+      # (release-X.Y → X.Y), matching hot-cluster-e2e.yml.
+      cnv_pin_version: ${{ inputs.cnv_pin_version || needs.resolve-config.outputs.cnv_pin_version }}
+      branch_name: ${{ needs.resolve-config.outputs.branch_name || inputs.branch }}
     secrets: inherit
 
   # if: always() so this still runs when resolve-pr was skipped (no
