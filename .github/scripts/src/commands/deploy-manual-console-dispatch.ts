@@ -3,12 +3,15 @@
  * Resolves infra type (falls back to 'vpc', matching deploy-manual-console.yml
  * and hot-cluster-e2e defaults) and dispatches the workflow.
  *
+ * OpenShift / CNV versions are not set here -- deploy-manual-console.yml
+ * runs the same resolve-cluster-config action as hot-cluster-e2e.yml
+ * (/retest-e2e), using the PR base ref passed as "branch".
+ *
  * Entry point: npx tsx src/commands/deploy-manual-console-dispatch.ts
  *
  * Required env: GITHUB_TOKEN, GITHUB_REPOSITORY,
  *               PR_NUMBER, BASE_REF, CLUSTER_NAME
- * Optional env: INFRA_TYPE, DETECT_OUTCOME, OPENSHIFT_VERSION, CNV_CHANNEL,
- *               CNV_PIN_VERSION, COMMENT_AUTHOR
+ * Optional env: INFRA_TYPE, DETECT_OUTCOME, COMMENT_AUTHOR
  */
 
 import { Octokit } from '@octokit/rest';
@@ -50,12 +53,12 @@ const main = async (): Promise<void> => {
 
   await dispatchWorkflow(octokit, {
     inputs: {
+      // PR base ref — resolve-cluster-config in the workflow derives
+      // openshift_version / cnv_channel / cnv_pin_version from this, same as
+      // hot-cluster-e2e.yml does for /retest-e2e.
       branch: baseRef,
       cluster_name: clusterName,
-      cnv_channel: process.env.CNV_CHANNEL ?? '',
-      cnv_pin_version: process.env.CNV_PIN_VERSION ?? '',
       infrastructure_type: infraType,
-      openshift_version: process.env.OPENSHIFT_VERSION ?? '',
       pr_number: prNumber,
       // Comment author — resolve-trusted-pr checks this when GITHUB_ACTOR is the bot.
       triggered_by: process.env.COMMENT_AUTHOR ?? '',
@@ -67,7 +70,8 @@ const main = async (): Promise<void> => {
   });
 
   console.log(
-    `Dispatched deploy-manual-console.yml for PR #${prNumber} (cluster=${clusterName}, infra=${infraType}).`,
+    `Dispatched deploy-manual-console.yml for PR #${prNumber} ` +
+      `(cluster=${clusterName}, infra=${infraType}, branch=${baseRef} for OC/CNV resolve).`,
   );
   setOutput('cluster_name', clusterName);
   setOutput('infra_type', infraType);

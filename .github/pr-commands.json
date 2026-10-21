@@ -75,7 +75,7 @@
     },
     {
       "command": "/deploy-manual-console <cluster>",
-      "description": "Deploy a manual console + kubevirt-plugin instance for this PR on the named hot cluster (defaults to ROKS VPC infra). The cluster is provisioned automatically if not already up. Credentials are sent to Slack.",
+      "description": "Deploy a manual console + kubevirt-plugin instance for this PR on the named hot cluster (ROKS VPC by default). If the cluster is not up, it is provisioned with the same OpenShift/CNV versions /retest-e2e would use for this PR's base branch. Credentials are sent to Slack.",
       "trust": "owners",
       "workflow": ".github/workflows/pr-commands.yml"
     },
