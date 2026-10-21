@@ -16,7 +16,7 @@ type DescriptionItemHeaderProps = {
   bodyContent: ReactNode;
   breadcrumb?: string;
   descriptionHeader: ReactNode;
-  isPopover: boolean;
+  isPopover?: boolean;
   isRequired?: boolean;
   label?: ReactNode;
   maxWidth?: string;
