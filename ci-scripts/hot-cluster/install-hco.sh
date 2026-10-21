@@ -33,7 +33,21 @@
 #                            repairs any golden-image DataVolume that was already
 #                            stuck importing on a broken storage class from before
 #                            DEFAULT_STORAGE_CLASS was corrected -- see the
-#                            "Repair stuck golden images" step below.
+#                            "Diagnose + repair stuck golden images" step below.
+#   DEFAULT_SC_ACCESS_MODE/DEFAULT_SC_VOLUME_MODE - Fallback accessMode/volumeMode
+#                            (defaults: "ReadWriteOnce"/"Filesystem") applied to
+#                            DEFAULT_STORAGE_CLASS's StorageProfile only when CDI
+#                            hasn't resolved one itself. CDI auto-detects
+#                            claimPropertySets for known CSI provisioners, but IBM
+#                            VPC Block's "vpc.block.csi.ibm.io" isn't one of them,
+#                            so its StorageProfile is permanently left with no
+#                            claimPropertySets -- every DataVolume on it then fails
+#                            forever with "no accessMode specified in
+#                            StorageProfile ..." (ErrClaimNotValid), which is the
+#                            actual reason golden images never import, independent
+#                            of the hostpath-csi issue above. Confirmed live on
+#                            kubevirt-plugin-420: patching this unblocked every
+#                            golden image within ~1 minute.
 #
 set -euo pipefail
 
@@ -45,6 +59,8 @@ HCO_CR_PATH="${HCO_CR_PATH:-playwright/fixtures/hco.yaml}"
 SKIP_HPP="${SKIP_HPP:-false}"
 HPP_VERSION="${HPP_VERSION:-release-v0.21}"
 DEFAULT_STORAGE_CLASS="${DEFAULT_STORAGE_CLASS:-ibmc-vpc-block-10iops-tier}"
+DEFAULT_SC_ACCESS_MODE="${DEFAULT_SC_ACCESS_MODE:-ReadWriteOnce}"
+DEFAULT_SC_VOLUME_MODE="${DEFAULT_SC_VOLUME_MODE:-Filesystem}"
 
 CNV_NS="openshift-cnv"
 
@@ -343,7 +359,61 @@ oc annotate storageclass "${DEFAULT_STORAGE_CLASS}" \
   storageclass.kubernetes.io/is-default-class='true' \
   storageclass.kubevirt.io/is-default-virt-class='true' --overwrite
 
-# --- Repair stuck golden images ---
+# --- Ensure the default storage class's StorageProfile has claimPropertySets ---
+# CDI can't create a PVC for any DataVolume without knowing its accessMode and
+# volumeMode. It auto-detects these for known CSI provisioners, but doesn't
+# recognize IBM VPC Block's "vpc.block.csi.ibm.io", so StorageProfile status
+# stays empty forever and every DataVolume on this class fails permanently with
+# "no accessMode specified in StorageProfile ..." (ErrClaimNotValid) -- this is
+# the actual reason golden images never import, regardless of which storage
+# class DEFAULT_STORAGE_CLASS points at. Only set spec.claimPropertySets as a
+# fallback when CDI's own status is still empty, so a provisioner CDI already
+# knows how to auto-detect (e.g. on a non-IBM cluster) is left alone.
+
+echo "Waiting for StorageProfile '${DEFAULT_STORAGE_CLASS}' to be created by CDI..."
+STORAGE_PROFILE_EXISTS="false"
+for i in $(seq 1 60); do
+  if oc get storageprofile "${DEFAULT_STORAGE_CLASS}" >/dev/null 2>&1; then
+    echo "StorageProfile '${DEFAULT_STORAGE_CLASS}' found"
+    STORAGE_PROFILE_EXISTS="true"
+    break
+  fi
+  if [[ "${i}" -eq 60 ]]; then
+    echo "ERROR: Timed out waiting for StorageProfile '${DEFAULT_STORAGE_CLASS}' to be created by CDI"
+    exit 1
+  fi
+  echo "Waiting for StorageProfile '${DEFAULT_STORAGE_CLASS}'... (${i}/60)"
+  sleep 5
+done
+
+# Query status.claimPropertySets without suppressing exit codes so that an API
+# lookup failure exits with an error instead of being falsely treated as empty.
+if ! EXISTING_CLAIM_PROPERTY_SETS="$(oc get storageprofile "${DEFAULT_STORAGE_CLASS}" -o jsonpath='{.status.claimPropertySets}')"; then
+  echo "ERROR: Failed to query StorageProfile '${DEFAULT_STORAGE_CLASS}' status"
+  exit 1
+fi
+
+if [[ -z "${EXISTING_CLAIM_PROPERTY_SETS}" || "${EXISTING_CLAIM_PROPERTY_SETS}" == "null" || "${EXISTING_CLAIM_PROPERTY_SETS}" == "[]" ]]; then
+  echo "StorageProfile '${DEFAULT_STORAGE_CLASS}' has no CDI-resolved claimPropertySets; setting fallback ${DEFAULT_SC_ACCESS_MODE}/${DEFAULT_SC_VOLUME_MODE}..."
+  oc patch storageprofile "${DEFAULT_STORAGE_CLASS}" --type=merge -p \
+    "{\"spec\":{\"claimPropertySets\":[{\"accessModes\":[\"${DEFAULT_SC_ACCESS_MODE}\"],\"volumeMode\":\"${DEFAULT_SC_VOLUME_MODE}\"}]}}"
+  for i in $(seq 1 30); do
+    CPS="$(oc get storageprofile "${DEFAULT_STORAGE_CLASS}" -o jsonpath='{.status.claimPropertySets}')"
+    if [[ -n "${CPS}" && "${CPS}" != "null" && "${CPS}" != "[]" ]]; then
+      echo "StorageProfile '${DEFAULT_STORAGE_CLASS}' status now has claimPropertySets: ${CPS}"
+      break
+    fi
+    if [[ "${i}" -eq 30 ]]; then
+      echo "ERROR: CDI did not propagate fallback claimPropertySets to StorageProfile '${DEFAULT_STORAGE_CLASS}' status"
+      exit 1
+    fi
+    sleep 2
+  done
+else
+  echo "StorageProfile '${DEFAULT_STORAGE_CLASS}' already has claimPropertySets: ${EXISTING_CLAIM_PROPERTY_SETS}"
+fi
+
+# --- Diagnose + repair stuck golden images ---
 # Re-annotating the default storage class above does not retroactively fix
 # golden-image DataVolumes that already started (and got permanently stuck)
 # importing on a broken storage class before DEFAULT_STORAGE_CLASS pointed
@@ -354,7 +424,27 @@ oc annotate storageclass "${DEFAULT_STORAGE_CLASS}" \
 # wait for the next scheduled cron tick), this time under the now-correct
 # default storage class. On a healthy cluster every DataVolume is already
 # Succeeded, so this is a no-op.
-echo "Checking for stuck golden-image imports in openshift-virtualization-os-images..."
+#
+# Always dump DataVolume/DataSource/StorageProfile state first (not just for
+# the stuck ones) -- the UI's "Bootable volumes" list can read as empty for
+# reasons a DataVolume phase check alone won't catch (e.g. a Ready=False
+# DataSource whose backing DataVolume nonetheless reports Succeeded), so this
+# is cheap, always-on evidence for diagnosing exactly that kind of mismatch.
+echo "Golden-image DataVolume status in openshift-virtualization-os-images:"
+oc get datavolume -n openshift-virtualization-os-images \
+  -o custom-columns='NAME:.metadata.name,PHASE:.status.phase,PROGRESS:.status.progress,REASON:.status.conditions[?(@.type=="Bound")].reason' \
+  2>/dev/null || echo "  (unable to list DataVolumes)"
+
+echo "DataSource readiness in openshift-virtualization-os-images:"
+oc get datasource -n openshift-virtualization-os-images \
+  -o custom-columns='NAME:.metadata.name,READY:.status.conditions[?(@.type=="Ready")].status,REASON:.status.conditions[?(@.type=="Ready")].reason,SOURCE_PVC:.spec.source.pvc.name' \
+  2>/dev/null || echo "  (unable to list DataSources)"
+
+echo "StorageProfile claimPropertySets for '${DEFAULT_STORAGE_CLASS}':"
+oc get storageprofile "${DEFAULT_STORAGE_CLASS}" -o jsonpath='{.status.claimPropertySets}' 2>/dev/null || echo "  (unable to read StorageProfile)"
+echo ""
+
+echo "Checking for stuck golden-image imports..."
 STUCK_DVS="$(oc get datavolume -n openshift-virtualization-os-images -o json 2>/dev/null \
   | jq -r '.items[]? | select(.status.phase != "Succeeded") | .metadata.name' || true)"
 
@@ -376,7 +466,14 @@ if [[ -n "${STUCK_DVS}" ]]; then
       break
     fi
     if [[ "${i}" -eq 60 ]]; then
-      echo "  WARNING: ${REMAINING} golden image(s) still not Succeeded after 10 minutes; they may need more time or further investigation"
+      echo "  WARNING: ${REMAINING} golden image(s) still not Succeeded after 10 minutes; dumping diagnostics for the remaining stuck DataVolume(s):"
+      STILL_STUCK="$(oc get datavolume -n openshift-virtualization-os-images -o json 2>/dev/null \
+        | jq -r '.items[]? | select(.status.phase != "Succeeded") | .metadata.name' || true)"
+      while IFS= read -r dv; do
+        [[ -z "${dv}" ]] && continue
+        echo "  --- oc describe datavolume ${dv} ---"
+        oc describe datavolume "${dv}" -n openshift-virtualization-os-images 2>/dev/null || true
+      done <<< "${STILL_STUCK}"
     fi
     sleep 10
   done
