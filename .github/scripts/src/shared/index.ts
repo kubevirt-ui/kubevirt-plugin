@@ -34,5 +34,13 @@ export {
   NEEDS_REBASE_LABEL,
 } from './merge-pool';
 export { addStepSummary, failStep, setOutput, warnStep } from './output';
-export { isListedInLocalOwners, isListedInOwners, parseOwnersFile } from './owners';
+export {
+  getLocalOwnersPath,
+  isListedInLocalOwners,
+  isListedInOwners,
+  parseOwnersFile,
+  resolveTrustLogin,
+} from './owners';
+export type { ResolveTrustLoginOptions } from './owners';
+
 export { cancelRun, listActiveRuns, reRunFailedJobs } from './runs';

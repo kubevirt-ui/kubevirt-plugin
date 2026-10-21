@@ -1,10 +1,13 @@
 name: Resolve Trusted PR
 description: >
-  Resolve a PR's head SHA/repo and verify its author is listed in OWNERS
-  before any in-cluster build touches their code. Shared by every
+  Resolve a PR's head SHA/repo and verify the workflow triggerer is listed
+  in OWNERS before any in-cluster build touches PR code. Shared by every
   manual-console workflow that builds + runs arbitrary PR source on a
   self-hosted runner, so this security-sensitive check can't drift between
-  callers. Assumes the caller has already run setup-gh-scripts.
+  callers. Trusts GITHUB_ACTOR (UI dispatch) or triggered-by when a bot
+  dispatches after the PR command dispatcher already gated the commenter.
+  On re-runs, trusts GITHUB_TRIGGERING_ACTOR only (never the original
+  TRIGGERED_BY / GITHUB_ACTOR).
 
 inputs:
   pr-number:
@@ -13,6 +16,13 @@ inputs:
   github-token:
     description: Token for the GitHub API call
     required: true
+  triggered-by:
+    description: >
+      Login of the human who authorized the run (e.g. PR comment author).
+      Required when a bot dispatches this workflow; ignored for human
+      workflow_dispatch (GITHUB_ACTOR is checked instead).
+    required: false
+    default: ''
 
 outputs:
   head-sha:
@@ -38,11 +48,12 @@ runs:
       with:
         ref: ${{ github.event.repository.default_branch }}
 
-    - name: Resolve PR and verify author is a trusted repo owner
+    - name: Resolve PR and verify triggerer is a trusted repo owner
       id: resolve
       shell: bash
       env:
         GITHUB_TOKEN: ${{ inputs.github-token }}
         PR_NUMBER: ${{ inputs.pr-number }}
+        TRIGGERED_BY: ${{ inputs.triggered-by }}
       working-directory: .github/scripts
       run: npx tsx src/e2e/resolve-trusted-pr.ts

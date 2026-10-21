@@ -11,8 +11,6 @@
  * Outputs: head_sha, mergeable, still_in_pool, trusted
  */
 
-import { resolve } from 'node:path';
-
 import { Octokit } from '@octokit/rest';
 
 import { requireEnv } from '../utils';
@@ -61,8 +59,7 @@ const main = async (): Promise<void> => {
   const pullRequest = await fetchPrWithMergeability(octokit, owner, repo, prNumber);
 
   const author = pullRequest.user?.login ?? '';
-  const workspace = process.env.GITHUB_WORKSPACE ?? resolve(process.cwd(), '../..');
-  const ownedByAuthor = isListedInLocalOwners(author, resolve(workspace, 'OWNERS'));
+  const ownedByAuthor = isListedInLocalOwners(author);
   const sameRepo = pullRequest.head.repo?.full_name === pullRequest.base.repo.full_name;
   const hasOkToTest = pullRequest.labels.some((label) => label.name === 'ok-to-test');
   const trusted = ownedByAuthor || sameRepo || hasOkToTest;

@@ -1,10 +1,48 @@
 import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 
 import { type Octokit } from '@octokit/rest';
 
 type OwnersData = {
   approvers: string[];
   reviewers: string[];
+};
+
+/**
+ * Repo-root OWNERS path. Scripts usually run with cwd `.github/scripts`, so a
+ * bare relative `OWNERS` would miss the real file; prefer GITHUB_WORKSPACE.
+ */
+export const getLocalOwnersPath = (ownersFile = 'OWNERS'): string =>
+  resolve(process.env.GITHUB_WORKSPACE ?? resolve(process.cwd(), '../..'), ownersFile);
+
+export type ResolveTrustLoginOptions = {
+  /** GITHUB_TRIGGERING_ACTOR — who clicked Re-run when attempt > 1. */
+  triggeringActor?: string;
+  /** GITHUB_RUN_ATTEMPT — 1 for the initial run, >1 for re-runs. */
+  runAttempt?: number;
+};
+
+/**
+ * Who to check against OWNERS for a workflow run.
+ * - Normal run: bot dispatches use triggeredBy (commenter); human UI dispatch
+ *   uses GITHUB_ACTOR and ignores triggeredBy so callers cannot spoof trust.
+ * - Re-run (runAttempt > 1): always use GITHUB_TRIGGERING_ACTOR. Never reuse
+ *   the original TRIGGERED_BY / GITHUB_ACTOR — a non-owner must not inherit
+ *   an owner-authorized deployment by clicking Re-run.
+ */
+export const resolveTrustLogin = (
+  actor: string,
+  triggeredBy: string,
+  options: ResolveTrustLoginOptions = {},
+): string => {
+  const runAttempt = options.runAttempt ?? 1;
+  if (runAttempt > 1) {
+    return options.triggeringActor ?? '';
+  }
+  if (actor.endsWith('[bot]') && triggeredBy) {
+    return triggeredBy;
+  }
+  return actor;
 };
 
 /**
@@ -48,8 +86,12 @@ export const parseOwnersFile = (content: string): OwnersData => {
 /**
  * Check whether a GitHub login is listed in the local OWNERS file.
  * Reads from the filesystem (assumes the repo is checked out).
+ * Defaults to the repo-root OWNERS via GITHUB_WORKSPACE (not cwd).
  */
-export const isListedInLocalOwners = (login: string, ownersPath = 'OWNERS'): boolean => {
+export const isListedInLocalOwners = (
+  login: string,
+  ownersPath: string = getLocalOwnersPath(),
+): boolean => {
   try {
     const content = readFileSync(ownersPath, 'utf8');
     const owners = parseOwnersFile(content);
