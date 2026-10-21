@@ -1,12 +1,14 @@
 /**
  * Dispatch deploy-manual-console.yml for a PR.
- * Resolves infra type (falls back to 'ipi') and dispatches the workflow.
+ * Resolves infra type (falls back to 'vpc', matching deploy-manual-console.yml
+ * and hot-cluster-e2e defaults) and dispatches the workflow.
  *
  * Entry point: npx tsx src/commands/deploy-manual-console-dispatch.ts
  *
  * Required env: GITHUB_TOKEN, GITHUB_REPOSITORY,
- *               PR_NUMBER, BASE_REF, CLUSTER_NAME, INFRA_TYPE,
- *               DETECT_OUTCOME, OPENSHIFT_VERSION, CNV_CHANNEL, CNV_PIN_VERSION
+ *               PR_NUMBER, BASE_REF, CLUSTER_NAME
+ * Optional env: INFRA_TYPE, DETECT_OUTCOME, OPENSHIFT_VERSION, CNV_CHANNEL,
+ *               CNV_PIN_VERSION, COMMENT_AUTHOR
  */
 
 import { Octokit } from '@octokit/rest';
@@ -17,6 +19,24 @@ import { getRepoContext } from '../shared/actions-context';
 import { dispatchWorkflow } from '../shared/dispatch';
 import { failStep, setOutput, warnStep } from '../shared/output';
 
+/** Default when INFRA_TYPE is unset — must stay aligned with workflow defaults. */
+export const DEFAULT_DEPLOY_INFRA_TYPE = 'vpc';
+
+export const resolveDeployInfraType = (
+  infraType: string | undefined,
+  detectOutcome = '',
+): string => {
+  if (infraType) {
+    return infraType;
+  }
+  if (detectOutcome === 'failure') {
+    warnStep(
+      `Cluster infra detection failed -- falling back to '${DEFAULT_DEPLOY_INFRA_TYPE}'.`,
+    );
+  }
+  return DEFAULT_DEPLOY_INFRA_TYPE;
+};
+
 const main = async (): Promise<void> => {
   const token = requireEnv('GITHUB_TOKEN');
   const { owner, repo } = getRepoContext();
@@ -26,10 +46,7 @@ const main = async (): Promise<void> => {
   const detectOutcome = process.env.DETECT_OUTCOME ?? '';
   const octokit = new Octokit({ auth: token });
 
-  if (detectOutcome === 'failure') {
-    warnStep(`Cluster infra detection for '${clusterName}' failed -- falling back to 'ipi'.`);
-  }
-  const infraType = process.env.INFRA_TYPE ?? 'ipi';
+  const infraType = resolveDeployInfraType(process.env.INFRA_TYPE, detectOutcome);
 
   await dispatchWorkflow(octokit, {
     inputs: {
