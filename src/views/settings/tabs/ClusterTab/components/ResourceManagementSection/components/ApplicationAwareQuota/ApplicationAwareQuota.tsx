@@ -5,8 +5,10 @@ import SectionWithSwitch from '@kubevirt-utils/components/SectionWithSwitch/Sect
 import { type HyperConverged } from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getHyperConvergedModelFromResource } from '@kubevirt-utils/resources/hyperconverged/model';
-import { getAAQCalculationMethod } from '@kubevirt-utils/resources/hyperconverged/selectors';
-import { isAAQEnabled } from '@kubevirt-utils/resources/hyperconverged/utils';
+import {
+  getAAQCalculationMethod,
+  isAAQEnabled,
+} from '@kubevirt-utils/resources/hyperconverged/selectors';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
 import { Alert, AlertVariant } from '@patternfly/react-core';
@@ -14,7 +16,7 @@ import { useSettingsCluster } from '@settings/context/SettingsClusterContext';
 import SettingsLink from '@settings/context/SettingsLink';
 
 import QuotaCalculationMethodTerm from './components/QuotaCalculationMethodTerm';
-import { getCalculationMethodContentMapper } from './constants';
+import { DEFAULT_CALCULATION_METHOD, getCalculationMethodContentMapper } from './constants';
 import { buildAAQEnablePatches } from './utils';
 
 type ApplicationAwareQuotaProps = {
@@ -30,18 +32,23 @@ const ApplicationAwareQuota: FC<ApplicationAwareQuotaProps> = ({
   const cluster = useSettingsCluster();
   const calculationMethodContentMapper = useMemo(() => getCalculationMethodContentMapper(t), [t]);
 
-  const [hyperConverge, hyperLoaded] = hyperConvergeConfiguration;
-  const aaqEnabled = isAAQEnabled(hyperConverge);
+  const [hyperConverge] = hyperConvergeConfiguration;
+  const clusterAaqEnabled = isAAQEnabled(hyperConverge);
 
-  const [isEnabled, setIsEnabled] = useState<boolean>(aaqEnabled);
+  const [aaqEnabledOnUi, setAaqEnabledOnUi] = useState(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<null | string>(null);
 
   useEffect(() => {
-    setIsEnabled(hyperLoaded ? aaqEnabled : false);
-  }, [aaqEnabled, cluster, hyperLoaded]);
+    setAaqEnabledOnUi(clusterAaqEnabled);
+  }, [clusterAaqEnabled]);
 
   const onFeatureChange = (checked: boolean): void => {
+    if (isLoading) {
+      return;
+    }
+    setError(null);
+    setAaqEnabledOnUi(checked);
     setIsLoading(true);
     kubevirtK8sPatch<HyperConverged>({
       cluster,
@@ -49,8 +56,10 @@ const ApplicationAwareQuota: FC<ApplicationAwareQuotaProps> = ({
       model: getHyperConvergedModelFromResource(hyperConverge),
       resource: hyperConverge,
     })
-      .then(() => setIsEnabled(checked))
-      .catch((err) => setError(err.message))
+      .catch((err) => {
+        setError(err.message);
+        setAaqEnabledOnUi(clusterAaqEnabled);
+      })
       .finally(() => setIsLoading(false));
   };
 
@@ -61,11 +70,10 @@ const ApplicationAwareQuota: FC<ApplicationAwareQuotaProps> = ({
         helpTextIconContent={t(
           'Extends ResourceQuota by managing quotas for VM workloads as well as pods and other resource limits. AAQ is virtualization-aware and helps prevent issues such as failing live migrations due to quota limits.',
         )}
-        isDisabled={!hyperLoaded}
         isLoading={isLoading}
         newBadge={newBadge}
         olsPromptType={OLSPromptType.APPLICATION_AWARE_QUOTA}
-        switchIsOn={isEnabled}
+        switchIsOn={aaqEnabledOnUi}
         title={t('Application Aware Quota (AAQ)')}
         turnOnSwitch={onFeatureChange}
       />
@@ -74,12 +82,14 @@ const ApplicationAwareQuota: FC<ApplicationAwareQuotaProps> = ({
           {error}
         </Alert>
       )}
-      {isEnabled && (
+      {aaqEnabledOnUi && (
         <>
           <QuotaCalculationMethodTerm
             calculationMethodContentMapper={calculationMethodContentMapper}
             hyperConverge={hyperConverge}
-            selectedCalculationMethod={getAAQCalculationMethod(hyperConverge)}
+            selectedCalculationMethod={
+              getAAQCalculationMethod(hyperConverge) ?? DEFAULT_CALCULATION_METHOD
+            }
           />
           <SettingsLink showExternalIcon to={getQuotaListURL()}>
             {t('Manage quotas')}

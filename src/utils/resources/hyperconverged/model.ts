@@ -17,6 +17,13 @@ export const isHyperConvergedV1 = (
 ): hyperConverged is HyperConvergedV1 =>
   Boolean(hyperConverged?.apiVersion && !hyperConverged.apiVersion.includes('v1beta1'));
 
+/** v1 spec layout from the resource (apiVersion or spec.deployment on partial watches). */
+export const usesHyperConvergedV1Spec = (
+  hyperConverged: HyperConverged | undefined,
+): hyperConverged is HyperConvergedV1 =>
+  isHyperConvergedV1(hyperConverged) ||
+  Boolean(hyperConverged?.spec && 'deployment' in hyperConverged.spec);
+
 export const getHyperConvergedModel = (isHCOV1: boolean): K8sModel =>
   isHCOV1 ? HyperConvergedV1Model : HyperConvergedV1Beta1Model;
 
@@ -27,4 +34,4 @@ export const getHyperConvergedGroupVersionKind = (
 
 export const getHyperConvergedModelFromResource = (
   hyperConverged: HyperConverged | undefined,
-): K8sModel => getHyperConvergedModel(isHyperConvergedV1(hyperConverged));
+): K8sModel => getHyperConvergedModel(usesHyperConvergedV1Spec(hyperConverged));

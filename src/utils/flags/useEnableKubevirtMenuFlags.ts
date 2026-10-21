@@ -3,7 +3,7 @@ import { VirtualMachineClusterPreferenceModel } from '@kubevirt-ui-ext/kubevirt-
 import { VirtualMachineInstancetypeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { VirtualMachinePreferenceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import useHyperConvergeConfiguration from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
-import { isAAQEnabled } from '@kubevirt-utils/resources/hyperconverged/utils';
+import { isAAQEnabled } from '@kubevirt-utils/resources/hyperconverged/selectors';
 import {
   type K8sVerb,
   type SetFeatureFlag,
