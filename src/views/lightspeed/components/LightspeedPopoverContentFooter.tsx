@@ -2,7 +2,7 @@ import React, { FC } from 'react';
 
 import Breadcrumbs from '@kubevirt-utils/components/Breadcrumbs/Breadcrumbs';
 import { FLAG_LIGHTSPEED_PLUGIN } from '@kubevirt-utils/flags/consts';
-import LightspeedHelpButton from '@lightspeed/components/LightspeedHelpButton/LightspeedHelpButton';
+import LightspeedHelpButton from '@lightspeed/components/LightspeedHelpButton';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { useFlag } from '@openshift-console/dynamic-plugin-sdk';
 import { Split, SplitItem } from '@patternfly/react-core';
