@@ -108,7 +108,7 @@ export const getBaseQuery = (
   const filters = [namespaceFilter, clusterFilter].filter(Boolean).join(',');
   const filterString = filters ? `{${filters}}` : '';
 
-  return `(sum_over_time(kubevirt_vmi_migration_data_processed_bytes${filterString}[${duration}]))${
+  return `(max_over_time(kubevirt_vmi_migration_data_processed_bytes${filterString}[${duration}]))${
     namespacedQuery ? ' BY (namespace)' : ''
   }`;
 };
