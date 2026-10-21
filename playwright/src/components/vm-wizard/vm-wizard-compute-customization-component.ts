@@ -1,4 +1,9 @@
 import BaseComponent from '@/components/shared/base-component';
+import {
+  isVsockSwitchEnabled,
+  isVsockSwitchVisible,
+  setVsockSwitchEnabled,
+} from '@/utils/vsock-switch';
 import { TestTimeouts } from '@/utils/test-config';
 import type { Locator, Page } from '@playwright/test';
 
@@ -598,6 +603,14 @@ export default class VmWizardComputeCustomizationComponent extends BaseComponent
     return await this.locator('#headless-mode').isChecked();
   }
 
+  async isVsockEnabled(): Promise<boolean> {
+    return isVsockSwitchEnabled(this.page);
+  }
+
+  async isVsockToggleVisible(): Promise<boolean> {
+    return isVsockSwitchVisible(this.page);
+  }
+
   async isPodNetworkingOptionVisibleInAddNetworkModal(): Promise<boolean> {
     const modal = this.networkInterfaceModal();
     const selectRoot = modal.getByTestId('network-attachment-definition-select');
@@ -753,6 +766,10 @@ export default class VmWizardComputeCustomizationComponent extends BaseComponent
 
   async toggleHeadlessMode(): Promise<void> {
     await this.toggleSwitch('headless-mode');
+  }
+
+  async setVsockEnabled(enabled: boolean): Promise<void> {
+    await setVsockSwitchEnabled(this.page, enabled);
   }
 
   async toggleStartAfterCreation(): Promise<void> {

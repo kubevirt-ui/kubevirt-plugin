@@ -6,6 +6,7 @@
 import BaseComponent from '@/components/shared/base-component';
 import { getPendingStatusMessageLocator } from '@/utils/pending-changes-locator';
 import { TestTimeouts } from '@/utils/test-config';
+import { isVsockSwitchVisible, setVsockSwitchEnabled } from '@/utils/vsock-switch';
 import type { Page } from '@playwright/test';
 
 /**
@@ -950,6 +951,14 @@ export class VirtualMachineDetailConfigurationComponent extends BaseComponent {
     } catch {
       return false;
     }
+  }
+
+  async setVsockEnabled(enabled: boolean): Promise<void> {
+    await setVsockSwitchEnabled(this.page, enabled);
+  }
+
+  async isVsockToggleVisible(): Promise<boolean> {
+    return isVsockSwitchVisible(this.page);
   }
 
   async verifyHostname(vmName: string, expectedHostname: string): Promise<boolean> {

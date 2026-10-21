@@ -4,17 +4,19 @@ import {
   type V1beta1VirtualMachineInstancetype,
   type V1VirtualMachine,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { K8S_OPS } from '@kubevirt-utils/constants/constants';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { type WORKLOADS } from '@kubevirt-utils/resources/template';
 import {
   DESCRIPTION_ANNOTATION,
-  getCPU,
+  getDevices,
   getHostname,
-  getMemory,
   getWorkload,
 } from '@kubevirt-utils/resources/vm';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sPatch, kubevirtK8sUpdate } from '@multicluster/k8sRequests';
+
+import { buildVirtualMachineResourcePatches } from './vmDataUtils';
 
 export const onSubmitYAML = (updatedVM: V1VirtualMachine): Promise<V1VirtualMachine> =>
   kubevirtK8sUpdate({
@@ -85,18 +87,7 @@ export const updateWorkload = (
 export const updatedVirtualMachine = (updatedVM: V1VirtualMachine): Promise<V1VirtualMachine> =>
   kubevirtK8sPatch({
     cluster: getCluster(updatedVM),
-    data: [
-      {
-        op: 'replace',
-        path: `/spec/template/spec/domain/cpu`,
-        value: getCPU(updatedVM),
-      },
-      {
-        op: 'replace',
-        path: `/spec/template/spec/domain/memory/guest`,
-        value: getMemory(updatedVM),
-      },
-    ],
+    data: buildVirtualMachineResourcePatches(updatedVM),
     model: VirtualMachineModel,
     resource: updatedVM,
   });
@@ -148,3 +139,25 @@ export const updateHeadlessMode = (
     model: VirtualMachineModel,
     resource: updatedVM,
   });
+
+const VSOCK_DEVICE_PATH = `/spec/template/spec/domain/devices/autoattachVSOCK`;
+
+export const updateVSOCK = (
+  updatedVM: V1VirtualMachine,
+  checked: boolean,
+): Promise<V1VirtualMachine> => {
+  const hasAutoattachVSOCK = getDevices(updatedVM)?.autoattachVSOCK;
+
+  return kubevirtK8sPatch({
+    cluster: getCluster(updatedVM),
+    data: [
+      {
+        op: hasAutoattachVSOCK ? K8S_OPS.REPLACE : K8S_OPS.ADD,
+        path: VSOCK_DEVICE_PATH,
+        value: checked,
+      },
+    ],
+    model: VirtualMachineModel,
+    resource: updatedVM,
+  });
+};

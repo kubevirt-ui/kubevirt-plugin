@@ -1,5 +1,6 @@
 import PageCommons from '@/page-objects/page-commons';
 import { getPendingStatusMessageLocator } from '@/utils/pending-changes-locator';
+import { isVsockSwitchVisible, setVsockSwitchEnabled } from '@/utils/vsock-switch';
 import { TestTimeouts } from '@/utils/test-config';
 import type { Page } from '@playwright/test';
 
@@ -649,6 +650,14 @@ export default class VmConfigurationComponent extends PageCommons {
 
   async verifyHeadlessMode(): Promise<boolean> {
     return await super.verifyTextVisible('Headless mode');
+  }
+
+  async setVsockEnabled(enabled: boolean): Promise<void> {
+    await setVsockSwitchEnabled(this.page, enabled);
+  }
+
+  async isVsockToggleVisible(): Promise<boolean> {
+    return isVsockSwitchVisible(this.page);
   }
 
   async verifyHostname(vmName: string, expectedHostname: string): Promise<boolean> {

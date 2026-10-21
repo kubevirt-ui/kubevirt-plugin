@@ -40,6 +40,7 @@ export type BuildPendingChangesParams = {
   modifiedHostDevices: string[];
   modifiedNICs: string[];
   modifiedVolumesHotplug: V1VirtualMachine['spec']['template']['spec']['volumes'];
+  modifiedVSOCK: boolean;
   navigate: NavigateFunction;
   nodeSelectorChanged: boolean;
   sshServiceChanged: boolean;
