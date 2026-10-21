@@ -2,7 +2,7 @@ import { type TFunction } from 'i18next';
 
 import { UPLOAD_PROGRESS_STATUS } from './constants';
 import { resetUploadProgressStore, useUploadProgressStore } from './uploadProgressStore';
-import { type UploadEntry } from './uploads/types/types';
+import { type UploadEntry, type UploadsStoreStateData } from './uploads/types/types';
 import {
   replaceWithTerminalUploadToast,
   showInProgressUploadToast,
@@ -41,6 +41,13 @@ const createUploadEntry = (overrides: Partial<UploadEntry> = {}): UploadEntry =>
   progress: 50,
   status: UPLOAD_PROGRESS_STATUS.UPLOADING,
   ...overrides,
+});
+
+const createUploadsData = (
+  uploadKey: string,
+  overrides: Partial<UploadEntry> = {},
+): UploadsStoreStateData => ({
+  [uploadKey]: { progressToastState: createUploadEntry(overrides) },
 });
 
 describe('showInProgressUploadToast', () => {
@@ -264,7 +271,7 @@ describe('syncUploadToasts', () => {
   it('should call showInProgressUploadToast for uploading entries', () => {
     const context = createMockContext();
     const processedToasts = new Set<string>();
-    const uploads = { [UPLOAD_KEY]: createUploadEntry() };
+    const uploads = createUploadsData(UPLOAD_KEY);
 
     syncUploadToasts(uploads, context, processedToasts);
 
@@ -275,9 +282,7 @@ describe('syncUploadToasts', () => {
   it('should call replaceWithTerminalUploadToast for terminal entries', () => {
     const context = createMockContext();
     const processedToasts = new Set<string>();
-    const uploads = {
-      [UPLOAD_KEY]: createUploadEntry({ status: UPLOAD_PROGRESS_STATUS.SUCCESS }),
-    };
+    const uploads = createUploadsData(UPLOAD_KEY, { status: UPLOAD_PROGRESS_STATUS.SUCCESS });
 
     syncUploadToasts(uploads, context, processedToasts);
 
@@ -287,9 +292,7 @@ describe('syncUploadToasts', () => {
   it('should remove terminal upload keys from processedToasts', () => {
     const context = createMockContext();
     const processedToasts = new Set<string>([UPLOAD_KEY]);
-    const uploads = {
-      [UPLOAD_KEY]: createUploadEntry({ status: UPLOAD_PROGRESS_STATUS.SUCCESS }),
-    };
+    const uploads = createUploadsData(UPLOAD_KEY, { status: UPLOAD_PROGRESS_STATUS.SUCCESS });
 
     syncUploadToasts(uploads, context, processedToasts);
 
@@ -299,7 +302,7 @@ describe('syncUploadToasts', () => {
   it('should not re-process uploads already in processedToasts', () => {
     const context = createMockContext();
     const processedToasts = new Set<string>([UPLOAD_KEY]);
-    const uploads = { [UPLOAD_KEY]: createUploadEntry() };
+    const uploads = createUploadsData(UPLOAD_KEY);
 
     syncUploadToasts(uploads, context, processedToasts);
 

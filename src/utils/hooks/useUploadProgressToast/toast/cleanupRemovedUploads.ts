@@ -5,12 +5,12 @@ import { isEmpty } from '@kubevirt-utils/utils/utils';
 
 import { UPLOAD_PROGRESS_STATUS } from '../constants';
 
-import { type UploadEntry } from '../uploads/types/types';
+import { type UploadsStoreStateData } from '../uploads/types/types';
 
 type CleanupRemovedUploadsParams = {
   addWarningToast: ToastActions['addWarningToast'];
-  currentUploads: Record<string, UploadEntry>;
-  previousUploads: Record<string, UploadEntry>;
+  currentUploads: UploadsStoreStateData;
+  previousUploads: UploadsStoreStateData;
   processedToasts: Set<string>;
   removeToast: ToastActions['removeToast'];
   t: TFunction;
@@ -29,11 +29,11 @@ export const cleanupRemovedUploads = ({
   for (const [uploadKey, upload] of Object.entries(previousUploads)) {
     if (!currentUploads[uploadKey]) {
       processedToasts.delete(uploadKey);
-      if (upload.toastId) {
-        removeToast(upload.toastId);
+      if (upload.progressToastState.toastId) {
+        removeToast(upload.progressToastState.toastId);
       }
-      if (upload.status === UPLOAD_PROGRESS_STATUS.UPLOADING) {
-        batchCanceledFileNames.push(upload.fileName);
+      if (upload.progressToastState.status === UPLOAD_PROGRESS_STATUS.UPLOADING) {
+        batchCanceledFileNames.push(upload.progressToastState.fileName);
       }
     }
   }

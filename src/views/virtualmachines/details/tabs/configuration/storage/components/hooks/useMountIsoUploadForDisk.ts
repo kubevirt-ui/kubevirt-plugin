@@ -35,7 +35,7 @@ export const useMountIsoUploadForDisk = (
   diskName: string,
 ): UseMountIsoUploadForDiskResult => {
   const uploadKey = getVmCdromUploadKeyFromVm(vm, diskName);
-  const upload = useUploadProgressStore((state) => state.uploads.data?.[uploadKey]);
+  const upload = useUploadProgressStore((state) => state.uploads.actions?.getUpload?.(uploadKey));
 
   const isUploadInProgress = upload?.status === UPLOAD_PROGRESS_STATUS.UPLOADING;
 

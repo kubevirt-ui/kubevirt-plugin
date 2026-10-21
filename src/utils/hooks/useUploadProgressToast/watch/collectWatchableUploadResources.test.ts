@@ -1,9 +1,10 @@
+import { describe, expect, it } from '@jest/globals';
 import { DataVolumeModel, VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 
 import { UPLOAD_PROGRESS_STATUS } from '../constants';
 
 import { getUploadLinkedResource } from '../completion/uploadLinkedResource';
-import { type UploadEntry } from '../uploads/types/types';
+import { type UploadEntry, type UploadsStoreStateData } from '../uploads/types/types';
 import {
   collectWatchableUploadResources,
   getUploadLinkedResourceWatchKey,
@@ -17,34 +18,41 @@ const vmResource = getUploadLinkedResource(VirtualMachineModel, VM_NAME, NAMESPA
 const otherVmResource = getUploadLinkedResource(VirtualMachineModel, 'other-vm', NAMESPACE);
 const dvResource = getUploadLinkedResource(DataVolumeModel, DV_NAME, NAMESPACE, 'spoke-1');
 
-const createUpload = (overrides: Partial<UploadEntry> = {}): UploadEntry => ({
+const createProgressToastState = (overrides: Partial<UploadEntry> = {}): UploadEntry => ({
   fileName: 'image.iso',
   progress: 40,
   status: UPLOAD_PROGRESS_STATUS.UPLOADING,
   ...overrides,
 });
 
+const createUploadsData = (
+  uploadKey: string,
+  overrides: Partial<UploadEntry> = {},
+): UploadsStoreStateData => {
+  return { [uploadKey]: { progressToastState: createProgressToastState(overrides) } };
+};
+
 describe('collectWatchableUploadResources', () => {
   it('should ignore URL-only links', () => {
-    const uploads = {
-      'export-disk/local/default/pvc': createUpload({
-        contextLinks: [{ label: 'View pod logs', url: '/k8s/ns/default/pods/exporter/logs' }],
-      }),
-    };
+    const uploadsData: UploadsStoreStateData = createUploadsData('export-disk/local/default/pvc', {
+      contextLinks: [{ label: 'View pod logs', url: '/k8s/ns/default/pods/exporter/logs' }],
+    });
 
-    expect(collectWatchableUploadResources(uploads)).toEqual([]);
+    expect(collectWatchableUploadResources(uploadsData)).toEqual([]);
   });
 
   it('should dedupe the same VM resource across uploads', () => {
     const vmLink = { label: 'View storage', resource: vmResource, url: '/vm/storage' };
-    const uploads = {
-      'vm-disk/default/test-vm/disk-0': createUpload({ contextLinks: [vmLink] }),
-      'vm-disk/default/test-vm/disk-1': createUpload({
+    const uploadsData: UploadsStoreStateData = {
+      ...createUploadsData('vm-disk/default/test-vm/disk-0', {
+        contextLinks: [vmLink],
+      }),
+      ...createUploadsData('vm-disk/default/test-vm/disk-1', {
         successLinks: [vmLink, { label: 'View DataVolume', resource: dvResource, url: '/dv' }],
       }),
     };
 
-    const resources = collectWatchableUploadResources(uploads);
+    const resources = collectWatchableUploadResources(uploadsData);
 
     expect(resources).toEqual([vmResource, dvResource]);
     expect(getUploadLinkedResourceWatchKey(resources[0])).toBe(
@@ -53,16 +61,16 @@ describe('collectWatchableUploadResources', () => {
   });
 
   it('should keep distinct resources with the same name in different identities', () => {
-    const uploads = {
-      'vm-disk/default/other-vm/disk-0': createUpload({
+    const uploadsData: UploadsStoreStateData = {
+      ...createUploadsData('vm-disk/default/other-vm/disk-0', {
         contextLinks: [{ label: 'View storage', resource: otherVmResource, url: '/other/storage' }],
       }),
-      'vm-disk/default/test-vm/disk-0': createUpload({
+      ...createUploadsData('vm-disk/default/test-vm/disk-0', {
         contextLinks: [{ label: 'View storage', resource: vmResource, url: '/vm/storage' }],
       }),
     };
 
-    const resources = collectWatchableUploadResources(uploads);
+    const resources = collectWatchableUploadResources(uploadsData);
 
     expect(resources).toHaveLength(2);
     expect(resources).toEqual(expect.arrayContaining([vmResource, otherVmResource]));

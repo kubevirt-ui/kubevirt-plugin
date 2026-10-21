@@ -1,6 +1,6 @@
 import {
-  type UploadEntry,
   type UploadLinkedResource,
+  type UploadsStoreStateData,
   type UploadSuccessLink,
 } from '../uploads/types/types';
 
@@ -18,14 +18,14 @@ const collectLinkResources = (links: UploadSuccessLink[] | undefined): UploadLin
   (links ?? []).flatMap((link) => (link.resource?.name ? [link.resource] : []));
 
 export const collectWatchableUploadResources = (
-  uploads: Record<string, UploadEntry>,
+  uploadsData: UploadsStoreStateData,
 ): UploadLinkedResource[] => {
   const resourcesByKey = new Map<string, UploadLinkedResource>();
 
-  for (const upload of Object.values(uploads)) {
+  for (const upload of Object.values(uploadsData)) {
     for (const resource of [
-      ...collectLinkResources(upload.contextLinks),
-      ...collectLinkResources(upload.successLinks),
+      ...collectLinkResources(upload.progressToastState.contextLinks),
+      ...collectLinkResources(upload.progressToastState.successLinks),
     ]) {
       const key = getUploadLinkedResourceWatchKey(resource);
       if (!resourcesByKey.has(key)) {
