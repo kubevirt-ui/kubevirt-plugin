@@ -9,9 +9,12 @@ import useClusterFilter from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/f
 import useProjectFilter from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/filters/useProjectFilter';
 import { type KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import useClusterParam from '@multicluster/hooks/useClusterParam';
 import useIsACMPage from '@multicluster/useIsACMPage';
+import { useSignals } from '@preact/signals-react/runtime';
 import useProjectsWithVMs from '@search/components/AdvancedSearchModal/hooks/useProjectsWithVMs';
 import { useAccessibleResources } from '@virtualmachines/search/hooks/useAccessibleResources';
+import { vmsSignal } from '@virtualmachines/tree/utils/signals';
 import { type PVCMapper, type VMIMapper } from '@virtualmachines/utils/mappers';
 
 import { getCPUFilter } from '../filters/getCPUFilter';
@@ -29,20 +32,25 @@ import { getStatusFilter } from '../filters/getStatusFilter';
 import useArchitectureFilter from '../filters/useArchitectureFilter';
 import useNodeFilter from '../filters/useNodeFilter';
 import useStorageClassFilter from '../filters/useStorageClassFilter';
+import { filterVMsByClusterAndNamespace } from '../utils/utils';
 import { useInstanceTypeMapper } from './useInstanceTypeMapper';
 
 const useVMListFilters = (
   vmiMapper: VMIMapper,
   pvcMapper: PVCMapper,
 ): KubevirtFilter<V1VirtualMachine>[] => {
+  useSignals();
   const { t } = useKubevirtTranslation();
   const isACMPage = useIsACMPage();
+  const cluster = useClusterParam();
   const isWindowsSupported = useIsWindowsSupportedArchitecture();
   const { featureEnabled: treeViewFoldersEnabled } = useFeatures(TREE_VIEW_FOLDERS);
 
-  const { resources: vms } = useAccessibleResources<V1VirtualMachine>({
+  const { resources: watchedVMs } = useAccessibleResources<V1VirtualMachine>({
     groupVersionKind: VirtualMachineModelGroupVersionKind,
+    isWatchEnabled: !isACMPage,
   });
+  const vms = isACMPage ? filterVMsByClusterAndNamespace(vmsSignal.value, '', cluster) : watchedVMs;
   const { instanceTypeMapper } = useInstanceTypeMapper();
 
   const projectsWithVMs = useProjectsWithVMs(vms);

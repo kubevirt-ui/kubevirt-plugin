@@ -22,6 +22,7 @@ type UseAccessibleResourcesArgs = {
   fieldSelector?: string;
   filterOptions?: KubevirtDataPodFilters;
   groupVersionKind: K8sGroupVersionKind;
+  isWatchEnabled?: boolean;
   namespace?: string;
   onlyUserProjects?: boolean;
   searchQueries?: AdvancedSearchFilter;
@@ -40,6 +41,7 @@ export const useAccessibleResources = <T>({
   fieldSelector,
   filterOptions,
   groupVersionKind,
+  isWatchEnabled = true,
   namespace,
   onlyUserProjects,
   searchQueries,
@@ -62,9 +64,10 @@ export const useAccessibleResources = <T>({
     return projectNames.filter((ns) => !isSystemNamespace(ns));
   }, [onlyUserProjects, projectNames, watchNamespaces]);
 
-  const loadPerNamespace = !isACMPage && projectNamesLoaded && !canListAllNamespaces;
+  const loadPerNamespace =
+    isWatchEnabled && !isACMPage && projectNamesLoaded && !canListAllNamespaces;
 
-  const shouldFetchClusterWide = canListAllNamespaces || isACMPage;
+  const shouldFetchClusterWide = isWatchEnabled && (canListAllNamespaces || isACMPage);
   const [allResources, allResourcesLoaded, allResourcesLoadError] = useKubevirtWatchResource<T[]>(
     shouldFetchClusterWide
       ? {
@@ -106,13 +109,22 @@ export const useAccessibleResources = <T>({
     return vms || [];
   }, [allResources, allowedResources, loadPerNamespace]);
 
-  const loaded = shouldFetchClusterWide
-    ? allResourcesLoaded || !!allResourcesLoadError
-    : projectNamesLoaded &&
+  let loaded = true;
+  if (isWatchEnabled && shouldFetchClusterWide) {
+    loaded = allResourcesLoaded || !!allResourcesLoadError;
+  } else if (isWatchEnabled) {
+    loaded =
+      projectNamesLoaded &&
       (isEmpty(allowedResources) ||
         Object.values(allowedResources).some((resource) => resource.loaded || resource.loadError));
+  }
 
-  const loadError = shouldFetchClusterWide ? allResourcesLoadError : projectNamesError;
+  let loadError: Error | undefined;
+  if (isWatchEnabled && shouldFetchClusterWide) {
+    loadError = allResourcesLoadError;
+  } else if (isWatchEnabled) {
+    loadError = projectNamesError;
+  }
 
-  return { loaded, loadError, resources };
+  return { loaded, loadError, resources: isWatchEnabled ? resources : [] };
 };
