@@ -32,7 +32,7 @@ import {
   VM_WORKLOAD_ANNOTATION,
 } from '@kubevirt-utils/resources/vm';
 import { readableSizeUnit } from '@kubevirt-utils/utils/units';
-import LightspeedSimplePopoverContent from '@lightspeed/components/LightspeedSimplePopoverContent';
+import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverContentWithLightspeedButton/PopoverContentWithLightspeedButton';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { getCatalogURL } from '@multicluster/urls';
@@ -133,7 +133,7 @@ const WizardOverviewGrid: FC<WizardOverviewGridProps> = ({ tabsData, updateVM, v
           <WizardDescriptionItem
             helperPopover={{
               content: (hide) => (
-                <LightspeedSimplePopoverContent
+                <PopoverContentWithLightspeedButton
                   content={t('Namespace of the VirtualMachine')}
                   hide={hide}
                   obj={vm}
@@ -219,7 +219,7 @@ const WizardOverviewGrid: FC<WizardOverviewGridProps> = ({ tabsData, updateVM, v
             })}
             helperPopover={{
               content: (hide) => (
-                <LightspeedSimplePopoverContent
+                <PopoverContentWithLightspeedButton
                   content={
                     <CPUDescription
                       cpu={getCPU(vm)}
@@ -247,7 +247,7 @@ const WizardOverviewGrid: FC<WizardOverviewGridProps> = ({ tabsData, updateVM, v
           <WizardDescriptionItem
             helperPopover={{
               content: (hide) => (
-                <LightspeedSimplePopoverContent
+                <PopoverContentWithLightspeedButton
                   content={t('The QEMU machine type.')}
                   hide={hide}
                   obj={vm}
@@ -382,7 +382,7 @@ const WizardOverviewGrid: FC<WizardOverviewGridProps> = ({ tabsData, updateVM, v
             }
             helperPopover={{
               content: (hide) => (
-                <LightspeedSimplePopoverContent
+                <PopoverContentWithLightspeedButton
                   content={
                     isDisabledGuestSystemLogs
                       ? t('Guest system logs disabled at cluster')
@@ -432,7 +432,7 @@ const WizardOverviewGrid: FC<WizardOverviewGridProps> = ({ tabsData, updateVM, v
             }
             helperPopover={{
               content: (hide) => (
-                <LightspeedSimplePopoverContent
+                <PopoverContentWithLightspeedButton
                   content={t(
                     'Applying deletion protection to this VM will prevent deletion through the web console.',
                   )}

@@ -2,7 +2,7 @@ import React, { FC, useState } from 'react';
 
 import ExpandSectionWithCustomToggle from '@kubevirt-utils/components/ExpandSectionWithCustomToggle/ExpandSectionWithCustomToggle';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import LightspeedSimplePopoverContent from '@lightspeed/components/LightspeedSimplePopoverContent';
+import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverContentWithLightspeedButton/PopoverContentWithLightspeedButton';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import {
   FENCE_AGENTS_OPERATOR_NAME,
@@ -30,7 +30,7 @@ const HighAvailabilityConfigurationSection: FC = () => {
         <HighAvailabilityToggleContent alternativeCheckedMap={alternativeCheckedMap} />
       }
       helpTextContent={(hide) => (
-        <LightspeedSimplePopoverContent
+        <PopoverContentWithLightspeedButton
           content={
             <HelpTextTooltipContent
               bodyText={t(

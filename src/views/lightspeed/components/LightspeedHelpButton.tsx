@@ -16,6 +16,7 @@ import {
 import { Button, ButtonVariant, Skeleton } from '@patternfly/react-core';
 
 type LightspeedHelpButtonProps = {
+  className?: string;
   isTroubleshootContext?: boolean;
   obj?: K8sResourceCommon;
   onClick?: () => void;
@@ -23,6 +24,7 @@ type LightspeedHelpButtonProps = {
 };
 
 const LightspeedHelpButton: FC<LightspeedHelpButtonProps> = ({
+  className,
   isTroubleshootContext,
   obj,
   onClick,
@@ -48,13 +50,17 @@ const LightspeedHelpButton: FC<LightspeedHelpButtonProps> = ({
     await clickOLSPromptSubmitButton();
   };
 
-  return !loaded ? (
-    <Skeleton />
-  ) : (
-    <Button className="pf-v6-u-py-0" onClick={() => handleClick()} variant={ButtonVariant.link}>
-      <AIExperienceIcon />
-      {isTroubleshootContext ? t('Troubleshoot') : t('Learn more')}
-    </Button>
+  return (
+    <div className={className}>
+      {!loaded ? (
+        <Skeleton className="lightspeed-help-button-skeleton" />
+      ) : (
+        <Button className="pf-v6-u-py-0" onClick={() => handleClick()} variant={ButtonVariant.link}>
+          <AIExperienceIcon />
+          {isTroubleshootContext ? t('Troubleshoot') : t('Learn more')}
+        </Button>
+      )}
+    </div>
   );
 };
 

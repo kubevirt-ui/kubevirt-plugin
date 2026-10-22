@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import LightspeedSimplePopoverContent from '@lightspeed/components/LightspeedSimplePopoverContent';
+import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverContentWithLightspeedButton/PopoverContentWithLightspeedButton';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { Content, ContentVariants } from '@patternfly/react-core';
 
@@ -12,7 +12,7 @@ type PasstPopoverContentProps = {
 const PasstPopoverContent: FC<PasstPopoverContentProps> = ({ hide }) => {
   const { t } = useKubevirtTranslation();
   return (
-    <LightspeedSimplePopoverContent
+    <PopoverContentWithLightspeedButton
       content={
         <div>
           <Content component={ContentVariants.h6}>{t('Passt')}</Content>

@@ -9,7 +9,7 @@ import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
-import LightspeedSimplePopoverContent from '@lightspeed/components/LightspeedSimplePopoverContent';
+import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverContentWithLightspeedButton/PopoverContentWithLightspeedButton';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 import useIsACMPage from '@multicluster/useIsACMPage';
 import {
@@ -156,7 +156,7 @@ const MigrationPolicyDetailsSection: FC<MigrationPolicyDetailsSectionProps> = ({
             <Title headingLevel="h2">
               <Popover
                 bodyContent={(hide) => (
-                  <LightspeedSimplePopoverContent
+                  <PopoverContentWithLightspeedButton
                     content={
                       <>
                         <Trans ns="plugin__kubevirt-plugin">
