@@ -22,6 +22,7 @@ type UseAccessibleResourcesArgs = {
   fieldSelector?: string;
   filterOptions?: KubevirtDataPodFilters;
   groupVersionKind: K8sGroupVersionKind;
+  isWatchEnabled?: boolean;
   namespace?: string;
   onlyUserProjects?: boolean;
   searchQueries?: AdvancedSearchFilter;
@@ -40,6 +41,7 @@ export const useAccessibleResources = <T>({
   fieldSelector,
   filterOptions,
   groupVersionKind,
+  isWatchEnabled = true,
   namespace,
   onlyUserProjects,
   searchQueries,
@@ -62,9 +64,11 @@ export const useAccessibleResources = <T>({
     return projectNames.filter((ns) => !isSystemNamespace(ns));
   }, [onlyUserProjects, projectNames, watchNamespaces]);
 
-  const loadPerNamespace = !isACMPage && projectNamesLoaded && !canListAllNamespaces;
+  const loadPerNamespace =
+    isWatchEnabled && !isACMPage && projectNamesLoaded && !canListAllNamespaces;
 
-  const shouldFetchClusterWide = canListAllNamespaces || isACMPage;
+  const shouldFetchClusterWide = isWatchEnabled && (canListAllNamespaces || isACMPage);
+
   const [allResources, allResourcesLoaded, allResourcesLoadError] = useKubevirtWatchResource<T[]>(
     shouldFetchClusterWide
       ? {
@@ -106,13 +110,24 @@ export const useAccessibleResources = <T>({
     return vms || [];
   }, [allResources, allowedResources, loadPerNamespace]);
 
-  const loaded = shouldFetchClusterWide
-    ? allResourcesLoaded || !!allResourcesLoadError
-    : projectNamesLoaded &&
+  if (!isWatchEnabled) {
+    return { loaded: true, loadError: undefined, resources: [] };
+  }
+
+  if (shouldFetchClusterWide) {
+    return {
+      loaded: allResourcesLoaded || Boolean(allResourcesLoadError),
+      loadError: allResourcesLoadError,
+      resources,
+    };
+  }
+
+  return {
+    loaded:
+      projectNamesLoaded &&
       (isEmpty(allowedResources) ||
-        Object.values(allowedResources).some((resource) => resource.loaded || resource.loadError));
-
-  const loadError = shouldFetchClusterWide ? allResourcesLoadError : projectNamesError;
-
-  return { loaded, loadError, resources };
+        Object.values(allowedResources).some((resource) => resource.loaded || resource.loadError)),
+    loadError: projectNamesError,
+    resources,
+  };
 };
