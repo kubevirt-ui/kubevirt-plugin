@@ -1,32 +1,30 @@
 import { type FC, useMemo } from 'react';
 
-import { VirtualMachineModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useClusterObservabilityDisabled } from '@kubevirt-utils/hooks/useAlerts/utils/useClusterObservabilityDisabled';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
 import useIsAllClustersPage from '@multicluster/hooks/useIsAllClustersPage';
 import useIsACMPage from '@multicluster/useIsACMPage';
-import { type WatchK8sResource } from '@openshift-console/dynamic-plugin-sdk';
 import { Alert, Bullseye, PageSection, Spinner, Stack } from '@patternfly/react-core';
 import { useSignals } from '@preact/signals-react/runtime';
-import { type AdvancedSearchFilter, useHubClusterName } from '@stolostron/multicluster-sdk';
-import { useAccessibleResources } from '@virtualmachines/search/hooks/useAccessibleResources';
-import { OBJECTS_FETCHING_LIMIT } from '@virtualmachines/utils';
+import { useHubClusterName } from '@stolostron/multicluster-sdk';
+
+import FleetVMInventoryBanner from '../FleetVMInventoryBanner';
 
 import OverviewAlerts from './components/OverviewAlerts';
 import { determineOverviewLevel, getOverviewConfig } from './config';
 import { KubeVirtOverviewClusterCsvProvider } from './context/KubeVirtOverviewClusterCsvContext';
 import useFolderFilter from './hooks/useFolderFilter';
+import useOverviewVMData from './hooks/useOverviewVMData';
 import { OVERVIEW_LEVEL_PROJECT, type OverviewTabProps } from './types';
 
 const OverviewTab: FC<OverviewTabProps> = ({ cluster, namespace }) => {
   useSignals();
   const { t } = useKubevirtTranslation();
 
-  const isMultiCluster = useIsAllClustersPage();
   const isACMPage = useIsACMPage();
+  const isMultiCluster = useIsAllClustersPage();
   const [hubClusterName, hubClusterLoaded] = useHubClusterName();
+  const { error, isSoftError, refresh, vms, vmsLoaded } = useOverviewVMData(namespace, cluster);
 
   const {
     disabledClusters,
@@ -34,45 +32,6 @@ const OverviewTab: FC<OverviewTabProps> = ({ cluster, namespace }) => {
     loaded: observabilityLoaded,
     mcoInstalled,
   } = useClusterObservabilityDisabled(true);
-
-  const isManagedClusterFetch =
-    isACMPage && !!cluster && hubClusterLoaded && hubClusterName !== cluster;
-
-  const searchQueries = useMemo<AdvancedSearchFilter | undefined>(
-    () => (isManagedClusterFetch ? [{ property: 'cluster', values: [cluster] }] : undefined),
-    [isManagedClusterFetch, cluster],
-  );
-
-  const watchEnabled = !isACMPage || !cluster || hubClusterLoaded;
-
-  const [watchedVms, watchedVmsLoaded, watchedVmsError] = useKubevirtWatchResource<
-    V1VirtualMachine[]
-  >(
-    (watchEnabled && !!namespace
-      ? {
-          cluster: isManagedClusterFetch ? undefined : cluster,
-          groupVersionKind: VirtualMachineModelGroupVersionKind,
-          isList: true,
-          limit: OBJECTS_FETCHING_LIMIT,
-          namespace,
-          namespaced: true,
-        }
-      : null) as WatchK8sResource,
-    undefined,
-    searchQueries,
-  );
-  const {
-    loaded: accessibleVmsLoaded,
-    loadError: accessibleVmsError,
-    resources: accessibleVms,
-  } = useAccessibleResources<V1VirtualMachine>({
-    groupVersionKind: VirtualMachineModelGroupVersionKind,
-    namespace: namespace ?? undefined,
-  });
-
-  const vms = namespace ? watchedVms : accessibleVms;
-  const vmsLoaded = namespace ? watchedVmsLoaded : accessibleVmsLoaded;
-  const vmsError = namespace ? watchedVmsError : accessibleVmsError;
 
   const { filteredVMs, vmNames } = useFolderFilter(vms);
 
@@ -83,6 +42,8 @@ const OverviewTab: FC<OverviewTabProps> = ({ cluster, namespace }) => {
 
   const config = useMemo(() => getOverviewConfig(overviewLevel, t), [overviewLevel, t]);
 
+  const isManagedClusterFetch =
+    isACMPage && !!cluster && hubClusterLoaded && hubClusterName !== cluster;
   const isManagedClusterDisabled = isManagedClusterFetch && disabledClusters.includes(cluster);
 
   const metricsUnavailable =
@@ -99,11 +60,11 @@ const OverviewTab: FC<OverviewTabProps> = ({ cluster, namespace }) => {
     [cluster, metricsUnavailable, namespace, filteredVMs, vmNames],
   );
 
-  if (vmsError) {
+  if (error && !isSoftError) {
     return (
       <PageSection>
         <Alert title={t('Error loading virtual machines')} variant="danger">
-          {vmsError?.message || t('An unknown error occurred')}
+          {error.message || t('An unknown error occurred')}
         </Alert>
       </PageSection>
     );
@@ -124,6 +85,11 @@ const OverviewTab: FC<OverviewTabProps> = ({ cluster, namespace }) => {
   return (
     <PageSection data-test="dashboard">
       <Stack data-test="vm-list-summary" hasGutter>
+        <FleetVMInventoryBanner
+          error={isSoftError ? error : undefined}
+          hasInventory={!hasNoVMs}
+          onRetry={refresh}
+        />
         <OverviewAlerts
           cluster={cluster}
           disabledClusters={disabledClusters}
