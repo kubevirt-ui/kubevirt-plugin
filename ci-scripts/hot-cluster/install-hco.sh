@@ -540,27 +540,52 @@ if [[ -n "${STUCK_DVS}" ]]; then
   while IFS= read -r dv; do
     [[ -z "${dv}" ]] && continue
     echo "  Repairing ${dv}..."
-    oc delete datavolume "${dv}" -n openshift-virtualization-os-images --ignore-not-found
-    oc delete pvc "${dv}" -n openshift-virtualization-os-images --ignore-not-found
+    oc delete datavolume "${dv}" -n openshift-virtualization-os-images --ignore-not-found --wait=false
+    oc delete pvc "${dv}" -n openshift-virtualization-os-images --ignore-not-found --wait=false
   done <<< "${STUCK_DVS}"
 
+  # Poll the specific names we deleted (not "any non-Succeeded DV"): with
+  # --wait=false the DV can vanish briefly before CDI recreates it, which
+  # would look like an empty stuck-set and exit this loop too early.
   echo "Waiting for repaired golden images to re-import (best-effort, up to 10 minutes)..."
   for i in $(seq 1 60); do
-    REMAINING="$(oc get datavolume -n openshift-virtualization-os-images -o json 2>/dev/null \
-      | jq -r '[.items[]? | select(.status.phase != "Succeeded")] | length' || echo "0")"
-    if [[ "${REMAINING}" -eq 0 ]]; then
-      echo "  All golden images are now Succeeded"
+    STILL_BAD=0
+    STILL_BAD_NAMES=""
+    while IFS= read -r dv; do
+      [[ -z "${dv}" ]] && continue
+      # Succeeded + deletionTimestamp set means the old object is still
+      # terminating; keep waiting for CDI's replacement (no deletionTimestamp).
+      DV_STATE="$(oc get datavolume "${dv}" -n openshift-virtualization-os-images \
+        -o jsonpath='{.status.phase}{"\t"}{.metadata.deletionTimestamp}' 2>/dev/null || true)"
+      PHASE="${DV_STATE%%$'\t'*}"
+      DELETING="${DV_STATE#*$'\t'}"
+      if [[ "${PHASE}" != "Succeeded" || -n "${DELETING}" ]]; then
+        STILL_BAD=$((STILL_BAD + 1))
+        if [[ -n "${DELETING}" ]]; then
+          STILL_BAD_NAMES="${STILL_BAD_NAMES} ${dv}(${PHASE:-Missing}+Deleting)"
+        else
+          STILL_BAD_NAMES="${STILL_BAD_NAMES} ${dv}(${PHASE:-Missing})"
+        fi
+      fi
+    done <<< "${STUCK_DVS}"
+    if [[ "${STILL_BAD}" -eq 0 ]]; then
+      echo "  All repaired golden images are now Succeeded"
       break
     fi
     if [[ "${i}" -eq 60 ]]; then
-      echo "  WARNING: ${REMAINING} golden image(s) still not Succeeded after 10 minutes; dumping diagnostics for the remaining stuck DataVolume(s):"
-      STILL_STUCK="$(oc get datavolume -n openshift-virtualization-os-images -o json 2>/dev/null \
-        | jq -r '.items[]? | select(.status.phase != "Succeeded") | .metadata.name' || true)"
+      echo "  WARNING: ${STILL_BAD} repaired golden image(s) still not Succeeded after 10 minutes:${STILL_BAD_NAMES}"
       while IFS= read -r dv; do
         [[ -z "${dv}" ]] && continue
+        DV_STATE="$(oc get datavolume "${dv}" -n openshift-virtualization-os-images \
+          -o jsonpath='{.status.phase}{"\t"}{.metadata.deletionTimestamp}' 2>/dev/null || true)"
+        PHASE="${DV_STATE%%$'\t'*}"
+        DELETING="${DV_STATE#*$'\t'}"
+        [[ "${PHASE}" == "Succeeded" && -z "${DELETING}" ]] && continue
         echo "  --- oc describe datavolume ${dv} ---"
         oc describe datavolume "${dv}" -n openshift-virtualization-os-images 2>/dev/null || true
-      done <<< "${STILL_STUCK}"
+      done <<< "${STUCK_DVS}"
+    else
+      echo "  Waiting for repaired DataVolumes (${i}/60); not Succeeded yet:${STILL_BAD_NAMES}"
     fi
     sleep 10
   done
