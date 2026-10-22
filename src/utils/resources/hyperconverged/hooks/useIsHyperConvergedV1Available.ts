@@ -1,8 +1,12 @@
-import { HyperConvergedV1ModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
+import {
+  HyperConvergedV1Beta1ModelRef,
+  HyperConvergedV1ModelGroupVersionKind,
+  HyperConvergedV1ModelRef,
+} from '@kubevirt-ui-ext/kubevirt-api/console';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { isManagedSpokeCluster } from '@multicluster/helpers/isManagedSpokeCluster';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
-import { useK8sModel } from '@openshift-console/dynamic-plugin-sdk';
+import { useK8sModels } from '@openshift-console/dynamic-plugin-sdk';
 import { useHubClusterName } from '@stolostron/multicluster-sdk';
 
 import useHyperConvergedAPIDiscovery from './useHyperConvergedAPIDiscovery';
@@ -32,7 +36,8 @@ const useIsHyperConvergedV1Available: UseIsHyperConvergedV1Available = (clusterO
 
   const isManagedCluster = isManagedSpokeCluster(cluster, hubClusterName, hubLoaded);
 
-  const [hcoV1Model, inFlight] = useK8sModel(HyperConvergedV1ModelGroupVersionKind);
+  const [models] = useK8sModels();
+
   const { loading: discoveryLoading, preferredVersion } = useHyperConvergedAPIDiscovery(
     isManagedCluster ? cluster : undefined,
   );
@@ -48,9 +53,13 @@ const useIsHyperConvergedV1Available: UseIsHyperConvergedV1Available = (clusterO
     };
   }
 
+  const hcoV1Model = models?.[HyperConvergedV1ModelRef];
+  const hcoV1beta1Model = models?.[HyperConvergedV1Beta1ModelRef];
+
+  const loading = !hcoV1Model || !hcoV1beta1Model;
   return {
-    isHCOV1: !inFlight && !isEmpty(hcoV1Model),
-    loading: inFlight,
+    isHCOV1: !isEmpty(hcoV1Model),
+    loading: loading,
   };
 };
 

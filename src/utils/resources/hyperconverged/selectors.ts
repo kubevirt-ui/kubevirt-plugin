@@ -17,7 +17,7 @@ import {
   type HyperConvergedSpecV1Beta1,
 } from './types';
 
-export { getAAQCalculationMethod, isAAQEnabled, isAAQEnableStateConfirmed } from './aaqSelectors';
+export { getAAQCalculationMethod, isAAQEnabled } from './aaqSelectors';
 
 const getVirtualizationSpec = (
   hyperConverge: HyperConverged | undefined,

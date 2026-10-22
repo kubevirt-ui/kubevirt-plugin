@@ -1,7 +1,7 @@
 import { K8S_OPS } from '@kubevirt-utils/constants/constants';
 import { type Patch } from '@openshift-console/dynamic-plugin-sdk';
 
-import { isHyperConvergedV1, usesHyperConvergedV1Spec } from './model';
+import { isHyperConvergedV1 } from './model';
 import { type HyperConverged } from './types';
 
 export const getRoleAggregationStrategyPatchPath = (hyperConverged: HyperConverged): string =>
@@ -56,7 +56,7 @@ export const getDataImportCronTemplatesPatchPath = (hyperConverged: HyperConverg
     : '/spec/dataImportCronTemplates';
 
 export const getAAQConfigPatchPath = (hyperConverged: HyperConverged): string =>
-  usesHyperConvergedV1Spec(hyperConverged)
+  isHyperConvergedV1(hyperConverged)
     ? '/spec/deployment/applicationAwareConfig'
     : '/spec/applicationAwareConfig';
 
@@ -64,7 +64,7 @@ export const getAAQCalculationMethodPatchPath = (hyperConverged: HyperConverged)
   `${getAAQConfigPatchPath(hyperConverged)}/vmiCalcConfigName`;
 
 export const getAAQEnabledPatchPath = (hyperConverged: HyperConverged): string =>
-  usesHyperConvergedV1Spec(hyperConverged)
+  isHyperConvergedV1(hyperConverged)
     ? '/spec/deployment/applicationAwareConfig/enable'
     : '/spec/enableApplicationAwareQuota';
 
@@ -80,7 +80,7 @@ export const getMissingV1AncestorPatches = (
   hyperConverged: HyperConverged,
   targetPath: string,
 ): Patch[] => {
-  if (!usesHyperConvergedV1Spec(hyperConverged) || !targetPath.startsWith('/spec/')) {
+  if (!isHyperConvergedV1(hyperConverged) || !targetPath.startsWith('/spec/')) {
     return [];
   }
 
