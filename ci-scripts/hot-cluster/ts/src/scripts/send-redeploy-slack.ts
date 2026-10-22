@@ -2,8 +2,9 @@
  * Send a Slack notification with rotated credentials after a plugin redeploy.
  * Uses Node 22+ built-in fetch().
  *
- * Env: SLACK_WEBHOOK_URL, CONSOLE_URL, MANUAL_CONSOLE_PASSWORD,
- *      MANUAL_CONSOLE_USER, ACTOR, BRANCH, PR_NUMBER, REPO
+ * Env: SLACK_WEBHOOK_URL, CONSOLE_URL, ACTOR, BRANCH, PR_NUMBER, REPO,
+ *      AUTH_MODE (openshift|disabled)
+ * When AUTH_MODE=openshift (default): MANUAL_CONSOLE_PASSWORD, MANUAL_CONSOLE_USER
  */
 
 import { requireEnv } from '../kube-client';
@@ -16,25 +17,31 @@ const main = async (): Promise<void> => {
   }
 
   const consoleUrl = requireEnv('CONSOLE_URL');
-  const password = requireEnv('MANUAL_CONSOLE_PASSWORD');
-  const user = requireEnv('MANUAL_CONSOLE_USER');
   const actor = requireEnv('ACTOR');
   const repo = requireEnv('REPO');
   const branch = process.env.BRANCH ?? '';
   const prNumber = process.env.PR_NUMBER ?? '';
-
-  console.log(`::add-mask::${password}`);
+  const authMode = (process.env.AUTH_MODE ?? 'openshift').trim() || 'openshift';
 
   const sourceLine = prNumber
     ? `*PR:* <https://github.com/${repo}/pull/${prNumber}|#${prNumber}>`
     : `*Branch:* \`${branch}\``;
 
+  const credentialLines =
+    authMode === 'disabled'
+      ? ['*Auth:* no login wall (console SA token)']
+      : (() => {
+          const password = requireEnv('MANUAL_CONSOLE_PASSWORD');
+          const user = requireEnv('MANUAL_CONSOLE_USER');
+          console.log(`::add-mask::${password}`);
+          return [`*User:* \`${user}\``, `*Password (rotated):* \`${password}\``];
+        })();
+
   const text = [
     ':arrows_counterclockwise: *Manual console plugin redeployed*',
     `*Triggered by:* @${actor}`,
     `*URL:* <${consoleUrl}>`,
-    `*User:* \`${user}\``,
-    `*Password (rotated):* \`${password}\``,
+    ...credentialLines,
     sourceLine,
   ].join('\n');
 

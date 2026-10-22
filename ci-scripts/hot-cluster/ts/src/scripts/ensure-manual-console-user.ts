@@ -58,9 +58,19 @@ const main = async (): Promise<void> => {
       console.log('htpass-secret not found; nothing to remove.');
     }
 
-    execSync(`oc adm policy remove-cluster-role-from-user cluster-admin "${username}"`, {
-      stdio: 'inherit',
-    });
+    try {
+      execSync(`oc adm policy remove-cluster-role-from-user cluster-admin "${username}"`, {
+        encoding: 'utf8',
+        stdio: ['ignore', 'pipe', 'pipe'],
+      });
+    } catch (err) {
+      const detail = err instanceof Error ? err.message : String(err);
+      // User object never created (e.g. provision failed before htpasswd upsert).
+      if (!/unable to find target/i.test(detail)) {
+        throw err;
+      }
+      console.log(`User '${username}' has no User object; nothing to revoke.`);
+    }
     console.log(`User '${username}' removed.`);
     return;
   }
@@ -129,10 +139,21 @@ const main = async (): Promise<void> => {
 
   if (!hasHtpasswdIdp) {
     console.log('Adding htpasswd identity provider to cluster OAuth config...');
-    execSync(
-      `oc get oauth cluster -o json | jq '.spec.identityProviders += [{"name":"htpasswd","mappingMethod":"claim","type":"HTPasswd","htpasswd":{"fileData":{"name":"htpass-secret"}}}]' | oc apply -f -`,
-      { stdio: 'inherit' },
-    );
+    try {
+      execSync(
+        `oc get oauth cluster -o json | jq '.spec.identityProviders += [{"name":"htpasswd","mappingMethod":"claim","type":"HTPasswd","htpasswd":{"fileData":{"name":"htpass-secret"}}}]' | oc apply -f -`,
+        { stdio: 'inherit' },
+      );
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      console.error(
+        'ERROR: failed to add HTPasswd identity provider to OAuth CR.\n' +
+          'ERROR: On VPC ROKS (hosted control plane) the OAuth CR is immutable; ' +
+          'use auth-mode=disabled or an IPI/classic cluster instead.\n' +
+          msg,
+      );
+      process.exit(1);
+    }
 
     console.log('Waiting for OAuth pods to roll out...');
     try {

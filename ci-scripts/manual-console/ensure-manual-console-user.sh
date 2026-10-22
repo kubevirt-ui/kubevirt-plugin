@@ -50,13 +50,19 @@ if [[ "${1:-}" == "--remove" ]]; then
     echo "htpass-secret not found; nothing to remove from it."
   fi
 
-  # Not `|| true`: a real failure here (permissions, API hiccup, etc.) must
-  # be visible so ci-env-controller can retry instead of marking teardown
-  # "cleaned". This command is already a no-op (exits 0) when the user
-  # isn't currently bound, so it only ever fails on a genuine error.
-  if ! oc adm policy remove-cluster-role-from-user cluster-admin "${USERNAME}"; then
-    echo "ERROR: failed to revoke cluster-admin from ${USERNAME}" >&2
-    exit 1
+  # remove-cluster-role-from-user is a no-op (exit 0) when the binding
+  # exists but the subject isn't bound. It *does* fail with "unable to
+  # find target" when the User object was never created (e.g. a prior
+  # provision failed before the htpasswd upsert finished) -- treat that
+  # as success so teardown of a never-fully-provisioned instance can
+  # complete. Other failures (permissions, API) still fail hard.
+  if ! remove_out="$(oc adm policy remove-cluster-role-from-user cluster-admin "${USERNAME}" 2>&1)"; then
+    if [[ "${remove_out}" == *"unable to find target"* ]]; then
+      echo "User '${USERNAME}' has no User object; nothing to revoke."
+    else
+      echo "ERROR: failed to revoke cluster-admin from ${USERNAME}: ${remove_out}" >&2
+      exit 1
+    fi
   fi
 
   echo "User '${USERNAME}' removed."
@@ -125,7 +131,16 @@ if [[ -z "${HAS_HTPASSWD_IDP}" ]]; then
     }
   }')"
 
-  oc patch oauth cluster --type=merge -p "${PATCH_JSON}"
+  if ! oc patch oauth cluster --type=merge -p "${PATCH_JSON}"; then
+    # VPC ROKS / Hypershift HCP locks the guest OAuth CR via
+    # ValidatingAdmissionPolicy -- identityProviders must be set on the
+    # HostedCluster. Manual-console should probe first and fall back to
+    # auth-mode=disabled (see probe-htpasswd-idp.ts).
+    echo "ERROR: failed to add HTPasswd identity provider to OAuth CR." >&2
+    echo "ERROR: On VPC ROKS (hosted control plane) the OAuth CR is immutable;" >&2
+    echo "ERROR: use auth-mode=disabled or an IPI/classic cluster instead." >&2
+    exit 1
+  fi
 
   echo "Waiting for OAuth pods to roll out..."
   oc rollout status deployment/oauth-openshift -n openshift-authentication --timeout=120s 2>&1 \
