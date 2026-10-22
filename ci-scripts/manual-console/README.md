@@ -14,12 +14,12 @@ CI run, and runs with `BRIDGE_USER_AUTH=disabled` (a bearer token, no login
 wall) -- suitable for automated Playwright tests, not for a human to browse.
 Manual-console is the same underlying stack with three differences:
 
-|              | E2E                                          | Manual console                                     |
-| ------------ | -------------------------------------------- | -------------------------------------------------- |
-| Namespace    | Ephemeral `kubevirt-plugin-ci-test-<run_id>` | Persistent `manual-console`                        |
-| Lifecycle    | Torn down after the test run; 2h TTL reaper  | Persists until the next deploy; **not** TTL-reaped |
-| Auth         | `BRIDGE_USER_AUTH=disabled` (bearer token)   | `BRIDGE_USER_AUTH=openshift` (OAuth login)         |
-| Plugin image | Built on `ubuntu-latest`, pushed to `quay.io` | Built in-cluster via an OpenShift BuildConfig      |
+|              | E2E                                           | Manual console                                                                                                                      |
+| ------------ | --------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| Namespace    | Ephemeral `kubevirt-plugin-ci-test-<run_id>`  | Persistent `manual-console`                                                                                                         |
+| Lifecycle    | Torn down after the test run; 2h TTL reaper   | Persists until the next deploy; **not** TTL-reaped                                                                                  |
+| Auth         | `BRIDGE_USER_AUTH=disabled` (bearer token)    | `openshift` (HTPasswd OAuth) when the cluster allows it; falls back to `disabled` on VPC ROKS where the guest OAuth CR is immutable |
+| Plugin image | Built on `ubuntu-latest`, pushed to `quay.io` | Built in-cluster via an OpenShift BuildConfig                                                                                       |
 
 ## Prerequisites
 
@@ -109,13 +109,14 @@ ServiceAccount token), the same model already used by
 
 ## Credentials
 
-Unlike the cluster-setup Slack notification (which uses either the IPI
-`kubeadmin` password or the `CLUSTER_ADMIN_PASSWORD` secret), manual-console
-credentials are generated fresh on every deploy -- no GitHub secret is
-required beyond `SLACK_WEBHOOK_URL`:
+Before provisioning, the workflow probes whether an HTPasswd OAuth identity
+provider can be configured on the cluster. VPC ROKS (Hypershift hosted
+control plane) locks the guest `OAuth` CR via `ValidatingAdmissionPolicy`,
+so HTPasswd cannot be added in-cluster there.
 
-1. The workflow generates a random password (`openssl rand -base64 24`) and
-   masks it in the logs.
+**When HTPasswd is available** (IPI / classic, or an IDP already present):
+
+1. The workflow generates a random password and masks it in the logs.
 2. It writes that password into a short-lived Kubernetes `Secret` in the
    `ci-env` namespace (never into the trigger ConfigMap).
 3. `ci-env-controller` reads the Secret, upserts an htpasswd identity
@@ -129,6 +130,10 @@ required beyond `SLACK_WEBHOOK_URL`:
 
 Redeploying (either workflow) rotates the password; the previous one stops
 working. **Deploy Plugin** sends its own Slack reminder for this reason.
+
+**When HTPasswd is unavailable** (typical VPC ROKS): the deploy uses
+`auth-mode=disabled` instead -- the console has no login wall and uses its
+ServiceAccount token. Slack posts the URL only (no username/password).
 
 Tearing down an instance (see above) removes that htpasswd user and revokes
 its `cluster-admin` grant, in addition to uninstalling its Helm release.

@@ -289,13 +289,22 @@ jobs:
         working-directory: ci-scripts/hot-cluster/ts
         run: npx tsx src/scripts/build-plugin-image.ts
 
+      # VPC ROKS (Hypershift) locks the guest OAuth CR -- HTPasswd IDP cannot
+      # be added in-cluster. Fall back to auth-mode=disabled when unavailable.
+      - name: Probe HTPasswd OAuth availability
+        id: oauth
+        working-directory: ci-scripts/hot-cluster/ts
+        run: npx tsx src/scripts/probe-htpasswd-idp.ts
+
       - name: Generate manual console password
         id: creds
+        if: steps.oauth.outputs.available == 'true'
         working-directory: ci-scripts/hot-cluster/ts
         run: npx tsx src/scripts/generate-password.ts
 
       - name: Create short-lived credentials Secret
         id: secret
+        if: steps.oauth.outputs.available == 'true'
         env:
           MANUAL_CONSOLE_PASSWORD: ${{ steps.creds.outputs.password }}
           SECRET_NAME: manual-console-creds-${{ github.run_id }}
@@ -312,7 +321,8 @@ jobs:
           configmap-name: manual-console-${{ needs.instance-key.outputs.key }}
           helm-release: manual-console-${{ needs.instance-key.outputs.key }}
           ci-env-namespace: ${{ env.CI_ENV_NS }}
-          htpasswd-user: manual-console-${{ needs.instance-key.outputs.key }}
+          auth-mode: ${{ steps.oauth.outputs.available == 'true' && 'openshift' || 'disabled' }}
+          htpasswd-user: ${{ steps.oauth.outputs.available == 'true' && format('manual-console-{0}', needs.instance-key.outputs.key) || '' }}
           htpasswd-secret-name: ${{ steps.secret.outputs.name }}
 
       - name: Send manual console credentials to Slack
@@ -320,6 +330,7 @@ jobs:
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
           CONSOLE_URL: ${{ steps.deploy.outputs.console-route }}
+          AUTH_MODE: ${{ steps.deploy.outputs.auth-mode }}
           MANUAL_CONSOLE_PASSWORD: ${{ steps.creds.outputs.password }}
           MANUAL_CONSOLE_USER: manual-console-${{ needs.instance-key.outputs.key }}
           ACTOR: ${{ github.actor }}
@@ -347,8 +358,9 @@ jobs:
       # password behind indefinitely. if: always() guarantees this runs on
       # every exit path, including job failure; --ignore-not-found makes it
       # a no-op on the normal path where the controller already deleted it.
+      # Skipped when OAuth probe chose auth-mode=disabled (no Secret created).
       - name: Clean up credentials Secret
-        if: always()
+        if: always() && steps.oauth.outputs.available == 'true'
         env:
           SECRET_NAME: manual-console-creds-${{ github.run_id }}
           CI_ENV_NS: ${{ env.CI_ENV_NS }}

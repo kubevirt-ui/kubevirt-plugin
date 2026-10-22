@@ -155,17 +155,26 @@ jobs:
         working-directory: ci-scripts/hot-cluster/ts
         run: npx tsx src/scripts/build-plugin-image.ts
 
-      # provision() always re-runs the htpasswd/OAuth ensure step regardless
-      # of whether credentials changed, so a fresh Secret is still required
-      # here -- this keeps ci-env-controller's logic simple (one code path)
-      # at the cost of a new (unused, if unchanged) password each redeploy.
+      # Match deploy-manual-console.yml: VPC ROKS cannot host HTPasswd, so
+      # fall back to auth-mode=disabled when the OAuth CR is immutable.
+      - name: Probe HTPasswd OAuth availability
+        id: oauth
+        working-directory: ci-scripts/hot-cluster/ts
+        run: npx tsx src/scripts/probe-htpasswd-idp.ts
+
+      # provision() always re-runs the htpasswd/OAuth ensure step when
+      # auth-mode=openshift, so a fresh Secret is still required on that
+      # path -- this keeps ci-env-controller's logic simple (one code path)
+      # at the cost of a new password each redeploy.
       - name: Generate manual console password
         id: creds
+        if: steps.oauth.outputs.available == 'true'
         working-directory: ci-scripts/hot-cluster/ts
         run: npx tsx src/scripts/generate-password.ts
 
       - name: Create short-lived credentials Secret
         id: secret
+        if: steps.oauth.outputs.available == 'true'
         env:
           MANUAL_CONSOLE_PASSWORD: ${{ steps.creds.outputs.password }}
           SECRET_NAME: manual-console-creds-${{ github.run_id }}
@@ -182,18 +191,19 @@ jobs:
           configmap-name: manual-console-${{ needs.instance-key.outputs.key }}
           helm-release: manual-console-${{ needs.instance-key.outputs.key }}
           ci-env-namespace: ${{ env.CI_ENV_NS }}
-          htpasswd-user: manual-console-${{ needs.instance-key.outputs.key }}
+          auth-mode: ${{ steps.oauth.outputs.available == 'true' && 'openshift' || 'disabled' }}
+          htpasswd-user: ${{ steps.oauth.outputs.available == 'true' && format('manual-console-{0}', needs.instance-key.outputs.key) || '' }}
           htpasswd-secret-name: ${{ steps.secret.outputs.name }}
 
-      # ci-env-controller re-applies the htpasswd user on every provision, so
-      # the previous login password is no longer valid after this step --
-      # a fresh reminder must be sent, otherwise the user is silently locked
-      # out with no way to discover the new password.
+      # When auth-mode=openshift, ci-env-controller re-applies the htpasswd
+      # user on every provision, so the previous password is no longer valid
+      # -- a fresh reminder must be sent. disabled mode has no credentials.
       - name: Send updated credentials to Slack
         if: always() && steps.deploy.outcome == 'success'
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
           CONSOLE_URL: ${{ steps.deploy.outputs.console-route }}
+          AUTH_MODE: ${{ steps.deploy.outputs.auth-mode }}
           MANUAL_CONSOLE_PASSWORD: ${{ steps.creds.outputs.password }}
           MANUAL_CONSOLE_USER: manual-console-${{ needs.instance-key.outputs.key }}
           ACTOR: ${{ github.actor }}

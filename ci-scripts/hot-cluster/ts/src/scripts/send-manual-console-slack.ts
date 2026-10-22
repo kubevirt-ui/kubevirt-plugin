@@ -2,8 +2,9 @@
  * Send a Slack notification with manual console credentials after deploy.
  * Uses Node 22+ built-in fetch().
  *
- * Env: SLACK_WEBHOOK_URL, CONSOLE_URL, MANUAL_CONSOLE_PASSWORD,
- *      MANUAL_CONSOLE_USER, ACTOR, BRANCH, PR_NUMBER, HEAD_REPO, REPO, RUN_ID
+ * Env: SLACK_WEBHOOK_URL, CONSOLE_URL, ACTOR, BRANCH, PR_NUMBER, HEAD_REPO,
+ *      REPO, RUN_ID, AUTH_MODE (openshift|disabled)
+ * When AUTH_MODE=openshift (default): MANUAL_CONSOLE_PASSWORD, MANUAL_CONSOLE_USER
  */
 
 import { requireEnv } from '../kube-client';
@@ -16,16 +17,13 @@ const main = async (): Promise<void> => {
   }
 
   const consoleUrl = requireEnv('CONSOLE_URL');
-  const password = requireEnv('MANUAL_CONSOLE_PASSWORD');
-  const user = requireEnv('MANUAL_CONSOLE_USER');
   const actor = requireEnv('ACTOR');
   const repo = requireEnv('REPO');
   const runId = requireEnv('RUN_ID');
   const branch = process.env.BRANCH ?? '';
   const prNumber = process.env.PR_NUMBER ?? '';
   const headRepo = process.env.HEAD_REPO ?? '';
-
-  console.log(`::add-mask::${password}`);
+  const authMode = (process.env.AUTH_MODE ?? 'openshift').trim() || 'openshift';
 
   const sourceLine = prNumber
     ? `*PR:* <https://github.com/${repo}/pull/${prNumber}|#${prNumber}> (\`${headRepo}\`)`
@@ -34,13 +32,24 @@ const main = async (): Promise<void> => {
     ? '\nDone with it? Comment `/cleanup-manual-console` on the PR.'
     : '';
 
+  const credentialLines =
+    authMode === 'disabled'
+      ? [
+          '*Auth:* no login wall (VPC ROKS OAuth is immutable; console uses its ServiceAccount token)',
+        ]
+      : (() => {
+          const password = requireEnv('MANUAL_CONSOLE_PASSWORD');
+          const user = requireEnv('MANUAL_CONSOLE_USER');
+          console.log(`::add-mask::${password}`);
+          return [`*User:* \`${user}\``, `*Password:* \`${password}\``];
+        })();
+
   const text =
     [
       ':rocket: *Manual console ready*',
       `*Triggered by:* @${actor}`,
       `*URL:* <${consoleUrl}>`,
-      `*User:* \`${user}\``,
-      `*Password:* \`${password}\``,
+      ...credentialLines,
       sourceLine,
       `*Run:* <https://github.com/${repo}/actions/runs/${runId}>`,
     ].join('\n') + cleanupLine;

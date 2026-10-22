@@ -49,6 +49,16 @@
 #                            kubevirt-plugin-420: patching this unblocked every
 #                            golden image within ~1 minute.
 #
+#                            Separately, when a VolumeSnapshotClass exists for
+#                            vpc.block.csi.ibm.io, CDI sets cloneStrategy=snapshot.
+#                            IBM VPC Block refuses snapshots unless the source
+#                            volume is attached to a running VSI -- golden-image
+#                            PVCs are Bound but unattached -- so VM disks hang in
+#                            SnapshotForSmartCloneInProgress
+#                            (snapshots_source_volume_not_attached). This script
+#                            forces cloneStrategy=copy on every IBM VPC
+#                            StorageProfile (see CDI #3886).
+#
 set -euo pipefail
 
 export KVM_EMULATION="${KVM_EMULATION:-true}"
@@ -411,6 +421,83 @@ if [[ -z "${EXISTING_CLAIM_PROPERTY_SETS}" || "${EXISTING_CLAIM_PROPERTY_SETS}" 
   done
 else
   echo "StorageProfile '${DEFAULT_STORAGE_CLASS}' already has claimPropertySets: ${EXISTING_CLAIM_PROPERTY_SETS}"
+fi
+
+# --- Force host-assisted clone for IBM VPC Block ---
+# CDI picks snapshot smart-clone when a VolumeSnapshotClass exists for the
+# provisioner. IBM VPC Block CSI returns snapshots_source_volume_not_attached
+# for unattached golden-image PVCs, so VM provisioning sticks in
+# SnapshotForSmartCloneInProgress forever. Override to copy (host-assisted).
+#
+# StorageProfiles are created asynchronously by CDI and may exist before
+# status.provisioner is populated. When IBM VPC Block StorageClasses are
+# present, wait for matching profiles rather than treating an empty
+# provisioner filter as "not an IBM cluster".
+IBM_VPC_PROVISIONER="vpc.block.csi.ibm.io"
+echo "Ensuring IBM VPC Block StorageProfiles use cloneStrategy=copy..."
+IBM_VPC_SCS="$(oc get storageclass -o json \
+  | jq -r --arg p "${IBM_VPC_PROVISIONER}" \
+    '.items[] | select(.provisioner == $p) | .metadata.name')"
+if [[ -z "${IBM_VPC_SCS}" ]]; then
+  echo "  No ${IBM_VPC_PROVISIONER} StorageClasses found; skipping cloneStrategy override"
+else
+  IBM_VPC_PROFILES=""
+  for i in $(seq 1 60); do
+    IBM_VPC_PROFILES="$(oc get storageprofile -o json \
+      | jq -r --arg p "${IBM_VPC_PROVISIONER}" \
+        '.items[] | select(.status.provisioner == $p) | .metadata.name')"
+    missing=""
+    while IFS= read -r sc; do
+      [[ -z "${sc}" ]] && continue
+      if ! printf '%s\n' "${IBM_VPC_PROFILES}" | grep -Fxq "${sc}"; then
+        missing="${missing} ${sc}"
+      fi
+    done <<< "${IBM_VPC_SCS}"
+    if [[ -z "${missing}" ]]; then
+      echo "  All IBM VPC Block StorageProfiles reported provisioner ${IBM_VPC_PROVISIONER}"
+      break
+    fi
+    if [[ "${i}" -eq 60 ]]; then
+      echo "ERROR: Timed out waiting for StorageProfiles for IBM VPC Block StorageClasses."
+      echo "ERROR: Still missing provisioner=${IBM_VPC_PROVISIONER} on:${missing}"
+      echo "ERROR: StorageClasses present:"
+      echo "${IBM_VPC_SCS}" | sed 's/^/  /'
+      echo "ERROR: StorageProfiles with that provisioner so far:"
+      echo "${IBM_VPC_PROFILES:-  (none)}" | sed 's/^/  /'
+      exit 1
+    fi
+    echo "  Waiting for IBM VPC Block StorageProfiles (${i}/60); missing:${missing}"
+    sleep 5
+  done
+
+  while IFS= read -r sp; do
+    [[ -z "${sp}" ]] && continue
+    current="$(oc get storageprofile "${sp}" -o jsonpath='{.status.cloneStrategy}' 2>/dev/null || true)"
+    if [[ "${current}" == "copy" ]]; then
+      # status.cloneStrategy can be copy while spec is unset (CDI-inferred).
+      # Persist spec so a later CDI reconcile cannot flip back to snapshot.
+      spec_strategy="$(oc get storageprofile "${sp}" -o jsonpath='{.spec.cloneStrategy}' 2>/dev/null || true)"
+      if [[ "${spec_strategy}" == "copy" ]]; then
+        echo "  StorageProfile '${sp}' already cloneStrategy=copy"
+        continue
+      fi
+      echo "  StorageProfile '${sp}' status is copy but spec.cloneStrategy is '${spec_strategy:-<unset>}'; persisting copy..."
+    fi
+    echo "  Patching StorageProfile '${sp}' cloneStrategy: ${current:-<unset>} -> copy"
+    oc patch storageprofile "${sp}" --type=merge -p '{"spec":{"cloneStrategy":"copy"}}'
+    for i in $(seq 1 30); do
+      current="$(oc get storageprofile "${sp}" -o jsonpath='{.status.cloneStrategy}' 2>/dev/null || true)"
+      if [[ "${current}" == "copy" ]]; then
+        echo "  StorageProfile '${sp}' status.cloneStrategy is now copy"
+        break
+      fi
+      if [[ "${i}" -eq 30 ]]; then
+        echo "ERROR: StorageProfile '${sp}' status.cloneStrategy did not become copy (still '${current:-<empty>}')"
+        exit 1
+      fi
+      sleep 2
+    done
+  done <<< "${IBM_VPC_PROFILES}"
 fi
 
 # --- Diagnose + repair stuck golden images ---

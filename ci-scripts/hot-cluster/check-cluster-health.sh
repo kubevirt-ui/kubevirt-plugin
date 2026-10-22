@@ -201,6 +201,31 @@ check "default StorageClass" bash -c '
   fi
 '
 
+# --- IBM VPC Block clone strategy ---
+# Snapshot smart-clone hangs on unattached golden-image PVCs
+# (snapshots_source_volume_not_attached). install-hco.sh forces copy.
+check "IBM VPC StorageProfiles use cloneStrategy=copy" bash -c '
+  profiles_json=$(oc get storageprofile -o json) || {
+    echo "  Failed to list StorageProfiles"
+    exit 1
+  }
+  bad=$(echo "${profiles_json}" | jq -r "
+    .items[]
+    | select(.status.provisioner == \"vpc.block.csi.ibm.io\")
+    | select(.status.cloneStrategy != \"copy\")
+    | \"\(.metadata.name)=\(.status.cloneStrategy // \"<unset>\")\"
+  ")
+  if [[ -z "${bad}" ]]; then
+    count=$(echo "${profiles_json}" | jq -r "[.items[] | select(.status.provisioner == \"vpc.block.csi.ibm.io\")] | length")
+    echo "  ${count} vpc.block.csi.ibm.io StorageProfile(s) use cloneStrategy=copy (or none present)"
+    exit 0
+  else
+    echo "  StorageProfiles still on snapshot/other strategy (VM clones will hang):"
+    echo "${bad}" | sed "s/^/    /"
+    exit 1
+  fi
+'
+
 # --- Console route ---
 check "console route accessible" bash -c '
   console_url=$(oc get consoles.config.openshift.io cluster -o jsonpath="{.status.consoleURL}" 2>/dev/null)

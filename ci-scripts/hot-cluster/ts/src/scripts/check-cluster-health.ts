@@ -178,6 +178,38 @@ const main = async (): Promise<void> => {
     }),
   );
 
+  // IBM VPC Block must use host-assisted clone (see install-hco.sh).
+  results.push(
+    await check('IBM VPC StorageProfiles use cloneStrategy=copy', async () => {
+      const list = (await client.customObjects.listClusterCustomObject({
+        group: 'cdi.kubevirt.io',
+        plural: 'storageprofiles',
+        version: 'v1beta1',
+      })) as {
+        items?: Array<{
+          metadata?: { name?: string };
+          status?: { cloneStrategy?: string; provisioner?: string };
+        }>;
+      };
+
+      const ibmProfiles = (list.items ?? []).filter(
+        (profile) => profile.status?.provisioner === 'vpc.block.csi.ibm.io',
+      );
+      const bad = ibmProfiles.filter((profile) => profile.status?.cloneStrategy !== 'copy');
+      if (bad.length > 0) {
+        throw new Error(
+          bad
+            .map(
+              (profile) =>
+                `${profile.metadata?.name ?? '<unnamed>'}=${profile.status?.cloneStrategy ?? '<unset>'}`,
+            )
+            .join(', '),
+        );
+      }
+      return `${ibmProfiles.length} vpc.block.csi.ibm.io StorageProfile(s) use cloneStrategy=copy (or none present)`;
+    }),
+  );
+
   // Console route
   results.push(
     await check('console route accessible', async () => {

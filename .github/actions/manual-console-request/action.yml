@@ -1,12 +1,15 @@
 name: Request Manual Console Environment
 description: >
   Create (or update) a trigger ConfigMap for the ci-env-controller to
-  provision the persistent, OAuth-protected manual-console environment,
-  and wait until it is ready. Separate from ci-env-request (used by E2E)
-  so E2E behavior is unaffected -- distinguished by the
-  "ci.kubevirt-plugin/type: manual-console" label instead of
-  "test-environment", which also exempts it from the controller's TTL
-  reaper.
+  provision the persistent manual-console environment, and wait until it
+  is ready. Separate from ci-env-request (used by E2E) so E2E behavior is
+  unaffected -- distinguished by the "ci.kubevirt-plugin/type: manual-console"
+  label instead of "test-environment", which also exempts it from the
+  controller's TTL reaper.
+
+  auth-mode=openshift (default) provisions an HTPasswd OAuth user.
+  auth-mode=disabled skips OAuth (used on VPC ROKS where the guest OAuth CR
+  is immutable) and serves the console with BRIDGE_USER_AUTH=disabled.
 
 inputs:
   plugin-image:
@@ -25,15 +28,23 @@ inputs:
   ci-env-namespace:
     description: Namespace where ci-env-controller runs
     default: ci-env
+  auth-mode:
+    description: >
+      openshift (HTPasswd OAuth login) or disabled (no login wall; console SA).
+      Use disabled on VPC ROKS when the OAuth CR cannot be patched.
+    required: false
+    default: openshift
   htpasswd-user:
-    description: Username to grant OAuth login access
-    required: true
+    description: Username to grant OAuth login access (required when auth-mode=openshift)
+    required: false
+    default: ''
   htpasswd-secret-name:
     description: >
       Name of a short-lived Secret (in ci-env-namespace) with key "password".
       The controller reads it and deletes it immediately after applying the
-      htpasswd user.
-    required: true
+      htpasswd user. Required when auth-mode=openshift.
+    required: false
+    default: ''
   timeout:
     description: Max seconds to wait for environment to become ready
     default: '360'
@@ -45,6 +56,9 @@ outputs:
   bridge-base-address:
     description: In-cluster URL for the console bridge (debugging)
     value: ${{ steps.request.outputs.bridge-base-address }}
+  auth-mode:
+    description: Auth mode that was requested (openshift or disabled)
+    value: ${{ steps.request.outputs.auth-mode }}
 
 runs:
   using: composite
@@ -58,6 +72,7 @@ runs:
         PLUGIN_IMAGE: ${{ inputs.plugin-image }}
         TEST_NS: ${{ inputs.test-namespace }}
         HELM_RELEASE: ${{ inputs.helm-release }}
+        AUTH_MODE: ${{ inputs.auth-mode }}
         HTPASSWD_USER: ${{ inputs.htpasswd-user }}
         HTPASSWD_SECRET_NAME: ${{ inputs.htpasswd-secret-name }}
         TIMEOUT: ${{ inputs.timeout }}
