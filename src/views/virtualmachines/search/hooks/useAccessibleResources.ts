@@ -19,6 +19,8 @@ import { OBJECTS_FETCHING_LIMIT } from '@virtualmachines/utils/constants';
 
 type UseAccessibleResourcesArgs = {
   clusters?: string[];
+  /** When false, skips watches (e.g. ACM consumers reusing Fleet tree inventory). */
+  enabled?: boolean;
   fieldSelector?: string;
   filterOptions?: KubevirtDataPodFilters;
   groupVersionKind: K8sGroupVersionKind;
@@ -37,6 +39,7 @@ type UseAccessibleResourcesReturn<T> = {
 
 export const useAccessibleResources = <T>({
   clusters,
+  enabled = true,
   fieldSelector,
   filterOptions,
   groupVersionKind,
@@ -62,9 +65,9 @@ export const useAccessibleResources = <T>({
     return projectNames.filter((ns) => !isSystemNamespace(ns));
   }, [onlyUserProjects, projectNames, watchNamespaces]);
 
-  const loadPerNamespace = !isACMPage && projectNamesLoaded && !canListAllNamespaces;
+  const loadPerNamespace = enabled && !isACMPage && projectNamesLoaded && !canListAllNamespaces;
 
-  const shouldFetchClusterWide = canListAllNamespaces || isACMPage;
+  const shouldFetchClusterWide = enabled && (canListAllNamespaces || isACMPage);
   const [allResources, allResourcesLoaded, allResourcesLoadError] = useKubevirtWatchResource<T[]>(
     shouldFetchClusterWide
       ? {
@@ -106,13 +109,22 @@ export const useAccessibleResources = <T>({
     return vms || [];
   }, [allResources, allowedResources, loadPerNamespace]);
 
-  const loaded = shouldFetchClusterWide
-    ? allResourcesLoaded || !!allResourcesLoadError
-    : projectNamesLoaded &&
+  let loaded = true;
+  if (enabled && shouldFetchClusterWide) {
+    loaded = allResourcesLoaded || !!allResourcesLoadError;
+  } else if (enabled) {
+    loaded =
+      projectNamesLoaded &&
       (isEmpty(allowedResources) ||
         Object.values(allowedResources).some((resource) => resource.loaded || resource.loadError));
+  }
 
-  const loadError = shouldFetchClusterWide ? allResourcesLoadError : projectNamesError;
+  let loadError: Error | undefined;
+  if (enabled && shouldFetchClusterWide) {
+    loadError = allResourcesLoadError;
+  } else if (enabled) {
+    loadError = projectNamesError;
+  }
 
-  return { loaded, loadError, resources };
+  return { loaded, loadError, resources: enabled ? resources : [] };
 };
