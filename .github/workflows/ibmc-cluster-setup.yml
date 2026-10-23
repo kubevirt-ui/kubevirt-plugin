@@ -629,20 +629,24 @@ jobs:
         working-directory: ci-scripts/hot-cluster/ts
         run: npx tsx src/scripts/send-cluster-credentials-slack.ts
 
-      - name: Delete ROKS cluster on failure
-        if: always() && inputs.infrastructure_type != 'ipi' && job.status == 'failure' && steps.check_cluster.outputs.exists == 'false'
+      # Also on cancelled: a superseding retest (concurrency cancel-in-progress)
+      # often kills us mid-"Wait for ROKS", after Create has already registered
+      # the cluster. Without deleting here, the VPC sweep below refuses to run
+      # (live-cluster guard) and leaves a deploying ROKS + VPC orphaned.
+      - name: Delete ROKS cluster on failure or cancellation
+        if: always() && inputs.infrastructure_type != 'ipi' && (job.status == 'failure' || job.status == 'cancelled') && steps.check_cluster.outputs.exists == 'false'
         working-directory: ci-scripts/hot-cluster/ts
         run: npx tsx src/scripts/delete-roks-cluster.ts
 
       # Backstop sweep: provision-vpc-resources.sh and create-roks-vpc.ts's
       # COS creation can leave a VPC/subnet/gateway/COS instance behind when
       # cluster create fails (e.g. a brand-new COS instance not yet visible
-      # to ROKS) or the job is cancelled before any cluster exists for the
-      # step above to delete. Gated on the same exists == 'false' check as
-      # that step: when the cluster already existed before this job ran,
-      # provisioning was skipped, so sweeping here on an unrelated later
-      # failure/cancellation would risk deleting that pre-existing cluster's
-      # live VPC/subnet instead of leftovers this job created.
+      # to ROKS) or after the delete step above (failure/cancel). Gated on the
+      # same exists == 'false' check as that step: when the cluster already
+      # existed before this job ran, provisioning was skipped, so sweeping
+      # here on an unrelated later failure/cancellation would risk deleting
+      # that pre-existing cluster's live VPC/subnet instead of leftovers
+      # this job created.
       - name: Sweep any remaining VPC resources on failure (vpc)
         if: always() && inputs.infrastructure_type == 'vpc' && (job.status == 'failure' || job.status == 'cancelled') && steps.check_cluster.outputs.exists == 'false'
         env:
