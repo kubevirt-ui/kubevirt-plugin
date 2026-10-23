@@ -74,16 +74,16 @@
       "workflow": ".github/workflows/hold-e2e.yml"
     },
     {
-      "command": "/deploy-manual-console <cluster>",
-      "description": "Deploy a manual console + kubevirt-plugin instance for this PR on the named hot cluster (ROKS VPC by default). If the cluster is not up, it is provisioned with the same OpenShift/CNV versions /retest-e2e would use for this PR's base branch. Credentials are sent to Slack.",
+      "command": "/deploy-manual-console [cluster]",
+      "description": "Deploy a manual console + kubevirt-plugin instance for this PR. Omit cluster to use the same hot cluster E2E would (release-X.Y → kubevirt-plugin-XY, else kubevirt-plugin-ci). If the cluster is not up, it is provisioned with the same OpenShift/CNV versions /retest-e2e would use for this PR's base branch. Credentials are sent to Slack.",
       "trust": "owners",
       "workflow": ".github/workflows/pr-commands.yml"
     },
     {
-      "command": "/cleanup-manual-console",
-      "description": "Tear down this PR's manual console + kubevirt-plugin instance (Helm release, trigger ConfigMap, and OAuth user).",
+      "command": "/cleanup-manual-console [cluster]",
+      "description": "Tear down this PR's manual console + kubevirt-plugin instance (Helm release, trigger ConfigMap, and OAuth user). Omit cluster to use the target recorded by the last deploy; pass an explicit name if none was recorded.",
       "trust": "owners",
-      "workflow": ".github/workflows/cleanup-manual-console-command.yml"
+      "workflow": ".github/workflows/pr-commands.yml"
     },
     {
       "command": "/recheck-jira",

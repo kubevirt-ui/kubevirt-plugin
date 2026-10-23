@@ -96,8 +96,9 @@ export const resolveClusterConfig = (params: {
       return { clusterName, cnvChannel, cnvPinVersion, openshiftVersion, testEngine };
     }
 
-    const clusterName = inputClusterName ?? DEFAULT_CLUSTER_NAME;
-    const openshiftVersion = inputOpenshiftVersion ?? DEFAULT_OPENSHIFT_VERSION;
+    // Treat empty string like unset (workflow_dispatch defaults are '').
+    const clusterName = inputClusterName || DEFAULT_CLUSTER_NAME;
+    const openshiftVersion = inputOpenshiftVersion || DEFAULT_OPENSHIFT_VERSION;
     console.error(
       `Using default/workflow_dispatch cluster config: '${clusterName}' (${openshiftVersion}, CNV channel '${DEFAULT_CNV_CHANNEL}')`,
     );

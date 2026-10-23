@@ -1,10 +1,16 @@
 name: Deploy Manual Console
-run-name: "${{ inputs.action == 'teardown' && 'Teardown' || 'Deploy' }} Manual Console [${{ inputs.cluster_name }}] @ ${{ inputs.pr_number && format('PR#{0}', inputs.pr_number) || inputs.branch }}"
+run-name: "${{ inputs.action == 'teardown' && 'Teardown' || 'Deploy' }} Manual Console [${{ inputs.cluster_name || inputs.branch || 'auto' }}] @ ${{ inputs.pr_number && format('PR#{0}', inputs.pr_number) || inputs.branch }}"
 
 # Deploys a standalone, OAuth-protected console + kubevirt-plugin stack to an
 # existing hot cluster for manual UI testing. Entirely separate from the E2E
 # path: it builds its own in-cluster plugin image, uses its own trigger
 # ConfigMap/action, and does not touch the CNV-managed console, HCO, or SSP.
+#
+# cluster_name is optional: when empty, resolve-cluster-config picks the same
+# hot cluster E2E would use for inputs.branch (release-X.Y →
+# kubevirt-plugin-XY, else kubevirt-plugin-ci). Prefer leaving it empty so
+# deploys land on the shared release/CI cluster instead of provisioning a
+# new one under a typo'd name.
 #
 # cluster-check below provisions the target cluster via "IBM Cloud Hot
 # Cluster Setup" (ibmc-cluster-setup.yml) if it isn't already up -- without
@@ -55,9 +61,13 @@ on:
         default: ''
         type: string
       cluster_name:
-        description: ARC runner label / hot cluster name (provisioned automatically if not already up)
-        required: true
-        default: kubevirt-plugin-ci
+        description: >-
+          ARC runner label / hot cluster name. Leave empty to use the same
+          cluster E2E would for "branch" (release-X.Y → kubevirt-plugin-XY,
+          else kubevirt-plugin-ci). Provisioned automatically only if that
+          cluster is not already up.
+        required: false
+        default: ''
         type: string
       infrastructure_type:
         description: Infrastructure type of the target cluster (used to provision if not already up)
@@ -98,11 +108,13 @@ permissions:
   pull-requests: read
 
 # Persistent environment: never cancel an in-flight run, since that could
-# leave the manual console mid-operation. Scoped by pr_number/branch (not
-# just cluster_name) -- each PR gets its own instance now, so distinct PRs
-# no longer queue behind each other.
+# leave the manual console mid-operation. Keyed by instance identity
+# (pr_number or branch) only -- not cluster_name -- so empty-default and
+# explicit-cluster runs for the same instance share one group (resolved
+# cluster isn't available at concurrency-eval time). Same key prefix as
+# deploy-plugin.yml so redeploys serialize with deploys/teardowns.
 concurrency:
-  group: deploy-manual-console-${{ inputs.cluster_name }}-${{ inputs.pr_number || inputs.branch }}
+  group: deploy-manual-console-${{ inputs.pr_number || inputs.branch }}
   cancel-in-progress: false
 
 env:
@@ -163,16 +175,19 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           triggered-by: ${{ inputs.triggered_by }}
 
-  # Same resolver hot-cluster-e2e.yml uses for /retest-e2e: derive
-  # openshift_version / cnv_channel / cnv_pin_version from inputs.branch
-  # (PR base ref when dispatched by /deploy-manual-console). Keeps the
-  # caller-supplied cluster_name — only the provision versions are resolved.
+  # Deploy: same resolver as hot-cluster-e2e (/retest-e2e). When pr_number
+  # is set, use that PR's base ref (not inputs.branch, which defaults to
+  # main on UI dispatch). Explicit inputs.cluster_name wins; otherwise
+  # release-X.Y → kubevirt-plugin-XY and main → kubevirt-plugin-ci.
+  #
+  # Teardown: never derive cluster_name from the PR base. Use the explicit
+  # input, or the newest deploy record on the PR; fail if neither exists.
   resolve-config:
     name: Resolve Cluster Config
-    if: inputs.action != 'teardown'
     runs-on: ubuntu-latest
     timeout-minutes: 2
     outputs:
+      cluster_name: ${{ steps.teardown-cluster.outputs.cluster_name || inputs.cluster_name || steps.resolve.outputs.cluster-name }}
       openshift_version: ${{ steps.resolve.outputs.openshift-version }}
       cnv_channel: ${{ steps.resolve.outputs.cnv-channel }}
       cnv_pin_version: ${{ steps.resolve.outputs.cnv-pin-version }}
@@ -183,11 +198,50 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Resolve OpenShift / CNV versions for this branch
+      # Teardown path: scripts only (do not run resolve-cluster-config — that
+      # would re-derive from the PR base and miss explicit deploy overrides).
+      - name: Setup scripts (teardown)
+        if: inputs.action == 'teardown'
+        uses: ./.github/actions/setup-gh-scripts
+        with:
+          ref: ${{ github.ref }}
+
+      - name: Resolve cluster for teardown (recorded deploy target)
+        id: teardown-cluster
+        if: inputs.action == 'teardown'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CLUSTER_NAME: ${{ inputs.cluster_name }}
+          PR_NUMBER: ${{ inputs.pr_number }}
+        working-directory: .github/scripts
+        run: npx tsx src/commands/resolve-teardown-cluster-name.ts
+
+      # Deploy path: resolve from PR base / inputs (needs repo checkout's
+      # resolve-cluster-config.sh — run before any sparse setup-gh-scripts).
+      - name: Resolve base ref for cluster config
+        id: base-ref
+        if: inputs.action != 'teardown'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ inputs.pr_number }}
+          BRANCH: ${{ inputs.branch }}
+        run: |
+          if [[ -n "${PR_NUMBER}" ]]; then
+            base_ref="$(gh api "repos/${GITHUB_REPOSITORY}/pulls/${PR_NUMBER}" --jq .base.ref)"
+            echo "Using PR #${PR_NUMBER} base ref '${base_ref}' for cluster resolution"
+            echo "base-ref=${base_ref}" >> "$GITHUB_OUTPUT"
+          else
+            echo "base-ref=${BRANCH}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Resolve cluster / OpenShift / CNV for this branch
         id: resolve
+        if: inputs.action != 'teardown'
         uses: ./.github/actions/hot-cluster/resolve-cluster-config
         with:
-          base-ref: ${{ inputs.branch }}
+          base-ref: ${{ steps.base-ref.outputs.base-ref }}
+          # Only used when inputs.cluster_name is empty (non-release defaults);
+          # release branches always resolve to kubevirt-plugin-XY from base-ref.
           cluster-name: ${{ inputs.cluster_name }}
           openshift-version: ${{ inputs.openshift_version }}
           cnv-channel: ${{ inputs.cnv_channel }}
@@ -209,7 +263,7 @@ jobs:
       inputs.action != 'teardown'
     uses: ./.github/workflows/hot-cluster-check.yml
     with:
-      cluster_name: ${{ inputs.cluster_name }}
+      cluster_name: ${{ needs.resolve-config.outputs.cluster_name }}
       infrastructure_type: ${{ inputs.infrastructure_type }}
       openshift_version: ${{ needs.resolve-config.outputs.openshift_version }}
       cnv_channel: ${{ needs.resolve-config.outputs.cnv_channel }}
@@ -227,14 +281,18 @@ jobs:
   # case).
   deploy:
     name: Deploy Manual Console
-    needs: [instance-key, resolve-pr, cluster-check]
+    needs: [instance-key, resolve-pr, resolve-config, cluster-check]
     if: |
       always() && inputs.action != 'teardown' &&
       needs.instance-key.result == 'success' &&
       needs.resolve-pr.result != 'failure' &&
       needs.cluster-check.outputs.cluster_ready == 'true'
-    runs-on: ${{ inputs.cluster_name }}
+    runs-on: ${{ needs.resolve-config.outputs.cluster_name }}
     timeout-minutes: 30
+    # Provisioning step outcome (not the whole job) — Slack/summary/cleanup
+    # failures must not block record-target-cluster.
+    outputs:
+      provisioned: ${{ steps.deploy.outcome }}
     steps:
       # Two checkouts, deliberately kept separate: (1) this repo's own
       # dispatch ref into $GITHUB_WORKSPACE, so CI scripts here always
@@ -274,7 +332,7 @@ jobs:
           PR_NUMBER: ${{ inputs.pr_number }}
           HEAD_REPO: ${{ needs.resolve-pr.outputs.head_repo }}
           HEAD_SHA: ${{ needs.resolve-pr.outputs.head_sha }}
-          CLUSTER_NAME: ${{ inputs.cluster_name }}
+          CLUSTER_NAME: ${{ needs.resolve-config.outputs.cluster_name }}
           INSTANCE_KEY: ${{ needs.instance-key.outputs.key }}
           INFRASTRUCTURE_TYPE: ${{ inputs.infrastructure_type }}
           ACTOR: ${{ github.actor }}
@@ -367,18 +425,61 @@ jobs:
         working-directory: ci-scripts/hot-cluster/ts
         run: npx tsx src/scripts/cleanup-credentials-secret.ts
 
+  # Persist the resolved target on the PR so cleanup/teardown can recover it
+  # (run-name brackets show inputs.branch when cluster_name was empty). Runs
+  # only after the provision step succeeds and resolve-pr's OWNERS trust check
+  # passed — never record for a failed provision or an untrusted triggerer.
+  # Uses steps.deploy.outcome (via deploy.outputs.provisioned), not the whole
+  # deploy job result, so Slack/summary/cleanup failures still allow recording.
+  record-target-cluster:
+    name: Record Target Cluster
+    needs: [resolve-pr, resolve-config, deploy]
+    if: |
+      always() &&
+      inputs.action != 'teardown' &&
+      inputs.pr_number != '' &&
+      needs.resolve-pr.result == 'success' &&
+      needs.resolve-config.result == 'success' &&
+      needs.deploy.outputs.provisioned == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Setup scripts
+        uses: ./.github/actions/setup-gh-scripts
+        with:
+          ref: ${{ github.ref }}
+
+      - name: Record target cluster on PR
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CLUSTER_NAME: ${{ needs.resolve-config.outputs.cluster_name }}
+          PR_NUMBER: ${{ inputs.pr_number }}
+        working-directory: .github/scripts
+        run: npx tsx src/commands/record-manual-console-cluster.ts
+
   # Triggered by /cleanup-manual-console. Runs on the target cluster's own
   # runner (same as deploy) and just flips the trigger ConfigMap's
   # desired-state to "absent" -- ci-env-controller's existing reconciliation
   # loop (also used by the TTL reaper) does the actual cleanup from there.
   teardown:
     name: Teardown Manual Console
-    needs: instance-key
-    if: inputs.action == 'teardown' && needs.instance-key.result == 'success'
-    runs-on: ${{ inputs.cluster_name }}
+    needs: [instance-key, resolve-config]
+    if: |
+      inputs.action == 'teardown' &&
+      needs.instance-key.result == 'success' &&
+      needs.resolve-config.result == 'success'
+    runs-on: ${{ needs.resolve-config.outputs.cluster_name }}
     timeout-minutes: 10
     env:
-      CLUSTER_NAME: ${{ inputs.cluster_name }}
+      CLUSTER_NAME: ${{ needs.resolve-config.outputs.cluster_name }}
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -394,7 +495,7 @@ jobs:
         env:
           CM_NAME: manual-console-${{ needs.instance-key.outputs.key }}
           CI_ENV_NS: ${{ env.CI_ENV_NS }}
-          CLUSTER_NAME: ${{ inputs.cluster_name }}
+          CLUSTER_NAME: ${{ needs.resolve-config.outputs.cluster_name }}
         working-directory: ci-scripts/hot-cluster/ts
         run: npx tsx src/scripts/mark-manual-console-teardown.ts
 
@@ -404,7 +505,7 @@ jobs:
           FOUND: ${{ steps.teardown.outputs.found }}
           INSTANCE_KEY: ${{ needs.instance-key.outputs.key }}
           CI_ENV_NS: ${{ env.CI_ENV_NS }}
-          CLUSTER_NAME: ${{ inputs.cluster_name }}
+          CLUSTER_NAME: ${{ needs.resolve-config.outputs.cluster_name }}
           ACTOR: ${{ github.actor }}
         working-directory: ci-scripts/hot-cluster/ts
         run: npx tsx src/scripts/write-teardown-summary.ts
