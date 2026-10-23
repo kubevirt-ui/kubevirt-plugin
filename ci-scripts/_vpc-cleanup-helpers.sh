@@ -24,21 +24,81 @@ run_or_dry() {
 RETRY_BUDGET_SECONDS=600
 RETRY_INTERVAL_SECONDS=30
 
+# Release orphaned IKS worker reserved IPs on CLUSTER_NAME-prefixed subnets.
+# When worker VSIs are already gone, IBM can leave user-owned reserved IPs
+# that block subnet-delete forever (subnet_in_use_iks_worker_node_exists).
+# Provider ibm-* addresses (network/gateway/dns/broadcast) must not be removed.
+#
+# Worker match (keep narrow — do not release every user-owned RIP):
+# - Prefer target.resource_type == containers_kubernetes_worker when present.
+# - IBM known issue: IKS worker-bound RIPs often omit `target` entirely; those
+#   still show Target type containers_kubernetes_worker in the CLI table.
+#   Fall back on the observed worker shape: auto_delete=true, no target, and
+#   name not starting with iks- (iks-* are IKS endpoint-gateway RIPs on the
+#   same subnet). Unbound user reservations default to auto_delete=false, so
+#   they stay excluded.
+release_iks_worker_reserved_ips() {
+  if [[ "${DRY_RUN}" == "true" ]]; then
+    echo "  [dry-run] would release user-owned IKS worker reserved IPs on subnets matching '${CLUSTER_NAME}'"
+    return 0
+  fi
+
+  local subnet_ids
+  subnet_ids=$(ibmcloud is subnets --output json 2>/dev/null \
+    | jq -r --arg cn "${CLUSTER_NAME}" \
+      'if type == "array" then .[] | select(.name | startswith($cn)) | .id else empty end' 2>/dev/null || true)
+  if [[ -z "${subnet_ids}" ]]; then
+    return 0
+  fi
+
+  while read -r subnet_id; do
+    [[ -z "${subnet_id}" ]] && continue
+    # Callers use set -euo pipefail; a jq/filter failure must not abort the
+    # outer subnet loop -- continue with the next subnet instead.
+    (ibmcloud is subnet-reserved-ips "${subnet_id}" --output json 2>/dev/null || echo '[]') \
+      | jq -r '
+          if type != "array" then empty
+          else
+            .[]
+            | select(.owner == "user")
+            | select((.name // "") | startswith("ibm-") | not)
+            | select(
+                (.target.resource_type // "") == "containers_kubernetes_worker"
+                or (
+                  .target == null
+                  and .auto_delete == true
+                  and ((.name // "") | startswith("iks-") | not)
+                )
+              )
+            | "\(.id)\t\(.address // "")\t\(.name // "")"
+          end' \
+      | while IFS=$'\t' read -r rip_id rip_addr rip_name; do
+          [[ -z "${rip_id}" ]] && continue
+          echo "  Releasing IKS worker reserved IP ${rip_id} (${rip_addr} ${rip_name}) on subnet ${subnet_id}"
+          ibmcloud is subnet-reserved-ip-delete "${subnet_id}" "${rip_id}" -f 2>&1 || true
+        done || true
+  done <<<"${subnet_ids}"
+}
+
 # Generic polling deletion for IBM Cloud VPC resources that may be blocked
 # by a dependent resource still draining (e.g. subnets blocked by IKS
 # worker nodes, VPCs blocked by lingering subnets).
 #
 # Usage:
-#   poll_delete_resource <list-cmd> <delete-cmd> <in-use-pattern> <label>
+#   poll_delete_resource <list-cmd> <delete-cmd> <in-use-pattern> <label> [on-blocked-cmd]
+#
+# Optional 5th arg: command/function to run when a delete is blocked by the
+# in-use pattern (e.g. release_iks_worker_reserved_ips before the next retry).
 #
 # Example:
 #   poll_delete_resource "ibmcloud is subnets" "ibmcloud is subnet-delete" \
-#     "subnet_in_use_iks_worker_node_exists" "subnet"
+#     "subnet_in_use_iks_worker_node_exists" "subnet" release_iks_worker_reserved_ips
 poll_delete_resource() {
   local list_cmd="$1"
   local delete_cmd="$2"
   local in_use_pattern="$3"
   local label="$4"
+  local on_blocked_cmd="${5:-}"
 
   if [[ "${DRY_RUN}" == "true" ]]; then
     (${list_cmd} --output json 2>/dev/null || echo '[]') \
@@ -74,6 +134,10 @@ poll_delete_resource() {
 
       if [[ "${blocked}" == "true" ]]; then
         echo "  ${label^}(s) still in use, retrying in ${RETRY_INTERVAL_SECONDS}s..."
+        if [[ -n "${on_blocked_cmd}" ]]; then
+          # shellcheck disable=SC2086 # intentional: function name / simple cmd
+          ${on_blocked_cmd} || true
+        fi
       fi
     else
       echo "  WARNING: '${list_cmd}' failed to list resources, will retry."

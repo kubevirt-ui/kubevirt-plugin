@@ -208,18 +208,21 @@ echo "6. Detaching public gateways from subnets..."
   | while read -r id; do echo "  Detaching gateway from subnet ${id}"; run_or_dry ibmcloud is subnet-public-gateway-detach "${id}" -f; done
 [[ "${DRY_RUN}" != "true" ]] && sleep 10
 
-echo "7. Deleting stale subnets (first pass)..."
+echo "7. Releasing orphaned IKS worker reserved IPs (unblocks subnet_in_use_iks_worker_node_exists)..."
+release_iks_worker_reserved_ips
+
+echo "8. Deleting stale subnets (first pass)..."
 (ibmcloud is subnets --output json 2>/dev/null || echo '[]') \
   | jq -r --arg cn "${CLUSTER_NAME}" 'if type == "array" then .[] | select(.name | startswith($cn)) | .id else empty end' \
   | while read -r id; do echo "  Deleting subnet ${id}"; run_or_dry ibmcloud is subnet-delete "${id}" -f; done
 [[ "${DRY_RUN}" != "true" ]] && sleep 30
 
-echo "8. Deleting stale public gateways..."
+echo "9. Deleting stale public gateways..."
 (ibmcloud is public-gateways --output json 2>/dev/null || echo '[]') \
   | jq -r --arg cn "${CLUSTER_NAME}" 'if type == "array" then .[] | select(.name | startswith($cn)) | .id else empty end' \
   | while read -r id; do echo "  Deleting gateway ${id}"; run_or_dry ibmcloud is public-gateway-delete "${id}" -f; done
 
-echo "9. Deleting stale floating IPs..."
+echo "10. Deleting stale floating IPs..."
 (ibmcloud is ips --output json 2>/dev/null || echo '[]') \
   | jq -r --arg cn "${CLUSTER_NAME}" 'if type == "array" then .[] | select(.name | startswith($cn)) | .id else empty end' \
   | while read -r id; do echo "  Releasing IP ${id}"; run_or_dry ibmcloud is floating-ip-release "${id}" -f; done
@@ -229,7 +232,7 @@ echo "9. Deleting stale floating IPs..."
 # the IP becomes unattached (target == null) but is not auto-released.
 # This sweep is account-wide, so it requires explicit opt-in.
 if [[ "${RELEASE_UNATTACHED_IPS}" == "true" ]]; then
-  echo "9b. Releasing orphan floating IPs (unattached, any name)..."
+  echo "10b. Releasing orphan floating IPs (unattached, any name)..."
   (ibmcloud is ips --output json 2>/dev/null || echo '[]') \
     | jq -r 'if type == "array" then .[] | select(.target == null) | .id else empty end' \
     | while read -r id; do echo "  Releasing orphan IP ${id}"; run_or_dry ibmcloud is floating-ip-release "${id}" -f; done
@@ -243,7 +246,7 @@ collect_default_sg_ids
 
 # Endpoint gateways (iks-*) hold references to security groups and must be
 # deleted before SGs can be removed.
-echo "10. Deleting VPC endpoint gateways..."
+echo "11. Deleting VPC endpoint gateways..."
 (ibmcloud is endpoint-gateways --output json 2>/dev/null || echo '[]') \
   | jq -r --arg cn "${CLUSTER_NAME}" --argjson vids "${STALE_VPC_FILTER}" \
     'if type == "array" then .[] | select((.name | startswith($cn)) or (.vpc.id as $vid | $vids | any(. == $vid))) | .id else empty end' \
@@ -254,7 +257,7 @@ echo "10. Deleting VPC endpoint gateways..."
 # cannot be deleted independently -- they are removed with the VPC.
 SG_MATCH_FILTER='if type == "array" then .[] | select(((.name | startswith($cn)) or (.vpc.id as $vid | $vids | any(. == $vid))) and (.id as $sid | $dsgs | any(. == $sid) | not)) | .id else empty end'
 
-echo "11. Stripping security group rules (breaks circular references)..."
+echo "12. Stripping security group rules (breaks circular references)..."
 if [[ "${DRY_RUN}" == "true" ]]; then
   echo "  [dry-run] skipping rule strip"
 else
@@ -269,7 +272,7 @@ else
       done
 fi
 
-echo "12. Deleting stale security groups..."
+echo "13. Deleting stale security groups..."
 SG_COUNT_FILTER='if type == "array" then [.[] | select(((.name | startswith($cn)) or (.vpc.id as $vid | $vids | any(. == $vid))) and (.id as $sid | $dsgs | any(. == $sid) | not))] | length else 0 end'
 if [[ "${DRY_RUN}" == "true" ]]; then
   (ibmcloud is security-groups --output json 2>/dev/null || echo '[]') \
@@ -290,35 +293,35 @@ else
   done
 fi
 
-echo "13. Retrying stale subnets (polling up to ${RETRY_BUDGET_SECONDS}s for IKS worker nodes to drain)..."
+echo "14. Retrying stale subnets (polling up to ${RETRY_BUDGET_SECONDS}s; re-release IKS reserved IPs when blocked)..."
 SUBNETS_CLEARED="true"
-if ! poll_delete_resource "ibmcloud is subnets" "ibmcloud is subnet-delete" "subnet_in_use_iks_worker_node_exists" "subnet"; then
+if ! poll_delete_resource "ibmcloud is subnets" "ibmcloud is subnet-delete" "subnet_in_use_iks_worker_node_exists" "subnet" release_iks_worker_reserved_ips; then
   SUBNETS_CLEARED="false"
   echo "  WARNING: subnet(s) matching '${CLUSTER_NAME}' still exist after ${RETRY_BUDGET_SECONDS}s of retries."
 fi
 
 VPCS_CLEARED="true"
 if [[ "${CLEAN_VPC}" == "true" ]]; then
-  echo "14. Deleting stale VPCs (polling up to ${RETRY_BUDGET_SECONDS}s while a lingering subnet is removed)..."
+  echo "15. Deleting stale VPCs (polling up to ${RETRY_BUDGET_SECONDS}s while a lingering subnet is removed)..."
   if ! poll_delete_resource "ibmcloud is vpcs" "ibmcloud is vpc-delete" "vpc_in_use" "VPC"; then
     VPCS_CLEARED="false"
     echo "  WARNING: VPC(s) matching '${CLUSTER_NAME}' still exist after ${RETRY_BUDGET_SECONDS}s of retries."
   fi
 else
-  echo "14. Skipping VPC deletion (CLEAN_VPC=false)."
+  echo "15. Skipping VPC deletion (CLEAN_VPC=false)."
 fi
 
-echo "15. Deleting orphaned custom images (RHCOS)..."
+echo "16. Deleting orphaned custom images (RHCOS)..."
 (ibmcloud is images --visibility private --output json 2>/dev/null || echo '[]') \
   | jq -r --arg cn "${CLUSTER_NAME}" 'if type == "array" then .[] | select(.name | startswith($cn)) | .id else empty end' \
   | while read -r id; do echo "  Deleting image ${id}"; run_or_dry ibmcloud is image-delete "${id}" -f; done
 
-echo "16. Deleting orphaned block storage volumes (PVC data volumes from deleted clusters)..."
+echo "17. Deleting orphaned block storage volumes (PVC data volumes from deleted clusters)..."
 (ibmcloud is volumes --output json 2>/dev/null || echo '[]') \
   | jq -r 'if type == "array" then .[] | select((.name | startswith("pvc-")) and (.volume_attachments | length == 0)) | .id else empty end' \
   | while read -r id; do echo "  Deleting volume ${id}"; run_or_dry ibmcloud is volume-delete "${id}" -f; done
 
-echo "17. Deleting orphaned COS instances..."
+echo "18. Deleting orphaned COS instances..."
 (ibmcloud resource service-instances --service-name cloud-object-storage --output json 2>/dev/null || echo '[]') \
   | jq -r --arg cn "${CLUSTER_NAME}" 'if type == "array" then .[] | select(.name | startswith($cn)) | .id else empty end' \
   | while read -r id; do echo "  Deleting COS ${id}"; run_or_dry ibmcloud resource service-instance-delete "${id}" -f --recursive; done
