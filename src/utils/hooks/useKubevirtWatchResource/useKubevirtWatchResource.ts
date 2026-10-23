@@ -19,6 +19,7 @@ export type Result<R extends K8sResourceCommon | K8sResourceCommon[]> = [
   resource: R,
   resourceLoaded: boolean,
   resourceLoadError: Error,
+  refresh?: () => void,
 ];
 
 const useKubevirtWatchResource = <T extends K8sResourceCommon | K8sResourceCommon[]>(
