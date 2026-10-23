@@ -31,13 +31,21 @@ export default class BaseComponent {
     '[role="dialog"] button.pf-m-danger:has-text("Delete")',
   );
 
-  constructor(public readonly page: Page) {}
+  constructor(
+    public readonly page: Page,
+    protected readonly root?: Locator,
+  ) {}
+
+  /** Mounted story root for component gallery tests; full page for scenario E2E. */
+  protected get ui(): Page | Locator {
+    return this.root ?? this.page;
+  }
 
   private get _loadingLocator(): Locator {
-    return this.page
+    return this.ui
       .locator(this.loadingIndicators.join(', '))
-      .or(this.page.getByTestId('loading'))
-      .or(this.page.getByTestId('loading-spinner'));
+      .or(this.ui.getByTestId('loading'))
+      .or(this.ui.getByTestId('loading-spinner'));
   }
 
   private async performRobustClick(
@@ -234,7 +242,7 @@ export default class BaseComponent {
    * Returns a dual locator matching either attribute for cross-environment compatibility.
    */
   protected consoleTestId(id: string) {
-    return this.page.getByTestId(id).or(this.page.locator(`[data-test-id="${id}"]`));
+    return this.ui.getByTestId(id).or(this.ui.locator(`[data-test-id="${id}"]`));
   }
 
   /**
@@ -269,7 +277,7 @@ export default class BaseComponent {
       hasText?: RegExp | string;
     },
   ) {
-    return this.page.locator(selectorText, options);
+    return this.ui.locator(selectorText, options);
   }
 
   async navigateToTab(
@@ -284,6 +292,34 @@ export default class BaseComponent {
 
     await this.waitForLoadingComplete(Math.min(timeout / 2, TestTimeouts.UI_DELAY_MEDIUM));
     await this.page.waitForTimeout(TestTimeouts.UI_DELAY_MEDIUM);
+  }
+
+  /** Gallery component scenes: avoid long E2E retry loops when scoped to a mount root. */
+  protected async interactClick(locator: Locator): Promise<void> {
+    if (this.root) {
+      await locator.evaluate((element) => {
+        (element as HTMLElement).click();
+      });
+      return;
+    }
+    await this.robustClick(locator);
+  }
+
+  protected async interactFill(locator: Locator, value: string): Promise<void> {
+    if (this.root) {
+      await locator.evaluate((element, text) => {
+        const input = element as HTMLInputElement;
+        const valueSetter = Object.getOwnPropertyDescriptor(
+          window.HTMLInputElement.prototype,
+          'value',
+        )?.set;
+        valueSetter?.call(input, text);
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+        input.dispatchEvent(new Event('change', { bubbles: true }));
+      }, value);
+      return;
+    }
+    await locator.fill(value);
   }
 
   protected async robustClick(
@@ -390,7 +426,7 @@ export default class BaseComponent {
   }
 
   protected testId(id: string) {
-    return this.page.getByTestId(id);
+    return this.ui.getByTestId(id);
   }
 
   async verifyPageLoaded(

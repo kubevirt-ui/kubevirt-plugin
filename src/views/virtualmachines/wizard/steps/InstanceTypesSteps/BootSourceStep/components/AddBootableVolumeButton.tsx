@@ -9,6 +9,7 @@ import { Button, ButtonVariant } from '@patternfly/react-core';
 import { useSignals } from '@preact/signals-react/runtime';
 
 import useAddBootableVolume from '../hooks/useAddBootableVolume';
+import { BOOT_SOURCE_ADD_VOLUME_TEST_ID } from '../utils/consts';
 
 type AddBootableVolumeButtonProps = {
   loadError: Error;
@@ -36,6 +37,7 @@ const AddBootableVolumeButton: FC<AddBootableVolumeButtonProps> = ({ loadError }
 
   return (
     <Button
+      data-test={BOOT_SOURCE_ADD_VOLUME_TEST_ID}
       id="tour-step-add-volume"
       isDisabled={!isEnabled}
       onClick={openAddBootableVolumeModal}
