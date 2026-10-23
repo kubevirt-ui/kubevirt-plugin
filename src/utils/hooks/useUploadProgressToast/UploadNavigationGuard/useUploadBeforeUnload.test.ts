@@ -104,9 +104,11 @@ describe('useUploadBeforeUnload', () => {
           ...state.uploads,
           data: {
             [UPLOAD_KEY]: {
-              fileName: FILE_IMAGE_ISO,
-              progress: 100,
-              status: UPLOAD_PROGRESS_STATUS.SUCCESS,
+              progressToastState: {
+                fileName: FILE_IMAGE_ISO,
+                progress: 100,
+                status: UPLOAD_PROGRESS_STATUS.SUCCESS,
+              },
             },
           },
         },

@@ -4,7 +4,7 @@ import {
   getVmStorageUrlForIdentity,
   omitLinksByUrl,
 } from '../completion/uploadLinks';
-import { type UploadEntry } from '../uploads/types/types';
+import { type UploadEntry, type UploadsStoreStateData } from '../uploads/types/types';
 
 export const getVmStorageUrls = (cluster: string, namespace: string, vmName: string): Set<string> =>
   new Set([
@@ -63,15 +63,15 @@ export const omitUploadLinksByUrl = (upload: UploadEntry, urlsToOmit: Set<string
 };
 
 export const updateUploads = (
-  uploads: Record<string, UploadEntry>,
+  uploadsData: UploadsStoreStateData,
   getUrlsToOmit: (key: string, upload: UploadEntry) => Set<string>,
-  keysToProcess = Object.keys(uploads),
-): Record<string, UploadEntry> => {
+  keysToProcess = Object.keys(uploadsData),
+): UploadsStoreStateData => {
   let changed = false;
-  const nextUploads = { ...uploads };
+  const nextUploads = { ...uploadsData };
 
   for (const key of keysToProcess) {
-    const current = nextUploads[key];
+    const current = nextUploads[key].progressToastState;
     if (!current) {
       continue;
     }
@@ -82,10 +82,10 @@ export const updateUploads = (
     }
 
     changed = true;
-    nextUploads[key] = nextUpload;
+    nextUploads[key].progressToastState = nextUpload;
   }
 
-  return changed ? nextUploads : uploads;
+  return changed ? nextUploads : uploadsData;
 };
 
 export const getBootableVolumeUrlsToOmit = (

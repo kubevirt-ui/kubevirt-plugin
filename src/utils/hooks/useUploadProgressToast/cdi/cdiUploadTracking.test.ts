@@ -235,7 +235,9 @@ describe('cdiUploadTracking', () => {
       });
 
       expect(useUploadProgressStore.getState().uploads.data).toEqual({
-        [UPLOAD_KEY]: expect.objectContaining({ fileName: FILE_IMAGE_ISO }),
+        [UPLOAD_KEY]: {
+          progressToastState: expect.objectContaining({ fileName: FILE_IMAGE_ISO }),
+        },
       });
     });
   });

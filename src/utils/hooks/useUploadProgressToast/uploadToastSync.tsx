@@ -6,7 +6,7 @@ import UploadProgressToastContent from './components/UploadProgressToastContent'
 import { UPLOAD_PROGRESS_STATUS } from './constants';
 import { getUploadTitle, isTerminalUploadStatus } from './toast/uploadTitles';
 import { useUploadProgressStore } from './uploadProgressStore';
-import { type UploadEntry } from './uploads/types/types';
+import { type UploadEntry, type UploadsStoreStateData } from './uploads/types/types';
 
 type ToastActions = ReturnType<typeof useKubevirtToast>;
 
@@ -103,17 +103,22 @@ export const replaceWithTerminalUploadToast = (
 };
 
 export const syncUploadToasts = (
-  uploads: Record<string, UploadEntry>,
+  uploadsData: UploadsStoreStateData,
   context: UploadToastContext,
   processedToasts: Set<string>,
 ): void => {
-  for (const [uploadKey, upload] of Object.entries(uploads)) {
-    if (upload.status === UPLOAD_PROGRESS_STATUS.UPLOADING) {
-      showInProgressUploadToast(uploadKey, upload, context, processedToasts);
+  for (const [uploadKey, uploadDataValue] of Object.entries(uploadsData)) {
+    if (uploadDataValue.progressToastState.status === UPLOAD_PROGRESS_STATUS.UPLOADING) {
+      showInProgressUploadToast(
+        uploadKey,
+        uploadDataValue.progressToastState,
+        context,
+        processedToasts,
+      );
       continue;
     }
 
     processedToasts.delete(uploadKey);
-    replaceWithTerminalUploadToast(uploadKey, upload, context);
+    replaceWithTerminalUploadToast(uploadKey, uploadDataValue.progressToastState, context);
   }
 };

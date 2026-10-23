@@ -58,6 +58,7 @@ export type RegisterCdiUploadParams = {
   uploadKey: string;
 };
 
+// TODO: change to ProgressToastState
 export type UploadEntry = {
   abortTooltip?: string;
   blockNavigation?: boolean;
@@ -79,19 +80,22 @@ export type UploadEntry = {
   terminalToastShown?: boolean;
   toastId?: string;
 };
-
-export type UploadsStoreStateActions = {
+export type UploadProgressActions = {
   cancelTrackedUpload: (uploadKey: string) => Promise<void>;
-  cancelUploadsForVm: (cluster: string, namespace: string, vmName: string) => Promise<void>;
-  cancelWizardPendingUploads: (uploadKeys: string[]) => Promise<void>;
   completeUpload: (uploadKey: string, options?: CompleteUploadOptions) => void;
   failUpload: (uploadKey: string, errorMessage: string, expectedGeneration?: number) => void;
   getUpload: (uploadKey: string) => undefined | UploadEntry;
   markUploadCanceled: (uploadKey: string, expectedGeneration?: number) => void;
   removeUpload: (uploadKey: string) => void;
   startUpload: (uploadKey: string, entry: StartUploadEntry) => number;
-  stripBootableVolumeLinks: (namespace: string, name: string, cluster?: string) => void;
   stripDataVolumeLinks: (uploadKey: string) => void;
+  tryMarkTerminalToastShown: (uploadKey: string) => boolean;
+  trySetToastId: (uploadKey: string, toastId: string) => boolean;
+  updateProgress: (uploadKey: string, progress: number) => void;
+};
+
+type StripBootableVolumeLinksActions = {
+  stripBootableVolumeLinks: (namespace: string, name: string, cluster?: string) => void;
   stripDataVolumeLinksForResource: (dvName: string, dvNamespace: string, cluster?: string) => void;
   stripVmStorageLinksForVm: (
     cluster: string,
@@ -99,13 +103,18 @@ export type UploadsStoreStateActions = {
     vmName: string,
     uploadKeys?: string[],
   ) => void;
-  tryMarkTerminalToastShown: (uploadKey: string) => boolean;
-  trySetToastId: (uploadKey: string, toastId: string) => boolean;
-  updateProgress: (uploadKey: string, progress: number) => void;
 };
+
+export type UploadsStoreStateActions = UploadProgressActions &
+  StripBootableVolumeLinksActions & {
+    cancelUploadsForVm: (cluster: string, namespace: string, vmName: string) => Promise<void>;
+    cancelWizardPendingUploads: (uploadKeys: string[]) => Promise<void>;
+  };
+
+export type UploadsStoreStateData = Record<string, { progressToastState: UploadEntry }>;
 
 export type UploadsStoreState = {
   actions: UploadsStoreStateActions;
-  data: Record<string, UploadEntry>;
+  data: UploadsStoreStateData;
   generationsByKey: Record<string, number>;
 };
