@@ -60,14 +60,13 @@ const SSHOptionUseExisting: FC<SSHOptionUseExistingProps> = ({
   );
   const [projects] = useProjects(cluster);
 
-  useEffect(
-    () =>
-      !selectedProject &&
+  useEffect(() => {
+    if (!selectedProject) {
       setSelectedProject(
         localNSProject || namespace || sshDetails?.sshSecretNamespace || projects?.[0],
-      ),
-    [namespace, localNSProject, projects, selectedProject, sshDetails?.sshSecretNamespace],
-  );
+      );
+    }
+  }, [namespace, localNSProject, projects, selectedProject, sshDetails?.sshSecretNamespace]);
 
   const onSelectProject = useCallback(
     (newProject: string) => {

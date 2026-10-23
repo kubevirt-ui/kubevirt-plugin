@@ -1,5 +1,6 @@
-import { CNV_NS, K8S_KIND, TEST_NS } from '../utils/const/index';
+import { CNV_NS, K8S_KIND, SECOND, TEST_NS } from '../utils/const/index';
 import { Perspective, switchPerspective } from '../views/perspective';
+import { saveBtn } from '../views/selector';
 
 export {};
 declare global {
@@ -16,6 +17,7 @@ declare global {
       ): Chainable;
       deleteVM(vmName: string[]): void;
       patchVM(vmName: string, status: string): void;
+      saveYAML(): void;
       startVM(vmName: string[]): void;
       stopVM(vmName: string[]): void;
       switchToVirt(): void;
@@ -96,12 +98,38 @@ Cypress.Commands.add('switchToVirt', () => {
 
 Cypress.Commands.add('beforeSpec', () => {
   cy.visit('');
+  // Self-heal the session: if a previous spec crashed the page and dropped the
+  // session, the login screen is shown again -- re-authenticate before asserting
+  // the logged-in state, so one broken spec can't cascade into the rest.
+  cy.get('body').then(($body) => {
+    if ($body.find('[data-test-id=login], [data-test=login]').length) {
+      cy.login();
+    }
+  });
   cy.get('[data-test="username"]', { timeout: 180000 }).should('exist');
   cy.wait(15000); // wait here because page refresh might happen
   cy.switchToVirt();
   cy.contains('[data-test-id="resource-title"]', 'Virtualization', { timeout: 180000 }).should(
     'exist',
   );
+});
+
+Cypress.Commands.add('saveYAML', () => {
+  // The console's Create-from-YAML editor loads its example template into the
+  // editor model asynchronously. Clicking Save before the model is populated
+  // fails with "No YAML content found" -- the resource is never created, which
+  // silently cascades into downstream tests. Give the editor time to load, save,
+  // and if the model still wasn't ready (the console surfaces that exact error),
+  // wait for it to load and retry the save.
+  cy.wait(5 * SECOND);
+  cy.get(saveBtn).click();
+  cy.wait(SECOND);
+  cy.get('body').then(($body) => {
+    if ($body.text().includes('No YAML content found')) {
+      cy.wait(10 * SECOND);
+      cy.get(saveBtn).click();
+    }
+  });
 });
 
 Cypress.Commands.add('deleteVM', (vms: string[]) => {

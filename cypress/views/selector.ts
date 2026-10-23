@@ -17,7 +17,7 @@ export const mpNav = '[data-test-id="migrationpolicies-nav-item"]';
 export const checkupNav = '[data-test-id="virtualization-checkups-nav-item"]';
 export const resourceTitle = '[data-test-id="resource-title"]';
 export const nameFilter = 'input[data-test="name-filter-input"]';
-export const breadcrumb = '[data-test-id="breadcrumb-link-0"]';
+export const breadcrumb = '.pf-v6-c-breadcrumb__item';
 export const welcomeCheckbox = '#welcome-modal-checkbox';
 export const templateTab = '[data-test="templates-tab"]';
 export const instanceTab = '[data-test="instancetypes-tab"]';
