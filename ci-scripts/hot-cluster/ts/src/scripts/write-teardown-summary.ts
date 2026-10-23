@@ -46,6 +46,11 @@ const main = async (): Promise<void> => {
         'Removed leftover ImageStream / BuildConfig (and any stray Helm release) for this instance where possible.',
       );
     }
+  } else if (found === 'false' && orphansIncomplete === 'true') {
+    // Prefer incomplete over "were removed" when both cleaned and failed.
+    lines.push(
+      'No trigger ConfigMap was present, and orphan cleanup did not fully succeed -- see the teardown step log.',
+    );
   } else if (found === 'false' && orphansCleaned === 'true') {
     lines.push(
       'No trigger ConfigMap was present (deploy likely failed before provisioning), ' +

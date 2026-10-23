@@ -20,18 +20,21 @@ metadata:
   labels:
     app.kubernetes.io/component: manual-console-rbac
 rules:
+  # delete is required for /cleanup-manual-console orphan sweeps
+  # (ImageStream / BuildConfig left behind when deploy fails before the
+  # trigger ConfigMap is written). create/update cover the build path.
   - apiGroups: ['image.openshift.io']
     resources: ['imagestreams', 'imagestreams/layers', 'imagestreamtags']
-    verbs: ['get', 'list', 'watch', 'create', 'update', 'patch']
+    verbs: ['get', 'list', 'watch', 'create', 'update', 'patch', 'delete']
   - apiGroups: ['build.openshift.io']
     resources: ['buildconfigs']
-    verbs: ['get', 'list', 'watch', 'create', 'update', 'patch']
+    verbs: ['get', 'list', 'watch', 'create', 'update', 'patch', 'delete']
   - apiGroups: ['build.openshift.io']
     resources: ['buildconfigs/instantiatebinary']
     verbs: ['create']
   - apiGroups: ['build.openshift.io']
     resources: ['builds']
-    verbs: ['get', 'list', 'watch']
+    verbs: ['get', 'list', 'watch', 'delete']
   - apiGroups: ['build.openshift.io']
     resources: ['builds/log']
     verbs: ['get']
