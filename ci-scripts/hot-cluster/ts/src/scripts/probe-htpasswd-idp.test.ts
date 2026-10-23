@@ -6,6 +6,7 @@ import {
   HTPASSWD_IDP_PROBE_PATCH,
   HTPASSWD_SECRET_NAME,
   interpretHtpasswdProbe,
+  isOauthAccessDenied,
   isOauthImmutableDenial,
   parseIdentityProviders,
   probeHtpasswdIdpAvailability,
@@ -22,7 +23,23 @@ describe('isOauthImmutableDenial', () => {
   });
 
   it('rejects unrelated errors', () => {
-    assert.equal(isOauthImmutableDenial('Unauthorized'), false);
+    assert.equal(isOauthImmutableDenial('connection refused'), false);
+  });
+});
+
+describe('isOauthAccessDenied', () => {
+  it('matches Forbidden and Unauthorized', () => {
+    assert.equal(
+      isOauthAccessDenied(
+        'Error from server (Forbidden): oauths.config.openshift.io "cluster" is forbidden',
+      ),
+      true,
+    );
+    assert.equal(isOauthAccessDenied('Error from server (Unauthorized): Unauthorized'), true);
+  });
+
+  it('rejects unrelated errors', () => {
+    assert.equal(isOauthAccessDenied('connection refused'), false);
   });
 });
 
@@ -107,6 +124,40 @@ describe('interpretHtpasswdProbe', () => {
     );
   });
 
+  it('treats Forbidden on OAuth get as unreadable (no runner oauths RBAC)', () => {
+    assert.deepEqual(
+      interpretHtpasswdProbe({
+        getErrorMessage:
+          'Error from server (Forbidden): oauths.config.openshift.io "cluster" is forbidden',
+        patchSucceeded: false,
+      }),
+      { available: false, reason: 'oauth-unreadable' },
+    );
+  });
+
+  it('treats Forbidden on OAuth dry-run patch as unreadable', () => {
+    assert.deepEqual(
+      interpretHtpasswdProbe({
+        identityProviders: [],
+        patchErrorMessage:
+          'Error from server (Forbidden): oauths.config.openshift.io "cluster" is forbidden',
+        patchSucceeded: false,
+      }),
+      { available: false, reason: 'oauth-unreadable' },
+    );
+  });
+
+  it('throws on unexpected get failures', () => {
+    assert.throws(
+      () =>
+        interpretHtpasswdProbe({
+          getErrorMessage: 'connection refused',
+          patchSucceeded: false,
+        }),
+      /Unexpected OAuth get failure/,
+    );
+  });
+
   it('throws on unexpected patch failures', () => {
     assert.throws(
       () =>
@@ -188,5 +239,20 @@ describe('probeHtpasswdIdpAvailability', () => {
       );
     });
     assert.deepEqual(result, { available: false, reason: 'oauth-immutable' });
+  });
+
+  it('maps Forbidden on OAuth get to oauth-unreadable without attempting patch', () => {
+    const calls: string[] = [];
+    const result = probeHtpasswdIdpAvailability((command) => {
+      calls.push(command);
+      throw new Error(
+        'Error from server (Forbidden): oauths.config.openshift.io "cluster" is forbidden: ' +
+          'User "system:serviceaccount:arc-runners:gal-test-419-gha-rs-no-permission" ' +
+          'cannot get resource "oauths" in API group "config.openshift.io" at the cluster scope',
+      );
+    });
+    assert.deepEqual(result, { available: false, reason: 'oauth-unreadable' });
+    assert.equal(calls.length, 1);
+    assert.match(calls[0]!, /oc get oauth/);
   });
 });
