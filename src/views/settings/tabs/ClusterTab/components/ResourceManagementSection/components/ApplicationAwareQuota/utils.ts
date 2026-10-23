@@ -1,5 +1,5 @@
 import { K8S_OPS } from '@kubevirt-utils/constants/constants';
-import { isHyperConvergedV1 } from '@kubevirt-utils/resources/hyperconverged/model';
+import { usesHyperConvergedV1Spec } from '@kubevirt-utils/resources/hyperconverged/model';
 import {
   buildHyperConvergedPatches,
   getAAQConfigPatchPath,
@@ -61,7 +61,9 @@ const buildV1Beta1EnablePatches = (
   ];
 };
 
-export const buildAAQEnablePatches = (hyperConverge: HyperConverged, checked: boolean): Patch[] =>
-  isHyperConvergedV1(hyperConverge)
-    ? buildV1EnablePatches(hyperConverge, checked)
-    : buildV1Beta1EnablePatches(hyperConverge as HyperConvergedV1Beta1, checked);
+export const buildAAQEnablePatches = (hyperConverge: HyperConverged, checked: boolean): Patch[] => {
+  if (usesHyperConvergedV1Spec(hyperConverge)) {
+    return buildV1EnablePatches(hyperConverge, checked);
+  }
+  return buildV1Beta1EnablePatches(hyperConverge as HyperConvergedV1Beta1, checked);
+};

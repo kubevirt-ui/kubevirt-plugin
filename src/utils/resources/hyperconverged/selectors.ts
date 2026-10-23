@@ -6,7 +6,6 @@ import { toArray } from '@kubevirt-utils/components/LazyActionMenu/order-extensi
 import type { KubevirtHyperconverged } from '@kubevirt-utils/hooks/useKubevirtHyperconvergeConfiguration';
 import { type K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
-import { type CalculationMethod } from '../quotas/types';
 import { isHyperConvergedV1 } from './model';
 import {
   HCO_FEATURE_GATE_STATE,
@@ -18,6 +17,8 @@ import {
   type HyperConvergedSpecV1Beta1,
 } from './types';
 
+export { getAAQCalculationMethod, isAAQEnabled, isAAQEnableStateConfirmed } from './aaqSelectors';
+
 const getVirtualizationSpec = (
   hyperConverge: HyperConverged | undefined,
 ): HyperConvergedSpecV1['virtualization'] | HyperConvergedSpecV1Beta1 | undefined =>
@@ -27,18 +28,6 @@ const getWorkloadSourcesSpec = (
   hyperConverged: HyperConverged | undefined,
 ): HyperConvergedSpecV1['workloadSources'] | HyperConvergedSpecV1Beta1 | undefined =>
   isHyperConvergedV1(hyperConverged) ? hyperConverged?.spec?.workloadSources : hyperConverged?.spec;
-
-export const getAAQCalculationMethod = (
-  hyperConverge: HyperConverged | undefined,
-): CalculationMethod | undefined =>
-  isHyperConvergedV1(hyperConverge)
-    ? hyperConverge?.spec?.deployment?.applicationAwareConfig?.vmiCalcConfigName
-    : hyperConverge?.spec?.applicationAwareConfig?.vmiCalcConfigName;
-
-export const isAAQEnabled = (hyperConverge: HyperConverged | undefined): boolean =>
-  isHyperConvergedV1(hyperConverge)
-    ? Boolean(hyperConverge?.spec?.deployment?.applicationAwareConfig?.enable)
-    : Boolean(hyperConverge?.spec?.enableApplicationAwareQuota);
 
 export const getHyperconvergedConfiguration = (
   hyperConverged: KubevirtHyperconverged | undefined,
