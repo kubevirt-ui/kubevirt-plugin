@@ -19,7 +19,10 @@ import { setOutput } from '../utils';
 
 export type HtpasswdIdpAvailability =
   | { available: true; reason: 'idp-present' | 'oauth-mutable' }
-  | { available: false; reason: 'htpasswd-secret-mismatch' | 'oauth-immutable' };
+  | {
+      available: false;
+      reason: 'htpasswd-secret-mismatch' | 'oauth-immutable' | 'oauth-unreadable';
+    };
 
 export type OauthIdentityProvider = {
   htpasswd?: { fileData?: { name?: string } };
@@ -47,6 +50,16 @@ export const HTPASSWD_IDP_PROBE_PATCH = JSON.stringify({
 
 export const isOauthImmutableDenial = (message: string): boolean =>
   /ValidatingAdmissionPolicy/i.test(message) || /HostedCluster object/i.test(message);
+
+/**
+ * RBAC denials on OAuth get/patch. The ARC runner intentionally cannot read
+ * oauths / openshift-config secrets (those stay with ci-env-controller so
+ * htpasswd credentials are never readable from the runner SA). Treat that as
+ * "HTPasswd unavailable" and fall back to auth-mode=disabled rather than
+ * failing the deploy.
+ */
+export const isOauthAccessDenied = (message: string): boolean =>
+  /\bForbidden\b/i.test(message) || /\bUnauthorized\b/i.test(message);
 
 /** Classify HTPasswd IDPs against the Secret our ensure path writes. */
 export const classifyHtpasswdIdpSecrets = (
@@ -80,10 +93,18 @@ export const parseIdentityProviders = (raw: string): OauthIdentityProvider[] => 
 
 /** Pure interpreter for unit tests. */
 export const interpretHtpasswdProbe = (opts: {
+  getErrorMessage?: string;
   identityProviders?: OauthIdentityProvider[];
   patchErrorMessage?: string;
   patchSucceeded: boolean;
 }): HtpasswdIdpAvailability => {
+  if (opts.getErrorMessage) {
+    if (isOauthAccessDenied(opts.getErrorMessage)) {
+      return { available: false, reason: 'oauth-unreadable' };
+    }
+    throw new Error(`Unexpected OAuth get failure: ${opts.getErrorMessage}`);
+  }
+
   const htpasswdClass = classifyHtpasswdIdpSecrets(opts.identityProviders ?? []);
   if (htpasswdClass === 'match') {
     return { available: true, reason: 'idp-present' };
@@ -98,6 +119,9 @@ export const interpretHtpasswdProbe = (opts: {
   }
   if (opts.patchErrorMessage && isOauthImmutableDenial(opts.patchErrorMessage)) {
     return { available: false, reason: 'oauth-immutable' };
+  }
+  if (opts.patchErrorMessage && isOauthAccessDenied(opts.patchErrorMessage)) {
+    return { available: false, reason: 'oauth-unreadable' };
   }
   throw new Error(
     `Unexpected OAuth probe failure: ${opts.patchErrorMessage ?? 'unknown error'}`,
@@ -120,9 +144,19 @@ const defaultExec: ExecFn = (command) => {
 export const probeHtpasswdIdpAvailability = (
   exec: ExecFn = defaultExec,
 ): HtpasswdIdpAvailability => {
-  const identityProviders = parseIdentityProviders(
-    exec(`oc get oauth cluster -o jsonpath='{.spec.identityProviders}'`),
-  );
+  let identityProviders: OauthIdentityProvider[];
+  try {
+    identityProviders = parseIdentityProviders(
+      exec(`oc get oauth cluster -o jsonpath='{.spec.identityProviders}'`),
+    );
+  } catch (err) {
+    const getErrorMessage = err instanceof Error ? err.message : String(err);
+    return interpretHtpasswdProbe({
+      getErrorMessage,
+      patchSucceeded: false,
+    });
+  }
+
   const htpasswdClass = classifyHtpasswdIdpSecrets(identityProviders);
 
   if (htpasswdClass !== 'none') {
@@ -159,6 +193,14 @@ const main = (): void => {
     console.log(
       `::warning::HTPasswd identity provider exists but does not use Secret ` +
         `'${HTPASSWD_SECRET_NAME}'. Manual console will use auth-mode=disabled.`,
+    );
+    return;
+  }
+  if (result.reason === 'oauth-unreadable') {
+    console.log(
+      `::warning::Runner cannot read/patch OAuth CR (expected: no oauths RBAC on ` +
+        `the ARC runner SA, so htpasswd credentials stay with ci-env-controller). ` +
+        `Manual console will use auth-mode=disabled (no login wall; console SA token).`,
     );
     return;
   }

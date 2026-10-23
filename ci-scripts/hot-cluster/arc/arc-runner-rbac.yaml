@@ -36,6 +36,12 @@ rules:
     resources: ['namespaces']
     verbs: ['patch']
     resourceNames: ['manual-console']
+  # oauths intentionally omitted: the runner must not read OAuth / openshift-config
+  # secrets. HTPasswd probing soft-fails to auth-mode=disabled when Forbidden;
+  # ci-env-controller alone manages htpass-secret. Login passwords (when used)
+  # are generated on the runner only long enough to hand off via a short-lived
+  # ci-env Secret + Slack -- never persisted in ConfigMaps or runner-readable
+  # cluster secrets.
   - apiGroups: ['config.openshift.io']
     resources: ['consoles', 'clusterversions', 'ingresses']
     verbs: ['get', 'list']
