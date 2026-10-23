@@ -54,14 +54,28 @@ Actions -> **Deploy Manual Console** -> Run workflow, with:
 
 - `branch` -- the branch to build the plugin image from (ignored if `pr_number` is set)
 - `pr_number` -- deploy a PR instead, or comment `/deploy-manual-console` on it
-- `cluster_name` -- the ARC runner label / hot cluster name (default `kubevirt-plugin-ci`)
-- `infrastructure_type` -- informational only, no kubeconfig is downloaded
+- `cluster_name` -- optional ARC runner label / hot cluster name. Leave empty
+  to use the same cluster E2E would: when `pr_number` is set, resolve from that
+  PR's base ref and ignore `branch`; otherwise resolve from `branch`
+  (`release-X.Y` → `kubevirt-plugin-XY`, else `kubevirt-plugin-ci`). Prefer
+  leaving it empty so deploys land on the shared release/CI cluster instead of
+  provisioning a new one under a typo'd name. Check the recorded target on the
+  PR (or the run's resolve-config output) before redeploy/teardown.
+- `infrastructure_type` -- used only if the target cluster is not already up
+  (cluster-check will provision it)
+
+Slash commands omit the cluster by default: `/deploy-manual-console`
+resolves from the PR base and records the target on the PR;
+`/cleanup-manual-console` uses the newest deploy record (not the PR base or
+run-name brackets). Pass an explicit name only for a different cluster
+(`/deploy-manual-console my-cluster`), or when cleanup cannot find a prior
+deploy (`/cleanup-manual-console <cluster-name>`).
 
 For UI-only iteration afterwards, **Deploy Plugin** rebuilds and redeploys
 just the plugin image against the same instance -- it takes the same
-`branch`/`pr_number` inputs and must be given the same one used for the
-original deploy, or it targets a different (and possibly nonexistent)
-instance.
+`branch`/`pr_number` inputs (and the same optional `cluster_name` defaulting)
+and must be given the same one used for the original deploy, or it targets a
+different (and possibly nonexistent) instance.
 
 Every deploy is scoped to an **instance key** -- `pr-<number>` when
 `pr_number` is set, otherwise a truncated, normalized `branch` prefix plus
@@ -77,11 +91,14 @@ domain>`) instead of overwriting each other. The namespace
 Manual-console ConfigMaps are exempt from the TTL reaper, so nothing removes
 a deployed instance automatically. Once done with it, either comment
 `/cleanup-manual-console` on the PR, or run **Deploy Manual Console** with
-`action: teardown` and the same `pr_number`/`branch` + `cluster_name` used to
-deploy it. This flips the trigger ConfigMap's `desired-state` to `absent`;
-`ci-env-controller` then removes that instance's Helm release and htpasswd
-user asynchronously. The shared `manual-console` namespace itself is only
-deleted once no other instance's Helm release remains in it.
+`action: teardown` and the same `pr_number` used to deploy it (preferred —
+cleanup recovers the recorded cluster). For a branch-only deploy (no
+`pr_number`), teardown requires the same `cluster_name` used at deploy;
+`branch` alone is not a supported teardown identifier. This flips the
+trigger ConfigMap's `desired-state` to `absent`; `ci-env-controller` then
+removes that instance's Helm release and htpasswd user asynchronously. The
+shared `manual-console` namespace itself is only deleted once no other
+instance's Helm release remains in it.
 
 ## How it works
 

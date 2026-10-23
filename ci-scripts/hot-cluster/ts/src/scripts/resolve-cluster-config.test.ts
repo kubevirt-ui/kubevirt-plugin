@@ -26,6 +26,16 @@ describe('resolveClusterConfig', () => {
     assert.equal(config.testEngine, 'playwright');
   });
 
+  it('treats empty-string overrides as unset (workflow_dispatch defaults)', () => {
+    const config = resolveClusterConfig({
+      baseRef: 'main',
+      inputClusterName: '',
+      inputOpenshiftVersion: '',
+    });
+    assert.equal(config.clusterName, 'kubevirt-plugin-ci');
+    assert.equal(config.openshiftVersion, '4.22_openshift');
+  });
+
   it('respects workflow_dispatch overrides', () => {
     const config = resolveClusterConfig({
       baseRef: 'main',

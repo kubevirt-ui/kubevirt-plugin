@@ -1,5 +1,5 @@
 name: Deploy Plugin (Manual Console Quick Redeploy)
-run-name: "Deploy Plugin [${{ inputs.cluster_name }}] @ ${{ inputs.pr_number && format('PR#{0}', inputs.pr_number) || inputs.branch }}"
+run-name: "Deploy Plugin [${{ inputs.cluster_name || inputs.branch || 'auto' }}] @ ${{ inputs.pr_number && format('PR#{0}', inputs.pr_number) || inputs.branch }}"
 
 # Lightweight companion to deploy-manual-console.yml for quickly
 # iterating on UI changes against an already-deployed manual console: builds
@@ -7,6 +7,10 @@ run-name: "Deploy Plugin [${{ inputs.cluster_name }}] @ ${{ inputs.pr_number && 
 # without repeating the full job summary / Slack notification of the main
 # workflow. Use deploy-manual-console.yml for the first deploy, or whenever
 # you need a fresh URL/credentials reminder.
+#
+# cluster_name is optional: when empty, resolve-cluster-config picks the same
+# hot cluster E2E / deploy-manual-console would use for inputs.branch
+# (release-X.Y → kubevirt-plugin-XY, else kubevirt-plugin-ci).
 #
 # Prerequisites: same as deploy-manual-console.yml -- the target cluster must
 # already be provisioned, and a manual console for this pr_number/branch
@@ -47,17 +51,22 @@ on:
         default: ''
         type: string
       cluster_name:
-        description: ARC runner label / hot cluster name (must already be provisioned)
-        required: true
-        default: kubevirt-plugin-ci
+        description: >-
+          ARC runner label / hot cluster name (must already be provisioned).
+          Leave empty to use the same cluster E2E would for "branch"
+          (release-X.Y → kubevirt-plugin-XY, else kubevirt-plugin-ci).
+        required: false
+        default: ''
         type: string
 
 permissions:
   contents: read
   pull-requests: read
 
+# Same instance key as deploy-manual-console.yml so redeploys serialize with
+# deploys/teardowns (cluster_name omitted — empty vs explicit must match).
 concurrency:
-  group: deploy-manual-console-${{ inputs.cluster_name }}-${{ inputs.pr_number || inputs.branch }}
+  group: deploy-manual-console-${{ inputs.pr_number || inputs.branch }}
   cancel-in-progress: false
 
 env:
@@ -115,11 +124,51 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           triggered-by: ${{ inputs.triggered_by }}
 
+  # Same cluster defaulting as deploy-manual-console.yml / hot-cluster-e2e.yml.
+  # When pr_number is set, use that PR's base ref (not inputs.branch default).
+  resolve-config:
+    name: Resolve Cluster Config
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    outputs:
+      cluster_name: ${{ inputs.cluster_name || steps.resolve.outputs.cluster-name }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Resolve base ref for cluster config
+        id: base-ref
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ inputs.pr_number }}
+          BRANCH: ${{ inputs.branch }}
+        run: |
+          if [[ -n "${PR_NUMBER}" ]]; then
+            base_ref="$(gh api "repos/${GITHUB_REPOSITORY}/pulls/${PR_NUMBER}" --jq .base.ref)"
+            echo "Using PR #${PR_NUMBER} base ref '${base_ref}' for cluster resolution"
+            echo "base-ref=${base_ref}" >> "$GITHUB_OUTPUT"
+          else
+            echo "base-ref=${BRANCH}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Resolve cluster for this branch
+        id: resolve
+        uses: ./.github/actions/hot-cluster/resolve-cluster-config
+        with:
+          base-ref: ${{ steps.base-ref.outputs.base-ref }}
+          cluster-name: ${{ inputs.cluster_name }}
+
   redeploy:
     name: Redeploy Plugin
-    needs: [instance-key, resolve-pr]
-    if: always() && needs.instance-key.result == 'success' && needs.resolve-pr.result != 'failure'
-    runs-on: ${{ inputs.cluster_name }}
+    needs: [instance-key, resolve-pr, resolve-config]
+    if: |
+      always() &&
+      needs.instance-key.result == 'success' &&
+      needs.resolve-pr.result != 'failure' &&
+      needs.resolve-config.result == 'success'
+    runs-on: ${{ needs.resolve-config.outputs.cluster_name }}
     timeout-minutes: 20
     steps:
       # Two checkouts, deliberately kept separate -- see
