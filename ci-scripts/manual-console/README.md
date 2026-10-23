@@ -98,7 +98,13 @@ cleanup recovers the recorded cluster). For a branch-only deploy (no
 trigger ConfigMap's `desired-state` to `absent`; `ci-env-controller` then
 removes that instance's Helm release and htpasswd user asynchronously. The
 shared `manual-console` namespace itself is only deleted once no other
-instance's Helm release remains in it.
+instance's Helm release remains in it (and never when `auth-mode=openshift`,
+so the one-time RBAC bootstrap survives).
+
+Teardown also always deletes that instance's ImageStream / BuildConfig (and
+any stray Helm release) in the shared namespace. Deploy creates those _before_
+the trigger ConfigMap, so a mid-deploy failure used to leave orphans that
+`/cleanup-manual-console` could not see; the artifact sweep covers that case.
 
 ## How it works
 
