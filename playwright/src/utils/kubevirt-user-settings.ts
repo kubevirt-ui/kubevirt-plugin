@@ -1,0 +1,115 @@
+import {
+  type ConsoleProxyRequestOptions,
+  getConsoleKubernetesProxyHeaders,
+} from '@/utils/console-kubernetes-proxy';
+import type { APIRequestContext } from '@playwright/test';
+
+const KUBEVIRT_USER_SETTINGS_NAMESPACE = 'default';
+const KUBEVIRT_USER_SETTINGS_CONFIG_MAP = 'kubevirt-user-settings';
+
+/** Matches `useKubevirtUserSettings` ConfigMap data key derivation. */
+export async function kubevirtUserSettingsDataKeyFromConsoleSession(
+  request: APIRequestContext,
+  consoleOrigin: string,
+  proxyOptions: ConsoleProxyRequestOptions = {},
+): Promise<string> {
+  const origin = consoleOrigin.replace(/\/$/, '');
+  const headers = getConsoleKubernetesProxyHeaders(origin, proxyOptions);
+  const userRes = await request.get(`${origin}/api/kubernetes/apis/user.openshift.io/v1/users/~`, {
+    headers,
+  });
+  if (!userRes.ok()) {
+    const body = await userRes.text();
+    throw new Error(`fetch openshift user ~ failed (${userRes.status()}): ${body.slice(0, 300)}`);
+  }
+  const user = (await userRes.json()) as {
+    metadata?: { name?: string; uid?: string };
+  };
+  const sanitizedName = user?.metadata?.name?.replace(/[^-._a-zA-Z0-9]+/g, '-');
+  const key = user?.metadata?.uid || sanitizedName;
+  if (!key) {
+    throw new Error('OpenShift user ~ missing metadata.uid and metadata.name');
+  }
+  return key;
+}
+
+function kubevirtSettingsWithWelcomeHidden(existingRaw?: string): string {
+  const existing = existingRaw
+    ? (JSON.parse(existingRaw) as Record<string, unknown>)
+    : { cards: {}, columns: {}, quickStart: {}, ssh: {} };
+  const quickStart =
+    existing.quickStart && typeof existing.quickStart === 'object'
+      ? { ...(existing.quickStart as Record<string, unknown>) }
+      : {};
+  return JSON.stringify({
+    ...existing,
+    quickStart: { ...quickStart, dontShowWelcomeModal: true },
+  });
+}
+
+/**
+ * JSON-patch `kubevirt-user-settings` so virtualization welcome modal stays hidden.
+ */
+export async function patchKubevirtUserSettingsHideWelcomeViaConsoleProxy(
+  request: APIRequestContext,
+  consoleOrigin: string,
+  proxyOptions: ConsoleProxyRequestOptions = {},
+): Promise<void> {
+  const origin = consoleOrigin.replace(/\/$/, '');
+  const headers = getConsoleKubernetesProxyHeaders(origin, proxyOptions);
+  const dataKey = await kubevirtUserSettingsDataKeyFromConsoleSession(
+    request,
+    origin,
+    proxyOptions,
+  );
+  const cmPath = `/api/kubernetes/api/v1/namespaces/${KUBEVIRT_USER_SETTINGS_NAMESPACE}/configmaps/${KUBEVIRT_USER_SETTINGS_CONFIG_MAP}`;
+  const cmUrl = `${origin}${cmPath}`;
+
+  const getRes = await request.get(cmUrl, { headers });
+  if (getRes.status() === 404) {
+    const value = kubevirtSettingsWithWelcomeHidden();
+    const create = await request.post(
+      `${origin}/api/kubernetes/api/v1/namespaces/${KUBEVIRT_USER_SETTINGS_NAMESPACE}/configmaps`,
+      {
+        data: {
+          apiVersion: 'v1',
+          data: { [dataKey]: value },
+          kind: 'ConfigMap',
+          metadata: {
+            name: KUBEVIRT_USER_SETTINGS_CONFIG_MAP,
+            namespace: KUBEVIRT_USER_SETTINGS_NAMESPACE,
+          },
+        },
+        headers: { ...headers, 'Content-Type': 'application/json' },
+      },
+    );
+    if (create.ok() || create.status() === 409) {
+      return;
+    }
+    const body = await create.text();
+    throw new Error(
+      `create kubevirt-user-settings failed (${create.status()}): ${body.slice(0, 500)}`,
+    );
+  }
+  if (!getRes.ok()) {
+    const body = await getRes.text();
+    throw new Error(
+      `get kubevirt-user-settings failed (${getRes.status()}): ${body.slice(0, 500)}`,
+    );
+  }
+
+  const cm = (await getRes.json()) as { data?: Record<string, string> };
+  const value = kubevirtSettingsWithWelcomeHidden(cm.data?.[dataKey]);
+  const op = cm.data?.[dataKey] ? 'replace' : 'add';
+  const patch = await request.patch(cmUrl, {
+    data: [{ op, path: `/data/${dataKey}`, value }],
+    headers: { ...headers, 'Content-Type': 'application/json-patch+json' },
+  });
+  if (patch.ok()) {
+    return;
+  }
+  const body = await patch.text();
+  throw new Error(
+    `patch kubevirt-user-settings (${dataKey}) failed (${patch.status()}): ${body.slice(0, 500)}`,
+  );
+}

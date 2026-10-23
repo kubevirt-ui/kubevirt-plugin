@@ -1,0 +1,67 @@
+# Containerfile for kubevirt-plugin Playwright E2E (OpenShift / CNV 4.14)
+#
+# ⚠️ Base image tag MUST match @playwright/test in package.json (see `npm ls @playwright/test`).
+# Current: Playwright 1.63.x → mcr.microsoft.com/playwright:v1.63.0-noble
+#
+# Published as quay.io/$QUAY_REPOSITORY:release-4.14 (see test-quay-build.sh).
+#
+# Build from repo root:
+#   playwright/containers/run-tests-container.sh build
+#
+# Jenkins / Prow agents: image ships Node, Chromium, oc, kubectl, Java, Allure CLI, and
+# Playwright npm deps. Tests are started by the job (e.g. npm run test-playwright-headless).
+
+FROM mcr.microsoft.com/playwright:v1.63.0-noble
+
+LABEL org.opencontainers.image.title="kubevirt-plugin-playwright" \
+    org.opencontainers.image.description="Playwright E2E tooling for kubevirt-plugin (CNV 4.14)" \
+    io.kubevirt.plugin.openshift-version="4.14"
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    bash \
+    curl \
+    wget \
+    ca-certificates \
+    unzip \
+    zip \
+    jq \
+    openjdk-17-jdk \
+    && rm -rf /var/lib/apt/lists/*
+
+# OpenShift CLI (oc) + kubectl
+RUN cd /tmp \
+    && curl -fL https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/openshift-client-linux.tar.gz -o oc.tar.gz \
+    || curl -fL https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/latest/openshift-client-linux.tar.gz -o oc.tar.gz \
+    && tar -xzf oc.tar.gz \
+    && mv oc kubectl /usr/local/bin/ \
+    && rm -f oc.tar.gz README.md \
+    && chmod +x /usr/local/bin/oc /usr/local/bin/kubectl \
+    && oc version --client \
+    && kubectl version --client
+
+ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+ENV PATH="${JAVA_HOME}/bin:${PATH}"
+
+RUN npm install -g allure-commandline@2.32.0 \
+    && allure --version
+
+WORKDIR /app
+
+# Root manifests + Playwright entrypoints (tests mounted at runtime).
+COPY package.json package-lock.json playwright.config.ts ./
+COPY playwright/load-env.ts ./playwright/load-env.ts
+COPY playwright/containers/slim-npm-install.sh /tmp/slim-npm-install.sh
+
+# Slim install: plugin repo bundles webpack/Jest/React for console build — not needed to run E2E.
+RUN chmod +x /tmp/slim-npm-install.sh && /tmp/slim-npm-install.sh && rm -f /tmp/slim-npm-install.sh
+
+RUN npx playwright install --with-deps chromium --only-shell
+
+ENV HEADLESS=true
+ENV CI=1
+
+RUN npx playwright --version \
+    && oc version --client \
+    && kubectl version --client \
+    && java -version \
+    && allure --version
