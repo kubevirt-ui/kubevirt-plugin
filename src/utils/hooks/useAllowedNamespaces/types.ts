@@ -1,20 +1,22 @@
-import { type FleetAccessReviewResourceAttributes } from '@stolostron/multicluster-sdk';
-
-export type AllowedNamespacesFailure = {
-  error: string;
-  namespace: string;
-};
+import type { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
 export type AllowedNamespacesResponse = {
   allowedNamespaces: string[];
-  failures?: AllowedNamespacesFailure[];
 };
 
-export type AllowedNamespacesRequestResourceAttributes = Pick<
-  FleetAccessReviewResourceAttributes,
-  'group' | 'resource' | 'subresource' | 'verb'
->;
+export type AllowedNamespacesFetchEntry = {
+  data: AllowedNamespacesResponse | undefined;
+  error: Error | null;
+};
 
-export type AllowedNamespacesRequest = {
-  resourceAttributes: AllowedNamespacesRequestResourceAttributes;
+export type UseFetchAllowedNamespacesResult = {
+  data: AllowedNamespacesResponse | undefined;
+  error: Error | null;
+  loaded: boolean;
+};
+
+export type UseAllowedNamespacesResult = {
+  namespaces: K8sResourceCommon[] | undefined;
+  namespacesError: Error | null;
+  namespacesLoaded: boolean;
 };

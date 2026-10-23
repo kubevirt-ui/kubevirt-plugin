@@ -1,5 +1,3 @@
-import { useEffect, useMemo, useState } from 'react';
-
 import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import useDeepCompareMemoize from '@kubevirt-utils/hooks/useDeepCompareMemoize/useDeepCompareMemoize';
 import { getName } from '@kubevirt-utils/resources/shared';
@@ -8,106 +6,48 @@ import useManagedClusterConsoleURLs from '@multicluster/hooks/useManagedClusterC
 import type { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { type FleetAccessReviewResourceAttributes } from '@stolostron/multicluster-sdk';
 
-import {
-  type AllowedNamespacesLoaderResult,
-  loadAllowedNamespaces,
-  peekAllowedNamespacesCache,
-} from './allowedNamespacesLoader';
+import { type UseAllowedNamespacesResult } from './types';
+import useFetchAllowedNamespaces from './useFetchAllowedNamespaces';
 
-export type UseAllowedNamespacesResult = AllowedNamespacesLoaderResult;
-
-const emptyResult: UseAllowedNamespacesResult = {
-  allowedNamespaces: [],
-  error: null,
-  failures: [],
-  filterByAllowedNamespaces: false,
-  loaded: true,
-};
-
-const loadingResult: UseAllowedNamespacesResult = {
-  allowedNamespaces: [],
-  error: null,
-  failures: [],
-  filterByAllowedNamespaces: false,
-  loaded: false,
-};
+export type { UseAllowedNamespacesResult };
 
 const useAllowedNamespaces = (
   accessReview: FleetAccessReviewResourceAttributes | null,
+  cluster?: string,
 ): UseAllowedNamespacesResult => {
-  const accessReviewMemoized = useDeepCompareMemoize<FleetAccessReviewResourceAttributes | null>(
-    accessReview,
+  const accessReviewMemoized = useDeepCompareMemoize(accessReview);
+  const watchCluster = accessReviewMemoized?.cluster ?? cluster;
+  const { isSpokeCluster, loaded: managedClustersLoaded } = useManagedClusterConsoleURLs(
+    accessReviewMemoized?.cluster,
   );
 
-  const cluster = accessReviewMemoized?.cluster;
-  const { isSpokeCluster, loaded: managedClustersLoaded } = useManagedClusterConsoleURLs(cluster);
-
-  const [projects, projectsLoaded] = useK8sWatchData<K8sResourceCommon[]>({
-    cluster,
-    groupVersionKind: modelToGroupVersionKind(ProjectModel),
-    isList: true,
-    namespaced: false,
-  });
-
-  const allNamespaceNames = useMemo(
-    () =>
-      (projects ?? [])
-        .reduce<string[]>((acc, project) => {
-          const name = getName(project);
-          if (name) {
-            acc.push(name);
-          }
-          return acc;
-        }, [])
-        .sort((a, b) => a.localeCompare(b)),
-    [projects],
+  const [namespaces, namespacesLoaded, namespacesWatchError] = useK8sWatchData<K8sResourceCommon[]>(
+    {
+      cluster: watchCluster,
+      groupVersionKind: modelToGroupVersionKind(ProjectModel),
+      isList: true,
+      namespaced: false,
+    },
   );
 
-  const [result, setResult] = useState<UseAllowedNamespacesResult>(emptyResult);
+  const useAllowedNamespacesApi =
+    Boolean(accessReviewMemoized) && managedClustersLoaded && !isSpokeCluster;
+  const { data, error, loaded } = useFetchAllowedNamespaces(
+    useAllowedNamespacesApi ? accessReviewMemoized : null,
+  );
 
-  useEffect(() => {
-    if (!accessReviewMemoized) {
-      setResult(emptyResult);
-      return;
-    }
+  const namespacesError = namespacesWatchError ?? (useAllowedNamespacesApi ? error : null);
 
-    if (!projectsLoaded || !managedClustersLoaded) {
-      setResult(loadingResult);
-      return;
-    }
+  if (!useAllowedNamespacesApi || error) {
+    return { namespaces, namespacesError, namespacesLoaded };
+  }
+  const allowedNamespaces = new Set(data?.allowedNamespaces ?? []);
 
-    const cached = peekAllowedNamespacesCache(accessReviewMemoized, allNamespaceNames);
-    if (cached) {
-      setResult(cached);
-      return;
-    }
-
-    setResult(loadingResult);
-
-    let cancelled = false;
-
-    void loadAllowedNamespaces({
-      accessReview: accessReviewMemoized,
-      allNamespaceNames,
-      isSpokeCluster,
-    }).then((loadedResult) => {
-      if (!cancelled) {
-        setResult(loadedResult);
-      }
-    });
-
-    return (): void => {
-      cancelled = true;
-    };
-  }, [
-    accessReviewMemoized,
-    allNamespaceNames,
-    isSpokeCluster,
-    managedClustersLoaded,
-    projectsLoaded,
-  ]);
-
-  return result;
+  return {
+    namespaces: (namespaces ?? []).filter((namespace) => allowedNamespaces.has(getName(namespace))),
+    namespacesError,
+    namespacesLoaded: loaded && namespacesLoaded,
+  };
 };
 
 export default useAllowedNamespaces;
