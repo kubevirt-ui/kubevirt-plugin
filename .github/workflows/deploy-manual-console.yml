@@ -494,6 +494,8 @@ jobs:
         id: teardown
         env:
           CM_NAME: manual-console-${{ needs.instance-key.outputs.key }}
+          INSTANCE_KEY: ${{ needs.instance-key.outputs.key }}
+          MANUAL_CONSOLE_NS: ${{ env.MANUAL_CONSOLE_NS }}
           CI_ENV_NS: ${{ env.CI_ENV_NS }}
           CLUSTER_NAME: ${{ needs.resolve-config.outputs.cluster_name }}
         working-directory: ci-scripts/hot-cluster/ts
@@ -503,6 +505,8 @@ jobs:
         if: always()
         env:
           FOUND: ${{ steps.teardown.outputs.found }}
+          ORPHANS_CLEANED: ${{ steps.teardown.outputs.orphans_cleaned }}
+          ORPHANS_INCOMPLETE: ${{ steps.teardown.outputs.orphans_incomplete }}
           INSTANCE_KEY: ${{ needs.instance-key.outputs.key }}
           CI_ENV_NS: ${{ env.CI_ENV_NS }}
           CLUSTER_NAME: ${{ needs.resolve-config.outputs.cluster_name }}
