@@ -30,16 +30,19 @@ workflow depends on.
 
 The ARC runner's ServiceAccount also needs permission to manage
 ImageStreams/BuildConfigs inside the `manual-console` namespace so it can
-build the plugin image (see "How it works" below). This is a one-time,
-per-cluster bootstrap -- `arc-runner-rbac.yaml` intentionally keeps that
-permission out of the cluster-wide E2E RBAC, so it's granted separately and
-scoped to just this namespace:
+build the plugin image and delete those objects on
+`/cleanup-manual-console` (see "How it works" / "Tearing down" below).
+This is a one-time, per-cluster bootstrap -- `arc-runner-rbac.yaml`
+intentionally keeps that permission out of the cluster-wide E2E RBAC, so
+it's granted separately and scoped to just this namespace:
 
 ```bash
 ./ci-scripts/manual-console/install-manual-console-rbac.sh
 ```
 
-Set `RUNNER_SCALE_SET_NAME` / `ARC_RUNNERS_NS` first if your cluster uses a
+Re-run the same script after Role changes (e.g. adding `delete`) so
+existing clusters pick up the updated verbs. Set
+`RUNNER_SCALE_SET_NAME` / `ARC_RUNNERS_NS` first if your cluster uses a
 custom runner scale set name (see [`arc/README.md`](../hot-cluster/arc/README.md))
 -- the script substitutes the `ServiceAccount` subject in
 `manual-console-rbac.yaml` for you (default `kubevirt-plugin-ci`, e.g.

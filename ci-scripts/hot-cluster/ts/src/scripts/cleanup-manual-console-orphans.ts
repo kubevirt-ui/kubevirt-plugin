@@ -11,8 +11,13 @@
  * controller deliberately does not delete it).
  *
  * This module deletes the instance-scoped ImageStream, BuildConfig, and
- * any lingering Helm release. It never deletes the shared namespace or
- * the one-time RBAC bootstrap.
+ * any lingering Helm release it can see. It never deletes the shared
+ * namespace or the one-time RBAC bootstrap.
+ *
+ * Helm storage is secrets in the release namespace. The ARC runner SA is
+ * not granted secrets access there (ci-env-controller owns Helm); a
+ * Forbidden on `helm list`/`uninstall` is skipped with a warning so build
+ * leftover cleanup still completes.
  */
 
 import { execFileSync } from 'node:child_process';
@@ -52,6 +57,14 @@ export type CleanupOrphansResult = {
 export const escapeHelmFilter = (value: string): string =>
   value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
+/**
+ * True when Helm failed because the runner lacks secrets RBAC for release
+ * storage. Generic Forbidden/Unauthorized (e.g. chart resource deletes)
+ * must NOT match -- those stay unexpected failures.
+ */
+export const isHelmPermissionError = (message: string): boolean =>
+  /\bsecrets?\b/i.test(message) && /forbidden|unauthorized/i.test(message);
+
 export const resolveInstanceArtifacts = (
   instanceKey: string,
 ): ManualConsoleInstanceArtifacts => ({
@@ -60,7 +73,7 @@ export const resolveInstanceArtifacts = (
   imageStream: `kubevirt-plugin-${instanceKey}`,
 });
 
-const formatExecError = (err: unknown): string => {
+export const formatExecError = (err: unknown): string => {
   const execErr = err as { message?: string; stderr?: string };
   const stderr = execErr.stderr?.trim();
   if (stderr) {
@@ -98,11 +111,32 @@ const tryDelete = (
   }
 };
 
+/** Args for listing one release across all statuses without the 256-cap. */
+export const helmListAllStatusesArgs = (
+  namespace: string,
+  helmRelease: string,
+): string[] => [
+  'list',
+  '-n',
+  namespace,
+  '-q',
+  '--filter',
+  `^${escapeHelmFilter(helmRelease)}$`,
+  '--max',
+  '10000',
+  '--deployed',
+  '--failed',
+  '--pending',
+  '--superseded',
+  '--uninstalling',
+  '--uninstalled',
+];
+
 /**
  * Delete instance-scoped build + helm leftovers in the shared manual-console
  * namespace. Continues after individual delete failures; callers must treat
  * `failed` as incomplete cleanup. `cleaned` only lists resources actually
- * removed.
+ * removed. Helm permission errors are skipped (not recorded as failed).
  */
 export const cleanupManualConsoleOrphans = (
   namespace: string,
@@ -185,41 +219,68 @@ export const cleanupManualConsoleOrphans = (
     );
   }
 
-  // Filter to this release across all statuses, with a high --max so we
-  // are not clipped by Helm's default 256-result page (filter is applied
-  // after the page is fetched). Status flags keep pending/failed/etc.
-  // visible even on Helm 3, where the default list is deployed-only.
-  const helmNames = runner.runSafe('helm', [
-    'list',
-    '-n',
-    namespace,
-    '-q',
-    '--filter',
-    `^${escapeHelmFilter(artifacts.helmRelease)}$`,
-    '--max',
-    '10000',
-    '--deployed',
-    '--failed',
-    '--pending',
-    '--superseded',
-    '--uninstalling',
-    '--uninstalled',
-  ]);
+  cleanupHelmRelease(runner, namespace, artifacts.helmRelease, cleaned, failed);
+
+  return { cleaned, failed };
+};
+
+const cleanupHelmRelease = (
+  runner: OcRunner,
+  namespace: string,
+  helmRelease: string,
+  cleaned: string[],
+  failed: CleanupOrphansResult['failed'],
+): void => {
+  let helmNames: string;
+  try {
+    helmNames = runner.runSafe('helm', helmListAllStatusesArgs(namespace, helmRelease));
+  } catch (err) {
+    const error = formatExecError(err);
+    if (isHelmPermissionError(error)) {
+      // Expected on ARC runners: no secrets RBAC in the release namespace.
+      // Build leftovers above are the orphan path; Helm stays with the controller.
+      console.log(
+        `::warning::Skipping helm orphan check in ${namespace} (no secrets RBAC for runner): ${error}`,
+      );
+      return;
+    }
+    failed.push({
+      error: `list failed: ${error}`,
+      resource: `helmrelease/${helmRelease}`,
+    });
+    return;
+  }
+
   const hasRelease = helmNames
     .split('\n')
     .map((line) => line.trim())
-    .includes(artifacts.helmRelease);
-  if (hasRelease) {
-    const resource = `helmrelease/${artifacts.helmRelease}`;
-    tryDelete(
-      runner,
-      resource,
-      'helm',
-      ['uninstall', artifacts.helmRelease, '-n', namespace, '--wait'],
-      cleaned,
-      failed,
-    );
+    .includes(helmRelease);
+  if (!hasRelease) {
+    return;
   }
 
-  return { cleaned, failed };
+  const resource = `helmrelease/${helmRelease}`;
+  const result = runner.runIgnore('helm', [
+    'uninstall',
+    helmRelease,
+    '-n',
+    namespace,
+    '--wait',
+  ]);
+  if (result.ok) {
+    cleaned.push(resource);
+    return;
+  }
+
+  const error = result.error ?? 'uninstall failed';
+  if (isHelmPermissionError(error)) {
+    // Same secrets-RBAC gap as list: runner cannot read Helm storage.
+    console.log(
+      `::warning::Skipping helm uninstall of ${helmRelease} in ${namespace} (no secrets RBAC for runner): ${error}`,
+    );
+    return;
+  }
+
+  // Chart/object delete failures (or other unexpected errors) stay visible.
+  failed.push({ error, resource });
 };
