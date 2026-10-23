@@ -1,11 +1,12 @@
 type ApiErrorShape = {
-  body?: { reason?: string } | string;
+  body?: { code?: number; reason?: string } | string;
+  code?: number | string;
   reason?: string;
-  response?: { body?: { reason?: string } };
+  response?: { body?: { code?: number; reason?: string } | string; statusCode?: number };
   statusCode?: number;
 };
 
-const kubernetesApiErrorReason = (err: unknown): string | undefined => {
+const resolvesApiErrorReason = (err: unknown): string | undefined => {
   const apiErr = err as ApiErrorShape;
   if (apiErr.reason) {
     return apiErr.reason;
@@ -22,6 +23,44 @@ const kubernetesApiErrorReason = (err: unknown): string | undefined => {
   return body?.reason;
 };
 
+const isHttpNotFoundCode = (value: unknown): boolean => value === 404 || value === '404';
+
+/** True when the API responded NotFound (resource already gone). */
+export const isNotFoundError = (err: unknown): boolean => {
+  const apiErr = err as ApiErrorShape;
+  if (
+    isHttpNotFoundCode(apiErr.statusCode) ||
+    isHttpNotFoundCode(apiErr.code) ||
+    isHttpNotFoundCode(apiErr.response?.statusCode)
+  ) {
+    return true;
+  }
+  if (resolvesApiErrorReason(err) === 'NotFound') {
+    return true;
+  }
+
+  const body = apiErr.body ?? apiErr.response?.body;
+  if (typeof body === 'string') {
+    if (/["']?reason["']?\s*:\s*["']NotFound["']/i.test(body) || /HTTP-Code:\s*404/i.test(body)) {
+      return true;
+    }
+    try {
+      const parsed = JSON.parse(body) as { code?: number | string; reason?: string };
+      if (parsed.reason === 'NotFound' || isHttpNotFoundCode(parsed.code)) {
+        return true;
+      }
+      // Parsed but not a NotFound payload -- keep checking the error message.
+    } catch {
+      /* fall through */
+    }
+  } else if (body && (body.reason === 'NotFound' || isHttpNotFoundCode(body.code))) {
+    return true;
+  }
+
+  const message = err instanceof Error ? err.message : String(err);
+  return /\b404\b/.test(message) && /not\s*found/i.test(message);
+};
+
 /** Check if an error is retryable (transient network / 5xx). */
 export const isRetryableError = (err: unknown): boolean => {
   if (!(err instanceof Error)) return false;
@@ -33,7 +72,7 @@ export const isRetryableError = (err: unknown): boolean => {
     // 409 is used for both transient Conflict (stale resourceVersion) and
     // permanent AlreadyExists -- only the former should be retried.
     if (status === 409) {
-      return kubernetesApiErrorReason(err) === 'Conflict';
+      return resolvesApiErrorReason(err) === 'Conflict';
     }
     return false;
   }
