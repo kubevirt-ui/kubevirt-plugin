@@ -21,10 +21,10 @@
  * RBAC, delete rejected, etc.), that failure must surface and fail the job
  * rather than being swallowed, otherwise the job would sail through to
  * "Execute tests" having silently done nothing, reproducing the exact
- * hang this script exists to fix. The one expected, non-error outcome is
- * a brand new cluster whose AutoscalingListener hasn't been created yet
- * by the install step above -- that case is handled explicitly below and
- * is not an error.
+ * hang this script exists to fix. Expected non-errors:
+ *   - No AutoscalingListener yet (brand-new install creates it fresh).
+ *   - NotFound on read/delete: the Helm upgrade that just ran (or the
+ *     controller) already removed the pod. 
  *
  * The replacement Pod keeps the *same name* (it's named after the
  * AutoscalingListener object, not given a random suffix), and a
@@ -34,6 +34,8 @@
  * is confirmed Running and Ready -- otherwise the later "Verify cluster
  * health" check could read the old, still-terminating pod and report a
  * false-positive "healthy listener", silently defeating this whole fix.
+ * When the old pod vanished before we captured a UID, any Ready pod under
+ * that name counts as the replacement.
  *
  * Required env: RUNNER_SCALE_SET_NAME
  * Optional env: ARC_CONTROLLER_NS (default: arc-systems), ARC_RUNNERS_NS (default: arc-runners)
@@ -41,6 +43,7 @@
 
 import { findArcListenerPodName, isPodReady, type PodStatusLike } from '../arc-listener';
 import { KubeClient, requireEnv, sleep } from '../kube-client';
+import { isNotFoundError } from '../retry';
 
 const REPLACEMENT_POLL_INTERVAL_MS = 5000;
 const REPLACEMENT_TIMEOUT_MS = 2 * 60 * 1000;
@@ -59,7 +62,9 @@ const waitForReplacementPod = async (
         namespace,
       })) as unknown as PodStatusLike;
 
-      if (pod.metadata?.uid && pod.metadata.uid !== previousUid && isPodReady(pod)) {
+      const uid = pod.metadata?.uid;
+      const replaced = Boolean(uid) && (previousUid === '' || uid !== previousUid);
+      if (replaced && isPodReady(pod)) {
         return;
       }
     } catch {
@@ -68,7 +73,9 @@ const waitForReplacementPod = async (
 
     if (Date.now() >= deadline) {
       throw new Error(
-        `Timed out after ${REPLACEMENT_TIMEOUT_MS}ms waiting for a new, Ready listener pod named '${podName}' to replace uid '${previousUid}'`,
+        previousUid
+          ? `Timed out after ${REPLACEMENT_TIMEOUT_MS}ms waiting for a new, Ready listener pod named '${podName}' to replace uid '${previousUid}'`
+          : `Timed out after ${REPLACEMENT_TIMEOUT_MS}ms waiting for a Ready listener pod named '${podName}'`,
       );
     }
     await sleep(Math.min(REPLACEMENT_POLL_INTERVAL_MS, deadline - Date.now()));
@@ -94,22 +101,54 @@ const main = async (): Promise<void> => {
     return;
   }
 
-  const previousPod = (await client.coreV1.readNamespacedPod({
-    name: podName,
-    namespace: controllerNamespace,
-  })) as unknown as PodStatusLike;
-  const previousUid = previousPod.metadata?.uid;
-  if (!previousUid) {
-    throw new Error(`Listener pod '${podName}' has no UID -- cannot verify it was actually replaced`);
+  let previousUid = '';
+  try {
+    const previousPod = (await client.coreV1.readNamespacedPod({
+      name: podName,
+      namespace: controllerNamespace,
+    })) as unknown as PodStatusLike;
+    previousUid = previousPod.metadata?.uid ?? '';
+    if (!previousUid) {
+      throw new Error(
+        `Listener pod '${podName}' has no UID -- cannot verify it was actually replaced`,
+      );
+    }
+  } catch (err) {
+    if (!isNotFoundError(err)) {
+      throw err;
+    }
+    console.log(
+      `Listener pod '${podName}' already gone before delete (likely removed during Helm upgrade) -- waiting for its replacement...`,
+    );
   }
 
-  console.log(
-    `Deleting listener pod '${podName}' (uid ${previousUid}) in '${controllerNamespace}' to force a fresh GitHub registration...`,
-  );
-  await client.coreV1.deleteNamespacedPod({ name: podName, namespace: controllerNamespace });
+  if (previousUid) {
+    console.log(
+      `Deleting listener pod '${podName}' (uid ${previousUid}) in '${controllerNamespace}' to force a fresh GitHub registration...`,
+    );
+    try {
+      await client.coreV1.deleteNamespacedPod({
+        name: podName,
+        namespace: controllerNamespace,
+      });
+    } catch (err) {
+      if (!isNotFoundError(err)) {
+        throw err;
+      }
+      // Helm upgrade / controller often deletes the listener between our
+      // read and delete. Gone is the desired state.
+      console.log(
+        `Listener pod '${podName}' already gone on delete (404) -- continuing to wait for replacement...`,
+      );
+    }
+  }
 
   console.log(`Waiting up to ${REPLACEMENT_TIMEOUT_MS / 1000}s for its replacement to become Ready...`);
-  await waitForReplacementPod(client, { namespace: controllerNamespace, podName, previousUid });
+  await waitForReplacementPod(client, {
+    namespace: controllerNamespace,
+    podName,
+    previousUid,
+  });
 
   console.log(
     `Replacement listener pod '${podName}' is Running and Ready -- the ARC controller established a new connection to GitHub.`,
