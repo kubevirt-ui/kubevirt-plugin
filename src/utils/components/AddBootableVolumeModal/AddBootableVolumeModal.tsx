@@ -1,6 +1,7 @@
 import type { FC } from 'react';
 import { useNavigate } from 'react-router';
 
+import AddBootableVolumeAllowedNamespacesPrefetch from '@kubevirt-utils/components/AddBootableVolumeModal/components/AddBootableVolumeAllowedNamespacesPrefetch';
 import AddBootableVolumeBody from '@kubevirt-utils/components/AddBootableVolumeModal/components/AddBootableVolumeBody';
 import { handleAddBootableVolumeSuccess } from '@kubevirt-utils/components/AddBootableVolumeModal/components/BootableVolumeModalToasts';
 import { emptyDataSource } from '@kubevirt-utils/components/AddBootableVolumeModal/consts';
@@ -47,7 +48,12 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
   const toastHandlers = { addInfoToast, addSuccessToast, navigate, t };
 
   return (
-    <TabModal
+    <>
+      <AddBootableVolumeAllowedNamespacesPrefetch
+        cluster={bootableVolume.bootableVolumeCluster}
+        isOpen={isOpen}
+      />
+      <TabModal
       closeOnSubmit
       headerText={t('Add volume')}
       isDisabled={!isFormValid}
@@ -80,6 +86,7 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
         upload={upload}
       />
     </TabModal>
+    </>
   );
 };
 

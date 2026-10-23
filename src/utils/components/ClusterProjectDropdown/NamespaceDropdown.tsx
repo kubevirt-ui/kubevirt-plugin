@@ -1,20 +1,20 @@
 import type { FC, JSX } from 'react';
 import { useCallback, useMemo } from 'react';
 
-import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import Dropdown from '@kubevirt-utils/components/ClusterProjectDropdown/Dropdown/Dropdown';
 import type {
   DropdownConfig,
   DropdownCreateProjectMenuFooterProps,
 } from '@kubevirt-utils/components/ClusterProjectDropdown/Dropdown/types';
 import { ALL_PROJECTS } from '@kubevirt-utils/hooks/constants';
+import useAllowedNamespaces from '@kubevirt-utils/hooks/useAllowedNamespaces/useAllowedNamespaces';
 import useConsoleNamespaceBookmarks from '@kubevirt-utils/hooks/useConsoleNamespaceBookmarks/useConsoleNamespaceBookmarks';
 import useConsoleShowSystemNamespaces from '@kubevirt-utils/hooks/useConsoleShowSystemNamespaces/useConsoleShowSystemNamespaces';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isSystemNamespace } from '@kubevirt-utils/resources/namespace/helper';
 import { getName } from '@kubevirt-utils/resources/shared';
-import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 import type { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+import { type FleetAccessReviewResourceAttributes } from '@stolostron/multicluster-sdk';
 
 import CreateProjectFromDropdownFooter from './components/CreateProjectFromDropdownFooter';
 import { extractName } from './utils';
@@ -29,6 +29,7 @@ export type NamespaceDropdownProps = {
   includeAllProjects?: boolean;
   onChange: (project: string) => void;
   onProjectCreated?: NamespaceDropdownProjectCreatedHandler;
+  projectAccessReview?: FleetAccessReviewResourceAttributes;
   selectedProject: string;
 };
 
@@ -40,18 +41,17 @@ const NamespaceDropdown: FC<NamespaceDropdownProps> = ({
   includeAllProjects = true,
   onChange,
   onProjectCreated,
+  projectAccessReview,
   selectedProject,
 }): JSX.Element => {
   const { t } = useKubevirtTranslation();
 
   const consoleSettingsCluster = bookmarkCluster ?? cluster;
 
-  const [projects, projectsLoaded] = useK8sWatchData<K8sResourceCommon[]>({
+  const { namespaces, namespacesLoaded } = useAllowedNamespaces(
+    projectAccessReview ?? null,
     cluster,
-    groupVersionKind: modelToGroupVersionKind(ProjectModel),
-    isList: true,
-    namespaced: false,
-  });
+  );
 
   const [bookmarks, updateBookmarks, bookmarksLoaded] =
     useConsoleNamespaceBookmarks(consoleSettingsCluster);
@@ -59,8 +59,8 @@ const NamespaceDropdown: FC<NamespaceDropdownProps> = ({
     useConsoleShowSystemNamespaces(consoleSettingsCluster);
 
   const hasSystemNamespaces = useMemo(
-    () => (projects || []).some((project) => isSystemNamespace(getName(project))),
-    [projects],
+    () => (namespaces ?? []).some((namespace) => isSystemNamespace(getName(namespace))),
+    [namespaces],
   );
 
   const config: DropdownConfig = useMemo(
@@ -111,17 +111,20 @@ const NamespaceDropdown: FC<NamespaceDropdownProps> = ({
     return { initialCluster: cluster, onProjectCreated };
   }, [cluster, onProjectCreated]);
 
+  const isDropdownDisabled = disabled || !namespacesLoaded;
+  const dropdownDisabledTooltip = !namespacesLoaded ? t('Loading projects...') : disabledTooltip;
+
   return (
     <Dropdown<K8sResourceCommon>
       bookmarks={bookmarksProp}
       config={config}
-      disabled={disabled}
-      disabledTooltip={disabledTooltip}
+      disabled={isDropdownDisabled}
+      disabledTooltip={dropdownDisabledTooltip}
       extractKey={extractName}
       extractTitle={extractName}
       includeAllItems={includeAllProjects}
-      items={projects || null}
-      itemsLoaded={projectsLoaded}
+      items={namespaces ?? null}
+      itemsLoaded={namespacesLoaded}
       menuFooter={onProjectCreated ? CreateProjectFromDropdownFooter : undefined}
       menuFooterProps={menuFooterProps}
       onChange={onChange}

@@ -1,9 +1,12 @@
 import { type FC, useCallback, useMemo } from 'react';
 
-import useProjects from '@kubevirt-utils/hooks/useProjects';
+import useAllowedNamespaces from '@kubevirt-utils/hooks/useAllowedNamespaces/useAllowedNamespaces';
 import usePVCs from '@kubevirt-utils/hooks/usePVCs';
 import { getPVCSize } from '@kubevirt-utils/resources/bootableresources/selectors';
+import { getCloneSourceFleetAccessReview } from '@kubevirt-utils/resources/cdi/pvcClonePermission';
+import { getName } from '@kubevirt-utils/resources/shared';
 import { formatQuantityString } from '@kubevirt-utils/utils/units';
+import { type FleetAccessReviewResourceAttributes } from '@stolostron/multicluster-sdk';
 
 import DiskSourcePVCSelectName from './DiskSourcePVCSelectName';
 import DiskSourcePVCSelectNamespace from './DiskSourcePVCSelectNamespace';
@@ -25,8 +28,22 @@ const DiskSourcePVCSelect: FC<DiskSourcePVCSelectProps> = ({
   selectPVCNamespace,
   setDiskSize,
 }) => {
-  const [projectsNames, projectNamesLoaded] = useProjects(cluster);
+  const cloneAccessReview = useMemo(
+    (): FleetAccessReviewResourceAttributes => getCloneSourceFleetAccessReview(cluster),
+    [cluster],
+  );
+
+  const { namespaces, namespacesLoaded } = useAllowedNamespaces(cloneAccessReview);
   const [pvcs, pvcsLoaded] = usePVCs(pvcNamespaceSelected, cluster);
+
+  const selectableProjectNames = useMemo(
+    () =>
+      (namespaces ?? [])
+        .map((namespace) => getName(namespace))
+        .filter((name): name is string => Boolean(name))
+        .sort((a, b) => a.localeCompare(b)),
+    [namespaces],
+  );
 
   const onSelectProject = useCallback(
     (newProject) => {
@@ -59,8 +76,8 @@ const DiskSourcePVCSelect: FC<DiskSourcePVCSelectProps> = ({
       <DiskSourcePVCSelectNamespace
         isDisabled={!selectPVCNamespace}
         onChange={onSelectProject}
-        projectNames={projectsNames}
-        projectsLoaded={projectNamesLoaded}
+        projectNames={selectableProjectNames}
+        projectsLoaded={namespacesLoaded}
         selectedProject={pvcNamespaceSelected}
       />
       <DiskSourcePVCSelectName

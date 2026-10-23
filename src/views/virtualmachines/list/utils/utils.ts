@@ -48,13 +48,19 @@ export const getDisabledCreateVMTooltip = (t: TFunction, isInAllNamespaces: bool
   );
 };
 
-export const getCanCreateVMFleetAccessReview = (
-  namespace: string,
+export const getVmCreateFleetAccessReview = (
   cluster?: string,
 ): FleetAccessReviewResourceAttributes => ({
   cluster,
   group: VirtualMachineModel.apiGroup,
-  namespace,
   resource: VirtualMachineModel.plural,
   verb: 'create',
+});
+
+export const getCanCreateVMFleetAccessReview = (
+  namespace: string,
+  cluster?: string,
+): FleetAccessReviewResourceAttributes => ({
+  ...getVmCreateFleetAccessReview(cluster),
+  namespace,
 });

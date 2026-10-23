@@ -1,4 +1,4 @@
-import { type FC, useCallback } from 'react';
+import { type FC, useCallback, useMemo } from 'react';
 import { Controller, useWatch } from 'react-hook-form';
 
 import ClusterDropdown from '@kubevirt-utils/components/ClusterProjectDropdown/ClusterDropdown';
@@ -16,6 +16,7 @@ import { getCluster } from '@multicluster/helpers/selectors';
 import useIsACMPage from '@multicluster/useIsACMPage';
 import { Form, FormGroup } from '@patternfly/react-core';
 import { useHubClusterName } from '@stolostron/multicluster-sdk';
+import { getVmCreateFleetAccessReview } from '@virtualmachines/list/utils/utils';
 import { useVMWizardForm } from '@virtualmachines/wizard/form/VMWizardFormProvider';
 import { useWizardVMDraft } from '@virtualmachines/wizard/hooks/useWizardVMDraft';
 import { VMCreationMethod } from '@virtualmachines/wizard/utils/constants';
@@ -38,6 +39,11 @@ const VMCreationLocationForm: FC = () => {
     control,
     name: ['deployment.cluster', 'deployment.folder', 'deployment.project'],
   });
+
+  const vmCreateProjectAccessReview = useMemo(
+    () => getVmCreateFleetAccessReview(cluster),
+    [cluster],
+  );
 
   const clearLocationDependentVM = useCallback((): void => {
     clearWizardDraftPendingUploads(getValues, setValue);
@@ -105,6 +111,7 @@ const VMCreationLocationForm: FC = () => {
                 clearLocationDependentVM();
               }}
               onProjectCreated={onLocationProjectCreated}
+              projectAccessReview={vmCreateProjectAccessReview}
               selectedProject={project || DEFAULT_NAMESPACE}
             />
           )}
