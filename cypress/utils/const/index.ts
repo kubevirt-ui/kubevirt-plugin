@@ -39,6 +39,7 @@ export const QUAY_CONTAINER_IMAGE = 'quay.io/openshift-cnv/qe-cnv-tests-fedora:4
 export const DATASOURCE_IMAGE = 'quay.io/containerdisks/centos:7-2009';
 export const DATASOURCE_CRON = '0 0 * * 2';
 export const ALL_PROJ_NS = 'All Projects';
+export const TREEVIEW_ROOT_ID = '#vms-tree-view-panel';
 export const CLEANUP_SCRIPT = './utils/cleanup.sh';
 export const DUMP_SCRIPT = './utils/dump.sh';
 export const TEST_SECRET_NAME = 'auto-test-secret';
