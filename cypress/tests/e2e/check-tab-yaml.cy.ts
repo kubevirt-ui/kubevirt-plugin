@@ -5,7 +5,6 @@ import {
   iconStartBtn,
   itemCreateBtn,
   nameFilter,
-  saveBtn,
   vmStatusOnOverview,
 } from '../../views/selector';
 import { tab } from '../../views/tab';
@@ -23,7 +22,7 @@ describe('Check all virtualization pages can be loaded', () => {
     it('create example VM', () => {
       cy.get(itemCreateBtn).click();
       cy.byButtonText(YAML).click();
-      cy.get(saveBtn).click();
+      cy.saveYAML();
     });
 
     it('start example vm', () => {
@@ -154,7 +153,7 @@ describe('Check all virtualization pages can be loaded', () => {
     it('create example template', () => {
       cy.switchProject('default');
       cy.get(itemCreateBtn).click();
-      cy.get(saveBtn).click();
+      cy.saveYAML();
     });
 
     it('custom template tabs are loaded', () => {
@@ -187,9 +186,12 @@ describe('Check all virtualization pages can be loaded', () => {
     });
 
     it('create instanceType from yaml on the first tab', () => {
-      cy.get('div.co-operator-details__actions').find(itemCreateBtn).click();
-      cy.get(saveBtn).click();
-      cy.get(breadcrumb).click();
+      // The `div.co-operator-details__actions` wrapper no longer exists on current
+      // consoles; match the cluster-scoped list container instead (same change already
+      // present on release-4.19).
+      cy.get('div.co-m-list').find(itemCreateBtn).eq(0).click();
+      cy.saveYAML();
+      cy.get(breadcrumb).first().click();
       cy.get(nameFilter).type(Example);
       cy.byLegacyTestID(Example).should('exist');
       cy.byLegacyTestID('cx1.2xlarge').should('not.exist');
@@ -198,8 +200,8 @@ describe('Check all virtualization pages can be loaded', () => {
     it('create instanceType from yaml on the second tab', () => {
       cy.contains('span.pf-v5-c-tabs__item-text', 'User provided').click();
       cy.get(itemCreateBtn).click();
-      cy.get(saveBtn).click();
-      cy.get(breadcrumb).click();
+      cy.saveYAML();
+      cy.get(breadcrumb).first().click();
       cy.byLegacyTestID(Example).should('exist');
     });
   });
@@ -211,9 +213,10 @@ describe('Check all virtualization pages can be loaded', () => {
     });
 
     it('create preference from yaml on the first tab', () => {
-      cy.get('div.co-operator-details__actions').find(itemCreateBtn).click();
-      cy.get(saveBtn).click();
-      cy.get(breadcrumb).click();
+      // See comment on the InstanceType "first tab" create test above.
+      cy.get('div.co-m-list').find(itemCreateBtn).eq(0).click();
+      cy.saveYAML();
+      cy.get(breadcrumb).first().click();
       cy.get(nameFilter).type(Example);
       cy.byLegacyTestID(Example).should('exist');
       cy.byLegacyTestID('fedora').should('not.exist');
@@ -222,8 +225,8 @@ describe('Check all virtualization pages can be loaded', () => {
     it('create preference from yaml on the second tab', () => {
       cy.contains('span.pf-v5-c-tabs__item-text', 'User preferences').click();
       cy.get(itemCreateBtn).click();
-      cy.get(saveBtn).click();
-      cy.get(breadcrumb).click();
+      cy.saveYAML();
+      cy.get(breadcrumb).first().click();
       cy.byLegacyTestID(Example).should('exist');
     });
   });
@@ -238,8 +241,8 @@ describe('Check all virtualization pages can be loaded', () => {
     xit('create bootable volume from yaml', () => {
       cy.get(itemCreateBtn).click();
       cy.byButtonText(YAML).click();
-      cy.get(saveBtn).click();
-      cy.get(breadcrumb).click();
+      cy.saveYAML();
+      cy.get(breadcrumb).first().click();
       cy.byLegacyTestID(Example).should('exist');
     });
   });
@@ -253,8 +256,11 @@ describe('Check all virtualization pages can be loaded', () => {
     it('create migration policy from yaml', () => {
       cy.get(itemCreateBtn).click();
       cy.byButtonText(YAML).click();
-      cy.get(saveBtn).click();
-      cy.get('.pf-v5-c-breadcrumb__item').eq(0).click();
+      cy.saveYAML();
+      // The MigrationPolicy details breadcrumb doesn't expose `data-test-id="breadcrumb-link-0"`;
+      // match on the PatternFly breadcrumb item class instead (same change already present
+      // on release-4.19).
+      cy.get('.pf-v6-c-breadcrumb__item').eq(0).click();
       cy.byLegacyTestID(Example).should('exist');
     });
   });
