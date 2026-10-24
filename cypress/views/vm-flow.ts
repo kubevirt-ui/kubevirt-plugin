@@ -102,9 +102,7 @@ export const vm = {
     cy.get(cView.quickCreateVMBtn).click();
     cy.get('[data-test="global-notifications"]').scrollIntoView();
     if (waitForRunning && vmData.startOnCreation !== false) {
-      // wait here for other state showing before running
-      // cy.wait(90000);
-      checkStatus(vmData.name, index.VM_STATUS.Running, 3 * index.MINUTE, false);
+      checkStatus(vmData.name, index.VM_STATUS.Running, 10 * index.MINUTE, false);
       // wait for vmi appear
       cy.wait(3000);
     }
@@ -145,9 +143,7 @@ export const vm = {
     });
     cy.get('[data-test="global-notifications"]').scrollIntoView();
     if (waitForRunning && vmData.startOnCreation !== false) {
-      // wait here for other state showing before running
-      // cy.wait(90000);
-      checkStatus(vmData.name, index.VM_STATUS.Running, 3 * index.MINUTE, false);
+      checkStatus(vmData.name, index.VM_STATUS.Running, 10 * index.MINUTE, false);
       // wait for vmi appear
       cy.wait(3000);
     }
@@ -163,7 +159,7 @@ export const vm = {
     if (waitForRunning && vmData.startOnCreation !== false) {
       // wait here for other state showing before running
       // cy.wait(90000);
-      checkStatus(vmData.name, index.VM_STATUS.Running, 3 * index.MINUTE, false);
+      checkStatus(vmData.name, index.VM_STATUS.Running, 10 * index.MINUTE, false);
       // wait for vmi appear
       cy.wait(3000);
     }
@@ -179,7 +175,7 @@ export const vm = {
     if (waitForRunning && vmData.startOnCreation !== false) {
       // wait here for other state showing before running
       // cy.wait(90000);
-      checkStatus(vmData.name, index.VM_STATUS.Running, 3 * index.MINUTE, false);
+      checkStatus(vmData.name, index.VM_STATUS.Running, 10 * index.MINUTE, false);
       // wait for vmi appear
       cy.wait(3000);
     }

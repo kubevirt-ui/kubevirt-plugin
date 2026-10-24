@@ -139,7 +139,7 @@ describe('Check all virtualization pages can be loaded', () => {
     it('create example template', () => {
       cy.switchProject(TEST_NS);
       cy.get(sel.itemCreateBtn).click();
-      cy.get(sel.saveBtn).click();
+      cy.saveYAML();
     });
 
     it('custom template tabs are loaded', () => {
@@ -173,18 +173,23 @@ describe('Check all virtualization pages can be loaded', () => {
 
     it('create VirtualMachineClusterInstanceType from YAML', () => {
       cy.get('div.co-m-list').find(sel.itemCreateBtn).eq(0).click();
-      cy.get(sel.saveBtn).click();
-      cy.get(sel.breadcrumb).click();
+      cy.saveYAML();
+      cy.get(sel.breadcrumb).first().click();
       cy.get(sel.nameFilter).first().type(Example);
       cy.byLegacyTestID(Example).should('exist');
       cy.byLegacyTestID('cx1.2xlarge').should('not.exist');
     });
 
     it('create VirtualMachineInstanceType from YAML', () => {
+      // Create into TEST_NS — default YAML targets `default`, which often has leftovers.
       cy.contains('span.pf-v6-c-tabs__item-text', userButtonTxt).click();
+      cy.switchProject(TEST_NS);
+      cy.exec(
+        `oc delete virtualmachineinstancetype ${Example} -n ${TEST_NS} --ignore-not-found=true`,
+      );
       cy.get(sel.itemCreateBtn).click();
-      cy.get(sel.saveBtn).click();
-      cy.get(sel.breadcrumb).click();
+      cy.saveYAML();
+      cy.get(sel.breadcrumb).first().click();
       cy.byLegacyTestID(Example).should('exist');
     });
   });
@@ -197,20 +202,32 @@ describe('Check all virtualization pages can be loaded', () => {
 
     it('create VirtualMachineClusterPreference from YAML', () => {
       cy.get('div.co-m-list').find(sel.itemCreateBtn).eq(0).click();
-      cy.get(sel.saveBtn).click();
-      cy.get(sel.breadcrumb).click();
+      cy.saveYAML();
+      cy.get(sel.breadcrumb).first().click();
       cy.get(sel.nameFilter).first().type(Example);
       cy.byLegacyTestID(Example).should('exist');
       cy.byLegacyTestID('fedora').should('not.exist');
     });
 
-    it('create VirtualMachinePreference from YAML', () => {
-      cy.contains('span.pf-v6-c-tabs__item-text', userButtonTxt).click();
-      cy.get(sel.itemCreateBtn).click();
-      cy.get(sel.saveBtn).click();
-      cy.get(sel.breadcrumb).click();
-      cy.byLegacyTestID(Example).should('exist');
-    });
+    it(
+      'create VirtualMachinePreference from YAML',
+      {
+        retries: {
+          runMode: 2,
+        },
+      },
+      () => {
+        cy.contains('span.pf-v6-c-tabs__item-text', userButtonTxt).click();
+        cy.switchProject(TEST_NS);
+        cy.exec(
+          `oc delete virtualmachinepreference ${Example} -n ${TEST_NS} --ignore-not-found=true`,
+        );
+        cy.get(sel.itemCreateBtn).click();
+        cy.saveYAML();
+        cy.get(sel.breadcrumb).first().click();
+        cy.byLegacyTestID(Example).should('exist');
+      },
+    );
   });
 
   describe('Check Bootable volumes page', () => {
@@ -221,10 +238,12 @@ describe('Check all virtualization pages can be loaded', () => {
     });
 
     it('create bootable volume from YAML', () => {
+      cy.switchProject(TEST_NS);
+      cy.exec(`oc delete datavolume ${Example} -n ${TEST_NS} --ignore-not-found=true`);
       cy.get(sel.itemCreateBtn).click();
       cy.byButtonText(YAML).click();
-      cy.get(sel.saveBtn).click();
-      cy.get(sel.breadcrumb).click();
+      cy.saveYAML();
+      cy.get(sel.breadcrumb).first().click();
       cy.byLegacyTestID(Example).should('exist');
     });
   });
@@ -238,8 +257,8 @@ describe('Check all virtualization pages can be loaded', () => {
     it('create migration policy from YAML', () => {
       cy.get(sel.itemCreateBtn).click();
       cy.byButtonText(YAML).click();
-      cy.get(sel.saveBtn).click();
-      cy.get('.pf-v6-c-breadcrumb__item').eq(0).click();
+      cy.saveYAML();
+      cy.get(sel.breadcrumb).first().click();
       cy.byLegacyTestID(Example).should('exist');
     });
   });

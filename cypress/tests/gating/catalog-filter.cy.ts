@@ -19,21 +19,29 @@ describe('Test filter in InstanceType', () => {
   });
 
   it('mark volume favorite ', () => {
+    // Assert the favorited CSS state instead of hardcoding volume names —
+    // Ready golden volumes and their default sort order differ across CNV
+    // versions on OCP 4.20+ hot clusters.
     cy.get('table.BootableVolumeList-table')
       .find('tbody')
       .within(() => {
-        cy.get('tr').last().find(favName).find('button').click();
-        cy.get('tr').first().should('contain', 'fedora');
-        cy.get('tr').last().find(favName).find('button').click();
-        cy.get('tr').first().should('contain', 'centos-stream9');
+        cy.get('tr').first().find(favName).find('button').click();
+        cy.wait(3000);
+        cy.get('tr')
+          .first()
+          .find('.pf-v6-c-table__td.pf-v6-c-table__favorite.pf-m-favorited')
+          .should('exist');
       });
     cy.get('button[aria-label="Sort favorites"]').click();
     cy.get('table.BootableVolumeList-table')
       .find('tbody')
       .within(() => {
-        cy.get('tr').last().should('contain', 'fedora');
+        cy.wait(3000);
+        cy.get('tr')
+          .last()
+          .find('.pf-v6-c-table__td.pf-v6-c-table__favorite.pf-m-favorited')
+          .should('exist');
         // restore favorites
-        cy.get('tr').last().find(favName).find('button').click();
         cy.get('tr').last().find(favName).find('button').click();
       });
   });
@@ -72,6 +80,11 @@ describe('Test filter in InstanceType', () => {
 });
 
 describe('Test filter in Templates', () => {
+  before(() => {
+    cy.beforeSpec();
+    cy.visitCatalogVirt();
+  });
+
   it('visit catalog template tab', () => {
     cy.get(cView.templateTab).click();
   });
