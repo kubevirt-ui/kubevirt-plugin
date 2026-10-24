@@ -1,3 +1,4 @@
+export const dsIT = Cypress.env('DOWNSTREAM') ? it : xit;
 export const QUICK_VM_IT_NAME = 'vm-it-quick';
 export const CUST_VM_IT_NAME = 'vm-it-custom';
 export const QUICK_VM_TMPL_NAME = 'vm-template-quick';
@@ -29,6 +30,7 @@ export const TEST_SECRET_NAME = 'auto-test-secret';
 export const RSA_SECRET_NAME = 'auto-rsa-secret';
 export const QUAY_USER = 'openshift-cnv+cnv_qe_internal_read_only';
 export const QUAY_USER_PASSWD = '9T8B4VWWRPTEZFFB6GOQ79C64VMTYFCKUM35B640AY71X379IFX8VR6GQX8DX94I';
+export const TREEVIEW_ROOT_ID = '#vms-tree-view-panel';
 
 // VM Status
 export enum VM_STATUS {

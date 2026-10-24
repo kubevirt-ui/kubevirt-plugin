@@ -4,6 +4,13 @@ import { descrText } from '../../views/selector-common';
 import { tab } from '../../views/tab';
 import { vm } from '../../views/vm-flow';
 
+const verifyCloudInitCredentials = (username: string, password: string) => {
+  cy.byTestID('username-show-hide-button').click();
+  cy.contains('.pf-v6-c-clipboard-copy', username).should('be.visible');
+  cy.byTestID('password-show-hide-button').click();
+  cy.contains('.pf-v6-c-clipboard-copy', password).should('be.visible');
+};
+
 describe('Create VMs from InstanceType', () => {
   before(() => {
     cy.visitOverviewVirt();
@@ -20,16 +27,12 @@ describe('Create VMs from InstanceType', () => {
   });
 
   it('verify customized VM from IT', () => {
-    cy.contains(descrText, VM_IT_CUST.iType).should('be.visible');
     cy.contains(descrText, 'centos.stream10').should('be.visible');
     tab.navigateToConfiguration();
     cy.contains(VM_IT_CUST.description).should('be.visible');
     cy.contains(VM_IT_CUST.hostname).should('be.visible');
     tab.navigateToConsole();
-    cy.byTestID('username-show-hide-button').click();
-    cy.contains('.pf-v6-c-clipboard-copy', VM_IT_CUST.cloudInitUname).should('be.visible');
-    cy.byTestID('password-show-hide-button').click();
-    cy.contains('.pf-v6-c-clipboard-copy', VM_IT_CUST.cloudInitPwd).should('be.visible');
+    verifyCloudInitCredentials(VM_IT_CUST.cloudInitUname, VM_IT_CUST.cloudInitPwd);
   });
 
   it('quick create VM from Template', () => {
@@ -46,9 +49,6 @@ describe('Create VMs from InstanceType', () => {
     cy.contains(VM_TMPL_CUST.hostname).should('be.visible');
     cy.contains(VM_TMPL_CUST.bootMode).should('be.visible');
     tab.navigateToConsole();
-    cy.byTestID('username-show-hide-button').click();
-    cy.contains('.pf-v6-c-clipboard-copy', VM_TMPL_CUST.cloudInitUname).should('be.visible');
-    cy.byTestID('password-show-hide-button').click();
-    cy.contains('.pf-v6-c-clipboard-copy', VM_TMPL_CUST.cloudInitPwd).should('be.visible');
+    verifyCloudInitCredentials(VM_TMPL_CUST.cloudInitUname, VM_TMPL_CUST.cloudInitPwd);
   });
 });

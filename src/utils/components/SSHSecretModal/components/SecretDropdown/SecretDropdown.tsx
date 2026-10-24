@@ -35,10 +35,11 @@ const SecretDropdown: FC<SecretDropdownProps> = ({
   const [activeNamespace] = useActiveNamespace();
 
   const [secretName, setSecretName] = useState<string>(sshDetails?.sshSecretName);
-  useEffect(
-    () => isEmpty(sshDetails?.sshSecretName) && isEmpty(sshDetails.sshPubKey) && setSecretName(''),
-    [sshDetails.sshPubKey, sshDetails?.sshSecretName],
-  );
+  useEffect(() => {
+    if (isEmpty(sshDetails?.sshSecretName) && isEmpty(sshDetails?.sshPubKey)) {
+      setSecretName('');
+    }
+  }, [sshDetails?.sshPubKey, sshDetails?.sshSecretName]);
 
   const onSelect = (newSecretName: string) => {
     const selectedSecret = selectedProjectSecrets.find(

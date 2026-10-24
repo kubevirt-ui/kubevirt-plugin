@@ -3,13 +3,16 @@ import { K8S_KIND, OS_IMAGES_NS, TEST_NS } from '../../utils/const/index';
 const SEARCH_NS = 'auto-search-ns';
 const SAVE_NAME = 'Saved search CNV QE';
 const SAVE_DESCR = 'CNV QE Testing save';
-const CENTOS9_VM = 'centos-stream9-sssss';
+// Prefer Ready golden volumes on OCP 4.20+/CNV stable (rhel9, centos-stream10, fedora).
+const RHEL9_VM = 'rhel9-sssss';
 const CENTOS10_VM = 'centos-stream10-sssss';
 const FEDORA_VM = 'fedora-sssss';
-const SRCH_VMS = [CENTOS9_VM, CENTOS10_VM, FEDORA_VM];
+const SRCH_VMS = [RHEL9_VM, CENTOS10_VM, FEDORA_VM];
 const U1_SM_IT = 'u1.small';
 const O1_MD_IT = 'o1.medium';
-const CX1_LG_IT = 'cx1.large';
+// Prefer u1.large over cx1.large: same >1 vCPU / >=4Gi profile without dedicatedCPU/hugepages
+// so the VM can actually become Ready on small hot-cluster nodes.
+const U1_LG_IT = 'u1.large';
 
 const NAME_CELL = 'td[data-label="name"]';
 const ADV_SRCH_BTN = 'button[data-test="vm-advanced-search"]';
@@ -27,17 +30,53 @@ const createTestVM = (
   volume: string,
 ) => {
   cy.exec(
-    `virtctl create vm --name=${vm_name} -n ${SEARCH_NS} --instancetype=${instancetype} --preference=${preference} --volume-datasource=src:${OS_IMAGES_NS}/${volume} | oc create -f -`,
+    `bash -c 'set -o pipefail; virtctl create vm --name=${vm_name} -n ${SEARCH_NS} --instancetype=${instancetype} --preference=${preference} --volume-datasource=src:${OS_IMAGES_NS}/${volume} | oc create -f -'`,
   );
   cy.exec(`oc label vm ${vm_name} -n ${SEARCH_NS} instancetype/${instancetype}=true`);
   cy.exec(`oc annotate vm ${vm_name} -n ${SEARCH_NS} description='Created from ${volume}'`);
 };
 
+// Memory/vCPU advanced filters read guest resources from the VMI. InstanceType-only
+// VMs have no domain.memory until started, so GreaterThan filters exclude them.
+const startAndWaitReady = (vm_name: string) => {
+  cy.exec(
+    `oc patch vm ${vm_name} -n ${SEARCH_NS} --type merge -p '{"spec":{"runStrategy":"Always"}}'`,
+  );
+  cy.exec(`oc wait --for=condition=Ready vm/${vm_name} -n ${SEARCH_NS} --timeout=300s`, {
+    timeout: 320000,
+  });
+};
+
+const dismissOpenDialogs = () => {
+  cy.get('body').then(($body) => {
+    if ($body.find('.pf-v6-c-modal-box button[aria-label="Close"]').length) {
+      cy.get('.pf-v6-c-modal-box button[aria-label="Close"]').click({ force: true });
+    }
+    if ($body.find('.saved-searches-dropdown-menu').length) {
+      cy.get('body').type('{esc}');
+    }
+  });
+};
+
+const clearSearchFilters = () => {
+  cy.get('body').then(($body) => {
+    if ($body.text().includes('Clear all filters')) {
+      cy.byButtonText('Clear all filters').click({ force: true });
+    }
+  });
+};
+
 describe('Test Advanced search for VMs', () => {
   before(() => {
-    cy.exec(`oc new-project ${SEARCH_NS}`, { failOnNonZeroExit: false });
+    cy.newProject(SEARCH_NS);
     cy.beforeSpec();
     cy.visitVMsVirt();
+    cy.switchProject(SEARCH_NS);
+  });
+
+  beforeEach(() => {
+    dismissOpenDialogs();
+    clearSearchFilters();
     cy.switchProject(SEARCH_NS);
   });
 
@@ -47,9 +86,14 @@ describe('Test Advanced search for VMs', () => {
   });
 
   it('create test VMs', () => {
+    cy.exec(`oc get ns ${SEARCH_NS} -o jsonpath='{.status.phase}'`)
+      .its('stdout')
+      .should('eq', 'Active');
     createTestVM(FEDORA_VM, U1_SM_IT, 'fedora', 'fedora');
-    createTestVM(CENTOS9_VM, O1_MD_IT, 'centos.stream9', 'centos-stream9');
-    createTestVM(CENTOS10_VM, CX1_LG_IT, 'centos.stream10', 'centos-stream10');
+    createTestVM(RHEL9_VM, O1_MD_IT, 'rhel.9', 'rhel9');
+    createTestVM(CENTOS10_VM, U1_LG_IT, 'centos.stream10', 'centos-stream10');
+    // Start after all creates so memory/vCPU filters can resolve guest resources.
+    [FEDORA_VM, RHEL9_VM, CENTOS10_VM].forEach(startAndWaitReady);
   });
 
   describe('Test advanced search', () => {
@@ -78,7 +122,7 @@ describe('Test Advanced search for VMs', () => {
     });
 
     it('test VM search by description', () => {
-      ['centos-stream9', 'centos-stream10', 'fedora'].forEach((volume) => {
+      ['rhel9', 'centos-stream10', 'fedora'].forEach((volume) => {
         cy.get(ADV_SRCH_BTN).click();
         cy.get('input[data-test="adv-search-vm-description"]').type(volume);
         cy.clickSearchBtn();
@@ -91,21 +135,21 @@ describe('Test Advanced search for VMs', () => {
       cy.get('[data-test="adv-search-vm-labels-toggle"]').find('input').type(O1_MD_IT);
       cy.byButtonText(`instancetype/${O1_MD_IT}=true`).click();
       cy.clickSearchBtn();
-      cy.contains(NAME_CELL, CENTOS9_VM).should('exist');
+      cy.contains(NAME_CELL, RHEL9_VM).should('exist');
       cy.contains(NAME_CELL, CENTOS10_VM).should('not.exist');
       cy.contains(NAME_CELL, FEDORA_VM).should('not.exist');
       cy.get(ADV_SRCH_BTN).click();
-      cy.get('[data-test="adv-search-vm-labels-toggle"]').find('input').type(CX1_LG_IT);
-      cy.byButtonText(`instancetype/${CX1_LG_IT}=true`).click();
+      cy.get('[data-test="adv-search-vm-labels-toggle"]').find('input').type(U1_LG_IT);
+      cy.byButtonText(`instancetype/${U1_LG_IT}=true`).click();
       cy.clickSearchBtn();
-      cy.contains(NAME_CELL, CENTOS9_VM).should('not.exist');
+      cy.contains(NAME_CELL, RHEL9_VM).should('not.exist');
       cy.contains(NAME_CELL, CENTOS10_VM).should('exist');
       cy.contains(NAME_CELL, FEDORA_VM).should('not.exist');
       cy.get(ADV_SRCH_BTN).click();
       cy.get('[data-test="adv-search-vm-labels-toggle"]').find('input').type(U1_SM_IT);
       cy.byButtonText(`instancetype/${U1_SM_IT}=true`).click();
       cy.clickSearchBtn();
-      cy.contains(NAME_CELL, CENTOS9_VM).should('not.exist');
+      cy.contains(NAME_CELL, RHEL9_VM).should('not.exist');
       cy.contains(NAME_CELL, CENTOS10_VM).should('not.exist');
       cy.contains(NAME_CELL, FEDORA_VM).should('exist');
     });
@@ -114,7 +158,7 @@ describe('Test Advanced search for VMs', () => {
       cy.get(ADV_SRCH_BTN).click();
       cy.get('input[data-test="adv-search-vcpu-value"]').type('1');
       cy.clickSearchBtn();
-      cy.contains(NAME_CELL, CENTOS9_VM).should('not.exist');
+      cy.contains(NAME_CELL, RHEL9_VM).should('not.exist');
       cy.contains(NAME_CELL, CENTOS10_VM).should('exist');
       cy.contains(NAME_CELL, FEDORA_VM).should('not.exist');
       cy.get(ADV_SRCH_BTN).click();
@@ -122,16 +166,17 @@ describe('Test Advanced search for VMs', () => {
       cy.byButtonText('Less than').click();
       cy.get('input[data-test="adv-search-vcpu-value"]').type('2');
       cy.clickSearchBtn();
-      cy.contains(NAME_CELL, CENTOS9_VM).should('exist');
+      cy.contains(NAME_CELL, RHEL9_VM).should('exist');
       cy.contains(NAME_CELL, CENTOS10_VM).should('not.exist');
       cy.contains(NAME_CELL, FEDORA_VM).should('exist');
     });
 
     it('test VM search by memory', () => {
+      // u1.small=2Gi, o1.medium=4Gi, u1.large=8Gi — default operator is Greater than.
       cy.get(ADV_SRCH_BTN).click();
       cy.get('input[data-test="adv-search-mem-value"]').type('2');
       cy.clickSearchBtn();
-      cy.contains(NAME_CELL, CENTOS9_VM).should('exist');
+      cy.contains(NAME_CELL, RHEL9_VM).should('exist');
       cy.contains(NAME_CELL, CENTOS10_VM).should('exist');
       cy.contains(NAME_CELL, FEDORA_VM).should('not.exist');
       cy.get(ADV_SRCH_BTN).click();
@@ -139,7 +184,7 @@ describe('Test Advanced search for VMs', () => {
       cy.byButtonText('Less than').click();
       cy.get('input[data-test="adv-search-mem-value"]').type('4');
       cy.clickSearchBtn();
-      cy.contains(NAME_CELL, CENTOS9_VM).should('not.exist');
+      cy.contains(NAME_CELL, RHEL9_VM).should('not.exist');
       cy.contains(NAME_CELL, CENTOS10_VM).should('not.exist');
       cy.contains(NAME_CELL, FEDORA_VM).should('exist');
     });
@@ -169,7 +214,7 @@ describe('Test Advanced search for VMs', () => {
       cy.get(ADV_SRCH_BTN).click();
       cy.get('input[data-test="adv-search-vm-name"]').type('10');
       cy.clickSearchBtn();
-      cy.contains(NAME_CELL, CENTOS9_VM).should('not.exist');
+      cy.contains(NAME_CELL, RHEL9_VM).should('not.exist');
       cy.contains(NAME_CELL, CENTOS10_VM).should('exist');
       cy.contains(NAME_CELL, FEDORA_VM).should('not.exist');
       cy.get(ADV_SRCH_BTN).click();
@@ -189,7 +234,7 @@ describe('Test Advanced search for VMs', () => {
       cy.get('#vm-search-input').type('centos');
       cy.byButtonText('All search results found').click();
       cy.checkSubTitle('Search results');
-      cy.contains(NAME_CELL, CENTOS9_VM).should('exist');
+      cy.contains(NAME_CELL, RHEL9_VM).should('not.exist');
       cy.contains(NAME_CELL, CENTOS10_VM).should('exist');
       cy.contains(NAME_CELL, FEDORA_VM).should('not.exist');
       cy.get('button[data-test="save-search"]').click();
@@ -206,7 +251,7 @@ describe('Test Advanced search for VMs', () => {
       cy.get('[data-test="saved-searches"]').within(() => {
         cy.byButtonText(SAVE_NAME).click();
       });
-      cy.contains(NAME_CELL, CENTOS9_VM).should('exist');
+      cy.contains(NAME_CELL, RHEL9_VM).should('not.exist');
       cy.contains(NAME_CELL, CENTOS10_VM).should('exist');
       cy.contains(NAME_CELL, FEDORA_VM).should('not.exist');
     });
@@ -219,11 +264,13 @@ describe('Test Advanced search for VMs', () => {
       cy.wait(1000);
       cy.byButtonText('Saved searches').click();
       cy.contains('button', SAVE_NAME).should('not.exist');
-      cy.byButtonText('Saved searches').click();
+      // Close the menu so it does not cover "Back to VirtualMachines list".
+      cy.get('body').type('{esc}');
     });
 
     it('exit search', () => {
-      cy.byButtonText('Back to VirtualMachines list').click();
+      dismissOpenDialogs();
+      cy.byButtonText('Back to VirtualMachines list').click({ force: true });
       cy.get('#vms-tree-view-panel').should('exist');
     });
   });
