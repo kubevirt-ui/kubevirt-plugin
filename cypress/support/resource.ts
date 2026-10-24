@@ -1,4 +1,5 @@
-import { K8S_KIND } from '../utils/const/index';
+import { K8S_KIND, SECOND } from '../utils/const/index';
+import { saveBtn } from '../views/selector';
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
@@ -6,6 +7,7 @@ declare global {
     interface Chainable {
       deleteResource(kind: string, name: string, namespace?: string): void;
       dropFile(filePath: string, fileName: string, inputSelector: string): void;
+      saveYAML(): void;
     }
   }
 }
@@ -30,6 +32,24 @@ Cypress.Commands.add('deleteResource', (kind: string, name: string, namespace?: 
       { failOnNonZeroExit: false, timeout: 1800000 },
     );
   }
+});
+
+Cypress.Commands.add('saveYAML', () => {
+  // The console's Create-from-YAML editor loads its example template into the
+  // editor model asynchronously. Clicking Save before the model is populated
+  // fails with "No YAML content found" -- the resource is never created, which
+  // silently cascades into downstream tests. Give the editor time to load, save,
+  // and if the model still wasn't ready (the console surfaces that exact error),
+  // wait for it to load and retry the save.
+  cy.wait(5 * SECOND);
+  cy.get(saveBtn).click();
+  cy.wait(SECOND);
+  cy.get('body').then(($body) => {
+    if ($body.text().includes('No YAML content found')) {
+      cy.wait(10 * SECOND);
+      cy.get(saveBtn).click();
+    }
+  });
 });
 
 Cypress.Commands.add('dropFile', (filePath, fileName, inputSelector) => {
