@@ -99,7 +99,6 @@ export const fillInstanceType = (vmData: VirtualMachineData) => {
     bootDiskSize,
     existSecret,
     folder,
-    iType,
     name,
     newSecret,
     newSecretName,
@@ -107,11 +106,9 @@ export const fillInstanceType = (vmData: VirtualMachineData) => {
     volume,
   } = vmData;
   cy.contains(iView.volName, volume).click();
-  cy.byButtonText('User').click();
-  cy.get('input[aria-label="Filter menu items"]').clear().type('medium');
-  if (iType) {
-    cy.contains(iType).click();
-  }
+  // Keep the volume's recommended instance type (Red Hat provided series).
+  // Selecting via the "User provided" tab + size filter is brittle on hot
+  // clusters and fails for series like o1/u1 that are not user-provided.
   if (newSecret !== undefined) {
     cy.contains(index.TEST_SECRET_NAME).click();
     cy.get(iView.addNew).click();
@@ -373,10 +370,6 @@ export const fillInitialRun = (vmData: VirtualMachineData) => {
 
 export const customizeIT = (vmData: VirtualMachineData) => {
   cy.contains(iView.volName, vmData.volume).click();
-  cy.byButtonText('User').click();
-  const size = vmData.iType.split('.')[1];
-  cy.get('input[aria-label="Filter menu items"]').clear().type(size);
-  cy.contains(vmData.iType).click();
   cy.get(iView.vmName).clear().type(vmData.name);
   cy.byButtonText('Customize VirtualMachine').click();
   fillDetails(vmData);

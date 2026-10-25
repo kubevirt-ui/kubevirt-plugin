@@ -49,7 +49,16 @@ const SearchBar: FC<SearchBarProps> = ({ onFilterChange, resetTextSearch }) => {
 
   const [vmSuggestions, vmSuggestionsLoaded] = useVirtualMachineSearchSuggestions(searchQuery);
   const navigateToSearchResults = useNavigateToSearchResults(onFilterChange, resetTextSearch);
-  const { saveSearch, urlSearchQuery } = useSavedSearchData();
+
+  const {
+    applySearch,
+    deleteSearch,
+    saveSearch,
+    searches,
+    searchesLoaded,
+    searchesLoadError,
+    urlSearchQuery,
+  } = useSavedSearchData();
 
   useEffect(() => {
     if (searchQuery) {
@@ -161,7 +170,13 @@ const SearchBar: FC<SearchBarProps> = ({ onFilterChange, resetTextSearch }) => {
         </Button>
       </InputGroupItem>
       <InputGroupItem>
-        <SavedSearchesDropdown />
+        <SavedSearchesDropdown
+          applySearch={applySearch}
+          deleteSearch={deleteSearch}
+          searches={searches}
+          searchesLoaded={searchesLoaded}
+          searchesLoadError={searchesLoadError}
+        />
       </InputGroupItem>
     </InputGroup>
   );

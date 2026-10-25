@@ -1,4 +1,5 @@
-import { CNV_NS, TEST_NS } from '../utils/const/index';
+import { CNV_NS, SECOND, TEST_NS } from '../utils/const/index';
+import { saveBtn } from '../views/selector';
 
 export {};
 declare global {
@@ -9,6 +10,7 @@ declare global {
       checkHCOSpec(spec: string, matchString: string, include: boolean): void;
       checkVMSpec(vmName: string, spec: string, matchString: string, include: boolean): void;
       patchVM(vmName: string, status: string): void;
+      saveYAML(): void;
       startVM(vmName: string): void;
       stopVM(vmName: string): void;
     }
@@ -57,9 +59,46 @@ Cypress.Commands.add('stopVM', (vmName: string) => {
 
 Cypress.Commands.add('beforeSpec', () => {
   cy.visit('');
+  // Self-heal the session: if a previous spec crashed the page and dropped the
+  // session, the login screen is shown again -- re-authenticate before asserting
+  // the logged-in state, so one broken spec can't cascade into the rest.
+  cy.get('body').then(($body) => {
+    if ($body.find('[data-test-id=login], [data-test=login]').length) {
+      cy.login();
+    }
+  });
   cy.get('[data-test="username"]', { timeout: 180000 }).should('exist');
   cy.switchToVirt();
   cy.contains('[data-test-id="resource-title"]', 'Virtualization', { timeout: 180000 }).should(
     'exist',
   );
+});
+
+Cypress.Commands.add('saveYAML', () => {
+  // The console's Create-from-YAML editor loads its example template into the
+  // editor model asynchronously. Clicking Save before the model is populated
+  // fails with "No YAML content found" -- the resource is never created, which
+  // silently cascades into downstream tests. Also retry transient virt-api
+  // webhook EOF failures seen on hot-cluster CI.
+  const shouldRetrySave = (text: string) =>
+    text.includes('No YAML content found') ||
+    text.includes('failed calling webhook') ||
+    text.includes(': EOF');
+
+  cy.wait(5 * SECOND);
+  cy.get(saveBtn).click();
+  cy.wait(SECOND);
+  cy.get('body').then(($body) => {
+    if (shouldRetrySave($body.text())) {
+      cy.wait(10 * SECOND);
+      cy.get(saveBtn).click();
+      cy.wait(SECOND);
+      cy.get('body').then(($retryBody) => {
+        if (shouldRetrySave($retryBody.text())) {
+          cy.wait(10 * SECOND);
+          cy.get(saveBtn).click();
+        }
+      });
+    }
+  });
 });

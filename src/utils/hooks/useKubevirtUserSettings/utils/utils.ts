@@ -23,7 +23,7 @@ export const patchUserConfigMap = async (
     data: [
       ...(isEmpty(userConfigMap.data) ? [{ op: 'add', path: '/data', value: {} }] : []),
       {
-        op: 'replace',
+        op: userConfigMap.data?.[userName] ? 'replace' : 'add',
         path: `/data/${userName}`,
         value: JSON.stringify(data),
       },
