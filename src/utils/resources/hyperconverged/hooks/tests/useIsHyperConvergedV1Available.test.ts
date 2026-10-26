@@ -90,12 +90,20 @@ describe('useIsHyperConvergedV1Available', () => {
     expect(result.current).toEqual({ isHCOV1: false, loading: false });
   });
 
-  it('stays loading until both HCO models are available on the hub', () => {
+  it('stays loading until at least one HCO model is available on the hub', () => {
+    mockUseK8sModels.mockReturnValue([{}]);
+
+    const { result } = renderHook(() => useIsHyperConvergedV1Available());
+
+    expect(result.current).toEqual({ isHCOV1: false, loading: true });
+  });
+
+  it('is not loading when only the v1 HCO model is registered on the hub', () => {
     mockHubModels({ v1beta1: false });
 
     const { result } = renderHook(() => useIsHyperConvergedV1Available());
 
-    expect(result.current).toEqual({ isHCOV1: true, loading: true });
+    expect(result.current).toEqual({ isHCOV1: true, loading: false });
   });
 
   it('uses discovery preferredVersion on a managed cluster', () => {
