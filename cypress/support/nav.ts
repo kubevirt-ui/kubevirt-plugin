@@ -55,11 +55,23 @@ Cypress.Commands.add('visitTemplates', () => {
 
 Cypress.Commands.add('visitITs', () => {
   cy.clickVirtLink(nav.itNav);
+  // Prior tests may leave the shared name-filter set (e.g. "example"), which
+  // hides the default cluster InstanceTypes this helper asserts on.
+  cy.get('body').then(($body) => {
+    if ($body.find(nav.nameFilter).length) {
+      cy.get(nav.nameFilter).clear();
+    }
+  });
   cy.byLegacyTestID('cx1.2xlarge').should('exist');
 });
 
 Cypress.Commands.add('visitPreferences', () => {
   cy.clickVirtLink(nav.preferenceNav);
+  cy.get('body').then(($body) => {
+    if ($body.find(nav.nameFilter).length) {
+      cy.get(nav.nameFilter).clear();
+    }
+  });
   cy.byLegacyTestID('fedora').should('exist');
 });
 

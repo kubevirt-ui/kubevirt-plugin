@@ -1,3 +1,4 @@
+import { K8S_KIND, TEST_NS } from '../../utils/const/index';
 import { Example, YAML } from '../../utils/const/string';
 import { TEMPLATE } from '../../utils/const/template';
 import {
@@ -9,14 +10,48 @@ import {
 } from '../../views/selector';
 import { tab } from '../../views/tab';
 
+const cleanupExampleResources = () => {
+  for (const ns of [TEST_NS, 'default']) {
+    cy.exec(
+      `oc delete --ignore-not-found=true -n ${ns} --cascade vm ${Example} vmi ${Example} --wait=true --timeout=180s`,
+      { failOnNonZeroExit: false, timeout: 180000 },
+    );
+    cy.deleteResource(K8S_KIND.Template, Example, ns);
+    cy.exec(
+      `oc delete --ignore-not-found=true -n ${ns} --cascade VirtualMachineInstancetype ${Example} VirtualMachinePreference ${Example} --wait=true --timeout=180s`,
+      { failOnNonZeroExit: false, timeout: 180000 },
+    );
+  }
+
+  cy.deleteResource(K8S_KIND.VMCI, Example);
+  cy.deleteResource(K8S_KIND.VMCP, Example);
+  cy.deleteResource(K8S_KIND.MP, Example);
+};
+
+const clickCreate = () => {
+  cy.get(itemCreateBtn).first().should('be.visible').click();
+};
+
+const clickTab = (label: string) => {
+  cy.contains('[role="tab"]', label).should('be.visible').click();
+};
+
 describe('Check all virtualization pages can be loaded', () => {
   before(() => {
     cy.visit('');
+    cy.newProject(TEST_NS);
+    cleanupExampleResources();
+    cy.switchProject(TEST_NS);
+  });
+
+  after(() => {
+    cleanupExampleResources();
   });
 
   describe('Check VM tabs', () => {
     it('visit VM list page', () => {
       cy.visitVMs();
+      cy.switchProject(TEST_NS);
     });
 
     it('create example VM', () => {
@@ -151,7 +186,7 @@ describe('Check all virtualization pages can be loaded', () => {
     });
 
     it('create example template', () => {
-      cy.switchProject('default');
+      cy.switchProject(TEST_NS);
       cy.get(itemCreateBtn).click();
       cy.saveYAML();
     });
@@ -186,20 +221,28 @@ describe('Check all virtualization pages can be loaded', () => {
     });
 
     it('create instanceType from yaml on the first tab', () => {
-      // The `div.co-operator-details__actions` wrapper no longer exists on current
-      // consoles; match the cluster-scoped list container instead (same change already
-      // present on release-4.19).
-      cy.get('div.co-m-list').find(itemCreateBtn).eq(0).click();
+      cy.deleteResource(K8S_KIND.VMCI, Example);
+      cy.visitITs();
+      clickCreate();
       cy.saveYAML();
       cy.get(breadcrumb).first().click();
-      cy.get(nameFilter).type(Example);
+      cy.get(nameFilter).should('be.visible').clear().type(Example);
       cy.byLegacyTestID(Example).should('exist');
       cy.byLegacyTestID('cx1.2xlarge').should('not.exist');
+      // Clear filter so visitITs() in the next test can see cluster defaults.
+      cy.get(nameFilter).clear();
     });
 
     it('create instanceType from yaml on the second tab', () => {
-      cy.contains('span.pf-v5-c-tabs__item-text', 'User provided').click();
-      cy.get(itemCreateBtn).click();
+      for (const ns of [TEST_NS, 'default']) {
+        cy.exec(
+          `oc delete --ignore-not-found=true -n ${ns} --cascade VirtualMachineInstancetype ${Example} --wait=true --timeout=180s`,
+          { failOnNonZeroExit: false, timeout: 180000 },
+        );
+      }
+      cy.visitITs();
+      clickTab('User provided');
+      clickCreate();
       cy.saveYAML();
       cy.get(breadcrumb).first().click();
       cy.byLegacyTestID(Example).should('exist');
@@ -213,18 +256,27 @@ describe('Check all virtualization pages can be loaded', () => {
     });
 
     it('create preference from yaml on the first tab', () => {
-      // See comment on the InstanceType "first tab" create test above.
-      cy.get('div.co-m-list').find(itemCreateBtn).eq(0).click();
+      cy.deleteResource(K8S_KIND.VMCP, Example);
+      cy.visitPreferences();
+      clickCreate();
       cy.saveYAML();
       cy.get(breadcrumb).first().click();
-      cy.get(nameFilter).type(Example);
+      cy.get(nameFilter).should('be.visible').clear().type(Example);
       cy.byLegacyTestID(Example).should('exist');
       cy.byLegacyTestID('fedora').should('not.exist');
+      cy.get(nameFilter).clear();
     });
 
     it('create preference from yaml on the second tab', () => {
-      cy.contains('span.pf-v5-c-tabs__item-text', 'User preferences').click();
-      cy.get(itemCreateBtn).click();
+      for (const ns of [TEST_NS, 'default']) {
+        cy.exec(
+          `oc delete --ignore-not-found=true -n ${ns} --cascade VirtualMachinePreference ${Example} --wait=true --timeout=180s`,
+          { failOnNonZeroExit: false, timeout: 180000 },
+        );
+      }
+      cy.visitPreferences();
+      clickTab('User preferences');
+      clickCreate();
       cy.saveYAML();
       cy.get(breadcrumb).first().click();
       cy.byLegacyTestID(Example).should('exist');
