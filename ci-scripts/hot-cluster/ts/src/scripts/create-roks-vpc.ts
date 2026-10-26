@@ -27,7 +27,12 @@ const main = async (): Promise<void> => {
   const openshiftVersion = requireEnv('OPENSHIFT_VERSION');
   const workerFlavor = requireEnv('WORKER_FLAVOR');
   const workerCount = requireEnv('WORKER_COUNT');
-  const cniPlugin = process.env.CNI_PLUGIN ?? 'OVNKubernetes';
+  // Empty/unset means "platform default" (Calico on IBM Cloud VPC) --
+  // required below OpenShift 4.20, where VPC rejects an explicit --cni
+  // selection entirely (E0723: "version is not supported for CNI selection
+  // in VPC. Specify 4.20 or later"). See resolve-cluster-config.sh/.ts for
+  // which OpenShift versions resolve to which CNI.
+  const cniPlugin = process.env.CNI_PLUGIN ?? '';
   const cosInstanceName = process.env.COS_INSTANCE_NAME ?? `${clusterName}-cos`;
   const cosCrn = await (async (): Promise<string> => {
     const initial = process.env.COS_CRN ?? '';
@@ -75,7 +80,7 @@ const main = async (): Promise<void> => {
   })();
 
   console.log(
-    `Creating VPC cluster '${clusterName}' with ${workerCount}x ${workerFlavor} workers in zone ${zone} (CNI: ${cniPlugin})...`,
+    `Creating VPC cluster '${clusterName}' with ${workerCount}x ${workerFlavor} workers in zone ${zone} (CNI: ${cniPlugin || 'platform default, Calico'})...`,
   );
   const createCmd = [
     'ibmcloud oc cluster create vpc-gen2',
@@ -87,7 +92,11 @@ const main = async (): Promise<void> => {
     `--vpc-id "${vpcId}"`,
     `--subnet-id "${subnetId}"`,
     `--cos-instance "${cosCrn}"`,
-    `--cni "${cniPlugin}"`,
+    // Omitted entirely (not just left blank) when unset -- VPC rejects
+    // --cni "" below 4.20 the same way it rejects an explicit plugin name,
+    // and relying on the platform default is exactly how Calico gets
+    // provisioned there.
+    ...(cniPlugin ? [`--cni "${cniPlugin}"`] : []),
     '--disable-outbound-traffic-protection',
   ].join(' ');
 

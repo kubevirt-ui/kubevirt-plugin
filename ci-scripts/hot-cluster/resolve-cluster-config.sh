@@ -26,17 +26,51 @@ DEFAULT_CNV_CHANNEL="stable"
 LAST_CYPRESS_MAJOR=4
 LAST_CYPRESS_MINOR=22
 
-# Window of OpenShift versions we can actually provision on IBM Cloud. The
-# lower bound is 4.20 because VPC cluster creation with an explicit CNI
-# (--cni OVNKubernetes) is rejected below it ("version is not supported for
-# CNI selection in VPC. Specify 4.20 or later", E0723). A release branch
-# outside this window still provisions, clamped to the nearest supported
-# version; the branch's own cluster_name/test_engine stay tied to the real
-# branch, and CNV is left unpinned when a clamp happens (see below).
+# Window of OpenShift versions we can actually provision on IBM Cloud. VPC
+# cluster creation with an explicit CNI (--cni OVNKubernetes) is rejected
+# below 4.20 ("version is not supported for CNI selection in VPC. Specify
+# 4.20 or later", E0723), so 4.20+ uses OVNKubernetes. Below that, down to
+# 4.18, create-roks-vpc.ts omits --cni entirely, which provisions with VPC's
+# platform-default CNI (Calico) instead -- see cni_plugin_for below. A
+# release branch outside this window still provisions, clamped to the
+# nearest supported version; the branch's own cluster_name/test_engine stay
+# tied to the real branch, and CNV is left unpinned when a clamp happens
+# (see below).
 MIN_SUPPORTED_MAJOR=4
-MIN_SUPPORTED_MINOR=20
+MIN_SUPPORTED_MINOR=18
 MAX_SUPPORTED_MAJOR=4
 MAX_SUPPORTED_MINOR=22
+
+# OpenShift versions below this use Calico (CNI_PLUGIN left empty, so
+# create-roks-vpc.ts omits --cni) since VPC rejects explicit CNI selection
+# below 4.20; at/above this, OVNKubernetes is requested explicitly.
+OVN_MIN_MAJOR=4
+OVN_MIN_MINOR=20
+
+# Echoes the CNI plugin to request for a given "<major> <minor>" pair: empty
+# (Calico, via omitted --cni) below the OVN floor, else "OVNKubernetes".
+cni_plugin_for() {
+  local major="$1" minor="$2"
+  local v=$(( major * 1000 + minor ))
+  local ovn_min=$(( OVN_MIN_MAJOR * 1000 + OVN_MIN_MINOR ))
+  if (( v < ovn_min )); then
+    echo ""
+  else
+    echo "OVNKubernetes"
+  fi
+}
+
+# Splits an "<major>.<minor>_openshift"-style version string into
+# "<major> <minor>"; falls back to the OVN floor (so an unparseable string
+# defaults to the safe, explicit-CNI behavior) if it doesn't match.
+major_minor_from_version() {
+  local version="$1"
+  if [[ "${version}" =~ ^([0-9]+)\.([0-9]+)_openshift$ ]]; then
+    echo "${BASH_REMATCH[1]} ${BASH_REMATCH[2]}"
+  else
+    echo "${OVN_MIN_MAJOR} ${OVN_MIN_MINOR}"
+  fi
+}
 
 # Clamp a "<major> <minor>" pair into the supported range; echoes "<major> <minor>".
 clamp_version() {
@@ -72,6 +106,7 @@ if [[ "${BASE_REF}" =~ ^release-([0-9]+)\.([0-9]+)$ ]]; then
   CLAMPED_MAJOR="${CLAMPED% *}"
   CLAMPED_MINOR="${CLAMPED#* }"
   OPENSHIFT_VERSION="${CLAMPED_MAJOR}.${CLAMPED_MINOR}_openshift"
+  CNI_PLUGIN="$(cni_plugin_for "${CLAMPED_MAJOR}" "${CLAMPED_MINOR}")"
   if [[ "${CLAMPED_MAJOR}.${CLAMPED_MINOR}" != "${MAJOR}.${MINOR}" ]]; then
     CNV_PIN_VERSION=""
     echo "Branch version ${MAJOR}.${MINOR} is outside the IBM Cloud supported range ${MIN_SUPPORTED_MAJOR}.${MIN_SUPPORTED_MINOR}-${MAX_SUPPORTED_MAJOR}.${MAX_SUPPORTED_MINOR}; clamping cluster OpenShift version to ${CLAMPED_MAJOR}.${CLAMPED_MINOR} and installing CNV unpinned (stable)" >&2
@@ -80,6 +115,7 @@ if [[ "${BASE_REF}" =~ ^release-([0-9]+)\.([0-9]+)$ ]]; then
     CNV_PIN_VERSION="${MAJOR}.${MINOR}"
     echo "Base branch '${BASE_REF}' is a release branch → cluster '${CLUSTER_NAME}' (${OPENSHIFT_VERSION}, CNV channel '${CNV_CHANNEL}', pinned to CNV ${CNV_PIN_VERSION}.x)" >&2
   fi
+  echo "CNI plugin: '${CNI_PLUGIN:-<platform default, Calico>}'" >&2
 
   if (( MAJOR * 1000 + MINOR <= LAST_CYPRESS_MAJOR * 1000 + LAST_CYPRESS_MINOR )); then
     TEST_ENGINE="cypress"
@@ -92,7 +128,9 @@ else
   OPENSHIFT_VERSION="${INPUT_OPENSHIFT_VERSION:-${DEFAULT_OPENSHIFT_VERSION}}"
   CNV_CHANNEL="${DEFAULT_CNV_CHANNEL}"
   CNV_PIN_VERSION=""
-  echo "Using default/workflow_dispatch cluster config: '${CLUSTER_NAME}' (${OPENSHIFT_VERSION}, CNV channel '${CNV_CHANNEL}')" >&2
+  read -r VERSION_MAJOR VERSION_MINOR <<< "$(major_minor_from_version "${OPENSHIFT_VERSION}")"
+  CNI_PLUGIN="$(cni_plugin_for "${VERSION_MAJOR}" "${VERSION_MINOR}")"
+  echo "Using default/workflow_dispatch cluster config: '${CLUSTER_NAME}' (${OPENSHIFT_VERSION}, CNV channel '${CNV_CHANNEL}', CNI plugin '${CNI_PLUGIN:-<platform default, Calico>}')" >&2
   TEST_ENGINE="${DEFAULT_TEST_ENGINE}"
 fi
 
@@ -117,5 +155,6 @@ echo "openshift_version=${OPENSHIFT_VERSION}"
 echo "test_engine=${TEST_ENGINE}"
 echo "cnv_channel=${CNV_CHANNEL}"
 echo "cnv_pin_version=${CNV_PIN_VERSION}"
+echo "cni_plugin=${CNI_PLUGIN}"
 # Empty when there's no PR context -- callers add a ref_name fallback for display.
 echo "branch_name=${BASE_REF}"

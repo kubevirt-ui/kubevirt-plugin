@@ -60,6 +60,18 @@ on:
         type: string
         required: false
         default: ''
+      cni_plugin:
+        description: |
+          CNI plugin for VPC cluster creation: "OVNKubernetes", empty to
+          omit --cni and let VPC provision its platform default (Calico --
+          required below OpenShift 4.20, where VPC rejects explicit CNI
+          selection entirely), or "auto" (default) to have
+          ibmc-cluster-setup.yml derive this from openshift_version
+          (OVNKubernetes at 4.20+, empty/Calico below it). Forwarded as-is
+          to ibmc-cluster-setup.yml.
+        type: string
+        required: false
+        default: 'auto'
       worker_flavor:
         description: Worker node flavor
         type: string
@@ -180,6 +192,7 @@ jobs:
       branch_name: ${{ inputs.branch_name }}
       cnv_channel: ${{ inputs.cnv_channel }}
       cnv_pin_version: ${{ inputs.cnv_pin_version }}
+      cni_plugin: ${{ inputs.cni_plugin }}
       worker_flavor: ${{ inputs.worker_flavor }}
       worker_count: ${{ inputs.worker_count }}
       # Declared as a string here but boolean on the callee's workflow_call

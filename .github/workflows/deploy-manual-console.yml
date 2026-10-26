@@ -191,6 +191,7 @@ jobs:
       openshift_version: ${{ steps.resolve.outputs.openshift-version }}
       cnv_channel: ${{ steps.resolve.outputs.cnv-channel }}
       cnv_pin_version: ${{ steps.resolve.outputs.cnv-pin-version }}
+      cni_plugin: ${{ steps.resolve.outputs.cni-plugin }}
       branch_name: ${{ steps.resolve.outputs.branch-name }}
     steps:
       - name: Checkout
@@ -270,6 +271,7 @@ jobs:
       # Prefer an explicit workflow_dispatch pin; otherwise use the resolver
       # (release-X.Y → X.Y), matching hot-cluster-e2e.yml.
       cnv_pin_version: ${{ inputs.cnv_pin_version || needs.resolve-config.outputs.cnv_pin_version }}
+      cni_plugin: ${{ needs.resolve-config.outputs.cni_plugin }}
       branch_name: ${{ needs.resolve-config.outputs.branch_name || inputs.branch }}
     secrets: inherit
 

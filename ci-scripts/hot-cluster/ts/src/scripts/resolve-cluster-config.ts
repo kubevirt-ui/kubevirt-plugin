@@ -4,7 +4,7 @@
  * Replaces: ci-scripts/hot-cluster/resolve-cluster-config.sh
  *
  * Outputs (via GITHUB_OUTPUT): cluster_name, openshift_version, test_engine,
- *   cnv_channel, cnv_pin_version, branch_name
+ *   cnv_channel, cnv_pin_version, cni_plugin, branch_name
  */
 
 import { appendFileSync } from 'node:fs';
@@ -17,15 +17,41 @@ const DEFAULT_CNV_CHANNEL = 'stable';
 const LAST_CYPRESS_MAJOR = 4;
 const LAST_CYPRESS_MINOR = 22;
 
-// Window of OpenShift versions we can actually provision on IBM Cloud. The
-// lower bound is 4.20 because VPC cluster creation with an explicit CNI
-// (--cni OVNKubernetes) is rejected below it ("version is not supported for
-// CNI selection in VPC. Specify 4.20 or later", E0723). A release branch
-// outside this window still provisions, clamped to the nearest supported
-// version; the branch's own cluster_name/test_engine stay tied to the real
-// branch, and CNV is left unpinned when a clamp happens (see below).
-const MIN_SUPPORTED = { major: 4, minor: 20 };
+// Window of OpenShift versions we can actually provision on IBM Cloud. VPC
+// cluster creation with an explicit CNI (--cni OVNKubernetes) is rejected
+// below 4.20 ("version is not supported for CNI selection in VPC. Specify
+// 4.20 or later", E0723), so 4.20+ uses OVNKubernetes. Below that, down to
+// 4.18, create-roks-vpc.ts omits --cni entirely, which provisions with
+// VPC's platform-default CNI (Calico) instead -- see cniPluginFor below. A
+// release branch outside this window still provisions, clamped to the
+// nearest supported version; the branch's own cluster_name/test_engine stay
+// tied to the real branch, and CNV is left unpinned when a clamp happens
+// (see below).
+const MIN_SUPPORTED = { major: 4, minor: 18 };
 const MAX_SUPPORTED = { major: 4, minor: 22 };
+
+// OpenShift versions below this use Calico (cniPlugin left empty, so
+// create-roks-vpc.ts omits --cni) since VPC rejects explicit CNI selection
+// below 4.20; at/above this, OVNKubernetes is requested explicitly.
+const OVN_MIN = { major: 4, minor: 20 };
+
+// Resolves the CNI plugin to request for a given major.minor: empty string
+// (Calico, via omitted --cni) below the OVN floor, else 'OVNKubernetes'.
+const cniPluginFor = (major: number, minor: number): string => {
+  const encoded = major * 1000 + minor;
+  return encoded < OVN_MIN.major * 1000 + OVN_MIN.minor ? '' : 'OVNKubernetes';
+};
+
+// Parses an '<major>.<minor>_openshift'-style version string into
+// major/minor; falls back to the OVN floor (so an unparseable string
+// defaults to the safe, explicit-CNI behavior) if it doesn't match.
+const majorMinorFromVersion = (version: string): { major: number; minor: number } => {
+  const match = /^(\d+)\.(\d+)_openshift$/.exec(version);
+  if (!match) {
+    return { ...OVN_MIN };
+  }
+  return { major: Number(match[1]), minor: Number(match[2]) };
+};
 
 // Clamp a branch's major.minor into the IBM Cloud supported range.
 const clampVersion = (major: number, minor: number): { major: number; minor: number } => {
@@ -42,6 +68,7 @@ const clampVersion = (major: number, minor: number): { major: number; minor: num
 export type ClusterConfig = {
   branchName: string;
   clusterName: string;
+  cniPlugin: string;
   cnvChannel: string;
   cnvPinVersion: string;
   openshiftVersion: string;
@@ -74,6 +101,7 @@ export const resolveClusterConfig = (params: {
       const clamped = clampVersion(major, minor);
       const isClamped = clamped.major !== major || clamped.minor !== minor;
       const openshiftVersion = `${clamped.major}.${clamped.minor}_openshift`;
+      const cniPlugin = cniPluginFor(clamped.major, clamped.minor);
       const cnvPinVersion = isClamped ? '' : `${major}.${minor}`;
       const testEngine =
         major * 1000 + minor <= LAST_CYPRESS_MAJOR * 1000 + LAST_CYPRESS_MINOR
@@ -93,17 +121,23 @@ export const resolveClusterConfig = (params: {
         })`,
       );
       console.error(`Base branch '${baseRef}' → test engine '${testEngine}'`);
-      return { clusterName, cnvChannel, cnvPinVersion, openshiftVersion, testEngine };
+      console.error(`CNI plugin: '${cniPlugin || '<platform default, Calico>'}'`);
+      return { clusterName, cniPlugin, cnvChannel, cnvPinVersion, openshiftVersion, testEngine };
     }
 
     // Treat empty string like unset (workflow_dispatch defaults are '').
     const clusterName = inputClusterName || DEFAULT_CLUSTER_NAME;
     const openshiftVersion = inputOpenshiftVersion || DEFAULT_OPENSHIFT_VERSION;
+    const { major: versionMajor, minor: versionMinor } = majorMinorFromVersion(openshiftVersion);
+    const cniPlugin = cniPluginFor(versionMajor, versionMinor);
     console.error(
-      `Using default/workflow_dispatch cluster config: '${clusterName}' (${openshiftVersion}, CNV channel '${DEFAULT_CNV_CHANNEL}')`,
+      `Using default/workflow_dispatch cluster config: '${clusterName}' (${openshiftVersion}, CNV channel '${DEFAULT_CNV_CHANNEL}', CNI plugin '${
+        cniPlugin || '<platform default, Calico>'
+      }')`,
     );
     return {
       clusterName,
+      cniPlugin,
       cnvChannel: DEFAULT_CNV_CHANNEL,
       cnvPinVersion: '',
       openshiftVersion,
@@ -131,6 +165,7 @@ export const resolveClusterConfig = (params: {
   return {
     branchName: baseRef,
     clusterName: base.clusterName,
+    cniPlugin: base.cniPlugin,
     cnvChannel,
     cnvPinVersion,
     openshiftVersion: base.openshiftVersion,
@@ -159,6 +194,7 @@ const main = async (): Promise<void> => {
     `test_engine=${config.testEngine}`,
     `cnv_channel=${config.cnvChannel}`,
     `cnv_pin_version=${config.cnvPinVersion}`,
+    `cni_plugin=${config.cniPlugin}`,
     `branch_name=${config.branchName}`,
   ];
 
