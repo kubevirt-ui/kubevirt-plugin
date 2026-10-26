@@ -61,7 +61,9 @@ const buildV1Beta1EnablePatches = (
   ];
 };
 
-export const buildAAQEnablePatches = (hyperConverge: HyperConverged, checked: boolean): Patch[] =>
-  isHyperConvergedV1(hyperConverge)
-    ? buildV1EnablePatches(hyperConverge, checked)
-    : buildV1Beta1EnablePatches(hyperConverge as HyperConvergedV1Beta1, checked);
+export const buildAAQEnablePatches = (hyperConverge: HyperConverged, checked: boolean): Patch[] => {
+  if (isHyperConvergedV1(hyperConverge)) {
+    return buildV1EnablePatches(hyperConverge, checked);
+  }
+  return buildV1Beta1EnablePatches(hyperConverge as HyperConvergedV1Beta1, checked);
+};
