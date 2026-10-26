@@ -66,11 +66,6 @@ const getPreviewFeaturesTabIds = (t: TFunction): SearchItem[] => [
     title: t('Enable Passt binding for primary user-defined networks'),
   },
   {
-    id: PREVIEW_FEATURES_TAB_IDS.vmTemplates,
-    // Shown only on HCO v1beta1; HCO v1 hides the Preview Features toggle.
-    title: t('Enable native VirtualMachine templates'),
-  },
-  {
     id: PREVIEW_FEATURES_TAB_IDS.controlDefaultVirtualizationPermissions,
     title: t('Control default Virtualization permissions'),
   },
