@@ -257,10 +257,7 @@ describe('Check all virtualization pages can be loaded', () => {
       cy.get(itemCreateBtn).click();
       cy.byButtonText(YAML).click();
       cy.saveYAML();
-      // The MigrationPolicy details breadcrumb doesn't expose `data-test-id="breadcrumb-link-0"`;
-      // match on the PatternFly breadcrumb item class instead (same change already present
-      // on release-4.19).
-      cy.get('.pf-v6-c-breadcrumb__item').eq(0).click();
+      cy.get('.pf-v5-c-breadcrumb__item').eq(0).click();
       cy.byLegacyTestID(Example).should('exist');
     });
   });
