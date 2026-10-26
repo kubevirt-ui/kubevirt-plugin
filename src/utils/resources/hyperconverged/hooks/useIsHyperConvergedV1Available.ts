@@ -56,7 +56,7 @@ const useIsHyperConvergedV1Available: UseIsHyperConvergedV1Available = (clusterO
   const hcoV1Model = models?.[HyperConvergedV1ModelRef];
   const hcoV1beta1Model = models?.[HyperConvergedV1Beta1ModelRef];
 
-  const loading = !hcoV1Model || !hcoV1beta1Model;
+  const loading = !hcoV1Model && !hcoV1beta1Model;
   return {
     isHCOV1: !isEmpty(hcoV1Model),
     loading: loading,
