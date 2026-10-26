@@ -71,6 +71,18 @@ on:
         required: false
         default: ''
         type: string
+      cni_plugin:
+        description: |
+          CNI plugin for VPC cluster creation: "OVNKubernetes", empty to
+          omit --cni and let VPC provision its platform default (Calico --
+          required below OpenShift 4.20, where VPC rejects explicit CNI
+          selection entirely), or "auto" (default) to derive this from
+          openshift_version (OVNKubernetes at 4.20+, empty/Calico below
+          it) -- see resolve-cluster-config.sh/.ts for the same rule. No
+          effect for classic/ipi.
+        required: false
+        default: 'auto'
+        type: string
       branch_name:
         description: |
           Branch identity to report in the "Hot cluster ready" Slack
@@ -156,6 +168,18 @@ on:
           The run then tests against the channel head, not the requested pin.
         required: false
         default: ''
+        type: string
+      cni_plugin:
+        description: |
+          CNI plugin for VPC cluster creation: "OVNKubernetes", empty to
+          omit --cni and let VPC provision its platform default (Calico --
+          required below OpenShift 4.20, where VPC rejects explicit CNI
+          selection entirely), or "auto" (default) to derive this from
+          openshift_version (OVNKubernetes at 4.20+, empty/Calico below
+          it) -- see resolve-cluster-config.sh/.ts for the same rule. No
+          effect for classic/ipi.
+        required: false
+        default: 'auto'
         type: string
       branch_name:
         description: |
@@ -266,6 +290,41 @@ jobs:
         working-directory: ci-scripts/hot-cluster/ts
         run: npx tsx src/scripts/validate-cluster-name.ts
 
+      # Resolves cni_plugin: 'auto' (the input default, for a bare dispatch/
+      # call that didn't set it) derives from openshift_version the same way
+      # resolve-cluster-config.sh/.ts do -- OVNKubernetes at 4.20+, empty
+      # (Calico, omitted --cni) below it. Any other value, including an
+      # explicit empty string from a caller that already resolved Calico, is
+      # passed through unchanged rather than re-derived.
+      - name: Resolve CNI plugin
+        id: resolve_cni
+        env:
+          CNI_PLUGIN_INPUT: ${{ inputs.cni_plugin }}
+          OPENSHIFT_VERSION: ${{ inputs.openshift_version }}
+        run: |
+          set -euo pipefail
+          if [[ "${CNI_PLUGIN_INPUT}" != "auto" ]]; then
+            echo "Using explicit cni_plugin input: '${CNI_PLUGIN_INPUT:-<empty, platform default Calico>}'" >&2
+            echo "cni_plugin=${CNI_PLUGIN_INPUT}" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          OVN_MIN_ENCODED=$(( 4 * 1000 + 20 ))
+          if [[ "${OPENSHIFT_VERSION}" =~ ^([0-9]+)\.([0-9]+)_openshift$ ]]; then
+            MAJOR="${BASH_REMATCH[1]}"
+            MINOR="${BASH_REMATCH[2]}"
+          else
+            # Unparseable -- default to the safe, explicit-CNI behavior.
+            MAJOR=4
+            MINOR=20
+          fi
+          if (( MAJOR * 1000 + MINOR < OVN_MIN_ENCODED )); then
+            CNI_PLUGIN=""
+          else
+            CNI_PLUGIN="OVNKubernetes"
+          fi
+          echo "Derived cni_plugin from openshift_version '${OPENSHIFT_VERSION}': '${CNI_PLUGIN:-<empty, platform default Calico>}'" >&2
+          echo "cni_plugin=${CNI_PLUGIN}" >> "$GITHUB_OUTPUT"
+
       - name: Setup IBM Cloud CLI
         uses: IBM/actions-ibmcloud-cli@v2
         with:
@@ -349,7 +408,7 @@ jobs:
           OPENSHIFT_VERSION: ${{ inputs.openshift_version }}
           WORKER_FLAVOR: ${{ inputs.worker_flavor }}
           WORKER_COUNT: ${{ inputs.worker_count }}
-          CNI_PLUGIN: OVNKubernetes
+          CNI_PLUGIN: ${{ steps.resolve_cni.outputs.cni_plugin }}
         working-directory: ci-scripts/hot-cluster/ts
         run: npx tsx src/scripts/create-roks-vpc.ts
 

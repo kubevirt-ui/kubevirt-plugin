@@ -49,6 +49,12 @@ outputs:
   cnv-pin-version:
     description: Resolved CNV startingCSV pin ("<major>.<minor>", or empty)
     value: ${{ steps.resolve.outputs.cnv_pin_version }}
+  cni-plugin:
+    description: |
+      Resolved CNI plugin ("OVNKubernetes" at/above the VPC CNI-selection
+      floor of 4.20, or empty below it -- meaning omit --cni and let VPC
+      provision its platform default, Calico)
+    value: ${{ steps.resolve.outputs.cni_plugin }}
 
 runs:
   using: composite

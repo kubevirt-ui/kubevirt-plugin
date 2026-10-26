@@ -161,6 +161,7 @@ jobs:
       branch_name: ${{ steps.resolve-config.outputs.branch-name }}
       cnv_channel: ${{ steps.resolve-config.outputs.cnv-channel }}
       cnv_pin_version: ${{ steps.resolve-config.outputs.cnv-pin-version }}
+      cni_plugin: ${{ steps.resolve-config.outputs.cni-plugin }}
       # Empty unless dispatched with pr_number.
       pr_head_sha: ${{ steps.resolve-pr-context.outputs.head-sha }}
       pr_mergeable: ${{ steps.resolve-pr-context.outputs.mergeable }}
@@ -287,6 +288,7 @@ jobs:
       openshift_version: ${{ needs.prepare.outputs.openshift_version }}
       cnv_channel: ${{ needs.prepare.outputs.cnv_channel }}
       cnv_pin_version: ${{ needs.prepare.outputs.cnv_pin_version }}
+      cni_plugin: ${{ needs.prepare.outputs.cni_plugin }}
       branch_name: ${{ needs.prepare.outputs.branch_name || github.ref_name }}
       should_run: ${{ inputs.pr_number == '' || needs.prepare.outputs.pr_trusted == 'true' }}
       run_health_check: ${{ github.event_name == 'workflow_dispatch' && inputs.pr_number == '' }}

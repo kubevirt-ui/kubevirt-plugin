@@ -2,7 +2,7 @@
 
 This directory contains scripts and documentation for the **IBM Cloud hot cluster** CI stack: an OpenShift cluster used for KubeVirt plugin E2E testing, with **Hyperconverged Cluster Operator (HCO)** and **GitHub Actions Runner Controller (ARC)** for self-hosted runners (`kubevirt-plugin-ci`).
 
-Three infrastructure types are supported: **Classic ROKS**, **VPC ROKS** (recommended; OVN-Kubernetes CNI with Multus), and **IPI** (self-managed OpenShift).
+Three infrastructure types are supported: **Classic ROKS**, **VPC ROKS** (recommended; OVN-Kubernetes CNI with Multus at OpenShift 4.20+, Calico below that -- see "Cluster & Test-Engine Resolution"), and **IPI** (self-managed OpenShift).
 
 **Prow/Tide are gone for this repo.** Gating E2E runs here; merge eligibility (`lgtm`/`approved`/`hold`/`needs-rebase`) and native auto-merge live in GitHub Actions. See [Prow/Tide → GitHub Actions Migration](#prowtide-github-actions-migration-complete-for-this-repo) below.
 
@@ -226,9 +226,11 @@ See [`hot-cluster/arc/README.md`](hot-cluster/arc/README.md) for ARC-specific de
 
 ## Cluster & Test-Engine Resolution
 
-`resolve-cluster-config.sh` picks the cluster name, OpenShift version, test engine, and CNV channel/pin for a run, from the PR's base branch (or `workflow_dispatch` overrides):
+`resolve-cluster-config.sh` picks the cluster name, OpenShift version, CNI plugin, test engine, and CNV channel/pin for a run, from the PR's base branch (or `workflow_dispatch` overrides):
 
 - **Release branches** (`release-<major>.<minor>`) get a dedicated cluster (`kubevirt-plugin-<major><minor>`) instead of sharing `kubevirt-plugin-ci`, and a CNV `startingCSV` pin to that major.minor. By default `install-hco.sh` fails the build if no matching CSV exists, rather than silently installing a newer one; the hot-cluster workflow sets `CNV_PIN_FALLBACK_UNPINNED=true` so that case instead installs unpinned (channel head) with a loud warning, keeping a release-branch PR green when its CNV version isn't in the catalog yet (e.g. not GA).
+- **Supported OpenShift window**: 4.18-4.22. A release branch outside this window still provisions, clamped to the nearest supported version; CNV is left unpinned when a clamp happens (the branch's own CSV won't exist in the clamped cluster's catalog).
+- **CNI plugin**: VPC cluster creation with an explicit CNI (`--cni OVNKubernetes`) is rejected below OpenShift 4.20 by IBM Cloud ("version is not supported for CNI selection in VPC. Specify 4.20 or later", `E0723`). So 4.20+ resolves to `OVNKubernetes` (with Multus); 4.18-4.19 resolve to an empty CNI plugin, which `create-roks-vpc.ts` turns into omitting `--cni` entirely, provisioning VPC's platform default (Calico) instead. `install-hco.sh` tolerates the resulting absence of the NAD CRD on those clusters.
 - **Test engine**: `release-4.22` and earlier predate the Cypress-to-Playwright migration and still carry a `cypress/` suite; everything else (main, future releases, non-release bases) uses Playwright. An explicit `workflow_dispatch` override always wins over this auto-detection.
 - **CNV channel**: always resolves to the catalog's real `stable` channel (there is no per-version `stable-4.X` channel); version pinning happens via `startingCSV`, not a different channel name.
 
