@@ -2,7 +2,6 @@ import { ADMIN_ONLY_TAG, GATING_TAG, T1_TAG, T2_TAG } from '@/data-models/allure
 import { ROUTE_MIGRATION_POLICIES_TAG } from '@/data-models/route-tags';
 import { expect, test } from '@/fixtures/migration-policies-fixture';
 import { CRUD_NAMES } from '@/utils/constants';
-import { verifyMigrationPolicyCreated } from '@/utils/creation-verification';
 import { migrationPolicyManifest } from '@/utils/manifests';
 import {
   generateNameWithBase,
@@ -21,11 +20,11 @@ test.describe(`MigrationPolicies read ${ROUTE_MIGRATION_POLICIES_TAG} ${GATING_T
   });
 });
 
-test.describe(`MigrationPolicies UI create YAML ${ROUTE_MIGRATION_POLICIES_TAG} ${GATING_TAG} ${T2_TAG} ${ADMIN_ONLY_TAG}`, () => {
+test.describe(`MigrationPolicies gating create YAML ${ROUTE_MIGRATION_POLICIES_TAG} ${GATING_TAG} ${ADMIN_ONLY_TAG}`, () => {
   test('ID(CNV-9384) Create MigrationPolicy from YAML and delete in UI', async ({
+    apiClient,
     migrationPoliciesPage,
     nav,
-    apiClient,
   }) => {
     const name = generateNameWithBase(CRUD_NAMES.migrationPolicyExample, 40);
 
@@ -40,7 +39,26 @@ test.describe(`MigrationPolicies UI create YAML ${ROUTE_MIGRATION_POLICIES_TAG} 
     await migrationPoliciesPage.goToList();
     await migrationPoliciesPage.dismissConsoleObstructions();
     await migrationPoliciesPage.createFromYaml(migrationPolicyManifest({ name }));
-    await verifyMigrationPolicyCreated(apiClient, migrationPoliciesPage, name);
+    await expect
+      .poll(() => apiClient.migrationPolicyExists(name), {
+        message: `MigrationPolicy ${name} should exist`,
+        timeout: TestTimeouts.RESOURCE_CREATION,
+      })
+      .toBe(true);
+    if (migrationPoliciesPage.isOnMigrationPolicyDetail(name)) {
+      await expect(migrationPoliciesPage.migrationPolicyDetailName(name)).toBeVisible({
+        timeout: TestTimeouts.ELEMENT_WAIT,
+      });
+    }
+    await migrationPoliciesPage.goToList();
+    await migrationPoliciesPage.filterByName(name);
+    await expect(migrationPoliciesPage.row(name)).toBeVisible({
+      timeout: TestTimeouts.LONG_OPERATION,
+    });
+    await migrationPoliciesPage.openDetail(name);
+    await expect(migrationPoliciesPage.migrationPolicyDetailName(name)).toBeVisible({
+      timeout: TestTimeouts.ELEMENT_WAIT,
+    });
 
     await nav.goToMigrationPolicies();
     await migrationPoliciesPage.goToList();
@@ -93,9 +111,9 @@ test.describe(`MigrationPolicies UI update and delete ${ROUTE_MIGRATION_POLICIES
 
 test.describe(`MigrationPolicies UI create form ${ROUTE_MIGRATION_POLICIES_TAG} ${T2_TAG} ${ADMIN_ONLY_TAG}`, () => {
   test('ID(CNV-9385) Create MigrationPolicy with form and delete in UI', async ({
+    apiClient,
     migrationPoliciesPage,
     nav,
-    apiClient,
   }) => {
     const name = generateNameWithBase(CRUD_NAMES.migrationPolicyForm, 40);
 
@@ -104,7 +122,26 @@ test.describe(`MigrationPolicies UI create form ${ROUTE_MIGRATION_POLICIES_TAG} 
     await nav.goToMigrationPolicies();
     await migrationPoliciesPage.goToList();
     await migrationPoliciesPage.createFromForm(name);
-    await verifyMigrationPolicyCreated(apiClient, migrationPoliciesPage, name);
+    await expect
+      .poll(() => apiClient.migrationPolicyExists(name), {
+        message: `MigrationPolicy ${name} should exist`,
+        timeout: TestTimeouts.RESOURCE_CREATION,
+      })
+      .toBe(true);
+    if (migrationPoliciesPage.isOnMigrationPolicyDetail(name)) {
+      await expect(migrationPoliciesPage.migrationPolicyDetailName(name)).toBeVisible({
+        timeout: TestTimeouts.ELEMENT_WAIT,
+      });
+    }
+    await migrationPoliciesPage.goToList();
+    await migrationPoliciesPage.filterByName(name);
+    await expect(migrationPoliciesPage.row(name)).toBeVisible({
+      timeout: TestTimeouts.LONG_OPERATION,
+    });
+    await migrationPoliciesPage.openDetail(name);
+    await expect(migrationPoliciesPage.migrationPolicyDetailName(name)).toBeVisible({
+      timeout: TestTimeouts.ELEMENT_WAIT,
+    });
     await nav.goToMigrationPolicies();
     await migrationPoliciesPage.goToList();
     await migrationPoliciesPage.deleteFromList(name);

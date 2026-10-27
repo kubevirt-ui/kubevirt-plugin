@@ -73,6 +73,7 @@ test.describe(`VirtualMachines UI create from catalog ${ROUTE_VIRTUAL_MACHINES_L
         .toMatch(catalogPage.catalogEntryUrlPattern(testNamespace));
       await catalogPage.waitForTemplateCatalogReady();
       await catalogPage.selectTemplateByMetadataName(VM_FROM_CATALOG.templateMetadataName);
+      await catalogPage.openLegacyQuickCreateModal();
       await catalogPage.quickCreateVm(vmName);
 
       await verifyVirtualMachineCreated(apiClient, vmListPage, testNamespace, vmName);

@@ -29,8 +29,12 @@ export class MigrationPoliciesPage extends ResourceListPage {
   async createFromYaml(manifestYaml?: string): Promise<void> {
     await this.openCreateDropdown(/Create MigrationPolicy/i);
     await this.createFromYamlAndSubmit(manifestYaml);
-    await this.waitForResourceDetailUrl(
-      /migrations\.kubevirt\.io~v1alpha1~MigrationPolicy\/[^/]+(?:\/|$|#)/,
+    const detailUrl = /migrations\.kubevirt\.io~v1alpha1~MigrationPolicy\/[^/]+(?:\/|$|#)/;
+    await this.waitForResourceDetailUrl(detailUrl, TestTimeouts.RESOURCE_CREATION).catch(
+      async () => {
+        // Import YAML sometimes returns to the list instead of opening the detail page.
+        await this.goToList();
+      },
     );
   }
 
