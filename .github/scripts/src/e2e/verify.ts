@@ -36,6 +36,7 @@ import {
   checkHoldState,
   closeOrphans,
   completeProgressStatus,
+  isPrHeadCurrent,
   publishGatingResult,
   syncE2ELabels,
 } from './verify-helpers';
@@ -131,7 +132,12 @@ const main = async (): Promise<void> => {
     runUrl,
   );
 
-  await syncE2ELabels(botOctokit, owner, repo, prNumber, result.conclusion);
+  // Labels are PR-scoped. A superseded run that finishes after a push must not
+  // re-apply e2e-passed/e2e-failed for a SHA that is no longer HEAD (the gate
+  // already cleared them on synchronize). Check-runs stay on prHeadSha.
+  if (await isPrHeadCurrent(botOctokit, owner, repo, prNumber, prHeadSha)) {
+    await syncE2ELabels(botOctokit, owner, repo, prNumber, result.conclusion);
+  }
   await closeOrphans(botOctokit, owner, repo, prHeadSha, publishedCheckRunId, runUrl);
 };
 

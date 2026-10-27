@@ -72,6 +72,40 @@ export const publishGatingResult = async (
     title: result.title,
   });
 
+/**
+ * True when the PR's live HEAD still matches the SHA this E2E run tested.
+ * Fail-open on API errors so a transient lookup failure doesn't drop a
+ * legitimate label sync; only skip when HEAD has positively moved.
+ */
+export const isPrHeadCurrent = async (
+  octokit: Octokit,
+  owner: string,
+  repo: string,
+  prNumber: string,
+  expectedSha: string,
+): Promise<boolean> => {
+  try {
+    const { data } = await octokit.pulls.get({
+      owner,
+      pull_number: Number(prNumber),
+      repo,
+    });
+    const currentSha = data.head.sha;
+    if (currentSha !== expectedSha) {
+      console.log(
+        `PR #${prNumber} HEAD moved (${expectedSha.slice(0, 7)} → ${currentSha.slice(0, 7)}); ` +
+          'skipping e2e-passed/e2e-failed label sync for this stale run.',
+      );
+      return false;
+    }
+    return true;
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.warn(`Could not re-check PR HEAD before label sync: ${msg}`);
+    return false;
+  }
+};
+
 /** Sync e2e-passed / e2e-failed labels based on check conclusion. */
 export const syncE2ELabels = async (
   octokit: Octokit,
