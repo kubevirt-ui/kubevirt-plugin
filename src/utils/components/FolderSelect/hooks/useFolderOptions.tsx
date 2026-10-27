@@ -22,7 +22,7 @@ const useFolderOptions: UseFolderOptions = (namespace) => {
   });
 
   useEffect(() => {
-    if (isEmpty(vms)) return null;
+    if (isEmpty(vms)) return;
 
     const folderOptions = vms.reduce((uniqueValues, vm) => {
       const folderLabel = getLabel(vm, VM_FOLDER_LABEL);
