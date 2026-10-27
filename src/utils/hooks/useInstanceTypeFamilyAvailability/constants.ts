@@ -1,6 +1,6 @@
-import { type InstanceTypeSeries } from '@kubevirt-utils/resources/instancetype/types';
+import { type InstanceTypeSeriesName } from '@kubevirt-utils/resources/instancetype/types';
 
-export const INSTANCE_TYPE_SERIES: InstanceTypeSeries[] = [
+export const INSTANCE_TYPE_SERIES: InstanceTypeSeriesName[] = [
   'u1',
   'm1',
   'cx1',

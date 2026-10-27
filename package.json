@@ -154,6 +154,7 @@
     "check-types": "tsc",
     "check-types:playwright": "tsc --noEmit --project playwright/tsconfig.json",
     "clean": "rm -rf dist",
+    "generate:pf-icons": "node scripts/generate-pf-icon-loaders.cjs && prettier --write src/utils/components/DynamicPfIcon/iconLoaders.generated.ts",
     "playwright-install": "playwright install chromium",
     "playwright-report": "playwright show-report ./playwright/test-results/html-report",
     "dev": "npm run clean && NODE_ENV=development NODE_OPTIONS=--max-old-space-size=8192 npm run ts-node -- node_modules/.bin/rspack serve",

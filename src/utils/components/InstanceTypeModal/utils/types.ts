@@ -1,7 +1,7 @@
 import type { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import type {
-  InstanceTypeSeries,
-  InstanceTypeSize,
+  InstanceTypeSeriesName,
+  InstanceTypeSizeName,
   InstanceTypeUnion,
 } from '@kubevirt-utils/resources/instancetype/types';
 
@@ -14,10 +14,10 @@ export type InstanceTypeRecord = {
 };
 
 export type MappedInstanceTypes = Record<
-  InstanceTypeSeries,
+  InstanceTypeSeriesName,
   {
     sizes: {
-      [key in InstanceTypeSize]?: InstanceTypeRecord;
+      [key in InstanceTypeSizeName]?: InstanceTypeRecord;
     };
   } & { descriptionSeries?: string; displayNameSeries?: string }
 >;

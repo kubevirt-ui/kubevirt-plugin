@@ -1,6 +1,6 @@
 import type { ComponentClass } from 'react';
 
-import type { InstanceTypeSeries } from '@kubevirt-utils/resources/instancetype/types';
+import { type InstanceTypeSeriesName } from '@kubevirt-utils/resources/instancetype/types';
 import {
   MemoryIcon,
   MicrochipIcon,
@@ -39,37 +39,21 @@ export const initialMenuItems: InstanceTypesMenuItemsData = {
   },
 };
 
-// Note: series labels are generated via getSeriesLabel() at render time using t('{{symbol}} series', { symbol })
-export const instanceTypeSeriesNameMapper: {
-  [key in InstanceTypeSeries]: {
-    Icon: ComponentClass;
-  };
-} = {
-  cx1: {
-    Icon: RegistryIcon,
-  },
-  d1: {
-    Icon: MicrochipIcon,
-  },
-  m1: {
-    Icon: MemoryIcon,
-  },
-  n1: {
-    Icon: NetworkIcon,
-  },
-  o1: {
-    Icon: ModuleIcon,
-  },
-  rt1: {
-    Icon: OutlinedClockIcon,
-  },
-  u1: {
-    Icon: ServerGroupIcon,
-  },
+// Maps Red Hat instance type series names to PatternFly icon components
+export const seriesNameIconMapper: Record<InstanceTypeSeriesName, ComponentClass> = {
+  cx1: RegistryIcon,
+  d1: MicrochipIcon,
+  m1: MemoryIcon,
+  n1: NetworkIcon,
+  o1: ModuleIcon,
+  rt1: OutlinedClockIcon,
+  u1: ServerGroupIcon,
 };
 
 export const REDHAT_COM = 'redhat.com';
 export const KUBEVIRT_IO = 'kubevirt.io';
-export const INSTANCETYPE_CLASS_ANNOTATION = 'instancetype.kubevirt.io/class';
+export const INSTANCETYPE_CLASS_LABEL = 'instancetype.kubevirt.io/class';
+export const INSTANCETYPE_SIZE_LABEL = 'instancetype.kubevirt.io/size';
+export const INSTANCETYPE_ICON_PF = 'instancetype.kubevirt.io/icon-pf';
 export const INSTANCETYPE_DESCRIPTION_ANNOTATION = 'instancetype.kubevirt.io/description';
 export const INSTANCETYPE_CLASS_DISPLAY_NAME = 'instancetype.kubevirt.io/displayName';

@@ -7,7 +7,7 @@ import useClusterInstanceTypes from '@kubevirt-utils/hooks/useClusterInstanceTyp
 import { INSTANCE_TYPE_SERIES } from '@kubevirt-utils/hooks/useInstanceTypeFamilyAvailability/constants';
 import useDisabledInstanceTypeFamilies from '@kubevirt-utils/hooks/useInstanceTypeFamilyAvailability/useDisabledInstanceTypeFamilies';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { type InstanceTypeSeries } from '@kubevirt-utils/resources/instancetype/types';
+import { type InstanceTypeSeriesName } from '@kubevirt-utils/resources/instancetype/types';
 import { universalComparator } from '@kubevirt-utils/utils/utils';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import {
@@ -82,7 +82,7 @@ const FamilyAvailabilitySection: FC = () => {
       <Gallery hasGutter minWidths={{ default: '12.5rem' }}>
         {isLoaded
           ? seriesItems.map((seriesItem) => {
-              const seriesName = seriesItem.seriesName as InstanceTypeSeries;
+              const seriesName = seriesItem.seriesName as InstanceTypeSeriesName;
               const isAvailable = !disabledFamilies.has(seriesName);
               return (
                 <GalleryItem key={seriesName}>
