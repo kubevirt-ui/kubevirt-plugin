@@ -4,6 +4,7 @@ import { Link } from 'react-router';
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { isAllNamespaces } from '@kubevirt-utils/utils/utils';
 import { getVMWizardURL } from '@multicluster/urls';
 import useIsACMPage from '@multicluster/useIsACMPage';
 import { useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
@@ -17,14 +18,16 @@ const NoVMsAlert: FC<NoVMsAlertProps> = ({ cluster, namespace }) => {
   const { t } = useKubevirtTranslation();
   const [dismissed, setDismissed] = useState(false);
   const isACMPage = useIsACMPage();
-  const selectedNamespace = namespace ?? DEFAULT_NAMESPACE;
+  const isAllProjectsScope = isAllNamespaces(namespace);
 
-  const [canCreateVM, loading] = useAccessReview({
+  const [canCreateVMInProject, loading] = useAccessReview({
     group: VirtualMachineModel.apiGroup,
-    namespace: selectedNamespace,
+    namespace: namespace ?? DEFAULT_NAMESPACE,
     resource: VirtualMachineModel.plural,
     verb: 'create',
   });
+
+  const canCreateVM = isAllProjectsScope || canCreateVMInProject;
 
   const vmWizardURL = useMemo(() => getVMWizardURL(isACMPage), [isACMPage]);
 
@@ -41,7 +44,7 @@ const NoVMsAlert: FC<NoVMsAlertProps> = ({ cluster, namespace }) => {
       title={t('No data to display yet.')}
       variant={AlertVariant.info}
     >
-      {loading ? (
+      {loading && !isAllProjectsScope ? (
         <Skeleton screenreaderText={t('Loading')} width="75%" />
       ) : (
         <>

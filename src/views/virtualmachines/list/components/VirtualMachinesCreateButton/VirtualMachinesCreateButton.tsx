@@ -7,9 +7,9 @@ import { TELEMETRY_VM_CREATION_METHOD } from '@kubevirt-utils/extensions/telemet
 import { logVMCreationStarted } from '@kubevirt-utils/extensions/telemetry/vm-creation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getVMListPath } from '@kubevirt-utils/resources/vm';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { isAllNamespaces } from '@kubevirt-utils/utils/utils';
 import useCluster from '@multicluster/hooks/useCluster';
-import { getACMVMListURL, navigateToVMWizard } from '@multicluster/urls';
+import { getACMVMListURL, isAllClusters, navigateToVMWizard } from '@multicluster/urls';
 import useIsACMPage from '@multicluster/useIsACMPage';
 import {
   Button,
@@ -43,21 +43,37 @@ const VirtualMachinesCreateButton: FC<VirtualMachinesCreateButtonProps> = ({
 
   const isACMPage = useIsACMPage();
   const cluster = useCluster();
-  const selectedNamespace = namespace || DEFAULT_NAMESPACE;
+  const isAllProjectsScope = isAllNamespaces(namespace);
+  // YAML create needs a concrete project for the URL; on all-projects start in `default`
+  // (users can switch project in the editor if they lack create access there).
+  const yamlTargetNamespace = isAllProjectsScope
+    ? DEFAULT_NAMESPACE
+    : namespace || DEFAULT_NAMESPACE;
 
-  const [canCreateVM] = useFleetAccessReview(
-    getCanCreateVMFleetAccessReview(selectedNamespace, cluster),
+  // ACM YAML route is /cluster/:cluster/ns/:ns/~new. Wait for a concrete cluster
+  // (URL param or hub fallback) so we never navigate to all-clusters/.../~new.
+  const hasConcreteYamlCluster = Boolean(cluster && !isAllClusters(cluster));
+  const canCreateWithYaml = !isACMPage || hasConcreteYamlCluster;
+
+  const [canCreateVMInProject] = useFleetAccessReview(
+    getCanCreateVMFleetAccessReview(yamlTargetNamespace, cluster),
   );
+
+  const canCreateVM = isAllProjectsScope || canCreateVMInProject;
 
   const wizardCluster = useMemo(() => (isACMPage ? (cluster ?? '') : ''), [isACMPage, cluster]);
 
-  const yamlURL = useMemo(
-    () =>
-      isACMPage
-        ? `${getACMVMListURL(cluster, selectedNamespace)}/~new`
-        : `${getVMListPath(selectedNamespace)}/~new`,
-    [isACMPage, cluster, selectedNamespace],
-  );
+  const yamlURL = useMemo(() => {
+    if (!isACMPage) {
+      return `${getVMListPath(yamlTargetNamespace)}/~new`;
+    }
+
+    if (!hasConcreteYamlCluster) {
+      return null;
+    }
+
+    return `${getACMVMListURL(cluster, yamlTargetNamespace)}/~new`;
+  }, [isACMPage, cluster, hasConcreteYamlCluster, yamlTargetNamespace]);
 
   const onSelect = useCallback(
     (_event: MouseEvent, value: string) => {
@@ -71,7 +87,7 @@ const VirtualMachinesCreateButton: FC<VirtualMachinesCreateButtonProps> = ({
     [navigate, wizardCluster, namespace, yamlURL],
   );
 
-  const disabledTooltip = getDisabledCreateVMTooltip(t, isEmpty(namespace));
+  const disabledTooltip = getDisabledCreateVMTooltip(t, isAllProjectsScope);
 
   const isDisabled = useMemo(() => !canCreateVM, [canCreateVM]);
 
@@ -122,7 +138,7 @@ const VirtualMachinesCreateButton: FC<VirtualMachinesCreateButtonProps> = ({
           )}
         >
           <DropdownList>
-            <DropdownItem key={YAML} value={YAML}>
+            <DropdownItem isDisabled={!canCreateWithYaml} key={YAML} value={YAML}>
               {t('With YAML')}
             </DropdownItem>
           </DropdownList>

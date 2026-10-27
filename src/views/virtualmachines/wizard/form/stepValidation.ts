@@ -53,7 +53,7 @@ export const getNavigationPrerequisites = (
   return destinationIndex <= flow.indexOf(currentStep) ? [] : flow.slice(0, destinationIndex);
 };
 
-const getWizardStepFieldPaths = (
+export const getWizardStepFieldPaths = (
   stepId: VMWizardStep,
   creationMethod: VMCreationMethod,
 ): readonly FieldPath<VMWizardFormValues>[] =>
@@ -63,6 +63,19 @@ const getWizardStepFieldPaths = (
       ) as FieldPath<VMWizardFormValues>[])
     : STEP_FIELDS[stepId];
 
+export const hasWizardStepErrors = (
+  errors: FieldErrors<VMWizardFormValues>,
+  stepId: VMWizardStep,
+  creationMethod: VMCreationMethod,
+  excludeFields: readonly FieldPath<VMWizardFormValues>[] = [],
+): boolean => {
+  const excluded = new Set(excludeFields);
+
+  return getWizardStepFieldPaths(stepId, creationMethod)
+    .filter((field) => !excluded.has(field))
+    .some((field) => Boolean(get(errors, field)));
+};
+
 export const mapWizardErrorsToSteps = (
   errors: FieldErrors<VMWizardFormValues>,
   creationMethod: VMWizardFormValues['creationMethod'],
@@ -70,7 +83,7 @@ export const mapWizardErrorsToSteps = (
   Object.fromEntries(
     Object.values(VMWizardStep).map((step) => [
       step,
-      getWizardStepFieldPaths(step, creationMethod).some((field) => Boolean(get(errors, field))),
+      hasWizardStepErrors(errors, step, creationMethod),
     ]),
   ) as WizardStepErrorMap;
 

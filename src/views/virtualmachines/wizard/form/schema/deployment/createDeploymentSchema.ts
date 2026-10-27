@@ -15,7 +15,8 @@ export const vmNameInputSchema = yup
 const createNameSchema = (t: TFunction): yup.StringSchema<string> =>
   yup
     .string()
-    .required()
+    // Keep the same RFC 1123 copy as the lenient in-field check when the name is cleared.
+    .required(getValidationMessage('DNS1123_NAME_MESSAGE', t))
     .max(63, getValidationMessage('MAX_NAME_LENGTH_MESSAGE', t, { maxNameLength: 63 }))
     .test(
       'dns-1123-name',
@@ -29,5 +30,5 @@ export const createDeploymentSchema = (t: TFunction): yup.ObjectSchema<VMWizardD
     description: yup.string().defined(),
     folder: yup.string().defined(),
     name: createNameSchema(t),
-    project: yup.string().defined(),
+    project: yup.string().required(),
   });

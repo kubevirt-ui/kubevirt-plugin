@@ -12,7 +12,7 @@ import {
   Button,
   WizardFooterWrapper,
 } from '@patternfly/react-core';
-import VMNameConfirmationNextButton from '@virtualmachines/wizard/components/VMNameConfirmationNextButton';
+import VMNameConfirmationNextButton from '@virtualmachines/wizard/components/VMNameConfirmationNextButton/VMNameConfirmationNextButton';
 import { useVMWizardForm } from '@virtualmachines/wizard/form/VMWizardFormProvider';
 import useCloseWizard from '@virtualmachines/wizard/hooks/useCloseWizard';
 import useWizardFooterNavigation from '@virtualmachines/wizard/hooks/useWizardFooterNavigation';
@@ -39,15 +39,14 @@ const DeploymentDetailsStepFooter: FC<{ navigation: WizardStepNavItemConfig }> =
             </Button>
           </ActionListItem>
           <ActionListItem>
-            {isCloneCreationMethod(creationMethod) ? (
-              <Button data-test="wizard-next-button" isDisabled={isNextDisabled} onClick={onNext}>
-                {nextButtonText}
-              </Button>
-            ) : (
-              <VMNameConfirmationNextButton onClick={onNext} validateOnClick={false}>
-                {nextButtonText}
-              </VMNameConfirmationNextButton>
-            )}
+            <VMNameConfirmationNextButton
+              isDisabled={isNextDisabled}
+              onClick={onNext}
+              requireVMName={!isCloneCreationMethod(creationMethod)}
+              validateOnClick={false}
+            >
+              {nextButtonText}
+            </VMNameConfirmationNextButton>
           </ActionListItem>
         </ActionListGroup>
         <ActionListGroup>

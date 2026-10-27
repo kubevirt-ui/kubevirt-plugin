@@ -28,8 +28,9 @@ const Dropdown = <T,>(props: DropdownProps<T>): JSX.Element => {
   const filterRef = useRef<HTMLInputElement>(null);
   const { closeMenu, filterText, isOpen, setFilterText, setIsOpen } = useDropdownMenuState();
 
-  const { allItemsTitle } = config;
-  const title = selectedItem === config.allItemsKey ? allItemsTitle : selectedItem;
+  const { allItemsTitle, selectPlaceholder } = config;
+  const title =
+    selectedItem === config.allItemsKey ? allItemsTitle : selectedItem || selectPlaceholder;
 
   const { onSelect } = useDropdownMenuSelect({ onChange, setIsOpen });
   const { onActionClick } = useDropdownBookmarkActions({ bookmarks });

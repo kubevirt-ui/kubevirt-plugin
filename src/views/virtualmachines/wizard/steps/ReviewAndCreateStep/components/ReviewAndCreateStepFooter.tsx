@@ -12,7 +12,7 @@ import {
   Stack,
   WizardFooterWrapper,
 } from '@patternfly/react-core';
-import VMNameConfirmationNextButton from '@virtualmachines/wizard/components/VMNameConfirmationNextButton';
+import VMNameConfirmationNextButton from '@virtualmachines/wizard/components/VMNameConfirmationNextButton/VMNameConfirmationNextButton';
 import { useVMWizardForm } from '@virtualmachines/wizard/form/VMWizardFormProvider';
 import useCloseWizard from '@virtualmachines/wizard/hooks/useCloseWizard';
 import useCreateVM from '@virtualmachines/wizard/hooks/useCreateVM';

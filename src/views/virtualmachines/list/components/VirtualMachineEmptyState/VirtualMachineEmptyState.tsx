@@ -4,6 +4,7 @@ import { Trans } from 'react-i18next';
 import { ProjectRequestModel, VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { isAllNamespaces } from '@kubevirt-utils/utils/utils';
 import { ListPageBody, useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
 import {
   EmptyState,
@@ -16,6 +17,7 @@ import {
 import { VirtualMachineIcon } from '@patternfly/react-icons';
 
 import VirtualMachinesCreateButton from '../VirtualMachinesCreateButton/VirtualMachinesCreateButton';
+import { getEmptyStateDescription } from './utils/getEmptyStateDescription';
 
 import './VirtualMachineEmptyState.scss';
 
@@ -25,11 +27,11 @@ type VirtualMachineEmptyStateProps = {
 
 const VirtualMachineEmptyState: FC<VirtualMachineEmptyStateProps> = ({ namespace }) => {
   const { t } = useKubevirtTranslation();
-  const selectedNamespace = namespace || DEFAULT_NAMESPACE;
+  const isAllProjectsScope = isAllNamespaces(namespace);
 
-  const [canCreateVM, loadingVM] = useAccessReview({
+  const [canCreateVMInProject, loadingVM] = useAccessReview({
     group: VirtualMachineModel.apiGroup,
-    namespace: selectedNamespace,
+    namespace: namespace || DEFAULT_NAMESPACE,
     resource: VirtualMachineModel.plural,
     verb: 'create',
   });
@@ -40,7 +42,13 @@ const VirtualMachineEmptyState: FC<VirtualMachineEmptyStateProps> = ({ namespace
     verb: 'create',
   });
 
-  const loading = loadingVM || loadingProject;
+  const loading = isAllProjectsScope ? loadingProject : loadingVM || loadingProject;
+
+  const emptyStateDescription = getEmptyStateDescription(
+    isAllProjectsScope,
+    canCreateVMInProject,
+    t,
+  );
 
   return (
     <ListPageBody>
@@ -56,15 +64,7 @@ const VirtualMachineEmptyState: FC<VirtualMachineEmptyStateProps> = ({ namespace
             <Skeleton screenreaderText={t('Loading')} width="75%" />
           ) : (
             <>
-              {canCreateVM ? (
-                <div>
-                  {t(
-                    'To get started, create a VirtualMachine or view the Catalog tab to create a VirtualMachine from the available options.',
-                  )}
-                </div>
-              ) : (
-                <div>{t('To create a VirtualMachine, contact an administrator.')}</div>
-              )}
+              <div>{emptyStateDescription}</div>
               {canCreateProject && (
                 <div className="pf-v6-u-mt-md">
                   <Trans ns="plugin__kubevirt-plugin" t={t}>
@@ -81,7 +81,7 @@ const VirtualMachineEmptyState: FC<VirtualMachineEmptyStateProps> = ({ namespace
             <EmptyStateActions>
               <VirtualMachinesCreateButton
                 buttonText={t('Create VirtualMachine')}
-                namespace={selectedNamespace}
+                namespace={namespace}
                 showDropdown={false}
               />
             </EmptyStateActions>
