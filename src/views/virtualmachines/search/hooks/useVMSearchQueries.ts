@@ -21,7 +21,10 @@ const useVMSearchQueries = (): VMSearchQueries => {
 
   const getMultipleParams = (filterType: VirtualMachineRowFilterType): string[] => {
     const values = searchParams.getAll(filterType);
-    if (!isEmpty(values)) return values;
+    if (!isEmpty(values)) {
+      return values.filter((value) => !isExcludedValue(value));
+    }
+    // Legacy rowFilter- prefixed params support
     const value = searchParams.get(getRowFilterQueryKey(filterType));
     return value ? value.split(',') : [];
   };
@@ -34,9 +37,6 @@ const useVMSearchQueries = (): VMSearchQueries => {
   const dateCreated = getParam(VirtualMachineRowFilterType.DateCreated);
   const createdFrom = getParam(VirtualMachineRowFilterType.DateCreatedFrom);
   const createdTo = getParam(VirtualMachineRowFilterType.DateCreatedTo);
-
-  const vmName = vmNames.find((name) => !isExcludedValue(name));
-  const ipAddress = ipAddresses.find((ipAddr) => !isExcludedValue(ipAddr));
 
   return useMemo(() => {
     const queries: VMSearchQueries = {
@@ -55,13 +55,15 @@ const useVMSearchQueries = (): VMSearchQueries => {
       queries.vmiQueries.push({ property: 'cluster', values: clusters });
     }
 
-    if (vmName) {
-      queries.vmQueries.push({ property: 'name', values: [`*${vmName}*`] });
-      queries.vmiQueries.push({ property: 'name', values: [`*${vmName}*`] });
+    if (!isEmpty(vmNames)) {
+      const wildcardNames = vmNames.map((name) => `*${name}*`);
+      queries.vmQueries.push({ property: 'name', values: wildcardNames });
+      queries.vmiQueries.push({ property: 'name', values: wildcardNames });
     }
 
-    if (ipAddress) {
-      queries.vmiQueries.push({ property: 'ipaddress', values: [`*${ipAddress}*`] });
+    if (!isEmpty(ipAddresses)) {
+      const wildcardIPs = ipAddresses.map((ipAddress) => `*${ipAddress}*`);
+      queries.vmiQueries.push({ property: 'ipaddress', values: wildcardIPs });
     }
 
     if (!isEmpty(projects)) {
@@ -70,7 +72,7 @@ const useVMSearchQueries = (): VMSearchQueries => {
     }
 
     return queries;
-  }, [dateCreated, createdFrom, createdTo, vmName, ipAddress, projects, clusters]);
+  }, [dateCreated, createdFrom, createdTo, vmNames, ipAddresses, projects, clusters]);
 };
 
 export default useVMSearchQueries;

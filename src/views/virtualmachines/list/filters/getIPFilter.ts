@@ -6,6 +6,7 @@ import {
   KubevirtFilterLayout,
 } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { getVMIIPAddresses } from '@kubevirt-utils/resources/vmi';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { compareCIDR, VirtualMachineRowFilterType } from '@virtualmachines/utils';
 import { getVMIFromMapper, type VMIMapper } from '@virtualmachines/utils/mappers';
 
@@ -17,13 +18,14 @@ export const getIPFilter = (
   filterLayout: KubevirtFilterLayout.HIDDEN,
   id: VirtualMachineRowFilterType.IP,
   match: (obj, selected): boolean => {
-    const search = selected[0];
-    if (!search) return true;
+    if (isEmpty(selected)) return true;
 
     const vmi = getVMIFromMapper(vmiMapper, obj);
     const ipAddresses = getVMIIPAddresses(vmi);
-    return search.includes('/')
-      ? ipAddresses.some((ipAddress) => compareCIDR(search, ipAddress))
-      : ipAddresses.some((ipAddress) => ipAddress?.includes(search));
+    return selected.some((search) =>
+      search.includes('/')
+        ? ipAddresses.some((ipAddress) => compareCIDR(search, ipAddress))
+        : ipAddresses.some((ipAddress) => ipAddress?.includes(search)),
+    );
   },
 });
