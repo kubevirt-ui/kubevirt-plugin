@@ -14,7 +14,9 @@ type CancelTrackedUploadOptions = {
   removeAfterCancel?: boolean;
 };
 
-const abortUploadStream = async (cancelUpload?: UploadEntry['cancelUpload']): Promise<boolean> => {
+export const abortUploadStream = async (
+  cancelUpload?: UploadEntry['cancelUpload'],
+): Promise<boolean> => {
   if (!cancelUpload) {
     return false;
   }
@@ -28,7 +30,7 @@ const abortUploadStream = async (cancelUpload?: UploadEntry['cancelUpload']): Pr
   }
 };
 
-const abortViaDataVolume = async (
+export const abortViaDataVolume = async (
   dvName?: string,
   dvNamespace?: string,
   dvCluster?: string,
@@ -49,7 +51,7 @@ const abortViaDataVolume = async (
   }
 };
 
-const runCancelCleanup = async (
+export const runCancelCleanup = async (
   onCancelCleanup?: UploadEntry['onCancelCleanup'],
 ): Promise<void> => {
   if (!onCancelCleanup) {
@@ -73,13 +75,14 @@ export const performCancelTrackedUpload = async (
     return;
   }
 
-  const { cancelUpload, dvCluster, dvName, dvNamespace, generation, onCancelCleanup } = upload;
+  const { cancelUpload, dvCluster, dvName, dvNamespace, generation, onCancelCleanup } =
+    upload.progressToastState;
 
   const aborted =
     (await abortUploadStream(cancelUpload)) ||
     (await abortViaDataVolume(dvName, dvNamespace, dvCluster));
 
-  if (get().uploads.data?.[uploadKey]?.generation !== generation) {
+  if (get().uploads.data?.[uploadKey]?.progressToastState.generation !== generation) {
     return;
   }
 
@@ -115,11 +118,11 @@ export const performCancelUploadsForVm = async (
   const generationByKey = Object.fromEntries(
     collectVmScopedUploadKeys(uploadsData, cluster, namespace, vmName).map((key) => [
       key,
-      uploadsData[key]?.generation,
+      uploadsData[key]?.progressToastState.generation,
     ]),
   );
   const matchingKeys = Object.keys(generationByKey).filter(
-    (key) => uploadsData?.[key]?.status === UPLOAD_PROGRESS_STATUS.UPLOADING,
+    (key) => uploadsData?.[key]?.progressToastState.status === UPLOAD_PROGRESS_STATUS.UPLOADING,
   );
 
   // Keep canceled entries so the terminal toast can merge stripped links instead of
@@ -130,7 +133,7 @@ export const performCancelUploadsForVm = async (
     namespace,
     vmName,
     Object.keys(generationByKey).filter(
-      (key) => get().uploads.data?.[key]?.generation === generationByKey[key],
+      (key) => get().uploads.data?.[key]?.progressToastState.generation === generationByKey[key],
     ),
   );
 };
@@ -140,7 +143,8 @@ export const performCancelWizardPendingUploads = async (
   uploadKeys: string[],
 ): Promise<void> => {
   const pendingKeys = uploadKeys.filter(
-    (key) => get().uploads.data?.[key]?.status === UPLOAD_PROGRESS_STATUS.UPLOADING,
+    (key) =>
+      get().uploads.data?.[key]?.progressToastState.status === UPLOAD_PROGRESS_STATUS.UPLOADING,
   );
 
   await performCancelTrackedUploads(get, pendingKeys, { removeAfterCancel: true });

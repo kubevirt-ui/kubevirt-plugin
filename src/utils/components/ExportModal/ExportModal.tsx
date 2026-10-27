@@ -73,10 +73,12 @@ const ExportModal: FC<ExportModalProps> = ({
         volumeName: pvcName,
       });
 
+      // TODO: get rid of export store
       persistExportPod(pod, cluster, pvcName, secretName);
 
       const podLogsUrl = `${getResourceUrl({ model: PodModel, resource: pod })}/logs`;
       const uploadKey = getExportDiskUploadKey(cluster, namespace, pvcName);
+      // TODO: set exportDisk store key instead of uploads
       useUploadProgressStore.getState().uploads.actions?.startUpload(uploadKey, {
         blockNavigation: true,
         cancelUpload: () => deleteExportResources(pod, secretName),

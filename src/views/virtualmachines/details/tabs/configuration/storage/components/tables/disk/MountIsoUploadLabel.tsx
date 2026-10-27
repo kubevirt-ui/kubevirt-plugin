@@ -15,7 +15,7 @@ type MountIsoUploadLabelProps = {
 const MountIsoUploadLabel: FC<MountIsoUploadLabelProps> = ({ diskName, vm }) => {
   const { t } = useKubevirtTranslation();
   const uploadKey = getVmCdromUploadKeyFromVm(vm, diskName);
-  const upload = useUploadProgressStore((state) => state.uploads.data?.[uploadKey]);
+  const upload = useUploadProgressStore((state) => state.uploads.actions?.getUpload?.(uploadKey));
 
   if (upload?.status !== UPLOAD_PROGRESS_STATUS.UPLOADING) {
     return null;

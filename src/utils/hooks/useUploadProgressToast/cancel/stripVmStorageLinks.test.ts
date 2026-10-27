@@ -13,7 +13,7 @@ import {
   getVmCdromUploadKey,
   getVmDiskUploadKey,
 } from '../keys/uploadKeys';
-import { type UploadEntry } from '../uploads/types/types';
+import { type UploadEntry, type UploadsStoreStateData } from '../uploads/types/types';
 import {
   stripDataVolumeLinksFromUpload,
   stripLinksForDeletedBootableVolume,
@@ -39,15 +39,28 @@ const dataVolumeLink = {
   url: getDataVolumeUrl(DV_NAME, NAMESPACE),
 };
 
-const createCanceledUpload = (): UploadEntry => ({
-  contextLinks: [storageLink, dataVolumeLink],
-  dvName: DV_NAME,
-  dvNamespace: NAMESPACE,
+const createProgressToastState = (overrides: Partial<UploadEntry> = {}): UploadEntry => ({
   fileName: 'image.iso',
   progress: 40,
-  status: UPLOAD_PROGRESS_STATUS.CANCELED,
-  successLinks: [storageLink, dataVolumeLink],
+  status: UPLOAD_PROGRESS_STATUS.UPLOADING,
+  ...overrides,
 });
+
+const createUploadsData = (
+  uploadKey: string,
+  overrides: Partial<UploadEntry> = {},
+): UploadsStoreStateData => ({
+  [uploadKey]: { progressToastState: createProgressToastState(overrides) },
+});
+
+const createCanceledUpload = (): UploadEntry =>
+  createProgressToastState({
+    contextLinks: [storageLink, dataVolumeLink],
+    dvName: DV_NAME,
+    dvNamespace: NAMESPACE,
+    status: UPLOAD_PROGRESS_STATUS.CANCELED,
+    successLinks: [storageLink, dataVolumeLink],
+  });
 
 describe('stripDataVolumeLinksFromUpload', () => {
   it('should remove DataVolume links and keep VM storage links', () => {
@@ -86,47 +99,47 @@ describe('stripDataVolumeLinksFromUpload', () => {
 describe('stripVmStorageLinksFromUploads', () => {
   it('should remove VM storage links from canceled uploads for the deleted VM', () => {
     const uploadKey = getVmDiskUploadKey(CLUSTER, NAMESPACE, VM_NAME, DISK_NAME);
-    const uploads = { [uploadKey]: createCanceledUpload() };
+    const uploadsData = createUploadsData(uploadKey, createCanceledUpload());
 
-    const nextUploads = stripVmStorageLinksFromUploads(uploads, CLUSTER, NAMESPACE, VM_NAME);
+    const nextUploads = stripVmStorageLinksFromUploads(uploadsData, CLUSTER, NAMESPACE, VM_NAME);
 
-    expect(nextUploads[uploadKey].contextLinks).toEqual([]);
-    expect(nextUploads[uploadKey].successLinks).toEqual([]);
+    expect(nextUploads[uploadKey].progressToastState.contextLinks).toEqual([]);
+    expect(nextUploads[uploadKey].progressToastState.successLinks).toEqual([]);
   });
 
   it('should remove VM storage links from canceled CD-ROM uploads for the deleted VM', () => {
     const uploadKey = getVmCdromUploadKey(CLUSTER, NAMESPACE, VM_NAME, DISK_NAME);
-    const uploads = {
-      [uploadKey]: {
-        ...createCanceledUpload(),
-        contextLinks: [storageLink],
-        successLinks: [storageLink],
-      },
-    };
+    const uploadsData = createUploadsData(uploadKey, {
+      ...createCanceledUpload(),
+      contextLinks: [storageLink],
+      successLinks: [storageLink],
+    });
 
-    const nextUploads = stripVmStorageLinksFromUploads(uploads, CLUSTER, NAMESPACE, VM_NAME);
+    const nextUploads = stripVmStorageLinksFromUploads(uploadsData, CLUSTER, NAMESPACE, VM_NAME);
 
-    expect(nextUploads[uploadKey].contextLinks).toEqual([]);
-    expect(nextUploads[uploadKey].successLinks).toEqual([]);
+    expect(nextUploads[uploadKey].progressToastState.contextLinks).toEqual([]);
+    expect(nextUploads[uploadKey].progressToastState.successLinks).toEqual([]);
   });
 
   it('should not change uploads for a different VM', () => {
     const uploadKey = getVmDiskUploadKey(CLUSTER, NAMESPACE, 'other-vm', DISK_NAME);
-    const uploads = { [uploadKey]: createCanceledUpload() };
+    const uploadsData = createUploadsData(uploadKey, createCanceledUpload());
 
-    expect(stripVmStorageLinksFromUploads(uploads, CLUSTER, NAMESPACE, VM_NAME)).toBe(uploads);
+    expect(stripVmStorageLinksFromUploads(uploadsData, CLUSTER, NAMESPACE, VM_NAME)).toBe(
+      uploadsData,
+    );
   });
 });
 
 describe('stripLinksForDeletedDataVolume', () => {
   it('should remove DataVolume links from VM disk uploads', () => {
     const uploadKey = getVmDiskUploadKey(CLUSTER, NAMESPACE, VM_NAME, DISK_NAME);
-    const uploads = { [uploadKey]: createCanceledUpload() };
+    const uploadsData = createUploadsData(uploadKey, createCanceledUpload());
 
-    const nextUploads = stripLinksForDeletedDataVolume(uploads, DV_NAME, NAMESPACE);
+    const nextUploads = stripLinksForDeletedDataVolume(uploadsData, DV_NAME, NAMESPACE);
 
-    expect(nextUploads[uploadKey].contextLinks).toEqual([storageLink]);
-    expect(nextUploads[uploadKey].successLinks).toEqual([storageLink]);
+    expect(nextUploads[uploadKey].progressToastState.contextLinks).toEqual([storageLink]);
+    expect(nextUploads[uploadKey].progressToastState.successLinks).toEqual([storageLink]);
   });
 
   it('should remove the bootable volume success link when its DataVolume is deleted', () => {
@@ -136,33 +149,28 @@ describe('stripLinksForDeletedDataVolume', () => {
       label: 'View bootable volume',
       url: getBootableVolumeUrl(volumeName, NAMESPACE),
     };
-    const uploads = {
-      [uploadKey]: {
-        dvName: volumeName,
-        dvNamespace: NAMESPACE,
-        fileName: 'image.iso',
-        progress: 100,
-        status: UPLOAD_PROGRESS_STATUS.SUCCESS,
-        successLinks: [bootableVolumeLink],
-      },
-    };
+    const uploadsData = createUploadsData(uploadKey, {
+      dvName: volumeName,
+      dvNamespace: NAMESPACE,
+      progress: 100,
+      status: UPLOAD_PROGRESS_STATUS.SUCCESS,
+      successLinks: [bootableVolumeLink],
+    });
 
-    const nextUploads = stripLinksForDeletedDataVolume(uploads, volumeName, NAMESPACE);
+    const nextUploads = stripLinksForDeletedDataVolume(uploadsData, volumeName, NAMESPACE);
 
-    expect(nextUploads[uploadKey].successLinks).toEqual([]);
+    expect(nextUploads[uploadKey].progressToastState.successLinks).toEqual([]);
   });
 
   it('should not strip DataVolume links from a same-name upload on another cluster', () => {
     const uploadKey = getVmDiskUploadKey(CLUSTER, NAMESPACE, VM_NAME, DISK_NAME);
-    const uploads = {
-      [uploadKey]: {
-        ...createCanceledUpload(),
-        dvCluster: CLUSTER,
-      },
-    };
+    const uploadsData = createUploadsData(uploadKey, {
+      ...createCanceledUpload(),
+      dvCluster: CLUSTER,
+    });
 
-    expect(stripLinksForDeletedDataVolume(uploads, DV_NAME, NAMESPACE, 'other-cluster')).toBe(
-      uploads,
+    expect(stripLinksForDeletedDataVolume(uploadsData, DV_NAME, NAMESPACE, 'other-cluster')).toBe(
+      uploadsData,
     );
   });
 
@@ -170,22 +178,16 @@ describe('stripLinksForDeletedDataVolume', () => {
     const remoteCluster = 'remote-cluster';
     const localKey = getVmDiskUploadKey(CLUSTER, NAMESPACE, VM_NAME, DISK_NAME);
     const remoteKey = getVmDiskUploadKey(remoteCluster, NAMESPACE, VM_NAME, DISK_NAME);
-    const uploads = {
-      [localKey]: {
-        ...createCanceledUpload(),
-        dvCluster: CLUSTER,
-      },
-      [remoteKey]: {
-        ...createCanceledUpload(),
-        dvCluster: remoteCluster,
-      },
+    const uploadsData: UploadsStoreStateData = {
+      ...createUploadsData(localKey, { ...createCanceledUpload(), dvCluster: CLUSTER }),
+      ...createUploadsData(remoteKey, { ...createCanceledUpload(), dvCluster: remoteCluster }),
     };
 
-    const nextUploads = stripLinksForDeletedDataVolume(uploads, DV_NAME, NAMESPACE, CLUSTER);
+    const nextUploads = stripLinksForDeletedDataVolume(uploadsData, DV_NAME, NAMESPACE, CLUSTER);
 
-    expect(nextUploads[localKey].contextLinks).toEqual([storageLink]);
-    expect(nextUploads[localKey].successLinks).toEqual([storageLink]);
-    expect(nextUploads[remoteKey]).toEqual(uploads[remoteKey]);
+    expect(nextUploads[localKey].progressToastState.contextLinks).toEqual([storageLink]);
+    expect(nextUploads[localKey].progressToastState.successLinks).toEqual([storageLink]);
+    expect(nextUploads[remoteKey]).toEqual(uploadsData[remoteKey]);
   });
 });
 
@@ -197,18 +199,15 @@ describe('stripLinksForDeletedBootableVolume', () => {
       label: 'View bootable volume',
       url: getBootableVolumeUrl(volumeName, NAMESPACE),
     };
-    const uploads = {
-      [uploadKey]: {
-        fileName: 'image.iso',
-        progress: 100,
-        status: UPLOAD_PROGRESS_STATUS.SUCCESS,
-        successLinks: [bootableVolumeLink],
-      },
-    };
+    const uploadsData = createUploadsData(uploadKey, {
+      progress: 100,
+      status: UPLOAD_PROGRESS_STATUS.SUCCESS,
+      successLinks: [bootableVolumeLink],
+    });
 
-    const nextUploads = stripLinksForDeletedBootableVolume(uploads, NAMESPACE, volumeName);
+    const nextUploads = stripLinksForDeletedBootableVolume(uploadsData, NAMESPACE, volumeName);
 
-    expect(nextUploads[uploadKey].successLinks).toEqual([]);
+    expect(nextUploads[uploadKey].progressToastState.successLinks).toEqual([]);
   });
 
   it('should not strip a bootable volume upload on another cluster', () => {
@@ -218,18 +217,15 @@ describe('stripLinksForDeletedBootableVolume', () => {
       label: 'View bootable volume',
       url: getBootableVolumeUrl(volumeName, NAMESPACE, CLUSTER),
     };
-    const uploads = {
-      [uploadKey]: {
-        dvCluster: CLUSTER,
-        fileName: 'image.iso',
-        progress: 100,
-        status: UPLOAD_PROGRESS_STATUS.SUCCESS,
-        successLinks: [bootableVolumeLink],
-      },
-    };
+    const uploadsData = createUploadsData(uploadKey, {
+      dvCluster: CLUSTER,
+      progress: 100,
+      status: UPLOAD_PROGRESS_STATUS.SUCCESS,
+      successLinks: [bootableVolumeLink],
+    });
 
     expect(
-      stripLinksForDeletedBootableVolume(uploads, NAMESPACE, volumeName, 'other-cluster'),
-    ).toBe(uploads);
+      stripLinksForDeletedBootableVolume(uploadsData, NAMESPACE, volumeName, 'other-cluster'),
+    ).toBe(uploadsData);
   });
 });

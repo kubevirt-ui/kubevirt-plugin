@@ -7,7 +7,8 @@ const useUploadBeforeUnload = (): void => {
   const hasActiveUploads = useUploadProgressStore((state) =>
     Object.values(state.uploads.data).some(
       (entry) =>
-        entry.status === UPLOAD_PROGRESS_STATUS.UPLOADING && entry.blockNavigation !== false,
+        entry.progressToastState?.status === UPLOAD_PROGRESS_STATUS.UPLOADING &&
+        entry.progressToastState?.blockNavigation !== false,
     ),
   );
 
