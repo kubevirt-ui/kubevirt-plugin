@@ -297,6 +297,10 @@ export default class RequestContextClient {
       runOcCommand(`oc delete namespace ${name} --wait=false --ignore-not-found`);
       return;
     }
+    // Gating lanes use console proxy only; janitor deletes labeled test namespaces.
+    if (status === 403 && !canRunOc()) {
+      return;
+    }
     await this.expectOk(del, `delete Namespace/${name}`);
   }
 

@@ -24,17 +24,33 @@ export class ResourceListPage extends BasePage {
   }
 
   protected deleteConfirmationDialog(): Locator {
+    const deleteHeading = this.page.getByRole('heading', { name: /Delete/i });
+    const deleteSubmit = this.page.getByRole('button', { name: /^Delete$/i });
     return this.page
-      .locator('#tab-modal')
+      .locator('#tab-modal, [role="dialog"][aria-modal="true"]')
       .filter({ visible: true })
-      .filter({ has: this.page.getByRole('heading', { name: /Delete/i }) })
-      .or(
-        this.page
-          .locator('[role="dialog"][aria-modal="true"]')
-          .filter({ visible: true })
-          .filter({ has: this.page.getByRole('heading', { name: /Delete/i }) }),
-      )
+      .filter({ has: deleteHeading })
+      .filter({ has: deleteSubmit })
       .first();
+  }
+
+  /** KubeVirt plugin modals (e.g. MigrationPolicy delete) render inside the plugin iframe. */
+  private async locateVisibleDeleteModal(): Promise<Locator | null> {
+    const roots: Array<Page | Frame> = [this.page, ...this.page.frames()];
+    for (const root of roots) {
+      const deleteHeading = root.getByRole('heading', { name: /Delete/i });
+      const deleteSubmit = root.getByRole('button', { name: /^Delete$/i });
+      const modal = root
+        .locator('#tab-modal, [role="dialog"][aria-modal="true"]')
+        .filter({ visible: true })
+        .filter({ has: deleteHeading })
+        .filter({ has: deleteSubmit })
+        .first();
+      if (await modal.isVisible().catch(() => false)) {
+        return modal;
+      }
+    }
+    return null;
   }
 
   protected async fillDeleteConfirmationName(
@@ -68,7 +84,8 @@ export class ResourceListPage extends BasePage {
       .or(deleteModal.getByRole('button', { name: /Delete DataSource/i }))
       .or(deleteModal.getByRole('button', { name: /Delete Template/i }))
       .or(deleteModal.getByRole('button', { name: /Delete VirtualMachine/i }))
-      .or(deleteModal.getByRole('button', { name: /Delete VirtualMachineInstancetype/i }));
+      .or(deleteModal.getByRole('button', { name: /Delete VirtualMachineInstancetype/i }))
+      .or(deleteModal.getByRole('button', { name: /Delete MigrationPolicy/i }));
 
     const findEnabledSubmit = async (): Promise<Locator | null> => {
       const count = await submitCandidates.count();
@@ -320,6 +337,7 @@ export class ResourceListPage extends BasePage {
       .or(menu.getByRole('menuitem', { name: /Delete VirtualMachine/i }))
       .or(menu.getByRole('menuitem', { name: /Delete VirtualMachineInstancetype/i }))
       .or(menu.getByRole('menuitem', { name: /Delete DataSource/i }))
+      .or(menu.getByRole('menuitem', { name: /Delete MigrationPolicy/i }))
       .or(menu.getByRole('button', { name: /^Delete$/i }));
   }
 
@@ -350,13 +368,21 @@ export class ResourceListPage extends BasePage {
       if (!(await frameRow.isVisible().catch(() => false))) {
         continue;
       }
-      const toggle = frameRow
+      const kebabToggle = frameRow
         .locator('[data-test="actions-dropdown"]')
         .getByTestId('kebab-button')
         .first()
         .or(root.locator('[data-test="actions-dropdown"]').getByTestId('kebab-button').first());
-      if (await toggle.isVisible().catch(() => false)) {
-        return { toggle, root };
+      if (await kebabToggle.isVisible().catch(() => false)) {
+        return { toggle: kebabToggle, root };
+      }
+
+      const pluginActionsDropdown = frameRow.locator(
+        '[data-test-id="migration-policies-actions"], [data-test-id="virtual-machine-cluster-instance-type-actions"], [data-test-id="virtual-machine-cluster-preference-actions"]',
+      );
+      const actionsToggle = pluginActionsDropdown.getByRole('button').first();
+      if (await actionsToggle.isVisible().catch(() => false)) {
+        return { toggle: actionsToggle, root };
       }
     }
 
@@ -519,8 +545,14 @@ export class ResourceListPage extends BasePage {
   }
 
   async confirmDelete(resourceName?: string): Promise<void> {
-    const deleteModal = this.deleteConfirmationDialog();
-    await deleteModal.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
+    await pollUntil(async () => (await this.locateVisibleDeleteModal()) !== null, {
+      message: 'Delete confirmation dialog should open with a heading',
+      timeout: TestTimeouts.ELEMENT_WAIT,
+    });
+    const deleteModal = await this.locateVisibleDeleteModal();
+    if (!deleteModal) {
+      throw new Error('Delete confirmation dialog not found');
+    }
     await this.fillDeleteConfirmationName(deleteModal, resourceName);
     await this.confirmDeleteDialog(deleteModal);
   }
