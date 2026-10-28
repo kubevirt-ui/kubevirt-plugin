@@ -370,18 +370,16 @@ jobs:
       # A release-branch run tests against the console that ships with that
       # release (e.g. origin-console:4.21) rather than ci-env-request.ts's
       # default (origin-console:5.0) -- console features/DOM differ between
-      # versions (e.g. the NetworkAttachmentDefinition create form). Prefer
-      # cnv_pin_version when set; for Cypress release branches that IBM Cloud
-      # clamps below the supported window (e.g. release-4.17 → OCP 4.18 with
-      # CNV unpinned), fall back to the clamped openshift_version so we still
-      # pin a matching console (origin-console:4.18) instead of 5.0. Empty for
+      # versions (e.g. the NetworkAttachmentDefinition create form). Set from
+      # cnv_pin_version when available. For Cypress release branches that IBM
+      # Cloud clamps below the supported window (e.g. release-4.17 → OCP 4.18
+      # with CNV unpinned), the "Resolve console image…" step below falls back
+      # to the clamped openshift_version (origin-console:4.18). Empty for
       # main/Playwright runs, which keep the 5.0 default.
       CONSOLE_IMAGE: >-
         ${{
           inputs.cnv_pin_version != '' &&
           format('quay.io/openshift/origin-console:{0}', inputs.cnv_pin_version) ||
-          ((inputs.test_engine || 'playwright') == 'cypress' && inputs.openshift_version != '') &&
-          format('quay.io/openshift/origin-console:{0}', replace(inputs.openshift_version, '_openshift', '')) ||
           ''
         }}
       # release-4.20's Cypress content hardcodes TEST_NS=auto-test-ns and
@@ -450,6 +448,18 @@ jobs:
         continue-on-error: true
         working-directory: .hc-infra/ci-scripts/hot-cluster/ts
         run: npx tsx src/scripts/log-env-summary.ts
+
+      # When cnv_pin_version is empty (clamped pre-4.18 Cypress branches) but we
+      # still have openshift_version (e.g. 4.18_openshift), pin console to that
+      # X.Y tag so ci-env-request does not fall through to origin-console:5.0.
+      - name: Resolve console image for clamped Cypress releases
+        if: env.CONSOLE_IMAGE == '' && env.TEST_ENGINE == 'cypress' && env.OPENSHIFT_VERSION != ''
+        shell: bash
+        run: |
+          tag="${OPENSHIFT_VERSION%_openshift}"
+          image="quay.io/openshift/origin-console:${tag}"
+          echo "CONSOLE_IMAGE=${image}" >> "${GITHUB_ENV}"
+          echo "Pinned console image to ${image} (from openshift_version=${OPENSHIFT_VERSION})"
 
       - name: Provision CI test environment
         id: ci-env
