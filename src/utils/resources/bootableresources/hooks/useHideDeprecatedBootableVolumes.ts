@@ -20,7 +20,7 @@ const useHideDeprecatedBootableVolumes: UseHideDeprecatedBootableVolumes = (
   const { setParam } = useURLParams();
 
   useEffect(() => {
-    if (currentTab !== CREATE_VM_TAB.INSTANCE_TYPES && currentTab !== undefined) return null;
+    if (currentTab !== CREATE_VM_TAB.INSTANCE_TYPES && currentTab !== undefined) return;
 
     // This is to select the 'Hide deprecated bootable volumes' filter by default
     onFilterChange(HIDE_DEPRECATED_BOOTABLE_VOLUMES, {

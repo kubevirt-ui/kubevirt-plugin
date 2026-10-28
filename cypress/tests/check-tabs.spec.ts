@@ -1,17 +1,44 @@
-import { K8S_KIND } from '../utils/const/index';
+import { K8S_KIND, TEST_NS } from '../utils/const/index';
 import { tab } from '../views/tab';
 import { vm } from '../views/vm';
+
+// Ported from release-4.18's check-tab-yaml.cy.ts.
+//
+// Hot-cluster runner RBAC: VM delete is cluster-wide (arc-runner-ci), but
+// Template delete is only granted via the namespaced ci-env-test-runner
+// RoleBinding in the test namespace. `oc delete template -n default` therefore
+// returns Forbidden and, with failOnNonZeroExit:false, silently leaves the
+// leftover that blocks Create-from-YAML ("example already exists"). Clear
+// Templates through the auth-disabled console proxy (cluster-admin SA) so
+// default leftovers are removable, and create new templates in TEST_NS.
+const cleanupExampleResources = () => {
+  for (const ns of ['default', TEST_NS]) {
+    cy.exec(
+      `oc delete --ignore-not-found=true -n ${ns} --cascade vm example vmi example --wait=true --timeout=180s`,
+      { failOnNonZeroExit: false, timeout: 180000 },
+    );
+    cy.deleteResource(K8S_KIND.TEMPLATE, 'example', ns);
+    cy.exec(`oc delete template example -n ${ns} --ignore-not-found=true --wait=true`, {
+      failOnNonZeroExit: false,
+      timeout: 60000,
+    });
+    // Console proxy has cluster-admin; runner SA does not for Templates in default.
+    cy.request({
+      failOnStatusCode: false,
+      method: 'DELETE',
+      url: `/api/kubernetes/apis/template.openshift.io/v1/namespaces/${ns}/templates/example`,
+    });
+  }
+};
 
 describe('Check all virtualization pages can be loaded', () => {
   before(() => {
     cy.login();
-    cy.deleteResource(K8S_KIND.VM, 'example', 'default');
-    cy.deleteResource(K8S_KIND.TEMPLATE, 'example', 'default');
+    cleanupExampleResources();
   });
 
   after(() => {
-    cy.deleteResource(K8S_KIND.VM, 'example', 'default');
-    cy.deleteResource(K8S_KIND.TEMPLATE, 'example', 'default');
+    cleanupExampleResources();
   });
 
   describe('Check VM list and tabs', () => {
@@ -46,7 +73,8 @@ describe('Check all virtualization pages can be loaded', () => {
     it('common template tabs are loaded', () => {
       cy.visitTemplates();
       cy.switchProject('All Projects');
-      cy.contains('centos7-desktop-large').click();
+      // CentOS 7 common templates are no longer shipped; use a current common template.
+      cy.contains('centos-stream9-server-small').click();
 
       cy.contains('Display name').should('be.visible');
       cy.byTestID('common-template-alert').should('be.visible');
@@ -71,10 +99,15 @@ describe('Check all virtualization pages can be loaded', () => {
     });
 
     it('custom template tabs are loaded', () => {
+      // Cypress retries re-run the test but not the suite before(); clean up so a
+      // prior attempt's "example" template does not make Create-from-YAML fail
+      // with "already exists". Create in TEST_NS (not All Projects → default):
+      // runner SA can only delete Templates in the test namespace.
+      cleanupExampleResources();
       cy.visitTemplates();
-      cy.switchProject('All Projects');
+      cy.switchProject(TEST_NS);
       cy.get('[data-test="item-create"]').click();
-      cy.get('[data-test="save-changes"]').click();
+      cy.saveYAML();
 
       cy.contains('Display name').should('be.visible');
 

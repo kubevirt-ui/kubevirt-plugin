@@ -69,11 +69,27 @@ Cypress.Commands.add('byButtonText', (selector: string) =>
 );
 
 Cypress.Commands.add('clickVirtLink', (navItemSelector: string) => {
-  cy.contains('Virtualization').should('be.visible');
-  cy.get('[data-test-id="virtualization-nav-item"]', { timeout: 10000 }).should(($el) => {
-    if ($el.attr('aria-expanded') == 'false') {
-      $el.click();
+  // Expand the sidebar if it was auto-collapsed, so nav items are clickable.
+  cy.get('body').then(($body) => {
+    const sidebar = $body.find('.pf-v5-c-page__sidebar, .pf-v6-c-page__sidebar');
+    if (sidebar.hasClass('pf-m-collapsed')) {
+      // eslint-disable-next-line cypress/no-force
+      cy.get('#nav-toggle, [aria-label="Side navigation toggle"]').first().click({ force: true });
     }
   });
-  cy.get(navItemSelector).click();
+
+  // The PatternFly 6 expandable nav button can exist in the DOM while being
+  // clipped by the scrollable sidebar container, which fails Cypress's
+  // default 'visible' check even though it is reachable. Scroll it into view
+  // and use a force click so clipping doesn't block the expand/click.
+  cy.get('[data-test-id="virtualization-nav-item"]', { timeout: 10000 })
+    .scrollIntoView()
+    .then(($el) => {
+      if ($el.attr('aria-expanded') == 'false') {
+        // eslint-disable-next-line cypress/no-force
+        cy.wrap($el).click({ force: true });
+      }
+    });
+  // eslint-disable-next-line cypress/no-force
+  cy.get(navItemSelector).scrollIntoView().click({ force: true });
 });

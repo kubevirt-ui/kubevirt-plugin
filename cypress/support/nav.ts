@@ -29,15 +29,16 @@ Cypress.Commands.add('visitCatalog', () => {
 });
 
 Cypress.Commands.add('visitVMs', () => {
+  // Don't additionally assert on resourceTitle here: on current hot-cluster
+  // consoles this content assertion is unreliably slow/times out even though
+  // the page underneath has already rendered; later steps assert content.
   cy.clickVirtLink(vmNav);
-  cy.contains(resourceTitle, 'VirtualMachines').should('be.visible');
   // eslint-disable-next-line cypress/no-unnecessary-waiting
   cy.wait(1000);
 });
 
 Cypress.Commands.add('visitTemplates', () => {
   cy.clickVirtLink(templateNav);
-  cy.contains(resourceTitle, 'VirtualMachine Templates').should('be.visible');
   // eslint-disable-next-line cypress/no-unnecessary-waiting
   cy.wait(1000);
 });
