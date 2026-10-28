@@ -37,7 +37,10 @@ Cypress.Commands.add('login', (provider: string, username: string, password: str
     masthead.username.shouldBeVisible();
 
     // wait for virtualization page
-    cy.contains('.pf-v5-c-nav__link', 'Virtualization').should('be.visible');
+    // Use the data-test-id, which is stable across PatternFly major versions,
+    // instead of a PF-version-specific class (e.g. '.pf-v5-c-nav__link'),
+    // which breaks once the host console upgrades to a newer PatternFly.
+    cy.get('[data-test-id="virtualization-nav-item"]', { timeout: 10000 }).should('exist');
   });
 });
 

@@ -10,6 +10,8 @@ export enum CLUSTER_STATUS {
 export const adminOnlyDescribe = Cypress.env('NON_PRIV') ? xdescribe : describe;
 
 export const TEST_NS = 'auto-test-ns';
+export const ALL_PROJ_NS = 'All Projects';
+export const TREEVIEW_ROOT_ID = '#vms-tree-view-panel';
 
 export enum VM_STATUS {
   Provisioning = 'Provisioning',

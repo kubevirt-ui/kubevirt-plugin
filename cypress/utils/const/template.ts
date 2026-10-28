@@ -35,10 +35,6 @@ export const TEMPLATE = {
     metadataName: 'windows10-desktop-medium',
     name: 'Microsoft Windows 10 VM',
   },
-  WIN2K12R2: {
-    metadataName: 'windows2k12r2-server-medium',
-    name: 'Microsoft Windows Server 2012 R2 VM',
-  },
   WIN2K16: {
     metadataName: 'windows2k16-server-medium',
     name: 'Microsoft Windows Server 2016 VM',
@@ -46,5 +42,9 @@ export const TEMPLATE = {
   WIN2K19: {
     metadataName: 'windows2k19-server-medium',
     name: 'Microsoft Windows Server 2019 VM',
+  },
+  WIN2K22: {
+    metadataName: 'windows2k22-server-medium',
+    name: 'Microsoft Windows Server 2022 VM',
   },
 };

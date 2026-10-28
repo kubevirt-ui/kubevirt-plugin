@@ -28,7 +28,7 @@ const SearchFilter = forwardRef<HTMLInputElement, SearchFilterProps>((props, ref
     inputRef.current.addEventListener('keydown', onKeyDown);
 
     return () => {
-      inputRef.current.removeEventListener('keydown', onKeyDown);
+      inputRef.current?.removeEventListener('keydown', onKeyDown);
     };
   }, [inputRef]);
 

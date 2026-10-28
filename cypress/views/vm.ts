@@ -84,7 +84,7 @@ export const vm = {
   createVMFromYAML: () => {
     cy.byButtonText('Create').click();
     cy.byButtonText('With YAML').click();
-    cy.get(vmView.saveBtn).click();
+    cy.saveYAML();
   },
   testStatus: (vmName: string, status: string, waitTime = 60000) => {
     getRow(vmName, () =>
