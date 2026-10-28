@@ -30,11 +30,7 @@ import { VM_COLUMN_KEYS, type VMCallbacks } from './virtualMachinesDefinition';
 
 import './VirtualMachinesList.scss';
 
-type VirtualMachinesListProps = {
-  allVMsLoaded?: boolean;
-  cluster?: string;
-  namespace: string;
-};
+type VirtualMachinesListProps = { allVMsLoaded?: boolean; cluster?: string; namespace: string };
 
 const VirtualMachinesList: FC<VirtualMachinesListProps> = ({
   allVMsLoaded,
@@ -86,7 +82,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({
     /* eslint-disable-next-line react-hooks/exhaustive-deps */
     [vmsSignal.value, namespace, cluster],
   );
-  const hasNoVMs = useMemo(() => allVMsInNamespace.length === 0, [allVMsInNamespace]);
+  const hasNoVMs = !allVMsInNamespace.length;
 
   const exportButton = (
     <KubevirtTableExport<V1VirtualMachine, VMCallbacks>
@@ -148,6 +144,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({
                 }
                 pagination={pagination}
                 persistSortInUrl
+                tableId={columnLayout.id}
                 unfilteredData={allVMsInNamespace}
               />
             </>

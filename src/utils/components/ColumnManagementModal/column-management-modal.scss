@@ -1,3 +1,5 @@
-.data-list-row-item label {
-  cursor: pointer;
+.kubevirt-column-management-unified-list {
+  .pf-v6-c-data-list__item-row {
+    align-items: center;
+  }
 }

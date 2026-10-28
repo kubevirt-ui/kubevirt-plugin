@@ -2,6 +2,7 @@ import { type FC, type ReactNode, type RefObject } from 'react';
 
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import ColumnManagement from '@kubevirt-utils/components/ColumnManagementModal/ColumnManagement';
+import RestoreColumnWidthsButton from '@kubevirt-utils/components/KubevirtTable/components/RestoreColumnWidthsButton';
 import { TableToolbarActionsFlex } from '@kubevirt-utils/components/TableToolbarActions/TableToolbarActionsFlex';
 import { type ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { useSortedTableData } from '@kubevirt-utils/hooks/useDataViewTableSort/useSortedTableData';
@@ -94,6 +95,7 @@ const VirtualMachinesListToolbar: FC<VirtualMachinesListToolbarProps> = ({
           <TableToolbarActionsFlex>
             {exportButton}
             <ColumnManagement columnLayout={columnLayout} />
+            <RestoreColumnWidthsButton tableId={columnLayout.id} />
           </TableToolbarActionsFlex>
           <Pagination
             className="list-managment-group__pagination"

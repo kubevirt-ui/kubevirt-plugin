@@ -1,4 +1,4 @@
-import { type FC, type MouseEventHandler, type SyntheticEvent } from 'react';
+import { type FC, type MouseEventHandler } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
@@ -15,7 +15,6 @@ type ColumnManagementModalFooterProps = {
   error: Error | null;
   loaded: boolean;
   onClose: () => void;
-  resetColumns: (event: SyntheticEvent) => void;
   submit: MouseEventHandler<HTMLButtonElement>;
 };
 
@@ -23,7 +22,6 @@ const ColumnManagementModalFooter: FC<ColumnManagementModalFooterProps> = ({
   error,
   loaded,
   onClose,
-  resetColumns,
   submit,
 }) => {
   const { t } = useKubevirtTranslation();
@@ -39,22 +37,12 @@ const ColumnManagementModalFooter: FC<ColumnManagementModalFooterProps> = ({
         <Flex spaceItems={{ default: 'spaceItemsSm' }}>
           <Button
             data-test="save-button"
-            form="modal-with-form-form"
             isDisabled={!loaded}
             isLoading={!loaded}
-            key="create"
             onClick={submit}
             variant={ButtonVariant.primary}
           >
             {t('Save')}
-          </Button>
-          <Button
-            data-test="reset-button"
-            key="reset"
-            onClick={resetColumns}
-            variant={ButtonVariant.secondary}
-          >
-            {t('Restore default columns')}
           </Button>
           <Button data-test="cancel-button" onClick={onClose} variant={ButtonVariant.link}>
             {t('Cancel')}

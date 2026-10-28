@@ -3,6 +3,7 @@ import { type OnboardingPopoversHidden } from '@kubevirt-utils/components/Onboar
 export type UserSettingsState = {
   cards: CardsUserSettings;
   columns: ColumnsUserSettings;
+  columnWidths: ColumnWidthsUserSettings;
   defaultVMLabels: DefaultVMLabelsUserSettings;
   favoriteBootableVolumes: string[];
   navigation: NavigationUserSettings;
@@ -25,6 +26,10 @@ type SSHUserSettings = {
 
 type ColumnsUserSettings = {
   [tableName: string]: string[];
+};
+
+type ColumnWidthsUserSettings = {
+  [tableId: string]: Record<string, number>;
 };
 
 export type QuickStartUserSettings = {
