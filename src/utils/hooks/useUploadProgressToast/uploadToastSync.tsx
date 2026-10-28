@@ -5,7 +5,7 @@ import type useKubevirtToast from '@kubevirt-utils/hooks/useKubevirtToast';
 import UploadProgressToastContent from './components/UploadProgressToastContent';
 import { UPLOAD_PROGRESS_STATUS } from './constants';
 import { getUploadTitle, isTerminalUploadStatus } from './toast/uploadTitles';
-import { useUploadProgressStore } from './uploadProgressStore';
+import { type UploadProgressStoreState } from './types';
 import { type UploadEntry, type UploadsStoreStateData } from './uploads/types/types';
 
 type ToastActions = ReturnType<typeof useKubevirtToast>;
@@ -16,9 +16,11 @@ type UploadToastContext = {
   addSuccessToast: ToastActions['addSuccessToast'];
   addWarningToast: ToastActions['addWarningToast'];
   cancelTrackedUpload: (uploadKey: string) => void;
+  getUpload: (uploadKey: string) => UploadEntry | undefined;
   navigate: (path: string) => void;
   removeToast: ToastActions['removeToast'];
   removeUpload: (uploadKey: string) => void;
+  storeSlice: keyof UploadProgressStoreState;
   t: TFunction;
   tryMarkTerminalToastShown: (uploadKey: string) => boolean;
   trySetToastId: (uploadKey: string, toastId: string) => boolean;
@@ -37,7 +39,13 @@ export const showInProgressUploadToast = (
   processedToasts.add(uploadKey);
 
   const toastId = context.addInfoToast({
-    content: <UploadProgressToastContent navigate={context.navigate} uploadKey={uploadKey} />,
+    content: (
+      <UploadProgressToastContent
+        navigate={context.navigate}
+        storeSlice={context.storeSlice}
+        uploadKey={uploadKey}
+      />
+    ),
     dismissible: false,
     minimizable: true,
     onClose: () => context.cancelTrackedUpload(uploadKey),
@@ -74,13 +82,14 @@ export const replaceWithTerminalUploadToast = (
     content: (
       <UploadProgressToastContent
         navigate={context.navigate}
+        storeSlice={context.storeSlice}
         uploadKey={uploadKey}
         uploadSnapshot={upload}
       />
     ),
     dismissible: true,
     onClose: (): void => {
-      const latestUpload = useUploadProgressStore.getState().uploads.actions?.getUpload(uploadKey);
+      const latestUpload = context.getUpload(uploadKey);
       if (latestUpload && latestUpload.generation !== capturedGeneration) {
         return;
       }

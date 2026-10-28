@@ -18,7 +18,8 @@ export const completeUploadState = (
   uploadKey: string,
   options?: CompleteUploadOptions,
 ): UploadsStoreStateData => {
-  const current = getProgressToastState(data?.[uploadKey]);
+  const currentEntry = data?.[uploadKey];
+  const current = getProgressToastState(currentEntry);
   const completeOptions = options ?? {};
   if (!canUpdateUploadingEntry(current, completeOptions.expectedGeneration)) {
     return data;
@@ -32,6 +33,7 @@ export const completeUploadState = (
   return {
     ...data,
     [uploadKey]: {
+      ...currentEntry,
       progressToastState: {
         ...current,
         progress: 100,

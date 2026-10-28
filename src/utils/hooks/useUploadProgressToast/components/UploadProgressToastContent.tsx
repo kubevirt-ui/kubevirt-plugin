@@ -1,6 +1,7 @@
 import type { FC } from 'react';
 
 import { UPLOAD_PROGRESS_STATUS } from '../constants';
+import { type UploadProgressStoreState } from '../types';
 import { useUploadProgressStore } from '../uploadProgressStore';
 
 import { resolveToastUpload } from '../toast/resolveToastUpload';
@@ -12,17 +13,21 @@ import UploadProgressUploadingToast from './UploadProgressUploadingToast';
 
 type UploadProgressToastContentProps = {
   navigate: (path: string) => void;
+  storeSlice: keyof UploadProgressStoreState;
   uploadKey: string;
   uploadSnapshot?: UploadEntry;
 };
 
 const UploadProgressToastContent: FC<UploadProgressToastContentProps> = ({
   navigate,
+  storeSlice,
   uploadKey,
   uploadSnapshot,
 }) => {
-  const storeUpload = useUploadProgressStore((state) => state.uploads.data?.[uploadKey]);
-  const upload = resolveToastUpload(uploadSnapshot, storeUpload?.progressToastState);
+  const progressToastState = useUploadProgressStore(
+    (state) => state?.[storeSlice].data?.[uploadKey]?.progressToastState,
+  );
+  const upload = resolveToastUpload(uploadSnapshot, progressToastState);
 
   if (!upload) {
     return null;
@@ -37,7 +42,12 @@ const UploadProgressToastContent: FC<UploadProgressToastContentProps> = ({
       return <UploadProgressCanceledToast navigate={navigate} upload={upload} />;
     default:
       return (
-        <UploadProgressUploadingToast navigate={navigate} upload={upload} uploadKey={uploadKey} />
+        <UploadProgressUploadingToast
+          navigate={navigate}
+          storeSlice={storeSlice}
+          upload={upload}
+          uploadKey={uploadKey}
+        />
       );
   }
 };

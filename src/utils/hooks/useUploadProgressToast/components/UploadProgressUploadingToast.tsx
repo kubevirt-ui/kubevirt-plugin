@@ -3,6 +3,8 @@ import type { FC } from 'react';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Flex, FlexItem } from '@patternfly/react-core';
 
+import { type UploadProgressStoreState } from '../types';
+
 import { type UploadEntry } from '../uploads/types/types';
 import ToastLayout from './ToastLayout';
 import UploadProgressAbortButton from './UploadProgressAbortButton';
@@ -11,12 +13,14 @@ import UploadProgressLinks from './UploadProgressLinks';
 
 type UploadProgressUploadingToastProps = {
   navigate: (path: string) => void;
+  storeSlice: keyof UploadProgressStoreState;
   upload: UploadEntry;
   uploadKey: string;
 };
 
 const UploadProgressUploadingToast: FC<UploadProgressUploadingToastProps> = ({
   navigate,
+  storeSlice,
   upload,
   uploadKey,
 }) => {
@@ -36,7 +40,11 @@ const UploadProgressUploadingToast: FC<UploadProgressUploadingToastProps> = ({
           )}
           {showAbort && (
             <FlexItem className={isEmpty(contextLinks) ? 'pf-v6-u-ml-auto' : undefined}>
-              <UploadProgressAbortButton abortTooltip={abortTooltip} uploadKey={uploadKey} />
+              <UploadProgressAbortButton
+                abortTooltip={abortTooltip}
+                storeSlice={storeSlice}
+                uploadKey={uploadKey}
+              />
             </FlexItem>
           )}
         </Flex>

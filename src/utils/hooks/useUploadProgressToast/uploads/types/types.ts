@@ -111,7 +111,11 @@ export type UploadsStoreStateActions = UploadProgressActions &
     cancelWizardPendingUploads: (uploadKeys: string[]) => Promise<void>;
   };
 
-export type UploadsStoreStateData = Record<string, { progressToastState: UploadEntry }>;
+export type ProgressToastStateParams = {
+  progressToastState: UploadEntry;
+};
+
+export type UploadsStoreStateData = Record<string, ProgressToastStateParams>;
 
 export type UploadsStoreState = {
   actions: UploadsStoreStateActions;

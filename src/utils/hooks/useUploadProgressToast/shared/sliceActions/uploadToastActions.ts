@@ -23,12 +23,13 @@ export const createStripDataVolumeLinks = (
       return state;
     }
 
+    const entry = state[storeSlice].data?.[uploadKey];
     return {
       [storeSlice]: {
         ...state[storeSlice],
         data: {
           ...state[storeSlice].data,
-          [uploadKey]: { progressToastState: nextUpload },
+          [uploadKey]: { ...entry, progressToastState: nextUpload },
         },
       },
     };

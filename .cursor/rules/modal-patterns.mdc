@@ -19,7 +19,7 @@ All virtualization modals should use one of four standard types. Each type has a
 | `BackgroundOperationAlert` | `src/utils/components/TabModal/BackgroundOperationAlert.tsx` | Info alert when work continues after closing the dialog |
 | `formatK8sError` | `src/utils/utils/formatK8sError.ts` | Explicit `t('...')` per known API error; unmatched errors shown as-is |
 | `getK8sErrorHref` | `src/utils/utils/formatK8sError.ts` | Optional `href` on API errors; `TabModalFooter` renders `ExternalLink` when present |
-| `exportUploadStore` | `src/utils/components/ExportModal/exportUploadStore.ts` | Zustand store for in-flight export uploads across modal re-opens |
+| `exportDisk` slice | `src/utils/hooks/useUploadProgressToast/uploadProgressStore.ts` | Export-to-registry progress + pod watch context (replaces `exportUploadStore`) |
 | Validators | `src/utils/utils/validation.ts` | `validateDNS1123Label`, `validateCronExpression`, etc. |
 
 ## 1. Form modal
@@ -59,7 +59,7 @@ Use the sub-variant that matches the flow. All variants use `TabModal` with `clo
 | Validation | Same as form modal before submit; disabled + loading after submit starts |
 | Errors | `TabModal` footer |
 | Success | Show progress in body; include `BackgroundOperationAlert` when work continues after close |
-| Persistence | Use `exportUploadStore` (or similar) when reopening the modal must resume an in-flight upload |
+| Persistence | Use `useUploadProgressStore` `exportDisk` slice when reopening the modal must resume an in-flight export |
 | Copy | Import `BackgroundOperationAlert` — do not duplicate the string inline |
 
 ### 3b. Post-submit confirmation
