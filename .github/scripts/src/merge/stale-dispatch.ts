@@ -9,6 +9,7 @@ import { Octokit } from '@octokit/rest';
 
 import { requireEnv } from '../utils';
 
+import { resolveDefaultClusterName } from '../commands/resolve-default-cluster-name';
 import { getRepoContext } from '../shared/actions-context';
 import { dispatchWorkflow } from '../shared/dispatch';
 import { failStep } from '../shared/output';
@@ -20,10 +21,12 @@ const main = async (): Promise<void> => {
   const octokit = new Octokit({ auth: token });
 
   const { data: pullRequest } = await octokit.pulls.get({ owner, pull_number: prNumber, repo });
+  const baseRef = pullRequest.base.ref;
 
   await dispatchWorkflow(octokit, {
     inputs: {
-      base_ref: pullRequest.base.ref,
+      base_ref: baseRef,
+      cluster_name: resolveDefaultClusterName(baseRef),
       is_pool_retest: 'true',
       pr_number: String(prNumber),
     },

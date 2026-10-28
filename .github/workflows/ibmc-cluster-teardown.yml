@@ -28,7 +28,7 @@ on:
         default: ''
         type: string
       force:
-        description: 'Force teardown even if setup/e2e workflows are running'
+        description: 'Force teardown even if setup/e2e workflows are running for this cluster'
         required: false
         default: false
         type: boolean

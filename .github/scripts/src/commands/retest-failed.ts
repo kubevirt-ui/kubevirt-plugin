@@ -19,6 +19,7 @@ import { dispatchWorkflow } from '../shared/dispatch';
 import { E2E_HOLD_LABEL } from '../shared/merge-pool';
 import { failStep, setOutput } from '../shared/output';
 import type { CommandContext } from './command-registry';
+import { resolveDefaultClusterName } from './resolve-default-cluster-name';
 import {
   describeResult,
   E2E_LINES,
@@ -102,6 +103,7 @@ const main = async (): Promise<void> => {
       await dispatchWorkflow(botOctokit, {
         inputs: {
           base_ref: baseRef,
+          cluster_name: resolveDefaultClusterName(baseRef),
           pr_number: String(prNumber),
           skip_pool_check: 'true',
         },

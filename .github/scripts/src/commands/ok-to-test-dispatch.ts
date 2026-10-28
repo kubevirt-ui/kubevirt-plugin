@@ -13,6 +13,7 @@ import { requireEnv } from '../utils';
 import { getRepoContext } from '../shared/actions-context';
 import { dispatchWorkflowAndResolveRun } from '../shared/dispatch';
 import { failStep, setOutput } from '../shared/output';
+import { resolveDefaultClusterName } from './resolve-default-cluster-name';
 
 const main = async (): Promise<void> => {
   const token = requireEnv('GITHUB_TOKEN');
@@ -24,6 +25,7 @@ const main = async (): Promise<void> => {
   const result = await dispatchWorkflowAndResolveRun(octokit, {
     inputs: {
       base_ref: baseRef,
+      cluster_name: resolveDefaultClusterName(baseRef),
       pr_number: prNumber,
       skip_pool_check: 'true',
     },

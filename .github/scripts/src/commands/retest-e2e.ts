@@ -20,6 +20,7 @@ import { dispatchWorkflow } from '../shared/dispatch';
 import { failStep, setOutput } from '../shared/output';
 import type { CommandContext } from './command-registry';
 import { findRunningE2ERun, liftE2EHold } from './e2e-dispatch-helpers';
+import { resolveDefaultClusterName } from './resolve-default-cluster-name';
 import { buildRetestReport, reportRetestE2EError } from './retest-e2e-helpers';
 
 const main = async (): Promise<void> => {
@@ -63,6 +64,7 @@ const main = async (): Promise<void> => {
     await dispatchWorkflow(octokit, {
       inputs: {
         base_ref: baseRef,
+        cluster_name: resolveDefaultClusterName(baseRef),
         pr_number: String(prNumber),
         skip_pool_check: 'true',
       },

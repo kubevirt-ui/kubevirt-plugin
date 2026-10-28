@@ -11,6 +11,7 @@ import { Octokit } from '@octokit/rest';
 
 import { requireEnv } from '../utils';
 
+import { resolveDefaultClusterName } from '../commands/resolve-default-cluster-name';
 import { getRepoContext } from '../shared/actions-context';
 import { dispatchWorkflow } from '../shared/dispatch';
 import { isMergePoolPr } from '../shared/merge-pool';
@@ -73,6 +74,7 @@ const main = async (): Promise<void> => {
   await dispatchWorkflow(octokit, {
     inputs: {
       base_ref: baseRef,
+      cluster_name: resolveDefaultClusterName(baseRef),
       is_pool_retest: 'true',
       pr_number: String(prNumber),
     },
