@@ -2,6 +2,7 @@ import { type FC, type ReactNode, type RefObject } from 'react';
 
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import ColumnManagement from '@kubevirt-utils/components/ColumnManagementModal/ColumnManagement';
+import RestoreColumnWidthsButton from '@kubevirt-utils/components/KubevirtTable/components/RestoreColumnWidthsButton';
 import { TableToolbarActionsFlex } from '@kubevirt-utils/components/TableToolbarActions/TableToolbarActionsFlex';
 import { type ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { useSortedTableData } from '@kubevirt-utils/hooks/useDataViewTableSort/useSortedTableData';
@@ -37,6 +38,7 @@ type VirtualMachinesListToolbarProps = {
   filters: KubevirtFilterState;
   handleSetFilters: (newFilters: Partial<KubevirtFilterState>) => void;
   onPageChange: (pagination: PaginationState) => void;
+  onRestoreColumnWidths: () => void;
   pagination: PaginationState;
   searchInputRef: RefObject<HTMLInputElement>;
   vmimMapper: VMIMMapper;
@@ -55,6 +57,7 @@ const VirtualMachinesListToolbar: FC<VirtualMachinesListToolbarProps> = ({
   filters,
   handleSetFilters,
   onPageChange,
+  onRestoreColumnWidths,
   pagination,
   searchInputRef,
   vmimMapper,
@@ -94,6 +97,7 @@ const VirtualMachinesListToolbar: FC<VirtualMachinesListToolbarProps> = ({
           <TableToolbarActionsFlex>
             {exportButton}
             <ColumnManagement columnLayout={columnLayout} />
+            <RestoreColumnWidthsButton onRestoreColumnWidths={onRestoreColumnWidths} />
           </TableToolbarActionsFlex>
           <Pagination
             className="list-managment-group__pagination"

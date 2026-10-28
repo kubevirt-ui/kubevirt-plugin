@@ -1,3 +1,4 @@
+import { orderColumnsByIds } from '@kubevirt-utils/components/KubevirtTable/utils/orderColumnsByKeys';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { type TableColumn } from '@openshift-console/dynamic-plugin-sdk';
 
@@ -34,11 +35,14 @@ const useKubevirtUserSettingsTableColumns: UseKubevirtUserSettingsTableColumnsTy
     });
   };
 
-  const activeColumns = columns?.filter((col) =>
-    userColumns?.[columnManagementID]
-      ? userColumns?.[columnManagementID]?.includes(col?.id)
-      : !col?.additional,
-  );
+  const savedColumnIds = userColumns?.[columnManagementID];
+
+  const activeColumns = savedColumnIds?.length
+    ? orderColumnsByIds(
+        columns.filter((col) => savedColumnIds.includes(col?.id)),
+        savedColumnIds,
+      )
+    : columns?.filter((col) => !col?.additional);
 
   return [
     !isEmpty(activeColumns) ? activeColumns : columns,

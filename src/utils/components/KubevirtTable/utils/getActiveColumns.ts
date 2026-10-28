@@ -2,6 +2,8 @@ import type { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/ty
 import { ACTIONS } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/const';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 
+import { orderColumnsByKeys } from './orderColumnsByKeys';
+
 export const getActiveColumns = <TData, TCallbacks = undefined>(
   columns: ColumnConfig<TData, TCallbacks>[],
   activeColumnKeys?: string[],
@@ -14,5 +16,10 @@ export const getActiveColumns = <TData, TCallbacks = undefined>(
     (col) => activeColumnKeys.includes(col.key) || col.key === ACTIONS,
   );
 
-  return !isEmpty(filtered) ? filtered : columns.filter((col) => !col.additional);
+  if (isEmpty(filtered)) {
+    return columns.filter((col) => !col.additional);
+  }
+
+  const orderKeys = [...activeColumnKeys, ACTIONS];
+  return orderColumnsByKeys(filtered, orderKeys);
 };
