@@ -181,15 +181,15 @@
     "@openshift-console/dynamic-plugin-sdk": {
       "immutable": "^3.8.3",
       "@patternfly/quickstarts": {
-        "dompurify": "^3.4.6"
+        "dompurify": "^3.4.13"
       }
     },
     "@openshift-console/dynamic-plugin-sdk-internal": {
       "immutable": "^3.8.3",
       "@patternfly/quickstarts": {
-        "dompurify": "^3.4.6"
+        "dompurify": "^3.4.13"
       }
-    }
-    
+    },
+    "dompurify": "^3.4.13"
   }
 }
