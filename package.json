@@ -148,7 +148,7 @@
     },
     "eslint": "^8.57.1",
     "delaunator": "4.0.1",
-    "dompurify": "^3.4.6"
+    "dompurify": "^3.4.13"
   },
   "private": true,
   "scripts": {
