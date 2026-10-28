@@ -30,8 +30,9 @@ inputs:
     description: |
       Optional override for the console container image. Leave empty (default)
       to let ci-env-request.ts pick its default (origin-console:5.0). A release
-      branch run passes the matching console (e.g. origin-console:4.21) so the
-      product is tested against the console it actually ships with.
+      branch run passes the matching console (e.g. origin-console:4.21, or
+      origin-console:4.18 when a pre-4.18 branch is clamped onto OCP 4.18) so
+      the product is tested against the console it actually ships with.
     required: false
     default: ''
 
