@@ -7,4 +7,4 @@ export const TECH_PREVIEW_LINK = 'https://access.redhat.com/support/offerings/te
 export const DEV_PREVIEW_LINK = 'https://access.redhat.com/support/offerings/devpreview';
 
 export const CREATING_VMS_FROM_TEMPLATES_LINK =
-  'https://docs.openshift.com/container-platform/4.15/virt/virtual_machines/creating_vms_rh/virt-creating-vms-from-templates.html';
+  'https://docs.openshift.com/container-platform/4.16/virt/virtual_machines/creating_vms_rh/virt-creating-vms-from-templates.html';

@@ -10,22 +10,7 @@ for OpenShift Console.
 
 ## Local development
 
-### Option 1 (recommended):
-
-Open two terminals and navigate to the kubevirt-plugin directory in both of them. The first terminal will run a containerized instance of console and the second will run the kubevirt-plugin.
-
-In the first terminal:
-
-1. Log into the OpenShift cluster you are using.
-2. Run `npm run start-console` OR `./start-console.sh` OR `./start-console-auth-mode.sh`.
-
-In the second terminal:
-
-1. Run `npm ci && npm run dev`
-
-NOTE: `./start-console-auth-mode.sh` is when authentication is needed, `start-console.sh`, ignores authentication.
-
-### Option 2: Docker + VSCode Remote Container
+### Option 1 (recommended): Docker + VSCode Remote Container
 
 Make sure the [Remote Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
 extension is installed. This method uses Docker Compose where one container is
@@ -46,13 +31,12 @@ OC_PASS=<password>
 3. `npm run dev`
 4. Navigate to <http://localhost:9000>
 
-#### Cypress Testing inside the container
+#### Playwright E2E inside the container
 
-1. `npm run test-cypress-docker`
-2. Navigate to <http://localhost:10000>
-3. login with password `kubevirt` (no need for username)
+1. See `playwright/README.md` and `scripts/run-playwright.sh`.
+2. `npm run test-playwright-headless` (or `npm run test-playwright-ui`).
 
-### Option 3:
+### Option 2:
 
 1. Set up [Console](https://github.com/openshift/console) and See the plugin development section in [Console Dynamic Plugins README](https://github.com/openshift/console/blob/master/frontend/packages/console-dynamic-plugin-sdk/README.md) for details on how to run OpenShift console using local plugins.
 2. Run bridge with `-plugins kubevirt-plugin=http://localhost:9001`
