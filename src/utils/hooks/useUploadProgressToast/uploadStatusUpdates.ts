@@ -30,7 +30,9 @@ export const failUploadState = (
   errorMessage: string,
   expectedGeneration?: number,
 ): UploadsStoreStateData => {
-  const current = getProgressToastState(data?.[uploadKey]);
+  const currentEntry = data?.[uploadKey];
+  const current = getProgressToastState(currentEntry);
+
   if (!canUpdateUploadingEntry(current, expectedGeneration)) {
     return data;
   }
@@ -38,6 +40,7 @@ export const failUploadState = (
   return {
     ...data,
     [uploadKey]: {
+      ...(currentEntry ?? {}),
       progressToastState: {
         ...current,
         errorMessage,

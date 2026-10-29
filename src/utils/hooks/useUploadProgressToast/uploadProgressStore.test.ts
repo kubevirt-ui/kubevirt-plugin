@@ -773,9 +773,15 @@ describe('useUploadProgressStore', () => {
         cancelUpload: bootableCancel,
         fileName: FILE_IMAGE_ISO,
       });
-      useUploadProgressStore.getState().uploads.actions?.startUpload(exportDiskUploadKey, {
-        cancelUpload: exportDiskCancel,
-        fileName: FILE_IMAGE_ISO,
+      useUploadProgressStore.getState().exportDisk.actions?.startUpload(exportDiskUploadKey, {
+        cluster: CLUSTER,
+        entry: {
+          cancelUpload: exportDiskCancel,
+          fileName: FILE_IMAGE_ISO,
+        },
+        pod: { metadata: { name: 'export-pod', namespace: NAMESPACE } } as never,
+        pvcName: 'export-pvc',
+        secretName: 'export-secret',
       });
 
       await useUploadProgressStore
@@ -804,7 +810,8 @@ describe('useUploadProgressStore', () => {
         useUploadProgressStore.getState().uploads.actions?.getUpload(otherVmCdromUploadKey)?.status,
       ).toBe(UPLOAD_PROGRESS_STATUS.UPLOADING);
       expect(
-        useUploadProgressStore.getState().uploads.actions?.getUpload(exportDiskUploadKey)?.status,
+        useUploadProgressStore.getState().exportDisk.actions?.getUpload(exportDiskUploadKey)
+          ?.status,
       ).toBe(UPLOAD_PROGRESS_STATUS.UPLOADING);
     });
 

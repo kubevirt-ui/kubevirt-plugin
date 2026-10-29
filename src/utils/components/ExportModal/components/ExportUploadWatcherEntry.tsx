@@ -4,20 +4,20 @@ import { SecretModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { type IoK8sApiCoreV1Pod } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
+import { type ExportDiskContext } from '@kubevirt-utils/hooks/useUploadProgressToast/exportDisk/types/types';
+import { getExportDiskUploadKey } from '@kubevirt-utils/hooks/useUploadProgressToast/keys/uploadKeys';
+import { useUploadProgressStore } from '@kubevirt-utils/hooks/useUploadProgressToast/uploadProgressStore';
 import { modelToGroupVersionKind, PodModel } from '@kubevirt-utils/models';
 import { getResourceUrl } from '@kubevirt-utils/resources/shared';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { kubevirtK8sDelete } from '@multicluster/k8sRequests';
 
-import { getExportDiskUploadKey } from '../../../hooks/useUploadProgressToast/keys/uploadKeys';
-import { useUploadProgressStore } from '../../../hooks/useUploadProgressToast/uploadProgressStore';
 import { UploaderPhase } from '../hooks/types';
 import useUploaderProgress from '../hooks/useUploaderProgress';
-import { type ExportUploadState, useExportUploadStore } from '../utils/exportUploadStore';
 import { exportFailed, exportSucceeded, getExportErrorMessage } from '../utils/utils';
 
 type ExportUploadWatcherEntryProps = {
-  upload: ExportUploadState;
+  upload: ExportDiskContext;
 };
 
 const deleteSecret = (cluster: string, namespace: string, secretName: string): void => {
@@ -35,7 +35,7 @@ const ExportUploadWatcherEntry: FC<ExportUploadWatcherEntryProps> = ({ upload })
   const prevPercentageRef = useRef(-1);
   const finishedRef = useRef(false);
   const generationRef = useRef(
-    useUploadProgressStore.getState().uploads.actions?.getUpload(uploadKey)?.generation,
+    useUploadProgressStore.getState().exportDisk.actions?.getUpload(uploadKey)?.generation,
   );
 
   const [pod, loaded, watchError] = useKubevirtWatchResource<IoK8sApiCoreV1Pod>({
@@ -47,14 +47,15 @@ const ExportUploadWatcherEntry: FC<ExportUploadWatcherEntryProps> = ({ upload })
 
   const progress = useUploaderProgress(loaded ? pod : undefined);
 
+  // TODO: check if we can avoid using 3 useEffects
   useEffect(() => {
     if (watchError) {
       finishedRef.current = true;
       deleteSecret(cluster, namespace, secretName);
       useUploadProgressStore
         .getState()
-        .uploads.actions?.failUpload(uploadKey, watchError.message, generationRef.current);
-      useExportUploadStore.getState().clearUpload(cluster, namespace, pvcName);
+        .exportDisk.actions?.failUpload(uploadKey, watchError.message, generationRef.current);
+      useUploadProgressStore.getState().exportDisk.actions?.clearExportDiskWatchContext(uploadKey);
     }
   }, [watchError, uploadKey, cluster, namespace, pvcName, secretName]);
 
@@ -67,7 +68,7 @@ const ExportUploadWatcherEntry: FC<ExportUploadWatcherEntryProps> = ({ upload })
       prevPercentageRef.current = progress.percentage;
       useUploadProgressStore
         .getState()
-        .uploads.actions?.updateProgress(uploadKey, progress.percentage);
+        .exportDisk.actions?.updateProgress(uploadKey, progress.percentage);
     }
   }, [progress.percentage, progress.phase, uploadKey]);
 
@@ -80,12 +81,12 @@ const ExportUploadWatcherEntry: FC<ExportUploadWatcherEntryProps> = ({ upload })
       finishedRef.current = true;
       deleteSecret(cluster, namespace, secretName);
       const podLogsUrl = `${getResourceUrl({ model: PodModel, resource: pod })}/logs`;
-      useUploadProgressStore.getState().uploads.actions?.completeUpload(uploadKey, {
+      useUploadProgressStore.getState().exportDisk.actions?.completeUpload(uploadKey, {
         expectedGeneration: generationRef.current,
         resourceName: podName,
         successLinks: [{ label: t('View pod logs'), url: podLogsUrl }],
       });
-      useExportUploadStore.getState().clearUpload(cluster, namespace, pvcName);
+      useUploadProgressStore.getState().exportDisk.actions?.clearExportDiskWatchContext(uploadKey);
     }
 
     if (exportFailed(pod)) {
@@ -94,8 +95,8 @@ const ExportUploadWatcherEntry: FC<ExportUploadWatcherEntryProps> = ({ upload })
       const errorMessage = getExportErrorMessage(pod, progress.errorMessage) ?? t('Unknown error');
       useUploadProgressStore
         .getState()
-        .uploads.actions?.failUpload(uploadKey, errorMessage, generationRef.current);
-      useExportUploadStore.getState().clearUpload(cluster, namespace, pvcName);
+        .exportDisk.actions?.failUpload(uploadKey, errorMessage, generationRef.current);
+      useUploadProgressStore.getState().exportDisk.actions?.clearExportDiskWatchContext(uploadKey);
     }
   }, [
     pod,

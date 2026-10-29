@@ -1,4 +1,5 @@
 import { type FC } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 
 import { useUploadProgressStore } from '../uploadProgressStore';
 
@@ -9,8 +10,8 @@ import {
 import UploadLinkResourceWatcherEntry from './UploadLinkResourceWatcherEntry';
 
 const UploadLinkResourceWatcher: FC = () => {
-  const resources = useUploadProgressStore((state) =>
-    collectWatchableUploadResources(state.uploads.data),
+  const resources = useUploadProgressStore(
+    useShallow((state) => collectWatchableUploadResources(state.uploads.data)),
   );
 
   return (

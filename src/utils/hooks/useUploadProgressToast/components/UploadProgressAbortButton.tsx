@@ -4,20 +4,23 @@ import { getCancelUploadLabel } from '@kubevirt-utils/hooks/useCDIUpload/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Button, ButtonVariant, Tooltip } from '@patternfly/react-core';
 
+import { type UploadProgressStoreState } from '../types';
 import { useUploadProgressStore } from '../uploadProgressStore';
 
 type UploadProgressAbortButtonProps = {
   abortTooltip?: string;
+  storeSlice: keyof UploadProgressStoreState;
   uploadKey: string;
 };
 
 const UploadProgressAbortButton: FC<UploadProgressAbortButtonProps> = ({
   abortTooltip,
+  storeSlice,
   uploadKey,
 }) => {
   const { t } = useKubevirtTranslation();
   const cancelTrackedUpload = useUploadProgressStore(
-    (state) => state.uploads.actions?.cancelTrackedUpload,
+    (state) => state?.[storeSlice].actions?.cancelTrackedUpload,
   );
 
   const button = (

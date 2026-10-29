@@ -9,13 +9,13 @@ import { getResourceUrl } from '@kubevirt-utils/resources/shared';
 import { getRandomChars } from '@kubevirt-utils/utils/utils';
 import { Alert, AlertVariant, Stack } from '@patternfly/react-core';
 
+import { UPLOAD_PROGRESS_STATUS } from '../../hooks/useUploadProgressToast/constants';
 import { getExportDiskUploadKey } from '../../hooks/useUploadProgressToast/keys/uploadKeys';
 import { useUploadProgressStore } from '../../hooks/useUploadProgressToast/uploadProgressStore';
 import TabModal from '../TabModal/TabModal';
 import ExportModalForm from './components/ExportModalForm';
 import { type ExportFormValues } from './types/types';
 import { createSchema } from './utils/createSchema';
-import { persistExportPod, useExportUploadStore } from './utils/exportUploadStore';
 import { createServiceAccount, createUploaderPod } from './utils/uploaderPod';
 import { deleteExportResources } from './utils/utils';
 
@@ -54,8 +54,11 @@ const ExportModal: FC<ExportModalProps> = ({
     handleSubmit,
   } = form;
 
-  const hasActiveExport = useExportUploadStore(
-    (state) => !!state.getUpload(cluster, namespace, pvcName),
+  const exportUploadKey = getExportDiskUploadKey(cluster, namespace, pvcName);
+  const hasActiveExport = useUploadProgressStore(
+    (state) =>
+      state?.exportDisk?.data?.[exportUploadKey]?.progressToastState?.status ===
+      UPLOAD_PROGRESS_STATUS.UPLOADING,
   );
 
   const onSubmit = useCallback(
@@ -73,19 +76,19 @@ const ExportModal: FC<ExportModalProps> = ({
         volumeName: pvcName,
       });
 
-      // TODO: get rid of export store
-      persistExportPod(pod, cluster, pvcName, secretName);
-
       const podLogsUrl = `${getResourceUrl({ model: PodModel, resource: pod })}/logs`;
       const uploadKey = getExportDiskUploadKey(cluster, namespace, pvcName);
-      // TODO: set exportDisk store key instead of uploads
-      useUploadProgressStore.getState().uploads.actions?.startUpload(uploadKey, {
-        blockNavigation: true,
-        cancelUpload: () => deleteExportResources(pod, secretName),
-        contextLinks: [{ label: t('View pod logs'), url: podLogsUrl }],
-        fileName: t('{{name}} to registry', { name: pvcName }),
-        onCancelCleanup: async () =>
-          useExportUploadStore.getState().clearUpload(cluster, namespace, pvcName),
+      useUploadProgressStore.getState()?.exportDisk?.actions?.startUpload(uploadKey, {
+        cluster,
+        entry: {
+          blockNavigation: true,
+          cancelUpload: () => deleteExportResources(pod, secretName),
+          contextLinks: [{ label: t('View pod logs'), url: podLogsUrl }],
+          fileName: t('{{name}} to registry', { name: pvcName }),
+        },
+        pod,
+        pvcName,
+        secretName,
       });
     },
     [cluster, namespace, pvcName, t, vmName],

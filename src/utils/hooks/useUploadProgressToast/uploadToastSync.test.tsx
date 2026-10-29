@@ -28,9 +28,12 @@ const createMockContext = () => ({
   addSuccessToast: jest.fn((_options: MockToastOptions) => 'success-toast-id'),
   addWarningToast: jest.fn((_options: MockToastOptions) => 'warning-toast-id'),
   cancelTrackedUpload: jest.fn(),
+  getUpload: (uploadKey: string) =>
+    useUploadProgressStore.getState().uploads.actions?.getUpload(uploadKey),
   navigate: jest.fn(),
   removeToast: jest.fn(),
   removeUpload: jest.fn(),
+  storeSlice: 'uploads' as const,
   t: ((key: string) => key) as unknown as TFunction,
   tryMarkTerminalToastShown: jest.fn(() => true),
   trySetToastId: jest.fn(() => true),
