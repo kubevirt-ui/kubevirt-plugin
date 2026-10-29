@@ -30,7 +30,7 @@ const STEP_FIELDS: Record<VMWizardStep, readonly FieldPath<VMWizardFormValues>[]
     'deployment.folder',
     'deployment.description',
   ],
-  [VMWizardStep.GUEST_OS]: ['instanceType.operatingSystem', 'instanceType.preference'],
+  [VMWizardStep.GUEST_OS]: ['instanceType.operatingSystem', 'instanceType.guestOperatingSystem'],
   [VMWizardStep.REVIEW_AND_CREATE]: [],
   [VMWizardStep.TEMPLATE]: ['template.selectedTemplate'],
 };
