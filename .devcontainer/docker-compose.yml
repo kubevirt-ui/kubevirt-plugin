@@ -36,7 +36,7 @@ services:
     volumes_from:
       - x11-bridge:rw
 
-  # x11 service for cypress
+  # x11 service for headed E2E / browser debugging
   x11-bridge:
     image: jare/x11-bridge
     volumes:

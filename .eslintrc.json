@@ -10,6 +10,16 @@
     "prettier",
     "plugin:perfectionist/recommended-alphabetical"
   ],
+  "overrides": [
+    {
+      "files": ["playwright/**/*.ts"],
+      "rules": {
+        "@typescript-eslint/no-non-null-assertion": "off",
+        "simple-import-sort/exports": "off",
+        "simple-import-sort/imports": "off"
+      }
+    }
+  ],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "ecmaFeatures": {
