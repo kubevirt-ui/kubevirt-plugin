@@ -20,6 +20,12 @@ describe('resolveClusterConfig', () => {
     assert.equal(config.clusterName, 'kubevirt-plugin-423');
   });
 
+  it('uses playwright for backported migrations listed in PLAYWRIGHT_MIGRATED_RELEASES', () => {
+    const config = resolveClusterConfig({ baseRef: 'release-4.15' });
+    assert.equal(config.testEngine, 'playwright');
+    assert.equal(config.clusterName, 'kubevirt-plugin-415');
+  });
+
   it('falls back to defaults for main branch', () => {
     const config = resolveClusterConfig({ baseRef: 'main' });
     assert.equal(config.clusterName, 'kubevirt-plugin-ci');

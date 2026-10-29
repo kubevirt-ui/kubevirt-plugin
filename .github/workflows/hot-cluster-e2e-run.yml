@@ -453,7 +453,7 @@ jobs:
       # still have openshift_version (e.g. 4.18_openshift), pin console to that
       # X.Y tag so ci-env-request does not fall through to origin-console:5.0.
       - name: Resolve console image for clamped Cypress releases
-        if: env.CONSOLE_IMAGE == '' && env.TEST_ENGINE == 'cypress' && env.OPENSHIFT_VERSION != ''
+        if: env.CONSOLE_IMAGE == '' && env.OPENSHIFT_VERSION == '4.18_openshift'
         shell: bash
         run: |
           tag="${OPENSHIFT_VERSION%_openshift}"
