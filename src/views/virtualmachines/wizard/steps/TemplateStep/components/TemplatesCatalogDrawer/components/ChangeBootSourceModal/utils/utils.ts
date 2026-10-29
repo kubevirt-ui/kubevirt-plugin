@@ -52,7 +52,7 @@ export const getChangeBootSourcePreferenceData = (
       kind: preferenceMatcher.kind,
       name: preferenceMatcher.name,
     };
-    return { lockedPreference, preferenceName: preferenceMatcher.name };
+    return { lockedPreference };
   }
 
   const templateOSVariant = getTemplateOSVariant(template);

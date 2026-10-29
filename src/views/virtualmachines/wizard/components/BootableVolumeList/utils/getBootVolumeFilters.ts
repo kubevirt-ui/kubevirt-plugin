@@ -1,6 +1,7 @@
 import type { TFunction } from 'i18next';
 
 import { DataSourceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import type { PreferenceOption } from '@kubevirt-utils/components/AddBootableVolumeModal/types';
 import type { KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import {
   ISO,
@@ -10,7 +11,6 @@ import {
   isBootableVolumeISO,
   isDeprecated,
 } from '@kubevirt-utils/resources/bootableresources/helpers';
-import type { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { OS_NAMES } from '@kubevirt-utils/resources/template';
 import {
@@ -20,73 +20,98 @@ import {
   getUniqueArchitectures,
 } from '@kubevirt-utils/utils/architecture';
 import { OTHER } from '@kubevirt-utils/utils/constants';
+import { type BootVolumeTableRow } from '@virtualmachines/wizard/utils/types';
 
-import { OS_NAME_FILTER_TYPE, RESOURCE_KIND_FILTER_TYPE } from './constants';
-import { getBootVolumeOS, isLinuxGenericPreference } from './utils';
+import { OS_NAME_FILTER_TYPE, RESOURCE_KIND_FILTER_TYPE, VARIANT_FILTER_TYPE } from './constants';
+import { getBootVolumeOS, getPreferenceOptionVariant, isLinuxGenericPreference } from './utils';
 
-const getDeprecatedBootVolumeFilter = (t: TFunction): KubevirtFilter<BootableVolume> => ({
+const getDeprecatedFilter = (t: TFunction): KubevirtFilter<BootVolumeTableRow> => ({
   applyWhenEmpty: true,
   hideCountBadge: true,
   id: SHOW_DEPRECATED_BOOTABLE_VOLUMES,
-  match: (obj, selected) => (selected.length === 0 ? !isDeprecated(getName(obj)) : true),
+  match: (row, selected) => (selected.length === 0 ? !isDeprecated(getName(row.volume)) : true),
   options: [{ label: t('Show deprecated bootable volumes'), value: 'true' }],
 });
 
-const getArchitectureBootVolumeFilter = (
-  bootableVolumes: BootableVolume[],
+const getVariantFilter = (
+  availablePreferences: PreferenceOption[],
   t: TFunction,
-): KubevirtFilter<BootableVolume> => {
-  const architectureOptions = getUniqueArchitectures(bootableVolumes).map((arch) => ({
+): KubevirtFilter<BootVolumeTableRow> => ({
+  categoryLabel: t('Variant'),
+  id: VARIANT_FILTER_TYPE,
+  match: (row, selected) => selected.includes(row.preferenceVariant.name),
+  options: availablePreferences.map((pref) => {
+    const variant = getPreferenceOptionVariant(pref);
+    return {
+      label: variant === 'default' ? t('Default') : variant,
+      value: pref.name,
+    };
+  }),
+});
+
+const getArchitectureBootVolumeFilter = (
+  tableRows: BootVolumeTableRow[],
+  t: TFunction,
+): KubevirtFilter<BootVolumeTableRow> => {
+  const volumes = tableRows.map((row) => row.volume);
+  const architectureOptions = getUniqueArchitectures(volumes).map((arch) => ({
     label: arch ?? t(OTHER),
     value: arch ?? OTHER,
   }));
-
   return {
     categoryLabel: ARCHITECTURE_TITLE,
     id: ARCHITECTURE_ID,
-    match: (obj, selected) => selected.includes(getArchitecture(obj) ?? OTHER),
+    match: (row, selected) => selected.includes(getArchitecture(row.volume) ?? OTHER),
     options: architectureOptions,
   };
 };
 
-const getOperatingSystemBootVolumeFilter = (t: TFunction): KubevirtFilter<BootableVolume> => ({
+const getOperatingSystemBootVolumeFilter = (t: TFunction): KubevirtFilter<BootVolumeTableRow> => ({
   categoryLabel: t('Operating system'),
   id: OS_NAME_FILTER_TYPE,
-  match: (obj, selected) => selected.includes(getBootVolumeOS(obj)),
+  match: (row) => OS_NAMES.some((osName) => osName.id === getBootVolumeOS(row.volume)),
   options: OS_NAMES.map((osName) => ({ label: osName.title, value: osName.id })),
 });
 
-const getResourceKindBootVolumeFilter = (t: TFunction): KubevirtFilter<BootableVolume> => ({
+const getResourceKindBootVolumeFilter = (t: TFunction): KubevirtFilter<BootVolumeTableRow> => ({
   categoryLabel: t('Resource'),
   id: RESOURCE_KIND_FILTER_TYPE,
-  match: (obj, selected) => selected.includes(obj?.kind),
+  match: (row, selected) => selected.includes(row.volume?.kind),
   options: [{ label: 'DS', value: DataSourceModel.kind }],
 });
 
-const getIsoBootVolumeFilter = (t: TFunction): KubevirtFilter<BootableVolume> => ({
+const getIsoBootVolumeFilter = (t: TFunction): KubevirtFilter<BootVolumeTableRow> => ({
   categoryLabel: t('Type'),
   id: ISO,
-  match: (obj) => isBootableVolumeISO(obj),
+  match: (row) => isBootableVolumeISO(row.volume),
   options: [{ label: ISO, value: ISO }],
 });
 
 const getBootVolumeFilters = (
-  bootableVolumes: BootableVolume[],
+  tableRows: BootVolumeTableRow[],
+  guestOperatingSystem: PreferenceOption | undefined,
   t: TFunction,
-): KubevirtFilter<BootableVolume>[] => [
-  getDeprecatedBootVolumeFilter(t),
-  getArchitectureBootVolumeFilter(bootableVolumes, t),
-  getOperatingSystemBootVolumeFilter(t),
-  getResourceKindBootVolumeFilter(t),
-  getIsoBootVolumeFilter(t),
-];
+): KubevirtFilter<BootVolumeTableRow>[] => {
+  const availablePreferences = guestOperatingSystem?.availablePreferences;
+
+  return [
+    getDeprecatedFilter(t),
+    availablePreferences
+      ? getVariantFilter(availablePreferences, t)
+      : getArchitectureBootVolumeFilter(tableRows, t),
+    getOperatingSystemBootVolumeFilter(t),
+    getResourceKindBootVolumeFilter(t),
+    getIsoBootVolumeFilter(t),
+  ];
+};
 
 export const getBootVolumeTableFilters = (
-  bootableVolumes: BootableVolume[],
-  preferenceName: string | undefined,
+  tableRows: BootVolumeTableRow[],
+  guestOperatingSystem: PreferenceOption | undefined,
   t: TFunction,
-): KubevirtFilter<BootableVolume>[] => {
-  const filters = getBootVolumeFilters(bootableVolumes, t);
+): KubevirtFilter<BootVolumeTableRow>[] => {
+  const filters = getBootVolumeFilters(tableRows, guestOperatingSystem, t);
+  const preferenceName = guestOperatingSystem?.name;
   const shouldIncludeOsFilter = !preferenceName || isLinuxGenericPreference(preferenceName);
 
   if (shouldIncludeOsFilter) {

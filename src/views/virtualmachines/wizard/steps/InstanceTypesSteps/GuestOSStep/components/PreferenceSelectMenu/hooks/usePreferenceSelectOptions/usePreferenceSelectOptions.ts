@@ -1,9 +1,11 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
+import { useWatch } from 'react-hook-form';
 
 import { type PreferenceOption } from '@kubevirt-utils/components/AddBootableVolumeModal/types';
 import useClusterPreferences from '@kubevirt-utils/hooks/useClusterPreferences';
 import useHcoWorkloadArchitectures from '@kubevirt-utils/hooks/useHcoWorkloadArchitectures';
 import useUserPreferences from '@kubevirt-utils/hooks/useUserPreferences';
+import { useVMWizardForm } from '@virtualmachines/wizard/form/VMWizardFormProvider';
 import {
   getGuestOperatingSystemPreferences,
   getSortedPreferencesByOSType,
@@ -24,6 +26,12 @@ const usePreferenceSelectOptions: UsePreferenceSelectOptions = (
   cluster,
   operatingSystemType,
 ) => {
+  const { control, setValue } = useVMWizardForm();
+  const guestOperatingSystem = useWatch({
+    control,
+    name: 'instanceType.guestOperatingSystem',
+  });
+
   const [architectures, architecturesLoaded] = useHcoWorkloadArchitectures(cluster);
   const [clusterPreferences, clusterPreferencesLoaded] = useClusterPreferences(null, null, cluster);
   const [userPreferences = [], userPreferencesLoaded] = useUserPreferences(
@@ -42,6 +50,19 @@ const usePreferenceSelectOptions: UsePreferenceSelectOptions = (
       getSortedPreferencesByOSType(allPreferences, operatingSystemType, architectures),
     );
   }, [architectures, clusterPreferences, userPreferences, operatingSystemType]);
+
+  useEffect(() => {
+    if (!isPreferencesLoaded || preferences.length === 0) return;
+
+    const isCurrentValid =
+      guestOperatingSystem && preferences.some((pref) => pref.name === guestOperatingSystem.name);
+
+    if (!isCurrentValid) {
+      setValue('instanceType.guestOperatingSystem', preferences[0] ?? null, {
+        shouldValidate: true,
+      });
+    }
+  }, [isPreferencesLoaded, operatingSystemType, guestOperatingSystem, preferences, setValue]);
 
   return {
     isPreferencesLoaded,

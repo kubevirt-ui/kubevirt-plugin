@@ -27,6 +27,7 @@ export type UseChangeBootSourceModalValues = ChangeBootSourcePreferenceData & {
   onCreateVolume: (volume: BootableVolume) => void;
   onSelectBootableVolume: OnSelectBootableVolume;
   selectedBootableVolume?: BootableVolume;
+  selectedPreference?: PreferenceOption;
   setVolumeListNamespace: (namespace: string) => void;
   volumeListNamespace: string;
 };

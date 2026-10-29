@@ -18,6 +18,7 @@ import {
   type ResourceMap,
 } from '@kubevirt-utils/resources/shared';
 import {
+  type BootVolumeTableRow,
   type OnSelectBootableVolume,
   type UseBootableVolumesValues,
   type UseInstanceTypeAndPreferencesValues,
@@ -55,6 +56,7 @@ export type BootableVolumeListProps = {
   bootableVolumesData: UseBootableVolumesValues;
   canCreateVolume: boolean;
   cluster?: string;
+  guestOperatingSystem?: PreferenceOption;
   instanceTypesAndPreferencesData: UseInstanceTypeAndPreferencesValues;
   loadError?: Error;
   lockedPreference?: PreferenceOption;
@@ -62,8 +64,7 @@ export type BootableVolumeListProps = {
   onSelectBootableVolume: OnSelectBootableVolume;
   onUploadStart?: (uploadKey: string) => void;
   onVolumeListNamespaceChange: (namespace: string) => void;
-  preferenceName?: string;
-  selectedBootableVolume?: BootableVolume;
+  selectedTableRow?: BootVolumeTableRow;
   showNoBootSourceHint?: boolean;
   syncFiltersWithURL?: boolean;
   volumeListNamespace: string;
