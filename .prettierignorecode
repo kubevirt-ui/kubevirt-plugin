@@ -1,0 +1,38 @@
+# Ignore artifacts (keep in sync with eslint):
+dist/
+node_modules/
+package-lock.json
+i18n-scripts/
+/coverage
+/gui-test-screenshots
+cypress/gui-test-screenshots
+cypress/cypress-a11y-report.json
+/locales
+
+# Helm templates contain Go template syntax that Prettier cannot parse
+ci-scripts/hot-cluster/helm/**/templates/
+
+# Playwright artifacts
+.playwright-cli/
+.playwright-mcp/
+.playwright-cli/
+test-results/
+playwright/gallery/dist/
+playwright/test-results/
+allure-results/
+playwright/.auth/
+.storage-states/
+.test-configs/
+.test-data/
+
+# Local agent tooling
+.claude/
+
+# Ignore anything that eslint will look at since eslint also applies prettier.
+**/*.js
+**/*.jsx
+**/*.cjs
+**/*.mjs
+**/*.ts
+**/*.tsx
+**/*.md
