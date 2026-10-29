@@ -22,9 +22,16 @@ DEFAULT_TEST_ENGINE="playwright"
 DEFAULT_CNV_CHANNEL="stable"
 
 # Last release branch still on the pre-migration Cypress suite. Any branch
-# release-<major>.<minor> with major.minor <= this threshold uses Cypress.
+# release-<major>.<minor> with major.minor <= this threshold uses Cypress,
+# unless listed in PLAYWRIGHT_MIGRATED_RELEASES below.
 LAST_CYPRESS_MAJOR=4
 LAST_CYPRESS_MINOR=22
+
+# Release branches at/below LAST_CYPRESS_* that already migrated to Playwright
+# (Cypress tree removed). Entries are "major.minor" strings.
+PLAYWRIGHT_MIGRATED_RELEASES=(
+  "4.15"
+)
 
 # Window of OpenShift versions we can actually provision on IBM Cloud. VPC
 # cluster creation with an explicit CNI (--cni OVNKubernetes) is rejected
@@ -117,8 +124,15 @@ if [[ "${BASE_REF}" =~ ^release-([0-9]+)\.([0-9]+)$ ]]; then
   fi
   echo "CNI plugin: '${CNI_PLUGIN:-<platform default, Calico>}'" >&2
 
+  BRANCH_VERSION="${MAJOR}.${MINOR}"
   if (( MAJOR * 1000 + MINOR <= LAST_CYPRESS_MAJOR * 1000 + LAST_CYPRESS_MINOR )); then
     TEST_ENGINE="cypress"
+    for migrated in "${PLAYWRIGHT_MIGRATED_RELEASES[@]}"; do
+      if [[ "${migrated}" == "${BRANCH_VERSION}" ]]; then
+        TEST_ENGINE="playwright"
+        break
+      fi
+    done
   else
     TEST_ENGINE="playwright"
   fi
