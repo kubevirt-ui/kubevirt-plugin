@@ -39,6 +39,7 @@ export const createInitialDeploymentValues = ({
 export const createInstanceTypeDefaultValues = (): VMWizardInstanceTypeValues => ({
   bootVolume: null,
   compute: null,
+  guestOperatingSystem: null,
   operatingSystem: OperatingSystemType.RHEL,
   preference: null,
   useBootSource: true,
