@@ -90,6 +90,7 @@ const TabModal: TabModalFC = memo(
 
     return (
       <Modal
+        backdropClassName="modal-backdrop"
         className="ocs-modal"
         data-test="dialog-modal"
         id="tab-modal"
