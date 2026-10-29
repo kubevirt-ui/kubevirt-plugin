@@ -67,6 +67,7 @@ describe('getUtilizationQueries', () => {
       expect(queries[VMQueries.CPU_USAGE]).toContain(`cluster='${MANAGED_CLUSTER_NAME}'`);
       expect(queries[VMQueries.CPU_USAGE]).toContain(BY_CLAUSE_MANAGED);
       expect(queries[VMQueries.MEMORY_USAGE]).toContain(`cluster='${MANAGED_CLUSTER_NAME}'`);
+      expect(queries[VMQueries.MEMORY_USAGE]).toContain('by (name, namespace, cluster)');
       expect(queries[VMQueries.NETWORK_IN_USAGE]).toContain(`cluster='${MANAGED_CLUSTER_NAME}'`);
       expect(queries[VMQueries.STORAGE_READ_LATENCY_AVG]).toContain(
         `cluster='${MANAGED_CLUSTER_NAME}'`,
@@ -88,7 +89,7 @@ describe('getUtilizationQueries', () => {
         `sum(rate(kubevirt_vmi_cpu_usage_seconds_total{name='${TEST_VM_NAME}',namespace='${TEST_NAMESPACE}'}[${EXTENDED_DURATION}])) ${BY_CLAUSE_HUB}`,
       );
       expect(queries[VMQueries.MEMORY_USAGE]).toBe(
-        `last_over_time(kubevirt_vmi_memory_used_bytes{name='${TEST_VM_NAME}',namespace='${TEST_NAMESPACE}'}[${EXTENDED_DURATION}])`,
+        `max by (name, namespace)(avg_over_time(kubevirt_vmi_memory_used_bytes{name='${TEST_VM_NAME}',namespace='${TEST_NAMESPACE}'}[${EXTENDED_DURATION}]))`,
       );
     });
 
