@@ -82,7 +82,7 @@ t('key' + id)
 ```
 
 - The optional i18nKey property on the [react-i18next Trans component](https://react.i18next.com/latest/trans-component) should only be used as a last resort. There is a known (rare) issue with the parser, where it will sometimes incorrectly generate a key that contains HTML tags. If this is the case, you will see a missingKey error in the developer tools of your browser or in our end to end tests. In this instance, the i18nKey prop should be used and made the same as the text being internationalized. HTML tags like `<strong>` can be used directly in the i18nKey prop.
-- Write tests for pseudolocalized code in Cypress
+- Write tests for pseudolocalized code in Playwright E2E specs under `playwright/tests/`
 
 #### Translations
 

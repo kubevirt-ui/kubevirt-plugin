@@ -8,13 +8,12 @@ dist
 .env.local
 /coverage
 /gui-test-screenshots
-cypress/gui-test-screenshots
-cypress/cypress-a11y-report.json
 # Playwright - ignore all test results (artifacts, traces, reports)
 playwright/test-results/
 allure-results/
 playwright/.auth/
 .playwright-mcp
+.playwright-cli/
 .kubeconfigs/
 .storage-states/
 .test-configs/
