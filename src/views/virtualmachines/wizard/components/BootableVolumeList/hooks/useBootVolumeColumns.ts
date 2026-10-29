@@ -2,7 +2,7 @@ import { ALL_PROJECTS } from '@kubevirt-utils/hooks/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettingsTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettingsTableColumns';
 import type { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
-import { ARCHITECTURE_ID, ARCHITECTURE_TITLE } from '@kubevirt-utils/utils/architecture';
+import { ARCHITECTURE_ID } from '@kubevirt-utils/utils/architecture';
 import type { ColumnLayout } from '@openshift-console/dynamic-plugin-sdk-internal/lib/extensions/console-types';
 
 import type { TableColumnWithOptionalIndex } from '../types';
@@ -35,7 +35,7 @@ const useBootVolumeColumns: UseBootVolumesColumns = (volumeListNamespace) => {
     {
       columnIndex: 1,
       id: ARCHITECTURE_ID,
-      title: ARCHITECTURE_TITLE,
+      title: t('Variant'),
     },
     ...(volumeListNamespace === ALL_PROJECTS
       ? [

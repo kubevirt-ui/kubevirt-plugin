@@ -6,16 +6,12 @@ import {
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { type BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
-import {
-  getName,
-  getNamespace,
-  type NamespacedResourceMap,
-  type ResourceMap,
-} from '@kubevirt-utils/resources/shared';
+import { type NamespacedResourceMap, type ResourceMap } from '@kubevirt-utils/resources/shared';
 import { Table, TableVariant, Tbody, Th, Thead, Tr } from '@patternfly/react-table';
 import { type ThSortType } from '@patternfly/react-table/dist/esm/components/Table/base/types';
 import { getBootableVolumeRowData } from '@virtualmachines/wizard/components/BootableVolumeList/utils/getBootableVolumeRowData';
 import {
+  type BootVolumeTableRow,
   type OnSelectBootableVolume,
   type UseBootableVolumesValues,
 } from '@virtualmachines/wizard/utils/types';
@@ -30,8 +26,8 @@ type BootableVolumeTableProps = {
   isHeaderStuck: boolean;
   onSelectBootableVolume: OnSelectBootableVolume;
   preferencesMap: ResourceMap<V1beta1VirtualMachineClusterPreference>;
-  selectedBootableVolume?: BootableVolume;
-  sortedPaginatedData: BootableVolume[];
+  selectedTableRow?: BootVolumeTableRow;
+  sortedPaginatedData: BootVolumeTableRow[];
   userPreferencesMap: NamespacedResourceMap<V1beta1VirtualMachinePreference>;
   volumeListNamespace: string;
 };
@@ -43,7 +39,7 @@ const BootableVolumeTable: FC<BootableVolumeTableProps> = ({
   isHeaderStuck,
   onSelectBootableVolume,
   preferencesMap,
-  selectedBootableVolume,
+  selectedTableRow,
   sortedPaginatedData,
   userPreferencesMap,
   volumeListNamespace,
@@ -68,20 +64,20 @@ const BootableVolumeTable: FC<BootableVolumeTableProps> = ({
         </Tr>
       </Thead>
       <Tbody>
-        {sortedPaginatedData?.map?.((bootableVolume) => (
+        {sortedPaginatedData?.map?.((tableRow) => (
           <BootableVolumeRow
             activeColumnIDs={activeColumns.map((col) => col.id)}
-            bootableVolume={bootableVolume}
-            key={`${getNamespace(bootableVolume)}/${getName(bootableVolume)}`}
+            key={tableRow.rowKey}
             onSelectBootableVolume={onSelectBootableVolume}
             rowData={getBootableVolumeRowData({
-              bootableVolume,
+              bootableVolume: tableRow.volume,
               bootableVolumesData,
               preferencesMap,
               userPreferencesMap,
               volumeListNamespace,
             })}
-            selectedBootableVolume={selectedBootableVolume}
+            selectedTableRow={selectedTableRow}
+            tableRow={tableRow}
           />
         ))}
       </Tbody>

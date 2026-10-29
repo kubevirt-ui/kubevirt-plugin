@@ -3,6 +3,7 @@ import { type PreferenceOption } from '@kubevirt-utils/components/AddBootableVol
 import { type BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import {
   type OnSelectBootableVolume,
+  type PreferenceRef,
   type UseBootableVolumesValues,
   type UseInstanceTypeAndPreferencesValues,
 } from '@virtualmachines/wizard/utils/types';
@@ -27,6 +28,7 @@ export type UseChangeBootSourceModalValues = ChangeBootSourcePreferenceData & {
   onCreateVolume: (volume: BootableVolume) => void;
   onSelectBootableVolume: OnSelectBootableVolume;
   selectedBootableVolume?: BootableVolume;
+  selectedPreference?: PreferenceRef;
   setVolumeListNamespace: (namespace: string) => void;
   volumeListNamespace: string;
 };
