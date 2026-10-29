@@ -22,9 +22,6 @@ export default class VmWizardNavigationComponent extends BaseComponent {
 
   private readonly _pfV6CMenuToggle = this.locator('.pf-v6-c-menu-toggle');
 
-  private readonly _pfV6CWizardButtonpfV6CButtonpfMPrimary = this.locator(
-    '.pf-v6-c-wizard button.pf-v6-c-button.pf-m-primary',
-  );
   private readonly _wizardFooterNextButton = this.locator(
     '.pf-v6-c-wizard__footer button.pf-v6-c-button.pf-m-primary',
   );
@@ -334,12 +331,12 @@ export default class VmWizardNavigationComponent extends BaseComponent {
   }
 
   async isNextButtonDisabled(): Promise<boolean> {
-    const nextButton = this._pfV6CWizardButtonpfV6CButtonpfMPrimary;
-    await nextButton.first().waitFor({
+    const nextButton = this._wizardFooterNextButton.first();
+    await nextButton.waitFor({
       state: 'visible',
       timeout: TestTimeouts.SHORT_WAIT,
     });
-    return await nextButton.first().isDisabled();
+    return await nextButton.isDisabled();
   }
 
   async navigateToStepByName(stepName: string): Promise<void> {

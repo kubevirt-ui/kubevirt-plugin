@@ -3,8 +3,8 @@ import { TestTimeouts } from '@/utils/test-config';
 import type { Page } from '@playwright/test';
 
 export class VmCreationWizardNavigationComponent extends BaseComponent {
-  private readonly _pfV6CWizardButtonpfV6CButtonpfMPrimary = this.locator(
-    '.pf-v6-c-wizard button.pf-v6-c-button.pf-m-primary',
+  private readonly _wizardFooterNextButton = this.locator(
+    '.pf-v6-c-wizard__footer button.pf-v6-c-button.pf-m-primary',
   );
 
   constructor(page: Page) {
@@ -25,12 +25,25 @@ export class VmCreationWizardNavigationComponent extends BaseComponent {
 
   async clickNext(): Promise<void> {
     await this.collapseSidebarIfExpanded();
-    const nextButton = this._pfV6CWizardButtonpfV6CButtonpfMPrimary;
-    await nextButton.first().waitFor({
+
+    // Dismiss any lingering tooltip that could intercept the click on the footer button.
+    await this.page.keyboard.press('Escape');
+    await this.page
+      .locator('.pf-v6-c-tooltip, [role="tooltip"]')
+      .first()
+      .waitFor({ state: 'hidden', timeout: TestTimeouts.SHORT_WAIT })
+      .catch(() => undefined);
+
+    // Target the primary button inside the wizard footer rather than the broad
+    // `.pf-v6-c-wizard ... .pf-m-primary` selector, which could resolve to the
+    // hidden list page `item-create` control and time out.
+    const nextButton = this._wizardFooterNextButton.first();
+    await nextButton.waitFor({
       state: 'visible',
       timeout: TestTimeouts.SHORT_WAIT,
     });
-    await this.robustClick(nextButton.first());
+    await nextButton.hover().catch(() => undefined);
+    await this.robustClick(nextButton);
     await this.page.waitForTimeout(1000);
   }
 
@@ -46,12 +59,12 @@ export class VmCreationWizardNavigationComponent extends BaseComponent {
   }
 
   async isNextButtonDisabled(): Promise<boolean> {
-    const nextButton = this._pfV6CWizardButtonpfV6CButtonpfMPrimary;
-    await nextButton.first().waitFor({
+    const nextButton = this._wizardFooterNextButton.first();
+    await nextButton.waitFor({
       state: 'visible',
       timeout: TestTimeouts.SHORT_WAIT,
     });
-    return await nextButton.first().isDisabled();
+    return await nextButton.isDisabled();
   }
 
   async navigateToStepByName(stepName: string): Promise<void> {
