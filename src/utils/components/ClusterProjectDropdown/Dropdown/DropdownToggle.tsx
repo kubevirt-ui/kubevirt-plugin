@@ -11,6 +11,7 @@ type DropdownToggleProps = {
   children: ReactNode;
   config: DropdownConfig;
   disabled?: boolean;
+  isLoading?: boolean;
   isOpen: boolean;
   onActionClick: (event: MouseEvent, itemID: string) => void;
   onCloseMenu: () => void;
@@ -24,6 +25,7 @@ const DropdownToggle: FC<DropdownToggleProps> = ({
   children,
   config,
   disabled = false,
+  isLoading = false,
   isOpen,
   onActionClick,
   onCloseMenu,
@@ -42,6 +44,7 @@ const DropdownToggle: FC<DropdownToggleProps> = ({
       <DropdownMenuToggle
         config={config}
         disabled={disabled}
+        isLoading={isLoading}
         isOpen={isOpen}
         onToggle={onToggle}
         title={title}

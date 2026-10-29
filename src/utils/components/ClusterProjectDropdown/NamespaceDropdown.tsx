@@ -25,6 +25,7 @@ export type NamespaceDropdownProps = {
   disabled?: boolean;
   disabledTooltip?: string;
   includeAllProjects?: boolean;
+  isLoading?: boolean;
   onChange: (project: string) => void;
   onlyUserProjects?: boolean;
   onProjectCreated?: NamespaceDropdownProjectCreatedHandler;
@@ -37,6 +38,7 @@ const NamespaceDropdown: FC<NamespaceDropdownProps> = ({
   disabled = false,
   disabledTooltip,
   includeAllProjects = true,
+  isLoading = false,
   onChange,
   onlyUserProjects = false,
   onProjectCreated,
@@ -138,6 +140,7 @@ const NamespaceDropdown: FC<NamespaceDropdownProps> = ({
       extractKey={extractName}
       extractTitle={extractName}
       includeAllItems={includeAllProjects}
+      isLoading={isLoading}
       items={visibleProjects}
       itemsLoaded={projectsLoaded}
       menuFooter={onProjectCreated ? CreateProjectFromDropdownFooter : undefined}

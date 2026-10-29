@@ -56,6 +56,7 @@ export type DropdownProps<T> = {
   extractTitle: (item: T) => string;
   includeAllItems?: boolean;
   isItemDisabled?: (key: string) => boolean;
+  isLoading?: boolean;
   items: null | T[] | undefined;
   itemsLoaded: boolean;
   menuFooter?: ComponentType<DropdownMenuFooterComponentProps>;
