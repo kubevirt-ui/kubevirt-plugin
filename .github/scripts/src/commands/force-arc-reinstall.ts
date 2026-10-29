@@ -28,6 +28,7 @@ import { getRepoContext } from '../shared/actions-context';
 import { enforceCommentTrust, reactToComment } from '../shared/command-helpers';
 import { dispatchWorkflow } from '../shared/dispatch';
 import { failStep, setOutput } from '../shared/output';
+import { resolveDefaultClusterName } from './resolve-default-cluster-name';
 import type { CommandContext } from './command-registry';
 import { findRunningE2ERun, liftE2EHold } from './e2e-dispatch-helpers';
 import {
@@ -84,6 +85,7 @@ const main = async (): Promise<void> => {
     await dispatchWorkflow(octokit, {
       inputs: {
         base_ref: baseRef,
+        cluster_name: resolveDefaultClusterName(baseRef),
         force_arc_reinstall: 'true',
         pr_number: String(prNumber),
         skip_pool_check: 'true',

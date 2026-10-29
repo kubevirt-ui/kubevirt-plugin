@@ -28,6 +28,7 @@ import { enforceCommentTrust, reactToComment } from '../shared/command-helpers';
 import { dispatchWorkflow } from '../shared/dispatch';
 import { failStep } from '../shared/output';
 import type { CommandContext } from './command-registry';
+import { resolveDefaultClusterName } from './resolve-default-cluster-name';
 import {
   buildTestE2EReport,
   parseTestE2ECommand,
@@ -103,6 +104,7 @@ const main = async (): Promise<void> => {
     await dispatchWorkflow(octokit, {
       inputs: {
         base_ref: baseRef,
+        cluster_name: resolveDefaultClusterName(baseRef),
         pr_number: String(prNumber),
         skip_pool_check: 'true',
         test_args: parsed.testArgs,

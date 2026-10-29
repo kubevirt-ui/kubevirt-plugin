@@ -18,12 +18,13 @@
 
 import { Octokit } from '@octokit/rest';
 
+import { resolveDefaultClusterName } from '../commands/resolve-default-cluster-name';
 import { createOctokit } from '../github-repo';
+import { getRepoContext } from '../shared/actions-context';
+import { dispatchWorkflow } from '../shared/dispatch';
 import { isMergePoolPr } from '../shared/merge-pool';
 import { failStep } from '../shared/output';
 import { isListedInLocalOwners } from '../shared/owners';
-import { dispatchWorkflow } from '../shared/dispatch';
-import { getRepoContext } from '../shared/actions-context';
 import type { GitHubConfig } from '../types/index';
 import { requireEnv, safeErrorMessage } from '../utils';
 import {
@@ -131,6 +132,7 @@ const runRetest = async (): Promise<void> => {
   await dispatchWorkflow(octokit, {
     inputs: {
       base_ref: baseRef,
+      cluster_name: resolveDefaultClusterName(baseRef),
       is_pool_retest: 'true',
       pr_number: String(prNumber),
     },

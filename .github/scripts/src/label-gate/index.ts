@@ -15,6 +15,7 @@
 
 import { Octokit } from '@octokit/rest';
 
+import { resolveDefaultClusterName } from '../commands/resolve-default-cluster-name';
 import { createOctokit } from '../github-repo';
 import { getRepoContext } from '../shared/actions-context';
 import { dispatchWorkflowAndResolveRun } from '../shared/dispatch';
@@ -52,6 +53,7 @@ const dispatchE2e = async (): Promise<void> => {
   const result = await dispatchWorkflowAndResolveRun(octokit, {
     inputs: {
       base_ref: baseRef,
+      cluster_name: resolveDefaultClusterName(baseRef),
       pr_number: prNumber,
       skip_pool_check: 'true',
     },

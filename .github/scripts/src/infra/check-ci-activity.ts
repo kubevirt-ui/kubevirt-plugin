@@ -13,9 +13,12 @@ const DEFAULT_WORKFLOWS = [
 
 /**
  * Resolve a display_title bracket token to a cluster name.
- * hot-cluster-e2e.yml's run-name is "Hot Cluster E2E [<test_project>] [<ref>] @ ...",
- * where the second bracket is the branch/cluster token -- either an already-resolved
- * cluster name ("kubevirt-plugin-420") or a raw base branch like "release-4.20".
+ * hot-cluster-e2e.yml's run-name is
+ * "Hot Cluster E2E [<test_project>] [cluster:<name>] @ ...".
+ * The cluster: prefix is unambiguous (custom names like "main" / "release-test"
+ * are not mistaken for legacy branch tokens). Legacy titles without the prefix
+ * still parse: kubevirt-plugin-*, exact release-X.Y, raw "main", and malformed
+ * release-* → kubevirt-plugin-ci.
  */
 export const resolveClusterFromTitle = (title: string): null | string => {
   const bracketed = /^Hot Cluster E2E \[[^\]]*\] \[([^\]]+)\]/.exec(title);
@@ -23,11 +26,24 @@ export const resolveClusterFromTitle = (title: string): null | string => {
     return null;
   }
   const token = bracketed[1];
+
+  const prefixed = /^cluster:(.+)$/.exec(token);
+  if (prefixed) {
+    return prefixed[1];
+  }
+
+  // Legacy titles (pre cluster: prefix).
   if (token.startsWith('kubevirt-plugin-')) {
     return token;
   }
-  const release = token.match(/^release-(\d+)\.(\d+)$/);
-  return release ? `kubevirt-plugin-${release[1]}${release[2]}` : 'kubevirt-plugin-ci';
+  const release = /^release-(\d+)\.(\d+)$/.exec(token);
+  if (release) {
+    return `kubevirt-plugin-${release[1]}${release[2]}`;
+  }
+  if (token === 'main' || token.startsWith('release-')) {
+    return 'kubevirt-plugin-ci';
+  }
+  return token;
 };
 
 const runMatchesCluster = (
@@ -128,37 +144,47 @@ export const checkCIActivity = async (
 };
 
 /**
- * Simple check whether any tagged workflows are active (used by teardown/cleanup safety checks).
+ * Count active setup/e2e workflows for a specific cluster (teardown safety).
+ *
+ * Filters by cluster the same way checkCIActivity does -- a queued E2E for
+ * release-4.21 must not block teardown of kubevirt-plugin-415. Previously this
+ * used unfiltered total_count and aborted teardown whenever *any* setup/e2e
+ * run was queued or in progress repo-wide.
  *
  * Checks both 'in_progress' AND 'queued' -- a run whose last job hasn't
  * been picked up by a runner yet (e.g. because ARC itself is broken, or a
  * runner-capacity backlog) has top-level status 'queued', not
  * 'in_progress'. Checking only 'in_progress' previously let a real,
  * waiting-for-a-runner backlog slip past this exact safety check and
- * allowed a teardown to proceed -- see checkCIActivity below, which
- * already checks both and is the reference for this fix.
+ * allowed a teardown to proceed.
  */
 export const hasActiveWorkflows = async (
   octokit: Octokit,
   owner: string,
   repo: string,
+  clusterName: string,
   workflows: string[] = DEFAULT_WORKFLOWS,
 ): Promise<number> => {
-  const totals = await Promise.all(
-    workflows.flatMap((workflow) =>
-      (['in_progress', 'queued'] as const).map(async (status) => {
-        const { data } = await octokit.actions.listWorkflowRuns({
-          owner,
-          per_page: 1,
-          repo,
-          status,
-          workflow_id: workflow,
-        });
-        return data.total_count;
-      }),
-    ),
-  );
-  return totals.reduce((sum, count) => sum + count, 0);
+  // lookback is unused for in_progress/queued queries
+  const lookbackDate = new Date(0).toISOString();
+  let total = 0;
+
+  for (const workflow of workflows) {
+    for (const status of ['in_progress', 'queued'] as const) {
+      const result = await collectWorkflowStatus(
+        octokit,
+        owner,
+        repo,
+        workflow,
+        status,
+        clusterName,
+        lookbackDate,
+      );
+      total += result.inProgress + result.queued;
+    }
+  }
+
+  return total;
 };
 
 /** Check if any of the matched clusters have active CI jobs (used by cleanup-all). */
@@ -172,7 +198,6 @@ export const checkBusyClusters = async (
   const busy = new Set<string>();
 
   for (const clusterName of clusterNames) {
-    const tag = `[${clusterName}]`;
     for (const workflow of workflows) {
       for (const status of ['in_progress', 'queued'] as const) {
         const runs = await octokit.paginate(octokit.actions.listWorkflowRuns, {
@@ -182,7 +207,9 @@ export const checkBusyClusters = async (
           status,
           workflow_id: workflow,
         });
-        if (runs.some((run) => run.display_title?.includes(tag))) {
+        // Use runMatchesCluster so hot-cluster-e2e titles with [cluster:name]
+        // are recognized (plain `[name]` substring matching misses that prefix).
+        if (runs.some((run) => runMatchesCluster(run, workflow, clusterName))) {
           busy.add(clusterName);
         }
       }
