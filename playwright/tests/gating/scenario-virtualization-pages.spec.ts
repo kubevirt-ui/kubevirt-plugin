@@ -1,5 +1,6 @@
 import { GATING, GATING_TAG, VM_SEARCH_TAG } from '@/data-models/allure-constants';
 import { expect, test } from '@/fixtures/gating-fixture';
+import { createHaltedVm } from '@/utils/vm-search-test-helpers';
 
 const SUITE = 'Virtualization pages';
 
@@ -90,6 +91,7 @@ test.describe('Virtualization pages (gating)', { tag: [GATING_TAG] }, () => {
   });
 
   test('VM search bar accepts key:value syntax and produces filter chips', async ({
+    apiClient,
     vmListPage,
     testConfig,
     utils,
@@ -100,8 +102,19 @@ test.describe('Virtualization pages (gating)', { tag: [GATING_TAG] }, () => {
       tags: [GATING_TAG, VM_SEARCH_TAG],
     });
 
+    // SearchBar is only rendered when the namespace has at least one VM; otherwise
+    // VirtualMachineEmptyState is shown and getByTestId('vm-search-input') never appears.
+    const vmName = utils.generateRandomVmName('search-vm');
+    await createHaltedVm(apiClient, {
+      cpuCores: 1,
+      memory: '256Mi',
+      name: vmName,
+      namespace: testConfig.testNamespace,
+    });
+
     await vmListPage.navigateToNamespaceVirtualMachinesViaUI(testConfig.testNamespace);
     await vmListPage.clickVmListTab();
+    await vmListPage.waitForVmRowVisible(vmName);
 
     await test.step('Search bar is visible and accepts key:value input', async () => {
       await vmListPage.typeInVmSearchInput('status:');
