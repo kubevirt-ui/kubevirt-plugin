@@ -9,9 +9,9 @@ import { getResourceUrl } from '@kubevirt-utils/resources/shared';
 import { getRandomChars } from '@kubevirt-utils/utils/utils';
 import { Alert, AlertVariant, Stack } from '@patternfly/react-core';
 
-import { UPLOAD_PROGRESS_STATUS } from '../../hooks/useUploadProgressToast/constants';
-import { getExportDiskUploadKey } from '../../hooks/useUploadProgressToast/keys/uploadKeys';
-import { useUploadProgressStore } from '../../hooks/useUploadProgressToast/uploadProgressStore';
+import { UPLOAD_PROGRESS_STATUS } from '../../hooks/useInFlightToast/constants';
+import { useInFlightToastStore } from '../../hooks/useInFlightToast/inFlightToastStore';
+import { getExportDiskUploadKey } from '../../hooks/useInFlightToast/keys/uploadKeys';
 import TabModal from '../TabModal/TabModal';
 import ExportModalForm from './components/ExportModalForm';
 import { type ExportFormValues } from './types/types';
@@ -55,7 +55,7 @@ const ExportModal: FC<ExportModalProps> = ({
   } = form;
 
   const exportUploadKey = getExportDiskUploadKey(cluster, namespace, pvcName);
-  const hasActiveExport = useUploadProgressStore(
+  const hasActiveExport = useInFlightToastStore(
     (state) =>
       state?.exportDisk?.data?.[exportUploadKey]?.progressToastState?.status ===
       UPLOAD_PROGRESS_STATUS.UPLOADING,
@@ -78,7 +78,7 @@ const ExportModal: FC<ExportModalProps> = ({
 
       const podLogsUrl = `${getResourceUrl({ model: PodModel, resource: pod })}/logs`;
       const uploadKey = getExportDiskUploadKey(cluster, namespace, pvcName);
-      useUploadProgressStore.getState()?.exportDisk?.actions?.startUpload(uploadKey, {
+      useInFlightToastStore.getState()?.exportDisk?.actions?.startUpload(uploadKey, {
         cluster,
         entry: {
           blockNavigation: true,

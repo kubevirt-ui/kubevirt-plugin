@@ -6,7 +6,7 @@ import {
 import {
   notifyBootableVolumeDeleted,
   notifyDataVolumeDeleted,
-} from '@kubevirt-utils/hooks/useUploadProgressToast/cancel/notifyDeletedUploadResources';
+} from '@kubevirt-utils/hooks/useInFlightToast/cancel/notifyDeletedUploadResources';
 import { kubevirtK8sDelete } from '@multicluster/k8sRequests';
 
 import { deleteDVAndRelatedResources } from './helpers';
@@ -15,13 +15,10 @@ jest.mock('@multicluster/k8sRequests', () => ({
   kubevirtK8sDelete: jest.fn(),
 }));
 
-jest.mock(
-  '@kubevirt-utils/hooks/useUploadProgressToast/cancel/notifyDeletedUploadResources',
-  () => ({
-    notifyBootableVolumeDeleted: jest.fn(),
-    notifyDataVolumeDeleted: jest.fn(),
-  }),
-);
+jest.mock('@kubevirt-utils/hooks/useInFlightToast/cancel/notifyDeletedUploadResources', () => ({
+  notifyBootableVolumeDeleted: jest.fn(),
+  notifyDataVolumeDeleted: jest.fn(),
+}));
 
 const mockDelete = kubevirtK8sDelete as jest.Mock;
 const mockNotifyDataVolumeDeleted = notifyDataVolumeDeleted as jest.Mock;

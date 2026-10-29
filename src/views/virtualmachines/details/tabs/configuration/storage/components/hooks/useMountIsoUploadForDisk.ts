@@ -1,7 +1,7 @@
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { UPLOAD_PROGRESS_STATUS } from '@kubevirt-utils/hooks/useUploadProgressToast/constants';
-import { getVmCdromUploadKeyFromVm } from '@kubevirt-utils/hooks/useUploadProgressToast/keys/uploadKeys';
-import { useUploadProgressStore } from '@kubevirt-utils/hooks/useUploadProgressToast/uploadProgressStore';
+import { UPLOAD_PROGRESS_STATUS } from '@kubevirt-utils/hooks/useInFlightToast/constants';
+import { useInFlightToastStore } from '@kubevirt-utils/hooks/useInFlightToast/inFlightToastStore';
+import { getVmCdromUploadKeyFromVm } from '@kubevirt-utils/hooks/useInFlightToast/keys/uploadKeys';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 
 type UseMountIsoUploadForDiskResult = {
@@ -14,7 +14,7 @@ export const cancelMountIsoUpload = async (
   cdromDiskName: string,
 ): Promise<boolean> => {
   const uploadKey = getVmCdromUploadKeyFromVm(vm, cdromDiskName);
-  const { cancelTrackedUpload, getUpload } = useUploadProgressStore.getState().uploads.actions;
+  const { cancelTrackedUpload, getUpload } = useInFlightToastStore.getState().uploads.actions;
   const upload = getUpload(uploadKey);
 
   if (upload?.status !== UPLOAD_PROGRESS_STATUS.UPLOADING) {
@@ -35,7 +35,7 @@ export const useMountIsoUploadForDisk = (
   diskName: string,
 ): UseMountIsoUploadForDiskResult => {
   const uploadKey = getVmCdromUploadKeyFromVm(vm, diskName);
-  const upload = useUploadProgressStore((state) => state.uploads.actions?.getUpload?.(uploadKey));
+  const upload = useInFlightToastStore((state) => state.uploads.actions?.getUpload?.(uploadKey));
 
   const isUploadInProgress = upload?.status === UPLOAD_PROGRESS_STATUS.UPLOADING;
 

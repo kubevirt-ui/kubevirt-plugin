@@ -1,7 +1,7 @@
 import { type V1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import { type K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
-import { type CdiUploadTrackMetadata } from '../useUploadProgressToast';
+import { type CdiUploadTrackMetadata } from '../useInFlightToast';
 
 export enum UPLOAD_STATUS {
   ALLOCATING = 'ALLOCATING',

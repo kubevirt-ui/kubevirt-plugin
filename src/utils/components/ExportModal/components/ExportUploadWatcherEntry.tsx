@@ -2,11 +2,11 @@ import { type FC, useEffect, useRef } from 'react';
 
 import { SecretModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { type IoK8sApiCoreV1Pod } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type ExportDiskContext } from '@kubevirt-utils/hooks/useInFlightToast/features/exportDisk/types/types';
+import { useInFlightToastStore } from '@kubevirt-utils/hooks/useInFlightToast/inFlightToastStore';
+import { getExportDiskUploadKey } from '@kubevirt-utils/hooks/useInFlightToast/keys/uploadKeys';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
-import { type ExportDiskContext } from '@kubevirt-utils/hooks/useUploadProgressToast/exportDisk/types/types';
-import { getExportDiskUploadKey } from '@kubevirt-utils/hooks/useUploadProgressToast/keys/uploadKeys';
-import { useUploadProgressStore } from '@kubevirt-utils/hooks/useUploadProgressToast/uploadProgressStore';
 import { modelToGroupVersionKind, PodModel } from '@kubevirt-utils/models';
 import { getResourceUrl } from '@kubevirt-utils/resources/shared';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
@@ -35,7 +35,7 @@ const ExportUploadWatcherEntry: FC<ExportUploadWatcherEntryProps> = ({ upload })
   const prevPercentageRef = useRef(-1);
   const finishedRef = useRef(false);
   const generationRef = useRef(
-    useUploadProgressStore.getState().exportDisk.actions?.getUpload(uploadKey)?.generation,
+    useInFlightToastStore.getState().exportDisk.actions?.getUpload(uploadKey)?.generation,
   );
 
   const [pod, loaded, watchError] = useKubevirtWatchResource<IoK8sApiCoreV1Pod>({
@@ -52,10 +52,10 @@ const ExportUploadWatcherEntry: FC<ExportUploadWatcherEntryProps> = ({ upload })
     if (watchError) {
       finishedRef.current = true;
       deleteSecret(cluster, namespace, secretName);
-      useUploadProgressStore
+      useInFlightToastStore
         .getState()
         .exportDisk.actions?.failUpload(uploadKey, watchError.message, generationRef.current);
-      useUploadProgressStore.getState().exportDisk.actions?.clearExportDiskWatchContext(uploadKey);
+      useInFlightToastStore.getState().exportDisk.actions?.clearExportDiskWatchContext(uploadKey);
     }
   }, [watchError, uploadKey, cluster, namespace, pvcName, secretName]);
 
@@ -66,7 +66,7 @@ const ExportUploadWatcherEntry: FC<ExportUploadWatcherEntryProps> = ({ upload })
       progress.phase !== UploaderPhase.Idle
     ) {
       prevPercentageRef.current = progress.percentage;
-      useUploadProgressStore
+      useInFlightToastStore
         .getState()
         .exportDisk.actions?.updateProgress(uploadKey, progress.percentage);
     }
@@ -81,22 +81,22 @@ const ExportUploadWatcherEntry: FC<ExportUploadWatcherEntryProps> = ({ upload })
       finishedRef.current = true;
       deleteSecret(cluster, namespace, secretName);
       const podLogsUrl = `${getResourceUrl({ model: PodModel, resource: pod })}/logs`;
-      useUploadProgressStore.getState().exportDisk.actions?.completeUpload(uploadKey, {
+      useInFlightToastStore.getState().exportDisk.actions?.completeUpload(uploadKey, {
         expectedGeneration: generationRef.current,
         resourceName: podName,
         successLinks: [{ label: t('View pod logs'), url: podLogsUrl }],
       });
-      useUploadProgressStore.getState().exportDisk.actions?.clearExportDiskWatchContext(uploadKey);
+      useInFlightToastStore.getState().exportDisk.actions?.clearExportDiskWatchContext(uploadKey);
     }
 
     if (exportFailed(pod)) {
       finishedRef.current = true;
       deleteSecret(cluster, namespace, secretName);
       const errorMessage = getExportErrorMessage(pod, progress.errorMessage) ?? t('Unknown error');
-      useUploadProgressStore
+      useInFlightToastStore
         .getState()
         .exportDisk.actions?.failUpload(uploadKey, errorMessage, generationRef.current);
-      useUploadProgressStore.getState().exportDisk.actions?.clearExportDiskWatchContext(uploadKey);
+      useInFlightToastStore.getState().exportDisk.actions?.clearExportDiskWatchContext(uploadKey);
     }
   }, [
     pod,

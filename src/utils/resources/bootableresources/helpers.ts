@@ -25,7 +25,7 @@ import {
 import {
   notifyBootableVolumeDeleted,
   notifyDataVolumeDeleted,
-} from '@kubevirt-utils/hooks/useUploadProgressToast/cancel/notifyDeletedUploadResources';
+} from '@kubevirt-utils/hooks/useInFlightToast/cancel/notifyDeletedUploadResources';
 import {
   getDataSourcePVCName,
   getDataSourcePVCNamespace,

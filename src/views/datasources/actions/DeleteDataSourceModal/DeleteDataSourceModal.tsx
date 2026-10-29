@@ -9,8 +9,8 @@ import {
 } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import ConfirmActionMessage from '@kubevirt-utils/components/ConfirmActionMessage/ConfirmActionMessage';
 import TabModal from '@kubevirt-utils/components/TabModal/TabModal';
+import { notifyBootableVolumeDeleted } from '@kubevirt-utils/hooks/useInFlightToast/cancel/notifyDeletedUploadResources';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { notifyBootableVolumeDeleted } from '@kubevirt-utils/hooks/useUploadProgressToast/cancel/notifyDeletedUploadResources';
 import { deleteDVAndRelatedResources } from '@kubevirt-utils/resources/bootableresources/helpers';
 import { isK8sNotFoundError } from '@kubevirt-utils/resources/errorStatusChecks';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';

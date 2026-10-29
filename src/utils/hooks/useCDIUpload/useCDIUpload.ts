@@ -11,7 +11,7 @@ import { useKubevirtTranslation } from '../useKubevirtTranslation';
 import {
   registerCdiUpload,
   syncCdiUploadProgressAndFailures,
-} from '../useUploadProgressToast/cdi/cdiUploadTracking';
+} from '../useInFlightToast/features/uploads/cdi/cdiUploadTracking';
 import { performUpload } from './performUpload';
 import {
   type CDIConfig,

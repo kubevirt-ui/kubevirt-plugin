@@ -1,5 +1,5 @@
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { getVmCdromUploadKeyFromVm } from '@kubevirt-utils/hooks/useUploadProgressToast/keys/uploadKeys';
+import { getVmCdromUploadKeyFromVm } from '@kubevirt-utils/hooks/useInFlightToast/keys/uploadKeys';
 import { generateUploadDiskName } from '@kubevirt-utils/utils/utils';
 import { isRunning } from '@virtualmachines/utils';
 
