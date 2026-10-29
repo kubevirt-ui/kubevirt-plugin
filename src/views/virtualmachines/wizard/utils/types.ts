@@ -67,6 +67,14 @@ export type UseBootableVolumesValues = {
   volumeSnapshotSources: { [dataSourceName: string]: VolumeSnapshotKind };
 };
 
+export type BootVolumeTableRow = {
+  metadata?: BootableVolume['metadata'];
+  preferenceVariant: PreferenceOption;
+  rowKey: string;
+  variant: string;
+  volume: BootableVolume;
+};
+
 export type ApplySelectedBootableVolumeToForm = {
   dvSource: null | V1beta1DataVolume;
   preferenceVariant?: PreferenceOption;
