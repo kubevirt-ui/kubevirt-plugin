@@ -1,0 +1,9 @@
+{
+  "browser": {
+    "ignoreHTTPSErrors": true,
+    "launchOptions": {
+      "args": ["--ignore-certificate-errors"]
+    },
+    "viewport": { "width": 1920, "height": 1080 }
+  }
+}

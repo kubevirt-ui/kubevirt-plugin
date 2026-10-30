@@ -61,20 +61,20 @@ const MigrationPolicyConfigurations: React.FC<MigrationPolicyConfigurationsProps
                   key={key}
                   label={label}
                 >
-                  labelHelp && (
-                  <FormGroupHelperText>
-                    <Title
-                      className="pf-v6-c-popover__header-title pf-v6-u-mb-sm"
-                      headingLevel="h6"
-                    >
-                      {label}
-                    </Title>
-                    {labelHelp.helpText}
-                    <a href={labelHelp.helpInfo} rel="noopener noreferrer" target="_blank">
-                      {labelHelp.helpInfo}
-                    </a>
-                  </FormGroupHelperText>
-                  )
+                  {labelHelp && (
+                    <FormGroupHelperText>
+                      <Title
+                        className="pf-v6-c-popover__header-title pf-v6-u-mb-sm"
+                        headingLevel="h6"
+                      >
+                        {label}
+                      </Title>
+                      {labelHelp.helpText}
+                      <a href={labelHelp.helpInfo} rel="noopener noreferrer" target="_blank">
+                        {labelHelp.helpInfo}
+                      </a>
+                    </FormGroupHelperText>
+                  )}
                   <Split>
                     <SplitItem>
                       <Component setState={setStateField(key)} state={state?.[key]} />
