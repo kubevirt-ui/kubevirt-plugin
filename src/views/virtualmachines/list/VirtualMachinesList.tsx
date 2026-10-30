@@ -1,5 +1,6 @@
 import { type FC, useEffect, useMemo, useRef } from 'react';
 
+import { VirtualMachineModelRef } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { tourGuideVM } from '@kubevirt-utils/components/GuidedTour/utils/constants';
 import { runningTourSignal } from '@kubevirt-utils/components/GuidedTour/utils/guidedTourSignals';
@@ -7,6 +8,7 @@ import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTabl
 import { getK8sRowId } from '@kubevirt-utils/components/KubevirtTable/utils';
 import { PageTitles } from '@kubevirt-utils/constants/page-constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import useKubevirtUserSettingsTableColumnWidths from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettingsTableColumnWidths';
 import usePagination from '@kubevirt-utils/hooks/usePagination/usePagination';
 import useQuery from '@kubevirt-utils/hooks/useQuery';
 import { EXPORT_TABLE_KEYS, KubevirtTableExport } from '@kubevirt-utils/hooks/useTableExport';
@@ -30,11 +32,7 @@ import { VM_COLUMN_KEYS, type VMCallbacks } from './virtualMachinesDefinition';
 
 import './VirtualMachinesList.scss';
 
-type VirtualMachinesListProps = {
-  allVMsLoaded?: boolean;
-  cluster?: string;
-  namespace: string;
-};
+type VirtualMachinesListProps = { allVMsLoaded?: boolean; cluster?: string; namespace: string };
 
 const VirtualMachinesList: FC<VirtualMachinesListProps> = ({
   allVMsLoaded,
@@ -69,6 +67,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({
 
   const { onPaginationChange, pagination, resetPagination } = usePagination();
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const { resetColumnWidths } = useKubevirtUserSettingsTableColumnWidths(VirtualMachineModelRef);
 
   const { clearAllFiltersWithReset, filterDefinitions, filteredVMs, filters, handleSetFilters } =
     useVMListFilterState(vmsToShow, vmiMapper, pvcMapper, resetPagination);
@@ -86,7 +85,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({
     /* eslint-disable-next-line react-hooks/exhaustive-deps */
     [vmsSignal.value, namespace, cluster],
   );
-  const hasNoVMs = useMemo(() => allVMsInNamespace.length === 0, [allVMsInNamespace]);
+  const hasNoVMs = !allVMsInNamespace.length;
 
   const exportButton = (
     <KubevirtTableExport<V1VirtualMachine, VMCallbacks>
@@ -123,6 +122,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({
                 filters={filters}
                 handleSetFilters={handleSetFilters}
                 onPageChange={onPaginationChange}
+                onRestoreColumnWidths={resetColumnWidths}
                 pagination={pagination}
                 searchInputRef={searchInputRef}
                 vmimMapper={vmimMapper}
@@ -148,6 +148,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({
                 }
                 pagination={pagination}
                 persistSortInUrl
+                tableId={VirtualMachineModelRef}
                 unfilteredData={allVMsInNamespace}
               />
             </>
