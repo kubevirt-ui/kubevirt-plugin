@@ -1,3 +1,4 @@
+import { VirtualMachineInstancetypeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import type {
   V1VirtualMachine,
   V1VirtualMachineInstance,
@@ -7,7 +8,7 @@ import {
   CLUSTER_INSTANCE_TYPE_NAME_ANNOTATION,
   CLUSTER_PREFERENCE_NAME_ANNOTATION,
 } from './constants';
-import { isExpandableSpecVM, isInstanceTypeVM } from './helper';
+import { getInstanceTypeModelFromMatcher, isExpandableSpecVM, isInstanceTypeVM } from './helper';
 
 const baseVM = (): V1VirtualMachine => ({
   apiVersion: 'kubevirt.io/v1',
@@ -33,6 +34,16 @@ const baseVMI = (): V1VirtualMachineInstance => ({
 });
 
 describe('instancetype/helper', () => {
+  describe('getInstanceTypeModelFromMatcher', () => {
+    it('uses namespaced model when matcher namespace is set and kind is omitted', () => {
+      expect(
+        getInstanceTypeModelFromMatcher({ name: 'user-it', namespace: 'ns' } as Parameters<
+          typeof getInstanceTypeModelFromMatcher
+        >[0]),
+      ).toEqual(expect.objectContaining({ kind: VirtualMachineInstancetypeModel.kind }));
+    });
+  });
+
   describe('isExpandableSpecVM', () => {
     it('is true when only spec.preference is set', () => {
       const vm: V1VirtualMachine = {

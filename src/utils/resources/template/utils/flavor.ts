@@ -22,7 +22,7 @@ import {
   getTemplateVirtualMachineCPU,
   getTemplateVirtualMachineObject,
 } from './selectors';
-import { findInstanceTypeForTemplate } from './templateInstanceType';
+import { findInstanceTypeForTemplate, isTemplateWithInstanceType } from './templateInstanceType';
 
 export type TemplateCPUMemoryDisplayOptions = CPUMemoryDisplayOptions & {
   instanceTypes?: InstanceTypeUnion[];
@@ -31,10 +31,10 @@ export type TemplateCPUMemoryDisplayOptions = CPUMemoryDisplayOptions & {
 const getTemplateCPUMemoryFromInstanceTypes = (
   template: Template,
   instanceTypes: InstanceTypeUnion[],
-): { cpu: V1CPU | undefined; memory: string | undefined } | null => {
+): { cpu: V1CPU | undefined; memory: string | undefined } | undefined => {
   const instanceType = findInstanceTypeForTemplate(template, instanceTypes);
   if (!instanceType) {
-    return null;
+    return undefined;
   }
 
   const cpuCount = getInstanceTypeCPU(instanceType);
@@ -44,6 +44,32 @@ const getTemplateCPUMemoryFromInstanceTypes = (
     cpu: cpuCount ? { cores: cpuCount } : undefined,
     memory,
   };
+};
+
+type TemplateCPUMemorySources = {
+  cpu: V1CPU | undefined;
+  memory: string | undefined;
+};
+
+/** Domain CPU/memory, or empty when instance-type lookup failed and domain values would mislead. */
+const resolveTemplateCPUMemorySources = (
+  template: Template,
+  instanceTypes?: InstanceTypeUnion[],
+): TemplateCPUMemorySources => {
+  if (instanceTypes?.length) {
+    const fromInstanceType = getTemplateCPUMemoryFromInstanceTypes(template, instanceTypes);
+    if (fromInstanceType) {
+      return fromInstanceType;
+    }
+  }
+
+  const shouldUseDomain = !isTemplateWithInstanceType(template) || !instanceTypes?.length;
+
+  if (shouldUseDomain) {
+    return getMemoryCPU(getTemplateVirtualMachineObject(template));
+  }
+
+  return { cpu: undefined, memory: undefined };
 };
 
 /**
@@ -140,12 +166,7 @@ export const getTemplateCPUMemoryDisplayValue = (
   t: TFunction,
   options?: TemplateCPUMemoryDisplayOptions,
 ): CPUMemoryDisplayValue => {
-  const fromInstanceType =
-    options?.instanceTypes &&
-    getTemplateCPUMemoryFromInstanceTypes(template, options.instanceTypes);
-
-  const { cpu, memory } =
-    fromInstanceType ?? getMemoryCPU(getTemplateVirtualMachineObject(template));
+  const { cpu, memory } = resolveTemplateCPUMemorySources(template, options?.instanceTypes);
 
   return getCPUMemoryDisplayValue(cpu, memory, t, options);
 };

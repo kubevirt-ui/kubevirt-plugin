@@ -5,10 +5,14 @@ import {
   VirtualMachineInstancetypeModel,
 } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { getInstanceTypeModelFromMatcher } from '@kubevirt-utils/resources/instancetype/helper';
+import {
+  getInstanceTypeMatcherNamespace,
+  getInstanceTypeModelFromMatcher,
+} from '@kubevirt-utils/resources/instancetype/helper';
 import { type InstanceTypeUnion } from '@kubevirt-utils/resources/instancetype/types';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getInstanceTypeMatcher } from '@kubevirt-utils/resources/vm';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 
 import { updateTemplate } from './helpers';
 import { extractParameterName } from './parameters';
@@ -40,6 +44,45 @@ export const getResolvedInstanceTypeName = (template: Template): string | undefi
   return getParameters(template)?.find((param) => param.name === paramName)?.value;
 };
 
+const findClusterInstanceType = (
+  instanceTypes: InstanceTypeUnion[],
+  name: string,
+): InstanceTypeUnion | undefined =>
+  instanceTypes.find(
+    (instanceType) =>
+      instanceType.kind === VirtualMachineClusterInstancetypeModel.kind &&
+      getName(instanceType) === name,
+  );
+
+const findNamespacedInstanceType = (
+  instanceTypes: InstanceTypeUnion[],
+  name: string,
+  namespace: string | undefined,
+): InstanceTypeUnion | undefined => {
+  const isNamespacedKind = (instanceType: InstanceTypeUnion): boolean =>
+    instanceType.kind === VirtualMachineInstancetypeModel.kind ||
+    Boolean(instanceType.kind && !instanceType.kind.includes('cluster'));
+
+  const matchesName = (instanceType: InstanceTypeUnion): boolean =>
+    isNamespacedKind(instanceType) && getName(instanceType) === name;
+
+  if (namespace) {
+    return instanceTypes.find(
+      (instanceType) => matchesName(instanceType) && getNamespace(instanceType) === namespace,
+    );
+  }
+
+  const matches = instanceTypes.filter(matchesName);
+  return matches.length === 1 ? matches[0] : undefined;
+};
+
+const getTemplateInstanceTypeNamespace = (
+  template: Template,
+  vm: V1VirtualMachine,
+  matcher: NonNullable<ReturnType<typeof getInstanceTypeMatcher>>,
+): string | undefined =>
+  getInstanceTypeMatcherNamespace(matcher) ?? getNamespace(vm) ?? getNamespace(template);
+
 /** Resolves the instance type CR referenced by a template (cluster or namespaced). */
 export const findInstanceTypeForTemplate = (
   template: Template,
@@ -57,24 +100,24 @@ export const findInstanceTypeForTemplate = (
     return undefined;
   }
 
+  const namespace = getTemplateInstanceTypeNamespace(template, vm, matcher);
   const instanceTypeModel = getInstanceTypeModelFromMatcher(matcher);
 
   if (instanceTypeModel.kind === VirtualMachineInstancetypeModel.kind) {
-    const namespace = getNamespace(vm) ?? getNamespace(template);
-
-    return instanceTypes.find(
-      (instanceType) =>
-        instanceType.kind === VirtualMachineInstancetypeModel.kind &&
-        getName(instanceType) === resolvedName &&
-        getNamespace(instanceType) === namespace,
-    );
+    return findNamespacedInstanceType(instanceTypes, resolvedName, namespace);
   }
 
-  return instanceTypes.find(
-    (instanceType) =>
-      instanceType.kind === VirtualMachineClusterInstancetypeModel.kind &&
-      getName(instanceType) === resolvedName,
-  );
+  const clusterMatch = findClusterInstanceType(instanceTypes, resolvedName);
+  if (clusterMatch) {
+    return clusterMatch;
+  }
+
+  // Matcher kind omitted (defaults to cluster) but name may refer to a namespaced CR.
+  if (isEmpty(matcher.kind)) {
+    return findNamespacedInstanceType(instanceTypes, resolvedName, namespace);
+  }
+
+  return undefined;
 };
 
 /**

@@ -60,10 +60,10 @@ export const getSpecConfiguration = ({
       }),
     ...(instanceTypeName && {
       instancetype: {
-        ...(selectedInstanceType?.type === 'user' &&
-          selectedInstanceType.namespace && {
-            kind: VirtualMachineInstancetypeModel.kind,
-          }),
+        ...(selectedInstanceType?.type === 'user' && {
+          kind: VirtualMachineInstancetypeModel.kind,
+          ...(selectedInstanceType.namespace && { namespace: selectedInstanceType.namespace }),
+        }),
         name: instanceTypeName,
       },
     }),
