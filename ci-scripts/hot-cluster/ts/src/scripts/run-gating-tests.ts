@@ -14,6 +14,7 @@ import { execFileSync, execSync } from 'node:child_process';
 import { requireEnv } from '../utils';
 
 import { parseTestArgs } from './parse-test-args';
+import { resolveHcPlaywrightRunner } from './resolve-hc-playwright-runner';
 import {
   normalizeTestProject,
   resolvePlaywrightProject,
@@ -91,7 +92,8 @@ const main = async (): Promise<void> => {
         : `Running Playwright project '${playwrightProject}'` +
             (testArgs.length > 0 ? ` with args: ${testArgs.join(' ')}` : ''),
     );
-    execFileSync('./playwright-runner-hc-e2e.sh', [playwrightProject, ...testArgs], {
+    const runnerPath = resolveHcPlaywrightRunner(repoRoot);
+    execFileSync(runnerPath, [playwrightProject, ...testArgs], {
       cwd: repoRoot,
       stdio: 'inherit',
     });
