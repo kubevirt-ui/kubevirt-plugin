@@ -16,7 +16,7 @@
       "onAutoForward": "silent"
     },
     "10000": {
-      "label": "X11 Server (Cypress)",
+      "label": "X11 Server (headed Playwright)",
       "onAutoForward": "silent"
     }
   },

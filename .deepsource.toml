@@ -1,7 +1,7 @@
 version = 1
 
 test_patterns = [
-  "cypress/tests/**",
+  "playwright/tests/**",
   "**/*.test.*"
 ]
 
