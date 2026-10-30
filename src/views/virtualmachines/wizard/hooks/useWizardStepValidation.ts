@@ -1,7 +1,6 @@
 import { useCallback } from 'react';
 import { useWatch } from 'react-hook-form';
 
-import { vmNameInputSchema } from '@virtualmachines/wizard/form/schema/deployment/createDeploymentSchema';
 import {
   getNavigationPrerequisites,
   hasWizardStepErrors,
@@ -9,8 +8,9 @@ import {
   triggerWizardStepsValidation,
 } from '@virtualmachines/wizard/form/stepValidation';
 import { useVMWizardForm } from '@virtualmachines/wizard/form/VMWizardFormProvider';
+import useVmNameValidation from '@virtualmachines/wizard/hooks/useVmNameValidation';
 import { useVMWizardState } from '@virtualmachines/wizard/state/useVMWizardState';
-import { VMCreationMethod, VMWizardStep } from '@virtualmachines/wizard/utils/constants';
+import { VMWizardStep } from '@virtualmachines/wizard/utils/constants';
 
 type WizardStepValidation = {
   isStepDisabled: (stepId: VMWizardStep) => boolean;
@@ -20,33 +20,28 @@ type WizardStepValidation = {
 // Derives navigation gates directly from the current RHF errors and active flow
 const useWizardStepValidation = (): WizardStepValidation => {
   const { control, formState, getValues, trigger } = useVMWizardForm();
-  const { currentStep, strictVMName, visitedSteps } = useVMWizardState();
-  const [creationMethod, vmName] = useWatch({
-    control,
-    name: ['creationMethod', 'deployment.name'],
-  });
+  const { currentStep, visitedSteps } = useVMWizardState();
+  const creationMethod = useWatch({ control, name: 'creationMethod' });
+  const { isVmNameValid } = useVmNameValidation();
 
   const errorsByStep = mapWizardErrorsToSteps(formState.errors, creationMethod);
 
   const isStepValid = useCallback(
     (stepId: VMWizardStep): boolean => {
-      // VM name, keep soft name validation only. Other fields the schema error map
-      if (
-        stepId === VMWizardStep.DEPLOYMENT_DETAILS &&
-        currentStep === stepId &&
-        !strictVMName &&
-        creationMethod !== VMCreationMethod.CLONE
-      ) {
-        if (hasWizardStepErrors(formState.errors, stepId, creationMethod, ['deployment.name'])) {
-          return false;
-        }
+      const useSharedNameValidation =
+        stepId === VMWizardStep.DEPLOYMENT_DETAILS && currentStep === stepId;
 
-        return vmNameInputSchema.isValidSync(vmName);
+      if (!useSharedNameValidation) {
+        return !errorsByStep[stepId];
       }
 
-      return !errorsByStep[stepId];
+      if (hasWizardStepErrors(formState.errors, stepId, creationMethod, ['deployment.name'])) {
+        return false;
+      }
+
+      return isVmNameValid;
     },
-    [creationMethod, currentStep, errorsByStep, formState.errors, strictVMName, vmName],
+    [creationMethod, currentStep, errorsByStep, formState.errors, isVmNameValid],
   );
 
   const isStepDisabled = useCallback(
