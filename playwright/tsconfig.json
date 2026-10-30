@@ -1,22 +1,47 @@
 {
+  "extends": "../tsconfig.json",
   "compilerOptions": {
     "baseUrl": ".",
-    "target": "es2022",
-    "lib": ["es2022", "DOM", "DOM.Iterable"],
-    "module": "commonjs",
-    "moduleResolution": "node",
-    "types": ["node", "@playwright/test"],
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "resolveJsonModule": true,
-    "strict": false,
-    "noImplicitOverride": true,
-    "useUnknownInCatchVariables": true,
+    "module": "esnext",
     "noEmit": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "strict": false,
+    "types": ["node"],
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@component-deps/*": ["./component-dependencies/*"],
+      "@images/*": ["../images/*"],
+      "@kubevirt-extensions/*": ["../src/extensions/*"],
+      "@kubevirt-utils": ["../src/utils"],
+      "@kubevirt-utils/*": ["../src/utils/*"],
+      "@lightspeed/*": ["../src/views/lightspeed/*"],
+      "@multicluster/*": ["../src/multicluster/*"],
+      "@search/*": ["../src/views/search/*"],
+      "@settings/*": ["../src/views/settings/*"],
+      "@templates/*": ["../src/views/templates/*"],
+      "@topology/*": ["../src/views/topology/*"],
+      "@virtualmachines/*": ["../src/views/virtualmachines/*"],
+      "src/*": ["../src/*"]
     }
   },
-  "include": ["./**/*.ts", "../playwright.config.ts"],
-  "exclude": ["node_modules"]
+  "include": [
+    "./src/**/*.ts",
+    "./tests/**/*.ts",
+    "./component-dependencies/fixtures/**/*.ts",
+    "./component-dependencies/gallery/**/*.ts",
+    "./component-dependencies/scenes/shared/**/*.ts",
+    "./component-dependencies/scenes/shared/**/*.tsx",
+    "./component-dependencies/scenes/**/*.scene.ts",
+    "./component-dependencies/scenes/**/*.scene.tsx",
+    "./component-dependencies/stories/**/*.ts",
+    "./component-dependencies/stories/**/*.tsx",
+    "./component-dependencies/stubs/**/*.ts",
+    "../playwright.config.ts",
+    "../@types/**/*",
+    "../images/**/*",
+    "../src/globals.d.ts",
+    "../src/**/*.d.ts"
+  ],
+  "exclude": ["node_modules", "./component-dependencies/bundle"]
 }
