@@ -6,6 +6,7 @@ import { buildColumnLayout } from '@kubevirt-utils/components/KubevirtTable/util
 import { type TableExportColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettingsTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettingsTableColumns';
+import useTemplatePageInstanceTypes from '@kubevirt-utils/resources/template/hooks/useTemplatePageInstanceTypes';
 import { type TemplateOrRequest } from '@kubevirt-utils/resources/template/utils';
 
 import { getTemplateColumns } from '../virtualMachineTemplatesDefinition';
@@ -22,10 +23,11 @@ const useVirtualMachineTemplatesListColumns = (
   isAllClustersPage: boolean,
 ): UseVirtualMachineTemplatesListColumnsResult => {
   const { t } = useKubevirtTranslation();
+  const instanceTypes = useTemplatePageInstanceTypes(namespace);
 
   const columns = useMemo(
-    () => getTemplateColumns(t, namespace, isAllClustersPage),
-    [t, namespace, isAllClustersPage],
+    () => getTemplateColumns(t, namespace, isAllClustersPage, instanceTypes),
+    [t, namespace, isAllClustersPage, instanceTypes],
   );
 
   const manageableColumns = useMemo(() => columns.filter((col) => col.label), [columns]);

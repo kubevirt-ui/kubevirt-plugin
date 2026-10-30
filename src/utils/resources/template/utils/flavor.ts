@@ -2,6 +2,11 @@ import { type TFunction } from 'i18next';
 
 import { type V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { type V1CPU, type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import {
+  getInstanceTypeCPU,
+  getInstanceTypeMemory,
+} from '@kubevirt-utils/resources/instancetype/selectors';
+import { type InstanceTypeUnion } from '@kubevirt-utils/resources/instancetype/types';
 import { type Template } from '@kubevirt-utils/resources/template';
 import {
   type CPUMemoryDisplayOptions,
@@ -17,6 +22,29 @@ import {
   getTemplateVirtualMachineCPU,
   getTemplateVirtualMachineObject,
 } from './selectors';
+import { findInstanceTypeForTemplate } from './templateInstanceType';
+
+export type TemplateCPUMemoryDisplayOptions = CPUMemoryDisplayOptions & {
+  instanceTypes?: InstanceTypeUnion[];
+};
+
+const getTemplateCPUMemoryFromInstanceTypes = (
+  template: Template,
+  instanceTypes: InstanceTypeUnion[],
+): { cpu: V1CPU | undefined; memory: string | undefined } | null => {
+  const instanceType = findInstanceTypeForTemplate(template, instanceTypes);
+  if (!instanceType) {
+    return null;
+  }
+
+  const cpuCount = getInstanceTypeCPU(instanceType);
+  const memory = getInstanceTypeMemory(instanceType)?.toString();
+
+  return {
+    cpu: cpuCount ? { cores: cpuCount } : undefined,
+    memory,
+  };
+};
 
 /**
  * parses CPU and returns its sockets, cores and threads
@@ -110,9 +138,14 @@ export const getTemplateFlavorData = (
 export const getTemplateCPUMemoryDisplayValue = (
   template: Template,
   t: TFunction,
-  options?: CPUMemoryDisplayOptions,
+  options?: TemplateCPUMemoryDisplayOptions,
 ): CPUMemoryDisplayValue => {
-  const { cpu, memory } = getMemoryCPU(getTemplateVirtualMachineObject(template));
+  const fromInstanceType =
+    options?.instanceTypes &&
+    getTemplateCPUMemoryFromInstanceTypes(template, options.instanceTypes);
+
+  const { cpu, memory } =
+    fromInstanceType ?? getMemoryCPU(getTemplateVirtualMachineObject(template));
 
   return getCPUMemoryDisplayValue(cpu, memory, t, options);
 };

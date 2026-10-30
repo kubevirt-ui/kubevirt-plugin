@@ -1,24 +1,20 @@
-import { type FC, useMemo } from 'react';
+import { type FC } from 'react';
 
 import { INSTANCETYPE_CLASS_DISPLAY_NAME } from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/InstanceTypeDrilldownSelect/utils/constants';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import InstanceTypeModal from '@kubevirt-utils/components/InstanceTypeModal/InstanceTypeModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
-import useClusterInstanceTypes from '@kubevirt-utils/hooks/useClusterInstanceTypes';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import {
-  getInstanceTypeCPU,
-  getInstanceTypeMemory,
-} from '@kubevirt-utils/resources/instancetype/selectors';
-import { getAnnotation, getName } from '@kubevirt-utils/resources/shared';
+import { getAnnotation, getNamespace } from '@kubevirt-utils/resources/shared';
 import {
   createTemplateInstanceTypeSubmit,
-  getResolvedInstanceTypeName,
   getTemplateVirtualMachineObject,
   type Template,
 } from '@kubevirt-utils/resources/template';
-import { getCPUMemoryDisplayValue } from '@kubevirt-utils/resources/vm';
+import useFindInstanceTypeForTemplate from '@kubevirt-utils/resources/template/hooks/useFindInstanceTypeForTemplate';
+import useTemplateCPUMemoryDisplayValue from '@kubevirt-utils/resources/template/hooks/useTemplateCPUMemoryDisplayValue';
+import useTemplatePageInstanceTypes from '@kubevirt-utils/resources/template/hooks/useTemplatePageInstanceTypes';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 
 type TemplateInstanceTypeDescriptionItemProps = {
@@ -32,31 +28,17 @@ const TemplateInstanceTypeDescriptionItem: FC<TemplateInstanceTypeDescriptionIte
 }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
+  const templateNamespace = getNamespace(template);
+  const allInstanceTypes = useTemplatePageInstanceTypes(templateNamespace);
+  const currentInstanceType = useFindInstanceTypeForTemplate(template, templateNamespace);
+  const { cpuMemoryText, isEmpty } = useTemplateCPUMemoryDisplayValue(template);
 
   const vm = getTemplateVirtualMachineObject(template);
-  const resolvedName = getResolvedInstanceTypeName(template);
-  const [clusterInstanceTypes] = useClusterInstanceTypes();
-
-  const currentInstanceType = useMemo(
-    () =>
-      clusterInstanceTypes.find(
-        (instanceTypeResource) => getName(instanceTypeResource) === resolvedName,
-      ),
-    [clusterInstanceTypes, resolvedName],
-  );
-
-  const cpuMemoryText = useMemo(() => {
-    if (!currentInstanceType) return undefined;
-    const cpuCount = getInstanceTypeCPU(currentInstanceType);
-    const memory = getInstanceTypeMemory(currentInstanceType)?.toString();
-    return getCPUMemoryDisplayValue(cpuCount ? { cores: cpuCount } : undefined, memory, t)
-      .cpuMemoryText;
-  }, [currentInstanceType, t]);
 
   const onEditClick = (): void =>
     createModal?.(({ isOpen, onClose }) => (
       <InstanceTypeModal
-        allInstanceTypes={clusterInstanceTypes}
+        allInstanceTypes={allInstanceTypes}
         instanceType={currentInstanceType}
         isOpen={isOpen}
         onClose={onClose}
@@ -67,7 +49,7 @@ const TemplateInstanceTypeDescriptionItem: FC<TemplateInstanceTypeDescriptionIte
 
   return (
     <DescriptionItem
-      descriptionData={cpuMemoryText ?? <MutedTextSpan text={t('Unknown')} />}
+      descriptionData={isEmpty ? <MutedTextSpan text={t('Unknown')} /> : cpuMemoryText}
       descriptionHeader={t('InstanceType')}
       isEdit={editable}
       olsObj={template}

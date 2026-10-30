@@ -8,10 +8,10 @@ import { getAnnotation, getName, getUID } from '@kubevirt-utils/resources/shared
 import {
   ANNOTATIONS,
   getTemplateCategoryDisplay,
-  getTemplateCPUMemoryDisplayValue,
   getTemplateName,
   type Template,
 } from '@kubevirt-utils/resources/template';
+import useTemplateCPUMemoryDisplayValue from '@kubevirt-utils/resources/template/hooks/useTemplateCPUMemoryDisplayValue';
 import { getTemplateBootSourceType } from '@kubevirt-utils/resources/template/hooks/useVmTemplateSource/utils';
 import { getVMBootSourceLabel } from '@kubevirt-utils/resources/vm/utils/source';
 import { ARCHITECTURE_ID, getArchitecture } from '@kubevirt-utils/utils/architecture';
@@ -27,6 +27,7 @@ type TemplatesTableRowProps = {
   activeColumnIDs: string[];
   availableDatasources: Record<string, V1beta1DataSource>;
   availableTemplatesUID: Set<string>;
+  catalogNamespace?: string;
   clusterPreference: null | V1beta1VirtualMachineClusterPreference;
   onSelectTemplate: (template: Template) => void;
   selectedTemplate?: Template;
@@ -37,6 +38,7 @@ const TemplatesTableRow: FC<TemplatesTableRowProps> = ({
   activeColumnIDs,
   availableDatasources,
   availableTemplatesUID,
+  catalogNamespace,
   clusterPreference,
   onSelectTemplate,
   selectedTemplate,
@@ -57,7 +59,9 @@ const TemplatesTableRow: FC<TemplatesTableRowProps> = ({
       ? availableDatasources[`${sourceRef.namespace}-${sourceRef.name}`]
       : undefined;
 
-  const { cpuMemoryText } = getTemplateCPUMemoryDisplayValue(template, t);
+  const { cpuMemoryText } = useTemplateCPUMemoryDisplayValue(template, {
+    namespace: catalogNamespace,
+  });
 
   return (
     <Tr

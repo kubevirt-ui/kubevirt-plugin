@@ -1,8 +1,13 @@
 import produce from 'immer';
 
+import {
+  VirtualMachineClusterInstancetypeModel,
+  VirtualMachineInstancetypeModel,
+} from '@kubevirt-ui-ext/kubevirt-api/console';
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { getInstanceTypeModelFromMatcher } from '@kubevirt-utils/resources/instancetype/helper';
 import { type InstanceTypeUnion } from '@kubevirt-utils/resources/instancetype/types';
-import { getName } from '@kubevirt-utils/resources/shared';
+import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getInstanceTypeMatcher } from '@kubevirt-utils/resources/vm';
 
 import { updateTemplate } from './helpers';
@@ -33,6 +38,43 @@ export const getResolvedInstanceTypeName = (template: Template): string | undefi
   if (!paramName) return rawName;
 
   return getParameters(template)?.find((param) => param.name === paramName)?.value;
+};
+
+/** Resolves the instance type CR referenced by a template (cluster or namespaced). */
+export const findInstanceTypeForTemplate = (
+  template: Template,
+  instanceTypes: InstanceTypeUnion[],
+): InstanceTypeUnion | undefined => {
+  if (!isTemplateWithInstanceType(template)) {
+    return undefined;
+  }
+
+  const vm = getTemplateVirtualMachineObject(template);
+  const matcher = getInstanceTypeMatcher(vm);
+  const resolvedName = getResolvedInstanceTypeName(template);
+
+  if (!matcher || !resolvedName) {
+    return undefined;
+  }
+
+  const instanceTypeModel = getInstanceTypeModelFromMatcher(matcher);
+
+  if (instanceTypeModel.kind === VirtualMachineInstancetypeModel.kind) {
+    const namespace = getNamespace(vm) ?? getNamespace(template);
+
+    return instanceTypes.find(
+      (instanceType) =>
+        instanceType.kind === VirtualMachineInstancetypeModel.kind &&
+        getName(instanceType) === resolvedName &&
+        getNamespace(instanceType) === namespace,
+    );
+  }
+
+  return instanceTypes.find(
+    (instanceType) =>
+      instanceType.kind === VirtualMachineClusterInstancetypeModel.kind &&
+      getName(instanceType) === resolvedName,
+  );
 };
 
 /**
