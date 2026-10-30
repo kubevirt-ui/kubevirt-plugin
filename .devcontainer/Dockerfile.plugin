@@ -13,5 +13,3 @@ RUN apt-get update && \
     libxss1 \
     libasound2 \
     libxtst6 xauth xvfb
-
-RUN npx cypress verify
