@@ -74,11 +74,12 @@ export const createInstanceTypeSchema = (
         then: () => createBootVolumeSchema().required(),
       }),
     compute: createInstanceTypeSelectionSchema(t),
+    guestOperatingSystem: yup.mixed<PreferenceOption>().required(),
     operatingSystem: yup
       .mixed<OperatingSystemType>()
       .oneOf(Object.values(OperatingSystemType))
       .required(),
-    preference: yup.mixed<PreferenceOption>().required(),
+    preference: yup.mixed<PreferenceOption>().nullable().defined(),
     useBootSource: yup.boolean().defined(),
     volumeNamespace: yup.string().defined(),
   });

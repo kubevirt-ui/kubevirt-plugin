@@ -1,13 +1,11 @@
-import { useEffect, useMemo } from 'react';
-import { useWatch } from 'react-hook-form';
+import { useMemo } from 'react';
 
 import { type PreferenceOption } from '@kubevirt-utils/components/AddBootableVolumeModal/types';
 import useClusterPreferences from '@kubevirt-utils/hooks/useClusterPreferences';
 import useHcoWorkloadArchitectures from '@kubevirt-utils/hooks/useHcoWorkloadArchitectures';
 import useUserPreferences from '@kubevirt-utils/hooks/useUserPreferences';
-import { useVMWizardForm } from '@virtualmachines/wizard/form/VMWizardFormProvider';
 import {
-  getDefaultPreference,
+  getGuestOperatingSystemPreferences,
   getSortedPreferencesByOSType,
 } from '@virtualmachines/wizard/steps/InstanceTypesSteps/GuestOSStep/components/PreferenceSelectMenu/hooks/usePreferenceSelectOptions/utils/utils';
 import { type OperatingSystemType } from '@virtualmachines/wizard/steps/InstanceTypesSteps/GuestOSStep/utils/constants';
@@ -26,11 +24,6 @@ const usePreferenceSelectOptions: UsePreferenceSelectOptions = (
   cluster,
   operatingSystemType,
 ) => {
-  const { control, setValue } = useVMWizardForm();
-  const preference = useWatch({
-    control,
-    name: 'instanceType.preference',
-  });
   const [architectures, architecturesLoaded] = useHcoWorkloadArchitectures(cluster);
   const [clusterPreferences, clusterPreferencesLoaded] = useClusterPreferences(null, null, cluster);
   const [userPreferences = [], userPreferencesLoaded] = useUserPreferences(
@@ -45,20 +38,10 @@ const usePreferenceSelectOptions: UsePreferenceSelectOptions = (
 
   const preferences = useMemo(() => {
     const allPreferences = [...(clusterPreferences || []), ...(userPreferences || [])];
-    return getSortedPreferencesByOSType(allPreferences, operatingSystemType, architectures);
+    return getGuestOperatingSystemPreferences(
+      getSortedPreferencesByOSType(allPreferences, operatingSystemType, architectures),
+    );
   }, [architectures, clusterPreferences, userPreferences, operatingSystemType]);
-
-  useEffect(() => {
-    if (!isPreferencesLoaded) return;
-
-    const defaultPref = getDefaultPreference(preferences, operatingSystemType, architectures);
-    const isCurrentPreferenceValid =
-      preference && preferences.some((pref) => pref.name === preference.name);
-
-    if (!isCurrentPreferenceValid) {
-      setValue('instanceType.preference', defaultPref ?? null, { shouldValidate: true });
-    }
-  }, [architectures, isPreferencesLoaded, operatingSystemType, preference, preferences, setValue]);
 
   return {
     isPreferencesLoaded,
