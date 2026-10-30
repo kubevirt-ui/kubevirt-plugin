@@ -27,9 +27,10 @@ export class BootableVolumesPage extends ResourceListPage {
 
   private async selectPreferenceInModal(preferenceName: string): Promise<void> {
     const modal = this.addVolumeModal();
-    const option = modal
-      .getByTestId(`preference-select-option-${preferenceName}`)
-      .or(modal.getByRole('option', { name: new RegExp(preferenceName, 'i') }));
+    // Exact match only: a loose /name/i role filter also matches arch-suffixed
+    // preferences (e.g. fedora.arm64, fedora.s390x) shipped by newer CNV,
+    // causing a strict-mode violation when multiple options match.
+    const option = modal.getByTestId(`preference-select-option-${preferenceName}`);
 
     if (!(await option.isVisible().catch(() => false))) {
       await this.closeOpenSelectMenus(modal);
