@@ -3,7 +3,7 @@ import { type K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
 import { ANNOTATIONS } from '../template';
 
-export const getDescription = (entity: K8sResourceCommon): string =>
+export const getDescription = (entity: K8sResourceCommon): string | undefined =>
   entity?.metadata?.annotations?.description;
 
 export const getLabels = (

@@ -2,7 +2,7 @@ import { type FC, useMemo } from 'react';
 import { useWatch } from 'react-hook-form';
 import classNames from 'classnames';
 
-import { instanceTypeSeriesNameMapper } from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/InstanceTypeDrilldownSelect/utils/constants';
+import { seriesNameIconMapper } from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/InstanceTypeDrilldownSelect/utils/constants';
 import { type RedHatInstanceTypeSeries } from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/InstanceTypeDrilldownSelect/utils/types';
 import {
   getSeriesLabel,
@@ -10,11 +10,12 @@ import {
   is1GiInstanceType,
   seriesHasHugepagesVariant,
 } from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/InstanceTypeDrilldownSelect/utils/utils';
+import MarkdownTooltipContent from '@kubevirt-utils/components/MarkdownTooltipContent/MarkdownTooltipContent';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { type InstanceTypeSeries } from '@kubevirt-utils/resources/instancetype/types';
+import { type InstanceTypeSeriesName } from '@kubevirt-utils/resources/instancetype/types';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Card, CardBody, CardHeader, Flex, Tooltip } from '@patternfly/react-core';
 import { useVMWizardForm } from '@virtualmachines/wizard/form/VMWizardFormProvider';
-import MarkdownTooltipContent from '@virtualmachines/wizard/steps/InstanceTypesSteps/ComputeResourcesStep/components/SelectInstanceTypeSection/components/RedHatProvidedInstanceTypesSection/components/RedHatInstanceTypeSeriesGallery/components/RedHatSeriesMenuCard/MarkdownTooltipContent';
 
 import './RedHatSeriesMenuCard.scss';
 
@@ -33,8 +34,7 @@ const RedHatSeriesMenuCard: FC<RedHatSeriesMenuCardProps> = ({ rhSeriesItem }) =
 
   const { classDisplayNameAnnotation, descriptionAnnotation, seriesName, sizes } = rhSeriesItem;
 
-  const seriesConfig = instanceTypeSeriesNameMapper[seriesName as InstanceTypeSeries];
-  const Icon = seriesConfig?.Icon;
+  const Icon = seriesNameIconMapper[seriesName as InstanceTypeSeriesName];
 
   const isSelectedSeries = useMemo(
     () => seriesName === selectedSeries,
@@ -97,9 +97,13 @@ const RedHatSeriesMenuCard: FC<RedHatSeriesMenuCardProps> = ({ rhSeriesItem }) =
     </Card>
   );
 
-  return (
-    <Tooltip content={<MarkdownTooltipContent content={descriptionAnnotation} />}>{card}</Tooltip>
-  );
+  if (!isEmpty(descriptionAnnotation)) {
+    return (
+      <Tooltip content={<MarkdownTooltipContent content={descriptionAnnotation} />}>{card}</Tooltip>
+    );
+  }
+
+  return card;
 };
 
 export default RedHatSeriesMenuCard;

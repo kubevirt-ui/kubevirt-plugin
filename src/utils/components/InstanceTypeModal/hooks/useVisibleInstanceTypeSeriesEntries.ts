@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 
 import useDisabledInstanceTypeFamilies from '@kubevirt-utils/hooks/useInstanceTypeFamilyAvailability/useDisabledInstanceTypeFamilies';
 import { getInstanceTypePrefix } from '@kubevirt-utils/resources/bootableresources/helpers';
-import { type InstanceTypeSeries } from '@kubevirt-utils/resources/instancetype/types';
+import { type InstanceTypeSeriesName } from '@kubevirt-utils/resources/instancetype/types';
 
 import { type MappedInstanceTypes } from '../utils/types';
 
@@ -12,7 +12,7 @@ type UseVisibleInstanceTypeSeriesEntriesParams = {
   mappedInstanceTypes: MappedInstanceTypes;
 };
 
-export type VisibleInstanceTypeSeriesEntry = [string, MappedInstanceTypes[InstanceTypeSeries]];
+export type VisibleInstanceTypeSeriesEntry = [string, MappedInstanceTypes[InstanceTypeSeriesName]];
 
 const useVisibleInstanceTypeSeriesEntries = ({
   cluster,

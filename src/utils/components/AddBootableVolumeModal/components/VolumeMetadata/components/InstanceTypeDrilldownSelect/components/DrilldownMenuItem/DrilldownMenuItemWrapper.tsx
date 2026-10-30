@@ -2,10 +2,10 @@ import { type FC, type ReactNode, useMemo } from 'react';
 
 import HugepagesInfo from '@kubevirt-utils/components/HugepagesInfo/HugepagesInfo';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { type InstanceTypeSeries } from '@kubevirt-utils/resources/instancetype/types';
+import { type InstanceTypeSeriesName } from '@kubevirt-utils/resources/instancetype/types';
 import { Divider } from '@patternfly/react-core';
 
-import { instanceTypeSeriesNameMapper } from '../../utils/constants';
+import { seriesNameIconMapper } from '../../utils/constants';
 import { type RedHatInstanceTypeSeries } from '../../utils/types';
 import { getSeriesLabel, seriesHasHugepagesVariant } from '../../utils/utils';
 import RedHatInstanceTypeSeriesSizesMenuItems from '../RedHatInstanceTypeSeriesMenu/RedHatInstanceTypeSeriesSizesMenuItems';
@@ -26,7 +26,7 @@ const DrilldownMenuItemWrapper: FC<DrilldownMenuItemWrapperProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const { seriesName, sizes } = series;
-  const Icon = instanceTypeSeriesNameMapper[seriesName as InstanceTypeSeries]?.Icon;
+  const Icon = seriesNameIconMapper[seriesName as InstanceTypeSeriesName];
   const seriesLabel = useMemo(() => getSeriesLabel(seriesName, t), [seriesName, t]);
 
   const getMenuItems = (isHugepages?: boolean): ReactNode => (

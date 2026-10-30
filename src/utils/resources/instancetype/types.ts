@@ -5,7 +5,7 @@ import type {
 
 // InstanceType series and sizes follow common-instancetypes@1.5.1 (https://github.com/kubevirt/common-instancetypes?tab=readme-ov-file#schema)
 
-export type InstanceTypeSize =
+export type InstanceTypeSizeName =
   | '2xlarge'
   | '2xlarge1gi'
   | '2xmedium'
@@ -23,7 +23,7 @@ export type InstanceTypeSize =
   | 'xlarge'
   | 'xlarge1gi';
 
-export type InstanceTypeSeries = 'cx1' | 'd1' | 'm1' | 'n1' | 'o1' | 'rt1' | 'u1';
+export type InstanceTypeSeriesName = 'cx1' | 'd1' | 'm1' | 'n1' | 'o1' | 'rt1' | 'u1';
 
 export type InstanceTypeUnion =
   | V1beta1VirtualMachineClusterInstancetype
