@@ -2,11 +2,14 @@ import { type FC, type ReactNode } from 'react';
 import { useWatch } from 'react-hook-form';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Button, Tooltip } from '@patternfly/react-core';
 import { useVMWizardState } from '@virtualmachines/wizard/state/useVMWizardState';
 
-import { vmNameInputSchema } from '../form/schema/deployment/createDeploymentSchema';
-import { useVMWizardForm } from '../form/VMWizardFormProvider';
+import { vmNameInputSchema } from '../../form/schema/deployment/createDeploymentSchema';
+import { useVMWizardForm } from '../../form/VMWizardFormProvider';
+import { getDisabledTooltipText } from './utils/getDisabledTooltipText';
+import { isVMNameInvalid } from './utils/isVMNameInvalid';
 
 type VMNameConfirmationNextButtonProps = {
   children: ReactNode;
@@ -14,6 +17,7 @@ type VMNameConfirmationNextButtonProps = {
   isDisabled?: boolean;
   isSubmitting?: boolean;
   onClick: () => void;
+  requireVMName?: boolean;
   validateOnClick?: boolean;
 };
 
@@ -23,36 +27,38 @@ const VMNameConfirmationNextButton: FC<VMNameConfirmationNextButtonProps> = ({
   isDisabled: isExternallyDisabled = false,
   isSubmitting = false,
   onClick,
+  requireVMName = true,
   validateOnClick = true,
 }) => {
   const { t } = useKubevirtTranslation();
   const { control, formState, trigger } = useVMWizardForm();
   const { setStrictVMName, strictVMName } = useVMWizardState();
-  const vmName = useWatch({
+  const [vmName, project] = useWatch({
     control,
-    name: 'deployment.name',
+    name: ['deployment.name', 'deployment.project'],
   });
 
   const isVMNameAlmostValid = vmNameInputSchema.isValidSync(vmName);
 
-  const isVMNameInvalid = strictVMName
-    ? Boolean(formState.errors.deployment?.name)
-    : !isVMNameAlmostValid;
-  const isDisabled = isExternallyDisabled || isSubmitting || isVMNameInvalid;
+  const vmNameInvalid = isVMNameInvalid(
+    requireVMName,
+    strictVMName,
+    isVMNameAlmostValid,
+    formState.errors.deployment?.name,
+  );
 
-  let disabledTooltip = vmName ? t('VM name is not valid') : t('VM name is required');
+  // Project and other schema-required fields are gated via isExternallyDisabled (step validation).
+  const isDisabled = isExternallyDisabled || isSubmitting || vmNameInvalid;
 
-  if (isExternallyDisabled) {
-    disabledTooltip = t('Complete all required fields');
-  }
+  const disabledTooltip = getDisabledTooltipText(!isEmpty(project), vmNameInvalid, t, vmName);
 
   const handleClick = async (): Promise<void> => {
-    const isVMNameValid = !validateOnClick || (await trigger('deployment.name'));
-    if (isVMNameValid) {
-      onClick();
+    if (requireVMName && validateOnClick && !(await trigger('deployment.name'))) {
+      setStrictVMName(true);
       return;
     }
-    setStrictVMName(true);
+
+    onClick();
   };
 
   const nextButton = (

@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useWatch } from 'react-hook-form';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Stack, StackItem, Title, TitleSizes } from '@patternfly/react-core';
 import { useVMWizardForm } from '@virtualmachines/wizard/form/VMWizardFormProvider';
 import CreationMethodTileGroup from '@virtualmachines/wizard/steps/DeploymentDetailsStep/components/CreationMethodTileGroup/CreationMethodTileGroup';
@@ -14,8 +15,12 @@ import { isCloneCreationMethod } from '@virtualmachines/wizard/utils/utils';
 const DeploymentDetailsStep: FC = () => {
   const { t } = useKubevirtTranslation();
   const { control } = useVMWizardForm();
-  const creationMethod = useWatch({ control, name: 'creationMethod' });
-  const [editCreationLocation, setEditCreationLocation] = useState(false);
+  const [creationMethod, project] = useWatch({
+    control,
+    name: ['creationMethod', 'deployment.project'],
+  });
+  const needsProjectSelection = isEmpty(project);
+  const [editCreationLocation, setEditCreationLocation] = useState(needsProjectSelection);
 
   const isCloneMethod = isCloneCreationMethod(creationMethod);
 
@@ -46,7 +51,13 @@ const DeploymentDetailsStep: FC = () => {
           {t('Location')}
         </Title>
       </StackItem>
-      <StackItem>{t('Your VirtualMachine will be created in the following location')}</StackItem>
+      <StackItem>
+        {needsProjectSelection
+          ? t(
+              'Select a project or create a new one before continuing. Your VirtualMachine will be created in the selected location.',
+            )
+          : t('Your VirtualMachine will be created in the following location')}
+      </StackItem>
       {!editCreationLocation && (
         <StackItem>
           <VMCreationLocationDisplay

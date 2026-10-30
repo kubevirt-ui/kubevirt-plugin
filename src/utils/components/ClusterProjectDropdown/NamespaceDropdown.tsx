@@ -11,13 +11,11 @@ import { ALL_PROJECTS } from '@kubevirt-utils/hooks/constants';
 import useConsoleNamespaceBookmarks from '@kubevirt-utils/hooks/useConsoleNamespaceBookmarks/useConsoleNamespaceBookmarks';
 import useConsoleShowSystemNamespaces from '@kubevirt-utils/hooks/useConsoleShowSystemNamespaces/useConsoleShowSystemNamespaces';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { isSystemNamespace } from '@kubevirt-utils/resources/namespace/helper';
-import { getName } from '@kubevirt-utils/resources/shared';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 import type { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
 import CreateProjectFromDropdownFooter from './components/CreateProjectFromDropdownFooter';
-import { extractName } from './utils';
+import { extractName, isUserProject } from './utils';
 
 export type NamespaceDropdownProjectCreatedHandler = (project: K8sResourceCommon) => void;
 
@@ -28,6 +26,7 @@ export type NamespaceDropdownProps = {
   disabledTooltip?: string;
   includeAllProjects?: boolean;
   onChange: (project: string) => void;
+  onlyUserProjects?: boolean;
   onProjectCreated?: NamespaceDropdownProjectCreatedHandler;
   selectedProject: string;
 };
@@ -39,6 +38,7 @@ const NamespaceDropdown: FC<NamespaceDropdownProps> = ({
   disabledTooltip,
   includeAllProjects = true,
   onChange,
+  onlyUserProjects = false,
   onProjectCreated,
   selectedProject,
 }): JSX.Element => {
@@ -58,8 +58,20 @@ const NamespaceDropdown: FC<NamespaceDropdownProps> = ({
   const [showSystemNamespaces, setShowSystemNamespaces, showSystemLoaded] =
     useConsoleShowSystemNamespaces(consoleSettingsCluster);
 
+  const visibleProjects = useMemo<K8sResourceCommon[] | null>(() => {
+    if (!projects) {
+      return null;
+    }
+
+    if (!onlyUserProjects) {
+      return projects;
+    }
+
+    return projects.filter(isUserProject);
+  }, [onlyUserProjects, projects]);
+
   const hasSystemNamespaces = useMemo(
-    () => (projects || []).some((project) => isSystemNamespace(getName(project))),
+    () => (projects || []).some((project) => !isUserProject(project)),
     [projects],
   );
 
@@ -92,17 +104,23 @@ const NamespaceDropdown: FC<NamespaceDropdownProps> = ({
     [setShowSystemNamespaces],
   );
 
-  const showSystemToggle = useMemo(
-    () =>
-      showSystemLoaded
-        ? {
-            hasSystemItems: hasSystemNamespaces,
-            onChange: onShowSystemNamespacesChange,
-            show: showSystemNamespaces,
-          }
-        : undefined,
-    [hasSystemNamespaces, onShowSystemNamespacesChange, showSystemLoaded, showSystemNamespaces],
-  );
+  const showSystemToggle = useMemo(() => {
+    if (onlyUserProjects || !showSystemLoaded) {
+      return undefined;
+    }
+
+    return {
+      hasSystemItems: hasSystemNamespaces,
+      onChange: onShowSystemNamespacesChange,
+      show: showSystemNamespaces,
+    };
+  }, [
+    hasSystemNamespaces,
+    onShowSystemNamespacesChange,
+    onlyUserProjects,
+    showSystemLoaded,
+    showSystemNamespaces,
+  ]);
 
   const menuFooterProps = useMemo((): DropdownCreateProjectMenuFooterProps | undefined => {
     if (!onProjectCreated) {
@@ -120,7 +138,7 @@ const NamespaceDropdown: FC<NamespaceDropdownProps> = ({
       extractKey={extractName}
       extractTitle={extractName}
       includeAllItems={includeAllProjects}
-      items={projects || null}
+      items={visibleProjects}
       itemsLoaded={projectsLoaded}
       menuFooter={onProjectCreated ? CreateProjectFromDropdownFooter : undefined}
       menuFooterProps={menuFooterProps}

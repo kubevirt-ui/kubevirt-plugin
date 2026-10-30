@@ -2,7 +2,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import isEqual from 'lodash/isEqual';
 
-import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { logTemplateFlowEvent } from '@kubevirt-utils/extensions/telemetry/telemetry';
 import {
   CUSTOMIZE_VM_BUTTON_CLICKED,
@@ -90,7 +89,9 @@ const useTemplateVMGeneration = ({
 
   const ensureTemplateDraft = useCallback((): Promise<boolean> => {
     const values = getValues();
-    const namespace = values.deployment.project || DEFAULT_NAMESPACE;
+    const namespace = values.deployment.project;
+    if (!namespace) return Promise.resolve(false);
+
     const requestSnapshot = getTemplateGenerationSource(
       values,
       authorizedSSHKeys?.[namespace],
@@ -126,7 +127,9 @@ const useTemplateVMGeneration = ({
 
     const isRequestCurrent = (): boolean => {
       const currentValues = getValues();
-      const currentNamespace = currentValues.deployment.project || DEFAULT_NAMESPACE;
+      const currentNamespace = currentValues.deployment.project;
+
+      if (!currentNamespace) return false;
 
       // The request must still be active, and its inputs must not have changed while awaiting it.
       return (

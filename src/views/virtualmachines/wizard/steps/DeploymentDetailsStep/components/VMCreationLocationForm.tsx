@@ -80,7 +80,11 @@ const VMCreationLocationForm: FC = () => {
                   if (selectedCluster === getValues('deployment.cluster')) return;
                   field.onChange(selectedCluster);
                   setValue('deployment.folder', '');
-                  setValue('deployment.project', DEFAULT_NAMESPACE, { shouldValidate: true });
+
+                  // Only keep DEFAULT_NAMESPACE across clusters
+                  if (getValues('deployment.project') !== DEFAULT_NAMESPACE) {
+                    setValue('deployment.project', '', { shouldValidate: true });
+                  }
                   clearLocationDependentVM();
                 }}
                 selectedCluster={value as string}
@@ -104,8 +108,9 @@ const VMCreationLocationForm: FC = () => {
                 setValue('deployment.folder', '');
                 clearLocationDependentVM();
               }}
+              onlyUserProjects
               onProjectCreated={onLocationProjectCreated}
-              selectedProject={project || DEFAULT_NAMESPACE}
+              selectedProject={project ?? ''}
             />
           )}
         />

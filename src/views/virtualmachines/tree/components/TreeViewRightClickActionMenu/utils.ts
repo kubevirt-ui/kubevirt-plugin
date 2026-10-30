@@ -6,7 +6,7 @@ import { type ActionDropdownItemType } from '@kubevirt-utils/components/ActionsD
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { SINGLE_CLUSTER_KEY } from '@kubevirt-utils/resources/constants';
 import { getLabel, getNamespace } from '@kubevirt-utils/resources/shared';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
+import { isAllNamespaces } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { navigateToVMWizard } from '@multicluster/urls';
 import {
@@ -30,15 +30,21 @@ export const getCreateVMAction = (
   navigate: NavigateFunction,
   namespace: string,
   cluster?: string,
-): ActionDropdownItemType => ({
-  accessReview: getCanCreateVMFleetAccessReview(namespace, cluster),
-  cta: (): void => {
-    navigateToVMWizard({ cluster, namespace, navigate });
-  },
-  disabledTooltip: getDisabledCreateVMTooltip(t, isEmpty(namespace)),
-  id: 'create-vm',
-  label: t('Create VirtualMachine'),
-});
+): ActionDropdownItemType => {
+  const isAllProjectsScope = isAllNamespaces(namespace);
+
+  return {
+    accessReview: isAllProjectsScope
+      ? undefined
+      : getCanCreateVMFleetAccessReview(namespace, cluster),
+    cta: (): void => {
+      navigateToVMWizard({ cluster, namespace, navigate });
+    },
+    disabledTooltip: getDisabledCreateVMTooltip(t, isAllProjectsScope),
+    id: 'create-vm',
+    label: t('Create VirtualMachine'),
+  };
+};
 
 export const getElementComponentsFromID = (
   triggerElement: HTMLElement | null,

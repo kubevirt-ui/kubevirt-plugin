@@ -2,7 +2,6 @@ import { useLocation } from 'react-router';
 
 import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
 import useLocalStorage from '@kubevirt-utils/hooks/useLocalStorage';
-import { getValidNamespace } from '@kubevirt-utils/utils/utils';
 import useIsACMPage from '@multicluster/useIsACMPage';
 import { useActiveNamespace as useActiveNamespaceSDK } from '@openshift-console/dynamic-plugin-sdk';
 import { useHubClusterName } from '@stolostron/multicluster-sdk';
@@ -19,7 +18,7 @@ type WizardInitialValues = {
   cluster: string;
   hubClusterError: unknown;
   isLoadingHubCluster: boolean;
-  namespace: string;
+  namespace: string | undefined;
 };
 
 const useWizardInitialValues = (): WizardInitialValues => {
@@ -36,7 +35,7 @@ const useWizardInitialValues = (): WizardInitialValues => {
   const isACM = useIsACMPage();
 
   const activeNamespace = isACM ? activeNamespaceFromUtil : activeNamespaceFromSDK;
-  const namespace = getValidNamespace(state?.namespace ?? activeNamespace);
+  const requestedNamespace = state?.namespace ?? activeNamespace;
 
   const [clusterFromLocalStorage] = useLocalStorage(SELECTED_CLUSTER.LOCAL_STORAGE_KEY);
 
@@ -51,7 +50,7 @@ const useWizardInitialValues = (): WizardInitialValues => {
     cluster,
     hubClusterError: isACM ? hubClusterError : undefined,
     isLoadingHubCluster: isACM && !hubClusterLoaded,
-    namespace,
+    namespace: requestedNamespace,
   };
 };
 

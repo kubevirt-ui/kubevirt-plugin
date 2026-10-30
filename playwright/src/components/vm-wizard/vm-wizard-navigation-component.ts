@@ -513,11 +513,18 @@ export default class VmWizardNavigationComponent extends BaseComponent {
       return;
     }
 
-    await this.openEditLocationPanel();
-
     const toggle = this.locator('.vm-creation-wizard').getByTestId(
       'namespace-dropdown-menu-toggle',
     );
+    // Empty project auto-opens Location edit (no Edit button); skip open when already editing.
+    const alreadyEditing = await toggle
+      .first()
+      .isVisible({ timeout: TestTimeouts.SHORT_WAIT })
+      .catch(() => false);
+    if (!alreadyEditing) {
+      await this.openEditLocationPanel();
+    }
+
     await toggle.first().waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
     await this.robustClick(toggle.first());
 

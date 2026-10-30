@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { useWatch } from 'react-hook-form';
 
 import { type V1Template } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import {
   createTemplateDraft,
   getParameters,
@@ -25,7 +24,7 @@ const useVMTemplateGeneratedParams = (
     name: ['deployment.cluster', 'deployment.project'],
   });
   const [error, setError] = useState<Error>();
-  const namespace = [namespaceOverride, project].find((ns) => ns) ?? DEFAULT_NAMESPACE;
+  const namespace = [namespaceOverride, project].find((ns) => Boolean(ns)) ?? '';
   const [templateWithGeneratedValues, setTemplateWithGeneratedValues] = useState<Template>();
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -47,6 +46,13 @@ const useVMTemplateGeneratedParams = (
 
     // VirtualMachineTemplates are processed on Next, not on selection.
     if (isEmpty(parametersToGenerate) || isVirtualMachineTemplate(template)) {
+      setError(null);
+      setLoading(false);
+      setTemplateWithGeneratedValues(replaceTemplateParameters(template, parameters));
+      return;
+    }
+
+    if (!namespace) {
       setError(null);
       setLoading(false);
       setTemplateWithGeneratedValues(replaceTemplateParameters(template, parameters));

@@ -2,16 +2,16 @@ import { type FC, type PropsWithChildren } from 'react';
 
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import { getErrorMessage, isEmpty } from '@kubevirt-utils/utils/utils';
-import useWizardInitialValues from '@virtualmachines/wizard/hooks/useWizardInitialValues';
+import useResolvedWizardInitialValues from '@virtualmachines/wizard/hooks/useResolvedWizardInitialValues';
 
 import { VMWizardFormProvider } from './VMWizardFormProvider';
 
 export const VMWizardFormProviderBoundary: FC<PropsWithChildren> = ({ children }) => {
-  const { cluster, hubClusterError, isLoadingHubCluster, namespace } = useWizardInitialValues();
+  const { cluster, error, isLoading, namespace } = useResolvedWizardInitialValues();
 
-  if (isLoadingHubCluster) return <Loading />;
+  if (isLoading) return <Loading />;
 
-  if (!isEmpty(hubClusterError)) throw new Error(getErrorMessage(hubClusterError));
+  if (!isEmpty(error)) throw new Error(getErrorMessage(error));
 
   return (
     <VMWizardFormProvider initialValues={{ cluster, namespace }}>{children}</VMWizardFormProvider>
