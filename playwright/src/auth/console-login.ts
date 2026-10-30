@@ -68,7 +68,8 @@ export async function bootstrapLocalConsoleSession(page: Page, baseURL: string):
  * Not used from specs.
  */
 export async function loginToOpenShiftConsole(page: Page, baseURL: string): Promise<void> {
-  if (EnvVariables.isLocalMode) {
+  // Local bridge (auth disabled) or HC_E2E (SA / auth-disabled console): no OAuth form.
+  if (EnvVariables.isLocalMode || EnvVariables.isSkipBrowserLogin) {
     await bootstrapLocalConsoleSession(page, baseURL);
     return;
   }
