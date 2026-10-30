@@ -1,5 +1,4 @@
 import { type FC } from 'react';
-import { useWatch } from 'react-hook-form';
 import classnames from 'classnames';
 
 import { FLAG_LIGHTSPEED_PLUGIN } from '@kubevirt-utils/flags/consts';
@@ -13,17 +12,13 @@ import {
   WizardFooterWrapper,
 } from '@patternfly/react-core';
 import VMNameConfirmationNextButton from '@virtualmachines/wizard/components/VMNameConfirmationNextButton/VMNameConfirmationNextButton';
-import { useVMWizardForm } from '@virtualmachines/wizard/form/VMWizardFormProvider';
 import useCloseWizard from '@virtualmachines/wizard/hooks/useCloseWizard';
 import useWizardFooterNavigation from '@virtualmachines/wizard/hooks/useWizardFooterNavigation';
 import { type WizardStepNavItemConfig } from '@virtualmachines/wizard/utils/types';
-import { isCloneCreationMethod } from '@virtualmachines/wizard/utils/utils';
 
 const DeploymentDetailsStepFooter: FC<{ navigation: WizardStepNavItemConfig }> = ({
   navigation,
 }) => {
-  const { control } = useVMWizardForm();
-  const creationMethod = useWatch({ control, name: 'creationMethod' });
   const hasOLSConsole = useFlag(FLAG_LIGHTSPEED_PLUGIN);
   const { isNextDisabled, onNext } = useWizardFooterNavigation(navigation);
   const closeWizard = useCloseWizard();
@@ -42,8 +37,7 @@ const DeploymentDetailsStepFooter: FC<{ navigation: WizardStepNavItemConfig }> =
             <VMNameConfirmationNextButton
               isDisabled={isNextDisabled}
               onClick={onNext}
-              requireVMName={!isCloneCreationMethod(creationMethod)}
-              validateOnClick={false}
+              validateVmNameOnClick={false}
             >
               {nextButtonText}
             </VMNameConfirmationNextButton>
