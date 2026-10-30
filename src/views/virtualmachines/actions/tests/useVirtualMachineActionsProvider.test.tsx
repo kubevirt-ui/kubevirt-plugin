@@ -36,6 +36,7 @@ describe('useVirtualMachineActionsProvider tests', () => {
       'migration-menu',
       'vm-action-copy-ssh',
       'vm-action-edit-labels',
+      'vm-action-change-run-strategy',
       'vm-action-delete',
     ]);
   });
@@ -60,6 +61,7 @@ describe('useVirtualMachineActionsProvider tests', () => {
       'migration-menu',
       'vm-action-copy-ssh',
       'vm-action-edit-labels',
+      'vm-action-change-run-strategy',
       'vm-action-delete',
     ]);
   });
@@ -84,6 +86,7 @@ describe('useVirtualMachineActionsProvider tests', () => {
       'migration-menu',
       'vm-action-copy-ssh',
       'vm-action-edit-labels',
+      'vm-action-change-run-strategy',
       'vm-action-delete',
     ]);
   });
@@ -111,6 +114,7 @@ describe('useVirtualMachineActionsProvider tests', () => {
       'migration-menu',
       'vm-action-copy-ssh',
       'vm-action-edit-labels',
+      'vm-action-change-run-strategy',
       'vm-action-delete',
     ]);
 

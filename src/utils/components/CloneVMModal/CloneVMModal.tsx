@@ -88,7 +88,11 @@ const CloneVMModal: FC<CloneVMModalProps> = ({ headerText, isOpen, onClose, sour
     >
       <Form className="pf-v6-u-w-75-on-md pf-v6-u-w-66-on-lg pf-v6-u-m-auto" isHorizontal>
         <NameInput name={cloneName} setIsValid={setIsVMNameValid} setName={setCloneName} />
-        <StartClonedVMCheckbox setStartCloneVM={setStartCloneVM} startCloneVM={startCloneVM} />
+        <StartClonedVMCheckbox
+          setStartCloneVM={setStartCloneVM}
+          source={source}
+          startCloneVM={startCloneVM}
+        />
         {isVM(source) ? (
           <ConfigurationSummary vm={source} />
         ) : (
