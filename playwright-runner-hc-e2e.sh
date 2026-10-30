@@ -12,6 +12,10 @@
 #
 # Local / agent entry (repo root; use nvm for Node). CI invokes this via
 # ci-scripts/hot-cluster/ts/src/scripts/run-gating-tests.ts — do not use that script locally.
+# On a release-branch HC run, this script is sparse-checked-out from main into
+# .hc-infra (it doesn't live on the branch itself) and invoked with cwd set to
+# the product checkout root, so PROJECT_ROOT below is derived from
+# GITHUB_WORKSPACE/cwd rather than this script's own location.
 #
 # Usage:
 #   ./playwright-runner-hc-e2e.sh [project] [extra-args...]
@@ -38,8 +42,11 @@ set -euo pipefail
 
 export HC_E2E=true
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="${SCRIPT_DIR}"
+# The product repo root (where package.json, playwright.config.ts, and specs
+# live). Not this script's own directory: on a release-branch HC run, this
+# script is overlaid from main into .hc-infra and run with the product
+# checkout as cwd, so it must `cd` there, not to its own (overlay) location.
+PROJECT_ROOT="${GITHUB_WORKSPACE:-$(pwd)}"
 cd "${PROJECT_ROOT}"
 
 # ── Helpers ──────────────────────────────────────────────────────────────

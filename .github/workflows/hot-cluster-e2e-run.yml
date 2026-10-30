@@ -413,13 +413,16 @@ jobs:
           checkout-ref: ${{ inputs.checkout_ref }}
           pr-number: ${{ inputs.pr_number }}
 
-      # ci-scripts/hot-cluster and the .github/scripts e2e orchestration code
-      # exist only on main; a release-branch checkout above has neither (an old
-      # release branch predates the e2e scripts entirely). Overlay both from the
-      # ref this run was dispatched at (github.sha -- main's tip in production,
-      # the fix branch during a workflow_dispatch validation) into an isolated
-      # subdir. GITHUB_WORKSPACE stays pointed at the product checkout at the
-      # workspace root, so the test runner still runs the branch's own specs.
+      # ci-scripts/hot-cluster, .github/scripts, and playwright-runner-hc-e2e.sh
+      # exist only on main; a release-branch checkout above may have none of
+      # them (an old release branch predates the e2e scripts entirely, and a
+      # Playwright-migrated release branch carries its own playwright.config.ts
+      # / specs but not the HC-specific runner script -- see run-gating-tests.ts's
+      # resolveHcPlaywrightRunner). Overlay all three from the ref this run was
+      # dispatched at (github.sha -- main's tip in production, the fix branch
+      # during a workflow_dispatch validation) into an isolated subdir.
+      # GITHUB_WORKSPACE stays pointed at the product checkout at the workspace
+      # root, so the test runner still runs the branch's own specs/config.
       - name: Overlay hot-cluster CI infra from main
         uses: actions/checkout@v4
         with:
@@ -428,6 +431,7 @@ jobs:
           sparse-checkout: |
             ci-scripts/hot-cluster
             .github/scripts
+            playwright-runner-hc-e2e.sh
           path: .hc-infra
           clean: false
 
