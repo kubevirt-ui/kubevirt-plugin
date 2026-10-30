@@ -5,12 +5,14 @@ import ArchitectureLabel from '@kubevirt-utils/components/ArchitectureLabel/Arch
 import { getCPUMemoryTitle } from '@kubevirt-utils/components/CPUMemory/utils';
 import { type TableExportColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { ACTIONS } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/const';
+import { type InstanceTypeUnion } from '@kubevirt-utils/resources/instancetype/types';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import {
   getTemplateCategory,
   isOpenShiftTemplate,
   isVirtualMachineTemplate,
   isVirtualMachineTemplateRequest,
+  type Template,
   type TemplateOrRequest,
 } from '@kubevirt-utils/resources/template';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm';
@@ -77,6 +79,7 @@ export const getTemplateColumns = (
   t: TFunction,
   namespace: string,
   isAllClustersPage: boolean,
+  instanceTypes?: InstanceTypeUnion[],
 ): TableExportColumnConfig<TemplateOrRequest>[] => {
   const columns: TableExportColumnConfig<TemplateOrRequest>[] = [
     {
@@ -139,10 +142,10 @@ export const getTemplateColumns = (
       getValue: (row) =>
         isVirtualMachineTemplateRequest(row)
           ? NO_DATA_DASH
-          : getVirtualMachineTemplatesCPUMemoryValue(row, t),
+          : getVirtualMachineTemplatesCPUMemoryValue(row as Template, t, { instanceTypes }),
       key: TEMPLATE_COLUMN_KEYS.cpu,
       label: getCPUMemoryTitle(t),
-      renderCell: (row) => <TemplateCPUMemoryCell row={row} />,
+      renderCell: (row) => <TemplateCPUMemoryCell namespace={namespace} row={row} />,
     },
     {
       key: TEMPLATE_COLUMN_KEYS.actions,

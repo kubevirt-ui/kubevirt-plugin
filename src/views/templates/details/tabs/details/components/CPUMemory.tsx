@@ -1,17 +1,18 @@
 import { type FC } from 'react';
-import { getVirtualMachineTemplatesCPUMemoryText } from 'src/views/templates/utils/utils';
 
 import CPUDescription from '@kubevirt-utils/components/CPUDescription/CPUDescription';
 import { CpuMemHelperTextResources } from '@kubevirt-utils/components/CPUDescription/utils/utils';
 import { getCPUMemoryTitle } from '@kubevirt-utils/components/CPUMemory/utils';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   getTemplateVirtualMachineCPU,
   type Template,
   updateTemplate,
 } from '@kubevirt-utils/resources/template';
+import useTemplateCPUMemoryDisplayValue from '@kubevirt-utils/resources/template/hooks/useTemplateCPUMemoryDisplayValue';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 
 import CPUMemoryModal from './CPUMemoryModal/CPUMemoryModal';
@@ -23,7 +24,8 @@ type CPUMemoryProps = {
 
 const CPUMemory: FC<CPUMemoryProps> = ({ editable, template }) => {
   const { t } = useKubevirtTranslation();
-  const CPUMemData = getVirtualMachineTemplatesCPUMemoryText(template, t);
+  const { cpuMemoryText, isEmpty } = useTemplateCPUMemoryDisplayValue(template);
+  const CPUMemData = isEmpty ? <MutedTextSpan text={t('None')} /> : cpuMemoryText;
   const { createModal } = useModal();
 
   const onEditClick = (): void =>

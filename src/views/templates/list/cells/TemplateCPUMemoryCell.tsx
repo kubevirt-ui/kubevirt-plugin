@@ -1,26 +1,42 @@
 import type { FC } from 'react';
 
+import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import type { TemplateOrRequest } from '@kubevirt-utils/resources/template';
+import type { Template, TemplateOrRequest } from '@kubevirt-utils/resources/template';
 import { isVirtualMachineTemplateRequest } from '@kubevirt-utils/resources/template';
+import useTemplateCPUMemoryDisplayValue from '@kubevirt-utils/resources/template/hooks/useTemplateCPUMemoryDisplayValue';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm';
 
-import { getVirtualMachineTemplatesCPUMemoryText } from '../../utils/utils';
+type TemplateCPUMemoryCellContentProps = {
+  namespace?: string;
+  template: Template;
+};
+
+const TemplateCPUMemoryCellContent: FC<TemplateCPUMemoryCellContentProps> = ({
+  namespace,
+  template,
+}) => {
+  const { t } = useKubevirtTranslation();
+  const { cpuMemoryText, isEmpty } = useTemplateCPUMemoryDisplayValue(template, { namespace });
+
+  if (isEmpty) {
+    return <MutedTextSpan text={t('None')} />;
+  }
+
+  return <>{cpuMemoryText}</>;
+};
 
 type TemplateCPUMemoryCellProps = {
+  namespace?: string;
   row: TemplateOrRequest;
 };
 
-const TemplateCPUMemoryCell: FC<TemplateCPUMemoryCellProps> = ({ row }) => {
-  const { t } = useKubevirtTranslation();
-
+const TemplateCPUMemoryCell: FC<TemplateCPUMemoryCellProps> = ({ namespace, row }) => {
   if (isVirtualMachineTemplateRequest(row)) {
     return <>{NO_DATA_DASH}</>;
   }
 
-  const cpuMemory = getVirtualMachineTemplatesCPUMemoryText(row, t);
-
-  return <>{cpuMemory}</>;
+  return <TemplateCPUMemoryCellContent namespace={namespace} template={row} />;
 };
 
 export default TemplateCPUMemoryCell;

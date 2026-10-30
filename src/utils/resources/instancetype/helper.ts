@@ -18,10 +18,20 @@ import {
   NAMESPACED_PREFERENCE_NAME_ANNOTATION,
 } from './constants';
 
+type InstancetypeMatcherWithNamespace = V1InstancetypeMatcher & { namespace?: string };
+
+export const getInstanceTypeMatcherNamespace = (
+  matcher: V1InstancetypeMatcher | undefined,
+): string | undefined => (matcher as InstancetypeMatcherWithNamespace | undefined)?.namespace;
+
 export const getInstanceTypeModelFromMatcher = (
   instanceTypeMatcher: V1InstancetypeMatcher,
 ): K8sModel => {
-  if (isEmpty(instanceTypeMatcher?.kind)) return VirtualMachineClusterInstancetypeModel;
+  if (isEmpty(instanceTypeMatcher?.kind)) {
+    return getInstanceTypeMatcherNamespace(instanceTypeMatcher)
+      ? VirtualMachineInstancetypeModel
+      : VirtualMachineClusterInstancetypeModel;
+  }
 
   return instanceTypeMatcher.kind.includes('cluster')
     ? VirtualMachineClusterInstancetypeModel
