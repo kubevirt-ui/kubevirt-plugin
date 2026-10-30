@@ -111,5 +111,7 @@ export const instanceTypeSeriesNameMapper: {
 };
 
 export const COMMON_INSTANCETYPES = 'common-instancetypes';
+export const REDHAT_COM = 'redhat.com';
+export const KUBEVIRT_IO = 'kubevirt.io';
 export const INSTANCETYPE_CLASS_ANNOTATION = 'instancetype.kubevirt.io/class';
 export const INSTANCETYPE_DESCRIPTION_ANNOTATION = 'instancetype.kubevirt.io/description';

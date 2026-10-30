@@ -23,4 +23,5 @@ scripts/ca.crt
 scripts/console-client-secret
 *.json-*
 *.env
+.env.local
 .claude/

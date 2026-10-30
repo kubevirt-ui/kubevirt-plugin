@@ -80,7 +80,7 @@ export default defineConfig({
   fullyParallel: true,
   globalSetup: './playwright/project-dependencies/global.setup.ts',
   globalTeardown: './playwright/project-dependencies/global.teardown.ts',
-  outputDir: testResultsDir,
+  outputDir: './playwright/test-results/artifacts',
   projects: [
     {
       fullyParallel: true,

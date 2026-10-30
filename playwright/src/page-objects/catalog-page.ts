@@ -114,6 +114,21 @@ export class CatalogPage extends BasePage {
       .first();
   }
 
+  /** Diagnostics for a quick create submit button stuck disabled (see CNV-8848). */
+  private async describeQuickCreateSubmitNotEnabled(vmName: string): Promise<string> {
+    const submit = this.drawerQuickCreateSubmitButton();
+    const [visible, enabled] = await Promise.all([
+      submit.isVisible().catch(() => false),
+      submit.isEnabled().catch(() => false),
+    ]);
+    return (
+      `Quick create VirtualMachine submit button did not become enabled for "${vmName}" ` +
+      `(submit visible=${visible}, enabled=${enabled}, url=${this.page.url()}). ` +
+      'Likely a template/boot source that never finishes resolving in this environment ' +
+      '(e.g. console useK8sModels() or DataSource/PVC readiness) -- see CNV-8848.'
+    );
+  }
+
   private drawerQuickCreateSubmitButton(): Locator {
     return this.templateDrawer().getByTestId('quick-create-vm-btn');
   }
@@ -391,7 +406,13 @@ export class CatalogPage extends BasePage {
     await this.ensureQuickCreateNameInputVisible();
     await this.fillCustomizeVmName(vmName);
     if (!(await this.waitForDrawerQuickCreateEnabled())) {
-      return false;
+      // Quick-create UI was present and committed to (name filled in), but the
+      // submit button never enabled within the long wait above. This is the
+      // CNV-8848 hang shape: silently returning false here lets quickCreateVm
+      // cascade through several more fallback branches (each with their own
+      // long waits) and die at the test's outer timeout with no useful error.
+      // Fail fast with concrete diagnostics instead.
+      throw new Error(await this.describeQuickCreateSubmitNotEnabled(vmName));
     }
     await this.robustClick(this.drawerQuickCreateSubmitButton());
     await this.confirmQuickCreateBootSourceAndWaitForVm();
