@@ -1,4 +1,4 @@
-import type { FC } from 'react';
+import { type FC, useMemo } from 'react';
 import { useController, useWatch } from 'react-hook-form';
 
 import { BOOTABLE_VOLUME_SELECTED, logITFlowEvent } from '@kubevirt-utils/extensions/telemetry';
@@ -18,7 +18,10 @@ import {
   TitleSizes,
 } from '@patternfly/react-core';
 import BootableVolumeList from '@virtualmachines/wizard/components/BootableVolumeList/BootableVolumeList';
-import { getEffectiveVolumeNamespace } from '@virtualmachines/wizard/components/BootableVolumeList/utils/utils';
+import {
+  createTableRowFromSelection,
+  getEffectiveVolumeNamespace,
+} from '@virtualmachines/wizard/components/BootableVolumeList/utils/utils';
 import { useVMWizardForm } from '@virtualmachines/wizard/form/VMWizardFormProvider';
 import { type OnSelectBootableVolume } from '@virtualmachines/wizard/utils/types';
 import { applySelectedBootableVolumeToForm } from '@virtualmachines/wizard/utils/utils';
@@ -31,18 +34,26 @@ const BootSourceStep: FC = () => {
   const canListAllNamespaces = useCanListNamespaces();
   const { control, setValue } = useVMWizardForm();
 
-  const [cluster, project, volumeListNamespace, selectedBootableVolume, preference, useBootSource] =
-    useWatch({
-      control,
-      name: [
-        'deployment.cluster',
-        'deployment.project',
-        'instanceType.volumeNamespace',
-        'instanceType.bootVolume.volume',
-        'instanceType.preference',
-        'instanceType.useBootSource',
-      ],
-    });
+  const [
+    cluster,
+    project,
+    volumeListNamespace,
+    selectedBootableVolume,
+    guestOperatingSystem,
+    selectedPreference,
+    useBootSource,
+  ] = useWatch({
+    control,
+    name: [
+      'deployment.cluster',
+      'deployment.project',
+      'instanceType.volumeNamespace',
+      'instanceType.bootVolume.volume',
+      'instanceType.guestOperatingSystem',
+      'instanceType.preference',
+      'instanceType.useBootSource',
+    ],
+  });
 
   const {
     field: { onChange, value },
@@ -61,6 +72,11 @@ const BootSourceStep: FC = () => {
   const effectiveNamespace = getEffectiveVolumeNamespace(volumeListNamespace, canListAllNamespaces);
 
   const bootableVolumesData = useBootableVolumes(effectiveNamespace, cluster);
+
+  const selectedTableRow = useMemo(
+    () => createTableRowFromSelection(selectedBootableVolume, selectedPreference),
+    [selectedBootableVolume, selectedPreference],
+  );
 
   const onSelectBootableVolume: OnSelectBootableVolume = (args) => {
     applySelectedBootableVolumeToForm({ ...args, setValue });
@@ -102,6 +118,7 @@ const BootSourceStep: FC = () => {
           bootableVolumesData={bootableVolumesData}
           canCreateVolume={canCreate}
           cluster={cluster}
+          guestOperatingSystem={guestOperatingSystem}
           instanceTypesAndPreferencesData={instanceTypesAndPreferencesData}
           loadError={instanceTypesAndPreferencesData?.loadError}
           lockedPreference={lockedPreference}
@@ -111,8 +128,7 @@ const BootSourceStep: FC = () => {
           onVolumeListNamespaceChange={(namespace) =>
             setValue('instanceType.volumeNamespace', namespace)
           }
-          preferenceName={preference?.name}
-          selectedBootableVolume={selectedBootableVolume}
+          selectedTableRow={selectedTableRow}
           volumeListNamespace={volumeListNamespace}
         />
       )}

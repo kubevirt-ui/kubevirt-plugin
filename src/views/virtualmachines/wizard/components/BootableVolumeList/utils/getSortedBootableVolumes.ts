@@ -13,9 +13,9 @@ import {
 import { type BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { getAnnotation, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { ANNOTATIONS } from '@kubevirt-utils/resources/template';
-import { getArchitecture } from '@kubevirt-utils/utils/architecture';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getOSFromDefaultPreference } from '@virtualmachines/wizard/components/BootableVolumeList/utils/utils';
+import { type BootVolumeTableRow } from '@virtualmachines/wizard/utils/types';
 
 import { type BootableVolumeResolvedSources, type BootableVolumeSortContext } from '../types';
 
@@ -65,41 +65,36 @@ export const getBootableVolumeSortStorageClass = (
   return getPVCStorageClassName(pvcSource) ?? getVolumeSnapshotStorageClass(volumeSnapshotSource);
 };
 
-export type BootableVolumeSortValueGetter = (bootableVolume: BootableVolume) => string;
+export type BootableVolumeSortValueGetter = (row: BootVolumeTableRow) => string;
 
 export const getBootableVolumeSortCriteria = (
   context: BootableVolumeSortContext,
 ): { columnIndex: number; columnToSortBy: BootableVolumeSortValueGetter }[] => [
-  { columnIndex: 0, columnToSortBy: (bootableVolume) => getName(bootableVolume) },
-  { columnIndex: 1, columnToSortBy: (bootableVolume) => getArchitecture(bootableVolume) },
+  { columnIndex: 0, columnToSortBy: (row) => getName(row.volume) },
+  { columnIndex: 1, columnToSortBy: (row) => row.variant },
   ...(context.includeNamespaceColumn
-    ? [
-        {
-          columnIndex: 2,
-          columnToSortBy: (bootableVolume: BootableVolume) => getNamespace(bootableVolume),
-        },
-      ]
+    ? [{ columnIndex: 2, columnToSortBy: (row: BootVolumeTableRow) => getNamespace(row.volume) }]
     : []),
   {
     columnIndex: 3,
-    columnToSortBy: (bootableVolume) =>
+    columnToSortBy: (row) =>
       getOSFromDefaultPreference(
-        bootableVolume,
+        row.volume,
         context.clusterPreferencesMap,
         context.userPreferencesMap,
       ),
   },
   {
     columnIndex: 4,
-    columnToSortBy: (bootableVolume) => getBootableVolumeSortStorageClass(bootableVolume, context),
+    columnToSortBy: (row) => getBootableVolumeSortStorageClass(row.volume, context),
   },
   {
     columnIndex: 5,
-    columnToSortBy: (bootableVolume) => getBootableVolumeSortDiskSize(bootableVolume, context),
+    columnToSortBy: (row) => getBootableVolumeSortDiskSize(row.volume, context),
   },
   {
     columnIndex: 6,
-    columnToSortBy: (bootableVolume) => getAnnotation(bootableVolume, ANNOTATIONS.description),
+    columnToSortBy: (row) => getAnnotation(row.volume, ANNOTATIONS.description),
   },
 ];
 
@@ -131,37 +126,33 @@ const sortFunctionByDirection: Record<
 };
 
 const sortBootableVolumesByCriterion = (
-  volumes: BootableVolume[],
+  rows: BootVolumeTableRow[],
   sortCriteria: BootableVolumeSortCriterion,
   columnToSortBy: BootableVolumeSortValueGetter,
-): BootableVolume[] =>
-  [...volumes].sort((firstVolume, secondVolume) => {
-    const firstColumnValue = columnToSortBy(firstVolume);
-    const secondColumnValue = columnToSortBy(secondVolume);
+): BootVolumeTableRow[] =>
+  [...rows].sort((firstRow, secondRow) => {
+    const firstColumnValue = columnToSortBy(firstRow);
+    const secondColumnValue = columnToSortBy(secondRow);
 
     return sortFunctionByDirection[sortCriteria.direction](firstColumnValue, secondColumnValue);
   });
 
 export const sortBootableVolumesWithColumnGetters = (
-  volumes: BootableVolume[],
+  rows: BootVolumeTableRow[],
   sortCriteria: BootableVolumeSortCriterion,
   context: BootableVolumeSortContext,
-): BootableVolume[] => {
+): BootVolumeTableRow[] => {
   if (isEmpty(sortCriteria)) {
-    return [...volumes];
+    return [...rows];
   }
 
-  const bootableVolumeSortCriteria = getBootableVolumeSortCriteria(context).find(
+  const sortCriterion = getBootableVolumeSortCriteria(context).find(
     (criteria) => criteria.columnIndex === sortCriteria.columnIndex,
   );
 
-  if (!bootableVolumeSortCriteria) {
-    return [...volumes];
+  if (!sortCriterion) {
+    return [...rows];
   }
 
-  return sortBootableVolumesByCriterion(
-    volumes,
-    sortCriteria,
-    bootableVolumeSortCriteria.columnToSortBy,
-  );
+  return sortBootableVolumesByCriterion(rows, sortCriteria, sortCriterion.columnToSortBy);
 };

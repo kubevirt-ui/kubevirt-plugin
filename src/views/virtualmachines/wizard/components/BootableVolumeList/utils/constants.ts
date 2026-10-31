@@ -19,6 +19,7 @@ export const WINDOWS_BOOTSOURCE_PIPELINE = 'windows-bootsource-pipeline';
 // inside a modal opened from that page (e.g. ChangeBootSourceModal).
 export const OS_NAME_FILTER_TYPE = 'bootVolumeOsName';
 export const RESOURCE_KIND_FILTER_TYPE = 'resourceKind';
+export const VARIANT_FILTER_TYPE = 'bootVolumeVariant';
 
 export const NAME_COLUMN_ID = 'name';
 export const NAMESPACE_COLUMN_ID = 'namespace';

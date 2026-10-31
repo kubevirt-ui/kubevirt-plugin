@@ -13,6 +13,7 @@ import {
   type V1beta1VirtualMachineClusterPreference,
   type V1beta1VirtualMachineInstancetype,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type PreferenceOption } from '@kubevirt-utils/components/AddBootableVolumeModal/types';
 import { type VolumeSnapshotKind } from '@kubevirt-utils/components/SelectSnapshot/types';
 import { type BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { type ClusterNamespacedResourceMap } from '@kubevirt-utils/resources/shared';
@@ -66,8 +67,17 @@ export type UseBootableVolumesValues = {
   volumeSnapshotSources: { [dataSourceName: string]: VolumeSnapshotKind };
 };
 
+export type BootVolumeTableRow = {
+  metadata?: BootableVolume['metadata'];
+  preferenceVariant: PreferenceOption;
+  rowKey: string;
+  variant: string;
+  volume: BootableVolume;
+};
+
 export type ApplySelectedBootableVolumeToForm = {
   dvSource: null | V1beta1DataVolume;
+  preferenceVariant?: PreferenceOption;
   pvcSource: IoK8sApiCoreV1PersistentVolumeClaim | null;
   selectedVolume: BootableVolume;
   setValue: UseFormSetValue<VMWizardFormValues>;

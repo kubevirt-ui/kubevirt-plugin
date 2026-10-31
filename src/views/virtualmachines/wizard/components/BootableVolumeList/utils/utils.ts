@@ -26,6 +26,14 @@ import {
   WIN_RESOURCE_NAME_PREFIX,
 } from './constants';
 
+// Re-export table row utilities
+export {
+  createTableRowFromSelection,
+  expandVolumesToTableRows,
+  getPreferenceOptionVariant,
+  isSameTableRow,
+} from './tableRowUtils';
+
 export const isLinuxGenericPreference = (preference: string): boolean =>
   preference === 'linux' || preference.startsWith('linux.') || preference.startsWith('linux-');
 

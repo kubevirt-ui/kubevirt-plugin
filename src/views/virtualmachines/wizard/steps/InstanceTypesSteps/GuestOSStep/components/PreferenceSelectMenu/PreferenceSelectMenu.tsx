@@ -9,6 +9,7 @@ import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { FormGroup, SelectOption } from '@patternfly/react-core';
 import { useVMWizardForm } from '@virtualmachines/wizard/form/VMWizardFormProvider';
 import usePreferenceSelectOptions from '@virtualmachines/wizard/steps/InstanceTypesSteps/GuestOSStep/components/PreferenceSelectMenu/hooks/usePreferenceSelectOptions/usePreferenceSelectOptions';
+import { getPreferenceVersionName } from '@virtualmachines/wizard/steps/InstanceTypesSteps/GuestOSStep/components/PreferenceSelectMenu/hooks/usePreferenceSelectOptions/utils/utils';
 import { resetBootableVolumeFields } from '@virtualmachines/wizard/utils/utils';
 
 import './PreferenceSelectMenu.scss';
@@ -48,8 +49,11 @@ const PreferenceSelectMenu: FC = () => {
       ) : (
         <Controller
           control={control}
-          name="instanceType.preference"
+          name="instanceType.guestOperatingSystem"
           render={({ field: { onChange, value } }) => {
+            const displayName =
+              value?.displayName ?? (value?.name ? getPreferenceVersionName(value.name) : '');
+
             return (
               <FormPFSelect
                 className="pf-v6-u-mt-md"
@@ -59,13 +63,13 @@ const PreferenceSelectMenu: FC = () => {
                   resetBootableVolumeFields(setValue);
                 }}
                 placeholder={placeholderText}
-                selected={(value?.name as string) || ''}
-                selectedLabel={(value?.name as string) || placeholderText}
+                selected={displayName}
+                selectedLabel={displayName || placeholderText}
                 toggleProps={{ isFullWidth: true }}
               >
                 {preferences?.map((pref) => (
                   <SelectOption key={pref.name} value={pref}>
-                    {pref.name}
+                    {pref.displayName ?? getPreferenceVersionName(pref.name)}
                   </SelectOption>
                 ))}
               </FormPFSelect>

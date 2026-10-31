@@ -17,6 +17,7 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
   bootableVolumesData,
   canCreateVolume,
   cluster,
+  guestOperatingSystem,
   instanceTypesAndPreferencesData,
   loadError,
   lockedPreference,
@@ -24,8 +25,7 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
   onSelectBootableVolume,
   onUploadStart,
   onVolumeListNamespaceChange,
-  preferenceName,
-  selectedBootableVolume,
+  selectedTableRow,
   showNoBootSourceHint,
   syncFiltersWithURL = true,
   volumeListNamespace,
@@ -63,7 +63,7 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
     bootableVolumesData,
     preferencesMap,
     userPreferencesMap,
-    preferenceName,
+    guestOperatingSystem,
     syncFiltersWithURL,
   );
 
@@ -119,9 +119,9 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
             onCreateVolume={onCreateVolume}
             onSelectBootableVolume={onSelectBootableVolume}
             onUploadStart={onUploadStart}
-            preferenceName={preferenceName}
+            preferenceName={guestOperatingSystem?.name}
             preferencesMap={preferencesMap}
-            selectedBootableVolume={selectedBootableVolume}
+            selectedTableRow={selectedTableRow}
             showNoBootSourceHint={showNoBootSourceHint}
             sortedPaginatedData={sortedPaginatedData}
             userPreferencesMap={userPreferencesMap}

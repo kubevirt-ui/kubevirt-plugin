@@ -18,6 +18,8 @@ import type { DROPDOWN_FORM_SELECTION } from './consts';
 
 export type PreferenceOption = {
   architecture?: string;
+  availablePreferences?: PreferenceOption[];
+  displayName?: string;
   kind?: string;
   name: string;
 };

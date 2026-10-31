@@ -1,13 +1,13 @@
 import { type Dispatch, type FC, type SetStateAction } from 'react';
 
 import { type PaginationState } from '@kubevirt-utils/hooks/usePagination/utils/types';
-import { type BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { Pagination } from '@patternfly/react-core';
+import { type BootVolumeTableRow } from '@virtualmachines/wizard/utils/types';
 
 import { paginationDefaultValuesForm } from '../../utils/constants';
 
 type BootableVolumeListPaginationProps = {
-  data: BootableVolume[];
+  data: BootVolumeTableRow[];
   pagination: PaginationState;
   setPagination: Dispatch<SetStateAction<PaginationState>>;
 };

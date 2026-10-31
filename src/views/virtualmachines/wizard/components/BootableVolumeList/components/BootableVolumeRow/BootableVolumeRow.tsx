@@ -1,6 +1,5 @@
 import { type FC } from 'react';
 
-import ArchitectureLabel from '@kubevirt-utils/components/ArchitectureLabel/ArchitectureLabel';
 import { PREFERENCE_DISPLAY_NAME_KEY } from '@kubevirt-utils/constants/instancetypes-and-preferences';
 import { ALL_PROJECTS } from '@kubevirt-utils/hooks/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -9,16 +8,20 @@ import {
   getPVCStorageClassName,
   getVolumeSnapshotStorageClass,
 } from '@kubevirt-utils/resources/bootableresources/selectors';
-import { type BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { getAnnotation, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { ANNOTATIONS } from '@kubevirt-utils/resources/template';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
-import { ARCHITECTURE_ID, getArchitecture } from '@kubevirt-utils/utils/architecture';
+import { ARCHITECTURE_ID } from '@kubevirt-utils/utils/architecture';
 import { getHumanizedSize } from '@kubevirt-utils/utils/units';
 import { Tooltip } from '@patternfly/react-core';
 import { TableText, Tr, WrapModifier } from '@patternfly/react-table';
+import { isSameTableRow } from '@virtualmachines/wizard/components/BootableVolumeList/utils/utils';
+import { getGuestOperatingSystemDisplayName } from '@virtualmachines/wizard/steps/InstanceTypesSteps/GuestOSStep/components/PreferenceSelectMenu/hooks/usePreferenceSelectOptions/utils/utils';
 import { getBootableVolumeOSIcon } from '@virtualmachines/wizard/utils/os-icons/os-icons';
-import { type OnSelectBootableVolume } from '@virtualmachines/wizard/utils/types';
+import {
+  type BootVolumeTableRow,
+  type OnSelectBootableVolume,
+} from '@virtualmachines/wizard/utils/types';
 
 import { type BootableVolumeRowData } from '../../types';
 import BootableVolumeRowNameCell from './components/BootableVolumeRowNameCell';
@@ -28,22 +31,23 @@ import '../../BootableVolumeList.scss';
 
 type BootableVolumeRowProps = {
   activeColumnIDs: string[];
-  bootableVolume: BootableVolume;
   onSelectBootableVolume: OnSelectBootableVolume;
   rowData: BootableVolumeRowData;
-  selectedBootableVolume?: BootableVolume;
+  selectedTableRow?: BootVolumeTableRow;
+  tableRow: BootVolumeTableRow;
 };
 
 const BootableVolumeRow: FC<BootableVolumeRowProps> = ({
   activeColumnIDs,
-  bootableVolume,
   onSelectBootableVolume,
   rowData,
-  selectedBootableVolume,
+  selectedTableRow,
+  tableRow,
 }) => {
   const { t } = useKubevirtTranslation();
-  const bootVolumeName = getName(bootableVolume);
-  const bootVolumeNamespace = getNamespace(bootableVolume);
+  const { preferenceVariant, variant, volume } = tableRow;
+  const bootVolumeName = getName(volume);
+  const bootVolumeNamespace = getNamespace(volume);
   const {
     dataImportCron,
     dvSource,
@@ -53,22 +57,27 @@ const BootableVolumeRow: FC<BootableVolumeRowProps> = ({
     volumeSnapshotSource,
   } = rowData;
 
-  const isSelected =
-    getName(selectedBootableVolume) === bootVolumeName &&
-    getNamespace(selectedBootableVolume) === bootVolumeNamespace;
+  const isSelected = isSameTableRow(selectedTableRow, tableRow);
 
   const handleClick = (): void => {
     onSelectBootableVolume({
       dvSource,
+      preferenceVariant,
       pvcSource,
-      selectedVolume: bootableVolume,
+      selectedVolume: volume,
       volumeSnapshotSource,
     });
   };
 
   const sizeData = getHumanizedSize(getDiskSize(dvSource, pvcSource, volumeSnapshotSource)).string;
   const icon = getBootableVolumeOSIcon(preference, bootVolumeName);
-  const description = getAnnotation(bootableVolume, ANNOTATIONS.description, NO_DATA_DASH);
+  const description = getAnnotation(volume, ANNOTATIONS.description, NO_DATA_DASH);
+  const preferenceDisplayName = getAnnotation(
+    preference,
+    PREFERENCE_DISPLAY_NAME_KEY,
+    NO_DATA_DASH,
+  );
+  const operatingSystem = getGuestOperatingSystemDisplayName(preferenceDisplayName);
 
   return (
     <Tr
@@ -80,18 +89,18 @@ const BootableVolumeRow: FC<BootableVolumeRowProps> = ({
     >
       <BootableVolumeRowNameCell
         activeColumnIDs={activeColumnIDs}
-        bootableVolume={bootableVolume}
+        bootableVolume={volume}
         bootVolumeName={bootVolumeName}
         dataImportCron={dataImportCron}
         icon={icon}
       />
       <TableData
         activeColumnIDs={activeColumnIDs}
-        dataLabel={t('Architecture')}
+        dataLabel={t('Variant')}
         id={ARCHITECTURE_ID}
         width={10}
       >
-        <ArchitectureLabel architecture={getArchitecture(bootableVolume)} />
+        {variant === 'default' ? t('Default') : variant}
       </TableData>
       {volumeListNamespace === ALL_PROJECTS && (
         <TableData
@@ -109,7 +118,7 @@ const BootableVolumeRow: FC<BootableVolumeRowProps> = ({
         id="operating-system"
         width={15}
       >
-        {getAnnotation(preference, PREFERENCE_DISPLAY_NAME_KEY, NO_DATA_DASH)}
+        {operatingSystem}
       </TableData>
       <TableData
         activeColumnIDs={activeColumnIDs}

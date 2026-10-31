@@ -19,9 +19,9 @@ export type AddBootableVolume = {
 const useAddBootableVolume = (): AddBootableVolume => {
   const { control, getValues, setValue } = useVMWizardForm();
 
-  const [volumeListNamespace, preference] = useWatch({
+  const [volumeListNamespace, guestOperatingSystem] = useWatch({
     control,
-    name: ['instanceType.volumeNamespace', 'instanceType.preference'],
+    name: ['instanceType.volumeNamespace', 'instanceType.guestOperatingSystem'],
   });
 
   const { canCreateDS, canCreatePVC } = useCanCreateBootableVolume(volumeListNamespace);
@@ -42,7 +42,7 @@ const useAddBootableVolume = (): AddBootableVolume => {
 
   return {
     canCreate,
-    lockedPreference: preference ?? undefined,
+    lockedPreference: guestOperatingSystem ?? undefined,
     onCreateVolume,
     onUploadStart,
   };

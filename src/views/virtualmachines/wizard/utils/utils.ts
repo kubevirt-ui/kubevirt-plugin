@@ -2,9 +2,14 @@ import { type UseFormGetValues, type UseFormSetValue } from 'react-hook-form';
 import { type TFunction } from 'i18next';
 
 import { getInstanceTypeFromVolume } from '@kubevirt-utils/components/AddBootableVolumeModal/utils';
+import {
+  DEFAULT_PREFERENCE_KIND_LABEL,
+  DEFAULT_PREFERENCE_LABEL,
+} from '@kubevirt-utils/constants/instancetypes-and-preferences';
 import { cancelAllWizardPendingUploads } from '@kubevirt-utils/hooks/useUploadProgressToast';
 import { isBootableVolumeUploadKey } from '@kubevirt-utils/hooks/useUploadProgressToast/keys/uploadKeys';
 import { getDiskSize } from '@kubevirt-utils/resources/bootableresources/selectors';
+import { getLabel } from '@kubevirt-utils/resources/shared';
 import CloneIcon from '@virtualmachines/wizard/steps/DeploymentDetailsStep/components/CreationMethodTileGroup/components/CreationMethodTile/components/CloneIcon';
 import { InstanceTypeIcon } from '@virtualmachines/wizard/steps/DeploymentDetailsStep/components/CreationMethodTileGroup/components/CreationMethodTile/components/InstanceTypeIcon';
 import TemplateIcon from '@virtualmachines/wizard/steps/DeploymentDetailsStep/components/CreationMethodTileGroup/components/CreationMethodTile/components/TemplateIcon';
@@ -59,6 +64,7 @@ export const isInstanceTypeCreationMethod = (creationMethod: VMCreationMethod): 
 
 export const applySelectedBootableVolumeToForm = ({
   dvSource,
+  preferenceVariant,
   pvcSource,
   selectedVolume,
   setValue,
@@ -81,11 +87,22 @@ export const applySelectedBootableVolumeToForm = ({
   setValue('instanceType.compute', series && size ? { name, series, size, type: 'redhat' } : null, {
     shouldValidate: true,
   });
+
+  const preferenceName =
+    preferenceVariant?.name ?? getLabel(selectedVolume, DEFAULT_PREFERENCE_LABEL);
+  const preferenceKind =
+    preferenceVariant?.kind ?? getLabel(selectedVolume, DEFAULT_PREFERENCE_KIND_LABEL);
+  setValue(
+    'instanceType.preference',
+    preferenceName ? { kind: preferenceKind, name: preferenceName } : null,
+    { shouldValidate: true },
+  );
 };
 
 export const resetBootableVolumeFields = (setValue: UseFormSetValue<VMWizardFormValues>): void => {
   setValue('instanceType.bootVolume', null, { shouldValidate: true });
   setValue('instanceType.compute', null, { shouldValidate: true });
+  setValue('instanceType.preference', null, { shouldValidate: true });
 };
 
 export const clearVMPendingUploads = (

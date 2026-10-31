@@ -4,6 +4,7 @@ import type {
   V1beta1VirtualMachineClusterPreference,
   V1beta1VirtualMachinePreference,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type PreferenceOption } from '@kubevirt-utils/components/AddBootableVolumeModal/types';
 import { ALL_PROJECTS } from '@kubevirt-utils/hooks/constants';
 import type {
   KubevirtFilter,
@@ -14,7 +15,7 @@ import useKubevirtDataViewFilters from '@kubevirt-utils/hooks/useKubevirtDataVie
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import type { PaginationState } from '@kubevirt-utils/hooks/usePagination/utils/types';
 import type { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
-import type { NamespacedResourceMap, ResourceMap } from '@kubevirt-utils/resources/shared';
+import { type NamespacedResourceMap, type ResourceMap } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import type { ColumnLayout } from '@openshift-console/dynamic-plugin-sdk';
 import type { ThSortType } from '@patternfly/react-table/dist/esm/components/Table/base/types';
@@ -22,8 +23,14 @@ import useBootVolumeColumns from '@virtualmachines/wizard/components/BootableVol
 import useBootVolumeSortColumns from '@virtualmachines/wizard/components/BootableVolumeList/hooks/useBootVolumeSortColumns';
 import { paginationInitialStateForm } from '@virtualmachines/wizard/components/BootableVolumeList/utils/constants';
 import { getBootVolumeTableFilters } from '@virtualmachines/wizard/components/BootableVolumeList/utils/getBootVolumeFilters';
-import { filterBootableVolumesByPreference } from '@virtualmachines/wizard/components/BootableVolumeList/utils/utils';
-import type { UseBootableVolumesValues } from '@virtualmachines/wizard/utils/types';
+import {
+  expandVolumesToTableRows,
+  filterBootableVolumesByPreference,
+} from '@virtualmachines/wizard/components/BootableVolumeList/utils/utils';
+import {
+  type BootVolumeTableRow,
+  type UseBootableVolumesValues,
+} from '@virtualmachines/wizard/utils/types';
 
 import type { TableColumnWithOptionalIndex } from '../types';
 
@@ -31,8 +38,8 @@ type BootableVolumesTableData = {
   activeColumns: TableColumnWithOptionalIndex<BootableVolume>[];
   clearAllFilters: () => void;
   columnLayout: ColumnLayout;
-  data: BootableVolume[];
-  filterDefinitions: KubevirtFilter<BootableVolume>[];
+  data: BootVolumeTableRow[];
+  filterDefinitions: KubevirtFilter<BootVolumeTableRow>[];
   filters: KubevirtFilterState;
   getSortType: (columnIndex: number) => ThSortType;
   isEmptyVolumes: boolean;
@@ -44,9 +51,9 @@ type BootableVolumesTableData = {
   setPagination: (
     value: ((prevState: PaginationState) => PaginationState) | PaginationState,
   ) => void;
-  sortedData: BootableVolume[];
-  sortedPaginatedData: BootableVolume[];
-  unfilteredData: BootableVolume[];
+  sortedData: BootVolumeTableRow[];
+  sortedPaginatedData: BootVolumeTableRow[];
+  unfilteredData: BootVolumeTableRow[];
 };
 
 type UseBootableVolumesTableData = (
@@ -54,7 +61,7 @@ type UseBootableVolumesTableData = (
   bootableVolumesData: UseBootableVolumesValues,
   preferencesMap: ResourceMap<V1beta1VirtualMachineClusterPreference>,
   userPreferencesMap: NamespacedResourceMap<V1beta1VirtualMachinePreference>,
-  preferenceName?: string,
+  guestOperatingSystem?: PreferenceOption,
   syncFiltersWithURL?: boolean,
 ) => BootableVolumesTableData;
 
@@ -63,7 +70,7 @@ const useBootableVolumesTableData: UseBootableVolumesTableData = (
   bootableVolumesData,
   preferencesMap,
   userPreferencesMap,
-  preferenceName,
+  guestOperatingSystem,
   syncFiltersWithURL = true,
 ) => {
   const { t } = useKubevirtTranslation();
@@ -72,14 +79,23 @@ const useBootableVolumesTableData: UseBootableVolumesTableData = (
 
   const { activeColumns, columnLayout, loadedColumns } = useBootVolumeColumns(volumeListNamespace);
 
-  const preferenceFilteredVolumes = useMemo(
-    () => filterBootableVolumesByPreference(bootableVolumes, preferenceName),
-    [bootableVolumes, preferenceName],
-  );
+  // When guest OS has availablePreferences, expand volumes to table rows (one per variant)
+  // Otherwise, filter volumes by preference name (for template flow) and create single rows
+  const tableRows = useMemo(() => {
+    if (guestOperatingSystem?.availablePreferences) {
+      return expandVolumesToTableRows(bootableVolumes, guestOperatingSystem);
+    }
+
+    const filteredVolumes = guestOperatingSystem?.name
+      ? filterBootableVolumesByPreference(bootableVolumes, guestOperatingSystem.name)
+      : bootableVolumes;
+
+    return expandVolumesToTableRows(filteredVolumes, undefined);
+  }, [bootableVolumes, guestOperatingSystem]);
 
   const filterDefinitions = useMemo(
-    () => getBootVolumeTableFilters(preferenceFilteredVolumes, preferenceName, t),
-    [preferenceFilteredVolumes, preferenceName, t],
+    () => getBootVolumeTableFilters(tableRows, guestOperatingSystem, t),
+    [tableRows, guestOperatingSystem, t],
   );
 
   const {
@@ -88,7 +104,7 @@ const useBootableVolumesTableData: UseBootableVolumesTableData = (
     filters,
     onSetFilters,
   } = useKubevirtDataViewFilters({
-    data: preferenceFilteredVolumes,
+    data: tableRows,
     filterDefinitions,
     hideLabelFilter: true,
     syncWithURL: syncFiltersWithURL,
@@ -98,7 +114,7 @@ const useBootableVolumesTableData: UseBootableVolumesTableData = (
 
   useEffect(() => {
     setPagination(paginationInitialStateForm);
-  }, [preferenceName]);
+  }, [guestOperatingSystem?.name]);
 
   const { getSortType, sortedData, sortedPaginatedData } = useBootVolumeSortColumns(
     data,
@@ -112,9 +128,9 @@ const useBootableVolumesTableData: UseBootableVolumesTableData = (
   );
 
   const isPreferenceFilterEmpty =
-    !!preferenceName && !isEmpty(bootableVolumes) && isEmpty(preferenceFilteredVolumes);
+    !!guestOperatingSystem?.name && !isEmpty(bootableVolumes) && isEmpty(tableRows);
 
-  const isManualFilterEmpty = !isEmpty(preferenceFilteredVolumes) && isEmpty(data);
+  const isManualFilterEmpty = !isEmpty(tableRows) && isEmpty(data);
 
   return {
     activeColumns,
@@ -133,7 +149,7 @@ const useBootableVolumesTableData: UseBootableVolumesTableData = (
     setPagination,
     sortedData,
     sortedPaginatedData,
-    unfilteredData: preferenceFilteredVolumes,
+    unfilteredData: tableRows,
   };
 };
 

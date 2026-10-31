@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useWatch } from 'react-hook-form';
 
+import { type PreferenceOption } from '@kubevirt-utils/components/AddBootableVolumeModal/types';
 import {
   BOOTABLE_VOLUME_SELECTED,
   logTemplateFlowEvent,
@@ -42,11 +43,15 @@ const useChangeBootSourceModal: UseChangeBootSourceModal = ({ isOpen, onClose, v
   const [selectedBootableVolume, setSelectedBootableVolume] = useState<BootableVolume | undefined>(
     undefined,
   );
+  const [selectedPreference, setSelectedPreference] = useState<PreferenceOption | undefined>(
+    undefined,
+  );
 
   // Reset the pending selection each time the modal opens
   useEffect(() => {
     if (isOpen) {
       setSelectedBootableVolume(undefined);
+      setSelectedPreference(undefined);
     }
   }, [isOpen]);
 
@@ -81,6 +86,7 @@ const useChangeBootSourceModal: UseChangeBootSourceModal = ({ isOpen, onClose, v
 
   const onSelectBootableVolume: OnSelectBootableVolume = (args) => {
     setSelectedBootableVolume(args.selectedVolume);
+    setSelectedPreference(args.preferenceVariant);
     logTemplateFlowEvent(BOOTABLE_VOLUME_SELECTED, template, {
       selectedBootableVolume: getName(args.selectedVolume),
     });
@@ -107,6 +113,7 @@ const useChangeBootSourceModal: UseChangeBootSourceModal = ({ isOpen, onClose, v
     onSelectBootableVolume,
     preferenceName,
     selectedBootableVolume,
+    selectedPreference,
     setVolumeListNamespace,
     volumeListNamespace,
   };

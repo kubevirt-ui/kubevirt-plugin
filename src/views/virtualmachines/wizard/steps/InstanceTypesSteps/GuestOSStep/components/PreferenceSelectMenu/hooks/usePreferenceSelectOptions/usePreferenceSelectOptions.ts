@@ -7,7 +7,7 @@ import useHcoWorkloadArchitectures from '@kubevirt-utils/hooks/useHcoWorkloadArc
 import useUserPreferences from '@kubevirt-utils/hooks/useUserPreferences';
 import { useVMWizardForm } from '@virtualmachines/wizard/form/VMWizardFormProvider';
 import {
-  getDefaultPreference,
+  getGuestOperatingSystemPreferences,
   getSortedPreferencesByOSType,
 } from '@virtualmachines/wizard/steps/InstanceTypesSteps/GuestOSStep/components/PreferenceSelectMenu/hooks/usePreferenceSelectOptions/utils/utils';
 import { type OperatingSystemType } from '@virtualmachines/wizard/steps/InstanceTypesSteps/GuestOSStep/utils/constants';
@@ -27,10 +27,11 @@ const usePreferenceSelectOptions: UsePreferenceSelectOptions = (
   operatingSystemType,
 ) => {
   const { control, setValue } = useVMWizardForm();
-  const preference = useWatch({
+  const guestOperatingSystem = useWatch({
     control,
-    name: 'instanceType.preference',
+    name: 'instanceType.guestOperatingSystem',
   });
+
   const [architectures, architecturesLoaded] = useHcoWorkloadArchitectures(cluster);
   const [clusterPreferences, clusterPreferencesLoaded] = useClusterPreferences(null, null, cluster);
   const [userPreferences = [], userPreferencesLoaded] = useUserPreferences(
@@ -45,20 +46,23 @@ const usePreferenceSelectOptions: UsePreferenceSelectOptions = (
 
   const preferences = useMemo(() => {
     const allPreferences = [...(clusterPreferences || []), ...(userPreferences || [])];
-    return getSortedPreferencesByOSType(allPreferences, operatingSystemType, architectures);
+    return getGuestOperatingSystemPreferences(
+      getSortedPreferencesByOSType(allPreferences, operatingSystemType, architectures),
+    );
   }, [architectures, clusterPreferences, userPreferences, operatingSystemType]);
 
   useEffect(() => {
-    if (!isPreferencesLoaded) return;
+    if (!isPreferencesLoaded || preferences.length === 0) return;
 
-    const defaultPref = getDefaultPreference(preferences, operatingSystemType, architectures);
-    const isCurrentPreferenceValid =
-      preference && preferences.some((pref) => pref.name === preference.name);
+    const isCurrentValid =
+      guestOperatingSystem && preferences.some((pref) => pref.name === guestOperatingSystem.name);
 
-    if (!isCurrentPreferenceValid) {
-      setValue('instanceType.preference', defaultPref ?? null, { shouldValidate: true });
+    if (!isCurrentValid) {
+      setValue('instanceType.guestOperatingSystem', preferences[0] ?? null, {
+        shouldValidate: true,
+      });
     }
-  }, [architectures, isPreferencesLoaded, operatingSystemType, preference, preferences, setValue]);
+  }, [isPreferencesLoaded, operatingSystemType, guestOperatingSystem, preferences, setValue]);
 
   return {
     isPreferencesLoaded,
