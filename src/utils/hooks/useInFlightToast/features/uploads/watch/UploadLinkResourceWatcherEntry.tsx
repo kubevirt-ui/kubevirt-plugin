@@ -3,7 +3,7 @@ import { type FC, useEffect, useRef } from 'react';
 import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
 import type { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
-import { type UploadLinkedResource } from '../shared/types/types';
+import { type UploadLinkedResource } from '../../../shared/types/types';
 import {
   isUploadLinkedResourceGone,
   notifyDeletedUploadLinkedResource,

@@ -1,4 +1,4 @@
-import { type ProgressToastState } from '../shared/types/types';
+import { type ProgressToastState } from '../../types/types';
 
 export const resolveToastUpload = (
   uploadSnapshot: ProgressToastState | undefined,

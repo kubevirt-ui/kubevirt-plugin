@@ -1,6 +1,6 @@
-import { UPLOAD_PROGRESS_STATUS } from '../constants';
+import { UPLOAD_PROGRESS_STATUS } from '@kubevirt-utils/hooks/useInFlightToast/constants';
 
-import { type ProgressToastState } from '../shared/types/types';
+import { type ProgressToastState } from '../../types/types';
 import { resolveToastUpload } from './resolveToastUpload';
 
 const snapshot: ProgressToastState = {

@@ -7,14 +7,13 @@ import {
 import { isK8sNotFoundError } from '@kubevirt-utils/resources/errorStatusChecks';
 import type { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 
-import { useInFlightToastStore } from '../inFlightToastStore';
-
 import {
   notifyBootableVolumeDeleted,
   notifyDataVolumeDeleted,
-} from '../cancel/notifyDeletedUploadResources';
-import { isSameGroupVersionKind } from '../completion/uploadLinkedResource';
-import { type UploadLinkedResource } from '../shared/types/types';
+} from '../../../cancel/notifyDeletedUploadResources';
+import { isSameGroupVersionKind } from '../../../completion/uploadLinkedResource';
+import { useInFlightToastStore } from '../../../inFlightToastStore';
+import { type UploadLinkedResource } from '../../../shared/types/types';
 
 export const isUploadLinkedResourceGone = (
   resource: K8sResourceCommon | undefined,

@@ -1,11 +1,10 @@
 import { describe, expect, it } from '@jest/globals';
 import { DataVolumeModel, VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 
-import { UPLOAD_PROGRESS_STATUS } from '../constants';
-
-import { getUploadLinkedResource } from '../completion/uploadLinkedResource';
-import { type UploadsStoreSliceData } from '../features/uploads/types/types';
-import { type ProgressToastState } from '../shared/types/types';
+import { getUploadLinkedResource } from '../../../completion/uploadLinkedResource';
+import { UPLOAD_PROGRESS_STATUS } from '../../../constants';
+import { type ProgressToastState } from '../../../shared/types/types';
+import { type UploadsStoreSliceData } from '../types/types';
 import {
   collectWatchableUploadResources,
   getUploadLinkedResourceWatchKey,

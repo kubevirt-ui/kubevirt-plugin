@@ -4,12 +4,12 @@ import { getCancelUploadLabel } from '@kubevirt-utils/hooks/useCDIUpload/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Button, ButtonVariant, Tooltip } from '@patternfly/react-core';
 
-import { useInFlightToastStore } from '../inFlightToastStore';
-import { type InFlightToastStoreState } from '../types';
+import { useInFlightToastStore } from '../../inFlightToastStore';
+import { type InFlightProgressToastStoreSlice } from '../../types';
 
 type UploadProgressAbortButtonProps = {
   abortTooltip?: string;
-  storeSlice: keyof InFlightToastStoreState;
+  storeSlice: InFlightProgressToastStoreSlice;
   uploadKey: string;
 };
 

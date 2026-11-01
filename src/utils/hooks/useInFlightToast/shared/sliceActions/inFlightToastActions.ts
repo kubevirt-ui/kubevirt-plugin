@@ -1,5 +1,9 @@
 import { type UploadsStoreSliceData } from '../../features/uploads/types/types';
-import { type InFlightToastStoreState, type InFlightToastStoreStateSetter } from '../../types';
+import {
+  type InFlightProgressToastStoreSlice,
+  type InFlightToastStoreState,
+  type InFlightToastStoreStateSetter,
+} from '../../types';
 import { type InFlightToastStoreActions, type ProgressToastState } from '../types/types';
 import {
   createStartUpload,
@@ -22,7 +26,7 @@ import {
 export const getInFlightToastSliceActions = (
   set: InFlightToastStoreStateSetter,
   get: () => InFlightToastStoreState,
-  storeSlice: keyof InFlightToastStoreState,
+  storeSlice: InFlightProgressToastStoreSlice,
 ): InFlightToastStoreActions => {
   const deps = { get, set, storeSlice };
 

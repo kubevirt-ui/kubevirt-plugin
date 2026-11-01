@@ -2,7 +2,7 @@ import type { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
-import { type ProgressToastState } from '../shared/types/types';
+import { type ProgressToastState } from '../types/types';
 import ToastLayout from './ToastLayout';
 import UploadProgressLinks from './UploadProgressLinks';
 

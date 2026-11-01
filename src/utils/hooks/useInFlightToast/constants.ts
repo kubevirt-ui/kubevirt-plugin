@@ -8,3 +8,5 @@ export const UPLOAD_PROGRESS_STATUS = {
 export const EXPORT_DISK_STORE_SLICE = 'exportDisk';
 
 export const UPLOADS_STORE_SLICE = 'uploads';
+
+export const WATCHED_RESOURCES_STORE_SLICE = 'watchedResources';

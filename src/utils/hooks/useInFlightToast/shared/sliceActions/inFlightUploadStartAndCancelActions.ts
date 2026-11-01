@@ -1,4 +1,8 @@
-import { abortUploadStream, abortViaDataVolume, runCancelCleanup } from '../../cancel/cancelUpload';
+import {
+  abortUploadStream,
+  abortViaDataVolume,
+  runCancelCleanup,
+} from '../../cancel/abortUploadHelpers';
 import { UPLOAD_PROGRESS_STATUS } from '../../constants';
 import { type UploadsStoreSliceActions } from '../../features/uploads/types/types';
 import {
@@ -43,7 +47,7 @@ export const createStartUpload =
   };
 
 export const performCancelTrackedUpload = async (
-  { get, storeSlice }: UploadsActionsParamsWithStoreSlice,
+  { get, storeSlice }: Pick<UploadsActionsParamsWithStoreSlice, 'get' | 'storeSlice'>,
   uploadKey: string,
   { removeAfterCancel = false }: CancelTrackedUploadOptions = {},
 ): Promise<void> => {
