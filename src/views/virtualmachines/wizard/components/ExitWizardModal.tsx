@@ -11,24 +11,32 @@ import {
 } from '@patternfly/react-core';
 
 type ExitWizardModalProps = {
+  continueButtonText?: string;
   isOpen: boolean;
   onClose: () => void;
   onExit: () => void;
+  title?: string;
 };
 
-const ExitWizardModal: FC<ExitWizardModalProps> = ({ isOpen, onClose, onExit }) => {
+const ExitWizardModal: FC<ExitWizardModalProps> = ({
+  continueButtonText,
+  isOpen,
+  onClose,
+  onExit,
+  title,
+}) => {
   const { t } = useKubevirtTranslation();
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} variant={ModalVariant.small}>
-      <ModalHeader title={t('Exit VirtualMachine creation?')} titleIconVariant="warning" />
+      <ModalHeader title={title ?? t('Exit VirtualMachine creation?')} titleIconVariant="warning" />
       <ModalBody>{t("If you leave now, any information you've entered won't be saved.")}</ModalBody>
       <ModalFooter>
         <Button onClick={onExit} variant="primary">
           {t('Exit without saving')}
         </Button>
         <Button onClick={onClose} variant="link">
-          {t('Continue creating')}
+          {continueButtonText ?? t('Continue creating')}
         </Button>
       </ModalFooter>
     </Modal>
