@@ -9,7 +9,7 @@ import {
   markUploadCanceledState,
   omitRemovedSuccessLinks,
 } from '../../uploadStatusUpdates';
-import { getProgressToastState, getSliceEntry } from '../selectors/uploadEntrySelectors';
+import { getProgressToastState, getSliceEntry } from '../selectors/inFlightToastStoreSelectors';
 import {
   type CompleteUploadOptions,
   type UploadsActionsParamsWithStoreSlice,

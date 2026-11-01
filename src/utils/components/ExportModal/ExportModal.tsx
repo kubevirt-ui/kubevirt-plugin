@@ -12,6 +12,7 @@ import { Alert, AlertVariant, Stack } from '@patternfly/react-core';
 import { UPLOAD_PROGRESS_STATUS } from '../../hooks/useInFlightToast/constants';
 import { useInFlightToastStore } from '../../hooks/useInFlightToast/inFlightToastStore';
 import { getExportDiskUploadKey } from '../../hooks/useInFlightToast/keys/uploadKeys';
+import { getExportDiskActions } from '../../hooks/useInFlightToast/shared/selectors/inFlightToastStoreSelectors';
 import TabModal from '../TabModal/TabModal';
 import ExportModalForm from './components/ExportModalForm';
 import { type ExportFormValues } from './types/types';
@@ -78,7 +79,7 @@ const ExportModal: FC<ExportModalProps> = ({
 
       const podLogsUrl = `${getResourceUrl({ model: PodModel, resource: pod })}/logs`;
       const uploadKey = getExportDiskUploadKey(cluster, namespace, pvcName);
-      useInFlightToastStore.getState()?.exportDisk?.actions?.startUpload(uploadKey, {
+      getExportDiskActions()?.startUpload(uploadKey, {
         cluster,
         entry: {
           blockNavigation: true,

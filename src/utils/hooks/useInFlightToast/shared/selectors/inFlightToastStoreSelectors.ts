@@ -1,5 +1,24 @@
+import {
+  type ExportDiskStoreStateActions,
+  type ExportDiskStoreStateData,
+} from '../../features/exportDisk/types/types';
+import { type UploadsStoreSliceActions } from '../../features/uploads/types/types';
+import { type UploadsStoreSliceData } from '../../features/uploads/types/types';
+import { useInFlightToastStore } from '../../inFlightToastStore';
 import { type InFlightToastStoreState } from '../../types';
 import { type ProgressToastState, type UploadProgressStatus } from '../types/types';
+
+export const getUploadsActions = (): UploadsStoreSliceActions =>
+  useInFlightToastStore.getState().uploads.actions;
+
+export const getExportDiskActions = (): ExportDiskStoreStateActions =>
+  useInFlightToastStore.getState().exportDisk.actions;
+
+export const getUploadsData = (): UploadsStoreSliceData =>
+  useInFlightToastStore.getState().uploads.data;
+
+export const getExportDiskData = (): ExportDiskStoreStateData =>
+  useInFlightToastStore.getState().exportDisk.data;
 
 type ProgressToastHolder = { progressToastState?: ProgressToastState };
 

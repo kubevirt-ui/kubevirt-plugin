@@ -5,7 +5,7 @@ import {
 import { type DataUpload, UPLOAD_STATUS } from '@kubevirt-utils/hooks/useCDIUpload/types';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 
-import { useInFlightToastStore } from '../inFlightToastStore';
+import { getUploadsActions } from '../shared/selectors/inFlightToastStoreSelectors';
 
 export const isCdiUploadInProgress = (upload?: DataUpload): boolean =>
   upload?.uploadStatus === UPLOAD_STATUS.UPLOADING;
@@ -31,9 +31,8 @@ export const cancelTrackedUploadOnModalClose = ({
   }
 
   if (uploadKey) {
-    useInFlightToastStore
-      .getState()
-      .uploads.actions?.cancelTrackedUpload(uploadKey)
+    getUploadsActions()
+      .cancelTrackedUpload(uploadKey)
       .catch(() => {});
     return;
   }

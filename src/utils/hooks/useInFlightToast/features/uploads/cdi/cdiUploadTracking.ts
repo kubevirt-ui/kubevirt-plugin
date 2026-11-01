@@ -1,6 +1,6 @@
 import type { UploadError } from '@kubevirt-utils/hooks/useCDIUpload/types';
 import { getUploadErrorMessage, UPLOAD_STATUS } from '@kubevirt-utils/hooks/useCDIUpload/types';
-import { useInFlightToastStore } from '@kubevirt-utils/hooks/useInFlightToast/inFlightToastStore';
+import { getUploadsActions } from '@kubevirt-utils/hooks/useInFlightToast/shared/selectors/inFlightToastStoreSelectors';
 
 import { type RegisterCdiUploadParams, type SyncCdiUploadParams } from '../types/types';
 
@@ -10,7 +10,7 @@ const applyCdiStatusToStore = (
   uploadError?: UploadError,
   expectedGeneration?: number,
 ): void => {
-  const { failUpload, markUploadCanceled } = useInFlightToastStore.getState().uploads.actions;
+  const { failUpload, markUploadCanceled } = getUploadsActions();
 
   if (uploadStatus === UPLOAD_STATUS.ERROR) {
     failUpload(uploadKey, getUploadErrorMessage(uploadError), expectedGeneration);
@@ -29,7 +29,7 @@ export const syncCdiUploadProgressAndFailures = ({
   uploadKey,
   uploadStatus,
 }: SyncCdiUploadParams): void => {
-  const { getUpload, updateProgress } = useInFlightToastStore.getState().uploads.actions;
+  const { getUpload, updateProgress } = getUploadsActions();
   const upload = getUpload(uploadKey);
 
   if (!upload) {
@@ -55,6 +55,4 @@ export const registerCdiUpload = ({
   metadata,
   uploadKey,
 }: RegisterCdiUploadParams): number =>
-  useInFlightToastStore
-    .getState()
-    .uploads.actions?.startUpload(uploadKey, { ...metadata, cancelUpload, fileName });
+  getUploadsActions().startUpload(uploadKey, { ...metadata, cancelUpload, fileName });

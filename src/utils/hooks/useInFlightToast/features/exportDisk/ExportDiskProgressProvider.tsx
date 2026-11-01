@@ -4,6 +4,7 @@ import { useShallow } from 'zustand/react/shallow';
 import ExportUploadWatcherEntry from '@kubevirt-utils/components/ExportModal/components/ExportUploadWatcherEntry';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 
+import { EXPORT_DISK_STORE_SLICE } from '../../constants';
 import UploadProgressToastSliceListener from '../../InFlightToastSliceListener';
 import { useInFlightToastStore } from '../../inFlightToastStore';
 import { type ExportDiskContext } from './types/types';
@@ -23,7 +24,7 @@ const ExportDiskProgressProvider: FC = () => {
 
   return (
     <>
-      <UploadProgressToastSliceListener storeSlice="exportDisk" />
+      <UploadProgressToastSliceListener storeSlice={EXPORT_DISK_STORE_SLICE} />
       {activeExports?.map((upload) => (
         <ExportUploadWatcherEntry
           key={`${upload.cluster}/${upload.namespace}/${upload.pvcName}`}

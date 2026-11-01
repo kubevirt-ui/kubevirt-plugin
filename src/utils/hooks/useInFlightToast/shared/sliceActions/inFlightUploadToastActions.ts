@@ -5,7 +5,7 @@ import {
   getSliceProgressToast,
   getTerminalToastShown,
   getToastId,
-} from '../selectors/uploadEntrySelectors';
+} from '../selectors/inFlightToastStoreSelectors';
 import { type UploadsActionsParamsWithStoreSlice } from '../types/types';
 
 export const createStripDataVolumeLinks = (

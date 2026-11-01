@@ -1,4 +1,3 @@
-/* eslint-disable max-lines -- Keep disk modal together. */
 import { type FC, type ReactElement, useCallback } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
@@ -6,11 +5,11 @@ import { isUploadCanceledError } from '@kubevirt-utils/hooks/useCDIUpload/errors
 import { useCDIUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
 import { cancelTrackedUploadOnModalClose } from '@kubevirt-utils/hooks/useInFlightToast/cancel/modalUploadCancel';
 import { completeVmDiskUpload } from '@kubevirt-utils/hooks/useInFlightToast/completion/uploadCompletion';
-import { useInFlightToastStore } from '@kubevirt-utils/hooks/useInFlightToast/inFlightToastStore';
 import {
   getUploadClusterForVm,
   getVmDiskUploadKey,
 } from '@kubevirt-utils/hooks/useInFlightToast/keys/uploadKeys';
+import { getUploadsActions } from '@kubevirt-utils/hooks/useInFlightToast/shared/selectors/inFlightToastStoreSelectors';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { ensurePath } from '@kubevirt-utils/utils/utils';
@@ -122,13 +121,11 @@ const UploadDiskModal: FC<V1SubDiskModalProps> = ({
           }
 
           if (expectedGeneration !== undefined) {
-            useInFlightToastStore
-              .getState()
-              .uploads.actions?.failUpload(
-                uploadKey,
-                error instanceof Error ? error.message : String(error),
-                expectedGeneration,
-              );
+            getUploadsActions().failUpload(
+              uploadKey,
+              error instanceof Error ? error.message : String(error),
+              expectedGeneration,
+            );
           }
           throw error;
         }

@@ -1,9 +1,8 @@
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 
-import { useInFlightToastStore } from '../inFlightToastStore';
-
 import { getUploadClusterForVm } from '../keys/uploadKeys';
+import { getUploadsActions } from '../shared/selectors/inFlightToastStoreSelectors';
 
 export const cancelPendingVmUploads = (vm?: V1VirtualMachine): Promise<void> => {
   const namespace = getNamespace(vm);
@@ -13,14 +12,11 @@ export const cancelPendingVmUploads = (vm?: V1VirtualMachine): Promise<void> => 
     return Promise.resolve();
   }
 
-  return useInFlightToastStore
-    .getState()
-    .uploads.actions?.cancelUploadsForVm(getUploadClusterForVm(vm), namespace, name);
+  return getUploadsActions().cancelUploadsForVm(getUploadClusterForVm(vm), namespace, name);
 };
 
 export const cancelAllWizardPendingUploads = (uploadKeys: string[] = []): void => {
-  useInFlightToastStore
-    .getState()
-    .uploads.actions?.cancelWizardPendingUploads(uploadKeys)
+  getUploadsActions()
+    .cancelWizardPendingUploads(uploadKeys)
     .catch(() => {});
 };

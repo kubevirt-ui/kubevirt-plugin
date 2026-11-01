@@ -5,7 +5,7 @@ import type { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { isUploadCanceledError } from '@kubevirt-utils/hooks/useCDIUpload/errors';
 import type { CdiUploadDataFn } from '@kubevirt-utils/hooks/useCDIUpload/types';
 import { completeVmCdromUpload } from '@kubevirt-utils/hooks/useInFlightToast/completion/uploadCompletion';
-import { useInFlightToastStore } from '@kubevirt-utils/hooks/useInFlightToast/inFlightToastStore';
+import { getUploadsActions } from '@kubevirt-utils/hooks/useInFlightToast/shared/selectors/inFlightToastStoreSelectors';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 
 import { uploadDataVolume } from './submit';
@@ -76,13 +76,11 @@ export const runVmCdromBackgroundUpload = async ({
     }
 
     if (expectedGeneration !== undefined) {
-      useInFlightToastStore
-        .getState()
-        .uploads.actions?.failUpload(
-          uploadKey,
-          error instanceof Error ? error.message : String(error),
-          expectedGeneration,
-        );
+      getUploadsActions().failUpload(
+        uploadKey,
+        error instanceof Error ? error.message : String(error),
+        expectedGeneration,
+      );
     }
 
     throw error;

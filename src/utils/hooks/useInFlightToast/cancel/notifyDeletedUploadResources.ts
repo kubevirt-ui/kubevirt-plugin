@@ -1,4 +1,4 @@
-import { useInFlightToastStore } from '../inFlightToastStore';
+import { getUploadsActions } from '../shared/selectors/inFlightToastStoreSelectors';
 
 export const notifyDataVolumeDeleted = (
   name?: string,
@@ -9,9 +9,7 @@ export const notifyDataVolumeDeleted = (
     return;
   }
 
-  useInFlightToastStore
-    .getState()
-    .uploads.actions?.stripDataVolumeLinksForResource(name, namespace, cluster);
+  getUploadsActions().stripDataVolumeLinksForResource(name, namespace, cluster);
 };
 
 export const notifyBootableVolumeDeleted = (
@@ -23,7 +21,5 @@ export const notifyBootableVolumeDeleted = (
     return;
   }
 
-  useInFlightToastStore
-    .getState()
-    .uploads.actions?.stripBootableVolumeLinks(namespace, name, cluster);
+  getUploadsActions().stripBootableVolumeLinks(namespace, name, cluster);
 };
