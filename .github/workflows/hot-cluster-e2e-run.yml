@@ -232,7 +232,7 @@ jobs:
       # GITHUB_WORKSPACE stays pointed at the product checkout at the workspace
       # root, so the TS scripts still build/test the branch's own code.
       - name: Overlay hot-cluster CI infra from main
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           ref: ${{ github.sha }}
           persist-credentials: false
@@ -424,7 +424,7 @@ jobs:
       # GITHUB_WORKSPACE stays pointed at the product checkout at the workspace
       # root, so the test runner still runs the branch's own specs/config.
       - name: Overlay hot-cluster CI infra from main
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           ref: ${{ github.sha }}
           persist-credentials: false
