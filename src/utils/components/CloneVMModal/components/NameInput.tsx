@@ -6,13 +6,11 @@ import { useDeferredFieldError } from '@kubevirt-utils/hooks/useDeferredFieldErr
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { FormGroup, TextInput } from '@patternfly/react-core';
 
-type CloneNameFormValues = {
-  name: string;
-};
+import { type CloneVMModalFormValues } from '../types/types';
 
 type NameInputProps = {
   autoFocus?: boolean;
-  control: Control<CloneNameFormValues>;
+  control: Control<CloneVMModalFormValues>;
   errorMessage?: string;
 };
 

@@ -1,9 +1,11 @@
 import { type TFunction } from 'i18next';
 import produce from 'immer';
 
-import { VirtualMachineCloneModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { VirtualMachineSnapshotModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import {
+  VirtualMachineCloneModel,
+  VirtualMachineModel,
+  VirtualMachineSnapshotModel,
+} from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
   type V1beta1VirtualMachineClone,
   type V1beta1VirtualMachineSnapshot,

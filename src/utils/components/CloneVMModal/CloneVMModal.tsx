@@ -1,5 +1,5 @@
-import { type FC, useMemo, useState } from 'react';
-import { type Resolver, useForm, useWatch } from 'react-hook-form';
+import { type FC, useMemo } from 'react';
+import { type Resolver, useForm } from 'react-hook-form';
 
 import { yupResolver } from '@hookform/resolvers/yup';
 import {
@@ -16,11 +16,8 @@ import { logVMCloned } from '@kubevirt-utils/extensions/telemetry/vm-storage';
 import { WatchedResourceKeyPrefix } from '@kubevirt-utils/hooks/useInFlightToast/features/watchedResources/types/types';
 import { getWatchedResourcesActions } from '@kubevirt-utils/hooks/useInFlightToast/shared/selectors/inFlightToastStoreSelectors';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
-import { createVMNameSchema } from '@kubevirt-utils/utils/createVMNameSchema';
+import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { isVM } from '@kubevirt-utils/utils/typeGuards';
-import { truncateToK8sName } from '@kubevirt-utils/utils/utils';
-import * as yup from '@kubevirt-utils/yup';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { Divider, ModalVariant } from '@patternfly/react-core';
 
@@ -29,9 +26,11 @@ import DescriptionInput from './components/DescriptionInput';
 import NameInput from './components/NameInput';
 import SnapshotContentConfigurationSummary from './components/SnapshotContentConfigurationSummary';
 import StartClonedVMCheckbox from './components/StartClonedVMCheckbox/StartClonedVMCheckbox';
+import { type CloneVMModalFormValues } from './types/types';
 import { getFailedCloneToastOptions, getToastWatchResourceData } from './utils/cloneWatchedToast';
 import getSubmitBtnText from './utils/getSubmitBtnText';
 import { cloneVM, generateName, vmExists } from './utils/helpers';
+import { getCloneVMSchema, getDefaultValues, getDescriptionPlaceholder } from './utils/utils';
 
 type CloneVMModalProps = {
   headerText?: string;
@@ -40,33 +39,27 @@ type CloneVMModalProps = {
   source: V1beta1VirtualMachineSnapshot | V1VirtualMachine;
 };
 
-type CloneNameFormValues = {
-  name: string;
-};
-
 const CloneVMModal: FC<CloneVMModalProps> = ({ headerText, isOpen, onClose, source }) => {
   const { t } = useKubevirtTranslation();
   const namespace = getNamespace(source);
-  const name = getName(source);
 
-  const schema = useMemo(() => yup.object({ name: createVMNameSchema(t) }), [t]);
+  const schema = useMemo(() => getCloneVMSchema(t), [t]);
 
   const {
     control,
     formState: { errors, isValid },
-  } = useForm<CloneNameFormValues>({
-    defaultValues: { name: truncateToK8sName(isVM(source) ? `${name}-clone` : name) },
+    getValues,
+  } = useForm<CloneVMModalFormValues>({
+    defaultValues: getDefaultValues(source),
     mode: 'onChange',
-    resolver: yupResolver(schema) as Resolver<CloneNameFormValues>,
+    resolver: yupResolver(schema) as Resolver<CloneVMModalFormValues>,
   });
 
-  const cloneName = useWatch({ control, name: 'name' });
-
-  const [cloneDescription, setCloneDescription] = useState('');
-  const [startCloneVM, setStartCloneVM] = useState(false);
-
-  const handleSendCloneRequest = async (cluster: string | undefined): Promise<void> => {
-    const metadataName = generateName(cloneName);
+  const handleSendCloneRequest = async (
+    cluster: string | undefined,
+    values: CloneVMModalFormValues,
+  ): Promise<void> => {
+    const metadataName = generateName(values.name);
     const actions = getWatchedResourcesActions();
     const id = actions.pushNewWatchedResource(
       getToastWatchResourceData({
@@ -74,20 +67,20 @@ const CloneVMModal: FC<CloneVMModalProps> = ({ headerText, isOpen, onClose, sour
         metadataName,
         namespace,
         t,
-        targetVmName: cloneName,
-        title: `${t('Clone virtual machine')} - ${cloneName}`,
+        targetVmName: values.name,
+        title: `${t('Clone virtual machine')} - ${values.name}`,
       }),
       WatchedResourceKeyPrefix.CloneVm,
     );
 
     try {
       await cloneVM({
-        description: cloneDescription,
+        description: values.description,
         metadataName,
         namespace,
         source,
-        startVM: startCloneVM,
-        targetName: cloneName,
+        startVM: values.startCloneVM,
+        targetName: values.name,
       });
       logVMCloned({ status: TELEMETRY_STATUS.SUCCESS });
       if (isVM(source)) {
@@ -100,14 +93,15 @@ const CloneVMModal: FC<CloneVMModalProps> = ({ headerText, isOpen, onClose, sour
   };
 
   const handleSubmit = async (): Promise<void> => {
+    const values = getValues();
     const cluster = getCluster(source);
-    const vmSameName = await vmExists(cloneName, namespace, cluster);
+    const vmSameName = await vmExists(values.name, namespace, cluster);
 
     if (vmSameName) {
       throw new Error(t('VirtualMachine with this name already exists'));
     }
 
-    await handleSendCloneRequest(cluster);
+    await handleSendCloneRequest(cluster, values);
     onClose();
   };
 
@@ -128,16 +122,8 @@ const CloneVMModal: FC<CloneVMModalProps> = ({ headerText, isOpen, onClose, sour
     >
       <NameInput autoFocus control={control} errorMessage={errors.name?.message} />
 
-      <DescriptionInput
-        description={cloneDescription}
-        placeholder={
-          isVM(source)
-            ? t('This is a cloned vm of {{name}}', { name })
-            : t('This is a vm created from snapshot {{name}}', { name })
-        }
-        setDescription={setCloneDescription}
-      />
-      <StartClonedVMCheckbox setStartCloneVM={setStartCloneVM} startCloneVM={startCloneVM} />
+      <DescriptionInput control={control} placeholder={getDescriptionPlaceholder(source, t)} />
+      <StartClonedVMCheckbox control={control} />
       <Divider />
       {isVM(source) ? (
         <CloneVMModalConfigSection vm={source} />
