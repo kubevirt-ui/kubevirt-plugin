@@ -1,6 +1,7 @@
-import { T2, T2_TAG, VM_TABS_TAG } from '@/data-models/allure-constants';
+import { T1, T1_TAG, T2, T2_TAG, VM_TABS_TAG } from '@/data-models/allure-constants';
 import { expect, test } from '@/fixtures/vm-tabs-fixture';
 import { ROUTE_VIRTUAL_MACHINES_DETAIL_OVERVIEW_TAG } from '@/data-models/route-tags';
+import { expectCloneModalHidden, expectCloneToast } from '@/utils/clone-toast-assertions';
 
 const SUITE = 'Test VM Snapshot';
 
@@ -119,17 +120,25 @@ test.describe.serial(
 
 test.describe(
   'VM Clone workflow — clone stopped VM, start clone, verify both exist',
-  { tag: [ROUTE_VIRTUAL_MACHINES_DETAIL_OVERVIEW_TAG, T2_TAG, '@tier2-vm-clone'] },
+  {
+    tag: [
+      ROUTE_VIRTUAL_MACHINES_DETAIL_OVERVIEW_TAG,
+      T1_TAG,
+      '@tier1-vm-actions',
+      '@vm-clone',
+    ],
+  },
   () => {
-    test('Clone a stopped VM with start-on-clone and verify the cloned VM runs', async ({
+    test('Clone a stopped VM with start-on-clone, toasts, and verify the cloned VM runs', async ({
       apiClient,
+      page,
       vmListPage,
       utils,
     }) => {
       await utils.withAllure({
         suite: 'VM Clone workflow',
-        feature: T2,
-        tags: [T2_TAG, VM_TABS_TAG],
+        feature: T1,
+        tags: [T1_TAG, '@tier1-vm-actions', VM_TABS_TAG],
       });
       test.setTimeout(utils.TestTimeouts.TEST_EXTENDED);
 
@@ -158,17 +167,28 @@ test.describe(
       await vmListPage.clickVmListTab();
 
       const clonedVm = utils.generateRandomVmName('clone-target');
-      await vmListPage.cloneVm(sourceVm, clonedVm, true);
+
+      await test.step('Clone from list modal and assert in-flight toast', async () => {
+        await vmListPage.cloneVm(sourceVm, clonedVm, true);
+        await expectCloneToast(page, 'info', clonedVm);
+        await expectCloneModalHidden(page);
+      });
+
       apiClient.trackResource('VirtualMachine', clonedVm, ns);
 
-      const cloneCreated = await apiClient.verifyVmCreated(
-        clonedVm,
-        ns,
-        utils.TestTimeouts.VM_BOOTUP,
-      );
-      expect
-        .soft(cloneCreated.exists, `Cloned VM ${clonedVm} should exist after clone operation`)
-        .toBe(true);
+      await test.step('Cloned VM exists while success toast is still observable', async () => {
+        const vmReady = apiClient.verifyVmCreated(clonedVm, ns, utils.TestTimeouts.VM_BOOTUP);
+        const successToast = expectCloneToast(
+          page,
+          'success',
+          clonedVm,
+          utils.TestTimeouts.VM_BOOTUP,
+        );
+        const [{ exists }] = await Promise.all([vmReady, successToast]);
+        expect
+          .soft(exists, `Cloned VM ${clonedVm} should exist after clone operation`)
+          .toBe(true);
+      });
 
       const cloneRunning = await apiClient.waitForVmRunning(
         clonedVm,

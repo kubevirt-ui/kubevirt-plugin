@@ -118,17 +118,9 @@ export default class VirtualMachineDetailMetricsSnapshotsComponent extends BaseC
         }
       }
 
-      const modalSubmit = this.locator('.pf-v6-c-modal-box button.pf-m-primary');
-      await modalSubmit.first().click();
-
-      const successAlert = this.locator('.pf-v6-c-modal-box .pf-v6-c-alert.pf-m-success');
-      await successAlert.waitFor({ state: 'visible', timeout: TestTimeouts.VM_BOOTUP });
-
-      await modalSubmit.first().click();
-      await this.locator('.pf-v6-c-modal-box').waitFor({
-        state: 'hidden',
-        timeout: TestTimeouts.ELEMENT_WAIT,
-      });
+      const createButton = this.testId('save-button').filter({ hasText: 'Create' });
+      await createButton.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
+      await this.robustClick(createButton);
 
       return true;
     } catch {

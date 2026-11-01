@@ -36,3 +36,7 @@ export const STATUS_TO_PROGRESS_VARIANT = {
   Succeeded: ProgressStepVariant.success,
   Unknown: ProgressStepVariant.danger,
 };
+
+export const TOAST_TIMEOUT_MS = 3000;
+export const INFO_TOAST_TIMEOUT_MS = 5000;
+export const WARNING_TOAST_TIMEOUT_MS = 8000;
