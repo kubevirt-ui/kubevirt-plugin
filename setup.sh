@@ -15,10 +15,10 @@ health_check () {
   #2 - pvc upload is working
   # virtctl image-upload -n default pvc auto-test-pvc --size=1Gi --image-path=${CYPRESS_LOCAL_IMAGE} --insecure --force-bind
 
-  #3 - create VM from CLI to verify the webhook
-  oc create -f cypress/fixtures/vm.yaml
-  oc wait --for=condition=ready vm/rhel-10-vm --timeout=360s
-  oc delete -f cypress/fixtures/vm.yaml
+  #3 - create VM from CLI to verify the webhook (legacy Cypress fixture removed)
+  # oc create -f cypress/fixtures/vm.yaml
+  # oc wait --for=condition=ready vm/rhel-10-vm --timeout=360s
+  # oc delete -f cypress/fixtures/vm.yaml
   set +e
 }
 
