@@ -29,6 +29,22 @@ jobs:
           persist-credentials: false
           sparse-checkout: .github
 
+      # Required so the do-not-merge/* label clears this job makes (jira,
+      # ai-config, ci-scripts, i18n path gates) are attributed to the bot
+      # identity and re-trigger auto-merge.yml -- see resolveLabelWriteToken
+      # and ci-scripts/README.md. continue-on-error: the job still runs with
+      # ambient GITHUB_TOKEN (and a logged warning) if this fails.
+      - name: Generate bot token
+        id: bot-token
+        continue-on-error: true
+        uses: actions/create-github-app-token@v3
+        with:
+          app-id: ${{ secrets.BOT_APP_ID }}
+          private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
+          permission-contents: read
+          permission-pull-requests: write
+          permission-issues: write
+
       - name: Setup scripts
         uses: ./.github/actions/setup-gh-scripts
         with:
@@ -37,7 +53,9 @@ jobs:
       - name: Run validation
         working-directory: .github/scripts
         env:
+          BOT_TOKEN: ${{ steps.bot-token.outputs.token }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          STATUS_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           JIRA_TOKEN: ${{ secrets.JIRA_TOKEN }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
           BASE_BRANCH: ${{ github.event.pull_request.base.ref }}
