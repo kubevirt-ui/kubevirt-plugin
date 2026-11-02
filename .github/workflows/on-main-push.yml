@@ -141,6 +141,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 2
     steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
       - name: Setup scripts
         uses: ./.github/actions/setup-gh-scripts
         with:
