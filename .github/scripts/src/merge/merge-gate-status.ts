@@ -7,7 +7,12 @@ export const GATING_CHECK_NAME = 'Run Gating Tests';
 type CheckRun = Awaited<ReturnType<Octokit['checks']['listForRef']>>['data']['check_runs'][number];
 
 const FAILED_COMMIT_STATES = new Set(['failure', 'error']);
-const PASSED_CHECK_CONCLUSIONS = new Set(['success', 'skipped', 'neutral']);
+// 'neutral' is deliberately excluded: on-main-push publishes a stale/held
+// Run Gating Tests check as 'neutral' (see on-main-push.yml's "Mark check
+// stale" and the /hold-e2e path), and that must count as pending -- not
+// passed -- or auto-merge can squash-merge a PR whose gating result is
+// stale rather than a real success 
+const PASSED_CHECK_CONCLUSIONS = new Set(['success', 'skipped']);
 const FAILED_CHECK_CONCLUSIONS = new Set([
   'failure',
   'cancelled',
