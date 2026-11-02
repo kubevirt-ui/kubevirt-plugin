@@ -130,7 +130,13 @@ export class CatalogPage extends BasePage {
   }
 
   private drawerQuickCreateSubmitButton(): Locator {
-    return this.templateDrawer().getByTestId('quick-create-vm-btn');
+    // Product emits data-test-id; playwright.config testIdAttribute is `data-test`,
+    // so bare getByTestId never matches. Fall back to the role button used by
+    // templateDrawerQuickCreateButton (same label).
+    const drawer = this.templateDrawer();
+    return drawer
+      .locator('[data-test-id="quick-create-vm-btn"]')
+      .or(drawer.getByRole('button', { name: /^Quick create VirtualMachine$/i }));
   }
 
   /** Quick-create heading can render before the name field; wait or re-open the modal. */

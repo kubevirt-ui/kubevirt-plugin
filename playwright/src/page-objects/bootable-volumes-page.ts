@@ -30,7 +30,11 @@ export class BootableVolumesPage extends ResourceListPage {
     // Exact match only: a loose /name/i role filter also matches arch-suffixed
     // preferences (e.g. fedora.arm64, fedora.s390x) shipped by newer CNV,
     // causing a strict-mode violation when multiple options match.
-    const option = modal.getByTestId(`preference-select-option-${preferenceName}`);
+    // Use data-test-id explicitly: playwright.config testIdAttribute is
+    // `data-test`, but FilterSelectOption emits `data-test-id`.
+    const option = modal
+      .locator(`[data-test-id="preference-select-option-${preferenceName}"]`)
+      .or(modal.getByRole('option', { exact: true, name: preferenceName }));
 
     if (!(await option.isVisible().catch(() => false))) {
       await this.closeOpenSelectMenus(modal);
