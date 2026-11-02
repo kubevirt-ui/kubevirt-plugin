@@ -22,12 +22,8 @@ export const buildColumnLayout = <TData, TCallbacks = undefined>(
   type = '',
 ): ColumnLayout => ({
   columns: columns
-    .filter((col) => col.key !== ACTIONS)
-    .map(({ additional, key, label }) => ({
-      additional,
-      id: key,
-      title: label,
-    })),
+    .filter(({ key }) => key !== ACTIONS)
+    .map(({ additional, key, label }) => ({ additional, id: key, title: label })),
   id,
   selectedColumns: new Set(activeColumnKeys),
   type,

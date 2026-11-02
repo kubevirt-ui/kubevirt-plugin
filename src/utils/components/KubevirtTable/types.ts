@@ -43,6 +43,8 @@ type BaseKubevirtTableProps<TData, TCallbacks = undefined> = {
   pagination?: PaginationState;
   /** When true, sort state (column and direction) is persisted in URL search params */
   persistSortInUrl?: boolean;
+  /** Table identity for persisting column widths in user settings. When provided with isResizable, widths survive page refresh. */
+  tableId?: string;
   unfilteredData?: TData[];
 };
 

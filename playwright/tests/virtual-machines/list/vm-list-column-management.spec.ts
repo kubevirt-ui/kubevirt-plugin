@@ -9,11 +9,12 @@ import type { Page } from '@playwright/test';
 
 const SUITE = 'VM List Column Management';
 
+/** Table header order after dragging Memory above vCPU in the manage-columns list. */
 const EXPECTED_VISIBLE_COLUMN_HEADERS = [
   'Name',
   'Namespace',
-  'vCPU',
   'Memory',
+  'vCPU',
   'Memory Utilization',
   'CPU Utilization',
 ] as const;
@@ -22,14 +23,32 @@ const COLUMNS_TO_ENABLE = ['namespace', 'vcpu', 'memory', 'memory-usage', 'cpu-u
 
 const NAME_COLUMN_ID = 'name';
 
+/** PatternFly DataViewTh resize control for the Name column (English UI). */
+const RESIZE_NAME_COLUMN_ARIA_LABEL = 'Resize name column';
+
+const RESET_COLUMN_WIDTHS_ARIA_LABEL = 'Reset column widths';
+
+const resetColumnWidthsButton = (page: Page) => page.getByTestId('reset-column-widths');
+
+const MIN_COLUMN_WIDTH_INCREASE_PX = 30;
+const COLUMN_WIDTH_RESTORE_TOLERANCE_PX = 30;
+
+const vmListTable = (page: Page) => page.locator('table.kubevirt-table').first();
+
 const columnManagementModal = (page: Page) => page.getByTestId('dialog-modal');
 
 const columnManagementCheckbox = (page: Page, columnId: string) =>
   columnManagementModal(page).locator(`#data-list-${columnId}`);
 
+const columnManagementListItem = (page: Page, columnId: string) =>
+  columnManagementModal(page)
+    .locator(`[aria-labelledby="table-column-management-item-${columnId}"]`);
+
+const columnManagementReorderHandle = (page: Page, columnId: string) =>
+  columnManagementModal(page).getByTestId(`column-reorder-handle-${columnId}`);
+
 const getTableColumnHeaders = async (page: Page): Promise<string[]> => {
-  const table = page.locator('table.kubevirt-table, table.pf-v6-c-table').first();
-  const headers = table.locator('thead th');
+  const headers = vmListTable(page).locator('thead th');
   const count = await headers.count();
 
   const labels = await Promise.all(
@@ -151,6 +170,80 @@ const configureResourceColumnSet = async (page: Page): Promise<void> => {
   }
 };
 
+const getModalColumnIdsInDisplayOrder = async (page: Page): Promise<string[]> => {
+  const labels = columnManagementModal(page).locator('[id^="table-column-management-item-"]');
+  const count = await labels.count();
+
+  const columnIds = await Promise.all(
+    Array.from({ length: count }, async (_, index) => {
+      const id = await labels.nth(index).getAttribute('id');
+      if (!id?.startsWith('table-column-management-item-')) {
+        return null;
+      }
+      return id.replace('table-column-management-item-', '');
+    }),
+  );
+
+  return columnIds.filter((columnId): columnId is string => columnId !== null);
+};
+
+const dragColumnAbove = async (
+  page: Page,
+  sourceColumnId: string,
+  targetColumnId: string,
+): Promise<void> => {
+  const sourceHandle = columnManagementReorderHandle(page, sourceColumnId);
+  const targetRow = columnManagementListItem(page, targetColumnId);
+
+  await sourceHandle.scrollIntoViewIfNeeded();
+  await targetRow.scrollIntoViewIfNeeded();
+
+  const sourceBox = await sourceHandle.boundingBox();
+  const targetBox = await targetRow.boundingBox();
+
+  if (!sourceBox || !targetBox) {
+    throw new Error(`Could not resolve drag bounds for ${sourceColumnId} -> ${targetColumnId}`);
+  }
+
+  await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(targetBox.x + targetBox.width / 2, targetBox.y + 6, { steps: 20 });
+  await page.mouse.up();
+  await page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
+};
+
+const reorderColumnAbove = async (
+  page: Page,
+  sourceColumnId: string,
+  targetColumnId: string,
+): Promise<void> => {
+  await expect(async () => {
+    const order = await getModalColumnIdsInDisplayOrder(page);
+    const sourceIndex = order.indexOf(sourceColumnId);
+    const targetIndex = order.indexOf(targetColumnId);
+
+    expect(sourceIndex, `Column "${sourceColumnId}" should be in the modal list`).toBeGreaterThan(
+      -1,
+    );
+    expect(targetIndex, `Column "${targetColumnId}" should be in the modal list`).toBeGreaterThan(
+      -1,
+    );
+
+    if (sourceIndex <= targetIndex) {
+      return;
+    }
+
+    await dragColumnAbove(page, sourceColumnId, targetColumnId);
+
+    const afterOrder = await getModalColumnIdsInDisplayOrder(page);
+    expect(afterOrder.indexOf(sourceColumnId)).toBeLessThan(afterOrder.indexOf(targetColumnId));
+  }).toPass({ timeout: TestTimeouts.ELEMENT_WAIT });
+};
+
+const reorderResourceColumnsForTest = async (page: Page): Promise<void> => {
+  await reorderColumnAbove(page, 'memory', 'vcpu');
+};
+
 const saveColumnManagementModal = async (page: Page): Promise<void> => {
   await waitForColumnManagementModalReady(page);
   await page.getByTestId('save-button').click();
@@ -183,7 +276,60 @@ const expectTableHeadersExactly = async (
   }).toPass({ timeout: TestTimeouts.ELEMENT_WAIT });
 };
 
-test.describe(SUITE, { tag: [ROUTE_VIRTUAL_MACHINES_LIST_TAG, T1_TAG, ADMIN_ONLY_TAG] }, () => {
+const columnResizeButton = (page: Page, ariaLabel: string) =>
+  vmListTable(page).locator(`thead button[aria-label="${ariaLabel}"]`);
+
+const columnHeaderForResizeButton = (page: Page, ariaLabel: string) =>
+  columnResizeButton(page, ariaLabel).locator('xpath=ancestor::th[1]');
+
+const getColumnHeaderWidth = async (page: Page, ariaLabel: string): Promise<number> => {
+  const header = columnHeaderForResizeButton(page, ariaLabel);
+  await header.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
+  const box = await header.boundingBox();
+  if (!box) {
+    throw new Error(`Could not measure column header for resize control "${ariaLabel}"`);
+  }
+  return box.width;
+};
+
+const waitForColumnResizeControl = async (page: Page, ariaLabel: string): Promise<void> => {
+  await columnResizeButton(page, ariaLabel).waitFor({
+    state: 'visible',
+    timeout: TestTimeouts.ELEMENT_WAIT,
+  });
+};
+
+const dragResizeColumnWider = async (
+  page: Page,
+  ariaLabel: string,
+  dragDeltaX: number,
+): Promise<void> => {
+  const resizeControl = columnResizeButton(page, ariaLabel);
+  await resizeControl.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
+  await resizeControl.scrollIntoViewIfNeeded();
+
+  const box = await resizeControl.boundingBox();
+  if (!box) {
+    throw new Error(`Could not resolve bounds for resize control "${ariaLabel}"`);
+  }
+
+  const startX = box.x + box.width / 2;
+  const startY = box.y + box.height / 2;
+  await page.mouse.move(startX, startY);
+  await page.mouse.down();
+  await page.mouse.move(startX + dragDeltaX, startY, { steps: 15 });
+  await page.mouse.up();
+  await page.waitForTimeout(TestTimeouts.UI_STABILIZE);
+};
+
+const clickRestoreColumnWidths = async (page: Page): Promise<void> => {
+  const restoreButton = resetColumnWidthsButton(page);
+  await restoreButton.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+  await restoreButton.click();
+  await page.waitForTimeout(TestTimeouts.UI_STABILIZE);
+};
+
+test.describe(SUITE, { tag: [T1_TAG, ADMIN_ONLY_TAG] }, () => {
   let namespace: string;
   let vmName: string;
 
@@ -216,14 +362,47 @@ test.describe(SUITE, { tag: [ROUTE_VIRTUAL_MACHINES_LIST_TAG, T1_TAG, ADMIN_ONLY
       tags: [ROUTE_VIRTUAL_MACHINES_LIST_TAG, T1_TAG, VM_LIST_TAG, ADMIN_ONLY_TAG],
     });
 
-    await test.step('Open Manage columns and select the resource column set', async () => {
+    await test.step('Open Manage columns, select columns, and reorder', async () => {
       await openColumnManagementModal(page);
       await configureResourceColumnSet(page);
+      await reorderResourceColumnsForTest(page);
       await saveColumnManagementModal(page);
     });
 
-    await test.step('Table shows only the selected column headers', async () => {
+    await test.step('Table shows selected columns in reordered header sequence', async () => {
       await expectTableHeadersExactly(page, EXPECTED_VISIBLE_COLUMN_HEADERS);
+    });
+
+    let initialNameColumnWidth = 0;
+
+    await test.step('Table columns are resizable', async () => {
+      await expect(resetColumnWidthsButton(page)).toBeVisible();
+      await expect(columnResizeButton(page, RESIZE_NAME_COLUMN_ARIA_LABEL)).toBeVisible();
+      const resizeButtons = vmListTable(page).locator('thead button[aria-label^="Resize "]');
+      await expect(resizeButtons.first()).toBeVisible();
+      expect(await resizeButtons.count()).toBeGreaterThan(1);
+    });
+
+    await test.step('Drag Name column wider and restore column widths', async () => {
+      await waitForColumnResizeControl(page, RESIZE_NAME_COLUMN_ARIA_LABEL);
+      initialNameColumnWidth = await getColumnHeaderWidth(page, RESIZE_NAME_COLUMN_ARIA_LABEL);
+      await dragResizeColumnWider(page, RESIZE_NAME_COLUMN_ARIA_LABEL, 80);
+
+      await expect(async () => {
+        await waitForColumnResizeControl(page, RESIZE_NAME_COLUMN_ARIA_LABEL);
+        const widerWidth = await getColumnHeaderWidth(page, RESIZE_NAME_COLUMN_ARIA_LABEL);
+        expect(widerWidth).toBeGreaterThan(initialNameColumnWidth + MIN_COLUMN_WIDTH_INCREASE_PX);
+      }).toPass({ timeout: TestTimeouts.ELEMENT_WAIT });
+
+      await clickRestoreColumnWidths(page);
+
+      await expect(async () => {
+        await waitForColumnResizeControl(page, RESIZE_NAME_COLUMN_ARIA_LABEL);
+        const restoredWidth = await getColumnHeaderWidth(page, RESIZE_NAME_COLUMN_ARIA_LABEL);
+        expect(Math.abs(restoredWidth - initialNameColumnWidth)).toBeLessThanOrEqual(
+          COLUMN_WIDTH_RESTORE_TOLERANCE_PX,
+        );
+      }).toPass({ timeout: TestTimeouts.ELEMENT_WAIT });
     });
   });
 });
