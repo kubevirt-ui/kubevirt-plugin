@@ -18,6 +18,7 @@ import { useNameValidation } from '@kubevirt-utils/hooks/useNameValidation';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { isVM } from '@kubevirt-utils/utils/typeGuards';
 import { truncateToK8sName } from '@kubevirt-utils/utils/utils';
+import { getDNS1123SubdomainError } from '@kubevirt-utils/utils/validation';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { Divider, ModalVariant } from '@patternfly/react-core';
 
@@ -53,7 +54,7 @@ const CloneVMModal: FC<CloneVMModalProps> = ({ headerText, isOpen, onClose, sour
     errorText,
     isValid: isCloneNameValid,
     validated,
-  } = useNameValidation({ name: cloneName });
+  } = useNameValidation({ getError: getDNS1123SubdomainError, name: cloneName });
 
   const [cloneDescription, setCloneDescription] = useState('');
   const [startCloneVM, setStartCloneVM] = useState(false);

@@ -19,7 +19,7 @@ export const getValidationMessage = (
   switch (key) {
     case 'DNS1123_NAME_MESSAGE':
       return t(
-        "a lowercase RFC 1123 label must consist of lower case alphanumeric characters or '-', and must start and end with an alphanumeric character",
+        "a lowercase RFC 1123 subdomain must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character",
         options,
       );
     case 'MAX_NAME_LENGTH_MESSAGE':
