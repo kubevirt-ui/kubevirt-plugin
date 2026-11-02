@@ -13,9 +13,12 @@ cypress/cypress-a11y-report.json
 ci-scripts/hot-cluster/helm/**/templates/
 
 # Playwright artifacts
+.playwright-cli/
 .playwright-mcp/
 .playwright-cli/
 test-results/
+playwright/gallery/dist/
+playwright/test-results/
 allure-results/
 playwright/.auth/
 .storage-states/

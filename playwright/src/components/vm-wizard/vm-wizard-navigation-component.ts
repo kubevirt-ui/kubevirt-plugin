@@ -2,6 +2,20 @@ import BaseComponent from '@/components/shared/base-component';
 import { TestTimeouts } from '@/utils/test-config';
 import type { Locator, Page } from '@playwright/test';
 
+/** Creation method values used by gallery scene helpers (`selectSceneCreationMethod`). */
+export type SceneCreationMethod = 'template' | 'instance-type' | 'clone';
+
+/** Gallery scene fixture defaults (match `component-dependencies/stories/virt-page-fixtures`). */
+const SCENE_TEMPLATE_TEST_ID = 'scene-rhel-template';
+const SCENE_BOOTABLE_VOLUME_TEST_ID = 'scene-bootable-volume';
+const SCENE_CLONE_VM_DISPLAY_NAME = 'story-vm';
+
+/**
+ * Page object for the VM creation wizard (PatternFly wizard + deployment / template / clone flows).
+ *
+ * Used by scenario E2E and **component-scenes** gallery tests. When constructed with a `root` locator
+ * (from the scene fixture), all `locator` / `testId` queries are scoped to the mounted story.
+ */
 export default class VmWizardNavigationComponent extends BaseComponent {
   private readonly _buttonEditVMCreationLocation = this.locator(
     'button[aria-label="Edit VM creation location"]',
@@ -22,15 +36,17 @@ export default class VmWizardNavigationComponent extends BaseComponent {
 
   private readonly _pfV6CMenuToggle = this.locator('.pf-v6-c-menu-toggle');
 
-  private readonly _wizardFooterCreateButton = this.page
-    .getByTestId('wizard-create-button')
-    .filter({ hasText: 'Create VirtualMachine' });
-  private readonly _wizardFooterCloneButton = this.page
-    .getByTestId('wizard-create-button')
-    .filter({ hasText: 'Clone VirtualMachine' });
-  private readonly _wizardFooterNextButton = this.page
-    .getByTestId('wizard-next-button')
-    .filter({ hasText: 'Next' });
+  private get _wizardFooterCreateButton(): Locator {
+    return this.testId('wizard-create-button').filter({ hasText: 'Create VirtualMachine' });
+  }
+
+  private get _wizardFooterCloneButton(): Locator {
+    return this.testId('wizard-create-button').filter({ hasText: 'Clone VirtualMachine' });
+  }
+
+  private get _wizardFooterNextButton(): Locator {
+    return this.testId('wizard-next-button').filter({ hasText: 'Next' });
+  }
   private readonly _pfV6CWizardMain = this.locator('.pf-v6-c-wizard__main');
   private readonly _pfV6CWizardTemplatesCatalogTile = this.locator(
     '.pf-v6-c-wizard .templates-catalog-tile',
@@ -57,8 +73,17 @@ export default class VmWizardNavigationComponent extends BaseComponent {
     name: 'Continue creating',
   });
 
-  constructor(page: Page) {
-    super(page);
+  /**
+   * @param page - Playwright page (gallery or OpenShift console).
+   * @param root - Optional mount root from component-scenes; scopes interactions to the story subtree.
+   */
+  constructor(page: Page, root?: Locator) {
+    super(page, root);
+  }
+
+  /** Gallery story mount node (`#root`); used for scene harness assertions. */
+  getSceneRoot(): Locator {
+    return this.root ?? this.page.locator('#root');
   }
 
   private get _osTypeDropdown() {
@@ -230,6 +255,10 @@ export default class VmWizardNavigationComponent extends BaseComponent {
     }
   }
 
+  async clickWizardNextButton(): Promise<void> {
+    await this.interactClick(this._wizardFooterNextButton);
+  }
+
   async clickNext(): Promise<void> {
     await this.page.keyboard.press('Escape');
     await this.page
@@ -244,8 +273,10 @@ export default class VmWizardNavigationComponent extends BaseComponent {
       timeout: TestTimeouts.SHORT_WAIT,
     });
     await nextButton.hover().catch(() => undefined);
-    await this.robustClick(nextButton);
-    await this.page.waitForTimeout(1000);
+    await this.interactClick(nextButton);
+    if (!this.root) {
+      await this.page.waitForTimeout(1000);
+    }
   }
 
   async clickViewAllProjectsInCatalog(): Promise<void> {
@@ -326,7 +357,7 @@ export default class VmWizardNavigationComponent extends BaseComponent {
       state: 'visible',
       timeout: TestTimeouts.SHORT_WAIT,
     });
-    await this._vmNameInput.first().fill(name);
+    await this.interactFill(this._vmNameInput.first(), name);
   }
 
   async filterTemplateCatalog(keyword: string): Promise<void> {
@@ -342,8 +373,10 @@ export default class VmWizardNavigationComponent extends BaseComponent {
       state: 'visible',
       timeout: TestTimeouts.SHORT_WAIT,
     });
-    await this.robustClick(this._generateVmNameButton.first());
-    await this.page.waitForTimeout(500);
+    await this.interactClick(this._generateVmNameButton.first());
+    if (!this.root) {
+      await this.page.waitForTimeout(500);
+    }
   }
 
   async getCloneWizardStepIds(): Promise<string[]> {
@@ -623,12 +656,23 @@ export default class VmWizardNavigationComponent extends BaseComponent {
   }
 
   async selectCreationMethod(method: 'newVm' | 'fromTemplate' | 'cloneVm'): Promise<void> {
+    const testIdSuffix = {
+      newVm: 'instance-type',
+      fromTemplate: 'template',
+      cloneVm: 'clone',
+    } as const;
+    const byTestId = this.testId(`creation-method-${testIdSuffix[method]}`);
+    if (await byTestId.isVisible({ timeout: TestTimeouts.SHORT_WAIT }).catch(() => false)) {
+      await this.interactClick(byTestId);
+      return;
+    }
+
     const radioMap = {
       newVm: this._newVmRadio,
       fromTemplate: this._fromTemplateRadio,
       cloneVm: this._cloneVmRadio,
     };
-    await this.robustClick(radioMap[method].first());
+    await this.interactClick(radioMap[method].first());
   }
 
   async selectOperatingSystem(os: 'rhel' | 'windows' | 'otherLinux'): Promise<void> {
@@ -1108,5 +1152,193 @@ export default class VmWizardNavigationComponent extends BaseComponent {
       state: 'hidden',
       timeout: TestTimeouts.UI_ACTION_COMPLETE,
     });
+  }
+
+  /** Left-hand wizard nav link for a step id (`WizardSceneStep` / production `VMWizardStep`). */
+  wizardNavLinkByStepId(stepId: string): Locator {
+    return this.locator(`.pf-v6-c-wizard__nav-link#${stepId}`);
+  }
+
+  /** PatternFly wizard step navigation container. */
+  wizardNav(): Locator {
+    return this.locator('.pf-v6-c-wizard__nav');
+  }
+
+  /** Sidebar step button by visible step label (used in component scene specs). */
+  wizardNavItem(stepName: string | RegExp): Locator {
+    return this.wizardNav().getByRole('button', { name: stepName });
+  }
+
+  /** Footer Next control (`data-test="wizard-next-button"`). */
+  wizardFooterNext(): Locator {
+    return this.testId('wizard-next-button');
+  }
+
+  /** Footer Back control (`data-test="wizard-back-button"`). */
+  wizardFooterBack(): Locator {
+    return this.testId('wizard-back-button');
+  }
+
+  /** Deployment details VM name field. */
+  getVmNameInput(): Locator {
+    return this._vmNameInput;
+  }
+
+  /** Clicks a sidebar step by label (skips disabled steps — use `expect` in specs). */
+  async jumpToWizardNavStep(stepName: string | RegExp): Promise<void> {
+    await this.interactClick(this.wizardNavItem(stepName));
+  }
+
+  /** Guest OS tile on the instance-type flow (`data-test="os-tile-*"`). */
+  guestOsTile(os: 'RHEL' | 'OTHER_LINUX' | 'WINDOWS'): Locator {
+    return this.testId(`os-tile-${os}`);
+  }
+
+  /** Guest OS type preference on the Guest OS step. Assert visibility in specs with `expect`. */
+  guestOsPreferenceButton(preferenceName: string | RegExp): Locator {
+    return this.page.getByRole('button', { name: preferenceName });
+  }
+
+  /** Review step primary action. Assert visibility in specs with `expect`. */
+  createVirtualMachineButton(): Locator {
+    return this.testId('create-virtual-machine');
+  }
+
+  /** Selects a guest OS tile by `data-test`, falling back to legacy text-based tiles in E2E. */
+  async selectGuestOsTileByTestId(os: 'RHEL' | 'OTHER_LINUX' | 'WINDOWS'): Promise<void> {
+    const tile = this.guestOsTile(os);
+    if (await tile.isVisible({ timeout: TestTimeouts.SHORT_WAIT }).catch(() => false)) {
+      await this.interactClick(tile);
+      return;
+    }
+    const legacyMap = {
+      RHEL: 'rhel',
+      OTHER_LINUX: 'otherLinux',
+      WINDOWS: 'windows',
+    } as const;
+    await this.selectOperatingSystem(legacyMap[os]);
+  }
+
+  /** Clicks a template catalog card by `data-test` (gallery fixtures use `scene-rhel-template`). */
+  async selectTemplateCatalogTileByTestId(templateTestId: string): Promise<void> {
+    await this.interactClick(this.testId(templateTestId));
+  }
+
+  /** Selects a clone source VM row by display name (gallery clone fixture: `story-vm`). */
+  async selectCloneSourceByDisplayName(name: string): Promise<void> {
+    await this.interactClick(this.ui.getByText(name, { exact: true }).first());
+  }
+
+  /** Add bootable volume control on the boot source step. */
+  bootSourceAddVolumeButton(): Locator {
+    return this.testId('boot-source-add-volume');
+  }
+
+  /** Bootable volume table (only rendered when "Boot volume" is selected). */
+  bootSourceVolumeTable(): Locator {
+    return this.locator('table.BootableVolumeList-table');
+  }
+
+  /** Clickable row for a boot volume by resource name. */
+  bootSourceVolumeRow(volumeName: string): Locator {
+    return this.bootSourceVolumeTable().locator('tbody tr').filter({ hasText: volumeName });
+  }
+
+  /** Selects a boot volume row on the boot source step. */
+  async selectBootVolumeByName(volumeName: string): Promise<void> {
+    const row = this.bootSourceVolumeRow(volumeName);
+    await row.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+    await this.interactClick(row);
+  }
+
+  /** Chooses the "Boot volume" radio on the boot source step. */
+  async selectBootVolumeSourceOption(): Promise<void> {
+    await this.interactClick(this.ui.getByLabel('Boot volume'));
+  }
+
+  /** Chooses the "No boot source" radio on the boot source step. */
+  async selectNoBootSource(): Promise<void> {
+    await this.interactClick(this.ui.getByLabel('No boot source'));
+  }
+
+  /**
+   * Completes the boot source step in gallery scenes: selects the stub volume by test id or "No boot source".
+   */
+  async completeBootSourceStepForScene(
+    volumeTestId: string = SCENE_BOOTABLE_VOLUME_TEST_ID,
+  ): Promise<void> {
+    const volumeCell = this.testId(volumeTestId);
+    if (await volumeCell.isVisible({ timeout: TestTimeouts.SHORT_WAIT }).catch(() => false)) {
+      await this.interactClick(volumeCell);
+      return;
+    }
+    await this.selectNoBootSource();
+  }
+
+  /** Selects the U1 instance type series tile in gallery compute step fixtures. */
+  async selectInstanceTypeSeriesU1(): Promise<void> {
+    await this.interactClick(this.testId('instance-type-series-u1'));
+  }
+
+  /** Opens size menu and selects Medium (gallery instance type fixtures). */
+  async selectInstanceTypeSizeMedium(): Promise<void> {
+    const sizeToggle = this.ui.getByRole('button', { name: /small:|Select size/ });
+    await this.interactClick(sizeToggle);
+    await this.interactClick(this.page.getByTestId('instance-type-size-medium'));
+  }
+
+  /** Footer Back when present; otherwise uses legacy wizard Back selector (E2E). */
+  async clickWizardBackButton(): Promise<void> {
+    const back = this.wizardFooterBack();
+    if (await back.isVisible({ timeout: TestTimeouts.SHORT_WAIT }).catch(() => false)) {
+      await this.interactClick(back);
+      return;
+    }
+    await this.clickBack();
+  }
+
+  // ── Component scene flows (shared PO; used by gallery specs and E2E-capable API) ──
+
+  /** Maps gallery creation method ids to E2E `selectCreationMethod` values. */
+  async selectSceneCreationMethod(method: SceneCreationMethod): Promise<void> {
+    const e2eMethod = {
+      template: 'fromTemplate',
+      'instance-type': 'newVm',
+      clone: 'cloneVm',
+    } as const satisfies Record<SceneCreationMethod, 'newVm' | 'fromTemplate' | 'cloneVm'>;
+    await this.selectCreationMethod(e2eMethod[method]);
+  }
+
+  /** Fills deployment prerequisites for gallery flows (generated VM name on 4.99+). */
+  async completeDeploymentDetailsForScene(): Promise<void> {
+    await this.generateVmName();
+  }
+
+  /** Selects the default RHEL template tile unless a custom `data-test` is passed. */
+  async selectSceneTemplateCatalogTile(
+    templateTestId: string = SCENE_TEMPLATE_TEST_ID,
+  ): Promise<void> {
+    await this.selectTemplateCatalogTileByTestId(templateTestId);
+  }
+
+  /** Picks the gallery clone source VM (`story-vm` by default). */
+  async selectSceneCloneSource(displayName: string = SCENE_CLONE_VM_DISPLAY_NAME): Promise<void> {
+    await this.selectCloneSourceByDisplayName(displayName);
+  }
+
+  /** Guest OS step shortcut for instance-type gallery flows (RHEL tile). */
+  async completeGuestOsStepForScene(): Promise<void> {
+    await this.selectGuestOsTileByTestId('RHEL');
+  }
+
+  /** Compute resources step shortcut (U1 series + Medium size). */
+  async completeComputeResourcesStepForScene(): Promise<void> {
+    await this.selectInstanceTypeSeriesU1();
+    await this.selectInstanceTypeSizeMedium();
+  }
+
+  /** Clicks Next to surface deployment name validation errors in component specs. */
+  async triggerDeploymentNameValidation(): Promise<void> {
+    await this.clickWizardNextButton();
   }
 }
