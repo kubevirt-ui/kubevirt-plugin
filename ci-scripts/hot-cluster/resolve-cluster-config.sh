@@ -31,6 +31,7 @@ LAST_CYPRESS_MINOR=22
 # (Cypress tree removed). Entries are "major.minor" strings.
 PLAYWRIGHT_MIGRATED_RELEASES=(
   "4.15"
+  "4.18"
 )
 
 # Window of OpenShift versions we can actually provision on IBM Cloud. VPC
