@@ -4,7 +4,7 @@ import { deleteCommentByMarker, findCommentByMarker, upsertComment } from '../..
 import { createOctokit, createStatusOctokit } from '../../github-repo';
 import type { GitHubConfig } from '../../types/index';
 import { COMMAND_FAILURE_SUMMARY_MARKER, VALIDATION_COMMENT_MARKER } from '../../types/index';
-import { requireEnv, safeErrorMessage } from '../../utils';
+import { requireEnv, resolveLabelWriteToken, safeErrorMessage } from '../../utils';
 import { AI_CONFIG_EVENT_ACTIONS } from '../ai-config-validation/constants';
 import { executeJiraValidation } from '../jira-validation/execute';
 import { HandledValidationError } from '../pr-path-validation/errors';
@@ -35,7 +35,10 @@ export const main = async (): Promise<void> => {
     owner: requireEnv('REPO_OWNER'),
     repo: requireEnv('REPO_NAME'),
     statusToken: process.env.STATUS_GITHUB_TOKEN,
-    token: requireEnv('GITHUB_TOKEN'),
+    // Bot token (not GITHUB_TOKEN): labels/comments here must be attributed
+    // to the bot identity so they re-trigger auto-merge.yml. See
+    // resolveLabelWriteToken's docstring.
+    token: resolveLabelWriteToken(),
   };
 
   const prNumber = parseInt(requireEnv('PR_NUMBER'), 10);

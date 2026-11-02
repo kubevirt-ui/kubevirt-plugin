@@ -44,6 +44,8 @@ Pool eligibility (`isMergePoolPr`): `lgtm` + `approved`, and no blockers (`hold`
 
 Only E2E failure turns Merge Gate red; label waits and other check gaps stay yellow/pending. Full merge-pool design: [`ci-scripts/README.md`](../../ci-scripts/README.md#merge-automation-prow--tide-replacement).
 
+Merge Gate only refreshes on `labeled`/`unlabeled`/review/`synchronize` events. A `do-not-merge/*` label cleared via the ambient `GITHUB_TOKEN` (instead of the bot token) doesn't fire those events and leaves Merge Gate stale — see [Clearing a `do-not-merge/*` label via `GITHUB_TOKEN` does not wake `auto-merge.yml`](../../ci-scripts/README.md#clearing-a-do-not-mergelabel-via-github_token-does-not-wake-auto-mergeyml) in `ci-scripts/README.md`.
+
 ## PR validation (OWNERS-gated paths)
 
 | Workflow            | Trigger               | Role                                                    |
