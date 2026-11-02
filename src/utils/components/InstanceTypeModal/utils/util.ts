@@ -11,8 +11,8 @@ import {
   getInstanceTypeMemory,
 } from '@kubevirt-utils/resources/instancetype/selectors';
 import {
-  type InstanceTypeSeries,
-  type InstanceTypeSize,
+  type InstanceTypeSeriesName,
+  type InstanceTypeSizeName,
   type InstanceTypeUnion,
 } from '@kubevirt-utils/resources/instancetype/types';
 import { getAnnotation, getName } from '@kubevirt-utils/resources/shared';
@@ -38,12 +38,12 @@ export const getInstanceTypeDescriptionAnnotation = (instanceType: InstanceTypeU
 
 export const getInstanceTypeSeriesAndSize = (
   instanceType: InstanceTypeUnion,
-): { series?: InstanceTypeSeries; size?: InstanceTypeSize } => {
+): { series?: InstanceTypeSeriesName; size?: InstanceTypeSizeName } => {
   const [series, size] = getName(instanceType)?.split('.') ?? [];
   if (!series || !size) {
     return {};
   }
-  return { series: series as InstanceTypeSeries, size: size as InstanceTypeSize };
+  return { series: series as InstanceTypeSeriesName, size: size as InstanceTypeSizeName };
 };
 
 export const mappedInstanceTypesToSelectOptions = (
@@ -92,8 +92,8 @@ const sortInstanceTypeSizes = (a: InstanceTypeRecord, b: InstanceTypeRecord): nu
 
 export const getInstanceTypesPrettyDisplaySize = (
   mappedInstanceTypes: MappedInstanceTypes,
-  instanceTypeSeries?: InstanceTypeSeries,
-  instanceTypeSize?: InstanceTypeSize,
+  instanceTypeSeries?: InstanceTypeSeriesName,
+  instanceTypeSize?: InstanceTypeSizeName,
 ): string | undefined => {
   if (!instanceTypeSeries || !instanceTypeSize) {
     return undefined;
@@ -113,7 +113,7 @@ export const getInstanceTypeSizes = (
 
 export const getInstanceTypeSeriesDisplayName = (
   mappedInstanceTypes: MappedInstanceTypes,
-  instanceTypeSeries?: InstanceTypeSeries,
+  instanceTypeSeries?: InstanceTypeSeriesName,
 ): string | undefined => {
   if (!instanceTypeSeries) {
     return undefined;

@@ -11,25 +11,36 @@ import { isEmpty } from '@kubevirt-utils/utils/utils';
 
 import {
   initialMenuItems,
-  INSTANCETYPE_CLASS_ANNOTATION,
   INSTANCETYPE_CLASS_DISPLAY_NAME,
+  INSTANCETYPE_CLASS_LABEL,
   INSTANCETYPE_DESCRIPTION_ANNOTATION,
+  INSTANCETYPE_SIZE_LABEL,
   KUBEVIRT_IO,
   REDHAT_COM,
 } from './constants';
 import {
+  type InstanceTypeSeries,
   type InstanceTypeSize,
   type InstanceTypesMenuItemsData,
   type RedHatInstanceTypeSeries,
 } from './types';
 
-const getRedHatInstanceTypeSeriesAndSize = (
+const getInstanceTypeSeries = (
   instanceType: V1beta1VirtualMachineClusterInstancetype,
-): { redHatITSeries: RedHatInstanceTypeSeries; size: InstanceTypeSize } => {
-  const [seriesName, sizeLabel] = getName(instanceType).split('.');
+): InstanceTypeSeries => {
+  const [seriesFromName, sizeFromName] = getName(instanceType)?.split('.') ?? [];
+  const classLabel = getLabel(instanceType, INSTANCETYPE_CLASS_LABEL) ?? seriesFromName ?? '';
+  const sizeLabel = getLabel(instanceType, INSTANCETYPE_SIZE_LABEL) ?? sizeFromName ?? '';
+
+  const descriptionAnnotation = getAnnotation(instanceType, INSTANCETYPE_DESCRIPTION_ANNOTATION);
+  const classDisplayNameAnnotation = getAnnotation(
+    instanceType,
+    INSTANCETYPE_CLASS_DISPLAY_NAME,
+    classLabel,
+  );
+
   const cpus = instanceType?.spec?.cpu?.guest;
   const memory = readableSizeUnit(instanceType?.spec?.memory?.guest);
-  const classAnnotation = getAnnotation(instanceType, INSTANCETYPE_CLASS_ANNOTATION, seriesName);
 
   const size: InstanceTypeSize = {
     cpus,
@@ -38,23 +49,44 @@ const getRedHatInstanceTypeSeriesAndSize = (
   };
 
   return {
-    redHatITSeries: {
-      classAnnotation,
-      classDisplayNameAnnotation: getAnnotation(
-        instanceType,
-        INSTANCETYPE_CLASS_DISPLAY_NAME,
-        classAnnotation,
-      ),
-      descriptionAnnotation: getAnnotation(instanceType, INSTANCETYPE_DESCRIPTION_ANNOTATION),
-      seriesName,
-      sizes: [size],
-    },
-    size,
+    classDisplayNameAnnotation,
+    classLabel,
+    descriptionAnnotation,
+    sizes: [size],
+  };
+};
+
+const getRedHatInstanceTypeSeries = (
+  instanceType: V1beta1VirtualMachineClusterInstancetype,
+): RedHatInstanceTypeSeries => {
+  const [seriesName] = getName(instanceType).split('.');
+
+  const instanceTypeSeries = getInstanceTypeSeries(instanceType);
+
+  return {
+    ...instanceTypeSeries,
+    seriesName,
   };
 };
 
 export const isRedHatInstanceType = (instanceType: InstanceTypeUnion): boolean =>
   [KUBEVIRT_IO, REDHAT_COM].includes(getLabel(instanceType, VENDOR_LABEL));
+
+const mergeSeries = (items: InstanceTypeSeries[], newSeries: InstanceTypeSeries): void => {
+  const existingSeries = items.find((item) => item.classLabel === newSeries.classLabel);
+
+  if (!existingSeries) {
+    items.push(newSeries);
+    return;
+  }
+
+  const newSize = newSeries.sizes[0];
+  const isSizeExisting = existingSeries.sizes.some((size) => isEqualObject(newSize, size));
+
+  if (!isSizeExisting) {
+    existingSeries.sizes.push(newSize);
+  }
+};
 
 export const getInstanceTypeMenuItems = (
   instanceTypes: V1beta1VirtualMachineClusterInstancetype[],
@@ -63,30 +95,15 @@ export const getInstanceTypeMenuItems = (
 
   const itemsData = instanceTypes.reduce<InstanceTypesMenuItemsData>((acc, instanceType) => {
     if (!isRedHatInstanceType(instanceType)) {
-      !acc.userProvided.items.includes(getName(instanceType)) &&
-        acc.userProvided.items.push(getName(instanceType));
+      const instanceTypeName = getName(instanceType) ?? '';
+      if (!acc.userProvided.items.includes(instanceTypeName)) {
+        acc.userProvided.items.push(instanceTypeName);
+      }
       return acc;
     }
 
-    const { redHatITSeries, size } = getRedHatInstanceTypeSeriesAndSize(instanceType);
-    if (isEmpty(acc?.redHatProvided.items)) {
-      acc.redHatProvided.items = [redHatITSeries];
-      return acc;
-    }
-
-    const series = acc.redHatProvided.items.find(
-      (item) => item.seriesName === redHatITSeries.seriesName,
-    );
-
-    if (!series) {
-      acc.redHatProvided.items = [...acc?.redHatProvided.items, redHatITSeries];
-      return acc;
-    }
-
-    const sizeNotExists = isEmpty(
-      series.sizes.find((seriesSize) => isEqualObject(size, seriesSize)),
-    );
-    sizeNotExists && series.sizes.push(size);
+    const redHatITSeries = getRedHatInstanceTypeSeries(instanceType);
+    mergeSeries(acc.redHatProvided.items, redHatITSeries);
 
     return acc;
   }, initialMenuItems);

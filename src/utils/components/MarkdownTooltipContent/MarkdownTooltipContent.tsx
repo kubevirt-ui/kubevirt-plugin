@@ -2,7 +2,8 @@ import { type FC } from 'react';
 
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Stack } from '@patternfly/react-core';
-import { MARKDOWN_BOLD_REGEX } from '@virtualmachines/wizard/steps/InstanceTypesSteps/ComputeResourcesStep/components/SelectInstanceTypeSection/components/RedHatProvidedInstanceTypesSection/components/RedHatInstanceTypeSeriesGallery/components/RedHatSeriesMenuCard/utils/constants';
+
+import { MARKDOWN_BOLD_REGEX } from './constants';
 
 type MarkdownTooltipContentProps = {
   content: string;

@@ -27,7 +27,8 @@ const DetailsSectionDescription: FC<DetailsSectionDescriptionProps> = ({ canUpda
   return (
     <DescriptionItem
       data-test={`${vmName}-description`}
-      descriptionData={getDescription(vm) || <MutedTextSpan text={t('None')} />}
+      //eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+      descriptionData={getDescription(vm) || <MutedTextSpan text={t('None')} />} // we don't want to show the empty string
       descriptionHeader={<SearchItem id="description">{t('Description')}</SearchItem>}
       isEdit={canUpdateVM}
       onEditClick={(): void =>

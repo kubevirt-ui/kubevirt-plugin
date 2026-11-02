@@ -1,6 +1,6 @@
 import { type ComponentClass } from 'react';
 
-import { type InstanceTypeSize } from '@kubevirt-utils/resources/instancetype/types';
+import { type InstanceTypeSizeName } from '@kubevirt-utils/resources/instancetype/types';
 
 export enum InstanceTypeCategory {
   ComputeIntensive = 'ComputeIntensive',
@@ -13,7 +13,7 @@ export type InstanceTypeSizeDetails = {
   cpus: number;
   label: string;
   memory: string;
-  name: InstanceTypeSize;
+  name: InstanceTypeSizeName;
 };
 
 export type CategoryDetails = {

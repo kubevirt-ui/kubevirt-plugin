@@ -4,7 +4,7 @@ import { ConfigMapModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import type { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { DISABLED_INSTANCE_TYPE_FAMILIES } from '@kubevirt-utils/hooks/useFeatures/constants';
 import useFeaturesConfigMap from '@kubevirt-utils/hooks/useFeatures/useFeaturesConfigMap';
-import { type InstanceTypeSeries } from '@kubevirt-utils/resources/instancetype/types';
+import { type InstanceTypeSeriesName } from '@kubevirt-utils/resources/instancetype/types';
 import { operatorNamespaceSignal } from '@kubevirt-utils/store/operatorNamespace';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
@@ -25,7 +25,7 @@ type PatchOperation = {
 
 const buildDisabledFamiliesPatchData = (
   featureConfigMap: IoK8sApiCoreV1ConfigMap,
-  nextDisabledFamilies: InstanceTypeSeries[],
+  nextDisabledFamilies: InstanceTypeSeriesName[],
 ): PatchOperation[] => {
   const serialized = serializeDisabledInstanceTypeFamilies(nextDisabledFamilies);
   const patchData: PatchOperation[] = [
@@ -56,10 +56,10 @@ const buildDisabledFamiliesPatchData = (
 
 type UseDisabledInstanceTypeFamilies = (clusterOverride?: string) => {
   canEdit: boolean;
-  disabledFamilies: ReadonlySet<InstanceTypeSeries>;
+  disabledFamilies: ReadonlySet<InstanceTypeSeriesName>;
   isFamilyVisible: (series: string, preserveFamily?: string) => boolean;
   loaded: boolean;
-  setFamilyAvailable: (series: InstanceTypeSeries, available: boolean) => Promise<void>;
+  setFamilyAvailable: (series: InstanceTypeSeriesName, available: boolean) => Promise<void>;
 };
 
 const useDisabledInstanceTypeFamilies: UseDisabledInstanceTypeFamilies = (clusterOverride) => {
@@ -85,7 +85,7 @@ const useDisabledInstanceTypeFamilies: UseDisabledInstanceTypeFamilies = (cluste
   );
 
   const setFamilyAvailable = useCallback(
-    async (series: InstanceTypeSeries, available: boolean): Promise<void> => {
+    async (series: InstanceTypeSeriesName, available: boolean): Promise<void> => {
       if (!canEditFeaturesConfigMap) {
         throw new Error('User is not authorized to update instance type family availability');
       }
@@ -93,7 +93,7 @@ const useDisabledInstanceTypeFamilies: UseDisabledInstanceTypeFamilies = (cluste
         throw new Error('Features ConfigMap is not available');
       }
 
-      const nextDisabledFamilies: InstanceTypeSeries[] = available
+      const nextDisabledFamilies: InstanceTypeSeriesName[] = available
         ? removeDisabledInstanceTypeFamily(disabledFamiliesList, series)
         : addDisabledInstanceTypeFamily(disabledFamiliesList, series);
 

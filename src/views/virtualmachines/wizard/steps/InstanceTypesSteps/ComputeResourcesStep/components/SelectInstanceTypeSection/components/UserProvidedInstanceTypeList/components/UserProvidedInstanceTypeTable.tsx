@@ -1,6 +1,8 @@
 import { type FC } from 'react';
 
-import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
+import { INSTANCETYPE_ICON_PF } from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/InstanceTypeDrilldownSelect/utils/constants';
+import DynamicPfIcon from '@kubevirt-utils/components/DynamicPfIcon/DynamicPfIcon';
+import { getLabel, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import {
   getGroupVersionKindForResource,
@@ -8,10 +10,13 @@ import {
   type TableColumn,
   Timestamp,
 } from '@openshift-console/dynamic-plugin-sdk';
+import { Flex } from '@patternfly/react-core';
 import { Table, TableVariant, Tbody, Td, Th, Thead, Tr } from '@patternfly/react-table';
 import { type ThSortType } from '@patternfly/react-table/dist/esm/components/Table/base/types';
 import { type InstanceTypeSelection } from '@virtualmachines/wizard/form/types';
 import { type InstanceTypes } from '@virtualmachines/wizard/utils/types';
+
+import { getInstanceTypeDescriptionValue } from '../utils/utils';
 
 type UserProvidedInstanceTypeTableProps = {
   columns: TableColumn<InstanceTypes[number]>[];
@@ -42,30 +47,35 @@ const UserProvidedInstanceTypeTable: FC<UserProvidedInstanceTypeTableProps> = ({
       {sortedData.map((instanceTypeItem) => {
         const instanceTypeName = getName(instanceTypeItem);
         const instanceTypeNamespace = getNamespace(instanceTypeItem);
+        const iconLabel = getLabel(instanceTypeItem, INSTANCETYPE_ICON_PF);
+
         return (
           <Tr
             isClickable
             isRowSelected={
               selectedInstanceType?.name === instanceTypeName &&
               selectedInstanceType?.type === 'user' &&
-              selectedInstanceType.namespace === instanceTypeNamespace
+              selectedInstanceType.namespace === (instanceTypeNamespace ?? '')
             }
             isSelectable
-            key={`${instanceTypeName}-${instanceTypeNamespace}`}
+            key={`${instanceTypeName}-${instanceTypeNamespace ?? ''}`}
             onRowClick={(): void => onRowClick(instanceTypeName ?? '', instanceTypeNamespace ?? '')}
           >
             <Td data-test={instanceTypeName}>
-              <ResourceLink
-                groupVersionKind={getGroupVersionKindForResource(instanceTypeItem)}
-                linkTo={false}
-                name={instanceTypeName}
-                namespace={instanceTypeNamespace}
-              />
+              <Flex alignItems={{ default: 'alignItemsCenter' }} gap={{ default: 'gapSm' }}>
+                <ResourceLink
+                  groupVersionKind={getGroupVersionKindForResource(instanceTypeItem)}
+                  linkTo={false}
+                  name={instanceTypeName}
+                  namespace={instanceTypeNamespace}
+                />
+                {iconLabel && <DynamicPfIcon pfIconLabel={iconLabel} />}
+              </Flex>
             </Td>
             <Td>
               <Timestamp timestamp={instanceTypeItem?.metadata?.creationTimestamp} />
             </Td>
-            <Td>{instanceTypeItem?.metadata?.annotations?.description ?? NO_DATA_DASH}</Td>
+            <Td>{getInstanceTypeDescriptionValue(instanceTypeItem) || NO_DATA_DASH}</Td>
           </Tr>
         );
       })}

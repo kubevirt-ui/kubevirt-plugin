@@ -6,12 +6,16 @@ export type InstanceTypeSize = {
   sizeLabel: string;
 };
 
-export type RedHatInstanceTypeSeries = {
-  classAnnotation: string;
-  classDisplayNameAnnotation: string;
-  descriptionAnnotation: string;
-  seriesName: string;
+export type InstanceTypeSeries = {
+  classDisplayNameAnnotation?: string;
+  classLabel: string;
+  descriptionAnnotation?: string;
+  iconPf?: string;
   sizes: InstanceTypeSize[];
+};
+
+export type RedHatInstanceTypeSeries = InstanceTypeSeries & {
+  seriesName: string;
 };
 
 export type RedHatInstanceTypeMetadata = {
