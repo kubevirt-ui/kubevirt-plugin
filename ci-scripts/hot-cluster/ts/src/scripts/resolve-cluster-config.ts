@@ -19,7 +19,7 @@ const LAST_CYPRESS_MINOR = 22;
 
 // Release branches at/below LAST_CYPRESS_* that already migrated to Playwright
 // (Cypress tree removed). Entries are "major.minor" strings.
-const PLAYWRIGHT_MIGRATED_RELEASES: readonly string[] = ['4.15'];
+const PLAYWRIGHT_MIGRATED_RELEASES: readonly string[] = ['4.15', '4.18'];
 
 // Window of OpenShift versions we can actually provision on IBM Cloud. VPC
 // cluster creation with an explicit CNI (--cni OVNKubernetes) is rejected
