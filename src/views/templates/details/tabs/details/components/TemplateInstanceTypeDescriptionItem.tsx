@@ -7,10 +7,7 @@ import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import useClusterInstanceTypes from '@kubevirt-utils/hooks/useClusterInstanceTypes';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import {
-  getInstanceTypeCPU,
-  getInstanceTypeMemory,
-} from '@kubevirt-utils/resources/instancetype/selectors';
+import { getInstanceTypeCPUMemoryDisplayText } from '@kubevirt-utils/resources/instancetype/selectors';
 import { getAnnotation, getName } from '@kubevirt-utils/resources/shared';
 import {
   createTemplateInstanceTypeSubmit,
@@ -18,7 +15,6 @@ import {
   getTemplateVirtualMachineObject,
   type Template,
 } from '@kubevirt-utils/resources/template';
-import { getCPUMemoryDisplayValue } from '@kubevirt-utils/resources/vm';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
 
 type TemplateInstanceTypeDescriptionItemProps = {
@@ -45,13 +41,10 @@ const TemplateInstanceTypeDescriptionItem: FC<TemplateInstanceTypeDescriptionIte
     [clusterInstanceTypes, resolvedName],
   );
 
-  const cpuMemoryText = useMemo(() => {
-    if (!currentInstanceType) return undefined;
-    const cpuCount = getInstanceTypeCPU(currentInstanceType);
-    const memory = getInstanceTypeMemory(currentInstanceType)?.toString();
-    return getCPUMemoryDisplayValue(cpuCount ? { cores: cpuCount } : undefined, memory, t)
-      .cpuMemoryText;
-  }, [currentInstanceType, t]);
+  const cpuMemoryText = useMemo(
+    () => getInstanceTypeCPUMemoryDisplayText(currentInstanceType, t),
+    [currentInstanceType, t],
+  );
 
   const onEditClick = (): void =>
     createModal?.(({ isOpen, onClose }) => (

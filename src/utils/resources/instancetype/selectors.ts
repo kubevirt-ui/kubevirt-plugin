@@ -1,3 +1,7 @@
+import { type TFunction } from 'i18next';
+
+import { getCPUMemoryDisplayValue } from '@kubevirt-utils/resources/vm';
+
 import { type InstanceTypeUnion } from './types';
 
 type VMWithRevisionRefs = {
@@ -12,6 +16,19 @@ export const getInstanceTypeCPU = (resource: InstanceTypeUnion): number | undefi
 
 export const getInstanceTypeMemory = (resource: InstanceTypeUnion): number | string | undefined =>
   resource?.spec?.memory?.guest;
+
+export const getInstanceTypeCPUMemoryDisplayText = (
+  instanceType: InstanceTypeUnion | undefined,
+  t: TFunction,
+): string | undefined => {
+  if (!instanceType) {
+    return undefined;
+  }
+  const cpuCount = getInstanceTypeCPU(instanceType);
+  const memory = getInstanceTypeMemory(instanceType)?.toString();
+  return getCPUMemoryDisplayValue(cpuCount ? { cores: cpuCount } : undefined, memory, t)
+    .cpuMemoryText;
+};
 
 export const getInstanceTypeRevisionName = (vm: VMWithRevisionRefs): string | undefined =>
   vm?.status?.instancetypeRef?.controllerRevisionRef?.name;
