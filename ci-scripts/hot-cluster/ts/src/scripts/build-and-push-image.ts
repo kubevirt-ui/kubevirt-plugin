@@ -53,6 +53,7 @@ const main = async (): Promise<void> => {
 
   const buildArgs = [
     'build',
+    '--ulimit=nofile=65536:65536',
     '--ignorefile',
     ignoreFile,
     ...labelArgs,
