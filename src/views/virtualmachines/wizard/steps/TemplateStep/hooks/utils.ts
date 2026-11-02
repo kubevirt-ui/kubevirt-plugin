@@ -2,6 +2,7 @@ import { produce } from 'immer';
 
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { DYNAMIC_CREDENTIALS_SUPPORT } from '@kubevirt-utils/components/DynamicSSHKeyInjection/constants/constants';
+import { initializeRunStrategyFromTemplateSpec } from '@kubevirt-utils/components/RunStrategyModal/utils';
 import { addSecretToVM } from '@kubevirt-utils/components/SSHSecretModal/utils/utils';
 import { getLabel, getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import {
@@ -14,7 +15,6 @@ import {
 } from '@kubevirt-utils/resources/template';
 import { processOpenShiftTemplate } from '@kubevirt-utils/resources/template/utils/processOpenShiftTemplate';
 import { processVirtualMachineTemplate } from '@kubevirt-utils/resources/template/utils/processVirtualMachineTemplate';
-import { getDefaultRunningStrategy } from '@kubevirt-utils/resources/vm';
 import { getDataVolumeSourceHTTP } from '@kubevirt-utils/resources/vm/utils/dataVolumeTemplate/selectors';
 import {
   getDataVolumeTemplates,
@@ -126,7 +126,7 @@ export const getVMObjectFromTemplate = ({
 
     draftVM.metadata.name = vmName ?? getName(draftVM) ?? draftVM.metadata.labels?.app;
     draftVM.metadata.namespace = namespace;
-    draftVM.spec.runStrategy = getDefaultRunningStrategy();
+    initializeRunStrategyFromTemplateSpec(draftVM.spec);
   });
 
   if (sshSecretName) {

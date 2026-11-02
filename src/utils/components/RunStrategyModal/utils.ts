@@ -106,6 +106,15 @@ export const migrateRunningFieldToRunStrategy = (vmSpec: V1VirtualMachine['spec'
   vmSpec.runStrategy ??= wasRunning ? RUNSTRATEGY_ALWAYS : RUNSTRATEGY_HALTED;
 };
 
+export const initializeRunStrategyFromTemplateSpec = (vmSpec: V1VirtualMachine['spec']): void => {
+  if (!vmSpec) {
+    return;
+  }
+
+  migrateRunningFieldToRunStrategy(vmSpec);
+  vmSpec.runStrategy ??= getDefaultRunningStrategy();
+};
+
 /**
  * Sets the run strategy on a VM spec, removing the deprecated spec.running field.
  * Mutates in place — intended for use inside immer produce().
