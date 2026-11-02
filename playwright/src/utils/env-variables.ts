@@ -31,6 +31,19 @@ export class EnvVariables {
     return process.env.DEBUG === '1' || Boolean(process.env.DEBUG_MODE);
   }
 
+  /**
+   * Hot-cluster E2E (`HC_E2E=true` from playwright-runner-hc-e2e.sh) or in-cluster
+   * runner (`KUBERNETES_SERVICE_HOST`). Uses ServiceAccount / auth-disabled console
+   * rather than browser OAuth + kubeadmin password.
+   */
+  static get isHcE2e(): boolean {
+    return (
+      process.env.HC_E2E === 'true' ||
+      process.env.HC_E2E === '1' ||
+      Boolean(process.env.KUBERNETES_SERVICE_HOST)
+    );
+  }
+
   /** Local plugin/console dev (`IS_LOCAL=1`) or tests targeting localhost:9000. */
   static get isLocalMode(): boolean {
     return (
@@ -46,6 +59,21 @@ export class EnvVariables {
 
   static get isNonPrivUser(): boolean {
     return process.env.NON_PRIV === '1' || process.env.NON_PRIV === 'true';
+  }
+
+  /**
+   * True when the console URL does not require OAuth login — HC_E2E mode
+   * (ServiceAccount auth), localhost, or an HTTP (non-TLS) in-cluster console
+   * service that has no OAuth proxy.
+   */
+  static get isSkipBrowserLogin(): boolean {
+    if (EnvVariables.isHcE2e) {
+      return true;
+    }
+    if (EnvVariables.isLocalhost) {
+      return true;
+    }
+    return EnvVariables.webConsoleUrl.startsWith('http://');
   }
 
   static get isSharded(): boolean {
