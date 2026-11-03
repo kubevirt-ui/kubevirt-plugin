@@ -4,18 +4,19 @@ import { type TFunction } from 'i18next';
 // https://github.com/kubernetes/kubernetes/blob/8d7d7a5e0d4d7e75f5a860574346944b8cc0fc43/staging/src/k8s.io/apimachinery/pkg/util/validation/validation.go#L107-L124
 const dns1123LabelRegexp = /^[a-z0-9]([-a-z0-9]*[a-z0-9])?$/;
 
-const dns1123LabelErrMsg = (t: TFunction): string =>
+export const dns1123LabelErrMsg = (t: TFunction): string =>
   t(
     "a lowercase RFC 1123 label must consist of lower case alphanumeric characters or '-', and must start and end with an alphanumeric character",
   );
 
 // DNS1123LabelMaxLength is a label's max length in DNS (RFC 1123)
-const DNS1123LabelMaxLength = 63;
+export const DNS1123LabelMaxLength = 63;
+
+export const getMaxNameLengthErrorMsg = (t: TFunction, maxNameLength: number): string =>
+  t('Maximum name length is {{ maxNameLength }} characters', { maxNameLength });
 
 const maxNameLengthErrorMsg = (t: TFunction): string =>
-  t('Maximum name length is {{ maxNameLength }} characters', {
-    maxNameLength: DNS1123LabelMaxLength,
-  });
+  getMaxNameLengthErrorMsg(t, DNS1123LabelMaxLength);
 
 // DNS-1123 (RFC 1123) is the Kubernetes resource naming convention.
 // The "DNS1123" prefix mirrors Kubernetes' own naming (e.g. IsDNS1123Label in apimachinery).

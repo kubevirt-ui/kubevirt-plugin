@@ -1,6 +1,10 @@
 import { type TFunction } from 'i18next';
 
-import { isDNS1123Label, isDNS1123LabelLenient } from '@kubevirt-utils/utils/validation';
+import {
+  DNS1123SubdomainMaxLength,
+  isDNS1123Subdomain,
+  isDNS1123SubdomainLenient,
+} from '@kubevirt-utils/utils/dns1123SubdomainValidation';
 import * as yup from '@kubevirt-utils/yup';
 
 import { type VMWizardDeploymentValues } from '../../types';
@@ -10,18 +14,22 @@ import { getValidationMessage } from '../shared/messages';
 export const vmNameInputSchema = yup
   .string()
   .defined()
-  .test('name-input', (value) => isDNS1123LabelLenient(value));
+  .test('name-input', (value) => isDNS1123SubdomainLenient(value));
 
 const createNameSchema = (t: TFunction): yup.StringSchema<string> =>
   yup
     .string()
-    // Keep the same RFC 1123 copy as the lenient in-field check when the name is cleared.
-    .required(getValidationMessage('DNS1123_NAME_MESSAGE', t))
-    .max(63, getValidationMessage('MAX_NAME_LENGTH_MESSAGE', t, { maxNameLength: 63 }))
+    .required(getValidationMessage('DNS1123_SUBDOMAIN_NAME_MESSAGE', t))
+    .max(
+      DNS1123SubdomainMaxLength,
+      getValidationMessage('MAX_NAME_LENGTH_MESSAGE', t, {
+        maxNameLength: DNS1123SubdomainMaxLength,
+      }),
+    )
     .test(
       'dns-1123-name',
-      getValidationMessage('DNS1123_NAME_MESSAGE', t),
-      (value) => !value || value.length > 63 || isDNS1123Label(value),
+      getValidationMessage('DNS1123_SUBDOMAIN_NAME_MESSAGE', t),
+      (value) => !value || value.length > DNS1123SubdomainMaxLength || isDNS1123Subdomain(value),
     );
 
 export const createDeploymentSchema = (t: TFunction): yup.ObjectSchema<VMWizardDeploymentValues> =>

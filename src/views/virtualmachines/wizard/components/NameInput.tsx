@@ -4,7 +4,7 @@ import { useController } from 'react-hook-form';
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useNameValidation } from '@kubevirt-utils/hooks/useNameValidation';
-import { getDNS1123LabelErrorLenient } from '@kubevirt-utils/utils/validation';
+import { getDNS1123SubdomainErrorLenient } from '@kubevirt-utils/utils/dns1123SubdomainValidation';
 import { InputGroup, InputGroupItem, TextInput, ValidatedOptions } from '@patternfly/react-core';
 import { useVMWizardState } from '@virtualmachines/wizard/state/useVMWizardState';
 
@@ -23,7 +23,7 @@ const NameInput: FC = () => {
   const showValidation = isTouched || Boolean(vmName) || strictVMName;
 
   const lenientValidation = useNameValidation({
-    getError: getDNS1123LabelErrorLenient,
+    getError: getDNS1123SubdomainErrorLenient,
     name: showValidation ? vmName : undefined,
   });
 

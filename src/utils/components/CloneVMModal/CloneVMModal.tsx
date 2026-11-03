@@ -16,6 +16,7 @@ import useKubevirtToast from '@kubevirt-utils/hooks/useKubevirtToast';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useNameValidation } from '@kubevirt-utils/hooks/useNameValidation';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
+import { getDNS1123SubdomainError } from '@kubevirt-utils/utils/dns1123SubdomainValidation';
 import { isVM } from '@kubevirt-utils/utils/typeGuards';
 import { truncateToK8sName } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
@@ -53,7 +54,7 @@ const CloneVMModal: FC<CloneVMModalProps> = ({ headerText, isOpen, onClose, sour
     errorText,
     isValid: isCloneNameValid,
     validated,
-  } = useNameValidation({ name: cloneName });
+  } = useNameValidation({ getError: getDNS1123SubdomainError, name: cloneName });
 
   const [cloneDescription, setCloneDescription] = useState('');
   const [startCloneVM, setStartCloneVM] = useState(false);
