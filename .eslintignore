@@ -1,9 +1,4 @@
-# Ignore artifacts (keep in sync with prettier):
+# Ignore artifacts:
 dist/
 node_modules/
 package-lock.json
-i18n-scripts/
-/coverage
-/gui-test-screenshots
-cypress/gui-test-screenshots
-cypress/cypress-a11y-report.json
