@@ -2,12 +2,12 @@ import type { TFunction } from 'i18next';
 
 import type { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { UploadCanceledError } from '@kubevirt-utils/hooks/useCDIUpload/errors';
-import { completeVmCdromUpload } from '@kubevirt-utils/hooks/useUploadProgressToast/completion/uploadCompletion';
-import { UPLOAD_PROGRESS_STATUS } from '@kubevirt-utils/hooks/useUploadProgressToast/constants';
+import { completeVmCdromUpload } from '@kubevirt-utils/hooks/useInFlightToast/completion/uploadCompletion';
+import { UPLOAD_PROGRESS_STATUS } from '@kubevirt-utils/hooks/useInFlightToast/constants';
 import {
-  resetUploadProgressStore,
-  useUploadProgressStore,
-} from '@kubevirt-utils/hooks/useUploadProgressToast/uploadProgressStore';
+  resetInFlightToastStore,
+  useInFlightToastStore,
+} from '@kubevirt-utils/hooks/useInFlightToast/inFlightToastStore';
 
 import { uploadDataVolume } from './submit';
 import type { V1DiskFormState } from './types';
@@ -17,7 +17,7 @@ jest.mock('./submit', () => ({
   uploadDataVolume: jest.fn(),
 }));
 
-jest.mock('@kubevirt-utils/hooks/useUploadProgressToast/completion/uploadCompletion', () => ({
+jest.mock('@kubevirt-utils/hooks/useInFlightToast/completion/uploadCompletion', () => ({
   completeVmCdromUpload: jest.fn().mockResolvedValue(undefined),
 }));
 
@@ -58,28 +58,28 @@ const runUpload = (
 describe('runVmCdromBackgroundUpload', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    resetUploadProgressStore();
+    resetInFlightToastStore();
   });
 
   it('should not fail a newer same-key upload when uploadDataVolume rejects before returning generation', async () => {
-    useUploadProgressStore
+    useInFlightToastStore
       .getState()
       .uploads.actions?.startUpload(UPLOAD_KEY, { fileName: 'test.iso' });
-    useUploadProgressStore
+    useInFlightToastStore
       .getState()
       .uploads.actions?.startUpload(UPLOAD_KEY, { fileName: 'retry.iso' });
     mockUploadDataVolume.mockRejectedValue(new Error('proxy failed'));
 
     await expect(runUpload()).rejects.toThrow('proxy failed');
 
-    const upload = useUploadProgressStore.getState().uploads.actions?.getUpload(UPLOAD_KEY);
+    const upload = useInFlightToastStore.getState().uploads.actions?.getUpload(UPLOAD_KEY);
     expect(upload?.generation).toBe(2);
     expect(upload?.status).toBe(UPLOAD_PROGRESS_STATUS.UPLOADING);
     expect(upload?.errorMessage).toBeUndefined();
   });
 
   it('should fail the captured generation when completeVmCdromUpload rejects', async () => {
-    useUploadProgressStore
+    useInFlightToastStore
       .getState()
       .uploads.actions?.startUpload(UPLOAD_KEY, { fileName: 'test.iso' });
     mockUploadDataVolume.mockResolvedValue({
@@ -93,20 +93,20 @@ describe('runVmCdromBackgroundUpload', () => {
 
     await expect(runUpload()).rejects.toThrow('complete failed');
 
-    const upload = useUploadProgressStore.getState().uploads.actions?.getUpload(UPLOAD_KEY);
+    const upload = useInFlightToastStore.getState().uploads.actions?.getUpload(UPLOAD_KEY);
     expect(upload?.status).toBe(UPLOAD_PROGRESS_STATUS.ERROR);
     expect(upload?.errorMessage).toBe('complete failed');
   });
 
   it('should not mark the store failed when the upload was canceled', async () => {
-    useUploadProgressStore
+    useInFlightToastStore
       .getState()
       .uploads.actions?.startUpload(UPLOAD_KEY, { fileName: 'test.iso' });
     mockUploadDataVolume.mockRejectedValue(new UploadCanceledError());
 
     await expect(runUpload()).resolves.toBeUndefined();
 
-    expect(useUploadProgressStore.getState().uploads.actions?.getUpload(UPLOAD_KEY)?.status).toBe(
+    expect(useInFlightToastStore.getState().uploads.actions?.getUpload(UPLOAD_KEY)?.status).toBe(
       UPLOAD_PROGRESS_STATUS.UPLOADING,
     );
   });

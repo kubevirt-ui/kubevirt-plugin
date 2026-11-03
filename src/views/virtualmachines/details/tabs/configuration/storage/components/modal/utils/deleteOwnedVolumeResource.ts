@@ -1,5 +1,5 @@
 import { DataVolumeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { notifyDataVolumeDeleted } from '@kubevirt-utils/hooks/useUploadProgressToast/cancel/notifyDeletedUploadResources';
+import { notifyDataVolumeDeleted } from '@kubevirt-utils/hooks/useInFlightToast/cancel/notifyDeletedUploadResources';
 import { isK8sNotFoundError } from '@kubevirt-utils/resources/errorStatusChecks';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getCluster } from '@multicluster/helpers/selectors';

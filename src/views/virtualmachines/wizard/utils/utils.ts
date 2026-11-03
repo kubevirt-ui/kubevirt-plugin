@@ -2,8 +2,8 @@ import { type UseFormGetValues, type UseFormSetValue } from 'react-hook-form';
 import { type TFunction } from 'i18next';
 
 import { getInstanceTypeFromVolume } from '@kubevirt-utils/components/AddBootableVolumeModal/utils';
-import { cancelAllWizardPendingUploads } from '@kubevirt-utils/hooks/useUploadProgressToast';
-import { isBootableVolumeUploadKey } from '@kubevirt-utils/hooks/useUploadProgressToast/keys/uploadKeys';
+import { cancelAllWizardPendingUploads } from '@kubevirt-utils/hooks/useInFlightToast';
+import { isBootableVolumeUploadKey } from '@kubevirt-utils/hooks/useInFlightToast/keys/uploadKeys';
 import { getDiskSize } from '@kubevirt-utils/resources/bootableresources/selectors';
 import CloneIcon from '@virtualmachines/wizard/steps/DeploymentDetailsStep/components/CreationMethodTileGroup/components/CreationMethodTile/components/CloneIcon';
 import { InstanceTypeIcon } from '@virtualmachines/wizard/steps/DeploymentDetailsStep/components/CreationMethodTileGroup/components/CreationMethodTile/components/InstanceTypeIcon';

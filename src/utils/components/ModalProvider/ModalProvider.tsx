@@ -7,7 +7,7 @@ import {
   useState,
 } from 'react';
 
-import UploadProgressToastProvider from '@kubevirt-utils/hooks/useUploadProgressToast/UploadProgressToastProvider';
+import InFlightToastProvider from '@kubevirt-utils/hooks/useInFlightToast/InFlightToastProvider';
 
 export type ModalComponentProps = {
   appendTo: () => HTMLElement;
@@ -75,7 +75,7 @@ export const ModalProvider: FC<{
 
   return (
     <ModalContext.Provider value={value}>
-      <UploadProgressToastProvider>
+      <InFlightToastProvider>
         {Modal && isOpen && (
           <Modal
             appendTo={() => document.querySelector('#modal-container')}
@@ -84,7 +84,7 @@ export const ModalProvider: FC<{
           />
         )}
         {children}
-      </UploadProgressToastProvider>
+      </InFlightToastProvider>
     </ModalContext.Provider>
   );
 };

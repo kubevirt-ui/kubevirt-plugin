@@ -6,7 +6,7 @@ import {
   type V1beta1VirtualMachineSnapshot,
   type V1VirtualMachine,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { cancelPendingVmUploads } from '@kubevirt-utils/hooks/useUploadProgressToast/cancel/cancelPendingVmUploads';
+import { cancelPendingVmUploads } from '@kubevirt-utils/hooks/useInFlightToast/cancel/cancelPendingVmUploads';
 import { buildOwnerReference } from '@kubevirt-utils/resources/shared';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';

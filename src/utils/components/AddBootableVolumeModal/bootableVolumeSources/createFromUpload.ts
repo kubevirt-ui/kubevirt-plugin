@@ -7,9 +7,9 @@ import { type CdiUploadDataFn } from '@kubevirt-utils/hooks/useCDIUpload/types';
 import {
   completeBootableVolumeUpload,
   failBootableVolumeUpload,
-} from '@kubevirt-utils/hooks/useUploadProgressToast/completion/uploadCompletion';
-import { getBootableVolumeContextLink } from '@kubevirt-utils/hooks/useUploadProgressToast/completion/uploadLinks';
-import { getBootableVolumeUploadKey } from '@kubevirt-utils/hooks/useUploadProgressToast/keys/uploadKeys';
+} from '@kubevirt-utils/hooks/useInFlightToast/completion/uploadCompletion';
+import { getBootableVolumeContextLink } from '@kubevirt-utils/hooks/useInFlightToast/completion/uploadLinks';
+import { getBootableVolumeUploadKey } from '@kubevirt-utils/hooks/useInFlightToast/keys/uploadKeys';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { kubevirtK8sCreate } from '@multicluster/k8sRequests';
 

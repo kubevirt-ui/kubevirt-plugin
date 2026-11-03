@@ -5,7 +5,7 @@ import { type V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containeri
 import { type TabModalResult } from '@kubevirt-utils/components/TabModal/TabModal';
 import { DEFAULT_INSTANCETYPE_LABEL } from '@kubevirt-utils/constants/instancetypes-and-preferences';
 import { isUploadCanceledError } from '@kubevirt-utils/hooks/useCDIUpload/errors';
-import { cancelTrackedUploadOnModalClose } from '@kubevirt-utils/hooks/useUploadProgressToast/cancel/modalUploadCancel';
+import { cancelTrackedUploadOnModalClose } from '@kubevirt-utils/hooks/useInFlightToast/cancel/modalUploadCancel';
 import { appendBootableVolumeContext } from '@kubevirt-utils/resources/bootableresources/constants';
 import { type BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { getLabel, getResourceUrl } from '@kubevirt-utils/resources/shared';

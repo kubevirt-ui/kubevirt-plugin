@@ -1,7 +1,7 @@
 import { useForm } from 'react-hook-form';
 
 import { DEFAULT_INSTANCETYPE_LABEL } from '@kubevirt-utils/constants/instancetypes-and-preferences';
-import { cancelAllWizardPendingUploads } from '@kubevirt-utils/hooks/useUploadProgressToast';
+import { cancelAllWizardPendingUploads } from '@kubevirt-utils/hooks/useInFlightToast';
 import { act, renderHook } from '@testing-library/react';
 
 import { createVMWizardDefaultValues, resetCreationMethodValues } from '../form/defaultValues';
@@ -14,7 +14,7 @@ import {
   resetBootableVolumeFields,
   trackWizardPendingUploadKey,
 } from './utils';
-jest.mock('@kubevirt-utils/hooks/useUploadProgressToast', () => ({
+jest.mock('@kubevirt-utils/hooks/useInFlightToast', () => ({
   cancelAllWizardPendingUploads: jest.fn(),
 }));
 const setup = () =>

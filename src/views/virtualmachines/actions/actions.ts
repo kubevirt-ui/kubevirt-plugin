@@ -10,7 +10,7 @@ import {
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { TELEMETRY_VM_ACTION, type VMActionTelemetry } from '@kubevirt-utils/extensions/telemetry';
 import { logVMActionPerformed } from '@kubevirt-utils/extensions/telemetry/vm-actions';
-import { cancelPendingVmUploads } from '@kubevirt-utils/hooks/useUploadProgressToast/cancel/cancelPendingVmUploads';
+import { cancelPendingVmUploads } from '@kubevirt-utils/hooks/useInFlightToast/cancel/cancelPendingVmUploads';
 import { getStorageMigrationPlanModelForKind } from '@kubevirt-utils/resources/migrations/backends';
 import { type MultiNamespaceVirtualMachineStorageMigrationPlan } from '@kubevirt-utils/resources/migrations/constants';
 import { getRandomChars, kubevirtConsole, truncateToK8sName } from '@kubevirt-utils/utils/utils';

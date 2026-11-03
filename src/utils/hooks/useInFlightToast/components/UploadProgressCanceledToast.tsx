@@ -1,0 +1,34 @@
+import type { FC } from 'react';
+
+import { ProgressVariant } from '@patternfly/react-core';
+
+import { type ProgressToastState } from '../shared/types/types';
+import ToastLayout from './ToastLayout';
+import UploadProgressBar from './UploadProgressBar';
+import UploadProgressLinks from './UploadProgressLinks';
+
+type UploadProgressCanceledToastProps = {
+  navigate: (path: string) => void;
+  upload: ProgressToastState;
+};
+
+const UploadProgressCanceledToast: FC<UploadProgressCanceledToastProps> = ({
+  navigate,
+  upload,
+}) => {
+  const { contextLinks, fileName, progress } = upload;
+
+  return (
+    <ToastLayout dataTest="upload-progress-aborted-toast">
+      <UploadProgressBar
+        fileName={fileName}
+        progress={progress}
+        showSpinner={false}
+        variant={ProgressVariant.danger}
+      />
+      <UploadProgressLinks links={contextLinks} navigate={navigate} />
+    </ToastLayout>
+  );
+};
+
+export default UploadProgressCanceledToast;

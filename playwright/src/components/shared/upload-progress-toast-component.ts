@@ -1,6 +1,6 @@
 /**
  * Upload progress toast — shared component for the CDI upload-experience toasts
- * (see `useUploadProgressToast` in product code). Covers the "uploading" toast
+ * (see `useInFlightToast` in product code). Covers the "uploading" toast
  * (with abort action and context links), the terminal success toast (with links),
  * and the terminal aborted/error toasts.
  *

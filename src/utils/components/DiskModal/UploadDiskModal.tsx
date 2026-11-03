@@ -4,14 +4,14 @@ import { FormProvider, useForm } from 'react-hook-form';
 
 import { isUploadCanceledError } from '@kubevirt-utils/hooks/useCDIUpload/errors';
 import { useCDIUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
-import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { cancelTrackedUploadOnModalClose } from '@kubevirt-utils/hooks/useUploadProgressToast/cancel/modalUploadCancel';
-import { completeVmDiskUpload } from '@kubevirt-utils/hooks/useUploadProgressToast/completion/uploadCompletion';
+import { cancelTrackedUploadOnModalClose } from '@kubevirt-utils/hooks/useInFlightToast/cancel/modalUploadCancel';
+import { completeVmDiskUpload } from '@kubevirt-utils/hooks/useInFlightToast/completion/uploadCompletion';
+import { useInFlightToastStore } from '@kubevirt-utils/hooks/useInFlightToast/inFlightToastStore';
 import {
   getUploadClusterForVm,
   getVmDiskUploadKey,
-} from '@kubevirt-utils/hooks/useUploadProgressToast/keys/uploadKeys';
-import { useUploadProgressStore } from '@kubevirt-utils/hooks/useUploadProgressToast/uploadProgressStore';
+} from '@kubevirt-utils/hooks/useInFlightToast/keys/uploadKeys';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { ensurePath } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
@@ -122,7 +122,7 @@ const UploadDiskModal: FC<V1SubDiskModalProps> = ({
           }
 
           if (expectedGeneration !== undefined) {
-            useUploadProgressStore
+            useInFlightToastStore
               .getState()
               .uploads.actions?.failUpload(
                 uploadKey,
