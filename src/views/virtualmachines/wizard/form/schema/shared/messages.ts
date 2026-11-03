@@ -1,7 +1,15 @@
 import { type TFunction, type TOptions } from 'i18next';
 
+import { dns1123SubdomainErrMsg } from '@kubevirt-utils/utils/dns1123SubdomainValidation';
+import {
+  dns1123LabelErrMsg,
+  DNS1123LabelMaxLength,
+  getMaxNameLengthErrorMsg,
+} from '@kubevirt-utils/utils/validation';
+
 type ValidationMessageType =
   | 'DNS1123_NAME_MESSAGE'
+  | 'DNS1123_SUBDOMAIN_NAME_MESSAGE'
   | 'MAX_NAME_LENGTH_MESSAGE'
   | 'MIN_PASSWORD_LENGTH_MESSAGE'
   | 'SELECT_CLONE_SOURCE_MESSAGE'
@@ -18,12 +26,14 @@ export const getValidationMessage = (
 ): string => {
   switch (key) {
     case 'DNS1123_NAME_MESSAGE':
-      return t(
-        "a lowercase RFC 1123 subdomain must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character",
-        options,
-      );
+      return dns1123LabelErrMsg(t);
+    case 'DNS1123_SUBDOMAIN_NAME_MESSAGE':
+      return dns1123SubdomainErrMsg(t);
     case 'MAX_NAME_LENGTH_MESSAGE':
-      return t('Maximum name length is {{ maxNameLength }} characters', options);
+      return getMaxNameLengthErrorMsg(
+        t,
+        typeof options?.maxNameLength === 'number' ? options.maxNameLength : DNS1123LabelMaxLength,
+      );
     case 'MIN_PASSWORD_LENGTH_MESSAGE':
       return t('Minimum password length is {{ minLength }} characters', options);
     case 'SELECT_CLONE_SOURCE_MESSAGE':

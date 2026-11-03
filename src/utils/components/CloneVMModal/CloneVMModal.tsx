@@ -16,9 +16,9 @@ import useKubevirtToast from '@kubevirt-utils/hooks/useKubevirtToast';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useNameValidation } from '@kubevirt-utils/hooks/useNameValidation';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
+import { getDNS1123SubdomainError } from '@kubevirt-utils/utils/dns1123SubdomainValidation';
 import { isVM } from '@kubevirt-utils/utils/typeGuards';
 import { truncateToK8sName } from '@kubevirt-utils/utils/utils';
-import { getDNS1123SubdomainError } from '@kubevirt-utils/utils/validation';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { Divider, ModalVariant } from '@patternfly/react-core';
 

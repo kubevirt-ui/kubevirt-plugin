@@ -1,22 +1,22 @@
-/* eslint-disable max-lines -- Label and subdomain validators kept together to mirror apimachinery. */
 import { type TFunction } from 'i18next';
 
 // follow the backend validations
 // https://github.com/kubernetes/kubernetes/blob/8d7d7a5e0d4d7e75f5a860574346944b8cc0fc43/staging/src/k8s.io/apimachinery/pkg/util/validation/validation.go#L107-L124
 const dns1123LabelRegexp = /^[a-z0-9]([-a-z0-9]*[a-z0-9])?$/;
 
-const dns1123LabelErrMsg = (t: TFunction): string =>
+export const dns1123LabelErrMsg = (t: TFunction): string =>
   t(
     "a lowercase RFC 1123 label must consist of lower case alphanumeric characters or '-', and must start and end with an alphanumeric character",
   );
 
 // DNS1123LabelMaxLength is a label's max length in DNS (RFC 1123)
-const DNS1123LabelMaxLength = 63;
+export const DNS1123LabelMaxLength = 63;
+
+export const getMaxNameLengthErrorMsg = (t: TFunction, maxNameLength: number): string =>
+  t('Maximum name length is {{ maxNameLength }} characters', { maxNameLength });
 
 const maxNameLengthErrorMsg = (t: TFunction): string =>
-  t('Maximum name length is {{ maxNameLength }} characters', {
-    maxNameLength: DNS1123LabelMaxLength,
-  });
+  getMaxNameLengthErrorMsg(t, DNS1123LabelMaxLength);
 
 // DNS-1123 (RFC 1123) is the Kubernetes resource naming convention.
 // The "DNS1123" prefix mirrors Kubernetes' own naming (e.g. IsDNS1123Label in apimachinery).
@@ -56,56 +56,6 @@ export const validateDNS1123Label = (t: TFunction, value: string): string | unde
   const errorFn = getDNS1123LabelError(value);
   return errorFn ? errorFn(t) : undefined;
 };
-
-// follow the backend validations
-// https://github.com/kubernetes/kubernetes/blob/8d7d7a5e0d4d7e75f5a860574346944b8cc0fc43/staging/src/k8s.io/apimachinery/pkg/util/validation/validation.go#L163-L180
-const dns1123SubdomainRegexp = /^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$/;
-
-const dns1123SubdomainErrMsg = (t: TFunction): string =>
-  t(
-    "a lowercase RFC 1123 subdomain must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character",
-  );
-
-// DNS1123SubdomainMaxLength is a subdomain's max length in DNS (RFC 1123)
-const DNS1123SubdomainMaxLength = 253;
-
-const maxSubdomainLengthErrorMsg = (t: TFunction): string =>
-  t('Maximum name length is {{ maxNameLength }} characters', {
-    maxNameLength: DNS1123SubdomainMaxLength,
-  });
-
-export const isDNS1123Subdomain = (value: string): boolean => !getDNS1123SubdomainError(value);
-
-export const getDNS1123SubdomainError = (value: string): ((t: TFunction) => string) | undefined => {
-  if (value?.length > DNS1123SubdomainMaxLength) {
-    return maxSubdomainLengthErrorMsg;
-  }
-  if (!dns1123SubdomainRegexp.test(value ?? '')) {
-    return dns1123SubdomainErrMsg;
-  }
-  return undefined;
-};
-
-// Tolerates a trailing '-' or '.' since the user is likely still typing (e.g. "my-vm-", "my.vm.").
-// A leading '-' or '.' is still rejected because it's never valid.
-export const getDNS1123SubdomainErrorLenient = (
-  value: string,
-): ((t: TFunction) => string) | undefined => {
-  const error = getDNS1123SubdomainError(value);
-  if (
-    error &&
-    !value?.startsWith('-') &&
-    !value?.startsWith('.') &&
-    value?.length <= DNS1123SubdomainMaxLength &&
-    (value?.endsWith('-') || value?.endsWith('.'))
-  ) {
-    return undefined;
-  }
-  return error;
-};
-
-export const isDNS1123SubdomainLenient = (value: string): boolean =>
-  !getDNS1123SubdomainErrorLenient(value);
 
 export const getFieldRequiredMessage = (t: TFunction): string => t('This field is required');
 
