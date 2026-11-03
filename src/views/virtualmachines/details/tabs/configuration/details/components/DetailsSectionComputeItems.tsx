@@ -121,7 +121,7 @@ const DetailsSectionComputeItems: FC<DetailsSectionComputeItemsProps> = ({
               <CPUMemoryModal
                 isOpen={isOpen}
                 onClose={onClose}
-                onSubmit={updatedVirtualMachine}
+                onSubmit={(updatedVM) => updatedVirtualMachine(vm, updatedVM)}
                 vm={vm}
               />
             ),

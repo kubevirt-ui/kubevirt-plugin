@@ -1,8 +1,9 @@
 import { produce } from 'immer';
 
 import { type V1CPU, type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { getDomain } from '@kubevirt-utils/resources/vm';
 import { BinaryUnit, type QuantityUnit } from '@kubevirt-utils/utils/unitConstants';
-import { ensurePath } from '@kubevirt-utils/utils/utils';
+import { ensurePath, isEmpty } from '@kubevirt-utils/utils/utils';
 
 export const MEMORY_UNITS = [BinaryUnit.Mi, BinaryUnit.Gi, BinaryUnit.Ti];
 
@@ -20,8 +21,15 @@ export const applyCPUMemoryToVM = (
     }
 
     if (memory && memoryUnit) {
-      ensurePath(vmDraft, 'spec.template.spec.domain.memory.guest');
+      const memoryString = `${memory}${memoryUnit}`;
 
-      vmDraft.spec.template.spec.domain.memory.guest = `${memory}${memoryUnit}`;
+      if (isEmpty(getDomain(vmDraft)?.memory?.guest)) {
+        // in case memory is not set in domain.memory.guest, it must be set in domain.resources.requests.memory
+        ensurePath(vmDraft, 'spec.template.spec.domain.resources.requests.memory');
+        vmDraft.spec.template.spec.domain.resources.requests.memory = memoryString;
+      } else {
+        ensurePath(vmDraft, 'spec.template.spec.domain.memory.guest');
+        vmDraft.spec.template.spec.domain.memory.guest = memoryString;
+      }
     }
   });
