@@ -23,17 +23,22 @@ function getReporterConfig(resultsDir: string): ReporterDescription[] {
     return [['list']];
   }
 
+  const htmlReporter: ReporterDescription = [
+    'html',
+    { open: 'never', outputFolder: './playwright/test-results/html-report' },
+  ];
+
   if (EnvVariables.isSharded) {
     const junitFile = path.resolve(
       repoRoot,
       'junit-results',
       `junit-shard-${EnvVariables.shardIndex}.xml`,
     );
-    return [allureReporter, ['junit', { outputFile: junitFile }]];
+    return [allureReporter, ['junit', { outputFile: junitFile }], htmlReporter];
   }
 
   const junitFile = path.resolve(repoRoot, 'junit-results', 'junit.xml');
-  return [['list'], allureReporter, ['junit', { outputFile: junitFile }]];
+  return [['list'], allureReporter, ['junit', { outputFile: junitFile }], htmlReporter];
 }
 
 const baseURL = EnvVariables.webConsoleUrl;
@@ -80,7 +85,7 @@ export default defineConfig({
   fullyParallel: true,
   globalSetup: './playwright/project-dependencies/global.setup.ts',
   globalTeardown: './playwright/project-dependencies/global.teardown.ts',
-  outputDir: testResultsDir,
+  outputDir: './playwright/test-results/artifacts',
   projects: [
     {
       fullyParallel: true,
@@ -142,7 +147,7 @@ export default defineConfig({
     storageState,
     testIdAttribute: 'data-test',
     trace: 'off',
-    video: 'off',
+    video: 'retain-on-failure',
     viewport: { height: 1080, width: 1920 },
   },
   workers: process.env.WORKERS ? parseInt(process.env.WORKERS, 10) : 4,
