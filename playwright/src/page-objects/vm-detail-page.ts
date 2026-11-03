@@ -855,27 +855,47 @@ export class VmDetailPage extends BasePage {
       return;
     }
 
+    // Start is disabled while printableStatus is Provisioning (DV not ready yet).
     const start = this.startAction();
-    await pollUntil(
-      async () => {
-        await this.openActionsMenu();
-        const startItem = this.page.locator('[data-test-id="vm-action-start"]').first();
-        const target = (await startItem.isVisible().catch(() => false)) ? startItem : start;
-        if (!(await target.isVisible().catch(() => false))) {
-          await this.dismissActionsMenu();
-          return false;
-        }
-        if (!(await target.isEnabled().catch(() => false))) {
-          await this.dismissActionsMenu();
-          return false;
-        }
-        await target.click();
-        return true;
-      },
-      {
-        message: 'VM Start action should be visible and enabled in Actions menu',
-        timeout: TestTimeouts.LONG_OPERATION,
-      },
+    let lastHeading = '';
+    const deadline = Date.now() + TestTimeouts.VM_BOOTUP;
+    while (Date.now() < deadline) {
+      lastHeading = ((await this.detailHeading().textContent()) ?? '').trim();
+      if (/Provisioning/i.test(lastHeading)) {
+        await this.dismissActionsMenu().catch(() => undefined);
+        await this.page.waitForTimeout(500);
+        continue;
+      }
+
+      if (
+        (await iconStart.isVisible().catch(() => false)) &&
+        (await iconStart.isEnabled().catch(() => false))
+      ) {
+        await this.robustClick(iconStart);
+        return;
+      }
+
+      await this.openActionsMenu();
+      const startItem = this.page.locator('[data-test-id="vm-action-start"]').first();
+      const target = (await startItem.isVisible().catch(() => false)) ? startItem : start;
+      if (!(await target.isVisible().catch(() => false))) {
+        await this.dismissActionsMenu();
+        await this.page.waitForTimeout(500);
+        continue;
+      }
+      const ariaDisabled = (await target.getAttribute('aria-disabled')) === 'true';
+      if (ariaDisabled || !(await target.isEnabled().catch(() => false))) {
+        await this.dismissActionsMenu();
+        await this.page.waitForTimeout(500);
+        continue;
+      }
+      await target.click();
+      return;
+    }
+    throw new Error(
+      `VM Start action should be visible and enabled in Actions menu (heading: ${
+        lastHeading || 'unknown'
+      })`,
     );
   }
 

@@ -10,10 +10,13 @@ test.describe(`VM detail tabs ${ROUTE_VIRTUAL_MACHINES_DETAIL_TAG} ${GATING_TAG}
     testNamespace,
     vmDetailPage: vmDetail,
   }) => {
+    test.setTimeout(TestTimeouts.TEST_EXTENDED);
+
     const name = CRUD_NAMES.vmExample;
     await apiClient.deleteVirtualMachine(name, testNamespace);
     await apiClient.deleteOpenshiftTemplate(name, testNamespace);
     await apiClient.applyVirtualMachineExample(testNamespace, name);
+    await apiClient.waitForExampleVmStartable(testNamespace, name);
 
     try {
       await vmDetail.openVmAndWaitForDetail(testNamespace, name);
@@ -30,7 +33,7 @@ test.describe(`VM detail tabs ${ROUTE_VIRTUAL_MACHINES_DETAIL_TAG} ${GATING_TAG}
 
       await vmDetail.startVmFromActions();
       await expect(vmDetail.detailHeading()).toContainText(/Running/i, {
-        timeout: TestTimeouts.LONG_OPERATION,
+        timeout: TestTimeouts.VM_BOOTUP,
       });
 
       await vmDetail.goToTab(VmTabTestId.Events);
@@ -51,16 +54,19 @@ test.describe(`VM detail tabs ${ROUTE_VIRTUAL_MACHINES_DETAIL_TAG} ${GATING_TAG}
     testNamespace,
     vmDetailPage: vmDetail,
   }) => {
+    test.setTimeout(TestTimeouts.TEST_EXTENDED);
+
     const name = CRUD_NAMES.vmExample;
     await apiClient.deleteVirtualMachine(name, testNamespace);
     await apiClient.deleteOpenshiftTemplate(name, testNamespace);
     await apiClient.applyVirtualMachineExample(testNamespace, name);
+    await apiClient.waitForExampleVmStartable(testNamespace, name);
 
     try {
       await vmDetail.openVmAndWaitForDetail(testNamespace, name);
       await vmDetail.startVmFromActions();
       await expect(vmDetail.overviewStatusWithText('Running')).toBeVisible({
-        timeout: TestTimeouts.TEST_VM_CREATION,
+        timeout: TestTimeouts.VM_BOOTUP,
       });
 
       await vmDetail.openVmAndWaitForDetail(testNamespace, name);

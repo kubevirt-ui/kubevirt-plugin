@@ -5,12 +5,15 @@ import { runningTourSignal } from '@kubevirt-utils/components/GuidedTour/utils/g
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
 import { Stack, Switch } from '@patternfly/react-core';
+import { useSignals } from '@preact/signals-react/runtime';
 
 import ExpandSection from '../../../ExpandSection/ExpandSection';
 
 import './GettingStartedSection.scss';
 
 const GettingStartedSection: FC = () => {
+  useSignals();
+
   const { t } = useKubevirtTranslation();
   const [quickStarts, setQuickStarts] = useKubevirtUserSettings('quickStart');
   const run = runningTourSignal.value;
