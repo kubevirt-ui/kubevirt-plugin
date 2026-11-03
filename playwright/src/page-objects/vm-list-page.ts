@@ -879,8 +879,16 @@ export class VmListPage extends ResourceListPage {
     );
   }
 
-  async deleteVirtualMachineFromTreeContext(namespace: string, vmName: string): Promise<void> {
-    await this.goToAllNamespacesList();
+  /**
+   * Search the tree by VM name and expand the project node if needed so the
+   * VM tree item (`namespace/vmName`) is visible. Searching by namespace alone
+   * leaves the project collapsed (badge count only).
+   */
+  async waitForVmTreeItemVisible(
+    namespace: string,
+    vmName: string,
+    timeout = TestTimeouts.LONG_OPERATION,
+  ): Promise<string> {
     const vmTreeId = this.vmTreeItemId(namespace, vmName);
     const projectTreeId = this.projectTreeItemId(namespace);
     await pollUntil(
@@ -895,15 +903,32 @@ export class VmListPage extends ResourceListPage {
             .click()
             .catch(() => undefined);
         }
+        // Fallback: project role treeitem may lack the id attribute used above.
+        const escaped = namespace.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const projectItem = this.vmTreeViewPanel().getByRole('treeitem', {
+          name: new RegExp(`^${escaped}(\\s|$)`),
+        });
+        if (await projectItem.isVisible().catch(() => false)) {
+          const expanded = await projectItem.getAttribute('aria-expanded');
+          if (expanded !== 'true') {
+            await projectItem.click().catch(() => undefined);
+          }
+        }
         return this.treeItemById(vmTreeId)
           .isVisible()
           .catch(() => false);
       },
       {
         message: `VM ${namespace}/${vmName} should appear in tree`,
-        timeout: TestTimeouts.LONG_OPERATION,
+        timeout,
       },
     );
+    return vmTreeId;
+  }
+
+  async deleteVirtualMachineFromTreeContext(namespace: string, vmName: string): Promise<void> {
+    await this.goToAllNamespacesList();
+    const vmTreeId = await this.waitForVmTreeItemVisible(namespace, vmName);
     await this.rightClickTreeItem(vmTreeId, {
       waitForActionId: 'vm-action-delete',
     });

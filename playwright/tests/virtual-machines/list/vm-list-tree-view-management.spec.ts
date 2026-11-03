@@ -23,8 +23,7 @@ test.describe(`VirtualMachines tree view management ${ROUTE_VIRTUAL_MACHINES_LIS
         .toBe(true);
 
       await vmListPage.goToAllNamespacesList();
-      await vmListPage.searchTreeView(name);
-      await vmListPage.waitForTreeItemVisible(vmListPage.vmTreeItemId(testNamespace, name));
+      await vmListPage.waitForVmTreeItemVisible(testNamespace, name);
     } finally {
       await apiClient.deleteVirtualMachine(name, testNamespace);
     }
