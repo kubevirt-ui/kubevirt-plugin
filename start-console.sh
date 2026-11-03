@@ -1,8 +1,6 @@
 #!/bin/sh
 set -eu
 
-source ./route-console.sh
-
 # Define plugins (name=url)
 plugins="
 monitoring-plugin=https://github.com/openshift/monitoring-plugin.git
@@ -43,17 +41,20 @@ for arg in "$@"; do
 
     git pull
 
+
     pid="$(lsof -t -i:$INITIAL_PORT 2>/dev/null || true)"
     [ -n "$pid" ] && kill -9 "$pid"
+
 
     if [ "$arg" = "monitoring-plugin" ]; then
         cd web
         npm ci
-        PORT=$INITIAL_PORT npm run start --port=$INITIAL_PORT &
+        PORT=$INITIAL_PORT npm run start -- --port=$INITIAL_PORT &
     else
         npm ci
-        PORT=$INITIAL_PORT npm run start --port="$INITIAL_PORT" &
+        PORT=$INITIAL_PORT npm run start -- --port="$INITIAL_PORT" &
     fi
+
 
     running_podman_linux="$running_podman_linux,$arg=http://localhost:$INITIAL_PORT"
     running_podman="$running_podman,$arg=http://host.containers.internal:$INITIAL_PORT"
@@ -73,8 +74,8 @@ BRIDGE_K8S_MODE="off-cluster"
 BRIDGE_K8S_AUTH="bearer-token"
 BRIDGE_K8S_MODE_OFF_CLUSTER_SKIP_VERIFY_TLS=true
 BRIDGE_K8S_MODE_OFF_CLUSTER_ENDPOINT=$(oc whoami --show-server)
-BRIDGE_K8S_MODE_OFF_CLUSTER_THANOS=$(oc -n openshift-config-managed get configmap monitoring-shared-config -o jsonpath='{.data.thanosPublicURL}')
-BRIDGE_K8S_MODE_OFF_CLUSTER_ALERTMANAGER=$(oc -n openshift-config-managed get configmap monitoring-shared-config -o jsonpath='{.data.alertmanagerPublicURL}')
+BRIDGE_K8S_MODE_OFF_CLUSTER_THANOS=$(oc -n openshift-config-managed get configmap monitoring-shared-config -o jsonpath='{.data.thanosPublicURL}' 2>/dev/null || true)
+BRIDGE_K8S_MODE_OFF_CLUSTER_ALERTMANAGER=$(oc -n openshift-config-managed get configmap monitoring-shared-config -o jsonpath='{.data.alertmanagerPublicURL}' 2>/dev/null || true)
 BRIDGE_K8S_AUTH_BEARER_TOKEN=$(oc whoami --show-token 2>/dev/null)
 BRIDGE_USER_SETTINGS_LOCATION="localstorage"
 BRIDGE_I18N_NAMESPACES="plugin__kubevirt-plugin"
