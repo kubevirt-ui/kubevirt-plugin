@@ -57,7 +57,6 @@ cached containers will help you start developing in seconds.
 
 ```bash
 OC_PLUGIN_NAME=kubevirt-plugin
-OC_PLUGIN_I18N_NAMESPACES=plugin__kubevirt-plugin
 OC_URL=https://api.example.com:6443
 OC_USER=kubeadmin
 OC_PASS=<password>
@@ -67,11 +66,10 @@ OC_PASS=<password>
 3. `npm run dev`
 4. Navigate to <http://localhost:9000>
 
-#### Cypress Testing inside the container
+#### Playwright E2E inside the container
 
-1. `npm run test-cypress-docker`
-2. Navigate to <http://localhost:10000>
-3. login with password `kubevirt` (no need for username)
+1. See `playwright/README.md` and `scripts/run-playwright.sh`.
+2. `npm run test-playwright-headless` (or `npm run test-playwright-ui`).
 
 ### Option 3:
 

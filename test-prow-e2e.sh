@@ -27,13 +27,13 @@ function generateLogsAndCopyArtifacts {
   oc get pods -n ${NS} -o wide >> ${ARTIFACT_DIR}/pod_details_openshift-kubevirt.yaml
   oc get pods -n ${NS} -o yaml >> ${ARTIFACT_DIR}/pod_details_openshift-kubevirt.yaml
   for pod in `oc get pods -n ${NS} --no-headers -o custom-columns=":metadata.name" | grep "kubevirt"`; do
-        echo $pod
+        echo $pod 
         oc logs $pod -n ${NS} > ${ARTIFACT_DIR}/${pod}.logs
   done
   oc get serviceaccounts -n ${NS} -o wide > ${ARTIFACT_DIR}/serviceaccount.yaml
   oc get serviceaccounts -n ${NS} -o yaml >> ${ARTIFACT_DIR}/serviceaccount.yaml
   oc get console.v1.operator.openshift.io cluster -o yaml >> ${ARTIFACT_DIR}/cluster.yaml
-
+  
   if [ -d "$ARTIFACT_DIR" ] && [ -d "$SCREENSHOTS_DIR" ]; then
     if [[ -z "$(ls -A -- "$SCREENSHOTS_DIR")" ]]; then
       echo "No artifacts were copied."
@@ -59,12 +59,12 @@ unset KUBERNETES_SERVICE_HOST
 unset KUBERNETES_PORT
 unset KUBERNETES_PORT_443_TCP_PORT
 
-PULL_SECRET_PATH="/var/run/operator-secret/dockerconfig"
+PULL_SECRET_PATH="/var/run/operator-secret/dockerconfig" 
 NAMESPACE="openshift-marketplace"
 SECRET_NAME="ocs-secret"
 NS="kubevirt-hyperconverged"
 ARTIFACT_DIR=${ARTIFACT_DIR:=/tmp/artifacts}
-SCREENSHOTS_DIR="cypress/gui-test-screenshots"
+SCREENSHOTS_DIR="allure-results"
 
 function createSecret {
     oc create secret generic ${SECRET_NAME} --from-file=.dockerconfigjson=${PULL_SECRET_PATH} --type=kubernetes.io/dockerconfigjson -n $1
@@ -78,7 +78,7 @@ function linkSecrets {
 }
 
 function deleteAllPods {
-  oc delete pods --all -n $1
+  oc delete pods --all -n $1 
 }
 
 echo "Creating secret for CI builds in ${NAMESPACE}"
@@ -138,22 +138,12 @@ export BRIDGE_KUBEADMIN_PASSWORD
 BRIDGE_BASE_ADDRESS="$(oc get consoles.config.openshift.io cluster -o jsonpath='{.status.consoleURL}')"
 export BRIDGE_BASE_ADDRESS
 
-# Disable color codes in Cypress since they do not render well CI test logs.
-# https://docs.cypress.io/guides/guides/continuous-integration.html#Colors
 export NO_COLOR=1
-
-# Export namespace for upstream test
-export CYPRESS_CNV_NS='kubevirt-hyperconverged';
-export CYPRESS_OS_IMAGES_NS='kubevirt-os-images';
-
-# Setup cluster
-bash test-setup.sh
+export CI=1
 
 # Install dependencies.
 npm ci
+npm run playwright-install
 
-# Run tests.
-npm run test-cypress-headless -- --spec="tests/gating.cy.ts"
-
-# Generate Cypress report.
-npm run cypress-postreport
+# Run Playwright gating suite (Prow/Jenkins).
+HEADLESS=true npm run test-playwright-headless -- --project=Gating

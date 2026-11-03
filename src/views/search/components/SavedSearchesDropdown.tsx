@@ -13,14 +13,30 @@ import {
 } from '@patternfly/react-core';
 import { TrashIcon } from '@patternfly/react-icons';
 import { ExclamationCircleIcon } from '@patternfly/react-icons/dist/esm/icons/exclamation-circle-icon';
-import { useSavedSearchData } from '@search/hooks/useSavedSearchData';
 
-const SavedSearchesDropdown: FC = () => {
+type SavedSearchEntry = {
+  description: string;
+  name: string;
+  query: string;
+};
+
+type SavedSearchesDropdownProps = {
+  applySearch: (name: string) => void;
+  deleteSearch: (name: string) => void;
+  searches: SavedSearchEntry[];
+  searchesLoaded: boolean;
+  searchesLoadError: Error;
+};
+
+const SavedSearchesDropdown: FC<SavedSearchesDropdownProps> = ({
+  applySearch,
+  deleteSearch,
+  searches,
+  searchesLoaded,
+  searchesLoadError,
+}) => {
   const { t } = useKubevirtTranslation();
   const [open, setOpen] = useState(false);
-
-  const { applySearch, deleteSearch, searches, searchesLoaded, searchesLoadError } =
-    useSavedSearchData();
 
   const emptyStateWrapperClass =
     'pf-v6-u-mx-lg pf-v6-u-my-md pf-v6-u-text-color-subtle saved-searches-dropdown-menu';
@@ -67,19 +83,17 @@ const SavedSearchesDropdown: FC = () => {
         {searches.map(({ description, name }) => (
           <DropdownItem
             actions={
-              <div data-test={`delete-search-item-${name}`}>
-                <MenuItemAction
-                  aria-label={t('Delete saved search')}
-                  icon={<TrashIcon />}
-                  onClick={() => deleteSearch(name)}
-                />
-              </div>
+              <MenuItemAction
+                aria-label={t('Delete saved search')}
+                icon={<TrashIcon />}
+                onClick={() => deleteSearch(name)}
+              />
             }
             onClick={() => {
               applySearch(name);
               setOpen(false);
             }}
-            data-test={`saved-search-item-${name}`}
+            data-test-id={`saved-search-item--${name}`}
             description={description}
             key={name}
           >

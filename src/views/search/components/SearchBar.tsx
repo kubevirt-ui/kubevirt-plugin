@@ -54,7 +54,15 @@ const SearchBar: FC<SearchBarProps> = ({ onFilterChange }) => {
     vmsLoaded,
   });
   const navigateToSearchResults = useNavigateToSearchResults(onFilterChange);
-  const { saveSearch, urlSearchQuery } = useSavedSearchData();
+  const {
+    applySearch,
+    deleteSearch,
+    saveSearch,
+    searches,
+    searchesLoaded,
+    searchesLoadError,
+    urlSearchQuery,
+  } = useSavedSearchData();
 
   const searchSuggestResult: SearchSuggestResult | undefined = useMemo(() => {
     if (!searchQuery) {
@@ -172,7 +180,13 @@ const SearchBar: FC<SearchBarProps> = ({ onFilterChange }) => {
         </Button>
       </InputGroupItem>
       <InputGroupItem>
-        <SavedSearchesDropdown />
+        <SavedSearchesDropdown
+          applySearch={applySearch}
+          deleteSearch={deleteSearch}
+          searches={searches}
+          searchesLoaded={searchesLoaded}
+          searchesLoadError={searchesLoadError}
+        />
       </InputGroupItem>
     </InputGroup>
   );
