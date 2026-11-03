@@ -5,15 +5,26 @@ import {
 import { type PreferenceOption } from '@kubevirt-utils/components/AddBootableVolumeModal/types';
 import { getClusterOnlyArchitecture } from '@kubevirt-utils/components/FirmwareBootloaderModal/utils/utils';
 import { ARCHITECTURES } from '@kubevirt-utils/constants/constants';
+import { PREFERENCE_DISPLAY_NAME_KEY } from '@kubevirt-utils/constants/instancetypes-and-preferences';
 import {
   filterPreferencesByClusterArchitecture,
   getPreferenceArchitecture,
 } from '@kubevirt-utils/resources/preference/architecture';
-import { getName } from '@kubevirt-utils/resources/shared';
+import { getAnnotation, getName } from '@kubevirt-utils/resources/shared';
 import { LINUX, OS_NAME_TYPES, RHEL, WINDOWS } from '@kubevirt-utils/resources/template';
 import { VM_OS_ANNOTATION } from '@kubevirt-utils/resources/vm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { OperatingSystemType } from '@virtualmachines/wizard/steps/InstanceTypesSteps/GuestOSStep/utils/constants';
+
+import { getGuestOperatingSystemDisplayName } from './preferenceNameUtils';
+
+// Re-export preference name utilities
+export {
+  getGuestOperatingSystemDisplayName,
+  getGuestOperatingSystemPreferences,
+  getPreferenceVariantName,
+  getPreferenceVersionName,
+} from './preferenceNameUtils';
 
 type PreferenceFilterByOsType = {
   name: string;
@@ -130,6 +141,9 @@ const getFilteredPreferencesByOsType = (
 
       filteredPreferences.push({
         architecture: getPreferenceArchitecture(preference),
+        displayName: getGuestOperatingSystemDisplayName(
+          getAnnotation(preference, PREFERENCE_DISPLAY_NAME_KEY, preferenceName),
+        ),
         kind: preference.kind,
         name: preferenceName,
       });

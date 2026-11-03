@@ -41,6 +41,7 @@ export type VMWizardDeploymentValues = {
 export type VMWizardInstanceTypeValues = {
   bootVolume: BootVolumeSelection | null;
   compute: InstanceTypeSelection | null;
+  guestOperatingSystem: PreferenceOption | null;
   operatingSystem: OperatingSystemType;
   preference: null | PreferenceOption;
   useBootSource: boolean;
