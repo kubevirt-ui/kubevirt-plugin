@@ -720,6 +720,12 @@ export default class VmWizardNavigationComponent extends BaseComponent {
     await this.page.waitForTimeout(500);
   }
 
+  async getTemplateCatalogCpuMemoryText(templateName: string): Promise<string> {
+    const cell = this.testId(`template-cpu-memory-${templateName}`);
+    await cell.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+    return (await cell.textContent())?.trim() ?? '';
+  }
+
   async toggleTemplateCatalogView(view: 'grid' | 'list'): Promise<void> {
     const btn = this.locator(`button[aria-label="template ${view} button"]`);
     await this.robustClick(btn);

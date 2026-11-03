@@ -14,6 +14,7 @@ type TemplatesCatalogItemsProps = {
   availableDatasources: Record<string, V1beta1DataSource>;
   availableTemplatesUID: Set<string>;
   bootSourcesLoaded: boolean;
+  catalogNamespace?: string;
   clusterPreferencesByName: ResourceMap<V1beta1VirtualMachineClusterPreference>;
   isList: boolean;
   loaded: boolean;
@@ -27,6 +28,7 @@ const TemplatesCatalogItems: FC<TemplatesCatalogItemsProps> = ({
   availableDatasources,
   availableTemplatesUID,
   bootSourcesLoaded,
+  catalogNamespace,
   clusterPreferencesByName,
   isList,
   loaded,
@@ -43,6 +45,7 @@ const TemplatesCatalogItems: FC<TemplatesCatalogItemsProps> = ({
         availableDatasources={availableDatasources}
         availableTemplatesUID={availableTemplatesUID}
         bootSourcesLoaded={bootSourcesLoaded}
+        catalogNamespace={catalogNamespace}
         clusterPreferencesByName={clusterPreferencesByName}
         loaded={loaded}
         onTemplateClick={onTemplateClick}
@@ -54,6 +57,7 @@ const TemplatesCatalogItems: FC<TemplatesCatalogItemsProps> = ({
       <Gallery className="vm-catalog-grid" hasGutter id="vm-catalog-grid">
         {sortedTemplates.map((template) => (
           <TemplatesCatalogTile
+            catalogNamespace={catalogNamespace}
             clusterPreference={getTemplateClusterPreference(template, clusterPreferencesByName)}
             isSelected={getUID(selectedTemplate) === getUID(template)}
             key={getUID(template) ?? getTemplateName(template)}

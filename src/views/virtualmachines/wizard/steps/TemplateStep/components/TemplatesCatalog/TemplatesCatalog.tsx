@@ -86,6 +86,7 @@ const TemplatesCatalog: FC = () => {
               availableDatasources={availableDataSources}
               availableTemplatesUID={availableTemplatesUID}
               bootSourcesLoaded={bootSourcesLoaded}
+              catalogNamespace={namespace}
               clusterPreferencesByName={clusterPreferencesByName}
               isList={isList}
               loaded={loaded}

@@ -7,7 +7,6 @@ import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import useClusterInstanceTypes from '@kubevirt-utils/hooks/useClusterInstanceTypes';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getInstanceTypeCPUMemoryDisplayText } from '@kubevirt-utils/resources/instancetype/selectors';
 import { getAnnotation, getName } from '@kubevirt-utils/resources/shared';
 import {
   createTemplateInstanceTypeSubmit,
@@ -15,7 +14,9 @@ import {
   getTemplateVirtualMachineObject,
   type Template,
 } from '@kubevirt-utils/resources/template';
+import useTemplateCPUMemoryDisplayValue from '@kubevirt-utils/resources/template/hooks/useTemplateCPUMemoryDisplayValue';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
+import { getCluster } from '@multicluster/helpers/selectors';
 
 type TemplateInstanceTypeDescriptionItemProps = {
   editable: boolean;
@@ -28,10 +29,17 @@ const TemplateInstanceTypeDescriptionItem: FC<TemplateInstanceTypeDescriptionIte
 }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
+  const { cpuMemoryText, isEmpty } = useTemplateCPUMemoryDisplayValue(template, {
+    cluster: getCluster(template),
+  });
 
   const vm = getTemplateVirtualMachineObject(template);
   const resolvedName = getResolvedInstanceTypeName(template);
-  const [clusterInstanceTypes] = useClusterInstanceTypes();
+  const [clusterInstanceTypes] = useClusterInstanceTypes(
+    undefined,
+    undefined,
+    getCluster(template),
+  );
 
   const currentInstanceType = useMemo(
     () =>
@@ -39,11 +47,6 @@ const TemplateInstanceTypeDescriptionItem: FC<TemplateInstanceTypeDescriptionIte
         (instanceTypeResource) => getName(instanceTypeResource) === resolvedName,
       ),
     [clusterInstanceTypes, resolvedName],
-  );
-
-  const cpuMemoryText = useMemo(
-    () => getInstanceTypeCPUMemoryDisplayText(currentInstanceType, t),
-    [currentInstanceType, t],
   );
 
   const onEditClick = (): void =>
@@ -60,7 +63,7 @@ const TemplateInstanceTypeDescriptionItem: FC<TemplateInstanceTypeDescriptionIte
 
   return (
     <DescriptionItem
-      descriptionData={cpuMemoryText ?? <MutedTextSpan text={t('Unknown')} />}
+      descriptionData={isEmpty ? <MutedTextSpan text={t('Unknown')} /> : cpuMemoryText}
       descriptionHeader={t('InstanceType')}
       isEdit={editable}
       olsObj={template}
