@@ -9,6 +9,7 @@ import { isEmpty } from '@kubevirt-utils/utils/utils';
 
 import { type GenerateVMSpecConfiguration } from '../types';
 
+import { getBootDataVolumeName } from './bootVolumeNames';
 import { getDataVolumeTemplates } from './generateVMSpecTemplateConfig';
 import { getSelectedPreferenceMatcher } from './getSelectedPreference';
 import { getSpecTemplateConfiguration } from './getSpecTemplateConfiguration';
@@ -46,7 +47,7 @@ export const getSpecConfiguration = ({
   const hasBootVolume = useBootSource && !isEmpty(selectedBootableVolume);
   const isIso = hasBootVolume && isBootableVolumeISO(selectedBootableVolume);
   const storageClassName = getPVCStorageClassName(pvcSource);
-  const volumeName = `${vmName}-volume`;
+  const volumeName = getBootDataVolumeName(vmName);
 
   return {
     ...(hasBootVolume &&

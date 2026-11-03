@@ -1,8 +1,11 @@
-import React, { FC, ReactNode } from 'react';
+import React, { type FC, type ReactNode } from 'react';
 import { useWatch } from 'react-hook-form';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { isDNS1123Label, isDNS1123LabelLenient } from '@kubevirt-utils/utils/validation';
+import {
+  isDNS1123Subdomain,
+  isDNS1123SubdomainLenient,
+} from '@kubevirt-utils/utils/dns1123SubdomainValidation';
 import { Button, Tooltip } from '@patternfly/react-core';
 
 import { useVMWizard } from '../state/vm-wizard-context/VMWizardContext';
@@ -30,12 +33,12 @@ const VMNameConfirmationNextButton: FC<VMNameConfirmationNextButtonProps> = ({
     name: CREATE_VM_FORM_FIELDS_UI_STATE.SHOULD_CHECK_VM_NAME_PROPERLY,
   });
 
-  const isVMNameValid = isDNS1123Label(vmName);
-  const isVMNameAlmostValid = isDNS1123LabelLenient(vmName);
+  const isVMNameValid = isDNS1123Subdomain(vmName);
+  const isVMNameAlmostValid = isDNS1123SubdomainLenient(vmName);
   const isVMNameInvalid = shouldCheckVMNameProperly ? !isVMNameValid : !isVMNameAlmostValid;
   const isDisabled = isSubmitting || isVMNameInvalid;
 
-  const handleClick = () => {
+  const handleClick = (): void => {
     if (isVMNameValid) {
       onClick();
       return;

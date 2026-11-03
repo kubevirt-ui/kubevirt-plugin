@@ -4,8 +4,8 @@ import { useWatch } from 'react-hook-form';
 import useAutoAppliedLabels from '@kubevirt-utils/hooks/useAutoAppliedLabels/useAutoAppliedLabels';
 import { getLabels } from '@kubevirt-utils/resources/shared';
 import { customizeWizardVMSignal } from '@kubevirt-utils/signals/customizeWizardVMSignal';
+import { isDNS1123Subdomain } from '@kubevirt-utils/utils/dns1123SubdomainValidation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { isDNS1123Label } from '@kubevirt-utils/utils/validation';
 import { useSignals } from '@preact/signals-react/runtime';
 import { VMWizardStep } from '@virtualmachines/wizard/utils/constants';
 import { getActiveFlow, isCloneCreationMethod } from '@virtualmachines/wizard/utils/utils';
@@ -73,10 +73,10 @@ const useWizardStepValidation = (): WizardStepValidation => {
     const isRedHatProvided = Boolean(selectedSeries) && Boolean(selectedSize);
     const isUserProvided =
       Boolean(selectedInstanceType?.namespace) && Boolean(selectedInstanceType?.name);
-    const isValidVMName = isCloneCreationMethod(creationMethod) || isDNS1123Label(name);
+    const isValidVMName = isCloneCreationMethod(creationMethod) || isDNS1123Subdomain(name);
 
     return {
-      [VMWizardStep.BOOT_SOURCE]: useBootSource && isEmpty(selectedBootableVolume),
+      [VMWizardStep.BOOT_SOURCE]: Boolean(useBootSource) && isEmpty(selectedBootableVolume),
       [VMWizardStep.CLONE]: isEmpty(currentVMSignalValue),
       [VMWizardStep.COMPUTE_RESOURCES]: !isRedHatProvided && !isUserProvided,
       [VMWizardStep.CUSTOMIZATION]: hasRequiredLabelsMissing,
