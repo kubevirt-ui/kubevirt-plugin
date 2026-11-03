@@ -33,6 +33,7 @@ PLAYWRIGHT_MIGRATED_RELEASES=(
   "4.15"
   "4.18"
   "4.19"
+  "4.20"
 )
 
 # Window of OpenShift versions we can actually provision on IBM Cloud. VPC
