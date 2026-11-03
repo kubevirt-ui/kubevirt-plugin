@@ -1,5 +1,6 @@
 import { type FC, useMemo, useRef, useState } from 'react';
 
+import { OpenLinksInNewTabContext } from '@kubevirt-utils/components/OpenLinksInNewTabContext/OpenLinksInNewTabContext';
 import useContainerWidth from '@kubevirt-utils/hooks/useContainerWidth';
 import useKubevirtDataViewFilters from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/useKubevirtDataViewFilters';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -15,7 +16,11 @@ import useCloneSourceVMColumns from './hooks/useCloneSourceVMColumns';
 import { useCloneSourceVMs } from './hooks/useCloneSourceVMs';
 import { getPaginatedVMs, getPaginationFirstPageState, getVMTableCallbacks } from './utils/utils';
 
-const VirtualMachinesList: FC = () => {
+type VirtualMachinesListProps = {
+  isVmWizard?: boolean;
+};
+
+const VirtualMachinesList: FC<VirtualMachinesListProps> = ({ isVmWizard }) => {
   const { t } = useKubevirtTranslation();
 
   const {
@@ -79,39 +84,41 @@ const VirtualMachinesList: FC = () => {
   );
 
   return (
-    <div className="pf-v6-u-mt-sm" ref={listPageBodyRef}>
-      {targetNamespace && (
-        <Label className="pf-v6-u-mb-sm">
-          {t('Project: {{project}}', { project: targetNamespace })}
-        </Label>
-      )}
-      <VirtualMachineFilter
-        clearAllFilters={() => {
-          clearAllFilters();
-          resetToFirstPage();
-        }}
-        columnLayout={columnLayout}
-        data={vms}
-        filterDefinitions={filterDefinitions}
-        filteredVMsCount={filteredVMs?.length}
-        filters={filters}
-        isCompact={listPageBodySize !== ListPageBodySize.Lg}
-        onPageChange={onPageChange}
-        onSetFilters={(newFilters) => {
-          onSetFilters(newFilters);
-          resetToFirstPage();
-        }}
-        pagination={pagination}
-      />
-      <VirtualMachineTable
-        callbacks={callbacks}
-        cluster={cluster}
-        columns={activeTableColumns}
-        loaded={loaded}
-        loadError={vmsLoadError}
-        vmsData={paginatedVMsData}
-      />
-    </div>
+    <OpenLinksInNewTabContext.Provider value={Boolean(isVmWizard)}>
+      <div className="pf-v6-u-mt-sm" ref={listPageBodyRef}>
+        {targetNamespace && (
+          <Label className="pf-v6-u-mb-sm">
+            {t('Project: {{project}}', { project: targetNamespace })}
+          </Label>
+        )}
+        <VirtualMachineFilter
+          clearAllFilters={() => {
+            clearAllFilters();
+            resetToFirstPage();
+          }}
+          columnLayout={columnLayout}
+          data={vms}
+          filterDefinitions={filterDefinitions}
+          filteredVMsCount={filteredVMs?.length}
+          filters={filters}
+          isCompact={listPageBodySize !== ListPageBodySize.Lg}
+          onPageChange={onPageChange}
+          onSetFilters={(newFilters) => {
+            onSetFilters(newFilters);
+            resetToFirstPage();
+          }}
+          pagination={pagination}
+        />
+        <VirtualMachineTable
+          callbacks={callbacks}
+          cluster={cluster}
+          columns={activeTableColumns}
+          loaded={loaded}
+          loadError={vmsLoadError}
+          vmsData={paginatedVMsData}
+        />
+      </div>
+    </OpenLinksInNewTabContext.Provider>
   );
 };
 
