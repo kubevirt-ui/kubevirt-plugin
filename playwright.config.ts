@@ -126,7 +126,7 @@ export default defineConfig({
     navigationTimeout: 120_000,
     screenshot: 'only-on-failure',
     trace: 'off',
-    video: 'off',
+    video: 'retain-on-failure',
     viewport: { height: 1080, width: 1920 },
   },
   workers: process.env.WORKERS ? parseInt(process.env.WORKERS, 10) : 4,
