@@ -4,23 +4,23 @@ import { describe, it } from 'node:test';
 import { resolveClusterConfig } from './resolve-cluster-config';
 
 describe('resolveClusterConfig', () => {
-  it('resolves a release branch to a release-specific cluster', () => {
+  it('resolves a release branch to a release-specific cluster with playwright', () => {
     const config = resolveClusterConfig({ baseRef: 'release-4.21' });
     assert.equal(config.clusterName, 'kubevirt-plugin-421');
     assert.equal(config.openshiftVersion, '4.21_openshift');
     assert.equal(config.cnvPinVersion, '4.21');
     assert.equal(config.cnvChannel, 'stable');
-    assert.equal(config.testEngine, 'cypress');
+    assert.equal(config.testEngine, 'playwright');
     assert.equal(config.cniPlugin, 'OVNKubernetes');
   });
 
-  it('uses playwright for branches after the Cypress cutoff', () => {
+  it('uses playwright for all release branches', () => {
     const config = resolveClusterConfig({ baseRef: 'release-4.23' });
     assert.equal(config.testEngine, 'playwright');
     assert.equal(config.clusterName, 'kubevirt-plugin-423');
   });
 
-  it('uses playwright for backported migrations listed in PLAYWRIGHT_MIGRATED_RELEASES', () => {
+  it('uses playwright for older release branches', () => {
     const config = resolveClusterConfig({ baseRef: 'release-4.15' });
     assert.equal(config.testEngine, 'playwright');
     assert.equal(config.clusterName, 'kubevirt-plugin-415');
@@ -49,20 +49,23 @@ describe('resolveClusterConfig', () => {
       baseRef: 'main',
       inputClusterName: 'my-cluster',
       inputOpenshiftVersion: '4.20_openshift',
-      inputTestEngine: 'cypress',
+      inputTestEngine: 'playwright',
     });
     assert.equal(config.clusterName, 'my-cluster');
     assert.equal(config.openshiftVersion, '4.20_openshift');
-    assert.equal(config.testEngine, 'cypress');
+    assert.equal(config.testEngine, 'playwright');
     assert.equal(config.cniPlugin, 'OVNKubernetes');
   });
 
-  it('explicit test_engine overrides release branch auto-detection', () => {
-    const config = resolveClusterConfig({
-      baseRef: 'release-4.21',
-      inputTestEngine: 'playwright',
-    });
-    assert.equal(config.testEngine, 'playwright');
+  it('rejects unsupported test_engine overrides', () => {
+    assert.throws(
+      () =>
+        resolveClusterConfig({
+          baseRef: 'release-4.21',
+          inputTestEngine: 'cypress',
+        }),
+      /Unsupported test engine/,
+    );
   });
 
   it('auto test_engine does not override', () => {
@@ -70,7 +73,7 @@ describe('resolveClusterConfig', () => {
       baseRef: 'release-4.21',
       inputTestEngine: 'auto',
     });
-    assert.equal(config.testEngine, 'cypress');
+    assert.equal(config.testEngine, 'playwright');
   });
 
   it('explicit cnv_channel clears pinned version', () => {

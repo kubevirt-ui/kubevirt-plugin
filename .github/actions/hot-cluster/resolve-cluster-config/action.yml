@@ -22,7 +22,7 @@ inputs:
     required: false
     default: ''
   test-engine:
-    description: workflow_dispatch inputs.test_engine override ('auto'/'playwright'/'cypress'), if set
+    description: workflow_dispatch inputs.test_engine override ('auto'/'playwright'), if set
     required: false
     default: ''
   cnv-channel:
@@ -38,7 +38,7 @@ outputs:
     description: Resolved OpenShift version
     value: ${{ steps.resolve.outputs.openshift_version }}
   test-engine:
-    description: Resolved E2E test engine (playwright or cypress)
+    description: Resolved E2E test engine (always playwright)
     value: ${{ steps.resolve.outputs.test_engine }}
   branch-name:
     description: Resolved base branch name (may be empty)

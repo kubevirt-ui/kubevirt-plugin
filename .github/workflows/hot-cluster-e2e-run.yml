@@ -7,9 +7,8 @@ on:
       test_project:
         description: |
           Suite to run.
-          Playwright (main): gating / tier1 / tier2 / suite / settings / api / all / auto.
+          Playwright: gating / tier1 / tier2 / suite / settings / api / all / auto.
           auto omits --project and requires test_args (spec path or -g).
-          Cypress (release only): gating or features (Cypress's Tier1 suite — not a Playwright project).
         required: true
         default: gating
         type: choice
@@ -18,7 +17,6 @@ on:
           - tier1
           - tier2
           - suite
-          - features
           - settings
           - api
           - all
@@ -33,16 +31,13 @@ on:
         type: string
       test_engine:
         description: |
-          E2E test engine to run against the checked-out code. Defaults to
-          playwright; set explicitly to cypress when manually testing a
-          release-4.22-or-earlier ref (there's no base branch to
-          auto-detect from outside hot-cluster-e2e.yml's own trigger).
+          E2E test engine to run against the checked-out code. Always
+          Playwright (kept for summary display / forward compatibility).
         required: false
         default: playwright
         type: choice
         options:
           - playwright
-          - cypress
       runner_label:
         description: ARC runner label (defaults to kubevirt-plugin-ci)
         required: false
@@ -56,9 +51,8 @@ on:
       cnv_pin_version:
         description: |
           CNV version pinned for this cluster (e.g. 4.20, 4.21, 4.22), as
-          resolved by hot-cluster-e2e.yml's prepare job. Only affects
-          Cypress's TEST_NS/TEST_SECRET_NAME (see that env below). Leave
-          empty for a standalone dispatch.
+          resolved by hot-cluster-e2e.yml's prepare job. Leave empty for
+          a standalone dispatch.
         required: false
         default: ''
         type: string
@@ -96,8 +90,7 @@ on:
     inputs:
       test_project:
         description: |
-          Suite to run. Playwright: gating / tier1 / tier2 / suite / settings / api / all.
-          Cypress (release only): gating or features (Cypress's Tier1 suite — not a Playwright project).
+          Suite to run. Playwright: gating / tier1 / tier2 / suite / settings / api / all / auto.
         type: string
         required: false
         default: gating
@@ -107,7 +100,7 @@ on:
         required: false
         default: ''
       test_engine:
-        description: E2E test engine to run (playwright or cypress); see hot-cluster-e2e.yml's prepare job for auto-detection.
+        description: E2E test engine to run (always playwright).
         type: string
         required: false
         default: playwright
@@ -124,9 +117,8 @@ on:
       cnv_pin_version:
         description: |
           CNV version pinned for this cluster (e.g. 4.20, 4.21, 4.22), as
-          resolved by hot-cluster-e2e.yml's prepare job. Only affects
-          Cypress's TEST_NS/TEST_SECRET_NAME (see that env below). Leave
-          empty for a standalone dispatch.
+          resolved by hot-cluster-e2e.yml's prepare job. Leave empty for
+          a standalone dispatch.
         type: string
         required: false
         default: ''
@@ -336,27 +328,10 @@ jobs:
     needs: [build-kubevirt-plugin-image]
     runs-on: ${{ inputs.runner_label || 'kubevirt-plugin-ci' }}
     timeout-minutes: 120
-    # Cypress on release-4.20 (or any unknown cnv_pin_version) still
-    # hardcodes a fixed auto-test-ns/auto-test-secret name, so same-cluster
-    # runs of that case are serialized here instead of made namespace-safe.
-    # release-4.21/4.22 get a genuine per-run namespace (see TEST_NS below)
-    # and fall into the unique no-lock-<run_id> group instead.
-    # cancel-in-progress: false + queue: max queue same-namespace runs one
-    # after another rather than cancelling or dropping a pending one.
-    concurrency:
-      group: >-
-        ${{
-          ((inputs.test_engine || 'playwright') == 'cypress' && inputs.cnv_pin_version != '4.21' && inputs.cnv_pin_version != '4.22') &&
-          format('cypress-fixed-ns-{0}', inputs.cluster_name || inputs.runner_label || 'kubevirt-plugin-ci') ||
-          format('no-lock-{0}', github.run_id)
-        }}
-      cancel-in-progress: false
-      queue: max
     env:
       PLUGIN_IMAGE: ${{ needs.build-kubevirt-plugin-image.outputs.kubevirt-plugin-image }}
       HEADLESS: 'true'
-      RUN_FEATURE_TESTS: ${{ inputs.test_project == 'features' && 'true' || 'false' }}
-      TEST_ENGINE: ${{ inputs.test_engine || 'playwright' }}
+      TEST_ENGINE: playwright
       CLUSTER_NAME: ${{ inputs.cluster_name || inputs.runner_label || 'kubevirt-plugin-ci' }}
       RUNNER_LABEL: ${{ inputs.runner_label || inputs.cluster_name || 'kubevirt-plugin-ci' }}
       TEST_PROJECT: ${{ inputs.test_project || 'gating' }}
@@ -371,38 +346,40 @@ jobs:
       # release (e.g. origin-console:4.21) rather than ci-env-request.ts's
       # default (origin-console:5.0) -- console features/DOM differ between
       # versions (e.g. the NetworkAttachmentDefinition create form). Set from
-      # cnv_pin_version when available. For Cypress release branches that IBM
-      # Cloud clamps below the supported window (e.g. release-4.17 → OCP 4.18
-      # with CNV unpinned), the "Resolve console image…" step below falls back
-      # to the clamped openshift_version (origin-console:4.18). Empty for
-      # main/Playwright runs, which keep the 5.0 default.
+      # cnv_pin_version when available. For release branches that IBM Cloud
+      # clamps below the supported window (e.g. release-4.17 → OCP 4.18 with
+      # CNV unpinned), the "Resolve console image…" step below falls back to
+      # the clamped openshift_version (origin-console:4.18). Empty for main
+      # runs, which keep the 5.0 default.
       CONSOLE_IMAGE: >-
         ${{
           inputs.cnv_pin_version != '' &&
           format('quay.io/openshift/origin-console:{0}', inputs.cnv_pin_version) ||
           ''
         }}
-      # release-4.20's Cypress content hardcodes TEST_NS=auto-test-ns and
-      # TEST_SECRET_NAME=auto-test-secret; release-4.21/4.22 read both
-      # dynamically, so they get a genuine per-run name instead (avoiding
-      # cross-PR collisions on a shared cluster). Playwright always gets a
-      # per-run name.
-      TEST_NS: >-
-        ${{
-          (inputs.test_engine || 'playwright') != 'cypress' && format('kubevirt-plugin-ci-test-{0}', github.run_id) ||
-          (inputs.cnv_pin_version == '4.21' || inputs.cnv_pin_version == '4.22') && format('auto-test-ns-{0}', github.run_id) ||
-          'auto-test-ns'
-        }}
-      TEST_SECRET_NAME: >-
-        ${{
-          (inputs.test_engine || 'playwright') != 'cypress' && 'ci-test-secret' ||
-          (inputs.cnv_pin_version == '4.21' || inputs.cnv_pin_version == '4.22') && format('auto-test-secret-{0}', github.run_id) ||
-          'auto-test-secret'
-        }}
+      TEST_NS: kubevirt-plugin-ci-test-${{ github.run_id }}
+      TEST_SECRET_NAME: ci-test-secret
     outputs:
       test_failure_summary: ${{ steps.test-summary.outputs.test_summary }}
 
     steps:
+      # workflow_call accepts a free-form string; reject unsupported values
+      # (e.g. cypress, typos) instead of silently hardcoding Playwright.
+      # Matches resolve-cluster-config: only 'playwright' (and 'auto') are valid.
+      - name: Validate test engine
+        env:
+          INPUT_TEST_ENGINE: ${{ inputs.test_engine }}
+        shell: bash
+        run: |
+          engine="${INPUT_TEST_ENGINE:-playwright}"
+          if [[ "${engine}" == "auto" || -z "${engine}" ]]; then
+            engine="playwright"
+          fi
+          if [[ "${engine}" != "playwright" ]]; then
+            echo "::error::Unsupported test engine '${INPUT_TEST_ENGINE}' (only 'playwright' is supported)"
+            exit 1
+          fi
+
       # Pinned to @main (not local ./) since checkout_ref can point at a
       # release branch predating this CI infra, or nothing may be checked
       # out yet. Both this and the actions below it are self-contained, so
@@ -416,8 +393,8 @@ jobs:
       # ci-scripts/hot-cluster, .github/scripts, and playwright-runner-hc-e2e.sh
       # exist only on main; a release-branch checkout above may have none of
       # them (an old release branch predates the e2e scripts entirely, and a
-      # Playwright-migrated release branch carries its own playwright.config.ts
-      # / specs but not the HC-specific runner script -- see run-gating-tests.ts's
+      # release branch carries its own playwright.config.ts / specs but not the
+      # HC-specific runner script -- see run-gating-tests.ts's
       # resolveHcPlaywrightRunner). Overlay all three from the ref this run was
       # dispatched at (github.sha -- main's tip in production, the fix branch
       # during a workflow_dispatch validation) into an isolated subdir.
@@ -453,10 +430,10 @@ jobs:
         working-directory: .hc-infra/ci-scripts/hot-cluster/ts
         run: npx tsx src/scripts/log-env-summary.ts
 
-      # When cnv_pin_version is empty (clamped pre-4.18 Cypress branches) but we
+      # When cnv_pin_version is empty (clamped pre-4.18 release branches) but we
       # still have openshift_version (e.g. 4.18_openshift), pin console to that
       # X.Y tag so ci-env-request does not fall through to origin-console:5.0.
-      - name: Resolve console image for clamped Cypress releases
+      - name: Resolve console image for clamped releases
         if: env.CONSOLE_IMAGE == '' && env.OPENSHIFT_VERSION == '4.18_openshift'
         shell: bash
         run: |
@@ -479,9 +456,6 @@ jobs:
           ci-env-namespace: ${{ env.CI_ENV_NS }}
           # Pin the console to the pinned release version (empty -> default).
           console-image: ${{ env.CONSOLE_IMAGE }}
-          # Cypress needs the console's welcome-modal dismissed server-side
-          # (configmap); Playwright already seeds this client-side.
-          user-settings-location: ${{ env.TEST_ENGINE == 'cypress' && 'configmap' || '' }}
 
       - name: Create test secret
         working-directory: .hc-infra/ci-scripts/hot-cluster/ts
@@ -495,16 +469,12 @@ jobs:
         run: |
           npm ci --ignore-scripts --no-audit
 
-          if [[ "${TEST_ENGINE}" == "cypress" ]]; then
-            npx cypress install
-          else
-            # A branch predating the Playwright migration may not define the
-            # playwright-install script; npm run exits non-zero when it's
-            # absent, so fall back to installing the browser directly.
-            # (Don't use --if-present: it exits 0 when missing, so the
-            # fallback would never fire.)
-            npm run playwright-install 2>/dev/null || npx playwright install chromium
-          fi
+          # A branch predating the Playwright migration may not define the
+          # playwright-install script; npm run exits non-zero when it's
+          # absent, so fall back to installing the browser directly.
+          # (Don't use --if-present: it exits 0 when missing, so the
+          # fallback would never fire.)
+          npm run playwright-install 2>/dev/null || npx playwright install chromium
 
       - name: Install GH script dependencies
         if: inputs.progress_status_sha != '' && inputs.progress_status_context != ''
@@ -544,9 +514,8 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: ${{ env.TEST_ENGINE }}-results-${{ github.run_id }}
-          path: |
-            ${{ env.TEST_ENGINE == 'cypress' && 'cypress/gui-test-screenshots/' || 'playwright/test-results/' }}
+          name: playwright-results-${{ github.run_id }}
+          path: playwright/test-results/
           retention-days: 7
           if-no-files-found: ignore
 

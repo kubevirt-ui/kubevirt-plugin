@@ -1,4 +1,4 @@
-# Grants the ARC runner SA namespace-scoped permissions so Cypress tests can
+# Grants the ARC runner SA namespace-scoped permissions so Playwright tests can
 # manage resources inside the test namespace. The subjects come from values so
 # the same chart works for any runner SA / namespace combination.
 apiVersion: rbac.authorization.k8s.io/v1

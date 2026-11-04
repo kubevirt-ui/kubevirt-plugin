@@ -74,6 +74,11 @@ describe('parseTestE2ECommand', () => {
       testArgs: 'nope',
       testProject: 'auto',
     });
+    // Former Cypress-only suite — no longer a valid project name
+    assert.deepEqual(parseTestE2ECommand('/test-e2e features'), {
+      testArgs: 'features',
+      testProject: 'auto',
+    });
   });
 
   it('ignores surrounding comment text when the command is on its own line', () => {

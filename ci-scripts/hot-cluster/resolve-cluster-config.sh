@@ -3,15 +3,15 @@ set -euo pipefail
 
 # Resolves cluster_name/openshift_version/test_engine/cnv_channel/
 # cnv_pin_version/branch_name for GITHUB_OUTPUT. See ci-scripts/README.md
-# ("Cluster & Test-Engine Resolution") for the release-branch naming,
-# Cypress/Playwright cutoff, and CNV channel/pin rules.
+# ("Cluster & Test-Engine Resolution") for the release-branch naming and
+# CNV channel/pin rules. test_engine is always playwright.
 #
 # Env:
 #   BASE_REF                - PR target branch, from github.base_ref or
 #                             workflow_dispatch inputs.base_ref
 #   INPUT_CLUSTER_NAME       - workflow_dispatch inputs.cluster_name, if set
 #   INPUT_OPENSHIFT_VERSION  - workflow_dispatch inputs.openshift_version, if set
-#   INPUT_TEST_ENGINE        - workflow_dispatch inputs.test_engine ('auto'/'playwright'/'cypress'), if set
+#   INPUT_TEST_ENGINE        - workflow_dispatch inputs.test_engine ('auto'/'playwright'), if set
 #   INPUT_CNV_CHANNEL        - workflow_dispatch inputs.cnv_channel, if set
 #
 # Usage: ./ci-scripts/hot-cluster/resolve-cluster-config.sh >> "$GITHUB_OUTPUT"
@@ -21,21 +21,6 @@ DEFAULT_OPENSHIFT_VERSION="4.22_openshift"
 DEFAULT_TEST_ENGINE="playwright"
 DEFAULT_CNV_CHANNEL="stable"
 
-# Last release branch still on the pre-migration Cypress suite. Any branch
-# release-<major>.<minor> with major.minor <= this threshold uses Cypress,
-# unless listed in PLAYWRIGHT_MIGRATED_RELEASES below.
-LAST_CYPRESS_MAJOR=4
-LAST_CYPRESS_MINOR=22
-
-# Release branches at/below LAST_CYPRESS_* that already migrated to Playwright
-# (Cypress tree removed). Entries are "major.minor" strings.
-PLAYWRIGHT_MIGRATED_RELEASES=(
-  "4.15"
-  "4.18"
-  "4.19"
-  "4.20"
-)
-
 # Window of OpenShift versions we can actually provision on IBM Cloud. VPC
 # cluster creation with an explicit CNI (--cni OVNKubernetes) is rejected
 # below 4.20 ("version is not supported for CNI selection in VPC. Specify
@@ -43,9 +28,8 @@ PLAYWRIGHT_MIGRATED_RELEASES=(
 # 4.18, create-roks-vpc.ts omits --cni entirely, which provisions with VPC's
 # platform-default CNI (Calico) instead -- see cni_plugin_for below. A
 # release branch outside this window still provisions, clamped to the
-# nearest supported version; the branch's own cluster_name/test_engine stay
-# tied to the real branch, and CNV is left unpinned when a clamp happens
-# (see below).
+# nearest supported version; the branch's own cluster_name stays tied to
+# the real branch, and CNV is left unpinned when a clamp happens (see below).
 MIN_SUPPORTED_MAJOR=4
 MIN_SUPPORTED_MINOR=18
 MAX_SUPPORTED_MAJOR=4
@@ -127,18 +111,7 @@ if [[ "${BASE_REF}" =~ ^release-([0-9]+)\.([0-9]+)$ ]]; then
   fi
   echo "CNI plugin: '${CNI_PLUGIN:-<platform default, Calico>}'" >&2
 
-  BRANCH_VERSION="${MAJOR}.${MINOR}"
-  if (( MAJOR * 1000 + MINOR <= LAST_CYPRESS_MAJOR * 1000 + LAST_CYPRESS_MINOR )); then
-    TEST_ENGINE="cypress"
-    for migrated in "${PLAYWRIGHT_MIGRATED_RELEASES[@]}"; do
-      if [[ "${migrated}" == "${BRANCH_VERSION}" ]]; then
-        TEST_ENGINE="playwright"
-        break
-      fi
-    done
-  else
-    TEST_ENGINE="playwright"
-  fi
+  TEST_ENGINE="${DEFAULT_TEST_ENGINE}"
   echo "Base branch '${BASE_REF}' → test engine '${TEST_ENGINE}'" >&2
 else
   CLUSTER_NAME="${INPUT_CLUSTER_NAME:-${DEFAULT_CLUSTER_NAME}}"
@@ -151,9 +124,13 @@ else
   TEST_ENGINE="${DEFAULT_TEST_ENGINE}"
 fi
 
-# An explicit, non-'auto' workflow_dispatch override always wins over
-# base_ref auto-detection.
+# An explicit, non-'auto' workflow_dispatch override always wins.
+# Only 'playwright' is supported; anything else is rejected.
 if [[ -n "${INPUT_TEST_ENGINE}" && "${INPUT_TEST_ENGINE}" != "auto" ]]; then
+  if [[ "${INPUT_TEST_ENGINE}" != "playwright" ]]; then
+    echo "Unsupported test engine '${INPUT_TEST_ENGINE}' (only 'playwright' is supported)" >&2
+    exit 1
+  fi
   TEST_ENGINE="${INPUT_TEST_ENGINE}"
   echo "Overriding test engine from input: '${TEST_ENGINE}'" >&2
 fi

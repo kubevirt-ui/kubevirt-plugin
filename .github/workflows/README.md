@@ -9,7 +9,7 @@ Index of workflows in this directory. Deep design notes (check-run model, merge 
 | Workflow                              | Trigger                                | Role                                                                                                                         |
 | ------------------------------------- | -------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
 | `hot-cluster-e2e.yml`                 | `workflow_dispatch` only               | Full E2E graph; suite via `test_project` (+ optional `test_args`); publishes required **Run Gating Tests** only for `gating` |
-| `hot-cluster-e2e-run.yml`             | `workflow_call` / `workflow_dispatch`  | Build plugin image + run Playwright/Cypress on ARC                                                                           |
+| `hot-cluster-e2e-run.yml`             | `workflow_call` / `workflow_dispatch`  | Build plugin image + run Playwright on ARC                                                                                   |
 | `hot-cluster-check.yml`               | `workflow_call` (+ manual health)      | Cluster readiness / health                                                                                                   |
 | `hot-cluster-e2e-pr-gate.yml`         | PR opened / synchronize / reopened     | Thin gate → dispatch `hot-cluster-e2e.yml`                                                                                   |
 | `pr-validation.yml`                   | All PR events (push + label)           | Unified PR validation: Jira, path checks, review labels, E2E dispatch, merge-pool sync                                       |

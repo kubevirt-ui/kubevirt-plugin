@@ -2,7 +2,7 @@
  * Seed kubevirt-user-settings and kubevirt-ui-features ConfigMaps.
  * Replaces the complex bash block that uses oc + jq for ConfigMap patching.
  *
- * Env: CI_ENV_CM, TEST_NS, CNV_NS, TEST_ENGINE
+ * Env: CI_ENV_CM, TEST_NS, CNV_NS
  */
 
 import * as k8s from '@kubernetes/client-node';
@@ -34,17 +34,10 @@ const USER_SETTINGS = JSON.stringify({
   quickStart: { dontShowWelcomeModal: true },
 });
 
-const GUIDED_TOUR = JSON.stringify({
-  admin: { completed: true },
-  dev: { completed: true },
-  'virtualization-perspective': { completed: true },
-});
-
 const main = async (): Promise<void> => {
   const ciEnvCm = requireEnv('CI_ENV_CM');
   const testNs = requireEnv('TEST_NS');
   const cnvNs = requireEnv('CNV_NS');
-  const testEngine = process.env.TEST_ENGINE ?? 'playwright';
 
   const client = KubeClient.fromKubeconfig();
   const coreApi = client.coreV1;
@@ -99,23 +92,6 @@ const main = async (): Promise<void> => {
     advancedSearch: 'true',
     treeViewFolders: 'true',
   });
-
-  // Cypress-only: seed guided tour completion
-  if (testEngine === 'cypress' && saUid) {
-    const cmName = `user-settings-${saUid}`;
-    const cmNs = 'openshift-console-user-settings';
-
-    try {
-      await coreApi.readNamespacedConfigMap({ name: cmName, namespace: cmNs });
-    } catch {
-      await coreApi.createNamespacedConfigMap({
-        body: { metadata: { name: cmName, namespace: cmNs } },
-        namespace: cmNs,
-      });
-    }
-
-    await patchConfigMapData(patchApi, cmName, cmNs, { 'console.guidedTour': GUIDED_TOUR });
-  }
 
   console.log('User settings seeded successfully.');
 };

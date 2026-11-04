@@ -51,7 +51,7 @@ rules:
     resources: ['pods', 'pods/log', 'events']
     verbs: ['get', 'list']
 
-  # --- Cypress cy.exec runs / Playwright scenario tests: VM create/patch/delete ---
+  # --- Playwright scenario tests: VM create/patch/delete ---
   - apiGroups: ['kubevirt.io']
     resources: ['virtualmachines']
     verbs: ['get', 'list', 'watch', 'patch', 'create', 'delete']
