@@ -8,12 +8,12 @@ import MoveBulkVMToFolderModal from '@kubevirt-utils/components/MoveVMToFolderMo
 import RunStrategyModal from '@kubevirt-utils/components/RunStrategyModal/RunStrategyModal';
 import { updateRunStrategy } from '@kubevirt-utils/components/RunStrategyModal/utils';
 import { haveSameCluster, haveSameNamespace } from '@kubevirt-utils/resources/shared';
+import { patchVM } from '@kubevirt-utils/resources/vm/utils/patch';
 import {
   getEffectiveRunStrategy,
   isVMNotStopped,
 } from '@kubevirt-utils/resources/vm/utils/selectors';
 import { isEmpty, kubevirtConsole } from '@kubevirt-utils/utils/utils';
-import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
 import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
 
 import { isStopped } from '../utils';
@@ -84,17 +84,7 @@ export const createMoveToFolderConfig =
               vms.map((vm) => {
                 const labels = vm?.metadata?.labels ?? {};
                 labels[VM_FOLDER_LABEL] = folderName;
-                return kubevirtK8sPatch<V1VirtualMachine>({
-                  data: [
-                    {
-                      op: 'replace',
-                      path: '/metadata/labels',
-                      value: labels,
-                    },
-                  ],
-                  model: VirtualMachineModel,
-                  resource: vm,
-                });
+                return patchVM(vm, [{ op: 'replace', path: '/metadata/labels', value: labels }]);
               }),
             );
           }}

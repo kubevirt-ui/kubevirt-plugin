@@ -15,12 +15,12 @@ import {
   type NetworkPresentation,
 } from '@kubevirt-utils/resources/vm/utils/network/constants';
 import {
-  patchVM,
   removeInterface,
   removeNetwork,
   updateInterface,
 } from '@kubevirt-utils/resources/vm/utils/network/patch';
 import { isPodNetwork } from '@kubevirt-utils/resources/vm/utils/network/selectors';
+import { patchVM } from '@kubevirt-utils/resources/vm/utils/patch';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { isStopped } from '@virtualmachines/utils';
 

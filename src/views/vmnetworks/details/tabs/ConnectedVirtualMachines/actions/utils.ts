@@ -2,7 +2,8 @@ import { type V1Network, type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt
 import { deleteNetworkInterface } from '@kubevirt-utils/components/NetworkInterfaceModal/utils/helpers';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
-import { patchVM, updateNetwork } from '@kubevirt-utils/resources/vm/utils/network/patch';
+import { updateNetwork } from '@kubevirt-utils/resources/vm/utils/network/patch';
+import { patchVM } from '@kubevirt-utils/resources/vm/utils/patch';
 import { getInterfaces, getNetworks } from '@kubevirt-utils/resources/vm/utils/selectors';
 
 const getMatchingNetworks = (vm: V1VirtualMachine, vmNetworkName: string): V1Network[] => {

@@ -1,6 +1,5 @@
 import { type TFunction } from 'i18next';
 
-import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import {
   getDefaultRunningStrategy,
@@ -10,13 +9,12 @@ import {
   RUNSTRATEGY_MANUAL,
   RUNSTRATEGY_RERUNONFAILURE,
 } from '@kubevirt-utils/resources/vm/utils/constants';
+import { patchVM } from '@kubevirt-utils/resources/vm/utils/patch';
 import {
   getEffectiveRunStrategy,
   getRunStrategy,
   getVMRunning,
 } from '@kubevirt-utils/resources/vm/utils/selectors';
-import { getCluster } from '@multicluster/helpers/selectors';
-import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
 
 export type { RunStrategyModalProps, WarningMessage } from './types';
 export { getRunStrategyWarningMessage } from './warnings';
@@ -163,10 +161,4 @@ export const buildRunStrategyPatches = (
 export const updateRunStrategy = (
   vm: V1VirtualMachine,
   runStrategy: RunStrategy,
-): Promise<V1VirtualMachine> =>
-  kubevirtK8sPatch({
-    cluster: getCluster(vm),
-    data: buildRunStrategyPatches(vm, runStrategy),
-    model: VirtualMachineModel,
-    resource: vm,
-  });
+): Promise<V1VirtualMachine> => patchVM(vm, buildRunStrategyPatches(vm, runStrategy));

@@ -1,7 +1,6 @@
 import type { FC } from 'react';
 import { useCallback } from 'react';
 
-import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import type {
   V1VirtualMachine,
   V1VirtualMachineInstance,
@@ -15,9 +14,8 @@ import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import Tolerations from '@kubevirt-utils/components/Tolerations/Tolerations';
 import TolerationsModal from '@kubevirt-utils/components/TolerationsModal/TolerationsModal';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { updateVM } from '@kubevirt-utils/resources/vm/utils/update';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
-import { getCluster } from '@multicluster/helpers/selectors';
-import { kubevirtK8sUpdate } from '@multicluster/k8sRequests';
 import { DescriptionList, GridItem } from '@patternfly/react-core';
 import Descheduler from '@virtualmachines/details/tabs/configuration/scheduling/components/Descheduler';
 import DeschedulerPopover from '@virtualmachines/details/tabs/configuration/scheduling/components/DeschedulerPopover';
@@ -41,17 +39,8 @@ const SchedulingSectionLeftGrid: FC<SchedulingSectionLeftGridProps> = ({
   const { createModal } = useModal();
 
   const onSubmit = useCallback(
-    (updatedVM: V1VirtualMachine) =>
-      onUpdateVM
-        ? onUpdateVM(updatedVM)
-        : kubevirtK8sUpdate({
-            cluster: getCluster(vm),
-            data: updatedVM,
-            model: VirtualMachineModel,
-            name: updatedVM?.metadata?.name,
-            ns: updatedVM?.metadata?.namespace,
-          }),
-    [onUpdateVM, vm],
+    (updatedVM: V1VirtualMachine) => (onUpdateVM ? onUpdateVM(updatedVM) : updateVM(updatedVM)),
+    [onUpdateVM],
   );
 
   return (

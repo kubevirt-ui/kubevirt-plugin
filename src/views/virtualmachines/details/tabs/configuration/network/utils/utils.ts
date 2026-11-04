@@ -1,14 +1,12 @@
-import produce from 'immer';
-
-import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
   type V1Network,
   type V1VirtualMachine,
   type V1VirtualMachineInstance,
   type V1VirtualMachineInstanceNetworkInterface,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { getInterface, getInterfaces } from '@kubevirt-utils/resources/vm';
+import { getInterfaces } from '@kubevirt-utils/resources/vm';
 import { DEFAULT_NETWORK_INTERFACE } from '@kubevirt-utils/resources/vm/utils/constants';
+import { updateInterface } from '@kubevirt-utils/resources/vm/utils/network/patch';
 import {
   getConfigInterfaceState,
   getConfigInterfaceStateFromVM,
@@ -16,11 +14,10 @@ import {
   isSRIOVNetworkByVM,
 } from '@kubevirt-utils/resources/vm/utils/network/selectors';
 import { NetworkInterfaceState } from '@kubevirt-utils/resources/vm/utils/network/types';
+import { patchVM } from '@kubevirt-utils/resources/vm/utils/patch';
 import { getVMIInterfaces, getVMIStatusInterfaces } from '@kubevirt-utils/resources/vmi';
 import { isNetworkInterfaceState } from '@kubevirt-utils/utils/typeGuards';
-import { ensurePath, kubevirtConsole } from '@kubevirt-utils/utils/utils';
-import { getCluster } from '@multicluster/helpers/selectors';
-import { kubevirtK8sUpdate } from '@multicluster/k8sRequests';
+import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { isRunning, isStopped } from '@virtualmachines/utils';
 
 import { ABSENT } from './constants';
@@ -99,19 +96,21 @@ export const setNetworkInterfaceState = (
   nicName: string,
   desiredState: NetworkInterfaceState,
 ): Promise<V1VirtualMachine | void> => {
-  if (!getInterface(vm, nicName)) return undefined;
+  const interfaces = getInterfaces(vm) ?? [];
+  const index = interfaces.findIndex((iface) => iface?.name === nicName);
 
-  const updatedVM = produce(vm, (draftVM) => {
-    ensurePath(draftVM, ['spec.template.spec.domain.devices.interfaces']);
-    const ifaceToUpdate = getInterface(draftVM, nicName);
-    ifaceToUpdate.state = desiredState;
-  });
+  if (index < 0) return undefined;
 
-  return kubevirtK8sUpdate({
-    cluster: getCluster(vm),
-    data: updatedVM,
-    model: VirtualMachineModel,
-  }).catch((error) => kubevirtConsole.error(error));
+  const currentValue = interfaces[index];
+
+  return patchVM(
+    vm,
+    updateInterface({
+      currentValue,
+      index,
+      nextValue: { ...currentValue, state: desiredState },
+    }),
+  ).catch((error) => kubevirtConsole.error(error));
 };
 
 export const isLinkStateEditable = (state: NetworkInterfaceState): boolean =>

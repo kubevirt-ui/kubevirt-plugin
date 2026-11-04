@@ -1,14 +1,13 @@
-import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { LabelsModal } from '@kubevirt-utils/components/LabelsModal/LabelsModal';
 import { type ModalComponent } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import RunStrategyModal from '@kubevirt-utils/components/RunStrategyModal/RunStrategyModal';
 import { updateRunStrategy } from '@kubevirt-utils/components/RunStrategyModal/utils';
+import { patchVM } from '@kubevirt-utils/resources/vm/utils/patch';
 import {
   getEffectiveRunStrategy,
   isVMNotStopped,
 } from '@kubevirt-utils/resources/vm/utils/selectors';
-import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
 import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
 
 import MoveVMToFolderModal from '../../../utils/components/MoveVMToFolderModal/MoveVMToFolderModal';
@@ -23,11 +22,7 @@ export const openLabelsModal = (
       obj={vm}
       onClose={onClose}
       onLabelsSubmit={(labels): Promise<V1VirtualMachine> =>
-        kubevirtK8sPatch({
-          data: [{ op: 'replace', path: '/metadata/labels', value: labels }],
-          model: VirtualMachineModel,
-          resource: vm,
-        })
+        patchVM(vm, [{ op: 'replace', path: '/metadata/labels', value: labels }])
       }
     />
   ));
@@ -57,11 +52,7 @@ export const openMoveToFolderModal = (
       onSubmit={(folderName) => {
         const labels = vm?.metadata?.labels ?? {};
         labels[VM_FOLDER_LABEL] = folderName;
-        return kubevirtK8sPatch({
-          data: [{ op: 'replace', path: '/metadata/labels', value: labels }],
-          model: VirtualMachineModel,
-          resource: vm,
-        });
+        return patchVM(vm, [{ op: 'replace', path: '/metadata/labels', value: labels }]);
       }}
       vm={vm}
       {...props}
