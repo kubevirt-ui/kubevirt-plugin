@@ -11,8 +11,8 @@ import { type ModalComponent } from '@kubevirt-utils/components/ModalProvider/Mo
 import BulkSnapshotModal from '@kubevirt-utils/components/SnapshotModal/BulkSnapshotModal';
 import SnapshotModal from '@kubevirt-utils/components/SnapshotModal/SnapshotModal';
 import { getLabels } from '@kubevirt-utils/resources/shared';
+import { patchVM } from '@kubevirt-utils/resources/vm/utils/patch';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
 import DeleteAllVMsConfirmationModal from '@virtualmachines/actions/components/DeleteAllConfirmationModal/DeleteAllVMsConfirmationModal';
 
 import { asBulkAccessReview } from './accessReviewUtils';
@@ -72,11 +72,7 @@ export const createEditLabelsConfig =
           onLabelsSubmit={(newLabels) => {
             return Promise.all(
               vms.map((vm) =>
-                kubevirtK8sPatch<V1VirtualMachine>({
-                  data: getLabelsDiffPatch(newLabels, commonLabels, getLabels(vm)),
-                  model: VirtualMachineModel,
-                  resource: vm,
-                }),
+                patchVM(vm, getLabelsDiffPatch(newLabels, commonLabels, getLabels(vm))),
               ),
             );
           }}

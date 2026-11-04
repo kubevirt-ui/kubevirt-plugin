@@ -1,43 +1,31 @@
-import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getDataVolumeTemplates, getDisks, getVolumes } from '@kubevirt-utils/resources/vm';
-import { getCluster } from '@multicluster/helpers/selectors';
-import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
+import { patchVM } from '@kubevirt-utils/resources/vm/utils/patch';
 
 export const updateDisks = (updatedVM: V1VirtualMachine): Promise<V1VirtualMachine> =>
-  kubevirtK8sPatch({
-    cluster: getCluster(updatedVM),
-    data: [
-      {
-        op: 'replace',
-        path: `/spec/template/spec/domain/devices/disks`,
-        value: getDisks(updatedVM),
-      },
-      {
-        op: 'replace',
-        path: `/spec/template/spec/volumes`,
-        value: getVolumes(updatedVM),
-      },
-      {
-        op: 'replace',
-        path: `/spec/dataVolumeTemplates`,
-        value: getDataVolumeTemplates(updatedVM),
-      },
-    ],
-    model: VirtualMachineModel,
-    resource: updatedVM,
-  });
+  patchVM(updatedVM, [
+    {
+      op: 'replace',
+      path: `/spec/template/spec/domain/devices/disks`,
+      value: getDisks(updatedVM),
+    },
+    {
+      op: 'replace',
+      path: `/spec/template/spec/volumes`,
+      value: getVolumes(updatedVM),
+    },
+    {
+      op: 'replace',
+      path: `/spec/dataVolumeTemplates`,
+      value: getDataVolumeTemplates(updatedVM),
+    },
+  ]);
 
 export const updateVolumes = (updatedVM: V1VirtualMachine): Promise<V1VirtualMachine> =>
-  kubevirtK8sPatch({
-    cluster: getCluster(updatedVM),
-    data: [
-      {
-        op: 'replace',
-        path: `/spec/template/spec/volumes`,
-        value: getVolumes(updatedVM),
-      },
-    ],
-    model: VirtualMachineModel,
-    resource: updatedVM,
-  });
+  patchVM(updatedVM, [
+    {
+      op: 'replace',
+      path: `/spec/template/spec/volumes`,
+      value: getVolumes(updatedVM),
+    },
+  ]);

@@ -2,7 +2,6 @@ import produce from 'immer';
 
 import { ServiceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { VirtualMachineInstanceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
   type IoK8sApiCoreV1Pod,
   type IoK8sApiCoreV1Service,
@@ -11,6 +10,7 @@ import {
   type V1VirtualMachine,
   type V1VirtualMachineInstance,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { updateVM } from '@kubevirt-utils/resources/vm/utils/update';
 import { getCloudInitCredentials } from '@kubevirt-utils/resources/vmi';
 import { getVMILabelForServiceSelector } from '@kubevirt-utils/resources/vmi/utils/services';
 import {
@@ -98,13 +98,7 @@ export const addSSHSelectorLabelToVM = async (
     });
   }
 
-  return kubevirtK8sUpdate<V1VirtualMachine>({
-    cluster: getCluster(vm),
-    data: vmWithLabel,
-    model: VirtualMachineModel,
-    name: vmWithLabel?.metadata?.name,
-    ns: vmWithLabel?.metadata?.namespace,
-  });
+  return updateVM(vmWithLabel);
 };
 
 export const createSSHService = async (

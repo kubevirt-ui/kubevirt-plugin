@@ -2,7 +2,6 @@ import { type ReactNode } from 'react';
 import { type NavigateFunction } from 'react-router';
 import { type TFunction } from 'i18next';
 
-import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
   type V1VirtualMachine,
   type V1VirtualMachineInstance,
@@ -11,8 +10,7 @@ import {
   getVirtualMachineDetailsTabLabel,
   type VirtualMachineDetailsTab,
 } from '@kubevirt-utils/constants/tabs-constants';
-import { getNamespace } from '@kubevirt-utils/resources/shared';
-import { kubevirtK8sUpdate } from '@multicluster/k8sRequests';
+import { updateVM } from '@kubevirt-utils/resources/vm/utils/update';
 
 import { getTabURL } from '../../utils/helpers';
 import { type PendingChange } from '../../utils/types';
@@ -65,16 +63,7 @@ export type PendingChangeContext = {
 export const createPendingChangeContext = (
   params: BuildPendingChangesParams,
 ): PendingChangeContext => {
-  const { cluster, navigate, t, vm } = params;
-
-  const onSubmit = (updatedVM: V1VirtualMachine): Promise<V1VirtualMachine> =>
-    kubevirtK8sUpdate({
-      cluster,
-      data: updatedVM,
-      model: VirtualMachineModel,
-      name: updatedVM?.metadata?.name,
-      ns: getNamespace(updatedVM),
-    });
+  const { navigate, t, vm } = params;
 
   const createProps = (
     tab: VirtualMachineDetailsTab,
@@ -91,5 +80,5 @@ export const createPendingChangeContext = (
     };
   };
 
-  return { createModal: params.createModal, createProps, onSubmit, params };
+  return { createModal: params.createModal, createProps, onSubmit: updateVM, params };
 };

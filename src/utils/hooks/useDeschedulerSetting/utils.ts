@@ -1,7 +1,6 @@
 import produce from 'immer';
 
 import { TemplateModel, VirtualMachineTemplateModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import {
@@ -9,6 +8,7 @@ import {
   isVirtualMachineTemplate,
   type Template,
 } from '@kubevirt-utils/resources/template';
+import { updateVM } from '@kubevirt-utils/resources/vm/utils/update';
 import {
   DESCHEDULER_EVICT_ANNOTATION,
   DESCHEDULER_PREFER_NO_EVICTION_ANNOTATION,
@@ -46,13 +46,7 @@ export const updateDeschedulerForVM = (
     updateVMDeschedulerSetting(vmDraft, settingChecked),
   );
 
-  return kubevirtK8sUpdate({
-    cluster: getCluster(vm),
-    data: updatedVM,
-    model: VirtualMachineModel,
-    name: getName(updatedVM),
-    ns: getNamespace(updatedVM),
-  });
+  return updateVM(updatedVM);
 };
 
 export const updateDeschedulerForTemplate = (

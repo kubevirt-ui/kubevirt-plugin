@@ -1,11 +1,9 @@
-import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
   type V1beta1VirtualMachineClusterInstancetype,
   type V1beta1VirtualMachineInstancetype,
   type V1VirtualMachine,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { K8S_OPS } from '@kubevirt-utils/constants/constants';
-import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { type WORKLOADS } from '@kubevirt-utils/resources/template';
 import {
   DESCRIPTION_ANNOTATION,
@@ -14,19 +12,12 @@ import {
   getWorkload,
 } from '@kubevirt-utils/resources/vm';
 import { patchVM } from '@kubevirt-utils/resources/vm/utils/patch';
-import { getCluster } from '@multicluster/helpers/selectors';
-import { kubevirtK8sUpdate } from '@multicluster/k8sRequests';
+import { updateVM } from '@kubevirt-utils/resources/vm/utils/update';
 
 import { buildVirtualMachineResourcePatches } from './vmDataUtils';
 
 export const onSubmitYAML = (updatedVM: V1VirtualMachine): Promise<V1VirtualMachine> =>
-  kubevirtK8sUpdate<V1VirtualMachine>({
-    cluster: getCluster(updatedVM),
-    data: updatedVM,
-    model: VirtualMachineModel,
-    name: getName(updatedVM),
-    ns: getNamespace(updatedVM),
-  });
+  updateVM(updatedVM);
 
 export const updateGuestSystemAccessLog = (
   updatedVM: V1VirtualMachine,

@@ -1,5 +1,4 @@
 import { type FC, useCallback } from 'react';
-import { VirtualMachineModel } from 'src/views/dashboard-extensions/utils';
 
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import NetworkInterfaceModal from '@kubevirt-utils/components/NetworkInterfaceModal/NetworkInterfaceModal';
@@ -11,13 +10,9 @@ import {
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getInterfaces, getNetworks } from '@kubevirt-utils/resources/vm';
 import { type NetworkPresentation } from '@kubevirt-utils/resources/vm/utils/network/constants';
-import {
-  patchVM,
-  updateInterface,
-  updateNetwork,
-} from '@kubevirt-utils/resources/vm/utils/network/patch';
-import { getCluster } from '@multicluster/helpers/selectors';
-import { kubevirtK8sUpdate } from '@multicluster/k8sRequests';
+import { updateInterface, updateNetwork } from '@kubevirt-utils/resources/vm/utils/network/patch';
+import { patchVM } from '@kubevirt-utils/resources/vm/utils/patch';
+import { updateVM } from '@kubevirt-utils/resources/vm/utils/update';
 
 import { produceUpdatedVM } from './editNetworkInterfaceUtils';
 
@@ -74,13 +69,7 @@ const VirtualMachinesEditNetworkInterfaceModal: FC<
             existingNetwork,
           );
 
-          return kubevirtK8sUpdate({
-            cluster: getCluster(vm),
-            data: newVM,
-            model: VirtualMachineModel,
-            name: newVM.metadata?.name,
-            ns: newVM.metadata?.namespace,
-          });
+          return updateVM(newVM);
         }
 
         return patchVM(vm, [

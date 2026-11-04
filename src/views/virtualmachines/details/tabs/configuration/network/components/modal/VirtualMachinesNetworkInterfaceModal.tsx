@@ -1,6 +1,5 @@
 import { type FC, useCallback } from 'react';
 import produce from 'immer';
-import { VirtualMachineModel } from 'src/views/dashboard-extensions/utils';
 
 import {
   type V1Disk,
@@ -17,14 +16,10 @@ import {
   prepareNICBootOrder,
 } from '@kubevirt-utils/components/NetworkInterfaceModal/utils/helpers';
 import { getInterface, getInterfaces, getNetworks } from '@kubevirt-utils/resources/vm';
-import {
-  addInterface,
-  addNetwork,
-  patchVM,
-} from '@kubevirt-utils/resources/vm/utils/network/patch';
+import { addInterface, addNetwork } from '@kubevirt-utils/resources/vm/utils/network/patch';
+import { patchVM } from '@kubevirt-utils/resources/vm/utils/patch';
+import { updateVM } from '@kubevirt-utils/resources/vm/utils/update';
 import { ensurePath } from '@kubevirt-utils/utils/utils';
-import { getCluster } from '@multicluster/helpers/selectors';
-import { kubevirtK8sUpdate } from '@multicluster/k8sRequests';
 
 type VirtualMachinesNetworkInterfaceModalProps = {
   headerText: string;
@@ -98,13 +93,8 @@ const VirtualMachinesNetworkInterfaceModal: FC<VirtualMachinesNetworkInterfaceMo
             ensurePath(draftVM, ['spec.template.spec.domain.devices.interfaces']);
             draftVM.spec.template.spec.domain.devices.interfaces.push(resultInterface);
           });
-          return kubevirtK8sUpdate({
-            cluster: getCluster(vm),
-            data: newVM,
-            model: VirtualMachineModel,
-            name: newVM.metadata?.name,
-            ns: newVM.metadata?.namespace,
-          });
+
+          return updateVM(newVM);
         }
 
         return patchVM(vm, [

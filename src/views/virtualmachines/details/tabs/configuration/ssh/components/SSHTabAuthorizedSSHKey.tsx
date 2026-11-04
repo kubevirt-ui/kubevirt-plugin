@@ -1,5 +1,4 @@
 import { type FC, useMemo } from 'react';
-import { VirtualMachineModel } from 'src/views/dashboard-extensions/utils';
 
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
@@ -11,10 +10,9 @@ import VMSSHSecretModal from '@kubevirt-utils/components/VMSSHSecretModal/VMSSHS
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
 import { USER_SETTINGS_KEYS } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/const';
-import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getVMSSHSecretName } from '@kubevirt-utils/resources/vm';
+import { updateVM } from '@kubevirt-utils/resources/vm/utils/update';
 import { getCluster } from '@multicluster/helpers/selectors';
-import { kubevirtK8sUpdate } from '@multicluster/k8sRequests';
 import { Stack } from '@patternfly/react-core';
 
 import { useDynamicSSHInjection } from '../hooks/useDynamicSSHInjection';
@@ -45,15 +43,7 @@ const SSHTabAuthorizedSSHKey: FC<SSHTabAuthorizedSSHKeyProps> = ({
     ((canEditVM && isDynamicSSHInjectionEnabled) || isCustomizeInstanceType) && loaded;
 
   const onSubmit = (updatedVM: V1VirtualMachine): Promise<V1VirtualMachine> =>
-    onUpdateVM
-      ? onUpdateVM(updatedVM)
-      : kubevirtK8sUpdate({
-          cluster: getCluster(vm),
-          data: updatedVM,
-          model: VirtualMachineModel,
-          name: getName(updatedVM),
-          ns: getNamespace(updatedVM),
-        });
+    onUpdateVM ? onUpdateVM(updatedVM) : updateVM(updatedVM);
 
   return (
     <DescriptionItem
