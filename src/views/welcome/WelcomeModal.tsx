@@ -17,12 +17,15 @@ import {
   Stack,
   Title,
 } from '@patternfly/react-core';
+import { useSignals } from '@preact/signals-react/runtime';
 
 import WelcomeButtons from './components/WelcomeButtons';
 
 import './WelcomeModal.scss';
 
 const WelcomeModal: FC = () => {
+  useSignals();
+
   const { t } = useKubevirtTranslation();
   const [isOpen, setIsOpen] = useState<boolean>(true);
   const [quickStarts, setQuickStarts, loaded] = useKubevirtUserSettings('quickStart');

@@ -44,11 +44,7 @@ test.describe(`VirtualMachines read ${ROUTE_VIRTUAL_MACHINES_LIST_TAG} ${GATING_
         .toBe(true);
 
       await vmListPage.goToAllNamespacesList();
-      await vmListPage.searchTreeView(testNamespace);
-      await vmListPage.waitForTreeItemVisible(
-        vmListPage.vmTreeItemId(testNamespace, name),
-        TestTimeouts.TEST_SHORT,
-      );
+      await vmListPage.waitForVmTreeItemVisible(testNamespace, name, TestTimeouts.TEST_SHORT);
       await vmListPage.openVmFromTree(testNamespace, name);
       await vmDetailPage.waitForDetailHeadingVmName(name);
       await expect(vmDetailPage.detailHeading()).toBeVisible({
