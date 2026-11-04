@@ -4,7 +4,7 @@ import { useWatch } from 'react-hook-form';
 import useAutoAppliedLabels from '@kubevirt-utils/hooks/useAutoAppliedLabels/useAutoAppliedLabels';
 import { getLabels } from '@kubevirt-utils/resources/shared';
 import { customizeWizardVMSignal } from '@kubevirt-utils/signals/customizeWizardVMSignal';
-import { isDNS1123Subdomain } from '@kubevirt-utils/utils/dns1123SubdomainValidation';
+import { isVMName } from '@kubevirt-utils/utils/dns1123SubdomainValidation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { useSignals } from '@preact/signals-react/runtime';
 import { VMWizardStep } from '@virtualmachines/wizard/utils/constants';
@@ -73,7 +73,7 @@ const useWizardStepValidation = (): WizardStepValidation => {
     const isRedHatProvided = Boolean(selectedSeries) && Boolean(selectedSize);
     const isUserProvided =
       Boolean(selectedInstanceType?.namespace) && Boolean(selectedInstanceType?.name);
-    const isValidVMName = isCloneCreationMethod(creationMethod) || isDNS1123Subdomain(name);
+    const isValidVMName = isCloneCreationMethod(creationMethod) || isVMName(name);
 
     return {
       [VMWizardStep.BOOT_SOURCE]: Boolean(useBootSource) && isEmpty(selectedBootableVolume),

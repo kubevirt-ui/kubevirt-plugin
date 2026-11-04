@@ -3,8 +3,13 @@ import type { TFunction } from 'i18next';
 import {
   getDNS1123SubdomainError,
   getDNS1123SubdomainErrorLenient,
+  getVMNameError,
+  getVMNameErrorLenient,
   isDNS1123Subdomain,
   isDNS1123SubdomainLenient,
+  isVMName,
+  isVMNameLenient,
+  VMNameMaxLength,
 } from './dns1123SubdomainValidation';
 
 const t = ((key: string) => key) as TFunction;
@@ -115,5 +120,45 @@ describe('isDNS1123SubdomainLenient', () => {
 
   it('should reject interior format errors while typing', () => {
     expect(isDNS1123SubdomainLenient('my..vm.')).toBe(false);
+  });
+});
+
+describe('getVMNameError', () => {
+  it('should allow DNS-1123 subdomain syntax including periods', () => {
+    expect(getVMNameError('my.vm')).toBeUndefined();
+  });
+
+  it('should reject names longer than the VM name limit', () => {
+    const error = getVMNameError('a'.repeat(VMNameMaxLength + 1));
+    expect(error?.(t)).toBe('Maximum name length is {{ maxNameLength }} characters');
+  });
+
+  it('should allow names at exactly the VM name limit', () => {
+    expect(getVMNameError('a'.repeat(VMNameMaxLength))).toBeUndefined();
+  });
+
+  it('should reject invalid subdomain syntax', () => {
+    expect(getVMNameError('My_VM')).toBeDefined();
+  });
+});
+
+describe('getVMNameErrorLenient', () => {
+  it('should tolerate a trailing dot or hyphen while typing', () => {
+    expect(getVMNameErrorLenient('my.vm.')).toBeUndefined();
+    expect(getVMNameErrorLenient('my-vm-')).toBeUndefined();
+  });
+
+  it('should reject names over the VM name limit even with a trailing separator', () => {
+    expect(getVMNameErrorLenient(`${'a'.repeat(VMNameMaxLength)}-`)).toBeDefined();
+  });
+});
+
+describe('isVMNameLenient', () => {
+  it('should accept valid VM names with periods', () => {
+    expect(isVMNameLenient('my.vm')).toBe(true);
+  });
+
+  it('should reject names longer than the VM name limit', () => {
+    expect(isVMName('a'.repeat(VMNameMaxLength + 1))).toBe(false);
   });
 });

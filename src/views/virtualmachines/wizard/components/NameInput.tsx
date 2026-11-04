@@ -5,8 +5,8 @@ import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useNameValidation } from '@kubevirt-utils/hooks/useNameValidation';
 import {
-  getDNS1123SubdomainError,
-  getDNS1123SubdomainErrorLenient,
+  getVMNameError,
+  getVMNameErrorLenient,
 } from '@kubevirt-utils/utils/dns1123SubdomainValidation';
 import { InputGroup, InputGroupItem, TextInput } from '@patternfly/react-core';
 
@@ -25,9 +25,7 @@ const NameInput: FC = () => {
     control,
     name: CREATE_VM_FORM_FIELDS_UI_STATE.SHOULD_CHECK_VM_NAME_PROPERLY,
   });
-  const getError = shouldCheckVMNameProperly
-    ? getDNS1123SubdomainError
-    : getDNS1123SubdomainErrorLenient;
+  const getError = shouldCheckVMNameProperly ? getVMNameError : getVMNameErrorLenient;
   const { errorText, validated } = useNameValidation({ getError, name: vmName });
 
   const applyName = useCallback(
