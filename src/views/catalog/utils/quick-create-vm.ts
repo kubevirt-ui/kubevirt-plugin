@@ -3,7 +3,11 @@ import produce from 'immer';
 import { ProcessedTemplatesModel, V1Template } from '@kubevirt-ui/kubevirt-api/console';
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
+import {
+  DEFAULT_NAMESPACE,
+  RUNSTRATEGY_ALWAYS,
+  RUNSTRATEGY_HALTED,
+} from '@kubevirt-utils/constants/constants';
 import {
   LABEL_USED_TEMPLATE_NAME,
   LABEL_USED_TEMPLATE_NAMESPACE,
@@ -46,9 +50,10 @@ export const quickCreateVM: QuickCreateVMType = async ({
 
     draftVM.metadata.labels[LABEL_USED_TEMPLATE_NAME] = processedTemplate.metadata.name;
     draftVM.metadata.labels[LABEL_USED_TEMPLATE_NAMESPACE] = template.metadata.namespace;
-    if (startVM) {
-      draftVM.spec.running = true;
-    }
+    // Newer common-templates already set runStrategy; KubeVirt rejects both
+    // fields together. Prefer runStrategy (CNV-45435 / CNV-8848).
+    delete draftVM.spec.running;
+    draftVM.spec.runStrategy = startVM ? RUNSTRATEGY_ALWAYS : RUNSTRATEGY_HALTED;
   });
 
   const { objects } = replaceTemplateVM(processedTemplate, overridedVM);
