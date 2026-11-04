@@ -13,13 +13,14 @@ import {
   getHostname,
   getWorkload,
 } from '@kubevirt-utils/resources/vm';
+import { patchVM } from '@kubevirt-utils/resources/vm/utils/patch';
 import { getCluster } from '@multicluster/helpers/selectors';
-import { kubevirtK8sPatch, kubevirtK8sUpdate } from '@multicluster/k8sRequests';
+import { kubevirtK8sUpdate } from '@multicluster/k8sRequests';
 
 import { buildVirtualMachineResourcePatches } from './vmDataUtils';
 
 export const onSubmitYAML = (updatedVM: V1VirtualMachine): Promise<V1VirtualMachine> =>
-  kubevirtK8sUpdate({
+  kubevirtK8sUpdate<V1VirtualMachine>({
     cluster: getCluster(updatedVM),
     data: updatedVM,
     model: VirtualMachineModel,
@@ -31,35 +32,25 @@ export const updateGuestSystemAccessLog = (
   updatedVM: V1VirtualMachine,
   checked: boolean,
 ): Promise<V1VirtualMachine> =>
-  kubevirtK8sPatch({
-    cluster: getCluster(updatedVM),
-    data: [
-      {
-        op: 'replace',
-        path: `/spec/template/spec/domain/devices/logSerialConsole`,
-        value: checked,
-      },
-    ],
-    model: VirtualMachineModel,
-    resource: updatedVM,
-  });
+  patchVM(updatedVM, [
+    {
+      op: 'replace',
+      path: `/spec/template/spec/domain/devices/logSerialConsole`,
+      value: checked,
+    },
+  ]);
 
 export const updateDescription = (
   updatedVM: V1VirtualMachine,
   updatedDescription: string,
 ): Promise<V1VirtualMachine> =>
-  kubevirtK8sPatch({
-    cluster: getCluster(updatedVM),
-    data: [
-      {
-        op: 'replace',
-        path: `/metadata/annotations/${DESCRIPTION_ANNOTATION}`,
-        value: updatedDescription,
-      },
-    ],
-    model: VirtualMachineModel,
-    resource: updatedVM,
-  });
+  patchVM(updatedVM, [
+    {
+      op: 'replace',
+      path: `/metadata/annotations/${DESCRIPTION_ANNOTATION}`,
+      value: updatedDescription,
+    },
+  ]);
 
 export const updateWorkload = (
   updatedVM: V1VirtualMachine,
@@ -70,75 +61,53 @@ export const updateWorkload = (
     return;
   }
 
-  return kubevirtK8sPatch({
-    cluster: getCluster(updatedVM),
-    data: [
-      {
-        op: 'replace',
-        path: `/spec/template/metadata/annotations/vm.kubevirt.io~1workload`,
-        value: newWorkload,
-      },
-    ],
-    model: VirtualMachineModel,
-    resource: updatedVM,
-  });
+  return patchVM(updatedVM, [
+    {
+      op: 'replace',
+      path: `/spec/template/metadata/annotations/vm.kubevirt.io~1workload`,
+      value: newWorkload,
+    },
+  ]);
 };
 
-export const updatedVirtualMachine = (updatedVM: V1VirtualMachine): Promise<V1VirtualMachine> =>
-  kubevirtK8sPatch({
-    cluster: getCluster(updatedVM),
-    data: buildVirtualMachineResourcePatches(updatedVM),
-    model: VirtualMachineModel,
-    resource: updatedVM,
-  });
+export const updatedVirtualMachine = (
+  originalVM: V1VirtualMachine,
+  updatedVM: V1VirtualMachine,
+): Promise<V1VirtualMachine> =>
+  patchVM(updatedVM, buildVirtualMachineResourcePatches(originalVM, updatedVM));
 
 export const updatedInstanceType = (
   vmToBeUpdated: V1VirtualMachine,
   instanceType: V1beta1VirtualMachineClusterInstancetype | V1beta1VirtualMachineInstancetype,
 ): Promise<V1VirtualMachine> =>
-  kubevirtK8sPatch({
-    cluster: vmToBeUpdated?.cluster,
-    data: [
-      {
-        op: 'replace',
-        path: `/spec/instancetype`,
-        value: { kind: instanceType.kind, name: instanceType.metadata.name },
-      },
-    ],
-    model: VirtualMachineModel,
-    resource: vmToBeUpdated,
-  });
+  patchVM(vmToBeUpdated, [
+    {
+      op: 'replace',
+      path: `/spec/instancetype`,
+      value: { kind: instanceType.kind, name: instanceType.metadata.name },
+    },
+  ]);
 
 export const updatedHostname = (updatedVM: V1VirtualMachine): Promise<V1VirtualMachine> =>
-  kubevirtK8sPatch({
-    cluster: getCluster(updatedVM),
-    data: [
-      {
-        op: 'replace',
-        path: `/spec/template/spec/hostname`,
-        value: getHostname(updatedVM),
-      },
-    ],
-    model: VirtualMachineModel,
-    resource: updatedVM,
-  });
+  patchVM(updatedVM, [
+    {
+      op: 'replace',
+      path: `/spec/template/spec/hostname`,
+      value: getHostname(updatedVM),
+    },
+  ]);
 
 export const updateHeadlessMode = (
   updatedVM: V1VirtualMachine,
   checked: boolean,
 ): Promise<V1VirtualMachine> =>
-  kubevirtK8sPatch({
-    cluster: getCluster(updatedVM),
-    data: [
-      {
-        op: 'replace',
-        path: `/spec/template/spec/domain/devices/autoattachGraphicsDevice`,
-        value: checked ? false : null,
-      },
-    ],
-    model: VirtualMachineModel,
-    resource: updatedVM,
-  });
+  patchVM(updatedVM, [
+    {
+      op: 'replace',
+      path: `/spec/template/spec/domain/devices/autoattachGraphicsDevice`,
+      value: checked ? false : null,
+    },
+  ]);
 
 const VSOCK_DEVICE_PATH = `/spec/template/spec/domain/devices/autoattachVSOCK`;
 
@@ -148,16 +117,11 @@ export const updateVSOCK = (
 ): Promise<V1VirtualMachine> => {
   const hasAutoattachVSOCK = getDevices(updatedVM)?.autoattachVSOCK;
 
-  return kubevirtK8sPatch({
-    cluster: getCluster(updatedVM),
-    data: [
-      {
-        op: hasAutoattachVSOCK ? K8S_OPS.REPLACE : K8S_OPS.ADD,
-        path: VSOCK_DEVICE_PATH,
-        value: checked,
-      },
-    ],
-    model: VirtualMachineModel,
-    resource: updatedVM,
-  });
+  return patchVM(updatedVM, [
+    {
+      op: hasAutoattachVSOCK ? K8S_OPS.REPLACE : K8S_OPS.ADD,
+      path: VSOCK_DEVICE_PATH,
+      value: checked,
+    },
+  ]);
 };

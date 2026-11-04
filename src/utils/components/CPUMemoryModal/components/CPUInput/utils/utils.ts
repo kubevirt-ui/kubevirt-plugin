@@ -67,6 +67,6 @@ export const getInitialCPUInputType = (cpu: undefined | V1CPU): CPUInputType => 
     return CPUInputType.EditVCPU;
   }
 
-  const isSimpleCPU = cpu.cores === 1 && cpu.threads === 1;
+  const isSimpleCPU = (cpu.cores ?? 1) === 1 && (cpu.threads ?? 1) === 1;
   return isSimpleCPU ? CPUInputType.EditVCPU : CPUInputType.EditTopologyManually;
 };
