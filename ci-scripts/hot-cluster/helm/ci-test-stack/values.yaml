@@ -38,8 +38,7 @@ console:
 
   # BRIDGE_USER_SETTINGS_LOCATION. "localstorage" (default) keeps user
   # settings purely in the browser, which Playwright's seedGuidedTourState()
-  # relies on. Only Cypress overrides this to "configmap" (it also seeds
-  # the matching server-side ConfigMap -- see hot-cluster-e2e-run.yml).
+  # relies on.
   userSettingsLocation: localstorage
 
 # ClusterRole created by the ci-env-controller Helm chart (clusterrole-console.yaml).

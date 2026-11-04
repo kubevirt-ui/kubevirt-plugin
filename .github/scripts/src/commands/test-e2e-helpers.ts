@@ -9,7 +9,6 @@ export const VALID_TEST_E2E_PROJECTS = [
   'tier1',
   'tier2',
   'suite',
-  'features',
   'settings',
   'api',
   'all',

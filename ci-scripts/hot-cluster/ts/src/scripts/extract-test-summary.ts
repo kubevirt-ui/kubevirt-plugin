@@ -3,11 +3,10 @@
  * XML results. Outputs `test_summary` to GITHUB_OUTPUT (always, including
  * all-pass runs) and also appends it to the job's step summary.
  *
- * Required env: TEST_ENGINE
  * Optional env: BRIDGE_BASE_ADDRESS, CHECKOUT_REF, CLUSTER_NAME, CNV_CHANNEL,
  *               CNV_PIN_VERSION, CONSOLE_ROUTE, GITHUB_* , INFRASTRUCTURE_TYPE,
  *               OPENSHIFT_VERSION, PLUGIN_IMAGE, PR_NUMBER, RUNNER_LABEL, TEST_ARGS,
- *               TEST_NS, TEST_PROJECT (GITHUB_WORKSPACE falls back to
+ *               TEST_ENGINE, TEST_NS, TEST_PROJECT (GITHUB_WORKSPACE falls back to
  *               `git rev-parse --show-toplevel`, matching run-gating-tests.ts)
  */
 
@@ -31,10 +30,9 @@ const resolveResultsFile = (): string => {
 };
 
 const main = async (): Promise<void> => {
-  const testEngine = process.env.TEST_ENGINE ?? '';
   const resultsFile = resolveResultsFile();
 
-  if (testEngine !== 'playwright' || !existsSync(resultsFile)) {
+  if (!existsSync(resultsFile)) {
     setOutput('test_summary', '');
     return;
   }

@@ -14,13 +14,6 @@ const DEFAULT_OPENSHIFT_VERSION = '4.22_openshift';
 const DEFAULT_TEST_ENGINE = 'playwright';
 const DEFAULT_CNV_CHANNEL = 'stable';
 
-const LAST_CYPRESS_MAJOR = 4;
-const LAST_CYPRESS_MINOR = 22;
-
-// Release branches at/below LAST_CYPRESS_* that already migrated to Playwright
-// (Cypress tree removed). Entries are "major.minor" strings.
-const PLAYWRIGHT_MIGRATED_RELEASES: readonly string[] = ['4.15', '4.18', '4.19', '4.20'];
-
 // Window of OpenShift versions we can actually provision on IBM Cloud. VPC
 // cluster creation with an explicit CNI (--cni OVNKubernetes) is rejected
 // below 4.20 ("version is not supported for CNI selection in VPC. Specify
@@ -28,9 +21,8 @@ const PLAYWRIGHT_MIGRATED_RELEASES: readonly string[] = ['4.15', '4.18', '4.19',
 // 4.18, create-roks-vpc.ts omits --cni entirely, which provisions with
 // VPC's platform-default CNI (Calico) instead -- see cniPluginFor below. A
 // release branch outside this window still provisions, clamped to the
-// nearest supported version; the branch's own cluster_name/test_engine stay
-// tied to the real branch, and CNV is left unpinned when a clamp happens
-// (see below).
+// nearest supported version; the branch's own cluster_name stays tied to
+// the real branch, and CNV is left unpinned when a clamp happens (see below).
 const MIN_SUPPORTED = { major: 4, minor: 18 };
 const MAX_SUPPORTED = { major: 4, minor: 22 };
 
@@ -107,13 +99,7 @@ export const resolveClusterConfig = (params: {
       const openshiftVersion = `${clamped.major}.${clamped.minor}_openshift`;
       const cniPlugin = cniPluginFor(clamped.major, clamped.minor);
       const cnvPinVersion = isClamped ? '' : `${major}.${minor}`;
-      const branchVersion = `${major}.${minor}`;
-      const belowCypressCutoff =
-        major * 1000 + minor <= LAST_CYPRESS_MAJOR * 1000 + LAST_CYPRESS_MINOR;
-      const testEngine =
-        belowCypressCutoff && !PLAYWRIGHT_MIGRATED_RELEASES.includes(branchVersion)
-          ? 'cypress'
-          : 'playwright';
+      const testEngine = DEFAULT_TEST_ENGINE;
 
       if (isClamped) {
         console.error(
@@ -155,6 +141,11 @@ export const resolveClusterConfig = (params: {
   const testEngine =
     inputTestEngine && inputTestEngine !== 'auto'
       ? ((): string => {
+          if (inputTestEngine !== 'playwright') {
+            throw new Error(
+              `Unsupported test engine '${inputTestEngine}' (only 'playwright' is supported)`,
+            );
+          }
           console.error(`Overriding test engine from input: '${inputTestEngine}'`);
           return inputTestEngine;
         })()

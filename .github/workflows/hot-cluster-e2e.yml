@@ -17,9 +17,8 @@ on:
       test_project:
         description: |
           Suite to run.
-          Playwright (main): gating / tier1 / tier2 / suite / settings / api / all / auto.
+          Playwright: gating / tier1 / tier2 / suite / settings / api / all / auto.
           auto omits --project and requires test_args (spec path or -g).
-          Cypress (release only): gating or features (Cypress's Tier1 suite — not a Playwright project).
           Default gating is the required PR check.
         required: true
         default: gating
@@ -29,7 +28,6 @@ on:
           - tier1
           - tier2
           - suite
-          - features
           - settings
           - api
           - all
@@ -72,16 +70,15 @@ on:
         type: string
       test_engine:
         description: |
-          E2E test engine to run. 'auto' detects from the base branch --
-          see ci-scripts/README.md ("Cluster & Test-Engine Resolution").
-          Override explicitly when manually testing a Cypress-era branch.
+          E2E test engine to run. Always Playwright; 'auto' and
+          'playwright' are equivalent. See ci-scripts/README.md
+          ("Cluster & Test-Engine Resolution").
         required: false
         default: auto
         type: choice
         options:
           - auto
           - playwright
-          - cypress
       cnv_channel:
         description: |
           Explicit CNV OLM subscription channel override. Leave empty to
@@ -101,9 +98,9 @@ on:
         type: string
       base_ref:
         description: |
-          PR base branch for cluster/test_engine auto-selection on
-          workflow_dispatch (e.g. release-4.20). Forwarded by
-          retest-e2e.yml's /retest-e2e fallback. Leave empty otherwise.
+          PR base branch for cluster auto-selection on workflow_dispatch
+          (e.g. release-4.20). Forwarded by retest-e2e.yml's /retest-e2e
+          fallback. Leave empty otherwise.
         required: false
         default: ''
         type: string

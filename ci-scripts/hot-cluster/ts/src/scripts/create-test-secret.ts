@@ -2,7 +2,7 @@
  * Create the test secret from a YAML fixture, substituting name/namespace.
  * Replaces the `yq | oc apply` bash block.
  *
- * Env: TEST_SECRET_NAME, TEST_NS, TEST_ENGINE
+ * Env: TEST_SECRET_NAME, TEST_NS
  */
 
 import * as yaml from 'js-yaml';
@@ -15,12 +15,11 @@ import { KubeClient, requireEnv } from '../kube-client';
 const main = async (): Promise<void> => {
   const secretName = requireEnv('TEST_SECRET_NAME');
   const testNs = requireEnv('TEST_NS');
-  const testEngine = process.env.TEST_ENGINE ?? 'playwright';
 
   const repoRoot =
     process.env.GITHUB_WORKSPACE ??
     execFileSync('git', ['rev-parse', '--show-toplevel'], { encoding: 'utf8' }).trim();
-  const fixturePath = resolve(repoRoot, testEngine, 'fixtures', 'secret.yaml');
+  const fixturePath = resolve(repoRoot, 'playwright/fixtures/secret.yaml');
   const content = yaml.load(readFileSync(fixturePath, 'utf8')) as Record<string, unknown>;
 
   const metadata = content.metadata as Record<string, unknown>;

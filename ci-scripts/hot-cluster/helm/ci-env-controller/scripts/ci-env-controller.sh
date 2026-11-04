@@ -227,12 +227,11 @@ provision() {
   oc create namespace "${test_ns}" --dry-run=client -o yaml | oc apply -f - || true
 
   # Namespace-scoped (not cluster-wide, see arc-runner-rbac.yaml) fallback
-  # so test-cleanup.sh's secret delete works in the one namespace that
-  # isn't torn down and recreated by a fresh Helm release each run: the
-  # fixed 'auto-test-ns' Cypress namespace. Applied directly here (not via
-  # the Helm chart) rather than once at bootstrap, so the Role/RoleBinding
-  # are reconciled fresh on every provisioning run regardless of any
-  # earlier drift.
+  # so test-cleanup's secret delete works in a fixed 'auto-test-ns' that
+  # isn't torn down and recreated by a fresh Helm release each run.
+  # Applied directly here (not via the Helm chart) rather than once at
+  # bootstrap, so the Role/RoleBinding are reconciled fresh on every
+  # provisioning run regardless of any earlier drift.
   if [[ "${test_ns}" == "auto-test-ns" ]]; then
     log "Ensuring auto-test-ns secret-cleanup RBAC..."
     local secret_rbac_applied="false"
@@ -294,9 +293,7 @@ EOF
   fi
 
   # Opt-in only: empty means "don't override" -- the chart's own default
-  # (localstorage) applies. Cypress flips this to "configmap" since its
-  # before-all hook can't otherwise dismiss the console's welcome modal
-  # (see hot-cluster-e2e-run.yml's "Seed kubevirt-user-settings ConfigMap").
+  # (localstorage) applies. Playwright seeds guided-tour state client-side.
   if [[ -n "${user_settings_location}" ]]; then
     if [[ "${user_settings_location}" != "configmap" && "${user_settings_location}" != "localstorage" ]]; then
       local err="invalid user-settings-location '${user_settings_location}' (must be 'configmap' or 'localstorage')"

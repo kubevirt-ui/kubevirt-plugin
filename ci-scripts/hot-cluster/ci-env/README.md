@@ -31,7 +31,7 @@ ARC Runner                ci-env namespace              Test namespace
 2. The **controller** discovers cluster endpoints, resolves the console image,
    creates the test namespace, deploys the Helm chart, and waits for readiness.
 3. The controller patches the ConfigMap with `status: ready` and the
-   `bridge-base-address` the runner needs for Playwright (or Cypress on older release branches).
+   `bridge-base-address` the runner needs for Playwright.
 4. After tests, the runner sets `desired-state: absent` and the controller
    tears down the environment.
 
@@ -59,7 +59,7 @@ Manual-console deploys (label `ci.kubevirt-plugin/type: manual-console`) also pa
 | Field                 | Description                                                             |
 | --------------------- | ----------------------------------------------------------------------- |
 | `status`              | `pending` / `provisioning` / `ready` / `error` / `cleaning` / `cleaned` |
-| `bridge-base-address` | In-cluster console URL for Playwright / Cypress E2E                     |
+| `bridge-base-address` | In-cluster console URL for Playwright E2E                               |
 | `console-route`       | External Route URL for debugging                                        |
 | `error-message`       | Error details (only when `status=error`)                                |
 
