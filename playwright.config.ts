@@ -80,7 +80,7 @@ export default defineConfig({
   fullyParallel: true,
   globalSetup: './playwright/project-dependencies/global.setup.ts',
   globalTeardown: './playwright/project-dependencies/global.teardown.ts',
-  outputDir: testResultsDir,
+  outputDir: './playwright/test-results/artifacts',
   /** Resolve `@/` → `playwright/src/` (see playwright/tsconfig.json). */
   tsconfig: './playwright/tsconfig.json',
   projects: [
@@ -140,7 +140,7 @@ export default defineConfig({
     storageState,
     testIdAttribute: 'data-test',
     trace: 'off',
-    video: 'off',
+    video: 'retain-on-failure',
     viewport: { height: 1080, width: 1920 },
   },
   workers: process.env.WORKERS ? parseInt(process.env.WORKERS, 10) : 4,
