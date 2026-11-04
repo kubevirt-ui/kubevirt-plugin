@@ -32,7 +32,7 @@ const DataVolumeDetailsGrid: FC<DataVolumeDetailsGridProps> = ({ dataVolume }) =
   const { t } = useKubevirtTranslation();
   const phase = getDataVolumePhase(dataVolume);
   const claimName = getDataVolumeClaimName(dataVolume);
-  const { color, text } = getDataVolumePhaseLabel(phase, t);
+  const { color, text } = getDataVolumePhaseLabel(phase);
 
   return (
     <Grid hasGutter>

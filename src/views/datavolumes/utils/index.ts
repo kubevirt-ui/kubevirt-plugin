@@ -1,5 +1,3 @@
-import type { TFunction } from 'i18next';
-
 import type { V1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import type { LabelProps } from '@patternfly/react-core';
 
@@ -21,29 +19,25 @@ export const getDataVolumeStorageClass = (dataVolume: V1beta1DataVolume): string
 
 type StatusLabel = { color: LabelProps['color']; text: string };
 
-export const getDataVolumePhaseLabel = (phase: string | undefined, t: TFunction): StatusLabel => {
+/** Status text matches the DataVolume API phase (same value as in YAML). */
+export const getDataVolumePhaseLabel = (phase: string | undefined): StatusLabel => {
   switch (phase) {
     case 'Succeeded':
-      return { color: 'green', text: t('Succeeded') };
+      return { color: 'green', text: phase };
     case 'Failed':
-      return { color: 'red', text: t('Failed') };
+      return { color: 'red', text: phase };
     case 'Unknown':
-      return { color: 'grey', text: t('Unknown') };
+      return { color: 'grey', text: phase };
     case 'ImportInProgress':
-      return { color: 'blue', text: t('ImportInProgress') };
     case 'CloneInProgress':
-      return { color: 'blue', text: t('CloneInProgress') };
     case 'SnapshotInProgress':
-      return { color: 'blue', text: t('SnapshotInProgress') };
     case 'UploadReady':
-      return { color: 'blue', text: t('UploadReady') };
     case 'PendingPopulation':
-      return { color: 'blue', text: t('PendingPopulation') };
     case 'WaitForFirstConsumer':
-      return { color: 'blue', text: t('WaitForFirstConsumer') };
+      return { color: 'blue', text: phase };
     case 'PVCBound':
-      return { color: 'cyan', text: t('PVCBound') };
+      return { color: 'cyan', text: phase };
     default:
-      return { color: 'grey', text: phase || t('Unknown') };
+      return { color: 'grey', text: phase || 'Unknown' };
   }
 };

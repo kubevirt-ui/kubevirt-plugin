@@ -1,7 +1,6 @@
 import type { FC } from 'react';
 
 import type { V1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
-import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { Label } from '@patternfly/react-core';
 
@@ -12,14 +11,13 @@ type DataVolumeStatusCellProps = {
 };
 
 const DataVolumeStatusCell: FC<DataVolumeStatusCellProps> = ({ row }) => {
-  const { t } = useKubevirtTranslation();
   const phase = getDataVolumePhase(row);
 
   if (!phase) {
     return <>{NO_DATA_DASH}</>;
   }
 
-  const { color, text } = getDataVolumePhaseLabel(phase, t);
+  const { color, text } = getDataVolumePhaseLabel(phase);
 
   return <Label color={color}>{text}</Label>;
 };

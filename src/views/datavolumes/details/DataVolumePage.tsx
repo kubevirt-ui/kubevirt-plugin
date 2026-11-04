@@ -1,4 +1,4 @@
-import type { FC } from 'react';
+import type { FC, ReactNode } from 'react';
 import { useMemo } from 'react';
 
 import type { V1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
@@ -48,18 +48,23 @@ const DataVolumePage: FC<DataVolumePageProps> = ({ kind, name, namespace }) => {
     [t, hideYamlTab],
   );
 
+  let content: ReactNode;
+  if (loadError) {
+    content = <ErrorAlert error={loadError} />;
+  } else if (!loaded) {
+    content = (
+      <Bullseye>
+        <Loading />
+      </Bullseye>
+    );
+  } else {
+    content = <HorizontalNav pages={pages} resource={dataVolume} />;
+  }
+
   return (
     <>
       <DataVolumePageTitle dataVolume={dataVolume} name={name} namespace={namespace} />
-      {loadError ? (
-        <ErrorAlert error={loadError} />
-      ) : loaded ? (
-        <HorizontalNav pages={pages} resource={dataVolume} />
-      ) : (
-        <Bullseye>
-          <Loading />
-        </Bullseye>
-      )}
+      {content}
     </>
   );
 };

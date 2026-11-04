@@ -22,7 +22,7 @@ const DataVolumePageTitle: FC<DataVolumePageTitleProps> = ({ dataVolume, name, n
   const { t } = useKubevirtTranslation();
   const ns = namespace || getNamespace(dataVolume);
   const phase = getDataVolumePhase(dataVolume);
-  const phaseLabel = getDataVolumePhaseLabel(phase, t);
+  const phaseLabel = getDataVolumePhaseLabel(phase);
 
   return (
     <DetailsPageTitle
