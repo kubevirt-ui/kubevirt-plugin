@@ -14,16 +14,10 @@ describe('bootVolumeNames', () => {
     expect(getIsoCdromDiskName('my.vm')).toBe('my-vm-cdrom-iso');
   });
 
-  it('should keep boot DataVolume names within 63 characters', () => {
+  it('should truncate the VM name prefix to fit the suffix within 63 characters', () => {
     const vmName = 'a'.repeat(DNS1123LabelMaxLength);
-    const volumeName = getBootDataVolumeName(vmName);
-    const blankVolumeName = getIsoBlankDataVolumeName(vmName);
-
-    expect(volumeName.length).toBeLessThanOrEqual(wizardDataVolumeNameMaxLength);
-    expect(blankVolumeName.length).toBeLessThanOrEqual(wizardDataVolumeNameMaxLength);
-    expect(volumeName.endsWith('-volume')).toBe(true);
-    expect(blankVolumeName.endsWith('-volume-blank')).toBe(true);
-    expect(volumeName).not.toMatch(/\.-/);
+    expect(getBootDataVolumeName(vmName)).toBe(`${'a'.repeat(56)}-volume`);
+    expect(getIsoBlankDataVolumeName(vmName)).toBe(`${'a'.repeat(50)}-volume-blank`);
   });
 
   it('should strip a trailing dot from the truncated prefix for boot DataVolume names', () => {

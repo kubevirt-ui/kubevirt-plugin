@@ -14,14 +14,20 @@ export const dns1123SubdomainErrMsg = (t: TFunction): string =>
 /** A subdomain's max length in DNS (RFC 1123). */
 export const DNS1123SubdomainMaxLength = 253;
 
-const maxSubdomainLengthErrorMsg = (t: TFunction): string =>
-  getMaxNameLengthErrorMsg(t, DNS1123SubdomainMaxLength);
+/** VM names use DNS-1123 subdomain rules but are capped at 63 chars for migration-safe derived names. */
+export const VMNameMaxLength = DNS1123LabelMaxLength;
 
-export const isDNS1123Subdomain = (value: string): boolean => !getDNS1123SubdomainError(value);
+const getMaxLengthErrorMsg =
+  (maxLength: number) =>
+  (t: TFunction): string =>
+    getMaxNameLengthErrorMsg(t, maxLength);
 
-export const getDNS1123SubdomainError = (value: string): ((t: TFunction) => string) | undefined => {
-  if (value?.length > DNS1123SubdomainMaxLength) {
-    return maxSubdomainLengthErrorMsg;
+export const getDNS1123SubdomainErrorWithMaxLength = (
+  value: string,
+  maxLength: number,
+): ((t: TFunction) => string) | undefined => {
+  if (value?.length > maxLength) {
+    return getMaxLengthErrorMsg(maxLength);
   }
   if (!dns1123SubdomainRegexp.test(value ?? '')) {
     return dns1123SubdomainErrMsg;
@@ -29,55 +35,44 @@ export const getDNS1123SubdomainError = (value: string): ((t: TFunction) => stri
   return undefined;
 };
 
+export const isDNS1123Subdomain = (value: string): boolean => !getDNS1123SubdomainError(value);
+
+export const getDNS1123SubdomainError = (value: string): ((t: TFunction) => string) | undefined =>
+  getDNS1123SubdomainErrorWithMaxLength(value, DNS1123SubdomainMaxLength);
+
 // Tolerates a trailing '-' or '.' since the user is likely still typing (e.g. "my-vm-", "my.vm.").
 // A leading '-' or '.' is still rejected because it's never valid.
-export const getDNS1123SubdomainErrorLenient = (
+export const getDNS1123SubdomainErrorLenientWithMaxLength = (
   value: string,
+  maxLength: number,
 ): ((t: TFunction) => string) | undefined => {
-  const error = getDNS1123SubdomainError(value);
+  const error = getDNS1123SubdomainErrorWithMaxLength(value, maxLength);
 
   if (
     error &&
     !value?.startsWith('-') &&
     !value?.startsWith('.') &&
-    value?.length <= DNS1123SubdomainMaxLength &&
+    value?.length <= maxLength &&
     (value?.endsWith('-') || value?.endsWith('.'))
   ) {
-    return getDNS1123SubdomainError(value.slice(0, -1)) ? error : undefined;
+    return getDNS1123SubdomainErrorWithMaxLength(value.slice(0, -1), maxLength) ? error : undefined;
   }
   return error;
 };
+
+export const getDNS1123SubdomainErrorLenient = (
+  value: string,
+): ((t: TFunction) => string) | undefined =>
+  getDNS1123SubdomainErrorLenientWithMaxLength(value, DNS1123SubdomainMaxLength);
 
 export const isDNS1123SubdomainLenient = (value: string): boolean =>
   !getDNS1123SubdomainErrorLenient(value);
 
-/** VM names use DNS-1123 subdomain rules but are capped at 63 chars for migration-safe derived names. */
-export const VMNameMaxLength = DNS1123LabelMaxLength;
+export const getVMNameError = (value: string): ((t: TFunction) => string) | undefined =>
+  getDNS1123SubdomainErrorWithMaxLength(value, VMNameMaxLength);
 
-const maxVMNameLengthErrorMsg = (t: TFunction): string =>
-  getMaxNameLengthErrorMsg(t, VMNameMaxLength);
-
-export const getVMNameError = (value: string): ((t: TFunction) => string) | undefined => {
-  if (value?.length > VMNameMaxLength) {
-    return maxVMNameLengthErrorMsg;
-  }
-  return getDNS1123SubdomainError(value);
-};
-
-export const getVMNameErrorLenient = (value: string): ((t: TFunction) => string) | undefined => {
-  const error = getVMNameError(value);
-
-  if (
-    error &&
-    !value?.startsWith('-') &&
-    !value?.startsWith('.') &&
-    value?.length <= VMNameMaxLength &&
-    (value?.endsWith('-') || value?.endsWith('.'))
-  ) {
-    return getVMNameError(value.slice(0, -1)) ? error : undefined;
-  }
-  return error;
-};
+export const getVMNameErrorLenient = (value: string): ((t: TFunction) => string) | undefined =>
+  getDNS1123SubdomainErrorLenientWithMaxLength(value, VMNameMaxLength);
 
 export const isVMName = (value: string): boolean => !getVMNameError(value);
 
