@@ -6,7 +6,11 @@ import { V1Devices, V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt'
 import { updateCloudInitRHELSubscription } from '@kubevirt-utils/components/CloudinitModal/utils/cloudinit-utils';
 import { applyCloudDriveCloudInitVolume } from '@kubevirt-utils/components/SSHSecretSection/utils/utils';
 import { addSecretToVM } from '@kubevirt-utils/components/SSHSecretSection/utils/utils';
-import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
+import {
+  DEFAULT_NAMESPACE,
+  RUNSTRATEGY_ALWAYS,
+  RUNSTRATEGY_HALTED,
+} from '@kubevirt-utils/constants/constants';
 import { RHELAutomaticSubscriptionData } from '@kubevirt-utils/hooks/useRHELAutomaticSubscription/utils/types';
 import {
   LABEL_USED_TEMPLATE_NAME,
@@ -64,9 +68,10 @@ export const quickCreateVM: QuickCreateVMType = async ({
 
     draftVM.metadata.labels[LABEL_USED_TEMPLATE_NAME] = processedTemplate.metadata.name;
     draftVM.metadata.labels[LABEL_USED_TEMPLATE_NAMESPACE] = template.metadata.namespace;
-    if (startVM) {
-      draftVM.spec.running = true;
-    }
+    // Newer common-templates already set runStrategy; KubeVirt rejects both
+    // fields together. Prefer runStrategy (CNV-45435 / CNV-8848).
+    delete draftVM.spec.running;
+    draftVM.spec.runStrategy = startVM ? RUNSTRATEGY_ALWAYS : RUNSTRATEGY_HALTED;
 
     if (isDisabledGuestSystemLogs) {
       const devices = (<unknown>draftVM.spec.template.spec.domain.devices) as V1Devices & {

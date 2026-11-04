@@ -70,7 +70,9 @@ export function getSetupRules(): SetupRule[] {
       },
     },
     {
-      guard: () => shouldRunBrowserLogin() && !EnvVariables.isLocalMode,
+      // HC_E2E / auth-disabled console: no kubeadmin password is provisioned.
+      guard: () =>
+        shouldRunBrowserLogin() && !EnvVariables.isLocalMode && !EnvVariables.isSkipBrowserLogin,
       id: 'validate-credentials',
       name: 'Validate console login credentials',
       onError: 'throw',
@@ -274,8 +276,12 @@ export function getSetupRules(): SetupRule[] {
       run: async (ctx) => {
         const baseURL = EnvVariables.webConsoleUrl;
         logger.info('🌐 Setting up browser state...');
-        if (EnvVariables.isLocalMode) {
-          logger.info(`🔄 Local console: opening ${baseURL} (no login — auth disabled)`);
+        if (EnvVariables.isLocalMode || EnvVariables.isSkipBrowserLogin) {
+          logger.info(
+            `🔄 ${
+              EnvVariables.isHcE2e ? 'HC E2E' : 'Local'
+            } console: opening ${baseURL} (no OAuth login)`,
+          );
         } else {
           logger.info(
             `🔄 Logging in to ${baseURL} as ${EnvVariables.loginUsername} (${EnvVariables.idp})`,
