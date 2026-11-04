@@ -18,6 +18,7 @@ export const EXPORT_TABLE_KEYS = {
   CHECKUPS_HISTORY: 'checkups-history',
   CLUSTER_INSTANCETYPES: 'cluster-instancetypes',
   DATASOURCES: 'datasources',
+  DATAVOLUMES: 'datavolumes',
   MIGRATION_POLICIES: 'migration-policies',
   SELF_VALIDATION_CHECKUPS: 'self-validation-checkups',
   STORAGE_CHECKUPS: 'storage-checkups',
