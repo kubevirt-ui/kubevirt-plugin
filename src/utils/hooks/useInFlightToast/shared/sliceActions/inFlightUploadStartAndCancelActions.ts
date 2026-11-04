@@ -5,7 +5,7 @@ import {
   getGeneration,
   getSliceEntry,
   getSliceProgressToast,
-} from '../selectors/uploadEntrySelectors';
+} from '../selectors/inFlightToastStoreSelectors';
 import {
   type CancelTrackedUploadOptions,
   type ProgressToastState,

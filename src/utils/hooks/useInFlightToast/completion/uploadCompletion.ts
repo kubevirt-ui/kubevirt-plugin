@@ -9,8 +9,8 @@ import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sGet } from '@multicluster/k8sRequests';
 
 import { UPLOAD_PROGRESS_STATUS } from '../constants';
-import { useInFlightToastStore } from '../inFlightToastStore';
 
+import { getUploadsActions } from '../shared/selectors/inFlightToastStoreSelectors';
 import { getBootableVolumeSuccessLink, getVmDiskUploadSuccessLinks } from './uploadLinks';
 
 type CompleteVmDiskUploadParams = {
@@ -88,7 +88,7 @@ const completeVmStorageUpload = async ({
   uploadKey,
   vm,
 }: CompleteVmDiskUploadParams & { isCdrom?: boolean }): Promise<void> => {
-  const current = useInFlightToastStore.getState().uploads.actions?.getUpload(uploadKey);
+  const current = getUploadsActions().getUpload(uploadKey);
   if (
     current?.status !== UPLOAD_PROGRESS_STATUS.UPLOADING ||
     (expectedGeneration !== undefined && current.generation !== expectedGeneration)
@@ -103,7 +103,7 @@ const completeVmStorageUpload = async ({
       : isDataVolumeAlive(dataVolumeName, getNamespace(vm), getCluster(vm)),
   ]);
 
-  useInFlightToastStore.getState().uploads.actions?.completeUpload(uploadKey, {
+  getUploadsActions().completeUpload(uploadKey, {
     expectedGeneration: expectedGeneration ?? current.generation,
     resourceName: diskName,
     successLinks: getVmDiskUploadSuccessLinks(
@@ -131,7 +131,7 @@ export const completeBootableVolumeUpload = ({
 }: CompleteBootableVolumeUploadParams): void => {
   const volumeName = getName(dataSource) ?? '';
 
-  useInFlightToastStore.getState().uploads.actions?.completeUpload(uploadKey, {
+  getUploadsActions().completeUpload(uploadKey, {
     expectedGeneration,
     resourceName: volumeName,
     successLinks: [
@@ -146,7 +146,5 @@ export const failBootableVolumeUpload = (
   expectedGeneration?: number,
 ): void => {
   const errorMessage = error instanceof Error ? error.message : String(error);
-  useInFlightToastStore
-    .getState()
-    .uploads.actions?.failUpload(uploadKey, errorMessage, expectedGeneration);
+  getUploadsActions().failUpload(uploadKey, errorMessage, expectedGeneration);
 };

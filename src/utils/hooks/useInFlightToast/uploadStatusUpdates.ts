@@ -2,7 +2,7 @@ import { isEmpty } from '@kubevirt-utils/utils/utils';
 
 import { UPLOAD_PROGRESS_STATUS } from './constants';
 import { type UploadsStoreSliceData } from './features/uploads/types/types';
-import { getProgressToastState } from './shared/selectors/uploadEntrySelectors';
+import { getProgressToastState } from './shared/selectors/inFlightToastStoreSelectors';
 import { type ProgressToastState } from './shared/types/types';
 
 export const canUpdateUploadingEntry = (

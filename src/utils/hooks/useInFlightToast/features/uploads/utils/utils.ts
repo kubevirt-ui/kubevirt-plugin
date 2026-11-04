@@ -7,6 +7,7 @@ import {
   stripLinksForDeletedDataVolume,
   stripVmStorageLinksFromUploads,
 } from '../../../cancel/stripVmStorageLinks';
+import { UPLOADS_STORE_SLICE } from '../../../constants';
 import { getInFlightToastSliceActions } from '../../../shared/sliceActions/inFlightToastActions';
 import { type InFlightToastStoreState, type InFlightToastStoreStateSetter } from '../../../types';
 import { type UploadsStoreSliceActions, type UploadsStoreSliceData } from '../types/types';
@@ -16,7 +17,7 @@ export const createUploadsActions = (
   get: () => InFlightToastStoreState,
 ): UploadsStoreSliceActions => {
   return {
-    ...getInFlightToastSliceActions(set, get, 'uploads'),
+    ...getInFlightToastSliceActions(set, get, UPLOADS_STORE_SLICE),
     cancelUploadsForVm: (cluster, namespace, vmName): Promise<void> =>
       performCancelUploadsForVm(get, cluster, namespace, vmName),
     cancelWizardPendingUploads: (uploadKeys): Promise<void> =>
