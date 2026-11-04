@@ -1,8 +1,6 @@
-import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { isAllNamespaces } from '@kubevirt-utils/utils/utils';
-import { useFleetAccessReview } from '@stolostron/multicluster-sdk';
-import { getCanCreateVMFleetAccessReview } from '@virtualmachines/list/utils/utils';
 
+import useCanCreateVMInDefaultNamespace from './useCanCreateVMInDefaultNamespace';
 import useWizardInitialValues from './useWizardInitialValues';
 import { resolveWizardNamespace } from './utils/resolveWizardNamespace';
 
@@ -18,8 +16,13 @@ const useResolvedWizardInitialValues = (): ResolvedWizardInitialValues => {
 
   const shouldResolveDefaultNamespace = isAllNamespaces(namespace);
 
-  const [canCreateVMInDefaultNamespace, isLoadingDefaultNamespaceAccessReview] =
-    useFleetAccessReview(getCanCreateVMFleetAccessReview(DEFAULT_NAMESPACE, cluster));
+  const {
+    canCreate: canCreateVMInDefaultNamespace,
+    loading: isLoadingDefaultNamespaceAccessReview,
+  } = useCanCreateVMInDefaultNamespace({
+    cluster,
+    enabled: shouldResolveDefaultNamespace,
+  });
 
   const isLoading =
     isLoadingHubCluster || (shouldResolveDefaultNamespace && isLoadingDefaultNamespaceAccessReview);

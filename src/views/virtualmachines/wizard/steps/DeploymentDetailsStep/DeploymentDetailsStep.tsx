@@ -9,7 +9,7 @@ import { useVMWizardForm } from '@virtualmachines/wizard/form/VMWizardFormProvid
 import CreationMethodTileGroup from '@virtualmachines/wizard/steps/DeploymentDetailsStep/components/CreationMethodTileGroup/CreationMethodTileGroup';
 import NameAndDescriptionForm from '@virtualmachines/wizard/steps/DeploymentDetailsStep/components/NameAndDescriptionForm/NameAndDescriptionForm';
 import VMCreationLocationDisplay from '@virtualmachines/wizard/steps/DeploymentDetailsStep/components/VMCreationLocationDisplay';
-import VMCreationLocationForm from '@virtualmachines/wizard/steps/DeploymentDetailsStep/components/VMCreationLocationForm';
+import VMCreationLocationForm from '@virtualmachines/wizard/steps/DeploymentDetailsStep/components/VMCreationLocationForm/VMCreationLocationForm';
 import { isCloneCreationMethod } from '@virtualmachines/wizard/utils/utils';
 
 const DeploymentDetailsStep: FC = () => {
