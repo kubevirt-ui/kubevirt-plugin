@@ -30,14 +30,19 @@ export const getDataVolumePhaseLabel = (phase: string | undefined, t: TFunction)
     case 'Unknown':
       return { color: 'grey', text: t('Unknown') };
     case 'ImportInProgress':
+      return { color: 'blue', text: t('ImportInProgress') };
     case 'CloneInProgress':
+      return { color: 'blue', text: t('CloneInProgress') };
     case 'SnapshotInProgress':
+      return { color: 'blue', text: t('SnapshotInProgress') };
     case 'UploadReady':
+      return { color: 'blue', text: t('UploadReady') };
     case 'PendingPopulation':
+      return { color: 'blue', text: t('PendingPopulation') };
     case 'WaitForFirstConsumer':
-      return { color: 'blue', text: phase };
+      return { color: 'blue', text: t('WaitForFirstConsumer') };
     case 'PVCBound':
-      return { color: 'cyan', text: phase };
+      return { color: 'cyan', text: t('PVCBound') };
     default:
       return { color: 'grey', text: phase || t('Unknown') };
   }

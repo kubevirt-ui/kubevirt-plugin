@@ -2,6 +2,7 @@ import type { FC } from 'react';
 import { useMemo } from 'react';
 
 import type { V1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
+import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import useHideYamlTab, { removeYamlTabs } from '@kubevirt-utils/hooks/useHideYamlTab';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -20,7 +21,7 @@ type DataVolumePageProps = {
 
 const DataVolumePage: FC<DataVolumePageProps> = ({ kind, name, namespace }) => {
   const { t } = useKubevirtTranslation();
-  const [dataVolume, loaded] = useK8sWatchResource<V1beta1DataVolume>({
+  const [dataVolume, loaded, loadError] = useK8sWatchResource<V1beta1DataVolume>({
     kind,
     name,
     namespace,
@@ -50,7 +51,9 @@ const DataVolumePage: FC<DataVolumePageProps> = ({ kind, name, namespace }) => {
   return (
     <>
       <DataVolumePageTitle dataVolume={dataVolume} name={name} namespace={namespace} />
-      {loaded ? (
+      {loadError ? (
+        <ErrorAlert error={loadError} />
+      ) : loaded ? (
         <HorizontalNav pages={pages} resource={dataVolume} />
       ) : (
         <Bullseye>

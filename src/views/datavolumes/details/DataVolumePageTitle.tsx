@@ -5,8 +5,8 @@ import { DataVolumeModelRef } from '@kubevirt-ui-ext/kubevirt-api/console';
 import type { V1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import DetailsPageTitle from '@kubevirt-utils/components/DetailsPageTitle/DetailsPageTitle';
 import PaneHeading from '@kubevirt-utils/components/PaneHeading/PaneHeading';
-import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { Breadcrumb, BreadcrumbItem, Label, Title } from '@patternfly/react-core';
 
 import DataVolumeActions from '../actions/DataVolumeActions';
@@ -20,7 +20,7 @@ type DataVolumePageTitleProps = {
 
 const DataVolumePageTitle: FC<DataVolumePageTitleProps> = ({ dataVolume, name, namespace }) => {
   const { t } = useKubevirtTranslation();
-  const ns = namespace || DEFAULT_NAMESPACE;
+  const ns = namespace || getNamespace(dataVolume);
   const phase = getDataVolumePhase(dataVolume);
   const phaseLabel = getDataVolumePhaseLabel(phase, t);
 
@@ -38,7 +38,7 @@ const DataVolumePageTitle: FC<DataVolumePageTitleProps> = ({ dataVolume, name, n
       <PaneHeading>
         <Title className="co-resource-item" headingLevel="h1">
           <span className="co-m-resource-icon co-m-resource-icon--lg">{t('DV')}</span>
-          <span data-test="resource-title">{name ?? dataVolume?.metadata?.name} </span>
+          <span data-test="resource-title">{name ?? getName(dataVolume)} </span>
           {phase && (
             <span className="dps-resource-item__resource-status pf-v6-u-display-none pf-v6-u-display-inline-on-md">
               <Label color={phaseLabel.color} isCompact>

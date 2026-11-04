@@ -21,7 +21,7 @@ const useDataVolumeActions: UseDataVolumeActions = (dataVolume) => {
   const actions: Action[] = useMemo(() => {
     const handleLabelsSubmit = (labels: { [key: string]: string }): Promise<unknown> =>
       kubevirtK8sPatch({
-        data: [{ op: 'replace', path: '/metadata/labels', value: labels }],
+        data: [{ op: 'add', path: '/metadata/labels', value: labels }],
         model: DataVolumeModel,
         resource: dataVolume,
       });
@@ -30,7 +30,7 @@ const useDataVolumeActions: UseDataVolumeActions = (dataVolume) => {
       [key: string]: string;
     }): Promise<unknown> =>
       kubevirtK8sPatch({
-        data: [{ op: 'replace', path: '/metadata/annotations', value: annotations }],
+        data: [{ op: 'add', path: '/metadata/annotations', value: annotations }],
         model: DataVolumeModel,
         resource: dataVolume,
       });

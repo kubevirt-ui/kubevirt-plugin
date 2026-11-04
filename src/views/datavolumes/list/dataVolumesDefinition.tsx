@@ -4,6 +4,8 @@ import type { V1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containeri
 import type { TableExportColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { ACTIONS } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/const';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
+import { convertToBaseValue } from '@kubevirt-utils/utils/humanize.js';
+import { SortByDirection } from '@patternfly/react-table';
 
 import {
   getDataVolumeCapacity,
@@ -83,6 +85,13 @@ export const getDataVolumeColumns = (
       label: t('Capacity'),
       props: { className: 'pf-m-width-10' },
       renderCell: (row) => <DataVolumeCapacityCell row={row} />,
+      sort: (data, direction) =>
+        [...data].sort((a, b) => {
+          const cmp =
+            (convertToBaseValue(getDataVolumeCapacity(a) ?? '') ?? 0) -
+            (convertToBaseValue(getDataVolumeCapacity(b) ?? '') ?? 0);
+          return direction === SortByDirection.asc ? cmp : -cmp;
+        }),
       sortable: true,
     },
     {

@@ -15,6 +15,8 @@ const STATUS_OPTIONS = [
   'PVCBound',
   'Pending',
   'WaitForFirstConsumer',
+  'PendingPopulation',
+  'UploadReady',
 ] as const;
 
 export const getDataVolumeStatusFilter = (t: TFunction): KubevirtFilter<V1beta1DataVolume>[] => [
