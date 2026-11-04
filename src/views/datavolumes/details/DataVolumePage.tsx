@@ -1,13 +1,11 @@
-import type { FC, ReactNode } from 'react';
+import type { FC } from 'react';
 import { useMemo } from 'react';
 
 import type { V1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
-import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
-import Loading from '@kubevirt-utils/components/Loading/Loading';
+import StateHandler from '@kubevirt-utils/components/StateHandler/StateHandler';
 import useHideYamlTab, { removeYamlTabs } from '@kubevirt-utils/hooks/useHideYamlTab';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { HorizontalNav, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
-import { Bullseye } from '@patternfly/react-core';
 
 import DataVolumeDetailsPage from './DataVolumeDetailsPage';
 import DataVolumePageTitle from './DataVolumePageTitle';
@@ -48,24 +46,11 @@ const DataVolumePage: FC<DataVolumePageProps> = ({ kind, name, namespace }) => {
     [t, hideYamlTab],
   );
 
-  let content: ReactNode;
-  if (loadError) {
-    content = <ErrorAlert error={loadError} />;
-  } else if (!loaded) {
-    content = (
-      <Bullseye>
-        <Loading />
-      </Bullseye>
-    );
-  } else {
-    content = <HorizontalNav pages={pages} resource={dataVolume} />;
-  }
-
   return (
-    <>
+    <StateHandler error={loadError} hasData={!!dataVolume} loaded={loaded} withBullseye>
       <DataVolumePageTitle dataVolume={dataVolume} name={name} namespace={namespace} />
-      {content}
-    </>
+      <HorizontalNav pages={pages} resource={dataVolume} />
+    </StateHandler>
   );
 };
 
