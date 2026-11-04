@@ -23,13 +23,13 @@ type ReadinessWizardStepsProps = {
   networkLoaded: boolean;
   networkMap: V1beta1NetworkMap;
   nodesArchs: string[];
-  sourceClusterVersion: string;
-  sourceKubevirtVersion: string;
+  sourceClusterVersion: string | null;
+  sourceKubevirtVersion: string | null;
   storageIsReady: boolean;
   storageLoaded: boolean;
   storageMap: V1beta1StorageMap;
-  targetClusterVersion: string;
-  targetKubevirtVersion: string;
+  targetClusterVersion: string | null;
+  targetKubevirtVersion: string | null;
   targetNADs: NetworkAttachmentDefinitionKind[];
   targetStorageClasses: IoK8sApiStorageV1StorageClass[];
   versionIsReady: boolean;

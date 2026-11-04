@@ -6,10 +6,10 @@ import { Divider, Split, SplitItem, Title } from '@patternfly/react-core';
 import './VersionCompatibility.scss';
 
 type VersionCompatibilityProps = {
-  sourceClusterVersion: string;
-  sourceKubevirtVersion: string;
-  targetClusterVersion: string;
-  targetKubevirtVersion: string;
+  sourceClusterVersion: string | null;
+  sourceKubevirtVersion: string | null;
+  targetClusterVersion: string | null;
+  targetKubevirtVersion: string | null;
 };
 
 const VersionCompatibility: FC<VersionCompatibilityProps> = ({

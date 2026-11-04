@@ -1,19 +1,19 @@
-import type { FC } from 'react';
-import { useMemo } from 'react';
+import { type FC, useMemo } from 'react';
 
-import type { V1beta1NetworkMap } from '@forklift-ui/types';
+import { type V1beta1NetworkMap } from '@forklift-ui/types';
 import { NetworkAttachmentDefinitionModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
+import { type EnhancedSelectOptionProps } from '@kubevirt-utils/components/FilterSelect/utils/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { modelToGroupVersionKind } from '@kubevirt-utils/models';
-import type { NetworkAttachmentDefinitionKind } from '@kubevirt-utils/resources/nad/types';
+import { type NetworkAttachmentDefinitionKind } from '@kubevirt-utils/resources/nad/types';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
-import { FormGroup, Split, SplitItem, TextInput, Title } from '@patternfly/react-core';
 
 import { POD_NETWORK_TYPE } from '../constants';
+import { getNetworkDestinationSelectValue, getNetworkMapRowId } from '../mappingDisplayUtils';
 import { getNADNameAndNamespace } from '../utils';
 
-import type { UseNetworkReadinessReturnType } from '../hooks/useNetworkReadiness';
+import { type UseNetworkReadinessReturnType } from '../hooks/useNetworkReadiness';
+import ResourceMappingPanel from './ResourceMappingPanel';
 
 type NetworkMappingProps = {
   changeNetworkMap: UseNetworkReadinessReturnType['changeNetworkMap'];
@@ -23,73 +23,56 @@ type NetworkMappingProps = {
 
 const NetworkMapping: FC<NetworkMappingProps> = ({ changeNetworkMap, nads, networkMap }) => {
   const { t } = useKubevirtTranslation();
-  const nadsOptions = useMemo(
+
+  const selectOptions = useMemo((): EnhancedSelectOptionProps[] => {
+    const nadOptions = (nads || []).map((nad) => {
+      const nadIdentifier = `${getNamespace(nad)}/${getName(nad)}`;
+      return {
+        children: nadIdentifier,
+        groupVersionKind: modelToGroupVersionKind(NetworkAttachmentDefinitionModel),
+        value: nadIdentifier,
+      };
+    });
+
+    return [
+      {
+        children: <div>{t('Pod network')}</div>,
+        value: POD_NETWORK_TYPE,
+      },
+      ...nadOptions,
+    ];
+  }, [nads, t]);
+
+  const rows = useMemo(
     () =>
-      (nads || [])?.map((nad) => {
-        const nadIdentifier = `${getNamespace(nad)}/${getName(nad)}`;
-        return {
-          children: nadIdentifier,
-          groupVersionKind: modelToGroupVersionKind(NetworkAttachmentDefinitionModel),
-          value: nadIdentifier,
-        };
-      }),
-    [nads],
+      (networkMap?.spec?.map ?? []).map((map) => ({
+        rowId: getNetworkMapRowId(map),
+        selectedValue: getNetworkDestinationSelectValue(map),
+        sourceValue:
+          map.source.type === POD_NETWORK_TYPE ? t('Pod network') : (map.source.name ?? ''),
+      })),
+    [networkMap?.spec?.map, t],
   );
 
   return (
-    <div>
-      <Title className="cross-cluster-migration-title" headingLevel="h5">
-        {t('Network mapping')}
-      </Title>
-      {networkMap?.spec?.map?.map((map) => (
-        <Split className="cross-cluster-migration-split" key={map.source.name}>
-          <SplitItem isFilled>
-            <FormGroup>
-              <TextInput
-                isDisabled
-                value={map.source.type === POD_NETWORK_TYPE ? t('Pod network') : map.source.name}
-              />
-            </FormGroup>
-          </SplitItem>
-          <SplitItem isFilled>
-            <FormGroup>
-              <InlineFilterSelect
-                options={[
-                  {
-                    children: <div>{t('Pod network')}</div>,
-                    value: POD_NETWORK_TYPE,
-                  },
-                  ...nadsOptions,
-                ]}
-                selected={
-                  map.destination.type === 'multus'
-                    ? `${map.source.namespace}/${map.source.name}`
-                    : POD_NETWORK_TYPE
-                }
-                selectProps={{ id: `network-select-${map.source.name}` }}
-                setSelected={(newSelection) => {
-                  if (newSelection === POD_NETWORK_TYPE) {
-                    changeNetworkMap(map.source.name, {
-                      type: POD_NETWORK_TYPE,
-                    });
-                    return;
-                  }
+    <ResourceMappingPanel
+      heading={t('Network mapping')}
+      onSelect={(rowId, newSelection) => {
+        if (newSelection === POD_NETWORK_TYPE) {
+          changeNetworkMap(rowId, { type: POD_NETWORK_TYPE });
+          return;
+        }
 
-                  const { name, namespace } = getNADNameAndNamespace(newSelection);
-
-                  changeNetworkMap(map.source.name, {
-                    name,
-                    namespace,
-                    type: 'multus',
-                  });
-                }}
-                toggleProps={{ isFullWidth: true }}
-              />
-            </FormGroup>
-          </SplitItem>
-        </Split>
-      ))}
-    </div>
+        const { name, namespace } = getNADNameAndNamespace(newSelection);
+        changeNetworkMap(rowId, { name, namespace, type: 'multus' });
+      }}
+      rows={rows}
+      selectIdPrefix="network-select"
+      selectOptions={selectOptions}
+      sourceTermLabel={t('Source network')}
+      targetTermLabel={t('Target network')}
+      testIdPrefix="network-mapping"
+    />
   );
 };
 
