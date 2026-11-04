@@ -1,6 +1,6 @@
 import { type TFunction } from 'i18next';
 
-import { getMaxNameLengthErrorMsg } from './validation';
+import { DNS1123LabelMaxLength, getMaxNameLengthErrorMsg } from './validation';
 
 // follow the backend validations
 // https://github.com/kubernetes/kubernetes/blob/8d7d7a5e0d4d7e75f5a860574346944b8cc0fc43/staging/src/k8s.io/apimachinery/pkg/util/validation/validation.go#L163-L180
@@ -50,3 +50,35 @@ export const getDNS1123SubdomainErrorLenient = (
 
 export const isDNS1123SubdomainLenient = (value: string): boolean =>
   !getDNS1123SubdomainErrorLenient(value);
+
+/** VM names use DNS-1123 subdomain rules but are capped at 63 chars for migration-safe derived names. */
+export const VMNameMaxLength = DNS1123LabelMaxLength;
+
+const maxVMNameLengthErrorMsg = (t: TFunction): string =>
+  getMaxNameLengthErrorMsg(t, VMNameMaxLength);
+
+export const getVMNameError = (value: string): ((t: TFunction) => string) | undefined => {
+  if (value?.length > VMNameMaxLength) {
+    return maxVMNameLengthErrorMsg;
+  }
+  return getDNS1123SubdomainError(value);
+};
+
+export const getVMNameErrorLenient = (value: string): ((t: TFunction) => string) | undefined => {
+  const error = getVMNameError(value);
+
+  if (
+    error &&
+    !value?.startsWith('-') &&
+    !value?.startsWith('.') &&
+    value?.length <= VMNameMaxLength &&
+    (value?.endsWith('-') || value?.endsWith('.'))
+  ) {
+    return getVMNameError(value.slice(0, -1)) ? error : undefined;
+  }
+  return error;
+};
+
+export const isVMName = (value: string): boolean => !getVMNameError(value);
+
+export const isVMNameLenient = (value: string): boolean => !getVMNameErrorLenient(value);
