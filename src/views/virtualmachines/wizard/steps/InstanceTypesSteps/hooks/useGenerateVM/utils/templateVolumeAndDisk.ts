@@ -2,6 +2,8 @@ import { type V1Disk, type V1Volume } from '@kubevirt-ui-ext/kubevirt-api/kubevi
 import { InterfaceTypes } from '@kubevirt-utils/components/DiskModal/utils/types';
 import { CLOUDINITDISK, ROOTDISK } from '@kubevirt-utils/constants/constants';
 
+import { getIsoBlankDataVolumeName, getIsoCdromDiskName } from './bootVolumeNames';
+
 export const getDomainDisks = (isIso: boolean, vmName: string): V1Disk[] => {
   if (isIso) {
     return [
@@ -10,7 +12,7 @@ export const getDomainDisks = (isIso: boolean, vmName: string): V1Disk[] => {
         cdrom: {
           bus: InterfaceTypes.SATA,
         },
-        name: `${vmName}-cdrom-iso`,
+        name: getIsoCdromDiskName(vmName),
       },
       {
         bootOrder: 1,
@@ -28,7 +30,7 @@ export const getDomainDisks = (isIso: boolean, vmName: string): V1Disk[] => {
 };
 
 const getRootDiskVolumeName = (isIso: boolean, vmName: string): string => {
-  if (isIso) return `${vmName}-cdrom-iso`;
+  if (isIso) return getIsoCdromDiskName(vmName);
 
   return ROOTDISK;
 };
@@ -38,7 +40,7 @@ const getISOVolumes = (isIso: boolean, vmName: string): V1Volume[] => {
 
   return [
     {
-      dataVolume: { name: `${vmName}-volume-blank` },
+      dataVolume: { name: getIsoBlankDataVolumeName(vmName) },
       name: ROOTDISK,
     },
   ];
