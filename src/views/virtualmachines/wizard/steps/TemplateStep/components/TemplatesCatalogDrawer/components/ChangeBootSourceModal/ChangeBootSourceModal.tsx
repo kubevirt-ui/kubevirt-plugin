@@ -1,8 +1,9 @@
-import { type FC } from 'react';
+import { type FC, useMemo } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Modal, ModalBody, ModalHeader, ModalVariant } from '@patternfly/react-core';
 import BootableVolumeList from '@virtualmachines/wizard/components/BootableVolumeList/BootableVolumeList';
+import { createTableRowFromSelection } from '@virtualmachines/wizard/components/BootableVolumeList/utils/utils';
 
 import AddBootableVolumeButton from './components/AddBootableVolumeButton';
 import ChangeBootSourceModalFooter from './components/ChangeBootSourceModalFooter';
@@ -25,9 +26,18 @@ const ChangeBootSourceModal: FC<ChangeBootSourceModalProps> = (props) => {
     onSelectBootableVolume,
     preferenceName,
     selectedBootableVolume,
+    selectedPreference,
     setVolumeListNamespace,
     volumeListNamespace,
   } = useChangeBootSourceModal(props);
+
+  const selectedTableRow = useMemo(
+    () => createTableRowFromSelection(selectedBootableVolume, selectedPreference),
+    [selectedBootableVolume, selectedPreference],
+  );
+
+  const guestOperatingSystem =
+    lockedPreference ?? (preferenceName ? { name: preferenceName } : undefined);
 
   return (
     <Modal
@@ -47,14 +57,14 @@ const ChangeBootSourceModal: FC<ChangeBootSourceModalProps> = (props) => {
           bootableVolumesData={bootableVolumesData}
           canCreateVolume={canCreate}
           cluster={cluster}
+          guestOperatingSystem={guestOperatingSystem}
           instanceTypesAndPreferencesData={instanceTypesAndPreferencesData}
           loadError={instanceTypesAndPreferencesData?.loadError}
           lockedPreference={lockedPreference}
           onCreateVolume={onCreateVolume}
           onSelectBootableVolume={onSelectBootableVolume}
           onVolumeListNamespaceChange={setVolumeListNamespace}
-          preferenceName={preferenceName}
-          selectedBootableVolume={selectedBootableVolume}
+          selectedTableRow={selectedTableRow}
           showNoBootSourceHint={false}
           syncFiltersWithURL={false}
           volumeListNamespace={volumeListNamespace}
