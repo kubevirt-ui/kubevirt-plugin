@@ -176,7 +176,7 @@ const DetailsSection: FC<DetailsSectionProps> = ({ allInstanceTypes, instanceTyp
                     <CPUMemoryModal
                       isOpen={isOpen}
                       onClose={onClose}
-                      onSubmit={updatedVirtualMachine}
+                      onSubmit={(updatedVM) => updatedVirtualMachine(vm, updatedVM)}
                       vm={vm}
                     />
                   );
