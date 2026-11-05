@@ -9,20 +9,20 @@ import { WORKLOADS } from '@kubevirt-utils/resources/template';
 import {
   DESCRIPTION_ANNOTATION,
   getBootloader,
-  getCPU,
   getDataVolumeTemplates,
   getDevices,
   getDisks,
   getDomainFeatures,
   getHostname,
   getInterfaces,
-  getMemory,
   getVolumes,
   getWorkload,
 } from '@kubevirt-utils/resources/vm';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { kubevirtK8sPatch, kubevirtK8sUpdate } from '@multicluster/k8sRequests';
 import { printableVMStatus } from '@virtualmachines/utils';
+
+import { buildVirtualMachineResourcePatches } from './vmDataUtils';
 
 export const updateStartStrategy = (checked: boolean, vm: V1VirtualMachine) => {
   kubevirtK8sPatch({
@@ -188,21 +188,13 @@ export const updateWorkload = (updatedVM: V1VirtualMachine, newWorkload: WORKLOA
   });
 };
 
-export const updatedVirtualMachine = (updatedVM: V1VirtualMachine) =>
+export const updatedVirtualMachine = (
+  originalVM: V1VirtualMachine,
+  updatedVM: V1VirtualMachine,
+): Promise<V1VirtualMachine> =>
   kubevirtK8sPatch({
     cluster: getCluster(updatedVM),
-    data: [
-      {
-        op: 'replace',
-        path: `/spec/template/spec/domain/cpu`,
-        value: getCPU(updatedVM),
-      },
-      {
-        op: 'replace',
-        path: `/spec/template/spec/domain/memory/guest`,
-        value: getMemory(updatedVM),
-      },
-    ],
+    data: buildVirtualMachineResourcePatches(originalVM, updatedVM),
     model: VirtualMachineModel,
     resource: updatedVM,
   });
