@@ -59,10 +59,21 @@ test.describe(`VM gating create from YAML ${ROUTE_VIRTUAL_MACHINES_LIST_TAG} ${G
   });
 });
 
+async function deleteVmBestEffort(
+  apiClient: { deleteVirtualMachine: (name: string, ns: string) => Promise<void> },
+  name: string,
+  ...namespaces: string[]
+): Promise<void> {
+  for (const ns of namespaces) {
+    await apiClient.deleteVirtualMachine(name, ns).catch(() => undefined);
+  }
+}
+
 test.describe(`VM gating create from template ${ROUTE_CATALOG_TAG} ${GATING_TAG} ${NON_PRIV_TAG}`, () => {
   test('ID(CNV-8848) Quick create VM from RHEL9 template', async ({
     apiClient,
     catalogPage,
+    nav,
     testNamespace,
     vmListPage,
   }) => {
@@ -71,6 +82,8 @@ test.describe(`VM gating create from template ${ROUTE_CATALOG_TAG} ${GATING_TAG}
 
     try {
       await catalogPage.openCatalogInNamespace(testNamespace);
+      // Align console project bar with the catalog ns so quick-create does not land in default.
+      await nav.switchProject(testNamespace);
       await catalogPage.selectTemplateByMetadataName(VM_FROM_CATALOG.templateMetadataName);
       createdName = await catalogPage.quickCreateVm(vmName);
       const resolvedVm = vmListPage.resolvedVirtualMachineName(testNamespace, createdName);
@@ -92,7 +105,8 @@ test.describe(`VM gating create from template ${ROUTE_CATALOG_TAG} ${GATING_TAG}
         });
       }
     } finally {
-      await apiClient.deleteVirtualMachine(createdName, testNamespace);
+      // Quick-create can still orphan into default if the project bar drifts.
+      await deleteVmBestEffort(apiClient, createdName, testNamespace, 'default');
     }
   });
 });
@@ -154,6 +168,7 @@ test.describe(`VM gating create from boot volume ${ROUTE_CATALOG_TAG} ${GATING_T
   test('Create VM from InstanceTypes catalog (bootable volume + series)', async ({
     apiClient,
     catalogPage,
+    nav,
     testNamespace,
     vmListPage,
   }) => {
@@ -161,6 +176,7 @@ test.describe(`VM gating create from boot volume ${ROUTE_CATALOG_TAG} ${GATING_T
 
     try {
       await catalogPage.openCatalogInNamespace(testNamespace);
+      await nav.switchProject(testNamespace);
       await catalogPage.prepareInstanceTypesCatalogTab();
       await catalogPage.createVirtualMachineFromInstanceTypesCatalog({
         bootVolumeName: CATALOG_INSTANCE_TYPES_BOOT_VOLUME,
@@ -186,7 +202,7 @@ test.describe(`VM gating create from boot volume ${ROUTE_CATALOG_TAG} ${GATING_T
         });
       }
     } finally {
-      await apiClient.deleteVirtualMachine(vmName, testNamespace);
+      await deleteVmBestEffort(apiClient, vmName, testNamespace, 'default');
     }
   });
 });

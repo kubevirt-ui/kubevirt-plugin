@@ -4,6 +4,7 @@ import { dismissConsoleObstructions } from '@/utils/console-modals';
 import { ensureNonPrivAdministratorPerspective } from '@/utils/console-perspective';
 import { ConsoleRoutes, DEFAULT_CATALOG_NAMESPACE } from '@/utils/console-routes';
 import { EnvVariables } from '@/utils/env-variables';
+import { pollUntil } from '@/utils/poll-until';
 import { SECOND, TestTimeouts } from '@/utils/test-config';
 import type { Page } from '@playwright/test';
 
@@ -262,7 +263,21 @@ export class NavigationPage extends BasePage {
 
   async switchProject(projectName: string): Promise<void> {
     await dismissConsoleObstructions(this.page);
-    await this.page.locator('[data-test-id="namespace-bar-dropdown"]').click();
+
+    // Only no-op when the project bar already shows this project. Do not treat a
+    // matching URL path alone as selected — quick-create uses the bar (often
+    // stuck on "default") and orphans VMs there when we skip the switch.
+    const namespaceBar = this.page.locator('[data-test-id="namespace-bar-dropdown"]');
+    const barText = (await namespaceBar.textContent().catch(() => '')) ?? '';
+    const uniquePrefix = projectName.slice(0, Math.min(32, projectName.length));
+    if (
+      barText.includes(projectName) ||
+      (uniquePrefix.length >= 16 && barText.includes(uniquePrefix))
+    ) {
+      return;
+    }
+
+    await namespaceBar.click();
 
     const showDefault = this.page.locator(
       '[data-test-id="showSystemSwitch"], [data-test="show-default-projects-switch"]',
@@ -289,11 +304,25 @@ export class NavigationPage extends BasePage {
       .locator('[data-test-id="dropdown-menu-item-link"]')
       .filter({ hasText: namePattern })
       .or(this.page.getByRole('menuitem', { name: namePattern }))
-      .or(this.page.getByRole('link', { name: namePattern }));
+      .or(this.page.getByRole('option', { name: namePattern }))
+      .or(this.page.getByRole('link', { name: namePattern }))
+      .or(this.page.getByRole('button', { name: namePattern }))
+      .or(this.page.getByText(namePattern));
 
     await projectEntry.first().waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
     await projectEntry.first().click();
     await this.page.keyboard.press('Escape').catch(() => undefined);
+
+    await pollUntil(
+      async () => {
+        const after = (await namespaceBar.textContent().catch(() => '')) ?? '';
+        return after.includes(uniquePrefix);
+      },
+      {
+        message: `Namespace bar should show project ${projectName}`,
+        timeout: TestTimeouts.ELEMENT_WAIT,
+      },
+    );
   }
 
   async switchToAdministratorPerspective(): Promise<void> {

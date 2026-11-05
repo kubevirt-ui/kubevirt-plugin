@@ -12,8 +12,9 @@ test.describe(`VM detail tabs ${ROUTE_VIRTUAL_MACHINES_DETAIL_TAG} ${GATING_TAG}
   }) => {
     const name = CRUD_NAMES.vmExample;
     await apiClient.deleteVirtualMachine(name, testNamespace);
-    await apiClient.deleteOpenshiftTemplate(name, testNamespace);
-    await apiClient.applyVirtualMachineExample(testNamespace, name);
+    // Container-disk VM: Start is enabled once Stopped. The DV-backed example
+    // stays Provisioning (rhel9 DataSource clone) and keeps Start disabled.
+    await apiClient.applyMigratableVirtualMachine(testNamespace, name);
 
     try {
       await vmDetail.openVmAndWaitForDetail(testNamespace, name);
@@ -44,7 +45,6 @@ test.describe(`VM detail tabs ${ROUTE_VIRTUAL_MACHINES_DETAIL_TAG} ${GATING_TAG}
       await expect(vmDetail.tabPanelText('rootdisk')).toBeVisible();
     } finally {
       await apiClient.deleteVirtualMachine(name, testNamespace);
-      await apiClient.deleteOpenshiftTemplate(name, testNamespace);
     }
   });
 
@@ -56,8 +56,8 @@ test.describe(`VM detail tabs ${ROUTE_VIRTUAL_MACHINES_DETAIL_TAG} ${GATING_TAG}
   }) => {
     const name = CRUD_NAMES.vmExample;
     await apiClient.deleteVirtualMachine(name, testNamespace);
-    await apiClient.deleteOpenshiftTemplate(name, testNamespace);
-    await apiClient.applyVirtualMachineExample(testNamespace, name);
+    // Same as above: need a startable VM without waiting on CDI DataVolume Provisioning.
+    await apiClient.applyMigratableVirtualMachine(testNamespace, name);
 
     try {
       await vmDetail.openVmAndWaitForDetail(testNamespace, name);
@@ -84,7 +84,6 @@ test.describe(`VM detail tabs ${ROUTE_VIRTUAL_MACHINES_DETAIL_TAG} ${GATING_TAG}
       await standalone.close();
     } finally {
       await apiClient.deleteVirtualMachine(name, testNamespace);
-      await apiClient.deleteOpenshiftTemplate(name, testNamespace);
     }
   });
 });

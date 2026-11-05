@@ -1,7 +1,10 @@
 import * as fs from 'fs';
 
-import { deleteLabeledE2eNamespaces, deletePwMigrationPolicies } from '@/utils/cluster-oc';
-import { EnvVariables } from '@/utils/env-variables';
+import {
+  deleteDefaultNamespaceE2eVms,
+  deleteLabeledE2eNamespaces,
+  deletePwMigrationPolicies,
+} from '@/utils/cluster-oc';
 import { logger } from '@/utils/logger';
 
 import type { TeardownRule } from './types';
@@ -17,13 +20,14 @@ function hasKubeconfigOnDisk(ctx: { kubeConfigPath?: string }): boolean {
   return Boolean(path && fs.existsSync(path));
 }
 
+/**
+ * Privileged HC sets skipOcInvocations so tests use console API only — teardown still
+ * needs kubeconfig-based cluster cleanup when a kubeconfig file is present.
+ */
 export function getClusterTeardownRules(): TeardownRule[] {
   return [
     {
-      guard: (ctx) =>
-        ctx.shouldCleanupClusterResources &&
-        !EnvVariables.skipOcInvocations &&
-        hasKubeconfigOnDisk(ctx),
+      guard: (ctx) => ctx.shouldCleanupClusterResources && hasKubeconfigOnDisk(ctx),
       id: 'cleanup-migration-policies',
       name: 'Clean up cluster-scoped migration policies',
       onError: 'warn',
@@ -37,10 +41,7 @@ export function getClusterTeardownRules(): TeardownRule[] {
       scope: TeardownScope.CLUSTER,
     },
     {
-      guard: (ctx) =>
-        ctx.shouldCleanupClusterResources &&
-        !EnvVariables.skipOcInvocations &&
-        hasKubeconfigOnDisk(ctx),
+      guard: (ctx) => ctx.shouldCleanupClusterResources && hasKubeconfigOnDisk(ctx),
       id: 'cleanup-test-namespaces',
       name: 'Delete test namespaces by label',
       onError: 'warn',
@@ -50,6 +51,21 @@ export function getClusterTeardownRules(): TeardownRule[] {
           deleteLabeledE2eNamespaces(ctx.kubeConfigPath);
         } catch (error: unknown) {
           safeWarn('Failed to delete test namespaces', error);
+        }
+      },
+      scope: TeardownScope.CLUSTER,
+    },
+    {
+      guard: (ctx) => ctx.shouldCleanupClusterResources && hasKubeconfigOnDisk(ctx),
+      id: 'cleanup-default-e2e-vms',
+      name: 'Delete orphan e2e VMs left in default namespace',
+      onError: 'warn',
+      run: async (ctx) => {
+        try {
+          logger.info('🧹 Sweeping Playwright orphan VMs from default namespace...');
+          deleteDefaultNamespaceE2eVms(ctx.kubeConfigPath);
+        } catch (error: unknown) {
+          safeWarn('Failed to clean default-namespace e2e VMs', error);
         }
       },
       scope: TeardownScope.CLUSTER,
