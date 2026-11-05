@@ -20,7 +20,6 @@ const main = async (): Promise<void> => {
   }
 
   await verifyMergePoolLabel({
-    baseBranch: requireEnv('BASE_BRANCH'),
     config,
     labelName: requireEnv('LABEL_NAME'),
     octokit,

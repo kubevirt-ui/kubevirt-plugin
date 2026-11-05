@@ -69,13 +69,7 @@ const approveViaOwnersLabel = async (
   reviewedLabel: string,
   reviewedLabelMeta: { color: string; description: string },
 ): Promise<void> => {
-  const trusted = await isListedInOwners(
-    ctx.contentsOctokit,
-    ctx.owner,
-    ctx.repo,
-    ctx.baseBranch,
-    ctx.author,
-  );
+  const trusted = await isListedInOwners(ctx.contentsOctokit, ctx.owner, ctx.repo, ctx.author);
 
   const trustStatus = trusted ? 'trusted' : `untrusted, ignoring ${commandName}`;
   console.log(
@@ -125,7 +119,6 @@ const requireRootOwnersApprover = async (
     ctx.contentsOctokit,
     ctx.owner,
     ctx.repo,
-    ctx.baseBranch,
     ctx.author,
     'OWNERS',
   );

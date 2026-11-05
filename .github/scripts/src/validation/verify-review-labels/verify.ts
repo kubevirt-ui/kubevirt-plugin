@@ -66,13 +66,7 @@ const isEventSenderTrusted = async (ctx: VerifyReviewLabelContext): Promise<bool
   if (isTrustedBot(ctx.sender)) {
     return true;
   }
-  return isListedInOwners(
-    ctx.octokit,
-    ctx.config.owner,
-    ctx.config.repo,
-    ctx.baseBranch,
-    ctx.sender,
-  );
+  return isListedInOwners(ctx.octokit, ctx.config.owner, ctx.config.repo, ctx.sender);
 };
 
 const dispatchValidation = async (
@@ -137,7 +131,6 @@ export const verifyReviewLabel = async (
             ctx.config.repo,
             ctx.prNumber,
             labelName,
-            ctx.baseBranch,
           );
 
     console.log(

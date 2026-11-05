@@ -99,7 +99,6 @@ export const runPathValidation = async (
       ctx.config.repo,
       ctx.prNumber,
       pathConfig.labels.skip,
-      ctx.baseBranch,
     ))
   ) {
     // Clear alert/block too -- otherwise "do-not-merge/*-review" stays

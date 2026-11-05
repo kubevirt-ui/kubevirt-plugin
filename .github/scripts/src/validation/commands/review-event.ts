@@ -14,7 +14,6 @@ import { grantApprove, grantLgtm, revokeApprove, revokeLgtm } from './review-lab
 export type ReviewSyncResult = 'applied' | 'revoked' | 'skipped';
 
 export type SyncLabelsFromReviewArgs = {
-  baseBranch: string;
   contentsOctokit: Octokit;
   octokit: Octokit;
   owner: string;
@@ -29,17 +28,8 @@ export type SyncLabelsFromReviewArgs = {
 export const syncLabelsFromReview = async (
   args: SyncLabelsFromReviewArgs,
 ): Promise<ReviewSyncResult> => {
-  const {
-    baseBranch,
-    contentsOctokit,
-    octokit,
-    owner,
-    prAuthor,
-    prNumber,
-    repo,
-    reviewAuthor,
-    reviewState,
-  } = args;
+  const { contentsOctokit, octokit, owner, prAuthor, prNumber, repo, reviewAuthor, reviewState } =
+    args;
 
   // A self-review should never grant lgtm/approved.
   if (sameGitHubLogin(reviewAuthor, prAuthor)) {
@@ -57,15 +47,8 @@ export const syncLabelsFromReview = async (
     return 'skipped';
   }
 
-  // An OWNERS approver's review also grants/revokes approved.
-  const isApprover = await isListedInOwners(
-    contentsOctokit,
-    owner,
-    repo,
-    baseBranch,
-    reviewAuthor,
-    'OWNERS',
-  );
+  // An OWNERS approver's review also grants/revokes approved (from main).
+  const isApprover = await isListedInOwners(contentsOctokit, owner, repo, reviewAuthor, 'OWNERS');
 
   if (reviewState === 'APPROVED') {
     await grantLgtm(octokit, owner, repo, prNumber);
@@ -110,10 +93,8 @@ const main = async (): Promise<void> => {
     token: requireEnv('GITHUB_TOKEN'),
   };
   const prNumber = parseInt(requireEnv('PR_NUMBER'), 10);
-  const baseBranch = requireEnv('BASE_BRANCH');
 
   await syncLabelsFromReview({
-    baseBranch,
     contentsOctokit: createStatusOctokit(config),
     octokit: createOctokit(config),
     owner: config.owner,

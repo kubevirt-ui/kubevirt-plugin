@@ -25,10 +25,9 @@ export const clearStaleApproval = async (
   repo: string,
   prNumber: number,
   prAuthor?: string,
-  baseRef?: string,
 ): Promise<void> => {
   const authorIsApprover =
-    prAuthor && baseRef && (await isListedInOwners(octokit, owner, repo, baseRef, prAuthor));
+    prAuthor && (await isListedInOwners(octokit, owner, repo, prAuthor));
 
   if (authorIsApprover) {
     console.log(`Keeping approved label: PR author "${prAuthor}" is listed in OWNERS`);

@@ -24,7 +24,6 @@ export const applyLgtm = async (ctx: ReviewContext): Promise<void> => {
     ctx.contentsOctokit,
     ctx.owner,
     ctx.repo,
-    ctx.baseBranch,
     ctx.author,
     'OWNERS',
   );

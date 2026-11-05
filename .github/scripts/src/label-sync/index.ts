@@ -70,7 +70,6 @@ const runVerify = async (config: GitHubConfig, action: string): Promise<void> =>
     await verifyMergePoolHoldRemoval({ config, octokit, prNumber, sender });
   } else {
     await verifyMergePoolLabel({
-      baseBranch: requireEnv('BASE_BRANCH'),
       config,
       labelName: requireEnv('LABEL_NAME'),
       octokit,

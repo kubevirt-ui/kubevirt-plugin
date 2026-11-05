@@ -15,7 +15,6 @@ export const MERGE_POOL_WATCHED_LABELS = new Set<string>([
 ]);
 
 export type VerifyMergePoolLabelContext = {
-  baseBranch: string;
   config: GitHubConfig;
   /** Label that triggered this `labeled` event. */
   labelName: string;
@@ -62,7 +61,6 @@ export const isTrustedMergePoolLabelActor = async (
   octokit: Octokit,
   owner: string,
   repo: string,
-  baseBranch: string,
   labelName: string,
   actor: string,
   prAuthor: string,
@@ -79,13 +77,13 @@ export const isTrustedMergePoolLabelActor = async (
   }
 
   if (labelName === APPROVED_LABEL) {
-    if (await isListedInOwners(octokit, owner, repo, baseBranch, prAuthor, 'OWNERS')) {
+    if (await isListedInOwners(octokit, owner, repo, prAuthor, 'OWNERS')) {
       return true;
     }
     if (sameGitHubLogin(actor, prAuthor)) {
       return false;
     }
-    return isListedInOwners(octokit, owner, repo, baseBranch, actor, 'OWNERS');
+    return isListedInOwners(octokit, owner, repo, actor, 'OWNERS');
   }
 
   if (labelName === DO_NOT_MERGE_HOLD_LABEL) {
@@ -139,7 +137,6 @@ export const verifyMergePoolLabel = async (
         ctx.octokit,
         ctx.config.owner,
         ctx.config.repo,
-        ctx.baseBranch,
         labelName,
         actor,
         ctx.prAuthor,
