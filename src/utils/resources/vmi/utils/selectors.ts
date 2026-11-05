@@ -80,8 +80,12 @@ export const getNetworkInterfaceState = (
   interfaceName: string,
 ): string | undefined => getNetworkInterface(vm, interfaceName)?.linkState;
 
-export const getVMIArchitecture = (vmi: V1VirtualMachineInstance): string =>
+export const getVMIArchitecture = (vmi: V1VirtualMachineInstance): string | undefined =>
   vmi?.spec?.architecture;
+
+export const getVMINodeSelector = (
+  vmi: V1VirtualMachineInstance,
+): Record<string, string> | undefined => vmi?.spec?.nodeSelector;
 
 export const getVMIDisks = (vmi: V1VirtualMachineInstance): V1Disk[] | undefined =>
   vmi?.spec?.domain?.devices?.disks;

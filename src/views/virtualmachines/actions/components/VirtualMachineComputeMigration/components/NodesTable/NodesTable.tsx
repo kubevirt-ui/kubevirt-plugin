@@ -2,10 +2,19 @@ import type { FC } from 'react';
 import { useMemo, useState } from 'react';
 
 import type { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ListPageBody } from '@openshift-console/dynamic-plugin-sdk';
-import { HelperText, HelperTextItem, SearchInput, Stack, StackItem } from '@patternfly/react-core';
+import {
+  Alert,
+  AlertVariant,
+  HelperText,
+  HelperTextItem,
+  SearchInput,
+  Stack,
+  StackItem,
+} from '@patternfly/react-core';
 
 import useNodesData from '../../utils/hooks/useNodesData';
 import type { NodesTableCallbacks } from './nodesTableDefinition';
@@ -21,7 +30,7 @@ type NodesTableProps = {
 
 const NodesTable: FC<NodesTableProps> = ({ handleNodeSelection, selectedNode, vm }) => {
   const { t } = useKubevirtTranslation();
-  const { nodesData, nodesDataLoaded, vmArch } = useNodesData(vm);
+  const { nodesData, nodesDataLoaded, vmArch, vmiLoadError, vmiMissing } = useNodesData(vm);
   const columns = useMemo(() => getNodesTableColumns(t), [t]);
   const [searchValue, setSearchValue] = useState<string>('');
 
@@ -34,6 +43,16 @@ const NodesTable: FC<NodesTableProps> = ({ handleNodeSelection, selectedNode, vm
     () => ({ handleNodeSelection, selectedNode }),
     [handleNodeSelection, selectedNode],
   );
+
+  if (vmiLoadError) return <ErrorAlert error={vmiLoadError} />;
+  if (vmiMissing)
+    return (
+      <Alert
+        isInline
+        title={t('Running VirtualMachineInstance not found')}
+        variant={AlertVariant.danger}
+      />
+    );
 
   return (
     <Stack hasGutter>
