@@ -67,7 +67,7 @@ const ComputeMigrationModal: FC<ComputeMigrationModalProps> = ({ isOpen, onClose
           <StackItem>
             <Alert isInline title={t('Manual node selection')} variant={AlertVariant.info}>
               {t(
-                'The listed nodes may not meet scheduling constraints such as node selectors, affinity rules, or topology constraints set on the VirtualMachine. Migrating to an unsuitable node will fail. It is your responsibility to ensure the selected node can run the workload.',
+                'The listed nodes may not meet scheduling constraints such as affinity rules, or topology constraints set on the VirtualMachine. Migrating to an unsuitable node will fail. It is your responsibility to ensure the selected node can run the workload.',
               )}
             </Alert>
           </StackItem>

@@ -17,3 +17,20 @@ export const nodeStatus = (node: IoK8sApiCoreV1Node): string =>
 export const isNodeSchedulable = (node: IoK8sApiCoreV1Node): boolean => {
   return !node?.spec?.unschedulable;
 };
+
+/**
+ * Returns true when the node's labels satisfy every entry of the given
+ * nodeSelector (matchLabels semantics). An empty/undefined selector matches
+ * any node. Note: this only covers `spec.nodeSelector`; it does not evaluate
+ * `spec.affinity` node affinity rules.
+ * @param {IoK8sApiCoreV1Node} node the node to test
+ * @param {Record<string, string>} [nodeSelector] the required node selector
+ * @returns {boolean} whether the node satisfies the selector
+ */
+export const nodeMatchesNodeSelector = (
+  node: IoK8sApiCoreV1Node,
+  nodeSelector?: Record<string, string>,
+): boolean => {
+  const labels = node?.metadata?.labels ?? {};
+  return Object.entries(nodeSelector ?? {}).every(([key, value]) => labels[key] === value);
+};
