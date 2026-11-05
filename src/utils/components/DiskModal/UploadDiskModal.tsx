@@ -12,6 +12,7 @@ import {
 import { getUploadsActions } from '@kubevirt-utils/hooks/useInFlightToast/shared/selectors/inFlightToastStoreSelectors';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
+import { getErrorMessage } from '@kubevirt-utils/utils/errorUtils';
 import { ensurePath } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { isRunning } from '@virtualmachines/utils';
@@ -121,11 +122,7 @@ const UploadDiskModal: FC<V1SubDiskModalProps> = ({
           }
 
           if (expectedGeneration !== undefined) {
-            getUploadsActions().failUpload(
-              uploadKey,
-              error instanceof Error ? error.message : String(error),
-              expectedGeneration,
-            );
+            getUploadsActions().failUpload(uploadKey, getErrorMessage(error), expectedGeneration);
           }
           throw error;
         }

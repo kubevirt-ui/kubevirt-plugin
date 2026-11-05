@@ -6,13 +6,13 @@ import useKubevirtToast from '@kubevirt-utils/hooks/useKubevirtToast';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 
 import { useInFlightToastStore } from './inFlightToastStore';
+import { cleanupRemovedUploads } from './shared/utils/progressToastSync/cleanupRemovedUploads';
+import { syncUploadToasts } from './shared/utils/progressToastSync/uploadToastSync';
 import { mapSliceDataToProgressToastData } from './shared/utils/utils';
-import { cleanupRemovedUploads } from './toast/cleanupRemovedUploads';
-import { type InFlightToastStoreState } from './types';
-import { syncUploadToasts } from './uploadToastSync';
+import { type InFlightProgressToastStoreSlice } from './types';
 
 type UploadProgressToastSliceListenerProps = {
-  storeSlice: keyof InFlightToastStoreState;
+  storeSlice: InFlightProgressToastStoreSlice;
 };
 
 const UploadProgressToastSliceListener: FC<UploadProgressToastSliceListenerProps> = ({
