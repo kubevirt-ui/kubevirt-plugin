@@ -11,6 +11,10 @@ export const VENDOR_LABEL = 'instancetype.kubevirt.io/vendor';
 
 export const ROOTDISK = 'rootdisk';
 
+export const RUNSTRATEGY_ALWAYS = 'Always';
+export const RUNSTRATEGY_HALTED = 'Halted';
+export const RUNSTRATEGY_RERUNONFAILURE = 'RerunOnFailure';
+
 export const KUBEVIRT_HYPERCONVERGED = 'kubevirt-hyperconverged';
 export const OPENSHIFT_CNV = 'openshift-cnv';
 

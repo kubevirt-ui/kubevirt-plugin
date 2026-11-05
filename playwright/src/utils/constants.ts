@@ -71,11 +71,6 @@ export const TEMPLATE_WIN10 = {
   name: 'Microsoft Windows 10 VM',
 };
 
-export const TEMPLATE_WIN2K12R2 = {
-  metadataName: 'windows2k12r2-server-medium',
-  name: 'Microsoft Windows Server 2012 R2 VM',
-};
-
 export const TEMPLATE_WIN2K16 = {
   metadataName: 'windows2k16-server-medium',
   name: 'Microsoft Windows Server 2016 VM',
