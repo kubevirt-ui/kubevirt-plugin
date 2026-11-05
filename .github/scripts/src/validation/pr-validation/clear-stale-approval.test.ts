@@ -50,7 +50,7 @@ describe('clearStaleApproval', () => {
     const calls: Call[] = [];
     const octokit = fakeOctokitWithOwners(calls, ['alice', 'bob']);
 
-    await clearStaleApproval(octokit, 'kubevirt-ui', 'kubevirt-plugin', 42, 'charlie', 'main');
+    await clearStaleApproval(octokit, 'kubevirt-ui', 'kubevirt-plugin', 42, 'charlie');
 
     const removed = calls
       .filter((call) => call.method === 'removeLabel')
@@ -62,7 +62,7 @@ describe('clearStaleApproval', () => {
     const calls: Call[] = [];
     const octokit = fakeOctokitWithOwners(calls, ['alice', 'bob']);
 
-    await clearStaleApproval(octokit, 'kubevirt-ui', 'kubevirt-plugin', 42, 'alice', 'main');
+    await clearStaleApproval(octokit, 'kubevirt-ui', 'kubevirt-plugin', 42, 'alice');
 
     const removed = calls
       .filter((call) => call.method === 'removeLabel')

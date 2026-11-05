@@ -3,7 +3,7 @@ import { describe, it } from 'node:test';
 
 import type { Octokit } from '@octokit/rest';
 
-import { isLabelAppliedByTrustedActor, isListedInOwners } from './owners';
+import { isLabelAppliedByTrustedActor, isListedInOwners, OWNERS_TRUST_REF } from './owners';
 
 const OWNERS_CONTENT = [
   'approvers:',
@@ -48,8 +48,9 @@ const OWNERS_WITH_COMMENTS_CONTENT = [
 const fakeOctokit = (expectedPath: string, content: null | string): Octokit =>
   ({
     repos: {
-      getContent: async ({ path }: { path: string }) => {
+      getContent: async ({ path, ref }: { path: string; ref?: string }) => {
         assert.equal(path, expectedPath);
+        assert.equal(ref, OWNERS_TRUST_REF);
         if (content === null) {
           throw new Error('Not Found');
         }
@@ -64,7 +65,17 @@ describe('isListedInOwners', () => {
       fakeOctokit('.github/OWNERS', OWNERS_CONTENT),
       'kubevirt-ui',
       'kubevirt-plugin',
-      'main',
+      'alice-approver',
+    );
+    assert.equal(trusted, true);
+  });
+
+  it('always fetches OWNERS from OWNERS_TRUST_REF (main)', async () => {
+    assert.equal(OWNERS_TRUST_REF, 'main');
+    const trusted = await isListedInOwners(
+      fakeOctokit('.github/OWNERS', OWNERS_CONTENT),
+      'kubevirt-ui',
+      'kubevirt-plugin',
       'alice-approver',
     );
     assert.equal(trusted, true);
@@ -75,7 +86,6 @@ describe('isListedInOwners', () => {
       fakeOctokit('ci-scripts/OWNERS', OWNERS_CONTENT),
       'kubevirt-ui',
       'kubevirt-plugin',
-      'main',
       'bob-approver',
       'ci-scripts/OWNERS',
     );
@@ -87,7 +97,6 @@ describe('isListedInOwners', () => {
       fakeOctokit('.github/OWNERS', OWNERS_CONTENT),
       'kubevirt-ui',
       'kubevirt-plugin',
-      'main',
       'random-contributor',
     );
     assert.equal(trusted, false);
@@ -98,7 +107,6 @@ describe('isListedInOwners', () => {
       fakeOctokit('.github/OWNERS', OWNERS_CONTENT),
       'kubevirt-ui',
       'kubevirt-plugin',
-      'main',
       'alice',
     );
     assert.equal(trusted, false);
@@ -109,7 +117,6 @@ describe('isListedInOwners', () => {
       fakeOctokit('.github/OWNERS', OWNERS_WITH_REVIEWERS_CONTENT),
       'kubevirt-ui',
       'kubevirt-plugin',
-      'main',
       'carol-reviewer',
     );
     assert.equal(trusted, false);
@@ -120,7 +127,6 @@ describe('isListedInOwners', () => {
       fakeOctokit('.github/OWNERS', OWNERS_WITH_REVIEWERS_CONTENT),
       'kubevirt-ui',
       'kubevirt-plugin',
-      'main',
       'alice-approver',
     );
     assert.equal(trusted, true);
@@ -131,7 +137,6 @@ describe('isListedInOwners', () => {
       fakeOctokit('.github/OWNERS', OWNERS_CONTENT),
       'kubevirt-ui',
       'kubevirt-plugin',
-      'main',
       'Alice-Approver',
     );
     assert.equal(trusted, true);
@@ -142,7 +147,6 @@ describe('isListedInOwners', () => {
       fakeOctokit('.github/OWNERS', UNINDENTED_OWNERS_CONTENT),
       'kubevirt-ui',
       'kubevirt-plugin',
-      'main',
       'alice-approver',
     );
     assert.equal(trusted, true);
@@ -153,7 +157,6 @@ describe('isListedInOwners', () => {
       fakeOctokit('.github/OWNERS', UNINDENTED_OWNERS_CONTENT),
       'kubevirt-ui',
       'kubevirt-plugin',
-      'main',
       'carol-reviewer',
     );
     assert.equal(trusted, false);
@@ -164,7 +167,6 @@ describe('isListedInOwners', () => {
       fakeOctokit('.github/OWNERS', OWNERS_WITH_COMMENTS_CONTENT),
       'kubevirt-ui',
       'kubevirt-plugin',
-      'main',
       'carol-approver',
     );
     assert.equal(trusted, true);
@@ -175,7 +177,6 @@ describe('isListedInOwners', () => {
       fakeOctokit('.github/OWNERS', OWNERS_WITH_COMMENTS_CONTENT),
       'kubevirt-ui',
       'kubevirt-plugin',
-      'main',
       'alice-approver',
     );
     assert.equal(trusted, true);
@@ -186,7 +187,6 @@ describe('isListedInOwners', () => {
       fakeOctokit('.github/OWNERS', OWNERS_WITH_COMMENTS_CONTENT),
       'kubevirt-ui',
       'kubevirt-plugin',
-      'main',
       'dave-reviewer',
     );
     assert.equal(trusted, false);
@@ -197,7 +197,6 @@ describe('isListedInOwners', () => {
       fakeOctokit('.github/OWNERS', null),
       'kubevirt-ui',
       'kubevirt-plugin',
-      'main',
       'alice-approver',
     );
     assert.equal(trusted, false);
@@ -224,7 +223,8 @@ const fakeLabelEventsOctokit = ({
         label: { name: e.label },
       })),
     repos: {
-      getContent: async () => {
+      getContent: async ({ ref }: { ref?: string }) => {
+        assert.equal(ref, OWNERS_TRUST_REF);
         if (ownersContent === null) throw new Error('Not Found');
         return { data: { content: Buffer.from(ownersContent, 'utf8').toString('base64') } };
       },
@@ -239,7 +239,6 @@ describe('isLabelAppliedByTrustedActor', () => {
       'kubevirt-plugin',
       1,
       'skip',
-      'main',
     );
     assert.equal(trusted, true);
   });
@@ -254,7 +253,6 @@ describe('isLabelAppliedByTrustedActor', () => {
       'kubevirt-plugin',
       1,
       'skip',
-      'main',
     );
     assert.equal(trusted, true);
   });
@@ -269,7 +267,6 @@ describe('isLabelAppliedByTrustedActor', () => {
       'kubevirt-plugin',
       1,
       'skip',
-      'main',
     );
     assert.equal(trusted, false);
   });
@@ -284,7 +281,6 @@ describe('isLabelAppliedByTrustedActor', () => {
       'kubevirt-plugin',
       1,
       'skip',
-      'main',
     );
     assert.equal(trusted, false);
   });
@@ -302,7 +298,6 @@ describe('isLabelAppliedByTrustedActor', () => {
       'kubevirt-plugin',
       1,
       'skip',
-      'main',
     );
     assert.equal(trusted, false);
   });
@@ -314,7 +309,6 @@ describe('isLabelAppliedByTrustedActor', () => {
       'kubevirt-plugin',
       1,
       'skip',
-      'main',
     );
     assert.equal(trusted, false);
   });
@@ -328,7 +322,6 @@ describe('isLabelAppliedByTrustedActor', () => {
       'kubevirt-plugin',
       1,
       'skip',
-      'main',
     );
     assert.equal(trusted, false);
   });

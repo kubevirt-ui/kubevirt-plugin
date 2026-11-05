@@ -90,7 +90,7 @@ export const main = async (): Promise<void> => {
     checks.push({
       name: 'clear-stale-approval',
       run: (): Promise<void> =>
-        clearStaleApproval(octokit, config.owner, config.repo, prNumber, prAuthor, baseBranch),
+        clearStaleApproval(octokit, config.owner, config.repo, prNumber, prAuthor),
     });
   }
 

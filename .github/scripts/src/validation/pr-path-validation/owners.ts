@@ -5,6 +5,13 @@ import type { Octokit } from '@octokit/rest';
 /** The primary identity commands/approve.ts uses to add reviewed/skip labels. */
 export const APPROVAL_BOT_LOGIN = 'kubevirt-plugin-bot[bot]';
 
+/**
+ * Single source of truth for OWNERS trust checks. Always the repo default
+ * branch -- never the PR base (release branches often lack `.github/OWNERS`)
+ * and never the PR head (a PR must not self-approve by editing OWNERS).
+ */
+export const OWNERS_TRUST_REF = 'main';
+
 const TRUSTED_BOT_LOGINS: ReadonlySet<string> = new Set([APPROVAL_BOT_LOGIN, 'openshift-ci[bot]']);
 
 export const isTrustedBot = (login: string): boolean => TRUSTED_BOT_LOGINS.has(login);
@@ -36,21 +43,26 @@ const extractApproversBlock = (ownersYaml: string): string => {
 
 /**
  * Return true when the user is an approver in the given OWNERS file's
- * approvers: block (never reviewers:) at the PR's base ref -- never the
- * PR's own branch, so a PR can't self-approve by editing OWNERS in its
- * own diff. Defaults to the narrower .github/OWNERS (kept in sync with
- * .cursor/OWNERS), not the root OWNERS file.
+ * approvers: block (never reviewers:) at {@link OWNERS_TRUST_REF} -- never
+ * the PR base or head, so release-branch PRs use main's OWNERS and a PR
+ * can't self-approve by editing OWNERS in its own diff. Defaults to the
+ * narrower .github/OWNERS (kept in sync with .cursor/OWNERS), not the root
+ * OWNERS file.
  */
 export const isListedInOwners = async (
   octokit: Octokit,
   owner: string,
   repo: string,
-  ref: string,
   username: string,
   ownersPath = '.github/OWNERS',
 ): Promise<boolean> => {
   try {
-    const { data } = await octokit.repos.getContent({ owner, path: ownersPath, ref, repo });
+    const { data } = await octokit.repos.getContent({
+      owner,
+      path: ownersPath,
+      ref: OWNERS_TRUST_REF,
+      repo,
+    });
     if (!('content' in data) || typeof data.content !== 'string') {
       return false;
     }
@@ -79,7 +91,6 @@ export const isLabelAppliedByTrustedActor = async (
   repo: string,
   issueNumber: number,
   labelName: string,
-  baseRef: string,
 ): Promise<boolean> => {
   try {
     const events = await octokit.paginate(octokit.issues.listEvents, {
@@ -102,7 +113,7 @@ export const isLabelAppliedByTrustedActor = async (
     if (isTrustedBot(actor)) {
       return true;
     }
-    return await isListedInOwners(octokit, owner, repo, baseRef, actor);
+    return await isListedInOwners(octokit, owner, repo, actor);
   } catch {
     return false;
   }

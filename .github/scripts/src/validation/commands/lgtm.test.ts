@@ -168,7 +168,8 @@ describe('applyLgtm', () => {
     await applyLgtm(baseCtx(octokit, contentsOctokit, 'alice-approver'));
 
     const getContentCall = contentsCalls.find((c) => c.method === 'getContent');
-    assert.equal((getContentCall?.args as { path: string }).path, 'OWNERS');
+    assert.equal((getContentCall?.args as { path: string; ref: string }).path, 'OWNERS');
+    assert.equal((getContentCall?.args as { path: string; ref: string }).ref, 'main');
   });
 });
 

@@ -39,7 +39,6 @@ export const executeJiraValidation = async (input: JiraValidationInput): Promise
       config.repo,
       prNumber,
       SKIP_LABEL,
-      baseBranch,
     );
     if (skipTrusted) {
       console.log(`Label "${SKIP_LABEL}" found (trusted actor), skipping Jira validation.`);

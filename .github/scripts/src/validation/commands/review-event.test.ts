@@ -45,7 +45,6 @@ describe('syncLabelsFromReview', () => {
     const octokit = fakeOctokit({ ownersContent: OWNERS_CONTENT, permission: 'write' }, calls);
 
     const result = await syncLabelsFromReview({
-      baseBranch: 'main',
       contentsOctokit: octokit,
       octokit,
       owner: 'kubevirt-ui',
@@ -68,7 +67,6 @@ describe('syncLabelsFromReview', () => {
     const octokit = fakeOctokit({ permission: 'read' }, calls);
 
     const result = await syncLabelsFromReview({
-      baseBranch: 'main',
       contentsOctokit: octokit,
       octokit,
       owner: 'kubevirt-ui',
@@ -91,7 +89,6 @@ describe('syncLabelsFromReview', () => {
     const octokit = fakeOctokit({ ownersContent: OWNERS_CONTENT, permission: 'write' }, calls);
 
     const result = await syncLabelsFromReview({
-      baseBranch: 'main',
       contentsOctokit: octokit,
       octokit,
       owner: 'kubevirt-ui',
@@ -114,7 +111,6 @@ describe('syncLabelsFromReview', () => {
     const octokit = fakeOctokit({ ownersContent: OWNERS_CONTENT, permission: 'write' }, calls);
 
     const result = await syncLabelsFromReview({
-      baseBranch: 'main',
       contentsOctokit: octokit,
       octokit,
       owner: 'kubevirt-ui',
@@ -137,7 +133,6 @@ describe('syncLabelsFromReview', () => {
     const octokit = fakeOctokit({ ownersContent: OWNERS_CONTENT, permission: 'write' }, calls);
 
     const result = await syncLabelsFromReview({
-      baseBranch: 'main',
       contentsOctokit: octokit,
       octokit,
       owner: 'kubevirt-ui',
@@ -160,7 +155,6 @@ describe('syncLabelsFromReview', () => {
     const octokit = fakeOctokit({ ownersContent: OWNERS_CONTENT, permission: 'write' }, calls);
 
     const result = await syncLabelsFromReview({
-      baseBranch: 'main',
       contentsOctokit: octokit,
       octokit,
       owner: 'kubevirt-ui',

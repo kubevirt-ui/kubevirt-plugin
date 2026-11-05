@@ -123,6 +123,22 @@ describe('approveAiConfig', () => {
       false,
     );
   });
+
+  it('reads OWNERS from main even when the PR targets a release branch', async () => {
+    const botCalls: Call[] = [];
+    const contentsCalls: Call[] = [];
+    const octokit = fakeOctokit(OWNERS_CONTENT, botCalls);
+    const contentsOctokit = fakeOctokit(OWNERS_CONTENT, contentsCalls);
+
+    await approveAiConfig({
+      ...baseCtx(octokit, contentsOctokit, 'alice-approver'),
+      baseBranch: 'release-4.14',
+    });
+
+    const getContentCall = contentsCalls.find((c) => c.method === 'getContent');
+    assert.equal((getContentCall?.args as { path: string; ref: string }).path, '.github/OWNERS');
+    assert.equal((getContentCall?.args as { path: string; ref: string }).ref, 'main');
+  });
 });
 
 describe('approveCiScripts', () => {
@@ -293,7 +309,8 @@ describe('applyApprove', () => {
     await applyApprove(baseCtx(octokit, contentsOctokit, 'alice-approver'));
 
     const getContentCall = contentsCalls.find((c) => c.method === 'getContent');
-    assert.equal((getContentCall?.args as { path: string }).path, 'OWNERS');
+    assert.equal((getContentCall?.args as { path: string; ref: string }).path, 'OWNERS');
+    assert.equal((getContentCall?.args as { path: string; ref: string }).ref, 'main');
   });
 });
 
