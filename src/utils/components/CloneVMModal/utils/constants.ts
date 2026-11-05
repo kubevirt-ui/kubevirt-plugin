@@ -36,3 +36,17 @@ export const STATUS_TO_PROGRESS_VARIANT = {
   Succeeded: ProgressStepVariant.success,
   Unknown: ProgressStepVariant.danger,
 };
+
+export const CLONE_VM_TOAST_TITLE = 'Clone virtual machine';
+
+export const CLONE_COMPLETED_CONTENT = 'Clone completed';
+
+export const CLONE_IN_PROGRESS_CONTENT =
+  'Cloning may take several minutes. The process will continue in the background. The cloned virtual machine may take some time to appear in the list.';
+
+export const CLONE_VM_CANNOT_RETRIEVE_STATUS_CONTENT =
+  'Unable to retrieve the resource status. Use the link for more information.';
+
+export const TOAST_TIMEOUT_MS = 3000;
+export const INFO_TOAST_TIMEOUT_MS = 5000;
+export const WARNING_TOAST_TIMEOUT_MS = 8000;
