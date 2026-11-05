@@ -3,11 +3,9 @@ import type { TFunction } from 'i18next';
 import {
   getCronScheduleFormatError,
   getDNS1123LabelError,
-  getDNS1123LabelErrorLenient,
   getFieldRequiredMessage,
   isDigitsOnly,
   isDNS1123Label,
-  isDNS1123LabelLenient,
   isValidCronExpression,
   isValidUrl,
   validateCronExpression,
@@ -58,34 +56,6 @@ describe('getDNS1123LabelError', () => {
   it('should return the format error for invalid characters', () => {
     const error = getDNS1123LabelError('My_VM');
     expect(error?.(t)).toContain('lowercase RFC 1123 label');
-  });
-});
-
-describe('getDNS1123LabelErrorLenient', () => {
-  it('should tolerate a trailing hyphen while typing', () => {
-    expect(getDNS1123LabelErrorLenient('my-vm-')).toBeUndefined();
-  });
-
-  it('should still reject a leading hyphen', () => {
-    expect(getDNS1123LabelErrorLenient('-my-vm')).toBeDefined();
-  });
-
-  it('should still reject overly long values even with a trailing hyphen', () => {
-    expect(getDNS1123LabelErrorLenient(`${'a'.repeat(63)}-`)).toBeDefined();
-  });
-
-  it('should return undefined for a valid label', () => {
-    expect(getDNS1123LabelErrorLenient('my-vm')).toBeUndefined();
-  });
-});
-
-describe('isDNS1123LabelLenient', () => {
-  it('should accept a label with a trailing hyphen', () => {
-    expect(isDNS1123LabelLenient('my-vm-')).toBe(true);
-  });
-
-  it('should reject a label with a leading hyphen', () => {
-    expect(isDNS1123LabelLenient('-my-vm')).toBe(false);
   });
 });
 

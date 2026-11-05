@@ -1,5 +1,7 @@
-import { type FC, useEffect, useRef, useState } from 'react';
+import { type FC, useEffect, useMemo, useRef, useState } from 'react';
+import { type Resolver, useForm } from 'react-hook-form';
 
+import { yupResolver } from '@hookform/resolvers/yup';
 import {
   type V1beta1VirtualMachineClone,
   type V1beta1VirtualMachineSnapshot,
@@ -14,11 +16,11 @@ import { logVMActionPerformed } from '@kubevirt-utils/extensions/telemetry/vm-ac
 import { logVMCloned } from '@kubevirt-utils/extensions/telemetry/vm-storage';
 import useKubevirtToast from '@kubevirt-utils/hooks/useKubevirtToast';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { useNameValidation } from '@kubevirt-utils/hooks/useNameValidation';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
-import { getVMNameError } from '@kubevirt-utils/utils/dns1123SubdomainValidation';
+import { createVMNameSchema } from '@kubevirt-utils/utils/createVMNameSchema';
 import { isVM } from '@kubevirt-utils/utils/typeGuards';
 import { truncateToK8sName } from '@kubevirt-utils/utils/utils';
+import * as yup from '@kubevirt-utils/yup';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { Divider, ModalVariant } from '@patternfly/react-core';
 
@@ -40,27 +42,34 @@ type CloneVMModalProps = {
   source: V1beta1VirtualMachineSnapshot | V1VirtualMachine;
 };
 
+type CloneNameFormValues = {
+  name: string;
+};
+
 const CloneVMModal: FC<CloneVMModalProps> = ({ headerText, isOpen, onClose, source }) => {
   const { t } = useKubevirtTranslation();
   const { addSuccessToast } = useKubevirtToast();
   const namespace = getNamespace(source);
   const name = getName(source);
 
-  const [cloneName, setCloneName] = useState(() =>
-    truncateToK8sName(isVM(source) ? `${name}-clone` : name),
-  );
+  const schema = useMemo(() => yup.object({ name: createVMNameSchema(t) }), [t]);
 
   const {
-    errorText,
-    isValid: isCloneNameValid,
-    validated,
-  } = useNameValidation({ getError: getVMNameError, name: cloneName });
+    control,
+    formState: { errors, isValid },
+    getValues,
+  } = useForm<CloneNameFormValues>({
+    defaultValues: { name: truncateToK8sName(isVM(source) ? `${name}-clone` : name) },
+    mode: 'onChange',
+    resolver: yupResolver(schema) as Resolver<CloneNameFormValues>,
+  });
 
   const [cloneDescription, setCloneDescription] = useState('');
   const [startCloneVM, setStartCloneVM] = useState(false);
   const [initialCloneRequest, setInitialCloneRequest] = useState<V1beta1VirtualMachineClone>();
 
   const sendCloneRequest = async (): Promise<void> => {
+    const cloneName = getValues('name');
     const vmSameName = await vmExists(cloneName, namespace, getCluster(source));
 
     if (vmSameName) {
@@ -112,7 +121,7 @@ const CloneVMModal: FC<CloneVMModalProps> = ({ headerText, isOpen, onClose, sour
       cancelBtnText={initialCloneRequest ? t('Close') : undefined}
       closeOnSubmit={false}
       headerText={headerText ?? t('Clone {{sourceKind}}', { sourceKind: source.kind })}
-      isDisabled={!isCloneNameValid || isCloneInProgress}
+      isDisabled={!isValid || isCloneInProgress}
       isHorizontal
       isLoading={isCloneInProgress}
       isOpen={isOpen}
@@ -128,13 +137,7 @@ const CloneVMModal: FC<CloneVMModalProps> = ({ headerText, isOpen, onClose, sour
         isCloneFailed={isCloneFailed}
         isCloneInProgress={isCloneInProgress}
       />
-      <NameInput
-        autoFocus
-        errorText={errorText}
-        name={cloneName}
-        setName={setCloneName}
-        validated={validated}
-      />
+      <NameInput autoFocus control={control} errorMessage={errors.name?.message} />
       <DescriptionInput
         description={cloneDescription}
         placeholder={

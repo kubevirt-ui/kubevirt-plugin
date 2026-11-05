@@ -1,15 +1,15 @@
 import { type FC, type ReactNode } from 'react';
-import { useWatch } from 'react-hook-form';
+import { useFormState, useWatch } from 'react-hook-form';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Button, Tooltip } from '@patternfly/react-core';
+import { useVMWizardForm } from '@virtualmachines/wizard/form/VMWizardFormProvider';
 import { useVMWizardState } from '@virtualmachines/wizard/state/useVMWizardState';
+import { VMWizardStep } from '@virtualmachines/wizard/utils/constants';
+import { isCloneCreationMethod } from '@virtualmachines/wizard/utils/utils';
 
-import { vmNameInputSchema } from '../../form/schema/deployment/createDeploymentSchema';
-import { useVMWizardForm } from '../../form/VMWizardFormProvider';
 import { getDisabledTooltipText } from './utils/getDisabledTooltipText';
-import { isVMNameInvalid } from './utils/isVMNameInvalid';
 
 type VMNameConfirmationNextButtonProps = {
   children: ReactNode;
@@ -17,8 +17,6 @@ type VMNameConfirmationNextButtonProps = {
   isDisabled?: boolean;
   isSubmitting?: boolean;
   onClick: () => void;
-  requireVMName?: boolean;
-  validateOnClick?: boolean;
 };
 
 const VMNameConfirmationNextButton: FC<VMNameConfirmationNextButtonProps> = ({
@@ -27,46 +25,32 @@ const VMNameConfirmationNextButton: FC<VMNameConfirmationNextButtonProps> = ({
   isDisabled: isExternallyDisabled = false,
   isSubmitting = false,
   onClick,
-  requireVMName = true,
-  validateOnClick = true,
 }) => {
   const { t } = useKubevirtTranslation();
-  const { control, formState, trigger } = useVMWizardForm();
-  const { setStrictVMName, strictVMName } = useVMWizardState();
-  const [vmName, project] = useWatch({
+  const { control } = useVMWizardForm();
+  const { currentStep } = useVMWizardState();
+  const { errors } = useFormState({ control, name: 'deployment.name' });
+  const [creationMethod, project, vmName] = useWatch({
     control,
-    name: ['deployment.name', 'deployment.project'],
+    name: ['creationMethod', 'deployment.project', 'deployment.name'],
   });
 
-  const isVMNameAlmostValid = vmNameInputSchema.isValidSync(vmName);
+  // Clone Deployment details hides the name field until a source VM is selected later.
+  const isNameDeferredForClone =
+    isCloneCreationMethod(creationMethod) && currentStep === VMWizardStep.DEPLOYMENT_DETAILS;
 
-  const vmNameInvalid = isVMNameInvalid(
-    requireVMName,
-    strictVMName,
-    isVMNameAlmostValid,
-    formState.errors.deployment?.name,
-  );
-
+  const isVmNameValid = isNameDeferredForClone || !errors.deployment?.name;
   // Project and other schema-required fields are gated via isExternallyDisabled (step validation).
-  const isDisabled = isExternallyDisabled || isSubmitting || vmNameInvalid;
+  const isDisabled = isExternallyDisabled || isSubmitting || !isVmNameValid;
 
-  const disabledTooltip = getDisabledTooltipText(!isEmpty(project), vmNameInvalid, t, vmName);
-
-  const handleClick = async (): Promise<void> => {
-    if (requireVMName && validateOnClick && !(await trigger('deployment.name'))) {
-      setStrictVMName(true);
-      return;
-    }
-
-    onClick();
-  };
+  const disabledTooltip = getDisabledTooltipText(!isEmpty(project), isVmNameValid, t, vmName);
 
   const nextButton = (
     <Button
       data-test={dataTest}
       isAriaDisabled={isDisabled}
       isLoading={isSubmitting}
-      onClick={isDisabled ? undefined : handleClick}
+      onClick={isDisabled ? undefined : onClick}
       variant="primary"
     >
       {children}

@@ -5,7 +5,6 @@ import {
   getNavigationPrerequisites,
   getWizardStepIds,
 } from '@virtualmachines/wizard/form/stepValidation';
-import { useVMWizardForm } from '@virtualmachines/wizard/form/VMWizardFormProvider';
 import { type VMGenerationCoordinator } from '@virtualmachines/wizard/hooks/useVMGenerationCoordinator/types';
 import useWizardStepValidation from '@virtualmachines/wizard/hooks/useWizardStepValidation';
 import { useVMWizardState } from '@virtualmachines/wizard/state/useVMWizardState';
@@ -25,8 +24,7 @@ const useVMGenerationNavClick = (
   creationMethod: VMCreationMethod,
   generationCoordinator: VMGenerationCoordinator,
 ): WizardStepNavItemConfig => {
-  const { getFieldState } = useVMWizardForm();
-  const { currentStep, setStrictVMName, visitedSteps } = useVMWizardState();
+  const { currentStep, visitedSteps } = useVMWizardState();
   const { isStepDisabled, validateSteps } = useWizardStepValidation();
   const { ensureInstanceTypeDraft, ensureTemplateDraft, instanceTypeReady, isTemplateGenerating } =
     generationCoordinator;
@@ -66,10 +64,6 @@ const useVMGenerationNavClick = (
 
       // Validate only prerequisites so fields in later steps cannot block this transition
       if (!(await validateSteps(prerequisites))) {
-        if (getFieldState('deployment.name').invalid) {
-          setStrictVMName(true);
-        }
-
         return;
       }
 

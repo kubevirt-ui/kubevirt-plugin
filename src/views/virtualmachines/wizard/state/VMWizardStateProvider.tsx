@@ -6,7 +6,6 @@ import { VMWizardStateContext } from './useVMWizardState';
 
 const createNavigationState = (): VMWizardNavigationState => ({
   currentStep: VMWizardStep.DEPLOYMENT_DETAILS,
-  strictVMName: false,
   visitedSteps: new Set([VMWizardStep.DEPLOYMENT_DETAILS]),
 });
 
@@ -33,10 +32,6 @@ const VMWizardStateProvider: FC<PropsWithChildren> = ({ children }) => {
     }));
   }, []);
 
-  const setStrictVMName = useCallback((strictVMName: boolean): void => {
-    setNavigation((current) => ({ ...current, strictVMName }));
-  }, []);
-
   const resetState = useCallback((): void => {
     templateGenerationRevisionRef.current = 0;
     setNavigation(createNavigationState());
@@ -53,7 +48,6 @@ const VMWizardStateProvider: FC<PropsWithChildren> = ({ children }) => {
       resetState,
       setCurrentStep,
       setIsTemplateDrawerOpen,
-      setStrictVMName,
       setTemplateProcessError,
       templateProcessError,
     }),
@@ -64,7 +58,6 @@ const VMWizardStateProvider: FC<PropsWithChildren> = ({ children }) => {
       isTemplateDrawerOpen,
       resetState,
       setCurrentStep,
-      setStrictVMName,
       templateProcessError,
     ],
   );

@@ -1,39 +1,47 @@
-import { type FC, type FormEvent, type ReactElement } from 'react';
+import { type FC, type ReactElement } from 'react';
+import { type Control, Controller } from 'react-hook-form';
 
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
+import { useDeferredFieldError } from '@kubevirt-utils/hooks/useDeferredFieldError';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { FormGroup, TextInput, type ValidatedOptions } from '@patternfly/react-core';
+import { FormGroup, TextInput } from '@patternfly/react-core';
+
+type CloneNameFormValues = {
+  name: string;
+};
 
 type NameInputProps = {
   autoFocus?: boolean;
-  errorText: string | undefined;
-  name: string;
-  setName: (value: string) => void;
-  validated: ValidatedOptions;
+  control: Control<CloneNameFormValues>;
+  errorMessage?: string;
 };
 
-const NameInput: FC<NameInputProps> = ({
-  autoFocus,
-  errorText,
-  name,
-  setName,
-  validated,
-}): ReactElement => {
+const NameInput: FC<NameInputProps> = ({ autoFocus, control, errorMessage }): ReactElement => {
   const { t } = useKubevirtTranslation();
-
-  const handleChange = (_event: FormEvent<HTMLInputElement>, value: string): void => {
-    setName(value);
-  };
+  const { errorText, onValueChange, revealError, validated } = useDeferredFieldError(errorMessage);
 
   return (
     <FormGroup fieldId="clone-name" isRequired label={t('Name')}>
-      <TextInput
-        autoFocus={autoFocus}
-        id="clone-name"
-        onChange={handleChange}
-        type="text"
-        validated={validated}
-        value={name}
+      <Controller
+        control={control}
+        name="name"
+        render={({ field }) => (
+          <TextInput
+            autoFocus={autoFocus}
+            id="clone-name"
+            onBlur={() => {
+              field.onBlur();
+              revealError();
+            }}
+            onChange={(_event, value) => {
+              onValueChange();
+              field.onChange(value);
+            }}
+            type="text"
+            validated={validated}
+            value={field.value}
+          />
+        )}
       />
       {errorText && <FormGroupHelperText validated={validated}>{errorText}</FormGroupHelperText>}
     </FormGroup>

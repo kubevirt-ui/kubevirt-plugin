@@ -81,7 +81,7 @@ test.describe(
         await expect
           .poll(
             () =>
-              vmWizardComputePage.isHostnameModalValidationErrorVisible('Please provide hostname.'),
+              vmWizardComputePage.isHostnameModalValidationErrorVisible('lowercase RFC 1123 label'),
             {
               message: 'Empty hostname should show the required validation error',
               timeout: utils.TestTimeouts.UI_VISIBILITY_QUICK,
