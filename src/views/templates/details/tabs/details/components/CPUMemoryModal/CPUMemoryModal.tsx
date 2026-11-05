@@ -7,10 +7,11 @@ import CPUInput from '@kubevirt-utils/components/CPUMemoryModal/components/CPUIn
 import { getCPULimitsFromTemplate } from '@kubevirt-utils/components/CPUMemoryModal/components/CPUInput/utils/utils';
 import MemoryInput from '@kubevirt-utils/components/CPUMemoryModal/components/MemoryInput/MemoryInput';
 import { getMemorySize } from '@kubevirt-utils/components/CPUMemoryModal/utils/CpuMemoryUtils';
+import { applyCPUMemoryToVMDraft } from '@kubevirt-utils/components/CPUMemoryModal/utils/CpuMemoryUtils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getTemplateVirtualMachineObject } from '@kubevirt-utils/resources/template';
 import { getCPU, getMemory } from '@kubevirt-utils/resources/vm';
-import { ensurePath } from '@kubevirt-utils/utils/utils';
+import { type QuantityUnit } from '@kubevirt-utils/utils/unitConstants';
 import {
   Alert,
   AlertVariant,
@@ -56,13 +57,7 @@ const CPUMemoryModal: FC<CPUMemoryModalProps> = ({ isOpen, onClose, onSubmit, te
     const updatedTemplate = produce<V1Template>(template, (templateDraft: V1Template) => {
       const draftVM = getTemplateVirtualMachineObject(templateDraft);
 
-      ensurePath(draftVM, [
-        'spec.template.spec.domain.cpu',
-        'spec.template.spec.domain.memory.guest',
-      ]);
-
-      draftVM.spec.template.spec.domain.cpu = cpu;
-      draftVM.spec.template.spec.domain.memory.guest = `${memory}${memoryUnit || ''}`;
+      applyCPUMemoryToVMDraft(draftVM, cpu, memory, memoryUnit as QuantityUnit);
     });
 
     try {
