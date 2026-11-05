@@ -1,12 +1,12 @@
 import * as React from 'react';
-import { Route, Switch } from 'react-router-dom';
+import { Route, RouteComponentProps, Switch } from 'react-router-dom';
 
 import CreateVMHorizontalNav from './CreateVMHorizontalNav/CreateVMHorizontalNav';
 import CustomizeVirtualMachine from './customize/CustomizeVirtualMachine';
 import { WizardVMContextProvider } from './utils/WizardVMContext';
 import Wizard from './wizard/Wizard';
 
-const Catalog: React.FC = () => {
+const Catalog: React.FC<RouteComponentProps<{ ns?: string }>> = () => {
   return (
     <WizardVMContextProvider>
       <Switch>
@@ -24,7 +24,15 @@ const Catalog: React.FC = () => {
           ]}
           component={Wizard}
         />
-        <Route component={CreateVMHorizontalNav} />
+        <Route
+          path={[
+            '/k8s/ns/:ns/templatescatalog',
+            '/k8s/all-namespaces/templatescatalog',
+            '/k8s/ns/:ns/templatescatalog/instanceTypes',
+            '/k8s/all-namespaces/templatescatalog/instanceTypes',
+          ]}
+          component={CreateVMHorizontalNav}
+        />
       </Switch>
     </WizardVMContextProvider>
   );
