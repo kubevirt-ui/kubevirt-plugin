@@ -67,7 +67,11 @@ export const getCPULimitsFromTemplate = (template: Template): Record<string, num
   return parseValidationAnnotations(getAnnotations(template));
 };
 
-export const getInitialCPUInputType = (cpu: V1CPU): CPUInputType => {
-  const isSimpleCPU = (cpu?.cores || 1) === 1 && (cpu?.threads || 1) === 1;
+export const getInitialCPUInputType = (cpu: undefined | V1CPU): CPUInputType => {
+  if (!cpu) {
+    return CPUInputType.editVCPU;
+  }
+
+  const isSimpleCPU = (cpu.cores ?? 1) === 1 && (cpu.threads ?? 1) === 1;
   return isSimpleCPU ? CPUInputType.editVCPU : CPUInputType.editTopologyManually;
 };
