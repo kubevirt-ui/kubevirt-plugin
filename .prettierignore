@@ -5,6 +5,3 @@ package-lock.json
 i18n-scripts/
 /coverage
 /gui-test-screenshots
-cypress/gui-test-screenshots
-cypress/cypress-a11y-report.json
-/locales
