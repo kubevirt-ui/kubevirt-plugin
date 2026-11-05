@@ -16,6 +16,7 @@ import {
   INSTANCETYPE_CLASS_DISPLAY_NAME,
   INSTANCETYPE_DESCRIPTION_ANNOTATION,
   instanceTypeSeriesNameMapper,
+  KUBEVIRT_IO,
   REDHAT_COM,
 } from './constants';
 import { InstanceTypeSize, InstanceTypesMenuItemsData, RedHatInstanceTypeSeries } from './types';
@@ -65,7 +66,8 @@ const hasRedHatSeriesSizeLabel = (
 export const isRedHatInstanceType = (
   instanceType: V1beta1VirtualMachineClusterInstancetype | V1beta1VirtualMachineInstancetype,
 ): boolean => {
-  if (getLabel(instanceType, VENDOR_LABEL) !== REDHAT_COM) return false;
+  const vendor = getLabel(instanceType, VENDOR_LABEL);
+  if (![KUBEVIRT_IO, REDHAT_COM].includes(vendor)) return false;
   return hasRedHatSeriesSizeLabel(instanceType);
 };
 
