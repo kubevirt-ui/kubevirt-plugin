@@ -1,16 +1,16 @@
-import type { FC } from 'react';
-import { useMemo } from 'react';
+import { type FC, useMemo } from 'react';
 
-import type { V1beta1StorageMap } from '@forklift-ui/types';
-import type { IoK8sApiStorageV1StorageClass } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
-import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
-import type { EnhancedSelectOptionProps } from '@kubevirt-utils/components/FilterSelect/utils/types';
+import { type V1beta1StorageMap } from '@forklift-ui/types';
+import { type IoK8sApiStorageV1StorageClass } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type EnhancedSelectOptionProps } from '@kubevirt-utils/components/FilterSelect/utils/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { modelToGroupVersionKind, StorageClassModel } from '@kubevirt-utils/models';
 import { getName } from '@kubevirt-utils/resources/shared';
-import { FormGroup, Split, SplitItem, TextInput, Title } from '@patternfly/react-core';
 
-import type { UseStorageReadinessReturnType } from '../hooks/useStorageReadiness';
+import { getStorageDestinationSelectValue } from '../mappingDisplayUtils';
+
+import { type UseStorageReadinessReturnType } from '../hooks/useStorageReadiness';
+import ResourceMappingPanel from './ResourceMappingPanel';
 
 type StorageMappingProps = {
   changeStorageMap: UseStorageReadinessReturnType['changeStorageMap'];
@@ -24,44 +24,41 @@ const StorageMapping: FC<StorageMappingProps> = ({
   storageMap,
 }) => {
   const { t } = useKubevirtTranslation();
-  const storageClassOptions = useMemo(
+
+  const rows = useMemo(
     () =>
-      storageClasses.map(
-        (storageClass): EnhancedSelectOptionProps => ({
-          children: getName(storageClass),
+      (storageMap?.spec?.map ?? []).map((map) => ({
+        rowId: map.source.name ?? '',
+        selectedValue: getStorageDestinationSelectValue(map),
+        sourceValue: map.source.name ?? '',
+      })),
+    [storageMap?.spec?.map],
+  );
+
+  const selectOptions = useMemo(
+    (): EnhancedSelectOptionProps[] =>
+      storageClasses.map((storageClass) => {
+        const name = getName(storageClass) ?? '';
+        return {
+          children: name,
           groupVersionKind: modelToGroupVersionKind(StorageClassModel),
-          value: getName(storageClass),
-        }),
-      ),
+          value: name,
+        };
+      }),
     [storageClasses],
   );
 
   return (
-    <div>
-      <Title className="cross-cluster-migration-title" headingLevel="h5">
-        {t('Storage mapping')}
-      </Title>
-      {storageMap?.spec?.map?.map((map) => (
-        <Split className="cross-cluster-migration-split" key={map.source.name}>
-          <SplitItem isFilled>
-            <FormGroup>
-              <TextInput isDisabled value={map.source.name} />
-            </FormGroup>
-          </SplitItem>
-          <SplitItem isFilled>
-            <FormGroup>
-              <InlineFilterSelect
-                options={storageClassOptions}
-                selected={map.destination.storageClass}
-                selectProps={{ id: `storage-class-select-${map.source.name}` }}
-                setSelected={(newSelection) => changeStorageMap(map.source.name, newSelection)}
-                toggleProps={{ isFullWidth: true }}
-              />
-            </FormGroup>
-          </SplitItem>
-        </Split>
-      ))}
-    </div>
+    <ResourceMappingPanel
+      heading={t('Storage mapping')}
+      onSelect={changeStorageMap}
+      rows={rows}
+      selectIdPrefix="storage-class-select"
+      selectOptions={selectOptions}
+      sourceTermLabel={t('Source storage class')}
+      targetTermLabel={t('Target storage class')}
+      testIdPrefix="storage-mapping"
+    />
   );
 };
 
