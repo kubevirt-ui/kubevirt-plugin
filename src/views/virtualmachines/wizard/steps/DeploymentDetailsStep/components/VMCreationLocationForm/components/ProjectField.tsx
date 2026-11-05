@@ -1,4 +1,4 @@
-import { type FC, useCallback } from 'react';
+import { type FC, useCallback, useMemo } from 'react';
 import { Controller, useWatch } from 'react-hook-form';
 
 import NamespaceDropdown, {
@@ -11,6 +11,7 @@ import { getCluster } from '@multicluster/helpers/selectors';
 import useIsACMPage from '@multicluster/useIsACMPage';
 import { FormGroup, ValidatedOptions } from '@patternfly/react-core';
 import { useHubClusterName } from '@stolostron/multicluster-sdk';
+import { getVmCreateFleetAccessReview } from '@virtualmachines/list/utils/utils';
 import { useVMWizardForm } from '@virtualmachines/wizard/form/VMWizardFormProvider';
 
 import useClearLocationDependentVM from '../hooks/useClearLocationDependentVM';
@@ -30,6 +31,11 @@ const ProjectField: FC<ProjectFieldProps> = ({ isValidatingDefaultAccess }) => {
     control,
     name: ['deployment.cluster', 'deployment.project'],
   });
+
+  const vmCreateProjectAccessReview = useMemo(
+    () => getVmCreateFleetAccessReview(cluster),
+    [cluster],
+  );
 
   const onLocationProjectCreated = useCallback<NamespaceDropdownProjectCreatedHandler>(
     (createdProject) => {
@@ -68,6 +74,7 @@ const ProjectField: FC<ProjectFieldProps> = ({ isValidatingDefaultAccess }) => {
               }}
               onlyUserProjects
               onProjectCreated={onLocationProjectCreated}
+              projectAccessReview={vmCreateProjectAccessReview}
               selectedProject={project ?? ''}
             />
             {fieldState.error?.message && fieldState.isTouched && (

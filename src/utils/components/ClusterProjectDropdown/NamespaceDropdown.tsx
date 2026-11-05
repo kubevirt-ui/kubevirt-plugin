@@ -1,18 +1,18 @@
 import type { FC, JSX } from 'react';
 import { useCallback, useMemo } from 'react';
 
-import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import Dropdown from '@kubevirt-utils/components/ClusterProjectDropdown/Dropdown/Dropdown';
 import type {
   DropdownConfig,
   DropdownCreateProjectMenuFooterProps,
 } from '@kubevirt-utils/components/ClusterProjectDropdown/Dropdown/types';
 import { ALL_PROJECTS } from '@kubevirt-utils/hooks/constants';
+import useAllowedNamespaces from '@kubevirt-utils/hooks/useAllowedNamespaces/useAllowedNamespaces';
 import useConsoleNamespaceBookmarks from '@kubevirt-utils/hooks/useConsoleNamespaceBookmarks/useConsoleNamespaceBookmarks';
 import useConsoleShowSystemNamespaces from '@kubevirt-utils/hooks/useConsoleShowSystemNamespaces/useConsoleShowSystemNamespaces';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 import type { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+import { type FleetAccessReviewResourceAttributes } from '@stolostron/multicluster-sdk';
 
 import CreateProjectFromDropdownFooter from './components/CreateProjectFromDropdownFooter';
 import { extractName, isUserProject } from './utils';
@@ -29,6 +29,7 @@ export type NamespaceDropdownProps = {
   onChange: (project: string) => void;
   onlyUserProjects?: boolean;
   onProjectCreated?: NamespaceDropdownProjectCreatedHandler;
+  projectAccessReview?: FleetAccessReviewResourceAttributes;
   selectedProject: string;
 };
 
@@ -42,39 +43,38 @@ const NamespaceDropdown: FC<NamespaceDropdownProps> = ({
   onChange,
   onlyUserProjects = false,
   onProjectCreated,
+  projectAccessReview,
   selectedProject,
 }): JSX.Element => {
   const { t } = useKubevirtTranslation();
 
   const consoleSettingsCluster = bookmarkCluster ?? cluster;
 
-  const [projects, projectsLoaded] = useK8sWatchData<K8sResourceCommon[]>({
+  const { namespaces, namespacesLoaded } = useAllowedNamespaces(
+    projectAccessReview ?? null,
     cluster,
-    groupVersionKind: modelToGroupVersionKind(ProjectModel),
-    isList: true,
-    namespaced: false,
-  });
+  );
 
   const [bookmarks, updateBookmarks, bookmarksLoaded] =
     useConsoleNamespaceBookmarks(consoleSettingsCluster);
   const [showSystemNamespaces, setShowSystemNamespaces, showSystemLoaded] =
     useConsoleShowSystemNamespaces(consoleSettingsCluster);
 
-  const visibleProjects = useMemo<K8sResourceCommon[] | null>(() => {
-    if (!projects) {
+  const visibleNamespaces = useMemo<K8sResourceCommon[] | null>(() => {
+    if (!namespaces) {
       return null;
     }
 
     if (!onlyUserProjects) {
-      return projects;
+      return namespaces;
     }
 
-    return projects.filter(isUserProject);
-  }, [onlyUserProjects, projects]);
+    return namespaces.filter(isUserProject);
+  }, [namespaces, onlyUserProjects]);
 
   const hasSystemNamespaces = useMemo(
-    () => (projects || []).some((project) => !isUserProject(project)),
-    [projects],
+    () => (namespaces ?? []).some((namespace) => !isUserProject(namespace)),
+    [namespaces],
   );
 
   const config: DropdownConfig = useMemo(
@@ -131,6 +131,8 @@ const NamespaceDropdown: FC<NamespaceDropdownProps> = ({
     return { initialCluster: cluster, onProjectCreated };
   }, [cluster, onProjectCreated]);
 
+  const isDropdownLoading = isLoading || !namespacesLoaded;
+
   return (
     <Dropdown<K8sResourceCommon>
       bookmarks={bookmarksProp}
@@ -140,9 +142,9 @@ const NamespaceDropdown: FC<NamespaceDropdownProps> = ({
       extractKey={extractName}
       extractTitle={extractName}
       includeAllItems={includeAllProjects}
-      isLoading={isLoading}
-      items={visibleProjects}
-      itemsLoaded={projectsLoaded}
+      isLoading={isDropdownLoading}
+      items={visibleNamespaces}
+      itemsLoaded={namespacesLoaded}
       menuFooter={onProjectCreated ? CreateProjectFromDropdownFooter : undefined}
       menuFooterProps={menuFooterProps}
       onChange={onChange}
