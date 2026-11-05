@@ -10,6 +10,7 @@ import {
   type Template,
   TEMPLATE_TYPE_BASE,
   TEMPLATE_TYPE_LABEL,
+  type TemplateCPUMemoryDisplayOptions,
   type TemplateOrRequest,
 } from '@kubevirt-utils/resources/template';
 import { getArchitecture as getVMArchitecture, getCPU } from '@kubevirt-utils/resources/vm';
@@ -24,8 +25,9 @@ export const isDedicatedCPUPlacement = (template: Template): boolean =>
 export const getVirtualMachineTemplatesCPUMemoryValue = (
   template: Template,
   t: TFunction,
+  options?: TemplateCPUMemoryDisplayOptions,
 ): string => {
-  const { cpuMemoryText, isEmpty } = getTemplateCPUMemoryDisplayValue(template, t);
+  const { cpuMemoryText, isEmpty } = getTemplateCPUMemoryDisplayValue(template, t, options);
 
   if (isEmpty) {
     return t('None');
@@ -37,8 +39,9 @@ export const getVirtualMachineTemplatesCPUMemoryValue = (
 export const getVirtualMachineTemplatesCPUMemoryText = (
   template: Template,
   t: TFunction,
+  options?: TemplateCPUMemoryDisplayOptions,
 ): ReactNode => {
-  const { cpuMemoryText, isEmpty } = getTemplateCPUMemoryDisplayValue(template, t);
+  const { cpuMemoryText, isEmpty } = getTemplateCPUMemoryDisplayValue(template, t, options);
 
   if (isEmpty) {
     return <MutedTextSpan text={t('None')} />;

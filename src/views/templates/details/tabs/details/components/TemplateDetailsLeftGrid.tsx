@@ -9,6 +9,7 @@ import DescriptionItemName from '@kubevirt-utils/components/DescriptionItem/comp
 import DescriptionItemNamespace from '@kubevirt-utils/components/DescriptionItem/components/DescriptionItemNamespace';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import OwnerDetailsItem from '@kubevirt-utils/components/OwnerDetailsItem/OwnerDetailsItem';
+import TemplateInstanceTypeCPUMemoryItem from '@kubevirt-utils/components/TemplateInstanceTypeCPUMemoryItem/TemplateInstanceTypeCPUMemoryItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   getTemplateModel,
@@ -33,7 +34,6 @@ import BootMethod from './BootMethod/BootMethod';
 import CPUMemory from './CPUMemory';
 import DisplayName from './DisplayName';
 import TemplateCategory from './TemplateCategory';
-import TemplateInstanceTypeDescriptionItem from './TemplateInstanceTypeDescriptionItem';
 import WorkloadProfile from './WorkloadProfile';
 
 const TemplateDetailsLeftGrid: FC<TemplateDetailsGridProps> = ({ template }) => {
@@ -62,7 +62,7 @@ const TemplateDetailsLeftGrid: FC<TemplateDetailsGridProps> = ({ template }) => 
       />
       <WorkloadProfile editable={isTemplateEditable} template={template} />
       {hasInstanceType ? (
-        <TemplateInstanceTypeDescriptionItem editable={isTemplateEditable} template={template} />
+        <TemplateInstanceTypeCPUMemoryItem editable={isTemplateEditable} template={template} />
       ) : (
         <CPUMemory editable={isTemplateEditable} template={template} />
       )}

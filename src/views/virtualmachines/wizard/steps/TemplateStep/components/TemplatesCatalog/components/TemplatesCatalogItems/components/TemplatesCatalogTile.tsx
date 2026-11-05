@@ -6,12 +6,13 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { getName, getNamespace, getUID } from '@kubevirt-utils/resources/shared';
 import {
   getTemplateCategoryDisplay,
-  getTemplateCPUMemoryDisplayValue,
   isDeprecatedTemplate,
   isVirtualMachineTemplate,
   type Template,
 } from '@kubevirt-utils/resources/template';
+import useTemplateCPUMemoryDisplayValue from '@kubevirt-utils/resources/template/hooks/useTemplateCPUMemoryDisplayValue';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm';
+import { getCluster } from '@multicluster/helpers/selectors';
 import {
   Badge,
   Card,
@@ -29,6 +30,7 @@ import { getTemplateOSIcon } from '@virtualmachines/wizard/utils/os-icons/os-ico
 import './TemplatesCatalogTile.scss';
 
 export type TemplatesCatalogTileProps = {
+  catalogNamespace?: string;
   clusterPreference: null | V1beta1VirtualMachineClusterPreference;
   isSelected?: boolean;
   onClick: (template: Template) => void;
@@ -37,14 +39,16 @@ export type TemplatesCatalogTileProps = {
 };
 
 const TemplatesCatalogTile: FC<TemplatesCatalogTileProps> = memo(
-  ({ clusterPreference, isSelected, onClick, osDisplayNames, template }) => {
+  ({ catalogNamespace, clusterPreference, isSelected, onClick, osDisplayNames, template }) => {
     const { t } = useKubevirtTranslation();
 
     const isDeprecated = isDeprecatedTemplate(template);
     const templateID = getUID(template);
     const templateName = getName(template);
-    const { cpuMemoryText } = getTemplateCPUMemoryDisplayValue(template, t, {
+    const { cpuMemoryText } = useTemplateCPUMemoryDisplayValue(template, {
+      cluster: getCluster(template),
       customFormat: (cpu, memory) => t('{{cpu}} | {{memory}}', { cpu, memory }),
+      namespace: catalogNamespace,
     });
     const architecture = getTemplateArchitecture(template);
     const osName = getTemplateOSName(template, clusterPreference, osDisplayNames) ?? NO_DATA_DASH;

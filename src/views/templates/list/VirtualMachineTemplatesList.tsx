@@ -44,9 +44,8 @@ const VirtualMachineTemplatesList: FC<ListPageProps> = ({
   const selectedProjects = useSelectedRowFilterProjects();
   const namespaceParam = useNamespaceParam();
   const isAllClustersPage = useIsAllClustersPage();
+  const cluster = selectedClusters?.length === 1 ? selectedClusters[0] : undefined;
 
-  // Prefer the namespace passed down by Console over the one parsed from the URL,
-  // since useNamespaceParam only matches /k8s/ns/:ns/* and the fleet path.
   const activeNamespace = namespace ?? namespaceParam;
 
   const { allTemplates, allTemplatesWithRequests, error, loaded } = useAllTemplateResources({
@@ -65,7 +64,7 @@ const VirtualMachineTemplatesList: FC<ListPageProps> = ({
   } = useVirtualMachineTemplatesListFilters(allTemplates, allTemplatesWithRequests);
 
   const { activeColumnKeys, columnLayout, columns, loadedColumns } =
-    useVirtualMachineTemplatesListColumns(activeNamespace, isAllClustersPage);
+    useVirtualMachineTemplatesListColumns(activeNamespace, isAllClustersPage, cluster);
 
   if (
     !runningTourSignal.value &&
