@@ -1,17 +1,17 @@
 import { type TFunction } from 'i18next';
 
-import { UPLOAD_PROGRESS_STATUS } from './constants';
-import { type UploadsStoreSliceData } from './features/uploads/types/types';
-import { resetInFlightToastStore, useInFlightToastStore } from './inFlightToastStore';
-import { type ProgressToastState } from './shared/types/types';
+import { UPLOAD_PROGRESS_STATUS } from '../../../constants';
+import { type UploadsStoreSliceData } from '../../../features/uploads/types/types';
+import { resetInFlightToastStore, useInFlightToastStore } from '../../../inFlightToastStore';
+import { type ProgressToastState } from '../../types/types';
 import {
   replaceWithTerminalUploadToast,
   showInProgressUploadToast,
   syncUploadToasts,
 } from './uploadToastSync';
 
-jest.mock('./components/UploadProgressToastContent', () => () => <div>toast-content</div>);
-jest.mock('./toast/uploadTitles', () => ({
+jest.mock('../../progressToastUI/UploadProgressToastContent', () => () => <div>toast-content</div>);
+jest.mock('./uploadTitles', () => ({
   getUploadTitle: (_upload: ProgressToastState, t: (s: string) => string) => t('Uploading'),
   isTerminalUploadStatus: jest.fn(
     (status) => status === 'success' || status === 'error' || status === 'canceled',

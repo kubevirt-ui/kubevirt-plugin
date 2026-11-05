@@ -1,11 +1,10 @@
 import type { FC } from 'react';
 
-import { UPLOAD_PROGRESS_STATUS } from '../constants';
-import { useInFlightToastStore } from '../inFlightToastStore';
-import { type InFlightToastStoreState } from '../types';
-
-import { type ProgressToastState } from '../shared/types/types';
-import { resolveToastUpload } from '../toast/resolveToastUpload';
+import { UPLOAD_PROGRESS_STATUS } from '../../constants';
+import { useInFlightToastStore } from '../../inFlightToastStore';
+import { type InFlightProgressToastStoreSlice } from '../../types';
+import { type ProgressToastState } from '../types/types';
+import { resolveToastUpload } from '../utils/progressToastSync/resolveToastUpload';
 import UploadProgressCanceledToast from './UploadProgressCanceledToast';
 import UploadProgressErrorToast from './UploadProgressErrorToast';
 import UploadProgressSuccessToast from './UploadProgressSuccessToast';
@@ -13,7 +12,7 @@ import UploadProgressUploadingToast from './UploadProgressUploadingToast';
 
 type UploadProgressToastContentProps = {
   navigate: (path: string) => void;
-  storeSlice: keyof InFlightToastStoreState;
+  storeSlice: InFlightProgressToastStoreSlice;
   uploadKey: string;
   uploadSnapshot?: ProgressToastState;
 };

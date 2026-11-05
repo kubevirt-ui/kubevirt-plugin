@@ -2,7 +2,7 @@ import type { FC } from 'react';
 
 import { ProgressVariant } from '@patternfly/react-core';
 
-import { type ProgressToastState } from '../shared/types/types';
+import { type ProgressToastState } from '../types/types';
 import ToastLayout from './ToastLayout';
 import UploadProgressBar from './UploadProgressBar';
 import UploadProgressLinks from './UploadProgressLinks';

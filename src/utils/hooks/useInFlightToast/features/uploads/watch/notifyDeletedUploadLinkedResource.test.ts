@@ -4,16 +4,15 @@ import {
   VirtualMachineModel,
 } from '@kubevirt-ui-ext/kubevirt-api/console';
 
-import { UPLOAD_PROGRESS_STATUS } from '../constants';
-import { resetInFlightToastStore, useInFlightToastStore } from '../inFlightToastStore';
-
-import { getUploadLinkedResource } from '../completion/uploadLinkedResource';
+import { getUploadLinkedResource } from '../../../completion/uploadLinkedResource';
 import {
   getBootableVolumeUrl,
   getDataVolumeUrl,
   getVmStorageUrlForIdentity,
-} from '../completion/uploadLinks';
-import { getBootableVolumeUploadKey, getVmDiskUploadKey } from '../keys/uploadKeys';
+} from '../../../completion/uploadLinks';
+import { UPLOAD_PROGRESS_STATUS } from '../../../constants';
+import { resetInFlightToastStore, useInFlightToastStore } from '../../../inFlightToastStore';
+import { getBootableVolumeUploadKey, getVmDiskUploadKey } from '../../../keys/uploadKeys';
 import {
   isUploadLinkedResourceGone,
   notifyDeletedUploadLinkedResource,

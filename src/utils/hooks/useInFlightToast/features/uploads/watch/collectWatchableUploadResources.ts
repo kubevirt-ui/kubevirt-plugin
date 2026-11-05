@@ -1,5 +1,5 @@
-import { type UploadsStoreSliceData } from '../features/uploads/types/types';
-import { type UploadLinkedResource, type UploadSuccessLink } from '../shared/types/types';
+import { type UploadLinkedResource, type UploadSuccessLink } from '../../../shared/types/types';
+import { type UploadsStoreSliceData } from '../types/types';
 
 export const getUploadLinkedResourceWatchKey = (resource: UploadLinkedResource): string =>
   [

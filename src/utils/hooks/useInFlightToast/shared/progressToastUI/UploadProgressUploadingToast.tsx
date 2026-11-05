@@ -3,9 +3,8 @@ import type { FC } from 'react';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Flex, FlexItem } from '@patternfly/react-core';
 
-import { type InFlightToastStoreState } from '../types';
-
-import { type ProgressToastState } from '../shared/types/types';
+import { type InFlightProgressToastStoreSlice } from '../../types';
+import { type ProgressToastState } from '../types/types';
 import ToastLayout from './ToastLayout';
 import UploadProgressAbortButton from './UploadProgressAbortButton';
 import UploadProgressBar from './UploadProgressBar';
@@ -13,7 +12,7 @@ import UploadProgressLinks from './UploadProgressLinks';
 
 type UploadProgressUploadingToastProps = {
   navigate: (path: string) => void;
-  storeSlice: keyof InFlightToastStoreState;
+  storeSlice: InFlightProgressToastStoreSlice;
   upload: ProgressToastState;
   uploadKey: string;
 };

@@ -1,8 +1,7 @@
 import { type FC } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 
-import { useInFlightToastStore } from '../inFlightToastStore';
-
+import { useInFlightToastStore } from '../../../inFlightToastStore';
 import {
   collectWatchableUploadResources,
   getUploadLinkedResourceWatchKey,

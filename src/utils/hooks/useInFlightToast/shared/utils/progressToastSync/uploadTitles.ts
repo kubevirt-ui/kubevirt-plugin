@@ -1,8 +1,8 @@
 import type { TFunction } from 'i18next';
 
-import { UPLOAD_PROGRESS_STATUS } from '../constants';
+import { UPLOAD_PROGRESS_STATUS } from '@kubevirt-utils/hooks/useInFlightToast/constants';
 
-import { type ProgressToastState, type UploadProgressStatus } from '../shared/types/types';
+import { type ProgressToastState, type UploadProgressStatus } from '../../types/types';
 
 export const isTerminalUploadStatus = (status?: UploadProgressStatus): boolean =>
   status === UPLOAD_PROGRESS_STATUS.SUCCESS ||
