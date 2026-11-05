@@ -2,6 +2,7 @@ import { dismissConsoleObstructions } from '@/utils/console-modals';
 import { ConsoleRoutes } from '@/utils/console-routes';
 import { KUBEVIRT_INSTANCETYPE_API_VERSION } from '@/utils/constants';
 import { waitForConsoleRouteReady } from '@/utils/instance-types-policy';
+import { isOpenShiftMajorMinor } from '@/utils/openshift-version';
 import { fillLabelsModalInput } from '@/utils/resource-summary';
 import { MINUTE, TestTimeouts } from '@/utils/test-config';
 import type { Locator } from '@playwright/test';
@@ -70,8 +71,24 @@ export class InstanceTypesPage extends ResourceListPage {
   }
 
   async createFromYaml(manifestYaml?: string): Promise<void> {
-    await this.openCreateDropdown(/Create VirtualMachineInstancetype|Create/i);
-    await this.createFromYamlAndSubmit(manifestYaml);
+    if (isOpenShiftMajorMinor('4.13')) {
+      await this.openCreateDropdown(/Create VirtualMachineInstancetype|Create/i);
+      await this.createFromYamlAndSubmit(manifestYaml);
+    } else {
+      // Skewed console: Create is a direct ~new link/button (no "With YAML" menuitem).
+      const directCreate = this.page
+        .getByRole('link', { name: /Create VirtualMachineInstancetype/i })
+        .or(this.page.getByRole('button', { name: /Create VirtualMachineInstancetype/i }))
+        .or(this.page.getByRole('link', { name: /^Create$/i }))
+        .or(this.page.getByRole('button', { name: /^Create$/i }))
+        .first();
+      if (await directCreate.isVisible().catch(() => false)) {
+        await directCreate.click();
+      } else {
+        await this.openCreateDropdown(/Create VirtualMachineInstancetype|Create/i);
+      }
+      await this.createFromYamlAndSubmit(manifestYaml, { selectFromMenu: false });
+    }
     await this.waitForResourceDetailUrl(
       new RegExp(
         `${instancetypeConsoleSegment.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}~VirtualMachineInstancetype/[^/]+(?:/|$)`,

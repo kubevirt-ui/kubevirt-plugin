@@ -4,10 +4,25 @@ import { expect, test } from '@/fixtures/templates-fixture';
 import { CRUD_NAMES, TEMPLATE_RHEL9 } from '@/utils/constants';
 import { verifyOpenshiftTemplateCreated } from '@/utils/creation-verification';
 import { openshiftTemplateImportYaml } from '@/utils/manifests';
+import { isOpenShiftMajorMinor } from '@/utils/openshift-version';
 import { generateNameWithBase, generateRandomLabel } from '@/utils/random-data-generator';
 import { MINUTE, TestTimeouts } from '@/utils/test-config';
 
+/**
+ * Templates list React-crashes under OC/console skew (e.g. HC clamped OCP 4.18 +
+ * origin-console:4.18 with a release-4.13 plugin). Run these UI tests only when
+ * live ClusterVersion major.minor is 4.13 (matching downstream).
+ */
+const skipTemplatesUiUnlessOcp413 = () => {
+  test.skip(
+    !isOpenShiftMajorMinor('4.13'),
+    'Templates UI requires matching OCP 4.13 (skipped under OC/console skew)',
+  );
+};
+
 test.describe(`Templates read ${ROUTE_VM_TEMPLATES_TAG} ${GATING_TAG}`, () => {
+  test.beforeEach(skipTemplatesUiUnlessOcp413);
+
   test('VirtualMachine Templates list loads with catalog templates', async ({
     templatesPage,
     nav,
@@ -30,6 +45,8 @@ test.describe(`Templates read ${ROUTE_VM_TEMPLATES_TAG} ${GATING_TAG}`, () => {
 });
 
 test.describe(`Templates gating create from YAML ${ROUTE_VM_TEMPLATES_TAG} ${GATING_TAG} ${ADMIN_ONLY_TAG}`, () => {
+  test.beforeEach(skipTemplatesUiUnlessOcp413);
+
   test('Create Template with import YAML', async ({ templatesPage, testNamespace, apiClient }) => {
     const name = generateNameWithBase(`${CRUD_NAMES.templateE2e}-gating`, 50);
 
@@ -57,6 +74,8 @@ test.describe(`Templates gating create from YAML ${ROUTE_VM_TEMPLATES_TAG} ${GAT
 });
 
 test.describe(`Templates CRUD from YAML ${ROUTE_VM_TEMPLATES_TAG} ${T1_TAG} ${ADMIN_ONLY_TAG}`, () => {
+  test.beforeEach(skipTemplatesUiUnlessOcp413);
+
   test('Create Template with YAML and delete in UI', async ({
     templatesPage,
     testNamespace,
@@ -96,6 +115,8 @@ test.describe(`Templates CRUD from YAML ${ROUTE_VM_TEMPLATES_TAG} ${T1_TAG} ${AD
 });
 
 test.describe(`Templates UI update and delete ${ROUTE_VM_TEMPLATES_TAG} ${T1_TAG} ${ADMIN_ONLY_TAG}`, () => {
+  test.beforeEach(skipTemplatesUiUnlessOcp413);
+
   test('Update Template labels in UI', async ({ templatesPage, testNamespace, apiClient }) => {
     const name = generateNameWithBase(CRUD_NAMES.templateE2e, 50);
     const label = generateRandomLabel('e2e');
@@ -126,6 +147,8 @@ test.describe(`Templates UI update and delete ${ROUTE_VM_TEMPLATES_TAG} ${T1_TAG
 });
 
 test.describe(`Templates column management ${ROUTE_VM_TEMPLATES_TAG} ${T2_TAG} ${ADMIN_ONLY_TAG}`, () => {
+  test.beforeEach(skipTemplatesUiUnlessOcp413);
+
   test('ID(CNV-9329) Template list column management opens', async ({ templatesPage, nav }) => {
     await nav.goToTemplates();
     await templatesPage.goToList();

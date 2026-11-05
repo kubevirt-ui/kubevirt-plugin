@@ -8,6 +8,7 @@ import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/Virtua
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { createVmSSHSecret } from '@kubevirt-utils/components/CloudinitModal/utils/cloudinit-utils';
+import { RUNSTRATEGY_ALWAYS, RUNSTRATEGY_HALTED } from '@kubevirt-utils/constants/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getResourceUrl } from '@kubevirt-utils/resources/shared';
 import { getPVC } from '@kubevirt-utils/resources/template/hooks/useVmTemplateSource/utils';
@@ -73,7 +74,9 @@ const CreateVMFooter: FC<CreateVMFooterProps> = ({
     );
 
     const vmToCreate = produce(vm, (draftVM) => {
-      draftVM.spec.running = startVM;
+      // Prefer runStrategy over deprecated spec.running (CNV-45435); both fields together are rejected.
+      delete draftVM.spec.running;
+      draftVM.spec.runStrategy = startVM ? RUNSTRATEGY_ALWAYS : RUNSTRATEGY_HALTED;
       draftVM.spec.dataVolumeTemplates[0].spec.storage.resources.requests.storage =
         pvc?.spec?.resources?.requests?.storage;
       if (sshSecretCredentials?.sshSecretName) {

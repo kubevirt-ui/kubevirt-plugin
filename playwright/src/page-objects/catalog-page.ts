@@ -691,6 +691,130 @@ export class CatalogPage extends BasePage {
     await this.confirmQuickCreateBootSourceAndWaitForVm();
   }
 
+  private async closeTemplateDrawerIfOpen(): Promise<void> {
+    const drawer = this.templateDrawer();
+    const closeDrawer = drawer.getByRole('button', { name: /^Close$/i });
+    if (await closeDrawer.isVisible().catch(() => false)) {
+      await closeDrawer.click();
+      await drawer
+        .waitFor({ state: 'hidden', timeout: TestTimeouts.ELEMENT_WAIT })
+        .catch(() => undefined);
+    }
+  }
+
+  /** Name field inside the template drawer only (avoids legacy toolbar/modal). */
+  private templateDrawerVmNameInput(): Locator {
+    const drawer = this.templateDrawer();
+    return drawer
+      .locator('[data-test-id="template-catalog-vm-name-input"]')
+      .or(drawer.getByRole('textbox', { name: /virtualmachine name/i }))
+      .first();
+  }
+
+  private async fillTemplateDrawerVmName(vmName: string): Promise<void> {
+    const input = this.templateDrawerVmNameInput();
+    await input.waitFor({ state: 'visible', timeout: TestTimeouts.LONG_OPERATION });
+    await pollUntil(
+      async () => {
+        try {
+          await this.waitForVmNameFieldToSettle(input);
+          await input.fill(vmName, { timeout: TestTimeouts.ELEMENT_WAIT });
+          await input.blur();
+          return (await input.inputValue()) === vmName;
+        } catch {
+          return false;
+        }
+      },
+      {
+        message: `Template drawer VM name field did not accept value "${vmName}"`,
+        timeout: TestTimeouts.LONG_OPERATION,
+      },
+    );
+  }
+
+  private async assertDrawerCreateNamespace(namespace: string): Promise<void> {
+    if (this.namespaceFromCurrentUrl() !== namespace) {
+      throw new Error(
+        `Catalog route ns is "${this.namespaceFromCurrentUrl()}" before submit; expected "${namespace}"`,
+      );
+    }
+    // Drawer shows read-only Project = route ns next to the name field.
+    const projectGroup = this.templateDrawer()
+      .locator('.pf-c-description-list__group, .pf-v5-c-description-list__group')
+      .filter({ hasText: /^Project/i })
+      .first();
+    if (await projectGroup.isVisible().catch(() => false)) {
+      const text = ((await projectGroup.textContent().catch(() => '')) || '').trim();
+      if (!text.includes(namespace)) {
+        throw new Error(
+          `Drawer Project is "${text}" before submit; expected "${namespace}" ` +
+            '(quick-create uses route ns and would create in the wrong project)',
+        );
+      }
+      return;
+    }
+    const drawerHasNs = await this.templateDrawer()
+      .getByText(namespace, { exact: true })
+      .isVisible()
+      .catch(() => false);
+    if (!drawerHasNs) {
+      throw new Error(
+        `Drawer does not show Project "${namespace}" before submit (url=${this.page.url()})`,
+      );
+    }
+  }
+
+  /**
+   * Quick-create from the templates-catalog drawer with route-ns enforcement.
+   * Product create uses URL `ns` (fallback `default`); project-bar sync alone is not enough.
+   * Drawer-only submit — never calls ensureQuickCreateNameInputVisible / openLegacyQuickCreateModal
+   * (those fall through to the toolbar path that follows the project bar → often `default`).
+   */
+  async quickCreateVmFromTemplateInNamespace(
+    namespace: string,
+    templateMetadataName: string,
+    vmName: string,
+  ): Promise<void> {
+    const openSelectAndAssertNs = async (): Promise<void> => {
+      await this.openCatalogInNamespace(namespace);
+      await this.waitForCatalogInNamespace(namespace);
+      await this.selectTemplateByMetadataName(templateMetadataName);
+      await this.templateDrawer().waitFor({
+        state: 'visible',
+        timeout: TestTimeouts.LONG_OPERATION,
+      });
+    };
+
+    await openSelectAndAssertNs();
+
+    if (this.namespaceFromCurrentUrl() !== namespace) {
+      await this.closeTemplateDrawerIfOpen();
+      await openSelectAndAssertNs();
+    }
+
+    if (this.namespaceFromCurrentUrl() !== namespace) {
+      throw new Error(
+        `Catalog route ns drifted to "${this.namespaceFromCurrentUrl()}" after reopen; ` +
+          `expected "${namespace}" (quick-create would land in the wrong project)`,
+      );
+    }
+
+    // Wait for drawer footer form (not ensureQuickCreateNameInputVisible — that opens legacy modal).
+    await this.templateDrawerVmNameInput().waitFor({
+      state: 'visible',
+      timeout: TestTimeouts.LONG_OPERATION,
+    });
+    await this.fillTemplateDrawerVmName(vmName);
+    await this.assertDrawerCreateNamespace(namespace);
+    const drawerSubmit = this.templateDrawerQuickCreateButton();
+    await pollUntil(async () => await drawerSubmit.isEnabled().catch(() => false), {
+      message: 'Template drawer Quick create VirtualMachine did not become enabled',
+      timeout: TestTimeouts.LONG_OPERATION,
+    });
+    await this.robustClick(drawerSubmit);
+    await this.confirmQuickCreateBootSourceAndWaitForVm();
+  }
+
   async quickCreateVm(vmName: string): Promise<void> {
     if (
       await this.legacyQuickCreateModalHeading()

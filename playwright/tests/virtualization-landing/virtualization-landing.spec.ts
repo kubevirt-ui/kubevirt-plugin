@@ -9,6 +9,7 @@ import { ROUTE_VIRTUALIZATION_LANDING_TAG } from '@/data-models/route-tags';
 import { expect, test } from '@/fixtures/virtualization-landing-fixture';
 import { OVERVIEW_HORIZONTAL_SUB_NAV_TABS } from '@/page-objects/overview-page';
 import { TEMPLATE_RHEL9 } from '@/utils/constants';
+import { isOpenShiftMajorMinor } from '@/utils/openshift-version';
 import { MINUTE, TestTimeouts } from '@/utils/test-config';
 
 test.describe(`Virtualization navigation smoke ${ROUTE_VIRTUALIZATION_LANDING_TAG} ${GATING_TAG}`, () => {
@@ -18,7 +19,11 @@ test.describe(`Virtualization navigation smoke ${ROUTE_VIRTUALIZATION_LANDING_TA
     await expect(overviewPage.statusCard()).toBeVisible({ timeout: 2 * MINUTE });
     await nav.goToCatalog();
     await nav.goToVirtualMachines();
-    await nav.goToTemplates();
+    // Templates list React-crashes under OC/console skew (HC OCP 4.18 + 4.13 plugin).
+    // Only navigate there when ClusterVersion is matching OCP 4.13 (d/s).
+    if (isOpenShiftMajorMinor('4.13')) {
+      await nav.goToTemplates();
+    }
     await nav.goToDataSources();
     await nav.goToMigrationPolicies();
   });
