@@ -7,8 +7,23 @@ import {
   provisionMigratableVmWithNad,
   teardownMigratableVmWithNad,
 } from '@/utils/network-test-data';
+import { isOpenShiftMajorMinor } from '@/utils/openshift-version';
+
+/**
+ * Configuration → Network React-crashes under OC/console skew (HC OCP 4.18 +
+ * origin-console:4.18 with a release-4.13 plugin: "Oh no! Something went wrong.").
+ * Run only when live ClusterVersion major.minor is 4.13 (matching downstream).
+ */
+const skipNetworkUiUnlessOcp413 = () => {
+  test.skip(
+    !isOpenShiftMajorMinor('4.13'),
+    'VM Network/Configuration UI requires matching OCP 4.13 (skipped under OC/console skew)',
+  );
+};
 
 test.describe(`VM network interfaces read ${ROUTE_VIRTUAL_MACHINES_DETAIL_NETWORK_ROUTE_TAGS} ${GATING_TAG}`, () => {
+  test.beforeEach(skipNetworkUiUnlessOcp413);
+
   test('Network interfaces tab lists pod NIC and add action', async ({
     vmDetailPage: vmDetail,
     vmNetworkInterfacesPage: networks,
@@ -33,6 +48,8 @@ test.describe(`VM network interfaces read ${ROUTE_VIRTUAL_MACHINES_DETAIL_NETWOR
 });
 
 test.describe(`VM network interfaces Multus CRUD ${ROUTE_VIRTUAL_MACHINES_DETAIL_NETWORK_ROUTE_TAGS} ${T1_TAG} ${NON_PRIV_TAG}`, () => {
+  test.beforeEach(skipNetworkUiUnlessOcp413);
+
   test('Add a network interface and delete the created NIC', async ({
     vmDetailPage: vmDetail,
     vmNetworkInterfacesPage: networks,
@@ -55,6 +72,8 @@ test.describe(`VM network interfaces Multus CRUD ${ROUTE_VIRTUAL_MACHINES_DETAIL
 });
 
 test.describe(`VM network interfaces Multus ${ROUTE_VIRTUAL_MACHINES_DETAIL_NETWORK_ROUTE_TAGS} ${T2_TAG}`, () => {
+  test.beforeEach(skipNetworkUiUnlessOcp413);
+
   test('Add a network interface and delete the created NIC', async ({
     vmDetailPage: vmDetail,
     vmNetworkInterfacesPage: networks,

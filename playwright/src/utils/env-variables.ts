@@ -33,7 +33,35 @@ export class EnvVariables {
   }
 
   static get clusterUrl(): string {
-    return process.env.CLUSTER_URL || deriveClusterUrlFromConsole(EnvVariables.webConsoleUrl) || '';
+    if (process.env.CLUSTER_URL) {
+      return process.env.CLUSTER_URL;
+    }
+    if (process.env.OPENSHIFT_CLUSTER_URL) {
+      return process.env.OPENSHIFT_CLUSTER_URL;
+    }
+
+    // In-cluster ARC / HC runners: derive API URL from the pod service env.
+    const k8sHost = process.env.KUBERNETES_SERVICE_HOST;
+    if (k8sHost) {
+      const port =
+        process.env.KUBERNETES_SERVICE_PORT_HTTPS || process.env.KUBERNETES_SERVICE_PORT || '443';
+      const formatted =
+        k8sHost.includes(':') && !k8sHost.startsWith('[') ? `[${k8sHost}]` : k8sHost;
+      return `https://${formatted}:${port}`;
+    }
+
+    const fromConsole = deriveClusterUrlFromConsole(EnvVariables.webConsoleUrl);
+    if (fromConsole) {
+      return fromConsole;
+    }
+
+    const clusterName = process.env.CLUSTER_NAME;
+    const clusterDomain = process.env.CLUSTER_DOMAIN;
+    if (clusterName && clusterDomain) {
+      return `https://api.${clusterName}.${clusterDomain}:6443`;
+    }
+
+    return '';
   }
 
   static get username(): string {
@@ -74,6 +102,19 @@ export class EnvVariables {
     return process.env.DEBUG === '1' || Boolean(process.env.DEBUG_MODE);
   }
 
+  /**
+   * Hot-cluster E2E (`HC_E2E=true` from playwright-runner-hc-e2e.sh) or in-cluster
+   * runner (`KUBERNETES_SERVICE_HOST`). Uses ServiceAccount / auth-disabled console
+   * rather than browser OAuth + kubeadmin password.
+   */
+  static get isHcE2e(): boolean {
+    return (
+      process.env.HC_E2E === 'true' ||
+      process.env.HC_E2E === '1' ||
+      Boolean(process.env.KUBERNETES_SERVICE_HOST)
+    );
+  }
+
   static get isLocalhost(): boolean {
     return EnvVariables.webConsoleUrl.includes('localhost');
   }
@@ -85,6 +126,21 @@ export class EnvVariables {
       process.env.IS_LOCAL?.toLowerCase() === 'true' ||
       EnvVariables.isLocalhost
     );
+  }
+
+  /**
+   * True when the console URL does not require OAuth login — HC_E2E mode
+   * (ServiceAccount auth), localhost, or an HTTP (non-TLS) in-cluster console
+   * service that has no OAuth proxy.
+   */
+  static get isSkipBrowserLogin(): boolean {
+    if (EnvVariables.isHcE2e) {
+      return true;
+    }
+    if (EnvVariables.isLocalhost) {
+      return true;
+    }
+    return EnvVariables.webConsoleUrl.startsWith('http://');
   }
 
   /**

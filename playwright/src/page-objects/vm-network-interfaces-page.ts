@@ -14,8 +14,8 @@ export class VmNetworkInterfacesPage extends BasePage {
   }
 
   addNetworkInterfaceButton(): Locator {
+    // Configuration → Network may not expose a tabpanel named "Network interfaces".
     return this.page
-      .getByRole('tabpanel', { name: /Network interfaces/i })
       .getByRole('button', { name: /Add network interface/i })
       .or(this.page.locator('.add-network-interface-button'))
       .or(
@@ -44,7 +44,10 @@ export class VmNetworkInterfacesPage extends BasePage {
   }
 
   podNetworkingCell(): Locator {
-    return this.page.getByRole('gridcell', { name: 'Pod networking' });
+    return this.page
+      .getByRole('gridcell', { name: /Pod networking|Pod network/i })
+      .or(this.page.getByText(/Pod networking|Pod network/i))
+      .first();
   }
 
   networkAttachmentCell(nadName: string): Locator {
@@ -214,6 +217,8 @@ export class VmNetworkInterfacesPage extends BasePage {
   async waitForNetworkTabReady(): Promise<void> {
     await this.addNetworkInterfaceButton()
       .or(this.podNetworkingCell())
+      .or(this.page.locator('[data-test="vm-configuration-network"]'))
+      .or(this.page.locator('.network-interface-list-page'))
       .first()
       .waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
     await this.page.waitForTimeout(TestTimeouts.UI_DELAY_EXTRA);
