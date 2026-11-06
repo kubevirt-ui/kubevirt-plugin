@@ -1,4 +1,5 @@
 import { LoginPage } from '@/page-objects/cluster/login-page';
+import { ensureNonPrivAdministratorPerspective } from '@/utils/console-perspective';
 import { EnvVariables } from '@/utils/env-variables';
 import { logger } from '@/utils/logger';
 import { NONPRIV_IDP_NAME } from '@/utils/nonpriv-user-setup';
@@ -87,6 +88,7 @@ export async function loginToOpenShiftConsole(page: Page, baseURL: string): Prom
 
   if (authDisabled) {
     await waitForConsoleReady(page, baseURL);
+    await ensureNonPrivAdministratorPerspective(page);
     return;
   }
 
@@ -122,6 +124,7 @@ export async function loginToOpenShiftConsole(page: Page, baseURL: string): Prom
   }
 
   await waitForConsoleReady(page, baseURL);
+  await ensureNonPrivAdministratorPerspective(page);
 }
 
 export async function saveStorageState(

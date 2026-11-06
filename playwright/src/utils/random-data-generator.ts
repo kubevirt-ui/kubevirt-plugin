@@ -8,8 +8,16 @@ import { generateKeyPairSync } from 'node:crypto';
 /** OpenSSH ed25519 public key line for catalog SSH UI tests (private key discarded). */
 export function generateEd25519SshPublicKey(comment = 'e2e@kubevirt-plugin'): string {
   const { publicKey } = generateKeyPairSync('ed25519');
-  const line = publicKey.export({ format: 'openssh', type: 'spki' }).toString('utf8').trim();
-  return `${line} ${comment}`;
+  const der = publicKey.export({ format: 'der', type: 'spki' });
+  const raw = der.subarray(der.length - 32);
+  const type = Buffer.from('ssh-ed25519');
+  const blob = Buffer.concat([
+    Buffer.from([0, 0, 0, type.length]),
+    type,
+    Buffer.from([0, 0, 0, raw.length]),
+    raw,
+  ]);
+  return `ssh-ed25519 ${blob.toString('base64')} ${comment}`;
 }
 
 export function generateRandomPassword(length = 12): string {
