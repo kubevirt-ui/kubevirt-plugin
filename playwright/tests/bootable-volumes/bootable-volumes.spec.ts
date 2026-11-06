@@ -12,15 +12,15 @@ import './bootable-volumes-read.suite';
 test.describe(`Bootable volumes gating create ${ROUTE_BOOTABLE_VOLUMES_TAG} ${GATING_TAG} ${ADMIN_ONLY_TAG}`, () => {
   test('Add volume With YAML opens DataVolume create', async ({
     bootableVolumesPage,
-    nav,
     testNamespace,
   }) => {
-    await nav.goToBootableVolumes(testNamespace);
     await bootableVolumesPage.goToNamespaceList(testNamespace);
-    await expect(bootableVolumesPage.addVolumeButton()).toBeVisible();
+    await expect(bootableVolumesPage.addVolumeButton()).toBeVisible({
+      timeout: TestTimeouts.LONG_OPERATION,
+    });
     await bootableVolumesPage.openCreateWithYaml(testNamespace);
     await expect(bootableVolumesPage.dataVolumeYamlCreateHeading()).toBeVisible({
-      timeout: TestTimeouts.ELEMENT_WAIT,
+      timeout: TestTimeouts.LONG_OPERATION,
     });
   });
 

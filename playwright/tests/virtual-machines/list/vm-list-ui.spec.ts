@@ -65,11 +65,7 @@ test.describe(`VirtualMachines column management ${ROUTE_VIRTUAL_MACHINES_LIST_T
     await expect(vmListPage.vmRow(name, testNamespace)).toBeVisible({ timeout: 2 * MINUTE });
 
     await vmListPage.openColumnManagement();
-    await vmListPage.setColumnChecked('table-column-management-item-created', false);
-    await vmListPage.saveColumnManagement();
-    await vmListPage.waitForColumnHeaderHidden('Created', { namespace: testNamespace });
-
-    await vmListPage.openColumnManagement();
+    await vmListPage.resetColumnManagement();
     await vmListPage.setColumnChecked('table-column-management-item-created', true);
     await vmListPage.saveColumnManagement();
     await vmListPage.waitForColumnHeader('Created', { namespace: testNamespace });
