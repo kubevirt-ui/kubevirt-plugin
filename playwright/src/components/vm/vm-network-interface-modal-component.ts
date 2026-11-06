@@ -21,15 +21,21 @@ export class VmNetworkInterfaceModalComponent extends BaseComponent {
   }
 
   private legacyNetworkSelectToggle(dialog: Locator): Locator {
-    return this.networkSelectRoot(dialog).locator('#network-attachment-definition button').first();
+    return dialog.locator('#network-attachment-definition button').first();
   }
 
   private networkSelectRoot(dialog: Locator): Locator {
     return dialog.locator('[data-test-id="network-attachment-definition-select"]');
   }
 
+  /** Newer PF SelectTypeahead (combobox). Absent on 4.17 FormPFSelect MenuToggle. */
   private typeaheadCombobox(dialog: Locator): Locator {
     return dialog.getByRole('combobox').first();
+  }
+
+  /** FormPFSelect / MenuToggle under `network-attachment-definition-select`. */
+  private wizardNetworkSelectToggle(dialog: Locator): Locator {
+    return this.networkSelectRoot(dialog).locator('button').first();
   }
 
   private networkAttachmentDefinitionOption(dialog: Locator, nadName: string): Locator {
@@ -64,30 +70,30 @@ export class VmNetworkInterfaceModalComponent extends BaseComponent {
     return dialog.getByRole('button', { name: /^Save$/ });
   }
 
-  /** Catalog review (PF Select) vs VM detail (SelectTypeahead / legacy MenuToggle). */
+  /** Combobox (newer) or FormPFSelect / MenuToggle button (4.17). */
+  private anyNetworkFieldToggle(dialog: Locator): Locator {
+    return this.typeaheadCombobox(dialog)
+      .or(this.wizardNetworkSelectToggle(dialog))
+      .or(this.legacyNetworkSelectToggle(dialog))
+      .or(this.pfNetworkOptionsMenuToggle(dialog));
+  }
+
+  /** Catalog review (PF Select MenuToggle) vs newer SelectTypeahead combobox. */
   private async visibleNetworkFieldToggle(dialog: Locator): Promise<Locator> {
     await this.waitForNetworkSelectReady(dialog);
-    const combobox = this.typeaheadCombobox(dialog);
-    if (await combobox.isVisible().catch(() => false)) {
-      return combobox;
-    }
-    const legacy = this.legacyNetworkSelectToggle(dialog);
-    if (await legacy.isVisible().catch(() => false)) {
-      return legacy;
-    }
-    return this.pfNetworkOptionsMenuToggle(dialog);
+    return this.anyNetworkFieldToggle(dialog).first();
   }
 
   private async waitForNetworkSelectReady(dialog: Locator): Promise<void> {
     await dialog
-      .locator('.pf-c-spinner, .pf-v6-c-spinner, .loading-skeleton')
+      .locator('.pf-c-spinner, .pf-v5-c-spinner, .pf-v6-c-spinner, .loading-skeleton')
       .first()
       .waitFor({ state: 'hidden', timeout: TestTimeouts.ELEMENT_WAIT })
       .catch(() => undefined);
-    await this.typeaheadCombobox(dialog).waitFor({
-      state: 'visible',
-      timeout: TestTimeouts.ELEMENT_WAIT,
-    });
+
+    await this.anyNetworkFieldToggle(dialog)
+      .first()
+      .waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
   }
 
   private async readNetworkFieldValue(field: Locator): Promise<string> {
