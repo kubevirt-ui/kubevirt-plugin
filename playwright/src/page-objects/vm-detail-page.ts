@@ -84,6 +84,13 @@ export class VmDetailPage extends BasePage {
   }
 
   private async openConfigurationInnerTab(innerKey: string): Promise<void> {
+    // Direct /configuration/storage loads often hit the console "Out-of-order effect"
+    // error boundary — always enter Storage via the details→tab recovery path.
+    if (innerKey === 'storage') {
+      await this.goToStorageTabWithRecovery();
+      return;
+    }
+
     await this.recoverConsoleCrashPage();
     const base = this.vmDetailBasePath();
     if (!base) {
