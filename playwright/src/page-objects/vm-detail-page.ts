@@ -84,6 +84,7 @@ export class VmDetailPage extends BasePage {
   }
 
   private async openConfigurationInnerTab(innerKey: string): Promise<void> {
+    await this.recoverConsoleCrashPage();
     const base = this.vmDetailBasePath();
     if (!base) {
       throw new Error(
@@ -123,6 +124,8 @@ export class VmDetailPage extends BasePage {
         timeout: TestTimeouts.LONG_OPERATION,
       },
     );
+
+    await this.recoverConsoleCrashPage();
 
     if (legacyTab && (await legacyTab.isVisible().catch(() => false))) {
       const label = (await legacyTab.textContent())?.trim();
@@ -435,8 +438,8 @@ export class VmDetailPage extends BasePage {
       await this.navigateToTab(envLink);
       return;
     }
-    // release-4.19: Environment editor lives under Configuration → Storage.
-    await this.openConfigurationInnerTab('storage');
+    // release-4.19+: Environment editor lives under Configuration → Storage.
+    await this.goToStorageTabWithRecovery();
     await pollUntil(
       async () =>
         await this.page
@@ -449,6 +452,88 @@ export class VmDetailPage extends BasePage {
         timeout: TestTimeouts.LONG_OPERATION,
       },
     );
+  }
+
+  /** Storage inner tab can hit the console "Out-of-order effect" error boundary on direct /configuration/storage loads. */
+  async goToStorageTabWithRecovery(): Promise<void> {
+    const base = this.vmDetailBasePath();
+    if (!base) {
+      throw new Error(`Cannot open storage tab — not on VM detail (${this.page.url()})`);
+    }
+    const storageReady = async (): Promise<boolean> => {
+      if (!/\/configuration\/storage/.test(this.page.url())) {
+        return false;
+      }
+      if (
+        await this.page
+          .locator('.disk-source-select')
+          .first()
+          .isVisible()
+          .catch(() => false)
+      ) {
+        return true;
+      }
+      return await this.page
+        .getByText(/rootdisk/i)
+        .first()
+        .isVisible()
+        .catch(() => false);
+    };
+
+    for (let attempt = 0; attempt < 8; attempt++) {
+      await dismissConsoleObstructions(this.page);
+      await this.recoverConsoleCrashPage();
+      await this.page.goto(`${base}/configuration/details`, { waitUntil: 'domcontentloaded' });
+      await dismissConsoleObstructions(this.page);
+      try {
+        await pollUntil(
+          async () => {
+            if (
+              await this.page
+                .getByRole('heading', { name: /Something wrong happened/i })
+                .isVisible()
+                .catch(() => false)
+            ) {
+              return false;
+            }
+            const innerTab = this.configurationInnerTab('storage');
+            const legacyTab = this.legacyConfigurationSubTab('storage');
+            return (
+              (await innerTab.isVisible().catch(() => false)) ||
+              Boolean(legacyTab && (await legacyTab.isVisible().catch(() => false))) ||
+              (await this.page
+                .getByRole('tab', { name: /^Storage$/i })
+                .isVisible()
+                .catch(() => false))
+            );
+          },
+          {
+            message: 'Configuration inner tabs should render',
+            timeout: TestTimeouts.CONSOLE_PAGE_LOAD,
+          },
+        );
+      } catch {
+        await this.recoverConsoleCrashPage();
+      }
+      const innerTab = this.configurationInnerTab('storage');
+      const legacyTab = this.legacyConfigurationSubTab('storage');
+      if (await innerTab.isVisible().catch(() => false)) {
+        await this.navigateToTab(innerTab);
+      } else if (legacyTab && (await legacyTab.isVisible().catch(() => false))) {
+        await this.navigateToTab(legacyTab);
+      } else {
+        await this.page
+          .getByRole('tab', { name: /^Storage$/i })
+          .click()
+          .catch(() => undefined);
+      }
+      await this.recoverConsoleCrashPage();
+      if (await storageReady()) {
+        return;
+      }
+      await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
+    }
+    throw new Error(`Storage configuration tab did not load (${this.page.url()})`);
   }
 
   async goToInitialRunTab(): Promise<void> {
@@ -715,7 +800,7 @@ export class VmDetailPage extends BasePage {
   }
 
   async navigateToDisksTab(): Promise<void> {
-    await this.openConfigurationInnerTab('storage');
+    await this.goToStorageTabWithRecovery();
   }
 
   async navigateToMetadataTab(): Promise<void> {
