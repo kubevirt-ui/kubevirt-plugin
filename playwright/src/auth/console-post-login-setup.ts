@@ -34,8 +34,8 @@ export async function runConsolePostLoginSetup(
       await patchConsoleUserSettingsViaConsoleProxy(apiContext, origin, options.userSettingsKey, {
         csrfToken,
       });
+      await patchKubevirtUserSettingsHideWelcomeViaConsoleProxy(apiContext, origin, { csrfToken });
     }
-    await patchKubevirtUserSettingsHideWelcomeViaConsoleProxy(apiContext, origin, { csrfToken });
   } finally {
     await apiContext.dispose();
   }

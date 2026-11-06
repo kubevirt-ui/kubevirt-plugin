@@ -1,4 +1,8 @@
-import { patchConsoleUserSettings, pinKubeconfigToProcess } from '@/utils/cluster-oc';
+import {
+  patchConsoleUserSettings,
+  patchKubevirtUserSettingsHideWelcomeForUser,
+  pinKubeconfigToProcess,
+} from '@/utils/cluster-oc';
 import { enableInstanceTypesDeveloperPreviewOnCluster } from '@/utils/kubevirt-ui-features';
 
 /**
@@ -12,4 +16,5 @@ export async function runAdminOcConfigMapSetup(
   pinKubeconfigToProcess(kubeconfigPath);
   await enableInstanceTypesDeveloperPreviewOnCluster({ cnvNamespace: options.cnvNamespace });
   patchConsoleUserSettings(kubeconfigPath, options.userSettingsKey);
+  patchKubevirtUserSettingsHideWelcomeForUser(kubeconfigPath, options.userSettingsKey);
 }
