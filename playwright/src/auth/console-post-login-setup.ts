@@ -12,6 +12,9 @@ export async function runConsolePostLoginSetup(
   consoleOrigin: string,
   options: { cnvNamespace?: string; userSettingsKey: string },
 ): Promise<void> {
+  if (EnvVariables.isNonPrivUser) {
+    return;
+  }
   const origin = consoleOrigin.replace(/\/$/, '');
   const storageState = await context.storageState();
   const csrfToken = csrfTokenFromPlaywrightCookies(storageState.cookies);
@@ -34,8 +37,8 @@ export async function runConsolePostLoginSetup(
       await patchConsoleUserSettingsViaConsoleProxy(apiContext, origin, options.userSettingsKey, {
         csrfToken,
       });
+      await patchKubevirtUserSettingsHideWelcomeViaConsoleProxy(apiContext, origin, { csrfToken });
     }
-    await patchKubevirtUserSettingsHideWelcomeViaConsoleProxy(apiContext, origin, { csrfToken });
   } finally {
     await apiContext.dispose();
   }

@@ -20,6 +20,7 @@ export const ConsoleRoutes = {
   checkupsNetworkForm: (namespace: string) => `/k8s/ns/${namespace}/checkups/network/form`,
   checkupsStorage: (namespace: string) => `/k8s/ns/${namespace}/checkups/storage`,
   checkupsStorageForm: (namespace: string) => `/k8s/ns/${namespace}/checkups/storage/form`,
+  clusterProjects: () => '/k8s/cluster/projects',
   clusterInstanceTypes: () =>
     `/k8s/all-namespaces/${instancetypeConsoleSegment}~VirtualMachineClusterInstancetype`,
   clusterPreferences: () =>

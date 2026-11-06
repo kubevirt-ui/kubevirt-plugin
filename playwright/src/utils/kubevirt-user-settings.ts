@@ -1,3 +1,4 @@
+import { clusterKubernetesJson } from '@/utils/cluster-kubernetes-api';
 import {
   type ConsoleProxyRequestOptions,
   getConsoleKubernetesProxyHeaders,
@@ -6,6 +7,85 @@ import type { APIRequestContext } from '@playwright/test';
 
 const KUBEVIRT_USER_SETTINGS_NAMESPACE = 'default';
 const KUBEVIRT_USER_SETTINGS_CONFIG_MAP = 'kubevirt-user-settings';
+const USER_SETTINGS_ROLE_NAME = 'kubevirt-user-settings-reader';
+const USER_SETTINGS_ROLE_BINDING_NAME = 'kubevirt-user-settings-reader-binding';
+
+async function createNamespacedResource(
+  apiPath: string,
+  body: Record<string, unknown>,
+  kubeconfigPath?: string,
+): Promise<void> {
+  const response = await clusterKubernetesJson('POST', apiPath, body, undefined, kubeconfigPath);
+  if (!response.ok && response.status !== 409) {
+    throw new Error(
+      `Create ${apiPath} failed (${response.status}): ${response.text.slice(0, 500)}`,
+    );
+  }
+}
+
+const kubevirtUserSettingsConfigMapRules = [
+  {
+    apiGroups: [''],
+    resourceNames: [KUBEVIRT_USER_SETTINGS_CONFIG_MAP],
+    resources: ['configmaps'],
+    verbs: ['get', 'list', 'watch', 'patch', 'update'],
+  },
+];
+
+/** Role + RoleBinding so non-priv users can read/patch `default/kubevirt-user-settings` (catalog + column prefs). */
+export async function ensureKubevirtUserSettingsReaderRbac(
+  options: { kubeconfigPath?: string } = {},
+): Promise<void> {
+  const kubeconfigPath = options.kubeconfigPath;
+  const role = {
+    apiVersion: 'rbac.authorization.k8s.io/v1',
+    kind: 'Role',
+    metadata: { name: USER_SETTINGS_ROLE_NAME, namespace: KUBEVIRT_USER_SETTINGS_NAMESPACE },
+    rules: kubevirtUserSettingsConfigMapRules,
+  };
+  const roleBinding = {
+    apiVersion: 'rbac.authorization.k8s.io/v1',
+    kind: 'RoleBinding',
+    metadata: {
+      name: USER_SETTINGS_ROLE_BINDING_NAME,
+      namespace: KUBEVIRT_USER_SETTINGS_NAMESPACE,
+    },
+    roleRef: {
+      apiGroup: 'rbac.authorization.k8s.io',
+      kind: 'Role',
+      name: USER_SETTINGS_ROLE_NAME,
+    },
+    subjects: [
+      {
+        apiGroup: 'rbac.authorization.k8s.io',
+        kind: 'Group',
+        name: 'system:authenticated',
+      },
+    ],
+  };
+  await createNamespacedResource(
+    `/apis/rbac.authorization.k8s.io/v1/namespaces/${KUBEVIRT_USER_SETTINGS_NAMESPACE}/roles`,
+    role,
+    kubeconfigPath,
+  );
+  const patchRole = await clusterKubernetesJson(
+    'PATCH',
+    `/apis/rbac.authorization.k8s.io/v1/namespaces/${KUBEVIRT_USER_SETTINGS_NAMESPACE}/roles/${USER_SETTINGS_ROLE_NAME}`,
+    { rules: kubevirtUserSettingsConfigMapRules },
+    { 'Content-Type': 'application/strategic-merge-patch+json' },
+    kubeconfigPath,
+  );
+  if (!patchRole.ok) {
+    throw new Error(
+      `Patch Role ${USER_SETTINGS_ROLE_NAME} failed (${patchRole.status}): ${patchRole.text.slice(0, 500)}`,
+    );
+  }
+  await createNamespacedResource(
+    `/apis/rbac.authorization.k8s.io/v1/namespaces/${KUBEVIRT_USER_SETTINGS_NAMESPACE}/rolebindings`,
+    roleBinding,
+    kubeconfigPath,
+  );
+}
 
 /** Matches `useKubevirtUserSettings` ConfigMap data key derivation. */
 export async function kubevirtUserSettingsDataKeyFromConsoleSession(
@@ -25,12 +105,20 @@ export async function kubevirtUserSettingsDataKeyFromConsoleSession(
   const user = (await userRes.json()) as {
     metadata?: { name?: string; uid?: string };
   };
-  const sanitizedName = user?.metadata?.name?.replace(/[^-._a-zA-Z0-9]+/g, '-');
-  const key = user?.metadata?.uid || sanitizedName;
+  return openshiftUserKubevirtSettingsDataKey(user?.metadata?.name, user?.metadata?.uid);
+}
+
+export function openshiftUserKubevirtSettingsDataKey(name?: string, uid?: string): string {
+  const sanitizedName = name?.replace(/[^-._a-zA-Z0-9]+/g, '-');
+  const key = uid || sanitizedName;
   if (!key) {
-    throw new Error('OpenShift user ~ missing metadata.uid and metadata.name');
+    throw new Error('OpenShift user missing metadata.uid and metadata.name');
   }
   return key;
+}
+
+export function buildKubevirtUserSettingsHideWelcomeJson(existingRaw?: string): string {
+  return kubevirtSettingsWithWelcomeHidden(existingRaw);
 }
 
 function kubevirtSettingsWithWelcomeHidden(existingRaw?: string): string {
