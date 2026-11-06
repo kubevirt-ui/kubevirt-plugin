@@ -25,7 +25,7 @@ export async function waitForConsoleRouteReady(
       (await missingResource.isVisible().catch(() => false))
     ) {
       throw new Error(
-        `${context}: console route unavailable at ${path}. Ensure InstanceTypes developer preview is enabled (kubevirt-ui-features instanceTypesEnabled=true) and the console plugin exposes this route.`,
+        `${context}: console route unavailable at ${path}. Ensure InstanceTypes developer preview is enabled (kubevirt-ui-preview-features instanceTypesEnabled=true) and the console plugin exposes this route.`,
       );
     }
     if (await readyLocator.isVisible().catch(() => false)) {

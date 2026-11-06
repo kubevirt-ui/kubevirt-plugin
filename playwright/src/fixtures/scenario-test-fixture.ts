@@ -21,7 +21,7 @@ import { expect, request as playwrightRequest, test as base } from '@playwright/
 
 interface Fixtures {
   _autoAnnotations: void;
-  /** Patches `kubevirt-ui-features` → `instanceTypesEnabled=true` via console API before each test. */
+  /** Patches `kubevirt-ui-preview-features` → `instanceTypesEnabled=true` via console API before each test. */
   _ensureInstanceTypesDeveloperPreview: void;
   testNamespace: string;
   nav: NavigationPage;

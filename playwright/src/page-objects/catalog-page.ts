@@ -339,6 +339,7 @@ export class CatalogPage extends BasePage {
       this.instanceTypesTabPanel(),
       'InstanceTypes catalog',
     );
+    await this.acceptInstanceTypesDeveloperPreviewIfPrompted();
   }
 
   async waitForCatalogInNamespace(namespace: string): Promise<void> {
@@ -851,8 +852,8 @@ export class CatalogPage extends BasePage {
       .filter({ hasText: /Creating a VirtualMachine from an InstanceType/i });
   }
 
-  /** First visit may show developer-preview modal; global setup sets `instanceTypesEnabled` but admin still confirms once. */
-  async acceptInstanceTypesDeveloperPreviewIfPrompted(): Promise<void> {
+  /** Dismiss the enable-InstanceTypes modal if it is already open (no wait for late appear). */
+  async dismissInstanceTypesDeveloperPreviewIfPresent(): Promise<void> {
     const dialog = this.instanceTypesDeveloperPreviewDialog();
     if (!(await dialog.isVisible().catch(() => false))) {
       return;
@@ -860,34 +861,57 @@ export class CatalogPage extends BasePage {
     const enable = dialog.getByRole('button', { name: /^Enable$/ });
     if (await enable.isVisible().catch(() => false)) {
       await this.robustClick(enable);
-    } else {
-      await dialog
-        .getByRole('button', { name: /^Close$/ })
-        .click()
-        .catch(() => undefined);
     }
-    await dialog
-      .waitFor({ state: 'hidden', timeout: TestTimeouts.LONG_OPERATION })
-      .catch(() => undefined);
+    // Enable closes only after the feature watch flips; fall back to dismiss if it sticks.
+    if (await dialog.isVisible().catch(() => false)) {
+      const dismiss = dialog
+        .getByRole('button', { name: /^Go to Catalog$/ })
+        .or(dialog.getByRole('button', { name: /^Close$/ }));
+      if (await dismiss.isVisible().catch(() => false)) {
+        await dismiss.click().catch(() => undefined);
+      } else {
+        await this.page.keyboard.press('Escape').catch(() => undefined);
+      }
+    }
+    await dialog.waitFor({ state: 'hidden', timeout: TestTimeouts.LONG_OPERATION });
+  }
+
+  /**
+   * First visit may show developer-preview modal; global setup sets `instanceTypesEnabled` but admin still confirms once.
+   * Feature watch can lag after ConfigMap patch — wait briefly so a late modal is still caught.
+   */
+  async acceptInstanceTypesDeveloperPreviewIfPrompted(): Promise<void> {
+    const dialog = this.instanceTypesDeveloperPreviewDialog();
+    if (!(await dialog.isVisible().catch(() => false))) {
+      const appeared = await dialog
+        .waitFor({ state: 'visible', timeout: TestTimeouts.UI_DELAY_LONG })
+        .then(() => true)
+        .catch(() => false);
+      if (!appeared) {
+        return;
+      }
+    }
+    await this.dismissInstanceTypesDeveloperPreviewIfPresent();
   }
 
   /** Compact label with info icon (`DeveloperPreviewLabel` — InstanceTypes / boot-volume creation). */
   instanceTypesDeveloperPreviewTooltipTrigger(): Locator {
+    // Call after dismiss/accept of the enable modal so this is the tab/page badge.
     return this.page
-      .locator('.dev-preview-label')
-      .or(
-        this.page
-          .getByText(/^Developer preview$/i)
-          .locator(
-            'xpath=ancestor::*[contains(@class,"pf-v6-c-label") or contains(@class,"pf-c-label")][1]',
-          ),
+      .locator(
+        [
+          '.dev-preview-label',
+          '.pf-c-label:has-text("Developer preview")',
+          '.pf-v5-c-label:has-text("Developer preview")',
+          '.pf-v6-c-label:has-text("Developer preview")',
+        ].join(', '),
       )
       .first();
   }
 
   instanceTypesDeveloperPreviewFeaturePopover(): Locator {
     return this.page
-      .locator('.pf-v6-c-popover, .pf-c-popover')
+      .locator('.pf-v6-c-popover, .pf-v5-c-popover, .pf-c-popover')
       .filter({ hasText: /not intended to use in production/i });
   }
 
@@ -911,6 +935,7 @@ export class CatalogPage extends BasePage {
 
   /** Opens the developer-preview tooltip; specs assert on the returned popover. */
   async openInstanceTypesDeveloperPreviewTooltip(): Promise<Locator> {
+    await this.acceptInstanceTypesDeveloperPreviewIfPrompted();
     const trigger = this.instanceTypesDeveloperPreviewTooltipTrigger();
     await trigger.waitFor({ state: 'visible', timeout: TestTimeouts.LONG_OPERATION });
     await this.robustClick(trigger);
@@ -924,7 +949,10 @@ export class CatalogPage extends BasePage {
   }
 
   async selectBootableVolumeForInstanceTypes(volumeName: string): Promise<void> {
-    await this.bootableVolumeRowForInstanceTypes(volumeName).click();
+    await this.dismissInstanceTypesDeveloperPreviewIfPresent();
+    const row = this.bootableVolumeRowForInstanceTypes(volumeName);
+    await row.waitFor({ state: 'visible', timeout: TestTimeouts.LONG_OPERATION });
+    await this.robustClick(row);
   }
 
   instanceTypeSeriesLabel(series: RegExp | string): Locator {
