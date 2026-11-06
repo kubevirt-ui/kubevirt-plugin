@@ -4,12 +4,13 @@ import HidableTooltip from '@kubevirt-utils/components/HidableTooltip/HidableToo
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getNoModalChangesTooltip } from '@kubevirt-utils/utils/text';
 import {
-  ActionGroup,
   Alert,
   AlertActionCloseButton,
   AlertVariant,
   Button,
   ButtonVariant,
+  Flex,
+  FlexItem,
   Stack,
   StackItem,
 } from '@patternfly/react-core';
@@ -84,22 +85,26 @@ const EnvironmentFormActions: FC<EnvironmentFormActionsProps> = ({
         )}
       </StackItem>
       <StackItem>
-        <ActionGroup className="pf-v6-c-form">
-          <HidableTooltip content={getNoModalChangesTooltip(t)} hidden={!noChangesMade}>
-            <Button
-              data-test="save-button"
-              isDisabled={noChangesMade || isSaveDisabled || loading}
-              isLoading={loading}
-              onClick={onSubmit}
-              type="submit"
-            >
-              {t('Save')}
+        <Flex>
+          <FlexItem>
+            <HidableTooltip content={getNoModalChangesTooltip(t)} hidden={!noChangesMade}>
+              <Button
+                data-test="save-button"
+                isDisabled={noChangesMade || isSaveDisabled || loading}
+                isLoading={loading}
+                onClick={onSubmit}
+                type="submit"
+              >
+                {t('Save')}
+              </Button>
+            </HidableTooltip>
+          </FlexItem>
+          <FlexItem>
+            <Button onClick={onReload} type="button" variant={ButtonVariant.secondary}>
+              {t('Reload')}
             </Button>
-          </HidableTooltip>
-          <Button onClick={onReload} type="button" variant={ButtonVariant.secondary}>
-            {t('Reload')}
-          </Button>
-        </ActionGroup>
+          </FlexItem>
+        </Flex>
       </StackItem>
     </Stack>
   );

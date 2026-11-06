@@ -1,3 +1,5 @@
+export const ENVIRONMENT_DISK_PREFIX = 'environment-disk-';
+
 export enum EnvironmentKind {
   ConfigMap = 'configMap',
   Secret = 'secret',
@@ -6,9 +8,9 @@ export enum EnvironmentKind {
 
 export type EnvironmentVariable = {
   diskName: string;
-  kind: EnvironmentKind;
-  name: string;
-  serial: string;
+  kind: EnvironmentKind | null;
+  name?: string;
+  serial?: string;
 };
 
 export const MapKindToAbbr: Record<EnvironmentKind, string> = {
