@@ -14,7 +14,7 @@ export const buildKubeVirtShapedSpecFromMigrations = (
   destinationStorageClass: string,
   retentionPolicy: MultiNamespaceVirtualMachineStorageMigrationPlan['spec']['namespaces'][0]['retentionPolicy'],
 ): MultiNamespaceVirtualMachineStorageMigrationPlan['spec'] => {
-  type Sel = (typeof selectedMigrations)[number];
+  type Sel = typeof selectedMigrations[number];
   const byNs = new Map<string, Map<string, Sel[]>>();
 
   selectedMigrations.forEach((m) => {
