@@ -181,16 +181,30 @@ export class BootableVolumesPage extends ResourceListPage {
 
   async openCreateWithYaml(namespace: string): Promise<void> {
     await dismissConsoleObstructions(this.page);
+    const yamlCreatePath = `/k8s/ns/${namespace}/cdi.kubevirt.io~v1beta1~DataVolume/~new`;
     const add = this.addVolumeButton();
-    if (await add.isVisible().catch(() => false)) {
+    try {
+      if (!(await add.isVisible().catch(() => false))) {
+        throw new Error('Add volume button not visible');
+      }
       await this.robustClick(add);
-      await this.page.getByRole('menuitem', { name: /With YAML/i }).click();
-    } else {
-      await this.page.goto(`/k8s/ns/${namespace}/cdi.kubevirt.io~v1beta1~DataVolume/~new`, {
+      const withYaml = this.page.getByRole('menuitem', { name: /With YAML/i });
+      await withYaml.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
+      await withYaml.click();
+      await this.page.waitForURL(new RegExp(`/ns/${namespace}/.*DataVolume.*~new`), {
+        timeout: TestTimeouts.ELEMENT_WAIT,
+      });
+    } catch {
+      await this.page.goto(yamlCreatePath, {
+        timeout: TestTimeouts.CONSOLE_PAGE_LOAD,
         waitUntil: 'domcontentloaded',
       });
     }
     await this.page.waitForURL(new RegExp(`/ns/${namespace}/.*DataVolume.*~new`), {
+      timeout: TestTimeouts.LONG_OPERATION,
+    });
+    await this.dataVolumeYamlCreateHeading().waitFor({
+      state: 'visible',
       timeout: TestTimeouts.LONG_OPERATION,
     });
   }

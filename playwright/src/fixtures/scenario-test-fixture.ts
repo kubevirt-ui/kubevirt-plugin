@@ -11,8 +11,8 @@
  */
 import RequestContextClient from '@/clients/request-context-client';
 import { NavigationPage } from '@/page-objects/navigation-page';
-import { dismissConsoleObstructions } from '@/utils/console-modals';
 import { E2E_LABEL, E2E_LABEL_VALUE } from '@/utils/constants';
+import { ensureConsoleShellReady } from '@/utils/console-session';
 import { EnvVariables } from '@/utils/env-variables';
 import { generateE2eTestNamespace } from '@/utils/random-data-generator';
 import { getStorageStatePath, storageStateExists } from '@/utils/storage-state';
@@ -95,20 +95,12 @@ const _test = base.extend<Fixtures, WorkerFixtures>({
   },
 
   page: async ({ baseURL, page }, use) => {
-    const entry = baseURL ?? EnvVariables.webConsoleUrl;
+    const entry = (baseURL ?? EnvVariables.webConsoleUrl).replace(/\/$/, '');
     await page.goto(entry, {
       timeout: TestTimeouts.CONSOLE_LOGIN,
       waitUntil: 'domcontentloaded',
     });
-    if (page.url().includes('/auth/login')) {
-      throw new Error(
-        'Console session is not authenticated. Re-run global setup (remove REUSE_STORAGE_STATE or delete .storage-states/*.json).',
-      );
-    }
-    await page
-      .locator('[data-test-id="perspective-switcher-toggle"]')
-      .waitFor({ state: 'visible', timeout: TestTimeouts.CONSOLE_LOGIN });
-    await dismissConsoleObstructions(page);
+    await ensureConsoleShellReady(page, entry);
     await use(page);
   },
 

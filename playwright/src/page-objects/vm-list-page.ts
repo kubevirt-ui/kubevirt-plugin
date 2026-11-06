@@ -503,6 +503,24 @@ export class VmListPage extends ResourceListPage {
     if ((await input.isChecked().catch(() => false)) === checked) {
       return;
     }
+    // Manage columns disables unchecked boxes at MAX_VIEW_COLS (9). Free a slot first.
+    if (checked && (await input.isDisabled().catch(() => false))) {
+      const donor = panel
+        .locator(
+          `input[type="checkbox"][id^="data-list-"]:checked:not(:disabled):not(#data-list-name):not(#${inputId})`,
+        )
+        .last();
+      if ((await donor.count()) > 0) {
+        const donorId = await donor.getAttribute('id');
+        if (donorId) {
+          await panel.locator(`label[for="${donorId}"]`).click({ force: true });
+          await pollUntil(async () => !(await donor.isChecked().catch(() => true)), {
+            message: `Should free a column slot before enabling ${columnId}`,
+            timeout: TestTimeouts.UI_ACTION_COMPLETE,
+          });
+        }
+      }
+    }
     await panel.locator(`label[for="${inputId}"]`).click({ force: true });
     await pollUntil(async () => (await input.isChecked().catch(() => !checked)) === checked, {
       message: `Column ${columnId} should be ${checked ? 'checked' : 'unchecked'}`,

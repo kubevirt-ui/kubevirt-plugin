@@ -143,7 +143,7 @@ export class EnvVariables {
   }
 
   static get testUserPassword(): string {
-    return process.env.TEST_PASSWORD || process.env.TEST_USER_PASSWORD || '';
+    return process.env.TEST_PASSWORD || process.env.TEST_USER_PASSWORD || 'test';
   }
 
   static get testUsername(): string {

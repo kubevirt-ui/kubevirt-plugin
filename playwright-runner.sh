@@ -25,6 +25,9 @@ Non-priv (set TEST_USERNAME / TEST_PASSWORD / TEST_IDP in .env or CI):
 Local console — inline IS_LOCAL=1 wins over IS_LOCAL=0 in .env:
   IS_LOCAL=1 ./playwright-runner.sh gating --workers=4
 
+CI debug harness (failures → skipped) — enabled by default via this runner:
+  CI_DEBUG=0 ./playwright-runner.sh tier1 --workers=4   # hard failures
+
 Examples:
   ./playwright-runner.sh gating --workers=4
   ./playwright-runner.sh tier1 --workers=4
@@ -34,6 +37,9 @@ EOF
 
 PROJECT="${1:-Gating}"
 shift || true
+
+# Opt-in harness: off for direct npx/scripts/run-playwright.sh; on for all runner tiers.
+export CI_DEBUG="${CI_DEBUG:-1}"
 
 case "${PROJECT}" in
   -h | --help | help)
