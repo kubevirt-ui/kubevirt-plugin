@@ -3,10 +3,7 @@ import { type FC, useEffect, useMemo, useRef } from 'react';
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { tourGuideVM } from '@kubevirt-utils/components/GuidedTour/utils/constants';
 import { runningTourSignal } from '@kubevirt-utils/components/GuidedTour/utils/guidedTourSignals';
-import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
-import { getK8sRowId } from '@kubevirt-utils/components/KubevirtTable/utils';
 import { PageTitles } from '@kubevirt-utils/constants/page-constants';
-import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import usePagination from '@kubevirt-utils/hooks/usePagination/usePagination';
 import useQuery from '@kubevirt-utils/hooks/useQuery';
 import { EXPORT_TABLE_KEYS, KubevirtTableExport } from '@kubevirt-utils/hooks/useTableExport';
@@ -16,8 +13,7 @@ import { useSignals } from '@preact/signals-react/runtime';
 import { vmsSignal } from '@virtualmachines/tree/utils/signals';
 
 import VirtualMachineEmptyState from './components/VirtualMachineEmptyState/VirtualMachineEmptyState';
-import VirtualMachineFilteredEmptyState from './components/VirtualMachineFilteredEmptyState/VirtualMachineFilteredEmptyState';
-import VirtualMachinesListToolbar from './components/VirtualMachinesListToolbar';
+import VirtualMachinesListBody from './components/VirtualMachinesListBody';
 import useExistingSelectedVMs from './hooks/useExistingSelectedVMs';
 import { useVMDataSource } from './hooks/useVMDataSource';
 import { useVMListColumns } from './hooks/useVMListColumns';
@@ -37,7 +33,6 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({
   cluster,
   namespace,
 }) => {
-  const { t } = useKubevirtTranslation();
   useSignals();
   useVMMetrics();
 
@@ -49,7 +44,10 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({
     return params.toString();
   }, [query]);
 
-  const { accessibleVMs, vms, vmsLoaded, vmsLoadError } = useVMDataSource(namespace, cluster);
+  const { accessibleVMs, error, isSoftError, refresh, vms, vmsLoaded } = useVMDataSource(
+    namespace,
+    cluster,
+  );
   const vmsToShow = useMemo(() => (runningTourSignal.value ? [tourGuideVM] : vms), [vms]);
 
   const {
@@ -103,51 +101,32 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({
       <DocumentTitle>{PageTitles.VirtualMachines}</DocumentTitle>
       <ListPageBody>
         <div className="vm-listpagebody">
-          {allVMsLoaded && hasNoVMs ? (
+          {allVMsLoaded && hasNoVMs && !error ? (
             <VirtualMachineEmptyState namespace={namespace} />
           ) : (
-            <>
-              <VirtualMachinesListToolbar
-                accessibleVMs={accessibleVMs}
-                callbacks={callbacks}
-                clearAllFiltersWithReset={clearAllFiltersWithReset}
-                columnLayout={columnLayout}
-                columns={columns}
-                exportButton={exportButton}
-                filterDefinitions={filterDefinitions}
-                filteredVMs={filteredVMs}
-                filters={filters}
-                handleSetFilters={handleSetFilters}
-                onPageChange={onPaginationChange}
-                pagination={pagination}
-                searchInputRef={searchInputRef}
-                vmimMapper={vmimMapper}
-                vmsToShow={vmsToShow}
-              />
-              <KubevirtTable<V1VirtualMachine, VMCallbacks>
-                activeColumnKeys={activeColumnKeys}
-                ariaLabel={t('VirtualMachines table')}
-                callbacks={callbacks}
-                columns={columns}
-                data={filteredVMs ?? []}
-                getRowId={getK8sRowId}
-                initialSortKey={VM_COLUMN_KEYS.name}
-                isResizable
-                loaded={loaded}
-                loadError={vmsLoadError}
-                noFilteredDataMsg={
-                  <VirtualMachineFilteredEmptyState
-                    clearAllFilters={clearAllFiltersWithReset}
-                    filters={filters}
-                    searchInputRef={searchInputRef}
-                  />
-                }
-                pagination={pagination}
-                persistSortInUrl
-                tableId={columnLayout.id}
-                unfilteredData={allVMsInNamespace}
-              />
-            </>
+            <VirtualMachinesListBody
+              accessibleVMs={accessibleVMs}
+              activeColumnKeys={activeColumnKeys}
+              allVMsInNamespace={allVMsInNamespace}
+              callbacks={callbacks}
+              clearAllFiltersWithReset={clearAllFiltersWithReset}
+              columnLayout={columnLayout}
+              columns={columns}
+              error={error}
+              exportButton={exportButton}
+              filterDefinitions={filterDefinitions}
+              filteredVMs={filteredVMs}
+              filters={filters}
+              handleSetFilters={handleSetFilters}
+              isSoftError={isSoftError}
+              loaded={loaded}
+              onPaginationChange={onPaginationChange}
+              pagination={pagination}
+              refresh={refresh}
+              searchInputRef={searchInputRef}
+              vmimMapper={vmimMapper}
+              vmsToShow={vmsToShow}
+            />
           )}
         </div>
       </ListPageBody>
