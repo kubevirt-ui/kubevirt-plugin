@@ -46,5 +46,5 @@ export type RfbSession = {
   testUrl?: string;
 };
 
-export type ScanCodeName = (typeof SCAN_CODE_NAMES)[number];
-export type VncLogLevel = (typeof VNC_LOG_LEVELS)[number] | false;
+export type ScanCodeName = typeof SCAN_CODE_NAMES[number];
+export type VncLogLevel = false | typeof VNC_LOG_LEVELS[number];

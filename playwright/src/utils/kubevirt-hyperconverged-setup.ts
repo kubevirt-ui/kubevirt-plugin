@@ -1,3 +1,5 @@
+import { setTimeout as sleep } from 'node:timers/promises';
+
 import { clusterKubernetesJson } from '@/utils/cluster-kubernetes-api';
 import { canRunOc } from '@/utils/cluster-oc';
 import {
@@ -6,6 +8,7 @@ import {
 } from '@/utils/console-kubernetes-proxy';
 import { EnvVariables } from '@/utils/env-variables';
 import { KUBEVIRT_HYPERCONVERGED_NAME } from '@/utils/kubevirt-ui-features';
+import { TestTimeouts } from '@/utils/test-config';
 import type { APIRequestContext } from '@playwright/test';
 
 /** HCO annotation — Preview: **Enable Passt binding for primary user-defined networks** (`usePasstFeatureFlag`). */
@@ -21,6 +24,9 @@ const DEPLOY_PASST_JSON_PATCH_PATH = `/metadata/annotations/${DEPLOY_PASST_NETWO
 
 const DECLARATIVE_HOTPLUG_VOLUMES_JSON_PATCH_PATH = `/spec/featureGates/${DECLARATIVE_HOTPLUG_VOLUMES_FEATURE_GATE}`;
 
+/** HCO reconcile often mutates the underlying KubeVirt CR between consecutive patches. */
+const HCO_CONFLICT_MAX_ATTEMPTS = 5;
+
 type JsonPatchOp =
   | { op: 'add'; path: string; value: boolean | string }
   | { op: 'replace'; path: string; value: boolean | string };
@@ -31,6 +37,32 @@ function hyperConvergedApiPath(cnvNamespace: string): string {
 
 function cnvNamespace(options: { cnvNamespace?: string } = {}): string {
   return options.cnvNamespace ?? process.env.CNV_NAMESPACE ?? 'openshift-cnv';
+}
+
+function isConflictStatus(status: number): boolean {
+  return status === 409;
+}
+
+function isConflictErrorMessage(message: string): boolean {
+  return message.includes('(409)') || /object has been modified/i.test(message);
+}
+
+async function withHcoConflictRetry(operation: () => Promise<void>): Promise<void> {
+  let lastError: unknown;
+  for (let attempt = 1; attempt <= HCO_CONFLICT_MAX_ATTEMPTS; attempt += 1) {
+    try {
+      await operation();
+      return;
+    } catch (error) {
+      lastError = error;
+      const message = error instanceof Error ? error.message : String(error);
+      if (!isConflictErrorMessage(message) || attempt === HCO_CONFLICT_MAX_ATTEMPTS) {
+        throw error;
+      }
+      await sleep(TestTimeouts.RETRY_DELAY);
+    }
+  }
+  throw lastError instanceof Error ? lastError : new Error(String(lastError));
 }
 
 async function patchHyperConvergedOnCluster(
@@ -59,26 +91,28 @@ async function applyReplaceWithAddFallbackOnCluster(
   kubeconfigPath: string | undefined,
   context: string,
 ): Promise<void> {
-  try {
+  await withHcoConflictRetry(async () => {
+    try {
+      await patchHyperConvergedOnCluster(
+        namespace,
+        [{ op: 'replace', path, value }],
+        kubeconfigPath,
+        context,
+      );
+      return;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      if (!message.includes('(422)')) {
+        throw error;
+      }
+    }
     await patchHyperConvergedOnCluster(
       namespace,
-      [{ op: 'replace', path, value }],
+      [{ op: 'add', path, value }],
       kubeconfigPath,
       context,
     );
-    return;
-  } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
-    if (!message.includes('(422)')) {
-      throw error;
-    }
-  }
-  await patchHyperConvergedOnCluster(
-    namespace,
-    [{ op: 'add', path, value }],
-    kubeconfigPath,
-    context,
-  );
+  });
 }
 
 async function applyReplaceWithAddFallbackViaConsole(
@@ -96,33 +130,45 @@ async function applyReplaceWithAddFallbackViaConsole(
     'Content-Type': 'application/json-patch+json',
   };
   const url = `${origin}/api/kubernetes${hyperConvergedApiPath(namespace)}`;
-  const replace = await request.patch(url, {
-    data: [{ op: 'replace', path, value }],
-    headers,
-  });
-  if (replace.ok()) {
-    return;
-  }
-  if (replace.status() === 422) {
-    const add = await request.patch(url, {
-      data: [{ op: 'add', path, value }],
+
+  await withHcoConflictRetry(async () => {
+    const replace = await request.patch(url, {
+      data: [{ op: 'replace', path, value }],
       headers,
     });
-    if (add.ok()) {
+    if (replace.ok()) {
       return;
     }
-  }
-  if (replace.status() === 403 && canRunOc()) {
-    await on403Fallback();
-    return;
-  }
-  const body = await replace.text();
-  throw new Error(
-    `JSON Patch HyperConverged via console proxy failed (${replace.status()}): ${body.slice(
-      0,
-      500,
-    )}`,
-  );
+    if (replace.status() === 422) {
+      const add = await request.patch(url, {
+        data: [{ op: 'add', path, value }],
+        headers,
+      });
+      if (add.ok()) {
+        return;
+      }
+      if (isConflictStatus(add.status())) {
+        const addBody = await add.text();
+        throw new Error(
+          `JSON Patch HyperConverged via console proxy failed (${add.status()}): ${addBody.slice(
+            0,
+            500,
+          )}`,
+        );
+      }
+    }
+    if (replace.status() === 403 && canRunOc()) {
+      await on403Fallback();
+      return;
+    }
+    const body = await replace.text();
+    throw new Error(
+      `JSON Patch HyperConverged via console proxy failed (${replace.status()}): ${body.slice(
+        0,
+        500,
+      )}`,
+    );
+  });
 }
 
 /** Preview feature: Enable Passt binding for primary user-defined networks (HCO annotation). */

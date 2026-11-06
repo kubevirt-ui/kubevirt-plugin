@@ -74,59 +74,71 @@ const migrationUse = {
 const uiTestDir = './playwright/tests';
 const uiTestIgnoreManual = ['**/api/**', '**/explore/**'];
 
+const privilegedProjects = [
+  {
+    fullyParallel: EnvVariables.isCI ? false : true,
+    grep: /@gating/,
+    name: 'Gating',
+    testDir: uiTestDir,
+    testIgnore: uiTestIgnoreManual,
+    use: { ...migrationUse, baseURL, storageState },
+  },
+  {
+    fullyParallel: true,
+    grep: /@tier1/,
+    grepInvert: /@tier2/,
+    name: 'Tier1',
+    testDir: uiTestDir,
+    testIgnore: uiTestIgnoreManual,
+    use: { ...migrationUse, baseURL, storageState },
+  },
+  {
+    fullyParallel: true,
+    grep: /@tier2/,
+    grepInvert: /@tier1/,
+    name: 'Tier2',
+    testDir: uiTestDir,
+    testIgnore: uiTestIgnoreManual,
+    use: { ...migrationUse, baseURL, storageState },
+  },
+];
+
+/**
+ * NonPriv needs a real OAuth non-priv session (`nonpriv-state.json`).
+ * HC auth-disabled setup only writes `test-state.json` — omit these projects on HC
+ * so `auto` (no --project filter) does not ENOENT on missing nonpriv-state.
+ */
+const nonPrivProjects = EnvVariables.isHcE2e
+  ? []
+  : [
+      {
+        fullyParallel: true,
+        grep: /@tier1/,
+        grepInvert: /@admin-only|@tier2/,
+        name: 'Tier1NonPriv',
+        testDir: uiTestDir,
+        testIgnore: uiTestIgnoreManual,
+        use: { ...migrationUse, baseURL, storageState: nonPrivStorageState },
+      },
+      {
+        fullyParallel: true,
+        grep: /@tier2/,
+        grepInvert: /@admin-only|@tier1/,
+        name: 'Tier2NonPriv',
+        testDir: uiTestDir,
+        testIgnore: uiTestIgnoreManual,
+        use: { ...migrationUse, baseURL, storageState: nonPrivStorageState },
+      },
+    ];
+
 export default defineConfig({
   expect: { timeout: TestTimeouts.ELEMENT_WAIT },
   forbidOnly: EnvVariables.isCI,
   fullyParallel: true,
   globalSetup: './playwright/project-dependencies/global.setup.ts',
   globalTeardown: './playwright/project-dependencies/global.teardown.ts',
-  outputDir: testResultsDir,
-  projects: [
-    {
-      fullyParallel: EnvVariables.isCI ? false : true,
-      grep: /@gating/,
-      name: 'Gating',
-      testDir: uiTestDir,
-      testIgnore: uiTestIgnoreManual,
-      use: { ...migrationUse, baseURL, storageState },
-    },
-    {
-      fullyParallel: true,
-      grep: /@tier1/,
-      grepInvert: /@tier2/,
-      name: 'Tier1',
-      testDir: uiTestDir,
-      testIgnore: uiTestIgnoreManual,
-      use: { ...migrationUse, baseURL, storageState },
-    },
-    {
-      fullyParallel: true,
-      grep: /@tier2/,
-      grepInvert: /@tier1/,
-      name: 'Tier2',
-      testDir: uiTestDir,
-      testIgnore: uiTestIgnoreManual,
-      use: { ...migrationUse, baseURL, storageState },
-    },
-    {
-      fullyParallel: true,
-      grep: /@tier1/,
-      grepInvert: /@admin-only|@tier2/,
-      name: 'Tier1NonPriv',
-      testDir: uiTestDir,
-      testIgnore: uiTestIgnoreManual,
-      use: { ...migrationUse, baseURL, storageState: nonPrivStorageState },
-    },
-    {
-      fullyParallel: true,
-      grep: /@tier2/,
-      grepInvert: /@admin-only|@tier1/,
-      name: 'Tier2NonPriv',
-      testDir: uiTestDir,
-      testIgnore: uiTestIgnoreManual,
-      use: { ...migrationUse, baseURL, storageState: nonPrivStorageState },
-    },
-  ],
+  outputDir: './playwright/test-results/artifacts',
+  projects: [...privilegedProjects, ...nonPrivProjects],
   reporter: getReporterConfig(testResultsDir),
   retries: EnvVariables.retries,
   timeout: TestTimeouts.TEST_LONG,
@@ -142,7 +154,7 @@ export default defineConfig({
     storageState,
     testIdAttribute: 'data-test',
     trace: 'off',
-    video: 'off',
+    video: 'retain-on-failure',
     viewport: { height: 1080, width: 1920 },
   },
   workers: process.env.WORKERS ? parseInt(process.env.WORKERS, 10) : 4,
