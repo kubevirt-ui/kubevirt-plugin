@@ -4,20 +4,26 @@ import {
   type ConsoleProxyRequestOptions,
   getConsoleKubernetesProxyHeaders,
 } from '@/utils/console-kubernetes-proxy';
-import { EnvVariables } from '@/utils/env-variables';
 import type { APIRequestContext } from '@playwright/test';
 
-export const KUBEVIRT_UI_FEATURES_CONFIG_MAP = 'kubevirt-ui-features';
+/**
+ * 4.13 plugin `usePreviewFeatures` ConfigMap (`kubevirt-ui-preview-features` in `default`).
+ * Later releases renamed this to `kubevirt-ui-features`.
+ */
+export const KUBEVIRT_UI_FEATURES_CONFIG_MAP = 'kubevirt-ui-preview-features';
 
-/** Feature key for InstanceTypes developer preview (`useFeatures` / Virtualization settings). */
+/** Namespace for preview-features ConfigMap (`DEFAULT_NAMESPACE` in plugin). */
+export const KUBEVIRT_UI_FEATURES_NAMESPACE = 'default';
+
+/** Feature key for InstanceTypes developer preview (`usePreviewFeatures` / Virtualization settings). */
 export const INSTANCE_TYPE_ENABLED = 'instanceTypesEnabled';
 
-/** Matches plugin `useFeatures` RBAC so non-priv users can read flags via the console proxy. */
-const FEATURES_ROLE_NAME = 'kubevirt-ui-features-reader';
-const FEATURES_ROLE_BINDING_NAME = 'kubevirt-ui-features-reader-binding';
+/** Matches plugin `usePreviewFeatures` RBAC so non-priv users can read flags via the console proxy. */
+const FEATURES_ROLE_NAME = 'kubevirt-ui-preview-features-reader';
+const FEATURES_ROLE_BINDING_NAME = 'kubevirt-ui-preview-features-reader-binding';
 
 function featuresNamespace(options: { cnvNamespace?: string }): string {
-  return options.cnvNamespace ?? process.env.CNV_NAMESPACE ?? 'openshift-cnv';
+  return options.cnvNamespace ?? KUBEVIRT_UI_FEATURES_NAMESPACE;
 }
 
 function configMapPath(namespace: string): string {
@@ -40,7 +46,9 @@ async function createKubevirtUiFeaturesConfigMap(
   );
   if (!response.ok && response.status !== 409) {
     throw new Error(
-      `Create ConfigMap ${namespace}/${KUBEVIRT_UI_FEATURES_CONFIG_MAP} failed (${response.status}): ${response.text.slice(0, 500)}`,
+      `Create ConfigMap ${namespace}/${KUBEVIRT_UI_FEATURES_CONFIG_MAP} failed (${
+        response.status
+      }): ${response.text.slice(0, 500)}`,
     );
   }
 }
@@ -59,8 +67,8 @@ async function createNamespacedResource(
 }
 
 /**
- * Role + RoleBinding for `system:authenticated` to get/watch `kubevirt-ui-features`
- * (same as `createFeaturesConfigMap` in the plugin).
+ * Role + RoleBinding for `system:authenticated` to get/watch `kubevirt-ui-preview-features`
+ * (same as `usePreviewFeatures` in the plugin).
  */
 export async function ensureKubevirtUiFeaturesReaderRbac(
   options: { cnvNamespace?: string; kubeconfigPath?: string } = {},
@@ -127,7 +135,9 @@ async function mergePatchKubevirtUiFeaturesData(
     return;
   }
   throw new Error(
-    `Patch ConfigMap ${namespace}/${KUBEVIRT_UI_FEATURES_CONFIG_MAP} failed (${response.status}): ${response.text.slice(0, 500)}`,
+    `Patch ConfigMap ${namespace}/${KUBEVIRT_UI_FEATURES_CONFIG_MAP} failed (${
+      response.status
+    }): ${response.text.slice(0, 500)}`,
   );
 }
 
@@ -144,7 +154,9 @@ export async function ensureKubevirtUiFeaturesConfigMap(
     return;
   }
   throw new Error(
-    `GET ConfigMap ${namespace}/${KUBEVIRT_UI_FEATURES_CONFIG_MAP} failed (${get.status}): ${get.text.slice(0, 500)}`,
+    `GET ConfigMap ${namespace}/${KUBEVIRT_UI_FEATURES_CONFIG_MAP} failed (${
+      get.status
+    }): ${get.text.slice(0, 500)}`,
   );
 }
 
@@ -181,7 +193,7 @@ export async function enableInstanceTypesDeveloperPreviewViaConsoleApi(
   consoleOrigin: string,
   options: { cnvNamespace?: string } & ConsoleProxyRequestOptions = {},
 ): Promise<void> {
-  const namespace = options.cnvNamespace ?? EnvVariables.cnvNamespace;
+  const namespace = options.cnvNamespace ?? KUBEVIRT_UI_FEATURES_NAMESPACE;
   const { csrfToken } = options;
   try {
     await patchKubevirtUiFeatureViaConsoleProxy(
@@ -217,7 +229,7 @@ export async function patchKubevirtUiFeatureViaConsoleProxy(
   cnvNamespace?: string,
   proxyOptions: ConsoleProxyRequestOptions = {},
 ): Promise<void> {
-  const namespace = cnvNamespace ?? EnvVariables.cnvNamespace;
+  const namespace = cnvNamespace ?? KUBEVIRT_UI_FEATURES_NAMESPACE;
   const origin = consoleOrigin.replace(/\/$/, '');
   const headers = getConsoleKubernetesProxyHeaders(origin, proxyOptions);
   const instancePath = `/api/kubernetes${configMapPath(namespace)}`;
@@ -227,7 +239,7 @@ export async function patchKubevirtUiFeatureViaConsoleProxy(
   if (!get.ok() && get.status() !== 404) {
     const body = await get.text();
     throw new Error(
-      `GET kubevirt-ui-features via console proxy failed (${get.status()}): ${body.slice(0, 500)}`,
+      `GET ${KUBEVIRT_UI_FEATURES_CONFIG_MAP} via console proxy failed (${get.status()}): ${body.slice(0, 500)}`,
     );
   }
 
@@ -242,13 +254,19 @@ export async function patchKubevirtUiFeatureViaConsoleProxy(
       },
       headers,
     });
-    if (!create.ok()) {
+    if (create.ok()) {
+      return;
+    }
+    // Parallel workers: another create won the race — merge-patch below.
+    if (create.status() !== 409) {
       const body = await create.text();
       throw new Error(
-        `Create kubevirt-ui-features via console proxy failed (${create.status()}): ${body.slice(0, 500)}`,
+        `Create ${KUBEVIRT_UI_FEATURES_CONFIG_MAP} via console proxy failed (${create.status()}): ${body.slice(
+          0,
+          500,
+        )}`,
       );
     }
-    return;
   }
 
   const patch = await request.patch(url, {
@@ -258,7 +276,10 @@ export async function patchKubevirtUiFeatureViaConsoleProxy(
   if (!patch.ok()) {
     const body = await patch.text();
     throw new Error(
-      `Patch kubevirt-ui-features via console proxy failed (${patch.status()}): ${body.slice(0, 500)}`,
+      `Patch ${KUBEVIRT_UI_FEATURES_CONFIG_MAP} via console proxy failed (${patch.status()}): ${body.slice(
+        0,
+        500,
+      )}`,
     );
   }
 }

@@ -643,7 +643,7 @@ export default class RequestContextClient {
     await patchConsoleUserSettingsViaConsoleProxy(this.request, this.consoleOrigin, settingsKey);
   }
 
-  /** `kubevirt-ui-features` in openshift-cnv — e.g. `instanceTypesEnabled` (developer preview). */
+  /** `kubevirt-ui-preview-features` in `default` — e.g. `instanceTypesEnabled` (developer preview). */
   async patchKubevirtUiFeature(
     featureName: string,
     value: string,
