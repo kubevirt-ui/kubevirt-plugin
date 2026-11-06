@@ -114,4 +114,5 @@ After implementing fixes:
 
 - Verify all new/changed user-facing strings are correctly wrapped in `t()`
 - Run `npm run check-types` to verify no type errors
+- Run `npm run check-module-resolutions` to verify vendor module resolutions
 - Run `npm run lint` to verify linting passes
