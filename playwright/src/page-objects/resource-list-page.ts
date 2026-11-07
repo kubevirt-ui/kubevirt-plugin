@@ -249,9 +249,23 @@ export class ResourceListPage extends BasePage {
     await deleteModal.waitFor({ state: 'hidden', timeout: 2 * MINUTE });
   }
 
-  async createFromYamlAndSubmit(manifestYaml?: string): Promise<void> {
-    await this.chooseCreateOption(/with yaml|import yaml/i);
-    await this.page.locator('.monaco-editor').first().waitFor({
+  /**
+   * @param selectFromMenu - when false, caller already opened ~new / import YAML
+   *   (e.g. Create is a direct control, not a dropdown with "With YAML").
+   *   Matching OCP 4.14 d/s keeps the classic menu; skewed console builds often land on ~new.
+   */
+  async createFromYamlAndSubmit(
+    manifestYaml?: string,
+    options: { selectFromMenu?: boolean } = {},
+  ): Promise<void> {
+    const { selectFromMenu = true } = options;
+    const monaco = this.page.locator('.monaco-editor').first();
+    const alreadyOnYamlEditor =
+      (await monaco.isVisible().catch(() => false)) || this.page.url().includes('~new');
+    if (selectFromMenu && !alreadyOnYamlEditor) {
+      await this.chooseCreateOption(/with yaml|import yaml/i);
+    }
+    await monaco.waitFor({
       state: 'visible',
       timeout: TestTimeouts.ELEMENT_WAIT,
     });

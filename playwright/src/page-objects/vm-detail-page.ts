@@ -538,7 +538,7 @@ export class VmDetailPage extends BasePage {
     return this.vmAction('vm-action-start', /^Start$/i);
   }
 
-  async startVmFromActions(): Promise<void> {
+  async startVmFromActions(timeout = TestTimeouts.TEST_VM_CREATION): Promise<void> {
     const start = this.startAction();
     await pollUntil(
       async () => {
@@ -556,9 +556,17 @@ export class VmDetailPage extends BasePage {
       },
       {
         message: 'VM Start action should be visible and enabled in Actions menu',
-        timeout: TestTimeouts.LONG_OPERATION,
+        timeout,
       },
     );
+  }
+
+  /** Wait until overview status shows the given printable status (e.g. Stopped, Running). */
+  async waitForOverviewStatus(
+    status: string,
+    timeout = TestTimeouts.TEST_VM_CREATION,
+  ): Promise<void> {
+    await this.overviewStatusWithText(status).waitFor({ state: 'visible', timeout });
   }
 
   tabPanelText(match: RegExp | string): Locator {

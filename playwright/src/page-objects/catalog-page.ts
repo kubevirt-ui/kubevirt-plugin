@@ -1,6 +1,7 @@
 import type RequestContextClient from '@/clients/request-context-client';
 import FilterToolbarComponent from '@/components/shared/filter-toolbar-component';
 import BasePage from '@/page-objects/base-page';
+import { NavigationPage } from '@/page-objects/navigation-page';
 import { dismissConsoleObstructions } from '@/utils/console-modals';
 import { ConsoleRoutes } from '@/utils/console-routes';
 import { CatalogReviewTabTestId } from '@/utils/constants';
@@ -13,6 +14,8 @@ import type { Locator, Page } from '@playwright/test';
 /** VM creation wizard — template catalog step (`/k8s/ns/<ns>/vm-wizard`). */
 export class CatalogPage extends BasePage {
   private readonly catalogFilterToolbar: FilterToolbarComponent;
+  /** Namespace last opened via {@link openCatalogInNamespace}; used for post-create URL waits. */
+  private lastCatalogNamespace: string | undefined;
 
   readonly filterTextSelector =
     '#filter-text-input, [data-test="search-catalog"] input, [placeholder*="Filter by keyword"]';
@@ -47,7 +50,39 @@ export class CatalogPage extends BasePage {
     );
   }
 
+  private async assertDrawerProjectMatchesCatalogNamespace(): Promise<void> {
+    const namespace = this.lastCatalogNamespace;
+    if (!namespace) {
+      throw new Error(
+        'assertDrawerProjectMatchesCatalogNamespace: openCatalogInNamespace must run first',
+      );
+    }
+    // Drawer DescriptionList: term "Project" is often aria-hidden; read the description value.
+    const drawer = this.page
+      .getByRole('dialog', { name: /Template drawer/i })
+      .or(this.page.locator('.template-catalog-drawer'))
+      .first();
+    const projectGroup = drawer
+      .locator(
+        '.pf-c-description-list__group, .pf-v5-c-description-list__group, [class*="description-list__group"]',
+      )
+      .filter({ hasText: /^Project/ });
+    const projectValue = projectGroup
+      .locator(
+        '.pf-c-description-list__description .pf-c-description-list__text, .pf-v5-c-description-list__description [class*="description-list__text"], dd, [class*="description-list__description"]',
+      )
+      .last();
+    await projectValue.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
+    const text = (await projectValue.textContent())?.trim() ?? '';
+    if (text !== namespace) {
+      throw new Error(
+        `Quick create Project is "${text}", expected catalog namespace "${namespace}"`,
+      );
+    }
+  }
+
   private async clickQuickCreateSubmit(scope: Locator): Promise<void> {
+    await this.assertDrawerProjectMatchesCatalogNamespace();
     await pollUntil(async () => (await this.findEnabledQuickCreateSubmit(scope)) !== undefined, {
       message: 'Quick create VirtualMachine submit button did not become enabled',
       timeout: TestTimeouts.LONG_OPERATION,
@@ -60,11 +95,18 @@ export class CatalogPage extends BasePage {
   }
 
   private async confirmQuickCreateBootSourceAndWaitForVm(): Promise<void> {
+    const namespace = this.lastCatalogNamespace;
+    if (!namespace) {
+      throw new Error(
+        'confirmQuickCreateBootSourceAndWaitForVm: openCatalogInNamespace must run first',
+      );
+    }
     const noBs = this.page.getByRole('button', { name: 'Create with no available boot source' });
     if (await noBs.isVisible({ timeout: 3 * SECOND }).catch(() => false)) {
       await noBs.click();
     }
-    await this.page.waitForURL(/kubevirt\.io~v1~VirtualMachine\/[^/]+/, {
+    // Require test ns — skewed HC can create into `default` while any-ns wait still passes.
+    await this.page.waitForURL(new RegExp(`/ns/${namespace}/.*kubevirt\\.io~v1~VirtualMachine/`), {
       timeout: TestTimeouts.LONG_OPERATION,
     });
   }
@@ -91,8 +133,29 @@ export class CatalogPage extends BasePage {
       .first();
   }
 
+  /** Diagnostics for a quick create submit button stuck disabled (see CNV-8848). */
+  private async describeQuickCreateSubmitNotEnabled(vmName: string): Promise<string> {
+    const submit = this.drawerQuickCreateSubmitButton();
+    const [visible, enabled] = await Promise.all([
+      submit.isVisible().catch(() => false),
+      submit.isEnabled().catch(() => false),
+    ]);
+    return (
+      `Quick create VirtualMachine submit button did not become enabled for "${vmName}" ` +
+      `(submit visible=${visible}, enabled=${enabled}, url=${this.page.url()}). ` +
+      'Likely a template/boot source that never finishes resolving in this environment ' +
+      '(e.g. console useK8sModels() or DataSource/PVC readiness) -- see CNV-8848.'
+    );
+  }
+
   private drawerQuickCreateSubmitButton(): Locator {
-    return this.templateDrawer().getByTestId('quick-create-vm-btn');
+    // Product emits data-test-id; playwright.config testIdAttribute is `data-test`,
+    // so bare getByTestId never matches. Fall back to the role button used by
+    // templateDrawerQuickCreateButton (same label).
+    const drawer = this.templateDrawer();
+    return drawer
+      .locator('[data-test-id="quick-create-vm-btn"]')
+      .or(drawer.getByRole('button', { name: /^Quick create VirtualMachine$/i }));
   }
 
   /** Quick-create heading can render before the name field; wait or re-open the modal. */
@@ -293,8 +356,15 @@ export class CatalogPage extends BasePage {
     await this.ensureQuickCreateNameInputVisible();
     await this.fillCustomizeVmName(vmName);
     if (!(await this.waitForDrawerQuickCreateEnabled())) {
-      return false;
+      // Quick-create UI was present and committed to (name filled in), but the
+      // submit button never enabled within the long wait above. This is the
+      // CNV-8848 hang shape: silently returning false here lets quickCreateVm
+      // cascade through several more fallback branches (each with their own
+      // long waits) and die at the test's outer timeout with no useful error.
+      // Fail fast with concrete diagnostics instead.
+      throw new Error(await this.describeQuickCreateSubmitNotEnabled(vmName));
     }
+    await this.assertDrawerProjectMatchesCatalogNamespace();
     await this.robustClick(this.drawerQuickCreateSubmitButton());
     await this.confirmQuickCreateBootSourceAndWaitForVm();
     return true;
@@ -872,10 +942,16 @@ export class CatalogPage extends BasePage {
   }
 
   async openCatalogInNamespace(namespace: string): Promise<void> {
+    this.lastCatalogNamespace = namespace;
     await this.page.goto(ConsoleRoutes.catalog(namespace), {
       waitUntil: 'domcontentloaded',
     });
     await dismissConsoleObstructions(this.page);
+    // Always sync project bar — skewed HC can keep Project: default while URL
+    // already has /ns/<test>/; URL-only skip left creates in default (CNV-8848).
+    // switchProject no-ops when the bar already shows the target (avoids HC flake).
+    await new NavigationPage(this.page).switchProject(namespace);
+    await this.waitForCatalogInNamespace(namespace);
     if (this.isLegacyTemplatesCatalogRoute() || (await this.shouldUseLegacyCatalogRoute())) {
       await this.ensureTemplateCatalogTabSelected();
       await this.waitForTemplateCatalogReady();

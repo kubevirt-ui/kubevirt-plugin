@@ -195,7 +195,14 @@ export class NavigationPage extends BasePage {
 
   async switchProject(projectName: string): Promise<void> {
     await dismissConsoleObstructions(this.page);
-    await this.page.locator('[data-test-id="namespace-bar-dropdown"]').click();
+    const toggle = this.page.locator('[data-test-id="namespace-bar-dropdown"]');
+    const toggleText = (await toggle.textContent().catch(() => '')) ?? '';
+    // Already selected — opening the menu and re-picking flakes on HC (current
+    // project often omitted from the dropdown list).
+    if (new RegExp(projectName.slice(0, 24), 'i').test(toggleText)) {
+      return;
+    }
+    await toggle.click();
 
     const showDefault = this.page.locator(
       '[data-test-id="showSystemSwitch"], [data-test="show-default-projects-switch"]',
