@@ -16,6 +16,7 @@ import {
 } from '@/utils/cluster-oc';
 import { EnvVariables } from '@/utils/env-variables';
 import { ensureKubevirtUiFeaturesReaderRbac } from '@/utils/kubevirt-ui-features';
+import { ensureKubevirtUserSettingsReaderRbac } from '@/utils/kubevirt-user-settings';
 import { logger } from '@/utils/logger';
 import {
   ensureNonPrivUserExists,
@@ -244,6 +245,25 @@ export function getSetupRules(): SetupRule[] {
       guard: (ctx) =>
         EnvVariables.isNonPrivUser &&
         !EnvVariables.skipOcInvocations &&
+        Boolean(ctx.effectiveKubeConfigPath),
+      id: 'ensure-kubevirt-user-settings-rbac',
+      name: 'Ensure kubevirt-user-settings reader RoleBinding (non-priv InstanceTypes catalog)',
+      onError: 'throw',
+      phase: SetupPhase.CLUSTER,
+      run: async (ctx) => {
+        const kubeconfig = ctx.effectiveKubeConfigPath;
+        if (!kubeconfig) {
+          throw new Error('Kubeconfig path missing before kubevirt-user-settings RBAC setup');
+        }
+        pinKubeconfigToProcess(kubeconfig);
+        await ensureKubevirtUserSettingsReaderRbac({ kubeconfigPath: kubeconfig });
+        logger.success('kubevirt-user-settings reader RBAC is present');
+      },
+    },
+    {
+      guard: (ctx) =>
+        EnvVariables.isNonPrivUser &&
+        !EnvVariables.skipOcInvocations &&
         !EnvVariables.isLocalMode &&
         Boolean(ctx.effectiveKubeConfigPath),
       id: 'nonpriv-admin-configmap-setup',
@@ -262,7 +282,9 @@ export function getSetupRules(): SetupRule[] {
           cnvNamespace: ctx.cnvNamespace,
           userSettingsKey: EnvVariables.testUsername,
         });
-        logger.success('instanceTypesEnabled=true; console user-settings patched for test user');
+        logger.success(
+          'instanceTypesEnabled=true; console + kubevirt user-settings patched for test user',
+        );
       },
     },
     {
@@ -301,7 +323,7 @@ export function getSetupRules(): SetupRule[] {
           if (!EnvVariables.isLocalMode) {
             logger.info(
               EnvVariables.isNonPrivUser
-                ? 'Post-login console API setup (kubevirt-user-settings via /api/kubernetes)...'
+                ? 'Post-login console API setup skipped (non-priv ConfigMaps patched via kubeadmin oc)...'
                 : 'Post-login console API setup (instanceTypes + user-settings + kubevirt-user-settings via /api/kubernetes)...',
             );
             await runConsolePostLoginSetup(context, baseURL, {
@@ -312,7 +334,7 @@ export function getSetupRules(): SetupRule[] {
             });
             logger.success(
               EnvVariables.isNonPrivUser
-                ? 'kubevirt-user-settings patched (welcome modal hidden)'
+                ? 'Non-priv browser session ready (welcome modal hidden via oc pre-patch)'
                 : 'instanceTypesEnabled=true; console user-settings patched; kubevirt welcome modal hidden',
             );
           }

@@ -6,6 +6,10 @@ import * as path from 'path';
 import { kubeconfigMatchesClusterUrl } from '@/utils/cluster-kubernetes-api';
 import { consoleUserSettingsPreferencesJson } from '@/utils/console-user-settings';
 import { EnvVariables } from '@/utils/env-variables';
+import {
+  buildKubevirtUserSettingsHideWelcomeJson,
+  openshiftUserKubevirtSettingsDataKey,
+} from '@/utils/kubevirt-user-settings';
 import { MINUTE } from '@/utils/test-config';
 
 export function getDefaultKubeconfigPath(): string {
@@ -124,6 +128,68 @@ export function patchConsoleUserSettings(kubeconfig: string, settingsKey: string
       return;
     }
     throw err;
+  }
+}
+
+const KUBEVIRT_USER_SETTINGS_CM = 'kubevirt-user-settings';
+
+/** Non-priv: test user cannot GET `default/kubevirt-user-settings` via console proxy — patch as kubeadmin. */
+export function patchKubevirtUserSettingsHideWelcomeForUser(
+  kubeconfig: string,
+  openshiftUsername: string,
+): void {
+  let uid: string | undefined;
+  try {
+    uid = runOc(
+      `oc get user ${openshiftUsername} -o jsonpath='{.metadata.uid}'`,
+      kubeconfig,
+    ).trim();
+  } catch {
+    uid = undefined;
+  }
+  const dataKey = openshiftUserKubevirtSettingsDataKey(openshiftUsername, uid || undefined);
+  let existingRaw: string | undefined;
+  try {
+    const raw = runOc(
+      `oc get configmap ${KUBEVIRT_USER_SETTINGS_CM} -n default -o json`,
+      kubeconfig,
+    );
+    const cm = JSON.parse(raw) as { data?: Record<string, string> };
+    existingRaw = cm.data?.[dataKey];
+  } catch {
+    existingRaw = undefined;
+  }
+  const value = buildKubevirtUserSettingsHideWelcomeJson(existingRaw);
+  const patchFile = path.join(os.tmpdir(), `pw-kubevirt-user-settings-${Date.now()}.json`);
+  fs.writeFileSync(patchFile, JSON.stringify({ data: { [dataKey]: value } }), 'utf8');
+  try {
+    runOc(
+      `oc patch configmap ${KUBEVIRT_USER_SETTINGS_CM} -n default --type merge --patch-file "${patchFile}"`,
+      kubeconfig,
+    );
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    if (!message.includes('NotFound')) {
+      throw err;
+    }
+    const manifest = path.join(os.tmpdir(), `pw-kubevirt-user-settings-cm-${Date.now()}.json`);
+    fs.writeFileSync(
+      manifest,
+      JSON.stringify({
+        apiVersion: 'v1',
+        data: { [dataKey]: value },
+        kind: 'ConfigMap',
+        metadata: { name: KUBEVIRT_USER_SETTINGS_CM, namespace: 'default' },
+      }),
+      'utf8',
+    );
+    try {
+      runOc(`oc apply -f "${manifest}"`, kubeconfig);
+    } finally {
+      fs.unlinkSync(manifest);
+    }
+  } finally {
+    fs.unlinkSync(patchFile);
   }
 }
 

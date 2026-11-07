@@ -1,3 +1,4 @@
+import { clusterKubernetesJson } from '@/utils/cluster-kubernetes-api';
 import {
   type ConsoleProxyRequestOptions,
   getConsoleKubernetesProxyHeaders,
@@ -6,6 +7,105 @@ import type { APIRequestContext } from '@playwright/test';
 
 const KUBEVIRT_USER_SETTINGS_NAMESPACE = 'default';
 const KUBEVIRT_USER_SETTINGS_CONFIG_MAP = 'kubevirt-user-settings';
+const USER_SETTINGS_ROLE_NAME = 'kubevirt-user-settings-reader';
+const USER_SETTINGS_ROLE_BINDING_NAME = 'kubevirt-user-settings-reader-binding';
+
+async function createNamespacedResource(
+  apiPath: string,
+  body: Record<string, unknown>,
+  kubeconfigPath?: string,
+): Promise<void> {
+  const response = await clusterKubernetesJson('POST', apiPath, body, undefined, kubeconfigPath);
+  if (!response.ok && response.status !== 409) {
+    throw new Error(
+      `Create ${apiPath} failed (${response.status}): ${response.text.slice(0, 500)}`,
+    );
+  }
+}
+
+async function upsertNamespacedRole(
+  role: Record<string, unknown>,
+  kubeconfigPath?: string,
+): Promise<void> {
+  const name = (role.metadata as { name: string }).name;
+  const namespace = (role.metadata as { namespace: string }).namespace;
+  const path = `/apis/rbac.authorization.k8s.io/v1/namespaces/${namespace}/roles/${name}`;
+  const response = await clusterKubernetesJson('PUT', path, role, undefined, kubeconfigPath);
+  if (response.ok) {
+    return;
+  }
+  if (response.status === 404) {
+    await createNamespacedResource(
+      `/apis/rbac.authorization.k8s.io/v1/namespaces/${namespace}/roles`,
+      role,
+      kubeconfigPath,
+    );
+    return;
+  }
+  throw new Error(
+    `Upsert Role ${name} failed (${response.status}): ${response.text.slice(0, 500)}`,
+  );
+}
+
+/** Role + RoleBinding for `default/kubevirt-user-settings` (InstanceTypes loader + column prefs PATCH). */
+export async function ensureKubevirtUserSettingsReaderRbac(
+  options: { kubeconfigPath?: string } = {},
+): Promise<void> {
+  const kubeconfigPath = options.kubeconfigPath;
+  const role = {
+    apiVersion: 'rbac.authorization.k8s.io/v1',
+    kind: 'Role',
+    metadata: { name: USER_SETTINGS_ROLE_NAME, namespace: KUBEVIRT_USER_SETTINGS_NAMESPACE },
+    rules: [
+      {
+        apiGroups: [''],
+        resourceNames: [KUBEVIRT_USER_SETTINGS_CONFIG_MAP],
+        resources: ['configmaps'],
+        verbs: ['get', 'list', 'watch', 'update', 'patch'],
+      },
+    ],
+  };
+  const roleBinding = {
+    apiVersion: 'rbac.authorization.k8s.io/v1',
+    kind: 'RoleBinding',
+    metadata: {
+      name: USER_SETTINGS_ROLE_BINDING_NAME,
+      namespace: KUBEVIRT_USER_SETTINGS_NAMESPACE,
+    },
+    roleRef: {
+      apiGroup: 'rbac.authorization.k8s.io',
+      kind: 'Role',
+      name: USER_SETTINGS_ROLE_NAME,
+    },
+    subjects: [
+      {
+        apiGroup: 'rbac.authorization.k8s.io',
+        kind: 'Group',
+        name: 'system:authenticated',
+      },
+    ],
+  };
+  await upsertNamespacedRole(role, kubeconfigPath);
+  await createNamespacedResource(
+    `/apis/rbac.authorization.k8s.io/v1/namespaces/${KUBEVIRT_USER_SETTINGS_NAMESPACE}/rolebindings`,
+    roleBinding,
+    kubeconfigPath,
+  );
+}
+
+function kubevirtSettingsWithWelcomeHidden(existingRaw?: string): string {
+  const existing = existingRaw
+    ? (JSON.parse(existingRaw) as Record<string, unknown>)
+    : { cards: {}, columns: {}, quickStart: {}, ssh: {} };
+  const quickStart =
+    existing.quickStart && typeof existing.quickStart === 'object'
+      ? { ...(existing.quickStart as Record<string, unknown>) }
+      : {};
+  return JSON.stringify({
+    ...existing,
+    quickStart: { ...quickStart, dontShowWelcomeModal: true },
+  });
+}
 
 /** Matches `useKubevirtUserSettings` ConfigMap data key derivation. */
 export async function kubevirtUserSettingsDataKeyFromConsoleSession(
@@ -25,26 +125,20 @@ export async function kubevirtUserSettingsDataKeyFromConsoleSession(
   const user = (await userRes.json()) as {
     metadata?: { name?: string; uid?: string };
   };
-  const sanitizedName = user?.metadata?.name?.replace(/[^-._a-zA-Z0-9]+/g, '-');
-  const key = user?.metadata?.uid || sanitizedName;
+  return openshiftUserKubevirtSettingsDataKey(user?.metadata?.name, user?.metadata?.uid);
+}
+
+export function openshiftUserKubevirtSettingsDataKey(name?: string, uid?: string): string {
+  const sanitizedName = name?.replace(/[^-._a-zA-Z0-9]+/g, '-');
+  const key = uid || sanitizedName;
   if (!key) {
-    throw new Error('OpenShift user ~ missing metadata.uid and metadata.name');
+    throw new Error('OpenShift user missing metadata.uid and metadata.name');
   }
   return key;
 }
 
-function kubevirtSettingsWithWelcomeHidden(existingRaw?: string): string {
-  const existing = existingRaw
-    ? (JSON.parse(existingRaw) as Record<string, unknown>)
-    : { cards: {}, columns: {}, quickStart: {}, ssh: {} };
-  const quickStart =
-    existing.quickStart && typeof existing.quickStart === 'object'
-      ? { ...(existing.quickStart as Record<string, unknown>) }
-      : {};
-  return JSON.stringify({
-    ...existing,
-    quickStart: { ...quickStart, dontShowWelcomeModal: true },
-  });
+export function buildKubevirtUserSettingsHideWelcomeJson(existingRaw?: string): string {
+  return kubevirtSettingsWithWelcomeHidden(existingRaw);
 }
 
 /**
