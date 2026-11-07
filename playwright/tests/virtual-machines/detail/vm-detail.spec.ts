@@ -13,7 +13,8 @@ test.describe(`VM detail tabs ${ROUTE_VIRTUAL_MACHINES_DETAIL_TAG} ${GATING_TAG}
     const name = CRUD_NAMES.vmExample;
     await apiClient.deleteVirtualMachine(name, testNamespace);
     await apiClient.deleteOpenshiftTemplate(name, testNamespace);
-    await apiClient.applyVirtualMachineExample(testNamespace, name);
+    // Container-disk: Start stays disabled while DV example VMs are Provisioning on HC.
+    await apiClient.applyMigratableVirtualMachine(testNamespace, name);
 
     try {
       await vmDetail.openVmAndWaitForDetail(testNamespace, name);
@@ -56,7 +57,8 @@ test.describe(`VM detail tabs ${ROUTE_VIRTUAL_MACHINES_DETAIL_TAG} ${GATING_TAG}
     const name = CRUD_NAMES.vmExample;
     await apiClient.deleteVirtualMachine(name, testNamespace);
     await apiClient.deleteOpenshiftTemplate(name, testNamespace);
-    await apiClient.applyVirtualMachineExample(testNamespace, name);
+    // Container-disk: Start stays disabled while DV example VMs are Provisioning on HC.
+    await apiClient.applyMigratableVirtualMachine(testNamespace, name);
 
     try {
       await vmDetail.openVmAndWaitForDetail(testNamespace, name);
