@@ -21,6 +21,7 @@ const ACMExtentionsTableData: FC<ACMExtentionsTableDataProps> = ({
         const CellColumn = column.cell as ComponentType<{ resource?: unknown }>;
 
         return (
+          // eslint-disable-next-line @typescript-eslint/no-deprecated -- SDK VirtualizedTable API; migrate ACM extension columns to ConsoleDataView in a follow-up
           <TableData
             activeColumnIDs={activeColumnIDs}
             className="vm-column"

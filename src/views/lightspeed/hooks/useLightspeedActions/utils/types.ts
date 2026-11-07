@@ -1,5 +1,3 @@
-import type { Map as ImmutableMap } from 'immutable';
-
 export type ErrorType = {
   message?: string;
   moreInfo?: string;
@@ -43,8 +41,8 @@ type ChatEntryAI = {
   isTruncated: boolean;
   references?: Array<ReferencedDoc>;
   text?: string;
-  tools?: ImmutableMap<string, Tool>;
-  userFeedback?: ImmutableMap<string, object>;
+  tools?: Map<string, Tool>;
+  userFeedback?: Map<string, object>;
   who: 'ai';
 };
 

@@ -370,14 +370,15 @@ Ensure your dev server is running, then:
 
 ### NPM Scripts
 
-| Command                 | Purpose                 |
-| ----------------------- | ----------------------- |
-| `npm run dev`           | Start dev server        |
-| `npm run start-console` | Start console container |
-| `npm run check-types`   | TypeScript check        |
-| `npm run lint`          | Lint check              |
-| `npm test`              | Run unit tests          |
-| `npm run i18n`          | Update translations     |
+| Command                            | Purpose                 |
+| ---------------------------------- | ----------------------- |
+| `npm run dev`                      | Start dev server        |
+| `npm run start-console`            | Start console container |
+| `npm run check-types`              | TypeScript check        |
+| `npm run check-module-resolutions` | Module resolution check |
+| `npm run lint`                     | Lint check              |
+| `npm test`                         | Run unit tests          |
+| `npm run i18n`                     | Update translations     |
 
 ---
 

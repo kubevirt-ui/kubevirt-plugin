@@ -47,6 +47,7 @@ const useVirtualMachineColumns = (): [
     [t],
   );
 
+  // eslint-disable-next-line @typescript-eslint/no-deprecated -- SDK VirtualizedTable API; migrate Connected VMs table to ConsoleDataView in a follow-up
   const [activeColumns, loaded] = useActiveColumns<V1VirtualMachine>({
     columnManagementID: 'VMNetwork-ConnectedVirtualMachines',
     columns,

@@ -11,7 +11,13 @@ const ISOBadge: FC<ISOBadgeProps> = ({ name }) => {
   const { t } = useKubevirtTranslation();
 
   return (
-    <Popover bodyContent={name} hasAutoWidth position={PopoverPosition.top} triggerAction="hover">
+    <Popover
+      bodyContent={name}
+      hasAutoWidth
+      position={PopoverPosition.top}
+      // eslint-disable-next-line @typescript-eslint/no-deprecated -- keep hover UX until Popover trigger migration
+      triggerAction="hover"
+    >
       <Badge isRead>{t('ISO')}</Badge>
     </Popover>
   );
