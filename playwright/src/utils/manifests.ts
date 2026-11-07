@@ -63,6 +63,11 @@ spec:
 `;
 }
 
+/**
+ * Lightweight example VM for list/detail gating.
+ * Uses containerDisk (not rhel9 DataSource clone) so HC is not stuck Provisioning
+ * when CDI/storage is congested (CNV-100472 / kubevirt-plugin-414).
+ */
 export function virtualMachineManifest(opts: { name: string; namespace: string }): string {
   const { name, namespace } = opts;
   return `apiVersion: kubevirt.io/v1
@@ -70,24 +75,9 @@ kind: VirtualMachine
 metadata:
   labels:
     app: ${name}
-    vm.kubevirt.io/template: rhel9-server-small
   name: ${name}
   namespace: ${namespace}
 spec:
-  dataVolumeTemplates:
-  - apiVersion: cdi.kubevirt.io/v1beta1
-    kind: DataVolume
-    metadata:
-      name: ${name}
-    spec:
-      sourceRef:
-        kind: DataSource
-        name: rhel9
-        namespace: openshift-virtualization-os-images
-      storage:
-        resources:
-          requests:
-            storage: 30Gi
   running: false
   template:
     metadata:
@@ -111,22 +101,16 @@ spec:
           - masquerade: {}
             model: virtio
             name: default
-        features:
-          smm:
-            enabled: true
-        firmware:
-          bootloader:
-            efi: {}
         resources:
           requests:
-            memory: 2Gi
+            memory: 512Mi
       evictionStrategy: LiveMigrate
       networks:
       - name: default
         pod: {}
       volumes:
-      - dataVolume:
-          name: ${name}
+      - containerDisk:
+          image: quay.io/kubevirt/cirros-container-disk-demo
         name: rootdisk
       - cloudInitNoCloud:
           userData: "#cloud-config\\n"

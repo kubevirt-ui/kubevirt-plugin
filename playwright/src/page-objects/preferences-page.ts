@@ -2,6 +2,7 @@ import { dismissConsoleObstructions } from '@/utils/console-modals';
 import { ConsoleRoutes } from '@/utils/console-routes';
 import { KUBEVIRT_INSTANCETYPE_API_VERSION } from '@/utils/constants';
 import { waitForConsoleRouteReady } from '@/utils/instance-types-policy';
+import { isOpenShiftMajorMinor } from '@/utils/openshift-version';
 import { fillLabelsModalInput } from '@/utils/resource-summary';
 import { MINUTE, TestTimeouts } from '@/utils/test-config';
 import type { Locator } from '@playwright/test';
@@ -39,8 +40,29 @@ export class PreferencesPage extends ResourceListPage {
   }
 
   async createFromYaml(manifestYaml?: string): Promise<void> {
-    await this.openCreateDropdown(/Create VirtualMachineClusterPreference|Create/i);
-    await this.createFromYamlAndSubmit(manifestYaml);
+    if (isOpenShiftMajorMinor('4.14')) {
+      await this.openCreateDropdown(/Create VirtualMachineClusterPreference|Create/i);
+      await this.createFromYamlAndSubmit(manifestYaml);
+    } else {
+      // Skewed console: already on ~new or Create is a direct link (no YAML menuitem).
+      const monaco = this.page.locator('.monaco-editor').first();
+      const alreadyOnYaml =
+        (await monaco.isVisible().catch(() => false)) || this.page.url().includes('~new');
+      if (!alreadyOnYaml) {
+        const directCreate = this.page
+          .getByRole('link', { name: /Create VirtualMachineClusterPreference/i })
+          .or(this.page.getByRole('button', { name: /Create VirtualMachineClusterPreference/i }))
+          .or(this.page.getByRole('link', { name: /^Create$/i }))
+          .or(this.page.getByRole('button', { name: /^Create$/i }))
+          .first();
+        if (await directCreate.isVisible().catch(() => false)) {
+          await directCreate.click();
+        } else {
+          await this.openCreateDropdown(/Create VirtualMachineClusterPreference|Create/i);
+        }
+      }
+      await this.createFromYamlAndSubmit(manifestYaml, { selectFromMenu: false });
+    }
     await this.waitForResourceDetailUrl(
       new RegExp(
         `${preferenceConsoleSegment.replace(

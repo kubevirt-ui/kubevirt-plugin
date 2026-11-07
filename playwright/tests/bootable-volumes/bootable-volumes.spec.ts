@@ -81,11 +81,14 @@ test.describe(`Bootable volumes gating create ${ROUTE_BOOTABLE_VOLUMES_TAG} ${GA
   }) => {
     await nav.goToBootableVolumes(testNamespace);
     await bootableVolumesPage.goToNamespaceList(testNamespace);
+    // Prefer test ns on the project bar; YAML create still follows the bar (may be default).
+    await nav.switchProject(testNamespace).catch(() => undefined);
     await expect(bootableVolumesPage.addVolumeButton()).toBeVisible();
     await bootableVolumesPage.openCreateWithYaml(testNamespace);
     await expect(bootableVolumesPage.dataVolumeYamlCreateHeading()).toBeVisible({
       timeout: TestTimeouts.ELEMENT_WAIT,
     });
+    await expect(bootableVolumesPage.page).toHaveURL(/DataVolume.*~new/);
   });
 
   test('Add volume With form creates bootable volume from registry', async ({

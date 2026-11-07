@@ -16,12 +16,14 @@ test.describe(`VM detail tabs ${ROUTE_VIRTUAL_MACHINES_DETAIL_TAG} ${GATING_TAG}
     await apiClient.applyVirtualMachineExample(testNamespace, name);
 
     try {
-      await vmDetail.openVm(testNamespace, name);
+      await vmDetail.openVmAndWaitForDetail(testNamespace, name);
       await expect(vmDetail.hostnameLabel()).toBeVisible({ timeout: TestTimeouts.ELEMENT_WAIT });
 
-      await vmDetail.startVmFromActions();
+      // containerDisk example reaches Stopped without CDI clone; then Start → Running.
+      await vmDetail.waitForOverviewStatus('Stopped', TestTimeouts.VM_CREATION);
+      await vmDetail.startVmFromActions(TestTimeouts.VM_BOOTUP);
       await expect(vmDetail.overviewStatusWithText('Running')).toBeVisible({
-        timeout: TestTimeouts.TEST_VM_CREATION,
+        timeout: TestTimeouts.VM_BOOTUP,
       });
 
       await vmDetail.goToTab(VmTabTestId.Details);

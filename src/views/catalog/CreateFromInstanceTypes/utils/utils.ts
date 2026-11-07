@@ -7,6 +7,7 @@ import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { convertUserDataObjectToYAML } from '@kubevirt-utils/components/CloudinitModal/utils/cloudinit-utils';
 import { ACTIVATION_KEY } from '@kubevirt-utils/components/CloudinitModal/utils/consts';
 import { addSecretToVM } from '@kubevirt-utils/components/SSHSecretSection/utils/utils';
+import { RUNSTRATEGY_ALWAYS, RUNSTRATEGY_HALTED } from '@kubevirt-utils/constants/constants';
 import { RHELAutomaticSubscriptionData } from '@kubevirt-utils/hooks/useRHELAutomaticSubscription/utils/types';
 import { isBootableVolumePVCKind } from '@kubevirt-utils/resources/bootableresources/helpers';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
@@ -112,7 +113,7 @@ export const generateVM = (
       preference: {
         name: selectedPreference,
       },
-      running: startVM,
+      runStrategy: startVM ? RUNSTRATEGY_ALWAYS : RUNSTRATEGY_HALTED,
       template: {
         spec: {
           domain: {

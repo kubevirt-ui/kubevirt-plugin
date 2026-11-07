@@ -29,9 +29,14 @@ export class BootableVolumesPage extends ResourceListPage {
 
   private async selectPreferenceInModal(preferenceName: string): Promise<void> {
     const modal = this.addVolumeModal();
+    // Exact match only: a loose /name/i role filter also matches arch-suffixed
+    // preferences (e.g. fedora.arm64, fedora.s390x) shipped by newer CNV,
+    // causing a strict-mode violation when multiple options match.
+    // Use data-test-id explicitly: playwright.config testIdAttribute is
+    // `data-test`, but FilterSelectOption emits `data-test-id`.
     const option = modal
-      .getByTestId(`preference-select-option-${preferenceName}`)
-      .or(modal.getByRole('option', { name: new RegExp(preferenceName, 'i') }));
+      .locator(`[data-test-id="preference-select-option-${preferenceName}"]`)
+      .or(modal.getByRole('option', { exact: true, name: preferenceName }));
 
     if (!(await option.isVisible().catch(() => false))) {
       await this.closeOpenSelectMenus(modal);
@@ -139,11 +144,21 @@ export class BootableVolumesPage extends ResourceListPage {
       });
   }
 
-  async openCreateWithYaml(namespace: string): Promise<void> {
+  async openCreateWithYaml(_namespace?: string): Promise<void> {
     await this.robustClick(this.addVolumeButton());
     await this.page.getByRole('menuitem', { name: /With YAML/i }).click();
-    await this.page.waitForURL(new RegExp(`/ns/${namespace}/.*DataVolume.*~new`), {
-      timeout: TestTimeouts.LONG_OPERATION,
-    });
+    // Console YAML create follows the project bar (often `default`), not the list URL ns.
+    // Do not require testNamespace in the path — wait for any DataVolume ~new + editor.
+    const onNew = /DataVolume.*~new/.test(this.page.url());
+    if (!onNew) {
+      await this.page.waitForURL(/DataVolume.*~new/, {
+        timeout: TestTimeouts.LONG_OPERATION,
+        waitUntil: 'domcontentloaded',
+      });
+    }
+    await this.dataVolumeYamlCreateHeading()
+      .or(this.page.locator('.monaco-editor').first())
+      .first()
+      .waitFor({ state: 'visible', timeout: TestTimeouts.LONG_OPERATION });
   }
 }

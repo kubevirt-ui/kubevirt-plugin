@@ -59,6 +59,8 @@ test.describe(`VM gating create from template ${ROUTE_CATALOG_TAG} ${GATING_TAG}
       await verifyVirtualMachineCreated(apiClient, vmListPage, testNamespace, vmName);
     } finally {
       await apiClient.deleteVirtualMachine(vmName, testNamespace);
+      // Skewed HC may have created the VM in `default` before the ns pin landed.
+      await apiClient.deleteVirtualMachine(vmName, 'default').catch(() => undefined);
     }
   });
 });

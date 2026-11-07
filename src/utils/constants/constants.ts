@@ -8,3 +8,8 @@ export const OPENSHIFT_SRIOV_NETWORK_OPERATOR_NS = 'openshift-sriov-network-oper
 export const OPENSHIFT_MULTUS_NS = 'openshift-multus';
 
 export const VENDOR_LABEL = 'instancetype.kubevirt.io/vendor';
+
+/** Prefer runStrategy over deprecated VM spec.running (CNV-45435). */
+export const RUNSTRATEGY_ALWAYS = 'Always';
+export const RUNSTRATEGY_HALTED = 'Halted';
+export const RUNSTRATEGY_RERUNONFAILURE = 'RerunOnFailure';
