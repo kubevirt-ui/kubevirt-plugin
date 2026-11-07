@@ -20,7 +20,13 @@ const NUMABadge: FC = () => {
   );
 
   return (
-    <Popover bodyContent={popoverContent} hasAutoWidth position="right" triggerAction="hover">
+    <Popover
+      bodyContent={popoverContent}
+      hasAutoWidth
+      position="right"
+      // eslint-disable-next-line @typescript-eslint/no-deprecated -- keep hover UX until Popover trigger migration
+      triggerAction="hover"
+    >
       <Label className="numa-badge" color="grey" isCompact>
         {t('vNUMA')}
       </Label>

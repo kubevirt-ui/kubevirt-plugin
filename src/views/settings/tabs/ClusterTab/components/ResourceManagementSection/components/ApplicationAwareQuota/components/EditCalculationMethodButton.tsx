@@ -45,6 +45,7 @@ const EditCalculationMethodButton: FC<EditCalculationMethodButtonProps> = ({
       className="edit-calculation-method-button__popover"
       hasAutoWidth
       position={PopoverPosition.right}
+      // eslint-disable-next-line @typescript-eslint/no-deprecated -- keep hover UX until Popover trigger migration
       triggerAction="hover"
     >
       <EditButton onClick={onClick} variant={ButtonVariant.link}>
