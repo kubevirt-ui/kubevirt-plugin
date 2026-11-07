@@ -57,6 +57,7 @@ const SelectedStorageTooltip: FC<SelectedStorageTooltipProps> = ({ children, vms
         </div>
       }
       hasAutoWidth
+      // eslint-disable-next-line @typescript-eslint/no-deprecated -- keep hover UX until Popover trigger migration
       triggerAction="hover"
     >
       <Button disabled isInline variant={ButtonVariant.link}>

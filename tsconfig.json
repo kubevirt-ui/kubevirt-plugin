@@ -7,7 +7,7 @@
     "esModuleInterop": true,
     "experimentalDecorators": true,
     "jsx": "react-jsx",
-    "lib": ["es2021", "dom"],
+    "lib": ["es2023", "dom"],
     "module": "esnext",
     "moduleResolution": "bundler",
     "noUnusedLocals": true,
@@ -27,7 +27,7 @@
       "@virtualmachines/*": ["src/views/virtualmachines/*"]
     },
     "skipLibCheck": true,
-    "target": "es2021",
+    "target": "es2023",
     "typeRoots": ["node_modules/@types", "@types"]
   },
   "include": [
