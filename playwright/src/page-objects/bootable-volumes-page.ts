@@ -32,9 +32,18 @@ export class BootableVolumesPage extends ResourceListPage {
 
   private async selectPreferenceInModal(preferenceName: string): Promise<void> {
     const modal = this.addVolumeModal();
+    // Prefer data-test-id when present (FilterSelectOption). Accessible names on
+    // 4.16+ look like "VirtualMachineClusterPreference VMCP fedora", so exact
+    // name "fedora" misses. Match a child label with exact text so fedora.arm64
+    // / fedora.s390x are not selected.
     const option = modal
-      .getByTestId(`preference-select-option-${preferenceName}`)
-      .or(modal.getByRole('option', { name: new RegExp(preferenceName, 'i') }));
+      .locator(`[data-test-id="preference-select-option-${preferenceName}"]`)
+      .or(
+        modal
+          .getByRole('option')
+          .filter({ has: this.page.getByText(preferenceName, { exact: true }) }),
+      )
+      .first();
 
     if (!(await option.isVisible().catch(() => false))) {
       await this.closeOpenSelectMenus(modal);
@@ -45,6 +54,7 @@ export class BootableVolumesPage extends ResourceListPage {
       }
     }
     await option.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
+    await option.scrollIntoViewIfNeeded().catch(() => undefined);
     await this.robustClick(option);
   }
 
