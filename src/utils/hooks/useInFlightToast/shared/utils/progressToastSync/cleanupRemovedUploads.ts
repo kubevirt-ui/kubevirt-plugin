@@ -3,9 +3,8 @@ import { type TFunction } from 'i18next';
 import { type ToastActions } from '@kubevirt-utils/hooks/useKubevirtToast';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 
-import { UPLOAD_PROGRESS_STATUS } from '../constants';
-
-import { type UploadsStoreSliceData } from '../features/uploads/types/types';
+import { UPLOAD_PROGRESS_STATUS } from '../../../constants';
+import { type UploadsStoreSliceData } from '../../../features/uploads/types/types';
 
 type CleanupRemovedUploadsParams = {
   addWarningToast: ToastActions['addWarningToast'];

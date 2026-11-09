@@ -4,8 +4,12 @@ import {
 } from '../../features/exportDisk/types/types';
 import { type UploadsStoreSliceActions } from '../../features/uploads/types/types';
 import { type UploadsStoreSliceData } from '../../features/uploads/types/types';
+import {
+  type WatchedResourcesSliceActions,
+  type WatchedResourcesStoreSliceData,
+} from '../../features/watchedResources/types/types';
 import { useInFlightToastStore } from '../../inFlightToastStore';
-import { type InFlightToastStoreState } from '../../types';
+import { type InFlightProgressToastStoreSlice, type InFlightToastStoreState } from '../../types';
 import { type ProgressToastState, type UploadProgressStatus } from '../types/types';
 
 export const getUploadsActions = (): UploadsStoreSliceActions =>
@@ -19,6 +23,12 @@ export const getUploadsData = (): UploadsStoreSliceData =>
 
 export const getExportDiskData = (): ExportDiskStoreStateData =>
   useInFlightToastStore.getState().exportDisk.data;
+
+export const getWatchedResourcesActions = (): WatchedResourcesSliceActions =>
+  useInFlightToastStore.getState().watchedResources.actions;
+
+export const getWatchedResourcesData = (): WatchedResourcesStoreSliceData =>
+  useInFlightToastStore.getState().watchedResources.data;
 
 type ProgressToastHolder = { progressToastState?: ProgressToastState };
 
@@ -40,14 +50,14 @@ export const getUploadStatus = (entry?: ProgressToastHolder): UploadProgressStat
 
 export const getSliceEntry = (
   state: InFlightToastStoreState,
-  storeSlice: keyof InFlightToastStoreState,
+  storeSlice: InFlightProgressToastStoreSlice,
   uploadKey: string,
 ): ProgressToastHolder | undefined =>
   state[storeSlice].data?.[uploadKey] as ProgressToastHolder | undefined;
 
 export const getSliceProgressToast = (
   state: InFlightToastStoreState,
-  storeSlice: keyof InFlightToastStoreState,
+  storeSlice: InFlightProgressToastStoreSlice,
   uploadKey: string,
 ): ProgressToastState | undefined =>
   getProgressToastState(getSliceEntry(state, storeSlice, uploadKey));

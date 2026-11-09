@@ -3,7 +3,10 @@ import { type ReactNode } from 'react';
 import { type K8sGroupVersionKind } from '@openshift-console/dynamic-plugin-sdk';
 
 import { type UPLOAD_PROGRESS_STATUS } from '../../constants';
-import { type InFlightToastStoreActionsParams, type InFlightToastStoreState } from '../../types';
+import {
+  type InFlightProgressToastStoreSlice,
+  type InFlightToastStoreActionsParams,
+} from '../../types';
 
 export type UploadLinkedResource = {
   cluster?: string;
@@ -77,5 +80,5 @@ export type CancelTrackedUploadOptions = {
 };
 
 export type UploadsActionsParamsWithStoreSlice = InFlightToastStoreActionsParams & {
-  storeSlice: keyof InFlightToastStoreState;
+  storeSlice: InFlightProgressToastStoreSlice;
 };

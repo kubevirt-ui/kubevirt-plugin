@@ -2,12 +2,12 @@ import { type TFunction } from 'i18next';
 
 import type useKubevirtToast from '@kubevirt-utils/hooks/useKubevirtToast';
 
-import UploadProgressToastContent from './components/UploadProgressToastContent';
-import { UPLOAD_PROGRESS_STATUS } from './constants';
-import { type UploadsStoreSliceData } from './features/uploads/types/types';
-import { type ProgressToastState } from './shared/types/types';
-import { getUploadTitle, isTerminalUploadStatus } from './toast/uploadTitles';
-import { type InFlightToastStoreState } from './types';
+import { UPLOAD_PROGRESS_STATUS } from '../../../constants';
+import { type UploadsStoreSliceData } from '../../../features/uploads/types/types';
+import { type InFlightProgressToastStoreSlice } from '../../../types';
+import UploadProgressToastContent from '../../progressToastUI/UploadProgressToastContent';
+import { type ProgressToastState } from '../../types/types';
+import { getUploadTitle, isTerminalUploadStatus } from './uploadTitles';
 
 type ToastActions = ReturnType<typeof useKubevirtToast>;
 
@@ -21,7 +21,7 @@ type UploadToastContext = {
   navigate: (path: string) => void;
   removeToast: ToastActions['removeToast'];
   removeUpload: (uploadKey: string) => void;
-  storeSlice: keyof InFlightToastStoreState;
+  storeSlice: InFlightProgressToastStoreSlice;
   t: TFunction;
   tryMarkTerminalToastShown: (uploadKey: string) => boolean;
   trySetToastId: (uploadKey: string, toastId: string) => boolean;

@@ -1,13 +1,13 @@
 import type { FC } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 
-import ExportUploadWatcherEntry from '@kubevirt-utils/components/ExportModal/components/ExportUploadWatcherEntry';
+import ExportUploadWatcherEntry from '@kubevirt-utils/hooks/useInFlightToast/features/exportDisk/provider/ExportUploadWatcherEntry';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 
-import { EXPORT_DISK_STORE_SLICE } from '../../constants';
-import UploadProgressToastSliceListener from '../../InFlightToastSliceListener';
-import { useInFlightToastStore } from '../../inFlightToastStore';
-import { type ExportDiskContext } from './types/types';
+import { EXPORT_DISK_STORE_SLICE } from '../../../constants';
+import UploadProgressToastSliceListener from '../../../InFlightToastSliceListener';
+import { useInFlightToastStore } from '../../../inFlightToastStore';
+import { type ExportDiskContext } from '../types/types';
 
 const ExportDiskProgressProvider: FC = () => {
   const activeExports = useInFlightToastStore(

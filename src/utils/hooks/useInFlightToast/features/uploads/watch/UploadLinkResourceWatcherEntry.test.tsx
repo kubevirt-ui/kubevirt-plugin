@@ -2,11 +2,10 @@ import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
 import { render } from '@testing-library/react';
 
-import { resetInFlightToastStore, useInFlightToastStore } from '../inFlightToastStore';
-
-import { getUploadLinkedResource } from '../completion/uploadLinkedResource';
-import { getVmStorageUrlForIdentity } from '../completion/uploadLinks';
-import { getVmDiskUploadKey } from '../keys/uploadKeys';
+import { getUploadLinkedResource } from '../../../completion/uploadLinkedResource';
+import { getVmStorageUrlForIdentity } from '../../../completion/uploadLinks';
+import { resetInFlightToastStore, useInFlightToastStore } from '../../../inFlightToastStore';
+import { getVmDiskUploadKey } from '../../../keys/uploadKeys';
 import UploadLinkResourceWatcherEntry from './UploadLinkResourceWatcherEntry';
 
 jest.mock('@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource', () => ({
