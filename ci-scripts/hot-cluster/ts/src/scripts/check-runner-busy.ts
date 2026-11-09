@@ -1,5 +1,6 @@
 /**
- * Check whether any self-hosted runner labelled with CLUSTER_NAME is currently busy.
+ * Check whether any self-hosted runner for CLUSTER_NAME is currently busy.
+ * Matches by label or ARC ephemeral name prefix (`{CLUSTER_NAME}-…`).
  * Outputs `busy=true|false` to GITHUB_OUTPUT.
  *
  * Required env: CLUSTER_NAME, GITHUB_REPOSITORY
@@ -9,6 +10,7 @@
 import { execSync } from 'node:child_process';
 
 import { requireEnv } from '../kube-client';
+import { type GhRunner, runnerBelongsToScaleSet } from '../runner-match';
 import { setOutput } from '../utils';
 
 const main = async (): Promise<void> => {
@@ -44,12 +46,12 @@ const main = async (): Promise<void> => {
   }
 
   const data = JSON.parse(runnersJson) as {
-    runners: Array<{ busy: boolean; labels?: Array<{ name: string }> }>;
+    runners: GhRunner[];
     total_count: number;
   };
 
   const busy = data.runners.some(
-    (runner) => runner.busy && runner.labels?.some((label) => label.name === clusterName),
+    (runner) => runner.busy === true && runnerBelongsToScaleSet(runner, clusterName),
   );
 
   console.log(

@@ -319,6 +319,7 @@ jobs:
           GITHUB_REPOSITORY: ${{ github.repository }}
           RUN_ID: ${{ github.run_id }}
           JOB_NAME: ${{ inputs.is_reusable_call && 'Run E2E Tests / Execute tests' || 'Execute tests (standalone dispatch)' }}
+          CLUSTER_NAME: ${{ inputs.cluster_name || inputs.runner_label || 'kubevirt-plugin-ci' }}
           RUNNER_LABEL: ${{ inputs.runner_label || 'kubevirt-plugin-ci' }}
         working-directory: ci-scripts/hot-cluster/ts
         run: npx tsx src/scripts/watch-runner-pickup.ts

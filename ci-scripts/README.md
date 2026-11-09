@@ -437,6 +437,7 @@ Key defaults:
 - `ARC_CONTROLLER_INSTALL_NAME=arc` (Helm release for controller)
 - `ARC_VERSION=0.14.0` (pinned Helm chart version)
 - `MAX_RUNNERS=2` (max concurrent ARC runner pods per cluster -- caps concurrent E2E + manual-console jobs against that cluster; extra jobs queue for a free runner rather than overloading it. Independent per cluster, since each has its own scale set. Override via `ibmc-cluster-setup.yml`'s `max_runners` input, or re-provision to apply a changed default)
+- Watch-for-Runner-Pickup (`watch-runner-pickup.ts`) cancels a run only when ARC looks dead: no online scale-set runner (matched by `RUNNER_LABEL` **or** ARC name prefix) **and** no peer Hot Cluster E2E Execute job on the same `CLUSTER_NAME` (workflow title `cluster:…`, which can differ from a custom runner label) within the pickup timeout. Capacity queue behind busy runners must not cancel; peer-check API failures fail open (skip cancel).
 
 ## Cost Control
 
