@@ -12,6 +12,7 @@ import { type NamespacedResourceMap, type ResourceMap } from '@kubevirt-utils/re
 import { Skeleton } from '@patternfly/react-core';
 import { type ThSortType } from '@patternfly/react-table/dist/esm/components/Table/base/types';
 import {
+  type BootVolumeTableRow,
   type OnSelectBootableVolume,
   type UseBootableVolumesValues,
 } from '@virtualmachines/wizard/utils/types';
@@ -37,9 +38,9 @@ type BootableVolumeListContentProps = {
   onUploadStart?: (uploadKey: string) => void;
   preferenceName?: string;
   preferencesMap: ResourceMap<V1beta1VirtualMachineClusterPreference>;
-  selectedBootableVolume?: BootableVolume;
+  selectedTableRow?: BootVolumeTableRow;
   showNoBootSourceHint?: boolean;
-  sortedPaginatedData: BootableVolume[];
+  sortedPaginatedData: BootVolumeTableRow[];
   userPreferencesMap: NamespacedResourceMap<V1beta1VirtualMachinePreference>;
   volumeListNamespace: string;
 };
@@ -61,7 +62,7 @@ const BootableVolumeListContent: FC<BootableVolumeListContentProps> = ({
   onUploadStart,
   preferenceName,
   preferencesMap,
-  selectedBootableVolume,
+  selectedTableRow,
   showNoBootSourceHint,
   sortedPaginatedData,
   userPreferencesMap,
@@ -79,7 +80,7 @@ const BootableVolumeListContent: FC<BootableVolumeListContentProps> = ({
           isHeaderStuck={isHeaderStuck}
           onSelectBootableVolume={onSelectBootableVolume}
           preferencesMap={preferencesMap}
-          selectedBootableVolume={selectedBootableVolume}
+          selectedTableRow={selectedTableRow}
           sortedPaginatedData={sortedPaginatedData}
           userPreferencesMap={userPreferencesMap}
           volumeListNamespace={volumeListNamespace}

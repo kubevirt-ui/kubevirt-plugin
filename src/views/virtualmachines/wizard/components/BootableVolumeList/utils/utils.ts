@@ -26,6 +26,15 @@ import {
   WIN_RESOURCE_NAME_PREFIX,
 } from './constants';
 
+// Re-export table row utilities
+export {
+  createTableRowFromSelection,
+  expandVolumesToTableRows,
+  getPreferenceOptionKey,
+  getPreferenceOptionVariant,
+  isSameTableRow,
+} from './tableRowUtils';
+
 export const isLinuxGenericPreference = (preference: string): boolean =>
   preference === 'linux' || preference.startsWith('linux.') || preference.startsWith('linux-');
 
@@ -72,28 +81,41 @@ export const filterBootableVolumesByPreference = (
 ): BootableVolume[] => {
   if (!preference) return bootableVolumes;
 
+  return bootableVolumes.filter((volume) => doesBootableVolumeMatchPreference(volume, preference));
+};
+
+export const doesBootableVolumeMatchPreference = (
+  bootableVolume: BootableVolume,
+  preference: string,
+): boolean => {
+  if (!preference) return true;
+
   if (isLinuxGenericPreference(preference)) {
-    return bootableVolumes.filter((vol) => {
-      const osCategory = getBootVolumeOS(vol);
-      return osCategory !== OS_NAME_TYPES.Rhel && osCategory !== OS_NAME_TYPES.Windows;
-    });
+    const osCategory = getBootVolumeOS(bootableVolume);
+    return osCategory !== OS_NAME_TYPES.Rhel && osCategory !== OS_NAME_TYPES.Windows;
   }
 
-  return bootableVolumes.filter((vol) => {
-    const volLabel = getBootVolumePreferenceIdentifier(vol);
-    if (!volLabel) return true;
-    return (
-      preference === volLabel ||
-      // preference is a specific preference name (e.g. "rhel.9") and volLabel is more generic (e.g. "rhel")
-      preference.startsWith(`${volLabel}.`) ||
-      preference.startsWith(`${volLabel}-`) ||
-      // preference is only an OS family (e.g. "rhel", derived from a template without a real
-      // preference reference) and volLabel is more specific (e.g. "rhel.9")
-      volLabel.startsWith(`${preference}.`) ||
-      volLabel.startsWith(`${preference}-`)
-    );
-  });
+  const volumePreference = getBootVolumePreferenceIdentifier(bootableVolume);
+  if (!volumePreference) return true;
+
+  return (
+    preference === volumePreference ||
+    preference.startsWith(`${volumePreference}.`) ||
+    preference.startsWith(`${volumePreference}-`) ||
+    volumePreference.startsWith(`${preference}.`) ||
+    volumePreference.startsWith(`${preference}-`)
+  );
 };
+
+export const filterBootableVolumesByPreferences = (
+  bootableVolumes: BootableVolume[],
+  preferences: string[],
+): BootableVolume[] =>
+  preferences.length === 0
+    ? bootableVolumes
+    : bootableVolumes.filter((volume) =>
+        preferences.some((preference) => doesBootableVolumeMatchPreference(volume, preference)),
+      );
 
 export const getBootVolumeOS = (bootVolume: BootableVolume): OS_NAME_TYPES => {
   const bootVolumePreference = getBootVolumePreferenceIdentifier(bootVolume);

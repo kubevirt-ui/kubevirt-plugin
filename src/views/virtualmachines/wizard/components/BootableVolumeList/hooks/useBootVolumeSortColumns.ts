@@ -8,7 +8,6 @@ import {
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { type VolumeSnapshotKind } from '@kubevirt-utils/components/SelectSnapshot/types';
 import { type PaginationState } from '@kubevirt-utils/hooks/usePagination/utils/types';
-import { type BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import {
   type ClusterNamespacedResourceMap,
   type NamespacedResourceMap,
@@ -19,22 +18,21 @@ import {
   type BootableVolumeSortCriterion,
   sortBootableVolumesWithColumnGetters,
 } from '@virtualmachines/wizard/components/BootableVolumeList/utils/getSortedBootableVolumes';
+import { type BootVolumeTableRow } from '@virtualmachines/wizard/utils/types';
 
 type UseBootVolumeSortColumns = (
-  unsortedData: BootableVolume[],
+  unsortedData: BootVolumeTableRow[],
   clusterPreferencesMap: ResourceMap<V1beta1VirtualMachineClusterPreference>,
   userPreferencesMap: NamespacedResourceMap<V1beta1VirtualMachinePreference>,
   pvcSources: ClusterNamespacedResourceMap<IoK8sApiCoreV1PersistentVolumeClaim>,
-  volumeSnapshotSources: {
-    [datSourceName: string]: VolumeSnapshotKind;
-  },
+  volumeSnapshotSources: { [datSourceName: string]: VolumeSnapshotKind },
   pagination: PaginationState,
   includeNamespaceColumn: boolean,
   dvSources: ClusterNamespacedResourceMap<V1beta1DataVolume>,
 ) => {
   getSortType: (columnIndex: number) => ThSortType;
-  sortedData: BootableVolume[];
-  sortedPaginatedData: BootableVolume[];
+  sortedData: BootVolumeTableRow[];
+  sortedPaginatedData: BootVolumeTableRow[];
 };
 
 const useBootVolumeSortColumns: UseBootVolumeSortColumns = (

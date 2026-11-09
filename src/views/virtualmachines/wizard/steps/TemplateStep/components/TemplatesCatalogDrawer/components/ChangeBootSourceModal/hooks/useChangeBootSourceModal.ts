@@ -15,7 +15,10 @@ import { getEffectiveVolumeNamespace } from '@virtualmachines/wizard/components/
 import { useVMWizardForm } from '@virtualmachines/wizard/form/VMWizardFormProvider';
 import { useVMWizardState } from '@virtualmachines/wizard/state/useVMWizardState';
 import { useDrawerContext } from '@virtualmachines/wizard/steps/TemplateStep/components/TemplatesCatalogDrawer/hooks/useDrawerContext';
-import { type OnSelectBootableVolume } from '@virtualmachines/wizard/utils/types';
+import {
+  type OnSelectBootableVolume,
+  type PreferenceRef,
+} from '@virtualmachines/wizard/utils/types';
 
 import {
   type ChangeBootSourceModalProps,
@@ -42,11 +45,15 @@ const useChangeBootSourceModal: UseChangeBootSourceModal = ({ isOpen, onClose, v
   const [selectedBootableVolume, setSelectedBootableVolume] = useState<BootableVolume | undefined>(
     undefined,
   );
+  const [selectedPreference, setSelectedPreference] = useState<PreferenceRef | undefined>(
+    undefined,
+  );
 
   // Reset the pending selection each time the modal opens
   useEffect(() => {
     if (isOpen) {
       setSelectedBootableVolume(undefined);
+      setSelectedPreference(undefined);
     }
   }, [isOpen]);
 
@@ -81,6 +88,7 @@ const useChangeBootSourceModal: UseChangeBootSourceModal = ({ isOpen, onClose, v
 
   const onSelectBootableVolume: OnSelectBootableVolume = (args) => {
     setSelectedBootableVolume(args.selectedVolume);
+    setSelectedPreference(args.preferenceRef);
     logTemplateFlowEvent(BOOTABLE_VOLUME_SELECTED, template, {
       selectedBootableVolume: getName(args.selectedVolume),
     });
@@ -94,6 +102,7 @@ const useChangeBootSourceModal: UseChangeBootSourceModal = ({ isOpen, onClose, v
   const onCreateVolume = (volume: BootableVolume): void => {
     applyBootSourceOverride(volume);
     setSelectedBootableVolume(volume);
+    setSelectedPreference(undefined);
   };
 
   return {
@@ -107,6 +116,7 @@ const useChangeBootSourceModal: UseChangeBootSourceModal = ({ isOpen, onClose, v
     onSelectBootableVolume,
     preferenceName,
     selectedBootableVolume,
+    selectedPreference,
     setVolumeListNamespace,
     volumeListNamespace,
   };

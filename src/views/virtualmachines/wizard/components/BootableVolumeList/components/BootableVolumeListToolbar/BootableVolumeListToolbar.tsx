@@ -10,9 +10,9 @@ import {
 } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { type PaginationState } from '@kubevirt-utils/hooks/usePagination/utils/types';
-import { type BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { type ColumnLayout } from '@openshift-console/dynamic-plugin-sdk';
 import { FormGroup, Split, SplitItem } from '@patternfly/react-core';
+import { type BootVolumeTableRow } from '@virtualmachines/wizard/utils/types';
 
 import { VOLUMES_PROJECT_FIELD_ID } from '../../utils/constants';
 import BootableVolumeListPagination from '../BootableVolumeListPagination/BootableVolumeListPagination';
@@ -20,10 +20,10 @@ import BootableVolumeListPagination from '../BootableVolumeListPagination/Bootab
 type BootableVolumeListToolbarProps = {
   clearAllFilters: () => void;
   columnLayout: ColumnLayout;
-  data: BootableVolume[];
+  data: BootVolumeTableRow[];
   displayVolumes: boolean;
   effectiveNamespace: string;
-  filterDefinitions: KubevirtFilter<BootableVolume>[];
+  filterDefinitions: KubevirtFilter<BootVolumeTableRow>[];
   filters: KubevirtFilterState;
   loaded: boolean;
   loadedColumns: boolean;
@@ -31,7 +31,7 @@ type BootableVolumeListToolbarProps = {
   onVolumeListNamespaceChange: (namespace: string) => void;
   pagination: PaginationState;
   setPagination: Dispatch<SetStateAction<PaginationState>>;
-  unfilteredData: BootableVolume[];
+  unfilteredData: BootVolumeTableRow[];
 };
 
 const BootableVolumeListToolbar: FC<BootableVolumeListToolbarProps> = ({
