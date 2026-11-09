@@ -43,6 +43,10 @@ const useSingleClusterAlerts: UseSingleClusterAlerts = () => {
 
   const [alertsResponse, alertsLoaded, alertsError] = usePrometheusPoll({
     endpoint: PrometheusEndpoint.QUERY,
+    namespace:
+      activeNamespace && activeNamespace !== ALL_NAMESPACES_SESSION_KEY
+        ? activeNamespace
+        : undefined,
     query: alertsQuery,
   });
 
