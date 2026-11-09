@@ -31,11 +31,12 @@
     "typeRoots": ["node_modules/@types", "@types"]
   },
   "include": [
+    "@types/**/*",
     "src/**/*",
     "images/**/*",
+    "scripts/**/*.mts",
     "plugin-metadata.ts",
     "plugin-extensions.ts",
-    "knip.config.ts",
-    "@types/**/*"
+    "knip.config.ts"
   ]
 }

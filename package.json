@@ -153,7 +153,7 @@
   "private": true,
   "scripts": {
     "build": "npm run clean && NODE_ENV=production NODE_OPTIONS=--max-old-space-size=8192 npm run ts-node -- node_modules/.bin/rspack",
-    "check-module-resolutions": "node scripts/check-module-resolutions.cjs",
+    "check-module-resolutions": "node scripts/check-module-resolutions.mts",
     "check-types": "tsc",
     "check-types:playwright": "tsc --noEmit --project playwright/tsconfig.json",
     "clean": "rm -rf dist",
