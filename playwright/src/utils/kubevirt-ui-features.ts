@@ -358,7 +358,11 @@ export async function patchKubevirtUiFeatureViaConsoleProxy(
       },
       headers,
     });
-    if (!create.ok()) {
+    if (create.ok()) {
+      return;
+    }
+    // Parallel workers: another create won the race — merge-patch below.
+    if (create.status() !== 409) {
       const body = await create.text();
       throw new Error(
         `Create kubevirt-ui-features via console proxy failed (${create.status()}): ${body.slice(
@@ -367,7 +371,6 @@ export async function patchKubevirtUiFeatureViaConsoleProxy(
         )}`,
       );
     }
-    return;
   }
 
   const patch = await request.patch(url, {
