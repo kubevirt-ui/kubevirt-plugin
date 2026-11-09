@@ -112,7 +112,7 @@ check "ARC controller pod in ${ARC_CONTROLLER_NS}" bash -c "
 # this scale set cannot pick up jobs -- this is a hard failure, same as
 # every other check in this script.
 check "ARC listener pod for '${RUNNER_SCALE_SET_NAME}' in ${ARC_CONTROLLER_NS}" bash -c "
-  for attempt in 1 2 3 4 5 6; do
+  for attempt in 1 2 3 4 5 6 7 8 9 10 11 12; do
     listener_name=\$(oc get autoscalinglisteners -n '${ARC_CONTROLLER_NS}' -o json 2>/dev/null \\
       | jq -r --arg name '${RUNNER_SCALE_SET_NAME}' --arg ns '${ARC_RUNNERS_NS}' \\
         '.items[] | select(.spec.autoscalingRunnerSetName == \$name and .spec.autoscalingRunnerSetNamespace == \$ns) | .metadata.name' \\
@@ -125,12 +125,23 @@ check "ARC listener pod for '${RUNNER_SCALE_SET_NAME}' in ${ARC_CONTROLLER_NS}" 
         exit 0
       fi
     fi
-    if [[ \"\${attempt}\" -lt 6 ]]; then
+    if [[ \"\${attempt}\" -lt 12 ]]; then
       sleep 30
     fi
   done
   echo \"  No Ready AutoscalingListener pod found for scale set '${RUNNER_SCALE_SET_NAME}' in ${ARC_CONTROLLER_NS}:\"
   oc get autoscalinglisteners -n '${ARC_CONTROLLER_NS}' 2>/dev/null || echo '  (no AutoscalingListener objects found)'
+  oc get pods -n '${ARC_CONTROLLER_NS}' -o wide 2>/dev/null || true
+  listener_name=\$(oc get autoscalinglisteners -n '${ARC_CONTROLLER_NS}' -o json 2>/dev/null \\
+    | jq -r --arg name '${RUNNER_SCALE_SET_NAME}' --arg ns '${ARC_RUNNERS_NS}' \\
+      '.items[] | select(.spec.autoscalingRunnerSetName == \$name and .spec.autoscalingRunnerSetNamespace == \$ns) | .metadata.name' \\
+    | head -n1)
+  if [[ -n \"\${listener_name}\" ]]; then
+    echo \"  --- oc describe pod \${listener_name} ---\"
+    oc describe pod \"\${listener_name}\" -n '${ARC_CONTROLLER_NS}' 2>/dev/null || true
+  fi
+  echo \"  --- recent events ---\"
+  oc get events -n '${ARC_CONTROLLER_NS}' --sort-by='.lastTimestamp' 2>/dev/null | tail -20 || true
   exit 1
 "
 

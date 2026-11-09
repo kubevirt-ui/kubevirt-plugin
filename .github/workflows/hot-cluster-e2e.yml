@@ -295,11 +295,19 @@ jobs:
     # release cluster_name validation). always() so the condition is evaluated
     # even after a failed needed job.
     if: always() && needs.prepare.result == 'success'
-    # Cancels a same-PR+suite push/retest's stale cluster check. Suite is in
-    # the key so /test-e2e tier1 does not cancel an in-flight gating run.
+    # One provision at a time per PR/cluster -- deliberately NOT keyed by
+    # test_project. Gating + changed-tests "auto" both target the same
+    # release cluster; suite-scoped groups let them race (auto creates,
+    # fails CNV, deletes; gating recreates). cancel-in-progress: false so
+    # auto queues behind gating instead of cancelling the required check.
+    # queue: max keeps multiple waiters (default queue: single would replace
+    # a pending gating run when auto or a retest arrives). Suite stays on
+    # run-e2e-tests concurrency below so /test-e2e tier1 still does not
+    # cancel an in-flight gating *test* job.
     concurrency:
-      group: hot-cluster-check-${{ inputs.pr_number || format('{0}-{1}', github.ref, inputs.cluster_name || 'kubevirt-plugin-ci') }}-${{ inputs.test_project || 'gating' }}
-      cancel-in-progress: true
+      group: hot-cluster-check-${{ inputs.pr_number || format('{0}-{1}', github.ref, inputs.cluster_name || 'kubevirt-plugin-ci') }}
+      cancel-in-progress: false
+      queue: max
     uses: ./.github/workflows/hot-cluster-check.yml
     with:
       cluster_name: ${{ needs.prepare.outputs.cluster_name }}

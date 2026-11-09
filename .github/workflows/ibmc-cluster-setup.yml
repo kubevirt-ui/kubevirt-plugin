@@ -62,12 +62,10 @@ on:
         description: |
           "<major>.<minor>" to pin CNV to the newest matching CSV within
           cnv_channel via startingCSV. Leave empty to install whatever
-          cnv_channel currently resolves to. If set and no matching CSV is
-          found in the channel's entries, this workflow installs unpinned from
-          the channel head with a loud warning (CNV_PIN_FALLBACK_UNPINNED=true)
-          rather than failing the build -- so a release-branch PR isn't blocked
-          when its CNV version simply isn't in the catalog yet (e.g. not GA).
-          The run then tests against the channel head, not the requested pin.
+          cnv_channel currently resolves to (unpinned). If set, install-hco.sh
+          waits for CatalogSource READY and polls PackageManifest for a
+          matching CSV, then installs with Manual startingCSV. Missing pin
+          after that wait is a hard failure -- no fallback to channel head.
         required: false
         default: ''
         type: string
@@ -160,12 +158,10 @@ on:
         description: |
           "<major>.<minor>" to pin CNV to the newest matching CSV within
           cnv_channel via startingCSV. Leave empty to install whatever
-          cnv_channel currently resolves to. If set and no matching CSV is
-          found in the channel's entries, this workflow installs unpinned from
-          the channel head with a loud warning (CNV_PIN_FALLBACK_UNPINNED=true)
-          rather than failing the build -- so a release-branch PR isn't blocked
-          when its CNV version simply isn't in the catalog yet (e.g. not GA).
-          The run then tests against the channel head, not the requested pin.
+          cnv_channel currently resolves to (unpinned). If set, install-hco.sh
+          waits for CatalogSource READY and polls PackageManifest for a
+          matching CSV, then installs with Manual startingCSV. Missing pin
+          after that wait is a hard failure -- no fallback to channel head.
         required: false
         default: ''
         type: string
@@ -479,10 +475,16 @@ jobs:
           bash ./ci-scripts/hot-cluster/install-oc-client.sh
 
       - name: Configure kubeconfig
+        id: kubeconfig
         env:
           OCP_CHANNEL: ${{ steps.ipi_tools.outputs.ocp_channel }}
           INFRASTRUCTURE_TYPE: ${{ inputs.infrastructure_type || 'vpc' }}
-        run: bash ./ci-scripts/hot-cluster/configure-kubeconfig.sh
+        run: |
+          bash ./ci-scripts/hot-cluster/configure-kubeconfig.sh
+          # Cluster API is reachable -- keep the ROKS cluster on later
+          # setup flakes (CNV/ARC/health) so retests can resume in-place
+          # instead of cold-reprovisioning.
+          echo "cluster_usable=true" >> "$GITHUB_OUTPUT"
 
       - name: Open ingress LB security group for public access
         if: inputs.infrastructure_type == 'ipi'
@@ -505,11 +507,11 @@ jobs:
           KVM_EMULATION: ${{ steps.kvm_check.outputs.kvm_emulation || inputs.kvm_emulation }}
           CNV_CHANNEL: ${{ inputs.cnv_channel || 'stable' }}
           CNV_PIN_VERSION: ${{ inputs.cnv_pin_version }}
-          # Don't block a release-branch PR when its pinned CNV version simply
-          # isn't in the catalog yet (e.g. not GA): install unpinned with a loud
-          # warning instead of hard-failing. The step log/summary makes clear the
-          # run tested against the channel head, not the requested pin.
-          CNV_PIN_FALLBACK_UNPINNED: 'true'
+          # Hard pin: never fall back to unpinned channel head. install-hco.sh
+          # waits for CatalogSource READY + pin-matching PackageManifest
+          # entries, then installs startingCSV. An empty early lookup is a
+          # sync race, not permission to install the wrong CNV version.
+          CNV_PIN_FALLBACK_UNPINNED: 'false'
         run: |
           echo "KVM_EMULATION=${KVM_EMULATION} (auto-detected)"
           echo "CNV_CHANNEL=${CNV_CHANNEL}"
@@ -570,6 +572,7 @@ jobs:
           echo "image_ref=${IMAGE_REF}" >> "$GITHUB_OUTPUT"
 
       - name: Install ARC
+        id: install_arc
         if: steps.check_cluster.outputs.exists == 'false' || steps.arc_listener_check.outputs.listener_ready != 'true' || inputs.force_arc_reinstall == true
         env:
           ARC_CONFIG_URL: 'https://github.com/${{ github.repository }}'
@@ -604,6 +607,18 @@ jobs:
           RUNNER_SCALE_SET_NAME: ${{ env.CLUSTER_NAME }}
         working-directory: ci-scripts/hot-cluster/ts
         run: npx tsx src/scripts/force-bounce-arc-listener.ts
+
+      # Fresh ARC install (or heal of an unready listener) can take several
+      # minutes for the AutoscalingListener pod to become Ready. Wait here
+      # with diagnostics + one bounce/retry before the full health check
+      # so we do not fail (and formerly delete) a usable cluster.
+      - name: Wait for ARC listener Ready
+        if: steps.install_arc.outcome == 'success' || steps.arc_listener_check.outputs.listener_ready != 'true' || inputs.force_arc_reinstall == true
+        env:
+          RUNNER_SCALE_SET_NAME: ${{ env.CLUSTER_NAME }}
+          ARC_CONTROLLER_NS: arc-systems
+          ARC_RUNNERS_NS: arc-runners
+        run: bash ./ci-scripts/hot-cluster/wait-arc-listener-ready.sh
 
       - name: Bootstrap manual-console RBAC
         # Optional feature; E2E does not depend on it. continue-on-error so
@@ -688,26 +703,22 @@ jobs:
         working-directory: ci-scripts/hot-cluster/ts
         run: npx tsx src/scripts/send-cluster-credentials-slack.ts
 
-      # Also on cancelled: a superseding retest (concurrency cancel-in-progress)
-      # often kills us mid-"Wait for ROKS", after Create has already registered
-      # the cluster. Without deleting here, the VPC sweep below refuses to run
-      # (live-cluster guard) and leaves a deploying ROKS + VPC orphaned.
+      # Delete only when this job created the cluster AND it never became
+      # API-usable (kubeconfig step never succeeded). Post-create setup
+      # flakes (CNV InstallPlan, ARC listener, health) leave the cluster
+      # warm so the next retest resumes in-place. Still delete on cancel
+      # mid-create (concurrency supersede before kubeconfig) so a deploying
+      # ROKS + VPC is not orphaned -- cancel sets job.status=cancelled and
+      # cluster_usable will be empty.
       - name: Delete ROKS cluster on failure or cancellation
-        if: always() && inputs.infrastructure_type != 'ipi' && (job.status == 'failure' || job.status == 'cancelled') && steps.check_cluster.outputs.exists == 'false'
+        if: always() && inputs.infrastructure_type != 'ipi' && (job.status == 'failure' || job.status == 'cancelled') && steps.check_cluster.outputs.exists == 'false' && steps.kubeconfig.outputs.cluster_usable != 'true'
         working-directory: ci-scripts/hot-cluster/ts
         run: npx tsx src/scripts/delete-roks-cluster.ts
 
-      # Backstop sweep: provision-vpc-resources.sh and create-roks-vpc.ts's
-      # COS creation can leave a VPC/subnet/gateway/COS instance behind when
-      # cluster create fails (e.g. a brand-new COS instance not yet visible
-      # to ROKS) or after the delete step above (failure/cancel). Gated on the
-      # same exists == 'false' check as that step: when the cluster already
-      # existed before this job ran, provisioning was skipped, so sweeping
-      # here on an unrelated later failure/cancellation would risk deleting
-      # that pre-existing cluster's live VPC/subnet instead of leftovers
-      # this job created.
+      # Backstop sweep: only when we also deleted (or never reached usable).
+      # Sweeping after a kept warm cluster would risk deleting its live VPC.
       - name: Sweep any remaining VPC resources on failure (vpc)
-        if: always() && inputs.infrastructure_type == 'vpc' && (job.status == 'failure' || job.status == 'cancelled') && steps.check_cluster.outputs.exists == 'false'
+        if: always() && inputs.infrastructure_type == 'vpc' && (job.status == 'failure' || job.status == 'cancelled') && steps.check_cluster.outputs.exists == 'false' && steps.kubeconfig.outputs.cluster_usable != 'true'
         env:
           IC_API_KEY: ${{ secrets.IC_KEY }}
           ZONE: ${{ inputs.zone }}
