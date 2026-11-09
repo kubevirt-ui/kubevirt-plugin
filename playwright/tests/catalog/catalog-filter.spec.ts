@@ -7,6 +7,8 @@ import {
   TEMPLATE_WIN2K19,
   TEMPLATE_WIN2K22,
 } from '@/utils/constants';
+import { EnvVariables } from '@/utils/env-variables';
+
 test.describe(`Catalog filters ${ROUTE_CATALOG_TAG} ${GATING_TAG}`, () => {
   test.beforeEach(async ({ catalogPage, testNamespace }) => {
     await catalogPage.openCatalogInNamespace(testNamespace);
@@ -20,11 +22,14 @@ test.describe(`Catalog filters ${ROUTE_CATALOG_TAG} ${GATING_TAG}`, () => {
     await expect(catalogPage.gridLinkWithText('Red Hat Enterprise Linux 7 VM')).toBeVisible();
     await catalogPage.filterByOsCheckbox('osName-RHEL', false);
 
-    await catalogPage.filterByOsCheckbox('osName-Windows', true);
-    await expect(catalogPage.gridLinkWithText('Microsoft Windows 10 VM')).toBeVisible();
-    await expect(catalogPage.gridLinkWithText(TEMPLATE_WIN2K22.name)).toBeVisible();
-    await expect(catalogPage.gridLinkWithText('Microsoft Windows Server 2016 VM')).toBeVisible();
-    await catalogPage.filterByOsCheckbox('osName-Windows', false);
+    // Desktop Windows tiles are not published on s390x (kubevirt-ui gating parity).
+    if (!EnvVariables.isS390x) {
+      await catalogPage.filterByOsCheckbox('osName-Windows', true);
+      await expect(catalogPage.gridLinkWithText('Microsoft Windows 10 VM')).toBeVisible();
+      await expect(catalogPage.gridLinkWithText(TEMPLATE_WIN2K22.name)).toBeVisible();
+      await expect(catalogPage.gridLinkWithText('Microsoft Windows Server 2016 VM')).toBeVisible();
+      await catalogPage.filterByOsCheckbox('osName-Windows', false);
+    }
 
     await catalogPage.filterByOsCheckbox('osName-Fedora', true);
     await expect(catalogPage.gridLinks()).toHaveCount(1);
@@ -37,6 +42,14 @@ test.describe(`Catalog filters ${ROUTE_CATALOG_TAG} ${GATING_TAG}`, () => {
   });
 
   test('ID(CNV-8465) Filter VM catalog by Workload', async ({ catalogPage }) => {
+    if (EnvVariables.isS390x) {
+      await catalogPage.filterByOsCheckbox('workload-Server', true);
+      await expect(catalogPage.gridLinkWithText('Red Hat Enterprise Linux 9 VM')).toBeVisible();
+      await expect(catalogPage.gridLinkWithText(/Fedora/i)).toBeVisible();
+      await catalogPage.filterByOsCheckbox('workload-Server', false);
+      return;
+    }
+
     await catalogPage.filterByOsCheckbox('workload-Desktop', true);
     await expect(catalogPage.gridLinkWithText(TEMPLATE_WIN10.name)).toBeVisible();
     await expect(catalogPage.gridLinkWithText(TEMPLATE_WIN2K19.name)).toBeHidden();
@@ -44,6 +57,17 @@ test.describe(`Catalog filters ${ROUTE_CATALOG_TAG} ${GATING_TAG}`, () => {
   });
 
   test('ID(CNV-8466) Filter VM catalog by OS and Workload', async ({ catalogPage }) => {
+    if (EnvVariables.isS390x) {
+      await catalogPage.filterByOsCheckbox('osName-RHEL', true);
+      await catalogPage.filterByOsCheckbox('workload-Server', true);
+      await expect(catalogPage.gridLinkWithText('Red Hat Enterprise Linux 9 VM')).toBeVisible();
+      await expect(catalogPage.gridLinkWithText('Red Hat Enterprise Linux 8 VM')).toBeVisible();
+      await expect(catalogPage.gridLinkWithText(/Fedora/i)).toBeHidden();
+      await catalogPage.filterByOsCheckbox('workload-Server', false);
+      await catalogPage.filterByOsCheckbox('osName-RHEL', false);
+      return;
+    }
+
     await catalogPage.filterByOsCheckbox('osName-Windows', true);
     await catalogPage.filterByOsCheckbox('workload-Server', true);
     await expect(catalogPage.gridLinkWithText(TEMPLATE_WIN2K22.name)).toBeVisible();

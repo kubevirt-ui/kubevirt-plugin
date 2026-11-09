@@ -2,6 +2,7 @@ import { GATING_TAG, NON_PRIV_TAG, T1_TAG } from '@/data-models/allure-constants
 import { ROUTE_CATALOG_TAG } from '@/data-models/route-tags';
 import { expect, test } from '@/fixtures/catalog-fixture';
 import { VM_FROM_CATALOG } from '@/utils/constants';
+import { EnvVariables } from '@/utils/env-variables';
 import { generateNameWithBase } from '@/utils/random-data-generator';
 import { TestTimeouts } from '@/utils/test-config';
 
@@ -16,6 +17,8 @@ test.describe(`Catalog read ${ROUTE_CATALOG_TAG} ${GATING_TAG}`, () => {
 
 test.describe(`Catalog template filter ${ROUTE_CATALOG_TAG} ${GATING_TAG}`, () => {
   test('Filter catalog grid by OS name', async ({ catalogPage, testNamespace }) => {
+    test.skip(EnvVariables.isS390x, 'Desktop Windows catalog tiles are not available on s390x');
+
     await catalogPage.openCatalogInNamespace(testNamespace);
     await catalogPage.waitForTemplateCatalogReady();
     await catalogPage.filterByText('windows');

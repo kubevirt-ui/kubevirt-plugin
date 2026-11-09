@@ -8,8 +8,13 @@ import {
   VM_FROM_WINDOWS_CATALOG,
   WINDOWS10_CATALOG_ROOT_DISK_SIZE_GIB,
 } from '@/utils/constants';
+import { EnvVariables } from '@/utils/env-variables';
 import { generateNameWithBase } from '@/utils/random-data-generator';
 import { TestTimeouts } from '@/utils/test-config';
+
+test.beforeEach(() => {
+  test.skip(EnvVariables.isS390x, 'Windows catalog create flows are not supported on s390x');
+});
 
 test.describe(`Create Windows VM from catalog (admin) ${ROUTE_CATALOG_TAG} ${T1_TAG} ${ADMIN_ONLY_TAG}`, () => {
   test('ID(CNV-8925) Create windows VM from ISO and verify rootdisk size', async ({

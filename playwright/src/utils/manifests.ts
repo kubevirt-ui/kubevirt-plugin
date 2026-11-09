@@ -1,5 +1,6 @@
 /** Minimal manifests for API setup in Playwright E2E. */
 
+import { getTemplateMetadataName } from '@/utils/architecture';
 import { assertValidStorageClassName } from '@/utils/k8s-resource-names';
 
 /** Secondary Multus NIC for VM network interface CRUD (OVN overlay). */
@@ -67,12 +68,13 @@ spec:
 
 export function virtualMachineManifest(opts: { name: string; namespace: string }): string {
   const { name, namespace } = opts;
+  const template = getTemplateMetadataName('rhel9-server-small');
   return `apiVersion: kubevirt.io/v1
 kind: VirtualMachine
 metadata:
   labels:
     app: ${name}
-    vm.kubevirt.io/template: rhel9-server-small
+    vm.kubevirt.io/template: ${template}
   name: ${name}
   namespace: ${namespace}
 spec:
