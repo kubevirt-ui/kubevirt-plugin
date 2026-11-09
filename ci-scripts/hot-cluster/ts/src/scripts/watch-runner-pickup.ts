@@ -8,18 +8,26 @@
  * runner claims the job, so this failure mode is otherwise silent -- see
  * https://github.com/kubevirt-ui/kubevirt-plugin/actions/runs/37301023503/job/111736216051.
  *
- * Distinguishes "ARC is broken" (no *online* runner for this label ever
- * appears within the timeout) from "legitimately queued behind
- * MAX_RUNNERS capacity" (an online runner for this label exists, even if
- * currently busy with another job) -- only the former is cancelled.
+ * Distinguishes "ARC is broken" (no *online* runner for this scale set and
+ * no peer Execute-tests job on the same cluster within the timeout) from
+ * "legitimately queued behind MAX_RUNNERS capacity" (an online runner for
+ * this scale set exists -- matched by label or ARC name prefix -- or a
+ * peer E2E run is already executing on the same cluster) -- only the
+ * former is cancelled. Capacity queue must not cancel.
+ *
+ * Online-runner checks key off RUNNER_LABEL (`runs-on`). Peer Execute
+ * matching keys off CLUSTER_NAME (workflow display_title `cluster:…`),
+ * which can differ when runner_label is customized.
  *
  * The self-hosted runners list is an admin-scoped API that the default
  * GITHUB_TOKEN cannot call (see check-runner-busy.ts); if the caller
  * couldn't mint that token, this is a no-op (fail open: never wrongly
  * cancel a legitimately-queued run just because we couldn't check).
+ * Peer Execute activity uses the ambient GITHUB_TOKEN (no admin scope).
  *
  * Required env: GH_TOKEN, GITHUB_REPOSITORY, RUN_ID, JOB_NAME, RUNNER_LABEL
- * Optional env: ARC_GH_TOKEN, PICKUP_TIMEOUT_MINUTES (default: 15),
+ * Optional env: CLUSTER_NAME (defaults to RUNNER_LABEL), ARC_GH_TOKEN,
+ *               PICKUP_TIMEOUT_MINUTES (default: 15),
  *               POLL_INTERVAL_SECONDS (default: 30),
  *               CANCEL_GRACE_SECONDS (default: 120)
  */
@@ -27,9 +35,17 @@
 import { execSync } from 'node:child_process';
 
 import { requireEnv, sleep } from '../kube-client';
+import {
+  type GhRunner,
+  type GhWorkflowJob,
+  type GhWorkflowRun,
+  hasOnlineScaleSetRunner,
+  hasPeerExecuteInProgress,
+  resolveClusterFromWorkflowTitle,
+  summarizeScaleSetRunners,
+} from '../runner-match';
 
 type Job = { name: string; status: string };
-type Runner = { labels?: Array<{ name: string }>; status: string };
 
 const DEFAULT_PICKUP_TIMEOUT_MINUTES = 15;
 const DEFAULT_POLL_INTERVAL_SECONDS = 30;
@@ -58,14 +74,79 @@ const getJobStatus = (
   return data.jobs.find((job) => job.name === jobName)?.status;
 };
 
-const hasOnlineRunner = (repo: string, label: string, token: string): boolean => {
+const listRunners = (repo: string, token: string): GhRunner[] => {
   const data = JSON.parse(ghApi(`repos/${repo}/actions/runners?per_page=100`, token)) as {
-    runners: Runner[];
+    runners: GhRunner[];
   };
-  return data.runners.some(
-    (runner) =>
-      runner.status === 'online' && runner.labels?.some((candidate) => candidate.name === label),
+  return data.runners;
+};
+
+const hasOnlineRunner = (repo: string, label: string, token: string): boolean =>
+  hasOnlineScaleSetRunner(listRunners(repo, token), label);
+
+const logRunnerCapacity = (repo: string, label: string, token: string): void => {
+  try {
+    const summary = summarizeScaleSetRunners(listRunners(repo, token), label);
+    console.log(
+      `Scale set '${label}': ${summary.online} online / ${summary.busy} busy / ${summary.total} total matching runners.`,
+    );
+  } catch (err) {
+    warnApiFailure('Failed to summarize runner capacity', err);
+  }
+};
+
+const HOT_CLUSTER_WORKFLOWS = ['hot-cluster-e2e.yml', 'hot-cluster-e2e-run.yml'] as const;
+
+/** All pages of in-progress runs from parent and standalone Hot Cluster E2E workflows. */
+const listInProgressHotClusterRuns = (repo: string, token: string): GhWorkflowRun[] => {
+  const byId = new Map<number, GhWorkflowRun>();
+  for (const workflow of HOT_CLUSTER_WORKFLOWS) {
+    const raw = execSync(
+      `gh api --paginate "repos/${repo}/actions/workflows/${workflow}/runs?status=in_progress&per_page=100" --jq ".workflow_runs[]"`,
+      { encoding: 'utf8', env: { ...process.env, GH_TOKEN: token } },
+    ).trim();
+    if (!raw) {
+      continue;
+    }
+    for (const line of raw.split('\n')) {
+      const run = JSON.parse(line) as GhWorkflowRun;
+      byId.set(run.id, run);
+    }
+  }
+  return [...byId.values()];
+};
+
+const listPeerExecuteJobs = (
+  repo: string,
+  runId: string,
+  clusterName: string,
+  token: string,
+): boolean => {
+  const workflowRuns = listInProgressHotClusterRuns(repo, token);
+
+  // Fetch jobs only for same-cluster peers (title cluster identity, not
+  // runner label) so a customized runs-on label cannot miss peer capacity.
+  // Parent and standalone titles both resolve via resolveClusterFromWorkflowTitle.
+  const peerRuns = workflowRuns.filter(
+    (run) =>
+      String(run.id) !== runId &&
+      resolveClusterFromWorkflowTitle(run.display_title ?? '') === clusterName,
   );
+
+  const jobsByRunId: Record<string, GhWorkflowJob[]> = {};
+  for (const run of peerRuns) {
+    const jobsData = JSON.parse(
+      ghApi(`repos/${repo}/actions/runs/${run.id}/jobs?per_page=100`, token),
+    ) as { jobs: GhWorkflowJob[] };
+    jobsByRunId[String(run.id)] = jobsData.jobs;
+  }
+
+  return hasPeerExecuteInProgress({
+    clusterName,
+    currentRunId: runId,
+    jobsByRunId,
+    runs: peerRuns,
+  });
 };
 
 const warnApiFailure = (label: string, err: unknown): void => {
@@ -100,8 +181,23 @@ const hasOnlineRunnerSafe = (
   }
 };
 
+const hasPeerExecuteInProgressSafe = (
+  repo: string,
+  runId: string,
+  clusterName: string,
+  token: string,
+): boolean | undefined => {
+  try {
+    return listPeerExecuteJobs(repo, runId, clusterName, token);
+  } catch (err) {
+    warnApiFailure('Failed to check peer Hot Cluster E2E activity', err);
+    return undefined;
+  }
+};
+
 type PollDeps = {
   arcToken: string;
+  clusterName: string;
   jobName: string;
   repo: string;
   runId: string;
@@ -109,8 +205,9 @@ type PollDeps = {
   token: string;
 };
 
-// Polls until either a healthy signal is observed (job left 'queued', or
-// an online runner for this label exists) or `untilMs` is reached.
+// Polls until either a healthy signal is observed (job left 'queued', an
+// online scale-set runner exists, or a peer Execute job is in_progress on
+// the same cluster) or `untilMs` is reached.
 // Shared by the main wait and the grace-confirmation window below, so
 // "what counts as healthy" only has to be defined once.
 const pollUntilHealthyOrDeadline = async (
@@ -118,13 +215,15 @@ const pollUntilHealthyOrDeadline = async (
   untilMs: number,
   pollIntervalMs: number,
 ): Promise<boolean> => {
-  const { arcToken, jobName, repo, runId, runnerLabel, token } = deps;
+  const { arcToken, clusterName, jobName, repo, runId, runnerLabel, token } = deps;
   for (;;) {
     const status = getJobStatusSafe(repo, runId, jobName, token);
     if (status !== undefined && status !== 'queued') {
       console.log(`Job '${jobName}' is now '${status}'. Watchdog done.`);
       return true;
     }
+
+    logRunnerCapacity(repo, runnerLabel, arcToken);
 
     const runnerOnline = hasOnlineRunnerSafe(repo, runnerLabel, arcToken);
     if (runnerOnline === true) {
@@ -134,10 +233,21 @@ const pollUntilHealthyOrDeadline = async (
       return true;
     }
 
+    const peerBusy = hasPeerExecuteInProgressSafe(repo, runId, clusterName, token);
+    if (peerBusy === true) {
+      console.log(
+        `Peer Hot Cluster E2E Execute tests already in_progress on cluster '${clusterName}' -- ARC is healthy; job is legitimately queued behind capacity. Watchdog done.`,
+      );
+      return true;
+    }
+
     const remainingMs = untilMs - Date.now();
     if (remainingMs <= 0) {
       return false;
     }
+    console.log(
+      `No healthy capacity signal yet for runner '${runnerLabel}' / cluster '${clusterName}' (job still queued). Waiting…`,
+    );
     await sleep(Math.min(pollIntervalMs, remainingMs));
   }
 };
@@ -148,6 +258,7 @@ const main = async (): Promise<void> => {
   const runId = requireEnv('RUN_ID');
   const jobName = requireEnv('JOB_NAME');
   const runnerLabel = requireEnv('RUNNER_LABEL');
+  const clusterName = process.env.CLUSTER_NAME?.trim() || runnerLabel;
   const arcToken = process.env.ARC_GH_TOKEN ?? '';
   const timeoutMinutes = positiveFiniteEnv(
     process.env.PICKUP_TIMEOUT_MINUTES,
@@ -167,10 +278,10 @@ const main = async (): Promise<void> => {
     return;
   }
 
-  const deps: PollDeps = { arcToken, jobName, repo, runId, runnerLabel, token };
+  const deps: PollDeps = { arcToken, clusterName, jobName, repo, runId, runnerLabel, token };
   const deadline = Date.now() + timeoutMinutes * 60 * 1000;
   console.log(
-    `Watching job '${jobName}' on run ${runId}: waiting for an online '${runnerLabel}' runner (timeout: ${timeoutMinutes}m)...`,
+    `Watching job '${jobName}' on run ${runId}: waiting for an online '${runnerLabel}' runner or peer Execute on cluster '${clusterName}' (timeout: ${timeoutMinutes}m)...`,
   );
 
   if (await pollUntilHealthyOrDeadline(deps, deadline, pollIntervalMs)) {
@@ -218,8 +329,36 @@ const main = async (): Promise<void> => {
     return;
   }
 
+  const peerBusyBeforeCancel = hasPeerExecuteInProgressSafe(repo, runId, clusterName, token);
+  if (peerBusyBeforeCancel === true) {
+    console.log(
+      `Peer Execute tests still in_progress on cluster '${clusterName}' -- skipping cancel despite pickup timeout.`,
+    );
+    return;
+  }
+  if (peerBusyBeforeCancel === undefined) {
+    console.log(
+      '::warning::Could not verify peer Execute activity before cancel -- skipping cancel (fail open).',
+    );
+    return;
+  }
+
+  // Peer lookup can take long enough that Execute tests got claimed
+  // mid-check; re-read status immediately before cancelling.
+  const statusBeforeCancel = getJobStatusSafe(repo, runId, jobName, token);
+  if (statusBeforeCancel === undefined) {
+    console.log(
+      '::warning::Could not reconfirm job status before cancel -- skipping cancel (fail open).',
+    );
+    return;
+  }
+  if (statusBeforeCancel !== 'queued') {
+    console.log(`Job '${jobName}' is now '${statusBeforeCancel}'. Skipping cancel.`);
+    return;
+  }
+
   console.error(
-    `::error::No online '${runnerLabel}' runner appeared within ${timeoutMinutes} minutes (confirmed again after a further ${graceSeconds}s grace window), and job '${jobName}' is still 'queued' -- ARC never claimed it. Cancelling run ${runId} so the required check does not hang forever.`,
+    `::error::No online '${runnerLabel}' runner and no peer Execute activity on cluster '${clusterName}' within ${timeoutMinutes} minutes (confirmed again after a further ${graceSeconds}s grace window), and job '${jobName}' is still 'queued' -- ARC never claimed it. Cancelling run ${runId} so the required check does not hang forever.`,
   );
 
   try {
