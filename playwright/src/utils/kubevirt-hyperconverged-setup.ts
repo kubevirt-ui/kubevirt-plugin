@@ -28,7 +28,7 @@ const DECLARATIVE_HOTPLUG_VOLUMES_JSON_PATCH_PATH = `/spec/featureGates/${DECLAR
 const HCO_CONFLICT_MAX_ATTEMPTS = 5;
 
 type JsonPatchOp =
-  | { op: 'add'; path: string; value: boolean | string }
+  | { op: 'add'; path: string; value: boolean | string | Record<string, string> }
   | { op: 'replace'; path: string; value: boolean | string };
 
 function hyperConvergedApiPath(cnvNamespace: string): string {
@@ -115,6 +115,58 @@ async function applyReplaceWithAddFallbackOnCluster(
   });
 }
 
+/**
+ * Ensure HCO annotation exists. Fresh clusters often omit `metadata.annotations` entirely;
+ * JSON Patch replace/add on `/metadata/annotations/<key>` then 422s (parent missing).
+ * Matches UI `usePasstFeatureFlag`: create annotations map when empty, then set the key.
+ */
+async function applyPasstAnnotationOnCluster(
+  namespace: string,
+  kubeconfigPath: string | undefined,
+): Promise<void> {
+  const context = DEPLOY_PASST_NETWORK_BINDING_ANNOTATION;
+  await withHcoConflictRetry(async () => {
+    try {
+      await patchHyperConvergedOnCluster(
+        namespace,
+        [{ op: 'replace', path: DEPLOY_PASST_JSON_PATCH_PATH, value: 'true' }],
+        kubeconfigPath,
+        context,
+      );
+      return;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      if (!message.includes('(422)')) {
+        throw error;
+      }
+    }
+    try {
+      await patchHyperConvergedOnCluster(
+        namespace,
+        [{ op: 'add', path: DEPLOY_PASST_JSON_PATCH_PATH, value: 'true' }],
+        kubeconfigPath,
+        context,
+      );
+      return;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      if (!message.includes('(422)')) {
+        throw error;
+      }
+    }
+    // Parent `/metadata/annotations` missing — create map + key (same as Preview Features toggle).
+    await patchHyperConvergedOnCluster(
+      namespace,
+      [
+        { op: 'add', path: '/metadata/annotations', value: {} },
+        { op: 'replace', path: DEPLOY_PASST_JSON_PATCH_PATH, value: 'true' },
+      ],
+      kubeconfigPath,
+      context,
+    );
+  });
+}
+
 async function applyReplaceWithAddFallbackViaConsole(
   request: APIRequestContext,
   consoleOrigin: string,
@@ -156,6 +208,16 @@ async function applyReplaceWithAddFallbackViaConsole(
           )}`,
         );
       }
+      // Preserve add failure details when replace also failed (e.g. missing parent path).
+      if (add.status() !== 422) {
+        const addBody = await add.text();
+        throw new Error(
+          `JSON Patch HyperConverged via console proxy failed (${add.status()}): ${addBody.slice(
+            0,
+            500,
+          )}`,
+        );
+      }
     }
     if (replace.status() === 403 && canRunOc()) {
       await on403Fallback();
@@ -171,18 +233,103 @@ async function applyReplaceWithAddFallbackViaConsole(
   });
 }
 
+async function applyPasstAnnotationViaConsole(
+  request: APIRequestContext,
+  consoleOrigin: string,
+  namespace: string,
+  proxyOptions: ConsoleProxyRequestOptions,
+  on403Fallback: () => Promise<void>,
+): Promise<void> {
+  const origin = consoleOrigin.replace(/\/$/, '');
+  const headers = {
+    ...getConsoleKubernetesProxyHeaders(origin, proxyOptions),
+    'Content-Type': 'application/json-patch+json',
+  };
+  const url = `${origin}/api/kubernetes${hyperConvergedApiPath(namespace)}`;
+
+  await withHcoConflictRetry(async () => {
+    const replace = await request.patch(url, {
+      data: [{ op: 'replace', path: DEPLOY_PASST_JSON_PATCH_PATH, value: 'true' }],
+      headers,
+    });
+    if (replace.ok()) {
+      return;
+    }
+    if (replace.status() === 403 && canRunOc()) {
+      await on403Fallback();
+      return;
+    }
+    if (replace.status() !== 422) {
+      const body = await replace.text();
+      throw new Error(
+        `JSON Patch HyperConverged via console proxy failed (${replace.status()}): ${body.slice(
+          0,
+          500,
+        )}`,
+      );
+    }
+
+    const add = await request.patch(url, {
+      data: [{ op: 'add', path: DEPLOY_PASST_JSON_PATCH_PATH, value: 'true' }],
+      headers,
+    });
+    if (add.ok()) {
+      return;
+    }
+    if (isConflictStatus(add.status())) {
+      const addBody = await add.text();
+      throw new Error(
+        `JSON Patch HyperConverged via console proxy failed (${add.status()}): ${addBody.slice(
+          0,
+          500,
+        )}`,
+      );
+    }
+    if (add.status() === 403 && canRunOc()) {
+      await on403Fallback();
+      return;
+    }
+    if (add.status() !== 422) {
+      const addBody = await add.text();
+      throw new Error(
+        `JSON Patch HyperConverged via console proxy failed (${add.status()}): ${addBody.slice(
+          0,
+          500,
+        )}`,
+      );
+    }
+
+    // Parent `/metadata/annotations` missing — create map then set key (Preview Features UI path).
+    const createMap = await request.patch(url, {
+      data: [
+        { op: 'add', path: '/metadata/annotations', value: {} },
+        { op: 'replace', path: DEPLOY_PASST_JSON_PATCH_PATH, value: 'true' },
+      ],
+      headers,
+    });
+    if (createMap.ok()) {
+      return;
+    }
+    if (createMap.status() === 403 && canRunOc()) {
+      await on403Fallback();
+      return;
+    }
+    const createBody = await createMap.text();
+    throw new Error(
+      `JSON Patch HyperConverged via console proxy failed (${createMap.status()}): ${createBody.slice(
+        0,
+        500,
+      )}`,
+    );
+  });
+}
+
 /** Preview feature: Enable Passt binding for primary user-defined networks (HCO annotation). */
 export async function enableDeployPasstNetworkBindingOnCluster(
   options: { cnvNamespace?: string; kubeconfigPath?: string } = {},
 ): Promise<void> {
   const namespace = cnvNamespace(options);
-  await applyReplaceWithAddFallbackOnCluster(
-    namespace,
-    DEPLOY_PASST_JSON_PATCH_PATH,
-    'true',
-    options.kubeconfigPath,
-    DEPLOY_PASST_NETWORK_BINDING_ANNOTATION,
-  );
+  await applyPasstAnnotationOnCluster(namespace, options.kubeconfigPath);
 }
 
 export async function enableDeployPasstNetworkBindingViaConsoleApi(
@@ -191,14 +338,8 @@ export async function enableDeployPasstNetworkBindingViaConsoleApi(
   options: { cnvNamespace?: string } & ConsoleProxyRequestOptions = {},
 ): Promise<void> {
   const namespace = options.cnvNamespace ?? EnvVariables.cnvNamespace;
-  await applyReplaceWithAddFallbackViaConsole(
-    request,
-    consoleOrigin,
-    namespace,
-    DEPLOY_PASST_JSON_PATCH_PATH,
-    'true',
-    options,
-    () => enableDeployPasstNetworkBindingOnCluster({ cnvNamespace: namespace }),
+  await applyPasstAnnotationViaConsole(request, consoleOrigin, namespace, options, () =>
+    enableDeployPasstNetworkBindingOnCluster({ cnvNamespace: namespace }),
   );
 }
 
