@@ -12,6 +12,7 @@
 import RequestContextClient from '@/clients/request-context-client';
 import { NavigationPage } from '@/page-objects/navigation-page';
 import { dismissConsoleObstructions } from '@/utils/console-modals';
+import { ensureNonPrivAdministratorPerspective } from '@/utils/console-perspective';
 import { E2E_LABEL, E2E_LABEL_VALUE } from '@/utils/constants';
 import { EnvVariables } from '@/utils/env-variables';
 import { generateE2eTestNamespace } from '@/utils/random-data-generator';
@@ -109,6 +110,20 @@ const _test = base.extend<Fixtures, WorkerFixtures>({
       .locator('[data-test-id="perspective-switcher-toggle"]')
       .waitFor({ state: 'visible', timeout: TestTimeouts.CONSOLE_LOGIN });
     await dismissConsoleObstructions(page);
+    if (EnvVariables.isNonPrivUser) {
+      await ensureNonPrivAdministratorPerspective(page);
+    } else if (!EnvVariables.isSkipBrowserLogin) {
+      // HC E2E / local auth-disabled console shows "Auth disabled", not kube:admin.
+      const userMenu = page.getByRole('button', { name: 'User menu' });
+      await userMenu.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
+      const userLabel = ((await userMenu.textContent()) ?? '').trim();
+      if (!/kube:admin/i.test(userLabel)) {
+        throw new Error(
+          `Expected kubeadmin console session (kube:admin), got "${userLabel || 'unknown'}". ` +
+            'Check OPENSHIFT_USERNAME/PASSWORD and re-run global setup.',
+        );
+      }
+    }
     await use(page);
   },
 

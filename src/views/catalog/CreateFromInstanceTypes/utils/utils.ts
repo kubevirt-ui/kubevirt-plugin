@@ -14,7 +14,11 @@ import { DEFAULT_DISK_SIZE } from '@kubevirt-utils/components/DiskModal/utils/co
 import { InterfaceTypes } from '@kubevirt-utils/components/DiskModal/utils/types';
 import { addSecretToVM } from '@kubevirt-utils/components/SSHSecretModal/utils/utils';
 import { sysprepDisk, sysprepVolume } from '@kubevirt-utils/components/SysprepModal/sysprep-utils';
-import { ROOTDISK } from '@kubevirt-utils/constants/constants';
+import {
+  ROOTDISK,
+  RUNSTRATEGY_ALWAYS,
+  RUNSTRATEGY_HALTED,
+} from '@kubevirt-utils/constants/constants';
 import { RHELAutomaticSubscriptionData } from '@kubevirt-utils/hooks/useRHELAutomaticSubscription/utils/types';
 import {
   isBootableVolumeISO,
@@ -167,7 +171,7 @@ export const generateVM = (
         name: selectedPreference,
         ...(selectPreferenceKind && { kind: selectPreferenceKind }),
       },
-      running: startVM,
+      runStrategy: startVM ? RUNSTRATEGY_ALWAYS : RUNSTRATEGY_HALTED,
       template: {
         metadata: {
           labels: {

@@ -66,7 +66,26 @@ export function runOcCommand(cmd: string, kubeconfig?: string, timeoutMs = MINUT
   });
 }
 
+/**
+ * Teardown may use kubeconfig even when privileged lanes set skipOcInvocations
+ * (tests use console /api/kubernetes only). Requires an explicit kubeconfig path.
+ */
+export function runOcTeardownCommand(cmd: string, kubeconfig: string, timeoutMs = MINUTE): string {
+  return execSync(`KUBECONFIG="${kubeconfig}" ${cmd}`, {
+    encoding: 'utf8',
+    stdio: ['pipe', 'pipe', 'pipe'],
+    timeout: timeoutMs,
+  });
+}
+
 function runOc(cmd: string, kubeconfig?: string, timeoutMs = MINUTE): string {
+  return runOcCommand(cmd, kubeconfig, timeoutMs);
+}
+
+function runOcTeardown(cmd: string, kubeconfig: string | undefined, timeoutMs = MINUTE): string {
+  if (kubeconfig && fs.existsSync(kubeconfig)) {
+    return runOcTeardownCommand(cmd, kubeconfig, timeoutMs);
+  }
   return runOcCommand(cmd, kubeconfig, timeoutMs);
 }
 
@@ -194,7 +213,7 @@ export function patchKubevirtUserSettingsHideWelcomeForUser(
 }
 
 export function deleteLabeledE2eNamespaces(kubeconfig?: string): void {
-  runOc(
+  runOcTeardown(
     `oc get ns -l kubevirt-plugin-e2e=true -o name | xargs -r oc delete --wait=false`,
     kubeconfig,
     2 * MINUTE,
@@ -203,7 +222,7 @@ export function deleteLabeledE2eNamespaces(kubeconfig?: string): void {
 
 export function deletePwMigrationPolicies(kubeconfig?: string): void {
   try {
-    const out = runOc(
+    const out = runOcTeardown(
       `oc get migrationpolicy -o jsonpath='{range .items[*]}{.metadata.name}{"\\n"}{end}'`,
       kubeconfig,
     );
@@ -213,7 +232,35 @@ export function deletePwMigrationPolicies(kubeconfig?: string): void {
       .filter((n) => n.startsWith('pw-') || n === 'example');
     for (const name of names) {
       try {
-        runOc(`oc delete migrationpolicy ${name} --ignore-not-found`, kubeconfig);
+        runOcTeardown(`oc delete migrationpolicy ${name} --ignore-not-found`, kubeconfig);
+      } catch {
+        // best-effort
+      }
+    }
+  } catch {
+    // CRD or permission missing
+  }
+}
+
+const DEFAULT_NS_E2E_VM_PREFIXES = ['pw-', 'rhel9-', 'gating-', 'example'];
+
+/** Best-effort: remove Playwright orphan VMs/DVs/PVCs left in `default` (wrong project bar). */
+export function deleteDefaultNamespaceE2eVms(kubeconfig?: string): void {
+  try {
+    const out = runOcTeardown(
+      `oc get vm -n default -o jsonpath='{range .items[*]}{.metadata.name}{"\\n"}{end}'`,
+      kubeconfig,
+    );
+    const names = out
+      .split('\n')
+      .map((n) => n.trim())
+      .filter((n) => n && DEFAULT_NS_E2E_VM_PREFIXES.some((p) => n.startsWith(p)));
+    for (const name of names) {
+      try {
+        runOcTeardown(
+          `oc delete vm,dv,pvc ${name} -n default --ignore-not-found --wait=false`,
+          kubeconfig,
+        );
       } catch {
         // best-effort
       }

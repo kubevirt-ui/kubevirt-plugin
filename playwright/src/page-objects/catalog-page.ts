@@ -84,12 +84,66 @@ export class CatalogPage extends BasePage {
     await this.robustClick(submit);
   }
 
-  private async confirmQuickCreateBootSourceAndWaitForVm(): Promise<void> {
+  /**
+   * After Quick create submit: confirm optional "no boot source", then wait for VM detail
+   * navigation. If a Quick create danger alert appears, retry transient virt-api webhook
+   * failures (EOF / failed calling webhook) via `resubmit`; fail fast on other errors.
+   */
+  private async confirmQuickCreateBootSourceAndWaitForVm(
+    resubmit?: () => Promise<void>,
+  ): Promise<void> {
     const noBs = this.page.getByRole('button', { name: 'Create with no available boot source' });
     if (await noBs.isVisible({ timeout: 3 * SECOND }).catch(() => false)) {
       await noBs.click();
     }
-    await this.waitForVirtualMachineDetailUrl();
+
+    const deadline = Date.now() + TestTimeouts.LONG_OPERATION;
+    let resubmitAttempts = 0;
+    const maxResubmits = 3;
+    // After a retry click, the prior danger alert may linger until the new request settles.
+    let ignoreAlertUntil = 0;
+
+    while (Date.now() < deadline) {
+      if (/kubevirt\.io~v1~VirtualMachine\/([^/?#]+)/.test(this.page.url())) {
+        return;
+      }
+
+      const alert = this.quickCreateErrorAlert();
+      if (Date.now() >= ignoreAlertUntil && (await alert.isVisible().catch(() => false))) {
+        const text = ((await alert.innerText().catch(() => '')) || '').trim();
+        if (
+          resubmit &&
+          resubmitAttempts < maxResubmits &&
+          this.isTransientQuickCreateWebhookError(text)
+        ) {
+          resubmitAttempts += 1;
+          await new Promise((resolve) => setTimeout(resolve, TestTimeouts.RETRY_DELAY));
+          await resubmit();
+          ignoreAlertUntil = Date.now() + TestTimeouts.UI_DELAY_MEDIUM;
+          continue;
+        }
+        throw new Error(`Quick create failed: ${text || 'unknown error'}`);
+      }
+
+      await new Promise((resolve) => setTimeout(resolve, 500));
+    }
+
+    throw new Error('Console should navigate to VirtualMachine detail after create');
+  }
+
+  private isTransientQuickCreateWebhookError(text: string): boolean {
+    return /failed calling webhook|\bEOF\b|connection refused|connection reset|i\/o timeout|ECONNRESET|ETIMEDOUT|\b502\b|\b503\b/i.test(
+      text,
+    );
+  }
+
+  private quickCreateErrorAlert(): Locator {
+    return this.page
+      .locator(
+        '.pf-v5-c-alert.pf-m-danger, .pf-c-alert.pf-m-danger, [class*="c-alert"].pf-m-danger',
+      )
+      .filter({ hasText: /Quick create error|failed calling webhook/i })
+      .first();
   }
 
   private async createVmFromTemplateDrawerCustomize(vmName: string): Promise<void> {
@@ -114,8 +168,29 @@ export class CatalogPage extends BasePage {
       .first();
   }
 
+  /** Diagnostics for a quick create submit button stuck disabled (see CNV-8848). */
+  private async describeQuickCreateSubmitNotEnabled(vmName: string): Promise<string> {
+    const submit = this.drawerQuickCreateSubmitButton();
+    const [visible, enabled] = await Promise.all([
+      submit.isVisible().catch(() => false),
+      submit.isEnabled().catch(() => false),
+    ]);
+    return (
+      `Quick create VirtualMachine submit button did not become enabled for "${vmName}" ` +
+      `(submit visible=${visible}, enabled=${enabled}, url=${this.page.url()}). ` +
+      'Likely a template/boot source that never finishes resolving in this environment ' +
+      '(e.g. console useK8sModels() or DataSource/PVC readiness) -- see CNV-8848.'
+    );
+  }
+
   private drawerQuickCreateSubmitButton(): Locator {
-    return this.templateDrawer().getByTestId('quick-create-vm-btn');
+    // Product emits data-test-id; playwright.config testIdAttribute is `data-test`,
+    // so bare getByTestId never matches. Fall back to the role button used by
+    // templateDrawerQuickCreateButton (same label).
+    const drawer = this.templateDrawer();
+    return drawer
+      .locator('[data-test-id="quick-create-vm-btn"]')
+      .or(drawer.getByRole('button', { name: /^Quick create VirtualMachine$/i }));
   }
 
   /** Quick-create heading can render before the name field; wait or re-open the modal. */
@@ -398,10 +473,19 @@ export class CatalogPage extends BasePage {
     await this.ensureQuickCreateNameInputVisible();
     await this.fillCustomizeVmName(vmName);
     if (!(await this.waitForDrawerQuickCreateEnabled())) {
-      return false;
+      // Quick-create UI was present and committed to (name filled in), but the
+      // submit button never enabled within the long wait above. This is the
+      // CNV-8848 hang shape: silently returning false here lets quickCreateVm
+      // cascade through several more fallback branches (each with their own
+      // long waits) and die at the test's outer timeout with no useful error.
+      // Fail fast with concrete diagnostics instead.
+      throw new Error(await this.describeQuickCreateSubmitNotEnabled(vmName));
     }
-    await this.robustClick(this.drawerQuickCreateSubmitButton());
-    await this.confirmQuickCreateBootSourceAndWaitForVm();
+    const drawerSubmit = this.drawerQuickCreateSubmitButton();
+    await this.robustClick(drawerSubmit);
+    await this.confirmQuickCreateBootSourceAndWaitForVm(async () => {
+      await this.robustClick(this.drawerQuickCreateSubmitButton());
+    });
     return true;
   }
 
@@ -594,8 +678,11 @@ export class CatalogPage extends BasePage {
   async completeLegacyQuickCreateModal(vmName: string): Promise<void> {
     await this.openLegacyQuickCreateModal();
     await this.fillCustomizeVmName(vmName);
-    await this.clickQuickCreateSubmit(this.quickCreateSubmitScope());
-    await this.confirmQuickCreateBootSourceAndWaitForVm();
+    const scope = this.quickCreateSubmitScope();
+    await this.clickQuickCreateSubmit(scope);
+    await this.confirmQuickCreateBootSourceAndWaitForVm(async () => {
+      await this.clickQuickCreateSubmit(this.quickCreateSubmitScope());
+    });
   }
 
   async configureInstanceTypePublicSshKey(options: {
@@ -1621,7 +1708,9 @@ export class CatalogPage extends BasePage {
       await this.ensureQuickCreateNameInputVisible();
       await this.fillCustomizeVmName(vmName);
       await this.clickQuickCreateSubmit(this.quickCreateSubmitScope());
-      await this.confirmQuickCreateBootSourceAndWaitForVm();
+      await this.confirmQuickCreateBootSourceAndWaitForVm(async () => {
+        await this.clickQuickCreateSubmit(this.quickCreateSubmitScope());
+      });
       return this.vmNameFromCurrentUrl() || vmName;
     }
 
@@ -1659,7 +1748,9 @@ export class CatalogPage extends BasePage {
       await this.ensureQuickCreateNameInputVisible();
       await this.fillCustomizeVmName(vmName);
       await this.clickQuickCreateSubmit(this.quickCreateSubmitScope());
-      await this.confirmQuickCreateBootSourceAndWaitForVm();
+      await this.confirmQuickCreateBootSourceAndWaitForVm(async () => {
+        await this.clickQuickCreateSubmit(this.quickCreateSubmitScope());
+      });
       return this.vmNameFromCurrentUrl() || vmName;
     }
 
@@ -1701,7 +1792,9 @@ export class CatalogPage extends BasePage {
       ) {
         await this.fillCustomizeVmName(vmName);
         await this.clickQuickCreateSubmit(this.quickCreateSubmitScope());
-        await this.confirmQuickCreateBootSourceAndWaitForVm();
+        await this.confirmQuickCreateBootSourceAndWaitForVm(async () => {
+          await this.clickQuickCreateSubmit(this.quickCreateSubmitScope());
+        });
         return this.vmNameFromCurrentUrl() || vmName;
       }
       await this.fillCustomizeVmName(vmName);

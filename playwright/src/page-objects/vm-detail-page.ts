@@ -681,7 +681,9 @@ export class VmDetailPage extends BasePage {
         return true;
       },
       {
-        message: 'VM Start action should be visible and enabled in Actions menu',
+        message:
+          'VM Start action should be visible and enabled in Actions menu ' +
+          '(Start stays disabled while printableStatus is Provisioning — prefer a container-disk VM)',
         timeout: TestTimeouts.LONG_OPERATION,
       },
     );
