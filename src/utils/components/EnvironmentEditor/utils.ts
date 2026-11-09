@@ -1,7 +1,7 @@
 import { type V1VirtualMachine, type V1Volume } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getDisks, getVolumes } from '@kubevirt-utils/resources/vm';
 
-import { EnvironmentKind, type EnvironmentVariable } from './constants';
+import { ENVIRONMENT_DISK_PREFIX, EnvironmentKind, type EnvironmentVariable } from './constants';
 
 const getKindFromEnvVolume = (volume: V1Volume): EnvironmentKind | null => {
   if (volume.configMap) {
@@ -20,9 +20,10 @@ const getKindFromEnvVolume = (volume: V1Volume): EnvironmentKind | null => {
 export const getVMEnvironmentsVariables = (vm: V1VirtualMachine): EnvironmentVariable[] => {
   const disks = getDisks(vm) ?? [];
 
-  return (getVolumes(vm) ?? []).reduce((acc, volume) => {
+  return (getVolumes(vm) ?? []).reduce<EnvironmentVariable[]>((acc, volume) => {
     const kind = getKindFromEnvVolume(volume);
-    if (!kind) return acc;
+    const isDraft = !kind && volume.name?.startsWith(ENVIRONMENT_DISK_PREFIX);
+    if (!kind && !isDraft) return acc;
 
     const matchingDisk = disks.find((disk) => disk.name === volume.name);
 

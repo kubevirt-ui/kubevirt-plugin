@@ -98,6 +98,7 @@ const PreferencePage: FC<ListPageProps> = (props) => {
           );
         }}
         style={{ flexShrink: 0 }}
+        usePageInsets
       >
         <Tab eventKey={0} title={<TabTitleText>{t('Cluster Preferences')}</TabTitleText>}>
           <ClusterPreferenceList {...props} />

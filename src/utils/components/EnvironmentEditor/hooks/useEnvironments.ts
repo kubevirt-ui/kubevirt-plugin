@@ -8,7 +8,11 @@ import { getDisks, getVolumes } from '@kubevirt-utils/resources/vm';
 import { isWindows } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
 import { ensurePath, getRandomChars } from '@kubevirt-utils/utils/utils';
 
-import { type EnvironmentKind, type EnvironmentVariable } from '../constants';
+import {
+  ENVIRONMENT_DISK_PREFIX,
+  type EnvironmentKind,
+  type EnvironmentVariable,
+} from '../constants';
 import {
   areEnvironmentsChanged,
   getRandomSerial,
@@ -65,7 +69,7 @@ const useEnvironments = (
         draftVM.spec.template.spec.domain.devices.disks = [];
       }
 
-      const diskName = `environment-disk-${getRandomChars()}`;
+      const diskName = `${ENVIRONMENT_DISK_PREFIX}${getRandomChars()}`;
       getDisks(draftVM).push({
         disk: {
           bus: isWindowsVM ? InterfaceTypes.SATA : InterfaceTypes.VIRTIO,
