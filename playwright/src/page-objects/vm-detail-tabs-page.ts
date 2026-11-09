@@ -297,12 +297,49 @@ export class VmDetailTabsPage extends BasePage {
         'Add CD-ROM should be enabled when upload ISO is off and advanced CD-ROM preview is on',
       timeout: TestTimeouts.ELEMENT_WAIT,
     });
-    await this.robustClick(addButton);
-    await dialog.waitFor({ state: 'hidden', timeout: TestTimeouts.LONG_OPERATION });
-    await pollUntil(async () => (await this.cdRomStorageRow().count()) > 0, {
-      message: 'Storage table should list a CD-ROM drive after add',
-      timeout: TestTimeouts.LONG_OPERATION,
-    });
+
+    const modalErrorText = async (): Promise<string> =>
+      (
+        (await dialog
+          .locator('.pf-v6-c-alert.pf-m-danger, .pf-m-danger[class*="alert"]')
+          .first()
+          .textContent()
+          .catch(() => null)) ?? ''
+      ).trim();
+
+    const isTransientWebhookError = (text: string): boolean =>
+      /webhook|deadline exceeded|context deadline|temporarily unavailable|connection refused/i.test(
+        text,
+      );
+
+    let lastError = '';
+    for (let attempt = 1; attempt <= 3; attempt += 1) {
+      await this.robustClick(addButton);
+      const closed = await dialog
+        .waitFor({ state: 'hidden', timeout: TestTimeouts.ELEMENT_WAIT })
+        .then(() => true)
+        .catch(() => false);
+      if (closed) {
+        await pollUntil(async () => (await this.cdRomStorageRow().count()) > 0, {
+          message: 'Storage table should list a CD-ROM drive after add',
+          timeout: TestTimeouts.LONG_OPERATION,
+        });
+        return;
+      }
+
+      lastError = await modalErrorText();
+      if (lastError && isTransientWebhookError(lastError) && attempt < 3) {
+        await this.page.waitForTimeout(TestTimeouts.RETRY_DELAY);
+        continue;
+      }
+      break;
+    }
+
+    throw new Error(
+      lastError
+        ? `Add CD-ROM modal stayed open after submit: ${lastError.slice(0, 500)}`
+        : 'Add CD-ROM modal stayed open after submit with no error alert',
+    );
   }
 
   async addEmptyCdRomFromStorage(diskName?: string): Promise<string> {

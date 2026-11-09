@@ -49,7 +49,7 @@ export const STORAGE_MIGRATION_PLAN_RETENTION_POLICY = {
 } as const;
 
 export type StorageMigrationPlanRetentionPolicy =
-  (typeof STORAGE_MIGRATION_PLAN_RETENTION_POLICY)[keyof typeof STORAGE_MIGRATION_PLAN_RETENTION_POLICY];
+  typeof STORAGE_MIGRATION_PLAN_RETENTION_POLICY[keyof typeof STORAGE_MIGRATION_PLAN_RETENTION_POLICY];
 
 export type MultiNamespaceVirtualMachineStorageMigrationPlan = K8sResourceCommon & {
   spec: {
@@ -119,8 +119,7 @@ export const STORAGE_MIGRATION_API = {
   SINGLE_NS: 'singleNamespace',
 } as const;
 
-export type StorageMigrationAPI =
-  (typeof STORAGE_MIGRATION_API)[keyof typeof STORAGE_MIGRATION_API];
+export type StorageMigrationAPI = typeof STORAGE_MIGRATION_API[keyof typeof STORAGE_MIGRATION_API];
 
 export type MigPlanPVSelection = {
   action?: string;
