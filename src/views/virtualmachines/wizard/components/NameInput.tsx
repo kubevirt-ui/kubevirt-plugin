@@ -2,50 +2,34 @@ import { type FC, useCallback } from 'react';
 import { useController } from 'react-hook-form';
 
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
+import { useDeferredFieldError } from '@kubevirt-utils/hooks/useDeferredFieldError';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { useNameValidation } from '@kubevirt-utils/hooks/useNameValidation';
-import { getVMNameErrorLenient } from '@kubevirt-utils/utils/dns1123SubdomainValidation';
-import { InputGroup, InputGroupItem, TextInput, ValidatedOptions } from '@patternfly/react-core';
-import { useVMWizardState } from '@virtualmachines/wizard/state/useVMWizardState';
+import { InputGroup, InputGroupItem, TextInput } from '@patternfly/react-core';
 
 import { useVMWizardForm } from '../form/VMWizardFormProvider';
 import GenerateVMNameButton from './GenerateVMNameButton';
 
 const NameInput: FC = () => {
   const { t } = useKubevirtTranslation();
-  const { control, setValue, trigger } = useVMWizardForm();
+  const { control, setValue } = useVMWizardForm();
   const {
     field,
-    fieldState: { error, isTouched },
+    fieldState: { error },
   } = useController({ control, name: 'deployment.name' });
-  const vmName = field.value;
-  const { setStrictVMName, strictVMName } = useVMWizardState();
-  const showValidation = isTouched || Boolean(vmName) || strictVMName;
 
-  const lenientValidation = useNameValidation({
-    getError: getVMNameErrorLenient,
-    name: showValidation ? vmName : undefined,
-  });
-
-  let errorText = lenientValidation.errorText;
-  let validated = lenientValidation.validated;
-
-  if (strictVMName) {
-    errorText = error?.message;
-    validated = error ? ValidatedOptions.error : ValidatedOptions.default;
-  }
+  const { errorText, onValueChange, revealError, validated } = useDeferredFieldError(
+    error?.message,
+  );
 
   const onChange = useCallback(
     (newName: string) => {
-      setStrictVMName(false);
-      // Keep errors visible after typing and clearing, even when the value is no longer dirty.
+      onValueChange();
       setValue('deployment.name', newName, {
         shouldDirty: true,
-        shouldTouch: true,
         shouldValidate: true,
       });
     },
-    [setStrictVMName, setValue],
+    [onValueChange, setValue],
   );
 
   return (
@@ -57,8 +41,7 @@ const NameInput: FC = () => {
             {...field}
             onBlur={() => {
               field.onBlur();
-              setStrictVMName(true);
-              void trigger('deployment.name');
+              revealError();
             }}
             onChange={(_event, value) => onChange(value)}
             placeholder={t('Enter a name or click the refresh icon to generate one')}
