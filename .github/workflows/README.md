@@ -74,6 +74,23 @@ See [`ci-scripts/manual-console/README.md`](../../ci-scripts/manual-console/READ
 | `ci_checks.yml` | Unit tests, build, lint, actionlint           |
 | `deploy.yml`    | Build/push multi-arch Quay image on main/tags |
 
+## `pull_request_target` Actions event policy
+
+GitHub's default public-repo policy blocks `pull_request_target` (evaluate mode now; enforcement **2026-12-02**). See [Securely using pull_request_target](https://docs.github.com/en/actions/reference/security/securely-using-pull_request_target#default-policy-for-pull_request_target).
+
+This repo keeps `pull_request_target` for fork-PR automation that needs secrets and a write token (labels, checks, bot App, Jira, E2E dispatch). An explicit repository Actions event policy allows it:
+
+| Field              | Value                                                                                                                                                   |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Policy             | [Allow pull_request_target for fork-PR automation](https://github.com/kubevirt-ui/kubevirt-plugin/settings/actions/rules/12538) (id `12538`)            |
+| Enforcement        | `active`                                                                                                                                                |
+| Allowed event      | `pull_request_target` only                                                                                                                              |
+| Targeted workflows | `pr-validation.yml`, `auto-merge.yml`, `hot-cluster-e2e-pr-gate.yml`, `hot-cluster-e2e-cancel-on-close.yml`, `needs-rebase.yml`, `ok-to-test-reset.yml` |
+
+Those six workflows check out the **default branch** (trusted scripts under `.github/`) and do **not** execute PR-head code. E2E runs PR code only after a separate `workflow_dispatch` into `hot-cluster-e2e.yml` (write access required to dispatch).
+
+Do not switch these workflows to `pull_request` without a redesign — fork PRs would lose secrets and write-token access. If you add another `pull_request_target` workflow, extend this policy's `workflow_path.include` (Settings → Actions → Policies, or `POST/PUT /repos/.../actions/policies`).
+
 ## Shared helpers
 
 | Path                                                                                       | Used for                                                                      |
