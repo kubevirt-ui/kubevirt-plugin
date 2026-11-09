@@ -60,6 +60,16 @@ export class VmDetailPage extends BasePage {
     return this.page.getByText(match).first();
   }
 
+  /** YAML tab content on 4.13 may omit a "Download" control — accept Monaco / kind marker. */
+  yamlTabContent(): Locator {
+    // `.first()` on the union — multiple branches can match and fail strict-mode expects.
+    return this.page
+      .locator('.monaco-editor')
+      .or(this.page.getByRole('button', { name: /^Download$/i }))
+      .or(this.page.getByText(/kind:\s*VirtualMachine/i))
+      .first();
+  }
+
   eventsTabContent(): Locator {
     return this.page
       .locator('.co-resource-event-list, .co-m-resource-event, [data-test="event-list"]')
@@ -194,7 +204,10 @@ export class VmDetailPage extends BasePage {
         `Cannot open configuration tab — not on a VM detail URL (${this.page.url()})`,
       );
     }
-    if (this.page.url().includes('/configurations')) {
+    // URL containing `/configurations` is not enough — skewed console can land on a
+    // nested path that still shows Overview tabs without configuration inner links.
+    const anyInnerConfigTab = this.page.locator('[data-test^="vm-configuration-"]').first();
+    if (await anyInnerConfigTab.isVisible().catch(() => false)) {
       return;
     }
     const configTab = this.configurationTabLink();
@@ -218,9 +231,7 @@ export class VmDetailPage extends BasePage {
       );
     }
 
-    if (!this.configurationLocationMatches(innerKey, this.page.url())) {
-      await this.openConfigurationParent();
-    }
+    await this.openConfigurationParent();
 
     const legacyTab = this.legacyConfigurationSubTab(innerKey);
     const innerTab = this.configurationInnerTab(innerKey);
@@ -232,12 +243,25 @@ export class VmDetailPage extends BasePage {
       await this.page.goto(`${base}/configurations/${innerKey}`, {
         waitUntil: 'domcontentloaded',
       });
+      // After goto, try clicking Configuration parent + inner again (skewed routing).
+      await this.openConfigurationParent();
+      if (await innerTab.isVisible().catch(() => false)) {
+        await this.navigateToTab(innerTab);
+      } else if (legacyTab && (await legacyTab.isVisible().catch(() => false))) {
+        await this.navigateToTab(legacyTab);
+      }
     }
 
     await pollUntil(
       async () => {
         if (legacyTab && (await legacyTab.isVisible().catch(() => false))) {
           return (await legacyTab.getAttribute('aria-selected')) === 'true';
+        }
+        if (await innerTab.isVisible().catch(() => false)) {
+          const selected = await innerTab.getAttribute('aria-selected').catch(() => null);
+          if (selected === 'true') {
+            return true;
+          }
         }
         return this.configurationLocationMatches(innerKey, this.page.url());
       },
@@ -257,9 +281,26 @@ export class VmDetailPage extends BasePage {
     }
   }
 
+  async goToYamlTab(): Promise<void> {
+    const base = this.vmDetailBasePath();
+    if (base) {
+      await this.page.goto(`${base}/yaml`, { waitUntil: 'domcontentloaded' });
+      return;
+    }
+    const yamlLink = this.consoleTestId(VmTabTestId.YAML).or(
+      this.page.getByRole('link', { name: /^YAML$/i }),
+    );
+    await this.navigateToTab(yamlLink.first());
+  }
+
   async goToTab(tabId: VmTabTestId): Promise<void> {
     if (tabId === VmTabTestId.Environment) {
       await this.goToEnvironmentTab();
+      return;
+    }
+
+    if (tabId === VmTabTestId.YAML) {
+      await this.goToYamlTab();
       return;
     }
 
@@ -323,18 +364,47 @@ export class VmDetailPage extends BasePage {
   }
 
   async openActionsMenu(): Promise<void> {
-    await this.robustClick(
-      this.consoleTestId('virtual-machine-actions').getByRole('button', { name: 'Actions' }),
-    );
+    const byTestId = this.consoleTestId('virtual-machine-actions').getByRole('button', {
+      name: 'Actions',
+    });
+    if (await byTestId.isVisible().catch(() => false)) {
+      await this.robustClick(byTestId);
+      return;
+    }
+    await this.robustClick(this.page.getByRole('button', { name: /^Actions$/i }).first());
   }
 
   async dismissActionsMenu(): Promise<void> {
     await this.page.keyboard.press('Escape');
   }
 
-  async startVmFromActions(): Promise<void> {
+  /**
+   * Start the VM from Actions when available.
+   * Returns true if Start was clicked; false when Stop is already shown (VM already started /
+   * Provisioning) so callers can skip waiting for a cold Start→Running transition.
+   */
+  async startVmFromActions(): Promise<boolean> {
     await this.openActionsMenu();
-    await this.robustClick(this.consoleTestId('vm-action-start'));
+    const byTestId = this.consoleTestId('vm-action-start');
+    if (await byTestId.isVisible().catch(() => false)) {
+      await this.robustClick(byTestId);
+      return true;
+    }
+    const start = this.page.getByRole('menuitem', { name: /^Start$/i }).first();
+    if (await start.isVisible().catch(() => false)) {
+      await this.robustClick(start);
+      return true;
+    }
+    const stop = this.page
+      .getByRole('menuitem', { name: /^Stop$/i })
+      .or(this.consoleTestId('vm-action-stop'))
+      .first();
+    if (await stop.isVisible().catch(() => false)) {
+      await this.dismissActionsMenu();
+      return false;
+    }
+    await this.robustClick(start);
+    return true;
   }
 
   async migrateFromActions(): Promise<void> {

@@ -1,5 +1,6 @@
 import { CatalogPage } from '@/page-objects/catalog-page';
 import { dismissConsoleObstructions } from '@/utils/console-modals';
+import { isOpenShiftMajorMinor } from '@/utils/openshift-version';
 import { MINUTE, TestTimeouts } from '@/utils/test-config';
 import type { Locator } from '@playwright/test';
 
@@ -244,12 +245,18 @@ export class VmListPage extends ResourceListPage {
   }
 
   async openCreateDropdown(): Promise<void> {
-    const create = this.page.getByTestId('item-create').getByRole('button', { name: /^Create/ });
-    if (await create.isVisible().catch(() => false)) {
-      await create.click();
-      return;
-    }
-    await this.page.getByTestId('item-create').getByRole('button').first().click();
+    // Matching OCP 4.13: ListPageCreateDropdown exposes data-test="item-create".
+    // Skewed HC (console 4.18): Create is often a plain header/empty-state button.
+    // Wait for either control — non-waiting isVisible() races page load and falls
+    // through to item-create which never appears on skewed console.
+    const create = this.page
+      .getByTestId('item-create')
+      .getByRole('button', { name: /^Create/ })
+      .or(this.page.getByRole('button', { name: /^Create$/ }))
+      .or(this.emptyStateCreateVirtualMachineButton())
+      .first();
+    await create.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
+    await create.click();
   }
 
   /** VM list → Create opens template catalog (wizard or legacy “From template”). */
@@ -277,8 +284,30 @@ export class VmListPage extends ResourceListPage {
   }
 
   async createFromYaml(manifestYaml?: string): Promise<void> {
+    const matching413 = isOpenShiftMajorMinor('4.13');
     await this.openCreateDropdown();
-    await this.createFromYamlAndSubmit(manifestYaml);
+    // Matching OCP 4.13: Create opens a menu with "With YAML" / "Import YAML".
+    // Skewed HC: Create may open a menu, land on ~new, or empty-state catalog —
+    // prefer YAML editor; fall back to direct ~new when Create did not open YAML UI.
+    if (!matching413) {
+      const monaco = this.page.locator('.monaco-editor').first();
+      const yamlMenu = this.page.getByRole('menuitem', { name: /with yaml|import yaml/i });
+      const onYaml =
+        (await monaco.isVisible().catch(() => false)) || this.page.url().includes('~new');
+      const hasYamlMenu = await yamlMenu.isVisible().catch(() => false);
+      if (!onYaml && !hasYamlMenu) {
+        const nsMatch = /\/ns\/([^/]+)\//.exec(this.page.url());
+        const namespace = nsMatch?.[1];
+        if (namespace) {
+          await this.page.goto(`/k8s/ns/${namespace}/kubevirt.io~v1~VirtualMachine/~new`, {
+            waitUntil: 'domcontentloaded',
+          });
+        }
+      }
+    }
+    await this.createFromYamlAndSubmit(manifestYaml, {
+      selectFromMenu: matching413,
+    });
     await this.waitForResourceDetailUrl(/kubevirt\.io~v1~VirtualMachine\/[^/]+(?:\/|$)/);
     await this.page
       .getByRole('heading', { level: 1 })

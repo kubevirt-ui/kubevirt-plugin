@@ -1,6 +1,13 @@
 import { T1_TAG, T2_TAG } from '@/data-models/allure-constants';
 import { ROUTE_CATALOG_TAG } from '@/data-models/route-tags';
 import { expect, test } from '@/fixtures/catalog-fixture';
+import {
+  TEMPLATE_WIN10,
+  TEMPLATE_WIN2K16,
+  TEMPLATE_WIN2K19,
+  TEMPLATE_WIN2K22,
+} from '@/utils/constants';
+
 test.describe(`Catalog filters ${ROUTE_CATALOG_TAG} ${T1_TAG}`, () => {
   test.beforeEach(async ({ catalogPage, testNamespace }) => {
     await catalogPage.openCatalogInNamespace(testNamespace);
@@ -15,9 +22,12 @@ test.describe(`Catalog filters ${ROUTE_CATALOG_TAG} ${T1_TAG}`, () => {
     await catalogPage.filterByOsCheckbox('osName-RHEL', false);
 
     await catalogPage.filterByOsCheckbox('osName-Windows', true);
-    await expect(catalogPage.gridLinkWithText('Microsoft Windows 10 VM')).toBeVisible();
-    await expect(catalogPage.gridLinkWithText('Microsoft Windows Server 2012 R2 VM')).toBeVisible();
-    await expect(catalogPage.gridLinkWithText('Microsoft Windows Server 2016 VM')).toBeVisible();
+    // common-templates removed Windows Server 2012 R2 (CNV-41784); unpinned CNV
+    // no longer ships it, so assert the templates that still exist.
+    await expect(catalogPage.gridLinkWithText(TEMPLATE_WIN10.name)).toBeVisible();
+    await expect(catalogPage.gridLinkWithText(TEMPLATE_WIN2K16.name)).toBeVisible();
+    await expect(catalogPage.gridLinkWithText(TEMPLATE_WIN2K19.name)).toBeVisible();
+    await expect(catalogPage.gridLinkWithText(TEMPLATE_WIN2K22.name)).toBeVisible();
     await catalogPage.filterByOsCheckbox('osName-Windows', false);
 
     await catalogPage.filterByOsCheckbox('osName-Fedora', true);

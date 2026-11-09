@@ -4,7 +4,7 @@ import DataSourceModel from '@kubevirt-ui/kubevirt-api/console/models/DataSource
 import VirtualMachineModel from '@kubevirt-ui/kubevirt-api/console/models/VirtualMachineModel';
 import { V1beta1DataSource } from '@kubevirt-ui/kubevirt-api/containerized-data-importer/models';
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
-import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
+import { DEFAULT_NAMESPACE, RUNSTRATEGY_ALWAYS } from '@kubevirt-utils/constants/constants';
 import { ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { OS_NAME_TYPES } from '@kubevirt-utils/resources/template';
 import { getRandomChars } from '@kubevirt-utils/utils/utils';
@@ -67,7 +67,7 @@ export const generateVM = (
       namespace: targetNamespace,
     },
     spec: {
-      running: true,
+      runStrategy: RUNSTRATEGY_ALWAYS,
       template: {
         spec: {
           domain: {

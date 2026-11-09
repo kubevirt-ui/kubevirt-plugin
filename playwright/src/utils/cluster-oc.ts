@@ -62,7 +62,30 @@ export function runOcCommand(cmd: string, kubeconfig?: string, timeoutMs = MINUT
   });
 }
 
+/**
+ * Teardown may use kubeconfig even when privileged lanes set skipOcInvocations
+ * (tests use console /api/kubernetes only). Requires an explicit kubeconfig path.
+ */
+export function runOcTeardownCommand(
+  cmd: string,
+  kubeconfig: string,
+  timeoutMs = MINUTE,
+): string {
+  return execSync(`KUBECONFIG="${kubeconfig}" ${cmd}`, {
+    encoding: 'utf8',
+    stdio: ['pipe', 'pipe', 'pipe'],
+    timeout: timeoutMs,
+  });
+}
+
 function runOc(cmd: string, kubeconfig?: string, timeoutMs = MINUTE): string {
+  return runOcCommand(cmd, kubeconfig, timeoutMs);
+}
+
+function runOcTeardown(cmd: string, kubeconfig: string | undefined, timeoutMs = MINUTE): string {
+  if (kubeconfig && fs.existsSync(kubeconfig)) {
+    return runOcTeardownCommand(cmd, kubeconfig, timeoutMs);
+  }
   return runOcCommand(cmd, kubeconfig, timeoutMs);
 }
 
@@ -75,10 +98,124 @@ export function isKubeconfigAuthenticated(kubeconfig: string): boolean {
   }
 }
 
+const SA_TOKEN_PATH = '/var/run/secrets/kubernetes.io/serviceaccount/token';
+const SA_CA_PATH = '/var/run/secrets/kubernetes.io/serviceaccount/ca.crt';
+
+/** Run `oc` without forcing KUBECONFIG (uses in-cluster SA or the process default). */
+function runOcDefault(cmd: string, timeoutMs = 30_000): string {
+  const env = { ...process.env };
+  delete env.KUBECONFIG;
+  return execSync(cmd, {
+    encoding: 'utf8',
+    env,
+    stdio: ['pipe', 'pipe', 'pipe'],
+    timeout: timeoutMs,
+  });
+}
+
+function isDefaultOcAuthenticated(): boolean {
+  try {
+    const whoami = runOcDefault('oc whoami').trim();
+    return whoami.length > 0 && !/unable to connect|Unauthorized|must be logged in/i.test(whoami);
+  } catch {
+    return false;
+  }
+}
+
+function writeInClusterKubeconfig(destPath: string): void {
+  const host = process.env.KUBERNETES_SERVICE_HOST;
+  if (!host || !fs.existsSync(SA_TOKEN_PATH) || !fs.existsSync(SA_CA_PATH)) {
+    throw new Error('In-cluster ServiceAccount credentials are not available');
+  }
+  const port =
+    process.env.KUBERNETES_SERVICE_PORT_HTTPS || process.env.KUBERNETES_SERVICE_PORT || '443';
+  const formatted = host.includes(':') && !host.startsWith('[') ? `[${host}]` : host;
+  const server = `https://${formatted}:${port}`;
+  const token = fs.readFileSync(SA_TOKEN_PATH, 'utf8').trim();
+  const caData = fs.readFileSync(SA_CA_PATH).toString('base64');
+  const kubeconfig = `apiVersion: v1
+kind: Config
+clusters:
+- cluster:
+    certificate-authority-data: ${caData}
+    server: ${server}
+  name: in-cluster
+contexts:
+- context:
+    cluster: in-cluster
+    user: in-cluster-sa
+  name: in-cluster
+current-context: in-cluster
+users:
+- name: in-cluster-sa
+  user:
+    token: ${token}
+`;
+  fs.mkdirSync(path.dirname(destPath), { recursive: true });
+  fs.writeFileSync(destPath, kubeconfig, 'utf8');
+}
+
+/**
+ * Copy env KUBECONFIG into `destPath`, optionally dumping the process-default
+ * `oc` config or materializing an in-cluster SA kubeconfig (HC / ARC).
+ * Returns true when the result authenticates with `oc whoami`.
+ */
+export function adoptDefaultOrInClusterKubeconfig(
+  destPath: string,
+  options: { allowInClusterFallback?: boolean } = {},
+): boolean {
+  const allowInClusterFallback =
+    options.allowInClusterFallback ??
+    (EnvVariables.isHcE2e || Boolean(process.env.KUBERNETES_SERVICE_HOST));
+
+  const fromEnv = process.env.KUBECONFIG;
+  if (fromEnv && fs.existsSync(fromEnv) && fromEnv !== destPath) {
+    fs.copyFileSync(fromEnv, destPath);
+    if (isKubeconfigAuthenticated(destPath)) {
+      return true;
+    }
+  }
+
+  if (!allowInClusterFallback) {
+    return false;
+  }
+
+  if (isDefaultOcAuthenticated()) {
+    try {
+      const raw = runOcDefault('oc config view --raw --minify', 30_000).trim();
+      if (raw.length > 0) {
+        fs.mkdirSync(path.dirname(destPath), { recursive: true });
+        fs.writeFileSync(destPath, raw, 'utf8');
+        if (isKubeconfigAuthenticated(destPath)) {
+          return true;
+        }
+      }
+    } catch {
+      // fall through to SA materialization
+    }
+  }
+
+  if (process.env.KUBERNETES_SERVICE_HOST && fs.existsSync(SA_TOKEN_PATH)) {
+    try {
+      writeInClusterKubeconfig(destPath);
+      return isKubeconfigAuthenticated(destPath);
+    } catch {
+      return false;
+    }
+  }
+
+  return false;
+}
+
 /** Re-run kubeadmin `oc login` when the on-disk kubeconfig token is missing or expired. */
 export function ensureKubeconfigAuthenticated(kubeConfigPath: string): void {
   if (isKubeconfigAuthenticated(kubeConfigPath)) {
     return;
+  }
+  if (EnvVariables.isHcE2e) {
+    throw new Error(
+      `HC_E2E kubeconfig at ${kubeConfigPath} is not authenticated; kubeadmin oc login is not available`,
+    );
   }
   ocLoginToCluster(kubeConfigPath);
   if (!isKubeconfigAuthenticated(kubeConfigPath)) {
@@ -128,7 +265,7 @@ export function patchConsoleUserSettings(kubeconfig: string, settingsKey: string
 }
 
 export function deleteLabeledE2eNamespaces(kubeconfig?: string): void {
-  runOc(
+  runOcTeardown(
     `oc get ns -l kubevirt-plugin-e2e=true -o name | xargs -r oc delete --wait=false`,
     kubeconfig,
     2 * MINUTE,
@@ -137,7 +274,7 @@ export function deleteLabeledE2eNamespaces(kubeconfig?: string): void {
 
 export function deletePwMigrationPolicies(kubeconfig?: string): void {
   try {
-    const out = runOc(
+    const out = runOcTeardown(
       `oc get migrationpolicy -o jsonpath='{range .items[*]}{.metadata.name}{"\\n"}{end}'`,
       kubeconfig,
     );
@@ -147,7 +284,35 @@ export function deletePwMigrationPolicies(kubeconfig?: string): void {
       .filter((n) => n.startsWith('pw-') || n === 'example');
     for (const name of names) {
       try {
-        runOc(`oc delete migrationpolicy ${name} --ignore-not-found`, kubeconfig);
+        runOcTeardown(`oc delete migrationpolicy ${name} --ignore-not-found`, kubeconfig);
+      } catch {
+        // best-effort
+      }
+    }
+  } catch {
+    // CRD or permission missing
+  }
+}
+
+const DEFAULT_NS_E2E_VM_PREFIXES = ['pw-', 'rhel9-', 'gating-', 'example'];
+
+/** Best-effort: remove Playwright orphan VMs/DVs/PVCs left in `default` (wrong project bar). */
+export function deleteDefaultNamespaceE2eVms(kubeconfig?: string): void {
+  try {
+    const out = runOcTeardown(
+      `oc get vm -n default -o jsonpath='{range .items[*]}{.metadata.name}{"\\n"}{end}'`,
+      kubeconfig,
+    );
+    const names = out
+      .split('\n')
+      .map((n) => n.trim())
+      .filter((n) => n && DEFAULT_NS_E2E_VM_PREFIXES.some((p) => n.startsWith(p)));
+    for (const name of names) {
+      try {
+        runOcTeardown(
+          `oc delete vm,dv,pvc ${name} -n default --ignore-not-found --wait=false`,
+          kubeconfig,
+        );
       } catch {
         // best-effort
       }
