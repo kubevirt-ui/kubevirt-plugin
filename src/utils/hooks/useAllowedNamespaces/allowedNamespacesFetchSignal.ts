@@ -19,36 +19,42 @@ const consumerCountByKey = new Map<string, number>();
 const toFetchError = (reason: unknown): Error =>
   reason instanceof Error ? reason : new Error(String(reason));
 
-export const getAllowedNamespacesFetchEntry = (
-  accessReview: FleetAccessReviewResourceAttributes,
-): FetchCacheEntry | undefined =>
-  allowedNamespacesFetchCache.value.get(getAllowedNamespacesRequestKey(accessReview));
+const getCacheKey = (accessReview: FleetAccessReviewResourceAttributes): string =>
+  getAllowedNamespacesRequestKey(accessReview);
 
-const setAllowedNamespacesFetchEntry = (
+export const hasAllowedNamespacesCacheEntry = (
+  accessReview: FleetAccessReviewResourceAttributes,
+): boolean => allowedNamespacesFetchCache.value.has(getCacheKey(accessReview));
+
+export const getAllowedNamespacesCacheEntry = (
+  accessReview: FleetAccessReviewResourceAttributes,
+): FetchCacheEntry | undefined => allowedNamespacesFetchCache.value.get(getCacheKey(accessReview));
+
+const setAllowedNamespacesCacheEntry = (
   accessReview: FleetAccessReviewResourceAttributes,
   entry: FetchCacheEntry,
 ): void => {
   allowedNamespacesFetchCache.value = new Map(allowedNamespacesFetchCache.value).set(
-    getAllowedNamespacesRequestKey(accessReview),
+    getCacheKey(accessReview),
     entry,
   );
 };
 
-const removeAllowedNamespacesFetchEntry = (
+const removeAllowedNamespacesCacheEntry = (
   accessReview: FleetAccessReviewResourceAttributes,
 ): void => {
-  const key = getAllowedNamespacesRequestKey(accessReview);
+  const key = getCacheKey(accessReview);
   const next = new Map(allowedNamespacesFetchCache.value);
   next.delete(key);
   allowedNamespacesFetchCache.value = next;
 };
 
 export const loadAllowedNamespaces = (accessReview: FleetAccessReviewResourceAttributes): void => {
-  if (getAllowedNamespacesFetchEntry(accessReview)) {
+  if (hasAllowedNamespacesCacheEntry(accessReview)) {
     return;
   }
 
-  setAllowedNamespacesFetchEntry(accessReview, {
+  setAllowedNamespacesCacheEntry(accessReview, {
     data: undefined,
     error: null,
     loading: true,
@@ -56,10 +62,10 @@ export const loadAllowedNamespaces = (accessReview: FleetAccessReviewResourceAtt
 
   void requestAllowedNamespaces(accessReview)
     .then((data) => {
-      setAllowedNamespacesFetchEntry(accessReview, { data, error: null, loading: false });
+      setAllowedNamespacesCacheEntry(accessReview, { data, error: null, loading: false });
     })
     .catch((reason) => {
-      setAllowedNamespacesFetchEntry(accessReview, {
+      setAllowedNamespacesCacheEntry(accessReview, {
         data: undefined,
         error: toFetchError(reason),
         loading: false,
@@ -70,7 +76,7 @@ export const loadAllowedNamespaces = (accessReview: FleetAccessReviewResourceAtt
 export const retainAllowedNamespacesFetch = (
   accessReview: FleetAccessReviewResourceAttributes,
 ): void => {
-  const key = getAllowedNamespacesRequestKey(accessReview);
+  const key = getCacheKey(accessReview);
   consumerCountByKey.set(key, (consumerCountByKey.get(key) ?? 0) + 1);
   loadAllowedNamespaces(accessReview);
 };
@@ -78,12 +84,12 @@ export const retainAllowedNamespacesFetch = (
 export const releaseAllowedNamespacesFetch = (
   accessReview: FleetAccessReviewResourceAttributes,
 ): void => {
-  const key = getAllowedNamespacesRequestKey(accessReview);
+  const key = getCacheKey(accessReview);
   const nextCount = (consumerCountByKey.get(key) ?? 0) - 1;
 
   if (nextCount <= 0) {
     consumerCountByKey.delete(key);
-    removeAllowedNamespacesFetchEntry(accessReview);
+    removeAllowedNamespacesCacheEntry(accessReview);
     return;
   }
 
@@ -97,7 +103,7 @@ export const getAllowedNamespacesFetchResult = (
     return allowedNamespacesFetchNotLoaded;
   }
 
-  const entry = getAllowedNamespacesFetchEntry(accessReview);
+  const entry = getAllowedNamespacesCacheEntry(accessReview);
   if (!entry || entry.loading) {
     return allowedNamespacesFetchNotLoaded;
   }

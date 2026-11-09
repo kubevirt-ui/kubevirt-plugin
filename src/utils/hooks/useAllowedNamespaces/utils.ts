@@ -3,10 +3,19 @@ import {
   PROXY_ALLOWED_NAMESPACES_PATH,
   PROXY_KUBEVIRT_URL,
 } from '@kubevirt-utils/hooks/useKubevirtDataPod/utils/constants';
-import { consoleFetch } from '@openshift-console/dynamic-plugin-sdk';
+import { getName } from '@kubevirt-utils/resources/shared';
+import { consoleFetch, type K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { type FleetAccessReviewResourceAttributes } from '@stolostron/multicluster-sdk';
 
 import { type AllowedNamespacesResponse } from './types';
+
+export const getSortedNamespaceNames = (
+  namespaces: K8sResourceCommon[] | null | undefined,
+): string[] =>
+  (namespaces ?? [])
+    .map((namespace) => getName(namespace))
+    .filter((name): name is string => Boolean(name))
+    .sort((a, b) => a.localeCompare(b));
 
 export const getAllowedNamespacesURL = (): string =>
   `${PROXY_KUBEVIRT_URL}${PROXY_ALLOWED_NAMESPACES_PATH}`;

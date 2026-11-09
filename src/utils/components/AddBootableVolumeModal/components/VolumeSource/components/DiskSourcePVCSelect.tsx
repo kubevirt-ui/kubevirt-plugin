@@ -1,10 +1,10 @@
 import { type FC, useCallback, useMemo } from 'react';
 
 import useAllowedNamespaces from '@kubevirt-utils/hooks/useAllowedNamespaces/useAllowedNamespaces';
+import { getSortedNamespaceNames } from '@kubevirt-utils/hooks/useAllowedNamespaces/utils';
 import usePVCs from '@kubevirt-utils/hooks/usePVCs';
 import { getPVCSize } from '@kubevirt-utils/resources/bootableresources/selectors';
 import { getCloneSourceFleetAccessReview } from '@kubevirt-utils/resources/cdi/pvcClonePermission';
-import { getName } from '@kubevirt-utils/resources/shared';
 import { formatQuantityString } from '@kubevirt-utils/utils/units';
 import { type FleetAccessReviewResourceAttributes } from '@stolostron/multicluster-sdk';
 
@@ -36,14 +36,7 @@ const DiskSourcePVCSelect: FC<DiskSourcePVCSelectProps> = ({
   const { namespaces, namespacesLoaded } = useAllowedNamespaces(cloneAccessReview);
   const [pvcs, pvcsLoaded] = usePVCs(pvcNamespaceSelected, cluster);
 
-  const selectableProjectNames = useMemo(
-    () =>
-      (namespaces ?? [])
-        .map((namespace) => getName(namespace))
-        .filter((name): name is string => Boolean(name))
-        .sort((a, b) => a.localeCompare(b)),
-    [namespaces],
-  );
+  const selectableProjectNames = useMemo(() => getSortedNamespaceNames(namespaces), [namespaces]);
 
   const onSelectProject = useCallback(
     (newProject) => {
