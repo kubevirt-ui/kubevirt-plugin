@@ -14,13 +14,17 @@ const repoRoot = path.resolve(__dirname);
 const testResultsDir = getTestResultsDir(repoRoot);
 
 function getReporterConfig(resultsDir: string): ReporterDescription[] {
+  const ciDebugHarness: ReporterDescription = [
+    path.resolve(__dirname, 'playwright/src/utils/ci-debug-harness.ts'),
+  ];
+
   const allureReporter: ReporterDescription = [
     path.resolve(__dirname, 'playwright/src/utils/allure-no-stdout-reporter.ts'),
     { detail: true, resultsDir, suiteTitle: true },
   ];
 
   if (EnvVariables.isDebugMode) {
-    return [['list']];
+    return [ciDebugHarness, ['list']];
   }
 
   const htmlReporter: ReporterDescription = [
@@ -34,11 +38,11 @@ function getReporterConfig(resultsDir: string): ReporterDescription[] {
       'junit-results',
       `junit-shard-${EnvVariables.shardIndex}.xml`,
     );
-    return [allureReporter, ['junit', { outputFile: junitFile }], htmlReporter];
+    return [ciDebugHarness, allureReporter, ['junit', { outputFile: junitFile }], htmlReporter];
   }
 
   const junitFile = path.resolve(repoRoot, 'junit-results', 'junit.xml');
-  return [['list'], allureReporter, ['junit', { outputFile: junitFile }], htmlReporter];
+  return [ciDebugHarness, ['list'], allureReporter, ['junit', { outputFile: junitFile }], htmlReporter];
 }
 
 const baseURL = EnvVariables.webConsoleUrl;
