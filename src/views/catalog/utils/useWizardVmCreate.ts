@@ -2,6 +2,7 @@ import { useState } from 'react';
 import produce from 'immer';
 
 import { V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
+import { RUNSTRATEGY_ALWAYS, RUNSTRATEGY_HALTED } from '@kubevirt-utils/constants/constants';
 import { addUploadDataVolumeOwnerReference } from '@kubevirt-utils/hooks/useCDIUpload/utils';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
 import { K8sResourceCommon, useK8sModels } from '@openshift-console/dynamic-plugin-sdk';
@@ -34,7 +35,9 @@ export const useWizardVmCreate = (): UseWizardVmCreateValues => {
       setError(undefined);
 
       const vmToCrete = produce(vm, (vmDraft) => {
-        vmDraft.spec.running = startVM;
+        // Prefer runStrategy over deprecated spec.running (CNV-45435).
+        delete vmDraft.spec.running;
+        vmDraft.spec.runStrategy = startVM ? RUNSTRATEGY_ALWAYS : RUNSTRATEGY_HALTED;
       });
 
       const createdObjects = await createMultipleResources(

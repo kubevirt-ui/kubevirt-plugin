@@ -1,4 +1,5 @@
 import { ConsoleRoutes } from '@/utils/console-routes';
+import { isOpenShiftMajorMinor } from '@/utils/openshift-version';
 import { pollUntil } from '@/utils/poll-until';
 import { fillLabelsModalInput, openResourceLabelsEditor } from '@/utils/resource-summary';
 import { MINUTE, TestTimeouts } from '@/utils/test-config';
@@ -27,8 +28,30 @@ export class TemplatesPage extends ResourceListPage {
   }
 
   async createFromYaml(manifestYaml?: string, target?: TemplateYamlCreateTarget): Promise<void> {
-    await this.openCreateDropdown(/Create Template/i);
-    await this.createFromYamlAndSubmit(manifestYaml);
+    if (isOpenShiftMajorMinor('4.14')) {
+      await this.openCreateDropdown(/Create Template/i);
+      await this.createFromYamlAndSubmit(manifestYaml);
+    } else {
+      // Skewed console: Create Template often lands on templates/~new + Monaco already.
+      const monaco = this.page.locator('.monaco-editor').first();
+      const alreadyOnYaml =
+        (await monaco.isVisible().catch(() => false)) ||
+        /templates\/~new|Template\/~new/.test(this.page.url());
+      if (!alreadyOnYaml) {
+        const directCreate = this.page
+          .getByRole('link', { name: /Create Template/i })
+          .or(this.page.getByRole('button', { name: /Create Template/i }))
+          .or(this.page.getByRole('link', { name: /^Create$/i }))
+          .or(this.page.getByRole('button', { name: /^Create$/i }))
+          .first();
+        if (await directCreate.isVisible().catch(() => false)) {
+          await directCreate.click();
+        } else {
+          await this.openCreateDropdown(/Create Template/i);
+        }
+      }
+      await this.createFromYamlAndSubmit(manifestYaml, { selectFromMenu: false });
+    }
 
     const onDetail = await pollUntil(async () => templateDetailUrlPattern.test(this.page.url()), {
       message: 'Template detail URL after YAML import',
