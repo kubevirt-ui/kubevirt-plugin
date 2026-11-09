@@ -27,7 +27,7 @@ import { exposedModules as VMNetworksExposedModules } from './src/views/vmnetwor
 
 const metadata: ConsolePluginBuildMetadata = {
   dependencies: {
-    '@console/pluginAPI': '>=4.17.0-0',
+    '@console/pluginAPI': '>=4.22.0-0',
   },
   displayName: 'Kubevirt Plugin',
   exposedModules: {

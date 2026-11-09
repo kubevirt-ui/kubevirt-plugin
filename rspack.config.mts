@@ -51,7 +51,7 @@ const config: Configuration = {
           options: {
             detectSyntax: 'auto',
             jsc: {
-              target: 'es2021',
+              target: 'es2023',
               transform: {
                 react: {
                   development: !isProd,
