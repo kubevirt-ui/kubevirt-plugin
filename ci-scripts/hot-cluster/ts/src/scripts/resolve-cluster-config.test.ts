@@ -90,19 +90,19 @@ describe('resolveClusterConfig', () => {
     assert.equal(config.branchName, 'release-4.20');
   });
 
-  it('clamps a below-range release branch to the min version (4.18) and unpins CNV', () => {
+  it('clamps a below-range release branch to the min version (4.18) and pins CNV to the clamp', () => {
     const config = resolveClusterConfig({ baseRef: 'release-4.12' });
     assert.equal(config.clusterName, 'kubevirt-plugin-412');
     assert.equal(config.openshiftVersion, '4.18_openshift');
-    assert.equal(config.cnvPinVersion, '');
+    assert.equal(config.cnvPinVersion, '4.18');
     assert.equal(config.cniPlugin, '');
   });
 
-  it('clamps 4.17 (below the 4.18 floor) up to the min version and unpins CNV, using Calico', () => {
+  it('clamps 4.17 (below the 4.18 floor) up to the min version and pins CNV to 4.18, using Calico', () => {
     const config = resolveClusterConfig({ baseRef: 'release-4.17' });
     assert.equal(config.clusterName, 'kubevirt-plugin-417');
     assert.equal(config.openshiftVersion, '4.18_openshift');
-    assert.equal(config.cnvPinVersion, '');
+    assert.equal(config.cnvPinVersion, '4.18');
     assert.equal(config.cniPlugin, '');
   });
 
@@ -136,19 +136,19 @@ describe('resolveClusterConfig', () => {
     assert.equal(config.cniPlugin, 'OVNKubernetes');
   });
 
-  it('clamps an above-range 4.x release branch to the max version and unpins CNV', () => {
+  it('clamps an above-range 4.x release branch to the max version and pins CNV to the clamp', () => {
     const config = resolveClusterConfig({ baseRef: 'release-4.23' });
     assert.equal(config.clusterName, 'kubevirt-plugin-423');
     assert.equal(config.openshiftVersion, '4.22_openshift');
-    assert.equal(config.cnvPinVersion, '');
+    assert.equal(config.cnvPinVersion, '4.22');
     assert.equal(config.cniPlugin, 'OVNKubernetes');
   });
 
-  it('clamps a next-major release branch (5.0) to the max version and unpins CNV', () => {
+  it('clamps a next-major release branch (5.0) to the max version and pins CNV to the clamp', () => {
     const config = resolveClusterConfig({ baseRef: 'release-5.0' });
     assert.equal(config.clusterName, 'kubevirt-plugin-50');
     assert.equal(config.openshiftVersion, '4.22_openshift');
-    assert.equal(config.cnvPinVersion, '');
+    assert.equal(config.cnvPinVersion, '4.22');
     assert.equal(config.cniPlugin, 'OVNKubernetes');
   });
 

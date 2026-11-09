@@ -13,11 +13,12 @@
 #                            can't re-pin an already-installed cluster.
 #   CNV_PIN_FALLBACK_UNPINNED - "true" to install unpinned (channel head) with a
 #                            loud warning when CNV_PIN_VERSION has no matching CSV
-#                            in the channel, instead of hard-failing (default:
-#                            "false"). Lets release-branch CI stay green when the
-#                            pinned CNV version simply isn't in the catalog yet
-#                            (e.g. not GA), while a bare `install-hco.sh` run still
-#                            fails hard by default.
+#                            after CatalogSource READY + PackageManifest poll,
+#                            instead of hard-failing (default: "false"). Hot
+#                            cluster CI keeps this false -- pinning is required.
+#                            An empty early lookup is treated as a sync race and
+#                            polled; only a still-empty result after the wait is
+#                            a hard failure (unless this fallback is enabled).
 #   HCO_CR_PATH            - Path to HCO CR yaml (default: playwright/fixtures/hco.yaml)
 #   SKIP_HPP               - Set to "true" to skip HPP installation
 #   HPP_VERSION            - HostPath Provisioner release branch
@@ -86,6 +87,58 @@ echo "  SKIP_HPP:        ${SKIP_HPP}"
 echo "  DEFAULT_SC:      ${DEFAULT_STORAGE_CLASS}"
 echo ""
 
+# --- Wait for CatalogSource READY ---
+# Fresh ROKS clusters often have redhat-operators still syncing when we first
+# query PackageManifest. An empty pin match is a sync race, not "not in catalog".
+wait_for_catalog_source_ready() {
+  echo "Waiting for CatalogSource/redhat-operators to become READY..."
+  for i in $(seq 1 60); do
+    STATE="$(oc get catalogsource redhat-operators -n openshift-marketplace \
+      -o jsonpath='{.status.connectionState.lastObservedState}' 2>/dev/null || true)"
+    if [[ "${STATE}" == "READY" ]]; then
+      echo "CatalogSource/redhat-operators is READY"
+      return 0
+    fi
+    echo "  CatalogSource state=${STATE:-unknown} (${i}/60)"
+    sleep 10
+  done
+  echo "ERROR: CatalogSource/redhat-operators did not become READY within 10 minutes"
+  oc get catalogsource redhat-operators -n openshift-marketplace -o yaml 2>/dev/null || true
+  return 1
+}
+
+# Looks up the newest CSV name matching CNV_PIN_VERSION. in channel CNV_CHANNEL
+# from redhat-operators. Echoes the CSV name, or empty if no match. Returns
+# non-zero only when the oc/jq query itself fails.
+lookup_pinned_csv() {
+  oc get packagemanifest -n openshift-marketplace -o json 2>/dev/null \
+    | jq -r --arg ch "${CNV_CHANNEL}" --arg ver "${CNV_PIN_VERSION}." \
+      '.items[]? | select(.metadata.name == "kubevirt-hyperconverged" and .status.catalogSource == "redhat-operators") | .status.channels[]? | select(.name == $ch) | .entries[]? | select((.version // "") | startswith($ver)) | "\(.version) \(.name)"' \
+    | sort -V | tail -1 | awk '{print $2}'
+}
+
+dump_packagemanifest_channel_entries() {
+  echo "=== PackageManifest channel entries (kubevirt-hyperconverged / ${CNV_CHANNEL}) ==="
+  oc get packagemanifest -n openshift-marketplace -o json 2>/dev/null \
+    | jq -r --arg ch "${CNV_CHANNEL}" \
+      '.items[]? | select(.metadata.name == "kubevirt-hyperconverged" and .status.catalogSource == "redhat-operators") | .status.channels[]? | select(.name == $ch) | .entries[]? | "\(.version // "?") \(.name // "?")"' \
+    | sort -V | tail -40 || echo "(failed to list entries)"
+  echo "=== CatalogSource/redhat-operators ==="
+  oc get catalogsource redhat-operators -n openshift-marketplace -o wide 2>/dev/null || true
+}
+
+dump_subscription_diagnostics() {
+  echo "=== Subscription / InstallPlan diagnostics ==="
+  oc get subscription hco-operatorhub -n "${CNV_NS}" -o yaml 2>/dev/null || echo "(no subscription)"
+  oc get installplan -n "${CNV_NS}" -o wide 2>/dev/null || true
+  oc get catalogsource redhat-operators -n openshift-marketplace -o yaml 2>/dev/null | tail -80 || true
+  echo "=== Recent events (${CNV_NS} / openshift-marketplace) ==="
+  oc get events -n "${CNV_NS}" --sort-by='.lastTimestamp' 2>/dev/null | tail -30 || true
+  oc get events -n openshift-marketplace --sort-by='.lastTimestamp' 2>/dev/null | tail -30 || true
+}
+
+wait_for_catalog_source_ready
+
 # --- Namespace + OperatorGroup ---
 echo "Creating CNV Namespace and OperatorGroup..."
 oc apply -f - <<EOF
@@ -116,54 +169,52 @@ if [[ -n "${CNV_PIN_VERSION}" ]]; then
   fi
 
   echo "Resolving pinned CSV for CNV_PIN_VERSION=${CNV_PIN_VERSION} from channel '${CNV_CHANNEL}'..."
-  # Filters by catalogSource explicitly since PackageManifest names aren't
-  # guaranteed unique across sources. Retried since a transient `oc get`
-  # failure would otherwise trip `set -e`; a genuine "no match" still
-  # exits 0, so this only retries real command failures.
-  # Distinguishes a successful lookup that found no match (exit 0, empty output)
-  # from a lookup that never completed (all retries failed). Only the former is a
-  # genuine "this version isn't in the catalog"; the latter must not be mistaken
-  # for it, or a transient API outage would wrongly trigger the unpinned fallback.
-  LOOKUP_SUCCEEDED="false"
-  for attempt in 1 2 3; do
-    if STARTING_CSV="$(oc get packagemanifest -n openshift-marketplace -o json 2>/dev/null \
-      | jq -r --arg ch "${CNV_CHANNEL}" --arg ver "${CNV_PIN_VERSION}." \
-        '.items[]? | select(.metadata.name == "kubevirt-hyperconverged" and .status.catalogSource == "redhat-operators") | .status.channels[]? | select(.name == $ch) | .entries[]? | select((.version // "") | startswith($ver)) | "\(.version) \(.name)"' \
-      | sort -V | tail -1 | awk '{print $2}')"; then
-      LOOKUP_SUCCEEDED="true"
-      break
+  echo "Polling PackageManifest until a matching ${CNV_PIN_VERSION}.* entry appears (catalog sync race)..."
+  # Poll for pin-matching entries after CatalogSource READY. A single empty
+  # read is not "not in catalog" -- entries often appear minutes later on
+  # fresh ROKS. Hard-fail only after the full wait (or if CNV_PIN_FALLBACK
+  # is explicitly enabled for ad-hoc use).
+  LOOKUP_API_OK="false"
+  for attempt in $(seq 1 60); do
+    if STARTING_CSV="$(lookup_pinned_csv)"; then
+      LOOKUP_API_OK="true"
+      if [[ -n "${STARTING_CSV}" ]]; then
+        echo "Resolved pinned CSV: ${STARTING_CSV} (attempt ${attempt}/60)"
+        break
+      fi
+    else
+      echo "  PackageManifest query failed (attempt ${attempt}/60); retrying..."
     fi
-    echo "  Retry ${attempt}/3 for packagemanifest lookup (API may be transiently unavailable)..."
+    echo "  No ${CNV_PIN_VERSION}.* CSV yet in channel '${CNV_CHANNEL}' (${attempt}/60)..."
     sleep 10
   done
 
-  if [[ "${LOOKUP_SUCCEEDED}" != "true" ]]; then
-    echo "ERROR: Could not query the PackageManifest catalog after 3 attempts (redhat-operators API unavailable)."
-    echo "This is a lookup failure, not a confirmed 'no matching CSV' -- refusing to fall back to unpinned even with CNV_PIN_FALLBACK_UNPINNED=true, since the pin may well be valid."
+  if [[ "${LOOKUP_API_OK}" != "true" ]]; then
+    echo "ERROR: Could not query the PackageManifest catalog after retries (redhat-operators API unavailable)."
+    echo "This is a lookup failure, not a confirmed 'no matching CSV' -- refusing to fall back to unpinned."
+    dump_packagemanifest_channel_entries
     exit 1
   fi
 
   if [[ -z "${STARTING_CSV}" ]]; then
+    dump_packagemanifest_channel_entries
     if [[ "${CNV_PIN_FALLBACK_UNPINNED}" == "true" ]]; then
-      echo "::warning::No CSV matching version prefix '${CNV_PIN_VERSION}.' found in channel '${CNV_CHANNEL}' (redhat-operators) -- CNV_PIN_FALLBACK_UNPINNED=true, so installing UNPINNED from the '${CNV_CHANNEL}' channel head instead of failing. The cluster will NOT be running the requested CNV ${CNV_PIN_VERSION}.x (it likely isn't in the catalog yet); treat these results as tested against the channel head, not the pinned release."
+      echo "::warning::No CSV matching version prefix '${CNV_PIN_VERSION}.' found in channel '${CNV_CHANNEL}' after waiting for catalog sync -- CNV_PIN_FALLBACK_UNPINNED=true, so installing UNPINNED from the '${CNV_CHANNEL}' channel head. The cluster will NOT be running the requested CNV ${CNV_PIN_VERSION}.x."
       PIN_FALLBACK_OCCURRED="true"
-      # Leave STARTING_CSV empty and INSTALL_PLAN_APPROVAL=Automatic so the
-      # rest of the script behaves exactly like an unpinned install.
     else
-      echo "ERROR: No CSV matching version prefix '${CNV_PIN_VERSION}.' found in channel '${CNV_CHANNEL}' (redhat-operators)."
-      echo "This is a hard failure rather than a silent fallback to the latest channel head. Set CNV_PIN_FALLBACK_UNPINNED=true to install unpinned instead, or override cnv_channel explicitly on the workflow dispatch."
+      echo "ERROR: No CSV matching version prefix '${CNV_PIN_VERSION}.' found in channel '${CNV_CHANNEL}' (redhat-operators) after CatalogSource READY + PackageManifest poll."
+      echo "Hard failure: version pinning is required. Do not fall back to unpinned channel head."
       exit 1
     fi
   else
-    echo "Resolved pinned CSV: ${STARTING_CSV}"
     INSTALL_PLAN_APPROVAL="Manual"
   fi
 fi
 
-# --- Subscription ---
-# installPlanApproval stays Manual when pinned, so a later upgrade
-# InstallPlan is left pending instead of moving the cluster off STARTING_CSV.
-SUBSCRIPTION_YAML="apiVersion: operators.coreos.com/v1alpha1
+create_cnv_subscription() {
+  # installPlanApproval stays Manual when pinned, so a later upgrade
+  # InstallPlan is left pending instead of moving the cluster off STARTING_CSV.
+  local subscription_yaml="apiVersion: operators.coreos.com/v1alpha1
 kind: Subscription
 metadata:
   name: hco-operatorhub
@@ -175,37 +226,72 @@ spec:
   channel: \"${CNV_CHANNEL}\"
   installPlanApproval: ${INSTALL_PLAN_APPROVAL}"
 
-if [[ -n "${STARTING_CSV}" ]]; then
-  SUBSCRIPTION_YAML="${SUBSCRIPTION_YAML}
+  if [[ -n "${STARTING_CSV}" ]]; then
+    subscription_yaml="${subscription_yaml}
   startingCSV: \"${STARTING_CSV}\""
-fi
+  fi
 
-SUBSCRIPTION_YAML="${SUBSCRIPTION_YAML}
+  subscription_yaml="${subscription_yaml}
   config:
     env:
     - name: KVM_EMULATION
       value: \"${KVM_EMULATION}\""
 
-echo "Creating CNV Subscription..."
-oc apply -f - <<EOF
-${SUBSCRIPTION_YAML}
+  echo "Creating CNV Subscription..."
+  oc apply -f - <<EOF
+${subscription_yaml}
 EOF
+}
 
-echo "Waiting for Subscription to have an InstallPlan..."
-for i in $(seq 1 120); do
-  INSTALL_PLAN="$(oc get subscription hco-operatorhub -n ${CNV_NS} \
-    -o jsonpath='{.status.installPlanRef.name}' 2>/dev/null || true)"
-  if [[ -n "${INSTALL_PLAN}" ]]; then
-    echo "InstallPlan found: ${INSTALL_PLAN}"
-    break
+wait_for_install_plan() {
+  local max_attempts="${1:-120}"
+  local i install_plan
+  echo "Waiting for Subscription to have an InstallPlan..."
+  for i in $(seq 1 "${max_attempts}"); do
+    install_plan="$(oc get subscription hco-operatorhub -n ${CNV_NS} \
+      -o jsonpath='{.status.installPlanRef.name}' 2>/dev/null || true)"
+    if [[ -n "${install_plan}" ]]; then
+      echo "InstallPlan found: ${install_plan}"
+      INSTALL_PLAN="${install_plan}"
+      return 0
+    fi
+    echo "Waiting for InstallPlan... (${i}/${max_attempts})"
+    sleep 5
+  done
+  return 1
+}
+
+# Resume path: drop a broken/stale Subscription so we can recreate with the
+# resolved pin (e.g. prior unpinned fallback left an Automatic subscription).
+if oc get subscription hco-operatorhub -n "${CNV_NS}" &>/dev/null; then
+  EXISTING_CSV="$(oc get subscription hco-operatorhub -n "${CNV_NS}" \
+    -o jsonpath='{.spec.startingCSV}' 2>/dev/null || true)"
+  EXISTING_APPROVAL="$(oc get subscription hco-operatorhub -n "${CNV_NS}" \
+    -o jsonpath='{.spec.installPlanApproval}' 2>/dev/null || true)"
+  if [[ -n "${STARTING_CSV}" && ( "${EXISTING_CSV}" != "${STARTING_CSV}" || "${EXISTING_APPROVAL}" != "Manual" ) ]]; then
+    echo "Existing Subscription does not match pin ${STARTING_CSV} (startingCSV='${EXISTING_CSV:-none}', approval='${EXISTING_APPROVAL:-none}') -- recreating..."
+    oc delete subscription hco-operatorhub -n "${CNV_NS}" --wait=false 2>/dev/null || true
+    # Leave installed CSVs alone; a fresh Subscription will reconcile.
+    sleep 5
   fi
-  if [[ "${i}" -eq 120 ]]; then
-    echo "ERROR: Timed out waiting for CNV InstallPlan"
+fi
+
+create_cnv_subscription
+
+INSTALL_PLAN=""
+if ! wait_for_install_plan 120; then
+  echo "WARNING: No InstallPlan after first wait -- dumping diagnostics and recreating Subscription once..."
+  dump_subscription_diagnostics
+  oc delete subscription hco-operatorhub -n "${CNV_NS}" --wait=false 2>/dev/null || true
+  sleep 10
+  create_cnv_subscription
+  if ! wait_for_install_plan 120; then
+    echo "ERROR: Timed out waiting for CNV InstallPlan after Subscription retry"
+    dump_subscription_diagnostics
+    dump_packagemanifest_channel_entries
     exit 1
   fi
-  echo "Waiting for InstallPlan... (${i}/120)"
-  sleep 5
-done
+fi
 
 if [[ "${INSTALL_PLAN_APPROVAL}" == "Manual" ]]; then
   # Guard against approving the wrong plan if this script is ever re-run
@@ -215,6 +301,7 @@ if [[ "${INSTALL_PLAN_APPROVAL}" == "Manual" ]]; then
   if [[ " ${PLAN_CSVS} " != *" ${STARTING_CSV} "* ]]; then
     echo "ERROR: InstallPlan ${INSTALL_PLAN} does not target the pinned CSV ${STARTING_CSV} (it targets: ${PLAN_CSVS:-<none>})."
     echo "Refusing to approve it -- investigate manually (a stale Subscription from a prior run is the most likely cause)."
+    dump_subscription_diagnostics
     exit 1
   fi
 

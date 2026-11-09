@@ -94,21 +94,19 @@ if [[ "${BASE_REF}" =~ ^release-([0-9]+)\.([0-9]+)$ ]]; then
   CNV_CHANNEL="${DEFAULT_CNV_CHANNEL}"
 
   # Clamp the cluster's OpenShift version into the IBM Cloud supported range.
-  # When a clamp happens, leave CNV unpinned: the branch's CNV CSV won't exist
-  # in the clamped cluster's catalog, so install-hco.sh would hard-fail on it.
+  # Always pin CNV to the *clamped* major.minor (hard requirement) -- never
+  # leave unpinned on clamp. The branch name / dedicated cluster stay tied to
+  # the real branch; only the OCP version + CNV pin follow the clamp.
   CLAMPED="$(clamp_version "${MAJOR}" "${MINOR}")"
   CLAMPED_MAJOR="${CLAMPED% *}"
   CLAMPED_MINOR="${CLAMPED#* }"
   OPENSHIFT_VERSION="${CLAMPED_MAJOR}.${CLAMPED_MINOR}_openshift"
   CNI_PLUGIN="$(cni_plugin_for "${CLAMPED_MAJOR}" "${CLAMPED_MINOR}")"
+  CNV_PIN_VERSION="${CLAMPED_MAJOR}.${CLAMPED_MINOR}"
   if [[ "${CLAMPED_MAJOR}.${CLAMPED_MINOR}" != "${MAJOR}.${MINOR}" ]]; then
-    CNV_PIN_VERSION=""
-    echo "Branch version ${MAJOR}.${MINOR} is outside the IBM Cloud supported range ${MIN_SUPPORTED_MAJOR}.${MIN_SUPPORTED_MINOR}-${MAX_SUPPORTED_MAJOR}.${MAX_SUPPORTED_MINOR}; clamping cluster OpenShift version to ${CLAMPED_MAJOR}.${CLAMPED_MINOR} and installing CNV unpinned (stable)" >&2
-    echo "Base branch '${BASE_REF}' is a release branch → cluster '${CLUSTER_NAME}' (${OPENSHIFT_VERSION}, CNV channel '${CNV_CHANNEL}', CNV unpinned)" >&2
-  else
-    CNV_PIN_VERSION="${MAJOR}.${MINOR}"
-    echo "Base branch '${BASE_REF}' is a release branch → cluster '${CLUSTER_NAME}' (${OPENSHIFT_VERSION}, CNV channel '${CNV_CHANNEL}', pinned to CNV ${CNV_PIN_VERSION}.x)" >&2
+    echo "Branch version ${MAJOR}.${MINOR} is outside the IBM Cloud supported range ${MIN_SUPPORTED_MAJOR}.${MIN_SUPPORTED_MINOR}-${MAX_SUPPORTED_MAJOR}.${MAX_SUPPORTED_MINOR}; clamping cluster OpenShift version to ${CLAMPED_MAJOR}.${CLAMPED_MINOR} and pinning CNV to ${CNV_PIN_VERSION}.x (stable)" >&2
   fi
+  echo "Base branch '${BASE_REF}' is a release branch → cluster '${CLUSTER_NAME}' (${OPENSHIFT_VERSION}, CNV channel '${CNV_CHANNEL}', pinned to CNV ${CNV_PIN_VERSION}.x)" >&2
   echo "CNI plugin: '${CNI_PLUGIN:-<platform default, Calico>}'" >&2
 
   TEST_ENGINE="${DEFAULT_TEST_ENGINE}"

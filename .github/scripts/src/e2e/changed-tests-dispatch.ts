@@ -6,6 +6,12 @@
  * Runs as a best-effort step after the gating gate dispatch. Failures are
  * logged but never surface as a workflow error (exit 0 on any catch).
  *
+ * Cluster provision is serialized with the gating run: hot-cluster-e2e.yml's
+ * cluster-check concurrency is keyed by PR (not test_project) with
+ * cancel-in-progress: false, so this auto run queues behind gating's
+ * provision and reuses the warm cluster instead of racing create/delete.
+ * Post-create setup flakes also keep the cluster (see ibmc-cluster-setup).
+ *
  * Entry point: npx tsx src/e2e/changed-tests-dispatch.ts
  *
  * Required env: GITHUB_TOKEN, GITHUB_REPOSITORY, PR_NUMBER, BASE_REF

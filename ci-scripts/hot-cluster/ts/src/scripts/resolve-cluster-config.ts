@@ -91,27 +91,24 @@ export const resolveClusterConfig = (params: {
       const cnvChannel = DEFAULT_CNV_CHANNEL;
 
       // Clamp the cluster's OpenShift version into the IBM Cloud supported
-      // range. When a clamp happens, leave CNV unpinned: the branch's CNV CSV
-      // won't exist in the clamped cluster's catalog, so install-hco.sh would
-      // hard-fail on it.
+      // range. Always pin CNV to the *clamped* major.minor (hard requirement)
+      // -- never leave unpinned on clamp.
       const clamped = clampVersion(major, minor);
       const isClamped = clamped.major !== major || clamped.minor !== minor;
       const openshiftVersion = `${clamped.major}.${clamped.minor}_openshift`;
       const cniPlugin = cniPluginFor(clamped.major, clamped.minor);
-      const cnvPinVersion = isClamped ? '' : `${major}.${minor}`;
+      const cnvPinVersion = `${clamped.major}.${clamped.minor}`;
       const testEngine = DEFAULT_TEST_ENGINE;
 
       if (isClamped) {
         console.error(
           `Branch version ${major}.${minor} is outside the IBM Cloud supported range ` +
             `${MIN_SUPPORTED.major}.${MIN_SUPPORTED.minor}-${MAX_SUPPORTED.major}.${MAX_SUPPORTED.minor}; ` +
-            `clamping cluster OpenShift version to ${clamped.major}.${clamped.minor} and installing CNV unpinned (stable)`,
+            `clamping cluster OpenShift version to ${clamped.major}.${clamped.minor} and pinning CNV to ${cnvPinVersion}.x (stable)`,
         );
       }
       console.error(
-        `Base branch '${baseRef}' is a release branch → cluster '${clusterName}' (${openshiftVersion}, CNV channel '${cnvChannel}', ${
-          cnvPinVersion ? `pinned to CNV ${cnvPinVersion}.x` : 'CNV unpinned'
-        })`,
+        `Base branch '${baseRef}' is a release branch → cluster '${clusterName}' (${openshiftVersion}, CNV channel '${cnvChannel}', pinned to CNV ${cnvPinVersion}.x)`,
       );
       console.error(`Base branch '${baseRef}' → test engine '${testEngine}'`);
       console.error(`CNI plugin: '${cniPlugin || '<platform default, Calico>'}'`);
