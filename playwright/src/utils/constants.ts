@@ -1,3 +1,5 @@
+import { getTemplateMetadataName, isS390xArchitecture } from '@/utils/architecture';
+
 export const KUBEADMIN_USERNAME = 'kubeadmin';
 export const KUBEADMIN_IDP = 'kube:admin';
 
@@ -63,13 +65,13 @@ export const VM_DETAIL_SIDEBAR_YAML_TABS: VmTabTestId[] = [
 export const DEFAULT_RED_HAT_INSTANCE_TYPE_SERIES = /U series|General Purpose|N Series/i;
 
 export const TEMPLATE_RHEL9 = {
-  metadataName: 'rhel9-server-small',
+  metadataName: getTemplateMetadataName('rhel9-server-small'),
   name: 'Red Hat Enterprise Linux 9.0 VM',
 };
 
 export const VM_FROM_CATALOG = {
   name: 'pw-rhel9-quick',
-  templateMetadataName: 'rhel9-server-small',
+  templateMetadataName: getTemplateMetadataName('rhel9-server-small'),
 };
 
 export const TEMPLATE_WIN10 = {
@@ -102,12 +104,17 @@ export const VM_FROM_WINDOWS_CATALOG = {
   templateMetadataName: TEMPLATE_WIN10.metadataName,
 };
 
-/** HTTP import for catalog customize (override via env in CI). */
+/**
+ * HTTP import for catalog customize.
+ * Override via `CATALOG_DISK_HTTP_IMAGE_URL` (required for non-x86 CI — default is x86_64 Cirros).
+ */
 export const CATALOG_DISK_HTTP_IMAGE_URL =
   process.env.CATALOG_DISK_HTTP_IMAGE_URL ??
-  'https://download.cirros-cloud.net/0.5.2/cirros-0.5.2-x86_64-disk.img';
+  (isS390xArchitecture()
+    ? ''
+    : 'https://download.cirros-cloud.net/0.5.2/cirros-0.5.2-x86_64-disk.img');
 
-/** Registry import for catalog customize. */
+/** Registry import for catalog customize. Override via `CATALOG_DISK_REGISTRY_IMAGE` on s390x. */
 export const CATALOG_DISK_REGISTRY_IMAGE =
   process.env.CATALOG_DISK_REGISTRY_IMAGE ??
   'quay.io/kubevirt/fedora-with-test-tooling-container-disk:latest';

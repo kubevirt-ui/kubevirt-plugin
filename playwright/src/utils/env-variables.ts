@@ -1,5 +1,7 @@
 import '../../load-env';
 
+import { getClusterArchitecture, isS390xArchitecture } from '@/utils/architecture';
+
 const deriveClusterUrlFromConsole = (consoleUrl: string): string | undefined => {
   const match = consoleUrl.match(/console-openshift-console\.apps\.(.+?)\/?$/);
   if (!match?.[1]) {
@@ -23,12 +25,22 @@ export class EnvVariables {
       : process.env.KUBEADMIN_IDP || 'kube:admin';
   }
 
+  /** Cluster CPU architecture from CI (`ARCH`), default `x86_64`. */
+  static get arch(): string {
+    return getClusterArchitecture();
+  }
+
   static get isCI(): boolean {
     return Boolean(process.env.CI);
   }
 
   static get isDebugMode(): boolean {
     return process.env.DEBUG === '1' || Boolean(process.env.DEBUG_MODE);
+  }
+
+  /** True when `ARCH=s390x` — skip Windows catalog assumptions / use `-s390x` templates. */
+  static get isS390x(): boolean {
+    return isS390xArchitecture(EnvVariables.arch);
   }
 
   /**
