@@ -9,9 +9,10 @@ import { isEmpty } from '@kubevirt-utils/utils/utils';
  * @returns {string}
  */
 export const getNodeSelectorLabel = (
-  nodeSelector: null | V1VirtualMachineInstanceSpec['nodeSelector'],
-): string =>
-  !isEmpty(nodeSelector) &&
-  Object.entries(nodeSelector)
-    .map(([key, value]) => `${key}=${value}`)
-    .join(', ');
+  nodeSelector: V1VirtualMachineInstanceSpec['nodeSelector'],
+): string | undefined =>
+  isEmpty(nodeSelector)
+    ? undefined
+    : Object.entries(nodeSelector ?? {})
+        .map(([key, value]) => `${key}=${value}`)
+        .join(', ');
