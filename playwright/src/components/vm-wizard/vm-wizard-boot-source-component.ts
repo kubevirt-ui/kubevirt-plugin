@@ -104,16 +104,35 @@ export default class VmWizardBootSourceComponent extends BaseComponent {
   }
 
   async getBootVolumeOsColumnValues(): Promise<string[]> {
+    const osCells = this._pfV6CWizardTableTbodyTr.locator('td[data-label="Operating system"]');
+    await osCells.first().waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+    return (await osCells.allTextContents()).reduce<string[]>((acc, text) => {
+      const value = text.trim();
+      if (value) acc.push(value);
+      return acc;
+    }, []);
+  }
+
+  async getBootVolumeVariantRows(): Promise<Array<{ name: string; variant: string }>> {
     const rows = this._pfV6CWizardTableTbodyTr;
     await rows.first().waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
-    const count = await rows.count();
-    const osValues: string[] = [];
-    for (let i = 0; i < count; i++) {
-      const osCell = rows.nth(i).locator('td:nth-child(4)');
-      const text = (await osCell.textContent())?.trim() ?? '';
-      if (text) osValues.push(text);
-    }
-    return osValues;
+
+    return rows.evaluateAll((trElements) =>
+      trElements.reduce<Array<{ name: string; variant: string }>>((acc, row) => {
+        const variant =
+          row.querySelector('td[data-label="Variant"]')?.textContent?.trim() ?? '';
+        const nameCell =
+          row.querySelector('td[data-label="Name"], td[data-label="Volume name"]') ??
+          row.querySelector('td');
+        const contentName = nameCell?.querySelector('.pf-v6-c-content')?.textContent?.trim();
+        const rawName = (contentName || nameCell?.textContent || '').trim();
+        const name = rawName
+          .replace(/\s*(Clone in progress|Upload in progress|Deprecated).*$/i, '')
+          .trim();
+        if (name && variant) acc.push({ name, variant });
+        return acc;
+      }, []),
+    );
   }
 
   async isAddVolumeModalSaveButtonDisabled(): Promise<boolean> {
@@ -204,6 +223,22 @@ export default class VmWizardBootSourceComponent extends BaseComponent {
   }
 
   async selectBootVolumeByName(volumeName: string): Promise<void> {
+    await this.selectBootVolumeRow(volumeName);
+  }
+
+  async selectBootVolumeByNameAndVariant(volumeName: string, variant: string): Promise<void> {
+    await this.selectBootVolumeRow(
+      volumeName,
+      this._pfV6CWizardTableTbodyTr
+        .filter({ hasText: volumeName })
+        .filter({ has: this.page.locator(`td[data-label="Variant"]:text-is("${variant}")`) }),
+    );
+  }
+
+  private async selectBootVolumeRow(
+    volumeName: string,
+    row = this._pfV6CWizardTableTbodyTr.filter({ hasText: volumeName }),
+  ): Promise<void> {
     const table = this.locator('.pf-v6-c-wizard table, .pf-v6-c-wizard [role="grid"]');
     await table.first().waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
 
@@ -214,7 +249,6 @@ export default class VmWizardBootSourceComponent extends BaseComponent {
       await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
     }
 
-    const row = this._pfV6CWizardTableTbodyTr.filter({ hasText: volumeName });
     await row.first().waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
     await this.robustClick(row.first());
 
@@ -328,17 +362,21 @@ export default class VmWizardBootSourceComponent extends BaseComponent {
   async verifyBootVolumeTableColumnsVisible(): Promise<boolean> {
     const expectedColumns = [
       'Volume name',
-      'Architecture',
+      'Variant',
       'Operating system',
       'Storage class',
       'Size',
       'Description',
     ];
     try {
-      for (const col of expectedColumns) {
-        const header = this.page.getByRole('columnheader', { name: col });
-        await header.waitFor({ state: 'visible', timeout: TestTimeouts.SHORT_WAIT });
-      }
+      await Promise.all(
+        expectedColumns.map((col) =>
+          this.page.getByRole('columnheader', { name: col }).waitFor({
+            state: 'visible',
+            timeout: TestTimeouts.SHORT_WAIT,
+          }),
+        ),
+      );
       return true;
     } catch {
       return false;
