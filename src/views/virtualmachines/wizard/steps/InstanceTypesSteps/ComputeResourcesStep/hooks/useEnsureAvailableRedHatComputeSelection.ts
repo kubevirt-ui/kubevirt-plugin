@@ -20,7 +20,7 @@ const useEnsureAvailableRedHatComputeSelection = (
       return;
     }
 
-    const selectedSeries = compute?.series;
+    const selectedSeries = (compute as { series: string })?.series;
     const needsReplacement = !selectedSeries || !isFamilyVisible(selectedSeries);
 
     if (!needsReplacement) {
