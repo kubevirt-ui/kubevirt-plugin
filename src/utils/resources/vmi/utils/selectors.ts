@@ -1,6 +1,7 @@
 import {
   V1Bootloader,
   V1Devices,
+  V1Disk,
   V1VirtualMachineCondition,
   V1VirtualMachineInstance,
   V1VirtualMachineInstanceNetworkInterface,
@@ -74,10 +75,11 @@ export const getNetworkInterfaceState = (
   interfaceName: string,
 ): string | undefined => getNetworkInterface(vm, interfaceName)?.linkState;
 
-export const getVMIArchitecture = (vmi: V1VirtualMachineInstance): string =>
+export const getVMIArchitecture = (vmi: V1VirtualMachineInstance): string | undefined =>
   vmi?.spec?.architecture;
 
-export const getVMIDisks = (vmi: V1VirtualMachineInstance) => vmi?.spec?.domain?.devices?.disks;
+export const getVMIDisks = (vmi: V1VirtualMachineInstance): V1Disk[] | undefined =>
+  vmi?.spec?.domain?.devices?.disks;
 
 /**
  * A selector that returns the VMI's status conditions
