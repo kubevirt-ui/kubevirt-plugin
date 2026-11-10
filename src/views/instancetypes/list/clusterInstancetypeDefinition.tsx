@@ -1,13 +1,14 @@
 import React from 'react';
-import { TFunction } from 'i18next';
+import { type TFunction } from 'i18next';
 import { parseSize } from 'xbytes';
 
 import { VirtualMachineClusterInstancetypeModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { V1beta1VirtualMachineClusterInstancetype } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1beta1VirtualMachineClusterInstancetype } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getK8sRowId } from '@kubevirt-utils/components/KubevirtTable/utils';
 import RedHatLabel from '@kubevirt-utils/components/RedHatLabel/RedHatLabel';
 import { VENDOR_LABEL } from '@kubevirt-utils/constants/constants';
-import { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
+import { type ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
+import { getInstanceTypePrefix } from '@kubevirt-utils/resources/bootableresources/helpers';
 import { getLabel, getName } from '@kubevirt-utils/resources/shared';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { getHumanizedSize } from '@kubevirt-utils/utils/units';
@@ -15,8 +16,13 @@ import MulticlusterResourceLink from '@multicluster/components/MulticlusterResou
 import { getCluster } from '@multicluster/helpers/selectors';
 
 import ClusterInstancetypeActions from '../actions/ClusterInstancetypeActions';
+import FamilyStatusCell from './components/FamilyStatusCell/FamilyStatusCell';
 
-const NameCell = ({ row }: { row: V1beta1VirtualMachineClusterInstancetype }) => (
+const NameCell = ({
+  row,
+}: {
+  row: V1beta1VirtualMachineClusterInstancetype;
+}): React.ReactElement => (
   <span data-test={getName(row)}>
     <MulticlusterResourceLink
       cluster={getCluster(row)}
@@ -28,30 +34,42 @@ const NameCell = ({ row }: { row: V1beta1VirtualMachineClusterInstancetype }) =>
   </span>
 );
 
-const ClusterCell = ({ row }: { row: V1beta1VirtualMachineClusterInstancetype }) => (
-  <>{getCluster(row) ?? NO_DATA_DASH}</>
-);
+const ClusterCell = ({
+  row,
+}: {
+  row: V1beta1VirtualMachineClusterInstancetype;
+}): React.ReactElement => <>{getCluster(row) ?? NO_DATA_DASH}</>;
 
-const CPUCell = ({ row }: { row: V1beta1VirtualMachineClusterInstancetype }) => (
-  <>{row?.spec?.cpu?.guest ?? NO_DATA_DASH}</>
-);
+const CPUCell = ({
+  row,
+}: {
+  row: V1beta1VirtualMachineClusterInstancetype;
+}): React.ReactElement => <>{row?.spec?.cpu?.guest ?? NO_DATA_DASH}</>;
 
-const MemoryCell = ({ row }: { row: V1beta1VirtualMachineClusterInstancetype }) => {
+const MemoryCell = ({
+  row,
+}: {
+  row: V1beta1VirtualMachineClusterInstancetype;
+}): React.ReactElement => {
   const memory = row?.spec?.memory?.guest;
   if (!memory) return <>{NO_DATA_DASH}</>;
   return <>{getHumanizedSize(String(memory))?.string ?? NO_DATA_DASH}</>;
 };
 
-const VendorCell = ({ row }: { row: V1beta1VirtualMachineClusterInstancetype }) => (
-  <>{getLabel(row, VENDOR_LABEL, NO_DATA_DASH)}</>
-);
+const VendorCell = ({
+  row,
+}: {
+  row: V1beta1VirtualMachineClusterInstancetype;
+}): React.ReactElement => <>{getLabel(row, VENDOR_LABEL, NO_DATA_DASH)}</>;
 
-const ActionsCell = ({ row }: { row: V1beta1VirtualMachineClusterInstancetype }) => (
-  <ClusterInstancetypeActions instanceType={row} isKebabToggle />
-);
+const ActionsCell = ({
+  row,
+}: {
+  row: V1beta1VirtualMachineClusterInstancetype;
+}): React.ReactElement => <ClusterInstancetypeActions instanceType={row} isKebabToggle />;
 
-const getMemoryValue = (it: V1beta1VirtualMachineClusterInstancetype): number => {
-  const memory = it?.spec?.memory?.guest;
+const getMemoryValue = (instanceType: V1beta1VirtualMachineClusterInstancetype): number => {
+  const memory = instanceType?.spec?.memory?.guest;
   if (!memory) return 0;
   try {
     return parseSize(`${memory}B`);
@@ -103,6 +121,16 @@ export const getClusterInstancetypeColumns = (
     renderCell: (row) => <VendorCell row={row} />,
   },
   {
+    getValue: (row): string => {
+      const name = getName(row);
+      return name ? getInstanceTypePrefix(name) : '';
+    },
+    key: 'familyStatus',
+    label: t('Family status'),
+    renderCell: (row) => <FamilyStatusCell row={row} />,
+  },
+  {
+    getValue: () => '',
     key: 'actions',
     label: '',
     props: { className: 'pf-v6-c-table__action' },
@@ -111,6 +139,6 @@ export const getClusterInstancetypeColumns = (
 ];
 
 export const getClusterInstancetypeRowId = (
-  it: V1beta1VirtualMachineClusterInstancetype,
+  instanceType: V1beta1VirtualMachineClusterInstancetype,
   index: number,
-): string => getK8sRowId(it, index, 'cluster-instancetype');
+): string => getK8sRowId(instanceType, index, 'cluster-instancetype');
