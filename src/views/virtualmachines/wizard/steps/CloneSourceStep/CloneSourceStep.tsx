@@ -2,7 +2,7 @@ import type { FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Stack, StackItem, Title, TitleSizes } from '@patternfly/react-core';
-import VirtualMachinesList from '@virtualmachines/wizard/steps/CloneSourceStep/components/VirtualMachinesList/VirtualMachinesList';
+import WizardVirtualMachinesList from '@virtualmachines/wizard/steps/CloneSourceStep/components/WizardVirtualMachinesList/WizardVirtualMachinesList';
 
 const CloneSourceStep: FC = () => {
   const { t } = useKubevirtTranslation();
@@ -16,7 +16,7 @@ const CloneSourceStep: FC = () => {
       </StackItem>
       <StackItem>{t('Select a VM to clone.')}</StackItem>
       <StackItem>
-        <VirtualMachinesList />
+        <WizardVirtualMachinesList />
       </StackItem>
     </Stack>
   );

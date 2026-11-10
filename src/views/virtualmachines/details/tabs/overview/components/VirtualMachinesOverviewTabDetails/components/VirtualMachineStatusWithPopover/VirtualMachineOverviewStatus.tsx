@@ -1,17 +1,16 @@
 import type { FC, ReactNode } from 'react';
-import { Link } from 'react-router';
 
 import type { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getName, getNamespace, getVMStatus } from '@kubevirt-utils/resources/shared';
+import { getVMStatus } from '@kubevirt-utils/resources/shared';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import LightspeedCard from '@lightspeed/components/LightspeedCard';
 import LightspeedHelpButton from '@lightspeed/components/LightspeedHelpButton/LightspeedHelpButton';
 import { getOLSPrompt, OLSPromptType } from '@lightspeed/utils/prompts';
-import { getCluster } from '@multicluster/helpers/selectors';
-import { getVMURL } from '@multicluster/urls';
 import { Content, Popover, PopoverPosition, Split, SplitItem } from '@patternfly/react-core';
 import { isErrorPrintableStatus } from '@virtualmachines/utils';
+
+import ViewDiagnosticLink from './ViewDiagnosticLink';
 
 import './VirtualMachineOverviewStatus.scss';
 
@@ -43,13 +42,7 @@ const VirtualMachineOverviewStatus: FC<VirtualMachineOverviewStatusProps> = ({ c
             <br />
             <Split>
               <SplitItem>
-                <Content component="p">
-                  <Link
-                    to={`${getVMURL(getCluster(vm), getNamespace(vm), getName(vm))}/diagnostics`}
-                  >
-                    {t('View diagnostic')}
-                  </Link>
-                </Content>
+                <ViewDiagnosticLink vm={vm} />
               </SplitItem>
               <SplitItem isFilled />
               <SplitItem>

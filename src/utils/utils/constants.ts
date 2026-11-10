@@ -2,6 +2,9 @@ export const MAX_K8S_NAME_LENGTH = 63;
 
 export const POPPER_CONTAINER_ID = 'popper-container';
 
+export const INTERACTIVE_SELECTOR =
+  'a, button, input, select, textarea, [role="button"], [role="link"], [role="menuitem"]';
+
 export enum NumberOperator {
   Equals = 'Equals',
   GreaterOrEquals = 'GreaterOrEquals',
