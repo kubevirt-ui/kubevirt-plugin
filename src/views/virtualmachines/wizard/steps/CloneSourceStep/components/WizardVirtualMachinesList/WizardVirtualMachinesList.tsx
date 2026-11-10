@@ -15,7 +15,7 @@ import useCloneSourceVMColumns from './hooks/useCloneSourceVMColumns';
 import { useCloneSourceVMs } from './hooks/useCloneSourceVMs';
 import { getPaginatedVMs, getPaginationFirstPageState, getVMTableCallbacks } from './utils/utils';
 
-const VirtualMachinesList: FC = () => {
+const WizardVirtualMachinesList: FC = () => {
   const { t } = useKubevirtTranslation();
 
   const {
@@ -115,4 +115,4 @@ const VirtualMachinesList: FC = () => {
   );
 };
 
-export default VirtualMachinesList;
+export default WizardVirtualMachinesList;

@@ -619,7 +619,7 @@ export default class VmWizardNavigationComponent extends BaseComponent {
       hasText: vmName,
     });
     await row.first().waitFor({ state: 'visible', timeout: TestTimeouts.VM_OPERATION });
-    await this.robustClick(row.first());
+    await this.robustClick(row.first().locator('input[name="clone-source-vm"]'));
   }
 
   async selectCreationMethod(method: 'newVm' | 'fromTemplate' | 'cloneVm'): Promise<void> {

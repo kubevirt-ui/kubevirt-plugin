@@ -10,9 +10,10 @@ import useKubevirtUserSettingsTableColumns from '@kubevirt-utils/hooks/useKubevi
 import useIsAllClustersPage from '@multicluster/hooks/useIsAllClustersPage';
 import type { ColumnLayout, K8sVerb } from '@openshift-console/dynamic-plugin-sdk';
 import { useFleetAccessReview } from '@stolostron/multicluster-sdk';
-import type { VMCallbacks } from '@virtualmachines/list/virtualMachinesDefinition';
 import { getVMColumns, VM_COLUMN_KEYS } from '@virtualmachines/list/virtualMachinesDefinition';
+import type { VMCallbacks, VMColumn } from '@virtualmachines/list/vmColumnTypes';
 
+import OpenInNewTabCapture from '../components/OpenInNewTabCapture';
 import { getActiveColumnKeys } from '../utils/utils';
 
 type UseCloneSourceVMColumnsReturn = {
@@ -20,6 +21,31 @@ type UseCloneSourceVMColumnsReturn = {
   columnLayout: ColumnLayout;
   loadedColumns: boolean;
 };
+
+const LINK_COLUMN_KEYS = new Set<string>([
+  VM_COLUMN_KEYS.cluster,
+  VM_COLUMN_KEYS.name,
+  VM_COLUMN_KEYS.namespace,
+  VM_COLUMN_KEYS.node,
+  VM_COLUMN_KEYS.status,
+  VM_COLUMN_KEYS.storageclassname,
+]);
+
+const wrapColumnLinksInNewTab = (columns: VMColumn[]): VMColumn[] =>
+  columns.map((column) => {
+    if (!LINK_COLUMN_KEYS.has(column.key) || !column.renderCell) {
+      return column;
+    }
+
+    const originalRenderCell = column.renderCell;
+
+    return {
+      ...column,
+      renderCell: (row: V1VirtualMachine, callbacks: VMCallbacks) => (
+        <OpenInNewTabCapture>{originalRenderCell(row, callbacks)}</OpenInNewTabCapture>
+      ),
+    };
+  });
 
 const useCloneSourceVMColumns = (cluster: string): UseCloneSourceVMColumnsReturn => {
   const { t } = useKubevirtTranslation();
@@ -33,7 +59,8 @@ const useCloneSourceVMColumns = (cluster: string): UseCloneSourceVMColumnsReturn
   });
 
   const columns = useMemo(
-    () => getVMColumns(t, undefined, isAllClustersPage, isAbleToGetNodeData),
+    () =>
+      wrapColumnLinksInNewTab(getVMColumns(t, undefined, isAllClustersPage, isAbleToGetNodeData)),
     [t, isAllClustersPage, isAbleToGetNodeData],
   );
 
