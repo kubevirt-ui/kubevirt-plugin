@@ -1,6 +1,7 @@
 import React, { FC, useMemo, useState } from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import type { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ListPageBody, TableColumn, VirtualizedTable } from '@openshift-console/dynamic-plugin-sdk';
 import { SearchInput } from '@patternfly/react-core';
@@ -20,13 +21,15 @@ type NodesTableProps = {
 const NodesTable: FC<NodesTableProps> = ({ handleNodeSelection, selectedNode, vm }) => {
   const { t } = useKubevirtTranslation();
   const columns: TableColumn<NodeData>[] = useNodesColumns();
-  const { nodesData, nodesDataLoaded } = useNodesData(vm);
+  const { nodesData, nodesDataLoaded, vmiLoadError } = useNodesData(vm);
   const [searchValue, setSearchValue] = useState<string>('');
 
   const filteredData = useMemo(
     () => nodesData.filter((nodeData) => nodeData?.name?.includes(searchValue)),
     [searchValue, nodesData],
   );
+
+  if (vmiLoadError) return <ErrorAlert error={vmiLoadError} />;
 
   return (
     <>
