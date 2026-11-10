@@ -19,13 +19,13 @@ Index of workflows in this directory. Deep design notes (check-run model, merge 
 
 ## Merge automation (Prow / Tide replacements)
 
-| Workflow                      | Trigger                       | Role                                                                                                                                   |
-| ----------------------------- | ----------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| `auto-merge.yml`              | label / review / synchronize… | Publishes required **Merge Gate** status, verifies checks, squash-merges via bot when ready                                            |
-| `pr-commands.yml`             | issue comment                 | Unified dispatcher for all PR commands (`/lgtm`, `/approve`, `/hold`, `/retest-e2e`, `/test-e2e`, etc.)                                |
-| `pr_review_commands.yml`      | review submitted              | Captures review data only (no secrets -- see below), uploads artifact                                                                  |
-| `pr_review_commands_sync.yml` | `workflow_run` (after above)  | Approve / Request changes ↔ `lgtm` (+ `approved` for root OWNERS); split out since `pull_request_review` withholds secrets on fork PRs |
-| `needs-rebase.yml`            | PR events                     | Sync `needs-rebase` from GitHub `mergeable`                                                                                            |
+| Workflow                      | Trigger                                   | Role                                                                                                                                   |
+| ----------------------------- | ----------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| `auto-merge.yml`              | label / synchronize / `workflow_dispatch` | Publishes required **Merge Gate** status, verifies checks, squash-merges via bot when ready                                            |
+| `pr-commands.yml`             | issue comment                             | Unified dispatcher for all PR commands (`/lgtm`, `/approve`, `/hold`, `/retest-e2e`, `/test-e2e`, etc.)                                |
+| `pr_review_commands.yml`      | review submitted                          | Captures review data only (no secrets -- see below), uploads artifact                                                                  |
+| `pr_review_commands_sync.yml` | `workflow_run` (after above)              | Approve / Request changes ↔ `lgtm` (+ `approved` for root OWNERS); split out since `pull_request_review` withholds secrets on fork PRs |
+| `needs-rebase.yml`            | PR events                                 | Sync `needs-rebase` from GitHub `mergeable`                                                                                            |
 
 Pool eligibility (`isMergePoolPr`): `lgtm` + `approved`, and no blockers (`hold`, `e2e-hold`, `needs-rebase`, any `do-not-merge/*`). Label names: [`.github/scripts/src/shared/merge-pool.ts`](../scripts/src/shared/merge-pool.ts).
 
@@ -33,18 +33,19 @@ Pool eligibility (`isMergePoolPr`): `lgtm` + `approved`, and no blockers (`hold`
 
 ### Merge Gate commit status
 
-`auto-merge.yml` runs [`.github/scripts/src/merge/auto-merge.ts`](../scripts/src/merge/auto-merge.ts), which publishes the required **Merge Gate** commit status on every label/review/sync event. Outcomes:
+`auto-merge.yml` runs [`.github/scripts/src/merge/auto-merge.ts`](../scripts/src/merge/auto-merge.ts), which publishes the required **Merge Gate** commit status on `labeled` / `unlabeled` / `synchronize` / `opened` / `reopened`, and on `workflow_dispatch` (woken by review sync or OWNERS `/lgtm`). Outcomes:
 
 | State     | When                                                                         | Example description                        |
 | --------- | ---------------------------------------------------------------------------- | ------------------------------------------ |
 | `pending` | Missing `lgtm`/`approved`, blocking labels, or required checks still running | `Missing lgtm`                             |
+| `pending` | Branch requires an approving review that is not yet present                  | `Waiting for approving review`             |
 | `pending` | Non-E2E required check failed (still in progress overall)                    | `Failed: build; Waiting: Run Gating Tests` |
 | `failure` | **Run Gating Tests** failed, or script/merge error                           | `E2E tests failed`                         |
 | `success` | Ready to merge / merged                                                      | `Merged`                                   |
 
-Only E2E failure turns Merge Gate red; label waits and other check gaps stay yellow/pending. Full merge-pool design: [`ci-scripts/README.md`](../../ci-scripts/README.md#merge-automation-prow--tide-replacement).
+Only E2E failure turns Merge Gate red; label waits, missing GitHub Approve, and other check gaps stay yellow/pending. Full merge-pool design: [`ci-scripts/README.md`](../../ci-scripts/README.md#merge-automation-prow--tide-replacement).
 
-Merge Gate only refreshes on `labeled`/`unlabeled`/review/`synchronize` events. A `do-not-merge/*` label cleared via the ambient `GITHUB_TOKEN` (instead of the bot token) doesn't fire those events and leaves Merge Gate stale — see [Clearing a `do-not-merge/*` label via `GITHUB_TOKEN` does not wake `auto-merge.yml`](../../ci-scripts/README.md#clearing-a-do-not-mergelabel-via-github_token-does-not-wake-auto-mergeyml) in `ci-scripts/README.md`.
+Merge Gate refreshes on `labeled`/`unlabeled`/`synchronize`/`opened`/`reopened`, and via `workflow_dispatch` after a human Approve (review sync) or OWNERS `/lgtm`/`/approve` (bot APPROVE). A `do-not-merge/*` label cleared via the ambient `GITHUB_TOKEN` (instead of the bot token) doesn't fire those events and leaves Merge Gate stale — see [Clearing a `do-not-merge/*` label via `GITHUB_TOKEN` does not wake `auto-merge.yml`](../../ci-scripts/README.md#clearing-a-do-not-mergelabel-via-github_token-does-not-wake-auto-mergeyml) in `ci-scripts/README.md`.
 
 ## PR validation (OWNERS-gated paths)
 
@@ -100,4 +101,4 @@ Do not switch these workflows to `pull_request` without a redesign — fork PRs 
 | [`.github/actions/clear-e2e-result-labels`](../actions/clear-e2e-result-labels/action.yml) | Remove `e2e-passed`/`e2e-failed` (shared by PR gate + on-main-push)           |
 | [`.github/scripts/`](../scripts/)                                                          | TypeScript for validation commands, merge-pool verify, Jira/AI/CI checks      |
 
-Bot secrets: `BOT_APP_ID`, `BOT_APP_PRIVATE_KEY` (Issues + Pull requests + Contents + Workflows write on the App; Workflows is required for auto-merge of PRs that touch `.github/workflows/*`). Details: [`ci-scripts/README.md`](../../ci-scripts/README.md#kubevirt-plugin-bot-required-for-prow-replacement-merge-automation).
+Bot secrets: `BOT_APP_ID`, `BOT_APP_PRIVATE_KEY` (Issues + Pull requests + Contents + Workflows + Actions write on the App; Workflows is required for auto-merge of PRs that touch `.github/workflows/*`; Actions is required for review sync / OWNERS `/lgtm` to `workflow_dispatch` Auto Merge). Details: [`ci-scripts/README.md`](../../ci-scripts/README.md#kubevirt-plugin-bot-required-for-prow-replacement-merge-automation).

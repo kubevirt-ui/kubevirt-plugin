@@ -73,6 +73,7 @@ jobs:
           private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
           permission-issues: write
           permission-pull-requests: write
+          permission-actions: write
 
       # GITHUB_TOKEN: bot (labels). STATUS_GITHUB_TOKEN: ambient token for
       # reading OWNERS. See createStatusOctokit.
@@ -90,6 +91,22 @@ jobs:
           REPO_OWNER: ${{ github.repository_owner }}
           REPO_NAME: ${{ github.event.repository.name }}
         run: npx tsx src/validation/commands/review-event.ts
+
+      # Re-run Auto Merge after Approve even when lgtm/approved were already
+      # present (no labeled event). Scripts always run from main.
+      - name: Wake Auto Merge after Approve
+        if: >
+          steps.bot-token.outputs.token != '' &&
+          steps.review.outputs.review_state == 'APPROVED' &&
+          steps.review.outputs.pr_head_sha != ''
+        working-directory: .github/scripts
+        env:
+          GITHUB_TOKEN: ${{ steps.bot-token.outputs.token }}
+          PR_NUMBER: ${{ steps.review.outputs.pr_number }}
+          PR_HEAD_SHA: ${{ steps.review.outputs.pr_head_sha }}
+          REPO_OWNER: ${{ github.repository_owner }}
+          REPO_NAME: ${{ github.event.repository.name }}
+        run: npx tsx src/commands/dispatch-auto-merge.ts
 
       - name: Note bot token failure
         if: steps.bot-token.outputs.token == ''

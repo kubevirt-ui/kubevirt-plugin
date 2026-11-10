@@ -46,6 +46,7 @@ const baseCtx = (octokit: Octokit, author: string): ApprovalContext => ({
   baseBranch: 'main',
   commentId: 123,
   contentsOctokit: octokit,
+  headSha: 'abc123headsha',
   octokit,
   owner: 'kubevirt-ui',
   prAuthor: 'pr-author',

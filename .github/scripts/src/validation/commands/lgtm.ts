@@ -2,6 +2,7 @@ import { sameGitHubLogin } from '../../utils';
 import { isListedInOwners } from '../pr-path-validation/owners';
 import type { ApprovalContext } from './approve';
 import { denyCommand, reactToComment } from './approve';
+import { dispatchAutoMerge, ensureBotApprovingReview } from './bot-approve-review';
 import { isWriteCollaborator } from './collaborator-trust';
 import { grantApprove, grantLgtm, revokeApprove, revokeLgtm } from './review-labels';
 
@@ -29,6 +30,22 @@ export const applyLgtm = async (ctx: ReviewContext): Promise<void> => {
   );
   if (isApprover) {
     await grantApprove(ctx.octokit, ctx.owner, ctx.repo, ctx.prNumber);
+    const botApprove = await ensureBotApprovingReview(ctx.octokit, {
+      author: ctx.author,
+      command: '/lgtm',
+      headSha: ctx.headSha,
+      owner: ctx.owner,
+      prNumber: ctx.prNumber,
+      repo: ctx.repo,
+    });
+    if (botApprove !== 'failed') {
+      await dispatchAutoMerge(ctx.octokit, {
+        headSha: ctx.headSha,
+        owner: ctx.owner,
+        prNumber: ctx.prNumber,
+        repo: ctx.repo,
+      });
+    }
   }
 
   await reactToComment(ctx.octokit, ctx.owner, ctx.repo, ctx.commentId, '+1');

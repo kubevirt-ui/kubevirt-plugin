@@ -20,6 +20,11 @@ type Call = { args: unknown; method: string };
 
 const fakeOctokit = (ownersContent: null | string, calls: Call[]): Octokit =>
   ({
+    actions: {
+      createWorkflowDispatch: async (args: unknown) => {
+        calls.push({ args, method: 'createWorkflowDispatch' });
+      },
+    },
     issues: {
       addLabels: async (args: unknown) => {
         calls.push({ args, method: 'addLabels' });
@@ -34,6 +39,17 @@ const fakeOctokit = (ownersContent: null | string, calls: Call[]): Octokit =>
       removeLabel: async (args: unknown) => {
         calls.push({ args, method: 'removeLabel' });
       },
+    },
+    paginate: {
+      iterator: async function* () {
+        yield { data: [] };
+      },
+    },
+    pulls: {
+      createReview: async (args: unknown) => {
+        calls.push({ args, method: 'createReview' });
+      },
+      listReviews: async () => ({ data: [] }),
     },
     reactions: {
       createForIssueComment: async (args: unknown) => {
@@ -59,6 +75,7 @@ const baseCtx = (
   baseBranch: 'main',
   commentId: 123,
   contentsOctokit,
+  headSha: 'abc123headsha',
   octokit,
   owner: 'kubevirt-ui',
   prAuthor,
@@ -286,7 +303,7 @@ describe('applyApprove', () => {
     assert.equal((reaction?.args as { content: string }).content, '-1');
   });
 
-  it('approves a root-OWNERS approver: adds the approved label, reacts +1', async () => {
+  it('approves a root-OWNERS approver: adds the approved label, bot APPROVE, wakes Auto Merge, reacts +1', async () => {
     const botCalls: Call[] = [];
     const contentsCalls: Call[] = [];
     const octokit = fakeOctokit(OWNERS_CONTENT, botCalls);
@@ -296,6 +313,14 @@ describe('applyApprove', () => {
 
     const addLabels = botCalls.find((c) => c.method === 'addLabels');
     assert.deepEqual((addLabels?.args as { labels: string[] }).labels, ['approved']);
+    assert.equal(
+      botCalls.some((c) => c.method === 'createReview'),
+      true,
+    );
+    assert.equal(
+      botCalls.some((c) => c.method === 'createWorkflowDispatch'),
+      true,
+    );
     const reaction = botCalls.find((c) => c.method === 'createForIssueComment');
     assert.equal((reaction?.args as { content: string }).content, '+1');
   });

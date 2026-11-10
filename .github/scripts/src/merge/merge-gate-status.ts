@@ -3,6 +3,7 @@ import type { Octokit } from '@octokit/rest';
 import type { Reason } from './merge-eligibility';
 
 export const GATING_CHECK_NAME = 'Run Gating Tests';
+export const MERGE_GATE_CONTEXT = 'Merge Gate';
 
 type CheckRun = Awaited<ReturnType<Octokit['checks']['listForRef']>>['data']['check_runs'][number];
 
@@ -165,6 +166,8 @@ export const resolveMergeGateOutcome = (params: {
   readyToMerge?: boolean;
   reasons: Reason[];
   statusResult?: StatusCheckResult;
+  /** Branch protection requires an approving review that is not yet present. */
+  waitingForReview?: boolean;
 }): MergeGateOutcome => {
   if (params.operationalError) {
     return { description: params.operationalError.slice(0, 140), state: 'failure' };
@@ -183,6 +186,10 @@ export const resolveMergeGateOutcome = (params: {
 
   if (params.merged) {
     return { description: 'Merged', state: 'success' };
+  }
+
+  if (params.waitingForReview) {
+    return { description: 'Waiting for approving review', state: 'pending' };
   }
 
   if (params.readyToMerge) {
@@ -210,6 +217,7 @@ export const buildStepSummary = (
   statusResult?: StatusCheckResult,
   gatingFailed?: boolean,
   merged?: boolean,
+  waitingForReview?: boolean,
 ): string => {
   if (!result.determined) {
     return (
@@ -247,6 +255,14 @@ export const buildStepSummary = (
 
     return (
       '## Merge Gate\n\n' + `:hourglass: **${heading}**\n\n` + lines.join('\n')
+    );
+  }
+
+  if (waitingForReview) {
+    return (
+      '## Merge Gate\n\n' +
+      ':hourglass: **Waiting for approving review** — this branch requires a GitHub Approve ' +
+      '(OWNERS `/lgtm` / `/approve` submit one via the bot when allowed).'
     );
   }
 

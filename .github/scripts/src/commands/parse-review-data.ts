@@ -16,6 +16,8 @@ import { failStep, setOutput } from '../shared/output';
 type ReviewData = {
   baseBranch: string;
   prAuthor: string;
+  /** Present on current artifacts; older review-data.json may omit it. */
+  prHeadSha?: string;
   prNumber: number;
   reviewAuthor: string;
   reviewState: string;
@@ -31,6 +33,8 @@ const main = async (): Promise<void> => {
   setOutput('review_author', data.reviewAuthor);
   setOutput('pr_author', data.prAuthor);
   setOutput('base_branch', data.baseBranch);
+  // Older review-data artifacts may omit prHeadSha; never pass undefined to setOutput.
+  setOutput('pr_head_sha', data.prHeadSha ?? '');
 };
 
 void main().catch((err) => {

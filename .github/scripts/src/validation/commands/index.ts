@@ -54,6 +54,7 @@ export const main = async (): Promise<void> => {
     baseBranch,
     commentId,
     contentsOctokit: createStatusOctokit(config),
+    headSha: headSha ?? '',
     octokit: createOctokit(config),
     owner: config.owner,
     prAuthor,

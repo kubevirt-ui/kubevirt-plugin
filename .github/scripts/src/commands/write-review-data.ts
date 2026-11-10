@@ -8,7 +8,7 @@
  * Entry point: npx tsx src/commands/write-review-data.ts
  *
  * Required env: PR_NUMBER, REVIEW_STATE, REVIEW_AUTHOR, PR_AUTHOR,
- *               BASE_BRANCH, REVIEW_USER
+ *               BASE_BRANCH, REVIEW_USER, PR_HEAD_SHA
  */
 
 import { writeFileSync } from 'node:fs';
@@ -36,6 +36,7 @@ const main = (): void => {
   const data = {
     baseBranch: requireEnv('BASE_BRANCH'),
     prAuthor: requireEnv('PR_AUTHOR'),
+    prHeadSha: requireEnv('PR_HEAD_SHA'),
     prNumber: Number(requireEnv('PR_NUMBER')),
     reviewAuthor: requireEnv('REVIEW_AUTHOR'),
     reviewState,
