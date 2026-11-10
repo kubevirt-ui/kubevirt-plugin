@@ -15,6 +15,8 @@ import useBootableVolumeWizardNavigation from './hooks/useBootableVolumeWizardNa
 import { useBootableVolumeWizardState } from './hooks/useBootableVolumeWizardState';
 import { getBootableVolumeWizardNavItem, getBootableVolumeWizardSteps } from './utils/steps';
 
+import './AddBootableVolumeWizard.scss';
+
 type AddBootableVolumeWizardContentProps = {
   onClose: () => void;
 };
@@ -36,7 +38,7 @@ const AddBootableVolumeWizardContent: FC<AddBootableVolumeWizardContentProps> = 
   );
 
   return (
-    <Modal isOpen variant="large">
+    <Modal className="add-bootable-volume-wizard" isOpen variant="large">
       <ModalBody>
         <Wizard
           header={

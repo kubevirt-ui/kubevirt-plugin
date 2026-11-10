@@ -1,6 +1,7 @@
 import { type ChangeEvent, type FC, type ReactElement } from 'react';
 
 import ContainerSource from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeSource/components/ContainerSource';
+import { REGISTRY_SOURCE_EXAMPLE_HELPER_TEXT } from '@kubevirt-utils/components/AddBootableVolumeModal/consts';
 import { formatRegistryURL } from '@kubevirt-utils/components/AddBootableVolumeModal/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { removeAllWhitespace } from '@kubevirt-utils/utils/utils';
@@ -35,7 +36,7 @@ const RegistrySource: FC<RegistrySourceProps> = ({
         containerImage={registryURL}
         onInputValueChange={handleInputValueChange}
         registryCredentials={registryCredentials}
-        registrySourceHelperText={t('Example: quay.io/containerdisks/centos:7-2009')}
+        registrySourceHelperText={t(REGISTRY_SOURCE_EXAMPLE_HELPER_TEXT)}
         selectedSourceType="registry"
         setRegistryCredentials={handleCredentialsChange}
         testId="volume-registry"

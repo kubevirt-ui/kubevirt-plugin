@@ -1,4 +1,11 @@
-import { type Dispatch, type FC, type SetStateAction, useCallback, useEffect } from 'react';
+import {
+  type Dispatch,
+  type FC,
+  type ReactElement,
+  type SetStateAction,
+  useCallback,
+  useEffect,
+} from 'react';
 
 import { getSCSelectOptions } from '@kubevirt-utils/components/DiskModal/components/StorageClassAndPreallocation/utils/helpers';
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
@@ -16,6 +23,7 @@ type StorageClassSelectProps = {
   checkSC?: (selectedSC: string) => boolean;
   cluster?: string;
   isDisabled?: boolean;
+  labelHelp?: ReactElement;
   setShowSCAlert: Dispatch<SetStateAction<boolean>>;
   setStorageClassName: (value: string) => void;
   setStorageClassProvisioner?: Dispatch<SetStateAction<string>>;
@@ -26,6 +34,7 @@ const StorageClassSelect: FC<StorageClassSelectProps> = ({
   checkSC,
   cluster,
   isDisabled,
+  labelHelp,
   setShowSCAlert,
   setStorageClassName,
   setStorageClassProvisioner,
@@ -59,7 +68,7 @@ const StorageClassSelect: FC<StorageClassSelectProps> = ({
   }, [defaultSC, setStorageClassName, setStorageClassProvisioner, storageClass, loaded]);
 
   return (
-    <FormGroup fieldId="storage-class" label={t('StorageClass')}>
+    <FormGroup fieldId="storage-class" label={t('StorageClass')} labelHelp={labelHelp}>
       <div data-test="storage-class-select">
         {loaded ? (
           <InlineFilterSelect

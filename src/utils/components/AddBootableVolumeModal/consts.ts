@@ -32,6 +32,9 @@ export const optionsValueLabelMapper = {
   [DROPDOWN_FORM_SELECTION.USE_SNAPSHOT]: 'Volume snapshot',
 };
 
+// t('Example: quay.io/containerdisks/centos:7-2009')
+export const REGISTRY_SOURCE_EXAMPLE_HELPER_TEXT = 'Example: quay.io/containerdisks/centos:7-2009';
+
 export const TLS_CERT_FIELD_NAMES = {
   tlsCertConfigMapName: 'tlsCertConfigMapName',
   tlsCertificate: 'tlsCertificate',
