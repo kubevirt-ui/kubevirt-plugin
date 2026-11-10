@@ -13,6 +13,7 @@ import {
   AlertActionCloseButton,
   Button,
   ButtonVariant,
+  Flex,
   Stack,
   StackItem,
 } from '@patternfly/react-core';
@@ -46,19 +47,21 @@ const FailedMigrationAlert: FC<FailedMigrationAlertProps> = ({ vm, vmim }) => {
           {t('The selected Node is unavailable. You can retry selecting a different one.')}
         </StackItem>
         <StackItem>
-          <Button
-            onClick={() =>
-              createModal(({ isOpen, onClose }) => (
-                <ComputeMigrationModal isOpen={isOpen} onClose={onClose} vm={vm} />
-              ))
-            }
-            variant={ButtonVariant.primary}
-          >
-            {t('Select different Node')}
-          </Button>
-          <Button onClick={() => cancelMigration(vmim)} variant={ButtonVariant.link}>
-            {t('Cancel migration')}
-          </Button>
+          <Flex spaceItems={{ default: 'spaceItemsSm' }}>
+            <Button
+              onClick={() =>
+                createModal?.(({ isOpen, onClose }) => (
+                  <ComputeMigrationModal isOpen={isOpen} onClose={onClose} vm={vm} />
+                ))
+              }
+              variant={ButtonVariant.primary}
+            >
+              {t('Select different Node')}
+            </Button>
+            <Button onClick={() => cancelMigration(vmim)} variant={ButtonVariant.link}>
+              {t('Cancel migration')}
+            </Button>
+          </Flex>
         </StackItem>
       </Stack>
     </Alert>
