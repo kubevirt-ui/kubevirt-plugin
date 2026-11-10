@@ -1,8 +1,11 @@
 import { ConfigMapModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { type IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { operatorNamespaceSignal } from '@kubevirt-utils/store/operatorNamespace';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
-import { getGroupVersionKindForModel, WatchK8sResult } from '@openshift-console/dynamic-plugin-sdk';
+import {
+  getGroupVersionKindForModel,
+  type WatchK8sResult,
+} from '@openshift-console/dynamic-plugin-sdk';
 
 import { useIsAdmin } from '../useIsAdmin';
 
@@ -30,7 +33,7 @@ const useFeaturesConfigMap: UseFeaturesConfigMap = (cluster, enableQuery: boolea
         namespace: operatorNamespace,
       },
   );
-  return { featuresConfigMapData: [...featuresConfigMapData], isAdmin };
+  return { featuresConfigMapData, isAdmin };
 };
 
 export default useFeaturesConfigMap;
