@@ -1,6 +1,7 @@
 import React, { FC, useMemo, useState } from 'react';
 
-import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import type { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ListPageBody } from '@openshift-console/dynamic-plugin-sdk';
@@ -20,7 +21,7 @@ type NodesTableProps = {
 
 const NodesTable: FC<NodesTableProps> = ({ handleNodeSelection, selectedNode, vm }) => {
   const { t } = useKubevirtTranslation();
-  const { nodesData, nodesDataLoaded, vmArch } = useNodesData(vm);
+  const { nodesData, nodesDataLoaded, vmArch, vmiLoadError } = useNodesData(vm);
   const columns = useMemo(() => getNodesTableColumns(t), [t]);
   const [searchValue, setSearchValue] = useState<string>('');
 
@@ -33,6 +34,8 @@ const NodesTable: FC<NodesTableProps> = ({ handleNodeSelection, selectedNode, vm
     () => ({ handleNodeSelection, selectedNode }),
     [handleNodeSelection, selectedNode],
   );
+
+  if (vmiLoadError) return <ErrorAlert error={vmiLoadError} />;
 
   return (
     <Stack hasGutter>
