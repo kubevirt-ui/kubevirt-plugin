@@ -6,6 +6,7 @@ import {
   VolumeSnapshotModel,
 } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getVolumeSnapshotSize } from '@kubevirt-utils/resources/bootableresources/selectors';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { FormGroup } from '@patternfly/react-core';
 
@@ -50,7 +51,7 @@ const SelectSnapshot: FC<SelectSnapshotProps> = ({
   );
 
   const getSnapshotSize = (snapshotName: string) =>
-    snapshots?.find((snapshot) => getName(snapshot) === snapshotName)?.status?.restoreSize;
+    getVolumeSnapshotSize(snapshots?.find((snapshot) => getName(snapshot) === snapshotName));
 
   useEffect(() => {
     if (snapshotNameSelected && snapshotsLoaded) {
