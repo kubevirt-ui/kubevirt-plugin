@@ -17,6 +17,11 @@ type FakeOptions = {
 
 const fakeOctokit = ({ ownersContent = null, permission }: FakeOptions, calls: Call[]): Octokit =>
   ({
+    actions: {
+      createWorkflowDispatch: async (args: unknown) => {
+        calls.push({ args, method: 'createWorkflowDispatch' });
+      },
+    },
     issues: {
       addLabels: async (args: unknown) => {
         calls.push({ args, method: 'addLabels' });
@@ -31,6 +36,17 @@ const fakeOctokit = ({ ownersContent = null, permission }: FakeOptions, calls: C
       removeLabel: async (args: unknown) => {
         calls.push({ args, method: 'removeLabel' });
       },
+    },
+    paginate: {
+      iterator: async function* () {
+        yield { data: [] };
+      },
+    },
+    pulls: {
+      createReview: async (args: unknown) => {
+        calls.push({ args, method: 'createReview' });
+      },
+      listReviews: async () => ({ data: [] }),
     },
     reactions: {
       createForIssueComment: async (args: unknown) => {
@@ -56,6 +72,7 @@ const baseCtx = (octokit: Octokit, contentsOctokit: Octokit, author: string): Re
   baseBranch: 'main',
   commentId: 123,
   contentsOctokit,
+  headSha: 'abc123headsha',
   octokit,
   owner: 'kubevirt-ui',
   prAuthor: 'pr-author',
@@ -154,6 +171,34 @@ describe('applyLgtm', () => {
       'approved',
       'lgtm',
     ]);
+    assert.equal(
+      calls.some((c) => c.method === 'createReview'),
+      true,
+    );
+    assert.equal(
+      calls.some((c) => c.method === 'createWorkflowDispatch'),
+      true,
+    );
+  });
+
+  it('does not bot-APPROVE or dispatch Auto Merge for a non-OWNERS /lgtm', async () => {
+    const calls: Call[] = [];
+    const octokit = fakeOctokit({ permission: 'write' }, calls);
+    const contentsOctokit = fakeOctokit(
+      { ownersContent: OWNERS_CONTENT, permission: 'write' },
+      calls,
+    );
+
+    await applyLgtm(baseCtx(octokit, contentsOctokit, 'bob-collaborator'));
+
+    assert.equal(
+      calls.some((c) => c.method === 'createReview'),
+      false,
+    );
+    assert.equal(
+      calls.some((c) => c.method === 'createWorkflowDispatch'),
+      false,
+    );
   });
 
   it('reads OWNERS via contentsOctokit at the root OWNERS path, not .github/OWNERS', async () => {

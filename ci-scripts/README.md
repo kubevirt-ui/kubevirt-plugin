@@ -122,7 +122,7 @@ Uses `openshift-install` to create a fully self-managed OpenShift cluster on IBM
 | `BOT_APP_ID`          | GitHub App ID for `kubevirt-plugin-bot` |
 | `BOT_APP_PRIVATE_KEY` | GitHub App private key                  |
 
-Used by `/lgtm`/`/approve`/`/hold`, review sync, `needs-rebase`, auto-merge (direct merge API), e2e result labels, and related PR comment/label writes. The App installation must have **Issues: Read & write**, **Pull requests: Read & write**, **Contents: Read & write**, and **Workflows: Read & write** (Contents for the merge API; Workflows so merges that touch `.github/workflows/*` don't 403 -- see below). Shared helper: [`.github/actions/create-bot-token`](../.github/actions/create-bot-token/action.yml).
+Used by `/lgtm`/`/approve`/`/hold`, review sync, `needs-rebase`, auto-merge (direct merge API), e2e result labels, and related PR comment/label writes. The App installation must have **Issues: Read & write**, **Pull requests: Read & write**, **Contents: Read & write**, **Workflows: Read & write**, and **Actions: Read & write** (Contents for the merge API; Workflows so merges that touch `.github/workflows/*` don't 403; Actions so review sync / OWNERS `/lgtm` can `workflow_dispatch` Auto Merge -- see below). Shared helper: [`.github/actions/create-bot-token`](../.github/actions/create-bot-token/action.yml).
 
 Ghost runner cleanup reuses the ARC Authentication GitHub App credentials above (`ARC_GITHUB_APP_ID` + `ARC_GITHUB_APP_PRIVATE_KEY`) — no separate secret needed, since that app is already scoped to `administration: write`, exactly what deregistering offline runners requires.
 
@@ -302,8 +302,11 @@ A PR is merge-pool eligible when **all** of the following hold (`isMergePoolPr`)
 `auto-merge.yml` then:
 
 - Publishes a **`Merge Gate`** commit status (`repos.createCommitStatus`) reflecting current eligibility.
-- When eligible AND all required checks pass (`Run Gating Tests`, `Code Checks`), **merges directly via `pulls.merge()`** using the bot App token. This bypasses GitHub's native auto-merge (`enablePullRequestAutoMerge`) which has a known platform bug where `mergeStateStatus` reports `BLOCKED` even when all required checks pass.
-- Names the **specific** condition(s) on every outcome -- e.g. `Missing lgtm` (pending), `Waiting: Run Gating Tests` (pending), `Failed: build; Waiting: Run Gating Tests` (pending), `E2E tests failed` (failure), or `Merged` on success.
+- When eligible AND all required checks pass (`Run Gating Tests`, `Code Checks`) AND any branch-protection **required approving review** is present, **merges directly via `pulls.merge()`** using the bot App token. This bypasses GitHub's native auto-merge (`enablePullRequestAutoMerge`) which has a known platform bug where `mergeStateStatus` reports `BLOCKED` even when all required checks pass.
+- Names the **specific** condition(s) on every outcome -- e.g. `Missing lgtm` (pending), `Waiting for approving review` (pending), `Waiting: Run Gating Tests` (pending), `Failed: build; Waiting: Run Gating Tests` (pending), `E2E tests failed` (failure), or `Merged` on success.
+- Missing/required-review merge API errors stay **pending** (not sticky failure). Approve review sync and OWNERS `/lgtm` wake Auto Merge via `workflow_dispatch` even when `lgtm`/`approved` labels were already present.
+
+**Label pool ≠ GitHub approving review.** `lgtm` + `approved` are merge-pool labels. Release branches that set `required_approving_review_count` also need a real GitHub Approve. OWNERS `/lgtm` / `/approve` submit one as `kubevirt-plugin-bot` when the App is allowed to approve (repo setting “Allow GitHub Actions to create and approve pull requests”).
 
 Branch protection must require **`Merge Gate`** and **`Run Gating Tests`** (plus build/test as before).
 
@@ -312,7 +315,7 @@ Branch protection must require **`Merge Gate`** and **`Run Gating Tests`** (plus
 To move a repo onto this model (already done for `kubevirt-plugin`):
 
 1. **Add `Merge Gate` to branch protection's required status checks** on the default branch (alongside `Run Gating Tests`, `build`, `test`, etc.). Native "Allow auto-merge" is **not** required — the script merges directly via the API.
-2. **Install/configure `kubevirt-plugin-bot`** with Contents + Pull requests + Workflows write; set `BOT_APP_ID` / `BOT_APP_PRIVATE_KEY` secrets. The bot token is **required** for merging — without it the merge gate reports failure. Workflows write is required specifically so PRs that change `.github/workflows/*` can be merged by the bot.
+2. **Install/configure `kubevirt-plugin-bot`** with Contents + Pull requests + Workflows + Actions write; set `BOT_APP_ID` / `BOT_APP_PRIVATE_KEY` secrets. The bot token is **required** for merging — without it the merge gate reports failure. Workflows write is required specifically so PRs that change `.github/workflows/*` can be merged by the bot. Actions write is required so `pr_review_commands_sync.yml` / OWNERS `/lgtm` can dispatch `auto-merge.yml` (`permission-actions: write` on the minted token).
 3. **Confirm the root `OWNERS` file lists real approvers** -- `/approve` and `/lgtm`'s approve-acting behavior both read it.
 4. **Uninstall/deselect the Prow GitHub App (`openshift-ci`) for this repo**. Removing the `tide:` block from `openshift/release` is optional hygiene afterward.
 5. **Announce the command set** -- `/help` or the table below. Reviews with `/lgtm` in the body now always honor Approve/Request-changes state (no Prow-style silent no-op).
@@ -331,12 +334,13 @@ Commands in `pr_validation_commands.yml` (`.github/scripts/src/validation/comman
 | `/hold cancel`    | `do-not-merge/hold` (removed)                    | Any repo collaborator with write access                                                       |
 
 - **`/lgtm` acts as `/approve` too** (mirrors Prow's `lgtm_acts_as_approve`): a root `OWNERS` approver's `/lgtm` also grants `approved`. `/lgtm cancel` always revokes `approved` too, **regardless of whether the cancelling actor is themselves an OWNERS approver** -- `approved` was only ever granted as part of that same pairing, so it must not outlive the `lgtm` that justified it just because a lower-trust actor is the one lifting it (an earlier version only revoked `approved` when the canceller was an approver, which let it silently survive a non-approver's `/lgtm cancel`).
+- **OWNERS `/lgtm` / `/approve` also submit a bot GitHub APPROVE review** (when none exists yet) so release-branch protection is satisfied without a separate Approve click, then dispatch Auto Merge. Soft-fails with a PR warning if the App cannot approve; labels are still applied.
 - **Trust checks**: `/lgtm`/`/hold` use `isWriteCollaborator`; `/approve` uses root `OWNERS` via `isListedInOwners`. Logins compared case-insensitively. Auth denials react `-1` and leave a short `@user: …` why-comment.
 - **Label names** come from [`.github/scripts/src/shared/merge-pool.ts`](../.github/scripts/src/shared/merge-pool.ts) (SSOT for `isMergePoolPr` and TS grant/revoke helpers).
 
 ### Native GitHub reviews also toggle `lgtm`/`approved`
 
-An "Approve" review grants `lgtm` (+ `approved` if the reviewer is a root OWNERS approver); a "Request changes" review always removes both `lgtm` and `approved`, regardless of the reviewer's own OWNERS status -- same reasoning as `/lgtm cancel` above. Same write-collaborator check as the comment commands, and the same self-review restriction (a PR author's own review never toggles anything). Mirrors Prow's `review_acts_as_lgtm` convenience.
+An "Approve" review grants `lgtm` (+ `approved` if the reviewer is a root OWNERS approver); a "Request changes" review always removes both `lgtm` and `approved`, regardless of the reviewer's own OWNERS status -- same reasoning as `/lgtm cancel` above. Same write-collaborator check as the comment commands, and the same self-review restriction (a PR author's own review never toggles anything). Mirrors Prow's `review_acts_as_lgtm` convenience. After a successful Approve sync, Auto Merge is re-dispatched so Merge Gate retries even when the labels were already present.
 
 **Deliberately simpler than Prow's original behavior**: Prow's real `lgtm` plugin skips handling a review entirely if its body text contains `/lgtm` or `/lgtm cancel` -- a genuinely confusing interaction (an "Approve" review with `/lgtm` typed in the body did _nothing_, neither the literal command nor the review-state auto-behavior), which is exactly what made the PR #4363 investigation so confusing in the first place. This implementation has no such special case: the review's **state** (`APPROVED`/`CHANGES_REQUESTED`) is always honored, regardless of anything typed in its body.
 

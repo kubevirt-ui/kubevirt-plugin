@@ -52,6 +52,7 @@ jobs:
           REVIEW_AUTHOR: ${{ github.event.review.user.login }}
           PR_AUTHOR: ${{ github.event.pull_request.user.login }}
           BASE_BRANCH: ${{ github.event.pull_request.base.ref }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: npx tsx src/commands/write-review-data.ts
 
       - name: Upload review data

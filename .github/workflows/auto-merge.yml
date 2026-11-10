@@ -6,9 +6,23 @@ name: Auto Merge
 # where mergeStateStatus reports BLOCKED even when all required checks pass.
 #
 # Publishes a "Merge Gate" commit status for visibility in the PR merge box.
+#
+# Also accepts workflow_dispatch (from review sync / OWNERS /lgtm bot APPROVE)
+# so Merge Gate retries after an approving review even when lgtm/approved
+# labels were already present (no labeled event).
 on:
   pull_request_target:
     types: [opened, labeled, unlabeled, reopened, synchronize]
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: Pull request number to evaluate
+        required: true
+        type: string
+      pr_head_sha:
+        description: PR head SHA for Merge Gate commit status
+        required: true
+        type: string
 
 permissions:
   contents: read
@@ -23,7 +37,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 2
     concurrency:
-      group: auto-merge-${{ github.event.pull_request.number }}
+      group: auto-merge-${{ github.event.pull_request.number || inputs.pr_number }}
       cancel-in-progress: true
     steps:
       - name: Checkout
@@ -53,7 +67,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
           BOT_TOKEN: ${{ steps.bot-token.outputs.token }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
-          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PR_NUMBER: ${{ github.event.pull_request.number || inputs.pr_number }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha || inputs.pr_head_sha }}
         working-directory: .github/scripts
         run: npx tsx src/merge/auto-merge.ts

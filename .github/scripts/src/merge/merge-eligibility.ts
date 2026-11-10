@@ -20,7 +20,7 @@ export const describeEligibility = (
 
   if (missingApproved) {
     reasons.push({
-      long: 'The PR does not carry the `approved` label. An OWNERS approver must comment `/approve`.',
+      long: 'The PR does not carry the `approved` label. An OWNERS approver must comment `/approve` or `/lgtm` (lgtm-acts-as-approve), or leave an Approve review.',
       short: 'Missing approved',
     });
   }

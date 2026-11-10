@@ -158,6 +158,34 @@ describe('resolveMergeGateOutcome', () => {
     assert.equal(outcome.state, 'pending');
     assert.equal(outcome.description, 'Failed: build; Waiting: Run Gating Tests');
   });
+
+  it('uses pending when waiting for an approving review', () => {
+    const outcome = resolveMergeGateOutcome({
+      determined: true,
+      eligible: true,
+      gatingFailed: false,
+      reasons: [],
+      statusResult: { allPassed: true, failed: [], pending: [] },
+      waitingForReview: true,
+    });
+
+    assert.equal(outcome.state, 'pending');
+    assert.equal(outcome.description, 'Waiting for approving review');
+  });
+
+  it('prefers waitingForReview over readyToMerge', () => {
+    const outcome = resolveMergeGateOutcome({
+      determined: true,
+      eligible: true,
+      gatingFailed: false,
+      readyToMerge: true,
+      reasons: [],
+      waitingForReview: true,
+    });
+
+    assert.equal(outcome.state, 'pending');
+    assert.equal(outcome.description, 'Waiting for approving review');
+  });
 });
 
 describe('describeRequiredCheckGap', () => {

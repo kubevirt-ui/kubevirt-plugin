@@ -6,6 +6,7 @@ import { AI_CONFIG } from '../ai-config-validation/constants';
 import { CI_SCRIPTS_CONFIG } from '../ci-scripts-validation/constants';
 import { I18N_CONFIG } from '../i18n-validation/constants';
 import { isListedInOwners } from '../pr-path-validation/owners';
+import { dispatchAutoMerge, ensureBotApprovingReview } from './bot-approve-review';
 import { grantApprove, revokeApprove } from './review-labels';
 
 export const reactToComment = async (
@@ -53,6 +54,8 @@ export type ApprovalContext = {
   commentId: number;
   /** Ambient token client -- only for reading .github/OWNERS ("Contents: read", a scope the bot app doesn't have). */
   contentsOctokit: Octokit;
+  /** PR head SHA -- used when submitting a bot APPROVE review for branch protection. */
+  headSha: string;
   /** Bot token client -- used for labels/reactions/comments. */
   octokit: Octokit;
   owner: string;
@@ -135,6 +138,22 @@ export const applyApprove = async (ctx: ApprovalContext): Promise<void> => {
   }
   await requireRootOwnersApprover(ctx, '/approve');
   await grantApprove(ctx.octokit, ctx.owner, ctx.repo, ctx.prNumber);
+  const botApprove = await ensureBotApprovingReview(ctx.octokit, {
+    author: ctx.author,
+    command: '/approve',
+    headSha: ctx.headSha,
+    owner: ctx.owner,
+    prNumber: ctx.prNumber,
+    repo: ctx.repo,
+  });
+  if (botApprove !== 'failed') {
+    await dispatchAutoMerge(ctx.octokit, {
+      headSha: ctx.headSha,
+      owner: ctx.owner,
+      prNumber: ctx.prNumber,
+      repo: ctx.repo,
+    });
+  }
   await reactToComment(ctx.octokit, ctx.owner, ctx.repo, ctx.commentId, '+1');
 };
 

@@ -25,6 +25,11 @@ import { requireEnv } from '../utils';
 import { getRepoContext } from '../shared/actions-context';
 import { getMergePoolBlockers } from '../shared/merge-pool';
 import { addStepSummary, warnStep } from '../shared/output';
+import {
+  getBranchProtectionRequirements,
+  hasApprovingReview,
+  isApprovingReviewMergeError,
+} from './approving-reviews';
 import type { Reason } from './merge-eligibility';
 import { describeEligibility } from './merge-eligibility';
 import {
@@ -32,40 +37,13 @@ import {
   checkRequiredStatuses,
   fetchCheckRunsForRef,
   isGatingCheckFailed,
+  MERGE_GATE_CONTEXT,
   resolveMergeGateOutcome,
 } from './merge-gate-status';
 
-const MERGE_GATE_CONTEXT = 'Merge Gate';
-
-type RequiredChecksResult = { ok: true; checks: Set<string> } | { ok: false; error: string };
-
-const getRequiredChecks = async (
-  octokit: Octokit,
-  owner: string,
-  repo: string,
-  branch: string,
-): Promise<RequiredChecksResult> => {
-  try {
-    const { data } = await octokit.repos.getBranchProtection({ branch, owner, repo });
-    const contexts = data.required_status_checks?.contexts ?? [];
-    const checks = data.required_status_checks?.checks?.map((c) => c.context) ?? [];
-    const all = new Set([...contexts, ...checks]);
-    all.delete(MERGE_GATE_CONTEXT);
-    console.log(`Required checks from branch protection (${branch}): [${[...all].join(', ')}]`);
-    return { checks: all, ok: true };
-  } catch (err: unknown) {
-    const status = (err as { status?: number }).status;
-    if (status === 404) {
-      console.log(`No branch protection configured on ${branch} — skipping status verification.`);
-      return { checks: new Set<string>(), ok: true };
-    }
-    const msg = err instanceof Error ? err.message : String(err);
-    return { error: `Could not read branch protection for ${branch}: ${msg}`, ok: false };
-  }
-};
-
 type EligibilityResult = {
   baseBranch: string;
+  currentHeadSha: string;
   determined: boolean;
   eligible: boolean;
   reasons: Reason[];
@@ -92,6 +70,7 @@ const evaluateEligibility = async (
     );
     return {
       baseBranch: pullRequest.base.ref,
+      currentHeadSha: pullRequest.head.sha,
       determined: true,
       eligible: isEligible,
       reasons: prReasons,
@@ -101,9 +80,21 @@ const evaluateEligibility = async (
     console.warn(
       `Could not determine merge-pool eligibility for PR #${prNumber}: ${msg} -- failing closed.`,
     );
-    return { baseBranch: '', determined: false, eligible: false, reasons: [] };
+    return {
+      baseBranch: '',
+      currentHeadSha: '',
+      determined: false,
+      eligible: false,
+      reasons: [],
+    };
   }
 };
+
+/** Stale workflow_dispatch / race: do not publish Merge Gate on a SHA that is no longer HEAD. */
+const isStaleHeadSha = (expectedHeadSha: string, result: EligibilityResult): boolean =>
+  result.determined && result.currentHeadSha !== expectedHeadSha;
+
+type MergeAttempt = { error: string; ok: false } | { ok: true };
 
 const tryMerge = async (
   botOctokit: Octokit,
@@ -111,7 +102,7 @@ const tryMerge = async (
   repo: string,
   prNumber: number,
   sha: string,
-): Promise<boolean> => {
+): Promise<MergeAttempt> => {
   try {
     await botOctokit.pulls.merge({
       merge_method: 'squash',
@@ -121,11 +112,11 @@ const tryMerge = async (
       sha,
     });
     console.log(`Squash-merged PR #${prNumber} via API.`);
-    return true;
+    return { ok: true };
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     console.warn(`Could not merge PR #${prNumber}: ${msg}`);
-    return false;
+    return { error: msg, ok: false };
   }
 };
 
@@ -141,6 +132,7 @@ const publishMergeGateStatus = async (
     operationalError?: string;
     readyToMerge?: boolean;
     statusResult?: Awaited<ReturnType<typeof checkRequiredStatuses>>;
+    waitingForReview?: boolean;
   },
 ): Promise<void> => {
   const outcome = resolveMergeGateOutcome({
@@ -152,10 +144,17 @@ const publishMergeGateStatus = async (
     readyToMerge: params.readyToMerge,
     reasons: result.reasons,
     statusResult: params.statusResult,
+    waitingForReview: params.waitingForReview,
   });
 
   addStepSummary(
-    buildStepSummary(result, params.statusResult, params.gatingFailed, params.merged),
+    buildStepSummary(
+      result,
+      params.statusResult,
+      params.gatingFailed,
+      params.merged,
+      params.waitingForReview,
+    ),
   );
   await setCommitStatus(
     octokit,
@@ -182,9 +181,17 @@ const main = async (): Promise<void> => {
   const prNumber = Number(requireEnv('PR_NUMBER'));
   const octokit = new Octokit({ auth: token });
 
+  const result = await evaluateEligibility(octokit, owner, repo, prNumber);
+  if (isStaleHeadSha(headSha, result)) {
+    console.warn(
+      `PR #${prNumber} head moved (${headSha.slice(0, 7)} → ${result.currentHeadSha.slice(0, 7)}); ` +
+        `skipping Merge Gate update for stale SHA.`,
+    );
+    return;
+  }
+
   const checkRuns = await fetchCheckRunsForRef(octokit, owner, repo, headSha);
   const gatingFailed = isGatingCheckFailed(checkRuns);
-  const result = await evaluateEligibility(octokit, owner, repo, prNumber);
 
   if (gatingFailed || !result.eligible) {
     await publishMergeGateStatus(octokit, owner, repo, headSha, result, { gatingFailed });
@@ -192,17 +199,17 @@ const main = async (): Promise<void> => {
   }
 
   const protectionClient = botToken ? new Octokit({ auth: botToken }) : octokit;
-  const requiredChecksResult = await getRequiredChecks(
+  const protection = await getBranchProtectionRequirements(
     protectionClient,
     owner,
     repo,
     result.baseBranch,
   );
 
-  if (!requiredChecksResult.ok) {
+  if (!protection.ok) {
     await publishMergeGateStatus(octokit, owner, repo, headSha, result, {
       gatingFailed,
-      operationalError: requiredChecksResult.error,
+      operationalError: protection.error,
     });
     return;
   }
@@ -212,7 +219,7 @@ const main = async (): Promise<void> => {
     owner,
     repo,
     headSha,
-    requiredChecksResult.checks,
+    protection.requiredChecks,
     checkRuns,
   );
 
@@ -224,6 +231,21 @@ const main = async (): Promise<void> => {
     return;
   }
 
+  if (protection.requiredApprovingReviewCount > 0) {
+    const approved = await hasApprovingReview(octokit, owner, repo, prNumber);
+    if (!approved) {
+      console.log(
+        `PR #${prNumber} needs ${protection.requiredApprovingReviewCount} approving review(s) — waiting.`,
+      );
+      await publishMergeGateStatus(octokit, owner, repo, headSha, result, {
+        gatingFailed,
+        statusResult,
+        waitingForReview: true,
+      });
+      return;
+    }
+  }
+
   if (!botToken) {
     await publishMergeGateStatus(octokit, owner, repo, headSha, result, {
       gatingFailed,
@@ -233,6 +255,13 @@ const main = async (): Promise<void> => {
   }
 
   const recheck = await evaluateEligibility(octokit, owner, repo, prNumber);
+  if (isStaleHeadSha(headSha, recheck)) {
+    console.warn(
+      `PR #${prNumber} head moved during evaluation (${headSha.slice(0, 7)} → ${recheck.currentHeadSha.slice(0, 7)}); ` +
+        `skipping Merge Gate update for stale SHA.`,
+    );
+    return;
+  }
   if (!recheck.eligible) {
     await publishMergeGateStatus(octokit, owner, repo, headSha, recheck, { gatingFailed });
     return;
@@ -251,10 +280,19 @@ const main = async (): Promise<void> => {
 
   const merged = await tryMerge(botOctokit, owner, repo, prNumber, headSha);
 
-  if (!merged) {
+  if (!merged.ok) {
+    if (isApprovingReviewMergeError(merged.error)) {
+      await publishMergeGateStatus(octokit, owner, repo, headSha, result, {
+        gatingFailed,
+        statusResult,
+        waitingForReview: true,
+      });
+      return;
+    }
+
     await publishMergeGateStatus(octokit, owner, repo, headSha, result, {
       gatingFailed,
-      operationalError: 'Merge failed — see workflow log',
+      operationalError: `Merge failed — ${merged.error}`.slice(0, 140),
       statusResult,
     });
     return;
