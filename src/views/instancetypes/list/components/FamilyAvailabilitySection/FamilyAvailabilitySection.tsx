@@ -2,7 +2,6 @@ import { type FC, useMemo } from 'react';
 
 import { getInstanceTypeMenuItems } from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/InstanceTypeDrilldownSelect/utils/utils';
 import ExpandSectionWithCustomToggle from '@kubevirt-utils/components/ExpandSectionWithCustomToggle/ExpandSectionWithCustomToggle';
-import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import useClusterInstanceTypes from '@kubevirt-utils/hooks/useClusterInstanceTypes';
 import { INSTANCE_TYPE_SERIES } from '@kubevirt-utils/hooks/useInstanceTypeFamilyAvailability/constants';
 import useDisabledInstanceTypeFamilies from '@kubevirt-utils/hooks/useInstanceTypeFamilyAvailability/useDisabledInstanceTypeFamilies';
@@ -10,14 +9,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { type InstanceTypeSeriesName } from '@kubevirt-utils/resources/instancetype/types';
 import { universalComparator } from '@kubevirt-utils/utils/utils';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
-import {
-  Flex,
-  Gallery,
-  GalleryItem,
-  Label,
-  PopoverPosition,
-  Skeleton,
-} from '@patternfly/react-core';
+import { Flex, Gallery, GalleryItem, Label, Skeleton } from '@patternfly/react-core';
 
 import FamilyAvailabilityCard from './components/FamilyAvailabilityCard';
 
@@ -60,9 +52,10 @@ const FamilyAvailabilitySection: FC = () => {
     <ExpandSectionWithCustomToggle
       className="family-availability-section"
       expandSectionClassName="family-availability-section__content"
+      helpTextContent={familyAvailabilityHelpText}
       id={FAMILY_AVAILABILITY_SECTION_ID}
       isIndented
-      toggleClassname="ExpandSection"
+      toggleClassname="ExpandSection family-availability-section__toggle"
       toggleContent={
         <Flex alignItems={{ default: 'alignItemsCenter' }} gap={{ default: 'gapSm' }}>
           <span>{t('Family availability')}</span>
@@ -74,7 +67,6 @@ const FamilyAvailabilitySection: FC = () => {
               })}
             </Label>
           )}
-          <HelpTextIcon bodyContent={familyAvailabilityHelpText} position={PopoverPosition.right} />
         </Flex>
       }
     >

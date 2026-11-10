@@ -8,4 +8,26 @@
   &__content {
     width: 100%;
   }
+
+  // Keep the help icon beside the title (outside the toggle) without stretching the Split row.
+  &.expand-section-custom-toggle {
+    [class*='split']:has(.family-availability-section__toggle) {
+      width: fit-content;
+      max-width: 100%;
+    }
+
+    [class*='split__item']:has(.family-availability-section__toggle),
+    .expand-section-custom-toggle__help-icon-container {
+      flex-grow: 0;
+      width: auto;
+    }
+
+    .expand-section-custom-toggle__help-icon-container {
+      margin-inline-start: var(--pf-t--global--spacer--xs);
+    }
+
+    .expand-section-custom-toggle__help-icon {
+      margin-left: 0;
+    }
+  }
 }
