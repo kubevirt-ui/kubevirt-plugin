@@ -10,6 +10,7 @@ import { type NetworkAttachmentDefinitionKind } from '@kubevirt-utils/resources/
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 
 import { POD_NETWORK_TYPE } from '../constants';
+import { getNetworkMapRowId } from '../mappingDisplayUtils';
 import { getInitialNetworkMap } from '../utils';
 
 import useProviderNADs from './useProviderNADs';
@@ -55,7 +56,7 @@ const useNetworkReadiness = (
     (vmNetworkName: string, destinationNetwork: V1beta1NetworkMapSpecMapDestination): void => {
       setNetworkMap((draftNetworkMap) => {
         const mappedNAD = draftNetworkMap.spec?.map?.find(
-          (map) => map.source.name === vmNetworkName,
+          (map) => getNetworkMapRowId(map) === vmNetworkName,
         );
 
         if (mappedNAD) {
