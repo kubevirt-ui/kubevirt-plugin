@@ -393,6 +393,23 @@ export default class VmWizardNavigationComponent extends BaseComponent {
     }
   }
 
+  async getGuestOsDropdownOptions(): Promise<string[]> {
+    await this.robustClick(this._osTypeDropdown.first());
+    await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
+
+    const options = this.page.locator('[role="listbox"] [role="option"], [role="option"]');
+    await options.first().waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
+    const labels = (await options.allTextContents()).reduce<string[]>((acc, text) => {
+      const label = text.trim();
+      if (label) acc.push(label);
+      return acc;
+    }, []);
+
+    await this.page.keyboard.press('Escape');
+    await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
+    return labels;
+  }
+
   async getSelectedTemplateCardTitle(templateTestId: string): Promise<string> {
     try {
       const card = this.testId(templateTestId);

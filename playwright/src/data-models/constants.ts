@@ -134,6 +134,32 @@ export const IT_PREFS = {
 } as const;
 
 /**
+ * Preference variant names from the product Guest OS grouping logic
+ * (`preferenceNameUtils.PREFERENCE_VARIANT_SUFFIXES`). Used to assert the
+ * wizard dropdown shows version groups, not raw preference variants.
+ */
+export const PREFERENCE_VARIANT_NAMES = [
+  'amd64',
+  'arm64',
+  's390x',
+  'realtime',
+  'dpdk',
+  'desktop',
+  'virtio',
+] as const;
+
+const PREFERENCE_VARIANT_NAMES_PATTERN = PREFERENCE_VARIANT_NAMES.join('|');
+
+/** Matches preference-variant labels that must not appear as Guest OS options. */
+export const PREFERENCE_VARIANT_OPTION_PATTERN = new RegExp(
+  `(\\.(${PREFERENCE_VARIANT_NAMES_PATTERN})$|\\((${PREFERENCE_VARIANT_NAMES_PATTERN})\\))`,
+  'i',
+);
+
+/** Boot-source table label for the default preference variant. */
+export const BOOT_VOLUME_DEFAULT_VARIANT = 'Default';
+
+/**
  * Instance type configurations
  */
 export const INSTANCE_TYPES = {

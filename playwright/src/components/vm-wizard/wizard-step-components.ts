@@ -630,17 +630,21 @@ export class VmCreationWizardBootSourceComponent extends BaseComponent {
   async verifyBootVolumeTableColumnsVisible(): Promise<boolean> {
     const expectedColumns = [
       'Volume name',
-      'Architecture',
+      'Variant',
       'Operating system',
       'Storage class',
       'Size',
       'Description',
     ];
     try {
-      for (const col of expectedColumns) {
-        const header = this.page.getByRole('columnheader', { name: col });
-        await header.waitFor({ state: 'visible', timeout: TestTimeouts.SHORT_WAIT });
-      }
+      await Promise.all(
+        expectedColumns.map((col) =>
+          this.page.getByRole('columnheader', { name: col }).waitFor({
+            state: 'visible',
+            timeout: TestTimeouts.SHORT_WAIT,
+          }),
+        ),
+      );
       return true;
     } catch {
       return false;
