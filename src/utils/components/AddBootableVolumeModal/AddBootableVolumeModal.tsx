@@ -1,6 +1,7 @@
 import type { FC } from 'react';
 import { useNavigate } from 'react-router';
 
+import AddBootableVolumeAllowedNamespacesPrefetch from '@kubevirt-utils/components/AddBootableVolumeModal/components/AddBootableVolumeAllowedNamespacesPrefetch';
 import AddBootableVolumeBody from '@kubevirt-utils/components/AddBootableVolumeModal/components/AddBootableVolumeBody';
 import { handleAddBootableVolumeSuccess } from '@kubevirt-utils/components/AddBootableVolumeModal/components/BootableVolumeModalToasts';
 import { emptyDataSource } from '@kubevirt-utils/components/AddBootableVolumeModal/consts';
@@ -47,39 +48,45 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
   const toastHandlers = { addInfoToast, addSuccessToast, navigate, t };
 
   return (
-    <TabModal
-      closeOnSubmit
-      headerText={t('Add volume')}
-      isDisabled={!isFormValid}
-      isOpen={isOpen}
-      obj={emptyDataSource}
-      onClose={() => handleAddBootableVolumeModalClose({ onClose, sourceType, upload })}
-      onSubmit={(dataSource) =>
-        submitAddBootableVolume({
-          bootableVolume,
-          checkUploadReady,
-          dataSource,
-          onClose,
-          onCreateVolume,
-          onUploadStart,
-          sourceType,
-          t,
-          uploadData,
-        })
-      }
-      onSuccess={(result) => handleAddBootableVolumeSuccess(result, sourceType, toastHandlers)}
-      submitBtnText={getAddBootableVolumeSubmitBtnText(t, isUploading)}
-    >
-      <Content>{t('Add a new bootable volume to the cluster.')}</Content>
-      <AddBootableVolumeBody
-        bootableVolume={bootableVolume}
-        isUploading={isUploading}
-        setBootableVolume={setBootableVolume}
-        setSourceType={setSourceType}
-        sourceType={sourceType}
-        upload={upload}
+    <>
+      <AddBootableVolumeAllowedNamespacesPrefetch
+        cluster={bootableVolume.bootableVolumeCluster}
+        isOpen={isOpen}
       />
-    </TabModal>
+      <TabModal
+        closeOnSubmit
+        headerText={t('Add volume')}
+        isDisabled={!isFormValid}
+        isOpen={isOpen}
+        obj={emptyDataSource}
+        onClose={() => handleAddBootableVolumeModalClose({ onClose, sourceType, upload })}
+        onSubmit={(dataSource) =>
+          submitAddBootableVolume({
+            bootableVolume,
+            checkUploadReady,
+            dataSource,
+            onClose,
+            onCreateVolume,
+            onUploadStart,
+            sourceType,
+            t,
+            uploadData,
+          })
+        }
+        onSuccess={(result) => handleAddBootableVolumeSuccess(result, sourceType, toastHandlers)}
+        submitBtnText={getAddBootableVolumeSubmitBtnText(t, isUploading)}
+      >
+        <Content>{t('Add a new bootable volume to the cluster.')}</Content>
+        <AddBootableVolumeBody
+          bootableVolume={bootableVolume}
+          isUploading={isUploading}
+          setBootableVolume={setBootableVolume}
+          setSourceType={setSourceType}
+          sourceType={sourceType}
+          upload={upload}
+        />
+      </TabModal>
+    </>
   );
 };
 

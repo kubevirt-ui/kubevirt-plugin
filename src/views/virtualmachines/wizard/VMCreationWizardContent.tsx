@@ -15,6 +15,7 @@ import { useVMWizardState } from '@virtualmachines/wizard/state/useVMWizardState
 
 import RequiredLabelsDrawerWrapper from './components/RequiredLabelsDrawerWrapper';
 import TemplatesDrawerWrapper from './components/TemplatesDrawerWrapper';
+import VMCreationWizardAllowedNamespacesPrefetch from './components/VMCreationWizardAllowedNamespacesPrefetch';
 import useVMGenerationNavClick from './hooks/useVMGenerationNavClick';
 import { type VMCreationMethod, VMWizardStep } from './utils/constants';
 import { getStepsToDisplayByCreationMethod } from './utils/displaySteps';
@@ -83,6 +84,7 @@ const VMCreationWizardContent: FC = () => {
 
   return (
     <RequiredLabelsDrawerWrapper currentStep={currentStep as VMWizardStep}>
+      <VMCreationWizardAllowedNamespacesPrefetch />
       <TemplatesDrawerWrapper>
         <Wizard
           className="vm-creation-wizard"
