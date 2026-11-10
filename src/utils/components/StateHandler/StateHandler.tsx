@@ -1,5 +1,6 @@
 import { type FC, type ReactNode } from 'react';
 
+import { isForbiddenError } from '@kubevirt-utils/errors/clusterMetricsAccess';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   Alert,
@@ -22,19 +23,30 @@ type StateHandlerError = {
 
 type StateHandlerProps = {
   children?: ReactNode;
-  error?: StateHandlerError;
+  error?: StateHandlerError | unknown;
   hasData: boolean;
+  /** Use compact Access Restricted warning (Overview cards). */
+  inlineAccessDenied?: boolean;
   loaded: boolean;
   showSkeletonLoading?: boolean;
   withBullseye?: boolean;
 };
 
-const getErrorMessage = (error: StateHandlerError): string => error.message ?? '';
+const getErrorMessage = (error: unknown): string => {
+  if (!error) return '';
+  if (typeof error === 'string') return error;
+  if (typeof error === 'object' && error !== null && 'message' in error) {
+    const message = (error as { message?: unknown }).message;
+    return typeof message === 'string' ? message : '';
+  }
+  return '';
+};
 
 const StateHandler: FC<StateHandlerProps> = ({
   children,
   error,
   hasData,
+  inlineAccessDenied = false,
   loaded,
   showSkeletonLoading = false,
   withBullseye = false,
@@ -42,11 +54,16 @@ const StateHandler: FC<StateHandlerProps> = ({
   const { t } = useKubevirtTranslation();
 
   if (error) {
-    const status = error.response?.status;
-
-    if (status === 403) {
-      return <AccessDenied message={getErrorMessage(error)} />;
+    if (isForbiddenError(error)) {
+      return (
+        <AccessDenied inline={inlineAccessDenied} message={getErrorMessage(error)} />
+      );
     }
+
+    const status =
+      typeof error === 'object' && error !== null && 'response' in error
+        ? (error as StateHandlerError).response?.status
+        : undefined;
 
     if (status === 404) {
       return (

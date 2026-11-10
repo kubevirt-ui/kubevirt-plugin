@@ -1,5 +1,6 @@
 import type { FC, ReactNode } from 'react';
 
+import AccessDenied from '@kubevirt-utils/components/AccessDenied/AccessDenied';
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import {
@@ -54,6 +55,9 @@ const OpenShiftVirtualizationWidgetBody: FC<OpenShiftVirtualizationWidgetBodyPro
   const notAvailableLabel = getClusterMetricsNotAvailableLabel(t);
 
   if (csvError) {
+    if (isForbiddenError(csvError)) {
+      return <AccessDenied inline />;
+    }
     return <ErrorAlert error={csvError} />;
   }
 
