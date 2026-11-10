@@ -23,6 +23,7 @@ import { useVMWizardForm } from '@virtualmachines/wizard/form/VMWizardFormProvid
 import useTemplatesWithAvailableSource from '@virtualmachines/wizard/steps/TemplateStep/components/TemplatesCatalog/hooks/useTemplatesWithAvailableSource/useTemplatesWithAvailableSource';
 
 import { buildOSDisplayNameMap } from '../../../utils/buildOSDisplayNameMap';
+import { isWizardCatalogTemplateVisibleForDestination } from './isWizardCatalogTemplateVisibleForDestination';
 import useCatalogUIState from './useCatalogUIState';
 
 type UseTemplatesCatalogReturn = {
@@ -46,14 +47,13 @@ type UseTemplatesCatalogReturn = {
 const useTemplatesCatalog = (): UseTemplatesCatalogReturn => {
   const { control } = useVMWizardForm();
   const cluster = useWatch({ control, name: 'deployment.cluster' });
+  const destinationNamespace = useWatch({ control, name: 'deployment.project' });
   const { isList, namespace, setIsList, setNamespace } = useCatalogUIState();
 
   const { availableDataSources, availableTemplatesUID, bootSourcesLoaded, loaded, templates } =
     useTemplatesWithAvailableSource({ clusterOverride: cluster, namespace });
 
   const clusterPreferencesByName = useClusterPreferencesByName(cluster);
-
-  const osDisplayNames = useMemo(() => buildOSDisplayNameMap(templates), [templates]);
 
   const isWindowsSupported = useIsWindowsSupportedArchitecture(cluster);
 
@@ -65,11 +65,24 @@ const useTemplatesCatalog = (): UseTemplatesCatalogReturn => {
     [templates, isWindowsSupported],
   );
 
-  const filterDefinitions = useVirtualMachineTemplatesFilters(supportedTemplates);
+  const destinationCompatibleTemplates = useMemo(
+    () =>
+      supportedTemplates.filter((template) =>
+        isWizardCatalogTemplateVisibleForDestination(template, destinationNamespace),
+      ),
+    [destinationNamespace, supportedTemplates],
+  );
+
+  const osDisplayNames = useMemo(
+    () => buildOSDisplayNameMap(destinationCompatibleTemplates),
+    [destinationCompatibleTemplates],
+  );
+
+  const filterDefinitions = useVirtualMachineTemplatesFilters(destinationCompatibleTemplates);
 
   const { clearAllFilters, filteredData, filters, onSetFilters } =
     useKubevirtDataViewFilters<Template>({
-      data: supportedTemplates,
+      data: destinationCompatibleTemplates,
       filterDefinitions,
     });
 

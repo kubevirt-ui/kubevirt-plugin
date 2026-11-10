@@ -52,6 +52,15 @@ describe('instancetype/helper', () => {
         }),
       ).toEqual(expect.objectContaining({ kind: VirtualMachineInstancetypeModel.kind }));
     });
+
+    it('treats canonical VirtualMachineClusterInstancetype kind as cluster-scoped', () => {
+      expect(
+        getInstanceTypeModelFromMatcher({
+          kind: VirtualMachineClusterInstancetypeModel.kind,
+          name: 'u1.small',
+        }),
+      ).toEqual(expect.objectContaining({ kind: VirtualMachineClusterInstancetypeModel.kind }));
+    });
   });
 
   describe('isExpandableSpecVM', () => {

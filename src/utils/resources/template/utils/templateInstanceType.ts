@@ -89,9 +89,25 @@ export const findInstanceTypeForTemplate = (
   );
 };
 
+const updateTemplateInstanceTypeMatcher = (
+  draftVM: V1VirtualMachine | undefined,
+  matcherName: string | undefined,
+  instanceType: InstanceTypeUnion,
+): void => {
+  if (!draftVM?.spec?.instancetype || !matcherName) {
+    return;
+  }
+
+  draftVM.spec.instancetype = {
+    ...draftVM.spec.instancetype,
+    kind: instanceType.kind,
+    name: matcherName,
+  };
+};
+
 /**
  * Creates an onSubmit handler for the InstanceTypeModal that updates the template parameter
- * (or direct instancetype name) when the user selects a new cluster instancetype.
+ * (or direct instancetype name) and matcher kind when the user selects an instance type.
  */
 export const createTemplateInstanceTypeSubmit =
   (template: Template) =>
@@ -103,18 +119,18 @@ export const createTemplateInstanceTypeSubmit =
     const newName = getName(instanceType);
 
     const updatedTemplate = produce(template, (draft) => {
+      const draftVM = getTemplateVirtualMachineObject(draft);
+
       if (paramName) {
         const param = getParameters(draft)?.find((par) => par.name === paramName);
         if (param) {
           param.value = newName;
         }
+        updateTemplateInstanceTypeMatcher(draftVM, rawName, instanceType);
         return;
       }
 
-      const draftVM = getTemplateVirtualMachineObject(draft);
-      if (draftVM?.spec?.instancetype) {
-        draftVM.spec.instancetype.name = newName;
-      }
+      updateTemplateInstanceTypeMatcher(draftVM, newName, instanceType);
     });
 
     await updateTemplate(updatedTemplate);
