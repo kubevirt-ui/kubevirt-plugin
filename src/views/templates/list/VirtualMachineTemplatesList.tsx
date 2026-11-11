@@ -44,8 +44,6 @@ const VirtualMachineTemplatesList: FC<ListPageProps> = ({
   const selectedProjects = useSelectedRowFilterProjects();
   const namespaceParam = useNamespaceParam();
   const isAllClustersPage = useIsAllClustersPage();
-  const cluster = selectedClusters?.length === 1 ? selectedClusters[0] : undefined;
-
   const activeNamespace = namespace ?? namespaceParam;
 
   const { allTemplates, allTemplatesWithRequests, error, loaded } = useAllTemplateResources({
@@ -64,7 +62,7 @@ const VirtualMachineTemplatesList: FC<ListPageProps> = ({
   } = useVirtualMachineTemplatesListFilters(allTemplates, allTemplatesWithRequests);
 
   const { activeColumnKeys, columnLayout, columns, loadedColumns } =
-    useVirtualMachineTemplatesListColumns(activeNamespace, isAllClustersPage, cluster);
+    useVirtualMachineTemplatesListColumns(activeNamespace, isAllClustersPage);
 
   if (
     !runningTourSignal.value &&

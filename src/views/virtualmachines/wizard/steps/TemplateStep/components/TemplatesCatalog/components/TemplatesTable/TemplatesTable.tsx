@@ -20,7 +20,6 @@ type TemplatesTableProps = {
   availableDatasources: Record<string, V1beta1DataSource>;
   availableTemplatesUID: Set<string>;
   bootSourcesLoaded: boolean;
-  catalogNamespace?: string;
   clusterPreferencesByName: ResourceMap<V1beta1VirtualMachineClusterPreference>;
   loaded: boolean;
   onTemplateClick: (template: Template) => void;
@@ -31,7 +30,6 @@ const TemplatesTable: FC<TemplatesTableProps> = ({
   availableDatasources,
   availableTemplatesUID,
   bootSourcesLoaded,
-  catalogNamespace,
   clusterPreferencesByName,
   loaded,
   onTemplateClick,
@@ -87,7 +85,6 @@ const TemplatesTable: FC<TemplatesTableProps> = ({
             activeColumnIDs={activeColumnIDs}
             availableDatasources={availableDatasources}
             availableTemplatesUID={availableTemplatesUID}
-            catalogNamespace={catalogNamespace}
             clusterPreference={getTemplateClusterPreference(template, clusterPreferencesByName)}
             key={getUID(template) ?? getTemplateName(template)}
             onSelectTemplate={onTemplateClick}

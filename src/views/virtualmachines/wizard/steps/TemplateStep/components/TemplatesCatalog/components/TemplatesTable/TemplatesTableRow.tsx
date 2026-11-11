@@ -3,6 +3,7 @@ import { type FC } from 'react';
 import { type V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import { type V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import ArchitectureLabel from '@kubevirt-utils/components/ArchitectureLabel/ArchitectureLabel';
+import TemplateCPUMemoryDisplay from '@kubevirt-utils/components/TemplateCPUMemoryDisplay/TemplateCPUMemoryDisplay';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getAnnotation, getName, getUID } from '@kubevirt-utils/resources/shared';
 import {
@@ -11,12 +12,10 @@ import {
   getTemplateName,
   type Template,
 } from '@kubevirt-utils/resources/template';
-import useTemplateCPUMemoryDisplayValue from '@kubevirt-utils/resources/template/hooks/useTemplateCPUMemoryDisplayValue';
 import { getTemplateBootSourceType } from '@kubevirt-utils/resources/template/hooks/useVmTemplateSource/utils';
 import { getVMBootSourceLabel } from '@kubevirt-utils/resources/vm/utils/source';
 import { ARCHITECTURE_ID, getArchitecture } from '@kubevirt-utils/utils/architecture';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { getCluster } from '@multicluster/helpers/selectors';
 import { Content, ContentVariants, Flex, FlexItem, Label } from '@patternfly/react-core';
 import { Tr } from '@patternfly/react-table';
 import { getTemplateOSIcon } from '@virtualmachines/wizard/utils/os-icons/os-icons';
@@ -28,7 +27,6 @@ type TemplatesTableRowProps = {
   activeColumnIDs: string[];
   availableDatasources: Record<string, V1beta1DataSource>;
   availableTemplatesUID: Set<string>;
-  catalogNamespace?: string;
   clusterPreference: null | V1beta1VirtualMachineClusterPreference;
   onSelectTemplate: (template: Template) => void;
   selectedTemplate?: Template;
@@ -39,7 +37,6 @@ const TemplatesTableRow: FC<TemplatesTableRowProps> = ({
   activeColumnIDs,
   availableDatasources,
   availableTemplatesUID,
-  catalogNamespace,
   clusterPreference,
   onSelectTemplate,
   selectedTemplate,
@@ -59,11 +56,6 @@ const TemplatesTableRow: FC<TemplatesTableRowProps> = ({
     sourceRef?.namespace && sourceRef?.name
       ? availableDatasources[`${sourceRef.namespace}-${sourceRef.name}`]
       : undefined;
-
-  const { cpuMemoryText } = useTemplateCPUMemoryDisplayValue(template, {
-    cluster: getCluster(template),
-    namespace: catalogNamespace,
-  });
 
   return (
     <Tr
@@ -107,7 +99,9 @@ const TemplatesTableRow: FC<TemplatesTableRowProps> = ({
         />
       </TemplatesTableRowCell>
       <TemplatesTableRowCell activeColumnIDs={activeColumnIDs} id="cpu-memory" width={20}>
-        <span data-test={`template-cpu-memory-${templateName}`}>{cpuMemoryText}</span>
+        <span data-test={`template-cpu-memory-${templateName}`}>
+          <TemplateCPUMemoryDisplay template={template} />
+        </span>
       </TemplatesTableRowCell>
     </Tr>
   );

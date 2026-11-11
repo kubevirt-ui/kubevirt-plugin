@@ -2,6 +2,7 @@ import { type FC, memo } from 'react';
 
 import { type V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import DeprecatedBadge from '@kubevirt-utils/components/badges/DeprecatedBadge/DeprecatedBadge';
+import TemplateCPUMemoryDisplay from '@kubevirt-utils/components/TemplateCPUMemoryDisplay/TemplateCPUMemoryDisplay';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName, getNamespace, getUID } from '@kubevirt-utils/resources/shared';
 import {
@@ -10,9 +11,7 @@ import {
   isVirtualMachineTemplate,
   type Template,
 } from '@kubevirt-utils/resources/template';
-import useTemplateCPUMemoryDisplayValue from '@kubevirt-utils/resources/template/hooks/useTemplateCPUMemoryDisplayValue';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm';
-import { getCluster } from '@multicluster/helpers/selectors';
 import {
   Badge,
   Card,
@@ -30,7 +29,6 @@ import { getTemplateOSIcon } from '@virtualmachines/wizard/utils/os-icons/os-ico
 import './TemplatesCatalogTile.scss';
 
 export type TemplatesCatalogTileProps = {
-  catalogNamespace?: string;
   clusterPreference: null | V1beta1VirtualMachineClusterPreference;
   isSelected?: boolean;
   onClick: (template: Template) => void;
@@ -39,17 +37,12 @@ export type TemplatesCatalogTileProps = {
 };
 
 const TemplatesCatalogTile: FC<TemplatesCatalogTileProps> = memo(
-  ({ catalogNamespace, clusterPreference, isSelected, onClick, osDisplayNames, template }) => {
+  ({ clusterPreference, isSelected, onClick, osDisplayNames, template }) => {
     const { t } = useKubevirtTranslation();
 
     const isDeprecated = isDeprecatedTemplate(template);
     const templateID = getUID(template);
     const templateName = getName(template);
-    const { cpuMemoryText } = useTemplateCPUMemoryDisplayValue(template, {
-      cluster: getCluster(template),
-      customFormat: (cpu, memory) => t('{{cpu}} | {{memory}}', { cpu, memory }),
-      namespace: catalogNamespace,
-    });
     const architecture = getTemplateArchitecture(template);
     const osName = getTemplateOSName(template, clusterPreference, osDisplayNames) ?? NO_DATA_DASH;
     const icon = getTemplateOSIcon(template, clusterPreference);
@@ -120,7 +113,13 @@ const TemplatesCatalogTile: FC<TemplatesCatalogTileProps> = memo(
                   <b>{t('OS')}</b> {osName}
                 </StackItem>
                 <StackItem>
-                  <b>{t('vCPU | Memory')}</b> {cpuMemoryText}
+                  <b>{t('vCPU | Memory')}</b>{' '}
+                  <TemplateCPUMemoryDisplay
+                    options={{
+                      customFormat: (cpu, memory) => t('{{cpu}} | {{memory}}', { cpu, memory }),
+                    }}
+                    template={template}
+                  />
                 </StackItem>
               </Stack>
             </StackItem>

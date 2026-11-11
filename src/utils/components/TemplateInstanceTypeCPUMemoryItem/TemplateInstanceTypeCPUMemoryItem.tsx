@@ -17,22 +17,18 @@ import { useTemplateInstanceTypeCPUMemory } from './hooks/useTemplateInstanceTyp
 import TemplateInstanceTypeCPUMemoryDescription from './TemplateInstanceTypeCPUMemoryDescription';
 
 type TemplateInstanceTypeCPUMemoryItemProps = {
-  cluster?: string;
   editable?: boolean;
-  namespace?: string;
   template: Template;
 };
 
 const TemplateInstanceTypeCPUMemoryItem: FC<TemplateInstanceTypeCPUMemoryItemProps> = ({
-  cluster,
   editable = false,
-  namespace,
   template,
 }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const { allInstanceTypes, cpuMemoryText, instanceType, instanceTypesLoaded, vm } =
-    useTemplateInstanceTypeCPUMemory(template, { cluster, namespace });
+    useTemplateInstanceTypeCPUMemory(template);
 
   const subTitle = instanceType
     ? getAnnotation(instanceType, INSTANCETYPE_CLASS_DISPLAY_NAME)

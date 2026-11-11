@@ -13,11 +13,6 @@ import {
 } from '@kubevirt-utils/resources/template';
 import { getCluster } from '@multicluster/helpers/selectors';
 
-type UseTemplateInstanceTypeCPUMemoryOptions = {
-  cluster?: string;
-  namespace?: string;
-};
-
 type UseTemplateInstanceTypeCPUMemoryReturn = {
   allInstanceTypes: InstanceTypeUnion[];
   cpuMemoryText: string | undefined;
@@ -28,16 +23,13 @@ type UseTemplateInstanceTypeCPUMemoryReturn = {
 
 export const useTemplateInstanceTypeCPUMemory = (
   template: Template,
-  options?: UseTemplateInstanceTypeCPUMemoryOptions,
 ): UseTemplateInstanceTypeCPUMemoryReturn => {
   const { t } = useKubevirtTranslation();
   const vm = getTemplateVirtualMachineObject(template);
-  const namespace = options?.namespace ?? getNamespace(vm);
-  const cluster = options?.cluster ?? getCluster(template);
 
   const { allInstanceTypes, loaded: instanceTypesLoaded } = useInstanceTypesAndPreferences(
-    namespace,
-    cluster,
+    getNamespace(template),
+    getCluster(template),
   );
 
   const instanceType = useMemo(

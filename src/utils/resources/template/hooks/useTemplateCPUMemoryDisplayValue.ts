@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 
+import useInstanceTypesAndPreferences from '@kubevirt-utils/hooks/useInstanceTypesAndPreferences';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { type CPUMemoryDisplayValue } from '@kubevirt-utils/resources/vm';
@@ -9,31 +10,30 @@ import {
   getTemplateCPUMemoryDisplayValue,
   type TemplateCPUMemoryDisplayOptions,
 } from '../utils/flavor';
+import { isTemplateWithInstanceType } from '../utils/templateInstanceType';
 import { type Template } from '../utils/types';
-import useTemplatePageInstanceTypes from './useTemplatePageInstanceTypes';
 
-export type UseTemplateCPUMemoryDisplayOptions = Omit<
+export type UseTemplateCPUMemoryDisplayOptions = Pick<
   TemplateCPUMemoryDisplayOptions,
-  'instanceTypes'
-> & {
-  /** ACM cluster for the template; defaults to the template's cluster when omitted. */
-  cluster?: string;
-  /** Watch scope for instance types (list page namespace). Defaults to template namespace when omitted. */
-  namespace?: string;
+  'customFormat'
+>;
+
+export type UseTemplateCPUMemoryDisplayResult = CPUMemoryDisplayValue & {
+  /** False while instance types are loading for templates that reference an instance type. */
+  instanceTypesLoaded: boolean;
 };
 
 const useTemplateCPUMemoryDisplayValue = (
   template: Template,
   options?: UseTemplateCPUMemoryDisplayOptions,
-): CPUMemoryDisplayValue => {
+): UseTemplateCPUMemoryDisplayResult => {
   const { t } = useKubevirtTranslation();
-  const { cluster: clusterOption, customFormat, namespace: namespaceOption } = options ?? {};
-  const instanceTypes = useTemplatePageInstanceTypes(
-    namespaceOption ?? getNamespace(template),
-    clusterOption ?? getCluster(template),
-  );
+  const { customFormat } = options ?? {};
+  const needsInstanceTypes = isTemplateWithInstanceType(template);
+  const { allInstanceTypes: instanceTypes, loaded: instanceTypesLoaded } =
+    useInstanceTypesAndPreferences(getNamespace(template), getCluster(template));
 
-  return useMemo(
+  const display = useMemo(
     () =>
       getTemplateCPUMemoryDisplayValue(template, t, {
         customFormat,
@@ -41,6 +41,11 @@ const useTemplateCPUMemoryDisplayValue = (
       }),
     [template, t, customFormat, instanceTypes],
   );
+
+  return {
+    ...display,
+    instanceTypesLoaded: !needsInstanceTypes || instanceTypesLoaded,
+  };
 };
 
 export default useTemplateCPUMemoryDisplayValue;

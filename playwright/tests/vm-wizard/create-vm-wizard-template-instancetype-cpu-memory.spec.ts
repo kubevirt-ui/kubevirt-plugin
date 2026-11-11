@@ -44,7 +44,6 @@ test.describe(
         instancetype: {
           kind: 'VirtualMachineInstancetype',
           name: instanceTypeName,
-          namespace: wizardNs,
         },
       };
 

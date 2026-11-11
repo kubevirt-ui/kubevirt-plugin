@@ -10,7 +10,6 @@ import NetworksReviewTable from '@kubevirt-utils/components/NetworksReviewTable/
 import TemplateInstanceTypeCPUMemoryItem from '@kubevirt-utils/components/TemplateInstanceTypeCPUMemoryItem/TemplateInstanceTypeCPUMemoryItem';
 import useIsIPv6SingleStackCluster from '@kubevirt-utils/hooks/useIPStackType/useIsIPv6SingleStackCluster';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getNamespace } from '@kubevirt-utils/resources/shared';
 import { WORKLOADS_LABELS } from '@kubevirt-utils/resources/template/utils/constants';
 import { getTemplateCategoryDisplay } from '@kubevirt-utils/resources/template/utils/getTemplateCategoryDisplay';
 import {
@@ -41,9 +40,6 @@ const TemplateInfoSection: FC = memo(() => {
   const isIPv6SingleStack = useIsIPv6SingleStackCluster(cluster);
   const { clusterPreference, osDisplayNames, template, vm } = useDrawerContext();
   const [disks] = useWizardDisksTableData(vm);
-  const project = useWatch({ control, name: 'deployment.project' });
-  const instanceTypeNamespace = getNamespace(vm) ?? project;
-
   const notAvailable = t('N/A');
   const description = getTemplateDescription(template) || notAvailable;
   const isVMTemplate = isVirtualMachineTemplate(template);
@@ -75,11 +71,7 @@ const TemplateInfoSection: FC = memo(() => {
         descriptionHeader={t('Description')}
       />
       {isTemplateWithInstanceType(template) ? (
-        <TemplateInstanceTypeCPUMemoryItem
-          cluster={cluster}
-          namespace={instanceTypeNamespace}
-          template={template}
-        />
+        <TemplateInstanceTypeCPUMemoryItem template={template} />
       ) : (
         <DescriptionItem
           bodyContent={<CPUDescription cpu={getCPU(vm)} />}
