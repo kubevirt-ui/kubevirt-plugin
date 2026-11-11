@@ -136,6 +136,7 @@ export const getTemplateColumns = (
     },
     {
       additional: true,
+      // Sort/export uses domain sizing; cells resolve instance types per template (per-row watch).
       getValue: (row) =>
         isVirtualMachineTemplateRequest(row)
           ? NO_DATA_DASH

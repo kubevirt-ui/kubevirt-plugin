@@ -7,6 +7,7 @@ import { getCPUMemoryTitle } from '@kubevirt-utils/components/CPUMemory/utils';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import DisksReviewTable from '@kubevirt-utils/components/DisksReviewTable/DisksReviewTable';
 import NetworksReviewTable from '@kubevirt-utils/components/NetworksReviewTable/NetworksReviewTable';
+import TemplateInstanceTypeCPUMemoryItem from '@kubevirt-utils/components/TemplateInstanceTypeCPUMemoryItem/TemplateInstanceTypeCPUMemoryItem';
 import useIsIPv6SingleStackCluster from '@kubevirt-utils/hooks/useIPStackType/useIsIPv6SingleStackCluster';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { WORKLOADS_LABELS } from '@kubevirt-utils/resources/template/utils/constants';
@@ -18,6 +19,7 @@ import {
   getTemplateWorkload,
   isDefaultVariantTemplate,
 } from '@kubevirt-utils/resources/template/utils/selectors';
+import { isTemplateWithInstanceType } from '@kubevirt-utils/resources/template/utils/templateInstanceType';
 import { isVirtualMachineTemplate } from '@kubevirt-utils/resources/template/utils/types';
 import { getCPU } from '@kubevirt-utils/resources/vm';
 import { networksHavePodNetwork } from '@kubevirt-utils/resources/vm/utils/network/utils';
@@ -38,7 +40,6 @@ const TemplateInfoSection: FC = memo(() => {
   const isIPv6SingleStack = useIsIPv6SingleStackCluster(cluster);
   const { clusterPreference, osDisplayNames, template, vm } = useDrawerContext();
   const [disks] = useWizardDisksTableData(vm);
-
   const notAvailable = t('N/A');
   const description = getTemplateDescription(template) || notAvailable;
   const isVMTemplate = isVirtualMachineTemplate(template);
@@ -69,14 +70,18 @@ const TemplateInfoSection: FC = memo(() => {
         descriptionData={<TemplateExpandableDescription description={description} />}
         descriptionHeader={t('Description')}
       />
-      <DescriptionItem
-        bodyContent={<CPUDescription cpu={getCPU(vm)} />}
-        descriptionData={<CPUMemory vm={vm} />}
-        descriptionHeader={getCPUMemoryTitle(t)}
-        isPopover
-        olsObj={vm}
-        promptType={OLSPromptType.CPU_MEMORY}
-      />
+      {isTemplateWithInstanceType(template) ? (
+        <TemplateInstanceTypeCPUMemoryItem template={template} />
+      ) : (
+        <DescriptionItem
+          bodyContent={<CPUDescription cpu={getCPU(vm)} />}
+          descriptionData={<CPUMemory vm={vm} />}
+          descriptionHeader={getCPUMemoryTitle(t)}
+          isPopover
+          olsObj={vm}
+          promptType={OLSPromptType.CPU_MEMORY}
+        />
+      )}
       <TemplateBootSourceItem />
       <DescriptionItem
         descriptionData={<NetworksReviewTable interfaces={interfaces} networks={networks} />}

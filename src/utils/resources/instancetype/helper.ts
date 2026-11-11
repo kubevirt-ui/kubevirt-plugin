@@ -23,7 +23,7 @@ export const getInstanceTypeModelFromMatcher = (
 ): K8sModel => {
   if (isEmpty(instanceTypeMatcher?.kind)) return VirtualMachineClusterInstancetypeModel;
 
-  return instanceTypeMatcher.kind.includes('cluster')
+  return instanceTypeMatcher.kind.toLowerCase().includes('cluster')
     ? VirtualMachineClusterInstancetypeModel
     : VirtualMachineInstancetypeModel;
 };

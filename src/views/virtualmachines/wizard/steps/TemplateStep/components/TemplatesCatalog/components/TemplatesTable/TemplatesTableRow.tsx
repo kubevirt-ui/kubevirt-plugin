@@ -3,12 +3,12 @@ import { type FC } from 'react';
 import { type V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import { type V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import ArchitectureLabel from '@kubevirt-utils/components/ArchitectureLabel/ArchitectureLabel';
+import TemplateCPUMemoryDisplay from '@kubevirt-utils/components/TemplateCPUMemoryDisplay/TemplateCPUMemoryDisplay';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getAnnotation, getName, getUID } from '@kubevirt-utils/resources/shared';
 import {
   ANNOTATIONS,
   getTemplateCategoryDisplay,
-  getTemplateCPUMemoryDisplayValue,
   getTemplateName,
   type Template,
 } from '@kubevirt-utils/resources/template';
@@ -57,8 +57,6 @@ const TemplatesTableRow: FC<TemplatesTableRowProps> = ({
       ? availableDatasources[`${sourceRef.namespace}-${sourceRef.name}`]
       : undefined;
 
-  const { cpuMemoryText } = getTemplateCPUMemoryDisplayValue(template, t);
-
   return (
     <Tr
       data-test={`template-row-${templateName}`}
@@ -101,7 +99,9 @@ const TemplatesTableRow: FC<TemplatesTableRowProps> = ({
         />
       </TemplatesTableRowCell>
       <TemplatesTableRowCell activeColumnIDs={activeColumnIDs} id="cpu-memory" width={20}>
-        <span data-test={`template-cpu-memory-${templateName}`}>{cpuMemoryText}</span>
+        <span data-test={`template-cpu-memory-${templateName}`}>
+          <TemplateCPUMemoryDisplay template={template} />
+        </span>
       </TemplatesTableRowCell>
     </Tr>
   );

@@ -2,11 +2,11 @@ import { type FC, memo } from 'react';
 
 import { type V1beta1VirtualMachineClusterPreference } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import DeprecatedBadge from '@kubevirt-utils/components/badges/DeprecatedBadge/DeprecatedBadge';
+import TemplateCPUMemoryDisplay from '@kubevirt-utils/components/TemplateCPUMemoryDisplay/TemplateCPUMemoryDisplay';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName, getNamespace, getUID } from '@kubevirt-utils/resources/shared';
 import {
   getTemplateCategoryDisplay,
-  getTemplateCPUMemoryDisplayValue,
   isDeprecatedTemplate,
   isVirtualMachineTemplate,
   type Template,
@@ -43,9 +43,6 @@ const TemplatesCatalogTile: FC<TemplatesCatalogTileProps> = memo(
     const isDeprecated = isDeprecatedTemplate(template);
     const templateID = getUID(template);
     const templateName = getName(template);
-    const { cpuMemoryText } = getTemplateCPUMemoryDisplayValue(template, t, {
-      customFormat: (cpu, memory) => t('{{cpu}} | {{memory}}', { cpu, memory }),
-    });
     const architecture = getTemplateArchitecture(template);
     const osName = getTemplateOSName(template, clusterPreference, osDisplayNames) ?? NO_DATA_DASH;
     const icon = getTemplateOSIcon(template, clusterPreference);
@@ -116,7 +113,13 @@ const TemplatesCatalogTile: FC<TemplatesCatalogTileProps> = memo(
                   <b>{t('OS')}</b> {osName}
                 </StackItem>
                 <StackItem>
-                  <b>{t('vCPU | Memory')}</b> {cpuMemoryText}
+                  <b>{t('vCPU | Memory')}</b>{' '}
+                  <TemplateCPUMemoryDisplay
+                    options={{
+                      customFormat: (cpu, memory) => t('{{cpu}} | {{memory}}', { cpu, memory }),
+                    }}
+                    template={template}
+                  />
                 </StackItem>
               </Stack>
             </StackItem>

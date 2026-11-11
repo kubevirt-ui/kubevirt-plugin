@@ -1,9 +1,15 @@
 import produce from 'immer';
 
+import {
+  VirtualMachineClusterInstancetypeModel,
+  VirtualMachineInstancetypeModel,
+} from '@kubevirt-ui-ext/kubevirt-api/console';
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { getInstanceTypeModelFromMatcher } from '@kubevirt-utils/resources/instancetype/helper';
 import { type InstanceTypeUnion } from '@kubevirt-utils/resources/instancetype/types';
-import { getName } from '@kubevirt-utils/resources/shared';
+import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { getInstanceTypeMatcher } from '@kubevirt-utils/resources/vm';
+import { getCluster } from '@multicluster/helpers/selectors';
 
 import { updateTemplate } from './helpers';
 import { extractParameterName } from './parameters';
@@ -35,9 +41,73 @@ export const getResolvedInstanceTypeName = (template: Template): string | undefi
   return getParameters(template)?.find((param) => param.name === paramName)?.value;
 };
 
+const matchesTemplateCluster = (template: Template, instanceType: InstanceTypeUnion): boolean => {
+  const templateCluster = getCluster(template);
+  if (!templateCluster) {
+    return true;
+  }
+
+  return getCluster(instanceType) === templateCluster;
+};
+
+/** Resolves the instance type CR referenced by a template (cluster or namespaced). */
+export const findInstanceTypeForTemplate = (
+  template: Template,
+  instanceTypes: InstanceTypeUnion[],
+): InstanceTypeUnion | undefined => {
+  if (!isTemplateWithInstanceType(template)) {
+    return undefined;
+  }
+
+  const vm = getTemplateVirtualMachineObject(template);
+  const matcher = getInstanceTypeMatcher(vm);
+  const resolvedName = getResolvedInstanceTypeName(template);
+
+  if (!matcher || !resolvedName) {
+    return undefined;
+  }
+
+  const instanceTypeModel = getInstanceTypeModelFromMatcher(matcher);
+
+  if (instanceTypeModel.kind === VirtualMachineInstancetypeModel.kind) {
+    const namespace = getNamespace(template);
+
+    return instanceTypes.find(
+      (instanceType) =>
+        instanceType.kind === VirtualMachineInstancetypeModel.kind &&
+        getName(instanceType) === resolvedName &&
+        getNamespace(instanceType) === namespace &&
+        matchesTemplateCluster(template, instanceType),
+    );
+  }
+
+  return instanceTypes.find(
+    (instanceType) =>
+      instanceType.kind === VirtualMachineClusterInstancetypeModel.kind &&
+      getName(instanceType) === resolvedName &&
+      matchesTemplateCluster(template, instanceType),
+  );
+};
+
+const updateTemplateInstanceTypeMatcher = (
+  draftVM: V1VirtualMachine | undefined,
+  matcherName: string | undefined,
+  instanceType: InstanceTypeUnion,
+): void => {
+  if (!draftVM?.spec?.instancetype || !matcherName) {
+    return;
+  }
+
+  draftVM.spec.instancetype = {
+    ...draftVM.spec.instancetype,
+    kind: instanceType.kind,
+    name: matcherName,
+  };
+};
+
 /**
  * Creates an onSubmit handler for the InstanceTypeModal that updates the template parameter
- * (or direct instancetype name) when the user selects a new cluster instancetype.
+ * (or direct instancetype name) and matcher kind when the user selects an instance type.
  */
 export const createTemplateInstanceTypeSubmit =
   (template: Template) =>
@@ -49,18 +119,18 @@ export const createTemplateInstanceTypeSubmit =
     const newName = getName(instanceType);
 
     const updatedTemplate = produce(template, (draft) => {
+      const draftVM = getTemplateVirtualMachineObject(draft);
+
       if (paramName) {
         const param = getParameters(draft)?.find((par) => par.name === paramName);
         if (param) {
           param.value = newName;
         }
+        updateTemplateInstanceTypeMatcher(draftVM, rawName, instanceType);
         return;
       }
 
-      const draftVM = getTemplateVirtualMachineObject(draft);
-      if (draftVM?.spec?.instancetype) {
-        draftVM.spec.instancetype.name = newName;
-      }
+      updateTemplateInstanceTypeMatcher(draftVM, newName, instanceType);
     });
 
     await updateTemplate(updatedTemplate);
