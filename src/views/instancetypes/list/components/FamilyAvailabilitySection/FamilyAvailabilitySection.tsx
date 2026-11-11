@@ -56,7 +56,7 @@ const FamilyAvailabilitySection: FC = () => {
       helpTextContent={familyAvailabilityHelpText}
       id={FAMILY_AVAILABILITY_SECTION_ID}
       isIndented
-      toggleClassname="ExpandSection family-availability-section__toggle"
+      toggleClassname="ExpandSection"
       toggleContent={
         <Flex alignItems={{ default: 'alignItemsCenter' }} gap={{ default: 'gapSm' }}>
           <span>{t('Family availability')}</span>

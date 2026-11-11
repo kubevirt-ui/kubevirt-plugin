@@ -1,6 +1,8 @@
+import { useEffect } from 'react';
 import { useWatch } from 'react-hook-form';
 
 import { type PreferenceOption } from '@kubevirt-utils/components/AddBootableVolumeModal/types';
+import { getInstanceTypeFromVolume } from '@kubevirt-utils/components/AddBootableVolumeModal/utils';
 import useDisabledInstanceTypeFamilies from '@kubevirt-utils/hooks/useInstanceTypeFamilyAvailability/useDisabledInstanceTypeFamilies';
 import useCanCreateBootableVolume from '@kubevirt-utils/resources/bootableresources/hooks/useCanCreateBootableVolume';
 import { type BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
@@ -31,14 +33,52 @@ const useAddBootableVolume = (): AddBootableVolume => {
       'instanceType.preference',
     ],
   });
-  const { isFamilyVisible } = useDisabledInstanceTypeFamilies(cluster);
+  const { isFamilyVisible, loaded: familiesLoaded } = useDisabledInstanceTypeFamilies(cluster);
 
   const { canCreateDS, canCreatePVC } = useCanCreateBootableVolume(volumeListNamespace);
   const canCreate = canCreateDS || canCreatePVC;
 
   const applyBootableVolume: OnSelectBootableVolume = (args) => {
-    applySelectedBootableVolumeToForm({ ...args, isFamilyVisible, setValue });
+    applySelectedBootableVolumeToForm({
+      ...args,
+      familiesLoaded,
+      isFamilyVisible,
+      setValue,
+    });
   };
+
+  useEffect(() => {
+    if (!familiesLoaded) {
+      return;
+    }
+
+    const bootVolume = getValues('instanceType.bootVolume');
+    if (!bootVolume?.volume) {
+      return;
+    }
+
+    const instanceTypeName = getInstanceTypeFromVolume(bootVolume.volume) ?? '';
+    const [series = '', size = ''] = instanceTypeName.split('.');
+    if (!series || !size) {
+      return;
+    }
+
+    const compute = getValues('instanceType.compute');
+    const computeMatchesVolume = compute?.name === instanceTypeName;
+    if (compute && !computeMatchesVolume) {
+      return;
+    }
+
+    applySelectedBootableVolumeToForm({
+      dvSource: bootVolume.dataVolumeSource,
+      familiesLoaded: true,
+      isFamilyVisible,
+      pvcSource: bootVolume.persistentVolumeClaimSource,
+      selectedVolume: bootVolume.volume,
+      setValue,
+      volumeSnapshotSource: bootVolume.volumeSnapshotSource,
+    });
+  }, [familiesLoaded, getValues, isFamilyVisible, setValue]);
 
   const onCreateVolume = (volume: BootableVolume): void => {
     applyBootableVolume({

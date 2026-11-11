@@ -64,6 +64,7 @@ export const isInstanceTypeCreationMethod = (creationMethod: VMCreationMethod): 
 
 export const applySelectedBootableVolumeToForm = ({
   dvSource,
+  familiesLoaded,
   isFamilyVisible,
   preferenceRef,
   pvcSource,
@@ -73,7 +74,7 @@ export const applySelectedBootableVolumeToForm = ({
 }: ApplySelectedBootableVolumeToForm): void => {
   const name = getInstanceTypeFromVolume(selectedVolume) ?? '';
   const [series = '', size = ''] = name.split('.');
-  const isSeriesVisible = !series || (isFamilyVisible?.(series) ?? true);
+  const isSeriesVisible = familiesLoaded === false ? false : (isFamilyVisible?.(series) ?? true);
 
   setValue(
     'instanceType.bootVolume',

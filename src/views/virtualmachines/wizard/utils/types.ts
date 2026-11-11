@@ -81,6 +81,7 @@ export type BootVolumeTableRow = {
 
 export type ApplySelectedBootableVolumeToForm = {
   dvSource: null | V1beta1DataVolume;
+  familiesLoaded?: boolean;
   isFamilyVisible?: (series: string) => boolean;
   preferenceRef?: PreferenceRef;
   pvcSource: IoK8sApiCoreV1PersistentVolumeClaim | null;
