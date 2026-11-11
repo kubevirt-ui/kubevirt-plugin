@@ -91,7 +91,14 @@ export hco_cr_is_created="false"
 for i in {1..20}
 do
   echo "Attempt ${i}/20"
-  if oc apply -f ./cypress/fixtures/hco.yaml; then
+  if oc apply -f - <<'EOF'
+apiVersion: hco.kubevirt.io/v1beta1
+kind: HyperConverged
+metadata:
+  name: kubevirt-hyperconverged
+spec: {}
+EOF
+  then
     echo "HCO cr is created"
     export hco_cr_is_created="true"
     break
