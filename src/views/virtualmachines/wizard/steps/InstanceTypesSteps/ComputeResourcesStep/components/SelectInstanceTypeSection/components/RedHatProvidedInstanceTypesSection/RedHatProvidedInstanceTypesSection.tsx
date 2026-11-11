@@ -6,7 +6,6 @@ import { Stack, StackItem } from '@patternfly/react-core';
 import { useVMWizardForm } from '@virtualmachines/wizard/form/VMWizardFormProvider';
 import InstanceTypeSizeMenu from '@virtualmachines/wizard/steps/InstanceTypesSteps/ComputeResourcesStep/components/SelectInstanceTypeSection/components/RedHatProvidedInstanceTypesSection/components/InstanceTypeSizeMenu/InstanceTypeSizeMenu';
 import RedHatInstanceTypeSeriesGallery from '@virtualmachines/wizard/steps/InstanceTypesSteps/ComputeResourcesStep/components/SelectInstanceTypeSection/components/RedHatProvidedInstanceTypesSection/components/RedHatInstanceTypeSeriesGallery/RedHatInstanceTypeSeriesGallery';
-import useEnsureAvailableRedHatComputeSelection from '@virtualmachines/wizard/steps/InstanceTypesSteps/ComputeResourcesStep/hooks/useEnsureAvailableRedHatComputeSelection';
 
 type RedHatProvidedInstanceTypesSectionProps = {
   cluster?: string;
@@ -19,8 +18,6 @@ const RedHatProvidedInstanceTypesSection: FC<RedHatProvidedInstanceTypesSectionP
 }) => {
   const { control } = useVMWizardForm();
   const selectedSeries = useWatch({ control, name: 'instanceType.compute.series' });
-
-  useEnsureAvailableRedHatComputeSelection(cluster);
 
   const sizes = redHatMenuItems?.items?.find((item) => item?.seriesName === selectedSeries)?.sizes;
 

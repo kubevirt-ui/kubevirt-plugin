@@ -52,6 +52,7 @@ const FamilyAvailabilitySection: FC = () => {
     <ExpandSectionWithCustomToggle
       className="family-availability-section"
       expandSectionClassName="family-availability-section__content"
+      helpTextBesideToggle
       helpTextContent={familyAvailabilityHelpText}
       id={FAMILY_AVAILABILITY_SECTION_ID}
       isIndented

@@ -88,6 +88,7 @@ const mergeSeries = (items: InstanceTypeSeries[], newSeries: InstanceTypeSeries)
   }
 };
 
+// Copy the shared menu so items pushed for one list do not remain on the next call.
 const createInstanceTypeMenuItems = (): InstanceTypesMenuItemsData => ({
   redHatProvided: { ...initialMenuItems.redHatProvided, items: [] },
   userProvided: { ...initialMenuItems.userProvided, items: [] },

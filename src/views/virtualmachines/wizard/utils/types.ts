@@ -81,6 +81,7 @@ export type BootVolumeTableRow = {
 
 export type ApplySelectedBootableVolumeToForm = {
   dvSource: null | V1beta1DataVolume;
+  isFamilyVisible?: (series: string) => boolean;
   preferenceRef?: PreferenceRef;
   pvcSource: IoK8sApiCoreV1PersistentVolumeClaim | null;
   selectedVolume: BootableVolume;
@@ -89,7 +90,7 @@ export type ApplySelectedBootableVolumeToForm = {
 };
 
 export type OnSelectBootableVolume = (
-  args: Omit<ApplySelectedBootableVolumeToForm, 'getValues' | 'setValue'>,
+  args: Omit<ApplySelectedBootableVolumeToForm, 'getValues' | 'isFamilyVisible' | 'setValue'>,
 ) => void;
 
 export type VMCreationMethodCardDetails = {

@@ -24,7 +24,6 @@ import {
 } from '@virtualmachines/wizard/components/BootableVolumeList/utils/utils';
 import { useVMWizardForm } from '@virtualmachines/wizard/form/VMWizardFormProvider';
 import { type OnSelectBootableVolume } from '@virtualmachines/wizard/utils/types';
-import { applySelectedBootableVolumeToForm } from '@virtualmachines/wizard/utils/utils';
 
 import AddBootableVolumeButton from './components/AddBootableVolumeButton';
 import useAddBootableVolume from './hooks/useAddBootableVolume';
@@ -67,7 +66,8 @@ const BootSourceStep: FC = () => {
     getValidNamespace(project),
     cluster,
   );
-  const { canCreate, lockedPreference, onCreateVolume, onUploadStart } = useAddBootableVolume();
+  const { applyBootableVolume, canCreate, lockedPreference, onCreateVolume, onUploadStart } =
+    useAddBootableVolume();
 
   const effectiveNamespace = getEffectiveVolumeNamespace(volumeListNamespace, canListAllNamespaces);
 
@@ -79,7 +79,7 @@ const BootSourceStep: FC = () => {
   );
 
   const onSelectBootableVolume: OnSelectBootableVolume = (args) => {
-    applySelectedBootableVolumeToForm({ ...args, setValue });
+    applyBootableVolume(args);
     logITFlowEvent(BOOTABLE_VOLUME_SELECTED, null, {
       selectedBootableVolume: getName(args.selectedVolume),
     });

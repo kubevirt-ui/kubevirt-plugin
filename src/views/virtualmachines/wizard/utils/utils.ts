@@ -64,6 +64,7 @@ export const isInstanceTypeCreationMethod = (creationMethod: VMCreationMethod): 
 
 export const applySelectedBootableVolumeToForm = ({
   dvSource,
+  isFamilyVisible,
   preferenceRef,
   pvcSource,
   selectedVolume,
@@ -72,6 +73,7 @@ export const applySelectedBootableVolumeToForm = ({
 }: ApplySelectedBootableVolumeToForm): void => {
   const name = getInstanceTypeFromVolume(selectedVolume) ?? '';
   const [series = '', size = ''] = name.split('.');
+  const isSeriesVisible = !series || (isFamilyVisible?.(series) ?? true);
 
   setValue(
     'instanceType.bootVolume',
@@ -84,9 +86,11 @@ export const applySelectedBootableVolumeToForm = ({
     },
     { shouldValidate: true },
   );
-  setValue('instanceType.compute', series && size ? { name, series, size, type: 'redhat' } : null, {
-    shouldValidate: true,
-  });
+  setValue(
+    'instanceType.compute',
+    series && size && isSeriesVisible ? { name, series, size, type: 'redhat' } : null,
+    { shouldValidate: true },
+  );
 
   const preferenceName = preferenceRef?.name ?? getLabel(selectedVolume, DEFAULT_PREFERENCE_LABEL);
   const preferenceKind =
