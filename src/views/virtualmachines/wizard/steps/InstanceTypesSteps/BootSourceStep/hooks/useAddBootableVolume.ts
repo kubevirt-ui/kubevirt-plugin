@@ -1,10 +1,14 @@
 import { useWatch } from 'react-hook-form';
 
-import { PreferenceOption } from '@kubevirt-utils/components/AddBootableVolumeModal/types';
+import { type PreferenceOption } from '@kubevirt-utils/components/AddBootableVolumeModal/types';
+import useDisabledInstanceTypeFamilies from '@kubevirt-utils/hooks/useInstanceTypeFamilyAvailability/useDisabledInstanceTypeFamilies';
 import useCanCreateBootableVolume from '@kubevirt-utils/resources/bootableresources/hooks/useCanCreateBootableVolume';
-import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
+import { type BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
-import { CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
+import {
+  CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA,
+  CREATE_VM_FORM_FIELDS_VM_DATA,
+} from '@virtualmachines/wizard/state/vm-wizard-form/consts';
 import { applySelectedBootableVolumeToForm } from '@virtualmachines/wizard/utils/utils';
 
 export type AddBootableVolume = {
@@ -16,21 +20,25 @@ export type AddBootableVolume = {
 const useAddBootableVolume = (): AddBootableVolume => {
   const { control, getValues, setValue } = useVMWizard();
 
-  const [volumeListNamespace, preference] = useWatch({
+  const [cluster, volumeListNamespace, preference] = useWatch({
     control,
     name: [
+      CREATE_VM_FORM_FIELDS_VM_DATA.CLUSTER,
       CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.VOLUME_LIST_NAMESPACE,
       CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.PREFERENCE,
     ],
   });
+  const { isFamilyVisible, loaded: familiesLoaded } = useDisabledInstanceTypeFamilies(cluster);
 
   const { canCreateDS, canCreatePVC } = useCanCreateBootableVolume(volumeListNamespace);
   const canCreate = canCreateDS || canCreatePVC;
 
-  const onCreateVolume = (volume: BootableVolume) =>
+  const onCreateVolume = (volume: BootableVolume): void =>
     applySelectedBootableVolumeToForm({
       dvSource: null,
+      familiesLoaded,
       getValues,
+      isFamilyVisible,
       pvcSource: null,
       selectedVolume: volume,
       setValue,
@@ -39,7 +47,7 @@ const useAddBootableVolume = (): AddBootableVolume => {
 
   return {
     canCreate,
-    lockedPreference: preference ?? undefined,
+    lockedPreference: preference as PreferenceOption | undefined,
     onCreateVolume,
   };
 };

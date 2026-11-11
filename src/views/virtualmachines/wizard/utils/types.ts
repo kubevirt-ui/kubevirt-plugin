@@ -1,7 +1,7 @@
-import { type TFunction } from 'i18next';
 import { type FC, type ReactNode } from 'react';
 import { type UseFormGetValues, type UseFormSetValue } from 'react-hook-form';
 import { type NavigateFunction } from 'react-router';
+import { type TFunction } from 'i18next';
 
 import {
   type V1beta1DataImportCron,
@@ -71,7 +71,9 @@ export type UseBootableVolumesValues = {
 
 export type ApplySelectedBootableVolumeToForm = {
   dvSource: null | V1beta1DataVolume;
+  familiesLoaded?: boolean;
   getValues: UseFormGetValues<VMWizardFormValues>;
+  isFamilyVisible?: (series: string) => boolean;
   pvcSource: IoK8sApiCoreV1PersistentVolumeClaim | null;
   selectedVolume: BootableVolume;
   setValue: UseFormSetValue<VMWizardFormValues>;
