@@ -12,6 +12,7 @@ import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import useSnapshots from '@kubevirt-utils/components/SelectSnapshot/useSnapshots';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getVolumeSnapshotSize } from '@kubevirt-utils/resources/bootableresources/selectors';
 import { convertResourceArrayToMap, getName } from '@kubevirt-utils/resources/shared';
 import { formatQuantityString } from '@kubevirt-utils/utils/units';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
@@ -71,7 +72,7 @@ const DiskSourceSnapshotVolumeSelectName: FC = () => {
             setSelected={(snapshotName) => {
               onChange(snapshotName);
               const selectedSnapshot = snapshotsMapper[snapshotName];
-              const selectedSnapshotSize = selectedSnapshot?.status?.restoreSize;
+              const selectedSnapshotSize = getVolumeSnapshotSize(selectedSnapshot);
               setValue(DISK_SIZE_FIELD, formatQuantityString(selectedSnapshotSize));
             }}
             toggleProps={{
