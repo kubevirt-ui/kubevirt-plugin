@@ -66,6 +66,17 @@ describe('wizard form mappings', () => {
       size: 'small',
       type: 'redhat',
     });
+    act(() =>
+      applySelectedBootableVolumeToForm({
+        ...result.current,
+        dvSource: null,
+        isFamilyVisible: (series) => series !== 'u1',
+        pvcSource: pvc,
+        selectedVolume: volume,
+        volumeSnapshotSource: null,
+      }),
+    );
+    expect(result.current.getValues('instanceType.compute')).toBeNull();
     act(() => resetBootableVolumeFields(result.current.setValue));
     expect(result.current.getValues('instanceType.bootVolume')).toBeNull();
     expect(result.current.getValues('instanceType.compute')).toBeNull();
