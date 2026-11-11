@@ -3,13 +3,13 @@ import type { Octokit } from '@octokit/rest';
 import { upsertComment } from '../github-comments';
 import { branchExists } from '../github-repo';
 import { type JiraClient } from '../jira-client';
+import { isListedInOwners } from '../validation/pr-path-validation/owners';
 import { extractVersionFromBranch, findMatchingFixVersion } from '../version-compare';
 import { extractTicketIds } from '../version-parse';
 
 import type { GitHubConfig, JiraVersion } from '../types/index';
 import { CLONE_COMMENT_MARKER, JIRA_PROJECT_KEY } from '../types/index';
 
-const ALLOWED_ASSOCIATIONS = new Set(['MEMBER', 'OWNER', 'COLLABORATOR']);
 const CLONE_CMD_REGEX = /^\/clone\s+(release-\d+\.\d+)\s*$/m;
 
 export type ValidatedCloneCommand = {
@@ -43,14 +43,21 @@ export const validateCloneCommand = async (
   prNumber: number,
   prTitle: string,
   commentBody: string,
-  commentAuthorAssociation: string,
+  commentAuthor: string,
 ): Promise<null | ValidatedCloneCommand> => {
-  if (!ALLOWED_ASSOCIATIONS.has(commentAuthorAssociation)) {
+  const trusted = await isListedInOwners(
+    octokit,
+    ghConfig.owner,
+    ghConfig.repo,
+    commentAuthor,
+    'OWNERS',
+  );
+  if (!trusted) {
     await postCloneError(
       octokit,
       ghConfig,
       prNumber,
-      'You do not have write access to use `/clone`.',
+      'Only root OWNERS approvers can use `/clone`.',
     );
     return null;
   }

@@ -5,10 +5,10 @@
 import type { Octokit } from '@octokit/rest';
 
 import { createOctokit, createStatusOctokit } from '../../github-repo';
+import { isListedInOwnersStrict as isRootOwnersMember } from '../../shared/owners';
 import type { GitHubConfig } from '../../types/index';
 import { requireEnv, safeErrorMessage, sameGitHubLogin } from '../../utils';
-import { isListedInOwners } from '../pr-path-validation/owners';
-import { isWriteCollaborator } from './collaborator-trust';
+import { isListedInOwners as isRootOwnersApprover } from '../pr-path-validation/owners';
 import { grantApprove, grantLgtm, revokeApprove, revokeLgtm } from './review-labels';
 
 export type ReviewSyncResult = 'applied' | 'revoked' | 'skipped';
@@ -39,16 +39,42 @@ export const syncLabelsFromReview = async (
     return 'skipped';
   }
 
-  const collaborator = await isWriteCollaborator(octokit, owner, repo, reviewAuthor);
-  if (!collaborator) {
+  let trusted: boolean;
+  try {
+    trusted = await isRootOwnersMember(contentsOctokit, owner, repo, reviewAuthor, 'OWNERS');
+  } catch (err) {
+    console.error(
+      `Could not verify ${reviewAuthor} against root OWNERS: ${safeErrorMessage(err)}.`,
+    );
+    if (reviewState === 'CHANGES_REQUESTED') {
+      // A lookup outage must not leave stale merge-enabling labels behind.
+      // Start both removals before awaiting so one failure cannot prevent the
+      // other removal from being attempted.
+      await Promise.all([
+        revokeLgtm(octokit, owner, repo, prNumber),
+        revokeApprove(octokit, owner, repo, prNumber),
+      ]);
+      console.warn(
+        `Removed lgtm and approved from PR #${prNumber} because root OWNERS could not be read for a Request-changes review by ${reviewAuthor}.`,
+      );
+    }
+    throw err;
+  }
+  if (!trusted) {
     console.log(
-      `${reviewAuthor} is not a write-access collaborator -- this review doesn't toggle lgtm/approved.`,
+      `${reviewAuthor} is not listed in root OWNERS -- this review doesn't toggle lgtm/approved.`,
     );
     return 'skipped';
   }
 
   // An OWNERS approver's review also grants/revokes approved (from main).
-  const isApprover = await isListedInOwners(contentsOctokit, owner, repo, reviewAuthor, 'OWNERS');
+  const isApprover = await isRootOwnersApprover(
+    contentsOctokit,
+    owner,
+    repo,
+    reviewAuthor,
+    'OWNERS',
+  );
 
   if (reviewState === 'APPROVED') {
     await grantLgtm(octokit, owner, repo, prNumber);

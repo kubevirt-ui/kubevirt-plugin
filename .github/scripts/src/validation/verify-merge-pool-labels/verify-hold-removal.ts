@@ -2,8 +2,8 @@ import type { Octokit } from '@octokit/rest';
 
 import { addLabel } from '../../github-comments';
 import { DO_NOT_MERGE_HOLD_LABEL } from '../../shared/merge-pool';
+import { isListedInOwners } from '../../shared/owners';
 import type { GitHubConfig } from '../../types/index';
-import { isWriteCollaborator } from '../commands/collaborator-trust';
 import { isTrustedBot } from '../pr-path-validation/owners';
 
 export type VerifyHoldRemovalContext = {
@@ -25,9 +25,9 @@ export const verifyMergePoolHoldRemoval = async (ctx: VerifyHoldRemovalContext):
     return;
   }
 
-  const trusted = await isWriteCollaborator(octokit, config.owner, config.repo, sender);
+  const trusted = await isListedInOwners(octokit, config.owner, config.repo, sender, 'OWNERS');
   if (trusted) {
-    console.log(`Hold removal by ${sender} — trusted (write collaborator).`);
+    console.log(`Hold removal by ${sender} — trusted (root OWNERS).`);
     return;
   }
 

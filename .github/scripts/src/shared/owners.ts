@@ -108,6 +108,40 @@ export const isListedInLocalOwners = (
 /**
  * Check whether a GitHub login is listed in OWNERS via the GitHub API.
  * Fetches the file from the default branch (secure -- PR can't self-approve).
+ * Lookup failures propagate so callers can distinguish them from nonmembership.
+ */
+export const isListedInOwnersStrict = async (
+  octokit: Octokit,
+  owner: string,
+  repo: string,
+  login: string,
+  ownersPath = 'OWNERS',
+  ref?: string,
+): Promise<boolean> => {
+  const { data } = await octokit.repos.getContent({
+    owner,
+    path: ownersPath,
+    repo,
+    ...(ref ? { ref } : {}),
+  });
+
+  if (!('content' in data) || !data.content) {
+    throw new Error(`GitHub returned no content for ${ownersPath}`);
+  }
+
+  const content = Buffer.from(data.content, 'base64').toString('utf8');
+  const owners = parseOwnersFile(content);
+  const lower = login.toLowerCase();
+  return (
+    owners.approvers.some((approver) => approver.toLowerCase() === lower) ||
+    owners.reviewers.some((reviewer) => reviewer.toLowerCase() === lower)
+  );
+};
+
+/**
+ * Fail-closed convenience wrapper for authorization grants. Callers that must
+ * distinguish nonmembership from lookup failure should use
+ * {@link isListedInOwnersStrict}.
  */
 export const isListedInOwners = async (
   octokit: Octokit,
@@ -118,23 +152,7 @@ export const isListedInOwners = async (
   ref?: string,
 ): Promise<boolean> => {
   try {
-    const { data } = await octokit.repos.getContent({
-      owner,
-      path: ownersPath,
-      repo,
-      ...(ref ? { ref } : {}),
-    });
-
-    if ('content' in data && data.content) {
-      const content = Buffer.from(data.content, 'base64').toString('utf8');
-      const owners = parseOwnersFile(content);
-      const lower = login.toLowerCase();
-      return (
-        owners.approvers.some((approver) => approver.toLowerCase() === lower) ||
-        owners.reviewers.some((reviewer) => reviewer.toLowerCase() === lower)
-      );
-    }
-    return false;
+    return await isListedInOwnersStrict(octokit, owner, repo, login, ownersPath, ref);
   } catch {
     return false;
   }

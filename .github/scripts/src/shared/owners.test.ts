@@ -4,8 +4,12 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, it } from 'node:test';
 
+import type { Octokit } from '@octokit/rest';
+
 import {
   getLocalOwnersPath,
+  isListedInOwners,
+  isListedInOwnersStrict,
   isListedInLocalOwners,
   parseOwnersFile,
   resolveTrustLogin,
@@ -70,6 +74,27 @@ describe('isListedInLocalOwners', () => {
 
   it('returns false when the OWNERS file is missing', () => {
     assert.equal(isListedInLocalOwners('alice', '/nonexistent/OWNERS'), false);
+  });
+});
+
+describe('GitHub OWNERS lookups', () => {
+  const failingOctokit = {
+    repos: {
+      getContent: async () => {
+        throw new Error('GitHub API unavailable');
+      },
+    },
+  } as unknown as Octokit;
+
+  it('strict lookup propagates API failures', async () => {
+    await assert.rejects(
+      () => isListedInOwnersStrict(failingOctokit, 'o', 'r', 'alice'),
+      /GitHub API unavailable/,
+    );
+  });
+
+  it('authorization wrapper converts API failures to false', async () => {
+    assert.equal(await isListedInOwners(failingOctokit, 'o', 'r', 'alice'), false);
   });
 });
 

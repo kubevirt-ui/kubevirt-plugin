@@ -6,16 +6,17 @@ import type { Octokit } from '@octokit/rest';
 import type { ReviewContext } from './lgtm';
 import { applyLgtm, cancelLgtm } from './lgtm';
 
-const OWNERS_CONTENT = ['approvers:', '  - alice-approver'].join('\n');
+const OWNERS_CONTENT = ['approvers:', '  - alice-approver', 'reviewers:', '  - bob-reviewer'].join(
+  '\n',
+);
 
 type Call = { args: unknown; method: string };
 
 type FakeOptions = {
   ownersContent?: null | string;
-  permission: null | string;
 };
 
-const fakeOctokit = ({ ownersContent = null, permission }: FakeOptions, calls: Call[]): Octokit =>
+const fakeOctokit = ({ ownersContent = null }: FakeOptions, calls: Call[]): Octokit =>
   ({
     actions: {
       createWorkflowDispatch: async (args: unknown) => {
@@ -54,11 +55,6 @@ const fakeOctokit = ({ ownersContent = null, permission }: FakeOptions, calls: C
       },
     },
     repos: {
-      getCollaboratorPermissionLevel: async (args: unknown) => {
-        calls.push({ args, method: 'getCollaboratorPermissionLevel' });
-        if (permission === null) throw new Error('Not Found');
-        return { data: { permission } };
-      },
       getContent: async (args: unknown) => {
         calls.push({ args, method: 'getContent' });
         if (ownersContent === null) throw new Error('Not Found');
@@ -83,8 +79,8 @@ const baseCtx = (octokit: Octokit, contentsOctokit: Octokit, author: string): Re
 describe('applyLgtm', () => {
   it('rejects the PR author lgtm-ing their own PR: reacts -1, adds no label, throws', async () => {
     const calls: Call[] = [];
-    const octokit = fakeOctokit({ permission: 'write' }, calls);
-    const contentsOctokit = fakeOctokit({ permission: 'write' }, calls);
+    const octokit = fakeOctokit({}, calls);
+    const contentsOctokit = fakeOctokit({}, calls);
 
     await assert.rejects(
       () => applyLgtm(baseCtx(octokit, contentsOctokit, 'pr-author')),
@@ -101,8 +97,8 @@ describe('applyLgtm', () => {
 
   it('rejects self-lgtm when author and prAuthor differ only by case', async () => {
     const calls: Call[] = [];
-    const octokit = fakeOctokit({ permission: 'write' }, calls);
-    const contentsOctokit = fakeOctokit({ permission: 'write' }, calls);
+    const octokit = fakeOctokit({}, calls);
+    const contentsOctokit = fakeOctokit({}, calls);
 
     await assert.rejects(
       () =>
@@ -121,10 +117,10 @@ describe('applyLgtm', () => {
     assert.equal((reaction?.args as { content: string }).content, '-1');
   });
 
-  it('rejects a non-collaborator: reacts -1, adds no label, throws', async () => {
+  it('rejects someone not listed in root OWNERS: reacts -1, adds no label, throws', async () => {
     const calls: Call[] = [];
-    const octokit = fakeOctokit({ permission: 'read' }, calls);
-    const contentsOctokit = fakeOctokit({ permission: 'read' }, calls);
+    const octokit = fakeOctokit({}, calls);
+    const contentsOctokit = fakeOctokit({ ownersContent: OWNERS_CONTENT }, calls);
 
     await assert.rejects(
       () => applyLgtm(baseCtx(octokit, contentsOctokit, 'random-contributor')),
@@ -137,15 +133,12 @@ describe('applyLgtm', () => {
     );
   });
 
-  it('grants lgtm only (not approved) for a write-collaborator who is not an OWNERS approver', async () => {
+  it('grants lgtm only (not approved) for a root OWNERS reviewer', async () => {
     const calls: Call[] = [];
-    const octokit = fakeOctokit({ permission: 'write' }, calls);
-    const contentsOctokit = fakeOctokit(
-      { ownersContent: OWNERS_CONTENT, permission: 'write' },
-      calls,
-    );
+    const octokit = fakeOctokit({}, calls);
+    const contentsOctokit = fakeOctokit({ ownersContent: OWNERS_CONTENT }, calls);
 
-    await applyLgtm(baseCtx(octokit, contentsOctokit, 'bob-collaborator'));
+    await applyLgtm(baseCtx(octokit, contentsOctokit, 'bob-reviewer'));
 
     const addLabelsCalls = calls.filter((c) => c.method === 'addLabels');
     assert.deepEqual(
@@ -156,13 +149,10 @@ describe('applyLgtm', () => {
     assert.equal((reaction?.args as { content: string }).content, '+1');
   });
 
-  it('lgtm-acts-as-approve: grants both lgtm and approved for a write-collaborator who is also a root-OWNERS approver', async () => {
+  it('lgtm-acts-as-approve: grants both lgtm and approved for a root OWNERS approver', async () => {
     const calls: Call[] = [];
-    const octokit = fakeOctokit({ permission: 'write' }, calls);
-    const contentsOctokit = fakeOctokit(
-      { ownersContent: OWNERS_CONTENT, permission: 'write' },
-      calls,
-    );
+    const octokit = fakeOctokit({}, calls);
+    const contentsOctokit = fakeOctokit({ ownersContent: OWNERS_CONTENT }, calls);
 
     await applyLgtm(baseCtx(octokit, contentsOctokit, 'alice-approver'));
 
@@ -181,15 +171,12 @@ describe('applyLgtm', () => {
     );
   });
 
-  it('does not bot-APPROVE or dispatch Auto Merge for a non-OWNERS /lgtm', async () => {
+  it('does not bot-APPROVE or dispatch Auto Merge for a root OWNERS reviewer', async () => {
     const calls: Call[] = [];
-    const octokit = fakeOctokit({ permission: 'write' }, calls);
-    const contentsOctokit = fakeOctokit(
-      { ownersContent: OWNERS_CONTENT, permission: 'write' },
-      calls,
-    );
+    const octokit = fakeOctokit({}, calls);
+    const contentsOctokit = fakeOctokit({ ownersContent: OWNERS_CONTENT }, calls);
 
-    await applyLgtm(baseCtx(octokit, contentsOctokit, 'bob-collaborator'));
+    await applyLgtm(baseCtx(octokit, contentsOctokit, 'bob-reviewer'));
 
     assert.equal(
       calls.some((c) => c.method === 'createReview'),
@@ -204,25 +191,30 @@ describe('applyLgtm', () => {
   it('reads OWNERS via contentsOctokit at the root OWNERS path, not .github/OWNERS', async () => {
     const calls: Call[] = [];
     const contentsCalls: Call[] = [];
-    const octokit = fakeOctokit({ permission: 'write' }, calls);
-    const contentsOctokit = fakeOctokit(
-      { ownersContent: OWNERS_CONTENT, permission: 'write' },
-      contentsCalls,
-    );
+    const octokit = fakeOctokit({}, calls);
+    const contentsOctokit = fakeOctokit({ ownersContent: OWNERS_CONTENT }, contentsCalls);
 
     await applyLgtm(baseCtx(octokit, contentsOctokit, 'alice-approver'));
 
-    const getContentCall = contentsCalls.find((c) => c.method === 'getContent');
-    assert.equal((getContentCall?.args as { path: string; ref: string }).path, 'OWNERS');
-    assert.equal((getContentCall?.args as { path: string; ref: string }).ref, 'main');
+    const getContentCalls = contentsCalls.filter((c) => c.method === 'getContent');
+    assert.deepEqual(
+      getContentCalls.map(({ args }) => {
+        const { path, ref } = args as { path: string; ref?: string };
+        return { path, ref };
+      }),
+      [
+        { path: 'OWNERS', ref: undefined },
+        { path: 'OWNERS', ref: 'main' },
+      ],
+    );
   });
 });
 
 describe('cancelLgtm', () => {
   it('allows the PR author to cancel their own lgtm, and revokes approved too', async () => {
     const calls: Call[] = [];
-    const octokit = fakeOctokit({ permission: null }, calls);
-    const contentsOctokit = fakeOctokit({ permission: null }, calls);
+    const octokit = fakeOctokit({}, calls);
+    const contentsOctokit = fakeOctokit({}, calls);
 
     await cancelLgtm(baseCtx(octokit, contentsOctokit, 'pr-author'));
 
@@ -232,12 +224,12 @@ describe('cancelLgtm', () => {
     assert.deepEqual(removed.sort(), ['approved', 'lgtm']);
   });
 
-  it('allows any write-access collaborator to cancel, and always revokes approved too -- approved must not outlive the lgtm that justified it just because a non-approver is the one cancelling', async () => {
+  it('allows a root OWNERS reviewer to cancel and always revokes approved too', async () => {
     const calls: Call[] = [];
-    const octokit = fakeOctokit({ permission: 'write' }, calls);
-    const contentsOctokit = fakeOctokit({ permission: 'write' }, calls);
+    const octokit = fakeOctokit({}, calls);
+    const contentsOctokit = fakeOctokit({ ownersContent: OWNERS_CONTENT }, calls);
 
-    await cancelLgtm(baseCtx(octokit, contentsOctokit, 'bob-collaborator'));
+    await cancelLgtm(baseCtx(octokit, contentsOctokit, 'bob-reviewer'));
 
     const removed = calls
       .filter((c) => c.method === 'removeLabel')
@@ -248,11 +240,8 @@ describe('cancelLgtm', () => {
   it('OWNERS cancel also revokes approved (mirrors lgtm-acts-as-approve)', async () => {
     const calls: Call[] = [];
     const contentsCalls: Call[] = [];
-    const octokit = fakeOctokit({ ownersContent: OWNERS_CONTENT, permission: 'write' }, calls);
-    const contentsOctokit = fakeOctokit(
-      { ownersContent: OWNERS_CONTENT, permission: 'write' },
-      contentsCalls,
-    );
+    const octokit = fakeOctokit({ ownersContent: OWNERS_CONTENT }, calls);
+    const contentsOctokit = fakeOctokit({ ownersContent: OWNERS_CONTENT }, contentsCalls);
 
     await cancelLgtm(baseCtx(octokit, contentsOctokit, 'alice-approver'));
 
@@ -262,10 +251,10 @@ describe('cancelLgtm', () => {
     assert.deepEqual(removed.sort(), ['approved', 'lgtm']);
   });
 
-  it('rejects a non-collaborator, non-author: reacts -1, throws', async () => {
+  it('rejects a non-OWNERS member who is not the PR author: reacts -1, throws', async () => {
     const calls: Call[] = [];
-    const octokit = fakeOctokit({ permission: 'read' }, calls);
-    const contentsOctokit = fakeOctokit({ permission: 'read' }, calls);
+    const octokit = fakeOctokit({}, calls);
+    const contentsOctokit = fakeOctokit({ ownersContent: OWNERS_CONTENT }, calls);
 
     await assert.rejects(
       () => cancelLgtm(baseCtx(octokit, contentsOctokit, 'random-contributor')),

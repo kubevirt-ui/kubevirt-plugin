@@ -52,7 +52,7 @@ export type ApprovalContext = {
   author: string;
   baseBranch: string;
   commentId: number;
-  /** Ambient token client -- only for reading .github/OWNERS ("Contents: read", a scope the bot app doesn't have). */
+  /** Ambient token client for reading root OWNERS or .github/OWNERS ("Contents: read", a scope the bot app doesn't have). */
   contentsOctokit: Octokit;
   /** PR head SHA -- used when submitting a bot APPROVE review for branch protection. */
   headSha: string;
@@ -113,7 +113,7 @@ export const approveI18n = (ctx: ApprovalContext): Promise<void> =>
 export const isApprovalAuthError = (err: unknown, commandName: string): boolean =>
   err instanceof Error && err.message.includes(`not authorized to use ${commandName}`);
 
-/** Shared by /approve and /approve cancel: gated to root OWNERS approvers only -- unlike /lgtm and /hold, which are open to any write-access collaborator. */
+/** Shared by /approve and /approve cancel: gated to root OWNERS approvers only. */
 const requireRootOwnersApprover = async (
   ctx: ApprovalContext,
   commandName: string,
