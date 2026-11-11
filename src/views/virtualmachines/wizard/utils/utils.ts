@@ -74,7 +74,11 @@ export const applySelectedBootableVolumeToForm = ({
 }: ApplySelectedBootableVolumeToForm): void => {
   const name = getInstanceTypeFromVolume(selectedVolume) ?? '';
   const [series = '', size = ''] = name.split('.');
-  const isSeriesVisible = familiesLoaded === false ? false : (isFamilyVisible?.(series) ?? true);
+  const volumeHasInstanceType = Boolean(series && size);
+  const familyAvailabilityReady = familiesLoaded !== false;
+  const volumeFamilyIsAvailable = isFamilyVisible ? isFamilyVisible(series) : true;
+  const shouldApplyComputeFromVolume =
+    volumeHasInstanceType && familyAvailabilityReady && volumeFamilyIsAvailable;
 
   setValue(
     'instanceType.bootVolume',
@@ -89,7 +93,7 @@ export const applySelectedBootableVolumeToForm = ({
   );
   setValue(
     'instanceType.compute',
-    series && size && isSeriesVisible ? { name, series, size, type: 'redhat' } : null,
+    shouldApplyComputeFromVolume ? { name, series, size, type: 'redhat' } : null,
     { shouldValidate: true },
   );
 
