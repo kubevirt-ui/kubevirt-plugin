@@ -23,11 +23,10 @@ type CommandEntry = {
 };
 
 const TRUST_LABELS: Record<string, string> = {
-  collaborator: 'Any collaborator (write access)',
   'github-owners': '.github/OWNERS only',
-  'member-or-owner': 'Member/owner/collaborator',
   none: 'Anyone',
-  owners: 'OWNERS only',
+  owners: 'Root OWNERS reviewers or approvers',
+  'owners-approvers': 'Root OWNERS approvers only',
 };
 
 import type { CommandContext } from './dispatcher';

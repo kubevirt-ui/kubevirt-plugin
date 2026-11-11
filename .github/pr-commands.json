@@ -1,40 +1,40 @@
 {
-  "_note": "Single source of truth for every PR-comment slash command in this repo, read by /help. Add an entry here whenever a new PR command is added -- same manual-sync convention as RELATED_AUTOMATION_PATHS in .github/scripts/src/validation/ai-config-validation/constants.ts. trust values: 'owners' = root OWNERS approvers; 'github-owners' = the narrower .github/OWNERS (kept in sync with .cursor/OWNERS) approvers gating /ai-approved, /ci-approved, and /i18n-approved; 'collaborator' = any repo collaborator with write access; 'member-or-owner' = GitHub author_association; 'none' = no trust gate.",
+  "_note": "Single source of truth for every PR-comment slash command in this repo, read by /help. Add an entry here whenever a new PR command is added -- same manual-sync convention as RELATED_AUTOMATION_PATHS in .github/scripts/src/validation/ai-config-validation/constants.ts. trust values: 'owners' = root OWNERS reviewers or approvers; 'owners-approvers' = root OWNERS approvers only; 'github-owners' = the narrower .github/OWNERS (kept in sync with .cursor/OWNERS) approvers gating /ai-approved, /ci-approved, and /i18n-approved; 'none' = no trust gate.",
   "commands": [
     {
       "command": "/lgtm",
-      "description": "Add the lgtm label (any write collaborator except the PR author). Root OWNERS approvers also get 'approved'. A native GitHub Approve review does the same.",
-      "trust": "collaborator",
+      "description": "Add the lgtm label (root OWNERS reviewers or approvers, except the PR author). Root OWNERS approvers also get 'approved'. A native GitHub Approve review does the same.",
+      "trust": "owners",
       "workflow": ".github/workflows/pr_validation_commands.yml"
     },
     {
       "command": "/lgtm cancel",
       "description": "Remove the lgtm label from this PR. Unlike /lgtm, the PR's own author may use this.",
-      "trust": "collaborator",
+      "trust": "owners",
       "workflow": ".github/workflows/pr_validation_commands.yml"
     },
     {
       "command": "/approve",
       "description": "Approve this PR for merge (root OWNERS approvers only).",
-      "trust": "owners",
+      "trust": "owners-approvers",
       "workflow": ".github/workflows/pr_validation_commands.yml"
     },
     {
       "command": "/approve cancel",
       "description": "Retract your approval (root OWNERS approvers only).",
-      "trust": "owners",
+      "trust": "owners-approvers",
       "workflow": ".github/workflows/pr_validation_commands.yml"
     },
     {
       "command": "/hold",
       "description": "Block this PR from merging until /hold cancel lifts it. Unrelated to /hold-e2e, which only pauses Hot Cluster E2E.",
-      "trust": "collaborator",
+      "trust": "owners",
       "workflow": ".github/workflows/pr_validation_commands.yml"
     },
     {
       "command": "/hold cancel",
       "description": "Lift a hold applied via /hold.",
-      "trust": "collaborator",
+      "trust": "owners",
       "workflow": ".github/workflows/pr_validation_commands.yml"
     },
     {
@@ -111,8 +111,8 @@
     },
     {
       "command": "/clone",
-      "description": "Cherry-pick this PR to another release branch once merged.",
-      "trust": "member-or-owner",
+      "description": "Cherry-pick this PR to another release branch once merged (root OWNERS approvers only).",
+      "trust": "owners-approvers",
       "workflow": ".github/workflows/pr-commands.yml"
     },
     {

@@ -17,13 +17,14 @@ import {
 
 type Call = { args: unknown; method: string };
 
-const ROOT_OWNERS = ['approvers:', '  - alice-approver'].join('\n');
+const ROOT_OWNERS = ['approvers:', '  - alice-approver', 'reviewers:', '  - bob-reviewer'].join(
+  '\n',
+);
 
 const fakeOctokit = (
   opts: {
+    contentCalls?: Call[];
     ownersContent?: null | string;
-    /** Default permission, or per-username map. */
-    permission?: null | Record<string, null | string> | string;
   },
   calls: Call[],
 ): Octokit =>
@@ -41,17 +42,9 @@ const fakeOctokit = (
       },
     },
     repos: {
-      getCollaboratorPermissionLevel: async (args: { username: string }) => {
-        const permission =
-          typeof opts.permission === 'object' && opts.permission !== null
-            ? opts.permission[args.username]
-            : opts.permission;
-        if (permission === null || permission === undefined) {
-          throw new Error('Not Found');
-        }
-        return { data: { permission } };
-      },
-      getContent: async () => {
+      getContent: async (args: { path: string; ref?: string }) => {
+        assert.equal(args.path, 'OWNERS');
+        opts.contentCalls?.push({ args, method: 'getContent' });
         if (opts.ownersContent === null || opts.ownersContent === undefined) {
           throw new Error('Not Found');
         }
@@ -67,10 +60,8 @@ const buildCtx = (
   calls: Call[],
   octokitOpts: {
     ownersContent?: null | string;
-    permission?: null | Record<string, null | string> | string;
   } = {
     ownersContent: ROOT_OWNERS,
-    permission: 'write',
   },
 ): VerifyMergePoolLabelContext => ({
   config: { owner: 'kubevirt-ui', repo: 'kubevirt-plugin', token: 'x' },
@@ -78,7 +69,7 @@ const buildCtx = (
   octokit: fakeOctokit(octokitOpts, calls),
   prAuthor: 'pr-author',
   prNumber: 1,
-  sender: 'bob-collaborator',
+  sender: 'bob-reviewer',
   ...overrides,
 });
 
@@ -93,32 +84,27 @@ const fakeDeps = (
 describe('isTrustedMergePoolLabelActor', () => {
   it('trusts the approval bot for every watched label', async () => {
     const calls: Call[] = [];
-    const octokit = fakeOctokit({ permission: 'read' }, calls);
-    assert.equal(
-      await isTrustedMergePoolLabelActor(
-        octokit,
-        'o',
-        'r',
-        'lgtm',
-        'kubevirt-plugin-bot[bot]',
-        'pr-author',
-      ),
-      true,
-    );
+    const octokit = fakeOctokit({}, calls);
+    for (const labelName of ['lgtm', 'approved', 'do-not-merge/hold']) {
+      assert.equal(
+        await isTrustedMergePoolLabelActor(
+          octokit,
+          'o',
+          'r',
+          labelName,
+          'kubevirt-plugin-bot[bot]',
+          'pr-author',
+        ),
+        true,
+      );
+    }
   });
 
-  it('rejects self-applied lgtm but allows self-applied approved for OWNERS actors', async () => {
+  it('rejects self-applied lgtm and approved, including for OWNERS approvers', async () => {
     const calls: Call[] = [];
-    const octokit = fakeOctokit({ ownersContent: ROOT_OWNERS, permission: 'admin' }, calls);
+    const octokit = fakeOctokit({ ownersContent: ROOT_OWNERS }, calls);
     assert.equal(
-      await isTrustedMergePoolLabelActor(
-        octokit,
-        'o',
-        'r',
-        'lgtm',
-        'pr-author',
-        'pr-author',
-      ),
+      await isTrustedMergePoolLabelActor(octokit, 'o', 'r', 'lgtm', 'pr-author', 'pr-author'),
       false,
     );
     assert.equal(
@@ -130,22 +116,26 @@ describe('isTrustedMergePoolLabelActor', () => {
         'alice-approver',
         'alice-approver',
       ),
-      true,
+      false,
     );
-  });
-
-  it('rejects self-applied lgtm when actor and prAuthor differ only by case', async () => {
-    const calls: Call[] = [];
-    const octokit = fakeOctokit({ ownersContent: ROOT_OWNERS, permission: 'admin' }, calls);
     assert.equal(
       await isTrustedMergePoolLabelActor(
         octokit,
         'o',
         'r',
-        'lgtm',
-        'PR-Author',
-        'pr-author',
+        'approved',
+        'random-user',
+        'alice-approver',
       ),
+      false,
+    );
+  });
+
+  it('rejects self-applied lgtm when actor and prAuthor differ only by case', async () => {
+    const calls: Call[] = [];
+    const octokit = fakeOctokit({ ownersContent: ROOT_OWNERS }, calls);
+    assert.equal(
+      await isTrustedMergePoolLabelActor(octokit, 'o', 'r', 'lgtm', 'PR-Author', 'pr-author'),
       false,
     );
     assert.equal(
@@ -157,33 +147,26 @@ describe('isTrustedMergePoolLabelActor', () => {
         'Alice-Approver',
         'alice-approver',
       ),
-      true,
+      false,
     );
   });
 
-  it('requires write access for lgtm/hold and root OWNERS for approved', async () => {
+  it('requires root OWNERS membership for lgtm/hold and approver status for approved', async () => {
     const calls: Call[] = [];
-    const writeOctokit = fakeOctokit({ ownersContent: ROOT_OWNERS, permission: 'write' }, calls);
-    const readOctokit = fakeOctokit({ ownersContent: ROOT_OWNERS, permission: 'read' }, calls);
+    const contentCalls: Call[] = [];
+    const octokit = fakeOctokit({ contentCalls, ownersContent: ROOT_OWNERS }, calls);
 
     assert.equal(
-      await isTrustedMergePoolLabelActor(
-        writeOctokit,
-        'o',
-        'r',
-        'lgtm',
-        'bob',
-        'pr-author',
-      ),
+      await isTrustedMergePoolLabelActor(octokit, 'o', 'r', 'lgtm', 'bob-reviewer', 'pr-author'),
       true,
     );
     assert.equal(
-      await isTrustedMergePoolLabelActor(readOctokit, 'o', 'r', 'lgtm', 'bob', 'pr-author'),
+      await isTrustedMergePoolLabelActor(octokit, 'o', 'r', 'lgtm', 'random-user', 'pr-author'),
       false,
     );
     assert.equal(
       await isTrustedMergePoolLabelActor(
-        writeOctokit,
+        octokit,
         'o',
         'r',
         'approved',
@@ -194,25 +177,38 @@ describe('isTrustedMergePoolLabelActor', () => {
     );
     assert.equal(
       await isTrustedMergePoolLabelActor(
-        writeOctokit,
+        octokit,
         'o',
         'r',
         'approved',
-        'bob',
+        'bob-reviewer',
         'pr-author',
       ),
       false,
     );
     assert.equal(
       await isTrustedMergePoolLabelActor(
-        writeOctokit,
+        octokit,
         'o',
         'r',
         'do-not-merge/hold',
-        'bob',
+        'bob-reviewer',
         'pr-author',
       ),
       true,
+    );
+    assert.deepEqual(
+      contentCalls.map(({ args }) => {
+        const { path, ref } = args as { path: string; ref?: string };
+        return { path, ref };
+      }),
+      [
+        { path: 'OWNERS', ref: undefined },
+        { path: 'OWNERS', ref: undefined },
+        { path: 'OWNERS', ref: 'main' },
+        { path: 'OWNERS', ref: 'main' },
+        { path: 'OWNERS', ref: undefined },
+      ],
     );
   });
 });
@@ -233,17 +229,17 @@ describe('verifyMergePoolLabel', () => {
     assert.equal(calls.length, 0);
   });
 
-  it('strips UI-applied lgtm from a non-collaborator', async () => {
+  it('strips UI-applied lgtm from someone not listed in root OWNERS', async () => {
     const calls: Call[] = [];
     await verifyMergePoolLabel(
-      buildCtx({ labelName: 'lgtm', sender: 'random-user' }, calls, { permission: 'read' }),
+      buildCtx({ labelName: 'lgtm', sender: 'random-user' }, calls, { ownersContent: ROOT_OWNERS }),
       fakeDeps(['lgtm'], {}),
     );
     assert.equal(calls.length, 1);
     assert.equal((calls[0].args as { name: string }).name, 'lgtm');
   });
 
-  it('keeps self-applied approved from an OWNERS author', async () => {
+  it('strips self-applied approved from an OWNERS author', async () => {
     const calls: Call[] = [];
     await verifyMergePoolLabel(
       buildCtx(
@@ -253,11 +249,11 @@ describe('verifyMergePoolLabel', () => {
           sender: 'alice-approver',
         },
         calls,
-        { ownersContent: ROOT_OWNERS, permission: 'admin' },
+        { ownersContent: ROOT_OWNERS },
       ),
       fakeDeps(['approved'], {}),
     );
-    assert.equal(calls.filter((c) => c.method === 'removeLabel').length, 0);
+    assert.equal(calls.filter((c) => c.method === 'removeLabel').length, 1);
   });
 
   it('leaves trusted hold and strips untrusted lgtm when both are present', async () => {
@@ -265,13 +261,9 @@ describe('verifyMergePoolLabel', () => {
     await verifyMergePoolLabel(
       buildCtx({ labelName: 'lgtm', sender: 'random-user' }, calls, {
         ownersContent: ROOT_OWNERS,
-        permission: {
-          'bob-collaborator': 'write',
-          'random-user': 'read',
-        },
       }),
       fakeDeps(['lgtm', 'do-not-merge/hold'], {
-        'do-not-merge/hold': 'bob-collaborator',
+        'do-not-merge/hold': 'bob-reviewer',
       }),
     );
 
@@ -346,35 +338,35 @@ describe('verifyMergePoolHoldRemoval', () => {
   const holdCtx = (
     sender: string,
     calls: Call[],
-    permission: null | Record<string, null | string> | string = 'write',
+    ownersContent: null | string = ROOT_OWNERS,
   ): VerifyHoldRemovalContext => ({
     config: { owner: 'kubevirt-ui', repo: 'kubevirt-plugin', token: 'x' },
-    octokit: fakeOctokit({ permission }, calls),
+    octokit: fakeOctokit({ ownersContent }, calls),
     prNumber: 1,
     sender,
   });
 
   it('allows bot removals without restoring', async () => {
     const calls: Call[] = [];
-    await verifyMergePoolHoldRemoval(holdCtx('kubevirt-plugin-bot[bot]', calls, 'read'));
+    await verifyMergePoolHoldRemoval(holdCtx('kubevirt-plugin-bot[bot]', calls, null));
     assert.equal(
       calls.some((c) => c.method === 'addLabels'),
       false,
     );
   });
 
-  it('allows write-collaborator removals without restoring', async () => {
+  it('allows root OWNERS reviewer removals without restoring', async () => {
     const calls: Call[] = [];
-    await verifyMergePoolHoldRemoval(holdCtx('bob-collaborator', calls, 'write'));
+    await verifyMergePoolHoldRemoval(holdCtx('bob-reviewer', calls));
     assert.equal(
       calls.some((c) => c.method === 'addLabels'),
       false,
     );
   });
 
-  it('restores the label when a non-collaborator removes it', async () => {
+  it('restores the label when a non-OWNERS user removes it', async () => {
     const calls: Call[] = [];
-    await verifyMergePoolHoldRemoval(holdCtx('random-user', calls, 'read'));
+    await verifyMergePoolHoldRemoval(holdCtx('random-user', calls));
     const addLabels = calls.find((c) => c.method === 'addLabels');
     assert.ok(addLabels);
     assert.deepEqual((addLabels.args as { labels: string[] }).labels, ['do-not-merge/hold']);

@@ -26,7 +26,7 @@ export const runClone = async (): Promise<void> => {
   const headSha = requireEnv('HEAD_SHA');
   const mergeCommitSha = process.env['MERGE_COMMIT_SHA'] ?? '';
   const commentBody = requireEnv('COMMENT_BODY');
-  const commentAuthorAssociation = requireEnv('COMMENT_AUTHOR_ASSOCIATION');
+  const commentAuthor = requireEnv('COMMENT_AUTHOR');
   const octokit = createOctokit(ghConfig);
 
   const jira = new JiraClient({
@@ -42,7 +42,7 @@ export const runClone = async (): Promise<void> => {
     prNumber,
     prTitle,
     commentBody,
-    commentAuthorAssociation,
+    commentAuthor,
   );
   if (!validated) {
     return;

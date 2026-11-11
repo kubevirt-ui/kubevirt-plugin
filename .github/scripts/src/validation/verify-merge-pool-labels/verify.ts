@@ -2,10 +2,13 @@ import type { Octokit } from '@octokit/rest';
 
 import { getPrLabelNames, removeLabel } from '../../github-comments';
 import { APPROVED_LABEL, DO_NOT_MERGE_HOLD_LABEL, LGTM_LABEL } from '../../shared/merge-pool';
+import { isListedInOwners as isRootOwnersMember } from '../../shared/owners';
 import type { GitHubConfig } from '../../types/index';
 import { sameGitHubLogin } from '../../utils';
-import { isWriteCollaborator } from '../commands/collaborator-trust';
-import { isListedInOwners, isTrustedBot } from '../pr-path-validation/owners';
+import {
+  isListedInOwners as isRootOwnersApprover,
+  isTrustedBot,
+} from '../pr-path-validation/owners';
 
 /** Pool-facing labels whose presence must match the slash-command trust model. */
 export const MERGE_POOL_WATCHED_LABELS = new Set<string>([
@@ -73,21 +76,18 @@ export const isTrustedMergePoolLabelActor = async (
     if (sameGitHubLogin(actor, prAuthor)) {
       return false;
     }
-    return isWriteCollaborator(octokit, owner, repo, actor);
+    return isRootOwnersMember(octokit, owner, repo, actor, 'OWNERS');
   }
 
   if (labelName === APPROVED_LABEL) {
-    if (await isListedInOwners(octokit, owner, repo, prAuthor, 'OWNERS')) {
-      return true;
-    }
     if (sameGitHubLogin(actor, prAuthor)) {
       return false;
     }
-    return isListedInOwners(octokit, owner, repo, actor, 'OWNERS');
+    return isRootOwnersApprover(octokit, owner, repo, actor, 'OWNERS');
   }
 
   if (labelName === DO_NOT_MERGE_HOLD_LABEL) {
-    return isWriteCollaborator(octokit, owner, repo, actor);
+    return isRootOwnersMember(octokit, owner, repo, actor, 'OWNERS');
   }
 
   return false;

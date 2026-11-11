@@ -1,27 +1,33 @@
 import { sameGitHubLogin } from '../../utils';
-import { isListedInOwners } from '../pr-path-validation/owners';
+import { isListedInOwners as isRootOwnersMember } from '../../shared/owners';
+import { isListedInOwners as isRootOwnersApprover } from '../pr-path-validation/owners';
 import type { ApprovalContext } from './approve';
 import { denyCommand, reactToComment } from './approve';
 import { dispatchAutoMerge, ensureBotApprovingReview } from './bot-approve-review';
-import { isWriteCollaborator } from './collaborator-trust';
 import { grantApprove, grantLgtm, revokeApprove, revokeLgtm } from './review-labels';
 
 export type ReviewContext = ApprovalContext;
 
-/** /lgtm: any write-access collaborator except the PR's own author. Also grants `approved` when the actor is a root-OWNERS approver, so they don't need to separately /approve. */
+/** /lgtm: any root-OWNERS reviewer or approver except the PR's own author. Root approvers also get `approved`. */
 export const applyLgtm = async (ctx: ReviewContext): Promise<void> => {
   if (sameGitHubLogin(ctx.author, ctx.prAuthor)) {
     await denyCommand(ctx, '/lgtm', 'you cannot `/lgtm` your own PR (you may use `/lgtm cancel`).');
   }
 
-  const collaborator = await isWriteCollaborator(ctx.octokit, ctx.owner, ctx.repo, ctx.author);
-  if (!collaborator) {
-    await denyCommand(ctx, '/lgtm', 'only write-access collaborators can use `/lgtm`.');
+  const trusted = await isRootOwnersMember(
+    ctx.contentsOctokit,
+    ctx.owner,
+    ctx.repo,
+    ctx.author,
+    'OWNERS',
+  );
+  if (!trusted) {
+    await denyCommand(ctx, '/lgtm', 'only root OWNERS reviewers or approvers can use `/lgtm`.');
   }
 
   await grantLgtm(ctx.octokit, ctx.owner, ctx.repo, ctx.prNumber);
 
-  const isApprover = await isListedInOwners(
+  const isApprover = await isRootOwnersApprover(
     ctx.contentsOctokit,
     ctx.owner,
     ctx.repo,
@@ -52,7 +58,7 @@ export const applyLgtm = async (ctx: ReviewContext): Promise<void> => {
 };
 
 /**
- * /lgtm cancel: any write-access collaborator, including the PR's own
+ * /lgtm cancel: any root-OWNERS reviewer or approver, including the PR's own
  * author. Always revokes `approved` too, regardless of whether *this*
  * actor is an OWNERS approver -- `approved` was only ever granted as part
  * of the same lgtm-acts-as-approve pairing, so it must not outlive the
@@ -62,13 +68,13 @@ export const applyLgtm = async (ctx: ReviewContext): Promise<void> => {
 export const cancelLgtm = async (ctx: ReviewContext): Promise<void> => {
   const allowed =
     sameGitHubLogin(ctx.author, ctx.prAuthor) ||
-    (await isWriteCollaborator(ctx.octokit, ctx.owner, ctx.repo, ctx.author));
+    (await isRootOwnersMember(ctx.contentsOctokit, ctx.owner, ctx.repo, ctx.author, 'OWNERS'));
 
   if (!allowed) {
     await denyCommand(
       ctx,
       '/lgtm cancel',
-      'only write-access collaborators (or the PR author) can use `/lgtm cancel`.',
+      'only root OWNERS reviewers or approvers (or the PR author) can use `/lgtm cancel`.',
     );
   }
 

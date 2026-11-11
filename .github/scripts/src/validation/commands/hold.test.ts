@@ -8,7 +8,11 @@ import { applyHold, cancelHold } from './hold';
 
 type Call = { args: unknown; method: string };
 
-const fakeOctokit = (permission: null | string, calls: Call[]): Octokit =>
+const ROOT_OWNERS = ['approvers:', '  - alice-approver', 'reviewers:', '  - bob-reviewer'].join(
+  '\n',
+);
+
+const fakeLabelOctokit = (calls: Call[]): Octokit =>
   ({
     issues: {
       addLabels: async (args: unknown) => {
@@ -30,22 +34,23 @@ const fakeOctokit = (permission: null | string, calls: Call[]): Octokit =>
         calls.push({ args, method: 'createForIssueComment' });
       },
     },
+  }) as unknown as Octokit;
+
+const fakeContentsOctokit = (ownersContent: string, calls: Call[]): Octokit =>
+  ({
     repos: {
-      getCollaboratorPermissionLevel: async (args: unknown) => {
-        calls.push({ args, method: 'getCollaboratorPermissionLevel' });
-        if (permission === null) {
-          throw new Error('Not Found');
-        }
-        return { data: { permission } };
+      getContent: async (args: { path: string; ref?: string }) => {
+        assert.deepEqual({ path: args.path, ref: args.ref }, { path: 'OWNERS', ref: undefined });
+        return { data: { content: Buffer.from(ownersContent, 'utf8').toString('base64') } };
       },
     },
   }) as unknown as Octokit;
 
-const baseCtx = (octokit: Octokit, author: string): ApprovalContext => ({
+const baseCtx = (octokit: Octokit, contentsOctokit: Octokit, author: string): ApprovalContext => ({
   author,
   baseBranch: 'main',
   commentId: 123,
-  contentsOctokit: octokit,
+  contentsOctokit,
   headSha: 'abc123headsha',
   octokit,
   owner: 'kubevirt-ui',
@@ -55,12 +60,13 @@ const baseCtx = (octokit: Octokit, author: string): ApprovalContext => ({
 });
 
 describe('applyHold', () => {
-  it('rejects a non-collaborator: reacts -1, adds no label, throws', async () => {
+  it('rejects someone not listed in root OWNERS: reacts -1, adds no label, throws', async () => {
     const calls: Call[] = [];
-    const octokit = fakeOctokit('read', calls);
+    const octokit = fakeLabelOctokit(calls);
+    const contentsOctokit = fakeContentsOctokit(ROOT_OWNERS, calls);
 
     await assert.rejects(
-      () => applyHold(baseCtx(octokit, 'random-contributor')),
+      () => applyHold(baseCtx(octokit, contentsOctokit, 'random-contributor')),
       /not authorized to use \/hold/,
     );
 
@@ -72,26 +78,39 @@ describe('applyHold', () => {
     assert.equal((reaction?.args as { content: string }).content, '-1');
   });
 
-  it('applies the do-not-merge/hold label for a write-access collaborator', async () => {
+  it('applies the do-not-merge/hold label for a root OWNERS reviewer', async () => {
     const calls: Call[] = [];
-    const octokit = fakeOctokit('write', calls);
+    const octokit = fakeLabelOctokit(calls);
+    const contentsOctokit = fakeContentsOctokit(ROOT_OWNERS, calls);
 
-    await applyHold(baseCtx(octokit, 'bob-collaborator'));
+    await applyHold(baseCtx(octokit, contentsOctokit, 'bob-reviewer'));
 
     const addLabels = calls.find((call) => call.method === 'addLabels');
     assert.deepEqual((addLabels?.args as { labels: string[] }).labels, ['do-not-merge/hold']);
     const reaction = calls.find((call) => call.method === 'createForIssueComment');
     assert.equal((reaction?.args as { content: string }).content, '+1');
   });
+
+  it('applies the do-not-merge/hold label for a root OWNERS approver', async () => {
+    const calls: Call[] = [];
+    const octokit = fakeLabelOctokit(calls);
+    const contentsOctokit = fakeContentsOctokit(ROOT_OWNERS, calls);
+
+    await applyHold(baseCtx(octokit, contentsOctokit, 'alice-approver'));
+
+    const addLabels = calls.find((call) => call.method === 'addLabels');
+    assert.deepEqual((addLabels?.args as { labels: string[] }).labels, ['do-not-merge/hold']);
+  });
 });
 
 describe('cancelHold', () => {
-  it('rejects a non-collaborator: reacts -1, removes no label, throws', async () => {
+  it('rejects someone not listed in root OWNERS: reacts -1, removes no label, throws', async () => {
     const calls: Call[] = [];
-    const octokit = fakeOctokit('read', calls);
+    const octokit = fakeLabelOctokit(calls);
+    const contentsOctokit = fakeContentsOctokit(ROOT_OWNERS, calls);
 
     await assert.rejects(
-      () => cancelHold(baseCtx(octokit, 'random-contributor')),
+      () => cancelHold(baseCtx(octokit, contentsOctokit, 'random-contributor')),
       /not authorized to use \/hold cancel/,
     );
 
@@ -101,11 +120,12 @@ describe('cancelHold', () => {
     );
   });
 
-  it('removes the do-not-merge/hold label for a write-access collaborator', async () => {
+  it('removes the do-not-merge/hold label for a root OWNERS reviewer', async () => {
     const calls: Call[] = [];
-    const octokit = fakeOctokit('write', calls);
+    const octokit = fakeLabelOctokit(calls);
+    const contentsOctokit = fakeContentsOctokit(ROOT_OWNERS, calls);
 
-    await cancelHold(baseCtx(octokit, 'bob-collaborator'));
+    await cancelHold(baseCtx(octokit, contentsOctokit, 'bob-reviewer'));
 
     const removeLabel = calls.find((call) => call.method === 'removeLabel');
     assert.equal((removeLabel?.args as { name: string }).name, 'do-not-merge/hold');
