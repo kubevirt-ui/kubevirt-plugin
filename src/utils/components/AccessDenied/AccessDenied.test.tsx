@@ -24,9 +24,14 @@ describe('AccessDenied', () => {
   });
 
   it('should render inline warning for dashboard cards', () => {
-    const { container } = render(<AccessDenied inline />);
+    render(<AccessDenied inline />);
 
     expect(screen.getByText('Access Restricted')).toBeInTheDocument();
-    expect(container.querySelector('.pf-m-warning')).toBeTruthy();
+    expect(
+      screen.getByText(
+        'You do not have the required permissions to view this information. Please contact your OpenShift administrator if you need access.',
+      ),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole('img')).not.toBeInTheDocument();
   });
 });

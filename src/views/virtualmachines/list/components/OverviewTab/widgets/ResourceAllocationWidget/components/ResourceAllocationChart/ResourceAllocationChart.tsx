@@ -1,9 +1,9 @@
 import { type FC } from 'react';
 
+import AccessDenied from '@kubevirt-utils/components/AccessDenied/AccessDenied';
 import useResponsiveCharts from '@kubevirt-utils/components/Charts/hooks/useResponsiveCharts';
 import getYAxisTicks from '@kubevirt-utils/components/Charts/MetricChartUtils/hooks/getYAxisTicks';
 import { getLabelUnit } from '@kubevirt-utils/components/Charts/MetricChartUtils/utils';
-import AccessDenied from '@kubevirt-utils/components/AccessDenied/AccessDenied';
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
 import { isForbiddenError } from '@kubevirt-utils/errors/clusterMetricsAccess';

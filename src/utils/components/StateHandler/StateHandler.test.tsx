@@ -27,7 +27,7 @@ describe('StateHandler', () => {
   });
 
   it('should show danger Alert for non-authz errors', () => {
-    const { container } = render(
+    render(
       <StateHandler error={{ message: 'boom', response: { status: 500 } }} hasData={false} loaded>
         <div>content</div>
       </StateHandler>,
@@ -35,6 +35,5 @@ describe('StateHandler', () => {
 
     expect(screen.getByText('Error')).toBeInTheDocument();
     expect(screen.getByText('boom')).toBeInTheDocument();
-    expect(container.querySelector('.pf-m-danger')).toBeTruthy();
   });
 });

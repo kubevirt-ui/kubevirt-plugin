@@ -35,7 +35,7 @@ type StateHandlerProps = {
 const getErrorMessage = (error: unknown): string => {
   if (!error) return '';
   if (typeof error === 'string') return error;
-  if (typeof error === 'object' && error !== null && 'message' in error) {
+  if (typeof error === 'object' && 'message' in error) {
     const message = (error as { message?: unknown }).message;
     return typeof message === 'string' ? message : '';
   }
@@ -55,13 +55,11 @@ const StateHandler: FC<StateHandlerProps> = ({
 
   if (error) {
     if (isForbiddenError(error)) {
-      return (
-        <AccessDenied inline={inlineAccessDenied} message={getErrorMessage(error)} />
-      );
+      return <AccessDenied inline={inlineAccessDenied} message={getErrorMessage(error)} />;
     }
 
     const status =
-      typeof error === 'object' && error !== null && 'response' in error
+      typeof error === 'object' && 'response' in error
         ? (error as StateHandlerError).response?.status
         : undefined;
 
