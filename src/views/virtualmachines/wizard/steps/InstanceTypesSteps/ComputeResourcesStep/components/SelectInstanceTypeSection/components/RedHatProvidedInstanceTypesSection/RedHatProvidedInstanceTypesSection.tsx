@@ -20,7 +20,7 @@ const RedHatProvidedInstanceTypesSection: FC<RedHatProvidedInstanceTypesSectionP
   const { control } = useVMWizardForm();
   const selectedSeries = useWatch({ control, name: 'instanceType.compute.series' });
 
-  useEnsureAvailableRedHatComputeSelection(cluster, redHatMenuItems);
+  useEnsureAvailableRedHatComputeSelection(cluster);
 
   const sizes = redHatMenuItems?.items?.find((item) => item?.seriesName === selectedSeries)?.sizes;
 
