@@ -7,6 +7,7 @@ import { loginToOpenShiftConsole, saveStorageState } from '@/auth/console-login'
 import { AllureEnvironment } from '@/utils/allure';
 import { kubeconfigMatchesClusterUrl } from '@/utils/cluster-kubernetes-api';
 import {
+  adoptDefaultOrInClusterKubeconfig,
   ensureKubeconfigAuthenticated,
   isKubeconfigAuthenticated,
   ocLoginToCluster,
@@ -70,7 +71,9 @@ export function getSetupRules(): SetupRule[] {
       id: 'validate-credentials',
       name: 'Validate console login credentials',
       phase: SetupPhase.AUTH,
-      guard: () => shouldRunBrowserLogin() && !EnvVariables.isLocalMode,
+      // HC_E2E / auth-disabled console: no kubeadmin password is provisioned.
+      guard: () =>
+        shouldRunBrowserLogin() && !EnvVariables.isLocalMode && !EnvVariables.isSkipBrowserLogin,
       onError: 'throw',
       run: async () => {
         if (EnvVariables.isNonPrivUser) {
@@ -144,10 +147,35 @@ export function getSetupRules(): SetupRule[] {
       },
     },
     {
+      id: 'adopt-default-kubeconfig',
+      name: 'Adopt env/default/in-cluster kubeconfig for HC or local runners',
+      phase: SetupPhase.AUTH,
+      guard: (ctx) => !ctx.effectiveKubeConfigPath && !EnvVariables.skipOcInvocations,
+      onError: 'throw',
+      run: async (ctx) => {
+        const adopted = adoptDefaultOrInClusterKubeconfig(ctx.kubeConfigPath, {
+          allowInClusterFallback: EnvVariables.isHcE2e,
+        });
+        if (adopted) {
+          ctx.effectiveKubeConfigPath = ctx.kubeConfigPath;
+          logger.success(`Adopted default/in-cluster kubeconfig at ${ctx.kubeConfigPath}`);
+          return;
+        }
+        if (EnvVariables.isHcE2e) {
+          throw new Error(
+            'HC_E2E requires a usable KUBECONFIG or in-cluster ServiceAccount; kubeadmin oc login is not available',
+          );
+        }
+        logger.info('No env/default kubeconfig available; will attempt oc login');
+      },
+    },
+    {
       id: 'oc-login',
       name: 'Generate kubeconfig via oc login',
       phase: SetupPhase.AUTH,
-      guard: (ctx) => !ctx.effectiveKubeConfigPath && !EnvVariables.skipOcInvocations,
+      // HC has no kubeadmin password — must use adopted SA/default kubeconfig instead.
+      guard: (ctx) =>
+        !ctx.effectiveKubeConfigPath && !EnvVariables.skipOcInvocations && !EnvVariables.isHcE2e,
       onError: 'throw',
       run: async (ctx) => {
         logger.info(`🔐 Authenticating to cluster: ${EnvVariables.clusterUrl}`);
@@ -160,14 +188,27 @@ export function getSetupRules(): SetupRule[] {
       id: 'ensure-kubeconfig-session',
       name: 'Refresh kubeconfig when token expired',
       phase: SetupPhase.AUTH,
-      guard: () => !EnvVariables.skipOcInvocations && Boolean(EnvVariables.clusterUrl),
+      guard: (ctx) =>
+        !EnvVariables.skipOcInvocations &&
+        (Boolean(ctx.effectiveKubeConfigPath) || Boolean(EnvVariables.clusterUrl)),
       onError: 'throw',
       run: async (ctx) => {
         const kubePath = ctx.effectiveKubeConfigPath ?? ctx.kubeConfigPath;
         if (!fs.existsSync(kubePath)) {
           throw new Error(
-            `No kubeconfig at ${kubePath}. Set OPENSHIFT_PASSWORD and CLUSTER_URL or provide a valid .kubeconfigs/test-config`,
+            EnvVariables.isHcE2e
+              ? `HC_E2E: no kubeconfig at ${kubePath}; oc login is not available`
+              : `No kubeconfig at ${kubePath}. Set OPENSHIFT_PASSWORD and CLUSTER_URL or provide a valid .kubeconfigs/test-config`,
           );
+        }
+        if (EnvVariables.isHcE2e) {
+          if (!isKubeconfigAuthenticated(kubePath)) {
+            throw new Error(
+              `HC_E2E kubeconfig at ${kubePath} is not authenticated; kubeadmin oc login is not available`,
+            );
+          }
+          ctx.effectiveKubeConfigPath = kubePath;
+          return;
         }
         ensureKubeconfigAuthenticated(kubePath);
         ctx.effectiveKubeConfigPath = kubePath;
@@ -210,8 +251,12 @@ export function getSetupRules(): SetupRule[] {
       run: async (ctx) => {
         const baseURL = EnvVariables.webConsoleUrl;
         logger.info('🌐 Setting up browser state...');
-        if (EnvVariables.isLocalMode) {
-          logger.info(`🔄 Local console: opening ${baseURL} (no login — auth disabled)`);
+        if (EnvVariables.isLocalMode || EnvVariables.isSkipBrowserLogin) {
+          logger.info(
+            `🔄 ${
+              EnvVariables.isHcE2e ? 'HC E2E' : 'Local'
+            } console: opening ${baseURL} (no OAuth login)`,
+          );
         } else {
           logger.info(
             `🔄 Logging in to ${baseURL} as ${EnvVariables.loginUsername} (${EnvVariables.idp})`,
