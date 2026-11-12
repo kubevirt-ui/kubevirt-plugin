@@ -37,9 +37,11 @@ import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { getCatalogURL } from '@multicluster/urls';
 import { DescriptionList, Grid, GridItem, Switch } from '@patternfly/react-core';
 import DeletionProtectionModal from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/DeletionProtectionModal';
-import { VM_DELETION_PROTECTION_LABEL } from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/utils/constants';
 import { VMDeletionProtectionOptions } from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/utils/types';
-import { isDeletionProtectionEnabled } from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/utils/utils';
+import {
+  applyDeletionProtectionLabel,
+  isDeletionProtectionEnabled,
+} from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/utils/utils';
 import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
 import { printableVMStatus } from '@virtualmachines/utils';
 
@@ -398,12 +400,7 @@ const WizardOverviewGrid: FC<WizardOverviewGridProps> = ({ tabsData, updateVM, v
                           : VMDeletionProtectionOptions.DISABLE
                       }
                       onConfirm={(enableDeletionProtection) => {
-                        updateVM((draftVM) => {
-                          draftVM.metadata.labels = {
-                            ...draftVM.metadata.labels,
-                            [VM_DELETION_PROTECTION_LABEL]: enableDeletionProtection.toString(),
-                          };
-                        });
+                        updateVM(applyDeletionProtectionLabel(vm, enableDeletionProtection));
                         onClose();
                       }}
                       isOpen={isOpen}
