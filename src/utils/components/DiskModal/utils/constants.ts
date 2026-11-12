@@ -1,7 +1,6 @@
 export const DEFAULT_DISK_SIZE = '30Gi';
 export const DEFAULT_CDROM_DISK_SIZE = '10Gi';
 
-export const ISO_FILE_EXTENSION = '.iso';
 export const ISO_FILTER_KEYWORDS = ['iso', 'cd', 'image'];
 export const UPLOAD_SUFFIX = 'upload';
 export const FORM_FIELD_UPLOAD_FILE = 'uploadFile';

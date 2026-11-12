@@ -26,6 +26,7 @@ import { useVMWizardForm } from '@virtualmachines/wizard/form/VMWizardFormProvid
 import { type OnSelectBootableVolume } from '@virtualmachines/wizard/utils/types';
 
 import AddBootableVolumeButton from './components/AddBootableVolumeButton';
+import BootSourceIsoOptions from './components/BootSourceIsoOptions';
 import useAddBootableVolume from './hooks/useAddBootableVolume';
 
 const BootSourceStep: FC = () => {
@@ -114,23 +115,28 @@ const BootSourceStep: FC = () => {
         </Split>
       </StackItem>
       {value && (
-        <BootableVolumeList
-          bootableVolumesData={bootableVolumesData}
-          canCreateVolume={canCreate}
-          cluster={cluster}
-          guestOperatingSystem={guestOperatingSystem}
-          instanceTypesAndPreferencesData={instanceTypesAndPreferencesData}
-          loadError={instanceTypesAndPreferencesData?.loadError}
-          lockedPreference={lockedPreference}
-          onCreateVolume={onCreateVolume}
-          onSelectBootableVolume={onSelectBootableVolume}
-          onUploadStart={onUploadStart}
-          onVolumeListNamespaceChange={(namespace) =>
-            setValue('instanceType.volumeNamespace', namespace)
-          }
-          selectedTableRow={selectedTableRow}
-          volumeListNamespace={volumeListNamespace}
-        />
+        <>
+          <BootableVolumeList
+            bootableVolumesData={bootableVolumesData}
+            canCreateVolume={canCreate}
+            cluster={cluster}
+            guestOperatingSystem={guestOperatingSystem}
+            instanceTypesAndPreferencesData={instanceTypesAndPreferencesData}
+            loadError={instanceTypesAndPreferencesData?.loadError}
+            lockedPreference={lockedPreference}
+            onCreateVolume={onCreateVolume}
+            onSelectBootableVolume={onSelectBootableVolume}
+            onUploadStart={onUploadStart}
+            onVolumeListNamespaceChange={(namespace) =>
+              setValue('instanceType.volumeNamespace', namespace)
+            }
+            selectedTableRow={selectedTableRow}
+            volumeListNamespace={volumeListNamespace}
+          />
+          <StackItem>
+            <BootSourceIsoOptions />
+          </StackItem>
+        </>
       )}
       <StackItem>
         <Radio
