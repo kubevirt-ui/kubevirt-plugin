@@ -22,7 +22,7 @@ type VMListColumnsResult = {
   vmimMapper: VMIMMapper;
 };
 
-export const useVMListColumns = (namespace: string, cluster?: string): VMListColumnsResult => {
+export const useVMListColumns = (namespace?: string, cluster?: string): VMListColumnsResult => {
   const isAllClustersPage = useIsAllClustersPage();
   const { loading: loadingFeatureProxy } = useFeatures(KUBEVIRT_APISERVER_PROXY);
 

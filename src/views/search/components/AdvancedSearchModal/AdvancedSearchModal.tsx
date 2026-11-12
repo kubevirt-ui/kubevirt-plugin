@@ -1,6 +1,5 @@
 import { type FC, useEffect, useRef } from 'react';
 
-import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { type ModalComponentProps } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { TREE_VIEW_FOLDERS } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
@@ -16,6 +15,7 @@ import {
   ModalFooter,
   ModalHeader,
 } from '@patternfly/react-core';
+import useAllAccessibleVMs from '@search/hooks/useAllAccessibleVMs';
 
 import { type AdvancedSearchInputs, type AdvancedSearchQueryInputs } from '../../utils/types';
 import ModalExpandableSection from './components/ModalExpandableSection';
@@ -45,7 +45,6 @@ import './advanced-search-modal.scss';
 type AdvancedSearchModalProps = Pick<ModalComponentProps, 'isOpen' | 'onClose'> & {
   onSubmit: (searchInputs: AdvancedSearchQueryInputs) => void;
   prefillInputs?: AdvancedSearchInputs;
-  vms: V1VirtualMachine[];
 };
 
 const AdvancedSearchModal: FC<AdvancedSearchModalProps> = ({
@@ -53,11 +52,11 @@ const AdvancedSearchModal: FC<AdvancedSearchModalProps> = ({
   onClose,
   onSubmit,
   prefillInputs = {},
-  vms,
 }) => {
   const { t } = useKubevirtTranslation();
   const isACMPage = useIsACMPage();
   const { featureEnabled: treeViewFoldersEnabled } = useFeatures(TREE_VIEW_FOLDERS);
+  const vms = useAllAccessibleVMs();
 
   const isSearchDisabled = useIsSearchDisabled();
   const { getSearchQueryInputs, initializeWithPrefill, resetForm } = useAdvancedSearchActions();
