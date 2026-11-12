@@ -5,6 +5,9 @@ import {
 } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { VolumeSnapshotKind } from '@kubevirt-utils/components/SelectSnapshot/types';
+import { getAnnotation } from '@kubevirt-utils/resources/shared';
+
+import { ADVISED_RESTORE_SIZE_ANNOTATION } from './constants';
 
 export const getDataSourcePVCSource = (dataSource: V1beta1DataSource): V1beta1DataVolumeSourcePVC =>
   dataSource?.spec?.source?.pvc;
@@ -16,6 +19,7 @@ export const getDataSourcePVCNamespace = (dataSource: V1beta1DataSource) =>
   getDataSourcePVCSource(dataSource)?.namespace;
 
 export const getVolumeSnapshotSize = (volumeSnapshot: VolumeSnapshotKind) =>
+  getAnnotation(volumeSnapshot, ADVISED_RESTORE_SIZE_ANNOTATION) ??
   volumeSnapshot?.status?.restoreSize;
 
 export const getVolumeSnapshotStorageClass = (volumeSnapshot: VolumeSnapshotKind) =>
