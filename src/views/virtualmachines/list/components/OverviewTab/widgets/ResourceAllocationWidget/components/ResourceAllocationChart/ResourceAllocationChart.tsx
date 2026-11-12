@@ -1,10 +1,12 @@
 import { type FC } from 'react';
 
+import AccessDenied from '@kubevirt-utils/components/AccessDenied/AccessDenied';
 import useResponsiveCharts from '@kubevirt-utils/components/Charts/hooks/useResponsiveCharts';
 import getYAxisTicks from '@kubevirt-utils/components/Charts/MetricChartUtils/hooks/getYAxisTicks';
 import { getLabelUnit } from '@kubevirt-utils/components/Charts/MetricChartUtils/utils';
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import MutedTextSpan from '@kubevirt-utils/components/MutedTextSpan/MutedTextSpan';
+import { isForbiddenError } from '@kubevirt-utils/errors/clusterMetricsAccess';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getNoDataAvailableMessage } from '@kubevirt-utils/utils/utils';
 import { Bullseye, Skeleton } from '@patternfly/react-core';
@@ -51,7 +53,7 @@ const ResourceAllocationChart: FC<ResourceAllocationChartProps> = ({
         data-test={`resource-allocation-chart-${metric}`}
         ref={ref}
       >
-        <ErrorAlert error={error} />
+        {isForbiddenError(error) ? <AccessDenied inline /> : <ErrorAlert error={error} />}
       </div>
     );
   }

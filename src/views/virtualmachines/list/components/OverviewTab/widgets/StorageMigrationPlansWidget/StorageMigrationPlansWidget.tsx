@@ -1,6 +1,8 @@
 import { type FC, type ReactNode, useMemo } from 'react';
 
+import AccessDenied from '@kubevirt-utils/components/AccessDenied/AccessDenied';
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
+import { isForbiddenError } from '@kubevirt-utils/errors/clusterMetricsAccess';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { STORAGE_MIGRATION_API } from '@kubevirt-utils/resources/migrations/constants';
 import { vmStatusIcon } from '@kubevirt-utils/resources/vm/vmStatuses/utils/utils';
@@ -64,6 +66,9 @@ const StorageMigrationPlansWidget: FC<StorageMigrationPlansWidgetProps> = ({ clu
 
   const cardBodyContent = ((): ReactNode => {
     if (loadError) {
+      if (isForbiddenError(loadError)) {
+        return <AccessDenied inline />;
+      }
       return <ErrorAlert error={loadError} />;
     }
     if (storageMigAPI === STORAGE_MIGRATION_API.NONE) {

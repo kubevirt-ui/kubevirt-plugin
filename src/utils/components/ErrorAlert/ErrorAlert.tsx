@@ -11,7 +11,7 @@ type ErrorAlertError = {
 };
 
 type ErrorAlertProps = {
-  error: ErrorAlertError;
+  error: ErrorAlertError | null | undefined;
 };
 
 const ErrorAlert: FC<ErrorAlertProps> = ({ error }): ReactElement | null => {

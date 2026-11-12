@@ -1,8 +1,9 @@
 import type { FC } from 'react';
 
 import { PlanModel } from '@forklift-ui/types';
-import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
+import StateHandler from '@kubevirt-utils/components/StateHandler/StateHandler';
 import { getResourceUrl } from '@kubevirt-utils/resources/shared';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { MTV_MIGRATION_NAMESPACE } from '@multicluster/components/CrossClusterMigration/constants';
 
 import CrossClusterMigrationPlansWidget from '../MigrationsWidget/components/CrossClusterMigrationPlansWidget';
@@ -29,13 +30,19 @@ const MultiClusterMigrationStatusSection: FC<MultiClusterMigrationStatusSectionP
     <OverviewSection dataTestId="migration-status-section" title={title}>
       <OverviewSectionRow className="overview-section__row--single-column-wide">
         {!isMTVInstalled && <MTVNotInstalledCard />}
-        {isMTVInstalled && loadError && <ErrorAlert error={loadError} />}
-        {isMTVInstalled && !loadError && (
-          <CrossClusterMigrationPlansWidget
-            isLoading={!mtvLoaded}
-            plans={plans}
-            plansListPath={MTV_PLANS_LIST_PATH}
-          />
+        {isMTVInstalled && (
+          <StateHandler
+            error={loadError}
+            hasData={!isEmpty(plans)}
+            inlineAccessDenied
+            loaded={mtvLoaded}
+          >
+            <CrossClusterMigrationPlansWidget
+              isLoading={!mtvLoaded}
+              plans={plans}
+              plansListPath={MTV_PLANS_LIST_PATH}
+            />
+          </StateHandler>
         )}
       </OverviewSectionRow>
     </OverviewSection>

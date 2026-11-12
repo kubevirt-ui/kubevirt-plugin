@@ -12,27 +12,40 @@ import {
 } from '@patternfly/react-core';
 
 type AccessDeniedProps = {
+  /** Compact inline warning for dashboard cards / widgets. */
+  inline?: boolean;
   message?: ReactNode;
 };
 
-const AccessDenied: FC<AccessDeniedProps> = ({ message }) => {
+const AccessDenied: FC<AccessDeniedProps> = ({ inline = false, message }) => {
   const { t } = useKubevirtTranslation();
+  const title = t('Access Restricted');
+  const description = t(
+    'You do not have the required permissions to view this information. Please contact your OpenShift administrator if you need access.',
+  );
+
+  if (inline) {
+    return (
+      <Alert isInline title={title} variant={AlertVariant.warning}>
+        {description}
+      </Alert>
+    );
+  }
+
   return (
     <Panel className="kv-access-denied">
       <PanelMain>
         <PanelMainBody>
           <div className="pf-v6-u-text-align-center">
-            <img src={restrictedSignImg} />
+            <img alt="" src={restrictedSignImg} />
           </div>
           <Title className="pf-v6-u-text-align-center" headingLevel="h2">
-            {t('Restricted access')}
+            {title}
           </Title>
 
-          <div className="pf-v6-u-text-align-center">
-            {t("You don't have access to this section due to cluster policy.")}
-          </div>
+          <div className="pf-v6-u-text-align-center">{description}</div>
           {message && (
-            <Alert isInline title={t('Error details')} variant={AlertVariant.danger}>
+            <Alert isInline title={t('Details')} variant={AlertVariant.warning}>
               {message}
             </Alert>
           )}
