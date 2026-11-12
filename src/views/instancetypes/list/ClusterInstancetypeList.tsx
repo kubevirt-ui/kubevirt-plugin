@@ -1,4 +1,4 @@
-import React, { FC, useMemo } from 'react';
+import React, { type FC, useMemo } from 'react';
 
 import { VirtualMachineClusterInstancetypeModelRef } from '@kubevirt-ui-ext/kubevirt-api/console';
 import KubevirtFilterToolbar from '@kubevirt-utils/components/KubevirtFilterToolbar/KubevirtFilterToolbar';
@@ -12,7 +12,7 @@ import useKubevirtTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettin
 import usePaginationWithFilters from '@kubevirt-utils/hooks/usePagination/usePaginationWithFilters';
 import { paginationDefaultValues } from '@kubevirt-utils/hooks/usePagination/utils/constants';
 import { EXPORT_TABLE_KEYS, KubevirtTableExport } from '@kubevirt-utils/hooks/useTableExport';
-import { ListPageProps } from '@kubevirt-utils/utils/types';
+import type { ListPageProps } from '@kubevirt-utils/utils/types';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useIsAllClustersPage from '@multicluster/hooks/useIsAllClustersPage';
 import useIsACMPage from '@multicluster/useIsACMPage';
@@ -23,6 +23,7 @@ import {
   getClusterInstancetypeColumns,
   getClusterInstancetypeRowId,
 } from './clusterInstancetypeDefinition';
+import FamilyAvailabilitySection from './components/FamilyAvailabilitySection/FamilyAvailabilitySection';
 
 import '@kubevirt-utils/styles/list-managment-group.scss';
 
@@ -74,6 +75,7 @@ const ClusterInstancetypeList: FC<ListPageProps> = ({
 
   return (
     <ListPageBody>
+      <FamilyAvailabilitySection />
       <div className="list-managment-group">
         <KubevirtFilterToolbar
           clearAllFilters={clearAllFilters}
@@ -82,7 +84,7 @@ const ClusterInstancetypeList: FC<ListPageProps> = ({
           filterDefinitions={filterDefinitions}
           filters={filters}
           hideColumnManagement={hideColumnManagement}
-          loaded={isLoaded}
+          loaded={loadedColumns}
           onSetFilters={handleSetFilters}
           toolbarEndContent={
             <KubevirtTableExport

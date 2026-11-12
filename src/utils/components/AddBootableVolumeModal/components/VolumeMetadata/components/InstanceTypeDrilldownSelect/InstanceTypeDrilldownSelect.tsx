@@ -1,9 +1,9 @@
-import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
+import React, { type FC, useCallback, useEffect, useMemo, useState } from 'react';
 
 import { VirtualMachineClusterInstancetypeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
-  AddBootableVolumeState,
-  SetBootableVolumeFieldType,
+  type AddBootableVolumeState,
+  type SetBootableVolumeFieldType,
 } from '@kubevirt-utils/components/AddBootableVolumeModal/types';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import {
@@ -76,6 +76,7 @@ export const InstanceTypeDrilldownSelect: FC<InstanceTypeMenuItemsProps> = ({
 
   return (
     <FormGroup
+      label={t('Default InstanceType')}
       labelHelp={
         <HelpTextIcon
           bodyContent={(hide) => (
@@ -88,15 +89,8 @@ export const InstanceTypeDrilldownSelect: FC<InstanceTypeMenuItemsProps> = ({
           position={PopoverPosition.right}
         />
       }
-      label={t('Default InstanceType')}
     >
       <ComposableDrilldownSelect
-        toggleLabel={
-          <SelectInstanceTypeToggle
-            selected={selectedInstanceType}
-            selectedKind={selectedInstanceTypeKind}
-          />
-        }
         appendTo={document.getElementById('tab-modal')}
         direction="up"
         id={MENUS.root}
@@ -104,9 +98,16 @@ export const InstanceTypeDrilldownSelect: FC<InstanceTypeMenuItemsProps> = ({
         isOpen={isOpen}
         scrollableMenuIDs={[MENUS.userProvided]}
         setIsOpen={setIsOpen}
+        toggleLabel={
+          <SelectInstanceTypeToggle
+            selected={selectedInstanceType}
+            selectedKind={selectedInstanceTypeKind}
+          />
+        }
       >
         <DrilldownMenuItem {...menuItems.redHatProvided} label={t(menuItems.redHatProvided.label)}>
           <RedHatInstanceTypeSeriesMenu
+            cluster={bootableVolumeCluster}
             onSelect={(value, keepMenuOpen) =>
               onSelect(VirtualMachineClusterInstancetypeModel.kind, value, keepMenuOpen)
             }

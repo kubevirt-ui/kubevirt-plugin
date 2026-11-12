@@ -1,12 +1,12 @@
-import { FC, ReactNode } from 'react';
 import React from 'react';
+import { type FC, type ReactNode } from 'react';
 import classNames from 'classnames';
 
 import {
   ExpandableSection,
   ExpandableSectionToggle,
   PopoverPosition,
-  PopoverProps,
+  type PopoverProps,
   Split,
   SplitItem,
   Stack,
@@ -23,6 +23,7 @@ type ExpandSectionWithCustomToggleProps = {
   className?: string;
   customContent?: ReactNode;
   expandSectionClassName?: string;
+  helpTextBesideToggle?: boolean;
   helpTextContent?: PopoverProps['bodyContent'];
   id: string;
   isExpanded?: boolean;
@@ -38,6 +39,7 @@ const ExpandSectionWithCustomToggle: FC<ExpandSectionWithCustomToggleProps> = ({
   className,
   customContent,
   expandSectionClassName = '',
+  helpTextBesideToggle = false,
   helpTextContent,
   id,
   isExpanded: controlledIsExpanded,
@@ -67,7 +69,7 @@ const ExpandSectionWithCustomToggle: FC<ExpandSectionWithCustomToggleProps> = ({
         })}
       >
         <Split>
-          <SplitItem isFilled>
+          <SplitItem isFilled={!helpTextBesideToggle}>
             <ExpandableSectionToggle
               className={classNames(toggleClassname, { isHighlighted })}
               contentId={contentID}
@@ -79,7 +81,10 @@ const ExpandSectionWithCustomToggle: FC<ExpandSectionWithCustomToggleProps> = ({
             </ExpandableSectionToggle>
           </SplitItem>
           {helpTextContent && (
-            <SplitItem className="expand-section-custom-toggle__help-icon-container" isFilled>
+            <SplitItem
+              className="expand-section-custom-toggle__help-icon-container"
+              isFilled={!helpTextBesideToggle}
+            >
               <HelpTextIcon
                 bodyContent={helpTextContent}
                 helpIconClassName="expand-section-custom-toggle__help-icon"

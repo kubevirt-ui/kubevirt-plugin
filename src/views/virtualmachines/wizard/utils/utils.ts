@@ -1,9 +1,10 @@
-import { TFunction } from 'i18next';
-import { UseFormGetValues, UseFormSetValue } from 'react-hook-form';
+import { type UseFormGetValues, type UseFormSetValue } from 'react-hook-form';
+import { type TFunction } from 'i18next';
 
 import { getInstanceTypeFromVolume } from '@kubevirt-utils/components/AddBootableVolumeModal/utils';
-
+import { cancelAllWizardPendingUploads } from '@kubevirt-utils/hooks/useUploadProgressToast';
 import { getDiskSize } from '@kubevirt-utils/resources/bootableresources/selectors';
+import { setCustomizeWizardVMSignal } from '@kubevirt-utils/signals/customizeWizardVMSignal';
 import CloneIcon from '@virtualmachines/wizard/steps/DeploymentDetailsStep/components/CreationMethodTileGroup/components/CreationMethodTile/components/CloneIcon';
 import { InstanceTypeIcon } from '@virtualmachines/wizard/steps/DeploymentDetailsStep/components/CreationMethodTileGroup/components/CreationMethodTile/components/InstanceTypeIcon';
 import TemplateIcon from '@virtualmachines/wizard/steps/DeploymentDetailsStep/components/CreationMethodTileGroup/components/CreationMethodTile/components/TemplateIcon';
@@ -12,20 +13,18 @@ import {
   INSTANCE_TYPE_FLOW,
   TEMPLATE_FLOW,
   VMCreationMethod,
-  VMWizardStep,
+  type VMWizardStep,
 } from '@virtualmachines/wizard/utils/constants';
 
-import { cancelAllWizardPendingUploads } from '@kubevirt-utils/hooks/useUploadProgressToast';
-import { setCustomizeWizardVMSignal } from '@kubevirt-utils/signals/customizeWizardVMSignal';
 import {
   CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA,
   CREATE_VM_FORM_FIELDS_STEP_NAVIGATION,
 } from '../state/vm-wizard-form/consts';
-import { VMWizardFormValues } from '../state/vm-wizard-form/types';
+import { type VMWizardFormValues } from '../state/vm-wizard-form/types';
 import {
-  ApplySelectedBootableVolumeToForm,
-  VMCreationMethodCardDetails,
-  VMCreationMethodConfig,
+  type ApplySelectedBootableVolumeToForm,
+  type VMCreationMethodCardDetails,
+  type VMCreationMethodConfig,
 } from './types';
 
 const VM_CREATION_METHOD_MAPPER: Record<VMCreationMethod, VMCreationMethodConfig> = {
@@ -67,16 +66,18 @@ export const getVMCreationMethodDetails = (
   t: TFunction,
 ): VMCreationMethodCardDetails => VM_CREATION_METHOD_MAPPER[creationMethod].cardDetails(t);
 
-export const isCloneCreationMethod = (creationMethod: VMCreationMethod) =>
+export const isCloneCreationMethod = (creationMethod: VMCreationMethod): boolean =>
   creationMethod === VMCreationMethod.CLONE;
-export const isTemplateCreationMethod = (creationMethod: VMCreationMethod) =>
+export const isTemplateCreationMethod = (creationMethod: VMCreationMethod): boolean =>
   creationMethod === VMCreationMethod.TEMPLATE;
-export const isInstanceTypeCreationMethod = (creationMethod: VMCreationMethod) =>
+export const isInstanceTypeCreationMethod = (creationMethod: VMCreationMethod): boolean =>
   creationMethod === VMCreationMethod.INSTANCE_TYPE;
 
 export const applySelectedBootableVolumeToForm = ({
   dvSource,
+  familiesLoaded,
   getValues,
+  isFamilyVisible,
   pvcSource,
   selectedVolume,
   setValue,
@@ -84,6 +85,11 @@ export const applySelectedBootableVolumeToForm = ({
 }: ApplySelectedBootableVolumeToForm): void => {
   const instanceTypeName = getInstanceTypeFromVolume(selectedVolume);
   const [series = '', size = ''] = instanceTypeName?.split('.') || [];
+  const volumeHasInstanceType = Boolean(series && size);
+  const familyAvailabilityReady = familiesLoaded !== false;
+  const volumeFamilyIsAvailable = isFamilyVisible ? isFamilyVisible(series) : true;
+  const shouldApplySeriesFromVolume =
+    volumeHasInstanceType && familyAvailabilityReady && volumeFamilyIsAvailable;
 
   setValue(CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.ROOT, {
     ...getValues(CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.ROOT),
@@ -95,8 +101,8 @@ export const applySelectedBootableVolumeToForm = ({
       name: instanceTypeName,
       namespace: null,
     },
-    selectedSeries: series,
-    selectedSize: size,
+    selectedSeries: shouldApplySeriesFromVolume ? series : '',
+    selectedSize: shouldApplySeriesFromVolume ? size : '',
     volumeSnapshotSource,
   });
 };
@@ -105,7 +111,7 @@ export const markStepVisited = (
   stepId: string,
   getValues: UseFormGetValues<VMWizardFormValues>,
   setValue: UseFormSetValue<VMWizardFormValues>,
-) => {
+): void => {
   const visitedSteps = getValues(CREATE_VM_FORM_FIELDS_STEP_NAVIGATION.VISITED_STEPS);
   if (visitedSteps.has(stepId)) {
     return;
@@ -116,7 +122,7 @@ export const markStepVisited = (
   setValue(CREATE_VM_FORM_FIELDS_STEP_NAVIGATION.VISITED_STEPS, nextVisitedSteps);
 };
 
-export const clearVMPendingUploadsAndSignal = () => {
+export const clearVMPendingUploadsAndSignal = (): void => {
   setCustomizeWizardVMSignal(null);
   cancelAllWizardPendingUploads();
 };

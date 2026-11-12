@@ -6,6 +6,7 @@ import {
   type V1beta1VirtualMachinePreference,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { BOOTABLE_VOLUME_SELECTED, logITFlowEvent } from '@kubevirt-utils/extensions/telemetry';
+import useDisabledInstanceTypeFamilies from '@kubevirt-utils/hooks/useInstanceTypeFamilyAvailability/useDisabledInstanceTypeFamilies';
 import { type BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import {
   getName,
@@ -16,7 +17,10 @@ import {
 import { Table, TableVariant, Tbody, Th, Thead, Tr } from '@patternfly/react-table';
 import { type ThSortType } from '@patternfly/react-table/dist/esm/components/Table/base/types';
 import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
-import { CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
+import {
+  CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA,
+  CREATE_VM_FORM_FIELDS_VM_DATA,
+} from '@virtualmachines/wizard/state/vm-wizard-form/consts';
 import { getBootableVolumeRowData } from '@virtualmachines/wizard/steps/InstanceTypesSteps/BootSourceStep/components/BootableVolumeList/utils/getBootableVolumeRowData';
 import {
   type ApplySelectedBootableVolumeToForm,
@@ -48,23 +52,35 @@ const BootableVolumeTable: FC<BootableVolumeTableProps> = ({
 }) => {
   const { control, getValues, setValue } = useVMWizard();
 
+  const cluster = useWatch({
+    control,
+    name: CREATE_VM_FORM_FIELDS_VM_DATA.CLUSTER,
+  });
   const selectedBootableVolume = useWatch({
     control,
     name: CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.SELECTED_BOOTABLE_VOLUME,
   });
+  const { isFamilyVisible, loaded: familiesLoaded } = useDisabledInstanceTypeFamilies(cluster);
 
   const onSelectBootableVolume = useCallback(
-    (args: ApplySelectedBootableVolumeToForm) => {
+    (
+      args: Omit<
+        ApplySelectedBootableVolumeToForm,
+        'familiesLoaded' | 'getValues' | 'isFamilyVisible' | 'setValue'
+      >,
+    ) => {
       applySelectedBootableVolumeToForm({
         ...args,
+        familiesLoaded,
         getValues,
+        isFamilyVisible,
         setValue,
       });
       logITFlowEvent(BOOTABLE_VOLUME_SELECTED, null, {
         selectedBootableVolume: getName(args.selectedVolume),
       });
     },
-    [getValues, setValue],
+    [familiesLoaded, getValues, isFamilyVisible, setValue],
   );
 
   return (
