@@ -1,0 +1,35 @@
+.add-bootable-volume-wizard {
+  // Keep modal chrome stable across steps and source-dependent fields.
+  display: flex;
+  flex-direction: column;
+  height: 85vh;
+
+  .pf-v6-c-modal-box__body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .pf-v6-c-wizard {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+  }
+
+  .pf-v6-c-wizard__outer-wrap,
+  .pf-v6-c-wizard__inner-wrap {
+    flex: 1;
+    min-height: 0;
+  }
+
+  // PatternFly scrolls this pane; it needs a bounded height from the flex chain above.
+  .pf-v6-c-wizard__main {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden auto;
+  }
+}

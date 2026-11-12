@@ -2,8 +2,7 @@ import { type FC, type ReactElement, useCallback, useEffect, useState } from 're
 
 import SelectToggle from '@kubevirt-utils/components/toggles/SelectToggle';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import usePermissions from '@kubevirt-utils/hooks/usePermissions/usePermissions';
-import useCanCreateBootableVolume from '@kubevirt-utils/resources/bootableresources/hooks/useCanCreateBootableVolume';
+import useBootableVolumeSourcePermissions from '@kubevirt-utils/resources/bootableresources/hooks/useBootableVolumeSourcePermissions';
 import { getNoPermissionTooltipContent } from '@kubevirt-utils/utils/utils';
 import { Divider, FormGroup, Select, SelectGroup, SelectOption } from '@patternfly/react-core';
 
@@ -26,10 +25,8 @@ const SourceTypeSelection: FC<SourceTypeSelectionProps> = ({
 }): ReactElement => {
   const { t } = useKubevirtTranslation();
   const [isOpen, setIsOpen] = useState(false);
-  const { canCreateDS, canCreatePVC, canCreateSnapshots, loading } =
-    useCanCreateBootableVolume(namespace);
-  const { capabilitiesData, isLoading: permissionsLoading } = usePermissions();
-  const canUploadImage = capabilitiesData.uploadImage.allowed && canCreatePVC;
+  const { canCreateDS, canCreatePVC, canCreateSnapshots, canUploadImage, defaultSource, loading } =
+    useBootableVolumeSourcePermissions(namespace);
 
   const onSelect = useCallback(
     (_event, value): void => {
@@ -48,14 +45,10 @@ const SourceTypeSelection: FC<SourceTypeSelectionProps> = ({
   );
 
   useEffect(() => {
-    if (!permissionsLoading && !loading) {
-      setFormSelection(
-        !canUploadImage
-          ? DROPDOWN_FORM_SELECTION.USE_REGISTRY
-          : DROPDOWN_FORM_SELECTION.UPLOAD_VOLUME,
-      );
+    if (!loading) {
+      setFormSelection(defaultSource);
     }
-  }, [canUploadImage, permissionsLoading, loading, setFormSelection]);
+  }, [defaultSource, loading, setFormSelection]);
 
   const onToggle = (): void => setIsOpen((prevIsOpen) => !prevIsOpen);
 

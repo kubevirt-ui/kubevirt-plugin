@@ -1,4 +1,5 @@
 import { useCallback, useRef } from 'react';
+import { useWatch } from 'react-hook-form';
 
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -6,9 +7,10 @@ import type { WizardStepType } from '@patternfly/react-core';
 import ExitWizardModal from '@virtualmachines/wizard/components/ExitWizardModal';
 
 import { useBootableVolumeWizardForm } from '../form/BootableVolumeWizardFormProvider';
+import { volumeNameInputSchema } from '../form/schema/createProjectAndVolumeSchema';
 import {
   BOOTABLE_VOLUME_WIZARD_STEPS,
-  type BootableVolumeWizardStep,
+  BootableVolumeWizardStep,
   getBootableVolumeWizardNavigationPrerequisites,
   mapBootableVolumeWizardErrorsToSteps,
   triggerBootableVolumeWizardStepValidation,
@@ -24,12 +26,32 @@ const useBootableVolumeWizardNavigation = ({
   onClose,
 }: UseBootableVolumeWizardNavigationArgs): BootableVolumeWizardNavItemConfig => {
   const { t } = useKubevirtTranslation();
-  const { formState, trigger } = useBootableVolumeWizardForm();
+  const { control, formState, trigger } = useBootableVolumeWizardForm();
   const { currentStep, visitedSteps } = useBootableVolumeWizardState();
   const { createModal } = useModal();
   const navigatingRef = useRef(false);
 
+  const [volumeName, destinationProject] = useWatch({
+    control,
+    name: ['projectAndVolume.volumeName', 'projectAndVolume.destinationProject'],
+  });
+
   const errorsByStep = mapBootableVolumeWizardErrorsToSteps(formState.errors);
+
+  const isStepValid = useCallback(
+    (stepId: BootableVolumeWizardStep): boolean => {
+      if (stepId !== BootableVolumeWizardStep.PROJECT_AND_VOLUME || currentStep !== stepId) {
+        return !errorsByStep[stepId];
+      }
+
+      return (
+        !errorsByStep[stepId] &&
+        volumeNameInputSchema.isValidSync(volumeName) &&
+        Boolean(destinationProject?.trim())
+      );
+    },
+    [currentStep, destinationProject, errorsByStep, volumeName],
+  );
 
   const openExitModal = useCallback((): void => {
     createModal(({ isOpen, onClose: closeModal }) => (
@@ -62,9 +84,9 @@ const useBootableVolumeWizardNavigation = ({
       if (targetIndex <= currentIndex) return false;
 
       const prerequisites = getBootableVolumeWizardNavigationPrerequisites(currentStep, stepId);
-      return prerequisites.some((prereq) => !visitedSteps.has(prereq) || errorsByStep[prereq]);
+      return prerequisites.some((prereq) => !visitedSteps.has(prereq) || !isStepValid(prereq));
     },
-    [currentStep, errorsByStep, visitedSteps],
+    [currentStep, isStepValid, visitedSteps],
   );
 
   const handleNavItemClick = useCallback(

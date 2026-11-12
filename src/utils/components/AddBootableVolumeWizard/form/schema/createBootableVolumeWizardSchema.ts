@@ -14,5 +14,5 @@ export const createBootableVolumeWizardSchema = (
   yup.object({
     imageSource: createImageSourceSchema(t),
     operatingSystem: createOperatingSystemSchema(),
-    projectAndVolume: createProjectAndVolumeSchema(),
+    projectAndVolume: createProjectAndVolumeSchema(t),
   }) as yup.ObjectSchema<BootableVolumeWizardFormValues>;

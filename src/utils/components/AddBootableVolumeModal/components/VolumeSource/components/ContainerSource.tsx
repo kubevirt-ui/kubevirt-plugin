@@ -4,6 +4,7 @@ import {
   type FormEvent,
   type FormEventHandler,
   type ReactElement,
+  type ReactNode,
   type SetStateAction,
 } from 'react';
 import { useFormContext } from 'react-hook-form';
@@ -12,36 +13,58 @@ import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/
 import { FormPasswordInput } from '@kubevirt-utils/components/FormPasswordInput/FormPasswordInput';
 import { FormTextInput } from '@kubevirt-utils/components/FormTextInput/FormTextInput';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getFieldRequiredMessage } from '@kubevirt-utils/utils/validation';
-import { FormGroup, ValidatedOptions } from '@patternfly/react-core';
+import { FormGroup, type ValidatedOptions } from '@patternfly/react-core';
+
+import {
+  resolveContainerImageHelperText,
+  resolveValidatedOption,
+} from './utils/containerSourceValidation';
 
 type ContainerSourceProps = {
   containerImage?: string;
+  imageHelperText?: ReactNode;
+  imageValidated?: ValidatedOptions;
   onInputValueChange?: FormEventHandler<HTMLInputElement>;
   registryCredentials: { password: string; username: string };
   registrySourceHelperText: string;
   selectedSourceType: string;
   setRegistryCredentials: Dispatch<SetStateAction<{ password: string; username: string }>>;
   testId: string;
+  usernameHelperText?: ReactNode;
+  usernameValidated?: ValidatedOptions;
 };
 
 const ContainerSource: FC<ContainerSourceProps> = ({
   containerImage,
+  imageHelperText,
+  imageValidated,
   onInputValueChange,
   registryCredentials,
   registrySourceHelperText,
   selectedSourceType,
   setRegistryCredentials,
   testId,
+  usernameHelperText,
+  usernameValidated,
 }): ReactElement => {
   const { t } = useKubevirtTranslation();
   const form = useFormContext();
-  const errors = form?.formState?.errors ?? {};
-  const register = form?.register;
+  const isControlled = Boolean(onInputValueChange);
+  const errors = !isControlled ? (form?.formState?.errors ?? {}) : {};
+  const register = !isControlled ? form?.register : undefined;
 
-  const validated = errors?.[`${testId}-containerImage`]
-    ? ValidatedOptions.error
-    : ValidatedOptions.default;
+  const hasImageError = Boolean(errors?.[`${testId}-containerImage`]);
+  const resolvedImageValidated = resolveValidatedOption(imageValidated, hasImageError);
+  const resolvedUsernameValidated = resolveValidatedOption(
+    usernameValidated,
+    Boolean(errors?.[`${testId}-username`]),
+  );
+  const resolvedImageHelperText = resolveContainerImageHelperText({
+    hasImageError,
+    imageHelperText,
+    registrySourceHelperText,
+    t,
+  });
 
   const handleCredentialsChange = (
     e: FormEvent<HTMLInputElement>,
@@ -65,13 +88,11 @@ const ContainerSource: FC<ContainerSourceProps> = ({
           id={`${testId}-${selectedSourceType}`}
           onChange={onInputValueChange}
           type="text"
-          validated={validated}
+          validated={resolvedImageValidated}
           value={register ? undefined : containerImage}
         />
-        <FormGroupHelperText validated={validated}>
-          {errors?.[`${testId}-containerImage`]
-            ? getFieldRequiredMessage(t)
-            : registrySourceHelperText}
+        <FormGroupHelperText validated={resolvedImageValidated}>
+          {resolvedImageHelperText}
         </FormGroupHelperText>
       </FormGroup>
       <FormGroup
@@ -86,11 +107,14 @@ const ContainerSource: FC<ContainerSourceProps> = ({
           id={`${testId}-${selectedSourceType}-username`}
           onChange={(e) => handleCredentialsChange(e, 'username')}
           type="text"
-          validated={
-            errors?.[`${testId}-username`] ? ValidatedOptions.error : ValidatedOptions.default
-          }
+          validated={resolvedUsernameValidated}
           value={register ? undefined : registryCredentials?.username}
         />
+        {usernameHelperText && (
+          <FormGroupHelperText validated={resolvedUsernameValidated}>
+            {usernameHelperText}
+          </FormGroupHelperText>
+        )}
       </FormGroup>
       <FormGroup
         className="disk-source-form-group"
@@ -104,9 +128,7 @@ const ContainerSource: FC<ContainerSourceProps> = ({
           id={`${testId}-${selectedSourceType}`}
           onChange={(e) => handleCredentialsChange(e, 'password')}
           type="text"
-          validated={
-            errors?.[`${testId}-password`] ? ValidatedOptions.error : ValidatedOptions.default
-          }
+          validated={resolveValidatedOption(undefined, Boolean(errors?.[`${testId}-password`]))}
           value={register ? undefined : registryCredentials?.password}
         />
       </FormGroup>
