@@ -1,8 +1,17 @@
+import { type UploadSuccessLink } from '@kubevirt-utils/hooks/useInFlightToast/shared/types/types';
 import { type HelperOptions } from '@kubevirt-utils/hooks/useKubevirtToast/types';
 import { type FleetWatchK8sResource } from '@stolostron/multicluster-sdk';
 
+export type WatchedResourceToastOptions = HelperOptions & {
+  error?: unknown;
+  showInitialToast?: boolean;
+  successContent?: string;
+  successLinks?: UploadSuccessLink[];
+  successTitle?: string;
+};
+
 export type WatchedResourceEntry = {
-  toastOptions: HelperOptions;
+  toastOptions: WatchedResourceToastOptions;
   watchDataResource: FleetWatchK8sResource | undefined;
 };
 
@@ -16,8 +25,12 @@ export type WatchedResourcesSliceActions = {
   pushNewWatchedResource: (
     watchedResourceEntry: WatchedResourceEntry,
     keyPrefix: WatchedResourceKeyPrefix,
-  ) => void;
+  ) => string;
   removeWatchedResource: (id: string) => void;
+  updateWatchedResourceToastOptions: (
+    id: string,
+    toastOptions: Partial<WatchedResourceToastOptions>,
+  ) => void;
 };
 
 export type WatchedResourcesStoreSlice = {

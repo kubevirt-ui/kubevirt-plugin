@@ -108,6 +108,12 @@
 // t('Import content via URL (HTTP or HTTPS endpoint).')
 // t('PVC (clone PVC)')
 // t('Select an existing persistent volume claim already available on the cluster and clone it.')
+
+// Clone VM toast strings - used in CloneVMModal and watched-resource clone toast helpers
+// t('Clone virtual machine')
+// t('Clone completed')
+// t('Cloning may take several minutes. The process will continue in the background. The cloned virtual machine may take some time to appear in the list.')
+// t('Unable to retrieve the resource status. Use the link for more information.')
 // t('Registry (creates PVC)')
 // t('Upload (Upload a new file to a PVC)')
 // t('Upload a new file to a PVC. A new PVC will be created.')

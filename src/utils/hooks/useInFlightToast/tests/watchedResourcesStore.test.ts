@@ -32,25 +32,35 @@ describe('watchedResources store slice', () => {
   });
 
   it('should add an entry when pushNewWatchedResource is called', () => {
-    getWatchedResourcesActions().pushNewWatchedResource(
+    const id = getWatchedResourcesActions().pushNewWatchedResource(
       WATCHED_RESOURCE_ENTRY,
       WatchedResourceKeyPrefix.CloneVm,
     );
 
     const data = getWatchedResourcesData();
-    const entries = Object.entries(data);
 
-    expect(entries).toHaveLength(1);
-    expect(entries[0][0]).toMatch(/^clone-vm-/);
-    expect(entries[0][1]).toEqual(WATCHED_RESOURCE_ENTRY);
+    expect(id).toMatch(/^clone-vm-/);
+    expect(Object.keys(data)).toHaveLength(1);
+    expect(data[id]).toEqual(WATCHED_RESOURCE_ENTRY);
   });
 
-  it('should remove an entry when removeWatchedResource is called', () => {
-    getWatchedResourcesActions().pushNewWatchedResource(
+  it('should update toast options when updateWatchedResourceToastOptions is called', () => {
+    const id = getWatchedResourcesActions().pushNewWatchedResource(
       WATCHED_RESOURCE_ENTRY,
       WatchedResourceKeyPrefix.CloneVm,
     );
-    const [id] = Object.keys(getWatchedResourcesData());
+    const error = new Error('clone failed');
+
+    getWatchedResourcesActions().updateWatchedResourceToastOptions(id, { error });
+
+    expect(getWatchedResourcesData()[id].toastOptions.error).toBe(error);
+  });
+
+  it('should remove an entry when removeWatchedResource is called', () => {
+    const id = getWatchedResourcesActions().pushNewWatchedResource(
+      WATCHED_RESOURCE_ENTRY,
+      WatchedResourceKeyPrefix.CloneVm,
+    );
 
     getWatchedResourcesActions().removeWatchedResource(id);
 

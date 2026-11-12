@@ -26,6 +26,10 @@ Automated E2E coverage for console routes under `tests/virtual-machines/detail/o
 
 ### vm-overview-lifecycle
 
+- **Environment:** OpenShift with CNV operator installed; Playwright `Tier1` / `Tier2` project (per spec tags).
+- **Configuration:** Clone workflow asserts in-flight info toast and terminal success toast when
+  VirtualMachineClone reaches Succeeded.
+
 ### vm-overview-namespace
 
 ---
@@ -35,7 +39,7 @@ Automated E2E coverage for console routes under `tests/virtual-machines/detail/o
 ### Module: `vm-overview-lifecycle.spec.ts`
 
 **Spec file:** `tests/virtual-machines/detail/overview/vm-overview-lifecycle.spec.ts`
-**Describe:** `VM Snapshots — shared stopped RHEL9 VM / VM Clone workflow — clone stopped VM, start clone, verify both exist / Running VM snapshot operations` — **Tags:** @tier2-snapshots, @tier2-vm-clone
+**Describe:** `VM Snapshots — shared stopped RHEL9 VM / VM Clone workflow — clone stopped VM, start clone, verify both exist / Running VM snapshot operations` — **Tags:** @tier2-snapshots, @tier1-vm-actions, @vm-clone
 **Allure:** suite `Test VM Snapshot`, feature `Tier 2`
 
 ---
@@ -85,17 +89,20 @@ Automated E2E coverage for console routes under `tests/virtual-machines/detail/o
 
 ---
 
-### `004`: Clone a stopped VM with start-on-clone and verify the cloned VM runs
+### `004`: Clone a stopped VM with start-on-clone, toasts, and verify the cloned VM runs
 
-- **Objective:** Clone a stopped VM with start-on-clone and verify the cloned VM runs
+- **Objective:** Clone a stopped VM from the list modal with start-on-clone; assert info and success
+  toasts; verify the cloned VM is created and reaches Running.
 - **Target version:** CNV 5.1.0
-- **Jira References:** —
-- **Pre-conditions:** See spec `beforeEach` / `beforeAll` hooks when present
-- **Tags:** @tier2-snapshots, @tier2-vm-clone
+- **Jira References:** CNV-95826
+- **Pre-conditions:** Halted RHEL9 source VM in a dedicated namespace; VirtualMachines list is open.
+- **Tags:** @tier1-vm-actions, @vm-clone
 
-| Step | Action                           | Expected Result                          |
-| :--- | :------------------------------- | :--------------------------------------- |
-| 1    | take snapshot and verify visible | Step completes without assertion failure |
+| Step | Action                                                      | Expected Result                                          |
+| :--- | :---------------------------------------------------------- | :------------------------------------------------------- |
+| 1    | Clone source VM with start after creation                   | Info toast for target name; clone modal closes           |
+| 2    | Poll for cloned VM while observing success toast            | Target VM exists; success toast titled `Clone completed` |
+| 3    | Verify cloned VM reaches Running and source VM still exists | Cloned VM Running; source VM unchanged                   |
 
 ---
 
