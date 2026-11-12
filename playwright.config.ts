@@ -79,99 +79,111 @@ const uiTestIgnoreManual = ['**/api/**', '**/explore/**'];
 /** Dedicated Settings / Migrations projects — exclude from gating/tier lanes. */
 const uiGrepInvertSettingsOrMigrations = /@cnv-settings|@migration/;
 
+const privilegedProjects = [
+  {
+    fullyParallel: EnvVariables.isCI ? false : true,
+    grep: /@gating/,
+    grepInvert: uiGrepInvertSettingsOrMigrations,
+    name: 'Gating',
+    testDir: uiTestDir,
+    testIgnore: uiTestIgnoreManual,
+    use: { ...migrationUse, baseURL, storageState },
+  },
+  {
+    fullyParallel: true,
+    grep: /@tier1/,
+    grepInvert: /@tier2|@cnv-settings|@migration/,
+    name: 'Tier1',
+    testDir: uiTestDir,
+    testIgnore: uiTestIgnoreManual,
+    use: { ...migrationUse, baseURL, storageState },
+  },
+  {
+    fullyParallel: true,
+    grep: /@tier2/,
+    grepInvert: /@tier1|@cnv-settings|@migration/,
+    name: 'Tier2',
+    testDir: uiTestDir,
+    testIgnore: uiTestIgnoreManual,
+    use: { ...migrationUse, baseURL, storageState },
+  },
+  {
+    /** CNV Settings — cluster/user/preview settings (kubevirt-ui `CNV Settings` group). */
+    fullyParallel: true,
+    grep: /@cnv-settings/,
+    name: 'Settings',
+    testDir: uiTestDir,
+    testIgnore: uiTestIgnoreManual,
+    use: { ...migrationUse, baseURL, storageState },
+  },
+  {
+    /** VM compute/storage migrations (kubevirt-ui `Migrations` group). */
+    fullyParallel: true,
+    grep: /@migration/,
+    name: 'Migrations',
+    testDir: uiTestDir,
+    testIgnore: uiTestIgnoreManual,
+    use: { ...migrationUse, baseURL, storageState },
+  },
+  {
+    /**
+     * s390x architecture-specific tests (kubevirt-ui `s390x` group).
+     * Specs guard with `EnvVariables.isS390x` / `s390xMockEnabled`.
+     */
+    fullyParallel: true,
+    grep: /@s390x/,
+    name: 's390x',
+    testDir: uiTestDir,
+    testIgnore: uiTestIgnoreManual,
+    testMatch: '**/s390x/**/*.spec.ts',
+    use: { ...migrationUse, baseURL, storageState },
+  },
+  {
+    /** Browserless console-proxy API contract tests (kubevirt-ui `API` project). */
+    fullyParallel: false,
+    name: 'API',
+    retries: 0,
+    testDir: './playwright/tests/api',
+    use: { ...migrationUse, baseURL, storageState },
+  },
+];
+
+/**
+ * NonPriv needs a real OAuth non-priv session (`nonpriv-state.json`).
+ * HC auth-disabled setup only writes `test-state.json` — omit these projects on HC
+ * so `auto` (no --project filter) does not ENOENT on missing nonpriv-state.
+ */
+const nonPrivProjects = EnvVariables.isHcE2e
+  ? []
+  : [
+      {
+        fullyParallel: true,
+        grep: /@tier1/,
+        grepInvert: /@admin-only|@tier2|@cnv-settings|@migration/,
+        name: 'Tier1NonPriv',
+        testDir: uiTestDir,
+        testIgnore: uiTestIgnoreManual,
+        use: { ...migrationUse, baseURL, storageState: nonPrivStorageState },
+      },
+      {
+        fullyParallel: true,
+        grep: /@tier2/,
+        grepInvert: /@admin-only|@tier1|@cnv-settings|@migration/,
+        name: 'Tier2NonPriv',
+        testDir: uiTestDir,
+        testIgnore: uiTestIgnoreManual,
+        use: { ...migrationUse, baseURL, storageState: nonPrivStorageState },
+      },
+    ];
+
 export default defineConfig({
   expect: { timeout: TestTimeouts.ELEMENT_WAIT },
   forbidOnly: EnvVariables.isCI,
   fullyParallel: true,
   globalSetup: './playwright/project-dependencies/global.setup.ts',
   globalTeardown: './playwright/project-dependencies/global.teardown.ts',
-  outputDir: testResultsDir,
-  projects: [
-    {
-      fullyParallel: EnvVariables.isCI ? false : true,
-      grep: /@gating/,
-      grepInvert: uiGrepInvertSettingsOrMigrations,
-      name: 'Gating',
-      testDir: uiTestDir,
-      testIgnore: uiTestIgnoreManual,
-      use: { ...migrationUse, baseURL, storageState },
-    },
-    {
-      fullyParallel: true,
-      grep: /@tier1/,
-      grepInvert: /@tier2|@cnv-settings|@migration/,
-      name: 'Tier1',
-      testDir: uiTestDir,
-      testIgnore: uiTestIgnoreManual,
-      use: { ...migrationUse, baseURL, storageState },
-    },
-    {
-      fullyParallel: true,
-      grep: /@tier2/,
-      grepInvert: /@tier1|@cnv-settings|@migration/,
-      name: 'Tier2',
-      testDir: uiTestDir,
-      testIgnore: uiTestIgnoreManual,
-      use: { ...migrationUse, baseURL, storageState },
-    },
-    {
-      /** CNV Settings — cluster/user/preview settings (kubevirt-ui `CNV Settings` group). */
-      fullyParallel: true,
-      grep: /@cnv-settings/,
-      name: 'Settings',
-      testDir: uiTestDir,
-      testIgnore: uiTestIgnoreManual,
-      use: { ...migrationUse, baseURL, storageState },
-    },
-    {
-      /** VM compute/storage migrations (kubevirt-ui `Migrations` group). */
-      fullyParallel: true,
-      grep: /@migration/,
-      name: 'Migrations',
-      testDir: uiTestDir,
-      testIgnore: uiTestIgnoreManual,
-      use: { ...migrationUse, baseURL, storageState },
-    },
-    {
-      /**
-       * s390x architecture-specific tests (kubevirt-ui `s390x` group).
-       * Specs guard with `EnvVariables.isS390x` / `s390xMockEnabled`.
-       */
-      fullyParallel: true,
-      grep: /@s390x/,
-      name: 's390x',
-      testDir: uiTestDir,
-      testIgnore: uiTestIgnoreManual,
-      testMatch: '**/s390x/**/*.spec.ts',
-      use: { ...migrationUse, baseURL, storageState },
-    },
-    {
-      fullyParallel: true,
-      grep: /@tier1/,
-      grepInvert: /@admin-only|@tier2|@cnv-settings|@migration/,
-      name: 'Tier1NonPriv',
-      testDir: uiTestDir,
-      testIgnore: uiTestIgnoreManual,
-      use: { ...migrationUse, baseURL, storageState: nonPrivStorageState },
-    },
-    {
-      fullyParallel: true,
-      grep: /@tier2/,
-      grepInvert: /@admin-only|@tier1|@cnv-settings|@migration/,
-      name: 'Tier2NonPriv',
-      testDir: uiTestDir,
-      testIgnore: uiTestIgnoreManual,
-      use: { ...migrationUse, baseURL, storageState: nonPrivStorageState },
-    },
-    {
-      /** Browserless console-proxy API contract tests (kubevirt-ui `API` project). */
-      fullyParallel: false,
-      name: 'API',
-      retries: 0,
-      testDir: './playwright/tests/api',
-      use: { ...migrationUse, baseURL, storageState },
-    },
-  ],
+  outputDir: './playwright/test-results/artifacts',
+  projects: [...privilegedProjects, ...nonPrivProjects],
   reporter: getReporterConfig(testResultsDir),
   retries: EnvVariables.retries,
   timeout: TestTimeouts.TEST_LONG,
@@ -187,7 +199,7 @@ export default defineConfig({
     storageState,
     testIdAttribute: 'data-test',
     trace: 'off',
-    video: 'off',
+    video: 'retain-on-failure',
     viewport: { height: 1080, width: 1920 },
   },
   workers: process.env.WORKERS ? parseInt(process.env.WORKERS, 10) : 4,

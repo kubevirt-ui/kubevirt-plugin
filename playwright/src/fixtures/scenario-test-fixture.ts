@@ -112,7 +112,8 @@ const _test = base.extend<Fixtures, WorkerFixtures>({
     await dismissConsoleObstructions(page);
     if (EnvVariables.isNonPrivUser) {
       await ensureNonPrivAdministratorPerspective(page);
-    } else {
+    } else if (!EnvVariables.isSkipBrowserLogin) {
+      // HC E2E / local auth-disabled console shows "Auth disabled", not kube:admin.
       const userMenu = page.getByRole('button', { name: 'User menu' });
       await userMenu.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
       const userLabel = ((await userMenu.textContent()) ?? '').trim();
