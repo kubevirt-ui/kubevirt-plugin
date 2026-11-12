@@ -16,7 +16,9 @@ type CapacityInputProps = {
   isDisabled?: boolean;
   isEditingCreatedDisk?: boolean;
   isMinusDisabled?: boolean;
+  isRequired?: boolean;
   label?: string;
+  labelHelp?: ReactElement;
   minValue?: number;
   onChange: (quantityString: string) => void;
   /** size must be in a Kubernetes Quantity format: https://kubernetes.io/docs/reference/kubernetes-api/common-definitions/quantity/ */
@@ -28,7 +30,9 @@ const CapacityInput: FC<CapacityInputProps> = ({
   isDisabled,
   isEditingCreatedDisk,
   isMinusDisabled,
+  isRequired = true,
   label,
+  labelHelp,
   minValue,
   onChange,
   size,
@@ -65,8 +69,14 @@ const CapacityInput: FC<CapacityInputProps> = ({
       : ValidatedOptions.default;
 
   return (
-    <FormGroup className="disk-source-form-group" fieldId="size-required" isRequired label={label}>
-      <Split hasGutter>
+    <FormGroup
+      className="disk-source-form-group"
+      fieldId="size-required"
+      isRequired={isRequired}
+      label={label}
+      labelHelp={labelHelp}
+    >
+      <Split className={label ? 'pf-v6-u-mt-sm' : undefined} hasGutter>
         <SplitItem>
           <NumberInput
             isDisabled={isDisabled || isEditingCreatedDisk}

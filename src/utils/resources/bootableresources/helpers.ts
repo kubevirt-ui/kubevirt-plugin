@@ -47,7 +47,7 @@ import {
 } from '../shared';
 
 import { type VirtualMachinePreference } from '../preference/types';
-import { deprecatedOSNames, KUBEVIRT_ISO_LABEL } from './constants';
+import { deprecatedOSNames } from './constants';
 import { type BootableVolume } from './types';
 
 export const isBootableVolumePVCKind = (
@@ -129,9 +129,6 @@ export const deleteDVAndRelatedResources = async (
     }
   }
 };
-
-export const isBootableVolumeISO = (bootableVolume: BootableVolume): boolean =>
-  getLabel(bootableVolume, KUBEVIRT_ISO_LABEL) === 'true';
 
 export const isDeprecated = (bootVolumeName: string): boolean =>
   deprecatedOSNames.includes(bootVolumeName);

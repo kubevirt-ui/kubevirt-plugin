@@ -56,6 +56,7 @@ describe('wizard form mappings', () => {
     expect(result.current.getValues('instanceType.bootVolume')).toEqual({
       dataVolumeSource: null,
       diskSize: '20Gi',
+      isIso: false,
       persistentVolumeClaimSource: pvc,
       volume,
       volumeSnapshotSource: null,

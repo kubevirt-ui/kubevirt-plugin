@@ -12,6 +12,7 @@ import { type VMCreationMethod } from '@virtualmachines/wizard/utils/constants';
 export type BootVolumeSelection = {
   dataVolumeSource?: null | V1beta1DataVolume;
   diskSize?: string;
+  isIso?: boolean;
   persistentVolumeClaimSource?: IoK8sApiCoreV1PersistentVolumeClaim | null;
   volume: BootableVolume;
   volumeSnapshotSource?: null | VolumeSnapshotKind;
