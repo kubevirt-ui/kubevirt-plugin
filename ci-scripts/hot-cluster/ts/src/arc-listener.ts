@@ -26,22 +26,46 @@ export type ArcListenerHealth = {
   ready: boolean;
 };
 
+export type PodContainerStatusLike = {
+  ready?: boolean;
+  restartCount?: number;
+  state?: {
+    terminated?: { reason?: string };
+    waiting?: { reason?: string };
+  };
+};
+
 export type PodStatusLike = {
   metadata?: { uid?: string };
-  status?: { containerStatuses?: Array<{ ready?: boolean }>; phase?: string };
+  status?: { containerStatuses?: PodContainerStatusLike[]; phase?: string };
+};
+
+/** True when a container is crash-looping, Error-terminated, or has restarted. */
+export const hasUnhealthyListenerContainer = (status: PodContainerStatusLike): boolean => {
+  if (status.state?.waiting?.reason === 'CrashLoopBackOff') {
+    return true;
+  }
+  if (status.state?.terminated?.reason === 'Error') {
+    return true;
+  }
+  // A healthy ARC listener should not restart; restartCount>=1 usually means
+  // ERS mismatch / crash loop (brief Ready windows between crashes).
+  return (status.restartCount ?? 0) >= 1;
 };
 
 /**
- * Running + every container Ready. Shared by the health check below and
- * force-bounce-arc-listener.ts, which polls this against a freshly
- * recreated pod (identified by a new UID) rather than the one it deleted.
+ * Running + every container Ready, and not crash-looping / Error / restarted.
+ * Shared by the health check below and force-bounce-arc-listener.ts, which
+ * polls this against a freshly recreated pod (identified by a new UID)
+ * rather than the one it deleted.
  */
 export const isPodReady = (pod: PodStatusLike): boolean => {
   const containerStatuses = pod.status?.containerStatuses ?? [];
   return (
     pod.status?.phase === 'Running' &&
     containerStatuses.length > 0 &&
-    containerStatuses.every((status) => status.ready === true)
+    containerStatuses.every((status) => status.ready === true) &&
+    !containerStatuses.some(hasUnhealthyListenerContainer)
   );
 };
 
@@ -99,8 +123,14 @@ export const checkArcListenerReady = async (
     const containerStatuses = pod.status?.containerStatuses ?? [];
     const allContainersReady =
       containerStatuses.length > 0 && containerStatuses.every((status) => status.ready === true);
+    const unhealthy = containerStatuses.find(hasUnhealthyListenerContainer);
+    const unhealthyDetail = unhealthy
+      ? `, waiting=${unhealthy.state?.waiting?.reason ?? 'none'}, terminated=${
+          unhealthy.state?.terminated?.reason ?? 'none'
+        }, restartCount=${unhealthy.restartCount ?? 0}`
+      : '';
     return {
-      detail: `Listener pod '${listenerName}' phase=${pod.status?.phase ?? 'unknown'}, containersReady=${allContainersReady}`,
+      detail: `Listener pod '${listenerName}' phase=${pod.status?.phase ?? 'unknown'}, containersReady=${allContainersReady}${unhealthyDetail}`,
       ready: false,
     };
   } catch (err) {
