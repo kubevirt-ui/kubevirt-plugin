@@ -1,16 +1,18 @@
-name: On Main Push
+name: On Base Branch Push
 
-# Consolidated from retest-stale-gating.yml + needs-rebase-on-push.yml.
-#
-# When main advances, two things need to happen for every open PR:
+# When main or a release-* branch advances, for open PRs targeting that same
+# base only:
 #   1. Mark gating checks stale + retest merge-pool PRs (tide-equivalent).
 #   2. Re-check mergeability and sync the needs-rebase label.
 #
-# Both used the same list→matrix fan-out pattern. This workflow shares a
-# single list job, saving one runner and one API paginate call per push.
+# Per-base isolation: a push to release-4.23 never touches release-4.22 or main
+# PRs (BASE_REF = github.ref_name).
+#
+# First checkout is always default_branch so local composite actions resolve on
+# older release tips that do not ship .github/actions/.
 on:
   push:
-    branches: [main]
+    branches: [main, 'release-*']
 
 permissions:
   contents: read
@@ -21,7 +23,7 @@ permissions:
 
 jobs:
   list-open-prs:
-    name: List Open PRs Targeting main
+    name: List Open PRs Targeting ${{ github.ref_name }}
     runs-on: ubuntu-latest
     timeout-minutes: 2
     outputs:
@@ -31,6 +33,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
         with:
+          ref: ${{ github.event.repository.default_branch }}
           persist-credentials: false
 
       - name: Setup scripts
@@ -41,6 +44,7 @@ jobs:
       - name: List open PRs and classify merge-pool membership
         id: list
         env:
+          BASE_REF: ${{ github.ref_name }}
           GITHUB_TOKEN: ${{ github.token }}
         working-directory: .github/scripts
         run: npx tsx src/merge/stale-gating.ts
@@ -62,6 +66,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
         with:
+          ref: ${{ github.event.repository.default_branch }}
           persist-credentials: false
 
       - name: Setup scripts
@@ -72,6 +77,7 @@ jobs:
       - name: Determine whether to (re-)mark this PR stale
         id: check
         env:
+          BASE_REF: ${{ github.ref_name }}
           GITHUB_TOKEN: ${{ github.token }}
           PR_NUMBER: ${{ matrix.pr_number }}
           POOL_PR_NUMBERS: ${{ needs.list-open-prs.outputs.pool_pr_numbers }}
@@ -85,20 +91,34 @@ jobs:
         with:
           app-id: ${{ secrets.BOT_APP_ID }}
           private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
+          # Needed so the next step's publish-gating-check can create/update the
+          # "Run Gating Tests" check-run. create-bot-token omits checks by
+          # default, which made Mark check stale 403 (and the clear below then
+          # stripped e2e-passed while the check stayed success).
+          permission-checks: write
 
       - name: Mark check stale
+        id: mark-stale
         if: steps.check.outputs.should_mark == 'true'
         uses: ./.github/actions/publish-gating-check
         with:
           head-sha: ${{ steps.check.outputs.head_sha }}
           status: completed
           conclusion: neutral
-          title: 'Hot Cluster E2E: stale -- main has advanced since this ran'
+          title: 'Hot Cluster E2E: stale -- ${{ github.ref_name }} has advanced since this ran'
           summary: ${{ steps.check.outputs.summary }}
           github-token: ${{ steps.bot-token.outputs.token }}
 
       - name: Clear stale e2e-passed/e2e-failed
-        if: always()
+        # Clear the labels ONLY when the stale marker was actually published
+        # (the Mark check stale step succeeded). Previously this ran with
+        # if: always(), so when marking the check stale failed, the e2e-passed
+        # label was still removed -- leaving the PR with a success "Run Gating
+        # Tests" check but no e2e-passed label (passed, yet unlabeled). Coupling
+        # the clear to the marker keeps label and check consistent: both flip to
+        # stale together, or neither does (the job still fails, so the next base
+        # push retries). A passing retest re-adds the label.
+        if: steps.mark-stale.outcome == 'success'
         continue-on-error: true
         uses: ./.github/actions/clear-e2e-result-labels
         with:
@@ -106,8 +126,9 @@ jobs:
           github-token: ${{ steps.bot-token.outputs.token || github.token }}
 
   # Real retest, merge-pool PRs only. Dispatches fresh (pr_number path,
-  # against main) rather than reRunWorkflow, which would reuse the cached
-  # head SHA and silently re-test the same commit instead of the new base tip.
+  # against the PR base) rather than reRunWorkflow, which would reuse the
+  # cached head SHA and silently re-test the same commit instead of the new
+  # base tip.
   #
   # needs: mark-stale so every stale marker lands before any retest, or a
   # delayed marker could mask a fast retest's result. if: always() keeps one
@@ -127,6 +148,12 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 2
     steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          persist-credentials: false
+
       - name: Setup scripts
         uses: ./.github/actions/setup-gh-scripts
         with:
@@ -140,7 +167,7 @@ jobs:
         run: npx tsx src/merge/stale-dispatch.ts
 
   # ── Needs-rebase sync ───────────────────────────────────────
-  # main advancing can introduce conflicts that a PR's own events can't
+  # Base advancing can introduce conflicts that a PR's own events can't
   # detect. Re-checks every open PR's mergeability and syncs the label.
   sync-rebase-label:
     name: Sync Needs-Rebase Label (PR #${{ matrix.pr_number }})
@@ -159,6 +186,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
         with:
+          ref: ${{ github.event.repository.default_branch }}
           persist-credentials: false
 
       - name: Generate bot token
