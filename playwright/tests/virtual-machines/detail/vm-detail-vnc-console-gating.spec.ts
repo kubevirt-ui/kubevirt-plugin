@@ -15,6 +15,7 @@ test.describe(`VM detail VNC console ${ROUTE_VIRTUAL_MACHINES_DETAIL_TAG} ${GATI
     await apiClient.deleteVirtualMachine(name, testNamespace);
     await apiClient.deleteOpenshiftTemplate(name, testNamespace);
     await apiClient.applyVirtualMachineExample(testNamespace, name);
+    await apiClient.waitForExampleVmStartable(testNamespace, name);
 
     try {
       await vmDetail.openVmAndWaitForDetail(testNamespace, name);

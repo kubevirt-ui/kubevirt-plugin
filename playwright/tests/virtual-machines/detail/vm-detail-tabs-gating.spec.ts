@@ -14,6 +14,7 @@ test.describe(`VM detail tabs ${ROUTE_VIRTUAL_MACHINES_DETAIL_TAG} ${GATING_TAG}
     await apiClient.deleteVirtualMachine(name, testNamespace);
     await apiClient.deleteOpenshiftTemplate(name, testNamespace);
     await apiClient.applyVirtualMachineExample(testNamespace, name);
+    await apiClient.waitForExampleVmStartable(testNamespace, name);
 
     try {
       await vmDetail.openVmAndWaitForDetail(testNamespace, name);

@@ -10,6 +10,7 @@ export async function withExampleVm(
 ): Promise<void> {
   await apiClient.deleteVirtualMachine(vmName, testNamespace);
   await apiClient.applyVirtualMachineExample(testNamespace, vmName);
+  await apiClient.waitForExampleVmStartable(testNamespace, vmName);
   try {
     await run(vmName);
   } finally {

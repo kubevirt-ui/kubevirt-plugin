@@ -82,14 +82,12 @@ spec:
     metadata:
       name: ${name}
     spec:
-      sourceRef:
-        kind: DataSource
-        name: rhel9
-        namespace: openshift-virtualization-os-images
+      source:
+        blank: {}
       storage:
         resources:
           requests:
-            storage: 30Gi
+            storage: 1Gi
   runStrategy: Halted
   template:
     metadata:
