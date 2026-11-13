@@ -1,8 +1,8 @@
 /**
- * Determine whether to mark a PR's gating check stale after main advances.
+ * Determine whether to mark a PR's gating check stale after its base advances.
  * Entry point: npx tsx src/merge/stale-mark-check.ts
  *
- * Required env: GITHUB_TOKEN, GITHUB_REPOSITORY, GITHUB_SHA,
+ * Required env: GITHUB_TOKEN, GITHUB_REPOSITORY, GITHUB_SHA, BASE_REF,
  *               PR_NUMBER, POOL_PR_NUMBERS (JSON array)
  */
 
@@ -14,15 +14,15 @@ import { getRepoContext } from '../shared/actions-context';
 import { E2E_HOLD_LABEL } from '../shared/merge-pool';
 import { failStep, setOutput } from '../shared/output';
 
-const STALE_MARKER_TITLE = 'Hot Cluster E2E: stale -- main has advanced since this ran';
-const STALE_MARKER_TITLE_LEGACY = 'Stale -- main has advanced since this ran';
+import { formatStaleGatingTitle, isStaleGatingTitle } from './stale-gating-title';
 
 const main = async (): Promise<void> => {
   const token = requireEnv('GITHUB_TOKEN');
   const { owner, repo } = getRepoContext();
   const prNumber = Number(requireEnv('PR_NUMBER'));
   const poolPrNumbers = JSON.parse(process.env.POOL_PR_NUMBERS ?? '[]') as number[];
-  const mainSha = requireEnv('GITHUB_SHA');
+  const baseRef = requireEnv('BASE_REF');
+  const baseSha = requireEnv('GITHUB_SHA');
   const octokit = new Octokit({ auth: token });
 
   const { data: pullRequest } = await octokit.pulls.get({ owner, pull_number: prNumber, repo });
@@ -37,7 +37,7 @@ const main = async (): Promise<void> => {
 
   const inPool = poolPrNumbers.includes(prNumber);
   const summary = [
-    `\`main\` advanced to ${mainSha} since this check last completed.`,
+    `\`${baseRef}\` advanced to ${baseSha} since this check last completed.`,
     inPool
       ? 'This PR is in the merge pool -- a real retest against the new base tip has been dispatched separately.'
       : "This PR is not currently in the merge pool (needs both 'lgtm' and 'approved', no hold) -- push a commit, relabel, or comment `/retest-e2e` for a fresh result before merging.",
@@ -63,9 +63,7 @@ const main = async (): Promise<void> => {
     return;
   }
 
-  const isOwnStaleMarker =
-    latest.output?.title === STALE_MARKER_TITLE ||
-    latest.output?.title === STALE_MARKER_TITLE_LEGACY;
+  const isOwnStaleMarker = isStaleGatingTitle(latest.output?.title);
 
   if (latest.status !== 'completed' && !isOwnStaleMarker) {
     console.log(
@@ -76,7 +74,8 @@ const main = async (): Promise<void> => {
   }
 
   console.log(
-    `PR #${prNumber}: marking stale (superseding check-run ${latest.id}, isOwnStaleMarker=${isOwnStaleMarker}).`,
+    `PR #${prNumber}: marking stale with title "${formatStaleGatingTitle(baseRef)}" ` +
+      `(superseding check-run ${latest.id}, isOwnStaleMarker=${isOwnStaleMarker}).`,
   );
   setOutput('should_mark', 'true');
 };

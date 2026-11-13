@@ -51,7 +51,7 @@ describe('isGatingCheckFailed', () => {
 
 describe('checkRequiredStatuses', () => {
   it('treats a completed "neutral" conclusion as pending, not passed', async () => {
-    // Reproduces the PR #5012 bug: on-main-push republishes a stale Run
+    // Reproduces the PR #5012 bug: on-base-push republishes a stale Run
     // Gating Tests check as completed/neutral. Auto-merge must keep waiting
     // for a real success instead of treating the stale marker as a pass.
     const checkRuns: CheckRun[] = [

@@ -90,8 +90,8 @@ on:
       pr_number:
         description: |
           PR number to retest merged with the current base branch tip,
-          instead of a plain manual run. Used by on-main-push.yml
-          to re-validate merge-pool PRs after main advances. Leave empty
+          instead of a plain manual run. Used by on-base-push.yml
+          to re-validate merge-pool PRs after their base advances. Leave empty
           for a normal manual dispatch.
         required: false
         default: ''
@@ -115,8 +115,8 @@ on:
       is_pool_retest:
         description: |
           True only for a merge-pool staleness retest dispatched by
-          on-main-push.yml or pr-validation.yml after main
-          advances. Selects "(retest after main advanced)" wording for the
+          on-base-push.yml or pr-validation.yml after the PR base
+          advances. Selects "(retest after base advanced)" wording for the
           Run Gating Tests result; every other pr_number dispatch (PR gate,
           ok-to-test, /retest-e2e) leaves this false for normal PR wording.
         required: false

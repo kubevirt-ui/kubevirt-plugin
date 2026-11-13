@@ -37,7 +37,7 @@ describe('mapResultDetails', () => {
       isPoolRetest: true,
       reason: 'passed',
     });
-    assert.match(result.title, /retest after main advanced/);
+    assert.match(result.title, /retest after base advanced/);
   });
 
   it('returns failure with test details for test-failed', () => {

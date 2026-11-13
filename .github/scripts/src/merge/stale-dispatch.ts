@@ -1,5 +1,5 @@
 /**
- * Dispatch a retest for a merge-pool PR after main advances.
+ * Dispatch a retest for a merge-pool PR after its base branch advances.
  * Entry point: npx tsx src/merge/stale-dispatch.ts
  *
  * Required env: GITHUB_TOKEN, GITHUB_REPOSITORY, PR_NUMBER
@@ -37,7 +37,7 @@ const main = async (): Promise<void> => {
   });
 
   console.log(
-    `PR #${prNumber}: dispatched a real retest against the new main tip (base_ref=${pullRequest.base.ref}).`,
+    `PR #${prNumber}: dispatched a real retest against the new ${baseRef} tip (base_ref=${baseRef}).`,
   );
 };
 
