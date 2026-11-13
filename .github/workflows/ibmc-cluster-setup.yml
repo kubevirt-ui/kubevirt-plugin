@@ -550,14 +550,15 @@ jobs:
         working-directory: ci-scripts/hot-cluster/ts
         run: npx tsx src/scripts/check-arc-listener.ts
 
-      # force_arc_reinstall exists for the case the listener check above
-      # cannot detect: the listener pod is Ready in-cluster but GitHub
-      # never assigns it a job (e.g. a stale/broken registration). Use it
-      # to force a helm upgrade when Execute tests stays queued with no
-      # runner -- see ci-scripts/hot-cluster/arc/README.md.
+      # force_arc_reinstall exists for cases the listener check above cannot
+      # detect cleanly: Ready-looking but broken GitHub registration, or a
+      # crash-looping listener bound to a deleted EphemeralRunnerSet hash
+      # after helm upgrade. The forced path uninstalls the scale set first,
+      # then reinstalls -- upgrade-in-place alone is not enough. See
+      # ci-scripts/hot-cluster/arc/README.md.
       - name: Log force_arc_reinstall override
         if: inputs.force_arc_reinstall == true
-        run: echo "::notice::force_arc_reinstall=true -- ARC will be reinstalled regardless of listener health."
+        run: echo "::notice::force_arc_reinstall=true -- ARC scale set will be uninstalled then reinstalled regardless of listener health."
 
       - name: Build ARC runner image
         id: build_runner
@@ -570,6 +571,17 @@ jobs:
           ./ci-scripts/hot-cluster/images/setup-arc-runner-image.sh
           IMAGE_REF=$(cat "$ARC_RUNNER_IMAGE_FILE")
           echo "image_ref=${IMAGE_REF}" >> "$GITHUB_OUTPUT"
+
+      # Uninstall before Install ARC so force_arc_reinstall cannot leave the
+      # listener pointing at a deleted EphemeralRunnerSet (ERS hash mismatch).
+      # Controller (arc / arc-systems) is left installed; install steps below
+      # helm-upgrade it idempotently and recreate the scale set cleanly.
+      - name: Uninstall ARC runner scale set (force reinstall)
+        if: inputs.force_arc_reinstall == true
+        env:
+          RUNNER_SCALE_SET_NAME: ${{ env.CLUSTER_NAME }}
+        working-directory: ci-scripts/hot-cluster/ts
+        run: npx tsx src/scripts/uninstall-runner-scale-set.ts
 
       - name: Install ARC
         id: install_arc
@@ -588,19 +600,9 @@ jobs:
           ./ci-scripts/hot-cluster/arc/install-arc-controller.sh && \
           ./ci-scripts/hot-cluster/arc/install-runner-scale-set.sh
 
-      # `helm upgrade --install` above is idempotent: if nothing in its
-      # values actually changed since the last install (the common case --
-      # same app config, same image, same version), Helm correctly no-ops
-      # and leaves the existing listener Pod completely untouched. That
-      # means force_arc_reinstall alone does NOT guarantee a fresh
-      # listener -- confirmed live, the listener pod's name was identical
-      # before and after a forced helm upgrade, and the stale GitHub-side
-      # registration persisted. Explicitly deleting the Pod is what
-      # actually forces a fresh connection: the ARC controller recreates
-      # it immediately. See ci-scripts/hot-cluster/arc/README.md.
-      # No continue-on-error: this is the forced recovery path itself, so a
-      # bounce failure must fail the job rather than silently proceeding to
-      # "Execute tests" having done nothing.
+      # After uninstall+install the listener is new, but bouncing still
+      # forces a fresh GitHub scale-set session. No continue-on-error: this
+      # is the forced recovery path, so a bounce failure must fail the job.
       - name: Force-bounce ARC listener pod
         if: inputs.force_arc_reinstall == true
         env:
