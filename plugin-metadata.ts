@@ -9,6 +9,7 @@ import { exposedModules as CDIUploadProviderExposedModules } from './src/views/c
 import { exposedModules as CheckupsExposedModules } from './src/views/checkups/extensions';
 import { exposedModules as dashboardExtensionsExposedModules } from './src/views/dashboard-extensions/extensions';
 import { exposedModules as DataSourcesExposedModules } from './src/views/datasources/extensions';
+import { exposedModules as DataVolumesExposedModules } from './src/views/datavolumes/extensions';
 import { exposedModules as InstanceTypesExposedModules } from './src/views/instancetypes/extensions';
 import { exposedModules as MigrationPoliciesExposedModules } from './src/views/migrationpolicies/extensions';
 import { exposedModules as MigrationsExposedModules } from './src/views/migrations/extensions';
@@ -52,6 +53,7 @@ const metadata: ConsolePluginBuildMetadata = {
     ...CheckupsExposedModules,
     ...SettingsExposedModules,
     ...DataSourcesExposedModules,
+    ...DataVolumesExposedModules,
     ...VirtualMachinesInstanceExposedModules,
     ...YamlTemplatesExposedModules,
     ...VMWizardExposedModules,
