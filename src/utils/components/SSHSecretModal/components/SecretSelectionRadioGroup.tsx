@@ -1,4 +1,5 @@
-import { type Dispatch, type FC, type SetStateAction, useCallback } from 'react';
+import { type FC, useCallback } from 'react';
+import { useFormContext } from 'react-hook-form';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Radio, Split, SplitItem } from '@patternfly/react-core';
@@ -6,32 +7,28 @@ import { Radio, Split, SplitItem } from '@patternfly/react-core';
 import { initialSSHCredentials } from '../utils/constants';
 import { SecretSelectionOption, type SSHSecretDetails } from '../utils/types';
 
-type SecretSelectionRadioGroupProps = {
-  selectedOption: SecretSelectionOption;
-  setSelectedOption: Dispatch<SetStateAction<SecretSelectionOption>>;
-  setSSHDetails: Dispatch<SetStateAction<SSHSecretDetails>>;
-};
-
-const SecretSelectionRadioGroup: FC<SecretSelectionRadioGroupProps> = ({
-  selectedOption,
-  setSelectedOption,
-  setSSHDetails,
-}) => {
+const SecretSelectionRadioGroup: FC = () => {
   const { t } = useKubevirtTranslation();
+  const { getValues, reset, setValue, watch } = useFormContext<SSHSecretDetails>();
+  const selectedOption = watch('secretOption');
 
-  // Inputs should not persist between changes of secretSelectionOption
   const onSelectSecretOption = useCallback(
     (secretOption: SecretSelectionOption) => {
-      setSelectedOption((prevSecretOption) => {
-        if (prevSecretOption !== secretOption) {
-          setSSHDetails((prev) => ({ ...prev, secretOption, sshPubKey: '', sshSecretName: '' }));
-        }
+      const prevSecretOption = getValues('secretOption');
+      if (prevSecretOption === secretOption) {
+        return;
+      }
 
-        return secretOption;
-      });
+      setValue('secretOption', secretOption, { shouldDirty: true, shouldValidate: false });
+      setValue('sshPubKey', '', { shouldDirty: true, shouldValidate: false });
+      setValue('sshSecretName', '', { shouldDirty: true, shouldValidate: false });
     },
-    [setSelectedOption, setSSHDetails],
+    [getValues, setValue],
   );
+
+  const onSelectNone = useCallback(() => {
+    reset(initialSSHCredentials);
+  }, [reset]);
 
   return (
     <Split className="ssh-secret-section__radio-group" hasGutter>
@@ -41,10 +38,7 @@ const SecretSelectionRadioGroup: FC<SecretSelectionRadioGroupProps> = ({
           isChecked={selectedOption === SecretSelectionOption.None}
           label={t('None')}
           name="ssh-secret-selection"
-          onClick={() => {
-            onSelectSecretOption(SecretSelectionOption.None);
-            setSSHDetails(initialSSHCredentials);
-          }}
+          onChange={onSelectNone}
         />
       </SplitItem>
       <SplitItem>
@@ -53,7 +47,7 @@ const SecretSelectionRadioGroup: FC<SecretSelectionRadioGroupProps> = ({
           isChecked={selectedOption === SecretSelectionOption.UseExisting}
           label={t('Use existing')}
           name="ssh-secret-selection"
-          onClick={() => onSelectSecretOption(SecretSelectionOption.UseExisting)}
+          onChange={() => onSelectSecretOption(SecretSelectionOption.UseExisting)}
         />
       </SplitItem>
       <SplitItem>
@@ -62,7 +56,7 @@ const SecretSelectionRadioGroup: FC<SecretSelectionRadioGroupProps> = ({
           isChecked={selectedOption === SecretSelectionOption.AddNew}
           label={t('Add new')}
           name="ssh-secret-selection"
-          onClick={() => onSelectSecretOption(SecretSelectionOption.AddNew)}
+          onChange={() => onSelectSecretOption(SecretSelectionOption.AddNew)}
         />
       </SplitItem>
     </Split>

@@ -1,5 +1,3 @@
-import { type Dispatch, type SetStateAction } from 'react';
-
 import { type IoK8sApiCoreV1Secret } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 
 export enum SecretSelectionOption {
@@ -25,19 +23,16 @@ export type SSHSecretDetails = {
 
 export type SSHOptionUseExistingProps = {
   cluster?: string;
-  localNSProject: string;
   namespace?: string;
-  projectsWithSecrets: { [namespace: string]: IoK8sApiCoreV1Secret[] };
-  secrets: IoK8sApiCoreV1Secret[];
-  secretsLoaded: boolean;
-  setLocalNSProject: Dispatch<SetStateAction<string>>;
-  setSSHDetails: Dispatch<SetStateAction<SSHSecretDetails>>;
-  sshDetails: SSHSecretDetails;
+};
+
+export type SSHKeyUploadProps = {
+  namespace: string;
 };
 
 export type SecretsData = {
-  allSecrets: IoK8sApiCoreV1Secret[];
-  projectsWithSecrets: { [p: string]: IoK8sApiCoreV1Secret[] };
+  secrets: IoK8sApiCoreV1Secret[];
   secretsLoaded: boolean;
-  secretsLoadError: Error;
+  secretsLoadError: Error | null;
+  sshKeySecrets: IoK8sApiCoreV1Secret[];
 };
