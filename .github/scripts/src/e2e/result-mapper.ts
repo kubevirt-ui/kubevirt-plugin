@@ -30,17 +30,17 @@ type MapParams = {
 const mapMergeConflict = (map: MapParams, poolSuffix: string): ResultDetails => ({
   conclusion: 'failure',
   summary: map.isPoolRetest
-    ? `PR #${map.prNumber} no longer merges cleanly with the current main tip (${map.mainSha}) -- resolve the conflict and push an update, which will trigger a normal gating run.`
+    ? `PR #${map.prNumber} no longer merges cleanly with the current base tip (${map.mainSha}) -- resolve the conflict and push an update, which will trigger a normal gating run.`
     : `PR #${map.prNumber} does not merge cleanly with the current base branch tip -- resolve the conflict and push an update to trigger a fresh run.`,
   title: map.isPoolRetest
-    ? `Hot Cluster E2E: PR no longer merges cleanly with main${poolSuffix}`
+    ? `Hot Cluster E2E: PR no longer merges cleanly with base${poolSuffix}`
     : 'Hot Cluster E2E: PR does not merge cleanly with the base branch',
 });
 
 const mapLeftPool = (map: MapParams, poolSuffix: string): ResultDetails => ({
   conclusion: 'failure',
   summary: map.isPoolRetest
-    ? `PR #${map.prNumber} no longer carries the lgtm+approved (no hold) labels required for the merge pool, re-checked fresh when this retest ran against main tip ${map.mainSha} -- the cluster run was skipped.`
+    ? `PR #${map.prNumber} no longer carries the lgtm+approved (no hold) labels required for the merge pool, re-checked fresh when this retest ran against base tip ${map.mainSha} -- the cluster run was skipped.`
     : `PR #${map.prNumber} does not carry the lgtm+approved (no hold) labels required for the merge pool, re-checked fresh at run time -- the cluster run was skipped.`,
   title: map.isPoolRetest
     ? `Hot Cluster E2E: no longer in the merge pool${poolSuffix}`
@@ -50,7 +50,7 @@ const mapLeftPool = (map: MapParams, poolSuffix: string): ResultDetails => ({
 const mapUntrustedRetest = (map: MapParams, poolSuffix: string): ResultDetails => ({
   conclusion: 'failure',
   summary: map.isPoolRetest
-    ? `PR #${map.prNumber} is not from OWNERS, not from a same-repo branch, and does not currently carry 'ok-to-test' (re-checked fresh when this retest ran against main tip ${map.mainSha}) -- the cluster run was skipped. A maintainer can add 'ok-to-test' to allow it.`
+    ? `PR #${map.prNumber} is not from OWNERS, not from a same-repo branch, and does not currently carry 'ok-to-test' (re-checked fresh when this retest ran against base tip ${map.mainSha}) -- the cluster run was skipped. A maintainer can add 'ok-to-test' to allow it.`
     : `Hot cluster E2E has not run for PR #${map.prNumber} because the author is not listed in OWNERS, is not from a same-repo branch, and does not currently carry 'ok-to-test' (re-checked fresh at run time). A maintainer can add the 'ok-to-test' label to trigger it.`,
   title: map.isPoolRetest
     ? `Hot Cluster E2E: not CI-trusted for a retest${poolSuffix}`
@@ -59,7 +59,7 @@ const mapUntrustedRetest = (map: MapParams, poolSuffix: string): ResultDetails =
 
 const mapTestFailed = (map: MapParams, poolSuffix: string): ResultDetails => {
   const baseSummary = map.isPoolRetest
-    ? `Re-validated PR #${map.prNumber} merged with the current main tip (${map.mainSha}) after main advanced -- tests did not pass.`
+    ? `Re-validated PR #${map.prNumber} merged with the current base tip (${map.mainSha}) after the base advanced -- tests did not pass.`
     : `Hot cluster gating tests did not pass for PR #${map.prNumber}.`;
 
   const summary = [
@@ -76,7 +76,7 @@ const mapTestFailed = (map: MapParams, poolSuffix: string): ResultDetails => {
 };
 
 export const mapResultDetails = (params: MapParams): ResultDetails => {
-  const poolSuffix = params.isPoolRetest ? ' (retest after main advanced)' : '';
+  const poolSuffix = params.isPoolRetest ? ' (retest after base advanced)' : '';
 
   if (params.held) {
     return {
@@ -91,7 +91,7 @@ export const mapResultDetails = (params: MapParams): ResultDetails => {
       return {
         conclusion: 'success',
         summary: params.isPoolRetest
-          ? `Re-validated PR #${params.prNumber} merged with the current main tip (${params.mainSha}) after main advanced.`
+          ? `Re-validated PR #${params.prNumber} merged with the current base tip (${params.mainSha}) after the base advanced.`
           : `Hot cluster gating tests passed for PR #${params.prNumber} at this commit.`,
         title: `Hot Cluster E2E: gating tests passed${poolSuffix}`,
       };

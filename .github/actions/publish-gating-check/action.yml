@@ -10,7 +10,7 @@ description: |
   check-run; the merge box shows whichever reported most recently.
 
   Single source of truth for the check's name/shape, used by
-  on-main-push.yml, and by hot-cluster-e2e.yml's prepare job
+  on-base-push.yml, and by hot-cluster-e2e.yml's prepare job
   (creates the initial in_progress check-run) and its verify-gating-tests
   job (updates that same check-run to its final completed result).
 

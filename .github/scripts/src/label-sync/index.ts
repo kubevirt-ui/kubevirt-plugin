@@ -20,6 +20,7 @@ import { Octokit } from '@octokit/rest';
 
 import { resolveDefaultClusterName } from '../commands/resolve-default-cluster-name';
 import { createOctokit } from '../github-repo';
+import { isStaleGatingTitle } from '../merge/stale-gating-title';
 import { getRepoContext } from '../shared/actions-context';
 import { dispatchWorkflow } from '../shared/dispatch';
 import { isMergePoolPr } from '../shared/merge-pool';
@@ -56,10 +57,6 @@ const resolveRoute = (labelName: string, action: string): Route => {
   return { retest: false, verify: false };
 };
 
-const STALE_TITLES = [
-  'Hot Cluster E2E: stale -- main has advanced since this ran',
-  'Stale -- main has advanced since this ran',
-];
 
 const runVerify = async (config: GitHubConfig, action: string): Promise<void> => {
   const octokit = createOctokit(config);
@@ -117,8 +114,7 @@ const runRetest = async (): Promise<void> => {
     (a, b) => new Date(b.started_at ?? '').getTime() - new Date(a.started_at ?? '').getTime(),
   );
 
-  const isStale =
-    latest?.status === 'completed' && STALE_TITLES.includes(latest.output?.title ?? '');
+  const isStale = latest?.status === 'completed' && isStaleGatingTitle(latest.output?.title);
 
   if (!isStale) {
     console.log(

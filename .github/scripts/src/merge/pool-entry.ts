@@ -18,10 +18,7 @@ import { isMergePoolPr } from '../shared/merge-pool';
 import { failStep } from '../shared/output';
 import { isListedInLocalOwners } from '../shared/owners';
 
-const STALE_TITLES = [
-  'Hot Cluster E2E: stale -- main has advanced since this ran',
-  'Stale -- main has advanced since this ran',
-];
+import { isStaleGatingTitle } from './stale-gating-title';
 
 const main = async (): Promise<void> => {
   const token = requireEnv('GITHUB_TOKEN');
@@ -60,8 +57,7 @@ const main = async (): Promise<void> => {
     (a, b) => new Date(b.started_at ?? '').getTime() - new Date(a.started_at ?? '').getTime(),
   );
 
-  const isStale =
-    latest?.status === 'completed' && STALE_TITLES.includes(latest.output?.title ?? '');
+  const isStale = latest?.status === 'completed' && isStaleGatingTitle(latest.output?.title);
 
   if (!isStale) {
     console.log(

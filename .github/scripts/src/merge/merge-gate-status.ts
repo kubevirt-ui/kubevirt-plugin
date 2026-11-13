@@ -8,8 +8,8 @@ export const MERGE_GATE_CONTEXT = 'Merge Gate';
 type CheckRun = Awaited<ReturnType<Octokit['checks']['listForRef']>>['data']['check_runs'][number];
 
 const FAILED_COMMIT_STATES = new Set(['failure', 'error']);
-// 'neutral' is deliberately excluded: on-main-push publishes a stale/held
-// Run Gating Tests check as 'neutral' (see on-main-push.yml's "Mark check
+// 'neutral' is deliberately excluded: on-base-push publishes a stale/held
+// Run Gating Tests check as 'neutral' (see on-base-push.yml's "Mark check
 // stale" and the /hold-e2e path), and that must count as pending -- not
 // passed -- or auto-merge can squash-merge a PR whose gating result is
 // stale rather than a real success 

@@ -1,7 +1,7 @@
 name: Needs Rebase
 
 # Applies/removes the needs-rebase label when the PR itself changes.
-# See on-main-push.yml for the main-advanced path.
+# See on-base-push.yml for the base-advanced path.
 on:
   pull_request_target:
     types: [opened, synchronize, reopened]

@@ -2,7 +2,7 @@ name: Resolve Hot Cluster PR Context
 description: |
   Looks up a PR's current head SHA, mergeability, merge-pool membership,
   and CI trust, fresh at execution time -- used by the pr_number retest
-  path (dispatched by on-main-push.yml after main advances, or
+  path (dispatched by on-base-push.yml after the PR base advances, or
   /retest-e2e's fallback dispatch). Trust is re-checked here since
   lgtm/approved are Tide's merge-readiness signal, not a CI-trust signal,
   and this workflow_dispatch path has no pull_request payload for the

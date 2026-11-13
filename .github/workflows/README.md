@@ -15,7 +15,7 @@ Index of workflows in this directory. Deep design notes (check-run model, merge 
 | `pr-validation.yml`                   | All PR events (push + label)           | Unified PR validation: Jira, path checks, review labels, E2E dispatch, merge-pool sync                                       |
 | `ok-to-test-reset.yml`                | synchronize while `ok-to-test` present | Remove `ok-to-test` when head moves                                                                                          |
 | `hot-cluster-e2e-cancel-on-close.yml` | PR closed                              | Cancel in-flight when PR closes                                                                                              |
-| `on-main-push.yml`                    | push to `main`                         | Mark checks stale; retest merge-pool PRs; sync needs-rebase                                                                  |
+| `on-base-push.yml`                    | push to `main` or `release-*`          | Mark checks stale for that base only; retest merge-pool PRs; sync needs-rebase                                               |
 
 ## Merge automation (Prow / Tide replacements)
 
@@ -98,7 +98,7 @@ Do not switch these workflows to `pull_request` without a redesign — fork PRs 
 | ------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------- |
 | [`.github/actions/setup-gh-scripts`](../actions/setup-gh-scripts/action.yml)               | Checkout validation scripts (+ `ci-scripts/hot-cluster/js` SSOT) and `npm ci` |
 | [`.github/actions/create-bot-token`](../actions/create-bot-token/action.yml)               | `kubevirt-plugin-bot` App token for label/comment/auto-merge writes           |
-| [`.github/actions/clear-e2e-result-labels`](../actions/clear-e2e-result-labels/action.yml) | Remove `e2e-passed`/`e2e-failed` (shared by PR gate + on-main-push)           |
+| [`.github/actions/clear-e2e-result-labels`](../actions/clear-e2e-result-labels/action.yml) | Remove `e2e-passed`/`e2e-failed` (shared by PR gate + on-base-push)           |
 | [`.github/scripts/`](../scripts/)                                                          | TypeScript for validation commands, merge-pool verify, Jira/AI/CI checks      |
 
 Bot secrets: `BOT_APP_ID`, `BOT_APP_PRIVATE_KEY` (Issues + Pull requests + Contents + Workflows + Actions write on the App; Workflows is required for auto-merge of PRs that touch `.github/workflows/*`; Actions is required for review sync / OWNERS `/lgtm` to `workflow_dispatch` Auto Merge). Details: [`ci-scripts/README.md`](../../ci-scripts/README.md#kubevirt-plugin-bot-required-for-prow-replacement-merge-automation).

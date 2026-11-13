@@ -1,8 +1,8 @@
 /**
- * List all open PRs targeting main and output their numbers as a JSON
+ * List all open PRs targeting BASE_REF and output their numbers as a JSON
  * array for downstream matrix consumption.
  *
- * Required env: GITHUB_TOKEN, GITHUB_REPOSITORY
+ * Required env: GITHUB_TOKEN, GITHUB_REPOSITORY, BASE_REF
  * Outputs (GITHUB_OUTPUT): pr_numbers (JSON array of numbers)
  */
 
@@ -15,17 +15,18 @@ import { failStep, setOutput } from '../shared/output';
 
 const main = async (): Promise<void> => {
   const { owner, repo } = getRepoContext();
+  const baseRef = requireEnv('BASE_REF');
   const octokit = new Octokit({ auth: requireEnv('GITHUB_TOKEN') });
 
   const prs = await octokit.paginate(octokit.pulls.list, {
-    base: 'main',
+    base: baseRef,
     owner,
     per_page: 100,
     repo,
     state: 'open',
   });
 
-  console.log(`Open PRs targeting main: ${prs.length}`);
+  console.log(`Open PRs targeting ${baseRef}: ${prs.length}`);
   setOutput('pr_numbers', JSON.stringify(prs.map((pullRequest) => pullRequest.number)));
 };
 

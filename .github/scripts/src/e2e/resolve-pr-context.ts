@@ -2,7 +2,7 @@
 /**
  * Resolve a PR's current head SHA, mergeability, CI trust, and
  * merge-pool membership. Used by the pr_number retest path
- * (dispatched by on-main-push.yml after main advances, or
+ * (dispatched by on-base-push.yml after the PR base advances, or
  * /retest-e2e's fallback dispatch).
  *
  * Required env: GITHUB_TOKEN, GITHUB_REPOSITORY, PR_NUMBER
