@@ -2,12 +2,14 @@ import { type UseFormGetValues, type UseFormSetValue } from 'react-hook-form';
 import { type TFunction } from 'i18next';
 
 import { getInstanceTypeFromVolume } from '@kubevirt-utils/components/AddBootableVolumeModal/utils';
+import { DEFAULT_DISK_SIZE } from '@kubevirt-utils/components/DiskModal/utils/constants';
 import {
   DEFAULT_PREFERENCE_KIND_LABEL,
   DEFAULT_PREFERENCE_LABEL,
 } from '@kubevirt-utils/constants/instancetypes-and-preferences';
 import { cancelAllWizardPendingUploads } from '@kubevirt-utils/hooks/useInFlightToast';
 import { isBootableVolumeUploadKey } from '@kubevirt-utils/hooks/useInFlightToast/keys/uploadKeys';
+import { detectBootableVolumeIsIso } from '@kubevirt-utils/resources/bootableresources/isoHelpers';
 import { getDiskSize } from '@kubevirt-utils/resources/bootableresources/selectors';
 import { getLabel } from '@kubevirt-utils/resources/shared';
 import CloneIcon from '@virtualmachines/wizard/steps/DeploymentDetailsStep/components/CreationMethodTileGroup/components/CreationMethodTile/components/CloneIcon';
@@ -21,6 +23,9 @@ import {
   type VMCreationMethodCardDetails,
   type VMCreationMethodConfig,
 } from './types';
+
+export const getDiskSizeForIsoSelection = (isIso: boolean, sourceDiskSize?: string): string =>
+  isIso ? DEFAULT_DISK_SIZE : (sourceDiskSize ?? DEFAULT_DISK_SIZE);
 
 const VM_CREATION_METHOD_MAPPER: Record<VMCreationMethod, VMCreationMethodConfig> = {
   [VMCreationMethod.CLONE]: {
@@ -79,12 +84,15 @@ export const applySelectedBootableVolumeToForm = ({
   const volumeFamilyIsAvailable = isFamilyVisible ? isFamilyVisible(series) : true;
   const shouldApplyComputeFromVolume =
     volumeHasInstanceType && familyAvailabilityReady && volumeFamilyIsAvailable;
+  const isIso = detectBootableVolumeIsIso(selectedVolume);
+  const sourceDiskSize = getDiskSize(dvSource, pvcSource, volumeSnapshotSource);
 
   setValue(
     'instanceType.bootVolume',
     {
       dataVolumeSource: dvSource,
-      diskSize: getDiskSize(dvSource, pvcSource, volumeSnapshotSource),
+      diskSize: getDiskSizeForIsoSelection(isIso, sourceDiskSize),
+      isIso,
       persistentVolumeClaimSource: pvcSource,
       volume: selectedVolume,
       volumeSnapshotSource,

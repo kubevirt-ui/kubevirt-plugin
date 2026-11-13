@@ -7,10 +7,8 @@ import {
   ISO,
   SHOW_DEPRECATED_BOOTABLE_VOLUMES,
 } from '@kubevirt-utils/resources/bootableresources/constants';
-import {
-  isBootableVolumeISO,
-  isDeprecated,
-} from '@kubevirt-utils/resources/bootableresources/helpers';
+import { isDeprecated } from '@kubevirt-utils/resources/bootableresources/helpers';
+import { isBootableVolumeISO } from '@kubevirt-utils/resources/bootableresources/isoHelpers';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { OS_NAMES } from '@kubevirt-utils/resources/template';
 import {

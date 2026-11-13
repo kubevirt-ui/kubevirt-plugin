@@ -1,7 +1,7 @@
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { DEFAULT_INSTANCETYPE_LABEL } from '@kubevirt-utils/constants/instancetypes-and-preferences';
 import { VirtualMachineInstancetypeModel } from '@kubevirt-utils/models';
-import { isBootableVolumeISO } from '@kubevirt-utils/resources/bootableresources/helpers';
+import { detectBootableVolumeIsIso } from '@kubevirt-utils/resources/bootableresources/isoHelpers';
 import { getPVCStorageClassName } from '@kubevirt-utils/resources/bootableresources/selectors';
 import { getLabels } from '@kubevirt-utils/resources/shared';
 import { getDefaultRunningStrategy } from '@kubevirt-utils/resources/vm';
@@ -41,7 +41,8 @@ export const getSpecConfiguration = ({
   const instanceTypeName =
     selectedInstanceType?.name ?? getLabels(selectedBootableVolume)?.[DEFAULT_INSTANCETYPE_LABEL];
   const hasBootVolume = useBootSource && !isEmpty(selectedBootableVolume);
-  const isIso = hasBootVolume && isBootableVolumeISO(selectedBootableVolume);
+  const isIso =
+    hasBootVolume && (bootVolume?.isIso ?? detectBootableVolumeIsIso(selectedBootableVolume));
   const storageClassName = getPVCStorageClassName(pvcSource);
   const volumeName = getBootDataVolumeName(vmName);
 

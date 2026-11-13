@@ -17,6 +17,7 @@ import { createBootableVolume } from './createBootableVolume';
 import {
   type AddBootableVolumeState,
   type HandleAddBootableVolumeModalCloseParams,
+  type SetBootableVolumeFieldType,
   type SubmitAddBootableVolumeParams,
 } from './types';
 
@@ -45,6 +46,15 @@ export const updateBootableVolumeField = (
     ? { [key]: { ...(prevState[key] as object), [fieldKey]: value } }
     : { [key]: value }),
 });
+
+export const autoDetectIsoField = (
+  setBootableVolumeField: SetBootableVolumeFieldType,
+  shouldEnable: boolean,
+): void => {
+  if (shouldEnable) {
+    setBootableVolumeField('isIso')(true);
+  }
+};
 
 export const deleteBootableVolumeLabel = (
   prevState: AddBootableVolumeState,

@@ -10,9 +10,9 @@ import ISOBadge from '@kubevirt-utils/components/ISOBadge/ISOBadge';
 import {
   getBootableVolumeGroupVersionKind,
   getDataImportCronFromDataSource,
-  isBootableVolumeISO,
   isDeprecated,
 } from '@kubevirt-utils/resources/bootableresources/helpers';
+import { isBootableVolumeISO } from '@kubevirt-utils/resources/bootableresources/isoHelpers';
 import {
   getName,
   getNamespace,

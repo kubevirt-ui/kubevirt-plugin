@@ -4,9 +4,11 @@ import {
   type AddBootableVolumeState,
   type SetBootableVolumeFieldType,
 } from '@kubevirt-utils/components/AddBootableVolumeModal/types';
+import { autoDetectIsoField } from '@kubevirt-utils/components/AddBootableVolumeModal/utils';
 import { type DataUpload } from '@kubevirt-utils/hooks/useCDIUpload/types';
 import { isUploadingDisk } from '@kubevirt-utils/hooks/useCDIUpload/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { isIsoFileName } from '@kubevirt-utils/resources/bootableresources/isoHelpers';
 import { type DropEvent, FileUpload, FormGroup } from '@patternfly/react-core';
 
 import DiskSourceUploadISO from './DiskSourceUploadISO';
@@ -56,6 +58,7 @@ const DiskSourceUploadPVC: FC<DiskSourceUploadPVCProps> = ({
           onFileInputChange={(_event, file: File) => {
             setUploadFileName(file.name);
             setUploadFile(file);
+            autoDetectIsoField(setBootableVolumeField, isIsoFileName(file.name));
           }}
           onReadFinished={() => setIsLoading(false)}
           onReadStarted={() => setIsLoading(true)}
