@@ -46,7 +46,7 @@ export const getClusterColumns = (t: TFunction, isAllClustersPage: boolean): VMC
       ]
     : [];
 
-export const getNamespaceColumns = (t: TFunction, namespace: string): VMColumn[] =>
+export const getNamespaceColumns = (t: TFunction, namespace: string | undefined): VMColumn[] =>
   namespace
     ? []
     : [

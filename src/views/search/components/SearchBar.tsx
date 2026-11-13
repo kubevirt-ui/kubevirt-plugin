@@ -1,6 +1,5 @@
 import { type FC, type RefObject, useCallback, useMemo } from 'react';
 
-import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import {
   type KubevirtFilter,
@@ -25,7 +24,6 @@ type SearchBarProps = {
   filters: KubevirtFilterState;
   inputRef?: RefObject<HTMLInputElement>;
   onSetFilters: OnSetFilters;
-  vms: V1VirtualMachine[];
 };
 
 const SearchBar: FC<SearchBarProps> = ({
@@ -34,9 +32,8 @@ const SearchBar: FC<SearchBarProps> = ({
   filters,
   inputRef,
   onSetFilters,
-  vms,
 }) => {
-  const showSearchModal = useShowAdvancedSearchModal(onSetFilters, vms);
+  const showSearchModal = useShowAdvancedSearchModal(onSetFilters);
   const modalInputs = useMemo(() => convertFilterStateToModalInputs(filters), [filters]);
 
   const { addRecentSearch, recentSearches, recentSearchesError } = useRecentSearches();

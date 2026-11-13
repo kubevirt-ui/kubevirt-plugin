@@ -23,12 +23,11 @@ import VirtualMachineFilteredEmptyState from './VirtualMachineFilteredEmptyState
 import VirtualMachinesListToolbar from './VirtualMachinesListToolbar';
 
 type VirtualMachinesListBodyProps = {
-  accessibleVMs: V1VirtualMachine[];
   allVMsInNamespace: V1VirtualMachine[];
   cluster?: string;
   error?: Error;
   isSoftError: boolean;
-  namespace: string;
+  namespace?: string;
   refresh?: () => void;
   showEmptyState: boolean;
   vmsLoaded: boolean;
@@ -36,7 +35,6 @@ type VirtualMachinesListBodyProps = {
 };
 
 const VirtualMachinesListBody: FC<VirtualMachinesListBodyProps> = ({
-  accessibleVMs,
   allVMsInNamespace,
   cluster,
   error,
@@ -108,7 +106,6 @@ const VirtualMachinesListBody: FC<VirtualMachinesListBodyProps> = ({
         onRetry={refresh}
       />
       <VirtualMachinesListToolbar
-        accessibleVMs={accessibleVMs}
         callbacks={callbacks}
         clearAllFiltersWithReset={clearAllFiltersWithReset}
         columnLayout={columnLayout}

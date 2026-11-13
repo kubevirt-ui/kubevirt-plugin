@@ -27,7 +27,6 @@ import VirtualMachineSelection from './VirtualMachineSelection/VirtualMachineSel
 import '@kubevirt-utils/styles/list-managment-group.scss';
 
 type VirtualMachinesListToolbarProps = {
-  accessibleVMs: V1VirtualMachine[];
   callbacks: VMCallbacks;
   clearAllFiltersWithReset: () => void;
   columnLayout: ColumnLayout;
@@ -45,7 +44,6 @@ type VirtualMachinesListToolbarProps = {
 };
 
 const VirtualMachinesListToolbar: FC<VirtualMachinesListToolbarProps> = ({
-  accessibleVMs,
   callbacks,
   clearAllFiltersWithReset,
   columnLayout,
@@ -76,7 +74,6 @@ const VirtualMachinesListToolbar: FC<VirtualMachinesListToolbarProps> = ({
         filters={filters}
         inputRef={searchInputRef}
         onSetFilters={handleSetFilters}
-        vms={accessibleVMs}
       />
       <VirtIODriversAlert vms={vmsToShow} />
       <VirtualMachineFilterToolbar
