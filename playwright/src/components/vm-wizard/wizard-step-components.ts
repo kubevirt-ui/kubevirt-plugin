@@ -35,6 +35,33 @@ export class VmCreationWizardLocationComponent extends BaseComponent {
     await this.page.waitForTimeout(500);
   }
 
+  async selectLocationProject(namespace: string): Promise<void> {
+    const current = await this.getLocationProject();
+    if (current.includes(namespace)) {
+      return;
+    }
+
+    await this.openEditLocationPanel();
+
+    const toggle = this.locator('.vm-creation-wizard').getByTestId('namespace-dropdown-menu-toggle');
+    await toggle.first().waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
+    await this.robustClick(toggle.first());
+
+    const filter = this.page.getByTestId('dropdown-text-filter');
+    await filter.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
+    await filter.clear();
+    await filter.fill(namespace);
+
+    const option = this.page.getByRole('menuitem', { name: namespace, exact: true });
+    await option.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
+    await this.robustClick(option);
+
+    await toggle
+      .filter({ hasText: namespace })
+      .first()
+      .waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
+  }
+
   async verifyEditLocationButtonVisible(): Promise<boolean> {
     try {
       const editBtn = this._buttonEditVMCreationLocation;
