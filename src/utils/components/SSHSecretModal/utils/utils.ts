@@ -111,7 +111,7 @@ export const applyCloudDriveCloudInitVolume = (
 };
 
 export const addSecretToVM = (vm: V1VirtualMachine, secretName?: string, isDynamic?: boolean) => {
-  if (isWindows(vm?.spec?.template)) return vm;
+  if (isWindows(vm?.spec?.template) || isEmpty(getCloudInitVolume(vm))) return vm;
 
   return produce(vm, (vmDraft) => {
     vmDraft.spec.template.spec.volumes = applyCloudDriveCloudInitVolume(vm, isDynamic);
