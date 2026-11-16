@@ -18,6 +18,10 @@ export type BootVolumeSelection = {
   volumeSnapshotSource?: null | VolumeSnapshotKind;
 };
 
+export type UserInstanceTypeKind =
+  | 'VirtualMachineClusterInstancetype'
+  | 'VirtualMachineInstancetype';
+
 export type InstanceTypeSelection =
   | {
       name: string;
@@ -26,6 +30,7 @@ export type InstanceTypeSelection =
       type: 'redhat';
     }
   | {
+      kind: UserInstanceTypeKind;
       name: string;
       namespace: string;
       type: 'user';

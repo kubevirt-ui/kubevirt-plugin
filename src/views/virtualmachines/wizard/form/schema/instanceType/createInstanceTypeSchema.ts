@@ -44,8 +44,16 @@ const createRedHatInstanceTypeSchema = (): yup.ObjectSchema<RedHatInstanceTypeSe
 
 const createUserInstanceTypeSchema = (): yup.ObjectSchema<UserInstanceTypeSelection> =>
   yup.object({
+    kind: yup
+      .mixed<UserInstanceTypeSelection['kind']>()
+      .oneOf(['VirtualMachineClusterInstancetype', 'VirtualMachineInstancetype'])
+      .defined(),
     name: requiredString(),
-    namespace: requiredString(),
+    namespace: yup.string().when('kind', {
+      is: 'VirtualMachineInstancetype',
+      otherwise: () => yup.string().defined(),
+      then: () => requiredString(),
+    }),
     type: yup.mixed<'user'>().oneOf(['user']).defined(),
   });
 
