@@ -1,17 +1,26 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
-import { getDriverEntry, setDriverEntry } from '@kubevirt-utils/store/drivers';
+import {
+  getDriverEntry,
+  setDriverEntry,
+  subscribeDriverCache,
+} from '@kubevirt-utils/store/drivers';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
-import { useSignals } from '@preact/signals-react/runtime';
 
 import { DEFAULT_INFO, getDriversInfo, VirtioWinDriversInfo } from './drivers';
 
 export const useVirtioWinDriversInfo = (clusterParam?: string): [VirtioWinDriversInfo, boolean] => {
-  useSignals();
   const clusterParamFromURL = useClusterParam();
   const cluster = clusterParam ?? clusterParamFromURL ?? undefined;
 
-  const entry = getDriverEntry(cluster);
+  const [entry, setEntry] = useState(() => getDriverEntry(cluster));
+
+  useEffect(() => {
+    setEntry(getDriverEntry(cluster));
+    return subscribeDriverCache(() => {
+      setEntry(getDriverEntry(cluster));
+    });
+  }, [cluster]);
 
   useEffect(() => {
     if (entry) return;
