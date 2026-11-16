@@ -1,17 +1,22 @@
-import { GATING_TAG, GATING } from '@/data-models/allure-constants';
+import { T1, T1_TAG } from '@/data-models/allure-constants';
 import { expect, test } from '@/fixtures/vm-actions-fixture';
 import { TestTimeouts } from '@/utils/test-config';
 
+// Tier1 only — RHEL9 Start/Stop via Actions is too slow/flaky for Hot Cluster gating (aligns with main).
 test.describe(
- 'Tier1 VM Start/Stop/Restart Lifecycle',
- { tag: [GATING_TAG, '@tier1-vm-actions'] },
- () => {
+  'Tier1 VM Start/Stop/Restart Lifecycle',
+  { tag: [T1_TAG, '@tier1-vm-actions'] },
+  () => {
     test(
       'Start, stop, and restart a VM from the detail page actions dropdown',
       { tag: ['@nonpriv'] },
       async ({ vmDetailPage, vmTreePage, apiClient, utils }) => {
         const SUITE = 'VM Lifecycle';
-        await utils.withAllure({ suite: SUITE, feature: GATING, tags: [GATING_TAG, '@tier1-vm-actions'] });
+        await utils.withAllure({
+          suite: SUITE,
+          feature: T1,
+          tags: [T1_TAG, '@tier1-vm-actions'],
+        });
 
         const ns = utils.generateTestNamespace('lifecycle');
         await apiClient.createNamespace(ns);
