@@ -123,15 +123,15 @@ locale files.
 
 1. Build the image:
    ```sh
-   docker build -t quay.io/kubevirt-ui/kubevirt-plugin:latest .
+   docker build -t quay.io/kubevirtui/kubevirt-plugin:latest .
    ```
 2. Run the image:
    ```sh
-   docker run -it --rm -d -p 9001:80 quay.io/kubevirt-ui/kubevirt-plugin:latest
+   docker run -it --rm -d -p 9001:80 quay.io/kubevirtui/kubevirt-plugin:latest
    ```
 3. Push the image to the image registry:
    ```sh
-   docker push quay.io/kubevirt-ui/kubevirt-plugin:latest
+   docker push quay.io/kubevirtui/kubevirt-plugin:latest
    ```
 
 ## Deployment on cluster
@@ -143,7 +143,7 @@ the plugin to a cluster by instantiating the template:
 oc process -f oc-manifest.yaml \
   -p PLUGIN_NAME=kubevirt-plugin \
   -p NAMESPACE=kubevirt-ui \
-  -p IMAGE=quay.io/kubevirt-ui/kubevirt-plugin:latest \
+  -p IMAGE=quay.io/kubevirtui/kubevirt-plugin:latest \
   | oc create -f -
 ```
 

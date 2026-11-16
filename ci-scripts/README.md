@@ -140,7 +140,7 @@ All paths converge after cluster creation: the workflow installs HCO, builds the
 
 1. Actions → **Hot Cluster E2E** → Run workflow (or triggered on PR)
 2. Health check verifies cluster is reachable
-3. Plugin image is built and pushed to `quay.io/kubevirt-ui/kubevirt-ui-ci` (2h auto-expiry via `quay.expires-after` label)
+3. Plugin image is built and pushed to `quay.io/kubevirtui/kubevirt-ui-ci` (2h auto-expiry via `quay.expires-after` label)
 4. Test environment is provisioned via ci-env-controller (ConfigMap-driven)
 5. Playwright gating tests run against the in-cluster console
 6. Artifacts are uploaded, test environment is released
@@ -456,7 +456,7 @@ Always verify the cluster has been torn down when done testing. The auto-teardow
 
 ## Known Limitations
 
-- **Ephemeral CI plugin images**: Plugin images are pushed to `quay.io/kubevirt-ui/kubevirt-ui-ci` with `quay.expires-after=2h` for automatic tag expiration. Quay's time machine retains expired tags for 14 days before garbage collection.
+- **Ephemeral CI plugin images**: Plugin images are pushed to `quay.io/kubevirtui/kubevirt-ui-ci` with `quay.expires-after=2h` for automatic tag expiration. Quay's time machine retains expired tags for 14 days before garbage collection.
 - **Ghost runner cleanup**: Requires the ARC GitHub App credentials (`ARC_GITHUB_APP_ID` + `ARC_GITHUB_APP_PRIVATE_KEY`). If ARC auth is instead configured via `ARC_GITHUB_PAT`, offline runners must be cleaned up manually.
 - **IBM Cloud VPC hairpin NAT**: VPC load balancers don't support hairpin NAT. On IPI clusters, ingress canary checks fail and the authentication operator may report Degraded. This is cosmetic -- the console works fine for browser access from outside the cluster, and CI tests are unaffected (they use internal service URLs).
 

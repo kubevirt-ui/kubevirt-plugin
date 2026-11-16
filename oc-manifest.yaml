@@ -18,7 +18,7 @@ parameters:
     required: true
   - description: Container image of the plugin.
     name: IMAGE
-    value: quay.io/repository/kubevirt-ui/kubevirt-plugin:latest
+    value: quay.io/kubevirtui/kubevirt-plugin:latest
     required: true
 message: >-
   To enable the plugin on the cluster, run the following command:

@@ -195,7 +195,7 @@ env:
   TEST_NS: kubevirt-plugin-ci-test-${{ github.run_id }}
   TEST_SECRET_NAME: ci-test-secret
 
-  KUBEVIRT_PLUGIN_IMAGE: 'quay.io/kubevirt-ui/kubevirt-ui-ci:run-${{ github.run_id }}-${{ github.run_attempt }}'
+  KUBEVIRT_PLUGIN_IMAGE: 'quay.io/kubevirtui/kubevirt-ui-ci:run-${{ github.run_id }}-${{ github.run_attempt }}'
 
   CI_ENV_NS: ci-env
   CI_ENV_CM: ci-env-${{ github.run_id }}
