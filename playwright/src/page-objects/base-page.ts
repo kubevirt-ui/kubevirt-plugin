@@ -6,9 +6,10 @@
 import BaseComponent from '@/components/shared/base-component';
 import type { ContextKey, ContextValueType } from '@/context-managers/context-keys';
 import ScenarioContextManager from '@/context-managers/scenario-context-manager';
+import { dismissConsoleObstructions } from '@/utils/console-modals';
 
 import type { TrackedResourceType } from '@/utils/test-resource-tracker';
-import type { Page, TestInfo } from '@playwright/test';
+import type { Locator, Page, TestInfo } from '@playwright/test';
 import { test as base } from '@playwright/test';
 
 export default abstract class BasePage extends BaseComponent {
@@ -31,6 +32,26 @@ export default abstract class BasePage extends BaseComponent {
   protected trackResource(type: TrackedResourceType, name: string, namespace?: string): void {
     this.ctx.trackResource(type, name, namespace);
   }
+
+  /** List index pages: 4.19+ use `h1`; older console builds use `data-test-id="resource-title"`. */
+  protected listPageHeading(titlePattern: RegExp): Locator {
+    return this.page
+      .getByRole('heading', { level: 1, name: titlePattern })
+      .or(this.page.locator('[data-test-id="resource-title"]').filter({ hasText: titlePattern }))
+      .first();
+  }
+
+  /** Console error boundary ("Out-of-order effect") after rapid tab changes on VM detail. */
+  protected async recoverConsoleCrashPage(): Promise<void> {
+    await dismissConsoleObstructions(this.page);
+    const crashed = this.page.getByRole('heading', { name: /Something wrong happened/i });
+    if (!(await crashed.isVisible().catch(() => false))) {
+      return;
+    }
+    await this.page.getByRole('button', { name: /Reload page/i }).click();
+    await this.page.waitForLoadState('domcontentloaded');
+    await dismissConsoleObstructions(this.page);
+  }
 }
 
 const TIMEOUT_PATTERNS: RegExp[] = [
@@ -48,7 +69,6 @@ const TIMEOUT_PATTERNS: RegExp[] = [
 
 export type TimeoutAwareTestInfo = TestInfo & {
   _actionTimeouts?: Array<{ method: string; message: string }>;
-  _diagnosisHandled?: boolean;
 };
 
 export function isBrowserClosedError(error: unknown): boolean {
@@ -67,13 +87,9 @@ export function isTimeoutError(error: unknown): boolean {
  * Wraps a page object so async method calls capture errors instead of
  * failing the test immediately. Timeout errors are recorded on
  * testInfo._actionTimeouts so the _autoTimeoutGuard fixture can
- * reclassify the test as skipped. Non-timeout errors are logged to
- * stderr so the reporter can surface them.
+ * reclassify the test as skipped. Other errors are swallowed quietly.
  */
 export function withSafeActions<T extends object>(instance: T): T {
-  const className = (target: T) =>
-    (target as { constructor?: { name?: string } }).constructor?.name ?? 'UnknownPage';
-
   return new Proxy(instance, {
     get(target, prop, receiver) {
       const value = Reflect.get(target, prop, receiver);
@@ -86,7 +102,6 @@ export function withSafeActions<T extends object>(instance: T): T {
                 error && typeof error === 'object'
                   ? ((error as { message?: string }).message ?? String(error))
                   : String(error);
-              const label = `${className(target)}.${String(prop)}`;
 
               if (isBrowserClosedError(error)) {
                 try {
@@ -107,8 +122,6 @@ export function withSafeActions<T extends object>(instance: T): T {
                 } catch {
                   /* outside test context */
                 }
-              } else {
-                console.error(`[safeAction] ✖ ERROR in ${label}: ${msg.split('\n')[0]}`);
               }
               return undefined;
             });

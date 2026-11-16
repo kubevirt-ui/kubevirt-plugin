@@ -67,69 +67,6 @@ export async function withAllure(meta: AllureMeta): Promise<void> {
   }
 }
 
-export interface AiDiagnosisAnnotation {
-  verdict: 'pass' | 'skip' | 'fail';
-  reason: string;
-  source: 'agent' | 'heuristic';
-  /** Page object method that timed out, if this diagnosis came from a timeout (vs. an assertion failure). */
-  method?: string;
-}
-
-const AI_DIAGNOSIS_VERDICT_ICONS: Record<AiDiagnosisAnnotation['verdict'], string> = {
-  pass: '✅',
-  fail: '❌',
-  skip: '⏭️',
-};
-
-/**
- * Surfaces a DIAGNOSE_FAILURES verdict in the Allure report as a filterable
- * label + a step containing the agent's/heuristic's full reasoning.
- *
- * This is deliberately NOT done via `testInfo.annotations.push()` — allure-playwright
- * only converts custom annotation types into report steps during `onTestBegin`
- * (before the test runs), so annotations added later during fixture teardown
- * (when a diagnosis verdict is actually known) are silently dropped from the
- * report. The Allure runtime API (`allure.step`/`allure.label`) instead attaches
- * to the currently-executing test via AsyncLocalStorage, so it works regardless
- * of when during the test's lifecycle it's called.
- *
- * Most important for `"pass"` verdicts, where the AI overrode what would
- * otherwise have been a failing/timed-out test — that override must be visible
- * to reviewers in the report itself, not just in console/CI logs.
- */
-export async function annotateAiDiagnosisInAllure(
-  annotation: AiDiagnosisAnnotation,
-): Promise<void> {
-  try {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const { allure } = require('allure-playwright');
-    if (!allure) return;
-
-    await allure.label('aiDiagnosisVerdict', annotation.verdict);
-    await allure.label('aiDiagnosisSource', annotation.source);
-
-    // A dedicated tag (not just a label) for "pass" verdicts specifically —
-    // these are the tests that show up green and otherwise look identical to
-    // a genuine pass, so they need to be filterable as a distinct group in
-    // the report, not just carry metadata a reviewer has to open the test to see.
-    if (annotation.verdict === 'pass') {
-      await allure.tag('ai-diagnosed');
-    }
-
-    const icon = AI_DIAGNOSIS_VERDICT_ICONS[annotation.verdict];
-    const context = annotation.method ? ` (timeout in ${annotation.method})` : '';
-    const title = `${icon} AI Diagnosis: ${annotation.verdict.toUpperCase()} via ${
-      annotation.source
-    }${context}`;
-
-    await allure.step(title, async () => {
-      await allure.attachment('AI Diagnosis Reason', annotation.reason, 'text/plain');
-    });
-  } catch {
-    // No-op if Allure is not available; the diagnosis verdict still applies to test status
-  }
-}
-
 /**
  * Logs a URL to Allure report as an attachment.
  * @param url - The URL to log

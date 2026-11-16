@@ -329,32 +329,15 @@ export class VmSchedulingMetricsComponent extends BaseComponent {
 
   async verifyEvictionStrategyLiveMigrate(): Promise<boolean> {
     try {
-      await this.page.waitForTimeout(TestTimeouts.UI_DELAY_MEDIUM);
-
-      const timeout = Math.min(TestTimeouts.UI_ELEMENT_VISIBILITY, 30000);
-
-      const count = await this._evictionStrategyElement.count();
-      if (count === 0) {
-        return false;
-      }
-
-      try {
-        await this._evictionStrategyElement.first().waitFor({ state: 'visible', timeout });
-      } catch {
-        await this._evictionStrategyElement.first().waitFor({ state: 'attached', timeout });
-      }
-
-      const textContent = await this._evictionStrategyElement.first().textContent();
-      const innerText = await this._evictionStrategyElement
-        .first()
-        .innerText()
-        .catch(() => '');
-
-      const hasLiveMigrate =
-        (textContent?.toLowerCase().includes('livemigrate') ?? false) ||
-        (innerText?.toLowerCase().includes('livemigrate') ?? false);
-
-      return hasLiveMigrate;
+      const timeout = Math.min(TestTimeouts.UI_ELEMENT_VISIBILITY, 30_000);
+      const el = this._evictionStrategyElement.filter({ visible: true }).first();
+      await el.waitFor({ state: 'visible', timeout });
+      const text = (
+        (await el.innerText().catch(() => '')) ||
+        (await el.textContent().catch(() => '')) ||
+        ''
+      ).toLowerCase();
+      return /live\s*migrate/.test(text);
     } catch {
       return false;
     }
@@ -1531,35 +1514,32 @@ export class VmStorageComponent extends BaseComponent {
     diskName: string,
     column: 'drive' | 'interface' | 'name' | 'source' | 'size',
   ): Promise<string | null> {
+    const table = this.locator(
+      '[data-test="vmi-disks-table"], [aria-label="Disks table"]',
+    ).first();
     try {
-      const cell = this.testId(`disk-${column}-${diskName}`).first();
-      const visible = await cell
-        .isVisible({ timeout: TestTimeouts.UI_DELAY_MEDIUM })
-        .catch(() => false);
-      if (visible) {
-        return (await cell.textContent())?.trim() || null;
-      }
+      const cell = table.getByTestId(`disk-${column}-${diskName}`).first();
+      await cell.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
+      return (await cell.textContent())?.trim() || null;
+    } catch {
+      // Fallback for builds without data-test cells — indices match disksTableDefinition.
       const columnIndex: Record<string, number> = {
         name: 1,
         source: 2,
-        drive: 3,
-        size: 4,
+        size: 3,
+        drive: 4,
         interface: 5,
       };
       const idx = columnIndex[column];
-      if (idx) {
-        const row = this.locator('tr').filter({ hasText: diskName }).first();
+      if (!idx) return null;
+      try {
+        const row = table.locator('tr').filter({ hasText: diskName }).first();
         const td = row.locator(`td:nth-child(${idx})`).first();
-        const tdVisible = await td
-          .isVisible({ timeout: TestTimeouts.UI_DELAY_MEDIUM })
-          .catch(() => false);
-        if (tdVisible) {
-          return (await td.textContent())?.trim() || null;
-        }
+        await td.waitFor({ state: 'visible', timeout: TestTimeouts.UI_DELAY_MEDIUM });
+        return (await td.textContent())?.trim() || null;
+      } catch {
+        return null;
       }
-      return null;
-    } catch {
-      return null;
     }
   }
 
@@ -1602,9 +1582,14 @@ export class VmStorageComponent extends BaseComponent {
 
   async navigateToVmiDisksTab(vmName: string, namespace: string): Promise<void> {
     await this.goTo(`/k8s/ns/${namespace}/kubevirt.io~v1~VirtualMachineInstance/${vmName}/disks`);
-    await this.locator('[aria-label="Disks table"]')
+    const table = this.locator(
+      '[data-test="vmi-disks-table"], [aria-label="Disks table"]',
+    ).first();
+    await table.waitFor({ state: 'visible', timeout: TestTimeouts.DEFAULT });
+    // Table shell can render before PVC-backed rows; wait for a disk name cell.
+    await this.locator('[data-test^="disk-name-"]')
       .first()
-      .waitFor({ state: 'visible', timeout: TestTimeouts.DEFAULT });
+      .waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
   }
 
   async resizeDisk(diskName: string, newSize: string): Promise<boolean> {

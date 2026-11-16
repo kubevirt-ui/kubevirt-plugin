@@ -1,15 +1,36 @@
+import * as fs from 'fs';
 import * as http from 'http';
 import * as https from 'https';
+import * as path from 'path';
 
+import { loginToOpenShiftConsole, saveStorageState } from '@/auth/console-login';
 import type { ClusterAuthConfig } from '@/clients/base-client';
 import RequestContextClient from '@/clients/request-context-client';
+import {
+  ensureKubeconfigAuthenticated,
+  ensureNonPrivWelcomeSettingsViaOc,
+  pinKubeconfigToProcess,
+  resolveKubeconfig,
+  runOcCommand,
+} from '@/utils/cluster-oc';
+import { dismissConsoleObstructions } from '@/utils/console-modals';
 import { EnvVariables } from '@/utils/env-variables';
 import { logger } from '@/utils/logger';
+import { grantNonPrivClusterRbac } from '@/utils/nonpriv-cluster-rbac';
+import {
+  ensureNonPrivUserExists,
+  NONPRIV_IDP_NAME,
+  waitForOAuthRollout,
+} from '@/utils/nonpriv-user-setup';
 import { type SharedTestConfig, MINUTE, SECOND, TestConfigManager } from '@/utils/test-config';
 import { type Browser, type BrowserContext, type Page, chromium } from '@playwright/test';
 
 import type { SetupRule } from './types';
 import { SetupPhase } from './types';
+
+function resolveSetupKubeconfigPath(projectRoot: string): string {
+  return path.join(projectRoot, '.kubeconfigs', 'test-config');
+}
 
 /**
  * Returns ordered global setup rules (BROWSER → AUTH → CLUSTER → REPORTING).
@@ -73,6 +94,66 @@ export function getSetupRules(): SetupRule[] {
         );
       },
     },
+    // CNV-98979: non-priv keeps oc for IDP/RBAC as kubeadmin *before* UI login as test user.
+    {
+      id: 'nonpriv-oc-prep',
+      name: 'Kubeadmin oc: ensure test-users htpasswd IDP, test namespace, and admin RBAC',
+      phase: SetupPhase.BROWSER,
+      guard: () =>
+        EnvVariables.isNonPrivUser &&
+        !EnvVariables.skipOcInvocations &&
+        process.env.SKIP_NONPRIV_IDP_SETUP !== '1',
+      onError: 'throw',
+      run: async (ctx) => {
+        if (!EnvVariables.testUserPassword) {
+          throw new Error('TEST_PASSWORD (or TEST_USER_PASSWORD) is required when NON_PRIV=1');
+        }
+        if (!EnvVariables.password) {
+          throw new Error(
+            'OPENSHIFT_PASSWORD (or BRIDGE_KUBEADMIN_PASSWORD) is required for non-priv oc prep',
+          );
+        }
+        const kubePath = resolveSetupKubeconfigPath(ctx.projectRoot);
+        fs.mkdirSync(path.dirname(kubePath), { recursive: true });
+        const username = EnvVariables.testUsername;
+        const password = EnvVariables.testUserPassword;
+        logger.info(
+          `Ensuring non-priv user "${username}" on htpasswd IDP "${NONPRIV_IDP_NAME}" (ns="${ctx.testNamespace}")...`,
+        );
+        ensureKubeconfigAuthenticated(kubePath);
+        pinKubeconfigToProcess(kubePath);
+
+        const changed = ensureNonPrivUserExists(username, password, kubePath);
+        if (changed) {
+          await waitForOAuthRollout(kubePath);
+          // Match CNV-98979: brief settle after IDP/htpasswd changes.
+          await new Promise((resolve) => setTimeout(resolve, 30_000));
+        } else {
+          // OAuth pods may still be rolling after long admin tiers.
+          await waitForOAuthRollout(kubePath, 90_000);
+          await new Promise((resolve) => setTimeout(resolve, 5_000));
+        }
+        logger.success(`Non-priv user "${username}" is available via IDP "${NONPRIV_IDP_NAME}"`);
+
+        try {
+          runOcCommand(`oc get project ${ctx.testNamespace}`, kubePath, 30 * SECOND);
+        } catch {
+          runOcCommand(
+            `oc new-project ${ctx.testNamespace} --display-name="${ctx.testNamespace}"`,
+            kubePath,
+            MINUTE,
+          );
+        }
+
+        // CNV-98979 + prior grant-kubevirt-access: cluster view / feature CM readers via kubeadmin oc.
+        await grantNonPrivClusterRbac({
+          kubeconfigPath: kubePath,
+          cnvNamespace: ctx.cnvNamespace,
+          testNamespace: ctx.testNamespace,
+          username,
+        });
+      },
+    },
     {
       id: 'browser-login',
       name: 'Launch browser and perform console login',
@@ -101,45 +182,19 @@ export function getSetupRules(): SetupRule[] {
           logger.info('   Navigating to console to capture session cookies...');
           await page.goto(baseUrl, { timeout: MINUTE, waitUntil: 'load' });
           await page.waitForLoadState('networkidle').catch(() => {});
-          await context.storageState({ path: ctx.storageStatePath });
+          await saveStorageState(context, ctx.storageStatePath);
           logger.success(`✓ Saved storage state to ${ctx.storageStatePath}`);
           return;
         }
 
-        logger.info('🌐 Performing browser OAuth login...');
-        await page.goto(`${baseUrl}/auth/login`, { timeout: MINUTE, waitUntil: 'load' });
-        await page.waitForLoadState('load');
-
-        const kubeAdminBtn = page.locator(
-          '[title="Log in with kube:admin"], a[href*="idp=kube%3Aadmin"]',
+        logger.info(
+          `🌐 Performing browser OAuth login as ${EnvVariables.loginUsername} (${EnvVariables.idp})...`,
         );
-        const kubeAdminVisible = await kubeAdminBtn
-          .waitFor({ state: 'visible', timeout: 10 * SECOND })
-          .then(() => true)
-          .catch(() => false);
-        if (kubeAdminVisible) {
-          await page.waitForTimeout(SECOND);
-          await kubeAdminBtn.click();
-        }
-
-        await page.locator('#inputUsername').fill(EnvVariables.uiLoginUsername);
-        await page.locator('#inputPassword').fill(EnvVariables.uiLoginPassword);
-        const coLoginBtn = page.locator('#co-login-button');
-        const submitBtn = page.locator('button[type="submit"]');
-        const useCoLogin = await coLoginBtn.isVisible({ timeout: 5000 }).catch(() => false);
-        if (useCoLogin) {
-          await coLoginBtn.click();
-        } else {
-          await submitBtn.click();
-        }
-
-        await page.waitForURL((url) => !url.pathname.includes('/auth/login'), {
-          timeout: 2 * MINUTE,
-        });
-        await page.waitForLoadState('load');
+        // CNV-98979: named htpasswd IDP for non-priv; kube:admin for privileged.
+        await loginToOpenShiftConsole(page, baseUrl);
         logger.success(`Login complete, redirected to: ${page.url()}`);
 
-        await context.storageState({ path: ctx.storageStatePath });
+        await saveStorageState(context, ctx.storageStatePath);
         logger.success(`✓ Saved authenticated storage state to ${ctx.storageStatePath}`);
       },
     },
@@ -204,7 +259,8 @@ export function getSetupRules(): SetupRule[] {
       id: 'ensure-nonpriv-user',
       name: 'Ensure non-priv test user exists in htpasswd IDP',
       phase: SetupPhase.CLUSTER,
-      guard: () => EnvVariables.isNonPrivUser,
+      // Prefer kubeadmin oc prep (nonpriv-oc-prep). Browser-session fallback is best-effort only.
+      guard: () => EnvVariables.isNonPrivUser && EnvVariables.skipOcInvocations,
       onError: 'warn',
       run: async (ctx) => {
         const apiClient = ctx.apiClient;
@@ -320,7 +376,10 @@ export function getSetupRules(): SetupRule[] {
           throw new Error('RequestContextClient not initialized');
         }
         await apiClient.setupKubevirtUiConfig(ctx.cnvNamespace);
-        logger.success('✓ VM folders (treeViewFolders) enabled in kubevirt-ui-features ConfigMap');
+        await apiClient.ensureVmTemplatesEnabled(ctx.cnvNamespace);
+        logger.success(
+          '✓ VM folders (treeViewFolders) + native VM templates (vmTemplates) enabled in kubevirt-ui-features ConfigMap',
+        );
       },
     },
     {
@@ -350,17 +409,15 @@ export function getSetupRules(): SetupRule[] {
       name: 'Disable sidebar auto-hide in user settings',
       phase: SetupPhase.CLUSTER,
       onError: 'warn',
-      guard: () => true,
+      // Non-priv: handled by disable-welcome-modals via kubeadmin oc (includes autoHideNav: false).
+      guard: () => !EnvVariables.isNonPrivUser,
       run: async (ctx) => {
         const apiClient = ctx.apiClient;
         if (!apiClient) {
           throw new Error('RequestContextClient not initialized');
         }
 
-        const consoleUsername = EnvVariables.isNonPrivUser
-          ? EnvVariables.testUsername
-          : 'kubeadmin';
-        const settingsKey = consoleUsername === 'kubeadmin' ? 'kube-admin' : consoleUsername;
+        const settingsKey = 'kube-admin';
 
         // Patch console user settings (guided tour, welcome modals).
         const consoleConfigMapName = `user-settings-${settingsKey}`;
@@ -425,55 +482,59 @@ export function getSetupRules(): SetupRule[] {
       phase: SetupPhase.CLUSTER,
       onError: 'warn',
       run: async (ctx) => {
+        // Non-priv: test-user session cannot create console user-settings CMs — use kubeadmin oc.
+        if (EnvVariables.isNonPrivUser) {
+          const kubeconfig = resolveKubeconfig();
+          if (!kubeconfig) {
+            throw new Error('Kubeconfig required to patch non-priv welcome settings via oc');
+          }
+          ensureNonPrivWelcomeSettingsViaOc(
+            kubeconfig,
+            EnvVariables.testUsername,
+            ctx.cnvNamespace,
+          );
+          // Reload so the console picks up ConfigMap changes before storage state is saved.
+          if (browserState?.page) {
+            await browserState.page
+              .reload({ waitUntil: 'domcontentloaded' })
+              .catch(() => undefined);
+            await dismissConsoleObstructions(browserState.page);
+          }
+          logger.success(
+            `✓ Welcome settings patched via kubeadmin oc for '${EnvVariables.testUsername}'`,
+          );
+          return;
+        }
+
         const apiClient = ctx.apiClient;
         if (!apiClient) {
           throw new Error('RequestContextClient not initialized');
         }
 
-        const virtUsername = EnvVariables.isNonPrivUser ? EnvVariables.testUsername : 'kube-admin';
-
-        let userUid: string | undefined;
-        if (EnvVariables.isNonPrivUser) {
-          try {
-            const userObj = await apiClient.getResourceByKind('user', virtUsername);
-            userUid = userObj?.metadata?.uid;
-          } catch {
-            // User may not exist yet
-          }
-          if (userUid) {
-            logger.info(`Resolved '${virtUsername}' UID: ${userUid}`);
-          } else {
-            logger.warn(`⚠️ Could not resolve UID for '${virtUsername}', patching by name only`);
-          }
-        }
+        const virtUsername = 'kube-admin';
 
         let virtResult = false;
         try {
-          const keysToUpdate = [virtUsername];
-          if (userUid && userUid !== virtUsername) {
-            keysToUpdate.push(userUid);
-          }
-
-          const patchData: Record<string, string> = {};
-          for (const key of keysToUpdate) {
-            patchData[key] = JSON.stringify({
-              navigation: { autoHideNav: true },
-              quickStart: { dontShowWelcomeModal: true, activeQuickStartID: '' },
-              guidedTour: false,
-              onboardingPopoversHidden: {
-                catalog: true,
-                createProject: true,
-                navCollapse: true,
-                vmsTab: true,
-              },
-            });
-          }
           await apiClient.mergePatchResource(
             '',
             'v1',
             'configmaps',
             'kubevirt-user-settings',
-            { data: patchData },
+            {
+              data: {
+                [virtUsername]: JSON.stringify({
+                  navigation: { autoHideNav: false },
+                  quickStart: { dontShowWelcomeModal: true, activeQuickStartID: '' },
+                  guidedTour: false,
+                  onboardingPopoversHidden: {
+                    catalog: true,
+                    createProject: true,
+                    navCollapse: true,
+                    vmsTab: true,
+                  },
+                }),
+              },
+            },
             ctx.cnvNamespace,
           );
           virtResult = true;
@@ -483,9 +544,7 @@ export function getSetupRules(): SetupRule[] {
 
         if (virtResult) {
           logger.success(
-            `✓ Virtualization welcome settings disabled for '${virtUsername}'${
-              userUid ? ` (UID: ${userUid})` : ''
-            } in ${ctx.cnvNamespace}`,
+            `✓ Virtualization welcome settings disabled for '${virtUsername}' in ${ctx.cnvNamespace}`,
           );
         } else {
           logger.warn(
@@ -493,12 +552,10 @@ export function getSetupRules(): SetupRule[] {
           );
         }
 
-        const consoleUsername = EnvVariables.isNonPrivUser
-          ? EnvVariables.testUsername
-          : EnvVariables.username;
+        const consoleUsername = EnvVariables.username;
         const consoleSettingsNs = 'openshift-console-user-settings';
         const configMapName = `user-settings-${consoleUsername}`;
-        const maxAttempts = EnvVariables.isNonPrivUser ? 1 : 5;
+        const maxAttempts = 5;
         const patchData: Record<string, string> = {
           'console.guidedTour': JSON.stringify({
             admin: { completed: true },
@@ -529,10 +586,6 @@ export function getSetupRules(): SetupRule[] {
 
         if (coreResult) {
           logger.success(`✓ Core console guided tours marked completed for '${consoleUsername}'`);
-        } else if (EnvVariables.isNonPrivUser) {
-          logger.info(
-            `ℹ️ Console user-settings ConfigMap not yet available for '${consoleUsername}' (first login)`,
-          );
         } else {
           logger.warn(
             `⚠️ Could not disable core welcome modal (ConfigMap may not exist for '${consoleUsername}')`,
@@ -544,7 +597,8 @@ export function getSetupRules(): SetupRule[] {
       id: 'grant-kubevirt-access',
       name: 'Grant test user KubeVirt access in test namespace',
       phase: SetupPhase.CLUSTER,
-      guard: () => EnvVariables.isNonPrivUser,
+      // When oc prep ran, admin RoleBinding is already applied as kubeadmin.
+      guard: () => EnvVariables.isNonPrivUser && EnvVariables.skipOcInvocations,
       onError: 'warn',
       run: async (ctx) => {
         const apiClient = ctx.apiClient;

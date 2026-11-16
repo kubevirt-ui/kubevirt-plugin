@@ -61,17 +61,20 @@ export const CNV_SETTINGS_TAG = '@cnv-settings';
 /** Allure feature label for CNV global settings tests. */
 export const CNV_SETTINGS_FEATURE = 'CNV Settings';
 
-/** Allure feature label for s390x architecture-specific tests. */
-export const S390X_FEATURE = 's390x';
-
-/** Playwright/Allure tag for s390x architecture-specific tests. */
-export const S390X_TAG = '@s390x';
-
 /** Allure feature label for non-privileged user tests. */
 export const NONPRIV_FEATURE = 'Non-Priv';
 
 /** Playwright/Allure tag for non-privileged user tests. */
 export const NONPRIV_TAG = '@nonpriv';
+
+/** Alias used by CNV-98979 / main-style specs (`@non-priv`). */
+export const NON_PRIV_TAG = '@nonpriv';
+
+/** Playwright tag for auto-applied labels specs. */
+export const AUTO_LABELS_TAG = '@auto-labels';
+
+/** Allure feature label for auto-applied labels. */
+export const AUTO_LABELS_FEATURE = 'Auto-Applied Labels';
 
 /** Allure feature label for VM migration tests (compute + storage). */
 export const MIGRATION_FEATURE = 'Migrations';

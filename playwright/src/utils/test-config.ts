@@ -55,6 +55,21 @@ export const TestTimeouts = {
   /** Default timeout for resource creation verification (60 seconds) */
   RESOURCE_CREATION: MINUTE,
 
+  /** Console login / perspective ready (main-style / CNV-98979) */
+  CONSOLE_LOGIN: 4 * MINUTE,
+
+  /** Console page navigation load (main-style / CNV-98979) */
+  CONSOLE_PAGE_LOAD: 4 * MINUTE,
+
+  /** Long UI/API operation (main-style) */
+  LONG_OPERATION: 5 * MINUTE,
+
+  /** Wait until VM is migratable (main-style) */
+  MIGRATION_VM_READY: 8 * MINUTE,
+
+  /** Extended test budget (main-style migrations / heavy flows) */
+  TEST_EXTENDED: 15 * MINUTE,
+
   /** Extended timeout for data volume operations (20 seconds) */
   DATA_VOLUME_CREATION: 20 * SECOND,
 

@@ -1,45 +1,16 @@
 #!/usr/bin/env bash
-# ────────────────────────────────────────────────────────────────────────────
-# playwright-runner-hc-e2e.sh — Run Playwright projects on a hot (pre-provisioned)
-#                                OpenShift cluster with ServiceAccount auth.
-#
-# Differences from playwright-runner.sh:
-#   • Exports HC_E2E=true so global setup uses the in-cluster / SA-token auth
-#     flow and skips browser OAuth login.
-#   • Includes the Gating, Tier1, and Tier2 projects (scenario infrastructure).
-#   • Supports IS_LOCAL=1 for localhost development (localhost:9000).
-#   • Extra args (file paths, -g patterns, --workers, …) are forwarded to Playwright.
-#
-# Usage:
-#   ./playwright-runner-hc-e2e.sh [project] [extra-args...]
-#
-# Environment:
-#   IS_LOCAL=1   Run against localhost:9000 (npm run start-console).
-#                Sets WEB_CONSOLE_URL=http://localhost:9000 automatically.
-#
-# Examples:
-#   ./playwright-runner-hc-e2e.sh Gating --workers=4
-#   ./playwright-runner-hc-e2e.sh Tier1
-#   ./playwright-runner-hc-e2e.sh Tier2 playwright/tests/tier2/foo.spec.ts
-#   ./playwright-runner-hc-e2e.sh auto playwright/tests/tier1/foo.spec.ts
-#   ./playwright-runner-hc-e2e.sh auto -g "creates a bootable volume"
-#   IS_LOCAL=1 ./playwright-runner-hc-e2e.sh Gating --headed
-#   ./playwright-runner-hc-e2e.sh suite
-#   ./playwright-runner-hc-e2e.sh all
-#
-# Note: --project=Name (equals form) is required so Playwright's variadic
-# --project option does not swallow file-path / -g filter args.
-# Use project "auto" to omit --project (filter by path / -g across projects).
-# ────────────────────────────────────────────────────────────────────────────
+# Hot-cluster Playwright runner — same CLI shape as playwright-runner.sh / CNV-98979,
+# with HC_E2E=true and hard failures (CI_DEBUG off by default).
 set -euo pipefail
 
 export HC_E2E=true
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="${SCRIPT_DIR}"
-cd "${PROJECT_ROOT}"
+cd "${SCRIPT_DIR}"
 
-# ── Helpers ──────────────────────────────────────────────────────────────
+# shellcheck source=scripts/playwright-env.sh
+source "${SCRIPT_DIR}/scripts/playwright-env.sh"
+playwright_bootstrap_env ".env"
 
 detect_urls() {
   if [[ -z "${WEB_CONSOLE_URL:-}" ]]; then
@@ -59,81 +30,108 @@ detect_urls() {
   fi
 }
 
-setup_local() {
-  export WEB_CONSOLE_URL="http://localhost:9000"
-  echo "🏠 IS_LOCAL=1 — targeting localhost console at ${WEB_CONSOLE_URL}"
-  detect_urls
+usage() {
+  cat <<'EOF'
+Usage: ./playwright-runner-hc-e2e.sh <project> [playwright test args...]
+
+Projects (kubeadmin):
+  Gating | gating              @gating (excludes @cnv-settings / @migration)
+  Tier1  | tier1 | t1          @tier1
+  Tier2  | tier2 | t2          @tier2
+  Settings | settings          @cnv-settings
+  Migrations | migrations      @migration
+  auto                         all projects (pass through args)
+  suite                        Gating + Tier1 + Tier2
+  all                          Gating, Tier1, Tier2, Settings, API
+
+Non-priv (test / test):
+  Tier1NonPriv | tier1-nonpriv | t1-nonpriv
+  Tier2NonPriv | tier2-nonpriv | t2-nonpriv
+
+Local console — inline IS_LOCAL=1 wins over IS_LOCAL=0 in .env:
+  IS_LOCAL=1 ./playwright-runner-hc-e2e.sh gating --workers=4
+
+Hard failures by default (HC CI). Opt into the debug harness with:
+  CI_DEBUG=1 ./playwright-runner-hc-e2e.sh gating --workers=4
+
+Examples:
+  ./playwright-runner-hc-e2e.sh gating --workers=4
+  ./playwright-runner-hc-e2e.sh tier1 --workers=4
+EOF
 }
 
-# ── Main ─────────────────────────────────────────────────────────────────
-
-PROJECT="${1:-}"
+PROJECT="${1:-Gating}"
 shift || true
 
-if [[ -z "${PROJECT}" ]]; then
-  echo "Usage: $0 <project> [extra-args...]"
-  echo ""
-  echo "Available projects:"
-  echo "  Gating                 Gating specs (scenario infrastructure)"
-  echo "  Tier1                  Tier 1 specs (scenario infrastructure)"
-  echo "  Tier2                  Tier 2 specs (scenario infrastructure)"
-  echo "  Settings               Settings specs (scenario infrastructure)"
-  echo "  API                    API contract tests (browserless)"
-  echo "  suite                  Run Gating + Tier1 + Tier2 together"
-  echo "  all                    Run all projects"
-  echo "  auto                   No --project filter (requires path / -g args)"
-  echo ""
-  echo "Extra args are forwarded to Playwright (file paths, -g, --workers, …)."
-  echo ""
-  echo "Environment:"
-  echo "  IS_LOCAL=1             Run against localhost:9000 (local console)"
-  exit 1
-fi
+# HC gating expects hard failures; callers can opt into CI_DEBUG=1.
+export CI_DEBUG="${CI_DEBUG:-0}"
 
-# Load .env if present
-if [[ -f "${PROJECT_ROOT}/.env" ]]; then
-  set -a
-  # shellcheck disable=SC1091
-  source "${PROJECT_ROOT}/.env"
-  set +a
-fi
-
-if [[ "${IS_LOCAL:-}" == "1" ]]; then
-  setup_local
-  export HEADLESS="${HEADLESS:-true}"
-else
+if [[ "${IS_LOCAL:-}" != "1" && "${IS_LOCAL:-}" != "true" ]]; then
   detect_urls
 fi
 
-EXTRA_ARGS=("$@")
+case "${PROJECT}" in
+  -h | --help | help)
+    usage
+    exit 0
+    ;;
+  gating | Gating)
+    PROJECT="Gating"
+    ;;
+  tier1 | t1 | Tier1)
+    PROJECT="Tier1"
+    ;;
+  tier2 | t2 | Tier2)
+    PROJECT="Tier2"
+    ;;
+  settings | Settings)
+    PROJECT="Settings"
+    ;;
+  migrations | Migrations)
+    PROJECT="Migrations"
+    ;;
+  tier1-nonpriv | t1-nonpriv | Tier1NonPriv)
+    PROJECT="Tier1NonPriv"
+    export NON_PRIV=1
+    export TEST_USERNAME="${TEST_USERNAME:-test}"
+    export TEST_PASSWORD="${TEST_PASSWORD:-test}"
+    export TEST_IDP="${TEST_IDP:-test-users}"
+    export HEADLESS="${HEADLESS:-true}"
+    ;;
+  tier2-nonpriv | t2-nonpriv | Tier2NonPriv)
+    PROJECT="Tier2NonPriv"
+    export NON_PRIV=1
+    export TEST_USERNAME="${TEST_USERNAME:-test}"
+    export TEST_PASSWORD="${TEST_PASSWORD:-test}"
+    export TEST_IDP="${TEST_IDP:-test-users}"
+    export HEADLESS="${HEADLESS:-true}"
+    ;;
+  suite)
+    echo "🚀 Running suite: Gating + Tier1 + Tier2 (HC E2E mode)..."
+    exec ./scripts/run-playwright.sh \
+      --project=Gating --project=Tier1 --project=Tier2 \
+      "$@"
+    ;;
+  all)
+    echo "🚀 Running all projects (HC E2E mode)..."
+    exec ./scripts/run-playwright.sh \
+      --project=Gating --project=Tier1 --project=Tier2 \
+      --project=Settings --project=API \
+      "$@"
+    ;;
+  auto)
+    if [[ $# -eq 0 ]]; then
+      echo "❌ Project 'auto' requires filter args (spec path or -g)."
+      exit 1
+    fi
+    echo "🚀 Running Playwright without --project filter (HC E2E mode)..."
+    exec ./scripts/run-playwright.sh "$@"
+    ;;
+esac
 
-PROJECT_LOWER=$(echo "${PROJECT}" | tr '[:upper:]' '[:lower:]')
-
-if [[ "${PROJECT_LOWER}" == "auto" ]]; then
-  if [[ ${#EXTRA_ARGS[@]} -eq 0 ]]; then
-    echo "❌ Project 'auto' requires Playwright filter args (spec path or -g)."
-    exit 1
-  fi
-  echo "🚀 Running Playwright without --project filter (HC E2E mode)..."
-  npx playwright test "${EXTRA_ARGS[@]}"
-elif [[ "${PROJECT_LOWER}" == "suite" ]]; then
-  echo "🚀 Running suite: Gating + Tier1 + Tier2 (HC E2E mode)..."
-  npx playwright test --project=Gating --project=Tier1 --project=Tier2 "${EXTRA_ARGS[@]}"
-elif [[ "${PROJECT_LOWER}" == "all" ]]; then
-  PROJECTS=(
-    Gating
-    Tier1
-    Tier2
-    Settings
-    API
-  )
-  PROJECT_ARGS=()
-  for p in "${PROJECTS[@]}"; do
-    PROJECT_ARGS+=(--project="${p}")
-  done
-  echo "🚀 Running all projects (HC E2E mode)..."
-  npx playwright test "${PROJECT_ARGS[@]}" "${EXTRA_ARGS[@]}"
-else
+if [[ "${PROJECT}" != "auto" ]]; then
   echo "🚀 Running project: ${PROJECT} (HC E2E mode)..."
-  npx playwright test --project="${PROJECT}" "${EXTRA_ARGS[@]}"
+  exec ./scripts/run-playwright.sh "--project=${PROJECT}" "$@"
 fi
+
+exec ./scripts/run-playwright.sh "$@"

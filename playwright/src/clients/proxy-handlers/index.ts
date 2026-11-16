@@ -7,3 +7,5 @@ export { ProxyApiContext } from './proxy-api-context';
 export { SnapshotProxyHandler } from './snapshot-proxy-handler';
 export { TemplateProxyHandler } from './template-proxy-handler';
 export { VirtualMachineProxyHandler } from './vm-proxy-handler';
+
+export { VmTemplateProxyHandler } from './vm-template-proxy-handler';

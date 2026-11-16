@@ -13,7 +13,13 @@ export default class VmWizardComputeCustomizationComponent extends BaseComponent
   private readonly _pfV6CMenuToggle = this.locator('.pf-v6-c-menu-toggle');
   private readonly _wizardFooterCreateButton = this.page
     .getByTestId('wizard-create-button')
-    .filter({ hasText: 'Create VirtualMachine' });
+    .filter({ hasText: 'Create VirtualMachine' })
+    .or(
+      this.page
+        .locator('.pf-v6-c-wizard__footer')
+        .getByRole('button', { name: /^(Create VirtualMachine|Create)$/i }),
+    )
+    .or(this.page.locator('.pf-v6-c-wizard__footer button.pf-v6-c-button.pf-m-primary'));
   private readonly _pfV6CWizardInputPlaceholderFindSettings = this.locator(
     '.pf-v6-c-wizard input[placeholder="Find settings"]',
   );

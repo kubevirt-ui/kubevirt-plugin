@@ -190,7 +190,7 @@ export const CREATE_VM_EXTENDED_SCENARIOS: CreateVmTestScenario[] = [
 ];
 
 /**
- * All catalog test scenarios combined
+ * All VM creation test scenarios combined
  */
 export const ALL_CREATE_VM_SCENARIOS: CreateVmTestScenario[] = [
   ...CREATE_VM_CREATION_SCENARIOS,

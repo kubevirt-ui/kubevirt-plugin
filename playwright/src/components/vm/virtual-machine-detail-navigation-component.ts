@@ -3,6 +3,7 @@
  */
 
 import BaseComponent from '@/components/shared/base-component';
+import { dismissConsoleObstructions } from '@/utils/console-modals';
 import { TestTimeouts } from '@/utils/test-config';
 import type { Page } from '@playwright/test';
 
@@ -92,6 +93,22 @@ export default class VirtualMachineDetailNavigationComponent extends BaseCompone
     const byTestId = this.testId('horizontal-link-Diagnostics');
     const byText = this.locator('a[href*="diagnostics"]').filter({ hasText: 'Diagnostics' });
     await this.navigateToTab(byTestId.or(byText).first());
+    // Confirm Diagnostics overview mounted (not overview/list under parallel nav races).
+    await this.page
+      .getByRole('button', { name: /Critical/ })
+      .or(this.page.getByRole('heading', { name: /Diagnostics overview/i }))
+      .first()
+      .waitFor({ state: 'visible', timeout: TestTimeouts.UI_ACTION_COMPLETE });
+  }
+
+  async navigateToDiagnosticsDirect(vmName: string, namespace: string) {
+    await this.goTo(`/k8s/ns/${namespace}/kubevirt.io~v1~VirtualMachine/${vmName}/diagnostics`);
+    await dismissConsoleObstructions(this.page);
+    await this.page
+      .getByRole('button', { name: /Critical/ })
+      .or(this.page.getByRole('heading', { name: /Diagnostics overview/i }))
+      .first()
+      .waitFor({ state: 'visible', timeout: TestTimeouts.UI_ACTION_COMPLETE });
   }
 
   async navigateToDisks(): Promise<void> {
@@ -139,6 +156,12 @@ export default class VirtualMachineDetailNavigationComponent extends BaseCompone
 
   async navigateToVirtualMachineDetail(vmName: string, namespace: string) {
     await this.goTo(`/k8s/ns/${namespace}/kubevirt.io~v1~VirtualMachine/${vmName}`);
+  }
+
+  async navigateToVirtualMachineInstanceDetail(vmName: string, namespace: string) {
+    // Cold CR URLs 404 until the plugin is loaded — prime via the VM detail route first.
+    await this.goTo(`/k8s/ns/${namespace}/kubevirt.io~v1~VirtualMachine/${vmName}`);
+    await this.goTo(`/k8s/ns/${namespace}/kubevirt.io~v1~VirtualMachineInstance/${vmName}`);
   }
 
   async navigateToYAML() {

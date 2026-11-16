@@ -26,6 +26,8 @@ const ignoresConfig = {
     'cypress/cypress-a11y-report.json',
     'locales/**',
     'playwright/**',
+    'playwright.config.ts', // uses playwright/src imports; covered by Playwright tooling, not app eslint project
+    'playwright/load-env.ts',
     '__mocks__/**',
     'webpack.config.ts', // will be removed when errors are fixed, in the meantime it is linted by default eslint.config.js
     'i18next-parser.config.js', // will be removed when errors are fixed, in the meantime it is linted by default eslint.config.js
