@@ -3,10 +3,6 @@ import { TestTimeouts } from '@/utils/test-config';
 import type { Page } from '@playwright/test';
 
 export class VmCreationWizardNavigationComponent extends BaseComponent {
-  private readonly _pfV6CWizardButtonpfV6CButtonpfMPrimary = this.locator(
-    '.pf-v6-c-wizard button.pf-v6-c-button.pf-m-primary',
-  );
-
   constructor(page: Page) {
     super(page);
   }
@@ -25,12 +21,12 @@ export class VmCreationWizardNavigationComponent extends BaseComponent {
 
   async clickNext(): Promise<void> {
     await this.collapseSidebarIfExpanded();
-    const nextButton = this._pfV6CWizardButtonpfV6CButtonpfMPrimary;
-    await nextButton.first().waitFor({
+    const nextButton = this.page.getByTestId('wizard-next-button').filter({ hasText: 'Next' });
+    await nextButton.waitFor({
       state: 'visible',
       timeout: TestTimeouts.SHORT_WAIT,
     });
-    await this.robustClick(nextButton.first());
+    await this.robustClick(nextButton);
     await this.page.waitForTimeout(1000);
   }
 
@@ -46,12 +42,12 @@ export class VmCreationWizardNavigationComponent extends BaseComponent {
   }
 
   async isNextButtonDisabled(): Promise<boolean> {
-    const nextButton = this._pfV6CWizardButtonpfV6CButtonpfMPrimary;
-    await nextButton.first().waitFor({
+    const nextButton = this.page.getByTestId('wizard-next-button').filter({ hasText: 'Next' });
+    await nextButton.waitFor({
       state: 'visible',
       timeout: TestTimeouts.SHORT_WAIT,
     });
-    return await nextButton.first().isDisabled();
+    return await nextButton.isDisabled();
   }
 
   async navigateToStepByName(stepName: string): Promise<void> {

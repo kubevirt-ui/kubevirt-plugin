@@ -13,12 +13,14 @@ import {
 
 type VMNameConfirmationNextButtonProps = {
   children: ReactNode;
+  dataTest?: string;
   isSubmitting?: boolean;
   onClick: () => void;
 };
 
 const VMNameConfirmationNextButton: FC<VMNameConfirmationNextButtonProps> = ({
   children,
+  dataTest = 'wizard-next-button',
   isSubmitting = false,
   onClick,
 }) => {
@@ -45,6 +47,7 @@ const VMNameConfirmationNextButton: FC<VMNameConfirmationNextButtonProps> = ({
 
   const nextButton = (
     <Button
+      data-test={dataTest}
       isAriaDisabled={isDisabled}
       isLoading={isSubmitting}
       onClick={isDisabled ? undefined : handleClick}

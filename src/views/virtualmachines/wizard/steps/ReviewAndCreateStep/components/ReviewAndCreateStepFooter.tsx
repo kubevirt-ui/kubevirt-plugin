@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 import { useWatch } from 'react-hook-form';
 
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
@@ -19,6 +19,7 @@ import useCreateVM from '@virtualmachines/wizard/hooks/useCreateVM';
 import { useVMWizard } from '@virtualmachines/wizard/state/vm-wizard-context/VMWizardContext';
 import { CREATE_VM_FORM_FIELDS_VM_DATA } from '@virtualmachines/wizard/state/vm-wizard-form/consts';
 import { isCloneCreationMethod } from '@virtualmachines/wizard/utils/utils';
+
 import { getCreateButtonText } from '../utils/utils';
 
 const ReviewAndCreateStepFooter: FC = () => {
@@ -40,19 +41,23 @@ const ReviewAndCreateStepFooter: FC = () => {
         <ActionList>
           <ActionListGroup>
             <ActionListItem>
-              <Button onClick={goToPrevStep} variant="secondary">
+              <Button data-test="wizard-back-button" onClick={goToPrevStep} variant="secondary">
                 {backButtonText}
               </Button>
             </ActionListItem>
             <ActionListItem data-test="create-virtual-machine">
-              <VMNameConfirmationNextButton isSubmitting={isSubmitting} onClick={createVM}>
+              <VMNameConfirmationNextButton
+                dataTest="wizard-create-button"
+                isSubmitting={isSubmitting}
+                onClick={createVM}
+              >
                 {createButtonText}
               </VMNameConfirmationNextButton>
             </ActionListItem>
           </ActionListGroup>
           <ActionListGroup>
             <ActionListItem>
-              <Button onClick={closeWizard} variant="link">
+              <Button data-test="wizard-cancel-button" onClick={closeWizard} variant="link">
                 {cancelButtonText}
               </Button>
             </ActionListItem>

@@ -11,9 +11,9 @@ export default class VmWizardComputeCustomizationComponent extends BaseComponent
   };
   private readonly _inputTypeText = this.locator('input[type="text"]');
   private readonly _pfV6CMenuToggle = this.locator('.pf-v6-c-menu-toggle');
-  private readonly _pfV6CWizardButtonpfV6CButtonpfMPrimary = this.locator(
-    '.pf-v6-c-wizard button.pf-v6-c-button.pf-m-primary',
-  );
+  private readonly _wizardFooterCreateButton = this.page
+    .getByTestId('wizard-create-button')
+    .filter({ hasText: 'Create VirtualMachine' });
   private readonly _pfV6CWizardInputPlaceholderFindSettings = this.locator(
     '.pf-v6-c-wizard input[placeholder="Find settings"]',
   );
@@ -186,10 +186,8 @@ export default class VmWizardComputeCustomizationComponent extends BaseComponent
 
   async getCreateButtonText(): Promise<string> {
     try {
-      const createBtn = this._pfV6CWizardButtonpfV6CButtonpfMPrimary;
-      return (
-        (await createBtn.first().textContent({ timeout: TestTimeouts.SHORT_WAIT }))?.trim() || ''
-      );
+      const createBtn = this._wizardFooterCreateButton;
+      return (await createBtn.textContent({ timeout: TestTimeouts.SHORT_WAIT }))?.trim() || '';
     } catch {
       return '';
     }
@@ -321,7 +319,7 @@ export default class VmWizardComputeCustomizationComponent extends BaseComponent
 
   async isCreateButtonDisabled(): Promise<boolean> {
     try {
-      const createBtn = this._pfV6CWizardButtonpfV6CButtonpfMPrimary.first();
+      const createBtn = this._wizardFooterCreateButton;
       await createBtn.waitFor({ state: 'visible', timeout: TestTimeouts.SHORT_WAIT });
       return createBtn.isDisabled();
     } catch {
@@ -422,6 +420,28 @@ export default class VmWizardComputeCustomizationComponent extends BaseComponent
   ): Promise<void> {
     const tab = this.locator(`button[role="tab"]:has-text("${tabName}")`);
     await this.robustClick(tab.first());
+  }
+
+  async selectLargestComputeSize(): Promise<void> {
+    const sizeBtn = this._pfV6CMenuToggle.filter({
+      hasText: /CPUs.*Memory/,
+    });
+    await this.robustClick(sizeBtn.first());
+
+    const menu = this.page
+      .locator('[role="menu"], .pf-v6-c-menu')
+      .filter({ hasText: /CPUs/ })
+      .first();
+    await menu.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+
+    const menuItems = menu.getByRole('menuitem');
+    await this.robustClick(menuItems.last());
+
+    await menu
+      .waitFor({ state: 'hidden', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY })
+      .catch(async () => {
+        await this.page.keyboard.press('Escape');
+      });
   }
 
   async selectInstanceTypeSeries(series: 'cx' | 'd' | 'u' | 'm' | 'n' | 'o' | 'rt'): Promise<void> {
