@@ -10,24 +10,16 @@ export type ParsedFailedTestGroup = {
   tests: ParsedFailedTest[];
 };
 
-const parseGroupTests = (category: string, tests: string[]): ParsedFailedTest[] => {
-  const seen = new Map<string, number>();
-
-  return tests.map((testName) => {
-    const occurrence = seen.get(testName) ?? 0;
-    seen.set(testName, occurrence + 1);
-
-    return {
-      key: `failed-${category}-${testName}-${occurrence}`,
-      ...parseFailedTest(testName),
-    };
-  });
-};
+const parseGroupTests = (category: string, tests: string[]): ParsedFailedTest[] =>
+  tests.map((testName) => ({
+    key: `failed-${category}-${testName}`,
+    ...parseFailedTest(testName),
+  }));
 
 /**
  * Turns a suite's `failed_tests` (grouped by category, the runner format) into non-empty category
- * groups, parsing each test name and assigning a stable React key. The key includes a per-group
- * occurrence index so duplicate test names within the same category stay unique.
+ * groups, parsing each test name and assigning a React key. Test names are unique within a category,
+ * so the category and test name together form the key.
  *
  * A non-empty `failed_tests` is taken to be a `Record<string, string[]>`. This never throws: if
  * the runtime data turns out to be anything else, no groups are returned.
