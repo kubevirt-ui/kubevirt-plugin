@@ -21,8 +21,7 @@ const ComputeResourcesStepFooter: FC = () => {
   };
 
   const isRedHatProvided = Boolean(selectedSeries) && Boolean(selectedSize);
-  const isUserProvided =
-    Boolean(selectedInstanceType?.namespace) && Boolean(selectedInstanceType?.name);
+  const isUserProvided = Boolean(selectedInstanceType?.name) && !selectedSeries && !selectedSize;
 
   return (
     <WizardFooter

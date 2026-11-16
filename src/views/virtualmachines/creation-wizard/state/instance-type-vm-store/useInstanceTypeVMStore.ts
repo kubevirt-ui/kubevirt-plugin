@@ -59,8 +59,12 @@ const useInstanceTypeVMStore = create<InstanceTypeVMStore>()((set) => {
       }),
     setSelectedBootableVolume: (selectedBootableVolume: BootableVolume) =>
       set({ selectedBootableVolume }),
-    setSelectedInstanceType: (selectedInstanceType: { name: string; namespace: string }) =>
-      set({ selectedInstanceType }),
+    setSelectedInstanceType: (selectedInstanceType: { name: string; namespace: null | string }) =>
+      set({
+        selectedInstanceType,
+        selectedSeries: '',
+        selectedSize: '',
+      }),
     setSelectedSeries: (selectedSeries: string) =>
       set((state) => ({
         ...state,
