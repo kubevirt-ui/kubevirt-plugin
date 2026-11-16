@@ -1,9 +1,9 @@
 import { useMemo } from 'react';
 
-import { useCanListNamespaces } from '@kubevirt-utils/hooks/useCanListNamespaces';
 import { type KubevirtDataPodFilters } from '@kubevirt-utils/hooks/useKubevirtDataPod/types';
 import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
 import useProjects from '@kubevirt-utils/hooks/useProjects';
+import useResourceWatchStrategy from '@kubevirt-utils/hooks/useResourceWatchStrategy';
 import { isSystemNamespace } from '@kubevirt-utils/resources/namespace/helper';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
@@ -48,7 +48,6 @@ export const useAccessibleResources = <T>({
   selector,
   watchNamespaces,
 }: UseAccessibleResourcesArgs): UseAccessibleResourcesReturn<T> => {
-  const canListAllNamespaces = useCanListNamespaces();
   const isACMPage = useIsACMPage();
   const cluster = useClusterParam();
   const [projectNames, projectNamesLoaded, projectNamesError] = useProjects();
@@ -64,10 +63,20 @@ export const useAccessibleResources = <T>({
     return projectNames.filter((ns) => !isSystemNamespace(ns));
   }, [onlyUserProjects, projectNames, watchNamespaces]);
 
-  const loadPerNamespace =
-    isWatchEnabled && !isACMPage && projectNamesLoaded && !canListAllNamespaces;
+  // CNV-101272: decide on the resource's own list permission, not CAN_LIST_NS (core namespaces).
+  const strategy = useResourceWatchStrategy({
+    cluster: clusterToWatch,
+    enabled: isWatchEnabled && !isACMPage,
+    groupVersionKind,
+    namespace,
+    namespaces: namespacesToWatch ?? [],
+    namespacesLoaded: projectNamesLoaded,
+    narrowNamespaces: !watchNamespaces,
+  });
 
-  const shouldFetchClusterWide = isWatchEnabled && (canListAllNamespaces || isACMPage);
+  const loadPerNamespace = strategy.perNamespace;
+
+  const shouldFetchClusterWide = isWatchEnabled && (isACMPage || strategy.clusterWide);
 
   const [allResources, allResourcesLoaded, allResourcesLoadError] = useKubevirtWatchResource<T[]>(
     shouldFetchClusterWide
@@ -89,7 +98,7 @@ export const useAccessibleResources = <T>({
   const allowedResources = useK8sWatchResources<{ [key: string]: T[] }>(
     Object.fromEntries(
       loadPerNamespace
-        ? (namespacesToWatch || []).map((ns) => [
+        ? strategy.namespaces.map((ns) => [
             ns,
             {
               fieldSelector,
@@ -112,6 +121,11 @@ export const useAccessibleResources = <T>({
 
   if (!isWatchEnabled) {
     return { loaded: true, loadError: undefined, resources: [] };
+  }
+
+  // Never report "loaded" before the watch strategy is known (avoids empty-state flashes).
+  if (!isACMPage && !strategy.resolved) {
+    return { loaded: false, loadError: projectNamesError, resources: [] };
   }
 
   if (shouldFetchClusterWide) {
