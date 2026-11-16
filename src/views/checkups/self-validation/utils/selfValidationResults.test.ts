@@ -19,8 +19,9 @@ compute:
   tests_skipped: 0
   tests_duration: "45m30s"
   failed_tests:
-    - "[sig-compute]VMIlifecycle Creating a VirtualMachineInstance should start in paused state"
-    - "[sig-compute]SecurityFeatures Check virt-launcher capabilities has precisely the documented extra capabilities"
+    lifecycle:
+      - "[sig-compute]VMIlifecycle Creating a VirtualMachineInstance should start in paused state"
+      - "[sig-compute]SecurityFeatures Check virt-launcher capabilities has precisely the documented extra capabilities"
 network:
   tests_run: 40
   tests_passed: 35
@@ -28,11 +29,12 @@ network:
   tests_skipped: 0
   tests_duration: "52m15s"
   failed_tests:
-    - |
-      [sig-network] [level:component]Networkpolicy
-      when three alpine VMs with default networking are started
-      and serverVMI start an HTTP server on port 80 and 81
-      should succeed pinging between two VMI/s in the same namespace
+    policy:
+      - |
+        [sig-network] [level:component]Networkpolicy
+        when three alpine VMs with default networking are started
+        and serverVMI start an HTTP server on port 80 and 81
+        should succeed pinging between two VMI/s in the same namespace
 storage:
   tests_run: 30
   tests_passed: 22
@@ -40,7 +42,8 @@ storage:
   tests_skipped: 5
   tests_duration: "38m45s"
   failed_tests:
-    - "[sig-storage] Volumes update with migration should migrate the source volume"`;
+    volumes:
+      - "[sig-storage] Volumes update with migration should migrate the source volume"`;
 
       const configMap: IoK8sApiCoreV1ConfigMap = {
         data: {
@@ -58,10 +61,12 @@ storage:
         total_tests_skipped: 5,
       });
       expect(result?.compute).toEqual({
-        failed_tests: [
-          '[sig-compute]VMIlifecycle Creating a VirtualMachineInstance should start in paused state',
-          '[sig-compute]SecurityFeatures Check virt-launcher capabilities has precisely the documented extra capabilities',
-        ],
+        failed_tests: {
+          lifecycle: [
+            '[sig-compute]VMIlifecycle Creating a VirtualMachineInstance should start in paused state',
+            '[sig-compute]SecurityFeatures Check virt-launcher capabilities has precisely the documented extra capabilities',
+          ],
+        },
         tests_duration: '45m30s',
         tests_failures: 2,
         tests_passed: 28,
@@ -69,13 +74,15 @@ storage:
         tests_skipped: 0,
       });
       expect(result?.network).toEqual({
-        failed_tests: [
-          `[sig-network] [level:component]Networkpolicy
+        failed_tests: {
+          policy: [
+            `[sig-network] [level:component]Networkpolicy
 when three alpine VMs with default networking are started
 and serverVMI start an HTTP server on port 80 and 81
 should succeed pinging between two VMI/s in the same namespace
 `,
-        ],
+          ],
+        },
         tests_duration: '52m15s',
         tests_failures: 5,
         tests_passed: 35,
@@ -83,9 +90,9 @@ should succeed pinging between two VMI/s in the same namespace
         tests_skipped: 0,
       });
       expect(result?.storage).toEqual({
-        failed_tests: [
-          '[sig-storage] Volumes update with migration should migrate the source volume',
-        ],
+        failed_tests: {
+          volumes: ['[sig-storage] Volumes update with migration should migrate the source volume'],
+        },
         tests_duration: '38m45s',
         tests_failures: 3,
         tests_passed: 22,
@@ -304,22 +311,13 @@ should migrate the source volume from a source and destination block RWX DVs`,
 });
 
 describe('normalizeFailedTests', () => {
-  it('should return no groups for undefined or null', () => {
-    expect(normalizeFailedTests(undefined)).toEqual({ groups: [], isMalformed: false, total: 0 });
-    expect(normalizeFailedTests(null)).toEqual({ groups: [], isMalformed: false, total: 0 });
-  });
-
-  it('should return no groups for empty array and empty object', () => {
-    expect(normalizeFailedTests([])).toEqual({ groups: [], isMalformed: false, total: 0 });
-    expect(normalizeFailedTests({})).toEqual({ groups: [], isMalformed: false, total: 0 });
-  });
-
-  it('should wrap a flat string array in a single uncategorized group', () => {
-    expect(normalizeFailedTests(['test_a', 'test_b'])).toEqual({
-      groups: [{ category: '', tests: ['test_a', 'test_b'] }],
-      isMalformed: false,
-      total: 2,
-    });
+  it.each([
+    ['undefined', undefined],
+    ['null', null],
+    ['an empty record', {}],
+    ['a category with an empty array', { storage: [] }],
+  ])('should return no groups for %s', (_label, value) => {
+    expect(normalizeFailedTests(value)).toEqual([]);
   });
 
   it('should keep categories, including the empty-string category', () => {
@@ -329,9 +327,7 @@ describe('normalizeFailedTests', () => {
       storage: ['test_clone_from_fs_to_block_using_dv_template', 'test_clone_from_block_to_fs'],
     });
 
-    expect(result.isMalformed).toBe(false);
-    expect(result.total).toBe(4);
-    expect(result.groups).toEqual([
+    expect(result).toEqual([
       { category: '', tests: ['virt_special_infra_cluster_verification_failed'] },
       { category: 'infrastructure', tests: ['test_start_vm[#rhel.10#-#managed-csi#]'] },
       {
@@ -342,35 +338,49 @@ describe('normalizeFailedTests', () => {
   });
 
   it('should drop categories with no tests', () => {
-    expect(normalizeFailedTests({ network: [], storage: ['test_a'] })).toEqual({
-      groups: [{ category: 'storage', tests: ['test_a'] }],
-      isMalformed: false,
-      total: 1,
-    });
+    expect(normalizeFailedTests({ network: [], storage: ['test_a'] })).toEqual([
+      { category: 'storage', tests: ['test_a'] },
+    ]);
   });
 
   it.each([
     ['a string', 'test_a'],
     ['a number', 42],
     ['a boolean', true],
+    ['an empty array', []],
+    ['a top-level array of strings', ['test_a', 'test_b']],
     ['an array with non-string items', ['test_a', 1]],
     ['an array of objects', [{ name: 'test_a' }]],
-    ['an object with a string category value', { storage: 'test_a' }],
-    ['an object with a non-string array value', { storage: ['test_a', null] }],
-    ['an object with a nested object value', { storage: { nested: ['test_a'] } }],
     ['a Date', new Date()],
     ['a Map', new Map()],
-  ])('should flag %s as malformed without throwing', (_label, value) => {
-    expect(normalizeFailedTests(value)).toEqual({ groups: [], isMalformed: true, total: 0 });
+  ])('should return no groups for %s without throwing', (_label, value) => {
+    expect(() => normalizeFailedTests(value)).not.toThrow();
+    expect(normalizeFailedTests(value)).toEqual([]);
+  });
+
+  it.each([
+    ['a string category value', { storage: 'test_a' }],
+    ['a non-string array value', { storage: ['test_a', null] }],
+    ['a nested object value', { storage: { nested: ['test_a'] } }],
+    ['a null value', { storage: null }],
+  ])('should return no groups for an object with %s without throwing', (_label, value) => {
+    expect(() => normalizeFailedTests(value)).not.toThrow();
+    expect(normalizeFailedTests(value)).toEqual([]);
+  });
+
+  it('should keep the valid entries and skip the malformed ones', () => {
+    expect(normalizeFailedTests({ network: 'test_a', storage: ['test_b'] })).toEqual([
+      { category: 'storage', tests: ['test_b'] },
+    ]);
   });
 
   it('should accept a null-prototype object', () => {
     const value = Object.assign(Object.create(null), { storage: ['test_a'] });
-    expect(normalizeFailedTests(value)).toEqual({
-      groups: [{ category: 'storage', tests: ['test_a'] }],
-      isMalformed: false,
-      total: 1,
-    });
+    expect(normalizeFailedTests(value)).toEqual([{ category: 'storage', tests: ['test_a'] }]);
+  });
+
+  it('should return no groups for an empty null-prototype object', () => {
+    expect(normalizeFailedTests(Object.create(null))).toEqual([]);
   });
 
   it('should not mutate its input', () => {
@@ -380,7 +390,9 @@ describe('normalizeFailedTests', () => {
   });
 
   it('should keep duplicate test names within a category', () => {
-    expect(normalizeFailedTests(['test_a', 'test_a']).total).toBe(2);
+    expect(normalizeFailedTests({ network: ['test_a', 'test_a'] })).toEqual([
+      { category: 'network', tests: ['test_a', 'test_a'] },
+    ]);
   });
 
   it('should parse the tier2 categorized YAML produced by the runner', () => {
@@ -401,14 +413,23 @@ tier2:
   tests_skipped: 21`;
 
     const parsed = parseResults({ data: { [SELF_VALIDATION_RESULTS_KEY]: yamlContent } });
-    const normalized = normalizeFailedTests(parsed?.tier2?.failed_tests);
+    const groups = normalizeFailedTests(parsed?.tier2?.failed_tests);
 
-    expect(normalized.isMalformed).toBe(false);
-    expect(normalized.total).toBe(4);
-    expect(normalized.groups.map(({ category }) => category)).toEqual([
-      '',
-      'infrastructure',
-      'storage',
-    ]);
+    expect(groups.map(({ category }) => category)).toEqual(['', 'infrastructure', 'storage']);
+    expect(groups.reduce((sum, { tests }) => sum + tests.length, 0)).toBe(4);
+  });
+
+  it('should not throw when the results YAML has a malformed failed_tests value', () => {
+    const yamlContent = `tier2:
+  failed_tests:
+    - test_a
+    - test_b
+  tests_failures: 2
+  tests_run: 5`;
+
+    const parsed = parseResults({ data: { [SELF_VALIDATION_RESULTS_KEY]: yamlContent } });
+
+    expect(() => normalizeFailedTests(parsed?.tier2?.failed_tests)).not.toThrow();
+    expect(normalizeFailedTests(parsed?.tier2?.failed_tests)).toEqual([]);
   });
 });

@@ -25,10 +25,6 @@
     overflow-y: auto;
   }
 
-  &__failed-tests-error {
-    margin-top: var(--pf-t--global--spacer--sm);
-  }
-
   &__failed-test-category {
     font-weight: bold;
     margin-top: var(--pf-t--global--spacer--sm);

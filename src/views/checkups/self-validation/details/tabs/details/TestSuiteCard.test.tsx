@@ -28,8 +28,6 @@ jest.mock('../../components/progress/utils/progressTracker', () => ({
 const renderCard = (suiteData: TestSuiteData) =>
   render(<TestSuiteCard isExpanded onToggle={jest.fn()} suiteData={suiteData} suiteName="tier2" />);
 
-const MALFORMED_TITLE = 'Unable to display failed tests';
-
 describe('TestSuiteCard failed tests rendering', () => {
   it('renders categorized failed tests with category headings', () => {
     renderCard({
@@ -47,34 +45,59 @@ describe('TestSuiteCard failed tests rendering', () => {
     expect(screen.getByText('infrastructure (1)')).toBeInTheDocument();
     expect(screen.getByText('storage (2)')).toBeInTheDocument();
     expect(screen.getByText('test_clone_b')).toBeInTheDocument();
-    expect(screen.queryByText(MALFORMED_TITLE)).not.toBeInTheDocument();
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
   });
 
-  it('renders a flat array without category headings', () => {
-    renderCard({ failed_tests: ['test_a', 'test_b'], tests_failures: 2, tests_run: 5 });
+  it.each([undefined, {}, { storage: [] }])(
+    'renders no failed tests section for %p',
+    (failedTests) => {
+      renderCard({ failed_tests: failedTests, tests_passed: 5, tests_run: 5 });
 
-    expect(screen.getByText('Failed tests (2)')).toBeInTheDocument();
-    expect(screen.getByText('test_a')).toBeInTheDocument();
-    expect(screen.queryByText(/Uncategorized/)).not.toBeInTheDocument();
-  });
-
-  it.each([undefined, [], {}])('renders no failed tests section for %p', (failedTests) => {
-    renderCard({ failed_tests: failedTests, tests_passed: 5, tests_run: 5 });
-
-    expect(screen.queryByText(/Failed tests/)).not.toBeInTheDocument();
-    expect(screen.queryByText(MALFORMED_TITLE)).not.toBeInTheDocument();
-  });
+      expect(screen.queryByText(/Failed tests/)).not.toBeInTheDocument();
+      expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    },
+  );
 
   it.each([
+    ['null', null],
     ['a string', 'boom'],
     ['a number', 7],
     ['an object with non-array values', { storage: 'test_a' }],
-    ['an array with non-string items', ['test_a', 1]],
-  ])('shows an error alert instead of crashing for %s', (_label, failedTests) => {
-    renderCard({ failed_tests: failedTests as never, tests_failures: 1, tests_run: 5 });
+    ['a top-level array', ['test_a', 'test_b']],
+    ['an empty top-level array', []],
+    ['a category with non-string items', { storage: ['test_a', 1] }],
+    ['a Date', new Date()],
+    ['a Map', new Map()],
+    ['a null-prototype object', Object.create(null)],
+  ])('renders without throwing or showing an alert for malformed failed_tests: %s', (_l, value) => {
+    expect(() =>
+      renderCard({ failed_tests: value as never, tests_failures: 1, tests_run: 5 }),
+    ).not.toThrow();
 
-    expect(screen.getByText(MALFORMED_TITLE)).toBeInTheDocument();
     expect(screen.queryByText(/Failed tests/)).not.toBeInTheDocument();
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    expect(screen.queryByText(/unexpected format/)).not.toBeInTheDocument();
+  });
+
+  it('renders only the valid categories when some entries are malformed', () => {
+    renderCard({
+      failed_tests: { network: 'test_a', storage: ['test_b'] } as never,
+      tests_failures: 2,
+      tests_run: 5,
+    });
+
+    expect(screen.getByText('Failed tests (1)')).toBeInTheDocument();
+    expect(screen.getByText('test_b')).toBeInTheDocument();
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+  });
+
+  it.each([
+    ['non-numeric counts', { tests_failures: 'x', tests_passed: null, tests_run: 'many' }],
+    ['a non-string duration', { tests_duration: 42, tests_failures: 1, tests_run: 2 }],
+    ['an empty suite', {}],
+  ])('renders without throwing for a malformed suite payload with %s', (_label, suiteData) => {
+    expect(() => renderCard(suiteData as never)).not.toThrow();
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
   });
 
   it('does not render category headings when the only category is the empty string', () => {
@@ -86,7 +109,11 @@ describe('TestSuiteCard failed tests rendering', () => {
 
   it('renders duplicate test names without React key warnings', () => {
     const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => undefined);
-    renderCard({ failed_tests: ['test_a', 'test_a'], tests_failures: 2, tests_run: 2 });
+    renderCard({
+      failed_tests: { storage: ['test_a', 'test_a'] },
+      tests_failures: 2,
+      tests_run: 2,
+    });
 
     expect(screen.getAllByText('test_a')).toHaveLength(2);
     expect(errorSpy).not.toHaveBeenCalled();

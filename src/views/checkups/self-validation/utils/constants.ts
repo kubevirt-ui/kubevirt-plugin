@@ -25,7 +25,7 @@ type SelfValidationTestSuiteName =
 export type FailedTestsByCategory = Record<string, string[]>;
 
 export type SelfValidationSuiteResult = {
-  failed_tests?: FailedTestsByCategory | string[];
+  failed_tests?: FailedTestsByCategory;
   tests_duration?: string;
   tests_failures?: number;
   tests_passed?: number;
