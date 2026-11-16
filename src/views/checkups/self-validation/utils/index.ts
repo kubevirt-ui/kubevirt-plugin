@@ -15,6 +15,8 @@ export type { DownloadInputValidationResult, DownloadResultsReturn } from './dow
 
 // Results parsing and status
 export { getCheckupsSelfValidationListFilters } from './filters';
+export type { FailedTestGroup, NormalizedFailedTests } from './normalizeFailedTests';
+export { normalizeFailedTests } from './normalizeFailedTests';
 // Job lifecycle and helpers
 export {
   addOwnerReference,

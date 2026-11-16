@@ -5,30 +5,17 @@ import {
   GreenCheckCircleIcon,
   RedExclamationCircleIcon,
 } from '@openshift-console/dynamic-plugin-sdk';
-import {
-  Card,
-  CardBody,
-  CardHeader,
-  CardTitle,
-  ExpandableSection,
-  Tooltip,
-} from '@patternfly/react-core';
+import { Card, CardBody, CardHeader, CardTitle, Tooltip } from '@patternfly/react-core';
 import { BanIcon, InfoCircleIcon } from '@patternfly/react-icons';
 
 import TestStatistics from '../../../components/shared/TestStatistics';
-import { formatGoDuration, parseFailedTest } from '../../../utils';
+import { formatGoDuration, type SelfValidationSuiteResult } from '../../../utils';
 import { getTestSuiteLabel } from '../../components/progress/utils/progressTracker';
+import FailedTestsSection from './FailedTestsSection';
 
 import './TestSuiteCard.scss';
 
-export type TestSuiteData = {
-  failed_tests?: string[];
-  tests_duration?: string;
-  tests_failures?: number;
-  tests_passed?: number;
-  tests_run?: number;
-  tests_skipped?: number;
-};
+export type TestSuiteData = SelfValidationSuiteResult;
 
 type TestSuiteCardProps = {
   isExpanded: boolean;
@@ -45,15 +32,9 @@ const TestSuiteCard: FC<TestSuiteCardProps> = ({ isExpanded, onToggle, suiteData
   const testsPassed = suiteData.tests_passed ?? 0;
   const testsSkipped = suiteData.tests_skipped ?? 0;
 
-  const failedTests = useMemo(() => suiteData.failed_tests ?? [], [suiteData.failed_tests]);
   const testDuration = useMemo(
     () => formatGoDuration(suiteData.tests_duration),
     [suiteData.tests_duration],
-  );
-
-  const parsedFailedTests = useMemo(
-    () => failedTests.map((testName: string) => ({ testName, ...parseFailedTest(testName) })),
-    [failedTests],
   );
 
   const getStatusDetails = useMemo(() => {
@@ -116,28 +97,11 @@ const TestSuiteCard: FC<TestSuiteCardProps> = ({ isExpanded, onToggle, suiteData
             <strong>{t('Duration')}</strong> {testDuration}
           </div>
 
-          {failedTests.length > 0 && (
-            <ExpandableSection
-              isExpanded={isExpanded}
-              onToggle={onToggle}
-              toggleText={t('Failed tests ({{count}})', { count: failedTests.length })}
-            >
-              <div className="test-suite-card__failed-tests-container">
-                {parsedFailedTests.map(({ description, testName, title }) => (
-                  <div className="test-suite-card__failed-test-item" key={`failed-${testName}`}>
-                    <div className="test-suite-card__failed-test-content">
-                      <div className="test-suite-card__failed-test-body">
-                        {title && <div className="test-suite-card__failed-test-title">{title}</div>}
-                        <div className="test-suite-card__failed-test-description">
-                          {description}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </ExpandableSection>
-          )}
+          <FailedTestsSection
+            failedTests={suiteData.failed_tests}
+            isExpanded={isExpanded}
+            onToggle={onToggle}
+          />
         </CardBody>
       )}
     </Card>

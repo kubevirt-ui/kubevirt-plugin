@@ -1,6 +1,7 @@
 import type { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 
 import { SELF_VALIDATION_RESULTS_KEY } from './constants';
+import { normalizeFailedTests } from './normalizeFailedTests';
 import { parseFailedTest, parseResults } from './selfValidationResults';
 
 describe('parseResults', () => {
@@ -299,5 +300,115 @@ should migrate the source volume from a source and destination block RWX DVs`,
       expect(result.title).toBe('[sig-compute]VMIlifecycle');
       expect(result.description).toBe('should work');
     });
+  });
+});
+
+describe('normalizeFailedTests', () => {
+  it('should return no groups for undefined or null', () => {
+    expect(normalizeFailedTests(undefined)).toEqual({ groups: [], isMalformed: false, total: 0 });
+    expect(normalizeFailedTests(null)).toEqual({ groups: [], isMalformed: false, total: 0 });
+  });
+
+  it('should return no groups for empty array and empty object', () => {
+    expect(normalizeFailedTests([])).toEqual({ groups: [], isMalformed: false, total: 0 });
+    expect(normalizeFailedTests({})).toEqual({ groups: [], isMalformed: false, total: 0 });
+  });
+
+  it('should wrap a flat string array in a single uncategorized group', () => {
+    expect(normalizeFailedTests(['test_a', 'test_b'])).toEqual({
+      groups: [{ category: '', tests: ['test_a', 'test_b'] }],
+      isMalformed: false,
+      total: 2,
+    });
+  });
+
+  it('should keep categories, including the empty-string category', () => {
+    const result = normalizeFailedTests({
+      '': ['virt_special_infra_cluster_verification_failed'],
+      infrastructure: ['test_start_vm[#rhel.10#-#managed-csi#]'],
+      storage: ['test_clone_from_fs_to_block_using_dv_template', 'test_clone_from_block_to_fs'],
+    });
+
+    expect(result.isMalformed).toBe(false);
+    expect(result.total).toBe(4);
+    expect(result.groups).toEqual([
+      { category: '', tests: ['virt_special_infra_cluster_verification_failed'] },
+      { category: 'infrastructure', tests: ['test_start_vm[#rhel.10#-#managed-csi#]'] },
+      {
+        category: 'storage',
+        tests: ['test_clone_from_fs_to_block_using_dv_template', 'test_clone_from_block_to_fs'],
+      },
+    ]);
+  });
+
+  it('should drop categories with no tests', () => {
+    expect(normalizeFailedTests({ network: [], storage: ['test_a'] })).toEqual({
+      groups: [{ category: 'storage', tests: ['test_a'] }],
+      isMalformed: false,
+      total: 1,
+    });
+  });
+
+  it.each([
+    ['a string', 'test_a'],
+    ['a number', 42],
+    ['a boolean', true],
+    ['an array with non-string items', ['test_a', 1]],
+    ['an array of objects', [{ name: 'test_a' }]],
+    ['an object with a string category value', { storage: 'test_a' }],
+    ['an object with a non-string array value', { storage: ['test_a', null] }],
+    ['an object with a nested object value', { storage: { nested: ['test_a'] } }],
+    ['a Date', new Date()],
+    ['a Map', new Map()],
+  ])('should flag %s as malformed without throwing', (_label, value) => {
+    expect(normalizeFailedTests(value)).toEqual({ groups: [], isMalformed: true, total: 0 });
+  });
+
+  it('should accept a null-prototype object', () => {
+    const value = Object.assign(Object.create(null), { storage: ['test_a'] });
+    expect(normalizeFailedTests(value)).toEqual({
+      groups: [{ category: 'storage', tests: ['test_a'] }],
+      isMalformed: false,
+      total: 1,
+    });
+  });
+
+  it('should not mutate its input', () => {
+    const input = Object.freeze({ network: Object.freeze([]), storage: Object.freeze(['test_a']) });
+    expect(() => normalizeFailedTests(input)).not.toThrow();
+    expect(input).toEqual({ network: [], storage: ['test_a'] });
+  });
+
+  it('should keep duplicate test names within a category', () => {
+    expect(normalizeFailedTests(['test_a', 'test_a']).total).toBe(2);
+  });
+
+  it('should parse the tier2 categorized YAML produced by the runner', () => {
+    const yamlContent = `summary:
+  total_tests_run: 194
+tier2:
+  failed_tests:
+    "":
+      - virt_special_infra_cluster_verification_failed
+    infrastructure:
+      - test_start_vm[#rhel.10#-#managed-csi#]
+    storage:
+      - test_clone_from_fs_to_block_using_dv_template
+      - test_clone_from_block_to_fs_using_dv_template
+  tests_failures: 9
+  tests_passed: 185
+  tests_run: 194
+  tests_skipped: 21`;
+
+    const parsed = parseResults({ data: { [SELF_VALIDATION_RESULTS_KEY]: yamlContent } });
+    const normalized = normalizeFailedTests(parsed?.tier2?.failed_tests);
+
+    expect(normalized.isMalformed).toBe(false);
+    expect(normalized.total).toBe(4);
+    expect(normalized.groups.map(({ category }) => category)).toEqual([
+      '',
+      'infrastructure',
+      'storage',
+    ]);
   });
 });
