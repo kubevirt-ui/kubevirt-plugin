@@ -665,7 +665,8 @@ export default class RequestContextClient implements ProxyApiContext {
     if (nonPriv && canRunOc()) {
       const kubeconfig = resolveKubeconfig();
       runOcCommand(`oc adm policy add-role-to-user admin test -n ${name}`, kubeconfig);
-      await new Promise((resolve) => setTimeout(resolve, 2_000));
+      // Console project dropdown caches SelfSubjectAccessReviews; give bindings time to land.
+      await new Promise((resolve) => setTimeout(resolve, 5_000));
     }
   }
 
