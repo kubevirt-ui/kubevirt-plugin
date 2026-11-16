@@ -4,9 +4,8 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { Alert, AlertVariant, ExpandableSection } from '@patternfly/react-core';
 
 import {
-  type FailedTestGroup,
   normalizeFailedTests,
-  parseFailedTest,
+  parseFailedTestGroups,
   type SelfValidationSuiteResult,
 } from '../../../utils';
 
@@ -15,35 +14,6 @@ type FailedTestsSectionProps = {
   isExpanded: boolean;
   onToggle: () => void;
 };
-
-type ParsedFailedTest = ReturnType<typeof parseFailedTest> & { key: string };
-
-type ParsedFailedTestGroup = {
-  category: string;
-  tests: ParsedFailedTest[];
-};
-
-/**
- * Parses each failed test name and assigns a stable React key. The key includes a per-group
- * occurrence index so duplicate test names within the same category stay unique.
- */
-const parseFailedTestGroups = (groups: FailedTestGroup[]): ParsedFailedTestGroup[] =>
-  groups.map(({ category, tests }) => {
-    const seen = new Map<string, number>();
-
-    return {
-      category,
-      tests: tests.map((testName) => {
-        const occurrence = seen.get(testName) ?? 0;
-        seen.set(testName, occurrence + 1);
-
-        return {
-          key: `failed-${category}-${testName}-${occurrence}`,
-          ...parseFailedTest(testName),
-        };
-      }),
-    };
-  });
 
 const FailedTestsSection: FC<FailedTestsSectionProps> = ({ failedTests, isExpanded, onToggle }) => {
   const { t } = useKubevirtTranslation();

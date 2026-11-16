@@ -9,6 +9,8 @@ export type NormalizedFailedTests = {
   total: number;
 };
 
+type FailedTestsEntry = [category: string, tests: string[]];
+
 const isStringArray = (value: unknown): value is string[] =>
   Array.isArray(value) && value.every((item) => typeof item === 'string');
 
@@ -18,6 +20,27 @@ const isPlainObject = (value: unknown): value is Record<string, unknown> => {
   return prototype === Object.prototype || prototype === null;
 };
 
+const isFailedTestsEntry = (entry: [string, unknown]): entry is FailedTestsEntry =>
+  isStringArray(entry[1]);
+
+const toMalformedResult = (): NormalizedFailedTests => ({
+  groups: [],
+  isMalformed: true,
+  total: 0,
+});
+
+const toGroupsResult = (entries: FailedTestsEntry[]): NormalizedFailedTests => {
+  const groups = entries
+    .filter(([, tests]) => tests.length > 0)
+    .map(([category, tests]) => ({ category, tests }));
+
+  return {
+    groups,
+    isMalformed: false,
+    total: groups.reduce((sum, { tests }) => sum + tests.length, 0),
+  };
+};
+
 /**
  * Normalizes a suite's `failed_tests` into a list of category groups.
  * Supports a flat `string[]` (single group with an empty category), a
@@ -25,33 +48,15 @@ const isPlainObject = (value: unknown): value is Record<string, unknown> => {
  * empty/missing values. Any other shape is reported as malformed instead of throwing.
  */
 export const normalizeFailedTests = (failedTests: unknown): NormalizedFailedTests => {
-  const malformed: NormalizedFailedTests = { groups: [], isMalformed: true, total: 0 };
+  if (failedTests === undefined || failedTests === null) return toGroupsResult([]);
 
-  if (failedTests === undefined || failedTests === null) {
-    return { groups: [], isMalformed: false, total: 0 };
-  }
+  if (isStringArray(failedTests)) return toGroupsResult([['', failedTests]]);
 
-  if (Array.isArray(failedTests)) {
-    if (!isStringArray(failedTests)) return malformed;
-    return {
-      groups: failedTests.length > 0 ? [{ category: '', tests: failedTests }] : [],
-      isMalformed: false,
-      total: failedTests.length,
-    };
-  }
-
-  if (!isPlainObject(failedTests)) return malformed;
+  if (!isPlainObject(failedTests)) return toMalformedResult();
 
   const entries = Object.entries(failedTests);
-  if (!entries.every(([, tests]) => isStringArray(tests))) return malformed;
 
-  const groups = entries
-    .filter(([, tests]) => (tests as string[]).length > 0)
-    .map(([category, tests]) => ({ category, tests: tests as string[] }));
+  if (!entries.every(isFailedTestsEntry)) return toMalformedResult();
 
-  return {
-    groups,
-    isMalformed: false,
-    total: groups.reduce((sum, { tests }) => sum + tests.length, 0),
-  };
+  return toGroupsResult(entries);
 };

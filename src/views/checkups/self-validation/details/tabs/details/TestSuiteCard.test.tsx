@@ -18,6 +18,7 @@ jest.mock('@openshift-console/dynamic-plugin-sdk', () => ({
 jest.mock('../../../utils', () => ({
   ...jest.requireActual('../../../utils/selfValidationResults'),
   ...jest.requireActual('../../../utils/normalizeFailedTests'),
+  ...jest.requireActual('../../../utils/parseFailedTestGroups'),
 }));
 
 jest.mock('../../components/progress/utils/progressTracker', () => ({
