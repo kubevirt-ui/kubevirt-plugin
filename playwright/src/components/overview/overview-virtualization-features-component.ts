@@ -406,7 +406,7 @@ export default class OverviewVirtualizationFeaturesComponent extends BaseCompone
   }
 
   async verifyInstalledVersion(
-    expectedVersion = '4',
+    expectedVersion = (process.env.PLAYWRIGHT_CONSOLE_RELEASE ?? '4').split('.')[0] || '4',
     expectedStatus = 'Up to date',
   ): Promise<boolean> {
     try {

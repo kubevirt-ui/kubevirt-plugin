@@ -3,6 +3,18 @@ import { TestTimeouts } from '@/utils/test-config';
 import type { Page } from '@playwright/test';
 
 export class VmCreationWizardNavigationComponent extends BaseComponent {
+  // data-test is preferred; footer role covers clusters whose plugin build lacks it.
+  // Scope to footer — bare `.pf-m-primary` can hit hidden list-page yaml-create.
+  private readonly _wizardNextButton = this.page
+    .getByTestId('wizard-next-button')
+    .filter({ hasText: 'Next' })
+    .or(
+      this.page
+        .locator('.pf-v6-c-wizard__footer')
+        .getByRole('button', { name: /^(Next|Create VirtualMachine|Create)$/i }),
+    )
+    .or(this.page.locator('.pf-v6-c-wizard__footer button.pf-v6-c-button.pf-m-primary'));
+
   constructor(page: Page) {
     super(page);
   }
@@ -21,11 +33,19 @@ export class VmCreationWizardNavigationComponent extends BaseComponent {
 
   async clickNext(): Promise<void> {
     await this.collapseSidebarIfExpanded();
-    const nextButton = this.page.getByTestId('wizard-next-button').filter({ hasText: 'Next' });
+    // Instance-type info tooltips can sit over the footer and intercept the click.
+    await this.page.keyboard.press('Escape');
+    await this.page
+      .locator('.pf-v6-c-tooltip, [role="tooltip"]')
+      .first()
+      .waitFor({ state: 'hidden', timeout: TestTimeouts.SHORT_WAIT })
+      .catch(() => undefined);
+    const nextButton = this._wizardNextButton.first();
     await nextButton.waitFor({
       state: 'visible',
-      timeout: TestTimeouts.SHORT_WAIT,
+      timeout: TestTimeouts.ELEMENT_WAIT,
     });
+    await nextButton.hover().catch(() => undefined);
     await this.robustClick(nextButton);
     await this.page.waitForTimeout(1000);
   }
@@ -42,10 +62,10 @@ export class VmCreationWizardNavigationComponent extends BaseComponent {
   }
 
   async isNextButtonDisabled(): Promise<boolean> {
-    const nextButton = this.page.getByTestId('wizard-next-button').filter({ hasText: 'Next' });
+    const nextButton = this._wizardNextButton.first();
     await nextButton.waitFor({
       state: 'visible',
-      timeout: TestTimeouts.SHORT_WAIT,
+      timeout: TestTimeouts.ELEMENT_WAIT,
     });
     return await nextButton.isDisabled();
   }
@@ -98,31 +118,42 @@ export class VmCreationWizardCloneComponent extends BaseComponent {
     await this.page.waitForTimeout(1000);
   }
 
-  async selectCloneSourceVm(vmName: string): Promise<void> {
+  async selectCloneSourceVm(vmName: string, namespace?: string): Promise<void> {
+    if (namespace) {
+      await this.setCloneSourceProjectFilter(namespace);
+    }
+    await this.searchCloneSourceByName(vmName);
     const row = this.locator('.pf-v6-c-wizard tr, .pf-v6-c-wizard [role="row"]').filter({
       hasText: vmName,
     });
-    await row.first().waitFor({ state: 'visible', timeout: TestTimeouts.VM_OPERATION });
-    await this.robustClick(row.first());
+    await row.first().waitFor({ state: 'visible', timeout: TestTimeouts.LONG_OPERATION });
+    // Radio only — name cell ResourceLink leaves the wizard for the VM/namespace page.
+    const radio = row.first().getByRole('radio').or(row.first().locator('input[type="radio"]'));
+    await radio.first().click({ force: true, timeout: TestTimeouts.ELEMENT_WAIT });
   }
 
   async setCloneSourceProjectFilter(namespace: string): Promise<void> {
     await this.clearCloneSourceFilters();
-    await this.page.waitForTimeout(1000);
+    await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
 
     const projectBtn = this.locator(
       '.pf-v6-c-wizard [data-ouia-component-type="PF6/MenuToggle"]',
-    ).filter({ hasText: 'Project' });
+    ).filter({ hasText: /Project/i });
+    if (!(await projectBtn.first().isVisible().catch(() => false))) {
+      return;
+    }
+    const label = ((await projectBtn.first().textContent()) ?? '').trim();
+    if (new RegExp(`Project:\\s*${namespace}\\b`, 'i').test(label)) {
+      return;
+    }
+
     await this.robustClick(projectBtn.first());
-    await this.page.waitForTimeout(500);
-
-    const option = this.page.getByRole('menuitem', { name: namespace, exact: true });
-    await option.waitFor({ state: 'visible', timeout: TestTimeouts.SHORT_WAIT });
-    await option.click();
-    await this.page.waitForTimeout(2000);
-
-    await projectBtn.first().click();
-    await this.page.waitForTimeout(500);
+    const option = this.page
+      .getByRole('menuitem', { name: namespace, exact: true })
+      .or(this.page.locator('.pf-v6-c-menu__item-text', { hasText: namespace }));
+    await option.first().waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
+    await this.robustClick(option.first());
+    await this.page.waitForTimeout(2 * TestTimeouts.UI_DELAY_SHORT);
   }
 
   async verifyCloneSourceDescription(): Promise<boolean> {

@@ -3,6 +3,7 @@
  */
 
 import BaseComponent from '@/components/shared/base-component';
+import { pollUntil } from '@/utils/poll-until';
 import { TestTimeouts } from '@/utils/test-config';
 import type { Page } from '@playwright/test';
 
@@ -241,17 +242,17 @@ export class VirtualMachineDetailConsoleComponent extends BaseComponent {
    * @param timeout - Timeout to wait for the dialog (default: 3 seconds)
    * @returns true if dialog was dismissed, false if not visible
    */
-  async tryDismissVncTryLaterDialog(
-    timeout: number = TestTimeouts.UI_DELAY_LONG,
-  ): Promise<boolean> {
-    try {
-      const vncTryLaterButton = this.locator('button:has-text("Try later")');
-      await vncTryLaterButton.waitFor({ state: 'visible', timeout });
-      await this.robustClick(vncTryLaterButton);
-      return true;
-    } catch {
+  async tryDismissVncTryLaterDialog(timeout: number = 3_000): Promise<boolean> {
+    const vncTryLaterButton = this.locator('button:has-text("Try later")');
+    const visible = await vncTryLaterButton
+      .waitFor({ state: 'visible', timeout })
+      .then(() => true)
+      .catch(() => false);
+    if (!visible) {
       return false;
     }
+    await this.robustClick(vncTryLaterButton);
+    return true;
   }
 
   async verifyActiveUsers(present: boolean, timeout = 60000): Promise<boolean> {
@@ -296,7 +297,7 @@ export class VirtualMachineDetailConsoleComponent extends BaseComponent {
   }
 
   async verifyGuestLogin(): Promise<boolean> {
-    return await this.verifyTextVisible('Guest login');
+    return await this.verifyTextVisible('Guest login credentials');
   }
 
   async verifySerialConsoleRenderedProperly(minWidth = 200): Promise<boolean> {
@@ -609,14 +610,42 @@ export class VirtualMachineDetailDiagnosticsComponent extends BaseComponent {
    * Clicks a severity card to toggle its filter. Re-clicking deselects.
    */
   async clickSeverityCard(severity: 'critical' | 'warning' | 'healthy' | 'all'): Promise<void> {
+    const testId =
+      severity === 'all'
+        ? 'diagnostics-card-all'
+        : severity === 'warning'
+          ? 'diagnostics-card-warning'
+          : `diagnostics-card-${severity}`;
     const nameMap: Record<string, RegExp> = {
       critical: /Critical/,
       warning: /Warnings/,
       healthy: /Healthy/,
       all: /All statuses/,
     };
-    await this.page.getByRole('button', { name: nameMap[severity] }).click();
+    const card = this.page
+      .getByTestId(testId)
+      .or(this.page.getByRole('button', { name: nameMap[severity] }))
+      .first();
+    await card.click({ force: true });
     await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
+  }
+
+  /** Clears severity + search filters so the full conditions table is visible again. */
+  async clearDiagnosticsFilters(): Promise<void> {
+    const clearLink = this.page
+      .getByRole('button', { name: /Clear all filters/i })
+      .or(this.page.getByRole('link', { name: /Clear all filters/i }))
+      .first();
+    if (await clearLink.isVisible().catch(() => false)) {
+      await clearLink.click({ force: true });
+    } else {
+      await this.clickSeverityCard('all');
+    }
+    await this.clearDiagnosticsSearch();
+    await this.page
+      .getByRole('grid', { name: 'Status conditions' })
+      .waitFor({ state: 'visible', timeout: TestTimeouts.UI_ACTION_COMPLETE })
+      .catch(() => undefined);
   }
   async getCloudInitValues(): Promise<{ username: string; password: string } | null> {
     try {
@@ -648,6 +677,8 @@ export class VirtualMachineDetailDiagnosticsComponent extends BaseComponent {
   /**
    * Reads the counts from all four severity overview cards.
    * Returns an object with critical, warnings, healthy, and allStatuses counts.
+   * Polls until All statuses === sum of the severity cards — counts can still be
+   * settling as conditions / DataVolumes / snapshot statuses stream in.
    */
   async getDiagnosticsOverviewCardCounts(): Promise<{
     critical: number;
@@ -655,20 +686,52 @@ export class VirtualMachineDetailDiagnosticsComponent extends BaseComponent {
     healthy: number;
     allStatuses: number;
   }> {
-    const readCard = async (namePattern: RegExp): Promise<number> => {
-      const card = this.page.getByRole('button', { name: namePattern });
+    const nameByTestId: Record<string, RegExp> = {
+      'diagnostics-card-critical': /Critical/,
+      'diagnostics-card-warning': /Warnings/,
+      'diagnostics-card-healthy': /Healthy/,
+      'diagnostics-card-all': /All statuses/,
+    };
+    const readCard = async (testId: string): Promise<number> => {
+      const card = this.page
+        .getByTestId(testId)
+        .or(this.page.getByRole('button', { name: nameByTestId[testId] }))
+        .first();
       await card.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ACTION_COMPLETE });
-      const text = ((await card.textContent()) ?? '').trim();
-      const match = text.match(/(\d+)/);
+      const countText = (
+        (await card.locator('.diagnostics-overview-cards__count').textContent().catch(() => null)) ??
+        (await card.textContent()) ??
+        ''
+      ).trim();
+      const match = countText.match(/(\d+)/);
       return match ? parseInt(match[1], 10) : -1;
     };
 
-    return {
-      critical: await readCard(/Critical/),
-      warnings: await readCard(/Warnings/),
-      healthy: await readCard(/Healthy/),
-      allStatuses: await readCard(/All statuses/),
-    };
+    const readAll = async (): Promise<{
+      critical: number;
+      warnings: number;
+      healthy: number;
+      allStatuses: number;
+    }> => ({
+      critical: await readCard('diagnostics-card-critical'),
+      warnings: await readCard('diagnostics-card-warning'),
+      healthy: await readCard('diagnostics-card-healthy'),
+      allStatuses: await readCard('diagnostics-card-all'),
+    });
+
+    let latest = await readAll();
+    await pollUntil(
+      async () => {
+        latest = await readAll();
+        const sum = latest.critical + latest.warnings + latest.healthy;
+        return latest.allStatuses >= 0 && latest.allStatuses === sum;
+      },
+      {
+        message: 'Diagnostics overview card counts should settle (all === critical+warnings+healthy)',
+        timeout: TestTimeouts.UI_ACTION_COMPLETE,
+      },
+    );
+    return latest;
   }
   /**
    * Reads the badge count displayed on the Diagnostics tab link.
@@ -719,9 +782,12 @@ export class VirtualMachineDetailDiagnosticsComponent extends BaseComponent {
    * Types into the diagnostics search box.
    */
   async searchDiagnostics(text: string): Promise<void> {
-    const searchBox = this.page.getByRole('textbox', {
-      name: 'Search diagnostics',
-    });
+    const searchBox = this.page
+      .getByRole('textbox', { name: /Search diagnostics/i })
+      .or(this.page.getByPlaceholder(/Search by reason, message/i))
+      .first();
+    await searchBox.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
+    await searchBox.fill('');
     await searchBox.fill(text);
     await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
   }

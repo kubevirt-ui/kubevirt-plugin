@@ -159,6 +159,10 @@ export default class VirtualMachineDetailPage extends PageCommons {
     return this.metricsSnapshots.changeMetricsTimeRange();
   }
 
+  async clearDiagnosticsFilters(): Promise<void> {
+    return this.diagnostics.clearDiagnosticsFilters();
+  }
+
   async clearDiagnosticsSearch(): Promise<void> {
     return this.diagnostics.clearDiagnosticsSearch();
   }
@@ -617,6 +621,10 @@ export default class VirtualMachineDetailPage extends PageCommons {
     return this.navigation.navigateToDiagnostics();
   }
 
+  async navigateToDiagnosticsDirect(vmName: string, namespace: string) {
+    return this.navigation.navigateToDiagnosticsDirect(vmName, namespace);
+  }
+
   async navigateToDisks(): Promise<void> {
     return this.navigation.navigateToDisks();
   }
@@ -651,6 +659,10 @@ export default class VirtualMachineDetailPage extends PageCommons {
 
   async navigateToVirtualMachineDetail(vmName: string, namespace: string) {
     return this.navigation.navigateToVirtualMachineDetail(vmName, namespace);
+  }
+
+  async navigateToVirtualMachineInstanceDetail(vmName: string, namespace: string) {
+    return this.navigation.navigateToVirtualMachineInstanceDetail(vmName, namespace);
   }
 
   async navigateToVmiDisksTab(vmName: string, namespace: string): Promise<void> {
@@ -709,7 +721,14 @@ export default class VirtualMachineDetailPage extends PageCommons {
 
   async reloadAndNavigateToScheduling() {
     await this.page.reload({ waitUntil: 'domcontentloaded' });
+    await this.page.keyboard.press('Escape').catch(() => undefined);
     await this.scheduling.navigateToConfigurationScheduling();
+    // Let the VM watch settle so eviction strategy text is current after the patch.
+    await this.page
+      .getByTestId('eviction-strategy')
+      .filter({ visible: true })
+      .first()
+      .waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
   }
 
   async resetVmFromActionsDropdown() {
@@ -958,7 +977,7 @@ export default class VirtualMachineDetailPage extends PageCommons {
     return this.configuration.verifyHeadlessChecked(expectedChecked);
   }
   async verifyHeadlessMode(): Promise<boolean> {
-    return this.diagnostics.verifyHeadlessMode();
+    return this.configuration.verifyHeadlessMode();
   }
   async verifyHeadlessServiceFQDN(
     vmName: string,
@@ -1059,7 +1078,7 @@ export default class VirtualMachineDetailPage extends PageCommons {
     return this.diagnostics.verifyRootdisk();
   }
   async verifySchedulingAndResourceRequirements(): Promise<boolean> {
-    return this.diagnostics.verifySchedulingAndResourceRequirements();
+    return this.scheduling.verifySchedulingAndResourceRequirements();
   }
   async verifySecretOnSSHTab(secretName: string): Promise<boolean> {
     return this.scheduling.verifySecretOnSSHTab(secretName);

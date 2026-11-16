@@ -37,6 +37,22 @@ export class CdiProxyHandler {
     return this.ctx.deleteResource('cdi.kubevirt.io', 'v1beta1', 'datasources', name, namespace);
   }
 
+  deleteDataImportCron(namespace: string, name: string): Promise<KubernetesResource | null> {
+    return this.ctx.deleteResource(
+      'cdi.kubevirt.io',
+      'v1beta1',
+      'dataimportcrons',
+      name,
+      namespace,
+    );
+  }
+
+  /** Form-created DataSources own a companion `${name}-import-cron` DataImportCron. */
+  async deleteDataSourceWithImportCron(namespace: string, name: string): Promise<void> {
+    await this.deleteDataImportCron(namespace, `${name}-import-cron`).catch(() => null);
+    await this.deleteDataSource(namespace, name).catch(() => null);
+  }
+
   deleteDataVolume(namespace: string, name: string): Promise<KubernetesResource | null> {
     return this.ctx.deleteResource('cdi.kubevirt.io', 'v1beta1', 'datavolumes', name, namespace);
   }

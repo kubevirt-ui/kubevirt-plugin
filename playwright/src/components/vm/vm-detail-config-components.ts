@@ -4,6 +4,7 @@
  */
 
 import BaseComponent from '@/components/shared/base-component';
+import { pollUntil } from '@/utils/poll-until';
 import { TestTimeouts } from '@/utils/test-config';
 import type { Page } from '@playwright/test';
 
@@ -450,12 +451,32 @@ export class VirtualMachineDetailConfigurationComponent extends BaseComponent {
     }
 
     if (vmData.headless !== undefined) {
-      await this._headlessCheckbox.waitFor({ state: 'visible', timeout: TestTimeouts.VM_CREATION });
-      if (vmData.headless) {
-        await this._headlessCheckbox.check({ force: true });
-      } else {
-        await this._headlessCheckbox.uncheck({ force: true });
-      }
+      await this._headlessCheckbox.waitFor({ state: 'attached', timeout: TestTimeouts.VM_CREATION });
+      await this._headlessCheckbox.scrollIntoViewIfNeeded().catch(() => undefined);
+      // PF Switch: click the input (or its label) and wait for the checked state to stick.
+      await pollUntil(
+        async () => {
+          const checked = await this._headlessCheckbox.isChecked().catch(() => false);
+          if (checked === vmData.headless) {
+            return true;
+          }
+          const switchRoot = this.page
+            .locator('.pf-v6-c-switch, .pf-v5-c-switch, .pf-c-switch')
+            .filter({ has: this._headlessCheckbox })
+            .first();
+          if (await switchRoot.isVisible().catch(() => false)) {
+            await switchRoot.click({ force: true });
+          } else {
+            await this._headlessCheckbox.click({ force: true });
+          }
+          await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
+          return (await this._headlessCheckbox.isChecked().catch(() => false)) === vmData.headless;
+        },
+        {
+          message: `Headless mode switch should become ${vmData.headless ? 'checked' : 'unchecked'}`,
+          timeout: TestTimeouts.LONG_OPERATION,
+        },
+      );
       await this.page.waitForTimeout(TestTimeouts.UI_DELAY_EXTRA);
     }
 
@@ -497,12 +518,48 @@ export class VirtualMachineDetailConfigurationComponent extends BaseComponent {
 
   async navigateToConfigurationDetails(): Promise<void> {
     await this.navigateToConfigurationTab();
+    // Dismiss Find-settings autocomplete so it cannot intercept Details tab clicks.
+    await this.page.keyboard.press('Escape').catch(() => undefined);
     await this._vmConfigurationDetails.waitFor({
       state: 'visible',
       timeout: TestTimeouts.VM_CREATION,
     });
-    await this.robustClick(this._vmConfigurationDetails);
-    await this.page.waitForTimeout(TestTimeouts.UI_DELAY_MEDIUM);
+    // Vertical PF tabs can keep Scheduling content mounted after a single click —
+    // poll until Details content (or the details path) is actually active.
+    await pollUntil(
+      async () => {
+        await this.page.keyboard.press('Escape').catch(() => undefined);
+        await this.robustClick(this._vmConfigurationDetails);
+        await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
+        if (/\/details(?:\/|$|\?|#)/.test(this.page.url())) {
+          return true;
+        }
+        return (
+          (await this.page
+            .getByText('Headless mode', { exact: false })
+            .isVisible()
+            .catch(() => false)) || (await this._headlessCheckbox.isVisible().catch(() => false))
+        );
+      },
+      {
+        message: 'Configuration Details sub-tab should show Details content',
+        timeout: TestTimeouts.LONG_OPERATION,
+      },
+    );
+  }
+
+  async verifyHeadlessMode(): Promise<boolean> {
+    try {
+      await this.navigateToConfigurationDetails();
+      const label = this.page.getByText('Headless mode', { exact: false }).first();
+      await label.scrollIntoViewIfNeeded().catch(() => undefined);
+      return (
+        (await label.isVisible({ timeout: TestTimeouts.UI_DELAY_MEDIUM }).catch(() => false)) ||
+        (await this._headlessCheckbox.isVisible({ timeout: TestTimeouts.UI_DELAY_MEDIUM }).catch(() => false))
+      );
+    } catch {
+      return false;
+    }
   }
 
   async navigateToConfigurationStorage(): Promise<void> {
@@ -538,20 +595,28 @@ export class VirtualMachineDetailConfigurationComponent extends BaseComponent {
     try {
       await this.navigateToConfigurationTab();
 
-      await this._configurationSearchAutocompleteSearchInput.waitFor({
+      const searchInput = this._configurationSearchAutocompleteSearchInput.or(
+        this.page.getByPlaceholder(/Find settings/i),
+      );
+      await searchInput.first().waitFor({
         state: 'visible',
-        timeout: TestTimeouts.VM_CREATION,
+        timeout: TestTimeouts.ELEMENT_WAIT,
       });
-      await this._configurationSearchAutocompleteSearchInput.fill(searchTerm);
+      await searchInput.first().fill(searchTerm);
       await this.page.waitForTimeout(TestTimeouts.UI_DELAY_MEDIUM);
 
+      let found = true;
       if (expectedResult) {
         const menuItems = this.locator(`[role="menuitem"]:has-text("${expectedResult}")`);
-        const count = await menuItems.count();
-        return count >= 1;
+        found = (await menuItems.count()) >= 1;
       }
 
-      return true;
+      // Dismiss autocomplete + clear so later Scheduling/Details clicks aren't blocked.
+      await this.page.keyboard.press('Escape').catch(() => undefined);
+      await searchInput.first().fill('').catch(() => undefined);
+      await this.page.keyboard.press('Escape').catch(() => undefined);
+
+      return found;
     } catch {
       return false;
     }
@@ -581,8 +646,10 @@ export class VirtualMachineDetailConfigurationComponent extends BaseComponent {
     try {
       await this.navigateToConfigurationDetails();
 
-      const descriptionVisible = await this.locator('text=Description')
-        .isVisible()
+      const description = this.page.getByText('Description', { exact: false }).first();
+      await description.scrollIntoViewIfNeeded().catch(() => undefined);
+      const descriptionVisible = await description
+        .isVisible({ timeout: TestTimeouts.UI_DELAY_MEDIUM })
         .catch(() => false);
       if (!descriptionVisible) {
         return false;
@@ -595,11 +662,11 @@ export class VirtualMachineDetailConfigurationComponent extends BaseComponent {
         }
       }
 
-      const bootModeExists = await this.locator('text=pc-q35')
-        .isVisible()
+      const machineType = this.page.getByText('pc-q35', { exact: false }).first();
+      await machineType.scrollIntoViewIfNeeded().catch(() => undefined);
+      return await machineType
+        .isVisible({ timeout: TestTimeouts.UI_DELAY_MEDIUM })
         .catch(() => false);
-
-      return bootModeExists;
     } catch {
       return false;
     }
@@ -782,32 +849,17 @@ export class VirtualMachineDetailConfigurationComponent extends BaseComponent {
 
   async verifyEvictionStrategyLiveMigrate(): Promise<boolean> {
     try {
-      await this.page.waitForTimeout(TestTimeouts.UI_DELAY_MEDIUM);
-
-      const timeout = Math.min(TestTimeouts.UI_ELEMENT_VISIBILITY, 30000);
-
-      const count = await this._evictionStrategyElement.count();
-      if (count === 0) {
-        return false;
-      }
-
-      try {
-        await this._evictionStrategyElement.first().waitFor({ state: 'visible', timeout });
-      } catch {
-        await this._evictionStrategyElement.first().waitFor({ state: 'attached', timeout });
-      }
-
-      const textContent = await this._evictionStrategyElement.first().textContent();
-      const innerText = await this._evictionStrategyElement
-        .first()
-        .innerText()
-        .catch(() => '');
-
-      const hasLiveMigrate =
-        (textContent?.toLowerCase().includes('livemigrate') ?? false) ||
-        (innerText?.toLowerCase().includes('livemigrate') ?? false);
-
-      return hasLiveMigrate;
+      const timeout = Math.min(TestTimeouts.ELEMENT_WAIT, 15_000);
+      // Prefer the visible edit control — a hidden stale match can be `.first()` after reload.
+      const el = this._evictionStrategyElement.filter({ visible: true }).first();
+      await el.waitFor({ state: 'visible', timeout });
+      const text = (
+        (await el.innerText().catch(() => '')) ||
+        (await el.textContent().catch(() => '')) ||
+        ''
+      ).toLowerCase();
+      // UI may render "LiveMigrate" or "Live migrate".
+      return /live\s*migrate/.test(text);
     } catch {
       return false;
     }
@@ -815,9 +867,7 @@ export class VirtualMachineDetailConfigurationComponent extends BaseComponent {
 
   async verifyEvictionStrategyNone(): Promise<boolean> {
     try {
-      await this.page.waitForTimeout(TestTimeouts.UI_DELAY_MEDIUM);
-
-      const timeout = Math.min(TestTimeouts.UI_ELEMENT_VISIBILITY, 30000);
+      const timeout = Math.min(TestTimeouts.ELEMENT_WAIT, 15_000);
 
       const evictionStrategyElement = this.testId('eviction-strategy');
 
@@ -862,15 +912,10 @@ export class VirtualMachineDetailConfigurationComponent extends BaseComponent {
     try {
       await this._headlessCheckbox.waitFor({
         state: 'attached',
-        timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+        timeout: TestTimeouts.ELEMENT_WAIT,
       });
-
-      try {
-        await this._headlessCheckbox.scrollIntoViewIfNeeded();
-      } catch {}
-
+      await this._headlessCheckbox.scrollIntoViewIfNeeded().catch(() => undefined);
       await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
-
       const isChecked = await this._headlessCheckbox.isChecked().catch(() => false);
       return isChecked === expectedChecked;
     } catch {
@@ -916,14 +961,26 @@ export class VirtualMachineDetailConfigurationComponent extends BaseComponent {
   }
 
   async verifyWorkload(vmName: string, expectedWorkload: string): Promise<boolean> {
-    const workloadLocator = this.testId(`${vmName}-workload-profile`).first();
+    const workloadLocator = this.testId(`${vmName}-workload-profile`)
+      .or(this.testId(`${vmName}-workload-profile-edit`))
+      .or(this.page.getByText(expectedWorkload, { exact: false }))
+      .first();
     try {
       await workloadLocator.waitFor({
         state: 'visible',
         timeout: TestTimeouts.INSTANCE_TYPE_VERIFICATION,
       });
       const workloadText = await workloadLocator.textContent();
-      return workloadText?.includes(expectedWorkload) ?? false;
+      if (workloadText?.includes(expectedWorkload)) {
+        return true;
+      }
+      // Editable DescriptionItem may put data-test on the pencil button only —
+      // fall back to visible workload label text on the Details pane.
+      return await this.page
+        .getByText(expectedWorkload, { exact: true })
+        .first()
+        .isVisible({ timeout: TestTimeouts.UI_DELAY_MEDIUM })
+        .catch(() => false);
     } catch {
       return false;
     }

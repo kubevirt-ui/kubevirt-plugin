@@ -6,6 +6,7 @@ import type {
   KubernetesListResource,
   KubernetesResource,
 } from '@/data-models/kubernetes-types';
+import { pollUntil } from '@/utils/poll-until';
 import { TestTimeouts } from '@/utils/test-config';
 
 import type { ProxyApiContext } from './proxy-api-context';
@@ -80,6 +81,43 @@ export class VirtualMachineProxyHandler {
 
   create(namespace: string, spec: KubernetesResource): Promise<KubernetesResource | null> {
     return this.ctx.createResource('kubevirt.io', 'v1', 'virtualmachines', spec, namespace);
+  }
+
+  /**
+   * Cirros containerDisk VM — no DataVolume/CDI. Use for gating UI tests that only
+   * need a Running/Stopped guest; avoids parallel workers racing on OS DataSources.
+   */
+  async createCirrosVm(namespace: string, vmName: string, startVm = true): Promise<string> {
+    const vmSpec: KubernetesResource = {
+      apiVersion: 'kubevirt.io/v1',
+      kind: 'VirtualMachine',
+      metadata: { name: vmName, namespace },
+      spec: {
+        runStrategy: startVm ? 'Always' : 'Halted',
+        template: {
+          metadata: { labels: { 'kubevirt.io/domain': vmName } },
+          spec: {
+            domain: {
+              devices: {
+                disks: [{ disk: { bus: 'virtio' }, name: 'rootdisk' }],
+                interfaces: [{ masquerade: {}, model: 'virtio', name: 'default' }],
+              },
+              resources: { requests: { memory: '512Mi' } },
+            },
+            evictionStrategy: 'LiveMigrate',
+            networks: [{ name: 'default', pod: {} }],
+            volumes: [
+              {
+                containerDisk: { image: 'quay.io/kubevirt/cirros-container-disk-demo' },
+                name: 'rootdisk',
+              },
+            ],
+          },
+        },
+      },
+    };
+    await this.create(namespace, vmSpec);
+    return vmName;
   }
 
   createMigration(namespace: string, spec: KubernetesResource): Promise<KubernetesResource | null> {
@@ -555,19 +593,47 @@ export class VirtualMachineProxyHandler {
     vmName: string,
     timeoutMs = TestTimeouts.VM_BOOTUP,
   ): Promise<boolean> {
-    const start = Date.now();
-    while (Date.now() - start < timeoutMs) {
-      try {
-        const vmi = await this.getInstance(namespace, vmName);
-        if (vmi) {
-          const status = vmi.status as Record<string, unknown> | undefined;
-          if (status?.phase === 'Running') return true;
+    // Throw on timeout — callers that ignored a false return used to continue and
+    // burn the whole Playwright test timeout on UI polls (HC E2E / contended CI).
+    await pollUntil(
+      async () => {
+        const vm = await this.get(namespace, vmName).catch(() => null);
+        const printable = (vm?.status as { printableStatus?: string } | undefined)
+          ?.printableStatus;
+        if (printable === 'Running') {
+          return true;
         }
-      } catch {
-        // VMI not yet available
-      }
-      await new Promise((r) => setTimeout(r, 5000));
-    }
-    return false;
+        const vmi = await this.getInstance(namespace, vmName).catch(() => null);
+        const phase = (vmi?.status as { phase?: string } | undefined)?.phase;
+        return phase === 'Running';
+      },
+      {
+        intervalMs: 5_000,
+        message: `VM ${namespace}/${vmName} should reach Running`,
+        timeout: timeoutMs,
+      },
+    );
+    return true;
+  }
+
+  async waitForVmStopped(
+    namespace: string,
+    vmName: string,
+    timeoutMs = TestTimeouts.VM_BOOTUP,
+  ): Promise<boolean> {
+    await pollUntil(
+      async () => {
+        const vm = await this.get(namespace, vmName).catch(() => null);
+        const printable = (vm?.status as { printableStatus?: string } | undefined)
+          ?.printableStatus;
+        return printable === 'Stopped' || printable === 'Succeeded';
+      },
+      {
+        intervalMs: 5_000,
+        message: `VM ${namespace}/${vmName} should reach Stopped`,
+        timeout: timeoutMs,
+      },
+    );
+    return true;
   }
 }

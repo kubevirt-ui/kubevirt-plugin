@@ -27,7 +27,7 @@ export default class UploadProgressToastComponent extends BaseComponent {
    */
   async clickAbortUpload(fileName?: string): Promise<void> {
     const abortButton = fileName
-      ? this.toastContaining(this._uploadingToast, fileName).getByTestId('upload-progress-abort')
+      ? this.toastContaining('upload-progress-toast', fileName).getByTestId('upload-progress-abort')
       : this._abortButton;
 
     await abortButton.first().waitFor({
@@ -42,7 +42,7 @@ export default class UploadProgressToastComponent extends BaseComponent {
     fileName?: string,
     timeout = TestTimeouts.UI_ELEMENT_VISIBILITY,
   ): Promise<void> {
-    await this.waitForToastVisible(this._abortedToast, fileName, timeout, 'aborted');
+    await this.waitForToastVisible('upload-progress-aborted-toast', fileName, timeout, 'aborted');
   }
 
   /** Waits until the error toast is visible (optionally matching `fileName`). */
@@ -50,21 +50,24 @@ export default class UploadProgressToastComponent extends BaseComponent {
     fileName?: string,
     timeout = TestTimeouts.UI_ELEMENT_VISIBILITY,
   ): Promise<void> {
-    await this.waitForToastVisible(this._errorToast, fileName, timeout, 'error');
+    await this.waitForToastVisible('upload-progress-error-toast', fileName, timeout, 'error');
   }
 
   /**
    * Waits until either the uploading toast or a terminal (success/error/aborted)
    * toast is visible. Useful when auth may fail before an abortable upload starts.
+   *
+   * File names live on the PF Alert title outside the ToastLayout `data-test` Flex,
+   * so matching scopes through the parent alert when `fileName` is provided.
    */
   async expectUploadingOrTerminalToastVisible(
     fileName?: string,
     timeout = TestTimeouts.UI_ELEMENT_VISIBILITY,
   ): Promise<'uploading' | 'success' | 'error' | 'aborted'> {
-    const uploading = this.toastContaining(this._uploadingToast, fileName);
-    const success = this.toastContaining(this._successToast, fileName);
-    const error = this.toastContaining(this._errorToast, fileName);
-    const aborted = this.toastContaining(this._abortedToast, fileName);
+    const uploading = this.toastContaining('upload-progress-toast', fileName);
+    const success = this.toastContaining('upload-progress-success-toast', fileName);
+    const error = this.toastContaining('upload-progress-error-toast', fileName);
+    const aborted = this.toastContaining('upload-progress-aborted-toast', fileName);
 
     const start = Date.now();
     await uploading
@@ -88,6 +91,53 @@ export default class UploadProgressToastComponent extends BaseComponent {
     throw new Error(
       `Upload toast became visible but could not classify state${fileName ? ` for "${fileName}"` : ''}`,
     );
+  }
+
+  /**
+   * Waits until the upload toast reaches a terminal state (success/error/aborted).
+   * The uploading toast stays visible during the whole browser upload, so callers must
+   * not treat "uploading" as an outcome when the DataVolume never leaves UploadReady.
+   */
+  async waitForTerminalUploadState(
+    fileName?: string,
+    timeout = TestTimeouts.LONG_OPERATION,
+  ): Promise<'success' | 'error' | 'aborted'> {
+    const success = this.toastContaining('upload-progress-success-toast', fileName);
+    const error = this.toastContaining('upload-progress-error-toast', fileName);
+    const aborted = this.toastContaining('upload-progress-aborted-toast', fileName);
+
+    await success.or(error).or(aborted).first().waitFor({ state: 'visible', timeout });
+    if (await error.first().isVisible().catch(() => false)) return 'error';
+    if (await aborted.first().isVisible().catch(() => false)) return 'aborted';
+    return 'success';
+  }
+
+  /** Closes any upload toast so a retried upload cannot read the previous attempt's state. */
+  async dismissUploadToasts(): Promise<void> {
+    const closeButtons = this.page.locator('.pf-v6-c-alert-group button[aria-label*="Close"]');
+    for (let attempt = 0; attempt < 5; attempt += 1) {
+      if (!(await this.isAnyUploadToastVisible(TestTimeouts.UI_DELAY_MEDIUM))) {
+        return;
+      }
+      await closeButtons
+        .filter({ visible: true })
+        .first()
+        .click({ force: true })
+        .catch(() => undefined);
+      await this.page.waitForTimeout(TestTimeouts.NETWORK_DELAY);
+    }
+  }
+
+  /** Message rendered by the upload error toast (CDI/proxy/certificate failure). */
+  async getUploadErrorToastText(fileName?: string): Promise<string> {
+    const errorToast = this.toastContaining('upload-progress-error-toast', fileName).first();
+    const alert = this.page
+      .locator('.pf-v6-c-alert, .pf-v5-c-alert, .pf-c-alert')
+      .filter({ has: errorToast })
+      .first();
+    return ((await alert.textContent().catch(() => null)) ?? (await errorToast.textContent()) ?? '')
+      .trim()
+      .replace(/\s+/g, ' ');
   }
 
   /**
@@ -116,7 +166,7 @@ export default class UploadProgressToastComponent extends BaseComponent {
     fileName?: string,
     timeout = TestTimeouts.UI_ELEMENT_VISIBILITY,
   ): Promise<void> {
-    await this.waitForToastVisible(this._uploadingToast, fileName, timeout, 'uploading');
+    await this.waitForToastVisible('upload-progress-toast', fileName, timeout, 'uploading');
   }
 
   /** Whether the abort button is currently visible (optionally scoped to `fileName`). */
@@ -125,7 +175,7 @@ export default class UploadProgressToastComponent extends BaseComponent {
     fileName?: string,
   ): Promise<boolean> {
     const abortButton = fileName
-      ? this.toastContaining(this._uploadingToast, fileName).getByTestId('upload-progress-abort')
+      ? this.toastContaining('upload-progress-toast', fileName).getByTestId('upload-progress-abort')
       : this._abortButton;
 
     return abortButton
@@ -145,21 +195,33 @@ export default class UploadProgressToastComponent extends BaseComponent {
       .catch(() => false);
   }
 
-  private toastContaining(root: Locator, fileName?: string): Locator {
+  /**
+   * Toast body `data-test` Flex often omits the file name — it lives on the Alert title.
+   * Prefer body text match, then parent alert/li that contains the file name.
+   */
+  private toastContaining(dataTest: string, fileName?: string): Locator {
+    const root = this.testId(dataTest);
     if (!fileName) {
       return root;
     }
-    return root.filter({ hasText: fileName });
+    return root.filter({ hasText: fileName }).or(
+      this.page
+        .locator(
+          '.pf-v6-c-alert, .pf-v5-c-alert, .pf-c-alert, li.pf-v6-c-alert-group__item, li.pf-v5-c-alert-group__item, li',
+        )
+        .filter({ hasText: fileName })
+        .getByTestId(dataTest),
+    );
   }
 
   private async waitForToastVisible(
-    root: Locator,
+    dataTest: string,
     fileName: string | undefined,
     timeout: number,
     kind: string,
   ): Promise<void> {
     try {
-      await this.toastContaining(root, fileName)
+      await this.toastContaining(dataTest, fileName)
         .first()
         .waitFor({ state: 'visible', timeout });
     } catch {

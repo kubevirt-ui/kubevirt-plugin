@@ -5,9 +5,16 @@ import type { Page } from '@playwright/test';
 export class VmCreationWizardReviewComponent extends BaseComponent {
   private readonly _inputTypeText = this.locator('input[type="text"]');
 
+  // data-test preferred; footer role covers plugin builds that lack it.
   private readonly _wizardFooterCreateButton = this.page
     .getByTestId('wizard-create-button')
-    .filter({ hasText: 'Create VirtualMachine' });
+    .filter({ hasText: 'Create VirtualMachine' })
+    .or(
+      this.page
+        .locator('.pf-v6-c-wizard__footer')
+        .getByRole('button', { name: /^(Create VirtualMachine|Create)$/i }),
+    )
+    .or(this.page.locator('.pf-v6-c-wizard__footer button.pf-v6-c-button.pf-m-primary'));
   private readonly _pfV6CWizardInputTypeText = this.locator('.pf-v6-c-wizard input[type="text"]');
   private readonly _startAfterCreateCheckbox = this.locator('#start-after-create-checkbox');
   private readonly _startThisVirtualMachineAfterCreation = this.locator(

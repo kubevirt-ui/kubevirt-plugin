@@ -47,6 +47,11 @@ export interface SetupContext {
 export interface TeardownContext {
   testNamespace: string;
   apiClient?: RequestContextClient;
+  /**
+   * Kubeadmin kubeconfig for non-priv teardown (CNV-98979).
+   * When set, cluster/namespace cleanup uses `oc` instead of the test-user browser session.
+   */
+  kubeConfigPath?: string;
   useSharding: boolean;
   shardIndex?: string;
   shouldCleanupClusterResources: boolean;
