@@ -2,6 +2,7 @@ export const VM_FOLDER_LABEL = 'vm.openshift.io/folder';
 export const PROJECT_SELECTOR_PREFIX = 'projectSelector';
 export const FOLDER_SELECTOR_PREFIX = 'folderSelector';
 export const CLUSTER_SELECTOR_PREFIX = 'clusterSelector';
+export const CLUSTER_SET_SELECTOR_PREFIX = 'clusterSetSelector';
 
 export const TREE_VIEW_PANEL_ID = 'vms-tree-view-panel';
 export const TREE_VIEW_SEARCH_ID = 'vms-tree-view-search-input';

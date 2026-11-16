@@ -18,11 +18,16 @@ import { getName } from '@kubevirt-utils/resources/shared';
 import { isEmpty, universalComparator } from '@kubevirt-utils/utils/utils';
 import useMulticlusterNamespaces from '@multicluster/hooks/useMulticlusterNamespaces';
 import useIsACMPage from '@multicluster/useIsACMPage';
-import { type K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { useK8sWatchResources } from '@openshift-console/dynamic-plugin-sdk';
-import { useFleetClusterNames } from '@stolostron/multicluster-sdk';
+import {
+  type ClusterSetData,
+  useFleetClusterNames,
+  useFleetClusterSetNames,
+  useFleetClusterSets,
+} from '@stolostron/multicluster-sdk';
 import { getLatestMigrationForEachVM } from '@virtualmachines/utils';
 
+import { type UseTreeViewDataResources } from '../types/types';
 import { isHardInventoryError } from '../utils/isHardInventoryError';
 import { vmimMapperSignal, vmsSignal } from '../utils/signals';
 import { toError } from '../utils/toError';
@@ -30,21 +35,16 @@ import { toUnknown } from '../utils/toUnknown';
 import { updateFleetVMInventory } from '../utils/updateFleetVMInventory';
 import { allClustersWatch, buildNamespacedListWatch } from './treeViewWatchConfigs';
 
-export type UseTreeViewDataResources = {
-  clusterNames: string[];
-  isACMTreeView: boolean;
-  isTourRunning: boolean;
-  loaded: boolean;
-  loadError: unknown;
-  namespacesByCluster: Record<string, K8sResourceCommon[]>;
-  projectNames: string[];
-  treeViewFoldersEnabled: boolean;
-  vms: V1VirtualMachine[];
-};
-
 export const useTreeViewDataResources = (): UseTreeViewDataResources => {
   const canListAllNamespaces = useCanListNamespaces();
   const [clusterNames] = useFleetClusterNames();
+  const [clusterSetNames, clusterSetNamesLoaded, clusterSetNamesError] =
+    useFleetClusterSetNames() as [string[] | undefined, boolean, unknown];
+  const [clusterSetData, clusterSetsLoaded, clusterSetsError] = useFleetClusterSets() as [
+    ClusterSetData | undefined,
+    boolean,
+    unknown,
+  ];
   const isACMTreeView = useIsACMPage();
   const isTourRunning = runningTourSignal.value;
   const { featureEnabled: treeViewFoldersEnabled } = useFeatures(TREE_VIEW_FOLDERS);
@@ -138,14 +138,24 @@ export const useTreeViewDataResources = (): UseTreeViewDataResources => {
 
   const projectsLoaded = isACMTreeView ? multiclusterNamespacesLoaded : projectNamesLoaded;
 
-  const loaded = projectsLoaded && (namespacedVMsLoaded || displayVMs.length > 0);
+  const clusterSetsLoadedForTree = !isACMTreeView || (clusterSetNamesLoaded && clusterSetsLoaded);
+
+  const loaded =
+    projectsLoaded && clusterSetsLoadedForTree && (namespacedVMsLoaded || !isEmpty(displayVMs));
+
+  const clusterSetLoadError = isACMTreeView
+    ? toUnknown(clusterSetNamesError ?? clusterSetsError)
+    : undefined;
 
   return {
     clusterNames,
+    clusterSetData: clusterSetData ?? {},
+    clusterSetNames: clusterSetNames ?? [],
     isACMTreeView,
     isTourRunning,
     loaded,
-    loadError: projectNamesError ?? toUnknown(namespacesResult.error) ?? toUnknown(hardVMError),
+    loadError:
+      projectNamesError ?? toUnknown(namespacesResult.error ?? hardVMError) ?? clusterSetLoadError,
     namespacesByCluster,
     projectNames,
     treeViewFoldersEnabled,

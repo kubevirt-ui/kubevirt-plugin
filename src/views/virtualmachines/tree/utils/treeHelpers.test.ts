@@ -1,6 +1,12 @@
 import { type TreeViewDataItem } from '@patternfly/react-core';
 
-import { HIDE, PROJECT_SELECTOR_PREFIX, SHOW } from './constants';
+import {
+  CLUSTER_SELECTOR_PREFIX,
+  CLUSTER_SET_SELECTOR_PREFIX,
+  HIDE,
+  PROJECT_SELECTOR_PREFIX,
+  SHOW,
+} from './constants';
 import {
   filterNamespaceItems,
   getEffectiveShowEmptyProjects,
@@ -56,5 +62,21 @@ describe('filterNamespaceItems', () => {
   it('should hide empty system namespaces even when showEmptyProjects is true', () => {
     expect(filterNamespaceItems(projectItem('openshift', []), true)).toBe(false);
     expect(filterNamespaceItems(projectItem('kube-system', []), true)).toBe(false);
+  });
+
+  it('should keep cluster set folders when child projects are filtered out', () => {
+    const clusterSetItem: TreeViewDataItem = {
+      children: [
+        {
+          children: [projectItem('empty-app', [])],
+          id: `${CLUSTER_SELECTOR_PREFIX}/cluster-a`,
+          name: 'cluster-a',
+        },
+      ],
+      id: `${CLUSTER_SET_SELECTOR_PREFIX}/production`,
+      name: 'production',
+    };
+
+    expect(filterNamespaceItems(clusterSetItem, false)).toBe(true);
   });
 });

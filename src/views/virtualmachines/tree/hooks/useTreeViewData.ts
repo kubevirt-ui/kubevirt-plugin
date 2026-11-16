@@ -1,25 +1,28 @@
 import { useMemo } from 'react';
 import { useLocation } from 'react-router';
 
-import { ALL_CLUSTERS } from '@kubevirt-utils/hooks/constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { type TreeViewDataItem } from '@patternfly/react-core';
+import { type ClusterSetData } from '@stolostron/multicluster-sdk';
 import { getNavigatorTabSearch } from '@virtualmachines/navigator/tabStorage';
 
 import { createMultiClusterTreeViewData, createSingleClusterTreeViewData } from '../utils/utils';
 import { useTreeViewDataResources } from './useTreeViewDataResources';
 
 export type UseTreeViewData = {
+  clusterSetData: ClusterSetData;
+  clusterSetNames: string[];
   loaded: boolean;
   loadError: unknown;
   treeData: TreeViewDataItem[];
 };
 
 export const useTreeViewData = (): UseTreeViewData => {
-  const { t } = useKubevirtTranslation();
   const location = useLocation();
   const {
     clusterNames,
+    clusterSetData,
+    clusterSetNames,
     isACMTreeView,
     isTourRunning,
     loaded,
@@ -30,6 +33,8 @@ export const useTreeViewData = (): UseTreeViewData => {
     vms,
   } = useTreeViewDataResources();
 
+  const { t } = useKubevirtTranslation();
+
   const navigatorTabSearch = getNavigatorTabSearch(location.search);
 
   const treeData = useMemo((): TreeViewDataItem[] => {
@@ -39,13 +44,17 @@ export const useTreeViewData = (): UseTreeViewData => {
 
     if (isACMTreeView) {
       return createMultiClusterTreeViewData(
-        vms,
-        location.pathname,
-        treeViewFoldersEnabled,
-        namespacesByCluster,
-        t(ALL_CLUSTERS),
-        navigatorTabSearch,
-        clusterNames,
+        {
+          clusterNames,
+          clusterSetData,
+          clusterSetNames,
+          foldersEnabled: treeViewFoldersEnabled,
+          pathname: location.pathname,
+          projectsByClusters: namespacesByCluster,
+          queryParams: navigatorTabSearch,
+          vms,
+        },
+        t,
       );
     }
 
@@ -60,23 +69,27 @@ export const useTreeViewData = (): UseTreeViewData => {
   }, [
     loaded,
     isACMTreeView,
-    isTourRunning,
     projectNames,
     vms,
     location.pathname,
     treeViewFoldersEnabled,
-    clusterNames,
-    namespacesByCluster,
     navigatorTabSearch,
+    isTourRunning,
+    clusterNames,
+    clusterSetData,
+    clusterSetNames,
+    namespacesByCluster,
     t,
   ]);
 
   return useMemo(
     (): UseTreeViewData => ({
+      clusterSetData,
+      clusterSetNames,
       loaded,
       loadError,
       treeData,
     }),
-    [loaded, loadError, treeData],
+    [clusterSetData, clusterSetNames, loaded, loadError, treeData],
   );
 };

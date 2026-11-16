@@ -10,6 +10,7 @@ import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
 import {
   CLUSTER_SELECTOR_PREFIX,
+  CLUSTER_SET_SELECTOR_PREFIX,
   FOLDER_SELECTOR_PREFIX,
   PROJECT_SELECTOR_PREFIX,
 } from './constants';
@@ -43,6 +44,9 @@ export const getFolderTreeViewItemID = (
 
 export const getClusterTreeViewItemID = (clusterName: string): string =>
   `${CLUSTER_SELECTOR_PREFIX}/${clusterName}`;
+
+export const getClusterSetTreeViewItemID = (clusterSetName: string): string =>
+  `${CLUSTER_SET_SELECTOR_PREFIX}/${clusterSetName}`;
 
 export const getVMInfoFromPathname = (
   pathname: string,
