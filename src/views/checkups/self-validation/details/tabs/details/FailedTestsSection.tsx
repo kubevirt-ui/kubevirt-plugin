@@ -3,11 +3,7 @@ import { type FC, useMemo } from 'react';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ExpandableSection } from '@patternfly/react-core';
 
-import {
-  normalizeFailedTests,
-  parseFailedTestGroups,
-  type SelfValidationSuiteResult,
-} from '../../../utils';
+import { parseFailedTestGroups, type SelfValidationSuiteResult } from '../../../utils';
 
 type FailedTestsSectionProps = {
   failedTests: SelfValidationSuiteResult['failed_tests'];
@@ -18,10 +14,7 @@ type FailedTestsSectionProps = {
 const FailedTestsSection: FC<FailedTestsSectionProps> = ({ failedTests, isExpanded, onToggle }) => {
   const { t } = useKubevirtTranslation();
 
-  const parsedGroups = useMemo(
-    () => parseFailedTestGroups(normalizeFailedTests(failedTests)),
-    [failedTests],
-  );
+  const parsedGroups = useMemo(() => parseFailedTestGroups(failedTests), [failedTests]);
 
   const failedTestsCount = useMemo(
     () => parsedGroups.reduce((sum, { tests }) => sum + tests.length, 0),

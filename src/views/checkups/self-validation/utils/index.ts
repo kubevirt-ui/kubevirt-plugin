@@ -15,8 +15,6 @@ export type { DownloadInputValidationResult, DownloadResultsReturn } from './dow
 
 // Results parsing and status
 export { getCheckupsSelfValidationListFilters } from './filters';
-export type { FailedTestGroup } from './normalizeFailedTests';
-export { normalizeFailedTests } from './normalizeFailedTests';
 export { parseFailedTestGroups } from './parseFailedTestGroups';
 // Job lifecycle and helpers
 export {
@@ -57,7 +55,6 @@ export {
   getOverallProgressFromJob,
   getResultsConfigMapName,
   groupJobsByConfigMapName,
-  parseFailedTest,
   parseResults,
 } from './selfValidationResults';
 export {
