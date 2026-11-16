@@ -15,8 +15,8 @@
  *      operations (SpecResourceSetup, beforeAll) continue to work.
  */
 
+import { loginToOpenShiftConsole } from '@/auth/console-login';
 import { createApiClientFromToken, getApiClient, resetApiClient } from '@/clients/rcc-singleton';
-import LoginPage from '@/page-objects/cluster/login-page';
 import { EnvVariables } from '@/utils/env-variables';
 import { FileUtils } from '@/utils/file-utils';
 import { logger } from '@/utils/logger';
@@ -68,40 +68,9 @@ export async function healBrowserAuth(page: Page, context: BrowserContext): Prom
   try {
     logger.info('[AuthHealer] Session expired — performing re-login…');
 
-    const loginPage = new LoginPage(page);
     const baseUrl = EnvVariables.webConsoleUrl;
-
-    await loginPage.navigateToLogin(baseUrl);
-    await page.waitForLoadState('load');
-
-    const isNonPriv = EnvVariables.isNonPrivUser;
-    if (!isNonPriv) {
-      const kubeAdminVisible = await loginPage.isKubeAdminButtonVisible({
-        timeout: TestTimeouts.MIGRATION_POLICY_VERIFICATION,
-      });
-      if (kubeAdminVisible) {
-        await page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
-        await loginPage.clickKubeAdminLogin();
-      }
-    } else {
-      const testVisible = await loginPage.isTestButtonVisible({
-        timeout: TestTimeouts.MIGRATION_POLICY_VERIFICATION,
-      });
-      if (testVisible) {
-        await page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
-        await loginPage.clickTestLogin();
-      }
-    }
-
-    await loginPage.fillAndSubmitLoginForm(
-      EnvVariables.uiLoginUsername,
-      EnvVariables.uiLoginPassword,
-    );
-
-    await page.waitForURL((url) => !url.pathname.includes('/auth/login'), {
-      timeout: TestTimeouts.LONG_OPERATION,
-    });
-    await page.waitForLoadState('load');
+    // Same IDP path as global setup / CNV-98979 (named htpasswd IDP for non-priv).
+    await loginToOpenShiftConsole(page, baseUrl);
     logger.info(`[AuthHealer] Re-login complete — redirected to ${page.url()}`);
 
     await dismissWelcomeModals(page);

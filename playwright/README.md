@@ -96,15 +96,18 @@ IS_LOCAL=1 ./playwright-runner-hc-e2e.sh Gating --workers=4 --headed
 
 ### Projects
 
-Tests are organized into projects. Each project maps to a tier with its own scope and test directory.
+UI specs live under route-based folders in `playwright/tests/`. Playwright **projects** select tests by tag (`grep`), not by directory (except `API`).
 
-| Project    | Directory                | Scope                                                         | Tags            |
-| ---------- | ------------------------ | ------------------------------------------------------------- | --------------- |
-| `Gating`   | `tests/gating/`          | Page loads, basic navigation, resource creation (form + YAML) | `@gating`       |
-| `Tier1`    | `tests/tier1/<feature>/` | Single-resource CRUD lifecycle per module                     | `@tier1`        |
-| `Tier2`    | `tests/tier2/<feature>/` | Cross-module integration, migrations, multi-step workflows    | `@tier2`        |
-| `Settings` | `tests/settings/`        | Cluster and user settings (runs in isolation)                 | `@cnv-settings` |
-| `API`      | `tests/api/`             | API contract tests via `RequestContextClient` (no browser UI) | `@api`          |
+| Project        | Tags (grep)     | Scope                                         |
+| -------------- | --------------- | --------------------------------------------- |
+| `Gating`       | `@gating`       | Smoke, navigation, resource creation          |
+| `Tier1`        | `@tier1`        | Single-resource CRUD lifecycle                |
+| `Tier2`        | `@tier2`        | Integration workflows (excludes `@migration`) |
+| `Settings`     | `@cnv-settings` | Cluster/user settings                         |
+| `Migrations`   | `@migration`    | VM compute/storage migrations                 |
+| `Tier1NonPriv` | `@tier1`        | Tier1 minus `@adminOnly` (non-priv session)   |
+| `Tier2NonPriv` | `@tier2`        | Tier2 minus `@adminOnly`                      |
+| `API`          | `@api`          | Browserless contract tests in `tests/api/`    |
 
 ### Running Tests
 
@@ -125,13 +128,14 @@ Use the runner scripts from the project root. They handle `.env` loading, URL de
 # Local dev console (localhost:9000)
 IS_LOCAL=1 ./playwright-runner-hc-e2e.sh Gating --workers=4 --headed
 
-# Non-HC runner (standard auth, no SA-token flow)
-./playwright-runner.sh Gating --workers=4
+# Downstream runner (kubeadmin OAuth; CI_DEBUG quarantine on by default)
+./playwright-runner.sh gating --workers=4
+./playwright-runner.sh migrations --workers=2
 
 # ── Direct npx (useful for single files/tests) ───────────────────────────
 
 # Specific spec file
-npx playwright test playwright/tests/tier1/bootable-volumes/bootable-volumes.spec.ts --workers=1
+./scripts/run-playwright.sh playwright/tests/bootable-volumes/bootable-volumes.spec.ts --workers=1
 
 # Specific test by name
 npx playwright test -g "creates a bootable volume" --workers=1
@@ -175,11 +179,14 @@ RequestContextClient (clients/request-context-client.ts) → console proxy → K
 ```text
 playwright/
 ├── tests/
-│   ├── gating/                    # Gating specs (gating-fixture)
-│   ├── tier1/<feature>/           # Tier 1 specs (per-feature fixtures)
-│   ├── tier2/<feature>/           # Tier 2 specs (per-feature fixtures)
-│   ├── settings/                  # Settings specs (settings-fixture)
-│   └── api/                       # API contract specs (api-test-fixture)
+│   ├── virtual-machines/          # list/, detail/, creation/, migrations/
+│   ├── vm-wizard/                 # Creation wizard
+│   ├── vm-templates/              # Templates
+│   ├── bootable-volumes/          # Bootable volumes
+│   ├── virtualization-landing/    # Landing / overview smoke
+│   ├── virtualization-settings/ # @cnv-settings
+│   ├── checkups/, instance-types/, migration-policies/
+│   └── api/                       # API contract specs
 ├── src/
 │   ├── components/                # UI components (extend BaseComponent)
 │   │   ├── shared/                # Base classes (base-component, navigation)

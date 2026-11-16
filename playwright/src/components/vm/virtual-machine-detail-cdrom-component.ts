@@ -163,41 +163,38 @@ export default class VirtualMachineDetailCdromComponent extends BaseComponent {
 
   /**
    * Returns a column value from the VMI Disks tab table.
-   * VMI tables use data-test (not data-test) selectors.
+   * Column order matches disksTableDefinition: name, source, size, drive, interface.
    */
   async getVmiDiskColumnValue(
     diskName: string,
     column: 'drive' | 'interface' | 'name' | 'source' | 'size',
   ): Promise<string | null> {
+    const table = this.locator(
+      '[data-test="vmi-disks-table"], [aria-label="Disks table"]',
+    ).first();
     try {
-      const cell = this.testId(`disk-${column}-${diskName}`).first();
-      const visible = await cell
-        .isVisible({ timeout: TestTimeouts.UI_DELAY_MEDIUM })
-        .catch(() => false);
-      if (visible) {
-        return (await cell.textContent())?.trim() || null;
-      }
+      const cell = table.getByTestId(`disk-${column}-${diskName}`).first();
+      await cell.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
+      return (await cell.textContent())?.trim() || null;
+    } catch {
+      // Fallback for builds without data-test cells — indices match disksTableDefinition.
       const columnIndex: Record<string, number> = {
         name: 1,
         source: 2,
-        drive: 3,
-        size: 4,
+        size: 3,
+        drive: 4,
         interface: 5,
       };
       const idx = columnIndex[column];
-      if (idx) {
-        const row = this.locator('tr').filter({ hasText: diskName }).first();
+      if (!idx) return null;
+      try {
+        const row = table.locator('tr').filter({ hasText: diskName }).first();
         const td = row.locator(`td:nth-child(${idx})`).first();
-        const tdVisible = await td
-          .isVisible({ timeout: TestTimeouts.UI_DELAY_MEDIUM })
-          .catch(() => false);
-        if (tdVisible) {
-          return (await td.textContent())?.trim() || null;
-        }
+        await td.waitFor({ state: 'visible', timeout: TestTimeouts.UI_DELAY_MEDIUM });
+        return (await td.textContent())?.trim() || null;
+      } catch {
+        return null;
       }
-      return null;
-    } catch {
-      return null;
     }
   }
 
@@ -266,8 +263,13 @@ export default class VirtualMachineDetailCdromComponent extends BaseComponent {
 
   async navigateToVmiDisksTab(vmName: string, namespace: string): Promise<void> {
     await this.goTo(`/k8s/ns/${namespace}/kubevirt.io~v1~VirtualMachineInstance/${vmName}/disks`);
-    await this.locator('[aria-label="Disks table"]')
+    const table = this.locator(
+      '[data-test="vmi-disks-table"], [aria-label="Disks table"]',
+    ).first();
+    await table.waitFor({ state: 'visible', timeout: TestTimeouts.DEFAULT });
+    // Table shell can render before PVC-backed rows; wait for a disk name cell.
+    await this.locator('[data-test^="disk-name-"]')
       .first()
-      .waitFor({ state: 'visible', timeout: TestTimeouts.DEFAULT });
+      .waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
   }
 }

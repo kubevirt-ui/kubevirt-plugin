@@ -462,8 +462,8 @@ export default class VmCreationWizardComponent extends BaseComponent {
     return this.bootSource.selectBootVolumeByName(volumeName);
   }
 
-  async selectCloneSourceVm(vmName: string): Promise<void> {
-    return this.clone.selectCloneSourceVm(vmName);
+  async selectCloneSourceVm(vmName: string, namespace?: string): Promise<void> {
+    return this.clone.selectCloneSourceVm(vmName, namespace);
   }
 
   async selectComputeSize(sizeName: string): Promise<void> {

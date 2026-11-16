@@ -5,10 +5,14 @@ import BaseComponent from './base-component';
 
 export default class ModalComponent extends BaseComponent {
   private readonly _modalTitle = this.locator('.pf-v5-c-modal-box__title, .pf-c-modal-box__title');
-  private readonly _welcomeModal = this.locator('#guided-tour-modal');
-  private readonly _welcomeModalCloseButton = this.locator(
-    '[id="guided-tour-modal"] button[aria-label="Close"]',
-  );
+  private readonly _welcomeModal = this.page
+    .locator('#guided-tour-modal')
+    .or(this.page.getByRole('dialog', { name: /Welcome(?:\s+modal|\s+to\s+OpenShift)?/i }))
+    .first();
+  private readonly _welcomeModalCloseButton = this._welcomeModal
+    .locator('button[aria-label="Close"]')
+    .or(this._welcomeModal.getByRole('button', { name: /^Close$/i }))
+    .first();
   readonly _confirmActionButton = this.testId('save-button');
 
   constructor(page: Page) {
@@ -17,7 +21,11 @@ export default class ModalComponent extends BaseComponent {
 
   private async _tryCloseGenericBackdropModal(): Promise<boolean> {
     try {
-      await this.page.waitForLoadState('networkidle').catch(() => undefined);
+      // Never wait for networkidle here — console pages keep websockets open and
+      // an unbounded wait burns the full navigation/test budget (3–8 minutes).
+      await this.page
+        .waitForLoadState('domcontentloaded', { timeout: TestTimeouts.UI_DELAY_MEDIUM })
+        .catch(() => undefined);
       const backdrop = this.page.locator('.pf-v5-c-backdrop, .pf-v6-c-backdrop');
       await backdrop.waitFor({ state: 'visible', timeout: TestTimeouts.UI_DELAY_MEDIUM });
 

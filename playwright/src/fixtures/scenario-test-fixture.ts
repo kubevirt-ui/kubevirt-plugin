@@ -3,6 +3,7 @@ import RequestContextClient from '@/clients/request-context-client';
 import ScenarioContextManager from '@/context-managers/scenario-context-manager';
 import { detectAuthExpired, healBrowserAuth } from '@/utils/auth-healer';
 import { waitForClusterResources, waitForNamespaceReady } from '@/utils/cluster-resource-checker';
+import { dismissConsoleObstructions } from '@/utils/console-modals';
 import { EnvVariables } from '@/utils/env-variables';
 import { FileUtils } from '@/utils/file-utils';
 import { getStorageStatePath } from '@/utils/storage-state';
@@ -19,7 +20,6 @@ import { getTestUtils } from './test-utils';
 
 type TimeoutAwareTestInfo = TestInfo & {
   _actionTimeouts?: Array<{ method: string; message: string }>;
-  _diagnosisHandled?: boolean;
 };
 
 type MutableTestInfo = TestInfo & {
@@ -82,8 +82,15 @@ const _test = base.extend<TestFixtures, WorkerFixtures>({
       } catch {
         await Promise.resolve();
       }
-      // Skip @adminOnly tests automatically when running as non-priv user
-      if (EnvVariables.isNonPrivUser && testInfo.tags.includes('@adminOnly')) {
+      // Skip admin-only suites when running as non-priv (tags match Cypress adminOnlyIT).
+      const adminOnlyTags = [
+        '@adminOnly',
+        '@admin-only',
+        '@tier1-virt-pages-admin',
+        '@tier2-virt-pages-admin',
+        '@virt-pages-admin',
+      ];
+      if (EnvVariables.isNonPrivUser && testInfo.tags.some((tag) => adminOnlyTags.includes(tag))) {
         testInfo.annotations.push({
           type: 'skip',
           description: 'Skipped: requires admin — not applicable for non-priv run (NON_PRIV=1)',
@@ -149,38 +156,8 @@ const _test = base.extend<TestFixtures, WorkerFixtures>({
             }
           }
 
-          // Dismiss Core platform "Welcome to OpenShift" guided tour modal.
-          const tourSkipBtn = page.getByTestId('tour-step-footer-secondary');
-          const hasTour = await tourSkipBtn
-            .isVisible({ timeout: TestTimeouts.RETRY_DELAY })
-            .catch(() => false);
-          if (hasTour) {
-            await tourSkipBtn.click({ force: true }).catch(() => undefined);
-            await page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
-          }
-
-          // Dismiss onboarding popover ("We've maximized your workspace") if present.
-          const onboardingDismiss = page.locator('[data-test="onboarding-dismiss-btn"]');
-          if (
-            await onboardingDismiss
-              .isVisible({ timeout: TestTimeouts.RETRY_DELAY })
-              .catch(() => false)
-          ) {
-            await onboardingDismiss.click({ force: true }).catch(() => undefined);
-            await page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
-          }
-
-          // Dismiss Virtualization welcome modal.
-          const welcomeCheckbox = page.locator('#welcome-modal-checkbox');
-          const hasWelcome = await welcomeCheckbox
-            .isVisible({ timeout: TestTimeouts.RETRY_DELAY })
-            .catch(() => false);
-          if (hasWelcome) {
-            await welcomeCheckbox.check({ force: true }).catch(() => undefined);
-            const closeBtn = page.locator('.pf-v6-c-modal-box__close button');
-            await closeBtn.click({ force: true }).catch(() => undefined);
-            await page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
-          }
+          // Dismiss guided tour / Virtualization welcome / onboarding overlays.
+          await dismissConsoleObstructions(page);
 
           // Wait for any modal backdrop to clear before interacting with the page.
           await page
@@ -205,25 +182,28 @@ const _test = base.extend<TestFixtures, WorkerFixtures>({
           ]).catch(() => 'none' as const);
 
           if (navType === 'perspective') {
-            const perspectiveUrlPattern = /virtualization/;
-            const inTargetPerspective = perspectiveUrlPattern.test(page.url());
+            const toggle = page
+              .getByTestId('perspective-switcher-toggle')
+              .or(page.locator('[data-test-id="perspective-switcher-toggle"]'));
+            const toggleLabel = ((await toggle.textContent().catch(() => '')) ?? '').trim();
+            const alreadyOnVirtNav =
+              /virtualization|administrator|core platform/i.test(toggleLabel) ||
+              /virtualization/.test(page.url());
 
-            if (!inTargetPerspective) {
+            if (!alreadyOnVirtNav) {
               const perspectiveOption = page
                 .getByTestId('perspective-switcher-menu-option')
                 .or(page.locator('[data-test-id="perspective-switcher-menu-option"]'))
                 .filter({
                   has: page.locator('.pf-v6-c-menu__item-text', {
-                    hasText: /^Virtualization$/,
+                    hasText: /^(Virtualization|Administrator|Core platform)$/i,
                   }),
-                });
+                })
+                .first();
 
               const selectionAttempts = 3;
               for (let selAttempt = 1; selAttempt <= selectionAttempts; selAttempt++) {
                 try {
-                  const toggle = page
-                    .getByTestId('perspective-switcher-toggle')
-                    .or(page.locator('[data-test-id="perspective-switcher-toggle"]'));
                   await toggle.waitFor({ state: 'visible', timeout: TestTimeouts.DEFAULT });
                   await toggle.click();
                   await perspectiveOption.waitFor({
@@ -233,15 +213,14 @@ const _test = base.extend<TestFixtures, WorkerFixtures>({
                   await perspectiveOption.scrollIntoViewIfNeeded();
                   await page.waitForTimeout(TestTimeouts.UI_DELAY_MICRO);
                   await perspectiveOption.click();
-
-                  await page.waitForURL(perspectiveUrlPattern, {
-                    timeout: TestTimeouts.UI_DELAY_LONG,
-                  });
                   await page.waitForLoadState('load');
                   break;
                 } catch {
-                  if (selAttempt === selectionAttempts)
-                    throw new Error('Perspective selection did not navigate to target URL');
+                  if (selAttempt === selectionAttempts) {
+                    // Admin/Core/Virtualization may already be active without a matching menu entry.
+                    await page.keyboard.press('Escape').catch(() => undefined);
+                    break;
+                  }
                   await page.keyboard.press('Escape').catch(() => undefined);
                   await page.waitForTimeout(TestTimeouts.POLLING_INTERVAL);
                 }

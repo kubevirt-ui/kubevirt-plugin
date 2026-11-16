@@ -128,13 +128,17 @@ export default class VmConfigurationComponent extends PageCommons {
     }
 
     if (vmData.headless !== undefined) {
-      await this._headlessCheckbox.waitFor({ state: 'visible', timeout: TestTimeouts.VM_CREATION });
-      if (vmData.headless) {
-        await this._headlessCheckbox.check({ force: true });
-      } else {
-        await this._headlessCheckbox.uncheck({ force: true });
+      // PF Switch: clicking the toggle is more reliable than input.check() (playwright-cli).
+      await this._headlessCheckbox.waitFor({ state: 'attached', timeout: TestTimeouts.VM_CREATION });
+      const switchRoot = this._headlessCheckbox.locator(
+        'xpath=ancestor::*[contains(@class,"pf-v6-c-switch")][1]',
+      );
+      const toggle = switchRoot.locator('.pf-v6-c-switch__toggle').or(this._headlessCheckbox);
+      const currentlyChecked = await this._headlessCheckbox.isChecked().catch(() => false);
+      if (currentlyChecked !== vmData.headless) {
+        await toggle.click({ force: true });
+        await this.page.waitForTimeout(TestTimeouts.UI_DELAY_EXTRA);
       }
-      await this.page.waitForTimeout(TestTimeouts.UI_DELAY_EXTRA);
     }
 
     if (vmData.startInPause !== undefined) {
@@ -364,20 +368,28 @@ export default class VmConfigurationComponent extends PageCommons {
     try {
       await this.navigateToConfigurationTab();
 
-      await this._configurationSearchAutocompleteSearchInput.waitFor({
+      const searchInput = this._configurationSearchAutocompleteSearchInput.or(
+        this.page.getByPlaceholder(/Find settings/i),
+      );
+      await searchInput.first().waitFor({
         state: 'visible',
-        timeout: TestTimeouts.VM_CREATION,
+        timeout: TestTimeouts.ELEMENT_WAIT,
       });
-      await this._configurationSearchAutocompleteSearchInput.fill(searchTerm);
+      await searchInput.first().fill(searchTerm);
       await this.page.waitForTimeout(TestTimeouts.UI_DELAY_MEDIUM);
 
+      let found = true;
       if (expectedResult) {
         const menuItems = this.locator(`[role="menuitem"]:has-text("${expectedResult}")`);
-        const count = await menuItems.count();
-        return count >= 1;
+        found = (await menuItems.count()) >= 1;
       }
 
-      return true;
+      // Dismiss autocomplete + clear so later Scheduling/Details clicks aren't blocked.
+      await this.page.keyboard.press('Escape').catch(() => undefined);
+      await searchInput.first().fill('').catch(() => undefined);
+      await this.page.keyboard.press('Escape').catch(() => undefined);
+
+      return found;
     } catch {
       return false;
     }

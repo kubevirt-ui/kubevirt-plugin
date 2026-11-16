@@ -1,8 +1,11 @@
 import BaseComponent from '@/components/shared/base-component';
+import FilterToolbarComponent from '@/components/shared/filter-toolbar-component';
+import { pollUntil } from '@/utils/poll-until';
 import { TestTimeouts } from '@/utils/test-config';
-import type { Page } from '@playwright/test';
+import type { Locator, Page } from '@playwright/test';
 
 export default class VmWizardNavigationComponent extends BaseComponent {
+  private readonly catalogFilterToolbar: FilterToolbarComponent;
   private readonly _buttonEditVMCreationLocation = this.locator(
     'button[aria-label="Edit VM creation location"]',
   );
@@ -39,6 +42,7 @@ export default class VmWizardNavigationComponent extends BaseComponent {
   private readonly _wizardContainer = this.locator('.pf-v6-c-wizard.vm-creation-wizard');
   constructor(page: Page) {
     super(page);
+    this.catalogFilterToolbar = new FilterToolbarComponent(page);
   }
 
   private get _osTypeDropdown() {
@@ -222,6 +226,68 @@ export default class VmWizardNavigationComponent extends BaseComponent {
     await this.page.waitForTimeout(500);
   }
 
+  /** Template catalog OS / workload facet checkbox (e.g. `osName-RHEL`, `workload-Server`). */
+  async filterTemplateCatalogByOsCheckbox(testId: string, checked: boolean): Promise<void> {
+    await this.openTemplateCatalogFilterToolbar();
+    await this.catalogFilterToolbar.setCatalogCheckboxFilter(testId, checked);
+  }
+
+  async openTemplateCatalogFilterToolbar(): Promise<void> {
+    const osGroup = this._pfV6CWizardMain
+      .getByText(/^Operating system$/i)
+      .or(this.page.locator('[data-test-id="filter-category-osName"], [data-test="filter-osName"]'))
+      .first();
+    await this.catalogFilterToolbar.openCatalogFilterPanelIfClosed(osGroup);
+  }
+
+  /**
+   * True when the wizard Template catalog filter panel exposes an Architecture group
+   * with at least one checkbox (s390x / multi-arch clusters and s390x mock mode).
+   */
+  async verifyArchitectureFilterExists(): Promise<boolean> {
+    await this.openTemplateCatalogFilterToolbar();
+    const archGroup = this._pfV6CWizardMain
+      .locator('[data-test-id="filter-category-Architecture"]')
+      .or(this.page.locator('[data-test-id="filter-category-Architecture"]'))
+      .first();
+    if (!(await archGroup.isVisible().catch(() => false))) {
+      return false;
+    }
+    const checkboxes = archGroup.locator(
+      'input[type="checkbox"], [data-test-id^="architecture-"]',
+    );
+    return (await checkboxes.count()) > 0;
+  }
+
+  /** Open /vm-wizard Create from Template → Templates catalog for a namespace. */
+  async openWizardTemplateCatalogInNamespace(namespace: string): Promise<void> {
+    await this.page.goto(`/k8s/ns/${namespace}/kubevirt.io~v1~VirtualMachine?tab=vms`, {
+      waitUntil: 'domcontentloaded',
+    });
+    await this.openWizardFromCreateDropdown();
+    await this.selectLocationProject(namespace);
+    await this.openFromTemplateCatalogStep();
+  }
+
+  templateCatalogTileMatching(text: RegExp | string): Locator {
+    return this._pfV6CWizardTemplatesCatalogTile.filter({ hasText: text }).first();
+  }
+
+  templateCatalogTiles(): Locator {
+    return this._pfV6CWizardTemplatesCatalogTile;
+  }
+
+  /** Navigate Deployment details → From Template → Templates catalog step. */
+  async openFromTemplateCatalogStep(): Promise<void> {
+    await this.selectCreationMethod('fromTemplate');
+    await this.generateVmName();
+    await this.selectCreationMethod('fromTemplate');
+    await this.clickNext();
+    if (!(await this.verifyTemplateCatalogStepVisible())) {
+      throw new Error('Template catalog step should be visible after Create from Template → Next');
+    }
+  }
+
   /** Click the dice icon to auto-generate a unique VM name (required on 4.99+ before Next). */
   async generateVmName(): Promise<void> {
     await this._generateVmNameButton.first().waitFor({
@@ -362,6 +428,50 @@ export default class VmWizardNavigationComponent extends BaseComponent {
     await this.page.waitForTimeout(500);
   }
 
+  /** Deployment details → Location: select the target project for the new VM. */
+  async selectLocationProject(projectName: string): Promise<void> {
+    const locationDisplay = this.locator('.vm-creation-location-display').first();
+    if (((await locationDisplay.textContent().catch(() => '')) || '').includes(projectName)) {
+      return;
+    }
+    const editLocation = this.page
+      .getByTestId('vm-creation-location-edit-btn')
+      .or(this._buttonEditVMCreationLocation)
+      .first();
+    const nsToggle = this.locator('.pf-v6-c-wizard, .vm-creation-location-form')
+      .getByTestId('namespace-dropdown-menu-toggle')
+      .first();
+    for (let attempt = 0; attempt < 5; attempt++) {
+      if (await nsToggle.isVisible().catch(() => false)) {
+        break;
+      }
+      if (await editLocation.isVisible().catch(() => false)) {
+        await editLocation.click({ force: true }).catch(() => undefined);
+      }
+      await this.page.waitForTimeout(300);
+    }
+    await nsToggle.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
+    if (((await nsToggle.textContent()) || '').includes(projectName)) {
+      return;
+    }
+    await nsToggle.click({ force: true });
+    const search = this.page
+      .getByPlaceholder(/Select project/i)
+      .or(this.page.locator('[data-test="namespace-dropdown-filter"] input, .co-namespace-dropdown input'))
+      .first();
+    if (await search.isVisible().catch(() => false)) {
+      await search.fill(projectName);
+    }
+    const escaped = projectName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const option = this.page
+      .getByRole('menuitem', { name: new RegExp(escaped) })
+      .or(this.page.getByRole('option', { name: new RegExp(escaped) }))
+      .filter({ hasNotText: /All projects/i })
+      .first();
+    await option.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
+    await option.click({ force: true });
+  }
+
   async openWizardFromCreateDropdown(): Promise<void> {
     await this.collapseSidebarIfExpanded();
     const welcomeModal = this.page
@@ -434,12 +544,35 @@ export default class VmWizardNavigationComponent extends BaseComponent {
     await this.page.waitForTimeout(1000);
   }
 
-  async selectCloneSourceVm(vmName: string): Promise<void> {
+  /**
+   * Select a clone source VM. Pass `namespace` — Source step defaults Project to "default",
+   * so name-only search finds nothing when the VM lives in the test project.
+   */
+  async selectCloneSourceVm(vmName: string, namespace?: string): Promise<void> {
+    if (namespace) {
+      await this.setCloneSourceProjectFilter(namespace);
+    }
+    await this.searchCloneSourceByName(vmName);
+
     const row = this.locator('.pf-v6-c-wizard tr, .pf-v6-c-wizard [role="row"]').filter({
       hasText: vmName,
     });
-    await row.first().waitFor({ state: 'visible', timeout: TestTimeouts.VM_OPERATION });
-    await this.robustClick(row.first());
+    await row.first().waitFor({ state: 'visible', timeout: TestTimeouts.LONG_OPERATION });
+
+    await pollUntil(
+      async () => {
+        if (!(await this.isNextButtonDisabled())) {
+          return true;
+        }
+        await this.robustClick(row.first()).catch(() => undefined);
+        await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
+        return !(await this.isNextButtonDisabled());
+      },
+      {
+        message: `Clone source VM ${vmName} should be selected (Next enabled)`,
+        timeout: TestTimeouts.LONG_OPERATION,
+      },
+    );
   }
 
   async selectCreationMethod(method: 'newVm' | 'fromTemplate' | 'cloneVm'): Promise<void> {
@@ -517,21 +650,27 @@ export default class VmWizardNavigationComponent extends BaseComponent {
 
   async setCloneSourceProjectFilter(namespace: string): Promise<void> {
     await this.clearCloneSourceFilters();
-    await this.page.waitForTimeout(1000);
+    await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
 
     const projectBtn = this.locator(
       '.pf-v6-c-wizard [data-ouia-component-type="PF6/MenuToggle"]',
-    ).filter({ hasText: 'Project' });
+    ).filter({ hasText: /Project/i });
+    if (!(await projectBtn.first().isVisible().catch(() => false))) {
+      return;
+    }
+    // Already filtered to the target project — avoid clearing a good selection.
+    const label = ((await projectBtn.first().textContent()) ?? '').trim();
+    if (new RegExp(`Project:\\s*${namespace}\\b`, 'i').test(label)) {
+      return;
+    }
+
     await this.robustClick(projectBtn.first());
-    await this.page.waitForTimeout(500);
-
-    const option = this.page.getByRole('menuitem', { name: namespace, exact: true });
-    await option.waitFor({ state: 'visible', timeout: TestTimeouts.SHORT_WAIT });
-    await option.click();
-    await this.page.waitForTimeout(2000);
-
-    await projectBtn.first().click();
-    await this.page.waitForTimeout(500);
+    const option = this.page
+      .getByRole('menuitem', { name: namespace, exact: true })
+      .or(this.page.locator('.pf-v6-c-menu__item-text', { hasText: namespace }));
+    await option.first().waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
+    await this.robustClick(option.first());
+    await this.page.waitForTimeout(2 * TestTimeouts.UI_DELAY_SHORT);
   }
 
   async toggleTemplateCatalogView(view: 'grid' | 'list'): Promise<void> {

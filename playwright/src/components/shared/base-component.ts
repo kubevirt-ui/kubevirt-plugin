@@ -5,6 +5,7 @@
  */
 
 import { getErrorMessage } from '@/data-models/kubernetes-types';
+import { dismissConsoleObstructions } from '@/utils/console-modals';
 import { TestTimeouts } from '@/utils/test-config';
 import { waitForCondition } from '@/utils/wait-helpers';
 import type { Locator, Page } from '@playwright/test';
@@ -219,6 +220,15 @@ export default class BaseComponent {
    */
   protected consoleTestId(id: string) {
     return this.page.getByTestId(id).or(this.page.locator(`[data-test-id="${id}"]`));
+  }
+
+  /** Current browser URL (for spec assertions without touching `page` in specs). */
+  currentUrl(): string {
+    return this.page.url();
+  }
+
+  async dismissConsoleObstructions(): Promise<void> {
+    await dismissConsoleObstructions(this.page);
   }
 
   /**

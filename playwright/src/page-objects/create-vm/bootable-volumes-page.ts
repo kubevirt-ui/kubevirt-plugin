@@ -224,6 +224,21 @@ export default class BootableVolumesPage extends PageCommons {
     return this.uploadToast.expectUploadingToastVisible(fileName, timeout);
   }
 
+  async waitForTerminalUploadState(
+    fileName?: string,
+    timeout?: number,
+  ): Promise<'success' | 'error' | 'aborted'> {
+    return this.uploadToast.waitForTerminalUploadState(fileName, timeout);
+  }
+
+  async getUploadErrorToastText(fileName?: string): Promise<string> {
+    return this.uploadToast.getUploadErrorToastText(fileName);
+  }
+
+  async dismissUploadToasts(): Promise<void> {
+    return this.uploadToast.dismissUploadToasts();
+  }
+
   async expectErrorUploadToastVisible(fileName?: string, timeout?: number): Promise<void> {
     return this.uploadToast.expectErrorToastVisible(fileName, timeout);
   }

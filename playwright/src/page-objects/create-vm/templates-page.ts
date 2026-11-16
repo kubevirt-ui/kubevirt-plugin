@@ -2,6 +2,7 @@
  * Page object for the Templates list page.
  */
 
+import { pollUntil } from '@/utils/poll-until';
 import { TestTimeouts } from '@/utils/test-config';
 import type { Locator, Page } from '@playwright/test';
 
@@ -292,6 +293,7 @@ export default class TemplatesPage extends PageCommons {
   }
 
   async editCategoryFromDetails(category: string): Promise<void> {
+    const categoryLabel = category.trim().replace(/\s+/g, '-');
     const categoryValue = this.locator('[data-test="template-category"]');
     await categoryValue.waitFor({
       state: 'visible',
@@ -299,20 +301,59 @@ export default class TemplatesPage extends PageCommons {
     });
     await this.robustClick(categoryValue);
 
-    const modal = this.locator('[role="dialog"]');
-    await modal.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
-    const categorySelect = modal.locator('[data-test="template-category-select"]');
-    const categoryInput = categorySelect.locator('input[role="combobox"]');
-    await this.robustClick(categoryInput);
-    await categoryInput.fill(category);
-    const categoryOption = this.page.getByRole('option', { name: category, exact: true }).first();
-    await categoryOption.waitFor({
-      state: 'visible',
-      timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+    const modal = this.locator('[role="dialog"]').filter({
+      has: this.page.getByRole('heading', { name: /edit category/i }),
     });
-    await this.robustClick(categoryOption);
+    await modal.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+    // MenuToggle owns the combobox; Prefer toggle over the Select root (both share data-test).
+    const categoryInput = modal
+      .locator('[data-test="template-category-select"] input[role="combobox"]')
+      .first();
+    await categoryInput.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
 
-    const saveButton = modal.locator('button:has-text("Save")').last();
+    await pollUntil(
+      async () => {
+        await categoryInput.click({ force: true });
+        await categoryInput.fill('');
+        await categoryInput.pressSequentially(categoryLabel, { delay: 20 });
+        const byId = this.page.locator(`#select-typeahead-${categoryLabel}`);
+        const existingOption = this.page
+          .getByRole('option', { name: categoryLabel, exact: true })
+          .first();
+        const createOption = this.page
+          .getByRole('option', {
+            name: new RegExp(`Create category ['"]${categoryLabel}['"]`),
+          })
+          .first();
+        // Must commit via an option click — filter text alone can match while React state stays stale.
+        if (await byId.isVisible({ timeout: TestTimeouts.UI_DELAY_MEDIUM }).catch(() => false)) {
+          await byId.click({ force: true });
+        } else if (
+          await existingOption
+            .isVisible({ timeout: TestTimeouts.UI_DELAY_MEDIUM })
+            .catch(() => false)
+        ) {
+          await existingOption.click({ force: true });
+        } else if (await createOption.isVisible().catch(() => false)) {
+          await createOption.click({ force: true });
+        } else {
+          return false;
+        }
+        const listbox = this.page.locator('[role="listbox"]').filter({ visible: true }).first();
+        await listbox
+          .waitFor({ state: 'hidden', timeout: TestTimeouts.UI_DELAY_MEDIUM })
+          .catch(() => undefined);
+        await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
+        const value = ((await categoryInput.inputValue().catch(() => '')) || '').trim();
+        return value === categoryLabel;
+      },
+      {
+        message: `Edit category "${categoryLabel}" should be selected from typeahead`,
+        timeout: TestTimeouts.LONG_OPERATION,
+      },
+    );
+
+    const saveButton = modal.getByRole('button', { name: /^Save$/i }).last();
     await this.robustClick(saveButton);
     await modal.waitFor({ state: 'hidden', timeout: TestTimeouts.UI_ACTION_COMPLETE });
   }
@@ -468,7 +509,10 @@ export default class TemplatesPage extends PageCommons {
   }
 
   async filterTemplatesByName(templateName: string) {
-    const templateNameFilter = this.testId('item-filter').or(this.testId('name-filter-input'));
+    const templateNameFilter = this.testId('item-filter')
+      .or(this.testId('name-filter-input'))
+      .or(this.page.getByPlaceholder(/Search by name/i))
+      .first();
     await templateNameFilter.waitFor({
       state: 'visible',
       timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
@@ -523,8 +567,13 @@ export default class TemplatesPage extends PageCommons {
         state: 'visible',
         timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
       });
-      const text = await categoryValue.textContent();
-      return text?.includes(category) ?? false;
+      const text = (await categoryValue.textContent())?.trim() ?? '';
+      const normalized = (s: string) => s.toLowerCase().replace(/[\s_-]+/g, '');
+      return (
+        text.includes(category) ||
+        normalized(text) === normalized(category) ||
+        normalized(text).includes(normalized(category))
+      );
     } catch {
       return false;
     }
@@ -618,9 +667,11 @@ export default class TemplatesPage extends PageCommons {
   }
 
   async isTemplateVisible(templateMetadataName: string): Promise<boolean> {
-    const templateLocator = this.testId(templateMetadataName);
+    const byTestId = this.testId(templateMetadataName);
+    const byLink = this.page.getByRole('link', { name: templateMetadataName, exact: true });
+    const locator = byTestId.or(byLink).first();
     try {
-      await templateLocator.waitFor({ state: 'visible', timeout: TestTimeouts.UI_DELAY_MEDIUM });
+      await locator.waitFor({ state: 'visible', timeout: TestTimeouts.UI_DELAY_MEDIUM });
       return true;
     } catch {
       return false;
@@ -691,6 +742,12 @@ export default class TemplatesPage extends PageCommons {
       }
       await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
     }
+    // Sidebar can fail under Core platform / parallel load — direct URL is reliable.
+    await this.goTo('/k8s/all-namespaces/template.openshift.io~v1~Template');
+    await this.page
+      .getByRole('heading', { name: 'Templates', level: 1 })
+      .waitFor({ state: 'visible', timeout: TestTimeouts.DEFAULT })
+      .catch(() => undefined);
   }
 
   async openClusterFilter(): Promise<void> {
@@ -823,7 +880,15 @@ export default class TemplatesPage extends PageCommons {
       .replace(/vm\.kubevirt\.io\/template: example\b/, `vm.kubevirt.io/template: ${templateName}`);
 
     if (namespace) {
-      updated = updated.replace(/^(\s*namespace:\s+)\S+/m, `$1${namespace}`);
+      if (/^(\s*namespace:\s+)\S+/m.test(updated)) {
+        updated = updated.replace(/^(\s*namespace:\s+)\S+/m, `$1${namespace}`);
+      } else {
+        // Example YAML may omit namespace — inject under metadata for non-priv project create.
+        updated = updated.replace(
+          /(metadata:\s*\n(?:\s+[^\n]+\n)*?)(\s+name:\s+)/,
+          `$1  namespace: ${namespace}\n$2`,
+        );
+      }
     }
 
     await this.fillYamlEditor(updated);

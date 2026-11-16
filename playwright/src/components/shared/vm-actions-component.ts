@@ -4,21 +4,25 @@ import type { Page } from '@playwright/test';
 import BaseComponent from './base-component';
 
 export default class VmActionsComponent extends BaseComponent {
-  readonly _actionsDropdown = this.testId('actions-dropdown').locator('button');
+  // LazyActionMenu puts data-test on the MenuToggle itself (the button).
+  readonly _actionsDropdown = this.testId('actions-dropdown');
   readonly _vmActionClone = this.testId('vm-action-clone');
   readonly _vmActionDelete = this.testId('vm-action-delete');
   readonly _vmActionEditLabels = this.testId('vm-action-edit-labels');
   readonly _vmActionMigrateCompute = this.testId('vm-action-migrate-compute');
   readonly _vmActionMigrateStorage = this.testId('vm-action-migrate-storage');
-  readonly _vmActionMoveToFolder = this.testId('vm-action-move-to-folder');
+  readonly _vmActionMoveToFolder = this.page
+    .locator('[data-test="vm-action-move-to-folder"] [role="menuitem"]')
+    .or(this.page.getByRole('menuitem', { name: /Move to (group|folder)/i }));
   readonly _vmActionPause = this.testId('vm-action-pause');
   readonly _vmActionPauseButton = this.testId('vm-action-pause-button');
   readonly _vmActionReset = this.testId('vm-action-reset');
   readonly _vmActionRestart = this.testId('vm-action-restart');
   readonly _vmActionRestartButton = this.testId('vm-action-restart-button');
-  readonly _vmActionSaveAsTemplate = this.page.getByRole('menuitem', {
-    name: 'Save as template',
-  });
+  // PF6 MenuItem puts data-test on the <li role="none">; the clickable control is the menuitem.
+  readonly _vmActionSaveAsTemplate = this.page
+    .locator('[data-test="vm-action-save-as-template"] [role="menuitem"]')
+    .or(this.page.getByRole('menuitem', { name: /^Save as template$/i }));
   readonly _vmActionsDropdown = this.testId('actions-dropdown');
   readonly _vmActionSnapshot = this.testId('vm-action-snapshot');
   readonly _vmActionStart = this.testId('vm-action-start');
@@ -145,11 +149,29 @@ export default class VmActionsComponent extends BaseComponent {
   }
 
   async openVmActionsDropdown(): Promise<void> {
-    await this._vmActionsDropdown.waitFor({
+    // List kebab uses actions-dropdown; VM detail header uses actions-menu-button.
+    const toggle = this._actionsDropdown
+      .or(this.page.getByTestId('actions-menu-button'))
+      .or(this.page.getByRole('button', { name: /^Actions$/i }))
+      .first();
+    await toggle.waitFor({
       state: 'visible',
       timeout: TestTimeouts.UI_ACTION_COMPLETE,
     });
-    await this.robustClick(this._vmActionsDropdown);
+    // Hover/focus primes LazyActionMenu's action loader before the menu opens.
+    await toggle.hover().catch(() => undefined);
+    await toggle.focus().catch(() => undefined);
+    await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
+
+    const expanded = await toggle.getAttribute('aria-expanded').catch(() => null);
+    if (expanded !== 'true') {
+      await toggle.click({ timeout: TestTimeouts.ELEMENT_WAIT });
+    }
+    await this.page
+      .getByRole('menuitem')
+      .first()
+      .waitFor({ state: 'visible', timeout: TestTimeouts.UI_ACTION_COMPLETE })
+      .catch(() => undefined);
   }
 
   async performVmAction(
@@ -176,9 +198,15 @@ export default class VmActionsComponent extends BaseComponent {
       await this.hoverOverControlMenu();
     }
 
-    const actionLocator = this.getVmActionLocator(action);
-    await actionLocator.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ACTION_COMPLETE });
-    await this.robustClick(actionLocator);
+    const target = this.getVmActionLocator(action).first();
+    await target.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ACTION_COMPLETE });
+    // Portaled Actions items can close between wait and robustClick — prefer a direct click.
+    if (action === 'save-as-template' || action === 'move-to-folder') {
+      await target.scrollIntoViewIfNeeded().catch(() => undefined);
+      await target.click({ timeout: TestTimeouts.UI_DELAY_MEDIUM });
+    } else {
+      await this.robustClick(target);
+    }
 
     // Actions with confirmVMActions enabled show a confirmation modal.
     const actionsWithConfirmation = ['stop', 'restart', 'reset', 'pause'];

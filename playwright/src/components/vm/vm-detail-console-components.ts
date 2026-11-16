@@ -241,17 +241,17 @@ export class VirtualMachineDetailConsoleComponent extends BaseComponent {
    * @param timeout - Timeout to wait for the dialog (default: 3 seconds)
    * @returns true if dialog was dismissed, false if not visible
    */
-  async tryDismissVncTryLaterDialog(
-    timeout: number = TestTimeouts.UI_DELAY_LONG,
-  ): Promise<boolean> {
-    try {
-      const vncTryLaterButton = this.locator('button:has-text("Try later")');
-      await vncTryLaterButton.waitFor({ state: 'visible', timeout });
-      await this.robustClick(vncTryLaterButton);
-      return true;
-    } catch {
+  async tryDismissVncTryLaterDialog(timeout: number = 3_000): Promise<boolean> {
+    const vncTryLaterButton = this.locator('button:has-text("Try later")');
+    const visible = await vncTryLaterButton
+      .waitFor({ state: 'visible', timeout })
+      .then(() => true)
+      .catch(() => false);
+    if (!visible) {
       return false;
     }
+    await this.robustClick(vncTryLaterButton);
+    return true;
   }
 
   async verifyActiveUsers(present: boolean, timeout = 60000): Promise<boolean> {
@@ -609,14 +609,42 @@ export class VirtualMachineDetailDiagnosticsComponent extends BaseComponent {
    * Clicks a severity card to toggle its filter. Re-clicking deselects.
    */
   async clickSeverityCard(severity: 'critical' | 'warning' | 'healthy' | 'all'): Promise<void> {
+    const testId =
+      severity === 'all'
+        ? 'diagnostics-card-all'
+        : severity === 'warning'
+          ? 'diagnostics-card-warning'
+          : `diagnostics-card-${severity}`;
     const nameMap: Record<string, RegExp> = {
       critical: /Critical/,
       warning: /Warnings/,
       healthy: /Healthy/,
       all: /All statuses/,
     };
-    await this.page.getByRole('button', { name: nameMap[severity] }).click();
+    const card = this.page
+      .getByTestId(testId)
+      .or(this.page.getByRole('button', { name: nameMap[severity] }))
+      .first();
+    await card.click({ force: true });
     await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
+  }
+
+  /** Clears severity + search filters so the full conditions table is visible again. */
+  async clearDiagnosticsFilters(): Promise<void> {
+    const clearLink = this.page
+      .getByRole('button', { name: /Clear all filters/i })
+      .or(this.page.getByRole('link', { name: /Clear all filters/i }))
+      .first();
+    if (await clearLink.isVisible().catch(() => false)) {
+      await clearLink.click({ force: true });
+    } else {
+      await this.clickSeverityCard('all');
+    }
+    await this.clearDiagnosticsSearch();
+    await this.page
+      .getByRole('grid', { name: 'Status conditions' })
+      .waitFor({ state: 'visible', timeout: TestTimeouts.UI_ACTION_COMPLETE })
+      .catch(() => undefined);
   }
   async getCloudInitValues(): Promise<{ username: string; password: string } | null> {
     try {
@@ -655,6 +683,12 @@ export class VirtualMachineDetailDiagnosticsComponent extends BaseComponent {
     healthy: number;
     allStatuses: number;
   }> {
+    // Wait for the Diagnostics overview before reading — withSafeActions returns
+    // undefined on timeout, which previously crashed callers on `.critical`.
+    await this.page
+      .getByRole('button', { name: /Critical/ })
+      .waitFor({ state: 'visible', timeout: TestTimeouts.UI_ACTION_COMPLETE });
+
     const readCard = async (namePattern: RegExp): Promise<number> => {
       const card = this.page.getByRole('button', { name: namePattern });
       await card.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ACTION_COMPLETE });
@@ -719,9 +753,12 @@ export class VirtualMachineDetailDiagnosticsComponent extends BaseComponent {
    * Types into the diagnostics search box.
    */
   async searchDiagnostics(text: string): Promise<void> {
-    const searchBox = this.page.getByRole('textbox', {
-      name: 'Search diagnostics',
-    });
+    const searchBox = this.page
+      .getByRole('textbox', { name: /Search diagnostics/i })
+      .or(this.page.getByPlaceholder(/Search by reason, message/i))
+      .first();
+    await searchBox.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
+    await searchBox.fill('');
     await searchBox.fill(text);
     await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
   }

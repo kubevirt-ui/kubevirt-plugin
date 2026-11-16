@@ -739,9 +739,10 @@ export const SSH_KEY_PATHS = {
  * Byte-size constants for generated test files (see TestFileFactory)
  */
 export const TEST_FILE_SIZES = {
-  /** Default size for a non-empty ISO-like file, large enough to keep a CDI upload
-   * in progress long enough for abort/toast assertions. */
+  /** Default size for a non-empty ISO-like file (toast visibility). */
   DEFAULT_ISO_SIZE_BYTES: 5 * 1024 * 1024,
+  /** Larger ISO so abort-from-toast tests can click Cancel before completion. */
+  ABORT_ISO_SIZE_BYTES: 50 * 1024 * 1024,
   /** Chunk size used when writing a sized test file to disk. */
   ISO_WRITE_CHUNK_SIZE_BYTES: 64 * 1024,
 } as const;
