@@ -13,7 +13,10 @@ import {
 import { Flex } from '@patternfly/react-core';
 import { Table, TableVariant, Tbody, Td, Th, Thead, Tr } from '@patternfly/react-table';
 import { type ThSortType } from '@patternfly/react-table/dist/esm/components/Table/base/types';
-import { type InstanceTypeSelection } from '@virtualmachines/wizard/form/types';
+import {
+  type InstanceTypeSelection,
+  type UserInstanceTypeKind,
+} from '@virtualmachines/wizard/form/types';
 import { type InstanceTypes } from '@virtualmachines/wizard/utils/types';
 
 import { getInstanceTypeDescriptionValue } from '../utils/utils';
@@ -21,7 +24,11 @@ import { getInstanceTypeDescriptionValue } from '../utils/utils';
 type UserProvidedInstanceTypeTableProps = {
   columns: TableColumn<InstanceTypes[number]>[];
   getSortType: (columnIndex: number) => ThSortType;
-  onRowClick: (instanceTypeName: string, instanceTypeNamespace: string) => void;
+  onRowClick: (
+    instanceTypeName: string,
+    instanceTypeNamespace: string,
+    kind: UserInstanceTypeKind,
+  ) => void;
   selectedInstanceType: null | InstanceTypeSelection;
   sortedData: InstanceTypes;
 };
@@ -47,6 +54,9 @@ const UserProvidedInstanceTypeTable: FC<UserProvidedInstanceTypeTableProps> = ({
       {sortedData.map((instanceTypeItem) => {
         const instanceTypeName = getName(instanceTypeItem);
         const instanceTypeNamespace = getNamespace(instanceTypeItem);
+        const instanceTypeKind: UserInstanceTypeKind = instanceTypeNamespace
+          ? 'VirtualMachineInstancetype'
+          : 'VirtualMachineClusterInstancetype';
         const iconLabel = getLabel(instanceTypeItem, INSTANCETYPE_ICON_PF);
 
         return (
@@ -55,11 +65,14 @@ const UserProvidedInstanceTypeTable: FC<UserProvidedInstanceTypeTableProps> = ({
             isRowSelected={
               selectedInstanceType?.name === instanceTypeName &&
               selectedInstanceType?.type === 'user' &&
+              selectedInstanceType.kind === instanceTypeKind &&
               selectedInstanceType.namespace === (instanceTypeNamespace ?? '')
             }
             isSelectable
             key={`${instanceTypeName}-${instanceTypeNamespace ?? ''}`}
-            onRowClick={(): void => onRowClick(instanceTypeName ?? '', instanceTypeNamespace ?? '')}
+            onRowClick={(): void =>
+              onRowClick(instanceTypeName ?? '', instanceTypeNamespace ?? '', instanceTypeKind)
+            }
           >
             <Td data-test={instanceTypeName}>
               <Flex alignItems={{ default: 'alignItemsCenter' }} gap={{ default: 'gapSm' }}>

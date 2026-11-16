@@ -63,8 +63,8 @@ export const getSpecConfiguration = ({
     ...(instanceTypeName && {
       instancetype: {
         ...(selectedInstanceType?.type === 'user' &&
-          selectedInstanceType.namespace && {
-            kind: VirtualMachineInstancetypeModel.kind,
+          selectedInstanceType.kind === VirtualMachineInstancetypeModel.kind && {
+            kind: selectedInstanceType.kind,
           }),
         name: instanceTypeName,
       },

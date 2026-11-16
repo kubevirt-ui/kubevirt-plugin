@@ -7,6 +7,7 @@ import { type PaginationState } from '@kubevirt-utils/hooks/usePagination/utils/
 import { getName } from '@kubevirt-utils/resources/shared';
 import { isAllNamespaces, isEmpty } from '@kubevirt-utils/utils/utils';
 import { ActionList, ActionListItem, Pagination, SearchInput } from '@patternfly/react-core';
+import { type UserInstanceTypeKind } from '@virtualmachines/wizard/form/types';
 import { useVMWizardForm } from '@virtualmachines/wizard/form/VMWizardFormProvider';
 import { type InstanceTypes } from '@virtualmachines/wizard/utils/types';
 
@@ -64,10 +65,15 @@ const UserProvidedInstanceTypesList: FC<UserProvidedInstanceTypesListProps> = ({
     return <UserProvidedComputeResourcesEmptyState namespace={namespace} />;
   }
 
-  const handleRowClick = (instanceTypeName: string, instanceTypeNamespace: string): void => {
+  const handleRowClick = (
+    instanceTypeName: string,
+    instanceTypeNamespace: string,
+    kind: UserInstanceTypeKind,
+  ): void => {
     setValue(
       'instanceType.compute',
       {
+        kind,
         name: instanceTypeName,
         namespace: instanceTypeNamespace,
         type: 'user',
