@@ -13,7 +13,7 @@ import { getVMColumns, type VMCallbacks } from '@virtualmachines/list/virtualMac
 
 const useVirtualMachineListColumns = (
   columnManagementID: string,
-  namespace: string,
+  namespace: string | undefined,
   isAllClustersPage: boolean,
   canGetNode: boolean,
   hideActions = false,

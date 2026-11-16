@@ -22,7 +22,7 @@ import { getEmptyStateDescription } from './utils/getEmptyStateDescription';
 import './VirtualMachineEmptyState.scss';
 
 type VirtualMachineEmptyStateProps = {
-  namespace: string;
+  namespace?: string;
 };
 
 const VirtualMachineEmptyState: FC<VirtualMachineEmptyStateProps> = ({ namespace }) => {
@@ -31,7 +31,7 @@ const VirtualMachineEmptyState: FC<VirtualMachineEmptyStateProps> = ({ namespace
 
   const [canCreateVMInProject, loadingVM] = useAccessReview({
     group: VirtualMachineModel.apiGroup,
-    namespace: namespace || DEFAULT_NAMESPACE,
+    namespace: namespace ?? DEFAULT_NAMESPACE,
     resource: VirtualMachineModel.plural,
     verb: 'create',
   });

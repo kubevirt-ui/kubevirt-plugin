@@ -14,7 +14,7 @@ import { filterVMsByClusterAndNamespace } from './utils/utils';
 
 import './VirtualMachinesList.scss';
 
-type VirtualMachinesListProps = { allVMsLoaded?: boolean; cluster?: string; namespace: string };
+type VirtualMachinesListProps = { allVMsLoaded?: boolean; cluster?: string; namespace?: string };
 
 const VirtualMachinesList: FC<VirtualMachinesListProps> = ({
   allVMsLoaded,
@@ -24,10 +24,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({
   useSignals();
   useVMMetrics();
 
-  const { accessibleVMs, error, isSoftError, refresh, vms, vmsLoaded } = useVMDataSource(
-    namespace,
-    cluster,
-  );
+  const { error, isSoftError, refresh, vms, vmsLoaded } = useVMDataSource(namespace, cluster);
   const vmsToShow = useMemo(() => (runningTourSignal.value ? [tourGuideVM] : vms), [vms]);
 
   const allVMsInNamespace = useMemo(
@@ -43,7 +40,6 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({
       <ListPageBody>
         <div className="vm-listpagebody">
           <VirtualMachinesListBody
-            accessibleVMs={accessibleVMs}
             allVMsInNamespace={allVMsInNamespace}
             cluster={cluster}
             error={error}

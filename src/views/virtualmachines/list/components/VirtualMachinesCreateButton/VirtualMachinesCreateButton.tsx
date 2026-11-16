@@ -28,7 +28,7 @@ import {
 
 type VirtualMachinesCreateButtonProps = {
   buttonText?: string;
-  namespace: string;
+  namespace?: string;
   showDropdown?: boolean;
 };
 
@@ -48,7 +48,7 @@ const VirtualMachinesCreateButton: FC<VirtualMachinesCreateButtonProps> = ({
   // (users can switch project in the editor if they lack create access there).
   const yamlTargetNamespace = isAllProjectsScope
     ? DEFAULT_NAMESPACE
-    : namespace || DEFAULT_NAMESPACE;
+    : (namespace ?? DEFAULT_NAMESPACE);
 
   // ACM YAML route is /cluster/:cluster/ns/:ns/~new. Wait for a concrete cluster
   // (URL param or hub fallback) so we never navigate to all-clusters/.../~new.

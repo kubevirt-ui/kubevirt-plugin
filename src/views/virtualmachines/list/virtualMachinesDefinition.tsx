@@ -52,7 +52,7 @@ export {
 
 export const getVMColumns = (
   t: TFunction,
-  namespace: string,
+  namespace: string | undefined,
   isAllClustersPage: boolean,
   canGetNode: boolean,
   hideActions = false,

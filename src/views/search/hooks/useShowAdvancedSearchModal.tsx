@@ -1,6 +1,5 @@
 import { useCallback } from 'react';
 
-import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { logVMAdvancedSearchModalUsed } from '@kubevirt-utils/extensions/telemetry/dashboard';
 import { type OnSetFilters } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
@@ -11,15 +10,14 @@ import { type AdvancedSearchInputs } from '@search/utils/types';
 
 type UseShowAdvancedSearchModal = (
   onSetFilters: OnSetFilters,
-  vms: V1VirtualMachine[],
 ) => (prefillInputs?: AdvancedSearchInputs) => void;
 
-const useShowAdvancedSearchModal: UseShowAdvancedSearchModal = (onSetFilters, vms) => {
+const useShowAdvancedSearchModal: UseShowAdvancedSearchModal = (onSetFilters) => {
   const { createModal } = useModal();
 
   const showSearchModal = useCallback(
     (prefillInputs?: AdvancedSearchInputs) => {
-      createModal(({ isOpen, onClose }) => (
+      createModal?.(({ isOpen, onClose }) => (
         <AdvancedSearchModal
           isOpen={isOpen}
           onClose={onClose}
@@ -30,11 +28,10 @@ const useShowAdvancedSearchModal: UseShowAdvancedSearchModal = (onSetFilters, vm
             onClose();
           }}
           prefillInputs={prefillInputs}
-          vms={vms}
         />
       ));
     },
-    [createModal, onSetFilters, vms],
+    [createModal, onSetFilters],
   );
 
   return showSearchModal;

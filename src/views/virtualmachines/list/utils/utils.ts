@@ -8,7 +8,7 @@ import { type FleetAccessReviewResourceAttributes } from '@stolostron/multiclust
 
 export const filterVMsByClusterAndNamespace = (
   vms: V1VirtualMachine[],
-  namespace: string,
+  namespace?: string,
   cluster?: string,
 ): V1VirtualMachine[] =>
   (vms ?? []).filter((vm) => {

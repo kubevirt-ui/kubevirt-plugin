@@ -7,14 +7,11 @@ import { useAccessibleResources } from '@virtualmachines/search/hooks/useAccessi
 import useVMSearchQueries from '@virtualmachines/search/hooks/useVMSearchQueries';
 import useFleetVMInventory from '@virtualmachines/tree/hooks/useFleetVMInventory';
 import { isHardInventoryError } from '@virtualmachines/tree/utils/isHardInventoryError';
-import { vmsSignal } from '@virtualmachines/tree/utils/signals';
 import { OBJECTS_FETCHING_LIMIT } from '@virtualmachines/utils';
 
 import { VM_FILTER_OPTIONS } from '../utils/constants';
-import { filterVMsByClusterAndNamespace } from '../utils/utils';
 
 type VMDataSourceResult = {
-  accessibleVMs: V1VirtualMachine[];
   error?: Error;
   isSoftError: boolean;
   refresh?: () => void;
@@ -22,7 +19,7 @@ type VMDataSourceResult = {
   vmsLoaded: boolean;
 };
 
-export const useVMDataSource = (namespace: string, cluster?: string): VMDataSourceResult => {
+export const useVMDataSource = (namespace?: string, cluster?: string): VMDataSourceResult => {
   useSignals();
   const isACMPage = useIsACMPage();
   const searchQueries = useVMSearchQueries();
@@ -60,7 +57,6 @@ export const useVMDataSource = (namespace: string, cluster?: string): VMDataSour
     const isSoftError = Boolean(error && !isHardInventoryError(error));
 
     return {
-      accessibleVMs: filterVMsByClusterAndNamespace(vmsSignal.value, '', cluster),
       error,
       isSoftError,
       refresh,
@@ -74,7 +70,6 @@ export const useVMDataSource = (namespace: string, cluster?: string): VMDataSour
   const error = namespace ? namespacedLoadError : accessibleVMsError;
 
   return {
-    accessibleVMs,
     error,
     isSoftError: false,
     vms,
