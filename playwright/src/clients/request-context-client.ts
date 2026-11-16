@@ -521,8 +521,8 @@ export default class RequestContextClient extends BaseClient implements ProxyApi
     return this.vm.disableDeleteProtection(namespace, vmName);
   }
 
-  ensureNamespace(name: string) {
-    return this.project.ensureNamespace(name);
+  ensureNamespace(name: string, nonPriv?: boolean) {
+    return this.project.ensureNamespace(name, nonPriv);
   }
   async ensureVmFoldersEnabled(cnvNamespace = 'openshift-cnv'): Promise<void> {
     try {
@@ -533,6 +533,23 @@ export default class RequestContextClient extends BaseClient implements ProxyApi
         'kubevirt-ui-features',
         {
           data: { treeViewFolders: 'true' },
+        },
+        cnvNamespace,
+      );
+    } catch {
+      // ignore
+    }
+  }
+
+  async ensureVmTemplatesEnabled(cnvNamespace = 'openshift-cnv'): Promise<void> {
+    try {
+      await this.mergePatchResource(
+        '',
+        'v1',
+        'configmaps',
+        'kubevirt-ui-features',
+        {
+          data: { vmTemplates: 'true' },
         },
         cnvNamespace,
       );
@@ -1012,9 +1029,28 @@ export default class RequestContextClient extends BaseClient implements ProxyApi
       await this.patchConfigMap('kubevirt-ui-features', cnvNamespace, [
         { op: 'replace', path: '/data/advancedSearch', value: 'true' },
         { op: 'replace', path: '/data/treeViewFolders', value: 'true' },
+        // Preview: Save as template / native VM templates (CNV 4.22+)
+        { op: 'add', path: '/data/vmTemplates', value: 'true' },
       ]);
     } catch {
-      // ConfigMap may not exist yet
+      try {
+        await this.mergePatchResource(
+          '',
+          'v1',
+          'configmaps',
+          'kubevirt-ui-features',
+          {
+            data: {
+              advancedSearch: 'true',
+              treeViewFolders: 'true',
+              vmTemplates: 'true',
+            },
+          },
+          cnvNamespace,
+        );
+      } catch {
+        // ConfigMap may not exist yet
+      }
     }
   }
 
@@ -1089,9 +1125,12 @@ export default class RequestContextClient extends BaseClient implements ProxyApi
     while (Date.now() - start < timeoutMs) {
       try {
         const dv = await this.getDataVolume(namespace, name);
-        if ((dv?.status as Record<string, unknown>)?.phase === 'Succeeded') return true;
+        const phase = (dv?.status as Record<string, unknown> | undefined)?.phase;
+        if (phase === 'Succeeded') return true;
+        // Terminal failure — stop early so callers get a faster, clearer result.
+        if (phase === 'Failed') return false;
       } catch {
-        // not ready yet
+        // not ready yet / transient API error
       }
       await new Promise((r) => setTimeout(r, 3000));
     }
@@ -1101,7 +1140,7 @@ export default class RequestContextClient extends BaseClient implements ProxyApi
   async waitForDataVolumeGone(
     name: string,
     namespace: string,
-    timeoutMs = DATA_VOLUME_DELETION_POLLING.TIMEOUT_MS,
+    timeoutMs: number = DATA_VOLUME_DELETION_POLLING.TIMEOUT_MS,
   ): Promise<boolean> {
     const start = Date.now();
     while (Date.now() - start < timeoutMs) {

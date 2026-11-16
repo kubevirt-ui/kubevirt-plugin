@@ -1,110 +1,81 @@
-import * as fs from 'fs';
 import * as path from 'path';
 
 import { EnvVariables } from '@/utils/env-variables';
 import { logger } from '@/utils/logger';
-import type { FullConfig } from '@playwright/test';
+import { getStorageStatePath, storageStateExists } from '@/utils/storage-state';
 
-import type { SetupContext } from './rule-engine';
-import { getSetupRules, RuleEngine } from './rule-engine';
+import '../load-env';
 
-async function globalSetup(_config: FullConfig) {
-  if (process.env.SKIP_GLOBAL_SETUP === 'true') {
-    logger.info('⏭️ Skipping global setup (SKIP_GLOBAL_SETUP=true)');
-    logger.info(' Assuming setup was done by orchestration layer');
-    return;
-  }
+import { getSetupRules, RuleEngine, type SetupContext } from './rule-engine';
 
-  // Auto-detect architecture from cluster URL/name and set ARCH so all workers see it.
-  if (!process.env.ARCH && EnvVariables.isS390x) {
-    process.env.ARCH = 's390x';
-    logger.info('🔧 Auto-detected s390x architecture from cluster URL — set ARCH=s390x');
-  }
-
-  logger.info('🚀 Setting up test environment...');
-
+function resolveUseSharding(): { shardIndex?: string; useSharding: boolean } {
   const useSharding = EnvVariables.isSharded;
   const shardIndex = EnvVariables.shardIndex;
+  return { shardIndex, useSharding };
+}
 
+function createSetupContext(): SetupContext {
+  const projectRoot = path.resolve(__dirname, '..', '..');
+  const { shardIndex, useSharding } = resolveUseSharding();
   const testNamespace =
     useSharding && shardIndex
       ? `${EnvVariables.testNamespace}-${shardIndex}`
       : EnvVariables.testNamespace;
 
-  if (useSharding && shardIndex) {
-    logger.info(
-      `🔀 Sharding enabled: Using isolated namespace '${testNamespace}' (shard ${shardIndex}/${EnvVariables.shardTotal})`,
-    );
-  }
-
-  const projectRoot = path.resolve(__dirname, '..', '..');
-
-  const storageStateDir = path.resolve(projectRoot, '.storage-states');
-  let storageStateFileName: string;
-  if (useSharding && shardIndex) {
-    storageStateFileName = `shard-${shardIndex}-state.json`;
-  } else if (EnvVariables.isNonPrivUser) {
-    storageStateFileName = 'nonpriv-state.json';
-  } else {
-    storageStateFileName = 'test-state.json';
-  }
-  const storageStatePath = path.join(storageStateDir, storageStateFileName);
-
-  if (!fs.existsSync(storageStateDir)) {
-    fs.mkdirSync(storageStateDir, { recursive: true });
-    logger.info(`📁 Created directory: ${storageStateDir}`);
-  }
-
-  const ctx: SetupContext = {
-    storageStatePath,
-    testNamespace,
+  return {
     cnvNamespace: EnvVariables.cnvNamespace,
     projectRoot,
-    useSharding,
     shardIndex,
+    storageStatePath: getStorageStatePath(),
+    testNamespace,
+    useSharding,
   };
+}
+
+/**
+ * Global setup via rule engine (main-style / CNV-98979): AUTH → CLUSTER → BROWSER → REPORTING.
+ * Tests assume authenticated `page` from config `storageState`.
+ * Quiet by design — individual setup rules own their log lines.
+ */
+async function globalSetup(): Promise<void> {
+  if (process.env.SKIP_GLOBAL_SETUP === 'true') {
+    if (!storageStateExists()) {
+      throw new Error(
+        'SKIP_GLOBAL_SETUP=true but no storage state file found. Run once without SKIP_GLOBAL_SETUP or copy state into .storage-states/',
+      );
+    }
+    return;
+  }
+
+  // Auto-detect architecture from cluster URL/name so workers see ARCH=s390x.
+  if (!process.env.ARCH && EnvVariables.isS390x) {
+    process.env.ARCH = 's390x';
+    logger.info('Auto-detected s390x architecture from cluster URL — set ARCH=s390x');
+  }
+
+  const ctx = createSetupContext();
+
+  if (process.env.REUSE_STORAGE_STATE === '1' && storageStateExists()) {
+    logger.info(`♻️ Reusing existing storage state: ${ctx.storageStatePath}`);
+  }
+
+  if (EnvVariables.skipOcInvocations) {
+    logger.info('🏠 Browser-only setup: skipping oc login');
+    if (EnvVariables.isLocalMode && !storageStateExists()) {
+      logger.info(
+        '🏠 Local console: global setup will open the UI (auth disabled) and write storage state',
+      );
+    } else if (!EnvVariables.isLocalMode && !EnvVariables.isNonPrivUser) {
+      logger.info('Privileged setup: console login + /api/kubernetes only (no oc)');
+    } else if (EnvVariables.isNonPrivUser) {
+      logger.info(
+        'Non-priv setup: kubeadmin oc (IDP, RBAC, ConfigMaps) then console login as test user',
+      );
+    }
+  }
 
   const engine = new RuleEngine();
-  const rules = getSetupRules();
-
-  if (EnvVariables.skipBrowserSetup) {
-    logger.info(
-      '⏭️ SKIP_BROWSER_SETUP=1: browser-login and save-storage-state still run so API tests have session cookies.',
-    );
-  }
-
-  if (EnvVariables.diagnoseFailures) {
-    const hasApiKey = Boolean(process.env.CURSOR_API_KEY);
-    const model = process.env.DIAGNOSE_MODEL || 'claude-sonnet-4-6';
-    const mode = hasApiKey
-      ? `agent mode (model: ${model})`
-      : 'heuristic-only mode — no CURSOR_API_KEY set';
-    const autofix = EnvVariables.diagnoseAutofix
-      ? 'ON — agent may edit spec/page-object files on "pass" verdicts, or add visual-regression masks on "skip"/"fail" verdicts'
-      : 'off';
-    const timeoutOverride = EnvVariables.diagnoseAgentTimeoutOverrideMs;
-    const agentTimeout =
-      timeoutOverride !== null
-        ? `${timeoutOverride}ms (DIAGNOSE_AGENT_TIMEOUT_MS override)`
-        : "auto — matches each failing test's own configured timeout";
-    logger.info(
-      `🤖 AI-assisted failure diagnosis ENABLED — ${mode}, autofix: ${autofix}, agent timeout: ${agentTimeout}`,
-    );
-  } else {
-    logger.info('🤖 AI-assisted failure diagnosis: disabled (set DIAGNOSE_FAILURES=1 to enable)');
-  }
-
-  try {
-    await engine.runSetup(rules, ctx);
-
-    logger.success('Test environment setup complete');
-    logger.info(`   - Test Namespace: ${ctx.testNamespace}`);
-    logger.info(`   - CNV Namespace: ${ctx.cnvNamespace}`);
-    logger.info(`   - Auth Token: ${ctx.authToken ? 'Available ✓' : 'Not available'}`);
-  } catch (error: unknown) {
-    logger.error(`❌ Failed to setup test environment: ${error}`);
-    throw error;
-  }
+  await engine.runSetup(getSetupRules(), ctx);
 }
 
 export default globalSetup;

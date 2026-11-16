@@ -1,7 +1,15 @@
 import BaseComponent from '@/components/shared/base-component';
 import NavigationComponent from '@/components/shared/navigation-component';
 import { TestTimeouts } from '@/utils/test-config';
-import type { Page } from '@playwright/test';
+import { expect, type Page } from '@playwright/test';
+
+const KUBEVIRT_UI_FEATURES_RESOURCE = 'kubevirt-ui-features';
+
+const isSuccessResponse = (resp: { status: () => number }): boolean =>
+  resp.status() >= 200 && resp.status() < 300;
+
+const isPatchOrPutRequest = (resp: { request: () => { method: () => string } }) =>
+  resp.request().method() === 'PATCH' || resp.request().method() === 'PUT';
 
 export default class OverviewSettingsComponent extends BaseComponent {
   private readonly _advancedCDROMFeaturesBtn = this.locator(
@@ -10,6 +18,12 @@ export default class OverviewSettingsComponent extends BaseComponent {
 
   private readonly _advancedCdromFeaturesToggle = this.testId('advanced-cdrom-features');
   private readonly _ariaWelcomeModal = this.locator('[aria-label="Welcome modal"]');
+  private readonly _automaticGrantVirtualizationRoles = this.testId(
+    'automatic-grant-virtualization-roles',
+  );
+  private readonly _automaticGrantVirtualizationRolesSection = this.locator(
+    'button:has-text("Automatically grant Virtualization roles")',
+  );
   private readonly _automaticImagesDownloadBtn = this.locator(
     'button:has-text("Automatic images download")',
   );
@@ -22,10 +36,15 @@ export default class OverviewSettingsComponent extends BaseComponent {
   private readonly _centosStream9ImageCronSwitch = this.testId(
     'centos-stream9-image-cron-auto-image-download-switch',
   );
+  private readonly _controlDefaultVirtualizationPermissions = this.testId(
+    'controlDefaultVirtualizationPermissions',
+  );
   private readonly _divIdAutoUpdateRhelVmsInputpfV6CSwitchInput = this.locator(
     'div[id="auto-update-rhel-vms"] input.pf-v6-c-switch__input',
   );
-  private readonly _generalSettingsButton = this.locator('button:has-text("General settings")');
+  private readonly _generalSettingsButton = this.locator(
+    '[data-test="general-settings"] button, button:has-text("General settings")',
+  ).first();
   private readonly _guestManagementButton = this.locator('button:has-text("Guest management")');
   private readonly _guestSystemLog = this.testId('guest-system-log');
   private readonly _hideCredentials = this.testId('hide-credentials');
@@ -145,6 +164,31 @@ export default class OverviewSettingsComponent extends BaseComponent {
     }
   }
 
+  async disableControlDefaultVirtualizationPermissions(): Promise<boolean> {
+    try {
+      const toggle = this._controlDefaultVirtualizationPermissions;
+      await toggle.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
+
+      if (!(await toggle.isChecked())) {
+        return true;
+      }
+
+      const patchPromise = this.page.waitForResponse(
+        (resp) =>
+          resp.url().includes(KUBEVIRT_UI_FEATURES_RESOURCE) &&
+          isPatchOrPutRequest(resp) &&
+          isSuccessResponse(resp),
+        { timeout: TestTimeouts.DEFAULT },
+      );
+      await toggle.click({ force: true });
+      await patchPromise.catch(() => void 0);
+      await this.page.waitForTimeout(TestTimeouts.UI_DELAY_MEDIUM);
+      return !(await toggle.isChecked().catch(() => true));
+    } catch {
+      return false;
+    }
+  }
+
   async disableGuidedTour(): Promise<boolean> {
     try {
       const guidedTourSwitch = this.testId('guided-tour');
@@ -240,6 +284,33 @@ export default class OverviewSettingsComponent extends BaseComponent {
       if (!isEnabled) {
         await this._centosStream9ImageCronSwitch.click({ force: true });
       }
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  /** Assumes Preview features tab is already open. */
+  async enableControlDefaultVirtualizationPermissions(): Promise<boolean> {
+    try {
+      const toggle = this._controlDefaultVirtualizationPermissions;
+      await expect(toggle).toBeVisible({ timeout: TestTimeouts.ELEMENT_WAIT });
+
+      if (await toggle.isChecked()) {
+        return true;
+      }
+
+      const patchPromise = this.page.waitForResponse(
+        (resp) =>
+          resp.url().includes(KUBEVIRT_UI_FEATURES_RESOURCE) &&
+          isPatchOrPutRequest(resp) &&
+          isSuccessResponse(resp),
+        { timeout: TestTimeouts.DEFAULT },
+      );
+      await toggle.click({ force: true });
+      await patchPromise.catch(() => void 0);
+
+      await expect(toggle).toBeChecked({ timeout: TestTimeouts.DEFAULT });
       return true;
     } catch {
       return false;
@@ -607,6 +678,27 @@ export default class OverviewSettingsComponent extends BaseComponent {
     }
   }
 
+  /** Assumes Automatically grant section is open and the switch is enabled. */
+  async isAutomaticGrantVirtualizationRolesChecked(): Promise<boolean> {
+    try {
+      const toggle = this._automaticGrantVirtualizationRoles;
+      await toggle.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
+      return await toggle.isChecked();
+    } catch {
+      return false;
+    }
+  }
+
+  async isAutomaticGrantVirtualizationRolesEnabled(): Promise<boolean> {
+    try {
+      const toggle = this._automaticGrantVirtualizationRoles;
+      await toggle.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
+      return await toggle.isEnabled();
+    } catch {
+      return false;
+    }
+  }
+
   async isGuestSystemLogEnabled(): Promise<boolean> {
     try {
       await this._guestSystemLog.waitFor({
@@ -703,13 +795,28 @@ export default class OverviewSettingsComponent extends BaseComponent {
     }
   }
 
+  async navigateToClusterTab(): Promise<boolean> {
+    try {
+      const clusterTab = this.locator('[role="tab"]:has-text("Cluster")');
+      await clusterTab.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+      await this.robustClick(clusterTab);
+      await this.page.waitForLoadState('domcontentloaded');
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
   async navigateToGeneralSettings(): Promise<boolean> {
     try {
       await this._generalSettingsButton.waitFor({
         state: 'visible',
         timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
       });
-      await this.robustClick(this._generalSettingsButton);
+      // ExpandSection toggles on click — only click when collapsed.
+      if ((await this._generalSettingsButton.getAttribute('aria-expanded')) !== 'true') {
+        await this.robustClick(this._generalSettingsButton);
+      }
       await this.page
         .waitForLoadState('domcontentloaded', { timeout: TestTimeouts.RESOURCE_CREATION })
         .catch(() => {
@@ -811,6 +918,95 @@ export default class OverviewSettingsComponent extends BaseComponent {
       });
       await this.robustClick(this._advancedCDROMFeaturesBtn);
       return await this._advancedCdromFeaturesToggle.isVisible();
+    } catch {
+      return false;
+    }
+  }
+
+  /** Assumes Cluster tab is open. Expands General settings → Automatically grant section. */
+  async openAutomaticGrantVirtualizationRolesSection(): Promise<boolean> {
+    try {
+      await this.navigateToClusterTab();
+      await this.navigateToGeneralSettings();
+
+      const section = this._automaticGrantVirtualizationRolesSection;
+      await section.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+
+      // Nested ExpandSection unmounts children when collapsed. Prefer switch visibility
+      // over aria-expanded — a second toggle click would collapse the section.
+      const toggle = this._automaticGrantVirtualizationRoles;
+      if (!(await toggle.isVisible().catch(() => false))) {
+        await this.robustClick(section);
+      }
+
+      await toggle.waitFor({
+        state: 'visible',
+        timeout: TestTimeouts.ELEMENT_WAIT,
+      });
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * Ensures Automatically grant section is open and the switch is enabled.
+   * ON → AggregateToDefault; OFF → Manual.
+   */
+  async setAutomaticGrantVirtualizationRoles(enable: boolean): Promise<boolean> {
+    try {
+      for (let attempt = 0; attempt < 2; attempt += 1) {
+        const sectionOpen = await this.openAutomaticGrantVirtualizationRolesSection();
+        if (!sectionOpen) {
+          continue;
+        }
+
+        const toggle = this._automaticGrantVirtualizationRoles;
+        await toggle.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
+        // Wait out in-flight HCO patches (switch is disabled while isLoading).
+        await expect
+          .poll(async () => toggle.isEnabled(), {
+            intervals: [500],
+            timeout: TestTimeouts.DEFAULT,
+          })
+          .toBe(true);
+
+        if ((await toggle.isChecked()) === enable) {
+          return true;
+        }
+
+        await toggle.scrollIntoViewIfNeeded();
+
+        const patchPromise = this.page.waitForResponse(
+          (resp) =>
+            /hyperconverged/i.test(resp.url()) &&
+            isPatchOrPutRequest(resp) &&
+            isSuccessResponse(resp),
+          { timeout: TestTimeouts.DEFAULT },
+        );
+
+        // Native DOM click reliably fires PatternFly Switch onChange (Playwright click can miss it).
+        await toggle.evaluate((el: HTMLInputElement) => el.click());
+        await patchPromise.catch(() => null);
+
+        const deadline = Date.now() + TestTimeouts.DEFAULT;
+        while (Date.now() < deadline) {
+          if (!(await toggle.isVisible().catch(() => false))) {
+            await this.openAutomaticGrantVirtualizationRolesSection();
+          }
+          if (
+            (await toggle.isEnabled().catch(() => false)) &&
+            (await toggle.isChecked()) === enable
+          ) {
+            return true;
+          }
+          await this.page.waitForTimeout(500);
+        }
+
+        // HCO patch can remount Cluster tab with sections collapsed — retry once from a fresh nav.
+        await this.page.reload({ waitUntil: 'domcontentloaded' }).catch(() => undefined);
+      }
+      return false;
     } catch {
       return false;
     }

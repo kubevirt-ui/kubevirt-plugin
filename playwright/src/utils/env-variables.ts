@@ -78,61 +78,6 @@ export class EnvVariables {
   }
 
   /**
-   * Fallback agent timeout (ms) used only when no test context is available
-   * to read the failing test's own timeout from (should not normally happen —
-   * diagnosis is always triggered from within a running test).
-   */
-  static get diagnoseAgentFallbackTimeoutMs(): number {
-    return 180_000;
-  }
-
-  /**
-   * Explicit override (ms) for the diagnosis agent's own timeout, via
-   * DIAGNOSE_AGENT_TIMEOUT_MS. Returns null when unset — in that case the
-   * harness uses the *current test's own configured timeout* instead (see
-   * `resolveAgentTimeoutMs` in `diagnose-protocol.ts`), rather than a single
-   * flat constant.
-   *
-   * A flat constant (previously 90s, then 180s) routinely timed out when
-   * running through the real test harness: the agent's full workflow (CDP
-   * attach, several `playwright-cli` commands, `kubevirt-ui-mcp` tool calls,
-   * verdict write) takes longer under parallel-worker CPU/network contention,
-   * and that contention scales with the number of workers, not with any
-   * fixed constant. Reusing the failing test's own timeout budget (e.g. 5-10
-   * min for VM creation tests vs. the 8 min global default) scales the same
-   * way the test itself already does, so no separate constant needs tuning.
-   */
-  static get diagnoseAgentTimeoutOverrideMs(): number | null {
-    const value = process.env.DIAGNOSE_AGENT_TIMEOUT_MS;
-    if (value === undefined) return null;
-    const parsed = parseInt(value, 10);
-    return isNaN(parsed) ? null : Math.max(30_000, parsed);
-  }
-
-  /**
-   * When set alongside DIAGNOSE_FAILURES=1, the diagnosis agent is allowed
-   * to modify spec files to fix stale assertions, wrong selectors, or
-   * inverted expected values it identifies during diagnosis.
-   */
-  static get diagnoseAutofix(): boolean {
-    return process.env.DIAGNOSE_AUTOFIX === '1';
-  }
-
-  /**
-   * Enable the failure diagnosis harness (default: off).
-   * When DIAGNOSE_FAILURES=1, withSafeActions captures a screenshot on timeout
-   * On failure, spawns a Cursor SDK agent (requires CURSOR_API_KEY) that
-   * inspects the screenshot, ARIA snapshot, cluster health, and Jira context
-   * to produce a verdict (pass/skip/fail). Falls back to heuristic
-   * classification if the SDK is unavailable or the agent fails.
-   *
-   * Optional: DIAGNOSE_MODEL overrides the default model (claude-sonnet-4-6).
-   */
-  static get diagnoseFailures(): boolean {
-    return process.env.DIAGNOSE_FAILURES === '1';
-  }
-
-  /**
    * Skip welcome/tour modal handling in global setup when set (e.g. IGNORE_WELCOME=1).
    * Useful when the console already has modals dismissed or when running headless.
    */
@@ -168,6 +113,15 @@ export class EnvVariables {
       process.env.HC_E2E === 'true' ||
       process.env.HC_E2E === '1' ||
       !!process.env.KUBERNETES_SERVICE_HOST
+    );
+  }
+
+  /** Local plugin/console dev (`IS_LOCAL=1`) or tests targeting localhost:9000. */
+  static get isLocalMode(): boolean {
+    return (
+      process.env.IS_LOCAL === '1' ||
+      process.env.IS_LOCAL?.toLowerCase() === 'true' ||
+      EnvVariables.isLocalhost
     );
   }
 
@@ -339,6 +293,41 @@ export class EnvVariables {
     );
   }
 
+  /**
+   * release-4.14 and older: `templatescatalog` routes.
+   * Opt in with `PLAYWRIGHT_LEGACY_CATALOG=1`, or auto when `PLAYWRIGHT_CONSOLE_RELEASE` is ≤4.14.
+   */
+  static get useLegacyCatalogEntry(): boolean {
+    if (
+      process.env.PLAYWRIGHT_LEGACY_CATALOG === '1' ||
+      process.env.PLAYWRIGHT_LEGACY_CATALOG?.toLowerCase() === 'true'
+    ) {
+      return true;
+    }
+    const release = process.env.PLAYWRIGHT_CONSOLE_RELEASE ?? '';
+    // 4.14 and older (and 3.x) used templatescatalog; 4.16–4.21 use `/catalog`.
+    return /^(3\.\d+|4\.([0-9]|1[0-4]))(\.|$)/.test(release);
+  }
+
+  /**
+   * `/vm-wizard` on 4.22+ (matches CNV-98979).
+   * release-4.16–4.21 use `/catalog` unless `PLAYWRIGHT_VM_WIZARD=1` is set explicitly.
+   * Set `PLAYWRIGHT_VM_WIZARD=0` to force catalog/legacy routes on newer consoles.
+   */
+  static get useVmWizardCatalogEntry(): boolean {
+    if (process.env.PLAYWRIGHT_VM_WIZARD === '0') {
+      return false;
+    }
+    if (process.env.PLAYWRIGHT_VM_WIZARD === '1' || process.env.PLAYWRIGHT_VM_WIZARD === 'true') {
+      return true;
+    }
+    if (EnvVariables.useLegacyCatalogEntry) {
+      return false;
+    }
+    const release = process.env.PLAYWRIGHT_CONSOLE_RELEASE ?? '';
+    return /^4\.(2[2-9]|[3-9]\d)/.test(release);
+  }
+
   static get secretName(): string {
     return process.env.TEST_SECRET_NAME || 'test-secret';
   }
@@ -387,6 +376,26 @@ export class EnvVariables {
     );
   }
 
+  /**
+   * When true, no `oc login`, cluster kubeconfig API, or `oc` fallbacks in the API client.
+   * Privileged lanes use console login + `/api/kubernetes` only. Non-priv keeps `oc` for IDP/RBAC.
+   * `IS_LOCAL=1` always skips oc (even if `WEB_CONSOLE_URL` points at a remote cluster).
+   */
+  static get skipOcInvocations(): boolean {
+    if (EnvVariables.isLocalMode) {
+      return true;
+    }
+    if (!EnvVariables.isNonPrivUser) {
+      return true;
+    }
+    return (
+      process.env.SKIP_OC === '1' ||
+      process.env.SKIP_OC?.toLowerCase() === 'true' ||
+      process.env.SKIP_OC_LOGIN === '1' ||
+      process.env.SKIP_OC_LOGIN?.toLowerCase() === 'true'
+    );
+  }
+
   static get skipUdn(): boolean {
     return process.env.SKIP_UDN === '1' || process.env.SKIP_UDN?.toLowerCase() === 'true';
   }
@@ -419,19 +428,42 @@ export class EnvVariables {
   }
 
   static get testUsername(): string {
-    return process.env.TEST_USERNAME || 'pwtest';
+    return process.env.TEST_USERNAME || 'test';
   }
 
+  /**
+   * Non-priv password. Prefer TEST_PASSWORD (playwright-runner / CNV-98979), then TEST_USER_PASSWORD.
+   */
   static get testUserPassword(): string {
-    return process.env.TEST_USER_PASSWORD || 'pwtest';
+    return process.env.TEST_PASSWORD || process.env.TEST_USER_PASSWORD || 'test';
+  }
+
+  /** OAuth IDP name for non-priv login (runner default: test-users). Alias of {@link idp}. */
+  static get testIdp(): string {
+    return EnvVariables.idp;
+  }
+
+  /**
+   * Active OAuth IDP for console login (CNV-98979).
+   * Non-priv → TEST_IDP / `test-users` (same as NONPRIV_IDP_NAME); privileged → kube:admin.
+   */
+  static get idp(): string {
+    return EnvVariables.isNonPrivUser
+      ? process.env.TEST_IDP || 'test-users'
+      : process.env.KUBEADMIN_IDP || 'kube:admin';
   }
 
   /**
    * Password to use for UI login. When NON_PRIV=1 (isNonPrivUser), returns the test user password
-   * (TEST_USER_PASSWORD env var, defaults to "pwtest"). Otherwise returns the admin password.
+   * (TEST_PASSWORD / TEST_USER_PASSWORD). Otherwise returns the admin password.
    */
   static get uiLoginPassword(): string {
     return EnvVariables.isNonPrivUser ? EnvVariables.testUserPassword : EnvVariables.password;
+  }
+
+  /** Alias of {@link uiLoginPassword} (CNV-98979 naming). */
+  static get loginPassword(): string {
+    return EnvVariables.uiLoginPassword;
   }
 
   /**
@@ -440,6 +472,11 @@ export class EnvVariables {
    */
   static get uiLoginUsername(): string {
     return EnvVariables.isNonPrivUser ? EnvVariables.testUsername : EnvVariables.username;
+  }
+
+  /** Alias of {@link uiLoginUsername} (CNV-98979 naming). */
+  static get loginUsername(): string {
+    return EnvVariables.uiLoginUsername;
   }
 
   /**
@@ -467,15 +504,26 @@ export class EnvVariables {
   }
 
   static get webConsoleUrl(): string {
+    // CNV-98979: IS_LOCAL=1 always prefers the local console lane.
+    const isLocalFlag =
+      process.env.IS_LOCAL === '1' || process.env.IS_LOCAL?.toLowerCase() === 'true';
+    if (isLocalFlag) {
+      const localExplicit = process.env.WEB_CONSOLE_URL || process.env.BRIDGE_BASE_ADDRESS;
+      if (localExplicit && /localhost|127\.0\.0\.1/.test(localExplicit)) {
+        return localExplicit.replace(/\/$/, '');
+      }
+      return 'http://localhost:9000';
+    }
+
     // Explicit URLs take highest priority
     if (process.env.WEB_CONSOLE_URL) {
-      return process.env.WEB_CONSOLE_URL;
+      return process.env.WEB_CONSOLE_URL.replace(/\/$/, '');
     }
     if (process.env.BASE_URL) {
-      return process.env.BASE_URL;
+      return process.env.BASE_URL.replace(/\/$/, '');
     }
     if (process.env.BRIDGE_BASE_ADDRESS) {
-      return process.env.BRIDGE_BASE_ADDRESS;
+      return process.env.BRIDGE_BASE_ADDRESS.replace(/\/$/, '');
     }
 
     // Construct from CLUSTER_NAME and CLUSTER_DOMAIN.
@@ -487,7 +535,7 @@ export class EnvVariables {
     const clusterName = process.env.CLUSTER_NAME;
     const clusterDomain = process.env.CLUSTER_DOMAIN;
     if (clusterName && clusterDomain) {
-      const constructed = `https://console-openshift-console.apps.${clusterName}.${clusterDomain}/`;
+      const constructed = `https://console-openshift-console.apps.${clusterName}.${clusterDomain}`;
       // Emit a warning so the mismatch is visible in test logs.
       // eslint-disable-next-line no-console
       console.warn(

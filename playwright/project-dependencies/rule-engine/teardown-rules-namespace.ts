@@ -1,4 +1,9 @@
+import { EnvVariables } from '@/utils/env-variables';
 import { logger } from '@/utils/logger';
+import {
+  ocCleanupTestNamespaceResources,
+  ocRemoveVmDeleteProtection,
+} from '@/utils/nonpriv-teardown-oc';
 
 import type { TeardownRule } from './types';
 import { TeardownScope } from './types';
@@ -6,6 +11,12 @@ import { TeardownScope } from './types';
 function safeWarn(message: string, err: unknown): void {
   const detail = err instanceof Error ? err.message : String(err);
   logger.warn(`${message}: ${detail}`);
+}
+
+function useKubeadminOc(ctx: { kubeConfigPath?: string }): ctx is { kubeConfigPath: string } {
+  return Boolean(
+    ctx.kubeConfigPath && EnvVariables.isNonPrivUser && !EnvVariables.skipOcInvocations,
+  );
 }
 
 export function getNamespaceTeardownRules(): TeardownRule[] {
@@ -16,9 +27,13 @@ export function getNamespaceTeardownRules(): TeardownRule[] {
       scope: TeardownScope.NAMESPACE,
       onError: 'warn',
       run: async (ctx) => {
+        const ns = ctx.testNamespace;
+        if (useKubeadminOc(ctx)) {
+          ocRemoveVmDeleteProtection(ns, ctx.kubeConfigPath);
+          return;
+        }
         if (!ctx.apiClient) return;
         const apiClient = ctx.apiClient;
-        const ns = ctx.testNamespace;
 
         try {
           const { items: vms } = await apiClient.listResourcesByKind('vm', ns);
@@ -76,6 +91,10 @@ export function getNamespaceTeardownRules(): TeardownRule[] {
       scope: TeardownScope.NAMESPACE,
       onError: 'warn',
       run: async (ctx) => {
+        if (useKubeadminOc(ctx)) {
+          ocCleanupTestNamespaceResources(ctx.testNamespace, ctx.kubeConfigPath);
+          return;
+        }
         if (!ctx.apiClient) return;
         try {
           await ctx.apiClient.cleanupTestNamespace(ctx.testNamespace);

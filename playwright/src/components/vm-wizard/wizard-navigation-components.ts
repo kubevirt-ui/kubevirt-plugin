@@ -115,31 +115,40 @@ export class VmCreationWizardCloneComponent extends BaseComponent {
     await this.page.waitForTimeout(1000);
   }
 
-  async selectCloneSourceVm(vmName: string): Promise<void> {
+  async selectCloneSourceVm(vmName: string, namespace?: string): Promise<void> {
+    if (namespace) {
+      await this.setCloneSourceProjectFilter(namespace);
+    }
+    await this.searchCloneSourceByName(vmName);
     const row = this.locator('.pf-v6-c-wizard tr, .pf-v6-c-wizard [role="row"]').filter({
       hasText: vmName,
     });
-    await row.first().waitFor({ state: 'visible', timeout: TestTimeouts.VM_OPERATION });
+    await row.first().waitFor({ state: 'visible', timeout: TestTimeouts.LONG_OPERATION });
     await this.robustClick(row.first());
   }
 
   async setCloneSourceProjectFilter(namespace: string): Promise<void> {
     await this.clearCloneSourceFilters();
-    await this.page.waitForTimeout(1000);
+    await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
 
     const projectBtn = this.locator(
       '.pf-v6-c-wizard [data-ouia-component-type="PF6/MenuToggle"]',
-    ).filter({ hasText: 'Project' });
+    ).filter({ hasText: /Project/i });
+    if (!(await projectBtn.first().isVisible().catch(() => false))) {
+      return;
+    }
+    const label = ((await projectBtn.first().textContent()) ?? '').trim();
+    if (new RegExp(`Project:\\s*${namespace}\\b`, 'i').test(label)) {
+      return;
+    }
+
     await this.robustClick(projectBtn.first());
-    await this.page.waitForTimeout(500);
-
-    const option = this.page.getByRole('menuitem', { name: namespace, exact: true });
-    await option.waitFor({ state: 'visible', timeout: TestTimeouts.SHORT_WAIT });
-    await option.click();
-    await this.page.waitForTimeout(2000);
-
-    await projectBtn.first().click();
-    await this.page.waitForTimeout(500);
+    const option = this.page
+      .getByRole('menuitem', { name: namespace, exact: true })
+      .or(this.page.locator('.pf-v6-c-menu__item-text', { hasText: namespace }));
+    await option.first().waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
+    await this.robustClick(option.first());
+    await this.page.waitForTimeout(2 * TestTimeouts.UI_DELAY_SHORT);
   }
 
   async verifyCloneSourceDescription(): Promise<boolean> {

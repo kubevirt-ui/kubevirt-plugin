@@ -54,6 +54,51 @@ export function buildTemplateFromVm(
 }
 
 /**
+ * Builds a native VirtualMachineTemplate (template.kubevirt.io/v1beta1) from an existing VM.
+ * Mirrors the Save as template product shape: parameterized NAME + embedded virtualMachine.
+ */
+export function buildNativeVirtualMachineTemplateFromVm(
+  vm: KubernetesResource,
+  templateName: string,
+  displayName?: string,
+): KubernetesResource {
+  const vmCopy = JSON.parse(JSON.stringify(vm)) as KubernetesResource;
+  const namespace = vmCopy.metadata?.namespace;
+
+  vmCopy.metadata = {
+    name: '${NAME}',
+    ...(vmCopy.metadata?.labels ? { labels: vmCopy.metadata.labels } : {}),
+    ...(vmCopy.metadata?.annotations ? { annotations: vmCopy.metadata.annotations } : {}),
+  };
+  delete vmCopy.status;
+  delete (vmCopy as { apiVersion?: string }).apiVersion;
+  delete (vmCopy as { kind?: string }).kind;
+
+  return {
+    apiVersion: 'template.kubevirt.io/v1beta1',
+    kind: 'VirtualMachineTemplate',
+    metadata: {
+      name: templateName,
+      namespace,
+      ...(displayName
+        ? { annotations: { 'openshift.io/display-name': displayName } }
+        : {}),
+    },
+    spec: {
+      parameters: [
+        {
+          name: 'NAME',
+          generate: 'expression',
+          from: 'vm-[a-z0-9]{5}',
+          required: true,
+        },
+      ],
+      virtualMachine: vmCopy,
+    },
+  };
+}
+
+/**
  * Returns all VMs in `namespace` whose folder label matches `folderName`.
  */
 export async function listVmsInFolder(

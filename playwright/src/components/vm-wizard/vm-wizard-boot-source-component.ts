@@ -1,6 +1,6 @@
 import BaseComponent from '@/components/shared/base-component';
 import { TestTimeouts } from '@/utils/test-config';
-import type { Page } from '@playwright/test';
+import type { Locator, Page } from '@playwright/test';
 
 export default class VmWizardBootSourceComponent extends BaseComponent {
   private readonly _dialogModalTabModal = this.testId('dialog-modal').or(
@@ -310,6 +310,23 @@ export default class VmWizardBootSourceComponent extends BaseComponent {
     } catch {
       return false;
     }
+  }
+
+  /** Compact "Developer preview" labels must not appear on the boot-source step. */
+  developerPreviewLabel(): Locator {
+    return this.locator('.pf-v6-c-wizard')
+      .locator('.dev-preview-label')
+      .or(
+        this.locator('.pf-v6-c-wizard')
+          .getByText(/^Developer preview$/i)
+          .locator(
+            'xpath=ancestor::*[contains(@class,"pf-v6-c-label") or contains(@class,"pf-c-label")][1]',
+          ),
+      );
+  }
+
+  bootVolumeRowMatching(text: RegExp | string): Locator {
+    return this._pfV6CWizardTableTbodyTr.filter({ hasText: text }).first();
   }
 
   async verifyBootVolumeTableColumnsVisible(): Promise<boolean> {

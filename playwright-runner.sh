@@ -1,98 +1,93 @@
 #!/usr/bin/env bash
-# ────────────────────────────────────────────────────────────────────────────
-# playwright-runner.sh — Run Playwright projects for kubevirt-plugin
-#
-# Usage:
-#   ./playwright-runner.sh [project] [extra-args...]
-#
-# Examples:
-#   ./playwright-runner.sh Gating
-#   ./playwright-runner.sh suite --workers=4
-#   ./playwright-runner.sh Tier1 playwright/tests/tier1/foo.spec.ts
-#   ./playwright-runner.sh all
-#
-# Note: --project=Name (equals form) is required so Playwright's variadic
-# --project option does not swallow file-path / -g filter args.
-# ────────────────────────────────────────────────────────────────────────────
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="${SCRIPT_DIR}"
-cd "${PROJECT_ROOT}"
+cd "${SCRIPT_DIR}"
 
-# ── Helpers ──────────────────────────────────────────────────────────────
+# shellcheck source=scripts/playwright-env.sh
+source "${SCRIPT_DIR}/scripts/playwright-env.sh"
+playwright_bootstrap_env ".env"
 
-detect_urls() {
-  # Derive WEB_CONSOLE_URL from CLUSTER_NAME + CLUSTER_DOMAIN if not already set
-  if [[ -z "${WEB_CONSOLE_URL:-}" ]]; then
-    if [[ -n "${CLUSTER_NAME:-}" && -n "${CLUSTER_DOMAIN:-}" ]]; then
-      export WEB_CONSOLE_URL="https://console-openshift-console.apps.${CLUSTER_NAME}.${CLUSTER_DOMAIN}"
-      echo "ℹ️  Derived WEB_CONSOLE_URL=${WEB_CONSOLE_URL}"
-    fi
-  fi
+usage() {
+  cat <<'EOF'
+Usage: ./playwright-runner.sh <project> [playwright test args...]
 
-  # Derive CLUSTER_URL from WEB_CONSOLE_URL if not already set
-  if [[ -z "${CLUSTER_URL:-}" && -n "${WEB_CONSOLE_URL:-}" ]]; then
-    local apps_domain
-    apps_domain=$(echo "${WEB_CONSOLE_URL}" | sed -n 's|.*console-openshift-console\.apps\.\(.*\)|\1|p' | sed 's|/$||')
-    if [[ -n "${apps_domain}" ]]; then
-      export CLUSTER_URL="https://api.${apps_domain}:6443"
-      echo "ℹ️  Derived CLUSTER_URL=${CLUSTER_URL}"
-    fi
-  fi
+Projects (kubeadmin):
+  Gating | gating              @gating (excludes @cnv-settings / @migration)
+  Tier1  | tier1 | t1          @tier1
+  Tier2  | tier2 | t2          @tier2
+  Settings | settings          @cnv-settings
+  Migrations | migrations      @migration
+  auto                         all projects (pass through args)
+
+Non-priv (test / test):
+  Tier1NonPriv | tier1-nonpriv | t1-nonpriv
+  Tier2NonPriv | tier2-nonpriv | t2-nonpriv
+
+Local console — inline IS_LOCAL=1 wins over IS_LOCAL=0 in .env:
+  IS_LOCAL=1 ./playwright-runner.sh gating --workers=4
+
+CI debug harness (failures → skipped) — enabled by default via this runner:
+  CI_DEBUG=0 ./playwright-runner.sh tier1 --workers=4   # hard failures
+
+Examples:
+  ./playwright-runner.sh gating --workers=4
+  ./playwright-runner.sh tier1 --workers=4
+  ./playwright-runner.sh tier2 --workers=4
+  ./playwright-runner.sh settings --workers=1
+  ./playwright-runner.sh migrations --workers=2
+EOF
 }
 
-# ── Main ─────────────────────────────────────────────────────────────────
-
-PROJECT="${1:-}"
+PROJECT="${1:-Gating}"
 shift || true
 
-if [[ -z "${PROJECT}" ]]; then
-  echo "Usage: $0 <project> [extra-args...]"
-  echo ""
-  echo "Available projects:"
-  echo "  Gating                 Gating specs (scenario infrastructure)"
-  echo "  Tier1                  Tier 1 specs (scenario infrastructure)"
-  echo "  Tier2                  Tier 2 specs (scenario infrastructure)"
-  echo "  Settings               Settings specs (scenario infrastructure)"
-  echo "  API                    API contract tests (browserless)"
-  echo "  suite                  Run Gating + Tier1 + Tier2 together"
-  echo "  all                    Run all projects"
-  exit 1
+# Opt-in harness: off for direct npx/scripts/run-playwright.sh; on for all runner tiers.
+export CI_DEBUG="${CI_DEBUG:-1}"
+
+case "${PROJECT}" in
+  -h | --help | help)
+    usage
+    exit 0
+    ;;
+  gating | Gating)
+    PROJECT="Gating"
+    ;;
+  tier1 | t1 | Tier1)
+    PROJECT="Tier1"
+    ;;
+  tier2 | t2 | Tier2)
+    PROJECT="Tier2"
+    ;;
+  settings | Settings)
+    PROJECT="Settings"
+    ;;
+  migrations | Migrations)
+    PROJECT="Migrations"
+    ;;
+  tier1-nonpriv | t1-nonpriv | Tier1NonPriv)
+    PROJECT="Tier1NonPriv"
+    export NON_PRIV=1
+    export TEST_USERNAME="${TEST_USERNAME:-test}"
+    export TEST_PASSWORD="${TEST_PASSWORD:-test}"
+    # EnvVariables.testUserPassword reads TEST_USER_PASSWORD first; keep both in sync.
+    export TEST_USER_PASSWORD="${TEST_USER_PASSWORD:-$TEST_PASSWORD}"
+    export TEST_IDP="${TEST_IDP:-test-users}"
+    export HEADLESS="${HEADLESS:-true}"
+    ;;
+  tier2-nonpriv | t2-nonpriv | Tier2NonPriv)
+    PROJECT="Tier2NonPriv"
+    export NON_PRIV=1
+    export TEST_USERNAME="${TEST_USERNAME:-test}"
+    export TEST_PASSWORD="${TEST_PASSWORD:-test}"
+    export TEST_USER_PASSWORD="${TEST_USER_PASSWORD:-$TEST_PASSWORD}"
+    export TEST_IDP="${TEST_IDP:-test-users}"
+    export HEADLESS="${HEADLESS:-true}"
+    ;;
+esac
+
+if [[ "${PROJECT}" != "auto" ]]; then
+  exec ./scripts/run-playwright.sh "--project=${PROJECT}" "$@"
 fi
 
-# Load .env if present
-if [[ -f "${PROJECT_ROOT}/.env" ]]; then
-  set -a
-  # shellcheck disable=SC1091
-  source "${PROJECT_ROOT}/.env"
-  set +a
-fi
-
-detect_urls
-
-EXTRA_ARGS=("$@")
-
-PROJECT_LOWER=$(echo "${PROJECT}" | tr '[:upper:]' '[:lower:]')
-
-if [[ "${PROJECT_LOWER}" == "suite" ]]; then
-  echo "🚀 Running suite: Gating + Tier1 + Tier2..."
-  npx playwright test --project=Gating --project=Tier1 --project=Tier2 "${EXTRA_ARGS[@]}"
-elif [[ "${PROJECT_LOWER}" == "all" ]]; then
-  PROJECTS=(
-    Gating
-    Tier1
-    Tier2
-    Settings
-    API
-  )
-  PROJECT_ARGS=()
-  for p in "${PROJECTS[@]}"; do
-    PROJECT_ARGS+=(--project="${p}")
-  done
-  echo "🚀 Running all projects..."
-  npx playwright test "${PROJECT_ARGS[@]}" "${EXTRA_ARGS[@]}"
-else
-  echo "🚀 Running project: ${PROJECT}..."
-  npx playwright test --project="${PROJECT}" "${EXTRA_ARGS[@]}"
-fi
+exec ./scripts/run-playwright.sh "$@"

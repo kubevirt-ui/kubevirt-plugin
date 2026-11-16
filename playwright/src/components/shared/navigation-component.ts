@@ -217,15 +217,18 @@ export default class NavigationComponent extends BaseComponent {
     if (childVisible) return;
 
     // Fallback for Core Platform perspective where Virtualization is a collapsible section.
-    const virtualizationSection = this.locator('[data-quickstart-id="qs-nav-sec-virtualization"]');
+    const virtualizationSection = this.locator('[data-quickstart-id="qs-nav-sec-virtualization"]')
+      .or(this.page.getByRole('button', { name: /^Virtualization$/i }))
+      .first();
     const sectionVisible = await virtualizationSection
-      .isVisible({ timeout: TestTimeouts.RETRY_DELAY })
+      .isVisible({ timeout: TestTimeouts.DEFAULT })
       .catch(() => false);
     if (!sectionVisible) return;
 
-    const isExpanded = await virtualizationSection.getAttribute('aria-expanded');
-    if (isExpanded === 'false') {
-      await virtualizationSection.click().catch(async () => {
+    for (let expandAttempt = 0; expandAttempt < 3; expandAttempt++) {
+      const isExpanded = await virtualizationSection.getAttribute('aria-expanded');
+      if (isExpanded === 'true') break;
+      await virtualizationSection.click({ force: true }).catch(async () => {
         await virtualizationSection.dispatchEvent('click');
       });
       await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
@@ -233,7 +236,7 @@ export default class NavigationComponent extends BaseComponent {
 
     await childItem
       .first()
-      .waitFor({ state: 'visible', timeout: TestTimeouts.UI_DELAY_LONG })
+      .waitFor({ state: 'visible', timeout: TestTimeouts.DEFAULT })
       .catch(() => undefined);
   }
 
@@ -356,7 +359,7 @@ export default class NavigationComponent extends BaseComponent {
     }
 
     const currentText = (await toggle.textContent().catch(() => '')) ?? '';
-    if (currentText.toLowerCase().includes('virtualization')) return;
+    if (/virtualization/i.test(currentText)) return;
 
     const virtOption = this.consoleTestId('perspective-switcher-menu-option').filter({
       hasText: 'Virtualization',
@@ -392,11 +395,24 @@ export default class NavigationComponent extends BaseComponent {
         // Confirm the perspective actually switched before returning; a click that
         // did not register leaves the toggle on its previous label, so retry.
         const switchedText = (await toggle.textContent().catch(() => '')) ?? '';
-        if (switchedText.toLowerCase().includes('virtualization')) return;
+        if (/virtualization/i.test(switchedText)) return;
+      } else {
+        // No Virtualization menu entry — Admin/Core platform uses a Virtualization nav section.
+        const label = (await toggle.textContent().catch(() => '')) ?? '';
+        if (/administrator|core platform/i.test(label)) {
+          await this.page.keyboard.press('Escape').catch(() => undefined);
+          return;
+        }
       }
 
       await this.page.keyboard.press('Escape').catch(() => undefined);
       await this.page.waitForTimeout(TestTimeouts.RETRY_DELAY);
+    }
+
+    // Last resort: stay on Administrator / Core platform and use the Virtualization nav section.
+    const finalLabel = (await toggle.textContent().catch(() => '')) ?? '';
+    if (/administrator|core platform/i.test(finalLabel)) {
+      return;
     }
 
     throw new Error('Perspective switcher: failed to select Virtualization after 4 attempts');

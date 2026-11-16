@@ -1,5 +1,14 @@
 import { EnvVariables } from '@/utils/env-variables';
 import { logger } from '@/utils/logger';
+import {
+  ocDeletePwClusterInstanceTypes,
+  ocDeletePwDataVolumesInNamespace,
+  ocDeletePwMigrationPolicies,
+  ocDeletePwNamespacesExcept,
+  ocDeletePwVmsInNamespace,
+  ocRestoreHyperConvergedDefaults,
+  ocRestoreKubevirtUiFeaturesDefaults,
+} from '@/utils/nonpriv-teardown-oc';
 
 import type { TeardownRule } from './types';
 import { TeardownScope } from './types';
@@ -7,6 +16,12 @@ import { TeardownScope } from './types';
 function safeWarn(message: string, err: unknown): void {
   const detail = err instanceof Error ? err.message : String(err);
   logger.warn(`${message}: ${detail}`);
+}
+
+function useKubeadminOc(ctx: { kubeConfigPath?: string }): ctx is { kubeConfigPath: string } {
+  return Boolean(
+    ctx.kubeConfigPath && EnvVariables.isNonPrivUser && !EnvVariables.skipOcInvocations,
+  );
 }
 
 export function getClusterTeardownRules(): TeardownRule[] {
@@ -19,6 +34,10 @@ export function getClusterTeardownRules(): TeardownRule[] {
       guard: (ctx) => ctx.shouldCleanupClusterResources,
       run: async (ctx) => {
         try {
+          if (useKubeadminOc(ctx)) {
+            ocDeletePwMigrationPolicies(ctx.kubeConfigPath);
+            return;
+          }
           if (!ctx.apiClient) {
             logger.warn('⚠️ No API client — skipping migration policy cleanup');
             return;
@@ -88,6 +107,10 @@ export function getClusterTeardownRules(): TeardownRule[] {
       guard: (ctx) => ctx.shouldCleanupClusterResources,
       run: async (ctx) => {
         try {
+          if (useKubeadminOc(ctx)) {
+            ocDeletePwClusterInstanceTypes(ctx.kubeConfigPath);
+            return;
+          }
           if (!ctx.apiClient) {
             logger.warn('⚠️ No API client — skipping cluster instance type cleanup');
             return;
@@ -138,6 +161,10 @@ export function getClusterTeardownRules(): TeardownRule[] {
       guard: (ctx) => ctx.shouldCleanupClusterResources && !EnvVariables.isHcE2e,
       run: async (ctx) => {
         try {
+          if (useKubeadminOc(ctx)) {
+            ocRestoreHyperConvergedDefaults(ctx.kubeConfigPath);
+            return;
+          }
           if (!ctx.apiClient) {
             logger.warn('⚠️ No API client — skipping HCO restore');
             return;
@@ -221,6 +248,11 @@ export function getClusterTeardownRules(): TeardownRule[] {
       onError: 'warn',
       guard: (ctx) => ctx.shouldCleanupClusterResources && !EnvVariables.isHcE2e,
       run: async (ctx) => {
+        if (useKubeadminOc(ctx)) {
+          // HCO field restore is handled in restore-hco; here only the features ConfigMap.
+          ocRestoreKubevirtUiFeaturesDefaults(ctx.kubeConfigPath);
+          return;
+        }
         if (!ctx.apiClient) {
           logger.warn('⚠️ No API client — skipping CNV settings restore');
           return;
@@ -229,7 +261,6 @@ export function getClusterTeardownRules(): TeardownRule[] {
         const hcoName = 'kubevirt-hyperconverged';
         const hcoNamespace = 'openshift-cnv';
 
-        // ── HCO: live migration limits and memory density ─────────────────────
         try {
           let hco: { spec?: Record<string, unknown> } | null = null;
           try {
@@ -271,7 +302,6 @@ export function getClusterTeardownRules(): TeardownRule[] {
           safeWarn('Failed to restore HCO live migration / memory density settings', error);
         }
 
-        // ── kubevirt-ui-features ConfigMap: all settings-test-modified keys ─────
         try {
           await apiClient.mergePatchResource(
             '',
@@ -308,6 +338,10 @@ export function getClusterTeardownRules(): TeardownRule[] {
       onError: 'warn',
       guard: (ctx) => ctx.shouldCleanupClusterResources,
       run: async (ctx) => {
+        if (useKubeadminOc(ctx)) {
+          ocDeletePwVmsInNamespace('default', ctx.kubeConfigPath);
+          return;
+        }
         if (!ctx.apiClient) return;
         const apiClient = ctx.apiClient;
         const ns = 'default';
@@ -343,6 +377,12 @@ export function getClusterTeardownRules(): TeardownRule[] {
       onError: 'warn',
       guard: (ctx) => ctx.shouldCleanupClusterResources,
       run: async (ctx) => {
+        if (useKubeadminOc(ctx)) {
+          if (ctx.testNamespace) {
+            ocDeletePwDataVolumesInNamespace(ctx.testNamespace, ctx.kubeConfigPath);
+          }
+          return;
+        }
         if (!ctx.apiClient || !ctx.testNamespace) return;
         const apiClient = ctx.apiClient;
         const ns = ctx.testNamespace;
@@ -383,6 +423,10 @@ export function getClusterTeardownRules(): TeardownRule[] {
       guard: (ctx) => ctx.shouldCleanupClusterResources,
       run: async (ctx) => {
         try {
+          if (useKubeadminOc(ctx)) {
+            ocDeletePwNamespacesExcept(ctx.testNamespace, ctx.kubeConfigPath);
+            return;
+          }
           if (!ctx.apiClient) {
             logger.warn('⚠️ No API client — skipping test namespace deletion');
             return;

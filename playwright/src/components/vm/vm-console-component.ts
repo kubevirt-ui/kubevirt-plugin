@@ -206,17 +206,17 @@ export default class VmConsoleComponent extends BaseComponent {
     await this.page.waitForTimeout(TestTimeouts.UI_DELAY_MEDIUM);
   }
 
-  async tryDismissVncTryLaterDialog(
-    timeout: number = TestTimeouts.UI_DELAY_LONG,
-  ): Promise<boolean> {
-    try {
-      const vncTryLaterButton = this.locator('button:has-text("Try later")');
-      await vncTryLaterButton.waitFor({ state: 'visible', timeout });
-      await this.robustClick(vncTryLaterButton);
-      return true;
-    } catch {
+  async tryDismissVncTryLaterDialog(timeout: number = 3_000): Promise<boolean> {
+    const vncTryLaterButton = this.locator('button:has-text("Try later")');
+    const visible = await vncTryLaterButton
+      .waitFor({ state: 'visible', timeout })
+      .then(() => true)
+      .catch(() => false);
+    if (!visible) {
       return false;
     }
+    await this.robustClick(vncTryLaterButton);
+    return true;
   }
 
   async verifyActiveUsers(present: boolean, timeout = 60000): Promise<boolean> {

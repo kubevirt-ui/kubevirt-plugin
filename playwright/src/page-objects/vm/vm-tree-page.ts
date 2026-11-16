@@ -1,5 +1,6 @@
 import PageCommons from '@/page-objects/page-commons';
 import { TreeContextMenuMixin } from '@/page-objects/vm/tree-context-menu-mixin';
+import { dismissConsoleObstructions } from '@/utils/console-modals';
 import { TestTimeouts } from '@/utils/test-config';
 import type { Page } from '@playwright/test';
 
@@ -124,10 +125,13 @@ export default class VmTreePage extends TreeContextMenuMixin(PageCommons) {
   }
 
   async clickProjectNode(namespace: string): Promise<void> {
+    await dismissConsoleObstructions(this.page);
+    await this.tryCloseWelcomeModal();
     const nodeId = `projectSelector/#single-cluster#/${namespace}`;
     const containerNode = this.locator(`[id="${nodeId}"]`);
 
     const waitForNode = async (): Promise<void> => {
+      await dismissConsoleObstructions(this.page);
       await containerNode.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
     };
 
@@ -372,8 +376,10 @@ export default class VmTreePage extends TreeContextMenuMixin(PageCommons) {
   ): Promise<void> {
     await this.clickNavVirtualMachines();
     await this.page.waitForLoadState('domcontentloaded');
-    if (options?.closeWelcomeModal) {
+    await dismissConsoleObstructions(this.page);
+    if (options?.closeWelcomeModal !== false) {
       await this.tryCloseWelcomeModal();
+      await dismissConsoleObstructions(this.page);
     }
     await this.toggleEmptyProjectsDisplay(true);
     await this.searchTreeView(namespace);
@@ -389,7 +395,7 @@ export default class VmTreePage extends TreeContextMenuMixin(PageCommons) {
   }
 
   async navigateToProjectVmListViaUI(namespace: string): Promise<void> {
-    await this.navigateToNamespaceVirtualMachinesViaUI(namespace);
+    await this.navigateToNamespaceVirtualMachinesViaUI(namespace, { closeWelcomeModal: true });
     await this.clickVmListTab();
   }
 
@@ -398,13 +404,87 @@ export default class VmTreePage extends TreeContextMenuMixin(PageCommons) {
   }
 
   async navigateToVmViaTreeView(namespace: string, vmName: string): Promise<void> {
+    const detailUrl = `/k8s/ns/${namespace}/kubevirt.io~v1~VirtualMachine/${vmName}`;
+
+    // PF horizontal nav often exposes Overview/Configuration as links, not role=tab.
+    const detailChrome = () =>
+      this.page
+        .getByRole('tab', { name: /Overview|Configuration|YAML|Details/i })
+        .or(this.page.getByRole('link', { name: /^(Overview|Configuration|YAML|Details)$/i }))
+        .or(this.page.locator('[data-test="actions-dropdown"], [data-test-id="actions-dropdown"]'))
+        .first();
+
+    const onVmDetail = async (): Promise<boolean> => {
+      if (await this.page.getByRole('heading', { name: /404/i }).isVisible().catch(() => false)) {
+        return false;
+      }
+      const namedHeading = this.page
+        .getByRole('heading', { level: 1 })
+        .filter({ hasText: new RegExp(`\\b${vmName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`) });
+      if (await namedHeading.first().isVisible().catch(() => false)) {
+        return true;
+      }
+      return detailChrome()
+        .isVisible()
+        .catch(() => false);
+    };
+
+    const openDetailDirect = async (): Promise<boolean> => {
+      // Cold kubevirt CR URLs 404 until the dynamic plugin is loaded — prime via list.
+      await this.page.goto(`/k8s/ns/${namespace}/kubevirt.io~v1~VirtualMachine`, {
+        waitUntil: 'domcontentloaded',
+      });
+      await dismissConsoleObstructions(this.page);
+      await this.page.goto(detailUrl, { waitUntil: 'domcontentloaded' });
+      await dismissConsoleObstructions(this.page);
+      return detailChrome()
+        .waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT })
+        .then(() => true)
+        .catch(() => false);
+    };
+
+    // Direct URL first: tree search + welcome-modal networkidle previously burned 3m+
+    // per call under parallel gating, and clicking a project node alone lands on 404.
+    if ((await openDetailDirect()) && (await onVmDetail())) {
+      return;
+    }
+
     await this.clickNavVirtualMachines();
     await this.page.waitForLoadState('domcontentloaded');
-    await this.tryCloseWelcomeModal();
-    await this.toggleEmptyProjectsDisplay(true);
-    await this.searchTreeView(namespace);
-    await this.clickTreeNodeAndEnsureExpanded(namespace, vmName, namespace);
-    await this.clickVmInTreeView(vmName, namespace);
+    await dismissConsoleObstructions(this.page);
+    await this.toggleEmptyProjectsDisplay(true).catch(() => undefined);
+
+    const projectNode = this.locator(`[id="projectSelector/#single-cluster#/${namespace}"]`);
+    const vmNode = this.locator(`[id="#single-cluster#/${namespace}/${vmName}"]`);
+
+    await this.searchTreeView(namespace).catch(() => undefined);
+    if (!(await projectNode.isVisible().catch(() => false))) {
+      await this.clearTreeViewSearch().catch(() => undefined);
+      const showOnly = this.locator(
+        '.vms-tree-view__toolbar-switch input[type="checkbox"], input[aria-label*="Show only projects"]',
+      );
+      if (await showOnly.isChecked().catch(() => false)) {
+        await showOnly.click({ force: true }).catch(() => undefined);
+        await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
+      }
+      await this.searchTreeView(namespace).catch(() => undefined);
+    }
+
+    if (await projectNode.isVisible().catch(() => false)) {
+      await this.clickTreeNodeAndEnsureExpanded(namespace, vmName, namespace).catch(() => undefined);
+      if (await vmNode.isVisible().catch(() => false)) {
+        await this.robustClick(vmNode);
+        if (await onVmDetail()) {
+          return;
+        }
+      }
+    }
+
+    if (!(await openDetailDirect()) || !(await onVmDetail())) {
+      throw new Error(
+        `Failed to open VM detail for ${namespace}/${vmName} via direct URL or tree view`,
+      );
+    }
   }
 
   async recoverFromErrorBoundaryIfNeeded(timeout = TestTimeouts.ELEMENT_WAIT): Promise<boolean> {
@@ -436,9 +516,10 @@ export default class VmTreePage extends TreeContextMenuMixin(PageCommons) {
   async searchTreeView(searchText: string): Promise<void> {
     const searchInput = this._idVmsTreeViewSearchInput;
     await searchInput.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
-    await searchInput.clear();
-    await searchInput.pressSequentially(searchText, { delay: 250 });
-    await this.page.waitForTimeout(TestTimeouts.UI_DELAY_EXTRA);
+    await searchInput.fill('');
+    // fill() is more reliable than pressSequentially (long names + 250ms/key burned timeouts).
+    await searchInput.fill(searchText);
+    await this.page.waitForTimeout(TestTimeouts.UI_DELAY_MEDIUM);
   }
 
   async toggleEmptyProjectsDisplay(show: boolean): Promise<void> {

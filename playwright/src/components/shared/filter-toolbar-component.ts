@@ -1,5 +1,6 @@
+import { pollUntil } from '@/utils/poll-until';
 import { TestTimeouts } from '@/utils/test-config';
-import type { Page } from '@playwright/test';
+import type { Locator, Page } from '@playwright/test';
 
 import BaseComponent from './base-component';
 
@@ -55,6 +56,91 @@ export default class FilterToolbarComponent extends BaseComponent {
     await itemFilter.fill(name);
     await itemFilter.press('Tab');
     await this.page.waitForTimeout(TestTimeouts.UI_VISIBILITY_QUICK);
+  }
+
+  /** Template catalog / wizard Template step keyword filter. */
+  async filterCatalogByText(text: string): Promise<void> {
+    const scope = this.catalogFilterScope();
+    const input = scope
+      .getByRole('textbox', { name: /Filter by keyword|Filter by name/i })
+      .or(scope.locator('#filter-text-input input, [data-test="search-catalog"] input'))
+      .or(this.page.getByRole('textbox', { name: /Filter by keyword|Filter by name/i }))
+      .or(this.locator('#filter-text-input input, [data-test="search-catalog"] input'))
+      .first();
+    await input.waitFor({ state: 'visible', timeout: TestTimeouts.LONG_OPERATION });
+    await input.click();
+    await input.press('ControlOrMeta+A').catch(() => undefined);
+    // Controlled React inputs often ignore fill() — type so the catalog filter re-renders tiles.
+    await input.pressSequentially(text, { delay: 15 });
+  }
+
+  /**
+   * Ensure OS/workload filter panel is available. Wizard Template step and legacy
+   * Template catalog keep filters visible; InstanceTypes may need a Filter toggle.
+   */
+  async openCatalogFilterPanelIfClosed(panelMarker: Locator): Promise<void> {
+    if (await panelMarker.isVisible().catch(() => false)) {
+      return;
+    }
+    if (await this.catalogFilterScope().isVisible().catch(() => false)) {
+      return;
+    }
+    const filterBtn = this.page.getByRole('button', { name: /^Filter$/i });
+    if (await filterBtn.isVisible().catch(() => false)) {
+      await this.robustClick(filterBtn);
+    }
+  }
+
+  async setCatalogCheckboxFilter(testId: string, checked: boolean): Promise<void> {
+    // Wizard Template step: data-test / id use camelCase prefix + lowercase suffix
+    // (e.g. osName-rhel, #filter-osName-rhel). Specs may pass osName-RHEL / osName-Windows.
+    const normalized = testId.replace(/^(osName|workload)-(.+)$/i, (_, prefix: string, suffix: string) => {
+      const p = /^osName$/i.test(prefix) ? 'osName' : 'workload';
+      return `${p}-${suffix.toLowerCase()}`;
+    });
+    const suffix = normalized.includes('-') ? normalized.split('-').slice(1).join('-') : normalized;
+    const scope = this.catalogFilterScope();
+    const box = scope
+      .locator(`#filter-${normalized}, #filter-${testId}`)
+      .or(
+        scope
+          .locator(`[data-test="${normalized}"], [data-test="${testId}"]`)
+          .locator('input[type="checkbox"]'),
+      )
+      .or(scope.getByTestId(normalized).locator('input[type="checkbox"]'))
+      .or(scope.getByTestId(testId).locator('input[type="checkbox"]'))
+      .or(scope.getByRole('checkbox', { name: new RegExp(`^${suffix}$`, 'i') }))
+      .first();
+    const visible = await box
+      .waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT })
+      .then(() => true)
+      .catch(() => false);
+    if (!visible) {
+      throw new Error(`Template catalog filter "${testId}" should be visible in the filter panel`);
+    }
+    if (checked) {
+      await box.check({ force: true });
+    } else {
+      await box.uncheck({ force: true });
+    }
+    // The tile list follows the checkbox state; a swallowed check leaves the catalog unfiltered.
+    await pollUntil(
+      async () => {
+        const isChecked = await box.isChecked().catch(() => null);
+        return isChecked === null || isChecked === checked;
+      },
+      {
+        message: `Template catalog filter "${testId}" should be ${checked ? 'checked' : 'unchecked'}`,
+        timeout: TestTimeouts.ELEMENT_WAIT,
+      },
+    );
+  }
+
+  private catalogFilterScope(): Locator {
+    return this.page
+      .locator('.vm-creation-wizard')
+      .or(this.page.getByRole('tabpanel', { name: /Template catalog/i }))
+      .or(this.page.locator('main'));
   }
 
   async saveColumns(): Promise<void> {

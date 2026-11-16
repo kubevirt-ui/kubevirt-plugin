@@ -198,6 +198,34 @@ export function generateRandomLabelValue(length = 6): string {
   return generateRandomString(length, 'alphanumeric');
 }
 
+/** Console Edit labels modal expects `key=value` (placeholder `app=frontend`). */
+export function generateRandomLabel(prefix = 'label'): string {
+  const key = `${prefix}-${generateRandomString(6, 'alphanumeric').toLowerCase()}`;
+  const value = generateRandomString(6, 'alphanumeric').toLowerCase();
+  return `${key}=${value}`;
+}
+
 export function generateRandomAnnotationValue(length = 10): string {
   return generateRandomString(length, 'alphanumeric');
+}
+
+/** Annotation key for detail-page annotation tests (lowercase alphanumeric, DNS-friendly). */
+export function generateRandomAnnotationKey(prefix = 'e2e'): string {
+  return `${prefix}-${generateRandomString(6, 'alphanumeric').toLowerCase()}`;
+}
+
+/** Appends a random suffix to a fixed base name (e.g. CRUD fixture names). */
+export function generateNameWithBase(baseName: string, maxLength = 63): string {
+  const name = `${baseName}-${generateRandomString(8, 'alphanumeric').toLowerCase()}`;
+  return name.length > maxLength ? name.slice(0, maxLength) : name;
+}
+
+/**
+ * Per-test namespace from the Playwright fixture (`testNamespace`).
+ * Keeps worker index and title for debugging; truncates to DNS label length.
+ */
+export function generateE2eTestNamespace(workerIndex: number, testTitle: string): string {
+  const safeTitle = testTitle.replace(/\W+/g, '-').slice(0, 24).toLowerCase();
+  const suffix = generateRandomString(8, 'alphanumeric').toLowerCase();
+  return `pw-e2e-${workerIndex}-${safeTitle}-${suffix}`.slice(0, 63);
 }

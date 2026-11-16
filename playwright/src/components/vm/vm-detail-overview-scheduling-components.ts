@@ -745,12 +745,57 @@ export class VirtualMachineDetailSchedulingComponent extends BaseComponent {
 
   async navigateToConfigurationScheduling(): Promise<void> {
     await this.navigateToConfigurationTab();
+    // Find-settings autocomplete can leave a menu overlay that intercepts tab clicks.
+    await this.page.keyboard.press('Escape').catch(() => undefined);
     await this._vmConfigurationScheduling.waitFor({
       state: 'visible',
       timeout: TestTimeouts.VM_CREATION,
     });
     await this.robustClick(this._vmConfigurationScheduling);
-    await this.page.waitForTimeout(TestTimeouts.UI_DELAY_MEDIUM);
+    // Wait for Scheduling content rather than a fixed multi-second sleep.
+    await this.testId('eviction-strategy')
+      .or(this.page.getByRole('heading', { name: /Scheduling and resource requirements/i }))
+      .or(this.page.getByText('Node selector', { exact: false }))
+      .first()
+      .waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
+  }
+
+  async verifySchedulingAndResourceRequirements(): Promise<boolean> {
+    try {
+      const markersVisible = async (): Promise<boolean> => {
+        // Prefer data-test — stable once Scheduling panel mounts.
+        if (await this.testId('eviction-strategy').isVisible().catch(() => false)) {
+          return true;
+        }
+        const heading = this.page
+          .getByRole('heading', { name: /Scheduling and resource requirements/i })
+          .or(this.page.getByText('Scheduling and resource requirements', { exact: false }));
+        if (await heading.first().isVisible().catch(() => false)) {
+          return true;
+        }
+        return await this.page
+          .getByText('Node selector', { exact: false })
+          .first()
+          .isVisible()
+          .catch(() => false);
+      };
+
+      // Cheap check only — never call navigateToConfigurationScheduling here.
+      // Callers wrap this in expect.poll; a 3-minute waitFor inside the poll burns the
+      // suite timeout (see gating failures on "Scheduling sub-tab should load").
+      if (await markersVisible()) {
+        return true;
+      }
+      // Light re-click of the Scheduling tab with a short budget.
+      await this.page.keyboard.press('Escape').catch(() => undefined);
+      if (await this._vmConfigurationScheduling.isVisible().catch(() => false)) {
+        await this._vmConfigurationScheduling.click({ force: true }).catch(() => undefined);
+        await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
+      }
+      return markersVisible();
+    } catch {
+      return false;
+    }
   }
 
   async navigateToConfigurationSSH(): Promise<void> {
