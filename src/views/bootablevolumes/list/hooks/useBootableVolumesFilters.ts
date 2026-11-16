@@ -6,10 +6,8 @@ import useProjectFilter from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/f
 import type { KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ISO } from '@kubevirt-utils/resources/bootableresources/constants';
-import {
-  isBootableVolumeISO,
-  isDeprecated,
-} from '@kubevirt-utils/resources/bootableresources/helpers';
+import { isDeprecated } from '@kubevirt-utils/resources/bootableresources/helpers';
+import { isBootableVolumeISO } from '@kubevirt-utils/resources/bootableresources/isoHelpers';
 import type { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { OS_NAMES } from '@kubevirt-utils/resources/template';

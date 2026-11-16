@@ -7,6 +7,7 @@ import {
   extractCreatedDataSources,
   getCreatedBootableVolumeUrl,
 } from '@kubevirt-utils/components/AddBootableVolumeModal/utils';
+import { isBootableVolumeISO } from '@kubevirt-utils/resources/bootableresources/isoHelpers';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 
@@ -44,7 +45,9 @@ export const showBootableVolumeCreatedSuccessToast = (
         url={getCreatedBootableVolumeUrl(createdVolume)}
       />
     ),
-    title: t('Bootable volume was created successfully'),
+    title: isBootableVolumeISO(createdVolume)
+      ? t('ISO uploaded and detected. Marked as installation media.')
+      : t('Bootable volume was created successfully'),
   });
 };
 

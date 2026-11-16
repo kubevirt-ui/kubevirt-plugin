@@ -7,6 +7,7 @@ import { DEFAULT_INSTANCETYPE_LABEL } from '@kubevirt-utils/constants/instancety
 import { isUploadCanceledError } from '@kubevirt-utils/hooks/useCDIUpload/errors';
 import { cancelTrackedUploadOnModalClose } from '@kubevirt-utils/hooks/useInFlightToast/cancel/modalUploadCancel';
 import { appendBootableVolumeContext } from '@kubevirt-utils/resources/bootableresources/constants';
+import { isIsoFile } from '@kubevirt-utils/resources/bootableresources/isoHelpers';
 import { type BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { getLabel, getResourceUrl } from '@kubevirt-utils/resources/shared';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
@@ -17,6 +18,7 @@ import { createBootableVolume } from './createBootableVolume';
 import {
   type AddBootableVolumeState,
   type HandleAddBootableVolumeModalCloseParams,
+  type SetBootableVolumeFieldType,
   type SubmitAddBootableVolumeParams,
 } from './types';
 
@@ -45,6 +47,13 @@ export const updateBootableVolumeField = (
     ? { [key]: { ...(prevState[key] as object), [fieldKey]: value } }
     : { [key]: value }),
 });
+
+export const autoDetectIsoField = (
+  setBootableVolumeField: SetBootableVolumeFieldType,
+  pathOrUrl?: null | string,
+): void => {
+  setBootableVolumeField('isIso')(isIsoFile(pathOrUrl));
+};
 
 export const deleteBootableVolumeLabel = (
   prevState: AddBootableVolumeState,

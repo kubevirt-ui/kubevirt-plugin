@@ -22,6 +22,7 @@ const createBootVolumeSchema = (): yup.ObjectSchema<BootVolumeSelection> =>
       .nullable()
       .optional(),
     diskSize: yup.string().optional(),
+    isIso: yup.boolean().optional(),
     persistentVolumeClaimSource: yup
       .mixed<NonNullable<BootVolumeSelection['persistentVolumeClaimSource']>>()
       .nullable()

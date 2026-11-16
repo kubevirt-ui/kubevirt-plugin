@@ -16,7 +16,9 @@ type CapacityInputProps = {
   isDisabled?: boolean;
   isEditingCreatedDisk?: boolean;
   isMinusDisabled?: boolean;
+  isRequired?: boolean;
   label?: string;
+  labelHelp?: ReactElement;
   minValue?: number;
   onChange: (quantityString: string) => void;
   /** size must be in a Kubernetes Quantity format: https://kubernetes.io/docs/reference/kubernetes-api/common-definitions/quantity/ */
@@ -28,7 +30,9 @@ const CapacityInput: FC<CapacityInputProps> = ({
   isDisabled,
   isEditingCreatedDisk,
   isMinusDisabled,
+  isRequired = true,
   label,
+  labelHelp,
   minValue,
   onChange,
   size,
@@ -47,9 +51,13 @@ const CapacityInput: FC<CapacityInputProps> = ({
     onChange(quantityToString({ unit: newUnit, value }));
   };
 
+  const minimumValue = minValue ?? 1;
+
   const onMinus = (): void => {
     if (value === undefined) return;
-    onValueChange(Number.isInteger(value) ? value - 1 : Math.floor(value));
+    const nextValue = Number.isInteger(value) ? value - 1 : Math.floor(value);
+    if (nextValue < minimumValue) return;
+    onValueChange(nextValue);
   };
 
   const onPlus = (): void => {
@@ -60,25 +68,32 @@ const CapacityInput: FC<CapacityInputProps> = ({
   const unitOptions = useUnitOptions(size);
 
   const validated: ValidatedOptions =
-    !value || value <= 0 || (minValue && value < minValue)
-      ? ValidatedOptions.error
-      : ValidatedOptions.default;
+    !value || value < minimumValue ? ValidatedOptions.error : ValidatedOptions.default;
 
   return (
-    <FormGroup className="disk-source-form-group" fieldId="size-required" isRequired label={label}>
-      <Split hasGutter>
+    <FormGroup
+      className="disk-source-form-group"
+      fieldId="size-required"
+      isRequired={isRequired}
+      label={label}
+      labelHelp={labelHelp}
+    >
+      <Split className={label ? 'pf-v6-u-mt-sm' : undefined} hasGutter>
         <SplitItem>
           <NumberInput
             isDisabled={isDisabled || isEditingCreatedDisk}
             max={Number.MAX_SAFE_INTEGER}
-            min={1}
+            min={minimumValue}
             minusBtnAriaLabel={t('Decrement')}
-            minusBtnProps={{ isDisabled: isDisabled || isMinusDisabled }}
+            minusBtnProps={{
+              isDisabled:
+                isDisabled || isMinusDisabled || (value !== undefined && value <= minimumValue),
+            }}
             onChange={(event: ChangeEvent<HTMLInputElement>) => {
               const numberValue = Number(event.target.value);
               if (
                 Number.isInteger(numberValue) &&
-                numberValue >= 1 &&
+                numberValue >= minimumValue &&
                 numberValue <= Number.MAX_SAFE_INTEGER
               ) {
                 onValueChange(numberValue);
@@ -108,7 +123,7 @@ const CapacityInput: FC<CapacityInputProps> = ({
         {validated === ValidatedOptions.error && (
           <>
             {t('Size cannot be')} {getErrorValue(t, value)}
-            {value > 0 && ` ${minValue} ${addByteSuffix(unit)}`}
+            {value > 0 && ` ${minimumValue} ${addByteSuffix(unit)}`}
           </>
         )}
       </FormGroupHelperText>

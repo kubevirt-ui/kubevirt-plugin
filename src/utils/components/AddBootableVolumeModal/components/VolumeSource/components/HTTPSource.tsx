@@ -5,6 +5,7 @@ import {
   type AddBootableVolumeState,
   type SetBootableVolumeFieldType,
 } from '@kubevirt-utils/components/AddBootableVolumeModal/types';
+import { autoDetectIsoField } from '@kubevirt-utils/components/AddBootableVolumeModal/utils';
 import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import { FormTextInput } from '@kubevirt-utils/components/FormTextInput/FormTextInput';
 import { TLSCertificateSection } from '@kubevirt-utils/components/TLSCertificateSection';
@@ -46,7 +47,11 @@ const HTTPSource: FC<HTTPSourceProps> = ({
         <FormTextInput
           id="image-url"
           onBlur={onUrlBlur}
-          onChange={(event) => setBootableVolumeField('url')(event.currentTarget.value)}
+          onChange={(event) => {
+            const url = event.currentTarget.value;
+            setBootableVolumeField('url')(url);
+            autoDetectIsoField(setBootableVolumeField, url);
+          }}
           type="text"
           validated={urlValidated}
           value={bootableVolume?.url ?? ''}
