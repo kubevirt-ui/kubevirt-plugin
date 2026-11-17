@@ -13,11 +13,24 @@ export const getDeletionProtectionPrintableStatus = (vm: V1VirtualMachine) => {
   return deletionProtectionEnabled ? t('Enabled') : t('Disabled');
 };
 
+export const applyDeletionProtectionLabel = (
+  vm: V1VirtualMachine,
+  enableDeletionProtection: boolean,
+): V1VirtualMachine => ({
+  ...vm,
+  metadata: {
+    ...vm.metadata,
+    labels: {
+      ...getLabels(vm, {}),
+      [VM_DELETION_PROTECTION_LABEL]: enableDeletionProtection ? 'true' : 'false',
+    },
+  },
+});
+
 export const setDeletionProtectionForVM = (
   vm: V1VirtualMachine,
   enableDeletionProtection: boolean,
 ) => {
-  const vmLabels = getLabels(vm, {});
-  vmLabels[VM_DELETION_PROTECTION_LABEL] = enableDeletionProtection.toString();
-  return updateLabels(vm, vmLabels);
+  const updatedVM = applyDeletionProtectionLabel(vm, enableDeletionProtection);
+  return updateLabels(updatedVM, updatedVM.metadata.labels);
 };

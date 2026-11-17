@@ -101,6 +101,20 @@ describe('customizeInstanceType', () => {
       expect(result.metadata.namespace).toBe('new-namespace');
     });
 
+    it('should set label keys that contain dots without nesting', () => {
+      vmSignal.value = mockVM;
+
+      const result = updateCustomizeInstanceType([
+        {
+          data: 'true',
+          path: ['metadata', 'labels', 'kubevirt.io/vm-delete-protection'],
+        },
+      ]);
+
+      expect(result.metadata.labels['kubevirt.io/vm-delete-protection']).toBe('true');
+      expect(result.metadata.labels.kubevirt).toBeUndefined();
+    });
+
     it('should create nested objects when they do not exist', () => {
       vmSignal.value = {
         ...mockVM,
