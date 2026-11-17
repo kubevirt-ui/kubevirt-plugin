@@ -22,8 +22,10 @@ type SelfValidationTestSuiteName =
   | typeof TEST_SUITE_STORAGE
   | typeof TEST_SUITE_TIER2;
 
-type SelfValidationSuiteResult = {
-  failed_tests?: string[];
+export type FailedTestsByCategory = Record<string, string[]>;
+
+export type SelfValidationSuiteResult = {
+  failed_tests?: FailedTestsByCategory;
   tests_duration?: string;
   tests_failures?: number;
   tests_passed?: number;

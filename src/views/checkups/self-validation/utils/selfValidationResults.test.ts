@@ -18,8 +18,9 @@ compute:
   tests_skipped: 0
   tests_duration: "45m30s"
   failed_tests:
-    - "[sig-compute]VMIlifecycle Creating a VirtualMachineInstance should start in paused state"
-    - "[sig-compute]SecurityFeatures Check virt-launcher capabilities has precisely the documented extra capabilities"
+    lifecycle:
+      - "[sig-compute]VMIlifecycle Creating a VirtualMachineInstance should start in paused state"
+      - "[sig-compute]SecurityFeatures Check virt-launcher capabilities has precisely the documented extra capabilities"
 network:
   tests_run: 40
   tests_passed: 35
@@ -27,11 +28,12 @@ network:
   tests_skipped: 0
   tests_duration: "52m15s"
   failed_tests:
-    - |
-      [sig-network] [level:component]Networkpolicy
-      when three alpine VMs with default networking are started
-      and serverVMI start an HTTP server on port 80 and 81
-      should succeed pinging between two VMI/s in the same namespace
+    policy:
+      - |
+        [sig-network] [level:component]Networkpolicy
+        when three alpine VMs with default networking are started
+        and serverVMI start an HTTP server on port 80 and 81
+        should succeed pinging between two VMI/s in the same namespace
 storage:
   tests_run: 30
   tests_passed: 22
@@ -39,7 +41,8 @@ storage:
   tests_skipped: 5
   tests_duration: "38m45s"
   failed_tests:
-    - "[sig-storage] Volumes update with migration should migrate the source volume"`;
+    volumes:
+      - "[sig-storage] Volumes update with migration should migrate the source volume"`;
 
       const configMap: IoK8sApiCoreV1ConfigMap = {
         data: {
@@ -57,10 +60,12 @@ storage:
         total_tests_skipped: 5,
       });
       expect(result?.compute).toEqual({
-        failed_tests: [
-          '[sig-compute]VMIlifecycle Creating a VirtualMachineInstance should start in paused state',
-          '[sig-compute]SecurityFeatures Check virt-launcher capabilities has precisely the documented extra capabilities',
-        ],
+        failed_tests: {
+          lifecycle: [
+            '[sig-compute]VMIlifecycle Creating a VirtualMachineInstance should start in paused state',
+            '[sig-compute]SecurityFeatures Check virt-launcher capabilities has precisely the documented extra capabilities',
+          ],
+        },
         tests_duration: '45m30s',
         tests_failures: 2,
         tests_passed: 28,
@@ -68,13 +73,15 @@ storage:
         tests_skipped: 0,
       });
       expect(result?.network).toEqual({
-        failed_tests: [
-          `[sig-network] [level:component]Networkpolicy
+        failed_tests: {
+          policy: [
+            `[sig-network] [level:component]Networkpolicy
 when three alpine VMs with default networking are started
 and serverVMI start an HTTP server on port 80 and 81
 should succeed pinging between two VMI/s in the same namespace
 `,
-        ],
+          ],
+        },
         tests_duration: '52m15s',
         tests_failures: 5,
         tests_passed: 35,
@@ -82,9 +89,9 @@ should succeed pinging between two VMI/s in the same namespace
         tests_skipped: 0,
       });
       expect(result?.storage).toEqual({
-        failed_tests: [
-          '[sig-storage] Volumes update with migration should migrate the source volume',
-        ],
+        failed_tests: {
+          volumes: ['[sig-storage] Volumes update with migration should migrate the source volume'],
+        },
         tests_duration: '38m45s',
         tests_failures: 3,
         tests_passed: 22,

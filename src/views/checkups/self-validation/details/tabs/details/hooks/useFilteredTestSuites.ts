@@ -14,9 +14,10 @@ export const useFilteredTestSuites = (
   return useMemo((): Array<[string, TestSuiteData]> => {
     if (!tests) return [];
     return Object.entries(tests).reduce<Array<[string, TestSuiteData]>>((acc, [key, value]) => {
-      if (key !== 'summary') {
-        acc.push([key, value as TestSuiteData]);
-      }
+      // Skip empty/null suite payloads (e.g. `compute:` with no body in the results YAML)
+      if (key === 'summary' || !value) return acc;
+
+      acc.push([key, value as TestSuiteData]);
       return acc;
     }, []);
   }, [tests]);
