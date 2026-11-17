@@ -665,7 +665,8 @@ export default class RequestContextClient implements ProxyApiContext {
     if (nonPriv && canRunOc()) {
       const kubeconfig = resolveKubeconfig();
       runOcCommand(`oc adm policy add-role-to-user admin test -n ${name}`, kubeconfig);
-      await new Promise((resolve) => setTimeout(resolve, 2_000));
+      // Console project dropdown caches SelfSubjectAccessReviews; give bindings time to land.
+      await new Promise((resolve) => setTimeout(resolve, 5_000));
     }
   }
 
@@ -1050,6 +1051,44 @@ export default class RequestContextClient implements ProxyApiContext {
     throw new Error(
       `Timed out waiting for NetworkAttachmentDefinition ${namespace}/${name} to exist`,
     );
+  }
+
+  /**
+   * Poll until VirtualMachine status.printableStatus matches.
+   * Example VMs stay Provisioning while the DV is created; Start stays disabled until Stopped.
+   */
+  async waitForVmPrintableStatus(
+    namespace: string,
+    name: string,
+    status: string,
+    timeoutMs = TestTimeouts.TEST_VM_CREATION,
+  ): Promise<void> {
+    let lastStatus = 'unknown';
+    const deadline = Date.now() + timeoutMs;
+    const intervalMs = 500;
+    while (Date.now() < deadline) {
+      const vm = await this.getVirtualMachine(namespace, name);
+      lastStatus = (vm?.status?.printableStatus as string | undefined) ?? 'missing';
+      if (lastStatus === status) {
+        return;
+      }
+      await new Promise((resolve) => setTimeout(resolve, intervalMs));
+    }
+    throw new Error(
+      `VM ${namespace}/${name} should reach printableStatus ${status} (last: ${lastStatus})`,
+    );
+  }
+
+  /**
+   * Wait until the example VM disk is Bound and printableStatus is Stopped so Actions → Start is enabled.
+   */
+  async waitForExampleVmStartable(
+    namespace: string,
+    name: string,
+    timeoutMs = TestTimeouts.TEST_VM_CREATION,
+  ): Promise<void> {
+    await this.waitForPersistentVolumeClaimBound(name, namespace, timeoutMs);
+    await this.waitForVmPrintableStatus(namespace, name, 'Stopped', timeoutMs);
   }
 
   async waitForPersistentVolumeClaimBound(

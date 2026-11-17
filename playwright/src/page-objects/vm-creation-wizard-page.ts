@@ -57,7 +57,7 @@ export class VmCreationWizardPage extends BasePage {
 
   /** Deployment details → Location: select the target project for the new VM. */
   async selectLocationProject(projectName: string): Promise<void> {
-    for (let attempt = 1; attempt <= 2; attempt += 1) {
+    for (let attempt = 1; attempt <= 3; attempt += 1) {
       const selected = await this.trySelectLocationProject(projectName)
         .then(() => true)
         .catch(() => false);

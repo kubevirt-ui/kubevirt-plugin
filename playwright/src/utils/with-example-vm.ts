@@ -1,4 +1,4 @@
-import type RequestContextClient from '@/clients/request-context-client';
+import type RequestContextClient from '@/clients/main-request-context-client';
 import { CRUD_NAMES } from '@/utils/constants';
 
 /** Apply example VM manifest, run test body, delete VM in `finally`. */
@@ -10,6 +10,7 @@ export async function withExampleVm(
 ): Promise<void> {
   await apiClient.deleteVirtualMachine(vmName, testNamespace);
   await apiClient.applyVirtualMachineExample(testNamespace, vmName);
+  await apiClient.waitForExampleVmStartable(testNamespace, vmName);
   try {
     await run(vmName);
   } finally {

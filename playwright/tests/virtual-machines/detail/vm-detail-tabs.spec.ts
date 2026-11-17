@@ -1,9 +1,11 @@
-import { GATING_TAG, GATING, VM_TABS_TAG } from '@/data-models/allure-constants';
+import { T1, T1_TAG, VM_TABS_TAG } from '@/data-models/allure-constants';
 import { expect, test } from '@/fixtures/vm-tabs-fixture';
 
 const SUITE = 'VM and VMI detail tabs';
 
-test.describe(SUITE, { tag: [GATING_TAG] }, () => {
+// Tier1 only — RHEL9 template + full VMI tab sweep is too heavy/flaky for Hot Cluster gating
+// (aligns with main; 4.22 gating uses a lighter example-VM tabs check).
+test.describe(SUITE, { tag: [T1_TAG, '@tier1-vm-tabs'] }, () => {
   test('VM and VMI detail tabs show expected content', async ({
     apiClient,
     vmTreePage,
@@ -13,8 +15,8 @@ test.describe(SUITE, { tag: [GATING_TAG] }, () => {
     test.setTimeout(utils.TestTimeouts.TEST_EXTENDED);
     await utils.withAllure({
       suite: SUITE,
-      feature: GATING,
-      tags: [GATING_TAG, VM_TABS_TAG, 'vmi-tabs'],
+      feature: T1,
+      tags: [T1_TAG, VM_TABS_TAG, 'vmi-tabs'],
     });
 
     const namespace = utils.generateTestNamespace('t1-vm-tabs');

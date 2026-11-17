@@ -1058,19 +1058,23 @@ export class VmListPage extends ResourceListPage {
     }
     await target.scrollIntoViewIfNeeded().catch(() => undefined);
     const dispatchContextMenu = async (): Promise<void> => {
-      if (treeItemId.startsWith('projectSelector/')) {
-        const namespace = treeItemId.replace(/^projectSelector\//, '');
-        const escaped = namespace.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        const projectItem = this.vmTreeViewPanel().getByRole('treeitem', {
-          name: new RegExp(`^${escaped}(\\s|$)`),
-        });
-        await projectItem.click({ button: 'right', force: true }).catch(() => undefined);
-      } else {
-        await this.treeItemById(treeItemId)
-          .click({ button: 'right', force: true })
-          .catch(() => undefined);
-      }
+      // Prefer id-based click — project tree ids are `projectSelector/#single-cluster#/<ns>`.
+      await target.click({ button: 'right', force: true }).catch(() => undefined);
       const menu = this.page.locator('.right-click-action-menu');
+      if (await menu.isVisible().catch(() => false)) {
+        return;
+      }
+      if (treeItemId.startsWith('projectSelector/')) {
+        // Accessible name is the bare namespace, not the cluster-prefixed id suffix.
+        const namespace = treeItemId.split('/').pop() ?? '';
+        if (namespace) {
+          const escaped = namespace.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+          const projectItem = this.vmTreeViewPanel().getByRole('treeitem', {
+            name: new RegExp(`^${escaped}(\\s|$)`, 'i'),
+          });
+          await projectItem.click({ button: 'right', force: true }).catch(() => undefined);
+        }
+      }
       if (await menu.isVisible().catch(() => false)) {
         return;
       }

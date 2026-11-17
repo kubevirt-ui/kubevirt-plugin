@@ -1,8 +1,9 @@
-import { GATING_TAG, GATING } from '@/data-models/allure-constants';
+import { T1, T1_TAG } from '@/data-models/allure-constants';
 import { expect, test } from '@/fixtures/vm-tabs-fixture';
 import { TestTimeouts } from '@/utils/test-config';
 
-test.describe('VM Overview - namespace level', { tag: [GATING_TAG, '@tier1-vm-overview'] }, () => {
+// Tier1 only — two running RHEL9 VMs + health widgets exceed Hot Cluster gating budget (aligns with main).
+test.describe('VM Overview - namespace level', { tag: [T1_TAG, '@tier1-vm-overview'] }, () => {
   test('Namespace VM overview health and resource charts', async ({
     apiClient,
     vmTreePage,
@@ -12,8 +13,8 @@ test.describe('VM Overview - namespace level', { tag: [GATING_TAG, '@tier1-vm-ov
     test.setTimeout(TestTimeouts.TEST_EXTENDED);
     await utils.withAllure({
       suite: 'VM Overview - namespace level',
-      feature: GATING,
-      tags: [GATING_TAG, '@tier1-vm-overview'],
+      feature: T1,
+      tags: [T1_TAG, '@tier1-vm-overview'],
     });
 
     const namespace = utils.generateTestNamespace('vm-overview-ns');
