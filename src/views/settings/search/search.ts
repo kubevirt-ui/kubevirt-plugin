@@ -30,6 +30,7 @@ export const getClusterTabIds = (t: TFunction): SearchItem[] => [
   },
   { id: CLUSTER_TAB_IDS.bootableVolumesProject, title: t('Bootable volumes project') },
   { id: CLUSTER_TAB_IDS.templatesProject, title: t('Templates project') },
+  { id: CLUSTER_TAB_IDS.defaultRunStrategy, title: t('Default run strategy') },
   { id: CLUSTER_TAB_IDS.vmActionsConfirmation, title: t('VirtualMachine actions confirmation') },
   { id: CLUSTER_TAB_IDS.hideYamlTab, title: t('Hide YAML tab') },
   { id: CLUSTER_TAB_IDS.advancedCDROMFeatures, title: t('Advanced CD-ROM features') },

@@ -75,7 +75,7 @@ export const getSpecConfiguration = ({
         ...(selectPreferenceKind && { kind: selectPreferenceKind }),
       },
     }),
-    runStrategy: getDefaultRunningStrategy(),
+    runStrategy: getDefaultRunningStrategy(context.runStrategy),
     template: getSpecTemplateConfiguration({
       enableMultiArchBootImageImport,
       hasBootVolume,

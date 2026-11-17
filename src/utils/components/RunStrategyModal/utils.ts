@@ -3,6 +3,7 @@ import { type TFunction } from 'i18next';
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import {
   getDefaultRunningStrategy,
+  isRunStrategyValue,
   type RunStrategy,
   RUNSTRATEGY_ALWAYS,
   RUNSTRATEGY_HALTED,
@@ -104,13 +105,16 @@ export const migrateRunningFieldToRunStrategy = (vmSpec: V1VirtualMachine['spec'
   vmSpec.runStrategy ??= wasRunning ? RUNSTRATEGY_ALWAYS : RUNSTRATEGY_HALTED;
 };
 
-export const initializeRunStrategyFromTemplateSpec = (vmSpec: V1VirtualMachine['spec']): void => {
+export const initializeRunStrategyFromTemplateSpec = (
+  vmSpec: V1VirtualMachine['spec'],
+  configuredRunStrategy?: string,
+): void => {
   if (!vmSpec) {
     return;
   }
 
   migrateRunningFieldToRunStrategy(vmSpec);
-  vmSpec.runStrategy ??= getDefaultRunningStrategy();
+  vmSpec.runStrategy ??= getDefaultRunningStrategy(configuredRunStrategy);
 };
 
 /**
@@ -133,15 +137,8 @@ export const isRunStrategyManual = (runStrategy: RunStrategy | undefined): boole
 export const isRunStrategyNotHalted = (runStrategy: RunStrategy | undefined): boolean =>
   Boolean(runStrategy) && runStrategy !== RUNSTRATEGY_HALTED;
 
-const VALID_RUN_STRATEGIES = new Set<string>([
-  RUNSTRATEGY_ALWAYS,
-  RUNSTRATEGY_HALTED,
-  RUNSTRATEGY_MANUAL,
-  RUNSTRATEGY_RERUNONFAILURE,
-]);
-
 export const isValidRunStrategy = (value: string): value is RunStrategy =>
-  VALID_RUN_STRATEGIES.has(value);
+  isRunStrategyValue(value);
 
 /**
  * Builds JSON Patch operations to set spec.runStrategy and remove the deprecated spec.running.
