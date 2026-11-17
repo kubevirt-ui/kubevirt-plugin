@@ -1,4 +1,4 @@
-import React, { FC, useMemo } from 'react';
+import React, { type FC, useMemo } from 'react';
 
 import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
 import useClusterVersion from '@kubevirt-utils/hooks/useClusterVersion/useClusterVersion';
@@ -15,13 +15,12 @@ import {
   GRID_CLUSTER_MIGRATION_STATUS,
   OVERVIEW_LEVEL_CLUSTER,
   OVERVIEW_LEVEL_MULTICLUSTER,
-  OverviewSectionData,
+  type OverviewSectionData,
 } from '../../types';
 import MigrationsWidget from '../MigrationsWidget/MigrationsWidget';
 import OverviewSection from '../OverviewSection/OverviewSection';
 import OverviewSectionRow from '../OverviewSection/OverviewSectionRow';
 import StorageMigrationPlansWidget from '../StorageMigrationPlansWidget/StorageMigrationPlansWidget';
-
 import MultiClusterMigrationStatusSection from './MultiClusterMigrationStatusSection';
 import { buildMigrationsSpokePath, getMigrationsTabPath, MIGRATIONS_DURATION } from './utils';
 
@@ -38,7 +37,9 @@ const MigrationStatusSection: FC<OverviewSectionData> = ({
   const activeNamespace = useActiveNamespace();
   const { isSpokeCluster, spokeConsoleURL } = useManagedClusterConsoleURLs(cluster);
   const effectiveCluster = cluster ?? activeCluster ?? undefined;
-  const [clusterVersion, clusterVersionLoaded] = useClusterVersion(effectiveCluster);
+  const [clusterVersion, clusterVersionLoaded, clusterVersionError] =
+    useClusterVersion(effectiveCluster);
+  const clusterVersionSettled = clusterVersionLoaded || !!clusterVersionError;
 
   const overviewLevel = determineOverviewLevel(namespace, isAllClustersPage);
   const isClusterLevel = overviewLevel === OVERVIEW_LEVEL_CLUSTER;
@@ -60,13 +61,13 @@ const MigrationStatusSection: FC<OverviewSectionData> = ({
       activeCluster,
       activeNamespace,
       clusterVersion,
-      clusterVersionLoaded,
+      clusterVersionSettled,
     );
   }, [
     activeCluster,
     activeNamespace,
     clusterVersion,
-    clusterVersionLoaded,
+    clusterVersionSettled,
     isACMPage,
     isSpokeCluster,
   ]);
@@ -76,11 +77,11 @@ const MigrationStatusSection: FC<OverviewSectionData> = ({
     const spokePath = buildMigrationsSpokePath(
       activeNamespace,
       clusterVersion,
-      clusterVersionLoaded,
+      clusterVersionSettled,
     );
     if (!spokePath) return undefined;
     return buildSpokeConsoleUrl(spokeConsoleURL, spokePath);
-  }, [activeNamespace, clusterVersion, clusterVersionLoaded, isSpokeCluster, spokeConsoleURL]);
+  }, [activeNamespace, clusterVersion, clusterVersionSettled, isSpokeCluster, spokeConsoleURL]);
 
   if (isMultiClusterLevel) {
     return <MultiClusterMigrationStatusSection title={title} />;
@@ -94,7 +95,7 @@ const MigrationStatusSection: FC<OverviewSectionData> = ({
       >
         <MigrationsWidget
           cardTitle={t('Compute migrations')}
-          isLoading={!migrationsLoaded || !clusterVersionLoaded}
+          isLoading={!migrationsLoaded}
           migrationsTabHref={migrationsTabHref}
           migrationsTabPath={migrationsTabPath}
           subHeader={t('Last day')}
