@@ -337,7 +337,9 @@ export class VmCreationWizardPage extends BasePage {
       hasText: vmName,
     });
     await row.first().waitFor({ state: 'visible', timeout: TestTimeouts.LONG_OPERATION });
-    await this.robustClick(row.first());
+    // Click the radio — the name cell is a ResourceLink and navigates out of the wizard.
+    const radio = row.first().getByRole('radio').or(row.first().locator('input[type="radio"]'));
+    await radio.first().click({ force: true, timeout: TestTimeouts.ELEMENT_WAIT });
   }
 
   async verifyReviewStepVisible(): Promise<boolean> {
