@@ -12,15 +12,16 @@ import useMigrationCardDataAndFilters from '@overview/MigrationsTab/hooks/useMig
 
 import { determineOverviewLevel } from '../../config';
 import {
+  type OverviewSectionData,
   GRID_THREE_EQUAL,
   OVERVIEW_LEVEL_CLUSTER,
   OVERVIEW_LEVEL_MULTICLUSTER,
-  type OverviewSectionData,
 } from '../../types';
 import MigrationsWidget from '../MigrationsWidget/MigrationsWidget';
 import OverviewSection from '../OverviewSection/OverviewSection';
 import OverviewSectionRow from '../OverviewSection/OverviewSectionRow';
 import StorageMigrationPlansWidget from '../StorageMigrationPlansWidget/StorageMigrationPlansWidget';
+
 import MultiClusterMigrationStatusSection from './MultiClusterMigrationStatusSection';
 import { buildMigrationsSpokePath, getMigrationsTabPath, MIGRATIONS_DURATION } from './utils';
 
