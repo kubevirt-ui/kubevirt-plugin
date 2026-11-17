@@ -11,6 +11,7 @@ import { FormTextInput } from '@kubevirt-utils/components/FormTextInput/FormText
 import { TLSCertificateSection } from '@kubevirt-utils/components/TLSCertificateSection';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { useRequiredFieldValidation } from '@kubevirt-utils/hooks/useRequiredFieldValidation';
+import { getIsoDetectionPath } from '@kubevirt-utils/resources/bootableresources/isoHelpers';
 import { getFieldRequiredMessage } from '@kubevirt-utils/utils/validation';
 import { FormGroup } from '@patternfly/react-core';
 
@@ -49,8 +50,12 @@ const HTTPSource: FC<HTTPSourceProps> = ({
           onBlur={onUrlBlur}
           onChange={(event) => {
             const url = event.currentTarget.value;
+            const previousPath = getIsoDetectionPath(bootableVolume?.url);
+            const nextPath = getIsoDetectionPath(url);
             setBootableVolumeField('url')(url);
-            autoDetectIsoField(setBootableVolumeField, url);
+            if (previousPath !== nextPath) {
+              autoDetectIsoField(setBootableVolumeField, url);
+            }
           }}
           type="text"
           validated={urlValidated}

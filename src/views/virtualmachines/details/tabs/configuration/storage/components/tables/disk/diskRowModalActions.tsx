@@ -11,6 +11,7 @@ import CreateBootableVolumeModal from '../../modal/CreateBootableVolumeModal';
 import EjectCDROMModal from '../../modal/EjectCDROMModal';
 import MakePersistentModal from '../../modal/MakePersistentModal';
 import MountCDROMModal from '../../modal/MountCDROMModal';
+import UseAsISOModal from '../../modal/UseAsISOModal';
 import DiskRowDeleteModal from './DiskRowDeleteModal';
 import { isPVCSource } from './utils/helpers';
 
@@ -118,4 +119,25 @@ export const openCDROMModal = (
       />
     ),
   );
+};
+
+export const openUseAsISOModal = (
+  createModal: CreateModal,
+  params: {
+    diskName: string;
+    getCurrentVM?: () => null | undefined | V1VirtualMachine;
+    onDiskSubmit: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine>;
+    vm: V1VirtualMachine;
+  },
+): void => {
+  createModal(({ isOpen, onClose }) => (
+    <UseAsISOModal
+      diskName={params.diskName}
+      getCurrentVM={params.getCurrentVM}
+      isOpen={isOpen}
+      onClose={onClose}
+      onSubmit={params.onDiskSubmit}
+      vm={params.vm}
+    />
+  ));
 };

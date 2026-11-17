@@ -11,6 +11,7 @@ export type DiskRowActionsProps = {
   getCurrentVM?: () => null | undefined | V1VirtualMachine;
   obj: DiskRowDataLayout;
   onDiskUpdate?: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine>;
+  onUploadStart?: (uploadKey: string) => void;
   vm: V1VirtualMachine;
   vmi?: V1VirtualMachineInstance;
 };
