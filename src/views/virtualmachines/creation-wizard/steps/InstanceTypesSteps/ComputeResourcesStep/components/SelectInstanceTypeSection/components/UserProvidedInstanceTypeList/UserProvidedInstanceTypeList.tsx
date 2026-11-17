@@ -71,8 +71,8 @@ const UserProvidedInstanceTypesList: FC<UserProvidedInstanceTypesListProps> = ({
     );
   }
 
-  const handleRowClick = (itName: string, itNamespace: string) => {
-    setSelectedInstanceType({ name: itName, namespace: itNamespace });
+  const handleRowClick = (itName: string, itNamespace?: string) => {
+    setSelectedInstanceType({ name: itName, namespace: itNamespace ?? null });
   };
 
   return (
@@ -131,7 +131,7 @@ const UserProvidedInstanceTypesList: FC<UserProvidedInstanceTypesListProps> = ({
                 <Tr
                   isRowSelected={
                     selectedInstanceType?.name === itName &&
-                    selectedInstanceType?.namespace === itNamespace
+                    selectedInstanceType?.namespace === (itNamespace ?? null)
                   }
                   isClickable
                   isSelectable
