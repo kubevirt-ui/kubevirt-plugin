@@ -218,7 +218,31 @@ export class VmCreationWizardComputeComponent extends BaseComponent {
   }
 
   async selectInstanceTypeSeries(series: 'cx' | 'd' | 'u' | 'm' | 'n' | 'o' | 'rt'): Promise<void> {
-    const card = this.testId(`instance-type-series-${series}1`);
+    const seriesLabels: Record<typeof series, string> = {
+      cx: 'Compute Exclusive',
+      d: 'Dedicated vCPU',
+      u: 'General Purpose',
+      m: 'Memory Intensive',
+      n: 'Network',
+      o: 'Overcommitted',
+      rt: 'Realtime',
+    };
+
+    // Boot-source → compute can lag; wait for the step + gallery before the series card.
+    await this.locator('.pf-v6-c-wizard h1:has-text("Compute resources")').waitFor({
+      state: 'visible',
+      timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+    });
+    await this.selectComputeTab('redhat').catch(() => undefined);
+    const galleryCard = this.locator('.instance-type-series-menu-card__toggle-card');
+    await galleryCard.first().waitFor({
+      state: 'visible',
+      timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+    });
+
+    const byTestId = this.testId(`instance-type-series-${series}1`);
+    const byLabel = galleryCard.filter({ hasText: seriesLabels[series] });
+    const card = byTestId.or(byLabel.first());
     await card.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
     await this.robustClick(card);
     await this.page.keyboard.press('Escape');

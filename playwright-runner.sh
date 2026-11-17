@@ -1,116 +1,55 @@
 #!/usr/bin/env bash
-# ────────────────────────────────────────────────────────────────────────────
-# playwright-runner.sh — Run Playwright projects for kubevirt-plugin
-#
-# Usage:
-#   ./playwright-runner.sh [project] [extra-args...]
-#
-# Examples:
-#   ./playwright-runner.sh Gating
-#   ./playwright-runner.sh suite --workers=4
-#   ./playwright-runner.sh Tier1 playwright/tests/bootable-volumes/foo.spec.ts
-#   ./playwright-runner.sh all
-#
-# Note: --project=Name (equals form) is required so Playwright's variadic
-# --project option does not swallow file-path / -g filter args.
-# ────────────────────────────────────────────────────────────────────────────
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="${SCRIPT_DIR}"
-cd "${PROJECT_ROOT}"
+cd "${SCRIPT_DIR}"
 
-# ── Helpers ──────────────────────────────────────────────────────────────
+# shellcheck source=scripts/playwright-env.sh
+source "${SCRIPT_DIR}/scripts/playwright-env.sh"
+playwright_bootstrap_env ".env"
 
-detect_urls() {
-  # Derive WEB_CONSOLE_URL from CLUSTER_NAME + CLUSTER_DOMAIN if not already set
-  if [[ -z "${WEB_CONSOLE_URL:-}" ]]; then
-    if [[ -n "${CLUSTER_NAME:-}" && -n "${CLUSTER_DOMAIN:-}" ]]; then
-      export WEB_CONSOLE_URL="https://console-openshift-console.apps.${CLUSTER_NAME}.${CLUSTER_DOMAIN}"
-      echo "ℹ️  Derived WEB_CONSOLE_URL=${WEB_CONSOLE_URL}"
-    fi
-  fi
+usage() {
+  cat <<'EOF'
+Usage: ./playwright-runner.sh [gating] [playwright test args...]
 
-  # Derive CLUSTER_URL from WEB_CONSOLE_URL if not already set
-  if [[ -z "${CLUSTER_URL:-}" && -n "${WEB_CONSOLE_URL:-}" ]]; then
-    local apps_domain
-    apps_domain=$(echo "${WEB_CONSOLE_URL}" | sed -n 's|.*console-openshift-console\.apps\.\(.*\)|\1|p' | sed 's|/$||')
-    if [[ -n "${apps_domain}" ]]; then
-      export CLUSTER_URL="https://api.${apps_domain}:6443"
-      echo "ℹ️  Derived CLUSTER_URL=${CLUSTER_URL}"
-    fi
-  fi
+Project:
+  Gating | gating              @gating (default)
+
+Local console — inline IS_LOCAL=1 wins over IS_LOCAL=0 in .env:
+  IS_LOCAL=1 ./playwright-runner.sh gating --workers=4
+
+CI debug harness (failures → skipped) — off by default; opt in with:
+  CI_DEBUG=1 ./playwright-runner.sh gating --workers=4
+
+Examples:
+  ./playwright-runner.sh
+  ./playwright-runner.sh gating --workers=4
+EOF
 }
 
-# ── Main ─────────────────────────────────────────────────────────────────
+# CI safety harness off by default (hard failures). Opt in with CI_DEBUG=1.
+export CI_DEBUG="${CI_DEBUG:-0}"
 
-PROJECT="${1:-}"
-shift || true
-
-if [[ -z "${PROJECT}" ]]; then
-  echo "Usage: $0 <project> [extra-args...]"
-  echo ""
-  echo "Available projects:"
-  echo "  Gating                 Gating specs (scenario infrastructure)"
-  echo "  Tier1                  Tier 1 specs (scenario infrastructure)"
-  echo "  Tier2                  Tier 2 specs (scenario infrastructure)"
-  echo "  Settings               Settings specs (scenario infrastructure)"
-  echo "  API                    API contract tests (browserless)"
-  echo "  suite                  Run Gating + Tier1 + Tier2 together"
-  echo "  all                    Run all projects"
-  exit 1
-fi
-
-# Load .env if present
-if [[ -f "${PROJECT_ROOT}/.env" ]]; then
-  set -a
-  # shellcheck disable=SC1091
-  source "${PROJECT_ROOT}/.env"
-  set +a
-fi
-
-detect_urls
-
-EXTRA_ARGS=("$@")
-
-PROJECT_LOWER=$(echo "${PROJECT}" | tr '[:upper:]' '[:lower:]')
-
-project_tag_grep_args() {
-  case "$1" in
-    gating)
-      echo --grep '@gating' --grep-invert '@cnv-settings'
+PROJECT="Gating"
+if [[ $# -gt 0 ]]; then
+  case "${1}" in
+    -h | --help | help)
+      usage
+      exit 0
       ;;
-    tier1) echo --grep '@tier1' ;;
-    tier2) echo --grep '@tier2' ;;
-    settings) echo --grep '@cnv-settings' ;;
-    *) echo ;;
+    gating | Gating)
+      PROJECT="Gating"
+      shift
+      ;;
+    --*)
+      # Playwright flags only — keep default Gating project.
+      ;;
+    *)
+      echo "Unknown project '${1}'. Only Gating is supported." >&2
+      usage >&2
+      exit 1
+      ;;
   esac
-}
-
-read -r -a TAG_GREP_ARGS <<< "$(project_tag_grep_args "${PROJECT_LOWER}")"
-
-if [[ "${PROJECT_LOWER}" == "suite" ]]; then
-  echo "🚀 Running suite: Gating + Tier1 + Tier2..."
-  npx playwright test --project=Gating --project=Tier1 --project=Tier2 "${EXTRA_ARGS[@]}"
-elif [[ "${PROJECT_LOWER}" == "all" ]]; then
-  PROJECTS=(
-    Gating
-    Tier1
-    Tier2
-    Settings
-    API
-  )
-  PROJECT_ARGS=()
-  for p in "${PROJECTS[@]}"; do
-    PROJECT_ARGS+=(--project="${p}")
-  done
-  echo "🚀 Running all projects..."
-  npx playwright test "${PROJECT_ARGS[@]}" "${EXTRA_ARGS[@]}"
-else
-  echo "🚀 Running project: ${PROJECT}..."
-  if [[ ${#TAG_GREP_ARGS[@]} -gt 0 ]]; then
-    npx playwright test --project="${PROJECT}" "${TAG_GREP_ARGS[@]}" "${EXTRA_ARGS[@]}"
-  else
-    npx playwright test --project="${PROJECT}" "${EXTRA_ARGS[@]}"
-  fi
 fi
+
+exec ./scripts/run-playwright.sh "--project=${PROJECT}" "$@"

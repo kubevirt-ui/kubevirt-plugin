@@ -1054,6 +1054,27 @@ export default class RequestContextClient extends BaseClient implements ProxyApi
     }
   }
 
+  async ensureVmTemplatesEnabled(cnvNamespace = 'openshift-cnv'): Promise<void> {
+    try {
+      await this.mergePatchResource(
+        '',
+        'v1',
+        'configmaps',
+        'kubevirt-ui-features',
+        {
+          data: {
+            vmTemplates: 'true',
+            // Wizard gating expects General Purpose (u1) visible.
+            disabledInstanceTypeFamilies: '[]',
+          },
+        },
+        cnvNamespace,
+      );
+    } catch {
+      // ignore
+    }
+  }
+
   setupTestNamespace(namespace: string) {
     return this.project.setupTestNamespace(namespace);
   }

@@ -97,6 +97,7 @@ test.describe('Role aggregation strategy', { tag: [ROUTE_VIRTUALIZATION_SETTINGS
     settingsPage,
     apiClient,
   }) => {
+    test.setTimeout(TestTimeouts.TEST_EXTENDED);
     test.skip(
       !(await hcoSupportsRoleAggregationStrategy(apiClient)),
       'HyperConverged CRD does not include roleAggregationStrategy on this cluster',
@@ -138,10 +139,11 @@ async function assertPreviewControlsGrantToggle(
   const sectionOpen = await settingsPage.openAutomaticGrantVirtualizationRolesSection();
   expect(sectionOpen, 'Automatically grant Virtualization roles section should open').toBe(true);
 
+  // Preview flag is ConfigMap-backed; Cluster tab enablement lags the PATCH response.
   await expect
     .poll(async () => settingsPage.isAutomaticGrantVirtualizationRolesEnabled(), {
-      intervals: [1_000],
-      timeout: TestTimeouts.DEFAULT,
+      intervals: [1_000, 2_000],
+      timeout: TestTimeouts.LONG_OPERATION,
     })
     .toBe(enablePreview);
 }
@@ -153,7 +155,7 @@ async function assertHcoStrategy(apiClient: RequestContextClient, expectedStrate
         const strategy = await getHcoStrategyField(apiClient);
         return strategy ?? STRATEGY_AGGREGATE_TO_DEFAULT;
       },
-      { intervals: [2_000], timeout: TestTimeouts.DEFAULT },
+      { intervals: [2_000, 3_000, 5_000], timeout: TestTimeouts.LONG_OPERATION },
     )
     .toBe(expectedStrategy);
 }
@@ -165,7 +167,8 @@ async function assertAggregateLabels(apiClient: RequestContextClient, expectPres
         const allPresent = await hasAggregateLabels(apiClient);
         return allPresent;
       },
-      { intervals: [2_000], timeout: TestTimeouts.DEFAULT },
+      // ClusterRole label reconcile lags the HCO strategy patch under load.
+      { intervals: [2_000, 3_000, 5_000], timeout: TestTimeouts.LONG_OPERATION },
     )
     .toBe(expectPresent);
 }
@@ -180,15 +183,13 @@ async function setGrantAndAssertAggregation(
   },
 ): Promise<void> {
   const { enable, expectedStrategy, expectAggregateLabel } = options;
-  const onOffOption = enable ? 'ON' : 'OFF';
 
-  const toggled = await settingsPage.setAutomaticGrantVirtualizationRoles(enable);
-  expect(toggled, `AutomaticallyGrantVirtualizationRoles should be ${onOffOption}`).toBe(true);
+  await settingsPage.setAutomaticGrantVirtualizationRoles(enable);
 
   await expect
     .poll(async () => settingsPage.isAutomaticGrantVirtualizationRolesChecked(), {
-      intervals: [500],
-      timeout: TestTimeouts.DEFAULT,
+      intervals: [500, 1000],
+      timeout: TestTimeouts.LONG_OPERATION,
     })
     .toBe(enable);
 

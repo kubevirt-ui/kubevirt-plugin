@@ -28,6 +28,11 @@ test.describe('Create VM via wizard — new VM', { tag: [ROUTE_VM_WIZARD_TAG, GA
     await vmCreationWizardPage.selectFirstAvailableBootVolume();
     await vmCreationWizardPage.clickNext();
 
+    const computeVisible = await vmCreationWizardPage.verifyComputeResourcesStepVisible();
+    expect(computeVisible, 'Compute resources step should be visible after boot source').toBe(
+      true,
+    );
+
     await vmCreationWizardPage.selectInstanceTypeSeries('u');
     await vmCreationWizardPage.selectComputeSize('small');
     await vmCreationWizardPage.clickNext();

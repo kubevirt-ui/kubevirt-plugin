@@ -1,8 +1,12 @@
 /**
  * Page object for the OpenShift console login page.
+ * IDP helpers match CNV-98979 (`clickIdpLogin` / `navigateToIdpLogin` / named htpasswd IDP).
  */
 
 import type { Page } from '@playwright/test';
+
+import { pollUntil } from '@/utils/poll-until';
+import { SECOND, TestTimeouts } from '@/utils/test-config';
 
 import BasePage from '../base-page';
 
@@ -24,20 +28,40 @@ export default class LoginPage extends BasePage {
   /**
    * Returns a locator targeting a specific IDP entry by name (e.g. "test-users").
    * Matches both button style (`title="Log in with test-users"`) and link style
-   * (text content or `idp=test-users` href param).
+   * (text content or `idp=test-users` href param) — same as CNV-98979.
    */
   private _idpEntryByName(name: string): ReturnType<typeof this.locator> {
     const encoded = encodeURIComponent(name);
-    return this.locator(`[title="Log in with ${name}"], a[href*="idp=${encoded}"]`);
+    return this.locator(
+      `[title="Log in with ${name}"], a[href*="idp=${encoded}"], a[href*="idp=${name}"]`,
+    ).or(this.page.getByRole('link', { name }));
   }
 
   async clickKubeAdminLogin() {
     await this._kubeAdminButton.click();
   }
 
+  /** CNV-98979: click a specific IDP entry by name. */
+  async clickIdpLogin(idp: string): Promise<void> {
+    const entry = this._idpEntryByName(idp);
+    if (
+      await entry
+        .first()
+        .isVisible()
+        .catch(() => false)
+    ) {
+      await entry.first().click();
+      return;
+    }
+    await this.page.getByRole('link', { name: idp }).click();
+  }
+
   async clickTestLogin(idpName?: string) {
-    const entry = idpName ? this._idpEntryByName(idpName) : this._nonAdminIdpEntry.first();
-    await entry.click();
+    if (idpName) {
+      await this.clickIdpLogin(idpName);
+      return;
+    }
+    await this._nonAdminIdpEntry.first().click();
   }
 
   async fillAndSubmitLoginForm(username: string, password: string) {
@@ -50,8 +74,123 @@ export default class LoginPage extends BasePage {
     if (useCoLoginBtn) {
       await coLoginBtn.click();
     } else {
-      await submitBtn.click();
+      await submitBtn
+        .or(this.page.getByRole('button', { name: /^Log in$/i }))
+        .first()
+        .click();
     }
+  }
+
+  /** CNV-98979: visibility of a named IDP entry. */
+  async isIdpButtonVisible(idp: string, timeoutMs = 5 * SECOND): Promise<boolean> {
+    return this._idpEntryByName(idp)
+      .first()
+      .isVisible({ timeout: timeoutMs })
+      .catch(() => false);
+  }
+
+  /** Username/password form (after IDP choice or on clusters with no IDP list). */
+  async isLoginFormVisible(timeoutMs = 5 * SECOND): Promise<boolean> {
+    return this.locator('#inputUsername')
+      .isVisible({ timeout: timeoutMs })
+      .catch(() => false);
+  }
+
+  /**
+   * Deep-link to an IDP (CNV-98979). With multiple providers the chooser may still appear.
+   */
+  async navigateToIdpLogin(baseUrl: string, idp: string): Promise<void> {
+    const root = baseUrl.replace(/\/$/, '');
+    const encoded = encodeURIComponent(idp);
+    await this._gotoAuthToleratingAbort(`${root}/auth/login?idp=${encoded}`);
+    await this.waitForLoginRouteReady();
+  }
+
+  /**
+   * Console `/auth/login` redirects to oauth-openshift; wait for chooser or credential form.
+   */
+  async waitForLoginRouteReady(timeoutMs = TestTimeouts.CONSOLE_LOGIN): Promise<void> {
+    await pollUntil(
+      async () => (await this.isIdpSelectionVisible(500)) || (await this.isLoginFormVisible(500)),
+      {
+        message: 'OpenShift OAuth login (IDP chooser or credential form) should load',
+        timeout: timeoutMs,
+      },
+    );
+  }
+
+  /** OAuth shows an IDP list when multiple providers exist (e.g. kube:admin + test-users). */
+  async isIdpSelectionVisible(timeoutMs = 5 * SECOND): Promise<boolean> {
+    const chooserHeading = this.page.getByRole('heading', { name: /^Log in with$/i });
+    if (
+      await chooserHeading
+        .isVisible({ timeout: Math.min(timeoutMs, 3 * SECOND) })
+        .catch(() => false)
+    ) {
+      return true;
+    }
+    if (await this.isKubeAdminButtonVisible({ timeout: timeoutMs })) {
+      return true;
+    }
+    const idpLinks = this.page.locator('a[href*="idp="]');
+    if ((await idpLinks.count()) > 0) {
+      return idpLinks
+        .first()
+        .isVisible({ timeout: Math.min(timeoutMs, 3 * SECOND) })
+        .catch(() => false);
+    }
+    return false;
+  }
+
+  /** OAuth redirects often abort `load`; prefer `domcontentloaded` and ignore ERR_ABORTED. */
+  private async _gotoAuthToleratingAbort(url: string): Promise<void> {
+    try {
+      await this.page.goto(url, {
+        timeout: TestTimeouts.CONSOLE_LOGIN,
+        waitUntil: 'domcontentloaded',
+      });
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : String(error);
+      if (!/ERR_ABORTED|frame was detached/i.test(msg)) {
+        throw error;
+      }
+    }
+  }
+
+  /** Open kubeadmin login form when the IDP picker is absent or kube:admin is offered. */
+  async openKubeadminLoginForm(): Promise<void> {
+    if (await this.isLoginFormVisible(2 * SECOND)) {
+      return;
+    }
+    if (await this.isKubeAdminButtonVisible({ timeout: 3 * SECOND })) {
+      await this.clickKubeAdminLogin();
+      await this.locator('#inputUsername').waitFor({
+        state: 'visible',
+        timeout: TestTimeouts.ELEMENT_WAIT,
+      });
+      return;
+    }
+    if (await this.isIdpButtonVisible('kube:admin', 2 * SECOND)) {
+      await this.clickIdpLogin('kube:admin');
+      await this.locator('#inputUsername').waitFor({
+        state: 'visible',
+        timeout: TestTimeouts.ELEMENT_WAIT,
+      });
+    }
+  }
+
+  /** Poll until a named IDP button appears (CNV-98979). */
+  async waitForIdpButtonWithReload(
+    baseUrl: string,
+    idp: string,
+    maxAttempts = 15,
+    retryIntervalMs = 5 * SECOND,
+  ): Promise<boolean> {
+    return this.waitForTestButtonWithReload(baseUrl, {
+      idpName: idp,
+      maxAttempts,
+      retryIntervalMs,
+    });
   }
 
   /**
@@ -106,9 +245,12 @@ export default class LoginPage extends BasePage {
 
     if (isLocalhost) {
       await this.goTo('/');
-    } else {
-      await this.goTo('/auth/login');
+      return;
     }
+
+    const root = (baseUrl || new URL(this.page.url()).origin).replace(/\/$/, '');
+    await this._gotoAuthToleratingAbort(`${root}/auth/login`);
+    await this.waitForLoginRouteReady();
   }
 
   async performLogout() {

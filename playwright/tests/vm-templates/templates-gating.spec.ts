@@ -39,112 +39,120 @@ test.describe('Templates page load', { tag: [ROUTE_VM_TEMPLATES_TAG, GATING_TAG]
   });
 });
 
-test.describe('Template creation flows', { tag: [ROUTE_VM_TEMPLATES_TAG, GATING_TAG, '@resource-creation'] }, () => {
-  test('Create a template via YAML editor', async ({
-    apiClient,
-    templatesPage,
-    testConfig,
-    utils,
-  }) => {
-    await utils.withAllure({ suite: RESOURCE_SUITE, feature: GATING, tags: [GATING_TAG] });
+test.describe(
+  'Template creation flows',
+  { tag: [ROUTE_VM_TEMPLATES_TAG, GATING_TAG, '@resource-creation'] },
+  () => {
+    test('Create a template via YAML editor', async ({
+      apiClient,
+      templatesPage,
+      testConfig,
+      utils,
+    }) => {
+      await utils.withAllure({ suite: RESOURCE_SUITE, feature: GATING, tags: [GATING_TAG] });
 
-    const templateName = utils.generateRandomTemplateName('gating-yaml-tpl');
-    const ns = testConfig.testNamespace;
+      const templateName = utils.generateRandomTemplateName('gating-yaml-tpl');
+      const ns = testConfig.testNamespace;
 
-    await templatesPage.navigateToTemplatesViaUI();
-    await templatesPage.switchProject(ns);
-    await templatesPage.clickCreateTemplate();
-    await templatesPage.setCreateTemplateExampleNameInYamlEditor(templateName, ns);
-    await templatesPage.clickCreateButtonInModal();
-    apiClient.trackResource('Template', templateName, ns);
+      await templatesPage.navigateToTemplatesViaUI();
+      await templatesPage.switchProject(ns);
+      await templatesPage.clickCreateTemplate();
+      await templatesPage.setCreateTemplateExampleNameInYamlEditor(templateName, ns);
+      await templatesPage.clickCreateButtonInModal();
+      apiClient.trackResource('Template', templateName, ns);
 
-    await templatesPage.page.waitForURL((url) => url.pathname.includes(templateName), {
-      timeout: utils.TestTimeouts.DEFAULT,
+      await templatesPage.page.waitForURL((url) => url.pathname.includes(templateName), {
+        timeout: utils.TestTimeouts.DEFAULT,
+      });
+
+      await expect
+        .poll(
+          async () => {
+            await templatesPage.navigateToTemplatesViaUI();
+            await templatesPage.switchProject(ns);
+            await templatesPage.filterTemplatesByName(templateName);
+            return templatesPage.isTemplateVisible(templateName);
+          },
+          {
+            message: `Template ${templateName} should be visible after creation`,
+            timeout: utils.TestTimeouts.UI_ELEMENT_VISIBILITY,
+            intervals: [2000, 3000, 5000],
+          },
+        )
+        .toBe(true);
     });
 
-    await expect
-      .poll(
-        async () => {
-          await templatesPage.navigateToTemplatesViaUI();
-          await templatesPage.switchProject(ns);
-          await templatesPage.filterTemplatesByName(templateName);
-          return templatesPage.isTemplateVisible(templateName);
-        },
-        {
-          message: `Template ${templateName} should be visible after creation`,
-          timeout: utils.TestTimeouts.UI_ELEMENT_VISIBILITY,
-          intervals: [2000, 3000, 5000],
-        },
-      )
-      .toBe(true);
-  });
+    test('Clone a template from an existing template', async ({
+      templatesPage,
+      pageCommons,
+      utils,
+    }) => {
+      await utils.withAllure({ suite: RESOURCE_SUITE, feature: GATING, tags: [GATING_TAG] });
 
-  test('Clone a template from an existing template', async ({
-    templatesPage,
-    pageCommons,
-    utils,
-  }) => {
-    await utils.withAllure({ suite: RESOURCE_SUITE, feature: GATING, tags: [GATING_TAG] });
+      await templatesPage.navigateToTemplatesViaUI();
+      await pageCommons.switchProject('All Projects');
 
-    await templatesPage.navigateToTemplatesViaUI();
-    await pageCommons.switchProject('All Projects');
+      await templatesPage.clickCreateTemplateOption('From an existing template');
 
-    await templatesPage.clickCreateTemplateOption('From an existing template');
+      const dialog = await templatesPage.verifyCloneDialogOpen();
+      expect.soft(dialog.dialogVisible, 'Clone dialog should be visible').toBe(true);
+      expect
+        .soft(dialog.hasSourceProjectSelector, 'Should show source project selector')
+        .toBe(true);
 
-    const dialog = await templatesPage.verifyCloneDialogOpen();
-    expect.soft(dialog.dialogVisible, 'Clone dialog should be visible').toBe(true);
-    expect.soft(dialog.hasSourceProjectSelector, 'Should show source project selector').toBe(true);
+      await templatesPage.closeDialog();
+    });
 
-    await templatesPage.closeDialog();
-  });
+    test('"From a virtual machine" navigates to the VM list', async ({ templatesPage, utils }) => {
+      await utils.withAllure({ suite: RESOURCE_SUITE, feature: GATING, tags: [GATING_TAG] });
 
-  test('"From a virtual machine" navigates to the VM list', async ({ templatesPage, utils }) => {
-    await utils.withAllure({ suite: RESOURCE_SUITE, feature: GATING, tags: [GATING_TAG] });
+      await templatesPage.navigateToTemplatesViaUI();
+      await templatesPage.clickCreateTemplateOption('From a virtual machine');
 
-    await templatesPage.navigateToTemplatesViaUI();
-    await templatesPage.clickCreateTemplateOption('From a virtual machine');
+      const result = await templatesPage.verifyNavigatedToVmsPage();
+      expect(result.onVmList, 'Should navigate to the VirtualMachines list with tab=vms').toBe(
+        true,
+      );
+      expect
+        .soft(result.toastVisible, 'Should show guidance toast for saving a VM as a template')
+        .toBe(true);
+    });
 
-    const result = await templatesPage.verifyNavigatedToVmsPage();
-    expect(result.onVmList, 'Should navigate to the VirtualMachines list with tab=vms').toBe(true);
-    expect
-      .soft(result.toastVisible, 'Should show guidance toast for saving a VM as a template')
-      .toBe(true);
-  });
+    // Re-enable after hot cluster is upgraded to CNV 4.22+ (requires template.kubevirt.io CRDs).
+    test('Create a template from a virtual machine', async ({
+      apiClient,
+      vmDetailPage,
+      vmListPage,
+      templatesPage,
+      testConfig,
+      utils,
+    }) => {
+      test.skip(!(await isNativeVmTemplatesEnabled(apiClient)), 'Native VM templates not enabled');
+      await utils.withAllure({ suite: RESOURCE_SUITE, feature: GATING, tags: [GATING_TAG] });
 
-  // Re-enable after hot cluster is upgraded to CNV 4.22+ (requires template.kubevirt.io CRDs).
-  test.skip('Create a template from a virtual machine', async ({
-    apiClient,
-    vmDetailPage,
-    vmListPage,
-    templatesPage,
-    testConfig,
-    utils,
-  }) => {
-    test.skip(!(await isNativeVmTemplatesEnabled(apiClient)), 'Native VM templates not enabled');
-    await utils.withAllure({ suite: RESOURCE_SUITE, feature: GATING, tags: [GATING_TAG] });
+      const vmName = utils.generateRandomVmName('save-tpl');
+      const ns = testConfig.testNamespace;
+      const templateName = utils.generateRandomTemplateName('from-vm');
 
-    const vmName = utils.generateRandomVmName('save-tpl');
-    const ns = testConfig.testNamespace;
-    const templateName = utils.generateRandomTemplateName('from-vm');
+      await apiClient.createVmFromTemplate('rhel9-server-small', vmName, ns);
+      apiClient.trackResource('VirtualMachine', vmName, ns);
+      const created = await apiClient.verifyVmCreated(vmName, ns, utils.TestTimeouts.VM_BOOTUP);
+      expect(created.exists, `VM ${vmName} should be created`).toBe(true);
 
-    await apiClient.createVmFromTemplate('rhel9-server-small', vmName, ns);
-    apiClient.trackResource('VirtualMachine', vmName, ns);
-    const created = await apiClient.verifyVmCreated(vmName, ns, utils.TestTimeouts.VM_BOOTUP);
-    expect(created.exists, `VM ${vmName} should be created`).toBe(true);
+      await vmListPage.navigateToVmViaTreeView(ns, vmName);
+      const nameVisible = await vmDetailPage.isVmNameVisible(
+        vmName,
+        utils.TestTimeouts.UI_ELEMENT_VISIBILITY,
+      );
+      expect(nameVisible, 'VM detail page should show the VM name').toBe(true);
 
-    await vmListPage.navigateToVmViaTreeView(ns, vmName);
-    const nameVisible = await vmDetailPage.isVmNameVisible(
-      vmName,
-      utils.TestTimeouts.UI_ELEMENT_VISIBILITY,
-    );
-    expect(nameVisible, 'VM detail page should show the VM name').toBe(true);
+      await vmDetailPage.saveAsTemplate(templateName, ns);
+      apiClient.trackResource('Template', templateName, ns);
 
-    await vmDetailPage.saveAsTemplate(templateName, ns);
-    apiClient.trackResource('Template', templateName, ns);
-
-    await templatesPage.navigateToTemplatesViaUI();
-    await templatesPage.filterTemplatesByName(templateName);
-    const tplVisible = await templatesPage.isTemplateVisible(templateName);
-    expect(tplVisible, `Template ${templateName} should be visible after creation`).toBe(true);
-  });
-});
+      await templatesPage.navigateToTemplatesViaUI();
+      await templatesPage.filterTemplatesByName(templateName);
+      const tplVisible = await templatesPage.isTemplateVisible(templateName);
+      expect(tplVisible, `Template ${templateName} should be visible after creation`).toBe(true);
+    });
+  },
+);
