@@ -1,4 +1,4 @@
-import { type FC, useCallback, useState } from 'react';
+import { type FC } from 'react';
 import { Link } from 'react-router';
 
 import ClusterDropdown from '@kubevirt-utils/components/ClusterProjectDropdown/ClusterDropdown';
@@ -9,6 +9,8 @@ import useCanManageClusterSettings from '@kubevirt-utils/hooks/useCanManageClust
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { VirtualMachineModelRef } from '@kubevirt-utils/models';
 import { getNamespacePathSegment } from '@kubevirt-utils/utils/utils';
+import { FLEET_VIRTUAL_MACHINES_PATH } from '@multicluster/constants';
+import useIsACMPage from '@multicluster/useIsACMPage';
 import { DocumentTitle, useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk';
 import {
   Breadcrumb,
@@ -21,9 +23,9 @@ import {
   Title,
 } from '@patternfly/react-core';
 import { useSignals } from '@preact/signals-react/runtime';
-import { useFleetClusterNames, useHubClusterName } from '@stolostron/multicluster-sdk';
 
 import { SettingsClusterProvider } from './context/SettingsClusterContext';
+import useMulticlusterSettingsUI from './hooks/useMulticlusterSettingsUI';
 import { createSettingsSearchURL, getSearchItems } from './search/search';
 import SettingsTab from './SettingsTab';
 
@@ -32,27 +34,26 @@ import './SettingsPage.scss';
 const SettingsPage: FC = () => {
   useSignals();
 
+  const isFleetPath = useIsACMPage();
   const { t } = useKubevirtTranslation();
   const [activeNamespace] = useActiveNamespace();
-  const [clusterNames, clustersLoaded] = useFleetClusterNames();
-  const [hubClusterName] = useHubClusterName();
-  const [selectedCluster, setSelectedCluster] = useState<string>();
-
-  const showClusterDropdown = clusterNames?.length > 1;
-  const activeCluster = selectedCluster ?? hubClusterName;
-
-  const contextCluster =
-    activeCluster && activeCluster !== hubClusterName ? activeCluster : undefined;
-
+  const {
+    activeCluster,
+    contextCluster,
+    isFleetSettings,
+    onClusterChange,
+    showMulticlusterSettings,
+    waitForFleetClusters,
+  } = useMulticlusterSettingsUI(isFleetPath);
   const [canManageClusterSettings] = useCanManageClusterSettings(contextCluster);
 
-  const onClusterChange = useCallback((cluster: string) => {
-    setSelectedCluster(cluster);
-  }, []);
-
-  if (!clustersLoaded) {
+  if (waitForFleetClusters) {
     return <LoadingEmptyState />;
   }
+
+  const virtualizationHref = isFleetSettings
+    ? `${FLEET_VIRTUAL_MACHINES_PATH}/all-clusters/all-namespaces`
+    : `/k8s/${getNamespacePathSegment(activeNamespace)}/${VirtualMachineModelRef}`;
 
   return (
     <>
@@ -62,11 +63,7 @@ const SettingsPage: FC = () => {
           <PageSection className="settings-page__header" hasBodyWrapper={false}>
             <Breadcrumb>
               <BreadcrumbItem>
-                <Link
-                  to={`/k8s/${getNamespacePathSegment(activeNamespace)}/${VirtualMachineModelRef}`}
-                >
-                  {t('Virtualization')}
-                </Link>
+                <Link to={virtualizationHref}>{t('Virtualization')}</Link>
               </BreadcrumbItem>
               <BreadcrumbItem isActive>{t('Settings')}</BreadcrumbItem>
             </Breadcrumb>
@@ -81,20 +78,20 @@ const SettingsPage: FC = () => {
           </PageSection>
           <PageSection className="settings-page__toolbar" hasBodyWrapper={false}>
             <Grid hasGutter>
-              {showClusterDropdown && (
+              {showMulticlusterSettings && (
                 <GridItem className="settings-page__cluster-selector" span={4}>
                   {t('Cluster')}:
                   <ClusterDropdown
                     includeAllClusters={false}
                     onChange={onClusterChange}
-                    selectedCluster={activeCluster}
+                    selectedCluster={activeCluster ?? ''}
                   />
                 </GridItem>
               )}
-              <GridItem span={showClusterDropdown ? 8 : 12}>
+              <GridItem span={showMulticlusterSettings ? 8 : 12}>
                 <ConfigurationSearch
                   createSearchURL={createSettingsSearchURL}
-                  placeholder={showClusterDropdown ? t('Find in selected cluster') : undefined}
+                  placeholder={showMulticlusterSettings ? t('Find in selected cluster') : undefined}
                   searchItems={getSearchItems(t, canManageClusterSettings)}
                 />
               </GridItem>
@@ -102,7 +99,7 @@ const SettingsPage: FC = () => {
           </PageSection>
         </div>
         <PageSection className="settings-page__content" hasBodyWrapper={false} isWidthLimited>
-          <SettingsClusterProvider cluster={contextCluster} key={activeCluster ?? 'hub'}>
+          <SettingsClusterProvider cluster={contextCluster} key={contextCluster ?? 'hub'}>
             <SettingsTab />
           </SettingsClusterProvider>
         </PageSection>

@@ -8,6 +8,7 @@ import {
   FLEET_BOOTABLE_VOLUMES_PATH,
   FLEET_CHECKUPS_PATH,
   FLEET_MIGRATION_POLICIES_PATH,
+  FLEET_SETTINGS_PATH,
   FLEET_TEMPLATES_PATH,
   FLEET_VIRTUAL_MACHINES_PATH,
 } from '../constants';
@@ -20,6 +21,8 @@ export const getFleetTemplatesURL = (cluster: string, namespace: string): string
 
 export const getFleetBootableVolumesURL = (cluster: string, namespace: string): string =>
   `${FLEET_BOOTABLE_VOLUMES_PATH}/cluster/${cluster}/ns/${namespace}`;
+
+export const getFleetSettingsURL = (): string => FLEET_SETTINGS_PATH;
 
 export const getFleetMigrationPoliciesListURL = (cluster?: string): string => {
   if (!cluster || cluster === ALL_CLUSTERS_KEY) {

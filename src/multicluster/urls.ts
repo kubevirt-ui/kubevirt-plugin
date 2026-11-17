@@ -4,6 +4,7 @@ export {
   getFleetBootableVolumesURL,
   getFleetCheckupsURL,
   getFleetMigrationPoliciesListURL,
+  getFleetSettingsURL,
   getFleetTemplatesURL,
   isVMDetailsPage,
 } from './urls/fleetPageUrls';
