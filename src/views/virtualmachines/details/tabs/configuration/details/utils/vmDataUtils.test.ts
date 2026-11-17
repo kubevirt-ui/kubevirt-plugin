@@ -68,6 +68,27 @@ describe('CPU and memory patches', () => {
     ]);
   });
 
+  it('stores a CPU model with the CPU', () => {
+    const originalVM = makeVM({
+      cpu: { cores: 2, sockets: 1, threads: 1 },
+      memory: { guest: '4Gi' },
+    });
+    const updatedVM = applyCPUMemoryToVM(
+      originalVM,
+      { cores: 2, model: 'Penryn', sockets: 1, threads: 1 },
+      4,
+      BinaryUnit.Gi,
+    );
+
+    expect(buildVirtualMachineResourcePatches(originalVM, updatedVM)).toEqual([
+      {
+        op: 'replace',
+        path: '/spec/template/spec/domain/cpu',
+        value: { cores: 2, model: 'Penryn', sockets: 1, threads: 1 },
+      },
+    ]);
+  });
+
   it('adds CPU when it does not exist', () => {
     const originalVM = makeVM({ memory: { guest: '4Gi' } });
     const updatedVM = applyCPUMemoryToVM(

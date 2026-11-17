@@ -1,8 +1,13 @@
 import { type FC, useMemo, useState } from 'react';
 
-import { type V1CPU, type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import {
+  type V1CPU,
+  type V1VirtualMachine,
+  type V1VirtualMachineInstance,
+} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import CPUInput from '@kubevirt-utils/components/CPUMemoryModal/components/CPUInput/CPUInput';
 import { getCPULimitsFromVM } from '@kubevirt-utils/components/CPUMemoryModal/components/CPUInput/utils/utils';
+import CPUModelInput from '@kubevirt-utils/components/CPUMemoryModal/components/CPUModelInput/CPUModelInput';
 import MemoryInput from '@kubevirt-utils/components/CPUMemoryModal/components/MemoryInput/MemoryInput';
 import { applyCPUMemoryToVM } from '@kubevirt-utils/components/CPUMemoryModal/utils/CpuMemoryUtils';
 import MemoryLimitsWarning from '@kubevirt-utils/components/MemoryLimitsWarning/MemoryLimitsWarning';
@@ -35,6 +40,7 @@ type CPUMemoryModalProps = {
   onSubmit: (updatedVM: V1VirtualMachine) => Promise<VirtuaMachineOrVoid> | VirtuaMachineOrVoid;
   templateNamespace?: string;
   vm: V1VirtualMachine;
+  vmi?: V1VirtualMachineInstance;
 };
 
 const CPUMemoryModal: FC<CPUMemoryModalProps> = ({
@@ -43,6 +49,7 @@ const CPUMemoryModal: FC<CPUMemoryModalProps> = ({
   onSubmit,
   templateNamespace = DEFAULT_NAMESPACE,
   vm,
+  vmi,
 }) => {
   const { t } = useKubevirtTranslation();
   const cluster = useClusterParam();
@@ -117,6 +124,7 @@ const CPUMemoryModal: FC<CPUMemoryModalProps> = ({
             setMemoryUnit={setMemoryUnit}
           />
         </div>
+        <CPUModelInput cluster={cluster} cpu={cpu} setCPU={setCPU} vmi={vmi} />
         <MemoryLimitsWarning vm={previewVM} />
         {updateError && (
           <Alert isInline title={t('Error')} variant={AlertVariant.danger}>

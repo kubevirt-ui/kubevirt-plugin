@@ -123,6 +123,7 @@ const DetailsSectionComputeItems: FC<DetailsSectionComputeItemsProps> = ({
                 onClose={onClose}
                 onSubmit={(updatedVM) => updatedVirtualMachine(vm, updatedVM)}
                 vm={vm}
+                vmi={vmi}
               />
             ),
           )

@@ -152,9 +152,14 @@ const DefaultCPUModel: FC<DefaultCPUModelProps> = ({ hyperConvergeConfiguration 
               )}
               variant={AlertVariant.warning}
             >
-              {missingNodes.map((nodeName) => (
-                <NodeLink cluster={cluster} key={nodeName} nodeName={nodeName} />
-              ))}
+              {missingNodes.length > 0 && (
+                <Stack>
+                  <StackItem>{t('Not supported on:')}</StackItem>
+                  {missingNodes.map((nodeName) => (
+                    <NodeLink cluster={cluster} key={nodeName} nodeName={nodeName} />
+                  ))}
+                </Stack>
+              )}
             </Alert>
           )}
           {selected !== savedModel && (
