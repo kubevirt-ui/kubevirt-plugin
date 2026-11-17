@@ -7,6 +7,7 @@ import { acmExtensions } from './extensions/acmExtensions';
 import { checkupRouteExtensions } from './extensions/checkupRouteExtensions';
 import { migrationRouteExtensions } from './extensions/migrationRouteExtensions';
 import { navigationExtensions, perspectiveExtension } from './extensions/navigationExtensions';
+import { settingsRouteExtensions } from './extensions/settingsRouteExtensions';
 import { templateRouteExtensions } from './extensions/templateRouteExtensions';
 import { vmRouteExtensions } from './extensions/vmRouteExtensions';
 
@@ -27,4 +28,5 @@ export const extensions: EncodedExtension[] = [
   ...migrationRouteExtensions,
   ...acmExtensions,
   ...checkupRouteExtensions,
+  ...settingsRouteExtensions,
 ];

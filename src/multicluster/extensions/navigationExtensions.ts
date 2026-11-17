@@ -15,6 +15,7 @@ import {
 } from '../constants';
 
 import { PERSPECTIVES } from '../../utils/constants/constants';
+import { fleetSettingsNavigationExtensions } from './fleetSettingsNavigationExtensions';
 
 export const perspectiveExtension: EncodedExtension<Perspective> = {
   flags: {
@@ -141,4 +142,5 @@ export const navigationExtensions: EncodedExtension[] = [
     },
     type: 'console.navigation/href',
   } as EncodedExtension<HrefNavItem>,
+  ...fleetSettingsNavigationExtensions,
 ];
