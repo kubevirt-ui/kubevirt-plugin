@@ -1,20 +1,20 @@
 import { useCanListNamespaces } from '@kubevirt-utils/hooks/useCanListNamespaces';
 import { useK8sModel } from '@openshift-console/dynamic-plugin-sdk';
+import { useFleetAccessReview } from '@stolostron/multicluster-sdk';
 import { renderHook } from '@testing-library/react';
 
-import useCanListResourceClusterWide from './useCanListResourceClusterWide';
 import useNamespacesWithListAccess from './useNamespacesWithListAccess';
 import useResourceWatchStrategy from './useResourceWatchStrategy';
 
 jest.mock('@kubevirt-utils/hooks/useCanListNamespaces', () => ({
   useCanListNamespaces: jest.fn(),
 }));
-jest.mock('./useCanListResourceClusterWide', () => ({ __esModule: true, default: jest.fn() }));
+jest.mock('@stolostron/multicluster-sdk', () => ({ useFleetAccessReview: jest.fn() }));
 jest.mock('./useNamespacesWithListAccess', () => ({ __esModule: true, default: jest.fn() }));
 jest.mock('@openshift-console/dynamic-plugin-sdk', () => ({ useK8sModel: jest.fn() }));
 
 const mockCanListNamespaces = useCanListNamespaces as jest.Mock;
-const mockCanListClusterWide = useCanListResourceClusterWide as jest.Mock;
+const mockCanListClusterWide = useFleetAccessReview as jest.Mock;
 const mockNamespacesWithAccess = useNamespacesWithListAccess as jest.Mock;
 const mockUseK8sModel = useK8sModel as jest.Mock;
 
@@ -86,7 +86,9 @@ describe('useResourceWatchStrategy (CNV-101272)', () => {
       perNamespace: false,
       resolved: true,
     });
-    expect(mockCanListClusterWide.mock.calls.at(-1)[0]).toBeNull();
+    expect(mockCanListClusterWide.mock.calls.at(-1)[0]).toEqual(
+      expect.objectContaining({ group: '', resource: '' }),
+    );
   });
 
   it('waits for the project list before choosing per-namespace watches', () => {
@@ -102,5 +104,60 @@ describe('useResourceWatchStrategy (CNV-101272)', () => {
     mockCanListClusterWide.mockReturnValue([false, false]);
 
     expect(render().resolved).toBe(false);
+  });
+
+  it('local cluster: checks CAN_LIST_NS (no cluster) and lists the resource cluster-wide locally', () => {
+    mockCanListNamespaces.mockReturnValue(true);
+    mockCanListClusterWide.mockReturnValue([true, false]);
+
+    render();
+
+    expect(mockCanListNamespaces).toHaveBeenCalledWith(undefined);
+    expect(mockCanListClusterWide).toHaveBeenCalledWith({
+      cluster: undefined,
+      group: 'kubevirt.io',
+      namespace: undefined,
+      resource: 'virtualmachines',
+      verb: 'list',
+    });
+  });
+
+  it('managed cluster: both namespace and resource reviews target the same cluster', () => {
+    mockCanListNamespaces.mockReturnValue(true);
+    mockCanListClusterWide.mockReturnValue([true, false]);
+
+    render({ cluster: 'spoke-1' });
+
+    expect(mockCanListNamespaces).toHaveBeenCalledWith('spoke-1');
+    expect(mockCanListClusterWide).toHaveBeenCalledWith(
+      expect.objectContaining({ cluster: 'spoke-1', resource: 'virtualmachines', verb: 'list' }),
+    );
+  });
+
+  it('managed cluster mixed RBAC: namespaces listable on spoke but VMs denied -> narrows, no cluster-wide watch', () => {
+    mockCanListNamespaces.mockReturnValue(true);
+    mockCanListClusterWide.mockReturnValue([false, false]);
+    mockNamespacesWithAccess.mockReturnValue([['webapp-vms'], true]);
+
+    expect(render({ cluster: 'spoke-1' })).toEqual({
+      clusterWide: false,
+      namespaces: ['webapp-vms'],
+      perNamespace: true,
+      resolved: true,
+    });
+  });
+
+  it('skips the resource review while the model is unresolved', () => {
+    mockUseK8sModel.mockReturnValue([undefined, true]);
+    mockCanListNamespaces.mockReturnValue(true);
+    mockCanListClusterWide.mockReturnValue([true, false]);
+
+    const { clusterWide, resolved } = render();
+
+    expect(mockCanListClusterWide).toHaveBeenLastCalledWith(
+      expect.objectContaining({ group: '', resource: '' }),
+    );
+    expect(clusterWide).toBe(false);
+    expect(resolved).toBe(false);
   });
 });

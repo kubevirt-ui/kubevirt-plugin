@@ -1,10 +1,10 @@
 import { useCanListNamespaces } from '@kubevirt-utils/hooks/useCanListNamespaces';
-import useCanListResourceClusterWide from '@kubevirt-utils/hooks/useCanListResourceClusterWide';
 import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
 import useNamespacesWithListAccess from '@kubevirt-utils/hooks/useNamespacesWithListAccess';
 import useProjects from '@kubevirt-utils/hooks/useProjects';
 import useIsACMPage from '@multicluster/useIsACMPage';
 import { useK8sModel, useK8sWatchResources } from '@openshift-console/dynamic-plugin-sdk';
+import { useFleetAccessReview } from '@stolostron/multicluster-sdk';
 import { renderHook } from '@testing-library/react';
 
 import { useAccessibleResources } from './useAccessibleResources';
@@ -12,10 +12,7 @@ import { useAccessibleResources } from './useAccessibleResources';
 jest.mock('@kubevirt-utils/hooks/useCanListNamespaces', () => ({
   useCanListNamespaces: jest.fn(),
 }));
-jest.mock('@kubevirt-utils/hooks/useCanListResourceClusterWide', () => ({
-  __esModule: true,
-  default: jest.fn(),
-}));
+jest.mock('@stolostron/multicluster-sdk', () => ({ useFleetAccessReview: jest.fn() }));
 jest.mock('@kubevirt-utils/hooks/useNamespacesWithListAccess', () => ({
   __esModule: true,
   default: jest.fn(),
@@ -43,7 +40,7 @@ const forbidden = Object.assign(new Error('forbidden'), { code: 403 });
 const vm = { metadata: { name: 'vm-1', namespace: 'webapp-vms' } };
 
 const mockCanListNamespaces = useCanListNamespaces as jest.Mock;
-const mockCanListClusterWide = useCanListResourceClusterWide as jest.Mock;
+const mockCanListClusterWide = useFleetAccessReview as jest.Mock;
 const mockNamespacesWithAccess = useNamespacesWithListAccess as jest.Mock;
 const mockWatchResource = useKubevirtWatchResource as jest.Mock;
 const mockUseProjects = useProjects as jest.Mock;
@@ -167,9 +164,41 @@ describe('useAccessibleResources RBAC strategy (CNV-101272)', () => {
 
     render();
 
-    expect(mockCanListClusterWide.mock.calls.at(-1)[0]).toBeNull();
+    expect(mockCanListClusterWide.mock.calls.at(-1)[0]).toEqual(
+      expect.objectContaining({ group: '', resource: '' }),
+    );
     expect(mockWatchResource.mock.calls.at(-1)[0]).toEqual(
       expect.objectContaining({ groupVersionKind: VM_GVK }),
+    );
+  });
+
+  it('local cluster: CAN_LIST_NS path (useCanListNamespaces called without a cluster)', () => {
+    mockCanListNamespaces.mockReturnValue(true);
+    mockCanListClusterWide.mockReturnValue([true, false]);
+
+    render();
+
+    expect(mockCanListNamespaces).toHaveBeenCalledWith(undefined);
+  });
+
+  it('single explicit cluster: namespace and VM list reviews both target that cluster', () => {
+    mockCanListNamespaces.mockReturnValue(true);
+    mockCanListClusterWide.mockReturnValue([true, false]);
+
+    renderHook(() =>
+      useAccessibleResources({
+        clusters: ['spoke-1'],
+        groupVersionKind: VM_GVK,
+        isWatchEnabled: true,
+      }),
+    );
+
+    expect(mockCanListNamespaces).toHaveBeenCalledWith('spoke-1');
+    expect(mockCanListClusterWide).toHaveBeenCalledWith(
+      expect.objectContaining({ cluster: 'spoke-1', resource: 'virtualmachines', verb: 'list' }),
+    );
+    expect(mockWatchResource.mock.calls.at(-1)[0]).toEqual(
+      expect.objectContaining({ cluster: 'spoke-1', isList: true }),
     );
   });
 });

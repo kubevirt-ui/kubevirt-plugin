@@ -1,9 +1,9 @@
 import { useCanListNamespaces } from '@kubevirt-utils/hooks/useCanListNamespaces';
-import useCanListResourceClusterWide from '@kubevirt-utils/hooks/useCanListResourceClusterWide';
 import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
 import useNamespacesWithListAccess from '@kubevirt-utils/hooks/useNamespacesWithListAccess';
 import useProjects from '@kubevirt-utils/hooks/useProjects';
 import { useK8sWatchResources } from '@openshift-console/dynamic-plugin-sdk';
+import { useFleetAccessReview } from '@stolostron/multicluster-sdk';
 import { renderHook } from '@testing-library/react';
 
 import { useTreeViewDataResources } from './useTreeViewDataResources';
@@ -11,9 +11,9 @@ import { useTreeViewDataResources } from './useTreeViewDataResources';
 jest.mock('@kubevirt-utils/hooks/useCanListNamespaces', () => ({
   useCanListNamespaces: jest.fn(),
 }));
-jest.mock('@kubevirt-utils/hooks/useCanListResourceClusterWide', () => ({
-  __esModule: true,
-  default: jest.fn(),
+jest.mock('@stolostron/multicluster-sdk', () => ({
+  useFleetAccessReview: jest.fn(),
+  useFleetClusterNames: () => [[], true, undefined],
 }));
 jest.mock('@kubevirt-utils/hooks/useNamespacesWithListAccess', () => ({
   __esModule: true,
@@ -46,7 +46,7 @@ const forbidden = Object.assign(new Error('forbidden'), { code: 403 });
 const vm = { metadata: { name: 'vm-1', namespace: 'webapp-vms' } };
 
 const mockCanListNamespaces = useCanListNamespaces as jest.Mock;
-const mockCanListClusterWide = useCanListResourceClusterWide as jest.Mock;
+const mockCanListClusterWide = useFleetAccessReview as jest.Mock;
 const mockNamespacesWithAccess = useNamespacesWithListAccess as jest.Mock;
 const mockWatchResource = useKubevirtWatchResource as jest.Mock;
 const mockUseProjects = useProjects as jest.Mock;
