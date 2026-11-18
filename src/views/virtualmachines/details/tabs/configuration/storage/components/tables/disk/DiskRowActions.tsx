@@ -1,46 +1,34 @@
 import { type FC, useMemo, useState } from 'react';
 
-import {
-  type V1VirtualMachine,
-  type V1VirtualMachineInstance,
-} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { isDeclarativeHotplugVolumesEnabled } from '@kubevirt-utils/components/DiskModal/utils/helpers';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import KebabToggle from '@kubevirt-utils/components/toggles/KebabToggle';
 import useIsVMEditable from '@kubevirt-utils/components/VMEditPermissionContext/useIsVMEditable';
-import { getCancelUploadLabel } from '@kubevirt-utils/hooks/useCDIUpload/utils';
 import useKubevirtHyperconvergeConfiguration from '@kubevirt-utils/hooks/useKubevirtHyperconvergeConfiguration';
-import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getDisks } from '@kubevirt-utils/resources/vm';
-import { type DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/constants';
 import { isCDROMDisk } from '@kubevirt-utils/resources/vm/utils/disk/selectors';
 import { getContentScrollableElement, kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { Dropdown } from '@patternfly/react-core';
-import { updateDisks } from '@virtualmachines/details/tabs/configuration/details/utils/utils';
+import {
+  updateDisks,
+  updateDisksAndBootOrder,
+} from '@virtualmachines/details/tabs/configuration/details/utils/utils';
 import { isRunning } from '@virtualmachines/utils';
 
 import { useMountIsoUploadForDisk } from '../../hooks/useMountIsoUploadForDisk';
 import DiskRowActionsItems from './DiskRowActionsItems';
-import { getDiskVolumeState, produceDeletedDiskVM } from './diskRowActionsUtils';
+import { customizeDeleteDisk, getDiskVolumeState } from './diskRowActionsUtils';
 import {
   openBootableVolumeModal,
   openCDROMModal,
   openDeleteDiskModal,
   openEditDiskModal,
   openMakePersistentModal,
+  openUseAsISOModal,
 } from './diskRowModalActions';
+import { type DiskRowActionsProps } from './types';
 import { isHotplugVolume } from './utils/helpers';
-
-type DiskRowActionsProps = {
-  customize?: boolean;
-  getCurrentVM?: () => null | undefined | V1VirtualMachine;
-  obj: DiskRowDataLayout;
-  onDiskUpdate?: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine>;
-  onUploadStart?: (uploadKey: string) => void;
-  vm: V1VirtualMachine;
-  vmi?: V1VirtualMachineInstance;
-};
 
 const DiskRowActions: FC<DiskRowActionsProps> = ({
   customize = false,
@@ -51,7 +39,6 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({
   vm,
   vmi,
 }) => {
-  const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
   const isEditable = useIsVMEditable();
   const { featureGates } = useKubevirtHyperconvergeConfiguration(getCluster(vm));
@@ -61,11 +48,7 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({
   const isHotplug = isHotplugVolume(vm, diskName, vmi);
   const vmDisk = getDisks(vm)?.find((disk) => disk.name === diskName);
   const isCDROM = vmDisk ? isCDROMDisk(vmDisk) : false;
-  const isDeclarativeHotplugVolumesFeatureGateEnabled = useMemo(
-    (): boolean => isDeclarativeHotplugVolumesEnabled(featureGates),
-    [featureGates],
-  );
-
+  const isCDROMOperationsEnabled = isCDROM && isDeclarativeHotplugVolumesEnabled(featureGates);
   const vmIsRunning = isRunning(vm);
 
   const { isCDROMMountedState, volume } = useMemo(
@@ -73,17 +56,9 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({
     [diskName, isCDROM, vmIsRunning, vm, vmi],
   );
 
-  const isCDROMOperationsEnabled = isCDROM && isDeclarativeHotplugVolumesFeatureGateEnabled;
   const { cancelUpload, isUploadInProgress } = useMountIsoUploadForDisk(vm, diskName);
   const onDiskSubmit = onDiskUpdate ?? updateDisks;
-
-  const onCustomizeDeleteDisk = async (): Promise<V1VirtualMachine> => {
-    if (isCDROM) {
-      await cancelUpload();
-    }
-    const newVM = produceDeletedDiskVM(vm, diskName);
-    return onDiskUpdate ? onDiskUpdate(newVM) : Promise.resolve(newVM);
-  };
+  const onUseAsIsoSubmit = onDiskUpdate ?? updateDisksAndBootOrder;
 
   const onModalOpen = (createModalCallback: () => void): void => {
     createModalCallback();
@@ -104,7 +79,6 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({
       })}
     >
       <DiskRowActionsItems
-        cancelUploadLabel={getCancelUploadLabel(t)}
         createBootableVolume={(): void => openBootableVolumeModal(createModal, obj, vm)}
         createCDROMModal={(): void =>
           openCDROMModal(createModal, {
@@ -123,7 +97,8 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({
             diskName,
             isCDROM,
             isHotplug,
-            onCustomizeDeleteDisk,
+            onCustomizeDeleteDisk: () =>
+              customizeDeleteDisk(vm, diskName, isCDROM, cancelUpload, onDiskUpdate),
             vm,
             volume,
           })
@@ -131,9 +106,14 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({
         createEditDiskModal={(): void =>
           openEditDiskModal(createModal, obj, diskName, onDiskSubmit, vm)
         }
-        deleteBtnText={t('Detach')}
-        editBtnText={t('Edit')}
-        ejectText={t('Eject')}
+        createUseAsISOModal={(): void =>
+          openUseAsISOModal(createModal, {
+            diskName,
+            getCurrentVM,
+            onDiskSubmit: onUseAsIsoSubmit,
+            vm,
+          })
+        }
         handleCancelMountIsoUpload={(): void => {
           setIsDropdownOpen(false);
           cancelUpload().catch(kubevirtConsole.error);
@@ -143,14 +123,10 @@ const DiskRowActions: FC<DiskRowActionsProps> = ({
         isCDROMOperationsEnabled={isCDROMOperationsEnabled}
         isHotplug={isHotplug}
         isUploadInProgress={isUploadInProgress}
+        isUseAsISODisabled={vmIsRunning}
         makePersistent={(): void => openMakePersistentModal(createModal, vm, vmi, volume)}
-        makePersistentDescription={t('Will make disk persistent on next reboot')}
-        mountIsoUploadInProgressTooltip={t('Upload in progress')}
-        mountText={t('Mount')}
         obj={obj}
         onModalOpen={onModalOpen}
-        removeHotplugBtnText={t('Make persistent')}
-        saveAsBootableVolumeText={t('Save as bootable volume')}
       />
     </Dropdown>
   );

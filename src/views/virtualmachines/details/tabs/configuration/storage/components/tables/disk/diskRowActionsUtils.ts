@@ -50,3 +50,17 @@ export const produceDeletedDiskVM = (vm: V1VirtualMachine, diskName: string): V1
       (dataVolume) => getName(dataVolume) !== volumeToDelete?.dataVolume?.name,
     );
   });
+
+export const customizeDeleteDisk = async (
+  vm: V1VirtualMachine,
+  diskName: string,
+  isCDROM: boolean,
+  cancelUpload: () => Promise<unknown>,
+  onDiskUpdate?: (updatedVM: V1VirtualMachine) => Promise<V1VirtualMachine>,
+): Promise<V1VirtualMachine> => {
+  if (isCDROM) {
+    await cancelUpload();
+  }
+  const newVM = produceDeletedDiskVM(vm, diskName);
+  return onDiskUpdate ? onDiskUpdate(newVM) : newVM;
+};

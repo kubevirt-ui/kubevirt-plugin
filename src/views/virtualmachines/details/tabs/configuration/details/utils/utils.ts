@@ -1,4 +1,4 @@
-export { updateDisks, updateVolumes } from './vmDiskUtils';
+export { updateDisks, updateDisksAndBootOrder, updateVolumes } from './vmDiskUtils';
 export {
   updateAnnotation,
   updateBootLoader,

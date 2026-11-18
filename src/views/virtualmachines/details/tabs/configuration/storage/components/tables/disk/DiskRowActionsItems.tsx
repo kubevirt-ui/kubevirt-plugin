@@ -1,70 +1,76 @@
 import { type FC, type ReactNode } from 'react';
 
+import { getCancelUploadLabel } from '@kubevirt-utils/hooks/useCDIUpload/utils';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { type DiskRowDataLayout } from '@kubevirt-utils/resources/vm/utils/disk/constants';
 import { DropdownItem, DropdownList, Tooltip } from '@patternfly/react-core';
 
 import { isPVCSource } from './utils/helpers';
 
 type DiskRowActionsItemsProps = {
-  cancelUploadLabel: string;
   createBootableVolume: () => void;
   createCDROMModal: () => void;
   createDeleteDiskModal: () => void;
   createEditDiskModal: () => void;
-  deleteBtnText: string;
-  editBtnText: string;
-  ejectText: string;
+  createUseAsISOModal: () => void;
   handleCancelMountIsoUpload: () => void;
   isCDROM: boolean;
   isCDROMMountedState: boolean;
   isCDROMOperationsEnabled: boolean;
   isHotplug: boolean;
   isUploadInProgress: boolean;
+  isUseAsISODisabled: boolean;
   makePersistent: () => void;
-  makePersistentDescription: string;
-  mountIsoUploadInProgressTooltip: string;
-  mountText: string;
   obj: DiskRowDataLayout;
   onModalOpen: (createModalCallback: () => void) => void;
-  removeHotplugBtnText: string;
-  saveAsBootableVolumeText: string;
 };
 
 const DiskRowActionsItems: FC<DiskRowActionsItemsProps> = ({
-  cancelUploadLabel,
   createBootableVolume,
   createCDROMModal,
   createDeleteDiskModal,
   createEditDiskModal,
-  deleteBtnText,
-  editBtnText,
-  ejectText,
+  createUseAsISOModal,
   handleCancelMountIsoUpload,
   isCDROM,
   isCDROMMountedState,
   isCDROMOperationsEnabled,
   isHotplug,
   isUploadInProgress,
+  isUseAsISODisabled,
   makePersistent,
-  makePersistentDescription,
-  mountIsoUploadInProgressTooltip,
-  mountText,
   obj,
   onModalOpen,
-  removeHotplugBtnText,
-  saveAsBootableVolumeText,
 }) => {
+  const { t } = useKubevirtTranslation();
+  const isoActionText = t('Use as ISO');
+  const mountOrEjectText = isCDROMMountedState ? t('Eject') : t('Mount');
+
   const mountCdromItem: ReactNode = isUploadInProgress ? (
-    <Tooltip content={mountIsoUploadInProgressTooltip}>
+    <Tooltip content={t('Upload in progress')}>
       <span>
         <DropdownItem isDisabled key="cdrom">
-          {isCDROMMountedState ? ejectText : mountText}
+          {mountOrEjectText}
         </DropdownItem>
       </span>
     </Tooltip>
   ) : (
     <DropdownItem key="cdrom" onClick={(): void => onModalOpen(createCDROMModal)}>
-      {isCDROMMountedState ? ejectText : mountText}
+      {mountOrEjectText}
+    </DropdownItem>
+  );
+
+  const isoActionItem: ReactNode = isUseAsISODisabled ? (
+    <Tooltip content={t('Stop the VirtualMachine to use this disk as ISO')}>
+      <span>
+        <DropdownItem isDisabled key="use-as-iso">
+          {isoActionText}
+        </DropdownItem>
+      </span>
+    </Tooltip>
+  ) : (
+    <DropdownItem key="use-as-iso" onClick={(): void => onModalOpen(createUseAsISOModal)}>
+      {isoActionText}
     </DropdownItem>
   );
 
@@ -75,27 +81,28 @@ const DiskRowActionsItems: FC<DiskRowActionsItemsProps> = ({
         key="disk-bootable-volume"
         onClick={(): void => createBootableVolume()}
       >
-        {saveAsBootableVolumeText}
+        {t('Save as bootable volume')}
       </DropdownItem>
       <DropdownItem key="disk-edit" onClick={(): void => onModalOpen(createEditDiskModal)}>
-        {editBtnText}
+        {t('Edit')}
       </DropdownItem>
+      {!isCDROM && isoActionItem}
       {isCDROMOperationsEnabled && mountCdromItem}
       {isCDROMOperationsEnabled && isUploadInProgress && (
         <DropdownItem key="cdrom-cancel-upload" onClick={handleCancelMountIsoUpload}>
-          {cancelUploadLabel}
+          {getCancelUploadLabel(t)}
         </DropdownItem>
       )}
       <DropdownItem key="disk-delete" onClick={(): void => onModalOpen(createDeleteDiskModal)}>
-        {deleteBtnText}
+        {t('Detach')}
       </DropdownItem>
       {isHotplug && !isCDROM && (
         <DropdownItem
-          description={makePersistentDescription}
+          description={t('Will make disk persistent on next reboot')}
           key="make-persistent"
           onClick={(): void => onModalOpen(makePersistent)}
         >
-          {removeHotplugBtnText}
+          {t('Make persistent')}
         </DropdownItem>
       )}
     </DropdownList>
