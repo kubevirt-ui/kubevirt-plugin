@@ -1,18 +1,17 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback } from 'react';
 
 import { ConfigMapModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import type { IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import useCanPatchFeaturesConfigMap from '@kubevirt-utils/hooks/useCanPatchFeaturesConfigMap';
 import { DISABLED_INSTANCE_TYPE_FAMILIES } from '@kubevirt-utils/hooks/useFeatures/constants';
-import useFeaturesConfigMap from '@kubevirt-utils/hooks/useFeatures/useFeaturesConfigMap';
 import { type InstanceTypeSeriesName } from '@kubevirt-utils/resources/instancetype/types';
 import { operatorNamespaceSignal } from '@kubevirt-utils/store/operatorNamespace';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
 
+import useDisabledInstanceTypeFamiliesData from './useDisabledInstanceTypeFamiliesData';
 import {
   addDisabledInstanceTypeFamily,
-  isInstanceTypeFamilyVisible,
-  parseDisabledInstanceTypeFamilies,
   removeDisabledInstanceTypeFamily,
   serializeDisabledInstanceTypeFamilies,
 } from './utils';
@@ -56,6 +55,7 @@ const buildDisabledFamiliesPatchData = (
 
 type UseDisabledInstanceTypeFamilies = (clusterOverride?: string) => {
   canEdit: boolean;
+  canEditLoaded: boolean;
   disabledFamilies: ReadonlySet<InstanceTypeSeriesName>;
   isFamilyVisible: (series: string, preserveFamily?: string) => boolean;
   loaded: boolean;
@@ -66,27 +66,13 @@ const useDisabledInstanceTypeFamilies: UseDisabledInstanceTypeFamilies = (cluste
   const clusterParam = useClusterParam();
   const cluster = clusterOverride ?? clusterParam;
   const operatorNamespace = operatorNamespaceSignal.value;
-  const { canEditFeaturesConfigMap, featuresConfigMapData } = useFeaturesConfigMap(cluster);
-  const [featureConfigMap, featureConfigMapLoaded] = featuresConfigMapData;
-  const familiesLoaded = Boolean(featureConfigMapLoaded);
-
-  const disabledFamiliesList = useMemo(
-    () =>
-      parseDisabledInstanceTypeFamilies(featureConfigMap?.data?.[DISABLED_INSTANCE_TYPE_FAMILIES]),
-    [featureConfigMap],
-  );
-
-  const disabledFamilies = useMemo(() => new Set(disabledFamiliesList), [disabledFamiliesList]);
-
-  const isFamilyVisible = useCallback(
-    (series: string, preserveFamily?: string) =>
-      isInstanceTypeFamilyVisible(series, disabledFamilies, preserveFamily),
-    [disabledFamilies],
-  );
+  const [canEdit, canEditLoading] = useCanPatchFeaturesConfigMap(cluster);
+  const { disabledFamilies, disabledFamiliesList, featureConfigMap, isFamilyVisible, loaded } =
+    useDisabledInstanceTypeFamiliesData(cluster);
 
   const setFamilyAvailable = useCallback(
     async (series: InstanceTypeSeriesName, available: boolean): Promise<void> => {
-      if (!canEditFeaturesConfigMap) {
+      if (!canEdit) {
         throw new Error('User is not authorized to update instance type family availability');
       }
       if (!operatorNamespace || !featureConfigMap) {
@@ -104,14 +90,15 @@ const useDisabledInstanceTypeFamilies: UseDisabledInstanceTypeFamilies = (cluste
         resource: featureConfigMap,
       });
     },
-    [canEditFeaturesConfigMap, cluster, disabledFamiliesList, featureConfigMap, operatorNamespace],
+    [canEdit, cluster, disabledFamiliesList, featureConfigMap, operatorNamespace],
   );
 
   return {
-    canEdit: canEditFeaturesConfigMap,
+    canEdit,
+    canEditLoaded: !canEditLoading,
     disabledFamilies,
     isFamilyVisible,
-    loaded: familiesLoaded,
+    loaded,
     setFamilyAvailable,
   };
 };

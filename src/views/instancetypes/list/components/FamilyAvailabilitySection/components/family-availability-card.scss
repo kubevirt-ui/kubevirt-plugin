@@ -30,9 +30,15 @@
     margin-bottom: var(--pf-t--global--spacer--md);
   }
 
-  &__switch {
+  &__switch,
+  &__switch-wrapper {
     margin-top: auto;
     padding-bottom: var(--pf-t--global--spacer--sm);
+  }
+
+  &__switch-wrapper &__switch {
+    margin-top: 0;
+    padding-bottom: 0;
   }
 
   &--unavailable {

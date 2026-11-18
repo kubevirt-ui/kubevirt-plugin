@@ -3,7 +3,7 @@ import { type FC } from 'react';
 import { type V1beta1VirtualMachineClusterInstancetype } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { isRedHatInstanceType } from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/InstanceTypeDrilldownSelect/utils/utils';
 import { getFamilySelectorVisibilityStatus } from '@kubevirt-utils/hooks/useInstanceTypeFamilyAvailability/familyAvailabilityStatus';
-import useDisabledInstanceTypeFamilies from '@kubevirt-utils/hooks/useInstanceTypeFamilyAvailability/useDisabledInstanceTypeFamilies';
+import useDisabledInstanceTypeFamiliesData from '@kubevirt-utils/hooks/useInstanceTypeFamilyAvailability/useDisabledInstanceTypeFamiliesData';
 import { isInstanceTypeSeries } from '@kubevirt-utils/hooks/useInstanceTypeFamilyAvailability/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getInstanceTypePrefix } from '@kubevirt-utils/resources/bootableresources/helpers';
@@ -18,7 +18,7 @@ type FamilyStatusCellProps = {
 
 const FamilyStatusCell: FC<FamilyStatusCellProps> = ({ row }) => {
   const { t } = useKubevirtTranslation();
-  const { disabledFamilies, loaded } = useDisabledInstanceTypeFamilies(getCluster(row));
+  const { disabledFamilies, loaded } = useDisabledInstanceTypeFamiliesData(getCluster(row));
 
   if (!loaded) {
     return <Skeleton width="5rem" />;
