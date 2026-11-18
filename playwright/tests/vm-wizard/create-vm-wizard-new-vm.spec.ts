@@ -15,10 +15,13 @@ test.describe('Create VM via wizard — new VM', { tag: [ROUTE_VM_WIZARD_TAG, GA
   }) => {
     await utils.withAllure({ suite: SUITE, feature: GATING, tags: [GATING_TAG, 'e2e-create'] });
 
+    // Dotted name (DNS-1123 subdomain, not a label) covers CNV-99815; keeps the `pw-` cleanup prefix.
+    const vmName = utils.generateRandomVmName('new.vm');
+
     await vmListPage.navigateToVirtualMachinesViaUI();
     await vmCreationWizardPage.openWizardFromCreateDropdown();
     await vmCreationWizardPage.selectCreationMethod('newVm');
-    await vmCreationWizardPage.ensureVmNameFilled();
+    await vmCreationWizardPage.fillVmName(vmName);
     await vmCreationWizardPage.clickNext();
 
     await vmCreationWizardPage.selectOperatingSystem('otherLinux');
@@ -50,10 +53,8 @@ test.describe('Create VM via wizard — new VM', { tag: [ROUTE_VM_WIZARD_TAG, GA
         message: 'Should redirect to VM detail page after creation',
         timeout: utils.TestTimeouts.UI_ACTION_COMPLETE,
       })
-      .toBeTruthy();
+      .toBe(vmName);
 
-    const vmName = await vmCreationWizardPage.getCreatedVmNameFromUrl();
-    expect(vmName.length, 'VM name should be parsed from redirected URL').toBeGreaterThan(0);
     apiClient.trackResource('VirtualMachine', vmName, testConfig.testNamespace);
 
     const nameVisible = await vmDetailPage.isVmNameVisible(
