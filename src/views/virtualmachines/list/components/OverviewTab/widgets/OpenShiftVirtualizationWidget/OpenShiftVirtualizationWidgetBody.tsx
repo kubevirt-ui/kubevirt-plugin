@@ -88,9 +88,12 @@ const OpenShiftVirtualizationWidgetBody: FC<OpenShiftVirtualizationWidgetBodyPro
       {!isAllClustersPage && (
         <>
           <StatusCountItem
+            helpContent={t(
+              'Reflects the health of the OpenShift Virtualization Operator. Shows active alerts or conditions (such as failing pods, degraded CSVs, or API sync delays) affecting operator health.',
+            )}
             icon={healthForbidden ? undefined : statusIcon}
             isLoading={isLoading && !healthForbidden}
-            label={t('Status')}
+            label={t('Operator status')}
             span={6}
             statusMessage={healthForbidden ? notAvailableLabel : statusMessage}
             tooltip={healthForbidden ? permissionMessage : undefined}
