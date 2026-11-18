@@ -5,7 +5,6 @@ import type { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { KUBEVIRT_APISERVER_PROXY } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import type { KubevirtFilter } from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/types';
-import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
 import { usePVCMapper } from '@kubevirt-utils/hooks/usePVCMapper';
 import useVirtualMachineInstanceMigrationMapper from '@kubevirt-utils/resources/vmim/hooks/useVirtualMachineInstanceMigrationMapper';
 import useVirtualMachineInstanceMigrations from '@kubevirt-utils/resources/vmim/hooks/useVirtualMachineInstanceMigrations';
@@ -15,11 +14,9 @@ import useVMMetrics from '@virtualmachines/list/hooks/useVMMetrics';
 import { VM_FILTER_OPTIONS } from '@virtualmachines/list/utils/constants';
 import { useAccessibleResources } from '@virtualmachines/search/hooks/useAccessibleResources';
 import useVMSearchQueries from '@virtualmachines/search/hooks/useVMSearchQueries';
-import { OBJECTS_FETCHING_LIMIT } from '@virtualmachines/utils';
 import type { PVCMapper, VMIMapper, VMIMMapper } from '@virtualmachines/utils/mappers';
 import { useVMWizardForm } from '@virtualmachines/wizard/form/VMWizardFormProvider';
 
-import { resolveVMListSource } from '../utils/utils';
 import { useCloneSourceVMFilters } from './useCloneSourceVMFilters';
 
 type UseCloneSourceVMsReturn = {
@@ -50,41 +47,17 @@ export const useCloneSourceVMs = (): UseCloneSourceVMsReturn => {
   const { loading: loadingFeatureProxy } = useFeatures(KUBEVIRT_APISERVER_PROXY);
   const searchQueries = useVMSearchQueries();
 
-  const [namespacedVMs, namespacedVMsLoaded, loadError] = useKubevirtWatchResource<
-    V1VirtualMachine[]
-  >(
-    targetNamespace
-      ? {
-          cluster,
-          groupVersionKind: VirtualMachineModelGroupVersionKind,
-          isList: true,
-          limit: OBJECTS_FETCHING_LIMIT,
-          namespace: targetNamespace,
-          namespaced: true,
-        }
-      : null,
-    VM_FILTER_OPTIONS,
-    searchQueries?.vmQueries,
-  );
-
-  const {
-    loaded: accessibleVMsLoaded,
-    loadError: accessibleVMsError,
-    resources: accessibleVMs,
-  } = useAccessibleResources<V1VirtualMachine>({
-    filterOptions: VM_FILTER_OPTIONS,
-    groupVersionKind: VirtualMachineModelGroupVersionKind,
-  });
-
   const {
     loaded: vmsLoaded,
     loadError: vmsLoadError,
-    vms,
-  } = resolveVMListSource(
-    targetNamespace,
-    { loaded: namespacedVMsLoaded, loadError, vms: namespacedVMs },
-    { loaded: accessibleVMsLoaded, loadError: accessibleVMsError, vms: accessibleVMs },
-  );
+    resources: vms,
+  } = useAccessibleResources<V1VirtualMachine>({
+    clusters: cluster ? [cluster] : undefined,
+    filterOptions: VM_FILTER_OPTIONS,
+    groupVersionKind: VirtualMachineModelGroupVersionKind,
+    namespace: targetNamespace,
+    searchQueries: searchQueries?.vmQueries,
+  });
 
   const [vmims, vmimsLoaded] = useVirtualMachineInstanceMigrations(cluster, targetNamespace);
   const { vmiMapper, vmisLoaded } = useVirtualMachineInstanceMapper();

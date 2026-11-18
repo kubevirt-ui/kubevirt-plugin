@@ -64,13 +64,11 @@ export const useAccessibleResources = <T>({
     return projectNames.filter((ns) => !isSystemNamespace(ns));
   }, [onlyUserProjects, projectNames, watchNamespaces]);
 
-  const loadPerNamespace =
-    isWatchEnabled && !isACMPage && projectNamesLoaded && !canListAllNamespaces;
-
-  const shouldFetchClusterWide = isWatchEnabled && (canListAllNamespaces || isACMPage);
+  const shouldWatchDirectly = isWatchEnabled && (canListAllNamespaces || isACMPage || namespace);
+  const loadPerNamespace = isWatchEnabled && projectNamesLoaded && !shouldWatchDirectly;
 
   const [allResources, allResourcesLoaded, allResourcesLoadError] = useKubevirtWatchResource<T[]>(
-    shouldFetchClusterWide
+    shouldWatchDirectly
       ? {
           cluster: clusterToWatch,
           fieldSelector,
@@ -104,17 +102,17 @@ export const useAccessibleResources = <T>({
   );
 
   const resources = useMemo(() => {
-    const vms = loadPerNamespace
+    const resourceList = loadPerNamespace
       ? Object.values(allowedResources).flatMap((resource) => resource.data || [])
       : allResources;
-    return vms || [];
+    return resourceList || [];
   }, [allResources, allowedResources, loadPerNamespace]);
 
   if (!isWatchEnabled) {
     return { loaded: true, loadError: undefined, resources: [] };
   }
 
-  if (shouldFetchClusterWide) {
+  if (shouldWatchDirectly) {
     return {
       loaded: allResourcesLoaded || Boolean(allResourcesLoadError),
       loadError: allResourcesLoadError,

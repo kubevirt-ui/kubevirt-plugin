@@ -13,6 +13,9 @@ type VMSearchQueries = {
   vmQueries: AdvancedSearchFilter;
 };
 
+/**
+ * Hook to get the search queries used in multicluster search.
+ */
 const useVMSearchQueries = (): VMSearchQueries => {
   const [searchParams] = useSearchParams();
 

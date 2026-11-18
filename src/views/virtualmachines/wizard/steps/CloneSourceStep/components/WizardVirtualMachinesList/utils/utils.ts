@@ -79,18 +79,6 @@ export const getPaginationFirstPageState = (prevPagination: PaginationState): Pa
   startIndex: 0,
 });
 
-type VMListSource = {
-  loaded: boolean;
-  loadError: Error;
-  vms: V1VirtualMachine[];
-};
-
-export const resolveVMListSource = (
-  targetNamespace: string | undefined,
-  namespacedSource: VMListSource,
-  accessibleSource: VMListSource,
-): VMListSource => (targetNamespace ? namespacedSource : accessibleSource);
-
 type VMConfiguration = {
   isRowSelected: boolean;
   rowId: string;
