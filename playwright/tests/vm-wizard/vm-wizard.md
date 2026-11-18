@@ -239,20 +239,20 @@ Automated E2E coverage for console routes under `tests/vm-wizard/`.
   boot volume, instance type, and size, and that submitting Review opens the created VM's detail
   page. Guest startup is outside this test's scope.
 - **Target version:** CNV 5.1.0
-- **Jira References:** —
+- **Jira References:** CNV-99815
 - **Pre-conditions:** At least one boot volume is available, and the user can create a
   VirtualMachine in the test namespace.
 - **Tags:** `@gating`, `@resource-creation`
 
-| Step | Action                                                                            | Expected Result                                                              |
-| :--- | :-------------------------------------------------------------------------------- | :--------------------------------------------------------------------------- |
-| 1    | Open VirtualMachines and launch the creation wizard                               | The wizard opens                                                             |
-| 2    | Select Custom configuration, ensure a generated VM name, and continue             | The wizard advances to Guest OS                                              |
-| 3    | Select Other Linux with Fedora and continue                                       | The wizard advances to Boot source                                           |
-| 4    | Select the first available boot volume                                            | The wizard accepts the boot source and advances to Compute resources         |
-| 5    | Select General Purpose series and small size, then continue through Customization | Review and create is visible                                                 |
-| 6    | Disable Start after creation if selected and submit                               | The console redirects to the detail page for the newly created VM            |
-| 7    | Read the VM name from the URL and track the resource                              | The VM name is visible on its detail page and is registered for test cleanup |
+| Step | Action                                                                               | Expected Result                                                              |
+| :--- | :----------------------------------------------------------------------------------- | :--------------------------------------------------------------------------- |
+| 1    | Open VirtualMachines and launch the creation wizard                                  | The wizard opens                                                             |
+| 2    | Select Custom configuration, enter a dotted VM name (`pw-new.vm-<random>`), continue | The wizard advances to Guest OS                                              |
+| 3    | Select Other Linux with Fedora and continue                                          | The wizard advances to Boot source                                           |
+| 4    | Select the first available boot volume                                               | The wizard accepts the boot source and advances to Compute resources         |
+| 5    | Select General Purpose series and small size, then continue through Customization    | Review and create is visible                                                 |
+| 6    | Disable Start after creation if selected and submit                                  | The console redirects to the detail page for the newly created VM            |
+| 7    | Confirm the URL VM name equals the dotted name and track the resource                | The VM name is visible on its detail page and is registered for test cleanup |
 
 ---
 
