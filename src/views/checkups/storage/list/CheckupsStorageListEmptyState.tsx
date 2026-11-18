@@ -3,6 +3,8 @@ import { useState } from 'react';
 
 import type { IoK8sApiRbacV1ClusterRoleBinding } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import useActiveNamespace from '@kubevirt-utils/hooks/useActiveNamespace';
+import useKubevirtToast from '@kubevirt-utils/hooks/useKubevirtToast';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
 
 import CheckupsEmptyState from '../../components/CheckupsEmptyState/CheckupsEmptyState';
@@ -22,6 +24,8 @@ const CheckupsStorageListEmptyState: FC<CheckupsStorageListEmptyStateProps> = ({
   isPermittedToInstall,
   loadingPermissions,
 }) => {
+  const { t } = useKubevirtTranslation();
+  const { addDangerToast } = useKubevirtToast();
   const namespace = useActiveNamespace();
   const cluster = useClusterParam();
   const [isLoading, setIsLoading] = useState<boolean>();
@@ -43,6 +47,11 @@ const CheckupsStorageListEmptyState: FC<CheckupsStorageListEmptyStateProps> = ({
               isPermitted,
               clusterRoleBinding,
             );
+          } catch (error) {
+            addDangerToast({
+              content: (error as Error)?.message,
+              title: t('Failed to install storage checkup permissions'),
+            });
           } finally {
             setIsLoading(false);
           }
