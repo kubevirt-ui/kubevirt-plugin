@@ -1,10 +1,10 @@
 import { ConfigMapModel, GroupModel, RoleModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
-  IoK8sApiCoreV1ConfigMap,
-  IoK8sApiRbacV1Role,
-  IoK8sApiRbacV1RoleBinding,
+  type IoK8sApiCoreV1ConfigMap,
+  type IoK8sApiRbacV1Role,
+  type IoK8sApiRbacV1RoleBinding,
 } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
-import { K8sVerb } from '@openshift-console/dynamic-plugin-sdk';
+import { type K8sVerb } from '@openshift-console/dynamic-plugin-sdk';
 
 export const AUTOMATIC_SUBSCRIPTION_ACTIVATION_KEY = 'automaticSubscriptionActivationKey';
 export const AUTOMATIC_SUBSCRIPTION_ORGANIZATION_ID = 'automaticSubscriptionOrganizationId';
@@ -25,6 +25,7 @@ export const ADVANCED_CDROM_FEATURES = 'advancedCDROMFeatures';
 export const TREE_VIEW_FOLDERS = 'treeViewFolders';
 export const PASST_UDN_NETWORK = 'passtUDNNetwork';
 export const VM_TEMPLATES = 'vmTemplates';
+export const DISABLED_INSTANCE_TYPE_FAMILIES = 'disabledInstanceTypeFamilies';
 
 export const FEATURES_CONFIG_MAP_NAME = 'kubevirt-ui-features';
 const FEATURES_ROLE_NAME = 'kubevirt-ui-features-reader';
@@ -40,6 +41,7 @@ export const FEATURES_CONFIG_MAP_INITIAL_DATA: Record<string, string> = {
   [AUTOMATIC_SUBSCRIPTION_ORGANIZATION_ID]: '',
   [CONFIRM_VM_ACTIONS]: 'false',
   [DISABLED_GUEST_SYSTEM_LOGS_ACCESS]: 'false',
+  [DISABLED_INSTANCE_TYPE_FAMILIES]: '[]',
   [HIDE_CREDENTIALS_NON_PRIVILEGED]: 'false',
   [HIDE_YAML_TAB]: 'false',
   [KUBEVIRT_APISERVER_PROXY]: 'true',

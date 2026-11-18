@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useMemo, useState } from 'react';
+import React, { type FC, useEffect, useMemo, useState } from 'react';
 
 import { getInstanceTypeMenuItems } from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/InstanceTypeDrilldownSelect/utils/utils';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
@@ -33,14 +33,20 @@ const SelectInstanceTypeSection: FC = ({}) => {
 
   if (!loaded) return <Loading />;
 
-  const handleTabClick = (_, tabIndex: TabKey) => {
+  const handleTabClick = (
+    _event: React.KeyboardEvent | React.MouseEvent,
+    tabIndex: TabKey,
+  ): void => {
     setActiveTabKey(tabIndex);
   };
 
   return (
     <Tabs activeKey={activeTabKey} className="pf-v6-u-mt-md" onSelect={handleTabClick}>
       <Tab eventKey={TabKey.RedHat} title={menuItems.redHatProvided.label}>
-        <RedHatProvidedInstanceTypesSection redHatMenuItems={menuItems?.redHatProvided} />
+        <RedHatProvidedInstanceTypesSection
+          cluster={cluster}
+          redHatMenuItems={menuItems?.redHatProvided}
+        />
       </Tab>
       <Tab eventKey={TabKey.Users} title={menuItems.userProvided.label}>
         <UserProvidedInstanceTypesList

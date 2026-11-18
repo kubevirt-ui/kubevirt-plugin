@@ -7,7 +7,10 @@ import { getInstanceTypeFromVolume } from '@kubevirt-utils/components/AddBootabl
 import { VolumeSnapshotKind } from '@kubevirt-utils/components/SelectSnapshot/types';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { initialInstanceTypeVMState } from '@virtualmachines/creation-wizard/state/instance-type-vm-store/utils/state';
-import { InstanceTypeVMStore } from '@virtualmachines/creation-wizard/state/instance-type-vm-store/utils/types';
+import {
+  BootableVolumeFamilyAvailability,
+  InstanceTypeVMStore,
+} from '@virtualmachines/creation-wizard/state/instance-type-vm-store/utils/types';
 import { OperatingSystemType } from '@virtualmachines/creation-wizard/steps/InstanceTypesSteps/GuestOSStep/utils/constants';
 import { getDiskSize } from '@virtualmachines/creation-wizard/utils/utils';
 
@@ -19,11 +22,19 @@ const useInstanceTypeVMStore = create<InstanceTypeVMStore>()((set) => {
       pvcSource: IoK8sApiCoreV1PersistentVolumeClaim,
       volumeSnapshotSource: VolumeSnapshotKind,
       dvSource: V1beta1DataVolume,
+      familyAvailability?: BootableVolumeFamilyAvailability,
     ) =>
       set(
         produce<InstanceTypeVMStore>((draftState) => {
           const instanceTypeName = getInstanceTypeFromVolume(selectedVolume);
           const [series = '', size = ''] = instanceTypeName?.split('.') || [];
+          const volumeHasInstanceType = Boolean(series && size);
+          const familyAvailabilityReady = familyAvailability?.familiesLoaded !== false;
+          const volumeFamilyIsAvailable = familyAvailability?.isFamilyVisible
+            ? familyAvailability.isFamilyVisible(series)
+            : true;
+          const shouldApplySeriesFromVolume =
+            volumeHasInstanceType && familyAvailabilityReady && volumeFamilyIsAvailable;
 
           draftState.dvSource = dvSource;
           draftState.selectedBootableVolume = selectedVolume;
@@ -34,8 +45,8 @@ const useInstanceTypeVMStore = create<InstanceTypeVMStore>()((set) => {
             name: instanceTypeName,
             namespace: null,
           };
-          draftState.selectedSeries = series;
-          draftState.selectedSize = size;
+          draftState.selectedSeries = shouldApplySeriesFromVolume ? series : '';
+          draftState.selectedSize = shouldApplySeriesFromVolume ? size : '';
         }),
       ),
     resetInstanceTypeVMState: () => set({ ...initialInstanceTypeVMState }),

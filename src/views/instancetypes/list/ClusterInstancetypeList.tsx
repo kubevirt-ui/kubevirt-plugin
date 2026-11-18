@@ -1,4 +1,4 @@
-import React, { FC, useMemo } from 'react';
+import React, { type FC, useMemo } from 'react';
 
 import { VirtualMachineClusterInstancetypeModelRef } from '@kubevirt-ui-ext/kubevirt-api/console';
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
@@ -17,6 +17,7 @@ import useIsACMPage from '@multicluster/useIsACMPage';
 import { ListPageBody, useListPageFilter } from '@openshift-console/dynamic-plugin-sdk';
 import { Pagination } from '@patternfly/react-core';
 
+import FamilyAvailabilitySection from './components/FamilyAvailabilitySection/FamilyAvailabilitySection';
 import {
   getClusterInstancetypeColumns,
   getClusterInstancetypeRowId,
@@ -74,6 +75,7 @@ const ClusterInstancetypeList: FC<ListPageProps> = ({
 
   return (
     <ListPageBody>
+      <FamilyAvailabilitySection />
       <div className="list-managment-group">
         <ListPageFilter
           columnLayout={columnLayout}
