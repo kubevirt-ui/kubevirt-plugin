@@ -2,6 +2,8 @@ import { ConfigMapModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import {
   type IoK8sApiBatchV1Job,
   type IoK8sApiCoreV1ConfigMap,
+  type IoK8sApiRbacV1PolicyRule,
+  type IoK8sApiRbacV1Role,
 } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 
 import {
@@ -46,27 +48,40 @@ export const serviceAccountResource = (namespace: string): Record<string, unknow
   metadata: { name: STORAGE_CHECKUP_SA, namespace },
 });
 
-export const storageCheckupRole = (namespace: string): Record<string, unknown> => ({
+// Keep in sync with https://github.com/kiagnose/kubevirt-storage-checkup/blob/main/manifests/storage_checkup_permissions.yaml
+// When the upstream Role changes, update these rules; existing Roles are patched on the next install.
+export const STORAGE_CHECKUP_ROLE_RULES: IoK8sApiRbacV1PolicyRule[] = [
+  { apiGroups: [''], resources: ['configmaps'], verbs: ['get', 'update'] },
+  {
+    apiGroups: ['kubevirt.io'],
+    resources: ['virtualmachines'],
+    verbs: ['create', 'delete', 'get', 'patch'],
+  },
+  { apiGroups: ['kubevirt.io'], resources: ['virtualmachineinstances'], verbs: ['get'] },
+  {
+    apiGroups: ['subresources.kubevirt.io'],
+    resources: ['virtualmachines/stop'],
+    verbs: ['update'],
+  },
+  {
+    apiGroups: ['kubevirt.io'],
+    resources: ['virtualmachineinstancemigrations'],
+    verbs: ['create'],
+  },
+  { apiGroups: ['cdi.kubevirt.io'], resources: ['datavolumes'], verbs: ['create', 'delete'] },
+  { apiGroups: [''], resources: ['persistentvolumeclaims'], verbs: ['delete'] },
+  {
+    apiGroups: ['snapshot.kubevirt.io'],
+    resources: ['virtualmachinesnapshots', 'virtualmachinerestores'],
+    verbs: ['create', 'get', 'delete'],
+  },
+];
+
+export const storageCheckupRole = (namespace: string): IoK8sApiRbacV1Role => ({
   apiVersion: 'rbac.authorization.k8s.io/v1',
   kind: 'Role',
   metadata: { name: STORAGE_CHECKUP_ROLE, namespace },
-  rules: [
-    { apiGroups: [''], resources: ['configmaps'], verbs: ['get', 'update'] },
-    { apiGroups: ['kubevirt.io'], resources: ['virtualmachines'], verbs: ['create', 'delete'] },
-    { apiGroups: ['kubevirt.io'], resources: ['virtualmachineinstances'], verbs: ['get'] },
-    {
-      apiGroups: ['subresources.kubevirt.io'],
-      resources: ['virtualmachineinstances/addvolume', 'virtualmachineinstances/removevolume'],
-      verbs: ['update'],
-    },
-    {
-      apiGroups: ['kubevirt.io'],
-      resources: ['virtualmachineinstancemigrations'],
-      verbs: ['create'],
-    },
-    { apiGroups: ['cdi.kubevirt.io'], resources: ['datavolumes'], verbs: ['create', 'delete'] },
-    { apiGroups: [''], resources: ['persistentvolumeclaims'], verbs: ['delete'] },
-  ],
+  rules: STORAGE_CHECKUP_ROLE_RULES,
 });
 
 export const storageCheckupRoleBinding = (namespace: string): Record<string, unknown> => ({

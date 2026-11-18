@@ -38,7 +38,7 @@ export const useCheckupsStoragePermissions = (): UseCheckupsStoragePermissionsRe
   const cluster = useSelectedCluster();
   const isAllNamespace = namespace === ALL_NAMESPACES_SESSION_KEY;
 
-  const [serviceAccounts, serviceAccountsLoaded] = useKubevirtWatchResource<
+  const [serviceAccounts, serviceAccountsLoaded, serviceAccountsError] = useKubevirtWatchResource<
     IoK8sApiCoreV1ServiceAccount[]
   >(
     !isAllNamespace && {
@@ -49,7 +49,7 @@ export const useCheckupsStoragePermissions = (): UseCheckupsStoragePermissionsRe
     },
   );
 
-  const [roles, rolesLoaded] = useKubevirtWatchResource<IoK8sApiRbacV1Role[]>(
+  const [roles, rolesLoaded, rolesError] = useKubevirtWatchResource<IoK8sApiRbacV1Role[]>(
     !isAllNamespace && {
       cluster,
       groupVersionKind: modelToGroupVersionKind(RoleModel),
@@ -58,17 +58,18 @@ export const useCheckupsStoragePermissions = (): UseCheckupsStoragePermissionsRe
     },
   );
 
-  const [clusterRoleBinding, loadedClusterRoleBinding] = useKubevirtWatchResource<
-    IoK8sApiRbacV1ClusterRoleBinding[]
-  >(
-    !isAllNamespace && {
-      cluster,
-      groupVersionKind: modelToGroupVersionKind(ClusterRoleBindingModel),
-      isList: true,
-    },
-  );
+  const [clusterRoleBindings, loadedClusterRoleBinding, clusterRoleBindingsError] =
+    useKubevirtWatchResource<IoK8sApiRbacV1ClusterRoleBinding[]>(
+      !isAllNamespace && {
+        cluster,
+        groupVersionKind: modelToGroupVersionKind(ClusterRoleBindingModel),
+        isList: true,
+      },
+    );
 
-  const [roleBinding, rolesBindingLoaded] = useKubevirtWatchResource<IoK8sApiRbacV1RoleBinding[]>(
+  const [roleBinding, rolesBindingLoaded, roleBindingError] = useKubevirtWatchResource<
+    IoK8sApiRbacV1RoleBinding[]
+  >(
     !isAllNamespace && {
       cluster,
       groupVersionKind: modelToGroupVersionKind(RoleBindingModel),
@@ -77,11 +78,22 @@ export const useCheckupsStoragePermissions = (): UseCheckupsStoragePermissionsRe
     },
   );
 
-  const isClusterRoleBinding = useMemo(() => {
-    const crb = findObjectByName(clusterRoleBinding, STORAGE_CLUSTER_ROLE_BINDING);
-    const hasSubjectMatchingNS = crb?.subjects?.find((subject) => subject?.namespace === namespace);
-    return hasSubjectMatchingNS && crb;
-  }, [clusterRoleBinding, namespace]);
+  // Raw ClusterRoleBinding found by name (not gated on this namespace's subject), so the install
+  // knows the shared CRB already exists and must be appended to instead of recreated.
+  const storageClusterRoleBindingResource = useMemo(
+    () => findObjectByName(clusterRoleBindings, STORAGE_CLUSTER_ROLE_BINDING),
+    [clusterRoleBindings],
+  );
+
+  const hasClusterRoleBindingSubject = useMemo(
+    () =>
+      Boolean(
+        storageClusterRoleBindingResource?.subjects?.some(
+          (subject) => subject?.namespace === namespace,
+        ),
+      ),
+    [storageClusterRoleBindingResource, namespace],
+  );
 
   const isConfigMapRole = useMemo(() => findObjectByName(roles, STORAGE_CHECKUP_ROLE), [roles]);
 
@@ -95,13 +107,24 @@ export const useCheckupsStoragePermissions = (): UseCheckupsStoragePermissionsRe
     [serviceAccounts],
   );
 
+  // A watch that errored (e.g. no permission to list ClusterRoleBindings) counts as settled,
+  // so users without that permission do not get an endless loading state.
+  const serviceAccountsSettled = serviceAccountsLoaded || !isEmpty(serviceAccountsError);
+  const rolesSettled = rolesLoaded || !isEmpty(rolesError);
+  const roleBindingsSettled = rolesBindingLoaded || !isEmpty(roleBindingError);
+  const clusterRoleBindingsSettled = loadedClusterRoleBinding || !isEmpty(clusterRoleBindingsError);
+
   return {
-    clusterRoleBinding: isClusterRoleBinding,
+    clusterRoleBinding: storageClusterRoleBindingResource,
     isPermitted: Boolean(
-      isServiceAccount && isConfigMapRole && isConfigMapRoleBinding && isClusterRoleBinding,
+      isServiceAccount && isConfigMapRole && isConfigMapRoleBinding && hasClusterRoleBindingSubject,
     ),
-    isPermittedToInstall: !isEmpty(clusterRoleBinding),
-    loading:
-      !serviceAccountsLoaded && !rolesLoaded && !rolesBindingLoaded && !loadedClusterRoleBinding,
+    isPermittedToInstall: !isEmpty(clusterRoleBindings),
+    loading: !(
+      serviceAccountsSettled &&
+      rolesSettled &&
+      roleBindingsSettled &&
+      clusterRoleBindingsSettled
+    ),
   };
 };
