@@ -190,9 +190,12 @@ const _test = base.extend<TestFixtures, WorkerFixtures>({
       const playwrightDir = FileUtils.resolvePath(__dirname, '..', '..');
       const storageStatePath = getStorageStatePath(playwrightDir);
 
+      const fs = await import('fs');
       const contextOptions: BrowserContextOptions = {
         baseURL: EnvVariables.webConsoleUrl,
-        storageState: storageStatePath,
+        ...(storageStatePath && fs.existsSync(storageStatePath)
+          ? { storageState: storageStatePath }
+          : {}),
         ignoreHTTPSErrors: true,
         viewport: { width: 1920, height: 1080 },
         permissions: ['clipboard-read', 'clipboard-write'],
@@ -407,9 +410,12 @@ const _test = base.extend<TestFixtures, WorkerFixtures>({
       const playwrightDir = FileUtils.resolvePath(__dirname, '..', '..');
       const storageStatePath = getStorageStatePath(playwrightDir);
 
+      const fs = await import('fs');
       const context = await browser.newContext({
         baseURL: EnvVariables.webConsoleUrl,
-        storageState: storageStatePath,
+        ...(storageStatePath && fs.existsSync(storageStatePath)
+          ? { storageState: storageStatePath }
+          : {}),
         ignoreHTTPSErrors: true,
         viewport: { width: 1920, height: 1080 },
         permissions: ['clipboard-read', 'clipboard-write'],

@@ -1,5 +1,6 @@
 import BaseComponent from '@/components/shared/base-component';
 import NavigationComponent from '@/components/shared/navigation-component';
+import { pollUntil } from '@/utils/poll-until';
 import { TestTimeouts } from '@/utils/test-config';
 import type { Locator, Page } from '@playwright/test';
 
@@ -970,25 +971,67 @@ export default class OverviewSettingsComponent extends BaseComponent {
   }
 
   async setAutomaticGrantVirtualizationRoles(enable: boolean): Promise<boolean> {
-    try {
-      await this._automaticGrantToggle.waitFor({
-        state: 'visible',
-        timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
-      });
-      if ((await this._automaticGrantToggle.isChecked()) !== enable) {
-        await this._automaticGrantToggle.click({ force: true });
-      }
-      const deadline = Date.now() + TestTimeouts.DEFAULT;
-      while (Date.now() < deadline) {
+    const desired = enable ? 'checked' : 'unchecked';
+    // Section can collapse after HCO/feature re-renders; always re-open before toggling.
+    if (!(await this.openAutomaticGrantVirtualizationRolesSection())) {
+      return false;
+    }
+
+    const deadline = Date.now() + TestTimeouts.LONG_OPERATION;
+    let lastError: unknown;
+
+    while (Date.now() < deadline) {
+      try {
+        await this._automaticGrantToggle.waitFor({
+          state: 'visible',
+          timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+        });
+        // Disabled while HCO patch/`isLoading` — clicks are no-ops on PF Switch.
+        await pollUntil(() => this._automaticGrantToggle.isEnabled(), {
+          message: 'Automatic grant toggle should be enabled before click',
+          timeout: TestTimeouts.DEFAULT,
+        });
+
         if ((await this._automaticGrantToggle.isChecked()) === enable) {
           return true;
         }
-        await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
+
+        const patchWait = this.page
+          .waitForResponse(
+            (response) =>
+              /hyperconvergeds\.hco\.kubevirt\.io/i.test(response.url()) &&
+              response.request().method() === 'PATCH' &&
+              response.ok(),
+            { timeout: TestTimeouts.DEFAULT },
+          )
+          .catch(() => null);
+
+        await this._automaticGrantToggle.click({ force: true });
+        await patchWait;
+
+        // Checked follows HCO watch (not optimistic).
+        await pollUntil(async () => (await this._automaticGrantToggle.isChecked()) === enable, {
+          intervalMs: 500,
+          message: `Automatic grant toggle should become ${desired}`,
+          timeout: TestTimeouts.CLUSTER_STATE_PROPAGATION * 3,
+        });
+        await pollUntil(() => this._automaticGrantToggle.isEnabled(), {
+          message: 'Automatic grant toggle should finish loading after patch',
+          timeout: TestTimeouts.DEFAULT,
+        });
+        return true;
+      } catch (error) {
+        lastError = error;
+        await this.openAutomaticGrantVirtualizationRolesSection().catch(() => false);
+        await this.page.waitForTimeout(TestTimeouts.UI_DELAY_MEDIUM);
       }
-      return false;
-    } catch {
-      return false;
     }
+
+    throw new Error(
+      `Failed to set automatic grant Virtualization roles to ${desired}: ${
+        lastError instanceof Error ? lastError.message : String(lastError)
+      }`,
+    );
   }
 
   async navigateToTemplatesAndImagesManagement(): Promise<boolean> {

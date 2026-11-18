@@ -55,6 +55,21 @@ export const TestTimeouts = {
   /** Default timeout for resource creation verification (60 seconds) */
   RESOURCE_CREATION: MINUTE,
 
+  /** Console login / perspective ready (main-style / CNV-98979) */
+  CONSOLE_LOGIN: 4 * MINUTE,
+
+  /** Console page navigation load (main-style / CNV-98979) */
+  CONSOLE_PAGE_LOAD: 4 * MINUTE,
+
+  /** Long UI/API operation (main-style) */
+  LONG_OPERATION: 5 * MINUTE,
+
+  /** Wait until VM is migratable (main-style) */
+  MIGRATION_VM_READY: 8 * MINUTE,
+
+  /** Extended test budget (main-style migrations / heavy flows) */
+  TEST_EXTENDED: 15 * MINUTE,
+
   /** Extended timeout for data volume operations (20 seconds) */
   DATA_VOLUME_CREATION: 20 * SECOND,
 
@@ -99,9 +114,6 @@ export const TestTimeouts = {
 
   /** Timeout for OLM operator install (e.g. COO); generous but under default test timeout (6 min) */
   OPERATOR_INSTALL: 5 * MINUTE,
-
-  /** Extended test timeout for long-running tests like migration (15 minutes) */
-  TEST_EXTENDED: 15 * MINUTE,
 
   /** Timeout for UI filter operations (6 seconds) */
   UI_FILTER_APPLY: 6 * SECOND,
@@ -204,9 +216,6 @@ export const TestTimeouts = {
 
   /** Budget for large/long-running test suites (15 minutes) */
   TEST_BUDGET_LARGE: 15 * MINUTE,
-
-  /** Extended timeout for long operations like storage migration (5 minutes) */
-  LONG_OPERATION: 5 * MINUTE,
 
   /** Timeout for storage migration modal completion (5 minutes) */
   STORAGE_MIGRATION_MODAL_COMPLETION: 5 * MINUTE,

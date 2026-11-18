@@ -3,6 +3,7 @@
  */
 
 import PageCommons from '@/page-objects/page-commons';
+import { pollUntil } from '@/utils/poll-until';
 import { TestTimeouts } from '@/utils/test-config';
 import type { Page } from '@playwright/test';
 import { expect } from '@playwright/test';
@@ -308,88 +309,163 @@ export default class VirtualMachineDetailActionsComponent extends PageCommons {
     project: string,
     options?: { category?: string },
   ): Promise<void> {
-    await this.performVmAction('save-as-template');
+    // ActionDropdownItem sets data-test on the menuitem itself (not a parent wrapper).
+    const saveAsTemplateItem = this.page
+      .locator('[data-test="vm-action-save-as-template"]')
+      .or(this.page.getByRole('menuitem', { name: /^Save as template$/i }))
+      .first();
+    const modal = this.page
+      .getByRole('dialog')
+      .filter({ has: this.page.getByRole('heading', { name: /save as template/i }) })
+      .first();
+    const nameInput = modal
+      .locator('#template-name')
+      .or(modal.getByRole('textbox', { name: /^Name$/i }))
+      .first();
 
-    const nameInput = this.locator('#template-name');
-    await nameInput.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
-    await nameInput.clear();
+    // VM detail uses data-test=actions-menu-button; list pages use actions-dropdown.
+    const openDetailActions = async (): Promise<void> => {
+      const toggle = this._actionsMenuButton
+        .or(this.page.getByTestId('actions-dropdown'))
+        .or(this.page.getByRole('button', { name: /^Actions$/i }))
+        .first();
+      await toggle.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
+      await toggle.hover().catch(() => undefined);
+      await toggle.focus().catch(() => undefined);
+      await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
+      if ((await toggle.getAttribute('aria-expanded').catch(() => null)) !== 'true') {
+        await toggle.click({ timeout: TestTimeouts.ELEMENT_WAIT });
+      }
+      await this.page
+        .getByRole('menuitem')
+        .first()
+        .waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT })
+        .catch(() => undefined);
+    };
+
+    // Open Actions → Save as template; retry if the menu closes before the modal mounts.
+    await pollUntil(
+      async () => {
+        if (
+          (await modal.isVisible().catch(() => false)) &&
+          (await nameInput.isVisible().catch(() => false))
+        ) {
+          return true;
+        }
+        try {
+          await openDetailActions();
+          await saveAsTemplateItem.waitFor({
+            state: 'visible',
+            timeout: TestTimeouts.ELEMENT_WAIT,
+          });
+          await saveAsTemplateItem.click({ timeout: TestTimeouts.ELEMENT_WAIT });
+          await modal.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
+          await nameInput.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
+          return true;
+        } catch {
+          await this.page.keyboard.press('Escape').catch(() => undefined);
+          return false;
+        }
+      },
+      {
+        message: 'Save as template modal should open from Actions menu',
+        timeout: TestTimeouts.LONG_OPERATION,
+      },
+    );
+
     await nameInput.fill(templateName);
 
-    // The Project field can appear as a native <select> or a PatternFly typeahead button.
-    // Scope all selectors to the modal to avoid matching other elements.
-    const modal = this.locator('[role="dialog"]');
-    const nativeSelect = modal.locator('select').filter({ has: modal.locator('option') });
-    const isNativeSelect = await nativeSelect
-      .first()
-      .waitFor({ state: 'visible', timeout: 3000 })
-      .then(() => true)
-      .catch(() => false);
+    // Project defaults to the source VM namespace — only change it when needed.
+    const projectEscaped = project.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const projectAlreadySet = modal
+      .getByRole('button')
+      .filter({ hasText: new RegExp(projectEscaped) })
+      .first();
+    const projectSet = await projectAlreadySet.isVisible().catch(() => false);
 
-    if (isNativeSelect) {
-      await nativeSelect.first().selectOption(project);
-    } else {
-      // PatternFly typeahead: placeholder button state or pre-filled state.
-      const emptyToggle = modal.locator('button[placeholder="Select project"]');
-      const isEmptyToggleVisible = await emptyToggle
-        .waitFor({ state: 'visible', timeout: 3000 })
-        .then(() => true)
-        .catch(() => false);
-
-      if (isEmptyToggleVisible) {
-        await this.robustClick(emptyToggle);
-      } else {
-        // Pre-filled typeahead toggle — open it to change the selection.
-        const filledToggle = modal.locator('button.pf-v6-c-menu-toggle').filter({
-          hasNotText: 'Select project',
-        });
-        await this.robustClick(filledToggle.first());
-      }
-
-      const searchInput = this._inputSearchInput;
-      await searchInput.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
-      await searchInput.clear();
+    if (!projectSet) {
+      const projectToggle = modal.locator('button.pf-v6-c-menu-toggle').first();
+      await projectToggle.click({ timeout: TestTimeouts.UI_DELAY_MEDIUM });
+      const searchInput = this.page.getByPlaceholder(/Select project/i);
+      await searchInput.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
       await searchInput.fill(project);
-      const projectOption = this.locator(`[role="option"]:has-text("${project}")`);
-      await projectOption.waitFor({
-        state: 'visible',
-        timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
-      });
-      await this.robustClick(projectOption);
+      await this.page
+        .getByRole('option', { name: new RegExp(projectEscaped, 'i') })
+        .first()
+        .click({ timeout: TestTimeouts.ELEMENT_WAIT });
     }
 
     if (options?.category) {
-      const categorySelect = modal.locator('[data-test="template-category-select"]');
-      await categorySelect.waitFor({
-        state: 'visible',
-        timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
-      });
-      const categoryInput = categorySelect.locator('input[role="combobox"]');
-      await this.robustClick(categoryInput);
-      await categoryInput.fill(options.category);
-      const listboxId = await categoryInput.getAttribute('aria-controls');
-      if (!listboxId) throw new Error('Category typeahead is missing its listbox reference');
-      const categoryOption = this.page
-        .locator(`#${listboxId}`)
-        .getByRole('option', { name: options.category, exact: true })
-        .first();
-      await categoryOption.waitFor({
-        state: 'visible',
-        timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
-      });
-      await this.robustClick(categoryOption);
-      await expect(categoryInput).toHaveAttribute('aria-expanded', 'false', {
-        timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
-      });
-      await expect(categoryInput).toHaveValue(options.category, {
-        timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
-      });
+      // Typed text alone does NOT set selectedValue — closing without onSelect resets input.
+      const categoryLabel = options.category.trim().replace(/\s+/g, '-');
+      const categorySelect = modal.locator('[data-test="template-category-select"]').first();
+      const categoryInput = categorySelect.locator('input[role="combobox"]').first();
+      await categoryInput.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
+
+      await pollUntil(
+        async () => {
+          await categoryInput.click({ force: true });
+          await categoryInput.fill('');
+          await categoryInput.pressSequentially(categoryLabel, { delay: 20 });
+          const byId = this.page.locator(`#select-typeahead-${categoryLabel}`);
+          const existingOption = this.page
+            .getByRole('option', { name: categoryLabel, exact: true })
+            .first();
+          const createOption = this.page
+            .getByRole('option', {
+              name: new RegExp(`Create category ['"]${categoryLabel}['"]`),
+            })
+            .first();
+          if (await byId.isVisible({ timeout: TestTimeouts.UI_DELAY_MEDIUM }).catch(() => false)) {
+            await byId.click({ force: true });
+          } else if (
+            await existingOption
+              .isVisible({ timeout: TestTimeouts.UI_DELAY_MEDIUM })
+              .catch(() => false)
+          ) {
+            await existingOption.click({ force: true });
+          } else if (await createOption.isVisible().catch(() => false)) {
+            await createOption.click({ force: true });
+          } else {
+            await categoryInput.press('ArrowDown');
+            await categoryInput.press('ArrowDown');
+            await categoryInput.press('Enter');
+          }
+          const listbox = this.page.locator('[role="listbox"]').filter({ visible: true }).first();
+          await listbox
+            .waitFor({ state: 'hidden', timeout: TestTimeouts.UI_DELAY_MEDIUM })
+            .catch(() => undefined);
+          if (await listbox.isVisible().catch(() => false)) {
+            await this.page.keyboard.press('Escape').catch(() => undefined);
+          }
+          await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
+          const value = ((await categoryInput.inputValue().catch(() => '')) || '').trim();
+          return value === categoryLabel;
+        },
+        {
+          message: `Template category "${categoryLabel}" should be selected from typeahead`,
+          timeout: TestTimeouts.LONG_OPERATION,
+        },
+      );
     }
 
-    const submitBtn = this.locator('button:has-text("Save as template")').last();
-    await submitBtn.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
-    await this.robustClick(submitBtn);
+    // PatternFly progress buttons remount on submit (`pf-m-progress`); a normal
+    // click retries on detach for ELEMENT_WAIT and loses the race. Force-click
+    // and treat modal close as success.
+    const submitBtn = modal
+      .getByRole('button', { name: /^(Save as template|Create)$/i })
+      .or(modal.getByTestId('save-button'))
+      .first();
+    await submitBtn.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
+    await Promise.race([
+      submitBtn.click({ force: true, timeout: TestTimeouts.UI_ACTION_COMPLETE }),
+      modal.waitFor({ state: 'hidden', timeout: TestTimeouts.UI_ACTION_COMPLETE }),
+    ]).catch(() => undefined);
+    await modal
+      .waitFor({ state: 'hidden', timeout: TestTimeouts.NAVIGATION })
+      .catch(() => undefined);
     await this.page
-      .waitForURL(/\/vm-templates/, { timeout: TestTimeouts.NAVIGATION })
+      .waitForURL(/\/(?:vm-)?templates/, { timeout: TestTimeouts.NAVIGATION })
       .catch(() => undefined);
     await this.waitForLoadingComplete(TestTimeouts.UI_DELAY_MEDIUM);
   }

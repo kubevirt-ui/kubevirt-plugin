@@ -1,16 +1,60 @@
 import * as path from 'path';
 
+import type { ReporterDescription } from '@playwright/test';
 import { defineConfig, devices } from '@playwright/test';
-import * as dotenv from 'dotenv';
 
-dotenv.config({ path: path.resolve(__dirname, '.env'), quiet: true });
+import './playwright/load-env';
 
-export const baseURL = (() => {
-  const addr =
-    process.env.WEB_CONSOLE_URL || process.env.BRIDGE_BASE_ADDRESS || 'http://localhost:9000';
-  const basePath = process.env.BRIDGE_BASE_PATH ?? '/';
-  return `${addr}${basePath}`.replace(/\/$/, '');
-})();
+import { EnvVariables } from './playwright/src/utils/env-variables';
+import {
+  getStorageStatePathForConfig,
+  storageStateExists,
+} from './playwright/src/utils/storage-state';
+import { TestTimeouts } from './playwright/src/utils/test-config';
+import { getTestResultsDir } from './playwright/src/utils/test-results-dir';
+
+const repoRoot = path.resolve(__dirname);
+const testResultsDir = getTestResultsDir(repoRoot);
+
+function getReporterConfig(resultsDir: string): ReporterDescription[] {
+  const ciDebugHarness: ReporterDescription = [
+    path.resolve(__dirname, 'playwright/src/utils/ci-debug-harness.ts'),
+  ];
+
+  // USE_ALLURE=0 → skip Allure; videos/screenshots still land in outputDir (test-results/).
+  const allureReporter: ReporterDescription[] = EnvVariables.useAllure
+    ? [
+        [
+          path.resolve(__dirname, 'playwright/src/utils/allure-no-stdout-reporter.ts'),
+          { detail: true, resultsDir, suiteTitle: true },
+        ],
+      ]
+    : [];
+
+  if (EnvVariables.isDebugMode) {
+    return [ciDebugHarness, ['list']];
+  }
+
+  if (EnvVariables.isSharded) {
+    const junitFile = path.resolve(
+      repoRoot,
+      'junit-results',
+      `junit-shard-${EnvVariables.shardIndex}.xml`,
+    );
+    return [ciDebugHarness, ...allureReporter, ['junit', { outputFile: junitFile }]];
+  }
+
+  const junitFile = path.resolve(repoRoot, 'junit-results', 'junit.xml');
+  return [ciDebugHarness, ['list'], ...allureReporter, ['junit', { outputFile: junitFile }]];
+}
+
+const baseURL = EnvVariables.webConsoleUrl;
+/**
+ * Written by global.setup. Only pass a path when the file exists — Playwright throws
+ * ENOENT if `storageState` points at a missing file (e.g. after teardown between runs).
+ */
+const storageStatePath = getStorageStatePathForConfig();
+const storageState = storageStateExists() ? storageStatePath : undefined;
 
 const chromeArgs = [
   '--ignore-certificate-errors',
@@ -28,10 +72,9 @@ const chromeArgs = [
   '--disable-translate',
   '--no-first-run',
   '--js-flags=--max-old-space-size=4096',
-  ...(process.env.DIAGNOSE_FAILURES === '1' ? ['--remote-debugging-port=0'] : []),
 ];
 
-const migrationUse = {
+const chromeUse = {
   ...devices['Desktop Chrome'],
   launchOptions: {
     args: chromeArgs,
@@ -40,91 +83,44 @@ const migrationUse = {
   viewport: { height: 1080, width: 1920 },
 };
 
-/** Route-based UI specs; API specs live under `playwright/tests/api`. */
+/** Route-based UI specs under `playwright/tests/`. */
 const uiTestDir = './playwright/tests';
-const uiTestIgnoreApi = '**/api/**';
-/** Avoid running `@cnv-settings` specs twice (Gating + Settings). */
-const uiGrepInvertSettings = /@cnv-settings/;
+const uiTestIgnoreManual = ['**/api/**', '**/explore/**'];
+
+/** Exact tag match — avoid `/@gating/` also matching secondary tags. */
+const tagExact = (tag: string): RegExp =>
+  new RegExp(`${tag.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?![\\w-])`);
 
 export default defineConfig({
-  expect: { timeout: 60_000 },
-  forbidOnly: !!process.env.CI,
-  fullyParallel: false,
+  expect: { timeout: TestTimeouts.ELEMENT_WAIT },
+  forbidOnly: EnvVariables.isCI,
+  fullyParallel: true,
   globalSetup: './playwright/project-dependencies/global.setup.ts',
   globalTeardown: './playwright/project-dependencies/global.teardown.ts',
-  outputDir: './playwright/test-results/artifacts',
+  outputDir: testResultsDir,
   projects: [
-    // ── Gating project (tag @gating) ─────────────────────────────────
     {
-      fullyParallel: true,
-      grep: /@gating/,
-      grepInvert: uiGrepInvertSettings,
+      fullyParallel: EnvVariables.isCI ? false : true,
+      grep: tagExact('@gating'),
       name: 'Gating',
-      retries: 0,
       testDir: uiTestDir,
-      testIgnore: uiTestIgnoreApi,
-      use: migrationUse,
+      testIgnore: uiTestIgnoreManual,
+      use: { ...chromeUse, baseURL, storageState },
     },
-
-    // ── Tier1 project ────────────────────────────────────────────────
-    {
-      fullyParallel: false,
-      grep: /@tier1/,
-      name: 'Tier1',
-      retries: 0,
-      testDir: uiTestDir,
-      testIgnore: uiTestIgnoreApi,
-      use: migrationUse,
-    },
-
-    // ── Tier2 project ────────────────────────────────────────────────
-    {
-      fullyParallel: false,
-      grep: /@tier2/,
-      name: 'Tier2',
-      retries: 0,
-      testDir: uiTestDir,
-      testIgnore: uiTestIgnoreApi,
-      use: migrationUse,
-    },
-
-    // ── Settings project ─────────────────────────────────────────────
-    {
-      fullyParallel: false,
-      grep: /@cnv-settings/,
-      name: 'Settings',
-      retries: 0,
-      testDir: uiTestDir,
-      testIgnore: uiTestIgnoreApi,
-      use: migrationUse,
-    },
-
-    // ── API contract tests (browserless, console proxy) ────────────────
-    {
-      fullyParallel: false,
-      name: 'API',
-      retries: 0,
-      testDir: './playwright/tests/api',
-      use: migrationUse,
-    },
-
-    // ── Migration projects (use global setup/teardown) ───────────────
   ],
-  reporter: [
-    ['list'],
-    ['junit', { outputFile: './playwright/test-results/results.xml' }],
-    ['html', { open: 'never', outputFolder: './playwright/test-results/html-report' }],
-  ],
-  retries: process.env.CI ? 1 : 0,
-  timeout: 480 * 1000,
+  reporter: getReporterConfig(testResultsDir),
+  retries: EnvVariables.retries,
+  timeout: TestTimeouts.TEST_LONG,
+  tsconfig: './playwright/tsconfig.json',
   use: {
-    actionTimeout: 60_000,
+    actionTimeout: TestTimeouts.ELEMENT_WAIT,
     baseURL,
     headless: process.env.HEADLESS !== 'false',
     ignoreHTTPSErrors: true,
-    testIdAttribute: 'data-test',
-    navigationTimeout: 120_000,
+    navigationTimeout: TestTimeouts.NAVIGATION,
     screenshot: 'only-on-failure',
+    storageState,
+    testIdAttribute: 'data-test',
     trace: 'off',
     video: 'retain-on-failure',
     viewport: { height: 1080, width: 1920 },
