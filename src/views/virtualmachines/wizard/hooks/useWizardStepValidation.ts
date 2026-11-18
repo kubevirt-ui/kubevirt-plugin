@@ -71,8 +71,7 @@ const useWizardStepValidation = (): WizardStepValidation => {
 
   const stepNextDisabled: Record<VMWizardStep, boolean> = useMemo(() => {
     const isRedHatProvided = Boolean(selectedSeries) && Boolean(selectedSize);
-    const isUserProvided =
-      Boolean(selectedInstanceType?.namespace) && Boolean(selectedInstanceType?.name);
+    const isUserProvided = Boolean(selectedInstanceType?.name) && !selectedSeries && !selectedSize;
     const isValidVMName = isCloneCreationMethod(creationMethod) || isVMName(name);
 
     return {

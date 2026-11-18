@@ -75,11 +75,13 @@ const UserProvidedInstanceTypesList: FC<UserProvidedInstanceTypesListProps> = ({
     return <UserProvidedComputeResourcesEmptyState namespace={namespace} />;
   }
 
-  const handleRowClick = (itName: string, itNamespace: string) => {
+  const handleRowClick = (itName: string, itNamespace?: string) => {
     setValue(CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.SELECTED_INSTANCE_TYPE, {
       name: itName,
-      namespace: itNamespace,
+      namespace: itNamespace ?? null,
     });
+    setValue(CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.SELECTED_SERIES, '');
+    setValue(CREATE_VM_FORM_FIELDS_INSTANCE_TYPE_DATA.SELECTED_SIZE, '');
   };
 
   return (
@@ -140,7 +142,7 @@ const UserProvidedInstanceTypesList: FC<UserProvidedInstanceTypesListProps> = ({
                 <Tr
                   isRowSelected={
                     selectedInstanceType?.name === itName &&
-                    selectedInstanceType?.namespace === itNamespace
+                    selectedInstanceType?.namespace === (itNamespace ?? null)
                   }
                   isClickable
                   isSelectable
