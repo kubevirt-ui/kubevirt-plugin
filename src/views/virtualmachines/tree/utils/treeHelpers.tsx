@@ -5,6 +5,7 @@ import { type TreeViewDataItem } from '@patternfly/react-core';
 import {
   ALL_CLUSTERS_ID,
   CLUSTER_SELECTOR_PREFIX,
+  CLUSTER_SET_SELECTOR_PREFIX,
   FOLDER_SELECTOR_PREFIX,
   PROJECT_SELECTOR_PREFIX,
 } from './constants';
@@ -18,6 +19,9 @@ const isAllNamespacesItem = (item: TreeViewDataItem): boolean =>
 
 const isClusterItem = (item: TreeViewDataItem): boolean =>
   item.id?.startsWith(CLUSTER_SELECTOR_PREFIX);
+
+const isClusterSetItem = (item: TreeViewDataItem): boolean =>
+  item.id?.startsWith(CLUSTER_SET_SELECTOR_PREFIX);
 
 const isProjectItem = (item: TreeViewDataItem): boolean =>
   item.id?.startsWith(PROJECT_SELECTOR_PREFIX);
@@ -80,7 +84,12 @@ export const filterNamespaceItems = (
       .map((opt) => Object.assign({}, opt))
       .filter((child) => filterNamespaceItems(child, showEmptyProjects));
 
-    return item.children.length > 0 || isClusterItem(item) || isAllNamespacesItem(item);
+    return (
+      item.children.length > 0 ||
+      isClusterItem(item) ||
+      isClusterSetItem(item) ||
+      isAllNamespacesItem(item)
+    );
   }
 };
 
@@ -107,6 +116,9 @@ export const getAllTreeViewProjectItems = (treeData: TreeViewDataItem[]): TreeVi
 export const getAllTreeViewClusterItems = (treeData: TreeViewDataItem[]): TreeViewDataItem[] =>
   getAllTreeViewItems(treeData).filter((treeItem) => isClusterItem(treeItem));
 
+export const getAllTreeViewClusterSetItems = (treeData: TreeViewDataItem[]): TreeViewDataItem[] =>
+  getAllTreeViewItems(treeData).filter((treeItem) => isClusterSetItem(treeItem));
+
 export const getMatchedProjectItems = (
   treeData: TreeViewDataItem[],
   searchText: string,
@@ -119,6 +131,12 @@ export const getMatchedClusterItems = (
 ): TreeViewDataItem[] =>
   getAllTreeViewClusterItems(treeData).filter((item) => nameMatchesSearch(item, searchText));
 
+export const getMatchedClusterSetItems = (
+  treeData: TreeViewDataItem[],
+  searchText: string,
+): TreeViewDataItem[] =>
+  getAllTreeViewClusterSetItems(treeData).filter((item) => nameMatchesSearch(item, searchText));
+
 export const highlightMatchedTreeItems = (
   treeData: TreeViewDataItem[],
   searchText: string,
@@ -128,7 +146,10 @@ export const highlightMatchedTreeItems = (
   return treeData.map((item) => {
     const copy = { ...item };
 
-    if ((isProjectItem(copy) || isClusterItem(copy)) && nameMatchesSearch(copy, searchText)) {
+    if (
+      (isProjectItem(copy) || isClusterItem(copy) || isClusterSetItem(copy)) &&
+      nameMatchesSearch(copy, searchText)
+    ) {
       copy.name = <b className="pf-v6-u-font-weight-bold">{copy.name}</b>;
     }
 
@@ -140,8 +161,22 @@ export const highlightMatchedTreeItems = (
   });
 };
 
+const getFirstClusterTreeItemId = (
+  children: TreeViewDataItem[] | undefined,
+): string | undefined => {
+  const firstChild = children?.[0];
+  if (!firstChild) {
+    return undefined;
+  }
+  if (isClusterSetItem(firstChild)) {
+    return firstChild.children?.[0]?.id;
+  }
+  return firstChild.id;
+};
+
 export const getClusterElement = (treeData: TreeViewDataItem[]): HTMLElement => {
   const root = treeData?.[0];
-  const targetId = root?.id === ALL_CLUSTERS_ID ? root?.children?.[0]?.id : root?.id;
+  const targetId =
+    root?.id === ALL_CLUSTERS_ID ? getFirstClusterTreeItemId(root?.children) : root?.id;
   return document.getElementById(targetId)?.querySelector('.pf-v6-c-tree-view__node-text');
 };
