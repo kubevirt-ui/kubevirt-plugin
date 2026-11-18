@@ -11,6 +11,8 @@ import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 
 import { type GenerateVMSpecDataVolumeTemplates } from '../types';
 
+import { getIsoBlankDataVolumeName } from './bootVolumeNames';
+
 type DataVolumeStorageResources = NonNullable<
   NonNullable<NonNullable<V1DataVolumeTemplateSpec['spec']>['storage']>['resources']
 >;
@@ -55,7 +57,7 @@ const getISODataVolumeTemplates = (
   return [
     {
       metadata: {
-        name: `${vmName}-volume-blank`,
+        name: getIsoBlankDataVolumeName(vmName),
       },
       spec: {
         source: {
