@@ -54,6 +54,11 @@ jobs:
         continue-on-error: true
         run: npm run lint
 
+      - name: Check module resolutions
+        id: module_resolutions
+        continue-on-error: true
+        run: npm run check-module-resolutions
+
       - name: Build
         id: build
         continue-on-error: true
@@ -82,6 +87,11 @@ jobs:
         id: offline
         continue-on-error: true
         run: HUSKY=0 npm ci --offline --ignore-scripts --no-audit
+
+      - name: Check module resolutions (offline)
+        id: module_resolutions_offline
+        continue-on-error: true
+        run: npm run check-module-resolutions
 
       # ── unit tests ────────────────────────────────────────
       - name: Run unit tests
@@ -120,9 +130,11 @@ jobs:
             {
               "actionlint": "${{ steps.actionlint.outcome }}",
               "lint": "${{ steps.lint.outcome }}",
+              "module-resolutions": "${{ steps.module_resolutions.outcome }}",
               "build": "${{ steps.build.outcome }}",
               "hermeto": "${{ steps.hermeto.outcome }}",
               "offline-install": "${{ steps.offline.outcome }}",
+              "module-resolutions-offline": "${{ steps.module_resolutions_offline.outcome }}",
               "test": "${{ steps.test.outcome }}",
               "script-types": "${{ steps.script_types.outcome }}",
               "script-tests": "${{ steps.script_tests.outcome }}"
