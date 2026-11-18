@@ -56,11 +56,10 @@ export const useTreeViewDataResources = (): UseTreeViewDataResources => {
   const vmStrategy = useResourceWatchStrategy({
     enabled: !isACMTreeView,
     groupVersionKind: VirtualMachineModelGroupVersionKind,
-    namespaces: projectNames ?? [],
     namespacesLoaded: projectNamesLoaded,
   });
 
-  const { namespaces: namespacesToWatch, perNamespace: loadVMsPerNamespace } = vmStrategy;
+  const loadVMsPerNamespace = vmStrategy.perNamespace;
   const clusterScopedEnabled = isACMTreeView || vmStrategy.clusterWide;
 
   const [allVMs, allVMsLoaded, allVMsError, refreshAllVMs] = useKubevirtWatchResource<
@@ -70,7 +69,7 @@ export const useTreeViewDataResources = (): UseTreeViewDataResources => {
   const allowedResources = useK8sWatchResources<{ [key: string]: V1VirtualMachine[] }>(
     buildNamespacedListWatch(
       loadVMsPerNamespace,
-      namespacesToWatch,
+      projectNames ?? [],
       VirtualMachineModelGroupVersionKind,
     ),
   );
@@ -84,7 +83,7 @@ export const useTreeViewDataResources = (): UseTreeViewDataResources => {
   }>(
     buildNamespacedListWatch(
       loadVMsPerNamespace,
-      namespacesToWatch,
+      projectNames ?? [],
       VirtualMachineInstanceMigrationModelGroupVersionKind,
     ),
   );
@@ -155,7 +154,7 @@ export const useTreeViewDataResources = (): UseTreeViewDataResources => {
     loaded,
     loadError: projectNamesError ?? toUnknown(namespacesResult.error) ?? toUnknown(hardVMError),
     namespacesByCluster,
-    projectNames: isACMTreeView ? projectNames : namespacesToWatch,
+    projectNames,
     treeViewFoldersEnabled,
     vms: displayVMs,
   };

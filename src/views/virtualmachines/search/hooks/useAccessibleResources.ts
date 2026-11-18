@@ -69,9 +69,7 @@ export const useAccessibleResources = <T>({
     enabled: isWatchEnabled && !isACMPage,
     groupVersionKind,
     namespace,
-    namespaces: namespacesToWatch ?? [],
     namespacesLoaded: projectNamesLoaded,
-    narrowNamespaces: !watchNamespaces,
   });
 
   const loadPerNamespace = strategy.perNamespace;
@@ -98,7 +96,7 @@ export const useAccessibleResources = <T>({
   const allowedResources = useK8sWatchResources<{ [key: string]: T[] }>(
     Object.fromEntries(
       loadPerNamespace
-        ? strategy.namespaces.map((ns) => [
+        ? (namespacesToWatch || []).map((ns) => [
             ns,
             {
               fieldSelector,

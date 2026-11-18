@@ -3,7 +3,6 @@ const multiclusterSDK = require('@stolostron/multicluster-sdk');
 module.exports = {
   FleetWatchK8sResource: multiclusterSDK.FleetWatchK8sResource,
   getFleetK8sAPIPath: () => Promise.resolve('/k8s/kubernetes'),
-  useFleetAccessReview: () => [false, false],
   useFleetClusterNames: () => [['cluster1', 'cluster2'], true, undefined],
   useFleetK8sAPIPath: () => ['/k8s/kubernetes', true, undefined],
   useFleetK8sWatchResource: () => [undefined, true, undefined],
