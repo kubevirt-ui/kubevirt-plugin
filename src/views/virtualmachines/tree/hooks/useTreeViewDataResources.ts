@@ -9,11 +9,11 @@ import {
   type V1VirtualMachineInstanceMigration,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { runningTourSignal } from '@kubevirt-utils/components/GuidedTour/utils/guidedTourSignals';
-import { useCanListNamespaces } from '@kubevirt-utils/hooks/useCanListNamespaces';
 import { TREE_VIEW_FOLDERS } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
 import useProjects from '@kubevirt-utils/hooks/useProjects';
+import useResourceWatchStrategy from '@kubevirt-utils/hooks/useResourceWatchStrategy';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { isEmpty, universalComparator } from '@kubevirt-utils/utils/utils';
 import useMulticlusterNamespaces from '@multicluster/hooks/useMulticlusterNamespaces';
@@ -23,6 +23,7 @@ import { useK8sWatchResources } from '@openshift-console/dynamic-plugin-sdk';
 import { useFleetClusterNames } from '@stolostron/multicluster-sdk';
 import { getLatestMigrationForEachVM } from '@virtualmachines/utils';
 
+import { getFirstNonForbiddenError } from '../utils/getFirstNonForbiddenError';
 import { isHardInventoryError } from '../utils/isHardInventoryError';
 import { vmimMapperSignal, vmsSignal } from '../utils/signals';
 import { toError } from '../utils/toError';
@@ -43,7 +44,6 @@ export type UseTreeViewDataResources = {
 };
 
 export const useTreeViewDataResources = (): UseTreeViewDataResources => {
-  const canListAllNamespaces = useCanListNamespaces();
   const [clusterNames] = useFleetClusterNames();
   const isACMTreeView = useIsACMPage();
   const isTourRunning = runningTourSignal.value;
@@ -52,8 +52,15 @@ export const useTreeViewDataResources = (): UseTreeViewDataResources => {
   const namespacesResult = useMulticlusterNamespaces();
   const { loaded: multiclusterNamespacesLoaded, namespacesByCluster } = namespacesResult;
 
-  const loadVMsPerNamespace = !isACMTreeView && projectNamesLoaded && !canListAllNamespaces;
-  const clusterScopedEnabled = canListAllNamespaces || isACMTreeView;
+  // CNV-101272: decide on kubevirt.io list permission, not CAN_LIST_NS (core namespaces list).
+  const vmStrategy = useResourceWatchStrategy({
+    enabled: !isACMTreeView,
+    groupVersionKind: VirtualMachineModelGroupVersionKind,
+    namespacesLoaded: projectNamesLoaded,
+  });
+
+  const loadVMsPerNamespace = vmStrategy.perNamespace;
+  const clusterScopedEnabled = isACMTreeView || vmStrategy.clusterWide;
 
   const [allVMs, allVMsLoaded, allVMsError, refreshAllVMs] = useKubevirtWatchResource<
     V1VirtualMachine[]
@@ -102,15 +109,15 @@ export const useTreeViewDataResources = (): UseTreeViewDataResources => {
     vmimMapperSignal.value = memoizedVMIMs;
   }, [memoizedVMIMs]);
 
-  const namespacedVMsLoaded = loadVMsPerNamespace
-    ? isEmpty(allowedResources) ||
-      Object.values(allowedResources).every((resource) => resource.loaded || resource.loadError)
-    : allVMsLoaded;
+  const namespacedVMsLoaded =
+    vmStrategy.resolved &&
+    (loadVMsPerNamespace
+      ? isEmpty(allowedResources) ||
+        Object.values(allowedResources).every((resource) => resource.loaded || resource.loadError)
+      : allVMsLoaded);
 
   const namespacedVMsError: unknown = loadVMsPerNamespace
-    ? Object.values(allowedResources)
-        .map((resource) => resource.loadError as unknown)
-        .find(Boolean)
+    ? getFirstNonForbiddenError(Object.values(allowedResources))
     : allVMsError;
 
   const vmWatchError = toError(namespacedVMsError);
