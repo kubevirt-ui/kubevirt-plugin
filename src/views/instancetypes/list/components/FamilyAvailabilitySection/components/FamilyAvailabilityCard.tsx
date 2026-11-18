@@ -8,18 +8,22 @@ import { getFamilySelectorVisibilityStatus } from '@kubevirt-utils/hooks/useInst
 import useKubevirtToast from '@kubevirt-utils/hooks/useKubevirtToast';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { type InstanceTypeSeriesName } from '@kubevirt-utils/resources/instancetype/types';
-import { Card, Flex, Switch } from '@patternfly/react-core';
+import { Card, Flex, Switch, Tooltip } from '@patternfly/react-core';
 
 import './family-availability-card.scss';
 
 type FamilyAvailabilityCardProps = {
+  cluster?: string;
   isAvailable: boolean;
+  isReadOnly?: boolean;
   seriesItem: RedHatInstanceTypeSeries;
   setFamilyAvailable: (series: InstanceTypeSeriesName, available: boolean) => Promise<void>;
 };
 
 const FamilyAvailabilityCard: FC<FamilyAvailabilityCardProps> = ({
+  cluster,
   isAvailable,
+  isReadOnly = false,
   seriesItem,
   setFamilyAvailable,
 }) => {
@@ -32,6 +36,7 @@ const FamilyAvailabilityCard: FC<FamilyAvailabilityCardProps> = ({
   const { label: visibilityLabel } = getFamilySelectorVisibilityStatus(isAvailable, t);
 
   const handleAvailabilityChange = async (_event: unknown, checked: boolean): Promise<void> => {
+    if (isReadOnly) return;
     setIsUpdating(true);
     try {
       await setFamilyAvailable(seriesName as InstanceTypeSeriesName, checked);
@@ -41,6 +46,20 @@ const FamilyAvailabilityCard: FC<FamilyAvailabilityCardProps> = ({
       setIsUpdating(false);
     }
   };
+
+  const familySwitch = (
+    <Switch
+      aria-label={t('Toggle availability for {{family}}', {
+        family: classDisplayNameAnnotation,
+      })}
+      className="family-availability-card__switch"
+      data-test={`family-availability-toggle-${seriesName}`}
+      isChecked={isAvailable}
+      isDisabled={isUpdating || isReadOnly}
+      label={visibilityLabel}
+      onChange={(_event, checked) => void handleAvailabilityChange(_event, checked)}
+    />
+  );
 
   return (
     <Card
@@ -59,17 +78,20 @@ const FamilyAvailabilityCard: FC<FamilyAvailabilityCardProps> = ({
         <div className="family-availability-card__icon">{Icon && <Icon />}</div>
         <div className="family-availability-card__title">{classDisplayNameAnnotation}</div>
         <div className="family-availability-card__series-label">{seriesLabel}</div>
-        <Switch
-          aria-label={t('Toggle availability for {{family}}', {
-            family: classDisplayNameAnnotation,
-          })}
-          className="family-availability-card__switch"
-          data-test={`family-availability-toggle-${seriesName}`}
-          isChecked={isAvailable}
-          isDisabled={isUpdating}
-          label={visibilityLabel}
-          onChange={(_event, checked) => void handleAvailabilityChange(_event, checked)}
-        />
+        {isReadOnly ? (
+          <Tooltip
+            content={t(
+              'You do not have permission to change instance type family availability on cluster {{cluster}}.',
+              { cluster },
+            )}
+          >
+            <span className="family-availability-card__switch-wrapper" tabIndex={0}>
+              {familySwitch}
+            </span>
+          </Tooltip>
+        ) : (
+          familySwitch
+        )}
       </Flex>
     </Card>
   );
