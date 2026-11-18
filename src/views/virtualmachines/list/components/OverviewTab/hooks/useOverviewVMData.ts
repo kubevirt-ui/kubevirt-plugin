@@ -1,12 +1,9 @@
 import { VirtualMachineModelGroupVersionKind } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import useKubevirtWatchResource from '@kubevirt-utils/hooks/useKubevirtWatchResource/useKubevirtWatchResource';
 import useIsACMPage from '@multicluster/useIsACMPage';
-import { type WatchK8sResource } from '@openshift-console/dynamic-plugin-sdk';
 import { useAccessibleResources } from '@virtualmachines/search/hooks/useAccessibleResources';
 import useFleetVMInventory from '@virtualmachines/tree/hooks/useFleetVMInventory';
 import { isHardInventoryError } from '@virtualmachines/tree/utils/isHardInventoryError';
-import { OBJECTS_FETCHING_LIMIT } from '@virtualmachines/utils';
 
 type OverviewVMData = {
   error?: Error;
@@ -20,50 +17,32 @@ const useOverviewVMData = (namespace?: string, cluster?: string): OverviewVMData
   const isACMPage = useIsACMPage();
   const fleetInventory = useFleetVMInventory(namespace, cluster);
 
-  const [watchedVms, watchedVmsLoaded, watchedVmsError] = useKubevirtWatchResource<
-    V1VirtualMachine[]
-  >(
-    (!isACMPage && namespace
-      ? {
-          cluster,
-          groupVersionKind: VirtualMachineModelGroupVersionKind,
-          isList: true,
-          limit: OBJECTS_FETCHING_LIMIT,
-          namespace,
-          namespaced: true,
-        }
-      : null) as WatchK8sResource,
-  );
-
   const {
-    loaded: accessibleVmsLoaded,
-    loadError: accessibleVmsError,
-    resources: accessibleVms,
+    loaded: vmsLoaded,
+    loadError,
+    resources: vms,
   } = useAccessibleResources<V1VirtualMachine>({
+    clusters: cluster ? [cluster] : undefined,
     groupVersionKind: VirtualMachineModelGroupVersionKind,
     isWatchEnabled: !isACMPage,
-    namespace: namespace ?? undefined,
+    namespace,
   });
 
   if (isACMPage) {
-    const { error, loaded, refresh, vms } = fleetInventory;
+    const { error, loaded, refresh, vms: fleetVMs } = fleetInventory;
     const isSoftError = Boolean(error && !isHardInventoryError(error));
 
     return {
       error,
       isSoftError,
       refresh,
-      vms,
+      vms: fleetVMs,
       vmsLoaded: loaded,
     };
   }
 
-  const vms = namespace ? watchedVms : accessibleVms;
-  const vmsLoaded = namespace ? watchedVmsLoaded : accessibleVmsLoaded;
-  const error = (namespace ? watchedVmsError : accessibleVmsError) as Error | undefined;
-
   return {
-    error,
+    error: loadError,
     isSoftError: false,
     vms,
     vmsLoaded,
