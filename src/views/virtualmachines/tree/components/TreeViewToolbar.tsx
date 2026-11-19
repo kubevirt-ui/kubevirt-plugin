@@ -28,7 +28,7 @@ const TreeViewToolbar: FC<TreeViewToolbarProps> = ({ onSearch }) => {
   const [showEmptyProjects, setShowEmptyProjects] = useLocalStorage(SHOW_EMPTY_PROJECTS_KEY, HIDE);
 
   return (
-    <Toolbar className="vms-tree-view-toolbar" isSticky>
+    <Toolbar className="vms-tree-view-toolbar">
       <ToolbarContent className="vms-tree-view-toolbar-content">
         <Stack className="vms-tree-view__toolbar-section">
           <StackItem>
