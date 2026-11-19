@@ -70,10 +70,10 @@ See [`ci-scripts/manual-console/README.md`](../../ci-scripts/manual-console/READ
 
 ## Other
 
-| Workflow        | Role                                          |
-| --------------- | --------------------------------------------- |
-| `ci_checks.yml` | Unit tests, build, lint, actionlint           |
-| `deploy.yml`    | Build/push multi-arch Quay image on main/tags |
+| Workflow        | Role                                                    |
+| --------------- | ------------------------------------------------------- |
+| `ci_checks.yml` | Unit tests, build, lint, module resolutions, actionlint |
+| `deploy.yml`    | Build/push multi-arch Quay image on main/tags           |
 
 ## `pull_request_target` Actions event policy
 
