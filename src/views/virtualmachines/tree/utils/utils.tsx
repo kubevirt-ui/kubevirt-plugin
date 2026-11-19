@@ -1,12 +1,7 @@
 import { SINGLE_CLUSTER_KEY } from '@kubevirt-utils/resources/constants';
-import {
-  CLUSTER_LIST_FILTER_TYPE,
-  PROJECT_LIST_FILTER_TYPE,
-} from '@kubevirt-utils/utils/constants';
 import { isACMPath } from '@multicluster/urls';
 import { type TreeViewDataItem } from '@patternfly/react-core';
 import { signal } from '@preact/signals-react';
-import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
 import {
   CLUSTER_SELECTOR_PREFIX,
@@ -67,36 +62,4 @@ export const getVMInfoFromPathname = (
   const vmNamespace = splitPathname?.[3];
 
   return { currentVMTab, vmCluster: null, vmName, vmNamespace };
-};
-
-type BuildTreeItemQueryOptions = {
-  cluster?: string;
-  folderName?: string;
-  project?: string;
-  query?: string;
-};
-
-export const buildTreeItemQuery = ({
-  cluster,
-  folderName,
-  project,
-  query,
-}: BuildTreeItemQueryOptions): string => {
-  const params = new URLSearchParams(query ?? '');
-
-  params.delete(CLUSTER_LIST_FILTER_TYPE);
-  params.delete(PROJECT_LIST_FILTER_TYPE);
-  params.delete(VirtualMachineRowFilterType.Group);
-
-  if (cluster) {
-    params.set(CLUSTER_LIST_FILTER_TYPE, cluster);
-  }
-  if (project) {
-    params.set(PROJECT_LIST_FILTER_TYPE, project);
-  }
-  if (folderName) {
-    params.set(VirtualMachineRowFilterType.Group, folderName);
-  }
-
-  return params.size > 0 ? `?${params.toString()}` : '';
 };

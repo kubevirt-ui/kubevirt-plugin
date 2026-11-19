@@ -9,9 +9,9 @@ import { ClusterIcon } from '@patternfly/react-icons';
 import { type BuildMultiClusterTreeChildrenArgs } from '@virtualmachines/tree/multi-cluster/types/types';
 import { ALL_CLUSTERS_ID } from '@virtualmachines/tree/utils/constants';
 import { createProjectTreeItem } from '@virtualmachines/tree/utils/projectTreeItems';
+import { buildTreeItemQuery } from '@virtualmachines/tree/utils/query-params/treeItemQuery';
 import { buildProjectMap } from '@virtualmachines/tree/utils/treeItemBuilders';
 import {
-  buildTreeItemQuery,
   getClusterTreeViewItemID,
   type TreeViewDataItemWithHref,
 } from '@virtualmachines/tree/utils/utils';

@@ -4,8 +4,8 @@ import { isEmpty, universalComparator } from '@kubevirt-utils/utils/utils';
 import { getACMVMListURL } from '@multicluster/urls';
 import { type ClusterSetData } from '@stolostron/multicluster-sdk';
 import { isNativeClusterSet } from '@virtualmachines/tree/multi-cluster/utils/multiClusterTreeChildren';
+import { buildTreeItemQuery } from '@virtualmachines/tree/utils/query-params/treeItemQuery';
 import {
-  buildTreeItemQuery,
   getClusterSetTreeViewItemID,
   type TreeViewDataItemWithHref,
 } from '@virtualmachines/tree/utils/utils';
@@ -89,6 +89,7 @@ export const getClusterNamesToDisplayInTree = ({
 
 export const buildClusterSetTreeSingleNode = ({
   children,
+  clusterNamesInSet,
   clusterSetName,
   defaultExpanded,
   queryParams,
@@ -99,7 +100,10 @@ export const buildClusterSetTreeSingleNode = ({
     children,
     defaultExpanded,
     hasBadge: false,
-    href: `${getACMVMListURL()}${buildTreeItemQuery({ query: queryParams })}`,
+    href: `${getACMVMListURL()}${buildTreeItemQuery({
+      clusters: clusterNamesInSet,
+      query: queryParams,
+    })}`,
     icon: createElement(ClusterSetTreeIcon, { t }),
     id: getClusterSetTreeViewItemID(clusterSetName),
     name: clusterSetName,

@@ -11,12 +11,8 @@ import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
 import { statusIcon } from '../icons/utils';
 import { VM_FOLDER_LABEL } from './constants';
-import {
-  buildTreeItemQuery,
-  getVMTreeViewItemID,
-  treeDataMap,
-  type TreeViewDataItemWithHref,
-} from './utils';
+import { buildTreeItemQuery } from './query-params/treeItemQuery';
+import { getVMTreeViewItemID, treeDataMap, type TreeViewDataItemWithHref } from './utils';
 
 export type ProjectMapEntry = {
   count: number;
