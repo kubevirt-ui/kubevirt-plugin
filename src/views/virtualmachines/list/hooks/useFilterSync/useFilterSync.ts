@@ -8,10 +8,15 @@ import {
   PROJECT_LIST_FILTER_TYPE,
 } from '@kubevirt-utils/utils/constants';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
-import { getACMVMListURL, getVMListURL } from '@multicluster/urls';
 import useIsACMPage from '@multicluster/useIsACMPage';
 
-import { hasMismatch } from './utils';
+import { type FilterSyncPrevState } from './types/types';
+import {
+  getListClusterProjectQueryFilterValues,
+  navigateToWidenedVmListPath,
+  syncFleetToolbarFromQuery,
+  widenUrlPathForToolbarFilters,
+} from './utils';
 
 /**
  * Unified hook that handles bidirectional sync between the URL path
@@ -19,7 +24,8 @@ import { hasMismatch } from './utils';
  *
  * Two directions:
  *  1. Tree view click changes the path → sync toolbar filter state to match.
- *  2. Toolbar filter change creates a mismatch → broaden the URL path (e.g. query params have multiple projects, but the URL path is /ns/project1 → broaden the URL path to /all-namespaces).
+ *  2. Toolbar filter change creates a mismatch → broaden the URL path (e.g. query params have
+ *     multiple projects, but the URL path is /ns/project1 → broaden the URL path to /all-namespaces).
  *
  * A `pathChangedAutomaticallyRef` ref prevents the broadening navigation
  * from triggering an unwanted filter-state reset on the next render.
@@ -31,14 +37,23 @@ const useFilterSync = (onSetFilters: OnSetFilters): void => {
   const cluster = useClusterParam();
   const isACMPage = useIsACMPage();
 
-  const prevRef = useRef({ cluster, namespace });
+  const prevFilterSyncRef = useRef<FilterSyncPrevState>({
+    cluster,
+    clusterProjectQueryKey: undefined,
+    namespace,
+  });
   const pathChangedAutomaticallyRef = useRef(false);
 
   useEffect(() => {
-    const prev = prevRef.current;
-    prevRef.current = { cluster, namespace };
+    const prev = prevFilterSyncRef.current;
+
+    const { clusterFilterValues, clusterProjectQueryKey, projectFilterValues } =
+      getListClusterProjectQueryFilterValues(searchParams, namespace);
 
     const pathChanged = prev.namespace !== namespace || prev.cluster !== cluster;
+    const clusterProjectQueryKeyChanged = prev.clusterProjectQueryKey !== clusterProjectQueryKey;
+
+    prevFilterSyncRef.current = { cluster, clusterProjectQueryKey, namespace };
 
     if (pathChanged && pathChangedAutomaticallyRef.current) {
       pathChangedAutomaticallyRef.current = false;
@@ -47,39 +62,27 @@ const useFilterSync = (onSetFilters: OnSetFilters): void => {
 
     if (pathChanged) {
       onSetFilters({
-        [CLUSTER_LIST_FILTER_TYPE]: cluster ? [cluster] : [],
-        [PROJECT_LIST_FILTER_TYPE]: namespace ? [namespace] : [],
+        [CLUSTER_LIST_FILTER_TYPE]: cluster ? [cluster] : clusterFilterValues,
+        [PROJECT_LIST_FILTER_TYPE]: namespace ? [namespace] : projectFilterValues,
       });
       return;
     }
 
-    const projectFilterValues = searchParams.getAll(PROJECT_LIST_FILTER_TYPE);
-    const clusterFilterValues = searchParams.getAll(CLUSTER_LIST_FILTER_TYPE);
+    const { scope, shouldNavigate } = widenUrlPathForToolbarFilters(
+      { cluster, namespace },
+      clusterFilterValues,
+      projectFilterValues,
+    );
 
-    let targetCluster: string | undefined | null = cluster;
-    let targetNamespace: string | undefined = namespace;
-    let needsNavigation = false;
-
-    if (hasMismatch(targetCluster, clusterFilterValues)) {
-      targetCluster = undefined;
-      targetNamespace = undefined;
-      needsNavigation = true;
-    }
-
-    if (hasMismatch(targetNamespace, projectFilterValues)) {
-      targetNamespace = undefined;
-      needsNavigation = true;
-    }
-
-    if (needsNavigation) {
+    if (shouldNavigate) {
       // tracks that the cluster or namespace was changed automatically by the filter sync and not by the user interacting with the tree view
       pathChangedAutomaticallyRef.current = true;
+      navigateToWidenedVmListPath({ isACMPage, navigate, scope, searchParams });
+      return;
+    }
 
-      const pathname = isACMPage
-        ? getACMVMListURL(targetCluster, targetNamespace)
-        : getVMListURL(undefined, targetNamespace);
-
-      navigate({ pathname, search: searchParams.toString() }, { replace: true });
+    if (!cluster && !pathChanged && clusterProjectQueryKeyChanged) {
+      syncFleetToolbarFromQuery({ namespace, onSetFilters, searchParams });
     }
   }, [searchParams, namespace, cluster, isACMPage, navigate, onSetFilters]);
 };

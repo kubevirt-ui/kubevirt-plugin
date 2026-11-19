@@ -1,11 +1,17 @@
 import { ALL_NAMESPACES, ALL_NAMESPACES_SESSION_KEY } from '@kubevirt-utils/hooks/constants';
 import { SINGLE_CLUSTER_KEY } from '@kubevirt-utils/resources/constants';
 import { isSystemNamespace } from '@kubevirt-utils/resources/namespace/helper';
+import { CLUSTER_LIST_FILTER_TYPE } from '@kubevirt-utils/utils/constants';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getVMListURL } from '@multicluster/urls';
 import { VirtualMachineRowFilterType } from '@virtualmachines/utils';
 
-import { ALL_CLUSTERS_ID, FOLDER_SELECTOR_PREFIX, SHOW } from '../../utils/constants';
+import {
+  ALL_CLUSTERS_ID,
+  CLUSTER_SET_SELECTOR_PREFIX,
+  FOLDER_SELECTOR_PREFIX,
+  SHOW,
+} from '../../utils/constants';
 import {
   getClusterTreeViewItemID,
   getProjectTreeViewItemID,
@@ -42,6 +48,16 @@ export const getProjectTreeItem = (
 ): TreeViewDataItemWithHref | undefined =>
   dataMap?.[getProjectTreeViewItemID(clusterKey, namespace)];
 
+const selectTreeItemIfChanged = (
+  treeItem: TreeViewDataItemWithHref | undefined,
+  selectedId: string | undefined,
+  setSelected: (item: TreeViewDataItemWithHref) => void,
+): void => {
+  if (treeItem && selectedId !== treeItem.id) {
+    setSelected(treeItem);
+  }
+};
+
 export const selectACMTreeItem = (
   dataMap: Record<string, TreeViewDataItemWithHref>,
   cluster: string | undefined,
@@ -54,10 +70,15 @@ export const selectACMTreeItem = (
   navigate: (path: string) => void,
 ): void => {
   if (!ns || !cluster || !loaded) {
-    const clusterTreeItem = getClusterTreeItem(dataMap, cluster);
-    if (clusterTreeItem && selectedId !== clusterTreeItem.id) {
-      setSelected(clusterTreeItem);
+    const clustersInQuery = searchParams.getAll(CLUSTER_LIST_FILTER_TYPE).filter(Boolean);
+    const preserveClusterSetTreeSelection =
+      selectedId?.startsWith(CLUSTER_SET_SELECTOR_PREFIX) && !isEmpty(clustersInQuery);
+
+    if (preserveClusterSetTreeSelection) {
+      return;
     }
+
+    selectTreeItemIfChanged(getClusterTreeItem(dataMap, cluster), selectedId, setSelected);
     return;
   }
 
@@ -67,10 +88,11 @@ export const selectACMTreeItem = (
 
   const projectTreeItem = getProjectTreeItem(dataMap, cluster, ns);
 
-  if (projectTreeItem && isProjectVisibleInTree(projectTreeItem, effectiveShowEmptyProjects)) {
-    if (selectedId !== projectTreeItem.id) {
-      setSelected(projectTreeItem);
-    }
+  const projectVisibleInTree =
+    projectTreeItem && isProjectVisibleInTree(projectTreeItem, effectiveShowEmptyProjects);
+
+  if (projectVisibleInTree) {
+    selectTreeItemIfChanged(projectTreeItem, selectedId, setSelected);
     return;
   }
 
