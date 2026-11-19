@@ -3,7 +3,11 @@ import type {
   V1Network,
   V1VirtualMachine,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { getAutoAttachPodInterface, getInterfaces } from '@kubevirt-utils/resources/vm';
+import {
+  getAutoAttachPodInterface,
+  getInterfaces,
+  getNetworks,
+} from '@kubevirt-utils/resources/vm';
 import { isNetworkInterfaceState } from '@kubevirt-utils/utils/typeGuards';
 
 import { NO_DATA_DASH, PASST_BINDING_NAME, UDN_BINDING_NAME } from '../constants';
@@ -76,6 +80,9 @@ export const getConfigInterfaceState = (
 
 export const isPodNetwork = (network: Partial<V1Network>): boolean =>
   Boolean(network?.pod) && typeof network.pod === 'object';
+
+export const getPodNetworkName = (vm: V1VirtualMachine): string | undefined =>
+  getNetworks(vm)?.find(isPodNetwork)?.name;
 
 /**
  * Check if a network interface is SR-IOV type

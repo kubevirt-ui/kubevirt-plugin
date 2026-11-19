@@ -6,6 +6,8 @@ import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import useIsIPv6SingleStackCluster from '@kubevirt-utils/hooks/useIPStackType/useIsIPv6SingleStackCluster';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useLocalStorage from '@kubevirt-utils/hooks/useLocalStorage';
+import { fetchProjectNetworkSettings } from '@kubevirt-utils/resources/namespace/fetchProjectNetworkSettings';
+import { applyProjectPodNetworkPolicy } from '@kubevirt-utils/resources/namespace/podNetworkPolicy';
 import { getName } from '@kubevirt-utils/resources/shared';
 import useNamespaceUDN from '@kubevirt-utils/resources/udn/hooks/useNamespaceUDN';
 import { getErrorMessage, kubevirtConsole } from '@kubevirt-utils/utils/utils';
@@ -66,9 +68,14 @@ const useCreateCustomizedVM: UseCreateCustomizedVM = () => {
     setError(null);
 
     try {
+      const { isPodNetworkAllowed } = await fetchProjectNetworkSettings({
+        cluster: deployment.cluster,
+        namespaceName: deployment.project,
+      });
+      const vmToCreate = applyProjectPodNetworkPolicy(storeVM, isPodNetworkAllowed);
       const createdVM = await kubevirtK8sCreate({
         cluster: deployment.cluster,
-        data: storeVM,
+        data: vmToCreate,
         model: VirtualMachineModel,
       });
 

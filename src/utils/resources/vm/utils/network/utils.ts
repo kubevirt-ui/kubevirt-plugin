@@ -4,11 +4,7 @@ import {
   type V1VirtualMachineInstance,
   type V1VirtualMachineInstanceNetworkInterface,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import {
-  DEFAULT_NETWORK_INTERFACE,
-  getInterfaces,
-  getNetworks,
-} from '@kubevirt-utils/resources/vm';
+import { getInterfaces, getNetworks } from '@kubevirt-utils/resources/vm';
 import {
   getVMIInterfaces,
   getVMINetworks,
@@ -18,7 +14,7 @@ import { sortByDirection, universalComparator } from '@kubevirt-utils/utils/util
 import { type SortByDirection } from '@patternfly/react-table';
 
 import { type NetworkPresentation } from './constants';
-import { getPrintableNetworkInterfaceType, isPodNetwork } from './selectors';
+import { getPodNetworkName, getPrintableNetworkInterfaceType, isPodNetwork } from './selectors';
 import { type NICState } from './types';
 
 export const sortNICs = (
@@ -82,8 +78,10 @@ export const getInterfacesAndNetworks = (
 };
 
 export const removePodNetworkFromVM = (vm: V1VirtualMachine): void => {
+  const podNetworkName = getPodNetworkName(vm);
+
   vm.spec.template.spec.domain.devices.interfaces = getInterfaces(vm)?.filter(
-    (iface) => iface.name !== DEFAULT_NETWORK_INTERFACE.name,
+    (networkInterface) => networkInterface.name !== podNetworkName,
   );
   vm.spec.template.spec.networks = getNetworks(vm)?.filter((network) => !isPodNetwork(network));
   vm.spec.template.spec.domain.devices.autoattachPodInterface = false;
