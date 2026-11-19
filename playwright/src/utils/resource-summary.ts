@@ -20,7 +20,7 @@ export async function fillLabelsModalInput(page: Page, label: string): Promise<v
     async () => {
       const dialog = editLabelsDialog(page);
       const textbox = dialog
-        .getByPlaceholder('app=frontend')
+        .getByPlaceholder(/app=frontend|Enter key=value/i)
         .or(dialog.locator('#tags-input, [data-test="tags-input"]'))
         .or(dialog.getByRole('textbox').first());
       if (!(await textbox.isVisible().catch(() => false))) {
@@ -51,7 +51,7 @@ export async function fillLabelsModalInput(page: Page, label: string): Promise<v
   if (!labelChipVisible) {
     const dialog = editLabelsDialog(page);
     const textbox = dialog
-      .getByPlaceholder('app=frontend')
+      .getByPlaceholder(/app=frontend|Enter key=value/i)
       .or(dialog.locator('#tags-input, [data-test="tags-input"]'))
       .or(dialog.getByRole('textbox').first());
     if (await textbox.isVisible().catch(() => false)) {

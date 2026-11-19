@@ -319,7 +319,7 @@ export class VmCreationWizardTemplateCatalogComponent extends BaseComponent {
   }
 
   async selectTemplateByTestId(templateTestId: string): Promise<void> {
-    const card = this.testId(templateTestId);
+    const card = this.consoleTestId(templateTestId);
     await card.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
     await this.robustClick(card);
     await card.evaluate(

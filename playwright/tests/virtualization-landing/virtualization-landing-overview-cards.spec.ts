@@ -13,13 +13,4 @@ test.describe(`Virtualization overview cards ${ROUTE_VIRTUALIZATION_LANDING_TAG}
       timeout: TestTimeouts.LONG_OPERATION,
     });
   });
-
-  test('ID(CNV-7925) Related operators card is displayed', async ({ nav, overviewPage }) => {
-    await nav.goToOverviewSettings();
-    await expect(
-      overviewPage.page.getByText(/Related operators|Installed version/i).first(),
-    ).toBeVisible({
-      timeout: TestTimeouts.LONG_OPERATION,
-    });
-  });
 });

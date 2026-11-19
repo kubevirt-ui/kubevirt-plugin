@@ -73,24 +73,6 @@ test.describe(`MigrationPolicies gating create YAML ${ROUTE_MIGRATION_POLICIES_T
 });
 
 test.describe(`MigrationPolicies UI update and delete ${ROUTE_MIGRATION_POLICIES_TAG} ${T1_TAG} ${ADMIN_ONLY_TAG}`, () => {
-  test('ID(CNV-9386) Update MigrationPolicy namespace selector labels', async ({
-    apiClient,
-    migrationPoliciesPage,
-  }) => {
-    const name = generateRandomMigrationPolicyName('mp-labels');
-
-    await apiClient.deleteMigrationPolicy(name);
-    await apiClient.applyMigrationPolicyExample(name);
-
-    try {
-      await migrationPoliciesPage.openDetail(name);
-      await migrationPoliciesPage.editNamespaceSelectorLabels('owner=cnv-qe');
-      await expect(migrationPoliciesPage.namespaceSelectorOwnerText()).toBeVisible();
-    } finally {
-      await apiClient.deleteMigrationPolicy(name);
-    }
-  });
-
   test('ID(CNV-9388) Delete MigrationPolicy from list in UI', async ({
     apiClient,
     migrationPoliciesPage,

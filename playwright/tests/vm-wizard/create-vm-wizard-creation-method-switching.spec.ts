@@ -9,16 +9,14 @@ test.describe(
   { tag: [ROUTE_VM_WIZARD_TAG, T1_TAG, '@catalog-wizard', ADMIN_ONLY_TAG] },
   () => {
     test('Switching between Custom configuration, Template, and Clone updates the wizard step navigation', async ({
-      vmListPage,
       vmWizardNavigationPage,
       utils,
       testConfig,
     }) => {
-      test.setTimeout(utils.TestTimeouts.TEST_SHORT);
+      test.setTimeout(utils.TestTimeouts.TEST_MEDIUM);
       await utils.withAllure({ suite: SUITE, feature: T1, tags: [T1_TAG] });
 
-      await vmListPage.navigateToProjectVirtualMachines(testConfig.testNamespace);
-      await vmWizardNavigationPage.openWizardFromCreateDropdown();
+      await vmWizardNavigationPage.navigateToWizardInNamespace(testConfig.testNamespace);
 
       await test.step('Custom configuration shows Guest OS, Boot source and Compute resources steps', async () => {
         const isCustomSelected = await vmWizardNavigationPage.verifyCreationMethodCardSelected(

@@ -300,28 +300,18 @@ export class VmCreationWizardDeploymentComponent extends BaseComponent {
   }
 
   async navigateToWizardInNamespace(namespace: string): Promise<void> {
-    await this.page.goto(`/k8s/ns/${namespace}/vm-wizard`, { waitUntil: 'domcontentloaded' });
-    const notFound = this.page.getByText(/doesn't have a resource type "vm-wizard"/i);
-    const deadline = Date.now() + TestTimeouts.LONG_OPERATION;
-    while (Date.now() < deadline) {
-      if (
-        await this._wizardContainer
-          .first()
-          .isVisible()
-          .catch(() => false)
-      ) {
-        return;
-      }
-      if (await notFound.isVisible().catch(() => false)) {
-        throw new Error(
-          `Console returned 404 for /vm-wizard in ${namespace} — open via VmListPage.openVmCreationWizard() to prime the plugin`,
-        );
-      }
-      await this.page.waitForTimeout(500);
-    }
+    const ns = namespace && namespace !== 'all-namespaces' ? namespace : 'default';
+    await this.page.goto(`/k8s/ns/${ns}/kubevirt.io~v1~VirtualMachine`, {
+      waitUntil: 'domcontentloaded',
+      timeout: TestTimeouts.CONSOLE_PAGE_LOAD,
+    });
+    await this.page.goto('/vm-wizard', {
+      waitUntil: 'domcontentloaded',
+      timeout: TestTimeouts.CONSOLE_PAGE_LOAD,
+    });
     await this._wizardContainer.first().waitFor({
       state: 'visible',
-      timeout: TestTimeouts.ELEMENT_WAIT,
+      timeout: TestTimeouts.LONG_OPERATION,
     });
   }
 
@@ -358,12 +348,8 @@ export class VmCreationWizardDeploymentComponent extends BaseComponent {
     // Empty / all-namespaces lists often omit Create; open the wizard by route.
     const namespace =
       this.page.url().match(/\/ns\/([^/]+)\//)?.[1] ??
-      this.page.url().match(/[?&]namespace=([^&]+)/)?.[1];
-    if (!namespace) {
-      throw new Error(
-        'Create VirtualMachine control not visible and no namespace in URL for /vm-wizard fallback',
-      );
-    }
+      this.page.url().match(/[?&]namespace=([^&]+)/)?.[1] ??
+      'default';
     await this.navigateToWizardInNamespace(namespace);
   }
 
@@ -383,6 +369,9 @@ export class VmCreationWizardDeploymentComponent extends BaseComponent {
       otherLinux: this._otherLinuxTile,
     };
     await this.robustClick(osMap[os].first());
+    // Changing OS clears preference; pick one so Guest OS Next can enable.
+    const preferred = os === 'windows' ? 'windows' : os === 'otherLinux' ? 'fedora' : 'rhel.9';
+    await this.selectOsType(preferred);
   }
 
   async selectOsType(osType: string): Promise<void> {

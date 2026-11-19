@@ -22,16 +22,17 @@ test.describe(
       const wizardNs = await utils.setupTestNamespace(apiClient, 'wizard-variant-win');
 
       await vmListPage.switchToVirtualizationPerspective();
-      await vmListPage.navigateToProjectVmListViaUI(wizardNs);
-      await vmWizardNavigationPage.openWizardFromCreateDropdown();
+      await vmWizardNavigationPage.navigateToWizardInNamespace(wizardNs);
 
       await vmWizardNavigationPage.generateVmName();
       await vmWizardNavigationPage.clickNext();
 
+      await vmWizardNavigationPage.ensureGuestOsPreferenceSelected();
+
       await vmWizardNavigationPage.selectOperatingSystem('windows');
       await expect
         .poll(() => vmWizardNavigationPage.isNextButtonDisabled(), {
-          message: 'Next should enable once the Windows guest OS type list finishes loading',
+          message: 'Next should enable once a Windows guest OS preference is selected',
           timeout: utils.TestTimeouts.UI_ACTION_COMPLETE,
         })
         .toBe(false);
@@ -68,12 +69,12 @@ test.describe(
       const wizardNs = await utils.setupTestNamespace(apiClient, 'wizard-variant-size');
 
       await vmListPage.switchToVirtualizationPerspective();
-      await vmListPage.navigateToProjectVmListViaUI(wizardNs);
-      await vmWizardNavigationPage.openWizardFromCreateDropdown();
+      await vmWizardNavigationPage.navigateToWizardInNamespace(wizardNs);
 
       await vmWizardNavigationPage.generateVmName();
       await vmWizardNavigationPage.clickNext();
 
+      await vmWizardNavigationPage.ensureGuestOsPreferenceSelected();
       await expect
         .poll(() => vmWizardNavigationPage.isNextButtonDisabled(), {
           timeout: utils.TestTimeouts.UI_ACTION_COMPLETE,

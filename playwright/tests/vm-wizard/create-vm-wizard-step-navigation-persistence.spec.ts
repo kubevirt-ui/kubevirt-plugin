@@ -14,7 +14,6 @@ test.describe(
   () => {
     test('Custom configuration — a Description edit survives direct step navigation', async ({
       apiClient,
-      vmListPage,
       vmWizardNavigationPage,
       vmWizardBootSourcePage,
       vmWizardComputePage,
@@ -24,16 +23,16 @@ test.describe(
       await utils.withAllure({ suite: SUITE, feature: T1, tags: [T1_TAG] });
 
       const wizardNs = await utils.setupTestNamespace(apiClient, 'wizard-nav');
-      await vmListPage.switchToVirtualizationPerspective();
-      await vmListPage.navigateToProjectVmListViaUI(wizardNs);
-      await vmWizardNavigationPage.openWizardFromCreateDropdown();
+      await vmWizardNavigationPage.navigateToWizardInNamespace(wizardNs);
 
       await vmWizardNavigationPage.generateVmName();
+      await vmWizardNavigationPage.fillDeploymentDescription('test');
       await vmWizardNavigationPage.clickNext();
 
+      await vmWizardNavigationPage.ensureGuestOsPreferenceSelected();
       await expect
         .poll(() => vmWizardNavigationPage.isNextButtonDisabled(), {
-          message: 'Next should enable once the guest OS type list finishes loading',
+          message: 'Next should enable once a guest OS preference is selected',
           timeout: utils.TestTimeouts.UI_ACTION_COMPLETE,
         })
         .toBe(false);
@@ -48,9 +47,12 @@ test.describe(
       await vmWizardNavigationPage.clickNext();
 
       const vmName = await vmWizardComputePage.getCustomizationVmName();
-      await vmWizardComputePage.openCustomizationDescriptionModal(vmName);
-      await vmWizardComputePage.fillCustomizationDescriptionModal('test');
-      await vmWizardComputePage.saveCustomizationDescriptionModal();
+      await expect
+        .poll(() => vmWizardComputePage.getCustomizationDescription(vmName), {
+          message: 'Deployment-details description should appear on Customization',
+          timeout: utils.TestTimeouts.UI_ACTION_COMPLETE,
+        })
+        .toContain('test');
 
       await test.step('Jump directly to the Guest OS step via the sidebar', async () => {
         await vmWizardNavigationPage.navigateToStepById(GUEST_OS_STEP_ID);
@@ -81,8 +83,7 @@ test.describe(
 
       const wizardNs = await utils.setupTestNamespace(apiClient, 'wizard-nav-tpl');
       await vmListPage.switchToVirtualizationPerspective();
-      await vmListPage.navigateToProjectVmListViaUI(wizardNs);
-      await vmWizardNavigationPage.openWizardFromCreateDropdown();
+      await vmWizardNavigationPage.navigateToWizardInNamespace(wizardNs);
 
       await vmWizardNavigationPage.selectCreationMethod('fromTemplate');
       await vmWizardNavigationPage.generateVmName();

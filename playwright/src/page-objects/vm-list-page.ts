@@ -161,6 +161,7 @@ export class VmListPage extends ResourceListPage {
    * fallback when the route is still unregistered.
    */
   async openVmCreationWizard(namespace: string): Promise<void> {
+    // Prime plugin via VM list, then open /vm-wizard (namespaced path 404s).
     await this.goToNamespaceList(namespace);
     await dismissConsoleObstructions(this.page);
     await this.page.goto(ConsoleRoutes.vmWizard(namespace), {
@@ -195,7 +196,16 @@ export class VmListPage extends ResourceListPage {
     }
 
     if (!opened) {
-      await this.openVmCreationWizardFromTreeNamespace(namespace);
+      // Create split-button action (not the chevron that owns data-test="item-create").
+      const create = this.page
+        .locator('#tour-step-create-button button[aria-label="Create VirtualMachine"]')
+        .or(this.page.getByRole('button', { name: 'Create VirtualMachine' }))
+        .first();
+      if (await create.isVisible().catch(() => false)) {
+        await this.robustClick(create);
+      } else {
+        await this.openVmCreationWizardFromTreeNamespace(namespace);
+      }
     }
 
     await this.page.waitForURL(/\/vm-wizard/, { timeout: TestTimeouts.LONG_OPERATION });

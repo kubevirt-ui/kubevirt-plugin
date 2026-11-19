@@ -4,6 +4,15 @@ import { expect, test } from '@/fixtures/virtualization-landing-fixture';
 import { TestTimeouts } from '@/utils/test-config';
 
 test.describe(`Virtualization overview — admin ${ROUTE_VIRTUALIZATION_LANDING_TAG} ${T1_TAG} ${ADMIN_ONLY_TAG}`, () => {
+  test('ID(CNV-7925) Related operators card is displayed', async ({ nav, overviewPage }) => {
+    await nav.goToOverviewSettings();
+    await expect(
+      overviewPage.page.getByText(/Related operators|Installed version/i).first(),
+    ).toBeVisible({
+      timeout: TestTimeouts.LONG_OPERATION,
+    });
+  });
+
   test('ID(CNV-7927) Quick Starts card is displayed', async ({ nav, overviewPage }) => {
     await nav.goToVirtualMachines();
     await overviewPage.page.getByRole('tab', { name: /^Overview$/i }).click();

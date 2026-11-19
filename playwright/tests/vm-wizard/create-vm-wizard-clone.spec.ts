@@ -41,8 +41,7 @@ test.describe(
       await vmListPage.switchToVirtualizationPerspective();
 
       await test.step('Step 1: Deployment details — select Clone existing VirtualMachine', async () => {
-        await vmListPage.navigateToProjectVmListViaUI(cloneNs);
-        await vmWizardNavigationPage.openWizardFromCreateDropdown();
+        await vmWizardNavigationPage.navigateToWizardInNamespace(cloneNs);
 
         const wizardVisible = await vmWizardNavigationPage.verifyWizardVisible();
         expect(wizardVisible, 'Wizard should open').toBe(true);

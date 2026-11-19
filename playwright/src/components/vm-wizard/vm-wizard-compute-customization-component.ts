@@ -57,7 +57,12 @@ export default class VmWizardComputeCustomizationComponent extends BaseComponent
   }
 
   private metadataDialog(): Locator {
-    return this.page.getByRole('dialog', { name: /Edit (labels|annotations)/i });
+    // TabModal title is "Edit annotations" / "Edit labels" — not the Annotations help popover.
+    return this.page.getByRole('dialog', { name: /Edit (labels|annotations)/i }).or(
+      this.page.locator('#tab-modal').filter({
+        has: this.page.getByRole('heading', { name: /Edit (labels|annotations)/i }),
+      }),
+    );
   }
 
   private async dismissSeriesTooltip(): Promise<void> {
@@ -267,8 +272,10 @@ export default class VmWizardComputeCustomizationComponent extends BaseComponent
   }
 
   async openHostnameModal(hostname: string): Promise<void> {
-    const hostnameValue = this._roleTabpanel.getByRole('button', { exact: true, name: hostname });
-    await this.robustClick(hostnameValue);
+    const hostnameValue = this._roleTabpanel
+      .locator(`button[data-test-id$="-hostname"]`)
+      .or(this._roleTabpanel.getByRole('button', { exact: true, name: hostname }));
+    await this.robustClick(hostnameValue.first());
     await this._hostnameModal.waitFor({
       state: 'visible',
       timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
@@ -289,7 +296,8 @@ export default class VmWizardComputeCustomizationComponent extends BaseComponent
 
   /** Opens the Description edit modal from the Customization > Details tab. */
   async openCustomizationDescriptionModal(vmName: string): Promise<void> {
-    const editButton = this.testId(`${vmName}-description`);
+    // DescriptionItem puts data-test-id on both <dd> and the edit <button> — prefer the button.
+    const editButton = this.page.locator(`button[data-test-id="${vmName}-description"]`);
     await editButton.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
     await this.robustClick(editButton);
     await this._descriptionModal.waitFor({
@@ -315,7 +323,7 @@ export default class VmWizardComputeCustomizationComponent extends BaseComponent
 
   /** Reads the description value as displayed on the Customization > Details tab (post-save). */
   async getCustomizationDescription(vmName: string): Promise<string> {
-    const editButton = this.testId(`${vmName}-description`);
+    const editButton = this.page.locator(`button[data-test-id="${vmName}-description"]`);
     return (await editButton.textContent({ timeout: TestTimeouts.SHORT_WAIT }))?.trim() ?? '';
   }
 
@@ -333,7 +341,7 @@ export default class VmWizardComputeCustomizationComponent extends BaseComponent
   /** Opens the boot order edit modal from the Customization > Details tab (expands the section first). */
   async openBootOrderModal(vmName: string): Promise<void> {
     await this.expandBootManagementSection();
-    const editButton = this.testId(`${vmName}-boot-order`);
+    const editButton = this.page.locator(`button[data-test-id="${vmName}-boot-order"]`);
     await editButton.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
 
     for (let attempt = 0; attempt < 2; attempt++) {
@@ -439,7 +447,8 @@ export default class VmWizardComputeCustomizationComponent extends BaseComponent
 
   /** Reads the boot order device names as displayed on the Customization > Details tab (post-save). */
   async getDisplayedBootOrder(vmName: string): Promise<string[]> {
-    const container = this.testId(`${vmName}-boot-order`);
+    // data-test-id is on both <dd> and the edit <button>; read devices from the <dd>.
+    const container = this.page.locator(`dd[data-test-id="${vmName}-boot-order"]`);
     await container.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
     const items = container.locator('li');
     const count = await items.count();
@@ -573,11 +582,21 @@ export default class VmWizardComputeCustomizationComponent extends BaseComponent
   /** Returns the Network column text for a NIC row on the customization Network tab. */
   async getWizardNetworkInterfaceNetworkName(nicName: string): Promise<string> {
     await this.selectCustomizationTab('Network');
-    const table = this.page.getByTestId('wizard-network-interfaces-table');
+    // Wizard table may lack data-test ids; fall back to grid row cells (Name, Model, Network).
+    const table = this.page
+      .getByTestId('wizard-network-interfaces-table')
+      .or(this._roleTabpanel.getByRole('grid'))
+      .first();
     await table.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
 
-    const networkCell = table.getByTestId(`nic-network-${nicName}`);
-    await networkCell.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+    const byTestId = table.getByTestId(`nic-network-${nicName}`);
+    if (await byTestId.isVisible().catch(() => false)) {
+      return ((await byTestId.textContent()) ?? '').trim();
+    }
+
+    const row = table.getByRole('row').filter({ hasText: new RegExp(`^${nicName}\\b`) });
+    await row.first().waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+    const networkCell = row.first().getByRole('gridcell').nth(2);
     return ((await networkCell.textContent()) ?? '').trim();
   }
 
@@ -701,21 +720,28 @@ export default class VmWizardComputeCustomizationComponent extends BaseComponent
       | 'Scheduling'
       | 'SSH'
       | 'Initial run'
-      | 'Labels and annotations',
+      | 'Labels and annotations'
+      | 'Metadata',
   ): Promise<void> {
-    const tab = this.locator(`button[role="tab"]:has-text("${tabName}")`);
+    // 4.22 renamed Labels and annotations → Metadata.
+    const resolved =
+      tabName === 'Labels and annotations' || tabName === 'Metadata'
+        ? /^(Metadata|Labels and annotations)$/
+        : tabName;
+    const tab = this.page.getByRole('tab', { name: resolved });
     await this.robustClick(tab.first());
   }
 
   async selectLargestComputeSize(): Promise<string> {
-    const sizeBtn = this._pfV6CMenuToggle.filter({
-      hasText: /CPUs.*Memory/,
-    });
+    // Unselected size shows "Select size"; after pick it shows "N CPUs, … Memory".
+    const sizeBtn = this._pfV6CMenuToggle
+      .filter({ hasText: /Select size|CPUs.*Memory/i })
+      .or(this.page.getByRole('button', { name: /Select size|CPUs.*Memory/i }));
     await this.robustClick(sizeBtn.first());
 
     const menu = this.page
-      .locator('[role="menu"], .pf-v6-c-menu')
-      .filter({ hasText: /CPUs/ })
+      .locator('[role="menu"], .pf-v6-c-menu, .instance-type-size-dropdown__menu')
+      .filter({ hasText: /CPU|Select size|medium|large|small/i })
       .first();
     await menu.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
 
@@ -911,6 +937,7 @@ export default class VmWizardComputeCustomizationComponent extends BaseComponent
   }
 
   async verifyCustomizationTabsVisible(): Promise<boolean> {
+    // 4.22+ uses Metadata; older builds may still say Labels and annotations.
     const expectedTabs = [
       'Details',
       'Storage',
@@ -918,7 +945,7 @@ export default class VmWizardComputeCustomizationComponent extends BaseComponent
       'Scheduling',
       'SSH',
       'Initial run',
-      'Labels and annotations',
+      /^(Metadata|Labels and annotations)$/,
     ];
     try {
       const tablist = this.locator('[role="tablist"]');
@@ -951,7 +978,10 @@ export default class VmWizardComputeCustomizationComponent extends BaseComponent
         .isVisible({ timeout: TestTimeouts.UI_ELEMENT_VISIBILITY })
         .catch(() => false),
       sysprepSection: await panel
-        .getByTestId('sysprep-button')
+        .locator('[data-test-id="sysprep-button"]')
+        .or(panel.getByRole('button', { name: /^Edit$/i }))
+        .or(panel.getByText(/^Sysprep$/))
+        .first()
         .isVisible({ timeout: TestTimeouts.UI_ELEMENT_VISIBILITY })
         .catch(() => false),
     };
@@ -1066,9 +1096,12 @@ export default class VmWizardComputeCustomizationComponent extends BaseComponent
   }
 
   async openAnnotationsModal(): Promise<void> {
-    const addButton = this._roleTabpanel.getByTestId('annotations-card-add-btn');
-    await addButton.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
-    await this.robustClick(addButton);
+    // Only the "N Annotations" edit control — the bare "Annotations" button opens help popover.
+    const editButton = this._roleTabpanel.getByRole('button', {
+      name: /^\d+\s+Annotations$/i,
+    });
+    await editButton.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+    await this.robustClick(editButton);
     await this.metadataDialog().waitFor({
       state: 'visible',
       timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
@@ -1076,9 +1109,16 @@ export default class VmWizardComputeCustomizationComponent extends BaseComponent
   }
 
   async openLabelsModal(): Promise<void> {
-    const addButton = this._roleTabpanel.getByTestId('labels-card-add-btn');
-    await addButton.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
-    await this.robustClick(addButton);
+    const editButton = this._roleTabpanel
+      .locator('.pf-v6-c-description-list__group, .pf-v5-c-description-list__group')
+      .filter({ hasText: /^Labels$/i })
+      .getByRole('button')
+      .first()
+      .or(this._roleTabpanel.getByTestId('labels-card-add-btn'));
+    await editButton
+      .first()
+      .waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+    await this.robustClick(editButton.first());
     await this.metadataDialog().waitFor({
       state: 'visible',
       timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
@@ -1089,7 +1129,7 @@ export default class VmWizardComputeCustomizationComponent extends BaseComponent
     labelsEditButton: boolean;
     annotationsButton: boolean;
   }> {
-    await this.selectCustomizationTab('Labels and annotations');
+    await this.selectCustomizationTab('Metadata');
     await this.page.waitForTimeout(1000);
     const panel = this._roleTabpanel;
     await panel.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });

@@ -74,19 +74,6 @@ export default class VmWizardNavigationComponent extends BaseComponent {
   );
   private readonly _wizardContainer = this.locator('.pf-v6-c-wizard.vm-creation-wizard');
 
-  // ── Exit wizard modal ──────────────────────────────────────────────
-  private readonly _exitModal = this.page
-    .locator('.pf-v6-c-modal-box')
-    .filter({ hasText: 'Exit VirtualMachine creation?' });
-
-  private readonly _exitModalExitButton = this._exitModal.getByRole('button', {
-    name: 'Exit without saving',
-  });
-
-  private readonly _exitModalContinueButton = this._exitModal.getByRole('button', {
-    name: 'Continue creating',
-  });
-
   constructor(page: Page) {
     super(page);
   }
@@ -114,10 +101,17 @@ export default class VmWizardNavigationComponent extends BaseComponent {
     await this.robustClick(
       this.locator('.pf-v6-c-wizard button.pf-v6-c-button.pf-m-link:has-text("Cancel")').first(),
     );
-    await this._wizardContainer.first().waitFor({
-      state: 'hidden',
-      timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
-    });
+    // Cancel navigates to the VM list; do not wait 3m on a detached wizard shell.
+    await this.page
+      .waitForURL((url) => !url.pathname.includes('/vm-wizard'), {
+        timeout: TestTimeouts.ELEMENT_WAIT,
+      })
+      .catch(async () => {
+        await this._wizardContainer.first().waitFor({
+          state: 'hidden',
+          timeout: TestTimeouts.ELEMENT_WAIT,
+        });
+      });
   }
 
   async clickCancelButton(): Promise<void> {
@@ -126,70 +120,8 @@ export default class VmWizardNavigationComponent extends BaseComponent {
     );
   }
 
-  async clickContinueCreating(): Promise<void> {
-    await this._exitModalContinueButton.waitFor({
-      state: 'visible',
-      timeout: TestTimeouts.ELEMENT_WAIT,
-    });
-    await this.robustClick(this._exitModalContinueButton);
-    await this._exitModal.waitFor({
-      state: 'hidden',
-      timeout: TestTimeouts.ELEMENT_WAIT,
-    });
-  }
-
-  async clickExitWithoutSaving(): Promise<void> {
-    await this._exitModalExitButton.waitFor({
-      state: 'visible',
-      timeout: TestTimeouts.ELEMENT_WAIT,
-    });
-    await this.robustClick(this._exitModalExitButton);
-    await this._exitModal.waitFor({
-      state: 'hidden',
-      timeout: TestTimeouts.ELEMENT_WAIT,
-    });
-  }
-
-  async getExitModalBody(): Promise<string> {
-    const body = this._exitModal.locator('.pf-v6-c-modal-box__body');
-    await body.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
-    return ((await body.textContent()) ?? '').trim();
-  }
-
-  async getExitModalTitle(): Promise<string> {
-    const title = this._exitModal
-      .locator('.pf-v6-c-modal-box__title')
-      .getByText('Exit VirtualMachine creation?', { exact: true });
-    await title.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
-    return ((await title.textContent()) ?? '').trim();
-  }
-
   async getVmName(): Promise<string> {
     return await this._vmNameInput.first().inputValue();
-  }
-
-  async isExitModalVisible(): Promise<boolean> {
-    try {
-      await this._exitModal.waitFor({
-        state: 'visible',
-        timeout: TestTimeouts.SHORT_WAIT,
-      });
-      return true;
-    } catch {
-      return false;
-    }
-  }
-
-  async verifyExitModalNotShown(): Promise<boolean> {
-    try {
-      await this._exitModal.waitFor({
-        state: 'visible',
-        timeout: TestTimeouts.SHORT_WAIT,
-      });
-      return false;
-    } catch {
-      return true;
-    }
   }
 
   async clearCloneSourceFilters(): Promise<void> {
@@ -252,8 +184,18 @@ export default class VmWizardNavigationComponent extends BaseComponent {
 
   async getWizardErrorAlertMessage(): Promise<string> {
     try {
-      const alert = this._wizardContainer.locator('.pf-v6-c-alert.pf-m-danger');
-      await alert.waitFor({ state: 'visible', timeout: TestTimeouts.SHORT_WAIT });
+      // Footer ErrorAlert can sit in WizardFooterWrapper (not only under wizard main).
+      const alert = this.page
+        .locator(
+          [
+            '.pf-v6-c-wizard.vm-creation-wizard .pf-v6-c-alert.pf-m-danger',
+            '.pf-v6-c-wizard__footer .pf-v6-c-alert.pf-m-danger',
+            '[role="alert"].pf-m-danger',
+          ].join(', '),
+        )
+        .filter({ hasText: /An error occurred/i })
+        .first();
+      await alert.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
       return (await alert.textContent())?.trim() || '';
     } catch {
       return '';
@@ -268,6 +210,9 @@ export default class VmWizardNavigationComponent extends BaseComponent {
       .waitFor({ state: 'hidden', timeout: TestTimeouts.SHORT_WAIT })
       .catch(() => undefined);
 
+    // Guest OS requires an explicit preference; product does not auto-select one.
+    await this.ensureGuestOsPreferenceSelected();
+
     const nextButton = this._wizardFooterNextButton;
     await nextButton.waitFor({
       state: 'visible',
@@ -276,6 +221,20 @@ export default class VmWizardNavigationComponent extends BaseComponent {
     await nextButton.hover().catch(() => undefined);
     await this.robustClick(nextButton);
     await this.page.waitForTimeout(1000);
+  }
+
+  /** Select a guest OS preference when the Guest OS step still has Next disabled. */
+  async ensureGuestOsPreferenceSelected(preferred = 'rhel.9'): Promise<void> {
+    const preferenceToggle = this.page.getByRole('button', {
+      name: /Select guest operating system type/i,
+    });
+    if (!(await preferenceToggle.isVisible().catch(() => false))) {
+      return;
+    }
+    if (!(await this.isNextButtonDisabled().catch(() => true))) {
+      return;
+    }
+    await this.selectOsType(preferred);
   }
 
   async clickViewAllProjectsInCatalog(): Promise<void> {
@@ -330,7 +289,7 @@ export default class VmWizardNavigationComponent extends BaseComponent {
 
   /** Select "User templates" in the catalog Template scope sidebar filter. */
   async selectUserTemplatesScopeFilter(): Promise<void> {
-    const userTemplatesRadio = this.testId('catalog-template-filter-user');
+    const userTemplatesRadio = this.consoleTestId('catalog-template-filter-user-templates');
     await userTemplatesRadio.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
     await this.robustClick(userTemplatesRadio);
     await this.page.waitForTimeout(TestTimeouts.UI_DELAY_MEDIUM);
@@ -349,6 +308,12 @@ export default class VmWizardNavigationComponent extends BaseComponent {
     if (value.trim().length === 0) {
       await this.generateVmName();
     }
+  }
+
+  async fillDeploymentDescription(description: string): Promise<void> {
+    const input = this.locator('.vm-creation-wizard #vm-description');
+    await input.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
+    await input.fill(description);
   }
 
   async fillVmName(name: string): Promise<void> {
@@ -405,9 +370,10 @@ export default class VmWizardNavigationComponent extends BaseComponent {
         return (await projectToggle.textContent())?.trim() ?? '';
       }
 
+      // Display packs labels without spaces: "Projectdefault>Folder—".
       const displayContent = this.locator('.vm-creation-location-display__content');
       const text = await displayContent.innerText({ timeout: TestTimeouts.SHORT_WAIT });
-      const match = text.match(/Project\s+(\S+)/);
+      const match = text.match(/Project\s*([^>\s]+)/);
       return match?.[1]?.trim() ?? '';
     } catch {
       return '';
@@ -524,35 +490,63 @@ export default class VmWizardNavigationComponent extends BaseComponent {
   }
 
   async navigateToWizardInNamespace(namespace: string): Promise<void> {
-    await this.page.goto(`/k8s/ns/${namespace}/vm-wizard`, { waitUntil: 'domcontentloaded' });
-    const notFound = this.page.getByText(/doesn't have a resource type "vm-wizard"/i);
-    const deadline = Date.now() + TestTimeouts.LONG_OPERATION;
-    while (Date.now() < deadline) {
+    // Product serves /vm-wizard (namespaced path 404s). Cold deep-links hang until the
+    // kubevirt plugin is loaded — open from the namespaced VM list so activeNamespace is set
+    // before the wizard mounts (admin Location init reads activeNamespace once).
+    const ns = namespace && namespace !== 'all-namespaces' ? namespace : 'default';
+    await this.page.goto(`/k8s/ns/${ns}/kubevirt.io~v1~VirtualMachine`, {
+      waitUntil: 'domcontentloaded',
+      timeout: TestTimeouts.CONSOLE_PAGE_LOAD,
+    });
+    await this.page.waitForURL(new RegExp(`/k8s/ns/${ns}/`), {
+      timeout: TestTimeouts.CONSOLE_PAGE_LOAD,
+    });
+
+    const createButton = this.locator('button[aria-label="Create VirtualMachine"]')
+      .or(this.locator('#tour-step-create-button button[aria-label="Create VirtualMachine"]'))
+      .first();
+    const createVisible = await createButton
+      .waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT })
+      .then(() => true)
+      .catch(() => false);
+
+    if (createVisible) {
+      await this.robustClick(createButton);
+    } else {
+      await this.page.goto('/vm-wizard', {
+        waitUntil: 'domcontentloaded',
+        timeout: TestTimeouts.CONSOLE_PAGE_LOAD,
+      });
+    }
+
+    await this._wizardContainer.first().waitFor({
+      state: 'visible',
+      timeout: TestTimeouts.LONG_OPERATION,
+    });
+
+    const current = await this.getLocationProject();
+    if (!current.includes(ns)) {
+      await this.selectLocationProject(ns);
+    }
+  }
+
+  async openEditLocationPanel(): Promise<void> {
+    const editBtn = this.page.getByRole('button', { name: 'Edit VM creation location' });
+    const toggle = this.locator('.vm-creation-wizard').getByTestId(
+      'namespace-dropdown-menu-toggle',
+    );
+    for (let attempt = 0; attempt < 3; attempt++) {
+      await editBtn.click({ force: true });
       if (
-        await this._wizardContainer
+        await toggle
           .first()
-          .isVisible()
+          .isVisible({ timeout: TestTimeouts.UI_DELAY_LONG })
           .catch(() => false)
       ) {
         return;
       }
-      if (await notFound.isVisible().catch(() => false)) {
-        throw new Error(
-          `Console returned 404 for /vm-wizard in ${namespace} — open via VmListPage.openVmCreationWizard() to prime the plugin`,
-        );
-      }
-      await this.page.waitForTimeout(500);
     }
-    await this._wizardContainer.first().waitFor({
-      state: 'visible',
-      timeout: TestTimeouts.ELEMENT_WAIT,
-    });
-  }
-
-  async openEditLocationPanel(): Promise<void> {
-    const editBtn = this._buttonEditVMCreationLocation;
-    await this.robustClick(editBtn);
-    await this.page.waitForTimeout(500);
+    await toggle.first().waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
   }
 
   async selectLocationProject(namespace: string): Promise<void> {
@@ -621,12 +615,12 @@ export default class VmWizardNavigationComponent extends BaseComponent {
 
     await dismissWelcomeModal();
 
-    const createButton = this.testId('item-create')
-      .and(this.locator('.pf-m-primary'))
-      .or(this.locator('.pf-m-primary').locator('[data-test="item-create"]'))
-      .or(this.testId('vms-treeview').locator('[data-test="item-create"]'))
+    // Split-button: data-test="item-create" is on the chevron; Create action uses aria-label.
+    const createButton = this.locator(
+      '#tour-step-create-button button[aria-label="Create VirtualMachine"]',
+    )
       .or(this.locator('button[aria-label="Create VirtualMachine"]'))
-      .or(this.locator('#tour-step-create-button').getByRole('button', { name: /^Create/i }))
+      .or(this.locator('#tour-step-create-button').getByRole('button', { name: /^Create$/i }))
       .or(
         this.page
           .locator('main')
@@ -634,44 +628,30 @@ export default class VmWizardNavigationComponent extends BaseComponent {
       )
       .first();
 
+    // Don't burn test budget waiting for Create — /vm-wizard is the reliable entry.
     const buttonVisible = await createButton
-      .waitFor({ state: 'visible', timeout: TestTimeouts.LONG_OPERATION })
+      .waitFor({ state: 'visible', timeout: TestTimeouts.SHORT_WAIT })
       .then(() => true)
       .catch(() => false);
 
     if (buttonVisible) {
       await this.robustClick(createButton);
-
-      for (let attempt = 0; attempt < 5; attempt++) {
-        const wizardVisible = await this._wizardContainer
+      await dismissWelcomeModal();
+      if (
+        await this._wizardContainer
           .first()
-          .waitFor({ state: 'visible', timeout: TestTimeouts.SHORT_WAIT })
+          .waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT })
           .then(() => true)
-          .catch(() => false);
-
-        if (wizardVisible) {
-          return;
-        }
-
-        const dismissed = await dismissWelcomeModal();
-        if (dismissed) {
-          await createButton.waitFor({
-            state: 'visible',
-            timeout: TestTimeouts.LONG_OPERATION,
-          });
-          await this.robustClick(createButton);
-        }
+          .catch(() => false)
+      ) {
+        return;
       }
     }
 
     const namespace =
       this.page.url().match(/\/ns\/([^/]+)\//)?.[1] ??
-      this.page.url().match(/[?&]namespace=([^&]+)/)?.[1];
-    if (!namespace) {
-      throw new Error(
-        'Create VirtualMachine control not visible and no namespace in URL for /vm-wizard fallback',
-      );
-    }
+      this.page.url().match(/[?&]namespace=([^&]+)/)?.[1] ??
+      'default';
     await this.navigateToWizardInNamespace(namespace);
   }
 
@@ -706,6 +686,9 @@ export default class VmWizardNavigationComponent extends BaseComponent {
       otherLinux: this._otherLinuxTile,
     };
     await this.robustClick(osMap[os].first());
+    // Changing OS clears preference; pick one so Guest OS Next can enable.
+    const preferred = os === 'windows' ? 'windows' : os === 'otherLinux' ? 'fedora' : 'rhel.9';
+    await this.selectOsType(preferred);
   }
 
   async selectOsType(osType: string): Promise<void> {
@@ -724,7 +707,8 @@ export default class VmWizardNavigationComponent extends BaseComponent {
   }
 
   async selectTemplateByTestId(templateTestId: string): Promise<void> {
-    const card = this.testId(templateTestId);
+    // Template tiles use data-test-id; Playwright testIdAttribute is data-test.
+    const card = this.consoleTestId(templateTestId);
     await card.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
     await this.robustClick(card);
 
@@ -751,7 +735,7 @@ export default class VmWizardNavigationComponent extends BaseComponent {
   }
 
   async isTemplateSelectedByTestId(templateTestId: string): Promise<boolean> {
-    const card = this.testId(templateTestId);
+    const card = this.consoleTestId(templateTestId);
     await card.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
     return await card.evaluate((element) => element.classList.contains('pf-m-selected'));
   }
@@ -1120,14 +1104,14 @@ export default class VmWizardNavigationComponent extends BaseComponent {
   }
 
   async getTemplateDrawerBootSourceText(): Promise<string> {
-    const item = this.testId('template-boot-source');
+    const item = this.consoleTestId('template-boot-source');
     await item.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
     return ((await item.textContent()) ?? '').trim();
   }
 
   async isTemplateBootSourceEditable(): Promise<boolean> {
     try {
-      await this.testId('template-boot-source').waitFor({
+      await this.consoleTestId('template-boot-source').waitFor({
         state: 'visible',
         timeout: TestTimeouts.SHORT_WAIT,
       });
@@ -1138,7 +1122,7 @@ export default class VmWizardNavigationComponent extends BaseComponent {
   }
 
   async clickEditBootSource(): Promise<void> {
-    const editButton = this.testId('template-boot-source');
+    const editButton = this.consoleTestId('template-boot-source');
     await editButton.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
     await this.robustClick(editButton);
     await this._changeBootSourceModal.waitFor({

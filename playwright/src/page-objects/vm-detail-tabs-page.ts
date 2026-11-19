@@ -266,7 +266,8 @@ export class VmDetailTabsPage extends BasePage {
     }
     return this.page
       .getByRole('menuitem', { name: /Empty disk \(blank\)|Blank/i })
-      .or(this.page.getByRole('option', { name: /Empty disk \(blank\)|Blank/i }));
+      .or(this.page.getByRole('option', { name: /Empty disk \(blank\)|Blank/i }))
+      .or(this.page.getByRole('button', { name: /Empty disk \(blank\)/i }));
   }
 
   addDiskModalHeading(): Locator {
@@ -548,7 +549,10 @@ export class VmDetailTabsPage extends BasePage {
 
   async createSnapshot(snapshotName: string): Promise<boolean> {
     await this.robustClick(this.takeSnapshotButton());
-    const dialog = this.page.getByRole('dialog', { name: /Take snapshot/i });
+    const dialog = this.page
+      .getByRole('dialog', { name: /Take snapshot/i })
+      .or(this.page.getByRole('dialog').filter({ hasText: /Take snapshot/i }))
+      .first();
     await dialog.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
     const unsupported = dialog.getByText(/No disks included in this snapshot/i);
     if (await unsupported.isVisible().catch(() => false)) {
@@ -556,7 +560,10 @@ export class VmDetailTabsPage extends BasePage {
       return false;
     }
     await dialog.locator('#name').fill(snapshotName);
-    const save = dialog.getByRole('button', { name: /^Save$/i });
+    const save = dialog
+      .getByRole('button', { name: /^Save$/i })
+      .or(dialog.getByTestId('save-button'))
+      .or(dialog.locator('[data-test="save-button"]'));
     await this.robustClick(save);
     await dialog.waitFor({ state: 'hidden', timeout: TestTimeouts.LONG_OPERATION });
     await this.page

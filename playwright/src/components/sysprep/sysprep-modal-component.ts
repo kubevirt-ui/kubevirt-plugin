@@ -19,9 +19,17 @@ export default class SysprepModalComponent extends BaseComponent {
   }
 
   async openSysprepModal(): Promise<void> {
-    const editButton = this.testId('sysprep-button-edit');
-    await editButton.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
-    await this.robustClick(editButton);
+    // DescriptionItem uses data-test-id (not data-test); title Edit is the open control.
+    const editButton = this.page.locator('[data-test-id="sysprep-button-edit"]').or(
+      this.page
+        .locator('.pf-v6-c-description-list__group, .pf-v5-c-description-list__group')
+        .filter({ hasText: /Sysprep/i })
+        .getByRole('button', { name: /^Edit$/i }),
+    );
+    await editButton
+      .first()
+      .waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+    await this.robustClick(editButton.first());
     await this.sysprepModal.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
   }
 

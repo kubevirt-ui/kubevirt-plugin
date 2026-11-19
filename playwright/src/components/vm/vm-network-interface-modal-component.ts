@@ -1,4 +1,5 @@
 import BaseComponent from '@/components/shared/base-component';
+import { dismissConsoleObstructions } from '@/utils/console-modals';
 import { pollUntil } from '@/utils/poll-until';
 import { TestTimeouts } from '@/utils/test-config';
 import type { Locator, Page } from '@playwright/test';
@@ -13,7 +14,15 @@ export class VmNetworkInterfaceModalComponent extends BaseComponent {
   }
 
   private addNetworkInterfaceDialog(): Locator {
-    return this.page.getByRole('dialog', { name: /Add network interface/i });
+    // PF6 TabModal often has no aria-label — match heading text / #tab-modal too.
+    return this.page
+      .getByRole('dialog', { name: /Add network interface/i })
+      .or(
+        this.page
+          .locator('#tab-modal, [data-test="dialog-modal"], [role="dialog"]')
+          .filter({ hasText: /Add network interface/i }),
+      )
+      .first();
   }
 
   private cancelButton(dialog: Locator): Locator {
@@ -49,7 +58,14 @@ export class VmNetworkInterfaceModalComponent extends BaseComponent {
   }
 
   private networkInterfaceDialog(title = /network interface/i): Locator {
-    return this.page.getByRole('dialog', { name: title });
+    return this.page
+      .getByRole('dialog', { name: title })
+      .or(
+        this.page
+          .locator('#tab-modal, [data-test="dialog-modal"], [role="dialog"]')
+          .filter({ hasText: title }),
+      )
+      .first();
   }
 
   private nicNameInput(dialog: Locator): Locator {
@@ -122,8 +138,24 @@ export class VmNetworkInterfaceModalComponent extends BaseComponent {
   }
 
   async openAddNetworkInterfaceModal(addButton: Locator): Promise<void> {
-    await this.robustClick(addButton);
     const dialog = this.addNetworkInterfaceDialog();
+    // Non-priv: Welcome / overlays steal the first click; retry after dismiss.
+    for (let attempt = 1; attempt <= 3; attempt += 1) {
+      await dismissConsoleObstructions(this.page);
+      await addButton.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
+      await this.robustClick(addButton);
+      const opened = await dialog
+        .waitFor({
+          state: 'visible',
+          timeout: attempt < 3 ? TestTimeouts.SHORT_WAIT : TestTimeouts.ELEMENT_WAIT,
+        })
+        .then(() => true)
+        .catch(() => false);
+      if (opened) {
+        await this.waitForModalNetworkFieldReady(dialog);
+        return;
+      }
+    }
     await dialog.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
     await this.waitForModalNetworkFieldReady(dialog);
   }

@@ -26,8 +26,7 @@ test.describe(
       const wizardNs = await utils.setupTestNamespace(apiClient, 'wizard-tpl-edit');
 
       await vmListPage.switchToVirtualizationPerspective();
-      await vmListPage.navigateToProjectVmListViaUI(wizardNs);
-      await vmWizardNavigationPage.openWizardFromCreateDropdown();
+      await vmWizardNavigationPage.navigateToWizardInNamespace(wizardNs);
 
       const wizardVisible = await vmWizardNavigationPage.verifyWizardVisible();
       expect(wizardVisible, 'Wizard should open').toBe(true);
@@ -41,6 +40,7 @@ test.describe(
         expect.soft(isTemplateSelected, 'Create from Template should be selected').toBe(true);
 
         await vmWizardNavigationPage.generateVmName();
+        await vmWizardNavigationPage.fillDeploymentDescription('persisted description');
         await vmWizardNavigationPage.clickNext();
       });
 
@@ -61,20 +61,16 @@ test.describe(
 
       let vmName = '';
 
-      await test.step('Step 3: Customization — edit Description', async () => {
+      await test.step('Step 3: Customization — description from Deployment details is shown', async () => {
         const custVisible = await vmWizardComputePage.verifyCustomizationStepVisible();
         expect(custVisible, 'Customization step should be visible').toBe(true);
 
         vmName = await vmWizardComputePage.getCustomizationVmName();
         expect(vmName.length, 'VM name should be available on the Details tab').toBeGreaterThan(0);
 
-        await vmWizardComputePage.openCustomizationDescriptionModal(vmName);
-        await vmWizardComputePage.fillCustomizationDescriptionModal('persisted description');
-        await vmWizardComputePage.saveCustomizationDescriptionModal();
-
         await expect
           .poll(() => vmWizardComputePage.getCustomizationDescription(vmName), {
-            message: 'The edited description should render immediately',
+            message: 'Deployment-details description should appear on Customization',
             timeout: utils.TestTimeouts.UI_ACTION_COMPLETE,
           })
           .toContain('persisted description');

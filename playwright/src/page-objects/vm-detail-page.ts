@@ -575,7 +575,9 @@ export class VmDetailPage extends BasePage {
   }
 
   async goToInitialRunTab(): Promise<void> {
+    await dismissConsoleObstructions(this.page);
     await this.openConfigurationInnerTab('initial');
+    await dismissConsoleObstructions(this.page);
     await this.initialRunCloudInitLabel().waitFor({
       state: 'visible',
       timeout: TestTimeouts.LONG_OPERATION,
@@ -1173,7 +1175,9 @@ export class VmDetailPage extends BasePage {
   }
 
   async openNetworkInterfacesTab(networks: VmNetworkInterfacesPage): Promise<void> {
+    await dismissConsoleObstructions(this.page);
     await this.goToTab(VmTabTestId.Networks);
+    await dismissConsoleObstructions(this.page);
     await networks.waitForNetworkTabReady();
   }
 
@@ -1181,6 +1185,8 @@ export class VmDetailPage extends BasePage {
     await this.page.goto(`/k8s/ns/${namespace}/kubevirt.io~v1~VirtualMachine/${name}`, {
       waitUntil: 'domcontentloaded',
     });
+    // Non-priv: Welcome can appear after kubevirt-user-settings loads (blocks Initial run labels).
+    await dismissConsoleObstructions(this.page);
   }
 
   /** Reload detail after API status changes so Actions menu picks up LiveMigratable. */
