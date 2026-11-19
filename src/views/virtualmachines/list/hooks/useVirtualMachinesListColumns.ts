@@ -3,30 +3,40 @@ import { useMemo } from 'react';
 import type { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { type ColumnLayout } from '@kubevirt-utils/components/KubevirtTable/types';
 import { buildColumnLayout } from '@kubevirt-utils/components/KubevirtTable/utils';
-import type {
-  ColumnConfig,
-  TableExportColumnConfig,
-} from '@kubevirt-utils/hooks/useDataViewTableSort/types';
+import type { ColumnConfig } from '@kubevirt-utils/hooks/useDataViewTableSort/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettingsTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettingsTableColumns';
 import { getVMColumns, type VMCallbacks } from '@virtualmachines/list/virtualMachinesDefinition';
 
-const useVirtualMachineListColumns = (
-  columnManagementID: string,
-  namespace: string | undefined,
-  isAllClustersPage: boolean,
-  canGetNode: boolean,
-  hideActions = false,
-): {
+import { type VMColumn } from '../vmColumnTypes';
+
+type UseVirtualMachineListColumnsOptions = {
+  canGetNode?: boolean;
+  hideActions?: boolean;
+  isAllClustersPage?: boolean;
+  namespace?: string;
+};
+
+type UseVirtualMachineListColumnsResult = {
   activeColumnKeys: string[];
   columnLayout: ColumnLayout;
-  columns: TableExportColumnConfig<V1VirtualMachine, VMCallbacks>[];
+  columns: VMColumn[];
   loadedColumns: boolean;
-} => {
+};
+
+const useVirtualMachineListColumns = (
+  columnManagementID: string,
+  {
+    canGetNode = false,
+    hideActions = false,
+    isAllClustersPage = false,
+    namespace,
+  }: UseVirtualMachineListColumnsOptions = {},
+): UseVirtualMachineListColumnsResult => {
   const { t } = useKubevirtTranslation();
 
   const columns = useMemo(
-    () => getVMColumns(t, namespace, isAllClustersPage, canGetNode, hideActions),
+    () => getVMColumns({ canGetNode, hideActions, isAllClustersPage, namespace, t }),
     [t, namespace, isAllClustersPage, canGetNode, hideActions],
   );
 

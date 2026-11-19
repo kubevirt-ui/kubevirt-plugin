@@ -50,13 +50,21 @@ export {
   getVCPUColumn,
 } from './vmResourceColumns';
 
-export const getVMColumns = (
-  t: TFunction,
-  namespace: string | undefined,
-  isAllClustersPage: boolean,
-  canGetNode: boolean,
+type GetVMColumnsProps = {
+  canGetNode: boolean;
+  hideActions?: boolean;
+  isAllClustersPage: boolean;
+  namespace?: string;
+  t: TFunction;
+};
+
+export const getVMColumns = ({
+  canGetNode,
   hideActions = false,
-): VMColumn[] => [
+  isAllClustersPage,
+  namespace,
+  t,
+}: GetVMColumnsProps): VMColumn[] => [
   ...getSelectionColumns(hideActions),
   getNameColumn(t),
   ...getClusterColumns(t, isAllClustersPage),

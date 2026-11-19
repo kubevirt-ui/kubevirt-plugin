@@ -99,10 +99,7 @@ const NodeVirtualMachinesList: FC<NodeVirtualMachinesListProps> = ({ obj }) => {
 
   const { activeColumnKeys, columnLayout, columns, loadedColumns } = useVirtualMachineListColumns(
     NODE_VM_COLUMN_MANAGEMENT_ID,
-    namespace,
-    false,
-    true,
-    true,
+    { canGetNode: true, hideActions: true, namespace },
   );
   const loaded = vmsLoaded && utilsLoaded && !loadingFeatureProxy && loadedColumns;
 

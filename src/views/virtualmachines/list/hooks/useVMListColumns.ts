@@ -43,9 +43,7 @@ export const useVMListColumns = (namespace?: string, cluster?: string): VMListCo
 
   const { activeColumnKeys, columnLayout, columns, loadedColumns } = useVirtualMachineListColumns(
     VirtualMachineModelRef,
-    namespace,
-    isAllClustersPage,
-    canGetNode,
+    { canGetNode, isAllClustersPage, namespace },
   );
 
   return {

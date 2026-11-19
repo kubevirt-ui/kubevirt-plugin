@@ -155,7 +155,11 @@ beforeEach(() => {
 
 describe('exported table columns require getValue', () => {
   it('covers every labeled VM list column', () => {
-    expect(getLabeledColumnsMissingGetValue(getVMColumns(t, '', true, true))).toEqual([]);
+    expect(
+      getLabeledColumnsMissingGetValue(
+        getVMColumns({ canGetNode: true, isAllClustersPage: true, namespace: '', t }),
+      ),
+    ).toEqual([]);
   });
 
   it('covers every labeled template list column', () => {
@@ -181,7 +185,12 @@ describe('exported table columns require getValue', () => {
 
 describe('VM list CSV export', () => {
   it('includes Memory, CPU, and Network when those columns are active', () => {
-    const columns = getVMColumns(t, 'ns', false, false);
+    const columns = getVMColumns({
+      canGetNode: false,
+      isAllClustersPage: false,
+      namespace: 'ns',
+      t,
+    });
     const exportable = getExportableColumns(columns, [
       VM_COLUMN_KEYS.name,
       VM_COLUMN_KEYS.memoryUsage,
@@ -238,7 +247,7 @@ describe('VM list CSV export', () => {
 
     const csv = buildCSVContent(
       [runningVM, stoppedVM],
-      getVMColumns(t, namespace, false, false),
+      getVMColumns({ canGetNode: false, isAllClustersPage: false, namespace, t }),
       [
         VM_COLUMN_KEYS.name,
         VM_COLUMN_KEYS.cpuUsage,
@@ -267,7 +276,7 @@ describe('VM list CSV export', () => {
 
     const csv = buildCSVContent(
       [vm],
-      getVMColumns(t, namespace, false, false),
+      getVMColumns({ canGetNode: false, isAllClustersPage: false, namespace, t }),
       [VM_COLUMN_KEYS.name, VM_COLUMN_KEYS.cpuUsage],
       {
         getVmi: () => undefined,
@@ -298,10 +307,11 @@ describe('VM list CSV export', () => {
       },
     } as V1VirtualMachine;
 
-    const csv = buildCSVContent([vm], getVMColumns(t, 'csv-ns', false, false), [
-      VM_COLUMN_KEYS.name,
-      VM_COLUMN_KEYS.conditions,
-    ]);
+    const csv = buildCSVContent(
+      [vm],
+      getVMColumns({ canGetNode: false, isAllClustersPage: false, namespace: 'csv-ns', t }),
+      [VM_COLUMN_KEYS.name, VM_COLUMN_KEYS.conditions],
+    );
 
     expect(csv).toBe(
       'Name,Conditions\ncsv-conditions-vm,"DataVolumesReady=True, LiveMigratable=True"',
@@ -325,7 +335,7 @@ describe('VM list CSV export', () => {
 
     const csv = buildCSVContent(
       [runningVM, stoppedVM],
-      getVMColumns(t, 'csv-ns', false, false),
+      getVMColumns({ canGetNode: false, isAllClustersPage: false, namespace: 'csv-ns', t }),
       [VM_COLUMN_KEYS.name, VM_COLUMN_KEYS.ipAddress],
       {
         getVmi: (vm: V1VirtualMachine) =>
