@@ -400,7 +400,9 @@ jobs:
       # dispatched at (github.sha -- main's tip in production, the fix branch
       # during a workflow_dispatch validation) into an isolated subdir.
       # GITHUB_WORKSPACE stays pointed at the product checkout at the workspace
-      # root, so the test runner still runs the branch's own specs/config.
+      # root. The overlaid runner must cd there and use the product tree's
+      # scripts/ (playwright-env.sh, run-playwright.sh), node_modules, and
+      # playwright.config.ts — never treat .hc-infra as the Playwright cwd.
       - name: Overlay hot-cluster CI infra from main
         uses: actions/checkout@v7
         with:

@@ -1,15 +1,35 @@
 #!/usr/bin/env bash
 # Hot-cluster Playwright runner — same CLI shape as playwright-runner.sh / CNV-98979,
 # with HC_E2E=true and hard failures (CI_DEBUG off by default).
+#
+# On a release-branch HC run this script is sparse-checked-out from main into
+# .hc-infra (it may not live on the branch). Always execute from the product
+# checkout root (GITHUB_WORKSPACE / cwd) so node_modules, playwright.config.ts,
+# specs, and scripts/ come from the branch under test — not from the overlay.
 set -euo pipefail
 
 export HC_E2E=true
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-cd "${SCRIPT_DIR}"
+# run-gating-tests.ts invokes this with cwd = repoRoot; prefer GITHUB_WORKSPACE
+# in CI so an overlay SCRIPT_DIR never becomes the Playwright working directory.
+# Local fallback uses git toplevel so subdirectory invocations still resolve.
+PROJECT_ROOT="${GITHUB_WORKSPACE:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
+
+PLAYWRIGHT_ENV=""
+if [[ -f "${PROJECT_ROOT}/scripts/playwright-env.sh" ]]; then
+  PLAYWRIGHT_ENV="${PROJECT_ROOT}/scripts/playwright-env.sh"
+elif [[ -f "${SCRIPT_DIR}/scripts/playwright-env.sh" ]]; then
+  PLAYWRIGHT_ENV="${SCRIPT_DIR}/scripts/playwright-env.sh"
+else
+  echo "❌ scripts/playwright-env.sh not found under '${PROJECT_ROOT}/scripts' or '${SCRIPT_DIR}/scripts'." >&2
+  exit 1
+fi
 
 # shellcheck source=scripts/playwright-env.sh
-source "${SCRIPT_DIR}/scripts/playwright-env.sh"
+source "${PLAYWRIGHT_ENV}"
+
+cd "${PROJECT_ROOT}"
 playwright_bootstrap_env ".env"
 
 detect_urls() {

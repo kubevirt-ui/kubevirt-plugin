@@ -5,8 +5,11 @@
  * the product repo root; a release-branch HC run (see hot-cluster-e2e-run.yml's
  * "Overlay hot-cluster CI infra from main" step) does not carry it on the
  * branch, so it is sparse-checked-out into .hc-infra alongside
- * ci-scripts/hot-cluster instead. Either way, Playwright must still run with
- * cwd = repoRoot so it picks up the branch's own playwright.config.ts/specs.
+ * ci-scripts/hot-cluster instead.
+ *
+ * Either way the runner must execute with cwd = repoRoot and use the product
+ * tree's scripts/ (playwright-env.sh, run-playwright.sh), node_modules, and
+ * playwright.config.ts/specs — not paths under .hc-infra.
  */
 
 import { existsSync } from 'node:fs';
