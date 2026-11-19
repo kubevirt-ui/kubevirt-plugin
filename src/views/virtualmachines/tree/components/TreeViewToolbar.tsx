@@ -1,4 +1,4 @@
-import React, { ChangeEvent, FC } from 'react';
+import React, { type ChangeEvent, type FC } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useIsACMPage from '@multicluster/useIsACMPage';
@@ -12,7 +12,6 @@ import {
 } from '@patternfly/react-core';
 
 import { TREE_VIEW_SEARCH_ID } from '../utils/constants';
-
 import ShowOnlyVMProjectsSwitch from './ShowOnlyVMProjectsSwitch';
 
 type TreeViewToolbarProps = {
@@ -25,7 +24,7 @@ const TreeViewToolbar: FC<TreeViewToolbarProps> = ({ hasVMs, onSearch }) => {
   const isACMPage = useIsACMPage();
 
   return (
-    <Toolbar className="vms-tree-view-toolbar" isSticky>
+    <Toolbar className="vms-tree-view-toolbar">
       <ToolbarContent className="vms-tree-view-toolbar-content">
         <Stack className="vms-tree-view__toolbar-section">
           <StackItem>
