@@ -318,6 +318,12 @@ export class VirtualMachineDetailConfigurationComponent extends BaseComponent {
   private readonly _configurationTab = this.testId('horizontal-link-Configuration');
   private readonly _cpuMemoryButton = this.testId('cpu-memory-value');
   private readonly _dataVolumeDetails = this.locator('text=DataVolume details');
+  private readonly _environmentAddButton = this.page.getByRole('button', {
+    name: 'Add ConfigMap, Secret, or ServiceAccount',
+  });
+  private readonly _environmentRowSerialInputs = this.page.getByRole('textbox', {
+    name: 'Serial number',
+  });
   private readonly _evictionStrategyElement = this.testId('eviction-strategy');
   private readonly _headlessCheckbox = this.locator('input[id="headless-mode"]');
   private readonly _pendingStatusMessage = getPendingStatusMessageLocator(this.page);
@@ -349,6 +355,30 @@ export class VirtualMachineDetailConfigurationComponent extends BaseComponent {
     });
     await this.robustClick(this._configurationStorageSubTab);
     await this.page.waitForTimeout(TestTimeouts.UI_DELAY_MEDIUM);
+  }
+
+  /**
+   * Clicks the "Add ConfigMap, Secret, or ServiceAccount" button in the
+   * Environment form on Configuration → Storage, adding one empty row.
+   */
+  async clickAddEnvironment(): Promise<void> {
+    await this._environmentAddButton.waitFor({
+      state: 'visible',
+      timeout: TestTimeouts.VM_CREATION,
+    });
+    await this.robustClick(this._environmentAddButton);
+  }
+
+  /**
+   * Number of Environment (ConfigMap/Secret/ServiceAccount) rows currently
+   * rendered in the Environment form on Configuration → Storage.
+   */
+  async getEnvironmentRowCount(): Promise<number> {
+    await this._environmentAddButton.waitFor({
+      state: 'visible',
+      timeout: TestTimeouts.VM_CREATION,
+    });
+    return this._environmentRowSerialInputs.count();
   }
 
   async clickPvcLink(volumeName: string): Promise<boolean> {

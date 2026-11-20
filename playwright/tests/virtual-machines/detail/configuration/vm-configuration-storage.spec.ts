@@ -1,6 +1,7 @@
 import { T1, T1_TAG } from '@/data-models/allure-constants';
 import { expect, test } from '@/fixtures/vm-tabs-fixture';
 import { ROUTE_VIRTUAL_MACHINES_DETAIL_CONFIGURATION_TAG } from '@/data-models/route-tags';
+import { TestTimeouts } from '@/utils/test-config';
 
 const SUITE = 'VM disks tab';
 
@@ -163,6 +164,32 @@ test.describe.serial(
           message: 'Disk should be persistent after Make persistent action',
         })
         .toBe(true);
+    });
+
+    test('Add ConfigMap/Secret/ServiceAccount button adds an environment row per click', async ({
+      vmListPage,
+      vmDetailPage,
+    }) => {
+      await vmListPage.navigateToVmViaTreeView(ns, vmName);
+      await vmDetailPage.navigateToConfigurationStorage();
+
+      const initialRows = await vmDetailPage.getEnvironmentRowCount();
+
+      await vmDetailPage.clickAddEnvironment();
+      await expect
+        .poll(() => vmDetailPage.getEnvironmentRowCount(), {
+          timeout: TestTimeouts.DEFAULT,
+          message: 'Clicking Add should render one new environment row',
+        })
+        .toBe(initialRows + 1);
+
+      await vmDetailPage.clickAddEnvironment();
+      await expect
+        .poll(() => vmDetailPage.getEnvironmentRowCount(), {
+          timeout: TestTimeouts.DEFAULT,
+          message: 'Clicking Add again should render a second new environment row',
+        })
+        .toBe(initialRows + 2);
     });
   },
 );
