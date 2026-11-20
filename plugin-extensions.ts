@@ -11,6 +11,7 @@ import { extensions as CDIUploadProviderExtensions } from './src/views/cdi-uploa
 import { extensions as CheckupsExtensions } from './src/views/checkups/extensions';
 import { extensions as dashboardExtensionsExtensions } from './src/views/dashboard-extensions/extensions';
 import { extensions as DataSourcesExtensions } from './src/views/datasources/extensions';
+import { extensions as DataVolumesExtensions } from './src/views/datavolumes/extensions';
 import { extensions as InstanceTypesExtensions } from './src/views/instancetypes/extensions';
 import { extensions as MigrationPoliciesExtensions } from './src/views/migrationpolicies/extensions';
 import { extensions as MigrationsExtensions } from './src/views/migrations/extensions';
@@ -51,6 +52,7 @@ const extensions: EncodedExtension[] = [
   ...SettingsExtensions,
   ...PreferencesExtensions,
   ...DataSourcesExtensions,
+  ...DataVolumesExtensions,
   ...VirtualMachinesInstanceExtensions,
   ...YamlTemplatesExtensions,
   ...VMWizardExtensions,
