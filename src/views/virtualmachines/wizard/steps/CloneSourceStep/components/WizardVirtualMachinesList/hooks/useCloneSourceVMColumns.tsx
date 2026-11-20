@@ -51,7 +51,7 @@ const useCloneSourceVMColumns = (cluster: string): UseCloneSourceVMColumnsReturn
   const { t } = useKubevirtTranslation();
   const isAllClustersPage = useIsAllClustersPage();
 
-  const [isAbleToGetNodeData] = useFleetAccessReview({
+  const [canGetNode] = useFleetAccessReview({
     cluster,
     namespace: undefined,
     resource: NodeModel.plural,
@@ -60,8 +60,15 @@ const useCloneSourceVMColumns = (cluster: string): UseCloneSourceVMColumnsReturn
 
   const columns = useMemo(
     () =>
-      wrapColumnLinksInNewTab(getVMColumns(t, undefined, isAllClustersPage, isAbleToGetNodeData)),
-    [t, isAllClustersPage, isAbleToGetNodeData],
+      wrapColumnLinksInNewTab(
+        getVMColumns({
+          canGetNode,
+          hideActions: true,
+          isAllClustersPage,
+          t,
+        }),
+      ),
+    [t, isAllClustersPage, canGetNode],
   );
 
   const { columnsWithoutSelection, manageableColumns } = useMemo(() => {

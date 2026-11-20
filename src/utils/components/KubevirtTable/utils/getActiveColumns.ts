@@ -20,6 +20,8 @@ export const getActiveColumns = <TData, TCallbacks = undefined>(
     return columns.filter((col) => !col.additional);
   }
 
-  const orderKeys = [...activeColumnKeys, ACTIONS];
+  // Force the actions (kebab) column to be last, regardless of where ACTIONS appears in
+  // activeColumnKeys. Callers don't need to position it themselves.
+  const orderKeys = [...activeColumnKeys.filter((key) => key !== ACTIONS), ACTIONS];
   return orderColumnsByKeys(filtered, orderKeys);
 };
