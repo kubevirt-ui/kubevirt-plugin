@@ -1,4 +1,4 @@
-import { type FC } from 'react';
+import { type FC, useMemo } from 'react';
 
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import SSHSecretModal from '@kubevirt-utils/components/SSHSecretModal/SSHSecretModal';
@@ -27,6 +27,20 @@ const AddProjectAuthKeyButton: FC<AddProjectAuthKeyButtonProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
 
+  const initialSSHSecretDetails = useMemo(
+    () =>
+      isEmpty(secretName)
+        ? initialSSHCredentials
+        : {
+            applyKeyToProject: true,
+            secretOption: SecretSelectionOption.UseExisting,
+            sshPubKey: '',
+            sshSecretName: secretName,
+            sshSecretNamespace: selectedProject,
+          },
+    [secretName, selectedProject],
+  );
+
   const { createModal } = useModal();
   return (
     <Button
@@ -39,17 +53,7 @@ const AddProjectAuthKeyButton: FC<AddProjectAuthKeyButtonProps> = ({
         createModal((modalProps) => (
           <SSHSecretModal
             cluster={cluster}
-            initialSSHSecretDetails={
-              isEmpty(secretName)
-                ? initialSSHCredentials
-                : {
-                    applyKeyToProject: true,
-                    secretOption: SecretSelectionOption.UseExisting,
-                    sshPubKey: '',
-                    sshSecretName: secretName,
-                    sshSecretNamespace: selectedProject,
-                  }
-            }
+            initialSSHSecretDetails={initialSSHSecretDetails}
             namespace={selectedProject}
             onSubmit={onSubmit}
             {...modalProps}
