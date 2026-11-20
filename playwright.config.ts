@@ -91,6 +91,23 @@ const uiTestIgnoreManual = ['**/api/**', '**/explore/**'];
 const tagExact = (tag: string): RegExp =>
   new RegExp(`${tag.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?![\\w-])`);
 
+/**
+ * Browser-based test cycles, keyed by project name → tier tag.
+ *
+ * Every project here can be run by the `auto` dispatch (CI `test_project: auto` omits `--project`),
+ * which is how `changed-tests-dispatch.ts` exercises specs touched by a PR.
+ * A tier missing from this map runs **zero** tests when its specs change,
+ * so keep it in sync with the CI suite→project mapping in
+ * `ci-scripts/hot-cluster/ts/src/scripts/resolve-playwright-test-project.ts`.
+ * API specs run without a browser and are handled separately (not here).
+ */
+const uiProjectTagByName: Record<string, string> = {
+  Gating: '@gating',
+  Settings: '@cnv-settings',
+  Tier1: '@tier1',
+  Tier2: '@tier2',
+};
+
 export default defineConfig({
   expect: { timeout: TestTimeouts.ELEMENT_WAIT },
   forbidOnly: EnvVariables.isCI,
@@ -98,16 +115,14 @@ export default defineConfig({
   globalSetup: './playwright/project-dependencies/global.setup.ts',
   globalTeardown: './playwright/project-dependencies/global.teardown.ts',
   outputDir: testResultsDir,
-  projects: [
-    {
-      fullyParallel: EnvVariables.isCI ? false : true,
-      grep: tagExact('@gating'),
-      name: 'Gating',
-      testDir: uiTestDir,
-      testIgnore: uiTestIgnoreManual,
-      use: { ...chromeUse, baseURL, storageState },
-    },
-  ],
+  projects: Object.entries(uiProjectTagByName).map(([name, tag]) => ({
+    fullyParallel: EnvVariables.isCI ? false : true,
+    grep: tagExact(tag),
+    name,
+    testDir: uiTestDir,
+    testIgnore: uiTestIgnoreManual,
+    use: { ...chromeUse, baseURL, storageState },
+  })),
   reporter: getReporterConfig(testResultsDir),
   retries: EnvVariables.retries,
   timeout: TestTimeouts.TEST_LONG,

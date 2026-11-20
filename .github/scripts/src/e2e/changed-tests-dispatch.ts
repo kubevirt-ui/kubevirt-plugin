@@ -1,7 +1,7 @@
 /**
- * Changed-tests dispatch — detects modified `.spec.ts` files outside the
- * gating folder and dispatches an informational hot-cluster-e2e.yml run so
- * non-gating tests touched by a PR are exercised automatically.
+ * Changed-tests dispatch — detects modified `.spec.ts` files and dispatches an
+ * informational hot-cluster-e2e.yml run so tests touched by a PR are exercised
+ * automatically.
  *
  * Runs as a best-effort step after the gating gate dispatch. Failures are
  * logged but never surface as a workflow error (exit 0 on any catch).
@@ -26,13 +26,15 @@ import { requireEnv } from '../utils';
 import { getRepoContext } from '../shared/actions-context';
 import { dispatchWorkflowAndResolveRun } from '../shared/dispatch';
 
-const CHANGED_TEST_PATTERN = /^playwright\/tests\/(?!gating\/).+\.spec\.ts$/;
+// Route-based spec files that a browser project can run. `api/` is excluded
+// because no browser project runs those specs
+const CHANGED_TEST_PATTERN = /^playwright\/tests\/(?!api\/).+\.spec\.ts$/;
 
 /**
- * Collect `.spec.ts` file paths changed in the PR that live outside the
- * gating folder (tier1, tier2, settings, api, etc.).
+ * Collect `.spec.ts` file paths changed in the PR. Gating vs non-gating is
+ * decided at run time by tag (`--grep-invert @gating`), not by path here.
  */
-const getChangedNonGatingTests = async (
+const getChangedTestSpecs = async (
   octokit: Octokit,
   owner: string,
   repo: string,
@@ -52,16 +54,18 @@ const main = async (): Promise<void> => {
   const baseRef = requireEnv('BASE_REF');
   const octokit = new Octokit({ auth: token });
 
-  const changedTests = await getChangedNonGatingTests(octokit, owner, repo, Number(prNumber));
+  const changedTests = await getChangedTestSpecs(octokit, owner, repo, Number(prNumber));
 
   if (changedTests.length === 0) {
-    console.log('No non-gating test files changed — skipping auto dispatch.');
+    console.log('No test files changed — skipping auto dispatch.');
     return;
   }
 
-  const testArgs = changedTests.join(' ');
+  // Run the changed spec files across all projects, but skip @gating tests (the
+  // gating gate already runs them) and tolerate a gating-only change (0 tests).
+  const testArgs = [...changedTests, '--grep-invert', '@gating', '--pass-with-no-tests'].join(' ');
   console.log(
-    `Detected ${changedTests.length} changed non-gating test files:\n  ${changedTests.join('\n  ')}`,
+    `Detected ${changedTests.length} changed test files:\n  ${changedTests.join('\n  ')}`,
   );
 
   const result = await dispatchWorkflowAndResolveRun(octokit, {
