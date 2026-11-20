@@ -65,6 +65,7 @@ test.describe('Cluster Settings', { tag: [ROUTE_VIRTUALIZATION_SETTINGS_TAG, CNV
 
     const subSections = await settingsPage.getGeneralSettingsSubSections();
     for (const expected of [
+      'Default CPU model',
       'Live migration',
       'Memory request ratio',
       'SSH configurations',

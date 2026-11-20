@@ -39,7 +39,7 @@ type HCOVirtualizationSpec = {
   ksmConfiguration?: HCOKsmConfiguration;
   liveMigrationConfig?: V1MigrationConfiguration;
   roleAggregationStrategy?: string;
-  virtualMachineOptions?: { disableSerialConsoleLog?: string };
+  virtualMachineOptions?: { defaultCPUModel?: string; disableSerialConsoleLog?: string };
 };
 
 type HCOWorkloadSourcesSpec = {
@@ -78,7 +78,7 @@ export type HyperConvergedSpecV1Beta1 = {
     autoCPULimitNamespaceLabelSelector?: V1LabelSelector;
   };
   roleAggregationStrategy?: string;
-  virtualMachineOptions?: { disableSerialConsoleLog?: string };
+  virtualMachineOptions?: { defaultCPUModel?: string; disableSerialConsoleLog?: string };
 };
 
 export type HyperConvergedSpecV1 = {
@@ -90,9 +90,15 @@ export type HyperConvergedSpecV1 = {
 
 export type HyperConvergedSpec = HyperConvergedSpecV1 | HyperConvergedSpecV1Beta1;
 
+export type CPUModelStatus = {
+  name: string;
+  unsupportedNodes?: string[];
+};
+
 type HyperConvergedStatus = {
   dataImportCronTemplates?: K8sResourceCommon[];
   nodeInfo?: {
+    cpu?: { models?: CPUModelStatus[] };
     workloadsArchitectures?: string[];
   };
 };

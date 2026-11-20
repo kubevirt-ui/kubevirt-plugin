@@ -9,6 +9,7 @@ import { type K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { isHyperConvergedV1 } from './model';
 import {
   HCO_FEATURE_GATE_STATE,
+  type CPUModelStatus,
   type HCOFeatureGateEntry,
   type HCOFeatureGatesV1Beta1,
   type HCOKsmConfiguration,
@@ -81,6 +82,12 @@ export const getDisableSerialConsoleLog = (
   hyperConverge: HyperConverged | undefined,
 ): string | undefined =>
   getVirtualizationSpec(hyperConverge)?.virtualMachineOptions?.disableSerialConsoleLog;
+
+export const getDefaultCPUModel = (hyperConverge: HyperConverged | undefined): string | undefined =>
+  getVirtualizationSpec(hyperConverge)?.virtualMachineOptions?.defaultCPUModel;
+
+export const getCpuModels = (hyperConverge: HyperConverged | undefined): CPUModelStatus[] =>
+  hyperConverge?.status?.nodeInfo?.cpu?.models ?? [];
 
 export const getKsmConfiguration = (
   hyperConverge: HyperConverged | undefined,

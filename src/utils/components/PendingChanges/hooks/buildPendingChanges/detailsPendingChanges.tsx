@@ -34,7 +34,7 @@ export const getDetailsPendingChanges = ({
   {
     ...createProps(VirtualMachineDetailsTab.Details, () =>
       createModal(({ isOpen, onClose }) => (
-        <CPUMemoryModal isOpen={isOpen} onClose={onClose} onSubmit={onSubmit} vm={vm} />
+        <CPUMemoryModal isOpen={isOpen} onClose={onClose} onSubmit={onSubmit} vm={vm} vmi={vmi} />
       )),
     ),
     hasPendingChange: !isInstanceTypeVM(vm) && cpuMemoryChanged && restartRequired(vm),
