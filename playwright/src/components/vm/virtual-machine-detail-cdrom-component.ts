@@ -163,7 +163,7 @@ export default class VirtualMachineDetailCdromComponent extends BaseComponent {
 
   /**
    * Returns a column value from the VMI Disks tab table.
-   * VMI tables use data-test (not data-test) selectors.
+   * Column order: Name, Source, Size, Drive, Interface, Storage class.
    */
   async getVmiDiskColumnValue(
     diskName: string,
@@ -172,24 +172,30 @@ export default class VirtualMachineDetailCdromComponent extends BaseComponent {
     try {
       const cell = this.testId(`disk-${column}-${diskName}`).first();
       const visible = await cell
-        .isVisible({ timeout: TestTimeouts.UI_DELAY_MEDIUM })
+        .waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT })
+        .then(() => true)
         .catch(() => false);
       if (visible) {
         return (await cell.textContent())?.trim() || null;
       }
+      // Matches getVMIDisksTableColumns order in disksTableDefinition.tsx
       const columnIndex: Record<string, number> = {
         name: 1,
         source: 2,
-        drive: 3,
-        size: 4,
+        size: 3,
+        drive: 4,
         interface: 5,
       };
       const idx = columnIndex[column];
       if (idx) {
-        const row = this.locator('tr').filter({ hasText: diskName }).first();
+        const row = this.locator('[data-test="vmi-disks-table"] tr')
+          .filter({ has: this.testId(`disk-name-${diskName}`) })
+          .or(this.locator('tr').filter({ hasText: diskName }))
+          .first();
         const td = row.locator(`td:nth-child(${idx})`).first();
         const tdVisible = await td
-          .isVisible({ timeout: TestTimeouts.UI_DELAY_MEDIUM })
+          .waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT })
+          .then(() => true)
           .catch(() => false);
         if (tdVisible) {
           return (await td.textContent())?.trim() || null;
@@ -266,8 +272,13 @@ export default class VirtualMachineDetailCdromComponent extends BaseComponent {
 
   async navigateToVmiDisksTab(vmName: string, namespace: string): Promise<void> {
     await this.goTo(`/k8s/ns/${namespace}/kubevirt.io~v1~VirtualMachineInstance/${vmName}/disks`);
-    await this.locator('[aria-label="Disks table"]')
+    await this.testId('vmi-disks-table')
+      .or(this.locator('[aria-label="Disks table"]'))
       .first()
       .waitFor({ state: 'visible', timeout: TestTimeouts.DEFAULT });
+    // PVC-backed size/source cells render after the PVC watch resolves; wait for rows.
+    await this.locator('[data-test^="disk-name-"]')
+      .first()
+      .waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
   }
 }
