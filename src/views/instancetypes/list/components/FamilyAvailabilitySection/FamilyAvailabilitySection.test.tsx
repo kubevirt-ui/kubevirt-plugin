@@ -4,8 +4,8 @@ import { type V1beta1VirtualMachineClusterInstancetype } from '@kubevirt-ui-ext/
 import useClusterInstanceTypes from '@kubevirt-utils/hooks/useClusterInstanceTypes';
 import { operatorNamespaceSignal } from '@kubevirt-utils/store/operatorNamespace';
 import useClusterParam from '@multicluster/hooks/useClusterParam';
-import useIsAllClustersPage from '@multicluster/hooks/useIsAllClustersPage';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
+import useIsACMPage from '@multicluster/useIsACMPage';
 import { fireEvent, render, screen } from '@testing-library/react';
 
 import FamilyAvailabilitySection from './FamilyAvailabilitySection';
@@ -13,7 +13,7 @@ import FamilyAvailabilitySection from './FamilyAvailabilitySection';
 const HUB = 'local-cluster';
 
 jest.mock('@multicluster/hooks/useClusterParam', () => jest.fn());
-jest.mock('@multicluster/hooks/useIsAllClustersPage', () => jest.fn());
+jest.mock('@multicluster/useIsACMPage', () => jest.fn());
 jest.mock('@multicluster/hooks/useK8sWatchData', () => jest.fn());
 jest.mock('@multicluster/k8sRequests', () => ({ kubevirtK8sPatch: jest.fn() }));
 jest.mock('@kubevirt-utils/hooks/useClusterInstanceTypes', () => jest.fn());
@@ -99,7 +99,7 @@ describe('FamilyAvailabilitySection', () => {
   });
 
   it('renders nothing on non-ACM consoles when the user cannot edit', () => {
-    jest.mocked(useIsAllClustersPage).mockReturnValue(false);
+    jest.mocked(useIsACMPage).mockReturnValue(false);
     jest.mocked(useClusterParam).mockReturnValue(undefined);
     // standalone console: no cluster -> hit the unauthorized branch via the access review
     // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -111,20 +111,20 @@ describe('FamilyAvailabilitySection', () => {
     expect(container).toBeEmptyDOMElement();
   });
 
-  it('ACM single-cluster route: shows the cluster label and no dropdown', () => {
-    jest.mocked(useIsAllClustersPage).mockReturnValue(false);
+  it('ACM single-cluster route: shows the dropdown defaulted to the URL cluster', () => {
+    jest.mocked(useIsACMPage).mockReturnValue(true);
     jest.mocked(useClusterParam).mockReturnValue('spoke-a');
 
     render(<FamilyAvailabilitySection />);
 
-    expect(screen.getByText('Cluster: spoke-a')).toBeInTheDocument();
-    expect(screen.queryByLabelText('cluster-dropdown')).not.toBeInTheDocument();
-    expect(screen.getByText('5 / 7 available')).toBeInTheDocument();
+    expect(screen.getByLabelText('cluster-dropdown')).toHaveValue('spoke-a');
+    expect(screen.queryByText('Cluster: spoke-a')).not.toBeInTheDocument();
+    expect(screen.getByText('5 / 7 available on spoke-a')).toBeInTheDocument();
   });
 
   describe('ACM All clusters', () => {
     beforeEach(() => {
-      jest.mocked(useIsAllClustersPage).mockReturnValue(true);
+      jest.mocked(useIsACMPage).mockReturnValue(true);
       jest.mocked(useClusterParam).mockReturnValue(undefined);
     });
 

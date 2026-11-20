@@ -1,16 +1,16 @@
 import useClusterParam from '@multicluster/hooks/useClusterParam';
-import useIsAllClustersPage from '@multicluster/hooks/useIsAllClustersPage';
+import useIsACMPage from '@multicluster/useIsACMPage';
 import { useHubClusterName } from '@stolostron/multicluster-sdk';
 import { act, renderHook } from '@testing-library/react';
 
 import useFamilyAvailabilityCluster from './useFamilyAvailabilityCluster';
 
 jest.mock('@multicluster/hooks/useClusterParam', () => jest.fn());
-jest.mock('@multicluster/hooks/useIsAllClustersPage', () => jest.fn());
+jest.mock('@multicluster/useIsACMPage', () => jest.fn());
 jest.mock('@stolostron/multicluster-sdk', () => ({ useHubClusterName: jest.fn() }));
 
 const mockUseClusterParam = jest.mocked(useClusterParam);
-const mockUseIsAllClustersPage = jest.mocked(useIsAllClustersPage);
+const mockUseIsACMPage = jest.mocked(useIsACMPage);
 const mockUseHubClusterName = jest.mocked(useHubClusterName);
 
 const setHub = (name: string | undefined, loaded = true): void => {
@@ -26,7 +26,7 @@ describe('useFamilyAvailabilityCluster', () => {
   });
 
   it('standalone console: no selector and no cluster', () => {
-    mockUseIsAllClustersPage.mockReturnValue(false);
+    mockUseIsACMPage.mockReturnValue(false);
     mockUseClusterParam.mockReturnValue(undefined);
 
     const { result } = renderHook(() => useFamilyAvailabilityCluster());
@@ -36,18 +36,24 @@ describe('useFamilyAvailabilityCluster', () => {
     expect(result.current.selectedCluster).toBeUndefined();
   });
 
-  it('ACM single-cluster route: uses the URL cluster and hides the selector', () => {
-    mockUseIsAllClustersPage.mockReturnValue(false);
+  it('ACM single-cluster route: shows the selector and defaults to the URL cluster', () => {
+    mockUseIsACMPage.mockReturnValue(true);
     mockUseClusterParam.mockReturnValue('spoke-a');
 
     const { result } = renderHook(() => useFamilyAvailabilityCluster());
 
-    expect(result.current.showClusterSelector).toBe(false);
+    expect(result.current.showClusterSelector).toBe(true);
+    expect(result.current.selectedCluster).toBe('spoke-a');
     expect(result.current.cluster).toBe('spoke-a');
+
+    act(() => result.current.onClusterChange('spoke-b'));
+
+    expect(result.current.selectedCluster).toBe('spoke-b');
+    expect(result.current.cluster).toBe('spoke-b');
   });
 
   it('ACM All clusters: defaults to the hub and switches to the selected cluster', () => {
-    mockUseIsAllClustersPage.mockReturnValue(true);
+    mockUseIsACMPage.mockReturnValue(true);
     mockUseClusterParam.mockReturnValue(undefined);
 
     const { result } = renderHook(() => useFamilyAvailabilityCluster());
@@ -63,7 +69,7 @@ describe('useFamilyAvailabilityCluster', () => {
   });
 
   it('ACM All clusters: cluster stays undefined until the hub name loads', () => {
-    mockUseIsAllClustersPage.mockReturnValue(true);
+    mockUseIsACMPage.mockReturnValue(true);
     mockUseClusterParam.mockReturnValue(undefined);
     setHub(undefined, false);
 

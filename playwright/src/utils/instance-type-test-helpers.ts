@@ -33,23 +33,52 @@ export async function getDisabledInstanceTypeFamilies(
   );
 }
 
+const isRetriableConfigMapPatchError = (error: unknown): boolean => {
+  if (!(error instanceof Error)) {
+    return false;
+  }
+  const { message } = error;
+  if (/^HTTP 5\d\d\b/.test(message)) {
+    return true;
+  }
+  return /ECONNRESET|ETIMEDOUT|ECONNREFUSED|socket|network|fetch failed/i.test(message);
+};
+
 export async function setDisabledInstanceTypeFamilies(
   client: RequestContextClient,
   namespace: string,
   families: string[],
 ): Promise<void> {
   const serialized = JSON.stringify([...new Set(families)].sort((a, b) => a.localeCompare(b)));
-  const result = await client.mergePatchResource(
-    '',
-    'v1',
-    'configmaps',
-    FEATURES_CONFIG_MAP_NAME,
-    { data: { [DISABLED_INSTANCE_TYPE_FAMILIES_KEY]: serialized } },
-    namespace,
-  );
-  if (!result && !(await client.getConfigMap(FEATURES_CONFIG_MAP_NAME, namespace))) {
-    throw new Error(`ConfigMap ${FEATURES_CONFIG_MAP_NAME} not found in ${namespace}`);
+  const deadline = Date.now() + TestTimeouts.DEFAULT;
+  let lastError: unknown;
+
+  while (Date.now() < deadline) {
+    try {
+      const result = await client.mergePatchResource(
+        '',
+        'v1',
+        'configmaps',
+        FEATURES_CONFIG_MAP_NAME,
+        { data: { [DISABLED_INSTANCE_TYPE_FAMILIES_KEY]: serialized } },
+        namespace,
+      );
+      if (!result && !(await client.getConfigMap(FEATURES_CONFIG_MAP_NAME, namespace))) {
+        throw new Error(`ConfigMap ${FEATURES_CONFIG_MAP_NAME} not found in ${namespace}`);
+      }
+      return;
+    } catch (error) {
+      lastError = error;
+      if (!isRetriableConfigMapPatchError(error) || Date.now() >= deadline) {
+        throw error;
+      }
+      await new Promise((resolve) => {
+        setTimeout(resolve, TestTimeouts.SHORT_WAIT);
+      });
+    }
   }
+
+  throw lastError;
 }
 
 export async function createClusterInstanceTypeApi(

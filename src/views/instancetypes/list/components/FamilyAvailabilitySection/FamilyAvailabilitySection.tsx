@@ -1,10 +1,13 @@
 import { type FC, useMemo } from 'react';
 
 import { getInstanceTypeMenuItems } from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/InstanceTypeDrilldownSelect/utils/utils';
-import ClusterDropdown from '@kubevirt-utils/components/ClusterProjectDropdown/ClusterDropdown';
 import ExpandSectionWithCustomToggle from '@kubevirt-utils/components/ExpandSectionWithCustomToggle/ExpandSectionWithCustomToggle';
 import useClusterInstanceTypes from '@kubevirt-utils/hooks/useClusterInstanceTypes';
-import { INSTANCE_TYPE_SERIES } from '@kubevirt-utils/hooks/useInstanceTypeFamilyAvailability/constants';
+import {
+  FAMILY_AVAILABILITY_SECTION_ID,
+  INSTANCE_TYPE_SERIES,
+} from '@kubevirt-utils/hooks/useInstanceTypeFamilyAvailability/constants';
+import { getAllInstanceTypeFamiliesDisabledWarning } from '@kubevirt-utils/hooks/useInstanceTypeFamilyAvailability/familyAvailabilityStatus';
 import useDisabledInstanceTypeFamilies from '@kubevirt-utils/hooks/useInstanceTypeFamilyAvailability/useDisabledInstanceTypeFamilies';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { type InstanceTypeSeriesName } from '@kubevirt-utils/resources/instancetype/types';
@@ -21,10 +24,14 @@ import {
 
 import useFamilyAvailabilityCluster from '../../hooks/useFamilyAvailabilityCluster';
 import FamilyAvailabilityCard from './components/FamilyAvailabilityCard';
+import FamilyAvailabilityClusterSelector from './components/FamilyAvailabilityClusterSelector';
+import {
+  getFamilyAvailabilityHelpText,
+  getFamilyAvailabilityPermissionDeniedMessage,
+  getFamilyAvailabilitySummaryBadgeText,
+} from './utils/utils';
 
 import './family-availability-section.scss';
-
-const FAMILY_AVAILABILITY_SECTION_ID = 'family-availability-section';
 
 const FamilyAvailabilitySection: FC = () => {
   const { t } = useKubevirtTranslation();
@@ -51,36 +58,13 @@ const FamilyAvailabilitySection: FC = () => {
   const showAvailabilitySummaryBadge = familiesLoaded && availableCount < totalFamilies;
   const isClusterResolved = !showClusterSelector || Boolean(cluster);
   const isLoaded = isClusterResolved && loaded && familiesLoaded;
-  const isSingleClusterRoute = Boolean(cluster) && !showClusterSelector;
   const isReadOnly = !canEdit;
-  const permissionDeniedMessage = t(
-    'You do not have permission to change instance type family availability on cluster {{cluster}}.',
-    { cluster },
-  );
-
-  const familyAvailabilityHelpText = showClusterSelector
-    ? t(
-        'Hide instance type families that the selected cluster cannot run. VM creators will not see unavailable families in pickers.',
-      )
-    : t(
-        'Hide instance type families that this cluster cannot run. VM creators will not see unavailable families in pickers.',
-      );
+  const allFamiliesDisabled = familiesLoaded && availableCount === 0;
+  const familyAvailabilityHelpText = getFamilyAvailabilityHelpText(t, showClusterSelector);
 
   if (!canEdit && !showClusterSelector) {
     return null;
   }
-
-  const summaryBadgeText =
-    showClusterSelector && cluster
-      ? t('{{available}} / {{total}} available on {{cluster}}', {
-          available: availableCount,
-          cluster,
-          total: totalFamilies,
-        })
-      : t('{{available}} / {{total}} available', {
-          available: availableCount,
-          total: totalFamilies,
-        });
 
   return (
     <ExpandSectionWithCustomToggle
@@ -90,37 +74,29 @@ const FamilyAvailabilitySection: FC = () => {
       helpTextContent={familyAvailabilityHelpText}
       id={FAMILY_AVAILABILITY_SECTION_ID}
       isIndented
+      searchItemId={FAMILY_AVAILABILITY_SECTION_ID}
       toggleClassname="ExpandSection"
       toggleContent={
         <Flex alignItems={{ default: 'alignItemsCenter' }} gap={{ default: 'gapSm' }}>
           <span>{t('Family availability')}</span>
-          {isSingleClusterRoute && (
-            <Label data-test="family-availability-cluster-label" isCompact>
-              {t('Cluster: {{clusterName}}', { clusterName: cluster })}
-            </Label>
-          )}
           {showAvailabilitySummaryBadge && (
             <Label className="family-availability-section__summary-badge" color="orange" isCompact>
-              {summaryBadgeText}
+              {getFamilyAvailabilitySummaryBadgeText(t, {
+                availableCount,
+                cluster,
+                showClusterSelector,
+                totalFamilies,
+              })}
             </Label>
           )}
         </Flex>
       }
     >
       {showClusterSelector && (
-        <Flex
-          alignItems={{ default: 'alignItemsCenter' }}
-          className="pf-v6-u-mb-md"
-          data-test="family-availability-cluster-selector"
-          gap={{ default: 'gapSm' }}
-        >
-          {t('Cluster')}:
-          <ClusterDropdown
-            includeAllClusters={false}
-            onChange={onClusterChange}
-            selectedCluster={selectedCluster ?? ''}
-          />
-        </Flex>
+        <FamilyAvailabilityClusterSelector
+          onClusterChange={onClusterChange}
+          selectedCluster={selectedCluster}
+        />
       )}
       <p className="pf-v6-u-text-color-subtle pf-v6-u-mb-md">{familyAvailabilityHelpText}</p>
       {isClusterResolved && canEditLoaded && isReadOnly && (
@@ -128,20 +104,28 @@ const FamilyAvailabilitySection: FC = () => {
           className="pf-v6-u-mb-md"
           isInline
           isPlain
-          title={permissionDeniedMessage}
+          title={getFamilyAvailabilityPermissionDeniedMessage(t, cluster)}
           variant={AlertVariant.info}
+        />
+      )}
+      {allFamiliesDisabled && (
+        <Alert
+          className="pf-v6-u-mb-md"
+          data-test="all-instance-type-families-disabled-alert"
+          isInline
+          title={getAllInstanceTypeFamiliesDisabledWarning(t)}
+          variant={AlertVariant.warning}
         />
       )}
       <Gallery hasGutter key={cluster ?? 'local'} minWidths={{ default: '12.5rem' }}>
         {isLoaded
           ? seriesItems.map((seriesItem) => {
               const seriesName = seriesItem.seriesName as InstanceTypeSeriesName;
-              const isAvailable = !disabledFamilies.has(seriesName);
               return (
                 <GalleryItem key={seriesName}>
                   <FamilyAvailabilityCard
                     cluster={cluster}
-                    isAvailable={isAvailable}
+                    isAvailable={!disabledFamilies.has(seriesName)}
                     isReadOnly={isReadOnly}
                     seriesItem={seriesItem}
                     setFamilyAvailable={setFamilyAvailable}
