@@ -9,6 +9,7 @@ import {
 } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { getPreferredBootmode } from '@kubevirt-utils/resources/preference/helper';
+import usePreference from '@kubevirt-utils/resources/preference/hooks/usePreference';
 import { asAccessReview } from '@kubevirt-utils/resources/shared';
 import { getDevices } from '@kubevirt-utils/resources/vm';
 import { type K8sVerb, useAccessReview } from '@openshift-console/dynamic-plugin-sdk';
@@ -16,7 +17,6 @@ import { Grid } from '@patternfly/react-core';
 import { isDeletionProtectionEnabled } from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/utils/utils';
 import { useVMWizardForm } from '@virtualmachines/wizard/form/VMWizardFormProvider';
 
-import usePreference from '../hooks/usePreference';
 import DetailsLeftColumn from './components/DetailsLeftColumn';
 import DetailsRightColumn from './components/DetailsRightColumn';
 

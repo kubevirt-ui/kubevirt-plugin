@@ -5,6 +5,7 @@ import type { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import HeadlessMode from '@kubevirt-utils/components/HeadlessMode/HeadlessMode';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+import PanicDeviceDescriptionItem from '@kubevirt-utils/components/PanicDeviceDescriptionItem/PanicDeviceDescriptionItem';
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName } from '@kubevirt-utils/resources/shared';
@@ -77,6 +78,7 @@ const DetailsToggleItems: FC<DetailsToggleItemsProps> = ({
         promptType={OLSPromptType.HEADLESS_MODE}
       />
       <WizardDetailsVSOCKToggleItem />
+      <PanicDeviceDescriptionItem vm={vm} />
       <DescriptionItem
         bodyContent={t(
           "Enables access to the VirtualMachine's guest system log. Wait a few seconds for logging to start before viewing the log.",
