@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
+import React, { type FC, useCallback, useEffect, useMemo, useState } from 'react';
 
 import {
   DEFAULT_INSTANCETYPE_KIND_LABEL,
@@ -109,6 +109,7 @@ export const InstanceTypeDrilldownSelect: FC<InstanceTypeMenuItemsProps> = ({
             onSelect={(value, keepMenuOpen) =>
               onSelect(VirtualMachineClusterInstancetypeModel.kind, value, keepMenuOpen)
             }
+            cluster={bootableVolumeCluster}
             selected={selectedInstanceType}
             selectedKind={selectedInstanceTypeKind}
             seriesList={sortedRedHatProvided}

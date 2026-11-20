@@ -6,6 +6,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import useCanCreateBootableVolume from '@kubevirt-utils/resources/bootableresources/hooks/useCanCreateBootableVolume';
 import { Button, ButtonVariant } from '@patternfly/react-core';
 import useInstanceTypeVMStore from '@virtualmachines/creation-wizard/state/instance-type-vm-store/useInstanceTypeVMStore';
+import useOnSelectCreatedVolume from '@virtualmachines/creation-wizard/steps/InstanceTypesSteps/BootSourceStep/hooks/useOnSelectCreatedVolume';
 
 import './AddBootableVolumeLink.scss';
 
@@ -22,7 +23,8 @@ const AddBootableVolumeLink: FC<AddBootableVolumeLinkProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
-  const { onSelectCreatedVolume, volumeListNamespace } = useInstanceTypeVMStore();
+  const { volumeListNamespace } = useInstanceTypeVMStore();
+  const onSelectCreatedVolume = useOnSelectCreatedVolume();
 
   const { canCreateDS, canCreatePVC } = useCanCreateBootableVolume(volumeListNamespace);
   const canCreate = canCreateDS || canCreatePVC;
