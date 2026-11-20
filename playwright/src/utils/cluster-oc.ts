@@ -115,17 +115,44 @@ export function ocLoginToCluster(kubeConfigPath: string): void {
   );
 }
 
+/** Console stores prefs under `user-settings-<uid>` (kubeadmin → `user-settings-kubeadmin`). */
+export function resolveConsoleUserSettingsResourceId(
+  kubeconfig: string,
+  openshiftUsername: string,
+): string {
+  if (
+    openshiftUsername === 'kubeadmin' ||
+    openshiftUsername === 'kube:admin' ||
+    openshiftUsername === 'kube-admin'
+  ) {
+    return 'kubeadmin';
+  }
+  try {
+    const uid = runOc(
+      `oc get user ${openshiftUsername} -o jsonpath='{.metadata.uid}'`,
+      kubeconfig,
+    ).trim();
+    if (uid) {
+      return uid;
+    }
+  } catch {
+    // fall through to username
+  }
+  return openshiftUsername;
+}
+
 /** Non-priv / janitor only — privileged lanes patch user-settings via console proxy after login. */
 export function patchConsoleUserSettings(kubeconfig: string, settingsKey: string): void {
   const namespace = 'openshift-console-user-settings';
-  const configMapName = `user-settings-${settingsKey}`;
+  const resourceId = resolveConsoleUserSettingsResourceId(kubeconfig, settingsKey);
+  const configMapName = `user-settings-${resourceId}`;
   const preferences = consoleUserSettingsPreferencesJson();
   const patchFile = path.join(os.tmpdir(), `pw-console-user-settings-${Date.now()}.json`);
   fs.writeFileSync(
     patchFile,
     JSON.stringify({
       data: {
-        [settingsKey]: preferences,
+        [resourceId]: preferences,
         'console.lastNamespace': CONSOLE_LAST_NAMESPACE_ALL,
       },
     }),
@@ -139,9 +166,12 @@ export function patchConsoleUserSettings(kubeconfig: string, settingsKey: string
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     if (message.includes('NotFound')) {
+      // Console creates the CM on first login; silent skip if setup ran before that.
       return;
     }
     throw err;
+  } finally {
+    fs.unlinkSync(patchFile);
   }
 }
 
@@ -165,6 +195,11 @@ export function patchKubevirtUserSettingsHideWelcomeForUser(
   }
   const dataKey = openshiftUserKubevirtSettingsDataKey(openshiftUsername, uid || undefined);
   patchKubevirtUserSettingsHideWelcomeForDataKey(kubeconfig, dataKey, namespace);
+  // Also username key — product prefers uid but falls back to sanitized name.
+  const nameKey = openshiftUserKubevirtSettingsDataKey(openshiftUsername, undefined);
+  if (nameKey !== dataKey) {
+    patchKubevirtUserSettingsHideWelcomeForDataKey(kubeconfig, nameKey, namespace);
+  }
   if (dataKey !== 'kube-admin') {
     patchKubevirtUserSettingsHideWelcomeForDataKey(kubeconfig, 'kube-admin', namespace);
   }

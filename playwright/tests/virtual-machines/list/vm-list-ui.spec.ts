@@ -1,54 +1,10 @@
-import { ADMIN_ONLY_TAG, NON_PRIV_TAG, T1_TAG, T2_TAG } from '@/data-models/allure-constants';
+import { ADMIN_ONLY_TAG, T2_TAG } from '@/data-models/allure-constants';
 import { ROUTE_VIRTUAL_MACHINES_LIST_TAG } from '@/data-models/route-tags';
 import { expect, test } from '@/fixtures/vm-list-fixture';
-import { CRUD_NAMES, VM_FROM_CATALOG } from '@/utils/constants';
-import { generateRandomVmName } from '@/utils/random-data-generator';
+import { CRUD_NAMES } from '@/utils/constants';
 import { MINUTE, TestTimeouts } from '@/utils/test-config';
 
 import './vm-list-ui.crud.suite';
-
-test.describe(`VirtualMachines UI create from VM wizard ${ROUTE_VIRTUAL_MACHINES_LIST_TAG} ${T1_TAG} ${NON_PRIV_TAG}`, () => {
-  test('Create VirtualMachine using tour Create → From Template wizard', async ({
-    apiClient,
-    testNamespace,
-    vmCreationWizardPage,
-    vmListPage,
-  }) => {
-    const vmName = generateRandomVmName('vm-wiz').slice(0, 50);
-    let createdName = vmName;
-
-    try {
-      await vmCreationWizardPage.openFromVirtualMachinesList(vmListPage, testNamespace);
-      await vmCreationWizardPage.advanceFromTemplateToReview(VM_FROM_CATALOG.templateMetadataName);
-      await vmCreationWizardPage.clickCreateVirtualMachine();
-      await vmCreationWizardPage.page.waitForURL(/VirtualMachine\//, {
-        timeout: TestTimeouts.VM_CREATION,
-      });
-      createdName = (await vmCreationWizardPage.getCreatedVmNameFromUrl()) || vmName;
-
-      const resolvedVm = vmListPage.resolvedVirtualMachineName(testNamespace, createdName);
-      await expect
-        .poll(() => apiClient.virtualMachineExists(resolvedVm, testNamespace), {
-          message: `VirtualMachine ${testNamespace}/${resolvedVm} should exist`,
-          timeout: TestTimeouts.VM_CREATION,
-        })
-        .toBe(true);
-      if (vmListPage.isOnVirtualMachineDetail(testNamespace, resolvedVm)) {
-        await expect(vmListPage.resourceDetailHeading(resolvedVm)).toBeVisible({
-          timeout: TestTimeouts.LONG_OPERATION,
-        });
-      } else {
-        await vmListPage.goToNamespaceList(testNamespace);
-        await vmListPage.waitForVmRowInList(resolvedVm, testNamespace);
-        await expect(vmListPage.vmListRowLocator(resolvedVm, testNamespace)).toBeVisible({
-          timeout: TestTimeouts.LONG_OPERATION,
-        });
-      }
-    } finally {
-      await apiClient.deleteVirtualMachine(createdName, testNamespace);
-    }
-  });
-});
 
 test.describe(`VirtualMachines column management ${ROUTE_VIRTUAL_MACHINES_LIST_TAG} ${T2_TAG}`, () => {
   test.describe.configure({ mode: 'serial' });

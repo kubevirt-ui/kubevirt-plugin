@@ -10,6 +10,7 @@ import {
   waitForConsoleReady,
 } from '@/auth/console-login';
 import { runConsolePostLoginSetup } from '@/auth/console-post-login-setup';
+import { dismissConsoleObstructions } from '@/utils/console-modals';
 import { ensureNonPrivAdministratorPerspective } from '@/utils/console-perspective';
 import { AllureEnvironment } from '@/utils/allure';
 import { kubeconfigMatchesClusterUrl } from '@/utils/cluster-kubernetes-api';
@@ -373,6 +374,8 @@ export function getSetupRules(): SetupRule[] {
               await page.reload({ waitUntil: 'domcontentloaded' });
               await waitForConsoleReady(page, baseURL);
               await ensureNonPrivAdministratorPerspective(page);
+              // Settings load after shell ready — dismiss Welcome if CM patch/RBAC raced.
+              await dismissConsoleObstructions(page);
             }
             logger.success(
               EnvVariables.isNonPrivUser

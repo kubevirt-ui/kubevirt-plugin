@@ -1,5 +1,6 @@
 import { VmNetworkInterfaceModalComponent } from '@/components/vm/vm-network-interface-modal-component';
 import BasePage from '@/page-objects/base-page';
+import { dismissConsoleObstructions } from '@/utils/console-modals';
 import { pollUntil } from '@/utils/poll-until';
 import { TestTimeouts } from '@/utils/test-config';
 import type { Locator, Page } from '@playwright/test';
@@ -51,16 +52,15 @@ export class VmNetworkInterfacesPage extends BasePage {
   }
 
   addNetworkInterfaceButton(): Locator {
+    // Prefer product class / console create control — tabpanel name is unreliable on 4.22.
     return this.page
-      .getByRole('tabpanel', { name: /Network interfaces/i })
-      .getByRole('button', { name: /Add network interface/i })
-      .or(this.page.locator('.add-network-interface-button'))
+      .locator('button.add-network-interface-button, .add-network-interface-button')
       .or(
         this.page
-          .getByTestId('item-create')
-          .filter({ hasText: /Add network interface/i })
-          .first(),
+          .locator('[data-test="item-create"], [data-test-id="item-create"]')
+          .filter({ hasText: /Add network interface/i }),
       )
+      .or(this.page.getByRole('button', { name: /^Add network interface$/i }))
       .first();
   }
 
@@ -158,6 +158,8 @@ export class VmNetworkInterfacesPage extends BasePage {
   }
 
   async openAddNetworkInterfaceModal(): Promise<void> {
+    await dismissConsoleObstructions(this.page);
+    await this.waitForNetworkTabReady();
     await this.modal.openAddNetworkInterfaceModal(this.addNetworkInterfaceButton());
   }
 

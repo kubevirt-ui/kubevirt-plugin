@@ -95,7 +95,7 @@ show_help() {
     echo "  $0 test-tag @gating                              # single container"
     echo "  $0 test-tag @tier1 --workers 3"
     echo "  $0 test                                          # all tests"
-    echo "  $0 test-file catalog/catalog.spec.ts"
+    echo "  $0 test-file vm-wizard/create-vm-wizard-custom-config.spec.ts"
     echo "  PLAYWRIGHT_PROJECT=Tier1 $0 test --workers=4"
     echo "  $0 show-report"
 }

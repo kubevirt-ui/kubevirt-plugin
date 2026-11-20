@@ -477,23 +477,40 @@ export class BootableVolumesPage extends ResourceListPage {
           await this.closeOpenSelectMenus(this.addVolumeModal());
           return this.isAddVolumeModalReady();
         }
-        const openMenu = this.page
-          .getByRole('menuitem', { name: /With form/i })
-          .or(this.page.locator('[role="menu"], .pf-v6-c-menu').filter({ visible: true }))
-          .first();
-        if (await openMenu.isVisible().catch(() => false)) {
-          const withForm = this.page.getByRole('menuitem', { name: /With form/i });
-          if (await withForm.isVisible().catch(() => false)) {
-            await withForm.click();
-            return this.isAddVolumeModalReady();
-          }
+        const withFormItem = () =>
+          this.page
+            .getByRole('menuitem', { name: /With form/i })
+            .or(
+              this.page.locator('.pf-v6-c-menu__item, [role="menuitem"]', {
+                hasText: /With form/i,
+              }),
+            )
+            .first();
+        if (
+          await withFormItem()
+            .isVisible()
+            .catch(() => false)
+        ) {
+          await withFormItem().click();
+          return this.isAddVolumeModalReady();
         }
         await this.robustClick(this.addVolumeButton());
-        const withForm = this.page.getByRole('menuitem', { name: /With form/i });
+        // ListPageCreateDropdown may open form immediately or via menu.
+        if (await this.isAddVolumeModalReady()) {
+          return true;
+        }
+        const withForm = withFormItem();
         if (!(await withForm.isVisible().catch(() => false))) {
           return false;
         }
-        await withForm.click();
+        // Menu can close between visibility check and click — short timeout, poll retries.
+        const clicked = await withForm
+          .click({ timeout: 5000 })
+          .then(() => true)
+          .catch(() => false);
+        if (!clicked) {
+          return false;
+        }
         return this.isAddVolumeModalReady();
       },
       {

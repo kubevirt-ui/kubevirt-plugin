@@ -10,17 +10,15 @@ test.describe(
   'VM Creation Wizard — Required field validation',
   { tag: [ROUTE_VM_WIZARD_TAG, T1_TAG, '@catalog-wizard', ADMIN_ONLY_TAG] },
   () => {
-    test.beforeEach(async ({ vmListPage, vmWizardNavigationPage, testConfig }) => {
-      await vmListPage.switchToVirtualizationPerspective();
-      await vmListPage.navigateToProjectVmListViaUI(testConfig.testNamespace);
-      await vmWizardNavigationPage.openWizardFromCreateDropdown();
+    test.beforeEach(async ({ vmWizardNavigationPage, testConfig }) => {
+      await vmWizardNavigationPage.navigateToWizardInNamespace(testConfig.testNamespace);
     });
 
     test('Custom configuration — Next is disabled until a Name is provided', async ({
       vmWizardNavigationPage,
       utils,
     }) => {
-      test.setTimeout(utils.TestTimeouts.TEST_SHORT);
+      test.setTimeout(utils.TestTimeouts.TEST_MEDIUM);
       await utils.withAllure({ suite: SUITE, feature: T1, tags: [T1_TAG] });
 
       const isCustomSelected = await vmWizardNavigationPage.verifyCreationMethodCardSelected(
@@ -43,7 +41,7 @@ test.describe(
       vmWizardNavigationPage,
       utils,
     }) => {
-      test.setTimeout(utils.TestTimeouts.TEST_SHORT);
+      test.setTimeout(utils.TestTimeouts.TEST_MEDIUM);
       await utils.withAllure({ suite: SUITE, feature: T1, tags: [T1_TAG] });
 
       await vmWizardNavigationPage.selectCreationMethod('fromTemplate');

@@ -24,13 +24,91 @@ async function dismissAlertToasts(page: Page): Promise<boolean> {
   return dismissed;
 }
 
-async function hasVisibleDialog(page: Page): Promise<boolean> {
-  return page
-    .locator('#tab-modal, [role="dialog"]')
-    .filter({ visible: true })
+async function isVirtualizationWelcomeDialog(page: Page, dialogIndex: number): Promise<boolean> {
+  const dialog = page.locator('[role="dialog"]').filter({ visible: true }).nth(dialogIndex);
+  const label = ((await dialog.getAttribute('aria-label').catch(() => '')) ?? '').trim();
+  if (/welcome modal/i.test(label)) {
+    return true;
+  }
+  return (
+    (await dialog
+      .locator('#welcome-modal-checkbox')
+      .count()
+      .catch(() => 0)) > 0
+  );
+}
+
+/** TabModal / form dialogs — do not Escape-close these. Welcome is handled separately. */
+async function hasBlockingTabModal(page: Page): Promise<boolean> {
+  if (
+    await page
+      .locator('#tab-modal')
+      .filter({ visible: true })
+      .first()
+      .isVisible()
+      .catch(() => false)
+  ) {
+    return true;
+  }
+  const dialogs = page.locator('[role="dialog"]').filter({ visible: true });
+  const count = await dialogs.count().catch(() => 0);
+  for (let i = 0; i < count; i += 1) {
+    if (await isVirtualizationWelcomeDialog(page, i)) {
+      continue;
+    }
+    if (
+      await dialogs
+        .nth(i)
+        .isVisible()
+        .catch(() => false)
+    ) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * Virtualization Welcome modal (kubevirt-user-settings). May appear after settings load —
+ * wait briefly so non-priv races (ConfigMap 403 → empty settings) still get dismissed.
+ */
+async function dismissVirtualizationWelcomeModal(
+  page: Page,
+  waitMs = 2 * SECOND,
+): Promise<boolean> {
+  const checkbox = page.locator('#welcome-modal-checkbox');
+  const dialog = page.getByRole('dialog', { name: /Welcome modal/i });
+  const appeared = await checkbox
+    .or(dialog)
     .first()
-    .isVisible()
+    .waitFor({ state: 'visible', timeout: waitMs })
+    .then(() => true)
     .catch(() => false);
+  if (!appeared) {
+    return false;
+  }
+
+  await checkbox.check({ force: true }).catch(() => undefined);
+
+  const closeInDialog = dialog.getByRole('button', { name: /^Close$/i });
+  if (await closeInDialog.isVisible().catch(() => false)) {
+    await closeInDialog.click({ force: true }).catch(() => undefined);
+  } else {
+    await page
+      .locator(
+        '.pf-v6-c-modal-box__close button, .pf-v5-c-modal-box__close button, .pf-c-modal-box__close button',
+      )
+      .first()
+      .click({ force: true })
+      .catch(() => undefined);
+  }
+
+  await dialog
+    .or(checkbox)
+    .first()
+    .waitFor({ state: 'hidden', timeout: 5 * SECOND })
+    .catch(() => undefined);
+  return true;
 }
 
 /** Dismiss quick starts / welcome overlays that block the console header and nav. */
@@ -40,34 +118,12 @@ export async function dismissConsoleObstructions(page: Page): Promise<void> {
     await tourSkip.click({ force: true }).catch(() => undefined);
   }
 
-  const welcomeDialog = page.getByRole('dialog', { name: /Welcome modal/i });
-  if (await welcomeDialog.isVisible().catch(() => false)) {
-    await page
-      .locator('#welcome-modal-checkbox')
-      .check({ force: true })
-      .catch(() => undefined);
-    await welcomeDialog
-      .getByRole('button', { name: /^Close$/i })
-      .click({ force: true })
-      .catch(() => undefined);
-  }
-
-  const welcomeCheckbox = page.locator('#welcome-modal-checkbox');
-  if (await welcomeCheckbox.isVisible().catch(() => false)) {
-    await welcomeCheckbox.check({ force: true }).catch(() => undefined);
-    await page
-      .locator('.pf-v6-c-modal-box__close button, .pf-c-modal-box__close button')
-      .first()
-      .click({
-        force: true,
-      })
-      .catch(() => undefined);
-  }
+  await dismissVirtualizationWelcomeModal(page);
 
   await dismissAlertToasts(page);
 
   // Open TabModal/dialog (Cloud-init, labels, etc.): only clear toasts — never Close/Escape.
-  if (await hasVisibleDialog(page)) {
+  if (await hasBlockingTabModal(page)) {
     return;
   }
 
@@ -85,10 +141,12 @@ export async function dismissConsoleObstructions(page: Page): Promise<void> {
   ];
 
   for (let round = 0; round < 4; round += 1) {
-    if (await hasVisibleDialog(page)) {
+    if (await hasBlockingTabModal(page)) {
       await dismissAlertToasts(page);
       return;
     }
+    // Late-arriving welcome after settings resolve
+    await dismissVirtualizationWelcomeModal(page, SECOND);
     let dismissed = await dismissAlertToasts(page);
     for (const target of closeTargets) {
       const el = target.first();
@@ -97,7 +155,7 @@ export async function dismissConsoleObstructions(page: Page): Promise<void> {
         dismissed = true;
       }
     }
-    if (!(await hasVisibleDialog(page))) {
+    if (!(await hasBlockingTabModal(page))) {
       await page.keyboard.press('Escape');
     }
     if (!dismissed) {

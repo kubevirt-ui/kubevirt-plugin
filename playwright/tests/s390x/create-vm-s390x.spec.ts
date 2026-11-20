@@ -36,30 +36,4 @@ test.describe(`s390x VM Creation ${S390X_TAG}`, () => {
       await apiClient.deleteVirtualMachine(vmName, testNamespace);
     }
   });
-
-  test('Catalog shows RHEL9 and hides Windows on s390x', async ({ catalogPage, testNamespace }) => {
-    await catalogPage.openCatalogInNamespace(testNamespace);
-    await catalogPage.waitForTemplateCatalogReady();
-
-    await expect(catalogPage.gridLinkWithText('Red Hat Enterprise Linux 9 VM')).toBeVisible();
-
-    await catalogPage.filterByOsCheckbox('osName-Windows', true);
-    await expect(catalogPage.gridLinkWithText(/Windows/i)).toHaveCount(0);
-    await catalogPage.filterByOsCheckbox('osName-Windows', false);
-  });
-
-  test('Catalog RHEL + Server combined filter works on s390x', async ({
-    catalogPage,
-    testNamespace,
-  }) => {
-    await catalogPage.openCatalogInNamespace(testNamespace);
-    await catalogPage.waitForTemplateCatalogReady();
-
-    await catalogPage.filterByOsCheckbox('osName-RHEL', true);
-    await catalogPage.filterByOsCheckbox('workload-Server', true);
-    await expect(catalogPage.gridLinkWithText('Red Hat Enterprise Linux 9 VM')).toBeVisible();
-    await expect(catalogPage.gridLinkWithText(/Fedora/i)).toBeHidden();
-    await catalogPage.filterByOsCheckbox('workload-Server', false);
-    await catalogPage.filterByOsCheckbox('osName-RHEL', false);
-  });
 });

@@ -106,8 +106,26 @@ export class MigrationPoliciesPage extends ResourceListPage {
       .filter({ hasText: /Project labels/i })
       .getByRole('button', { name: 'Edit' })
       .click();
-    await this.page.locator('#tags-input, [data-test="tags-input"]').fill(label);
-    await this.page.getByRole('button', { name: 'Save' }).click();
+    // Prefer #tab-modal with Edit labels copy — avoid a stale/empty dialog shell.
+    const dialog = this.page
+      .locator('#tab-modal')
+      .filter({ hasText: /Edit labels/i })
+      .or(this.page.getByRole('dialog').filter({ hasText: /Edit labels/i }))
+      .first();
+    await dialog.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
+    // react-tagsinput: the real input has id/data-test tags-input (placeholder only when empty).
+    const textbox = dialog.locator('#tags-input, [data-test="tags-input"]');
+    await textbox.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
+    await textbox.fill(label);
+    await textbox.blur().catch(() => undefined);
+    const save = dialog
+      .getByTestId('save-button')
+      .or(dialog.locator('[data-test="save-button"]'))
+      .or(dialog.getByRole('button', { name: /^Save$/i }));
+    await save.first().click();
+    await dialog
+      .waitFor({ state: 'hidden', timeout: TestTimeouts.UI_ACTION_COMPLETE })
+      .catch(() => undefined);
   }
 
   editPolicyModalHeading(): Locator {

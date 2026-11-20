@@ -24,20 +24,62 @@ function kubevirtUserSettingsNamespace(cnvNamespace?: string): string {
   return cnvNamespace ?? EnvVariables.cnvNamespace;
 }
 
-async function createNamespacedResource(
-  apiPath: string,
+/** Create or replace so 409 does not leave a stale Role from an older rule set. */
+async function applyNamespacedResource(
+  collectionPath: string,
+  name: string,
   body: Record<string, unknown>,
   kubeconfigPath?: string,
 ): Promise<void> {
-  const response = await clusterKubernetesJson('POST', apiPath, body, undefined, kubeconfigPath);
-  if (!response.ok && response.status !== 409) {
-    throw new Error(
-      `Create ${apiPath} failed (${response.status}): ${response.text.slice(0, 500)}`,
+  const instancePath = `${collectionPath}/${name}`;
+  const existing = await clusterKubernetesJson(
+    'GET',
+    instancePath,
+    undefined,
+    undefined,
+    kubeconfigPath,
+  );
+  if (existing.ok) {
+    const current = JSON.parse(existing.text) as { metadata?: { resourceVersion?: string } };
+    const metadata = (body.metadata ?? {}) as Record<string, unknown>;
+    const putBody = {
+      ...body,
+      metadata: { ...metadata, resourceVersion: current.metadata?.resourceVersion },
+    };
+    const put = await clusterKubernetesJson(
+      'PUT',
+      instancePath,
+      putBody,
+      undefined,
+      kubeconfigPath,
     );
+    if (!put.ok) {
+      throw new Error(`Replace ${instancePath} failed (${put.status}): ${put.text.slice(0, 500)}`);
+    }
+    return;
+  }
+  const create = await clusterKubernetesJson(
+    'POST',
+    collectionPath,
+    body,
+    undefined,
+    kubeconfigPath,
+  );
+  if (!create.ok && create.status !== 409) {
+    throw new Error(
+      `Create ${collectionPath} failed (${create.status}): ${create.text.slice(0, 500)}`,
+    );
+  }
+  if (create.status === 409) {
+    await applyNamespacedResource(collectionPath, name, body, kubeconfigPath);
   }
 }
 
-/** Role + RoleBinding so non-priv users can GET `openshift-cnv/kubevirt-user-settings`. */
+/**
+ * Role + RoleBinding so non-priv users can read `openshift-cnv/kubevirt-user-settings`.
+ * Console informers need namespace list/watch; resourceNames-only list/watch always 403s → empty
+ * settings → Welcome modal ignores the kubeadmin ConfigMap patch.
+ */
 export async function ensureKubevirtUserSettingsReaderRbac(
   options: { cnvNamespace?: string; kubeconfigPath?: string } = {},
 ): Promise<void> {
@@ -52,7 +94,12 @@ export async function ensureKubevirtUserSettingsReaderRbac(
         apiGroups: [''],
         resourceNames: [KUBEVIRT_USER_SETTINGS_CONFIG_MAP],
         resources: ['configmaps'],
-        verbs: ['get', 'list', 'watch'],
+        verbs: ['get', 'update', 'patch'],
+      },
+      {
+        apiGroups: [''],
+        resources: ['configmaps'],
+        verbs: ['list', 'watch'],
       },
     ],
   };
@@ -76,13 +123,15 @@ export async function ensureKubevirtUserSettingsReaderRbac(
       },
     ],
   };
-  await createNamespacedResource(
+  await applyNamespacedResource(
     `/apis/rbac.authorization.k8s.io/v1/namespaces/${namespace}/roles`,
+    USER_SETTINGS_ROLE_NAME,
     role,
     kubeconfigPath,
   );
-  await createNamespacedResource(
+  await applyNamespacedResource(
     `/apis/rbac.authorization.k8s.io/v1/namespaces/${namespace}/rolebindings`,
+    USER_SETTINGS_ROLE_BINDING_NAME,
     roleBinding,
     kubeconfigPath,
   );

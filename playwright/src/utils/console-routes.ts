@@ -12,7 +12,7 @@ export const ConsoleRoutes = {
       return `/k8s/ns/${namespace}/templatescatalog`;
     }
     if (EnvVariables.useVmWizardCatalogEntry) {
-      return `/k8s/ns/${namespace}/vm-wizard`;
+      return `/vm-wizard`;
     }
     return `/k8s/ns/${namespace}/catalog`;
   },
@@ -61,9 +61,16 @@ export const ConsoleRoutes = {
   virtualMachines: () => '/k8s/all-namespaces/kubevirt.io~v1~VirtualMachine',
   virtualMachinesInNamespace: (namespace: string) =>
     `/k8s/ns/${namespace}/kubevirt.io~v1~VirtualMachine`,
-  vmWizard: (namespace: string) => `/k8s/ns/${namespace}/vm-wizard`,
+  // Product getVMWizardURL() serves /vm-wizard; namespaced /k8s/ns/<ns>/vm-wizard 404s.
+  vmWizard: (namespace?: string) => {
+    void namespace;
+    return `/vm-wizard`;
+  },
   /** VM creation wizard (when deployed). */
-  vmWizardCatalog: (namespace: string) => `/k8s/ns/${namespace}/vm-wizard`,
+  vmWizardCatalog: (namespace?: string) => {
+    void namespace;
+    return `/vm-wizard`;
+  },
 };
 
 /** Default project for catalog nav before `switchProject` in specs. */

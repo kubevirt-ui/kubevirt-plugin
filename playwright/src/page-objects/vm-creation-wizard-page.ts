@@ -42,6 +42,45 @@ export class VmCreationWizardPage extends BasePage {
   async openFromVirtualMachinesList(vmListPage: VmListPage, namespace: string): Promise<void> {
     await vmListPage.openVmCreationWizard(namespace);
     await this.waitForWizardReady();
+    // /vm-wizard does not bind Location to the list namespace — default is often "default".
+    await this.selectLocationProject(namespace);
+  }
+
+  async selectLocationProject(namespace: string): Promise<void> {
+    const locationText = this.page
+      .locator('.vm-creation-wizard')
+      .getByText(/Project/i)
+      .first();
+    const shown = ((await locationText.textContent().catch(() => '')) ?? '').includes(namespace);
+    if (shown) {
+      return;
+    }
+
+    const editBtn = this.page.getByRole('button', { name: 'Edit VM creation location' });
+    const toggle = this.page
+      .locator('.vm-creation-wizard')
+      .getByTestId('namespace-dropdown-menu-toggle');
+    if (
+      !(await toggle
+        .first()
+        .isVisible()
+        .catch(() => false))
+    ) {
+      await editBtn.click({ force: true });
+    }
+    await toggle.first().waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
+    await this.robustClick(toggle.first());
+
+    const filter = this.page.getByTestId('dropdown-text-filter');
+    await filter.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
+    await filter.fill(namespace);
+    const option = this.page.getByRole('menuitem', { name: namespace, exact: true });
+    await option.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
+    await this.robustClick(option);
+    await toggle
+      .filter({ hasText: namespace })
+      .first()
+      .waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
   }
 
   async openFromTreeNamespace(vmListPage: VmListPage, namespace: string): Promise<void> {

@@ -10,7 +10,6 @@ test.describe(
   () => {
     test('Description edit persists across Back/Next navigation', async ({
       apiClient,
-      vmListPage,
       vmWizardNavigationPage,
       vmWizardBootSourcePage,
       vmWizardComputePage,
@@ -25,14 +24,12 @@ test.describe(
 
       const wizardNs = await utils.setupTestNamespace(apiClient, 'wizard-custom-edit');
 
-      await vmListPage.switchToVirtualizationPerspective();
-      await vmListPage.navigateToProjectVmListViaUI(wizardNs);
-      await vmWizardNavigationPage.openWizardFromCreateDropdown();
+      await vmWizardNavigationPage.navigateToWizardInNamespace(wizardNs);
 
       const wizardVisible = await vmWizardNavigationPage.verifyWizardVisible();
       expect(wizardVisible, 'Wizard should open').toBe(true);
 
-      await test.step('Step 1: Deployment details — Custom configuration, generate name', async () => {
+      await test.step('Step 1: Deployment details — Custom configuration, name + description', async () => {
         const isCustomSelected = await vmWizardNavigationPage.verifyCreationMethodCardSelected(
           'newVm',
         );
@@ -41,13 +38,17 @@ test.describe(
           .toBe(true);
 
         await vmWizardNavigationPage.generateVmName();
+        // Description lives in the wizard buffer (vmDescription); Customization modal-only
+        // edits are wiped when Compute regenerates the VM — set it here so Back/Next survives.
+        await vmWizardNavigationPage.fillDeploymentDescription('persisted description');
         await vmWizardNavigationPage.clickNext();
       });
 
-      await test.step('Step 2: Guest OS — wait for async OS type load, then Next', async () => {
+      await test.step('Step 2: Guest OS — select preference, then Next', async () => {
+        await vmWizardNavigationPage.ensureGuestOsPreferenceSelected();
         await expect
           .poll(() => vmWizardNavigationPage.isNextButtonDisabled(), {
-            message: 'Next should enable once the guest OS type list finishes loading',
+            message: 'Next should enable once a guest OS preference is selected',
             timeout: utils.TestTimeouts.UI_ACTION_COMPLETE,
           })
           .toBe(false);
@@ -77,20 +78,16 @@ test.describe(
 
       let vmName = '';
 
-      await test.step('Step 5: Customization — edit Description', async () => {
+      await test.step('Step 5: Customization — description from Deployment details is shown', async () => {
         const custVisible = await vmWizardComputePage.verifyCustomizationStepVisible();
         expect(custVisible, 'Customization step should be visible').toBe(true);
 
         vmName = await vmWizardComputePage.getCustomizationVmName();
         expect(vmName.length, 'VM name should be available on the Details tab').toBeGreaterThan(0);
 
-        await vmWizardComputePage.openCustomizationDescriptionModal(vmName);
-        await vmWizardComputePage.fillCustomizationDescriptionModal('persisted description');
-        await vmWizardComputePage.saveCustomizationDescriptionModal();
-
         await expect
           .poll(() => vmWizardComputePage.getCustomizationDescription(vmName), {
-            message: 'The edited description should render immediately',
+            message: 'Deployment-details description should appear on Customization',
             timeout: utils.TestTimeouts.UI_ACTION_COMPLETE,
           })
           .toContain('persisted description');
