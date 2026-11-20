@@ -1,11 +1,7 @@
-// @ai-rules:
-// 1. [Pattern]: Cluster scope for the Family availability section. Only ACM "All clusters" exposes a selector;
-//    ACM single-cluster routes and standalone console keep using the URL cluster param.
-// 2. [Gotcha]: `hubClusterName` loads asynchronously, so `cluster` can be undefined on first render of All clusters.
 import { useCallback, useState } from 'react';
 
 import useClusterParam from '@multicluster/hooks/useClusterParam';
-import useIsAllClustersPage from '@multicluster/hooks/useIsAllClustersPage';
+import useIsACMPage from '@multicluster/useIsACMPage';
 import { useHubClusterName } from '@stolostron/multicluster-sdk';
 
 type UseFamilyAvailabilityCluster = () => {
@@ -16,14 +12,14 @@ type UseFamilyAvailabilityCluster = () => {
 };
 
 const useFamilyAvailabilityCluster: UseFamilyAvailabilityCluster = () => {
-  const isAllClustersPage = useIsAllClustersPage();
+  const isACMPage = useIsACMPage();
   const clusterParam = useClusterParam();
   const [hubClusterName] = useHubClusterName();
   const [selected, setSelected] = useState<string>();
 
   const onClusterChange = useCallback((newCluster: string) => setSelected(newCluster), []);
 
-  if (!isAllClustersPage) {
+  if (!isACMPage) {
     return {
       cluster: clusterParam,
       onClusterChange,
@@ -32,7 +28,7 @@ const useFamilyAvailabilityCluster: UseFamilyAvailabilityCluster = () => {
     };
   }
 
-  const selectedCluster = selected ?? hubClusterName;
+  const selectedCluster = selected ?? clusterParam ?? hubClusterName;
 
   return {
     cluster: selectedCluster,
