@@ -3,8 +3,10 @@ import { type TFunction } from 'i18next';
 
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import Timestamp from '@kubevirt-utils/components/Timestamp/Timestamp';
+import { getDescription } from '@kubevirt-utils/resources/shared';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { getIPAddressesDisplayValue, getVMINodeName } from '@kubevirt-utils/resources/vmi';
+import { Truncate } from '@patternfly/react-core';
 
 import VMIPCell from './cells/VMIPCell';
 import VMNodeCell from './cells/VMNodeCell';
@@ -13,7 +15,20 @@ import { filterConditions } from './components/VirtualMachineRow/utils/utils';
 import { VMStatusConditionLabelList } from './components/VMStatusConditionLabel';
 import { getConditionsDisplayValue } from './components/VMStatusConditionLabel/utils';
 import { VM_COLUMN_KEYS, type VMCallbacks, type VMColumn } from './vmColumnTypes';
-import { sortByNode } from './vmSortFunctions';
+import { sortByDescription, sortByNode } from './vmSortFunctions';
+
+export const getDescriptionColumn = (t: TFunction): VMColumn => ({
+  additional: true,
+  getValue: (row: V1VirtualMachine): string => getDescription(row) ?? NO_DATA_DASH,
+  key: VM_COLUMN_KEYS.description,
+  label: t('Description'),
+  renderCell: (row: V1VirtualMachine): ReactNode => {
+    const description = getDescription(row);
+    return description ? <Truncate content={description} /> : NO_DATA_DASH;
+  },
+  sort: sortByDescription,
+  sortable: true,
+});
 
 export const getStatusColumn = (t: TFunction): VMColumn => ({
   getValue: (row: V1VirtualMachine): string => row?.status?.printableStatus ?? '',

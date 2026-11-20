@@ -15,6 +15,7 @@ import useCurrentTime from '@kubevirt-utils/hooks/useCurrentTime';
 import { TREE_VIEW_FOLDERS } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getDescription } from '@kubevirt-utils/resources/shared';
 import { getInstanceTypeMatcher, hasNUMAConfiguration } from '@kubevirt-utils/resources/vm';
 import { NO_DATA_DASH } from '@kubevirt-utils/resources/vm/utils/constants';
 import { getOSLabel } from '@kubevirt-utils/resources/vm/utils/operation-system/operationSystem';
@@ -79,6 +80,11 @@ const OverviewDetailsDescriptionList: FC<OverviewDetailsDescriptionListProps> = 
         treeViewFoldersEnabled={treeViewFoldersEnabled}
         vm={vm}
         vmi={vmi}
+      />
+      <DescriptionItem
+        data-test="virtual-machine-overview-details-description"
+        descriptionData={getDescription(vm) ?? NO_DATA_DASH}
+        descriptionHeader={t('Description')}
       />
       <DescriptionItem
         data-test="virtual-machine-overview-details-os"
