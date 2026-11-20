@@ -16,7 +16,7 @@ import { logVMCloned } from '@kubevirt-utils/extensions/telemetry/vm-storage';
 import { WatchedResourceKeyPrefix } from '@kubevirt-utils/hooks/useInFlightToast/features/watchedResources/types/types';
 import { getWatchedResourcesActions } from '@kubevirt-utils/hooks/useInFlightToast/shared/selectors/inFlightToastStoreSelectors';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getNamespace } from '@kubevirt-utils/resources/shared';
+import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { isVM } from '@kubevirt-utils/utils/typeGuards';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { Divider, ModalVariant } from '@patternfly/react-core';
@@ -57,6 +57,7 @@ const CloneVMModal: FC<CloneVMModalProps> = ({ headerText, isOpen, onClose, sour
 
   const handleSendCloneRequest = async (
     cluster: string | undefined,
+    sourceToClone: V1beta1VirtualMachineSnapshot | V1VirtualMachine,
     values: CloneVMModalFormValues,
   ): Promise<void> => {
     const metadataName = generateName(values.name);
@@ -78,7 +79,7 @@ const CloneVMModal: FC<CloneVMModalProps> = ({ headerText, isOpen, onClose, sour
         description: values.description,
         metadataName,
         namespace,
-        source,
+        source: sourceToClone,
         startVM: values.startCloneVM,
         targetName: values.name,
       });
@@ -95,13 +96,22 @@ const CloneVMModal: FC<CloneVMModalProps> = ({ headerText, isOpen, onClose, sour
   const handleSubmit = async (): Promise<void> => {
     const values = getValues();
     const cluster = getCluster(source);
-    const vmSameName = await vmExists(values.name, namespace, cluster);
+    const [sourceToClone, vmSameName] = await Promise.all([
+      isVM(source)
+        ? vmExists(getName(source), getNamespace(source), cluster)
+        : Promise.resolve(source),
+      vmExists(values.name, namespace, cluster),
+    ]);
+
+    if (!sourceToClone) {
+      throw new Error(t('{{name}} VirtualMachine no longer exists', { name: getName(source) }));
+    }
 
     if (vmSameName) {
       throw new Error(t('VirtualMachine with this name already exists'));
     }
 
-    await handleSendCloneRequest(cluster, values);
+    await handleSendCloneRequest(cluster, sourceToClone, values);
     onClose();
   };
 

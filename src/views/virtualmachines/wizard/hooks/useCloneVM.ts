@@ -107,8 +107,8 @@ const useCloneVM: UseCloneVM = () => {
       const request = await createCloneRequest({
         description: targetDescription,
         namespace: targetProject,
-        source,
-        startVM: source.spec?.runStrategy !== RUNSTRATEGY_HALTED,
+        source: vmToClone,
+        startVM: vmToClone.spec?.runStrategy !== RUNSTRATEGY_HALTED,
         targetName,
       });
 

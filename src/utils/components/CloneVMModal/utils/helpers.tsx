@@ -15,6 +15,8 @@ import {
   buildRunStrategyPatches,
   getStartingRunStrategy,
 } from '@kubevirt-utils/components/RunStrategyModal/utils';
+import { fetchProjectNetworkSettings } from '@kubevirt-utils/resources/namespace/fetchProjectNetworkSettings';
+import { getProjectPodNetworkPatches } from '@kubevirt-utils/resources/namespace/podNetworkPolicy';
 import { getEffectiveRunStrategy } from '@kubevirt-utils/resources/vm/utils/selectors';
 import { isVM } from '@kubevirt-utils/utils/typeGuards';
 import { getRandomChars, truncateToK8sName } from '@kubevirt-utils/utils/utils';
@@ -55,7 +57,7 @@ type CloneVMParams = {
   targetName: string;
 };
 
-export const cloneVM = ({
+export const cloneVM = async ({
   description,
   metadataName,
   namespace,
@@ -63,6 +65,15 @@ export const cloneVM = ({
   startVM,
   targetName,
 }: CloneVMParams): Promise<V1beta1VirtualMachineClone> => {
+  let projectPodNetworkPatches: Patch[] = [];
+
+  if (isVM(source)) {
+    const { isPodNetworkAllowed } = await fetchProjectNetworkSettings({
+      cluster: source.cluster,
+      namespaceName: namespace,
+    });
+    projectPodNetworkPatches = getProjectPodNetworkPatches(source, isPodNetworkAllowed);
+  }
   const cloningRequest = produce(cloneVMToVM, (draftCloneData) => {
     draftCloneData.spec.source = {
       apiGroup: isVM(source) ? VirtualMachineModel.apiGroup : VirtualMachineSnapshotModel.apiGroup,
@@ -78,7 +89,7 @@ export const cloneVM = ({
 
     draftCloneData.spec.volumeNamePolicy = VolumeNamePolicy.PrefixTargetName;
 
-    const patches: Patch[] = [];
+    const patches = projectPodNetworkPatches;
 
     if (startVM) {
       const sourceVM = source as V1VirtualMachine;
