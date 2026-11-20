@@ -31,6 +31,9 @@ const isFolderItem = (item: TreeViewDataItem): boolean =>
 
 const isVMItem = (item: TreeViewDataItem): boolean => !item.children;
 
+export const shallowCloneTreeViewItems = (items: TreeViewDataItem[]): TreeViewDataItem[] =>
+  items.map((item) => Object.assign({}, item));
+
 // searches for clusters, projects and folders
 export const filterItems = (item: TreeViewDataItem, input: string): boolean => {
   if (isVMItem(item)) {
@@ -46,9 +49,9 @@ export const filterItems = (item: TreeViewDataItem, input: string): boolean => {
   }
 
   if (item.children) {
-    const filteredChildren = item.children
-      .map((opt) => Object.assign({}, opt))
-      .filter((child) => filterItems(child, input));
+    const filteredChildren = shallowCloneTreeViewItems(item.children).filter((child) =>
+      filterItems(child, input),
+    );
     item.children = filteredChildren;
     return filteredChildren.length > 0;
   }
@@ -80,9 +83,9 @@ export const filterNamespaceItems = (
   }
 
   if (item.children) {
-    item.children = item.children
-      .map((opt) => Object.assign({}, opt))
-      .filter((child) => filterNamespaceItems(child, showEmptyProjects));
+    item.children = shallowCloneTreeViewItems(item.children).filter((child) =>
+      filterNamespaceItems(child, showEmptyProjects),
+    );
 
     return (
       item.children.length > 0 ||
@@ -105,7 +108,9 @@ export const getAllTreeViewVMItems = (treeData: TreeViewDataItem[]): TreeViewDat
 export const getAllRightClickableTreeViewItems = (
   treeData: TreeViewDataItem[],
 ): TreeViewDataItem[] =>
-  getAllTreeViewItems(treeData).filter((treeItem) => !treeItem.id.startsWith(ALL_CLUSTERS_ID));
+  getAllTreeViewItems(treeData).filter(
+    (treeItem) => !treeItem.id?.startsWith(ALL_CLUSTERS_ID) && !isClusterSetItem(treeItem),
+  );
 
 export const getAllTreeViewFolderItems = (treeData: TreeViewDataItem[]): TreeViewDataItem[] =>
   getAllTreeViewItems(treeData)?.filter((treeItem) => isFolderItem(treeItem)) || [];

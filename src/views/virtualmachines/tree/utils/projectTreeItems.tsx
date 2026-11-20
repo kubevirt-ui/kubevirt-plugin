@@ -3,9 +3,9 @@ import { getVMListNamespacesURL } from '@multicluster/urls';
 import { Tooltip } from '@patternfly/react-core';
 import { FolderIcon, FolderOpenIcon, ProjectDiagramIcon } from '@patternfly/react-icons';
 
+import { buildTreeItemQuery } from './query-params/treeItemQuery';
 import { type ProjectMapEntry } from './treeItemBuilders';
 import {
-  buildTreeItemQuery,
   getFolderTreeViewItemID,
   getProjectTreeViewItemID,
   type TreeViewDataItemWithHref,
