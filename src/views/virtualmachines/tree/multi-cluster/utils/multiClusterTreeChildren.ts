@@ -6,6 +6,7 @@ import {
   buildClusterSetTreeSingleNode,
   getClusterNamesToDisplayInTree,
 } from '@virtualmachines/tree/cluster-set/utils/clusterSetTreeItems';
+import { isClusterSetSelectedInQuery } from '@virtualmachines/tree/cluster-set/utils/clusterSetTreeSelection';
 
 import { DEFAULT_CLUSTER_SET_KEY, GLOBAL_CLUSTER_SET_KEY } from '../consts/constants';
 import { type BuildMultiClusterTreeChildrenArgs } from '../types/types';
@@ -24,8 +25,11 @@ const buildClusterSetTreeNodes = (
 
     return buildClusterSetTreeSingleNode({
       children: clusterChildren,
+      clusterNamesInSet: clustersInClusterSet,
       clusterSetName,
-      defaultExpanded: clustersInClusterSet.includes(args.vmCluster),
+      defaultExpanded:
+        isClusterSetSelectedInQuery(clustersInClusterSet, args.queryParams) ||
+        clustersInClusterSet.includes(args.vmCluster),
       queryParams: args.queryParams,
       t,
       treeViewDataMap: args.treeViewDataMap,
