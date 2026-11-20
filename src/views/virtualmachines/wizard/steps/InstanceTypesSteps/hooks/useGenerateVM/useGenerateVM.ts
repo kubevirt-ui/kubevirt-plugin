@@ -4,6 +4,7 @@ import { useWatch } from 'react-hook-form';
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { KUBEVIRT_OS } from '@kubevirt-utils/constants/instancetypes-and-preferences';
 import useDeepCompareMemoize from '@kubevirt-utils/hooks/useDeepCompareMemoize/useDeepCompareMemoize';
+import useDefaultRunStrategy from '@kubevirt-utils/hooks/useDefaultRunStrategy/useDefaultRunStrategy';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import useHyperConvergeConfiguration from '@kubevirt-utils/hooks/useHyperConvergeConfiguration';
 import useIsIPv6SingleStackCluster from '@kubevirt-utils/hooks/useIPStackType/useIsIPv6SingleStackCluster';
@@ -49,6 +50,7 @@ const useGenerateVM = (autoLabelsLoading: boolean): UseGenerateVMResult => {
   const selectedBootableVolume = bootVolume?.volume ?? null;
 
   const { featureEnabled: autoUpdateEnabled } = useFeatures(AUTOMATIC_UPDATE_FEATURE_NAME);
+  const defaultRunStrategy = useDefaultRunStrategy(cluster);
   const { subscriptionData } = useRHELAutomaticSubscription();
 
   const validNamespace = getValidNamespace(project);
@@ -98,6 +100,7 @@ const useGenerateVM = (autoLabelsLoading: boolean): UseGenerateVMResult => {
         isIPv6SingleStack,
         isUDNManagedNamespace,
         populatedCloudInitYAML,
+        runStrategy: defaultRunStrategy,
         sshSecretName: defaultSSHSecretName,
         vmCreationNad,
         vmName,
@@ -110,6 +113,7 @@ const useGenerateVM = (autoLabelsLoading: boolean): UseGenerateVMResult => {
 
     return isWindowsOSVolume ? addWinDriverVolume(generatedVM, driversImage) : generatedVM;
   }, [
+    defaultRunStrategy,
     defaultSSHSecretName,
     driversImage,
     enableMultiArchBootImageImport,
@@ -129,6 +133,7 @@ const useGenerateVM = (autoLabelsLoading: boolean): UseGenerateVMResult => {
       enableMultiArchBootImageImport,
       isIPv6SingleStack,
       isUDNManagedNamespace,
+      runStrategy: defaultRunStrategy,
       sshSecretName: defaultSSHSecretName,
       vmCreationNad,
     },

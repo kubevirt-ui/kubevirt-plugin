@@ -17,16 +17,17 @@ type UseRunStrategyToggleResult = {
 
 export const useRunStrategyToggle = (
   vmOrRunStrategy: RunStrategy | undefined | V1VirtualMachine,
+  defaultRunStrategy: RunStrategy = getDefaultRunningStrategy(),
 ): UseRunStrategyToggleResult => {
   const runStrategy =
     typeof vmOrRunStrategy === 'string'
       ? vmOrRunStrategy
-      : (getEffectiveRunStrategy(vmOrRunStrategy) ?? getDefaultRunningStrategy());
+      : (getEffectiveRunStrategy(vmOrRunStrategy) ?? defaultRunStrategy);
 
   const isManual = isRunStrategyManual(runStrategy);
   const isActive = isRunStrategyNotHalted(runStrategy);
 
-  const previousRunStrategyRef = useRef(getDefaultRunningStrategy());
+  const previousRunStrategyRef = useRef(defaultRunStrategy);
   const [manualChecked, setManualChecked] = useState(isActive);
 
   useEffect(() => {

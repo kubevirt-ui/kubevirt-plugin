@@ -6,6 +6,7 @@ import VMActionsConfirmation from '@settings/tabs/ClusterTab/components/GeneralS
 
 import AdvancedCDROMFeatures from '../AdvancedCDROMFeatures/AdvancedCDROMFeatures';
 import AutomaticallyGrantVirtualizationRoles from '../AutomaticallyGrantVirtualizationRoles/AutomaticallyGrantVirtualizationRoles';
+import DefaultRunStrategy from '../DefaultRunStrategy/DefaultRunStrategy';
 import HideYamlTab from '../HideYamlTab/HideYamlTab';
 import LiveMigrationSection from '../LiveMigrationSection/LiveMigrationSection';
 import MemoryDensity from '../MemoryDensity/MemoryDensity';
@@ -22,6 +23,7 @@ type GeneralSettingsSection = {
 type GeneralSettingsLabels = {
   advancedCDROMFeatures: string;
   automaticallyGrantVirtualizationRoles: string;
+  defaultRunStrategy: string;
   liveMigration: string;
   memoryRequestRatio: string;
   sshConfigurations: string;
@@ -33,6 +35,7 @@ type GeneralSettingsLabels = {
 export const getGeneralSettingsLabels = (t: TFunction): GeneralSettingsLabels => ({
   advancedCDROMFeatures: t('Advanced CD-ROM features'),
   automaticallyGrantVirtualizationRoles: t('Automatically grant Virtualization roles'),
+  defaultRunStrategy: t('Default run strategy'),
   liveMigration: t('Live migration'),
   memoryRequestRatio: t('Memory request ratio'),
   sshConfigurations: t('SSH configurations'),
@@ -45,6 +48,7 @@ export const getGeneralSettingsSections = (t: TFunction): GeneralSettingsSection
   const labels = getGeneralSettingsLabels(t);
   return [
     { Component: AdvancedCDROMFeatures, label: labels.advancedCDROMFeatures },
+    { Component: DefaultRunStrategy, label: labels.defaultRunStrategy },
     {
       Component: AutomaticallyGrantVirtualizationRoles,
       label: labels.automaticallyGrantVirtualizationRoles,

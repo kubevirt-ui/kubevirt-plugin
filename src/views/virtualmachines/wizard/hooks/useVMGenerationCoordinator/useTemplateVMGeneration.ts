@@ -8,6 +8,7 @@ import {
   CUSTOMIZE_VM_FAILED,
 } from '@kubevirt-utils/extensions/telemetry/utils/constants';
 import { logVMCreationFailedFromTemplate } from '@kubevirt-utils/extensions/telemetry/vm-creation';
+import useDefaultRunStrategy from '@kubevirt-utils/hooks/useDefaultRunStrategy/useDefaultRunStrategy';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
 import { USER_SETTINGS_KEYS } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/const';
@@ -50,6 +51,7 @@ const useTemplateVMGeneration = ({
   } = useVMWizardState();
   const { getValues, setValue } = useVMWizardForm();
   const [authorizedSSHKeys] = useKubevirtUserSettings(USER_SETTINGS_KEYS.ssh, cluster);
+  const defaultRunStrategy = useDefaultRunStrategy(cluster);
   const authorizedSSHKeysRef = useRef(authorizedSSHKeys);
   const activeRequestRef = useRef<ActiveTemplateRequest | null>(null);
   const mountedRef = useRef(true);
@@ -96,6 +98,7 @@ const useTemplateVMGeneration = ({
       values,
       authorizedSSHKeys?.[namespace],
       getTemplateGenerationRevision(),
+      defaultRunStrategy,
     );
 
     if (!requestSnapshot) return Promise.resolve(false);
@@ -140,6 +143,7 @@ const useTemplateVMGeneration = ({
             currentValues,
             authorizedSSHKeysRef.current?.[currentNamespace],
             getTemplateGenerationRevision(),
+            defaultRunStrategy,
           ),
           requestSnapshot,
         )
@@ -159,6 +163,7 @@ const useTemplateVMGeneration = ({
 
         const generatedVM = applyBootSourceOverrideToVM(
           getVMObjectFromTemplate({
+            defaultRunStrategy: requestSnapshot.defaultRunStrategy,
             description: requestSnapshot.description,
             folder: requestSnapshot.folder,
             namespace,
@@ -199,6 +204,7 @@ const useTemplateVMGeneration = ({
     return promise;
   }, [
     authorizedSSHKeys,
+    defaultRunStrategy,
     failTemplateGeneration,
     getTemplateGenerationRevision,
     getValues,
