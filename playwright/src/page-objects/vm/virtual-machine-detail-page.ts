@@ -198,6 +198,10 @@ export default class VirtualMachineDetailPage extends PageCommons {
     return this.uploadToast.clickAbortUpload(fileName);
   }
 
+  async clickAddEnvironment() {
+    await this.configuration.clickAddEnvironment();
+  }
+
   async clickConfigurationStorageSubTab() {
     await this.configuration.clickConfigurationStorageSubTab();
   }
@@ -419,6 +423,10 @@ export default class VirtualMachineDetailPage extends PageCommons {
   }
   async getCloudInitValues(): Promise<{ username: string; password: string } | null> {
     return this.diagnostics.getCloudInitValues();
+  }
+
+  async getEnvironmentRowCount(): Promise<number> {
+    return this.configuration.getEnvironmentRowCount();
   }
   async getDiagnosticsOverviewCardCounts(): Promise<{
     critical: number;
