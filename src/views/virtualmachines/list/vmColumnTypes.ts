@@ -19,6 +19,7 @@ export const VM_COLUMN_KEYS = {
   cpuUsage: 'cpu-usage',
   created: 'created',
   deletionProtection: 'deletion-protection',
+  description: 'description',
   ipAddress: 'ip-address',
   memory: 'memory',
   memoryUsage: 'memory-usage',

@@ -3,6 +3,7 @@ import {
   getInstanceTypeCPU,
   getInstanceTypeMemory,
 } from '@kubevirt-utils/resources/instancetype/selectors';
+import { getDescription } from '@kubevirt-utils/resources/shared';
 import { vCPUCount } from '@kubevirt-utils/resources/template';
 import { getCPU, getMemory } from '@kubevirt-utils/resources/vm';
 import { getVMINodeName } from '@kubevirt-utils/resources/vmi';
@@ -16,7 +17,7 @@ import {
   getMemoryUsagePercentage,
   getNetworkUsagePercentage,
 } from './metrics';
-import { type VMCallbacks } from './virtualMachinesDefinition';
+import { type VMCallbacks } from './vmColumnTypes';
 
 const EMPTY_STRING_VALUE = '';
 const EMPTY_NUMBER_VALUE = 0;
@@ -61,6 +62,8 @@ export const sortByNode = createNullSafeSort(
   (vm, callbacks) => getVMINodeName(callbacks?.getVmi(vm)),
   true,
 );
+
+export const sortByDescription = createNullSafeSort((vm) => getDescription(vm), true);
 
 export const sortByMemoryUsage = createNullSafeSort((vm, callbacks) =>
   getMemoryUsagePercentage(vm, getMemory(callbacks?.getVmi(vm))),

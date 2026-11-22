@@ -10,6 +10,7 @@ import { type VMColumn } from './vmColumnTypes';
 import {
   getConditionsColumn,
   getCreatedColumn,
+  getDescriptionColumn,
   getIPAddressColumn,
   getNodeColumns,
   getStatusColumn,
@@ -35,6 +36,7 @@ export { VM_COLUMN_KEYS, type VMCallbacks } from './vmColumnTypes';
 export {
   getConditionsColumn,
   getCreatedColumn,
+  getDescriptionColumn,
   getIPAddressColumn,
   getNodeColumns,
   getStatusColumn,
@@ -67,6 +69,7 @@ export const getVMColumns = ({
 }: GetVMColumnsProps): VMColumn[] => [
   ...getSelectionColumns(hideActions),
   getNameColumn(t),
+  getDescriptionColumn(t),
   ...getClusterColumns(t, isAllClustersPage),
   ...getNamespaceColumns(t, namespace),
   getStatusColumn(t),
