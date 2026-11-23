@@ -130,6 +130,25 @@ export default class VirtualMachineDetailPage extends PageCommons {
     return this.disks.openEditDiskModal(diskName);
   }
 
+  async openDiskKebabMenu(diskName: string): Promise<void> {
+    return this.disks.openDiskKebabMenu(diskName);
+  }
+
+  async isUseAsIsoActionVisible(diskName: string): Promise<boolean> {
+    return this.disks.isUseAsIsoActionVisible(diskName);
+  }
+
+  async isUseAsIsoActionDisabled(diskName: string): Promise<boolean> {
+    return this.disks.isUseAsIsoActionDisabled(diskName);
+  }
+
+  async useDiskAsIso(
+    diskName: string,
+    options?: { expectSystemDiskSize?: boolean },
+  ): Promise<boolean> {
+    return this.disks.useDiskAsIso(diskName, options);
+  }
+
   async expandDiskAdvancedSettings(): Promise<void> {
     return this.disks.expandDiskAdvancedSettings();
   }

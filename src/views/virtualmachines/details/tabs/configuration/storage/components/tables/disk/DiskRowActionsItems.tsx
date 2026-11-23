@@ -63,13 +63,17 @@ const DiskRowActionsItems: FC<DiskRowActionsItemsProps> = ({
   const isoActionItem: ReactNode = isUseAsISODisabled ? (
     <Tooltip content={t('Stop the VirtualMachine to use this disk as ISO')}>
       <span>
-        <DropdownItem isDisabled key="use-as-iso">
+        <DropdownItem data-test="use-as-iso" isAriaDisabled isDisabled key="use-as-iso">
           {isoActionText}
         </DropdownItem>
       </span>
     </Tooltip>
   ) : (
-    <DropdownItem key="use-as-iso" onClick={(): void => onModalOpen(createUseAsISOModal)}>
+    <DropdownItem
+      data-test="use-as-iso"
+      key="use-as-iso"
+      onClick={(): void => onModalOpen(createUseAsISOModal)}
+    >
       {isoActionText}
     </DropdownItem>
   );
