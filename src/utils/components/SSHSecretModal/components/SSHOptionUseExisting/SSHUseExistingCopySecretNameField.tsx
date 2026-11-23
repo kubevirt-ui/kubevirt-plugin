@@ -23,7 +23,7 @@ const SSHUseExistingCopySecretNameField: FC = () => {
   const secretNameValidated = getValidatedOptionsFromFieldError(errors.sshSecretName);
 
   return (
-    <FormGroup label={t('New secret name')}>
+    <FormGroup fieldId="ssh-copy-secret-name" label={t('New secret name')}>
       <TextInput
         id="ssh-copy-secret-name"
         onChange={(_event, newSecretName: string) => {

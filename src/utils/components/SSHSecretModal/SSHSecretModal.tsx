@@ -13,8 +13,6 @@ import useSSHSecretFormResolver from './hooks/useSSHSecretFormResolver';
 import { resolveSSHSecretDetailsForSubmit } from './utils/sshSecretHelpers';
 import { SecretSelectionOption, type SSHSecretDetails } from './utils/types';
 
-const SSH_SUBMIT_VALIDATION_ERROR = 'SSH_SECRET_MODAL_VALIDATION';
-
 type SSHSecretModalProps = {
   cluster?: string;
   initialSSHSecretDetails: SSHSecretDetails;
@@ -69,30 +67,29 @@ const SSHSecretModal: FC<SSHSecretModalProps> = ({
 
   const handleSubmit = useCallback(
     () =>
-      submitForm(
-        async (formValues) => {
-          const sshDetails = resolveSSHSecretDetailsForSubmit(formValues, namespace);
+      submitForm(async (formValues) => {
+        const sshDetails = resolveSSHSecretDetailsForSubmit(formValues, namespace);
 
-          if (sshDetails.secretOption === SecretSelectionOption.AddNew) {
-            await createSSHSecret(
-              sshDetails.sshPubKey,
-              sshDetails.sshSecretName,
-              namespace,
-              cluster,
-              true,
-            );
-          }
+        if (sshDetails.secretOption === SecretSelectionOption.AddNew) {
+          await createSSHSecret(
+            sshDetails.sshPubKey,
+            sshDetails.sshSecretName,
+            namespace,
+            cluster,
+            true,
+          );
+        }
 
-          return onSubmit(sshDetails);
-        },
-        () => Promise.reject(new Error(SSH_SUBMIT_VALIDATION_ERROR)),
-      )(),
-    [cluster, namespace, onSubmit, submitForm],
+        await onSubmit(sshDetails);
+        await onClose();
+      })(),
+    [cluster, namespace, onClose, onSubmit, submitForm],
   );
 
   return (
     <FormProvider {...methods}>
       <TabModal
+        closeOnSubmit={false}
         headerText={t('Public SSH key')}
         isDisabled={!secretsLoaded || !isValid}
         isLoading={!secretsLoaded}
