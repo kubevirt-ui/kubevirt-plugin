@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import { type FC } from 'react';
 
 import {
@@ -8,6 +9,7 @@ import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/Descript
 import HeadlessMode from '@kubevirt-utils/components/HeadlessMode/HeadlessMode';
 import HostnameModal from '@kubevirt-utils/components/HostnameModal/HostnameModal';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
+import PanicDeviceDescriptionItem from '@kubevirt-utils/components/PanicDeviceDescriptionItem/PanicDeviceDescriptionItem';
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import VSOCKDetailsDescriptionItem from '@kubevirt-utils/components/VSOCKDetailsDescriptionItem/VSOCKDetailsDescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -94,6 +96,7 @@ const DetailsSectionAccessItems: FC<DetailsSectionAccessItemsProps> = ({
         updateVSOCK={(checked) => updateVSOCK(vm, checked)}
         vm={vm}
       />
+      <PanicDeviceDescriptionItem vm={vm} vmi={vmi} />
       <DescriptionItem
         bodyContent={t(
           'Applying the start/pause mode to this virtual machine will cause it to partially reboot and pause.',
@@ -154,7 +157,6 @@ const DetailsSectionAccessItems: FC<DetailsSectionAccessItemsProps> = ({
       />
     </>
   );
-  // eslint-disable-next-line max-lines
 };
 
 export default DetailsSectionAccessItems;

@@ -28,6 +28,6 @@ export const getPreferredBootmode = (
 };
 
 export const getPreferenceModelFromMatcher = (preferenceMatcher: V1PreferenceMatcher): K8sModel =>
-  preferenceMatcher?.kind === VirtualMachinePreferenceModel.kind
+  preferenceMatcher?.kind?.toLowerCase() === VirtualMachinePreferenceModel.kind.toLowerCase()
     ? VirtualMachinePreferenceModel
     : VirtualMachineClusterPreferenceModel;
