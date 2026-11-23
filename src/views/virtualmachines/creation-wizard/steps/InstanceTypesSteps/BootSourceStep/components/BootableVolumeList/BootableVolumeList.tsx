@@ -12,6 +12,7 @@ import { OS_IMAGES_NS } from '@kubevirt-utils/utils/utils';
 import { Card, FormGroup, Skeleton, Split, SplitItem } from '@patternfly/react-core';
 import useInstanceTypeVMStore from '@virtualmachines/creation-wizard/state/instance-type-vm-store/useInstanceTypeVMStore';
 import usePreferencesData from '@virtualmachines/creation-wizard/steps/InstanceTypesSteps/BootSourceStep/components/BootableVolumeList/hooks/usePreferencesData';
+import useOnSelectCreatedVolume from '@virtualmachines/creation-wizard/steps/InstanceTypesSteps/BootSourceStep/hooks/useOnSelectCreatedVolume';
 import {
   UseBootableVolumesValues,
   UseInstanceTypeAndPreferencesValues,
@@ -39,13 +40,13 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
   const isAdmin = useIsAdmin();
   const {
     dvSource,
-    onSelectCreatedVolume,
     pvcSource,
     selectedBootableVolume,
     setVolumeListNamespace,
     volumeListNamespace,
     volumeSnapshotSource,
   } = useInstanceTypeVMStore();
+  const onSelectCreatedVolume = useOnSelectCreatedVolume();
 
   // Non-admin users cannot list across all projects — default to the OS images
   // namespace where system bootable volumes live. If they explicitly pick a

@@ -19,12 +19,18 @@ export type InstanceTypeVMState = {
   volumeSnapshotSource?: VolumeSnapshotKind;
 };
 
+export type BootableVolumeFamilyAvailability = {
+  familiesLoaded?: boolean;
+  isFamilyVisible?: (series: string) => boolean;
+};
+
 export type InstanceTypeVMActions = {
   onSelectCreatedVolume: (
     selectedVolume: BootableVolume,
     pvcSource: IoK8sApiCoreV1PersistentVolumeClaim,
     volumeSnapshotSource: VolumeSnapshotKind,
     dvSource: V1beta1DataVolume,
+    familyAvailability?: BootableVolumeFamilyAvailability,
   ) => void;
   resetInstanceTypeVMState: () => void;
   setDVSource: (dvSource: V1beta1DataVolume) => void;
