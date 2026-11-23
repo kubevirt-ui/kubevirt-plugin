@@ -1,4 +1,4 @@
-import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { type V1VirtualMachine } from '@kubevirt-ui/kubevirt-api/kubevirt';
 import { getName } from '@kubevirt-utils/resources/shared';
 
 import { VM_ACTION_PERFORMED, VM_BULK_ACTION_PERFORMED } from './utils/constants';
