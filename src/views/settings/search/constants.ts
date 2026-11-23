@@ -5,6 +5,7 @@ export const CLUSTER_TAB_IDS = {
   automaticImagesDownload: 'automatic-images-download',
   automaticSubscriptionRhel: 'automatic-subscription-rhel',
   bootableVolumesProject: 'bootable-volumes-project',
+  defaultCPUModel: 'default-cpu-model',
   generalSettings: 'general-settings',
   guestManagement: 'guest-management',
   hideYamlTab: 'hide-yaml-tab',
@@ -52,6 +53,7 @@ export const SEARCH_ITEM_CHILDREN_TREE = {
   [CLUSTER_TAB_IDS.generalSettings]: [
     CLUSTER_TAB_IDS.advancedCDROMFeatures,
     CLUSTER_TAB_IDS.automaticGrantVirtualizationRoles,
+    CLUSTER_TAB_IDS.defaultCPUModel,
     CLUSTER_TAB_IDS.liveMigration,
     CLUSTER_TAB_IDS.memoryDensity,
     CLUSTER_TAB_IDS.sshConfiguration,

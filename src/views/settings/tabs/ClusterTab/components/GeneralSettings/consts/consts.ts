@@ -1,6 +1,7 @@
 import { type ComponentType } from 'react';
 import { type TFunction } from 'i18next';
 
+import DefaultCPUModel from '@settings/tabs/ClusterTab/components/GeneralSettings/DefaultCPUModel/DefaultCPUModel';
 import TemplatesAndImagesManagement from '@settings/tabs/ClusterTab/components/GeneralSettings/TemplatesAndImagesManagement/TemplatesAndImagesManagement';
 import VMActionsConfirmation from '@settings/tabs/ClusterTab/components/GeneralSettings/VMActionsConfirmation/VMActionsConfirmation';
 
@@ -22,6 +23,7 @@ type GeneralSettingsSection = {
 type GeneralSettingsLabels = {
   advancedCDROMFeatures: string;
   automaticallyGrantVirtualizationRoles: string;
+  defaultCPUModel: string;
   liveMigration: string;
   memoryRequestRatio: string;
   sshConfigurations: string;
@@ -33,6 +35,7 @@ type GeneralSettingsLabels = {
 export const getGeneralSettingsLabels = (t: TFunction): GeneralSettingsLabels => ({
   advancedCDROMFeatures: t('Advanced CD-ROM features'),
   automaticallyGrantVirtualizationRoles: t('Automatically grant Virtualization roles'),
+  defaultCPUModel: t('Default CPU model'),
   liveMigration: t('Live migration'),
   memoryRequestRatio: t('Memory request ratio'),
   sshConfigurations: t('SSH configurations'),
@@ -45,6 +48,7 @@ export const getGeneralSettingsSections = (t: TFunction): GeneralSettingsSection
   const labels = getGeneralSettingsLabels(t);
   return [
     { Component: AdvancedCDROMFeatures, label: labels.advancedCDROMFeatures },
+    { Component: DefaultCPUModel, label: labels.defaultCPUModel },
     {
       Component: AutomaticallyGrantVirtualizationRoles,
       label: labels.automaticallyGrantVirtualizationRoles,
