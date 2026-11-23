@@ -32,6 +32,8 @@ Automated E2E coverage for console routes under `tests/virtual-machines/detail/d
 
 ### vm-disk-serial
 
+### vm-use-as-iso
+
 ---
 
 ## 4. Test Case Definitions
@@ -178,3 +180,60 @@ Automated E2E coverage for console routes under `tests/virtual-machines/detail/d
 | Step | Action                                                                             | Expected Result                   |
 | :--- | :--------------------------------------------------------------------------------- | :-------------------------------- |
 | 1    | Run Playwright test: add blank disk with serial, verify in table, then edit serial | All expectations in the spec pass |
+
+---
+
+### Module: `vm-use-as-iso.spec.ts`
+
+**Spec file:** `tests/virtual-machines/detail/disks/vm-use-as-iso.spec.ts`
+**Describe:** `Tier1 VM Use as ISO — Configuration Storage` — **Tags:** `@tier1`, `@nonpriv`
+**Allure:** suite `Tier1 VM Use as ISO`, feature `Tier 1`
+
+---
+
+### `001`: Stopped RHEL9 — Use as ISO on extra disk converts to CD-ROM without blank size
+
+- **Objective:** Converting a non-boot blank disk to ISO media when `rootdisk` already exists does not
+  prompt for system disk size; the disk becomes CD-ROM and Use as ISO is hidden afterward.
+- **Target version:** CNV 5.1.0
+- **Jira References:** CNV-98887
+- **Pre-conditions:** Stopped RHEL9 VM from template
+- **Tags:** `@nonpriv`
+
+| Step | Action                                              | Expected Result                           |
+| :--- | :-------------------------------------------------- | :---------------------------------------- |
+| 1    | Attach a blank DataVolume disk via API              | Disk is present on the VM                 |
+| 2    | Use as ISO on that disk (no system disk size field) | Modal succeeds; drive column shows CD-ROM |
+| 3    | Check rootdisk                                      | rootdisk remains                          |
+| 4    | Open kebab on the converted disk                    | Use as ISO action is not shown            |
+
+---
+
+### `002`: Empty-disk VM — Use as ISO requires blank system disk and sets boot order
+
+- **Objective:** Converting the only installable disk shows system disk size, adds blank `rootdisk`,
+  and assigns bootOrder 1 (blank) / 2 (ISO).
+- **Target version:** CNV 5.1.0
+- **Jira References:** CNV-98887
+- **Pre-conditions:** Stopped VM created with `createVmWithEmptyDisk`
+- **Tags:** `@nonpriv`
+
+| Step | Action                                 | Expected Result                             |
+| :--- | :------------------------------------- | :------------------------------------------ |
+| 1    | Use as ISO on `emptydisk` with size UI | Conversion succeeds; emptydisk is CD-ROM    |
+| 2    | Check storage table                    | Blank `rootdisk` is present                 |
+| 3    | Read VM spec via API                   | rootdisk bootOrder=1, emptydisk bootOrder=2 |
+
+---
+
+### `003`: Running VM — Use as ISO disabled
+
+- **Objective:** Use as ISO is disabled on the disk kebab while the VM is running.
+- **Target version:** CNV 5.1.0
+- **Jira References:** CNV-98887
+- **Pre-conditions:** RHEL9 VM started and Running
+- **Tags:** `@nonpriv`
+
+| Step | Action                      | Expected Result        |
+| :--- | :-------------------------- | :--------------------- |
+| 1    | Open disk kebab on rootdisk | Use as ISO is disabled |

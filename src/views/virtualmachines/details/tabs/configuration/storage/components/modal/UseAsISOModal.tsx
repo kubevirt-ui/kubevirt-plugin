@@ -47,7 +47,7 @@ const UseAsISOModal: FC<UseAsISOModalProps> = ({
 
   return (
     <TabModal<V1VirtualMachine>
-      headerText={t('Use as ISO')}
+      headerText={t('Use as an ISO?')}
       isOpen={isOpen}
       onClose={onClose}
       onSubmit={handleSubmit}
@@ -55,16 +55,16 @@ const UseAsISOModal: FC<UseAsISOModalProps> = ({
       submitBtnText={t('Use as ISO')}
       submitBtnVariant={ButtonVariant.primary}
     >
-      <Stack hasGutter>
+      <Stack data-test="use-as-iso-modal" hasGutter>
         <StackItem>
           {needsBlank
             ? t(
-                'This volume will be used as installation media. A blank system disk is required to install the operating system.',
+                'The system will use this volume as installation media. A blank system disk is required to install the operating system.',
               )
-            : t('This volume will be used as installation media.')}
+            : t('The system will use this volume as installation media.')}
         </StackItem>
         {needsBlank && (
-          <StackItem>
+          <StackItem data-test="use-as-iso-system-disk-size">
             <CapacityInput
               isRequired={false}
               label={sizeLabel}

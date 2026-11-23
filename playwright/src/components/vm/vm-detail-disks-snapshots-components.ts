@@ -385,12 +385,124 @@ export class VirtualMachineDetailDisksComponent extends BaseComponent {
     });
   }
 
+  /** Opens the disk row kebab on Configuration → Storage. */
+  async openDiskKebabMenu(diskName: string): Promise<void> {
+    await this.navigateToConfigurationStorage();
+    const diskRow = this.getDiskRow(diskName);
+    await diskRow.waitFor({ state: 'visible', timeout: TestTimeouts.VM_CREATION });
+    const kebab = this.page
+      .locator(`#disk-actions-${diskName}`)
+      .or(diskRow.locator(this._diskRowActionsButton));
+    await kebab.first().waitFor({ state: 'visible', timeout: TestTimeouts.UI_ACTION_COMPLETE });
+    await this.robustClick(kebab.first());
+  }
+
+  private useAsIsoMenuItem() {
+    return this.testId('use-as-iso').or(
+      this.locator('[role="menu"] button', { hasText: 'Use as ISO' }),
+    );
+  }
+
+  /** Whether the Use as ISO kebab action is present for the disk. */
+  async isUseAsIsoActionVisible(diskName: string): Promise<boolean> {
+    try {
+      await this.openDiskKebabMenu(diskName);
+      return await this.useAsIsoMenuItem()
+        .first()
+        .isVisible({ timeout: TestTimeouts.UI_ELEMENT_VISIBILITY })
+        .catch(() => false);
+    } catch {
+      return false;
+    }
+  }
+
+  /** Whether the Use as ISO kebab action is disabled (e.g. VM running). */
+  async isUseAsIsoActionDisabled(diskName: string): Promise<boolean> {
+    try {
+      await this.openDiskKebabMenu(diskName);
+      const item = this.useAsIsoMenuItem().first();
+      await item.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+      return item.evaluate((el) => {
+        const target =
+          (el instanceof HTMLElement && el.closest('button, [role="menuitem"]')) || el;
+        if (!(target instanceof HTMLElement)) {
+          return false;
+        }
+        const ariaDisabled = target.getAttribute('aria-disabled') === 'true';
+        const attrDisabled = target.hasAttribute('disabled');
+        const classDisabled = target.className.includes('pf-m-disabled');
+        return ariaDisabled || attrDisabled || classDisabled;
+      });
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * Converts a non-CD-ROM disk to ISO media via the Use as ISO modal.
+   * When expectSystemDiskSize is true, asserts the blank system-disk size control is shown.
+   */
+  async useDiskAsIso(
+    diskName: string,
+    options?: { expectSystemDiskSize?: boolean },
+  ): Promise<boolean> {
+    try {
+      await this.openDiskKebabMenu(diskName);
+      const menuItem = this.useAsIsoMenuItem().first();
+      await menuItem.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ACTION_COMPLETE });
+      await this.robustClick(menuItem);
+
+      const modal = this._modal.filter({ has: this.testId('use-as-iso-modal') }).or(
+        this._modal.filter({ hasText: /Use as an ISO/i }),
+      );
+      await modal.first().waitFor({ state: 'visible', timeout: TestTimeouts.UI_ACTION_COMPLETE });
+
+      const sizeSection = this.testId('use-as-iso-system-disk-size');
+      const sizeVisible = await sizeSection
+        .isVisible({ timeout: TestTimeouts.UI_DELAY_MEDIUM })
+        .catch(() => false);
+      if (options?.expectSystemDiskSize === true && !sizeVisible) {
+        return false;
+      }
+      if (options?.expectSystemDiskSize === false && sizeVisible) {
+        return false;
+      }
+
+      const submit = modal
+        .first()
+        .locator('[data-test="save-button"]')
+        .filter({ hasText: 'Use as ISO' });
+      await submit.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ACTION_COMPLETE });
+      await this.robustClick(submit);
+      await modal.first().waitFor({ state: 'hidden', timeout: TestTimeouts.UI_ACTION_COMPLETE });
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
   async expandDiskAdvancedSettings(): Promise<void> {
-    await this._advancedSettingsButton.waitFor({
+    const nameInModal = this._modal.locator('#name').first();
+    const alreadyOpen = await nameInModal
+      .isVisible({ timeout: TestTimeouts.UI_DELAY_MEDIUM })
+      .catch(() => false);
+    if (alreadyOpen) {
+      return;
+    }
+
+    const advanced = this._modal
+      .locator('button:has-text("Advanced settings")')
+      .or(this._advancedSettingsButton)
+      .first();
+    await advanced.waitFor({
       state: 'visible',
       timeout: TestTimeouts.UI_ACTION_COMPLETE,
     });
-    await this.robustClick(this._advancedSettingsButton);
+    await this.robustClick(advanced);
+    await nameInModal.waitFor({
+      state: 'visible',
+      timeout: TestTimeouts.UI_ACTION_COMPLETE,
+    });
   }
 
   async addBlankDisk(diskName: string, size = '1', storageClass?: string): Promise<boolean> {
@@ -398,31 +510,38 @@ export class VirtualMachineDetailDisksComponent extends BaseComponent {
       await this.openAddBlankDiskModal();
       await this.expandDiskAdvancedSettings();
 
-      await this._name.waitFor({
+      const nameInput = this._modal.locator('#name').first();
+      await nameInput.waitFor({
         state: 'visible',
         timeout: TestTimeouts.INSTANCE_TYPE_VERIFICATION,
       });
-      await this._name.clear();
-      await this._name.fill(diskName);
+      await nameInput.click();
+      await nameInput.fill('');
+      await nameInput.fill(diskName);
+      await expect
+        .poll(async () => nameInput.inputValue(), {
+          timeout: TestTimeouts.UI_ACTION_COMPLETE,
+        })
+        .toBe(diskName);
 
       if (size) {
-        const sizeInputExists = await this._inputInput
+        const sizeInput = this._modal.locator('input[aria-label="Input"]').first();
+        const sizeInputExists = await sizeInput
           .isVisible({ timeout: TestTimeouts.UI_DELAY_LONG })
           .catch(() => false);
         if (sizeInputExists) {
-          await this._inputInput.clear();
-          for (let i = 0; i < parseInt(size); i++) {
-            await this.robustClick(this.locator('button[aria-label="Increment"]'));
-          }
+          await sizeInput.click();
+          await sizeInput.fill(size);
         }
       }
 
       if (storageClass) {
-        const scOpen = await this._storageClassSelect
+        const scSelect = this._modal.locator('[data-test="storage-class-select"]').first();
+        const scOpen = await scSelect
           .isVisible({ timeout: TestTimeouts.INSTANCE_TYPE_VERIFICATION })
           .catch(() => false);
         if (scOpen) {
-          await this.robustClick(this._storageClassSelect);
+          await this.robustClick(scSelect);
           const storageClassOption = this.getStorageClassOption(storageClass);
           const optVisible = await storageClassOption
             .isVisible({ timeout: TestTimeouts.INSTANCE_TYPE_VERIFICATION })
@@ -433,19 +552,15 @@ export class VirtualMachineDetailDisksComponent extends BaseComponent {
         }
       }
 
-      const dialogSaveVisible = await this.page
-        .locator('[role="dialog"]')
-        .locator('[data-test="save-button"]')
-        .isVisible({ timeout: TestTimeouts.UI_ACTION_COMPLETE })
-        .catch(() => false);
-      if (dialogSaveVisible) {
-        await this.clickDialogSaveButton();
-      } else {
-        await this.clickSave();
-      }
+      const dialogSave = this._modal.locator('[data-test="save-button"]').first();
+      await dialogSave.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ACTION_COMPLETE });
+      await this.robustClick(dialogSave);
+      await this._modal
+        .first()
+        .waitFor({ state: 'hidden', timeout: TestTimeouts.ELEMENT_WAIT })
+        .catch(() => undefined);
 
-      await this.page.waitForTimeout(TestTimeouts.UI_DELAY_EXTRA);
-
+      await this.navigateToConfigurationStorage();
       const diskExists =
         (await this.verifyDiskNameExists(diskName)) || (await this.verifyDiskExists(diskName));
       return diskExists;
