@@ -23,6 +23,7 @@ export const CONFIRM_VM_ACTIONS = 'confirmVMActions';
 export const ADVANCED_CDROM_FEATURES = 'advancedCDROMFeatures';
 export const TREE_VIEW_FOLDERS = 'treeViewFolders';
 export const PASST_UDN_NETWORK = 'passtUDNNetwork';
+export const DISABLED_INSTANCE_TYPE_FAMILIES = 'disabledInstanceTypeFamilies';
 
 export const FEATURES_CONFIG_MAP_NAME = 'kubevirt-ui-features';
 const FEATURES_ROLE_NAME = 'kubevirt-ui-features-reader';
@@ -41,6 +42,7 @@ export const FEATURES_CONFIG_MAP_INITIAL_DATA: Record<string, string> = {
   [AUTOMATIC_SUBSCRIPTION_ORGANIZATION_ID]: '',
   [CONFIRM_VM_ACTIONS]: 'false',
   [DISABLED_GUEST_SYSTEM_LOGS_ACCESS]: 'false',
+  [DISABLED_INSTANCE_TYPE_FAMILIES]: '[]',
   [KUBEVIRT_APISERVER_PROXY]: 'true',
   [LOAD_BALANCER_ENABLED]: 'false',
   [NODE_PORT_ADDRESS]: '',

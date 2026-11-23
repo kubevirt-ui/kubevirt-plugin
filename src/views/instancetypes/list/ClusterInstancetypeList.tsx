@@ -16,6 +16,7 @@ import {
 import { Pagination } from '@patternfly/react-core';
 
 import ClusterInstancetypeRow from './components/ClusterInstancetypeRow';
+import FamilyAvailabilitySection from './components/FamilyAvailabilitySection/FamilyAvailabilitySection';
 import useClusterInstancetypeListColumns from './hooks/useClusterInstancetypeListColumns';
 
 import '@kubevirt-utils/styles/list-managment-group.scss';
@@ -42,6 +43,7 @@ const ClusterInstancetypeList: FC<ListPageProps> = ({
 
   return (
     <ListPageBody>
+      <FamilyAvailabilitySection />
       <div className="list-managment-group">
         <ListPageFilter
           columnLayout={{

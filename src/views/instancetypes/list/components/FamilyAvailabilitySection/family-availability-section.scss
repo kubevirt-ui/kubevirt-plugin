@@ -1,0 +1,11 @@
+.family-availability-section {
+  margin-bottom: var(--pf-t--global--spacer--lg);
+
+  &__summary-badge {
+    margin-inline-start: var(--pf-t--global--spacer--xs);
+  }
+
+  &__content {
+    width: 100%;
+  }
+}

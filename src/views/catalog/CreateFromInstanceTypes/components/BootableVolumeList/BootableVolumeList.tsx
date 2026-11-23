@@ -1,5 +1,6 @@
 import React, { FC, useEffect, useMemo, useState } from 'react';
 
+import useOnSelectCreatedVolume from '@catalog/CreateFromInstanceTypes/state/hooks/useOnSelectCreatedVolume';
 import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
 import { UseBootableVolumesValues } from '@catalog/CreateFromInstanceTypes/state/utils/types';
 import { CREATE_VM_TAB } from '@catalog/CreateVMHorizontalNav/constants';
@@ -63,12 +64,9 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
   const isAdmin = useIsAdmin();
   const operatorNamespace = operatorNamespaceSignal.value;
 
-  const {
-    instanceTypeVMState,
-    onSelectCreatedVolume,
-    setVolumeListNamespace,
-    volumeListNamespace,
-  } = useInstanceTypeVMStore();
+  const { instanceTypeVMState, setVolumeListNamespace, volumeListNamespace } =
+    useInstanceTypeVMStore();
+  const onSelectCreatedVolume = useOnSelectCreatedVolume();
 
   const { dvSource, pvcSource, selectedBootableVolume, volumeSnapshotSource } = instanceTypeVMState;
   const { bootableVolumes, dvSources, loaded, pvcSources, volumeSnapshotSources } =

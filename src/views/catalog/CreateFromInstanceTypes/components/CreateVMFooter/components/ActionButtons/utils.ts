@@ -20,7 +20,8 @@ export const getDisableButtonTooltipContent = (
 
   if (noBootableVolumeCreated) return t('A boot volume must be selected');
   if (isEmpty(vmName)) return t('VirtualMachine name field is mandatory');
-  if (isEmpty(selectedInstanceType)) return t('An InstanceType must be selected');
+  if (isEmpty(selectedInstanceType) || !selectedInstanceType?.name)
+    return t('An InstanceType must be selected');
   if (!isValidVmName) return t('VirtualMachine name not valid');
 
   if (udnConfigurationIssue) return NOT_SUPPORTED_VM_ERROR.message;
