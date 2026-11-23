@@ -92,6 +92,11 @@ export type InstanceTypeVMStoreState = {
   volumeListNamespace: string;
 };
 
+export type BootableVolumeFamilyAvailability = {
+  familiesLoaded?: boolean;
+  isFamilyVisible?: (series: string) => boolean;
+};
+
 export type InstanceTypeVMStoreActions = {
   applySSHFromSettings: (sshSecretName: string, targetNamespace: string) => void;
   onSelectCreatedVolume: (
@@ -99,6 +104,7 @@ export type InstanceTypeVMStoreActions = {
     pvcSource?: IoK8sApiCoreV1PersistentVolumeClaim,
     volumeSnapshotSource?: VolumeSnapshotKind,
     dvSource?: V1beta1DataVolume,
+    familyAvailability?: BootableVolumeFamilyAvailability,
   ) => void;
   resetInstanceTypeVMState: () => void;
   setCustomDiskSize: (diskSize: null | string) => void;

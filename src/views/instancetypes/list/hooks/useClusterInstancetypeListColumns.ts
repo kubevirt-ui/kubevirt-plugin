@@ -60,6 +60,10 @@ const useClusterInstancetypeListColumns: UseClusterInstancetypeListColumns = (pa
         title: t('Vendor'),
       },
       {
+        id: 'familyStatus',
+        title: t('Family status'),
+      },
+      {
         id: '',
         props: { className: 'pf-v6-c-table__action' },
         title: '',

@@ -1,3 +1,4 @@
+import { TFunction } from 'react-i18next';
 import { parseSize } from 'xbytes';
 
 import { V1beta1VirtualMachineClusterInstancetype } from '@kubevirt-ui/kubevirt-api/kubevirt';
@@ -63,10 +64,18 @@ export const isRedHatInstanceType = (instanceType: InstanceTypeUnion): boolean =
   return hasRedHatSeriesSizeLabel(instanceType);
 };
 
+// Copy the shared menu so items pushed for one list do not remain on the next call.
+const createInstanceTypeMenuItems = (): InstanceTypesMenuItemsData => ({
+  redHatProvided: { ...initialMenuItems.redHatProvided, items: [] },
+  userProvided: { ...initialMenuItems.userProvided, items: [] },
+});
+
 export const getInstanceTypeMenuItems = (
   instanceTypes: V1beta1VirtualMachineClusterInstancetype[],
 ): InstanceTypesMenuItemsData => {
-  if (isEmpty(instanceTypes)) return initialMenuItems;
+  const menuItems = createInstanceTypeMenuItems();
+
+  if (isEmpty(instanceTypes)) return menuItems;
 
   const itemsData = instanceTypes.reduce((acc, it) => {
     if (!isRedHatInstanceType(it)) {
@@ -95,11 +104,11 @@ export const getInstanceTypeMenuItems = (
     sizeNotExists && series.sizes.push(size);
 
     return acc;
-  }, initialMenuItems);
+  }, menuItems);
 
   itemsData.redHatProvided.items = itemsData.redHatProvided.items.map((series) => ({
     ...series,
-    sizes: series.sizes.sort((a, b) => parseSize(a?.memory) - parseSize(b?.memory)),
+    sizes: [...series.sizes].sort((a, b) => parseSize(a?.memory) - parseSize(b?.memory)),
   }));
 
   return itemsData;
@@ -123,3 +132,12 @@ export const is1GiInstanceType = (sizeLabel: string): boolean => sizeLabel.endsW
 
 export const getOppositeHugepagesInstanceType = (instanceTypeName: string, checked: boolean) =>
   checked ? `${instanceTypeName}1gi` : `${instanceTypeName.replace(/1gi$/, '')}`;
+
+// Converts series name to symbol (e.g. cx1 -> CX, d1 -> D, etc.)
+export const getSeriesSymbol = (seriesName: string): string => {
+  const match = seriesName?.match(/^[a-zA-Z]+/);
+  return match ? match[0].toUpperCase() : '';
+};
+
+export const getSeriesLabel = (seriesName: string, t: TFunction): string =>
+  t('{{symbol}} series', { symbol: getSeriesSymbol(seriesName) });

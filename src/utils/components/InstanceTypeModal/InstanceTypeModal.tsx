@@ -2,11 +2,14 @@ import React, { FC, useMemo, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { InstanceTypeUnion } from '@kubevirt-utils/resources/instancetype/types';
+import { getName } from '@kubevirt-utils/resources/shared';
+import { getCluster } from '@multicluster/helpers/selectors';
 import { Content, Flex, FlexItem, SelectList, SelectOption } from '@patternfly/react-core';
 
 import FormPFSelect from '../FormPFSelect/FormPFSelect';
 import TabModal from '../TabModal/TabModal';
 
+import useVisibleInstanceTypeSeriesEntries from './hooks/useVisibleInstanceTypeSeriesEntries';
 import { InstanceTypeModalProps } from './utils/types';
 import {
   getInstanceTypeFromSeriesAndSize,
@@ -43,6 +46,12 @@ const InstanceTypeModal: FC<InstanceTypeModalProps> = ({
     getInstanceTypesPrettyDisplaySize(mappedInstanceTypes, instanceTypeSeries, instanceTypeSize),
   );
 
+  const visibleSeriesEntries = useVisibleInstanceTypeSeriesEntries({
+    cluster: getCluster(vm),
+    instanceTypeName: getName(instanceType),
+    mappedInstanceTypes,
+  });
+
   const handleSubmit = (selectedInstanceType: InstanceTypeUnion) =>
     onSubmit(vm, selectedInstanceType);
 
@@ -74,7 +83,7 @@ const InstanceTypeModal: FC<InstanceTypeModalProps> = ({
             toggleProps={{ isFullWidth: true }}
           >
             <SelectList>
-              {Object.entries(mappedInstanceTypes).map(([key, value]) => (
+              {visibleSeriesEntries.map(([key, value]) => (
                 <SelectOption
                   description={value.descriptionSeries}
                   key={key}
