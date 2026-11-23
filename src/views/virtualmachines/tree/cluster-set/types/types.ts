@@ -20,6 +20,7 @@ export type MapFleetClustersByClusterSetResult = MapFleetClustersByClusterSet & 
 
 export type BuildClusterSetTreeNodeArgs = BuildParentTreeNodeArgs & {
   children: TreeViewDataItem[];
+  clusterNamesInSet: string[];
   clusterSetName: string;
   t: TFunction;
   treeViewDataMap: Record<string, TreeViewDataItem>;

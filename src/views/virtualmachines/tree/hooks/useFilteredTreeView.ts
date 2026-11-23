@@ -8,7 +8,12 @@ import { useSignals } from '@preact/signals-react/runtime';
 
 import { HIDE, SHOW, SHOW_EMPTY_PROJECTS_KEY } from '../utils/constants';
 import { vmsSignal } from '../utils/signals';
-import { filterItems, filterNamespaceItems, getEffectiveShowEmptyProjects } from '../utils/utils';
+import {
+  filterItems,
+  filterNamespaceItems,
+  getEffectiveShowEmptyProjects,
+  shallowCloneTreeViewItems,
+} from '../utils/utils';
 
 type UseFilteredTreeView = (treeData: TreeViewDataItem[]) => {
   filteredTreeData: TreeViewDataItem[];
@@ -29,17 +34,11 @@ const useFilteredTreeView: UseFilteredTreeView = (treeData) => {
   }, []);
 
   const filteredTreeData = useMemo(() => {
-    let items = treeData;
-
-    if (searchText) {
-      items = treeData
-        .map((opt) => Object.assign({}, opt))
-        .filter((item) => filterItems(item, searchText));
-    }
-
-    return items
-      .map((opt) => Object.assign({}, opt))
-      .filter((item) => filterNamespaceItems(item, effectiveShowEmptyProjects === SHOW));
+    const clonedTreeData = shallowCloneTreeViewItems(treeData);
+    return clonedTreeData.filter((item) => {
+      const matchesTreeSearch = !searchText || filterItems(item, searchText);
+      return matchesTreeSearch && filterNamespaceItems(item, effectiveShowEmptyProjects === SHOW);
+    });
   }, [effectiveShowEmptyProjects, searchText, treeData]);
 
   return { filteredTreeData, hasVMs, onSearch, searchText };
