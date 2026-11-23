@@ -20,7 +20,7 @@ type SSHSecretModalProps = {
   isTemplate?: boolean;
   isUserTab?: boolean;
   namespace: string;
-  onClose: () => void;
+  onClose: () => Promise<void> | void;
   onSubmit: (sshDetails: SSHSecretDetails) => Promise<unknown | void>;
 };
 
@@ -81,7 +81,7 @@ const SSHSecretModal: FC<SSHSecretModalProps> = ({
         }
 
         await onSubmit(sshDetails);
-        await onClose();
+        await Promise.resolve(onClose());
       })(),
     [cluster, namespace, onClose, onSubmit, submitForm],
   );
