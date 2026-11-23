@@ -19,3 +19,6 @@ export const createVMFlowTypes = {
   InstanceTypes: 'InstanceTypes',
   Template: 'Template',
 };
+
+export const VM_ACTION_PERFORMED = 'VM Action Performed';
+export const VM_BULK_ACTION_PERFORMED = 'VM Bulk Action Performed';
