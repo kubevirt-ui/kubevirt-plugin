@@ -1197,8 +1197,9 @@ export class CatalogPage extends BasePage {
     return this.page.getByRole('row').filter({ hasText: name }).first();
   }
 
+  /** Series toggle button on the Red Hat series card (not the non-interactive class-name card header). */
   instanceTypeSeriesLabel(series: RegExp | string): Locator {
-    return this.page.getByText(series).first();
+    return this.page.getByRole('button', { name: series }).first();
   }
 
   instanceTypeSizeMenuItem(name: RegExp): Locator {
