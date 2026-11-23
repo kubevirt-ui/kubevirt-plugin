@@ -1,5 +1,8 @@
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { logVMBulkActionPerformed, VMActionTelemetry } from '@kubevirt-utils/extensions/telemetry';
+import {
+  logVMBulkActionPerformed,
+  VMActionTelemetry,
+} from '@kubevirt-utils/extensions/telemetry/vm-actions';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { getCluster } from '@multicluster/helpers/selectors';

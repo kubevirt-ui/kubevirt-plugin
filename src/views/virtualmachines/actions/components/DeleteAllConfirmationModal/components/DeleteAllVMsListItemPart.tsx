@@ -1,4 +1,4 @@
-import type { FC, ReactNode } from 'react';
+import React, { FC, ReactNode } from 'react';
 
 import { Flex, FlexItem } from '@patternfly/react-core';
 

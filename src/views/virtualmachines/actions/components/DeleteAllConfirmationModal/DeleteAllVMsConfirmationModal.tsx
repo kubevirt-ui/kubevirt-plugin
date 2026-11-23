@@ -1,7 +1,7 @@
 import React, { FC, useState } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { TELEMETRY_VM_ACTION } from '@kubevirt-utils/extensions/telemetry';
+import { TELEMETRY_VM_ACTION } from '@kubevirt-utils/extensions/telemetry/vm-actions';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName } from '@kubevirt-utils/resources/shared';
 import useIsACMPage from '@multicluster/useIsACMPage';

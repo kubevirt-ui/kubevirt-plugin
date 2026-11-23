@@ -1,3 +1,6 @@
+export const VM_ACTION_PERFORMED = 'VM Action Performed';
+export const VM_BULK_ACTION_PERFORMED = 'VM Bulk Action Performed';
+
 export const VIEW_YAML_AND_CLI_CLICKED = 'View YAML & CLI button clicked';
 
 export const BOOTABLE_VOLUME_SELECTED = 'Bootable volume selected';
