@@ -14,9 +14,9 @@ import {
   StackItem,
 } from '@patternfly/react-core';
 import {
+  MonitoringIcon,
   ProjectDiagramIcon,
-  RhUiMonitoringIcon,
-  RhUiServerStackIcon,
+  ServicestackIcon,
 } from '@patternfly/react-icons';
 
 import { DEFAULT_VM_COUNT } from '../constants';
@@ -67,7 +67,7 @@ const DeleteAllVMsList: FC<DeleteAllVMsListProps> = ({
           {hasMultipleClusters && (
             <DeleteAllVMsListItemPart
               ariaLabel={t('Cluster')}
-              icon={<RhUiServerStackIcon />}
+              icon={<ServicestackIcon />}
               text={cluster}
             />
           )}
@@ -82,7 +82,7 @@ const DeleteAllVMsList: FC<DeleteAllVMsListProps> = ({
 
           <DeleteAllVMsListItemPart
             ariaLabel={t('Name')}
-            icon={<RhUiMonitoringIcon />}
+            icon={<MonitoringIcon />}
             text={name}
           />
         </Flex>
