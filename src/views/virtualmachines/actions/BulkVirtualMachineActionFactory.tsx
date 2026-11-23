@@ -12,13 +12,14 @@ import { isEmpty } from '@kubevirt-utils/utils/utils';
 import CrossClusterMigration from '@multicluster/components/CrossClusterMigration/CrossClusterMigration';
 import { CROSS_CLUSTER_MIGRATION_ACTION_ID } from '@multicluster/constants';
 import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
+import DeleteAllVMsConfirmationModal from '@virtualmachines/actions/components/DeleteAllConfirmationModal/DeleteAllVMsConfirmationModal';
 import { VM_FOLDER_LABEL } from '@virtualmachines/tree/utils/constants';
 import { isRunning } from '@virtualmachines/utils';
 
 import ConfirmMultipleVMActionsModal from './components/ConfirmMultipleVMActionsModal/ConfirmMultipleVMActionsModal';
 import VirtualMachineMigrateModal from './components/VirtualMachineMigration/VirtualMachineMigrationModal';
 import { ACTIONS_ID } from './hooks/constants';
-import { deleteVM, pauseVM, restartVM, startVM, stopVM, unpauseVM } from './actions';
+import { pauseVM, restartVM, startVM, stopVM, unpauseVM } from './actions';
 import { getCommonLabels, getLabelsDiffPatch, isSameCluster, isSameNamespace } from './utils';
 
 export const createBulkVirtualMachineActionFactory = (t: TFunction) => ({
@@ -50,13 +51,7 @@ export const createBulkVirtualMachineActionFactory = (t: TFunction) => ({
   ): ActionDropdownItemType => ({
     cta: () =>
       createModal(({ isOpen, onClose }) => (
-        <ConfirmMultipleVMActionsModal
-          action={deleteVM}
-          actionType="Delete"
-          isOpen={isOpen}
-          onClose={onClose}
-          vms={vms}
-        />
+        <DeleteAllVMsConfirmationModal isOpen={isOpen} onClose={onClose} vms={vms} />
       )),
     disabled: isEmpty(vms) || isDisabled,
     id: ACTIONS_ID.DELETE,
