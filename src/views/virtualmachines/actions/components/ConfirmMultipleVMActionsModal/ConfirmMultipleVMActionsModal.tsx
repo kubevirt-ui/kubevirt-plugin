@@ -1,10 +1,14 @@
 import React, { FC } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { VMActionTelemetry } from '@kubevirt-utils/extensions/telemetry/vm-actions';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { Popover, PopoverPosition } from '@patternfly/react-core';
 import VMsByNamespacePopover from '@virtualmachines/actions/components/ConfirmMultipleVMActionsModal/components/VMsByNamespacePopover';
-import { getVMNamesByNamespace } from '@virtualmachines/actions/components/ConfirmMultipleVMActionsModal/utils/utils';
+import {
+  getVMNamesByNamespace,
+  runActionOnVMs,
+} from '@virtualmachines/actions/components/ConfirmMultipleVMActionsModal/utils/utils';
 
 import ConfirmVMActionBaseModal from './components/ConfirmVMActionBaseModal';
 
@@ -34,12 +38,7 @@ const ConfirmMultipleVMActionsModal: FC<ConfirmMultipleVMActionsModalProps> = ({
   const numVMs = vms?.length;
   const numVMNamespaces = Object.keys(vmsByNamespace)?.length;
 
-  const actionOnVms = async () =>
-    Promise.any(
-      vms?.map((vm) => {
-        action(vm);
-      }),
-    );
+  const actionOnVms = () => runActionOnVMs(vms, action, actionType as VMActionTelemetry);
 
   const body = (
     <>
