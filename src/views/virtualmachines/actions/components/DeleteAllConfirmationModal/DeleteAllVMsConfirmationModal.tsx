@@ -1,4 +1,4 @@
-import { type FC, useState } from 'react';
+import React, { type FC, useState } from 'react';
 
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { TELEMETRY_VM_ACTION } from '@kubevirt-utils/extensions/telemetry';
