@@ -15,7 +15,7 @@ export const TELEMETRY_VM_ACTION = {
   UNPAUSE: 'unpause',
 } as const;
 
-export type VMActionTelemetry = (typeof TELEMETRY_VM_ACTION)[keyof typeof TELEMETRY_VM_ACTION];
+export type VMActionTelemetry = typeof TELEMETRY_VM_ACTION[keyof typeof TELEMETRY_VM_ACTION];
 
 export const logVMActionPerformed = (action: VMActionTelemetry, vm: V1VirtualMachine): void => {
   eventMonitor(VM_ACTION_PERFORMED, {
