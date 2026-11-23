@@ -13,11 +13,7 @@ import {
   Stack,
   StackItem,
 } from '@patternfly/react-core';
-import {
-  MonitoringIcon,
-  ProjectDiagramIcon,
-  ServicestackIcon,
-} from '@patternfly/react-icons';
+import { MonitoringIcon, ProjectDiagramIcon, ServicestackIcon } from '@patternfly/react-icons';
 
 import { DEFAULT_VM_COUNT } from '../constants';
 
@@ -80,11 +76,7 @@ const DeleteAllVMsList: FC<DeleteAllVMsListProps> = ({
             />
           )}
 
-          <DeleteAllVMsListItemPart
-            ariaLabel={t('Name')}
-            icon={<MonitoringIcon />}
-            text={name}
-          />
+          <DeleteAllVMsListItemPart ariaLabel={t('Name')} icon={<MonitoringIcon />} text={name} />
         </Flex>
       </StackItem>
     );

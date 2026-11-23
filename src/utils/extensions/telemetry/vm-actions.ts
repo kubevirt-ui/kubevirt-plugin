@@ -1,8 +1,8 @@
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getName } from '@kubevirt-utils/resources/shared';
 
-import { eventMonitor } from './telemetry';
 import { VM_ACTION_PERFORMED, VM_BULK_ACTION_PERFORMED } from './utils/constants';
+import { eventMonitor } from './telemetry';
 
 export const TELEMETRY_VM_ACTION = {
   CLONE: 'clone',
