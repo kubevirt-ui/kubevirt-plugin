@@ -1,3 +1,8 @@
+// Stack exit confirm above the large wizard modal (shared default backdrop z-index).
+.pf-v6-c-backdrop:has(.add-bootable-volume-wizard-exit) {
+  --pf-v6-c-backdrop--ZIndex: 600;
+}
+
 .add-bootable-volume-wizard {
   // Keep modal chrome stable across steps and source-dependent fields.
   display: flex;

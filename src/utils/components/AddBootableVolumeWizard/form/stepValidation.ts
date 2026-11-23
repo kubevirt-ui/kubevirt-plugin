@@ -1,5 +1,6 @@
 import { type FieldErrors, type FieldPath, get, type UseFormTrigger } from 'react-hook-form';
 
+import { DESTINATION_PROJECT_FIELD, OPERATING_SYSTEM_FIELD, VOLUME_NAME_FIELD } from './fieldPaths';
 import type { BootableVolumeWizardFormValues } from './types';
 
 export enum BootableVolumeWizardStep {
@@ -37,14 +38,8 @@ const STEP_FIELDS: Record<
     'imageSource.url.certificate',
     'imageSource.url.configMapName',
   ],
-  [BootableVolumeWizardStep.OPERATING_SYSTEM]: [
-    'operatingSystem.operatingSystem',
-    'operatingSystem.architecture',
-  ],
-  [BootableVolumeWizardStep.PROJECT_AND_VOLUME]: [
-    'projectAndVolume.volumeName',
-    'projectAndVolume.destinationProject',
-  ],
+  [BootableVolumeWizardStep.OPERATING_SYSTEM]: [OPERATING_SYSTEM_FIELD],
+  [BootableVolumeWizardStep.PROJECT_AND_VOLUME]: [VOLUME_NAME_FIELD, DESTINATION_PROJECT_FIELD],
   [BootableVolumeWizardStep.REVIEW]: [],
 };
 
@@ -61,6 +56,16 @@ export const mapBootableVolumeWizardErrorsToSteps = (
       STEP_FIELDS[step].some((field) => Boolean(get(errors, field))),
     ]),
   ) as Record<BootableVolumeWizardStep, boolean>;
+
+export const getFirstInvalidBootableVolumeWizardStep = (
+  errors: FieldErrors<BootableVolumeWizardFormValues>,
+): BootableVolumeWizardStep | undefined => {
+  const errorsByStep = mapBootableVolumeWizardErrorsToSteps(errors);
+
+  return BOOTABLE_VOLUME_WIZARD_STEPS.find(
+    (step) => step !== BootableVolumeWizardStep.REVIEW && errorsByStep[step],
+  );
+};
 
 export const triggerBootableVolumeWizardStepValidation = (
   trigger: UseFormTrigger<BootableVolumeWizardFormValues>,

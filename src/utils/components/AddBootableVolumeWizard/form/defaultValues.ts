@@ -1,6 +1,10 @@
 import { DROPDOWN_FORM_SELECTION } from '@kubevirt-utils/components/AddBootableVolumeModal/consts';
 import { DEFAULT_DISK_SIZE } from '@kubevirt-utils/components/DiskModal/utils/constants';
 import { TLS_CERT_SOURCE_EXISTING } from '@kubevirt-utils/components/TLSCertificateSection';
+import {
+  DEFAULT_PREFERENCE_KIND_LABEL,
+  DEFAULT_PREFERENCE_LABEL,
+} from '@kubevirt-utils/constants/instancetypes-and-preferences';
 
 import type {
   BootableVolumeWizardDefaultValuesArgs,
@@ -23,6 +27,7 @@ export const createImageSourceDefaultValues = (): BootableVolumeWizardImageSourc
   diskSize: DEFAULT_DISK_SIZE,
   existingSnapshot: { name: '', project: '' },
   existingVolume: { clone: true, name: '', project: '' },
+  isIso: false,
   registry: {
     cronExpression: '',
     image: '',
@@ -45,8 +50,16 @@ export const createOperatingSystemDefaultValues = (
   lockedPreference?: BootableVolumeWizardDefaultValuesArgs['lockedPreference'],
 ): BootableVolumeWizardOperatingSystemValues => ({
   architecture: lockedPreference?.architecture ?? '',
+  architectures: lockedPreference?.architecture ? [lockedPreference.architecture] : [],
   defaultInstanceType: undefined,
-  operatingSystem: '',
+  labels: lockedPreference
+    ? {
+        [DEFAULT_PREFERENCE_KIND_LABEL]: lockedPreference.kind ?? '',
+        [DEFAULT_PREFERENCE_LABEL]: lockedPreference.name,
+      }
+    : {},
+  lockedPreference: lockedPreference?.name,
+  operatingSystem: lockedPreference?.name ?? '',
   preference: lockedPreference ?? null,
   preferenceKind: lockedPreference?.kind,
 });

@@ -4,7 +4,7 @@ import { useWatch } from 'react-hook-form';
 import SelectSnapshot from '@kubevirt-utils/components/SelectSnapshot/SelectSnapshot';
 
 import { useBootableVolumeWizardForm } from '../../../form/BootableVolumeWizardFormProvider';
-import { imageSourceSetValueOptions } from '../utils/resetImageSourceFields';
+import { wizardSetValueOptions } from '../../../form/wizardSetValueOptions';
 import { setImageSourceDiskSize } from '../utils/setImageSourceDiskSize';
 
 const ExistingSnapshotSourceFields: FC = () => {
@@ -19,10 +19,10 @@ const ExistingSnapshotSourceFields: FC = () => {
     <SelectSnapshot
       cluster={cluster}
       selectSnapshotName={(name) =>
-        setValue('imageSource.existingSnapshot.name', name ?? '', imageSourceSetValueOptions)
+        setValue('imageSource.existingSnapshot.name', name ?? '', wizardSetValueOptions)
       }
       selectSnapshotNamespace={(project) =>
-        setValue('imageSource.existingSnapshot.project', project ?? '', imageSourceSetValueOptions)
+        setValue('imageSource.existingSnapshot.project', project ?? '', wizardSetValueOptions)
       }
       setDiskSize={(size) => setImageSourceDiskSize(getValues, setValue, size)}
       snapshotNameSelected={snapshotName}

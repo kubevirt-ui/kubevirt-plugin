@@ -49,6 +49,7 @@ export type BootableVolumeWizardImageSourceValues = {
   diskSize: string;
   existingSnapshot: BootableVolumeWizardExistingSnapshotValues;
   existingVolume: BootableVolumeWizardExistingVolumeValues;
+  isIso: boolean;
   registry: BootableVolumeWizardRegistryValues;
   sourceType: DROPDOWN_FORM_SELECTION;
   storageClassName: string;
@@ -59,7 +60,10 @@ export type BootableVolumeWizardImageSourceValues = {
 
 export type BootableVolumeWizardOperatingSystemValues = {
   architecture: string;
+  architectures: string[];
   defaultInstanceType?: string;
+  labels: Record<string, string>;
+  lockedPreference?: string;
   operatingSystem: string;
   preference: null | PreferenceOption;
   preferenceKind?: string;

@@ -7,7 +7,8 @@ import { getFieldValidationState } from '@kubevirt-utils/utils/getFieldValidatio
 import { type DropEvent, FileUpload, FormGroup } from '@patternfly/react-core';
 
 import { useBootableVolumeWizardForm } from '../../../form/BootableVolumeWizardFormProvider';
-import { imageSourceSetValueOptions } from '../utils/resetImageSourceFields';
+import { wizardSetValueOptions } from '../../../form/wizardSetValueOptions';
+import { setImageSourceIsoFromFilename } from '../utils/setImageSourceDiskSize';
 
 const UploadSourceFields: FC = () => {
   const { t } = useKubevirtTranslation();
@@ -26,8 +27,9 @@ const UploadSourceFields: FC = () => {
   const { message, validated } = getFieldValidationState(error);
 
   const clearUpload = (): void => {
-    setValue('imageSource.upload.file', undefined, imageSourceSetValueOptions);
-    setValue('imageSource.upload.filename', '', imageSourceSetValueOptions);
+    setValue('imageSource.upload.file', undefined, wizardSetValueOptions);
+    setValue('imageSource.upload.filename', '', wizardSetValueOptions);
+    setImageSourceIsoFromFilename(setValue, '');
   };
 
   return (
@@ -42,16 +44,17 @@ const UploadSourceFields: FC = () => {
         isLoading={isLoading}
         onClearClick={clearUpload}
         onDataChange={(_event: DropEvent, droppedFile: string) => {
-          setValue('imageSource.upload.file', droppedFile, imageSourceSetValueOptions);
+          setValue('imageSource.upload.file', droppedFile, wizardSetValueOptions);
         }}
         onFileInputChange={(_event, file: File) => {
-          setValue('imageSource.upload.filename', file.name, imageSourceSetValueOptions);
-          setValue('imageSource.upload.file', file, imageSourceSetValueOptions);
+          setValue('imageSource.upload.filename', file.name, wizardSetValueOptions);
+          setValue('imageSource.upload.file', file, wizardSetValueOptions);
+          setImageSourceIsoFromFilename(setValue, file.name);
         }}
         onReadFinished={() => setIsLoading(false)}
         onReadStarted={() => setIsLoading(true)}
         onTextChange={(_event: ChangeEvent<HTMLTextAreaElement>, value: string) => {
-          setValue('imageSource.upload.file', value, imageSourceSetValueOptions);
+          setValue('imageSource.upload.file', value, wizardSetValueOptions);
         }}
         value={uploadFile}
       />

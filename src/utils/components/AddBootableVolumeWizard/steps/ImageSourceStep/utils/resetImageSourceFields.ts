@@ -1,16 +1,11 @@
-import type { SetValueConfig, UseFormSetValue } from 'react-hook-form';
+import type { UseFormSetValue } from 'react-hook-form';
 
 import { DROPDOWN_FORM_SELECTION } from '@kubevirt-utils/components/AddBootableVolumeModal/consts';
 import { DEFAULT_DISK_SIZE } from '@kubevirt-utils/components/DiskModal/utils/constants';
 import { TLS_CERT_SOURCE_EXISTING } from '@kubevirt-utils/components/TLSCertificateSection';
 
 import type { BootableVolumeWizardFormValues } from '../../../form/types';
-
-export const imageSourceSetValueOptions: SetValueConfig = {
-  shouldDirty: true,
-  shouldTouch: true,
-  shouldValidate: true,
-};
+import { wizardSetValueOptions } from '../../../form/wizardSetValueOptions';
 
 type ResetImageSourceFieldsArgs = {
   previousSourceType: DROPDOWN_FORM_SELECTION;
@@ -21,13 +16,14 @@ export const resetImageSourceFieldsOnSourceChange = ({
   previousSourceType,
   setValue,
 }: ResetImageSourceFieldsArgs): void => {
-  setValue('imageSource.upload', { filename: '' }, imageSourceSetValueOptions);
+  setValue('imageSource.upload', { filename: '' }, wizardSetValueOptions);
+  setValue('imageSource.isIso', false, wizardSetValueOptions);
   setValue(
     'imageSource.existingVolume',
     { clone: true, name: '', project: '' },
-    imageSourceSetValueOptions,
+    wizardSetValueOptions,
   );
-  setValue('imageSource.existingSnapshot', { name: '', project: '' }, imageSourceSetValueOptions);
+  setValue('imageSource.existingSnapshot', { name: '', project: '' }, wizardSetValueOptions);
   setValue(
     'imageSource.registry',
     {
@@ -37,7 +33,7 @@ export const resetImageSourceFieldsOnSourceChange = ({
       retainRevisions: 3,
       username: '',
     },
-    imageSourceSetValueOptions,
+    wizardSetValueOptions,
   );
   setValue(
     'imageSource.url',
@@ -46,10 +42,10 @@ export const resetImageSourceFieldsOnSourceChange = ({
       imageUrl: '',
       tlsCertificateRequired: false,
     },
-    imageSourceSetValueOptions,
+    wizardSetValueOptions,
   );
 
   if (previousSourceType === DROPDOWN_FORM_SELECTION.USE_SNAPSHOT) {
-    setValue('imageSource.diskSize', DEFAULT_DISK_SIZE, imageSourceSetValueOptions);
+    setValue('imageSource.diskSize', DEFAULT_DISK_SIZE, wizardSetValueOptions);
   }
 };

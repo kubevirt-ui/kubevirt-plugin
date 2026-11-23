@@ -16,7 +16,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { universalComparator } from '@kubevirt-utils/utils/utils';
 import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverContentWithLightspeedButton/PopoverContentWithLightspeedButton';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
-import { FormGroup, PopoverPosition } from '@patternfly/react-core';
+import { FormGroup, PopoverPosition, type PopperProps } from '@patternfly/react-core';
 
 import ComposableDrilldownSelect from './components/ComposableDrilldownSelect/ComposableDrilldownSelect';
 import DrilldownMenuItem from './components/DrilldownMenuItem/DrilldownMenuItem';
@@ -27,15 +27,21 @@ import { MENUS } from './utils/constants';
 import { getInstanceTypeMenuItems, isExistingInstanceType } from './utils/utils';
 
 type InstanceTypeMenuItemsProps = {
+  appendTo?: HTMLElement | (() => HTMLElement);
   bootableVolume: AddBootableVolumeState;
   deleteLabel: (labelKey: string) => void;
+  direction?: PopperProps['direction'];
   isDisabled?: boolean;
   setBootableVolumeField: SetBootableVolumeFieldType;
 };
 
+const getDefaultAppendTo = (): HTMLElement => document.getElementById('tab-modal') ?? document.body;
+
 export const InstanceTypeDrilldownSelect: FC<InstanceTypeMenuItemsProps> = ({
+  appendTo,
   bootableVolume,
   deleteLabel,
+  direction = 'up',
   isDisabled,
   setBootableVolumeField,
 }) => {
@@ -92,8 +98,8 @@ export const InstanceTypeDrilldownSelect: FC<InstanceTypeMenuItemsProps> = ({
       }
     >
       <ComposableDrilldownSelect
-        appendTo={document.getElementById('tab-modal')}
-        direction="up"
+        appendTo={appendTo ?? getDefaultAppendTo}
+        direction={direction}
         id={MENUS.root}
         isDisabled={isDisabled}
         isOpen={isOpen}

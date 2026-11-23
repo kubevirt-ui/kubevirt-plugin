@@ -7,7 +7,7 @@ import { DEFAULT_INSTANCETYPE_LABEL } from '@kubevirt-utils/constants/instancety
 import { isUploadCanceledError } from '@kubevirt-utils/hooks/useCDIUpload/errors';
 import { cancelTrackedUploadOnModalClose } from '@kubevirt-utils/hooks/useInFlightToast/cancel/modalUploadCancel';
 import { appendBootableVolumeContext } from '@kubevirt-utils/resources/bootableresources/constants';
-import { isIsoFile } from '@kubevirt-utils/resources/bootableresources/isoHelpers';
+import { isIsoFile, isIsoFilename } from '@kubevirt-utils/resources/bootableresources/isoHelpers';
 import { type BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { getLabel, getResourceUrl } from '@kubevirt-utils/resources/shared';
 import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
@@ -53,6 +53,13 @@ export const autoDetectIsoField = (
   pathOrUrl?: null | string,
 ): void => {
   setBootableVolumeField('isIso')(isIsoFile(pathOrUrl));
+};
+
+export const autoDetectIsoFromFilename = (
+  setBootableVolumeField: SetBootableVolumeFieldType,
+  fileName?: null | string,
+): void => {
+  setBootableVolumeField('isIso')(isIsoFilename(fileName));
 };
 
 export const deleteBootableVolumeLabel = (
