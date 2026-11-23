@@ -13,7 +13,7 @@ import {
   Stack,
   StackItem,
 } from '@patternfly/react-core';
-import { MonitoringIcon, ProjectDiagramIcon, ServicestackIcon } from '@patternfly/react-icons';
+import { ClusterIcon, MonitoringIcon, ProjectDiagramIcon } from '@patternfly/react-icons';
 
 import { DEFAULT_VM_COUNT } from '../constants';
 
@@ -63,7 +63,7 @@ const DeleteAllVMsList: FC<DeleteAllVMsListProps> = ({
           {hasMultipleClusters && (
             <DeleteAllVMsListItemPart
               ariaLabel={t('Cluster')}
-              icon={<ServicestackIcon />}
+              icon={<ClusterIcon />}
               text={cluster}
             />
           )}
