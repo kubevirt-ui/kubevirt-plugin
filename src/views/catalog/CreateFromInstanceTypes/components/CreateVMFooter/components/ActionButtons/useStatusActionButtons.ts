@@ -41,7 +41,10 @@ const useStatusActionButtons: UseStatusActionButtonsType = (isSubmitting) => {
     disableButtonTooltipContent,
     isCreationDisabled,
     isViewYAMLDisabled:
-      isEmpty(selectedBootableVolume) || isEmpty(vmName) || isEmpty(selectedInstanceType),
+      isEmpty(selectedBootableVolume) ||
+      isEmpty(vmName) ||
+      isEmpty(selectedInstanceType) ||
+      !selectedInstanceType?.name,
   };
 };
 
