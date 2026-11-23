@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FC, ReactNode, useState } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
@@ -17,6 +17,7 @@ type ConfirmVMActionBaseModalProps = {
   action: () => Promise<string | void>;
   actionType: string;
   checkToConfirmMessage?: string;
+  children?: ReactNode;
   isOpen: boolean;
   onClose: () => void;
   severityVariant?: 'danger' | 'warning' | undefined;
