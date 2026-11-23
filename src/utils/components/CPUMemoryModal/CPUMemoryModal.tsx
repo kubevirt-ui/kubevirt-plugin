@@ -3,6 +3,7 @@ import { type FC, useMemo, useState } from 'react';
 import { type V1CPU, type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import CPUInput from '@kubevirt-utils/components/CPUMemoryModal/components/CPUInput/CPUInput';
 import { getCPULimitsFromVM } from '@kubevirt-utils/components/CPUMemoryModal/components/CPUInput/utils/utils';
+import CPUModelInput from '@kubevirt-utils/components/CPUMemoryModal/components/CPUModelInput/CPUModelInput';
 import MemoryInput from '@kubevirt-utils/components/CPUMemoryModal/components/MemoryInput/MemoryInput';
 import { applyCPUMemoryToVM } from '@kubevirt-utils/components/CPUMemoryModal/utils/CpuMemoryUtils';
 import MemoryLimitsWarning from '@kubevirt-utils/components/MemoryLimitsWarning/MemoryLimitsWarning';
@@ -117,6 +118,7 @@ const CPUMemoryModal: FC<CPUMemoryModalProps> = ({
             setMemoryUnit={setMemoryUnit}
           />
         </div>
+        <CPUModelInput cluster={cluster} cpu={cpu} setCPU={setCPU} />
         <MemoryLimitsWarning vm={previewVM} />
         {updateError && (
           <Alert isInline title={t('Error')} variant={AlertVariant.danger}>

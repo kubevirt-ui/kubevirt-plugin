@@ -34,7 +34,9 @@ export const getCPUMemoryDisplayValue = (
 ): CPUMemoryDisplayValue => {
   const isEmpty = !cpu && !memory;
 
-  const cpuText = cpu ? `${vCPUCount(cpu)}` : NO_DATA_DASH;
+  const cpuText = cpu
+    ? `${vCPUCount(cpu)}${cpu.model ? ` (${cpu.model})` : ''}`
+    : NO_DATA_DASH;
   const memoryText = memory ? readableSizeUnit(memory) : NO_DATA_DASH;
 
   if (isEmpty) {

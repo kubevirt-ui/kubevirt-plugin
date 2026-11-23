@@ -23,6 +23,8 @@ import {
   Flex,
   SelectOption,
   Skeleton,
+  Split,
+  SplitItem,
   Stack,
   StackItem,
 } from '@patternfly/react-core';
@@ -148,9 +150,18 @@ const DefaultCPUModel: FC<DefaultCPUModelProps> = ({ hyperConvergeConfiguration 
           </Alert>
         )}
         {selected !== savedModel && (
-          <Button isDisabled={isDisabled} isLoading={isSaving} onClick={onSave} variant="secondary">
-            {t('Save')}
-          </Button>
+          <Split hasGutter>
+            <SplitItem>
+              <Button
+                isDisabled={isDisabled}
+                isLoading={isSaving}
+                onClick={onSave}
+                variant="secondary"
+              >
+                {t('Save')}
+              </Button>
+            </SplitItem>
+          </Split>
         )}
       </Stack>
       <GeneralSettingsError error={error} />
