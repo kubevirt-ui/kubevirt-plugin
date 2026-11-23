@@ -20,6 +20,30 @@ import { isMergePoolPr } from '../shared/merge-pool';
 import { failStep, setOutput } from '../shared/output';
 import { isListedInLocalOwners } from '../shared/owners';
 
+/**
+ * Bots whose fork PRs may run Hot Cluster E2E without the `ok-to-test` label.
+ * Deliberately NOT in OWNERS: OWNERS membership would also grant Prow
+ * /lgtm and /approve rights and make blunderbuss assign the bot as a reviewer.
+ * Compared against the PR author login with an exact match (like TRUSTED_BOT_LOGINS).
+ */
+export const TRUSTED_E2E_BOT_LOGINS: ReadonlySet<string> = new Set(['darwin-project-ai[bot]']);
+
+export const isTrustedE2eBot = (login: string): boolean => TRUSTED_E2E_BOT_LOGINS.has(login);
+
+export type PrTrustInputs = {
+  author: string;
+  hasOkToTest: boolean;
+  ownedByAuthor: boolean;
+  sameRepo: boolean;
+};
+
+export const isPrTrusted = ({
+  author,
+  hasOkToTest,
+  ownedByAuthor,
+  sameRepo,
+}: PrTrustInputs): boolean => ownedByAuthor || isTrustedE2eBot(author) || sameRepo || hasOkToTest;
+
 const MERGEABLE_RETRIES = 5;
 const MERGEABLE_DELAY_MS = 3000;
 
@@ -62,7 +86,8 @@ const main = async (): Promise<void> => {
   const ownedByAuthor = isListedInLocalOwners(author);
   const sameRepo = pullRequest.head.repo?.full_name === pullRequest.base.repo.full_name;
   const hasOkToTest = pullRequest.labels.some((label) => label.name === 'ok-to-test');
-  const trusted = ownedByAuthor || sameRepo || hasOkToTest;
+  const isTrustedBotAuthor = isTrustedE2eBot(author);
+  const trusted = isPrTrusted({ author, hasOkToTest, ownedByAuthor, sameRepo });
   const stillInPool = skipPoolCheck || isMergePoolPr(pullRequest.labels);
 
   console.log(
@@ -72,7 +97,7 @@ const main = async (): Promise<void> => {
   );
   console.log(
     `PR #${prNumber}: author=${author}, ownedByAuthor=${ownedByAuthor}, ` +
-      `sameRepo=${sameRepo}, hasOkToTest=${hasOkToTest}, trusted=${trusted}`,
+      `trustedE2eBot=${isTrustedBotAuthor}, sameRepo=${sameRepo}, hasOkToTest=${hasOkToTest}, trusted=${trusted}`,
   );
 
   setOutput('head_sha', pullRequest.head.sha);
@@ -81,6 +106,8 @@ const main = async (): Promise<void> => {
   setOutput('trusted', trusted ? 'true' : 'false');
 };
 
-void main().catch((err) => {
-  failStep(err instanceof Error ? err.message : String(err));
-});
+if (require.main === module) {
+  void main().catch((err) => {
+    failStep(err instanceof Error ? err.message : String(err));
+  });
+}
