@@ -1,90 +1,65 @@
 import { type ReactNode, useCallback, useEffect, useState } from 'react';
+import { useFormContext, useWatch } from 'react-hook-form';
 
 import { modelToGroupVersionKind, ProjectModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import InlineFilterSelect from '@kubevirt-utils/components/FilterSelect/InlineFilterSelect';
-import FormGroupHelperText from '@kubevirt-utils/components/FormGroupHelperText/FormGroupHelperText';
 import Loading from '@kubevirt-utils/components/Loading/Loading';
-import {
-  addNewSecret,
-  getSecretNameErrorMessage,
-} from '@kubevirt-utils/components/SSHSecretModal/utils/utils';
+import { shouldCopySshSecretFromProject } from '@kubevirt-utils/components/SSHSecretModal/utils/utils';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useNamespaceParam from '@kubevirt-utils/hooks/useNamespaceParam';
 import useProjects from '@kubevirt-utils/hooks/useProjects';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import {
-  Alert,
-  Bullseye,
-  FormGroup,
-  Grid,
-  GridItem,
-  TextInput,
-  ValidatedOptions,
-} from '@patternfly/react-core';
+import { Alert, Bullseye, FormGroup, Grid, GridItem } from '@patternfly/react-core';
 
-import { SecretSelectionOption, type SSHOptionUseExistingProps } from '../../utils/types';
+import useSecretsData from '../../hooks/useSecretsData';
+import { type SSHOptionUseExistingProps, type SSHSecretDetails } from '../../utils/types';
 import SecretDropdown from '../SecretDropdown/SecretDropdown';
+import SSHUseExistingCopySecretNameField from './SSHUseExistingCopySecretNameField';
 
 import './SSHOptionUseExisting.scss';
 
-const SSHOptionUseExisting = ({
-  cluster,
-  localNSProject,
-  namespace,
-  projectsWithSecrets,
-  secrets,
-  secretsLoaded,
-  setLocalNSProject,
-  setSSHDetails,
-  sshDetails,
-}: SSHOptionUseExistingProps): ReactNode => {
+const SSHOptionUseExisting = ({ cluster, namespace }: SSHOptionUseExistingProps): ReactNode => {
   const { t } = useKubevirtTranslation();
   const activeNamespace = useNamespaceParam();
-  const [nameErrorMessage, setNameErrorMessage] = useState<string>(null);
-  const [selectedProject, setSelectedProject] = useState<string>(
-    localNSProject ?? namespace ?? sshDetails?.sshSecretNamespace,
-  );
+  const { control, getValues, setValue } = useFormContext<SSHSecretDetails>();
+  const sshSecretNamespace = useWatch({ control, name: 'sshSecretNamespace' });
+
+  const [selectedProject, setSelectedProject] = useState<string>(namespace ?? '');
   const [userProjects] = useProjects(cluster, true);
 
+  const { secretsLoaded, secretsLoadError, sshKeySecrets } = useSecretsData(
+    selectedProject || null,
+    cluster,
+  );
   useEffect(() => {
     if (!selectedProject) {
-      setSelectedProject(
-        localNSProject ?? namespace ?? sshDetails?.sshSecretNamespace ?? userProjects?.[0],
-      );
+      setSelectedProject(namespace ?? getValues('sshSecretNamespace') ?? userProjects?.[0] ?? '');
     }
-  }, [namespace, localNSProject, userProjects, selectedProject, sshDetails?.sshSecretNamespace]);
+  }, [getValues, namespace, selectedProject, userProjects]);
 
   const onSelectProject = useCallback(
     (newProject: string) => {
       setSelectedProject(newProject);
-      setLocalNSProject(newProject);
-      const addNew = addNewSecret(namespace, newProject, activeNamespace);
-      setSSHDetails((prev) => ({
-        ...prev,
-        secretOption: addNew ? SecretSelectionOption.AddNew : SecretSelectionOption.UseExisting,
-        sshPubKey: '',
-        sshSecretName: '',
-        sshSecretNamespace: namespace,
-      }));
+      const isCopyFromSelectedProject = shouldCopySshSecretFromProject(
+        namespace ?? '',
+        newProject,
+        activeNamespace,
+      );
+      setValue('sshPubKey', '', { shouldDirty: true, shouldValidate: false });
+      setValue('sshSecretName', '', { shouldDirty: true, shouldValidate: false });
+      setValue(
+        'sshSecretNamespace',
+        isCopyFromSelectedProject ? newProject : (namespace ?? newProject),
+        { shouldDirty: true, shouldValidate: false },
+      );
     },
-    [setLocalNSProject, namespace, activeNamespace, setSSHDetails],
+    [activeNamespace, namespace, setValue],
   );
 
-  const onSelectSecret = (generatedSecretName: string): void => {
-    setNameErrorMessage(getSecretNameErrorMessage(generatedSecretName, namespace, secrets));
-  };
-
-  const onChangeSecretName = (newSecretName: string): void => {
-    setNameErrorMessage(getSecretNameErrorMessage(newSecretName, namespace, secrets));
-    setSSHDetails((prev) => ({
-      ...prev,
-      sshSecretName: newSecretName,
-    }));
-  };
-
-  const showNewSecretNameField = namespace
+  const showCopySecretNameField = namespace
     ? selectedProject !== namespace
-    : selectedProject !== sshDetails?.sshSecretNamespace;
+    : selectedProject !== sshSecretNamespace;
 
   if (isEmpty(userProjects)) {
     return <Bullseye>{t('No SSH keys found')}</Bullseye>;
@@ -92,6 +67,7 @@ const SSHOptionUseExisting = ({
 
   return (
     <>
+      {secretsLoadError && <ErrorAlert error={secretsLoadError} />}
       <Alert
         isInline
         title={t(
@@ -125,11 +101,8 @@ const SSHOptionUseExisting = ({
             {secretsLoaded ? (
               <SecretDropdown
                 namespace={namespace}
-                onSelectSecret={onSelectSecret}
                 selectedProject={selectedProject}
-                selectedProjectSecrets={projectsWithSecrets?.[selectedProject]}
-                setSSHDetails={setSSHDetails}
-                sshDetails={sshDetails}
+                selectedProjectSecrets={sshKeySecrets}
               />
             ) : (
               <Loading />
@@ -137,21 +110,7 @@ const SSHOptionUseExisting = ({
           </FormGroup>
         </GridItem>
       </Grid>
-      {showNewSecretNameField && (
-        <FormGroup label={t('New secret name')}>
-          <TextInput
-            id="new-secret-name"
-            onChange={(_event, newSecretName: string) => onChangeSecretName(newSecretName)}
-            type="text"
-            value={sshDetails.sshSecretName}
-          />
-          <FormGroupHelperText
-            validated={nameErrorMessage ? ValidatedOptions.error : ValidatedOptions.default}
-          >
-            {nameErrorMessage}
-          </FormGroupHelperText>
-        </FormGroup>
-      )}
+      {showCopySecretNameField && <SSHUseExistingCopySecretNameField />}
     </>
   );
 };

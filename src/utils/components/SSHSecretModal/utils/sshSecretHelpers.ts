@@ -17,38 +17,19 @@ import { getAccessCredentials } from '@kubevirt-utils/resources/vm';
 import { generatePrettyName, isEmpty, validateSSHPublicKey } from '@kubevirt-utils/utils/utils';
 
 import { DYNAMIC_SSH_INJECTION_CMD, MIN_NAME_LENGTH_FOR_GENERATED_SUFFIX } from './constants';
+import { SecretSelectionOption, type SSHSecretDetails } from './types';
 
 const getFallbackUserData = (): CloudInitUserData => ({
   password: '',
   user: '',
 });
 
-export const getAllSecretsFromSecretData = (
+export const filterSshKeySecrets = (
   secretsResourceData: IoK8sApiCoreV1Secret[],
-): IoK8sApiCoreV1Secret[] => {
-  const sshKeySecrets = secretsResourceData
+): IoK8sApiCoreV1Secret[] =>
+  secretsResourceData
     ?.filter((secret) => secret?.data?.key && validateSSHPublicKey(decodeSecret(secret)))
-    ?.sort((a, b) => (a?.metadata?.name ?? '').localeCompare(b?.metadata?.name ?? ''));
-
-  return sshKeySecrets;
-};
-
-export const getMappedProjectsWithKeys = (
-  secretsData: IoK8sApiCoreV1Secret[],
-): { [namespace: string]: IoK8sApiCoreV1Secret[] } => {
-  const sshKeySecrets = getAllSecretsFromSecretData(secretsData);
-
-  const sshData = sshKeySecrets.reduce(
-    (acc, secret) => {
-      const ns = secret?.metadata?.namespace ?? '';
-      acc[ns] = [...(acc[ns] ?? []), secret];
-      return acc;
-    },
-    {} as { [namespace: string]: IoK8sApiCoreV1Secret[] },
-  );
-
-  return sshData;
-};
+    ?.sort((a, b) => (a?.metadata?.name ?? '').localeCompare(b?.metadata?.name ?? '')) ?? [];
 
 export const getPropagationMethod = (
   vm: V1VirtualMachine,
@@ -60,11 +41,33 @@ export const generateValidSecretName = (secretName: string): string =>
     ? generatePrettyName()
     : generatePrettyName(secretName);
 
-export const addNewSecret = (
-  namespace: string,
-  targetProject: string,
+/** Selected project is not the target namespace, so the key must be copied into the target. */
+export const shouldCopySshSecretFromProject = (
+  targetNamespace: string,
+  selectedProject: string,
   activeNamespace: string,
-): boolean => (namespace ? targetProject !== namespace : targetProject !== activeNamespace);
+): boolean =>
+  targetNamespace ? selectedProject !== targetNamespace : selectedProject !== activeNamespace;
+
+/** Use existing in the UI, but the secret must be created in the target namespace (copy). */
+export const isCopyingSSHSecretToTarget = (
+  sshDetails: SSHSecretDetails,
+  targetNamespace?: string,
+): boolean =>
+  sshDetails.secretOption === SecretSelectionOption.UseExisting &&
+  Boolean(
+    targetNamespace &&
+    sshDetails.sshSecretNamespace &&
+    sshDetails.sshSecretNamespace !== targetNamespace,
+  );
+
+export const resolveSSHSecretDetailsForSubmit = (
+  sshDetails: SSHSecretDetails,
+  targetNamespace: string,
+): SSHSecretDetails =>
+  isCopyingSSHSecretToTarget(sshDetails, targetNamespace)
+    ? { ...sshDetails, secretOption: SecretSelectionOption.AddNew }
+    : sshDetails;
 
 export const cmdIsSSHInjection = (cmd: string | string[]): boolean => {
   const extendedCommand = Array.isArray(cmd) ? cmd?.join(' ') : cmd;
