@@ -1,0 +1,21 @@
+.delete-all-vms {
+  border: 1px solid var(--pf-t--global--border--color--default);
+  border-radius: var(--pf-t--global--border--radius--tiny);
+  padding-inline: var(--pf-t--global--spacer--md);
+  padding-top: var(--pf-t--global--spacer--sm);
+  padding-bottom: var(--pf-t--global--spacer--sm);
+  min-height: 6rem;
+  max-height: 20rem;
+  overflow-y: auto;
+
+  &__show-all-button {
+    position: sticky;
+    bottom: 0;
+    z-index: 1;
+  }
+
+  &__more-projects {
+    cursor: pointer;
+    text-decoration: underline dotted;
+  }
+}

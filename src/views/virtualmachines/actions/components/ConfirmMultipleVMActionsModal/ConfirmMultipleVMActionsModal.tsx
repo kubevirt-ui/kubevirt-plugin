@@ -1,10 +1,14 @@
 import React, { FC } from 'react';
 
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { VMActionTelemetry } from '@kubevirt-utils/extensions/telemetry';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Stack, StackItem } from '@patternfly/react-core';
-import { getVMNamesByNamespace } from '@virtualmachines/actions/components/ConfirmMultipleVMActionsModal/utils/utils';
+import {
+  getVMNamesByNamespace,
+  runActionOnVMs,
+} from '@virtualmachines/actions/components/ConfirmMultipleVMActionsModal/utils/utils';
 
 import ConfirmVMActionBaseModal from './components/ConfirmVMActionBaseModal';
 import VMsCountByNamespacePopoverLink from './components/VMsCountByNamespacePopoverLink';
@@ -45,12 +49,7 @@ const ConfirmMultipleVMActionsModal: FC<ConfirmMultipleVMActionsModalProps> = ({
   const numExcludedVMs = excludedVMs?.length;
   const totalSelectedVMs = numVMs + (numExcludedVMs || 0);
 
-  const actionOnVms = async () =>
-    Promise.any(
-      vms?.map((vm) => {
-        action(vm);
-      }),
-    );
+  const actionOnVms = () => runActionOnVMs(vms, action, actionType as VMActionTelemetry);
 
   const defaultBody = (
     <>
