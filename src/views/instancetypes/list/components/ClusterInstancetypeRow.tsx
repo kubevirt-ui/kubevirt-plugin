@@ -14,6 +14,8 @@ import { FleetResourceLink } from '@stolostron/multicluster-sdk';
 
 import ClusterInstancetypeActions from '../../actions/ClusterInstancetypeActions';
 
+import FamilyStatusCell from './FamilyStatusCell/FamilyStatusCell';
+
 const ClusterInstancetypeRow: FC<RowProps<V1beta1VirtualMachineClusterInstancetype>> = ({
   activeColumnIDs,
   obj: it,
@@ -40,6 +42,9 @@ const ClusterInstancetypeRow: FC<RowProps<V1beta1VirtualMachineClusterInstancety
     </TableData>
     <TableData activeColumnIDs={activeColumnIDs} id="vendor">
       {getLabel(it, VENDOR_LABEL, NO_DATA_DASH)}
+    </TableData>
+    <TableData activeColumnIDs={activeColumnIDs} id="familyStatus">
+      <FamilyStatusCell row={it} />
     </TableData>
     <TableData activeColumnIDs={activeColumnIDs} className="pf-v6-c-table__action" id="">
       <ClusterInstancetypeActions instanceType={it} isKebabToggle />

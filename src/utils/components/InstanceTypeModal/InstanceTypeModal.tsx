@@ -4,6 +4,7 @@ import { groupVersionKindFromCommonResource } from '@catalog/CreateFromInstanceT
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { InstanceTypeUnion } from '@kubevirt-utils/resources/instancetype/types';
 import { getName } from '@kubevirt-utils/resources/shared';
+import { getCluster } from '@multicluster/helpers/selectors';
 import { ResourceLink } from '@openshift-console/dynamic-plugin-sdk';
 import { FormGroup, Radio, SelectOption } from '@patternfly/react-core';
 import { RedhatIcon, UserIcon } from '@patternfly/react-icons';
@@ -12,6 +13,7 @@ import FormPFSelect from '../FormPFSelect/FormPFSelect';
 import TabModal from '../TabModal/TabModal';
 
 import useEditInstanceType from './hooks/useEditInstanceType';
+import useVisibleInstanceTypeSeriesEntries from './hooks/useVisibleInstanceTypeSeriesEntries';
 import { InstanceTypeModalProps } from './utils/types';
 import { getInstanceTypeSizes } from './utils/util';
 
@@ -38,6 +40,12 @@ const InstanceTypeModal: FC<InstanceTypeModalProps> = ({
     size,
     userInstanceTypes,
   } = useEditInstanceType({ allInstanceTypes, instanceType });
+
+  const visibleSeriesEntries = useVisibleInstanceTypeSeriesEntries({
+    cluster: getCluster(vm),
+    instanceTypeName: getName(instanceType),
+    mappedInstanceTypes,
+  });
 
   const handleSubmit = (newInstanceType: InstanceTypeUnion) => onSubmit(vm, newInstanceType);
 
@@ -90,7 +98,7 @@ const InstanceTypeModal: FC<InstanceTypeModalProps> = ({
               selected={series}
               toggleProps={{ isFullWidth: true, placeholder: t('Select series') }}
             >
-              {Object.entries(mappedInstanceTypes).map(([key, value]) => (
+              {visibleSeriesEntries.map(([key, value]) => (
                 <SelectOption
                   description={value.descriptionSeries}
                   key={key}

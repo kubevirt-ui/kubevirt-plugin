@@ -51,10 +51,18 @@ const getRedHatInstanceTypeSeriesAndSize = (
 export const isRedHatInstanceType = (instanceType: InstanceTypeUnion): boolean =>
   getLabel(instanceType, VENDOR_LABEL) === REDHAT_COM;
 
+// Copy the shared menu so items pushed for one list do not remain on the next call.
+const createInstanceTypeMenuItems = (): InstanceTypesMenuItemsData => ({
+  redHatProvided: { ...initialMenuItems.redHatProvided, items: [] },
+  userProvided: { ...initialMenuItems.userProvided, items: [] },
+});
+
 export const getInstanceTypeMenuItems = (
   instanceTypes: V1beta1VirtualMachineClusterInstancetype[],
 ): InstanceTypesMenuItemsData => {
-  if (isEmpty(instanceTypes)) return initialMenuItems;
+  const menuItems = createInstanceTypeMenuItems();
+
+  if (isEmpty(instanceTypes)) return menuItems;
 
   const itemsData = instanceTypes.reduce<InstanceTypesMenuItemsData>((acc, it) => {
     if (!isRedHatInstanceType(it)) {
@@ -83,11 +91,11 @@ export const getInstanceTypeMenuItems = (
     sizeNotExists && series.sizes.push(size);
 
     return acc;
-  }, initialMenuItems);
+  }, menuItems);
 
   itemsData.redHatProvided.items = itemsData.redHatProvided.items.map((series) => ({
     ...series,
-    sizes: series.sizes.sort((a, b) => parseSize(a?.memory) - parseSize(b?.memory)),
+    sizes: [...series.sizes].sort((a, b) => parseSize(a?.memory) - parseSize(b?.memory)),
   }));
 
   return itemsData;

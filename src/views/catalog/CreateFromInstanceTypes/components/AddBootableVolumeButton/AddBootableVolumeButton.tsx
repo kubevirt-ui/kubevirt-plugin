@@ -1,5 +1,6 @@
 import React, { FC } from 'react';
 
+import useOnSelectCreatedVolume from '@catalog/CreateFromInstanceTypes/state/hooks/useOnSelectCreatedVolume';
 import { useInstanceTypeVMStore } from '@catalog/CreateFromInstanceTypes/state/useInstanceTypeVMStore';
 import AddBootableVolumeModal from '@kubevirt-utils/components/AddBootableVolumeModal/AddBootableVolumeModal';
 import { runningTourSignal } from '@kubevirt-utils/components/GuidedTour/utils/guidedTourSignals';
@@ -16,7 +17,8 @@ export type AddBootableVolumeButtonProps = {
 const AddBootableVolumeButton: FC<AddBootableVolumeButtonProps> = ({ loadError }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
-  const { onSelectCreatedVolume, volumeListNamespace } = useInstanceTypeVMStore();
+  const { volumeListNamespace } = useInstanceTypeVMStore();
+  const onSelectCreatedVolume = useOnSelectCreatedVolume();
 
   const { canCreateDS, canCreatePVC } = useCanCreateBootableVolume(volumeListNamespace);
   const canCreate = canCreateDS || canCreatePVC;
