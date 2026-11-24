@@ -1,18 +1,16 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
-import {
-  ConfigMapModel,
-  modelToGroupVersionKind,
-  UserModel,
-} from '@kubevirt-ui-ext/kubevirt-api/console';
-import { type IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { operatorNamespaceSignal } from '@kubevirt-utils/store/operatorNamespace';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
-import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
+import { useUserPreference } from '@openshift-console/dynamic-plugin-sdk';
+import { useSignals } from '@preact/signals-react/runtime';
 
-import { KUBEVIRT_USER_SETTINGS_CONFIG_MAP_NAME } from './utils/const';
+import { KUBEVIRT_USER_PREFERENCE_PREFIX, USER_SETTINGS_KEYS } from './utils/const';
+import {
+  getLegacyUserSettings,
+  type LegacyUserSettings,
+  markAsMigrated,
+} from './utils/legacyUserSettings';
 import { type UserSettingsState } from './utils/userSettingsInitialState';
-import { parseNestedJSON, patchUserConfigMap } from './utils/utils';
 
 export type KubevirtUserSettingResult<T> = [
   value: T,
@@ -21,94 +19,76 @@ export type KubevirtUserSettingResult<T> = [
   error: Error,
 ];
 
-function useKubevirtUserSettings(): KubevirtUserSettingResult<UserSettingsState>;
-function useKubevirtUserSettings<K extends keyof UserSettingsState>(
+/**
+ * Builds the SDK user preference key: `kubevirt.<key>`. SSH keys are the only cluster scoped
+ * setting; for ACM spoke clusters they are stored on the hub as `kubevirt.ssh.<cluster>`.
+ */
+export const getUserPreferenceKey = (key: keyof UserSettingsState, cluster?: string): string =>
+  cluster && key === USER_SETTINGS_KEYS.ssh
+    ? `${KUBEVIRT_USER_PREFERENCE_PREFIX}.${key}.${cluster}`
+    : `${KUBEVIRT_USER_PREFERENCE_PREFIX}.${key}`;
+
+/**
+ * Stores a kubevirt user setting in the SDK user preferences (console `user-settings` ConfigMap,
+ * owned by the current user), instead of the shared `kubevirt-user-settings` ConfigMap.
+ *
+ * Existing values of the legacy ConfigMap are migrated on first load through a single cached,
+ * read-only request. The legacy ConfigMap is never written to.
+ */
+const useKubevirtUserSettings = <K extends keyof UserSettingsState>(
   key: K,
   cluster?: string,
-): KubevirtUserSettingResult<UserSettingsState[K]>;
-function useKubevirtUserSettings(
-  key?: keyof UserSettingsState,
-  cluster?: string,
-): KubevirtUserSettingResult<UserSettingsState | UserSettingsState[keyof UserSettingsState]> {
-  const [error, setError] = useState<Error>();
-  const [userSettings, setUserSettings] = useState<UserSettingsState>();
-  const [loading, setLoading] = useState<boolean>(false);
-  const [settingsInitialized, setSettingsInitialized] = useState<boolean>(false);
+): KubevirtUserSettingResult<UserSettingsState[K]> => {
+  useSignals();
   const operatorNamespace = operatorNamespaceSignal.value;
+  const preferenceKey = getUserPreferenceKey(key, cluster);
+  // Legacy entries were only ever stored for the hub cluster; spoke entries are not migrated
+  const shouldMigrate = !cluster;
 
-  const [user, loadedUser, errorUser] = useK8sWatchData<IoK8sApiCoreV1ConfigMap>({
-    cluster,
-    groupVersionKind: modelToGroupVersionKind(UserModel),
-    name: '~',
-  });
-
-  const userName = user?.metadata?.uid ?? user?.metadata?.name?.replace(/[^-._a-zA-Z0-9]+/g, '-');
-
-  const [userConfigMap, loadedConfigMap, configMapError] = useK8sWatchData<IoK8sApiCoreV1ConfigMap>(
-    operatorNamespace &&
-      userName && {
-        cluster,
-        groupVersionKind: modelToGroupVersionKind(ConfigMapModel),
-        name: KUBEVIRT_USER_SETTINGS_CONFIG_MAP_NAME,
-        namespace: operatorNamespace,
-      },
+  const [preference, setPreference, preferenceLoaded] = useUserPreference<UserSettingsState[K]>(
+    preferenceKey,
+    undefined,
+    true,
   );
 
-  const loadedCM = (loadedConfigMap || !isEmpty(configMapError)) && !isEmpty(operatorNamespace);
-  const loadedUsr = loadedUser || !isEmpty(errorUser);
-
-  const loadedUserSettings = loadedCM && loadedUsr;
+  const [legacySettings, setLegacySettings] = useState<LegacyUserSettings>();
 
   useEffect(() => {
-    if (!loadedUserSettings) return;
+    if (!shouldMigrate || !operatorNamespace) return;
 
-    if (!isEmpty(userConfigMap) && userName) {
-      setUserSettings(
-        (<unknown>parseNestedJSON(userConfigMap?.data?.[userName]) || {}) as UserSettingsState,
-      );
-    }
+    let isMounted = true;
 
-    setSettingsInitialized(true);
-  }, [userConfigMap, userName, loadedUserSettings]);
-
-  const pushUserSettingsChanges = async (
-    data: UserSettingsState,
-    resolve: (value: unknown) => void,
-    reject: (reason: unknown) => void,
-  ): Promise<void> => {
-    setLoading(true);
-
-    try {
-      await patchUserConfigMap(userConfigMap, userName, data, cluster);
-      resolve(key ? data[key] : data);
-    } catch (apiError) {
-      setError(apiError as Error);
-      reject(apiError);
-    }
-
-    setLoading(false);
-  };
-
-  const updateUserSetting = (
-    val: UserSettingsState | UserSettingsState[keyof UserSettingsState],
-  ): Promise<unknown> => {
-    return new Promise((resolve, reject) => {
-      setUserSettings((prevUserSettings) => {
-        const data = (key ? { ...prevUserSettings, [key]: val } : val) as UserSettingsState;
-
-        void pushUserSettingsChanges(data, resolve, reject);
-
-        return data;
-      });
+    void getLegacyUserSettings(operatorNamespace).then((legacy) => {
+      if (isMounted) setLegacySettings(legacy);
     });
-  };
 
-  return [
-    key ? userSettings?.[key] : userSettings,
-    userSettings && updateUserSetting,
-    !loading && loadedUserSettings && settingsInitialized,
-    (error ?? errorUser) || configMapError,
-  ] as KubevirtUserSettingResult<UserSettingsState | UserSettingsState[keyof UserSettingsState]>;
-}
+    return (): void => {
+      isMounted = false;
+    };
+  }, [operatorNamespace, shouldMigrate]);
+
+  const legacyLoaded = !shouldMigrate || legacySettings !== undefined;
+  const legacyValue = shouldMigrate ? (legacySettings?.[key] as UserSettingsState[K]) : undefined;
+  const needsMigration = preferenceLoaded && preference === undefined && legacyValue !== undefined;
+
+  useEffect(() => {
+    // never overwrite an existing preference and never migrate the same key twice
+    if (!needsMigration || !markAsMigrated(preferenceKey)) return;
+
+    setPreference(legacyValue);
+  }, [needsMigration, preferenceKey, legacyValue, setPreference]);
+
+  const updater = useCallback(
+    async (val: UserSettingsState[K]): Promise<UserSettingsState[K]> => {
+      setPreference(val);
+      return val;
+    },
+    [setPreference],
+  );
+
+  const value = preference ?? legacyValue;
+
+  return [value, updater, preferenceLoaded && legacyLoaded, undefined];
+};
 
 export default useKubevirtUserSettings;
