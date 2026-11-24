@@ -1,4 +1,9 @@
 import BaseComponent from '@/components/shared/base-component';
+import {
+  CONSOLE_USER_SETTINGS_NAMESPACE,
+  CONSOLE_USER_SETTINGS_ROUTE,
+  withMockedKubevirtPreferences,
+} from '@/utils/kubevirt-user-preferences';
 import VmOverviewTabResourceHealthComponent from '@/components/vm/vm-overview-tab-resource-health-component';
 import type { VmMetricEntry } from '@/data-factories/vm-metrics-mock-factory';
 import { buildPrometheusVectorResponse } from '@/data-factories/vm-metrics-mock-factory';
@@ -6,8 +11,7 @@ import { TestTimeouts } from '@/utils/test-config';
 import type { Page } from '@playwright/test';
 
 export default class VmOverviewTabComponent extends BaseComponent {
-  private static readonly _USER_SETTINGS_URL =
-    '**/api/kubernetes/api/v1/namespaces/openshift-cnv/configmaps/kubevirt-user-settings';
+  private static readonly _USER_SETTINGS_URL = CONSOLE_USER_SETTINGS_ROUTE;
 
   private static readonly _VM_LIST_PATH = '/k8s/all-namespaces/kubevirt.io~v1~VirtualMachine';
   private readonly _clusterStatusWidget = this.testId('cluster-status-widget');
@@ -780,8 +784,6 @@ export default class VmOverviewTabComponent extends BaseComponent {
 
     await this.page.unroute(configMapUrl);
 
-    const serialized = JSON.stringify(settings);
-
     await this.page.route(configMapUrl, async (route) => {
       const method = route.request().method();
       if (method === 'GET' || method === 'PATCH') {
@@ -793,19 +795,11 @@ export default class VmOverviewTabComponent extends BaseComponent {
           body = {
             apiVersion: 'v1',
             kind: 'ConfigMap',
-            metadata: { name: 'kubevirt-user-settings', namespace: 'openshift-cnv' },
+            metadata: { name: 'user-settings', namespace: CONSOLE_USER_SETTINGS_NAMESPACE },
             data: {},
           };
         }
-        const existingData = (body['data'] as Record<string, string>) ?? {};
-        const patchedData: Record<string, string> = {};
-        for (const key of Object.keys(existingData)) {
-          patchedData[key] = serialized;
-        }
-        if (Object.keys(patchedData).length === 0) {
-          patchedData['kube-admin'] = serialized;
-        }
-        body['data'] = patchedData;
+        body = withMockedKubevirtPreferences(body, settings);
         await route.fulfill({
           status: 200,
           contentType: 'application/json',

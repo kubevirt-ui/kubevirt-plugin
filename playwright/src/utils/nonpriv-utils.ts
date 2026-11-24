@@ -8,6 +8,11 @@
 import type RequestContextClient from '@/clients/request-context-client';
 import type { JsonPatchOp } from '@/data-models/kubernetes-types';
 
+import {
+  CONSOLE_USER_SETTINGS_NAMESPACE,
+  consoleUserSettingsConfigMapName,
+  consoleUserSettingsKey,
+} from './kubevirt-user-preferences';
 import { logger } from './logger';
 import { MINUTE } from './test-config';
 
@@ -169,7 +174,7 @@ function ignore404(err: unknown): void {
  *   1. Namespace RoleBindings created by setup (`test-user-admin`, `test-user-kubevirt-edit`)
  *   2. Cluster-level ClusterRoleBindings (via `revokeNonPrivClusterViewAccess`)
  *   3. OpenShift Identity and User objects
- *   4. The user's key in the `kubevirt-user-settings` ConfigMap
+ *   4. The user's console user-settings ConfigMap (SDK user preferences, incl. `kubevirt.*` keys)
  *   5. The htpasswd secret in `openshift-config`
  *   6. The `test-users` HTPasswd IDP from the OAuth cluster resource
  *
@@ -181,8 +186,17 @@ export async function removeNonPrivUser(
   client: RequestContextClient,
   username: string,
   testNamespace: string,
-  cnvNamespace: string,
 ): Promise<void> {
+  // The console user-settings ConfigMap is named after the user uid: resolve it before deleting the user.
+  const userSettingsKeys = new Set<string>([username]);
+  try {
+    const user = await client.getResource('user.openshift.io', 'v1', 'users', username);
+    const key = consoleUserSettingsKey(user ?? undefined);
+    if (key) userSettingsKeys.add(key);
+  } catch {
+    // user may not exist (partially provisioned) — fall back to the username
+  }
+
   // 1. Namespace RoleBindings
   const nsBindings = ['test-user-admin', 'test-user-kubevirt-edit'];
   for (const name of nsBindings) {
@@ -228,16 +242,22 @@ export async function removeNonPrivUser(
     }
   }
 
-  // 4. kubevirt-user-settings ConfigMap — remove the user's key
-  try {
-    const patchOps: JsonPatchOp[] = [{ op: 'remove', path: `/data/${username}` }];
-    await client.patchConfigMap('kubevirt-user-settings', cnvNamespace, patchOps);
-    logger.info(`✓ Removed "${username}" key from kubevirt-user-settings`);
-  } catch (err) {
+  // 4. Console user-settings ConfigMap(s) — holds the SDK user preferences (incl. kubevirt.* keys)
+  for (const key of userSettingsKeys) {
+    const configMapName = consoleUserSettingsConfigMapName(key);
     try {
-      ignore404(err);
-    } catch {
-      logger.warn(`⚠️ Failed to patch kubevirt-user-settings: ${err}`);
+      await client.deleteResourceByKind(
+        'configmap',
+        configMapName,
+        CONSOLE_USER_SETTINGS_NAMESPACE,
+      );
+      logger.info(`✓ Deleted ConfigMap ${configMapName} in ${CONSOLE_USER_SETTINGS_NAMESPACE}`);
+    } catch (err) {
+      try {
+        ignore404(err);
+      } catch {
+        logger.warn(`⚠️ Failed to delete ConfigMap ${configMapName}: ${err}`);
+      }
     }
   }
 

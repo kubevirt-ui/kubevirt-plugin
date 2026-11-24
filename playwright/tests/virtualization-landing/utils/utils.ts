@@ -1,7 +1,7 @@
 import RequestContextClient from '@/clients/request-context-client';
 import NavigationComponent from '@/components/shared/navigation-component';
-import { KubernetesResource } from '@/data-models/kubernetes-types';
-import { EnvVariables } from '@/utils/env-variables';
+import { USER_PREFERENCES_URL_FRAGMENT } from '@/utils/kubevirt-user-preferences';
+import { getKubevirtUserPreference, setKubevirtUserPreference } from '@/utils/test-setup-helpers';
 import { SECOND, TestTimeouts } from '@/utils/test-config';
 import { expect, Page } from '@playwright/test';
 
@@ -30,29 +30,19 @@ export const verifyWelcomeModalVisibility = async (
 };
 
 export const resetUserSettings = async (apiClient: RequestContextClient) => {
-  const user: KubernetesResource | null = await apiClient.getResource(
-    'user.openshift.io',
-    'v1',
-    'users',
-    '~',
+  const quickStart = await getKubevirtUserPreference<{ dontShowWelcomeModal?: boolean }>(
+    apiClient,
+    'quickStart',
   );
 
-  const settingsKey =
-    user?.metadata?.uid || user?.metadata?.name?.replace(/[^-._a-zA-Z0-9]+/g, '-');
+  // Nothing stored yet: the plugin defaults (welcome modal visible) already apply
+  if (quickStart === undefined) return;
 
-  if (!settingsKey) return;
-
-  const userSettingsCm = await apiClient.getKubeVirtUserSettings(EnvVariables.cnvNamespace);
-  const cmData = (userSettingsCm?.data ?? {}) as Record<string, string>;
-
-  if (!(settingsKey in cmData)) return;
-
-  const parsed = JSON.parse(cmData[settingsKey] || '{}');
-  parsed.quickStart = { ...parsed.quickStart, dontShowWelcomeModal: false, tourStepsSeen: [] };
-
-  await apiClient.patchConfigMap('kubevirt-user-settings', EnvVariables.cnvNamespace, [
-    { op: 'replace', path: `/data/${settingsKey}`, value: JSON.stringify(parsed) },
-  ]);
+  await setKubevirtUserPreference(apiClient, 'quickStart', {
+    ...quickStart,
+    dontShowWelcomeModal: false,
+    tourStepsSeen: [],
+  });
 };
 
 export const getTourTotalSteps = async (page: Page): Promise<number> => {
@@ -74,7 +64,7 @@ export const enterVirtualMachinesPage = async (page: Page, nav: NavigationCompon
 export const checkIfModalIsVisibleAfterCheckboxClick = async (page: Page) => {
   const patchPromise = page.waitForResponse(
     (resp) =>
-      resp.url().includes('kubevirt-user-settings') &&
+      resp.url().includes(USER_PREFERENCES_URL_FRAGMENT) &&
       (resp.request().method() === 'PATCH' || resp.request().method() === 'PUT') &&
       resp.status() >= 200 &&
       resp.status() < 300,

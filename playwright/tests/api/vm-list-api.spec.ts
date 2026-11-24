@@ -1,5 +1,6 @@
 import { expect, test } from '@/fixtures/api-test-fixture';
 import { assertList } from '@/utils/api-assertions';
+import { resolveUserSettingsKey } from '@/utils/test-setup-helpers';
 import { ROUTE_API_TAG } from '@/data-models/route-tags';
 
 test.describe('VirtualMachines list page — API endpoints', { tag: [ROUTE_API_TAG, '@api'] }, () => {
@@ -45,10 +46,13 @@ test.describe('VirtualMachines list page — API endpoints', { tag: [ROUTE_API_T
     expect(body.metadata?.name, 'name must match').toBe('kubevirt-ui-features');
   });
 
-  test('GET kubevirt-user-settings configmap is readable', async ({ apiClient }) => {
-    const body = await apiClient.getKubeVirtUserSettings();
+  test('GET console user-settings configmap (SDK user preferences) is readable', async ({
+    apiClient,
+  }) => {
+    const settingsKey = await resolveUserSettingsKey(apiClient);
+    const body = await apiClient.getKubeVirtUserSettings(settingsKey);
     expect(body.kind, 'kind must be ConfigMap').toBe('ConfigMap');
-    expect(body.metadata?.name, 'name must match').toBe('kubevirt-user-settings');
+    expect(body.metadata?.name, 'name must match').toBe(`user-settings-${settingsKey}`);
   });
 
   test('GET migration policies returns MigrationPolicyList', async ({ apiClient }) => {

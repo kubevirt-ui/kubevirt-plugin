@@ -9,12 +9,7 @@ import {
   consoleUserSettingsPreferencesJson,
 } from '@/utils/console-user-settings';
 import { EnvVariables } from '@/utils/env-variables';
-import {
-  buildKubevirtUserSettingsHideWelcomeJson,
-  buildKubevirtUserSettingsWelcomeJsonPatch,
-  KUBEADMIN_KUBEVIRT_WELCOME_HIDDEN_JSON,
-  openshiftUserKubevirtSettingsDataKey,
-} from '@/utils/kubevirt-user-settings';
+import { kubevirtWelcomeHiddenPreferenceData } from '@/utils/kubevirt-user-preferences';
 import { MINUTE } from '@/utils/test-config';
 
 export function getDefaultKubeconfigPath(): string {
@@ -128,6 +123,8 @@ export function patchConsoleUserSettings(kubeconfig: string, settingsKey: string
       dev: { completed: true },
       'virtualization-perspective': { completed: true },
     }),
+    // KubeVirt plugin settings are SDK user preferences (`kubevirt.<setting>`), CNV-100983.
+    ...kubevirtWelcomeHiddenPreferenceData(),
   };
   const patchFile = path.join(os.tmpdir(), `pw-console-user-settings-${Date.now()}.json`);
   fs.writeFileSync(patchFile, JSON.stringify({ data }), 'utf8');
@@ -172,7 +169,6 @@ export function patchConsoleUserSettings(kubeconfig: string, settingsKey: string
 export function ensureNonPrivWelcomeSettingsViaOc(
   kubeconfig: string,
   openshiftUsername: string,
-  cnvNamespace?: string,
 ): void {
   let uid: string | undefined;
   try {
@@ -190,92 +186,6 @@ export function ensureNonPrivWelcomeSettingsViaOc(
   }
   for (const key of settingsKeys) {
     patchConsoleUserSettings(kubeconfig, key);
-  }
-
-  patchKubevirtUserSettingsHideWelcomeForUser(kubeconfig, openshiftUsername, cnvNamespace);
-}
-
-const KUBEVIRT_USER_SETTINGS_CM = 'kubevirt-user-settings';
-
-/** Non-priv: test user cannot GET `openshift-cnv/kubevirt-user-settings` via console proxy — patch as kubeadmin. */
-export function patchKubevirtUserSettingsHideWelcomeForUser(
-  kubeconfig: string,
-  openshiftUsername: string,
-  cnvNamespace?: string,
-): void {
-  const namespace = cnvNamespace ?? EnvVariables.cnvNamespace;
-  let uid: string | undefined;
-  try {
-    uid = runOc(
-      `oc get user ${openshiftUsername} -o jsonpath='{.metadata.uid}'`,
-      kubeconfig,
-    ).trim();
-  } catch {
-    uid = undefined;
-  }
-  const primaryKey = openshiftUserKubevirtSettingsDataKey(openshiftUsername, uid || undefined);
-  const keys = new Set<string>([primaryKey, openshiftUsername]);
-  if (uid) {
-    keys.add(uid);
-  }
-  for (const key of keys) {
-    patchKubevirtUserSettingsHideWelcomeForDataKey(kubeconfig, key, namespace);
-  }
-  if (!keys.has('kube-admin')) {
-    patchKubevirtUserSettingsHideWelcomeForDataKey(kubeconfig, 'kube-admin', namespace);
-  }
-}
-
-function patchKubevirtUserSettingsHideWelcomeForDataKey(
-  kubeconfig: string,
-  dataKey: string,
-  namespace: string,
-): void {
-  let cm: { data?: Record<string, string> } | undefined;
-  try {
-    const raw = runOc(
-      `oc get configmap ${KUBEVIRT_USER_SETTINGS_CM} -n ${namespace} -o json`,
-      kubeconfig,
-    );
-    cm = JSON.parse(raw) as { data?: Record<string, string> };
-  } catch {
-    cm = undefined;
-  }
-  const patchOps = buildKubevirtUserSettingsWelcomeJsonPatch(cm, dataKey);
-  const patchFile = path.join(os.tmpdir(), `pw-kubevirt-user-settings-${Date.now()}.json`);
-  fs.writeFileSync(patchFile, JSON.stringify(patchOps), 'utf8');
-  try {
-    runOc(
-      `oc patch configmap ${KUBEVIRT_USER_SETTINGS_CM} -n ${namespace} --type json --patch-file "${patchFile}"`,
-      kubeconfig,
-    );
-  } catch (err) {
-    const message = err instanceof Error ? err.message : String(err);
-    if (!message.includes('NotFound')) {
-      throw err;
-    }
-    const welcomeValue =
-      dataKey === 'kube-admin'
-        ? KUBEADMIN_KUBEVIRT_WELCOME_HIDDEN_JSON
-        : buildKubevirtUserSettingsHideWelcomeJson();
-    const manifest = path.join(os.tmpdir(), `pw-kubevirt-user-settings-cm-${Date.now()}.json`);
-    fs.writeFileSync(
-      manifest,
-      JSON.stringify({
-        apiVersion: 'v1',
-        data: { [dataKey]: welcomeValue },
-        kind: 'ConfigMap',
-        metadata: { name: KUBEVIRT_USER_SETTINGS_CM, namespace },
-      }),
-      'utf8',
-    );
-    try {
-      runOc(`oc apply -f "${manifest}"`, kubeconfig);
-    } finally {
-      fs.unlinkSync(manifest);
-    }
-  } finally {
-    fs.unlinkSync(patchFile);
   }
 }
 

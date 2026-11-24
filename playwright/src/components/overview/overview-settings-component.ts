@@ -1,5 +1,6 @@
 import BaseComponent from '@/components/shared/base-component';
 import NavigationComponent from '@/components/shared/navigation-component';
+import { USER_PREFERENCES_URL_FRAGMENT } from '@/utils/kubevirt-user-preferences';
 import { pollUntil } from '@/utils/poll-until';
 import { TestTimeouts } from '@/utils/test-config';
 import type { Locator, Page } from '@playwright/test';
@@ -227,7 +228,7 @@ export default class OverviewSettingsComponent extends BaseComponent {
       const patchPromise = this.page.waitForResponse(
         (resp) =>
           (resp.url().includes('kubevirt-ui-features') ||
-            resp.url().includes('kubevirt-user-settings')) &&
+            resp.url().includes(USER_PREFERENCES_URL_FRAGMENT)) &&
           (resp.request().method() === 'PATCH' || resp.request().method() === 'PUT') &&
           resp.status() >= 200 &&
           resp.status() < 300,
@@ -379,7 +380,7 @@ export default class OverviewSettingsComponent extends BaseComponent {
       const patchPromise = this.page.waitForResponse(
         (resp) =>
           (resp.url().includes('kubevirt-ui-features') ||
-            resp.url().includes('kubevirt-user-settings')) &&
+            resp.url().includes(USER_PREFERENCES_URL_FRAGMENT)) &&
           (resp.request().method() === 'PATCH' || resp.request().method() === 'PUT') &&
           resp.status() >= 200 &&
           resp.status() < 300,

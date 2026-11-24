@@ -15,6 +15,11 @@ import {
 } from '@/utils/cluster-oc';
 import { dismissConsoleObstructions } from '@/utils/console-modals';
 import { EnvVariables } from '@/utils/env-variables';
+import {
+  CONSOLE_USER_SETTINGS_NAMESPACE,
+  consoleUserSettingsConfigMapName,
+  kubevirtWelcomeHiddenPreferenceData,
+} from '@/utils/kubevirt-user-preferences';
 import { logger } from '@/utils/logger';
 import { grantNonPrivClusterRbac } from '@/utils/nonpriv-cluster-rbac';
 import {
@@ -448,30 +453,22 @@ export function getSetupRules(): SetupRule[] {
           );
         }
 
-        // Patch KubeVirt plugin user settings (auto-hide nav).
-        const kubevirtSettings = JSON.stringify({
-          navigation: { autoHideNav: false },
-          onboardingPopoversHidden: {
-            catalog: true,
-            createProject: true,
-            navCollapse: true,
-            vmsTab: true,
-          },
-          quickStart: { dontShowWelcomeModal: true },
-        });
+        // KubeVirt plugin user settings are SDK user preferences (kubevirt.<setting>) stored in
+        // the same per-user console ConfigMap (auto-hide nav, onboarding popovers, welcome modal).
+        const pluginConfigMapName = consoleUserSettingsConfigMapName(EnvVariables.username);
         try {
           await apiClient.mergePatchResource(
             '',
             'v1',
             'configmaps',
-            'kubevirt-user-settings',
-            { data: { [settingsKey]: kubevirtSettings } },
-            ctx.cnvNamespace,
+            pluginConfigMapName,
+            { data: kubevirtWelcomeHiddenPreferenceData() },
+            CONSOLE_USER_SETTINGS_NAMESPACE,
           );
-          logger.success(`✓ KubeVirt sidebar auto-hide disabled for '${settingsKey}'`);
+          logger.success(`✓ KubeVirt sidebar auto-hide disabled for '${EnvVariables.username}'`);
         } catch {
           logger.info(
-            `ℹ ConfigMap kubevirt-user-settings not found in ${ctx.cnvNamespace} — will use defaults`,
+            `ℹ ConfigMap ${pluginConfigMapName} not found — KubeVirt settings will use defaults`,
           );
         }
       },
@@ -488,11 +485,7 @@ export function getSetupRules(): SetupRule[] {
           if (!kubeconfig) {
             throw new Error('Kubeconfig required to patch non-priv welcome settings via oc');
           }
-          ensureNonPrivWelcomeSettingsViaOc(
-            kubeconfig,
-            EnvVariables.testUsername,
-            ctx.cnvNamespace,
-          );
+          ensureNonPrivWelcomeSettingsViaOc(kubeconfig, EnvVariables.testUsername);
           // Reload so the console picks up ConfigMap changes before storage state is saved.
           if (browserState?.page) {
             await browserState.page
@@ -511,50 +504,9 @@ export function getSetupRules(): SetupRule[] {
           throw new Error('RequestContextClient not initialized');
         }
 
-        const virtUsername = 'kube-admin';
-
-        let virtResult = false;
-        try {
-          await apiClient.mergePatchResource(
-            '',
-            'v1',
-            'configmaps',
-            'kubevirt-user-settings',
-            {
-              data: {
-                [virtUsername]: JSON.stringify({
-                  navigation: { autoHideNav: false },
-                  quickStart: { dontShowWelcomeModal: true, activeQuickStartID: '' },
-                  guidedTour: false,
-                  onboardingPopoversHidden: {
-                    catalog: true,
-                    createProject: true,
-                    navCollapse: true,
-                    vmsTab: true,
-                  },
-                }),
-              },
-            },
-            ctx.cnvNamespace,
-          );
-          virtResult = true;
-        } catch {
-          virtResult = false;
-        }
-
-        if (virtResult) {
-          logger.success(
-            `✓ Virtualization welcome settings disabled for '${virtUsername}' in ${ctx.cnvNamespace}`,
-          );
-        } else {
-          logger.warn(
-            `⚠️ Could not disable virtualization welcome settings (ConfigMap may not exist yet)`,
-          );
-        }
-
         const consoleUsername = EnvVariables.username;
-        const consoleSettingsNs = 'openshift-console-user-settings';
-        const configMapName = `user-settings-${consoleUsername}`;
+        const consoleSettingsNs = CONSOLE_USER_SETTINGS_NAMESPACE;
+        const configMapName = consoleUserSettingsConfigMapName(consoleUsername);
         const maxAttempts = 5;
         const patchData: Record<string, string> = {
           'console.guidedTour': JSON.stringify({
@@ -562,6 +514,8 @@ export function getSetupRules(): SetupRule[] {
             dev: { completed: true },
             'virtualization-perspective': { completed: true },
           }),
+          // KubeVirt plugin welcome modal / onboarding popovers (SDK user preferences)
+          ...kubevirtWelcomeHiddenPreferenceData(),
         };
 
         let coreResult = false;
@@ -585,7 +539,9 @@ export function getSetupRules(): SetupRule[] {
         }
 
         if (coreResult) {
-          logger.success(`✓ Core console guided tours marked completed for '${consoleUsername}'`);
+          logger.success(
+            `✓ Console guided tours + KubeVirt welcome settings set for '${consoleUsername}'`,
+          );
         } else {
           logger.warn(
             `⚠️ Could not disable core welcome modal (ConfigMap may not exist for '${consoleUsername}')`,

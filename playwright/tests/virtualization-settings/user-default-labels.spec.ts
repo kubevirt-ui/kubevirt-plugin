@@ -84,7 +84,7 @@ test.describe('User default VM labels settings', { tag: [ROUTE_VIRTUALIZATION_SE
 
   // --- Group C: persist check (fresh state for isolation) ---
 
-  // User-edited value persists to kubevirt-user-settings ConfigMap
+  // User-edited value persists to the kubevirt.defaultVMLabels user preference
   test('User-edited value persists to user-settings ConfigMap', async ({
     apiClient,
     autoLabelsComponent,
