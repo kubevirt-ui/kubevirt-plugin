@@ -1,6 +1,7 @@
 import { type FC, type JSX, type ReactNode, useState } from 'react';
 
-import { Select, SelectList, type SelectProps } from '@patternfly/react-core';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { Select, SelectList, type SelectProps, Spinner } from '@patternfly/react-core';
 
 import SelectToggle, { type MenuTogglePropsWithTestId } from '../toggles/SelectToggle';
 
@@ -10,6 +11,7 @@ type FormPFSelectProps = Omit<SelectProps, 'isOpen' | 'selected' | 'toggle'> & {
   children?: ReactNode;
   closeOnSelect?: boolean;
   isDisabled?: boolean;
+  isLoading?: boolean;
   placeholder?: string;
   selected?: string | readonly string[] | number | undefined;
   selectedLabel?: ReactNode;
@@ -23,6 +25,7 @@ type FormPFSelectProps = Omit<SelectProps, 'isOpen' | 'selected' | 'toggle'> & {
  * @param root0.className
  * @param root0.closeOnSelect
  * @param root0.isDisabled
+ * @param root0.isLoading
  * @param root0.onSelect
  * @param root0.selected
  * @param root0.selectedLabel
@@ -34,6 +37,7 @@ const FormPFSelect: FC<FormPFSelectProps> = ({
   className,
   closeOnSelect = true,
   isDisabled = false,
+  isLoading = false,
   onSelect,
   placeholder,
   selected,
@@ -41,6 +45,7 @@ const FormPFSelect: FC<FormPFSelectProps> = ({
   toggleProps,
   ...props
 }): JSX.Element => {
+  const { t } = useKubevirtTranslation();
   const [isOpen, setIsOpen] = useState(false);
 
   const onToggle = (): void => setIsOpen((prevIsOpen) => !prevIsOpen);
@@ -62,6 +67,10 @@ const FormPFSelect: FC<FormPFSelectProps> = ({
         onClick: onToggle,
         selected: selectedLabel ?? selected ?? placeholder,
         ...toggleProps,
+        ...(isLoading && {
+          icon: <Spinner aria-label={t('Loading')} size="sm" />,
+          isDisabled: true,
+        }),
       })}
       {...props}
     >

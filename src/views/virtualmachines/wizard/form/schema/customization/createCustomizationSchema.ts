@@ -21,6 +21,10 @@ export const createCustomizationSchema = (
 
   return yup.object({
     autoLabelsApplied: yup.boolean().defined(),
+    pendingCloudIdentity: yup
+      .mixed<VMWizardCustomizationValues['pendingCloudIdentity']>()
+      .nullable()
+      .defined(),
     pendingUploadKeys: yup.array().of(yup.string().defined()).defined(),
     templateAdditionalObjects: yup.array().defined(),
     vmDraft: vmDraftSchema.test('required-vm-labels', function (value) {

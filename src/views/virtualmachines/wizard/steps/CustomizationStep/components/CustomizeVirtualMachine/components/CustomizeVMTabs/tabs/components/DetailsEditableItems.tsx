@@ -17,6 +17,7 @@ import { useVMWizardForm } from '@virtualmachines/wizard/form/VMWizardFormProvid
 import { useWizardVMDraft } from '@virtualmachines/wizard/hooks/useWizardVMDraft';
 
 import CPUMemory from './CPUMemory';
+import WizardCloudIdentity from './WizardCloudIdentity';
 
 type DetailsEditableItemsProps = {
   treeViewFoldersEnabled: boolean;
@@ -123,6 +124,7 @@ const DetailsEditableItems: FC<DetailsEditableItemsProps> = ({ treeViewFoldersEn
           ));
         }}
       />
+      <WizardCloudIdentity />
     </>
   );
 };

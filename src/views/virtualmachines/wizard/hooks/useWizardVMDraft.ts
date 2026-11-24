@@ -26,6 +26,7 @@ export const useWizardVMDraft = (): WizardVMDraft => {
   const vmDraft = useWatch({ control, name: 'customization.vmDraft' });
 
   const clearDraft = useCallback(() => {
+    setValue('customization.pendingCloudIdentity', null);
     setValue('customization.templateAdditionalObjects', []);
     setValue('customization.autoLabelsApplied', false);
     setValue('customization.vmDraft', null, options);

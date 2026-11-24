@@ -2,6 +2,10 @@ import { type V1beta1DataVolume } from '@kubevirt-ui-ext/kubevirt-api/containeri
 import { type IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { type PreferenceOption } from '@kubevirt-utils/components/AddBootableVolumeModal/types';
+import {
+  type CloudIdentityFormValues,
+  type CloudIdentityProvider,
+} from '@kubevirt-utils/components/CloudIdentity';
 import { type VolumeSnapshotKind } from '@kubevirt-utils/components/SelectSnapshot/types';
 import { type BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { type Template } from '@kubevirt-utils/resources/template';
@@ -69,8 +73,16 @@ export type VMWizardCloneValues = {
   sourceVM: null | V1VirtualMachine;
 };
 
+export type VMWizardPendingCloudIdentity = {
+  provider: CloudIdentityProvider;
+  values: Omit<CloudIdentityFormValues, 'serviceAccountSource'> & {
+    serviceAccountSource: 'new';
+  };
+};
+
 export type VMWizardCustomizationValues = {
   autoLabelsApplied: boolean;
+  pendingCloudIdentity: null | VMWizardPendingCloudIdentity;
   pendingUploadKeys: string[];
   templateAdditionalObjects: K8sResourceCommon[];
   vmDraft: null | V1VirtualMachine;

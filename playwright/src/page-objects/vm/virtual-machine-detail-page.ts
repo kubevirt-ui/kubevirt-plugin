@@ -644,6 +644,30 @@ export default class VirtualMachineDetailPage extends PageCommons {
     return this.disks.mountCdrom(diskName, source, sourceType);
   }
 
+  async getCloudIdentityDetailsText(): Promise<string> {
+    return this.configuration.getCloudIdentityDetailsText();
+  }
+
+  async openCloudIdentityModal(): Promise<void> {
+    return this.configuration.openCloudIdentityModal();
+  }
+
+  async selectExistingCloudIdentityServiceAccount(name: string): Promise<void> {
+    return this.configuration.selectExistingCloudIdentityServiceAccount(name);
+  }
+
+  async saveCloudIdentity(): Promise<void> {
+    return this.configuration.saveCloudIdentity();
+  }
+
+  async openCloudIdentityDetachModal(): Promise<void> {
+    return this.configuration.openCloudIdentityDetachModal();
+  }
+
+  async confirmCloudIdentityDetach(): Promise<void> {
+    return this.configuration.confirmCloudIdentityDetach();
+  }
+
   async navigateToConfigurationDetails() {
     await this.configuration.navigateToConfigurationDetails();
   }

@@ -1,30 +1,19 @@
-/* eslint-disable max-lines */
 import { type FC } from 'react';
 
 import {
   type V1VirtualMachine,
   type V1VirtualMachineInstance,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
-import HeadlessMode from '@kubevirt-utils/components/HeadlessMode/HeadlessMode';
-import HostnameModal from '@kubevirt-utils/components/HostnameModal/HostnameModal';
-import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import PanicDeviceDescriptionItem from '@kubevirt-utils/components/PanicDeviceDescriptionItem/PanicDeviceDescriptionItem';
-import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import VSOCKDetailsDescriptionItem from '@kubevirt-utils/components/VSOCKDetailsDescriptionItem/VSOCKDetailsDescriptionItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { OLSPromptType } from '@lightspeed/utils/prompts';
-import { Switch } from '@patternfly/react-core';
-import DeletionProtectionModal from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/DeletionProtectionModal';
-import { VMDeletionProtectionOptions } from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/utils/types';
-import { setDeletionProtectionForVM } from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/utils/utils';
+import DetailsSectionCloudIdentity from '@virtualmachines/details/tabs/configuration/details/components/DetailsSectionCloudIdentity/DetailsSectionCloudIdentity';
 
-import {
-  updatedHostname,
-  updateGuestSystemAccessLog,
-  updateHeadlessMode,
-  updateVSOCK,
-} from '../utils/utils';
+import { updateVSOCK } from '../utils/utils';
+import DeletionProtectionDescriptionItem from './DetailsSectionAccessItems/DeletionProtectionDescriptionItem';
+import GuestSystemLogAccessDescriptionItem from './DetailsSectionAccessItems/GuestSystemLogAccessDescriptionItem';
+import HeadlessModeDescriptionItem from './DetailsSectionAccessItems/HeadlessModeDescriptionItem';
+import HostnameDescriptionItem from './DetailsSectionAccessItems/HostnameDescriptionItem';
 
 type DetailsSectionAccessItemsProps = {
   canUpdateVM: boolean;
@@ -47,49 +36,13 @@ const DetailsSectionAccessItems: FC<DetailsSectionAccessItemsProps> = ({
   vmi,
   vmName,
 }) => {
-  const { createModal } = useModal();
   const { t } = useKubevirtTranslation();
 
   return (
     <>
-      <DescriptionItem
-        data-test={`${vmName}-hostname`}
-        descriptionData={
-          // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- empty string must fall back
-          vm?.spec?.template?.spec?.hostname || vmName
-        }
-        descriptionHeader={<SearchItem id="hostname">{t('Hostname')}</SearchItem>}
-        isEdit={canUpdateVM}
-        onEditClick={() =>
-          createModal(({ isOpen, onClose }) => (
-            <HostnameModal
-              isOpen={isOpen}
-              onClose={onClose}
-              onSubmit={updatedHostname}
-              vm={vm}
-              vmi={vmi}
-            />
-          ))
-        }
-      />
-      <DescriptionItem
-        bodyContent={t(
-          'Whether to attach the default graphics device or not. VNC will not be available if checked.',
-        )}
-        breadcrumb="VirtualMachine.spec.template.devices.autoattachGraphicsDevice"
-        data-test={`${vmName}-headless`}
-        descriptionData={
-          <HeadlessMode
-            isDisabled={!canUpdateVM}
-            updateHeadlessMode={(checked) => updateHeadlessMode(vm, checked)}
-            vm={vm}
-          />
-        }
-        descriptionHeader={<SearchItem id="headless-mode">{t('Headless mode')}</SearchItem>}
-        isPopover
-        olsObj={vm}
-        promptType={OLSPromptType.HEADLESS_MODE}
-      />
+      <HostnameDescriptionItem canUpdateVM={canUpdateVM} vm={vm} vmi={vmi} vmName={vmName} />
+      <DetailsSectionCloudIdentity canUpdateVM={canUpdateVM} vm={vm} vmi={vmi} />
+      <HeadlessModeDescriptionItem canUpdateVM={canUpdateVM} vm={vm} vmName={vmName} />
       <VSOCKDetailsDescriptionItem
         disabledTooltipText={t("You don't have permission to update this virtual machine")}
         isDisabled={!canUpdateVM}
@@ -97,63 +50,17 @@ const DetailsSectionAccessItems: FC<DetailsSectionAccessItemsProps> = ({
         vm={vm}
       />
       <PanicDeviceDescriptionItem vm={vm} vmi={vmi} />
-      <DescriptionItem
-        bodyContent={t(
-          'Applying the start/pause mode to this virtual machine will cause it to partially reboot and pause.',
-        )}
-        descriptionData={
-          <Switch
-            id="guest-system-log-access"
-            isChecked={isCheckedGuestSystemAccessLog}
-            isDisabled={isGuestSystemLogsDisabled || !canUpdateVM}
-            onChange={(_event, checked) => {
-              setIsCheckedGuestSystemAccessLog(checked);
-              void updateGuestSystemAccessLog(vm, checked);
-            }}
-          />
-        }
-        descriptionHeader={
-          <SearchItem id="guest-system-log-access">{t('Guest system log access')}</SearchItem>
-        }
-        isPopover
-        olsObj={vm}
-        promptType={OLSPromptType.GUEST_SYSTEM_LOG_ACCESS}
+      <GuestSystemLogAccessDescriptionItem
+        canUpdateVM={canUpdateVM}
+        isChecked={isCheckedGuestSystemAccessLog}
+        isDisabled={isGuestSystemLogsDisabled}
+        setIsChecked={setIsCheckedGuestSystemAccessLog}
+        vm={vm}
       />
-      <DescriptionItem
-        bodyContent={t(
-          'Applying deletion protection to this VM will prevent deletion through the web console.',
-        )}
-        descriptionData={
-          <Switch
-            id="deletion-protection"
-            isChecked={deletionProtectionEnabled}
-            isDisabled={!canUpdateVM}
-            onChange={(_event, checked) =>
-              createModal(({ isOpen, onClose }) => (
-                <DeletionProtectionModal
-                  deletionProtectionOption={
-                    checked
-                      ? VMDeletionProtectionOptions.ENABLE
-                      : VMDeletionProtectionOptions.DISABLE
-                  }
-                  isOpen={isOpen}
-                  onCancel={onClose}
-                  onConfirm={(enableDeletionProtection) => {
-                    void setDeletionProtectionForVM(vm, enableDeletionProtection);
-                    onClose();
-                  }}
-                  vm={vm}
-                />
-              ))
-            }
-          />
-        }
-        descriptionHeader={
-          <SearchItem id="deletion-protection">{t('Deletion protection')}</SearchItem>
-        }
-        isPopover
-        olsObj={vm}
-        promptType={OLSPromptType.DELETION_PROTECTION}
+      <DeletionProtectionDescriptionItem
+        canUpdateVM={canUpdateVM}
+        isChecked={deletionProtectionEnabled}
+        vm={vm}
       />
     </>
   );

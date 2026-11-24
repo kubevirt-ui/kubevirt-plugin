@@ -2,12 +2,14 @@ import type { ConsoleUserSettingsLocation } from '@kubevirt-utils/hooks/consoleU
 
 import './i18next';
 
+type ConsoleBranding = 'azure' | 'dedicated' | 'ocp' | 'okd' | 'online' | 'openshift' | 'rosa';
+
 declare global {
   // eslint-disable-next-line @typescript-eslint/consistent-type-definitions -- global augmentation requires interface
   interface Window {
     SERVER_FLAGS: {
       authDisabled: boolean;
-      branding: string;
+      branding: ConsoleBranding;
       nodeArchitectures?: string[];
       userSettingsLocation?: ConsoleUserSettingsLocation;
     };

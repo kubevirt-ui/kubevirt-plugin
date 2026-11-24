@@ -1,4 +1,8 @@
 import BootOrderModal from '@kubevirt-utils/components/BootOrderModal/BootOrderModal';
+import {
+  CloudIdentityModal,
+  getCloudIdentityProvider,
+} from '@kubevirt-utils/components/CloudIdentity';
 import CPUMemoryModal from '@kubevirt-utils/components/CPUMemoryModal/CPUMemoryModal';
 import FirmwareBootloaderModal from '@kubevirt-utils/components/FirmwareBootloaderModal/FirmwareBootloaderModal';
 import HostnameModal from '@kubevirt-utils/components/HostnameModal/HostnameModal';
@@ -19,6 +23,7 @@ export const getDetailsPendingChanges = ({
   params: {
     bootModeChanged,
     bootOrderChanged,
+    cloudIdentityChanged,
     cpuMemoryChanged,
     hostnameChanged,
     instanceTypeChanged,
@@ -30,86 +35,109 @@ export const getDetailsPendingChanges = ({
     vm,
     vmi,
   },
-}: PendingChangeContext): PendingChange[] => [
-  {
-    ...createProps(VirtualMachineDetailsTab.Details, () =>
-      createModal(({ isOpen, onClose }) => (
-        <CPUMemoryModal isOpen={isOpen} onClose={onClose} onSubmit={onSubmit} vm={vm} />
-      )),
-    ),
-    hasPendingChange: !isInstanceTypeVM(vm) && cpuMemoryChanged && restartRequired(vm),
-    label: t('CPU | Memory'),
-  },
-  {
-    ...createProps(VirtualMachineDetailsTab.Details, () =>
-      createModal(({ isOpen, onClose }) => (
-        <StandaloneInstanceTypeModal
-          isOpen={isOpen}
-          onClose={onClose}
-          onSubmit={updatedInstanceType}
-          vm={vm}
-        />
-      )),
-    ),
-    hasPendingChange: isInstanceTypeVM(vm) && instanceTypeChanged && restartRequired(vm),
-    label: t('InstanceType'),
-  },
-  {
-    ...createProps(VirtualMachineDetailsTab.Details, () =>
-      createModal(({ isOpen, onClose }) => (
-        <BootOrderModal
-          instanceTypeVM={instanceTypeExpandedSpec}
-          isOpen={isOpen}
-          onClose={onClose}
-          onSubmit={onSubmit}
-          vm={vm}
-          vmi={vmi}
-        />
-      )),
-    ),
-    hasPendingChange: bootOrderChanged,
-    label: t('Boot disk'),
-  },
-  {
-    ...createProps(VirtualMachineDetailsTab.Details, () =>
-      createModal(({ isOpen, onClose }) => (
-        <HostnameModal isOpen={isOpen} onClose={onClose} onSubmit={onSubmit} vm={vm} vmi={vmi} />
-      )),
-    ),
-    hasPendingChange: hostnameChanged,
-    label: t('Hostname'),
-  },
-  {
-    ...createProps(VirtualMachineDetailsTab.Details, () =>
-      createModal(({ isOpen, onClose }) => (
-        <FirmwareBootloaderModal
-          isOpen={isOpen}
-          onClose={onClose}
-          onSubmit={onSubmit}
-          vm={vm}
-          vmi={vmi}
-        />
-      )),
-    ),
-    hasPendingChange: bootModeChanged,
-    label: t('Boot mode'),
-  },
-  {
-    ...createProps(VirtualMachineDetailsTab.Environment),
-    hasPendingChange: !isEmpty(modifiedEnvDisks),
-    label:
-      !isEmpty(modifiedEnvDisks) && modifiedEnvDisks?.length > 1
-        ? modifiedEnvDisks.join(', ')
-        : modifiedEnvDisks[0],
-  },
-  {
-    ...createProps(VirtualMachineDetailsTab.Storage),
-    hasPendingChange: !isEmpty(modifiedCDROMs),
-    label: modifiedCDROMs.join(', '),
-  },
-  {
-    ...createProps(VirtualMachineDetailsTab.Network),
-    hasPendingChange: !isEmpty(modifiedNICs),
-    label: modifiedNICs.join(', '),
-  },
-];
+}: PendingChangeContext): PendingChange[] => {
+  const provider = getCloudIdentityProvider();
+
+  return [
+    {
+      ...createProps(VirtualMachineDetailsTab.Details, () =>
+        createModal(({ isOpen, onClose }) => (
+          <CPUMemoryModal isOpen={isOpen} onClose={onClose} onSubmit={onSubmit} vm={vm} />
+        )),
+      ),
+      hasPendingChange: !isInstanceTypeVM(vm) && cpuMemoryChanged && restartRequired(vm),
+      label: t('CPU | Memory'),
+    },
+    {
+      ...createProps(VirtualMachineDetailsTab.Details, () =>
+        createModal(({ isOpen, onClose }) => (
+          <StandaloneInstanceTypeModal
+            isOpen={isOpen}
+            onClose={onClose}
+            onSubmit={updatedInstanceType}
+            vm={vm}
+          />
+        )),
+      ),
+      hasPendingChange: isInstanceTypeVM(vm) && instanceTypeChanged && restartRequired(vm),
+      label: t('InstanceType'),
+    },
+    {
+      ...createProps(VirtualMachineDetailsTab.Details, () =>
+        createModal(({ isOpen, onClose }) => (
+          <BootOrderModal
+            instanceTypeVM={instanceTypeExpandedSpec}
+            isOpen={isOpen}
+            onClose={onClose}
+            onSubmit={onSubmit}
+            vm={vm}
+            vmi={vmi}
+          />
+        )),
+      ),
+      hasPendingChange: bootOrderChanged,
+      label: t('Boot disk'),
+    },
+    {
+      ...createProps(VirtualMachineDetailsTab.Details, () =>
+        createModal(({ isOpen, onClose }) => (
+          <HostnameModal isOpen={isOpen} onClose={onClose} onSubmit={onSubmit} vm={vm} vmi={vmi} />
+        )),
+      ),
+      hasPendingChange: hostnameChanged,
+      label: t('Hostname'),
+    },
+    ...(provider
+      ? [
+          {
+            ...createProps(VirtualMachineDetailsTab.Details, () =>
+              createModal(({ isOpen, onClose }) => (
+                <CloudIdentityModal
+                  isOpen={isOpen}
+                  onClose={onClose}
+                  provider={provider}
+                  vm={vm}
+                  vmi={vmi}
+                />
+              )),
+            ),
+            hasPendingChange: cloudIdentityChanged,
+            label: t('Cloud identity'),
+          },
+        ]
+      : []),
+    {
+      ...createProps(VirtualMachineDetailsTab.Details, () =>
+        createModal(({ isOpen, onClose }) => (
+          <FirmwareBootloaderModal
+            isOpen={isOpen}
+            onClose={onClose}
+            onSubmit={onSubmit}
+            vm={vm}
+            vmi={vmi}
+          />
+        )),
+      ),
+      hasPendingChange: bootModeChanged,
+      label: t('Boot mode'),
+    },
+    {
+      ...createProps(VirtualMachineDetailsTab.Environment),
+      hasPendingChange: !isEmpty(modifiedEnvDisks),
+      label:
+        !isEmpty(modifiedEnvDisks) && modifiedEnvDisks?.length > 1
+          ? modifiedEnvDisks.join(', ')
+          : modifiedEnvDisks[0],
+    },
+    {
+      ...createProps(VirtualMachineDetailsTab.Storage),
+      hasPendingChange: !isEmpty(modifiedCDROMs),
+      label: modifiedCDROMs.join(', '),
+    },
+    {
+      ...createProps(VirtualMachineDetailsTab.Network),
+      hasPendingChange: !isEmpty(modifiedNICs),
+      label: modifiedNICs.join(', '),
+    },
+  ];
+};
