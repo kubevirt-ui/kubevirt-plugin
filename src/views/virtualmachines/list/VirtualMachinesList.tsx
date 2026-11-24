@@ -2,7 +2,7 @@ import { type FC, useMemo } from 'react';
 
 import { tourGuideVM } from '@kubevirt-utils/components/GuidedTour/utils/constants';
 import { runningTourSignal } from '@kubevirt-utils/components/GuidedTour/utils/guidedTourSignals';
-import { PageTitles } from '@kubevirt-utils/constants/page-constants';
+import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { DocumentTitle, ListPageBody } from '@openshift-console/dynamic-plugin-sdk';
 import { useSignals } from '@preact/signals-react/runtime';
 import { vmsSignal } from '@virtualmachines/tree/utils/signals';
@@ -23,6 +23,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({
 }) => {
   useSignals();
   useVMMetrics();
+  const { t } = useKubevirtTranslation();
 
   const { error, isSoftError, refresh, vms, vmsLoaded } = useVMDataSource(namespace, cluster);
   const vmsToShow = useMemo(() => (runningTourSignal.value ? [tourGuideVM] : vms), [vms]);
@@ -36,7 +37,7 @@ const VirtualMachinesList: FC<VirtualMachinesListProps> = ({
 
   return (
     <>
-      <DocumentTitle>{PageTitles.VirtualMachines}</DocumentTitle>
+      <DocumentTitle>{t('VirtualMachines')}</DocumentTitle>
       <ListPageBody>
         <div className="vm-listpagebody">
           <VirtualMachinesListBody

@@ -2,7 +2,6 @@ import type { FC } from 'react';
 import { useMemo } from 'react';
 
 import ClusterProjectDropdown from '@kubevirt-utils/components/ClusterProjectDropdown/ClusterProjectDropdown';
-import { PageTitles } from '@kubevirt-utils/constants/page-constants';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import {
   DocumentTitle,
@@ -24,11 +23,13 @@ const CheckupsList: FC = () => {
   const defaultTab = pages[0]?.href;
   useCheckupsTabsNavigation(defaultTab);
 
+  const pageTitle = t('Checkups');
+
   return (
     <>
-      <DocumentTitle>{PageTitles.Checkups}</DocumentTitle>
+      <DocumentTitle>{pageTitle}</DocumentTitle>
       <ClusterProjectDropdown includeAllClusters={false} includeAllProjects={false} />
-      <ListPageHeader title={PageTitles.Checkups}>
+      <ListPageHeader title={pageTitle}>
         <CheckupsRunButton />
       </ListPageHeader>
       <HorizontalNav pages={pages} />

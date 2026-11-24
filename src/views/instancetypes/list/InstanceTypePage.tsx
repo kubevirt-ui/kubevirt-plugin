@@ -6,7 +6,6 @@ import {
   VirtualMachineClusterInstancetypeModel,
   VirtualMachineClusterInstancetypeModelRef,
 } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { PageTitles } from '@kubevirt-utils/constants/page-constants';
 import useIsCRDPage from '@kubevirt-utils/hooks/useIsCRDPage';
 import useIsSearchPage from '@kubevirt-utils/hooks/useIsSearchPage';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -88,8 +87,8 @@ const InstanceTypePage: FC<ListPageProps> = (props) => {
 
   const pageTitle =
     activeTabKey === CLUSTER_INSTANCETYPE_TAB_INDEX
-      ? PageTitles.VirtualMachineClusterInstanceTypes
-      : PageTitles.VirtualMachineInstanceTypes;
+      ? t('VirtualMachineClusterInstanceTypes')
+      : t('VirtualMachineInstanceTypes');
 
   return (
     <>

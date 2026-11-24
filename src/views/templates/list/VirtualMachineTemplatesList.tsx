@@ -16,7 +16,7 @@ import { type TemplateOrRequest } from '@kubevirt-utils/resources/template/utils
 import { type ListPageProps } from '@kubevirt-utils/utils/types';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useIsAllClustersPage from '@multicluster/hooks/useIsAllClustersPage';
-import { ListPageBody, ListPageHeader } from '@openshift-console/dynamic-plugin-sdk';
+import { DocumentTitle, ListPageBody, ListPageHeader } from '@openshift-console/dynamic-plugin-sdk';
 import { ToolbarItem } from '@patternfly/react-core';
 import { useSignals } from '@preact/signals-react/runtime';
 
@@ -64,6 +64,8 @@ const VirtualMachineTemplatesList: FC<ListPageProps> = ({
   const { activeColumnKeys, columnLayout, columns, loadedColumns } =
     useVirtualMachineTemplatesListColumns(activeNamespace, isAllClustersPage);
 
+  const pageTitle = t('Templates');
+
   if (
     !runningTourSignal.value &&
     loaded &&
@@ -72,13 +74,14 @@ const VirtualMachineTemplatesList: FC<ListPageProps> = ({
     isEmpty(selectedClusters) &&
     isEmpty(selectedProjects)
   ) {
-    return <VirtualMachineTemplatesEmptyState />;
+    return <VirtualMachineTemplatesEmptyState pageTitle={pageTitle} />;
   }
 
   return (
     <>
       <GuidedTour />
-      <ListPageHeader title={showTitle && t('Templates')}>
+      <DocumentTitle>{pageTitle}</DocumentTitle>
+      <ListPageHeader title={showTitle && pageTitle}>
         <VirtualMachineTemplatesCreateButton />
       </ListPageHeader>
       <ListPageBody>

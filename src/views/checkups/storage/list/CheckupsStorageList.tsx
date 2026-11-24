@@ -15,7 +15,7 @@ import { paginationDefaultValues } from '@kubevirt-utils/hooks/usePagination/uti
 import { EXPORT_TABLE_KEYS, KubevirtTableExport } from '@kubevirt-utils/hooks/useTableExport';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useIsACMPage from '@multicluster/useIsACMPage';
-import { ListPageBody } from '@openshift-console/dynamic-plugin-sdk';
+import { DocumentTitle, ListPageBody } from '@openshift-console/dynamic-plugin-sdk';
 import { Pagination } from '@patternfly/react-core';
 import { useHubClusterName } from '@stolostron/multicluster-sdk';
 
@@ -90,19 +90,25 @@ const CheckupsStorageList = (): JSX.Element => {
     [columns, activeColumnKeys, t],
   );
 
+  const documentTitle = <DocumentTitle>{t('Checkups · Storage')}</DocumentTitle>;
+
   if (isEmpty(configMaps) && isLoaded && !error) {
     return (
-      <CheckupsStorageListEmptyState
-        clusterRoleBinding={clusterRoleBinding}
-        isPermitted={isPermitted}
-        isPermittedToInstall={isPermittedToInstall}
-        loadingPermissions={loadingPermissions}
-      />
+      <>
+        {documentTitle}
+        <CheckupsStorageListEmptyState
+          clusterRoleBinding={clusterRoleBinding}
+          isPermitted={isPermitted}
+          isPermittedToInstall={isPermittedToInstall}
+          loadingPermissions={loadingPermissions}
+        />
+      </>
     );
   }
 
   return (
     <ListPageBody>
+      {documentTitle}
       <div className="list-managment-group">
         <KubevirtFilterToolbar
           clearAllFilters={clearAllFilters}

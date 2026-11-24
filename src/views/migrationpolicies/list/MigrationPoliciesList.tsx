@@ -13,7 +13,7 @@ import { type ListPageProps } from '@kubevirt-utils/utils/types';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useIsAllClustersPage from '@multicluster/hooks/useIsAllClustersPage';
 import useIsACMPage from '@multicluster/useIsACMPage';
-import { ListPageBody, ListPageHeader } from '@openshift-console/dynamic-plugin-sdk';
+import { DocumentTitle, ListPageBody, ListPageHeader } from '@openshift-console/dynamic-plugin-sdk';
 
 import { COLUMN_MANAGEMENT_ID_MIGRATION_POLICIES } from '../utils/constants';
 import MigrationPoliciesCreateButton from './components/MigrationPoliciesCreateButton/MigrationPoliciesCreateButton';
@@ -65,13 +65,16 @@ const MigrationPoliciesList: FC<ListPageProps> = ({
 
   const isLoaded = loaded && loadedColumns;
 
+  const pageTitle = t('MigrationPolicies');
+
   if (isLoaded && !loadError && isEmpty(mps) && isEmpty(filteredClusters)) {
-    return <MigrationPoliciesEmptyState />;
+    return <MigrationPoliciesEmptyState pageTitle={pageTitle} />;
   }
 
   return (
     <>
-      <ListPageHeader title={showTitle && t('MigrationPolicies')}>
+      <DocumentTitle>{pageTitle}</DocumentTitle>
+      <ListPageHeader title={showTitle && pageTitle}>
         <MigrationPoliciesCreateButton />
       </ListPageHeader>
 
