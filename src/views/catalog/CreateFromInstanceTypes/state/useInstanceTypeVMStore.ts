@@ -8,6 +8,7 @@ import { IoK8sApiCoreV1PersistentVolumeClaim } from '@kubevirt-ui-ext/kubevirt-a
 import { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { getInstanceTypeFromVolume } from '@kubevirt-utils/components/AddBootableVolumeModal/utils/utils';
 import { VolumeSnapshotKind } from '@kubevirt-utils/components/SelectSnapshot/types';
+import { isInstanceTypeSeries } from '@kubevirt-utils/hooks/useInstanceTypeFamilyAvailability/utils';
 import { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { getLabel } from '@kubevirt-utils/resources/shared';
 import { generatePrettyName } from '@kubevirt-utils/utils/utils';
@@ -17,7 +18,7 @@ import { kubevirtK8sCreate } from '@multicluster/k8sRequests';
 import { getDiskSize } from '../utils/utils';
 
 import { instanceTypeVMStoreInitialState } from './utils/state';
-import { InstanceTypeVMStore } from './utils/types';
+import { BootableVolumeFamilyAvailability, InstanceTypeVMStore } from './utils/types';
 import { getSSHCredentials } from './utils/utils';
 
 export const useInstanceTypeVMStore = create<InstanceTypeVMStore>()((set, get) => {
@@ -39,9 +40,21 @@ export const useInstanceTypeVMStore = create<InstanceTypeVMStore>()((set, get) =
       pvcSource: IoK8sApiCoreV1PersistentVolumeClaim,
       volumeSnapshotSource: VolumeSnapshotKind,
       dvSource: V1beta1DataVolume,
+      familyAvailability?: BootableVolumeFamilyAvailability,
     ) =>
       set(
         produce<InstanceTypeVMStore>(({ instanceTypeVMState }) => {
+          const instanceTypeName = getInstanceTypeFromVolume(selectedVolume);
+          const [series = '', size = ''] = instanceTypeName?.split('.') || [];
+          // Only Red Hat series defaults (series.size) are subject to family availability;
+          // user-provided instance types on the volume are always applied.
+          const isRedHatSeriesDefault = Boolean(size) && isInstanceTypeSeries(series);
+          const familiesReady = familyAvailability?.familiesLoaded !== false;
+          const familyVisible = familyAvailability?.isFamilyVisible
+            ? familyAvailability.isFamilyVisible(series)
+            : true;
+          const applyFromVolume = !isRedHatSeriesDefault || (familiesReady && familyVisible);
+
           instanceTypeVMState.dvSource = dvSource;
           instanceTypeVMState.selectedBootableVolume = selectedVolume;
           instanceTypeVMState.pvcSource = pvcSource;
@@ -52,7 +65,7 @@ export const useInstanceTypeVMStore = create<InstanceTypeVMStore>()((set, get) =
             volumeSnapshotSource,
           );
           instanceTypeVMState.selectedInstanceType = {
-            name: getInstanceTypeFromVolume(selectedVolume),
+            name: applyFromVolume ? instanceTypeName : '',
             namespace: null,
           };
 
