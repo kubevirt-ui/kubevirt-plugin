@@ -1,12 +1,17 @@
-import { useCallback, useRef } from 'react';
-import { useWatch } from 'react-hook-form';
+import { useCallback, useMemo, useRef, useState } from 'react';
+import { useFormState, useWatch } from 'react-hook-form';
 
-import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import type { WizardStepType } from '@patternfly/react-core';
-import ExitWizardModal from '@virtualmachines/wizard/components/ExitWizardModal';
 
 import { useBootableVolumeWizardForm } from '../form/BootableVolumeWizardFormProvider';
+import {
+  DESTINATION_PROJECT_FIELD,
+  IMAGE_SOURCE_FIELD,
+  OPERATING_SYSTEM_FIELD,
+  VOLUME_NAME_FIELD,
+} from '../form/fieldPaths';
+import { createImageSourceSchema } from '../form/schema/createImageSourceSchema';
 import { volumeNameInputSchema } from '../form/schema/createProjectAndVolumeSchema';
 import {
   BOOTABLE_VOLUME_WIZARD_STEPS,
@@ -15,6 +20,7 @@ import {
   mapBootableVolumeWizardErrorsToSteps,
   triggerBootableVolumeWizardStepValidation,
 } from '../form/stepValidation';
+import type { BootableVolumeWizardImageSourceValues } from '../form/types';
 import type { BootableVolumeWizardNavItemConfig } from '../utils/types';
 import { useBootableVolumeWizardState } from './useBootableVolumeWizardState';
 
@@ -27,57 +33,86 @@ const useBootableVolumeWizardNavigation = ({
 }: UseBootableVolumeWizardNavigationArgs): BootableVolumeWizardNavItemConfig => {
   const { t } = useKubevirtTranslation();
   const { control, formState, trigger } = useBootableVolumeWizardForm();
+  const { isDirty } = useFormState({ control });
   const { currentStep, visitedSteps } = useBootableVolumeWizardState();
-  const { createModal } = useModal();
   const navigatingRef = useRef(false);
+  const [isExitConfirmOpen, setIsExitConfirmOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const [volumeName, destinationProject] = useWatch({
+  const [volumeName, destinationProject, operatingSystem, imageSource] = useWatch({
     control,
-    name: ['projectAndVolume.volumeName', 'projectAndVolume.destinationProject'],
+    name: [
+      VOLUME_NAME_FIELD,
+      DESTINATION_PROJECT_FIELD,
+      OPERATING_SYSTEM_FIELD,
+      IMAGE_SOURCE_FIELD,
+    ],
   });
 
   const errorsByStep = mapBootableVolumeWizardErrorsToSteps(formState.errors);
+  const imageSourceSchema = useMemo(() => createImageSourceSchema(t), [t]);
+
+  const shouldConfirmExit =
+    isDirty || Boolean(volumeName?.trim()) || Boolean(operatingSystem?.trim());
 
   const isStepValid = useCallback(
     (stepId: BootableVolumeWizardStep): boolean => {
-      if (stepId !== BootableVolumeWizardStep.PROJECT_AND_VOLUME || currentStep !== stepId) {
-        return !errorsByStep[stepId];
+      if (errorsByStep[stepId]) {
+        return false;
       }
 
-      return (
-        !errorsByStep[stepId] &&
-        volumeNameInputSchema.isValidSync(volumeName) &&
-        Boolean(destinationProject?.trim())
-      );
+      switch (stepId) {
+        case BootableVolumeWizardStep.PROJECT_AND_VOLUME:
+          return (
+            volumeNameInputSchema.isValidSync(volumeName) && Boolean(destinationProject?.trim())
+          );
+        case BootableVolumeWizardStep.IMAGE_SOURCE:
+          return imageSourceSchema.isValidSync(
+            imageSource as BootableVolumeWizardImageSourceValues,
+          );
+        case BootableVolumeWizardStep.OPERATING_SYSTEM:
+          return Boolean(operatingSystem?.trim());
+        case BootableVolumeWizardStep.REVIEW:
+          return true;
+        default:
+          return true;
+      }
     },
-    [currentStep, destinationProject, errorsByStep, volumeName],
+    [destinationProject, errorsByStep, imageSource, imageSourceSchema, operatingSystem, volumeName],
   );
 
-  const openExitModal = useCallback((): void => {
-    createModal(({ isOpen, onClose: closeModal }) => (
-      <ExitWizardModal
-        continueButtonText={t('Continue adding')}
-        isOpen={isOpen}
-        onClose={closeModal}
-        onExit={() => {
-          closeModal();
-          onClose();
-        }}
-        title={t('Exit "Add bootable volume"?')}
-      />
-    ));
-  }, [createModal, onClose, t]);
-
   const handleClose = useCallback((): void => {
-    if (formState.isDirty) {
-      openExitModal();
-    } else {
-      onClose();
+    if (isSubmitting) {
+      return;
     }
-  }, [formState.isDirty, onClose, openExitModal]);
+
+    if (shouldConfirmExit) {
+      setIsExitConfirmOpen(true);
+      return;
+    }
+
+    onClose();
+  }, [isSubmitting, onClose, shouldConfirmExit]);
+
+  const onContinueAdding = useCallback((): void => {
+    setIsExitConfirmOpen(false);
+  }, []);
+
+  const onExitWithoutSaving = useCallback((): void => {
+    if (isSubmitting) {
+      return;
+    }
+
+    setIsExitConfirmOpen(false);
+    onClose();
+  }, [isSubmitting, onClose]);
 
   const isStepDisabled = useCallback(
     (stepId: BootableVolumeWizardStep): boolean => {
+      if (isSubmitting) {
+        return true;
+      }
+
       const currentIndex = BOOTABLE_VOLUME_WIZARD_STEPS.indexOf(currentStep);
       const targetIndex = BOOTABLE_VOLUME_WIZARD_STEPS.indexOf(stepId);
 
@@ -86,7 +121,7 @@ const useBootableVolumeWizardNavigation = ({
       const prerequisites = getBootableVolumeWizardNavigationPrerequisites(currentStep, stepId);
       return prerequisites.some((prereq) => !visitedSteps.has(prereq) || !isStepValid(prereq));
     },
-    [currentStep, isStepValid, visitedSteps],
+    [currentStep, isStepValid, isSubmitting, visitedSteps],
   );
 
   const handleNavItemClick = useCallback(
@@ -95,7 +130,7 @@ const useBootableVolumeWizardNavigation = ({
       activeStep: WizardStepType,
       goToStepByIndex: (index: number) => void,
     ): Promise<void> => {
-      if (navigatingRef.current) return;
+      if (isSubmitting || navigatingRef.current) return;
 
       const target = step.id as BootableVolumeWizardStep;
       const current = activeStep.id as BootableVolumeWizardStep;
@@ -116,21 +151,27 @@ const useBootableVolumeWizardNavigation = ({
           return;
         }
 
-        const isValid = await triggerBootableVolumeWizardStepValidation(trigger, prerequisites);
-        if (!isValid) return;
+        const stepValid = await triggerBootableVolumeWizardStepValidation(trigger, prerequisites);
+        if (!stepValid) return;
 
         goToStepByIndex(step.index);
       } finally {
         navigatingRef.current = false;
       }
     },
-    [trigger, visitedSteps],
+    [isSubmitting, trigger, visitedSteps],
   );
 
   return {
     handleClose,
     handleNavItemClick,
+    isExitConfirmOpen,
     isStepDisabled,
+    isSubmitting,
+    onContinueAdding,
+    onDismiss: onClose,
+    onExitWithoutSaving,
+    setIsSubmitting,
   };
 };
 

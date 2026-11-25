@@ -24,6 +24,8 @@ type PreferenceSelectProps = {
   bootableVolume: AddBootableVolumeState;
   deleteLabel: (labelKey: string) => void;
   isDisabled?: boolean;
+  label?: string;
+  placeholder?: string;
   setBootableVolumeField: SetBootableVolumeFieldType;
 };
 
@@ -31,6 +33,8 @@ const PreferenceSelect: FC<PreferenceSelectProps> = ({
   bootableVolume,
   deleteLabel,
   isDisabled,
+  label,
+  placeholder,
   setBootableVolumeField,
 }): ReactElement => {
   const { t } = useKubevirtTranslation();
@@ -73,7 +77,7 @@ const PreferenceSelect: FC<PreferenceSelectProps> = ({
   return (
     <FormGroup
       isRequired
-      label={t('Preference')}
+      label={label ?? t('Preference')}
       labelHelp={
         <HelpTextIcon
           bodyContent={(hide) => (
@@ -89,7 +93,7 @@ const PreferenceSelect: FC<PreferenceSelectProps> = ({
     >
       <InlineFilterSelect
         options={preferenceSelectOptions}
-        placeholder={t('Select preference')}
+        placeholder={placeholder ?? t('Select preference')}
         selected={selectedPreferenceKey}
         setSelected={handleSelect}
         toggleProps={{

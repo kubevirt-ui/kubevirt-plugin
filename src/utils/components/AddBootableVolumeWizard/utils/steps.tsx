@@ -9,40 +9,53 @@ import ImageSourceStep from '../steps/ImageSourceStep/ImageSourceStep';
 import OperatingSystemStep from '../steps/OperatingSystemStep/OperatingSystemStep';
 import ProjectAndVolumeStep from '../steps/ProjectAndVolumeStep/ProjectAndVolumeStep';
 import ReviewStep from '../steps/ReviewStep/ReviewStep';
-import type { BootableVolumeWizardNavItemConfig, BootableVolumeWizardStepDisplay } from './types';
+import { getOperatingSystemLabel } from './constants';
+import type {
+  BootableVolumeWizardCallbacks,
+  BootableVolumeWizardNavItemConfig,
+  BootableVolumeWizardStepDisplay,
+} from './types';
 
-const getDefaultFooter = (navigation: BootableVolumeWizardNavItemConfig): ReactElement =>
-  createElement(BootableVolumeWizardFooter, { navigation });
+const getDefaultFooter = (
+  navigation: BootableVolumeWizardNavItemConfig,
+  callbacks?: BootableVolumeWizardCallbacks,
+): ReactElement =>
+  createElement(BootableVolumeWizardFooter, {
+    navigation,
+    onCreateVolume: callbacks?.onCreateVolume,
+    onUploadStart: callbacks?.onUploadStart,
+  });
 
 export const getBootableVolumeWizardSteps = (
   t: TFunction,
   navigation: BootableVolumeWizardNavItemConfig,
+  callbacks?: BootableVolumeWizardCallbacks,
 ): BootableVolumeWizardStepDisplay[] => [
   {
     children: createElement(ProjectAndVolumeStep),
     displayIndex: 1,
-    footer: getDefaultFooter(navigation),
+    footer: getDefaultFooter(navigation, callbacks),
     id: BootableVolumeWizardStep.PROJECT_AND_VOLUME,
     name: t('Project & volume'),
   },
   {
     children: createElement(ImageSourceStep),
     displayIndex: 2,
-    footer: getDefaultFooter(navigation),
+    footer: getDefaultFooter(navigation, callbacks),
     id: BootableVolumeWizardStep.IMAGE_SOURCE,
     name: t('Image source'),
   },
   {
     children: createElement(OperatingSystemStep),
     displayIndex: 3,
-    footer: getDefaultFooter(navigation),
+    footer: getDefaultFooter(navigation, callbacks),
     id: BootableVolumeWizardStep.OPERATING_SYSTEM,
-    name: t('Operating system'),
+    name: getOperatingSystemLabel(t),
   },
   {
     children: createElement(ReviewStep),
     displayIndex: 4,
-    footer: getDefaultFooter(navigation),
+    footer: getDefaultFooter(navigation, callbacks),
     id: BootableVolumeWizardStep.REVIEW,
     name: t('Review'),
   },

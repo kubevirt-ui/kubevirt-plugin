@@ -9,10 +9,8 @@ import { getNoPermissionTooltipContent } from '@kubevirt-utils/utils/utils';
 import { FormGroup, Select, SelectOption } from '@patternfly/react-core';
 
 import { useBootableVolumeWizardForm } from '../../../form/BootableVolumeWizardFormProvider';
-import {
-  imageSourceSetValueOptions,
-  resetImageSourceFieldsOnSourceChange,
-} from '../utils/resetImageSourceFields';
+import { wizardSetValueOptions } from '../../../form/wizardSetValueOptions';
+import { resetImageSourceFieldsOnSourceChange } from '../utils/resetImageSourceFields';
 import { getSourceOptionLabel, getSourceOptions } from '../utils/sourceOptions';
 
 const SourceSelect: FC = () => {
@@ -39,7 +37,7 @@ const SourceSelect: FC = () => {
       }
 
       resetImageSourceFieldsOnSourceChange({ previousSourceType: sourceType, setValue });
-      setValue('imageSource.sourceType', nextSource, imageSourceSetValueOptions);
+      setValue('imageSource.sourceType', nextSource, wizardSetValueOptions);
     },
     [setValue, sourceType],
   );

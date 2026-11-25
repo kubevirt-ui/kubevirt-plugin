@@ -11,6 +11,7 @@ import {
 } from '@patternfly/react-core';
 
 type ExitWizardModalProps = {
+  className?: string;
   continueButtonText?: string;
   isOpen: boolean;
   onClose: () => void;
@@ -19,6 +20,7 @@ type ExitWizardModalProps = {
 };
 
 const ExitWizardModal: FC<ExitWizardModalProps> = ({
+  className,
   continueButtonText,
   isOpen,
   onClose,
@@ -28,7 +30,7 @@ const ExitWizardModal: FC<ExitWizardModalProps> = ({
   const { t } = useKubevirtTranslation();
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} variant={ModalVariant.small}>
+    <Modal className={className} isOpen={isOpen} onClose={onClose} variant={ModalVariant.small}>
       <ModalHeader title={title ?? t('Exit VirtualMachine creation?')} titleIconVariant="warning" />
       <ModalBody>{t("If you leave now, any information you've entered won't be saved.")}</ModalBody>
       <ModalFooter>

@@ -11,7 +11,7 @@ import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { Checkbox, PopoverPosition, Split, SplitItem } from '@patternfly/react-core';
 
 import { useBootableVolumeWizardForm } from '../../../form/BootableVolumeWizardFormProvider';
-import { imageSourceSetValueOptions } from '../utils/resetImageSourceFields';
+import { wizardSetValueOptions } from '../../../form/wizardSetValueOptions';
 import { setImageSourceDiskSize } from '../utils/setImageSourceDiskSize';
 
 const ExistingVolumeSourceFields: FC = () => {
@@ -40,10 +40,10 @@ const ExistingVolumeSourceFields: FC = () => {
         pvcNameSelected={volumeName}
         pvcNamespaceSelected={volumeProject}
         selectPVCName={(name) =>
-          setValue('imageSource.existingVolume.name', name ?? '', imageSourceSetValueOptions)
+          setValue('imageSource.existingVolume.name', name ?? '', wizardSetValueOptions)
         }
         selectPVCNamespace={(project) =>
-          setValue('imageSource.existingVolume.project', project ?? '', imageSourceSetValueOptions)
+          setValue('imageSource.existingVolume.project', project ?? '', wizardSetValueOptions)
         }
         setDiskSize={(size) => setImageSourceDiskSize(getValues, setValue, size)}
       />

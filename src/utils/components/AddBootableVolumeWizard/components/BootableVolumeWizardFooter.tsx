@@ -5,25 +5,55 @@ import { useWizardContext, WizardFooter } from '@patternfly/react-core';
 
 import {
   BOOTABLE_VOLUME_WIZARD_STEPS,
-  type BootableVolumeWizardStep,
+  BootableVolumeWizardStep,
+  type BootableVolumeWizardStep as WizardStepId,
 } from '../form/stepValidation';
-import type { BootableVolumeWizardNavItemConfig } from '../utils/types';
+import useBootableVolumeWizardSave from '../hooks/useBootableVolumeWizardSave';
+import type {
+  BootableVolumeWizardCallbacks,
+  BootableVolumeWizardNavItemConfig,
+} from '../utils/types';
+import BootableVolumeWizardReviewFooter from './BootableVolumeWizardReviewFooter';
 
-type BootableVolumeWizardFooterProps = {
+type BootableVolumeWizardFooterProps = BootableVolumeWizardCallbacks & {
   navigation: BootableVolumeWizardNavItemConfig;
 };
 
-const BootableVolumeWizardFooter: FC<BootableVolumeWizardFooterProps> = ({ navigation }) => {
+const BootableVolumeWizardFooter: FC<BootableVolumeWizardFooterProps> = ({
+  navigation,
+  onCreateVolume,
+  onUploadStart,
+}) => {
   const { t } = useKubevirtTranslation();
-  const { activeStep, goToStepByIndex, steps } = useWizardContext();
+  const { activeStep, goToStepById, goToStepByIndex, steps } = useWizardContext();
+  const { error, onSave } = useBootableVolumeWizardSave({
+    goToStepById,
+    onClose: navigation.onDismiss,
+    onCreateVolume,
+    onUploadStart,
+    setIsSubmitting: navigation.setIsSubmitting,
+  });
 
   const currentIndex = steps.findIndex((step) => step.id === activeStep.id);
   const previous = steps[currentIndex - 1];
   const next = steps[currentIndex + 1];
 
   const isFirstStep = activeStep.id === BOOTABLE_VOLUME_WIZARD_STEPS[0];
-  const isBackDisabled = isFirstStep || !previous;
-  const isNextDisabled = !next || navigation.isStepDisabled(next.id as BootableVolumeWizardStep);
+  const isReviewStep = activeStep.id === BootableVolumeWizardStep.REVIEW;
+  const isBackDisabled = isFirstStep || !previous || navigation.isSubmitting;
+  const isNextDisabled =
+    !next || navigation.isStepDisabled(next.id as WizardStepId) || navigation.isSubmitting;
+
+  if (isReviewStep) {
+    return (
+      <BootableVolumeWizardReviewFooter
+        error={error}
+        isSubmitting={navigation.isSubmitting}
+        navigation={navigation}
+        onSave={onSave}
+      />
+    );
+  }
 
   return (
     <WizardFooter

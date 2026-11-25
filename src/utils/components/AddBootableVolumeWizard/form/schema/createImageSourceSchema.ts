@@ -123,6 +123,7 @@ const createBaseImageSourceSchema = (
     diskSize: requiredString().defined(),
     existingSnapshot: createExistingSnapshotSchema(false).defined(),
     existingVolume: createExistingVolumeSchema(false).defined(),
+    isIso: yup.boolean().defined(),
     registry: createRegistrySchema(false, t).defined(),
     sourceType: yup
       .mixed<DROPDOWN_FORM_SELECTION>()

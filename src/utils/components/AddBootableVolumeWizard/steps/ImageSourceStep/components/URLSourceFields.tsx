@@ -7,11 +7,13 @@ import {
   type TLSCertSourceType,
 } from '@kubevirt-utils/components/TLSCertificateSection';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { getIsoDetectionPath } from '@kubevirt-utils/resources/bootableresources/isoHelpers';
 import { getFieldValidationState } from '@kubevirt-utils/utils/getFieldValidationState';
 import { FormGroup, TextInput } from '@patternfly/react-core';
 
 import { useBootableVolumeWizardForm } from '../../../form/BootableVolumeWizardFormProvider';
-import { imageSourceSetValueOptions } from '../utils/resetImageSourceFields';
+import { wizardSetValueOptions } from '../../../form/wizardSetValueOptions';
+import { setImageSourceIsoFromPath } from '../utils/setImageSourceDiskSize';
 
 const EXAMPLE_IMAGE_URL =
   'https://cloud.centos.org/centos/9-stream/x86_64/images/CentOS-Stream-GenericCloud-9-latest.x86_64.qcow2';
@@ -46,23 +48,32 @@ const URLSourceFields: FC = () => {
   });
 
   const onExistingCertificateChange = (certNamespace: string, certConfigMapName: string): void => {
-    setValue('imageSource.url.project', certNamespace, imageSourceSetValueOptions);
-    setValue('imageSource.url.configMapName', certConfigMapName, imageSourceSetValueOptions);
-    setValue('imageSource.url.certificate', undefined, imageSourceSetValueOptions);
+    setValue('imageSource.url.project', certNamespace, wizardSetValueOptions);
+    setValue('imageSource.url.configMapName', certConfigMapName, wizardSetValueOptions);
+    setValue('imageSource.url.certificate', undefined, wizardSetValueOptions);
   };
 
   const onNewCertificateChange = (newCertificate: string): void => {
-    setValue('imageSource.url.certificate', newCertificate, imageSourceSetValueOptions);
-    setValue('imageSource.url.project', undefined, imageSourceSetValueOptions);
-    setValue('imageSource.url.configMapName', undefined, imageSourceSetValueOptions);
+    setValue('imageSource.url.certificate', newCertificate, wizardSetValueOptions);
+    setValue('imageSource.url.project', undefined, wizardSetValueOptions);
+    setValue('imageSource.url.configMapName', undefined, wizardSetValueOptions);
   };
 
   const onRequiredChange = (required: boolean): void => {
-    setValue('imageSource.url.tlsCertificateRequired', required, imageSourceSetValueOptions);
+    setValue('imageSource.url.tlsCertificateRequired', required, wizardSetValueOptions);
   };
 
   const onSourceChange = (source: TLSCertSourceType): void => {
-    setValue('imageSource.url.certificateSource', source, imageSourceSetValueOptions);
+    setValue('imageSource.url.certificateSource', source, wizardSetValueOptions);
+  };
+
+  const onImageUrlChange = (url: string): void => {
+    const previousPath = getIsoDetectionPath(imageUrlField.value);
+    const nextPath = getIsoDetectionPath(url);
+    imageUrlField.onChange(url);
+    if (previousPath !== nextPath) {
+      setImageSourceIsoFromPath(setValue, url);
+    }
   };
 
   return (
@@ -71,7 +82,7 @@ const URLSourceFields: FC = () => {
         <TextInput
           id="image-url"
           {...imageUrlField}
-          onChange={(_event, value) => imageUrlField.onChange(value)}
+          onChange={(_event, value) => onImageUrlChange(value)}
           type="text"
           validated={validated}
           value={imageUrlField.value ?? ''}
