@@ -1,7 +1,7 @@
 import { type FC } from 'react';
 import { useNavigate } from 'react-router';
 
-import AddBootableVolumeModal from '@kubevirt-utils/components/AddBootableVolumeModal/AddBootableVolumeModal';
+import AddBootableVolumeWizard from '@kubevirt-utils/components/AddBootableVolumeWizard/AddBootableVolumeWizard';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import NoPermissionButton from '@kubevirt-utils/components/NoPermissionButton/NoPermissionButton';
 import { DEFAULT_NAMESPACE } from '@kubevirt-utils/constants/constants';
@@ -34,7 +34,12 @@ const BootableVolumeAddButton: FC<BootableVolumeAddButtonProps> = ({ namespace }
 
   const onCreate = (type: string): void => {
     if (type === 'form') {
-      createModal?.((props) => <AddBootableVolumeModal {...props} />);
+      createModal?.(({ onClose }) => (
+        <AddBootableVolumeWizard
+          initialValues={{ cluster: selectedCluster, namespace: selectedNamespace }}
+          onClose={onClose}
+        />
+      ));
       return;
     }
     const url = isACMPage

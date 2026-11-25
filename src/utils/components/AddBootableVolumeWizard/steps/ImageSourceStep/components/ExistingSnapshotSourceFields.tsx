@@ -5,10 +5,12 @@ import SelectSnapshot from '@kubevirt-utils/components/SelectSnapshot/SelectSnap
 
 import { useBootableVolumeWizardForm } from '../../../form/BootableVolumeWizardFormProvider';
 import { wizardSetValueOptions } from '../../../form/wizardSetValueOptions';
+import useAllowedPreferenceNames from '../../../hooks/useAllowedPreferenceNames';
 import { setImageSourceDiskSize } from '../utils/setImageSourceDiskSize';
 
 const ExistingSnapshotSourceFields: FC = () => {
   const { cluster, control, getValues, setValue } = useBootableVolumeWizardForm();
+  const allowedPreferenceNames = useAllowedPreferenceNames();
 
   const [snapshotName, snapshotProject] = useWatch({
     control,
@@ -17,6 +19,7 @@ const ExistingSnapshotSourceFields: FC = () => {
 
   return (
     <SelectSnapshot
+      allowedPreferenceNames={allowedPreferenceNames}
       cluster={cluster}
       selectSnapshotName={(name) =>
         setValue('imageSource.existingSnapshot.name', name ?? '', wizardSetValueOptions)

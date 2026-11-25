@@ -2,25 +2,11 @@ import { type TFunction } from 'i18next';
 
 import { DataSourceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { type V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
-import { type TabModalResult } from '@kubevirt-utils/components/TabModal/TabModal';
 import { DEFAULT_INSTANCETYPE_LABEL } from '@kubevirt-utils/constants/instancetypes-and-preferences';
-import { isUploadCanceledError } from '@kubevirt-utils/hooks/useCDIUpload/errors';
-import { cancelTrackedUploadOnModalClose } from '@kubevirt-utils/hooks/useInFlightToast/cancel/modalUploadCancel';
 import { appendBootableVolumeContext } from '@kubevirt-utils/resources/bootableresources/constants';
-import { isIsoFile, isIsoFilename } from '@kubevirt-utils/resources/bootableresources/isoHelpers';
 import { type BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { getLabel, getResourceUrl } from '@kubevirt-utils/resources/shared';
-import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 import { getFieldRequiredMessage } from '@kubevirt-utils/utils/validation';
-
-import { isUploadVolumeSource, SOURCE_DETAILS_SECTION_ID } from './consts';
-import { createBootableVolume } from './createBootableVolume';
-import {
-  type AddBootableVolumeState,
-  type HandleAddBootableVolumeModalCloseParams,
-  type SetBootableVolumeFieldType,
-  type SubmitAddBootableVolumeParams,
-} from './types';
 
 export const formatRegistryURL = (registryURL: string): string =>
   registryURL?.replace(/^(https?:\/\/)/i, '');
@@ -34,41 +20,6 @@ export const extractCreatedDataSources = (result: unknown): V1beta1DataSource[] 
       'kind' in item &&
       (item as { kind: string }).kind === DataSourceModel.kind,
   );
-};
-
-export const updateBootableVolumeField = (
-  prevState: AddBootableVolumeState,
-  key: keyof AddBootableVolumeState,
-  value: AddBootableVolumeState[keyof AddBootableVolumeState],
-  fieldKey?: string,
-): AddBootableVolumeState => ({
-  ...prevState,
-  ...(fieldKey
-    ? { [key]: { ...(prevState[key] as object), [fieldKey]: value } }
-    : { [key]: value }),
-});
-
-export const autoDetectIsoField = (
-  setBootableVolumeField: SetBootableVolumeFieldType,
-  pathOrUrl?: null | string,
-): void => {
-  setBootableVolumeField('isIso')(isIsoFile(pathOrUrl));
-};
-
-export const autoDetectIsoFromFilename = (
-  setBootableVolumeField: SetBootableVolumeFieldType,
-  fileName?: null | string,
-): void => {
-  setBootableVolumeField('isIso')(isIsoFilename(fileName));
-};
-
-export const deleteBootableVolumeLabel = (
-  prevState: AddBootableVolumeState,
-  labelKey: string,
-): AddBootableVolumeState => {
-  const updatedLabels = { ...prevState?.labels };
-  delete updatedLabels[labelKey];
-  return { ...prevState, labels: updatedLabels };
 };
 
 export const getCronHelperText = (
@@ -85,66 +36,5 @@ export const getCronHelperText = (
 export const getInstanceTypeFromVolume = (bootableVolume: BootableVolume): string =>
   getLabel(bootableVolume, DEFAULT_INSTANCETYPE_LABEL, '');
 
-export const getAddBootableVolumeSubmitBtnText = (t: TFunction, isUploading: boolean): string =>
-  isUploading ? t('Uploading') : t('Save');
-
 export const getCreatedBootableVolumeUrl = (createdVolume: V1beta1DataSource): string =>
   appendBootableVolumeContext(getResourceUrl({ model: DataSourceModel, resource: createdVolume }));
-
-export const handleAddBootableVolumeModalClose = ({
-  onClose,
-  sourceType,
-  upload,
-}: HandleAddBootableVolumeModalCloseParams): void => {
-  cancelTrackedUploadOnModalClose({ sourceType, upload });
-  onClose();
-};
-
-export const submitAddBootableVolume = async ({
-  checkUploadReady,
-  createParams,
-  dataSource,
-  onClose,
-  onCreateVolume,
-  onUploadStart,
-  sourceType,
-  t,
-  uploadData,
-}: SubmitAddBootableVolumeParams): Promise<TabModalResult<V1beta1DataSource>> => {
-  if (isUploadVolumeSource(sourceType)) {
-    document.getElementById(SOURCE_DETAILS_SECTION_ID)?.scrollIntoView();
-    await checkUploadReady();
-  }
-
-  const createVolume = createBootableVolume({
-    createParams,
-    onCreateVolume,
-    onUploadStart,
-    sourceType,
-    t,
-    uploadData,
-  });
-
-  if (isUploadVolumeSource(sourceType)) {
-    void (async (): Promise<void> => {
-      try {
-        await createVolume(dataSource);
-      } catch (error) {
-        if (!isUploadCanceledError(error)) {
-          kubevirtConsole.error(error);
-        }
-      }
-    })();
-    onClose();
-    return Promise.resolve();
-  }
-
-  try {
-    return await createVolume(dataSource);
-  } catch (error) {
-    if (isUploadCanceledError(error)) {
-      return;
-    }
-    throw error;
-  }
-};

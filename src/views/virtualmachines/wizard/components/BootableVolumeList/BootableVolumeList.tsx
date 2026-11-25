@@ -14,6 +14,7 @@ import { getEffectiveVolumeNamespace } from './utils/utils';
 import './BootableVolumeList.scss';
 
 const BootableVolumeList: FC<BootableVolumeListProps> = ({
+  addVolumeNamespace,
   bootableVolumesData,
   canCreateVolume,
   cluster,
@@ -106,8 +107,10 @@ const BootableVolumeList: FC<BootableVolumeListProps> = ({
         <div className="bootable-volume-list__table-wrapper" onScroll={handleTableScroll}>
           <BootableVolumeListContent
             activeColumns={activeColumns}
+            addVolumeNamespace={addVolumeNamespace}
             bootableVolumesData={bootableVolumesData}
             canCreateVolume={canCreateVolume}
+            cluster={cluster}
             displayVolumes={displayVolumes}
             getSortType={getSortType}
             isHeaderStuck={isHeaderStuck}

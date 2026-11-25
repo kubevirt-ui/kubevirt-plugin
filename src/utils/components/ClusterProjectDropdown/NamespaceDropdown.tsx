@@ -25,6 +25,7 @@ export type NamespaceDropdownProps = {
   disabled?: boolean;
   disabledTooltip?: string;
   includeAllProjects?: boolean;
+  isFullWidth?: boolean;
   isLoading?: boolean;
   onChange: (project: string) => void;
   onlyUserProjects?: boolean;
@@ -39,6 +40,7 @@ const NamespaceDropdown: FC<NamespaceDropdownProps> = ({
   disabled = false,
   disabledTooltip,
   includeAllProjects = true,
+  isFullWidth = false,
   isLoading = false,
   onChange,
   onlyUserProjects = false,
@@ -142,6 +144,7 @@ const NamespaceDropdown: FC<NamespaceDropdownProps> = ({
       extractKey={extractName}
       extractTitle={extractName}
       includeAllItems={includeAllProjects}
+      isFullWidth={isFullWidth}
       isLoading={isDropdownLoading}
       items={visibleNamespaces}
       itemsLoaded={namespacesLoaded}

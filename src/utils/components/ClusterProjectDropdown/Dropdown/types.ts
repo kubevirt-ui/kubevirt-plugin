@@ -55,6 +55,7 @@ export type DropdownProps<T> = {
   extractKey: (item: T) => string;
   extractTitle: (item: T) => string;
   includeAllItems?: boolean;
+  isFullWidth?: boolean;
   isItemDisabled?: (key: string) => boolean;
   isLoading?: boolean;
   items: null | T[] | undefined;

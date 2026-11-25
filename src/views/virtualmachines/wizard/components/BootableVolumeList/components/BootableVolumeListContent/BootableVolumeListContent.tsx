@@ -23,8 +23,10 @@ import BootableVolumeTable from '../BootableVolumeTable/BootableVolumeTable';
 
 type BootableVolumeListContentProps = {
   activeColumns: TableColumnWithOptionalIndex<BootableVolume>[];
+  addVolumeNamespace?: string;
   bootableVolumesData: UseBootableVolumesValues;
   canCreateVolume: boolean;
+  cluster?: string;
   displayVolumes: boolean;
   getSortType: (columnIndex: number) => ThSortType;
   isHeaderStuck: boolean;
@@ -47,8 +49,10 @@ type BootableVolumeListContentProps = {
 
 const BootableVolumeListContent: FC<BootableVolumeListContentProps> = ({
   activeColumns,
+  addVolumeNamespace,
   bootableVolumesData,
   canCreateVolume,
+  cluster,
   displayVolumes,
   getSortType,
   isHeaderStuck,
@@ -89,8 +93,10 @@ const BootableVolumeListContent: FC<BootableVolumeListContentProps> = ({
       {isVolumesLoaded && isVolumeListEmpty && (
         <BootableVolumeEmptyState
           canCreate={canCreateVolume}
+          cluster={cluster}
           loadError={loadError}
           lockedPreference={lockedPreference}
+          namespace={addVolumeNamespace}
           onCreateVolume={onCreateVolume}
           onUploadStart={onUploadStart}
           preferenceName={preferenceName}

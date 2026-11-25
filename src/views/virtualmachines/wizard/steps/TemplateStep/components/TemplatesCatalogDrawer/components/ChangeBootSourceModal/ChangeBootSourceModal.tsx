@@ -16,6 +16,7 @@ const ChangeBootSourceModal: FC<ChangeBootSourceModalProps> = (props) => {
   const { t } = useKubevirtTranslation();
 
   const {
+    addVolumeNamespace,
     bootableVolumesData,
     canCreate,
     cluster,
@@ -50,10 +51,13 @@ const ChangeBootSourceModal: FC<ChangeBootSourceModalProps> = (props) => {
       <ModalBody>
         <AddBootableVolumeButton
           canCreate={canCreate}
+          cluster={cluster}
           lockedPreference={lockedPreference}
+          namespace={addVolumeNamespace}
           onCreateVolume={onCreateVolume}
         />
         <BootableVolumeList
+          addVolumeNamespace={addVolumeNamespace}
           bootableVolumesData={bootableVolumesData}
           canCreateVolume={canCreate}
           cluster={cluster}

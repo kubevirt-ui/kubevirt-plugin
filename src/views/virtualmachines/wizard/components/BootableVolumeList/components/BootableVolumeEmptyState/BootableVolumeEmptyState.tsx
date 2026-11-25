@@ -13,8 +13,10 @@ import './BootableVolumeEmptyState.scss';
 
 type BootableVolumeEmptyStateProps = {
   canCreate: boolean;
+  cluster?: string;
   loadError?: Error;
   lockedPreference?: PreferenceOption;
+  namespace?: string;
   onCreateVolume: (volume: BootableVolume) => void;
   onUploadStart?: (uploadKey: string) => void;
   preferenceName?: string;
@@ -23,8 +25,10 @@ type BootableVolumeEmptyStateProps = {
 
 const BootableVolumeEmptyState: FC<BootableVolumeEmptyStateProps> = ({
   canCreate,
+  cluster,
   loadError,
   lockedPreference,
+  namespace,
   onCreateVolume,
   onUploadStart,
   preferenceName,
@@ -39,8 +43,10 @@ const BootableVolumeEmptyState: FC<BootableVolumeEmptyStateProps> = ({
   const addVolumeLink = (
     <AddBootableVolumeLink
       canCreate={canCreate}
+      cluster={cluster}
       loadError={loadError}
       lockedPreference={lockedPreference}
+      namespace={namespace}
       onCreateVolume={onCreateVolume}
       onUploadStart={onUploadStart}
     />

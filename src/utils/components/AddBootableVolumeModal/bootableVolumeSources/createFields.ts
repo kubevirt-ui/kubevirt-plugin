@@ -16,15 +16,6 @@ export const dataVolumeSpecFromCreateParams = (
   volumeMode: createParams.volumeMode,
 });
 
-export const dataSourceMetadataFromCreateParams = (
-  createParams: AddBootableVolumeState,
-): DataSourceMetadataFields => ({
-  annotations: createParams.annotations,
-  isIso: createParams.isIso,
-  labels: createParams.labels,
-  name: createParams.bootableVolumeName,
-});
-
 export const descriptionAnnotations = (
   description?: string,
 ): DataSourceMetadataFields['annotations'] => {

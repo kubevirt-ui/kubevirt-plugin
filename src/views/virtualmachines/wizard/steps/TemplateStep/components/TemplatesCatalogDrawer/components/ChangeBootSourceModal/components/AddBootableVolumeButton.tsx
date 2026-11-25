@@ -1,7 +1,7 @@
 import { type FC } from 'react';
 
-import AddBootableVolumeModal from '@kubevirt-utils/components/AddBootableVolumeModal/AddBootableVolumeModal';
 import { type PreferenceOption } from '@kubevirt-utils/components/AddBootableVolumeModal/types';
+import AddBootableVolumeWizard from '@kubevirt-utils/components/AddBootableVolumeWizard/AddBootableVolumeWizard';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { type BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
@@ -12,24 +12,27 @@ import { CHANGE_BOOT_SOURCE_ADD_VOLUME_TEST_ID } from '../utils/consts';
 
 type AddBootableVolumeButtonProps = {
   canCreate: boolean;
+  cluster?: string;
   lockedPreference?: PreferenceOption;
+  namespace?: string;
   onCreateVolume: (volume: BootableVolume) => void;
 };
 
 const AddBootableVolumeButton: FC<AddBootableVolumeButtonProps> = ({
   canCreate,
+  cluster,
   lockedPreference,
+  namespace,
   onCreateVolume,
 }) => {
   const { t } = useKubevirtTranslation();
   const { createModal } = useModal();
 
-  const openAddBootableVolumeModal = (): void => {
-    createModal((props) => (
-      <AddBootableVolumeModal
-        {...props}
-        lockedPreference={lockedPreference}
-        onClose={props.onClose}
+  const openAddBootableVolumeWizard = (): void => {
+    createModal(({ onClose }) => (
+      <AddBootableVolumeWizard
+        initialValues={{ cluster, lockedPreference, namespace }}
+        onClose={onClose}
         onCreateVolume={onCreateVolume}
       />
     ));
@@ -49,7 +52,7 @@ const AddBootableVolumeButton: FC<AddBootableVolumeButtonProps> = ({
               if (!canCreate) {
                 return;
               }
-              openAddBootableVolumeModal();
+              openAddBootableVolumeWizard();
             }}
             variant={ButtonVariant.secondary}
           >

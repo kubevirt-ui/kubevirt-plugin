@@ -1,12 +1,10 @@
 import { type FC, useMemo } from 'react';
 import { useController, useWatch } from 'react-hook-form';
 
-import { BOOTABLE_VOLUME_SELECTED, logITFlowEvent } from '@kubevirt-utils/extensions/telemetry';
 import { useCanListNamespaces } from '@kubevirt-utils/hooks/useCanListNamespaces';
 import useInstanceTypesAndPreferences from '@kubevirt-utils/hooks/useInstanceTypesAndPreferences';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useBootableVolumes from '@kubevirt-utils/resources/bootableresources/hooks/useBootableVolumes';
-import { getName } from '@kubevirt-utils/resources/shared';
 import { getValidNamespace } from '@kubevirt-utils/utils/utils';
 import {
   Radio,
@@ -23,7 +21,6 @@ import {
   getEffectiveVolumeNamespace,
 } from '@virtualmachines/wizard/components/BootableVolumeList/utils/utils';
 import { useVMWizardForm } from '@virtualmachines/wizard/form/VMWizardFormProvider';
-import { type OnSelectBootableVolume } from '@virtualmachines/wizard/utils/types';
 
 import AddBootableVolumeButton from './components/AddBootableVolumeButton';
 import BootSourceIsoOptions from './components/BootSourceIsoOptions';
@@ -67,24 +64,22 @@ const BootSourceStep: FC = () => {
     getValidNamespace(project),
     cluster,
   );
-  const { applyBootableVolume, canCreate, lockedPreference, onCreateVolume, onUploadStart } =
-    useAddBootableVolume();
+  const {
+    canCreate,
+    cluster: addVolumeCluster,
+    lockedPreference,
+    namespace: addVolumeNamespace,
+    onCreateVolume,
+    onSelectBootableVolume,
+    onUploadStart,
+  } = useAddBootableVolume();
 
   const effectiveNamespace = getEffectiveVolumeNamespace(volumeListNamespace, canListAllNamespaces);
-
   const bootableVolumesData = useBootableVolumes(effectiveNamespace, cluster);
-
   const selectedTableRow = useMemo(
     () => createTableRowFromSelection(selectedBootableVolume, selectedPreference),
     [selectedBootableVolume, selectedPreference],
   );
-
-  const onSelectBootableVolume: OnSelectBootableVolume = (args) => {
-    applyBootableVolume(args);
-    logITFlowEvent(BOOTABLE_VOLUME_SELECTED, null, {
-      selectedBootableVolume: getName(args.selectedVolume),
-    });
-  };
 
   return (
     <Stack hasGutter>
@@ -117,9 +112,10 @@ const BootSourceStep: FC = () => {
       {value && (
         <>
           <BootableVolumeList
+            addVolumeNamespace={addVolumeNamespace}
             bootableVolumesData={bootableVolumesData}
             canCreateVolume={canCreate}
-            cluster={cluster}
+            cluster={addVolumeCluster ?? cluster}
             guestOperatingSystem={guestOperatingSystem}
             instanceTypesAndPreferencesData={instanceTypesAndPreferencesData}
             loadError={instanceTypesAndPreferencesData?.loadError}

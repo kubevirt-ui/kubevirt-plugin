@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 
-import type { AddBootableVolumeModalProps } from '@kubevirt-utils/components/AddBootableVolumeModal/types';
+import type { BootableVolumeCreateCallbacks } from '@kubevirt-utils/components/AddBootableVolumeModal/types';
 import type { WizardStepProps, WizardStepType } from '@patternfly/react-core';
 
 import type { BootableVolumeWizardStep } from '../form/stepValidation';
@@ -28,7 +28,4 @@ export type BootableVolumeWizardStepDisplay = WizardStepProps & {
   displayIndex: number;
 };
 
-export type BootableVolumeWizardCallbacks = {
-  onCreateVolume?: AddBootableVolumeModalProps['onCreateVolume'];
-  onUploadStart?: AddBootableVolumeModalProps['onUploadStart'];
-};
+export type BootableVolumeWizardCallbacks = BootableVolumeCreateCallbacks;

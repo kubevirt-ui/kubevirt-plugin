@@ -1,7 +1,5 @@
-import type { Dispatch, SetStateAction } from 'react';
 import type { TFunction } from 'i18next';
 
-import type { V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import type {
   V1beta1StorageSpecAccessModesEnum,
   V1beta1StorageSpecVolumeModeEnum,
@@ -10,11 +8,8 @@ import type {
   TLS_CERT_SOURCE_EXISTING,
   TLS_CERT_SOURCE_NEW,
 } from '@kubevirt-utils/components/TLSCertificateSection';
-import type { CdiUploadDataFn, DataUpload } from '@kubevirt-utils/hooks/useCDIUpload/types';
 import type { ToastActions } from '@kubevirt-utils/hooks/useKubevirtToast';
 import type { BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
-
-import type { DROPDOWN_FORM_SELECTION } from './consts';
 
 export type PreferenceOption = {
   architecture?: string;
@@ -24,15 +19,7 @@ export type PreferenceOption = {
   name: string;
 };
 
-export type AddBootableVolumeModalProps = {
-  isOpen: boolean;
-  lockedPreference?: PreferenceOption;
-  onClose: () => void;
-  onCreateVolume?: (createdVolume: BootableVolume) => void;
-  onUploadStart?: (uploadKey: string) => void;
-};
-
-/** Modal / disk-flow UI state and create payload (wizard uses BootableVolumeWizardFormValues). */
+/** Disk-flow UI state and create payload (wizard uses BootableVolumeWizardFormValues). */
 export type AddBootableVolumeState = {
   accessMode?: V1beta1StorageSpecAccessModesEnum;
   annotations?: { [key: string]: string };
@@ -71,49 +58,12 @@ export type SetBootableVolumeFieldType = (
   value: { password: string; username: string } | boolean | File | number | string | string[],
 ) => void;
 
-export type SubmitAddBootableVolumeParams = {
-  checkUploadReady: () => Promise<void>;
-  createParams: AddBootableVolumeState;
-  dataSource: V1beta1DataSource;
-  onClose: () => void;
-  onCreateVolume?: (createdVolume: BootableVolume) => void;
-  onUploadStart?: (uploadKey: string) => void;
-  sourceType: DROPDOWN_FORM_SELECTION;
-  t: TFunction;
-  uploadData: CdiUploadDataFn;
-};
-
-export type HandleAddBootableVolumeModalCloseParams = {
-  onClose: () => void;
-  sourceType: DROPDOWN_FORM_SELECTION;
-  upload?: DataUpload;
-};
-
-export type CreateBootableVolumeType = (input: {
-  createParams: AddBootableVolumeState;
-  onCreateVolume?: (createdVolume: BootableVolume) => void;
-  onUploadStart?: (uploadKey: string) => void;
-  sourceType: DROPDOWN_FORM_SELECTION;
-  t: TFunction;
-  uploadData: CdiUploadDataFn;
-}) => (dataSource: V1beta1DataSource) => Promise<V1beta1DataSource[]>;
-
-export type UseAddBootableVolumeFormValidationParams = {
-  bootableVolume: AddBootableVolumeState;
-  sourceType: DROPDOWN_FORM_SELECTION;
-};
-
-export type UseAddBootableVolumeModalData = (lockedPreference?: PreferenceOption) => {
-  bootableVolume: AddBootableVolumeState;
-  checkUploadReady: () => Promise<void>;
-  setBootableVolume: Dispatch<SetStateAction<AddBootableVolumeState>>;
-  setSourceType: Dispatch<SetStateAction<DROPDOWN_FORM_SELECTION>>;
-  sourceType: DROPDOWN_FORM_SELECTION;
-  upload: DataUpload;
-  uploadData: CdiUploadDataFn;
-};
-
 export type BootableVolumeToastHandlers = Pick<ToastActions, 'addInfoToast' | 'addSuccessToast'> & {
   navigate: (url: string) => void;
   t: TFunction;
+};
+
+export type BootableVolumeCreateCallbacks = {
+  onCreateVolume?: (createdVolume: BootableVolume) => void;
+  onUploadStart?: (uploadKey: string) => void;
 };

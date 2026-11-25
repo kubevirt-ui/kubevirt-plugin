@@ -14,8 +14,6 @@ import { CDI_BIND_REQUESTED_ANNOTATION } from '@kubevirt-utils/hooks/useCDIUploa
 
 import type { AddBootableVolumeState } from './types';
 
-export const SOURCE_DETAILS_SECTION_ID = 'source-details-section';
-
 export enum DROPDOWN_FORM_SELECTION {
   UPLOAD_VOLUME = 'volume',
   USE_EXISTING_PVC = 'pvc',
@@ -24,24 +22,8 @@ export enum DROPDOWN_FORM_SELECTION {
   USE_SNAPSHOT = 'snapshot',
 }
 
-export const optionsValueLabelMapper = {
-  [DROPDOWN_FORM_SELECTION.UPLOAD_VOLUME]: 'Volume',
-  [DROPDOWN_FORM_SELECTION.USE_EXISTING_PVC]: 'Volume',
-  [DROPDOWN_FORM_SELECTION.USE_HTTP]: 'URL',
-  [DROPDOWN_FORM_SELECTION.USE_REGISTRY]: 'Registry',
-  [DROPDOWN_FORM_SELECTION.USE_SNAPSHOT]: 'Volume snapshot',
-};
-
 // t('Example: quay.io/containerdisks/centos:7-2009')
 export const REGISTRY_SOURCE_EXAMPLE_HELPER_TEXT = 'Example: quay.io/containerdisks/centos:7-2009';
-
-export const TLS_CERT_FIELD_NAMES = {
-  tlsCertConfigMapName: 'tlsCertConfigMapName',
-  tlsCertificate: 'tlsCertificate',
-  tlsCertificateRequired: 'tlsCertificateRequired',
-  tlsCertProject: 'tlsCertProject',
-  tlsCertSource: 'tlsCertSource',
-} as const;
 
 export const initialBootableVolumeState = {
   annotations: {},

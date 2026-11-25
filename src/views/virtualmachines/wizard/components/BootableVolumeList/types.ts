@@ -53,6 +53,7 @@ export type BootableVolumeRowData = {
 };
 
 export type BootableVolumeListProps = {
+  addVolumeNamespace?: string;
   bootableVolumesData: UseBootableVolumesValues;
   canCreateVolume: boolean;
   cluster?: string;

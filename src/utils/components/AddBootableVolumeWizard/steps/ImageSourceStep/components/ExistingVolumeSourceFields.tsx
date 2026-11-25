@@ -12,11 +12,13 @@ import { Checkbox, PopoverPosition, Split, SplitItem } from '@patternfly/react-c
 
 import { useBootableVolumeWizardForm } from '../../../form/BootableVolumeWizardFormProvider';
 import { wizardSetValueOptions } from '../../../form/wizardSetValueOptions';
+import useAllowedPreferenceNames from '../../../hooks/useAllowedPreferenceNames';
 import { setImageSourceDiskSize } from '../utils/setImageSourceDiskSize';
 
 const ExistingVolumeSourceFields: FC = () => {
   const { t } = useKubevirtTranslation();
   const { cluster, control, getValues, setValue } = useBootableVolumeWizardForm();
+  const allowedPreferenceNames = useAllowedPreferenceNames();
 
   const [destinationProject, volumeName, volumeProject] = useWatch({
     control,
@@ -36,6 +38,7 @@ const ExistingVolumeSourceFields: FC = () => {
   return (
     <>
       <DiskSourcePVCSelect
+        allowedPreferenceNames={allowedPreferenceNames}
         cluster={cluster}
         pvcNameSelected={volumeName}
         pvcNamespaceSelected={volumeProject}

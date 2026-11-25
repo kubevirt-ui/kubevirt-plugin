@@ -1,5 +1,6 @@
 import type { FC, MouseEvent, ReactNode } from 'react';
 import { useRef } from 'react';
+import classNames from 'classnames';
 
 import { useClickOutside } from '@kubevirt-utils/hooks/useClickOutside/useClickOutside';
 import { Menu, Popper } from '@patternfly/react-core';
@@ -11,6 +12,7 @@ type DropdownToggleProps = {
   children: ReactNode;
   config: DropdownConfig;
   disabled?: boolean;
+  isFullWidth?: boolean;
   isLoading?: boolean;
   isOpen: boolean;
   onActionClick: (event: MouseEvent, itemID: string) => void;
@@ -25,6 +27,7 @@ const DropdownToggle: FC<DropdownToggleProps> = ({
   children,
   config,
   disabled = false,
+  isFullWidth = false,
   isLoading = false,
   isOpen,
   onActionClick,
@@ -40,10 +43,15 @@ const DropdownToggle: FC<DropdownToggleProps> = ({
   useClickOutside([menuRef, toggleRef], onCloseMenu);
 
   return (
-    <div className={config.cssPrefix}>
+    <div
+      className={classNames(config.cssPrefix, {
+        [`${config.cssPrefix}--full-width`]: isFullWidth,
+      })}
+    >
       <DropdownMenuToggle
         config={config}
         disabled={disabled}
+        isFullWidth={isFullWidth}
         isLoading={isLoading}
         isOpen={isOpen}
         onToggle={onToggle}
@@ -51,6 +59,8 @@ const DropdownToggle: FC<DropdownToggleProps> = ({
         toggleRef={toggleRef}
       />
       <Popper
+        // Portal outside the wizard modal (overflow: hidden) so the menu is not clipped.
+        appendTo={() => document.body}
         isVisible={isOpen}
         placement="bottom-start"
         popper={
@@ -68,6 +78,7 @@ const DropdownToggle: FC<DropdownToggleProps> = ({
         }
         popperRef={menuRef}
         triggerRef={toggleRef}
+        zIndex={600}
       />
     </div>
   );

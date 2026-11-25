@@ -24,7 +24,9 @@ const DestinationProjectSelect: FC = () => {
       <NamespaceDropdown
         cluster={cluster}
         includeAllProjects={false}
+        isFullWidth
         onChange={onChange}
+        onlyUserProjects
         selectedProject={value ?? ''}
       />
       {message && <FormGroupHelperText validated={validated}>{message}</FormGroupHelperText>}

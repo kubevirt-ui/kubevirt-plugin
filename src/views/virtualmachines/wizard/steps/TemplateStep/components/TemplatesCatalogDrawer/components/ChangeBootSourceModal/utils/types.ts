@@ -20,6 +20,7 @@ export type ChangeBootSourcePreferenceData = {
 };
 
 export type UseChangeBootSourceModalValues = ChangeBootSourcePreferenceData & {
+  addVolumeNamespace?: string;
   bootableVolumesData: UseBootableVolumesValues;
   canCreate: boolean;
   cluster: string;

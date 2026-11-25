@@ -5,6 +5,7 @@ import {
   BOOTABLE_VOLUME_SELECTED,
   logTemplateFlowEvent,
 } from '@kubevirt-utils/extensions/telemetry';
+import { ALL_PROJECTS } from '@kubevirt-utils/hooks/constants';
 import { useCanListNamespaces } from '@kubevirt-utils/hooks/useCanListNamespaces';
 import useInstanceTypesAndPreferences from '@kubevirt-utils/hooks/useInstanceTypesAndPreferences';
 import useBootableVolumes from '@kubevirt-utils/resources/bootableresources/hooks/useBootableVolumes';
@@ -94,18 +95,23 @@ const useChangeBootSourceModal: UseChangeBootSourceModal = ({ isOpen, onClose, v
     });
   };
 
-  // Uploads close the "Add new boot source" sub-modal immediately and finish in the
-  // background (see submitAddBootableVolume), so this can fire long after the user has
-  // moved on. Apply the override and reflect the new volume as the selection so the list
-  // and Confirm button match the committed state — but don't close this modal out from
-  // under them.
+  // Uploads close the add-volume wizard immediately and finish in the background, so
+  // this can fire long after the user has moved on. Apply the override and reflect the
+  // new volume as the selection so the list and Confirm button match the committed
+  // state — but don't close this modal out from under them.
   const onCreateVolume = (volume: BootableVolume): void => {
     applyBootSourceOverride(volume);
     setSelectedBootableVolume(volume);
     setSelectedPreference(undefined);
   };
 
+  const addVolumeNamespace =
+    volumeListNamespace && volumeListNamespace !== ALL_PROJECTS
+      ? volumeListNamespace
+      : project || undefined;
+
   return {
+    addVolumeNamespace,
     bootableVolumesData,
     canCreate,
     cluster,

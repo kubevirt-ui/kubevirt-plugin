@@ -14,11 +14,13 @@ import { initialBootableVolumeState } from '../AddBootableVolumeModal/consts';
 import ErrorAlert from '../ErrorAlert/ErrorAlert';
 import InlineFilterSelect from '../FilterSelect/InlineFilterSelect';
 import Loading from '../Loading/Loading';
+import useClearInvalidSnapshotSelection from './useClearInvalidSnapshotSelection';
 import useSnapshots from './useSnapshots';
 
 import './select-snapshot.scss';
 
 type SelectSnapshotProps = {
+  allowedPreferenceNames?: string[];
   cluster?: string;
   selectSnapshotName: (value: string) => void;
   selectSnapshotNamespace?: (value: string) => void;
@@ -28,6 +30,7 @@ type SelectSnapshotProps = {
 };
 
 const SelectSnapshot: FC<SelectSnapshotProps> = ({
+  allowedPreferenceNames,
   cluster,
   selectSnapshotName,
   selectSnapshotNamespace,
@@ -39,6 +42,7 @@ const SelectSnapshot: FC<SelectSnapshotProps> = ({
   const { error, projectsLoaded, projectsWithSnapshots, snapshots, snapshotsLoaded } = useSnapshots(
     snapshotNamespaceSelected,
     cluster,
+    allowedPreferenceNames,
   );
 
   const onSelectProject = useCallback(
@@ -52,7 +56,7 @@ const SelectSnapshot: FC<SelectSnapshotProps> = ({
 
   const getSnapshotSize = useCallback(
     (snapshotName: string) =>
-      getVolumeSnapshotSize(snapshots?.find((snapshot) => getName(snapshot) === snapshotName)),
+      getVolumeSnapshotSize(snapshots.find((snapshot) => getName(snapshot) === snapshotName)),
     [snapshots],
   );
 
@@ -65,10 +69,22 @@ const SelectSnapshot: FC<SelectSnapshotProps> = ({
   const snapshotNames = useMemo(
     () =>
       snapshots
-        ?.map((snapshot) => getName(snapshot))
-        ?.sort((a, b) => (a ?? '').localeCompare(b ?? '')),
+        .map((snapshot) => getName(snapshot))
+        .filter((name): name is string => Boolean(name))
+        .sort((a, b) => a.localeCompare(b)),
     [snapshots],
   );
+
+  useClearInvalidSnapshotSelection({
+    projectsLoaded,
+    projectsWithSnapshots,
+    selectSnapshotName,
+    selectSnapshotNamespace,
+    snapshotNames,
+    snapshotNameSelected,
+    snapshotNamespaceSelected,
+    snapshotsLoaded,
+  });
 
   if (error) {
     return (

@@ -1,6 +1,6 @@
 import { type FC } from 'react';
 
-import AddBootableVolumeModal from '@kubevirt-utils/components/AddBootableVolumeModal/AddBootableVolumeModal';
+import AddBootableVolumeWizard from '@kubevirt-utils/components/AddBootableVolumeWizard/AddBootableVolumeWizard';
 import { runningTourSignal } from '@kubevirt-utils/components/GuidedTour/utils/guidedTourSignals';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -18,16 +18,16 @@ const AddBootableVolumeButton: FC<AddBootableVolumeButtonProps> = ({ loadError }
   const { t } = useKubevirtTranslation();
   useSignals();
   const { createModal } = useModal();
-  const { canCreate, lockedPreference, onCreateVolume, onUploadStart } = useAddBootableVolume();
+  const { canCreate, cluster, lockedPreference, namespace, onCreateVolume, onUploadStart } =
+    useAddBootableVolume();
 
   const isEnabled = runningTourSignal.value || (isEmpty(loadError) && canCreate);
 
-  const openAddBootableVolumeModal = (): void => {
-    createModal((props) => (
-      <AddBootableVolumeModal
-        {...props}
-        lockedPreference={lockedPreference}
-        onClose={props.onClose}
+  const openAddBootableVolumeWizard = (): void => {
+    createModal(({ onClose }) => (
+      <AddBootableVolumeWizard
+        initialValues={{ cluster, lockedPreference, namespace }}
+        onClose={onClose}
         onCreateVolume={onCreateVolume}
         onUploadStart={onUploadStart}
       />
@@ -38,7 +38,7 @@ const AddBootableVolumeButton: FC<AddBootableVolumeButtonProps> = ({ loadError }
     <Button
       id="tour-step-add-volume"
       isDisabled={!isEnabled}
-      onClick={openAddBootableVolumeModal}
+      onClick={openAddBootableVolumeWizard}
       variant={ButtonVariant.secondary}
     >
       {t('Add volume')}

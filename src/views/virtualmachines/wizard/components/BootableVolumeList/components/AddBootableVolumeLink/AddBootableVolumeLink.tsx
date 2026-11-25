@@ -1,7 +1,7 @@
 import { type FC } from 'react';
 
-import AddBootableVolumeModal from '@kubevirt-utils/components/AddBootableVolumeModal/AddBootableVolumeModal';
 import { type PreferenceOption } from '@kubevirt-utils/components/AddBootableVolumeModal/types';
+import AddBootableVolumeWizard from '@kubevirt-utils/components/AddBootableVolumeWizard/AddBootableVolumeWizard';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { type BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
@@ -13,9 +13,11 @@ import './AddBootableVolumeLink.scss';
 
 type AddBootableVolumeLinkProps = {
   canCreate: boolean;
+  cluster?: string;
   hidePopover?: () => void;
   loadError?: Error;
   lockedPreference?: PreferenceOption;
+  namespace?: string;
   onCreateVolume: (volume: BootableVolume) => void;
   onUploadStart?: (uploadKey: string) => void;
   text?: string;
@@ -23,9 +25,11 @@ type AddBootableVolumeLinkProps = {
 
 const AddBootableVolumeLink: FC<AddBootableVolumeLinkProps> = ({
   canCreate,
+  cluster,
   hidePopover,
   loadError,
   lockedPreference,
+  namespace,
   onCreateVolume,
   onUploadStart,
   text,
@@ -34,17 +38,16 @@ const AddBootableVolumeLink: FC<AddBootableVolumeLinkProps> = ({
   const { createModal } = useModal();
   const isDisabled = Boolean(loadError) || !canCreate;
 
-  const openAddBootableVolumeModal = (): void => {
+  const openAddBootableVolumeWizard = (): void => {
     if (isDisabled) {
       return;
     }
 
     hidePopover?.();
-    createModal((props) => (
-      <AddBootableVolumeModal
-        {...props}
-        lockedPreference={lockedPreference}
-        onClose={props.onClose}
+    createModal(({ onClose }) => (
+      <AddBootableVolumeWizard
+        initialValues={{ cluster, lockedPreference, namespace }}
+        onClose={onClose}
         onCreateVolume={onCreateVolume}
         onUploadStart={onUploadStart}
       />
@@ -56,7 +59,7 @@ const AddBootableVolumeLink: FC<AddBootableVolumeLinkProps> = ({
       className="add-bootable-volume-link__inline-text"
       isAriaDisabled={isDisabled}
       isInline
-      onClick={openAddBootableVolumeModal}
+      onClick={openAddBootableVolumeWizard}
       variant={ButtonVariant.link}
     >
       {text ?? t('Add volume')}

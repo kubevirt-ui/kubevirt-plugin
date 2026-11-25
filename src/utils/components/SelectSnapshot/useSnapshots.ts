@@ -4,6 +4,7 @@ import {
   modelToGroupVersionKind,
   VolumeSnapshotModel,
 } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { filterResourcesByAllowedPreferences } from '@kubevirt-utils/resources/bootableresources/preferenceLabelFilter';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 
@@ -22,7 +23,11 @@ type UseSnapshotsReturnType = {
   snapshotsLoaded: boolean;
 };
 
-const useSnapshots = (projectSelected: string, cluster?: string): UseSnapshotsReturnType => {
+const useSnapshots = (
+  projectSelected: string,
+  cluster?: string,
+  allowedPreferenceNames?: string[],
+): UseSnapshotsReturnType => {
   const [allSnapshots, allSnapshotsLoaded, allSnapshotsErrors] = useK8sWatchData<
     VolumeSnapshotKind[]
   >({
@@ -33,8 +38,13 @@ const useSnapshots = (projectSelected: string, cluster?: string): UseSnapshotsRe
     namespaced: true,
   });
 
+  const preferenceFilteredSnapshots = useMemo(
+    () => filterResourcesByAllowedPreferences(allSnapshots, allowedPreferenceNames),
+    [allSnapshots, allowedPreferenceNames],
+  );
+
   const projectsWithSnapshots = useMemo(() => {
-    const countByNamespace = (allSnapshots || []).reduce<Record<string, number>>(
+    const countByNamespace = preferenceFilteredSnapshots.reduce<Record<string, number>>(
       (acc, snapshot) => {
         const ns = getNamespace(snapshot);
         if (ns) {
@@ -48,14 +58,14 @@ const useSnapshots = (projectSelected: string, cluster?: string): UseSnapshotsRe
     return Object.entries(countByNamespace)
       .map(([name, count]) => ({ count, name }))
       .sort((a, b) => a.name.localeCompare(b.name));
-  }, [allSnapshots]);
+  }, [preferenceFilteredSnapshots]);
 
   const snapshots = useMemo(
     () =>
-      (allSnapshots || [])
+      preferenceFilteredSnapshots
         .filter((snapshot) => getNamespace(snapshot) === projectSelected)
         .sort((a, b) => (getName(a) ?? '').localeCompare(getName(b) ?? '')),
-    [allSnapshots, projectSelected],
+    [preferenceFilteredSnapshots, projectSelected],
   );
 
   const loaded = allSnapshotsLoaded || !!allSnapshotsErrors;

@@ -21,6 +21,7 @@ const Dropdown = <T,>(props: DropdownProps<T>): JSX.Element => {
     config,
     disabled = false,
     disabledTooltip,
+    isFullWidth = false,
     isLoading = false,
     onChange,
     selectedItem,
@@ -41,6 +42,7 @@ const Dropdown = <T,>(props: DropdownProps<T>): JSX.Element => {
       <DropdownToggle
         config={config}
         disabled={disabled}
+        isFullWidth={isFullWidth}
         isLoading={isLoading}
         isOpen={isOpen}
         onActionClick={onActionClick}
