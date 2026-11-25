@@ -1,11 +1,15 @@
 import { useState } from 'react';
 
+import { CONSOLE_USER_SETTINGS } from '@kubevirt-utils/hooks/consoleUserSettings/useConsoleUserSettingLocalStorage/consts';
 import { operatorNamespaceSignal } from '@kubevirt-utils/store/operatorNamespace';
 import { k8sGet, useUserPreference } from '@openshift-console/dynamic-plugin-sdk';
 import { act, renderHook, waitFor } from '@testing-library/react';
 
 import useKubevirtUserSettings, { getUserPreferenceKey } from './useKubevirtUserSettings';
-import { resetLegacyUserSettingsCache } from './utils/legacyUserSettings';
+import {
+  resetLegacyKubevirtUserSettingsMigration,
+  startLegacyKubevirtUserSettingsMigration,
+} from './utils/migrateLegacyKubevirtUserSettings';
 
 jest.mock('@kubevirt-utils/store/operatorNamespace', () => ({
   operatorNamespaceSignal: { value: 'openshift-cnv' },
@@ -22,6 +26,10 @@ jest.mock('@openshift-console/dynamic-plugin-sdk', () => ({
   useUserPreference: jest.fn(),
 }));
 
+jest.mock('js-sha256', () => ({
+  sha256: (value: string) => `hash-${value}`,
+}));
+
 const mockedUseUserPreference = useUserPreference as jest.Mock;
 const mockedK8sGet = k8sGet as jest.Mock;
 // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -35,6 +43,7 @@ let preferenceLoaded: boolean;
 const setterSpy = jest.fn();
 
 const legacyConfigMap = (data: Record<string, string>) => ({ data });
+const USER_SETTINGS_CONFIG_MAP = 'user-settings-hash-alice';
 
 const mockK8sGet = (configMap: unknown | Error) => {
   mockedK8sGet.mockImplementation(({ model }: { model: { kind: string } }) => {
@@ -42,6 +51,32 @@ const mockK8sGet = (configMap: unknown | Error) => {
     if (configMap instanceof Error) return Promise.reject(configMap);
     return Promise.resolve(configMap);
   });
+};
+
+const mockLegacyMigrationGets = ({
+  legacyData,
+  legacyError,
+  userSettingsData = {},
+}: {
+  legacyData?: Record<string, string>;
+  legacyError?: Error;
+  userSettingsData?: Record<string, string>;
+}) => {
+  mockedK8sGet.mockImplementation(
+    ({ model, name, ns }: { model: { kind: string }; name?: string; ns?: string }) => {
+      if (model.kind === 'User') return Promise.resolve(USER);
+      if (name === 'kubevirt-user-settings') {
+        if (legacyError) return Promise.reject(legacyError);
+        return Promise.resolve(legacyConfigMap(legacyData ?? {}));
+      }
+      if (name === USER_SETTINGS_CONFIG_MAP && ns === 'openshift-console-user-settings') {
+        if (Object.keys(userSettingsData).length === 0)
+          return Promise.reject(new Error('not found'));
+        return Promise.resolve({ data: userSettingsData });
+      }
+      return Promise.reject(new Error('not found'));
+    },
+  );
 };
 
 const expectNoWrites = () => {
@@ -53,8 +88,14 @@ const expectNoWrites = () => {
 
 beforeEach(() => {
   jest.clearAllMocks();
-  resetLegacyUserSettingsCache();
+  resetLegacyKubevirtUserSettingsMigration();
   operatorNamespaceSignal.value = 'openshift-cnv';
+  window.SERVER_FLAGS = {
+    authDisabled: false,
+    branding: 'okd',
+    userSettingsLocation: CONSOLE_USER_SETTINGS.LOCATION.CONFIGMAP,
+  };
+  localStorage.clear();
   store = {};
   preferenceLoaded = true;
 
@@ -96,7 +137,11 @@ describe('getUserPreferenceKey', () => {
   });
 });
 
-describe('useKubevirtUserSettings', () => {
+describe('useKubevirtUserSettings (hub)', () => {
+  beforeEach(() => {
+    startLegacyKubevirtUserSettingsMigration('openshift-cnv');
+  });
+
   it('calls useUserPreference with sync=true and an undefined default value', async () => {
     const { result } = renderHook(() => useKubevirtUserSettings('columns'));
 
@@ -122,16 +167,14 @@ describe('useKubevirtUserSettings', () => {
     expect(result.current[0]).toEqual({ vms: ['name'] });
   });
 
-  it('writes updates to the user preference and resolves with the value', async () => {
+  it('writes updates via setPreference from useUserPreference', async () => {
     const { result } = renderHook(() => useKubevirtUserSettings('ssh'));
     await waitFor(() => expect(result.current[2]).toBe(true));
 
-    let resolved: unknown;
-    await act(async () => {
-      resolved = await result.current[1]({ default: 'ssh-rsa AAA' });
+    act(() => {
+      result.current[1]({ default: 'ssh-rsa AAA' });
     });
 
-    expect(resolved).toEqual({ default: 'ssh-rsa AAA' });
     expect(store['kubevirt.ssh']).toEqual({ default: 'ssh-rsa AAA' });
     expect(result.current[0]).toEqual({ default: 'ssh-rsa AAA' });
     expectNoWrites();
@@ -147,166 +190,112 @@ describe('useKubevirtUserSettings', () => {
 
     expect(result.current[2]).toBe(false);
   });
+});
 
-  it('is not loaded until the operator namespace is known', async () => {
-    operatorNamespaceSignal.value = null;
-    const { result } = renderHook(() => useKubevirtUserSettings('columns'));
-
-    await act(async () => {
-      await Promise.resolve();
-    });
-
-    expect(result.current[2]).toBe(false);
-    expect(mockedK8sGet).not.toHaveBeenCalled();
+describe('legacy kubevirt-user-settings migration', () => {
+  beforeEach(() => {
+    resetLegacyKubevirtUserSettingsMigration();
   });
 
-  describe('legacy kubevirt-user-settings migration', () => {
-    it('migrates missing keys from the legacy ConfigMap into the user preference', async () => {
-      mockK8sGet(
-        legacyConfigMap({
-          'uid-alice': JSON.stringify({
-            columns: { vms: ['name', 'status'] },
-            ssh: { ns1: 'secret1' },
+  it('writes all legacy keys in one ConfigMap create', async () => {
+    mockLegacyMigrationGets({
+      legacyData: {
+        'uid-alice': JSON.stringify({
+          columns: { vms: ['name', 'status'] },
+          ssh: { ns1: 'secret1' },
+        }),
+      },
+    });
+    startLegacyKubevirtUserSettingsMigration('openshift-cnv');
+
+    const { result } = renderHook(() => ({
+      columns: useKubevirtUserSettings('columns'),
+      ssh: useKubevirtUserSettings('ssh'),
+    }));
+
+    await waitFor(() => expect(result.current.ssh[2]).toBe(true));
+
+    expect(sdk.k8sCreate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          data: expect.objectContaining({
+            'kubevirt.columns': JSON.stringify({ vms: ['name', 'status'] }),
+            'kubevirt.ssh': JSON.stringify({ ns1: 'secret1' }),
           }),
         }),
-      );
+      }),
+    );
+    expect(setterSpy).not.toHaveBeenCalled();
+  });
 
-      const { result } = renderHook(() => useKubevirtUserSettings('ssh'));
-      await waitFor(() => expect(result.current[2]).toBe(true));
+  it('does not overwrite existing keys and still copies missing legacy keys', async () => {
+    store['kubevirt.columns'] = { new: ['value'] };
+    mockLegacyMigrationGets({
+      legacyData: {
+        'uid-alice': JSON.stringify({
+          columns: { old: ['value'] },
+          onboardingPopoversHidden: { catalog: true },
+        }),
+      },
+      userSettingsData: { 'kubevirt.columns': JSON.stringify({ new: ['value'] }) },
+    });
+    startLegacyKubevirtUserSettingsMigration('openshift-cnv');
+    await waitFor(() => expect(sdk.k8sPatch).toHaveBeenCalled());
 
-      expect(result.current[0]).toEqual({ ns1: 'secret1' });
-      await waitFor(() => expect(store['kubevirt.ssh']).toEqual({ ns1: 'secret1' }));
-      expectNoWrites();
+    expect(sdk.k8sCreate).not.toHaveBeenCalled();
+    expect(sdk.k8sPatch).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: [
+          {
+            op: 'replace',
+            path: '/data',
+            value: expect.objectContaining({
+              'kubevirt.columns': JSON.stringify({ new: ['value'] }),
+              'kubevirt.onboardingPopoversHidden': JSON.stringify({ catalog: true }),
+            }),
+          },
+        ],
+      }),
+    );
+
+    const { result } = renderHook(() => useKubevirtUserSettings('columns'));
+    await waitFor(() => expect(result.current[2]).toBe(true));
+    expect(result.current[0]).toEqual({ new: ['value'] });
+  });
+
+  it('writes all legacy keys in one localStorage update', async () => {
+    window.SERVER_FLAGS.userSettingsLocation = CONSOLE_USER_SETTINGS.LOCATION.LOCALSTORAGE;
+    mockLegacyMigrationGets({
+      legacyData: {
+        'uid-alice': JSON.stringify({ navigation: { autoHideNav: true } }),
+      },
+    });
+    startLegacyKubevirtUserSettingsMigration('openshift-cnv');
+
+    const { result } = renderHook(() => useKubevirtUserSettings('navigation'));
+    await waitFor(() => expect(result.current[2]).toBe(true));
+
+    expect(
+      JSON.parse(localStorage.getItem(CONSOLE_USER_SETTINGS.LOCAL_STORAGE_KEY) ?? '{}'),
+    ).toEqual({
+      'kubevirt.navigation': { autoHideNav: true },
+    });
+    expect(mockedK8sGet).toHaveBeenCalledTimes(2);
+    expect(sdk.k8sCreate).not.toHaveBeenCalled();
+  });
+});
+
+describe('useKubevirtUserSettings without legacy migration', () => {
+  it('does not run legacy migration for ACM spoke ssh keys', async () => {
+    operatorNamespaceSignal.value = 'openshift-cnv';
+    mockLegacyMigrationGets({
+      legacyData: { 'uid-alice': JSON.stringify({ ssh: { ns1: 'secret1' } }) },
     });
 
-    it('reads the legacy ConfigMap only once for many hook instances and never writes', async () => {
-      mockK8sGet(legacyConfigMap({ 'uid-alice': JSON.stringify({ columns: { a: ['b'] } }) }));
+    const { result } = renderHook(() => useKubevirtUserSettings('ssh', 'spoke-1'));
+    await waitFor(() => expect(result.current[2]).toBe(true));
 
-      const { result } = renderHook(() => ({
-        columns: useKubevirtUserSettings('columns'),
-        navigation: useKubevirtUserSettings('navigation'),
-        ssh: useKubevirtUserSettings('ssh'),
-      }));
-      await waitFor(() => expect(result.current.ssh[2]).toBe(true));
-      await waitFor(() => expect(result.current.columns[2]).toBe(true));
-
-      // one GET for the user + one GET for the ConfigMap
-      expect(mockedK8sGet).toHaveBeenCalledTimes(2);
-      expectNoWrites();
-    });
-
-    it('does not migrate the same key twice', async () => {
-      mockK8sGet(legacyConfigMap({ 'uid-alice': JSON.stringify({ columns: { a: ['b'] } }) }));
-
-      const { result } = renderHook(() => ({
-        first: useKubevirtUserSettings('columns'),
-        second: useKubevirtUserSettings('columns'),
-      }));
-      await waitFor(() => expect(result.current.first[2]).toBe(true));
-      await waitFor(() => expect(store['kubevirt.columns']).toBeDefined());
-
-      expect(setterSpy.mock.calls.filter(([key]) => key === 'kubevirt.columns')).toHaveLength(1);
-    });
-
-    it('never overwrites an existing user preference', async () => {
-      store['kubevirt.columns'] = { new: ['value'] };
-      mockK8sGet(legacyConfigMap({ 'uid-alice': JSON.stringify({ columns: { old: ['value'] } }) }));
-
-      const { result } = renderHook(() => useKubevirtUserSettings('columns'));
-      await waitFor(() => expect(result.current[2]).toBe(true));
-
-      expect(result.current[0]).toEqual({ new: ['value'] });
-      expect(setterSpy).not.toHaveBeenCalled();
-    });
-
-    it('does not migrate before the user preference is loaded', async () => {
-      preferenceLoaded = false;
-      mockK8sGet(legacyConfigMap({ 'uid-alice': JSON.stringify({ columns: { old: ['v'] } }) }));
-
-      renderHook(() => useKubevirtUserSettings('columns'));
-      await waitFor(() => expect(mockedK8sGet).toHaveBeenCalledTimes(2));
-      await act(async () => {
-        await Promise.resolve();
-      });
-
-      expect(setterSpy).not.toHaveBeenCalled();
-    });
-
-    it('does not migrate ACM spoke ssh keys and does not read the legacy ConfigMap', async () => {
-      mockK8sGet(legacyConfigMap({ 'uid-alice': JSON.stringify({ ssh: { ns1: 'secret1' } }) }));
-
-      const { result } = renderHook(() => useKubevirtUserSettings('ssh', 'spoke-1'));
-      await waitFor(() => expect(result.current[2]).toBe(true));
-
-      expect(result.current[0]).toBeUndefined();
-      expect(setterSpy).not.toHaveBeenCalled();
-      expect(mockedK8sGet).not.toHaveBeenCalled();
-    });
-
-    it.each([
-      ['403 forbidden', new Error('Forbidden')],
-      ['404 not found', new Error('Not found')],
-    ])('handles %s gracefully', async (_name, error) => {
-      mockK8sGet(error);
-
-      const { result } = renderHook(() => useKubevirtUserSettings('columns'));
-      await waitFor(() => expect(result.current[2]).toBe(true));
-
-      expect(result.current[0]).toBeUndefined();
-      expect(setterSpy).not.toHaveBeenCalled();
-      expectNoWrites();
-    });
-
-    it('handles a user lookup failure gracefully', async () => {
-      mockedK8sGet.mockRejectedValue(new Error('boom'));
-
-      const { result } = renderHook(() => useKubevirtUserSettings('columns'));
-      await waitFor(() => expect(result.current[2]).toBe(true));
-
-      expect(result.current[0]).toBeUndefined();
-    });
-
-    it.each([
-      ['no data', {}],
-      ['no entry for the user', { data: { 'uid-bob': '{"columns":{}}' } }],
-      ['malformed JSON', { data: { 'uid-alice': '{not json' } }],
-      ['a non-object entry', { data: { 'uid-alice': '"just a string"' } }],
-      ['an array entry', { data: { 'uid-alice': '[1,2]' } }],
-    ])('ignores a legacy ConfigMap with %s', async (_name, configMap) => {
-      mockK8sGet(configMap);
-
-      const { result } = renderHook(() => useKubevirtUserSettings('columns'));
-      await waitFor(() => expect(result.current[2]).toBe(true));
-
-      expect(result.current[0]).toBeUndefined();
-      expect(setterSpy).not.toHaveBeenCalled();
-    });
-
-    it('does not migrate keys absent from the legacy entry', async () => {
-      mockK8sGet(legacyConfigMap({ 'uid-alice': JSON.stringify({ columns: { a: ['b'] } }) }));
-
-      const { result } = renderHook(() => useKubevirtUserSettings('navigation'));
-      await waitFor(() => expect(result.current[2]).toBe(true));
-
-      expect(result.current[0]).toBeUndefined();
-      expect(setterSpy).not.toHaveBeenCalled();
-    });
-
-    it('falls back to the user name when the user has no uid', async () => {
-      mockedK8sGet.mockImplementation(({ model }: { model: { kind: string } }) =>
-        model.kind === 'User'
-          ? Promise.resolve({ metadata: { name: 'system:admin' } })
-          : Promise.resolve(
-              legacyConfigMap({
-                'system-admin': JSON.stringify({ navigation: { autoHideNav: true } }),
-              }),
-            ),
-      );
-
-      const { result } = renderHook(() => useKubevirtUserSettings('navigation'));
-      await waitFor(() => expect(result.current[2]).toBe(true));
-
-      expect(result.current[0]).toEqual({ autoHideNav: true });
-    });
+    expect(result.current[0]).toBeUndefined();
+    expect(mockedK8sGet).not.toHaveBeenCalled();
   });
 });

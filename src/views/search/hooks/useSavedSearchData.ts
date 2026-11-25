@@ -3,7 +3,7 @@ import { useLocation } from 'react-router';
 
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
 import { USER_SETTINGS_KEYS } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/const';
-import { isEmpty, kubevirtConsole } from '@kubevirt-utils/utils/utils';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { getUrlSearchQuery } from '@search/utils/query';
 
 import { type SavedSearchData, type SavedSearchEntry } from '../savedSearches/types';
@@ -43,17 +43,17 @@ export const useSavedSearchData = (): SavedSearchDataResult => {
     (name) => {
       const { [name]: _removed, ...restSearches } = savedSearches;
 
-      setSavedSearches?.(restSearches)?.catch(kubevirtConsole.error);
+      setSavedSearches(restSearches);
     },
     [setSavedSearches, savedSearches],
   );
 
   const saveSearch = useCallback<SavedSearchDataResult['saveSearch']>(
     (name, data) => {
-      setSavedSearches?.({
+      setSavedSearches({
         ...savedSearches,
         [name]: data,
-      })?.catch(kubevirtConsole.error);
+      });
     },
     [setSavedSearches, savedSearches],
   );
@@ -63,10 +63,10 @@ export const useSavedSearchData = (): SavedSearchDataResult => {
       const entry = savedSearches?.[name] as SavedSearchData | undefined;
       if (!entry) return;
 
-      setSavedSearches?.({
+      setSavedSearches({
         ...savedSearches,
         [name]: { ...entry, isFavorited: !entry.isFavorited },
-      })?.catch(kubevirtConsole.error);
+      });
     },
     [setSavedSearches, savedSearches],
   );

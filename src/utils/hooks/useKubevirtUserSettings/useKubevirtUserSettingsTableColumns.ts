@@ -29,10 +29,12 @@ const useKubevirtUserSettingsTableColumns: UseKubevirtUserSettingsTableColumnsTy
   const setActiveColumns = (
     columnIds: string[],
   ): Promise<UserSettingsState['columns']> | undefined => {
-    return setUserColumns?.({
+    const next = {
       ...userColumns,
       [columnManagementID]: columnIds,
-    });
+    };
+    setUserColumns(next);
+    return Promise.resolve(next);
   };
 
   const savedColumnIds = userColumns?.[columnManagementID];

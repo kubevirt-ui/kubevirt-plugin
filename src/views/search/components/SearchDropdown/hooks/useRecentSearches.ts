@@ -2,8 +2,6 @@ import { useCallback, useMemo } from 'react';
 
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
 import { USER_SETTINGS_KEYS } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/const';
-import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
-
 const MAX_RECENT_SEARCHES = 3;
 
 type UseRecentSearchesResult = {
@@ -33,9 +31,7 @@ const useRecentSearches = (): UseRecentSearchesResult => {
       const deduplicated = current.filter((search) => search !== trimmed);
       const updated = [trimmed, ...deduplicated].slice(0, MAX_RECENT_SEARCHES);
 
-      if (setStoredSearches) {
-        setStoredSearches(updated).catch((err: unknown) => kubevirtConsole.error(err));
-      }
+      setStoredSearches(updated);
     },
     [storedSearches, setStoredSearches],
   );
