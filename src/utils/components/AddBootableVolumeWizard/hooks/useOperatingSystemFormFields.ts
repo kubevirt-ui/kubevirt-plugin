@@ -1,115 +1,109 @@
-import { useCallback, useMemo } from 'react';
-import { type UseFormSetValue, useWatch } from 'react-hook-form';
+import { useCallback, useEffect, useRef } from 'react';
+import { useWatch } from 'react-hook-form';
 
-import type {
-  AddBootableVolumeState,
-  SetBootableVolumeFieldType,
-} from '@kubevirt-utils/components/AddBootableVolumeModal/types';
-import {
-  DEFAULT_INSTANCETYPE_LABEL,
-  DEFAULT_PREFERENCE_KIND_LABEL,
-  DEFAULT_PREFERENCE_LABEL,
-} from '@kubevirt-utils/constants/instancetypes-and-preferences';
+import useHcoWorkloadArchitectures from '@kubevirt-utils/hooks/useHcoWorkloadArchitectures';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 
 import { useBootableVolumeWizardForm } from '../form/BootableVolumeWizardFormProvider';
-import type { BootableVolumeWizardFormValues } from '../form/types';
+import {
+  DESTINATION_PROJECT_FIELD,
+  OPERATING_SYSTEM_ARCHITECTURE_FIELD,
+  OPERATING_SYSTEM_ARCHITECTURES_FIELD,
+  OPERATING_SYSTEM_LABELS_FIELD,
+  OPERATING_SYSTEM_LOCKED_PREFERENCE_FIELD,
+} from '../form/fieldPaths';
 import { wizardSetValueOptions } from '../form/wizardSetValueOptions';
-
-type SetOperatingSystemValue = UseFormSetValue<BootableVolumeWizardFormValues>;
+import { labelKeyToClearHandlers, labelKeyToSetHandlers } from './operatingSystemLabelHandlers';
 
 type OperatingSystemFormFields = {
-  bootableVolume: AddBootableVolumeState;
+  architectures: string[];
+  cluster?: string;
   deleteLabel: (labelKey: string) => void;
-  setBootableVolumeField: SetBootableVolumeFieldType;
-};
-
-const labelKeyToSetHandlers: Record<
-  string,
-  (setValue: SetOperatingSystemValue, value: unknown) => void
-> = {
-  [DEFAULT_INSTANCETYPE_LABEL]: (setValue, value) => {
-    setValue('operatingSystem.defaultInstanceType', String(value), wizardSetValueOptions);
-  },
-  [DEFAULT_PREFERENCE_KIND_LABEL]: (setValue, value) => {
-    setValue('operatingSystem.preferenceKind', String(value), wizardSetValueOptions);
-  },
-  [DEFAULT_PREFERENCE_LABEL]: (setValue, value) => {
-    setValue('operatingSystem.operatingSystem', String(value), wizardSetValueOptions);
-  },
-};
-
-const labelKeyToClearHandlers: Record<string, (setValue: SetOperatingSystemValue) => void> = {
-  [DEFAULT_INSTANCETYPE_LABEL]: (setValue) => {
-    setValue('operatingSystem.defaultInstanceType', undefined, wizardSetValueOptions);
-  },
-  [DEFAULT_PREFERENCE_KIND_LABEL]: (setValue) => {
-    setValue('operatingSystem.preferenceKind', undefined, wizardSetValueOptions);
-  },
-  [DEFAULT_PREFERENCE_LABEL]: (setValue) => {
-    setValue('operatingSystem.operatingSystem', '', wizardSetValueOptions);
-    setValue('operatingSystem.preference', null, wizardSetValueOptions);
-  },
+  labels: Record<string, string>;
+  lockedPreference?: string;
+  namespace: string;
+  setArchitectures: (architectures: string[]) => void;
+  setLabel: (labelKey: string, value: string) => void;
 };
 
 const useOperatingSystemFormFields = (): OperatingSystemFormFields => {
   const { cluster, control, getValues, setValue } = useBootableVolumeWizardForm();
+  const [workloadArchitectures, architecturesLoaded] = useHcoWorkloadArchitectures(cluster);
+  const hasAppliedArchitectureDefaultRef = useRef(false);
 
   const [destinationProject, labels, architectures, lockedPreference] = useWatch({
     control,
     name: [
-      'projectAndVolume.destinationProject',
-      'operatingSystem.labels',
-      'operatingSystem.architectures',
-      'operatingSystem.lockedPreference',
+      DESTINATION_PROJECT_FIELD,
+      OPERATING_SYSTEM_LABELS_FIELD,
+      OPERATING_SYSTEM_ARCHITECTURES_FIELD,
+      OPERATING_SYSTEM_LOCKED_PREFERENCE_FIELD,
     ],
   });
 
-  const bootableVolume = useMemo(
-    (): AddBootableVolumeState => ({
-      architectures: architectures ?? [],
-      bootableVolumeCluster: cluster,
-      bootableVolumeName: '',
-      bootableVolumeNamespace: destinationProject ?? '',
-      labels: labels ?? {},
-      lockedPreference,
-      pvcName: '',
-      pvcNamespace: '',
-    }),
-    [architectures, cluster, destinationProject, labels, lockedPreference],
-  );
+  useEffect(() => {
+    if (hasAppliedArchitectureDefaultRef.current || !architecturesLoaded) {
+      return;
+    }
 
-  const setBootableVolumeField: SetBootableVolumeFieldType = useCallback(
-    (key, fieldKey) => (value) => {
-      if (key === 'labels' && fieldKey) {
-        const nextLabels = {
-          ...getValues('operatingSystem.labels'),
-          [fieldKey]: String(value),
-        };
-        setValue('operatingSystem.labels', nextLabels, wizardSetValueOptions);
-        labelKeyToSetHandlers[fieldKey]?.(setValue, value);
-        return;
-      }
+    if (lockedPreference || !isEmpty(architectures) || isEmpty(workloadArchitectures)) {
+      hasAppliedArchitectureDefaultRef.current = true;
+      return;
+    }
 
-      if (key === 'architectures') {
-        const nextArchitectures = (value as string[]) ?? [];
-        setValue('operatingSystem.architectures', nextArchitectures, wizardSetValueOptions);
-        setValue('operatingSystem.architecture', nextArchitectures[0] ?? '', wizardSetValueOptions);
-      }
+    setValue(OPERATING_SYSTEM_ARCHITECTURES_FIELD, workloadArchitectures, wizardSetValueOptions);
+    setValue(
+      OPERATING_SYSTEM_ARCHITECTURE_FIELD,
+      workloadArchitectures[0] ?? '',
+      wizardSetValueOptions,
+    );
+    hasAppliedArchitectureDefaultRef.current = true;
+  }, [architectures, architecturesLoaded, lockedPreference, setValue, workloadArchitectures]);
+
+  const setLabel = useCallback(
+    (labelKey: string, value: string) => {
+      const nextLabels = {
+        ...getValues(OPERATING_SYSTEM_LABELS_FIELD),
+        [labelKey]: value,
+      };
+      setValue(OPERATING_SYSTEM_LABELS_FIELD, nextLabels, wizardSetValueOptions);
+      labelKeyToSetHandlers[labelKey]?.(setValue, value);
     },
     [getValues, setValue],
   );
 
+  const setArchitectures = useCallback(
+    (nextArchitectures: string[]) => {
+      setValue(OPERATING_SYSTEM_ARCHITECTURES_FIELD, nextArchitectures, wizardSetValueOptions);
+      setValue(
+        OPERATING_SYSTEM_ARCHITECTURE_FIELD,
+        nextArchitectures[0] ?? '',
+        wizardSetValueOptions,
+      );
+    },
+    [setValue],
+  );
+
   const deleteLabel = useCallback(
     (labelKey: string) => {
-      const nextLabels = { ...getValues('operatingSystem.labels') };
+      const nextLabels = { ...getValues(OPERATING_SYSTEM_LABELS_FIELD) };
       delete nextLabels[labelKey];
-      setValue('operatingSystem.labels', nextLabels, wizardSetValueOptions);
+      setValue(OPERATING_SYSTEM_LABELS_FIELD, nextLabels, wizardSetValueOptions);
       labelKeyToClearHandlers[labelKey]?.(setValue);
     },
     [getValues, setValue],
   );
 
-  return { bootableVolume, deleteLabel, setBootableVolumeField };
+  return {
+    architectures: architectures ?? [],
+    cluster,
+    deleteLabel,
+    labels: labels ?? {},
+    lockedPreference,
+    namespace: destinationProject ?? '',
+    setArchitectures,
+    setLabel,
+  };
 };
 
 export default useOperatingSystemFormFields;

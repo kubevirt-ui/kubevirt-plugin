@@ -7,42 +7,59 @@ import {
 } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { type V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import { type V1beta1DataVolumeSource } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
-import { getOrCreateTLSCertConfigMapName } from '@kubevirt-utils/components/TLSCertificateSection';
+import {
+  getOrCreateTLSCertConfigMapName,
+  type TLSCertSourceType,
+} from '@kubevirt-utils/components/TLSCertificateSection';
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { kubevirtK8sCreate, kubevirtK8sDelete } from '@multicluster/k8sRequests';
 
-import { type AddBootableVolumeState } from '../types';
+import { type DataVolumeSpecFields, getDataVolumeWithSource } from './dataVolumeHelpers';
 
-import { getDataVolumeWithSource } from './dataVolumeHelpers';
+export type CreateHTTPBootableVolumeArgs = {
+  cluster?: string;
+  dataVolume: DataVolumeSpecFields;
+  draftDataSource: V1beta1DataSource;
+  namespace: string;
+  tlsCertConfigMapName?: string;
+  tlsCertificate?: string;
+  tlsCertificateRequired?: boolean;
+  tlsCertProject?: string;
+  tlsCertSource?: TLSCertSourceType;
+  url?: string;
+};
 
-export const createHTTPDataSource = async (
-  bootableVolume: AddBootableVolumeState,
-  draftDataSource: V1beta1DataSource,
-  namespace: string,
-): Promise<V1beta1DataSource> => {
-  const updatedNameBootableVolume = produce(bootableVolume, (draft) => {
-    draft.bootableVolumeName = draftDataSource.metadata.name;
-  });
-
+export const createHTTPDataSource = async ({
+  cluster,
+  dataVolume,
+  draftDataSource,
+  namespace,
+  tlsCertConfigMapName,
+  tlsCertificate,
+  tlsCertificateRequired,
+  tlsCertProject,
+  tlsCertSource,
+  url,
+}: CreateHTTPBootableVolumeArgs): Promise<V1beta1DataSource> => {
   const { configMapName: certConfigMapName, created: certConfigMapCreated } =
     await getOrCreateTLSCertConfigMapName(
       {
-        cluster: bootableVolume.bootableVolumeCluster,
-        tlsCertConfigMapName: bootableVolume.tlsCertConfigMapName,
-        tlsCertificate: bootableVolume.tlsCertificate,
-        tlsCertificateRequired: bootableVolume.tlsCertificateRequired,
-        tlsCertProject: bootableVolume.tlsCertProject,
-        tlsCertSource: bootableVolume.tlsCertSource,
+        cluster,
+        tlsCertConfigMapName,
+        tlsCertificate,
+        tlsCertificateRequired,
+        tlsCertProject,
+        tlsCertSource,
       },
       namespace,
     );
 
   const httpSource: V1beta1DataVolumeSource['http'] = {
-    url: bootableVolume.url,
+    url,
     ...(certConfigMapName && { certConfigMap: certConfigMapName }),
   };
 
-  const bootableVolumeToCreate = getDataVolumeWithSource(updatedNameBootableVolume, namespace, {
+  const bootableVolumeToCreate = getDataVolumeWithSource(dataVolume, namespace, {
     http: httpSource,
   });
 
@@ -61,7 +78,7 @@ export const createHTTPDataSource = async (
     }
 
     return kubevirtK8sDelete({
-      cluster: bootableVolume.bootableVolumeCluster,
+      cluster,
       model: ConfigMapModel,
       resource: { metadata: { name: certConfigMapName, namespace } },
     });
@@ -69,7 +86,7 @@ export const createHTTPDataSource = async (
 
   try {
     const createdDS = await kubevirtK8sCreate({
-      cluster: bootableVolume.bootableVolumeCluster,
+      cluster,
       data: dataSourceToCreate,
       model: DataSourceModel,
       ns: namespace,
@@ -77,7 +94,7 @@ export const createHTTPDataSource = async (
 
     try {
       await kubevirtK8sCreate({
-        cluster: bootableVolume.bootableVolumeCluster,
+        cluster,
         data: bootableVolumeToCreate,
         model: DataVolumeModel,
         ns: namespace,
@@ -85,7 +102,7 @@ export const createHTTPDataSource = async (
     } catch (error) {
       const cleanups: Promise<unknown>[] = [
         kubevirtK8sDelete({
-          cluster: bootableVolume.bootableVolumeCluster,
+          cluster,
           model: DataSourceModel,
           resource: createdDS,
         }),

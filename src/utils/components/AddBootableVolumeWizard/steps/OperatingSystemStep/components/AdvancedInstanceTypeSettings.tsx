@@ -1,23 +1,23 @@
 import { type FC, useState } from 'react';
 
 import { InstanceTypeDrilldownSelect } from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/InstanceTypeDrilldownSelect/InstanceTypeDrilldownSelect';
-import type {
-  AddBootableVolumeState,
-  SetBootableVolumeFieldType,
-} from '@kubevirt-utils/components/AddBootableVolumeModal/types';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ExpandableSection } from '@patternfly/react-core';
 
 type AdvancedInstanceTypeSettingsProps = {
-  bootableVolume: AddBootableVolumeState;
+  cluster?: string;
   deleteLabel: (labelKey: string) => void;
-  setBootableVolumeField: SetBootableVolumeFieldType;
+  labels: Record<string, string>;
+  namespace: string;
+  setLabel: (labelKey: string, value: string) => void;
 };
 
 const AdvancedInstanceTypeSettings: FC<AdvancedInstanceTypeSettingsProps> = ({
-  bootableVolume,
+  cluster,
   deleteLabel,
-  setBootableVolumeField,
+  labels,
+  namespace,
+  setLabel,
 }) => {
   const { t } = useKubevirtTranslation();
   const [isExpanded, setIsExpanded] = useState(false);
@@ -30,10 +30,12 @@ const AdvancedInstanceTypeSettings: FC<AdvancedInstanceTypeSettingsProps> = ({
       toggleText={t('Advanced (optional)')}
     >
       <InstanceTypeDrilldownSelect
-        bootableVolume={bootableVolume}
+        cluster={cluster}
         deleteLabel={deleteLabel}
         direction="down"
-        setBootableVolumeField={setBootableVolumeField}
+        labels={labels}
+        namespace={namespace}
+        setLabel={setLabel}
       />
     </ExpandableSection>
   );

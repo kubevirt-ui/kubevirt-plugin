@@ -2,10 +2,6 @@ import type { FC } from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { VirtualMachineClusterInstancetypeModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import type {
-  AddBootableVolumeState,
-  SetBootableVolumeFieldType,
-} from '@kubevirt-utils/components/AddBootableVolumeModal/types';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import {
   DEFAULT_INSTANCETYPE_KIND_LABEL,
@@ -26,33 +22,33 @@ import UserInstanceTypeMenu from './components/UserInstanceTypeMenu/UserInstance
 import { MENUS } from './utils/constants';
 import { getInstanceTypeMenuItems, isExistingInstanceType } from './utils/utils';
 
-type InstanceTypeMenuItemsProps = {
+type InstanceTypeDrilldownSelectProps = {
   appendTo?: HTMLElement | (() => HTMLElement);
-  bootableVolume: AddBootableVolumeState;
+  cluster?: string;
   deleteLabel: (labelKey: string) => void;
   direction?: PopperProps['direction'];
   isDisabled?: boolean;
-  setBootableVolumeField: SetBootableVolumeFieldType;
+  labels?: Record<string, string>;
+  namespace: string;
+  setLabel: (labelKey: string, value: string) => void;
 };
 
 const getDefaultAppendTo = (): HTMLElement => document.getElementById('tab-modal') ?? document.body;
 
-export const InstanceTypeDrilldownSelect: FC<InstanceTypeMenuItemsProps> = ({
+export const InstanceTypeDrilldownSelect: FC<InstanceTypeDrilldownSelectProps> = ({
   appendTo,
-  bootableVolume,
+  cluster,
   deleteLabel,
   direction = 'up',
   isDisabled,
-  setBootableVolumeField,
+  labels,
+  namespace,
+  setLabel,
 }) => {
   const { t } = useKubevirtTranslation();
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
-  const { bootableVolumeCluster, bootableVolumeNamespace, labels } = bootableVolume;
-  const { allInstanceTypes } = useInstanceTypesAndPreferences(
-    bootableVolumeNamespace,
-    bootableVolumeCluster,
-  );
+  const { allInstanceTypes } = useInstanceTypesAndPreferences(namespace, cluster);
   const menuItems = useMemo(() => getInstanceTypeMenuItems(allInstanceTypes), [allInstanceTypes]);
   const sortedRedHatProvided = menuItems.redHatProvided.items.toSorted((a, b) =>
     universalComparator(a.classDisplayNameAnnotation, b.classDisplayNameAnnotation),
@@ -74,11 +70,11 @@ export const InstanceTypeDrilldownSelect: FC<InstanceTypeMenuItemsProps> = ({
 
   const onSelect = useCallback(
     (kind: string, value: string, keepMenuOpen?: boolean) => {
-      setBootableVolumeField('labels', DEFAULT_INSTANCETYPE_KIND_LABEL)(kind);
-      setBootableVolumeField('labels', DEFAULT_INSTANCETYPE_LABEL)(value);
+      setLabel(DEFAULT_INSTANCETYPE_KIND_LABEL, kind);
+      setLabel(DEFAULT_INSTANCETYPE_LABEL, value);
       !keepMenuOpen && setIsOpen(false);
     },
-    [setBootableVolumeField],
+    [setLabel],
   );
 
   return (
@@ -114,7 +110,7 @@ export const InstanceTypeDrilldownSelect: FC<InstanceTypeMenuItemsProps> = ({
       >
         <DrilldownMenuItem {...menuItems.redHatProvided} label={t(menuItems.redHatProvided.label)}>
           <RedHatInstanceTypeSeriesMenu
-            cluster={bootableVolumeCluster}
+            cluster={cluster}
             onSelect={(value, keepMenuOpen) =>
               onSelect(VirtualMachineClusterInstancetypeModel.kind, value, keepMenuOpen)
             }

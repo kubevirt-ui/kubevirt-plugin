@@ -2,6 +2,7 @@ import { type TFunction } from 'i18next';
 
 import { type V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import type { CdiUploadDataFn } from '@kubevirt-utils/hooks/useCDIUpload/types';
+import { getName } from '@kubevirt-utils/resources/shared';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 
 import {
@@ -12,12 +13,16 @@ import {
   createSnapshotDataSource,
   setDataSourceMetadata,
 } from './bootableVolumeSources';
+import {
+  dataSourceMetadataFromCreateParams,
+  dataVolumeSpecFromCreateParams,
+} from './bootableVolumeSources/createFields';
 import { DROPDOWN_FORM_SELECTION } from './consts';
 import { type AddBootableVolumeState, type CreateBootableVolumeType } from './types';
 
 const getBootableVolumePromise = ({
   arch,
-  bootableVolume,
+  createParams,
   dataSource,
   onUploadStart,
   sourceType,
@@ -25,56 +30,95 @@ const getBootableVolumePromise = ({
   uploadData,
 }: {
   arch?: string;
-  bootableVolume: AddBootableVolumeState;
+  createParams: AddBootableVolumeState;
   dataSource: V1beta1DataSource;
   onUploadStart?: (uploadKey: string) => void;
   sourceType: DROPDOWN_FORM_SELECTION;
   t: TFunction;
   uploadData: CdiUploadDataFn;
 }): Promise<V1beta1DataSource> => {
-  const { bootableVolumeNamespace } = bootableVolume;
+  const namespace = createParams.bootableVolumeNamespace;
+  const cluster = createParams.bootableVolumeCluster;
 
   const draftDataSource = setDataSourceMetadata(
-    bootableVolume,
-    bootableVolumeNamespace,
+    dataSourceMetadataFromCreateParams(createParams),
+    namespace,
     dataSource,
     arch,
     sourceType,
   );
 
+  const volumeName = getName(draftDataSource) ?? createParams.bootableVolumeName;
+  const dataVolume = dataVolumeSpecFromCreateParams(createParams, volumeName);
+
   const actionBySourceType: Record<string, () => Promise<V1beta1DataSource>> = {
     [DROPDOWN_FORM_SELECTION.UPLOAD_VOLUME]: () =>
-      createBootableVolumeFromUpload(
-        bootableVolume,
-        bootableVolumeNamespace,
+      createBootableVolumeFromUpload({
+        cluster,
+        dataVolume,
         draftDataSource,
-        uploadData,
-        t,
+        namespace,
         onUploadStart,
-      ),
+        t,
+        uploadData,
+        uploadFile: createParams.uploadFile,
+      }),
     [DROPDOWN_FORM_SELECTION.USE_EXISTING_PVC]: () =>
-      createPVCBootableVolume(bootableVolume, bootableVolumeNamespace, draftDataSource),
+      createPVCBootableVolume({
+        cluster,
+        dataVolume,
+        draftDataSource,
+        namespace,
+        pvcName: createParams.pvcName,
+        pvcNamespace: createParams.pvcNamespace,
+      }),
     [DROPDOWN_FORM_SELECTION.USE_HTTP]: () =>
-      createHTTPDataSource(bootableVolume, draftDataSource, bootableVolumeNamespace),
+      createHTTPDataSource({
+        cluster,
+        dataVolume,
+        draftDataSource,
+        namespace,
+        tlsCertConfigMapName: createParams.tlsCertConfigMapName,
+        tlsCertificate: createParams.tlsCertificate,
+        tlsCertificateRequired: createParams.tlsCertificateRequired,
+        tlsCertProject: createParams.tlsCertProject,
+        tlsCertSource: createParams.tlsCertSource,
+        url: createParams.url,
+      }),
     [DROPDOWN_FORM_SELECTION.USE_REGISTRY]: () =>
-      createDataSourceWithImportCron(bootableVolume, draftDataSource),
+      createDataSourceWithImportCron({
+        cluster,
+        cronExpression: createParams.cronExpression,
+        draftDataSource,
+        password: createParams.registryCredentials?.password,
+        registryURL: createParams.registryURL,
+        retainRevisions: createParams.retainRevisions,
+        size: createParams.size,
+        storageClassName: createParams.storageClassName,
+        username: createParams.registryCredentials?.username,
+      }),
     [DROPDOWN_FORM_SELECTION.USE_SNAPSHOT]: () =>
-      createSnapshotDataSource(bootableVolume, draftDataSource),
+      createSnapshotDataSource({
+        cluster,
+        draftDataSource,
+        snapshotName: createParams.snapshotName,
+        snapshotNamespace: createParams.snapshotNamespace,
+      }),
   };
 
   return actionBySourceType[sourceType]();
 };
 
 export const createBootableVolume: CreateBootableVolumeType =
-  ({ bootableVolume, onCreateVolume, onUploadStart, sourceType, t, uploadData }) =>
+  ({ createParams, onCreateVolume, onUploadStart, sourceType, t, uploadData }) =>
   async (dataSource: V1beta1DataSource): Promise<V1beta1DataSource[]> => {
-    const architectures = bootableVolume?.architectures;
+    const architectures = createParams?.architectures;
 
     if (!isEmpty(architectures)) {
       const dataSourcePromises = architectures?.map((arch) =>
         getBootableVolumePromise({
           arch,
-          bootableVolume,
+          createParams,
           dataSource,
           onUploadStart,
           sourceType,
@@ -91,7 +135,7 @@ export const createBootableVolume: CreateBootableVolumeType =
     }
 
     const dataSourceWithoutArch = await getBootableVolumePromise({
-      bootableVolume,
+      createParams,
       dataSource,
       onUploadStart,
       sourceType,

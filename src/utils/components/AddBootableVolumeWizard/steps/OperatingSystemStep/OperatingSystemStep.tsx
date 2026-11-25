@@ -11,7 +11,16 @@ import AdvancedInstanceTypeSettings from './components/AdvancedInstanceTypeSetti
 
 const OperatingSystemStep: FC = () => {
   const { t } = useKubevirtTranslation();
-  const { bootableVolume, deleteLabel, setBootableVolumeField } = useOperatingSystemFormFields();
+  const {
+    architectures,
+    cluster,
+    deleteLabel,
+    labels,
+    lockedPreference,
+    namespace,
+    setArchitectures,
+    setLabel,
+  } = useOperatingSystemFormFields();
   const operatingSystemLabel = getOperatingSystemLabel(t);
 
   return (
@@ -21,20 +30,26 @@ const OperatingSystemStep: FC = () => {
       </Title>
       <Form>
         <PreferenceSelect
-          bootableVolume={bootableVolume}
+          cluster={cluster}
           deleteLabel={deleteLabel}
           label={operatingSystemLabel}
+          labels={labels}
+          lockedPreference={lockedPreference}
+          namespace={namespace}
           placeholder={t('Select operating system')}
-          setBootableVolumeField={setBootableVolumeField}
+          setLabel={setLabel}
         />
         <ArchitectureSelect
-          bootableVolumeState={bootableVolume}
-          setBootableVolumeField={setBootableVolumeField}
+          architectures={architectures}
+          cluster={cluster}
+          onArchitecturesChange={setArchitectures}
         />
         <AdvancedInstanceTypeSettings
-          bootableVolume={bootableVolume}
+          cluster={cluster}
           deleteLabel={deleteLabel}
-          setBootableVolumeField={setBootableVolumeField}
+          labels={labels}
+          namespace={namespace}
+          setLabel={setLabel}
         />
       </Form>
     </>

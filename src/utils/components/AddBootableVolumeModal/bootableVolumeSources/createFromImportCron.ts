@@ -13,25 +13,32 @@ import { appendDockerPrefix, getRandomChars, truncateToK8sName } from '@kubevirt
 import { kubevirtK8sCreate } from '@multicluster/k8sRequests';
 
 import { initialDataImportCron } from '../consts';
-import { type CreateDataSourceWithImportCronType } from '../types';
 
-export const createDataSourceWithImportCron: CreateDataSourceWithImportCronType = async (
-  bootableVolume,
-  initialDataSource,
-) => {
-  const {
-    bootableVolumeCluster,
-    cronExpression,
-    registryCredentials,
-    registryURL,
-    retainRevisions,
-    size,
-    storageClassName,
-  } = bootableVolume;
+export type CreateRegistryBootableVolumeArgs = {
+  cluster?: string;
+  cronExpression?: string;
+  draftDataSource: V1beta1DataSource;
+  password?: string;
+  registryURL?: string;
+  retainRevisions?: number;
+  size?: string;
+  storageClassName?: string;
+  username?: string;
+};
 
-  const dataSourceName = getName(initialDataSource);
-  const targetNamespace = getNamespace(initialDataSource);
-  const { password, username } = registryCredentials ?? {};
+export const createDataSourceWithImportCron = async ({
+  cluster,
+  cronExpression,
+  draftDataSource,
+  password,
+  registryURL,
+  retainRevisions,
+  size,
+  storageClassName,
+  username,
+}: CreateRegistryBootableVolumeArgs): Promise<V1beta1DataSource> => {
+  const dataSourceName = getName(draftDataSource);
+  const targetNamespace = getNamespace(draftDataSource);
   const addRegistrySecret = !!(username && password);
   const imageSecretName = addRegistrySecret
     ? truncateToK8sName(dataSourceName, `registry-secret-${getRandomChars()}`)
@@ -39,7 +46,7 @@ export const createDataSourceWithImportCron: CreateDataSourceWithImportCronType 
 
   if (addRegistrySecret) {
     await createUserPasswordSecret({
-      cluster: bootableVolumeCluster,
+      cluster,
       namespace: OPENSHIFT_CNV,
       password,
       secretName: imageSecretName,
@@ -47,7 +54,7 @@ export const createDataSourceWithImportCron: CreateDataSourceWithImportCronType 
     });
 
     await createUserPasswordSecret({
-      cluster: bootableVolumeCluster,
+      cluster,
       namespace: targetNamespace,
       password,
       secretName: imageSecretName,
@@ -87,7 +94,7 @@ export const createDataSourceWithImportCron: CreateDataSourceWithImportCronType 
   });
 
   await kubevirtK8sCreate<V1beta1DataImportCron>({
-    cluster: bootableVolumeCluster,
+    cluster,
     data: dataImportCron,
     model: DataImportCronModel,
     queryParams: {
@@ -97,15 +104,15 @@ export const createDataSourceWithImportCron: CreateDataSourceWithImportCronType 
   });
 
   const createdDataSource = await kubevirtK8sCreate<V1beta1DataSource>({
-    cluster: bootableVolumeCluster,
-    data: produce(initialDataSource, (draftDataSource) => {
-      draftDataSource.metadata.labels[DATA_SOURCE_CRONJOB_LABEL] = dataImportCronName;
+    cluster,
+    data: produce(draftDataSource, (draftDataSourceToCreate) => {
+      draftDataSourceToCreate.metadata.labels[DATA_SOURCE_CRONJOB_LABEL] = dataImportCronName;
     }),
     model: DataSourceModel,
   });
 
   await kubevirtK8sCreate<V1beta1DataImportCron>({
-    cluster: bootableVolumeCluster,
+    cluster,
     data: produce(dataImportCron, (draft) => {
       draft.metadata.ownerReferences = [
         buildOwnerReference(createdDataSource, { blockOwnerDeletion: false }),

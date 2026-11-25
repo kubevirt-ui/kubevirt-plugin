@@ -13,25 +13,30 @@ import { getBootableVolumeUploadKey } from '@kubevirt-utils/hooks/useInFlightToa
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { kubevirtK8sCreate } from '@multicluster/k8sRequests';
 
-import { type AddBootableVolumeState } from '../types';
+import { type DataVolumeSpecFields, getDataVolumeWithSource } from './dataVolumeHelpers';
 
-import { getDataVolumeWithSource } from './dataVolumeHelpers';
+export type CreateUploadBootableVolumeArgs = {
+  cluster?: string;
+  dataVolume: DataVolumeSpecFields;
+  draftDataSource: V1beta1DataSource;
+  namespace: string;
+  onUploadStart?: (uploadKey: string) => void;
+  t: TFunction;
+  uploadData: CdiUploadDataFn;
+  uploadFile?: File | string;
+};
 
-export const createBootableVolumeFromUpload = async (
-  bootableVolume: AddBootableVolumeState,
-  namespace: string,
-  draftDataSource: V1beta1DataSource,
-  uploadData: CdiUploadDataFn,
-  t: TFunction,
-  onUploadStart?: (uploadKey: string) => void,
-): Promise<V1beta1DataSource> => {
-  const { uploadFile } = bootableVolume || {};
-  const updatedNameBootableVolume = produce(bootableVolume, (draft) => {
-    draft.bootableVolumeName = draftDataSource.metadata.name;
-  });
-  const bootableVolumeToCreate = getDataVolumeWithSource(updatedNameBootableVolume, namespace, {
-    upload: {},
-  });
+export const createBootableVolumeFromUpload = async ({
+  cluster,
+  dataVolume,
+  draftDataSource,
+  namespace,
+  onUploadStart,
+  t,
+  uploadData,
+  uploadFile,
+}: CreateUploadBootableVolumeArgs): Promise<V1beta1DataSource> => {
+  const bootableVolumeToCreate = getDataVolumeWithSource(dataVolume, namespace, { upload: {} });
 
   const dataSourceToCreate = produce(draftDataSource, (draftDS) => {
     draftDS.spec.source = {
@@ -44,11 +49,7 @@ export const createBootableVolumeFromUpload = async (
 
   const volumeName = getName(dataSourceToCreate);
   const volumeNamespace = getNamespace(dataSourceToCreate);
-  const uploadKey = getBootableVolumeUploadKey(
-    volumeNamespace,
-    volumeName,
-    bootableVolume.bootableVolumeCluster,
-  );
+  const uploadKey = getBootableVolumeUploadKey(volumeNamespace, volumeName, cluster);
 
   onUploadStart?.(uploadKey);
 
@@ -58,14 +59,9 @@ export const createBootableVolumeFromUpload = async (
     uploadKey,
     uploadTrackMetadata: {
       contextLinks: [
-        getBootableVolumeContextLink(
-          t,
-          volumeName ?? '',
-          volumeNamespace ?? namespace,
-          bootableVolume.bootableVolumeCluster,
-        ),
+        getBootableVolumeContextLink(t, volumeName ?? '', volumeNamespace ?? namespace, cluster),
       ],
-      dvCluster: bootableVolume.bootableVolumeCluster,
+      dvCluster: cluster,
       dvName: getName(bootableVolumeToCreate),
       dvNamespace: getNamespace(bootableVolumeToCreate),
       resourceName: volumeName,
@@ -74,7 +70,7 @@ export const createBootableVolumeFromUpload = async (
 
   try {
     const createdDataSource = await kubevirtK8sCreate({
-      cluster: bootableVolume.bootableVolumeCluster,
+      cluster,
       data: dataSourceToCreate,
       model: DataSourceModel,
     });

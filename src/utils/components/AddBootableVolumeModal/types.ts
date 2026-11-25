@@ -32,6 +32,7 @@ export type AddBootableVolumeModalProps = {
   onUploadStart?: (uploadKey: string) => void;
 };
 
+/** Modal / disk-flow UI state and create payload (wizard uses BootableVolumeWizardFormValues). */
 export type AddBootableVolumeState = {
   accessMode?: V1beta1StorageSpecAccessModesEnum;
   annotations?: { [key: string]: string };
@@ -71,8 +72,8 @@ export type SetBootableVolumeFieldType = (
 ) => void;
 
 export type SubmitAddBootableVolumeParams = {
-  bootableVolume: AddBootableVolumeState;
   checkUploadReady: () => Promise<void>;
+  createParams: AddBootableVolumeState;
   dataSource: V1beta1DataSource;
   onClose: () => void;
   onCreateVolume?: (createdVolume: BootableVolume) => void;
@@ -89,7 +90,7 @@ export type HandleAddBootableVolumeModalCloseParams = {
 };
 
 export type CreateBootableVolumeType = (input: {
-  bootableVolume: AddBootableVolumeState;
+  createParams: AddBootableVolumeState;
   onCreateVolume?: (createdVolume: BootableVolume) => void;
   onUploadStart?: (uploadKey: string) => void;
   sourceType: DROPDOWN_FORM_SELECTION;
@@ -116,8 +117,3 @@ export type BootableVolumeToastHandlers = Pick<ToastActions, 'addInfoToast' | 'a
   navigate: (url: string) => void;
   t: TFunction;
 };
-
-export type CreateDataSourceWithImportCronType = (
-  bootableVolume: AddBootableVolumeState,
-  initialDataSource: V1beta1DataSource,
-) => Promise<V1beta1DataSource>;

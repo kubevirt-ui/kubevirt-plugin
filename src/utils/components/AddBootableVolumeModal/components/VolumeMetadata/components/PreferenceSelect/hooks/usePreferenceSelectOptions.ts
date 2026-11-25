@@ -7,27 +7,24 @@ import {
 import { VirtualMachineClusterPreferenceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { VirtualMachinePreferenceModel } from '@kubevirt-ui-ext/kubevirt-api/console';
 import { getResourceDropdownOptions } from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/PreferenceSelect/utils/utils';
-import type { SetBootableVolumeFieldType } from '@kubevirt-utils/components/AddBootableVolumeModal/types';
 import type { EnhancedSelectOptionProps } from '@kubevirt-utils/components/FilterSelect/utils/types';
 import { DEFAULT_PREFERENCE_KIND_LABEL } from '@kubevirt-utils/constants/instancetypes-and-preferences';
 import useClusterPreferences from '@kubevirt-utils/hooks/useClusterPreferences';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useUserPreferences from '@kubevirt-utils/hooks/useUserPreferences';
 
+type SetLabel = (labelKey: string, value: string) => void;
+
 type UsePreferenceSelectOptions = (
   namespace: string,
-  setBootableVolumeField: SetBootableVolumeFieldType,
-  cluster: string,
+  setLabel: SetLabel,
+  cluster?: string,
 ) => {
   preferenceSelectOptions: EnhancedSelectOptionProps[];
   preferencesLoaded: boolean;
 };
 
-const usePreferenceSelectOptions: UsePreferenceSelectOptions = (
-  namespace,
-  setBootableVolumeField,
-  cluster,
-) => {
+const usePreferenceSelectOptions: UsePreferenceSelectOptions = (namespace, setLabel, cluster) => {
   const { t } = useKubevirtTranslation();
 
   const [preferences, preferencesLoaded] = useClusterPreferences(null, null, cluster);
@@ -44,10 +41,10 @@ const usePreferenceSelectOptions: UsePreferenceSelectOptions = (
       groupVersionKind: VirtualMachineClusterPreferenceModelGroupVersionKind,
       kind: VirtualMachineClusterPreferenceModel.kind,
       onClick: () =>
-        setBootableVolumeField(
-          'labels',
+        setLabel(
           DEFAULT_PREFERENCE_KIND_LABEL,
-        )(VirtualMachineClusterPreferenceModelGroupVersionKind.kind),
+          VirtualMachineClusterPreferenceModelGroupVersionKind.kind,
+        ),
       resources: preferences,
     });
 
@@ -56,15 +53,12 @@ const usePreferenceSelectOptions: UsePreferenceSelectOptions = (
       groupVersionKind: VirtualMachinePreferenceModelGroupVersionKind,
       kind: VirtualMachinePreferenceModel.kind,
       onClick: () =>
-        setBootableVolumeField(
-          'labels',
-          DEFAULT_PREFERENCE_KIND_LABEL,
-        )(VirtualMachinePreferenceModelGroupVersionKind.kind),
+        setLabel(DEFAULT_PREFERENCE_KIND_LABEL, VirtualMachinePreferenceModelGroupVersionKind.kind),
       resources: userPreferences,
     });
 
     return [...userPreferenceOptions, ...preferenceOptions];
-  }, [preferences, userPreferences, setBootableVolumeField, t]);
+  }, [preferences, setLabel, t, userPreferences]);
 
   return {
     preferenceSelectOptions,

@@ -1,4 +1,4 @@
-import { type FC } from 'react';
+import { type FC, useCallback } from 'react';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ANNOTATIONS } from '@kubevirt-utils/resources/template';
@@ -24,26 +24,46 @@ const VolumeMetadata: FC<VolumeMetadataProps> = ({
 }) => {
   const { t } = useKubevirtTranslation();
 
-  const { annotations } = bootableVolume || {};
+  const {
+    annotations,
+    architectures,
+    bootableVolumeCluster,
+    bootableVolumeNamespace,
+    labels,
+    lockedPreference,
+  } = bootableVolume || {};
+
+  const setLabel = useCallback(
+    (labelKey: string, value: string) => {
+      setBootableVolumeField('labels', labelKey)(value);
+    },
+    [setBootableVolumeField],
+  );
 
   return (
     <>
       <PreferenceSelect
-        bootableVolume={bootableVolume}
+        cluster={bootableVolumeCluster}
         deleteLabel={deleteLabel}
         isDisabled={isDisabled}
-        setBootableVolumeField={setBootableVolumeField}
+        labels={labels}
+        lockedPreference={lockedPreference}
+        namespace={bootableVolumeNamespace}
+        setLabel={setLabel}
       />
       <InstanceTypeDrilldownSelect
-        bootableVolume={bootableVolume}
+        cluster={bootableVolumeCluster}
         deleteLabel={deleteLabel}
         isDisabled={isDisabled}
-        setBootableVolumeField={setBootableVolumeField}
+        labels={labels}
+        namespace={bootableVolumeNamespace}
+        setLabel={setLabel}
       />
       <ArchitectureSelect
-        bootableVolumeState={bootableVolume}
+        architectures={architectures}
+        cluster={bootableVolumeCluster}
         isDisabled={isDisabled}
-        setBootableVolumeField={setBootableVolumeField}
+        onArchitecturesChange={(next) => setBootableVolumeField('architectures')(next)}
       />
       <FormGroup label={t('Description')}>
         <TextInput

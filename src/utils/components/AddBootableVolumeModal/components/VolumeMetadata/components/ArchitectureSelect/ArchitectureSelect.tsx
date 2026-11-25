@@ -1,9 +1,5 @@
 import { type FC, type ReactElement } from 'react';
 
-import {
-  type AddBootableVolumeState,
-  type SetBootableVolumeFieldType,
-} from '@kubevirt-utils/components/AddBootableVolumeModal/types';
 import FormPFSelect from '@kubevirt-utils/components/FormPFSelect/FormPFSelect';
 import HelpTextIcon from '@kubevirt-utils/components/HelpTextIcon/HelpTextIcon';
 import useHcoWorkloadArchitectures from '@kubevirt-utils/hooks/useHcoWorkloadArchitectures';
@@ -15,73 +11,67 @@ import { OLSPromptType } from '@lightspeed/utils/prompts';
 import { FormGroup, PopoverPosition, SelectOption } from '@patternfly/react-core';
 
 type ArchitectureSelectProps = {
-  bootableVolumeState: AddBootableVolumeState;
+  architectures?: string[];
+  cluster?: string;
   isDisabled?: boolean;
-  setBootableVolumeField: SetBootableVolumeFieldType;
+  onArchitecturesChange: (architectures: string[]) => void;
 };
 
 const ArchitectureSelect: FC<ArchitectureSelectProps> = ({
-  bootableVolumeState,
+  architectures,
+  cluster,
   isDisabled,
-  setBootableVolumeField,
+  onArchitecturesChange,
 }): ReactElement | null => {
   const { t } = useKubevirtTranslation();
-  const [workloadArchitectures] = useHcoWorkloadArchitectures(
-    bootableVolumeState?.bootableVolumeCluster,
-  );
+  const [workloadArchitectures] = useHcoWorkloadArchitectures(cluster);
 
   if (isEmpty(workloadArchitectures)) return null;
 
-  const architectures = bootableVolumeState?.architectures;
-
   return (
-    <>
-      <FormGroup
-        label={t(ARCHITECTURE_TITLE)}
-        labelHelp={
-          <HelpTextIcon
-            bodyContent={(hide) => (
-              <PopoverContentWithLightspeedButton
-                content={t(
-                  'The architecture type will be added as a suffix to the bootable volume name.',
-                )}
-                hide={hide}
-                promptType={OLSPromptType.BOOTABLE_VOLUME_ARCHITECTURES}
-              />
-            )}
-            position={PopoverPosition.right}
-          />
-        }
+    <FormGroup
+      label={t(ARCHITECTURE_TITLE)}
+      labelHelp={
+        <HelpTextIcon
+          bodyContent={(hide) => (
+            <PopoverContentWithLightspeedButton
+              content={t(
+                'The architecture type will be added as a suffix to the bootable volume name.',
+              )}
+              hide={hide}
+              promptType={OLSPromptType.BOOTABLE_VOLUME_ARCHITECTURES}
+            />
+          )}
+          position={PopoverPosition.right}
+        />
+      }
+    >
+      <FormPFSelect
+        closeOnSelect={true}
+        isDisabled={isDisabled}
+        selected={architectures}
+        selectedLabel={architectures?.length ? architectures.join(', ') : t('Select architecture')}
+        toggleProps={{ isFullWidth: true }}
       >
-        <FormPFSelect
-          closeOnSelect={true}
-          isDisabled={isDisabled}
-          selected={architectures}
-          selectedLabel={
-            architectures?.length ? architectures.join(', ') : t('Select architecture')
-          }
-          toggleProps={{ isFullWidth: true }}
-        >
-          {workloadArchitectures.map((arch: string) => (
-            <SelectOption
-              hasCheckbox
-              isSelected={architectures?.includes(arch)}
-              key={arch}
-              onClick={() =>
-                setBootableVolumeField('architectures')(
-                  architectures?.includes(arch)
-                    ? architectures.filter((a) => a !== arch)
-                    : [...(architectures ?? []), arch],
-                )
-              }
-              value={arch}
-            >
-              {arch}
-            </SelectOption>
-          ))}
-        </FormPFSelect>
-      </FormGroup>
-    </>
+        {workloadArchitectures.map((arch: string) => (
+          <SelectOption
+            hasCheckbox
+            isSelected={architectures?.includes(arch)}
+            key={arch}
+            onClick={() =>
+              onArchitecturesChange(
+                architectures?.includes(arch)
+                  ? architectures.filter((a) => a !== arch)
+                  : [...(architectures ?? []), arch],
+              )
+            }
+            value={arch}
+          >
+            {arch}
+          </SelectOption>
+        ))}
+      </FormPFSelect>
+    </FormGroup>
   );
 };
 

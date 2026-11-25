@@ -62,8 +62,8 @@ const AddBootableVolumeModal: FC<AddBootableVolumeModalProps> = ({
         onClose={() => handleAddBootableVolumeModalClose({ onClose, sourceType, upload })}
         onSubmit={(dataSource) =>
           submitAddBootableVolume({
-            bootableVolume,
             checkUploadReady,
+            createParams: bootableVolume,
             dataSource,
             onClose,
             onCreateVolume,

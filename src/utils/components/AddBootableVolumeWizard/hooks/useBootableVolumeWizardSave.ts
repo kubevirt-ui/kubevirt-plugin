@@ -2,11 +2,12 @@ import { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router';
 
 import { handleAddBootableVolumeSuccess } from '@kubevirt-utils/components/AddBootableVolumeModal/components/BootableVolumeModalToasts';
-import { emptyDataSource } from '@kubevirt-utils/components/AddBootableVolumeModal/consts';
-import { submitAddBootableVolume } from '@kubevirt-utils/components/AddBootableVolumeModal/utils';
+import { isUploadVolumeSource } from '@kubevirt-utils/components/AddBootableVolumeModal/consts';
+import { isUploadCanceledError } from '@kubevirt-utils/hooks/useCDIUpload/errors';
 import { useCDIUpload } from '@kubevirt-utils/hooks/useCDIUpload/useCDIUpload';
 import useKubevirtToast from '@kubevirt-utils/hooks/useKubevirtToast';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
+import { kubevirtConsole } from '@kubevirt-utils/utils/utils';
 
 import { useBootableVolumeWizardForm } from '../form/BootableVolumeWizardFormProvider';
 import {
@@ -15,7 +16,7 @@ import {
   triggerBootableVolumeWizardStepValidation,
 } from '../form/stepValidation';
 import type { BootableVolumeWizardFormValues } from '../form/types';
-import { mapWizardFormToBootableVolumeState } from '../utils/mapWizardFormToBootableVolumeState';
+import { createBootableVolumes } from '../utils/createBootableVolumes';
 import type { BootableVolumeWizardCallbacks } from '../utils/types';
 
 type UseBootableVolumeWizardSaveArgs = BootableVolumeWizardCallbacks & {
@@ -43,46 +44,47 @@ const useBootableVolumeWizardSave = ({
   const { checkUploadReady, uploadData } = useCDIUpload(cluster);
   const [error, setError] = useState<unknown>(null);
 
-  const submitBootableVolume = useCallback(
+  const createFromValues = useCallback(
     async (values: BootableVolumeWizardFormValues): Promise<void> => {
-      setIsSubmitting(true);
-      setError(null);
+      const sourceType = values.imageSource.sourceType;
 
-      try {
-        const { bootableVolume, sourceType } = mapWizardFormToBootableVolumeState({
-          cluster,
-          values,
-        });
-
-        const result = await submitAddBootableVolume({
-          bootableVolume,
-          checkUploadReady,
-          dataSource: emptyDataSource,
-          onClose,
-          onCreateVolume,
-          onUploadStart,
-          sourceType,
-          t,
-          uploadData,
-        });
-
-        // Upload path calls onClose inside submitAddBootableVolume before returning undefined.
-        if (result === undefined) {
-          return;
-        }
-
-        handleAddBootableVolumeSuccess(result, sourceType, {
-          addInfoToast,
-          addSuccessToast,
-          navigate,
-          t,
-        });
+      if (isUploadVolumeSource(sourceType)) {
+        await checkUploadReady();
+        void (async (): Promise<void> => {
+          try {
+            await createBootableVolumes({
+              cluster,
+              onCreateVolume,
+              onUploadStart,
+              t,
+              uploadData,
+              values,
+            });
+          } catch (uploadError) {
+            if (!isUploadCanceledError(uploadError)) {
+              kubevirtConsole.error(uploadError);
+            }
+          }
+        })();
         onClose();
-      } catch (submitError) {
-        setError(submitError);
-      } finally {
-        setIsSubmitting(false);
+        return;
       }
+
+      const result = await createBootableVolumes({
+        cluster,
+        onCreateVolume,
+        onUploadStart,
+        t,
+        uploadData,
+        values,
+      });
+      handleAddBootableVolumeSuccess(result, sourceType, {
+        addInfoToast,
+        addSuccessToast,
+        navigate,
+        t,
+      });
+      onClose();
     },
     [
       addInfoToast,
@@ -93,15 +95,12 @@ const useBootableVolumeWizardSave = ({
       onClose,
       onCreateVolume,
       onUploadStart,
-      setIsSubmitting,
       t,
       uploadData,
     ],
   );
 
   const onSave = useCallback(async (): Promise<void> => {
-    // Validate step fields the same way as Next. Avoid formState.isValid, which can stay
-    // false with empty errors when using yup.lazy + @hookform/resolvers.
     const stepsToValidate = BOOTABLE_VOLUME_WIZARD_STEPS.slice(
       0,
       BOOTABLE_VOLUME_WIZARD_STEPS.indexOf(BootableVolumeWizardStep.REVIEW),
@@ -119,8 +118,19 @@ const useBootableVolumeWizardSave = ({
       return;
     }
 
-    await submitBootableVolume(getValues());
-  }, [getValues, goToStepById, submitBootableVolume, trigger]);
+    setIsSubmitting(true);
+    setError(null);
+
+    try {
+      await createFromValues(getValues());
+    } catch (submitError) {
+      if (!isUploadCanceledError(submitError)) {
+        setError(submitError);
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
+  }, [createFromValues, getValues, goToStepById, setIsSubmitting, trigger]);
 
   return {
     error,

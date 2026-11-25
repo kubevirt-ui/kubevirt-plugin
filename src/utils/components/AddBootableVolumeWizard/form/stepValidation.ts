@@ -1,6 +1,11 @@
 import { type FieldErrors, type FieldPath, get, type UseFormTrigger } from 'react-hook-form';
 
-import { DESTINATION_PROJECT_FIELD, OPERATING_SYSTEM_FIELD, VOLUME_NAME_FIELD } from './fieldPaths';
+import {
+  DESTINATION_PROJECT_FIELD,
+  IMAGE_SOURCE_STEP_FIELDS,
+  OPERATING_SYSTEM_FIELD,
+  VOLUME_NAME_FIELD,
+} from './fieldPaths';
 import type { BootableVolumeWizardFormValues } from './types';
 
 export enum BootableVolumeWizardStep {
@@ -21,23 +26,7 @@ const STEP_FIELDS: Record<
   BootableVolumeWizardStep,
   readonly FieldPath<BootableVolumeWizardFormValues>[]
 > = {
-  [BootableVolumeWizardStep.IMAGE_SOURCE]: [
-    'imageSource.sourceType',
-    'imageSource.diskSize',
-    'imageSource.upload.file',
-    'imageSource.existingVolume.project',
-    'imageSource.existingVolume.name',
-    'imageSource.existingSnapshot.project',
-    'imageSource.existingSnapshot.name',
-    'imageSource.registry.image',
-    'imageSource.registry.cronExpression',
-    'imageSource.registry.username',
-    'imageSource.registry.password',
-    'imageSource.registry.retainRevisions',
-    'imageSource.url.imageUrl',
-    'imageSource.url.certificate',
-    'imageSource.url.configMapName',
-  ],
+  [BootableVolumeWizardStep.IMAGE_SOURCE]: IMAGE_SOURCE_STEP_FIELDS,
   [BootableVolumeWizardStep.OPERATING_SYSTEM]: [OPERATING_SYSTEM_FIELD],
   [BootableVolumeWizardStep.PROJECT_AND_VOLUME]: [VOLUME_NAME_FIELD, DESTINATION_PROJECT_FIELD],
   [BootableVolumeWizardStep.REVIEW]: [],

@@ -101,8 +101,8 @@ export const handleAddBootableVolumeModalClose = ({
 };
 
 export const submitAddBootableVolume = async ({
-  bootableVolume,
   checkUploadReady,
+  createParams,
   dataSource,
   onClose,
   onCreateVolume,
@@ -117,7 +117,7 @@ export const submitAddBootableVolume = async ({
   }
 
   const createVolume = createBootableVolume({
-    bootableVolume,
+    createParams,
     onCreateVolume,
     onUploadStart,
     sourceType,

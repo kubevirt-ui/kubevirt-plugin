@@ -8,6 +8,7 @@ import { getFieldValidationState } from '@kubevirt-utils/utils/getFieldValidatio
 import { FormGroup } from '@patternfly/react-core';
 
 import { useBootableVolumeWizardForm } from '../../../form/BootableVolumeWizardFormProvider';
+import { DESTINATION_PROJECT_FIELD } from '../../../form/fieldPaths';
 
 const DestinationProjectSelect: FC = () => {
   const { t } = useKubevirtTranslation();
@@ -15,7 +16,7 @@ const DestinationProjectSelect: FC = () => {
   const {
     field: { onChange, value },
     fieldState: { error },
-  } = useController({ control, name: 'projectAndVolume.destinationProject' });
+  } = useController({ control, name: DESTINATION_PROJECT_FIELD });
   const { message, validated } = getFieldValidationState(error);
 
   return (

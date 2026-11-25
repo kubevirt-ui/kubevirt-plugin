@@ -3,6 +3,8 @@ import produce from 'immer';
 import {
   type V1beta1DataSource,
   type V1beta1DataVolume,
+  type V1beta1StorageSpecAccessModesEnum,
+  type V1beta1StorageSpecVolumeModeEnum,
 } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import { type V1beta1DataVolumeSource } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { KUBEVIRT_ISO_LABEL } from '@kubevirt-utils/resources/bootableresources/constants';
@@ -15,18 +17,32 @@ import {
   emptySourceDataVolume,
   ISO_SUPPORTED_SOURCE_TYPES,
 } from '../consts';
-import { type AddBootableVolumeState } from '../types';
+
+export type DataVolumeSpecFields = {
+  accessMode?: V1beta1StorageSpecAccessModesEnum;
+  labels?: { [key: string]: string };
+  name: string;
+  size?: string;
+  storageClassName?: string;
+  volumeMode?: V1beta1StorageSpecVolumeModeEnum;
+};
+
+export type DataSourceMetadataFields = {
+  annotations?: { [key: string]: string };
+  isIso?: boolean;
+  labels?: { [key: string]: string };
+  name: string;
+};
 
 export const getDataVolumeWithSource = (
-  bootableVolume: AddBootableVolumeState,
+  fields: DataVolumeSpecFields,
   namespace: string,
   dataVolumeSource: V1beta1DataVolumeSource,
 ): V1beta1DataVolume => {
-  const { accessMode, bootableVolumeName, labels, size, storageClassName, volumeMode } =
-    bootableVolume || {};
+  const { accessMode, labels, name, size, storageClassName, volumeMode } = fields;
 
   return produce(emptySourceDataVolume, (draftBootableVolume) => {
-    draftBootableVolume.metadata.name = bootableVolumeName;
+    draftBootableVolume.metadata.name = name;
     draftBootableVolume.metadata.namespace = namespace;
     draftBootableVolume.spec.storage.resources.requests.storage = size;
     draftBootableVolume.metadata.labels = labels;
@@ -43,20 +59,17 @@ export const getDataVolumeWithSource = (
 };
 
 export const setDataSourceMetadata = (
-  bootableVolume: AddBootableVolumeState,
+  fields: DataSourceMetadataFields,
   namespace: string,
   dataSource: V1beta1DataSource,
   architecture: string,
   sourceType: DROPDOWN_FORM_SELECTION,
 ): V1beta1DataSource => {
-  const { annotations, bootableVolumeName, isIso, labels } = bootableVolume || {};
-
+  const { annotations, isIso, labels, name } = fields;
   const hasSelectedArchitecture = !isEmpty(architecture);
 
   return produce(dataSource, (draftDS) => {
-    draftDS.metadata.name = hasSelectedArchitecture
-      ? `${bootableVolumeName}-${architecture}`
-      : bootableVolumeName;
+    draftDS.metadata.name = hasSelectedArchitecture ? `${name}-${architecture}` : name;
     draftDS.metadata.namespace = namespace;
     draftDS.metadata.annotations = annotations;
     draftDS.metadata.labels = hasSelectedArchitecture

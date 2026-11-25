@@ -3,6 +3,7 @@ import produce from 'immer';
 import type { V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containerized-data-importer';
 import type { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { createPVCBootableVolume } from '@kubevirt-utils/components/AddBootableVolumeModal/bootableVolumeSources';
+import { dataVolumeSpecFromCreateParams } from '@kubevirt-utils/components/AddBootableVolumeModal/bootableVolumeSources/createFields';
 import { emptyDataSource } from '@kubevirt-utils/components/AddBootableVolumeModal/consts';
 import type { AddBootableVolumeState } from '@kubevirt-utils/components/AddBootableVolumeModal/types';
 import { DEFAULT_PREFERENCE_LABEL } from '@kubevirt-utils/constants/instancetypes-and-preferences';
@@ -18,7 +19,8 @@ const getBootableVolumeDraft = (
   architecture?: string,
 ): Promise<V1beta1DataSource> => {
   const hasSelectedArchitecture = !isEmpty(architecture);
-  const { bootableVolumeName, bootableVolumeNamespace, labels } = bootableVolumeSource ?? {};
+  const { bootableVolumeCluster, bootableVolumeName, bootableVolumeNamespace, labels } =
+    bootableVolumeSource ?? {};
   const dataSource = produce(emptyDataSource, (draftDataSource) => {
     draftDataSource.metadata.name = hasSelectedArchitecture
       ? `${bootableVolumeName}-${architecture}`
@@ -32,7 +34,17 @@ const getBootableVolumeDraft = (
     };
   });
 
-  return createPVCBootableVolume(bootableVolumeSource, diskObj?.namespace, dataSource);
+  return createPVCBootableVolume({
+    cluster: bootableVolumeCluster,
+    dataVolume: dataVolumeSpecFromCreateParams(
+      bootableVolumeSource,
+      dataSource.metadata.name ?? bootableVolumeName,
+    ),
+    draftDataSource: dataSource,
+    namespace: diskObj?.namespace,
+    pvcName: bootableVolumeSource.pvcName,
+    pvcNamespace: bootableVolumeSource.pvcNamespace,
+  });
 };
 
 export const createBootableVolumeFromDisk = async (

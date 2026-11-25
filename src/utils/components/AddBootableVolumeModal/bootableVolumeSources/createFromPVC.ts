@@ -5,22 +5,26 @@ import { type V1beta1DataSource } from '@kubevirt-ui-ext/kubevirt-api/containeri
 import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import { kubevirtK8sCreate, kubevirtK8sDelete } from '@multicluster/k8sRequests';
 
-import { type AddBootableVolumeState } from '../types';
+import { type DataVolumeSpecFields, getDataVolumeWithSource } from './dataVolumeHelpers';
 
-import { getDataVolumeWithSource } from './dataVolumeHelpers';
+export type CreatePVCBootableVolumeArgs = {
+  cluster?: string;
+  dataVolume: DataVolumeSpecFields;
+  draftDataSource: V1beta1DataSource;
+  namespace: string;
+  pvcName: string;
+  pvcNamespace: string;
+};
 
-export const createPVCBootableVolume = async (
-  bootableVolume: AddBootableVolumeState,
-  namespace: string,
-  draftDataSource: V1beta1DataSource,
-): Promise<V1beta1DataSource> => {
-  const { pvcName, pvcNamespace } = bootableVolume || {};
-
-  const updatedNameBootableVolume = produce(bootableVolume, (draft) => {
-    draft.bootableVolumeName = draftDataSource.metadata.name;
-  });
-
-  const bootableVolumeToCreate = getDataVolumeWithSource(updatedNameBootableVolume, namespace, {
+export const createPVCBootableVolume = async ({
+  cluster,
+  dataVolume,
+  draftDataSource,
+  namespace,
+  pvcName,
+  pvcNamespace,
+}: CreatePVCBootableVolumeArgs): Promise<V1beta1DataSource> => {
+  const bootableVolumeToCreate = getDataVolumeWithSource(dataVolume, namespace, {
     pvc: { name: pvcName, namespace: pvcNamespace },
   });
 
@@ -34,21 +38,21 @@ export const createPVCBootableVolume = async (
   });
 
   const createdDS = await kubevirtK8sCreate({
-    cluster: bootableVolume.bootableVolumeCluster,
+    cluster,
     data: dataSourceToCreate,
     model: DataSourceModel,
   });
 
   try {
     await kubevirtK8sCreate({
-      cluster: bootableVolume.bootableVolumeCluster,
+      cluster,
       data: bootableVolumeToCreate,
       model: DataVolumeModel,
     });
   } catch (error) {
     await Promise.allSettled([
       kubevirtK8sDelete({
-        cluster: bootableVolume.bootableVolumeCluster,
+        cluster,
         model: DataSourceModel,
         resource: createdDS,
       }),
