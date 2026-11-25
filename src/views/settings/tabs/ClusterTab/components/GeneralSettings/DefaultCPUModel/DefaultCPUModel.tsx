@@ -15,6 +15,8 @@ import {
   getVirtualMachineOptionsPatchPath,
 } from '@kubevirt-utils/resources/hyperconverged/patchUtils';
 import { getCPUModels, getDefaultCPUModel } from '@kubevirt-utils/resources/hyperconverged/selectors';
+import useSchedulableVirtNodes from '@kubevirt-utils/resources/node/hooks/useSchedulableVirtNodes';
+import { getNodesMissingCPUModel } from '@kubevirt-utils/resources/node/utils/cpuModel';
 import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
 import {
   Alert,
@@ -43,6 +45,7 @@ const DefaultCPUModel: FC<DefaultCPUModelProps> = ({ hyperConvergeConfiguration 
   const cluster = useSettingsCluster();
   const [canPatchHyperConverged] = useCanPatchHyperConverged(cluster);
   const [hyperConverge, loaded] = hyperConvergeConfiguration;
+  const [nodes, nodesLoaded] = useSchedulableVirtNodes(cluster);
   const savedModel = getDefaultCPUModel(hyperConverge) ?? '';
   const [selected, setSelected] = useState(savedModel);
   const [error, setError] = useState<unknown>(null);
@@ -52,16 +55,16 @@ const DefaultCPUModel: FC<DefaultCPUModelProps> = ({ hyperConvergeConfiguration 
     setSelected(savedModel);
   }, [savedModel]);
 
-  if (!loaded) return <Skeleton width="300px" />;
+  if (!loaded || !nodesLoaded) return <Skeleton width="300px" />;
 
   const models = getCPUModels(hyperConverge);
   const options =
     savedModel && !models.some((model) => model.name === savedModel)
       ? [...models, { name: savedModel }]
       : models;
-  const selectedModel = models.find((model) => model.name === selected);
-  const missingNodes = selectedModel?.unsupportedNodes ?? [];
-  const unavailable = Boolean(selected) && (!selectedModel || missingNodes.length > 0);
+  const selectedKnown = models.some((model) => model.name === selected);
+  const missingNodes = getNodesMissingCPUModel(nodes, selected);
+  const unavailable = Boolean(selected) && (!selectedKnown || missingNodes.length > 0);
   const isDisabled = !canPatchHyperConverged || isSaving;
 
   const onSave = async (): Promise<void> => {
@@ -111,9 +114,7 @@ const DefaultCPUModel: FC<DefaultCPUModelProps> = ({ hyperConvergeConfiguration 
             {options.map((model) => (
               <SelectOption
                 description={
-                  !models.some(
-                    (entry) => entry.name === model.name && !entry.unsupportedNodes?.length,
-                  )
+                  getNodesMissingCPUModel(nodes, model.name).length > 0
                     ? t('Not available on every node')
                     : undefined
                 }

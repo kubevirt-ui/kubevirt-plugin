@@ -92,7 +92,6 @@ export type HyperConvergedSpec = HyperConvergedSpecV1 | HyperConvergedSpecV1Beta
 
 export type CPUModelStatus = {
   name: string;
-  unsupportedNodes?: string[];
 };
 
 type HyperConvergedStatus = {
