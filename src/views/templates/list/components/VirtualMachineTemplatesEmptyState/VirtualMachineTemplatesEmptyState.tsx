@@ -4,17 +4,24 @@ import ExternalLink from '@kubevirt-utils/components/ExternalLink/ExternalLink';
 import ListEmptyState from '@kubevirt-utils/components/ListEmptyState/ListEmptyState';
 import { documentationURL } from '@kubevirt-utils/constants/documentation';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { ListPageBody, ListPageHeader } from '@openshift-console/dynamic-plugin-sdk';
+import { DocumentTitle, ListPageBody, ListPageHeader } from '@openshift-console/dynamic-plugin-sdk';
 import { PficonTemplateIcon } from '@patternfly/react-icons';
 
 import VirtualMachineTemplatesCreateButton from '../VirtualMachineTemplatesCreateButton/VirtualMachineTemplatesCreateButton';
 
-const VirtualMachineTemplatesEmptyState: FC = () => {
+type VirtualMachineTemplatesEmptyStateProps = {
+  pageTitle: string;
+};
+
+const VirtualMachineTemplatesEmptyState: FC<VirtualMachineTemplatesEmptyStateProps> = ({
+  pageTitle,
+}) => {
   const { t } = useKubevirtTranslation();
 
   return (
     <>
-      <ListPageHeader title={t('Templates')} />
+      <DocumentTitle>{pageTitle}</DocumentTitle>
+      <ListPageHeader title={pageTitle} />
       <ListPageBody>
         <ListEmptyState
           bodyContent={t('To get started, create a template.')}

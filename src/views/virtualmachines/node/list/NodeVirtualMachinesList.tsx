@@ -16,7 +16,6 @@ import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import ColumnManagement from '@kubevirt-utils/components/ColumnManagementModal/ColumnManagement';
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
 import { getK8sRowId } from '@kubevirt-utils/components/KubevirtTable/utils';
-import { PageTitles } from '@kubevirt-utils/constants/page-constants';
 import { KUBEVIRT_APISERVER_PROXY } from '@kubevirt-utils/hooks/useFeatures/constants';
 import { useFeatures } from '@kubevirt-utils/hooks/useFeatures/useFeatures';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -108,7 +107,7 @@ const NodeVirtualMachinesList: FC<NodeVirtualMachinesListProps> = ({ obj }) => {
       <VirtualMachinesListPageHeader hideFavoriteButton>
         <ManageVirtualMachinesButton />
       </VirtualMachinesListPageHeader>
-      <DocumentTitle>{PageTitles.VirtualMachines}</DocumentTitle>
+      <DocumentTitle>{t('VirtualMachines')}</DocumentTitle>
       <ListPageBody>
         <div className="vm-listpagebody">
           {isEmpty(filteredVMs) && loaded && !vmsLoadError ? (

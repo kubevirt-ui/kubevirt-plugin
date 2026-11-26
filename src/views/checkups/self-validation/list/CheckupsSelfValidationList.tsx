@@ -2,6 +2,7 @@ import { type FC, useMemo } from 'react';
 
 import { type IoK8sApiBatchV1Job } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
 import KubevirtFilterToolbar from '@kubevirt-utils/components/KubevirtFilterToolbar/KubevirtFilterToolbar';
+import KubevirtTablePagination from '@kubevirt-utils/components/KubevirtTable/components/KubevirtTablePagination';
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
 import { buildColumnLayout, getK8sRowId } from '@kubevirt-utils/components/KubevirtTable/utils';
 import useKubevirtDataViewFilters from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/useKubevirtDataViewFilters';
@@ -9,12 +10,10 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import useKubevirtTableColumns from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtTableColumns';
 import { COLUMN_MANAGEMENT_IDS } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/const';
 import usePaginationWithFilters from '@kubevirt-utils/hooks/usePagination/usePaginationWithFilters';
-import { paginationDefaultValues } from '@kubevirt-utils/hooks/usePagination/utils/constants';
 import { EXPORT_TABLE_KEYS, KubevirtTableExport } from '@kubevirt-utils/hooks/useTableExport';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 import useIsACMPage from '@multicluster/useIsACMPage';
-import { ListPageBody } from '@openshift-console/dynamic-plugin-sdk';
-import { Pagination } from '@patternfly/react-core';
+import { DocumentTitle, ListPageBody } from '@openshift-console/dynamic-plugin-sdk';
 import { useHubClusterName } from '@stolostron/multicluster-sdk';
 
 import { getCheckupsSelfValidationListFilters } from '../utils';
@@ -90,19 +89,25 @@ const CheckupsSelfValidationList: FC = () => {
 
   const isLoaded = loaded && !loadingPermissions && loadedColumns;
 
+  const documentTitle = <DocumentTitle>{t('Checkups · Self validation')}</DocumentTitle>;
+
   if (isEmpty(configMaps) && isLoaded && !error) {
     return (
-      <CheckupsSelfValidationListEmptyState
-        clusterRoleBinding={clusterRoleBinding}
-        isPermitted={isPermitted}
-        isPermittedToInstall={isPermittedToInstall}
-        loadingPermissions={loadingPermissions}
-      />
+      <>
+        {documentTitle}
+        <CheckupsSelfValidationListEmptyState
+          clusterRoleBinding={clusterRoleBinding}
+          isPermitted={isPermitted}
+          isPermittedToInstall={isPermittedToInstall}
+          loadingPermissions={loadingPermissions}
+        />
+      </>
     );
   }
 
   return (
     <ListPageBody>
+      {documentTitle}
       <div className="list-managment-group">
         <KubevirtFilterToolbar
           clearAllFilters={clearAllFilters}
@@ -126,15 +131,11 @@ const CheckupsSelfValidationList: FC = () => {
           }
         />
         {!isEmpty(filteredData) && isLoaded && (
-          <Pagination
-            className="list-managment-group__pagination"
-            isLastFullPageShown
+          <KubevirtTablePagination
             itemCount={filteredData?.length}
             onPerPageSelect={handlePerPageSelect}
             onSetPage={handleSetPage}
-            page={pagination?.page}
-            perPage={pagination?.perPage}
-            perPageOptions={paginationDefaultValues}
+            pagination={pagination}
           />
         )}
       </div>

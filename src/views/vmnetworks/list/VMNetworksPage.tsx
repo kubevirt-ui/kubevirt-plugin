@@ -6,7 +6,7 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import { NetworkAttachmentDefinitionModel } from '@kubevirt-utils/models';
 import PopoverContentWithLightspeedButton from '@lightspeed/components/PopoverContentWithLightspeedButton/PopoverContentWithLightspeedButton';
 import { OLSPromptType } from '@lightspeed/utils/prompts';
-import { ListPageHeader } from '@openshift-console/dynamic-plugin-sdk';
+import { DocumentTitle, ListPageHeader } from '@openshift-console/dynamic-plugin-sdk';
 import { Button, PopoverPosition, Stack, Tab, Tabs, TabTitleText } from '@patternfly/react-core';
 
 import CreateNetworkButton from './components/CreateNetworkButton';
@@ -21,9 +21,12 @@ const VMNetworksPage: FC = () => {
 
   const locationTabKey = TAB_INDEX_BY_PATH[location?.pathname] as number | undefined;
 
+  const pageTitle = t('Virtual machine networks');
+
   return (
     <>
-      <ListPageHeader title={t('Virtual machine networks')}>
+      <DocumentTitle>{pageTitle}</DocumentTitle>
+      <ListPageHeader title={pageTitle}>
         <CreateNetworkButton />
       </ListPageHeader>
       <Tabs

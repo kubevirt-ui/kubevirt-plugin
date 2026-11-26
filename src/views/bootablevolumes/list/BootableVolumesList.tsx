@@ -3,7 +3,6 @@ import { useParams } from 'react-router';
 
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
 import { buildColumnLayout, getK8sRowId } from '@kubevirt-utils/components/KubevirtTable/utils';
-import { PageTitles } from '@kubevirt-utils/constants/page-constants';
 import useClusterPreferences from '@kubevirt-utils/hooks/useClusterPreferences';
 import useKubevirtDataViewFilters from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/useKubevirtDataViewFilters';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
@@ -106,10 +105,12 @@ const BootableVolumesList: FC = () => {
     return <BootableVolumesEmptyState namespace={namespace} />;
   }
 
+  const pageTitle = t('Bootable volumes');
+
   return (
     <>
-      <DocumentTitle>{PageTitles.BootableVolumes}</DocumentTitle>
-      <ListPageHeader title={PageTitles.BootableVolumes}>
+      <DocumentTitle>{pageTitle}</DocumentTitle>
+      <ListPageHeader title={pageTitle}>
         <BootableVolumeAddButton namespace={namespace} />
       </ListPageHeader>
 
