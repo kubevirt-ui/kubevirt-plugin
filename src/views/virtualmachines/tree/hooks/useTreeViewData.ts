@@ -123,7 +123,9 @@ export const useTreeViewData = (): UseTreeViewData => {
   const loaded =
     projectsLoaded &&
     (loadVMsPerNamespace
-      ? Object.values(allowedResources).some((resource) => resource.loaded)
+      ? Object.values(allowedResources).some(
+          (resource) => resource.loaded || Boolean(resource.loadError),
+        )
       : allVMsLoaded);
 
   const treeData = useMemo(() => {
