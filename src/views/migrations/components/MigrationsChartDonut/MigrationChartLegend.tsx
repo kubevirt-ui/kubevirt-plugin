@@ -13,7 +13,11 @@ type MigrationChartLegendProps = {
 
 const MigrationChartLegend: FC<MigrationChartLegendProps> = ({ legendItems, onSetFilters }) => {
   return (
-    <Flex gap={{ default: 'gapMd' }}>
+    <Flex
+      className="migrations-chart-donut__legend"
+      direction={{ default: 'column' }}
+      gap={{ default: 'gapSm' }}
+    >
       {legendItems?.map((item) => {
         const { fill, x: status, y: statusCount } = item || {};
         return (

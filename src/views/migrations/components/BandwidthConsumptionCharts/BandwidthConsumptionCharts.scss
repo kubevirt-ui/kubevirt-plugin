@@ -1,0 +1,53 @@
+.migrations-bandwidth-charts {
+  margin-inline: auto;
+  min-width: 0;
+  width: 78%;
+
+  &__section-title {
+    font-size: var(--pf-t--global--font--size--heading--sm);
+    font-weight: var(--pf-t--global--font--weight--body--bold);
+    line-height: 1.2;
+    margin: 0 0 var(--pf-t--global--spacer--sm);
+    padding: 0;
+    text-align: start;
+  }
+
+  .pf-v6-l-stack {
+    gap: var(--pf-t--global--spacer--md);
+  }
+
+  &__item {
+    margin: 0;
+    min-width: 0;
+  }
+
+  &__header {
+    align-items: baseline;
+    display: flex;
+    justify-content: space-between;
+    margin: 0 0 var(--pf-t--global--spacer--xs);
+    padding: 0;
+  }
+
+  &__title {
+    font-size: var(--pf-t--global--font--size--body--default);
+    font-weight: var(--pf-t--global--font--weight--body--default);
+    line-height: 1.2;
+  }
+
+  &__unit {
+    color: var(--pf-t--global--text--color--subtle);
+    font-size: var(--pf-t--global--font--size--body--sm);
+    line-height: 1.2;
+    white-space: nowrap;
+  }
+
+  &__chart {
+    line-height: 0;
+    overflow: visible;
+
+    svg {
+      overflow: visible;
+    }
+  }
+}

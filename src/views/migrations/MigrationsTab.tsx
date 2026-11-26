@@ -13,6 +13,8 @@ import {
   CardExpandableContent,
   CardHeader,
   CardTitle,
+  Divider,
+  Flex,
   Grid,
   GridItem,
 } from '@patternfly/react-core';
@@ -57,19 +59,21 @@ const MigrationsTab: FC<MigrationsTabProps> = ({ duration }) => {
               </Bullseye>
             )}
             {loaded && !loadErrors && !isEmpty(filteredVMIMS) && (
-              <Grid>
-                <GridItem className="kv-monitoring-card__graph-separator" span={6}>
+              <Grid hasGutter>
+                <GridItem lg={5} sm={12}>
                   <CardHeader>
                     <CardTitle>{t('Migrations')}</CardTitle>
                   </CardHeader>
-                  <CardBody className="kv-monitoring-card__body">
+                  <CardBody className="kv-monitoring-card__body kv-monitoring-card__migrations-chart-body">
                     <MigrationsChartDonut onSetFilters={onSetFilters} vmims={filteredVMIMS} />
                   </CardBody>
                 </GridItem>
-                <GridItem className="kv-monitoring-card__resources" span={6}>
-                  <CardHeader>
-                    <CardTitle>{t('Resources')}</CardTitle>
-                  </CardHeader>
+                <GridItem className="kv-monitoring-card__overview-divider" lg={1} sm={12}>
+                  <Flex className="kv-monitoring-card__overview-divider-flex">
+                    <Divider orientation={{ default: 'horizontal', lg: 'vertical' }} />
+                  </Flex>
+                </GridItem>
+                <GridItem lg={6} sm={12}>
                   <CardBody className="kv-monitoring-card__body">
                     <BandwidthConsumptionCharts duration={duration} />
                   </CardBody>

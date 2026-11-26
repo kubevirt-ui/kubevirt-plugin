@@ -13,6 +13,20 @@ import { type PrometheusValue } from '@openshift-console/dynamic-plugin-sdk';
 
 import { type ChartDataObject, GRID_LINES } from './constants';
 
+export type VictoryChartPadding = {
+  bottom: number;
+  left: number;
+  right: number;
+  top: number;
+};
+
+export const MIGRATIONS_UTILIZATION_CHART_PADDING: VictoryChartPadding = {
+  bottom: 40,
+  left: 80,
+  right: 0,
+  top: 40,
+};
+
 export const mapPrometheusValues = (
   prometheusValues: PrometheusValue[],
   name: string,

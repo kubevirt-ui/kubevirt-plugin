@@ -1,0 +1,36 @@
+.migrations-chart-donut {
+  align-items: center;
+  width: 100%;
+
+  &__overview {
+    align-items: flex-start;
+    margin-inline: auto;
+    width: fit-content;
+  }
+
+  &__chart-and-legend {
+    flex-shrink: 0;
+  }
+
+  &__chart-column {
+    flex-shrink: 0;
+    width: var(--migrations-donut-size, 150px);
+  }
+
+  &__chart {
+    flex-shrink: 0;
+    width: var(--migrations-donut-size, 150px);
+  }
+
+  &__settings {
+    display: flex;
+    transform: translateX(var(--pf-t--global--spacer--sm));
+    white-space: nowrap;
+    width: max-content;
+  }
+
+  &__legend {
+    min-width: 0;
+    padding-inline-start: var(--pf-t--global--spacer--md);
+  }
+}

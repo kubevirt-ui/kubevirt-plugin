@@ -28,7 +28,7 @@ const MigrationsPage: FC = () => {
 
   const [duration, setDuration] = useLocalStorage(
     MIGRATIONS_DURATION_KEY,
-    DurationOption.FIVE_MIN.toString(),
+    DurationOption.ONE_DAY.toString(),
   );
 
   const onDurationSelect = (value: string): void => {

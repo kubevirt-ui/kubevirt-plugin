@@ -9,6 +9,8 @@ import type {
   EncodedExtension,
 } from '@openshift-console/dynamic-plugin-sdk-webpack';
 
+import { COMPUTE_MIGRATIONS_PAGE_PATH } from '../migrations/constants';
+
 export const exposedModules: ConsolePluginBuildMetadata['exposedModules'] = {
   StorageMigrationList: './views/storagemigrations/list/StorageMigrationList.tsx',
   useStorageMigrationActionsProvider:
@@ -36,6 +38,23 @@ export const extensions: EncodedExtension[] = [
     type: 'console.navigation/section',
   } as EncodedExtension<NavSection>,
 
+  {
+    flags: {
+      required: ['SHOW_MIGRATION_SECTION'],
+    },
+    properties: {
+      dataAttributes: {
+        'data-quickstart-id': 'qs-nav-compute-migrations',
+        'data-test': 'compute-migrations-nav-item',
+      },
+      href: COMPUTE_MIGRATIONS_PAGE_PATH,
+      id: 'compute-migrations',
+      name: '%plugin__kubevirt-plugin~Compute migrations%',
+      prefixNamespaced: true,
+      section: 'migration',
+    },
+    type: 'console.navigation/href',
+  } as EncodedExtension<HrefNavItem>,
   {
     properties: {
       component: { $codeRef: 'StorageMigrationList' },
