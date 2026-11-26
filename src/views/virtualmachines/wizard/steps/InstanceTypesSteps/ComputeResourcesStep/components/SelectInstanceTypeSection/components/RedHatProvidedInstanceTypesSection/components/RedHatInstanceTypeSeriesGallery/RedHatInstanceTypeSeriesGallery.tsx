@@ -3,7 +3,9 @@ import React, { type FC, useMemo } from 'react';
 import type { RedHatInstanceTypeMetadata } from '@kubevirt-utils/components/AddBootableVolumeModal/components/VolumeMetadata/components/InstanceTypeDrilldownSelect/utils/types';
 import { getVisibleRedHatInstanceTypeSeriesItems } from '@kubevirt-utils/hooks/useInstanceTypeFamilyAvailability/getVisibleRedHatInstanceTypeSeriesItems';
 import useDisabledInstanceTypeFamilies from '@kubevirt-utils/hooks/useInstanceTypeFamilyAvailability/useDisabledInstanceTypeFamilies';
+import { isEmpty } from '@kubevirt-utils/utils/utils';
 import { Gallery, GalleryItem } from '@patternfly/react-core';
+import RedHatInstanceTypesEmptyState from '@virtualmachines/wizard/steps/InstanceTypesSteps/ComputeResourcesStep/components/SelectInstanceTypeSection/components/RedHatProvidedInstanceTypesSection/components/RedHatInstanceTypeSeriesGallery/components/RedHatInstanceTypesEmptyState/RedHatInstanceTypesEmptyState';
 import RedHatSeriesMenuCard from '@virtualmachines/wizard/steps/InstanceTypesSteps/ComputeResourcesStep/components/SelectInstanceTypeSection/components/RedHatProvidedInstanceTypesSection/components/RedHatInstanceTypeSeriesGallery/components/RedHatSeriesMenuCard/RedHatSeriesMenuCard';
 
 type RedHatInstanceTypeSeriesGalleryProps = {
@@ -17,7 +19,8 @@ const RedHatInstanceTypeSeriesGallery: FC<RedHatInstanceTypeSeriesGalleryProps> 
   preserveFamily,
   redHatMenuItems,
 }) => {
-  const { isFamilyVisible, loaded } = useDisabledInstanceTypeFamilies(cluster);
+  const { canEdit, canEditLoaded, isFamilyVisible, loaded } =
+    useDisabledInstanceTypeFamilies(cluster);
   const visibleSortedItems = useMemo(
     () =>
       getVisibleRedHatInstanceTypeSeriesItems(
@@ -30,6 +33,16 @@ const RedHatInstanceTypeSeriesGallery: FC<RedHatInstanceTypeSeriesGalleryProps> 
 
   if (!loaded) {
     return null;
+  }
+
+  if (isEmpty(visibleSortedItems)) {
+    return (
+      <RedHatInstanceTypesEmptyState
+        allFamiliesDisabled={!isEmpty(redHatMenuItems?.items)}
+        canEdit={canEdit && canEditLoaded}
+        cluster={cluster}
+      />
+    );
   }
 
   return (

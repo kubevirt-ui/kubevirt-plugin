@@ -4,6 +4,7 @@ import { VirtualMachineClusterInstancetypeModelRef } from '@kubevirt-ui-ext/kube
 import KubevirtFilterToolbar from '@kubevirt-utils/components/KubevirtFilterToolbar/KubevirtFilterToolbar';
 import KubevirtTable from '@kubevirt-utils/components/KubevirtTable/KubevirtTable';
 import { buildColumnLayout } from '@kubevirt-utils/components/KubevirtTable/utils';
+import useCanPatchFeaturesConfigMap from '@kubevirt-utils/hooks/useCanPatchFeaturesConfigMap';
 import useClusterInstanceTypes from '@kubevirt-utils/hooks/useClusterInstanceTypes';
 import useClusterFilter from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/filters/useClusterFilter';
 import useKubevirtDataViewFilters from '@kubevirt-utils/hooks/useKubevirtDataViewFilters/useKubevirtDataViewFilters';
@@ -56,9 +57,15 @@ const ClusterInstancetypeList: FC<ListPageProps> = ({
     pagination,
   } = usePaginationWithFilters(filteredData?.length ?? 0, onSetFilters);
 
+  // Family status reveals family availability, so the whole column (header, column management
+  // and export included) exists only for users who can patch the features ConfigMap. Fails
+  // closed while the access review is loading. Rows from other clusters are gated per cell.
+  const [canPatchFeaturesConfigMap, canPatchLoading] = useCanPatchFeaturesConfigMap();
+  const showFamilyStatusColumn = canPatchFeaturesConfigMap && !canPatchLoading;
+
   const columns = useMemo(
-    () => getClusterInstancetypeColumns(t, showClusterColumn),
-    [t, showClusterColumn],
+    () => getClusterInstancetypeColumns(t, showClusterColumn, showFamilyStatusColumn),
+    [t, showClusterColumn, showFamilyStatusColumn],
   );
 
   const { activeColumnKeys, loaded: loadedColumns } = useKubevirtTableColumns({
