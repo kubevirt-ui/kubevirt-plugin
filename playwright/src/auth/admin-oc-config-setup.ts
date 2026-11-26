@@ -3,6 +3,9 @@ import {
   patchKubevirtUserSettingsHideWelcomeForUser,
   pinKubeconfigToProcess,
 } from '@/utils/cluster-oc';
+import { ensureConsoleGuidedTourCompletedViaOc } from '@/utils/console-guided-tour';
+import { EnvVariables } from '@/utils/env-variables';
+import { listNonPrivTestUsers } from '@/utils/nonpriv-user-setup';
 import {
   enableDeclarativeHotplugVolumesOnCluster,
   enableDeployPasstNetworkBindingOnCluster,
@@ -42,4 +45,11 @@ export async function runAdminOcConfigMapSetup(
     options.userSettingsKey,
     options.cnvNamespace,
   );
+  // `console.guidedTour` for kubeadmin, the configured test user and every HTPasswd
+  // `test-users` account (including ones created in this run, before their first login).
+  ensureConsoleGuidedTourCompletedViaOc(kubeconfigPath, [
+    EnvVariables.username,
+    options.userSettingsKey,
+    ...listNonPrivTestUsers(kubeconfigPath),
+  ]);
 }

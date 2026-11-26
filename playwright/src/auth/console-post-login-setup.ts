@@ -1,3 +1,4 @@
+import { ensureConsoleGuidedTourCompletedViaConsoleProxy } from '@/utils/console-guided-tour';
 import { csrfTokenFromPlaywrightCookies } from '@/utils/console-kubernetes-proxy';
 import { patchConsoleUserSettingsViaConsoleProxy } from '@/utils/console-user-settings';
 import { EnvVariables } from '@/utils/env-variables';
@@ -73,6 +74,14 @@ export async function runConsolePostLoginSetup(
     await patchConsoleUserSettingsViaConsoleProxy(apiContext, origin, options.userSettingsKey, {
       csrfToken,
     });
+    // Privileged lanes run without `oc`: patch `console.guidedTour` for kubeadmin and the
+    // non-priv user through kubeadmin's console proxy (same payload as the admin oc patch).
+    await ensureConsoleGuidedTourCompletedViaConsoleProxy(
+      apiContext,
+      origin,
+      [EnvVariables.username, EnvVariables.testUsername],
+      { csrfToken },
+    );
     await patchKubevirtUserSettingsHideWelcomeViaConsoleProxy(apiContext, origin, {
       csrfToken,
       cnvNamespace: options.cnvNamespace,

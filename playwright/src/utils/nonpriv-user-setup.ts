@@ -39,6 +39,22 @@ function readHtpasswdFile(kubeconfig: string): string | undefined {
   }
 }
 
+/** Usernames currently provisioned by the `test-users` HTPasswd IDP (new and pre-existing). */
+export function listNonPrivTestUsers(kubeconfig: string): string[] {
+  const content = readHtpasswdFile(kubeconfig);
+  if (!content) {
+    return [];
+  }
+  return [
+    ...new Set(
+      content
+        .split('\n')
+        .map((line) => line.split(':')[0]?.trim())
+        .filter((username): username is string => Boolean(username)),
+    ),
+  ];
+}
+
 function writeHtpasswdSecret(content: string, kubeconfig: string): void {
   const tmp = path.join(os.tmpdir(), `pw-htpasswd-${Date.now()}`);
   fs.writeFileSync(tmp, content.endsWith('\n') ? content : `${content}\n`, 'utf8');

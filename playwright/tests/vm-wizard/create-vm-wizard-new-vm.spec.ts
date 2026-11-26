@@ -18,9 +18,8 @@ test.describe(
     }) => {
       await utils.withAllure({ suite: SUITE, feature: GATING, tags: [GATING_TAG, 'e2e-create'] });
 
-      // Cold `/vm-wizard` deep-links 404 until the kubevirt plugin is loaded; VmListPage
-      // primes via the namespace list and falls back to tree Create when needed.
       await vmListPage.openVmCreationWizard(testConfig.testNamespace);
+      await vmCreationWizardPage.selectLocationProject(testConfig.testNamespace);
       await vmCreationWizardPage.selectCreationMethod('newVm');
       await vmCreationWizardPage.ensureVmNameFilled();
       await vmCreationWizardPage.clickNext();
@@ -32,8 +31,6 @@ test.describe(
       await vmCreationWizardPage.selectFirstAvailableBootVolume();
       await vmCreationWizardPage.clickNext();
 
-      await vmCreationWizardPage.selectInstanceTypeSeries('u');
-      await vmCreationWizardPage.selectComputeSize('small');
       await vmCreationWizardPage.clickNext();
 
       await vmCreationWizardPage.clickNext();
@@ -60,11 +57,15 @@ test.describe(
       expect(vmName.length, 'VM name should be parsed from redirected URL').toBeGreaterThan(0);
       apiClient.trackResource('VirtualMachine', vmName, testConfig.testNamespace);
 
-      const nameVisible = await vmDetailPage.isVmNameVisible(
-        vmName,
-        utils.TestTimeouts.UI_ELEMENT_VISIBILITY,
-      );
-      expect(nameVisible, 'VM name should be visible on the detail page').toBe(true);
+      // The detail route loads before the VM resource resolves; the heading can stay a
+      // skeleton ("VM" + Loading) for several seconds, so poll instead of a one-shot check.
+      await expect
+        .poll(() => vmDetailPage.isVmNameVisible(vmName, utils.TestTimeouts.SHORT_WAIT), {
+          intervals: [1_000, 2_000, 3_000],
+          message: `VM detail heading should show ${vmName} after wizard completion`,
+          timeout: utils.TestTimeouts.UI_ELEMENT_VISIBILITY,
+        })
+        .toBe(true);
     });
   },
 );

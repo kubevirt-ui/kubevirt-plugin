@@ -1,13 +1,54 @@
+import { createHash } from 'crypto';
+
 import {
   type ConsoleProxyRequestOptions,
   getConsoleKubernetesProxyHeaders,
 } from '@/utils/console-kubernetes-proxy';
 import type { APIRequestContext } from '@playwright/test';
 
-const USER_SETTINGS_NAMESPACE = 'openshift-console-user-settings';
+export const USER_SETTINGS_NAMESPACE = 'openshift-console-user-settings';
 
 /** Console project picker default after login (merge-patch `console.lastNamespace`). */
 export const CONSOLE_LAST_NAMESPACE_ALL = 'all-namespaces';
+
+const KUBEADMIN_USERNAMES = ['kubeadmin', 'kube:admin', 'kube-admin'];
+
+export function isKubeadminUsername(username: string): boolean {
+  return KUBEADMIN_USERNAMES.includes(username);
+}
+
+/**
+ * Console 4.22 names user-settings ConfigMaps `user-settings-<sha256(username)>`;
+ * `kube:admin` is special-cased to `user-settings-kubeadmin`
+ * (`frontend/packages/console-shared/src/hooks/useUserSettings.ts`).
+ */
+export function consoleUserSettingsConfigMapName(username: string): string {
+  if (isKubeadminUsername(username)) {
+    return 'user-settings-kubeadmin';
+  }
+  return `user-settings-${createHash('sha256').update(username).digest('hex')}`;
+}
+
+/**
+ * Console grants each user access to their own ConfigMap through a `<cm>-role` Role
+ * restricted by `resourceNames` and a `<cm>-rolebinding` (see openshift/console
+ * `pkg/usersettings/helpers.go`). CMs we pre-create must ship that RBAC too, otherwise the
+ * console's first GET fails with 403 and the UI does not load.
+ */
+export function consoleUserSettingsRbac(username: string): {
+  configMapName: string;
+  roleBindingName: string;
+  roleName: string;
+  subjectName: string;
+} {
+  const configMapName = consoleUserSettingsConfigMapName(username);
+  return {
+    configMapName,
+    roleBindingName: `${configMapName}-rolebinding`,
+    roleName: `${configMapName}-role`,
+    subjectName: isKubeadminUsername(username) ? 'kube:admin' : username,
+  };
+}
 
 export function consoleUserSettingsPreferencesJson(): string {
   return JSON.stringify({

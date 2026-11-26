@@ -50,7 +50,10 @@ export default class FilterToolbarComponent extends BaseComponent {
   }
 
   async filterByName(name: string): Promise<void> {
-    const itemFilter = this.testId('item-filter');
+    // Tabbed lists (e.g. InstanceTypes) render one toolbar per tab panel and keep the
+    // inactive panel mounted but hidden — always target the visible input.
+    const itemFilter = this.consoleTestId('item-filter').filter({ visible: true }).first();
+    await itemFilter.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
     await itemFilter.clear();
     await itemFilter.fill(name);
     await itemFilter.press('Enter');

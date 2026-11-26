@@ -13,6 +13,7 @@ usage() {
 Usage: ./playwright-runner.sh <project> [playwright test args...]
 
 Projects (kubeadmin):
+  API | api                    browserless console-proxy API contract tests
   Gating | gating              @gating (excludes @cnv-settings / @migration)
   Tier1  | tier1 | t1          @tier1
   Tier2  | tier2 | t2          @tier2
@@ -28,8 +29,8 @@ Non-priv (test / test):
 Local console — inline IS_LOCAL=1 wins over IS_LOCAL=0 in .env:
   IS_LOCAL=1 ./playwright-runner.sh gating --workers=4
 
-CI debug harness (failures → skipped) — enabled by default via this runner:
-  CI_DEBUG=0 ./playwright-runner.sh tier1 --workers=4   # hard failures
+CI debug harness (failures → skipped) — API lane only (UI lanes always fail hard):
+  CI_DEBUG=1 ./playwright-runner.sh tier1 --workers=4   # opt in for a UI lane
 
 Examples:
   ./playwright-runner.sh gating --workers=4
@@ -44,13 +45,13 @@ EOF
 PROJECT="${1:-Gating}"
 shift || true
 
-# Opt-in harness: off for direct npx/scripts/run-playwright.sh; on for all runner tiers.
-export CI_DEBUG="${CI_DEBUG:-1}"
-
 case "${PROJECT}" in
   -h | --help | help)
     usage
     exit 0
+    ;;
+  api | API)
+    PROJECT="API"
     ;;
   gating | Gating)
     PROJECT="Gating"
@@ -87,6 +88,14 @@ case "${PROJECT}" in
     export HEADLESS="${HEADLESS:-true}"
     ;;
 esac
+
+# CI debug harness (failures → skipped) only for the API lane; UI lanes must report real
+# failures. An explicit CI_DEBUG in the environment still wins.
+if [[ "${PROJECT}" == "API" ]]; then
+  export CI_DEBUG="${CI_DEBUG:-1}"
+else
+  export CI_DEBUG="${CI_DEBUG:-0}"
+fi
 
 if [[ "${PROJECT}" != "auto" ]]; then
   exec ./scripts/run-playwright.sh "--project=${PROJECT}" "$@"
