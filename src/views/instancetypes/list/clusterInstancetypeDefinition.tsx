@@ -82,6 +82,7 @@ const getMemoryValue = (instanceType: V1beta1VirtualMachineClusterInstancetype):
 export const getClusterInstancetypeColumns = (
   t: TFunction,
   showClusterColumn: boolean,
+  showFamilyStatusColumn: boolean,
 ): ColumnConfig<V1beta1VirtualMachineClusterInstancetype>[] => [
   {
     getValue: (row) => getName(row) ?? '',
@@ -121,15 +122,21 @@ export const getClusterInstancetypeColumns = (
     label: t('Vendor'),
     renderCell: (row) => <VendorCell row={row} />,
   },
-  {
-    getValue: (row): string => {
-      const name = getName(row);
-      return name ? getInstanceTypePrefix(name) : '';
-    },
-    key: 'familyStatus',
-    label: t('Family status'),
-    renderCell: (row) => <FamilyStatusCell row={row} />,
-  },
+  ...(showFamilyStatusColumn
+    ? [
+        {
+          getValue: (row: V1beta1VirtualMachineClusterInstancetype): string => {
+            const name = getName(row);
+            return name ? getInstanceTypePrefix(name) : '';
+          },
+          key: 'familyStatus',
+          label: t('Family status'),
+          renderCell: (row: V1beta1VirtualMachineClusterInstancetype) => (
+            <FamilyStatusCell row={row} />
+          ),
+        },
+      ]
+    : []),
   {
     getValue: () => '',
     key: 'actions',
