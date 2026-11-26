@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import { FormProvider, useForm } from 'react-hook-form';
+import { FormProvider, useForm, useWatch } from 'react-hook-form';
 
 import useCanClonePVCFromNamespace from '@kubevirt-utils/hooks/useCanClonePVCFromNamespace';
 import { getNamespace } from '@kubevirt-utils/resources/shared';
@@ -44,13 +44,13 @@ const ClonePVCDiskModal: FC<V1SubDiskModalProps> = ({
   });
 
   const {
+    control,
     formState: { isSubmitting, isValid },
     handleSubmit,
-    watch,
   } = methods;
 
-  const sourceNamespace = watch(DATAVOLUME_PVC_NAMESPACE);
-  const vmCluster = watch(VM_CLUSTER_FIELD);
+  const sourceNamespace = useWatch({ control, name: DATAVOLUME_PVC_NAMESPACE });
+  const vmCluster = useWatch({ control, name: VM_CLUSTER_FIELD });
   const { blocksCloneAction } = useCanClonePVCFromNamespace(sourceNamespace, namespace, vmCluster);
   const hasClonePermission = isCreated || !blocksCloneAction;
 

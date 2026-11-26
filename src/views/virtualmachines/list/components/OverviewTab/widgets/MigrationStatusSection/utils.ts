@@ -5,9 +5,11 @@ import {
   versionMeetsMajorMinorThreshold,
 } from '@kubevirt-utils/version/versionUtils';
 
+import { COMPUTE_MIGRATIONS_PAGE_PATH } from '../../../../../../migrations/constants';
+
 export const MIGRATIONS_DURATION = DurationOption.ONE_DAY.toString();
 
-export const STANDALONE_MIGRATIONS_PAGE_PATH = 'virtualization-migrations';
+export const STANDALONE_MIGRATIONS_PAGE_PATH = COMPUTE_MIGRATIONS_PAGE_PATH;
 export const LEGACY_MIGRATIONS_PAGE_PATH = 'virtualization-overview/migrations';
 
 /**

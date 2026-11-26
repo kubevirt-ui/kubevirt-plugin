@@ -102,9 +102,9 @@ describe('getMigrationChartData', () => {
     ]);
 
     expect(chartData.map((item) => item.x)).toEqual([
+      vmimStatuses.Failed,
       vmimStatuses.Pending,
       vmimStatuses.Succeeded,
-      vmimStatuses.Failed,
     ]);
   });
 

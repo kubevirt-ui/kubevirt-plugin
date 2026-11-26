@@ -1,19 +1,20 @@
-import { type FC } from 'react';
-import xbytes from 'xbytes';
+import { type FC, useMemo } from 'react';
 
-import useResponsiveCharts from '@kubevirt-utils/components/Charts/hooks/useResponsiveCharts';
 import DurationOption from '@kubevirt-utils/components/DurationOption/DurationOption';
 import ErrorAlert from '@kubevirt-utils/components/ErrorAlert/ErrorAlert';
 import LoadingEmptyState from '@kubevirt-utils/components/LoadingEmptyState/LoadingEmptyState';
 import useCurrentTime from '@kubevirt-utils/hooks/useCurrentTime';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { Bullseye, Divider, Grid } from '@patternfly/react-core';
+import { multipliers } from '@kubevirt-utils/utils/unitConstants';
+import { Bullseye, Stack, StackItem } from '@patternfly/react-core';
 
-import MigrationsTimeAxis from './components/MigrationsTimeAxis';
 import MigrationsUtilizationChart from './components/MigrationsUtilizationChart';
+import { MIGRATIONS_OVERVIEW_CHART_HEIGHT } from './constants';
+import { formatOverviewTick, getOverviewAxis, getOverviewDomainX } from './overviewChartUtils';
 import useMigrationChartsData from './useMigrationChartsData';
-import { getDomainY, getLabel, getTickValuesAxisY } from './utils';
+import { getLabel } from './utils';
+
+import './BandwidthConsumptionCharts.scss';
 
 type BandwidthConsumptionChartsProps = {
   duration: string;
@@ -24,8 +25,6 @@ const BandwidthConsumptionCharts: FC<BandwidthConsumptionChartsProps> = ({ durat
 
   const currentTime = useCurrentTime();
   const timespan = DurationOption.getMilliseconds(duration);
-  const domainX: [number, number] = [currentTime - timespan, currentTime];
-  const { ref } = useResponsiveCharts();
 
   const {
     bandwidthConsumed,
@@ -38,53 +37,67 @@ const BandwidthConsumptionCharts: FC<BandwidthConsumptionChartsProps> = ({ durat
     migrationsCount,
   } = useMigrationChartsData(duration, currentTime, timespan);
 
+  const bandwidthYAxis = useMemo(
+    () => getOverviewAxis(maxBandwidthConsumed, multipliers.Mi),
+    [maxBandwidthConsumed],
+  );
+  const runningYAxis = useMemo(() => getOverviewAxis(maxMigrationCount, 1), [maxMigrationCount]);
+  const domainX = useMemo(
+    () =>
+      getOverviewDomainX([bandwidthConsumed, migrationsCount], currentTime - timespan, currentTime),
+    [bandwidthConsumed, currentTime, migrationsCount, timespan],
+  );
+
   const isLoading = !bandwidthLoaded || !countLoaded;
   const hasError = !!errorBandwidth || !!errorCount;
 
-  if (isLoading && !hasError) {
-    return (
-      <Bullseye>
-        <LoadingEmptyState />
-      </Bullseye>
-    );
-  }
-
-  if (hasError) {
-    return (
-      <Bullseye>
-        <ErrorAlert error={errorBandwidth || errorCount} />
-      </Bullseye>
-    );
-  }
-
   return (
-    <Grid ref={ref}>
-      {(!isEmpty(bandwidthConsumed) || !isEmpty(migrationsCount)) && (
-        <MigrationsTimeAxis domainX={domainX} timespan={timespan} />
+    <div className="migrations-bandwidth-charts">
+      <div className="migrations-bandwidth-charts__section-title">{t('Resources')}</div>
+      {isLoading && !hasError && (
+        <Bullseye>
+          <LoadingEmptyState />
+        </Bullseye>
       )}
-      <MigrationsUtilizationChart
-        chartData={bandwidthConsumed}
-        domain={{
-          x: domainX,
-          y: getDomainY(maxBandwidthConsumed),
-        }}
-        labels={getLabel(timespan, bandwidthConsumed, true)}
-        tickFormat={(yValue) => xbytes(yValue, { fixed: 0, iec: true, prefixIndex: 3 })}
-        tickValues={getTickValuesAxisY(maxBandwidthConsumed)}
-        title={t('Bandwidth consumption')}
-      />
-      <Divider />
-      <MigrationsUtilizationChart
-        chartData={migrationsCount}
-        domain={{
-          x: domainX,
-          y: getDomainY(maxMigrationCount, 1),
-        }}
-        labels={getLabel(timespan, migrationsCount)}
-        tickValues={getTickValuesAxisY(maxMigrationCount, 1)}
-        title={t('Running migrations')}
-      />
-    </Grid>
+      {hasError && (
+        <Bullseye>
+          <ErrorAlert error={errorBandwidth || errorCount} />
+        </Bullseye>
+      )}
+      {!isLoading && !hasError && (
+        <Stack>
+          <StackItem isFilled={false}>
+            <MigrationsUtilizationChart
+              chartData={bandwidthConsumed}
+              chartHeight={MIGRATIONS_OVERVIEW_CHART_HEIGHT}
+              domain={{
+                x: domainX,
+                y: bandwidthYAxis.domainY,
+              }}
+              labels={getLabel(timespan, bandwidthConsumed, true)}
+              tickFormat={(yValue) => formatOverviewTick(yValue, multipliers.Mi)}
+              tickValues={bandwidthYAxis.tickValues}
+              title={t('Bandwidth consumption')}
+              yAxisUnit={t('MiB/s')}
+            />
+          </StackItem>
+          <StackItem isFilled={false}>
+            <MigrationsUtilizationChart
+              chartData={migrationsCount}
+              chartHeight={MIGRATIONS_OVERVIEW_CHART_HEIGHT}
+              domain={{
+                x: domainX,
+                y: runningYAxis.domainY,
+              }}
+              labels={getLabel(timespan, migrationsCount)}
+              tickFormat={(yValue) => formatOverviewTick(yValue, 1)}
+              tickValues={runningYAxis.tickValues}
+              title={t('Running migrations')}
+            />
+          </StackItem>
+        </Stack>
+      )}
+    </div>
   );
 };
 

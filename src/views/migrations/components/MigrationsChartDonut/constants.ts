@@ -11,19 +11,21 @@ import chart_color_orange_500 from '@patternfly/react-tokens/dist/esm/chart_colo
 import chart_color_red_orange_300 from '@patternfly/react-tokens/dist/esm/chart_color_red_orange_300';
 import chart_color_teal_300 from '@patternfly/react-tokens/dist/esm/chart_color_teal_300';
 
+export const MIGRATIONS_DONUT_SIZE_PX = 150;
+
 export const defaultMigrationStatusColor = chart_color_black_400.value;
 
 export const migrationChartStatusOrder: string[] = [
-  vmimStatuses.Pending,
-  vmimStatuses.WaitingForSync,
-  vmimStatuses.Synchronizing,
-  vmimStatuses.Scheduling,
-  vmimStatuses.Scheduled,
-  vmimStatuses.PreparingTarget,
-  vmimStatuses.TargetReady,
-  vmimStatuses.Running,
-  vmimStatuses.Succeeded,
   vmimStatuses.Failed,
+  vmimStatuses.Pending,
+  vmimStatuses.PreparingTarget,
+  vmimStatuses.Running,
+  vmimStatuses.Scheduled,
+  vmimStatuses.Scheduling,
+  vmimStatuses.Succeeded,
+  vmimStatuses.Synchronizing,
+  vmimStatuses.TargetReady,
+  vmimStatuses.WaitingForSync,
 ];
 
 export const migrationStatusColorMap: { [status: string]: string } = {

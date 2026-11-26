@@ -2,10 +2,13 @@ import { type TFunction } from 'i18next';
 
 import { idIsHighlighted } from '@kubevirt-utils/components/SearchItem/useIsHighlighted';
 import { VIRTUALIZATION_PATHS } from '@kubevirt-utils/constants/constants';
+import { getNamespacePathSegment } from '@kubevirt-utils/utils/utils';
 import {
   type SearchItem,
   type SearchItemWithTab,
 } from '@virtualmachines/details/tabs/configuration/utils/search';
+
+import { SETTINGS_TABS } from '../tabs';
 
 import {
   CLUSTER_TAB_IDS,
@@ -105,6 +108,12 @@ export const createSettingsSearchURL = (
   const prefix =
     index === -1 ? pathname.substring(0, pathname.lastIndexOf('/') + 1) : pathname.slice(0, index);
   return `${prefix}${settingsPath}/${tab}#${elementId}`;
+};
+
+/** Cluster Settings → General settings → Live migration (scroll target via hash). */
+export const getLiveMigrationSettingsURL = (activeNamespace: string): string => {
+  const nsPath = getNamespacePathSegment(activeNamespace);
+  return `/k8s/${nsPath}/${VIRTUALIZATION_PATHS.SETTINGS}/${SETTINGS_TABS.CLUSTER}#${CLUSTER_TAB_IDS.liveMigration}`;
 };
 
 export const isSearchItemChildrenHighlighted = (itemId: string, hash: string): boolean => {

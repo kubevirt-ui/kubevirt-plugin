@@ -27,12 +27,18 @@ $BORDER: var(--pf-t--global--border--width--regular) solid
     padding: 0 var(--pf-t--global--spacer--xl);
   }
 
-  &__graph-separator {
-    border-right: $BORDER;
+  &__overview-divider {
+    @media (width >= 992px) {
+      align-self: stretch;
+      display: flex;
+    }
   }
 
-  &__resources {
-    margin-left: var(--pf-t--global--spacer--xl);
+  &__overview-divider-flex {
+    @media (width >= 992px) {
+      height: 100%;
+      width: 100%;
+    }
   }
 
   .co-utilization-card__item-description {
@@ -45,6 +51,11 @@ $BORDER: var(--pf-t--global--border--width--regular) solid
 
   .pf-v6-c-card__footer {
     padding-bottom: 0;
+  }
+
+  &__migrations-chart-body {
+    display: flex;
+    justify-content: center;
   }
 
   &__live-settings {
