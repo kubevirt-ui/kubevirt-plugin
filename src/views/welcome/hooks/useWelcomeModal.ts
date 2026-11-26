@@ -42,7 +42,7 @@ const useWelcomeModal = (): UseWelcomeModalReturn => {
   };
 
   const onDontShowAgainCheckboxChange = (event: ChangeEvent<HTMLInputElement>): void => {
-    void setQuickStarts({
+    setQuickStarts({
       ...quickStarts,
       dontShowWelcomeModal: event.target.checked,
     });

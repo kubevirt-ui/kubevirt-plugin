@@ -30,7 +30,7 @@ const useKubevirtUserSettingsTableColumnWidths = (
     (columnId: string, width: number) => {
       if (!setColumnWidthsByTable) return;
       const tableWidths = columnWidthsByTable?.[tableId] ?? {};
-      void setColumnWidthsByTable({
+      setColumnWidthsByTable({
         ...columnWidthsByTable,
         [tableId]: { ...tableWidths, [columnId]: width },
       });
@@ -46,7 +46,7 @@ const useKubevirtUserSettingsTableColumnWidths = (
   const resetColumnWidths = useCallback(() => {
     if (!setColumnWidthsByTable || !columnWidthsByTable?.[tableId]) return;
     const { [tableId]: _removed, ...remainingTables } = columnWidthsByTable;
-    void setColumnWidthsByTable(remainingTables);
+    setColumnWidthsByTable(remainingTables);
   }, [columnWidthsByTable, setColumnWidthsByTable, tableId]);
 
   return { columnWidths, loaded, persistColumnWidth, resetColumnWidths };

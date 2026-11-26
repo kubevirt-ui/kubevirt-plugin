@@ -1,7 +1,8 @@
 /**
  * KubeVirt plugin user settings live in the SDK user preferences (CNV-100983): the per-user console
  * ConfigMap `openshift-console-user-settings/user-settings-<user>`, one data key per setting,
- * named `kubevirt.<setting>` (`kubevirt.ssh.<cluster>` for SSH keys of ACM spoke clusters).
+ * named `kubevirt.<setting>` (`kubevirt.ssh.<cluster>` for SSH keys of ACM spoke clusters only; the
+ * local cluster and the ACM hub cluster share `kubevirt.ssh`, so never pass the hub name as `cluster`).
  * The legacy shared `openshift-cnv/kubevirt-user-settings` ConfigMap is no longer used by the plugin.
  */
 

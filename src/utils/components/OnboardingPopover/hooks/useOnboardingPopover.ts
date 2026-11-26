@@ -43,7 +43,7 @@ const useOnboardingPopover = ({
 
   const dismiss = useCallback(() => {
     dismissedPopoverKeysSignal.value = new Set([...dismissedPopoverKeysSignal.value, popoverKey]);
-    void setOnboardingPopoversHidden({ ...onboardingPopoversHidden, [popoverKey]: true });
+    setOnboardingPopoversHidden({ ...onboardingPopoversHidden, [popoverKey]: true });
   }, [onboardingPopoversHidden, popoverKey, setOnboardingPopoversHidden]);
 
   return { dismiss, isVisible };
