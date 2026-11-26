@@ -1,11 +1,11 @@
 import { NONPRIV_TAG, T1, T1_TAG, VM_LIST_TAG } from '@/data-models/allure-constants';
+import { ROUTE_VIRTUAL_MACHINES_LIST_TAG } from '@/data-models/route-tags';
 import { expect, test } from '@/fixtures/vm-search-fixture';
 import SettingsPage from '@/page-objects/settings/settings-page';
 import type VirtualMachinesPage from '@/page-objects/vm/virtual-machines-page';
 import { TestTimeouts } from '@/utils/test-config';
 import { setupTestNamespace } from '@/utils/test-setup-helpers';
 import { cleanupVmFixtures, createHaltedVm } from '@/utils/vm-search-test-helpers';
-import { ROUTE_VIRTUAL_MACHINES_LIST_TAG } from '@/data-models/route-tags';
 
 const SUITE = 'VirtIO drivers alert';
 
@@ -57,27 +57,68 @@ test.describe(SUITE, { tag: [ROUTE_VIRTUAL_MACHINES_LIST_TAG, T1_TAG, NONPRIV_TA
     }
   });
 
-  test('Alert is shown only when a Windows VM is in the list', async ({ vmListPage, utils }) => {
+  test.beforeEach(async ({ vmListPage }) => {
+    // Alert is driven by Prometheus recording rule series, not VM OS labels.
+    await vmListPage.virtioAlert.mockOutdatedVirtioDrivers([
+      { name: windowsVm, namespace: windowsNs },
+    ]);
+  });
+
+  test('Count-based alert is shown only when Prometheus reports outdated VirtIO drivers', async ({
+    vmListPage,
+    utils,
+  }) => {
     await utils.withAllure({
       suite: SUITE,
       feature: T1,
       tags: [T1_TAG, VM_LIST_TAG, NONPRIV_TAG],
     });
 
-    await test.step('Linux-only namespace does not show the VirtIO drivers alert', async () => {
+    await test.step('Namespace without outdated-driver series does not show the alert', async () => {
       await openNamespaceVmList(vmListPage, linuxNs, linuxVm);
       const alertVisible = await vmListPage.virtioAlert.isVisible(TestTimeouts.SHORT_WAIT);
-      expect.soft(alertVisible, 'Alert should be hidden when no Windows VM is listed').toBe(false);
+      expect.soft(alertVisible, 'Alert should be hidden when no outdated series match').toBe(false);
     });
 
-    await test.step('Windows namespace shows the VirtIO drivers alert', async () => {
+    await test.step('Namespace with outdated-driver series shows the main alert', async () => {
       await openNamespaceVmList(vmListPage, windowsNs, windowsVm);
-      const alertVisible = await vmListPage.virtioAlert.isVisible();
-      expect.soft(alertVisible, 'Alert should be visible when a Windows VM is listed').toBe(true);
+      const mainVariantVisible = await vmListPage.virtioAlert.isMainVariantVisible();
+      expect
+        .soft(mainVariantVisible, 'Count-based alert should be visible when outdated series match')
+        .toBe(true);
     });
   });
 
-  test('Go to Downloads opens the Downloads tab with the Download ISO button', async ({
+  test('Backup alert is shown for a Windows VM when the Prometheus count is unavailable', async ({
+    vmListPage,
+    utils,
+  }) => {
+    await utils.withAllure({
+      suite: SUITE,
+      feature: T1,
+      tags: [T1_TAG, VM_LIST_TAG, NONPRIV_TAG],
+    });
+
+    await vmListPage.virtioAlert.mockPrometheusQueryError();
+
+    await test.step('Namespace without a Windows VM does not show the backup alert', async () => {
+      await openNamespaceVmList(vmListPage, linuxNs, linuxVm);
+      const alertVisible = await vmListPage.virtioAlert.isVisible(TestTimeouts.SHORT_WAIT);
+      expect
+        .soft(alertVisible, 'Backup alert should be hidden when the list has no Windows VM')
+        .toBe(false);
+    });
+
+    await test.step('Namespace with a Windows VM shows the backup alert', async () => {
+      await openNamespaceVmList(vmListPage, windowsNs, windowsVm);
+      const backupVariantVisible = await vmListPage.virtioAlert.isBackupVariantVisible();
+      expect
+        .soft(backupVariantVisible, 'Backup alert should be visible for a Windows VM')
+        .toBe(true);
+    });
+  });
+
+  test('"Get updated drivers" button opens the Downloads tab with the Download ISO button', async ({
     page,
     vmListPage,
     utils,
@@ -96,8 +137,8 @@ test.describe(SUITE, { tag: [ROUTE_VIRTUAL_MACHINES_LIST_TAG, T1_TAG, NONPRIV_TA
       expect(alertVisible, 'Alert should be visible before navigating to Downloads').toBe(true);
     });
 
-    await test.step('Click Go to Downloads and land on the Downloads tab', async () => {
-      await vmListPage.virtioAlert.clickGoToDownloads();
+    await test.step('Click "Get updated drivers" and land on the Downloads tab', async () => {
+      await vmListPage.virtioAlert.clickGetUpdatedDrivers();
       await expect
         .poll(() => page.url(), {
           timeout: TestTimeouts.NAVIGATION,

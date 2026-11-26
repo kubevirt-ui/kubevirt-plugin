@@ -166,6 +166,12 @@ const tsConfigs = tseslint.configs.recommended.map((config) => ({
       { format: ['PascalCase', 'UPPER_CASE'], selector: 'enum' },
       { format: ['PascalCase', 'UPPER_CASE'], selector: 'enumMember' },
       { format: null, selector: 'property' },
+      {
+        format: ['camelCase', 'PascalCase'],
+        modifiers: ['destructured'],
+        selector: 'parameter',
+        leadingUnderscore: 'allow',
+      },
       { format: ['camelCase'], leadingUnderscore: 'allow', selector: 'parameter' },
       { format: null, selector: 'import' },
     ],

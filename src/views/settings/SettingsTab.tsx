@@ -1,7 +1,7 @@
-import { createElement, type FC } from 'react';
+import { type FC } from 'react';
 import classNames from 'classnames';
 
-import { Card, Tab, Tabs, TabTitleText } from '@patternfly/react-core';
+import { Card, Tab, Tabs, TabTitleIcon, TabTitleText } from '@patternfly/react-core';
 
 import { useSettingsTabs } from './hooks/useSettingsTabs';
 
@@ -15,20 +15,29 @@ const SettingsTab: FC = () => {
     <div className="settings-tab__layout">
       <div className="settings-tab__tabs-wrapper">
         <Tabs activeKey={activeTab} className="settings-tab__tabs">
-          {tabs.map(({ name, title }) => (
+          {tabs.map(({ name, title, TitleIcon }) => (
             <Tab
               data-test={`settings-tab-${name}`}
               eventKey={name}
               key={name}
               onClick={() => redirectTab(name)}
-              title={<TabTitleText>{title}</TabTitleText>}
+              title={
+                <>
+                  <TabTitleText>{title}</TabTitleText>
+                  {TitleIcon && (
+                    <TabTitleIcon>
+                      <TitleIcon />
+                    </TabTitleIcon>
+                  )}
+                </>
+              }
             />
           ))}
         </Tabs>
       </div>
       <div className="settings-tab__scrollable">
         <Card className="settings-tab__card">
-          {tabs.map(({ Component: tabComponent, dataTest, isFullWidth, name }) =>
+          {tabs.map(({ Component, dataTest, isFullWidth, name }) =>
             activeTab === name ? (
               <div
                 className={classNames('settings-tab__content', {
@@ -37,7 +46,7 @@ const SettingsTab: FC = () => {
                 data-test={dataTest}
                 key={name}
               >
-                {createElement(tabComponent)}
+                <Component />
               </div>
             ) : null,
           )}

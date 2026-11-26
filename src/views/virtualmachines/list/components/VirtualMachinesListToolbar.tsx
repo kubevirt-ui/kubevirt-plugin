@@ -75,7 +75,11 @@ const VirtualMachinesListToolbar: FC<VirtualMachinesListToolbarProps> = ({
         inputRef={searchInputRef}
         onSetFilters={handleSetFilters}
       />
-      <VirtIODriversAlert vms={vmsToShow} />
+      <VirtIODriversAlert
+        clearAllFiltersWithReset={clearAllFiltersWithReset}
+        handleSetFilters={handleSetFilters}
+        vms={vmsToShow}
+      />
       <VirtualMachineFilterToolbar
         className="list-managment-group__toolbar"
         clearAllFilters={clearAllFiltersWithReset}

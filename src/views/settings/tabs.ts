@@ -2,6 +2,7 @@ import type { FC } from 'react';
 import type { TFunction } from 'i18next';
 
 import ClusterTab from './tabs/ClusterTab/ClusterTab';
+import DownloadsTabWarningIcon from './tabs/DownloadsTab/components/DownloadsTabWarningIcon';
 import DownloadsTab from './tabs/DownloadsTab/DownloadsTab';
 import PreviewFeaturesTab from './tabs/PreviewFeaturesTab/PreviewFeaturesTab';
 import RecommendedCapabilitiesTab from './tabs/RecommendedCapabilitiesTab/RecommendedCapabilitiesTab';
@@ -26,6 +27,7 @@ export type SettingsTabConfig = {
   isFullWidth?: boolean;
   name: SettingsTab;
   title: string;
+  TitleIcon?: FC;
 };
 
 export const getTabs = (canManageClusterSettings: boolean, t: TFunction): SettingsTabConfig[] => [
@@ -64,5 +66,6 @@ export const getTabs = (canManageClusterSettings: boolean, t: TFunction): Settin
     isEnabled: true,
     name: SETTINGS_TABS.DOWNLOADS,
     title: t('Downloads'),
+    TitleIcon: DownloadsTabWarningIcon,
   },
 ];

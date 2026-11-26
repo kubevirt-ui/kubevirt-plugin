@@ -32,7 +32,7 @@ export const isAllNamespaces = (namespace: string | undefined): boolean =>
 export const getValidNamespace = (activeNamespace: string): string =>
   activeNamespace === ALL_NAMESPACES_SESSION_KEY ? DEFAULT_NAMESPACE : activeNamespace;
 
-export const getNamespacePathSegment = (namespace: string): string =>
+export const getNamespacePathSegment = (namespace: string | undefined): string =>
   isAllNamespaces(namespace) ? ALL_NAMESPACES : `ns/${namespace}`;
 
 export const isEmpty = (obj: unknown): boolean =>
