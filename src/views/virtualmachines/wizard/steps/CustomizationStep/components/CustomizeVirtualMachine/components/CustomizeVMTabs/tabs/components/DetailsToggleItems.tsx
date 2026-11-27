@@ -5,7 +5,6 @@ import type { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/DescriptionItem';
 import HeadlessMode from '@kubevirt-utils/components/HeadlessMode/HeadlessMode';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
-import PanicDeviceDescriptionItem from '@kubevirt-utils/components/PanicDeviceDescriptionItem/PanicDeviceDescriptionItem';
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { getName } from '@kubevirt-utils/resources/shared';
@@ -17,6 +16,7 @@ import { VM_DELETION_PROTECTION_LABEL } from '@virtualmachines/details/tabs/conf
 import { VMDeletionProtectionOptions } from '@virtualmachines/details/tabs/configuration/details/components/DeletionProtection/utils/types';
 import { useWizardVMDraft } from '@virtualmachines/wizard/hooks/useWizardVMDraft';
 
+import WizardDetailsPanicDetectionToggleItem from './WizardDetailsPanicDetectionToggleItem';
 import WizardDetailsVSOCKToggleItem from './WizardDetailsVSOCKToggleItem';
 
 type DetailsToggleItemsProps = {
@@ -78,7 +78,7 @@ const DetailsToggleItems: FC<DetailsToggleItemsProps> = ({
         promptType={OLSPromptType.HEADLESS_MODE}
       />
       <WizardDetailsVSOCKToggleItem />
-      <PanicDeviceDescriptionItem vm={vm} />
+      <WizardDetailsPanicDetectionToggleItem />
       <DescriptionItem
         bodyContent={t(
           "Enables access to the VirtualMachine's guest system log. Wait a few seconds for logging to start before viewing the log.",

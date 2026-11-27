@@ -3,7 +3,11 @@ import type { TFunction } from 'i18next';
 import type { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { ANNOTATIONS } from '@kubevirt-utils/resources/template';
 
-import { getEffectivePanicDevices, getPanicDeviceDisplayState } from './helpers';
+import {
+  getDefaultPanicDeviceModel,
+  getEffectivePanicDevices,
+  getPanicDeviceDisplayState,
+} from './helpers';
 
 const t = ((key: string) => key) as TFunction;
 
@@ -233,5 +237,20 @@ describe('getPanicDeviceDisplayState', () => {
 
       expect(showWindowsWarning).toBe(false);
     });
+  });
+});
+
+describe('getDefaultPanicDeviceModel', () => {
+  it('should prefer the preference model when provided', () => {
+    expect(getDefaultPanicDeviceModel(createVM(), 'hyperv')).toBe('hyperv');
+  });
+
+  it('should use hyperv for Windows VMs without a preference model', () => {
+    expect(getDefaultPanicDeviceModel(createVM('win10'))).toBe('hyperv');
+  });
+
+  it('should use pvpanic for non-Windows VMs without a preference model', () => {
+    expect(getDefaultPanicDeviceModel(createVM('rhel9'))).toBe('pvpanic');
+    expect(getDefaultPanicDeviceModel(createVM())).toBe('pvpanic');
   });
 });

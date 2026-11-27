@@ -2,18 +2,24 @@ import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTransla
 import usePreference from '@kubevirt-utils/resources/preference/hooks/usePreference';
 import { getPreferredPanicDeviceModel } from '@kubevirt-utils/resources/preference/selectors';
 import { getName } from '@kubevirt-utils/resources/shared';
-import { getPanicDevices } from '@kubevirt-utils/resources/vm';
+import { getPanicDevices, isPanicDetectionEnabled } from '@kubevirt-utils/resources/vm';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
 
-import { getEffectivePanicDevices, getPanicDeviceDisplayState } from '../utils/helpers';
+import {
+  getDefaultPanicDeviceModel,
+  getEffectivePanicDevices,
+  getPanicDeviceDisplayState,
+} from '../utils/helpers';
 import type { PanicDeviceDescriptionItemProps } from '../utils/types';
 import useHasPanicDeviceMetric from './useHasPanicDeviceMetric';
 
 const usePanicDeviceDescriptionState = ({
   vm,
   vmi,
-}: PanicDeviceDescriptionItemProps): {
+}: Pick<PanicDeviceDescriptionItemProps, 'vm' | 'vmi'>): {
+  isChecked: boolean;
   isPending: boolean;
+  panicDeviceModel: string;
   showWindowsWarning: boolean;
   statusText: string;
   vmName: string;
@@ -46,7 +52,9 @@ const usePanicDeviceDescriptionState = ({
   });
 
   return {
+    isChecked: isPanicDetectionEnabled(vm),
     isPending,
+    panicDeviceModel: getDefaultPanicDeviceModel(vm, preferredPanicDeviceModel),
     showWindowsWarning,
     statusText,
     vmName: getName(vm) ?? '',
