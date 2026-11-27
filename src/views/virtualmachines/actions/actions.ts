@@ -22,6 +22,8 @@ import {
 } from '@multicluster/k8sRequests';
 import { consoleFetch, type K8sModel } from '@openshift-console/dynamic-plugin-sdk';
 
+import { applyDefaultRunStrategyToHaltedVM } from './startVMRunStrategy';
+
 export enum VMActionType {
   AddVolume = 'addvolume',
   Pause = 'pause',
@@ -88,8 +90,10 @@ export const VMActionRequest = async (
   }
 };
 
-export const startVM = async (vm: V1VirtualMachine): Promise<string | undefined> =>
-  VMActionRequest(vm, VMActionType.Start, VirtualMachineModel);
+export const startVM = async (vm: V1VirtualMachine): Promise<string | undefined> => {
+  if (!(await applyDefaultRunStrategyToHaltedVM(vm))) return;
+  return VMActionRequest(vm, VMActionType.Start, VirtualMachineModel);
+};
 export const stopVM = async (
   vm: V1VirtualMachine,
   body?: V1StopOptions,
