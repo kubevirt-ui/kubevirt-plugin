@@ -64,11 +64,26 @@ export const storageSection: EncodedExtension[] = [
       section: 'storage-virt-perspective',
     },
     type: 'console.navigation/resource-ns',
-  },
+  } as EncodedExtension<ResourceNSNavItem>,
+  {
+    properties: {
+      id: 'datavolumes-virt-perspective',
+      insertAfter: 'persistentvolumeclaims-virt-perspective',
+      model: {
+        group: 'cdi.kubevirt.io',
+        kind: 'DataVolume',
+        version: 'v1beta1',
+      },
+      name: '%plugin__kubevirt-plugin~DataVolumes%',
+      perspective: PERSPECTIVES.VIRTUALIZATION,
+      section: 'storage-virt-perspective',
+    },
+    type: 'console.navigation/resource-ns',
+  } as EncodedExtension<ResourceNSNavItem>,
   {
     properties: {
       id: 'storageclasses-virt-perspective',
-      insertAfter: 'persistentvolumeclaims-virt-perspective',
+      insertAfter: 'datavolumes-virt-perspective',
       model: {
         group: 'storage.k8s.io',
         kind: 'StorageClass',

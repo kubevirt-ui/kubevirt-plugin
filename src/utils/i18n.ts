@@ -36,6 +36,7 @@
 // t('plugin__kubevirt-plugin~Storage IOPS')
 // t('plugin__kubevirt-plugin~PersistentVolumes')
 // t('plugin__kubevirt-plugin~PersistentVolumeClaims')
+// t('plugin__kubevirt-plugin~DataVolumes')
 // t('plugin__kubevirt-plugin~StorageClasses')
 // t('plugin__kubevirt-plugin~MachineHealthChecks')
 // t('plugin__kubevirt-plugin~MachineConfigs')
