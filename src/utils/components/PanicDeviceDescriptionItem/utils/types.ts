@@ -1,7 +1,4 @@
-import type {
-  V1VirtualMachine,
-  V1VirtualMachineInstance,
-} from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import type { V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 
 export type PanicDeviceDescriptionItemProps = {
   disabledTooltipText?: string;
@@ -11,5 +8,4 @@ export type PanicDeviceDescriptionItemProps = {
     panicDeviceModel: string,
   ) => Promise<V1VirtualMachine | void>;
   vm: V1VirtualMachine;
-  vmi?: V1VirtualMachineInstance;
 };

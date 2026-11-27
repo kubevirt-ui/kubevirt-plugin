@@ -126,24 +126,20 @@ export const updatePanicDetection = (
 ): Promise<V1VirtualMachine> => {
   const hasPanicDevices = getPanicDevices(updatedVM) !== undefined;
 
-  if (!checked) {
-    if (!hasPanicDevices) {
-      return Promise.resolve(updatedVM);
-    }
-
-    return patchVM(updatedVM, [
-      {
-        op: K8S_OPS.REMOVE,
-        path: PANIC_DEVICES_PATH,
-      },
-    ]);
+  if (!checked && !hasPanicDevices) {
+    return Promise.resolve(updatedVM);
   }
 
-  return patchVM(updatedVM, [
-    {
-      op: hasPanicDevices ? K8S_OPS.REPLACE : K8S_OPS.ADD,
-      path: PANIC_DEVICES_PATH,
-      value: [{ model: panicDeviceModel }],
-    },
-  ]);
+  const patch = checked
+    ? {
+        op: hasPanicDevices ? K8S_OPS.REPLACE : K8S_OPS.ADD,
+        path: PANIC_DEVICES_PATH,
+        value: [{ model: panicDeviceModel }],
+      }
+    : {
+        op: K8S_OPS.REMOVE,
+        path: PANIC_DEVICES_PATH,
+      };
+
+  return patchVM(updatedVM, [patch]);
 };

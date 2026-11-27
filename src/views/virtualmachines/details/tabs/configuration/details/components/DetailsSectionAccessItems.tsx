@@ -56,7 +56,6 @@ const DetailsSectionAccessItems: FC<DetailsSectionAccessItemsProps> = ({
           updatePanicDetection(vm, checked, panicDeviceModel)
         }
         vm={vm}
-        vmi={vmi}
       />
       <GuestSystemLogAccessDescriptionItem
         canUpdateVM={canUpdateVM}
