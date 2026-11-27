@@ -21,7 +21,7 @@ const config: Config.InitialOptions = {
       '<rootDir>/__mocks__/useKubevirtTranslation.ts',
     '@console/*': '<rootDir>/__mocks__/dummy.ts',
     '@stolostron/multicluster-sdk': '<rootDir>/__mocks__/multicluster-sdk.ts',
-    '\\.(css|less|scss|svg)$': '<rootDir>/__mocks__/dummy.ts',
+    '\\.(css|less|scss)$': '<rootDir>/__mocks__/dummy.ts',
     'react-i18next': '<rootDir>/__mocks__/react-i18next.ts',
     'react-redux': '<rootDir>/__mocks__/react-redux.ts',
     'react-router': '<rootDir>/__mocks__/react-router.ts',
@@ -41,6 +41,7 @@ const config: Config.InitialOptions = {
   ],
   testRegex: '.*\\.test\\.(ts|tsx|js|jsx)$',
   transform: {
+    '^.+\\.svg$': '<rootDir>/__mocks__/svgTransform.js',
     '^.+\\.[t|j]sx?$': ['ts-jest', tsJestOptions],
   },
   transformIgnorePatterns: [
