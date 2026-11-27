@@ -16,11 +16,7 @@ import {
 
 import EnablePanicDetection from './EnablePanicDetection';
 import usePanicDeviceDescriptionState from './hooks/usePanicDeviceDescriptionState';
-import {
-  PANIC_DETECTION_SEARCH_ID,
-  PANIC_DEVICES_BREADCRUMB,
-  PANIC_DEVICES_SEARCH_ID,
-} from './utils/constants';
+import { PANIC_DETECTION_BREADCRUMB, PANIC_DETECTION_SEARCH_ID } from './utils/constants';
 import { getPanicDetectionHelpText } from './utils/helpers';
 import type { PanicDeviceDescriptionItemProps } from './utils/types';
 
@@ -47,7 +43,7 @@ const PanicDeviceDescriptionItem: FC<PanicDeviceDescriptionItemProps> = ({
   return (
     <DescriptionItem
       bodyContent={getPanicDetectionHelpText(t)}
-      breadcrumb={PANIC_DEVICES_BREADCRUMB}
+      breadcrumb={PANIC_DETECTION_BREADCRUMB}
       data-test={`${vmName}-${PANIC_DETECTION_SEARCH_ID}`}
       descriptionData={
         <Flex alignItems={{ default: 'alignItemsCenter' }} spaceItems={{ default: 'spaceItemsSm' }}>
@@ -66,7 +62,7 @@ const PanicDeviceDescriptionItem: FC<PanicDeviceDescriptionItemProps> = ({
               <Tooltip content={recommendedForWindows}>
                 <Button
                   aria-label={recommendedForWindows}
-                  data-test={`${vmName}-${PANIC_DEVICES_SEARCH_ID}-warning`}
+                  data-test={`${vmName}-${PANIC_DETECTION_SEARCH_ID}-warning`}
                   icon={<YellowExclamationTriangleIcon />}
                   variant={ButtonVariant.plain}
                 />
