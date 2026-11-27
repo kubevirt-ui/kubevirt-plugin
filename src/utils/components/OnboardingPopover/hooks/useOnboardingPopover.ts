@@ -1,6 +1,7 @@
 import { useCallback } from 'react';
 
 import useKubevirtUserSettings from '@kubevirt-utils/hooks/useKubevirtUserSettings/useKubevirtUserSettings';
+import { USER_SETTINGS_KEYS } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/const';
 import { useSignals } from '@preact/signals-react/runtime';
 
 import { dismissedPopoverKeysSignal } from '../onboardingSignals';
@@ -24,29 +25,26 @@ const useOnboardingPopover = ({
   triggerElement,
 }: UseOnboardingPopoverArgs): UseOnboardingPopoverReturn => {
   useSignals();
-  const [userSettings, setUserSettings, userSettingsLoaded, userSettingsError] =
-    useKubevirtUserSettings();
-  const onboardingPopoversHidden = userSettings?.onboardingPopoversHidden;
+  const [onboardingPopoversHidden, setOnboardingPopoversHidden, onboardingLoaded] =
+    useKubevirtUserSettings(USER_SETTINGS_KEYS.onboardingPopoversHidden);
+  const [quickStart, , quickStartLoaded] = useKubevirtUserSettings(USER_SETTINGS_KEYS.quickStart);
 
-  const tourStepsSeen = getTourStepsSeen(userSettings?.quickStart);
+  const tourStepsSeen = getTourStepsSeen(quickStart);
   const isCoveredByTour = isCoveredByTourSteps(coveredByTourSteps, tourStepsSeen);
 
   const isVisible = isPopoverVisible({
     isCoveredByTour,
+    onboardingPopoversHidden,
     popoverKey,
+    quickStart,
     triggerElement,
-    userSettings,
-    userSettingsError,
-    userSettingsLoaded,
+    userSettingsLoaded: onboardingLoaded && quickStartLoaded,
   });
 
   const dismiss = useCallback(() => {
     dismissedPopoverKeysSignal.value = new Set([...dismissedPopoverKeysSignal.value, popoverKey]);
-    void setUserSettings({
-      ...userSettings,
-      onboardingPopoversHidden: { ...onboardingPopoversHidden, [popoverKey]: true },
-    });
-  }, [onboardingPopoversHidden, popoverKey, setUserSettings, userSettings]);
+    setOnboardingPopoversHidden({ ...onboardingPopoversHidden, [popoverKey]: true });
+  }, [onboardingPopoversHidden, popoverKey, setOnboardingPopoversHidden]);
 
   return { dismiss, isVisible };
 };

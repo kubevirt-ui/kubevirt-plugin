@@ -8,6 +8,13 @@ import { DISK_NAMES } from '@/data-models';
 import type { JsonPatchOp, KubernetesResource } from '@/data-models/kubernetes-types';
 import { EnvVariables } from '@/utils/env-variables';
 import {
+  CONSOLE_USER_SETTINGS_NAMESPACE,
+  consoleUserSettingsConfigMapName,
+  consoleUserSettingsKey,
+  kubevirtPreferenceKey,
+  type KubevirtPreferenceName,
+} from '@/utils/kubevirt-user-preferences';
+import {
   generateRandomName,
   generateRandomString,
   generateTestNamespace,
@@ -164,7 +171,6 @@ export async function setupTestNamespace(
 
 type DefaultSSHKeyArgs = {
   client: RequestContextClient;
-  cnvNamespace?: string;
   namespace: string;
 };
 
@@ -172,75 +178,89 @@ type SetupDefaultSSHKeyArgs = DefaultSSHKeyArgs & {
   secretName: string;
 };
 
-type UserSshSettings = { ssh?: Record<string, string> };
-
-/** Matches useKubevirtUserSettings: uid, else sanitized metadata.name. */
+/**
+ * Identifier of the current user in the console user-settings ConfigMap
+ * (`user-settings-<key>`, SDK user preferences): `kubeadmin`, else the user uid / sanitized name.
+ */
 export async function resolveUserSettingsKey(client: RequestContextClient): Promise<string> {
   const user = await client.getResource('user.openshift.io', 'v1', 'users', '~');
   const key =
-    user?.metadata?.uid ??
-    user?.metadata?.name?.replace(/[^-._a-zA-Z0-9]+/g, '-') ??
+    consoleUserSettingsKey(user ?? undefined) ??
     (EnvVariables.isNonPrivUser ? EnvVariables.testUsername : undefined);
 
   if (!key) {
-    throw new Error('Could not resolve kubevirt user-settings key for the current user');
+    throw new Error('Could not resolve console user-settings key for the current user');
   }
   return key;
 }
 
+/** Reads a KubeVirt plugin SDK user preference (`kubevirt.<name>`) of the current user. */
+export async function getKubevirtUserPreference<T = unknown>(
+  client: RequestContextClient,
+  name: KubevirtPreferenceName,
+  cluster?: string,
+): Promise<T | undefined> {
+  const settingsKey = await resolveUserSettingsKey(client);
+  const userSettingsCm = await client.getKubeVirtUserSettings(settingsKey);
+  const raw = (userSettingsCm?.data as Record<string, string> | undefined)?.[
+    kubevirtPreferenceKey(name, cluster)
+  ];
+  return raw === undefined ? undefined : (JSON.parse(raw) as T);
+}
+
+/** Writes a KubeVirt plugin SDK user preference (`kubevirt.<name>`) of the current user. */
+export async function setKubevirtUserPreference(
+  client: RequestContextClient,
+  name: KubevirtPreferenceName,
+  value: unknown,
+  cluster?: string,
+): Promise<void> {
+  const settingsKey = await resolveUserSettingsKey(client);
+  await client.mergePatchResource(
+    '',
+    'v1',
+    'configmaps',
+    consoleUserSettingsConfigMapName(settingsKey),
+    { data: { [kubevirtPreferenceKey(name, cluster)]: JSON.stringify(value) } },
+    CONSOLE_USER_SETTINGS_NAMESPACE,
+  );
+}
+
 async function patchDefaultSshForNamespace({
   client,
-  cnvNamespace = EnvVariables.cnvNamespace,
   namespace,
   secretName,
 }: DefaultSSHKeyArgs & { secretName: string | null }): Promise<void> {
-  const settingsKey = await resolveUserSettingsKey(client);
-  const userSettingsCm = await client.getKubeVirtUserSettings(cnvNamespace);
-  if (!userSettingsCm) {
-    throw new Error(`kubevirt-user-settings ConfigMap not found in ${cnvNamespace}`);
-  }
-  const cmData = (userSettingsCm?.data ?? {}) as Record<string, string>;
-  const parsed = JSON.parse(cmData[settingsKey] || '{}') as UserSshSettings;
-  const ssh = { ...parsed.ssh };
+  const ssh = { ...(await getKubevirtUserPreference<Record<string, string>>(client, 'ssh')) };
   if (secretName) {
     ssh[namespace] = secretName;
   } else {
     delete ssh[namespace];
   }
-  parsed.ssh = ssh;
 
-  const op: JsonPatchOp = cmData[settingsKey]
-    ? { op: 'replace', path: `/data/${settingsKey}`, value: JSON.stringify(parsed) }
-    : { op: 'add', path: `/data/${settingsKey}`, value: JSON.stringify(parsed) };
-
-  await client.patchConfigMap('kubevirt-user-settings', cnvNamespace, [op]);
+  await setKubevirtUserPreference(client, 'ssh', ssh);
 }
 
 /**
  * Creates an SSH public-key Secret and records it as the user's default key
- * for the given namespace in kubevirt-user-settings.
+ * for the given namespace in the `kubevirt.ssh` user preference.
  */
 export async function setupDefaultSSHKey({
   client,
-  cnvNamespace = EnvVariables.cnvNamespace,
   namespace,
   secretName,
 }: SetupDefaultSSHKeyArgs): Promise<void> {
   await client.createSSHKeySecret(namespace, secretName);
   client.trackResource('Secret', secretName, namespace);
-  await patchDefaultSshForNamespace({ client, cnvNamespace, namespace, secretName });
+  await patchDefaultSshForNamespace({ client, namespace, secretName });
 }
 
 /**
- * Removes the default SSH key mapping for a namespace from kubevirt-user-settings.
+ * Removes the default SSH key mapping for a namespace from the `kubevirt.ssh` user preference.
  * Used when the test namespace is reused (HC E2E) so leftover defaults do not leak.
  */
-export async function clearDefaultSSHKey({
-  client,
-  cnvNamespace = EnvVariables.cnvNamespace,
-  namespace,
-}: DefaultSSHKeyArgs): Promise<void> {
-  await patchDefaultSshForNamespace({ client, cnvNamespace, namespace, secretName: null });
+export async function clearDefaultSSHKey({ client, namespace }: DefaultSSHKeyArgs): Promise<void> {
+  await patchDefaultSshForNamespace({ client, namespace, secretName: null });
 }
 
 export const getVmAccessCredentials = (vm: KubernetesResource | null): unknown[] | undefined => {

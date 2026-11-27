@@ -3,7 +3,7 @@ import {
   runningTourSignal,
   tourStepsSeenSignal,
 } from '@kubevirt-utils/components/GuidedTour/utils/guidedTourSignals';
-import type { UserSettingsState } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/userSettingsInitialState';
+import { type QuickStartUserSettings } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/userSettingsInitialState';
 
 import { ONBOARDING_POPOVER_CHAIN } from './constants';
 import { dismissedPopoverKeysSignal } from './onboardingSignals';
@@ -36,25 +36,21 @@ export const getTourStepsSeen = (
 
 type IsPopoverVisibleArgs = {
   isCoveredByTour: boolean;
+  onboardingPopoversHidden: OnboardingPopoversHidden | undefined;
   popoverKey: OnboardingPopoverKey;
+  quickStart: QuickStartUserSettings | undefined;
   triggerElement: HTMLElement | null;
-  userSettings: Partial<UserSettingsState> | undefined;
-  userSettingsError: Error | undefined;
   userSettingsLoaded: boolean;
 };
 
 export const isPopoverVisible = ({
   isCoveredByTour,
+  onboardingPopoversHidden,
   popoverKey,
+  quickStart,
   triggerElement,
-  userSettings,
-  userSettingsError,
   userSettingsLoaded,
 }: IsPopoverVisibleArgs): boolean => {
-  if (userSettingsError) return false;
-
-  const onboardingPopoversHidden = userSettings?.onboardingPopoversHidden;
-
   if (
     dismissedPopoverKeysSignal.value.has(popoverKey) ||
     !!onboardingPopoversHidden?.[popoverKey]
@@ -63,8 +59,7 @@ export const isPopoverVisible = ({
   }
 
   const shouldDismissOnboardingByWelcomeModal =
-    dismissOnboardingPopoverByWelcomeModalSignal.value ||
-    userSettings?.quickStart?.dontShowWelcomeModal;
+    dismissOnboardingPopoverByWelcomeModalSignal.value || quickStart?.dontShowWelcomeModal;
 
   if (!userSettingsLoaded || !triggerElement || shouldDismissOnboardingByWelcomeModal) return false;
 

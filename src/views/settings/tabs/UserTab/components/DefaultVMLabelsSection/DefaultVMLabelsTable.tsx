@@ -36,7 +36,7 @@ const DefaultVMLabelsTable: FC = () => {
 
   const onValueChange = useCallback(
     (key: string, value: string): void => {
-      void setUserValues({ ...(userValues ?? {}), [key]: value });
+      setUserValues({ ...(userValues ?? {}), [key]: value });
     },
     [setUserValues, userValues],
   );

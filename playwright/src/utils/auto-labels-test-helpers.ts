@@ -11,9 +11,9 @@ import type { TestUtilsType } from '@/fixtures/test-utils';
 import type SettingsPage from '@/page-objects/settings/settings-page';
 import type VirtualMachinesPage from '@/page-objects/vm/virtual-machines-page';
 import type VmCreationWizardPage from '@/page-objects/vm-wizard/vm-creation-wizard-page';
+import { getKubevirtUserPreference } from '@/utils/test-setup-helpers';
 
 export const FEATURES_CONFIG_MAP = 'kubevirt-ui-features';
-export const USER_SETTINGS_CONFIG_MAP = 'kubevirt-user-settings';
 
 /** Overwrites the autoAppliedLabels field in the features ConfigMap for setup and cleanup. */
 export async function setAutoAppliedLabels(
@@ -127,19 +127,15 @@ export async function getVmLabels(
   return (vm?.metadata?.labels || {}) as Record<string, string>;
 }
 
-/** Fetches the user's defaultVMLabels value for a given key from user-settings ConfigMap. */
+/** Fetches the user's defaultVMLabels value for a given key from the `kubevirt.defaultVMLabels` user preference. */
 export async function getUserSettingsLabelValue(
   apiClient: RequestContextClient,
-  utils: TestUtilsType,
+  _utils: TestUtilsType,
   labelKey: string,
 ): Promise<string | undefined> {
-  const configMap = await apiClient.getConfigMap(
-    USER_SETTINGS_CONFIG_MAP,
-    utils.EnvVariables.cnvNamespace,
+  const defaultVMLabels = await getKubevirtUserPreference<Record<string, string>>(
+    apiClient,
+    'defaultVMLabels',
   );
-  const configMapData = configMap?.data as Record<string, string> | undefined;
-  const userData = JSON.parse(
-    configMapData?.['kube-admin'] || configMapData?.['kubeadmin'] || '{}',
-  );
-  return userData?.defaultVMLabels?.[labelKey];
+  return defaultVMLabels?.[labelKey];
 }

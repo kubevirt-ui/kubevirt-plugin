@@ -2,6 +2,7 @@ import {
   type ConsoleProxyRequestOptions,
   getConsoleKubernetesProxyHeaders,
 } from '@/utils/console-kubernetes-proxy';
+import { kubevirtWelcomeHiddenPreferenceData } from '@/utils/kubevirt-user-preferences';
 import type { APIRequestContext } from '@playwright/test';
 
 const USER_SETTINGS_NAMESPACE = 'openshift-console-user-settings';
@@ -37,6 +38,7 @@ export async function patchConsoleUserSettingsViaConsoleProxy(
     data: {
       [settingsKey]: consoleUserSettingsPreferencesJson(),
       'console.lastNamespace': CONSOLE_LAST_NAMESPACE_ALL,
+      ...kubevirtWelcomeHiddenPreferenceData(),
     },
   };
 

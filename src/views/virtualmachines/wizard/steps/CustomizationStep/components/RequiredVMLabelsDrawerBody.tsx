@@ -47,7 +47,7 @@ const RequiredVMLabelsDrawerBody: FC<RequiredVMLabelsDrawerBodyProps> = ({ requi
       );
 
       if (saveAsDefaults) {
-        void setUserDefaults({ ...(userDefaults || {}), [key]: value });
+        setUserDefaults({ ...(userDefaults || {}), [key]: value });
       }
     },
     [replaceDraft, saveAsDefaults, setUserDefaults, userDefaults, vmDraft],

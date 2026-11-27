@@ -50,12 +50,7 @@ const useSSHAuthKeys: UseSSHAuthKeys = () => {
   const [authorizedSSHKeys = {}, updateAuthorizedSSHKeys, loadedSettings] = useKubevirtUserSettings(
     USER_SETTINGS_KEYS.ssh,
     cluster,
-  ) as [
-    Record<string, string>,
-    (val: Record<string, string>) => Promise<Record<string, string>>,
-    boolean,
-    Error,
-  ];
+  );
 
   const [activeNamespace] = useActiveNamespace();
 
@@ -104,7 +99,7 @@ const useSSHAuthKeys: UseSSHAuthKeys = () => {
 
       const { projectName, secretName } = updatedKey;
       if (!isEmpty(projectName) && !isEmpty(secretName)) {
-        void updateAuthorizedSSHKeys({
+        updateAuthorizedSSHKeys({
           ...authorizedSSHKeys,
           [projectName]: secretName,
         });
@@ -117,7 +112,7 @@ const useSSHAuthKeys: UseSSHAuthKeys = () => {
     (keyToRemove: AuthKeyRow) => {
       const { [keyToRemove.projectName]: _removed, ...rest } = authorizedSSHKeys;
 
-      void updateAuthorizedSSHKeys(rest);
+      updateAuthorizedSSHKeys(rest);
 
       setAuthKeyRows((prevKeys) => {
         const updatedKeys = prevKeys.filter(({ id }) => id !== keyToRemove.id);

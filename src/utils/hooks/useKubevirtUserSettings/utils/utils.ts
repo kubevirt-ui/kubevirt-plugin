@@ -1,8 +1,3 @@
-import { ConfigMapModel } from '@kubevirt-ui-ext/kubevirt-api/console';
-import { type IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { kubevirtK8sPatch } from '@multicluster/k8sRequests';
-
 export const parseNestedJSON = <T>(str: string): T => {
   try {
     return JSON.parse(str, (_key, val) => {
@@ -15,23 +10,3 @@ export const parseNestedJSON = <T>(str: string): T => {
     return (<unknown>str) as T;
   }
 };
-
-export const patchUserConfigMap = async (
-  userConfigMap: IoK8sApiCoreV1ConfigMap,
-  userName: string,
-  data: { [key: string]: unknown },
-  cluster?: string,
-): Promise<IoK8sApiCoreV1ConfigMap> =>
-  kubevirtK8sPatch<IoK8sApiCoreV1ConfigMap>({
-    cluster,
-    data: [
-      ...(isEmpty(userConfigMap.data) ? [{ op: 'add', path: '/data', value: {} }] : []),
-      {
-        op: 'replace',
-        path: `/data/${userName}`,
-        value: JSON.stringify(data),
-      },
-    ],
-    model: ConfigMapModel,
-    resource: userConfigMap,
-  });

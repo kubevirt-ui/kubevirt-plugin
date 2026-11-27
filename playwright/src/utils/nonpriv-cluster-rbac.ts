@@ -9,7 +9,6 @@ import { ensureConsoleCliDownloadReaderRbac } from '@/utils/console-cli-download
 import { resolveKubeconfig, runOcCommand } from '@/utils/cluster-oc';
 import { EnvVariables } from '@/utils/env-variables';
 import { ensureKubevirtUiFeaturesReaderRbac } from '@/utils/kubevirt-ui-features';
-import { ensureKubevirtUserSettingsReaderRbac } from '@/utils/kubevirt-user-settings';
 import { logger } from '@/utils/logger';
 import { MINUTE } from '@/utils/test-config';
 
@@ -40,10 +39,6 @@ export async function grantNonPrivClusterRbac(options: {
   const { cnvNamespace, testNamespace } = options;
 
   await ensureKubevirtUiFeaturesReaderRbac({
-    cnvNamespace,
-    kubeconfigPath: kubeconfig,
-  });
-  await ensureKubevirtUserSettingsReaderRbac({
     cnvNamespace,
     kubeconfigPath: kubeconfig,
   });

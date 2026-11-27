@@ -297,18 +297,8 @@ export default class RequestContextClient extends BaseClient implements ProxyApi
     ]);
   }
 
-  configureUserSettings(
-    username = 'kube-admin',
-    namespace = 'openshift-cnv',
-    favoriteBootableVolumes: string[] = ['fedora'],
-    dontShowWelcomeModal = true,
-  ) {
-    return this.core.configureUserSettings(
-      username,
-      namespace,
-      favoriteBootableVolumes,
-      dontShowWelcomeModal,
-    );
+  configureUserSettings(userKey = 'kubeadmin', dontShowWelcomeModal = true) {
+    return this.core.configureUserSettings(userKey, dontShowWelcomeModal);
   }
 
   async createBlankDataVolume(
@@ -596,8 +586,9 @@ export default class RequestContextClient extends BaseClient implements ProxyApi
   getKubeVirtUiFeatures(namespace = 'openshift-cnv') {
     return this.core.getUiFeatures(namespace);
   }
-  getKubeVirtUserSettings(namespace = 'openshift-cnv') {
-    return this.core.getUserSettings(namespace);
+  /** Console user-settings ConfigMap of the user (SDK user preferences, `kubevirt.*` keys). */
+  getKubeVirtUserSettings(userKey = 'kubeadmin') {
+    return this.core.getUserSettings(userKey);
   }
   getMigrationPolicies() {
     return this.infra.listMigrationPolicies();
@@ -1034,15 +1025,12 @@ export default class RequestContextClient extends BaseClient implements ProxyApi
 
   async setupKubevirtUiConfig(
     cnvNamespace = 'openshift-cnv',
-    username = 'kube-admin',
+    username = 'kubeadmin',
   ): Promise<void> {
-    const userSettingsPatch = `{"quickStart":{"dontShowWelcomeModal":true}}`;
     try {
-      await this.patchConfigMap('kubevirt-user-settings', cnvNamespace, [
-        { op: 'replace', path: `/data/${username}`, value: userSettingsPatch },
-      ]);
+      await this.configureUserSettings(username, true);
     } catch {
-      // ConfigMap may not exist yet
+      // console user-settings ConfigMap may not exist yet (created on first login)
     }
     try {
       await this.patchConfigMap('kubevirt-ui-features', cnvNamespace, [

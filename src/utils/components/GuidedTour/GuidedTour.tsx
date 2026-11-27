@@ -54,7 +54,7 @@ const GuidedTour: FC = () => {
             ]),
           );
           if (mergedSeen.length !== (quickStarts?.tourStepsSeen ?? []).length) {
-            void setQuickStarts?.({ ...quickStarts, tourStepsSeen: mergedSeen });
+            setQuickStarts?.({ ...quickStarts, tourStepsSeen: mergedSeen });
           }
           if (mergedSeen.length !== tourStepsSeenSignal.value.length) {
             tourStepsSeenSignal.value = mergedSeen;

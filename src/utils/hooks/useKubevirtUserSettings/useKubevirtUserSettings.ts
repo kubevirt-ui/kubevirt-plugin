@@ -1,114 +1,61 @@
-import { useEffect, useState } from 'react';
+import { type Dispatch, type SetStateAction } from 'react';
 
-import {
-  ConfigMapModel,
-  modelToGroupVersionKind,
-  UserModel,
-} from '@kubevirt-ui-ext/kubevirt-api/console';
-import { type IoK8sApiCoreV1ConfigMap } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
-import { operatorNamespaceSignal } from '@kubevirt-utils/store/operatorNamespace';
-import { isEmpty } from '@kubevirt-utils/utils/utils';
-import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
+import useIsACMPage from '@multicluster/useIsACMPage';
+import { useUserPreference } from '@openshift-console/dynamic-plugin-sdk';
+import { useSignals } from '@preact/signals-react/runtime';
+import { useHubClusterName } from '@stolostron/multicluster-sdk';
 
-import { KUBEVIRT_USER_SETTINGS_CONFIG_MAP_NAME } from './utils/const';
+import { USER_SETTINGS_KEYS } from './utils/const';
+import { getUserPreferenceKey } from './utils/getUserPreferenceKey';
 import { type UserSettingsState } from './utils/userSettingsInitialState';
-import { parseNestedJSON, patchUserConfigMap } from './utils/utils';
+
+export { getUserPreferenceKey };
 
 export type KubevirtUserSettingResult<T> = [
   value: T,
-  updater: (val: T) => Promise<T>,
+  setValue: Dispatch<SetStateAction<T>>,
   loaded: boolean,
   error: Error,
 ];
 
-function useKubevirtUserSettings(): KubevirtUserSettingResult<UserSettingsState>;
-function useKubevirtUserSettings<K extends keyof UserSettingsState>(
+/**
+ * Stores a kubevirt user setting in the SDK user preferences (console `user-settings` ConfigMap
+ * or local storage, owned by the current user), instead of the shared `kubevirt-user-settings`
+ * ConfigMap.
+ *
+ * SSH keys are cluster scoped: the local cluster (Virtualization, `cluster` undefined/empty) and the
+ * hub cluster (Fleet Virtualization, `cluster === hubClusterName`) share the same `kubevirt.ssh` key;
+ * only managed spoke clusters use `kubevirt.ssh.<cluster>`.
+ *
+ * Legacy values are copied in one shot at plugin load (see `operatorNamespace`); this hook only
+ * reads and updates via `useUserPreference`.
+ */
+const useKubevirtUserSettings = <K extends keyof UserSettingsState>(
   key: K,
   cluster?: string,
-): KubevirtUserSettingResult<UserSettingsState[K]>;
-function useKubevirtUserSettings(
-  key?: keyof UserSettingsState,
-  cluster?: string,
-): KubevirtUserSettingResult<UserSettingsState | UserSettingsState[keyof UserSettingsState]> {
-  const [error, setError] = useState<Error>();
-  const [userSettings, setUserSettings] = useState<UserSettingsState>();
-  const [loading, setLoading] = useState<boolean>(false);
-  const [settingsInitialized, setSettingsInitialized] = useState<boolean>(false);
-  const operatorNamespace = operatorNamespaceSignal.value;
+): KubevirtUserSettingResult<UserSettingsState[K]> => {
+  useSignals();
+  const isACMPage = useIsACMPage();
+  const [hubClusterName, hubClusterLoaded] = useHubClusterName();
 
-  const [user, loadedUser, errorUser] = useK8sWatchData<IoK8sApiCoreV1ConfigMap>({
-    cluster,
-    groupVersionKind: modelToGroupVersionKind(UserModel),
-    name: '~',
-  });
+  // Without ACM, useHubClusterName never loads, so only wait for it on ACM pages.
+  const waitingForHubClusterName =
+    isACMPage && key === USER_SETTINGS_KEYS.ssh && Boolean(cluster) && !hubClusterLoaded;
 
-  const userName = user?.metadata?.uid ?? user?.metadata?.name?.replace(/[^-._a-zA-Z0-9]+/g, '-');
+  const preferenceKey = getUserPreferenceKey(key, cluster, hubClusterName);
 
-  const [userConfigMap, loadedConfigMap, configMapError] = useK8sWatchData<IoK8sApiCoreV1ConfigMap>(
-    operatorNamespace &&
-      userName && {
-        cluster,
-        groupVersionKind: modelToGroupVersionKind(ConfigMapModel),
-        name: KUBEVIRT_USER_SETTINGS_CONFIG_MAP_NAME,
-        namespace: operatorNamespace,
-      },
+  const [preference, setPreference, preferenceLoaded] = useUserPreference<UserSettingsState[K]>(
+    preferenceKey,
+    undefined,
+    true,
   );
 
-  const loadedCM = (loadedConfigMap || !isEmpty(configMapError)) && !isEmpty(operatorNamespace);
-  const loadedUsr = loadedUser || !isEmpty(errorUser);
-
-  const loadedUserSettings = loadedCM && loadedUsr;
-
-  useEffect(() => {
-    if (!loadedUserSettings) return;
-
-    if (!isEmpty(userConfigMap) && userName) {
-      setUserSettings(
-        (<unknown>parseNestedJSON(userConfigMap?.data?.[userName]) || {}) as UserSettingsState,
-      );
-    }
-
-    setSettingsInitialized(true);
-  }, [userConfigMap, userName, loadedUserSettings]);
-
-  const pushUserSettingsChanges = async (
-    data: UserSettingsState,
-    resolve: (value: unknown) => void,
-    reject: (reason: unknown) => void,
-  ): Promise<void> => {
-    setLoading(true);
-
-    try {
-      await patchUserConfigMap(userConfigMap, userName, data, cluster);
-      resolve(key ? data[key] : data);
-    } catch (apiError) {
-      setError(apiError as Error);
-      reject(apiError);
-    }
-
-    setLoading(false);
-  };
-
-  const updateUserSetting = (
-    val: UserSettingsState | UserSettingsState[keyof UserSettingsState],
-  ): Promise<unknown> => {
-    return new Promise((resolve, reject) => {
-      setUserSettings((prevUserSettings) => {
-        const data = (key ? { ...prevUserSettings, [key]: val } : val) as UserSettingsState;
-
-        void pushUserSettingsChanges(data, resolve, reject);
-
-        return data;
-      });
-    });
-  };
-
   return [
-    key ? userSettings?.[key] : userSettings,
-    userSettings && updateUserSetting,
-    !loading && loadedUserSettings && settingsInitialized,
-    (error ?? errorUser) || configMapError,
-  ] as KubevirtUserSettingResult<UserSettingsState | UserSettingsState[keyof UserSettingsState]>;
-}
+    waitingForHubClusterName ? undefined : preference,
+    setPreference,
+    preferenceLoaded && !waitingForHubClusterName,
+    undefined,
+  ];
+};
 
 export default useKubevirtUserSettings;

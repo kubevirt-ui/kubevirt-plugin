@@ -1431,17 +1431,17 @@ Automated E2E coverage for console routes under `tests/api/`.
 
 ---
 
-### `007`: GET kubevirt-user-settings configmap is readable
+### `007`: GET console user-settings configmap (SDK user preferences) is readable
 
-- **Objective:** GET kubevirt-user-settings configmap is readable
+- **Objective:** GET console user-settings configmap (SDK user preferences) is readable
 - **Target version:** CNV 5.1.0
 - **Jira References:** —
 - **Pre-conditions:** See spec `beforeEach` / `beforeAll` hooks when present
 - **Tags:** @api
 
-| Step | Action                                                                | Expected Result                   |
-| :--- | :-------------------------------------------------------------------- | :-------------------------------- |
-| 1    | Run Playwright test: GET kubevirt-user-settings configmap is readable | All expectations in the spec pass |
+| Step | Action                                                                                      | Expected Result                   |
+| :--- | :------------------------------------------------------------------------------------------ | :-------------------------------- |
+| 1    | Run Playwright test: GET console user-settings configmap (SDK user preferences) is readable | All expectations in the spec pass |
 
 ---
 

@@ -5,6 +5,7 @@ import {
   OPENSHIFT_CNV,
   OPENSHIFT_OS_IMAGES_NS,
 } from '@kubevirt-utils/constants/constants';
+import { startLegacyKubevirtUserSettingsMigration } from '@kubevirt-utils/hooks/useKubevirtUserSettings/utils/migrateLegacyKubevirtUserSettings';
 import { getName } from '@kubevirt-utils/resources/shared';
 import { DEFAULT_OPERATOR_NAMESPACE } from '@kubevirt-utils/utils/utils';
 import { k8sList, type K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
@@ -32,10 +33,13 @@ const resolveOperatorNamespace = async (): Promise<string> => {
   return DEFAULT_OPERATOR_NAMESPACE;
 };
 
+const setOperatorNamespace = (ns: string): void => {
+  startLegacyKubevirtUserSettingsMigration(ns);
+  operatorNamespaceSignal.value = ns;
+};
+
 resolveOperatorNamespace()
-  .then((ns) => {
-    operatorNamespaceSignal.value = ns;
-  })
+  .then(setOperatorNamespace)
   .catch(() => {
-    operatorNamespaceSignal.value = DEFAULT_OPERATOR_NAMESPACE;
+    setOperatorNamespace(DEFAULT_OPERATOR_NAMESPACE);
   });

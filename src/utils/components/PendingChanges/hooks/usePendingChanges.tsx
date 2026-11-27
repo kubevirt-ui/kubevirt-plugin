@@ -56,6 +56,7 @@ export const usePendingChanges = (
   const { createModal } = useModal();
   const [authorizedSSHKeys, updateAuthorizedSSHKeys] = useKubevirtUserSettings(
     USER_SETTINGS_KEYS.ssh,
+    cluster,
   );
   const { hideYamlTab } = useHideYamlTab();
 

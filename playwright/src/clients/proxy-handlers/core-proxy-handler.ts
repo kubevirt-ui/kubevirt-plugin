@@ -7,13 +7,19 @@ import type {
   KubernetesResource,
 } from '@/data-models/kubernetes-types';
 
+import {
+  CONSOLE_USER_SETTINGS_NAMESPACE,
+  consoleUserSettingsConfigMapName,
+  kubevirtPreferenceData,
+} from '@/utils/kubevirt-user-preferences';
+
 import type { ProxyApiContext } from './proxy-api-context';
 
 /**
  * Console-proxy handler for Kubernetes core API resources:
  * ConfigMaps, Pods, and PersistentVolumeClaims.
  *
- * Also provides named helpers for the KubeVirt UI feature / user-settings ConfigMaps
+ * Also provides named helpers for the KubeVirt UI feature ConfigMap, the console user-settings (SDK user preferences) ConfigMap
  * and the console guided-tour ConfigMap.
  *
  * Note: `patchProject` is intentionally NOT included here because it targets
@@ -29,19 +35,24 @@ export class CoreProxyHandler {
   // ConfigMaps
   // ---------------------------------------------------------------------------
 
+  /**
+   * Stores the KubeVirt plugin welcome-modal preference in the user's console user-settings
+   * ConfigMap (SDK user preference `kubevirt.quickStart`). The console creates the ConfigMap on login.
+   */
   configureUserSettings(
-    username = 'kube-admin',
-    namespace = 'openshift-cnv',
-    favoriteBootableVolumes: string[] = ['fedora'],
+    userKey = 'kubeadmin',
     dontShowWelcomeModal = true,
   ): Promise<KubernetesResource | null> {
-    const userSettings = {
-      favoriteBootableVolumes,
-      quickStart: { dontShowWelcomeModal },
-    };
-    return this.patchConfigMap('kubevirt-user-settings', namespace, [
-      { op: 'replace', path: `/data/${username}`, value: JSON.stringify(userSettings) },
-    ]);
+    return this.ctx.mergePatchResource(
+      '',
+      'v1',
+      'configmaps',
+      consoleUserSettingsConfigMapName(userKey),
+      {
+        data: kubevirtPreferenceData({ quickStart: { dontShowWelcomeModal } }),
+      },
+      CONSOLE_USER_SETTINGS_NAMESPACE,
+    );
   }
 
   createConfigMap(
@@ -114,8 +125,12 @@ export class CoreProxyHandler {
     return this.getConfigMap('kubevirt-ui-features', namespace);
   }
 
-  getUserSettings(namespace = 'openshift-cnv'): Promise<KubernetesResource | null> {
-    return this.getConfigMap('kubevirt-user-settings', namespace);
+  /** Console user-settings ConfigMap holding the user's SDK user preferences (`kubevirt.*` keys). */
+  getUserSettings(userKey = 'kubeadmin'): Promise<KubernetesResource | null> {
+    return this.getConfigMap(
+      consoleUserSettingsConfigMapName(userKey),
+      CONSOLE_USER_SETTINGS_NAMESPACE,
+    );
   }
 
   getPersistentVolumeClaim(namespace: string, name: string): Promise<KubernetesResource | null> {
