@@ -21,6 +21,9 @@ const seriesItem = {
 
 const ERROR_TITLE = 'Failed to update family availability';
 
+const getToggle = () =>
+  screen.getByRole('switch', { name: 'Toggle availability for General Purpose' });
+
 describe('FamilyAvailabilityCard', () => {
   it('toggles availability without showing an error', async () => {
     const setFamilyAvailable = jest.fn().mockResolvedValue(undefined);
@@ -76,5 +79,46 @@ describe('FamilyAvailabilityCard', () => {
     fireEvent.click(screen.getByRole('switch'));
     await waitFor(() => expect(setFamilyAvailable).toHaveBeenCalledTimes(2));
     expect(screen.queryByText('patch conflict')).not.toBeInTheDocument();
+  });
+
+  it('calls setFamilyAvailable with the toggled value', async () => {
+    const setFamilyAvailable = jest.fn().mockResolvedValue(undefined);
+    render(
+      <FamilyAvailabilityCard
+        isAvailable={false}
+        seriesItem={seriesItem}
+        setFamilyAvailable={setFamilyAvailable}
+      />,
+    );
+
+    fireEvent.click(getToggle());
+
+    await waitFor(() => expect(setFamilyAvailable).toHaveBeenCalledWith('u1', true));
+    await waitFor(() => expect(getToggle()).toBeEnabled());
+  });
+
+  it('re-enables the switch after the patch is rejected', async () => {
+    const setFamilyAvailable = jest.fn().mockRejectedValue(new Error('conflict'));
+    render(
+      <FamilyAvailabilityCard
+        isAvailable={false}
+        seriesItem={seriesItem}
+        setFamilyAvailable={setFamilyAvailable}
+      />,
+    );
+
+    fireEvent.click(getToggle());
+
+    expect(await screen.findByText(ERROR_TITLE, { exact: false })).toBeInTheDocument();
+    await waitFor(() => expect(getToggle()).toBeEnabled());
+  });
+
+  it('renders an enabled switch without a read-only tooltip', () => {
+    render(
+      <FamilyAvailabilityCard isAvailable seriesItem={seriesItem} setFamilyAvailable={jest.fn()} />,
+    );
+
+    expect(getToggle()).toBeEnabled();
+    expect(screen.queryByRole('tooltip')).not.toBeInTheDocument();
   });
 });
