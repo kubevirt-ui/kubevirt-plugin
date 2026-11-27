@@ -19,6 +19,7 @@ type VMSpec = NonNullable<V1VirtualMachine['spec']>;
 export const getSpecConfiguration = ({
   context,
   instanceType,
+  vmNamespace,
 }: GenerateVMSpecConfiguration): VMSpec => {
   const { bootVolume, compute: selectedInstanceType, preference, useBootSource } = instanceType;
   const selectedBootableVolume = bootVolume?.volume;
@@ -87,6 +88,7 @@ export const getSpecConfiguration = ({
       selectedPreference,
       vmCreationNad,
       vmName,
+      vmNamespace,
       volumeName,
     }),
   };

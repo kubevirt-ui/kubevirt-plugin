@@ -4,6 +4,7 @@ import { useFetchNADs } from '@kubevirt-utils/components/NetworkInterfaceModal/c
 import { filterUDNNads } from '@kubevirt-utils/components/NetworkInterfaceModal/components/hooks/utils';
 import { NetworkAttachmentDefinitionModelGroupVersionKind } from '@kubevirt-utils/models';
 import { type NetworkAttachmentDefinitionKind } from '@kubevirt-utils/resources/nad/types';
+import { parseVMMultusIntoNAD } from '@kubevirt-utils/resources/nad/utils';
 import useK8sWatchData from '@multicluster/hooks/useK8sWatchData';
 
 import useProjectNetworkSettings from './useProjectNetworkSettings';
@@ -35,14 +36,19 @@ const useProjectDefaultNad = ({
 
   const [nads, nadsLoaded] = useFetchNADs(namespaceName ?? '', cluster);
 
+  const defaultNadReference =
+    defaultNadName && namespaceName
+      ? parseVMMultusIntoNAD(defaultNadName, namespaceName)
+      : undefined;
+
   const [annotatedNad, annotatedNadLoaded, annotatedNadError] =
     useK8sWatchData<NetworkAttachmentDefinitionKind>(
-      defaultNadName && namespaceName
+      defaultNadReference
         ? {
             cluster,
             groupVersionKind: NetworkAttachmentDefinitionModelGroupVersionKind,
-            name: defaultNadName,
-            namespace: namespaceName,
+            name: defaultNadReference.name,
+            namespace: defaultNadReference.namespace,
           }
         : null,
     );

@@ -21,6 +21,7 @@ import { ROUTE_VM_WIZARD_TAG } from '@/data-models/route-tags';
 
 const SUITE = 'Project network settings';
 const DEFAULT_NIC_NAME = 'default';
+const DEFAULT_NAD_NAMESPACE = 'default';
 
 /**
  * API-only project setup. Must complete before any VirtualMachines UI navigation
@@ -31,13 +32,18 @@ async function setupProjectNetworkNamespace(
   prefix: string,
   options: {
     nadName?: string;
+    nadNamespace?: string;
     settings?: ProjectNetworkSettingsAnnotations;
   } = {},
 ): Promise<string> {
   const namespace = await setupTestNamespace(apiClient, prefix);
 
   if (options.nadName) {
-    await createBridgeNetworkAttachmentDefinition(apiClient, options.nadName, namespace);
+    await createBridgeNetworkAttachmentDefinition(
+      apiClient,
+      options.nadName,
+      options.nadNamespace ?? namespace,
+    );
   }
 
   if (options.settings) {
@@ -113,7 +119,7 @@ async function assertDefaultNicUsesNetwork(
       message: `Default NIC should use ${expectedNetwork}`,
       timeout,
     })
-    .toContain(expectedNetwork);
+    .toBe(expectedNetwork);
 
   const networkName =
     await vmWizardComputePage.getWizardNetworkInterfaceNetworkName(DEFAULT_NIC_NAME);
@@ -270,6 +276,40 @@ test.describe(SUITE, { tag: [ROUTE_VM_WIZARD_TAG, T1_TAG, '@catalog-wizard', ADM
         'The project default network must be available before you can continue',
       );
     });
+  });
+
+  test('uses a cross-namespace project default-network for the default NIC', async ({
+    apiClient,
+    vmListPage,
+    vmWizardNavigationPage,
+    vmWizardBootSourcePage,
+    vmWizardComputePage,
+    utils,
+  }) => {
+    test.setTimeout(utils.TestTimeouts.TEST_VM_CREATION);
+
+    const nadName = utils.generateRandomNadName('global-proj-nad');
+    const defaultNetwork = `${DEFAULT_NAD_NAMESPACE}/${nadName}`;
+    const namespace = await setupProjectNetworkNamespace(apiClient, 'proj-net-global-default', {
+      nadName,
+      nadNamespace: DEFAULT_NAD_NAMESPACE,
+      settings: { defaultNetwork },
+    });
+
+    await navigateWizardToCustomizationNetwork({
+      vmListPage,
+      vmWizardNavigationPage,
+      vmWizardBootSourcePage,
+      vmWizardComputePage,
+      namespace,
+    });
+
+    await expect
+      .poll(async () => vmWizardComputePage.getWizardNetworkInterfaceNetworkName(DEFAULT_NIC_NAME), {
+        message: `Default NIC should use ${defaultNetwork}`,
+        timeout: utils.TestTimeouts.TEST_MEDIUM,
+      })
+      .toBe(defaultNetwork);
   });
 
   test('hides Pod networking and selects available NAD when pod network is disallowed', async ({

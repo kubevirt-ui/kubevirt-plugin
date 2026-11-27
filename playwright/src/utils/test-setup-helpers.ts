@@ -251,7 +251,7 @@ export const getVmAccessCredentials = (vm: KubernetesResource | null): unknown[]
 };
 
 export type ProjectNetworkSettingsAnnotations = {
-  /** Value for kubevirt.io/default-network (NAD name in the project). */
+  /** Value for kubevirt.io/default-network (NAD name or namespace/name). */
   defaultNetwork?: string;
   /**
    * When false, sets kubevirt.io/allow-pod-network to "false".

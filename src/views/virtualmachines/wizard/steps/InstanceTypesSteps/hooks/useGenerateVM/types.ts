@@ -24,6 +24,7 @@ export type GenerateVMCallback = (props: GenerateVMArgs) => V1VirtualMachine;
 export type GenerateVMSpecConfiguration = {
   context: Omit<GenerateVMContext, 'sshSecretName'>;
   instanceType: VMWizardFormValues['instanceType'];
+  vmNamespace: string;
 };
 
 export type GenerateVMSpecTemplateConfiguration = {
@@ -37,6 +38,7 @@ export type GenerateVMSpecTemplateConfiguration = {
   selectedPreference?: string;
   vmCreationNad?: NetworkAttachmentDefinitionKind;
   vmName: string;
+  vmNamespace: string;
   volumeName: string;
 };
 
