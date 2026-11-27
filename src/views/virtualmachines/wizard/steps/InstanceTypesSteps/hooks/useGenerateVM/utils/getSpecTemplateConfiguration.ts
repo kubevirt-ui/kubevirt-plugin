@@ -32,10 +32,11 @@ export const getSpecTemplateConfiguration = ({
   selectedPreference,
   vmCreationNad,
   vmName,
+  vmNamespace,
   volumeName,
 }: GenerateVMSpecTemplateConfiguration): VMSpecTemplate => {
   const defaultInterface = buildDefaultNetworkInterface({ isUDNManagedNamespace, vmCreationNad });
-  const defaultNetwork = buildDefaultNetwork({ vmCreationNad });
+  const defaultNetwork = buildDefaultNetwork({ vmCreationNad, vmNamespace });
   const isWindowsVM = Boolean(selectedPreference?.startsWith(OS_WINDOWS_PREFIX));
   const volumeArchitecture = getArchitecture(selectedBootableVolume);
 

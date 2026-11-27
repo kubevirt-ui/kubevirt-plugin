@@ -42,6 +42,7 @@ export const generateVM: GenerateVMCallback = ({ context, deployment, instanceTy
     spec: getSpecConfiguration({
       context,
       instanceType,
+      vmNamespace: project,
     }),
   };
 

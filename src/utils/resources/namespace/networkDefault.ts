@@ -2,10 +2,11 @@ import { type V1Interface, type V1Network } from '@kubevirt-ui-ext/kubevirt-api/
 import {
   createInterface,
   createNetwork,
+  getNadFullName,
   getNadType,
+  getNameAndNs,
 } from '@kubevirt-utils/components/NetworkInterfaceModal/utils/helpers';
 import { type NetworkAttachmentDefinitionKind } from '@kubevirt-utils/resources/nad/types';
-import { getName } from '@kubevirt-utils/resources/shared';
 import {
   DEFAULT_NETWORK,
   DEFAULT_NETWORK_INTERFACE,
@@ -66,14 +67,20 @@ export const buildDefaultNetworkInterface = ({
 
 type BuildDefaultNetworkArgs = {
   vmCreationNad?: NetworkAttachmentDefinitionKind;
+  vmNamespace: string;
 };
 
-export const buildDefaultNetwork = ({ vmCreationNad }: BuildDefaultNetworkArgs): V1Network => {
+export const buildDefaultNetwork = ({
+  vmCreationNad,
+  vmNamespace,
+}: BuildDefaultNetworkArgs): V1Network => {
   if (!vmCreationNad) {
     return DEFAULT_NETWORK;
   }
 
-  const vmCreationNadName = getName(vmCreationNad);
+  const nadReference = getNameAndNs(vmCreationNad);
+  const vmCreationNadName =
+    nadReference.namespace === vmNamespace ? nadReference.name : getNadFullName(nadReference);
 
   return createNetwork(DEFAULT_NETWORK_INTERFACE.name, vmCreationNadName);
 };
