@@ -47,7 +47,7 @@ async function setupProjectNetworkNamespace(
   return namespace;
 }
 
-async function navigateWizardToCustomizationNetwork(args: {
+async function navigateWizardToComputeResources(args: {
   vmListPage: VirtualMachinesPage;
   vmWizardNavigationPage: VmWizardNavigationPage;
   vmWizardBootSourcePage: VmWizardBootSourcePage;
@@ -82,6 +82,19 @@ async function navigateWizardToCustomizationNetwork(args: {
 
   await vmWizardComputePage.verifyComputeResourcesStepVisible();
   await vmWizardComputePage.clickElementByExactText('div', 'Compute Exclusive');
+}
+
+async function navigateWizardToCustomizationNetwork(args: {
+  vmListPage: VirtualMachinesPage;
+  vmWizardNavigationPage: VmWizardNavigationPage;
+  vmWizardBootSourcePage: VmWizardBootSourcePage;
+  vmWizardComputePage: VmWizardComputeCustomizationPage;
+  namespace: string;
+}): Promise<void> {
+  const { vmWizardComputePage, vmWizardNavigationPage } = args;
+
+  await navigateWizardToComputeResources(args);
+
   // Give namespace/NAD watches time to settle before Compute → Next snapshots the VM.
   await vmWizardNavigationPage.page.waitForTimeout(TestTimeouts.CLUSTER_STATE_PROPAGATION);
   await vmWizardNavigationPage.clickNext();
@@ -214,6 +227,48 @@ test.describe(SUITE, { tag: [ROUTE_VM_WIZARD_TAG, T1_TAG, '@catalog-wizard', ADM
       expect(podVisible, 'Pod networking option should remain available').toBe(true);
 
       await vmWizardComputePage.cancelNetworkInterfaceModal();
+    });
+  });
+
+  test('reports a missing project default-network and blocks customization', async ({
+    apiClient,
+    vmListPage,
+    vmWizardNavigationPage,
+    vmWizardBootSourcePage,
+    vmWizardComputePage,
+    utils,
+  }) => {
+    test.setTimeout(utils.TestTimeouts.TEST_VM_CREATION);
+
+    const missingNadName = utils.generateRandomNadName('missing-proj-nad');
+    const namespace = await setupProjectNetworkNamespace(apiClient, 'proj-net-missing-default', {
+      settings: { defaultNetwork: missingNadName },
+    });
+
+    await navigateWizardToComputeResources({
+      vmListPage,
+      vmWizardNavigationPage,
+      vmWizardBootSourcePage,
+      vmWizardComputePage,
+      namespace,
+    });
+
+    await test.step('The missing default network is reported prominently', async () => {
+      const alertText = await vmWizardComputePage.getDefaultNetworkErrorText();
+      expect(alertText, 'Compute resources should identify the missing default network').toContain(
+        `NetworkAttachmentDefinition "${missingNadName}"`,
+      );
+      expect(alertText, 'Compute resources should identify the affected project').toContain(
+        `project "${namespace}"`,
+      );
+    });
+
+    await test.step('Next is aria-disabled and explains how to continue', async () => {
+      const nextButtonState = await vmWizardComputePage.getWizardNextButtonState();
+      expect(nextButtonState.isAriaDisabled, 'Next should be aria-disabled').toBe(true);
+      expect(nextButtonState.tooltipText, 'Next should explain the blocking network error').toBe(
+        'The project default network must be available before you can continue',
+      );
     });
   });
 

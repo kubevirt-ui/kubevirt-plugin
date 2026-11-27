@@ -44,7 +44,10 @@ export type VMWizardStepDisplay = WizardStepProps & {
 };
 
 export type GetStepsToDisplayByCreationMethodArgs = {
+  defaultNadError?: Error;
+  defaultNadName?: string;
   navItemConfig: WizardStepNavItemConfig;
+  project?: string;
   t: TFunction;
 };
 

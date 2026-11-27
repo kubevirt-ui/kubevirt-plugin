@@ -7,6 +7,7 @@ import CustomizationStep from '../steps/CustomizationStep/CustomizationStep';
 import DeploymentDetailsStepFooter from '../steps/DeploymentDetailsStep/components/DeploymentDetailsStepFooter';
 import DeploymentDetailsStep from '../steps/DeploymentDetailsStep/DeploymentDetailsStep';
 import BootSourceStep from '../steps/InstanceTypesSteps/BootSourceStep/BootSourceStep';
+import ComputeResourcesStepFooter from '../steps/InstanceTypesSteps/ComputeResourcesStep/components/ComputeResourcesStepFooter';
 import ComputeResourcesStep from '../steps/InstanceTypesSteps/ComputeResourcesStep/ComputeResourcesStep';
 import GuestOSStep from '../steps/InstanceTypesSteps/GuestOSStep/GuestOSStep';
 import ReviewAndCreateStepFooter from '../steps/ReviewAndCreateStep/components/ReviewAndCreateStepFooter';
@@ -56,7 +57,10 @@ const getReviewAndCreateStep = (
 });
 
 export const getStepsToDisplayByCreationMethod = ({
+  defaultNadError,
+  defaultNadName,
   navItemConfig,
+  project,
   t,
 }: GetStepsToDisplayByCreationMethodArgs): Record<VMCreationMethod, VMWizardStepDisplay[]> => {
   const deploymentDetailsStep = getDeploymentDetailsStep(t, navItemConfig);
@@ -92,9 +96,16 @@ export const getStepsToDisplayByCreationMethod = ({
         name: t('Boot source'),
       },
       {
-        children: createElement(ComputeResourcesStep),
+        children: createElement(ComputeResourcesStep, {
+          defaultNadError,
+          defaultNadName,
+          project,
+        }),
         displayIndex: 4,
-        footer: getDefaultFooter(navItemConfig),
+        footer: createElement(ComputeResourcesStepFooter, {
+          defaultNadError,
+          navigation: navItemConfig,
+        }),
         id: VMWizardStep.COMPUTE_RESOURCES,
         name: t('Compute resources'),
       },

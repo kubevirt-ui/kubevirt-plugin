@@ -10,7 +10,8 @@ import useTemplateVMGeneration from './useTemplateVMGeneration';
 
 const useVMGenerationCoordinator = (): VMGenerationCoordinator => {
   const { autoLabelsLoading, control } = useVMWizardForm();
-  const { generateVM, generationSource, ready } = useGenerateVM(autoLabelsLoading);
+  const { defaultNadError, defaultNadName, generateVM, generationSource, ready } =
+    useGenerateVM(autoLabelsLoading);
   const [creationMethod, cluster, project] = useWatch({
     control,
     name: ['creationMethod', 'deployment.cluster', 'deployment.project', 'customization.vmDraft'],
@@ -26,18 +27,28 @@ const useVMGenerationCoordinator = (): VMGenerationCoordinator => {
   });
 
   const ensureInstanceTypeDraft = useCallback((): boolean => {
+    if (defaultNadError) return false;
     if (isCurrentGeneratedDraft(generationSource)) return true;
     if (!ready) return false;
 
     publishGeneratedVM(generateVM(), generationSource);
 
     return true;
-  }, [generateVM, generationSource, isCurrentGeneratedDraft, publishGeneratedVM, ready]);
+  }, [
+    defaultNadError,
+    generateVM,
+    generationSource,
+    isCurrentGeneratedDraft,
+    publishGeneratedVM,
+    ready,
+  ]);
 
   return {
+    defaultNadError,
+    defaultNadName,
     ensureInstanceTypeDraft,
     ensureTemplateDraft,
-    instanceTypeReady: isCurrentGeneratedDraft(generationSource) || ready,
+    instanceTypeReady: !defaultNadError && (isCurrentGeneratedDraft(generationSource) || ready),
     isTemplateGenerating,
   };
 };

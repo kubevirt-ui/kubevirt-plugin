@@ -23,6 +23,8 @@ export type TemplateVMGeneration = {
 };
 
 export type VMGenerationCoordinator = {
+  defaultNadError?: Error;
+  defaultNadName?: string;
   ensureInstanceTypeDraft: () => boolean;
   ensureTemplateDraft: () => Promise<boolean>;
   instanceTypeReady: boolean;
