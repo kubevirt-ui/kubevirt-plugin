@@ -40,7 +40,7 @@ export const getDetailsTabMainIds: SearchItemGetter = (vm) => [
   { id: 'guest-system-log-access', title: t('Guest system log access') },
   { id: 'headless-mode', title: t('Headless mode') },
   { id: 'hostname', title: t('Hostname') },
-  { id: 'panic-devices', title: t('Panic devices') },
+  { id: 'panic-detection', title: t('Panic detection') },
   {
     id: 'cpu-memory',
     isDisabled: Boolean(getInstanceTypeMatcher(vm)) && !getCreationTimestamp(vm),

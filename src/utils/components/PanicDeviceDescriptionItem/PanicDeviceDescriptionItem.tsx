@@ -4,53 +4,54 @@ import DescriptionItem from '@kubevirt-utils/components/DescriptionItem/Descript
 import Loading from '@kubevirt-utils/components/Loading/Loading';
 import SearchItem from '@kubevirt-utils/components/SearchItem/SearchItem';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { YellowExclamationTriangleIcon } from '@openshift-console/dynamic-plugin-sdk';
-import {
-  Button,
-  ButtonVariant,
-  Flex,
-  FlexItem,
-  spinnerSize,
-  Tooltip,
-} from '@patternfly/react-core';
+import { spinnerSize } from '@patternfly/react-core';
 
+import EnablePanicDetection from './EnablePanicDetection';
 import usePanicDeviceDescriptionState from './hooks/usePanicDeviceDescriptionState';
-import { PANIC_DEVICES_BREADCRUMB, PANIC_DEVICES_SEARCH_ID } from './utils/constants';
+import { PANIC_DETECTION_BREADCRUMB, PANIC_DETECTION_SEARCH_ID } from './utils/constants';
+import { getPanicDetectionHelpText } from './utils/helpers';
 import type { PanicDeviceDescriptionItemProps } from './utils/types';
 
-const PanicDeviceDescriptionItem: FC<PanicDeviceDescriptionItemProps> = ({ vm, vmi }) => {
+const PanicDeviceDescriptionItem: FC<PanicDeviceDescriptionItemProps> = ({
+  disabledTooltipText,
+  isDisabled,
+  updatePanicDetection,
+  vm,
+}) => {
   const { t } = useKubevirtTranslation();
-  const { isPending, showWindowsWarning, statusText, vmName } = usePanicDeviceDescriptionState({
-    vm,
-    vmi,
-  });
-  const recommendedForWindows = t('Recommended for Windows');
+  const { isChecked, panicDeviceModel, preferenceLoading, vmName } = usePanicDeviceDescriptionState(
+    { vm },
+  );
+  const canToggle = Boolean(updatePanicDetection) && !isDisabled;
+
+  const handleChange = (checked: boolean): void => {
+    if (!updatePanicDetection) {
+      return;
+    }
+    void updatePanicDetection(checked, panicDeviceModel);
+  };
 
   return (
     <DescriptionItem
-      bodyContent={t(
-        'A panic device provides additional crash information when a guest crashes. For Windows VMs, a panic device (such as pvpanic or hyperv) is recommended to report BSODs.',
-      )}
-      breadcrumb={PANIC_DEVICES_BREADCRUMB}
-      data-test={`${vmName}-${PANIC_DEVICES_SEARCH_ID}`}
+      bodyContent={getPanicDetectionHelpText(t)}
+      breadcrumb={PANIC_DETECTION_BREADCRUMB}
+      data-test={`${vmName}-${PANIC_DETECTION_SEARCH_ID}`}
       descriptionData={
-        <Flex alignItems={{ default: 'alignItemsCenter' }} spaceItems={{ default: 'spaceItemsSm' }}>
-          <FlexItem>{isPending ? <Loading size={spinnerSize.sm} /> : statusText}</FlexItem>
-          {showWindowsWarning && (
-            <FlexItem>
-              <Tooltip content={recommendedForWindows}>
-                <Button
-                  aria-label={recommendedForWindows}
-                  data-test={`${vmName}-${PANIC_DEVICES_SEARCH_ID}-warning`}
-                  icon={<YellowExclamationTriangleIcon />}
-                  variant={ButtonVariant.plain}
-                />
-              </Tooltip>
-            </FlexItem>
-          )}
-        </Flex>
+        preferenceLoading ? (
+          <Loading size={spinnerSize.sm} />
+        ) : (
+          <EnablePanicDetection
+            disabledTooltipText={disabledTooltipText}
+            isChecked={isChecked}
+            isDisabled={!canToggle}
+            onChange={handleChange}
+            vmName={vmName}
+          />
+        )
       }
-      descriptionHeader={<SearchItem id={PANIC_DEVICES_SEARCH_ID}>{t('Panic devices')}</SearchItem>}
+      descriptionHeader={
+        <SearchItem id={PANIC_DETECTION_SEARCH_ID}>{t('Panic detection')}</SearchItem>
+      }
       isPopover
     />
   );

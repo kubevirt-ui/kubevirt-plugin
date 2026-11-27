@@ -9,6 +9,7 @@ import {
   DESCRIPTION_ANNOTATION,
   getDevices,
   getHostname,
+  getPanicDevices,
   getWorkload,
 } from '@kubevirt-utils/resources/vm';
 import { patchVM } from '@kubevirt-utils/resources/vm/utils/patch';
@@ -101,6 +102,7 @@ export const updateHeadlessMode = (
   ]);
 
 const VSOCK_DEVICE_PATH = `/spec/template/spec/domain/devices/autoattachVSOCK`;
+const PANIC_DEVICES_PATH = `/spec/template/spec/domain/devices/panicDevices`;
 
 export const updateVSOCK = (
   updatedVM: V1VirtualMachine,
@@ -115,4 +117,29 @@ export const updateVSOCK = (
       value: checked,
     },
   ]);
+};
+
+export const updatePanicDetection = (
+  updatedVM: V1VirtualMachine,
+  checked: boolean,
+  panicDeviceModel: string,
+): Promise<V1VirtualMachine> => {
+  const hasPanicDevices = getPanicDevices(updatedVM) !== undefined;
+
+  if (!checked && !hasPanicDevices) {
+    return Promise.resolve(updatedVM);
+  }
+
+  const patch = checked
+    ? {
+        op: hasPanicDevices ? K8S_OPS.REPLACE : K8S_OPS.ADD,
+        path: PANIC_DEVICES_PATH,
+        value: [{ model: panicDeviceModel }],
+      }
+    : {
+        op: K8S_OPS.REMOVE,
+        path: PANIC_DEVICES_PATH,
+      };
+
+  return patchVM(updatedVM, [patch]);
 };

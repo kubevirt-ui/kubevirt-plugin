@@ -9,7 +9,7 @@ import VSOCKDetailsDescriptionItem from '@kubevirt-utils/components/VSOCKDetails
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import DetailsSectionCloudIdentity from '@virtualmachines/details/tabs/configuration/details/components/DetailsSectionCloudIdentity/DetailsSectionCloudIdentity';
 
-import { updateVSOCK } from '../utils/utils';
+import { updatePanicDetection, updateVSOCK } from '../utils/utils';
 import DeletionProtectionDescriptionItem from './DetailsSectionAccessItems/DeletionProtectionDescriptionItem';
 import GuestSystemLogAccessDescriptionItem from './DetailsSectionAccessItems/GuestSystemLogAccessDescriptionItem';
 import HeadlessModeDescriptionItem from './DetailsSectionAccessItems/HeadlessModeDescriptionItem';
@@ -49,7 +49,14 @@ const DetailsSectionAccessItems: FC<DetailsSectionAccessItemsProps> = ({
         updateVSOCK={(checked) => updateVSOCK(vm, checked)}
         vm={vm}
       />
-      <PanicDeviceDescriptionItem vm={vm} vmi={vmi} />
+      <PanicDeviceDescriptionItem
+        disabledTooltipText={t("You don't have permission to update this virtual machine")}
+        isDisabled={!canUpdateVM}
+        updatePanicDetection={(checked, panicDeviceModel) =>
+          updatePanicDetection(vm, checked, panicDeviceModel)
+        }
+        vm={vm}
+      />
       <GuestSystemLogAccessDescriptionItem
         canUpdateVM={canUpdateVM}
         isChecked={isCheckedGuestSystemAccessLog}
