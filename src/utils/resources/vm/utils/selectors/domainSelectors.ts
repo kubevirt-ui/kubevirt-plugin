@@ -6,7 +6,6 @@ import {
   type V1DomainSpec,
   type V1Features,
   type V1InstancetypeMatcher,
-  type V1PanicDevice,
   type V1PreferenceMatcher,
   type V1VirtualMachine,
   type V1VirtualMachineCondition,
@@ -116,10 +115,6 @@ export const getEvictionStrategy = (vm: V1VirtualMachine): string | undefined =>
 
 export const getDevices = (vm: V1VirtualMachine): V1Devices | undefined =>
   vm?.spec?.template?.spec?.domain?.devices;
-
-export const getPanicDevices = (
-  obj: V1VirtualMachine | V1VirtualMachineInstance,
-): V1PanicDevice[] | undefined => getDomain(obj)?.devices?.panicDevices;
 
 export const getDomainFeatures = (vm: V1VirtualMachine): V1Features | undefined =>
   vm?.spec?.template?.spec?.domain?.features;
