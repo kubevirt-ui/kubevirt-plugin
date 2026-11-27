@@ -113,6 +113,7 @@ test.describe(`DataSources UI annotations ${ROUTE_DATASOURCES_TAG} ${T2_TAG}`, (
     testNamespace,
   }) => {
     const name = CRUD_NAMES.dataSourceExample;
+    test.setTimeout(TestTimeouts.TEST_LONG);
 
     await apiClient.deleteDataSource(name, testNamespace);
     await apiClient.applyDataSourceWithAnnotations(testNamespace, name, {

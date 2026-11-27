@@ -87,10 +87,49 @@ export class InstanceTypesPage extends ResourceListPage {
   }
 
   async ensureUserInstanceTypesTabSelected(): Promise<void> {
-    const userTab = this.page.getByRole('tab', { name: /User provided|User InstanceTypes/i });
-    if (await userTab.isVisible().catch(() => false)) {
+    const userTab = this.userTab();
+    if (!(await userTab.isVisible().catch(() => false))) {
+      return;
+    }
+    if ((await userTab.getAttribute('aria-selected')) !== 'true') {
       await this.robustClick(userTab);
     }
+    await pollUntil(
+      async () => (await userTab.getAttribute('aria-selected').catch(() => null)) === 'true',
+      {
+        message: 'User InstanceTypes tab should be selected',
+        timeout: TestTimeouts.ELEMENT_WAIT,
+      },
+    );
+  }
+
+  /**
+   * Filters the user list by name. The toolbar only renders once the namespace watch is
+   * loaded, and on congested CI that watch can stall while the system list's toolbar stays
+   * hidden in its inactive panel; reload once to re-establish it before giving up.
+   */
+  async filterByName(name: string): Promise<void> {
+    await this.ensureUserInstanceTypesTabSelected();
+    if (!(await this.waitForVisibleNameFilter(TestTimeouts.ELEMENT_WAIT))) {
+      await this.page.reload({ waitUntil: 'domcontentloaded' });
+      await dismissConsoleObstructions(this.page);
+      await this.ensureUserInstanceTypesTabSelected();
+      if (!(await this.waitForVisibleNameFilter(TestTimeouts.LONG_OPERATION))) {
+        throw new Error(
+          'InstanceTypes user list did not render its name filter (namespace watch not loaded)',
+        );
+      }
+    }
+    await super.filterByName(name);
+  }
+
+  private async waitForVisibleNameFilter(timeout: number): Promise<boolean> {
+    return this.consoleTestId('item-filter')
+      .filter({ visible: true })
+      .first()
+      .waitFor({ state: 'visible', timeout })
+      .then(() => true)
+      .catch(() => false);
   }
 
   async goToClusterList(): Promise<void> {

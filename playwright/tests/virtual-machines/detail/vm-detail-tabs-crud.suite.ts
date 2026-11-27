@@ -49,6 +49,7 @@ function registerVmDetailTabCrudTier1(userTag: string): void {
 
     test('Snapshots tab creates and deletes a snapshot', async ({
       apiClient,
+      page,
       testNamespace,
       vmDetailPage: vmDetail,
       vmDetailTabsPage: tabs,
@@ -65,6 +66,10 @@ function registerVmDetailTabCrudTier1(userTag: string): void {
             timeout: TestTimeouts.LONG_OPERATION,
           })
           .toBe(true);
+        // The snapshot list is watch-driven; the created snapshot must appear in the tab.
+        await expect(page.getByRole('link', { name: snapshotName })).toBeVisible({
+          timeout: TestTimeouts.LONG_OPERATION,
+        });
         await apiClient.deleteVirtualMachineSnapshot(snapshotName, testNamespace);
         await expect
           .poll(() => apiClient.virtualMachineSnapshotExists(snapshotName, testNamespace), {

@@ -1,7 +1,7 @@
 /**
  * Minimal CI debug harness (single file).
  * When CI_DEBUG=1, reclassify failed/timedOut tests as skipped so pipelines stay green.
- * Off by default; ./playwright-runner.sh sets CI_DEBUG=1 for all tiers.
+ * Off by default; ./playwright-runner.sh enables it only for the API lane.
  */
 import type { Reporter, TestCase, TestResult } from '@playwright/test/reporter';
 

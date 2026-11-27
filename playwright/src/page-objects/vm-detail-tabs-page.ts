@@ -547,30 +547,55 @@ export class VmDetailTabsPage extends BasePage {
     return this.cloudInitScriptEditorArea().getByRole('button', { name: /^Download$/i });
   }
 
-  async createSnapshot(snapshotName: string): Promise<boolean> {
-    await this.robustClick(this.takeSnapshotButton());
-    const dialog = this.page
-      .getByRole('dialog', { name: /Take snapshot/i })
-      .or(this.page.getByRole('dialog').filter({ hasText: /Take snapshot/i }))
-      .first();
+  private async openTakeSnapshotDialog(dialog: Locator, snapshotName: string): Promise<void> {
+    if (!(await dialog.isVisible().catch(() => false))) {
+      await this.robustClick(this.takeSnapshotButton());
+    }
     await dialog.waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
+    await dialog.locator('#name').fill(snapshotName);
+  }
+
+  async createSnapshot(snapshotName: string): Promise<boolean> {
+    const dialog = this.snapshotDialog();
+    await this.openTakeSnapshotDialog(dialog, snapshotName);
+
     const unsupported = dialog.getByText(/No disks included in this snapshot/i);
     if (await unsupported.isVisible().catch(() => false)) {
       await dialog.getByRole('button', { name: /^Cancel$/i }).click();
       return false;
     }
-    await dialog.locator('#name').fill(snapshotName);
-    const save = dialog
-      .getByRole('button', { name: /^Save$/i })
-      .or(dialog.getByTestId('save-button'))
-      .or(dialog.locator('[data-test="save-button"]'));
-    await this.robustClick(save);
-    await dialog.waitFor({ state: 'hidden', timeout: TestTimeouts.LONG_OPERATION });
-    await this.page
-      .getByRole('link', { name: snapshotName })
-      .or(this.page.getByText(snapshotName))
-      .first()
-      .waitFor({ state: 'visible', timeout: TestTimeouts.LONG_OPERATION });
+
+    // Save both submits and closes the modal, so Playwright can reject the click when the
+    // dialog unmounts mid-call. "Dialog gone after a Save click" is the success signal; if the
+    // modal vanishes before Save was pressed, reopen it and retry (the snapshot itself is
+    // polled through the API by the caller).
+    let submitted = false;
+    await pollUntil(
+      async () => {
+        if (!(await dialog.isVisible().catch(() => false))) {
+          if (submitted) {
+            return true;
+          }
+          await this.openTakeSnapshotDialog(dialog, snapshotName);
+          return false;
+        }
+        const save = dialog
+          .locator('[data-test="save-button"]')
+          .or(dialog.getByRole('button', { name: /^Save$/i }))
+          .first();
+        if (!(await save.isVisible().catch(() => false))) {
+          return false;
+        }
+        await save.click({ timeout: TestTimeouts.SHORT_WAIT }).catch(() => undefined);
+        submitted = true;
+        await this.page.waitForTimeout(TestTimeouts.UI_DELAY_SHORT);
+        return !(await dialog.isVisible().catch(() => false));
+      },
+      {
+        message: 'Take snapshot dialog should accept Save and close',
+        timeout: TestTimeouts.LONG_OPERATION,
+      },
+    );
     return true;
   }
 
@@ -1011,6 +1036,15 @@ export class VmDetailTabsPage extends BasePage {
       const model = models.find((m) => m.getValue().includes('userData')) ?? models.at(-1);
       model?.setValue(content);
     }, yaml);
+  }
+
+  snapshotDialog(): Locator {
+    return this.page
+      .locator('#tab-modal')
+      .filter({ hasText: /Take snapshot/i })
+      .or(this.page.getByRole('dialog', { name: /Take snapshot/i }))
+      .or(this.page.getByRole('dialog').filter({ hasText: /Take snapshot/i }))
+      .first();
   }
 
   takeSnapshotButton(): Locator {

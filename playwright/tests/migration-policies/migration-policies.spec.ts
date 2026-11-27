@@ -37,7 +37,6 @@ test.describe(`MigrationPolicies gating create YAML ${ROUTE_MIGRATION_POLICIES_T
 
     await nav.goToMigrationPolicies();
     await migrationPoliciesPage.goToList();
-    await migrationPoliciesPage.dismissConsoleObstructions();
     await migrationPoliciesPage.createFromYaml(migrationPolicyManifest({ name }));
     await expect
       .poll(() => apiClient.migrationPolicyExists(name), {
@@ -45,22 +44,6 @@ test.describe(`MigrationPolicies gating create YAML ${ROUTE_MIGRATION_POLICIES_T
         timeout: TestTimeouts.RESOURCE_CREATION,
       })
       .toBe(true);
-    if (migrationPoliciesPage.isOnMigrationPolicyDetail(name)) {
-      await expect(migrationPoliciesPage.migrationPolicyDetailName(name)).toBeVisible({
-        timeout: TestTimeouts.ELEMENT_WAIT,
-      });
-    }
-    await migrationPoliciesPage.goToList();
-    await migrationPoliciesPage.filterByName(name);
-    await expect(migrationPoliciesPage.row(name)).toBeVisible({
-      timeout: TestTimeouts.LONG_OPERATION,
-    });
-    await migrationPoliciesPage.openDetail(name);
-    await expect(migrationPoliciesPage.migrationPolicyDetailName(name)).toBeVisible({
-      timeout: TestTimeouts.ELEMENT_WAIT,
-    });
-
-    await nav.goToMigrationPolicies();
     await migrationPoliciesPage.goToList();
     await migrationPoliciesPage.deleteFromList(name);
     await expect

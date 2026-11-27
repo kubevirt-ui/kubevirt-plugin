@@ -1,4 +1,5 @@
 import BaseComponent from '@/components/shared/base-component';
+import { pollUntil } from '@/utils/poll-until';
 import { TestTimeouts } from '@/utils/test-config';
 import type { Page } from '@playwright/test';
 
@@ -27,8 +28,11 @@ export class VmCreationWizardLocationComponent extends BaseComponent {
 
       const displayContent = this.locator('.vm-creation-location-display__content');
       const text = await displayContent.innerText({ timeout: TestTimeouts.SHORT_WAIT });
-      const match = text.match(/Project\s+(\S+)/);
-      return match?.[1]?.trim() ?? '';
+      // `VMCreationLocationDisplay` renders "Project<name>>Folder<folder>" with no separators,
+      // and "—" while the project is still unset.
+      const match = text.match(/Project\s*([^>\s]+)\s*>/);
+      const project = match?.[1]?.trim() ?? '';
+      return project === '—' ? '' : project;
     } catch {
       return '';
     }
@@ -41,6 +45,13 @@ export class VmCreationWizardLocationComponent extends BaseComponent {
   }
 
   async selectLocationProject(namespace: string): Promise<void> {
+    // The wizard sets the initial project in a mount effect (route namespace or the previous
+    // pick) after first render; a selection made before that lands is overwritten by it.
+    await pollUntil(async () => (await this.getLocationProject()).length > 0, {
+      message: 'Wizard Location project should be initialized before selecting a project',
+      timeout: TestTimeouts.ELEMENT_WAIT,
+    });
+
     const current = await this.getLocationProject();
     if (current.includes(namespace)) {
       return;
@@ -136,7 +147,10 @@ export class VmCreationWizardLocationComponent extends BaseComponent {
 }
 
 export class VmCreationWizardComputeComponent extends BaseComponent {
-  private readonly _pfV6CMenuToggle = this.locator('.pf-v6-c-menu-toggle');
+  /** Size dropdown under the series gallery (console 4.22 wizard). */
+  private readonly _sizeDropdownToggle = this.locator(
+    '.instance-type-series-menu-card__size-dropdown button',
+  );
 
   constructor(page: Page) {
     super(page);
@@ -158,22 +172,17 @@ export class VmCreationWizardComputeComponent extends BaseComponent {
 
   async getComputeSizeDropdownText(): Promise<string> {
     try {
-      const sizeBtn = this._pfV6CMenuToggle.filter({
-        hasText: /CPUs.*Memory/,
-      });
-      return (
-        (await sizeBtn.first().textContent({ timeout: TestTimeouts.SHORT_WAIT }))?.trim() || ''
-      );
+      const text = await this._sizeDropdownToggle
+        .first()
+        .textContent({ timeout: TestTimeouts.SHORT_WAIT });
+      return text?.trim() || '';
     } catch {
       return '';
     }
   }
 
   async getComputeSizeOptions(): Promise<string[]> {
-    const sizeBtn = this._pfV6CMenuToggle.filter({
-      hasText: /CPUs.*Memory/,
-    });
-    await this.robustClick(sizeBtn.first());
+    await this.robustClick(this._sizeDropdownToggle.first());
     await this.page.waitForTimeout(500);
 
     const options: string[] = [];
@@ -201,11 +210,10 @@ export class VmCreationWizardComputeComponent extends BaseComponent {
   }
 
   async selectComputeSize(sizeName: string): Promise<void> {
-    const sizeToggle = this.locator('button.pf-v6-c-menu-toggle').filter({
-      hasText: /Select size|CPUs.*Memory|medium|small|large|tiny|micro/i,
-    });
-    await sizeToggle.first().waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
-    await this.robustClick(sizeToggle.first());
+    await this._sizeDropdownToggle
+      .first()
+      .waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT });
+    await this.robustClick(this._sizeDropdownToggle.first());
     await this.page.waitForTimeout(500);
 
     const sizeOption = this.page

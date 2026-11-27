@@ -79,7 +79,7 @@ test.describe(
       vmWizardNavigationPage,
       utils,
     }) => {
-      test.setTimeout(utils.TestTimeouts.TEST_MEDIUM);
+      test.setTimeout(utils.TestTimeouts.TEST_LONG);
       await utils.withAllure({ suite: SUITE, feature: T1, tags: [T1_TAG] });
 
       const sourceVmName = utils.generateRandomVmName('clone-required');

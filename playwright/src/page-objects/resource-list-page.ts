@@ -717,7 +717,8 @@ export class ResourceListPage extends BasePage {
   }
 
   async filterByName(name: string): Promise<void> {
-    const itemFilter = this.testId('item-filter');
+    // Inactive tab panels keep their own hidden `item-filter` input in the DOM.
+    const itemFilter = this.consoleTestId('item-filter').filter({ visible: true }).first();
     if (
       await itemFilter
         .waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT })
@@ -730,7 +731,10 @@ export class ResourceListPage extends BasePage {
 
     const input = this.page
       .getByPlaceholder(/Search by name|Filter by name|Search/i)
-      .or(this.page.locator('#filter-text-input input, #name-filter input'))
+      .filter({ visible: true })
+      .or(
+        this.page.locator('#filter-text-input input, #name-filter input').filter({ visible: true }),
+      )
       .first();
     await this.resourceTitle()
       .waitFor({ state: 'visible', timeout: TestTimeouts.ELEMENT_WAIT })
