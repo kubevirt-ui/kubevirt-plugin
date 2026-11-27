@@ -1,4 +1,5 @@
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { getCloudIdentityProvider } from '@kubevirt-utils/components/CloudIdentity';
 import {
   type SearchItem,
   type SearchItemWithTab,
@@ -33,6 +34,7 @@ export const getDetailsTabHardwareIds: SearchItemGetter = (vm) => [
 ];
 
 export const getDetailsTabMainIds: SearchItemGetter = (vm) => [
+  ...(getCloudIdentityProvider() ? [{ id: 'cloud-identity', title: t('Cloud identity') }] : []),
   { id: 'deletion-protection', title: t('Deletion protection') },
   { id: 'enable-vsock', title: t('Enable VSOCK') },
   { id: 'guest-system-log-access', title: t('Guest system log access') },

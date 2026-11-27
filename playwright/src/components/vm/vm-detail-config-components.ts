@@ -316,6 +316,15 @@ export class VirtualMachineDetailConfigurationComponent extends BaseComponent {
   );
   private readonly _configurationStorageSubTab = this.testId('vm-configuration-storage');
   private readonly _configurationTab = this.testId('horizontal-link-Configuration');
+  private readonly _cloudIdentityValue = this.page
+    .locator('dt', { hasText: /^Cloud identity$/ })
+    .locator(':scope + dd');
+  private readonly _cloudIdentityModal = this.page.getByRole('dialog').filter({
+    has: this.page.getByRole('heading', { name: /^(?:Add|Edit) cloud identity$/ }),
+  });
+  private readonly _cloudIdentityDetachModal = this.page.getByRole('dialog').filter({
+    has: this.page.getByRole('heading', { name: 'Detach cloud identity?', exact: true }),
+  });
   private readonly _cpuMemoryButton = this.testId('cpu-memory-value');
   private readonly _dataVolumeDetails = this.locator('text=DataVolume details');
   private readonly _environmentAddButton = this.page.getByRole('button', {
@@ -342,6 +351,70 @@ export class VirtualMachineDetailConfigurationComponent extends BaseComponent {
 
   constructor(page: Page) {
     super(page);
+  }
+
+  async getCloudIdentityDetailsText(): Promise<string> {
+    await this._cloudIdentityValue.waitFor({
+      state: 'visible',
+      timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+    });
+    return this._cloudIdentityValue.innerText();
+  }
+
+  async openCloudIdentityModal(): Promise<void> {
+    await this.navigateToConfigurationDetails();
+    await this.robustClick(this._cloudIdentityValue.getByRole('button'));
+    await this._cloudIdentityModal.waitFor({
+      state: 'visible',
+      timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+    });
+  }
+
+  async selectExistingCloudIdentityServiceAccount(name: string): Promise<void> {
+    const existing = this._cloudIdentityModal.getByLabel('Use an existing ServiceAccount');
+    await existing.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+    if (!(await existing.isChecked())) await existing.check();
+
+    const serviceAccount = this._cloudIdentityModal.getByLabel('ServiceAccount name');
+    await serviceAccount.waitFor({
+      state: 'visible',
+      timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+    });
+    await this.robustClick(serviceAccount);
+    const option = this.page.getByRole('option', { name, exact: true });
+    await option.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+    await this.robustClick(option);
+  }
+
+  async saveCloudIdentity(): Promise<void> {
+    const save = this._cloudIdentityModal.getByRole('button', { name: 'Save', exact: true });
+    await this.robustClick(save);
+    await this._cloudIdentityModal.waitFor({
+      state: 'hidden',
+      timeout: TestTimeouts.CLUSTER_OPERATION,
+    });
+  }
+
+  async openCloudIdentityDetachModal(): Promise<void> {
+    const detach = this._cloudIdentityModal.getByRole('button', {
+      name: 'Detach identity',
+      exact: true,
+    });
+    await this.robustClick(detach);
+    await this._cloudIdentityDetachModal.waitFor({
+      state: 'visible',
+      timeout: TestTimeouts.UI_ELEMENT_VISIBILITY,
+    });
+  }
+
+  async confirmCloudIdentityDetach(): Promise<void> {
+    await this.robustClick(
+      this._cloudIdentityDetachModal.getByRole('button', { name: 'Detach', exact: true }),
+    );
+    await this._cloudIdentityDetachModal.waitFor({
+      state: 'hidden',
+      timeout: TestTimeouts.CLUSTER_OPERATION,
+    });
   }
 
   private async navigateToConfigurationTab(): Promise<void> {

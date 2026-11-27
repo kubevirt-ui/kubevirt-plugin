@@ -6,7 +6,7 @@
 - **Route folder:** `tests/virtual-machines/detail/configuration/`
 - **Feature Area:** Tier1 — VM configuration
 - **Latest version:** CNV 5.1.0
-- **Latest update:** 2026-10-20
+- **Latest update:** 2026-11-24
 - **Document Status:** Draft
 
 ## 2. Introduction
@@ -24,6 +24,8 @@ Automated E2E coverage for console routes under `tests/virtual-machines/detail/c
 
 ## 3. Test Environment & Prerequisites
 
+### vm-configuration-cloud-identity
+
 ### vm-configuration-details
 
 ### vm-configuration-lifecycle
@@ -39,6 +41,31 @@ Automated E2E coverage for console routes under `tests/virtual-machines/detail/c
 ---
 
 ## 4. Test Case Definitions
+
+### Module: `vm-configuration-cloud-identity.spec.ts`
+
+**Spec file:** `tests/virtual-machines/detail/configuration/vm-configuration-cloud-identity.spec.ts`
+**Describe:** `VM Configuration — cloud identity` — **Tags:** `@route-virtual-machines-detail-configuration`, `@tier1`, `@nonpriv`
+**Allure:** suite `VM Configuration cloud identity`, feature `Tier 1`
+
+---
+
+### `001`: Attach and detach a cloud identity
+
+- **Objective:** Verify that a compatible existing ServiceAccount can be attached to a VM as its cloud identity and detached without deleting the ServiceAccount
+- **Target version:** CNV 5.1.0
+- **Jira References:** —
+- **Pre-conditions:** ROSA branding, a stopped RHEL9 VM, and an AWS-compatible ServiceAccount in the same test namespace
+- **Tags:** `@tier1`, `@nonpriv`
+
+| Step | Action                                                                   | Expected Result                                                       |
+| :--- | :----------------------------------------------------------------------- | :-------------------------------------------------------------------- |
+| 1    | Open Cloud identity from the VM Configuration details                    | The Add cloud identity modal opens                                    |
+| 2    | Select the existing compatible ServiceAccount, then save                 | The VM references the ServiceAccount and the UI displays the identity |
+| 3    | Reopen Cloud identity and confirm Detach identity                        | The cloud identity is removed from the VM                             |
+| 4    | Verify the ServiceAccount and the Configuration details after detachment | The ServiceAccount still exists and the UI displays Not configured    |
+
+---
 
 ### Module: `vm-configuration-details.spec.ts`
 

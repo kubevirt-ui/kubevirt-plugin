@@ -4,6 +4,7 @@ import {
   type V1VirtualMachine,
   type V1VirtualMachineInstance,
 } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
+import { getChangedCloudIdentity } from '@kubevirt-utils/components/CloudIdentity';
 import { EVICTION_STRATEGY_DEFAULT } from '@kubevirt-utils/components/EvictionStrategy/constants';
 import { useModal } from '@kubevirt-utils/components/ModalProvider/ModalProvider';
 import useHideYamlTab from '@kubevirt-utils/hooks/useHideYamlTab';
@@ -69,6 +70,7 @@ export const usePendingChanges = (
     authorizedSSHKeys,
     bootModeChanged: checkBootModeChanged(vm, vmi),
     bootOrderChanged: checkBootOrderChanged(vm, vmi),
+    cloudIdentityChanged: getChangedCloudIdentity(vm, vmi),
     cloudInitChanged: getChangedCloudInit(vm, vmi),
     cluster,
     cpuMemoryChanged: checkCPUMemoryChanged(vm, vmi),

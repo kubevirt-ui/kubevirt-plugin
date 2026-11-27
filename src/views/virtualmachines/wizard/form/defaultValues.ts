@@ -57,6 +57,7 @@ export const createCloneDefaultValues = (): VMWizardCloneValues => ({
 
 export const createCustomizationDefaultValues = (): VMWizardCustomizationValues => ({
   autoLabelsApplied: false,
+  pendingCloudIdentity: null,
   pendingUploadKeys: [],
   templateAdditionalObjects: [],
   vmDraft: null,

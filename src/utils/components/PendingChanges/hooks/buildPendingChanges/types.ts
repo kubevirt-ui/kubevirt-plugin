@@ -20,6 +20,7 @@ export type BuildPendingChangesParams = {
   authorizedSSHKeys: Record<string, string>;
   bootModeChanged: boolean;
   bootOrderChanged: boolean;
+  cloudIdentityChanged: boolean;
   cloudInitChanged: boolean;
   cluster: string;
   cpuMemoryChanged: boolean;

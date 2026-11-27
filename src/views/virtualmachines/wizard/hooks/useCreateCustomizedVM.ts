@@ -3,6 +3,7 @@ import { useWatch } from 'react-hook-form';
 import { useLocation } from 'react-router';
 
 import { VirtualMachineModel } from '@kubevirt-ui-ext/kubevirt-api/console';
+import { createServiceAccount } from '@kubevirt-utils/components/CloudIdentity';
 import useIsIPv6SingleStackCluster from '@kubevirt-utils/hooks/useIPStackType/useIsIPv6SingleStackCluster';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import useLocalStorage from '@kubevirt-utils/hooks/useLocalStorage';
@@ -37,7 +38,7 @@ type UseCreateCustomizedVM = () => {
 const useCreateCustomizedVM: UseCreateCustomizedVM = () => {
   const { t } = useKubevirtTranslation();
   const { pathname } = useLocation();
-  const { control } = useVMWizardForm();
+  const { control, setValue } = useVMWizardForm();
   const { completeWizardAndNavigate } = useWizardNavigationGuard();
   const [cluster, vmNamespaceTarget] = useWatch({
     control,
@@ -73,6 +74,18 @@ const useCreateCustomizedVM: UseCreateCustomizedVM = () => {
         namespaceName: deployment.project,
       });
       const vmToCreate = applyProjectPodNetworkPolicy(storeVM, isPodNetworkAllowed);
+      const cloudIdentity = customization.pendingCloudIdentity;
+
+      if (cloudIdentity) {
+        await createServiceAccount({
+          cluster: deployment.cluster,
+          namespace: deployment.project,
+          provider: cloudIdentity.provider,
+          values: cloudIdentity.values,
+        });
+        setValue('customization.pendingCloudIdentity', null);
+      }
+
       const createdVM = await kubevirtK8sCreate({
         cluster: deployment.cluster,
         data: vmToCreate,

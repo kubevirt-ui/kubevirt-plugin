@@ -5,15 +5,14 @@ import { useLocation } from 'react-router';
 import { VirtualMachineDetailsTab } from '@kubevirt-utils/constants/tabs-constants';
 import useInstanceTypesAndPreferences from '@kubevirt-utils/hooks/useInstanceTypesAndPreferences';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
-import { getName } from '@kubevirt-utils/resources/shared';
+import { getName, getNamespace } from '@kubevirt-utils/resources/shared';
 import useVMI from '@kubevirt-utils/resources/vm/hooks/useVMI';
+import { isVMNotStopped } from '@kubevirt-utils/resources/vm/utils/selectors';
 import { getCluster } from '@multicluster/helpers/selectors';
 import { PageSection, Tab, Tabs, TabTitleText } from '@patternfly/react-core';
 import { type NavPageComponentProps } from '@virtualmachines/details/utils/types';
-import { isRunning } from '@virtualmachines/utils';
 
 import ConfigurationSearch from '../../../../../utils/components/ConfigurationSearch/ConfigurationSearch';
-import { getNamespace } from '../../../../cdi-upload-provider/utils/selectors';
 import { createConfigurationSearchURL } from './search/utils/utils';
 import { getSearchItems } from './utils/search';
 import { getInnerTabFromPath, getTabs, includesConfigurationPath } from './utils/utils';
@@ -29,7 +28,7 @@ const VirtualMachineConfigurationTab: FC<NavPageComponentProps> = ({
   const location = useLocation();
   const tabs = useMemo(() => getTabs(t), [t]);
 
-  const { vmi } = useVMI(getName(vm), getNamespace(vm), getCluster(vm), isRunning(vm));
+  const { vmi } = useVMI(getName(vm), getNamespace(vm), getCluster(vm), isVMNotStopped(vm));
   const { allInstanceTypes } = useInstanceTypesAndPreferences(getNamespace(vm), getCluster(vm));
   const [activeTabKey, setActiveTabKey] = useState<number | string>(
     VirtualMachineDetailsTab.Details,
