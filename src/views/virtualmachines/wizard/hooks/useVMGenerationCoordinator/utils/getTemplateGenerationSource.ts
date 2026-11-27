@@ -2,12 +2,14 @@ import cloneDeep from 'lodash/cloneDeep';
 
 import { getResourceKey } from '@kubevirt-utils/resources/shared';
 import { type Template } from '@kubevirt-utils/resources/template';
+import { type RunStrategy } from '@kubevirt-utils/resources/vm/utils/constants';
 import { type VMWizardFormValues } from '@virtualmachines/wizard/form/types';
 
 export type TemplateGenerationSource = {
   authorizedSSHKey: string | undefined;
   cluster: string;
   creationMethod: VMWizardFormValues['creationMethod'];
+  defaultRunStrategy: RunStrategy;
   description: string;
   folder: string;
   generationRevision: number;
@@ -48,6 +50,7 @@ export const getTemplateGenerationSource = (
   values: VMWizardFormValues,
   authorizedSSHKey: string | undefined,
   generationRevision: number,
+  defaultRunStrategy: RunStrategy,
 ): TemplateGenerationSource | null => {
   if (!values.template.selectedTemplate) return null;
 
@@ -55,6 +58,7 @@ export const getTemplateGenerationSource = (
     authorizedSSHKey,
     cluster: values.deployment.cluster,
     creationMethod: values.creationMethod,
+    defaultRunStrategy,
     description: values.deployment.description,
     folder: values.deployment.folder,
     generationRevision,

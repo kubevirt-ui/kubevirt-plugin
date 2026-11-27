@@ -1,6 +1,7 @@
 import { type V1VirtualMachine } from '@kubevirt-ui-ext/kubevirt-api/kubevirt';
 import { type BootableVolume } from '@kubevirt-utils/resources/bootableresources/types';
 import { type NetworkAttachmentDefinitionKind } from '@kubevirt-utils/resources/nad/types';
+import { type RunStrategy } from '@kubevirt-utils/resources/vm/utils/constants';
 import { type VMWizardFormValues } from '@virtualmachines/wizard/form/types';
 
 export type GenerateVMContext = {
@@ -8,6 +9,7 @@ export type GenerateVMContext = {
   isIPv6SingleStack?: boolean;
   isUDNManagedNamespace: boolean;
   populatedCloudInitYAML: string;
+  runStrategy?: RunStrategy;
   sshSecretName?: string;
   vmCreationNad?: NetworkAttachmentDefinitionKind;
   vmName: string;

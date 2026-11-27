@@ -4,6 +4,7 @@ import type {
   IoK8sApiRbacV1Role,
   IoK8sApiRbacV1RoleBinding,
 } from '@kubevirt-ui-ext/kubevirt-api/kubernetes';
+import { RUNSTRATEGY_RERUNONFAILURE } from '@kubevirt-utils/resources/vm/utils/constants';
 import type { K8sVerb } from '@openshift-console/dynamic-plugin-sdk';
 
 export const AUTOMATIC_SUBSCRIPTION_ACTIVATION_KEY = 'automaticSubscriptionActivationKey';
@@ -18,6 +19,7 @@ export const NODE_PORT_ADDRESS = 'nodePortAddress';
 export const NODE_PORT_ENABLED = 'nodePortEnabled';
 export const DISABLED_GUEST_SYSTEM_LOGS_ACCESS = 'disabledGuestSystemLogsAccess';
 export const CONFIRM_VM_ACTIONS = 'confirmVMActions';
+export const DEFAULT_RUN_STRATEGY = 'defaultRunStrategy';
 export const HIDE_CREDENTIALS_NON_PRIVILEGED = 'hideCredentialsNonPrivileged';
 export const HIDE_YAML_TAB = 'hideYamlTab';
 
@@ -42,6 +44,7 @@ export const FEATURES_CONFIG_MAP_INITIAL_DATA: Record<string, string> = {
   [AUTOMATIC_SUBSCRIPTION_ORGANIZATION_ID]: '',
   [CONFIRM_VM_ACTIONS]: 'false',
   [CONTROL_DEFAULT_VIRTUALIZATION_PERMISSIONS]: 'false',
+  [DEFAULT_RUN_STRATEGY]: RUNSTRATEGY_RERUNONFAILURE,
   [DISABLED_GUEST_SYSTEM_LOGS_ACCESS]: 'false',
   [DISABLED_INSTANCE_TYPE_FAMILIES]: '[]',
   [HIDE_CREDENTIALS_NON_PRIVILEGED]: 'false',

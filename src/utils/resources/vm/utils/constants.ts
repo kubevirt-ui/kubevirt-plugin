@@ -59,7 +59,18 @@ export type RunStrategy =
   | typeof RUNSTRATEGY_MANUAL
   | typeof RUNSTRATEGY_RERUNONFAILURE;
 
-export const getDefaultRunningStrategy = (): RunStrategy => RUNSTRATEGY_RERUNONFAILURE;
+const RUN_STRATEGY_VALUES = new Set<string>([
+  RUNSTRATEGY_ALWAYS,
+  RUNSTRATEGY_HALTED,
+  RUNSTRATEGY_MANUAL,
+  RUNSTRATEGY_RERUNONFAILURE,
+]);
+
+export const isRunStrategyValue = (value: string | undefined): value is RunStrategy =>
+  value !== undefined && RUN_STRATEGY_VALUES.has(value);
+
+export const getDefaultRunningStrategy = (configured?: string): RunStrategy =>
+  isRunStrategyValue(configured) ? configured : RUNSTRATEGY_RERUNONFAILURE;
 
 export enum UPDATE_STRATEGIES {
   Migration = 'Migration',

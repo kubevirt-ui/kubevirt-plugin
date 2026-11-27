@@ -7,6 +7,7 @@ import {
   getStartAfterCreationLabel,
   START_AFTER_CREATION_CHECKBOX_ID,
 } from '@kubevirt-utils/components/RunStrategyModal/utils';
+import useDefaultRunStrategy from '@kubevirt-utils/hooks/useDefaultRunStrategy/useDefaultRunStrategy';
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { ensurePath } from '@kubevirt-utils/utils/utils';
 import { Checkbox, Stack, StackItem, Title, TitleSizes } from '@patternfly/react-core';
@@ -21,10 +22,12 @@ const ReviewAndCreateStep: FC = () => {
   const { control, getValues, setValue } = useVMWizardForm();
   const { replaceDraft } = useWizardVMDraft();
   const creationMethod = useWatch({ control, name: 'creationMethod' });
+  const cluster = useWatch({ control, name: 'deployment.cluster' });
   const vm = useWizardReviewVM();
   const isCloneMethod = isCloneCreationMethod(creationMethod);
+  const defaultRunStrategy = useDefaultRunStrategy(cluster);
 
-  const { isStartChecked, onToggle } = useRunStrategyToggle(vm ?? undefined);
+  const { isStartChecked, onToggle } = useRunStrategyToggle(vm ?? undefined, defaultRunStrategy);
   return (
     <Stack hasGutter>
       <StackItem>

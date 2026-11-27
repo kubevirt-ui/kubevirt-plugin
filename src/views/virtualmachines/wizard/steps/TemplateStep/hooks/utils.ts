@@ -81,6 +81,7 @@ export const applyCertConfigMapToCDRom = (
 };
 
 export const getVMObjectFromTemplate = ({
+  defaultRunStrategy,
   description,
   folder,
   namespace,
@@ -89,6 +90,7 @@ export const getVMObjectFromTemplate = ({
   vm,
   vmName,
 }: {
+  defaultRunStrategy?: string;
   description: string;
   folder: string;
   namespace: string;
@@ -126,7 +128,7 @@ export const getVMObjectFromTemplate = ({
 
     draftVM.metadata.name = vmName ?? getName(draftVM) ?? draftVM.metadata.labels?.app;
     draftVM.metadata.namespace = namespace;
-    initializeRunStrategyFromTemplateSpec(draftVM.spec);
+    initializeRunStrategyFromTemplateSpec(draftVM.spec, defaultRunStrategy);
   });
 
   if (sshSecretName) {
