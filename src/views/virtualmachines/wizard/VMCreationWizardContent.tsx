@@ -30,15 +30,16 @@ const VMCreationWizardContent: FC = () => {
   const closeWizard = useCloseWizard();
 
   const { control } = useVMWizardForm();
-  const creationMethod = useWatch({
+  const [creationMethod, project] = useWatch({
     control,
-    name: 'creationMethod',
+    name: ['creationMethod', 'deployment.project'],
   });
 
   const { currentStep, setCurrentStep, setIsTemplateDrawerOpen } = useVMWizardState();
 
   const generationCoordinator = useVMGenerationCoordinator();
   const navItemConfig = useVMGenerationNavClick(creationMethod, generationCoordinator);
+  const { defaultNadError, defaultNadName } = generationCoordinator;
 
   const { finalizeDraft } = useWizardVMDraft();
   const hasLoggedCreationStartedRef = useRef(false);
@@ -46,10 +47,13 @@ const VMCreationWizardContent: FC = () => {
   const stepsToDisplay: VMWizardStepDisplay[] = useMemo(
     () =>
       getStepsToDisplayByCreationMethod({
+        defaultNadError,
+        defaultNadName,
         navItemConfig,
+        project,
         t,
       })[creationMethod as VMCreationMethod].toSorted((a, b) => a.displayIndex - b.displayIndex),
-    [navItemConfig, creationMethod, t],
+    [creationMethod, defaultNadError, defaultNadName, navItemConfig, project, t],
   );
 
   const onStepChange = useCallback(

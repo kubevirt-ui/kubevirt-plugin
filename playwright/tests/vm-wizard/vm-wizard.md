@@ -369,7 +369,22 @@ Automated E2E coverage for console routes under `tests/vm-wizard/`.
 
 ---
 
-### `003`: hides Pod networking and selects available NAD when pod network is disallowed
+### `003`: reports a missing project default-network and blocks customization
+
+- **Objective:** show an actionable error instead of hanging when the configured project default NAD does not exist
+- **Target version:** CNV 5.1.0
+- **Jira References:** CNV-101414
+- **Pre-conditions:** The project has `kubevirt.io/default-network` set to a NAD that does not exist in that project
+- **Tags:** @tier1
+
+| Step | Action                                 | Expected Result                                                                     |
+| :--- | :------------------------------------- | :---------------------------------------------------------------------------------- |
+| 1    | Navigate to the Compute resources step | An inline error identifies the missing NAD and affected project                     |
+| 2    | Inspect the Next button                | Next is aria-disabled and its tooltip explains that the default network is required |
+
+---
+
+### `004`: hides Pod networking and selects available NAD when pod network is disallowed
 
 - **Objective:** hides Pod networking and selects available NAD when pod network is disallowed
 - **Target version:** CNV 5.1.0
@@ -386,7 +401,7 @@ Automated E2E coverage for console routes under `tests/vm-wizard/`.
 
 ---
 
-### `004`: honors default-network and hides Pod networking when disallowed
+### `005`: honors default-network and hides Pod networking when disallowed
 
 - **Objective:** honors default-network and hides Pod networking when disallowed
 - **Target version:** CNV 5.1.0

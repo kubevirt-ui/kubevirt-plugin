@@ -32,6 +32,8 @@ import {
 } from '@virtualmachines/wizard/steps/InstanceTypesSteps/hooks/useGenerateVM/utils/getVMGenerationSource';
 
 export type UseGenerateVMResult = {
+  defaultNadError?: Error;
+  defaultNadName?: string;
   generateVM: () => V1VirtualMachine;
   generationSource: VMGenerationSource;
   ready: boolean;
@@ -53,7 +55,7 @@ const useGenerateVM = (autoLabelsLoading: boolean): UseGenerateVMResult => {
 
   const validNamespace = getValidNamespace(project);
   const [isUDNManagedNamespace] = useNamespaceUDN(validNamespace, cluster);
-  const { loaded, vmCreationNad } = useProjectDefaultNad({
+  const { defaultNadError, defaultNadName, loaded, vmCreationNad } = useProjectDefaultNad({
     cluster,
     namespaceName: validNamespace,
   });
@@ -139,9 +141,11 @@ const useGenerateVM = (autoLabelsLoading: boolean): UseGenerateVMResult => {
   });
 
   return {
+    defaultNadError,
+    defaultNadName,
     generateVM,
     generationSource,
-    ready: loaded && !autoLabelsLoading,
+    ready: loaded && !defaultNadError && !autoLabelsLoading,
   };
 };
 

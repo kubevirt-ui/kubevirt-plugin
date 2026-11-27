@@ -3,7 +3,7 @@ import { useFormState, useWatch } from 'react-hook-form';
 
 import { useKubevirtTranslation } from '@kubevirt-utils/hooks/useKubevirtTranslation';
 import { isEmpty } from '@kubevirt-utils/utils/utils';
-import { Button, Tooltip } from '@patternfly/react-core';
+import VMWizardNextButton from '@virtualmachines/wizard/components/VMWizardNextButton/VMWizardNextButton';
 import { useVMWizardForm } from '@virtualmachines/wizard/form/VMWizardFormProvider';
 import { useVMWizardState } from '@virtualmachines/wizard/state/useVMWizardState';
 import { VMWizardStep } from '@virtualmachines/wizard/utils/constants';
@@ -45,23 +45,17 @@ const VMNameConfirmationNextButton: FC<VMNameConfirmationNextButtonProps> = ({
 
   const disabledTooltip = getDisabledTooltipText(!isEmpty(project), isVmNameValid, t, vmName);
 
-  const nextButton = (
-    <Button
-      data-test={dataTest}
-      isAriaDisabled={isDisabled}
+  return (
+    <VMWizardNextButton
+      dataTest={dataTest}
+      disabledTooltip={disabledTooltip}
+      isDisabled={isDisabled}
       isLoading={isSubmitting}
-      onClick={isDisabled ? undefined : onClick}
-      variant="primary"
+      onClick={onClick}
     >
       {children}
-    </Button>
+    </VMWizardNextButton>
   );
-
-  if (isDisabled && !isSubmitting) {
-    return <Tooltip content={disabledTooltip}>{nextButton}</Tooltip>;
-  }
-
-  return nextButton;
 };
 
 export default VMNameConfirmationNextButton;

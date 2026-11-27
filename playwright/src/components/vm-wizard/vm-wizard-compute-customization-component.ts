@@ -238,6 +238,25 @@ export default class VmWizardComputeCustomizationComponent extends BaseComponent
     }
   }
 
+  async getDefaultNetworkErrorText(): Promise<string | null> {
+    const alert = this.page.getByTestId('default-network-error-alert');
+    await alert.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+    return (await alert.textContent())?.trim() ?? null;
+  }
+
+  async getWizardNextButtonState(): Promise<{
+    isAriaDisabled: boolean;
+    tooltipText: string | null;
+  }> {
+    const nextButton = this.page.getByTestId('wizard-next-button');
+    await nextButton.waitFor({ state: 'visible', timeout: TestTimeouts.UI_ELEMENT_VISIBILITY });
+
+    return {
+      isAriaDisabled: (await nextButton.getAttribute('aria-disabled')) === 'true',
+      tooltipText: await this.getAriaDisabledTooltipText(nextButton),
+    };
+  }
+
   async getCustomizationVmName(): Promise<string> {
     try {
       const hostname = this.locator('button').filter({ hasText: /^[a-z0-9-]+$/ });
