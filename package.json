@@ -148,7 +148,8 @@
       "@openshift-console/dynamic-plugin-sdk": "4.23.0-prerelease.5",
       "react-i18next": "~16.5.8"
     },
-    "delaunator": "4.0.1"
+    "delaunator": "4.0.1",
+    "follow-redirects": ">=1.16.1"
   },
   "private": true,
   "scripts": {
