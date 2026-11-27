@@ -110,6 +110,17 @@ export class JiraClient {
   getProjectVersions = async (projectKey: string): Promise<JiraVersion[]> =>
     this.request<JiraVersion[]>(`/project/${projectKey}/versions`);
 
+  /**
+   * Update an issue (`PUT /issue/{key}`, 204). `update` carries incremental operations such as
+   * `components: [{ add: { name } }]`, which never remove existing values.
+   */
+  updateIssue = async (
+    issueKey: string,
+    body: { fields?: Record<string, unknown>; update?: Record<string, unknown> },
+  ): Promise<void> => {
+    await this.request<void>(`/issue/${issueKey}`, { body, method: 'PUT' });
+  };
+
   constructor(config: JiraConfig) {
     this.baseUrl = config.baseUrl.replace(/\/$/, '');
     this.authHeader = `Basic ${config.token}`;

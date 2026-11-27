@@ -110,6 +110,12 @@
       "workflow": ".github/workflows/pr-commands.yml"
     },
     {
+      "command": "/autofix",
+      "description": "Run PR Autofix: pushes ESLint fixes (and Cursor-verified lint/unit-test fixes when AUTOFIX_API_KEY is set) as kubevirt-plugin-bot, fills in a missing Jira Component / empty Fix Version, and comments a summary. Never pushes to a PR with lgtm/approved. Root OWNERS only.",
+      "trust": "owners",
+      "workflow": ".github/workflows/pr-autofix.yml"
+    },
+    {
       "command": "/clone",
       "description": "Cherry-pick this PR to another release branch once merged (root OWNERS approvers only).",
       "trust": "owners-approvers",
