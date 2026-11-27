@@ -2,6 +2,7 @@ import { useState } from 'react';
 
 import { CONSOLE_USER_SETTINGS } from '@kubevirt-utils/hooks/consoleUserSettings/useConsoleUserSettingLocalStorage/consts';
 import { operatorNamespaceSignal } from '@kubevirt-utils/store/operatorNamespace';
+import useIsACMPage from '@multicluster/useIsACMPage';
 import { k8sGet, useUserPreference } from '@openshift-console/dynamic-plugin-sdk';
 import { useHubClusterName } from '@stolostron/multicluster-sdk';
 import { act, renderHook, waitFor } from '@testing-library/react';
@@ -31,6 +32,11 @@ jest.mock('@stolostron/multicluster-sdk', () => ({
   useHubClusterName: jest.fn(),
 }));
 
+jest.mock('@multicluster/useIsACMPage', () => ({
+  __esModule: true,
+  default: jest.fn(),
+}));
+
 jest.mock('js-sha256', () => ({
   sha256: (value: string) => `hash-${value}`,
 }));
@@ -38,10 +44,8 @@ jest.mock('js-sha256', () => ({
 const mockedUseUserPreference = useUserPreference as jest.Mock;
 const mockedK8sGet = k8sGet as jest.Mock;
 const mockedUseHubClusterName = useHubClusterName as jest.Mock;
+const mockedUseIsACMPage = useIsACMPage as jest.Mock;
 const HUB = 'local-cluster';
-const NO_FLEET_ERROR = new Error(
-  'A version of RHACM that is compatible with the multicluster SDK is not available',
-);
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const sdk = require('@openshift-console/dynamic-plugin-sdk');
 
@@ -121,7 +125,8 @@ beforeEach(() => {
   });
 
   mockK8sGet(new Error('not found'));
-  mockedUseHubClusterName.mockReturnValue([HUB, true, undefined]);
+  mockedUseIsACMPage.mockReturnValue(true);
+  mockedUseHubClusterName.mockReturnValue([HUB, true]);
 });
 
 describe('getUserPreferenceKey', () => {
@@ -219,7 +224,7 @@ describe('useKubevirtUserSettings ssh key resolution across local, hub and spoke
   });
 
   it('honours a renamed hub cluster', async () => {
-    mockedUseHubClusterName.mockReturnValue(['my-renamed-hub', true, undefined]);
+    mockedUseHubClusterName.mockReturnValue(['my-renamed-hub', true]);
     store['kubevirt.ssh'] = { ns1: 'secret1' };
 
     const { result } = renderHook(() => useKubevirtUserSettings('ssh', 'my-renamed-hub'));
@@ -228,8 +233,8 @@ describe('useKubevirtUserSettings ssh key resolution across local, hub and spoke
     expect(result.current[0]).toEqual({ ns1: 'secret1' });
   });
 
-  it('is not loaded and hides the value while the hub cluster name is resolving', async () => {
-    mockedUseHubClusterName.mockReturnValue([undefined, false, undefined]);
+  it('on ACM pages, is not loaded and hides the value while the hub cluster name is resolving', async () => {
+    mockedUseHubClusterName.mockReturnValue([undefined, false]);
     store[`kubevirt.ssh.${HUB}`] = { ns1: 'stale' };
 
     const { result } = renderHook(() => useKubevirtUserSettings('ssh', HUB));
@@ -241,8 +246,27 @@ describe('useKubevirtUserSettings ssh key resolution across local, hub and spoke
     expect(result.current[2]).toBe(false);
   });
 
+  it('on ACM pages, resolves the value once the hub cluster name is loaded', async () => {
+    mockedUseHubClusterName.mockReturnValue([undefined, false]);
+    store['kubevirt.ssh'] = { ns1: 'secret1' };
+
+    const { rerender, result } = renderHook(() => useKubevirtUserSettings('ssh', HUB));
+    await act(async () => {
+      await Promise.resolve();
+    });
+
+    expect(result.current[0]).toBeUndefined();
+    expect(result.current[2]).toBe(false);
+
+    mockedUseHubClusterName.mockReturnValue([HUB, true]);
+    rerender();
+
+    await waitFor(() => expect(result.current[2]).toBe(true));
+    expect(result.current[0]).toEqual({ ns1: 'secret1' });
+  });
+
   it('does not wait for the hub cluster name when no cluster is passed', async () => {
-    mockedUseHubClusterName.mockReturnValue([undefined, false, undefined]);
+    mockedUseHubClusterName.mockReturnValue([undefined, false]);
     store['kubevirt.ssh'] = { ns1: 'secret1' };
 
     const { result } = renderHook(() => useKubevirtUserSettings('ssh'));
@@ -252,7 +276,8 @@ describe('useKubevirtUserSettings ssh key resolution across local, hub and spoke
   });
 
   it('uses kubevirt.ssh on standalone (non-ACM) clusters', async () => {
-    mockedUseHubClusterName.mockReturnValue([undefined, false, NO_FLEET_ERROR]);
+    mockedUseIsACMPage.mockReturnValue(false);
+    mockedUseHubClusterName.mockReturnValue([undefined, false]);
     store['kubevirt.ssh'] = { ns1: 'secret1' };
 
     const { result } = renderHook(() => ({
@@ -266,8 +291,19 @@ describe('useKubevirtUserSettings ssh key resolution across local, hub and spoke
     expect(result.current.empty[2]).toBe(true);
   });
 
+  it('on non-ACM pages, does not wait for a hub cluster name that never loads', async () => {
+    mockedUseIsACMPage.mockReturnValue(false);
+    mockedUseHubClusterName.mockReturnValue([undefined, false]);
+    store['kubevirt.ssh.spoke-1'] = { ns1: 'secret1' };
+
+    const { result } = renderHook(() => useKubevirtUserSettings('ssh', 'spoke-1'));
+    await waitFor(() => expect(result.current[2]).toBe(true));
+
+    expect(result.current[0]).toEqual({ ns1: 'secret1' });
+  });
+
   it('does not wait for the hub cluster name for non ssh settings', async () => {
-    mockedUseHubClusterName.mockReturnValue([undefined, false, undefined]);
+    mockedUseHubClusterName.mockReturnValue([undefined, false]);
     store['kubevirt.columns'] = { vms: ['name'] };
 
     const { result } = renderHook(() => useKubevirtUserSettings('columns', 'spoke-1'));

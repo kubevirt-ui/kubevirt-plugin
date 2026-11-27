@@ -1,5 +1,6 @@
 import { type Dispatch, type SetStateAction } from 'react';
 
+import useIsACMPage from '@multicluster/useIsACMPage';
 import { useUserPreference } from '@openshift-console/dynamic-plugin-sdk';
 import { useSignals } from '@preact/signals-react/runtime';
 import { useHubClusterName } from '@stolostron/multicluster-sdk';
@@ -34,15 +35,12 @@ const useKubevirtUserSettings = <K extends keyof UserSettingsState>(
   cluster?: string,
 ): KubevirtUserSettingResult<UserSettingsState[K]> => {
   useSignals();
-  const [hubClusterName, hubClusterLoaded, hubClusterError] = useHubClusterName() as [
-    string | undefined,
-    boolean,
-    unknown,
-  ];
+  const isACMPage = useIsACMPage();
+  const [hubClusterName, hubClusterLoaded] = useHubClusterName();
 
-  // Without ACM, useHubClusterName never loads and reports an error, so this only waits on ACM.
+  // Without ACM, useHubClusterName never loads, so only wait for it on ACM pages.
   const waitingForHubClusterName =
-    key === USER_SETTINGS_KEYS.ssh && Boolean(cluster) && !hubClusterLoaded && !hubClusterError;
+    isACMPage && key === USER_SETTINGS_KEYS.ssh && Boolean(cluster) && !hubClusterLoaded;
 
   const preferenceKey = getUserPreferenceKey(key, cluster, hubClusterName);
 
