@@ -1,5 +1,6 @@
 import type { Octokit } from '@octokit/rest';
 
+import { executeAutofix } from './autofix';
 import { executeCancelE2E } from './cancel-e2e';
 import { executeCleanupConsole } from './cleanup-manual-console-dispatch';
 import { executeClone } from './clone-handler';
@@ -82,6 +83,12 @@ export const COMMANDS: CommandConfig[] = [
     execute: executeCleanupConsole,
     name: 'cleanup-manual-console',
     pattern: /(^|\s)\/cleanup-manual-console(\s|$)/,
+    requiresTrust: true,
+  },
+  {
+    execute: executeAutofix,
+    name: 'autofix',
+    pattern: /(^|\s)\/autofix(\s|$)/,
     requiresTrust: true,
   },
   {

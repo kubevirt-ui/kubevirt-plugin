@@ -1,0 +1,179 @@
+name: PR Autofix
+
+# Command-only: a root OWNER comments /autofix (dispatched by pr-commands.yml) or dispatches it by
+# hand. NOT pull_request_target / workflow_run. Setup and safety model: workflows/README.md.
+#   fix    PR code runs here. Read-only token, NO Jira token, NO bot key. AUTOFIX_API_KEY exists only
+#          in the Cursor step, which runs only when the PR author is in root OWNERS.
+#   apply  Default-branch code only (never PR code). Holds the bot key and Jira token. Treats the
+#          patches as data: gate -> commit -> push -> Jira -> one summary comment.
+on:
+  workflow_dispatch:
+    inputs:
+      pr_number: { description: 'PR number to autofix', required: true, type: string }
+      triggered_by: { description: 'Set by /autofix; empty = the dispatching user', default: '' }
+
+concurrency:
+  group: pr-autofix-${{ inputs.pr_number }}
+  cancel-in-progress: false
+
+permissions: {}
+
+jobs:
+  fix:
+    name: Fix
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    permissions: { contents: read, pull-requests: read }
+    # Step outcomes are runner-held, so PR code cannot forge them (unlike files in the artifact).
+    outputs:
+      ai_status: ${{ steps.cursor.outputs.status }}
+      ai_verify: ${{ steps.verify2.outcome }}
+      head_sha: ${{ steps.prepare.outputs.head_sha }}
+      lint_verify: ${{ steps.verify1.outcome }}
+      trusted: ${{ steps.prepare.outputs.trusted }}
+    env:
+      OUT_DIR: ${{ github.workspace }}/out
+      PR_DIR: ${{ github.workspace }}/pr
+      PR_NUMBER: ${{ inputs.pr_number }}
+    steps:
+      - name: Checkout PR head
+        uses: actions/checkout@v7
+        with:
+          ref: refs/pull/${{ inputs.pr_number }}/head
+          path: pr
+          persist-credentials: false
+      - name: Checkout trusted default-branch scripts
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          path: trusted
+          sparse-checkout: .github/scripts
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+      - name: Install trusted script dependencies
+        working-directory: trusted/.github/scripts
+        run: npm ci
+      # Trust check, removes nested agent config (.cursor, AGENTS.md, ...), baseline commit.
+      - name: Prepare
+        id: prepare
+        working-directory: trusted/.github/scripts
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          OWNERS_FILE: ${{ github.workspace }}/trusted/OWNERS
+          TRIGGERED_BY: ${{ inputs.triggered_by }}
+        run: npx tsx src/pr-autofix/gate.ts prepare
+      - name: Install PR dependencies (no lifecycle scripts)
+        working-directory: pr
+        run: npm ci --ignore-scripts
+      - name: ESLint --fix on PR files (deterministic)
+        continue-on-error: true
+        working-directory: pr
+        run: xargs -r -d '\n' -a "$OUT_DIR/files.txt" npx --no-install eslint --fix --no-warn-ignored --
+      - name: Capture deterministic patch
+        working-directory: trusted/.github/scripts
+        run: npx tsx src/pr-autofix/gate.ts capture lint
+      - name: Verify (ESLint + related tests)
+        id: verify1
+        continue-on-error: true
+        working-directory: pr
+        run: |
+          rc=0
+          xargs -r -d '\n' -a "$OUT_DIR/files.txt" npx --no-install eslint --no-warn-ignored -- >"$OUT_DIR/verify-1.log" 2>&1 || rc=1
+          xargs -r -d '\n' -a "$OUT_DIR/files.txt" npx --no-install jest --passWithNoTests --findRelatedTests >>"$OUT_DIR/verify-1.log" 2>&1 || rc=1
+          tail -n 60 "$OUT_DIR/verify-1.log"
+          exit "$rc"
+      # The ONLY step that sees the API key. A missing key or installer outage ends in a status
+      # output, never a failure, so deterministic fixes and Jira still run.
+      - name: Cursor fixes (trusted authors only)
+        id: cursor
+        if: steps.verify1.outcome == 'failure' && steps.prepare.outputs.trusted == 'true'
+        continue-on-error: true
+        working-directory: trusted/.github/scripts
+        env:
+          AUTOFIX_API_KEY: ${{ secrets.AUTOFIX_API_KEY }}
+          AUTOFIX_MODEL: ${{ vars.AUTOFIX_MODEL || 'composer-2.5' }}
+        run: npx tsx src/pr-autofix/cursor.ts
+      - name: Verify AI result (ESLint + related tests + tsc)
+        id: verify2
+        if: steps.cursor.outputs.status == 'ok'
+        continue-on-error: true
+        working-directory: pr
+        run: |
+          rc=0
+          xargs -r -d '\n' -a "$OUT_DIR/files.txt" npx --no-install eslint --no-warn-ignored -- >"$OUT_DIR/verify-2.log" 2>&1 || rc=1
+          xargs -r -d '\n' -a "$OUT_DIR/files.txt" npx --no-install jest --passWithNoTests --findRelatedTests >>"$OUT_DIR/verify-2.log" 2>&1 || rc=1
+          npx --no-install tsc --noEmit >>"$OUT_DIR/verify-2.log" 2>&1 || rc=1
+          tail -n 60 "$OUT_DIR/verify-2.log"
+          exit "$rc"
+      - name: Capture AI patch
+        if: steps.cursor.outputs.status == 'ok'
+        working-directory: trusted/.github/scripts
+        run: npx tsx src/pr-autofix/gate.ts capture ai
+      - name: Upload patches
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: pr-autofix-patches
+          path: |
+            ${{ github.workspace }}/out/lint.patch
+            ${{ github.workspace }}/out/ai.patch
+          retention-days: 3
+          if-no-files-found: ignore
+
+  apply:
+    name: Apply
+    needs: fix
+    if: always() && needs.fix.result != 'cancelled'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions: { contents: read, issues: write, pull-requests: write }
+    steps:
+      - name: Checkout default branch
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          persist-credentials: false
+      # contents: write lets the bot push to the PR branch (and re-triggers Code Checks).
+      - name: Generate bot token
+        id: bot-token
+        continue-on-error: true
+        uses: actions/create-github-app-token@v3
+        with:
+          app-id: ${{ secrets.BOT_APP_ID }}
+          private-key: ${{ secrets.BOT_APP_PRIVATE_KEY }}
+          permission-contents: write
+          permission-issues: write
+          permission-pull-requests: write
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: .github/scripts/package-lock.json
+      - name: Install script dependencies
+        working-directory: .github/scripts
+        run: npm ci
+      - name: Download patches
+        continue-on-error: true
+        uses: actions/download-artifact@v8
+        with:
+          name: pr-autofix-patches
+          path: ${{ runner.temp }}/patches
+      - name: Gate, push, update Jira, comment
+        working-directory: .github/scripts
+        env:
+          AI_STATUS: ${{ needs.fix.outputs.ai_status }}
+          AI_VERIFY: ${{ needs.fix.outputs.ai_verify }}
+          BOT_TOKEN: ${{ steps.bot-token.outputs.token }}
+          FIX_RESULT: ${{ needs.fix.result }}
+          GITHUB_TOKEN: ${{ github.token }}
+          HEAD_SHA: ${{ needs.fix.outputs.head_sha }}
+          JIRA_TOKEN: ${{ secrets.JIRA_TOKEN }}
+          LINT_VERIFY: ${{ needs.fix.outputs.lint_verify }}
+          PR_NUMBER: ${{ inputs.pr_number }}
+          RESULT_DIR: ${{ runner.temp }}/patches
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          TRIGGERED_BY: ${{ inputs.triggered_by }}
+          TRUSTED: ${{ needs.fix.outputs.trusted }}
+        run: npx tsx src/pr-autofix/apply.ts
