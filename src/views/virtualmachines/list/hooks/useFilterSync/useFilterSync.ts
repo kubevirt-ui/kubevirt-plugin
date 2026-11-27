@@ -22,13 +22,16 @@ import {
  * Unified hook that handles bidirectional sync between the URL path
  * (namespace/cluster) and the toolbar's project/cluster filter state.
  *
- * Two directions:
+ * Three directions:
  *  1. Tree view click changes the path → sync toolbar filter state to match.
  *  2. Toolbar filter change creates a mismatch → broaden the URL path (e.g. query params have
  *     multiple projects, but the URL path is /ns/project1 → broaden the URL path to /all-namespaces).
  *
  * A `pathChangedAutomaticallyRef` ref prevents the broadening navigation
  * from triggering an unwanted filter-state reset on the next render.
+ *
+ * `lastSyncedFleetUrlFilterKeyRef` avoids calling `onSetFilters` on every effect run
+ * when the fleet URL query filters did not change (direction 2).
  */
 const useFilterSync = (onSetFilters: OnSetFilters): void => {
   const navigate = useNavigate();
@@ -43,6 +46,7 @@ const useFilterSync = (onSetFilters: OnSetFilters): void => {
     namespace,
   });
   const pathChangedAutomaticallyRef = useRef(false);
+  const lastSyncedFleetUrlFilterKeyRef = useRef('');
 
   useEffect(() => {
     const prev = prevFilterSyncRef.current;
@@ -61,6 +65,7 @@ const useFilterSync = (onSetFilters: OnSetFilters): void => {
     }
 
     if (pathChanged) {
+      lastSyncedFleetUrlFilterKeyRef.current = '';
       onSetFilters({
         [CLUSTER_LIST_FILTER_TYPE]: cluster ? [cluster] : clusterFilterValues,
         [PROJECT_LIST_FILTER_TYPE]: namespace ? [namespace] : projectFilterValues,
