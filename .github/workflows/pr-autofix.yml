@@ -93,7 +93,7 @@ jobs:
         working-directory: trusted/.github/scripts
         env:
           AUTOFIX_API_KEY: ${{ secrets.AUTOFIX_API_KEY }}
-          AUTOFIX_MODEL: ${{ vars.AUTOFIX_MODEL }}
+          AUTOFIX_MODEL: ${{ vars.AUTOFIX_MODEL || 'composer-2.5' }}
         run: npx tsx src/pr-autofix/cursor.ts
       - name: Verify AI result (ESLint + related tests + tsc)
         id: verify2

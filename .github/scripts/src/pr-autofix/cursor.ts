@@ -13,6 +13,12 @@ import { capUtf8, fenceUntrusted, LIMITS } from './policy';
 const INSTALL_COMMAND = 'curl https://cursor.com/install -fsS | bash';
 const RUN_TIMEOUT = '20m';
 
+/** Cursor CLI model id (`agent --list-models`). Override with repo variable `AUTOFIX_MODEL`. */
+export const DEFAULT_AUTOFIX_MODEL = 'composer-2.5';
+
+export const resolveAutofixModel = (): string =>
+  process.env.AUTOFIX_MODEL?.trim() || DEFAULT_AUTOFIX_MODEL;
+
 export type CursorStatus = 'failed' | 'install-failed' | 'no-key' | 'ok' | 'timeout';
 
 const INSTRUCTIONS = [
@@ -37,7 +43,8 @@ const finish = (status: CursorStatus): void => {
 };
 
 const run = (): void => {
-  const { AUTOFIX_API_KEY: key = '', AUTOFIX_MODEL: model = '', HOME: home = '' } = process.env;
+  const { AUTOFIX_API_KEY: key = '', HOME: home = '' } = process.env;
+  const model = resolveAutofixModel();
   if (!key) {
     return finish('no-key');
   }
@@ -60,7 +67,7 @@ const run = (): void => {
   if (installed.status !== 0 || !bin) {
     return finish('install-failed');
   }
-  const modelArgs = model ? ['--model', model] : [];
+  const modelArgs = ['--model', model];
   const agent = spawnSync(
     'timeout',
     ['--kill-after=30s', RUN_TIMEOUT, bin, '-p', '--force', ...modelArgs, prompt],

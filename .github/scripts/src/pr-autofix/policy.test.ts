@@ -5,7 +5,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, it } from 'node:test';
 
-import { buildPrompt } from './cursor';
+import { DEFAULT_AUTOFIX_MODEL, buildPrompt, resolveAutofixModel } from './cursor';
 import { gatePatch, neutralizeAgentConfigs } from './gate';
 import {
   type PatchSummary,
@@ -74,6 +74,32 @@ describe('evaluatePolicy', () => {
     assert.match(problems({}, { labels: ['approved'] }), /`approved` label/);
     assert.match(problems({}, { state: 'closed' }), /PR is closed/);
     assert.match(problems({}, { headIsBot: true }), /bot/);
+  });
+});
+
+describe('resolveAutofixModel', () => {
+  it('defaults to Composer 2.5 when AUTOFIX_MODEL is unset or blank', () => {
+    const previous = process.env.AUTOFIX_MODEL;
+    delete process.env.AUTOFIX_MODEL;
+    assert.equal(resolveAutofixModel(), DEFAULT_AUTOFIX_MODEL);
+    process.env.AUTOFIX_MODEL = '   ';
+    assert.equal(resolveAutofixModel(), DEFAULT_AUTOFIX_MODEL);
+    if (previous === undefined) {
+      delete process.env.AUTOFIX_MODEL;
+    } else {
+      process.env.AUTOFIX_MODEL = previous;
+    }
+  });
+
+  it('honours a non-empty AUTOFIX_MODEL', () => {
+    const previous = process.env.AUTOFIX_MODEL;
+    process.env.AUTOFIX_MODEL = 'opus-4.1';
+    assert.equal(resolveAutofixModel(), 'opus-4.1');
+    if (previous === undefined) {
+      delete process.env.AUTOFIX_MODEL;
+    } else {
+      process.env.AUTOFIX_MODEL = previous;
+    }
   });
 });
 

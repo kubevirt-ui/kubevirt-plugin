@@ -59,7 +59,7 @@ Sensitive-path review uses `/ai-approved`, `/ci-approved`, and `/i18n-approved` 
 
 `pr-autofix.yml` is command-only (root OWNERS comment `/autofix`, or manual dispatch); it has no `pull_request_target`/`workflow_run` trigger. The `fix` job (PR code, read-only token, no Jira/bot secrets) runs `eslint --fix`, verifies with ESLint + related Jest, and, only for PR authors in root `OWNERS`, lets Cursor fix what is left (re-verified with ESLint, Jest, `tsc`). The `apply` job (default-branch code only) gates the patch (≤10 files / ≤200 lines, no `.github/`, `locales/`, agent config, lockfiles or check-silencing edits, no `lgtm`/`approved` PR), pushes it as `kubevirt-plugin-bot`, fills a missing Jira Component and empty Fix Version (never overwrites; honours `skip-jira-check`), and posts one summary comment.
 
-Setup: repo secret `AUTOFIX_API_KEY` (a Cursor API key; without it only the deterministic ESLint fixes and Jira run), optional repo variable `AUTOFIX_MODEL`. Reuses `BOT_APP_ID`/`BOT_APP_PRIVATE_KEY` and `JIRA_TOKEN`.
+Setup: repo secret `AUTOFIX_API_KEY` (a Cursor API key; without it only the deterministic ESLint fixes and Jira run), optional repo variable `AUTOFIX_MODEL` (defaults to `composer-2.5`). Reuses `BOT_APP_ID`/`BOT_APP_PRIVATE_KEY` and `JIRA_TOKEN`.
 
 ## Cluster lifecycle & manual console
 
